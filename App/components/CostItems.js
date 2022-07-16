@@ -1,23 +1,33 @@
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, Pressable } from "react-native";
 
-function CostItem(props) {
+function CostItems(props) {
   return (
-    <View style={styles.costItem}>
-      <Text style={styles.goalText}>{props.text}</Text>
+    <View style={styles.goalItem}>
+      <Pressable
+        android_ripple={{ color: "#210644" }}
+        onPress={props.onDeleteItem.bind(this, props.id)}
+        style={(pressable) => pressable.pressed && styles.pressedItem}
+      >
+        <Text style={styles.goalText}>{props.text}</Text>
+      </Pressable>
     </View>
   );
 }
 
-export default CostItem;
+export default CostItems;
 
 const styles = StyleSheet.create({
-  costItem: {
+  goalItem: {
     margin: 8,
-    padding: 8,
     borderRadius: 6,
-    backgroundColor: "#5e0acc",
+    backgroundColor: "#2241d8",
+  },
+  pressedItem: {
+    color: "black",
+    opacity: 0.5,
   },
   goalText: {
     color: "white",
+    padding: 8,
   },
 });

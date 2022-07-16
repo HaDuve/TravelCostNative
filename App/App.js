@@ -1,6 +1,6 @@
 import { StyleSheet, View, FlatList } from "react-native";
 import { useState } from "react";
-import CostItem from "./components/CostItems";
+import CostItems from "./components/CostItems";
 import CostInput from "./components/CostInputs";
 
 export default function App() {
@@ -13,6 +13,12 @@ export default function App() {
     ]);
   }
 
+  function deleteCostHandler(id) {
+    setCourseCosts((currentCourseCosts) => {
+      return currentCourseCosts.filter((cost) => cost.id !== id);
+    });
+  }
+
   return (
     <View style={styles.appContainer}>
       <CostInput onAddGoal={addCostHandler}></CostInput>
@@ -20,7 +26,13 @@ export default function App() {
         <FlatList
           data={courseCosts}
           renderItem={(itemData) => {
-            return <CostItem text={itemData.item.text} />;
+            return (
+              <CostItems
+                text={itemData.item.text}
+                id={itemData.item.id}
+                onDeleteItem={deleteCostHandler}
+              />
+            );
           }}
           keyExtractor={(item, index) => {
             return item.id;

@@ -2,6 +2,7 @@ import { StyleSheet, View, FlatList, Button } from "react-native";
 import { useState } from "react";
 import CostItems from "./components/CostItems";
 import CostInput from "./components/CostInputs";
+import { StatusBar } from "expo-status-bar";
 
 export default function App() {
   const [modalIsVisible, setModalIsVisible] = useState(false);
@@ -30,35 +31,38 @@ export default function App() {
   }
 
   return (
-    <View style={styles.appContainer}>
-      <Button
-        title="Add new Goal"
-        color="#2241d8"
-        onPress={startAddGoalHandler}
-      ></Button>
-      <CostInput
-        visible={modalIsVisible}
-        onAddGoal={addCostHandler}
-        onCancel={endAddGoalHandler}
-      ></CostInput>
-      <View style={styles.goalsContainer}>
-        <FlatList
-          data={courseCosts}
-          renderItem={(itemData) => {
-            return (
-              <CostItems
-                text={itemData.item.text}
-                id={itemData.item.id}
-                onDeleteItem={deleteCostHandler}
-              />
-            );
-          }}
-          keyExtractor={(item, index) => {
-            return item.id;
-          }}
-        />
+    <>
+      <StatusBar style="light"></StatusBar>
+      <View style={styles.appContainer}>
+        <Button
+          title="Add new Goal"
+          color="#ddc1f0"
+          onPress={startAddGoalHandler}
+        ></Button>
+        <CostInput
+          visible={modalIsVisible}
+          onAddGoal={addCostHandler}
+          onCancel={endAddGoalHandler}
+        ></CostInput>
+        <View style={styles.goalsContainer}>
+          <FlatList
+            data={courseCosts}
+            renderItem={(itemData) => {
+              return (
+                <CostItems
+                  text={itemData.item.text}
+                  id={itemData.item.id}
+                  onDeleteItem={deleteCostHandler}
+                />
+              );
+            }}
+            keyExtractor={(item, index) => {
+              return item.id;
+            }}
+          />
+        </View>
       </View>
-    </View>
+    </>
   );
 }
 

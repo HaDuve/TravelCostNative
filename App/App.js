@@ -1,10 +1,15 @@
-import { StyleSheet, View, FlatList } from "react-native";
+import { StyleSheet, View, FlatList, Button } from "react-native";
 import { useState } from "react";
 import CostItems from "./components/CostItems";
 import CostInput from "./components/CostInputs";
 
 export default function App() {
+  const [modalIsVisible, setModalIsVisible] = useState(false);
   const [courseCosts, setCourseCosts] = useState([]);
+
+  function startAddGoalHandler() {
+    setModalIsVisible(true);
+  }
 
   function addCostHandler(enteredCostText) {
     setCourseCosts((currentCourseCosts) => [
@@ -21,7 +26,15 @@ export default function App() {
 
   return (
     <View style={styles.appContainer}>
-      <CostInput onAddGoal={addCostHandler}></CostInput>
+      <Button
+        title="Add new Goal"
+        color="#2241d8"
+        onPress={startAddGoalHandler}
+      ></Button>
+      <CostInput
+        visible={modalIsVisible}
+        onAddGoal={addCostHandler}
+      ></CostInput>
       <View style={styles.goalsContainer}>
         <FlatList
           data={courseCosts}

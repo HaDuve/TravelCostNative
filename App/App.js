@@ -11,11 +11,16 @@ export default function App() {
     setModalIsVisible(true);
   }
 
+  function endAddGoalHandler() {
+    setModalIsVisible(false);
+  }
+
   function addCostHandler(enteredCostText) {
     setCourseCosts((currentCourseCosts) => [
       ...currentCourseCosts,
       { text: enteredCostText, id: Math.random().toString() },
     ]);
+    endAddGoalHandler();
   }
 
   function deleteCostHandler(id) {
@@ -34,6 +39,7 @@ export default function App() {
       <CostInput
         visible={modalIsVisible}
         onAddGoal={addCostHandler}
+        onCancel={endAddGoalHandler}
       ></CostInput>
       <View style={styles.goalsContainer}>
         <FlatList

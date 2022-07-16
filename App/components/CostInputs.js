@@ -3,7 +3,6 @@ import { Modal, View, TextInput, Button, StyleSheet } from "react-native";
 
 function CostInput(props) {
   const [enteredGoalText, setEnteredGoalText] = useState("");
-
   function goalInputHandler(enteredText) {
     setEnteredGoalText(enteredText);
   }
@@ -27,7 +26,7 @@ function CostInput(props) {
             <Button title="Add Goal" onPress={addGoalHandler} />
           </View>
           <View style={styles.button}>
-            <Button title="Cancel" onPress={addGoalHandler} />
+            <Button title="Cancel" onPress={props.onCancel} />
           </View>
         </View>
       </View>
@@ -43,10 +42,8 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 26,
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#cccccc",
   },
   textInput: {
     borderWidth: 1,
@@ -57,6 +54,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
+    marginTop: 8,
   },
   button: {
     width: "30%",

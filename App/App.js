@@ -1,35 +1,31 @@
-import { StyleSheet, Text, View, TextInput, Button } from "react-native";
+import { StyleSheet, View, FlatList } from "react-native";
 import { useState } from "react";
+import CostItem from "./components/CostItems";
+import CostInput from "./components/CostInputs";
 
 export default function App() {
-  const [enteredCostText, setEnteredCostText] = useState("");
   const [courseCosts, setCourseCosts] = useState([]);
-  function goalInputHandler(enteredText) {
-    setEnteredCostText(enteredText);
-  }
-  function addCostHandler() {
+
+  function addCostHandler(enteredCostText) {
     setCourseCosts((currentCourseCosts) => [
       ...currentCourseCosts,
-      enteredCostText,
+      { text: enteredCostText, id: Math.random().toString() },
     ]);
   }
 
   return (
     <View style={styles.appContainer}>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.textInput}
-          placeholder="Your new Cost!"
-          onChangeText={goalInputHandler}
-        ></TextInput>
-        <Button title="New Cost" onPress={addCostHandler}></Button>
-      </View>
+      <CostInput onAddGoal={addCostHandler}></CostInput>
       <View style={styles.goalsContainer}>
-        {courseCosts.map((cost) => (
-          <View key={cost} style={styles.costItem}>
-            <Text style={styles.costText}>{cost}</Text>
-          </View>
-        ))}
+        <FlatList
+          data={courseCosts}
+          renderItem={(itemData) => {
+            return <CostItem text={itemData.item.text} />;
+          }}
+          keyExtractor={(item, index) => {
+            return item.id;
+          }}
+        />
       </View>
     </View>
   );
@@ -39,35 +35,9 @@ const styles = StyleSheet.create({
   appContainer: {
     flex: 1,
     paddingTop: 50,
-    paddingHorizontal: 16,
-  },
-  inputContainer: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: "#cccccc",
-  },
-  textInput: {
-    borderColor: "#cccccc",
-    borderWidth: 1,
-    width: "70%",
-    marginRight: 10,
-    marginBottom: 10,
-    padding: 8,
+    paddingHorizontal: 18,
   },
   goalsContainer: {
     flex: 6,
-  },
-  costItem: {
-    margin: 8,
-    padding: 6,
-    backgroundColor: "#146bbdba",
-    borderRadius: 3,
-  },
-  costText: {
-    color: "white",
   },
 });

@@ -37,7 +37,7 @@ const ManageExpense = ({ route, navigation }) => {
       expenseCtx.addExpense({
         description: "Test",
         amount: 19.99,
-        date: new Date("2022-05-20"),
+        date: new Date(),
       });
     }
     navigation.goBack();

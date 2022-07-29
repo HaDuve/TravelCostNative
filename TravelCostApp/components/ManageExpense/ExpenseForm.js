@@ -3,6 +3,7 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 import Input from "./Input";
 import Button from "../UI/Button";
 import { getFormattedDate } from "../../util/date";
+import { GlobalStyles } from "../../constants/styles";
 
 const ExpenseForm = ({
   onCancel,
@@ -65,7 +66,7 @@ const ExpenseForm = ({
   }
 
   const formIsInvalid =
-    !inputs.amountIsValid ||
+    !inputs.amount.isValid ||
     !inputs.date.isValid ||
     !inputs.description.isValid;
 
@@ -81,6 +82,7 @@ const ExpenseForm = ({
             onChangeText: inputChangedHandler.bind(this, "amount"),
             value: inputs.amount.value,
           }}
+          invalid={!inputs.amount.isValid}
         />
         <Input
           style={styles.rowInput}
@@ -91,6 +93,7 @@ const ExpenseForm = ({
             onChangeText: inputChangedHandler.bind(this, "date"),
             value: inputs.date.value,
           }}
+          invalid={!inputs.date.isValid}
         />
       </View>
       <Input
@@ -100,9 +103,12 @@ const ExpenseForm = ({
           onChangeText: inputChangedHandler.bind(this, "description"),
           value: inputs.description.value,
         }}
+        invalid={!inputs.description.isValid}
       />
       {formIsInvalid && (
-        <Text>Invalid input values - please check your entered data!</Text>
+        <Text style={styles.errorText}>
+          Invalid input values - please check your entered data!
+        </Text>
       )}
       <View style={styles.buttonContainer}>
         <Button style={styles.button} mode="flat" onPress={onCancel}>
@@ -136,7 +142,11 @@ const styles = StyleSheet.create({
   rowInput: {
     flex: 1,
   },
-
+  errorText: {
+    textAlign: "center",
+    color: GlobalStyles.colors.error500,
+    margin: 8,
+  },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "center",

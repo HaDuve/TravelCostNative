@@ -3,6 +3,7 @@ import { StyleSheet, Text, TextInput, View } from "react-native";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 
 import Button from "../components/UI/Button";
+import ErrorOverlay from "../components/UI/ErrorOverlay";
 import IconButton from "../components/UI/IconButton";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { ExpensesContext } from "../store/expenses-context";
@@ -11,6 +12,7 @@ import { GlobalStyles } from "./../constants/styles";
 
 const ManageExpense = ({ route, navigation }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState();
   const expenseCtx = useContext(ExpensesContext);
 
   const editedExpenseId = route.params?.expenseId;
@@ -28,10 +30,14 @@ const ManageExpense = ({ route, navigation }) => {
 
   async function deleteExpenseHandler() {
     setIsSubmitting(true);
-    await deleteExpense(editedExpenseId);
-    expenseCtx.deleteExpense(editedExpenseId);
-    setIsSubmitting(false);
-    navigation.goBack();
+    try {
+      await deleteExpense(editedExpenseId);
+      expenseCtx.deleteExpense(editedExpenseId);
+      navigation.goBack();
+    } catch (error) {
+      setError("Could not delete expense - please try again later!");
+      setIsSubmitting(false);
+    }
   }
 
   function cancelHandler() {
@@ -40,15 +46,27 @@ const ManageExpense = ({ route, navigation }) => {
 
   async function confirmHandler(expenseData) {
     setIsSubmitting(true);
-    if (isEditing) {
-      expenseCtx.updateExpense(editedExpenseId, expenseData);
-      await updateExpense(editedExpenseId, expenseData);
-    } else {
-      const id = await storeExpense(expenseData);
-      expenseCtx.addExpense({ ...expenseData, id: id });
+    try {
+      if (isEditing) {
+        expenseCtx.updateExpense(editedExpenseId, expenseData);
+        await updateExpense(editedExpenseId, expenseData);
+      } else {
+        const id = await storeExpense(expenseData);
+        expenseCtx.addExpense({ ...expenseData, id: id });
+      }
+      navigation.goBack();
+    } catch (error) {
+      setError("Could not save data - please try again later!");
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
-    navigation.goBack();
+  }
+
+  function errorHandler() {
+    setError(null);
+  }
+
+  if (error && !isSubmitting) {
+    return <ErrorOverlay message={error} onConfirm={errorHandler} />;
   }
 
   if (isSubmitting) {

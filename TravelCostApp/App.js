@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
+import AppLoading from "expo-app-loading";
 
 import SignupScreen from "./screens/SignupScreen";
 import LoginScreen from "./screens/LoginScreen";
@@ -24,12 +25,13 @@ const AuthStack = createNativeStackNavigator();
 const BottomTabs = createBottomTabNavigator();
 
 function NotAuthenticatedStack() {
+  console.log("NotAuthenticatedStack");
   return (
     <AuthStack.Navigator
       screenOptions={{
-        headerStyle: { backgroundColor: Colors.primary500 },
+        headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
         headerTintColor: "white",
-        contentStyle: { backgroundColor: Colors.primary100 },
+        contentStyle: { backgroundColor: GlobalStyles.colors.primary100 },
       }}
     >
       <AuthStack.Screen name="Login" component={LoginScreen} />
@@ -39,6 +41,7 @@ function NotAuthenticatedStack() {
 }
 
 function AuthenticatedStack() {
+  console.log("AuthenticatedStack");
   return (
     <ExpensesContextProvider>
       <Stack.Navigator
@@ -76,6 +79,7 @@ function AuthNavigation() {
 }
 
 function ExpensesOverview(authCtx) {
+  console.log("ExpensesOverview");
   return (
     <BottomTabs.Navigator
       screenOptions={({ navigation }) => ({
@@ -122,6 +126,7 @@ function ExpensesOverview(authCtx) {
 }
 
 function Root() {
+  console.log("Root");
   const [isTryingLogin, setIsTryingLogin] = useState(true);
 
   const authCtx = useContext(AuthContext);

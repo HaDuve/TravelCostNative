@@ -17,7 +17,6 @@ function Input({
       </Text>
       <TextInput
         style={[styles.input, isInvalid && styles.inputInvalid]}
-        autoCapitalize={false}
         keyboardType={keyboardType}
         secureTextEntry={secure}
         onChangeText={onUpdateValue}
@@ -38,7 +37,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   labelInvalid: {
-    color: Colors.error500,
+    color: GlobalStyles.colors.error500,
   },
   input: {
     paddingVertical: 8,
@@ -48,6 +47,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   inputInvalid: {
-    backgroundColor: Colors.error100,
+    backgroundColor: GlobalStyles.colors.error50,
   },
 });

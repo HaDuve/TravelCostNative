@@ -13,7 +13,8 @@ async function authenticate(mode, email, password) {
   });
 
   const token = response.data.idToken;
-  return token;
+  const uid = response.data.localId;
+  return { token, uid };
 }
 
 export function createUser(email, password) {

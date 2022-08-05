@@ -13,8 +13,14 @@ function LoginScreen() {
   async function loginHandler({ email, password }) {
     setIsAuthenticating(true);
     try {
-      const token = await login(email, password);
+      const { token, uid } = await login(email, password);
+      console.log(
+        "🚀 ~ file: LoginScreen.js ~ line 17 ~ loginHandler ~ uid",
+        uid
+      );
+
       authCtx.authenticate(token);
+      authCtx.setUserID(uid);
     } catch (error) {
       console.log(error.message);
       Alert.alert(

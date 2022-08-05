@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import Input from "./Input";
 import Button from "../UI/Button";
 import { getFormattedDate } from "../../util/date";
 import { GlobalStyles } from "../../constants/styles";
+import { AuthContext } from "../../store/auth-context";
 
 const ExpenseForm = ({
   onCancel,
@@ -11,6 +12,8 @@ const ExpenseForm = ({
   submitButtonLabel,
   defaultValues,
 }) => {
+  const AuthCtx = useContext(AuthContext);
+
   const [inputs, setInputs] = useState({
     amount: {
       value: defaultValues ? defaultValues.amount.toString() : "",
@@ -36,7 +39,9 @@ const ExpenseForm = ({
   }
 
   function submitHandler() {
+    console.log("uid", AuthCtx.uid);
     const expenseData = {
+      uid: AuthCtx.uid,
       amount: +inputs.amount.value,
       date: new Date(inputs.date.value),
       description: inputs.description.value,

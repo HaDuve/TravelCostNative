@@ -1,9 +1,11 @@
 import axios from "axios";
+import { AuthContext } from "../store/auth-context";
+import { useContext } from "react";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
 
-export async function storeExpense(expenseData) {
+export async function storeExpense(uid, expenseData) {
   const response = await axios.post(
     BACKEND_URL + "/expenses.json",
     expenseData
@@ -12,7 +14,7 @@ export async function storeExpense(expenseData) {
   return id;
 }
 
-export async function fetchExpenses() {
+export async function fetchExpenses(uid) {
   const response = await axios.get(BACKEND_URL + "/expenses.json");
 
   const expenses = [];
@@ -30,10 +32,10 @@ export async function fetchExpenses() {
   return expenses;
 }
 
-export function updateExpense(id, expenseData) {
+export function updateExpense(uid, id, expenseData) {
   return axios.put(BACKEND_URL + `/expenses/${id}.json`, expenseData);
 }
 
-export function deleteExpense(id) {
+export function deleteExpense(uid, id) {
   return axios.delete(BACKEND_URL + `/expenses/${id}.json`);
 }

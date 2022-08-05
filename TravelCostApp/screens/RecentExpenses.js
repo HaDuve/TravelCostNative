@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
+import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
 import { getDateMinusDays } from "../util/date";
 import { fetchExpenses } from "../util/http";
@@ -11,12 +12,14 @@ function RecentExpenses() {
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
   const expensesCtx = useContext(ExpensesContext);
+  const authCtx = useContext(AuthContext);
+  const uid = authCtx.uid;
 
   useEffect(() => {
     async function getExpenses() {
       setIsFetching(true);
       try {
-        const expenses = await fetchExpenses();
+        const expenses = await fetchExpenses(uid);
         expensesCtx.setExpenses(expenses);
       } catch (error) {
         setError("Could not fetch expenses from the web database!");

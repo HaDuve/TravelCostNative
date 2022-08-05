@@ -7,7 +7,7 @@ export const AuthContext = createContext({
   isAuthenticated: false,
   authenticate: (token) => {},
   logout: () => {},
-  setUid: (uid) => {},
+  setUserID: (uid) => {},
 });
 
 function AuthContextProvider({ children }) {

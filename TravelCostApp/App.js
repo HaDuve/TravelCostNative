@@ -25,7 +25,6 @@ const AuthStack = createNativeStackNavigator();
 const BottomTabs = createBottomTabNavigator();
 
 function NotAuthenticatedStack() {
-  console.log("NotAuthenticatedStack");
   return (
     <AuthStack.Navigator
       screenOptions={{
@@ -41,7 +40,6 @@ function NotAuthenticatedStack() {
 }
 
 function AuthenticatedStack() {
-  console.log("AuthenticatedStack");
   return (
     <ExpensesContextProvider>
       <Stack.Navigator
@@ -79,7 +77,6 @@ function AuthNavigation() {
 }
 
 function ExpensesOverview(authCtx) {
-  console.log("ExpensesOverview");
   return (
     <BottomTabs.Navigator
       screenOptions={({ navigation }) => ({
@@ -126,7 +123,6 @@ function ExpensesOverview(authCtx) {
 }
 
 function Root() {
-  console.log("Root");
   const [isTryingLogin, setIsTryingLogin] = useState(true);
 
   const authCtx = useContext(AuthContext);

@@ -39,7 +39,6 @@ const ExpenseForm = ({
   }
 
   function submitHandler() {
-    console.log("uid", AuthCtx.uid);
     const expenseData = {
       uid: AuthCtx.uid,
       amount: +inputs.amount.value,

@@ -65,7 +65,7 @@ function AuthenticatedStack() {
   );
 }
 
-function AuthNavigation() {
+function Navigation() {
   const authCtx = useContext(AuthContext);
 
   return (
@@ -147,7 +147,7 @@ function Root() {
     return <AppLoading />;
   }
 
-  return <AuthNavigation />;
+  return <Navigation />;
 }
 
 export default function App() {

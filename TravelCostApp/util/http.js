@@ -18,7 +18,6 @@ export async function storeExpense(uid, expenseData) {
       "/expenses.json",
     expenseData
   );
-  console.log(response);
   const id = response.data.name;
   return id;
 }

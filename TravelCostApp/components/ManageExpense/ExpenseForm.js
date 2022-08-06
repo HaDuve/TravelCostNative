@@ -5,6 +5,7 @@ import Button from "../UI/Button";
 import { getFormattedDate } from "../../util/date";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
+import IconButton from "../UI/IconButton";
 
 const ExpenseForm = ({
   onCancel,
@@ -129,6 +130,10 @@ const ExpenseForm = ({
     onSubmit(expenseData);
   }
 
+  function categoryHandler() {
+    console.log("pressed");
+  }
+
   const formIsInvalid =
     !inputs.amount.isValid ||
     !inputs.date.isValid ||
@@ -142,6 +147,39 @@ const ExpenseForm = ({
   return (
     <View style={styles.form}>
       <Text style={styles.title}>Your Expense: </Text>
+      <View style={styles.categoryRow}>
+        <IconButton
+          icon="fast-food-outline"
+          color={GlobalStyles.colors.accent500}
+          size={36}
+          onPress={categoryHandler}
+        />
+        <IconButton
+          icon="car-outline"
+          color={GlobalStyles.colors.accent500}
+          size={36}
+          onPress={categoryHandler}
+        />
+        <IconButton
+          icon="airplane-outline"
+          color={GlobalStyles.colors.accent500}
+          size={36}
+          onPress={categoryHandler}
+        />
+        <IconButton
+          icon="home-outline"
+          color={GlobalStyles.colors.accent500}
+          size={36}
+          onPress={categoryHandler}
+        />
+        <IconButton
+          icon="basket-outline"
+          color={GlobalStyles.colors.accent500}
+          size={36}
+          onPress={categoryHandler}
+        />
+      </View>
+
       <View style={styles.inputsRow}>
         <Input
           style={styles.rowInput}
@@ -244,6 +282,10 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 24,
     textAlign: "center",
+  },
+  categoryRow: {
+    flexDirection: "row",
+    justifyContent: "center",
   },
   inputsRow: {
     flexDirection: "row",

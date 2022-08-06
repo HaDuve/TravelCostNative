@@ -27,6 +27,26 @@ const ExpenseForm = ({
       value: defaultValues ? defaultValues.description : "",
       isValid: true,
     },
+    category: {
+      value: defaultValues ? defaultValues.category : "",
+      isValid: true,
+    },
+    country: {
+      value: defaultValues ? defaultValues.country : "",
+      isValid: true,
+    },
+    currency: {
+      value: defaultValues ? defaultValues.currency : "",
+      isValid: true,
+    },
+    whoPaid: {
+      value: defaultValues ? defaultValues.whoPaid : "",
+      isValid: true,
+    },
+    owePerc: {
+      value: defaultValues ? defaultValues.owePerc.toString() : "",
+      isValid: true,
+    },
   });
 
   function inputChangedHandler(inputIdentifier, enteredValue) {
@@ -44,13 +64,33 @@ const ExpenseForm = ({
       amount: +inputs.amount.value,
       date: new Date(inputs.date.value),
       description: inputs.description.value,
+      category: inputs.category.value, // TODO: convert this to category
+      country: inputs.country.value, // TODO: convert this to country
+      currency: inputs.currency.value, // TODO: convert this to currency
+      whoPaid: inputs.whoPaid.value, // TODO: convert this to uid
+      owePerc: +inputs.owePerc.value,
     };
 
     const amountIsValid = !isNaN(expenseData.amount) && expenseData.amount > 0;
     const dateIsValid = expenseData.date.toString() !== "Invalid Date";
     const descriptionIsValid = expenseData.description.trim().length > 0;
+    const categoryIsValid = expenseData.description.trim().length > 0;
+    const countryIsValid = expenseData.description.trim().length > 0;
+    const currencyIsValid = expenseData.description.trim().length > 0;
+    const whoPaidIsValid = expenseData.description.trim().length > 0;
+    const owePercIsValid =
+      !isNaN(expenseData.owePerc) && expenseData.owePerc > 0;
 
-    if (!amountIsValid || !dateIsValid || !descriptionIsValid) {
+    if (
+      !amountIsValid ||
+      !dateIsValid ||
+      !descriptionIsValid ||
+      !categoryIsValid ||
+      !countryIsValid ||
+      !currencyIsValid ||
+      !whoPaidIsValid ||
+      !owePercIsValid
+    ) {
       // show feedback
       Alert.alert("Invalid Input", "Please check your input values");
       setInputs((curInputs) => {
@@ -60,6 +100,26 @@ const ExpenseForm = ({
           description: {
             value: curInputs.description.value,
             isValid: descriptionIsValid,
+          },
+          category: {
+            value: curInputs.category.value,
+            isValid: categoryIsValid,
+          },
+          country: {
+            value: curInputs.country.value,
+            isValid: countryIsValid,
+          },
+          currency: {
+            value: curInputs.currency.value,
+            isValid: currencyIsValid,
+          },
+          whoPaid: {
+            value: curInputs.whoPaid.value,
+            isValid: whoPaidIsValid,
+          },
+          owePerc: {
+            value: curInputs.owePerc.value,
+            isValid: owePercIsValid,
           },
         };
       });
@@ -72,7 +132,12 @@ const ExpenseForm = ({
   const formIsInvalid =
     !inputs.amount.isValid ||
     !inputs.date.isValid ||
-    !inputs.description.isValid;
+    !inputs.description.isValid ||
+    !inputs.category.isValid ||
+    !inputs.country.isValid ||
+    !inputs.currency.isValid ||
+    !inputs.whoPaid.isValid ||
+    !inputs.owePerc.isValid;
 
   return (
     <View style={styles.form}>
@@ -109,6 +174,46 @@ const ExpenseForm = ({
         }}
         invalid={!inputs.description.isValid}
       />
+      <Input
+        label="Category"
+        textInputConfig={{
+          onChangeText: inputChangedHandler.bind(this, "category"),
+          value: inputs.category.value,
+        }}
+        invalid={!inputs.category.isValid}
+      />
+      <Input
+        label="Country"
+        textInputConfig={{
+          onChangeText: inputChangedHandler.bind(this, "country"),
+          value: inputs.country.value,
+        }}
+        invalid={!inputs.country.isValid}
+      />
+      <Input
+        label="Currency"
+        textInputConfig={{
+          onChangeText: inputChangedHandler.bind(this, "currency"),
+          value: inputs.currency.value,
+        }}
+        invalid={!inputs.currency.isValid}
+      />
+      <Input
+        label="Who paid?"
+        textInputConfig={{
+          onChangeText: inputChangedHandler.bind(this, "whoPaid"),
+          value: inputs.whoPaid.value,
+        }}
+        invalid={!inputs.whoPaid.isValid}
+      />
+      <Input
+        label="Owe Percent %"
+        textInputConfig={{
+          onChangeText: inputChangedHandler.bind(this, "owePerc"),
+          value: inputs.owePerc.value,
+        }}
+        invalid={!inputs.owePerc.isValid}
+      />
       {formIsInvalid && (
         <Text style={styles.errorText}>
           Invalid input values - please check your entered data!
@@ -136,7 +241,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
-    marginVertical: 24,
+    marginTop: 5,
+    marginBottom: 24,
     textAlign: "center",
   },
   inputsRow: {
@@ -155,6 +261,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 8,
   },
   button: {
     minWidth: 120,

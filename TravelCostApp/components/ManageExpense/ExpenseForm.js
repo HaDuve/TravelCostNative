@@ -135,9 +135,10 @@ const ExpenseForm = ({
     inputChangedHandler("description", arg);
     inputChangedHandler("category", arg);
 
-    // TODO: add check if date field is empty
-    const today = new Date();
-    inputChangedHandler("date", getFormattedDate(today));
+    if (inputs.date.value === "") {
+      const today = new Date();
+      inputChangedHandler("date", getFormattedDate(today));
+    }
 
     // for now set default values to every field so everything goes fast
     inputChangedHandler("amount", "1");

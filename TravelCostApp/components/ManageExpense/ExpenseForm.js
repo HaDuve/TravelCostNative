@@ -135,12 +135,14 @@ const ExpenseForm = ({
     inputChangedHandler("description", arg);
     inputChangedHandler("category", arg);
 
-    // for now set default values to every field so everything goes fast
+    // TODO: add check if date field is empty
     const today = new Date();
     inputChangedHandler("date", getFormattedDate(today));
+
+    // for now set default values to every field so everything goes fast
     inputChangedHandler("amount", "1");
 
-    // more default values
+    // TODO: make some user specific default settings to fill these in
     inputChangedHandler("country", "Germany");
     inputChangedHandler("currency", "€");
     inputChangedHandler("whoPaid", "Hannes");

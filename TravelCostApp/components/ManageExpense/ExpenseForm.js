@@ -130,9 +130,22 @@ const ExpenseForm = ({
     onSubmit(expenseData);
   }
 
-  function categoryHandler() {
-    console.log("pressed");
-  }
+  const onPressCategory = (arg) => () => {
+    console.log(arg);
+    inputChangedHandler("description", arg);
+    inputChangedHandler("category", arg);
+
+    // for now set default values to every field so everything goes fast
+    const today = new Date();
+    inputChangedHandler("date", getFormattedDate(today));
+    inputChangedHandler("amount", "1");
+
+    // more default values
+    inputChangedHandler("country", "Germany");
+    inputChangedHandler("currency", "€");
+    inputChangedHandler("whoPaid", "Hannes");
+    inputChangedHandler("owePerc", "50");
+  };
 
   const formIsInvalid =
     !inputs.amount.isValid ||
@@ -152,31 +165,31 @@ const ExpenseForm = ({
           icon="fast-food-outline"
           color={GlobalStyles.colors.accent500}
           size={36}
-          onPress={categoryHandler}
+          onPress={onPressCategory("food")}
         />
         <IconButton
           icon="car-outline"
           color={GlobalStyles.colors.accent500}
           size={36}
-          onPress={categoryHandler}
+          onPress={onPressCategory("national-travel")}
         />
         <IconButton
           icon="airplane-outline"
           color={GlobalStyles.colors.accent500}
           size={36}
-          onPress={categoryHandler}
+          onPress={onPressCategory("international-travel")}
         />
         <IconButton
-          icon="home-outline"
+          icon="bed-outline"
           color={GlobalStyles.colors.accent500}
           size={36}
-          onPress={categoryHandler}
+          onPress={onPressCategory("accomodation")}
         />
         <IconButton
           icon="basket-outline"
           color={GlobalStyles.colors.accent500}
           size={36}
-          onPress={categoryHandler}
+          onPress={onPressCategory("other")}
         />
       </View>
 

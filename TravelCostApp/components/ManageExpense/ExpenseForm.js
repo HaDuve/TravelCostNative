@@ -236,38 +236,46 @@ const ExpenseForm = ({
         }}
         invalid={!inputs.category.isValid}
       />
-      <Input
-        label="Country"
-        textInputConfig={{
-          onChangeText: inputChangedHandler.bind(this, "country"),
-          value: inputs.country.value,
-        }}
-        invalid={!inputs.country.isValid}
-      />
-      <Input
-        label="Currency"
-        textInputConfig={{
-          onChangeText: inputChangedHandler.bind(this, "currency"),
-          value: inputs.currency.value,
-        }}
-        invalid={!inputs.currency.isValid}
-      />
-      <Input
-        label="Who paid?"
-        textInputConfig={{
-          onChangeText: inputChangedHandler.bind(this, "whoPaid"),
-          value: inputs.whoPaid.value,
-        }}
-        invalid={!inputs.whoPaid.isValid}
-      />
-      <Input
-        label="Owe Percent %"
-        textInputConfig={{
-          onChangeText: inputChangedHandler.bind(this, "owePerc"),
-          value: inputs.owePerc.value,
-        }}
-        invalid={!inputs.owePerc.isValid}
-      />
+      <View style={styles.inputsRowSecond}>
+        <Input
+          style={styles.rowInput}
+          label="Country"
+          textInputConfig={{
+            onChangeText: inputChangedHandler.bind(this, "country"),
+            value: inputs.country.value,
+          }}
+          invalid={!inputs.country.isValid}
+        />
+        <Input
+          style={styles.rowInput}
+          label="Currency"
+          textInputConfig={{
+            onChangeText: inputChangedHandler.bind(this, "currency"),
+            value: inputs.currency.value,
+          }}
+          invalid={!inputs.currency.isValid}
+        />
+      </View>
+      <View style={styles.inputsRowSecond}>
+        <Input
+          style={styles.rowInput}
+          label="Who paid?"
+          textInputConfig={{
+            onChangeText: inputChangedHandler.bind(this, "whoPaid"),
+            value: inputs.whoPaid.value,
+          }}
+          invalid={!inputs.whoPaid.isValid}
+        />
+        <Input
+          style={styles.rowInput}
+          label="Owe Percent %"
+          textInputConfig={{
+            onChangeText: inputChangedHandler.bind(this, "owePerc"),
+            value: inputs.owePerc.value,
+          }}
+          invalid={!inputs.owePerc.isValid}
+        />
+      </View>
       {formIsInvalid && (
         <Text style={styles.errorText}>
           Invalid input values - please check your entered data!
@@ -304,6 +312,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   inputsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  inputsRowSecond: {
     flexDirection: "row",
     justifyContent: "space-between",
   },

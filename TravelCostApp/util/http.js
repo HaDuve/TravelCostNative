@@ -10,12 +10,7 @@ const BACKEND_URL =
 export async function storeExpense(uid, expenseData) {
   console.log(uid);
   const response = await axios.post(
-    BACKEND_URL +
-      "/data/users/" +
-      uid +
-      "/trips/" +
-      DUMMYTRIP +
-      "/expenses.json",
+    BACKEND_URL + "/users/" + uid + "/trips/" + DUMMYTRIP + "/expenses.json",
     expenseData
   );
   const id = response.data.name;
@@ -24,12 +19,7 @@ export async function storeExpense(uid, expenseData) {
 
 export async function fetchExpenses(uid) {
   const response = await axios.get(
-    BACKEND_URL +
-      "/data/users/" +
-      uid +
-      "/trips/" +
-      DUMMYTRIP +
-      "/expenses.json"
+    BACKEND_URL + "/users/" + uid + "/trips/" + DUMMYTRIP + "/expenses.json"
   );
 
   const expenses = [];
@@ -50,7 +40,7 @@ export async function fetchExpenses(uid) {
 export function updateExpense(uid, id, expenseData) {
   return axios.put(
     BACKEND_URL +
-      "/data/users/" +
+      "/users/" +
       uid +
       "/trips/" +
       DUMMYTRIP +
@@ -63,7 +53,7 @@ export function updateExpense(uid, id, expenseData) {
 export function deleteExpense(uid, id) {
   return axios.delete(
     BACKEND_URL +
-      "/data/users/" +
+      "/users/" +
       uid +
       "/trips/" +
       DUMMYTRIP +

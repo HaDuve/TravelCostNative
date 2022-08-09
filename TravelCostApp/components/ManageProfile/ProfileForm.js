@@ -51,6 +51,10 @@ const ProfileForm = ({
     });
   }
 
+  function submitHandler() {
+    console.log("submit");
+  }
+
   return (
     <View style={styles.form}>
       <Text style={styles.title}>User Profile</Text>
@@ -113,9 +117,14 @@ const ProfileForm = ({
           invalid={!inputs.lastCurrency.isValid}
         />
       </View>
-      <Button title="LOGOUT" onPress={AuthCtx.logout}>
-        LOGOUT
-      </Button>
+      <View style={styles.buttonContainer}>
+        <Button style={styles.button} title="SAVE" onPress={submitHandler}>
+          SAVE
+        </Button>
+        <Button style={styles.button} title="LOGOUT" onPress={AuthCtx.logout}>
+          LOGOUT
+        </Button>
+      </View>
     </View>
   );
 };

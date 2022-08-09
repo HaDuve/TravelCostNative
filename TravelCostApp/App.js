@@ -6,7 +6,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import AppLoading from "expo-app-loading";
-
 import SignupScreen from "./screens/SignupScreen";
 import LoginScreen from "./screens/LoginScreen";
 
@@ -19,6 +18,7 @@ import AuthContextProvider, { AuthContext } from "./store/auth-context";
 import ExpensesContextProvider, {
   ExpensesContext,
 } from "./store/expenses-context";
+import ProfileScreen from "./screens/ProfileScreen";
 
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
@@ -115,6 +115,17 @@ function ExpensesOverview(authCtx) {
           tabBarLabel: "All Expenses",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar" size={size} color={color} />
+          ),
+        }}
+      />
+      <BottomTabs.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          title: "Profile",
+          tabBarLabel: "Profile",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-circle-outline" size={size} color={color} />
           ),
         }}
       />

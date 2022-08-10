@@ -2,7 +2,7 @@ import { createContext, useState } from "react";
 import { Alert } from "react-native";
 
 export const UserContext = createContext({
-  name: "",
+  userName: "",
   dailyBudget: "",
   homeCountry: "",
   homeCurrency: "",
@@ -10,7 +10,7 @@ export const UserContext = createContext({
   lastCurrency: "",
 
   addUser: ({
-    name,
+    userName,
     dailyBudget,
     homeCountry,
     homeCurrency,
@@ -18,14 +18,6 @@ export const UserContext = createContext({
     currency,
   }) => {},
   deleteUser: (uid) => {},
-  updateUser: ({
-    name,
-    dailyBudget,
-    homeCountry,
-    homeCurrency,
-    country,
-    currency,
-  }) => {},
 });
 
 function UsersContextProvider({ children }) {

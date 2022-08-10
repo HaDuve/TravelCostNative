@@ -1,5 +1,6 @@
 import { useContext, useLayoutEffect, useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
+import { ScrollView } from "react-native";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 
 import Button from "../components/UI/Button";
@@ -78,23 +79,25 @@ const ManageExpense = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ExpenseForm
-        onCancel={cancelHandler}
-        onSubmit={confirmHandler}
-        submitButtonLabel={isEditing ? "Update" : "Add"}
-        defaultValues={selectedExpense}
-      />
+      <ScrollView>
+        <ExpenseForm
+          onCancel={cancelHandler}
+          onSubmit={confirmHandler}
+          submitButtonLabel={isEditing ? "Update" : "Add"}
+          defaultValues={selectedExpense}
+        />
 
-      {isEditing && (
-        <View style={styles.deleteContainer}>
-          <IconButton
-            icon="trash"
-            color={GlobalStyles.colors.error500}
-            size={36}
-            onPress={deleteExpenseHandler}
-          />
-        </View>
-      )}
+        {isEditing && (
+          <View style={styles.deleteContainer}>
+            <IconButton
+              icon="trash"
+              color={GlobalStyles.colors.error500}
+              size={36}
+              onPress={deleteExpenseHandler}
+            />
+          </View>
+        )}
+      </ScrollView>
     </View>
   );
 };

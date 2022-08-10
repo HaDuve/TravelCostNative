@@ -6,6 +6,7 @@ import { getFormattedDate } from "../../util/date";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
 import IconButton from "../UI/IconButton";
+import { UserContext } from "../../store/user-context";
 
 const ExpenseForm = ({
   onCancel,
@@ -14,6 +15,7 @@ const ExpenseForm = ({
   defaultValues,
 }) => {
   const AuthCtx = useContext(AuthContext);
+  const UserCtx = useContext(UserContext);
   const [hideAdvanced, sethideAdvanced] = useState(true);
 
   const [inputs, setInputs] = useState({
@@ -81,7 +83,9 @@ const ExpenseForm = ({
     const currencyIsValid = expenseData.description.trim().length > 0;
     const whoPaidIsValid = expenseData.description.trim().length > 0;
     const owePercIsValid =
-      !isNaN(expenseData.owePerc) && expenseData.owePerc > 0;
+      !isNaN(expenseData.owePerc) &&
+      expenseData.owePerc >= 0 &&
+      expenseData.owePerc <= 100;
 
     if (
       !amountIsValid ||
@@ -128,11 +132,14 @@ const ExpenseForm = ({
       return;
     }
 
+    // update lastcountry and lastcurrency
+    UserCtx.lastCountry = inputs.country.value;
+    UserCtx.lastCurrency = inputs.currency.value;
+
     onSubmit(expenseData);
   }
 
   const onPressCategory = (arg) => () => {
-    console.log(arg);
     inputChangedHandler("description", arg);
     inputChangedHandler("category", arg);
 
@@ -142,28 +149,19 @@ const ExpenseForm = ({
     }
 
     // for now set default values to every field so everything goes fast
+    // TODO delete the line below
     inputChangedHandler("amount", "1");
-
-    // TODO: make some user specific default settings to fill these in
-    inputChangedHandler("country", "Germany");
-    inputChangedHandler("currency", "€");
-    inputChangedHandler("whoPaid", "Hannes");
-    inputChangedHandler("owePerc", "50");
+    inputChangedHandler("country", UserCtx.lastCountry);
+    inputChangedHandler("currency", UserCtx.lastCurrency);
+    inputChangedHandler("whoPaid", UserCtx.userName);
+    inputChangedHandler("owePerc", "0");
   };
 
   function toggleAdvancedHandler() {
     if (hideAdvanced) {
       sethideAdvanced(false);
-      console.log(
-        "🚀 ~ file: ExpenseForm.js ~ line 156 ~ toggleHandler ~ hideAdvanced",
-        hideAdvanced
-      );
     } else {
       sethideAdvanced(true);
-      console.log(
-        "🚀 ~ file: ExpenseForm.js ~ line 156 ~ toggleHandler ~ hideAdvanced",
-        hideAdvanced
-      );
     }
   }
 
@@ -242,8 +240,8 @@ const ExpenseForm = ({
             ? "arrow-down-circle-outline"
             : "arrow-forward-circle-outline"
         }
-        color={GlobalStyles.colors.accent500}
-        size={36}
+        color={GlobalStyles.colors.primary100}
+        size={24}
         onPress={toggleAdvancedHandler}
       />
       {/* toggleable content */}

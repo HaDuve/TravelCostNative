@@ -67,7 +67,7 @@ const ProfileForm = () => {
 
   return (
     <View style={styles.form}>
-      <Text style={styles.title}>User Profile</Text>
+      <Text style={styles.title}>{inputs.userName.value} Profile</Text>
       <Input
         label="Name"
         textInputConfig={{

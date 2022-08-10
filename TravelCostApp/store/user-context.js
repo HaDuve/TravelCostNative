@@ -2,7 +2,6 @@ import { createContext, useState } from "react";
 import { Alert } from "react-native";
 
 export const UserContext = createContext({
-  uid: "",
   name: "",
   dailyBudget: "",
   homeCountry: "",
@@ -11,7 +10,6 @@ export const UserContext = createContext({
   lastCurrency: "",
 
   addUser: ({
-    uid,
     name,
     dailyBudget,
     homeCountry,
@@ -21,7 +19,6 @@ export const UserContext = createContext({
   }) => {},
   deleteUser: (uid) => {},
   updateUser: ({
-    uid,
     name,
     dailyBudget,
     homeCountry,
@@ -32,19 +29,21 @@ export const UserContext = createContext({
 });
 
 function UsersContextProvider({ children }) {
-  const [uid, setUid] = useState("");
-  const [name, setName] = useState("");
-  const [dailyBudget, setDailyBudget] = useState("");
+  const [userName, setName] = useState("");
+  const [dailybudget, setDailyBudget] = useState("");
   const [homeCountry, setHomeCountry] = useState("");
   const [homeCurrency, setHomeCurrency] = useState("");
   const [lastCountry, setLastCountry] = useState("");
   const [lastCurrency, setLastCurrency] = useState("");
 
   function addUser(UserData) {
-    console.log("addUserCalled");
-    //setUid(UserData.uid);
+    console.log(
+      "ADD USER WAS CALLED",
+      "🚀 ~ file: user-context.js ~ line 44 ~ addUser ~ UserData",
+      UserData
+    );
     setName(UserData.userName);
-    setDailyBudget(UserData.dailybudget);
+    setDailyBudget(UserData.dailybudget.toString());
     setHomeCountry(UserData.homeCountry);
     setHomeCurrency(UserData.homeCurrency);
     setLastCountry(UserData.lastCountry);
@@ -55,14 +54,9 @@ function UsersContextProvider({ children }) {
     Alert.alert("delete context not implemented");
   }
 
-  function updateUser(UserData) {
-    addUser(UserData);
-  }
-
   const value = {
-    uid: uid,
-    name: name,
-    dailyBudget: dailyBudget,
+    userName: userName,
+    dailybudget: dailybudget,
     homeCountry: homeCountry,
     homeCurrency: homeCurrency,
     lastCountry: lastCountry,
@@ -70,7 +64,6 @@ function UsersContextProvider({ children }) {
 
     addUser: addUser,
     deleteUser: deleteUser,
-    updateUser: updateUser,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

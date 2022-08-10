@@ -18,7 +18,10 @@ import AuthContextProvider, { AuthContext } from "./store/auth-context";
 import ExpensesContextProvider, {
   ExpensesContext,
 } from "./store/expenses-context";
+import UsersContextProvider from "./store/user-context";
 import ProfileScreen from "./screens/ProfileScreen";
+import { UserContext } from "./store/user-context";
+import { fetchUser } from "./util/http";
 
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
@@ -42,25 +45,27 @@ function NotAuthenticatedStack() {
 function AuthenticatedStack() {
   return (
     <ExpensesContextProvider>
-      <Stack.Navigator
-        screenOptions={{
-          headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
-          headerTintColor: "white",
-        }}
-      >
-        <Stack.Screen
-          name="ExpensesOverview"
-          component={ExpensesOverview}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="ManageExpense"
-          component={ManageExpense}
-          options={{
-            presentation: "modal",
+      <UsersContextProvider>
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
+            headerTintColor: "white",
           }}
-        />
-      </Stack.Navigator>
+        >
+          <Stack.Screen
+            name="ExpensesOverview"
+            component={ExpensesOverview}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="ManageExpense"
+            component={ManageExpense}
+            options={{
+              presentation: "modal",
+            }}
+          />
+        </Stack.Navigator>
+      </UsersContextProvider>
     </ExpensesContextProvider>
   );
 }
@@ -137,6 +142,7 @@ function Root() {
   const [isTryingLogin, setIsTryingLogin] = useState(true);
 
   const authCtx = useContext(AuthContext);
+  const userCtx = useContext(UserContext);
 
   useEffect(() => {
     async function fetchToken() {
@@ -146,6 +152,8 @@ function Root() {
       if (storedToken) {
         authCtx.authenticate(storedToken);
         authCtx.setUserID(storedUid);
+
+        userCtx.addUser(fetchUser(authCtx.uid));
       }
 
       setIsTryingLogin(false);

@@ -5,14 +5,16 @@ import ErrorOverlay from "../components/UI/ErrorOverlay";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
+import { UserContext } from "../store/user-context";
 import { getDateMinusDays } from "../util/date";
-import { fetchExpenses } from "../util/http";
+import { fetchExpenses, fetchUser } from "../util/http";
 
 function RecentExpenses() {
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
   const expensesCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
+  const userCtx = useContext(UserContext);
   const uid = authCtx.uid;
 
   useEffect(() => {
@@ -21,8 +23,10 @@ function RecentExpenses() {
       try {
         const expenses = await fetchExpenses(uid);
         expensesCtx.setExpenses(expenses);
+        const user = await fetchUser(uid);
+        userCtx.addUser(user);
       } catch (error) {
-        setError("Could not fetch expenses from the web database!");
+        setError("Could not fetch data from the web database!");
       }
       setIsFetching(false);
     }

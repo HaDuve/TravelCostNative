@@ -1,6 +1,4 @@
 import axios from "axios";
-import { AuthContext } from "../store/auth-context";
-import { useContext } from "react";
 
 const DUMMYTRIP = "abcdefgh";
 
@@ -73,4 +71,8 @@ export async function storeUser(uid, userData) {
 
 export function updateUser(uid, userData) {
   return axios.put(BACKEND_URL + "/users/" + `${uid}.json`, userData);
+}
+export async function fetchUser(uid) {
+  const response = await axios.get(BACKEND_URL + "/users/" + `${uid}.json`);
+  return response.data;
 }

@@ -14,6 +14,7 @@ const ExpenseForm = ({
   defaultValues,
 }) => {
   const AuthCtx = useContext(AuthContext);
+  const [hideAdvanced, sethideAdvanced] = useState(true);
 
   const [inputs, setInputs] = useState({
     amount: {
@@ -150,6 +151,22 @@ const ExpenseForm = ({
     inputChangedHandler("owePerc", "50");
   };
 
+  function toggleAdvancedHandler() {
+    if (hideAdvanced) {
+      sethideAdvanced(false);
+      console.log(
+        "🚀 ~ file: ExpenseForm.js ~ line 156 ~ toggleHandler ~ hideAdvanced",
+        hideAdvanced
+      );
+    } else {
+      sethideAdvanced(true);
+      console.log(
+        "🚀 ~ file: ExpenseForm.js ~ line 156 ~ toggleHandler ~ hideAdvanced",
+        hideAdvanced
+      );
+    }
+  }
+
   const formIsInvalid =
     !inputs.amount.isValid ||
     !inputs.date.isValid ||
@@ -219,63 +236,78 @@ const ExpenseForm = ({
           invalid={!inputs.date.isValid}
         />
       </View>
-      <Input
-        label="Description"
-        textInputConfig={{
-          multiline: true,
-          onChangeText: inputChangedHandler.bind(this, "description"),
-          value: inputs.description.value,
-        }}
-        invalid={!inputs.description.isValid}
+      <IconButton
+        icon={
+          hideAdvanced
+            ? "arrow-down-circle-outline"
+            : "arrow-forward-circle-outline"
+        }
+        color={GlobalStyles.colors.accent500}
+        size={36}
+        onPress={toggleAdvancedHandler}
       />
-      <Input
-        label="Category"
-        textInputConfig={{
-          onChangeText: inputChangedHandler.bind(this, "category"),
-          value: inputs.category.value,
-        }}
-        invalid={!inputs.category.isValid}
-      />
-      <View style={styles.inputsRowSecond}>
-        <Input
-          style={styles.rowInput}
-          label="Country"
-          textInputConfig={{
-            onChangeText: inputChangedHandler.bind(this, "country"),
-            value: inputs.country.value,
-          }}
-          invalid={!inputs.country.isValid}
-        />
-        <Input
-          style={styles.rowInput}
-          label="Currency"
-          textInputConfig={{
-            onChangeText: inputChangedHandler.bind(this, "currency"),
-            value: inputs.currency.value,
-          }}
-          invalid={!inputs.currency.isValid}
-        />
-      </View>
-      <View style={styles.inputsRowSecond}>
-        <Input
-          style={styles.rowInput}
-          label="Who paid?"
-          textInputConfig={{
-            onChangeText: inputChangedHandler.bind(this, "whoPaid"),
-            value: inputs.whoPaid.value,
-          }}
-          invalid={!inputs.whoPaid.isValid}
-        />
-        <Input
-          style={styles.rowInput}
-          label="Owe Percent %"
-          textInputConfig={{
-            onChangeText: inputChangedHandler.bind(this, "owePerc"),
-            value: inputs.owePerc.value,
-          }}
-          invalid={!inputs.owePerc.isValid}
-        />
-      </View>
+      {/* toggleable content */}
+      {!hideAdvanced && (
+        <>
+          <Input
+            label="Description"
+            textInputConfig={{
+              multiline: true,
+              onChangeText: inputChangedHandler.bind(this, "description"),
+              value: inputs.description.value,
+            }}
+            invalid={!inputs.description.isValid}
+          />
+          <Input
+            label="Category"
+            textInputConfig={{
+              onChangeText: inputChangedHandler.bind(this, "category"),
+              value: inputs.category.value,
+            }}
+            invalid={!inputs.category.isValid}
+          />
+          <View style={styles.inputsRowSecond}>
+            <Input
+              style={styles.rowInput}
+              label="Country"
+              textInputConfig={{
+                onChangeText: inputChangedHandler.bind(this, "country"),
+                value: inputs.country.value,
+              }}
+              invalid={!inputs.country.isValid}
+            />
+            <Input
+              style={styles.rowInput}
+              label="Currency"
+              textInputConfig={{
+                onChangeText: inputChangedHandler.bind(this, "currency"),
+                value: inputs.currency.value,
+              }}
+              invalid={!inputs.currency.isValid}
+            />
+          </View>
+          <View style={styles.inputsRowSecond}>
+            <Input
+              style={styles.rowInput}
+              label="Who paid?"
+              textInputConfig={{
+                onChangeText: inputChangedHandler.bind(this, "whoPaid"),
+                value: inputs.whoPaid.value,
+              }}
+              invalid={!inputs.whoPaid.isValid}
+            />
+            <Input
+              style={styles.rowInput}
+              label="Owe Percent %"
+              textInputConfig={{
+                onChangeText: inputChangedHandler.bind(this, "owePerc"),
+                value: inputs.owePerc.value,
+              }}
+              invalid={!inputs.owePerc.isValid}
+            />
+          </View>
+        </>
+      )}
       {formIsInvalid && (
         <Text style={styles.errorText}>
           Invalid input values - please check your entered data!

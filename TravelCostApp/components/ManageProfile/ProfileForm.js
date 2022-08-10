@@ -1,41 +1,46 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { View, Text } from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
 import { UserContext } from "../../store/user-context";
-import { storeUser, updateUser } from "../../util/http";
+import { fetchUser, updateUser } from "../../util/http";
 import { Button } from "react-native";
 
 import Input from "../ManageExpense/Input";
+import ErrorOverlay from "../UI/ErrorOverlay";
+import LoadingOverlay from "../UI/LoadingOverlay";
 
-const ProfileForm = ({}) => {
-  const UserCtx = useContext(UserContext);
+const ProfileForm = (defaultValues) => {
+  const User = useContext(UserContext);
+
+  console.log("User.name : ", User.name);
   const AuthCtx = useContext(AuthContext);
+  const uid = AuthContext.uid;
 
   const [inputs, setInputs] = useState({
     userName: {
-      value: UserCtx.name ? UserCtx.name : "",
+      value: User.userName ? User.userName : "",
       isValid: true,
     },
     dailybudget: {
-      value: UserCtx.dailyBudget ? UserCtx.dailyBudget : "",
+      value: User.dailybudget ? User.dailybudget : "",
       isValid: true,
     },
     homeCountry: {
-      value: UserCtx.homeCountry ? UserCtx.homeCountry : "",
+      value: User.homeCountry ? User.homeCountry : "",
       isValid: true,
     },
     homeCurrency: {
-      value: UserCtx.homeCurrency ? UserCtx.homeCurrency : "",
+      value: User.homeCurrency ? User.homeCurrency : "",
       isValid: true,
     },
     lastCountry: {
-      value: UserCtx.lastCountry ? UserCtx.lastCountry : "",
+      value: User.lastCountry ? User.lastCountry : "",
       isValid: true,
     },
     lastCurrency: {
-      value: UserCtx.lastCurrency ? UserCtx.lastCurrency : "",
+      value: User.lastCurrency ? User.lastCurrency : "",
       isValid: true,
     },
   });
@@ -49,7 +54,11 @@ const ProfileForm = ({}) => {
     });
   }
 
-  async function submitHandler() {
+  async function submitHandler(e) {
+    console.log(
+      "🚀 ~ file: ProfileForm.js ~ line 59 ~ submitHandler ~ submitHandler",
+      submitHandler
+    );
     const userData = {};
     userData.userName = inputs.userName.value;
     userData.dailybudget = +inputs.dailybudget.value;
@@ -58,7 +67,11 @@ const ProfileForm = ({}) => {
     userData.lastCountry = inputs.lastCountry.value;
     userData.lastCurrency = inputs.lastCurrency.value;
 
-    UserCtx.updateUser(userData);
+    console.log(
+      "🚀 ~ file: ProfileForm.js ~ line 64 ~ submitHandler ~ userData",
+      userData
+    );
+    User.addUser(userData);
     await updateUser(AuthCtx.uid, userData);
   }
 

@@ -61,3 +61,16 @@ export function deleteExpense(uid, id) {
       `${id}.json`
   );
 }
+
+export async function storeUser(uid, userData) {
+  const response = await axios.post(
+    BACKEND_URL + "/users/" + `${uid}.json`,
+    userData ? userData : { uid: uid }
+  );
+  const id = response.data.name;
+  return id;
+}
+
+export function updateUser(uid, userData) {
+  return axios.put(BACKEND_URL + "/users/" + `${uid}.json`, userData);
+}

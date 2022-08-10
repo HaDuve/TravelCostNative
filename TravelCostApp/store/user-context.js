@@ -41,9 +41,10 @@ function UsersContextProvider({ children }) {
   const [lastCurrency, setLastCurrency] = useState("");
 
   function addUser(UserData) {
-    setUid(UserData.uid);
-    setName(UserData.name);
-    setDailyBudget(UserData.dailyBudget);
+    console.log("addUserCalled");
+    //setUid(UserData.uid);
+    setName(UserData.userName);
+    setDailyBudget(UserData.dailybudget);
     setHomeCountry(UserData.homeCountry);
     setHomeCurrency(UserData.homeCurrency);
     setLastCountry(UserData.lastCountry);

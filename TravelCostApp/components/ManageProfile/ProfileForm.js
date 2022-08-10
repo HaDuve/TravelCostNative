@@ -3,41 +3,39 @@ import { View, Text } from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
+import { UserContext } from "../../store/user-context";
+import { storeUser } from "../../util/http";
 import { Button } from "react-native";
 
 import Input from "../ManageExpense/Input";
 
-const ProfileForm = ({
-  onCancel,
-  onSubmit,
-  submitButtonLabel,
-  defaultValues,
-}) => {
+const ProfileForm = ({}) => {
+  const UserCtx = useContext(UserContext);
   const AuthCtx = useContext(AuthContext);
 
   const [inputs, setInputs] = useState({
     userName: {
-      value: defaultValues ? defaultValues.userName : "",
+      value: UserCtx.name ? UserCtx.name : "",
       isValid: true,
     },
     dailybudget: {
-      value: defaultValues ? defaultValues.dailybudget : "",
+      value: UserCtx.dailyBudget ? UserCtx.dailyBudget : "",
       isValid: true,
     },
     homeCountry: {
-      value: defaultValues ? defaultValues.homeCountry : "",
+      value: UserCtx.homeCountry ? UserCtx.homeCountry : "",
       isValid: true,
     },
     homeCurrency: {
-      value: defaultValues ? defaultValues.homeCurrency : "",
+      value: UserCtx.homeCurrency ? UserCtx.homeCurrency : "",
       isValid: true,
     },
     lastCountry: {
-      value: defaultValues ? defaultValues.lastCountry : "",
+      value: UserCtx.lastCountry ? UserCtx.lastCountry : "",
       isValid: true,
     },
     lastCurrency: {
-      value: defaultValues ? defaultValues.lastCurrency : "",
+      value: UserCtx.lastCurrency ? UserCtx.lastCurrency : "",
       isValid: true,
     },
   });
@@ -51,8 +49,17 @@ const ProfileForm = ({
     });
   }
 
-  function submitHandler() {
-    console.log("submit");
+  async function submitHandler() {
+    const userData = {};
+    userData.userName = inputs.userName.value;
+    userData.dailybudget = +inputs.dailybudget.value;
+    userData.homeCountry = inputs.homeCountry.value;
+    userData.homeCurrency = inputs.homeCurrency.value;
+    userData.lastCountry = inputs.lastCountry.value;
+    userData.lastCurrency = inputs.lastCurrency.value;
+
+    UserCtx.updateUser(userData);
+    await updateUser(AuthCtx.uid, userData);
   }
 
   return (

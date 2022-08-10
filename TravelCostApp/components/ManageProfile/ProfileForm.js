@@ -11,7 +11,7 @@ import Input from "../ManageExpense/Input";
 import ErrorOverlay from "../UI/ErrorOverlay";
 import LoadingOverlay from "../UI/LoadingOverlay";
 
-const ProfileForm = (defaultValues) => {
+const ProfileForm = () => {
   const User = useContext(UserContext);
   const AuthCtx = useContext(AuthContext);
   const uid = AuthContext.uid;

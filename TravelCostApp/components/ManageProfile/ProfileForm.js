@@ -4,7 +4,7 @@ import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
 import { UserContext } from "../../store/user-context";
-import { storeUser } from "../../util/http";
+import { storeUser, updateUser } from "../../util/http";
 import { Button } from "react-native";
 
 import Input from "../ManageExpense/Input";

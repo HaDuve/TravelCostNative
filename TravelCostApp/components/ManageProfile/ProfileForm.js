@@ -53,10 +53,6 @@ const ProfileForm = () => {
   }
 
   async function submitHandler(e) {
-    console.log(
-      "🚀 ~ file: ProfileForm.js ~ line 59 ~ submitHandler ~ submitHandler",
-      submitHandler
-    );
     const userData = {};
     userData.userName = inputs.userName.value;
     userData.dailybudget = +inputs.dailybudget.value;
@@ -65,10 +61,6 @@ const ProfileForm = () => {
     userData.lastCountry = inputs.lastCountry.value;
     userData.lastCurrency = inputs.lastCurrency.value;
 
-    console.log(
-      "🚀 ~ file: ProfileForm.js ~ line 64 ~ submitHandler ~ userData",
-      userData
-    );
     User.addUser(userData);
     await updateUser(AuthCtx.uid, userData);
   }

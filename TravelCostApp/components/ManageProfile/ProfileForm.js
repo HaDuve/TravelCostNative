@@ -13,8 +13,6 @@ import LoadingOverlay from "../UI/LoadingOverlay";
 
 const ProfileForm = (defaultValues) => {
   const User = useContext(UserContext);
-
-  console.log("User.name : ", User.name);
   const AuthCtx = useContext(AuthContext);
   const uid = AuthContext.uid;
 

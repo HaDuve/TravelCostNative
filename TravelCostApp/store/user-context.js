@@ -37,11 +37,6 @@ function UsersContextProvider({ children }) {
   const [lastCurrency, setLastCurrency] = useState("");
 
   function addUser(UserData) {
-    console.log(
-      "ADD USER WAS CALLED",
-      "🚀 ~ file: user-context.js ~ line 44 ~ addUser ~ UserData",
-      UserData
-    );
     setName(UserData.userName);
     setDailyBudget(UserData.dailybudget.toString());
     setHomeCountry(UserData.homeCountry);

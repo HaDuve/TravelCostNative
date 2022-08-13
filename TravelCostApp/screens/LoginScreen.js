@@ -6,12 +6,14 @@ import { Alert } from "react-native";
 import { AuthContext } from "./../store/auth-context";
 import { UserContext } from "../store/user-context";
 import { fetchUser } from "../util/http";
+import { TripContext } from "../store/trip-context";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
+  const tripCtx = useContext(TripContext);
 
   async function loginHandler({ email, password }) {
     setIsAuthenticating(true);

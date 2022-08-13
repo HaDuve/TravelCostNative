@@ -3,28 +3,23 @@ import { View, Text } from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
-import { fetchUser, updateUser } from "../../util/http";
+import { fetchUser, storeTrip, updateUser } from "../../util/http";
 import { Button } from "react-native";
 
 import Input from "../ManageExpense/Input";
 import ErrorOverlay from "../UI/ErrorOverlay";
 import LoadingOverlay from "../UI/LoadingOverlay";
+import { TripContext } from "../../store/trip-context";
 
-const ProfileForm = () => {
-  const Trip = useContext(TripContext);
-
+const TripForm = () => {
+  const TripCtx = useContext(TripContext);
   const [inputs, setInputs] = useState({
     tripName: {
-      value: Trip.tripName ? Trip.tripName : "",
+      value: TripCtx.tripName ? TripCtx.tripName : "",
       isValid: true,
     },
     totalBudget: {
-      value: Trip.totalBudget ? Trip.totalBudget : "",
-      isValid: true,
-    },
-    // TODO: decide if this is maybe not a good state to handle??
-    travellerList: {
-      value: Trip.travellerList ? Trip.travellerList : [],
+      value: TripCtx.totalBudget ? TripCtx.totalBudget : "",
       isValid: true,
     },
   });
@@ -39,95 +34,46 @@ const ProfileForm = () => {
   }
 
   async function submitHandler(e) {
-    // TODO: adjust this function
-    const userData = {};
-    userData.userName = inputs.userName.value;
-    userData.dailybudget = +inputs.dailybudget.value;
-    userData.homeCountry = inputs.homeCountry.value;
-    userData.homeCurrency = inputs.homeCurrency.value;
-    userData.lastCountry = inputs.lastCountry.value;
-    userData.lastCurrency = inputs.lastCurrency.value;
+    const tripData = {};
+    tripData.tripName = inputs.tripName.value;
+    tripData.totalBudget = +inputs.totalBudget.value;
 
-    User.addUser(userData);
-    await updateUser(AuthCtx.uid, userData);
+    const id = await storeTrip(tripData);
+    TripCtx.setCurrentTrip(id, tripData);
   }
 
   return (
-    // TODO: adjust this input form
     <View style={styles.form}>
-      <Text style={styles.title}>{inputs.userName.value} Profile</Text>
+      <Text style={styles.title}>New Trip</Text>
       <Input
-        label="Name"
+        label="Trip Name"
         textInputConfig={{
-          onChangeText: inputChangedHandler.bind(this, "userName"),
-          value: inputs.userName.value,
+          onChangeText: inputChangedHandler.bind(this, "tripName"),
+          value: inputs.tripName.value,
         }}
-        invalid={!inputs.userName.isValid}
+        invalid={!inputs.tripName.isValid}
       />
       <Input
         style={styles.rowInput}
-        label="Daily Budget"
+        label="Total Budget"
         textInputConfig={{
           keyboardType: "decimal-pad",
-          onChangeText: inputChangedHandler.bind(this, "dailybudget"),
-          value: inputs.dailybudget.value,
+          onChangeText: inputChangedHandler.bind(this, "totalBudget"),
+          value: inputs.totalBudget.value,
         }}
-        invalid={!inputs.dailybudget.isValid}
+        invalid={!inputs.totalBudget.isValid}
       />
 
-      <View style={styles.inputsRow}>
-        <Input
-          style={styles.rowInput}
-          label="homeCountry"
-          textInputConfig={{
-            onChangeText: inputChangedHandler.bind(this, "homeCountry"),
-            value: inputs.homeCountry.value,
-          }}
-          invalid={!inputs.homeCountry.isValid}
-        />
-        <Input
-          style={styles.rowInput}
-          label="homeCurrency"
-          textInputConfig={{
-            onChangeText: inputChangedHandler.bind(this, "homeCurrency"),
-            value: inputs.homeCurrency.value,
-          }}
-          invalid={!inputs.homeCurrency.isValid}
-        />
-      </View>
-      <View style={styles.inputsRow}>
-        <Input
-          style={styles.rowInput}
-          label="lastCountry"
-          textInputConfig={{
-            onChangeText: inputChangedHandler.bind(this, "lastCountry"),
-            value: inputs.lastCountry.value,
-          }}
-          invalid={!inputs.lastCountry.isValid}
-        />
-        <Input
-          style={styles.rowInput}
-          label="lastCurrency"
-          textInputConfig={{
-            onChangeText: inputChangedHandler.bind(this, "lastCurrency"),
-            value: inputs.lastCurrency.value,
-          }}
-          invalid={!inputs.lastCurrency.isValid}
-        />
-      </View>
       <View style={styles.buttonContainer}>
         <Button style={styles.button} title="SAVE" onPress={submitHandler}>
           SAVE
-        </Button>
-        <Button style={styles.button} title="LOGOUT" onPress={AuthCtx.logout}>
-          LOGOUT
         </Button>
       </View>
     </View>
   );
 };
 
-export default ProfileForm;
+export default TripForm;
 
 const styles = StyleSheet.create({
   form: {

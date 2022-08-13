@@ -5,6 +5,7 @@ import ErrorOverlay from "../components/UI/ErrorOverlay";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
+import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 import { getDateMinusDays } from "../util/date";
 import { fetchExpenses, fetchUser } from "../util/http";
@@ -15,13 +16,15 @@ function RecentExpenses() {
   const expensesCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
+  const tripCtx = useContext(TripContext);
+  const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
 
   useEffect(() => {
     async function getExpenses() {
       setIsFetching(true);
       try {
-        const expenses = await fetchExpenses(uid);
+        const expenses = await fetchExpenses(tripid, uid);
         expensesCtx.setExpenses(expenses);
         const user = await fetchUser(uid);
         userCtx.addUser(user);

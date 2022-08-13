@@ -22,6 +22,8 @@ import UsersContextProvider from "./store/user-context";
 import ProfileScreen from "./screens/ProfileScreen";
 import { UserContext } from "./store/user-context";
 import { fetchUser } from "./util/http";
+import TripContextProvider, { TripContext } from "./store/trip-context";
+import TripForm from "./components/ManageTrip/TripForm";
 
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
@@ -134,6 +136,17 @@ function ExpensesOverview(authCtx) {
           ),
         }}
       />
+      <BottomTabs.Screen
+        name="Trip"
+        component={TripForm}
+        options={{
+          title: "Trip",
+          tabBarLabel: "Trip",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-circle-outline" size={size} color={color} />
+          ),
+        }}
+      />
     </BottomTabs.Navigator>
   );
 }
@@ -143,17 +156,24 @@ function Root() {
 
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
+  const tripCtx = useContext(TripContext);
 
   useEffect(() => {
     async function fetchToken() {
       const storedToken = await AsyncStorage.getItem("token");
       const storedUid = await AsyncStorage.getItem("uid");
+      const storedTripId = await AsyncStorage.getItem("currentTripId");
 
       if (storedToken) {
         authCtx.authenticate(storedToken);
         authCtx.setUserID(storedUid);
-
+        // TODO: this addUser didnt work because the context was not correctly set around the root
         userCtx.addUser(fetchUser(authCtx.uid));
+        tripCtx.fetchCurrentTrip(storedTripId);
+        console.log(
+          "🚀 ~ file: App.js ~ line 174 ~ fetchToken ~ storedTripId",
+          storedTripId
+        );
       }
 
       setIsTryingLogin(false);
@@ -174,7 +194,9 @@ export default function App() {
     <>
       <StatusBar style="light" />
       <AuthContextProvider>
-        <Root />
+        <TripContextProvider>
+          <Root />
+        </TripContextProvider>
       </AuthContextProvider>
     </>
   );

@@ -1,5 +1,13 @@
 {
   "rules": {
+    "trips": {
+      ".read": true,
+      "$tripId": {
+        "$userID": {
+          ".validate": "auth.uid === $userID"
+        }
+      }
+    },
     ".read": "auth != null",
     ".write": "auth != null"
   }

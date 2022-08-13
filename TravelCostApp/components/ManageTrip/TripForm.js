@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
   form: {
     flex: 1,
     marginTop: 10,
+    backgroundColor: GlobalStyles.colors.primary700,
   },
   title: {
     fontSize: 24,

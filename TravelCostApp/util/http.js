@@ -15,9 +15,16 @@ export async function storeExpense(tripid, uid, expenseData) {
   return id;
 }
 
-export async function fetchExpenses(tripid, uid) {
+export async function fetchExpenses(tripid, uid, token) {
+  console.log("🚀 ~ file: http.js ~ line 19 ~ fetchExpenses ~ token", token);
   const response = await axios.get(
-    BACKEND_URL + "/trips/" + DUMMYTRIP + "/" + uid + "/expenses.json"
+    BACKEND_URL +
+      "/trips/" +
+      tripid +
+      "/" +
+      uid +
+      "/expenses.json" +
+      `auth=${token}`
   );
 
   const expenses = [];

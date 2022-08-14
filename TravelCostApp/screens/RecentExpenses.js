@@ -19,12 +19,13 @@ function RecentExpenses() {
   const tripCtx = useContext(TripContext);
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
+  const token = authCtx.token;
 
   useEffect(() => {
     async function getExpenses() {
       setIsFetching(true);
       try {
-        const expenses = await fetchExpenses(tripid, uid);
+        const expenses = await fetchExpenses(tripid, uid, token);
         expensesCtx.setExpenses(expenses);
         const user = await fetchUser(uid);
         userCtx.addUser(user);

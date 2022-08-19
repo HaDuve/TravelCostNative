@@ -7,9 +7,9 @@
     "icon": "./assets/iosAppIcon2.jpeg",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/iosAppIcon2.jpeg",
+      "image": "./assets/launchscreen.jpeg",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "updates": {
       "fallbackToCacheTimeout": 0

@@ -4,11 +4,11 @@
     "slug": "TravelCostApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/iosAppIcon2.jpeg",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/launchscreen.jpeg",
-      "resizeMode": "contain",
+      "image": "./assets/splash.png",
+      "resizeMode": "cover",
       "backgroundColor": "#000000"
     },
     "updates": {

@@ -26,6 +26,7 @@ import { UserContext } from "./store/user-context";
 import { fetchUser } from "./util/http";
 import TripContextProvider, { TripContext } from "./store/trip-context";
 import TripForm from "./components/ManageTrip/TripForm";
+import OnboardingScreen from "./screens/OnboardingScreen";
 
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
@@ -40,6 +41,11 @@ function NotAuthenticatedStack() {
         contentStyle: { backgroundColor: GlobalStyles.colors.primary100 },
       }}
     >
+      <AuthStack.Screen
+        name="Onboarding"
+        component={OnboardingScreen}
+        options={{ headerShown: false }}
+      />
       <AuthStack.Screen name="Login" component={LoginScreen} />
       <AuthStack.Screen name="Signup" component={SignupScreen} />
     </AuthStack.Navigator>

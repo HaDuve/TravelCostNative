@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
+import * as Linking from "expo-linking";
 
 import AppLoading from "expo-app-loading";
 import SignupScreen from "./screens/SignupScreen";
@@ -31,6 +32,8 @@ import OnboardingScreen from "./screens/OnboardingScreen";
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
 const BottomTabs = createBottomTabNavigator();
+
+const prefix = Linking.createURL("/");
 
 function NotAuthenticatedStack() {
   return (
@@ -82,9 +85,14 @@ function AuthenticatedStack() {
 
 function Navigation() {
   const authCtx = useContext(AuthContext);
+  const linking = {
+    // If you are using universal links, you need to add your domain to the prefixes as well:
+    // prefixes: [Linking.createURL('/'), 'https://app.example.com'],
+    prefixes: [prefix],
+  };
 
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking} fallback={<Text>Loading...</Text>}>
       {!authCtx.isAuthenticated && <NotAuthenticatedStack />}
       {authCtx.isAuthenticated && <AuthenticatedStack />}
     </NavigationContainer>

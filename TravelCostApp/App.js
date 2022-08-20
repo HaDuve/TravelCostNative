@@ -89,6 +89,16 @@ function Navigation() {
     // If you are using universal links, you need to add your domain to the prefixes as well:
     // prefixes: [Linking.createURL('/'), 'https://app.example.com'],
     prefixes: [prefix],
+    config: {
+      screens: {
+        ExpensesOverview: {
+          screens: {
+            RecentExpenses: "recent",
+            AllExpenses: "all",
+          },
+        },
+      },
+    },
   };
 
   return (

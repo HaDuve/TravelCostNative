@@ -85,3 +85,12 @@ export async function fetchTrip(tripid) {
   const response = await axios.get(BACKEND_URL + "/trips/" + `${tripid}.json`);
   return response.data;
 }
+
+export async function storeUserToTrip(tripid, uid) {
+  const response = await axios.post(
+    BACKEND_URL + "/trips/" + `${tripid}/` + `travellers.json`,
+    uid
+  );
+  const id = response.data.name;
+  return id;
+}

@@ -3,7 +3,12 @@ import { View, Text } from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
-import { fetchUser, storeTrip, updateUser } from "../../util/http";
+import {
+  fetchUser,
+  storeTrip,
+  storeUserToTrip,
+  updateUser,
+} from "../../util/http";
 import { Button } from "react-native";
 
 import Input from "../ManageExpense/Input";
@@ -11,8 +16,10 @@ import ErrorOverlay from "../UI/ErrorOverlay";
 import LoadingOverlay from "../UI/LoadingOverlay";
 import { TripContext } from "../../store/trip-context";
 
-const TripForm = () => {
+const TripForm = ({ navigation }) => {
   const TripCtx = useContext(TripContext);
+  const AuthCtx = useContext(AuthContext);
+  const uid = AuthCtx.uid;
   const [inputs, setInputs] = useState({
     tripName: {
       value: TripCtx.tripName ? TripCtx.tripName : "",
@@ -39,7 +46,9 @@ const TripForm = () => {
     tripData.totalBudget = +inputs.totalBudget.value;
 
     const id = await storeTrip(tripData);
-    TripCtx.setCurrentTrip(id, tripData);
+    const response = await TripCtx.setCurrentTrip(id, tripData);
+    storeUserToTrip(id, { travellerid: uid });
+    navigation.navigate("RecentExpenses");
   }
 
   return (

@@ -28,6 +28,7 @@ import { fetchUser } from "./util/http";
 import TripContextProvider, { TripContext } from "./store/trip-context";
 import TripForm from "./components/ManageTrip/TripForm";
 import OnboardingScreen from "./screens/OnboardingScreen";
+import JoinTrip from "./screens/JoinTrip";
 
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
@@ -66,13 +67,20 @@ function AuthenticatedStack() {
           }}
         >
           <Stack.Screen
-            name="ExpensesOverview"
-            component={ExpensesOverview}
+            name="Home"
+            component={Home}
             options={{ headerShown: false }}
           />
           <Stack.Screen
             name="ManageExpense"
             component={ManageExpense}
+            options={{
+              presentation: "modal",
+            }}
+          />
+          <Stack.Screen
+            name="ManageTrip"
+            component={TripForm}
             options={{
               presentation: "modal",
             }}
@@ -91,10 +99,16 @@ function Navigation() {
     prefixes: [prefix],
     config: {
       screens: {
-        ExpensesOverview: {
+        Home: {
           screens: {
             RecentExpenses: "recent",
             AllExpenses: "all",
+            Join: {
+              path: "join/:id",
+              parse: {
+                id: (id) => `${id}`,
+              },
+            },
           },
         },
       },
@@ -109,7 +123,7 @@ function Navigation() {
   );
 }
 
-function ExpensesOverview(authCtx) {
+function Home(authCtx) {
   return (
     <BottomTabs.Navigator
       screenOptions={({ navigation }) => ({
@@ -118,14 +132,24 @@ function ExpensesOverview(authCtx) {
         tabBarStyle: { backgroundColor: GlobalStyles.colors.primary500 },
         tabBarActiveTintColor: GlobalStyles.colors.accent500,
         headerRight: ({ tintColor }) => (
-          <IconButton
-            icon="add"
-            size={24}
-            color={tintColor}
-            onPress={() => {
-              navigation.navigate("ManageExpense");
-            }}
-          />
+          <>
+            <IconButton
+              icon="add"
+              size={24}
+              color={tintColor}
+              onPress={() => {
+                navigation.navigate("ManageExpense");
+              }}
+            />
+            <IconButton
+              icon="add"
+              size={26}
+              color={tintColor}
+              onPress={() => {
+                navigation.navigate("ManageTrip");
+              }}
+            />
+          </>
         ),
       })}
     >
@@ -163,13 +187,13 @@ function ExpensesOverview(authCtx) {
         }}
       />
       <BottomTabs.Screen
-        name="Trip"
-        component={TripForm}
+        name="Join"
+        component={JoinTrip}
         options={{
-          title: "Trip",
-          tabBarLabel: "Trip",
+          title: "JoinTrip",
+          tabBarLabel: "JoinTrip",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-circle-outline" size={size} color={color} />
+            <Ionicons name="add" size={size} color={color} />
           ),
         }}
       />

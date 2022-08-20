@@ -21,15 +21,7 @@ function TripContextProvider({ children }) {
 
   function setCurrentTrip(tripid, tripData) {
     setTripid(tripid);
-    console.log(
-      "🚀 ~ file: trip-context.js ~ line 22 ~ setCurrentTrip ~ tripid",
-      tripid
-    );
     setTripName(tripData.tripName);
-    console.log(
-      "🚀 ~ file: trip-context.js ~ line 24 ~ setCurrentTrip ~ tripData.tripName",
-      tripData.tripName
-    );
     setTotalBudget(tripData.totalBudget.toString());
     AsyncStorage.setItem("currentTripId", tripid);
     AsyncStorage.setItem("currentTripName", tripData.tripName);
@@ -41,26 +33,13 @@ function TripContextProvider({ children }) {
 
   async function getCurrentTripFromStorage() {
     // TODO: find out why this doesnt seem to work
-    console.log(
-      "🚀 ~ file: trip-context.js ~ line 40 ~ getCurrentTripFromStorage ~ getCurrentTripFromStorage",
-      getCurrentTripFromStorage
-    );
     // TODO: add a security check via user id
     const id = await AsyncStorage.getItem("currentTripId");
     const name = await AsyncStorage.getItem("currentTripName");
     const budget = await AsyncStorage.getItem("currentTripTotalBudget");
 
     if (id) {
-      setTripid(id);
-      console.log(
-        "🚀 ~ file: trip-context.js ~ line 41 ~ getCurrentTripFromStorage ~ id",
-        id
-      );
       setTripName(name);
-      console.log(
-        "🚀 ~ file: trip-context.js ~ line 43 ~ getCurrentTripFromStorage ~ name",
-        name
-      );
       setTotalBudget(budget);
     } else console.log("no trip stored in memory");
   }
@@ -71,10 +50,6 @@ function TripContextProvider({ children }) {
 
   async function fetchCurrentTrip(tripid) {
     const trip = await fetchTrip(tripid);
-    console.log(
-      "🚀 ~ file: trip-context.js ~ line 74 ~ fetchCurrentTrip ~ trip",
-      trip
-    );
     if (!trip) {
       console.log("COULD NOT FETCH AND SET TRIP");
       return;

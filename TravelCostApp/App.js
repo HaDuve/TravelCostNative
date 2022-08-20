@@ -7,7 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import * as Linking from "expo-linking";
-
+import { Text } from "react-native";
 import AppLoading from "expo-app-loading";
 import SignupScreen from "./screens/SignupScreen";
 import LoginScreen from "./screens/LoginScreen";
@@ -186,10 +186,6 @@ function Root() {
         // TODO: this addUser didnt work because the context was not correctly set around the root
         userCtx.addUser(fetchUser(authCtx.uid));
         tripCtx.fetchCurrentTrip(storedTripId);
-        console.log(
-          "🚀 ~ file: App.js ~ line 174 ~ fetchToken ~ storedTripId",
-          storedTripId
-        );
       }
 
       setIsTryingLogin(false);

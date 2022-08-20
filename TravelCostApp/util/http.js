@@ -6,7 +6,6 @@ const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
 
 export async function storeExpense(tripid, uid, expenseData) {
-  console.log(uid);
   const response = await axios.post(
     BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json",
     expenseData
@@ -16,7 +15,6 @@ export async function storeExpense(tripid, uid, expenseData) {
 }
 
 export async function fetchExpenses(tripid, uid, token) {
-  console.log("🚀 ~ file: http.js ~ line 19 ~ fetchExpenses ~ token", token);
   const response = await axios.get(
     BACKEND_URL +
       "/trips/" +

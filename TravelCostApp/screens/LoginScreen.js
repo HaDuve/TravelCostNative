@@ -19,11 +19,6 @@ function LoginScreen() {
     setIsAuthenticating(true);
     try {
       const { token, uid } = await login(email, password);
-      console.log(
-        "🚀 ~ file: LoginScreen.js ~ line 17 ~ loginHandler ~ uid",
-        uid
-      );
-
       authCtx.authenticate(token);
       authCtx.setUserID(uid);
     } catch (error) {

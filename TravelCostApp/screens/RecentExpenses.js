@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { Button } from "react-native-web";
+import DropDownPicker from "react-native-dropdown-picker";
 
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
@@ -15,6 +16,17 @@ function RecentExpenses() {
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
   const [range, setRange] = useState("day");
+
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("day");
+  const [items, setItems] = useState([
+    { label: "Day", value: "day" },
+    { label: "Week", value: "week" },
+    { label: "Month", value: "month" },
+    { label: "Year", value: "year" },
+    { label: "Total", value: "total" },
+  ]);
+
   const expensesCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
@@ -50,7 +62,7 @@ function RecentExpenses() {
   }
 
   let recentExpenses = [];
-  switch (range) {
+  switch (value) {
     case "day":
       recentExpenses = expensesCtx.expenses.filter((expense) => {
         const today = new Date();
@@ -83,17 +95,31 @@ function RecentExpenses() {
         return expense.date >= date7DaysAgo && expense.date <= today;
       });
       break;
+    case "total":
+      recentExpenses = expensesCtx.expenses;
+      break;
 
     default:
+      recentExpenses = expensesCtx.expenses;
       break;
   }
 
   return (
-    <ExpensesOutput
-      expenses={recentExpenses}
-      expensesPeriod={"Expenses this " + range}
-      fallbackText={"No expenses in " + range}
-    />
+    <>
+      <DropDownPicker
+        open={open}
+        value={value}
+        items={items}
+        setOpen={setOpen}
+        setValue={setValue}
+        setItems={setItems}
+      />
+      <ExpensesOutput
+        expenses={recentExpenses}
+        expensesPeriod={"Expenses this " + range}
+        fallbackText={"No expenses in " + range}
+      />
+    </>
   );
 }
 

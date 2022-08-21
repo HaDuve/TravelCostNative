@@ -170,7 +170,7 @@ function Home(authCtx) {
           ),
         }}
       />
-      <BottomTabs.Screen
+      {/* <BottomTabs.Screen
         name="AllExpenses"
         component={AllExpenses}
         options={{
@@ -180,7 +180,7 @@ function Home(authCtx) {
             <Ionicons name="calendar" size={size} color={color} />
           ),
         }}
-      />
+      /> */}
       <BottomTabs.Screen
         name="Profile"
         component={ProfileScreen}

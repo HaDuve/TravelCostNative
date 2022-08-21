@@ -30,7 +30,7 @@ function RecentExpenses() {
         const user = await fetchUser(uid);
         userCtx.addUser(user);
       } catch (error) {
-        setError("Could not fetch data from the web database!");
+        setError("Could not fetch data from the web database!" + error);
       }
       setIsFetching(false);
     }

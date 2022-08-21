@@ -84,6 +84,13 @@ function AuthenticatedStack() {
               presentation: "modal",
             }}
           />
+          <Stack.Screen
+            name="Join"
+            component={JoinTrip}
+            options={{
+              presentation: "modal",
+            }}
+          />
         </Stack.Navigator>
       </>
     </ExpensesContextProvider>
@@ -182,17 +189,6 @@ function Home(authCtx) {
           tabBarLabel: "Profile",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-circle-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <BottomTabs.Screen
-        name="Join"
-        component={JoinTrip}
-        options={{
-          title: "JoinTrip",
-          tabBarLabel: "JoinTrip",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="add" size={size} color={color} />
           ),
         }}
       />

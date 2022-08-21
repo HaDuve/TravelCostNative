@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-import { Button } from "react-native-web";
 import DropDownPicker from "react-native-dropdown-picker";
 
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
@@ -12,15 +11,19 @@ import { UserContext } from "../store/user-context";
 import { getDateMinusDays } from "../util/date";
 import { fetchExpenses, fetchUser } from "../util/http";
 
+import { StyleSheet, Text, View } from "react-native";
+import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
+import { GlobalStyles } from "../constants/styles";
+
 function RecentExpenses() {
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
   const [range, setRange] = useState("day");
 
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("day");
+  const [PeriodValue, setPeriodValue] = useState("day");
   const [items, setItems] = useState([
-    { label: "Day", value: "day" },
+    { label: "Today", value: "day" },
     { label: "Week", value: "week" },
     { label: "Month", value: "month" },
     { label: "Year", value: "year" },
@@ -62,7 +65,7 @@ function RecentExpenses() {
   }
 
   let recentExpenses = [];
-  switch (value) {
+  switch (PeriodValue) {
     case "day":
       recentExpenses = expensesCtx.expenses.filter((expense) => {
         const today = new Date();
@@ -103,24 +106,94 @@ function RecentExpenses() {
       recentExpenses = expensesCtx.expenses;
       break;
   }
+  const todayDateString = new Date().toISOString().slice(0, 10);
 
   return (
-    <>
-      <DropDownPicker
-        open={open}
-        value={value}
-        items={items}
-        setOpen={setOpen}
-        setValue={setValue}
-        setItems={setItems}
-      />
+    <View style={styles.container}>
+      <View style={styles.dateHeader}>
+        <Text style={styles.dateString}>{todayDateString}</Text>
+      </View>
+      <View style={styles.header}>
+        <DropDownPicker
+          open={open}
+          value={PeriodValue}
+          items={items}
+          setOpen={setOpen}
+          setValue={setPeriodValue}
+          setItems={setItems}
+          containerStyle={styles.dropdownContainer}
+          style={styles.dropdown}
+          textStyle={styles.dropdownTextStyle}
+        />
+        <ExpensesSummary
+          expenses={recentExpenses}
+          periodName={PeriodValue}
+        ></ExpensesSummary>
+      </View>
+      <View style={styles.tempGrayBar1}></View>
       <ExpensesOutput
         expenses={recentExpenses}
         expensesPeriod={"Expenses this " + range}
         fallbackText={"No expenses in " + range}
       />
-    </>
+      <View style={styles.tempGrayBar2}></View>
+    </View>
   );
 }
 
 export default RecentExpenses;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 0,
+    backgroundColor: "white",
+    justifyContent: "flex-start",
+  },
+  dateHeader: {
+    marginTop: 48,
+    marginLeft: 36,
+    marginBottom: -48,
+  },
+  dateString: {
+    fontSize: 12,
+    fontStyle: "italic",
+    color: GlobalStyles.colors.gray700,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    zIndex: 1,
+    marginTop: 48,
+    marginHorizontal: 24,
+    marginBottom: 12,
+  },
+  dropdownContainer: {
+    maxWidth: 160,
+  },
+  dropdown: {
+    borderRadius: 0,
+    borderWidth: 0,
+  },
+  dropdownTextStyle: {
+    fontSize: 25,
+    fontWeight: "bold",
+  },
+  zBehind: {
+    zIndex: 10,
+  },
+  tempGrayBar1: {
+    borderTopWidth: 0,
+    borderBottomWidth: 1,
+    borderTopColor: GlobalStyles.colors.gray600,
+    borderBottomColor: GlobalStyles.colors.gray600,
+    minHeight: 48,
+    backgroundColor: GlobalStyles.colors.gray500,
+  },
+  tempGrayBar2: {
+    borderTopWidth: 1,
+    borderTopColor: GlobalStyles.colors.gray600,
+    minHeight: 16,
+    backgroundColor: GlobalStyles.colors.gray500,
+  },
+});

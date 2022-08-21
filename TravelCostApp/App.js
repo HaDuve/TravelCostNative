@@ -74,6 +74,7 @@ function AuthenticatedStack() {
             name="ManageExpense"
             component={ManageExpense}
             options={{
+              headerShown: false,
               presentation: "modal",
             }}
           />
@@ -81,6 +82,7 @@ function AuthenticatedStack() {
             name="ManageTrip"
             component={TripForm}
             options={{
+              headerShown: false,
               presentation: "modal",
             }}
           />
@@ -88,6 +90,7 @@ function AuthenticatedStack() {
             name="Join"
             component={JoinTrip}
             options={{
+              headerShown: false,
               presentation: "modal",
             }}
           />
@@ -135,8 +138,10 @@ function Home(authCtx) {
       screenOptions={({ navigation }) => ({
         headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
         headerTintColor: "white",
-        tabBarStyle: { backgroundColor: GlobalStyles.colors.primary500 },
-        tabBarActiveTintColor: GlobalStyles.colors.accent500,
+        tabBarStyle: {
+          backgroundColor: GlobalStyles.colors.gray500,
+        },
+        tabBarActiveTintColor: GlobalStyles.colors.primary500,
         headerRight: ({ tintColor }) => (
           <>
             <IconButton
@@ -163,14 +168,15 @@ function Home(authCtx) {
         name="RecentExpenses"
         component={RecentExpenses}
         options={{
+          headerShown: false,
           title: "Recent Expenses",
-          tabBarLabel: "Recent",
+          tabBarLabel: "Expenses",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="hourglass" size={size} color={color} />
           ),
         }}
       />
-      {/* <BottomTabs.Screen
+      <BottomTabs.Screen
         name="AllExpenses"
         component={AllExpenses}
         options={{
@@ -180,11 +186,12 @@ function Home(authCtx) {
             <Ionicons name="calendar" size={size} color={color} />
           ),
         }}
-      /> */}
+      />
       <BottomTabs.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
+          headerShown: false,
           title: "Profile",
           tabBarLabel: "Profile",
           tabBarIcon: ({ color, size }) => (
@@ -241,7 +248,7 @@ function Root() {
 export default function App() {
   return (
     <>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       <AuthContextProvider>
         <TripContextProvider>
           <UserContextProvider>

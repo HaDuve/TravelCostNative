@@ -1,8 +1,9 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { GlobalStyles } from "../../constants/styles";
 import { getFormattedDate } from "../../util/date";
+import { Ionicons } from "@expo/vector-icons";
 
 function ExpenseItem({ id, description, amount, date }) {
   const navigation = useNavigation();
@@ -19,7 +20,14 @@ function ExpenseItem({ id, description, amount, date }) {
       style={({ pressed }) => pressed && styles.pressed}
     >
       <View style={styles.expenseItem}>
-        <View>
+        <View style={styles.iconContainer}>
+          <Ionicons
+            name="hourglass"
+            size={28}
+            color={GlobalStyles.colors.textColor}
+          />
+        </View>
+        <View style={styles.leftItem}>
           <Text style={[styles.textBase, styles.description]}>
             {description}
           </Text>
@@ -41,24 +49,30 @@ const styles = StyleSheet.create({
   },
   expenseItem: {
     padding: 12,
-    marginVertical: 8,
-    backgroundColor: GlobalStyles.colors.primary500,
+    marginVertical: 4,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
     flexDirection: "row",
     justifyContent: "space-between",
-    borderRadius: 6,
-    elevation: 3,
-    shadowColor: GlobalStyles.colors.gray500,
-    shadowRadius: 4,
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.4,
+    // borderRadius: 6,
+    // elevation: 3,
+    // shadowColor: GlobalStyles.colors.gray500,
+    // shadowRadius: 4,
+    // shadowOffset: { width: 1, height: 1 },
+    // shadowOpacity: 0.4,
   },
   textBase: {
-    color: GlobalStyles.colors.primary50,
+    color: GlobalStyles.colors.textColor,
   },
   description: {
     fontSize: 16,
-    marginBottom: 4,
-    fontWeight: "bold",
+  },
+  iconContainer: {
+    marginTop: 4,
+    marginRight: 8,
+    marginLeft: -12,
+  },
+  leftItem: {
+    flex: 1,
   },
   amountContainer: {
     paddingHorizontal: 12,
@@ -70,7 +84,6 @@ const styles = StyleSheet.create({
     minWidth: 80,
   },
   amount: {
-    color: GlobalStyles.colors.primary500,
-    fontWeight: "bold",
+    color: GlobalStyles.colors.error300,
   },
 });

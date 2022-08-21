@@ -48,7 +48,7 @@ const ExpenseForm = ({
       isValid: true,
     },
     owePerc: {
-      value: defaultValues ? defaultValues.owePerc : "",
+      value: defaultValues ? defaultValues.owePerc.toString() : "",
       isValid: true,
     },
   });

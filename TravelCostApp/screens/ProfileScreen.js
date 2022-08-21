@@ -2,10 +2,12 @@ import { StyleSheet, Text, TextInput, View } from "react-native";
 import { GlobalStyles } from "./../constants/styles";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 
+
 const ProfileScreen = () => {
+  
+
   return (
     <View style={styles.container}>
-      //TODO fetch stuff here to give as argument to ProfileForm
       <ProfileForm></ProfileForm>
     </View>
   );

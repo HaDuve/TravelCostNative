@@ -20,7 +20,7 @@ export const UserContext = createContext({
   deleteUser: (uid) => {},
 });
 
-function UsersContextProvider({ children }) {
+function UserContextProvider({ children }) {
   const [userName, setName] = useState("");
   const [dailybudget, setDailyBudget] = useState("");
   const [homeCountry, setHomeCountry] = useState("");
@@ -29,6 +29,11 @@ function UsersContextProvider({ children }) {
   const [lastCurrency, setLastCurrency] = useState("");
 
   function addUser(UserData) {
+    console.log(
+      "🚀 ~ file: user-context.js ~ line 32 ~ addUser ~ UserData",
+      UserData
+    );
+
     setName(UserData.userName);
     setDailyBudget(UserData.dailybudget.toString());
     setHomeCountry(UserData.homeCountry);
@@ -56,4 +61,4 @@ function UsersContextProvider({ children }) {
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
-export default UsersContextProvider;
+export default UserContextProvider;

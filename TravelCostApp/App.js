@@ -21,9 +21,8 @@ import AuthContextProvider, { AuthContext } from "./store/auth-context";
 import ExpensesContextProvider, {
   ExpensesContext,
 } from "./store/expenses-context";
-import UsersContextProvider from "./store/user-context";
 import ProfileScreen from "./screens/ProfileScreen";
-import { UserContext } from "./store/user-context";
+import UserContextProvider, { UserContext } from "./store/user-context";
 import { fetchUser } from "./util/http";
 import TripContextProvider, { TripContext } from "./store/trip-context";
 import TripForm from "./components/ManageTrip/TripForm";
@@ -59,7 +58,7 @@ function NotAuthenticatedStack() {
 function AuthenticatedStack() {
   return (
     <ExpensesContextProvider>
-      <UsersContextProvider>
+      <>
         <Stack.Navigator
           screenOptions={{
             headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
@@ -86,7 +85,7 @@ function AuthenticatedStack() {
             }}
           />
         </Stack.Navigator>
-      </UsersContextProvider>
+      </>
     </ExpensesContextProvider>
   );
 }
@@ -212,14 +211,22 @@ function Root() {
     async function fetchToken() {
       const storedToken = await AsyncStorage.getItem("token");
       const storedUid = await AsyncStorage.getItem("uid");
+      console.log(
+        "🚀 ~ file: App.js ~ line 214 ~ fetchToken ~ storedUid",
+        storedUid
+      );
       const storedTripId = await AsyncStorage.getItem("currentTripId");
 
       if (storedToken) {
-        authCtx.authenticate(storedToken);
         authCtx.setUserID(storedUid);
-        // TODO: this addUser didnt work because the context was not correctly set around the root
-        userCtx.addUser(fetchUser(authCtx.uid));
+        const response = await fetchUser(storedUid);
+        if (response) {
+          userCtx.addUser(response);
+        } else {
+          console.log("no responsedata");
+        }
         tripCtx.fetchCurrentTrip(storedTripId);
+        authCtx.authenticate(storedToken);
       }
 
       setIsTryingLogin(false);
@@ -241,7 +248,9 @@ export default function App() {
       <StatusBar style="light" />
       <AuthContextProvider>
         <TripContextProvider>
-          <Root />
+          <UserContextProvider>
+            <Root />
+          </UserContextProvider>
         </TripContextProvider>
       </AuthContextProvider>
     </>

@@ -12,13 +12,18 @@ import ErrorOverlay from "../UI/ErrorOverlay";
 import LoadingOverlay from "../UI/LoadingOverlay";
 
 const ProfileForm = () => {
-  const User = useContext(UserContext);
+  console.log("Profile Form was called!");
   const AuthCtx = useContext(AuthContext);
+  const User = useContext(UserContext);
+  console.log(
+    "🚀 ~ file: ProfileForm.js ~ line 18 ~ ProfileForm ~ User",
+    User.userName ? User.userName : " kein Username"
+  );
   const uid = AuthContext.uid;
 
   const [inputs, setInputs] = useState({
     userName: {
-      value: User.userName ? User.userName : "",
+      value: !User.userName ? "" : User.userName,
       isValid: true,
     },
     dailybudget: {
@@ -138,6 +143,18 @@ const ProfileForm = () => {
     </View>
   );
 };
+console.log(
+  "🚀 ~ file: ProfileForm.js ~ line 142 ~ ProfileForm ~ ProfileForm",
+  ProfileForm
+);
+console.log(
+  "🚀 ~ file: ProfileForm.js ~ line 142 ~ ProfileForm ~ ProfileForm",
+  ProfileForm
+);
+console.log(
+  "🚀 ~ file: ProfileForm.js ~ line 142 ~ ProfileForm ~ ProfileForm",
+  ProfileForm
+);
 
 export default ProfileForm;
 

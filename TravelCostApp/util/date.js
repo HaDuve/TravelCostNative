@@ -4,18 +4,18 @@ export function getFormattedDate(date) {
 
 export function toShortFormat(date) {
   let monthNames = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
+    "January",
+    "February",
+    "March",
+    "April",
     "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   let day = date.getDate();
@@ -25,7 +25,7 @@ export function toShortFormat(date) {
 
   let year = date.getFullYear();
 
-  return `${day}-${monthName}-${year}`;
+  return `${day} ${monthName}, ${year}`;
 }
 
 export function getDateMinusDays(date, days) {

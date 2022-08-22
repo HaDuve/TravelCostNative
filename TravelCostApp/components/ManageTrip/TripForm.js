@@ -12,10 +12,7 @@ import {
 import { Button } from "react-native";
 
 import Input from "../ManageExpense/Input";
-import ErrorOverlay from "../UI/ErrorOverlay";
-import LoadingOverlay from "../UI/LoadingOverlay";
 import { TripContext } from "../../store/trip-context";
-import ShareExample from "../Share/ShareExample";
 
 const TripForm = ({ navigation }) => {
   const TripCtx = useContext(TripContext);
@@ -78,7 +75,6 @@ const TripForm = ({ navigation }) => {
         <Button style={styles.button} title="SAVE" onPress={submitHandler}>
           SAVE
         </Button>
-        <ShareExample />
       </View>
     </View>
   );

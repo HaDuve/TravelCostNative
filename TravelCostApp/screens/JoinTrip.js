@@ -46,7 +46,7 @@ const JoinTrip = ({ navigation, route }) => {
       return;
     }
     console.log("NO pressed");
-    navigation.navigate("RecentExpenses");
+    navigation.navigate("Home");
   }
 
   return (

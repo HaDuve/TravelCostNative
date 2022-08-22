@@ -28,6 +28,7 @@ import TripContextProvider, { TripContext } from "./store/trip-context";
 import TripForm from "./components/ManageTrip/TripForm";
 import OnboardingScreen from "./screens/OnboardingScreen";
 import JoinTrip from "./screens/JoinTrip";
+import ShareTripButton from "./components/ProfileOutput/ShareTrip";
 
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
@@ -94,6 +95,14 @@ function AuthenticatedStack() {
               presentation: "modal",
             }}
           />
+          <Stack.Screen
+            name="Share"
+            component={ShareTripButton}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
         </Stack.Navigator>
       </>
     </ExpensesContextProvider>
@@ -108,16 +117,16 @@ function Navigation() {
     prefixes: [prefix],
     config: {
       screens: {
+        Join: {
+          path: "join/:id",
+          parse: {
+            id: (id) => `${id}`,
+          },
+        },
         Home: {
           screens: {
             RecentExpenses: "recent",
             AllExpenses: "all",
-            Join: {
-              path: "join/:id",
-              parse: {
-                id: (id) => `${id}`,
-              },
-            },
           },
         },
       },

@@ -27,15 +27,9 @@ const ProfileScreen = () => {
 
   const DUMMYTRIPS = [
     {
-      id: 1,
-      description: "trip1",
+      id: "-N9zE5RNR99u_qjn-rud",
+      description: "Goes to Bandung",
       amount: "1",
-      date: "",
-    },
-    {
-      id: 2,
-      description: "trip2",
-      amount: "2",
       date: "",
     },
   ];
@@ -46,6 +40,9 @@ const ProfileScreen = () => {
         <ProfileForm></ProfileForm>
       </ScrollView>
       <View style={styles.container}>
+        <Text>Active Trip</Text>
+        <TripList trips={DUMMYTRIPS}></TripList>
+        <Text>Other Trips</Text>
         <TripList trips={DUMMYTRIPS}></TripList>
       </View>
     </View>

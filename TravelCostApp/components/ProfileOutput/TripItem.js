@@ -7,13 +7,16 @@ function TripItem({ id, description, amount, date }) {
   const navigation = useNavigation();
 
   function tripPressHandler() {
-    navigation.navigate("ManageTrip", {
+    navigation.navigate("Share", {
       tripId: id,
     });
   }
 
   return (
-    <Pressable style={({ pressed }) => pressed && styles.pressed}>
+    <Pressable
+      onPress={tripPressHandler}
+      style={({ pressed }) => pressed && styles.pressed}
+    >
       <View style={styles.tripItem}>
         <View>
           <Text style={[styles.textBase, styles.description]}>

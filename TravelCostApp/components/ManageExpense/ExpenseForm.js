@@ -101,7 +101,10 @@ const ExpenseForm = ({
       Alert.alert("Invalid Input", "Please check your input values");
       setInputs((curInputs) => {
         return {
-          amount: { value: curInputs.amount.value, isValid: amountIsValid },
+          amount: {
+            value: curInputs.amount.value,
+            isValid: amountIsValid,
+          },
           date: { value: curInputs.date.value, isValid: dateIsValid },
           description: {
             value: curInputs.description.value,
@@ -177,35 +180,35 @@ const ExpenseForm = ({
 
   return (
     <View style={styles.form}>
-      <Text style={styles.title}>Your Expense: </Text>
+      {/* <Text style={styles.title}>Your Expense: </Text> */}
       <View style={styles.categoryRow}>
         <IconButton
           icon="fast-food-outline"
-          color={GlobalStyles.colors.accent500}
+          color={GlobalStyles.colors.primary500}
           size={36}
           onPress={onPressCategory("food")}
         />
         <IconButton
           icon="car-outline"
-          color={GlobalStyles.colors.accent500}
+          color={GlobalStyles.colors.primary500}
           size={36}
           onPress={onPressCategory("national-travel")}
         />
         <IconButton
           icon="airplane-outline"
-          color={GlobalStyles.colors.accent500}
+          color={GlobalStyles.colors.primary500}
           size={36}
           onPress={onPressCategory("international-travel")}
         />
         <IconButton
           icon="bed-outline"
-          color={GlobalStyles.colors.accent500}
+          color={GlobalStyles.colors.primary500}
           size={36}
           onPress={onPressCategory("accomodation")}
         />
         <IconButton
           icon="basket-outline"
-          color={GlobalStyles.colors.accent500}
+          color={GlobalStyles.colors.primary500}
           size={36}
           onPress={onPressCategory("other")}
         />
@@ -221,6 +224,7 @@ const ExpenseForm = ({
             value: inputs.amount.value,
           }}
           invalid={!inputs.amount.isValid}
+          autoFocus={true}
         />
         <Input
           style={styles.rowInput}
@@ -327,7 +331,16 @@ export default ExpenseForm;
 
 const styles = StyleSheet.create({
   form: {
-    marginTop: 10,
+    margin: 16,
+    padding: 12,
+    backgroundColor: GlobalStyles.colors.gray500,
+    borderRadius: 10,
+    borderWidth: 1,
+    elevation: 3,
+    borderColor: GlobalStyles.colors.gray600,
+    shadowColor: GlobalStyles.colors.gray600,
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 10,
   },
   title: {
     fontSize: 24,

@@ -3,8 +3,13 @@ import { GlobalStyles } from "./../constants/styles";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
 import { ScrollView } from "react-native";
+import { useEffect } from "react";
+import IconButton from "../components/UI/IconButton";
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ route, navigation, param }) => {
+  useEffect(() => {
+    // do something
+  }, [route]);
   // TODO: make a list in context where all trips are handled like expenses,
   // also 1 trip has to be set as active
 
@@ -28,21 +33,33 @@ const ProfileScreen = () => {
   const DUMMYTRIPS = [
     {
       id: "-N9zE5RNR99u_qjn-rud",
-      description: "Goes to Bandung",
-      amount: "1",
+      description: "Worldtrip",
+      amount: "20,000$",
       date: "",
     },
   ];
 
+  function cancelHandler() {
+    //refreshes the screen
+    console.log("canceled");
+  }
+
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.container}>
-        <ProfileForm></ProfileForm>
-      </ScrollView>
       <View style={styles.container}>
-        <Text>Active Trip</Text>
-        <TripList trips={DUMMYTRIPS}></TripList>
-        <Text>Other Trips</Text>
+        <ProfileForm onCancel={cancelHandler}></ProfileForm>
+      </View>
+      <View style={styles.tripContainer}>
+        <View style={styles.horizontalContainer}>
+          <Text style={styles.tripListTitle}>My Trips</Text>
+          <IconButton
+            icon={"create-outline"}
+            size={24}
+            color={GlobalStyles.colors.primary500}
+            style={styles.button}
+            onPress={navigation.navigate.bind(this, "ManageTrip")}
+          />
+        </View>
         <TripList trips={DUMMYTRIPS}></TripList>
       </View>
     </View>
@@ -53,9 +70,25 @@ export default ProfileScreen;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 2,
+    padding: 4,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  tripContainer: {
     flex: 1,
-    padding: 8,
-    backgroundColor: GlobalStyles.colors.primary800,
+    margin: 16,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  horizontalContainer: {
+    marginLeft: 100,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  tripListTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    fontStyle: "italic",
+    color: GlobalStyles.colors.gray600,
   },
   deleteContainer: {
     marginTop: 16,

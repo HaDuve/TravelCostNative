@@ -37,6 +37,9 @@ const TripForm = ({ navigation }) => {
       };
     });
   }
+  function cancelHandler() {
+    navigation.navigate("RecentExpenses");
+  }
 
   async function submitHandler(e) {
     const tripData = {};
@@ -44,37 +47,46 @@ const TripForm = ({ navigation }) => {
     tripData.totalBudget = +inputs.totalBudget.value;
 
     const id = await storeTrip(tripData);
-    const response = await TripCtx.setCurrentTrip(id, tripData);
+    const response = TripCtx.setCurrentTrip(id, tripData);
     storeUserToTrip(id, { travellerid: uid });
     navigation.navigate("RecentExpenses");
   }
 
   return (
     <View style={styles.form}>
-      <Text style={styles.title}>New Trip</Text>
-      <Input
-        label="Trip Name"
-        textInputConfig={{
-          onChangeText: inputChangedHandler.bind(this, "tripName"),
-          value: inputs.tripName.value,
-        }}
-        invalid={!inputs.tripName.isValid}
-      />
-      <Input
-        style={styles.rowInput}
-        label="Total Budget"
-        textInputConfig={{
-          keyboardType: "decimal-pad",
-          onChangeText: inputChangedHandler.bind(this, "totalBudget"),
-          value: inputs.totalBudget.value,
-        }}
-        invalid={!inputs.totalBudget.isValid}
-      />
-
+      <View style={styles.card}>
+        <Text style={styles.title}>New Trip</Text>
+        <Input
+          label="Trip Name"
+          textInputConfig={{
+            onChangeText: inputChangedHandler.bind(this, "tripName"),
+            value: inputs.tripName.value,
+          }}
+          invalid={!inputs.tripName.isValid}
+          autoFocus={true}
+        />
+        <Input
+          style={styles.rowInput}
+          label="Total Budget"
+          textInputConfig={{
+            keyboardType: "decimal-pad",
+            onChangeText: inputChangedHandler.bind(this, "totalBudget"),
+            value: inputs.totalBudget.value,
+          }}
+          invalid={!inputs.totalBudget.isValid}
+        />
+      </View>
       <View style={styles.buttonContainer}>
-        <Button style={styles.button} title="SAVE" onPress={submitHandler}>
-          SAVE
-        </Button>
+        <Button
+          style={styles.button}
+          title="CANCEL"
+          onPress={cancelHandler}
+        ></Button>
+        <Button
+          style={styles.button}
+          title="SAVE"
+          onPress={submitHandler}
+        ></Button>
       </View>
     </View>
   );
@@ -85,13 +97,25 @@ export default TripForm;
 const styles = StyleSheet.create({
   form: {
     flex: 1,
-    marginTop: 10,
-    backgroundColor: GlobalStyles.colors.primary700,
+    padding: 12,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  card: {
+    margin: 16,
+    padding: 12,
+    backgroundColor: GlobalStyles.colors.gray500,
+    borderRadius: 10,
+    borderWidth: 1,
+    elevation: 3,
+    borderColor: GlobalStyles.colors.gray600,
+    shadowColor: GlobalStyles.colors.gray600,
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 10,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "white",
+    color: GlobalStyles.colors.textColor,
     marginTop: 5,
     marginBottom: 24,
     textAlign: "center",
@@ -104,15 +128,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  rowInput: {
-    flex: 1,
-  },
   errorText: {
     textAlign: "center",
     color: GlobalStyles.colors.error500,
     margin: 8,
   },
   buttonContainer: {
+    flex: 1,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",

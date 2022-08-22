@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Alert } from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
@@ -10,17 +10,29 @@ import { Button } from "react-native";
 import Input from "../ManageExpense/Input";
 import ErrorOverlay from "../UI/ErrorOverlay";
 import LoadingOverlay from "../UI/LoadingOverlay";
+import IconButton from "../UI/IconButton";
 
-const ProfileForm = () => {
-  console.log("Profile Form was called!");
+const ProfileForm = ({ onCancel }) => {
   const AuthCtx = useContext(AuthContext);
   const User = useContext(UserContext);
-  console.log(
-    "🚀 ~ file: ProfileForm.js ~ line 18 ~ ProfileForm ~ User",
-    User.userName ? User.userName : " kein Username"
-  );
   const uid = AuthContext.uid;
 
+  function logoutHandler() {
+    return Alert.alert("Are your sure?", "Are you sure you want to logout?", [
+      // The "No" button
+      // Does nothing but dismiss the dialog when tapped
+      {
+        text: "No",
+      },
+      // The "Yes" button
+      {
+        text: "Yes",
+        onPress: () => {
+          Alert.AuthCtx.logout();
+        },
+      },
+    ]);
+  }
   const [inputs, setInputs] = useState({
     userName: {
       value: !User.userName ? "" : User.userName,
@@ -72,7 +84,15 @@ const ProfileForm = () => {
 
   return (
     <View style={styles.form}>
-      <Text style={styles.title}>{inputs.userName.value} Profile</Text>
+      <View style={styles.avatarBar}>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>
+            {inputs.userName.value.charAt(0)}
+          </Text>
+        </View>
+        <Text>Change Avatar</Text>
+        <Text>Delete Avatar</Text>
+      </View>
       <Input
         label="Name"
         textInputConfig={{
@@ -81,18 +101,18 @@ const ProfileForm = () => {
         }}
         invalid={!inputs.userName.isValid}
       />
-      <Input
-        style={styles.rowInput}
-        label="Daily Budget"
-        textInputConfig={{
-          keyboardType: "decimal-pad",
-          onChangeText: inputChangedHandler.bind(this, "dailybudget"),
-          value: inputs.dailybudget.value,
-        }}
-        invalid={!inputs.dailybudget.isValid}
-      />
-
       <View style={styles.inputsRow}>
+        <Input
+          style={styles.rowInput}
+          label="Daily Budget"
+          textInputConfig={{
+            keyboardType: "decimal-pad",
+            onChangeText: inputChangedHandler.bind(this, "dailybudget"),
+            value: inputs.dailybudget.value,
+          }}
+          invalid={!inputs.dailybudget.isValid}
+        />
+
         <Input
           style={styles.rowInput}
           label="homeCountry"
@@ -133,28 +153,32 @@ const ProfileForm = () => {
         />
       </View>
       <View style={styles.buttonContainer}>
-        <Button style={styles.button} title="SAVE" onPress={submitHandler}>
-          SAVE
-        </Button>
-        <Button style={styles.button} title="LOGOUT" onPress={AuthCtx.logout}>
-          LOGOUT
-        </Button>
+        <IconButton
+          icon={"exit-outline"}
+          size={24}
+          color={GlobalStyles.colors.textColor}
+          style={styles.button}
+          onPress={logoutHandler}
+        />
+
+        <IconButton
+          icon={"close-outline"}
+          size={24}
+          color={GlobalStyles.colors.backgroundColor}
+          style={styles.button}
+          onPress={onCancel}
+        />
+        <IconButton
+          icon={"checkmark"}
+          size={24}
+          color={GlobalStyles.colors.primary400}
+          style={styles.button}
+          onPress={submitHandler}
+        />
       </View>
     </View>
   );
 };
-console.log(
-  "🚀 ~ file: ProfileForm.js ~ line 142 ~ ProfileForm ~ ProfileForm",
-  ProfileForm
-);
-console.log(
-  "🚀 ~ file: ProfileForm.js ~ line 142 ~ ProfileForm ~ ProfileForm",
-  ProfileForm
-);
-console.log(
-  "🚀 ~ file: ProfileForm.js ~ line 142 ~ ProfileForm ~ ProfileForm",
-  ProfileForm
-);
 
 export default ProfileForm;
 
@@ -162,6 +186,28 @@ const styles = StyleSheet.create({
   form: {
     flex: 1,
     marginTop: 10,
+  },
+  avatarBar: {
+    marginTop: 48,
+    marginHorizontal: 12,
+    padding: 4,
+    minHeight: 60,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  avatar: {
+    minHeight: 60,
+    minWidth: 60,
+    borderRadius: 60,
+    backgroundColor: GlobalStyles.colors.gray500,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarText: {
+    fontSize: 36,
+    fontWeight: "bold",
+    color: GlobalStyles.colors.primary700,
   },
   title: {
     fontSize: 24,
@@ -188,10 +234,11 @@ const styles = StyleSheet.create({
     margin: 8,
   },
   buttonContainer: {
+    flex: 1,
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 8,
+    margin: 8,
   },
   button: {
     minWidth: 120,

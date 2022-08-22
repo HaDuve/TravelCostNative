@@ -244,8 +244,8 @@ const ExpenseForm = ({
             ? "arrow-down-circle-outline"
             : "arrow-forward-circle-outline"
         }
-        color={GlobalStyles.colors.primary100}
-        size={24}
+        color={GlobalStyles.colors.primary500}
+        size={28}
         onPress={toggleAdvancedHandler}
       />
       {/* toggleable content */}

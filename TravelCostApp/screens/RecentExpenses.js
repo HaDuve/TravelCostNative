@@ -8,7 +8,7 @@ import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
-import { getDateMinusDays } from "../util/date";
+import { getDateMinusDays, toShortFormat } from "../util/date";
 import { fetchExpenses, fetchUser } from "../util/http";
 
 import { StyleSheet, Text, View } from "react-native";
@@ -106,7 +106,9 @@ function RecentExpenses() {
       recentExpenses = expensesCtx.expenses;
       break;
   }
-  const todayDateString = new Date().toISOString().slice(0, 10);
+
+  let todayDateString = new Date();
+  todayDateString = toShortFormat(todayDateString);
 
   return (
     <View style={styles.container}>

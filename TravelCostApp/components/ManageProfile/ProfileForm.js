@@ -28,7 +28,7 @@ const ProfileForm = ({ onCancel }) => {
       {
         text: "Yes",
         onPress: () => {
-          Alert.AuthCtx.logout();
+          AuthCtx.logout();
         },
       },
     ]);

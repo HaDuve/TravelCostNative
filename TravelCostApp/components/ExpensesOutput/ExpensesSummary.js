@@ -38,14 +38,26 @@ const ExpensesSummary = ({ expenses, periodName }) => {
     default:
       break;
   }
-  const budgetProgress = (expenseSumNum / dailyBudgetNum) * 1;
+  let budgetProgress = (expenseSumNum / dailyBudgetNum) * 1;
+  const budgetColor =
+    budgetProgress <= 1
+      ? GlobalStyles.colors.primary500
+      : GlobalStyles.colors.error300;
+  const unfilledColor =
+    budgetProgress <= 1
+      ? GlobalStyles.colors.gray600
+      : GlobalStyles.colors.primaryGrayed;
+
+  if (budgetProgress > 1) budgetProgress -= 1;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sum}>${expensesSum.toFixed(2)}</Text>
+      <Text style={[styles.sum, { color: budgetColor }]}>
+        ${expensesSum.toFixed(2)}
+      </Text>
       <Progress.Bar
-        color={GlobalStyles.colors.primary500}
-        unfilledColor={GlobalStyles.colors.gray600}
+        color={budgetColor}
+        unfilledColor={unfilledColor}
         borderWidth={0}
         borderRadius={8}
         progress={budgetProgress}

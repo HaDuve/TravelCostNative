@@ -95,6 +95,7 @@ const ProfileForm = ({ onCancel }) => {
       </View>
       <Input
         label="Name"
+        inputStyle={styles.inputStyle}
         textInputConfig={{
           onChangeText: inputChangedHandler.bind(this, "userName"),
           value: inputs.userName.value,
@@ -104,6 +105,7 @@ const ProfileForm = ({ onCancel }) => {
       <View style={styles.inputsRow}>
         <Input
           style={styles.rowInput}
+          inputStyle={styles.inputStyle}
           label="Daily Budget"
           textInputConfig={{
             keyboardType: "decimal-pad",
@@ -115,6 +117,7 @@ const ProfileForm = ({ onCancel }) => {
 
         <Input
           style={styles.rowInput}
+          inputStyle={styles.inputStyle}
           label="homeCountry"
           textInputConfig={{
             onChangeText: inputChangedHandler.bind(this, "homeCountry"),
@@ -124,6 +127,7 @@ const ProfileForm = ({ onCancel }) => {
         />
         <Input
           style={styles.rowInput}
+          inputStyle={styles.inputStyle}
           label="homeCurrency"
           textInputConfig={{
             onChangeText: inputChangedHandler.bind(this, "homeCurrency"),
@@ -135,6 +139,7 @@ const ProfileForm = ({ onCancel }) => {
       <View style={styles.inputsRow}>
         <Input
           style={styles.rowInput}
+          inputStyle={styles.inputStyle}
           label="lastCountry"
           textInputConfig={{
             onChangeText: inputChangedHandler.bind(this, "lastCountry"),
@@ -144,6 +149,7 @@ const ProfileForm = ({ onCancel }) => {
         />
         <Input
           style={styles.rowInput}
+          inputStyle={styles.inputStyle}
           label="lastCurrency"
           textInputConfig={{
             onChangeText: inputChangedHandler.bind(this, "lastCurrency"),
@@ -227,6 +233,9 @@ const styles = StyleSheet.create({
   },
   rowInput: {
     flex: 1,
+  },
+  inputStyle: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   errorText: {
     textAlign: "center",

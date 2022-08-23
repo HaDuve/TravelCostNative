@@ -1,4 +1,5 @@
 import { createContext, useReducer } from "react";
+import { getDateMinusDays } from "../util/date";
 
 export const ExpensesContext = createContext({
   expenses: [],
@@ -29,6 +30,7 @@ export const ExpensesContext = createContext({
       owePerc,
     }
   ) => {},
+  getRecentExpenses: (rangestring) => {},
 });
 
 function expensesReducer(state, action) {
@@ -72,6 +74,49 @@ function ExpensesContextProvider({ children }) {
   function updateExpense(id, expenseData) {
     dispatch({ type: "UPDATE", payload: { id: id, data: expenseData } });
   }
+  function getRecentExpenses(rangestring) {
+    switch (rangestring) {
+      case "day":
+        return expensesState.filter((expense) => {
+          const today = new Date();
+          const date7DaysAgo = getDateMinusDays(today, 1);
+
+          return expense.date >= date7DaysAgo && expense.date <= today;
+        });
+        break;
+      case "week":
+        return expensesState.filter((expense) => {
+          const today = new Date();
+          const date7DaysAgo = getDateMinusDays(today, 7);
+
+          return expense.date >= date7DaysAgo && expense.date <= today;
+        });
+        break;
+      case "month":
+        return expensesState.filter((expense) => {
+          const today = new Date();
+          const date7DaysAgo = getDateMinusDays(today, 30);
+
+          return expense.date >= date7DaysAgo && expense.date <= today;
+        });
+        break;
+      case "year":
+        return expensesState.filter((expense) => {
+          const today = new Date();
+          const date7DaysAgo = getDateMinusDays(today, 365);
+
+          return expense.date >= date7DaysAgo && expense.date <= today;
+        });
+        break;
+      case "total":
+        return expensesState;
+        break;
+
+      default:
+        return expensesState;
+        break;
+    }
+  }
 
   const value = {
     expenses: expensesState,
@@ -79,6 +124,7 @@ function ExpensesContextProvider({ children }) {
     setExpenses: setExpenses,
     deleteExpense: deleteExpense,
     updateExpense: updateExpense,
+    getRecentExpenses: getRecentExpenses,
   };
 
   return (

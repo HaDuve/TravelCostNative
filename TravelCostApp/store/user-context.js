@@ -3,7 +3,7 @@ import { Alert } from "react-native";
 
 export const UserContext = createContext({
   userName: "",
-  dailyBudget: "",
+  dailybudget: "",
   homeCountry: "",
   homeCurrency: "",
   lastCountry: "",
@@ -11,7 +11,7 @@ export const UserContext = createContext({
 
   addUser: ({
     userName,
-    dailyBudget,
+    dailybudget,
     homeCountry,
     homeCurrency,
     country,

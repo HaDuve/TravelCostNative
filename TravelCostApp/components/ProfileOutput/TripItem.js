@@ -2,10 +2,15 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { GlobalStyles } from "../../constants/styles";
+import * as Progress from "react-native-progress";
+import { useContext } from "react";
+import { TripContext } from "../../store/trip-context";
 
 function TripItem({ id, description, amount, date }) {
   const navigation = useNavigation();
 
+  // const TripCtx = useContext(TripContext);
+  // const tripBudget = Number(TripCtx.totalBudget);
   function tripPressHandler() {
     navigation.navigate("Share", {
       tripId: id,
@@ -26,6 +31,15 @@ function TripItem({ id, description, amount, date }) {
         </View>
         <View style={styles.amountContainer}>
           <Text style={styles.amount}>{amount}</Text>
+          <Progress.Bar
+            color={GlobalStyles.colors.primary500}
+            unfilledColor={GlobalStyles.colors.gray600}
+            borderWidth={0}
+            borderRadius={8}
+            progress={0.3}
+            height={12}
+            width={150}
+          />
         </View>
       </View>
     </Pressable>
@@ -41,7 +55,7 @@ const styles = StyleSheet.create({
   tripItem: {
     padding: 12,
     marginVertical: 8,
-    backgroundColor: GlobalStyles.colors.primary500,
+    backgroundColor: GlobalStyles.colors.gray500,
     flexDirection: "row",
     justifyContent: "space-between",
     borderRadius: 6,
@@ -52,7 +66,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
   },
   textBase: {
-    color: GlobalStyles.colors.primary50,
+    color: GlobalStyles.colors.primary500,
   },
   description: {
     fontSize: 16,
@@ -62,7 +76,6 @@ const styles = StyleSheet.create({
   amountContainer: {
     paddingHorizontal: 12,
     paddingVertical: 4,
-    backgroundColor: "white",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,

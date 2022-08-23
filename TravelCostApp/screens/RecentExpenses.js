@@ -66,47 +66,7 @@ function RecentExpenses({ navigation }) {
   }
 
   let recentExpenses = [];
-  switch (PeriodValue) {
-    case "day":
-      recentExpenses = expensesCtx.expenses.filter((expense) => {
-        const today = new Date();
-        const date7DaysAgo = getDateMinusDays(today, 1);
-
-        return expense.date >= date7DaysAgo && expense.date <= today;
-      });
-      break;
-    case "week":
-      recentExpenses = expensesCtx.expenses.filter((expense) => {
-        const today = new Date();
-        const date7DaysAgo = getDateMinusDays(today, 7);
-
-        return expense.date >= date7DaysAgo && expense.date <= today;
-      });
-      break;
-    case "month":
-      recentExpenses = expensesCtx.expenses.filter((expense) => {
-        const today = new Date();
-        const date7DaysAgo = getDateMinusDays(today, 30);
-
-        return expense.date >= date7DaysAgo && expense.date <= today;
-      });
-      break;
-    case "year":
-      recentExpenses = expensesCtx.expenses.filter((expense) => {
-        const today = new Date();
-        const date7DaysAgo = getDateMinusDays(today, 365);
-
-        return expense.date >= date7DaysAgo && expense.date <= today;
-      });
-      break;
-    case "total":
-      recentExpenses = expensesCtx.expenses;
-      break;
-
-    default:
-      recentExpenses = expensesCtx.expenses;
-      break;
-  }
+  recentExpenses = expensesCtx.getRecentExpenses(PeriodValue);
 
   let todayDateString = new Date();
   todayDateString = toShortFormat(todayDateString);

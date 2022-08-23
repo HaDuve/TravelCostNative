@@ -24,7 +24,7 @@ const ExpenseForm = ({
       isValid: true,
     },
     date: {
-      value: defaultValues.date ? getFormattedDate(defaultValues.date) : "",
+      value: defaultValues ? getFormattedDate(defaultValues.date) : "",
       isValid: true,
     },
     description: {
@@ -152,8 +152,7 @@ const ExpenseForm = ({
     }
 
     // for now set default values to every field so everything goes fast
-    // TODO delete the line below
-    inputChangedHandler("amount", "1");
+
     inputChangedHandler("country", UserCtx.lastCountry);
     inputChangedHandler("currency", UserCtx.lastCurrency);
     inputChangedHandler("whoPaid", UserCtx.userName);

@@ -88,10 +88,7 @@ function RecentExpenses({ navigation }) {
           style={styles.dropdown}
           textStyle={styles.dropdownTextStyle}
         />
-        <ExpensesSummary
-          expenses={recentExpenses}
-          periodName={PeriodValue}
-        ></ExpensesSummary>
+        <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
       </View>
       <View style={styles.tempGrayBar1}></View>
       <ExpensesOutput
@@ -176,6 +173,7 @@ const styles = StyleSheet.create({
     minHeight: 55,
     minWidth: 30,
     marginHorizontal: 160,
+    marginTop: -40,
     marginBottom: -15,
     flexDirection: "row",
     alignItems: "center",

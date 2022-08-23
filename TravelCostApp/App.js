@@ -41,8 +41,8 @@ function NotAuthenticatedStack() {
     <AuthStack.Navigator
       screenOptions={{
         headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
-        headerTintColor: "white",
-        contentStyle: { backgroundColor: GlobalStyles.colors.primary100 },
+        headerTintColor: "black",
+        contentStyle: { backgroundColor: GlobalStyles.colors.backgroundColor },
       }}
     >
       <AuthStack.Screen
@@ -50,8 +50,16 @@ function NotAuthenticatedStack() {
         component={OnboardingScreen}
         options={{ headerShown: false }}
       />
-      <AuthStack.Screen name="Login" component={LoginScreen} />
-      <AuthStack.Screen name="Signup" component={SignupScreen} />
+      <AuthStack.Screen
+        name="Login"
+        component={LoginScreen}
+        options={{ headerShown: false }}
+      />
+      <AuthStack.Screen
+        name="Signup"
+        component={SignupScreen}
+        options={{ headerShown: false }}
+      />
     </AuthStack.Navigator>
   );
 }

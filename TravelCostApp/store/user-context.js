@@ -18,6 +18,7 @@ export const UserContext = createContext({
     currency,
   }) => {},
   deleteUser: (uid) => {},
+  setUserName: (name) => {},
 });
 
 function UserContextProvider({ children }) {
@@ -45,6 +46,10 @@ function UserContextProvider({ children }) {
   function deleteUser(id) {
     Alert.alert("delete context not implemented");
   }
+  function setUserName(name) {
+    if (!name || name.length < 1) return;
+    setName(name);
+  }
 
   const value = {
     userName: userName,
@@ -56,6 +61,7 @@ function UserContextProvider({ children }) {
 
     addUser: addUser,
     deleteUser: deleteUser,
+    setUserName: setUserName,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

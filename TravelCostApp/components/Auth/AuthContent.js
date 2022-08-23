@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import FlatButton from "../UI/FlatButton";
@@ -25,31 +25,26 @@ function AuthContent({ isLogin, onAuthenticate }) {
   }
 
   function submitHandler(credentials) {
-    let { email, confirmEmail, password, confirmPassword } = credentials;
+    let { name, email, password } = credentials;
 
+    name = name.trim();
     email = email.trim();
     password = password.trim();
 
+    const nameIsValid = name.length > 0;
     const emailIsValid = email.includes("@");
     const passwordIsValid = password.length > 6;
-    const emailsAreEqual = email === confirmEmail;
-    const passwordsAreEqual = password === confirmPassword;
 
-    if (
-      !emailIsValid ||
-      !passwordIsValid ||
-      (!isLogin && (!emailsAreEqual || !passwordsAreEqual))
-    ) {
+    if (!emailIsValid || !passwordIsValid || !isLogin) {
       Alert.alert("Invalid input", "Please check your entered credentials.");
       setCredentialsInvalid({
+        name: !nameIsValid,
         email: !emailIsValid,
-        confirmEmail: !emailIsValid || !emailsAreEqual,
         password: !passwordIsValid,
-        confirmPassword: !passwordIsValid || !passwordsAreEqual,
       });
       return;
     }
-    onAuthenticate({ email, password });
+    onAuthenticate({ name, email, password });
   }
 
   return (
@@ -60,6 +55,9 @@ function AuthContent({ isLogin, onAuthenticate }) {
         credentialsInvalid={credentialsInvalid}
       />
       <View style={styles.buttons}>
+        <Text style={styles.secondaryText}>
+          {isLogin ? "Already have an account?" : "Don't have an account?"}
+        </Text>
         <FlatButton onPress={switchAuthModeHandler}>
           {isLogin ? "Create a new user" : "Log in instead"}
         </FlatButton>
@@ -76,14 +74,20 @@ const styles = StyleSheet.create({
     marginHorizontal: 32,
     padding: 16,
     borderRadius: 8,
-    backgroundColor: GlobalStyles.colors.primary800,
-    elevation: 2,
-    shadowColor: "black",
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    // elevation: 2,
+    // shadowColor: "black",
+    // shadowOffset: { width: 1, height: 1 },
+    // shadowOpacity: 0.35,
+    // shadowRadius: 4,
   },
   buttons: {
+    flexDirection: "row",
     marginTop: 8,
+  },
+  secondaryText: {
+    fontSize: 14,
+    color: GlobalStyles.colors.gray700,
+    fontWeight: "300",
   },
 });

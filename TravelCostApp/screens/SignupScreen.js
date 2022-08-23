@@ -13,13 +13,14 @@ function SignupScreen() {
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
 
-  async function signupHandler({ email, password }) {
+  async function signupHandler({ name, email, password }) {
     setIsAuthenticating(true);
     try {
       const { token, uid } = await createUser(email, password);
       authCtx.authenticate(token);
       authCtx.setUserID(uid);
       storeUser(uid);
+      userCtx.setName(name);
     } catch (error) {
       Alert.alert(
         "Authentication failed",

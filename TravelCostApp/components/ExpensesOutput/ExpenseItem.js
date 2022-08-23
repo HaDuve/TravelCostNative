@@ -53,12 +53,7 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
     flexDirection: "row",
     justifyContent: "space-between",
-    // borderRadius: 6,
-    // elevation: 3,
-    // shadowColor: GlobalStyles.colors.gray500,
-    // shadowRadius: 4,
-    // shadowOffset: { width: 1, height: 1 },
-    // shadowOpacity: 0.4,
+
   },
   textBase: {
     color: GlobalStyles.colors.textColor,

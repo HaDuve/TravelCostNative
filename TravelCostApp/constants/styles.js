@@ -19,4 +19,21 @@ export const GlobalStyles = {
     gray600: "#BFBFBF",
     gray700: "#626262",
   },
+  buttonTextPrimary: {
+    color: "#FFFFFF",
+    textAlign: "center",
+    fontStyle: "italic",
+    fontWeight: "300",
+  },
+  buttonTextFlat: {
+    color: "#008C70",
+    textAlign: "center",
+    fontStyle: "italic",
+    fontWeight: "300",
+  },
+  secondaryText: {
+    fontSize: 14,
+    color: "#626262",
+    fontWeight: "300",
+  },
 };

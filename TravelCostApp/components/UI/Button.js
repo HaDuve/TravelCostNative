@@ -10,7 +10,12 @@ const Button = ({ children, onPress, mode, style }) => {
         style={({ pressed }) => pressed && styles.pressed}
       >
         <View style={[styles.button, mode === "flat" && styles.flat]}>
-          <Text style={[styles.buttonText, mode === "flat" && styles.flatText]}>
+          <Text
+            style={[
+              GlobalStyles.buttonTextPrimary,
+              mode === "flat" && styles.flatText,
+            ]}
+          >
             {children}
           </Text>
         </View>
@@ -23,16 +28,18 @@ export default Button;
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 4,
-    padding: 8,
+    padding: 16,
     backgroundColor: GlobalStyles.colors.primary500,
+    borderRadius: 16,
+    elevation: 3,
+    shadowColor: GlobalStyles.colors.primary800,
+    shadowRadius: 4,
+    shadowOffset: { width: 1, height: 4 },
+    shadowOpacity: 0.4,
+    overflow: "visible",
   },
   flat: {
     backgroundColor: "transparent",
-  },
-  buttonText: {
-    color: "white",
-    textAlign: "center",
   },
   flatText: {
     color: GlobalStyles.colors.primary200,
@@ -40,6 +47,8 @@ const styles = StyleSheet.create({
   pressed: {
     opacity: 0.75,
     backgroundColor: GlobalStyles.colors.primary100,
-    borderRadius: 4,
+    borderRadius: 16,
+    shadowColor: GlobalStyles.colors.backgroundColor,
+    shadowRadius: 0,
   },
 });

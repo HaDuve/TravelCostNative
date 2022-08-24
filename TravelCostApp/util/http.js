@@ -27,6 +27,12 @@ export async function fetchExpenses(tripid, uid) {
       amount: response.data[key].amount,
       date: new Date(response.data[key].date),
       description: response.data[key].description,
+      category: response.data[key].category,
+      country: response.data[key].country,
+      currency: response.data[key].currency,
+      whoPaid: response.data[key].whoPaid,
+      owePerc: response.data[key].owePerc,
+      uid: response.data[key].uid,
     };
     expenses.push(expenseObj);
   }

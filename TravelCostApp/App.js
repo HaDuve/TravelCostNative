@@ -187,10 +187,10 @@ function Home(authCtx) {
         component={RecentExpenses}
         options={{
           headerShown: false,
-          title: "Recent Expenses",
-          tabBarLabel: "Expenses",
+          // title: "Recent Expenses",
+          tabBarLabel: "",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="hourglass" size={size} color={color} />
+            <Ionicons name="ios-list" size={size} color={color} />
           ),
         }}
       />
@@ -200,7 +200,7 @@ function Home(authCtx) {
         options={{
           headerShown: false,
           title: "Overview",
-          tabBarLabel: "Overview",
+          tabBarLabel: "",
           tabBarIcon: ({ color, size }) => (
             <Ionicons
               name="ios-stats-chart-outline"
@@ -227,7 +227,7 @@ function Home(authCtx) {
         options={{
           headerShown: false,
           title: "Profile",
-          tabBarLabel: "Profile",
+          tabBarLabel: "",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-circle-outline" size={size} color={color} />
           ),

@@ -2,10 +2,12 @@ import { Pressable, StyleSheet, Text, View, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { GlobalStyles } from "../../constants/styles";
-import { getFormattedDate } from "../../util/date";
+import { getFormattedDate, toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
+import { getCatSymbol } from "../../util/category";
+import { G } from "react-native-svg";
 
-function ExpenseItem({ id, description, amount, date }) {
+function ExpenseItem({ id, description, amount, date, category }) {
   const navigation = useNavigation();
 
   function expensePressHandler() {
@@ -13,6 +15,8 @@ function ExpenseItem({ id, description, amount, date }) {
       expenseId: id,
     });
   }
+
+  const iconString = getCatSymbol(category);
 
   return (
     <Pressable
@@ -22,7 +26,7 @@ function ExpenseItem({ id, description, amount, date }) {
       <View style={styles.expenseItem}>
         <View style={styles.iconContainer}>
           <Ionicons
-            name="hourglass"
+            name={iconString}
             size={28}
             color={GlobalStyles.colors.textColor}
           />
@@ -31,10 +35,12 @@ function ExpenseItem({ id, description, amount, date }) {
           <Text style={[styles.textBase, styles.description]}>
             {description}
           </Text>
-          <Text style={styles.textBase}>{getFormattedDate(date)}</Text>
+          <Text style={[styles.textBase, styles.secondaryText]}>
+            {toShortFormat(date)}
+          </Text>
         </View>
         <View style={styles.amountContainer}>
-          <Text style={styles.amount}>${amount.toFixed(2)}</Text>
+          <Text style={styles.amount}>{amount.toFixed(2)}$</Text>
         </View>
       </View>
     </Pressable>
@@ -48,18 +54,24 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
   expenseItem: {
-    padding: 12,
-    marginVertical: 4,
+    padding: 4,
+    marginLeft: 8,
+    marginRight: -8,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     flexDirection: "row",
     justifyContent: "space-between",
-
   },
   textBase: {
     color: GlobalStyles.colors.textColor,
   },
   description: {
-    fontSize: 16,
+    fontStyle: "italic",
+    fontWeight: "300",
+    fontSize: 15,
+  },
+  secondaryText: {
+    color: GlobalStyles.colors.gray700,
+    fontSize: 13,
   },
   iconContainer: {
     marginTop: 4,
@@ -79,6 +91,8 @@ const styles = StyleSheet.create({
     minWidth: 80,
   },
   amount: {
+    fontSize: 20,
+    fontWeight: "300",
     color: GlobalStyles.colors.error300,
   },
 });

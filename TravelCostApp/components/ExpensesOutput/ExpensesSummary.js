@@ -54,7 +54,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   return (
     <View style={styles.container}>
       <Text style={[styles.sum, { color: budgetColor }]}>
-        ${expensesSum.toFixed(2)}
+        {expensesSum.toFixed(2)}$
       </Text>
       <Progress.Bar
         color={budgetColor}
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.primary500,
   },
   sum: {
-    fontSize: 24,
+    fontSize: 34,
     fontWeight: "bold",
     color: GlobalStyles.colors.primary500,
   },

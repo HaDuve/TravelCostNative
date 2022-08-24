@@ -179,7 +179,6 @@ const ExpenseForm = ({
 
   return (
     <View style={styles.form}>
-      {/* <Text style={styles.title}>Your Expense: </Text> */}
       <View style={styles.categoryRow}>
         <IconButton
           icon="fast-food-outline"

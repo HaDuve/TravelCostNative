@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   dropdownTextStyle: {
-    fontSize: 25,
+    fontSize: 34,
     fontWeight: "bold",
   },
   zBehind: {
@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
     borderTopColor: GlobalStyles.colors.gray600,
     borderBottomColor: GlobalStyles.colors.gray600,
     minHeight: 24,
+    marginBottom: -20,
     backgroundColor: GlobalStyles.colors.gray500,
   },
 });

@@ -22,7 +22,7 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
       <View style={styles.titleRow}>
         <Text style={[styles.sum, { color: budgetColor }]}>{cat}</Text>
         <View style={{ flex: 1 }}></View>
-        <Text style={[styles.sum, { color: budgetColor }]}>${catCost}</Text>
+        <Text style={[styles.sum, { color: budgetColor }]}>{catCost}$</Text>
       </View>
       <Progress.Bar
         color={budgetColor}

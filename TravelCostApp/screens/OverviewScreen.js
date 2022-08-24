@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   dropdownTextStyle: {
-    fontSize: 25,
+    fontSize: 34,
     fontWeight: "bold",
   },
   zBehind: {

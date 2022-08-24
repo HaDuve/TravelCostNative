@@ -10,7 +10,7 @@ const ExpenseCategories = ({ expenses }) => {
 
   let categoryList = [];
   expenses.forEach((expense) => {
-    const cat = expense.description;
+    const cat = expense.category;
     if (!categoryList.includes(cat)) {
       categoryList.push(cat);
     }
@@ -18,7 +18,7 @@ const ExpenseCategories = ({ expenses }) => {
 
   function getAllExpensesWithCat(category) {
     return expenses.filter((expense) => {
-      return expense.description === category;
+      return expense.category === category;
     });
   }
 

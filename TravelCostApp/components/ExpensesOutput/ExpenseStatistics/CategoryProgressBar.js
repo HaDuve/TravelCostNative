@@ -1,26 +1,24 @@
 import { StyleSheet, Text, View } from "react-native";
 import * as Progress from "react-native-progress";
 import { GlobalStyles } from "../../../constants/styles";
+import { Ionicons } from "@expo/vector-icons";
+import { getCatSymbol } from "../../../util/category";
 
 const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   let budgetProgress = (catCost / totalCost) * 1;
   const budgetColor = color;
   const unfilledColor = GlobalStyles.colors.gray500;
-  //   const budgetColor =
-  //     budgetProgress <= 1
-  //       ? GlobalStyles.colors.primary500
-  //       : GlobalStyles.colors.error300;
-  //   const unfilledColor =
-  //     budgetProgress <= 1
-  //       ? GlobalStyles.colors.gray600
-  //       : GlobalStyles.colors.primaryGrayed;
-
-  //   if (budgetProgress > 1) budgetProgress -= 1;
+  const icon = getCatSymbol(cat);
+  const stylingSpace = "  ";
 
   return (
     <View style={styles.container}>
       <View style={styles.titleRow}>
-        <Text style={[styles.sum, { color: budgetColor }]}>{cat}</Text>
+        <Ionicons name={icon} size={30} color={GlobalStyles.colors.error300} />
+        <Text style={[styles.sum, { color: budgetColor }]}>
+          {stylingSpace}
+          {cat}
+        </Text>
         <View style={{ flex: 1 }}></View>
         <Text style={[styles.sum, { color: budgetColor }]}>{catCost}$</Text>
       </View>
@@ -57,7 +55,7 @@ const styles = StyleSheet.create({
   },
   sum: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: "300",
     color: GlobalStyles.colors.primary500,
   },
 });

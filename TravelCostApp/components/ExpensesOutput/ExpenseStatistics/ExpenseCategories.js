@@ -51,10 +51,10 @@ const ExpenseCategories = ({ expenses }) => {
   catSumCat.sort((a, b) => b.sumCat - a.sumCat);
 
   const colorlist = [
-    // GlobalStyles.colors.error500,
-    // GlobalStyles.colors.accent500,
+    GlobalStyles.colors.error500,
+    GlobalStyles.colors.accent500,
     GlobalStyles.colors.error300,
-    // GlobalStyles.colors.accent700,
+    GlobalStyles.colors.accent700,
   ];
 
   let color_i = 0;

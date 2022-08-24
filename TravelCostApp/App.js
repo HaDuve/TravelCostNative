@@ -29,6 +29,7 @@ import TripForm from "./components/ManageTrip/TripForm";
 import OnboardingScreen from "./screens/OnboardingScreen";
 import JoinTrip from "./screens/JoinTrip";
 import ShareTripButton from "./components/ProfileOutput/ShareTrip";
+import OverviewScreen from "./screens/OverviewScreen";
 
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
@@ -190,6 +191,22 @@ function Home(authCtx) {
           tabBarLabel: "Expenses",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="hourglass" size={size} color={color} />
+          ),
+        }}
+      />
+      <BottomTabs.Screen
+        name="Overview"
+        component={OverviewScreen}
+        options={{
+          headerShown: false,
+          title: "Overview",
+          tabBarLabel: "Overview",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons
+              name="ios-stats-chart-outline"
+              size={size}
+              color={color}
+            />
           ),
         }}
       />

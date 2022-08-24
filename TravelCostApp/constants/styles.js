@@ -10,6 +10,7 @@ export const GlobalStyles = {
     primaryGrayed: "#538076",
     secondaryMain500: "#00BB95",
     accent500: "#DC7813",
+    accent700: "#AF7063",
     backgroundColor: "#FFFFFF",
     textColor: "#002A22",
     error50: "#fcc4e4",
@@ -19,6 +20,15 @@ export const GlobalStyles = {
     gray500: "#DCDCDC",
     gray600: "#BFBFBF",
     gray700: "#626262",
+  },
+  colorLists: {
+    costList: [
+      GlobalStyles.colors.error300,
+      GlobalStyles.colors.accent500,
+      GlobalStyles.colors.error500,
+      GlobalStyles.colors.accent700,
+      GlobalStyles.colors.error50,
+    ],
   },
   buttonTextPrimary: {
     color: "#FFFFFF",

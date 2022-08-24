@@ -38,6 +38,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
     default:
       break;
   }
+  
   let budgetProgress = (expenseSumNum / dailyBudgetNum) * 1;
   const budgetColor =
     budgetProgress <= 1

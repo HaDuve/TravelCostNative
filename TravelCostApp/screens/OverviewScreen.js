@@ -15,9 +15,10 @@ import { StyleSheet, Text, View } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
 import IconButton from "../components/UI/IconButton";
+import ExpensesOverview from "../components/ExpensesOutput/ExpensesOverview";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
 
-function RecentExpenses({ navigation }) {
+const OverviewScreen = ({ navigation }) => {
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
   const [range, setRange] = useState("day");
@@ -91,18 +92,13 @@ function RecentExpenses({ navigation }) {
         />
         <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
       </View>
-      <View style={styles.tempGrayBar1}></View>
-      <ExpensesOutput
-        expenses={recentExpenses}
-        expensesPeriod={"Expenses this " + range}
-        fallbackText={"No expenses in " + range}
-      />
-      <AddExpenseButton navigation={navigation} />
+      <ExpensesOverview expenses={recentExpenses} />
+      <AddExpenseButton navigation={navigation}></AddExpenseButton>
     </View>
   );
-}
+};
 
-export default RecentExpenses;
+export default OverviewScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -150,5 +146,25 @@ const styles = StyleSheet.create({
     borderBottomColor: GlobalStyles.colors.gray600,
     minHeight: 24,
     backgroundColor: GlobalStyles.colors.gray500,
+  },
+  tempGrayBar2: {
+    borderTopWidth: 1,
+    borderTopColor: GlobalStyles.colors.gray600,
+    minHeight: 16,
+    backgroundColor: GlobalStyles.colors.gray500,
+  },
+  addButton: {
+    backgroundColor: GlobalStyles.colors.primary400,
+    flex: 0,
+    borderRadius: 100,
+    minHeight: 55,
+    minWidth: 30,
+    marginHorizontal: 160,
+    marginTop: -40,
+    marginBottom: -15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
   },
 });

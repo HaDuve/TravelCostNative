@@ -92,6 +92,7 @@ const OverviewScreen = ({ navigation }) => {
         />
         <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
       </View>
+      <View style={styles.tempGrayBar1}></View>
       <ExpensesOverview expenses={recentExpenses} />
       <AddExpenseButton navigation={navigation}></AddExpenseButton>
     </View>
@@ -144,8 +145,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderTopColor: GlobalStyles.colors.gray600,
     borderBottomColor: GlobalStyles.colors.gray600,
-    minHeight: 24,
+    maxHeight: 16,
+    minHeight: 4,
     backgroundColor: GlobalStyles.colors.gray500,
+    marginBottom: -36,
   },
   tempGrayBar2: {
     borderTopWidth: 1,

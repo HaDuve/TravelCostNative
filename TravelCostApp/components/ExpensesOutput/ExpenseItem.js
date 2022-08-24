@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
   expenseItem: {
-    padding: 4,
+    padding: 8,
     marginLeft: 8,
     marginRight: -8,
     backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   textBase: {
+    marginLeft: 4,
     color: GlobalStyles.colors.textColor,
   },
   description: {

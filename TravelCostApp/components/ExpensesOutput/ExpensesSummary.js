@@ -38,7 +38,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
     default:
       break;
   }
-  
+
   let budgetProgress = (expenseSumNum / dailyBudgetNum) * 1;
   const budgetColor =
     budgetProgress <= 1
@@ -47,7 +47,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   const unfilledColor =
     budgetProgress <= 1
       ? GlobalStyles.colors.gray600
-      : GlobalStyles.colors.primaryGrayed;
+      : GlobalStyles.colors.errorGrayed;
 
   if (budgetProgress > 1) budgetProgress -= 1;
 

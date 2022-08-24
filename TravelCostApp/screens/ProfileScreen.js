@@ -5,6 +5,7 @@ import TripList from "../components/ProfileOutput/TripList";
 import { ScrollView } from "react-native";
 import { useEffect } from "react";
 import IconButton from "../components/UI/IconButton";
+import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
 
 const ProfileScreen = ({ route, navigation, param }) => {
   useEffect(() => {
@@ -46,7 +47,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.container}>
+      <View style={styles.innerContainer}>
         <ProfileForm onCancel={cancelHandler}></ProfileForm>
       </View>
       <View style={styles.tripContainer}>
@@ -62,6 +63,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
         </View>
         <TripList trips={DUMMYTRIPS}></TripList>
       </View>
+      <AddExpenseButton navigation={navigation} />
     </View>
   );
 };
@@ -70,9 +72,13 @@ export default ProfileScreen;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    padding: 0,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  innerContainer: {
     flex: 2,
     padding: 4,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   tripContainer: {
     flex: 1,

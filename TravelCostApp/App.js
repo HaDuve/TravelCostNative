@@ -14,7 +14,6 @@ import LoginScreen from "./screens/LoginScreen";
 
 import ManageExpense from "./screens/ManageExpense";
 import RecentExpenses from "./screens/RecentExpenses";
-import AllExpenses from "./screens/AllExpenses";
 import { GlobalStyles } from "./constants/styles";
 import IconButton from "./components/UI/IconButton";
 import AuthContextProvider, { AuthContext } from "./store/auth-context";
@@ -135,7 +134,6 @@ function Navigation() {
         Home: {
           screens: {
             RecentExpenses: "recent",
-            AllExpenses: "all",
           },
         },
       },
@@ -160,26 +158,6 @@ function Home(authCtx) {
           backgroundColor: GlobalStyles.colors.gray500,
         },
         tabBarActiveTintColor: GlobalStyles.colors.primary500,
-        headerRight: ({ tintColor }) => (
-          <>
-            <IconButton
-              icon="add"
-              size={24}
-              color={tintColor}
-              onPress={() => {
-                navigation.navigate("ManageExpense");
-              }}
-            />
-            <IconButton
-              icon="add"
-              size={26}
-              color={tintColor}
-              onPress={() => {
-                navigation.navigate("ManageTrip");
-              }}
-            />
-          </>
-        ),
       })}
     >
       <BottomTabs.Screen
@@ -210,17 +188,6 @@ function Home(authCtx) {
           ),
         }}
       />
-      {/* <BottomTabs.Screen
-        name="AllExpenses"
-        component={AllExpenses}
-        options={{
-          title: "All Expenses",
-          tabBarLabel: "All Expenses",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="calendar" size={size} color={color} />
-          ),
-        }}
-      /> */}
       <BottomTabs.Screen
         name="Profile"
         component={ProfileScreen}

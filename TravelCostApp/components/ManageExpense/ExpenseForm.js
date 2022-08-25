@@ -102,7 +102,8 @@ const ExpenseForm = ({
       !owePercIsValid
     ) {
       // show feedback
-      Alert.alert("Invalid Input", "Please check your input values");
+      // Alert.alert("Invalid Input", "Please check your input values");
+      alertDefaultValues();
       setInputs((curInputs) => {
         return {
           amount: {
@@ -147,10 +148,6 @@ const ExpenseForm = ({
   }
 
   function addDefaultValues(arg) {
-    console.log(
-      "🚀 ~ file: ExpenseForm.js ~ line 151 ~ addDefaultValues ~ arg",
-      arg
-    );
     inputChangedHandler("description", arg);
     inputChangedHandler("category", arg);
 
@@ -169,19 +166,18 @@ const ExpenseForm = ({
 
   function alertDefaultValues() {
     Alert.alert(
-      "Values Missing",
-      "Do you want to add quick default values? (last country, last currency etc.)",
+      "Quick Expense?",
+      "Do you want to fill the advanced options with suggested default values? (Today as Date, Your Name, Category as Description, Your last Country and last Currency etc.)",
       [
         {
           text: "Cancel",
-          onPress: () => console.log("Cancel Pressed"),
+          onPress: () => false,
           style: "cancel",
         },
         {
-          text: "OK",
+          text: "Yes",
           onPress: () => {
             addDefaultValues(pickedCat);
-            onSubmit();
           },
         },
       ]
@@ -316,7 +312,7 @@ const ExpenseForm = ({
           </View>
         </>
       )}
-      {formIsInvalid && (
+      {formIsInvalid && !hideAdvanced && (
         <Text style={styles.errorText}>
           Invalid input values - please check your entered data!
         </Text>
@@ -325,7 +321,7 @@ const ExpenseForm = ({
         <FlatButton style={styles.button} onPress={onCancel}>
           Cancel
         </FlatButton>
-        <Button style={styles.button} onPress={alertDefaultValues}>
+        <Button style={styles.button} onPress={submitHandler}>
           {submitButtonLabel}
         </Button>
       </View>

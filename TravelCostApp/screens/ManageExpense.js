@@ -64,7 +64,7 @@ const ManageExpense = ({ route, navigation }) => {
         const id = await storeExpense(tripid, uid, expenseData);
         expenseCtx.addExpense({ ...expenseData, id: id });
       }
-      navigation.goBack();
+      navigation.navigate("RecentExpenses");
     } catch (error) {
       setError("Could not save data - please try again later!");
       setIsSubmitting(false);

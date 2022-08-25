@@ -14,6 +14,8 @@ import { deleteExpense, storeExpense, updateExpense } from "../util/http";
 import { GlobalStyles } from "./../constants/styles";
 
 const ManageExpense = ({ route, navigation }) => {
+  const { pickedCat, tempValues } = route.params;
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState();
   const expenseCtx = useContext(ExpensesContext);
@@ -28,6 +30,7 @@ const ManageExpense = ({ route, navigation }) => {
   const selectedExpense = expenseCtx.expenses.find(
     (expense) => expense.id === editedExpenseId
   );
+  //TODO: add tempValues to selected Expense
 
   useLayoutEffect(() => {
     navigation.setOptions({

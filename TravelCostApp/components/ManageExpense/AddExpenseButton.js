@@ -11,7 +11,7 @@ const AddExpenseButton = ({ navigation }) => {
           size={30}
           color={"white"}
           onPress={() => {
-            navigation.navigate("ManageExpense");
+            navigation.navigate("CategoryPick");
           }}
         />
       </View>

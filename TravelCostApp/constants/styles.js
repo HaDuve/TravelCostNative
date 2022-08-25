@@ -39,4 +39,18 @@ export const GlobalStyles = {
     color: "#626262",
     fontWeight: "300",
   },
+  shadow: {
+    elevation: 3,
+    borderColor: "#BFBFBF",
+    shadowColor: "#BFBFBF",
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 10,
+  },
+  shadowPrimary: {
+    elevation: 3,
+    borderColor: "#538076",
+    shadowColor: "#538076",
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 10,
+  },
 };

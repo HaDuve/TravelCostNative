@@ -7,6 +7,7 @@ import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
 import IconButton from "../UI/IconButton";
 import { UserContext } from "../../store/user-context";
+import FlatButton from "../UI/FlatButton";
 
 const ExpenseForm = ({
   onCancel,
@@ -314,9 +315,9 @@ const ExpenseForm = ({
         </Text>
       )}
       <View style={styles.buttonContainer}>
-        <Button style={styles.button} mode="flat" onPress={onCancel}>
+        <FlatButton style={styles.button} onPress={onCancel}>
           Cancel
-        </Button>
+        </FlatButton>
         <Button style={styles.button} onPress={submitHandler}>
           {submitButtonLabel}
         </Button>
@@ -370,12 +371,12 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-around",
     alignItems: "center",
     marginTop: 8,
   },
   button: {
-    minWidth: 120,
-    marginHorizontal: 8,
+    minWidth: 200,
+    marginHorizontal: 0,
   },
 });

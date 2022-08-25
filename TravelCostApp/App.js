@@ -29,6 +29,7 @@ import OnboardingScreen from "./screens/OnboardingScreen";
 import JoinTrip from "./screens/JoinTrip";
 import ShareTripButton from "./components/ProfileOutput/ShareTrip";
 import OverviewScreen from "./screens/OverviewScreen";
+import CategoryPickScreen from "./screens/CategoryPickScreen";
 
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
@@ -82,6 +83,14 @@ function AuthenticatedStack() {
           <Stack.Screen
             name="ManageExpense"
             component={ManageExpense}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
+          <Stack.Screen
+            name="CategoryPick"
+            component={CategoryPickScreen}
             options={{
               headerShown: false,
               presentation: "modal",

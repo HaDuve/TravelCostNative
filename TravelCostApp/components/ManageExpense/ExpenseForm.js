@@ -8,12 +8,15 @@ import { AuthContext } from "../../store/auth-context";
 import IconButton from "../UI/IconButton";
 import { UserContext } from "../../store/user-context";
 import FlatButton from "../UI/FlatButton";
+import { getCatSymbol } from "../../util/category";
 
 const ExpenseForm = ({
   onCancel,
   onSubmit,
   submitButtonLabel,
   defaultValues,
+  pickedCat,
+  navigation,
 }) => {
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
@@ -143,7 +146,11 @@ const ExpenseForm = ({
     onSubmit(expenseData);
   }
 
-  const onPressCategory = (arg) => () => {
+  function addDefaultValues(arg) {
+    console.log(
+      "🚀 ~ file: ExpenseForm.js ~ line 151 ~ addDefaultValues ~ arg",
+      arg
+    );
     inputChangedHandler("description", arg);
     inputChangedHandler("category", arg);
 
@@ -158,7 +165,28 @@ const ExpenseForm = ({
     inputChangedHandler("currency", UserCtx.lastCurrency);
     inputChangedHandler("whoPaid", UserCtx.userName);
     inputChangedHandler("owePerc", "0");
-  };
+  }
+
+  function alertDefaultValues() {
+    Alert.alert(
+      "Values Missing",
+      "Do you want to add quick default values? (last country, last currency etc.)",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: () => {
+            addDefaultValues(pickedCat);
+            onSubmit();
+          },
+        },
+      ]
+    );
+  }
 
   function toggleAdvancedHandler() {
     if (hideAdvanced) {
@@ -180,39 +208,6 @@ const ExpenseForm = ({
 
   return (
     <View style={styles.form}>
-      <View style={styles.categoryRow}>
-        <IconButton
-          icon="fast-food-outline"
-          color={GlobalStyles.colors.primary500}
-          size={36}
-          onPress={onPressCategory("food")}
-        />
-        <IconButton
-          icon="car-outline"
-          color={GlobalStyles.colors.primary500}
-          size={36}
-          onPress={onPressCategory("national-travel")}
-        />
-        <IconButton
-          icon="airplane-outline"
-          color={GlobalStyles.colors.primary500}
-          size={36}
-          onPress={onPressCategory("international-travel")}
-        />
-        <IconButton
-          icon="bed-outline"
-          color={GlobalStyles.colors.primary500}
-          size={36}
-          onPress={onPressCategory("accomodation")}
-        />
-        <IconButton
-          icon="basket-outline"
-          color={GlobalStyles.colors.primary500}
-          size={36}
-          onPress={onPressCategory("other")}
-        />
-      </View>
-
       <View style={styles.inputsRow}>
         <Input
           style={styles.rowInput}
@@ -225,16 +220,17 @@ const ExpenseForm = ({
           invalid={!inputs.amount.isValid}
           autoFocus={true}
         />
-        <Input
-          style={styles.rowInput}
-          label="Date"
-          textInputConfig={{
-            placeholder: "YYYY-MM-DD",
-            maxLength: 10,
-            onChangeText: inputChangedHandler.bind(this, "date"),
-            value: inputs.date.value,
+        <IconButton
+          icon={
+            defaultValues
+              ? getCatSymbol(defaultValues.category)
+              : getCatSymbol(pickedCat)
+          }
+          color={GlobalStyles.colors.primary500}
+          size={36}
+          onPress={() => {
+            navigation.navigate("CategoryPick");
           }}
-          invalid={!inputs.date.isValid}
         />
       </View>
       <IconButton
@@ -258,6 +254,17 @@ const ExpenseForm = ({
               value: inputs.description.value,
             }}
             invalid={!inputs.description.isValid}
+          />
+          <Input
+            style={styles.rowInput}
+            label="Date"
+            textInputConfig={{
+              placeholder: "YYYY-MM-DD",
+              maxLength: 10,
+              onChangeText: inputChangedHandler.bind(this, "date"),
+              value: inputs.date.value,
+            }}
+            invalid={!inputs.date.isValid}
           />
           <Input
             label="Category"
@@ -318,7 +325,7 @@ const ExpenseForm = ({
         <FlatButton style={styles.button} onPress={onCancel}>
           Cancel
         </FlatButton>
-        <Button style={styles.button} onPress={submitHandler}>
+        <Button style={styles.button} onPress={alertDefaultValues}>
           {submitButtonLabel}
         </Button>
       </View>

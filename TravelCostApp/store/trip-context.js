@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useReducer, useState } from "react";
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchTrip } from "../util/http";
@@ -8,13 +8,59 @@ export const TripContext = createContext({
   tripName: "",
   totalBudget: "",
 
+  trips: [],
+  addTrip: ({ tripName, tripTotalBudget }) => {},
+  deleteTrip: (tripid) => {},
+  updateTrip: ({ tripid, tripName, tripTotalBudget }) => {},
+
   setCurrentTrip: ({ tripName, totalBudget }) => {},
-  deleteTrip: (uid) => {},
+  deleteCurrentTrip: (uid) => {},
   getCurrentTripFromStorage: () => {},
   fetchCurrentTrip: (tripid) => {},
 });
 
+function tripsReducer(state, action) {
+  switch (action.type) {
+    case "ADD":
+      return [action.payload, ...state];
+    case "SET":
+      const inverted = action.payload.reverse();
+      return inverted;
+    case "UPDATE":
+      const updatableTripIndex = state.findIndex(
+        (trip) => trip.tripid === action.payload.tripid
+      );
+      const updatableTrip = state[updatableTripIndex];
+      const updatedItem = { ...updatableTrip, ...action.payload.data };
+      const updatedTrips = [...state];
+      updatedTrips[updatableTripIndex] = updatedItem;
+      return updatedTrips;
+    case "DELETE":
+      return state.filter((trip) => trip.tripid !== action.payload);
+    default:
+      return state;
+  }
+}
+
 function TripContextProvider({ children }) {
+  const [tripsState, dispatch] = useReducer(tripsReducer, []);
+
+  function addTrip(tripData) {
+    dispatch({ type: "ADD", payload: tripData });
+  }
+
+  function setTrips(trips) {
+    dispatch({ type: "SET", payload: trips });
+  }
+
+  function deleteTrip(id) {
+    dispatch({ type: "DELETE", payload: id });
+  }
+
+  function updateTrip(id, tripData) {
+    dispatch({ type: "UPDATE", payload: { id: id, data: tripData } });
+  }
+
   const [tripid, setTripid] = useState("");
   const [tripName, setTripName] = useState("");
   const [totalBudget, setTotalBudget] = useState("");
@@ -44,14 +90,14 @@ function TripContextProvider({ children }) {
     } else console.log("no trip stored in memory");
   }
 
-  function deleteTrip(id) {
+  function deleteCurrentTrip(id) {
     Alert.alert("delete context not implemented");
   }
 
   async function fetchCurrentTrip(tripid) {
     const trip = await fetchTrip(tripid);
     if (!trip) {
-      console.log("COULD NOT FETCH AND SET TRIP");
+      console.error("COULD NOT FETCH AND SET TRIP");
       return;
     }
     setCurrentTrip(tripid, trip);
@@ -63,9 +109,14 @@ function TripContextProvider({ children }) {
     totalBudget: totalBudget,
 
     setCurrentTrip: setCurrentTrip,
-    deleteTrip: deleteTrip,
+    deleteCurrentTrip: deleteCurrentTrip,
     getCurrentTripFromStorage: getCurrentTripFromStorage,
     fetchCurrentTrip: fetchCurrentTrip,
+
+    addTrip: addTrip,
+    setTrips: setTrips,
+    deleteTrip: deleteTrip,
+    updateTrip: updateTrip,
   };
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>;

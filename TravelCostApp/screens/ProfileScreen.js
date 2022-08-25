@@ -3,14 +3,19 @@ import { GlobalStyles } from "./../constants/styles";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
 import { ScrollView } from "react-native";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import IconButton from "../components/UI/IconButton";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
+import { TripContext } from "../store/trip-context";
+import Button from "../components/UI/Button";
 
 const ProfileScreen = ({ route, navigation, param }) => {
   useEffect(() => {
     // do something
   }, [route]);
+
+  const TripCtx = useContext(TripContext);
+
   // TODO: make a list in context where all trips are handled like expenses,
   // also 1 trip has to be set as active
 
@@ -45,6 +50,11 @@ const ProfileScreen = ({ route, navigation, param }) => {
     console.log("canceled");
   }
 
+  console.log(
+    "🚀 ~ file: ProfileScreen.js ~ line 80 ~ ProfileScreen ~ TripCtx",
+    TripCtx.trips
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
@@ -61,9 +71,19 @@ const ProfileScreen = ({ route, navigation, param }) => {
             onPress={navigation.navigate.bind(this, "ManageTrip")}
           />
         </View>
-        <TripList trips={DUMMYTRIPS}></TripList>
+        <TripList trips={TripCtx.trips}></TripList>
       </View>
       <AddExpenseButton navigation={navigation} />
+      <Button
+        onPress={() => {
+          TripCtx.addTrip({
+            tripName: "Worldtrip",
+            totalBudget: "20,000$",
+          });
+        }}
+      >
+        Add Trip
+      </Button>
     </View>
   );
 };

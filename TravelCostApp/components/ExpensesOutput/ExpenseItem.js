@@ -5,7 +5,6 @@ import { GlobalStyles } from "../../constants/styles";
 import { getFormattedDate, toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
 import { getCatSymbol } from "../../util/category";
-import { G } from "react-native-svg";
 
 function ExpenseItem({ id, description, amount, date, category }) {
   const navigation = useNavigation();

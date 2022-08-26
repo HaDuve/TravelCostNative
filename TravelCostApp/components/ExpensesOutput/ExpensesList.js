@@ -13,9 +13,9 @@ function renderExpenseItem(itemData) {
       <View
         style={{
           margin: 0,
-          alignContent: "center",
+          alignContent: "flex-end",
           justifyContent: "center",
-          width: 70,
+          width: 90,
         }}
       >
         <Button color="red" onPress={onClick} title="DELETE"></Button>
@@ -38,6 +38,9 @@ function renderExpenseItem(itemData) {
 }
 
 function onClick({ item, index }) {
+  Alert.alert(
+    "Deleteswipe not yet implemented, sorry! :( Please delete via touch menu"
+  );
   console.log(item, index);
   // let a = listData;
   // a.splice(index, 1);
@@ -45,6 +48,7 @@ function onClick({ item, index }) {
   // setListData([...a]);
 }
 
+// Displays a list of all expenses.
 function ExpensesList({ expenses }) {
   return (
     <FlatList

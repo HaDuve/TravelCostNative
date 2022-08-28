@@ -74,7 +74,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
         <TripList trips={TripCtx.trips}></TripList>
       </View>
       <AddExpenseButton navigation={navigation} />
-      <Button
+      {/* <Button
         onPress={() => {
           TripCtx.addTrip({
             tripName: "Worldtrip",
@@ -83,7 +83,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
         }}
       >
         Add Trip
-      </Button>
+      </Button> */}
     </View>
   );
 };

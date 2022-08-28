@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View, Pressable } from "react-native";
 import Input from "./Input";
 import Button from "../UI/Button";
 import { getFormattedDate } from "../../util/date";
@@ -9,6 +9,9 @@ import IconButton from "../UI/IconButton";
 import { UserContext } from "../../store/user-context";
 import FlatButton from "../UI/FlatButton";
 import { getCatSymbol } from "../../util/category";
+// import ExpensePicker from "./ExpensePicker";
+
+import CurrencyPicker from "react-native-currency-picker";
 
 const ExpenseForm = ({
   onCancel,
@@ -21,6 +24,8 @@ const ExpenseForm = ({
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
   const [hideAdvanced, sethideAdvanced] = useState(true);
+
+  let currencyPickerRef = undefined;
 
   const [inputs, setInputs] = useState({
     amount: {
@@ -44,7 +49,7 @@ const ExpenseForm = ({
       isValid: true,
     },
     currency: {
-      value: defaultValues ? defaultValues.currency : "",
+      value: defaultValues ? defaultValues.currency : UserCtx.lastCurrency,
       isValid: true,
     },
     whoPaid: {
@@ -151,17 +156,24 @@ const ExpenseForm = ({
     inputChangedHandler("description", arg);
     inputChangedHandler("category", arg);
 
-    if (inputs.date.value === "") {
+    if (!inputs.date.isValid) {
       const today = new Date();
       inputChangedHandler("date", getFormattedDate(today));
     }
 
     // for now set default values to every field so everything goes fast
-
-    inputChangedHandler("country", UserCtx.lastCountry);
-    inputChangedHandler("currency", UserCtx.lastCurrency);
-    inputChangedHandler("whoPaid", UserCtx.userName);
-    inputChangedHandler("owePerc", "0");
+    if (!inputs.country.isValid) {
+      inputChangedHandler("country", UserCtx.lastCountry);
+    }
+    if (!inputs.currency.isValid) {
+      inputChangedHandler("currency", UserCtx.lastCurrency);
+    }
+    if (!inputs.whoPaid.isValid) {
+      inputChangedHandler("whoPaid", UserCtx.userName);
+    }
+    if (!inputs.owePerc.isValid) {
+      inputChangedHandler("owePerc", "0");
+    }
   }
 
   function alertDefaultValues() {
@@ -216,6 +228,12 @@ const ExpenseForm = ({
           invalid={!inputs.amount.isValid}
           autoFocus={true}
         />
+        <Pressable
+          style={styles.topCurrencyPressableContainer}
+          onPress={currencyPickerRef?.open()}
+        >
+          <Text style={styles.topCurrencyText}>{inputs.currency.value}</Text>
+        </Pressable>
         <IconButton
           icon={
             defaultValues
@@ -242,6 +260,66 @@ const ExpenseForm = ({
       {/* toggleable content */}
       {!hideAdvanced && (
         <>
+          <View style={styles.currencyContainer}>
+            <Text style={styles.currencyLabel}>Currency</Text>
+            <CurrencyPicker
+              currencyPickerRef={(ref) => {
+                currencyPickerRef = ref;
+              }}
+              enable={true}
+              darkMode={false}
+              currencyCode={inputs.currency.value}
+              showFlag={true}
+              showCurrencyName={true}
+              showCurrencyCode={false}
+              onSelectCurrency={(data) => {
+                console.log("DATA", data);
+                inputChangedHandler("currency", data.code);
+              }}
+              onOpen={() => {
+                console.log("Open");
+              }}
+              onClose={() => {
+                console.log("Close");
+              }}
+              showNativeSymbol={true}
+              showSymbol={false}
+              containerStyle={{
+                container: { paddingLeft: 4, paddingTop: 4 },
+                flagWidth: 25,
+                currencyCodeStyle: { color: GlobalStyles.colors.primary500 },
+                currencyNameStyle: { color: GlobalStyles.colors.primary500 },
+                symbolStyle: { color: GlobalStyles.colors.primary500 },
+                symbolNativeStyle: { color: GlobalStyles.colors.primary500 },
+              }}
+              modalStyle={{
+                container: {},
+                searchStyle: {},
+                tileStyle: {},
+                itemStyle: {
+                  itemContainer: {},
+                  flagWidth: 25,
+                  currencyCodeStyle: {},
+                  currencyNameStyle: {},
+                  symbolStyle: {},
+                  symbolNativeStyle: {},
+                },
+              }}
+              title={"Currency"}
+              searchPlaceholder={"Search"}
+              showCloseButton={true}
+              showModalTitle={true}
+            />
+            {/* <Input
+              style={styles.rowInput}
+              label="Currency"
+              textInputConfig={{
+                onChangeText: inputChangedHandler.bind(this, "currency"),
+                value: inputs.currency.value,
+              }}
+              invalid={!inputs.currency.isValid}
+            /> */}
+          </View>
           <Input
             label="Description"
             textInputConfig={{
@@ -270,26 +348,7 @@ const ExpenseForm = ({
             }}
             invalid={!inputs.category.isValid}
           />
-          <View style={styles.inputsRowSecond}>
-            <Input
-              style={styles.rowInput}
-              label="Country"
-              textInputConfig={{
-                onChangeText: inputChangedHandler.bind(this, "country"),
-                value: inputs.country.value,
-              }}
-              invalid={!inputs.country.isValid}
-            />
-            <Input
-              style={styles.rowInput}
-              label="Currency"
-              textInputConfig={{
-                onChangeText: inputChangedHandler.bind(this, "currency"),
-                value: inputs.currency.value,
-              }}
-              invalid={!inputs.currency.isValid}
-            />
-          </View>
+
           <View style={styles.inputsRowSecond}>
             <Input
               style={styles.rowInput}
@@ -344,6 +403,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 4, height: 4 },
     shadowOpacity: 10,
   },
+  topCurrencyPressableContainer: {
+    padding: 8,
+    marginRight: 4,
+  },
+  topCurrencyText: {
+    fontSize: 12,
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -377,6 +443,19 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
     marginTop: 8,
+  },
+  currencyContainer: {
+    flex: 1,
+    marginVertical: 4,
+    marginHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: GlobalStyles.colors.gray700,
+  },
+  currencyLabel: {
+    fontSize: 13,
+    color: GlobalStyles.colors.textColor,
+    marginBottom: 4,
   },
   button: {
     minWidth: 200,

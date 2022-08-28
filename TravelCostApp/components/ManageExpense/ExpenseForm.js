@@ -108,7 +108,8 @@ const ExpenseForm = ({
     ) {
       // show feedback
       // Alert.alert("Invalid Input", "Please check your input values");
-      alertDefaultValues();
+      addDefaultValues(pickedCat);
+      // alertDefaultValues();
       setInputs((curInputs) => {
         return {
           amount: {
@@ -153,8 +154,35 @@ const ExpenseForm = ({
   }
 
   function addDefaultValues(arg) {
-    inputChangedHandler("description", arg);
-    inputChangedHandler("category", arg);
+    const expenseData = {
+      uid: AuthCtx.uid,
+      amount: +inputs.amount.value,
+      date: new Date(inputs.date.value),
+      description: inputs.description.value,
+      category: inputs.category.value, // TODO: convert this to category
+      country: inputs.country.value, // TODO: convert this to country
+      currency: inputs.currency.value, // TODO: convert this to currency
+      whoPaid: inputs.whoPaid.value, // TODO: convert this to uid
+      owePerc: +inputs.owePerc.value,
+    };
+    const amountIsValid = !isNaN(expenseData.amount) && expenseData.amount > 0;
+    const dateIsValid = expenseData.date.toString() !== "Invalid Date";
+    const descriptionIsValid = expenseData.description.trim().length > 0;
+    const categoryIsValid = expenseData.description.trim().length > 0;
+    const countryIsValid = expenseData.description.trim().length > 0;
+    const currencyIsValid = expenseData.description.trim().length > 0;
+    const whoPaidIsValid = expenseData.description.trim().length > 0;
+    const owePercIsValid =
+      !isNaN(expenseData.owePerc) &&
+      expenseData.owePerc >= 0 &&
+      expenseData.owePerc <= 100;
+
+    if (!inputs.description.isValid) {
+      inputChangedHandler("description", arg);
+    }
+    if (!inputs.category.isValid) {
+      inputChangedHandler("category", arg);
+    }
 
     if (!inputs.date.isValid) {
       const today = new Date();

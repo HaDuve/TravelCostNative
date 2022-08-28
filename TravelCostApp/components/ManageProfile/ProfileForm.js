@@ -79,7 +79,12 @@ const ProfileForm = ({ onCancel }) => {
     userData.lastCurrency = inputs.lastCurrency.value;
 
     User.addUser(userData);
-    await updateUser(AuthCtx.uid, userData);
+
+    try {
+      await updateUser(AuthCtx.uid, userData);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -93,15 +98,29 @@ const ProfileForm = ({ onCancel }) => {
         <Text>Change Avatar</Text>
         <Text>Delete Avatar</Text>
       </View>
-      <Input
-        label="Name"
-        inputStyle={styles.inputStyle}
-        textInputConfig={{
-          onChangeText: inputChangedHandler.bind(this, "userName"),
-          value: inputs.userName.value,
-        }}
-        invalid={!inputs.userName.isValid}
-      />
+      <View style={styles.inputsRow}>
+        <Input
+          label="Name"
+          style={styles.rowInput}
+          inputStyle={styles.inputStyle}
+          textInputConfig={{
+            onChangeText: inputChangedHandler.bind(this, "userName"),
+            value: inputs.userName.value,
+          }}
+          invalid={!inputs.userName.isValid}
+        />
+
+        <Input
+          style={styles.rowInput}
+          inputStyle={styles.inputStyle}
+          label="homeCountry"
+          textInputConfig={{
+            onChangeText: inputChangedHandler.bind(this, "homeCountry"),
+            value: inputs.homeCountry.value,
+          }}
+          invalid={!inputs.homeCountry.isValid}
+        />
+      </View>
       <View style={styles.inputsRow}>
         <Input
           style={styles.rowInput}
@@ -115,16 +134,6 @@ const ProfileForm = ({ onCancel }) => {
           invalid={!inputs.dailybudget.isValid}
         />
 
-        <Input
-          style={styles.rowInput}
-          inputStyle={styles.inputStyle}
-          label="homeCountry"
-          textInputConfig={{
-            onChangeText: inputChangedHandler.bind(this, "homeCountry"),
-            value: inputs.homeCountry.value,
-          }}
-          invalid={!inputs.homeCountry.isValid}
-        />
         <Input
           style={styles.rowInput}
           inputStyle={styles.inputStyle}

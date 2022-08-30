@@ -19,7 +19,8 @@ function SignupScreen() {
       const { token, uid } = await createUser(email, password);
       authCtx.authenticate(token);
       authCtx.setUserID(uid);
-      storeUser(uid);
+      const userdata = { name: name };
+      storeUser(uid, userdata);
       userCtx.setName(name);
     } catch (error) {
       Alert.alert(

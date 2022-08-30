@@ -10,11 +10,11 @@ import { TripContext } from "../store/trip-context";
 import Button from "../components/UI/Button";
 
 const ProfileScreen = ({ route, navigation, param }) => {
+  const TripCtx = useContext(TripContext);
+
   useEffect(() => {
     // do something
   }, [route]);
-
-  const TripCtx = useContext(TripContext);
 
   // TODO: make a list in context where all trips are handled like expenses,
   // also 1 trip has to be set as active
@@ -36,12 +36,11 @@ const ProfileScreen = ({ route, navigation, param }) => {
   //   getTrips();
   // }, []);
 
-  const DUMMYTRIPS = [
+  const ACTIVETRIP = [
     {
-      id: "-N9zE5RNR99u_qjn-rud",
-      description: "Worldtrip",
-      amount: "20,000$",
-      date: "",
+      id: TripCtx.tripid,
+      description: TripCtx.tripName,
+      amount: TripCtx.totalBudget,
     },
   ];
 
@@ -71,7 +70,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
             onPress={navigation.navigate.bind(this, "ManageTrip")}
           />
         </View>
-        <TripList trips={TripCtx.trips}></TripList>
+        <TripList trips={ACTIVETRIP}></TripList>
       </View>
       <AddExpenseButton navigation={navigation} />
       {/* <Button

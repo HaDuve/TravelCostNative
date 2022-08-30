@@ -20,11 +20,11 @@ const TripForm = ({ navigation }) => {
   const uid = AuthCtx.uid;
   const [inputs, setInputs] = useState({
     tripName: {
-      value: TripCtx.tripName ? TripCtx.tripName : "",
+      value: "",
       isValid: true,
     },
     totalBudget: {
-      value: TripCtx.totalBudget ? TripCtx.totalBudget : "",
+      value: "",
       isValid: true,
     },
   });

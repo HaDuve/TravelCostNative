@@ -9,7 +9,7 @@ import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 import { getDateMinusDays, toShortFormat } from "../util/date";
-import { fetchExpenses, fetchUser } from "../util/http";
+import { fetchExpenses, fetchTripExpenses, fetchUser } from "../util/http";
 
 import { StyleSheet, Text, View } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
@@ -44,7 +44,7 @@ function RecentExpenses({ navigation }) {
     async function getExpenses() {
       setIsFetching(true);
       try {
-        const expenses = await fetchExpenses(tripid, uid);
+        const expenses = await fetchTripExpenses(tripid);
         expensesCtx.setExpenses(expenses);
       } catch (error) {
         setError("Could not fetch data from the web database!" + error);

@@ -239,6 +239,7 @@ function Root() {
           console.log("no responsedata");
         }
         tripCtx.fetchCurrentTrip(storedTripId);
+        tripCtx.getCurrentTripFromStorage();
         authCtx.authenticate(storedToken);
       }
 

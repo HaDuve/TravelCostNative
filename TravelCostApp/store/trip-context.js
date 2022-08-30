@@ -78,16 +78,15 @@ function TripContextProvider({ children }) {
   }
 
   async function getCurrentTripFromStorage() {
-    // TODO: find out why this doesnt seem to work
-    // TODO: add a security check via user id
     const id = await AsyncStorage.getItem("currentTripId");
     const name = await AsyncStorage.getItem("currentTripName");
     const budget = await AsyncStorage.getItem("currentTripTotalBudget");
 
     if (id) {
+      setTripid(id);
       setTripName(name);
       setTotalBudget(budget);
-    } else console.log("no trip stored in memory");
+    } else console.error("no trip stored in memory");
   }
 
   function deleteCurrentTrip(id) {

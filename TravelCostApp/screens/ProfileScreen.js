@@ -49,11 +49,6 @@ const ProfileScreen = ({ route, navigation, param }) => {
     console.log("canceled");
   }
 
-  console.log(
-    "🚀 ~ file: ProfileScreen.js ~ line 80 ~ ProfileScreen ~ TripCtx",
-    TripCtx.trips
-  );
-
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>

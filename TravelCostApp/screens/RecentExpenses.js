@@ -52,10 +52,7 @@ function RecentExpenses({ navigation }) {
     }
 
     getExpenses();
-    // causes 1 rerender
-    setPeriodValue("total");
-    console.log("🚀 ~ file: RecentExpenses.js ~ line 57 ~ useEffect ~ setPeriodValue", setPeriodValue)
-  }, [PeriodValue]);
+  }, []);
 
   function errorHandler() {
     setError(null);

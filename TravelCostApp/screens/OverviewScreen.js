@@ -21,7 +21,6 @@ import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
 const OverviewScreen = ({ navigation }) => {
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
-  const [range, setRange] = useState("day");
 
   const [open, setOpen] = useState(false);
   const [PeriodValue, setPeriodValue] = useState("total");

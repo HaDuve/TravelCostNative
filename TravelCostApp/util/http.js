@@ -40,33 +40,6 @@ export async function fetchExpenses(tripid, uid) {
   return expenses;
 }
 
-export async function fetchTripExpenses(tripid) {
-  const travellersResponse = await axios.get(
-    BACKEND_URL + "/trips/" + tripid + "/travellers"
-  );
-  const travellers = [];
-
-  console.log(
-    "🚀 ~ file: http.js ~ line 50 ~ fetchTripExpenses ~ travellersResponse.data",
-    travellersResponse.data
-  );
-  for (const key in travellersResponse.data) {
-    travellers.push(travellersResponse.data[key].travellerid);
-  }
-
-  const expenses = [];
-  console.log(
-    "🚀 ~ file: http.js ~ line 54 ~ fetchTripExpenses ~ expenses",
-    expenses
-  );
-
-  for (const traveller in travellers) {
-    expenses.push(fetchExpenses(tripid, traveller));
-  }
-
-  return expenses;
-}
-
 export function updateExpense(tripid, uid, id, expenseData) {
   return axios.put(
     BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses/" + `${id}.json`,

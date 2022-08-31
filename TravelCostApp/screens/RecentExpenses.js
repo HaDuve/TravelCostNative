@@ -9,7 +9,7 @@ import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 import { getDateMinusDays, toShortFormat } from "../util/date";
-import { fetchExpenses, fetchTripExpenses, fetchUser } from "../util/http";
+import { fetchExpenses, fetchUser } from "../util/http";
 
 import { StyleSheet, Text, View } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";

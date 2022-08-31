@@ -20,10 +20,9 @@ import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
 function RecentExpenses({ navigation }) {
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
-  const [range, setRange] = useState("day");
 
   const [open, setOpen] = useState(false);
-  const [PeriodValue, setPeriodValue] = useState("total");
+  const [PeriodValue, setPeriodValue] = useState("day");
   const [items, setItems] = useState([
     { label: "Today", value: "day" },
     { label: "Week", value: "week" },
@@ -53,7 +52,10 @@ function RecentExpenses({ navigation }) {
     }
 
     getExpenses();
-  }, []);
+    // causes 1 rerender
+    setPeriodValue("total");
+    console.log("🚀 ~ file: RecentExpenses.js ~ line 57 ~ useEffect ~ setPeriodValue", setPeriodValue)
+  }, [PeriodValue]);
 
   function errorHandler() {
     setError(null);
@@ -94,8 +96,8 @@ function RecentExpenses({ navigation }) {
       <View style={styles.tempGrayBar1}></View>
       <ExpensesOutput
         expenses={recentExpenses}
-        expensesPeriod={"Expenses this " + range}
-        fallbackText={"No expenses in " + range}
+        expensesPeriod={"Expenses this " + PeriodValue}
+        fallbackText={"No expenses in " + PeriodValue}
       />
       <AddExpenseButton navigation={navigation} />
     </View>

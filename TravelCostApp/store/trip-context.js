@@ -7,6 +7,9 @@ export const TripContext = createContext({
   tripid: "",
   tripName: "",
   totalBudget: "",
+  // save user as obj with (tname, tid)
+  travellers: [],
+  setCurrentTravellers: (tripid) => {},
 
   trips: [],
   addTrip: ({ tripName, tripTotalBudget }) => {},
@@ -44,6 +47,23 @@ function tripsReducer(state, action) {
 
 function TripContextProvider({ children }) {
   const [tripsState, dispatch] = useReducer(tripsReducer, []);
+  const [travellers, setTravellers] = useState([]);
+
+  async function setCurrentTravellers(tripid) {
+    try {
+      const trip = await fetchTrip(tripid);
+      if (!trip) return;
+      console.log(
+        "🚀 ~ file: trip-context.js ~ line 55 ~ setCurrentTravellers ~ trip.data",
+        trip.data
+      );
+    } catch (error) {
+      console.log(
+        "🚀 ~ file: trip-context.js ~ line 57 ~ setCurrentTravellers ~ error",
+        error
+      );
+    }
+  }
 
   function addTrip(tripData) {
     dispatch({ type: "ADD", payload: tripData });
@@ -99,13 +119,15 @@ function TripContextProvider({ children }) {
       console.error("COULD NOT FETCH AND SET TRIP");
       return;
     }
-    setCurrentTrip(tripid, trip);
+    setCurrentTrip(tripid, trip.data);
   }
 
   const value = {
     tripid: tripid,
     tripName: tripName,
     totalBudget: totalBudget,
+    travellers: travellers,
+    setCurrentTravellers: setCurrentTravellers,
 
     setCurrentTrip: setCurrentTrip,
     deleteCurrentTrip: deleteCurrentTrip,

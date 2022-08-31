@@ -14,7 +14,8 @@ const ProfileScreen = ({ route, navigation, param }) => {
 
   useEffect(() => {
     // do something
-  }, [route]);
+    // TripCtx.setCurrentTravellers();
+  }, []);
 
   // TODO: make a list in context where all trips are handled like expenses,
   // also 1 trip has to be set as active

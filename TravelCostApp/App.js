@@ -241,7 +241,7 @@ function Root() {
         }
         if (storedTripId) {
           tripCtx.fetchCurrentTrip(storedTripId);
-          tripCtx.getCurrentTripFromStorage();
+          tripCtx.setCurrentTravellers(storedTripId);
         }
         authCtx.authenticate(storedToken);
       }

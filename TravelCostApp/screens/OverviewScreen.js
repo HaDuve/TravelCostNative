@@ -24,7 +24,7 @@ const OverviewScreen = ({ navigation }) => {
   const [range, setRange] = useState("day");
 
   const [open, setOpen] = useState(false);
-  const [PeriodValue, setPeriodValue] = useState("day");
+  const [PeriodValue, setPeriodValue] = useState("total");
   const [items, setItems] = useState([
     { label: "Today", value: "day" },
     { label: "Week", value: "week" },

@@ -160,7 +160,7 @@ function Navigation() {
 function Home(authCtx) {
   return (
     <BottomTabs.Navigator
-      initialRouteName="Overview"
+      // initialRouteName="Overview"
       screenOptions={({ navigation }) => ({
         headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
         headerTintColor: "white",

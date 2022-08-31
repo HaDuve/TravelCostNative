@@ -43,7 +43,7 @@ function RecentExpenses({ navigation }) {
     async function getExpenses() {
       setIsFetching(true);
       try {
-        const expenses = await fetchTripExpenses(tripid);
+        const expenses = await fetchExpenses(tripid, uid);
         expensesCtx.setExpenses(expenses);
       } catch (error) {
         setError("Could not fetch data from the web database!" + error);

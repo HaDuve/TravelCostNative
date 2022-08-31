@@ -17,16 +17,21 @@ function SignupScreen() {
     setIsAuthenticating(true);
     try {
       const { token, uid } = await createUser(email, password);
-      authCtx.authenticate(token);
       authCtx.setUserID(uid);
       const userdata = { name: name };
       storeUser(uid, userdata);
-      userCtx.setName(name);
+      userCtx.setUserName(name);
+      authCtx.authenticate(token);
     } catch (error) {
+      console.log(
+        "🚀 ~ file: SignupScreen.js ~ line 26 ~ signupHandler ~ error",
+        error
+      );
       Alert.alert(
         "Authentication failed",
         "Could not create user, please check your input and try again later."
       );
+
       setIsAuthenticating(false);
     }
   }

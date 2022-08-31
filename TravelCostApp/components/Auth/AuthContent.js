@@ -35,7 +35,7 @@ function AuthContent({ isLogin, onAuthenticate }) {
     const emailIsValid = email.includes("@");
     const passwordIsValid = password.length > 6;
 
-    if (!nameIsValid || !emailIsValid || !passwordIsValid) {
+    if ((!nameIsValid || !emailIsValid || !passwordIsValid) && !isLogin) {
       Alert.alert("Invalid input", "Please check your entered credentials.");
       setCredentialsInvalid({
         name: !nameIsValid,

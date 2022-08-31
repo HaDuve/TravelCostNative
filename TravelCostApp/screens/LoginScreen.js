@@ -22,7 +22,10 @@ function LoginScreen() {
       authCtx.authenticate(token);
       authCtx.setUserID(uid);
     } catch (error) {
-      console.log(error.message);
+      console.log(
+        "🚀 ~ file: LoginScreen.js ~ line 25 ~ loginHandler ~ error",
+        error
+      );
       Alert.alert(
         "Authentication failed!",
         "Failed to login. Wrong password or Username? Please try again later."

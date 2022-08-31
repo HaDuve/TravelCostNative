@@ -10,6 +10,14 @@ const ExpensesSummary = ({ expenses, periodName }) => {
     return sum + expense.amount;
   }, 0);
   const tripCtx = useContext(TripContext);
+  if (tripCtx.tripid === "")
+    return (
+      <View style={styles.container}>
+        <Text style={[styles.sum, { color: budgetColor }]}>
+          {expensesSum.toFixed(2)}$
+        </Text>
+      </View>
+    );
   const userCtx = useContext(UserContext);
   let dailyBudgetNum = Number(userCtx.dailybudget);
   const expenseSumNum = Number(expensesSum);

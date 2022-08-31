@@ -34,13 +34,26 @@ function UserContextProvider({ children }) {
       "🚀 ~ file: user-context.js ~ line 32 ~ addUser ~ UserData",
       UserData
     );
+    if (!UserData) return;
 
-    setName(UserData.userName);
-    setDailyBudget(UserData.dailybudget.toString());
-    setHomeCountry(UserData.homeCountry);
-    setHomeCurrency(UserData.homeCurrency);
-    setLastCountry(UserData.lastCountry);
-    setLastCurrency(UserData.lastCurrency);
+    if (UserData.userName) {
+      setName(UserData.userName);
+    }
+    if (UserData.dailybudget) {
+      setDailyBudget(UserData.dailybudget.toString());
+    }
+    if (UserData.homeCountry) {
+      setHomeCountry(UserData.homeCountry);
+    }
+    if (UserData.homeCurrency) {
+      setHomeCurrency(UserData.homeCurrency);
+    }
+    if (UserData.lastCountry) {
+      setLastCountry(UserData.lastCountry);
+    }
+    if (UserData.lastCurrency) {
+      setLastCurrency(UserData.lastCurrency);
+    }
   }
 
   function deleteUser(id) {

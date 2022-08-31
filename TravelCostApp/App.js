@@ -234,12 +234,14 @@ function Root() {
         authCtx.setUserID(storedUid);
         const response = await fetchUser(storedUid);
         if (response) {
-          userCtx.addUser(response);
+          userCtx.addUser(response.data);
         } else {
           console.log("no responsedata");
         }
-        tripCtx.fetchCurrentTrip(storedTripId);
-        tripCtx.getCurrentTripFromStorage();
+        if (storedTripId) {
+          tripCtx.fetchCurrentTrip(storedTripId);
+          tripCtx.getCurrentTripFromStorage();
+        }
         authCtx.authenticate(storedToken);
       }
 

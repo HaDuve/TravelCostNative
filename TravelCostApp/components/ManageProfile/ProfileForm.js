@@ -12,9 +12,9 @@ import ErrorOverlay from "../UI/ErrorOverlay";
 import LoadingOverlay from "../UI/LoadingOverlay";
 import IconButton from "../UI/IconButton";
 
-const ProfileForm = ({ onCancel }) => {
+const ProfileForm = ({ navigation, onCancel }) => {
   const AuthCtx = useContext(AuthContext);
-  const User = useContext(UserContext);
+  const UserCtx = useContext(UserContext);
   const uid = AuthContext.uid;
 
   function logoutHandler() {
@@ -35,27 +35,27 @@ const ProfileForm = ({ onCancel }) => {
   }
   const [inputs, setInputs] = useState({
     userName: {
-      value: !User.userName ? "" : User.userName,
+      value: !UserCtx.userName ? "" : UserCtx.userName,
       isValid: true,
     },
     dailybudget: {
-      value: User.dailybudget ? User.dailybudget : "",
+      value: UserCtx.dailybudget ? UserCtx.dailybudget : "",
       isValid: true,
     },
     homeCountry: {
-      value: User.homeCountry ? User.homeCountry : "",
+      value: UserCtx.homeCountry ? UserCtx.homeCountry : "",
       isValid: true,
     },
     homeCurrency: {
-      value: User.homeCurrency ? User.homeCurrency : "",
+      value: UserCtx.homeCurrency ? UserCtx.homeCurrency : "",
       isValid: true,
     },
     lastCountry: {
-      value: User.lastCountry ? User.lastCountry : "",
+      value: UserCtx.lastCountry ? UserCtx.lastCountry : "",
       isValid: true,
     },
     lastCurrency: {
-      value: User.lastCurrency ? User.lastCurrency : "",
+      value: UserCtx.lastCurrency ? UserCtx.lastCurrency : "",
       isValid: true,
     },
   });
@@ -78,12 +78,29 @@ const ProfileForm = ({ onCancel }) => {
     userData.lastCountry = inputs.lastCountry.value;
     userData.lastCurrency = inputs.lastCurrency.value;
 
-    User.addUser(userData);
+    const invalid =
+      userData.userName.length > 0 &&
+      isNaN(userData.dailybudget) &&
+      userData.homeCountry.length > 0 &&
+      userData.homeCurrency.length > 0;
+
+    if (invalid) {
+      Alert.alert("Check your profile please!");
+      return;
+    }
+
+    UserCtx.addUser(userData);
 
     try {
       await updateUser(AuthCtx.uid, userData);
+      Alert.alert("Successfully saved Profile! :)");
+      if (!UserCtx.freshlyCreated) {
+        return;
+      }
+      navigation.navigate("ManageTrip");
     } catch (error) {
       console.log(error);
+      Alert.alert("Could not save Profile! :(");
     }
   }
 
@@ -92,6 +109,7 @@ const ProfileForm = ({ onCancel }) => {
       <View style={styles.avatarBar}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>
+            {/* Profile Picture for now replaced with first char of the name */}
             {inputs.userName.value.charAt(0)}
           </Text>
         </View>
@@ -145,7 +163,7 @@ const ProfileForm = ({ onCancel }) => {
           invalid={!inputs.homeCurrency.isValid}
         />
       </View>
-      <View style={styles.inputsRow}>
+      {/* <View style={styles.inputsRow}>
         <Input
           style={styles.rowInput}
           inputStyle={styles.inputStyle}
@@ -166,7 +184,7 @@ const ProfileForm = ({ onCancel }) => {
           }}
           invalid={!inputs.lastCurrency.isValid}
         />
-      </View>
+      </View> */}
       <View style={styles.buttonContainer}>
         <IconButton
           icon={"exit-outline"}

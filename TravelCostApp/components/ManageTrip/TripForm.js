@@ -9,14 +9,17 @@ import {
   storeUserToTrip,
   updateUser,
 } from "../../util/http";
-import { Button } from "react-native";
 
 import Input from "../ManageExpense/Input";
 import { TripContext } from "../../store/trip-context";
+import { UserContext } from "../../store/user-context";
+import Button from "../UI/Button";
+import FlatButton from "../UI/FlatButton";
 
 const TripForm = ({ navigation }) => {
   const TripCtx = useContext(TripContext);
   const AuthCtx = useContext(AuthContext);
+  const UserCtx = useContext(UserContext);
   const uid = AuthCtx.uid;
   const [inputs, setInputs] = useState({
     tripName: {
@@ -49,6 +52,7 @@ const TripForm = ({ navigation }) => {
     const id = await storeTrip(tripData);
     const response = TripCtx.setCurrentTrip(id, tripData);
     storeUserToTrip(id, { travellerid: uid });
+    UserCtx.setFreshlyCreatedTo(false);
     navigation.navigate("RecentExpenses");
   }
 
@@ -77,16 +81,12 @@ const TripForm = ({ navigation }) => {
         />
       </View>
       <View style={styles.buttonContainer}>
-        <Button
-          style={styles.button}
-          title="CANCEL"
-          onPress={cancelHandler}
-        ></Button>
-        <Button
-          style={styles.button}
-          title="SAVE"
-          onPress={submitHandler}
-        ></Button>
+        <FlatButton style={styles.button} onPress={cancelHandler}>
+          Cancel
+        </FlatButton>
+        <Button style={styles.button} onPress={submitHandler}>
+          Save Trip
+        </Button>
       </View>
     </View>
   );
@@ -136,9 +136,10 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-around",
     alignItems: "center",
     marginTop: 8,
+    marginLeft: 12,
   },
   button: {
     minWidth: 120,

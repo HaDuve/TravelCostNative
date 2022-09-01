@@ -21,6 +21,7 @@ function SignupScreen() {
       const userdata = { name: name };
       storeUser(uid, userdata);
       userCtx.setUserName(name);
+      userCtx.setFreshlyCreatedTo(true);
       authCtx.authenticate(token);
     } catch (error) {
       console.log(

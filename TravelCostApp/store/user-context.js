@@ -19,6 +19,9 @@ export const UserContext = createContext({
   }) => {},
   deleteUser: (uid) => {},
   setUserName: (name) => {},
+
+  freshlyCreated: false,
+  setFreshlyCreatedTo: (bool) => {},
 });
 
 function UserContextProvider({ children }) {
@@ -28,6 +31,7 @@ function UserContextProvider({ children }) {
   const [homeCurrency, setHomeCurrency] = useState("");
   const [lastCountry, setLastCountry] = useState("");
   const [lastCurrency, setLastCurrency] = useState("");
+  const [freshlyCreated, setFreshlyCreated] = useState(false);
 
   function addUser(UserData) {
     console.log(
@@ -56,6 +60,10 @@ function UserContextProvider({ children }) {
     }
   }
 
+  function setFreshlyCreatedTo(bool) {
+    setFreshlyCreated(bool);
+  }
+
   function deleteUser(id) {
     Alert.alert("delete context not implemented");
   }
@@ -71,6 +79,9 @@ function UserContextProvider({ children }) {
     homeCurrency: homeCurrency,
     lastCountry: lastCountry,
     lastCurrency: lastCurrency,
+
+    freshlyCreated: freshlyCreated,
+    setFreshlyCreatedTo: setFreshlyCreatedTo,
 
     addUser: addUser,
     deleteUser: deleteUser,

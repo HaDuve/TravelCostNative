@@ -53,7 +53,10 @@ const ProfileScreen = ({ route, navigation, param }) => {
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
-        <ProfileForm onCancel={cancelHandler}></ProfileForm>
+        <ProfileForm
+          navigation={navigation}
+          onCancel={cancelHandler}
+        ></ProfileForm>
       </View>
       <View style={styles.tripContainer}>
         <View style={styles.horizontalContainer}>

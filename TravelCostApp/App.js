@@ -158,9 +158,12 @@ function Navigation() {
 }
 
 function Home(authCtx) {
+  const UserCtx = useContext(UserContext);
+  const FreshlyCreated = UserCtx.freshlyCreated;
+  const FirstScreen = FreshlyCreated ? "Profile" : "RecentExpenses";
   return (
     <BottomTabs.Navigator
-      // initialRouteName="Overview"
+      initialRouteName={FirstScreen}
       screenOptions={({ navigation }) => ({
         headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
         headerTintColor: "white",
@@ -170,34 +173,38 @@ function Home(authCtx) {
         tabBarActiveTintColor: GlobalStyles.colors.primary500,
       })}
     >
-      <BottomTabs.Screen
-        name="RecentExpenses"
-        component={RecentExpenses}
-        options={{
-          headerShown: false,
-          // title: "Recent Expenses",
-          tabBarLabel: "",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="ios-list" size={size} color={color} />
-          ),
-        }}
-      />
-      <BottomTabs.Screen
-        name="Overview"
-        component={OverviewScreen}
-        options={{
-          headerShown: false,
-          title: "Overview",
-          tabBarLabel: "",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons
-              name="ios-stats-chart-outline"
-              size={size}
-              color={color}
-            />
-          ),
-        }}
-      />
+      {!FreshlyCreated && (
+        <BottomTabs.Screen
+          name="RecentExpenses"
+          component={RecentExpenses}
+          options={{
+            headerShown: false,
+            // title: "Recent Expenses",
+            tabBarLabel: "",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="ios-list" size={size} color={color} />
+            ),
+          }}
+        />
+      )}
+      {!FreshlyCreated && (
+        <BottomTabs.Screen
+          name="Overview"
+          component={OverviewScreen}
+          options={{
+            headerShown: false,
+            title: "Overview",
+            tabBarLabel: "",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons
+                name="ios-stats-chart-outline"
+                size={size}
+                color={color}
+              />
+            ),
+          }}
+        />
+      )}
       <BottomTabs.Screen
         name="Profile"
         component={ProfileScreen}
@@ -222,14 +229,15 @@ function Root() {
   const tripCtx = useContext(TripContext);
 
   useEffect(() => {
-    async function fetchToken() {
+    async function onRootMount() {
+      // fetch token and trip
       const storedToken = await AsyncStorage.getItem("token");
       const storedUid = await AsyncStorage.getItem("uid");
-      console.log(
-        "🚀 ~ file: App.js ~ line 214 ~ fetchToken ~ storedUid",
-        storedUid
-      );
       const storedTripId = await AsyncStorage.getItem("currentTripId");
+
+      console.log("onRootMount ~ storedToken", storedToken);
+      console.log("onRootMount ~ storedUid", storedUid);
+      console.log("onRootMount ~ storedTripId", storedTripId);
 
       if (storedToken) {
         authCtx.setUserID(storedUid);
@@ -249,7 +257,7 @@ function Root() {
       setIsTryingLogin(false);
     }
 
-    fetchToken();
+    onRootMount();
   }, []);
 
   if (isTryingLogin) {

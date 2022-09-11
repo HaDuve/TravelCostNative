@@ -19,15 +19,20 @@ function SignupScreen() {
       const { token, uid } = await createUser(email, password);
       authCtx.setUserID(uid);
       const userdata = { name: name };
-      storeUser(uid, userdata);
+      try {
+        storeUser(uid, userdata);
+      } catch (error) {
+        console.log("signupHandler ~ error", error);
+        Alert.alert(
+          "Storing User failed",
+          "Could not create user, please try other credentials or try again later."
+        );
+      }
       userCtx.setUserName(name);
       userCtx.setFreshlyCreatedTo(true);
       authCtx.authenticate(token);
     } catch (error) {
-      console.log(
-        "🚀 ~ file: SignupScreen.js ~ line 26 ~ signupHandler ~ error",
-        error
-      );
+      console.log("signupHandler ~ error", error);
       Alert.alert(
         "Authentication failed",
         "Could not create user, please check your input and try again later."

@@ -3,14 +3,11 @@ import { Share, View, Button } from "react-native";
 const ShareTripButton = ({ route, navigation }) => {
   const shareId = route.params?.tripId;
   const onShare = async () => {
-    const link = "exp://192.168.1.10:19000/--/join/" + shareId;
+    const link = "exp://192.168.100.102:19000/--/join/" + shareId;
     try {
       const result = await Share.share({
         message:
-          "Invite to trip: " +
-          shareId +
-          " - you are welcome to join me on TripExpense!  " +
-          link,
+          "Invite to trip: " + " You are welcome to join me on TripExpense!",
         url: link,
       });
       if (result.action === Share.sharedAction) {

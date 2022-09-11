@@ -6,7 +6,7 @@ import { getFormattedDate, toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
 import { getCatSymbol } from "../../util/category";
 
-function ExpenseItem({ id, description, amount, date, category }) {
+function ExpenseItem({ id, description, amount, date, category, whoPaid }) {
   const navigation = useNavigation();
 
   function expensePressHandler() {
@@ -32,7 +32,7 @@ function ExpenseItem({ id, description, amount, date, category }) {
         </View>
         <View style={styles.leftItem}>
           <Text style={[styles.textBase, styles.description]}>
-            {description}
+            {description} -- {whoPaid}
           </Text>
           <Text style={[styles.textBase, styles.secondaryText]}>
             {toShortFormat(date)}

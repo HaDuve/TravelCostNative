@@ -163,7 +163,7 @@ function Home(authCtx) {
   const FirstScreen = FreshlyCreated ? "Profile" : "RecentExpenses";
   return (
     <BottomTabs.Navigator
-      initialRouteName="Profile"
+      initialRouteName={FirstScreen}
       screenOptions={({ navigation }) => ({
         headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
         headerTintColor: "white",
@@ -238,18 +238,12 @@ function Root() {
       const storedUid = await AsyncStorage.getItem("uid");
       const storedTripId = await AsyncStorage.getItem("currentTripId");
 
-      console.log("onRootMount ~ storedToken", storedToken);
-      console.log("onRootMount ~ storedUid", storedUid);
-      console.log("onRootMount ~ storedTripId", storedTripId);
-
       if (storedToken) {
         authCtx.setUserID(storedUid);
         try {
           const response = await fetchUser(storedUid);
           if (response) {
             userCtx.addUser(response);
-            console.log("onRootMount ~ response.data", response);
-            Alert.alert(`user wurde geadded. username: ${userCtx.userName}`);
           }
         } catch (error) {
           Alert.alert(error);

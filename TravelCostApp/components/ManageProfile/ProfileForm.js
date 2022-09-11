@@ -86,7 +86,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
       userData.homeCurrency.length > 0;
 
     if (invalid) {
-      Alert.alert("Check your profile please!");
+      Alert.alert("Check your profile for invalid entries please!");
       return;
     }
 
@@ -94,7 +94,6 @@ const ProfileForm = ({ navigation, onCancel }) => {
 
     try {
       await updateUser(AuthCtx.uid, userData);
-      Alert.alert("Successfully saved Profile! :)");
       if (!UserCtx.freshlyCreated) {
         return;
       }
@@ -114,9 +113,15 @@ const ProfileForm = ({ navigation, onCancel }) => {
             {inputs.userName.value.charAt(0)}
           </Text>
         </View>
+        <IconButton
+          icon={"exit-outline"}
+          size={36}
+          color={GlobalStyles.colors.textColor}
+          style={styles.button}
+          onPress={logoutHandler}
+        />
         {/* <Text>Change Avatar</Text>
         <Text>Delete Avatar</Text> */}
-        <Text>name: {UserCtx.userName}</Text>
       </View>
       <View style={styles.inputsRow}>
         <Input
@@ -189,23 +194,15 @@ const ProfileForm = ({ navigation, onCancel }) => {
       </View> */}
       <View style={styles.buttonContainer}>
         <IconButton
-          icon={"exit-outline"}
-          size={24}
-          color={GlobalStyles.colors.textColor}
-          style={styles.button}
-          onPress={logoutHandler}
-        />
-
-        <IconButton
           icon={"close-outline"}
-          size={24}
+          size={36}
           color={GlobalStyles.colors.backgroundColor}
           style={styles.button}
           onPress={onCancel}
         />
         <IconButton
           icon={"checkmark"}
-          size={24}
+          size={36}
           color={GlobalStyles.colors.primary400}
           style={styles.button}
           onPress={submitHandler}
@@ -275,7 +272,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
     margin: 8,
   },
   button: {

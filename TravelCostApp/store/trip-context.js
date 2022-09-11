@@ -85,16 +85,13 @@ function TripContextProvider({ children }) {
   const [tripName, setTripName] = useState("");
   const [totalBudget, setTotalBudget] = useState("");
 
-  function setCurrentTrip(tripid, tripData) {
+  function setCurrentTrip(tripid, trip) {
     setTripid(tripid);
-    setTripName(tripData.tripName);
-    setTotalBudget(tripData.totalBudget.toString());
+    setTripName(trip.tripName);
+    setTotalBudget(trip.totalBudget.toString());
     AsyncStorage.setItem("currentTripId", tripid);
-    AsyncStorage.setItem("currentTripName", tripData.tripName);
-    AsyncStorage.setItem(
-      "currentTripTotalBudget",
-      tripData.totalBudget.toString()
-    );
+    AsyncStorage.setItem("currentTripName", trip.tripName);
+    AsyncStorage.setItem("currentTripTotalBudget", trip.totalBudget.toString());
   }
 
   async function getCurrentTripFromStorage() {
@@ -114,12 +111,14 @@ function TripContextProvider({ children }) {
   }
 
   async function fetchCurrentTrip(tripid) {
-    const trip = await fetchTrip(tripid);
-    if (!trip) {
-      console.error("COULD NOT FETCH AND SET TRIP");
-      return;
+    try {
+      const trip = await fetchTrip(tripid);
+      console.log("fetchCurrentTrip ~ trip", trip);
+      console.log(trip.tripName);
+      setCurrentTrip(tripid, trip);
+    } catch (error) {
+      console.log(error);
     }
-    setCurrentTrip(tripid, trip.data);
   }
 
   const value = {

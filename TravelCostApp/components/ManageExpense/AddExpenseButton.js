@@ -8,7 +8,7 @@ const AddExpenseButton = ({ navigation }) => {
       <View style={styles.addButton}>
         <IconButton
           icon="add"
-          size={30}
+          size={36}
           color={"white"}
           onPress={() => {
             navigation.navigate("CategoryPick");
@@ -32,12 +32,9 @@ const styles = StyleSheet.create({
   addButton: {
     backgroundColor: GlobalStyles.colors.primary400,
     flex: 0,
-    borderRadius: 100,
-    minHeight: 55,
-    minWidth: 30,
-    marginHorizontal: 160,
-    marginTop: -40,
-    marginBottom: -15,
+    borderRadius: 999,
+    marginHorizontal: 150,
+    marginBottom: -10,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

@@ -8,8 +8,11 @@ import IconButton from "../components/UI/IconButton";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
 import { TripContext } from "../store/trip-context";
 import Button from "../components/UI/Button";
+import { UserContext } from "../store/user-context";
 
 const ProfileScreen = ({ route, navigation, param }) => {
+  const UserCtx = useContext(UserContext);
+  const FreshlyCreated = UserCtx.freshlyCreated;
   const TripCtx = useContext(TripContext);
 
   useEffect(() => {
@@ -50,14 +53,10 @@ const ProfileScreen = ({ route, navigation, param }) => {
     console.log("canceled");
   }
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.innerContainer}>
-        <ProfileForm
-          navigation={navigation}
-          onCancel={cancelHandler}
-        ></ProfileForm>
-      </View>
+  const visibleContent = FreshlyCreated ? (
+    <></>
+  ) : (
+    <>
       <View style={styles.tripContainer}>
         <View style={styles.horizontalContainer}>
           <Text style={styles.tripListTitle}>My Trips</Text>
@@ -72,16 +71,18 @@ const ProfileScreen = ({ route, navigation, param }) => {
         <TripList trips={ACTIVETRIP}></TripList>
       </View>
       <AddExpenseButton navigation={navigation} />
-      {/* <Button
-        onPress={() => {
-          TripCtx.addTrip({
-            tripName: "Worldtrip",
-            totalBudget: "20,000$",
-          });
-        }}
-      >
-        Add Trip
-      </Button> */}
+    </>
+  );
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.innerContainer}>
+        <ProfileForm
+          navigation={navigation}
+          onCancel={cancelHandler}
+        ></ProfileForm>
+      </View>
+      {visibleContent}
     </View>
   );
 };

@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   infoText: {
-    color: "white",
+    color: GlobalStyles.colors.textColor,
     fontSize: 16,
     textAlign: "center",
     marginTop: 32,

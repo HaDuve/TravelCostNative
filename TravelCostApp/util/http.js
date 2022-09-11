@@ -22,6 +22,7 @@ export async function fetchExpenses(tripid, uid) {
   const expenses = [];
 
   for (const key in response.data) {
+    console.log("fetchExpenses ~ key", key);
     const expenseObj = {
       id: key,
       amount: response.data[key].amount,

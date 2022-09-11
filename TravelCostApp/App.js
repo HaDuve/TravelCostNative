@@ -7,7 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import * as Linking from "expo-linking";
-import { Text } from "react-native";
+import { Alert, Text } from "react-native";
 import AppLoading from "expo-app-loading";
 import SignupScreen from "./screens/SignupScreen";
 import LoginScreen from "./screens/LoginScreen";
@@ -163,7 +163,7 @@ function Home(authCtx) {
   const FirstScreen = FreshlyCreated ? "Profile" : "RecentExpenses";
   return (
     <BottomTabs.Navigator
-      initialRouteName={FirstScreen}
+      initialRouteName="Profile"
       screenOptions={({ navigation }) => ({
         headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
         headerTintColor: "white",
@@ -230,6 +230,9 @@ function Root() {
 
   useEffect(() => {
     async function onRootMount() {
+      // DEBUG: if we ever want to clear all memory
+      // await AsyncStorage.clear();
+
       // fetch token and trip
       const storedToken = await AsyncStorage.getItem("token");
       const storedUid = await AsyncStorage.getItem("uid");
@@ -241,11 +244,15 @@ function Root() {
 
       if (storedToken) {
         authCtx.setUserID(storedUid);
-        const response = await fetchUser(storedUid);
-        if (response) {
-          userCtx.addUser(response.data);
-        } else {
-          console.log("no responsedata");
+        try {
+          const response = await fetchUser(storedUid);
+          if (response) {
+            userCtx.addUser(response);
+            console.log("onRootMount ~ response.data", response);
+            Alert.alert(`user wurde geadded. username: ${userCtx.userName}`);
+          }
+        } catch (error) {
+          Alert.alert(error);
         }
         if (storedTripId) {
           tripCtx.fetchCurrentTrip(storedTripId);

@@ -15,6 +15,7 @@ import IconButton from "../UI/IconButton";
 const ProfileForm = ({ navigation, onCancel }) => {
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
+  const FreshlyCreated = UserCtx.freshlyCreated;
   const uid = AuthContext.uid;
 
   function logoutHandler() {
@@ -113,8 +114,9 @@ const ProfileForm = ({ navigation, onCancel }) => {
             {inputs.userName.value.charAt(0)}
           </Text>
         </View>
-        <Text>Change Avatar</Text>
-        <Text>Delete Avatar</Text>
+        {/* <Text>Change Avatar</Text>
+        <Text>Delete Avatar</Text> */}
+        <Text>name: {UserCtx.userName}</Text>
       </View>
       <View style={styles.inputsRow}>
         <Input

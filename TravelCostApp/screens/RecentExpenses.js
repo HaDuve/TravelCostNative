@@ -37,6 +37,7 @@ function RecentExpenses({ navigation }) {
   const tripCtx = useContext(TripContext);
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
+  console.log("RecentExpenses ~ uid", uid);
   const token = authCtx.token;
 
   useEffect(() => {
@@ -71,6 +72,8 @@ function RecentExpenses({ navigation }) {
   let todayDateString = new Date();
   todayDateString = toShortFormat(todayDateString);
 
+  const datalength = recentExpenses.length > 0;
+
   return (
     <View style={styles.container}>
       <View style={styles.dateHeader}>
@@ -88,7 +91,9 @@ function RecentExpenses({ navigation }) {
           style={styles.dropdown}
           textStyle={styles.dropdownTextStyle}
         />
-        <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
+        {datalength && (
+          <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
+        )}
       </View>
       <View style={styles.tempGrayBar1}></View>
       <ExpensesOutput

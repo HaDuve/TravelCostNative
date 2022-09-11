@@ -149,7 +149,25 @@ const ExpenseForm = ({
     // update lastcountry and lastcurrency
     UserCtx.lastCountry = inputs.country.value;
     UserCtx.lastCurrency = inputs.currency.value;
+    console.log(expenseData);
+    onSubmit(expenseData);
+  }
 
+  function fastSubmit() {
+    const expenseData = {
+      uid: AuthCtx.uid,
+      amount: +inputs.amount.value,
+      date: new Date(),
+      description: pickedCat,
+      category: pickedCat,
+      country: UserCtx.lastCountry ? UserCtx.lastCountry : UserCtx.homeCountry,
+      currency: UserCtx.lastCurrency
+        ? UserCtx.lastCurrency
+        : UserCtx.homeCurrency,
+      whoPaid: UserCtx.userName,
+      owePerc: "0",
+    };
+    console.log(expenseData);
     onSubmit(expenseData);
   }
 
@@ -231,6 +249,8 @@ const ExpenseForm = ({
       sethideAdvanced(true);
     }
   }
+
+  const advancedSubmitHandler = hideAdvanced ? fastSubmit : submitHandler;
 
   const formIsInvalid =
     !inputs.amount.isValid ||
@@ -408,7 +428,7 @@ const ExpenseForm = ({
         <FlatButton style={styles.button} onPress={onCancel}>
           Cancel
         </FlatButton>
-        <Button style={styles.button} onPress={submitHandler}>
+        <Button style={styles.button} onPress={advancedSubmitHandler}>
           {submitButtonLabel}
         </Button>
       </View>

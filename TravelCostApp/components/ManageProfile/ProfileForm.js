@@ -18,6 +18,8 @@ const ProfileForm = ({ navigation, onCancel }) => {
   const FreshlyCreated = UserCtx.freshlyCreated;
   const uid = AuthContext.uid;
 
+  let currencyPickerRef = undefined;
+
   function logoutHandler() {
     return Alert.alert("Are your sure?", "Are you sure you want to logout?", [
       // The "No" button
@@ -82,7 +84,6 @@ const ProfileForm = ({ navigation, onCancel }) => {
     const invalid =
       userData.userName.length > 0 &&
       isNaN(userData.dailybudget) &&
-      userData.homeCountry.length > 0 &&
       userData.homeCurrency.length > 0;
 
     if (invalid) {
@@ -135,7 +136,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
           invalid={!inputs.userName.isValid}
         />
 
-        <Input
+        {/* <Input
           style={styles.rowInput}
           inputStyle={styles.inputStyle}
           label="homeCountry"
@@ -144,7 +145,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
             value: inputs.homeCountry.value,
           }}
           invalid={!inputs.homeCountry.isValid}
-        />
+        /> */}
       </View>
       <View style={styles.inputsRow}>
         <Input
@@ -158,8 +159,59 @@ const ProfileForm = ({ navigation, onCancel }) => {
           }}
           invalid={!inputs.dailybudget.isValid}
         />
-
-        <Input
+        <CurrencyPicker
+          currencyPickerRef={(ref) => {
+            currencyPickerRef = ref;
+          }}
+          enable={true}
+          darkMode={false}
+          currencyCode={inputs.homeCurrency.value}
+          showFlag={true}
+          showCurrencyName={false}
+          showCurrencyCode={false}
+          onSelectCurrency={(data) => {
+            console.log("DATA", data);
+            inputChangedHandler("homeCurrency", data.code);
+          }}
+          onOpen={() => {
+            console.log("Open");
+          }}
+          onClose={() => {
+            console.log("Close");
+          }}
+          showNativeSymbol={true}
+          showSymbol={false}
+          containerStyle={{
+            container: {
+              marginLeft: 10,
+              paddingTop: 24,
+              marginRight: 200,
+            },
+            flagWidth: 25,
+            currencyCodeStyle: { color: GlobalStyles.colors.primary500 },
+            currencyNameStyle: { color: GlobalStyles.colors.primary500 },
+            symbolStyle: { color: GlobalStyles.colors.primary500 },
+            symbolNativeStyle: { color: GlobalStyles.colors.primary500 },
+          }}
+          modalStyle={{
+            container: {},
+            searchStyle: {},
+            tileStyle: {},
+            itemStyle: {
+              itemContainer: {},
+              flagWidth: 25,
+              currencyCodeStyle: {},
+              currencyNameStyle: {},
+              symbolStyle: {},
+              symbolNativeStyle: {},
+            },
+          }}
+          title={"Currency"}
+          searchPlaceholder={"Search"}
+          showCloseButton={true}
+          showModalTitle={true}
+        />
+        {/* <Input
           style={styles.rowInput}
           inputStyle={styles.inputStyle}
           label="homeCurrency"
@@ -168,7 +220,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
             value: inputs.homeCurrency.value,
           }}
           invalid={!inputs.homeCurrency.isValid}
-        />
+        /> */}
       </View>
       {/* <View style={styles.inputsRow}>
         <Input

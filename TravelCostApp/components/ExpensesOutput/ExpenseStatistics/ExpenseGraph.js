@@ -5,7 +5,6 @@ import { daysBetween, toMonthString, toShortFormat } from "../../../util/date";
 import { UserContext } from "../../../store/user-context";
 
 const ExpenseGraph = ({ expenses }) => {
-  console.log("ExpenseGraph ~ expenses", expenses);
   const ExpenseCtx = useContext(ExpensesContext);
   const UserCtx = useContext(UserContext);
 
@@ -23,15 +22,12 @@ const ExpenseGraph = ({ expenses }) => {
     listExpenseSumBudgets.push(obj);
   }
 
-  console.log("ExpenseGraph ~ listExpenseSumBudgets", listExpenseSumBudgets);
-
   function renderItem({ item }) {
     // const fday = toShortFormat(item.firstDay);
     // const lday = toShortFormat(item.lastDay);
     const month = toMonthString(item.firstDay);
     const debt = item.expensesSum > item.monthlyBudget;
     const colorCoding = !debt ? styles.green : styles.red;
-    console.log("renderItem ~ fday", item.firstDay);
     return (
       <View style={styles.itemContainer}>
         <Text style={styles.text1}>

@@ -37,7 +37,6 @@ function RecentExpenses({ navigation }) {
   const tripCtx = useContext(TripContext);
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
-  console.log("RecentExpenses ~ uid", uid);
   const token = authCtx.token;
 
   useEffect(() => {

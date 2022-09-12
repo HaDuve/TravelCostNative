@@ -34,10 +34,6 @@ function UserContextProvider({ children }) {
   const [freshlyCreated, setFreshlyCreated] = useState(false);
 
   function addUser(UserData) {
-    console.log(
-      "🚀 ~ file: user-context.js ~ line 32 ~ addUser ~ UserData",
-      UserData
-    );
     if (!UserData) return;
 
     if (UserData.userName) {

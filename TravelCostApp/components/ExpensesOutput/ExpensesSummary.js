@@ -6,6 +6,8 @@ import { UserContext } from "../../store/user-context";
 import { TripContext } from "../../store/trip-context";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
+  const userCtx = useContext(UserContext);
+  const userCurrency = userCtx.homeCurrency;
   const expensesSum = expenses.reduce((sum, expense) => {
     return sum + expense.amount;
   }, 0);
@@ -14,11 +16,11 @@ const ExpensesSummary = ({ expenses, periodName }) => {
     return (
       <View style={styles.container}>
         <Text style={[styles.sum, { color: budgetColor }]}>
-          {expensesSum.toFixed(2)}$
+          {expensesSum.toFixed(2)}
+          {userCurrency}
         </Text>
       </View>
     );
-  const userCtx = useContext(UserContext);
   let dailyBudgetNum = Number(userCtx.dailybudget);
   const expenseSumNum = Number(expensesSum);
   const totalBudget = Number(tripCtx.totalBudget);
@@ -62,7 +64,8 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   return (
     <View style={styles.container}>
       <Text style={[styles.sum, { color: budgetColor }]}>
-        {expensesSum.toFixed(2)}$
+        {expensesSum.toFixed(2)}
+        {userCurrency}
       </Text>
       <Progress.Bar
         color={budgetColor}

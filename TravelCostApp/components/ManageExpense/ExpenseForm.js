@@ -149,7 +149,6 @@ const ExpenseForm = ({
     // update lastcountry and lastcurrency
     UserCtx.lastCountry = inputs.country.value;
     UserCtx.lastCurrency = inputs.currency.value;
-    console.log(expenseData);
     onSubmit(expenseData);
   }
 
@@ -321,7 +320,6 @@ const ExpenseForm = ({
               showCurrencyName={true}
               showCurrencyCode={false}
               onSelectCurrency={(data) => {
-                console.log("DATA", data);
                 inputChangedHandler("currency", data.code);
               }}
               onOpen={() => {

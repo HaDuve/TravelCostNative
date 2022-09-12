@@ -24,12 +24,7 @@ const JoinTrip = ({ navigation, route }) => {
         // const user = await fetchUser(uid);
         // userCtx.addUser(user);
       } catch (error) {
-        console.log(
-          "🚀 ~ file: JoinTrip.js ~ line 22 ~ getTrip ~ error",
-          error
-        );
-
-        // setError("Could not fetch data from the web database!");
+        console.log(error);
       }
       //   setIsFetching(false);
     }
@@ -39,13 +34,11 @@ const JoinTrip = ({ navigation, route }) => {
 
   function joinHandler(arg) {
     if (arg) {
-      console.log("YES pressed");
       const traveller = { travellerid: uid };
       storeUserToTrip(tripid, traveller);
       navigation.navigate("RecentExpenses");
       return;
     }
-    console.log("NO pressed");
     navigation.navigate("Home");
   }
 

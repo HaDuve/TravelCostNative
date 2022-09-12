@@ -10,6 +10,7 @@ import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
+import { UserContext } from "../store/user-context";
 import { deleteExpense, storeExpense, updateExpense } from "../util/http";
 import { GlobalStyles } from "./../constants/styles";
 
@@ -21,6 +22,7 @@ const ManageExpense = ({ route, navigation }) => {
   const expenseCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const tripCtx = useContext(TripContext);
+  const userCtx = useContext(UserContext);
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
 

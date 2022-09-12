@@ -51,17 +51,11 @@ function TripContextProvider({ children }) {
 
   async function setCurrentTravellers(tripid) {
     try {
+      //TODO finish this function
       const trip = await fetchTrip(tripid);
       if (!trip) return;
-      console.log(
-        "🚀 ~ file: trip-context.js ~ line 55 ~ setCurrentTravellers ~ trip.data",
-        trip.data
-      );
     } catch (error) {
-      console.log(
-        "🚀 ~ file: trip-context.js ~ line 57 ~ setCurrentTravellers ~ error",
-        error
-      );
+      console.log(error);
     }
   }
 
@@ -113,8 +107,6 @@ function TripContextProvider({ children }) {
   async function fetchCurrentTrip(tripid) {
     try {
       const trip = await fetchTrip(tripid);
-      console.log("fetchCurrentTrip ~ trip", trip);
-      console.log(trip.tripName);
       setCurrentTrip(tripid, trip);
     } catch (error) {
       console.log(error);

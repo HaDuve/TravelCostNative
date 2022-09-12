@@ -5,9 +5,23 @@ import { GlobalStyles } from "../../constants/styles";
 import { getFormattedDate, toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
 import { getCatSymbol } from "../../util/category";
+import { useContext } from "react";
+import { UserContext } from "../../store/user-context";
 
-function ExpenseItem({ id, description, amount, date, category, whoPaid }) {
+function ExpenseItem({
+  id,
+  description,
+  amount,
+  date,
+  category,
+  whoPaid,
+  currency,
+}) {
   const navigation = useNavigation();
+
+  const UserCtx = useContext(UserContext);
+  const homeCurrency = UserCtx.homeCurrency;
+  const homeAmount = amount;
 
   function expensePressHandler() {
     navigation.navigate("ManageExpense", {
@@ -39,7 +53,14 @@ function ExpenseItem({ id, description, amount, date, category, whoPaid }) {
           </Text>
         </View>
         <View style={styles.amountContainer}>
-          <Text style={styles.amount}>{amount.toFixed(2)}$</Text>
+          <Text style={styles.amount}>
+            {homeAmount.toFixed(2)}
+            {homeCurrency}
+          </Text>
+          <Text>
+            {amount.toFixed(2)}
+            {currency}
+          </Text>
         </View>
       </View>
     </Pressable>
@@ -82,8 +103,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   amountContainer: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 0,
     backgroundColor: "white",
     justifyContent: "center",
     alignItems: "center",

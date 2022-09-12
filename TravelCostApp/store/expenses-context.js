@@ -1,5 +1,5 @@
 import { createContext, useReducer } from "react";
-import { getDateMinusDays } from "../util/date";
+import { getDateMinusDays, toShortFormat } from "../util/date";
 
 export const ExpensesContext = createContext({
   expenses: [],
@@ -31,6 +31,9 @@ export const ExpensesContext = createContext({
     }
   ) => {},
   getRecentExpenses: (rangestring) => {},
+  getMonthlyExpenses: (month) => {
+    firstDay, lastDay, monthlyExpenses;
+  },
 });
 
 function expensesReducer(state, action) {
@@ -118,6 +121,27 @@ function ExpensesContextProvider({ children }) {
     }
   }
 
+  function getMonthlyExpenses(monthsBack) {
+    /*
+     *  Returns an object containing the first date, last date of a month and
+     *  the expenses in that range.
+     *  returns {firstDay, lastDay, monthlyExpenses}
+     */
+    const daysBefore = monthsBack * 30;
+    const today = new Date();
+
+    const dayBack = getDateMinusDays(today, daysBefore);
+
+    const firstDay = new Date(dayBack.getFullYear(), dayBack.getMonth(), 1);
+
+    const lastDay = new Date(dayBack.getFullYear(), dayBack.getMonth() + 1, 0);
+
+    const monthlyExpenses = expensesState.filter((expense) => {
+      return expense.date >= firstDay && expense.date <= lastDay;
+    });
+    return { firstDay, lastDay, monthlyExpenses };
+  }
+
   const value = {
     expenses: expensesState,
     addExpense: addExpense,
@@ -125,6 +149,7 @@ function ExpensesContextProvider({ children }) {
     deleteExpense: deleteExpense,
     updateExpense: updateExpense,
     getRecentExpenses: getRecentExpenses,
+    getMonthlyExpenses: getMonthlyExpenses,
   };
 
   return (

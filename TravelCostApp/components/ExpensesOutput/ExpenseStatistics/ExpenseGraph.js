@@ -34,7 +34,8 @@ const ExpenseGraph = ({ expenses }) => {
           {month} {item.firstDay.getFullYear()}
         </Text>
         <Text style={[styles.text1, colorCoding]}>
-          {item.expensesSum}$ / {item.monthlyBudget}$
+          {item.expensesSum.toFixed(2)}
+          {UserCtx.homeCurrency}
         </Text>
       </View>
     );

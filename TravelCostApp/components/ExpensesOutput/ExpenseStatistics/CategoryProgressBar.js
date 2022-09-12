@@ -3,6 +3,8 @@ import * as Progress from "react-native-progress";
 import { GlobalStyles } from "../../../constants/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { getCatSymbol } from "../../../util/category";
+import { useContext } from "react";
+import { UserContext } from "../../../store/user-context";
 
 const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   let budgetProgress = (catCost / totalCost) * 1;
@@ -10,6 +12,8 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   const unfilledColor = GlobalStyles.colors.gray500;
   const icon = getCatSymbol(cat);
   const stylingSpace = "  ";
+  const userCtx = useContext(UserContext);
+  const userCurrency = userCtx.homeCurrency;
 
   return (
     <View style={styles.container}>
@@ -20,7 +24,10 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
           {cat}
         </Text>
         <View style={{ flex: 1 }}></View>
-        <Text style={[styles.sum, { color: budgetColor }]}>{catCost}$</Text>
+        <Text style={[styles.sum, { color: budgetColor }]}>
+          {catCost.toFixed(2)}
+          {userCurrency}
+        </Text>
       </View>
       <Progress.Bar
         color={budgetColor}

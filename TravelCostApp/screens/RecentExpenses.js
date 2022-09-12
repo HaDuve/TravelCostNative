@@ -16,6 +16,8 @@ import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
 import IconButton from "../components/UI/IconButton";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
+import Button from "../components/UI/Button";
+import { fetchRates, getRate } from "../util/currencyExchange";
 
 function RecentExpenses({ navigation }) {
   const [isFetching, setIsFetching] = useState(true);

@@ -5,8 +5,9 @@ import { GlobalStyles } from "../../constants/styles";
 import { getFormattedDate, toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
 import { getCatSymbol } from "../../util/category";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../store/user-context";
+import { getRate } from "../../util/currencyExchange";
 
 function ExpenseItem({
   id,
@@ -17,11 +18,23 @@ function ExpenseItem({
   whoPaid,
   currency,
 }) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [calcAmount, setCalcAmount] = useState(0);
   const navigation = useNavigation();
 
   const UserCtx = useContext(UserContext);
   const homeCurrency = UserCtx.homeCurrency;
-  const homeAmount = amount;
+
+  useEffect(() => {
+    setIsLoading(true);
+    async function getRateNow() {
+      const homeRate = await getRate(currency, homeCurrency);
+      console.log("homeRate", homeRate);
+      setCalcAmount(amount * homeRate);
+      setIsLoading(false);
+    }
+    getRateNow();
+  }, []);
 
   function expensePressHandler() {
     navigation.navigate("ManageExpense", {
@@ -54,12 +67,13 @@ function ExpenseItem({
         </View>
         <View style={styles.amountContainer}>
           <Text style={styles.amount}>
-            {homeAmount.toFixed(2)}
-            {homeCurrency}
+            {!isLoading && calcAmount.toFixed(2)}
+            {isLoading && "??"}
+            {" " + homeCurrency}
           </Text>
-          <Text>
+          <Text style={styles.originalCurrencyText}>
             {amount.toFixed(2)}
-            {currency}
+            {" " + currency}
           </Text>
         </View>
       </View>
@@ -115,5 +129,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "300",
     color: GlobalStyles.colors.error300,
+  },
+  originalCurrencyText: {
+    fontSize: 12,
+    fontWeight: "300",
   },
 });

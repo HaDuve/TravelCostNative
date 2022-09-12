@@ -29,7 +29,6 @@ function ExpenseItem({
     setIsLoading(true);
     async function getRateNow() {
       const homeRate = await getRate(currency, homeCurrency);
-      console.log("homeRate", homeRate);
       setCalcAmount(amount * homeRate);
       setIsLoading(false);
     }

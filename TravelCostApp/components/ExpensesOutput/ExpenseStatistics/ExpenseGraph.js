@@ -29,19 +29,19 @@ const ExpenseGraph = ({ expenses }) => {
     // const fday = toShortFormat(item.firstDay);
     // const lday = toShortFormat(item.lastDay);
     const month = toMonthString(item.firstDay);
-
+    const debt = item.expensesSum > item.monthlyBudget;
+    const colorCoding = !debt ? styles.green : styles.red;
     console.log("renderItem ~ fday", item.firstDay);
     return (
       <View style={styles.itemContainer}>
-        <Text>
+        <Text style={styles.text1}>
           {month} {item.firstDay.getFullYear()}
         </Text>
-        <Text>
+        <Text style={[styles.text1, colorCoding]}>
           {item.expensesSum}$ / {item.monthlyBudget}$
         </Text>
       </View>
     );
-    // return <Text>{item.expensesSum}</Text>;
   }
   return (
     <View style={styles.container}>
@@ -54,9 +54,21 @@ export default ExpenseGraph;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 4,
+    paddingTop: 12,
+    paddingHorizontal: 24,
   },
   itemContainer: {
-    padding: 4,
+    padding: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  text1: {
+    fontSize: 20,
+  },
+  green: {
+    color: "green",
+  },
+  red: {
+    color: "red",
   },
 });

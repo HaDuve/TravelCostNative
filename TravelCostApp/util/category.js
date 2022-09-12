@@ -2,6 +2,8 @@ export function getCatSymbol(cat) {
   switch (cat) {
     case "food":
       return "fast-food-outline";
+    case "Food":
+      return "fast-food-outline";
     case "national-travel":
       return "car-outline";
     case "international-travel":
@@ -11,6 +13,6 @@ export function getCatSymbol(cat) {
     case "other":
       return "basket-outline";
     default:
-      return "md-ice-cream-outline";
+      return "help-outline";
   }
 }

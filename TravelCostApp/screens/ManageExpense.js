@@ -93,6 +93,7 @@ const ManageExpense = ({ route, navigation }) => {
           onSubmit={confirmHandler}
           pickedCat={pickedCat}
           navigation={navigation}
+          isEditing={isEditing}
           submitButtonLabel={isEditing ? "Update" : "Add"}
           defaultValues={selectedExpense}
         />

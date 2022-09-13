@@ -17,13 +17,14 @@ const ExpenseForm = ({
   onCancel,
   onSubmit,
   submitButtonLabel,
+  isEditing,
   defaultValues,
   pickedCat,
   navigation,
 }) => {
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
-  const [hideAdvanced, sethideAdvanced] = useState(true);
+  const [hideAdvanced, sethideAdvanced] = useState(!isEditing);
 
   let currencyPickerRef = undefined;
 

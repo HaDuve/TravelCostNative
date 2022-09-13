@@ -21,12 +21,18 @@ const TripForm = ({ navigation }) => {
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
   const uid = AuthCtx.uid;
+  let currencyPickerRef = undefined;
+
   const [inputs, setInputs] = useState({
     tripName: {
       value: "",
       isValid: true,
     },
     totalBudget: {
+      value: "",
+      isValid: true,
+    },
+    tripCurrency: {
       value: "",
       isValid: true,
     },
@@ -48,9 +54,10 @@ const TripForm = ({ navigation }) => {
     const tripData = {};
     tripData.tripName = inputs.tripName.value;
     tripData.totalBudget = +inputs.totalBudget.value;
+    tripData.tripCurrency = inputs.tripCurrency.value;
 
     const id = await storeTrip(tripData);
-    const response = TripCtx.setCurrentTrip(id, tripData);
+    TripCtx.setCurrentTrip(id, tripData);
     storeUserToTrip(id, { travellerid: uid });
     UserCtx.setFreshlyCreatedTo(false);
     navigation.navigate("RecentExpenses");
@@ -78,6 +85,58 @@ const TripForm = ({ navigation }) => {
             value: inputs.totalBudget.value,
           }}
           invalid={!inputs.totalBudget.isValid}
+        />
+        <CurrencyPicker
+          currencyPickerRef={(ref) => {
+            currencyPickerRef = ref;
+          }}
+          enable={true}
+          darkMode={false}
+          currencyCode={inputs.tripCurrency.value}
+          showFlag={true}
+          showCurrencyName={false}
+          showCurrencyCode={false}
+          onSelectCurrency={(data) => {
+            console.log("DATA", data);
+            inputChangedHandler("tripCurrency", data.code);
+          }}
+          onOpen={() => {
+            console.log("Open");
+          }}
+          onClose={() => {
+            console.log("Close");
+          }}
+          showNativeSymbol={true}
+          showSymbol={false}
+          containerStyle={{
+            container: {
+              marginLeft: 10,
+              paddingTop: 24,
+              marginRight: 200,
+            },
+            flagWidth: 25,
+            currencyCodeStyle: { color: GlobalStyles.colors.primary500 },
+            currencyNameStyle: { color: GlobalStyles.colors.primary500 },
+            symbolStyle: { color: GlobalStyles.colors.primary500 },
+            symbolNativeStyle: { color: GlobalStyles.colors.primary500 },
+          }}
+          modalStyle={{
+            container: {},
+            searchStyle: {},
+            tileStyle: {},
+            itemStyle: {
+              itemContainer: {},
+              flagWidth: 25,
+              currencyCodeStyle: {},
+              currencyNameStyle: {},
+              symbolStyle: {},
+              symbolNativeStyle: {},
+            },
+          }}
+          title={"Currency"}
+          searchPlaceholder={"Search"}
+          showCloseButton={true}
+          showModalTitle={true}
         />
       </View>
       <View style={styles.buttonContainer}>

@@ -7,6 +7,7 @@ export const TripContext = createContext({
   tripid: "",
   tripName: "",
   totalBudget: "",
+  tripCurrency: "",
   // save user as obj with (tname, tid)
   travellers: [],
   setCurrentTravellers: (tripid) => {},
@@ -78,14 +79,17 @@ function TripContextProvider({ children }) {
   const [tripid, setTripid] = useState("");
   const [tripName, setTripName] = useState("");
   const [totalBudget, setTotalBudget] = useState("");
+  const [tripCurrency, setTripCurrency] = useState("EUR");
 
   function setCurrentTrip(tripid, trip) {
     setTripid(tripid);
     setTripName(trip.tripName);
     setTotalBudget(trip.totalBudget.toString());
+    setTripCurrency(trip.tripCurrency);
     AsyncStorage.setItem("currentTripId", tripid);
     AsyncStorage.setItem("currentTripName", trip.tripName);
     AsyncStorage.setItem("currentTripTotalBudget", trip.totalBudget.toString());
+    AsyncStorage.setItem("currentTripCurrency", trip.tripCurrency);
   }
 
   async function getCurrentTripFromStorage() {
@@ -117,6 +121,7 @@ function TripContextProvider({ children }) {
     tripid: tripid,
     tripName: tripName,
     totalBudget: totalBudget,
+    tripCurrency: tripCurrency,
     travellers: travellers,
     setCurrentTravellers: setCurrentTravellers,
 

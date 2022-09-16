@@ -7,6 +7,7 @@ export const TripContext = createContext({
   tripid: "",
   tripName: "",
   totalBudget: "",
+  dailyBudget: "",
   tripCurrency: "",
   // save user as obj with (tname, tid)
   travellers: [],
@@ -17,7 +18,7 @@ export const TripContext = createContext({
   deleteTrip: (tripid) => {},
   updateTrip: ({ tripid, tripName, tripTotalBudget }) => {},
 
-  setCurrentTrip: ({ tripName, totalBudget, tripCurrency }) => {},
+  setCurrentTrip: ({ tripName, totalBudget, tripCurrency, dailyBudget }) => {},
   deleteCurrentTrip: (uid) => {},
   getCurrentTripFromStorage: () => {},
   fetchCurrentTrip: (tripid) => {},
@@ -50,6 +51,12 @@ function TripContextProvider({ children }) {
   const [tripsState, dispatch] = useReducer(tripsReducer, []);
   const [travellers, setTravellers] = useState([]);
 
+  const [tripid, setTripid] = useState("");
+  const [tripName, setTripName] = useState("");
+  const [totalBudget, setTotalBudget] = useState("");
+  const [tripCurrency, setTripCurrency] = useState("");
+  const [dailyBudget, setdailyBudget] = useState("");
+
   async function setCurrentTravellers(tripid) {
     try {
       //TODO finish this function
@@ -76,20 +83,17 @@ function TripContextProvider({ children }) {
     dispatch({ type: "UPDATE", payload: { id: id, data: tripData } });
   }
 
-  const [tripid, setTripid] = useState("");
-  const [tripName, setTripName] = useState("");
-  const [totalBudget, setTotalBudget] = useState("");
-  const [tripCurrency, setTripCurrency] = useState("");
-
   function setCurrentTrip(tripid, trip) {
     setTripid(tripid);
     setTripName(trip.tripName);
     setTotalBudget(trip.totalBudget.toString());
     setTripCurrency(trip.tripCurrency);
+    setdailyBudget(trip.dailyBudget.toString());
     AsyncStorage.setItem("currentTripId", tripid);
     AsyncStorage.setItem("currentTripName", trip.tripName);
     AsyncStorage.setItem("currentTripTotalBudget", trip.totalBudget.toString());
     AsyncStorage.setItem("currentTripCurrency", trip.tripCurrency);
+    AsyncStorage.setItem("currentTripDailyBudget", trip.dailyBudget.toString());
   }
 
   async function getCurrentTripFromStorage() {
@@ -122,6 +126,7 @@ function TripContextProvider({ children }) {
     tripName: tripName,
     totalBudget: totalBudget,
     tripCurrency: tripCurrency,
+    dailyBudget: dailyBudget,
     travellers: travellers,
     setCurrentTravellers: setCurrentTravellers,
 

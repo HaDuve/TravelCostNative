@@ -33,6 +33,10 @@ const TripForm = ({ navigation }) => {
       isValid: true,
     },
     tripCurrency: {
+      value: "EUR",
+      isValid: true,
+    },
+    dailyBudget: {
       value: "",
       isValid: true,
     },
@@ -55,6 +59,7 @@ const TripForm = ({ navigation }) => {
     tripData.tripName = inputs.tripName.value;
     tripData.totalBudget = +inputs.totalBudget.value;
     tripData.tripCurrency = inputs.tripCurrency.value;
+    tripData.dailyBudget = inputs.dailyBudget.value;
 
     const id = await storeTrip(tripData);
     TripCtx.setCurrentTrip(id, tripData);
@@ -62,6 +67,60 @@ const TripForm = ({ navigation }) => {
     UserCtx.setFreshlyCreatedTo(false);
     navigation.navigate("RecentExpenses");
   }
+
+  const currencyPickJSX = (
+    <CurrencyPicker
+      currencyPickerRef={(ref) => {
+        currencyPickerRef = ref;
+      }}
+      enable={true}
+      darkMode={false}
+      currencyCode={inputs.tripCurrency.value}
+      showFlag={true}
+      showCurrencyName={false}
+      showCurrencyCode={false}
+      onSelectCurrency={(data) => {
+        console.log("DATA", data);
+        inputChangedHandler("tripCurrency", data.code);
+      }}
+      onOpen={() => {
+        console.log("Open");
+      }}
+      onClose={() => {
+        console.log("Close");
+      }}
+      showNativeSymbol={true}
+      showSymbol={false}
+      containerStyle={{
+        container: {
+          marginLeft: 0,
+          paddingTop: 24,
+        },
+        flagWidth: 25,
+        currencyCodeStyle: { color: GlobalStyles.colors.primary500 },
+        currencyNameStyle: { color: GlobalStyles.colors.primary500 },
+        symbolStyle: { color: GlobalStyles.colors.primary500 },
+        symbolNativeStyle: { color: GlobalStyles.colors.primary500 },
+      }}
+      modalStyle={{
+        container: {},
+        searchStyle: {},
+        tileStyle: {},
+        itemStyle: {
+          itemContainer: {},
+          flagWidth: 25,
+          currencyCodeStyle: {},
+          currencyNameStyle: {},
+          symbolStyle: {},
+          symbolNativeStyle: {},
+        },
+      }}
+      title={"Currency"}
+      searchPlaceholder={"Search"}
+      showCloseButton={true}
+      showModalTitle={true}
+    />
+  );
 
   return (
     <View style={styles.form}>
@@ -76,68 +135,32 @@ const TripForm = ({ navigation }) => {
           invalid={!inputs.tripName.isValid}
           autoFocus={true}
         />
-        <Input
-          style={styles.rowInput}
-          label="Total Budget"
-          textInputConfig={{
-            keyboardType: "decimal-pad",
-            onChangeText: inputChangedHandler.bind(this, "totalBudget"),
-            value: inputs.totalBudget.value,
-          }}
-          invalid={!inputs.totalBudget.isValid}
-        />
-        <CurrencyPicker
-          currencyPickerRef={(ref) => {
-            currencyPickerRef = ref;
-          }}
-          enable={true}
-          darkMode={false}
-          currencyCode={inputs.tripCurrency.value}
-          showFlag={true}
-          showCurrencyName={false}
-          showCurrencyCode={false}
-          onSelectCurrency={(data) => {
-            console.log("DATA", data);
-            inputChangedHandler("tripCurrency", data.code);
-          }}
-          onOpen={() => {
-            console.log("Open");
-          }}
-          onClose={() => {
-            console.log("Close");
-          }}
-          showNativeSymbol={true}
-          showSymbol={false}
-          containerStyle={{
-            container: {
-              marginLeft: 10,
-              paddingTop: 24,
-              marginRight: 200,
-            },
-            flagWidth: 25,
-            currencyCodeStyle: { color: GlobalStyles.colors.primary500 },
-            currencyNameStyle: { color: GlobalStyles.colors.primary500 },
-            symbolStyle: { color: GlobalStyles.colors.primary500 },
-            symbolNativeStyle: { color: GlobalStyles.colors.primary500 },
-          }}
-          modalStyle={{
-            container: {},
-            searchStyle: {},
-            tileStyle: {},
-            itemStyle: {
-              itemContainer: {},
-              flagWidth: 25,
-              currencyCodeStyle: {},
-              currencyNameStyle: {},
-              symbolStyle: {},
-              symbolNativeStyle: {},
-            },
-          }}
-          title={"Currency"}
-          searchPlaceholder={"Search"}
-          showCloseButton={true}
-          showModalTitle={true}
-        />
+        <View style={styles.categoryRow}>
+          <Input
+            style={styles.rowInput}
+            label="Total Budget"
+            textInputConfig={{
+              keyboardType: "decimal-pad",
+              onChangeText: inputChangedHandler.bind(this, "totalBudget"),
+              value: inputs.totalBudget.value,
+            }}
+            invalid={!inputs.totalBudget.isValid}
+          />
+          {currencyPickJSX}
+        </View>
+        <View style={styles.categoryRow}>
+          <Input
+            style={styles.rowInput}
+            label="Daily Budget"
+            textInputConfig={{
+              keyboardType: "decimal-pad",
+              onChangeText: inputChangedHandler.bind(this, "dailyBudget"),
+              value: inputs.dailyBudget.value,
+            }}
+            invalid={!inputs.dailyBudget.isValid}
+          />
+          {currencyPickJSX}
+        </View>
       </View>
       <View style={styles.buttonContainer}>
         <FlatButton style={styles.button} onPress={cancelHandler}>
@@ -180,8 +203,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   categoryRow: {
+    flex: 0,
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "flex-start",
   },
   inputsRow: {
     flexDirection: "row",

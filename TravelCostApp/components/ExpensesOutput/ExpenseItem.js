@@ -57,7 +57,7 @@ function ExpenseItem({
         </View>
         <View style={styles.amountContainer}>
           <Text style={styles.amount}>
-            {calcAmount.toFixed(2)}
+            {calcAmount?.toFixed(2)}
             {" " + homeCurrency}
           </Text>
           <Text style={styles.originalCurrencyText}>

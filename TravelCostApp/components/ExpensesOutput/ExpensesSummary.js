@@ -7,10 +7,10 @@ import { TripContext } from "../../store/trip-context";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
   const userCtx = useContext(UserContext);
+  const tripCtx = useContext(TripContext);
   const expensesSum = expenses.reduce((sum, expense) => {
     return sum + expense.calcAmount;
   }, 0);
-  const tripCtx = useContext(TripContext);
   const userCurrency = tripCtx.tripCurrency;
   if (tripCtx.tripid === "")
     return (
@@ -21,7 +21,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
         </Text>
       </View>
     );
-  let dailyBudgetNum = Number(userCtx.dailybudget);
+  let dailyBudgetNum = Number(tripCtx.dailyBudget);
   const expenseSumNum = Number(expensesSum);
   const totalBudget = Number(tripCtx.totalBudget);
   //TODO: change the dailybudget system to make calculating this unified

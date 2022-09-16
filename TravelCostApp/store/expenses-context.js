@@ -13,6 +13,7 @@ export const ExpensesContext = createContext({
     currency,
     whoPaid,
     owePerc,
+    calcAmount,
   }) => {},
   setExpenses: (expenses) => {},
   deleteExpense: (id) => {},
@@ -28,6 +29,7 @@ export const ExpensesContext = createContext({
       currency,
       whoPaid,
       owePerc,
+      calcAmount,
     }
   ) => {},
   getRecentExpenses: (rangestring) => {},
@@ -41,8 +43,9 @@ function expensesReducer(state, action) {
     case "ADD":
       return [action.payload, ...state];
     case "SET":
-      const inverted = action.payload.reverse();
-      return inverted;
+    // TODO: find out why this crashes the app
+    // const inverted = action.payload.reverse();
+    // return inverted;
     case "UPDATE":
       const updatableExpenseIndex = state.findIndex(
         (expense) => expense.id === action.payload.id

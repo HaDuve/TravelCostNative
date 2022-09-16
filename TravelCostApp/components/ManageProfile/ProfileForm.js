@@ -83,17 +83,17 @@ const ProfileForm = ({ navigation, onCancel }) => {
     userData.lastCountry = inputs.lastCountry.value;
     userData.lastCurrency = inputs.lastCurrency.value;
 
-    const invalid = userData.userName.length > 0 && isNaN(userData.dailybudget);
+    const invalid = userData.userName.length == 0;
 
     if (invalid) {
       Alert.alert("Check your profile for invalid entries please!");
       return;
     }
-
     UserCtx.addUser(userData);
 
     try {
       await updateUser(AuthCtx.uid, userData);
+      console.log("adding", userData.userName);
       if (!UserCtx.freshlyCreated) {
         return;
       }
@@ -134,24 +134,14 @@ const ProfileForm = ({ navigation, onCancel }) => {
         />
       </View>
       <View style={styles.inputsRow}>
-        <Input
-          style={styles.rowInput}
-          inputStyle={styles.inputStyle}
-          label="Daily Budget"
-          textInputConfig={{
-            keyboardType: "decimal-pad",
-            onChangeText: inputChangedHandler.bind(this, "dailybudget"),
-            value: inputs.dailybudget.value,
-          }}
-          invalid={!inputs.dailybudget.isValid}
-        />
-        <Text>Cur: {TripCtx.tripCurrency}</Text>
+        {!FreshlyCreated && <Text>Cur: {TripCtx.tripCurrency}</Text>}
+        {!FreshlyCreated && <Text>Day: {TripCtx.dailyBudget}</Text>}
       </View>
       <View style={styles.buttonContainer}>
         <IconButton
           icon={"close-outline"}
           size={36}
-          color={GlobalStyles.colors.backgroundColor}
+          color={GlobalStyles.colors.primary400}
           style={styles.button}
           onPress={onCancel}
         />

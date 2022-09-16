@@ -3,10 +3,12 @@ import React, { useContext } from "react";
 import { ExpensesContext } from "../../../store/expenses-context";
 import { daysBetween, toMonthString, toShortFormat } from "../../../util/date";
 import { UserContext } from "../../../store/user-context";
+import { TripContext } from "../../../store/trip-context";
 
 const ExpenseGraph = ({ expenses }) => {
   const ExpenseCtx = useContext(ExpensesContext);
   const UserCtx = useContext(UserContext);
+  const TripCtx = useContext(TripContext);
 
   // list the last months and compare their respective expenseSum to their budget
   const listExpenseSumBudgets = [];
@@ -17,7 +19,7 @@ const ExpenseGraph = ({ expenses }) => {
     const expensesSum = monthlyExpenses.reduce((sum, expense) => {
       return sum + expense.calcAmount;
     }, 0);
-    const monthlyBudget = UserCtx.dailybudget * 30;
+    const monthlyBudget = TripCtx.dailyBudget * 30;
     const obj = { firstDay, lastDay, expensesSum, monthlyBudget };
     listExpenseSumBudgets.push(obj);
   }
@@ -35,7 +37,7 @@ const ExpenseGraph = ({ expenses }) => {
         </Text>
         <Text style={[styles.text1, colorCoding]}>
           {item.expensesSum.toFixed(2)}
-          {UserCtx.homeCurrency}
+          {TripCtx.tripCurrency}
         </Text>
       </View>
     );

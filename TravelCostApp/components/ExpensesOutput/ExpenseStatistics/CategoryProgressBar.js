@@ -9,6 +9,8 @@ import { TripContext } from "../../../store/trip-context";
 
 const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   let budgetProgress = (catCost / totalCost) * 1;
+  let catString = cat.slice(0, 14);
+  if (cat.length > 14) catString = catString + "...";
   const budgetColor = color;
   const unfilledColor = GlobalStyles.colors.gray500;
   const icon = getCatSymbol(cat);
@@ -23,7 +25,7 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
         <Ionicons name={icon} size={30} color={GlobalStyles.colors.error300} />
         <Text style={[styles.sum, { color: budgetColor }]}>
           {stylingSpace}
-          {cat}
+          {catString}
         </Text>
         <View style={{ flex: 1 }}></View>
         <Text style={[styles.sum, { color: budgetColor }]}>

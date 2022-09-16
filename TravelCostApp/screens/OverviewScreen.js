@@ -72,6 +72,9 @@ const OverviewScreen = ({ navigation }) => {
   let todayDateString = new Date();
   todayDateString = toShortFormat(todayDateString);
 
+  const valid = recentExpenses.length > 0;
+  console.log("OverviewScreen ~ valid", valid);
+
   return (
     <View style={styles.container}>
       <View style={styles.dateHeader}>

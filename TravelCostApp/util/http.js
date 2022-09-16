@@ -18,7 +18,6 @@ export async function fetchExpenses(tripid, uid) {
   const response = await axios.get(
     BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json"
   );
-
   const expenses = [];
 
   for (const key in response.data) {
@@ -33,6 +32,7 @@ export async function fetchExpenses(tripid, uid) {
       whoPaid: response.data[key].whoPaid,
       owePerc: response.data[key].owePerc,
       uid: response.data[key].uid,
+      calcAmount: response.data[key].calcAmount,
     };
     expenses.push(expenseObj);
   }

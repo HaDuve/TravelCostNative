@@ -43,9 +43,8 @@ function expensesReducer(state, action) {
     case "ADD":
       return [action.payload, ...state];
     case "SET":
-    // TODO: find out why this crashes the app
-    // const inverted = action.payload.reverse();
-    // return inverted;
+      const inverted = action.payload.reverse();
+      return inverted;
     case "UPDATE":
       const updatableExpenseIndex = state.findIndex(
         (expense) => expense.id === action.payload.id

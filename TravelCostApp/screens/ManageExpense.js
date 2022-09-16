@@ -61,13 +61,15 @@ const ManageExpense = ({ route, navigation }) => {
     setIsSubmitting(true);
     try {
       // calc calcAmount from amount, currency and TripCtx.tripCurrency and add it to expenseData
-      // TODO: the rate from updating seems kinda bugged
       const base = expenseData.currency;
+      console.log("confirmHandler ~ base", base);
       const target = tripCtx.tripCurrency;
+      console.log("confirmHandler ~ target", target);
       const rate = await getRate(base, target);
       console.log("confirmHandler ~ rate", rate);
       const calcAmount = expenseData.amount * rate;
       console.log("confirmHandler ~ calcAmount", calcAmount);
+      // TODO: add calcAmount to expenseData
 
       if (isEditing) {
         expenseCtx.updateExpense(editedExpenseId, expenseData);

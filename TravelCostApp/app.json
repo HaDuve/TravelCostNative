@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "TravelCostApp",
-    "slug": "TravelCostApp",
-    "scheme": "travelexpense",
-    "version": "1.0.0",
+    "name": "Travel Expense",
+    "slug": "Travel-Expense",
+    "scheme": "travel-expense",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,22 +15,29 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.travelexpense.app",
       "buildNumber": "1.0.0"
     },
     "android": {
-      "package": "com.yourcompany.yourappname",
+      "package": "com.travelexpense.app",
       "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#FFFFFF"
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "dff7ffc5-6f1e-4ece-bb23-0c50cda19f46"
+      }
     }
   }
 }

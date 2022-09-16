@@ -17,7 +17,7 @@ export const TripContext = createContext({
   deleteTrip: (tripid) => {},
   updateTrip: ({ tripid, tripName, tripTotalBudget }) => {},
 
-  setCurrentTrip: ({ tripName, totalBudget }) => {},
+  setCurrentTrip: ({ tripName, totalBudget, tripCurrency }) => {},
   deleteCurrentTrip: (uid) => {},
   getCurrentTripFromStorage: () => {},
   fetchCurrentTrip: (tripid) => {},
@@ -79,7 +79,7 @@ function TripContextProvider({ children }) {
   const [tripid, setTripid] = useState("");
   const [tripName, setTripName] = useState("");
   const [totalBudget, setTotalBudget] = useState("");
-  const [tripCurrency, setTripCurrency] = useState("EUR");
+  const [tripCurrency, setTripCurrency] = useState("");
 
   function setCurrentTrip(tripid, trip) {
     setTripid(tripid);

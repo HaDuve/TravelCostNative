@@ -11,10 +11,12 @@ import Input from "../ManageExpense/Input";
 import ErrorOverlay from "../UI/ErrorOverlay";
 import LoadingOverlay from "../UI/LoadingOverlay";
 import IconButton from "../UI/IconButton";
+import { TripContext } from "../../store/trip-context";
 
 const ProfileForm = ({ navigation, onCancel }) => {
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
+  const TripCtx = useContext(TripContext);
   const FreshlyCreated = UserCtx.freshlyCreated;
   const uid = AuthContext.uid;
 
@@ -159,68 +161,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
           }}
           invalid={!inputs.dailybudget.isValid}
         />
-        <CurrencyPicker
-          currencyPickerRef={(ref) => {
-            currencyPickerRef = ref;
-          }}
-          enable={true}
-          darkMode={false}
-          currencyCode={inputs.homeCurrency.value}
-          showFlag={true}
-          showCurrencyName={false}
-          showCurrencyCode={false}
-          onSelectCurrency={(data) => {
-            console.log("DATA", data);
-            inputChangedHandler("homeCurrency", data.code);
-          }}
-          onOpen={() => {
-            console.log("Open");
-          }}
-          onClose={() => {
-            console.log("Close");
-          }}
-          showNativeSymbol={true}
-          showSymbol={false}
-          containerStyle={{
-            container: {
-              marginLeft: 10,
-              paddingTop: 24,
-              marginRight: 200,
-            },
-            flagWidth: 25,
-            currencyCodeStyle: { color: GlobalStyles.colors.primary500 },
-            currencyNameStyle: { color: GlobalStyles.colors.primary500 },
-            symbolStyle: { color: GlobalStyles.colors.primary500 },
-            symbolNativeStyle: { color: GlobalStyles.colors.primary500 },
-          }}
-          modalStyle={{
-            container: {},
-            searchStyle: {},
-            tileStyle: {},
-            itemStyle: {
-              itemContainer: {},
-              flagWidth: 25,
-              currencyCodeStyle: {},
-              currencyNameStyle: {},
-              symbolStyle: {},
-              symbolNativeStyle: {},
-            },
-          }}
-          title={"Currency"}
-          searchPlaceholder={"Search"}
-          showCloseButton={true}
-          showModalTitle={true}
-        />
-        {/* <Input
-          style={styles.rowInput}
-          inputStyle={styles.inputStyle}
-          label="homeCurrency"
-          textInputConfig={{
-            onChangeText: inputChangedHandler.bind(this, "homeCurrency"),
-            value: inputs.homeCurrency.value,
-          }}
-          invalid={!inputs.homeCurrency.isValid}
-        /> */}
+        <Text>Cur: {TripCtx.tripCurrency}</Text>
       </View>
       {/* <View style={styles.inputsRow}>
         <Input

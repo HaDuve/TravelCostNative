@@ -10,8 +10,8 @@ import { formatExpenseString } from "../../../util/string";
 
 const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   let budgetProgress = (catCost / totalCost) * 1;
-  let catString = cat.slice(0, 14);
-  if (cat.length > 14) catString = catString + "...";
+  let catString = cat?.slice(0, 18);
+  if (cat?.length > 18) catString = catString + "...";
   const budgetColor = color;
   const unfilledColor = GlobalStyles.colors.gray500;
   const icon = getCatSymbol(cat);

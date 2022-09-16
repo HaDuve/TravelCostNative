@@ -22,7 +22,6 @@ function ExpenseItem({
 }) {
   const navigation = useNavigation();
 
-  const UserCtx = useContext(UserContext);
   const TripCtx = useContext(TripContext);
   const homeCurrency = TripCtx.tripCurrency;
 

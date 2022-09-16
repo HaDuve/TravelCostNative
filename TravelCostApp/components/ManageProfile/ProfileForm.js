@@ -83,10 +83,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
     userData.lastCountry = inputs.lastCountry.value;
     userData.lastCurrency = inputs.lastCurrency.value;
 
-    const invalid =
-      userData.userName.length > 0 &&
-      isNaN(userData.dailybudget) &&
-      userData.homeCurrency.length > 0;
+    const invalid = userData.userName.length > 0 && isNaN(userData.dailybudget);
 
     if (invalid) {
       Alert.alert("Check your profile for invalid entries please!");
@@ -112,7 +109,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
       <View style={styles.avatarBar}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>
-            {/* Profile Picture for now replaced with first char of the name */}
+            {/* TODO: Profile Picture for now replaced with first char of the name */}
             {inputs.userName.value.charAt(0)}
           </Text>
         </View>
@@ -123,8 +120,6 @@ const ProfileForm = ({ navigation, onCancel }) => {
           style={styles.button}
           onPress={logoutHandler}
         />
-        {/* <Text>Change Avatar</Text>
-        <Text>Delete Avatar</Text> */}
       </View>
       <View style={styles.inputsRow}>
         <Input
@@ -137,17 +132,6 @@ const ProfileForm = ({ navigation, onCancel }) => {
           }}
           invalid={!inputs.userName.isValid}
         />
-
-        {/* <Input
-          style={styles.rowInput}
-          inputStyle={styles.inputStyle}
-          label="homeCountry"
-          textInputConfig={{
-            onChangeText: inputChangedHandler.bind(this, "homeCountry"),
-            value: inputs.homeCountry.value,
-          }}
-          invalid={!inputs.homeCountry.isValid}
-        /> */}
       </View>
       <View style={styles.inputsRow}>
         <Input
@@ -163,28 +147,6 @@ const ProfileForm = ({ navigation, onCancel }) => {
         />
         <Text>Cur: {TripCtx.tripCurrency}</Text>
       </View>
-      {/* <View style={styles.inputsRow}>
-        <Input
-          style={styles.rowInput}
-          inputStyle={styles.inputStyle}
-          label="lastCountry"
-          textInputConfig={{
-            onChangeText: inputChangedHandler.bind(this, "lastCountry"),
-            value: inputs.lastCountry.value,
-          }}
-          invalid={!inputs.lastCountry.isValid}
-        />
-        <Input
-          style={styles.rowInput}
-          inputStyle={styles.inputStyle}
-          label="lastCurrency"
-          textInputConfig={{
-            onChangeText: inputChangedHandler.bind(this, "lastCurrency"),
-            value: inputs.lastCurrency.value,
-          }}
-          invalid={!inputs.lastCurrency.isValid}
-        />
-      </View> */}
       <View style={styles.buttonContainer}>
         <IconButton
           icon={"close-outline"}

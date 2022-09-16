@@ -2,12 +2,11 @@ import { Pressable, StyleSheet, Text, View, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { GlobalStyles } from "../../constants/styles";
-import { getFormattedDate, toShortFormat } from "../../util/date";
+import { toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
 import { getCatSymbol } from "../../util/category";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { UserContext } from "../../store/user-context";
-import { getRate } from "../../util/currencyExchange";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseString } from "../../util/string";
 

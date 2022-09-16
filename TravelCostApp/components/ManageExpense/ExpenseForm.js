@@ -301,16 +301,24 @@ const ExpenseForm = ({
           }}
         />
       </View>
-      <IconButton
-        icon={
-          hideAdvanced
-            ? "arrow-down-circle-outline"
-            : "arrow-forward-circle-outline"
-        }
-        color={GlobalStyles.colors.primary500}
-        size={28}
-        onPress={toggleAdvancedHandler}
-      />
+      <View style={styles.advancedRow}>
+        <IconButton
+          icon={
+            hideAdvanced
+              ? "arrow-down-circle-outline"
+              : "arrow-forward-circle-outline"
+          }
+          color={GlobalStyles.colors.primary500}
+          size={28}
+          onPress={toggleAdvancedHandler}
+        />
+        {hideAdvanced && (
+          <Text style={styles.advancedText}>Show more options</Text>
+        )}
+        {!hideAdvanced && (
+          <Text style={styles.advancedText}>Show less options</Text>
+        )}
+      </View>
       {/* toggleable content */}
       {!hideAdvanced && (
         <>
@@ -483,6 +491,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  advancedRow: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+  },
   rowInput: {
     flex: 1,
   },
@@ -513,5 +525,11 @@ const styles = StyleSheet.create({
   button: {
     minWidth: 200,
     marginHorizontal: 0,
+  },
+  advancedText: {
+    marginTop: 14,
+    fontSize: 12,
+    fontStyle: "italic",
+    fontWeight: "300",
   },
 });

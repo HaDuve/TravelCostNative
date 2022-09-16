@@ -43,7 +43,7 @@ function ExpenseItem({
     <>
       <Text style={styles.originalCurrencyText}>
         {amountString}
-        {" " + currency}
+        {currency}
       </Text>
     </>
   ) : (
@@ -74,7 +74,7 @@ function ExpenseItem({
         <View style={styles.amountContainer}>
           <Text style={styles.amount}>
             {calcAmountString}
-            {" " + homeCurrency}
+            {homeCurrency}
           </Text>
           {originalCurrency}
         </View>

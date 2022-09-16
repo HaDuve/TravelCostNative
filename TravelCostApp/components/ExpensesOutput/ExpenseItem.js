@@ -18,24 +18,13 @@ function ExpenseItem({
   category,
   whoPaid,
   currency,
+  calcAmount,
 }) {
-  const [isLoading, setIsLoading] = useState(true);
-  const [calcAmount, setCalcAmount] = useState(0);
   const navigation = useNavigation();
 
   const UserCtx = useContext(UserContext);
   const TripCtx = useContext(TripContext);
   const homeCurrency = TripCtx.tripCurrency;
-
-  useEffect(() => {
-    setIsLoading(true);
-    async function getRateNow() {
-      const homeRate = await getRate(currency, homeCurrency);
-      setCalcAmount(amount * homeRate);
-      setIsLoading(false);
-    }
-    getRateNow();
-  }, []);
 
   function expensePressHandler() {
     navigation.navigate("ManageExpense", {
@@ -68,8 +57,7 @@ function ExpenseItem({
         </View>
         <View style={styles.amountContainer}>
           <Text style={styles.amount}>
-            {!isLoading && calcAmount.toFixed(2)}
-            {isLoading && "??"}
+            {calcAmount.toFixed(2)}
             {" " + homeCurrency}
           </Text>
           <Text style={styles.originalCurrencyText}>

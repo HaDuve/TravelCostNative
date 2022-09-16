@@ -62,13 +62,9 @@ const ManageExpense = ({ route, navigation }) => {
     try {
       // calc calcAmount from amount, currency and TripCtx.tripCurrency and add it to expenseData
       const base = expenseData.currency;
-      console.log("confirmHandler ~ base", base);
       const target = tripCtx.tripCurrency;
-      console.log("confirmHandler ~ target", target);
       const rate = await getRate(base, target);
-      console.log("confirmHandler ~ rate", rate);
       const calcAmount = expenseData.amount * rate;
-      console.log("confirmHandler ~ calcAmount", calcAmount);
       expenseData.calcAmount = calcAmount;
 
       if (isEditing) {

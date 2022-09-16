@@ -4,6 +4,7 @@ import { GlobalStyles } from "./../../constants/styles";
 import * as Progress from "react-native-progress";
 import { UserContext } from "../../store/user-context";
 import { TripContext } from "../../store/trip-context";
+import { formatExpenseString } from "../../util/string";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
   const userCtx = useContext(UserContext);
@@ -11,12 +12,13 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   const expensesSum = expenses.reduce((sum, expense) => {
     return sum + expense.calcAmount;
   }, 0);
+  const expensesSumString = formatExpenseString(expensesSum);
   const userCurrency = tripCtx.tripCurrency;
   if (tripCtx.tripid === "")
     return (
       <View style={styles.container}>
         <Text style={[styles.sum, { color: budgetColor }]}>
-          {expensesSum.toFixed(2)}
+          {expensesSumString}
           {userCurrency}
         </Text>
       </View>
@@ -64,7 +66,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   return (
     <View style={styles.container}>
       <Text style={[styles.sum, { color: budgetColor }]}>
-        {expensesSum.toFixed(2)}
+        {expensesSumString}
         {userCurrency}
       </Text>
       <Progress.Bar

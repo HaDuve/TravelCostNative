@@ -4,6 +4,8 @@ import { ExpensesContext } from "../../../store/expenses-context";
 import { daysBetween, toMonthString, toShortFormat } from "../../../util/date";
 import { UserContext } from "../../../store/user-context";
 import { TripContext } from "../../../store/trip-context";
+import { formatExpenseString } from "../../../util/string";
+import { GlobalStyles } from "../../../constants/styles";
 
 const ExpenseGraph = ({ expenses }) => {
   const ExpenseCtx = useContext(ExpensesContext);
@@ -30,14 +32,20 @@ const ExpenseGraph = ({ expenses }) => {
     const month = toMonthString(item.firstDay);
     const debt = item.expensesSum > item.monthlyBudget;
     const colorCoding = !debt ? styles.green : styles.red;
+
+    const emptyValue = item.expensesSum === 0;
+    const expenseString = emptyValue
+      ? ""
+      : formatExpenseString(item.expensesSum);
+
     return (
       <View style={styles.itemContainer}>
         <Text style={styles.text1}>
           {month} {item.firstDay.getFullYear()}
         </Text>
         <Text style={[styles.text1, colorCoding]}>
-          {item.expensesSum.toFixed(2)}
-          {TripCtx.tripCurrency}
+          {expenseString}
+          {emptyValue ? "-" : TripCtx.tripCurrency}
         </Text>
       </View>
     );
@@ -65,9 +73,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   green: {
-    color: "green",
+    color: GlobalStyles.colors.primary500,
   },
   red: {
-    color: "red",
+    color: GlobalStyles.colors.error300,
   },
 });

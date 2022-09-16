@@ -6,6 +6,7 @@ import { getCatSymbol } from "../../../util/category";
 import { useContext } from "react";
 import { UserContext } from "../../../store/user-context";
 import { TripContext } from "../../../store/trip-context";
+import { formatExpenseString } from "../../../util/string";
 
 const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   let budgetProgress = (catCost / totalCost) * 1;
@@ -18,6 +19,7 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const userCurrency = tripCtx.tripCurrency;
+  const catCostString = formatExpenseString(catCost);
 
   return (
     <View style={styles.container}>
@@ -29,7 +31,7 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
         </Text>
         <View style={{ flex: 1 }}></View>
         <Text style={[styles.sum, { color: budgetColor }]}>
-          {catCost.toFixed(2)}
+          {catCostString}
           {userCurrency}
         </Text>
       </View>

@@ -9,6 +9,7 @@ import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../store/user-context";
 import { getRate } from "../../util/currencyExchange";
 import { TripContext } from "../../store/trip-context";
+import { formatExpenseString } from "../../util/string";
 
 function ExpenseItem({
   id,
@@ -26,6 +27,9 @@ function ExpenseItem({
   const TripCtx = useContext(TripContext);
   const homeCurrency = TripCtx.tripCurrency;
 
+  const calcAmountString = formatExpenseString(calcAmount);
+  const amountString = formatExpenseString(amount);
+
   function expensePressHandler() {
     navigation.navigate("ManageExpense", {
       expenseId: id,
@@ -33,6 +37,18 @@ function ExpenseItem({
   }
 
   const iconString = getCatSymbol(category);
+
+  const sameCurrency = homeCurrency === currency;
+  const originalCurrency = !sameCurrency ? (
+    <>
+      <Text style={styles.originalCurrencyText}>
+        {amountString}
+        {" " + currency}
+      </Text>
+    </>
+  ) : (
+    <></>
+  );
 
   return (
     <Pressable
@@ -57,13 +73,10 @@ function ExpenseItem({
         </View>
         <View style={styles.amountContainer}>
           <Text style={styles.amount}>
-            {calcAmount?.toFixed(2)}
+            {calcAmountString}
             {" " + homeCurrency}
           </Text>
-          <Text style={styles.originalCurrencyText}>
-            {amount.toFixed(2)}
-            {" " + currency}
-          </Text>
+          {originalCurrency}
         </View>
       </View>
     </Pressable>

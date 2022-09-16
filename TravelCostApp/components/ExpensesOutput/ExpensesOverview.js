@@ -21,13 +21,13 @@ const ExpensesOverview = ({ expenses }) => {
         <IconButton
           icon="toggle"
           size={48}
-          color={GlobalStyles.colors.primary500}
+          color={GlobalStyles.colors.primary700}
           onPress={toggleContent}
           rotate={toggleGraph ? true : false}
         />
       </View>
-      {!toggleGraph && <ExpenseCategories expenses={expenses} />}
-      {toggleGraph && <ExpenseGraph expenses={expenses} />}
+      {toggleGraph && <ExpenseCategories expenses={expenses} />}
+      {!toggleGraph && <ExpenseGraph expenses={expenses} />}
     </View>
   );
 };

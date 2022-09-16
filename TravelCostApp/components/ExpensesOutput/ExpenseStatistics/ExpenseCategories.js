@@ -24,7 +24,7 @@ const ExpenseCategories = ({ expenses }) => {
 
   function getSumExpenses(expenses) {
     const expensesSum = expenses.reduce((sum, expense) => {
-      return sum + expense.amount;
+      return sum + expense.calcAmount;
     }, 0);
     return expensesSum;
   }

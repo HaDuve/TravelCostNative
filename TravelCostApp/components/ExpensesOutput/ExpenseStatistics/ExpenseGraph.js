@@ -15,7 +15,7 @@ const ExpenseGraph = ({ expenses }) => {
     const { firstDay, lastDay, monthlyExpenses } =
       ExpenseCtx.getMonthlyExpenses(i);
     const expensesSum = monthlyExpenses.reduce((sum, expense) => {
-      return sum + expense.amount;
+      return sum + expense.calcAmount;
     }, 0);
     const monthlyBudget = UserCtx.dailybudget * 30;
     const obj = { firstDay, lastDay, expensesSum, monthlyBudget };

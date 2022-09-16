@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { getCatSymbol } from "../../../util/category";
 import { useContext } from "react";
 import { UserContext } from "../../../store/user-context";
+import { TripContext } from "../../../store/trip-context";
 
 const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   let budgetProgress = (catCost / totalCost) * 1;
@@ -13,7 +14,8 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   const icon = getCatSymbol(cat);
   const stylingSpace = "  ";
   const userCtx = useContext(UserContext);
-  const userCurrency = userCtx.homeCurrency;
+  const tripCtx = useContext(TripContext);
+  const userCurrency = tripCtx.tripCurrency;
 
   return (
     <View style={styles.container}>

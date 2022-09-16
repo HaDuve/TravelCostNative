@@ -7,11 +7,11 @@ import { TripContext } from "../../store/trip-context";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
   const userCtx = useContext(UserContext);
-  const userCurrency = userCtx.homeCurrency;
   const expensesSum = expenses.reduce((sum, expense) => {
-    return sum + expense.amount;
+    return sum + expense.calcAmount;
   }, 0);
   const tripCtx = useContext(TripContext);
+  const userCurrency = tripCtx.tripCurrency;
   if (tripCtx.tripid === "")
     return (
       <View style={styles.container}>

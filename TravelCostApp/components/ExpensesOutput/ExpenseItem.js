@@ -8,6 +8,7 @@ import { getCatSymbol } from "../../util/category";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../store/user-context";
 import { getRate } from "../../util/currencyExchange";
+import { TripContext } from "../../store/trip-context";
 
 function ExpenseItem({
   id,
@@ -23,7 +24,8 @@ function ExpenseItem({
   const navigation = useNavigation();
 
   const UserCtx = useContext(UserContext);
-  const homeCurrency = UserCtx.homeCurrency;
+  const TripCtx = useContext(TripContext);
+  const homeCurrency = TripCtx.tripCurrency;
 
   useEffect(() => {
     setIsLoading(true);

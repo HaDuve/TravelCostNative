@@ -69,7 +69,7 @@ const ManageExpense = ({ route, navigation }) => {
       console.log("confirmHandler ~ rate", rate);
       const calcAmount = expenseData.amount * rate;
       console.log("confirmHandler ~ calcAmount", calcAmount);
-      // TODO: add calcAmount to expenseData
+      expenseData.calcAmount = calcAmount;
 
       if (isEditing) {
         expenseCtx.updateExpense(editedExpenseId, expenseData);

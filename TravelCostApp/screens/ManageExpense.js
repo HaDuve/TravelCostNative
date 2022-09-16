@@ -13,6 +13,7 @@ import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 import { deleteExpense, storeExpense, updateExpense } from "../util/http";
 import { GlobalStyles } from "./../constants/styles";
+import { getRate } from "./../util/currencyExchange";
 
 const ManageExpense = ({ route, navigation }) => {
   const { pickedCat, tempValues } = route.params;
@@ -59,6 +60,15 @@ const ManageExpense = ({ route, navigation }) => {
   async function confirmHandler(expenseData) {
     setIsSubmitting(true);
     try {
+      // calc calcAmount from amount, currency and TripCtx.tripCurrency and add it to expenseData
+      // TODO: the rate from updating seems kinda bugged
+      const base = expenseData.currency;
+      const target = tripCtx.tripCurrency;
+      const rate = await getRate(base, target);
+      console.log("confirmHandler ~ rate", rate);
+      const calcAmount = expenseData.amount * rate;
+      console.log("confirmHandler ~ calcAmount", calcAmount);
+
       if (isEditing) {
         expenseCtx.updateExpense(editedExpenseId, expenseData);
         await updateExpense(tripid, uid, editedExpenseId, expenseData);
@@ -68,7 +78,7 @@ const ManageExpense = ({ route, navigation }) => {
       }
       navigation.navigate("RecentExpenses");
     } catch (error) {
-      setError("Could not save data - please try again later!");
+      setError("Could not save data - please try again later!" + error);
       setIsSubmitting(false);
     }
   }

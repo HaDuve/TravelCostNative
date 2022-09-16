@@ -12,6 +12,7 @@ import { getCatSymbol } from "../../util/category";
 // import ExpensePicker from "./ExpensePicker";
 
 import CurrencyPicker from "react-native-currency-picker";
+import { TripContext } from "../../store/trip-context";
 
 const ExpenseForm = ({
   onCancel,
@@ -24,6 +25,7 @@ const ExpenseForm = ({
 }) => {
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
+  const TripCtx = useContext(TripContext);
   const [hideAdvanced, sethideAdvanced] = useState(!isEditing);
 
   let currencyPickerRef = undefined;
@@ -50,7 +52,11 @@ const ExpenseForm = ({
       isValid: true,
     },
     currency: {
-      value: defaultValues ? defaultValues.currency : UserCtx.lastCurrency,
+      value: defaultValues
+        ? defaultValues.currency
+        : UserCtx.lastCurrency
+        ? UserCtx.lastCurrency
+        : TripCtx.tripCurrency,
       isValid: true,
     },
     whoPaid: {
@@ -163,7 +169,7 @@ const ExpenseForm = ({
       country: UserCtx.lastCountry ? UserCtx.lastCountry : UserCtx.homeCountry,
       currency: UserCtx.lastCurrency
         ? UserCtx.lastCurrency
-        : UserCtx.homeCurrency,
+        : TripCtx.tripCurrency,
       whoPaid: UserCtx.userName,
       owePerc: "0",
     };

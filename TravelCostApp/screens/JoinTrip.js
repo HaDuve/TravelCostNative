@@ -39,6 +39,7 @@ const JoinTrip = ({ navigation, route }) => {
       const traveller = { travellerid: uid, userName: userCtx.userName };
       storeUserToTrip(tripid, traveller);
       userCtx.addTripHistory(tripdata);
+      // TODO: SAVE triphistory online
       navigation.navigate("Profile");
       return;
     }

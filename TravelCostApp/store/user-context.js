@@ -87,6 +87,9 @@ function UserContextProvider({ children }) {
     if (UserData.lastCurrency) {
       setLastCurrency(UserData.lastCurrency);
     }
+    if (UserData.tripHistory) {
+      setTripHistory(UserData.tripHistory);
+    }
   }
 
   function setFreshlyCreatedTo(bool) {

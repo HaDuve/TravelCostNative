@@ -20,6 +20,8 @@ const TripForm = ({ navigation }) => {
   const TripCtx = useContext(TripContext);
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
+  console.log("submitHandler ~ UserCtx.tripHistory", UserCtx.tripHistory);
+
   const uid = AuthCtx.uid;
   let currencyPickerRef = undefined;
 
@@ -62,10 +64,19 @@ const TripForm = ({ navigation }) => {
     tripData.dailyBudget = inputs.dailyBudget.value;
     tripData.travellers = [{ userName: UserCtx.userName }];
 
-    const id = await storeTrip(tripData);
-    TripCtx.setCurrentTrip(id, tripData);
-    storeUserToTrip(id, { travellerid: uid });
-    UserCtx.addTripHistory(tripData);
+    const tripid = await storeTrip(tripData);
+    tripData.tripid = tripid;
+
+    TripCtx.setCurrentTrip(tripid, tripData);
+    UserCtx.addTripHistory(TripCtx.getcurrentTrip());
+
+    storeUserToTrip(tripid, { travellerid: uid });
+
+    updateUser(uid, {
+      userName: UserCtx.userName,
+      tripHistory: UserCtx.tripHistory,
+    });
+
     UserCtx.setFreshlyCreatedTo(false);
     navigation.navigate("Profile");
   }

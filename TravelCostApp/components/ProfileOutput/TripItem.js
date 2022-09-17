@@ -17,6 +17,7 @@ function TripItem({
   travellers,
 }) {
   const navigation = useNavigation();
+  const tripCtx = useContext(TripContext);
   // const totalBudgetString = formatExpenseString(totalBudget) + tripCurrency;
   const DUMMYTRAVELLERS = travellers
     ? travellers
@@ -34,6 +35,11 @@ function TripItem({
       travellers: DUMMYTRAVELLERS,
     });
   }
+
+  const activeBorder =
+    tripName === tripCtx.tripName
+      ? { borderWidth: 1, borderColor: GlobalStyles.colors.primary400 }
+      : {};
 
   function renderTravellers(item) {
     return (
@@ -54,7 +60,7 @@ function TripItem({
       onPress={tripPressHandler}
       style={({ pressed }) => pressed && styles.pressed}
     >
-      <View style={styles.tripItem}>
+      <View style={[styles.tripItem, activeBorder]}>
         <View style={styles.topRow}>
           <View>
             <Text style={[styles.textBase, styles.description]}>
@@ -85,7 +91,9 @@ function TripItem({
           data={DUMMYTRAVELLERS}
           renderItem={renderTravellers}
           numColumns={2}
-          keyExtractor={(item) => item.userName + tripid}
+          keyExtractor={(item) => {
+            return item.userName + tripid;
+          }}
         ></FlatList>
       </View>
     </Pressable>

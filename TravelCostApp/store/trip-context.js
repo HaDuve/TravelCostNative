@@ -18,7 +18,7 @@ export const TripContext = createContext({
   addTrip: ({ tripName, tripTotalBudget }) => {},
   deleteTrip: (tripid) => {},
   updateTrip: ({ tripid, tripName, tripTotalBudget }) => {},
-
+  getcurrentTrip: () => {},
   setCurrentTrip: ({
     tripName,
     totalBudget,
@@ -90,8 +90,20 @@ function TripContextProvider({ children }) {
   function updateTrip(id, tripData) {
     dispatch({ type: "UPDATE", payload: { id: id, data: tripData } });
   }
-
+  function getcurrentTrip() {
+    const tripData = {
+      tripid: tripid,
+      tripName: tripName,
+      totalBudget: totalBudget,
+      dailyBudget: dailyBudget,
+      tripCurrency: tripCurrency,
+      totalSum: totalSum,
+      travellers: travellers,
+    };
+    return tripData;
+  }
   function setCurrentTrip(tripid, trip) {
+    console.log("setCurrentTrip ~ trip", trip);
     setTripid(tripid);
     setTripName(trip.tripName);
     setTotalBudget(trip.totalBudget.toString());
@@ -145,6 +157,7 @@ function TripContextProvider({ children }) {
     totalSum: totalSum,
     setCurrentTravellers: setCurrentTravellers,
 
+    getcurrentTrip: getcurrentTrip,
     setCurrentTrip: setCurrentTrip,
     deleteCurrentTrip: deleteCurrentTrip,
     getCurrentTripFromStorage: getCurrentTripFromStorage,

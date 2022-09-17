@@ -245,6 +245,7 @@ function Root() {
           const response = await fetchUser(storedUid);
           if (response) {
             userCtx.addUser(response);
+            userCtx.setTripHistory(response.tripHistory);
           }
         } catch (error) {
           Alert.alert(error);

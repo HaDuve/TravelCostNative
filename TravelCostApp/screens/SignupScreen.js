@@ -19,6 +19,7 @@ function SignupScreen() {
     try {
       const { token, uid } = await createUser(email, password);
       await AsyncStorage.clear();
+      userCtx.setTripHistory([]);
       authCtx.setUserID(uid);
       const userdata = { name: name };
       try {

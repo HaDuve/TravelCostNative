@@ -23,16 +23,10 @@ const ProfileScreen = ({ route, navigation, param }) => {
     tripCurrency: TripCtx.tripCurrency,
   };
 
-  useEffect(() => {
-    if (UserCtx.tripHistory.length < 1 && !FreshlyCreated)
-      UserCtx.addTripHistory(ACTIVETRIP);
-  }, []);
-
   function cancelHandler() {
     //refreshes the screen
     console.log("canceled");
   }
-  console.log("ProfileScreen ~ UserCtx.tripHistory", UserCtx.tripHistory);
 
   const visibleContent = FreshlyCreated ? (
     <></>

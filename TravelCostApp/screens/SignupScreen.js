@@ -17,6 +17,7 @@ function SignupScreen() {
     setIsAuthenticating(true);
     try {
       const { token, uid } = await createUser(email, password);
+      await AsyncStorage.clear();
       authCtx.setUserID(uid);
       const userdata = { name: name };
       try {

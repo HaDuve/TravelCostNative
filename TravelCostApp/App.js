@@ -22,7 +22,7 @@ import ExpensesContextProvider, {
 } from "./store/expenses-context";
 import ProfileScreen from "./screens/ProfileScreen";
 import UserContextProvider, { UserContext } from "./store/user-context";
-import { fetchUser } from "./util/http";
+import { fetchExpenses, fetchUser } from "./util/http";
 import TripContextProvider, { TripContext } from "./store/trip-context";
 import TripForm from "./components/ManageTrip/TripForm";
 import OnboardingScreen from "./screens/OnboardingScreen";
@@ -227,6 +227,7 @@ function Root() {
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
+  const expensesCtx = useContext(ExpensesContext);
 
   useEffect(() => {
     async function onRootMount() {
@@ -249,8 +250,14 @@ function Root() {
           Alert.alert(error);
         }
         if (storedTripId) {
+          // TODO: figure out when we want to save or load from async storage,
+          // right now this function seems to be confused
           tripCtx.fetchCurrentTrip(storedTripId);
-          tripCtx.setCurrentTravellers(storedTripId);
+          // TODO: finish set current travellers function
+          // tripCtx.setCurrentTravellers(storedTripId);
+
+          const expenses = await fetchExpenses(storedTripId, storedUid);
+          expensesCtx.setExpenses(expenses);
         }
         authCtx.authenticate(storedToken);
       }

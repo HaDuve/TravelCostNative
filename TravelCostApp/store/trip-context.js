@@ -9,6 +9,7 @@ export const TripContext = createContext({
   totalBudget: "",
   dailyBudget: "",
   tripCurrency: "",
+  totalSum: "",
   // save user as obj with (tname, tid)
   travellers: [],
   setCurrentTravellers: (tripid) => {},
@@ -18,7 +19,13 @@ export const TripContext = createContext({
   deleteTrip: (tripid) => {},
   updateTrip: ({ tripid, tripName, tripTotalBudget }) => {},
 
-  setCurrentTrip: ({ tripName, totalBudget, tripCurrency, dailyBudget }) => {},
+  setCurrentTrip: ({
+    tripName,
+    totalBudget,
+    tripCurrency,
+    dailyBudget,
+    travellers,
+  }) => {},
   deleteCurrentTrip: (uid) => {},
   getCurrentTripFromStorage: () => {},
   fetchCurrentTrip: (tripid) => {},
@@ -56,6 +63,7 @@ function TripContextProvider({ children }) {
   const [totalBudget, setTotalBudget] = useState("");
   const [tripCurrency, setTripCurrency] = useState("");
   const [dailyBudget, setdailyBudget] = useState("");
+  const [totalSum, setTotalSumTrip] = useState("");
 
   async function setCurrentTravellers(tripid) {
     try {
@@ -89,11 +97,17 @@ function TripContextProvider({ children }) {
     setTotalBudget(trip.totalBudget.toString());
     setTripCurrency(trip.tripCurrency);
     setdailyBudget(trip.dailyBudget.toString());
+    setCurrentTravellers(trip.travellers);
     AsyncStorage.setItem("currentTripId", tripid);
     AsyncStorage.setItem("currentTripName", trip.tripName);
     AsyncStorage.setItem("currentTripTotalBudget", trip.totalBudget.toString());
     AsyncStorage.setItem("currentTripCurrency", trip.tripCurrency);
     AsyncStorage.setItem("currentTripDailyBudget", trip.dailyBudget.toString());
+    AsyncStorage.setItem("currentTripTravellers", trip.travellers?.toString());
+  }
+
+  function setTotalSum(amount) {
+    setTotalSumTrip(amount);
   }
 
   async function getCurrentTripFromStorage() {
@@ -128,6 +142,7 @@ function TripContextProvider({ children }) {
     tripCurrency: tripCurrency,
     dailyBudget: dailyBudget,
     travellers: travellers,
+    totalSum: totalSum,
     setCurrentTravellers: setCurrentTravellers,
 
     setCurrentTrip: setCurrentTrip,
@@ -139,6 +154,7 @@ function TripContextProvider({ children }) {
     setTrips: setTrips,
     deleteTrip: deleteTrip,
     updateTrip: updateTrip,
+    setTotalSum: setTotalSum,
   };
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>;

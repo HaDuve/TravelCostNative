@@ -1,20 +1,52 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View, FlatList } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
 import { useContext } from "react";
 import { TripContext } from "../../store/trip-context";
+import { formatExpenseString } from "../../util/string";
 
-function TripItem({ id, description, amount, date }) {
+function TripItem({
+  tripid,
+  tripName,
+  totalBudget,
+  dailyBudget,
+  tripCurrency,
+  totalSum,
+  travellers,
+}) {
   const navigation = useNavigation();
+  // const totalBudgetString = formatExpenseString(totalBudget) + tripCurrency;
+  const DUMMYTRAVELLERS = travellers
+    ? travellers
+    : [
+        { userName: "Hannes" },
+        { userName: "Tina" },
+        { userName: "Helene" },
+        { userName: "Thorben" },
+      ];
 
-  // const TripCtx = useContext(TripContext);
-  // const tripBudget = Number(TripCtx.totalBudget);
   function tripPressHandler() {
     navigation.navigate("Share", {
-      tripId: id,
+      tripId: tripid,
+      tripName: tripName,
+      travellers: DUMMYTRAVELLERS,
     });
+  }
+
+  function renderTravellers(item) {
+    return (
+      <View style={styles.travellerCard}>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>
+            {/* TODO: Profile Picture for now replaced with first char of the name */}
+            {item.item.userName.charAt(0)}
+          </Text>
+        </View>
+        <Text>{item.item.userName}</Text>
+      </View>
+    );
   }
 
   return (
@@ -23,24 +55,38 @@ function TripItem({ id, description, amount, date }) {
       style={({ pressed }) => pressed && styles.pressed}
     >
       <View style={styles.tripItem}>
-        <View>
-          <Text style={[styles.textBase, styles.description]}>
-            {description}
-          </Text>
-          <Text style={styles.textBase}>{date}</Text>
+        <View style={styles.topRow}>
+          <View>
+            <Text style={[styles.textBase, styles.description]}>
+              {tripName}
+            </Text>
+            <Text style={styles.textBase}>
+              {dailyBudget}
+              {" " + tripCurrency}
+            </Text>
+          </View>
+          <View style={styles.amountContainer}>
+            <Text style={styles.amount}>
+              {totalBudget}
+              {" " + tripCurrency}
+            </Text>
+            <Progress.Bar
+              color={GlobalStyles.colors.primary500}
+              unfilledColor={GlobalStyles.colors.gray600}
+              borderWidth={0}
+              borderRadius={8}
+              progress={totalSum ? totalBudget / totalSum : 0.3}
+              height={12}
+              width={150}
+            />
+          </View>
         </View>
-        <View style={styles.amountContainer}>
-          <Text style={styles.amount}>{amount}</Text>
-          <Progress.Bar
-            color={GlobalStyles.colors.primary500}
-            unfilledColor={GlobalStyles.colors.gray600}
-            borderWidth={0}
-            borderRadius={8}
-            progress={0.3}
-            height={12}
-            width={150}
-          />
-        </View>
+        <FlatList
+          data={DUMMYTRAVELLERS}
+          renderItem={renderTravellers}
+          numColumns={2}
+          keyExtractor={(item) => item.userName + tripid}
+        ></FlatList>
       </View>
     </Pressable>
   );
@@ -53,17 +99,21 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
   tripItem: {
+    flex: 1,
     padding: 12,
-    marginVertical: 8,
+    margin: 12,
     backgroundColor: GlobalStyles.colors.gray500,
-    flexDirection: "row",
-    justifyContent: "space-between",
     borderRadius: 6,
     elevation: 3,
     shadowColor: GlobalStyles.colors.gray500,
     shadowRadius: 4,
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.4,
+  },
+  topRow: {
+    marginVertical: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   textBase: {
     color: GlobalStyles.colors.primary500,
@@ -84,5 +134,33 @@ const styles = StyleSheet.create({
   amount: {
     color: GlobalStyles.colors.primary500,
     fontWeight: "bold",
+  },
+  travellerCard: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    margin: 4,
+    padding: 8,
+    borderRadius: 16,
+    maxWidth: 200,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  travellerText: {
+    fontSize: 12,
+    color: GlobalStyles.colors.textColor,
+  },
+  avatar: {
+    minHeight: 20,
+    minWidth: 20,
+    borderRadius: 60,
+    backgroundColor: GlobalStyles.colors.gray500,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 14,
+  },
+  avatarText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: GlobalStyles.colors.primary700,
   },
 });

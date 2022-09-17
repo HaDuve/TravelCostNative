@@ -11,7 +11,7 @@ function TripList({ trips }) {
     <FlatList
       data={trips}
       renderItem={renderTripItem}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item.tripid}
     />
   );
 }

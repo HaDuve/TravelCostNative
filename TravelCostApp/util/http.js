@@ -94,3 +94,10 @@ export async function storeUserToTrip(tripid, uid) {
   const id = response.data.name;
   return id;
 }
+
+export async function fetchTripUsers(tripid) {
+  const response = await axios.get(
+    BACKEND_URL + `/trips/${tripid}/travellers.json`
+  );
+  return response.data;
+}

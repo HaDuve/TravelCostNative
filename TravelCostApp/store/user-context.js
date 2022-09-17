@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useReducer, useState } from "react";
 import { Alert } from "react-native";
 
 export const UserContext = createContext({
@@ -8,6 +8,7 @@ export const UserContext = createContext({
   homeCurrency: "",
   lastCountry: "",
   lastCurrency: "",
+  tripHistory: [],
 
   addUser: ({
     userName,
@@ -20,9 +21,27 @@ export const UserContext = createContext({
   deleteUser: (uid) => {},
   setUserName: (name) => {},
 
+  addTripHistory: (tripData) => {},
+  setTripHistory: (trips) => {},
+  deleteTripHistory: (tripid) => {},
+
   freshlyCreated: false,
   setFreshlyCreatedTo: (bool) => {},
 });
+
+function tripsReducer(state, action) {
+  switch (action.type) {
+    case "ADD":
+      return [action.payload, ...state];
+    case "SET":
+      const inverted = action.payload.reverse();
+      return inverted;
+    case "DELETE":
+      return state.filter((trip) => trip.id !== action.payload);
+    default:
+      return state;
+  }
+}
 
 function UserContextProvider({ children }) {
   const [userName, setName] = useState("");
@@ -32,6 +51,20 @@ function UserContextProvider({ children }) {
   const [lastCountry, setLastCountry] = useState("");
   const [lastCurrency, setLastCurrency] = useState("");
   const [freshlyCreated, setFreshlyCreated] = useState(false);
+
+  const [tripsState, dispatch] = useReducer(tripsReducer, []);
+
+  function addTripHistory(tripData) {
+    dispatch({ type: "ADD", payload: tripData });
+  }
+
+  function setTripHistory(trips) {
+    dispatch({ type: "SET", payload: trips });
+  }
+
+  function deleteTripHistory(tripid) {
+    dispatch({ type: "DELETE", payload: tripid });
+  }
 
   function addUser(UserData) {
     if (!UserData) return;
@@ -76,8 +109,14 @@ function UserContextProvider({ children }) {
     lastCountry: lastCountry,
     lastCurrency: lastCurrency,
 
+    tripHistory: tripsState,
+
     freshlyCreated: freshlyCreated,
     setFreshlyCreatedTo: setFreshlyCreatedTo,
+
+    addTripHistory: addTripHistory,
+    setTripHistory: setTripHistory,
+    deleteTripHistory: deleteTripHistory,
 
     addUser: addUser,
     deleteUser: deleteUser,

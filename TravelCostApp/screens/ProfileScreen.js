@@ -15,43 +15,24 @@ const ProfileScreen = ({ route, navigation, param }) => {
   const FreshlyCreated = UserCtx.freshlyCreated;
   const TripCtx = useContext(TripContext);
 
+  const ACTIVETRIP = {
+    tripid: TripCtx.tripid,
+    tripName: TripCtx.tripName,
+    totalBudget: TripCtx.totalBudget,
+    dailyBudget: TripCtx.dailyBudget,
+    tripCurrency: TripCtx.tripCurrency,
+  };
+
   useEffect(() => {
-    // do something
-    // TripCtx.setCurrentTravellers();
+    if (UserCtx.tripHistory.length < 1 && !FreshlyCreated)
+      UserCtx.addTripHistory(ACTIVETRIP);
   }, []);
-
-  // TODO: make a list in context where all trips are handled like expenses,
-  // also 1 trip has to be set as active
-
-  // useEffect(() => {
-  //   async function getTrips() {
-  //     setIsFetching(true);
-  //     try {
-  //       const expenses = await fetchTrips(tripid, uid, token);
-  //       expensesCtx.setTrips(expenses);
-  //       const user = await fetchUser(uid);
-  //       userCtx.addUser(user);
-  //     } catch (error) {
-  //       setError("Could not fetch data from the web database!");
-  //     }
-  //     setIsFetching(false);
-  //   }
-
-  //   getTrips();
-  // }, []);
-
-  const ACTIVETRIP = [
-    {
-      id: TripCtx.tripid,
-      description: TripCtx.tripName,
-      amount: TripCtx.totalBudget,
-    },
-  ];
 
   function cancelHandler() {
     //refreshes the screen
     console.log("canceled");
   }
+  console.log("ProfileScreen ~ UserCtx.tripHistory", UserCtx.tripHistory);
 
   const visibleContent = FreshlyCreated ? (
     <></>
@@ -68,7 +49,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
             onPress={navigation.navigate.bind(this, "ManageTrip")}
           />
         </View>
-        <TripList trips={ACTIVETRIP}></TripList>
+        <TripList trips={UserCtx.tripHistory}></TripList>
       </View>
       <AddExpenseButton navigation={navigation} />
     </>
@@ -101,6 +82,7 @@ const styles = StyleSheet.create({
   },
   tripContainer: {
     flex: 1,
+    minHeight: 300,
     margin: 16,
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },

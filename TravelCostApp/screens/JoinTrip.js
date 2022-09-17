@@ -11,6 +11,7 @@ const JoinTrip = ({ navigation, route }) => {
   const authCtx = useContext(AuthContext);
   const uid = authCtx.uid;
   const tripid = route.params.id;
+  let tripdata = {};
   console.log("🚀 ~ file: JoinTrip.js ~ line 8 ~ JoinTrip ~ tripid", tripid);
   const [tripName, setTripName] = useState("");
 
@@ -20,6 +21,7 @@ const JoinTrip = ({ navigation, route }) => {
       try {
         const trip = await fetchTrip(tripid);
         setTripName(trip.tripName);
+        tripdata = trip;
         // expensesCtx.setExpenses(expenses);
         // const user = await fetchUser(uid);
         // userCtx.addUser(user);
@@ -32,11 +34,12 @@ const JoinTrip = ({ navigation, route }) => {
     getTrip();
   }, [tripid]);
 
-  function joinHandler(arg) {
-    if (arg) {
-      const traveller = { travellerid: uid };
+  function joinHandler(join) {
+    if (join) {
+      const traveller = { travellerid: uid, userName: userCtx.userName };
       storeUserToTrip(tripid, traveller);
-      navigation.navigate("RecentExpenses");
+      userCtx.addTripHistory(tripdata);
+      navigation.navigate("Profile");
       return;
     }
     navigation.navigate("Home");

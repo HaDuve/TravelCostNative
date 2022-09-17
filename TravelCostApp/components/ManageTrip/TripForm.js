@@ -51,7 +51,7 @@ const TripForm = ({ navigation }) => {
     });
   }
   function cancelHandler() {
-    navigation.navigate("RecentExpenses");
+    navigation.navigate("Profile");
   }
 
   async function submitHandler(e) {
@@ -60,12 +60,14 @@ const TripForm = ({ navigation }) => {
     tripData.totalBudget = +inputs.totalBudget.value;
     tripData.tripCurrency = inputs.tripCurrency.value;
     tripData.dailyBudget = inputs.dailyBudget.value;
+    tripData.travellers = [{ userName: UserCtx.userName }];
 
     const id = await storeTrip(tripData);
     TripCtx.setCurrentTrip(id, tripData);
     storeUserToTrip(id, { travellerid: uid });
+    UserCtx.addTripHistory(tripData);
     UserCtx.setFreshlyCreatedTo(false);
-    navigation.navigate("RecentExpenses");
+    navigation.navigate("Profile");
   }
 
   const currencyPickJSX = (

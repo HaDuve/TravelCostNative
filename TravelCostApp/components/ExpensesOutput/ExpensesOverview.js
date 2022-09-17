@@ -14,8 +14,8 @@ const ExpensesOverview = ({ expenses }) => {
   return (
     <View style={styles.container}>
       <View>
-        {!toggleGraph && <Text style={styles.titleText}> Categories</Text>}
-        {toggleGraph && <Text style={styles.titleText}> Last Months </Text>}
+        {!toggleGraph && <Text style={styles.titleText}> Last Months</Text>}
+        {toggleGraph && <Text style={styles.titleText}> Categories</Text>}
       </View>
       <View style={styles.toggleButton}>
         <IconButton

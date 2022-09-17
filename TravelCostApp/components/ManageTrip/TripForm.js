@@ -4,6 +4,7 @@ import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
 import {
+  fetchExpenses,
   fetchUser,
   storeTrip,
   storeUserToTrip,
@@ -15,11 +16,13 @@ import { TripContext } from "../../store/trip-context";
 import { UserContext } from "../../store/user-context";
 import Button from "../UI/Button";
 import FlatButton from "../UI/FlatButton";
+import { ExpensesContext } from "../../store/expenses-context";
 
 const TripForm = ({ navigation }) => {
   const TripCtx = useContext(TripContext);
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
+  const ExpenseCtx = useContext(ExpensesContext);
   console.log("submitHandler ~ UserCtx.tripHistory", UserCtx.tripHistory);
 
   const uid = AuthCtx.uid;
@@ -76,6 +79,9 @@ const TripForm = ({ navigation }) => {
       userName: UserCtx.userName,
       tripHistory: UserCtx.tripHistory,
     });
+
+    const expenses = await fetchExpenses(tripid, uid);
+    ExpenseCtx.setExpenses(expenses);
 
     UserCtx.setFreshlyCreatedTo(false);
     navigation.navigate("Profile");

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Dimensions } from "react-native";
 import * as Progress from "react-native-progress";
 import { GlobalStyles } from "../../../constants/styles";
 import { Ionicons } from "@expo/vector-icons";
@@ -20,6 +20,7 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   const tripCtx = useContext(TripContext);
   const userCurrency = tripCtx.tripCurrency;
   const catCostString = formatExpenseString(catCost);
+  const windowWidth = Dimensions.get("window").width;
 
   return (
     <View style={styles.container}>
@@ -41,8 +42,8 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
         borderWidth={0}
         borderRadius={8}
         progress={budgetProgress}
-        height={12}
-        width={360}
+        height={14}
+        width={windowWidth - 60}
       />
     </View>
   );

@@ -2,7 +2,6 @@ import { StyleSheet, Text, TextInput, View } from "react-native";
 import { GlobalStyles } from "./../constants/styles";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
-import { ScrollView } from "react-native";
 import { useContext, useEffect } from "react";
 import IconButton from "../components/UI/IconButton";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
@@ -15,13 +14,21 @@ const ProfileScreen = ({ route, navigation, param }) => {
   const FreshlyCreated = UserCtx.freshlyCreated;
   const TripCtx = useContext(TripContext);
 
-  const ACTIVETRIP = {
-    tripid: TripCtx.tripid,
-    tripName: TripCtx.tripName,
-    totalBudget: TripCtx.totalBudget,
-    dailyBudget: TripCtx.dailyBudget,
-    tripCurrency: TripCtx.tripCurrency,
-  };
+  const ACTIVETRIPS = [
+    {
+      tripid: TripCtx.tripid,
+      tripName: TripCtx.tripName,
+      totalBudget: TripCtx.totalBudget,
+      dailyBudget: TripCtx.dailyBudget,
+      tripCurrency: TripCtx.tripCurrency,
+      travellers: TripCtx.travellers,
+    },
+  ];
+
+  UserCtx.tripHistory.forEach((trip) => {
+    console.log("UserCtx.tripHistory.forEach ~ trip", trip);
+    ACTIVETRIPS.push(trip);
+  });
 
   function cancelHandler() {
     //refreshes the screen
@@ -43,7 +50,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
             onPress={navigation.navigate.bind(this, "ManageTrip")}
           />
         </View>
-        <TripList trips={UserCtx.tripHistory}></TripList>
+        <TripList trips={ACTIVETRIPS}></TripList>
       </View>
       <AddExpenseButton navigation={navigation} />
     </>

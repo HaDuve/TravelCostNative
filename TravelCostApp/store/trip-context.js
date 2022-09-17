@@ -14,7 +14,6 @@ export const TripContext = createContext({
   travellers: [],
   setCurrentTravellers: (tripid) => {},
 
-  trips: [],
   addTrip: ({ tripName, tripTotalBudget }) => {},
   deleteTrip: (tripid) => {},
   updateTrip: ({ tripid, tripName, tripTotalBudget }) => {},
@@ -29,33 +28,10 @@ export const TripContext = createContext({
   deleteCurrentTrip: (uid) => {},
   getCurrentTripFromStorage: () => {},
   fetchCurrentTrip: (tripid) => {},
+  getcurrentTrip: () => {},
 });
 
-function tripsReducer(state, action) {
-  switch (action.type) {
-    case "ADD":
-      return [action.payload, ...state];
-    case "SET":
-      const inverted = action.payload.reverse();
-      return inverted;
-    case "UPDATE":
-      const updatableTripIndex = state.findIndex(
-        (trip) => trip.tripid === action.payload.tripid
-      );
-      const updatableTrip = state[updatableTripIndex];
-      const updatedItem = { ...updatableTrip, ...action.payload.data };
-      const updatedTrips = [...state];
-      updatedTrips[updatableTripIndex] = updatedItem;
-      return updatedTrips;
-    case "DELETE":
-      return state.filter((trip) => trip.tripid !== action.payload);
-    default:
-      return state;
-  }
-}
-
 function TripContextProvider({ children }) {
-  const [tripsState, dispatch] = useReducer(tripsReducer, []);
   const [travellers, setTravellers] = useState([]);
 
   const [tripid, setTripid] = useState("");
@@ -75,33 +51,6 @@ function TripContextProvider({ children }) {
     }
   }
 
-  function addTrip(tripData) {
-    dispatch({ type: "ADD", payload: tripData });
-  }
-
-  function setTrips(trips) {
-    dispatch({ type: "SET", payload: trips });
-  }
-
-  function deleteTrip(id) {
-    dispatch({ type: "DELETE", payload: id });
-  }
-
-  function updateTrip(id, tripData) {
-    dispatch({ type: "UPDATE", payload: { id: id, data: tripData } });
-  }
-  function getcurrentTrip() {
-    const tripData = {
-      tripid: tripid,
-      tripName: tripName,
-      totalBudget: totalBudget,
-      dailyBudget: dailyBudget,
-      tripCurrency: tripCurrency,
-      totalSum: totalSum,
-      travellers: travellers,
-    };
-    return tripData;
-  }
   function setCurrentTrip(tripid, trip) {
     console.log("setCurrentTrip ~ trip", trip);
     setTripid(tripid);
@@ -109,7 +58,7 @@ function TripContextProvider({ children }) {
     setTotalBudget(trip.totalBudget.toString());
     setTripCurrency(trip.tripCurrency);
     setdailyBudget(trip.dailyBudget.toString());
-    setCurrentTravellers(trip.travellers);
+    setTravellers(trip.travellers);
     AsyncStorage.setItem("currentTripId", tripid);
     AsyncStorage.setItem("currentTripName", trip.tripName);
     AsyncStorage.setItem("currentTripTotalBudget", trip.totalBudget.toString());
@@ -147,6 +96,18 @@ function TripContextProvider({ children }) {
     }
   }
 
+  function getcurrentTrip() {
+    const curTripData = {
+      tripid: tripid,
+      tripName: tripName,
+      totalBudget: totalBudget,
+      dailyBudget: dailyBudget,
+      tripCurrency: tripCurrency,
+      totalSum: totalSum,
+    };
+    return curTripData;
+  }
+
   const value = {
     tripid: tripid,
     tripName: tripName,
@@ -155,18 +116,12 @@ function TripContextProvider({ children }) {
     dailyBudget: dailyBudget,
     travellers: travellers,
     totalSum: totalSum,
-    setCurrentTravellers: setCurrentTravellers,
-
     getcurrentTrip: getcurrentTrip,
+    setCurrentTravellers: setCurrentTravellers,
     setCurrentTrip: setCurrentTrip,
-    deleteCurrentTrip: deleteCurrentTrip,
     getCurrentTripFromStorage: getCurrentTripFromStorage,
     fetchCurrentTrip: fetchCurrentTrip,
 
-    addTrip: addTrip,
-    setTrips: setTrips,
-    deleteTrip: deleteTrip,
-    updateTrip: updateTrip,
     setTotalSum: setTotalSum,
   };
 

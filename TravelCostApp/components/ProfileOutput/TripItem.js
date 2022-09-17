@@ -1,4 +1,11 @@
-import { Pressable, StyleSheet, Text, View, FlatList } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  Alert,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { GlobalStyles } from "../../constants/styles";
@@ -6,6 +13,8 @@ import * as Progress from "react-native-progress";
 import { useContext } from "react";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseString } from "../../util/string";
+import { fetchTrip } from "../../util/http";
+import { onShare } from "./ShareTrip";
 
 function TripItem({
   tripid,
@@ -16,8 +25,21 @@ function TripItem({
   totalSum,
   travellers,
 }) {
+  const tripData = {
+    tripid,
+    tripName,
+    totalBudget,
+    dailyBudget,
+    tripCurrency,
+    totalSum,
+    travellers,
+  };
+  console.log("tripPressHandler ~ tripData", tripData);
+  // this clause might hide some bugs
+  if (!tripid) return <></>;
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
+
   // const totalBudgetString = formatExpenseString(totalBudget) + tripCurrency;
   const DUMMYTRAVELLERS = travellers
     ? travellers
@@ -29,11 +51,27 @@ function TripItem({
       ];
 
   function tripPressHandler() {
-    navigation.navigate("Share", {
-      tripId: tripid,
-      tripName: tripName,
-      travellers: DUMMYTRAVELLERS,
-    });
+    console.log("pressed: ", tripid);
+    Alert.alert(tripName, "Please choose action:", [
+      {
+        text: "Cancel",
+        onPress: () => navigation.navigate("Profile"),
+        style: "cancel",
+      },
+      {
+        text: "Invite other travellers",
+        onPress: () => {
+          onShare(tripid);
+        },
+      },
+      {
+        text: "Set as active Trip",
+        onPress: () => {
+          tripCtx.setCurrentTrip(tripid, tripData);
+          console.log(`set ${tripName} ${tripid} as active!`);
+        },
+      },
+    ]);
   }
 
   const activeBorder =
@@ -67,7 +105,8 @@ function TripItem({
               {tripName}
             </Text>
             <Text style={styles.textBase}>
-              {dailyBudget}
+              Daily:
+              {" " + dailyBudget}
               {" " + tripCurrency}
             </Text>
           </View>

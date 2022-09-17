@@ -244,8 +244,9 @@ function Root() {
         try {
           const response = await fetchUser(storedUid);
           if (response) {
+            console.log("onRootMount ~ response", response);
             userCtx.addUser(response);
-            userCtx.setTripHistory(response.tripHistory);
+            // userCtx.setTripHistory(response.tripHistory);
           }
         } catch (error) {
           Alert.alert(error);

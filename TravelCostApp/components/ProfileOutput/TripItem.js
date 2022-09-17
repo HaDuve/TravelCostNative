@@ -34,6 +34,7 @@ function TripItem({
     totalSum,
     travellers,
   };
+  const firstExpense = tripData.totalSum > 1;
   console.log("tripPressHandler ~ tripData", tripData);
   // this clause might hide some bugs
   if (!tripid) return <></>;
@@ -115,15 +116,17 @@ function TripItem({
               {totalBudget}
               {" " + tripCurrency}
             </Text>
-            <Progress.Bar
-              color={GlobalStyles.colors.primary500}
-              unfilledColor={GlobalStyles.colors.gray600}
-              borderWidth={0}
-              borderRadius={8}
-              progress={totalSum ? totalBudget / totalSum : 0.3}
-              height={12}
-              width={150}
-            />
+            {firstExpense && (
+              <Progress.Bar
+                color={GlobalStyles.colors.primary500}
+                unfilledColor={GlobalStyles.colors.gray600}
+                borderWidth={0}
+                borderRadius={8}
+                progress={totalSum ? totalBudget / totalSum : 0.3}
+                height={12}
+                width={150}
+              />
+            )}
           </View>
         </View>
         <FlatList

@@ -133,10 +133,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
           invalid={!inputs.userName.isValid}
         />
       </View>
-      <View style={styles.inputsRow}>
-        {!FreshlyCreated && <Text>Cur: {TripCtx.tripCurrency}</Text>}
-        {!FreshlyCreated && <Text>Day: {TripCtx.dailyBudget}</Text>}
-      </View>
+      <View style={styles.inputsRow}></View>
       <View style={styles.buttonContainer}>
         <IconButton
           icon={"close-outline"}
@@ -163,6 +160,7 @@ const styles = StyleSheet.create({
   form: {
     flex: 1,
     marginTop: 10,
+    minHeight: 250,
   },
   avatarBar: {
     marginTop: 48,

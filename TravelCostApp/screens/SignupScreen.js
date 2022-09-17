@@ -21,7 +21,7 @@ function SignupScreen() {
       await AsyncStorage.clear();
       userCtx.setTripHistory([]);
       authCtx.setUserID(uid);
-      const userdata = { name: name };
+      const userdata = { name: name, tripHistory: [] };
       try {
         storeUser(uid, userdata);
       } catch (error) {

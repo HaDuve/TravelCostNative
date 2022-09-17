@@ -5,7 +5,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
-import axios from "axios";
 import * as Linking from "expo-linking";
 import { Alert, Text } from "react-native";
 import AppLoading from "expo-app-loading";
@@ -15,7 +14,6 @@ import LoginScreen from "./screens/LoginScreen";
 import ManageExpense from "./screens/ManageExpense";
 import RecentExpenses from "./screens/RecentExpenses";
 import { GlobalStyles } from "./constants/styles";
-import IconButton from "./components/UI/IconButton";
 import AuthContextProvider, { AuthContext } from "./store/auth-context";
 import ExpensesContextProvider, {
   ExpensesContext,

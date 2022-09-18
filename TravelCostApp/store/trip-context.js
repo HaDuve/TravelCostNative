@@ -47,12 +47,11 @@ function TripContextProvider({ children }) {
       const trip = await fetchTrip(tripid);
       if (!trip) return;
     } catch (error) {
-      console.log(error);
+      console.log("error while setCurrentTravellers fetch Trip");
     }
   }
 
   function setCurrentTrip(tripid, trip) {
-    console.log("setCurrentTrip ~ trip", trip);
     setTripid(tripid);
     setTripName(trip.tripName);
     setTotalBudget(trip.totalBudget.toString());
@@ -92,7 +91,7 @@ function TripContextProvider({ children }) {
       const trip = await fetchTrip(tripid);
       setCurrentTrip(tripid, trip);
     } catch (error) {
-      console.log(error);
+      console.log("error while fetchCurrent Trip in trip-context");
     }
   }
 

@@ -25,10 +25,12 @@ const ProfileScreen = ({ route, navigation, param }) => {
     },
   ];
 
-  UserCtx.tripHistory.forEach((trip) => {
-    console.log("UserCtx.tripHistory.forEach ~ trip", trip);
-    ACTIVETRIPS.push(trip);
-  });
+  useEffect(() => {
+    UserCtx.tripHistory.forEach((trip) => {
+      ACTIVETRIPS.push(trip);
+    });
+  }, []);
+  // TODO: try UserCtx.tripHistory as a listener for this useEffect
 
   function cancelHandler() {
     //refreshes the screen

@@ -6,6 +6,6 @@ export async function getRate(base = "EUR", target = "USD") {
     const response = await axios.get(requestURL);
     return response.data.rates[target];
   } catch (error) {
-    console.log("getRate ~ error", error);
+    console.log("getRate ~ error");
   }
 }

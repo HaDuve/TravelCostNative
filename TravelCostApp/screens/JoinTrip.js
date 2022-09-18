@@ -12,7 +12,6 @@ const JoinTrip = ({ navigation, route }) => {
   const uid = authCtx.uid;
   const tripid = route.params.id;
   let tripdata = {};
-  console.log("🚀 ~ file: JoinTrip.js ~ line 8 ~ JoinTrip ~ tripid", tripid);
   const [tripName, setTripName] = useState("");
 
   useLayoutEffect(() => {
@@ -26,7 +25,9 @@ const JoinTrip = ({ navigation, route }) => {
         // const user = await fetchUser(uid);
         // userCtx.addUser(user);
       } catch (error) {
-        console.log(error);
+        console.log(
+          "An error happened while joining trip! (fetchTrip). Please try again later."
+        );
       }
       //   setIsFetching(false);
     }

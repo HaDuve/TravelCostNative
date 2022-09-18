@@ -41,11 +41,6 @@ function onClick({ item, index }) {
   Alert.alert(
     "Deleteswipe not yet implemented, sorry! :( Please delete via touch menu"
   );
-  console.log(item, index);
-  // let a = listData;
-  // a.splice(index, 1);
-  // console.log(a);
-  // setListData([...a]);
 }
 
 // Displays a list of all expenses.

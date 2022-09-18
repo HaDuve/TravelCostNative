@@ -93,13 +93,11 @@ const ProfileForm = ({ navigation, onCancel }) => {
 
     try {
       await updateUser(AuthCtx.uid, userData);
-      console.log("adding", userData.userName);
       if (!UserCtx.freshlyCreated) {
         return;
       }
       navigation.navigate("ManageTrip");
     } catch (error) {
-      console.log(error);
       Alert.alert("Could not save Profile! :(");
     }
   }

@@ -25,7 +25,6 @@ function SignupScreen() {
       try {
         storeUser(uid, userdata);
       } catch (error) {
-        console.log("signupHandler ~ error", error);
         Alert.alert(
           "Storing User failed",
           "Could not create user, please try other credentials or try again later."
@@ -35,7 +34,6 @@ function SignupScreen() {
       userCtx.setFreshlyCreatedTo(true);
       authCtx.authenticate(token);
     } catch (error) {
-      console.log("signupHandler ~ error", error);
       Alert.alert(
         "Authentication failed",
         "Could not create user, please check your input and try again later."

@@ -173,7 +173,6 @@ const ExpenseForm = ({
       whoPaid: UserCtx.userName,
       owePerc: "0",
     };
-    console.log(expenseData);
     onSubmit(expenseData);
   }
 

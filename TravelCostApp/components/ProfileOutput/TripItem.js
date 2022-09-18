@@ -35,7 +35,6 @@ function TripItem({
     travellers,
   };
   const firstExpense = tripData.totalSum > 1;
-  console.log("tripPressHandler ~ tripData", tripData);
   // this clause might hide some bugs
   if (!tripid) return <></>;
   const navigation = useNavigation();

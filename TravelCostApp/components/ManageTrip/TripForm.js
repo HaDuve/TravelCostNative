@@ -23,7 +23,6 @@ const TripForm = ({ navigation }) => {
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
   const ExpenseCtx = useContext(ExpensesContext);
-  console.log("submitHandler ~ UserCtx.tripHistory", UserCtx.tripHistory);
 
   const uid = AuthCtx.uid;
   let currencyPickerRef = undefined;
@@ -99,7 +98,6 @@ const TripForm = ({ navigation }) => {
       showCurrencyName={false}
       showCurrencyCode={false}
       onSelectCurrency={(data) => {
-        console.log("DATA", data);
         inputChangedHandler("tripCurrency", data.code);
       }}
       onOpen={() => {

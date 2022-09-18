@@ -10,6 +10,11 @@ import { formatExpenseString } from "../../../util/string";
 
 const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   let budgetProgress = (catCost / totalCost) * 1;
+  if (Number.isNaN(budgetProgress)) {
+    console.log("NaN budgetProgress passed to CategoryProgressBar");
+    return <></>;
+  }
+
   let catString = cat?.slice(0, 18);
   if (cat?.length > 18) catString = catString + "...";
   const budgetColor = color;

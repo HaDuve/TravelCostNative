@@ -62,6 +62,10 @@ const ExpensesSummary = ({ expenses, periodName }) => {
       : GlobalStyles.colors.errorGrayed;
 
   if (budgetProgress > 1) budgetProgress -= 1;
+  if (Number.isNaN(budgetProgress)) {
+    console.log("NaN budgetProgress passed to Summary");
+    return <></>;
+  }
 
   return (
     <View style={styles.container}>

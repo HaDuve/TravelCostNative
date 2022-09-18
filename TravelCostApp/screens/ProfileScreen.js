@@ -33,7 +33,6 @@ const ProfileScreen = ({ route, navigation, param }) => {
   // TODO: try UserCtx.tripHistory as a listener for this useEffect
 
   function cancelHandler() {
-    //refreshes the screen
     console.log("canceled");
   }
 

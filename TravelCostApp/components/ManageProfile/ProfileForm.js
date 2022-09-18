@@ -136,14 +136,14 @@ const ProfileForm = ({ navigation, onCancel }) => {
         <IconButton
           icon={"close-outline"}
           size={36}
-          color={GlobalStyles.colors.primary400}
+          color={GlobalStyles.colors.accent500}
           style={styles.button}
           onPress={onCancel}
         />
         <IconButton
           icon={"checkmark"}
           size={36}
-          color={GlobalStyles.colors.primary400}
+          color={GlobalStyles.colors.primary500}
           style={styles.button}
           onPress={submitHandler}
         />

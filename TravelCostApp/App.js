@@ -220,6 +220,18 @@ function Home(authCtx) {
 }
 
 function Root() {
+  // NOTE: batchedBridge debugging global
+  if (global.__fbBatchedBridge) {
+    const origMessageQueue = global.__fbBatchedBridge;
+    const modules = origMessageQueue._remoteModuleTable;
+    const methods = origMessageQueue._remoteMethodTable;
+    global.findModuleByModuleAndMethodIds = (moduleId, methodId) => {
+      console.log(
+        `The problematic line code is in: ${modules[moduleId]}.${methods[moduleId][methodId]}`
+      );
+    };
+  }
+
   const [isTryingLogin, setIsTryingLogin] = useState(true);
 
   const authCtx = useContext(AuthContext);
@@ -229,7 +241,7 @@ function Root() {
 
   useEffect(() => {
     async function onRootMount() {
-      // DEBUG: if we ever want to clear all memory
+      // NOTE: uncomment below for memory/login debugging
       // await AsyncStorage.clear();
 
       // fetch token and trip

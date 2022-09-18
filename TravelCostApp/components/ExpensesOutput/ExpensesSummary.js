@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { GlobalStyles } from "./../../constants/styles";
 import * as Progress from "react-native-progress";
 import { UserContext } from "../../store/user-context";
@@ -12,6 +12,10 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   const expensesSum = expenses.reduce((sum, expense) => {
     return sum + expense.calcAmount;
   }, 0);
+  useEffect(() => {
+    tripCtx.setTotalSum(expensesSum);
+  }, []);
+
   const expensesSumString = formatExpenseString(expensesSum);
   const userCurrency = tripCtx.tripCurrency;
   if (tripCtx.tripid === "")

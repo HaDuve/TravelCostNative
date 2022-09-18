@@ -241,6 +241,7 @@ function Root() {
 
   useEffect(() => {
     async function onRootMount() {
+      console.log("onRootMount ~ onRootMount");
       // NOTE: uncomment below for memory/login debugging
       // await AsyncStorage.clear();
 

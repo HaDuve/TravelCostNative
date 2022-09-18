@@ -10,7 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseString } from "../../util/string";
 import { fetchTrip } from "../../util/http";
@@ -22,8 +22,6 @@ function TripItem({
   totalBudget,
   dailyBudget,
   tripCurrency,
-  totalSum,
-  travellers,
 }) {
   const tripData = {
     tripid,
@@ -31,24 +29,19 @@ function TripItem({
     totalBudget,
     dailyBudget,
     tripCurrency,
-    totalSum,
-    travellers,
   };
-  const firstExpense = tripData.totalSum > 1;
   // this clause might hide some bugs
   if (!tripid) return <></>;
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
 
   // const totalBudgetString = formatExpenseString(totalBudget) + tripCurrency;
-  const DUMMYTRAVELLERS = travellers
-    ? travellers
-    : [
-        { userName: "Hannes" },
-        { userName: "Tina" },
-        { userName: "Helene" },
-        { userName: "Thorben" },
-      ];
+  const DUMMYTRAVELLERS = [
+    { userName: "Traveller " },
+    { userName: "Name " },
+    { userName: "Name " },
+    { userName: "Traveller" },
+  ];
 
   function tripPressHandler() {
     console.log("pressed: ", tripid);
@@ -115,17 +108,15 @@ function TripItem({
               {totalBudget}
               {" " + tripCurrency}
             </Text>
-            {firstExpense && (
-              <Progress.Bar
-                color={GlobalStyles.colors.primary500}
-                unfilledColor={GlobalStyles.colors.gray600}
-                borderWidth={0}
-                borderRadius={8}
-                progress={totalSum ? totalBudget / totalSum : 0.3}
-                height={12}
-                width={150}
-              />
-            )}
+            <Progress.Bar
+              color={GlobalStyles.colors.primary500}
+              unfilledColor={GlobalStyles.colors.gray600}
+              borderWidth={0}
+              borderRadius={8}
+              progress={0}
+              height={12}
+              width={150}
+            />
           </View>
         </View>
         <FlatList

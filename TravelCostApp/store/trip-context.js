@@ -9,10 +9,11 @@ export const TripContext = createContext({
   totalBudget: "",
   dailyBudget: "",
   tripCurrency: "",
-  totalSum: "",
+  totalSum: 0,
   // save user as obj with (tname, tid)
   travellers: [],
   setCurrentTravellers: (tripid) => {},
+  setTotalSum: (amount) => {},
 
   addTrip: ({ tripName, tripTotalBudget }) => {},
   deleteTrip: (tripid) => {},
@@ -39,7 +40,7 @@ function TripContextProvider({ children }) {
   const [totalBudget, setTotalBudget] = useState("");
   const [tripCurrency, setTripCurrency] = useState("");
   const [dailyBudget, setdailyBudget] = useState("");
-  const [totalSum, setTotalSumTrip] = useState("");
+  const [totalSum, setTotalSumTrip] = useState(0);
 
   async function setCurrentTravellers(tripid) {
     try {
@@ -115,6 +116,7 @@ function TripContextProvider({ children }) {
     dailyBudget: dailyBudget,
     travellers: travellers,
     totalSum: totalSum,
+    setTotalSum: setTotalSum,
     getcurrentTrip: getcurrentTrip,
     setCurrentTravellers: setCurrentTravellers,
     setCurrentTrip: setCurrentTrip,

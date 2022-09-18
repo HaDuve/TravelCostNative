@@ -127,7 +127,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    overflow: true,
   },
   deleteContainer: {
     marginTop: 16,

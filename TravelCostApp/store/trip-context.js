@@ -10,6 +10,8 @@ export const TripContext = createContext({
   dailyBudget: "",
   tripCurrency: "",
   totalSum: 0,
+  tripProgress: 0,
+  setTripProgress: (percent) => {},
   // save user as obj with (tname, tid)
   travellers: [],
   setCurrentTravellers: (tripid) => {},
@@ -41,6 +43,12 @@ function TripContextProvider({ children }) {
   const [tripCurrency, setTripCurrency] = useState("");
   const [dailyBudget, setdailyBudget] = useState("");
   const [totalSum, setTotalSumTrip] = useState(0);
+  const [progress, setProgress] = useState(0);
+
+  function setTripProgress(percent) {
+    if (percent < 0 || percent > 1) percent = 1;
+    setProgress(percent);
+  }
 
   async function setCurrentTravellers(tripid) {
     try {
@@ -123,6 +131,8 @@ function TripContextProvider({ children }) {
     getCurrentTripFromStorage: getCurrentTripFromStorage,
     fetchCurrentTrip: fetchCurrentTrip,
 
+    tripProgress: progress,
+    setTripProgress: setTripProgress,
     setTotalSum: setTotalSum,
   };
 

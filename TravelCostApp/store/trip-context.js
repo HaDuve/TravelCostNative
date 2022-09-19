@@ -1,7 +1,7 @@
 import { createContext, useReducer, useState } from "react";
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { fetchTrip } from "../util/http";
+import { fetchTrip, getTravellers } from "../util/http";
 
 export const TripContext = createContext({
   tripid: "",
@@ -45,13 +45,9 @@ function TripContextProvider({ children }) {
   }
 
   async function setCurrentTravellers(tripid) {
-    try {
-      //TODO finish this function
-      const trip = await fetchTrip(tripid);
-      if (!trip) return;
-    } catch (error) {
-      console.log("error while setCurrentTravellers fetch Trip");
-    }
+    // updates the current Travellers in context
+    const travellers = await getTravellers(tripid);
+    setTravellers(travellers);
   }
 
   function setCurrentTrip(tripid, trip) {

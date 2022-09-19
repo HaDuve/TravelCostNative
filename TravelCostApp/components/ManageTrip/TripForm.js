@@ -6,6 +6,7 @@ import { AuthContext } from "../../store/auth-context";
 import {
   fetchExpenses,
   fetchUser,
+  getAllExpenses,
   storeTrip,
   storeUserToTrip,
   updateUser,
@@ -81,7 +82,7 @@ const TripForm = ({ navigation }) => {
     });
 
     UserCtx.setFreshlyCreatedTo(false);
-    const expenses = await fetchExpenses(tripid, uid);
+    const expenses = await getAllExpenses(tripid);
     ExpenseCtx.setExpenses(expenses);
 
     navigation.navigate("Profile");

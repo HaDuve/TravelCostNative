@@ -105,7 +105,13 @@ const ManageExpense = ({ route, navigation }) => {
           submitButtonLabel={isEditing ? "Update" : "Add"}
           defaultValues={selectedExpense}
         />
-
+        {/* <View style={{ padding: 40 }}>
+          <Text>
+            {tripCtx.travellers[0]}
+            {tripCtx.travellers[1]}
+            {tripCtx.travellers[2]}
+          </Text>
+        </View> */}
         {isEditing && (
           <View style={styles.deleteContainer}>
             <IconButton

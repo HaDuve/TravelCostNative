@@ -18,9 +18,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
   const TripCtx = useContext(TripContext);
-  // const freshlyCreated = UserCtx.freshlyCreated;
-  // debug
-  const freshlyCreated = true;
+  const freshlyCreated = UserCtx.freshlyCreated;
   const uid = AuthContext.uid;
 
   let currencyPickerRef = undefined;

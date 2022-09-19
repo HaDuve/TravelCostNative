@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useReducer, useState } from "react";
 import { Alert } from "react-native";
 
@@ -94,6 +95,7 @@ function UserContextProvider({ children }) {
 
   function setFreshlyCreatedTo(bool) {
     setFreshlyCreated(bool);
+    AsyncStorage.setItem("freshlyCreated", bool.toString());
   }
 
   function deleteUser(id) {

@@ -1,23 +1,26 @@
 import { useState, useContext, useEffect } from "react";
-import { View, Text, Alert } from "react-native";
+import { View, Text, Alert, Keyboard, Dimensions } from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
 import { UserContext } from "../../store/user-context";
 import { fetchUser, updateUser } from "../../util/http";
-import { Button } from "react-native";
 
 import Input from "../ManageExpense/Input";
 import ErrorOverlay from "../UI/ErrorOverlay";
 import LoadingOverlay from "../UI/LoadingOverlay";
 import IconButton from "../UI/IconButton";
+import Button from "../UI/Button";
 import { TripContext } from "../../store/trip-context";
+import FlatButton from "../UI/FlatButton";
 
 const ProfileForm = ({ navigation, onCancel }) => {
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
   const TripCtx = useContext(TripContext);
-  const FreshlyCreated = UserCtx.freshlyCreated;
+  // const freshlyCreated = UserCtx.freshlyCreated;
+  // debug
+  const freshlyCreated = true;
   const uid = AuthContext.uid;
 
   let currencyPickerRef = undefined;
@@ -96,11 +99,54 @@ const ProfileForm = ({ navigation, onCancel }) => {
       if (!UserCtx.freshlyCreated) {
         return;
       }
-      navigation.navigate("ManageTrip");
     } catch (error) {
       Alert.alert("Could not save Profile! :(");
     }
   }
+
+  function cancelHandler() {
+    setInputs((curInputs) => {
+      return {
+        ...curInputs,
+        ["userName"]: { value: UserCtx.userName, isValid: true },
+      };
+    });
+    Keyboard.dismiss();
+  }
+
+  const changedName = inputs.userName.value !== UserCtx.userName;
+  const changedNameButtons = (
+    <View style={styles.buttonContainer}>
+      <IconButton
+        icon={"close-outline"}
+        size={36}
+        color={GlobalStyles.colors.accent500}
+        style={styles.button}
+        onPress={cancelHandler}
+      />
+      <IconButton
+        icon={"checkmark"}
+        size={36}
+        color={GlobalStyles.colors.primary500}
+        style={styles.button}
+        onPress={submitHandler}
+      />
+    </View>
+  );
+
+  const freshlyNavigationButtons = (
+    <View style={styles.navButtonContainer}>
+      <FlatButton style={styles.navButton}>
+        I have an invitation from another Traveller!
+      </FlatButton>
+      <Button
+        style={styles.navButton}
+        onPress={() => navigation.navigate("ManageTrip")}
+      >
+        Create first Trip
+      </Button>
+    </View>
+  );
 
   return (
     <View style={styles.form}>
@@ -132,22 +178,8 @@ const ProfileForm = ({ navigation, onCancel }) => {
         />
       </View>
       <View style={styles.inputsRow}></View>
-      <View style={styles.buttonContainer}>
-        <IconButton
-          icon={"close-outline"}
-          size={36}
-          color={GlobalStyles.colors.accent500}
-          style={styles.button}
-          onPress={onCancel}
-        />
-        <IconButton
-          icon={"checkmark"}
-          size={36}
-          color={GlobalStyles.colors.primary500}
-          style={styles.button}
-          onPress={submitHandler}
-        />
-      </View>
+      {changedName && changedNameButtons}
+      {freshlyCreated && freshlyNavigationButtons}
     </View>
   );
 };
@@ -214,6 +246,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     margin: 8,
+    minHeight: 100,
+  },
+  navButtonContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignContent: "flex-end",
+    padding: 30,
+  },
+  navButton: {
+    minWidth: 120,
+    marginVertical: 8,
+    marginTop: 36,
   },
   button: {
     minWidth: 120,

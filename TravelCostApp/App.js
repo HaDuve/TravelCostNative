@@ -155,7 +155,7 @@ function Navigation() {
   );
 }
 
-function Home(authCtx) {
+function Home() {
   const UserCtx = useContext(UserContext);
   const FreshlyCreated = UserCtx.freshlyCreated;
   const FirstScreen = FreshlyCreated ? "Profile" : "RecentExpenses";
@@ -249,6 +249,7 @@ function Root() {
       const storedToken = await AsyncStorage.getItem("token");
       const storedUid = await AsyncStorage.getItem("uid");
       const storedTripId = await AsyncStorage.getItem("currentTripId");
+      const freshlyCreated = await AsyncStorage.getItem("freshlyCreated");
 
       if (storedToken) {
         authCtx.setUserID(storedUid);
@@ -271,6 +272,8 @@ function Root() {
           const expenses = await fetchExpenses(storedTripId, storedUid);
           expensesCtx.setExpenses(expenses);
         }
+        if (freshlyCreated)
+          userCtx.setFreshlyCreatedTo(JSON.parse(freshlyCreated));
         authCtx.authenticate(storedToken);
       }
 

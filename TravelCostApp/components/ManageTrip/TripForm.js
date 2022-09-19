@@ -79,10 +79,10 @@ const TripForm = ({ navigation }) => {
       tripHistory: UserCtx.tripHistory,
     });
 
+    UserCtx.setFreshlyCreatedTo(false);
     const expenses = await fetchExpenses(tripid, uid);
     ExpenseCtx.setExpenses(expenses);
 
-    UserCtx.setFreshlyCreatedTo(false);
     navigation.navigate("Profile");
   }
 

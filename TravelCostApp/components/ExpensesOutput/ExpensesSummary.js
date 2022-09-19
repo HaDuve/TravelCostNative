@@ -12,9 +12,6 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   const expensesSum = expenses.reduce((sum, expense) => {
     return sum + expense.calcAmount;
   }, 0);
-  useEffect(() => {
-    tripCtx.setTotalSum(expensesSum);
-  }, []);
 
   const expensesSumString = formatExpenseString(expensesSum);
   const userCurrency = tripCtx.tripCurrency;

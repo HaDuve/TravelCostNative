@@ -4,8 +4,7 @@ export async function onShare(shareId) {
   const link = "exp://192.168.100.102:19000/--/join/" + shareId;
   try {
     const result = await Share.share({
-      message:
-        "Invite to trip: " + " You are welcome to join me on TripExpense!",
+      message: `Invite to trip: ${shareId} - You are welcome to join me on TripExpense!`,
       url: link,
     });
     if (result.action === Share.sharedAction) {

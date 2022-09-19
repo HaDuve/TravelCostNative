@@ -25,6 +25,7 @@ const TripForm = ({ navigation }) => {
   const ExpenseCtx = useContext(ExpensesContext);
 
   const uid = AuthCtx.uid;
+  const userName = UserCtx.userName;
   let currencyPickerRef = undefined;
 
   const [inputs, setInputs] = useState({
@@ -72,7 +73,7 @@ const TripForm = ({ navigation }) => {
     TripCtx.setCurrentTrip(tripid, tripData);
     UserCtx.addTripHistory(TripCtx.getcurrentTrip());
 
-    storeUserToTrip(tripid, { travellerid: uid });
+    storeUserToTrip(tripid, { travellerid: uid, userName: userName });
 
     updateUser(uid, {
       userName: UserCtx.userName,

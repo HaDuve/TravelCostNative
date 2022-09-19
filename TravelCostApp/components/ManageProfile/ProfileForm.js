@@ -17,9 +17,7 @@ import FlatButton from "../UI/FlatButton";
 const ProfileForm = ({ navigation, onCancel }) => {
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
-  const TripCtx = useContext(TripContext);
   const freshlyCreated = UserCtx.freshlyCreated;
-  const uid = AuthContext.uid;
 
   let currencyPickerRef = undefined;
 
@@ -133,20 +131,24 @@ const ProfileForm = ({ navigation, onCancel }) => {
   );
 
   function joinInvite() {
-    UserCtx.setFreshlyCreatedTo(false);
+    // TODO: this hardcoded join
     navigation.navigate("Join", { id: "-NCIxnq4MrQjGB_unKiE" });
   }
+
   const freshlyNavigationButtons = (
     <View style={styles.navButtonContainer}>
       <FlatButton style={styles.navButton} onPress={joinInvite}>
         I have an invitation from another Traveller!
       </FlatButton>
-      <Button
-        style={styles.navButton}
-        onPress={() => navigation.navigate("ManageTrip")}
-      >
-        Create first Trip
-      </Button>
+      {/*  for debugging i leave this condition only around this button, it should be around the whole view though */}
+      {freshlyCreated && (
+        <Button
+          style={styles.navButton}
+          onPress={() => navigation.navigate("ManageTrip")}
+        >
+          Create first Trip
+        </Button>
+      )}
     </View>
   );
 
@@ -181,7 +183,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
       </View>
       <View style={styles.inputsRow}></View>
       {changedName && changedNameButtons}
-      {freshlyCreated && freshlyNavigationButtons}
+      {freshlyNavigationButtons}
     </View>
   );
 };
@@ -254,7 +256,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignContent: "flex-end",
-    padding: 30,
+    padding: 24,
   },
   navButton: {
     minWidth: 120,

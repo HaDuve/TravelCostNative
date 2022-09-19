@@ -178,7 +178,7 @@ function Home(authCtx) {
           options={{
             headerShown: false,
             // title: "Recent Expenses",
-            tabBarLabel: "",
+            tabBarLabel: "Expenses",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="ios-list" size={size} color={color} />
             ),
@@ -192,7 +192,7 @@ function Home(authCtx) {
           options={{
             headerShown: false,
             title: "Overview",
-            tabBarLabel: "",
+            tabBarLabel: "Overview",
             tabBarIcon: ({ color, size }) => (
               <Ionicons
                 name="ios-stats-chart-outline"
@@ -209,7 +209,7 @@ function Home(authCtx) {
         options={{
           headerShown: false,
           title: "Profile",
-          tabBarLabel: "",
+          tabBarLabel: "Profile",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-circle-outline" size={size} color={color} />
           ),

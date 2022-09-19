@@ -87,7 +87,7 @@ export async function fetchTrip(tripid) {
 }
 
 export async function storeUserToTrip(tripid, uid) {
-  const response = await axios.put(
+  const response = await axios.post(
     BACKEND_URL + "/trips/" + `${tripid}/` + `travellers.json`,
     uid
   );
@@ -100,4 +100,19 @@ export async function fetchTripUsers(tripid) {
     BACKEND_URL + `/trips/${tripid}/travellers.json`
   );
   return response.data;
+}
+
+export async function getTravellers(tripid) {
+  const response = await fetchTripUsers(tripid);
+  let travellerids = [];
+  let travellers = [];
+  for (let key in response) {
+    const traveller = response[key].userName;
+    const uid = response[key].travellerid;
+    if (!travellerids.includes(uid) && traveller && traveller.length > 0) {
+      travellerids.push(uid);
+      travellers.push(traveller);
+    }
+  }
+  return travellers;
 }

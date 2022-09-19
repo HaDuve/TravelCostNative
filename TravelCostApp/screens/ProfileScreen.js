@@ -17,7 +17,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
   const trip = [TripCtx.tripName];
   console.log("ProfileScreen ~ trip", trip);
 
-  const ACTIVETRIPS = [
+  const allTripsList = [
     {
       tripid: TripCtx.tripid,
       tripName: TripCtx.tripName,
@@ -29,11 +29,11 @@ const ProfileScreen = ({ route, navigation, param }) => {
   ];
 
   useEffect(() => {
+    // add all trips from history into the list
     UserCtx.tripHistory.forEach((trip) => {
-      ACTIVETRIPS.push(trip);
+      if (trip.tripid !== TripCtx.tripid) allTripsList.push(trip);
     });
   }, []);
-  // TODO: try UserCtx.tripHistory as a listener for this useEffect
 
   function cancelHandler() {
     console.log("canceled");
@@ -54,7 +54,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
             onPress={navigation.navigate.bind(this, "ManageTrip")}
           />
         </View>
-        <TripList trips={ACTIVETRIPS}></TripList>
+        <TripList trips={allTripsList}></TripList>
       </View>
       <AddExpenseButton navigation={navigation} />
     </>

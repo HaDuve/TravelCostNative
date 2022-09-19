@@ -10,10 +10,10 @@ import { useNavigation } from "@react-navigation/native";
 
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseString } from "../../util/string";
-import { fetchTrip } from "../../util/http";
+import { fetchTrip, getTravellers } from "../../util/http";
 import { onShare } from "./ShareTrip";
 
 function TripItem({
@@ -34,14 +34,19 @@ function TripItem({
   if (!tripid) return <></>;
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
+  const [travellers, setTravellers] = useState([]);
 
-  // const totalBudgetString = formatExpenseString(totalBudget) + tripCurrency;
-  const DUMMYTRAVELLERS = [
-    { userName: "Traveller " },
-    { userName: "Name " },
-    { userName: "Name " },
-    { userName: "Traveller" },
-  ];
+  useEffect(() => {
+    async function getTripTravellers() {
+      const listTravellers = await getTravellers(tripid);
+      const objTravellers = [];
+      listTravellers.forEach((traveller) => {
+        objTravellers.push({ userName: traveller });
+      });
+      setTravellers(objTravellers);
+    }
+    getTripTravellers();
+  }, []);
 
   function tripPressHandler() {
     console.log("pressed: ", tripid);
@@ -120,7 +125,7 @@ function TripItem({
           </View>
         </View>
         <FlatList
-          data={DUMMYTRAVELLERS}
+          data={travellers}
           renderItem={renderTravellers}
           numColumns={2}
           keyExtractor={(item) => {

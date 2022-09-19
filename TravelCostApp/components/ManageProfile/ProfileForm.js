@@ -4,7 +4,12 @@ import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
 import { UserContext } from "../../store/user-context";
-import { fetchUser, updateUser } from "../../util/http";
+import {
+  fetchTripUsers,
+  fetchUser,
+  getTravellers,
+  updateUser,
+} from "../../util/http";
 
 import Input from "../ManageExpense/Input";
 import ErrorOverlay from "../UI/ErrorOverlay";
@@ -17,6 +22,7 @@ import FlatButton from "../UI/FlatButton";
 const ProfileForm = ({ navigation, onCancel }) => {
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
+  const TripCtx = useContext(TripContext);
   const freshlyCreated = UserCtx.freshlyCreated;
 
   let currencyPickerRef = undefined;

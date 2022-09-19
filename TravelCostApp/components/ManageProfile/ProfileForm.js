@@ -132,9 +132,13 @@ const ProfileForm = ({ navigation, onCancel }) => {
     </View>
   );
 
+  function joinInvite() {
+    UserCtx.setFreshlyCreatedTo(false);
+    navigation.navigate("Join", { id: "-NCIxnq4MrQjGB_unKiE" });
+  }
   const freshlyNavigationButtons = (
     <View style={styles.navButtonContainer}>
-      <FlatButton style={styles.navButton}>
+      <FlatButton style={styles.navButton} onPress={joinInvite}>
         I have an invitation from another Traveller!
       </FlatButton>
       <Button

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { Dimensions, StyleSheet, Text, TextInput, View } from "react-native";
 import { GlobalStyles } from "./../constants/styles";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
@@ -84,12 +84,12 @@ const styles = StyleSheet.create({
   },
   tripContainer: {
     flex: 1,
-    minHeight: 300,
+    minHeight: Dimensions.get("window").height / 4,
     margin: 16,
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   horizontalContainer: {
-    marginLeft: 100,
+    marginLeft: Dimensions.get("window").width / 3,
     flexDirection: "row",
     justifyContent: "space-between",
   },

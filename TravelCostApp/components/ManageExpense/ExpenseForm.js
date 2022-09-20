@@ -111,6 +111,7 @@ const ExpenseForm = ({
 
     // TODO: get these splitTravellers from inputForm (or a new modal)
     // TODO: get the exactList / percentList from inputForm (or a new modal)
+    // TODO: move the logic further down, so it only gets called once we really submit
 
     const splitTravellers = currentTravellers.filter((item) => {
       return item !== whoPaid;

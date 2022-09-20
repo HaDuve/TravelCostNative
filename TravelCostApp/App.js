@@ -40,7 +40,7 @@ function NotAuthenticatedStack() {
     <AuthStack.Navigator
       screenOptions={{
         headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
-        headerTintColor: "black",
+        headerTintColor: GlobalStyles.colors.textColor,
         contentStyle: { backgroundColor: GlobalStyles.colors.backgroundColor },
       }}
     >
@@ -70,7 +70,7 @@ function AuthenticatedStack() {
         <Stack.Navigator
           screenOptions={{
             headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
-            headerTintColor: "white",
+            headerTintColor: GlobalStyles.colors.backgroundColor,
           }}
         >
           <Stack.Screen
@@ -164,7 +164,7 @@ function Home() {
       initialRouteName={FirstScreen}
       screenOptions={({ navigation }) => ({
         headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
-        headerTintColor: "white",
+        headerTintColor: GlobalStyles.colors.backgroundColor,
         tabBarStyle: {
           backgroundColor: GlobalStyles.colors.gray500,
         },

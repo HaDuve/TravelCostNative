@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   amountContainer: {
     paddingHorizontal: 4,
     paddingVertical: 0,
-    backgroundColor: "white",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,

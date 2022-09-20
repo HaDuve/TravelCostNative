@@ -6,6 +6,7 @@ import React, { Component } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
+import { GlobalStyles } from "../../constants/styles";
 
 function renderExpenseItem(itemData) {
   const renderRightActions = (progress, dragX, onClick) => {
@@ -63,9 +64,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   actionText: {
-    color: "white",
+    color: GlobalStyles.colors.backgroundColor,
     fontSize: 16,
-    backgroundColor: "transparent",
+    //TODO: find another way to describe transparent, might cause android crash
+    // backgroundColor: "transparent",
     padding: 10,
   },
 });

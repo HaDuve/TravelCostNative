@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "white",
+    color: GlobalStyles.colors.backgroundColor,
     marginTop: 5,
     marginBottom: 24,
     textAlign: "center",

@@ -39,7 +39,8 @@ const styles = StyleSheet.create({
     overflow: "visible",
   },
   flat: {
-    backgroundColor: "transparent",
+    // TODO: find another way android
+    // backgroundColor: "transparent",
   },
   flatText: {
     color: GlobalStyles.colors.primary200,

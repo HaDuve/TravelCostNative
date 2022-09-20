@@ -7,10 +7,10 @@ const OnboardingScreen = ({ navigation }) => {
   return (
     <Onboarding
       onDone={() => navigation.replace("Signup")}
-      onSkip={() => navigation.replace("Signup")}
+      onSkip={() => navigation.replace("Login")}
       pages={[
         {
-          backgroundColor: "white",
+          backgroundColor: GlobalStyles.colors.backgroundColor,
           image: (
             <Image source={require("../assets/Onboarding/Illustration1.png")} />
           ),
@@ -19,7 +19,7 @@ const OnboardingScreen = ({ navigation }) => {
           titleStyles: titleStyle,
         },
         {
-          backgroundColor: "white",
+          backgroundColor: GlobalStyles.colors.backgroundColor,
           image: (
             <Image source={require("../assets/Onboarding/Illustration2.png")} />
           ),
@@ -29,7 +29,7 @@ const OnboardingScreen = ({ navigation }) => {
           titleStyles: titleStyle,
         },
         {
-          backgroundColor: "white",
+          backgroundColor: GlobalStyles.colors.backgroundColor,
           image: (
             <Image source={require("../assets/Onboarding/Illustration3.png")} />
           ),

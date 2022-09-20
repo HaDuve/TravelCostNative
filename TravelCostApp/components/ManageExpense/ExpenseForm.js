@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Alert, StyleSheet, Text, View, Pressable } from "react-native";
 import Input from "./Input";
 import Button from "../UI/Button";
@@ -15,6 +15,7 @@ import CurrencyPicker from "react-native-currency-picker";
 import { TripContext } from "../../store/trip-context";
 import { travellerToDropdown } from "../../util/util";
 import { G } from "react-native-svg";
+import { calcSplitList, splitExpense } from "../../util/split";
 
 const ExpenseForm = ({
   onCancel,
@@ -41,8 +42,8 @@ const ExpenseForm = ({
   const [whoPaid, setWhoPaid] = useState(
     defaultValues ? defaultValues.whoPaid : null
   );
-  const [items, setItems] = useState(dropdownItems);
 
+  const [items, setItems] = useState(dropdownItems);
   // dropdown for owe system
   const oweDropdown = [
     { label: "Self", value: "SELF" },
@@ -50,11 +51,11 @@ const ExpenseForm = ({
     { label: "Exact owe", value: "EXACT" },
     { label: "Percent owe", value: "PERCENT" },
   ];
-  const [openOwe, setOpenOwe] = useState(false);
-  const [oweValue, setOweValue] = useState(
-    defaultValues ? defaultValues.owe : null
+  const [openSplitTypes, setOpenSplitTypes] = useState(false);
+  const [splitType, setSplitType] = useState(
+    defaultValues ? defaultValues.splitType : null
   );
-  const [oweItems, setOweItems] = useState(oweDropdown);
+  const [splitItems, setSplitTypeItems] = useState(oweDropdown);
 
   const [inputs, setInputs] = useState({
     amount: {
@@ -105,6 +106,27 @@ const ExpenseForm = ({
   }
 
   function submitHandler() {
+    // calculate splits
+    let listSplits = [];
+
+    // TODO: get these splitTravellers from inputForm (or a new modal)
+    // TODO: get the exactList / percentList from inputForm (or a new modal)
+
+    const splitTravellers = currentTravellers.filter((item) => {
+      return item !== whoPaid;
+    });
+    const exactList = [1, 1, 2];
+    const percentList = [0.1, 0.7, 0.2];
+    listSplits = calcSplitList(
+      splitType,
+      inputs.amount.value,
+      whoPaid,
+      splitTravellers,
+      exactList,
+      percentList
+    );
+    if (listSplits) console.log("useEffect ~ listSplits", listSplits);
+
     const expenseData = {
       uid: AuthCtx.uid,
       amount: +inputs.amount.value,
@@ -183,6 +205,13 @@ const ExpenseForm = ({
   }
 
   function fastSubmit() {
+    // TODO: compute listSplits for fastSubmit
+    const splitMap = splitExpense(
+      "SELF",
+      inputs.amount.value,
+      UserCtx.userName,
+      listSplits
+    );
     const expenseData = {
       uid: AuthCtx.uid,
       amount: +inputs.amount.value,
@@ -316,6 +345,8 @@ const ExpenseForm = ({
     !inputs.date.isValid ||
     !inputs.description.isValid ||
     !inputs.currency.isValid;
+
+  const whoPaidValid = whoPaid !== null;
 
   return (
     <>
@@ -470,6 +501,7 @@ const ExpenseForm = ({
                 setOpen={setOpen}
                 setValue={setWhoPaid}
                 setItems={setItems}
+                onClose={setOpenSplitTypes}
                 listMode="MODAL"
                 modalProps={{
                   animationType: "slide",
@@ -490,33 +522,38 @@ const ExpenseForm = ({
                 style={styles.dropdown}
                 textStyle={styles.dropdownTextStyle}
               />
-              <DropDownPicker
-                open={openOwe}
-                value={oweValue}
-                items={oweItems}
-                setOpen={setOpenOwe}
-                setValue={setOweValue}
-                setItems={setOweItems}
-                listMode="MODAL"
-                modalProps={{
-                  animationType: "slide",
-                  presentationStyle: "pageSheet",
-                }}
-                searchable={false}
-                modalTitle={"How are the costs shared?"}
-                modalTitleStyle={{
-                  color: GlobalStyles.colors.textColor,
-                  fontSize: 32,
-                  fontWeight: "bold",
-                }}
-                modalContentContainerStyle={{
-                  backgroundColor: GlobalStyles.colors.backgroundColor,
-                }}
-                placeholder="Who Paid?"
-                containerStyle={styles.dropdownContainer}
-                style={styles.dropdown}
-                textStyle={styles.dropdownTextStyle}
-              />
+              {whoPaidValid && (
+                <DropDownPicker
+                  open={openSplitTypes}
+                  value={splitType}
+                  items={splitItems}
+                  setOpen={setOpenSplitTypes}
+                  setValue={setSplitType}
+                  setItems={setSplitTypeItems}
+                  // TODO: this always sends splitType=null because splitType only gets set next render
+                  // fix this somehow
+                  // onClose={splitHandler.bind(this, splitType)}
+                  listMode="MODAL"
+                  modalProps={{
+                    animationType: "slide",
+                    presentationStyle: "pageSheet",
+                  }}
+                  searchable={false}
+                  modalTitle={"How are the costs shared?"}
+                  modalTitleStyle={{
+                    color: GlobalStyles.colors.textColor,
+                    fontSize: 32,
+                    fontWeight: "bold",
+                  }}
+                  modalContentContainerStyle={{
+                    backgroundColor: GlobalStyles.colors.backgroundColor,
+                  }}
+                  placeholder="Shared expense?"
+                  containerStyle={styles.dropdownContainer}
+                  style={styles.dropdown}
+                  textStyle={styles.dropdownTextStyle}
+                />
+              )}
               {/* <Input
               style={styles.rowInput}
               label="Who paid?"

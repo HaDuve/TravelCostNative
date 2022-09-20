@@ -205,13 +205,6 @@ const ExpenseForm = ({
   }
 
   function fastSubmit() {
-    // TODO: compute listSplits for fastSubmit
-    const splitMap = splitExpense(
-      "SELF",
-      inputs.amount.value,
-      UserCtx.userName,
-      listSplits
-    );
     const expenseData = {
       uid: AuthCtx.uid,
       amount: +inputs.amount.value,

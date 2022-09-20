@@ -9,7 +9,6 @@ import IconButton from "../UI/IconButton";
 import { UserContext } from "../../store/user-context";
 import FlatButton from "../UI/FlatButton";
 import { getCatSymbol } from "../../util/category";
-// import ExpensePicker from "./ExpensePicker";
 
 import CurrencyPicker from "react-native-currency-picker";
 import { TripContext } from "../../store/trip-context";

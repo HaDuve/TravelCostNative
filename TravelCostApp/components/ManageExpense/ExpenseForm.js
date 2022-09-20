@@ -200,6 +200,40 @@ const ExpenseForm = ({
       expenseData.owePerc >= 0 &&
       expenseData.owePerc <= 100;
 
+    setInputs((curInputs) => {
+      return {
+        amount: {
+          value: curInputs.amount.value,
+          isValid: amountIsValid,
+        },
+        date: { value: curInputs.date.value, isValid: dateIsValid },
+        description: {
+          value: curInputs.description.value,
+          isValid: descriptionIsValid,
+        },
+        category: {
+          value: curInputs.category.value,
+          isValid: categoryIsValid,
+        },
+        country: {
+          value: curInputs.country.value,
+          isValid: countryIsValid,
+        },
+        currency: {
+          value: curInputs.currency.value,
+          isValid: currencyIsValid,
+        },
+        whoPaid: {
+          value: curInputs.whoPaid.value,
+          isValid: whoPaidIsValid,
+        },
+        owePerc: {
+          value: curInputs.owePerc.value,
+          isValid: owePercIsValid,
+        },
+      };
+    });
+
     if (!inputs.description.isValid) {
       inputChangedHandler("description", arg);
     }

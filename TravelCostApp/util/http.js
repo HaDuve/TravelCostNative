@@ -18,7 +18,6 @@ export async function fetchExpensesWithUIDs(tripid, uidlist) {
   const expenses = [];
   uidlist.forEach((uid) => {
     async function getExp(uid) {
-      console.log("getExp ~ uid", uid);
       const response = await axios.get(
         BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json"
       );
@@ -37,9 +36,7 @@ export async function fetchExpensesWithUIDs(tripid, uidlist) {
           uid: response.data[key].uid,
           calcAmount: response.data[key].calcAmount,
         };
-        console.log("getExp ~ expenseObj", expenseObj);
         expenses.push(expenseObj);
-        console.log("getExp ~ expenses!!!!", expenses);
       }
     }
     getExp(uid);
@@ -173,8 +170,6 @@ export async function getUIDs(tripid) {
 
 export async function getAllExpenses(tripid) {
   const uids = await getUIDs(tripid);
-  console.log("getAllExpenses ~ uids", uids);
   const expenses = await fetchExpensesWithUIDs(tripid, uids);
-  console.log("getAllExpenses ~ expenses", expenses);
   return expenses;
 }

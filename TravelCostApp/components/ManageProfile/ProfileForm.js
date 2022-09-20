@@ -28,7 +28,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
   let currencyPickerRef = undefined;
 
   function logoutHandler() {
-    return Alert.alert("Are your sure?", "Are you sure you want to logout?", [
+    return Alert.alert("Are you sure?", "Are you sure you want to logout?", [
       // The "No" button
       // Does nothing but dismiss the dialog when tapped
       {

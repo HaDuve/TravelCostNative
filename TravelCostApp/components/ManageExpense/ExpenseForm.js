@@ -9,9 +9,12 @@ import IconButton from "../UI/IconButton";
 import { UserContext } from "../../store/user-context";
 import FlatButton from "../UI/FlatButton";
 import { getCatSymbol } from "../../util/category";
+import DropDownPicker from "react-native-dropdown-picker";
 
 import CurrencyPicker from "react-native-currency-picker";
 import { TripContext } from "../../store/trip-context";
+import { travellerToDropdown } from "../../util/util";
+import { G } from "react-native-svg";
 
 const ExpenseForm = ({
   onCancel,
@@ -22,12 +25,23 @@ const ExpenseForm = ({
   pickedCat,
   navigation,
 }) => {
+  // set context
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
   const TripCtx = useContext(TripContext);
   const [hideAdvanced, sethideAdvanced] = useState(!isEditing);
 
+  // currencypicker reference for open/close
   let currencyPickerRef = undefined;
+
+  // dropdown for whoPaid system
+  const currentTravellers = TripCtx.travellers;
+  const dropdownItems = travellerToDropdown(currentTravellers);
+  const [open, setOpen] = useState(false);
+  const [whoPaid, setWhoPaid] = useState(
+    defaultValues ? defaultValues.whoPaid : null
+  );
+  const [items, setItems] = useState(dropdownItems);
 
   const [inputs, setInputs] = useState({
     amount: {
@@ -86,7 +100,7 @@ const ExpenseForm = ({
       category: inputs.category.value,
       country: inputs.country.value,
       currency: inputs.currency.value,
-      whoPaid: inputs.whoPaid.value, // TODO: convert this to uid
+      whoPaid: whoPaid, // TODO: convert this to uid
       owePerc: +inputs.owePerc.value,
     };
 
@@ -184,7 +198,7 @@ const ExpenseForm = ({
       category: inputs.category.value, // TODO: convert this to category
       country: inputs.country.value, // TODO: convert this to country
       currency: inputs.currency.value, // TODO: convert this to currency
-      whoPaid: inputs.whoPaid.value, // TODO: convert this to uid
+      whoPaid: whoPaid, // TODO: convert this to uid
       owePerc: +inputs.owePerc.value,
     };
     const amountIsValid = !isNaN(expenseData.amount) && expenseData.amount > 0;
@@ -443,7 +457,34 @@ const ExpenseForm = ({
           /> */}
 
           <View style={styles.inputsRowSecond}>
-            <Input
+            <DropDownPicker
+              open={open}
+              value={whoPaid}
+              items={items}
+              setOpen={setOpen}
+              setValue={setWhoPaid}
+              setItems={setItems}
+              listMode="MODAL"
+              modalProps={{
+                animationType: "slide",
+                presentationStyle: "pageSheet",
+              }}
+              searchable={false}
+              modalTitle={"Who paid?"}
+              modalTitleStyle={{
+                color: GlobalStyles.colors.textColor,
+                fontSize: 32,
+                fontWeight: "bold",
+              }}
+              modalContentContainerStyle={{
+                backgroundColor: GlobalStyles.colors.backgroundColor,
+              }}
+              placeholder="Who Paid?"
+              containerStyle={styles.dropdownContainer}
+              style={styles.dropdown}
+              textStyle={styles.dropdownTextStyle}
+            />
+            {/* <Input
               style={styles.rowInput}
               label="Who paid?"
               textInputConfig={{
@@ -451,7 +492,7 @@ const ExpenseForm = ({
                 value: inputs.whoPaid.value,
               }}
               invalid={!inputs.whoPaid.isValid}
-            />
+            /> */}
             <Input
               style={styles.rowInput}
               label="Owe Percent %"
@@ -563,5 +604,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontStyle: "italic",
     fontWeight: "300",
+  },
+  dropdownContainer: {
+    maxWidth: 160,
+    marginLeft: 16,
+  },
+  dropdown: {
+    backgroundColor: GlobalStyles.colors.gray500,
+    borderWidth: 0,
+    marginTop: 7,
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderRadius: 0,
+    borderBottomColor: GlobalStyles.colors.gray700,
+  },
+  dropdownTextStyle: {
+    fontSize: 18,
+    color: GlobalStyles.colors.primary500,
   },
 });

@@ -1,5 +1,5 @@
 import { useContext, useLayoutEffect, useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import { ScrollView } from "react-native";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 
@@ -42,15 +42,35 @@ const ManageExpense = ({ route, navigation }) => {
   }, [navigation, isEditing]);
 
   async function deleteExpenseHandler() {
-    setIsSubmitting(true);
-    try {
-      await deleteExpense(tripid, uid, editedExpenseId);
-      expenseCtx.deleteExpense(editedExpenseId);
-      navigation.goBack();
-    } catch (error) {
-      setError("Could not delete expense - please try again later!");
-      setIsSubmitting(false);
+    async function deleteExp() {
+      setIsSubmitting(true);
+      try {
+        await deleteExpense(tripid, uid, editedExpenseId);
+        expenseCtx.deleteExpense(editedExpenseId);
+        navigation.goBack();
+      } catch (error) {
+        setError("Could not delete expense - please try again later!");
+        setIsSubmitting(false);
+      }
     }
+    Alert.alert(
+      "Are you sure?",
+      "Are you sure you want to delete this expense?",
+      [
+        // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: "No",
+        },
+        // The "Yes" button
+        {
+          text: "Yes",
+          onPress: () => {
+            deleteExp();
+          },
+        },
+      ]
+    );
   }
 
   function cancelHandler() {
@@ -105,13 +125,6 @@ const ManageExpense = ({ route, navigation }) => {
           submitButtonLabel={isEditing ? "Update" : "Add"}
           defaultValues={selectedExpense}
         />
-        {/* <View style={{ padding: 40 }}>
-          <Text>
-            {tripCtx.travellers[0]}
-            {tripCtx.travellers[1]}
-            {tripCtx.travellers[2]}
-          </Text>
-        </View> */}
         {isEditing && (
           <View style={styles.deleteContainer}>
             <IconButton

@@ -63,7 +63,7 @@ function ExpenseItem({
         </View>
         <View style={styles.leftItem}>
           <Text style={[styles.textBase, styles.description]}>
-            {description} -- {whoPaid}
+            {description}
           </Text>
           <Text style={[styles.textBase, styles.secondaryText]}>
             {toShortFormat(date)}

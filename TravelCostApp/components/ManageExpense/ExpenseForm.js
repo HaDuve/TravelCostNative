@@ -44,7 +44,7 @@ const ExpenseForm = ({
       isValid: true,
     },
     category: {
-      value: defaultValues ? defaultValues.category : "",
+      value: defaultValues ? defaultValues.category : pickedCat,
       isValid: true,
     },
     country: {
@@ -400,14 +400,14 @@ const ExpenseForm = ({
             }}
             invalid={!inputs.date.isValid}
           />
-          <Input
+          {/* <Input
             label="Category"
             textInputConfig={{
               onChangeText: inputChangedHandler.bind(this, "category"),
               value: inputs.category.value,
             }}
             invalid={!inputs.category.isValid}
-          />
+          /> */}
 
           <View style={styles.inputsRowSecond}>
             <Input

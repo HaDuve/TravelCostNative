@@ -43,6 +43,19 @@ const ExpenseForm = ({
   );
   const [items, setItems] = useState(dropdownItems);
 
+  // dropdown for owe system
+  const oweDropdown = [
+    { label: "Self", value: "SELF" },
+    { label: "Shared equally", value: "EQUAL" },
+    { label: "Exact owe", value: "EXACT" },
+    { label: "Percent owe", value: "PERCENT" },
+  ];
+  const [openOwe, setOpenOwe] = useState(false);
+  const [oweValue, setOweValue] = useState(
+    defaultValues ? defaultValues.owe : null
+  );
+  const [oweItems, setOweItems] = useState(oweDropdown);
+
   const [inputs, setInputs] = useState({
     amount: {
       value: defaultValues ? defaultValues.amount?.toString() : "",
@@ -107,14 +120,11 @@ const ExpenseForm = ({
     const amountIsValid = !isNaN(expenseData.amount) && expenseData.amount > 0;
     const dateIsValid = expenseData.date.toString() !== "Invalid Date";
     const descriptionIsValid = expenseData.description.trim().length > 0;
-    const categoryIsValid = expenseData.description.trim().length > 0;
-    const countryIsValid = expenseData.description.trim().length > 0;
-    const currencyIsValid = expenseData.description.trim().length > 0;
-    const whoPaidIsValid = expenseData.description.trim().length > 0;
-    const owePercIsValid =
-      !isNaN(expenseData.owePerc) &&
-      expenseData.owePerc >= 0 &&
-      expenseData.owePerc <= 100;
+    const categoryIsValid = true;
+    const countryIsValid = true;
+    const currencyIsValid = true;
+    const whoPaidIsValid = true;
+    const owePercIsValid = true;
 
     if (
       !amountIsValid ||
@@ -204,14 +214,11 @@ const ExpenseForm = ({
     const amountIsValid = !isNaN(expenseData.amount) && expenseData.amount > 0;
     const dateIsValid = expenseData.date.toString() !== "Invalid Date";
     const descriptionIsValid = expenseData.description.trim().length > 0;
-    const categoryIsValid = expenseData.description.trim().length > 0;
-    const countryIsValid = expenseData.description.trim().length > 0;
-    const currencyIsValid = expenseData.description.trim().length > 0;
-    const whoPaidIsValid = expenseData.description.trim().length > 0;
-    const owePercIsValid =
-      !isNaN(expenseData.owePerc) &&
-      expenseData.owePerc >= 0 &&
-      expenseData.owePerc <= 100;
+    const categoryIsValid = true;
+    const countryIsValid = true;
+    const currencyIsValid = true;
+    const whoPaidIsValid = true;
+    const owePercIsValid = true;
 
     setInputs((curInputs) => {
       return {
@@ -308,116 +315,115 @@ const ExpenseForm = ({
     !inputs.amount.isValid ||
     !inputs.date.isValid ||
     !inputs.description.isValid ||
-    !inputs.category.isValid ||
-    !inputs.country.isValid ||
-    !inputs.currency.isValid ||
-    !inputs.whoPaid.isValid ||
-    !inputs.owePerc.isValid;
+    !inputs.currency.isValid;
 
   return (
-    <View style={styles.form}>
-      <View style={styles.inputsRow}>
-        <Input
-          style={styles.rowInput}
-          label="Price"
-          textInputConfig={{
-            keyboardType: "decimal-pad",
-            onChangeText: inputChangedHandler.bind(this, "amount"),
-            value: inputs.amount.value,
-          }}
-          invalid={!inputs.amount.isValid}
-          autoFocus={true}
-        />
-        <Pressable
-          style={styles.topCurrencyPressableContainer}
-          onPress={currencyPickerRef?.open()}
-        >
-          <Text style={styles.topCurrencyText}>{inputs.currency.value}</Text>
-        </Pressable>
-        <IconButton
-          icon={
-            defaultValues
-              ? getCatSymbol(defaultValues.category)
-              : getCatSymbol(pickedCat)
-          }
-          color={GlobalStyles.colors.primary500}
-          size={36}
-          onPress={() => {
-            navigation.navigate("CategoryPick");
-          }}
-        />
-      </View>
-      <View style={styles.advancedRow}>
-        <IconButton
-          icon={
-            hideAdvanced
-              ? "arrow-down-circle-outline"
-              : "arrow-forward-circle-outline"
-          }
-          color={GlobalStyles.colors.primary500}
-          size={28}
-          onPress={toggleAdvancedHandler}
-        />
-        {hideAdvanced && (
-          <Text style={styles.advancedText}>Show more options</Text>
-        )}
-        {!hideAdvanced && (
-          <Text style={styles.advancedText}>Show less options</Text>
-        )}
-      </View>
-      {/* toggleable content */}
-      {!hideAdvanced && (
-        <>
-          <View style={styles.currencyContainer}>
-            <Text style={styles.currencyLabel}>Currency</Text>
-            <CurrencyPicker
-              currencyPickerRef={(ref) => {
-                currencyPickerRef = ref;
-              }}
-              enable={true}
-              darkMode={false}
-              currencyCode={inputs.currency.value}
-              showFlag={true}
-              showCurrencyName={true}
-              showCurrencyCode={false}
-              onSelectCurrency={(data) => {
-                inputChangedHandler("currency", data.code);
-              }}
-              onOpen={() => {
-                console.log("Open");
-              }}
-              onClose={() => {
-                console.log("Close");
-              }}
-              showNativeSymbol={true}
-              showSymbol={false}
-              containerStyle={{
-                container: { paddingLeft: 4, paddingTop: 4 },
-                flagWidth: 25,
-                currencyCodeStyle: { color: GlobalStyles.colors.primary500 },
-                currencyNameStyle: { color: GlobalStyles.colors.primary500 },
-                symbolStyle: { color: GlobalStyles.colors.primary500 },
-                symbolNativeStyle: { color: GlobalStyles.colors.primary500 },
-              }}
-              modalStyle={{
-                container: {},
-                searchStyle: {},
-                tileStyle: {},
-                itemStyle: {
-                  itemContainer: {},
-                  flagWidth: 25,
-                  currencyCodeStyle: {},
-                  currencyNameStyle: {},
-                  symbolStyle: {},
-                  symbolNativeStyle: {},
-                },
-              }}
-              title={"Currency"}
-              searchPlaceholder={"Search"}
-              showCloseButton={true}
-              showModalTitle={true}
+    <>
+      <View style={styles.form}>
+        <View style={styles.inputsRow}>
+          <Input
+            style={styles.rowInput}
+            label="Price"
+            textInputConfig={{
+              keyboardType: "decimal-pad",
+              onChangeText: inputChangedHandler.bind(this, "amount"),
+              value: inputs.amount.value,
+            }}
+            invalid={!inputs.amount.isValid}
+            autoFocus={true}
+          />
+          <Pressable
+            style={styles.topCurrencyPressableContainer}
+            onPress={currencyPickerRef?.open()}
+          >
+            <Text style={styles.topCurrencyText}>{inputs.currency.value}</Text>
+          </Pressable>
+          <IconButton
+            icon={
+              defaultValues
+                ? getCatSymbol(defaultValues.category)
+                : getCatSymbol(pickedCat)
+            }
+            color={GlobalStyles.colors.primary500}
+            size={36}
+            onPress={() => {
+              navigation.navigate("CategoryPick");
+            }}
+          />
+        </View>
+        <Pressable onPress={toggleAdvancedHandler}>
+          <View style={styles.advancedRow}>
+            <IconButton
+              icon={
+                hideAdvanced
+                  ? "arrow-down-circle-outline"
+                  : "arrow-forward-circle-outline"
+              }
+              color={GlobalStyles.colors.primary500}
+              size={28}
+              onPress={toggleAdvancedHandler}
             />
-            {/* <Input
+            {hideAdvanced && (
+              <Text style={styles.advancedText}>Show more options</Text>
+            )}
+            {!hideAdvanced && (
+              <Text style={styles.advancedText}>Show less options</Text>
+            )}
+          </View>
+        </Pressable>
+        {/* toggleable content */}
+        {!hideAdvanced && (
+          <>
+            <View style={styles.currencyContainer}>
+              <Text style={styles.currencyLabel}>Currency</Text>
+              <CurrencyPicker
+                currencyPickerRef={(ref) => {
+                  currencyPickerRef = ref;
+                }}
+                enable={true}
+                darkMode={false}
+                currencyCode={inputs.currency.value}
+                showFlag={true}
+                showCurrencyName={true}
+                showCurrencyCode={false}
+                onSelectCurrency={(data) => {
+                  inputChangedHandler("currency", data.code);
+                }}
+                onOpen={() => {
+                  console.log("Open");
+                }}
+                onClose={() => {
+                  console.log("Close");
+                }}
+                showNativeSymbol={true}
+                showSymbol={false}
+                containerStyle={{
+                  container: { paddingLeft: 4, paddingTop: 4 },
+                  flagWidth: 25,
+                  currencyCodeStyle: { color: GlobalStyles.colors.primary500 },
+                  currencyNameStyle: { color: GlobalStyles.colors.primary500 },
+                  symbolStyle: { color: GlobalStyles.colors.primary500 },
+                  symbolNativeStyle: { color: GlobalStyles.colors.primary500 },
+                }}
+                modalStyle={{
+                  container: {},
+                  searchStyle: {},
+                  tileStyle: {},
+                  itemStyle: {
+                    itemContainer: {},
+                    flagWidth: 25,
+                    currencyCodeStyle: {},
+                    currencyNameStyle: {},
+                    symbolStyle: {},
+                    symbolNativeStyle: {},
+                  },
+                }}
+                title={"Currency"}
+                searchPlaceholder={"Search"}
+                showCloseButton={true}
+                showModalTitle={true}
+              />
+              {/* <Input
               style={styles.rowInput}
               label="Currency"
               textInputConfig={{
@@ -426,28 +432,28 @@ const ExpenseForm = ({
               }}
               invalid={!inputs.currency.isValid}
             /> */}
-          </View>
-          <Input
-            label="Description"
-            textInputConfig={{
-              multiline: true,
-              onChangeText: inputChangedHandler.bind(this, "description"),
-              value: inputs.description.value,
-            }}
-            invalid={!inputs.description.isValid}
-          />
-          <Input
-            style={styles.rowInput}
-            label="Date"
-            textInputConfig={{
-              placeholder: "YYYY-MM-DD",
-              maxLength: 10,
-              onChangeText: inputChangedHandler.bind(this, "date"),
-              value: inputs.date.value,
-            }}
-            invalid={!inputs.date.isValid}
-          />
-          {/* <Input
+            </View>
+            <Input
+              label="Description"
+              textInputConfig={{
+                multiline: true,
+                onChangeText: inputChangedHandler.bind(this, "description"),
+                value: inputs.description.value,
+              }}
+              invalid={!inputs.description.isValid}
+            />
+            <Input
+              style={styles.rowInput}
+              label="Date"
+              textInputConfig={{
+                placeholder: "YYYY-MM-DD",
+                maxLength: 10,
+                onChangeText: inputChangedHandler.bind(this, "date"),
+                value: inputs.date.value,
+              }}
+              invalid={!inputs.date.isValid}
+            />
+            {/* <Input
             label="Category"
             textInputConfig={{
               onChangeText: inputChangedHandler.bind(this, "category"),
@@ -456,35 +462,62 @@ const ExpenseForm = ({
             invalid={!inputs.category.isValid}
           /> */}
 
-          <View style={styles.inputsRowSecond}>
-            <DropDownPicker
-              open={open}
-              value={whoPaid}
-              items={items}
-              setOpen={setOpen}
-              setValue={setWhoPaid}
-              setItems={setItems}
-              listMode="MODAL"
-              modalProps={{
-                animationType: "slide",
-                presentationStyle: "pageSheet",
-              }}
-              searchable={false}
-              modalTitle={"Who paid?"}
-              modalTitleStyle={{
-                color: GlobalStyles.colors.textColor,
-                fontSize: 32,
-                fontWeight: "bold",
-              }}
-              modalContentContainerStyle={{
-                backgroundColor: GlobalStyles.colors.backgroundColor,
-              }}
-              placeholder="Who Paid?"
-              containerStyle={styles.dropdownContainer}
-              style={styles.dropdown}
-              textStyle={styles.dropdownTextStyle}
-            />
-            {/* <Input
+            <View style={styles.inputsRowSecond}>
+              <DropDownPicker
+                open={open}
+                value={whoPaid}
+                items={items}
+                setOpen={setOpen}
+                setValue={setWhoPaid}
+                setItems={setItems}
+                listMode="MODAL"
+                modalProps={{
+                  animationType: "slide",
+                  presentationStyle: "pageSheet",
+                }}
+                searchable={false}
+                modalTitle={"Who paid?"}
+                modalTitleStyle={{
+                  color: GlobalStyles.colors.textColor,
+                  fontSize: 32,
+                  fontWeight: "bold",
+                }}
+                modalContentContainerStyle={{
+                  backgroundColor: GlobalStyles.colors.backgroundColor,
+                }}
+                placeholder="Who Paid?"
+                containerStyle={styles.dropdownContainer}
+                style={styles.dropdown}
+                textStyle={styles.dropdownTextStyle}
+              />
+              <DropDownPicker
+                open={openOwe}
+                value={oweValue}
+                items={oweItems}
+                setOpen={setOpenOwe}
+                setValue={setOweValue}
+                setItems={setOweItems}
+                listMode="MODAL"
+                modalProps={{
+                  animationType: "slide",
+                  presentationStyle: "pageSheet",
+                }}
+                searchable={false}
+                modalTitle={"How are the costs shared?"}
+                modalTitleStyle={{
+                  color: GlobalStyles.colors.textColor,
+                  fontSize: 32,
+                  fontWeight: "bold",
+                }}
+                modalContentContainerStyle={{
+                  backgroundColor: GlobalStyles.colors.backgroundColor,
+                }}
+                placeholder="Who Paid?"
+                containerStyle={styles.dropdownContainer}
+                style={styles.dropdown}
+                textStyle={styles.dropdownTextStyle}
+              />
+              {/* <Input
               style={styles.rowInput}
               label="Who paid?"
               textInputConfig={{
@@ -493,7 +526,8 @@ const ExpenseForm = ({
               }}
               invalid={!inputs.whoPaid.isValid}
             /> */}
-            <Input
+
+              {/* <Input
               style={styles.rowInput}
               label="Owe Percent %"
               textInputConfig={{
@@ -501,15 +535,16 @@ const ExpenseForm = ({
                 value: inputs.owePerc.value,
               }}
               invalid={!inputs.owePerc.isValid}
-            />
-          </View>
-        </>
-      )}
-      {formIsInvalid && !hideAdvanced && (
-        <Text style={styles.errorText}>
-          Invalid input values - please check your entered data!
-        </Text>
-      )}
+            /> */}
+            </View>
+          </>
+        )}
+        {formIsInvalid && !hideAdvanced && (
+          <Text style={styles.errorText}>
+            Invalid input values - please check your entered data!
+          </Text>
+        )}
+      </View>
       <View style={styles.buttonContainer}>
         <FlatButton style={styles.button} onPress={onCancel}>
           Cancel
@@ -518,7 +553,7 @@ const ExpenseForm = ({
           {submitButtonLabel}
         </Button>
       </View>
-    </View>
+    </>
   );
 };
 
@@ -577,10 +612,11 @@ const styles = StyleSheet.create({
     margin: 8,
   },
   buttonContainer: {
+    flex: 1,
     flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    marginTop: 8,
+    justifyContent: "space-evenly",
+    alignItems: "baseline",
+    marginTop: 36,
   },
   currencyContainer: {
     flex: 1,
@@ -607,12 +643,14 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     maxWidth: 160,
+    marginVertical: 12,
     marginLeft: 16,
+    marginRight: 12,
   },
   dropdown: {
     backgroundColor: GlobalStyles.colors.gray500,
     borderWidth: 0,
-    marginTop: 7,
+    marginTop: 12,
     marginBottom: 10,
     borderBottomWidth: 1,
     borderRadius: 0,

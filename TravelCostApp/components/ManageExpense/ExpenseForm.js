@@ -83,9 +83,9 @@ const ExpenseForm = ({
       amount: +inputs.amount.value,
       date: new Date(inputs.date.value),
       description: inputs.description.value,
-      category: inputs.category.value, // TODO: convert this to category
-      country: inputs.country.value, // TODO: convert this to country
-      currency: inputs.currency.value, // TODO: convert this to currency
+      category: inputs.category.value,
+      country: inputs.country.value,
+      currency: inputs.currency.value,
       whoPaid: inputs.whoPaid.value, // TODO: convert this to uid
       owePerc: +inputs.owePerc.value,
     };

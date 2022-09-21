@@ -115,7 +115,7 @@ const ManageExpense = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <>
         <ExpenseForm
           onCancel={cancelHandler}
           onSubmit={confirmHandler}
@@ -135,7 +135,7 @@ const ManageExpense = ({ route, navigation }) => {
             />
           </View>
         )}
-      </ScrollView>
+      </>
     </View>
   );
 };

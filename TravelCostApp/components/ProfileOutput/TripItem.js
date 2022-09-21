@@ -15,6 +15,7 @@ import { TripContext } from "../../store/trip-context";
 import { formatExpenseString } from "../../util/string";
 import { fetchTrip, getTravellers } from "../../util/http";
 import { onShare } from "./ShareTrip";
+import { calcOpenSplitsTable } from "../../util/split";
 
 function TripItem({
   tripid,
@@ -67,6 +68,12 @@ function TripItem({
         onPress: () => {
           tripCtx.setCurrentTrip(tripid, tripData);
           console.log(`set ${tripName} ${tripid} as active!`);
+        },
+      },
+      {
+        text: "Calculate open splits!",
+        onPress: () => {
+          calcOpenSplitsTable(tripid);
         },
       },
     ]);

@@ -23,18 +23,22 @@ export async function fetchExpensesWithUIDs(tripid, uidlist) {
       );
 
       for (const key in response.data) {
+        const r = response.data[key];
         const expenseObj = {
           id: key,
-          amount: response.data[key].amount,
-          date: new Date(response.data[key].date),
-          description: response.data[key].description,
-          category: response.data[key].category,
-          country: response.data[key].country,
-          currency: response.data[key].currency,
-          whoPaid: response.data[key].whoPaid,
-          owePerc: response.data[key].owePerc,
-          uid: response.data[key].uid,
-          calcAmount: response.data[key].calcAmount,
+          amount: r.amount,
+          date: new Date(r.date),
+          description: r.description,
+          category: r.category,
+          country: r.country,
+          currency: r.currency,
+          whoPaid: r.whoPaid,
+          owePerc: r.owePerc,
+          uid: r.uid,
+          calcAmount: r.calcAmount,
+          splitType: r.splitType,
+          listEQUAL: r.listEQUAL,
+          splitList: r.splitList,
         };
         expenses.push(expenseObj);
       }

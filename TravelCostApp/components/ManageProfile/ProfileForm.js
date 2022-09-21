@@ -138,7 +138,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
 
   function joinInvite() {
     // TODO: this hardcoded join
-    navigation.navigate("Join", { id: "-NCIxnq4MrQjGB_unKiE" });
+    navigation.navigate("Join", { id: "-NCU-c47x12mUih6A1Y6" });
   }
 
   const freshlyNavigationButtons = (

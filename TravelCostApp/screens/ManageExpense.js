@@ -87,6 +87,17 @@ const ManageExpense = ({ route, navigation }) => {
       const calcAmount = expenseData.amount * rate;
       expenseData.calcAmount = calcAmount;
 
+      // change the splits to calcAmount aswell, nobody cares original currency
+      expenseData.splitList.forEach((split) => {
+        console.log("confirmHandler ~ split", split);
+        const calcAmount = split.amount * rate;
+        split.amount = calcAmount.toFixed(2);
+      });
+      console.log(
+        "expenseData.splitList.forEach ~ expenseData.splitList after rates",
+        expenseData.splitList
+      );
+
       if (isEditing) {
         expenseCtx.updateExpense(editedExpenseId, expenseData);
         await updateExpense(tripid, uid, editedExpenseId, expenseData);

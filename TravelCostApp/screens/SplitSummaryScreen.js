@@ -1,5 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-import { Alert, FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  Dimensions,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import Button from "../components/UI/Button";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import FlatButton from "../components/UI/FlatButton";
@@ -58,7 +65,11 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.titleText}> Open splits!</Text>
-      <FlatList data={splits} renderItem={renderSplitItem} />
+      <FlatList
+        style={{ maxHeight: Dimensions.get("screen").height / 1.5 }}
+        data={splits}
+        renderItem={renderSplitItem}
+      />
       <View style={styles.buttonContainer}>
         <FlatButton
           onPress={() => {

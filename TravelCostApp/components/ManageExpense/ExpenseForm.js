@@ -334,8 +334,7 @@ const ExpenseForm = ({
   // NOTE: for DEBUG the pickers
   const showWhoPaid = inputs.amount.value !== "";
   const whoPaidValid = whoPaid !== null;
-  // const splitTypeEqual = splitType === "EQUAL";
-  const splitTypeEqual = true;
+  const splitTypeEqual = splitType === "EQUAL";
   // hide the pickers
   const hidePickers = true;
 
@@ -548,7 +547,7 @@ const ExpenseForm = ({
                 />
               )}
             </View>
-            {splitTypeEqual && (
+            {true && (
               <DropDownPicker
                 open={openEQUAL}
                 value={listEQUAL}
@@ -616,6 +615,11 @@ const ExpenseForm = ({
                         {itemData.item.userName}
                       </Text>
                       <Input
+                        inputStyle={
+                          splitTypeEqual && {
+                            color: GlobalStyles.colors.textColor,
+                          }
+                        }
                         style={[
                           styles.rowInput,
                           {

@@ -1,10 +1,14 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import IconButton from "../UI/IconButton";
 
 const AddExpenseButton = ({ navigation }) => {
   return (
-    <View>
+    <Pressable
+      onPress={() => {
+        navigation.navigate("CategoryPick");
+      }}
+    >
       <View style={styles.addButton}>
         <IconButton
           icon="add"
@@ -16,7 +20,7 @@ const AddExpenseButton = ({ navigation }) => {
         />
       </View>
       <View style={styles.tempGrayBar2}></View>
-    </View>
+    </Pressable>
   );
 };
 

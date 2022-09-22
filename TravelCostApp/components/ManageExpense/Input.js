@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { Keyboard, StyleSheet, Text, TextInput, View } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 
 const Input = ({
@@ -21,6 +21,9 @@ const Input = ({
       </Text>
       <TextInput
         style={[inputStyles, invalid && styles.invalidInput]}
+        returnKeyLabel="Done"
+        returnKeyType="done"
+        onSubmitEditing={Keyboard.dismiss}
         {...textInputConfig}
         autoFocus={autoFocus ? autoFocus : false}
       />

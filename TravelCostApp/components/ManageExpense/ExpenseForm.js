@@ -184,11 +184,11 @@ const ExpenseForm = ({
     const amountIsValid = !isNaN(expenseData.amount) && expenseData.amount > 0;
     const dateIsValid = expenseData.date.toString() !== "Invalid Date";
     const descriptionIsValid = expenseData.description.trim().length > 0;
-    // unused items below
+    const whoPaidIsValid = expenseData.whoPaid !== null;
+
     const categoryIsValid = true;
     const countryIsValid = true;
     const currencyIsValid = true;
-    const whoPaidIsValid = true;
     const owePercIsValid = true;
 
     if (
@@ -288,7 +288,7 @@ const ExpenseForm = ({
       inputChangedHandler("currency", UserCtx.lastCurrency);
     }
     if (!inputs.whoPaid.isValid) {
-      inputChangedHandler("whoPaid", UserCtx.userName);
+      setWhoPaid(UserCtx.userName);
     }
     if (!inputs.owePerc.isValid) {
       inputChangedHandler("owePerc", "0");
@@ -453,6 +453,7 @@ const ExpenseForm = ({
               textInputConfig={{
                 onChangeText: inputChangedHandler.bind(this, "description"),
                 value: inputs.description.value,
+                // multiline: true,
               }}
               invalid={!inputs.description.isValid}
             />
@@ -479,7 +480,14 @@ const ExpenseForm = ({
             <View style={styles.inputsRowSecond}>
               {showWhoPaid && (
                 <View style={styles.whoPaidContainer}>
-                  <Text style={styles.currencyLabel}>Who paid?</Text>
+                  <Text
+                    style={[
+                      styles.currencyLabel,
+                      !inputs.whoPaid.isValid && styles.invalidLabel,
+                    ]}
+                  >
+                    Who paid?
+                  </Text>
                   <DropDownPicker
                     open={open}
                     value={whoPaid}
@@ -505,7 +513,11 @@ const ExpenseForm = ({
                     }}
                     placeholder="Who Paid?"
                     containerStyle={styles.dropdownContainer}
-                    style={styles.dropdown}
+                    style={
+                      !inputs.whoPaid.isValid
+                        ? [styles.dropdown, styles.invalidInput]
+                        : styles.dropdown
+                    }
                     textStyle={styles.dropdownTextStyle}
                   />
                 </View>
@@ -751,7 +763,8 @@ const styles = StyleSheet.create({
     fontWeight: "300",
   },
   dropdownContainer: {
-    maxWidth: 160,
+    marginTop: -12,
+    maxWidth: Dimensions.get("screen").width / 1.27,
     marginRight: 12,
   },
   dropdown: {
@@ -776,5 +789,11 @@ const styles = StyleSheet.create({
     marginLeft: 36,
     flexDirection: "row",
     justifyContent: "flex-start",
+  },
+  invalidLabel: {
+    color: GlobalStyles.colors.error500,
+  },
+  invalidInput: {
+    backgroundColor: GlobalStyles.colors.error50,
   },
 });

@@ -133,5 +133,5 @@ export async function calcOpenSplitsTable(tripid) {
       }
     });
   });
-  console.log("calcOpenSplitsTable ~ openSplits", openSplits);
+  return openSplits;
 }

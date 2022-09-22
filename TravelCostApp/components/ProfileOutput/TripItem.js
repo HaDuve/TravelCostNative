@@ -81,7 +81,7 @@ function TripItem({
       {
         text: "Calculate open splits!",
         onPress: () => {
-          navigation.navigate("SplitSummary");
+          navigation.navigate("SplitSummary", { tripid: tripid });
         },
       },
     ]);

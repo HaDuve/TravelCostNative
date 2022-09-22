@@ -48,7 +48,7 @@ function RecentExpenses({ navigation }) {
         const expenses = await getAllExpenses(tripid);
         expensesCtx.setExpenses(expenses);
       } catch (error) {
-        setError("Could not fetch data from the web database!" + error);
+        setError("Could not fetch expenses from the web database! " + error);
       }
       setIsFetching(false);
     }

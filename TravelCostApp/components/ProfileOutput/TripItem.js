@@ -16,6 +16,7 @@ import { formatExpenseString } from "../../util/string";
 import { fetchTrip, getTravellers } from "../../util/http";
 import { onShare } from "./ShareTrip";
 import { calcOpenSplitsTable } from "../../util/split";
+import LoadingOverlay from "../UI/LoadingOverlay";
 
 function TripItem({
   tripid,
@@ -36,15 +37,22 @@ function TripItem({
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const [travellers, setTravellers] = useState([]);
+  const [isFetching, setIsFetching] = useState(true);
 
   useEffect(() => {
     async function getTripTravellers() {
-      const listTravellers = await getTravellers(tripid);
-      const objTravellers = [];
-      listTravellers.forEach((traveller) => {
-        objTravellers.push({ userName: traveller });
-      });
-      setTravellers(objTravellers);
+      setIsFetching(true);
+      try {
+        const listTravellers = await getTravellers(tripid);
+        const objTravellers = [];
+        listTravellers.forEach((traveller) => {
+          objTravellers.push({ userName: traveller });
+        });
+        setTravellers(objTravellers);
+      } catch (error) {
+        console.log("error caught while get Travellers!");
+      }
+      setIsFetching(false);
     }
     getTripTravellers();
   }, []);
@@ -73,7 +81,7 @@ function TripItem({
       {
         text: "Calculate open splits!",
         onPress: () => {
-          calcOpenSplitsTable(tripid);
+          navigation.navigate("SplitSummary");
         },
       },
     ]);
@@ -83,6 +91,10 @@ function TripItem({
     tripName === tripCtx.tripName
       ? { borderWidth: 1, borderColor: GlobalStyles.colors.primary400 }
       : {};
+
+  if (isFetching) {
+    return <LoadingOverlay />;
+  }
 
   function renderTravellers(item) {
     return (

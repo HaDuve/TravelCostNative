@@ -28,6 +28,7 @@ import JoinTrip from "./screens/JoinTrip";
 import ShareTripButton from "./components/ProfileOutput/ShareTrip";
 import OverviewScreen from "./screens/OverviewScreen";
 import CategoryPickScreen from "./screens/CategoryPickScreen";
+import SplitSummaryScreen from "./screens/SplitSummaryScreen";
 
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
@@ -113,6 +114,14 @@ function AuthenticatedStack() {
           <Stack.Screen
             name="Share"
             component={ShareTripButton}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
+          <Stack.Screen
+            name="SplitSummary"
+            component={SplitSummaryScreen}
             options={{
               headerShown: false,
               presentation: "modal",

@@ -48,9 +48,9 @@ const ProfileScreen = ({ route, navigation, param }) => {
           <Text style={styles.tripListTitle}>My Trips</Text>
           <IconButton
             icon={"create-outline"}
-            size={24}
+            size={36}
             color={GlobalStyles.colors.primary500}
-            style={styles.button}
+            buttonStyle={styles.createButton}
             onPress={navigation.navigate.bind(this, "ManageTrip")}
           />
         </View>
@@ -108,5 +108,9 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderTopColor: GlobalStyles.colors.primary200,
     alignItems: "center",
+  },
+  createButton: {
+    marginTop: -12,
+    marginRight: 16,
   },
 });

@@ -39,9 +39,7 @@ function renderExpenseItem(itemData) {
 }
 
 function onClick({ item, index }) {
-  Alert.alert(
-    "Deleteswipe not yet implemented, sorry! :( Please delete via touch menu"
-  );
+  Alert.alert("Swipe to delete function coming soon...");
 }
 
 // Displays a list of all expenses.

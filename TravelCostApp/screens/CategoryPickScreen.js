@@ -1,4 +1,12 @@
-import { StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  Dimensions,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import React from "react";
 import IconButton from "../components/UI/IconButton";
 import Button from "../components/UI/Button";
@@ -8,80 +16,94 @@ import { GlobalStyles } from "../constants/styles";
 const CategoryPickScreen = ({ route, navigation }) => {
   const { tempPickedCat, tempValues } = route.params ? route.params : "null";
 
+  const CATLIST = [
+    {
+      icon: "fast-food-outline",
+      color: GlobalStyles.colors.textColor,
+      cat: "food",
+      catString: "Food",
+    },
+    {
+      icon: "airplane-outline",
+      color: GlobalStyles.colors.textColor,
+      cat: "international-travel",
+      catString: "International Travel",
+    },
+    {
+      icon: "bed-outline",
+      color: GlobalStyles.colors.textColor,
+      cat: "accomodation",
+      catString: "Accomodation",
+    },
+    {
+      icon: "car-outline",
+      color: GlobalStyles.colors.textColor,
+      cat: "national-travel",
+      catString: "National Travel",
+    },
+    {
+      icon: "basket-outline",
+      color: GlobalStyles.colors.textColor,
+      cat: "other",
+      catString: "Other",
+    },
+    {
+      icon: "add-outline",
+      color: GlobalStyles.colors.textColor,
+      cat: "newCat",
+      catString: "New Category",
+    },
+  ];
+
+  function catPressHandler(item) {
+    if (item.cat === "newCat") {
+      Alert.alert("New Category function coming soon... ");
+    } else
+      navigation.navigate("ManageExpense", {
+        pickedCat: item.cat,
+      });
+  }
+
+  function renderCatItem(itemData) {
+    const item = itemData.item;
+    console.log("renderCatItem ~ item", item);
+    return (
+      <View
+        style={[
+          styles.itemContainer,
+          styles.buttonStyle,
+          GlobalStyles.shadow,
+          styles.widthConstraint,
+        ]}
+      >
+        <Pressable
+          style={({ pressed }) => [
+            styles.widthConstraint,
+            pressed && styles.pressed,
+          ]}
+          onPress={catPressHandler.bind(this, item)}
+        >
+          <View style={styles.centerStyle}>
+            <IconButton
+              icon={item.icon}
+              size={42}
+              color={item.color}
+              onPress={catPressHandler.bind(this, item)}
+            ></IconButton>
+            <Text style={styles.itemText}>{item.catString}</Text>
+          </View>
+        </Pressable>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <View style={styles.rowContainer}>
-        <IconButton
-          icon={"fast-food-outline"}
-          size={34}
-          color={GlobalStyles.colors.textColor}
-          buttonStyle={[styles.buttonStyle, GlobalStyles.shadow]}
-          onPress={() => {
-            navigation.navigate("ManageExpense", {
-              pickedCat: "food",
-            });
-          }}
-        ></IconButton>
-        <IconButton
-          icon={"airplane-outline"}
-          size={34}
-          color={GlobalStyles.colors.textColor}
-          buttonStyle={[styles.buttonStyle, GlobalStyles.shadow]}
-          onPress={() => {
-            navigation.navigate("ManageExpense", {
-              pickedCat: "international-travel",
-            });
-          }}
-        ></IconButton>
-      </View>
-      <View style={styles.rowContainer}>
-        <IconButton
-          icon={"bed-outline"}
-          size={34}
-          color={GlobalStyles.colors.textColor}
-          buttonStyle={[styles.buttonStyle, GlobalStyles.shadow]}
-          onPress={() => {
-            navigation.navigate("ManageExpense", {
-              pickedCat: "accomodation",
-            });
-          }}
-        ></IconButton>
-        <IconButton
-          icon={"car-outline"}
-          size={34}
-          color={GlobalStyles.colors.textColor}
-          buttonStyle={[styles.buttonStyle, GlobalStyles.shadow]}
-          onPress={() => {
-            navigation.navigate("ManageExpense", {
-              pickedCat: "national-travel",
-            });
-          }}
-        ></IconButton>
-      </View>
-      <View style={styles.rowContainer}>
-        <IconButton
-          icon={"basket-outline"}
-          size={34}
-          color={GlobalStyles.colors.textColor}
-          buttonStyle={[styles.buttonStyle, GlobalStyles.shadow]}
-          onPress={() => {
-            navigation.navigate("ManageExpense", {
-              pickedCat: "other",
-            });
-          }}
-        ></IconButton>
-        <IconButton
-          icon={"md-ice-cream-outline"}
-          size={34}
-          color={GlobalStyles.colors.textColor}
-          buttonStyle={[styles.buttonStyle, GlobalStyles.shadow]}
-          onPress={() => {
-            navigation.navigate("ManageExpense", {
-              pickedCat: "other",
-            });
-          }}
-        ></IconButton>
-      </View>
+      <FlatList
+        numColumns={2}
+        data={CATLIST}
+        renderItem={renderCatItem}
+      ></FlatList>
       <View style={styles.buttonContainer}>
         <FlatButton
           onPress={() => {
@@ -91,6 +113,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
           Cancel
         </FlatButton>
         <Button
+          buttonStyle={styles.continueButtonStyle}
           onPress={() => {
             navigation.navigate("ManageExpense", {
               pickedCat: "other",
@@ -107,16 +130,27 @@ const CategoryPickScreen = ({ route, navigation }) => {
 export default CategoryPickScreen;
 
 const styles = StyleSheet.create({
+  pressed: {
+    opacity: 0.4,
+  },
   container: {
     flex: 1,
     padding: 4,
     paddingTop: 24,
     paddingHorizontal: 20,
   },
+  widthConstraint: {
+    minWidth: Dimensions.get("window").width / 2.7,
+    maxWidth: Dimensions.get("window").width / 2.7,
+  },
   rowContainer: {
     paddingVertical: 12,
     flexDirection: "row",
     justifyContent: "space-around",
+    alignItems: "center",
+  },
+  centerStyle: {
+    justifyContent: "flex-start",
     alignItems: "center",
   },
   buttonContainer: {
@@ -129,7 +163,25 @@ const styles = StyleSheet.create({
   buttonStyle: {
     backgroundColor: GlobalStyles.colors.gray500,
     borderRadius: 0,
-    paddingVertical: 20,
-    paddingHorizontal: 50,
+    paddingBottom: 8,
+    paddingHorizontal: 4,
+  },
+  itemContainer: {
+    flex: 1,
+    padding: 0,
+    margin: 16,
+  },
+  onPressStyleItem: {
+    backgroundColor: GlobalStyles.colors.primary400,
+  },
+  itemText: {
+    fontSize: 16,
+    color: GlobalStyles.colors.textColor,
+    fontWeight: "200",
+    fontStyle: "italic",
+  },
+  continueButtonStyle: {
+    paddingVertical: 16,
+    paddingHorizontal: 44,
   },
 });

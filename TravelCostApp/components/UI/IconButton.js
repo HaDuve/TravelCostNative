@@ -1,7 +1,15 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const IconButton = ({ icon, size, color, onPress, buttonStyle, rotate }) => {
+const IconButton = ({
+  icon,
+  size,
+  color,
+  onPress,
+  buttonStyle,
+  rotate,
+  onPressStyle,
+}) => {
   let transformStyle = {};
   if (rotate) {
     transformStyle = { transform: [{ rotateY: "180deg" }] };
@@ -9,7 +17,7 @@ const IconButton = ({ icon, size, color, onPress, buttonStyle, rotate }) => {
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => pressed && styles.pressed}
+      style={({ pressed }) => pressed && [styles.pressed, onPressStyle]}
     >
       <View style={[styles.buttonContainer, buttonStyle]}>
         <Ionicons

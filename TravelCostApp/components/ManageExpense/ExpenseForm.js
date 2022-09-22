@@ -452,7 +452,6 @@ const ExpenseForm = ({
             <Input
               label="Description"
               textInputConfig={{
-                multiline: true,
                 onChangeText: inputChangedHandler.bind(this, "description"),
                 value: inputs.description.value,
               }}

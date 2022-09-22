@@ -1,4 +1,11 @@
-import { Pressable, StyleSheet, Text, View, Image } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Dimensions,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { GlobalStyles } from "../../constants/styles";
@@ -8,7 +15,7 @@ import { getCatSymbol } from "../../util/category";
 import { useContext } from "react";
 import { UserContext } from "../../store/user-context";
 import { TripContext } from "../../store/trip-context";
-import { formatExpenseString } from "../../util/string";
+import { formatExpenseString, truncateString } from "../../util/string";
 
 function ExpenseItem({
   id,
@@ -27,6 +34,9 @@ function ExpenseItem({
 
   const calcAmountString = formatExpenseString(calcAmount);
   const amountString = formatExpenseString(amount);
+
+  const widthInChars = parseInt(Dimensions.get("window").width / 13);
+  const descriptionString = truncateString(description, widthInChars);
 
   function expensePressHandler() {
     navigation.navigate("ManageExpense", {
@@ -63,7 +73,7 @@ function ExpenseItem({
         </View>
         <View style={styles.leftItem}>
           <Text style={[styles.textBase, styles.description]}>
-            {description}
+            {descriptionString}
           </Text>
           <Text style={[styles.textBase, styles.secondaryText]}>
             {toShortFormat(date)}

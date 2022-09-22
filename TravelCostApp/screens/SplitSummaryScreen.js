@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import Button from "../components/UI/Button";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import FlatButton from "../components/UI/FlatButton";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { GlobalStyles } from "../constants/styles";
+import { TripContext } from "../store/trip-context";
 import { calcOpenSplitsTable } from "../util/split";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
@@ -13,6 +14,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const [error, setError] = useState();
 
   const [splits, setSplits] = useState([]);
+  const TripCtx = useContext(TripContext);
 
   useEffect(() => {
     async function getOpenSplits() {
@@ -46,7 +48,8 @@ const SplitSummaryScreen = ({ route, navigation }) => {
     return (
       <View style={styles.splitContainer}>
         <Text>
-          {item.userName} owes {item.amount} to {item.whoPaid}!
+          {item.userName} owes {item.amount}
+          {TripCtx.tripCurrency} to {item.whoPaid}!
         </Text>
       </View>
     );

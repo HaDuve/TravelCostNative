@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { Alert, FlatList, StyleSheet, Text, View } from "react-native";
 import Button from "../components/UI/Button";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import FlatButton from "../components/UI/FlatButton";
@@ -67,7 +67,14 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         >
           Back
         </FlatButton>
-        <Button>Settle</Button>
+        <Button
+          style={{ marginLeft: 24 }}
+          onPress={() => {
+            Alert.alert("Settle debts function coming soon...");
+          }}
+        >
+          Settle debts
+        </Button>
       </View>
     </View>
   );

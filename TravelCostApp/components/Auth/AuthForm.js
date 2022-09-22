@@ -88,7 +88,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
           </Button>
         </View>
         <View style={styles.orTextContainer}>
-          <Text style={styles.orText}>Or With</Text>
+          {/* <Text style={styles.orText}>Or With</Text> */}
           <View style={styles.google}>
             <Text style={styles.googleText}>Sign Up with Google</Text>
           </View>

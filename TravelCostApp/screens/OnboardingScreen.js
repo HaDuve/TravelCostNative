@@ -25,7 +25,7 @@ const OnboardingScreen = ({ navigation }) => {
           ),
           title: "Know where your money goes",
           subtitle:
-            "Track your transaction easily, with categories and financial report.",
+            "Track your transactions easily, with categories and financial report.",
           titleStyles: titleStyle,
         },
         {
@@ -35,7 +35,7 @@ const OnboardingScreen = ({ navigation }) => {
           ),
           title: "Planning ahead",
           subtitle:
-            "Setup your budget for each category so you stay in control.",
+            "Set up your budget for each category so you are in control.",
           titleStyles: titleStyle,
         },
       ]}

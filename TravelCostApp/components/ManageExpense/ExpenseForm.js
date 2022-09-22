@@ -345,7 +345,7 @@ const ExpenseForm = ({
         <View style={styles.inputsRow}>
           <Input
             style={styles.rowInput}
-            label="Price"
+            label={"Price in " + inputs.currency.value}
             textInputConfig={{
               keyboardType: "decimal-pad",
               onChangeText: inputChangedHandler.bind(this, "amount"),
@@ -354,12 +354,6 @@ const ExpenseForm = ({
             invalid={!inputs.amount.isValid}
             autoFocus={true}
           />
-          <Pressable
-            style={styles.topCurrencyPressableContainer}
-            onPress={currencyPickerRef?.open()}
-          >
-            <Text style={styles.topCurrencyText}>{inputs.currency.value}</Text>
-          </Pressable>
           <IconButton
             icon={
               defaultValues
@@ -686,7 +680,7 @@ const styles = StyleSheet.create({
   },
   topCurrencyPressableContainer: {
     padding: 8,
-    marginRight: 4,
+    marginLeft: -120,
   },
   topCurrencyText: {
     fontSize: 12,

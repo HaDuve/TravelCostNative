@@ -19,7 +19,7 @@ export default FlatButton;
 
 const styles = StyleSheet.create({
   button: {
-    paddingHorizontal: 4,
+    padding: 12,
   },
   pressed: {
     opacity: 0.5,

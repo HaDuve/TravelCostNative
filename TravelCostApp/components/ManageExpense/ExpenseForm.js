@@ -12,7 +12,11 @@ import {
 } from "react-native";
 import Input from "./Input";
 import Button from "../UI/Button";
-import { getFormattedDate } from "../../util/date";
+import {
+  getDatePlusDays,
+  getFormattedDate,
+  toShortFormat,
+} from "../../util/date";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
 import IconButton from "../UI/IconButton";
@@ -20,10 +24,9 @@ import { UserContext } from "../../store/user-context";
 import FlatButton from "../UI/FlatButton";
 import { getCatSymbol } from "../../util/category";
 import DropDownPicker from "react-native-dropdown-picker";
-
 import CurrencyPicker from "react-native-currency-picker";
+import DatePicker from "react-native-neat-date-picker";
 import { TripContext } from "../../store/trip-context";
-import { G } from "react-native-svg";
 import {
   calcSplitList,
   splitExpense,
@@ -49,6 +52,25 @@ const ExpenseForm = ({
 
   // currencypicker reference for open/close
   let currencyPickerRef = undefined;
+
+  // datepicker states
+  const [showDatePickerRange, setShowDatePickerRange] = useState(false);
+  const [startDate, setStartDate] = useState(
+    defaultValues ? getFormattedDate(defaultValues.date) : ""
+  );
+  const [endDate, setEndDate] = useState("");
+  const openDatePickerRange = () => setShowDatePickerRange(true);
+  const onCancelRange = () => {
+    setShowDatePickerRange(false);
+  };
+
+  const onConfirmRange = (output) => {
+    setShowDatePickerRange(false);
+    const startDateFormat = getFormattedDate(output.startDate);
+    const endDateFormat = getFormattedDate(output.endDate);
+    setStartDate(startDateFormat);
+    setEndDate(endDateFormat);
+  };
 
   // list of all splits owed
   const [splitList, setSplitList] = useState(
@@ -80,6 +102,10 @@ const ExpenseForm = ({
     defaultValues ? defaultValues.listEQUAL : []
   );
 
+  // dont show EQUAL share picker when "SELF" is picked
+  if (splitType === "SELF") {
+    if (openEQUAL) setOpenEQUAL(false);
+  }
   // NOTE: we might not even need a picker for each case
   function openTravellerMultiPicker() {
     setOpenEQUAL(true);
@@ -168,7 +194,7 @@ const ExpenseForm = ({
     const expenseData = {
       uid: AuthCtx.uid,
       amount: +inputs.amount.value,
-      date: new Date(inputs.date.value),
+      date: new Date(startDate),
       description: inputs.description.value,
       category: inputs.category.value,
       country: inputs.country.value,
@@ -183,6 +209,8 @@ const ExpenseForm = ({
     // validate the expenseData
     const amountIsValid = !isNaN(expenseData.amount) && expenseData.amount > 0;
     const dateIsValid = expenseData.date.toString() !== "Invalid Date";
+    console.log("submitHandler ~ expenseData.date", expenseData.date);
+    console.log("submitHandler ~ dateIsValid", dateIsValid);
     const descriptionIsValid = expenseData.description.trim().length > 0;
     const whoPaidIsValid = expenseData.whoPaid !== null;
 
@@ -278,7 +306,8 @@ const ExpenseForm = ({
 
     if (!inputs.date.isValid) {
       const today = new Date();
-      inputChangedHandler("date", getFormattedDate(today));
+      setStartDate(today);
+      // inputChangedHandler("date", getFormattedDate(today));
     }
     // for now set default values to every field so everything goes fast
     if (!inputs.country.isValid) {
@@ -327,7 +356,6 @@ const ExpenseForm = ({
 
   const formIsInvalid =
     !inputs.amount.isValid ||
-    !inputs.date.isValid ||
     !inputs.description.isValid ||
     !inputs.currency.isValid;
 
@@ -335,11 +363,19 @@ const ExpenseForm = ({
   const showWhoPaid = inputs.amount.value !== "";
   const whoPaidValid = whoPaid !== null;
   const splitTypeEqual = splitType === "EQUAL";
+  const splitTypeSelf = splitType === "SELF";
   // hide the pickers
   const hidePickers = true;
 
   return (
     <>
+      <DatePicker
+        isVisible={showDatePickerRange}
+        mode={"range"}
+        onCancel={onCancelRange}
+        onConfirm={onConfirmRange}
+        startDate={new Date()}
+      />
       <View style={styles.form}>
         <View style={styles.inputsRow}>
           <Input
@@ -351,7 +387,7 @@ const ExpenseForm = ({
               value: inputs.amount.value,
             }}
             invalid={!inputs.amount.isValid}
-            autoFocus={true}
+            // autoFocus={true}
           />
           <IconButton
             icon={
@@ -457,7 +493,7 @@ const ExpenseForm = ({
               }}
               invalid={!inputs.description.isValid}
             />
-            <Input
+            {/* <Input
               style={styles.rowInput}
               label="Date"
               textInputConfig={{
@@ -467,7 +503,24 @@ const ExpenseForm = ({
                 value: inputs.date.value,
               }}
               invalid={!inputs.date.isValid}
-            />
+            /> */}
+            <View style={{ marginLeft: 16 }}>
+              <Text style={styles.topCurrencyText}>Date</Text>
+            </View>
+            <View style={styles.dateContainer}>
+              <IconButton
+                icon={"calendar-outline"}
+                size={24}
+                color={GlobalStyles.colors.primary500}
+                style={styles.button}
+                onPress={openDatePickerRange}
+              />
+              {/* <FlatButton onPress={openDatePickerRange}>Date</FlatButton> */}
+              <Text style={styles.advancedText}>
+                {startDate && toShortFormat(new Date(startDate))}
+              </Text>
+            </View>
+
             {/* <Input
             label="Category"
             textInputConfig={{
@@ -599,64 +652,66 @@ const ExpenseForm = ({
               />
             )}
             <View styles={styles.advancedRowSplit}>
-              <FlatList
-                // numColumns={2}
-                data={splitList}
-                horizontal={true}
-                renderItem={(itemData) => {
-                  const splitValue = itemData.item.amount.toString();
-                  return (
-                    <View
-                      style={{
-                        borderWidth: 1,
-                        borderRadius: 16,
-                        padding: 8,
-                        margin: 14,
-                      }}
-                    >
-                      <Text
+              {!splitTypeSelf && (
+                <FlatList
+                  // numColumns={2}
+                  data={splitList}
+                  horizontal={true}
+                  renderItem={(itemData) => {
+                    const splitValue = itemData.item.amount.toString();
+                    return (
+                      <View
                         style={{
-                          minHeight: 36,
-                          minWidth: Dimensions.get("window").width / 6,
-                          maxWidth: Dimensions.get("window").width / 6,
-                          color: splitListValid
-                            ? GlobalStyles.colors.textColor
-                            : GlobalStyles.colors.error500,
+                          borderWidth: 1,
+                          borderRadius: 16,
+                          padding: 8,
+                          margin: 14,
                         }}
                       >
-                        {itemData.item.userName}
-                      </Text>
-                      <Input
-                        inputStyle={
-                          splitTypeEqual && {
-                            color: GlobalStyles.colors.textColor,
-                          }
-                        }
-                        style={[
-                          styles.rowInput,
-                          {
+                        <Text
+                          style={{
+                            minHeight: 36,
                             minWidth: Dimensions.get("window").width / 6,
                             maxWidth: Dimensions.get("window").width / 6,
-                          },
-                        ]}
-                        label="Split"
-                        textInputConfig={{
-                          onFocus: () => {
-                            if (splitType === "EQUAL") Keyboard.dismiss();
-                          },
-                          keyboardType: "decimal-pad",
-                          onChangeText: inputSplitListHandler.bind(
-                            this,
-                            itemData.index,
-                            itemData.item
-                          ),
-                          value: splitValue ? splitValue : "",
-                        }}
-                      ></Input>
-                    </View>
-                  );
-                }}
-              ></FlatList>
+                            color: splitListValid
+                              ? GlobalStyles.colors.textColor
+                              : GlobalStyles.colors.error500,
+                          }}
+                        >
+                          {itemData.item.userName}
+                        </Text>
+                        <Input
+                          inputStyle={
+                            splitTypeEqual && {
+                              color: GlobalStyles.colors.textColor,
+                            }
+                          }
+                          style={[
+                            styles.rowInput,
+                            {
+                              minWidth: Dimensions.get("window").width / 6,
+                              maxWidth: Dimensions.get("window").width / 6,
+                            },
+                          ]}
+                          label="Split"
+                          textInputConfig={{
+                            onFocus: () => {
+                              if (splitType === "EQUAL") Keyboard.dismiss();
+                            },
+                            keyboardType: "decimal-pad",
+                            onChangeText: inputSplitListHandler.bind(
+                              this,
+                              itemData.index,
+                              itemData.item
+                            ),
+                            value: splitValue ? splitValue : "",
+                          }}
+                        ></Input>
+                      </View>
+                    );
+                  }}
+                ></FlatList>
+              )}
             </View>
           </>
         )}
@@ -761,6 +816,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontStyle: "italic",
     fontWeight: "300",
+  },
+  dateContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderBottomColor: GlobalStyles.colors.gray700,
+    borderBottomWidth: 1,
+    marginHorizontal: 16,
+    marginVertical: 4,
+    paddingBottom: 4,
   },
   dropdownContainer: {
     marginTop: -12,

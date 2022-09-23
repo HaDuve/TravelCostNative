@@ -58,3 +58,7 @@ export function daysBetween(date_1, date_2) {
   let TotalDays = Math.ceil(difference / (1000 * 3600 * 24));
   return TotalDays;
 }
+
+export function getDatePlusDays(date, days) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+}

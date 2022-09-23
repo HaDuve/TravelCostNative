@@ -29,6 +29,7 @@
     "react-native-currency-picker": "^1.0.5",
     "react-native-dropdown-picker": "^5.4.2",
     "react-native-gesture-handler": "~2.2.1",
+    "react-native-neat-date-picker": "^1.4.5",
     "react-native-onboarding-swiper": "^1.2.0",
     "react-native-progress": "^5.0.0",
     "react-native-safe-area-context": "4.2.4",

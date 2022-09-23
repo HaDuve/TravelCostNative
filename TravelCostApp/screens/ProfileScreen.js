@@ -45,7 +45,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
     <>
       <View style={styles.tripContainer}>
         <View style={styles.horizontalContainer}>
-          <Text style={styles.tripListTitle}>My Trips</Text>
+          <Text style={styles.tripListTitle}>My Trip</Text>
           <IconButton
             icon={"create-outline"}
             size={36}

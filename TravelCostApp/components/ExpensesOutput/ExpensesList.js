@@ -29,13 +29,6 @@ function renderExpenseItem(itemData) {
     );
   };
 
-  // close swipeable item via ref
-  const swipeRef = React.useRef();
-
-  const closeSwipable = () => {
-    swipeRef?.current?.close();
-  };
-
   return (
     <Swipeable
       renderRightActions={(progress, dragX) =>

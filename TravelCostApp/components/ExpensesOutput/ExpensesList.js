@@ -2,13 +2,18 @@ import { Alert, FlatList, Button } from "react-native";
 
 import ExpenseItem from "./ExpenseItem";
 
-import React, { Component } from "react";
+import React, { Component, useContext } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { GlobalStyles } from "../../constants/styles";
+import { deleteExpense } from "../../util/http";
+import { TripContext } from "../../store/trip-context";
+import { AuthContext } from "../../store/auth-context";
+import { ExpensesContext } from "../../store/expenses-context";
 
 function renderExpenseItem(itemData) {
+  // swipe left to delete
   const renderRightActions = (progress, dragX, onClick) => {
     return (
       <View
@@ -24,14 +29,22 @@ function renderExpenseItem(itemData) {
     );
   };
 
+  // close swipeable item via ref
+  const swipeRef = React.useRef();
+
+  const closeSwipable = () => {
+    swipeRef?.current?.close();
+  };
+
   return (
     <Swipeable
       renderRightActions={(progress, dragX) =>
-        renderRightActions(progress, dragX, onClick)
+        renderRightActions(progress, dragX, onClick.bind(this, itemData))
       }
       onSwipeableOpen={() => console.log("onSwipeableOpen")}
       ref={(ref) => ref}
       rightOpenValue={-100}
+      overshootFriction={8}
     >
       <ExpenseItem {...itemData.item} />
     </Swipeable>
@@ -39,11 +52,58 @@ function renderExpenseItem(itemData) {
 }
 
 function onClick({ item, index }) {
-  Alert.alert("Swipe to delete function coming soon...");
+  console.log(this);
+  const editedExpenseId = item.id;
+
+  async function deleteExpenseHandler() {
+    async function deleteExp() {
+      try {
+        await deleteExpense(tripid, uid, editedExpenseId);
+        expenseCtx.deleteExpense(editedExpenseId);
+      } catch (error) {
+        console.log(
+          "Could not delete expense - please try again later!",
+          error
+        );
+      }
+    }
+    Alert.alert(
+      "Are you sure?",
+      "Are you sure you want to delete this expense?",
+      [
+        // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: "No",
+          onPress: () => {},
+        },
+        // The "Yes" button
+        {
+          text: "Yes",
+          onPress: () => {
+            deleteExp();
+          },
+        },
+      ]
+    );
+  }
+  deleteExpenseHandler();
 }
+
+// global variables across all expenseItems
+var tripid = 0;
+var uid = "";
+var expenseCtx = {};
 
 // Displays a list of all expenses.
 function ExpensesList({ expenses }) {
+  const tripCtx = useContext(TripContext);
+  const authCtx = useContext(AuthContext);
+  expenseCtx = useContext(ExpensesContext);
+
+  tripid = tripCtx.tripid;
+  uid = authCtx.uid;
+
   return (
     <FlatList
       data={expenses}

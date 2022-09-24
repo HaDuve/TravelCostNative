@@ -98,14 +98,12 @@ let row = [];
 let prevOpenedRow;
 
 function closeRow(index) {
-  console.log("closeRow ~ closeRow", closeRow);
   if (prevOpenedRow && prevOpenedRow !== row[index]) {
     prevOpenedRow.close();
   }
   prevOpenedRow = row[index];
 }
 function forceCloseRow(index) {
-  console.log("closeRow ~ closeRow", closeRow);
   row[index].close();
 }
 

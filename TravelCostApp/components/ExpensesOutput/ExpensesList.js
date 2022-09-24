@@ -28,14 +28,14 @@ function renderExpenseItem(itemData) {
       </View>
     );
   };
-
+  const index = itemData.index;
   return (
     <Swipeable
       renderRightActions={(progress, dragX) =>
         renderRightActions(progress, dragX, onClick.bind(this, itemData))
       }
-      onSwipeableOpen={() => console.log("onSwipeableOpen")}
-      ref={(ref) => ref}
+      onSwipeableOpen={closeRow.bind(this, index)}
+      ref={(ref) => (row[index] = ref)}
       rightOpenValue={-100}
       overshootFriction={8}
     >
@@ -52,9 +52,6 @@ function onClick({ item, index }) {
     async function deleteExp() {
       try {
         await deleteExpense(tripid, uid, editedExpenseId);
-        console.log("deleteExp ~ editedExpenseId", editedExpenseId);
-        console.log("deleteExp ~ uid", uid);
-        console.log("deleteExp ~ tripid", tripid);
         expenseCtx.deleteExpense(editedExpenseId);
       } catch (error) {
         console.log(
@@ -71,7 +68,7 @@ function onClick({ item, index }) {
         // Does nothing but dismiss the dialog when tapped
         {
           text: "No",
-          onPress: () => {},
+          onPress: forceCloseRow(index),
         },
         // The "Yes" button
         {
@@ -87,8 +84,22 @@ function onClick({ item, index }) {
 }
 
 // global variables across all expenseItems
-var tripid = 0;
+var tripid = "";
 var expenseCtx = {};
+let row = [];
+let prevOpenedRow;
+
+function closeRow(index) {
+  console.log("closeRow ~ closeRow", closeRow);
+  if (prevOpenedRow && prevOpenedRow !== row[index]) {
+    prevOpenedRow.close();
+  }
+  prevOpenedRow = row[index];
+}
+function forceCloseRow(index) {
+  console.log("closeRow ~ closeRow", closeRow);
+  row[index].close();
+}
 
 // Displays a list of all expenses.
 function ExpensesList({ expenses }) {

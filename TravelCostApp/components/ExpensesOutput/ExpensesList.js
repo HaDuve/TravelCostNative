@@ -11,6 +11,7 @@ import { deleteExpense } from "../../util/http";
 import { TripContext } from "../../store/trip-context";
 import { AuthContext } from "../../store/auth-context";
 import { ExpensesContext } from "../../store/expenses-context";
+import IconButton from "../UI/IconButton";
 
 function renderExpenseItem(itemData) {
   // swipe left to delete
@@ -22,9 +23,16 @@ function renderExpenseItem(itemData) {
           alignContent: "flex-end",
           justifyContent: "center",
           width: 90,
+          backgroundColor: GlobalStyles.colors.error500,
         }}
       >
-        <Button color="red" onPress={onClick} title="DELETE"></Button>
+        <IconButton
+          icon="trash"
+          color={GlobalStyles.colors.backgroundColor}
+          size={24}
+          onPress={onClick}
+          buttonStyle={{ marginLeft: 30 }}
+        />
       </View>
     );
   };

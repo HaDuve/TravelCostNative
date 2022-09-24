@@ -45,13 +45,16 @@ function renderExpenseItem(itemData) {
 }
 
 function onClick({ item, index }) {
-  console.log(this);
   const editedExpenseId = item.id;
+  const uid = item.uid;
 
   async function deleteExpenseHandler() {
     async function deleteExp() {
       try {
         await deleteExpense(tripid, uid, editedExpenseId);
+        console.log("deleteExp ~ editedExpenseId", editedExpenseId);
+        console.log("deleteExp ~ uid", uid);
+        console.log("deleteExp ~ tripid", tripid);
         expenseCtx.deleteExpense(editedExpenseId);
       } catch (error) {
         console.log(
@@ -85,17 +88,14 @@ function onClick({ item, index }) {
 
 // global variables across all expenseItems
 var tripid = 0;
-var uid = "";
 var expenseCtx = {};
 
 // Displays a list of all expenses.
 function ExpensesList({ expenses }) {
   const tripCtx = useContext(TripContext);
-  const authCtx = useContext(AuthContext);
   expenseCtx = useContext(ExpensesContext);
 
   tripid = tripCtx.tripid;
-  uid = authCtx.uid;
 
   return (
     <FlatList

@@ -60,6 +60,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 8,
+    marginLeft: 24,
+    marginRight: 20,
     borderRadius: 6,
     justifyContent: "space-between",
     alignItems: "flex-start",

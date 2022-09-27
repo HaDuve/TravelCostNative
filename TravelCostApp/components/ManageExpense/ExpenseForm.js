@@ -43,6 +43,8 @@ const ExpenseForm = ({
   defaultValues,
   pickedCat,
   navigation,
+  editedExpenseId,
+  newCat,
 }) => {
   // set context
   const AuthCtx = useContext(AuthContext);
@@ -127,7 +129,6 @@ const ExpenseForm = ({
 
   function inputSplitListHandler(index, props, value) {
     if (splitType === "EQUAL") return;
-    console.log("inputSplitListHandler ~ inputSplitListHandler");
     const tempList = [...splitList];
     // TODO: this Number(value) makes it impossible to enter decimal numbers (eg.: 1.9)
     const tempValue = { amount: Number(value), userName: props.userName };
@@ -152,7 +153,11 @@ const ExpenseForm = ({
       isValid: true,
     },
     category: {
-      value: defaultValues ? defaultValues.category : pickedCat,
+      value: defaultValues
+        ? newCat
+          ? pickedCat
+          : defaultValues.category
+        : pickedCat,
       isValid: true,
     },
     country: {
@@ -199,7 +204,6 @@ const ExpenseForm = ({
       splitList
     );
     if (listSplits) {
-      console.log("~~ listSplits", listSplits);
       setSplitList(listSplits);
     }
   }
@@ -210,7 +214,7 @@ const ExpenseForm = ({
       amount: +inputs.amount.value,
       date: new Date(startDate),
       description: inputs.description.value,
-      category: inputs.category.value,
+      category: newCat ? pickedCat : inputs.category.value,
       country: inputs.country.value,
       currency: inputs.currency.value,
       whoPaid: whoPaid, // TODO: convert this to uid
@@ -220,11 +224,10 @@ const ExpenseForm = ({
       splitList: splitList,
     };
 
+    console.log("submitHandler ~ category", expenseData.category);
     // validate the expenseData
     const amountIsValid = !isNaN(expenseData.amount) && expenseData.amount > 0;
     const dateIsValid = expenseData.date.toString() !== "Invalid Date";
-    console.log("submitHandler ~ expenseData.date", expenseData.date);
-    console.log("submitHandler ~ dateIsValid", dateIsValid);
     const descriptionIsValid = expenseData.description.trim().length > 0;
     const whoPaidIsValid = expenseData.whoPaid !== null;
 
@@ -406,13 +409,17 @@ const ExpenseForm = ({
           <IconButton
             icon={
               defaultValues
-                ? getCatSymbol(defaultValues.category)
+                ? newCat
+                  ? getCatSymbol(pickedCat)
+                  : getCatSymbol(defaultValues.category)
                 : getCatSymbol(pickedCat)
             }
             color={GlobalStyles.colors.primary500}
             size={36}
             onPress={() => {
-              navigation.navigate("CategoryPick");
+              navigation.navigate("CategoryPick", {
+                editedExpenseId: editedExpenseId,
+              });
             }}
           />
         </View>

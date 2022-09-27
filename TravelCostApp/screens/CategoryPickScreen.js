@@ -14,7 +14,8 @@ import FlatButton from "../components/UI/FlatButton";
 import { GlobalStyles } from "../constants/styles";
 
 const CategoryPickScreen = ({ route, navigation }) => {
-  const { tempPickedCat, tempValues } = route.params ? route.params : "null";
+  const { editedExpenseId } = route.params ? route.params : "null";
+  console.log("CategoryPickScreen ~ editedExpenseId", editedExpenseId);
 
   const CATLIST = [
     {
@@ -61,12 +62,13 @@ const CategoryPickScreen = ({ route, navigation }) => {
     } else
       navigation.navigate("ManageExpense", {
         pickedCat: item.cat,
+        newCat: true,
+        expenseId: editedExpenseId,
       });
   }
 
   function renderCatItem(itemData) {
     const item = itemData.item;
-    console.log("renderCatItem ~ item", item);
     return (
       <View
         style={[

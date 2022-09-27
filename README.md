@@ -10,6 +10,8 @@
 
 ## Developement Screenshots:
 Google Drive has the newest Screenshots:
+![Simulator Screen Shot - iPhone SE (3rd generation) - 2022-09-27 at 12 21 19](https://user-images.githubusercontent.com/48185176/192431211-6c5c4950-e702-436f-a1ae-5eaffe2dcc46.png)
+
 https://drive.google.com/drive/folders/1-3xQV7rxPB9MWz0-QEnE7xA4QCxM0LAb?usp=sharing
 
 <img height="350" alt="image" src="https://user-images.githubusercontent.com/48185176/183236829-66358506-8e6a-477c-9e05-106f9cb47c6a.png">

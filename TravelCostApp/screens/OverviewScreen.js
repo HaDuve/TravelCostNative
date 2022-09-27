@@ -19,19 +19,6 @@ import ExpensesOverview from "../components/ExpensesOutput/ExpensesOverview";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
 
 const OverviewScreen = ({ navigation }) => {
-  const [isFetching, setIsFetching] = useState(true);
-  const [error, setError] = useState();
-
-  const [open, setOpen] = useState(false);
-  const [PeriodValue, setPeriodValue] = useState("total");
-  const [items, setItems] = useState([
-    { label: "Today", value: "day" },
-    { label: "Week", value: "week" },
-    { label: "Month", value: "month" },
-    { label: "Year", value: "year" },
-    { label: "Total", value: "total" },
-  ]);
-
   const expensesCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
@@ -39,6 +26,29 @@ const OverviewScreen = ({ navigation }) => {
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
   const token = authCtx.token;
+
+  const [isFetching, setIsFetching] = useState(true);
+  const [error, setError] = useState();
+
+  const [open, setOpen] = useState(false);
+  const [PeriodValue, setPeriodValue] = useState(userCtx.periodName);
+
+  useEffect(() => {
+    if (PeriodValue !== userCtx.periodName)
+      userCtx.setPeriodString(PeriodValue);
+  }, [PeriodValue]);
+
+  useEffect(() => {
+    if (PeriodValue !== userCtx.periodName) setPeriodValue(userCtx.periodName);
+  }, [userCtx.periodName]);
+
+  const [items, setItems] = useState([
+    { label: "Today", value: "day" },
+    { label: "Week", value: "week" },
+    { label: "Month", value: "month" },
+    { label: "Year", value: "year" },
+    { label: "Total", value: "total" },
+  ]);
 
   useEffect(() => {
     async function getExpenses() {

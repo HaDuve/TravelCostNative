@@ -10,6 +10,8 @@ export const UserContext = createContext({
   lastCountry: "",
   lastCurrency: "",
   tripHistory: [],
+  periodName: "day",
+  setPeriodString: (string) => {},
 
   addUser: ({
     userName,
@@ -52,9 +54,14 @@ function UserContextProvider({ children }) {
   const [lastCountry, setLastCountry] = useState("");
   const [lastCurrency, setLastCurrency] = useState("");
   const [freshlyCreated, setFreshlyCreated] = useState(false);
+  const [periodName, setPeriodName] = useState("day");
 
   const [tripsState, dispatch] = useReducer(tripsReducer, []);
 
+  function setPeriodString(string) {
+    console.log("setPeriodString ~ string", string);
+    setPeriodName(string);
+  }
   function addTripHistory(tripData) {
     dispatch({ type: "ADD", payload: tripData });
   }
@@ -113,6 +120,8 @@ function UserContextProvider({ children }) {
     homeCurrency: homeCurrency,
     lastCountry: lastCountry,
     lastCurrency: lastCurrency,
+    periodName: periodName,
+    setPeriodString: setPeriodString,
 
     tripHistory: tripsState,
 

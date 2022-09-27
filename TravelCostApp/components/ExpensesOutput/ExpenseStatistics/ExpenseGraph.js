@@ -210,8 +210,6 @@ const ExpenseGraph = ({ expenses, periodName }) => {
     default:
       break;
   }
-  // inputData={listExpenseSumBudgets}
-  console.log("ExpenseGraph ~ listExpenseSumBudgets", listExpenseSumBudgets);
   return (
     <ScrollView style={styles.container}>
       <View style={styles.graphContainer}>

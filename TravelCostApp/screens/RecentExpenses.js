@@ -17,11 +17,29 @@ import { GlobalStyles } from "../constants/styles";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
 
 function RecentExpenses({ navigation }) {
+  const expensesCtx = useContext(ExpensesContext);
+  const authCtx = useContext(AuthContext);
+  const userCtx = useContext(UserContext);
+  const tripCtx = useContext(TripContext);
+
+  const tripid = tripCtx.tripid;
+  const uid = authCtx.uid;
+  const token = authCtx.token;
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
 
   const [open, setOpen] = useState(false);
-  const [PeriodValue, setPeriodValue] = useState("total");
+  const [PeriodValue, setPeriodValue] = useState("day");
+
+  useEffect(() => {
+    if (PeriodValue !== userCtx.periodName)
+      userCtx.setPeriodString(PeriodValue);
+  }, [PeriodValue]);
+
+  useEffect(() => {
+    if (PeriodValue !== userCtx.periodName) setPeriodValue(userCtx.periodName);
+  }, [userCtx.periodName]);
+
   const [items, setItems] = useState([
     { label: "Today", value: "day" },
     { label: "Week", value: "week" },
@@ -29,14 +47,6 @@ function RecentExpenses({ navigation }) {
     { label: "Year", value: "year" },
     { label: "Total", value: "total" },
   ]);
-
-  const expensesCtx = useContext(ExpensesContext);
-  const authCtx = useContext(AuthContext);
-  const userCtx = useContext(UserContext);
-  const tripCtx = useContext(TripContext);
-  const tripid = tripCtx.tripid;
-  const uid = authCtx.uid;
-  const token = authCtx.token;
 
   useEffect(() => {
     async function getExpenses() {
@@ -49,7 +59,6 @@ function RecentExpenses({ navigation }) {
       }
       setIsFetching(false);
     }
-
     getExpenses();
   }, []);
 

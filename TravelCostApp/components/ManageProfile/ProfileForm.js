@@ -143,7 +143,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
 
   const freshlyNavigationButtons = (
     <View style={styles.navButtonContainer}>
-      <FlatButton style={styles.navButton} onPress={joinInvite}>
+      <FlatButton style={[styles.navButton]} onPress={joinInvite}>
         I have an invitation from another Traveller!
       </FlatButton>
       {/*  for debugging i leave this condition only around this button, it should be around the whole view though */}
@@ -262,7 +262,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignContent: "flex-end",
-    padding: 24,
+    padding: 4,
+    marginBottom: 8,
   },
   navButton: {
     minWidth: 120,

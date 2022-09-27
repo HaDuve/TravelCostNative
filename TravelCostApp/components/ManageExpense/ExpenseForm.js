@@ -50,6 +50,20 @@ const ExpenseForm = ({
   const TripCtx = useContext(TripContext);
   const [hideAdvanced, sethideAdvanced] = useState(!isEditing);
 
+  const [loadingTravellers, setLoadingTravellers] = useState(false);
+  useEffect(() => {
+    async function setTravellers() {
+      setLoadingTravellers(true);
+      try {
+        TripCtx.setCurrentTravellers(TripCtx.tripid);
+      } catch (error) {
+        console.log("error loading travellers in expenseForm");
+      }
+      setLoadingTravellers(false);
+    }
+    setTravellers();
+  }, []);
+
   // currencypicker reference for open/close
   let currencyPickerRef = undefined;
 
@@ -541,38 +555,40 @@ const ExpenseForm = ({
                   >
                     Who paid?
                   </Text>
-                  <DropDownPicker
-                    open={open}
-                    value={whoPaid}
-                    items={items}
-                    setOpen={setOpen}
-                    setValue={setWhoPaid}
-                    setItems={setItems}
-                    onClose={setOpenSplitTypes}
-                    listMode="MODAL"
-                    modalProps={{
-                      animationType: "slide",
-                      presentationStyle: "pageSheet",
-                    }}
-                    searchable={false}
-                    modalTitle={"Who paid?"}
-                    modalTitleStyle={{
-                      color: GlobalStyles.colors.textColor,
-                      fontSize: 32,
-                      fontWeight: "bold",
-                    }}
-                    modalContentContainerStyle={{
-                      backgroundColor: GlobalStyles.colors.backgroundColor,
-                    }}
-                    placeholder="Who Paid?"
-                    containerStyle={styles.dropdownContainer}
-                    style={
-                      !inputs.whoPaid.isValid
-                        ? [styles.dropdown, styles.invalidInput]
-                        : styles.dropdown
-                    }
-                    textStyle={styles.dropdownTextStyle}
-                  />
+                  {!loadingTravellers && (
+                    <DropDownPicker
+                      open={open}
+                      value={whoPaid}
+                      items={items}
+                      setOpen={setOpen}
+                      setValue={setWhoPaid}
+                      setItems={setItems}
+                      onClose={setOpenSplitTypes}
+                      listMode="MODAL"
+                      modalProps={{
+                        animationType: "slide",
+                        presentationStyle: "pageSheet",
+                      }}
+                      searchable={false}
+                      modalTitle={"Who paid?"}
+                      modalTitleStyle={{
+                        color: GlobalStyles.colors.textColor,
+                        fontSize: 32,
+                        fontWeight: "bold",
+                      }}
+                      modalContentContainerStyle={{
+                        backgroundColor: GlobalStyles.colors.backgroundColor,
+                      }}
+                      placeholder="Who Paid?"
+                      containerStyle={styles.dropdownContainer}
+                      style={
+                        !inputs.whoPaid.isValid
+                          ? [styles.dropdown, styles.invalidInput]
+                          : styles.dropdown
+                      }
+                      textStyle={styles.dropdownTextStyle}
+                    />
+                  )}
                 </View>
               )}
               {whoPaidValid && (
@@ -612,7 +628,7 @@ const ExpenseForm = ({
                 />
               )}
             </View>
-            {true && (
+            {!loadingTravellers && (
               <DropDownPicker
                 open={openEQUAL}
                 value={listEQUAL}

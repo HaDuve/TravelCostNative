@@ -34,10 +34,10 @@ const ExpenseGraph = ({ expenses, periodName }) => {
   const listExpenseSumBudgets = [];
   let xAxis = "";
   let yAxis = "";
-  const lastDays = 20;
+  const lastDays = 35;
   const lastWeeks = 20;
-  const lastMonths = 20;
-  const lastYears = 20;
+  const lastMonths = 15;
+  const lastYears = 10;
 
   switch (periodName) {
     case "day":

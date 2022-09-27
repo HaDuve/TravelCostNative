@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     marginHorizontal: 150,
     marginBottom: -10,
+    marginTop: -48,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

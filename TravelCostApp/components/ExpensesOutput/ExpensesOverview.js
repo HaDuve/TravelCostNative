@@ -50,10 +50,7 @@ export default ExpensesOverview;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 36,
     flex: 1,
-    padding: 4,
-    marginHorizontal: 18,
   },
   toggleButton: {
     marginTop: -50,
@@ -64,7 +61,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingRight: 20,
     textAlign: "center",
-    fontSize: 30,
+    fontSize: 20,
     fontWeight: "bold",
   },
 });

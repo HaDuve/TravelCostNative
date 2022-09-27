@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, FlatList } from "react-native";
+import { StyleSheet, Text, View, FlatList, Dimensions } from "react-native";
 import React, { useContext } from "react";
 import { ExpensesContext } from "../../../store/expenses-context";
 import {
@@ -15,6 +15,8 @@ import { UserContext } from "../../../store/user-context";
 import { TripContext } from "../../../store/trip-context";
 import { formatExpenseString } from "../../../util/string";
 import { GlobalStyles } from "../../../constants/styles";
+import ExpenseChart from "../../ExpensesOverview/ExpenseChart";
+import { ScrollView } from "react-native-gesture-handler";
 
 const ExpenseGraph = ({ expenses, periodName }) => {
   const ExpenseCtx = useContext(ExpensesContext);
@@ -30,9 +32,17 @@ const ExpenseGraph = ({ expenses, periodName }) => {
   // year
   // total
   const listExpenseSumBudgets = [];
+  let xAxis = "";
+  let yAxis = "";
+  const lastDays = 20;
+  const lastWeeks = 20;
+  const lastMonths = 20;
+  const lastYears = 20;
+
   switch (periodName) {
     case "day":
-      const lastDays = 62;
+      xAxis = "day";
+      yAxis = "expensesSum";
       for (let i = 0; i < lastDays; i++) {
         const day = getDateMinusDays(today, i);
         const dayExpenses = ExpenseCtx.getDailyExpenses(i);
@@ -73,7 +83,8 @@ const ExpenseGraph = ({ expenses, periodName }) => {
       };
       break;
     case "week":
-      const lastWeeks = 24;
+      xAxis = "firstDay";
+      yAxis = "expensesSum";
       for (let i = 0; i < lastWeeks; i++) {
         const { firstDay, lastDay, weeklyExpenses } =
           ExpenseCtx.getWeeklyExpenses(i);
@@ -117,7 +128,8 @@ const ExpenseGraph = ({ expenses, periodName }) => {
       };
       break;
     case "month":
-      const lastMonths = 24;
+      xAxis = "firstDay";
+      yAxis = "expensesSum";
       for (let i = 0; i < lastMonths; i++) {
         const { firstDay, lastDay, monthlyExpenses } =
           ExpenseCtx.getMonthlyExpenses(i);
@@ -153,7 +165,8 @@ const ExpenseGraph = ({ expenses, periodName }) => {
       };
       break;
     case "year":
-      const lastYears = 20;
+      xAxis = "firstDay";
+      yAxis = "expensesSum";
       for (let i = 0; i < lastYears; i++) {
         const { firstDay, lastDay, yearlyExpenses } =
           ExpenseCtx.getYearlyExpenses(i);
@@ -187,7 +200,7 @@ const ExpenseGraph = ({ expenses, periodName }) => {
       break;
     case "total":
       return (
-        <View>
+        <View style={{ padding: 24 }}>
           <Text style={styles.text1}>
             Please choose a Time Frame in the Dropdown Bar.
           </Text>
@@ -197,14 +210,24 @@ const ExpenseGraph = ({ expenses, periodName }) => {
     default:
       break;
   }
-
+  // inputData={listExpenseSumBudgets}
+  console.log("ExpenseGraph ~ listExpenseSumBudgets", listExpenseSumBudgets);
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={listExpenseSumBudgets}
-        renderItem={renderItemRef}
-      ></FlatList>
-    </View>
+    <ScrollView style={styles.container}>
+      <View style={styles.graphContainer}>
+        <ExpenseChart
+          inputData={listExpenseSumBudgets}
+          xAxis={xAxis}
+          yAxis={yAxis}
+        ></ExpenseChart>
+      </View>
+      <View>
+        <FlatList
+          data={listExpenseSumBudgets}
+          renderItem={renderItemRef}
+        ></FlatList>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -212,8 +235,11 @@ export default ExpenseGraph;
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 12,
+    flex: 1,
     paddingHorizontal: 24,
+  },
+  graphContainer: {
+    flex: 1,
   },
   itemContainer: {
     padding: 8,

@@ -17,7 +17,6 @@ import { formatExpenseString } from "../../../util/string";
 import { GlobalStyles } from "../../../constants/styles";
 
 const ExpenseGraph = ({ expenses, periodName }) => {
-  console.log("ExpenseGraph ~ periodName", periodName);
   const ExpenseCtx = useContext(ExpensesContext);
   const UserCtx = useContext(UserContext);
   const TripCtx = useContext(TripContext);
@@ -154,8 +153,46 @@ const ExpenseGraph = ({ expenses, periodName }) => {
       };
       break;
     case "year":
+      const lastYears = 20;
+      for (let i = 0; i < lastYears; i++) {
+        const { firstDay, lastDay, yearlyExpenses } =
+          ExpenseCtx.getYearlyExpenses(i);
+        const expensesSum = yearlyExpenses.reduce((sum, expense) => {
+          return sum + expense.calcAmount;
+        }, 0);
+        const yearlyBudget = TripCtx.dailyBudget * 365;
+        const obj = { firstDay, lastDay, expensesSum, yearlyBudget };
+        listExpenseSumBudgets.push(obj);
+      }
+      renderItemRef = function renderItem({ item }) {
+        const yearString = item.firstDay.getFullYear();
+        const debt = item.expensesSum > item.yearlyBudget;
+        const colorCoding = !debt ? styles.green : styles.red;
+
+        const emptyValue = item.expensesSum === 0;
+        const expenseString = emptyValue
+          ? ""
+          : formatExpenseString(item.expensesSum);
+
+        return (
+          <View style={styles.itemContainer}>
+            <Text style={styles.text1}>{yearString}</Text>
+            <Text style={[styles.text1, colorCoding]}>
+              {expenseString}
+              {emptyValue ? "-" : TripCtx.tripCurrency}
+            </Text>
+          </View>
+        );
+      };
       break;
     case "total":
+      return (
+        <View>
+          <Text style={styles.text1}>
+            Please choose a Time Frame in the Dropdown Bar.
+          </Text>
+        </View>
+      );
       break;
     default:
       break;

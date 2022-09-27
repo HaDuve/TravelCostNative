@@ -38,6 +38,9 @@ export const ExpensesContext = createContext({
     }
   ) => {},
   getRecentExpenses: (rangestring) => {},
+  getYearlyExpenses: (yearsBack) => {
+    firstDay, lastDay, yearlyExpenses;
+  },
   getMonthlyExpenses: (month) => {
     firstDay, lastDay, monthlyExpenses;
   },
@@ -131,7 +134,26 @@ function ExpensesContextProvider({ children }) {
         break;
     }
   }
+  function getYearlyExpenses(yearsBack) {
+    /*
+     *  Returns an object containing the first date, last date of a month and
+     *  the expenses in that range.
+     *  returns {firstDay, lastDay, monthlyExpenses}
+     */
+    const daysBefore = yearsBack * 365;
+    const today = new Date();
 
+    const dayBack = getDateMinusDays(today, daysBefore);
+
+    const firstDay = new Date(dayBack.getFullYear(), dayBack.getMonth(), 1);
+
+    const lastDay = new Date(dayBack.getFullYear() + 1, dayBack.getMonth(), 0);
+
+    const yearlyExpenses = expensesState.filter((expense) => {
+      return expense.date >= firstDay && expense.date <= lastDay;
+    });
+    return { firstDay, lastDay, yearlyExpenses };
+  }
   function getMonthlyExpenses(monthsBack) {
     /*
      *  Returns an object containing the first date, last date of a month and
@@ -186,6 +208,7 @@ function ExpensesContextProvider({ children }) {
     deleteExpense: deleteExpense,
     updateExpense: updateExpense,
     getRecentExpenses: getRecentExpenses,
+    getYearlyExpenses: getYearlyExpenses,
     getMonthlyExpenses: getMonthlyExpenses,
     getWeeklyExpenses: getWeeklyExpenses,
     getDailyExpenses: getDailyExpenses,

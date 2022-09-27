@@ -11,12 +11,20 @@ const ExpensesOverview = ({ expenses, periodName }) => {
     setToggleGraph(!toggleGraph);
   }
 
+  let titleString = "";
+  switch (periodName) {
+    case "total":
+      titleString = "Overview";
+      break;
+    default:
+      titleString = `Last ${periodName}s`;
+      break;
+  }
+
   return (
     <View style={styles.container}>
       <View>
-        {!toggleGraph && (
-          <Text style={styles.titleText}> Last {periodName}s </Text>
-        )}
+        {!toggleGraph && <Text style={styles.titleText}> {titleString}</Text>}
         {toggleGraph && <Text style={styles.titleText}> Categories </Text>}
       </View>
       <View style={styles.toggleButton}>

@@ -89,7 +89,6 @@ const ManageExpense = ({ route, navigation }) => {
 
       // change the splits to calcAmount aswell, nobody cares original currency
       expenseData.splitList?.forEach((split) => {
-        console.log("confirmHandler ~ split", split);
         const calcAmount = split.amount * rate;
         split.amount = calcAmount.toFixed(2);
       });

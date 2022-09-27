@@ -8,16 +8,13 @@ import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
-import { getDateMinusDays, toShortFormat } from "../util/date";
-import { fetchExpenses, fetchUser, getAllExpenses } from "../util/http";
+import { toShortFormat } from "../util/date";
+import { getAllExpenses } from "../util/http";
 
 import { StyleSheet, Text, View } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
-import IconButton from "../components/UI/IconButton";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
-import Button from "../components/UI/Button";
-import { fetchRates, getRate } from "../util/currencyExchange";
 
 function RecentExpenses({ navigation }) {
   const [isFetching, setIsFetching] = useState(true);

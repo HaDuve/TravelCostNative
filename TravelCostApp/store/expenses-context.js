@@ -1,5 +1,10 @@
 import { createContext, useReducer } from "react";
-import { getDateMinusDays, toShortFormat } from "../util/date";
+import {
+  getDateMinusDays,
+  getDatePlusDays,
+  getPreviousMondayDate,
+  toShortFormat,
+} from "../util/date";
 
 export const ExpensesContext = createContext({
   expenses: [],
@@ -36,6 +41,10 @@ export const ExpensesContext = createContext({
   getMonthlyExpenses: (month) => {
     firstDay, lastDay, monthlyExpenses;
   },
+  getWeeklyExpenses: (weeksBack) => {
+    firstDay, lastDay, weeklyExpenses;
+  },
+  getDailyExpenses: (day) => {},
 });
 
 function expensesReducer(state, action) {
@@ -143,6 +152,32 @@ function ExpensesContextProvider({ children }) {
     });
     return { firstDay, lastDay, monthlyExpenses };
   }
+  function getWeeklyExpenses(weeksBack) {
+    /*
+     *  Returns an object containing the first date, last date of a month and
+     *  the expenses in that range.
+     *  returns {firstDay, lastDay, weeklyExpenses}
+     */
+    const daysBefore = weeksBack * 7;
+    const today = new Date();
+
+    const dayBack = getDateMinusDays(today, daysBefore);
+    const prevMonday = getPreviousMondayDate(dayBack);
+    const firstDay = prevMonday;
+    const lastDay = getDatePlusDays(prevMonday, 6);
+    const weeklyExpenses = expensesState.filter((expense) => {
+      return expense.date >= firstDay && expense.date <= lastDay;
+    });
+    return { firstDay, lastDay, weeklyExpenses };
+  }
+  function getDailyExpenses(daysBack) {
+    const today = new Date();
+    const dayBack = getDateMinusDays(today, daysBack);
+    const dayExpenses = expensesState.filter((expense) => {
+      return expense.date.toDateString() === dayBack.toDateString();
+    });
+    return dayExpenses;
+  }
 
   const value = {
     expenses: expensesState,
@@ -152,6 +187,8 @@ function ExpensesContextProvider({ children }) {
     updateExpense: updateExpense,
     getRecentExpenses: getRecentExpenses,
     getMonthlyExpenses: getMonthlyExpenses,
+    getWeeklyExpenses: getWeeklyExpenses,
+    getDailyExpenses: getDailyExpenses,
   };
 
   return (

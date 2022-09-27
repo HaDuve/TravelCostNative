@@ -5,7 +5,7 @@ import React from "react";
 import CategoryProgressBar from "./CategoryProgressBar";
 import { GlobalStyles } from "../../../constants/styles";
 
-const ExpenseCategories = ({ expenses }) => {
+const ExpenseCategories = ({ expenses, periodName }) => {
   if (!expenses) return;
 
   let categoryList = [];

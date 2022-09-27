@@ -5,7 +5,7 @@ import IconButton from "../UI/IconButton";
 import ExpenseGraph from "./ExpenseStatistics/ExpenseGraph";
 import { GlobalStyles } from "../../constants/styles";
 
-const ExpensesOverview = ({ expenses }) => {
+const ExpensesOverview = ({ expenses, periodName }) => {
   const [toggleGraph, setToggleGraph] = useState(false);
   function toggleContent() {
     setToggleGraph(!toggleGraph);
@@ -14,8 +14,10 @@ const ExpensesOverview = ({ expenses }) => {
   return (
     <View style={styles.container}>
       <View>
-        {!toggleGraph && <Text style={styles.titleText}> Last Months</Text>}
-        {toggleGraph && <Text style={styles.titleText}> Categories</Text>}
+        {!toggleGraph && (
+          <Text style={styles.titleText}> Last {periodName}s </Text>
+        )}
+        {toggleGraph && <Text style={styles.titleText}> Categories </Text>}
       </View>
       <View style={styles.toggleButton}>
         <IconButton
@@ -26,8 +28,12 @@ const ExpensesOverview = ({ expenses }) => {
           rotate={toggleGraph ? true : false}
         />
       </View>
-      {toggleGraph && <ExpenseCategories expenses={expenses} />}
-      {!toggleGraph && <ExpenseGraph expenses={expenses} />}
+      {toggleGraph && (
+        <ExpenseCategories expenses={expenses} periodName={periodName} />
+      )}
+      {!toggleGraph && (
+        <ExpenseGraph expenses={expenses} periodName={periodName} />
+      )}
     </View>
   );
 };

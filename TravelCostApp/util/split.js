@@ -125,6 +125,7 @@ export async function calcOpenSplitsTable(tripid) {
   // cleanup all expenses where payer === debtor
 
   const expenses = await getAllExpenses(tripid);
+  if (!expenses) return;
   let openSplits = [];
   expenses.forEach((expense) => {
     if (!expense.splitList || expense.splitList.length < 1) return;
@@ -136,10 +137,11 @@ export async function calcOpenSplitsTable(tripid) {
     });
   });
   openSplits = sumUpSamePairs(openSplits);
+  openSplits = cancelDifferences(openSplits);
   return openSplits;
 }
 
-export function sumUpSamePairs(openSplits) {
+function sumUpSamePairs(openSplits) {
   // add up all the sums of the same payer and debtor pair
 
   if (!openSplits || openSplits.length < 1) return;
@@ -166,5 +168,31 @@ export function sumUpSamePairs(openSplits) {
       listOfSums.push(obj);
     }
   });
+  return listOfSums;
+}
+
+function cancelDifferences(openSplits) {
+  let listOfSums = [...openSplits];
+  listOfSums.forEach((split) => {
+    /* list contains the element we're looking for */
+    const index = listOfSums.findIndex((e) => {
+      return e.userName === split.whoPaid && e.whoPaid === split.userName;
+    });
+    if (index !== -1) {
+      // same amount
+      if (split.amount === listOfSums[index].amount) {
+        split.amount = 0;
+        listOfSums.splice(index, 1);
+      }
+      // difference
+      if (split.amount > listOfSums[index].amount) {
+        split.amount -= listOfSums[index].amount;
+        split.amount = split.amount.toFixed(2);
+        listOfSums.splice(index, 1);
+      }
+    }
+    listOfSums = listOfSums.filter((item) => item.amount !== 0);
+  });
+
   return listOfSums;
 }

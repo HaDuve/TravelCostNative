@@ -29,7 +29,6 @@ import ShareTripButton from "./components/ProfileOutput/ShareTrip";
 import OverviewScreen from "./screens/OverviewScreen";
 import CategoryPickScreen from "./screens/CategoryPickScreen";
 import SplitSummaryScreen from "./screens/SplitSummaryScreen";
-import { setupHighscoreListener, storeHighScore } from "./firebase/testAuth";
 
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
@@ -260,12 +259,6 @@ function Root() {
       const storedUid = await AsyncStorage.getItem("uid");
       const storedTripId = await AsyncStorage.getItem("currentTripId");
       const freshlyCreated = await AsyncStorage.getItem("freshlyCreated");
-
-      // firebase stuff
-      storeHighScore(storedUid, 1);
-      setupHighscoreListener(storedUid);
-      storeHighScore(storedUid, 2);
-      storeHighScore(storedUid, 3);
 
       if (storedToken) {
         authCtx.setUserID(storedUid);

@@ -122,8 +122,10 @@ export function travellerToDropdown(travellers) {
 }
 
 export async function calcOpenSplitsTable(tripid) {
+  // cleanup all expenses where payer === debtor
+
   const expenses = await getAllExpenses(tripid);
-  const openSplits = [];
+  let openSplits = [];
   expenses.forEach((expense) => {
     if (!expense.splitList || expense.splitList.length < 1) return;
     expense.splitList.forEach((split) => {
@@ -133,5 +135,39 @@ export async function calcOpenSplitsTable(tripid) {
       }
     });
   });
+  openSplits = simplifyOpenSplitsTable(openSplits);
   return openSplits;
+}
+
+export function simplifyOpenSplitsTable(openSplits) {
+  // add up all the sums of the same payer and debtor pair
+
+  if (!openSplits || openSplits.length < 1) return;
+  const listOfSums = [];
+  openSplits.forEach((split) => {
+    if (
+      listOfSums.some(
+        (e) => e.userName === split.userName && e.whoPaid === split.whoPaid
+      )
+    ) {
+      /* list contains the element we're looking for */
+      console.log("exists");
+      const index = listOfSums.findIndex((e) => {
+        return e.userName === split.userName && e.whoPaid === split.whoPaid;
+      });
+      if (index !== -1) {
+        listOfSums[index].amount += Number(split.amount);
+      }
+    } else {
+      console.log("exists not");
+      let obj = {
+        userName: split.userName,
+        whoPaid: split.whoPaid,
+        amount: Number(split.amount),
+      };
+      listOfSums.push(obj);
+    }
+    console.log("simplifyOpenSplitsTable ~ listOfSums", listOfSums);
+  });
+  return listOfSums;
 }

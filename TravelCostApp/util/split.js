@@ -135,11 +135,11 @@ export async function calcOpenSplitsTable(tripid) {
       }
     });
   });
-  openSplits = simplifyOpenSplitsTable(openSplits);
+  openSplits = sumUpSamePairs(openSplits);
   return openSplits;
 }
 
-export function simplifyOpenSplitsTable(openSplits) {
+export function sumUpSamePairs(openSplits) {
   // add up all the sums of the same payer and debtor pair
 
   if (!openSplits || openSplits.length < 1) return;

@@ -151,7 +151,6 @@ export function simplifyOpenSplitsTable(openSplits) {
       )
     ) {
       /* list contains the element we're looking for */
-      console.log("exists");
       const index = listOfSums.findIndex((e) => {
         return e.userName === split.userName && e.whoPaid === split.whoPaid;
       });
@@ -159,7 +158,6 @@ export function simplifyOpenSplitsTable(openSplits) {
         listOfSums[index].amount += Number(split.amount);
       }
     } else {
-      console.log("exists not");
       let obj = {
         userName: split.userName,
         whoPaid: split.whoPaid,
@@ -167,7 +165,6 @@ export function simplifyOpenSplitsTable(openSplits) {
       };
       listOfSums.push(obj);
     }
-    console.log("simplifyOpenSplitsTable ~ listOfSums", listOfSums);
   });
   return listOfSums;
 }

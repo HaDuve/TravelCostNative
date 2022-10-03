@@ -41,6 +41,8 @@ const ExpenseGraph = ({ expenses, periodName }) => {
   let xAxis = "";
   let yAxis = "";
   let budgetAxis = "";
+  let budget = 0;
+  let daysRange = 0;
   const lastDays = 35;
   const lastWeeks = 20;
   const lastMonths = 15;
@@ -58,6 +60,8 @@ const ExpenseGraph = ({ expenses, periodName }) => {
           return sum + expense.calcAmount;
         }, 0);
         const dailyBudget = TripCtx.dailyBudget;
+        budget = dailyBudget;
+        daysRange = lastDays;
         const obj = { day, expensesSum, dailyBudget };
         listExpenseSumBudgets.push(obj);
       }
@@ -102,6 +106,8 @@ const ExpenseGraph = ({ expenses, periodName }) => {
           return sum + expense.calcAmount;
         }, 0);
         const weeklyBudget = TripCtx.dailyBudget * 7;
+        budget = weeklyBudget;
+        daysRange = lastWeeks * 7;
         const obj = { firstDay, lastDay, expensesSum, weeklyBudget };
         listExpenseSumBudgets.push(obj);
       }
@@ -149,6 +155,8 @@ const ExpenseGraph = ({ expenses, periodName }) => {
           return sum + expense.calcAmount;
         }, 0);
         const monthlyBudget = TripCtx.dailyBudget * 30;
+        budget = monthlyBudget;
+        daysRange = lastMonths * 30;
         const obj = { firstDay, lastDay, expensesSum, monthlyBudget };
         listExpenseSumBudgets.push(obj);
       }
@@ -188,6 +196,8 @@ const ExpenseGraph = ({ expenses, periodName }) => {
           return sum + expense.calcAmount;
         }, 0);
         const yearlyBudget = TripCtx.dailyBudget * 365;
+        budget = yearlyBudget;
+        daysRange = lastYears * 365;
         const obj = { firstDay, lastDay, expensesSum, yearlyBudget };
         listExpenseSumBudgets.push(obj);
       }
@@ -232,6 +242,8 @@ const ExpenseGraph = ({ expenses, periodName }) => {
           xAxis={xAxis}
           yAxis={yAxis}
           budgetAxis={budgetAxis}
+          budget={budget}
+          daysRange={daysRange}
         ></ExpenseChart>
       </View>
       <View>

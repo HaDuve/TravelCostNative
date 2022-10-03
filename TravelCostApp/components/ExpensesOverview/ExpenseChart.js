@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import {
+  VictoryAxis,
   VictoryBar,
   VictoryChart,
   VictoryLine,
@@ -8,8 +9,16 @@ import {
   VictoryTheme,
 } from "victory-native";
 import { GlobalStyles } from "../../constants/styles";
+import { getDateMinusDays } from "../../util/date";
 
-const ExpenseChart = ({ inputData, xAxis, yAxis, budgetAxis }) => {
+const ExpenseChart = ({
+  inputData,
+  xAxis,
+  yAxis,
+  budgetAxis,
+  budget,
+  daysRange,
+}) => {
   const data = inputData
     ? inputData
     : // DUMMYDATA BEGIN
@@ -23,7 +32,7 @@ const ExpenseChart = ({ inputData, xAxis, yAxis, budgetAxis }) => {
   const yAxisString = yAxis ? yAxis : "earnings";
   // DUMMYDATA END
 
-  inputData.forEach((obj) => {
+  inputData?.forEach((obj) => {
     if (obj.expensesSum > 0) {
       obj.fill = GlobalStyles.colors.primary500;
     }
@@ -49,9 +58,23 @@ const ExpenseChart = ({ inputData, xAxis, yAxis, budgetAxis }) => {
               fill: ({ datum }) => datum.fill,
             },
           }}
+          standalone={false}
           data={data}
           x={xAxisString}
           y={yAxisString}
+        />
+        <VictoryLine
+          data={[
+            {
+              x: getDateMinusDays(new Date(), daysRange),
+              y: Number(budget),
+            },
+            { x: new Date(), y: Number(budget) },
+          ]}
+          standalone={false}
+          style={{
+            data: { stroke: GlobalStyles.colors.gray700, strokeWidth: 2 },
+          }}
         />
       </VictoryChart>
     </View>

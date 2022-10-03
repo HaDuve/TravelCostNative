@@ -1,4 +1,11 @@
-import { StyleSheet, Text, View, FlatList, Dimensions } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  ScrollView,
+  Dimensions,
+} from "react-native";
 import React, { useContext } from "react";
 import { ExpensesContext } from "../../../store/expenses-context";
 import {
@@ -16,7 +23,6 @@ import { TripContext } from "../../../store/trip-context";
 import { formatExpenseString } from "../../../util/string";
 import { GlobalStyles } from "../../../constants/styles";
 import ExpenseChart from "../../ExpensesOverview/ExpenseChart";
-import { ScrollView } from "react-native-gesture-handler";
 
 const ExpenseGraph = ({ expenses, periodName }) => {
   const ExpenseCtx = useContext(ExpensesContext);
@@ -34,6 +40,7 @@ const ExpenseGraph = ({ expenses, periodName }) => {
   const listExpenseSumBudgets = [];
   let xAxis = "";
   let yAxis = "";
+  let budgetAxis = "";
   const lastDays = 35;
   const lastWeeks = 20;
   const lastMonths = 15;
@@ -43,6 +50,7 @@ const ExpenseGraph = ({ expenses, periodName }) => {
     case "day":
       xAxis = "day";
       yAxis = "expensesSum";
+      budgetAxis = "dailyBudget";
       for (let i = 0; i < lastDays; i++) {
         const day = getDateMinusDays(today, i);
         const dayExpenses = ExpenseCtx.getDailyExpenses(i);
@@ -85,6 +93,8 @@ const ExpenseGraph = ({ expenses, periodName }) => {
     case "week":
       xAxis = "firstDay";
       yAxis = "expensesSum";
+      budgetAxis = "weeklyBudget";
+
       for (let i = 0; i < lastWeeks; i++) {
         const { firstDay, lastDay, weeklyExpenses } =
           ExpenseCtx.getWeeklyExpenses(i);
@@ -130,6 +140,8 @@ const ExpenseGraph = ({ expenses, periodName }) => {
     case "month":
       xAxis = "firstDay";
       yAxis = "expensesSum";
+      budgetAxis = "monthlyBudget";
+
       for (let i = 0; i < lastMonths; i++) {
         const { firstDay, lastDay, monthlyExpenses } =
           ExpenseCtx.getMonthlyExpenses(i);
@@ -167,6 +179,8 @@ const ExpenseGraph = ({ expenses, periodName }) => {
     case "year":
       xAxis = "firstDay";
       yAxis = "expensesSum";
+      budgetAxis = "yearlyBudget";
+
       for (let i = 0; i < lastYears; i++) {
         const { firstDay, lastDay, yearlyExpenses } =
           ExpenseCtx.getYearlyExpenses(i);
@@ -217,6 +231,7 @@ const ExpenseGraph = ({ expenses, periodName }) => {
           inputData={listExpenseSumBudgets}
           xAxis={xAxis}
           yAxis={yAxis}
+          budgetAxis={budgetAxis}
         ></ExpenseChart>
       </View>
       <View>

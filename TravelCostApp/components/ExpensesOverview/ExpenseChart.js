@@ -9,10 +9,11 @@ import {
 } from "victory-native";
 import { GlobalStyles } from "../../constants/styles";
 
-const ExpenseChart = ({ inputData, xAxis, yAxis }) => {
+const ExpenseChart = ({ inputData, xAxis, yAxis, budgetAxis }) => {
   const data = inputData
     ? inputData
-    : [
+    : // DUMMYDATA BEGIN
+      [
         { quarter: 1, earnings: 13000 },
         { quarter: 2, earnings: 16500 },
         { quarter: 3, earnings: 14250 },
@@ -20,12 +21,33 @@ const ExpenseChart = ({ inputData, xAxis, yAxis }) => {
       ];
   const xAxisString = xAxis ? xAxis : "quarter";
   const yAxisString = yAxis ? yAxis : "earnings";
+  // DUMMYDATA END
+
+  inputData.forEach((obj) => {
+    if (obj.expensesSum > 0) {
+      obj.fill = "green";
+    }
+    if (
+      obj.expensesSum > obj.dailyBudget ||
+      obj.expensesSum > obj.weeklyBudget ||
+      obj.expensesSum > obj.montylyBudget ||
+      obj.expensesSum > obj.yearlyBudget
+    ) {
+      obj.fill = "red";
+    }
+  });
   return (
     <View style={styles.container}>
-      {/* theme={VictoryTheme.material} */}
-      <VictoryChart height={200}>
-        <VictoryLine
-          horizontal={false}
+      <VictoryChart
+        height={200}
+        animate={{ duration: 2000}}
+      >
+        <VictoryScatter
+          style={{
+            data: {
+              fill: ({ datum }) => datum.fill,
+            },
+          }}
           data={data}
           x={xAxisString}
           y={yAxisString}

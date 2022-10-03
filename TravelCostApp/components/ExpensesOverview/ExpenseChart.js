@@ -25,7 +25,7 @@ const ExpenseChart = ({ inputData, xAxis, yAxis, budgetAxis }) => {
 
   inputData.forEach((obj) => {
     if (obj.expensesSum > 0) {
-      obj.fill = "green";
+      obj.fill = GlobalStyles.colors.primary500;
     }
     if (
       obj.expensesSum > obj.dailyBudget ||
@@ -33,12 +33,16 @@ const ExpenseChart = ({ inputData, xAxis, yAxis, budgetAxis }) => {
       obj.expensesSum > obj.montylyBudget ||
       obj.expensesSum > obj.yearlyBudget
     ) {
-      obj.fill = "red";
+      obj.fill = GlobalStyles.colors.error300;
     }
   });
   return (
     <View style={styles.container}>
-      <VictoryChart height={200} animate={{ duration: 2000 }}>
+      <VictoryChart
+        height={200}
+        animate={{ duration: 2000, onLoad: { duration: 500 } }}
+        domainPadding={{ x: [10, 10], y: 5 }}
+      >
         <VictoryBar
           style={{
             data: {

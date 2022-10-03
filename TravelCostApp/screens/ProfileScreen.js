@@ -15,7 +15,6 @@ const ProfileScreen = ({ route, navigation, param }) => {
   const TripCtx = useContext(TripContext);
 
   const trip = [TripCtx.tripName];
-  console.log("ProfileScreen ~ trip", trip);
 
   const allTripsList = [
     {

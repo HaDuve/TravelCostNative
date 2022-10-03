@@ -49,7 +49,7 @@ const ExpenseChart = ({
     <View style={styles.container}>
       <VictoryChart
         height={200}
-        animate={{ duration: 2000, onLoad: { duration: 500 } }}
+        animate={{ duration: 1000, onLoad: { duration: 500 } }}
         domainPadding={{ x: [10, 10], y: 5 }}
       >
         <VictoryBar

@@ -112,6 +112,7 @@ export function splitTypesDropdown() {
 }
 
 export function travellerToDropdown(travellers) {
+  if (!travellers || travellers?.length < 1) return;
   const listOfLabelValues = [];
   travellers.forEach((traveller) => {
     // TODO: make value uid based and not name based

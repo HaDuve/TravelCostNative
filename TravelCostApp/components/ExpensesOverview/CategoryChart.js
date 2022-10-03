@@ -24,6 +24,7 @@ const CategoryChart = ({ inputData }) => {
       setUseDummyData(false);
     }, 100);
   }
+
   return (
     <View style={styles.container}>
       <VictoryPie
@@ -32,7 +33,7 @@ const CategoryChart = ({ inputData }) => {
         startAngle={-270}
         endAngle={90}
         animate={{
-          duration: 2000,
+          duration: 500,
           onLoad: { duration: 500 },
         }}
         innerRadius={70}

@@ -235,24 +235,26 @@ const ExpenseGraph = ({ expenses, periodName }) => {
       break;
   }
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.graphContainer}>
-        <ExpenseChart
-          inputData={listExpenseSumBudgets}
-          xAxis={xAxis}
-          yAxis={yAxis}
-          budgetAxis={budgetAxis}
-          budget={budget}
-          daysRange={daysRange}
-        ></ExpenseChart>
-      </View>
+    <View style={styles.container}>
       <View>
         <FlatList
+          ListHeaderComponent={
+            <View style={styles.graphContainer}>
+              <ExpenseChart
+                inputData={listExpenseSumBudgets}
+                xAxis={xAxis}
+                yAxis={yAxis}
+                budgetAxis={budgetAxis}
+                budget={budget}
+                daysRange={daysRange}
+              ></ExpenseChart>
+            </View>
+          }
           data={listExpenseSumBudgets}
           renderItem={renderItemRef}
         ></FlatList>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 

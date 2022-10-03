@@ -6,7 +6,7 @@ import { getCatSymbol } from "../../../util/category";
 import { useContext } from "react";
 import { UserContext } from "../../../store/user-context";
 import { TripContext } from "../../../store/trip-context";
-import { formatExpenseString } from "../../../util/string";
+import { formatExpenseString, truncateString } from "../../../util/string";
 
 const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   let budgetProgress = (catCost / totalCost) * 1;
@@ -15,8 +15,8 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
     return <></>;
   }
 
-  let catString = cat?.slice(0, 18);
-  if (cat?.length > 18) catString = catString + "...";
+  const widthChars = Dimensions.get("screen").width / 22;
+  let catString = truncateString(cat, widthChars);
   const budgetColor = color;
   const unfilledColor = GlobalStyles.colors.gray500;
   const icon = getCatSymbol(cat);
@@ -30,13 +30,13 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   return (
     <View style={styles.container}>
       <View style={styles.titleRow}>
-        <Ionicons name={icon} size={30} color={GlobalStyles.colors.error300} />
+        <Ionicons name={icon} size={30} color={color} />
         <Text style={[styles.sum, { color: budgetColor }]}>
           {stylingSpace}
           {catString}
         </Text>
         <View style={{ flex: 1 }}></View>
-        <Text style={[styles.sum, { color: budgetColor }]}>
+        <Text style={[styles.sum, { color: GlobalStyles.colors.error300 }]}>
           {catCostString}
           {userCurrency}
         </Text>

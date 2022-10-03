@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { G } from "react-native-svg";
 import {
@@ -14,14 +14,27 @@ import { GlobalStyles } from "../../constants/styles";
 import { getDateMinusDays } from "../../util/date";
 
 const CategoryChart = ({ inputData }) => {
+  const [useDummyData, setUseDummyData] = useState(true);
+  let chartDataForRender = Array.from(inputData);
+  // this little trick is necessary to make the pie animate on load.  For the very first render, pare down
+  // the chartData array to just one element, then, for all future renders, use the fully array
+  if (useDummyData) {
+    chartDataForRender = inputData.slice(0, 1);
+    setTimeout(() => {
+      setUseDummyData(false);
+    }, 100);
+  }
   return (
     <View style={styles.container}>
       <VictoryPie
-        data={inputData}
+        data={chartDataForRender}
         height={200}
         startAngle={-270}
         endAngle={90}
-        animate={{ duration: 2000, onLoad: { duration: 500 } }}
+        animate={{
+          duration: 2000,
+          onLoad: { duration: 500 },
+        }}
         innerRadius={70}
         padAngle={0}
         padding={10}

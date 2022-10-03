@@ -263,13 +263,14 @@ export default ExpenseGraph;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: 0,
   },
   graphContainer: {
     flex: 1,
   },
   itemContainer: {
     padding: 8,
+    paddingHorizontal: 24,
     flexDirection: "row",
     justifyContent: "space-between",
   },

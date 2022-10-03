@@ -38,11 +38,8 @@ const ExpenseChart = ({ inputData, xAxis, yAxis, budgetAxis }) => {
   });
   return (
     <View style={styles.container}>
-      <VictoryChart
-        height={200}
-        animate={{ duration: 2000}}
-      >
-        <VictoryScatter
+      <VictoryChart height={200} animate={{ duration: 2000 }}>
+        <VictoryBar
           style={{
             data: {
               fill: ({ datum }) => datum.fill,

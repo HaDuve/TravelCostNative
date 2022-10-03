@@ -78,7 +78,7 @@ const ExpenseCategories = ({ expenses, periodName }) => {
   });
 
   return (
-    <View>
+    <View style={styles.container}>
       <FlatList
         data={catSumCat}
         renderItem={renderItem}
@@ -93,4 +93,8 @@ const ExpenseCategories = ({ expenses, periodName }) => {
 
 export default ExpenseCategories;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

@@ -16,6 +16,15 @@ import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 function RecentExpenses({ navigation }) {
   const expensesCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
@@ -41,10 +50,10 @@ function RecentExpenses({ navigation }) {
   }, [userCtx.periodName]);
 
   const [items, setItems] = useState([
-    { label: "Today", value: "day" },
-    { label: "Week", value: "week" },
-    { label: "Month", value: "month" },
-    { label: "Year", value: "year" },
+    { label: i18n.t("todayLabel"), value: "day" },
+    { label: i18n.t("weekLabel"), value: "week" },
+    { label: i18n.t("monthLabel"), value: "month" },
+    { label: i18n.t("yearLabel"), value: "year" },
     { label: "Total", value: "total" },
   ]);
 

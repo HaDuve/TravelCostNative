@@ -12,6 +12,9 @@ const en = {
   monthLabel: "Month",
   yearLabel: "Year",
   totalLabel: "Total",
+
+  // Error Messages
+  fetchError: "Could not fetch expenses from the database! ",
 };
 const de = {
   // standard strings
@@ -27,5 +30,8 @@ const de = {
   monthLabel: "Monat",
   yearLabel: "Jahr",
   totalLabel: "Gesamt",
+
+  // Error Messages
+  fetchError: "Konnte die Ausgaben nicht von der Datenbank abrufen! ",
 };
 export { en, de };

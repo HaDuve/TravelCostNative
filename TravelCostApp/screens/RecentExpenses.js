@@ -54,7 +54,7 @@ function RecentExpenses({ navigation }) {
     { label: i18n.t("weekLabel"), value: "week" },
     { label: i18n.t("monthLabel"), value: "month" },
     { label: i18n.t("yearLabel"), value: "year" },
-    { label: "Total", value: "total" },
+    { label: i18n.t("totalLabel"), value: "total" },
   ]);
 
   useEffect(() => {
@@ -64,7 +64,7 @@ function RecentExpenses({ navigation }) {
         const expenses = await getAllExpenses(tripid);
         expensesCtx.setExpenses(expenses);
       } catch (error) {
-        setError("Could not fetch expenses from the web database! " + error);
+        setError(i18n.t("fetchError") + error);
       }
       setIsFetching(false);
     }

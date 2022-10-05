@@ -114,8 +114,7 @@ function RecentExpenses({ navigation }) {
       <View style={styles.tempGrayBar1}></View>
       <ExpensesOutput
         expenses={recentExpenses}
-        expensesPeriod={"Expenses this " + PeriodValue}
-        fallbackText={"No expenses in " + PeriodValue}
+        fallbackText={i18n.t("fallbackTextExpenses")}
       />
       <AddExpenseButton navigation={navigation} />
     </View>

@@ -13,6 +13,14 @@ import { AuthContext } from "../../store/auth-context";
 import { ExpensesContext } from "../../store/expenses-context";
 import IconButton from "../UI/IconButton";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+
 function renderExpenseItem(itemData) {
   // swipe left to delete
   const renderRightActions = (progress, dragX, onClick) => {
@@ -62,14 +70,11 @@ function onClick({ item, index }) {
         await deleteExpense(tripid, uid, editedExpenseId);
         expenseCtx.deleteExpense(editedExpenseId);
       } catch (error) {
-        console.log(
-          "Could not delete expense - please try again later!",
-          error
-        );
+        console.log(i18n.t("deleteError"), error);
       }
     }
     Alert.alert(
-      "Are you sure?",
+      i18n.t("sure"),
       "Are you sure you want to delete this expense?",
       [
         // The "No" button

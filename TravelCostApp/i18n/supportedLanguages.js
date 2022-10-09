@@ -5,9 +5,10 @@ const en = {
   signOutAlertMess: "Are you sure you want to sign out?",
   confirm: "Okay",
   sure: "Are you sure?",
+  sureExt: "Are you sure you want to delete this expense?",
   resetBtn: "Reset password",
-  yes: "yes",
-  no: "no",
+  yes: "Yes",
+  no: "No",
 
   // Dropdown Labels
   todayLabel: "Today",
@@ -29,7 +30,10 @@ const de = {
   signOutAlertMess: "Sind Sie sicher, dass Sie sich abmelden wollen?",
   confirm: "Okay",
   sure: "Sind Sie sicher?",
+  sureExt: "Sind Sie sicher, dass Sie diese Ausgabe löschen wollen?",
   resetBtn: "Passwort zurücksetzen",
+  yes: "Ja",
+  no: "Nein",
 
   // Dropdown Labels
   todayLabel: "Heute",

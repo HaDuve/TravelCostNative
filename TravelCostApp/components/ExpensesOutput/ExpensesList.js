@@ -21,6 +21,12 @@ const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 
+// GLOBALS across all expenseItems
+var tripid = "";
+var expenseCtx = {};
+let row = [];
+let prevOpenedRow;
+
 function renderExpenseItem(itemData) {
   // swipe left to delete
   const renderRightActions = (progress, dragX, onClick) => {
@@ -73,34 +79,24 @@ function onClick({ item, index }) {
         console.log(i18n.t("deleteError"), error);
       }
     }
-    Alert.alert(
-      i18n.t("sure"),
-      "Are you sure you want to delete this expense?",
-      [
-        // The "No" button
-        // Does nothing but dismiss the dialog when tapped
-        {
-          text: "No",
-          onPress: forceCloseRow(index),
+    Alert.alert(i18n.t("sure"), i18n.t("sureExt"), [
+      // The "No" button
+      // Does nothing but dismiss the dialog when tapped
+      {
+        text: i18n.t("no"),
+        onPress: forceCloseRow(index),
+      },
+      // The "Yes" button
+      {
+        text: i18n.t("yes"),
+        onPress: () => {
+          deleteExp();
         },
-        // The "Yes" button
-        {
-          text: "Yes",
-          onPress: () => {
-            deleteExp();
-          },
-        },
-      ]
-    );
+      },
+    ]);
   }
   deleteExpenseHandler();
 }
-
-// global variables across all expenseItems
-var tripid = "";
-var expenseCtx = {};
-let row = [];
-let prevOpenedRow;
 
 function closeRow(index) {
   if (prevOpenedRow && prevOpenedRow !== row[index]) {

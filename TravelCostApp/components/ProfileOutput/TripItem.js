@@ -18,6 +18,15 @@ import { onShare } from "./ShareTrip";
 import { calcOpenSplitsTable } from "../../util/split";
 import LoadingOverlay from "../UI/LoadingOverlay";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 function TripItem({
   tripid,
   tripName,
@@ -58,28 +67,29 @@ function TripItem({
   }, []);
 
   function tripPressHandler() {
+    // TODO: Android can only handle alert with 2 actions, so this needs to be changed or actions will go missing
     console.log("pressed: ", tripid);
     Alert.alert(tripName, "Please choose action:", [
       {
-        text: "Cancel",
+        text: i18n.t("cancel"),
         onPress: () => navigation.navigate("Profile"),
         style: "cancel",
       },
       {
-        text: "Invite other travellers",
+        text: i18n.t("inviteTravellers"),
         onPress: () => {
           onShare(tripid);
         },
       },
       {
-        text: "Set as active Trip",
+        text: i18n.t("setActiveTrip"),
         onPress: () => {
           tripCtx.setCurrentTrip(tripid, tripData);
           console.log(`set ${tripName} ${tripid} as active!`);
         },
       },
       {
-        text: "Calculate open splits",
+        text: i18n.t("calcOpenSplits"),
         onPress: () => {
           navigation.navigate("SplitSummary", { tripid: tripid });
         },
@@ -137,6 +147,7 @@ function TripItem({
               unfilledColor={GlobalStyles.colors.gray600}
               borderWidth={0}
               borderRadius={8}
+              // TODO: add this progress number from useEffect or Context
               progress={0}
               height={12}
               width={150}

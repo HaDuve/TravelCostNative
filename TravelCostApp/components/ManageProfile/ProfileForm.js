@@ -19,6 +19,15 @@ import Button from "../UI/Button";
 import { TripContext } from "../../store/trip-context";
 import FlatButton from "../UI/FlatButton";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 const ProfileForm = ({ navigation, onCancel }) => {
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
@@ -28,15 +37,15 @@ const ProfileForm = ({ navigation, onCancel }) => {
   let currencyPickerRef = undefined;
 
   function logoutHandler() {
-    return Alert.alert("Are you sure?", "Are you sure you want to logout?", [
+    return Alert.alert(i18n.t("sure"), i18n.t("signOutAlertMess"), [
       // The "No" button
       // Does nothing but dismiss the dialog when tapped
       {
-        text: "No",
+        text: i18n.t("no"),
       },
       // The "Yes" button
       {
-        text: "Yes",
+        text: i18n.t("yes"),
         onPress: () => {
           AuthCtx.logout();
         },
@@ -102,7 +111,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
         return;
       }
     } catch (error) {
-      Alert.alert("Could not save Profile! :(");
+      Alert.alert(i18n.t("profileError"));
     }
   }
 
@@ -144,15 +153,15 @@ const ProfileForm = ({ navigation, onCancel }) => {
   const freshlyNavigationButtons = (
     <View style={styles.navButtonContainer}>
       <FlatButton style={[styles.navButton]} onPress={joinInvite}>
-        I have an invitation from another Traveller!
+        {i18n.t("invitationText")}
       </FlatButton>
-      {/*  for debugging i leave this condition only around this button, it should be around the whole view though */}
+      {/*  TODO: DEBUG: for debugging i leave this condition only around this button, it should be around the whole view though */}
       {freshlyCreated && (
         <Button
           style={styles.navButton}
           onPress={() => navigation.navigate("ManageTrip")}
         >
-          Create first Trip
+          {i18n.t("createFirstTrip")}
         </Button>
       )}
     </View>
@@ -177,7 +186,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
       </View>
       <View style={styles.inputsRow}>
         <Input
-          label="Name"
+          label={i18n.t("nameLabel")}
           style={styles.rowInput}
           inputStyle={styles.inputStyle}
           textInputConfig={{

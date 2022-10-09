@@ -9,6 +9,15 @@ import { TripContext } from "../store/trip-context";
 import Button from "../components/UI/Button";
 import { UserContext } from "../store/user-context";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 const ProfileScreen = ({ route, navigation, param }) => {
   const UserCtx = useContext(UserContext);
   const FreshlyCreated = UserCtx.freshlyCreated;
@@ -44,7 +53,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
     <>
       <View style={styles.tripContainer}>
         <View style={styles.horizontalContainer}>
-          <Text style={styles.tripListTitle}>My Trip</Text>
+          <Text style={styles.tripListTitle}>{i18n.t("myTrips")}</Text>
           <IconButton
             icon={"create-outline"}
             size={36}

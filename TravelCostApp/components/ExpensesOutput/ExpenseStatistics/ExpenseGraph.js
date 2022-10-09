@@ -23,7 +23,15 @@ import { TripContext } from "../../../store/trip-context";
 import { formatExpenseString } from "../../../util/string";
 import { GlobalStyles } from "../../../constants/styles";
 import ExpenseChart from "../../ExpensesOverview/ExpenseChart";
-import { i18n } from "react-native-neat-date-picker/src/dateformat";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
 
 const ExpenseGraph = ({ expenses, periodName }) => {
   const ExpenseCtx = useContext(ExpensesContext);

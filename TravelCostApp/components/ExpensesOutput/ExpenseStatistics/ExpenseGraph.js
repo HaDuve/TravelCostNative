@@ -23,6 +23,7 @@ import { TripContext } from "../../../store/trip-context";
 import { formatExpenseString } from "../../../util/string";
 import { GlobalStyles } from "../../../constants/styles";
 import ExpenseChart from "../../ExpensesOverview/ExpenseChart";
+import { i18n } from "react-native-neat-date-picker/src/dateformat";
 
 const ExpenseGraph = ({ expenses, periodName }) => {
   const ExpenseCtx = useContext(ExpensesContext);
@@ -70,9 +71,9 @@ const ExpenseGraph = ({ expenses, periodName }) => {
         if (
           item.day.toDateString() === getDateMinusDays(today, 1).toDateString()
         ) {
-          dayString = "Yesterday";
+          dayString = i18n.t("yesterday");
         } else if (item.day.toDateString() === new Date().toDateString()) {
-          dayString = "Today";
+          dayString = i18n.t("today");
         } else {
           dayString = toDayMonthString(item.day);
         }
@@ -117,12 +118,12 @@ const ExpenseGraph = ({ expenses, periodName }) => {
           item.firstDay.toDateString() ===
           getPreviousMondayDate(getDateMinusDays(today, 7)).toDateString()
         ) {
-          weekString = "Last Week";
+          weekString = i18n.t("lastWeek");
         } else if (
           item.firstDay.toDateString() ===
           getPreviousMondayDate(new Date()).toDateString()
         ) {
-          weekString = "This Week";
+          weekString = i18n.t("thisWeek");
         } else {
           weekString = toDayMonthString2(item.firstDay, item.lastDay);
         }
@@ -225,9 +226,7 @@ const ExpenseGraph = ({ expenses, periodName }) => {
     case "total":
       return (
         <View style={{ padding: 24 }}>
-          <Text style={styles.text1}>
-            Please choose a Time Frame in the Dropdown Bar.
-          </Text>
+          <Text style={styles.text1}>{i18n.t("fallbackTimeFrame")}</Text>
         </View>
       );
       break;

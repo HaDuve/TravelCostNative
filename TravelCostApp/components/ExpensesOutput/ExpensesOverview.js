@@ -5,6 +5,15 @@ import IconButton from "../UI/IconButton";
 import ExpenseGraph from "./ExpenseStatistics/ExpenseGraph";
 import { GlobalStyles } from "../../constants/styles";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 const ExpensesOverview = ({ expenses, periodName }) => {
   const [toggleGraph, setToggleGraph] = useState(false);
   function toggleContent() {
@@ -14,10 +23,11 @@ const ExpensesOverview = ({ expenses, periodName }) => {
   let titleString = "";
   switch (periodName) {
     case "total":
-      titleString = "Overview";
+      titleString = i18n.t("overview");
       break;
     default:
-      titleString = `Last ${periodName}s`;
+      // convert day into days etc. for localization
+      titleString = `${i18n.t("last")} ${i18n.t(periodName + "s")}`;
       break;
   }
 
@@ -25,7 +35,9 @@ const ExpensesOverview = ({ expenses, periodName }) => {
     <View style={styles.container}>
       <View>
         {!toggleGraph && <Text style={styles.titleText}> {titleString}</Text>}
-        {toggleGraph && <Text style={styles.titleText}> Categories </Text>}
+        {toggleGraph && (
+          <Text style={styles.titleText}> {i18n.t("categories")} </Text>
+        )}
       </View>
       <View style={styles.toggleButton}>
         <IconButton

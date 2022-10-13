@@ -384,6 +384,12 @@ const ExpenseForm = ({
   // hide the pickers
   const hidePickers = true;
 
+  // set the default range to today until tomorrow for now
+  // TODO: fix the date -1 bug and add range functionality
+  const today = new Date();
+  const tomorrow = new Date().setDate(today.getDate() + 1);
+  const yesterday = new Date().setDate(today.getDate() - 1);
+
   return (
     <>
       <DatePicker
@@ -392,6 +398,7 @@ const ExpenseForm = ({
         onCancel={onCancelRange}
         onConfirm={onConfirmRange}
         startDate={new Date()}
+        endDate={tomorrow}
       />
       <View style={styles.form}>
         <View style={styles.inputsRow}>

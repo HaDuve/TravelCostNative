@@ -112,14 +112,16 @@ export function splitTypesDropdown() {
 }
 
 export function travellerToDropdown(travellers) {
-  if (!travellers || travellers?.length < 1) return;
+  if (!travellers || travellers?.length < 1) {
+    console.log("travellertodropdown failed");
+    return [];
+  }
   const listOfLabelValues = [];
   travellers.forEach((traveller) => {
     // TODO: make value uid based and not name based
     listOfLabelValues.push({ label: traveller, value: traveller });
   });
-  const response = listOfLabelValues;
-  return response;
+  return listOfLabelValues;
 }
 
 export async function calcOpenSplitsTable(tripid) {

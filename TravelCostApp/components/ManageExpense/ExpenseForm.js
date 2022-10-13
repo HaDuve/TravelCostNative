@@ -35,6 +35,15 @@ import {
   validateSplitList,
 } from "../../util/split";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 const ExpenseForm = ({
   onCancel,
   onSubmit,
@@ -96,7 +105,12 @@ const ExpenseForm = ({
 
   // dropdown for whoPaid picker
   const currentTravellers = TripCtx.travellers;
-  const dropdownItems = travellerToDropdown(currentTravellers);
+  let dropdownItems = travellerToDropdown(currentTravellers);
+
+  useEffect(() => {
+    dropdownItems = travellerToDropdown(currentTravellers);
+  }, []);
+
   const [items, setItems] = useState(dropdownItems);
   const [open, setOpen] = useState(false);
   const [whoPaid, setWhoPaid] = useState(
@@ -398,13 +412,13 @@ const ExpenseForm = ({
         onCancel={onCancelRange}
         onConfirm={onConfirmRange}
         startDate={new Date()}
-        endDate={tomorrow}
+        endDate={new Date()}
       />
       <View style={styles.form}>
         <View style={styles.inputsRow}>
           <Input
             style={styles.rowInput}
-            label={"Price in " + inputs.currency.value}
+            label={i18n.t("priceIn") + inputs.currency.value}
             textInputConfig={{
               keyboardType: "decimal-pad",
               onChangeText: inputChangedHandler.bind(this, "amount"),
@@ -443,10 +457,14 @@ const ExpenseForm = ({
               onPress={toggleAdvancedHandler}
             />
             {hideAdvanced && (
-              <Text style={styles.advancedText}>Show more options</Text>
+              <Text style={styles.advancedText}>
+                {i18n.t("showMoreOptions")}
+              </Text>
             )}
             {!hideAdvanced && (
-              <Text style={styles.advancedText}>Show less options</Text>
+              <Text style={styles.advancedText}>
+                {i18n.t("showLessOptions")}
+              </Text>
             )}
           </View>
         </Pressable>
@@ -454,7 +472,9 @@ const ExpenseForm = ({
         {!hideAdvanced && (
           <>
             <View style={styles.currencyContainer}>
-              <Text style={styles.currencyLabel}>Currency</Text>
+              <Text style={styles.currencyLabel}>
+                {i18n.t("currencyLabel")}
+              </Text>
               <CurrencyPicker
                 currencyPickerRef={(ref) => {
                   currencyPickerRef = ref;
@@ -497,7 +517,7 @@ const ExpenseForm = ({
                     symbolNativeStyle: {},
                   },
                 }}
-                title={"Currency"}
+                title={i18n.t("currencyLabel")}
                 searchPlaceholder={"Search"}
                 showCloseButton={true}
                 showModalTitle={true}
@@ -513,7 +533,7 @@ const ExpenseForm = ({
             /> */}
             </View>
             <Input
-              label="Description"
+              label={i18n.t("descriptionLabel")}
               textInputConfig={{
                 onChangeText: inputChangedHandler.bind(this, "description"),
                 value: inputs.description.value,
@@ -533,7 +553,7 @@ const ExpenseForm = ({
               invalid={!inputs.date.isValid}
             /> */}
             <View style={{ marginLeft: 16 }}>
-              <Text style={styles.topCurrencyText}>Date</Text>
+              <Text style={styles.topCurrencyText}>{i18n.t("dateLabel")}</Text>
             </View>
             <View style={styles.dateContainer}>
               <IconButton
@@ -567,7 +587,7 @@ const ExpenseForm = ({
                       !inputs.whoPaid.isValid && styles.invalidLabel,
                     ]}
                   >
-                    Who paid?
+                    {i18n.t("whoPaid")}
                   </Text>
                   {!loadingTravellers && (
                     <DropDownPicker
@@ -584,16 +604,11 @@ const ExpenseForm = ({
                         presentationStyle: "pageSheet",
                       }}
                       searchable={false}
-                      modalTitle={"Who paid?"}
-                      modalTitleStyle={{
-                        color: GlobalStyles.colors.textColor,
-                        fontSize: 32,
-                        fontWeight: "bold",
-                      }}
+                      modalTitle={i18n.t("whoPaid")}
                       modalContentContainerStyle={{
                         backgroundColor: GlobalStyles.colors.backgroundColor,
                       }}
-                      placeholder="Who Paid?"
+                      placeholder={" - "}
                       containerStyle={styles.dropdownContainer}
                       style={
                         !inputs.whoPaid.isValid
@@ -620,12 +635,7 @@ const ExpenseForm = ({
                     presentationStyle: "pageSheet",
                   }}
                   searchable={false}
-                  modalTitle={"How are the costs shared?"}
-                  modalTitleStyle={{
-                    color: GlobalStyles.colors.textColor,
-                    fontSize: 32,
-                    fontWeight: "bold",
-                  }}
+                  modalTitle={i18n.t("howShared")}
                   modalContentContainerStyle={{
                     backgroundColor: GlobalStyles.colors.backgroundColor,
                   }}
@@ -653,19 +663,27 @@ const ExpenseForm = ({
                 onClose={splitHandler}
                 listMode="MODAL"
                 multiple={true}
+                CloseIconComponent={({ style }) => (
+                  <Text
+                    style={{
+                      color: GlobalStyles.colors.textColor,
+                      fontSize: 24,
+                      fontWeight: "bold",
+                      padding: 4,
+                    }}
+                  >
+                    {i18n.t("confirm2")}
+                  </Text>
+                )}
                 min={1}
                 max={99}
+                labelProps={{ style: { padding: 40 } }}
                 modalProps={{
                   animationType: "slide",
                   presentationStyle: "pageSheet",
                 }}
                 searchable={false}
-                modalTitle={"Who is the cost shared between?"}
-                modalTitleStyle={{
-                  color: GlobalStyles.colors.textColor,
-                  fontSize: 32,
-                  fontWeight: "bold",
-                }}
+                modalTitle={i18n.t("whoShared")}
                 modalContentContainerStyle={{
                   backgroundColor: GlobalStyles.colors.backgroundColor,
                 }}
@@ -681,7 +699,18 @@ const ExpenseForm = ({
                 textStyle={styles.dropdownTextStyle}
               />
             )}
-            <View styles={styles.advancedRowSplit}>
+            <View styles={[styles.advancedRowSplit]}>
+              {!splitTypeSelf && whoPaidValid && (
+                <Text
+                  style={[
+                    styles.currencyLabel,
+                    ,
+                    { marginTop: 16, marginLeft: 16 },
+                  ]}
+                >
+                  {i18n.t("whoShared")}
+                </Text>
+              )}
               {!splitTypeSelf && (
                 <FlatList
                   // numColumns={2}
@@ -719,8 +748,8 @@ const ExpenseForm = ({
                           style={[
                             styles.rowInput,
                             {
-                              minWidth: Dimensions.get("window").width / 6,
-                              maxWidth: Dimensions.get("window").width / 6,
+                              minWidth: Dimensions.get("window").width / 4,
+                              maxWidth: Dimensions.get("window").width / 4,
                             },
                           ]}
                           label="Split"
@@ -734,6 +763,7 @@ const ExpenseForm = ({
                               itemData.index,
                               itemData.item
                             ),
+                            // TODO: mask this input https://www.npmjs.com/package/react-native-mask-input and fix random response
                             value: splitValue ? splitValue : "",
                           }}
                         ></Input>
@@ -746,9 +776,7 @@ const ExpenseForm = ({
           </>
         )}
         {formIsInvalid && !hideAdvanced && (
-          <Text style={styles.errorText}>
-            Invalid input values - please check your entered data!
-          </Text>
+          <Text style={styles.errorText}>{i18n.t("invalidInput")} </Text>
         )}
       </View>
       <View style={styles.buttonContainer}>
@@ -872,7 +900,8 @@ const styles = StyleSheet.create({
   },
   dropdownTextStyle: {
     fontSize: 18,
-    color: GlobalStyles.colors.primary500,
+    color: GlobalStyles.colors.textColor,
+    padding: 4,
   },
   hidePickersStyle: {
     maxHeight: 0,

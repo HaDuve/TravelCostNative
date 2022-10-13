@@ -4,6 +4,7 @@ const en = {
   signOutAlertTitle: "Cancel",
   signOutAlertMess: "Are you sure you want to sign out?",
   confirm: "Okay",
+  confirm2: "Confirm",
   cancel: "Cancel",
   sure: "Are you sure?",
   sureExt: "Are you sure you want to delete this expense?",
@@ -42,7 +43,17 @@ const en = {
 
   // Form Labels
   nameLabel: "Name",
+  priceIn: "Price in ",
+  showMoreOptions: "Show more options",
+  showLessOptions: "Show less options",
+  currencyLabel: "Currency",
+  descriptionLabel: "Description",
+  dateLabel: "Date",
 
+  // Modal Titles
+  whoPaid: "Who paid?",
+  howShared: "How are the costs shared?",
+  whoShared: "Who is the cost shared between?",
   // Dropdown Labels
   todayLabel: "Today",
   weekLabel: "Week",
@@ -57,6 +68,7 @@ const en = {
   fallbackTextExpenses:
     "No expenses in this time period yet. Add new expenses with the Button below!",
   fallbackTimeFrame: "Please choose a Time Frame in the Dropdown Bar.",
+  invalidInput: "Invalid input values - please check your entered data!",
 };
 const de = {
   // standard strings
@@ -64,6 +76,7 @@ const de = {
   signOutAlertTitle: "Abbrechen",
   signOutAlertMess: "Sind Sie sicher, dass Sie sich abmelden wollen?",
   confirm: "Okay",
+  confirm2: "Bestätigen",
   cancel: "Abbrechen",
   sure: "Sind Sie sicher?",
   sureExt: "Sind Sie sicher, dass Sie diese Ausgabe löschen wollen?",
@@ -102,6 +115,17 @@ const de = {
 
   // Form Labels
   nameLabel: "Name",
+  priceIn: "Preis in ",
+  showMoreOptions: "Zeige mehr Optionen",
+  showLessOptions: "Zeige weniger Optionen",
+  currencyLabel: "Währung",
+  descriptionLabel: "Beschreibung",
+  dateLabel: "Datum",
+
+  // Modal Titles
+  whoPaid: "Wer hat bezahlt?",
+  howShared: "Wie wurden die Kosten geteilt?",
+  whoShared: "Zwischen wem wurden die Kosten geteilt?",
 
   // Dropdown Labels
   todayLabel: "Heute",
@@ -121,5 +145,6 @@ const de = {
     "Noch keine Ausgaben in diesem Zeitraum. Neue Ausgaben mit der Schaltfläche unten hinzufügen!",
   fallbackTimeFrame:
     "Bitte wählen Sie einen Zeitraum oben in der Dropdown-Leiste.",
+  invalidInput: "Ungültige Eingabe - Bitte überprüfe die eingegebenen Daten!",
 };
 export { en, de };

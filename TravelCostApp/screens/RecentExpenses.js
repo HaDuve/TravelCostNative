@@ -11,7 +11,7 @@ import { UserContext } from "../store/user-context";
 import { toShortFormat } from "../util/date";
 import { getAllExpenses } from "../util/http";
 
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, RefreshControl } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
@@ -57,9 +57,9 @@ function RecentExpenses({ navigation }) {
     { label: i18n.t("totalLabel"), value: "total" },
   ]);
 
-  // TODO: call getExpenses on refresh
-  async function getExpenses() {
-    setIsFetching(true);
+  async function getExpenses(refresh) {
+    if (!refresh) setIsFetching(true);
+    setRefreshing(true);
     try {
       const expenses = await getAllExpenses(tripid);
       expensesCtx.setExpenses(expenses);
@@ -70,12 +70,16 @@ function RecentExpenses({ navigation }) {
     } catch (error) {
       setError(i18n.t("fetchError") + error);
     }
-    setIsFetching(false);
+    if (!refresh) setIsFetching(false);
+    setRefreshing(false);
   }
 
   useEffect(() => {
     getExpenses();
   }, []);
+
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = getExpenses.bind(this, true);
 
   function errorHandler() {
     setError(null);
@@ -113,14 +117,15 @@ function RecentExpenses({ navigation }) {
           style={styles.dropdown}
           textStyle={styles.dropdownTextStyle}
         />
-        {datalength && (
-          <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
-        )}
+        <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
       </View>
       <View style={styles.tempGrayBar1}></View>
       <ExpensesOutput
         expenses={recentExpenses}
         fallbackText={i18n.t("fallbackTextExpenses")}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
       <AddExpenseButton navigation={navigation} />
     </View>

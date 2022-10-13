@@ -83,7 +83,6 @@ const de = {
   calcOpenSplits: "Berechne offene Schulden",
   daily: "Täglich",
 
-
   // today - yesterday etc.
   today: "Heute",
   yesterday: "Gestern",
@@ -109,7 +108,7 @@ const de = {
   weekLabel: "Woche",
   monthLabel: "Monat",
   yearLabel: "Jahr",
-  totalLabel: "Gesamt",
+  totalLabel: "Total",
 
   // Error Messages
   fetchError: "Konnte die Ausgaben nicht von der Datenbank abrufen! ",

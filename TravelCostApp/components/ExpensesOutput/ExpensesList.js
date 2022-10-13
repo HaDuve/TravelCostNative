@@ -109,7 +109,7 @@ function forceCloseRow(index) {
 }
 
 // Displays a list of all expenses.
-function ExpensesList({ expenses }) {
+function ExpensesList({ expenses, refreshControl }) {
   const tripCtx = useContext(TripContext);
   expenseCtx = useContext(ExpensesContext);
 
@@ -120,6 +120,7 @@ function ExpensesList({ expenses }) {
       data={expenses}
       renderItem={renderExpenseItem}
       keyExtractor={(item) => item.id}
+      refreshControl={refreshControl}
     />
   );
 }

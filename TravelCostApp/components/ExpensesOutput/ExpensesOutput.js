@@ -1,17 +1,20 @@
 import { StyleSheet, Text, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 
 import { GlobalStyles } from "../../constants/styles";
 import ExpensesList from "./ExpensesList";
 
-function ExpensesOutput({ expenses, fallbackText }) {
+function ExpensesOutput({ expenses, fallbackText, refreshControl }) {
   let content = <Text style={styles.infoText}>{fallbackText}</Text>;
   if (expenses.length > 0) {
-    content = <ExpensesList expenses={expenses} />;
+    content = (
+      <ExpensesList expenses={expenses} refreshControl={refreshControl} />
+    );
   }
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} refreshControl={refreshControl}>
       <View>{content}</View>
-    </View>
+    </ScrollView>
   );
 }
 

@@ -57,17 +57,23 @@ function RecentExpenses({ navigation }) {
     { label: i18n.t("totalLabel"), value: "total" },
   ]);
 
-  useEffect(() => {
-    async function getExpenses() {
-      setIsFetching(true);
-      try {
-        const expenses = await getAllExpenses(tripid);
-        expensesCtx.setExpenses(expenses);
-      } catch (error) {
-        setError(i18n.t("fetchError") + error);
-      }
-      setIsFetching(false);
+  // TODO: call getExpenses on refresh
+  async function getExpenses() {
+    setIsFetching(true);
+    try {
+      const expenses = await getAllExpenses(tripid);
+      expensesCtx.setExpenses(expenses);
+      const expensesSum = expenses.reduce((sum, expense) => {
+        return sum + expense.calcAmount;
+      }, 0);
+      tripCtx.setTotalSum(expensesSum);
+    } catch (error) {
+      setError(i18n.t("fetchError") + error);
     }
+    setIsFetching(false);
+  }
+
+  useEffect(() => {
     getExpenses();
   }, []);
 

@@ -21,6 +21,7 @@ const en = {
   inviteTravellers: "Invite other travellers",
   setActiveTrip: "Set as active Trip",
   calcOpenSplits: "Calculate open splits",
+  daily: "Daily",
 
   // today - yesterday etc.
   today: "Today",
@@ -80,6 +81,8 @@ const de = {
   inviteTravellers: "Andere Reisende einladen",
   setActiveTrip: "Als aktive Reise markieren",
   calcOpenSplits: "Berechne offene Schulden",
+  daily: "Täglich",
+
 
   // today - yesterday etc.
   today: "Heute",

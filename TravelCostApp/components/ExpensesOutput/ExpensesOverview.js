@@ -8,7 +8,7 @@ import { GlobalStyles } from "../../constants/styles";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de } from "../i18n/supportedLanguages";
+import { en, de } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;

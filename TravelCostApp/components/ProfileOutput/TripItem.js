@@ -21,7 +21,7 @@ import LoadingOverlay from "../UI/LoadingOverlay";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de } from "../i18n/supportedLanguages";
+import { en, de } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -102,6 +102,8 @@ function TripItem({
       ? { borderWidth: 1, borderColor: GlobalStyles.colors.primary400 }
       : {};
 
+  const activeProgress = tripCtx.totalSum / totalBudget;
+
   if (isFetching) {
     return <LoadingOverlay />;
   }
@@ -132,8 +134,8 @@ function TripItem({
               {tripName}
             </Text>
             <Text style={styles.textBase}>
-              Daily:
-              {" " + dailyBudget}
+              {i18n.t("daily")}
+              {": " + dailyBudget}
               {" " + tripCurrency}
             </Text>
           </View>
@@ -148,7 +150,7 @@ function TripItem({
               borderWidth={0}
               borderRadius={8}
               // TODO: add this progress number from useEffect or Context
-              progress={0}
+              progress={activeProgress}
               height={12}
               width={150}
             />

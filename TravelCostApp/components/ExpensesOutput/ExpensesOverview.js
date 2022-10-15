@@ -46,7 +46,12 @@ const ExpensesOverview = ({ expenses, periodName }) => {
       {!toggleGraph && (
         <ExpenseGraph expenses={expenses} periodName={periodName} />
       )}
-      <View style={[styles.addButton, styles.toggleButton]}>
+      <View
+        style={[
+          styles.addButton,
+          // styles.toggleButton
+        ]}
+      >
         <IconButton
           icon="toggle"
           size={48}
@@ -97,7 +102,7 @@ const styles = StyleSheet.create({
     flex: 0,
     borderRadius: 999,
     marginHorizontal: 150,
-    marginBottom: -16,
+    marginBottom: -26,
     marginTop: -48,
     flexDirection: "row",
     alignItems: "center",

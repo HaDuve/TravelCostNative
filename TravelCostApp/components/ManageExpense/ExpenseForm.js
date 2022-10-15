@@ -413,6 +413,8 @@ const ExpenseForm = ({
         onConfirm={onConfirmRange}
         startDate={new Date()}
         endDate={new Date()}
+        // TODO: test if this works with non-european countries
+        language={Localization.locale.slice(0, 2)}
       />
       <View style={styles.form}>
         <View style={styles.inputsRow}>

@@ -117,10 +117,19 @@ export function travellerToDropdown(travellers) {
     return [];
   }
   const listOfLabelValues = [];
-  travellers.forEach((traveller) => {
-    // TODO: make value uid based and not name based
-    listOfLabelValues.push({ label: traveller, value: traveller });
-  });
+  // sometimes this is not an array but an object
+  try {
+    travellers.forEach((traveller) => {
+      // TODO: make value uid based and not name based
+      listOfLabelValues.push({ label: traveller, value: traveller });
+    });
+  } catch (error) {
+    console.log("travellers is an object");
+    Object.keys(travellers).forEach((traveller) => {
+      // TODO: make value uid based and not name based
+      listOfLabelValues.push({ label: traveller, value: traveller });
+    });
+  }
   return listOfLabelValues;
 }
 

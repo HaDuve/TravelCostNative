@@ -105,7 +105,6 @@ const ExpenseForm = ({
 
   // dropdown for whoPaid picker
   const currentTravellers = TripCtx.travellers;
-  console.log("currentTravellers", currentTravellers);
   let dropdownItems = travellerToDropdown(currentTravellers);
 
   useEffect(() => {
@@ -139,6 +138,13 @@ const ExpenseForm = ({
   }
   // NOTE: we might not even need a picker for each case
   function openTravellerMultiPicker() {
+    console.log("openTravellerMultiPicker ~ whoPaid", whoPaid);
+    console.log("listEQUAL", listEQUAL);
+    if (!defaultValues) {
+      console.log("list is empty");
+      // setSplitItemsEQUAL(travellerToDropdown([whoPaid]));
+      setListEQUAL([whoPaid]);
+    }
     setOpenEQUAL(true);
   }
 

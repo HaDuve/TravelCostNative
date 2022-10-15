@@ -184,6 +184,7 @@ function Home() {
         headerTintColor: GlobalStyles.colors.backgroundColor,
         tabBarStyle: {
           backgroundColor: GlobalStyles.colors.gray500,
+          paddingBottom: 8,
         },
         tabBarActiveTintColor: GlobalStyles.colors.primary500,
       })}

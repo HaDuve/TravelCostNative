@@ -1,4 +1,12 @@
 import { getAllExpenses } from "./http";
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
 
 export function calcSplitList(
   splitType,
@@ -103,11 +111,11 @@ export function splitTypesDropdown() {
   // containerStyle: 'containerStyle',
   // labelStyle: 'labelStyle'
   return [
-    { label: "Paid for self", value: "SELF" },
-    { label: "Shared equally [=] between ... ", value: "EQUAL" },
+    { label: i18n.t("paidSelf"), value: "SELF" },
+    { label: i18n.t("sharedEq"), value: "EQUAL" },
     // TODO: make this work next
     // { label: "Shared percents [%] between ...", value: "PERCENT" },
-    { label: "Shared exact [$] between ...", value: "EXACT" },
+    { label: i18n.t("sharedEx"), value: "EXACT" },
   ];
 }
 

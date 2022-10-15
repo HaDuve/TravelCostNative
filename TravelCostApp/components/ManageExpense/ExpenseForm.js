@@ -136,13 +136,10 @@ const ExpenseForm = ({
   if (splitType === "SELF") {
     if (openEQUAL) setOpenEQUAL(false);
   }
-  // NOTE: we might not even need a picker for each case
+
   function openTravellerMultiPicker() {
-    console.log("openTravellerMultiPicker ~ whoPaid", whoPaid);
-    console.log("listEQUAL", listEQUAL);
+    // add person who paid automatically to shared list
     if (!defaultValues) {
-      console.log("list is empty");
-      // setSplitItemsEQUAL(travellerToDropdown([whoPaid]));
       setListEQUAL([whoPaid]);
     }
     setOpenEQUAL(true);

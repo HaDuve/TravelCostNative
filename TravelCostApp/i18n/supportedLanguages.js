@@ -67,6 +67,9 @@ const en = {
   whoPaid: "Who paid?",
   howShared: "How are the costs shared?",
   whoShared: "Who is the cost shared between?",
+  paidSelf: "Paid for self",
+  sharedEq: "Shared equally [=] between ... ",
+  sharedEx: "Shared exact [$] between ...",
 
   // Dropdown Labels
   todayLabel: "Today",
@@ -153,6 +156,9 @@ const de = {
   whoPaid: "Wer hat bezahlt?",
   howShared: "Wie wurden die Kosten geteilt?",
   whoShared: "Zwischen wem wurden die Kosten geteilt?",
+  paidSelf: "Für sich selbst gezahlt",
+  sharedEq: "Gleichermaßen aufgeteilt [=] zwischen ... ",
+  sharedEx: "Exakt aufgeteilt [$] zwischen ... ",
 
   // Dropdown Labels
   todayLabel: "Heute",

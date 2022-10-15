@@ -48,7 +48,6 @@ function TripContextProvider({ children }) {
     // updates the current Travellers in context
     try {
       const travellers = await getTravellers(tripid);
-      console.log("setCurrentTravellers ~ travellers", travellers);
       setTravellers(travellers);
       return true;
     } catch (error) {

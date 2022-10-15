@@ -69,7 +69,7 @@ function TripItem({
   function tripPressHandler() {
     // TODO: Android can only handle alert with 2 actions, so this needs to be changed or actions will go missing
     console.log("pressed: ", tripid);
-    Alert.alert(tripName, "Please choose action:", [
+    Alert.alert(tripName, i18n.t("chooseAction"), [
       {
         text: i18n.t("cancel"),
         onPress: () => navigation.navigate("Profile"),

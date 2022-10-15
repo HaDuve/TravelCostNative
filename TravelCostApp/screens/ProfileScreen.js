@@ -23,8 +23,6 @@ const ProfileScreen = ({ route, navigation, param }) => {
   const FreshlyCreated = UserCtx.freshlyCreated;
   const TripCtx = useContext(TripContext);
 
-  const trip = [TripCtx.tripName];
-
   const allTripsList = [
     {
       tripid: TripCtx.tripid,
@@ -64,7 +62,8 @@ const ProfileScreen = ({ route, navigation, param }) => {
         </View>
         <TripList trips={allTripsList}></TripList>
       </View>
-      <AddExpenseButton navigation={navigation} />
+      {/* <AddExpenseButton navigation={navigation} /> */}
+      <View style={styles.tempGrayBar2}></View>
     </>
   );
 
@@ -108,7 +107,9 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     fontStyle: "italic",
+    alignContent: "flex-start",
     color: GlobalStyles.colors.gray600,
+    marginLeft: -20,
   },
   deleteContainer: {
     marginTop: 16,
@@ -120,5 +121,11 @@ const styles = StyleSheet.create({
   createButton: {
     marginTop: -12,
     marginRight: 16,
+  },
+  tempGrayBar2: {
+    borderTopWidth: 1,
+    borderTopColor: GlobalStyles.colors.gray600,
+    minHeight: 16,
+    backgroundColor: GlobalStyles.colors.gray500,
   },
 });

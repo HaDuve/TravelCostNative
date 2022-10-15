@@ -39,21 +39,24 @@ const ExpensesOverview = ({ expenses, periodName }) => {
           <Text style={styles.titleText}> {i18n.t("categories")} </Text>
         )}
       </View>
-      <View style={styles.toggleButton}>
-        <IconButton
-          icon="toggle"
-          size={48}
-          color={GlobalStyles.colors.primary700}
-          onPress={toggleContent}
-          rotate={toggleGraph ? true : false}
-        />
-      </View>
+
       {toggleGraph && (
         <ExpenseCategories expenses={expenses} periodName={periodName} />
       )}
       {!toggleGraph && (
         <ExpenseGraph expenses={expenses} periodName={periodName} />
       )}
+      <View style={[styles.addButton, styles.toggleButton]}>
+        <IconButton
+          icon="toggle"
+          size={48}
+          color={GlobalStyles.colors.primary700}
+          onPress={toggleContent}
+          rotate={toggleGraph ? true : false}
+          imageNumber={1}
+        />
+      </View>
+      <View style={styles.tempGrayBar2}></View>
     </View>
   );
 };
@@ -66,8 +69,12 @@ const styles = StyleSheet.create({
   },
   toggleButton: {
     marginTop: -50,
-    flexDirection: "row-reverse",
-    justifyContent: "flex-start",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderWidth: 2,
+    borderColor: GlobalStyles.colors.gray500Accent,
+    padding: 4,
   },
   titleText: {
     paddingTop: 20,
@@ -75,5 +82,23 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 20,
     fontWeight: "bold",
+  },
+  tempGrayBar2: {
+    borderTopWidth: 1,
+    borderTopColor: GlobalStyles.colors.gray600,
+    minHeight: 16,
+    backgroundColor: GlobalStyles.colors.gray500,
+  },
+  addButton: {
+    // backgroundColor: GlobalStyles.colors.primary400,
+    flex: 0,
+    borderRadius: 999,
+    marginHorizontal: 150,
+    marginBottom: -16,
+    marginTop: -48,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
   },
 });

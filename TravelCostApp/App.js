@@ -38,6 +38,11 @@ i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
 i18n.enableFallback = true;
 
+// NOTE: for alpha testing we leave this here
+import { LogBox } from "react-native";
+LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
+LogBox.ignoreAllLogs(); //Ignore all log notifications
+
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
 const BottomTabs = createBottomTabNavigator();

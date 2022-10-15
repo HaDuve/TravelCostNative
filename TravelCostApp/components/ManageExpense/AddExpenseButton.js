@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import IconButton from "../UI/IconButton";
 
@@ -12,7 +12,7 @@ const AddExpenseButton = ({ navigation }) => {
       <View style={styles.addButton}>
         <IconButton
           icon="add"
-          size={36}
+          size={42}
           color={"white"}
           onPress={() => {
             navigation.navigate("CategoryPick");
@@ -37,9 +37,10 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.primary400,
     flex: 0,
     borderRadius: 999,
-    marginHorizontal: 150,
+    marginHorizontal: Dimensions.get("screen").width / 2.49,
     marginBottom: -10,
-    marginTop: -48,
+    marginTop: -Dimensions.get("screen").height / 11,
+    paddingTop: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

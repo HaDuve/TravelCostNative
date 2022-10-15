@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 const IconButton = ({
@@ -9,24 +9,29 @@ const IconButton = ({
   buttonStyle,
   rotate,
   onPressStyle,
+  imageNumber,
 }) => {
   let transformStyle = {};
   if (rotate) {
     transformStyle = { transform: [{ rotateY: "180deg" }] };
   }
+  let content = (
+    <Ionicons name={icon} size={size} color={color} style={transformStyle} />
+  );
+  if (imageNumber === 1)
+    content = (
+      <Image
+        style={[transformStyle, buttonStyle]}
+        source={require("../../assets/overviewButtonToggleOn.png")}
+      />
+    );
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => pressed && [styles.pressed, onPressStyle]}
     >
-      <View style={[styles.buttonContainer, buttonStyle]}>
-        <Ionicons
-          name={icon}
-          size={size}
-          color={color}
-          style={transformStyle}
-        />
-      </View>
+      {content}
+      <View style={[styles.buttonContainer, buttonStyle]}></View>
     </Pressable>
   );
 };

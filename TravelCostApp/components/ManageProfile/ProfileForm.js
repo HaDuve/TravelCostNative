@@ -1,5 +1,12 @@
 import { useState, useContext, useEffect } from "react";
-import { View, Text, Alert, Keyboard, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  Alert,
+  Keyboard,
+  Dimensions,
+  Pressable,
+} from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
@@ -125,6 +132,10 @@ const ProfileForm = ({ navigation, onCancel }) => {
     Keyboard.dismiss();
   }
 
+  function avatarHandler() {
+    Alert.alert("Profile picture function coming soon... ");
+  }
+
   const changedName = inputs.userName.value !== UserCtx.userName;
   const changedNameButtons = (
     <View style={styles.buttonContainer}>
@@ -150,32 +161,48 @@ const ProfileForm = ({ navigation, onCancel }) => {
     navigation.navigate("Join", { id: "-NCU-c47x12mUih6A1Y6" });
   }
 
-  const freshlyNavigationButtons = (
+  // TODO: THIS IS ONLY DEBUG, COMMENT AND UNCOMMENT BELOW
+  // const freshlyNavigationButtons = (
+  //   <View style={styles.navButtonContainer}>
+  //     <FlatButton style={[styles.navButton]} onPress={joinInvite}>
+  //       {i18n.t("invitationText")}
+  //     </FlatButton>
+  //     {/*  TODO: DEBUG: for debugging i leave this condition only around this button, it should be around the whole view though */}
+  //     <Button
+  //       style={styles.navButton}
+  //       onPress={() => navigation.navigate("ManageTrip")}
+  //     >
+  //       {i18n.t("createFirstTrip")}
+  //     </Button>
+  //   </View>
+  // );
+  // TODO: THIS IS FINAL, COMMENT AND UNCOMMENT ABOVE
+  const freshlyNavigationButtons = freshlyCreated && (
     <View style={styles.navButtonContainer}>
       <FlatButton style={[styles.navButton]} onPress={joinInvite}>
         {i18n.t("invitationText")}
       </FlatButton>
       {/*  TODO: DEBUG: for debugging i leave this condition only around this button, it should be around the whole view though */}
-      {freshlyCreated && (
-        <Button
-          style={styles.navButton}
-          onPress={() => navigation.navigate("ManageTrip")}
-        >
-          {i18n.t("createFirstTrip")}
-        </Button>
-      )}
+      <Button
+        style={styles.navButton}
+        onPress={() => navigation.navigate("ManageTrip")}
+      >
+        {i18n.t("createFirstTrip")}
+      </Button>
     </View>
   );
 
   return (
     <View style={styles.form}>
       <View style={styles.avatarBar}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {/* TODO: Profile Picture for now replaced with first char of the name */}
-            {inputs.userName.value.charAt(0)}
-          </Text>
-        </View>
+        <Pressable onPress={avatarHandler}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>
+              {/* TODO: Profile Picture for now replaced with first char of the name */}
+              {inputs.userName.value.charAt(0)}
+            </Text>
+          </View>
+        </Pressable>
         <IconButton
           icon={"exit-outline"}
           size={36}

@@ -113,7 +113,8 @@ const OverviewScreen = ({ navigation }) => {
         <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
       </View>
       <ExpensesOverview expenses={recentExpenses} periodName={PeriodValue} />
-      <AddExpenseButton navigation={navigation}></AddExpenseButton>
+
+      {/* <AddExpenseButton navigation={navigation}></AddExpenseButton> */}
     </View>
   );
 };

@@ -13,6 +13,15 @@ import { TripContext } from "../store/trip-context";
 import { GlobalStyles } from "../constants/styles";
 import Input from "../components/Auth/Input";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 const JoinTrip = ({ navigation, route }) => {
   // join Trips via route params (route.params.id -> tripid)
   // or with an invitation link (Input -> joinTripid)
@@ -74,15 +83,24 @@ const JoinTrip = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <Text>Do you want to join the Trip : {tripName}?</Text>
+      <Text style={{ padding: 4 }}>{i18n.t("joinTrip")}?</Text>
+      <Text style={{ padding: 4, fontSize: 18, fontWeight: "bold" }}>
+        {tripName}
+      </Text>
       <View style={styles.buttonContainer}>
-        <Button title="Yes" onPress={joinHandler.bind(this, true)} />
-        <Button title="No" onPress={joinHandler.bind(this, false)} />
+        <Button
+          title={i18n.t("cancel")}
+          onPress={joinHandler.bind(this, false)}
+        />
+        <Button
+          title={i18n.t("confirm2")}
+          onPress={joinHandler.bind(this, true)}
+        />
       </View>
       <View style={styles.linkInputContainer}>
-        <Text> I have an invitation link!</Text>
+        <Text> {i18n.t("joinLink")}</Text>
         <Input value={joinTripid} onUpdateValue={setJoinTripid}></Input>
-        <Button title={"Join"} onPress={joinLinkHandler}></Button>
+        <Button title={i18n.t("join")} onPress={joinLinkHandler}></Button>
       </View>
     </View>
   );

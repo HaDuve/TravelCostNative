@@ -105,6 +105,7 @@ const ExpenseForm = ({
 
   // dropdown for whoPaid picker
   const currentTravellers = TripCtx.travellers;
+  console.log("currentTravellers", currentTravellers);
   let dropdownItems = travellerToDropdown(currentTravellers);
 
   useEffect(() => {
@@ -783,7 +784,7 @@ const ExpenseForm = ({
       </View>
       <View style={styles.buttonContainer}>
         <FlatButton style={styles.button} onPress={onCancel}>
-          Cancel
+          {i18n.t("cancel")}
         </FlatButton>
         <Button style={styles.button} onPress={advancedSubmitHandler}>
           {submitButtonLabel}

@@ -13,6 +13,15 @@ import Button from "../components/UI/Button";
 import FlatButton from "../components/UI/FlatButton";
 import { GlobalStyles } from "../constants/styles";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 const CategoryPickScreen = ({ route, navigation }) => {
   const { editedExpenseId } = route.params ? route.params : "null";
   console.log("CategoryPickScreen ~ editedExpenseId", editedExpenseId);
@@ -22,37 +31,37 @@ const CategoryPickScreen = ({ route, navigation }) => {
       icon: "fast-food-outline",
       color: GlobalStyles.colors.textColor,
       cat: "food",
-      catString: "Food",
+      catString: i18n.t("catFoodString"),
     },
     {
       icon: "airplane-outline",
       color: GlobalStyles.colors.textColor,
       cat: "international-travel",
-      catString: "International Travel",
+      catString: i18n.t("catIntTravString"),
     },
     {
       icon: "bed-outline",
       color: GlobalStyles.colors.textColor,
       cat: "accomodation",
-      catString: "Accomodation",
+      catString: i18n.t("catAccoString"),
     },
     {
       icon: "car-outline",
       color: GlobalStyles.colors.textColor,
       cat: "national-travel",
-      catString: "National Travel",
+      catString: i18n.t("catNatTravString"),
     },
     {
       icon: "basket-outline",
       color: GlobalStyles.colors.textColor,
       cat: "other",
-      catString: "Other",
+      catString: i18n.t("catOtherString"),
     },
     {
       icon: "add-outline",
       color: GlobalStyles.colors.textColor,
       cat: "newCat",
-      catString: "New Category",
+      catString: i18n.t("catNewString"),
     },
   ];
 
@@ -112,7 +121,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
             navigation.goBack();
           }}
         >
-          Cancel
+          {i18n.t("cancel")}
         </FlatButton>
         <Button
           buttonStyle={styles.continueButtonStyle}
@@ -122,7 +131,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
             });
           }}
         >
-          Continue
+          {i18n.t("continue")}
         </Button>
       </View>
     </View>

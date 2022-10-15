@@ -15,6 +15,15 @@ import { deleteExpense, storeExpense, updateExpense } from "../util/http";
 import { GlobalStyles } from "./../constants/styles";
 import { getRate } from "./../util/currencyExchange";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 const ManageExpense = ({ route, navigation }) => {
   const { pickedCat, tempValues, newCat } = route.params;
 
@@ -37,7 +46,7 @@ const ManageExpense = ({ route, navigation }) => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: isEditing ? "Edit Expense" : "Add Expense",
+      title: isEditing ? i18n.t("editExp") : i18n.t("addExp"),
     });
   }, [navigation, isEditing]);
 
@@ -53,24 +62,21 @@ const ManageExpense = ({ route, navigation }) => {
         setIsSubmitting(false);
       }
     }
-    Alert.alert(
-      "Are you sure?",
-      "Are you sure you want to delete this expense?",
-      [
-        // The "No" button
-        // Does nothing but dismiss the dialog when tapped
-        {
-          text: "No",
+    Alert.alert(i18n.t("sure"), i18n.t("sureExt"), [
+      // The "No" button
+      // Does nothing but dismiss the dialog when tapped
+      {
+        text: i18n.t("no"),
+        onPress: forceCloseRow(index),
+      },
+      // The "Yes" button
+      {
+        text: i18n.t("yes"),
+        onPress: () => {
+          deleteExp();
         },
-        // The "Yes" button
-        {
-          text: "Yes",
-          onPress: () => {
-            deleteExp();
-          },
-        },
-      ]
-    );
+      },
+    ]);
   }
 
   function cancelHandler() {
@@ -128,7 +134,7 @@ const ManageExpense = ({ route, navigation }) => {
           pickedCat={pickedCat}
           navigation={navigation}
           isEditing={isEditing}
-          submitButtonLabel={isEditing ? "Update" : "Add"}
+          submitButtonLabel={isEditing ? i18n.t("update") : i18n.t("add")}
           defaultValues={selectedExpense}
           editedExpenseId={editedExpenseId}
           newCat={newCat}

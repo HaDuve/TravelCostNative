@@ -5,7 +5,10 @@ const en = {
   signOutAlertMess: "Are you sure you want to sign out?",
   confirm: "Okay",
   confirm2: "Confirm",
+  continue: "Continue",
   cancel: "Cancel",
+  add: "Add",
+  update: "Update",
   sure: "Are you sure?",
   sureExt: "Are you sure you want to delete this expense?",
   resetBtn: "Reset password",
@@ -41,6 +44,14 @@ const en = {
   months: "months",
   years: "years",
 
+  // Category Names
+  catFoodString: "Food",
+  catIntTravString: "International Travel",
+  catAccoString: "Accomodation",
+  catNatTravString: "National Travel",
+  catOtherString: "Other",
+  catNewString: "New Category",
+
   // Form Labels
   nameLabel: "Name",
   priceIn: "Price in ",
@@ -51,9 +62,12 @@ const en = {
   dateLabel: "Date",
 
   // Modal Titles
+  editExp: "Edit Expense",
+  addExp: "Add Expense",
   whoPaid: "Who paid?",
   howShared: "How are the costs shared?",
   whoShared: "Who is the cost shared between?",
+
   // Dropdown Labels
   todayLabel: "Today",
   weekLabel: "Week",
@@ -77,7 +91,10 @@ const de = {
   signOutAlertMess: "Sind Sie sicher, dass Sie sich abmelden wollen?",
   confirm: "Okay",
   confirm2: "Bestätigen",
+  continue: "Weiter",
   cancel: "Abbrechen",
+  add: "Hinzufügen",
+  update: "Aktualisieren",
   sure: "Sind Sie sicher?",
   sureExt: "Sind Sie sicher, dass Sie diese Ausgabe löschen wollen?",
   resetBtn: "Passwort zurücksetzen",
@@ -113,6 +130,14 @@ const de = {
   months: "Monate",
   years: "Jahre",
 
+  // Category Names
+  catFoodString: "Essen",
+  catIntTravString: "Internationale Reisen",
+  catAccoString: "Unterkunft",
+  catNatTravString: "Nationale Reisen",
+  catOtherString: "Andere",
+  catNewString: "Neue Kategorie",
+
   // Form Labels
   nameLabel: "Name",
   priceIn: "Preis in ",
@@ -123,6 +148,8 @@ const de = {
   dateLabel: "Datum",
 
   // Modal Titles
+  editExp: "Ausgabe bearbeiten",
+  addExp: "Ausgabe hinzufügen",
   whoPaid: "Wer hat bezahlt?",
   howShared: "Wie wurden die Kosten geteilt?",
   whoShared: "Zwischen wem wurden die Kosten geteilt?",

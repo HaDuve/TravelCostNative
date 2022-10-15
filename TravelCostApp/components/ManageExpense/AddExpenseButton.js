@@ -11,7 +11,7 @@ const AddExpenseButton = ({ navigation }) => {
     >
       <View style={styles.addButton}>
         <IconButton
-          icon="add"
+          icon="ios-create-outline"
           size={42}
           color={"white"}
           onPress={() => {

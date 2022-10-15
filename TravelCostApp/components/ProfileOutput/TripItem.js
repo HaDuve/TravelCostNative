@@ -76,12 +76,6 @@ function TripItem({
         style: "cancel",
       },
       {
-        text: i18n.t("inviteTravellers"),
-        onPress: () => {
-          onShare(tripid);
-        },
-      },
-      {
         text: i18n.t("setActiveTrip"),
         onPress: () => {
           tripCtx.setCurrentTrip(tripid, tripData);

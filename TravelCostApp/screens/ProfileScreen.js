@@ -8,6 +8,7 @@ import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
 import { TripContext } from "../store/trip-context";
 import Button from "../components/UI/Button";
 import { UserContext } from "../store/user-context";
+import { onShare } from "../components/ProfileOutput/ShareTrip";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -52,17 +53,29 @@ const ProfileScreen = ({ route, navigation, param }) => {
       <View style={styles.tripContainer}>
         <View style={styles.horizontalContainer}>
           <Text style={styles.tripListTitle}>{i18n.t("myTrips")}</Text>
-          <IconButton
-            icon={"create-outline"}
-            size={36}
-            color={GlobalStyles.colors.primary500}
-            buttonStyle={styles.createButton}
-            onPress={navigation.navigate.bind(this, "ManageTrip")}
-          />
+          <View style={{ borderRadius: 99 }}>
+            <IconButton
+              icon={"ios-earth"}
+              size={36}
+              color={GlobalStyles.colors.primary400}
+              buttonStyle={styles.createButton}
+              onPress={navigation.navigate.bind(this, "ManageTrip")}
+            />
+          </View>
         </View>
         <TripList trips={allTripsList}></TripList>
       </View>
       {/* <AddExpenseButton navigation={navigation} /> */}
+      <View style={styles.addButton}>
+        <IconButton
+          icon="person-add-outline"
+          size={42}
+          color={"white"}
+          onPress={() => {
+            onShare(TripCtx.tripid);
+          }}
+        />
+      </View>
       <View style={styles.tempGrayBar2}></View>
     </>
   );
@@ -127,5 +140,18 @@ const styles = StyleSheet.create({
     borderTopColor: GlobalStyles.colors.gray600,
     minHeight: 16,
     backgroundColor: GlobalStyles.colors.gray500,
+  },
+  addButton: {
+    backgroundColor: GlobalStyles.colors.primary400,
+    flex: 0,
+    borderRadius: 999,
+    marginHorizontal: Dimensions.get("screen").width / 2.49,
+    marginBottom: -10,
+    marginTop: -Dimensions.get("screen").height / 11,
+    paddingTop: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
   },
 });

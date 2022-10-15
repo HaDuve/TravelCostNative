@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import ExpenseCategories from "./ExpenseStatistics/ExpenseCategories";
 import IconButton from "../UI/IconButton";
@@ -68,13 +68,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   toggleButton: {
-    marginTop: -50,
-    justifyContent: "center",
+    backgroundColor: GlobalStyles.colors.primary400,
+    flex: 0,
+    borderRadius: 999,
+    marginHorizontal: Dimensions.get("screen").width / 2.49,
+    marginBottom: -10,
+    marginTop: -Dimensions.get("screen").height / 11,
+    paddingTop: 12,
+    flexDirection: "row",
     alignItems: "center",
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderWidth: 2,
-    borderColor: GlobalStyles.colors.gray500Accent,
-    padding: 4,
+    justifyContent: "center",
+    zIndex: 1,
   },
   titleText: {
     paddingTop: 20,
@@ -90,7 +94,6 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.gray500,
   },
   addButton: {
-    // backgroundColor: GlobalStyles.colors.primary400,
     flex: 0,
     borderRadius: 999,
     marginHorizontal: 150,

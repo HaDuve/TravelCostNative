@@ -92,39 +92,19 @@ function ExpensesContextProvider({ children }) {
     dispatch({ type: "UPDATE", payload: { id: id, data: expenseData } });
   }
   function getRecentExpenses(rangestring) {
+    let expenses = [];
     switch (rangestring) {
       case "day":
-        return expensesState.filter((expense) => {
-          const today = new Date();
-          const date7DaysAgo = getDateMinusDays(today, 1);
-
-          return expense.date >= date7DaysAgo && expense.date <= today;
-        });
-        break;
+        return getDailyExpenses(0);
       case "week":
-        return expensesState.filter((expense) => {
-          const today = new Date();
-          const date7DaysAgo = getDateMinusDays(today, 7);
-
-          return expense.date >= date7DaysAgo && expense.date <= today;
-        });
-        break;
+        expenses = getWeeklyExpenses(0).weeklyExpenses;
+        return expenses;
       case "month":
-        return expensesState.filter((expense) => {
-          const today = new Date();
-          const date7DaysAgo = getDateMinusDays(today, 30);
-
-          return expense.date >= date7DaysAgo && expense.date <= today;
-        });
-        break;
+        expenses = getMonthlyExpenses(0).monthlyExpenses;
+        return expenses;
       case "year":
-        return expensesState.filter((expense) => {
-          const today = new Date();
-          const date7DaysAgo = getDateMinusDays(today, 365);
-
-          return expense.date >= date7DaysAgo && expense.date <= today;
-        });
-        break;
+        expenses = getYearlyExpenses(0).yearlyExpenses;
+        return expenses;
       case "total":
         return expensesState;
         break;

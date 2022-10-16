@@ -23,6 +23,15 @@ export const GlobalStyles = {
     gray500: "#DCDCDC",
     gray600: "#BFBFBF",
     gray700: "#626262",
+    cat1: "#dc3a4a",
+    cat2: "#d4703f",
+    cat3: "#e3c638",
+    cat4: "#a4b21f",
+    cat5: "#7dc73f",
+    cat6: "#00b9aa",
+    cat7: "#2fc2f7",
+    cat8: "#0097e5",
+    cat9: "#e10a8e",
   },
   buttonTextPrimary: {
     color: "#FFFFFF",
@@ -56,3 +65,14 @@ export const GlobalStyles = {
     shadowOpacity: 10,
   },
 };
+export const CatColors = [
+  GlobalStyles.colors.cat2,
+  GlobalStyles.colors.cat3,
+  GlobalStyles.colors.cat5,
+  GlobalStyles.colors.cat6,
+  GlobalStyles.colors.cat7,
+  GlobalStyles.colors.cat8,
+  GlobalStyles.colors.cat9,
+  GlobalStyles.colors.cat1,
+  GlobalStyles.colors.cat4,
+];

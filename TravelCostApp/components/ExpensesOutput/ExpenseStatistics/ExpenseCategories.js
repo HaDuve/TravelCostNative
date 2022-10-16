@@ -3,9 +3,10 @@ import { FlatList } from "react-native";
 
 import React from "react";
 import CategoryProgressBar from "./CategoryProgressBar";
-import { GlobalStyles } from "../../../constants/styles";
+import { CatColors, GlobalStyles } from "../../../constants/styles";
 import CategoryChart from "../../ExpensesOverview/CategoryChart";
 import { ScrollView } from "react-native-gesture-handler";
+import { G } from "react-native-svg";
 
 const ExpenseCategories = ({ expenses, periodName }) => {
   if (!expenses) return;
@@ -55,17 +56,7 @@ const ExpenseCategories = ({ expenses, periodName }) => {
   catSumCat.sort((a, b) => b.sumCat - a.sumCat);
   dataList.sort((a, b) => b.sumCat - a.sumCat);
 
-  const colorlist = [
-    // items of the color list will repeat those colors
-
-    GlobalStyles.colors.primary400,
-    GlobalStyles.colors.error500,
-    GlobalStyles.colors.accent500,
-    GlobalStyles.colors.primary700,
-    GlobalStyles.colors.error300,
-    GlobalStyles.colors.accent700,
-    GlobalStyles.colors.errorGrayed,
-  ];
+  const colorlist = CatColors;
 
   let color_i = 0;
   catSumCat.forEach((item) => {

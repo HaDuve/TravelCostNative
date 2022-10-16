@@ -54,10 +54,12 @@ const SplitSummaryScreen = ({ route, navigation }) => {
     const item = itemData.item;
     return (
       <View style={styles.splitContainer}>
-        <Text>
-          {item.userName} owes {item.amount}
-          {TripCtx.tripCurrency} to {item.whoPaid}!
-        </Text>
+        <Text style={styles.userText}>{item.userName} </Text>
+        <Text style={styles.normalText}>owes </Text>
+        <Text style={styles.amountText}>{item.amount} </Text>
+        <Text style={styles.amountText}>{TripCtx.tripCurrency} </Text>
+        <Text style={styles.normalText}>to</Text>
+        <Text style={styles.userText}> {item.whoPaid}!</Text>
       </View>
     );
   }
@@ -102,14 +104,17 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: 24,
     fontWeight: "bold",
+    paddingBottom: 12,
     color: GlobalStyles.colors.textColor,
   },
   splitContainer: {
+    flexDirection: "row",
     padding: 8,
     borderWidth: 1,
     margin: 8,
     borderRadius: 12,
-    borderColor: GlobalStyles.colors.textColor,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderColor: GlobalStyles.colors.error300,
   },
   buttonContainer: {
     marginTop: 24,
@@ -117,5 +122,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  userText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: GlobalStyles.colors.textColor,
+  },
+  normalText: { fontSize: 14, color: GlobalStyles.colors.textColor },
+  amountText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: GlobalStyles.colors.errorGrayed,
   },
 });

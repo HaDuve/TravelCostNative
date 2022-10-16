@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import ExpenseCategories from "./ExpenseStatistics/ExpenseCategories";
 import IconButton from "../UI/IconButton";
@@ -9,6 +9,7 @@ import { GlobalStyles } from "../../constants/styles";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../../i18n/supportedLanguages";
+import ToggleButton from "../../assets/SVG/toggleButton";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -52,14 +53,9 @@ const ExpensesOverview = ({ expenses, periodName }) => {
           // styles.toggleButton
         ]}
       >
-        <IconButton
-          icon="toggle"
-          size={48}
-          color={GlobalStyles.colors.primary700}
-          onPress={toggleContent}
-          rotate={toggleGraph ? true : false}
-          imageNumber={1}
-        />
+        <Pressable onPress={toggleContent}>
+          <ToggleButton></ToggleButton>
+        </Pressable>
       </View>
       <View style={styles.tempGrayBar2}></View>
     </View>

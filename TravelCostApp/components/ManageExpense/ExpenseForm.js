@@ -250,7 +250,10 @@ const ExpenseForm = ({
 
     console.log("submitHandler ~ category", expenseData.category);
     // validate the expenseData
-    const amountIsValid = !isNaN(expenseData.amount) && expenseData.amount > 0;
+    const amountIsValid =
+      !isNaN(expenseData.amount) &&
+      expenseData.amount > 0 &&
+      expenseData.amount < 34359738368;
     const dateIsValid = expenseData.date.toString() !== "Invalid Date";
     const descriptionIsValid = expenseData.description.trim().length > 0;
     const whoPaidIsValid = expenseData.whoPaid !== null;
@@ -407,17 +410,8 @@ const ExpenseForm = ({
   const whoPaidValid = whoPaid !== null;
   const splitTypeEqual = splitType === "EQUAL";
   const splitTypeSelf = splitType === "SELF";
-  // hide the pickers
   const hidePickers = true;
-
-  // set the default range to today until tomorrow for now
-  // TODO: fix the date -1 bug and add range functionality
-  const today = new Date();
-  const tomorrow = new Date().setDate(today.getDate() + 1);
-  const yesterday = new Date().setDate(today.getDate() - 1);
-
   const dateIsRanged = startDate.toString() !== endDate.toString();
-  console.log("dateISRanged ", dateIsRanged);
 
   return (
     <>

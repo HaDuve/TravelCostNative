@@ -68,6 +68,23 @@ const TripForm = ({ navigation }) => {
     tripData.dailyBudget = inputs.dailyBudget.value;
     tripData.travellers = [{ userName: UserCtx.userName }];
 
+    const totalBudgetIsValid =
+      !isNaN(tripData.totalBudget) &&
+      tripData.totalBudget > 0 &&
+      tripData.totalBudget < 34359738368 &&
+      tripData.totalBudget < tripData.dailyBudget;
+    const dailyBudgetIsValid =
+      !isNaN(tripData.dailyBudget) &&
+      tripData.dailyBudget > 0 &&
+      tripData.dailyBudget < 34359738368 &&
+      tripData.dailyBudget > tripData.totalBudget;
+
+    if (!totalBudgetIsValid || !dailyBudgetIsValid) {
+      inputs.totalBudget.isValid = totalBudgetIsValid;
+      inputs.dailyBudget.isValid = dailyBudgetIsValid;
+      return;
+    }
+
     const tripid = await storeTrip(tripData);
     tripData.tripid = tripid;
 

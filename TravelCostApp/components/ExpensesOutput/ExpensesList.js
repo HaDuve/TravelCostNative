@@ -34,16 +34,18 @@ function renderExpenseItem(itemData) {
       <View
         style={{
           margin: 0,
+          paddingTop: 12,
+          paddingLeft: 20,
           alignContent: "flex-end",
           justifyContent: "center",
-          width: 90,
+          width: 70,
           backgroundColor: GlobalStyles.colors.error500,
         }}
       >
         <IconButton
           icon="trash"
           color={GlobalStyles.colors.backgroundColor}
-          size={24}
+          size={36}
           onPress={onClick}
           buttonStyle={{ marginLeft: 30 }}
         />

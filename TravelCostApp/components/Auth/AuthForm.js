@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { StyleSheet, View, Text, Image } from "react-native";
+import { StyleSheet, View, Text, Image, Pressable } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 
 import Button from "../UI/Button";
@@ -89,9 +89,15 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
         </View>
         <View style={styles.orTextContainer}>
           {/* <Text style={styles.orText}>Or With</Text> */}
-          <View style={styles.google}>
-            <Text style={styles.googleText}>Sign Up with Google</Text>
-          </View>
+          <Pressable
+            onPress={Alert.alert(
+              "Sign Up / Login with Google function coming soon... "
+            )}
+          >
+            <View style={styles.google}>
+              <Text style={styles.googleText}>Sign Up with Google</Text>
+            </View>
+          </Pressable>
         </View>
       </View>
     </View>

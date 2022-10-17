@@ -93,6 +93,9 @@ const ExpenseForm = ({
     setShowDatePickerRange(false);
     const startDateFormat = getFormattedDate(output.startDate);
     const endDateFormat = getFormattedDate(output.endDate);
+    if (startDateFormat !== endDateFormat) {
+      Alert.alert("Ranged Expense function coming soon... ");
+    }
     setStartDate(startDateFormat);
     setEndDate(endDateFormat);
   };

@@ -1,9 +1,15 @@
 Changelog Travel Expense App
 
 
+1.0.21
+- added range functionality for expenses over multiple days
+- hotfixing dates always being 1 day off for asian countries
+
+
 1.0.2
 - added "Coming soon..." alerts
 - fixed crash at login
+
 
 1.0.1
 - first creation of the App in changelog

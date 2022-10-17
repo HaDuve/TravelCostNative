@@ -83,7 +83,9 @@ const ExpenseForm = ({
   const [startDate, setStartDate] = useState(
     defaultValues ? getFormattedDate(defaultValues.date) : ""
   );
-  const [endDate, setEndDate] = useState("");
+  const [endDate, setEndDate] = useState(
+    defaultValues ? getFormattedDate(defaultValues.date) : ""
+  );
   const openDatePickerRange = () => setShowDatePickerRange(true);
   const onCancelRange = () => {
     setShowDatePickerRange(false);
@@ -91,11 +93,11 @@ const ExpenseForm = ({
 
   const onConfirmRange = (output) => {
     setShowDatePickerRange(false);
-    const startDateFormat = getFormattedDate(output.startDate);
-    const endDateFormat = getFormattedDate(output.endDate);
-    if (startDateFormat !== endDateFormat) {
-      Alert.alert("Ranged Expense function coming soon... ");
-    }
+    // hotfixing datebug for asian countries
+    const startDatePlus1 = getDatePlusDays(output.startDate, 1);
+    const endDatePlus1 = getDatePlusDays(output.endDate, 1);
+    const startDateFormat = getFormattedDate(startDatePlus1);
+    const endDateFormat = getFormattedDate(endDatePlus1);
     setStartDate(startDateFormat);
     setEndDate(endDateFormat);
   };
@@ -234,6 +236,7 @@ const ExpenseForm = ({
       uid: AuthCtx.uid,
       amount: +inputs.amount.value,
       date: new Date(startDate),
+      endDate: new Date(endDate),
       description: inputs.description.value,
       category: newCat ? pickedCat : inputs.category.value,
       country: inputs.country.value,
@@ -319,6 +322,7 @@ const ExpenseForm = ({
       uid: AuthCtx.uid,
       amount: +inputs.amount.value,
       date: new Date(),
+      endDate: new Date(),
       description: pickedCat,
       category: pickedCat,
       country: UserCtx.lastCountry ? UserCtx.lastCountry : UserCtx.homeCountry,
@@ -345,6 +349,7 @@ const ExpenseForm = ({
     if (!inputs.date.isValid) {
       const today = new Date();
       setStartDate(today);
+      setEndDate(today);
       // inputChangedHandler("date", getFormattedDate(today));
     }
     // for now set default values to every field so everything goes fast
@@ -410,6 +415,9 @@ const ExpenseForm = ({
   const today = new Date();
   const tomorrow = new Date().setDate(today.getDate() + 1);
   const yesterday = new Date().setDate(today.getDate() - 1);
+
+  const dateIsRanged = startDate.toString() !== endDate.toString();
+  console.log("dateISRanged ", dateIsRanged);
 
   return (
     <>
@@ -572,20 +580,20 @@ const ExpenseForm = ({
                 style={styles.button}
                 onPress={openDatePickerRange}
               />
-              {/* <FlatButton onPress={openDatePickerRange}>Date</FlatButton> */}
-              <Text style={styles.advancedText}>
-                {startDate && toShortFormat(new Date(startDate))}
-              </Text>
+              <View>
+                <Text style={styles.advancedText}>
+                  {startDate && toShortFormat(new Date(startDate))}
+                </Text>
+                {dateIsRanged && (
+                  <Text style={styles.advancedText}>- duplicate until - </Text>
+                )}
+                {dateIsRanged && (
+                  <Text style={styles.advancedText}>
+                    {endDate && toShortFormat(new Date(endDate))}
+                  </Text>
+                )}
+              </View>
             </View>
-
-            {/* <Input
-            label="Category"
-            textInputConfig={{
-              onChangeText: inputChangedHandler.bind(this, "category"),
-              value: inputs.category.value,
-            }}
-            invalid={!inputs.category.isValid}
-          /> */}
 
             <View style={styles.inputsRowSecond}>
               {showWhoPaid && (

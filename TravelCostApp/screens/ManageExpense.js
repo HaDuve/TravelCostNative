@@ -14,6 +14,7 @@ import { UserContext } from "../store/user-context";
 import { deleteExpense, storeExpense, updateExpense } from "../util/http";
 import { GlobalStyles } from "./../constants/styles";
 import { getRate } from "./../util/currencyExchange";
+import { daysBetween, getDatePlusDays } from "../util/date";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -103,8 +104,30 @@ const ManageExpense = ({ route, navigation }) => {
         expenseCtx.updateExpense(editedExpenseId, expenseData);
         await updateExpense(tripid, uid, editedExpenseId, expenseData);
       } else {
-        const id = await storeExpense(tripid, uid, expenseData);
-        expenseCtx.addExpense({ ...expenseData, id: id });
+        // Check for ranged Expense
+        console.log("expenseData:", expenseData);
+        if (expenseData.date.toString() !== expenseData.endDate.toString()) {
+          console.log("ranged Data detected");
+          // get number of days
+          const day1 = new Date(expenseData.date);
+          const day2 = new Date(expenseData.endDate);
+          const days = daysBetween(day2, day1);
+          // iterate over number of days between and change date and endDate to the first date + iterator
+          for (let i = 0; i <= days; i++) {
+            console.log("day nr: ", i);
+            const newDate = getDatePlusDays(day1, i);
+
+            expenseData.date = expenseData.endDate = newDate;
+            console.log("Storing New Date: ", newDate);
+            const id = await storeExpense(tripid, uid, expenseData);
+            console.log("id", id);
+            expenseCtx.addExpense({ ...expenseData, id: id });
+          }
+        } else {
+          console.log("no ranged Data detected");
+          const id = await storeExpense(tripid, uid, expenseData);
+          expenseCtx.addExpense({ ...expenseData, id: id });
+        }
       }
       navigation.navigate("RecentExpenses");
     } catch (error) {

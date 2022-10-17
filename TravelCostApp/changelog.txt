@@ -1,0 +1,11 @@
+Changelog Travel Expense App
+
+
+1.0.2
+- added "Coming soon..." alerts
+
+1.0.1
+- first creation of the App in changelog
+- features Expense Management, with daily and total Budget
+- multiple Travellers
+- statistics and overviews over past time and categories of expenses

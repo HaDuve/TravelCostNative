@@ -97,6 +97,9 @@ export function deleteExpense(tripid, uid, id) {
 }
 
 export async function storeUser(uid, userData) {
+  // some weird shit is happening here
+  // TODO: fix it
+
   const response = await axios.post(
     BACKEND_URL + "/users/" + `${uid}.json`,
     userData ? userData : { uid: uid }

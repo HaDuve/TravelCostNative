@@ -72,12 +72,12 @@ const TripForm = ({ navigation }) => {
       !isNaN(tripData.totalBudget) &&
       tripData.totalBudget > 0 &&
       tripData.totalBudget < 34359738368 &&
-      tripData.totalBudget < tripData.dailyBudget;
+      tripData.totalBudget > tripData.dailyBudget;
     const dailyBudgetIsValid =
       !isNaN(tripData.dailyBudget) &&
       tripData.dailyBudget > 0 &&
       tripData.dailyBudget < 34359738368 &&
-      tripData.dailyBudget > tripData.totalBudget;
+      tripData.dailyBudget < tripData.totalBudget;
 
     if (!totalBudgetIsValid || !dailyBudgetIsValid) {
       inputs.totalBudget.isValid = totalBudgetIsValid;

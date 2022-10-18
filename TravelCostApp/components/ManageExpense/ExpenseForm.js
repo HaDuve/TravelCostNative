@@ -9,6 +9,7 @@ import {
   SectionList,
   Dimensions,
   Keyboard,
+  Platform,
 } from "react-native";
 import Input from "./Input";
 import Button from "../UI/Button";
@@ -110,6 +111,10 @@ const ExpenseForm = ({
 
   // dropdown for whoPaid picker
   const currentTravellers = TripCtx.travellers;
+
+  // TODO: make solo travellers not be asked about sharing expenses
+  // for now sometimes, the tripctx.travellers are weird objects, so calling .length might crash
+  // const IsSoloTraveller = currentTravellers.length() === 1;
   let dropdownItems = travellerToDropdown(currentTravellers);
 
   useEffect(() => {
@@ -412,9 +417,13 @@ const ExpenseForm = ({
   const splitTypeSelf = splitType === "SELF";
   const hidePickers = true;
   const dateIsRanged = startDate.toString() !== endDate.toString();
-
-  return (
-    <>
+  const android = Platform.OS === "android";
+  const datepickerJSX = android ? (
+    <View
+      style={
+        showDatePickerRange && { minHeight: Dimensions.get("screen").height }
+      }
+    >
       <DatePicker
         isVisible={showDatePickerRange}
         mode={"range"}
@@ -422,9 +431,24 @@ const ExpenseForm = ({
         onConfirm={onConfirmRange}
         startDate={new Date()}
         endDate={new Date()}
-        // TODO: test if this works with non-european countries
         language={Localization.locale.slice(0, 2)}
       />
+    </View>
+  ) : (
+    <DatePicker
+      isVisible={showDatePickerRange}
+      mode={"range"}
+      onCancel={onCancelRange}
+      onConfirm={onConfirmRange}
+      startDate={new Date()}
+      endDate={new Date()}
+      language={Localization.locale.slice(0, 2)}
+    />
+  );
+
+  return (
+    <>
+      {datepickerJSX}
       <View style={styles.form}>
         <View style={styles.inputsRow}>
           <Input
@@ -510,10 +534,16 @@ const ExpenseForm = ({
                 containerStyle={{
                   container: {},
                   flagWidth: 25,
-                  currencyCodeStyle: { color: GlobalStyles.colors.primary500 },
-                  currencyNameStyle: { color: GlobalStyles.colors.primary500 },
+                  currencyCodeStyle: {
+                    color: GlobalStyles.colors.primary500,
+                  },
+                  currencyNameStyle: {
+                    color: GlobalStyles.colors.primary500,
+                  },
                   symbolStyle: { color: GlobalStyles.colors.primary500 },
-                  symbolNativeStyle: { color: GlobalStyles.colors.primary500 },
+                  symbolNativeStyle: {
+                    color: GlobalStyles.colors.primary500,
+                  },
                 }}
                 modalStyle={{
                   container: {},
@@ -590,6 +620,7 @@ const ExpenseForm = ({
             </View>
 
             <View style={styles.inputsRowSecond}>
+              {/* !IsSoloTraveller && */}
               {showWhoPaid && (
                 <View style={styles.whoPaidContainer}>
                   <Text
@@ -816,6 +847,8 @@ const styles = StyleSheet.create({
     shadowColor: GlobalStyles.colors.gray600,
     shadowOffset: { width: 4, height: 4 },
     shadowOpacity: 10,
+    justifyContent: "space-around",
+    alignContent: "stretch",
   },
   topCurrencyPressableContainer: {
     padding: 8,

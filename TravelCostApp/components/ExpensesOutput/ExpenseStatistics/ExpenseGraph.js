@@ -233,7 +233,12 @@ const ExpenseGraph = ({ expenses, periodName }) => {
       break;
     case "total":
       return (
-        <View style={{ padding: 24 }}>
+        <View
+          style={{
+            flex: 1,
+            padding: 24,
+          }}
+        >
           <Text style={styles.text1}>{i18n.t("fallbackTimeFrame")}</Text>
         </View>
       );

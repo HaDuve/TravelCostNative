@@ -155,7 +155,12 @@ export async function getTravellers(tripid) {
   for (let key in response) {
     const traveller = response[key].userName;
     const uid = response[key].travellerid;
-    if (!travellerids.includes(uid) && traveller && traveller.length > 0) {
+    if (
+      !travellerids.includes(uid) &&
+      !travellers.includes(traveller) &&
+      traveller &&
+      traveller.length > 0
+    ) {
       travellerids.push(uid);
       travellers.push(traveller);
     }

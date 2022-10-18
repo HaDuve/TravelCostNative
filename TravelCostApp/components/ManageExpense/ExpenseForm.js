@@ -113,8 +113,7 @@ const ExpenseForm = ({
   const currentTravellers = TripCtx.travellers;
 
   // TODO: make solo travellers not be asked about sharing expenses
-  // for now sometimes, the tripctx.travellers are weird objects, so calling .length might crash
-  // const IsSoloTraveller = currentTravellers.length() === 1;
+  const IsSoloTraveller = currentTravellers.length === 1;
   let dropdownItems = travellerToDropdown(currentTravellers);
 
   useEffect(() => {
@@ -253,7 +252,9 @@ const ExpenseForm = ({
       splitList: splitList,
     };
 
-    console.log("submitHandler ~ category", expenseData.category);
+    // SoloTravellers always pay for themselves
+    if (IsSoloTraveller) expenseData.whoPaid = UserCtx.userName;
+
     // validate the expenseData
     const amountIsValid =
       !isNaN(expenseData.amount) &&
@@ -621,7 +622,7 @@ const ExpenseForm = ({
 
             <View style={styles.inputsRowSecond}>
               {/* !IsSoloTraveller && */}
-              {showWhoPaid && (
+              {showWhoPaid && !IsSoloTraveller && (
                 <View style={styles.whoPaidContainer}>
                   <Text
                     style={[
@@ -742,7 +743,7 @@ const ExpenseForm = ({
               />
             )}
             <View styles={[styles.advancedRowSplit]}>
-              {!splitTypeSelf && whoPaidValid && (
+              {!splitTypeSelf && whoPaidValid && !IsSoloTraveller && (
                 <Text
                   style={[
                     styles.currencyLabel,
@@ -839,6 +840,8 @@ const styles = StyleSheet.create({
   form: {
     margin: 16,
     padding: 12,
+    paddingBottom: 24,
+    marginTop: 30,
     backgroundColor: GlobalStyles.colors.gray500,
     borderRadius: 10,
     borderWidth: 1,

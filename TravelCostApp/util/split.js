@@ -145,7 +145,7 @@ export async function calcOpenSplitsTable(tripid) {
   // cleanup all expenses where payer === debtor
 
   const expenses = await getAllExpenses(tripid);
-  if (!expenses) return;
+  if (!expenses || expenses.length < 1) return;
   let openSplits = [];
   expenses.forEach((expense) => {
     if (!expense.splitList || expense.splitList.length < 1) return;

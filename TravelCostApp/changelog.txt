@@ -1,5 +1,8 @@
 Changelog Travel Expense App
 
+1.0.23
+- Solo Travellers will not be asked about sharing expenses anymore
+
 1.0.22
 - added a maximum number of 34359738368 to prevent crashes
 - daily Budget cant be higher anymore than total Budget

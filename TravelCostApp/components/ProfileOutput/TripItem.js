@@ -82,7 +82,7 @@ function TripItem({
           console.log(`set ${tripName} ${tripid} as active!`);
         },
       },
-      {
+      travellers.length > 1 && {
         text: i18n.t("calcOpenSplits"),
         onPress: () => {
           navigation.navigate("SplitSummary", { tripid: tripid });

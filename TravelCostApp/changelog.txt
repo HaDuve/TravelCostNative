@@ -2,6 +2,7 @@ Changelog Travel Expense App
 
 1.0.23
 - solo travellers will not be asked about sharing expenses anymore
+- solo travellers cannot view split expenses summary anymore
 
 1.0.22
 - added a maximum number of 34359738368 to prevent crashes

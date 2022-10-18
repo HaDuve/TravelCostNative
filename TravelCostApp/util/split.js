@@ -143,12 +143,22 @@ export function travellerToDropdown(travellers) {
 
 export async function calcOpenSplitsTable(tripid) {
   // cleanup all expenses where payer === debtor
-
-  const expenses = await getAllExpenses(tripid);
+  let expenses = [];
+  try {
+    expenses = await getAllExpenses(tripid);
+  } catch (error) {
+    console.log(error);
+  }
+  console.log("calcOpenSplitsTable ~ expenses", expenses);
   if (!expenses || expenses.length < 1) return;
   let openSplits = [];
   expenses.forEach((expense) => {
-    if (!expense.splitList || expense.splitList.length < 1) return;
+    if (
+      !expense.splitList ||
+      expense.splitlist === undefined ||
+      Object.keys(expense.splitList).length < 1
+    )
+      return;
     expense.splitList.forEach((split) => {
       if (split.userName !== expense.whoPaid) {
         split.whoPaid = expense.whoPaid;

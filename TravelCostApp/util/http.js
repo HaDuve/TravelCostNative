@@ -1,7 +1,5 @@
 import axios from "axios";
 
-const DUMMYTRIP = "abcdefgh";
-
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
 
@@ -139,6 +137,12 @@ export async function storeUserToTrip(tripid, uid) {
   );
   const id = response.data.name;
   return id;
+}
+
+export async function storeTripidToUser(tripid, uid) {
+  return await axios.post(
+    BACKEND_URL + `/${uid}/` + "/trips/" + `${tripid}.json`
+  );
 }
 
 export async function fetchTripUsers(tripid) {

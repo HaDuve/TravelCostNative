@@ -8,6 +8,7 @@ import {
   fetchUser,
   getAllExpenses,
   storeTrip,
+  storeTripidToUser,
   storeUserToTrip,
   updateUser,
 } from "../../util/http";
@@ -92,6 +93,11 @@ const TripForm = ({ navigation }) => {
     UserCtx.addTripHistory(TripCtx.getcurrentTrip());
 
     storeUserToTrip(tripid, { travellerid: uid, userName: userName });
+    try {
+      storeTripidToUser(tripid, uid);
+    } catch (error) {
+      console.log(error);
+    }
 
     updateUser(uid, {
       userName: UserCtx.userName,

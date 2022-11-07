@@ -2,6 +2,7 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
   fetchTrip,
+  storeTripidToUser,
   storeUserToTrip,
   updateTrip,
   updateUser,
@@ -62,6 +63,7 @@ const JoinTrip = ({ navigation, route }) => {
     if (join) {
       const traveller = { travellerid: uid, userName: userCtx.userName };
       storeUserToTrip(tripid, traveller);
+      storeTripidToUser(tripid, uid);
       userCtx.addTripHistory(tripdata);
       tripCtx.setCurrentTrip(tripid, tripdata);
       tripCtx.setCurrentTravellers(tripid);

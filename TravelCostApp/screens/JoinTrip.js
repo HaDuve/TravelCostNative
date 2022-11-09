@@ -4,7 +4,6 @@ import {
   fetchTrip,
   storeTripidToUser,
   storeUserToTrip,
-  updateTrip,
   updateUser,
 } from "../util/http";
 import { Button } from "react-native";

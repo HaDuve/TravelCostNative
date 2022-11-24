@@ -1,12 +1,12 @@
-import { StatusBar } from "expo-status-bar";
 import { useContext, useEffect, useState } from "react";
+import { Alert, Text, SafeAreaView } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
-import { Alert, Text } from "react-native";
 import AppLoading from "expo-app-loading";
 import SignupScreen from "./screens/SignupScreen";
 import LoginScreen from "./screens/LoginScreen";
@@ -314,7 +314,7 @@ function Root() {
 
 export default function App() {
   return (
-    <>
+    <SafeAreaView style={{ flex: 1 }}>
       <StatusBar style="dark" />
       <AuthContextProvider>
         <TripContextProvider>
@@ -323,6 +323,6 @@ export default function App() {
           </UserContextProvider>
         </TripContextProvider>
       </AuthContextProvider>
-    </>
+    </SafeAreaView>
   );
 }

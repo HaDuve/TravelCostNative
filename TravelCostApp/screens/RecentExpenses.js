@@ -124,7 +124,11 @@ function RecentExpenses({ navigation }) {
         expenses={recentExpenses}
         fallbackText={i18n.t("fallbackTextExpenses")}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            // progressViewOffset={-100000}
+          />
         }
       />
       <AddExpenseButton navigation={navigation} />

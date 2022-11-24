@@ -7,9 +7,7 @@ import ExpensesList from "./ExpensesList";
 function ExpensesOutput({ expenses, fallbackText, refreshControl }) {
   let content = <Text style={styles.infoText}>{fallbackText}</Text>;
   if (expenses.length > 0) {
-    content = (
-      <ExpensesList expenses={expenses} refreshControl={refreshControl} />
-    );
+    content = <ExpensesList expenses={expenses} />;
   }
   return (
     <ScrollView style={styles.container} refreshControl={refreshControl}>

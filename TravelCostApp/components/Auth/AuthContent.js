@@ -87,6 +87,7 @@ const styles = StyleSheet.create({
   },
   secondaryText: {
     fontSize: 14,
+    padding: 12,
     color: GlobalStyles.colors.gray700,
     fontWeight: "300",
   },

@@ -314,7 +314,12 @@ function Root() {
 
 export default function App() {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: GlobalStyles.colors.gray500,
+      }}
+    >
       <StatusBar style="dark" />
       <AuthContextProvider>
         <TripContextProvider>

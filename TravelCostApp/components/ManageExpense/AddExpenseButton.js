@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: GlobalStyles.colors.primary400,
-    flex: 0,
+    flex: 1,
     borderRadius: 999,
     marginHorizontal: Dimensions.get("screen").width / 2.49,
     marginBottom: -10,

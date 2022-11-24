@@ -1,5 +1,9 @@
 Changelog Travel Expense App
 
+1.0.24
+- fixed loading indicators showing twice
+- app now acknowleges device specific UI parameters (SafeAreaView)
+
 1.0.23
 - solo travellers will not be asked about sharing expenses anymore
 - solo travellers cannot view split expenses summary anymore

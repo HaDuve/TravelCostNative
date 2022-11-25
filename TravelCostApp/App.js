@@ -313,21 +313,34 @@ function Root() {
 }
 
 export default function App() {
+  // <SafeAreaView style={{ flex:0, backgroundColor: 'red' }} />
+  //       <SafeAreaView style={{ flex:1, backgroundColor: 'gray' }}>
+  //         <View style={{ flex: 1, backgroundColor: 'white' }} />
+  //       </SafeAreaView>
+
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: GlobalStyles.colors.gray500,
-      }}
-    >
-      <StatusBar style="dark" />
-      <AuthContextProvider>
-        <TripContextProvider>
-          <UserContextProvider>
-            <Root />
-          </UserContextProvider>
-        </TripContextProvider>
-      </AuthContextProvider>
-    </SafeAreaView>
+    <>
+      <SafeAreaView
+        style={{
+          flex: 0,
+          backgroundColor: GlobalStyles.colors.backgroundColor,
+        }}
+      />
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: GlobalStyles.colors.gray500,
+        }}
+      >
+        <StatusBar style="dark" />
+        <AuthContextProvider>
+          <TripContextProvider>
+            <UserContextProvider>
+              <Root />
+            </UserContextProvider>
+          </TripContextProvider>
+        </AuthContextProvider>
+      </SafeAreaView>
+    </>
   );
 }

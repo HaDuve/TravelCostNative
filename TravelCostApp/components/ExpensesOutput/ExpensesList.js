@@ -3,8 +3,8 @@ import { Alert, FlatList, Button } from "react-native";
 import ExpenseItem from "./ExpenseItem";
 
 import React, { Component, useContext } from "react";
-import { Animated, StyleSheet, View } from "react-native";
-import { RectButton } from "react-native-gesture-handler";
+import { View } from "react-native";
+
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { GlobalStyles } from "../../constants/styles";
 import { deleteExpense } from "../../util/http";

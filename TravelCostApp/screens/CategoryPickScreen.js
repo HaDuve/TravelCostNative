@@ -84,6 +84,34 @@ const CategoryPickScreen = ({ route, navigation }) => {
     console.log("long pressed", item);
     Alert.alert("Customizing categories function coming soon... ");
   }
+  
+  function startShake(item) {
+    Animated.sequence([
+      Animated.timing(item.shakeAnimation, {
+        toValue: 5,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(item.shakeAnimation, {
+        toValue: -5,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(item.shakeAnimation, {
+        toValue: 5,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(item.shakeAnimation, {
+        toValue: 0,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    setTimeout(() => {
+      if (isShaking) startShake(item);
+    }, 800);
+  }
 
   function renderCatItem(itemData) {
     const item = itemData.item;
@@ -159,34 +187,6 @@ const CategoryPickScreen = ({ route, navigation }) => {
 };
 
 export default CategoryPickScreen;
-
-function startShake(item) {
-  Animated.sequence([
-    Animated.timing(item.shakeAnimation, {
-      toValue: 5,
-      duration: 100,
-      useNativeDriver: true,
-    }),
-    Animated.timing(item.shakeAnimation, {
-      toValue: -5,
-      duration: 100,
-      useNativeDriver: true,
-    }),
-    Animated.timing(item.shakeAnimation, {
-      toValue: 5,
-      duration: 100,
-      useNativeDriver: true,
-    }),
-    Animated.timing(item.shakeAnimation, {
-      toValue: 0,
-      duration: 100,
-      useNativeDriver: true,
-    }),
-  ]).start();
-  setTimeout(() => {
-    startShake(item);
-  }, 800);
-}
 
 const styles = StyleSheet.create({
   pressed: {

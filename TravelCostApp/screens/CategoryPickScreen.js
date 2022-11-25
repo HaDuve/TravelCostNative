@@ -1,5 +1,6 @@
 import {
   Alert,
+  Animated,
   Dimensions,
   FlatList,
   Pressable,
@@ -7,7 +8,7 @@ import {
   Text,
   View,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import IconButton from "../components/UI/IconButton";
 import Button from "../components/UI/Button";
 import FlatButton from "../components/UI/FlatButton";
@@ -25,6 +26,7 @@ i18n.enableFallback = true;
 const CategoryPickScreen = ({ route, navigation }) => {
   const { editedExpenseId } = route.params ? route.params : "null";
   console.log("CategoryPickScreen ~ editedExpenseId", editedExpenseId);
+  const [isShaking, setIsShaking] = useState(false);
 
   const CATLIST = [
     {
@@ -66,6 +68,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
   ];
 
   function catPressHandler(item) {
+    setIsShaking(false);
     if (item.cat === "newCat") {
       Alert.alert("New Category function coming soon... ");
     } else
@@ -76,15 +79,24 @@ const CategoryPickScreen = ({ route, navigation }) => {
       });
   }
 
+  function catLongPressHandler(item) {
+    setIsShaking(true);
+    console.log("long pressed", item);
+    Alert.alert("Customizing categories function coming soon... ");
+  }
+
   function renderCatItem(itemData) {
     const item = itemData.item;
+    item.shakeAnimation = new Animated.Value(0);
+    if (isShaking) startShake(item);
     return (
-      <View
+      <Animated.View
         style={[
           styles.itemContainer,
           styles.buttonStyle,
           GlobalStyles.shadow,
           styles.widthConstraint,
+          { transform: [{ translateX: item.shakeAnimation }] },
         ]}
       >
         <Pressable
@@ -93,18 +105,25 @@ const CategoryPickScreen = ({ route, navigation }) => {
             pressed && styles.pressed,
           ]}
           onPress={catPressHandler.bind(this, item)}
+          onLongPress={catLongPressHandler.bind(this, item)}
         >
-          <View style={styles.centerStyle}>
+          <Animated.View
+            style={[
+              styles.centerStyle,
+              { transform: [{ translateX: item.shakeAnimation }] },
+            ]}
+          >
             <IconButton
               icon={item.icon}
               size={42}
               color={item.color}
               onPress={catPressHandler.bind(this, item)}
+              onLongPress={catLongPressHandler.bind(this, item)}
             ></IconButton>
             <Text style={styles.itemText}>{item.catString}</Text>
-          </View>
+          </Animated.View>
         </Pressable>
-      </View>
+      </Animated.View>
     );
   }
 
@@ -114,6 +133,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
         numColumns={2}
         data={CATLIST}
         renderItem={renderCatItem}
+        style={styles.listStyle}
       ></FlatList>
       <View style={styles.buttonContainer}>
         <FlatButton
@@ -140,14 +160,45 @@ const CategoryPickScreen = ({ route, navigation }) => {
 
 export default CategoryPickScreen;
 
+function startShake(item) {
+  Animated.sequence([
+    Animated.timing(item.shakeAnimation, {
+      toValue: 5,
+      duration: 100,
+      useNativeDriver: true,
+    }),
+    Animated.timing(item.shakeAnimation, {
+      toValue: -5,
+      duration: 100,
+      useNativeDriver: true,
+    }),
+    Animated.timing(item.shakeAnimation, {
+      toValue: 5,
+      duration: 100,
+      useNativeDriver: true,
+    }),
+    Animated.timing(item.shakeAnimation, {
+      toValue: 0,
+      duration: 100,
+      useNativeDriver: true,
+    }),
+  ]).start();
+  setTimeout(() => {
+    startShake(item);
+  }, 800);
+}
+
 const styles = StyleSheet.create({
   pressed: {
     opacity: 0.4,
   },
+  listStyle: {
+    paddingTop: 12,
+  },
   container: {
     flex: 1,
     padding: 4,
-    paddingTop: 24,
+    paddingTop: 0,
     paddingHorizontal: 20,
   },
   widthConstraint: {

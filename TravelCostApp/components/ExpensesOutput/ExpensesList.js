@@ -133,18 +133,3 @@ function ExpensesList({ expenses, refreshControl }) {
 }
 
 export default ExpensesList;
-
-const styles = StyleSheet.create({
-  rightAction: {
-    alignItems: "center",
-    flex: 1,
-    justifyContent: "center",
-  },
-  actionText: {
-    color: GlobalStyles.colors.backgroundColor,
-    fontSize: 16,
-    //TODO: find another way to describe transparent, might cause android crash
-    // backgroundColor: "transparent",
-    padding: 10,
-  },
-});

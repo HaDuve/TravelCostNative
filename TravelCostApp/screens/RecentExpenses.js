@@ -98,8 +98,6 @@ function RecentExpenses({ navigation }) {
   let todayDateString = new Date();
   todayDateString = toShortFormat(todayDateString);
 
-  const datalength = recentExpenses.length > 0;
-
   return (
     <View style={styles.container}>
       <View style={styles.dateHeader}>

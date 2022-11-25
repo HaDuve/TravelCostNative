@@ -105,7 +105,12 @@ function closeRow(index) {
     prevOpenedRow.close();
   }
   prevOpenedRow = row[index];
+
+  setTimeout(() => {
+    forceCloseRow(index);
+  }, 1000);
 }
+
 function forceCloseRow(index) {
   row[index].close();
 }

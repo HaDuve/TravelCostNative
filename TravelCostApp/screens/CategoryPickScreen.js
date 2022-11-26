@@ -84,7 +84,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
     console.log("long pressed", item);
     Alert.alert("Customizing categories function coming soon... ");
   }
-  
+
   function startShake(item) {
     Animated.sequence([
       Animated.timing(item.shakeAnimation, {
@@ -185,7 +185,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
     </View>
   );
 };
-
+// testcommit
 export default CategoryPickScreen;
 
 const styles = StyleSheet.create({

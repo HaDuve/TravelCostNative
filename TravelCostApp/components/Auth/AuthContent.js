@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Alert, StyleSheet, View, Text } from "react-native";
+import {
+  Alert,
+  StyleSheet,
+  View,
+  Text,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import FlatButton from "../UI/FlatButton";
@@ -48,7 +55,10 @@ function AuthContent({ isLogin, onAuthenticate }) {
   }
 
   return (
-    <View style={styles.authContent}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.authContent}
+    >
       <AuthForm
         isLogin={isLogin}
         onSubmit={submitHandler}
@@ -62,7 +72,7 @@ function AuthContent({ isLogin, onAuthenticate }) {
           {isLogin ? "Create a new user" : "Log in instead"}
         </FlatButton>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

@@ -95,10 +95,10 @@ export function deleteExpense(tripid, uid, id) {
 }
 
 export async function storeUser(uid, userData) {
-  // some weird shit is happening here
-  // TODO: fix it
 
+  // TODO: fix the double store User bug
   const response = await axios.post(
+    // POST /users/uid.jos with userData if it exists, otherwise with {uid:uid}
     BACKEND_URL + "/users/" + `${uid}.json`,
     userData ? userData : { uid: uid }
   );

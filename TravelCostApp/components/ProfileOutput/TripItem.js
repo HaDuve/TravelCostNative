@@ -43,6 +43,7 @@ function TripItem({
   };
   // this clause might hide some bugs
   if (!tripid) return <></>;
+  console.log("tripid", tripid);
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const [travellers, setTravellers] = useState([]);

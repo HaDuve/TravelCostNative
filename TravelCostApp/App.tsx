@@ -289,7 +289,7 @@ function Root() {
           // TODO: figure out when we want to save or load from async storage,
           // right now this function seems to be confused
           tripCtx.fetchCurrentTrip(storedTripId);
-          const respo = await tripCtx.setCurrentTravellers(storedTripId);
+          tripCtx.setCurrentTravellers(storedTripId);
 
           const expenses = await getAllExpenses(storedTripId);
           expensesCtx.setExpenses(expenses);

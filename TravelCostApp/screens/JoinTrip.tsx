@@ -58,7 +58,7 @@ const JoinTrip = ({ navigation, route }) => {
     getTrip();
   }, []);
 
-  function joinHandler(join) {
+  function joinHandler(join: boolean) {
     if (join) {
       const traveller = { travellerid: uid, userName: userCtx.userName };
       storeUserToTrip(tripid, traveller);
@@ -100,7 +100,14 @@ const JoinTrip = ({ navigation, route }) => {
       </View>
       <View style={styles.linkInputContainer}>
         <Text> {i18n.t("joinLink")}</Text>
-        <Input value={joinTripid} onUpdateValue={setJoinTripid}></Input>
+        <Input
+          value={joinTripid}
+          onUpdateValue={setJoinTripid}
+          label={""}
+          secure={false}
+          keyboardType={"default"}
+          isInvalid={false}
+        ></Input>
         <Button title={i18n.t("join")} onPress={joinLinkHandler}></Button>
       </View>
     </View>

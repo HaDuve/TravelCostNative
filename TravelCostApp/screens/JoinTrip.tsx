@@ -66,7 +66,7 @@ const JoinTrip = ({ navigation, route }) => {
       const traveller = { travellerid: uid, userName: userCtx.userName };
       storeUserToTrip(tripid, traveller);
       storeTripidToUser(tripid, uid);
-      userCtx.addTripHistory(tripdata);
+      userCtx.addTripHistory(tripid);
       tripCtx.setCurrentTrip(tripid, tripdata);
       tripCtx.setCurrentTravellers(tripid);
       updateUser(uid, {

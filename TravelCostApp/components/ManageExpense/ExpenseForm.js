@@ -10,6 +10,7 @@ import {
   Dimensions,
   Keyboard,
   Platform,
+  KeyboardAvoidingView,
 } from "react-native";
 import Input from "./Input";
 import Button from "../UI/Button";
@@ -450,7 +451,7 @@ const ExpenseForm = ({
   return (
     <>
       {datepickerJSX}
-      <View style={styles.form}>
+      <KeyboardAvoidingView style={styles.form}>
         <View style={styles.inputsRow}>
           <Input
             style={styles.rowInput}
@@ -821,7 +822,7 @@ const ExpenseForm = ({
         {formIsInvalid && !hideAdvanced && (
           <Text style={styles.errorText}>{i18n.t("invalidInput")} </Text>
         )}
-      </View>
+      </KeyboardAvoidingView>
       <View style={styles.buttonContainer}>
         <FlatButton style={styles.button} onPress={onCancel}>
           {i18n.t("cancel")}

@@ -161,22 +161,6 @@ const ProfileForm = ({ navigation, onCancel }) => {
     navigation.navigate("Join", { id: "-NCU-c47x12mUih6A1Y6" });
   }
 
-  // TODO: THIS IS ONLY DEBUG, COMMENT AND UNCOMMENT BELOW
-  // const freshlyNavigationButtons = (
-  //   <View style={styles.navButtonContainer}>
-  //     <FlatButton style={[styles.navButton]} onPress={joinInvite}>
-  //       {i18n.t("invitationText")}
-  //     </FlatButton>
-  //     {/*  TODO: DEBUG: for debugging i leave this condition only around this button, it should be around the whole view though */}
-  //     <Button
-  //       style={styles.navButton}
-  //       onPress={() => navigation.navigate("ManageTrip")}
-  //     >
-  //       {i18n.t("createFirstTrip")}
-  //     </Button>
-  //   </View>
-  // );
-  // TODO: THIS IS FINAL, COMMENT AND UNCOMMENT ABOVE
   const freshlyNavigationButtons = freshlyCreated && (
     <View style={styles.navButtonContainer}>
       <FlatButton style={[styles.navButton]} onPress={joinInvite}>

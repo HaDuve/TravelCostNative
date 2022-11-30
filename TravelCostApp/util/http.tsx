@@ -3,7 +3,8 @@ import axios from "axios";
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
 
-export async function storeExpense(tripid, uid, expenseData) {
+export async function storeExpense(tripid: string, uid: string, expenseData) {
+  // TODO: create expenseData interface for TypeScript
   const response = await axios.post(
     BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json",
     expenseData
@@ -12,10 +13,10 @@ export async function storeExpense(tripid, uid, expenseData) {
   return id;
 }
 
-export async function fetchExpensesWithUIDs(tripid, uidlist) {
+export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
   const expenses = [];
   uidlist.forEach((uid) => {
-    async function getExp(uid) {
+    async function getExp(uid: string) {
       const response = await axios.get(
         BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json"
       );
@@ -55,7 +56,7 @@ export async function fetchExpensesWithUIDs(tripid, uidlist) {
   return expenses;
 }
 
-export async function fetchExpenses(tripid, uid) {
+export async function fetchExpenses(tripid: string, uid: string) {
   const response = await axios.get(
     BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json"
   );
@@ -81,21 +82,26 @@ export async function fetchExpenses(tripid, uid) {
   return expenses;
 }
 
-export function updateExpense(tripid, uid, id, expenseData) {
+export function updateExpense(
+  tripid: string,
+  uid: string,
+  id: string,
+  expenseData
+) {
+  //TODO: create expenseData Interface for TypeScript
   return axios.put(
     BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses/" + `${id}.json`,
     expenseData
   );
 }
 
-export function deleteExpense(tripid, uid, id) {
+export function deleteExpense(tripid: string, uid: string, id: string) {
   return axios.delete(
     BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses/" + `${id}.json`
   );
 }
 
-export async function storeUser(uid, userData) {
-
+export async function storeUser(uid: string, userData) {
   // TODO: fix the double store User bug
   const response = await axios.post(
     // POST /users/uid.jos with userData if it exists, otherwise with {uid:uid}
@@ -106,31 +112,35 @@ export async function storeUser(uid, userData) {
   return id;
 }
 
-export function updateUser(uid, userData) {
+export function updateUser(uid: string, userData) {
+  //TODO: create userData Interface for TypeScript
   return axios.put(BACKEND_URL + "/users/" + `${uid}.json`, userData);
 }
 
-export async function fetchUser(uid) {
+export async function fetchUser(uid: string) {
   const response = await axios.get(BACKEND_URL + "/users/" + `${uid}.json`);
   return response.data;
 }
 
 export async function storeTrip(tripData) {
+  //TODO: create tripData Interface for TypeScript
   const response = await axios.post(BACKEND_URL + "/trips.json", tripData);
   const id = response.data.name;
   return id;
 }
 
-export function updateTrip(tripid, tripData) {
+export function updateTrip(tripid: string, tripData) {
+  //TODO: create tripData Interface for TypeScript
   return axios.put(BACKEND_URL + "/trips/" + `${tripid}.json`, tripData);
 }
 
-export async function fetchTrip(tripid) {
+export async function fetchTrip(tripid: string) {
   const response = await axios.get(BACKEND_URL + "/trips/" + `${tripid}.json`);
   return response.data;
 }
 
-export async function storeUserToTrip(tripid, uid) {
+export async function storeUserToTrip(tripid: string, uid: string) {
+  // TODO: check first if User is already in the Trip!
   const response = await axios.post(
     BACKEND_URL + "/trips/" + `${tripid}/` + `travellers.json`,
     uid
@@ -139,20 +149,20 @@ export async function storeUserToTrip(tripid, uid) {
   return id;
 }
 
-export async function storeTripidToUser(tripid, uid) {
+export async function storeTripidToUser(tripid: string, uid: string) {
   return await axios.post(
     BACKEND_URL + `/${uid}/` + "/trips/" + `${tripid}.json`
   );
 }
 
-export async function fetchTripUsers(tripid) {
+export async function fetchTripUsers(tripid: string) {
   const response = await axios.get(
     BACKEND_URL + `/trips/${tripid}/travellers.json`
   );
   return response.data;
 }
 
-export async function getTravellers(tripid) {
+export async function getTravellers(tripid: string) {
   const response = await fetchTripUsers(tripid);
   let travellerids = [];
   let travellers = [];
@@ -172,7 +182,7 @@ export async function getTravellers(tripid) {
   return travellers;
 }
 
-export async function getUIDs(tripid) {
+export async function getUIDs(tripid: string) {
   const response = await fetchTripUsers(tripid);
   let travellerids = [];
   for (let key in response) {
@@ -184,7 +194,7 @@ export async function getUIDs(tripid) {
   return travellerids;
 }
 
-export async function getAllExpenses(tripid) {
+export async function getAllExpenses(tripid: string) {
   const uids = await getUIDs(tripid);
   const expenses = await fetchExpensesWithUIDs(tripid, uids);
   return expenses;

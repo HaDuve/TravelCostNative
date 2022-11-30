@@ -158,24 +158,24 @@ const ProfileForm = ({ navigation, onCancel }) => {
 
   function joinInvite() {
     // TODO: this hardcoded join
-    navigation.navigate("Join", { id: "-NCU-c47x12mUih6A1Y6" });
+    navigation.navigate("Join", { id: "-NHs1Goz9sc1Ea69uHUY" });
   }
 
-  const freshlyNavigationButtons = freshlyCreated && (
+  const freshlyNavigationButtons = (
     <View style={styles.navButtonContainer}>
       <FlatButton style={[styles.navButton]} onPress={joinInvite}>
         {i18n.t("invitationText")}
       </FlatButton>
-      {/*  TODO: DEBUG: for debugging i leave this condition only around this button, it should be around the whole view though */}
-      <Button
-        style={styles.navButton}
-        onPress={() => navigation.navigate("ManageTrip")}
-      >
-        {i18n.t("createFirstTrip")}
-      </Button>
+      {freshlyCreated && (
+        <Button
+          style={styles.navButton}
+          onPress={() => navigation.navigate("ManageTrip")}
+        >
+          {i18n.t("createFirstTrip")}
+        </Button>
+      )}
     </View>
   );
-
   return (
     <View style={styles.form}>
       <View style={styles.avatarBar}>

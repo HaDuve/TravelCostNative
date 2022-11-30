@@ -41,7 +41,7 @@ function TripItem({
     dailyBudget,
     tripCurrency,
   };
-  // this clause might hide some bugs
+  // TODO: investigate why this clause might hide some bugs
   if (!tripid) return <></>;
   console.log("tripid", tripid);
   const navigation = useNavigation();

@@ -100,10 +100,12 @@ const JoinTrip = ({ navigation, route }) => {
           title={i18n.t("cancel")}
           onPress={joinHandler.bind(this, false)}
         />
-        <Button
-          title={i18n.t("confirm2")}
-          onPress={joinHandler.bind(this, true)}
-        />
+        {tripName?.length > 0 && (
+          <Button
+            title={i18n.t("confirm2")}
+            onPress={joinHandler.bind(this, true)}
+          />
+        )}
       </View>
       <View style={styles.linkInputContainer}>
         <Text> {i18n.t("joinLink")}</Text>

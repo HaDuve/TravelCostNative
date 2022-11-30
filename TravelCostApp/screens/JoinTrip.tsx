@@ -86,11 +86,34 @@ const JoinTrip = ({ navigation, route }) => {
   async function joinLinkHandler() {
     setTripdata({});
     setTripName("");
-    await getTrip(joinTripid);
+    if (joinTripid.length > 25) {
+      console.log("long lonk");
+      const index_start = joinTripid.indexOf("-");
+      const temp_string = joinTripid.slice(index_start);
+      const index_end = temp_string.indexOf(" ");
+      const final_link_string = temp_string.slice(0, index_end);
+      console.log("joinLinkHandler ~ final_link_string", final_link_string);
+      setJoinTripid(final_link_string);
+      getTrip(final_link_string);
+    } else {
+      await getTrip(joinTripid);
+    }
   }
 
   return (
     <KeyboardAvoidingView style={styles.container}>
+      <View style={styles.linkInputContainer}>
+        <Text> {i18n.t("joinLink")}</Text>
+        <Input
+          value={joinTripid}
+          onUpdateValue={setJoinTripid}
+          label={""}
+          secure={false}
+          keyboardType={"default"}
+          isInvalid={false}
+        ></Input>
+        <Button title={i18n.t("join")} onPress={joinLinkHandler}></Button>
+      </View>
       <Text style={{ padding: 4 }}>{i18n.t("joinTrip")}?</Text>
       <Text style={{ padding: 4, fontSize: 18, fontWeight: "bold" }}>
         {tripName}
@@ -107,18 +130,6 @@ const JoinTrip = ({ navigation, route }) => {
           />
         )}
       </View>
-      <View style={styles.linkInputContainer}>
-        <Text> {i18n.t("joinLink")}</Text>
-        <Input
-          value={joinTripid}
-          onUpdateValue={setJoinTripid}
-          label={""}
-          secure={false}
-          keyboardType={"default"}
-          isInvalid={false}
-        ></Input>
-        <Button title={i18n.t("join")} onPress={joinLinkHandler}></Button>
-      </View>
     </KeyboardAvoidingView>
   );
 };
@@ -131,6 +142,8 @@ const styles = StyleSheet.create({
     padding: 40,
     alignContent: "center",
     alignItems: "center",
+
+    marginBottom: "80%",
   },
   buttonContainer: {
     flex: 1,

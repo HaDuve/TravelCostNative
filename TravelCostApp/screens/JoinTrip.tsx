@@ -1,4 +1,10 @@
-import { Alert, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
   fetchTrip,
@@ -33,13 +39,15 @@ const JoinTrip = ({ navigation, route }) => {
   const uid = authCtx.uid;
   const tripid = route.params.id;
 
-  // NOTE: joinTripid for debug purposes
-  //("-NCIxnq4MrQjGB_unKiE");
   const [joinTripid, setJoinTripid] = useState("");
   const [tripdata, setTripdata] = useState({});
   const [tripName, setTripName] = useState("");
 
-  async function getTrip(tripID = tripid) {
+  async function getTrip(tripID: string) {
+    // NOTE COMMENT NEXT LINE for PRODUCTION
+    // if (tripID === "") tripID = tripid;
+    console.log("getTrip ~ tripID2", tripID);
+
     //   setIsFetching(true);
     try {
       const trip = await fetchTrip(tripID);
@@ -55,7 +63,7 @@ const JoinTrip = ({ navigation, route }) => {
   }
 
   useLayoutEffect(() => {
-    getTrip();
+    getTrip(joinTripid);
   }, []);
 
   function joinHandler(join: boolean) {
@@ -79,11 +87,10 @@ const JoinTrip = ({ navigation, route }) => {
     setTripdata({});
     setTripName("");
     await getTrip(joinTripid);
-    joinHandler(true);
   }
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView style={styles.container}>
       <Text style={{ padding: 4 }}>{i18n.t("joinTrip")}?</Text>
       <Text style={{ padding: 4, fontSize: 18, fontWeight: "bold" }}>
         {tripName}
@@ -110,7 +117,7 @@ const JoinTrip = ({ navigation, route }) => {
         ></Input>
         <Button title={i18n.t("join")} onPress={joinLinkHandler}></Button>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 

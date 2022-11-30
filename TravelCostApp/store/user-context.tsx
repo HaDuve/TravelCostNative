@@ -11,7 +11,7 @@ export const UserContext = createContext({
   lastCurrency: "",
   tripHistory: [],
   periodName: "day",
-  setPeriodString: (string) => {},
+  setPeriodString: (string: string) => {},
 
   addUser: ({
     userName,
@@ -21,15 +21,15 @@ export const UserContext = createContext({
     country,
     currency,
   }) => {},
-  deleteUser: (uid) => {},
-  setUserName: (name) => {},
+  deleteUser: (uid: string) => {},
+  setUserName: (name: string) => {},
 
   addTripHistory: (tripid: string) => {},
-  setTripHistory: (trips) => {},
-  deleteTripHistory: (tripid) => {},
+  setTripHistory: (trips: string[]) => {},
+  deleteTripHistory: (tripid: string) => {},
 
   freshlyCreated: false,
-  setFreshlyCreatedTo: (bool) => {},
+  setFreshlyCreatedTo: (bool: boolean) => {},
 });
 
 function tripsReducer(state, action) {
@@ -65,15 +65,16 @@ function UserContextProvider({ children }) {
     dispatch({ type: "ADD", payload: tripid });
   }
 
-  function setTripHistory(trips) {
+  function setTripHistory(trips: string[]) {
     dispatch({ type: "SET", payload: trips });
   }
 
-  function deleteTripHistory(tripid) {
+  function deleteTripHistory(tripid: string) {
     dispatch({ type: "DELETE", payload: tripid });
   }
 
-  function addUser(UserData) {
+  function addUser(UserData: any) {
+    // TODO: create User interface for typeScript
     if (!UserData) return;
 
     if (UserData.userName) {
@@ -99,15 +100,15 @@ function UserContextProvider({ children }) {
     }
   }
 
-  function setFreshlyCreatedTo(bool) {
+  function setFreshlyCreatedTo(bool: boolean) {
     setFreshlyCreated(bool);
     AsyncStorage.setItem("freshlyCreated", bool.toString());
   }
 
-  function deleteUser(id) {
+  function deleteUser(id: string) {
     Alert.alert("delete context not implemented");
   }
-  function setUserName(name) {
+  function setUserName(name: string) {
     if (!name || name.length < 1) return;
     setName(name);
   }

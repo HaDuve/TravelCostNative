@@ -2,6 +2,7 @@ import { createContext, useReducer, useState } from "react";
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchTrip, getTravellers } from "../util/http";
+import { de } from "../i18n/supportedLanguages";
 
 export const TripContext = createContext({
   tripid: "",
@@ -11,21 +12,19 @@ export const TripContext = createContext({
   tripCurrency: "",
   totalSum: 0,
   tripProgress: 0,
-  setTripProgress: (percent) => {},
+  setTripProgress: (percent: number) => {},
   // save user as obj with (tname, tid)
   travellers: [],
-  setCurrentTravellers: (tripid) => {},
-  setTotalSum: (amount) => {},
+  setCurrentTravellers: (tripid: string) => {},
+  setTotalSum: (amount: number) => {},
 
   addTrip: ({ tripName, tripTotalBudget }) => {},
-  deleteTrip: (tripid) => {},
-  updateTrip: ({ tripid, tripName, tripTotalBudget }) => {},
+  deleteTrip: (tripid: string) => {},
   getcurrentTrip: () => {},
-  setCurrentTrip: (tripid, trip) => {},
-  deleteCurrentTrip: (uid) => {},
+  setCurrentTrip: (tripid: string, trip) => {},
+  deleteCurrentTrip: (uid: string) => {},
   getCurrentTripFromStorage: () => {},
-  fetchCurrentTrip: (tripid) => {},
-  getcurrentTrip: () => {},
+  fetchCurrentTrip: (tripid: string) => {},
 });
 
 function TripContextProvider({ children }) {
@@ -39,12 +38,12 @@ function TripContextProvider({ children }) {
   const [totalSum, setTotalSumTrip] = useState(0);
   const [progress, setProgress] = useState(0);
 
-  function setTripProgress(percent) {
+  function setTripProgress(percent: number) {
     if (percent < 0 || percent > 1) percent = 1;
     setProgress(percent);
   }
 
-  async function setCurrentTravellers(tripid) {
+  async function setCurrentTravellers(tripid: string) {
     // updates the current Travellers in context
     try {
       const travellers = await getTravellers(tripid);
@@ -56,13 +55,14 @@ function TripContextProvider({ children }) {
     }
   }
 
-  function setCurrentTrip(tripid, trip) {
+  function setCurrentTrip(tripid: string, trip) {
+    // TODO: write trip interface for TypeScript
     setTripid(tripid);
     setTripName(trip.tripName);
     setTotalBudget(trip.totalBudget.toString());
     setTripCurrency(trip.tripCurrency);
     setdailyBudget(trip.dailyBudget.toString());
-    setTravellers(trip.travellers);
+    setCurrentTravellers(tripid);
     AsyncStorage.setItem("currentTripId", tripid);
     AsyncStorage.setItem("currentTripName", trip.tripName);
     AsyncStorage.setItem("currentTripTotalBudget", trip.totalBudget.toString());
@@ -71,7 +71,7 @@ function TripContextProvider({ children }) {
     AsyncStorage.setItem("currentTripTravellers", trip.travellers?.toString());
   }
 
-  function setTotalSum(amount) {
+  function setTotalSum(amount: number) {
     setTotalSumTrip(amount);
   }
 
@@ -87,11 +87,11 @@ function TripContextProvider({ children }) {
     } else console.error("no trip stored in memory");
   }
 
-  function deleteCurrentTrip(id) {
-    Alert.alert("delete context not implemented");
+  function deleteCurrentTrip(id: string) {
+    Alert.alert("deleteCurrentTrip not implemented");
   }
 
-  async function fetchCurrentTrip(tripid) {
+  async function fetchCurrentTrip(tripid: string) {
     try {
       const trip = await fetchTrip(tripid);
       setCurrentTrip(tripid, trip);
@@ -112,24 +112,31 @@ function TripContextProvider({ children }) {
     return curTripData;
   }
 
+  function addTrip() {
+    console.log("add Trip NOT IMPLEMENTED");
+  }
+  function deleteTrip() {
+    console.log("delete Trip NOT IMPLEMENTED");
+  }
   const value = {
     tripid: tripid,
     tripName: tripName,
     totalBudget: totalBudget,
-    tripCurrency: tripCurrency,
     dailyBudget: dailyBudget,
-    travellers: travellers,
+    tripCurrency: tripCurrency,
     totalSum: totalSum,
-    setTotalSum: setTotalSum,
-    getcurrentTrip: getcurrentTrip,
-    setCurrentTravellers: setCurrentTravellers,
-    setCurrentTrip: setCurrentTrip,
-    getCurrentTripFromStorage: getCurrentTripFromStorage,
-    fetchCurrentTrip: fetchCurrentTrip,
-
     tripProgress: progress,
     setTripProgress: setTripProgress,
+    travellers: travellers,
+    setCurrentTravellers: setCurrentTravellers,
     setTotalSum: setTotalSum,
+    addTrip: addTrip,
+    deleteTrip: deleteTrip,
+    getcurrentTrip: getcurrentTrip,
+    setCurrentTrip: setCurrentTrip,
+    deleteCurrentTrip: deleteCurrentTrip,
+    getCurrentTripFromStorage: getCurrentTripFromStorage,
+    fetchCurrentTrip: fetchCurrentTrip,
   };
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>;

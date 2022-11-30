@@ -24,6 +24,8 @@ const ProfileScreen = ({ route, navigation, param }) => {
   const FreshlyCreated = UserCtx.freshlyCreated;
   const TripCtx = useContext(TripContext);
 
+  const currentTrip = TripCtx.tripid;
+  console.log("ProfileScreen ~ currentTrip", currentTrip);
   const allTripsList = [
     {
       tripid: TripCtx.tripid,

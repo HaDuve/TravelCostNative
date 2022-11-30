@@ -24,7 +24,7 @@ export const UserContext = createContext({
   deleteUser: (uid) => {},
   setUserName: (name) => {},
 
-  addTripHistory: (tripData) => {},
+  addTripHistory: (tripid: string) => {},
   setTripHistory: (trips) => {},
   deleteTripHistory: (tripid) => {},
 
@@ -58,12 +58,11 @@ function UserContextProvider({ children }) {
 
   const [tripsState, dispatch] = useReducer(tripsReducer, []);
 
-  function setPeriodString(string) {
-    console.log("setPeriodString ~ string", string);
-    setPeriodName(string);
+  function setPeriodString(periodName: string) {
+    setPeriodName(periodName);
   }
-  function addTripHistory(tripData) {
-    dispatch({ type: "ADD", payload: tripData });
+  function addTripHistory(tripid: string) {
+    dispatch({ type: "ADD", payload: tripid });
   }
 
   function setTripHistory(trips) {

@@ -82,6 +82,7 @@ const JoinTrip = ({ navigation, route }) => {
     setTripdata({});
     setTripName("");
     if (joinTripid.length > 25) {
+      // find the tripid from long string
       const index_start = joinTripid.indexOf("-");
       const temp_string = joinTripid.slice(index_start);
       const index_end = temp_string.indexOf(" ");

@@ -44,11 +44,6 @@ const JoinTrip = ({ navigation, route }) => {
   const [tripName, setTripName] = useState("");
 
   async function getTrip(tripID: string) {
-    // NOTE COMMENT NEXT LINE for PRODUCTION
-    // if (tripID === "") tripID = tripid;
-    console.log("getTrip ~ tripID2", tripID);
-
-    //   setIsFetching(true);
     try {
       const trip = await fetchTrip(tripID);
       setTripName(trip.tripName);
@@ -59,7 +54,6 @@ const JoinTrip = ({ navigation, route }) => {
         " Please try another invitation or try again later."
       );
     }
-    //   setIsFetching(false);
   }
 
   useLayoutEffect(() => {
@@ -88,12 +82,10 @@ const JoinTrip = ({ navigation, route }) => {
     setTripdata({});
     setTripName("");
     if (joinTripid.length > 25) {
-      console.log("long lonk");
       const index_start = joinTripid.indexOf("-");
       const temp_string = joinTripid.slice(index_start);
       const index_end = temp_string.indexOf(" ");
       const final_link_string = temp_string.slice(0, index_end);
-      console.log("joinLinkHandler ~ final_link_string", final_link_string);
       setJoinTripid(final_link_string);
       getTrip(final_link_string);
     } else {

@@ -139,11 +139,11 @@ export async function fetchTrip(tripid: string) {
   return response.data;
 }
 
-export async function storeUserToTrip(tripid: string, uid: string) {
+export async function storeUserToTrip(tripid: string, uid) {
+  console.log("storeUserToTrip ~ tripid", tripid);
   // TODO: check first if User is already in the Trip!
   const response = await axios.post(
-    BACKEND_URL + "/trips/" + `${tripid}/` + `travellers.json`,
-    uid
+    BACKEND_URL + "/trips/" + `${tripid}/` + `${uid}.json`
   );
   const id = response.data.name;
   return id;

@@ -117,6 +117,10 @@ function TripItem({
     );
   }
 
+  if (tripid && !totalBudget) {
+    return <Text>{tripid}</Text>;
+  }
+
   return (
     <Pressable
       onPress={tripPressHandler}

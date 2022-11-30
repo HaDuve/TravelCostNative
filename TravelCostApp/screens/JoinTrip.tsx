@@ -37,7 +37,7 @@ const JoinTrip = ({ navigation, route }) => {
   const authCtx = useContext(AuthContext);
   const tripCtx = useContext(TripContext);
   const uid = authCtx.uid;
-  const tripid = route.params.id;
+  let tripid = route.params.id;
 
   const [joinTripid, setJoinTripid] = useState("");
   const [tripdata, setTripdata] = useState({});
@@ -60,12 +60,13 @@ const JoinTrip = ({ navigation, route }) => {
     getTrip(joinTripid);
   }, []);
 
-  function joinHandler(join: boolean) {
+  async function joinHandler(join: boolean) {
     // either we press the confirm or the cancel button (join=true/false)
     if (join) {
-      const traveller = { travellerid: uid, userName: userCtx.userName };
-      storeUserToTrip(tripid, traveller);
-      storeTripidToUser(tripid, uid);
+      tripid = joinTripid;
+      console.log("joinHandler ~ tripid", tripid);
+      await storeUserToTrip(tripid, uid);
+      await storeTripidToUser(tripid, uid);
       userCtx.addTripHistory(tripid);
       tripCtx.setCurrentTrip(tripid, tripdata);
       tripCtx.setCurrentTravellers(tripid);

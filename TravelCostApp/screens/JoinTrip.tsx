@@ -67,6 +67,7 @@ const JoinTrip = ({ navigation, route }) => {
   }, []);
 
   function joinHandler(join: boolean) {
+    // either we press the confirm or the cancel button (join=true/false)
     if (join) {
       const traveller = { travellerid: uid, userName: userCtx.userName };
       storeUserToTrip(tripid, traveller);

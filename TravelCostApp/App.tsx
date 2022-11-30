@@ -157,7 +157,9 @@ function Navigation() {
         Join: {
           path: "join/:id",
           parse: {
-            id: (id) => `${id}`,
+            id: (id: string) => {
+              return `${id}`;
+            },
           },
         },
         Home: {

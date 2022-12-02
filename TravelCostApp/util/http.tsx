@@ -3,6 +3,26 @@ import axios from "axios";
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
 
+/** Axios Logger */
+
+axios.interceptors.request.use(
+  (config) => {
+    console.log(`${config.method.toUpperCase()} request sent to ${config.url}`);
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+/**
+ * storeExpense posts expense data under the specified path:
+ * #### trips/$tripid/$user/
+ * @param tripid
+ * @param uid
+ * @param expenseData
+ * @returns id
+ */
 export async function storeExpense(tripid: string, uid: string, expenseData) {
   // TODO: create expenseData interface for TypeScript
   const response = await axios.post(
@@ -114,7 +134,7 @@ export async function storeUser(uid: string, userData) {
 
 export function updateUser(uid: string, userData) {
   //TODO: create userData Interface for TypeScript
-  return axios.put(BACKEND_URL + "/users/" + `${uid}.json`, userData);
+  return axios.patch(BACKEND_URL + "/users/" + `${uid}.json`, userData);
 }
 
 export async function fetchUser(uid: string) {
@@ -129,10 +149,10 @@ export async function storeTrip(tripData) {
   return id;
 }
 
-export function updateTrip(tripid: string, tripData) {
-  //TODO: create tripData Interface for TypeScript
-  return axios.put(BACKEND_URL + "/trips/" + `${tripid}.json`, tripData);
-}
+// export function updateTrip(tripid: string, tripData) {
+//    create tripData Interface for TypeScript
+//   return axios.put(BACKEND_URL + "/trips/" + `${tripid}.json`, tripData);
+// }
 
 export async function fetchTrip(tripid: string) {
   const response = await axios.get(BACKEND_URL + "/trips/" + `${tripid}.json`);

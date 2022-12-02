@@ -3,8 +3,8 @@ import axios from "axios";
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
 
+ 
 /** Axios Logger */
-
 axios.interceptors.request.use(
   (config) => {
     console.log(`${config.method.toUpperCase()} request sent to ${config.url}`);

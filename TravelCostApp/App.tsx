@@ -267,8 +267,8 @@ function Root() {
   useEffect(() => {
     async function onRootMount() {
       console.log("onRootMount ~ onRootMount");
-      // NOTE: uncomment below for memory/login debugging
-      // await AsyncStorage.clear();
+      // NOTE: uncomment below for memory/login debugging // flush memory
+      await AsyncStorage.clear();
 
       // fetch token and trip
       const storedToken = await AsyncStorage.getItem("token");

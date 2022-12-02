@@ -40,6 +40,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
   const UserCtx = useContext(UserContext);
   const TripCtx = useContext(TripContext);
   const freshlyCreated = UserCtx.freshlyCreated;
+  console.log("ProfileForm User: ", AuthCtx.uid);
 
   let currencyPickerRef = undefined;
 
@@ -104,7 +105,8 @@ const ProfileForm = ({ navigation, onCancel }) => {
     userData.lastCountry = inputs.lastCountry.value;
     userData.lastCurrency = inputs.lastCurrency.value;
 
-    const invalid = userData.userName.length == 0;
+    const invalid =
+      userData.userName.length == 0 || userData.userName.length > 20;
 
     if (invalid) {
       Alert.alert("Check your profile for invalid entries please!");

@@ -65,8 +65,8 @@ const JoinTrip = ({ navigation, route }) => {
     if (join) {
       tripid = joinTripid;
       console.log("joinHandler ~ tripid", tripid);
-      await storeUserToTrip(tripid, uid);
-      await storeTripidToUser(tripid, uid);
+
+      // TODO: store user to trip and trip to user history in axios
       userCtx.addTripHistory(tripid);
       tripCtx.setCurrentTrip(tripid, tripdata);
       tripCtx.setCurrentTravellers(tripid);

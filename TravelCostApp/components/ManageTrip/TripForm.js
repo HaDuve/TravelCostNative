@@ -92,12 +92,7 @@ const TripForm = ({ navigation }) => {
     TripCtx.setCurrentTrip(tripid, tripData);
     UserCtx.addTripHistory(TripCtx.getcurrentTrip());
 
-    storeUserToTrip(tripid, { travellerid: uid, userName: userName });
-    try {
-      storeTripidToUser(tripid, uid);
-    } catch (error) {
-      console.log(error);
-    }
+    // TODO: store user to trip and trip to user history in axios
 
     updateUser(uid, {
       userName: UserCtx.userName,

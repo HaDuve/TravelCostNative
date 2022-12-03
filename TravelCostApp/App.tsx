@@ -315,11 +315,6 @@ function Root() {
 }
 
 export default function App() {
-  // <SafeAreaView style={{ flex:0, backgroundColor: 'red' }} />
-  //       <SafeAreaView style={{ flex:1, backgroundColor: 'gray' }}>
-  //         <View style={{ flex: 1, backgroundColor: 'white' }} />
-  //       </SafeAreaView>
-
   return (
     <>
       <SafeAreaView

@@ -33,6 +33,7 @@ export const UserContext = createContext({
 });
 
 function tripsReducer(state, action) {
+  console.log("tripsReducer ~ state", state)
   switch (action.type) {
     case "ADD":
       return [action.payload, ...state];

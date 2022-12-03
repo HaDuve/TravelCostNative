@@ -224,8 +224,10 @@ export async function getTravellers(tripid: string) {
 export async function getUIDs(tripid: string) {
   console.log("getUIDs ~ tripid", tripid);
   const response = await fetchTripUsers(tripid);
+  console.log("getUIDs ~ response", response);
   let travellerids = [];
   for (let key in response) {
+    console.log("getUIDs ~ key", key);
     const uid = response[key].travellerid;
     if (!travellerids.includes(uid) && uid && uid.length > 0) {
       travellerids.push(uid);
@@ -234,9 +236,10 @@ export async function getUIDs(tripid: string) {
   return travellerids;
 }
 
-export async function getAllExpenses(tripid: string) {
+export async function getAllExpenses(tripid: string, uid?: string) {
   console.log("getAllExpenses ~ tripid", tripid);
   const uids = await getUIDs(tripid);
+  if (uids.length < 1) uids.push(uid);
   const expenses = await fetchExpensesWithUIDs(tripid, uids);
   return expenses;
 }

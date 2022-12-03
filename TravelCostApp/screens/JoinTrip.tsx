@@ -8,6 +8,7 @@ import {
 import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
   fetchTrip,
+  storeTripHistory,
   storeTripidToUser,
   storeUserToTrip,
   updateUser,
@@ -61,6 +62,7 @@ const JoinTrip = ({ navigation, route }) => {
   }, []);
 
   async function joinHandler(join: boolean) {
+    console.log("joinHandler ~ joinHandler", joinHandler)
     // either we press the confirm or the cancel button (join=true/false)
     if (join) {
       tripid = joinTripid;
@@ -68,6 +70,8 @@ const JoinTrip = ({ navigation, route }) => {
 
       // TODO: store user to trip and trip to user history in axios
       userCtx.addTripHistory(tripid);
+      const res = await storeTripHistory(uid, userCtx.tripHistory);
+      console.log("joinHandler ~ res", res)
       tripCtx.setCurrentTrip(tripid, tripdata);
       tripCtx.setCurrentTravellers(tripid);
       updateUser(uid, {

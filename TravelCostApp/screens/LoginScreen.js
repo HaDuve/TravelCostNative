@@ -5,7 +5,7 @@ import { login } from "../util/auth";
 import { Alert } from "react-native";
 import { AuthContext } from "./../store/auth-context";
 import { UserContext } from "../store/user-context";
-import { fetchUser } from "../util/http";
+import { fetchTripHistory, fetchUser } from "../util/http";
 import { TripContext } from "../store/trip-context";
 
 function LoginScreen() {
@@ -21,11 +21,12 @@ function LoginScreen() {
       const { token, uid } = await login(email, password);
       authCtx.authenticate(token);
       authCtx.setUserID(uid);
-      tripCtx.fetchCurrentTrip(tripid);
+      const res = await fetchTripHistory(uid);
+      tripCtx.fetchAndSetCurrentTrip(res[0]);
       // tripCtx.setCurrentTrip(tripid, tripdata);
       // tripCtx.setCurrentTravellers(tripid);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       Alert.alert(
         "Authentication failed!",
         "Failed to login. Wrong password or Username? Please try again later."

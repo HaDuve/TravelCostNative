@@ -24,7 +24,7 @@ export const TripContext = createContext({
   setCurrentTrip: (tripid: string, trip) => {},
   deleteCurrentTrip: (uid: string) => {},
   getCurrentTripFromStorage: () => {},
-  fetchCurrentTrip: (tripid: string) => {},
+  fetchAndSetCurrentTrip: (tripid: string) => {},
 });
 
 function TripContextProvider({ children }) {
@@ -91,7 +91,7 @@ function TripContextProvider({ children }) {
     Alert.alert("deleteCurrentTrip not implemented");
   }
 
-  async function fetchCurrentTrip(tripid: string) {
+  async function fetchAndSetCurrentTrip(tripid: string) {
     try {
       const trip = await fetchTrip(tripid);
       setCurrentTrip(tripid, trip);
@@ -136,7 +136,7 @@ function TripContextProvider({ children }) {
     setCurrentTrip: setCurrentTrip,
     deleteCurrentTrip: deleteCurrentTrip,
     getCurrentTripFromStorage: getCurrentTripFromStorage,
-    fetchCurrentTrip: fetchCurrentTrip,
+    fetchAndSetCurrentTrip: fetchAndSetCurrentTrip,
   };
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>;

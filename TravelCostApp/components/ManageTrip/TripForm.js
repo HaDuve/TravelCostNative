@@ -8,6 +8,7 @@ import {
   fetchUser,
   getAllExpenses,
   storeTrip,
+  storeTripHistory,
   storeTripidToUser,
   storeUserToTrip,
   updateUser,
@@ -67,7 +68,7 @@ const TripForm = ({ navigation }) => {
     tripData.totalBudget = +inputs.totalBudget.value;
     tripData.tripCurrency = inputs.tripCurrency.value;
     tripData.dailyBudget = inputs.dailyBudget.value;
-    tripData.travellers = [{ userName: UserCtx.userName }];
+    tripData.travellers = [{ userName: UserCtx.userName, uid: uid }];
 
     const totalBudgetIsValid =
       !isNaN(tripData.totalBudget) &&
@@ -90,7 +91,8 @@ const TripForm = ({ navigation }) => {
     tripData.tripid = tripid;
 
     TripCtx.setCurrentTrip(tripid, tripData);
-    UserCtx.addTripHistory(TripCtx.getcurrentTrip());
+    UserCtx.addTripHistory(tripid);
+    storeTripHistory(uid, UserCtx.tripHistory);
 
     // TODO: store user to trip and trip to user history in axios
 
@@ -100,7 +102,7 @@ const TripForm = ({ navigation }) => {
     });
 
     UserCtx.setFreshlyCreatedTo(false);
-    const expenses = await getAllExpenses(tripid);
+    const expenses = await getAllExpenses(tripid, uid);
     ExpenseCtx.setExpenses(expenses);
 
     navigation.navigate("Profile");

@@ -63,7 +63,7 @@ const OverviewScreen = ({ navigation }) => {
     async function getExpenses() {
       setIsFetching(true);
       try {
-        const expenses = await getAllExpenses(tripid);
+        const expenses = await getAllExpenses(tripid, uid);
         expensesCtx.setExpenses(expenses);
       } catch (error) {
         setError(i18n.t("fetchError") + error);

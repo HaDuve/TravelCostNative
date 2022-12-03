@@ -61,7 +61,7 @@ function RecentExpenses({ navigation }) {
     if (!refresh) setIsFetching(true);
     setRefreshing(true);
     try {
-      const expenses = await getAllExpenses(tripid);
+      const expenses = await getAllExpenses(tripid, uid);
       expensesCtx.setExpenses(expenses);
       const expensesSum = expenses.reduce((sum, expense) => {
         return sum + expense.calcAmount;

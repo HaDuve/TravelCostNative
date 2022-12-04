@@ -18,18 +18,12 @@ function SignupScreen() {
     setIsAuthenticating(true);
     try {
       const { token, uid } = await createUser(email, password);
+      //CLEAR
       await AsyncStorage.clear();
       userCtx.setTripHistory([]);
+      //NEW
       authCtx.setUserID(uid);
-      const userdata = { name: name, tripHistory: [] };
-      try {
-        storeUser(uid, userdata);
-      } catch (error) {
-        Alert.alert(
-          "Storing User failed",
-          "Could not create user, please try other credentials or try again later."
-        );
-      }
+      await storeUser(uid, { userName: name });
       userCtx.setUserName(name);
       userCtx.setFreshlyCreatedTo(true);
       authCtx.authenticate(token);

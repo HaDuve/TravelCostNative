@@ -1,5 +1,5 @@
 import { Dimensions, StyleSheet, Text, TextInput, View } from "react-native";
-import { GlobalStyles } from "./../constants/styles";
+import { GlobalStyles } from "../constants/styles";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
 import { useContext, useEffect } from "react";
@@ -14,6 +14,7 @@ import { onShare } from "../components/ProfileOutput/ShareTrip";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
+import { fetchTrip } from "../util/http";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -39,9 +40,18 @@ const ProfileScreen = ({ route, navigation, param }) => {
 
   useEffect(() => {
     // add all trips from history into the list
-    UserCtx.tripHistory.forEach((trip) => {
-      if (trip.tripid !== TripCtx.tripid) allTripsList.push(trip);
-    });
+    async function getTrips(tripid: string) {
+      const tripres = await fetchTrip(tripid).then((res) => {
+        if (tripid !== TripCtx.tripid) allTripsList.push(res);
+      });
+    }
+    async function constructHistory() {
+      UserCtx.getTripHistory().forEach((tripid) => {
+        console.log("UserCtx.getTripHistory ~ tripid", tripid);
+        getTrips(tripid);
+      });
+    }
+    constructHistory();
   }, []);
 
   function cancelHandler() {

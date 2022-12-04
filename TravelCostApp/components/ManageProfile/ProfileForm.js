@@ -64,27 +64,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
     userName: {
       value: !UserCtx.userName ? "" : UserCtx.userName,
       isValid: true,
-    },
-    dailybudget: {
-      value: UserCtx.dailybudget ? UserCtx.dailybudget : "",
-      isValid: true,
-    },
-    homeCountry: {
-      value: UserCtx.homeCountry ? UserCtx.homeCountry : "",
-      isValid: true,
-    },
-    homeCurrency: {
-      value: UserCtx.homeCurrency ? UserCtx.homeCurrency : "",
-      isValid: true,
-    },
-    lastCountry: {
-      value: UserCtx.lastCountry ? UserCtx.lastCountry : "",
-      isValid: true,
-    },
-    lastCurrency: {
-      value: UserCtx.lastCurrency ? UserCtx.lastCurrency : "",
-      isValid: true,
-    },
+    }
   });
 
   function inputChangedHandler(inputIdentifier, enteredValue) {
@@ -99,11 +79,6 @@ const ProfileForm = ({ navigation, onCancel }) => {
   async function submitHandler(e) {
     const userData = {};
     userData.userName = inputs.userName.value;
-    userData.dailybudget = +inputs.dailybudget.value;
-    userData.homeCountry = inputs.homeCountry.value;
-    userData.homeCurrency = inputs.homeCurrency.value;
-    userData.lastCountry = inputs.lastCountry.value;
-    userData.lastCurrency = inputs.lastCurrency.value;
 
     const invalid =
       userData.userName.length == 0 || userData.userName.length > 20;

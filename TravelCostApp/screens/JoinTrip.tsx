@@ -10,7 +10,6 @@ import {
   fetchTrip,
   storeTripHistory,
   storeTripidToUser,
-  storeUserToTrip,
   updateUser,
 } from "../util/http";
 import { Button } from "react-native";
@@ -62,7 +61,7 @@ const JoinTrip = ({ navigation, route }) => {
   }, []);
 
   async function joinHandler(join: boolean) {
-    console.log("joinHandler ~ joinHandler", joinHandler)
+    console.log("joinHandler ~ joinHandler", joinHandler);
     // either we press the confirm or the cancel button (join=true/false)
     if (join) {
       tripid = joinTripid;
@@ -70,13 +69,13 @@ const JoinTrip = ({ navigation, route }) => {
 
       // TODO: store user to trip and trip to user history in axios
       userCtx.addTripHistory(tripid);
-      const res = await storeTripHistory(uid, userCtx.tripHistory);
-      console.log("joinHandler ~ res", res)
+      const res = await storeTripHistory(uid, userCtx.getTripHistory());
+      console.log("joinHandler ~ res", res);
       tripCtx.setCurrentTrip(tripid, tripdata);
       tripCtx.setCurrentTravellers(tripid);
       updateUser(uid, {
         userName: userCtx.userName,
-        tripHistory: userCtx.tripHistory,
+        tripHistory: userCtx.getTripHistory(),
       });
       userCtx.setFreshlyCreatedTo(false);
     }

@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Alert } from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
@@ -10,7 +10,6 @@ import {
   storeTrip,
   storeTripHistory,
   storeTripidToUser,
-  storeUserToTrip,
   updateUser,
 } from "../../util/http";
 
@@ -63,12 +62,14 @@ const TripForm = ({ navigation }) => {
   }
 
   async function submitHandler(e) {
-    const tripData = {};
-    tripData.tripName = inputs.tripName.value;
-    tripData.totalBudget = +inputs.totalBudget.value;
-    tripData.tripCurrency = inputs.tripCurrency.value;
-    tripData.dailyBudget = inputs.dailyBudget.value;
-    tripData.travellers = [{ userName: UserCtx.userName, uid: uid }];
+    const tripData = {
+      tripName: inputs.tripName.value,
+      totalBudget: +inputs.totalBudget.value,
+      tripCurrency: inputs.tripCurrency.value,
+      dailyBudget: +inputs.dailyBudget.value,
+      travellers: [{ userName: userName, uid: uid }],
+      tripid: "",
+    };
 
     const totalBudgetIsValid =
       !isNaN(tripData.totalBudget) &&
@@ -84,21 +85,22 @@ const TripForm = ({ navigation }) => {
     if (!totalBudgetIsValid || !dailyBudgetIsValid) {
       inputs.totalBudget.isValid = totalBudgetIsValid;
       inputs.dailyBudget.isValid = dailyBudgetIsValid;
+      Alert.alert(
+        "Budgets are invalid! Please enter positive Numbers (Total Budget cannot be lower than Daily Budget)"
+      );
       return;
     }
 
     const tripid = await storeTrip(tripData);
+    console.log(" submitHandler ~ tripid", tripid);
     tripData.tripid = tripid;
 
     TripCtx.setCurrentTrip(tripid, tripData);
     UserCtx.addTripHistory(tripid);
-    storeTripHistory(uid, UserCtx.tripHistory);
-
-    // TODO: store user to trip and trip to user history in axios
 
     updateUser(uid, {
       userName: UserCtx.userName,
-      tripHistory: UserCtx.tripHistory,
+      tripHistory: UserCtx.getTripHistory(),
     });
 
     UserCtx.setFreshlyCreatedTo(false);

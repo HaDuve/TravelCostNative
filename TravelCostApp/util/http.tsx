@@ -11,7 +11,11 @@ const Axios = axios.create({
 /** Axios Logger */
 axios.interceptors.request.use(
   (config) => {
-    console.log(`${config.method.toUpperCase()} request sent to ${config.url}`);
+    console.warn(
+      `--- ~~~`,
+      `${config.method.toUpperCase()} request sent to ${config.url}`,
+      `~~~ ---`
+    );
     return config;
   },
   (error) => {
@@ -143,12 +147,9 @@ export function deleteExpense(tripid: string, uid: string, id: string) {
  */
 export async function storeUser(uid: string, userData) {
   console.log("storeUser ~ userData", userData);
-  console.log("storeUser ~ uid", uid);
-  // TODO: fix the double store User bug
   const response = await axios.post(
-    // POST /users/uid.jos with userData if it exists, otherwise with {uid:uid}
     BACKEND_URL + "/users/" + `${uid}.json`,
-    userData ? userData : { uid: uid }
+    userData
   );
   const id = response.data.name;
   return id;
@@ -245,7 +246,7 @@ export async function getAllExpenses(tripid: string, uid?: string) {
 }
 
 export async function storeTripHistory(userId: string, tripHistory: string[]) {
-  console.log("fetchTripHistory ~ userId", userId);
+  console.log("storeTripHistory ~ userId", userId);
   const response = await axios.post(
     BACKEND_URL + `/users/${userId}/tripHistory.json`,
     tripHistory

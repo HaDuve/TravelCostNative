@@ -1,11 +1,10 @@
 {
   "name": "travelcostapp",
   "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "eject": "expo eject"
   },
@@ -40,7 +39,8 @@
     "react-native-svg": "^12.3.0",
     "react-native-web": "0.17.7",
     "victory": "^36.6.5",
-    "victory-native": "^36.6.8"
+    "victory-native": "^36.6.8",
+    "expo-splash-screen": "~0.15.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { setAxiosAccessToken } from "../util/http";
 
 export const AuthContext = createContext({
   uid: "",
@@ -17,6 +18,7 @@ function AuthContextProvider({ children }) {
   function authenticate(token) {
     setAuthToken(token);
     AsyncStorage.setItem("token", token);
+    setAxiosAccessToken(token);
   }
 
   function logout() {

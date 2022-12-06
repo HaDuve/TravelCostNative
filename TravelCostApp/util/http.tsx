@@ -4,9 +4,20 @@ const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
 
 /** AXIOS Instance */
-const Axios = axios.create({
-  baseURL: BACKEND_URL,
-});
+// const Axios = axios.create({
+//   baseURL: BACKEND_URL,
+// });
+
+/** ACCESS TOKEN */
+var QPAR: string = "";
+export function setAxiosAccessToken(token: string) {
+  if (!token || token.length < 2) {
+    console.error("wrong token error");
+    return;
+  }
+  QPAR = `?auth=${token}`;
+  console.log("setAxiosAccessToken ~ QPAR", QPAR);
+}
 
 /** Axios Logger */
 axios.interceptors.request.use(

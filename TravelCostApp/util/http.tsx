@@ -16,7 +16,6 @@ export function setAxiosAccessToken(token: string) {
     return;
   }
   QPAR = `?auth=${token}`;
-  console.log("setAxiosAccessToken ~ QPAR", QPAR);
 }
 
 /** Axios Logger */

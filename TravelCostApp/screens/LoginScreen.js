@@ -21,8 +21,8 @@ function LoginScreen() {
       const { token, uid } = await login(email, password);
       authCtx.authenticate(token);
       authCtx.setUserID(uid);
-      const res = await fetchTripHistory(uid);
-      tripCtx.fetchAndSetCurrentTrip(res[0]);
+      // const res = await fetchTripHistory(uid);
+      // tripCtx.fetchAndSetCurrentTrip(res[0]);
       // tripCtx.setCurrentTrip(tripid, tripdata);
       // tripCtx.setCurrentTravellers(tripid);
     } catch (error) {

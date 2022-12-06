@@ -14,6 +14,7 @@ async function authenticate(mode, email, password) {
 
   const token = response.data.idToken;
   const uid = response.data.localId;
+  axios.defaults.headers.common["auth"] = token;
   return { token, uid };
 }
 

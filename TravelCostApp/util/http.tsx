@@ -22,10 +22,10 @@ export function setAxiosAccessToken(token: string) {
 /** Axios Logger */
 axios.interceptors.request.use(
   (config) => {
-    console.warn(
-      `--- ~~~`,
+    console.log(
+      `--- AXIOS LOG ~~~ \n`,
       `${config.method.toUpperCase()} request sent to ${config.url}`,
-      `~~~ ---`
+      `~~~ AXIOS LOG --- \n`
     );
     return config;
   },

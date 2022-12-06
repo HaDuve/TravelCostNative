@@ -47,7 +47,7 @@ export async function storeExpense(tripid: string, uid: string, expenseData) {
   console.log("storeExpense ~ tripid", tripid);
   // TODO: create expenseData interface for TypeScript
   const response = await axios.post(
-    BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json",
+    BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json" + QPAR,
     expenseData
   );
   const id = response.data.name;
@@ -62,7 +62,7 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
   uidlist.forEach((uid) => {
     async function getExp(uid: string) {
       const response = await axios.get(
-        BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json"
+        BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json" + QPAR
       );
 
       for (const key in response.data) {
@@ -92,10 +92,22 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
   // TODO: find out why we dont await the above
   // for some reason we dont await the above so we have to do this to really get all the expense
   const response1 = await axios.get(
-    BACKEND_URL + "/trips/" + tripid + "/" + uidlist[0] + "/expenses.json"
+    BACKEND_URL +
+      "/trips/" +
+      tripid +
+      "/" +
+      uidlist[0] +
+      "/expenses.json" +
+      QPAR
   );
   const response2 = await axios.get(
-    BACKEND_URL + "/trips/" + tripid + "/" + uidlist[0] + "/expenses.json"
+    BACKEND_URL +
+      "/trips/" +
+      tripid +
+      "/" +
+      uidlist[0] +
+      "/expenses.json" +
+      QPAR
   );
   return expenses;
 }
@@ -104,7 +116,7 @@ export async function fetchExpenses(tripid: string, uid: string) {
   console.log("fetchExpenses ~ uid", uid);
   console.log("fetchExpenses ~ tripid", tripid);
   const response = await axios.get(
-    BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json"
+    BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json" + QPAR
   );
   const expenses = [];
 
@@ -138,7 +150,14 @@ export function updateExpense(
   console.log("tripid", tripid);
   //TODO: create expenseData Interface for TypeScript
   return axios.put(
-    BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses/" + `${id}.json`,
+    BACKEND_URL +
+      "/trips/" +
+      tripid +
+      "/" +
+      uid +
+      "/expenses/" +
+      `${id}.json` +
+      QPAR,
     expenseData
   );
 }
@@ -146,7 +165,14 @@ export function updateExpense(
 export function deleteExpense(tripid: string, uid: string, id: string) {
   console.log("deleteExpense ~ tripid", tripid);
   return axios.delete(
-    BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses/" + `${id}.json`
+    BACKEND_URL +
+      "/trips/" +
+      tripid +
+      "/" +
+      uid +
+      "/expenses/" +
+      `${id}.json` +
+      QPAR
   );
 }
 
@@ -159,7 +185,7 @@ export function deleteExpense(tripid: string, uid: string, id: string) {
 export async function storeUser(uid: string, userData) {
   console.log("storeUser ~ userData", userData);
   const response = await axios.post(
-    BACKEND_URL + "/users/" + `${uid}.json`,
+    BACKEND_URL + "/users/" + `${uid}.json` + QPAR,
     userData
   );
   const id = response.data.name;
@@ -169,19 +195,24 @@ export async function storeUser(uid: string, userData) {
 export function updateUser(uid: string, userData) {
   console.log("updateUser ~ uid", uid);
   //TODO: create userData Interface for TypeScript
-  return axios.patch(BACKEND_URL + "/users/" + `${uid}.json`, userData);
+  return axios.patch(BACKEND_URL + "/users/" + `${uid}.json` + QPAR, userData);
 }
 
 export async function fetchUser(uid: string) {
   console.log("fetchUser ~ uid", uid);
-  const response = await axios.get(BACKEND_URL + "/users/" + `${uid}.json`);
+  const response = await axios.get(
+    BACKEND_URL + "/users/" + `${uid}.json` + QPAR
+  );
   return response.data;
 }
 
 export async function storeTrip(tripData) {
   console.log("storeTrip ~ tripData", tripData);
   //TODO: create tripData Interface for TypeScript
-  const response = await axios.post(BACKEND_URL + "/trips.json", tripData);
+  const response = await axios.post(
+    BACKEND_URL + "/trips.json" + QPAR,
+    tripData
+  );
   const id = response.data.name;
   return id;
 }
@@ -193,21 +224,23 @@ export async function storeTrip(tripData) {
 
 export async function fetchTrip(tripid: string) {
   console.log("fetchTrip ~ tripid", tripid);
-  const response = await axios.get(BACKEND_URL + "/trips/" + `${tripid}.json`);
+  const response = await axios.get(
+    BACKEND_URL + "/trips/" + `${tripid}.json` + QPAR
+  );
   return response.data;
 }
 
 export async function storeTripidToUser(tripid: string, uid: string) {
   console.log("storeTripidToUser ~ tripid", tripid);
   return await axios.post(
-    BACKEND_URL + `/${uid}/` + "/trips/" + `${tripid}.json`
+    BACKEND_URL + `/${uid}/` + "/trips/" + `${tripid}.json` + QPAR
   );
 }
 
 export async function fetchTripUsers(tripid: string) {
   console.log("fetchTripUsers ~ tripid", tripid);
   const response = await axios.get(
-    BACKEND_URL + `/trips/${tripid}/travellers.json`
+    BACKEND_URL + `/trips/${tripid}/travellers.json` + QPAR
   );
   return response.data;
 }
@@ -259,7 +292,7 @@ export async function getAllExpenses(tripid: string, uid?: string) {
 export async function storeTripHistory(userId: string, tripHistory: string[]) {
   console.log("storeTripHistory ~ userId", userId);
   const response = await axios.post(
-    BACKEND_URL + `/users/${userId}/tripHistory.json`,
+    BACKEND_URL + `/users/${userId}/tripHistory.json` + QPAR,
     tripHistory
   );
   return response.data;
@@ -268,7 +301,7 @@ export async function storeTripHistory(userId: string, tripHistory: string[]) {
 export async function fetchTripHistory(userId: string) {
   console.log("fetchTripHistory ~ userId", userId);
   const response = await axios.get(
-    BACKEND_URL + `/users/${userId}/tripHistory.json`
+    BACKEND_URL + `/users/${userId}/tripHistory.json` + QPAR
   );
   return response.data;
 }

@@ -13,7 +13,6 @@ async function authenticate(mode, email, password) {
   });
 
   const token = response.data.idToken;
-  console.warn("authenticate ~ token", token);
   const uid = response.data.localId;
   return { token, uid };
 }

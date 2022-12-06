@@ -27,11 +27,12 @@ function LoginScreen() {
       // tripCtx.setCurrentTravellers(tripid);
     } catch (error) {
       console.error(error);
+      setIsAuthenticating(false);
       Alert.alert(
         "Authentication failed!",
         "Failed to login. Wrong password or Username? Please try again later."
       );
-      setIsAuthenticating(false);
+      authCtx.logout();
     }
   }
 

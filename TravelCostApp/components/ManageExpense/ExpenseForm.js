@@ -113,7 +113,6 @@ const ExpenseForm = ({
   // dropdown for whoPaid picker
   const currentTravellers = TripCtx.travellers;
 
-  // TODO: make solo travellers not be asked about sharing expenses
   const IsSoloTraveller = currentTravellers.length === 1;
   let dropdownItems = travellerToDropdown(currentTravellers);
 

@@ -56,6 +56,8 @@ function TripContextProvider({ children }) {
   }
 
   function setCurrentTrip(tripid: string, trip) {
+    console.log("setCurrentTrip ~ trip", trip);
+    console.log("setCurrentTrip ~ tripid", tripid);
     // TODO: write trip interface for TypeScript
     setTripid(tripid);
     setTripName(trip.tripName);

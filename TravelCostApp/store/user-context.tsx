@@ -6,9 +6,7 @@ export const UserContext = createContext({
   periodName: "day",
   setPeriodString: (string: string) => {},
 
-  addUser: ({
-    userName,
-  }) => {},
+  addUser: ({ userName }) => {},
   deleteUser: (uid: string) => {},
   setUserName: (name: string) => {},
 
@@ -48,22 +46,22 @@ function UserContextProvider({ children }) {
     setPeriodName(periodName);
   }
   function addTripHistory(tripid: string) {
-    console.log("addTripHistory ~ tripid", tripid)
+    console.warn("!!!!!!! addTripHistory ~ tripid", tripid);
     dispatch({ type: "ADD", payload: tripid });
   }
 
   function setTripHistory(trips: string[]) {
-    console.log("setTripHistory ~ trips", trips)
+    console.log("setTripHistory ~ trips", trips);
     dispatch({ type: "SET", payload: trips });
   }
 
   function deleteTripHistory(tripid: string) {
-    console.log("deleteTripHistory ~ tripid", tripid)
+    console.log("deleteTripHistory ~ tripid", tripid);
     dispatch({ type: "DELETE", payload: tripid });
   }
 
   function addUser(UserData: any) {
-    console.log("addUser ~ UserData", UserData)
+    console.log("addUser ~ UserData", UserData);
     // TODO: create User interface for typeScript
     if (!UserData) return;
 
@@ -73,7 +71,7 @@ function UserContextProvider({ children }) {
   }
 
   function setFreshlyCreatedTo(bool: boolean) {
-    console.log("setFreshlyCreatedTo ~ bool", bool)
+    console.log("setFreshlyCreatedTo ~ bool", bool);
     setFreshlyCreated(bool);
   }
 
@@ -81,13 +79,13 @@ function UserContextProvider({ children }) {
     Alert.alert("delete context not implemented");
   }
   function setUserName(name: string) {
-    console.log("setUserName ~ name", name)
+    console.log("setUserName ~ name", name);
     if (!name || name.length < 1) return;
     setName(name);
   }
 
   function getTripHistory() {
-    console.log("!!!!!!!!!!!!!! getTripHistory ~ tripsState", tripsState);
+    console.warn("!!!!!!!!!!!!!! getTripHistory ~ tripsState", tripsState);
     return tripsState;
   }
 

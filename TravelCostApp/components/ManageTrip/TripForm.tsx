@@ -9,7 +9,7 @@ import {
   getAllExpenses,
   storeTrip,
   storeTripHistory,
-  storeTripidToUser,
+  storeTripUser,
   updateUser,
 } from "../../util/http";
 
@@ -61,13 +61,12 @@ const TripForm = ({ navigation }) => {
     navigation.navigate("Profile");
   }
 
-  async function submitHandler(e) {
+  async function submitHandler() {
     const tripData = {
       tripName: inputs.tripName.value,
       totalBudget: +inputs.totalBudget.value,
       tripCurrency: inputs.tripCurrency.value,
       dailyBudget: +inputs.dailyBudget.value,
-      travellers: [{ userName: userName, uid: uid }],
       tripid: "",
     };
 
@@ -92,6 +91,7 @@ const TripForm = ({ navigation }) => {
     }
 
     const tripid = await storeTrip(tripData);
+    storeTripUser(tripid, [{ userName: userName, uid: uid }]);
     console.log(" submitHandler ~ tripid", tripid);
     tripData.tripid = tripid;
 
@@ -101,6 +101,7 @@ const TripForm = ({ navigation }) => {
     updateUser(uid, {
       userName: UserCtx.userName,
       tripHistory: UserCtx.getTripHistory(),
+      currentTrip: tripid,
     });
 
     UserCtx.setFreshlyCreatedTo(false);

@@ -6,7 +6,7 @@ import AuthContent from "../components/Auth/AuthContent";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { UserContext } from "../store/user-context";
 import { createUser } from "../util/auth";
-import { fetchUser, storeUser } from "../util/http";
+import { fetchUser, saveUserCorrectly, storeUser } from "../util/http";
 import { AuthContext } from "./../store/auth-context";
 
 function SignupScreen() {
@@ -22,12 +22,14 @@ function SignupScreen() {
       await AsyncStorage.clear();
       userCtx.setTripHistory([]);
       //NEW
-      authCtx.setUserID(uid);
-      await storeUser(uid, { userName: name });
+      const userData = { userName: name };
+      storeUser(uid, userData);
       userCtx.setUserName(name);
       userCtx.setFreshlyCreatedTo(true);
+      authCtx.setUserID(uid);
       authCtx.authenticate(token);
     } catch (error) {
+      console.log("signupHandler ~ error2", error);
       Alert.alert(
         "Authentication failed",
         "Could not create user, please check your input and try again later."

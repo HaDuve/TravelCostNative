@@ -1,5 +1,9 @@
 Changelog Travel Expense App
 
+1.0.25
+- joining a shared trip is easier now
+- database was made more secure by restricting access
+
 1.0.24
 - fixed loading indicators showing twice
 - app now acknowleges device specific UI parameters (SafeAreaView)

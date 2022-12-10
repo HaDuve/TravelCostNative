@@ -71,11 +71,11 @@ function TripItem({
     // TODO: Android can only handle alert with 2 actions, so this needs to be changed or actions will go missing
     console.log("pressed: ", tripid);
     Alert.alert(tripName, i18n.t("chooseAction"), [
-      {
-        text: i18n.t("cancel"),
-        onPress: () => navigation.navigate("Profile"),
-        style: "cancel",
-      },
+      // {
+      //   text: i18n.t("cancel"),
+      //   onPress: () => navigation.navigate("Profile"),
+      //   style: "cancel",
+      // },
       {
         text: i18n.t("setActiveTrip"),
         onPress: () => {

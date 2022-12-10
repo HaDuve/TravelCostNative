@@ -67,3 +67,25 @@ export async function asyncStoreSetObject(key: string, value: object) {
   }
   console.log("Done.");
 }
+
+/**
+ * Async Clear, but safer:
+ *
+ * first calls getAllKeys() and then multiremove(keys)
+ */
+export async function asyncStoreSafeClear() {
+  try {
+    var keys = await AsyncStorage.getAllKeys();
+  } catch (error) {
+    // read key error
+    console.error(error);
+  }
+  try {
+    await AsyncStorage.multiRemove(keys);
+  } catch (error) {
+    // remove error
+    console.error(error);
+  }
+
+  console.log("Done");
+}

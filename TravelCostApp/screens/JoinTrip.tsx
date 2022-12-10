@@ -8,8 +8,9 @@ import {
 import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
   fetchTrip,
+  getAllExpenses,
   storeTripHistory,
-  storeTripidToUser,
+  storeTripUser,
   updateUser,
 } from "../util/http";
 import { Button } from "react-native";
@@ -23,6 +24,7 @@ import Input from "../components/Auth/Input";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
+import { ExpensesContext } from "../store/expenses-context";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -36,6 +38,7 @@ const JoinTrip = ({ navigation, route }) => {
   const userCtx = useContext(UserContext);
   const authCtx = useContext(AuthContext);
   const tripCtx = useContext(TripContext);
+  const ExpenseCtx = useContext(ExpensesContext);
   const uid = authCtx.uid;
   let tripid = route.params.id;
 
@@ -69,15 +72,27 @@ const JoinTrip = ({ navigation, route }) => {
 
       // TODO: store user to trip and trip to user history in axios
       userCtx.addTripHistory(tripid);
-      const res = await storeTripHistory(uid, userCtx.getTripHistory());
-      console.log("joinHandler ~ res", res);
-      tripCtx.setCurrentTrip(tripid, tripdata);
-      tripCtx.setCurrentTravellers(tripid);
+      try {
+        const res = await storeTripHistory(uid, userCtx.getTripHistory());
+        const storeRes = await storeTripUser(tripid, {
+          userName: userCtx.userName,
+          uid: uid,
+        });
+        console.warn("joinHandler ~ storeRes", storeRes);
+        console.warn("joinHandler ~ res", res);
+      } catch (error) {
+        console.error(error);
+      }
       updateUser(uid, {
         userName: userCtx.userName,
         tripHistory: userCtx.getTripHistory(),
+        currentTrip: tripid,
       });
+      tripCtx.setCurrentTrip(tripid, tripdata);
+      tripCtx.setCurrentTravellers(tripid);
       userCtx.setFreshlyCreatedTo(false);
+      const expenses = await getAllExpenses(tripid, uid);
+      ExpenseCtx.setExpenses(expenses);
     }
     navigation.navigate("Profile");
   }

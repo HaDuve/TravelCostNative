@@ -6,10 +6,10 @@ const IconButton = ({
   size,
   color,
   onPress,
-  buttonStyle,
-  rotate,
-  onPressStyle,
-  imageNumber,
+  buttonStyle = {},
+  rotate = 0,
+  onPressStyle = {},
+  imageNumber = 0,
 }) => {
   let transformStyle = {};
   if (rotate) {

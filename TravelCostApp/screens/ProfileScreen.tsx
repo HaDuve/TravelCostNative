@@ -9,6 +9,7 @@ import { TripContext } from "../store/trip-context";
 import Button from "../components/UI/Button";
 import { UserContext } from "../store/user-context";
 import { onShare } from "../components/ProfileOutput/ShareTrip";
+import { NetworkConsumer } from "react-native-offline";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -75,6 +76,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
             />
           </View>
         </View>
+
         <TripList trips={allTripsList}></TripList>
       </View>
       {/* <AddExpenseButton navigation={navigation} /> */}
@@ -94,6 +96,11 @@ const ProfileScreen = ({ route, navigation, param }) => {
 
   return (
     <View style={styles.container}>
+      <NetworkConsumer>
+        {({ isConnected }) =>
+          isConnected ? <Text>Online</Text> : <Text>Offline</Text>
+        }
+      </NetworkConsumer>
       <View style={styles.innerContainer}>
         <ProfileForm
           navigation={navigation}

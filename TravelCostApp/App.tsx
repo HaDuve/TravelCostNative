@@ -5,6 +5,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { NetworkProvider } from "react-native-offline";
+
 import { Ionicons } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 import AppLoading from "expo-app-loading";
@@ -333,7 +335,9 @@ export default function App() {
         <AuthContextProvider>
           <TripContextProvider>
             <UserContextProvider>
-              <Root />
+              <NetworkProvider>
+                <Root />
+              </NetworkProvider>
             </UserContextProvider>
           </TripContextProvider>
         </AuthContextProvider>

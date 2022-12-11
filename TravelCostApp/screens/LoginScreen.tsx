@@ -3,9 +3,9 @@ import { useContext, useEffect, useState } from "react";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { login } from "../util/auth";
 import { Alert } from "react-native";
-import { AuthContext } from "./../store/auth-context";
+import { AuthContext } from "../store/auth-context";
 import { UserContext } from "../store/user-context";
-import { fetchTripHistory, fetchUser } from "../util/http";
+import { fetchTripHistory, fetchUser, fetchUserName } from "../util/http";
 import { TripContext } from "../store/trip-context";
 
 function LoginScreen() {
@@ -21,6 +21,8 @@ function LoginScreen() {
       const { token, uid } = await login(email, password);
       authCtx.authenticate(token);
       authCtx.setUserID(uid);
+      const loggedUserName: string = await fetchUserName(uid);
+      userCtx.setUserName(loggedUserName);
       // const res = await fetchTripHistory(uid);
       // tripCtx.fetchAndSetCurrentTrip(res[0]);
       // tripCtx.setCurrentTrip(tripid, tripdata);

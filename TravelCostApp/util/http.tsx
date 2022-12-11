@@ -244,17 +244,9 @@ export async function fetchTrip(tripid: string) {
   return response.data;
 }
 
-export async function fetchTripUsers(tripid: string) {
-  console.log("fetchTripUsers ~ tripid", tripid);
-  const response = await axios.get(
-    BACKEND_URL + `/trips/${tripid}/travellers.json` + QPAR
-  );
-  return response.data;
-}
-
-export async function storeTripUser(tripid: string, traveller) {
+export async function storeTravellerToTrip(tripid: string, traveller) {
+  console.log("storeTravellerToTrip ~ traveller", traveller);
   // TODO: add traveller interface for TypeScript ({ userName: userName, uid: uid })
-  console.log("fetchTripUsers ~ tripid", tripid);
   const response = await axios.post(
     BACKEND_URL + `/trips/${tripid}/travellers.json` + QPAR,
     traveller
@@ -262,14 +254,23 @@ export async function storeTripUser(tripid: string, traveller) {
   return response.data;
 }
 
+export async function fetchTripsTravellers(tripid: string) {
+  const response = await axios.get(
+    BACKEND_URL + `/trips/${tripid}/travellers.json` + QPAR
+  );
+  console.log("fetchTripsTravellers ~ response", response.data);
+  return response.data;
+}
+
 export async function getTravellers(tripid: string) {
   console.log("getTravellers ~ tripid", tripid);
-  const response = await fetchTripUsers(tripid);
+  const response = await fetchTripsTravellers(tripid);
+  console.log("getTravellers ~ response", response);
   let travellerids = [];
   let travellers = [];
   for (let key in response) {
     const traveller = response[key].userName;
-    const uid = response[key].travellerid;
+    const uid = response[key].uid;
     if (
       !travellerids.includes(uid) &&
       !travellers.includes(traveller) &&
@@ -284,13 +285,11 @@ export async function getTravellers(tripid: string) {
 }
 
 export async function getUIDs(tripid: string) {
-  console.log("getUIDs ~ tripid", tripid);
-  const response = await fetchTripUsers(tripid);
-  console.log("getUIDs ~ response", response);
-  let travellerids = [];
+  const response = await fetchTripsTravellers(tripid);
+  let travellerids: string[] = [];
   for (let key in response) {
-    console.log("getUIDs ~ key", key);
-    const uid = response[key].travellerid;
+    const uid = response[key].uid;
+    console.log("getUIDs ~ uid", uid);
     if (!travellerids.includes(uid) && uid && uid.length > 0) {
       travellerids.push(uid);
     }
@@ -320,5 +319,14 @@ export async function fetchTripHistory(userId: string) {
   const response = await axios.get(
     BACKEND_URL + `/users/${userId}/tripHistory.json` + QPAR
   );
+  console.log("fetchTripHistory ~ response", response.data);
   return response.data;
+}
+
+export async function fetchUserName(userId: string): Promise<string> {
+  const response = await axios.get(
+    BACKEND_URL + `/users/${userId}.json` + QPAR
+  );
+  console.log("fetchUserName ~ response", response.data);
+  return response.data.userName;
 }

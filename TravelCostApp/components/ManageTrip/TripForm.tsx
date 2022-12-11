@@ -9,7 +9,7 @@ import {
   getAllExpenses,
   storeTrip,
   storeTripHistory,
-  storeTripUser,
+  storeTravellerToTrip,
   updateUser,
 } from "../../util/http";
 
@@ -91,7 +91,7 @@ const TripForm = ({ navigation }) => {
     }
 
     const tripid = await storeTrip(tripData);
-    storeTripUser(tripid, [{ userName: userName, uid: uid }]);
+    storeTravellerToTrip(tripid, { userName: userName, uid: uid });
     console.log(" submitHandler ~ tripid", tripid);
     tripData.tripid = tripid;
 

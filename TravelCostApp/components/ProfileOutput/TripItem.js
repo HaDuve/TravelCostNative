@@ -5,6 +5,7 @@ import {
   View,
   FlatList,
   Alert,
+  Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -218,7 +219,7 @@ const styles = StyleSheet.create({
     margin: 4,
     padding: 8,
     borderRadius: 16,
-    maxWidth: 200,
+    maxWidth: "47%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   travellerText: {

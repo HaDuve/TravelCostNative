@@ -10,7 +10,7 @@ import {
   fetchTrip,
   getAllExpenses,
   storeTripHistory,
-  storeTripUser,
+  storeTravellerToTrip,
   updateUser,
 } from "../util/http";
 import { Button } from "react-native";
@@ -74,7 +74,7 @@ const JoinTrip = ({ navigation, route }) => {
       userCtx.addTripHistory(tripid);
       try {
         const res = await storeTripHistory(uid, userCtx.getTripHistory());
-        const storeRes = await storeTripUser(tripid, {
+        const storeRes = await storeTravellerToTrip(tripid, {
           userName: userCtx.userName,
           uid: uid,
         });

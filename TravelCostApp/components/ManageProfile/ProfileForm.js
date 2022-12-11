@@ -12,7 +12,7 @@ import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
 import { UserContext } from "../../store/user-context";
 import {
-  fetchTripUsers,
+  fetchTripsTravellers,
   fetchUser,
   getTravellers,
   updateUser,
@@ -64,7 +64,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
     userName: {
       value: !UserCtx.userName ? "" : UserCtx.userName,
       isValid: true,
-    }
+    },
   });
 
   function inputChangedHandler(inputIdentifier, enteredValue) {

@@ -114,13 +114,14 @@ const ExpenseForm = ({
   const currentTravellers = TripCtx.travellers;
 
   const IsSoloTraveller = currentTravellers.length === 1;
-  let dropdownItems = travellerToDropdown(currentTravellers);
+  let currentTravellersAsItems = travellerToDropdown(currentTravellers);
 
   useEffect(() => {
-    dropdownItems = travellerToDropdown(currentTravellers);
+    currentTravellersAsItems = travellerToDropdown(currentTravellers);
+
   }, []);
 
-  const [items, setItems] = useState(dropdownItems);
+  const [items, setItems] = useState(currentTravellersAsItems);
   const [open, setOpen] = useState(false);
   const [whoPaid, setWhoPaid] = useState(
     defaultValues ? defaultValues.whoPaid : null
@@ -135,10 +136,12 @@ const ExpenseForm = ({
   );
 
   // dropdown for EQUAL share picker
-  const [splitItemsEQUAL, setSplitItemsEQUAL] = useState(dropdownItems);
+  const [splitItemsEQUAL, setSplitItemsEQUAL] = useState(
+    currentTravellersAsItems
+  );
   const [openEQUAL, setOpenEQUAL] = useState(false);
   const [listEQUAL, setListEQUAL] = useState(
-    defaultValues ? defaultValues.listEQUAL : []
+    defaultValues ? defaultValues.listEQUAL : currentTravellers
   );
 
   // dont show EQUAL share picker when "SELF" is picked
@@ -341,7 +344,7 @@ const ExpenseForm = ({
       whoPaid: UserCtx.userName,
       owePerc: "0",
       splitType: "SELF",
-      listEQUAL: [],
+      listEQUAL: currentTravellers,
       splitList: [],
     };
     onSubmit(expenseData);

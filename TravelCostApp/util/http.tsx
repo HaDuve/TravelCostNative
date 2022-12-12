@@ -63,56 +63,38 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
   console.log("fetchExpensesWithUIDs ~ tripid", tripid);
   const expenses = [];
   if (!tripid || !uidlist) return expenses;
-  uidlist.forEach((uid) => {
-    async function getExp(uid: string) {
-      const response = await axios.get(
-        BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json" + QPAR
-      );
 
-      for (const key in response.data) {
-        const r = response.data[key];
-        const expenseObj = {
-          id: key,
-          amount: r.amount,
-          date: new Date(r.date),
-          description: r.description,
-          category: r.category,
-          country: r.country,
-          currency: r.currency,
-          whoPaid: r.whoPaid,
-          owePerc: r.owePerc,
-          uid: r.uid,
-          calcAmount: r.calcAmount,
-          splitType: r.splitType,
-          listEQUAL: r.listEQUAL,
-          splitList: r.splitList,
-        };
-        expenses.push(expenseObj);
-      }
+  const axios_calls = [];
+  uidlist.forEach((uid) => {
+    const new_axios_call = axios.get(
+      BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json" + QPAR
+    );
+    axios_calls.push(new_axios_call);
+  });
+  const responseArray = await Promise.all(axios_calls);
+  responseArray.forEach((response) => {
+    for (const key in response.data) {
+      const r = response.data[key];
+      const expenseObj = {
+        id: key,
+        amount: r.amount,
+        date: new Date(r.date),
+        description: r.description,
+        category: r.category,
+        country: r.country,
+        currency: r.currency,
+        whoPaid: r.whoPaid,
+        owePerc: r.owePerc,
+        uid: r.uid,
+        calcAmount: r.calcAmount,
+        splitType: r.splitType,
+        listEQUAL: r.listEQUAL,
+        splitList: r.splitList,
+      };
+      expenses.push(expenseObj);
     }
-    getExp(uid);
   });
 
-  // TODO: find out why we dont await the above
-  // for some reason we dont await the above so we have to do this to really get all the expense
-  const response1 = await axios.get(
-    BACKEND_URL +
-      "/trips/" +
-      tripid +
-      "/" +
-      uidlist[0] +
-      "/expenses.json" +
-      QPAR
-  );
-  const response2 = await axios.get(
-    BACKEND_URL +
-      "/trips/" +
-      tripid +
-      "/" +
-      uidlist[0] +
-      "/expenses.json" +
-      QPAR
-  );
   return expenses;
 }
 

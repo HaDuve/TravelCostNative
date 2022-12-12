@@ -88,7 +88,6 @@ const ProfileForm = ({ navigation, onCancel }) => {
       return;
     }
     UserCtx.addUser(userData);
-
     try {
       await updateUser(AuthCtx.uid, userData);
       if (!UserCtx.freshlyCreated) {

@@ -1,8 +1,15 @@
-import { Dimensions, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Dimensions,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { GlobalStyles } from "../constants/styles";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import IconButton from "../components/UI/IconButton";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
 import { TripContext } from "../store/trip-context";
@@ -26,34 +33,51 @@ const ProfileScreen = ({ route, navigation, param }) => {
   const FreshlyCreated = UserCtx.freshlyCreated;
   const TripCtx = useContext(TripContext);
 
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = constructHistory.bind(this, true);
+
   const currentTrip = TripCtx.tripid;
-  console.log("ProfileScreen ~ currentTrip", currentTrip);
-  const allTripsList = [
-    {
+  let allTripsList = [];
+  const [tripsList, setTripsList] = useState([]);
+  function addTripFromContext() {
+    allTripsList.push({
       tripid: TripCtx.tripid,
       tripName: TripCtx.tripName,
       totalBudget: TripCtx.totalBudget,
       dailyBudget: TripCtx.dailyBudget,
       tripCurrency: TripCtx.tripCurrency,
       travellers: TripCtx.travellers,
-    },
-  ];
+    });
+    console.log("addTripFromContext ~ allTripsList", allTripsList);
+    setTripsList(allTripsList);
+  }
+
+  // add all trips from history into the list
+  async function getTrips(tripid: string) {
+    await fetchTrip(tripid).then((res) => {
+      console.log("awaitfetchTrip ~ res", res);
+      if (tripid !== TripCtx.tripid) allTripsList.push(res);
+    });
+  }
+  async function constructHistory() {
+    UserCtx.getTripHistory().forEach((tripid) => {
+      console.log("UserCtx.getTripHistory ~ tripid", tripid);
+      getTrips(tripid);
+    });
+  }
 
   useEffect(() => {
-    // add all trips from history into the list
-    async function getTrips(tripid: string) {
-      const tripres = await fetchTrip(tripid).then((res) => {
-        if (tripid !== TripCtx.tripid) allTripsList.push(res);
-      });
-    }
-    async function constructHistory() {
-      UserCtx.getTripHistory().forEach((tripid) => {
-        console.log("UserCtx.getTripHistory ~ tripid", tripid);
-        getTrips(tripid);
-      });
-    }
+    console.log("useEffect ~ useEffect", useEffect);
+    addTripFromContext();
     constructHistory();
   }, []);
+
+  function refreshHandler() {
+    allTripsList = [];
+    TripCtx.fetchAndSetCurrentTrip(TripCtx.tripid);
+    addTripFromContext();
+    constructHistory();
+  }
 
   function cancelHandler() {
     console.log("canceled");
@@ -77,7 +101,16 @@ const ProfileScreen = ({ route, navigation, param }) => {
           </View>
         </View>
 
-        <TripList trips={allTripsList}></TripList>
+        <TripList
+          trips={tripsList}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refreshHandler}
+              // progressViewOffset={-100000}
+            />
+          }
+        ></TripList>
       </View>
       {/* <AddExpenseButton navigation={navigation} /> */}
       <View style={styles.addButton}>

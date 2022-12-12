@@ -236,6 +236,7 @@ export async function storeTravellerToTrip(tripid: string, traveller) {
   return response.data;
 }
 
+
 export async function fetchTripsTravellers(tripid: string) {
   const response = await axios.get(
     BACKEND_URL + `/trips/${tripid}/travellers.json` + QPAR

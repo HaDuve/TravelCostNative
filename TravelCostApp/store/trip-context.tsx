@@ -55,7 +55,7 @@ function TripContextProvider({ children }) {
     }
   }
 
-  function setCurrentTrip(tripid: string, trip) {
+  async function setCurrentTrip(tripid: string, trip) {
     console.log("setCurrentTrip ~ trip", trip);
     console.log("setCurrentTrip ~ tripid", tripid);
     // TODO: write trip interface for TypeScript
@@ -65,12 +65,21 @@ function TripContextProvider({ children }) {
     setTripCurrency(trip.tripCurrency);
     setdailyBudget(trip.dailyBudget.toString());
     setCurrentTravellers(tripid);
-    AsyncStorage.setItem("currentTripId", tripid);
-    AsyncStorage.setItem("currentTripName", trip.tripName);
-    AsyncStorage.setItem("currentTripTotalBudget", trip.totalBudget.toString());
-    AsyncStorage.setItem("currentTripCurrency", trip.tripCurrency);
-    AsyncStorage.setItem("currentTripDailyBudget", trip.dailyBudget.toString());
-    AsyncStorage.setItem("currentTripTravellers", trip.travellers?.toString());
+    await AsyncStorage.setItem("currentTripId", tripid);
+    await AsyncStorage.setItem("currentTripName", trip.tripName);
+    await AsyncStorage.setItem(
+      "currentTripTotalBudget",
+      trip.totalBudget.toString()
+    );
+    await AsyncStorage.setItem("currentTripCurrency", trip.tripCurrency);
+    await AsyncStorage.setItem(
+      "currentTripDailyBudget",
+      trip.dailyBudget.toString()
+    );
+    await AsyncStorage.setItem(
+      "currentTripTravellers",
+      trip.travellers?.toString()
+    );
   }
 
   function setTotalSum(amount: number) {

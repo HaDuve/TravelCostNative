@@ -40,6 +40,8 @@ function RecentExpenses({ navigation }) {
   const [open, setOpen] = useState(false);
   const [PeriodValue, setPeriodValue] = useState("day");
 
+
+
   useEffect(() => {
     if (PeriodValue !== userCtx.periodName)
       userCtx.setPeriodString(PeriodValue);
@@ -125,7 +127,6 @@ function RecentExpenses({ navigation }) {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            // progressViewOffset={-100000}
           />
         }
       />

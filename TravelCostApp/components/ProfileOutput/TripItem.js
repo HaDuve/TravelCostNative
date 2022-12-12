@@ -149,7 +149,6 @@ function TripItem({
               unfilledColor={GlobalStyles.colors.gray600}
               borderWidth={0}
               borderRadius={8}
-              // TODO: add this progress number from useEffect or Context
               progress={activeProgress}
               height={12}
               width={150}

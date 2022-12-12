@@ -120,6 +120,7 @@ export function splitTypesDropdown() {
 }
 
 export function travellerToDropdown(travellers) {
+  console.log("travellerToDropdown ~ travellers", travellers);
   if (!travellers || travellers?.length < 1) {
     console.log("travellertodropdown failed");
     return [];
@@ -149,16 +150,10 @@ export async function calcOpenSplitsTable(tripid) {
   } catch (error) {
     console.log(error);
   }
-  console.log("calcOpenSplitsTable ~ expenses", expenses);
   if (!expenses || expenses.length < 1) return;
   let openSplits = [];
   expenses.forEach((expense) => {
-    if (
-      !expense.splitList ||
-      expense.splitlist === undefined ||
-      Object.keys(expense.splitList).length < 1
-    )
-      return;
+    if (expense.splitType === "SELF" || !expense.splitList) return;
     expense.splitList.forEach((split) => {
       if (split.userName !== expense.whoPaid) {
         split.whoPaid = expense.whoPaid;
@@ -168,7 +163,49 @@ export async function calcOpenSplitsTable(tripid) {
   });
   openSplits = sumUpSamePairs(openSplits);
   openSplits = cancelDifferences(openSplits);
+
   return openSplits;
+}
+
+export function simplifySplits(openSplits) {
+  const Splitwise = require("splitwise-js-map");
+  listOfSplits = [];
+  openSplits.forEach((openSplit) => {
+    if (listOfSplits.some((e) => e.paidBy === openSplit.whoPaid)) {
+      /* list contains the element we're looking for */
+      const index = listOfSplits.findIndex((e) => {
+        return e.paidBy === openSplit.whoPaid;
+      });
+      if (index !== -1) {
+        listOfSplits[index].paidFor[openSplit.userName] = Number(
+          openSplit.amount
+        );
+      }
+    } else {
+      let newSplit = {
+        paidBy: openSplit.whoPaid,
+        paidFor: {},
+      };
+      newSplit.paidFor[openSplit.userName] = Number(openSplit.amount);
+      listOfSplits.push(newSplit);
+    }
+  });
+
+  const splits = Splitwise(listOfSplits);
+  console.log("simplifySplits ~ splits", splits);
+  const simplifiedItems = [];
+  splits.forEach((simpleSplit) => {
+    const from = simpleSplit[0];
+    const to = simpleSplit[1];
+    const value = simpleSplit[2];
+    const item = {
+      amount: value,
+      userName: from,
+      whoPaid: to,
+    };
+    simplifiedItems.push(item);
+  });
+  return simplifiedItems;
 }
 
 function sumUpSamePairs(openSplits) {

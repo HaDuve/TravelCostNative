@@ -7,13 +7,14 @@ import {
   Text,
   View,
 } from "react-native";
+import { G } from "react-native-svg";
 import Button from "../components/UI/Button";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import FlatButton from "../components/UI/FlatButton";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { GlobalStyles } from "../constants/styles";
 import { TripContext } from "../store/trip-context";
-import { calcOpenSplitsTable } from "../util/split";
+import { calcOpenSplitsTable, simplifySplits } from "../util/split";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
   const { tripid } = route.params;
@@ -21,20 +22,23 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const [error, setError] = useState();
 
   const [splits, setSplits] = useState([]);
+  const [showSimplify, setShowSimplify] = useState(true);
+  const [titleText, setTitleText] = useState("Open Splits!");
   const TripCtx = useContext(TripContext);
 
-  useEffect(() => {
-    async function getOpenSplits() {
-      setIsFetching(true);
-      try {
-        const response = await calcOpenSplitsTable(tripid);
-        setSplits(response);
-      } catch (error) {
-        setError("Could not fetch splits from the web database! " + error);
-      }
-      setIsFetching(false);
+  async function getOpenSplits() {
+    setIsFetching(true);
+    try {
+      const response = await calcOpenSplitsTable(tripid);
+      console.log("getOpenSplits ~ response", response);
+      setSplits(response);
+    } catch (error) {
+      setError("Could not fetch splits from the web database! " + error);
     }
+    setIsFetching(false);
+  }
 
+  useEffect(() => {
     getOpenSplits();
   }, []);
 
@@ -66,7 +70,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titleText}> Open splits!</Text>
+      <Text style={styles.titleText}> {titleText}</Text>
       <FlatList
         style={{ maxHeight: Dimensions.get("screen").height / 1.5 }}
         data={splits}
@@ -75,18 +79,36 @@ const SplitSummaryScreen = ({ route, navigation }) => {
       <View style={styles.buttonContainer}>
         <FlatButton
           onPress={() => {
-            navigation.goBack();
+            if (showSimplify) navigation.goBack();
+            getOpenSplits();
+            setShowSimplify(true);
+            setTitleText("Open Splits!");
           }}
         >
           Back
         </FlatButton>
+        {showSimplify && (
+          <Button
+            style={{ marginLeft: 24 }}
+            onPress={() => {
+              setSplits(simplifySplits(splits));
+              setShowSimplify(false);
+              setTitleText("Simplified Open Splits!");
+            }}
+          >
+            Simplify Splits
+          </Button>
+        )}
         <Button
-          style={{ marginLeft: 24 }}
+          style={{
+            marginLeft: 24,
+          }}
+          buttonStyle={{ backgroundColor: GlobalStyles.colors.errorGrayed }}
           onPress={() => {
-            Alert.alert("Settle debts function coming soon...");
+            Alert.alert("Settle Splits function coming soon...");
           }}
         >
-          Settle debts
+          Settle Splits
         </Button>
       </View>
     </View>

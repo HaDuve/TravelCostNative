@@ -42,7 +42,6 @@ function TripItem({
     dailyBudget,
     tripCurrency,
   };
-  // TODO: investigate why this clause might hide some bugs
   if (!tripid) return <></>;
   console.log("tripid", tripid);
   const navigation = useNavigation();
@@ -69,7 +68,7 @@ function TripItem({
   }, []);
 
   function tripPressHandler() {
-    // TODO: Android can only handle alert with 2 actions, so this needs to be changed or actions will go missing
+    // NOTE: Android can only handle alert with 2 actions, so this needs to be changed or actions will go missing
     console.log("pressed: ", tripid);
     Alert.alert(tripName, i18n.t("chooseAction"), [
       // {

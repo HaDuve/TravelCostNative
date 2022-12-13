@@ -46,8 +46,8 @@ function UserContextProvider({ children }) {
     setPeriodName(periodName);
   }
   function addTripHistory(tripid: string) {
-    console.warn("!!!!!!! addTripHistory ~ tripid", tripid);
-    dispatch({ type: "ADD", payload: tripid });
+    console.log("!!!!!!! addTripHistory ~ tripid", tripid);
+    dispatch({ type: "ADD", payload: [tripid] });
   }
 
   function setTripHistory(trips: string[]) {

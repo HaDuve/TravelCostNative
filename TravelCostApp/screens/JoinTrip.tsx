@@ -12,6 +12,7 @@ import {
   storeTripHistory,
   storeTravellerToTrip,
   updateUser,
+  fetchTripHistory,
 } from "../util/http";
 import { Button } from "react-native";
 import { UserContext } from "../store/user-context";
@@ -38,7 +39,7 @@ const JoinTrip = ({ navigation, route }) => {
   const userCtx = useContext(UserContext);
   const authCtx = useContext(AuthContext);
   const tripCtx = useContext(TripContext);
-  const ExpenseCtx = useContext(ExpensesContext);
+  const expenseCtx = useContext(ExpensesContext);
   const uid = authCtx.uid;
   let tripid = route.params.id;
 
@@ -66,7 +67,9 @@ const JoinTrip = ({ navigation, route }) => {
   async function joinHandler(join: boolean) {
     console.log("joinHandler ~ joinHandler", joinHandler);
     // either we press the confirm or the cancel button (join=true/false)
-    if (join) {
+    if (!join) {
+      navigation.navigate("Profile");
+    } else {
       tripid = joinTripid;
       console.log("joinHandler ~ tripid", tripid);
 
@@ -92,9 +95,9 @@ const JoinTrip = ({ navigation, route }) => {
       tripCtx.setCurrentTravellers(tripid);
       userCtx.setFreshlyCreatedTo(false);
       const expenses = await getAllExpenses(tripid, uid);
-      ExpenseCtx.setExpenses(expenses);
+      expenseCtx.setExpenses(expenses);
+      navigation.navigate("Profile");
     }
-    navigation.navigate("Profile");
   }
 
   async function joinLinkHandler() {

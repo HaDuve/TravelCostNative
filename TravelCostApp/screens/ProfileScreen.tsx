@@ -67,6 +67,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
   }
 
   useEffect(() => {
+    TripCtx.fetchAndSetCurrentTrip(TripCtx.tripid);
     console.log("useEffect ~ useEffect", useEffect);
     addTripFromContext();
     constructHistory();

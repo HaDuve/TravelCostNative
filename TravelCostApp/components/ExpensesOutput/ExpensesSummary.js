@@ -5,10 +5,12 @@ import * as Progress from "react-native-progress";
 import { UserContext } from "../../store/user-context";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseString } from "../../util/string";
+import { AuthContext } from "../../store/auth-context";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
+  const authCtx = useContext(AuthContext);
   const expensesSum = expenses.reduce((sum, expense) => {
     return sum + expense.calcAmount;
   }, 0);
@@ -64,8 +66,9 @@ const ExpensesSummary = ({ expenses, periodName }) => {
 
   if (budgetProgress > 1) budgetProgress -= 1;
   if (Number.isNaN(budgetProgress)) {
-    console.log("NaN budgetProgress passed to Summary");
-    return <></>;
+    console.error("NaN budgetProgress passed to Summary");
+    authCtx.logout();
+    return;
   }
 
   return (

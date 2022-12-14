@@ -4,6 +4,8 @@ import { GlobalStyles } from "../constants/styles";
 
 const OnboardingScreen = ({ navigation }) => {
   const titleStyle = styles.titleStyle;
+  // TODO: make onboarding only come once per installation
+  // https://blog.openreplay.com/setting-up-onboarding-screens-in-react-native/
   return (
     <Onboarding
       onDone={() => navigation.replace("Signup")}

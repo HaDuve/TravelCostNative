@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import React, { useContext, useEffect } from "react";
 import { GlobalStyles } from "./../../constants/styles";
 import * as Progress from "react-native-progress";
@@ -67,8 +67,9 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   if (budgetProgress > 1) budgetProgress -= 1;
   if (Number.isNaN(budgetProgress)) {
     console.error("NaN budgetProgress passed to Summary");
+    Alert.alert("Could not login, please try again later!");
     authCtx.logout();
-    return;
+    return null;
   }
 
   return (

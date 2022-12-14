@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Alert, Text, SafeAreaView } from "react-native";
+import { Alert, Text, SafeAreaView, View, Keyboard } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -316,32 +316,42 @@ function Root() {
   return <Navigation />;
 }
 
+function handleUnhandledTouches() {
+  Keyboard.dismiss();
+  return false;
+}
+
 export default function App() {
   return (
-    <>
-      <SafeAreaView
-        style={{
-          flex: 0,
-          backgroundColor: GlobalStyles.colors.backgroundColor,
-        }}
-      />
-      <SafeAreaView
-        style={{
-          flex: 1,
-          backgroundColor: GlobalStyles.colors.gray500,
-        }}
-      >
-        <StatusBar style="dark" />
-        <AuthContextProvider>
-          <TripContextProvider>
-            <UserContextProvider>
-              <NetworkProvider>
-                <Root />
-              </NetworkProvider>
-            </UserContextProvider>
-          </TripContextProvider>
-        </AuthContextProvider>
-      </SafeAreaView>
-    </>
+    <View
+      style={{ flex: 1 }}
+      onStartShouldSetResponder={handleUnhandledTouches}
+    >
+      <>
+        <SafeAreaView
+          style={{
+            flex: 0,
+            backgroundColor: GlobalStyles.colors.backgroundColor,
+          }}
+        />
+        <SafeAreaView
+          style={{
+            flex: 1,
+            backgroundColor: GlobalStyles.colors.gray500,
+          }}
+        >
+          <StatusBar style="dark" />
+          <AuthContextProvider>
+            <TripContextProvider>
+              <UserContextProvider>
+                <NetworkProvider>
+                  <Root />
+                </NetworkProvider>
+              </UserContextProvider>
+            </TripContextProvider>
+          </AuthContextProvider>
+        </SafeAreaView>
+      </>
+    </View>
   );
 }

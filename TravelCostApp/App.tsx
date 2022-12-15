@@ -279,6 +279,7 @@ function Root() {
       const freshlyCreated = await AsyncStorage.getItem("freshlyCreated");
 
       if (storedToken) {
+        console.log("onRootMount ~ storedToken");
         authCtx.setUserID(storedUid);
         try {
           const response = await fetchUser(storedUid);
@@ -290,6 +291,7 @@ function Root() {
           Alert.alert(error);
         }
         if (storedTripId) {
+          console.log("onRootMount ~ storedTripId", storedTripId);
           // TODO: figure out when we want to save or load from async storage,
           // right now this function seems to be confused
           tripCtx.fetchAndSetCurrentTrip(storedTripId);

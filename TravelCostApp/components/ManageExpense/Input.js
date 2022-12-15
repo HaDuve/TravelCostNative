@@ -8,6 +8,8 @@ const Input = ({
   invalid,
   autoFocus,
   inputStyle,
+  editable = true,
+  selectTextOnFocus = true,
 }) => {
   let inputStyles = [styles.input, inputStyle];
   if (textInputConfig && textInputConfig.multiline) {
@@ -26,6 +28,8 @@ const Input = ({
         onSubmitEditing={Keyboard.dismiss}
         {...textInputConfig}
         autoFocus={autoFocus ? autoFocus : false}
+        editable={editable}
+        selectTextOnFocus={selectTextOnFocus}
       />
     </View>
   );

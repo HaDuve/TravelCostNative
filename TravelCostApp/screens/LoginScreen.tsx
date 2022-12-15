@@ -5,7 +5,12 @@ import { login } from "../util/auth";
 import { Alert } from "react-native";
 import { AuthContext } from "../store/auth-context";
 import { UserContext } from "../store/user-context";
-import { fetchTripHistory, fetchUser, fetchUserName } from "../util/http";
+import {
+  fetchCurrentTrip,
+  fetchTripHistory,
+  fetchUser,
+  fetchUserName,
+} from "../util/http";
 import { TripContext } from "../store/trip-context";
 
 function LoginScreen() {
@@ -23,10 +28,10 @@ function LoginScreen() {
       authCtx.setUserID(uid);
       const loggedUserName: string = await fetchUserName(uid);
       userCtx.setUserName(loggedUserName);
-      // const res = await fetchTripHistory(uid);
-      // tripCtx.fetchAndSetCurrentTrip(res[0]);
-      // tripCtx.setCurrentTrip(tripid, tripdata);
-      // tripCtx.setCurrentTravellers(tripid);
+      const res = await fetchCurrentTrip(uid);
+      console.log("loginHandler ~ res", res);
+      tripCtx.fetchAndSetCurrentTrip(res[0]);
+      tripCtx.setCurrentTravellers(res[0]);
     } catch (error) {
       console.error(error);
       setIsAuthenticating(false);

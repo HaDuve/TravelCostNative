@@ -181,6 +181,8 @@ const ProfileForm = ({ navigation, onCancel }) => {
             value: inputs.userName.value,
           }}
           invalid={!inputs.userName.isValid}
+          editable={false}
+          selectTextOnFocus={false}
         />
       </View>
       <View style={styles.inputsRow}></View>

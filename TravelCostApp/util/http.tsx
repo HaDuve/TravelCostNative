@@ -236,7 +236,6 @@ export async function storeTravellerToTrip(tripid: string, traveller) {
   return response.data;
 }
 
-
 export async function fetchTripsTravellers(tripid: string) {
   const response = await axios.get(
     BACKEND_URL + `/trips/${tripid}/travellers.json` + QPAR
@@ -304,6 +303,17 @@ export async function fetchTripHistory(userId: string) {
   );
   console.log("fetchTripHistory ~ response", response.data);
   return response.data;
+}
+
+export async function fetchCurrentTrip(userId: string) {
+  console.log("fetchCurrentTrip ~ userId", userId);
+  const response = await axios.get(
+    BACKEND_URL + `/users/${userId}.json` + QPAR
+  );
+  console.log("fetchCurrentTrip ~ response", response.data);
+  if (!response?.data?.currentTrip)
+    console.warn("could not find current trip of this user!");
+  return response.data.currentTrip;
 }
 
 export async function fetchUserName(userId: string): Promise<string> {

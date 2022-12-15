@@ -13,7 +13,6 @@ export const TripContext = createContext({
   totalSum: 0,
   tripProgress: 0,
   setTripProgress: (percent: number) => {},
-  // save user as obj with (tname, tid)
   travellers: [],
   setCurrentTravellers: (tripid: string) => {},
   setTotalSum: (amount: number) => {},
@@ -23,7 +22,6 @@ export const TripContext = createContext({
   getcurrentTrip: () => {},
   setCurrentTrip: (tripid: string, trip) => {},
   deleteCurrentTrip: (uid: string) => {},
-  getCurrentTripFromStorage: () => {},
   fetchAndSetCurrentTrip: (tripid: string) => {},
 });
 
@@ -65,37 +63,10 @@ function TripContextProvider({ children }) {
     setTripCurrency(trip.tripCurrency);
     setdailyBudget(trip.dailyBudget.toString());
     setCurrentTravellers(tripid);
-    await AsyncStorage.setItem("currentTripId", tripid);
-    await AsyncStorage.setItem("currentTripName", trip.tripName);
-    await AsyncStorage.setItem(
-      "currentTripTotalBudget",
-      trip.totalBudget.toString()
-    );
-    await AsyncStorage.setItem("currentTripCurrency", trip.tripCurrency);
-    await AsyncStorage.setItem(
-      "currentTripDailyBudget",
-      trip.dailyBudget.toString()
-    );
-    await AsyncStorage.setItem(
-      "currentTripTravellers",
-      trip.travellers?.toString()
-    );
   }
 
   function setTotalSum(amount: number) {
     setTotalSumTrip(amount);
-  }
-
-  async function getCurrentTripFromStorage() {
-    const id = await AsyncStorage.getItem("currentTripId");
-    const name = await AsyncStorage.getItem("currentTripName");
-    const budget = await AsyncStorage.getItem("currentTripTotalBudget");
-
-    if (id) {
-      setTripid(id);
-      setTripName(name);
-      setTotalBudget(budget);
-    } else console.error("no trip stored in memory");
   }
 
   function deleteCurrentTrip(id: string) {
@@ -146,7 +117,6 @@ function TripContextProvider({ children }) {
     getcurrentTrip: getcurrentTrip,
     setCurrentTrip: setCurrentTrip,
     deleteCurrentTrip: deleteCurrentTrip,
-    getCurrentTripFromStorage: getCurrentTripFromStorage,
     fetchAndSetCurrentTrip: fetchAndSetCurrentTrip,
   };
 

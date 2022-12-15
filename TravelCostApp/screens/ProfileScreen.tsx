@@ -34,14 +34,13 @@ const ProfileScreen = ({ route, navigation, param }) => {
   const TripCtx = useContext(TripContext);
 
   const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = constructHistory.bind(this, true);
 
-  const currentTrip = TripCtx.tripid;
+  const currentTripid = TripCtx.tripid;
   let allTripsList = [];
   const [tripsList, setTripsList] = useState([]);
   function addTripFromContext() {
     allTripsList.push({
-      tripid: TripCtx.tripid,
+      tripid: currentTripid,
       tripName: TripCtx.tripName,
       totalBudget: TripCtx.totalBudget,
       dailyBudget: TripCtx.dailyBudget,
@@ -56,28 +55,20 @@ const ProfileScreen = ({ route, navigation, param }) => {
   async function getTrips(tripid: string) {
     await fetchTrip(tripid).then((res) => {
       console.log("awaitfetchTrip ~ res", res);
-      if (tripid !== TripCtx.tripid) allTripsList.push(res);
-    });
-  }
-  async function constructHistory() {
-    UserCtx.getTripHistory().forEach((tripid) => {
-      console.log("UserCtx.getTripHistory ~ tripid", tripid);
-      getTrips(tripid);
+      if (tripid !== currentTripid) allTripsList.push(res);
     });
   }
 
   useEffect(() => {
-    TripCtx.fetchAndSetCurrentTrip(TripCtx.tripid);
+    TripCtx.fetchAndSetCurrentTrip(currentTripid);
     console.log("useEffect ~ useEffect", useEffect);
     addTripFromContext();
-    constructHistory();
   }, []);
 
   function refreshHandler() {
     allTripsList = [];
-    TripCtx.fetchAndSetCurrentTrip(TripCtx.tripid);
+    TripCtx.fetchAndSetCurrentTrip(currentTripid);
     addTripFromContext();
-    constructHistory();
   }
 
   function cancelHandler() {
@@ -120,7 +111,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
           size={42}
           color={"white"}
           onPress={() => {
-            onShare(TripCtx.tripid);
+            onShare(currentTripid);
           }}
         />
       </View>

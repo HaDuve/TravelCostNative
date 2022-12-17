@@ -42,8 +42,7 @@ function TripItem({
     dailyBudget,
     tripCurrency,
   };
-  if (!tripid) return <></>;
-  console.log("tripid", tripid);
+  if (!tripid) return <Text>No Tripid</Text>;
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const [travellers, setTravellers] = useState([]);
@@ -71,11 +70,11 @@ function TripItem({
     // NOTE: Android can only handle alert with 2 actions, so this needs to be changed or actions will go missing
     console.log("pressed: ", tripid);
     Alert.alert(tripName, i18n.t("chooseAction"), [
-      // {
-      //   text: i18n.t("cancel"),
-      //   onPress: () => navigation.navigate("Profile"),
-      //   style: "cancel",
-      // },
+      {
+        text: i18n.t("cancel"),
+        onPress: () => navigation.navigate("Profile"),
+        style: "cancel",
+      },
       {
         text: i18n.t("setActiveTrip"),
         onPress: () => {

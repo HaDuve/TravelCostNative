@@ -11,7 +11,9 @@ import {
   storeTripHistory,
   storeTravellerToTrip,
   updateUser,
+  fetchTrip,
 } from "../../util/http";
+import * as Updates from "expo-updates";
 
 import Input from "../ManageExpense/Input";
 import { TripContext } from "../../store/trip-context";
@@ -19,15 +21,16 @@ import { UserContext } from "../../store/user-context";
 import Button from "../UI/Button";
 import FlatButton from "../UI/FlatButton";
 import { ExpensesContext } from "../../store/expenses-context";
+import CurrencyPicker from "react-native-currency-picker";
 
 const TripForm = ({ navigation }) => {
-  const TripCtx = useContext(TripContext);
-  const AuthCtx = useContext(AuthContext);
-  const UserCtx = useContext(UserContext);
-  const ExpenseCtx = useContext(ExpensesContext);
+  const tripCtx = useContext(TripContext);
+  const authCtx = useContext(AuthContext);
+  const userCtx = useContext(UserContext);
+  const expenseCtx = useContext(ExpensesContext);
 
-  const uid = AuthCtx.uid;
-  const userName = UserCtx.userName;
+  const uid = authCtx.uid;
+  const userName = userCtx.userName;
   let currencyPickerRef = undefined;
 
   const [inputs, setInputs] = useState({
@@ -92,23 +95,23 @@ const TripForm = ({ navigation }) => {
 
     const tripid = await storeTrip(tripData);
     storeTravellerToTrip(tripid, { userName: userName, uid: uid });
-    console.log(" submitHandler ~ tripid", tripid);
-    tripData.tripid = tripid;
 
-    TripCtx.setCurrentTrip(tripid, tripData);
-    UserCtx.addTripHistory(tripid);
+    const newTripData = await fetchTrip(tripid);
+
+    tripCtx.setCurrentTrip(tripid, newTripData);
+    userCtx.addTripHistory(tripid);
 
     updateUser(uid, {
-      userName: UserCtx.userName,
-      tripHistory: UserCtx.getTripHistory(),
+      userName: userCtx.userName,
+      tripHistory: userCtx.getTripHistory(),
       currentTrip: tripid,
     });
 
-    UserCtx.setFreshlyCreatedTo(false);
-    const expenses = await getAllExpenses(tripid, uid);
-    ExpenseCtx.setExpenses(expenses);
+    userCtx.setFreshlyCreatedTo(false);
+    expenseCtx.setExpenses([]);
 
-    navigation.navigate("Profile");
+    // Immediately reload the React Native Bundle
+    Updates.reloadAsync();
   }
 
   const currencyPickJSX = (
@@ -170,6 +173,8 @@ const TripForm = ({ navigation }) => {
         <Text style={styles.title}>New Trip</Text>
         <Input
           label="Trip Name"
+          style={{}}
+          inputStyle={{}}
           textInputConfig={{
             onChangeText: inputChangedHandler.bind(this, "tripName"),
             value: inputs.tripName.value,
@@ -179,8 +184,10 @@ const TripForm = ({ navigation }) => {
         />
         <View style={styles.categoryRow}>
           <Input
-            style={styles.rowInput}
             label="Total Budget"
+            style={{}}
+            inputStyle={{}}
+            autoFocus={false}
             textInputConfig={{
               keyboardType: "decimal-pad",
               onChangeText: inputChangedHandler.bind(this, "totalBudget"),
@@ -192,7 +199,9 @@ const TripForm = ({ navigation }) => {
         </View>
         <View style={styles.categoryRow}>
           <Input
-            style={styles.rowInput}
+            style={{}}
+            inputStyle={{}}
+            autoFocus={false}
             label="Daily Budget"
             textInputConfig={{
               keyboardType: "decimal-pad",
@@ -205,10 +214,13 @@ const TripForm = ({ navigation }) => {
         </View>
       </View>
       <View style={styles.buttonContainer}>
-        <FlatButton style={styles.button} onPress={cancelHandler}>
-          Cancel
-        </FlatButton>
-        <Button style={styles.button} onPress={submitHandler}>
+        <FlatButton onPress={cancelHandler}>Cancel</FlatButton>
+        <Button
+          buttonStyle={{}}
+          mode={""}
+          style={styles.button}
+          onPress={submitHandler}
+        >
           Save Trip
         </Button>
       </View>

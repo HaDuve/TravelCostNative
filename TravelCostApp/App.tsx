@@ -22,7 +22,12 @@ import ExpensesContextProvider, {
 } from "./store/expenses-context";
 import ProfileScreen from "./screens/ProfileScreen";
 import UserContextProvider, { UserContext } from "./store/user-context";
-import { fetchExpenses, fetchUser, getAllExpenses } from "./util/http";
+import {
+  fetchExpenses,
+  fetchUser,
+  fetchTrip,
+  getAllExpenses,
+} from "./util/http";
 import TripContextProvider, { TripContext } from "./store/trip-context";
 import TripForm from "./components/ManageTrip/TripForm";
 import OnboardingScreen from "./screens/OnboardingScreen";
@@ -268,7 +273,7 @@ function Root() {
 
   useEffect(() => {
     async function onRootMount() {
-      console.log("onRootMount ~ onRootMount");
+      // console.log("onRootMount ~ onRootMount");
       // NOTE: uncomment below for memory/login debugging // flush memory
       // await AsyncStorage.clear();
 
@@ -279,19 +284,22 @@ function Root() {
       const freshlyCreated = await AsyncStorage.getItem("freshlyCreated");
 
       if (storedToken) {
-        console.log("onRootMount ~ storedToken");
+        // console.log("onRootMount ~ storedToken");
         authCtx.setUserID(storedUid);
         try {
-          const response = await fetchUser(storedUid);
-          if (response) {
-            userCtx.addUser(response);
-            // userCtx.setTripHistory(response.tripHistory);
+          const userData = await fetchUser(storedUid);
+          const tripid = userData.currentTrip;
+          if (userData) {
+            console.log("onRootMount ~ userData", userData);
+            userCtx.addUser(userData);
+            const tripData = await fetchTrip(tripid);
+            tripCtx.setCurrentTrip(tripid, tripData);
           }
         } catch (error) {
           Alert.alert(error);
         }
         if (storedTripId) {
-          console.log("onRootMount ~ storedTripId", storedTripId);
+          // console.log("onRootMount ~ storedTripId", storedTripId);
           // TODO: figure out when we want to save or load from async storage,
           // right now this function seems to be confused
           tripCtx.fetchAndSetCurrentTrip(storedTripId);

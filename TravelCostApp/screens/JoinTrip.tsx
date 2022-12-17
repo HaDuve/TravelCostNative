@@ -20,7 +20,7 @@ import { AuthContext } from "../store/auth-context";
 import { TripContext } from "../store/trip-context";
 import { GlobalStyles } from "../constants/styles";
 import Input from "../components/Auth/Input";
-
+import * as Updates from "expo-updates";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
@@ -96,7 +96,9 @@ const JoinTrip = ({ navigation, route }) => {
       userCtx.setFreshlyCreatedTo(false);
       const expenses = await getAllExpenses(tripid, uid);
       expenseCtx.setExpenses(expenses);
-      navigation.navigate("Profile");
+
+      // Immediately reload the React Native Bundle
+      Updates.reloadAsync();
     }
   }
 
@@ -118,6 +120,9 @@ const JoinTrip = ({ navigation, route }) => {
 
   return (
     <KeyboardAvoidingView style={styles.container}>
+      <View style={styles.titleContainer}>
+        <Text style={styles.titleText}>Join Trip</Text>
+      </View>
       <View style={styles.linkInputContainer}>
         <Text> {i18n.t("joinLink")}</Text>
         <Input
@@ -128,9 +133,11 @@ const JoinTrip = ({ navigation, route }) => {
           keyboardType={"default"}
           isInvalid={false}
         ></Input>
-        <Button title={i18n.t("join")} onPress={joinLinkHandler}></Button>
+        <Button title={"Update"} onPress={joinLinkHandler}></Button>
       </View>
-      <Text style={{ padding: 4 }}>{i18n.t("joinTrip")}?</Text>
+      {tripName?.length > 1 && (
+        <Text style={{ padding: 16, fontSize: 22 }}>{i18n.t("joinTrip")}?</Text>
+      )}
       <Text style={{ padding: 4, fontSize: 18, fontWeight: "bold" }}>
         {tripName}
       </Text>
@@ -159,7 +166,15 @@ const styles = StyleSheet.create({
     alignContent: "center",
     alignItems: "center",
 
-    marginBottom: "80%",
+    marginBottom: "40%",
+  },
+  titleContainer: {
+    padding: 12,
+    marginBottom: 24,
+  },
+  titleText: {
+    fontSize: 30,
+    fontWeight: "bold",
   },
   buttonContainer: {
     flex: 1,
@@ -169,8 +184,9 @@ const styles = StyleSheet.create({
   },
   linkInputContainer: {
     flex: 1,
-    padding: 12,
-    margin: 12,
+    padding: 24,
+    margin: 16,
+    marginBottom: 32,
     borderWidth: 1,
     borderColor: GlobalStyles.colors.gray500,
   },

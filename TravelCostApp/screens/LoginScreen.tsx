@@ -7,6 +7,7 @@ import { AuthContext } from "../store/auth-context";
 import { UserContext } from "../store/user-context";
 import {
   fetchCurrentTrip,
+  fetchTrip,
   fetchTripHistory,
   fetchUser,
   fetchUserName,
@@ -26,12 +27,17 @@ function LoginScreen() {
       const { token, uid } = await login(email, password);
       authCtx.authenticate(token);
       authCtx.setUserID(uid);
-      const loggedUserName: string = await fetchUserName(uid);
-      userCtx.setUserName(loggedUserName);
-      const res = await fetchCurrentTrip(uid);
-      console.log("loginHandler ~ res", res);
-      tripCtx.fetchAndSetCurrentTrip(res[0]);
-      tripCtx.setCurrentTravellers(res[0]);
+      try {
+        const userData = await fetchUser(uid);
+        const tripid = userData.currentTrip;
+        if (userData) {
+          userCtx.addUser(userData);
+          const tripData = await fetchTrip(tripid);
+          tripCtx.setCurrentTrip(tripid, tripData);
+        }
+      } catch (error) {
+        Alert.alert(error);
+      }
     } catch (error) {
       console.error(error);
       setIsAuthenticating(false);

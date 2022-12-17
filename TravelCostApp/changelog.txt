@@ -1,33 +1,38 @@
 Changelog Travel Expense App
 
-1.0.25
-- joining a shared trip is easier now
-- database was made more secure by restricting access
+1.0.30
+- Fixed alot of bugs revolving around the login system
+- Fixed alot of bugs revolving around the new trip system
+- Split expenses can be simplified now (similar to splitwise)
+- Joining a shared trip is easier and prettier now
+- Database was made more secure by restricting access to unauthenticated users
+- You can tap anywhere to get out of any Keyboard View now
+- Swipeable Expense Rows close smoothly now
 
 1.0.24
-- fixed loading indicators showing twice
-- app now acknowleges device specific UI parameters (SafeAreaView)
+- Fixed loading indicators showing twice
+- App now acknowleges device specific UI parameters (SafeAreaView)
 
 1.0.23
-- solo travellers will not be asked about sharing expenses anymore
-- solo travellers cannot view split expenses summary anymore
+- Solo travellers will not be asked about sharing expenses anymore
+- Solo travellers cannot view split expenses summary anymore
 
 1.0.22
-- added a maximum number of 34359738368 to prevent crashes
-- daily Budget cant be higher anymore than total Budget
-- fixed some styling on big devices
-- fixed android users not seeing the whole date picker
+- Added a maximum number of 34359738368 to prevent crashes
+- Daily Budget cant be higher anymore than total Budget
+- Fixed some styling on big devices
+- Fixed android users not seeing the whole date picker
 
 1.0.21
-- added range functionality for expenses over multiple days
-- hotfixed dates always being 1 day off for asian countries
+- Added range functionality for expenses over multiple days
+- Hotfixed dates always being 1 day off for asian countries
 
 1.0.2
-- added "Coming soon..." alerts
-- fixed crash at login
+- Added "Coming soon..." alerts
+- Fixed crash at login
 
 1.0.1
-- first creation of the App in changelog
-- features Expense Management, with daily and total Budget
-- multiple Travellers
-- statistics and overviews over past time and categories of expenses
+- First creation of the App in changelog
+- Features Expense Management, with daily and total Budget
+- Multiple Travellers
+- Statistics and overviews over past time and categories of expenses

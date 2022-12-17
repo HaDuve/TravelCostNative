@@ -35,10 +35,32 @@ const ProfileScreen = ({ route, navigation, param }) => {
 
   const [refreshing, setRefreshing] = useState(false);
 
-  const currentTripid = TripCtx.tripid;
+  let currentTripid = TripCtx.tripid;
   let allTripsList = [];
   const [tripsList, setTripsList] = useState([]);
+
+  useEffect(() => {
+    refreshHandler();
+  }, []);
+
+  // This should refresh on navigation/focus change, but it prevents the update for some reason
+  useEffect(() => {
+    const focusHandler = navigation.addListener("focus", () => {
+      console.warn("REFRESHED");
+      refreshHandler();
+    });
+    return focusHandler;
+  }, [navigation]);
+
+  function refreshHandler() {
+    allTripsList = [];
+    console.log("refreshHandler ~ currentTripid", currentTripid);
+    TripCtx.fetchAndSetCurrentTrip(currentTripid);
+    addTripFromContext();
+  }
+
   function addTripFromContext() {
+    if (!TripCtx.tripid || TripCtx.tripid.length < 1) return;
     allTripsList.push({
       tripid: currentTripid,
       tripName: TripCtx.tripName,
@@ -49,26 +71,6 @@ const ProfileScreen = ({ route, navigation, param }) => {
     });
     console.log("addTripFromContext ~ allTripsList", allTripsList);
     setTripsList(allTripsList);
-  }
-
-  // add all trips from history into the list
-  async function getTrips(tripid: string) {
-    await fetchTrip(tripid).then((res) => {
-      console.log("awaitfetchTrip ~ res", res);
-      if (tripid !== currentTripid) allTripsList.push(res);
-    });
-  }
-
-  useEffect(() => {
-    TripCtx.fetchAndSetCurrentTrip(currentTripid);
-    console.log("useEffect ~ useEffect", useEffect);
-    addTripFromContext();
-  }, []);
-
-  function refreshHandler() {
-    allTripsList = [];
-    TripCtx.fetchAndSetCurrentTrip(currentTripid);
-    addTripFromContext();
   }
 
   function cancelHandler() {
@@ -105,15 +107,17 @@ const ProfileScreen = ({ route, navigation, param }) => {
         ></TripList>
       </View>
       {/* <AddExpenseButton navigation={navigation} /> */}
-      <View style={styles.addButton}>
-        <IconButton
-          icon="person-add-outline"
-          size={42}
-          color={"white"}
-          onPress={() => {
-            onShare(currentTripid);
-          }}
-        />
+      <View style={styles.horizontalButtonContainer}>
+        <View style={styles.addButton}>
+          <IconButton
+            icon="person-add-outline"
+            size={42}
+            color={"white"}
+            onPress={() => {
+              onShare(currentTripid, navigation);
+            }}
+          />
+        </View>
       </View>
       <View style={styles.tempGrayBar2}></View>
     </>
@@ -121,11 +125,13 @@ const ProfileScreen = ({ route, navigation, param }) => {
 
   return (
     <View style={styles.container}>
-      <NetworkConsumer>
+      {/* NOTE: this commented pattern can be used, to maintain offline/online //
+      behavior */}
+      {/* <NetworkConsumer>
         {({ isConnected }) =>
           isConnected ? <Text>Online</Text> : <Text>Offline</Text>
         }
-      </NetworkConsumer>
+      </NetworkConsumer> */}
       <View style={styles.innerContainer}>
         <ProfileForm
           navigation={navigation}
@@ -160,6 +166,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  horizontalButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   tripListTitle: {
     fontSize: 24,
     fontWeight: "bold",
@@ -189,11 +200,8 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.primary400,
     flex: 0,
     borderRadius: 999,
-    marginHorizontal: Dimensions.get("screen").width / 2.49,
-    marginBottom: -10,
-    marginTop: -Dimensions.get("screen").height / 11,
-    paddingTop: 12,
-    flexDirection: "row",
+    minWidth: "18%",
+    paddingTop: "3%",
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1,

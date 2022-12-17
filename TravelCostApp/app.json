@@ -3,7 +3,7 @@
     "name": "Travel Expense",
     "slug": "Travel-Expense",
     "scheme": "travel-expense",
-    "version": "1.0.24",
+    "version": "1.0.30",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -19,11 +19,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.travelexpense.app",
-      "buildNumber": "1.0.24"
+      "buildNumber": "1.0.30"
     },
     "android": {
       "package": "com.travelexpense.app",
-      "versionCode": 1024,
+      "versionCode": 1030,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#FFFFFF"

@@ -20,7 +20,7 @@ const en = {
   categories: "Categories",
   invitationText: "I have an invitation from another Traveller!",
   joinTrip: "Do you want to join the Trip",
-  joinLink: "I got an invitation link!",
+  joinLink: "You can paste your Invitation Link here!",
   join: "Join",
   createFirstTrip: "Create first trip",
   myTrips: "My Trips",

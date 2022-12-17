@@ -61,13 +61,8 @@ function UserContextProvider({ children }) {
   }
 
   function addUser(UserData: any) {
-    console.log("addUser ~ UserData", UserData);
-    // TODO: create User interface for typeScript
-    if (!UserData) return;
-
-    if (UserData.userName) {
-      setName(UserData.userName);
-    }
+    if (!UserData || !UserData.userName) return;
+    setUserName(UserData.userName);
   }
 
   function setFreshlyCreatedTo(bool: boolean) {

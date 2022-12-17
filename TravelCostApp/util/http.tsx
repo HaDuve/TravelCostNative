@@ -23,14 +23,14 @@ export function setAxiosAccessToken(token: string) {
 /** Axios Logger */
 axios.interceptors.request.use(
   (config) => {
-    console.log(
-      `\n--- AXIOS LOG ~~~ \n`,
-      `${config.method.toUpperCase()} request sent to ${truncateString(
-        config.url,
-        160
-      )}`,
-      `\n~~~ AXIOS LOG --- \n`
-    );
+    // console.log(
+    //   `\n--- AXIOS LOG ~~~ \n`,
+    //   `${config.method.toUpperCase()} request sent to ${truncateString(
+    //     config.url,
+    //     160
+    //   )}`,
+    //   `\n~~~ AXIOS LOG --- \n`
+    // );
     return config;
   },
   (error) => {
@@ -240,14 +240,12 @@ export async function fetchTripsTravellers(tripid: string) {
   const response = await axios.get(
     BACKEND_URL + `/trips/${tripid}/travellers.json` + QPAR
   );
-  console.log("fetchTripsTravellers ~ response", response.data);
   return response.data;
 }
 
 export async function getTravellers(tripid: string) {
   console.log("getTravellers ~ tripid", tripid);
   const response = await fetchTripsTravellers(tripid);
-  console.log("getTravellers ~ response", response);
   let travellerids = [];
   let travellers = [];
   for (let key in response) {
@@ -271,7 +269,6 @@ export async function getUIDs(tripid: string) {
   let travellerids: string[] = [];
   for (let key in response) {
     const uid = response[key].uid;
-    console.log("getUIDs ~ uid", uid);
     if (!travellerids.includes(uid) && uid && uid.length > 0) {
       travellerids.push(uid);
     }
@@ -288,7 +285,6 @@ export async function getAllExpenses(tripid: string, uid?: string) {
 }
 
 export async function storeTripHistory(userId: string, tripHistory: string[]) {
-  console.log("storeTripHistory ~ userId", userId);
   const response = await axios.put(
     BACKEND_URL + `/users/${userId}/tripHistory.json` + QPAR,
     tripHistory
@@ -297,11 +293,9 @@ export async function storeTripHistory(userId: string, tripHistory: string[]) {
 }
 
 export async function fetchTripHistory(userId: string) {
-  console.log("fetchTripHistory ~ userId", userId);
   const response = await axios.get(
     BACKEND_URL + `/users/${userId}/tripHistory.json` + QPAR
   );
-  console.log("fetchTripHistory ~ response", response.data);
   return response.data;
 }
 

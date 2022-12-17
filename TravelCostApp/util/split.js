@@ -32,7 +32,6 @@ export function calcSplitList(
     case "SELF":
       console.log("SELF");
       return splitList;
-      break;
 
     case "EQUAL":
       const splitAmount = amount / splitTravellers.length;

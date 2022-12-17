@@ -55,10 +55,7 @@ function AuthContent({ isLogin, onAuthenticate }) {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.authContent}
-    >
+    <View style={styles.authContent}>
       <AuthForm
         isLogin={isLogin}
         onSubmit={submitHandler}
@@ -72,7 +69,7 @@ function AuthContent({ isLogin, onAuthenticate }) {
           {isLogin ? "Create a new user" : "Log in instead"}
         </FlatButton>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -80,9 +77,9 @@ export default AuthContent;
 
 const styles = StyleSheet.create({
   authContent: {
-    marginTop: 64,
-    marginHorizontal: 32,
-    padding: 16,
+    marginTop: "5%",
+    marginHorizontal: "6%",
+    padding: "4%",
     borderRadius: 8,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     elevation: 2,
@@ -94,10 +91,13 @@ const styles = StyleSheet.create({
   buttons: {
     flexDirection: "row",
     marginTop: 8,
+    alignItems: "center",
+    justifyContent: "center",
   },
   secondaryText: {
     fontSize: 14,
-    padding: 12,
+    paddingVertical: "4%",
+    paddingHorizontal: "4%",
     color: GlobalStyles.colors.gray700,
     fontWeight: "300",
   },

@@ -6,7 +6,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NetworkProvider } from "react-native-offline";
-
+import * as Updates from "expo-updates";
 import { Ionicons } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 import AppLoading from "expo-app-loading";
@@ -284,12 +284,23 @@ function Root() {
       const freshlyCreated = await AsyncStorage.getItem("freshlyCreated");
 
       if (storedToken) {
-        // console.log("onRootMount ~ storedToken");
+        // check if user was deleted
+        const checkUser = await fetchUser(storedUid);
+        if (!checkUser || !checkUser.userName) {
+          console.error("no user data stored under this token!");
+          await AsyncStorage.clear();
+          setIsTryingLogin(false);
+          return;
+        }
+
+        // setup context
         authCtx.setUserID(storedUid);
         try {
-          const userData = await fetchUser(storedUid);
+          const userData = checkUser;
           const tripid = userData.currentTrip;
-          if (userData) {
+          if (!userData) {
+            return;
+          } else {
             console.log("onRootMount ~ userData", userData);
             userCtx.addUser(userData);
             const tripData = await fetchTrip(tripid);

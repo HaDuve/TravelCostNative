@@ -301,7 +301,7 @@ function Root() {
           if (!userData) {
             return;
           } else {
-            console.log("onRootMount ~ userData", userData);
+            // console.log("onRootMount ~ userData", userData);
             userCtx.addUser(userData);
             const tripData = await fetchTrip(tripid);
             tripCtx.setCurrentTrip(tripid, tripData);

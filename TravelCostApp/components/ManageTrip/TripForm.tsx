@@ -12,6 +12,7 @@ import {
   storeTravellerToTrip,
   updateUser,
   fetchTrip,
+  updateTripHistory,
 } from "../../util/http";
 import * as Updates from "expo-updates";
 
@@ -99,11 +100,15 @@ const TripForm = ({ navigation }) => {
     const newTripData = await fetchTrip(tripid);
 
     tripCtx.setCurrentTrip(tripid, newTripData);
-    userCtx.addTripHistory(tripid);
+    // if fresh store history else update
+    if (userCtx.freshlyCreated) {
+      await storeTripHistory(uid, [tripid]);
+    } else {
+      await updateTripHistory(uid, tripid);
+    }
 
     updateUser(uid, {
-      userName: userCtx.userName,
-      tripHistory: userCtx.getTripHistory(),
+      userName: userName,
       currentTrip: tripid,
     });
 

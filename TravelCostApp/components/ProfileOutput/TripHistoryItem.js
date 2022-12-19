@@ -8,13 +8,22 @@ import {
   Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import * as Updates from "expo-updates";
 
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
 import { useContext, useEffect, useState } from "react";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseString } from "../../util/string";
-import { fetchTrip, getTravellers } from "../../util/http";
+import {
+  fetchTrip,
+  fetchTripName,
+  getAllExpenses,
+  getTravellers,
+  storeTravellerToTrip,
+  updateTripHistory,
+  updateUser,
+} from "../../util/http";
 import { onShare } from "./ShareTrip";
 import { calcOpenSplitsTable } from "../../util/split";
 import LoadingOverlay from "../UI/LoadingOverlay";
@@ -23,31 +32,32 @@ import LoadingOverlay from "../UI/LoadingOverlay";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../../i18n/supportedLanguages";
+import { ExpensesContext } from "../../store/expenses-context";
+import { UserContext } from "../../store/user-context";
+import { AuthContext } from "../../store/auth-context";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-function TripItem({
-  tripid,
-  tripName,
-  totalBudget,
-  dailyBudget,
-  tripCurrency,
-}) {
-  const tripData = {
-    tripid,
-    tripName,
-    totalBudget,
-    dailyBudget,
-    tripCurrency,
-  };
-  if (!tripid) return <Text>no id</Text>;
+function TripHistoryItem({ tripid }) {
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
+  const expenseCtx = useContext(ExpensesContext);
+  const userCtx = useContext(UserContext);
+  const authCtx = useContext(AuthContext);
+  const uid = authCtx.uid;
   const [travellers, setTravellers] = useState([]);
   const [isFetching, setIsFetching] = useState(true);
+  const [tripName, setTripName] = useState(tripid);
+  const [totalBudget, setTotalBudget] = useState("100");
+  const [dailyBudget, setDailyBudget] = useState("10");
+  const [tripCurrency, setTripCurrency] = useState("EUR");
 
+  if (!tripid) return <Text>no id</Text>;
+  if (tripid === tripCtx.tripid) {
+    return <></>;
+  }
   useEffect(() => {
     async function getTripTravellers() {
       setIsFetching(true);
@@ -63,26 +73,52 @@ function TripItem({
       }
       setIsFetching(false);
     }
+    async function getTripName() {
+      const name = await fetchTripName(tripid);
+      setTripName(name);
+    }
+    getTripName();
     getTripTravellers();
   }, []);
+
+  async function joinRoutine(tripid) {
+    setIsFetching(true);
+    const trip = await fetchTrip(tripid);
+    const tripData = trip;
+    await updateTripHistory(uid, tripid);
+    await storeTravellerToTrip(tripid, {
+      userName: userCtx.userName,
+      uid: uid,
+    });
+    updateUser(uid, {
+      currentTrip: tripid,
+    });
+    tripCtx.setCurrentTrip(tripid, tripData);
+    tripCtx.setCurrentTravellers(tripid);
+    userCtx.setFreshlyCreatedTo(false);
+    const expenses = await getAllExpenses(tripid, uid);
+    expenseCtx.setExpenses(expenses);
+    setIsFetching(false);
+    // Immediately reload the React Native Bundle
+    Updates.reloadAsync();
+  }
 
   function tripPressHandler() {
     // NOTE: Android can only handle alert with 2 actions, so this needs to be changed or actions will go missing
     console.log("pressed: ", tripid);
-    travellers.length > 1 &&
-      Alert.alert(tripName, i18n.t("chooseAction"), [
-        {
-          text: i18n.t("cancel"),
-          onPress: () => navigation.navigate("Profile"),
-          style: "cancel",
+    Alert.alert(tripName, i18n.t("chooseAction"), [
+      {
+        text: i18n.t("cancel"),
+        onPress: () => navigation.navigate("Profile"),
+        style: "cancel",
+      },
+      {
+        text: i18n.t("setActiveTrip"),
+        onPress: () => {
+          joinRoutine(tripid);
         },
-        travellers.length > 1 && {
-          text: i18n.t("calcOpenSplits"),
-          onPress: () => {
-            navigation.navigate("SplitSummary", { tripid: tripid });
-          },
-        },
-      ]);
+      },
+    ]);
   }
 
   const activeBorder =
@@ -125,13 +161,13 @@ function TripItem({
             <Text style={[styles.textBase, styles.description]}>
               {tripName}
             </Text>
-            <Text style={styles.textBase}>
+            {/* <Text style={styles.textBase}>
               {i18n.t("daily")}
               {": " + dailyBudget}
               {" " + tripCurrency}
-            </Text>
+            </Text> */}
           </View>
-          <View style={styles.amountContainer}>
+          {/* <View style={styles.amountContainer}>
             <Text style={styles.amount}>
               {totalBudget}
               {" " + tripCurrency}
@@ -145,7 +181,7 @@ function TripItem({
               height={12}
               width={150}
             />
-          </View>
+          </View> */}
         </View>
         <FlatList
           data={travellers}
@@ -160,7 +196,7 @@ function TripItem({
   );
 }
 
-export default TripItem;
+export default TripHistoryItem;
 
 const styles = StyleSheet.create({
   pressed: {

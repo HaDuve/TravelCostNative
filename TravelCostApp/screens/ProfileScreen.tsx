@@ -22,7 +22,8 @@ import { NetworkConsumer } from "react-native-offline";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
-import { fetchTrip } from "../util/http";
+import { fetchTrip, fetchTripHistory } from "../util/http";
+import { AuthContext } from "../store/auth-context";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -32,6 +33,8 @@ const ProfileScreen = ({ route, navigation, param }) => {
   const UserCtx = useContext(UserContext);
   const FreshlyCreated = UserCtx.freshlyCreated;
   const TripCtx = useContext(TripContext);
+  const AuthCtx = useContext(AuthContext);
+  const uid = AuthCtx.uid;
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -43,17 +46,17 @@ const ProfileScreen = ({ route, navigation, param }) => {
     refreshHandler();
   }, []);
 
-  // This should refresh on navigation/focus change, but it prevents the update for some reason
   useEffect(() => {
-    const focusHandler = navigation.addListener("focus", () => {
-      console.warn("REFRESHED");
-      refreshHandler();
+    const focusHandler = navigation.addListener("focus", async () => {
+      await refreshHandler();
     });
     return focusHandler;
   }, [navigation]);
 
-  function refreshHandler() {
+  async function refreshHandler() {
     allTripsList = [];
+    const tripHistory = await fetchTripHistory(uid);
+    allTripsList = tripHistory;
     console.log("refreshHandler ~ currentTripid", currentTripid);
     TripCtx.fetchAndSetCurrentTrip(currentTripid);
     addTripFromContext();
@@ -69,8 +72,8 @@ const ProfileScreen = ({ route, navigation, param }) => {
       tripCurrency: TripCtx.tripCurrency,
       travellers: TripCtx.travellers,
     });
-    console.log("addTripFromContext ~ allTripsList", allTripsList);
-    setTripsList(allTripsList);
+    console.log("allTripsList length: ", allTripsList.length);
+    setTripsList(allTripsList.reverse());
   }
 
   function cancelHandler() {

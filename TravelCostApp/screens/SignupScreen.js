@@ -6,7 +6,12 @@ import AuthContent from "../components/Auth/AuthContent";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { UserContext } from "../store/user-context";
 import { createUser } from "../util/auth";
-import { fetchUser, saveUserCorrectly, storeUser } from "../util/http";
+import {
+  fetchUser,
+  saveUserCorrectly,
+  storeUser,
+  updateUser,
+} from "../util/http";
 import { AuthContext } from "./../store/auth-context";
 
 function SignupScreen() {
@@ -24,6 +29,9 @@ function SignupScreen() {
       //NEW
       const userData = { userName: name };
       storeUser(uid, userData);
+      updateUser(uid, {
+        userName: name,
+      });
       userCtx.setUserName(name);
       userCtx.setFreshlyCreatedTo(true);
       authCtx.setUserID(uid);

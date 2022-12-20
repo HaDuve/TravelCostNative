@@ -5,22 +5,19 @@ import DropDownPicker from "react-native-dropdown-picker";
 import * as i18nIsoCountries from "i18n-iso-countries";
 import { useState } from "react";
 
-//Localization
-import * as Localization from "expo-localization";
 import { GlobalStyles } from "../../constants/styles";
-import { G } from "react-native-svg";
 
 const CurrencyPicker = ({ countryValue, setCountryValue, onChangeValue }) => {
   // Users Device CountryCode CC to translate Country names in picker
-  const CC = Localization.locale.slice(0, 2);
+
   const countryToCurrency = require("country-to-currency");
 
   var countries = require("i18n-iso-countries");
 
   i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/en.json"));
-  const countryOptions = Object.keys(countries.getNames(CC)).map((code) => ({
-    label: `${countryToCurrency[code]} - ${countries.getName(code, CC)}`,
-    value: `${countryToCurrency[code]} - ${countries.getName(code, CC)}`,
+  const countryOptions = Object.keys(countries.getNames("en")).map((code) => ({
+    label: `${countryToCurrency[code]} - ${countries.getName(code, "en")}`,
+    value: `${countryToCurrency[code]} - ${countries.getName(code, "en")}`,
   }));
 
   const [open, setOpen] = useState(false);

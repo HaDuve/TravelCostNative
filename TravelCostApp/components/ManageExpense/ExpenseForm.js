@@ -26,7 +26,7 @@ import { UserContext } from "../../store/user-context";
 import FlatButton from "../UI/FlatButton";
 import { getCatSymbol } from "../../util/category";
 import DropDownPicker from "react-native-dropdown-picker";
-import CurrencyPicker from "react-native-currency-picker";
+// import CurrencyPicker from "react-native-currency-picker";
 import DatePicker from "react-native-neat-date-picker";
 import { TripContext } from "../../store/trip-context";
 import {
@@ -78,7 +78,7 @@ const ExpenseForm = ({
   }, []);
 
   // currencypicker reference for open/close
-  let currencyPickerRef = undefined;
+  // let currencyPickerRef = undefined;
 
   // datepicker states
   const [showDatePickerRange, setShowDatePickerRange] = useState(false);
@@ -118,7 +118,6 @@ const ExpenseForm = ({
 
   useEffect(() => {
     currentTravellersAsItems = travellerToDropdown(currentTravellers);
-
   }, []);
 
   const [items, setItems] = useState(currentTravellersAsItems);
@@ -514,7 +513,7 @@ const ExpenseForm = ({
               <Text style={styles.currencyLabel}>
                 {i18n.t("currencyLabel")}
               </Text>
-              <CurrencyPicker
+              {/* <CurrencyPicker
                 currencyPickerRef={(ref) => {
                   currencyPickerRef = ref;
                 }}
@@ -566,7 +565,7 @@ const ExpenseForm = ({
                 searchPlaceholder={"Search"}
                 showCloseButton={true}
                 showModalTitle={true}
-              />
+              /> */}
               {/* <Input
               style={styles.rowInput}
               label="Currency"

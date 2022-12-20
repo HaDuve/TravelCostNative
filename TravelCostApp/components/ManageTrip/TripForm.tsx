@@ -1,3 +1,4 @@
+import React from "react";
 import { useState, useContext, useEffect } from "react";
 import { View, Text, Alert } from "react-native";
 import { StyleSheet } from "react-native";
@@ -22,7 +23,7 @@ import { UserContext } from "../../store/user-context";
 import Button from "../UI/Button";
 import FlatButton from "../UI/FlatButton";
 import { ExpensesContext } from "../../store/expenses-context";
-import CurrencyPicker from "react-native-currency-picker";
+// import CurrencyPicker from "react-native-currency-picker";
 
 const TripForm = ({ navigation }) => {
   const tripCtx = useContext(TripContext);
@@ -32,7 +33,7 @@ const TripForm = ({ navigation }) => {
 
   const uid = authCtx.uid;
   const userName = userCtx.userName;
-  let currencyPickerRef = undefined;
+  // let currencyPickerRef = undefined;
 
   const [inputs, setInputs] = useState({
     tripName: {
@@ -120,56 +121,57 @@ const TripForm = ({ navigation }) => {
   }
 
   const currencyPickJSX = (
-    <CurrencyPicker
-      currencyPickerRef={(ref) => {
-        currencyPickerRef = ref;
-      }}
-      enable={true}
-      darkMode={false}
-      currencyCode={inputs.tripCurrency.value}
-      showFlag={true}
-      showCurrencyName={false}
-      showCurrencyCode={false}
-      onSelectCurrency={(data) => {
-        inputChangedHandler("tripCurrency", data.code);
-      }}
-      onOpen={() => {
-        console.log("Open");
-      }}
-      onClose={() => {
-        console.log("Close");
-      }}
-      showNativeSymbol={true}
-      showSymbol={false}
-      containerStyle={{
-        container: {
-          marginLeft: 0,
-          paddingTop: 24,
-        },
-        flagWidth: 25,
-        currencyCodeStyle: { color: GlobalStyles.colors.primary500 },
-        currencyNameStyle: { color: GlobalStyles.colors.primary500 },
-        symbolStyle: { color: GlobalStyles.colors.primary500 },
-        symbolNativeStyle: { color: GlobalStyles.colors.primary500 },
-      }}
-      modalStyle={{
-        container: {},
-        searchStyle: {},
-        tileStyle: {},
-        itemStyle: {
-          itemContainer: {},
-          flagWidth: 25,
-          currencyCodeStyle: {},
-          currencyNameStyle: {},
-          symbolStyle: {},
-          symbolNativeStyle: {},
-        },
-      }}
-      title={"Currency"}
-      searchPlaceholder={"Search"}
-      showCloseButton={true}
-      showModalTitle={true}
-    />
+    <></>
+    // <CurrencyPicker
+    //   currencyPickerRef={(ref) => {
+    //     currencyPickerRef = ref;
+    //   }}
+    //   enable={true}
+    //   darkMode={false}
+    //   currencyCode={inputs.tripCurrency.value}
+    //   showFlag={true}
+    //   showCurrencyName={false}
+    //   showCurrencyCode={false}
+    //   onSelectCurrency={(data) => {
+    //     inputChangedHandler("tripCurrency", data.code);
+    //   }}
+    //   onOpen={() => {
+    //     console.log("Open");
+    //   }}
+    //   onClose={() => {
+    //     console.log("Close");
+    //   }}
+    //   showNativeSymbol={true}
+    //   showSymbol={false}
+    //   containerStyle={{
+    //     container: {
+    //       marginLeft: 0,
+    //       paddingTop: 24,
+    //     },
+    //     flagWidth: 25,
+    //     currencyCodeStyle: { color: GlobalStyles.colors.primary500 },
+    //     currencyNameStyle: { color: GlobalStyles.colors.primary500 },
+    //     symbolStyle: { color: GlobalStyles.colors.primary500 },
+    //     symbolNativeStyle: { color: GlobalStyles.colors.primary500 },
+    //   }}
+    //   modalStyle={{
+    //     container: {},
+    //     searchStyle: {},
+    //     tileStyle: {},
+    //     itemStyle: {
+    //       itemContainer: {},
+    //       flagWidth: 25,
+    //       currencyCodeStyle: {},
+    //       currencyNameStyle: {},
+    //       symbolStyle: {},
+    //       symbolNativeStyle: {},
+    //     },
+    //   }}
+    //   title={"Currency"}
+    //   searchPlaceholder={"Search"}
+    //   showCloseButton={true}
+    //   showModalTitle={true}
+    // />
   );
 
   return (

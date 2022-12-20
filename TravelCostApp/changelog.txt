@@ -2,6 +2,7 @@ Changelog Travel Expense App
 
 1.0.31
 - (Re-)Added the trip history: Users can now switch freely between multiple trips
+- Replaced the currencyPicker with a selfmade component (Old one prevented Android compiling)
 
 1.0.30
 - Fixed alot of bugs revolving around the login system

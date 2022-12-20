@@ -23,6 +23,7 @@ import { UserContext } from "../../store/user-context";
 import Button from "../UI/Button";
 import FlatButton from "../UI/FlatButton";
 import { ExpensesContext } from "../../store/expenses-context";
+import CurrencyPicker from "../Currency/CurrencyPicker";
 // import CurrencyPicker from "react-native-currency-picker";
 
 const TripForm = ({ navigation }) => {
@@ -30,6 +31,8 @@ const TripForm = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
   const expenseCtx = useContext(ExpensesContext);
+
+  const [countryValue, setCountryValue] = useState("DE");
 
   const uid = authCtx.uid;
   const userName = userCtx.userName;
@@ -118,10 +121,19 @@ const TripForm = ({ navigation }) => {
 
     // Immediately reload the React Native Bundle
     Updates.reloadAsync();
+    return <></>;
+  }
+
+  function updateCurrency() {
+    inputChangedHandler("tripCurrency", countryValue.split(" ")[0]);
   }
 
   const currencyPickJSX = (
-    <></>
+    <CurrencyPicker
+      countryValue={countryValue}
+      setCountryValue={setCountryValue}
+      onChangeValue={updateCurrency}
+    ></CurrencyPicker>
     // <CurrencyPicker
     //   currencyPickerRef={(ref) => {
     //     currencyPickerRef = ref;

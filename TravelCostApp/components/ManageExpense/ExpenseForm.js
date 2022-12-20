@@ -41,6 +41,7 @@ import {
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../../i18n/supportedLanguages";
+import CurrencyPicker from "../Currency/CurrencyPicker";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -62,6 +63,7 @@ const ExpenseForm = ({
   const UserCtx = useContext(UserContext);
   const TripCtx = useContext(TripContext);
   const [hideAdvanced, sethideAdvanced] = useState(!isEditing);
+  const [countryValue, setCountryValue] = useState("DE");
 
   const [loadingTravellers, setLoadingTravellers] = useState(false);
   useEffect(() => {
@@ -408,6 +410,10 @@ const ExpenseForm = ({
 
   const advancedSubmitHandler = hideAdvanced ? fastSubmit : submitHandler;
 
+  function updateCurrency() {
+    inputChangedHandler("currency", countryValue.split(" ")[0]);
+  }
+
   const formIsInvalid =
     !inputs.amount.isValid ||
     !inputs.description.isValid ||
@@ -513,68 +519,11 @@ const ExpenseForm = ({
               <Text style={styles.currencyLabel}>
                 {i18n.t("currencyLabel")}
               </Text>
-              {/* <CurrencyPicker
-                currencyPickerRef={(ref) => {
-                  currencyPickerRef = ref;
-                }}
-                enable={true}
-                darkMode={false}
-                currencyCode={inputs.currency.value}
-                showFlag={true}
-                showCurrencyName={true}
-                showCurrencyCode={false}
-                onSelectCurrency={(data) => {
-                  inputChangedHandler("currency", data.code);
-                }}
-                onOpen={() => {
-                  console.log("Open");
-                }}
-                onClose={() => {
-                  console.log("Close");
-                }}
-                showNativeSymbol={true}
-                showSymbol={false}
-                containerStyle={{
-                  container: {},
-                  flagWidth: 25,
-                  currencyCodeStyle: {
-                    color: GlobalStyles.colors.primary500,
-                  },
-                  currencyNameStyle: {
-                    color: GlobalStyles.colors.primary500,
-                  },
-                  symbolStyle: { color: GlobalStyles.colors.primary500 },
-                  symbolNativeStyle: {
-                    color: GlobalStyles.colors.primary500,
-                  },
-                }}
-                modalStyle={{
-                  container: {},
-                  searchStyle: {},
-                  tileStyle: {},
-                  itemStyle: {
-                    itemContainer: {},
-                    flagWidth: 25,
-                    currencyCodeStyle: {},
-                    currencyNameStyle: {},
-                    symbolStyle: {},
-                    symbolNativeStyle: {},
-                  },
-                }}
-                title={i18n.t("currencyLabel")}
-                searchPlaceholder={"Search"}
-                showCloseButton={true}
-                showModalTitle={true}
-              /> */}
-              {/* <Input
-              style={styles.rowInput}
-              label="Currency"
-              textInputConfig={{
-                onChangeText: inputChangedHandler.bind(this, "currency"),
-                value: inputs.currency.value,
-              }}
-              invalid={!inputs.currency.isValid}
-            /> */}
+              <CurrencyPicker
+                countryValue={countryValue}
+                setCountryValue={setCountryValue}
+                onChangeValue={updateCurrency}
+              ></CurrencyPicker>
             </View>
             <Input
               label={i18n.t("descriptionLabel")}
@@ -585,17 +534,7 @@ const ExpenseForm = ({
               }}
               invalid={!inputs.description.isValid}
             />
-            {/* <Input
-              style={styles.rowInput}
-              label="Date"
-              textInputConfig={{
-                placeholder: "YYYY-MM-DD",
-                maxLength: 10,
-                onChangeText: inputChangedHandler.bind(this, "date"),
-                value: inputs.date.value,
-              }}
-              invalid={!inputs.date.isValid}
-            /> */}
+
             <View style={{ marginLeft: 16 }}>
               <Text style={styles.topCurrencyText}>{i18n.t("dateLabel")}</Text>
             </View>

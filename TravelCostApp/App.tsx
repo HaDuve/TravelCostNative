@@ -1,3 +1,5 @@
+import React from "react";
+
 import { useContext, useEffect, useState } from "react";
 import { Alert, Text, SafeAreaView, View, Keyboard } from "react-native";
 import { StatusBar } from "expo-status-bar";

@@ -6,7 +6,6 @@ import {
   View,
   Pressable,
   FlatList,
-  SectionList,
   Dimensions,
   Keyboard,
   Platform,

@@ -111,7 +111,7 @@ function RecentExpenses({ navigation }) {
           setOpen={setOpen}
           setValue={setPeriodValue}
           setItems={setItems}
-          containerStyle={styles.dropdowwnContainer}
+          containerStyle={styles.dropdownContainer}
           style={styles.dropdown}
           textStyle={styles.dropdownTextStyle}
         />
@@ -151,14 +151,14 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",
     zIndex: 1,
     marginTop: 48,
     marginHorizontal: 24,
     marginBottom: 12,
   },
   dropdownContainer: {
-    maxWidth: 160,
+    maxWidth: "50%",
   },
   dropdown: {
     borderRadius: 0,

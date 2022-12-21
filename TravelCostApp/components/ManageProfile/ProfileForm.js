@@ -129,14 +129,14 @@ const ProfileForm = ({ navigation, onCancel }) => {
     </View>
   );
 
-  function joinInvite() {
+  function joinInviteHandler() {
     // TODO: this hardcoded join
     navigation.navigate("Join", { id: "-NHs1Goz9sc1Ea69uHUY" });
   }
 
   const freshlyNavigationButtons = (
     <View style={styles.navButtonContainer}>
-      <FlatButton style={[styles.navButton]} onPress={joinInvite}>
+      <FlatButton style={[styles.navButton]} onPress={joinInviteHandler}>
         {i18n.t("invitationText")}
       </FlatButton>
       {freshlyCreated && (

@@ -24,6 +24,7 @@ import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
 import { fetchTrip, fetchTripHistory } from "../util/http";
 import { AuthContext } from "../store/auth-context";
+import React from "react";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -56,6 +57,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
   async function refreshHandler() {
     allTripsList = [];
     const tripHistory = await fetchTripHistory(uid);
+    console.log("refreshHandler ~ tripHistory", tripHistory);
     allTripsList = tripHistory;
     console.log("refreshHandler ~ currentTripid", currentTripid);
     TripCtx.fetchAndSetCurrentTrip(currentTripid);
@@ -71,6 +73,11 @@ const ProfileScreen = ({ route, navigation, param }) => {
       dailyBudget: TripCtx.dailyBudget,
       tripCurrency: TripCtx.tripCurrency,
       travellers: TripCtx.travellers,
+    });
+
+    allTripsList.forEach((trip) => {
+      console.log(" ~ trip.tripName", trip.tripName);
+      console.log(" ~ trip.tripid", trip.tripid);
     });
     console.log("allTripsList length: ", allTripsList.length);
     setTripsList(allTripsList.reverse());
@@ -160,7 +167,7 @@ const styles = StyleSheet.create({
   },
   tripContainer: {
     flex: 1,
-    minHeight: Dimensions.get("window").height / 4,
+    minHeight: "10%",
     margin: 16,
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },

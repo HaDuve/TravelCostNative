@@ -16,6 +16,7 @@ import { useContext } from "react";
 import { UserContext } from "../../store/user-context";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseString, truncateString } from "../../util/string";
+import React from "react";
 
 function ExpenseItem({
   id,
@@ -35,7 +36,9 @@ function ExpenseItem({
   const calcAmountString = formatExpenseString(calcAmount);
   const amountString = formatExpenseString(amount);
 
-  const widthInChars = parseInt(Dimensions.get("window").width / 13);
+  const widthInChars = parseInt(
+    (Dimensions.get("window").width / 13).toString()
+  );
   const descriptionString = truncateString(description, widthInChars);
 
   function expensePressHandler() {

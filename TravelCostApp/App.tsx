@@ -49,6 +49,7 @@ i18n.enableFallback = true;
 
 // NOTE: for alpha testing we leave this here
 import { LogBox } from "react-native";
+import SandboxScreen from "./screens/SandboxScreen";
 LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
 LogBox.ignoreAllLogs(); //Ignore all log notifications
 
@@ -246,6 +247,18 @@ function Home() {
           tabBarLabel: "Profile",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-circle-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <BottomTabs.Screen
+        name="Sandbox"
+        component={SandboxScreen}
+        options={{
+          headerShown: false,
+          title: "Sandbox",
+          tabBarLabel: "Sandbox",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="cog-outline" size={size} color={color} />
           ),
         }}
       />

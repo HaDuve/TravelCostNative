@@ -40,8 +40,6 @@ function RecentExpenses({ navigation }) {
   const [open, setOpen] = useState(false);
   const [PeriodValue, setPeriodValue] = useState("day");
 
-
-
   useEffect(() => {
     if (PeriodValue !== userCtx.periodName)
       userCtx.setPeriodString(PeriodValue);
@@ -113,7 +111,7 @@ function RecentExpenses({ navigation }) {
           setOpen={setOpen}
           setValue={setPeriodValue}
           setItems={setItems}
-          containerStyle={styles.dropdownContainer}
+          containerStyle={styles.dropdowwnContainer}
           style={styles.dropdown}
           textStyle={styles.dropdownTextStyle}
         />
@@ -124,10 +122,7 @@ function RecentExpenses({ navigation }) {
         expenses={recentExpenses}
         fallbackText={i18n.t("fallbackTextExpenses")}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       />
       <AddExpenseButton navigation={navigation} />

@@ -10,10 +10,7 @@ export const OpenXLSXPicker = async () => {
       copyToCacheDirectory: true,
       multiple: false,
     });
-    console.log(
-      "openFilePicker ~ JSON.stringify(res)",
-      JSON.stringify(res, null, 4)
-    );
+    console.log("openFilePicker ~ ", res.name);
     const fileData = await FileSystem.readAsStringAsync(res.uri, {
       encoding: FileSystem.EncodingType.Base64,
     }).then((b64) => XLSX.read(b64, { type: "base64" }));
@@ -28,20 +25,17 @@ const getExcelData = async (workbook, uid, tripid, userName, addExpense) => {
   // const sheetNames = workbook.SheetNames;
 
   const sheet = workbook.Sheets[workbook.SheetNames[2]];
-  const index1 = getAllTextCostPairs(sheet, 1);
-  console.log("getExcelData ~ index1", index1);
+  const index1 = await getAllTextCostPairs(sheet, 1);
   await importExpenseFromXLSX(index1, uid, tripid, userName, addExpense);
 
-  const index2 = getAllTextCostPairs(sheet, 2);
-  console.log("getExcelData ~ index2", index2);
+  const index2 = await getAllTextCostPairs(sheet, 2);
   await importExpenseFromXLSX(index2, uid, tripid, userName, addExpense);
 
-  const index3 = getAllTextCostPairs(sheet, 3);
-  console.log("getExcelData ~ index3", index3);
+  const index3 = await getAllTextCostPairs(sheet, 3);
   await importExpenseFromXLSX(index3, uid, tripid, userName, addExpense);
 };
 
-async function getAllTextCostPairs(sheet, index) {
+async function getAllTextCostPairs(sheet, index: number) {
   /**
    * Anreise 2, 12, 2, 17 - 4, 12, 4, 17
    * 13-18 ANREISE
@@ -99,6 +93,7 @@ async function getAllTextCostPairs(sheet, index) {
   for (let i = 0; i < config.length; i++) {
     const catRange = config[i];
     if (!(catRange && catRange.start && catRange.end && catRange.cat)) {
+      console.log(" either no catRange, or no start end or category detected!");
       continue;
     }
     listOfCategoriesTextCostPairs.push(
@@ -110,12 +105,6 @@ async function getAllTextCostPairs(sheet, index) {
       )
     );
   }
-
-  console.log(
-    "getAllTextCostPairs ~ listOfCategoriesTextCostPairs",
-    listOfCategoriesTextCostPairs
-  );
-
   return listOfCategoriesTextCostPairs;
 }
 
@@ -147,8 +136,10 @@ async function getCatTextCostPairs(
     const textObj = textColumn[i];
     const costObj = costColumn[i];
     try {
-      if (!costObj || !textObj || isNaN(costObj.v) || costObj.v === 0) continue;
-      textCostPairs.push({ text: textObj.v, cost: costObj.v, cat: cat });
+      if (!costObj || !textObj || isNaN(costObj.v) || costObj.v === 0) {
+        continue;
+      }
+      textCostPairs.push({ text: textObj.w, cost: costObj.v, cat: cat });
     } catch (error) {
       console.log(error);
     }

@@ -39,7 +39,7 @@ const CurrencyPicker = ({ countryValue, setCountryValue, onChangeValue }) => {
         onChangeValue={onChangeValue}
         setValue={setCountryValue}
         setItems={setItems}
-        placeholder={"EUR - Pick your home Currency / Country"}
+        placeholder={"Currency"}
         containerStyle={{
           backgroundColor: GlobalStyles.colors.gray500,
           marginHorizontal: "1%",

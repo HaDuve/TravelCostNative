@@ -128,71 +128,20 @@ const TripForm = ({ navigation }) => {
     inputChangedHandler("tripCurrency", countryValue.split(" ")[0]);
   }
 
-  const currencyPickJSX = (
-    <CurrencyPicker
-      countryValue={countryValue}
-      setCountryValue={setCountryValue}
-      onChangeValue={updateCurrency}
-    ></CurrencyPicker>
-    // <CurrencyPicker
-    //   currencyPickerRef={(ref) => {
-    //     currencyPickerRef = ref;
-    //   }}
-    //   enable={true}
-    //   darkMode={false}
-    //   currencyCode={inputs.tripCurrency.value}
-    //   showFlag={true}
-    //   showCurrencyName={false}
-    //   showCurrencyCode={false}
-    //   onSelectCurrency={(data) => {
-    //     inputChangedHandler("tripCurrency", data.code);
-    //   }}
-    //   onOpen={() => {
-    //     console.log("Open");
-    //   }}
-    //   onClose={() => {
-    //     console.log("Close");
-    //   }}
-    //   showNativeSymbol={true}
-    //   showSymbol={false}
-    //   containerStyle={{
-    //     container: {
-    //       marginLeft: 0,
-    //       paddingTop: 24,
-    //     },
-    //     flagWidth: 25,
-    //     currencyCodeStyle: { color: GlobalStyles.colors.primary500 },
-    //     currencyNameStyle: { color: GlobalStyles.colors.primary500 },
-    //     symbolStyle: { color: GlobalStyles.colors.primary500 },
-    //     symbolNativeStyle: { color: GlobalStyles.colors.primary500 },
-    //   }}
-    //   modalStyle={{
-    //     container: {},
-    //     searchStyle: {},
-    //     tileStyle: {},
-    //     itemStyle: {
-    //       itemContainer: {},
-    //       flagWidth: 25,
-    //       currencyCodeStyle: {},
-    //       currencyNameStyle: {},
-    //       symbolStyle: {},
-    //       symbolNativeStyle: {},
-    //     },
-    //   }}
-    //   title={"Currency"}
-    //   searchPlaceholder={"Search"}
-    //   showCloseButton={true}
-    //   showModalTitle={true}
-    // />
-  );
-
   return (
     <View style={styles.form}>
       <View style={styles.card}>
-        <Text style={styles.title}>New Trip</Text>
+        <Text style={styles.title}>New Trip Budget</Text>
+        <View style={styles.currencyPickerContainer}>
+          <CurrencyPicker
+            countryValue={countryValue}
+            setCountryValue={setCountryValue}
+            onChangeValue={updateCurrency}
+          ></CurrencyPicker>
+        </View>
         <Input
           label="Trip Name"
-          style={{}}
+          style={{ flex: 1 }}
           inputStyle={{}}
           textInputConfig={{
             onChangeText: inputChangedHandler.bind(this, "tripName"),
@@ -203,8 +152,8 @@ const TripForm = ({ navigation }) => {
         />
         <View style={styles.categoryRow}>
           <Input
-            label="Total Budget"
-            style={{}}
+            label={`Total Budget in ${inputs.tripCurrency.value}`}
+            style={{ flex: 1 }}
             inputStyle={{}}
             autoFocus={false}
             textInputConfig={{
@@ -214,14 +163,13 @@ const TripForm = ({ navigation }) => {
             }}
             invalid={!inputs.totalBudget.isValid}
           />
-          {currencyPickJSX}
         </View>
         <View style={styles.categoryRow}>
           <Input
-            style={{}}
+            style={{ flex: 1 }}
             inputStyle={{}}
             autoFocus={false}
-            label="Daily Budget"
+            label={`Daily Budget in ${inputs.tripCurrency.value}`}
             textInputConfig={{
               keyboardType: "decimal-pad",
               onChangeText: inputChangedHandler.bind(this, "dailyBudget"),
@@ -229,7 +177,6 @@ const TripForm = ({ navigation }) => {
             }}
             invalid={!inputs.dailyBudget.isValid}
           />
-          {currencyPickJSX}
         </View>
       </View>
       <View style={styles.buttonContainer}>
@@ -256,6 +203,7 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   card: {
+    flex: 1,
     margin: 16,
     padding: 12,
     backgroundColor: GlobalStyles.colors.gray500,
@@ -267,6 +215,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 4, height: 4 },
     shadowOpacity: 10,
   },
+  currencyPickerContainer: {
+    flex: 1,
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -276,7 +227,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   categoryRow: {
-    flex: 0,
+    flex: 1,
     flexDirection: "row",
     justifyContent: "flex-start",
   },

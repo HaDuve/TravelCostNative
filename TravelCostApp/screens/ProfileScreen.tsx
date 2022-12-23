@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   },
   tripContainer: {
     flex: 1,
-    minHeight: "10%",
+    minHeight: "40%",
     margin: 16,
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },

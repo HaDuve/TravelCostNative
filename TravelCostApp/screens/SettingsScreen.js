@@ -1,0 +1,88 @@
+import { Alert, StyleSheet, Text, View } from "react-native";
+import React, { useContext } from "react";
+import FlatButton from "../components/UI/FlatButton";
+import { importExcelFile } from "../components/ImportExport/OpenXLSXPicker";
+import { TripContext } from "../store/trip-context";
+import { UserContext } from "../store/user-context";
+import { AuthContext } from "../store/auth-context";
+import { ExpensesContext } from "../store/expenses-context";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../../TravelCostApp/i18n/supportedLanguages";
+import Button from "../components/UI/Button";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
+const SettingsScreen = ({ navigation }) => {
+  const expensesCtx = useContext(ExpensesContext);
+  const authCtx = useContext(AuthContext);
+  const userCtx = useContext(UserContext);
+  const tripCtx = useContext(TripContext);
+  const uid = authCtx.uid;
+  const tripid = tripCtx.tripid;
+  const userName = userCtx.userName;
+  const addExpense = expensesCtx.addExpense;
+
+  function joinInviteHandler() {
+    navigation.navigate("Join");
+  }
+
+  function logoutHandler() {
+    return Alert.alert(i18n.t("sure"), i18n.t("signOutAlertMess"), [
+      // The "No" button
+      // Does nothing but dismiss the dialog when tapped
+      {
+        text: i18n.t("no"),
+      },
+      // The "Yes" button
+      {
+        text: i18n.t("yes"),
+        onPress: () => {
+          authCtx.logout();
+        },
+      },
+    ]);
+  }
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        padding: "4%",
+      }}
+    >
+      <Button
+        style={{
+          paddingVertical: "2%",
+        }}
+        onPress={logoutHandler}
+      >
+        Logout
+      </Button>
+      <Button
+        style={{
+          paddingVertical: "2%",
+        }}
+        onPress={joinInviteHandler}
+      >
+        {i18n.t("invitationText")}
+      </Button>
+      <Button
+        onPress={importExcelFile.bind(this, uid, tripid, userName, addExpense)}
+        style={{
+          paddingVertical: "2%",
+        }}
+      >
+        Importiere Kosten aus GehMalReisen Excel Tabelle
+      </Button>
+    </View>
+  );
+};
+
+export default SettingsScreen;
+
+const styles = StyleSheet.create({});

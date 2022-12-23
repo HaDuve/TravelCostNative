@@ -15,7 +15,6 @@ import {
   fetchTripHistory,
   updateTripHistory,
 } from "../util/http";
-import { Button } from "react-native";
 import { UserContext } from "../store/user-context";
 import { AuthContext } from "../store/auth-context";
 import { TripContext } from "../store/trip-context";
@@ -28,6 +27,9 @@ import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
 import { ExpensesContext } from "../store/expenses-context";
 import React from "react";
+import FlatButton from "../components/UI/FlatButton";
+import Button from "../components/UI/Button";
+import { G } from "react-native-svg";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -37,23 +39,24 @@ const JoinTrip = ({ navigation, route }) => {
   // join Trips via route params (route.params.id -> tripid)
   // or with an invitation link (Input -> joinTripid)
 
-  if (!route.params.id) return;
   const userCtx = useContext(UserContext);
   const authCtx = useContext(AuthContext);
   const tripCtx = useContext(TripContext);
   const expenseCtx = useContext(ExpensesContext);
   const uid = authCtx.uid;
-  let tripid = route.params.id;
+  let tripid = route.params ? route.params.id : "";
 
   const [joinTripid, setJoinTripid] = useState("");
   const [tripdata, setTripdata] = useState({});
   const [tripName, setTripName] = useState("");
+  const [freshLink, setFreshLink] = useState(true);
 
   async function getTrip(tripID: string) {
     try {
       const trip = await fetchTrip(tripID);
       setTripName(trip.tripName);
       setTripdata(trip);
+      setFreshLink(false);
     } catch (e) {
       Alert.alert(
         "Could not find trip!",
@@ -119,7 +122,7 @@ const JoinTrip = ({ navigation, route }) => {
   }
 
   return (
-    <KeyboardAvoidingView style={styles.container}>
+    <KeyboardAvoidingView style={styles.card}>
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>Join Trip</Text>
       </View>
@@ -127,30 +130,45 @@ const JoinTrip = ({ navigation, route }) => {
         <Text> {i18n.t("joinLink")}</Text>
         <Input
           value={joinTripid}
-          onUpdateValue={setJoinTripid}
+          onUpdateValue={(value) => {
+            setJoinTripid(value);
+            setFreshLink(true);
+          }}
           label={""}
           secure={false}
           keyboardType={"default"}
           isInvalid={false}
         ></Input>
-        <Button title={"Update"} onPress={joinLinkHandler}></Button>
+        <Button
+          style={{ maxWidth: "100%", marginTop: "5%" }}
+          buttonStyle={{
+            backgroundColor: freshLink
+              ? GlobalStyles.colors.primaryGrayed
+              : GlobalStyles.colors.gray700,
+          }}
+          onPress={joinLinkHandler}
+        >
+          Update
+        </Button>
       </View>
       {tripName?.length > 1 && (
         <Text style={{ padding: 16, fontSize: 22 }}>{i18n.t("joinTrip")}?</Text>
       )}
-      <Text style={{ padding: 4, fontSize: 18, fontWeight: "bold" }}>
+      <Text style={{ padding: 4, fontSize: 26, fontWeight: "bold" }}>
         {tripName}
       </Text>
       <View style={styles.buttonContainer}>
-        <Button
-          title={i18n.t("cancel")}
-          onPress={joinHandler.bind(this, false)}
-        />
+        <FlatButton onPress={joinHandler.bind(this, false)}>
+          {i18n.t("cancel")}
+        </FlatButton>
         {tripName?.length > 0 && (
           <Button
-            title={i18n.t("confirm2")}
+            style={{ marginLeft: "10%" }}
+            buttonStyle={{ paddingHorizontal: "20%" }}
             onPress={joinHandler.bind(this, true)}
-          />
+          >
+            {i18n.t("confirm2")}
+          </Button>
         )}
       </View>
     </KeyboardAvoidingView>
@@ -160,13 +178,22 @@ const JoinTrip = ({ navigation, route }) => {
 export default JoinTrip;
 
 const styles = StyleSheet.create({
-  container: {
+  card: {
     flex: 1,
-    padding: 40,
+    margin: "10%",
+    marginBottom: "40%",
+    padding: 12,
+    backgroundColor: GlobalStyles.colors.gray500,
+    borderRadius: 10,
+    borderWidth: 1,
+    elevation: 3,
+    borderColor: GlobalStyles.colors.gray600,
+    shadowColor: GlobalStyles.colors.gray600,
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 10,
+
     alignContent: "center",
     alignItems: "center",
-
-    marginBottom: "40%",
   },
   titleContainer: {
     padding: 12,
@@ -178,9 +205,9 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flex: 1,
-    padding: 40,
+    padding: "5%",
+    marginTop: "5%",
     flexDirection: "row",
-    alignContent: "space-between",
   },
   linkInputContainer: {
     flex: 1,

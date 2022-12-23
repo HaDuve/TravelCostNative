@@ -6,18 +6,22 @@ import * as i18nIsoCountries from "i18n-iso-countries";
 import { useState } from "react";
 
 import { GlobalStyles } from "../../constants/styles";
+import * as Localization from "expo-localization";
 
 const CurrencyPicker = ({ countryValue, setCountryValue, onChangeValue }) => {
   // Users Device CountryCode CC to translate Country names in picker
+  // enforce a language we have registered, otherwise, english
+  var CC = Localization.locale.slice(0, 2);
+  if (CC !== "de" && CC !== "en") CC = "en";
 
   const countryToCurrency = require("country-to-currency");
-
   var countries = require("i18n-iso-countries");
-
   i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/en.json"));
+  i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/de.json"));
+
   const countryOptions = Object.keys(countries.getNames("en")).map((code) => ({
-    label: `${countryToCurrency[code]} - ${countries.getName(code, "en")}`,
-    value: `${countryToCurrency[code]} - ${countries.getName(code, "en")}`,
+    label: `${countryToCurrency[code]} - ${countries.getName(code, CC)}`,
+    value: `${countryToCurrency[code]} - ${countries.getName(code, CC)}`,
   }));
 
   const [open, setOpen] = useState(false);
@@ -35,11 +39,18 @@ const CurrencyPicker = ({ countryValue, setCountryValue, onChangeValue }) => {
         onChangeValue={onChangeValue}
         setValue={setCountryValue}
         setItems={setItems}
-        placeholder={"Currency"}
+        placeholder={"EUR - Pick your home Currency / Country"}
         containerStyle={{
           backgroundColor: GlobalStyles.colors.gray500,
+          marginHorizontal: "1%",
+          paddingHorizontal: "1%",
+          paddingRight: "2%",
         }}
         style={{
+          paddingLeft: "-20%",
+          borderRadius: 0,
+          borderWidth: 0,
+          borderBottomWidth: 1,
           backgroundColor: GlobalStyles.colors.gray500,
           borderColor: GlobalStyles.colors.gray700,
         }}

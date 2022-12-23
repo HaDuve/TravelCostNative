@@ -130,23 +130,20 @@ const ProfileForm = ({ navigation, onCancel }) => {
   );
 
   function joinInviteHandler() {
-    // TODO: this hardcoded join
-    navigation.navigate("Join", { id: "-NHs1Goz9sc1Ea69uHUY" });
+    navigation.navigate("Join");
   }
 
-  const freshlyNavigationButtons = (
+  const freshlyNavigationButtons = freshlyCreated && (
     <View style={styles.navButtonContainer}>
       <FlatButton style={[styles.navButton]} onPress={joinInviteHandler}>
         {i18n.t("invitationText")}
       </FlatButton>
-      {freshlyCreated && (
-        <Button
-          style={styles.navButton}
-          onPress={() => navigation.navigate("ManageTrip")}
-        >
-          {i18n.t("createFirstTrip")}
-        </Button>
-      )}
+      <Button
+        style={styles.navButton}
+        onPress={() => navigation.navigate("ManageTrip")}
+      >
+        {i18n.t("createFirstTrip")}
+      </Button>
     </View>
   );
   return (
@@ -198,10 +195,10 @@ const styles = StyleSheet.create({
     minHeight: 250,
   },
   avatarBar: {
-    marginTop: 48,
-    marginHorizontal: 12,
-    padding: 4,
-    minHeight: 60,
+    marginTop: "6%",
+    marginHorizontal: "3%",
+    padding: "1%",
+    minHeight: "20%",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

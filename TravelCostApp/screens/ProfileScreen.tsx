@@ -205,15 +205,17 @@ const styles = StyleSheet.create({
     borderTopColor: GlobalStyles.colors.gray600,
     minHeight: 16,
     backgroundColor: GlobalStyles.colors.gray500,
+    zIndex: -1,
   },
   addButton: {
     backgroundColor: GlobalStyles.colors.primary400,
+    marginBottom: -12,
     flex: 0,
     borderRadius: 999,
     minWidth: "18%",
     paddingTop: "3%",
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 1,
+    zIndex: 0,
   },
 });

@@ -6,6 +6,8 @@ import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NetworkProvider } from "react-native-offline";
 import * as Updates from "expo-updates";
@@ -55,7 +57,7 @@ LogBox.ignoreAllLogs(); //Ignore all log notifications
 
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
-const BottomTabs = createBottomTabNavigator();
+const BottomTabs = createMaterialTopTabNavigator();
 
 const prefix = Linking.createURL("/");
 
@@ -196,6 +198,8 @@ function Home() {
   return (
     <BottomTabs.Navigator
       initialRouteName={FirstScreen}
+      backBehavior={"history"}
+      tabBarPosition={"bottom"}
       screenOptions={({ navigation }) => ({
         headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
         headerTintColor: GlobalStyles.colors.backgroundColor,
@@ -204,6 +208,10 @@ function Home() {
           paddingBottom: 8,
         },
         tabBarActiveTintColor: GlobalStyles.colors.primary500,
+        tabBarIndicatorStyle: {
+          backgroundColor: GlobalStyles.colors.primary500,
+        },
+        tabBarBounces: true,
       })}
     >
       {!FreshlyCreated && (
@@ -211,11 +219,11 @@ function Home() {
           name="RecentExpenses"
           component={RecentExpenses}
           options={{
-            headerShown: false,
+            // headerShown: false,
             // title: "Recent Expenses",
             tabBarLabel: "Expenses",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="ios-list" size={size} color={color} />
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="ios-list" size={22} color={color} />
             ),
           }}
         />
@@ -225,13 +233,13 @@ function Home() {
           name="Overview"
           component={OverviewScreen}
           options={{
-            headerShown: false,
+            // headerShown: false,
             title: "Overview",
             tabBarLabel: "Overview",
-            tabBarIcon: ({ color, size }) => (
+            tabBarIcon: ({ color }) => (
               <Ionicons
                 name="ios-stats-chart-outline"
-                size={size}
+                size={22}
                 color={color}
               />
             ),
@@ -242,11 +250,11 @@ function Home() {
         name="Profile"
         component={ProfileScreen}
         options={{
-          headerShown: false,
+          // headerShown: false,
           title: "Profile",
           tabBarLabel: "Profile",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-circle-outline" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="person-circle-outline" size={22} color={color} />
           ),
         }}
       />
@@ -255,11 +263,11 @@ function Home() {
           name="Settings"
           component={SettingsScreen}
           options={{
-            headerShown: false,
+            // headerShown: false,
             title: "Settings",
             tabBarLabel: "Settings",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="cog-outline" size={size} color={color} />
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="cog-outline" size={22} color={color} />
             ),
           }}
         />

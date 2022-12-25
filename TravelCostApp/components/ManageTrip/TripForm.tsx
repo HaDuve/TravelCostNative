@@ -24,7 +24,7 @@ import Button from "../UI/Button";
 import FlatButton from "../UI/FlatButton";
 import { ExpensesContext } from "../../store/expenses-context";
 import CurrencyPicker from "../Currency/CurrencyPicker";
-// import CurrencyPicker from "react-native-currency-picker";
+import CurrencyInput from "react-currency-input-field";
 
 const TripForm = ({ navigation }) => {
   const tripCtx = useContext(TripContext);
@@ -179,6 +179,7 @@ const TripForm = ({ navigation }) => {
           />
         </View>
       </View>
+      {/* Add Currency Input field */}
       <View style={styles.buttonContainer}>
         <FlatButton onPress={cancelHandler}>Cancel</FlatButton>
         <Button

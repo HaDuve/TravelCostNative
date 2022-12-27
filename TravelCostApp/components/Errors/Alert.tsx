@@ -9,23 +9,22 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-export function alertNoYes(
+export function alertYesNo(
   title: string,
   message: string,
-  onPressNo?: Function,
-  onPressYes?: Function
+  onPressYes,
+  onPressNo?
 ) {
   return Alert.alert(title, message, [
     // The "No" button
-    // Does nothing but dismiss the dialog when tapped
     {
       text: i18n.t("no"),
-      onPress: () => onPressNo,
+      onPress: () => (onPressNo ? onPressNo() : () => {}),
     },
     // The "Yes" button
     {
       text: i18n.t("yes"),
-      onPress: () => onPressYes,
+      onPress: () => onPressYes(),
     },
   ]);
 }

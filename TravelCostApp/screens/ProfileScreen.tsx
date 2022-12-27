@@ -25,6 +25,10 @@ import { en, de } from "../i18n/supportedLanguages";
 import { fetchTrip, fetchTripHistory } from "../util/http";
 import { AuthContext } from "../store/auth-context";
 import React from "react";
+import { Alert } from "react-native";
+import { alertNoYes, alertYesNo } from "../components/Errors/Alert";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Updates from "expo-updates";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -59,6 +63,15 @@ const ProfileScreen = ({ route, navigation, param }) => {
     const tripHistory = await fetchTripHistory(uid);
     console.log("refreshHandler ~ tripHistory", tripHistory);
     allTripsList = tripHistory;
+
+    if (!currentTripid) {
+      if (!tripHistory || !tripHistory[0]) {
+        AuthCtx.logout();
+        Updates.reloadAsync();
+        return;
+      }
+      currentTripid = tripHistory[0];
+    }
     console.log("refreshHandler ~ currentTripid", currentTripid);
     TripCtx.fetchAndSetCurrentTrip(currentTripid);
     addTripFromContext();

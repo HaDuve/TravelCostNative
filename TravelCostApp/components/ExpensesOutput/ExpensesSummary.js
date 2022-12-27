@@ -6,7 +6,7 @@ import { UserContext } from "../../store/user-context";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseString } from "../../util/string";
 import { AuthContext } from "../../store/auth-context";
-import { alertNoYes } from "../Errors/Alert";
+import { alertNoYes, alertYesNo } from "../Errors/Alert";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
   const userCtx = useContext(UserContext);
@@ -68,12 +68,14 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   if (budgetProgress > 1) budgetProgress -= 1;
   if (Number.isNaN(budgetProgress)) {
     console.error("NaN budgetProgress passed to Summary");
-    alertNoYes(
+    alertYesNo(
       "Trip NaN Error",
       "Some Error probably made your Trip unreadable. Do you want to reset this account? (Create New Trip)",
-      authCtx.logout(),
       () => {
         userCtx.setFreshlyCreatedTo(true);
+        authCtx.logout();
+      },
+      () => {
         authCtx.logout();
       }
     );

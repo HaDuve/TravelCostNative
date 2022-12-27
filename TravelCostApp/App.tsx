@@ -309,19 +309,30 @@ function Root() {
       const freshlyCreated = await AsyncStorage.getItem("freshlyCreated");
 
       if (storedToken) {
+        //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
         console.log("storedToken true");
         // check if user was deleted
         const checkUser = await fetchUser(storedUid);
         console.log("onRootMount ~ checkUser", checkUser);
-        // if the user logged in but there is no userName, we deleted the account
+        // Check if the user logged in but there is no userName, we deleted the account
         if (!checkUser || !checkUser.userName) {
           Alert.alert(
-            "Your Account was deleted or AppData was reset, please try to signup with another account!"
+            "Your Account was deleted or AppData was reset, please create a new account!"
           );
           await AsyncStorage.clear();
           setIsTryingLogin(false);
           return;
         }
+        if (checkUser.userName && !checkUser.currentTrip) {
+          userCtx.setFreshlyCreatedTo(true);
+        }
+        if (freshlyCreated) {
+          userCtx.setFreshlyCreatedTo(JSON.parse(freshlyCreated));
+          setIsTryingLogin(false);
+          authCtx.authenticate(storedToken);
+          return;
+        }
+        //// END OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
 
         // setup context
         authCtx.setUserID(storedUid);
@@ -335,15 +346,7 @@ function Root() {
         } catch (error) {
           Alert.alert(error);
         }
-        if (checkUser.userName && !checkUser.currentTrip) {
-          userCtx.setFreshlyCreatedTo(true);
-        }
-        if (freshlyCreated) {
-          userCtx.setFreshlyCreatedTo(JSON.parse(freshlyCreated));
-          setIsTryingLogin(false);
-          authCtx.authenticate(storedToken);
-          return;
-        }
+
         if (storedTripId) {
           // TODO: figure out when we want to save or load from async storage,
           // right now this function seems to be confused

@@ -13,6 +13,7 @@ import {
   fetchUserName,
 } from "../util/http";
 import { TripContext } from "../store/trip-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -25,8 +26,24 @@ function LoginScreen() {
     setIsAuthenticating(true);
     try {
       const { token, uid } = await login(email, password);
-      authCtx.authenticate(token);
+      //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
+      // check if user was deleted
+      const checkUser = await fetchUser(uid);
+      console.log("loginHandler ~ checkUser", checkUser);
+      // Check if the user logged in but there is no userName, we deleted the account
+      if (!checkUser || !checkUser.userName) {
+        Alert.alert(
+          "Your Account was deleted or AppData was reset, please create a new account!"
+        );
+        authCtx.logout();
+      }
+      if (checkUser.userName && !checkUser.currentTrip) {
+        userCtx.setFreshlyCreatedTo(true);
+      }
+      //// END OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
+
       authCtx.setUserID(uid);
+      authCtx.authenticate(token);
       try {
         const userData = await fetchUser(uid);
         const tripid = userData.currentTrip;

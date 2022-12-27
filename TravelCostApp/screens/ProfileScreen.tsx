@@ -26,7 +26,6 @@ import { fetchTrip, fetchTripHistory } from "../util/http";
 import { AuthContext } from "../store/auth-context";
 import React from "react";
 import { Alert } from "react-native";
-import { alertNoYes, alertYesNo } from "../components/Errors/Alert";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Updates from "expo-updates";
 const i18n = new I18n({ en, de });

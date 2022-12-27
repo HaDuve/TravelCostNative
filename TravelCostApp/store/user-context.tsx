@@ -1,5 +1,6 @@
 import { createContext, useReducer, useState } from "react";
 import { Alert } from "react-native";
+import { asyncStoreSetObject } from "./async-storage";
 
 export const UserContext = createContext({
   userName: "",
@@ -68,6 +69,7 @@ function UserContextProvider({ children }) {
   function setFreshlyCreatedTo(bool: boolean) {
     console.log("setFreshlyCreatedTo ~ bool", bool);
     setFreshlyCreated(bool);
+    asyncStoreSetObject("freshlyCreated", bool);
   }
 
   function deleteUser(id: string) {

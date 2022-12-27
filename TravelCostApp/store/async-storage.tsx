@@ -57,7 +57,7 @@ export async function asyncStoreSetItem(
  * @param key The name of the object to be stored
  * @param value The value of the object to be stored
  */
-export async function asyncStoreSetObject(key: string, value: object) {
+export async function asyncStoreSetObject(key: string, value: any) {
   console.log("attempting save in Memory an Obj > ", key + ": " + value);
   try {
     const jsonValue = JSON.stringify(value);

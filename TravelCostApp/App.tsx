@@ -309,10 +309,15 @@ function Root() {
       const freshlyCreated = await AsyncStorage.getItem("freshlyCreated");
 
       if (storedToken) {
+        console.log("storedToken true");
         // check if user was deleted
         const checkUser = await fetchUser(storedUid);
+        console.log("onRootMount ~ checkUser", checkUser);
+        // if the user logged in but there is no userName, we deleted the account
         if (!checkUser || !checkUser.userName) {
-          console.error("no user data stored under this token!");
+          Alert.alert(
+            "Your Account was deleted or AppData was reset, please try to signup with another account!"
+          );
           await AsyncStorage.clear();
           setIsTryingLogin(false);
           return;
@@ -323,19 +328,23 @@ function Root() {
         try {
           const userData = checkUser;
           const tripid = userData.currentTrip;
-          if (!userData) {
-            return;
-          } else {
-            // console.log("onRootMount ~ userData", userData);
-            userCtx.addUser(userData);
-            const tripData = await fetchTrip(tripid);
-            tripCtx.setCurrentTrip(tripid, tripData);
-          }
+          // console.log("onRootMount ~ userData", userData);
+          userCtx.addUser(userData);
+          const tripData = await fetchTrip(tripid);
+          tripCtx.setCurrentTrip(tripid, tripData);
         } catch (error) {
           Alert.alert(error);
         }
+        if (checkUser.userName && !checkUser.currentTrip) {
+          userCtx.setFreshlyCreatedTo(true);
+        }
+        if (freshlyCreated) {
+          userCtx.setFreshlyCreatedTo(JSON.parse(freshlyCreated));
+          setIsTryingLogin(false);
+          authCtx.authenticate(storedToken);
+          return;
+        }
         if (storedTripId) {
-          // console.log("onRootMount ~ storedTripId", storedTripId);
           // TODO: figure out when we want to save or load from async storage,
           // right now this function seems to be confused
           tripCtx.fetchAndSetCurrentTrip(storedTripId);
@@ -344,8 +353,7 @@ function Root() {
           const expenses = await getAllExpenses(storedTripId, storedUid);
           expensesCtx.setExpenses(expenses);
         }
-        if (freshlyCreated)
-          userCtx.setFreshlyCreatedTo(JSON.parse(freshlyCreated));
+
         authCtx.authenticate(storedToken);
       }
 

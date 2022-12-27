@@ -68,8 +68,10 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   if (Number.isNaN(budgetProgress)) {
     console.error("NaN budgetProgress passed to Summary");
     Alert.alert("Could not login, please try again later!");
-    authCtx.logout();
-    return null;
+    // for debugging purposes leave this commented
+    // TODO: fix the isNaN problem
+    // authCtx.logout();
+    return <Text> Error: Number is NAN </Text>;
   }
 
   return (

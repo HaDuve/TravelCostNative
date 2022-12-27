@@ -1,5 +1,11 @@
 Changelog Travel Expense App
 
+1.0.32
+- made screens swipeable
+- implemented Import from Excel for GMR
+- created a reset function to save an account from errors
+- fixed a lot of login bugs
+
 1.0.31
 - (Re-)Added the trip history: Users can now switch freely between multiple trips
 - Replaced the currencyPicker with a selfmade component (Old one prevented Android compiling)

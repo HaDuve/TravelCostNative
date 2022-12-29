@@ -78,6 +78,10 @@ const TripForm = ({ navigation }) => {
       tripid: "",
     };
 
+    // Tripname should not be empty
+    const tripNameIsValid =
+      tripData.tripName !== "" && tripData.tripName.length > 0;
+    // Total budget should be a number between 1 and 3B
     const totalBudgetIsValid =
       !isNaN(tripData.totalBudget) &&
       tripData.totalBudget > 0 &&
@@ -89,11 +93,18 @@ const TripForm = ({ navigation }) => {
       tripData.dailyBudget < 34359738368 &&
       tripData.dailyBudget < tripData.totalBudget;
 
+
+    if (!tripNameIsValid) {
+      inputs.tripName.isValid = tripNameIsValid;
+      Alert.alert("Please enter a Name for your new Trip Budget");
+      return;
+    }
+
     if (!totalBudgetIsValid || !dailyBudgetIsValid) {
       inputs.totalBudget.isValid = totalBudgetIsValid;
       inputs.dailyBudget.isValid = dailyBudgetIsValid;
       Alert.alert(
-        "Budgets are invalid! Please enter positive Numbers (Total Budget cannot be lower than Daily Budget)"
+        "Please enter positive Numbers (Total Budget cannot be lower than Daily Budget)"
       );
       return;
     }

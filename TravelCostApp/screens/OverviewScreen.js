@@ -1,22 +1,19 @@
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 
-import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
-import { getDateMinusDays, toShortFormat } from "../util/date";
-import { fetchExpenses, fetchUser, getAllExpenses } from "../util/http";
+import { toShortFormat } from "../util/date";
+import { getAllExpenses } from "../util/http";
 
 import { StyleSheet, Text, View } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
-import IconButton from "../components/UI/IconButton";
 import ExpensesOverview from "../components/ExpensesOutput/ExpensesOverview";
-import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -66,7 +63,7 @@ const OverviewScreen = ({ navigation }) => {
         const expenses = await getAllExpenses(tripid, uid);
         expensesCtx.setExpenses(expenses);
       } catch (error) {
-        setError(i18n.t("fetchError") + error);
+        console.error(error);
       }
       setIsFetching(false);
     }

@@ -12,9 +12,9 @@ import * as Updates from "expo-updates";
 
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { TripContext } from "../../store/trip-context";
-import { formatExpenseString } from "../../util/string";
+import { formatExpenseString, truncateString } from "../../util/string";
 import {
   fetchTrip,
   fetchTripName,
@@ -40,7 +40,7 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-function TripHistoryItem({ tripid }) {
+function TripHistoryItem({ tripid, setRefreshing }) {
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const expenseCtx = useContext(ExpensesContext);
@@ -54,11 +54,20 @@ function TripHistoryItem({ tripid }) {
   const [dailyBudget, setDailyBudget] = useState("10");
   const [tripCurrency, setTripCurrency] = useState("EUR");
 
-  if (!tripid) return <Text>no id</Text>;
-  if (tripid === tripCtx.tripid) {
-    return <></>;
-  }
   useEffect(() => {
+    if (!tripid) return;
+    async function getTrip() {
+      setIsFetching(true);
+      const trip = await fetchTrip(tripid);
+      // console.log("getTrip ~ trip", trip);
+      const _dailyBudget = trip.dailyBudget;
+      const _totalBudget = trip.totalBudget;
+      const _tripCurrency = trip.tripCurrency;
+      setTotalBudget(_totalBudget);
+      setDailyBudget(_dailyBudget);
+      setTripCurrency(_tripCurrency);
+      setIsFetching(false);
+    }
     async function getTripTravellers() {
       setIsFetching(true);
       try {
@@ -77,11 +86,18 @@ function TripHistoryItem({ tripid }) {
       const name = await fetchTripName(tripid);
       setTripName(name);
     }
+    getTrip(tripid);
     getTripName();
     getTripTravellers();
-  }, []);
+  }, [tripid]);
+
+  if (!tripid) return <Text>no id</Text>;
+  if (tripid === tripCtx.tripid) {
+    return <></>;
+  }
 
   async function joinRoutine(tripid) {
+    setRefreshing(true);
     setIsFetching(true);
     const trip = await fetchTrip(tripid);
     const tripData = trip;
@@ -99,8 +115,8 @@ function TripHistoryItem({ tripid }) {
     const expenses = await getAllExpenses(tripid, uid);
     expenseCtx.setExpenses(expenses);
     setIsFetching(false);
-    // Immediately reload the React Native Bundle
-    Updates.reloadAsync();
+    setRefreshing(false);
+    tripCtx.refresh();
   }
 
   function tripPressHandler() {
@@ -126,7 +142,9 @@ function TripHistoryItem({ tripid }) {
       ? { borderWidth: 1, borderColor: GlobalStyles.colors.primary400 }
       : {};
 
-  const activeProgress = tripCtx.totalSum / totalBudget;
+  // TODO: get sum
+  // const activeProgress = tripCtx.totalSum / totalBudget;
+  const activeProgress = 0;
 
   if (isFetching) {
     return <LoadingOverlay />;
@@ -141,7 +159,7 @@ function TripHistoryItem({ tripid }) {
             {item.item.userName.charAt(0)}
           </Text>
         </View>
-        <Text>{item.item.userName}</Text>
+        <Text>{truncateString(item.item.userName, 10)}</Text>
       </View>
     );
   }
@@ -161,13 +179,13 @@ function TripHistoryItem({ tripid }) {
             <Text style={[styles.textBase, styles.description]}>
               {tripName}
             </Text>
-            {/* <Text style={styles.textBase}>
+            <Text style={styles.textBase}>
               {i18n.t("daily")}
               {": " + dailyBudget}
               {" " + tripCurrency}
-            </Text> */}
+            </Text>
           </View>
-          {/* <View style={styles.amountContainer}>
+          <View style={styles.amountContainer}>
             <Text style={styles.amount}>
               {totalBudget}
               {" " + tripCurrency}
@@ -181,7 +199,7 @@ function TripHistoryItem({ tripid }) {
               height={12}
               width={150}
             />
-          </View> */}
+          </View>
         </View>
         <FlatList
           data={travellers}

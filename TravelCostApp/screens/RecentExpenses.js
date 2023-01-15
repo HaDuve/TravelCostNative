@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
@@ -62,6 +62,7 @@ function RecentExpenses({ navigation }) {
     setRefreshing(true);
     try {
       const expenses = await getAllExpenses(tripid, uid);
+      // console.log("getExpenses ~ expenses", expenses);
       expensesCtx.setExpenses(expenses);
       const expensesSum = expenses.reduce((sum, expense) => {
         return sum + expense.calcAmount;

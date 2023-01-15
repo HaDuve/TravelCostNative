@@ -1,4 +1,6 @@
-import { createContext, useReducer, useState } from "react";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-empty-function */
+import React, { createContext, useReducer, useState } from "react";
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchTrip, getTravellers } from "../util/http";
@@ -12,6 +14,8 @@ export const TripContext = createContext({
   tripCurrency: "",
   totalSum: 0,
   tripProgress: 0,
+  refreshState: false,
+  refresh: () => {},
   setTripProgress: (percent: number) => {},
   travellers: [],
   setCurrentTravellers: (tripid: string) => {},
@@ -35,10 +39,15 @@ function TripContextProvider({ children }) {
   const [dailyBudget, setdailyBudget] = useState("");
   const [totalSum, setTotalSumTrip] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [refreshState, setRefreshState] = useState(false);
 
   function setTripProgress(percent: number) {
     if (percent < 0 || percent > 1) percent = 1;
     setProgress(percent);
+  }
+
+  function refresh() {
+    setRefreshState(!refreshState);
   }
 
   async function setCurrentTravellers(tripid: string) {
@@ -48,13 +57,15 @@ function TripContextProvider({ children }) {
       setTravellers(travellers);
       return true;
     } catch (error) {
-      console.log("setCurrentTravellers ~ error", error);
+      // console.log("setCurrentTravellers ~ error", error);
       return false;
     }
   }
 
   async function setCurrentTrip(tripid: string, trip) {
-    setTripid(tripid);
+    // console.log("setCurrentTrip ~ trip", trip);
+    // console.log("setCurrentTrip ~ tripid", tripid);
+    _setTripid(tripid);
     setTripName(trip.tripName);
     setTotalBudget(trip.totalBudget.toString());
     setTripCurrency(trip.tripCurrency);
@@ -75,7 +86,10 @@ function TripContextProvider({ children }) {
       const trip = await fetchTrip(tripid);
       setCurrentTrip(tripid, trip);
     } catch (error) {
-      console.log("error while fetchCurrent Trip in trip-context");
+      console.warn(
+        "error while fetchCurrent Trip in trip-context searching for ",
+        tripid
+      );
     }
   }
 
@@ -89,6 +103,11 @@ function TripContextProvider({ children }) {
       totalSum: totalSum,
     };
     return curTripData;
+  }
+
+  function _setTripid(tripid: string) {
+    // console.log("_setTripid ~ tripid", tripid);
+    setTripid(tripid);
   }
 
   function addTrip() {
@@ -105,10 +124,13 @@ function TripContextProvider({ children }) {
     tripCurrency: tripCurrency,
     totalSum: totalSum,
     tripProgress: progress,
+    refresh: refresh,
+    refreshState: refreshState,
     setTripProgress: setTripProgress,
     travellers: travellers,
     setCurrentTravellers: setCurrentTravellers,
     setTotalSum: setTotalSum,
+    setTripid: _setTripid,
     addTrip: addTrip,
     deleteTrip: deleteTrip,
     getcurrentTrip: getcurrentTrip,

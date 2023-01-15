@@ -22,7 +22,7 @@
     "expo": "~45.0.0",
     "expo-app-loading": "~2.0.0",
     "expo-document-picker": "~10.2.1",
-    "expo-file-system": "^15.1.1",
+    "expo-file-system": "~14.0.0",
     "expo-linking": "~3.1.0",
     "expo-localization": "~13.0.0",
     "expo-splash-screen": "~0.15.1",
@@ -46,6 +46,7 @@
     "react-native-onboarding-swiper": "^1.2.0",
     "react-native-pager-view": "5.4.15",
     "react-native-progress": "^5.0.0",
+    "react-native-reanimated": "^2.13.0",
     "react-native-restart": "^0.0.24",
     "react-native-safe-area-context": "4.2.4",
     "react-native-screens": "~3.11.1",
@@ -62,6 +63,11 @@
     "@babel/core": "^7.12.9",
     "@types/react": "~17.0.21",
     "@types/react-native": "^0.67.16",
+    "@typescript-eslint/eslint-plugin": "^5.48.0",
+    "@typescript-eslint/parser": "^5.48.0",
+    "eslint": "^8.31.0",
+    "eslint-plugin-react": "^7.31.11",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "typescript": "~4.3.5"
   },
   "private": true

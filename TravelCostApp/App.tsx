@@ -1,19 +1,19 @@
-import React from "react";
+// Debug constant, set to true if you want all storage to be reset and user logged out
+const DEBUG_RESET = false;
 
-import { useContext, useEffect, useState } from "react";
+import React from "react";
+import { useContext, useEffect, useState, useLayoutEffect } from "react";
 import { Alert, Text, SafeAreaView, View, Keyboard } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import * as SplashScreen from "expo-splash-screen";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NetworkProvider } from "react-native-offline";
-import * as Updates from "expo-updates";
 import { Ionicons } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
-import AppLoading from "expo-app-loading";
 import SignupScreen from "./screens/SignupScreen";
 import LoginScreen from "./screens/LoginScreen";
 
@@ -26,12 +26,7 @@ import ExpensesContextProvider, {
 } from "./store/expenses-context";
 import ProfileScreen from "./screens/ProfileScreen";
 import UserContextProvider, { UserContext } from "./store/user-context";
-import {
-  fetchExpenses,
-  fetchUser,
-  fetchTrip,
-  getAllExpenses,
-} from "./util/http";
+import { fetchUser, fetchTrip, getAllExpenses } from "./util/http";
 import TripContextProvider, { TripContext } from "./store/trip-context";
 import TripForm from "./components/ManageTrip/TripForm";
 import OnboardingScreen from "./screens/OnboardingScreen";
@@ -40,27 +35,35 @@ import ShareTripButton from "./components/ProfileOutput/ShareTrip";
 import OverviewScreen from "./screens/OverviewScreen";
 import CategoryPickScreen from "./screens/CategoryPickScreen";
 import SplitSummaryScreen from "./screens/SplitSummaryScreen";
+import SettingsScreen from "./screens/SettingsScreen";
 
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "./i18n/supportedLanguages";
+import {
+  asyncStoreGetItem,
+  asyncStoreGetObject,
+  asyncStoreSafeClear,
+} from "./store/async-storage";
+import { truncateString } from "./util/string";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
 i18n.enableFallback = true;
 
-// NOTE: for alpha testing we leave this here
-import { LogBox } from "react-native";
-import SettingsScreen from "./screens/SettingsScreen";
-LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
-LogBox.ignoreAllLogs(); //Ignore all log notifications
+// // NOTE: for beta testing we leave this here
+// import { LogBox } from "react-native";
+// LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
+// LogBox.ignoreAllLogs(); //Ignore all log notifications
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
 const BottomTabs = createMaterialTopTabNavigator();
 
 const prefix = Linking.createURL("/");
-
 function NotAuthenticatedStack() {
   return (
     <AuthStack.Navigator
@@ -205,11 +208,20 @@ function Home() {
         headerTintColor: GlobalStyles.colors.backgroundColor,
         tabBarStyle: {
           backgroundColor: GlobalStyles.colors.gray500,
-          paddingBottom: 8,
+        },
+        tabBarItemStyle: {
+          // width: "40%",
+          paddingTop: 0,
+          marginBottom: "1%",
+          paddingBottom: "1%",
+        },
+        tabBarLabelStyle: {
+          fontSize: 10,
         },
         tabBarActiveTintColor: GlobalStyles.colors.primary500,
         tabBarIndicatorStyle: {
           backgroundColor: GlobalStyles.colors.primary500,
+          padding: "0,5%",
         },
         tabBarBounces: true,
       })}
@@ -223,7 +235,7 @@ function Home() {
             // title: "Recent Expenses",
             tabBarLabel: "Expenses",
             tabBarIcon: ({ color }) => (
-              <Ionicons name="ios-list" size={22} color={color} />
+              <Ionicons name="ios-list" size={24} color={color} />
             ),
           }}
         />
@@ -239,7 +251,7 @@ function Home() {
             tabBarIcon: ({ color }) => (
               <Ionicons
                 name="ios-stats-chart-outline"
-                size={22}
+                size={24}
                 color={color}
               />
             ),
@@ -254,7 +266,7 @@ function Home() {
           title: "Profile",
           tabBarLabel: "Profile",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="person-circle-outline" size={22} color={color} />
+            <Ionicons name="person-circle-outline" size={24} color={color} />
           ),
         }}
       />
@@ -267,7 +279,7 @@ function Home() {
             title: "Settings",
             tabBarLabel: "Settings",
             tabBarIcon: ({ color }) => (
-              <Ionicons name="cog-outline" size={22} color={color} />
+              <Ionicons name="cog-outline" size={24} color={color} />
             ),
           }}
         />
@@ -289,7 +301,7 @@ function Root() {
     };
   }
 
-  const [isTryingLogin, setIsTryingLogin] = useState(true);
+  const [appIsReady, setAppIsReady] = useState(false);
 
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
@@ -298,40 +310,54 @@ function Root() {
 
   useEffect(() => {
     async function onRootMount() {
-      // console.log("onRootMount ~ onRootMount");
-      // NOTE: uncomment below for memory/login debugging // flush memory
-      // await AsyncStorage.clear();
+      console.log("onRootMount ~ onRootMount");
+      if (DEBUG_RESET) await asyncStoreSafeClear();
 
       // fetch token and trip
-      const storedToken = await AsyncStorage.getItem("token");
-      const storedUid = await AsyncStorage.getItem("uid");
-      const storedTripId = await AsyncStorage.getItem("currentTripId");
-      const freshlyCreated = await AsyncStorage.getItem("freshlyCreated");
+      const storedToken = await asyncStoreGetItem("token");
+      const storedUid = await asyncStoreGetItem("uid");
+      const storedTripId = await asyncStoreGetItem("currentTripId");
+      const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
+
+      console.log(
+        "store loads: ",
+        truncateString(storedToken, 10),
+        truncateString(storedUid, 10),
+        truncateString(storedTripId, 10),
+        freshlyCreated
+      );
 
       if (storedToken) {
         //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
-        console.log("storedToken true");
+        // check if user was only freshly created
+        if (freshlyCreated) {
+          userCtx.setFreshlyCreatedTo(freshlyCreated);
+          console.log("storedFreshlyCreated: ", freshlyCreated);
+        }
         // check if user was deleted
+        console.log("onRootMount ~ calling fetchUser");
         const checkUser = await fetchUser(storedUid);
-        console.log("onRootMount ~ checkUser", checkUser);
+        // console.log("onRootMount ~ fetchUser", checkUser);
         // Check if the user logged in but there is no userName, we deleted the account
         if (!checkUser || !checkUser.userName) {
           Alert.alert(
             "Your Account was deleted or AppData was reset, please create a new account!"
           );
           await AsyncStorage.clear();
-          setIsTryingLogin(false);
+          setAppIsReady(true);
           return;
         }
         if (checkUser.userName && !checkUser.currentTrip) {
           userCtx.setFreshlyCreatedTo(true);
         }
-        if (freshlyCreated) {
-          userCtx.setFreshlyCreatedTo(JSON.parse(freshlyCreated));
-          setIsTryingLogin(false);
-          authCtx.authenticate(storedToken);
-          return;
-        }
+        // TODO: fix status when user disconnedcted while freshlyCreated=true
+        // console.log("onRootMount ~ freshlyCreated", freshlyCreated);
+        // if (freshlyCreated === true) {
+        //   userCtx.setFreshlyCreatedTo(JSON.parse(freshlyCreated));
+        //   setAppIsReady(true);
+        //   authCtx.authenticate(storedToken);
+        //   return;
+        // }
         //// END OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
 
         // setup context
@@ -358,16 +384,25 @@ function Root() {
         }
 
         authCtx.authenticate(storedToken);
+      } else {
+        authCtx.logout();
       }
 
-      setIsTryingLogin(false);
+      setAppIsReady(true);
     }
 
     onRootMount();
   }, []);
 
-  if (isTryingLogin) {
-    return <AppLoading />;
+  useLayoutEffect(() => {
+    async function hideSplashScreen() {
+      await SplashScreen.hideAsync();
+    }
+    hideSplashScreen();
+  }, [appIsReady]);
+
+  if (!appIsReady) {
+    return null;
   }
 
   return <Navigation />;

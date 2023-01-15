@@ -57,7 +57,7 @@ export async function asyncStoreSetItem(
  * @param key The name of the object to be stored
  * @param value The value of the object to be stored
  */
-export async function asyncStoreSetObject(key: string, value: any) {
+export async function asyncStoreSetObject(key: string, value: unknown) {
   console.log("attempting save in Memory an Obj > ", key + ": " + value);
   try {
     const jsonValue = JSON.stringify(value);
@@ -74,8 +74,10 @@ export async function asyncStoreSetObject(key: string, value: any) {
  * first calls getAllKeys() and then multiremove(keys)
  */
 export async function asyncStoreSafeClear() {
+  console.log("attempting to clear all async stored Memory > ");
+  let keys: readonly string[];
   try {
-    var keys = await AsyncStorage.getAllKeys();
+    keys = await AsyncStorage.getAllKeys();
   } catch (error) {
     // read key error
     console.error(error);

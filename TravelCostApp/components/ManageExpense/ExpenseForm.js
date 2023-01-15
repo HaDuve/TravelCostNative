@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   Alert,
   StyleSheet,
@@ -687,7 +687,6 @@ const ExpenseForm = ({
                 <Text
                   style={[
                     styles.currencyLabel,
-                    ,
                     { marginTop: 16, marginLeft: 16 },
                   ]}
                 >

@@ -119,7 +119,7 @@ export function splitTypesDropdown() {
 }
 
 export function travellerToDropdown(travellers) {
-  console.log("travellerToDropdown ~ travellers", travellers);
+  // console.log("travellerToDropdown ~ travellers", travellers);
   if (!travellers || travellers?.length < 1) {
     console.log("travellertodropdown failed");
     return [];
@@ -191,7 +191,7 @@ export function simplifySplits(openSplits) {
   });
 
   const splits = Splitwise(listOfSplits);
-  console.log("simplifySplits ~ splits", splits);
+  // console.log("simplifySplits ~ splits", splits);
   const simplifiedItems = [];
   splits.forEach((simpleSplit) => {
     const from = simpleSplit[0];

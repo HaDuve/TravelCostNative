@@ -1,5 +1,4 @@
 import axios from "axios";
-import { truncateString } from "./string";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -10,11 +9,11 @@ const BACKEND_URL =
 // });
 
 /** ACCESS TOKEN */
-var QPAR: string = "";
+let QPAR = "";
 /** Sets the ACCESS TOKEN for all future http requests */
 export function setAxiosAccessToken(token: string) {
   if (!token || token.length < 2) {
-    console.error("wrong token error");
+    console.error("https: ~ wrong token error");
     return;
   }
   QPAR = `?auth=${token}`;
@@ -47,29 +46,42 @@ axios.interceptors.request.use(
  * @returns id
  */
 export async function storeExpense(tripid: string, uid: string, expenseData) {
-  // console.log("storeExpense ~ uid", uid);
-  // console.log("storeExpense ~ tripid", tripid);
+  // console.log("https: ~ storeExpense ~ uid", uid);
+  // console.log("https: ~ storeExpense ~ tripid", tripid);
   // TODO: create expenseData interface for TypeScript
-  const response = await axios.post(
-    BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json" + QPAR,
-    expenseData
-  );
-  const id = response.data.name;
-  return id;
+  try {
+    const response = await axios.post(
+      BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json" + QPAR,
+      expenseData
+    );
+    const id = response.data.name;
+    return id;
+  } catch (error) {
+    console.warn(error);
+    return null;
+  }
 }
 
 export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
-  // console.log("fetchExpensesWithUIDs ~ uidlist", uidlist);
-  // console.log("fetchExpensesWithUIDs ~ tripid", tripid);
+  // console.log(
+  // "https: ~ fetchExpensesWithUIDs ~ uidlist",
+  // uidlist,
+  // "tripid",
+  // tripid
+  // );
   const expenses = [];
   if (!tripid || !uidlist) return expenses;
 
   const axios_calls = [];
   uidlist.forEach((uid) => {
-    const new_axios_call = axios.get(
-      BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json" + QPAR
-    );
-    axios_calls.push(new_axios_call);
+    try {
+      const new_axios_call = axios.get(
+        BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json" + QPAR
+      );
+      axios_calls.push(new_axios_call);
+    } catch (error) {
+      console.warn("error while fetchingExpenses of user: ", uid, error);
+    }
   });
   const responseArray = await Promise.all(axios_calls);
   responseArray.forEach((response) => {
@@ -99,31 +111,35 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
 }
 
 export async function fetchExpenses(tripid: string, uid: string) {
-  // console.log("fetchExpenses ~ uid", uid);
-  // console.log("fetchExpenses ~ tripid", tripid);
-  const response = await axios.get(
-    BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json" + QPAR
-  );
-  const expenses = [];
+  // console.log("https: ~ fetchExpenses ~ tripid", tripid, "uid", uid);
+  try {
+    const response = await axios.get(
+      BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json" + QPAR
+    );
+    const expenses = [];
 
-  for (const key in response.data) {
-    const expenseObj = {
-      id: key,
-      amount: response.data[key].amount,
-      date: new Date(response.data[key].date),
-      description: response.data[key].description,
-      category: response.data[key].category,
-      country: response.data[key].country,
-      currency: response.data[key].currency,
-      whoPaid: response.data[key].whoPaid,
-      owePerc: response.data[key].owePerc,
-      uid: response.data[key].uid,
-      calcAmount: response.data[key].calcAmount,
-    };
-    expenses.push(expenseObj);
+    for (const key in response.data) {
+      const expenseObj = {
+        id: key,
+        amount: response.data[key].amount,
+        date: new Date(response.data[key].date),
+        description: response.data[key].description,
+        category: response.data[key].category,
+        country: response.data[key].country,
+        currency: response.data[key].currency,
+        whoPaid: response.data[key].whoPaid,
+        owePerc: response.data[key].owePerc,
+        uid: response.data[key].uid,
+        calcAmount: response.data[key].calcAmount,
+      };
+      expenses.push(expenseObj);
+    }
+
+    return expenses;
+  } catch (error) {
+    console.warn(error);
+    return [];
   }
-
-  return expenses;
 }
 
 export function updateExpense(
@@ -132,8 +148,7 @@ export function updateExpense(
   id: string,
   expenseData
 ) {
-  console.log("uid", uid);
-  console.log("tripid", tripid);
+  // console.log("updateExpense ~ expenseData", expenseData);
   //TODO: create expenseData Interface for TypeScript
   return axios.put(
     BACKEND_URL +
@@ -149,7 +164,7 @@ export function updateExpense(
 }
 
 export function deleteExpense(tripid: string, uid: string, id: string) {
-  // console.log("deleteExpense ~ tripid", tripid);
+  // console.log("https: ~ deleteExpense ~ tripid", tripid);
   return axios.delete(
     BACKEND_URL +
       "/trips/" +
@@ -169,42 +184,47 @@ export function deleteExpense(tripid: string, uid: string, id: string) {
  * @returns uid
  */
 export async function storeUser(uid: string, userData: object) {
-  // console.log("storeUser ~ userData", userData);
-  const response = await axios.post(
-    BACKEND_URL + "/users/" + `${uid}`,
-    userData
-  );
-  const id = response.data.name;
-  return id;
-}
-
-export async function saveUserCorrectly(uid: string, userName: string) {
-  // console.log("saveUserCorrectly ~ userName", userName);
-  const response = await axios.post(
-    BACKEND_URL + "/users/" + `${uid}`,
-    userName + "2"
-  );
-  const id = response.data.name;
-  return id;
+  // console.log("https: ~ storeUser ~ userData", userData);
+  try {
+    const response = await axios.post(
+      BACKEND_URL + "/users/" + `${uid}`,
+      userData
+    );
+    const id = response.data.name;
+    return id;
+  } catch (error) {
+    console.warn(error);
+    return null;
+  }
 }
 
 /**
  * Updates User via axios.patch given uid and userdata to patch
  */
 export function updateUser(uid: string, userData: object) {
+  // console.log("updateUser ~ userData", userData);
   return axios.patch(BACKEND_URL + "/users/" + `${uid}.json` + QPAR, userData);
 }
 
 export async function fetchUser(uid: string) {
-  // console.log("fetchUser ~ uid", uid);
-  const response = await axios.get(
-    BACKEND_URL + "/users/" + `${uid}.json` + QPAR
-  );
-  return response.data;
+  // console.log("https: ~ fetchUser ~ uid", uid);
+  if (!uid) {
+    console.warn("https: ~ fetchUser ~ uid is empty");
+    return null;
+  }
+  try {
+    const response = await axios.get(
+      BACKEND_URL + "/users/" + `${uid}.json` + QPAR
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 }
 
 export async function storeTrip(tripData) {
-  // console.log("storeTrip ~ tripData", tripData);
+  // console.log("https: ~ storeTrip ~ tripData", tripData);
   //TODO: create tripData Interface for TypeScript
   const response = await axios.post(
     BACKEND_URL + "/trips.json" + QPAR,
@@ -215,7 +235,8 @@ export async function storeTrip(tripData) {
 }
 
 export async function fetchTrip(tripid: string) {
-  // console.log("fetchTrip ~ tripid", tripid);
+  if (!tripid) return null;
+  // console.log("https: ~ fetchTrip ~ tripid", tripid);
   const response = await axios.get(
     BACKEND_URL + "/trips/" + `${tripid}.json` + QPAR
   );
@@ -223,8 +244,21 @@ export async function fetchTrip(tripid: string) {
 }
 
 export async function storeTravellerToTrip(tripid: string, traveller) {
-  // console.log("storeTravellerToTrip ~ traveller", traveller);
+  // console.log("https: ~ storeTravellerToTrip ~ traveller", traveller);
   // TODO: add traveller interface for TypeScript ({ userName: userName, uid: uid })
+
+  // TODO: check if Traveller already exists
+  const listTravellers = await getTravellers(tripid);
+  const objTravellers = [];
+  listTravellers.forEach((traveller) => {
+    objTravellers.push({ userName: traveller });
+  });
+  console.warn("~~~~~~ storeTravellerToTrip ~ objTravellers", objTravellers);
+  // // look for newTripid inside of oldTripHistory
+  if (objTravellers.indexOf(traveller.userName) > -1) {
+    console.log(traveller.userName + " already exists");
+    return;
+  }
   const response = await axios.post(
     BACKEND_URL + `/trips/${tripid}/travellers.json` + QPAR,
     traveller
@@ -233,6 +267,7 @@ export async function storeTravellerToTrip(tripid: string, traveller) {
 }
 
 export async function fetchTripsTravellers(tripid: string) {
+  // console.log("fetchTripsTravellers ~ tripid", tripid);
   const response = await axios.get(
     BACKEND_URL + `/trips/${tripid}/travellers.json` + QPAR
   );
@@ -240,10 +275,11 @@ export async function fetchTripsTravellers(tripid: string) {
 }
 
 export async function getTravellers(tripid: string) {
+  // console.log("getTravellers ~ tripid", tripid);
   const response = await fetchTripsTravellers(tripid);
-  let travellerids = [];
-  let travellers = [];
-  for (let key in response) {
+  const travellerids = [];
+  const travellers = [];
+  for (const key in response) {
     const traveller = response[key].userName;
     const uid = response[key].uid;
     if (
@@ -260,9 +296,10 @@ export async function getTravellers(tripid: string) {
 }
 
 export async function getUIDs(tripid: string) {
+  // console.log("getUIDs ~ tripid", tripid);
   const response = await fetchTripsTravellers(tripid);
-  let travellerids: string[] = [];
-  for (let key in response) {
+  const travellerids: string[] = [];
+  for (const key in response) {
     const uid = response[key].uid;
     if (!travellerids.includes(uid) && uid && uid.length > 0) {
       travellerids.push(uid);
@@ -272,7 +309,8 @@ export async function getUIDs(tripid: string) {
 }
 
 export async function getAllExpenses(tripid: string, uid?: string) {
-  // console.log("getAllExpenses ~ tripid", tripid);
+  // console.log("~~ https: ~ getAllExpenses ~ tripid", tripid);
+  // console.log("~~ https: ~ getAllExpenses ~ uid", uid);
   const uids = await getUIDs(tripid);
   if (uids.length < 1) uids.push(uid);
   const expenses = await fetchExpensesWithUIDs(tripid, uids);
@@ -280,6 +318,7 @@ export async function getAllExpenses(tripid: string, uid?: string) {
 }
 
 export async function updateTripHistory(userId: string, newTripid: string) {
+  // console.log("updateTripHistory ~ newTripid", newTripid);
   const tripHistory = await fetchTripHistory(userId);
   // look for newTripid inside of oldTripHistory
   if (tripHistory.indexOf(newTripid) > -1) return;
@@ -291,6 +330,7 @@ export async function updateTripHistory(userId: string, newTripid: string) {
 }
 
 export async function storeTripHistory(userId: string, tripHistory: string[]) {
+  // console.log("storeTripHistory ~ tripHistory", tripHistory);
   const response = await axios.put(
     BACKEND_URL + `/users/${userId}/tripHistory.json` + QPAR,
     tripHistory
@@ -299,6 +339,7 @@ export async function storeTripHistory(userId: string, tripHistory: string[]) {
 }
 
 export async function fetchTripHistory(userId: string) {
+  // console.log("fetchTripHistory ~ userId", userId);
   const response = await axios.get(
     BACKEND_URL + `/users/${userId}/tripHistory.json` + QPAR
   );
@@ -306,13 +347,13 @@ export async function fetchTripHistory(userId: string) {
 }
 
 export async function fetchCurrentTrip(userId: string) {
-  // console.log("fetchCurrentTrip ~ userId", userId);
+  // console.log("https: ~ fetchCurrentTrip ~ userId", userId);
   const response = await axios.get(
     BACKEND_URL + `/users/${userId}.json` + QPAR
   );
-  // console.log("fetchCurrentTrip ~ response", response.data);
+  // console.log("https: ~ fetchCurrentTrip ~ response", response.data);
   if (!response?.data?.currentTrip)
-    console.warn("could not find current trip of this user!");
+    console.warn("https: ~ could not find current trip of this user!");
   return response.data.currentTrip;
 }
 
@@ -320,7 +361,7 @@ export async function fetchUserName(userId: string): Promise<string> {
   const response = await axios.get(
     BACKEND_URL + `/users/${userId}.json` + QPAR
   );
-  // console.log("fetchUserName ~ response", response.data);
+  // console.log("https: ~ fetchUserName ~ response", response.data);
   return response.data.userName;
 }
 

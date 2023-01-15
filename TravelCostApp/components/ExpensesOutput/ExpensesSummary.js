@@ -9,24 +9,19 @@ import { AuthContext } from "../../store/auth-context";
 import { alertNoYes, alertYesNo } from "../Errors/Alert";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
+  // console.log("ExpensesSummary ~ expenses", expenses);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const authCtx = useContext(AuthContext);
+  if (!expenses || !periodName || tripCtx.tripid === "") return <></>;
+
   const expensesSum = expenses.reduce((sum, expense) => {
-    return sum + expense.calcAmount;
+    return sum + Number(expense.calcAmount);
   }, 0);
+  // console.log("expensesSum ~ expensesSum", expensesSum);
 
   const expensesSumString = formatExpenseString(expensesSum);
   const userCurrency = tripCtx.tripCurrency;
-  if (tripCtx.tripid === "")
-    return (
-      <View style={styles.container}>
-        <Text style={[styles.sum, { color: budgetColor }]}>
-          {expensesSumString}
-          {userCurrency}
-        </Text>
-      </View>
-    );
   let dailyBudgetNum = Number(tripCtx.dailyBudget);
   const expenseSumNum = Number(expensesSum);
   const totalBudget = Number(tripCtx.totalBudget);
@@ -67,18 +62,18 @@ const ExpensesSummary = ({ expenses, periodName }) => {
 
   if (budgetProgress > 1) budgetProgress -= 1;
   if (Number.isNaN(budgetProgress)) {
-    console.error("NaN budgetProgress passed to Summary");
-    alertYesNo(
-      "Trip NaN Error",
-      "Some Error probably made your Trip unreadable. Do you want to reset this account? (Create New Trip)",
-      () => {
-        userCtx.setFreshlyCreatedTo(true);
-        authCtx.logout();
-      },
-      () => {
-        authCtx.logout();
-      }
-    );
+    console.log("NaN budgetProgress passed to Summary");
+    // alertYesNo(
+    //   "Trip NaN Error",
+    //   "Some Error probably made your Trip unreadable. Do you want to reset this account? (Create New Trip)",
+    //   () => {
+    //     userCtx.setFreshlyCreatedTo(true);
+    //     authCtx.logout();
+    //   },
+    //   () => {
+    //     authCtx.logout();
+    //   }
+    // );
     return <Text> Error: Number is NAN </Text>;
   }
 

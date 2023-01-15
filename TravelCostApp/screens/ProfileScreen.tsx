@@ -1,102 +1,80 @@
+/* eslint-disable react/prop-types */
 import {
   Dimensions,
   RefreshControl,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { GlobalStyles } from "../constants/styles";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import IconButton from "../components/UI/IconButton";
-import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
 import { TripContext } from "../store/trip-context";
-import Button from "../components/UI/Button";
 import { UserContext } from "../store/user-context";
 import { onShare } from "../components/ProfileOutput/ShareTrip";
-import { NetworkConsumer } from "react-native-offline";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
-import { fetchTrip, fetchTripHistory } from "../util/http";
+import { fetchTrip, fetchTripHistory, fetchUser } from "../util/http";
 import { AuthContext } from "../store/auth-context";
 import React from "react";
-import { Alert } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Updates from "expo-updates";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-const ProfileScreen = ({ route, navigation, param }) => {
+const ProfileScreen = ({ navigation }) => {
   const UserCtx = useContext(UserContext);
   const FreshlyCreated = UserCtx.freshlyCreated;
+  // // // console.log("ProfileScreen ~ FreshlyCreated", FreshlyCreated);
   const TripCtx = useContext(TripContext);
   const AuthCtx = useContext(AuthContext);
   const uid = AuthCtx.uid;
 
   const [refreshing, setRefreshing] = useState(false);
 
-  let currentTripid = TripCtx.tripid;
   let allTripsList = [];
   const [tripsList, setTripsList] = useState([]);
 
   useEffect(() => {
+    if (FreshlyCreated) return;
     refreshHandler();
-  }, []);
-
-  useEffect(() => {
-    const focusHandler = navigation.addListener("focus", async () => {
-      await refreshHandler();
-    });
-    return focusHandler;
-  }, [navigation]);
+  }, [TripCtx.refreshState]);
 
   async function refreshHandler() {
+    if (FreshlyCreated) return;
     allTripsList = [];
     const tripHistory = await fetchTripHistory(uid);
-    console.log("refreshHandler ~ tripHistory", tripHistory);
-    allTripsList = tripHistory;
-
-    if (!currentTripid) {
-      if (!tripHistory || !tripHistory[0]) {
-        AuthCtx.logout();
-        Updates.reloadAsync();
-        return;
-      }
-      currentTripid = tripHistory[0];
+    if (!tripHistory.length) {
+      console.log("no tripHistory fetched");
+      return;
     }
-    console.log("refreshHandler ~ currentTripid", currentTripid);
-    TripCtx.fetchAndSetCurrentTrip(currentTripid);
+    allTripsList = [...tripHistory];
+    TripCtx.fetchAndSetCurrentTrip(TripCtx.tripid);
     addTripFromContext();
+    allTripsList.forEach((trip) => {
+      // console.log("allTripsList ~ trip.tripName", trip.tripName);
+      // console.log("allTripsList ~ trip.tripid", trip.tripid);
+    });
+    // console.log("allTripsList length: ", allTripsList.length);
+    setTripsList(allTripsList.reverse());
   }
-
   function addTripFromContext() {
     if (!TripCtx.tripid || TripCtx.tripid.length < 1) return;
+    allTripsList = allTripsList.filter((trip) => trip !== TripCtx.tripid);
     allTripsList.push({
-      tripid: currentTripid,
+      tripid: TripCtx.tripid,
       tripName: TripCtx.tripName,
       totalBudget: TripCtx.totalBudget,
       dailyBudget: TripCtx.dailyBudget,
       tripCurrency: TripCtx.tripCurrency,
       travellers: TripCtx.travellers,
     });
-
-    allTripsList.forEach((trip) => {
-      console.log(" ~ trip.tripName", trip.tripName);
-      console.log(" ~ trip.tripid", trip.tripid);
-    });
-    console.log("allTripsList length: ", allTripsList.length);
-    setTripsList(allTripsList.reverse());
-  }
-
-  function cancelHandler() {
-    console.log("canceled");
   }
 
   const visibleContent = FreshlyCreated ? (
@@ -119,6 +97,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
 
         <TripList
           trips={tripsList}
+          setRefreshing={setRefreshing}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -136,7 +115,7 @@ const ProfileScreen = ({ route, navigation, param }) => {
             size={42}
             color={"white"}
             onPress={() => {
-              onShare(currentTripid, navigation);
+              onShare(TripCtx.tripid, navigation);
             }}
           />
         </View>
@@ -147,18 +126,8 @@ const ProfileScreen = ({ route, navigation, param }) => {
 
   return (
     <View style={styles.container}>
-      {/* NOTE: this commented pattern can be used, to maintain offline/online //
-      behavior */}
-      {/* <NetworkConsumer>
-        {({ isConnected }) =>
-          isConnected ? <Text>Online</Text> : <Text>Offline</Text>
-        }
-      </NetworkConsumer> */}
       <View style={styles.innerContainer}>
-        <ProfileForm
-          navigation={navigation}
-          onCancel={cancelHandler}
-        ></ProfileForm>
+        <ProfileForm navigation={navigation}></ProfileForm>
       </View>
       {visibleContent}
     </View>

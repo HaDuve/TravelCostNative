@@ -49,8 +49,9 @@ export default OnboardingScreen;
 
 const styles = StyleSheet.create({
   titleStyle: {
-    paddingHorizontal: 40,
-    fontSize: 32,
+    paddingHorizontal: "10%",
+    marginTop: "-10%",
+    fontSize: 28,
     fontWeight: "bold",
   },
 });

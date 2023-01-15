@@ -1,26 +1,14 @@
-import { useState, useContext, useEffect } from "react";
-import {
-  View,
-  Text,
-  Alert,
-  Keyboard,
-  Dimensions,
-  Pressable,
-} from "react-native";
+/* eslint-disable react/prop-types */
+/* eslint-disable react/react-in-jsx-scope */
+import { useState, useContext } from "react";
+import { View, Text, Alert, Keyboard, Pressable } from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
 import { UserContext } from "../../store/user-context";
-import {
-  fetchTripsTravellers,
-  fetchUser,
-  getTravellers,
-  updateUser,
-} from "../../util/http";
+import { updateUser } from "../../util/http";
 
 import Input from "../ManageExpense/Input";
-import ErrorOverlay from "../UI/ErrorOverlay";
-import LoadingOverlay from "../UI/LoadingOverlay";
 import IconButton from "../UI/IconButton";
 import Button from "../UI/Button";
 import { TripContext } from "../../store/trip-context";
@@ -35,10 +23,9 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-const ProfileForm = ({ navigation, onCancel }) => {
+const ProfileForm = ({ navigation }) => {
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
-  const TripCtx = useContext(TripContext);
   const freshlyCreated = UserCtx.freshlyCreated;
 
   function logoutHandler() {
@@ -73,7 +60,7 @@ const ProfileForm = ({ navigation, onCancel }) => {
     });
   }
 
-  async function submitHandler(e) {
+  async function submitHandler() {
     const userData = {};
     userData.userName = inputs.userName.value;
 

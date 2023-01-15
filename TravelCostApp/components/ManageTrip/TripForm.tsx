@@ -5,9 +5,6 @@ import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
 import {
-  fetchExpenses,
-  fetchUser,
-  getAllExpenses,
   storeTrip,
   storeTripHistory,
   storeTravellerToTrip,
@@ -25,6 +22,7 @@ import FlatButton from "../UI/FlatButton";
 import { ExpensesContext } from "../../store/expenses-context";
 import CurrencyPicker from "../Currency/CurrencyPicker";
 import CurrencyInput from "react-currency-input-field";
+import { asyncStoreSetItem } from "../../store/async-storage";
 
 const TripForm = ({ navigation }) => {
   const tripCtx = useContext(TripContext);
@@ -109,12 +107,13 @@ const TripForm = ({ navigation }) => {
     }
 
     const tripid = await storeTrip(tripData);
-    storeTravellerToTrip(tripid, { userName: userName, uid: uid });
+    asyncStoreSetItem("currentTripId", tripid);
+    await storeTravellerToTrip(tripid, { userName: userName, uid: uid });
 
     const newTripData = await fetchTrip(tripid);
 
     tripCtx.setCurrentTrip(tripid, newTripData);
-    // if fresh store history else update
+    // if fresh store TripHistory else update TripHistory
     if (userCtx.freshlyCreated) {
       await storeTripHistory(uid, [tripid]);
     } else {
@@ -129,9 +128,8 @@ const TripForm = ({ navigation }) => {
     userCtx.setFreshlyCreatedTo(false);
     expenseCtx.setExpenses([]);
 
-    // Immediately reload the React Native Bundle
-    Updates.reloadAsync();
-    return <></>;
+    tripCtx.refresh();
+    navigation.navigate("RecentExpenses");
   }
 
   function updateCurrency() {
@@ -210,13 +208,13 @@ export default TripForm;
 const styles = StyleSheet.create({
   form: {
     flex: 1,
-    padding: 12,
+    padding: "2%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   card: {
     flex: 1,
-    margin: 16,
-    padding: 12,
+    margin: "4%",
+    padding: "4%",
     backgroundColor: GlobalStyles.colors.gray500,
     borderRadius: 10,
     borderWidth: 1,
@@ -228,6 +226,7 @@ const styles = StyleSheet.create({
   },
   currencyPickerContainer: {
     flex: 1,
+    marginBottom: "4%",
   },
   title: {
     fontSize: 24,
@@ -252,12 +251,11 @@ const styles = StyleSheet.create({
     margin: 8,
   },
   buttonContainer: {
-    flex: 1,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    marginTop: 8,
-    marginLeft: 12,
+    marginVertical: "20%",
+    marginHorizontal: "10%",
   },
   button: {
     minWidth: 120,

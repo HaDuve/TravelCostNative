@@ -5,18 +5,15 @@ import {
   View,
   FlatList,
   Alert,
-  Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { TripContext } from "../../store/trip-context";
-import { formatExpenseString } from "../../util/string";
-import { fetchTrip, getTravellers } from "../../util/http";
-import { onShare } from "./ShareTrip";
-import { calcOpenSplitsTable } from "../../util/split";
+import { truncateString } from "../../util/string";
+import { getTravellers } from "../../util/http";
 import LoadingOverlay from "../UI/LoadingOverlay";
 
 //Localization
@@ -105,7 +102,7 @@ function TripItem({
             {item.item.userName.charAt(0)}
           </Text>
         </View>
-        <Text>{item.item.userName}</Text>
+        <Text>{truncateString(item.item.userName, 10)}</Text>
       </View>
     );
   }

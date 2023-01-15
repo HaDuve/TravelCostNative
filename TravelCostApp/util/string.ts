@@ -1,4 +1,5 @@
 export function formatExpenseString(amount: number) {
+  if (!amount) return "0 ";
   let expensesSumString = amount.toFixed(2) + " ";
   if (amount.toFixed(2).toString().length > 5)
     expensesSumString = amount.toFixed(0).toString() + " ";

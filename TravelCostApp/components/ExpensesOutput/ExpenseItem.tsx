@@ -61,6 +61,8 @@ function ExpenseItem({
     <></>
   );
 
+  if (!id) return <></>;
+
   return (
     <Pressable
       onPress={expensePressHandler}

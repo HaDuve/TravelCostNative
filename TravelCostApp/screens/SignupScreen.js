@@ -1,17 +1,14 @@
+/* eslint-disable react/react-in-jsx-scope */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useContext, useState } from "react";
 import { Alert } from "react-native";
 
 import AuthContent from "../components/Auth/AuthContent";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
+import { asyncStoreSafeClear } from "../store/async-storage";
 import { UserContext } from "../store/user-context";
 import { createUser } from "../util/auth";
-import {
-  fetchUser,
-  saveUserCorrectly,
-  storeUser,
-  updateUser,
-} from "../util/http";
+import { storeUser, updateUser } from "../util/http";
 import { AuthContext } from "./../store/auth-context";
 
 function SignupScreen() {
@@ -24,7 +21,7 @@ function SignupScreen() {
     try {
       const { token, uid } = await createUser(email, password);
       //CLEAR
-      await AsyncStorage.clear();
+      asyncStoreSafeClear();
       userCtx.setTripHistory([]);
       //NEW
       const userData = { userName: name };

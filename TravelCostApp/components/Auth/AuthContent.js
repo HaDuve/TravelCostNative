@@ -63,7 +63,7 @@ function AuthContent({ isLogin, onAuthenticate }) {
       />
       <View style={styles.buttons}>
         <Text style={styles.secondaryText}>
-          {isLogin ? "Already have an account?" : "Don't have an account?"}
+          {isLogin ? "Don't have an account?" : "Already have an account?"}
         </Text>
         <FlatButton onPress={switchAuthModeHandler}>
           {isLogin ? "Create a new user" : "Log in instead"}
@@ -77,9 +77,11 @@ export default AuthContent;
 
 const styles = StyleSheet.create({
   authContent: {
-    marginTop: "5%",
+    padding: "6%",
+    marginTop: "10%",
+    marginBottom: "8%",
     marginHorizontal: "6%",
-    padding: "4%",
+
     borderRadius: 8,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     elevation: 2,
@@ -90,14 +92,14 @@ const styles = StyleSheet.create({
   },
   buttons: {
     flexDirection: "row",
-    marginTop: 8,
+    marginTop: "4%",
     alignItems: "center",
     justifyContent: "center",
   },
   secondaryText: {
     fontSize: 14,
-    paddingVertical: "4%",
-    paddingHorizontal: "4%",
+    paddingVertical: "2%",
+    paddingHorizontal: "2%",
     color: GlobalStyles.colors.gray700,
     fontWeight: "300",
   },

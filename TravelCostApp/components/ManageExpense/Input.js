@@ -1,3 +1,4 @@
+/* eslint-disable react/react-in-jsx-scope */
 import { Keyboard, StyleSheet, Text, TextInput, View } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 
@@ -30,6 +31,7 @@ const Input = ({
         autoFocus={autoFocus ? autoFocus : false}
         editable={editable}
         selectTextOnFocus={selectTextOnFocus}
+        autoCorrect={false}
       />
     </View>
   );

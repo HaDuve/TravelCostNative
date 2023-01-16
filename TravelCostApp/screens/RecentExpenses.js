@@ -154,9 +154,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
     zIndex: 1,
-    marginTop: 48,
-    marginHorizontal: 24,
-    marginBottom: 12,
+    marginTop: "6%",
+    marginHorizontal: "4%",
+    marginBottom: "4%",
   },
   dropdownContainer: {
     maxWidth: "50%",

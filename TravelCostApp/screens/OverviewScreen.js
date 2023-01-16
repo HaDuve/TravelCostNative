@@ -121,7 +121,6 @@ export default OverviewScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     justifyContent: "flex-start",
   },
@@ -137,10 +136,11 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",
     zIndex: 1,
-    marginTop: 48,
-    marginHorizontal: 24,
+    marginTop: "6%",
+    marginHorizontal: "4%",
+    marginBottom: "4%",
   },
   dropdownContainer: {
     maxWidth: 160,

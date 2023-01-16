@@ -11,7 +11,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../../TravelCostApp/i18n/supportedLanguages";
 import Button from "../components/UI/Button";
-import { OpenGoogleXlsxPicker } from "../components/ImportExport/ImportFromGoogleXlsx";
+import {
+  importGoogleExcelFile,
+  OpenGoogleXlsxPicker,
+} from "../components/ImportExport/ImportFromGoogleXlsx";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -65,10 +68,19 @@ const SettingsScreen = ({ navigation }) => {
         onPress={importExcelFile.bind(this, uid, tripid, userName, addExpense)}
         style={styles.settingsButton}
       >
-        Importiere Kosten aus GehMalReisen Excel Tabelle
+        Importiere aus GehMalReisen Excel
       </Button>
-      <Button onPress={OpenGoogleXlsxPicker} style={styles.settingsButton}>
-        Importiere Kosten aus FoodForNomads GSheets Tabelle
+      <Button
+        onPress={importGoogleExcelFile.bind(
+          this,
+          uid,
+          tripid,
+          userName,
+          addExpense
+        )}
+        style={styles.settingsButton}
+      >
+        Importiere aus FoodForNomads GSheetsXlsx
       </Button>
     </View>
   );

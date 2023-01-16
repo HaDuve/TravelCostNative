@@ -154,16 +154,16 @@ const rowsColumsToData = async (
   endColumn: number,
   endRow: number
 ) => {
-  var range = {
+  const range = {
     s: { c: startColumn, r: startRow },
     e: { c: endColumn, r: endRow },
   };
-  var dataRange = [];
+  const dataRange = [];
   /* Iterate through each element in the structure */
-  for (var R = range.s.r; R <= range.e.r; ++R) {
-    for (var C = range.s.c; C <= range.e.c; ++C) {
-      var cell_address = { c: C, r: R };
-      var data = XLSX.utils.encode_cell(cell_address);
+  for (let R = range.s.r; R <= range.e.r; ++R) {
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const cell_address = { c: C, r: R };
+      const data = XLSX.utils.encode_cell(cell_address);
       dataRange.push(sheet[data]);
     }
   }

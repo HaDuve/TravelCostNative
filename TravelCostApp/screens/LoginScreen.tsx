@@ -7,7 +7,7 @@ import { AuthContext } from "../store/auth-context";
 import { UserContext } from "../store/user-context";
 import { fetchUser } from "../util/http";
 import { TripContext } from "../store/trip-context";
-import { asyncStoreSetItem } from "../store/async-storage";
+import { asyncStoreSetItem, asyncStoreSetObject } from "../store/async-storage";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -42,15 +42,17 @@ function LoginScreen() {
         const userData = await fetchUser(uid);
         console.log("loginHandler ~ userData", userData);
         const tripid = userData.currentTrip;
-        asyncStoreSetItem("currentTripId", tripid);
         if (!userData) {
           console.error("no userData");
         } else {
+          asyncStoreSetItem("currentTripId", tripid);
+          tripCtx.setTripid(tripid);
           userCtx.addUser(userData);
           tripCtx.fetchAndSetCurrentTrip(tripid);
+          tripCtx.refresh();
         }
       } catch (error) {
-        Alert.alert("Errow while fetching user!!: ", error);
+        Alert.alert("Error while logging in: ", error);
       }
       authCtx.setUserID(uid);
       authCtx.authenticate(token);

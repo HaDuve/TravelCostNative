@@ -20,6 +20,7 @@ export const TripContext = createContext({
   travellers: [],
   setCurrentTravellers: (tripid: string) => {},
   setTotalSum: (amount: number) => {},
+  setTripid: (tripid: string) => {},
 
   addTrip: ({ tripName, tripTotalBudget }) => {},
   deleteTrip: (tripid: string) => {},
@@ -47,10 +48,15 @@ function TripContextProvider({ children }) {
   }
 
   function refresh() {
+    console.log("refresh ~ refresh", refresh);
     setRefreshState(!refreshState);
   }
 
   async function setCurrentTravellers(tripid: string) {
+    if (tripid === "") {
+      setTravellers([]);
+      return;
+    }
     // updates the current Travellers in context
     try {
       const travellers = await getTravellers(tripid);
@@ -63,6 +69,18 @@ function TripContextProvider({ children }) {
   }
 
   async function setCurrentTrip(tripid: string, trip) {
+    if (!trip) return;
+    console.log("setCurrentTrip ~ setCurrentTrip", setCurrentTrip);
+    if (tripid === "reset") {
+      console.log("resetting Trip to empty!");
+      _setTripid("");
+      setTripName("");
+      setTotalBudget("");
+      setTripCurrency("");
+      setdailyBudget("");
+      setCurrentTravellers("");
+      return;
+    }
     // console.log("setCurrentTrip ~ trip", trip);
     // console.log("setCurrentTrip ~ tripid", tripid);
     _setTripid(tripid);

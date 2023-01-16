@@ -253,7 +253,7 @@ export async function storeTravellerToTrip(tripid: string, traveller) {
   listTravellers.forEach((traveller) => {
     objTravellers.push({ userName: traveller });
   });
-  console.warn("~~~~~~ storeTravellerToTrip ~ objTravellers", objTravellers);
+  console.log("storeTravellerToTrip ~ objTravellers", objTravellers);
   // // look for newTripid inside of oldTripHistory
   if (objTravellers.indexOf(traveller.userName) > -1) {
     console.log(traveller.userName + " already exists");

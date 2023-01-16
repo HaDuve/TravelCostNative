@@ -108,7 +108,11 @@ function TripItem({
   }
 
   if (tripid && !totalBudget) {
-    return <Text>{tripid}</Text>;
+    return (
+      <View style={styles.tripItem}>
+        <Text>Refresh..</Text>
+      </View>
+    );
   }
 
   return (

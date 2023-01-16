@@ -46,6 +46,7 @@ const ProfileScreen = ({ navigation }) => {
     refreshHandler();
   }, [TripCtx.refreshState]);
 
+  // TODO: all of this has to be moved into TripContext to be loaded correctly
   async function refreshHandler() {
     if (FreshlyCreated) return;
     allTripsList = [];
@@ -57,14 +58,11 @@ const ProfileScreen = ({ navigation }) => {
     allTripsList = [...tripHistory];
     TripCtx.fetchAndSetCurrentTrip(TripCtx.tripid);
     addTripFromContext();
-    allTripsList.forEach((trip) => {
-      // console.log("allTripsList ~ trip.tripName", trip.tripName);
-      // console.log("allTripsList ~ trip.tripid", trip.tripid);
-    });
     // console.log("allTripsList length: ", allTripsList.length);
     setTripsList(allTripsList.reverse());
   }
   function addTripFromContext() {
+    console.log("addTripFromContext ~ addTripFromContext", TripCtx.tripName);
     if (!TripCtx.tripid || TripCtx.tripid.length < 1) return;
     allTripsList = allTripsList.filter((trip) => trip !== TripCtx.tripid);
     allTripsList.push({

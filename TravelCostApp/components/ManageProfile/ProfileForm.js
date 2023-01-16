@@ -26,6 +26,7 @@ i18n.enableFallback = true;
 const ProfileForm = ({ navigation }) => {
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
+  const TripCtx = useContext(TripContext);
   const freshlyCreated = UserCtx.freshlyCreated;
 
   function logoutHandler() {
@@ -39,6 +40,7 @@ const ProfileForm = ({ navigation }) => {
       {
         text: i18n.t("yes"),
         onPress: () => {
+          TripCtx.setCurrentTrip("reset", "null");
           AuthCtx.logout();
         },
       },

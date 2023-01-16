@@ -1,6 +1,5 @@
 import { Alert, StyleSheet, Text, View } from "react-native";
 import React, { useContext } from "react";
-import FlatButton from "../components/UI/FlatButton";
 import { importExcelFile } from "../components/ImportExport/OpenXLSXPicker";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
@@ -12,6 +11,7 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../../TravelCostApp/i18n/supportedLanguages";
 import Button from "../components/UI/Button";
+import { OpenGoogleXlsxPicker } from "../components/ImportExport/ImportFromGoogleXlsx";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -55,29 +55,20 @@ const SettingsScreen = ({ navigation }) => {
         padding: "4%",
       }}
     >
-      <Button
-        style={{
-          paddingVertical: "2%",
-        }}
-        onPress={logoutHandler}
-      >
+      <Button style={styles.settingsButton} onPress={logoutHandler}>
         Logout
       </Button>
-      <Button
-        style={{
-          paddingVertical: "2%",
-        }}
-        onPress={joinInviteHandler}
-      >
+      <Button style={styles.settingsButton} onPress={joinInviteHandler}>
         {i18n.t("invitationText")}
       </Button>
       <Button
         onPress={importExcelFile.bind(this, uid, tripid, userName, addExpense)}
-        style={{
-          paddingVertical: "2%",
-        }}
+        style={styles.settingsButton}
       >
         Importiere Kosten aus GehMalReisen Excel Tabelle
+      </Button>
+      <Button onPress={OpenGoogleXlsxPicker} style={styles.settingsButton}>
+        Importiere Kosten aus FoodForNomads GSheets Tabelle
       </Button>
     </View>
   );
@@ -85,4 +76,8 @@ const SettingsScreen = ({ navigation }) => {
 
 export default SettingsScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  settingsButton: {
+    paddingVertical: "2%",
+  },
+});

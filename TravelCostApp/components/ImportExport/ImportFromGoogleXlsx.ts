@@ -1,6 +1,7 @@
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import * as XLSX from "xlsx";
+import { storeExpense } from "../../util/http";
 
 export const OpenGoogleXlsxPicker = async () => {
   try {
@@ -37,7 +38,7 @@ const getGoogleExcelData = async (
 ) => {
   // Get the names of all the tables in the workbook
   const sheetNames = workbook.SheetNames;
-  console.log("}).then ~ sheetNames", sheetNames);
+  // console.log("}).then ~ sheetNames", sheetNames);
 
   const listOfMonths = [
     "Januar",
@@ -65,6 +66,7 @@ const getGoogleExcelData = async (
   //TODO: iterate throu months and cats
   for (let i = 0; i < listOfMonthsInt.length; i++) {
     for (let j = 0; j < config.length; j++) {
+      // console.log("Monat: ", listOfMonths[i], "Kategorie:", config[j].cat);
       const monthInt = listOfMonthsInt[i];
       const sheet = workbook.Sheets[workbook.SheetNames[monthInt]];
       const catConfig = config[j];
@@ -74,33 +76,96 @@ const getGoogleExcelData = async (
         catConfig.end,
         catConfig.cat
       );
-      // TODO: add WerHatBezahlt, Schulden Beglichen, Schulden Prozent into data
-      console.log("data", data);
+      await importCostDataFromGSXlsx(data, uid, tripid, userName, addExpense);
     }
   }
-  //   await importExpenseFromXLSX(pairs, uid, tripid, userName, addExpense);
 };
 
 async function getDataObjects(sheet, start: number, end: number, cat: string) {
+  const textColumnInt = 3;
+  const costColumnInt = 4;
+  // for food and other we use column B(1), otherwise column D(3)
+  const foodTextColumn = 1;
+  const otherTextColumn = 1;
+  const finalTextColumnInt =
+    cat === "food"
+      ? foodTextColumn
+      : cat === "other"
+      ? otherTextColumn
+      : textColumnInt;
+
+  const whoPaidColumnInt = 5;
+  const percentageColumnInt = 6;
+
   const dateColumn = await rowsColumsToData(sheet, 0, start - 1, 0, end - 1);
-  const textColumn = await rowsColumsToData(sheet, 3, start - 1, 3, end - 1);
-  const costColumn = await rowsColumsToData(sheet, 4, start - 1, 4, end - 1);
+  const textColumn = await rowsColumsToData(
+    sheet,
+    finalTextColumnInt,
+    start - 1,
+    finalTextColumnInt,
+    end - 1
+  );
+  const costColumn = await rowsColumsToData(
+    sheet,
+    costColumnInt,
+    start - 1,
+    costColumnInt,
+    end - 1
+  );
+  const whoPaidColumn = await rowsColumsToData(
+    sheet,
+    whoPaidColumnInt,
+    start - 1,
+    whoPaidColumnInt,
+    end - 1
+  );
+  const percentageColumn = await rowsColumsToData(
+    sheet,
+    percentageColumnInt,
+    start - 1,
+    percentageColumnInt,
+    end - 1
+  );
   const textCostPairs = [];
 
   for (let i = 0; i < costColumn.length; i++) {
     const dateObj = dateColumn[i];
     const textObj = textColumn[i];
     const costObj = costColumn[i];
+    const whoPaidObj = whoPaidColumn[i];
+    const percentageObj = percentageColumn[i];
+
     try {
-      if (!costObj || !textObj || isNaN(costObj.v) || costObj.v === 0) {
+      if (
+        !costObj ||
+        !textObj ||
+        !whoPaidObj ||
+        !percentageObj ||
+        isNaN(costObj.v) ||
+        costObj.v === 0
+      ) {
         continue;
       }
       textCostPairs.push({
-        date: new Date(Date.UTC(0, 0, dateObj.v - 1)),
+        cat: cat,
         text: textObj.w,
         cost: costObj.v,
-        cat: cat,
+        date: new Date(Date.UTC(0, 0, dateObj.v - 1)),
+        whoPaid: whoPaidObj.w,
+        percentage: percentageObj.v,
       });
+
+      // debug
+      if (i == 0) {
+        textCostPairs.push({
+          cat: cat,
+          text: textObj.w,
+          cost: costObj.v,
+          date: new Date(Date.UTC(0, 0, dateObj.v - 1)),
+          whoPaid: whoPaidObj.w,
+          percentage: percentageObj.v,
+        });
+      }
     } catch (error) {
       console.log(error);
     }
@@ -130,3 +195,39 @@ const rowsColumsToData = async (
   }
   return dataRange;
 };
+
+async function importCostDataFromGSXlsx(
+  data,
+  uid,
+  tripid,
+  userName,
+  addExpense
+) {
+  async function storeImportedExpense(expenseData) {
+    await storeExpense(tripid, uid, expenseData);
+    // addExpense()
+  }
+
+  for (let i = 0; i < data.length; i++) {
+    const expenseObj = data[i];
+    if (i == 0) console.log("expenseObj", expenseObj);
+    const expenseData = {
+      uid: uid,
+      amount: +expenseObj.cost,
+      calcAmount: +expenseObj.cost,
+      date: expenseObj.date,
+      endDate: expenseObj.date,
+      description: expenseObj.text,
+      category: expenseObj.cat,
+      country: "",
+      currency: "EUR",
+      whoPaid: expenseObj.whoPaid,
+      owePerc: expenseObj.percentage,
+      splitType: expenseObj.percentage == 0 ? "SELF" : "SELF", // TODO: find out sharing
+      listEQUAL: [userName],
+      splitList: [],
+    };
+    await storeImportedExpense(expenseData);
+  }
+  return;
+}

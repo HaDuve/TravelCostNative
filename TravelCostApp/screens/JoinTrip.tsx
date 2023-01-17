@@ -66,7 +66,7 @@ const JoinTrip = ({ navigation, route }) => {
   }
 
   useLayoutEffect(() => {
-    getTrip(joinTripid);
+    // getTrip(joinTripid);
   }, []);
 
   async function joinHandler(join: boolean) {

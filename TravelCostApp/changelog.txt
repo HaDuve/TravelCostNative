@@ -1,5 +1,8 @@
 Changelog Travel Expense App
 
+1.0.34
+- added import function from FoodForNomads GoogleSheets (need to convert to xlsx first, whoPaid still missing)
+
 1.0.33
 - made the trip history user experience more smooth
 - prepared the developement for better animations

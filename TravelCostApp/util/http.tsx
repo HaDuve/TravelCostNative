@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const DEBUG_NO_DATA = true;
+
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
 
@@ -69,9 +71,8 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
   // "tripid",
   // tripid
   // );
+  if (!tripid || !uidlist || DEBUG_NO_DATA) return [];
   const expenses = [];
-  if (!tripid || !uidlist) return expenses;
-
   const axios_calls = [];
   uidlist.forEach((uid) => {
     try {
@@ -112,6 +113,8 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
 }
 
 export async function fetchExpenses(tripid: string, uid: string) {
+  if (!tripid || DEBUG_NO_DATA) return [];
+
   try {
     console.log("loading expense list...");
     const response = await axios.get(

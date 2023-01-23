@@ -4,7 +4,13 @@ import * as XLSX from "xlsx";
 import { importExpenseFromXLSX } from "./ImportExpense";
 import * as Updates from "expo-updates";
 
-export const OpenXLSXPicker = async () => {
+export const importExcelFile = async (uid, tripid, userName, addExpense) => {
+  const workbook = await OpenXLSXPicker();
+  await getExcelData(workbook, uid, tripid, userName, addExpense);
+  await Updates.reloadAsync();
+};
+
+const OpenXLSXPicker = async () => {
   try {
     const res = await DocumentPicker.getDocumentAsync({
       copyToCacheDirectory: true,
@@ -168,10 +174,4 @@ const rowsColumsToData = async (
     }
   }
   return dataRange;
-};
-
-export const importExcelFile = async (uid, tripid, userName, addExpense) => {
-  const workbook = await OpenXLSXPicker();
-  await getExcelData(workbook, uid, tripid, userName, addExpense);
-  await Updates.reloadAsync();
 };

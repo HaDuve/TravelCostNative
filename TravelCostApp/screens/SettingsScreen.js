@@ -62,13 +62,13 @@ const SettingsScreen = ({ navigation }) => {
         Logout
       </Button>
       <Button style={styles.settingsButton} onPress={joinInviteHandler}>
-        {i18n.t("invitationText")}
+        Join Trip
       </Button>
       <Button
         onPress={importExcelFile.bind(this, uid, tripid, userName, addExpense)}
         style={styles.settingsButton}
       >
-        Importiere aus GehMalReisen Excel
+        Import GehMalReisen Excel
       </Button>
       <Button
         onPress={importGoogleExcelFile.bind(
@@ -80,7 +80,7 @@ const SettingsScreen = ({ navigation }) => {
         )}
         style={styles.settingsButton}
       >
-        Importiere aus FoodForNomads GSheetsXlsx
+        Import FoodForNomads GSheetsXlsx
       </Button>
     </View>
   );

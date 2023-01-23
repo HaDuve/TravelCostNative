@@ -84,10 +84,14 @@ const ExpenseForm = ({
   // datepicker states
   const [showDatePickerRange, setShowDatePickerRange] = useState(false);
   const [startDate, setStartDate] = useState(
-    defaultValues ? getFormattedDate(defaultValues.date) : ""
+    defaultValues
+      ? getFormattedDate(defaultValues.date)
+      : getFormattedDate(new Date())
   );
   const [endDate, setEndDate] = useState(
-    defaultValues ? getFormattedDate(defaultValues.date) : ""
+    defaultValues
+      ? getFormattedDate(defaultValues.date)
+      : getFormattedDate(new Date())
   );
   const openDatePickerRange = () => setShowDatePickerRange(true);
   const onCancelRange = () => {
@@ -515,9 +519,9 @@ const ExpenseForm = ({
         {!hideAdvanced && (
           <>
             <View style={styles.currencyContainer}>
-              <Text style={styles.currencyLabel}>
+              {/* <Text style={styles.currencyLabel}>
                 {i18n.t("currencyLabel")}
-              </Text>
+              </Text> */}
               <CurrencyPicker
                 countryValue={countryValue}
                 setCountryValue={setCountryValue}
@@ -526,6 +530,7 @@ const ExpenseForm = ({
             </View>
             <Input
               label={i18n.t("descriptionLabel")}
+              placeholder={pickedCat}
               textInputConfig={{
                 onChangeText: inputChangedHandler.bind(this, "description"),
                 value: inputs.description.value,
@@ -534,17 +539,19 @@ const ExpenseForm = ({
               invalid={!inputs.description.isValid}
             />
 
-            <View style={{ marginLeft: 16 }}>
-              <Text style={styles.topCurrencyText}>{i18n.t("dateLabel")}</Text>
+            <View style={styles.dateLabel}>
+              <Text style={styles.dateLabelText}>{i18n.t("dateLabel")}</Text>
             </View>
             <View style={styles.dateContainer}>
-              <IconButton
-                icon={"calendar-outline"}
-                size={24}
-                color={GlobalStyles.colors.primary500}
-                style={styles.button}
-                onPress={openDatePickerRange}
-              />
+              <View style={styles.dateIconContainer}>
+                <IconButton
+                  icon={"calendar-outline"}
+                  size={24}
+                  color={GlobalStyles.colors.primary500}
+                  style={styles.button}
+                  onPress={openDatePickerRange}
+                />
+              </View>
               <View>
                 <Text style={styles.advancedText}>
                   {startDate && toShortFormat(new Date(startDate))}
@@ -591,7 +598,7 @@ const ExpenseForm = ({
                       modalContentContainerStyle={{
                         backgroundColor: GlobalStyles.colors.backgroundColor,
                       }}
-                      placeholder={" - "}
+                      placeholder={UserCtx.userName}
                       containerStyle={styles.dropdownContainer}
                       style={
                         !inputs.whoPaid.isValid
@@ -836,11 +843,9 @@ const styles = StyleSheet.create({
     alignItems: "baseline",
   },
   currencyContainer: {
-    marginVertical: 4,
-    marginHorizontal: 16,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: GlobalStyles.colors.gray700,
+    marginBottom: "2%",
+    // borderBottomWidth: 1,
+    // borderBottomColor: GlobalStyles.colors.gray700,
   },
   currencyLabel: {
     fontSize: 13,
@@ -861,13 +866,25 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     fontWeight: "300",
   },
+  dateLabel: {
+    marginTop: "4%",
+    marginLeft: "5.5%",
+  },
+  dateLabelText: {
+    fontSize: 12,
+    fontWeight: "400",
+    color: GlobalStyles.colors.textColor,
+  },
+  dateIconContainer: {
+    marginLeft: "2.5%",
+  },
   dateContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     borderBottomColor: GlobalStyles.colors.gray700,
     borderBottomWidth: 1,
-    marginHorizontal: 16,
-    marginVertical: 4,
+    marginHorizontal: "5%",
+    marginTop: "4%",
     paddingBottom: 4,
   },
   dropdownContainer: {

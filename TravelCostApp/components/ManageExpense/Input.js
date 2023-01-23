@@ -9,6 +9,7 @@ const Input = ({
   invalid,
   autoFocus,
   inputStyle,
+  placeholder = "",
   editable = true,
   selectTextOnFocus = true,
 }) => {
@@ -32,6 +33,7 @@ const Input = ({
         editable={editable}
         selectTextOnFocus={selectTextOnFocus}
         autoCorrect={false}
+        placeholder={placeholder}
       />
     </View>
   );

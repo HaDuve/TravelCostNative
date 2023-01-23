@@ -349,12 +349,9 @@ function Root() {
         // check if user was only freshly created
         if (freshlyCreated) {
           userCtx.setFreshlyCreatedTo(freshlyCreated);
-          console.log("storedFreshlyCreated: ", freshlyCreated);
         }
         // check if user was deleted
-        console.log("onRootMount ~ calling fetchUser");
         const checkUser = await fetchUser(storedUid);
-        // console.log("onRootMount ~ fetchUser", checkUser);
         // Check if the user logged in but there is no userName, we deleted the account
         if (!checkUser || !checkUser.userName) {
           Alert.alert(
@@ -368,13 +365,6 @@ function Root() {
           userCtx.setFreshlyCreatedTo(true);
         }
         // TODO: fix status when user disconnedcted while freshlyCreated=true
-        // console.log("onRootMount ~ freshlyCreated", freshlyCreated);
-        // if (freshlyCreated === true) {
-        //   userCtx.setFreshlyCreatedTo(JSON.parse(freshlyCreated));
-        //   setAppIsReady(true);
-        //   authCtx.authenticate(storedToken);
-        //   return;
-        // }
         //// END OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
 
         // setup context
@@ -391,13 +381,8 @@ function Root() {
         }
 
         if (storedTripId) {
-          // TODO: figure out when we want to save or load from async storage,
-          // right now this function seems to be confused
           tripCtx.fetchAndSetCurrentTrip(storedTripId);
           tripCtx.setCurrentTravellers(storedTripId);
-
-          const expenses = await getAllExpenses(storedTripId, storedUid);
-          expensesCtx.setExpenses(expenses);
         }
 
         authCtx.authenticate(storedToken);

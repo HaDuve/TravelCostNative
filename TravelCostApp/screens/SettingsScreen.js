@@ -68,7 +68,8 @@ const SettingsScreen = ({ navigation }) => {
         onPress={importExcelFile.bind(this, uid, tripid, userName, addExpense)}
         style={styles.settingsButton}
       >
-        Import GehMalReisen Excel
+        {/* aus der Excel .xlsm */}
+        Import GehMalReisen
       </Button>
       <Button
         onPress={importGoogleExcelFile.bind(
@@ -80,7 +81,8 @@ const SettingsScreen = ({ navigation }) => {
         )}
         style={styles.settingsButton}
       >
-        Import FoodForNomads GSheetsXlsx
+        {/* aus der heruntergeladenen GoogleSheets als Xlsx */}
+        Import FoodForNomads
       </Button>
     </View>
   );

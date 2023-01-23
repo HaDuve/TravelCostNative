@@ -141,9 +141,9 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   dateHeader: {
-    marginTop: 48,
-    marginLeft: 36,
-    marginBottom: -48,
+    marginVertical: "4%",
+    marginLeft: "6%",
+    marginBottom: "-6%",
   },
   dateString: {
     fontSize: 12,

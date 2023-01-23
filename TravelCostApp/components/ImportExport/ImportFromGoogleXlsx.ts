@@ -2,8 +2,20 @@ import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import * as XLSX from "xlsx";
 import { storeExpense } from "../../util/http";
+import * as Updates from "expo-updates";
 
-export const OpenGoogleXlsxPicker = async () => {
+export const importGoogleExcelFile = async (
+  uid,
+  tripid,
+  userName,
+  addExpense
+) => {
+  const workbook = await OpenGoogleXlsxPicker();
+  await getGoogleExcelData(workbook, uid, tripid, userName, addExpense);
+  await Updates.reloadAsync();
+};
+
+const OpenGoogleXlsxPicker = async () => {
   try {
     const res = await DocumentPicker.getDocumentAsync({
       copyToCacheDirectory: true,
@@ -19,16 +31,6 @@ export const OpenGoogleXlsxPicker = async () => {
   }
 };
 
-export const importGoogleExcelFile = async (
-  uid,
-  tripid,
-  userName,
-  addExpense
-) => {
-  const workbook = await OpenGoogleXlsxPicker();
-  await getGoogleExcelData(workbook, uid, tripid, userName, addExpense);
-};
-
 const getGoogleExcelData = async (
   workbook,
   uid,
@@ -37,23 +39,23 @@ const getGoogleExcelData = async (
   addExpense
 ) => {
   // Get the names of all the tables in the workbook
-  const sheetNames = workbook.SheetNames;
+  // const sheetNames = workbook.SheetNames;
   // console.log("}).then ~ sheetNames", sheetNames);
 
-  const listOfMonths = [
-    "Januar",
-    "Februar",
-    "März",
-    "April",
-    "Mai",
-    "Juni",
-    "Juli",
-    "August",
-    "September",
-    "Oktober",
-    "November",
-    "Dezember",
-  ];
+  // const listOfMonths = [
+  //   "Januar",
+  //   "Februar",
+  //   "März",
+  //   "April",
+  //   "Mai",
+  //   "Juni",
+  //   "Juli",
+  //   "August",
+  //   "September",
+  //   "Oktober",
+  //   "November",
+  //   "Dezember",
+  // ];
   const listOfMonthsInt = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
   // 5 is january
 
@@ -208,9 +210,43 @@ async function importCostDataFromGSXlsx(
     // addExpense()
   }
 
+  /**
+  returns a list of length 2
+
+   [0] is Hannes split cost
+
+   [1] is Tina split cost
+   */
+  function calculateSplitCost(
+    whopaid: string,
+    percentage: number,
+    amount: number
+  ) {
+    // whopaid is H or T
+    // percentage is 0-100
+    // amount is a number
+    const splitCostList = [];
+    if (whopaid == "H") {
+      splitCostList.push(((100 - percentage) / 100) * amount);
+      splitCostList.push((percentage / 100) * amount);
+    } else if (whopaid == "T") {
+      splitCostList.push((percentage / 100) * amount);
+      splitCostList.push(((100 - percentage) / 100) * amount);
+    } else {
+      console.warn("Invalid whopaid");
+    }
+    return splitCostList;
+  }
+
   for (let i = 0; i < data.length; i++) {
     const expenseObj = data[i];
     if (i == 0) console.log("expenseObj", expenseObj);
+
+    const splitString = calculateSplitCost(
+      expenseObj.whoPaid,
+      expenseObj.percentage,
+      expenseObj.cost
+    );
     const expenseData = {
       uid: uid,
       amount: +expenseObj.cost,
@@ -221,11 +257,22 @@ async function importCostDataFromGSXlsx(
       category: expenseObj.cat,
       country: "",
       currency: "EUR",
-      whoPaid: expenseObj.whoPaid,
-      owePerc: expenseObj.percentage,
-      splitType: expenseObj.percentage == 0 ? "SELF" : "SELF", // TODO: find out sharing
-      listEQUAL: [userName],
-      splitList: [],
+      // hardcoded for now
+      whoPaid:
+        expenseObj.whoPaid == "H"
+          ? "Hannes"
+          : expenseObj.whoPaid == "T"
+          ? "Tina"
+          : expenseObj.whoPaid,
+      // owePerc is outdated
+      owePerc: 0,
+      splitType: "EXACT",
+      // hardcoded for now
+      listEQUAL: ["Hannes", "Tina"],
+      splitList: [
+        { amount: splitString[0], userName: "Hannes" },
+        { amount: splitString[1], userName: "Tina" },
+      ],
     };
     await storeImportedExpense(expenseData);
   }

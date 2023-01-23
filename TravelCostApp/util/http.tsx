@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const DEBUG_NO_DATA = true;
+const DEBUG_NO_DATA = false;
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";

@@ -75,6 +75,7 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
   const axios_calls = [];
   uidlist.forEach((uid) => {
     try {
+      console.log("loading expense list...");
       const new_axios_call = axios.get(
         BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json" + QPAR
       );
@@ -111,8 +112,8 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
 }
 
 export async function fetchExpenses(tripid: string, uid: string) {
-  // console.log("https: ~ fetchExpenses ~ tripid", tripid, "uid", uid);
   try {
+    console.log("loading expense list...");
     const response = await axios.get(
       BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json" + QPAR
     );

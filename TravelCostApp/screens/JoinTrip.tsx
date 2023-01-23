@@ -180,9 +180,8 @@ export default JoinTrip;
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    margin: "10%",
-    marginBottom: "40%",
-    padding: 12,
+    margin: "5%",
+    padding: "2%",
     backgroundColor: GlobalStyles.colors.gray500,
     borderRadius: 10,
     borderWidth: 1,

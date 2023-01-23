@@ -124,7 +124,7 @@ function TripItem({
         <View style={styles.topRow}>
           <View>
             <Text style={[styles.textBase, styles.description]}>
-              {tripName}
+              {truncateString(tripName, 14)}
             </Text>
             <Text style={styles.textBase}>
               {i18n.t("daily")}

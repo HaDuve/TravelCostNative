@@ -308,6 +308,19 @@ function Root() {
   const tripCtx = useContext(TripContext);
   const expensesCtx = useContext(ExpensesContext);
 
+  async function checkOfflineMode() {
+    const isOfflineMode = await asyncStoreGetObject("isOfflineMode");
+    return isOfflineMode;
+  }
+
+  async function setupOfflineMount(isOfflineMode: boolean) {
+    if (!isOfflineMode) return null;
+    const offlineExpenses = await asyncStoreGetObject("expenses");
+    const offlineActionQueue = await asyncStoreGetObject("actionQueue");
+    const offlineTripName = await asyncStoreGetObject("tripName");
+    const offlineUserName = await asyncStoreGetObject("userName");
+  }
+
   useEffect(() => {
     async function onRootMount() {
       console.log("onRootMount ~ onRootMount");
@@ -318,6 +331,10 @@ function Root() {
       const storedUid = await asyncStoreGetItem("uid");
       const storedTripId = await asyncStoreGetItem("currentTripId");
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
+
+      // offline data
+      const isOffline = await checkOfflineMode();
+      setupOfflineMount(isOffline);
 
       console.log(
         "store loads: ",

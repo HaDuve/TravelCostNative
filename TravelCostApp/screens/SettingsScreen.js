@@ -15,6 +15,7 @@ import {
   importGoogleExcelFile,
   OpenGoogleXlsxPicker,
 } from "../components/ImportExport/ImportFromGoogleXlsx";
+import { exportAllExpensesToXLSX } from "../components/ImportExport/ExportToGoogleXlsx";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -83,6 +84,14 @@ const SettingsScreen = ({ navigation }) => {
       >
         {/* aus der heruntergeladenen GoogleSheets als Xlsx */}
         Import FoodForNomads
+      </Button>
+      <Button
+        onPress={exportAllExpensesToXLSX.bind(this, expensesCtx.expenses)}
+        style={styles.settingsButton}
+      >
+        {/* in die heruntergeladene GoogleSheets als Xlsx */}
+        {/* danach muss zurueck konvertiert werden  */}
+        Export FoodForNomads
       </Button>
     </View>
   );

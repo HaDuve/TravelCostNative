@@ -1,8 +1,7 @@
-import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system";
 import * as XLSX from "xlsx";
 import { storeExpense } from "../../util/http";
 import * as Updates from "expo-updates";
+import { OpenXLSXPicker } from "./OpenXLSXPicker";
 
 export const importGoogleExcelFile = async (
   uid,
@@ -10,25 +9,9 @@ export const importGoogleExcelFile = async (
   userName,
   addExpense
 ) => {
-  const workbook = await OpenGoogleXlsxPicker();
+  const workbook = await OpenXLSXPicker();
   await getGoogleExcelData(workbook, uid, tripid, userName, addExpense);
   await Updates.reloadAsync();
-};
-
-const OpenGoogleXlsxPicker = async () => {
-  try {
-    const res = await DocumentPicker.getDocumentAsync({
-      copyToCacheDirectory: true,
-      multiple: false,
-    });
-    console.log("openFilePicker ~ ", res.name);
-    const fileData = await FileSystem.readAsStringAsync(res.uri, {
-      encoding: FileSystem.EncodingType.Base64,
-    }).then((b64) => XLSX.read(b64, { type: "base64" }));
-    return fileData;
-  } catch (err) {
-    console.error(err);
-  }
 };
 
 const getGoogleExcelData = async (
@@ -191,8 +174,8 @@ const rowsColumsToData = async (
   for (let R = range.s.r; R <= range.e.r; ++R) {
     for (let C = range.s.c; C <= range.e.c; ++C) {
       const cell_address = { c: C, r: R };
-      const data = XLSX.utils.encode_cell(cell_address);
-      dataRange.push(sheet[data]);
+      const dataAddress = XLSX.utils.encode_cell(cell_address);
+      dataRange.push(sheet[dataAddress]);
     }
   }
   return dataRange;

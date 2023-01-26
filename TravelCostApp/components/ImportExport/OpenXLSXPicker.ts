@@ -10,7 +10,7 @@ export const importExcelFile = async (uid, tripid, userName, addExpense) => {
   await Updates.reloadAsync();
 };
 
-const OpenXLSXPicker = async () => {
+export const OpenXLSXPicker = async () => {
   try {
     const res = await DocumentPicker.getDocumentAsync({
       copyToCacheDirectory: true,

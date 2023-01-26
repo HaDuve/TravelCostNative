@@ -431,6 +431,7 @@ function Root() {
         authCtx.logout();
       }
 
+      //TODO: we should fetch the expenses before setting this + implement the dirty system
       setAppIsReady(true);
     }
 

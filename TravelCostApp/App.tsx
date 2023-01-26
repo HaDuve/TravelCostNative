@@ -1,6 +1,7 @@
-// Debug constant, set to true if you want all storage to be reset and user logged out
+// Debug asyncStorage, set to true if you want all storage to be reset and user logged out
 const DEBUG_RESET = false;
-const DEBUG_OFFLINEMODE = true;
+// Debug OfflineMode, set to true if you want the simulator to be offline
+const DEBUG_OFFLINEMODE = false;
 
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
@@ -27,7 +28,7 @@ import ExpensesContextProvider, {
 } from "./store/expenses-context";
 import ProfileScreen from "./screens/ProfileScreen";
 import UserContextProvider, { UserContext } from "./store/user-context";
-import { fetchUser, fetchTrip, getAllExpenses } from "./util/http";
+import { fetchUser, fetchTrip } from "./util/http";
 import TripContextProvider, { TripContext } from "./store/trip-context";
 import TripForm from "./components/ManageTrip/TripForm";
 import OnboardingScreen from "./screens/OnboardingScreen";
@@ -188,7 +189,21 @@ function Navigation() {
   };
 
   return (
-    <NavigationContainer linking={linking} fallback={<Text>Loading...</Text>}>
+    <NavigationContainer
+      linking={linking}
+      fallback={
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: GlobalStyles.colors.backgroundColor,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text>Loading...</Text>
+        </View>
+      }
+    >
       {!authCtx.isAuthenticated && <NotAuthenticatedStack />}
       {authCtx.isAuthenticated && <AuthenticatedStack />}
     </NavigationContainer>
@@ -224,7 +239,10 @@ function Home() {
         },
         tabBarActiveTintColor: GlobalStyles.colors.primary500,
         tabBarIndicatorStyle: {
-          backgroundColor: GlobalStyles.colors.primary500,
+          backgroundColor:
+            UserCtx.onlineStatus == "online"
+              ? GlobalStyles.colors.primary500
+              : "black",
           padding: "0,5%",
         },
         tabBarBounces: true,
@@ -327,6 +345,7 @@ function Root() {
     // pingTimeout?: number = 10000,
     // shouldPing?: boolean = true,
     // method?: HTTPMethod = 'HEAD'
+    userCtx.setOnlineStatus(!isOfflineMode ? "online" : "offline");
     return isOfflineMode;
   }
 
@@ -336,6 +355,7 @@ function Root() {
       return null;
     }
     console.log("Offline mode");
+    // TODO: save offline data in asyncStore when online
     const offlineExpenses = await asyncStoreGetObject("expenses");
     const offlineActionQueue = await asyncStoreGetObject("actionQueue");
     const offlineTripName = await asyncStoreGetObject("tripName");

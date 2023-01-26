@@ -65,10 +65,11 @@ const ExpenseGraph = ({ expenses, periodName }) => {
       for (let i = 0; i < lastDays; i++) {
         const day = getDateMinusDays(today, i);
         const dayExpenses = ExpenseCtx.getDailyExpenses(i);
-        const expensesSum = dayExpenses.reduce((sum, expense) => {
+        let expensesSum = dayExpenses.reduce((sum, expense) => {
           return sum + expense.calcAmount;
         }, 0);
         const dailyBudget = TripCtx.dailyBudget;
+        if (expensesSum > dailyBudget * 5) expensesSum = dailyBudget * 5;
         budget = dailyBudget;
         daysRange = lastDays;
         const obj = { day, expensesSum, dailyBudget };
@@ -282,6 +283,8 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     padding: 8,
+    paddingBottom: 0,
+    marginBottom: 8,
     paddingHorizontal: 24,
     flexDirection: "row",
     justifyContent: "space-between",

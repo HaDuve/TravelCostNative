@@ -1,4 +1,4 @@
-import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { Dimensions, Pressable, StyleSheet, View } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import IconButton from "../UI/IconButton";
 
@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: GlobalStyles.colors.gray600,
     minHeight: 16,
+    zIndex: -1,
     backgroundColor: GlobalStyles.colors.gray500,
   },
   addButton: {

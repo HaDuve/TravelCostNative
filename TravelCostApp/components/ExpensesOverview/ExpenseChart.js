@@ -39,7 +39,7 @@ const ExpenseChart = ({
     if (
       obj.expensesSum > obj.dailyBudget ||
       obj.expensesSum > obj.weeklyBudget ||
-      obj.expensesSum > obj.montylyBudget ||
+      obj.expensesSum > obj.monthlyBudget ||
       obj.expensesSum > obj.yearlyBudget
     ) {
       obj.fill = GlobalStyles.colors.error300;

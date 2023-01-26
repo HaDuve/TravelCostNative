@@ -174,11 +174,10 @@ const styles = StyleSheet.create({
   },
   tempGrayBar1: {
     borderTopWidth: 1,
-    borderBottomWidth: 1,
+    borderBottomWidth: 0,
     borderTopColor: GlobalStyles.colors.gray600,
     borderBottomColor: GlobalStyles.colors.gray600,
     minHeight: 24,
-    marginBottom: -20,
-    backgroundColor: GlobalStyles.colors.gray500,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
   },
 });

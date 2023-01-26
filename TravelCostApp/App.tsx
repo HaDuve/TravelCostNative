@@ -1,5 +1,6 @@
 // Debug constant, set to true if you want all storage to be reset and user logged out
 const DEBUG_RESET = false;
+const DEBUG_OFFLINEMODE = true;
 
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
@@ -11,7 +12,7 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import * as SplashScreen from "expo-splash-screen";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NetworkProvider } from "react-native-offline";
+import { NetworkProvider, checkInternetConnection } from "react-native-offline";
 import { Ionicons } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 import SignupScreen from "./screens/SignupScreen";
@@ -208,10 +209,13 @@ function Home() {
         headerTintColor: GlobalStyles.colors.backgroundColor,
         tabBarStyle: {
           backgroundColor: GlobalStyles.colors.gray500,
+          borderColor: GlobalStyles.colors.gray500,
         },
         tabBarItemStyle: {
           // width: "40%",
-          paddingTop: 0,
+          borderWidth: 0,
+          padding: "0%",
+          margin: "0%",
           marginBottom: "1%",
           paddingBottom: "1%",
         },
@@ -309,12 +313,29 @@ function Root() {
   const expensesCtx = useContext(ExpensesContext);
 
   async function checkOfflineMode() {
-    const isOfflineMode = await asyncStoreGetObject("isOfflineMode");
+    const force = DEBUG_OFFLINEMODE;
+    const isOfflineMode = !(await checkInternetConnection(
+      force
+        ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
+        : "https://www.google.com/",
+      10000,
+      true,
+      "HEAD"
+    ));
+    console.log("checkOfflineMode ~ isOfflineMode", isOfflineMode);
+    // url?: string = 'https://www.google.com/',
+    // pingTimeout?: number = 10000,
+    // shouldPing?: boolean = true,
+    // method?: HTTPMethod = 'HEAD'
     return isOfflineMode;
   }
 
   async function setupOfflineMount(isOfflineMode: boolean) {
-    if (!isOfflineMode) return null;
+    if (!isOfflineMode) {
+      console.log("Online mode");
+      return null;
+    }
+    console.log("Offline mode");
     const offlineExpenses = await asyncStoreGetObject("expenses");
     const offlineActionQueue = await asyncStoreGetObject("actionQueue");
     const offlineTripName = await asyncStoreGetObject("tripName");

@@ -101,7 +101,7 @@ export default ExpensesSummary;
 const styles = StyleSheet.create({
   container: {
     padding: "2%",
-    marginRight: "-2%",
+    marginRight: "-4%",
   },
   period: {
     fontSize: 12,

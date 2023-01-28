@@ -153,10 +153,10 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    zIndex: 1,
     marginTop: "6%",
     marginHorizontal: "4%",
     marginBottom: "4%",
+    zIndex: 10,
   },
   dropdownContainer: {
     maxWidth: "50%",
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   dropdown: {
-    borderRadius: 0,
+    borderRadius: 10,
     borderWidth: 0,
   },
   dropdownTextStyle: {
@@ -183,7 +183,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
     borderTopColor: GlobalStyles.colors.gray600,
     borderBottomColor: GlobalStyles.colors.gray600,
-    minHeight: 24,
+    minHeight: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
+    elevation: 2,
+    shadowColor: GlobalStyles.colors.textColor,
+    shadowOffset: { width: 1, height: 2.5 },
+    shadowOpacity: 0.9,
+    shadowRadius: 4,
+    zIndex: 2,
   },
 });

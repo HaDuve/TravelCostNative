@@ -109,6 +109,7 @@ const OverviewScreen = ({ navigation }) => {
         />
         <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
       </View>
+      <View style={styles.tempGrayBar1}></View>
       <ExpensesOverview expenses={recentExpenses} periodName={PeriodValue} />
     </View>
   );
@@ -135,12 +136,12 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    zIndex: 1,
+    zIndex: 10,
     marginTop: "6%",
     paddingHorizontal: "4%",
     paddingBottom: "4%",
 
-    borderBottomWidth: 1,
+    borderBottomWidth: 0,
     borderBottomColor: GlobalStyles.colors.gray600,
   },
   dropdownContainer: {
@@ -153,7 +154,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   dropdown: {
-    borderRadius: 0,
+    borderRadius: 10,
     borderWidth: 0,
   },
   dropdownTextStyle: {
@@ -176,5 +177,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1,
+  },
+  tempGrayBar1: {
+    borderTopWidth: 1,
+    borderBottomWidth: 0,
+    borderTopColor: GlobalStyles.colors.gray600,
+    borderBottomColor: GlobalStyles.colors.gray600,
+    minHeight: 1,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    elevation: 2,
+    shadowColor: GlobalStyles.colors.textColor,
+    shadowOffset: { width: 1, height: 2.5 },
+    shadowOpacity: 0.9,
+    shadowRadius: 4,
+    zIndex: 0,
   },
 });

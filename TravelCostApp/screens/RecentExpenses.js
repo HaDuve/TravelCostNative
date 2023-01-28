@@ -160,6 +160,12 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     maxWidth: "50%",
+    marginTop: "2%",
+    elevation: 2,
+    shadowColor: GlobalStyles.colors.textColor,
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.35,
+    shadowRadius: 4,
   },
   dropdown: {
     borderRadius: 0,

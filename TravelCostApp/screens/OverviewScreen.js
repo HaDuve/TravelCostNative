@@ -110,8 +110,6 @@ const OverviewScreen = ({ navigation }) => {
         <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
       </View>
       <ExpensesOverview expenses={recentExpenses} periodName={PeriodValue} />
-
-      {/* <AddExpenseButton navigation={navigation}></AddExpenseButton> */}
     </View>
   );
 };
@@ -122,7 +120,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    justifyContent: "flex-start",
+    // justifyContent: "flex-start",
   },
   dateHeader: {
     marginVertical: "4%",
@@ -139,11 +137,20 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     zIndex: 1,
     marginTop: "6%",
-    marginHorizontal: "4%",
-    marginBottom: "4%",
+    paddingHorizontal: "4%",
+    paddingBottom: "4%",
+
+    borderBottomWidth: 1,
+    borderBottomColor: GlobalStyles.colors.gray600,
   },
   dropdownContainer: {
     maxWidth: 160,
+    marginTop: "2%",
+    elevation: 2,
+    shadowColor: GlobalStyles.colors.textColor,
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.35,
+    shadowRadius: 4,
   },
   dropdown: {
     borderRadius: 0,
@@ -155,22 +162,6 @@ const styles = StyleSheet.create({
   },
   zBehind: {
     zIndex: 10,
-  },
-  tempGrayBar1: {
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderTopColor: GlobalStyles.colors.gray600,
-    borderBottomColor: GlobalStyles.colors.gray600,
-    maxHeight: 16,
-    minHeight: 4,
-    backgroundColor: GlobalStyles.colors.gray500,
-    marginBottom: -36,
-  },
-  tempGrayBar2: {
-    borderTopWidth: 1,
-    borderTopColor: GlobalStyles.colors.gray600,
-    minHeight: 16,
-    backgroundColor: GlobalStyles.colors.gray500,
   },
   addButton: {
     backgroundColor: GlobalStyles.colors.primary400,

@@ -118,7 +118,6 @@ const ProfileScreen = ({ navigation }) => {
           />
         </View>
       </View>
-      <View style={styles.tempGrayBar2}></View>
     </>
   );
 
@@ -179,22 +178,21 @@ const styles = StyleSheet.create({
     marginTop: -12,
     marginRight: 16,
   },
-  tempGrayBar2: {
-    borderTopWidth: 1,
-    borderTopColor: GlobalStyles.colors.gray600,
-    minHeight: 16,
-    backgroundColor: GlobalStyles.colors.gray500,
-    zIndex: -1,
-  },
   addButton: {
     backgroundColor: GlobalStyles.colors.primary400,
-    marginBottom: -12,
     flex: 0,
     borderRadius: 999,
     minWidth: "18%",
     paddingTop: "3%",
+    paddingHorizontal: "4%",
     alignItems: "center",
     justifyContent: "center",
     zIndex: 0,
+
+    elevation: 2,
+    shadowColor: GlobalStyles.colors.textColor,
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.35,
+    shadowRadius: 4,
   },
 });

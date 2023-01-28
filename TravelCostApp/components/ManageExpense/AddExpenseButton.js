@@ -19,7 +19,6 @@ const AddExpenseButton = ({ navigation }) => {
           }}
         />
       </View>
-      <View style={styles.tempGrayBar2}></View>
     </Pressable>
   );
 };
@@ -27,24 +26,22 @@ const AddExpenseButton = ({ navigation }) => {
 export default AddExpenseButton;
 
 const styles = StyleSheet.create({
-  tempGrayBar2: {
-    borderTopWidth: 1,
-    borderTopColor: GlobalStyles.colors.gray600,
-    minHeight: 16,
-    zIndex: -1,
-    backgroundColor: GlobalStyles.colors.gray500,
-  },
   addButton: {
     backgroundColor: GlobalStyles.colors.primary400,
     flex: 1,
     borderRadius: 999,
-    marginHorizontal: Dimensions.get("screen").width / 2.49,
-    marginBottom: -10,
-    marginTop: -Dimensions.get("screen").height / 11,
-    paddingTop: 12,
+    marginHorizontal: "41.5%",
+    marginTop: "-17%",
+    paddingTop: "4.3%",
+    paddingLeft: "1.0%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 1,
+
+    elevation: 2,
+    shadowColor: GlobalStyles.colors.textColor,
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.35,
+    shadowRadius: 4,
   },
 });

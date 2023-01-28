@@ -48,6 +48,7 @@ import {
   asyncStoreSafeClear,
 } from "./store/async-storage";
 import { truncateString } from "./util/string";
+import LoadingOverlay from "./components/UI/LoadingOverlay";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
@@ -200,7 +201,7 @@ function Navigation() {
             justifyContent: "center",
           }}
         >
-          <Text>Loading...</Text>
+          <LoadingOverlay></LoadingOverlay>
         </View>
       }
     >
@@ -224,7 +225,9 @@ function Home() {
         headerTintColor: GlobalStyles.colors.backgroundColor,
         tabBarStyle: {
           backgroundColor: GlobalStyles.colors.gray500,
-          borderColor: GlobalStyles.colors.gray500,
+          paddingTop: 4,
+          borderTopWidth: 1,
+          borderTopColor: GlobalStyles.colors.gray600,
         },
         tabBarItemStyle: {
           // width: "40%",

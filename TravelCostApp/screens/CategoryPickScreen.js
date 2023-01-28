@@ -224,7 +224,6 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     backgroundColor: GlobalStyles.colors.gray500,
-    borderRadius: 0,
     paddingBottom: 8,
     borderRadius: 12,
     paddingHorizontal: 4,

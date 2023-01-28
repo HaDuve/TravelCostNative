@@ -597,6 +597,12 @@ const ExpenseForm = ({
                       modalTitle={i18n.t("whoPaid")}
                       modalContentContainerStyle={{
                         backgroundColor: GlobalStyles.colors.backgroundColor,
+                        marginTop: "2%",
+                        elevation: 2,
+                        shadowColor: GlobalStyles.colors.textColor,
+                        shadowOffset: { width: 1, height: 1 },
+                        shadowOpacity: 0.35,
+                        shadowRadius: 4,
                       }}
                       placeholder={UserCtx.userName}
                       containerStyle={styles.dropdownContainer}

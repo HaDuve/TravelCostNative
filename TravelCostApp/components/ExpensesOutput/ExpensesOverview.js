@@ -34,7 +34,7 @@ const ExpensesOverview = ({ expenses, periodName }) => {
 
   return (
     <View style={styles.container}>
-      <View>
+      <View style={styles.titleContainer}>
         {!toggleGraph && <Text style={styles.titleText}> {titleString}</Text>}
         {toggleGraph && (
           <Text style={styles.titleText}> {i18n.t("categories")} </Text>
@@ -49,7 +49,7 @@ const ExpensesOverview = ({ expenses, periodName }) => {
       )}
       <View
         style={[
-          styles.addButton,
+          styles.toggleButton,
           // styles.toggleButton
         ]}
       >
@@ -57,7 +57,6 @@ const ExpensesOverview = ({ expenses, periodName }) => {
           <ToggleButton></ToggleButton>
         </Pressable>
       </View>
-      <View style={styles.tempGrayBar2}></View>
     </View>
   );
 };
@@ -68,19 +67,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  toggleButton: {
-    backgroundColor: GlobalStyles.colors.primary400,
-    flex: 0,
-    borderRadius: 999,
-    marginHorizontal: Dimensions.get("screen").width / 2.49,
-    marginBottom: -10,
-    marginTop: -Dimensions.get("screen").height / 11,
-    paddingTop: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 1,
-  },
+  titleContainer: {},
   titleText: {
     paddingTop: 20,
     paddingRight: 20,
@@ -88,21 +75,21 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
-  tempGrayBar2: {
-    borderTopWidth: 1,
-    borderTopColor: GlobalStyles.colors.gray600,
-    minHeight: 16,
-    backgroundColor: GlobalStyles.colors.gray500,
-  },
-  addButton: {
+  toggleButton: {
     flex: 0,
     borderRadius: 999,
     marginHorizontal: 150,
-    marginBottom: -26,
-    marginTop: -48,
+    marginBottom: "-2%",
+    marginTop: "-20%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1,
+
+    elevation: 2,
+    shadowColor: GlobalStyles.colors.textColor,
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.35,
+    shadowRadius: 4,
   },
 });

@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 24,
+    marginTop: "-6%",
     paddingBottom: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },

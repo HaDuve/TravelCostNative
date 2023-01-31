@@ -124,7 +124,7 @@ function TripItem({
         <View style={styles.topRow}>
           <View>
             <Text style={[styles.textBase, styles.description]}>
-              {truncateString(tripName, 14)}
+              {truncateString(tripName, 11)}
             </Text>
             <Text style={styles.textBase}>
               {i18n.t("daily")}
@@ -173,11 +173,11 @@ const styles = StyleSheet.create({
     margin: 12,
     backgroundColor: GlobalStyles.colors.gray500,
     borderRadius: 6,
-    elevation: 3,
-    shadowColor: GlobalStyles.colors.gray500,
-    shadowRadius: 4,
+    elevation: 2,
+    shadowColor: GlobalStyles.colors.textColor,
     shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.35,
+    shadowRadius: 4,
   },
   topRow: {
     marginVertical: 8,

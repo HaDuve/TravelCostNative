@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import {
   Dimensions,
+  Pressable,
   RefreshControl,
   StyleSheet,
   Text,
@@ -22,11 +23,10 @@ import { en, de } from "../i18n/supportedLanguages";
 import { fetchTrip, fetchTripHistory, fetchUser } from "../util/http";
 import { AuthContext } from "../store/auth-context";
 import React from "react";
-import * as Updates from "expo-updates";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
-// i18n.locale = "en";
+// i18n.locale = "de";
 
 const ProfileScreen = ({ navigation }) => {
   const UserCtx = useContext(UserContext);
@@ -82,7 +82,11 @@ const ProfileScreen = ({ navigation }) => {
       <View style={styles.tripContainer}>
         <View style={styles.horizontalContainer}>
           <Text style={styles.tripListTitle}>{i18n.t("myTrips")}</Text>
-          <View style={{ borderRadius: 99 }}>
+          <Pressable
+            onPress={navigation.navigate.bind(this, "ManageTrip")}
+            style={styles.newTripButtonContainer}
+          >
+            <Text style={{ color: GlobalStyles.colors.primary700 }}>+</Text>
             <IconButton
               icon={"ios-earth"}
               size={36}
@@ -90,9 +94,8 @@ const ProfileScreen = ({ navigation }) => {
               buttonStyle={styles.createButton}
               onPress={navigation.navigate.bind(this, "ManageTrip")}
             />
-          </View>
+          </Pressable>
         </View>
-
         <TripList
           trips={tripsList}
           setRefreshing={setRefreshing}
@@ -150,7 +153,7 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   horizontalContainer: {
-    marginLeft: Dimensions.get("window").width / 3,
+    marginTop: "2%",
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -159,13 +162,27 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  newTripButtonContainer: {
+    flexDirection: "row",
+    padding: "2%",
+    paddingHorizontal: "4%",
+    marginRight: "4%",
+    marginBottom: "2%",
+    marginTop: "-4%",
+    borderRadius: 99,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    elevation: 2,
+    shadowColor: GlobalStyles.colors.textColor,
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.35,
+    shadowRadius: 4,
+  },
   tripListTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
     fontStyle: "italic",
-    alignContent: "flex-start",
-    color: GlobalStyles.colors.gray600,
-    marginLeft: -20,
+    color: GlobalStyles.colors.gray700,
+    marginLeft: "2%",
   },
   deleteContainer: {
     marginTop: 16,

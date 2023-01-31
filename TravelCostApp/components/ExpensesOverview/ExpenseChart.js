@@ -1,13 +1,6 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import {
-  VictoryAxis,
-  VictoryBar,
-  VictoryChart,
-  VictoryLine,
-  VictoryScatter,
-  VictoryTheme,
-} from "victory-native";
+import { VictoryBar, VictoryChart, VictoryLine } from "victory-native";
 import { GlobalStyles } from "../../constants/styles";
 import { getDateMinusDays } from "../../util/date";
 
@@ -33,9 +26,6 @@ const ExpenseChart = ({
   // DUMMYDATA END
 
   inputData?.forEach((obj) => {
-    if (obj.expensesSum > 0) {
-      obj.fill = GlobalStyles.colors.primary500;
-    }
     if (
       obj.expensesSum > obj.dailyBudget ||
       obj.expensesSum > obj.weeklyBudget ||
@@ -43,13 +33,17 @@ const ExpenseChart = ({
       obj.expensesSum > obj.yearlyBudget
     ) {
       obj.fill = GlobalStyles.colors.error300;
+    } else {
+      if (obj.expensesSum > 0) {
+        obj.fill = GlobalStyles.colors.primary500;
+      }
     }
   });
   return (
     <View style={styles.container}>
       <VictoryChart
         height={200}
-        animate={{ duration: 1000, onLoad: { duration: 500 } }}
+        animate={{ duration: 1000 }}
         domainPadding={{ x: [10, 10], y: 5 }}
       >
         <VictoryBar

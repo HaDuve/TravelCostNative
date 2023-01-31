@@ -16,6 +16,7 @@ import {
   OpenGoogleXlsxPicker,
 } from "../components/ImportExport/ImportFromGoogleXlsx";
 import { exportAllExpensesToXLSX } from "../components/ImportExport/ExportToGoogleXlsx";
+import { ScrollView } from "react-native-gesture-handler";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -53,7 +54,7 @@ const SettingsScreen = ({ navigation }) => {
   }
 
   return (
-    <View
+    <ScrollView
       style={{
         flex: 1,
         padding: "4%",
@@ -93,7 +94,7 @@ const SettingsScreen = ({ navigation }) => {
         {/* danach muss zurueck konvertiert werden  */}
         Export FoodForNomads
       </Button>
-    </View>
+    </ScrollView>
   );
 };
 

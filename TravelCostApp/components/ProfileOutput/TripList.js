@@ -1,7 +1,8 @@
-import { FlatList } from "react-native";
+import { FlatList, View } from "react-native";
 import TripHistoryItem from "./TripHistoryItem";
 import React from "react";
 import TripItem from "./TripItem";
+import { GlobalStyles } from "../../constants/styles";
 
 function TripList({ trips, refreshControl, setRefreshing }) {
   if (!trips) return <></>;
@@ -19,15 +20,23 @@ function TripList({ trips, refreshControl, setRefreshing }) {
     return <TripItem {...itemData.item} />;
   }
   return (
-    <FlatList
-      data={trips}
-      refreshControl={refreshControl}
-      renderItem={renderTripItem}
-      keyExtractor={(item) => {
-        if (typeof item === "string" || item instanceof String) return item;
-        return item.tripid + item.tripName;
+    <View
+      style={{
+        flex: 1,
+        minHeight: "90%",
+        zIndex: -10,
       }}
-    />
+    >
+      <FlatList
+        data={trips}
+        refreshControl={refreshControl}
+        renderItem={renderTripItem}
+        keyExtractor={(item) => {
+          if (typeof item === "string" || item instanceof String) return item;
+          return item.tripid + item.tripName;
+        }}
+      />
+    </View>
   );
 }
 

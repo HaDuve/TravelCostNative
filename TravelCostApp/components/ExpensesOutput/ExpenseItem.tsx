@@ -18,6 +18,14 @@ import { TripContext } from "../../store/trip-context";
 import { formatExpenseString, truncateString } from "../../util/string";
 import React from "react";
 
+import Animated, {
+  SlideInUp,
+  SlideInDown,
+  SlideInLeft,
+  SlideInRight,
+  SlideOutLeft,
+} from "react-native-reanimated";
+
 function ExpenseItem({
   id,
   description,
@@ -64,35 +72,37 @@ function ExpenseItem({
   if (!id) return <></>;
 
   return (
-    <Pressable
-      onPress={expensePressHandler}
-      style={({ pressed }) => pressed && styles.pressed}
-    >
-      <View style={styles.expenseItem}>
-        <View style={styles.iconContainer}>
-          <Ionicons
-            name={iconString}
-            size={28}
-            color={GlobalStyles.colors.textColor}
-          />
+    <Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
+      <Pressable
+        onPress={expensePressHandler}
+        style={({ pressed }) => pressed && styles.pressed}
+      >
+        <View style={styles.expenseItem}>
+          <View style={styles.iconContainer}>
+            <Ionicons
+              name={iconString}
+              size={28}
+              color={GlobalStyles.colors.textColor}
+            />
+          </View>
+          <View style={styles.leftItem}>
+            <Text style={[styles.textBase, styles.description]}>
+              {descriptionString}
+            </Text>
+            <Text style={[styles.textBase, styles.secondaryText]}>
+              {toShortFormat(date)}
+            </Text>
+          </View>
+          <View style={styles.amountContainer}>
+            <Text style={styles.amount}>
+              {calcAmountString}
+              {homeCurrency}
+            </Text>
+            {originalCurrency}
+          </View>
         </View>
-        <View style={styles.leftItem}>
-          <Text style={[styles.textBase, styles.description]}>
-            {descriptionString}
-          </Text>
-          <Text style={[styles.textBase, styles.secondaryText]}>
-            {toShortFormat(date)}
-          </Text>
-        </View>
-        <View style={styles.amountContainer}>
-          <Text style={styles.amount}>
-            {calcAmountString}
-            {homeCurrency}
-          </Text>
-          {originalCurrency}
-        </View>
-      </View>
-    </Pressable>
+      </Pressable>
+    </Animated.View>
   );
 }
 

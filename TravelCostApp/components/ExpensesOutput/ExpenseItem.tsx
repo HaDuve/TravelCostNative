@@ -12,7 +12,7 @@ import { GlobalStyles } from "../../constants/styles";
 import { toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
 import { getCatSymbol } from "../../util/category";
-import { useContext } from "react";
+import { memo, useContext } from "react";
 import { UserContext } from "../../store/user-context";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseString, truncateString } from "../../util/string";
@@ -107,7 +107,7 @@ function ExpenseItem({
   );
 }
 
-export default ExpenseItem;
+export default memo(ExpenseItem);
 
 const styles = StyleSheet.create({
   pressed: {

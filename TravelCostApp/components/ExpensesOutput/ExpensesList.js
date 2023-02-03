@@ -12,6 +12,18 @@ import { TripContext } from "../../store/trip-context";
 import { AuthContext } from "../../store/auth-context";
 import { ExpensesContext } from "../../store/expenses-context";
 import IconButton from "../UI/IconButton";
+import Animated, {
+  SlideInUp,
+  SlideInDown,
+  SlideInLeft,
+  SlideInRight,
+  SlideOutLeft,
+  SlideOutDown,
+  FadeInRight,
+  FadeOutLeft,
+  JumpingTransition,
+} from "react-native-reanimated";
+import { CurvedTransition } from "react-native-reanimated";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -123,12 +135,18 @@ function ExpensesList({ expenses, refreshControl }) {
   tripid = tripCtx.tripid;
 
   return (
-    <FlatList
-      data={expenses}
-      renderItem={renderExpenseItem}
-      keyExtractor={(item) => item.id}
-      refreshControl={refreshControl}
-    />
+    <Animated.View
+      // layout={JumpingTransition.duration(5000)}
+      entering={FadeInRight.duration(600)}
+      exiting={FadeOutLeft.duration(500)}
+    >
+      <FlatList
+        data={expenses}
+        renderItem={renderExpenseItem}
+        keyExtractor={(item) => item.id}
+        refreshControl={refreshControl}
+      />
+    </Animated.View>
   );
 }
 

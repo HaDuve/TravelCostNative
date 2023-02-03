@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Dimensions } from "react-native";
+import React, { StyleSheet, Text, View, Dimensions } from "react-native";
 import * as Progress from "react-native-progress";
 import { GlobalStyles } from "../../../constants/styles";
 import { Ionicons } from "@expo/vector-icons";
@@ -9,20 +9,19 @@ import { TripContext } from "../../../store/trip-context";
 import { formatExpenseString, truncateString } from "../../../util/string";
 
 const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
+  const tripCtx = useContext(TripContext);
   let budgetProgress = (catCost / totalCost) * 1;
   if (Number.isNaN(budgetProgress)) {
-    console.log("NaN budgetProgress passed to CategoryProgressBar");
+    console.error("NaN budgetProgress passed to CategoryProgressBar");
     return <></>;
   }
 
   const widthChars = Dimensions.get("screen").width / 22;
   let catString = truncateString(cat, widthChars);
   const budgetColor = color;
-  const unfilledColor = GlobalStyles.colors.gray500;
+  const unfilledColor = GlobalStyles.colors.gray500Accent;
   const icon = getCatSymbol(cat);
   const stylingSpace = "  ";
-  const userCtx = useContext(UserContext);
-  const tripCtx = useContext(TripContext);
   const userCurrency = tripCtx.tripCurrency;
   const catCostString = formatExpenseString(catCost);
   const windowWidth = Dimensions.get("window").width;

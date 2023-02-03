@@ -1,6 +1,7 @@
 import React, { Dimensions, Pressable, StyleSheet, View } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import IconButton from "../UI/IconButton";
+import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 
 const AddExpenseButton = ({ navigation }) => {
   return (
@@ -9,7 +10,10 @@ const AddExpenseButton = ({ navigation }) => {
         navigation.navigate("CategoryPick");
       }}
     >
-      <View style={styles.addButton}>
+      <Animated.View
+        entering={FadeInDown.duration(600)}
+        style={styles.addButton}
+      >
         <IconButton
           icon="add-outline"
           size={42}
@@ -18,7 +22,7 @@ const AddExpenseButton = ({ navigation }) => {
             navigation.navigate("CategoryPick");
           }}
         />
-      </View>
+      </Animated.View>
     </Pressable>
   );
 };

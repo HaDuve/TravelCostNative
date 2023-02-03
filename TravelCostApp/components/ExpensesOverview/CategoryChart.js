@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View } from "react-native";
-import { G } from "react-native-svg";
+import { StyleSheet } from "react-native";
 import {
   VictoryAxis,
   VictoryBar,
@@ -11,7 +10,7 @@ import {
   VictoryTheme,
 } from "victory-native";
 import { GlobalStyles } from "../../constants/styles";
-import { getDateMinusDays } from "../../util/date";
+import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 
 const CategoryChart = ({ inputData }) => {
   const [useDummyData, setUseDummyData] = useState(true);
@@ -26,7 +25,11 @@ const CategoryChart = ({ inputData }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <Animated.View
+      entering={FadeInRight}
+      exiting={FadeOutLeft}
+      style={styles.container}
+    >
       <VictoryPie
         data={chartDataForRender}
         height={200}
@@ -50,7 +53,7 @@ const CategoryChart = ({ inputData }) => {
           //   `${datum.x[0].toUpperCase()}${datum.x.slice(1, 3)}`
         }
       />
-    </View>
+    </Animated.View>
   );
 };
 

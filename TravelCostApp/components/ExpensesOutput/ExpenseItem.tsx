@@ -24,6 +24,7 @@ import Animated, {
   SlideInLeft,
   SlideInRight,
   SlideOutLeft,
+  CurvedTransition,
 } from "react-native-reanimated";
 
 function ExpenseItem({
@@ -45,7 +46,7 @@ function ExpenseItem({
   const amountString = formatExpenseString(amount);
 
   const widthInChars = parseInt(
-    (Dimensions.get("window").width / 13).toString()
+    (Dimensions.get("window").width / 17).toString()
   );
   const descriptionString = truncateString(description, widthInChars);
 
@@ -113,9 +114,11 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
   expenseItem: {
+    borderWidth: 0,
+    borderColor: "black",
     padding: 8,
-    marginLeft: 8,
-    marginRight: -8,
+    paddingRight: 28,
+    marginLeft: 28,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     flexDirection: "row",
     justifyContent: "space-between",

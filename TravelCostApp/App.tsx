@@ -49,6 +49,7 @@ import {
 } from "./store/async-storage";
 import { truncateString } from "./util/string";
 import LoadingOverlay from "./components/UI/LoadingOverlay";
+import ImportGSScreen from "./screens/ImportGSScreen";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
@@ -153,6 +154,14 @@ function AuthenticatedStack() {
           <Stack.Screen
             name="SplitSummary"
             component={SplitSummaryScreen}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
+          <Stack.Screen
+            name="ImportGS"
+            component={ImportGSScreen}
             options={{
               headerShown: false,
               presentation: "modal",

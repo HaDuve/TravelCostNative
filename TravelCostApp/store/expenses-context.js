@@ -125,10 +125,13 @@ function ExpensesContextProvider({ children }) {
 
     const dayBack = getDateMinusDays(today, daysBefore);
 
-    const firstDay = new Date(dayBack.getFullYear(), dayBack.getMonth(), 1);
+    const firstDay = new Date(dayBack.getFullYear(), dayBack.getMonth() - 1, 1);
 
-    const lastDay = new Date(dayBack.getFullYear() + 1, dayBack.getMonth(), 0);
-
+    const lastDay = new Date(
+      dayBack.getFullYear() + 1,
+      dayBack.getMonth() - 1,
+      0
+    );
     const yearlyExpenses = expensesState.filter((expense) => {
       return expense.date >= firstDay && expense.date <= lastDay;
     });

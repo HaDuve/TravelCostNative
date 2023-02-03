@@ -74,13 +74,12 @@ const SettingsScreen = ({ navigation }) => {
         Import GehMalReisen
       </Button>
       <Button
-        onPress={importGoogleExcelFile.bind(
-          this,
+        onPress={navigation.navigate.bind(this, "ImportGS", {
           uid,
           tripid,
           userName,
-          addExpense
-        )}
+          addExpense,
+        })}
         style={styles.settingsButton}
       >
         {/* aus der heruntergeladenen GoogleSheets als Xlsx */}

@@ -3,6 +3,25 @@ import { storeExpense } from "../../util/http";
 import * as Updates from "expo-updates";
 import { OpenXLSXPicker } from "./OpenXLSXPicker";
 
+export const importGoogleExcelFileFROM = async (
+  uid,
+  tripid,
+  userName,
+  addExpense,
+  fromDate
+) => {
+  const workbook = await OpenXLSXPicker();
+  await getGoogleExcelData(
+    workbook,
+    uid,
+    tripid,
+    userName,
+    addExpense,
+    fromDate
+  );
+  await Updates.reloadAsync();
+};
+
 export const importGoogleExcelFile = async (
   uid,
   tripid,
@@ -19,7 +38,8 @@ const getGoogleExcelData = async (
   uid,
   tripid,
   userName,
-  addExpense
+  addExpense,
+  fromDate = null
 ) => {
   // Get the names of all the tables in the workbook
   // const sheetNames = workbook.SheetNames;
@@ -61,7 +81,14 @@ const getGoogleExcelData = async (
         catConfig.end,
         catConfig.cat
       );
-      await importCostDataFromGSXlsx(data, uid, tripid, userName, addExpense);
+      await importCostDataFromGSXlsx(
+        data,
+        uid,
+        tripid,
+        userName,
+        addExpense,
+        fromDate
+      );
     }
   }
 };
@@ -146,7 +173,7 @@ async function getDataObjects(sheet, start: number, end: number, cat: string) {
           cat: cat,
           text: textObj.w,
           cost: costObj.v,
-          date: new Date(Date.UTC(0, 0, dateObj.v - 1)),
+          date: new Date(Date.UTC(0, 0, dateObj.v + 1)),
           whoPaid: whoPaidObj.w,
           percentage: percentageObj.v,
         });
@@ -186,7 +213,8 @@ async function importCostDataFromGSXlsx(
   uid,
   tripid,
   userName,
-  addExpense
+  addExpense,
+  fromDate = null
 ) {
   async function storeImportedExpense(expenseData) {
     await storeExpense(tripid, uid, expenseData);
@@ -223,7 +251,7 @@ async function importCostDataFromGSXlsx(
 
   for (let i = 0; i < data.length; i++) {
     const expenseObj = data[i];
-    if (i == 0) console.log("expenseObj", expenseObj);
+    // if (i == 0) console.log("expenseObj", expenseObj);
 
     const splitString = calculateSplitCost(
       expenseObj.whoPaid,
@@ -257,6 +285,17 @@ async function importCostDataFromGSXlsx(
         { amount: splitString[1], userName: "Tina" },
       ],
     };
+    const performTimeConsumingTask = async () => {
+      return new Promise((resolve) =>
+        setTimeout(() => {
+          resolve("result");
+        }, 10)
+      );
+    };
+    if (fromDate != null && new Date(fromDate) > new Date(expenseData.date)) {
+      continue; // too old
+    }
+    console.log("expense not too old: " + expenseData.date, fromDate);
     await storeImportedExpense(expenseData);
   }
   return;

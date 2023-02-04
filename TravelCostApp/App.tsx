@@ -116,7 +116,7 @@ function AuthenticatedStack() {
             component={ManageExpense}
             options={{
               headerShown: false,
-              presentation: "modal",
+              presentation: "formSheet",
             }}
           />
           <Stack.Screen

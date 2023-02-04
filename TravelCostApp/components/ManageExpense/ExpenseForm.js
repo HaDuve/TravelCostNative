@@ -62,7 +62,8 @@ const ExpenseForm = ({
   const UserCtx = useContext(UserContext);
   const TripCtx = useContext(TripContext);
   const [hideAdvanced, sethideAdvanced] = useState(!isEditing);
-  const [countryValue, setCountryValue] = useState("DE");
+  const [countryValue, setCountryValue] = useState("EUR");
+  console.log("defaultvalues.currency", defaultValues.currency);
 
   const [loadingTravellers, setLoadingTravellers] = useState(false);
   useEffect(() => {
@@ -491,30 +492,33 @@ const ExpenseForm = ({
             }}
           />
         </View>
-        <Pressable onPress={toggleAdvancedHandler}>
-          <View style={styles.advancedRow}>
-            <IconButton
-              icon={
-                hideAdvanced
-                  ? "arrow-down-circle-outline"
-                  : "arrow-forward-circle-outline"
-              }
-              color={GlobalStyles.colors.primary500}
-              size={28}
-              onPress={toggleAdvancedHandler}
-            />
-            {hideAdvanced && (
-              <Text style={styles.advancedText}>
-                {i18n.t("showMoreOptions")}
-              </Text>
-            )}
-            {!hideAdvanced && (
-              <Text style={styles.advancedText}>
-                {i18n.t("showLessOptions")}
-              </Text>
-            )}
-          </View>
-        </Pressable>
+        {/* always show more options when editing */}
+        {!isEditing && (
+          <Pressable onPress={toggleAdvancedHandler}>
+            <View style={styles.advancedRow}>
+              <IconButton
+                icon={
+                  hideAdvanced
+                    ? "arrow-down-circle-outline"
+                    : "arrow-forward-circle-outline"
+                }
+                color={GlobalStyles.colors.primary500}
+                size={28}
+                onPress={toggleAdvancedHandler}
+              />
+              {hideAdvanced && (
+                <Text style={styles.advancedText}>
+                  {i18n.t("showMoreOptions")}
+                </Text>
+              )}
+              {!hideAdvanced && (
+                <Text style={styles.advancedText}>
+                  {i18n.t("showLessOptions")}
+                </Text>
+              )}
+            </View>
+          </Pressable>
+        )}
         {/* toggleable content */}
         {!hideAdvanced && (
           <>
@@ -526,6 +530,7 @@ const ExpenseForm = ({
                 countryValue={countryValue}
                 setCountryValue={setCountryValue}
                 onChangeValue={updateCurrency}
+                placeholder={isEditing ? defaultValues.currency : null}
               ></CurrencyPicker>
             </View>
             <Input

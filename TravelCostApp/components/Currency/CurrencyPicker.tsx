@@ -8,7 +8,12 @@ import { useState } from "react";
 import { GlobalStyles } from "../../constants/styles";
 import * as Localization from "expo-localization";
 
-const CurrencyPicker = ({ countryValue, setCountryValue, onChangeValue }) => {
+const CurrencyPicker = ({
+  countryValue,
+  setCountryValue,
+  onChangeValue,
+  placeholder,
+}) => {
   // Users Device CountryCode CC to translate Country names in picker
   // enforce a language we have registered, otherwise, english
   var CC = Localization.locale.slice(0, 2);
@@ -39,7 +44,7 @@ const CurrencyPicker = ({ countryValue, setCountryValue, onChangeValue }) => {
         onChangeValue={onChangeValue}
         setValue={setCountryValue}
         setItems={setItems}
-        placeholder={"Currency"}
+        placeholder={placeholder ? placeholder : "Currency"}
         containerStyle={{
           backgroundColor: GlobalStyles.colors.gray500,
           marginHorizontal: "1%",

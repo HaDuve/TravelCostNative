@@ -1,5 +1,13 @@
 import { useContext, useLayoutEffect, useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import React from "react";
 import { ScrollView } from "react-native";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 
@@ -68,7 +76,6 @@ const ManageExpense = ({ route, navigation }) => {
       // Does nothing but dismiss the dialog when tapped
       {
         text: i18n.t("no"),
-        onPress: forceCloseRow(index),
       },
       // The "Yes" button
       {
@@ -149,31 +156,33 @@ const ManageExpense = ({ route, navigation }) => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <>
-        <ExpenseForm
-          onCancel={cancelHandler}
-          onSubmit={confirmHandler}
-          pickedCat={pickedCat}
-          navigation={navigation}
-          isEditing={isEditing}
-          submitButtonLabel={isEditing ? i18n.t("update") : i18n.t("add")}
-          defaultValues={selectedExpense}
-          editedExpenseId={editedExpenseId}
-          newCat={newCat}
-        />
-        {isEditing && (
-          <View style={styles.deleteContainer}>
-            <IconButton
-              icon="trash"
-              color={GlobalStyles.colors.error500}
-              size={36}
-              onPress={deleteExpenseHandler}
-            />
-          </View>
-        )}
-      </>
-    </ScrollView>
+    <KeyboardAvoidingView behavior={"height"} style={styles.container}>
+      <ScrollView style={styles.container}>
+        <>
+          <ExpenseForm
+            onCancel={cancelHandler}
+            onSubmit={confirmHandler}
+            pickedCat={pickedCat}
+            navigation={navigation}
+            isEditing={isEditing}
+            submitButtonLabel={isEditing ? i18n.t("update") : i18n.t("add")}
+            defaultValues={selectedExpense}
+            editedExpenseId={editedExpenseId}
+            newCat={newCat}
+          />
+          {isEditing && (
+            <View style={styles.deleteContainer}>
+              <IconButton
+                icon="trash"
+                color={GlobalStyles.colors.error500}
+                size={36}
+                onPress={deleteExpenseHandler}
+              />
+            </View>
+          )}
+        </>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -187,6 +196,7 @@ const styles = StyleSheet.create({
   deleteContainer: {
     marginTop: 16,
     paddingTop: 8,
+    marginBottom: "15%",
     alignItems: "center",
   },
 });

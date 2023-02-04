@@ -7,12 +7,13 @@ import {
   Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import PropTypes from "prop-types";
 
 import { GlobalStyles } from "../../constants/styles";
 import { toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
 import { getCatSymbol } from "../../util/category";
-import { memo, useContext } from "react";
+import { memo, useContext, useCallback } from "react";
 import { UserContext } from "../../store/user-context";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseString, truncateString } from "../../util/string";
@@ -36,29 +37,24 @@ function ExpenseItem({
   whoPaid,
   currency,
   calcAmount,
-}) {
+}): JSX.Element {
   const navigation = useNavigation();
-
   const TripCtx = useContext(TripContext);
   const homeCurrency = TripCtx.tripCurrency;
-
   const calcAmountString = formatExpenseString(calcAmount);
   const amountString = formatExpenseString(amount);
-
   const widthInChars = parseInt(
     (Dimensions.get("window").width / 17).toString()
   );
   const descriptionString = truncateString(description, widthInChars);
-
+  const iconString = getCatSymbol(category);
+  const sameCurrency = homeCurrency === currency;
   function expensePressHandler() {
     navigation.navigate("ManageExpense", {
       expenseId: id,
     });
   }
-
-  const iconString = getCatSymbol(category);
-
-  const sameCurrency = homeCurrency === currency;
+  const memoizedCallback = useCallback((id) => expensePressHandler());
   const originalCurrency = !sameCurrency ? (
     <>
       <Text style={styles.originalCurrencyText}>
@@ -108,6 +104,16 @@ function ExpenseItem({
 }
 
 export default memo(ExpenseItem);
+ExpenseItem.propTypes = {
+  id: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  amount: PropTypes.number.isRequired,
+  date: PropTypes.string.isRequired,
+  category: PropTypes.string.isRequired,
+  whoPaid: PropTypes.string.isRequired,
+  currency: PropTypes.string.isRequired,
+  calcAmount: PropTypes.number.isRequired,
+};
 
 const styles = StyleSheet.create({
   pressed: {

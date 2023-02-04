@@ -146,7 +146,7 @@ function TripHistoryItem({ tripid, setRefreshing }) {
   // const activeProgress = tripCtx.totalSum / totalBudget;
   const activeProgress = 0;
 
-  if (isFetching) {
+  if (isFetching || (tripid && !totalBudget)) {
     return <LoadingOverlay />;
   }
 
@@ -162,10 +162,6 @@ function TripHistoryItem({ tripid, setRefreshing }) {
         <Text>{truncateString(item.item.userName, 10)}</Text>
       </View>
     );
-  }
-
-  if (tripid && !totalBudget) {
-    return <Text>Loading Trip ...</Text>;
   }
 
   return (

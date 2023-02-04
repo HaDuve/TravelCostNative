@@ -165,7 +165,7 @@ function TripHistoryItem({ tripid, setRefreshing }) {
   }
 
   if (tripid && !totalBudget) {
-    return <Text>{tripid}</Text>;
+    return <Text>Loading Trip ...</Text>;
   }
 
   return (

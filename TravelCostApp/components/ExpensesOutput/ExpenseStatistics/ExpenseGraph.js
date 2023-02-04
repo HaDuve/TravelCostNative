@@ -244,8 +244,8 @@ const ExpenseGraph = ({ expenses, periodName }) => {
   }
   return (
     <Animated.View
-      entering={FadeInRight}
-      exiting={FadeOutLeft}
+      entering={FadeInRight.duration(1000)}
+      exiting={FadeOutLeft.duration(1000)}
       style={styles.container}
     >
       <View>

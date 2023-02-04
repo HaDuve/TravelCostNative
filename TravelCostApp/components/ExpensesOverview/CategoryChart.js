@@ -10,7 +10,11 @@ import {
   VictoryTheme,
 } from "victory-native";
 import { GlobalStyles } from "../../constants/styles";
-import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
+import Animated, {
+  FadeInRight,
+  FadeInUp,
+  FadeOutLeft,
+} from "react-native-reanimated";
 
 const CategoryChart = ({ inputData }) => {
   const [useDummyData, setUseDummyData] = useState(true);
@@ -26,8 +30,8 @@ const CategoryChart = ({ inputData }) => {
 
   return (
     <Animated.View
-      entering={FadeInRight}
-      exiting={FadeOutLeft}
+      entering={FadeInRight.duration(1000)}
+      exiting={FadeOutLeft.duration(1000)}
       style={styles.container}
     >
       <VictoryPie

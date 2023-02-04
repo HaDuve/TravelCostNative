@@ -7,6 +7,12 @@ import { useContext } from "react";
 import { UserContext } from "../../../store/user-context";
 import { TripContext } from "../../../store/trip-context";
 import { formatExpenseString, truncateString } from "../../../util/string";
+import Animated, {
+  FadeInRight,
+  FadeInUp,
+  FadeOut,
+  FadeOutLeft,
+} from "react-native-reanimated";
 
 const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   const tripCtx = useContext(TripContext);
@@ -27,7 +33,11 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   const windowWidth = Dimensions.get("window").width;
 
   return (
-    <View style={styles.container}>
+    <Animated.View
+      entering={FadeInRight.duration(1000)}
+      exiting={FadeOutLeft.duration(1000)}
+      style={styles.container}
+    >
       <View style={styles.titleRow}>
         <Ionicons name={icon} size={30} color={color} />
         <Text style={[styles.sum, { color: budgetColor }]}>
@@ -49,7 +59,7 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
         height={14}
         width={windowWidth - 60}
       />
-    </View>
+    </Animated.View>
   );
 };
 

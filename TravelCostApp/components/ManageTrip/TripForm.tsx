@@ -156,7 +156,7 @@ const TripForm = ({ navigation }) => {
             value: inputs.tripName.value,
           }}
           invalid={!inputs.tripName.isValid}
-          autoFocus={true}
+          autoFocus={false}
         />
         <View style={styles.categoryRow}>
           <Input

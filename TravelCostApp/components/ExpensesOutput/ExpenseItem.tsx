@@ -49,12 +49,14 @@ function ExpenseItem({
   const descriptionString = truncateString(description, widthInChars);
   const iconString = getCatSymbol(category);
   const sameCurrency = homeCurrency === currency;
-  function expensePressHandler() {
-    navigation.navigate("ManageExpense", {
-      expenseId: id,
-    });
-  }
-  const memoizedCallback = useCallback((id) => expensePressHandler());
+
+  const memoizedCallback = useCallback(
+    () =>
+      navigation.navigate("ManageExpense", {
+        expenseId: id,
+      }),
+    []
+  );
   const originalCurrency = !sameCurrency ? (
     <>
       <Text style={styles.originalCurrencyText}>
@@ -65,13 +67,11 @@ function ExpenseItem({
   ) : (
     <></>
   );
-
   if (!id) return <></>;
-
   return (
     <Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
       <Pressable
-        onPress={expensePressHandler}
+        onPress={memoizedCallback}
         style={({ pressed }) => pressed && styles.pressed}
       >
         <View style={styles.expenseItem}>
@@ -102,13 +102,12 @@ function ExpenseItem({
     </Animated.View>
   );
 }
-
 export default memo(ExpenseItem);
+
 ExpenseItem.propTypes = {
   id: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   amount: PropTypes.number.isRequired,
-  date: PropTypes.string.isRequired,
   category: PropTypes.string.isRequired,
   whoPaid: PropTypes.string.isRequired,
   currency: PropTypes.string.isRequired,

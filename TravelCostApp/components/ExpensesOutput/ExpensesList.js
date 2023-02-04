@@ -145,6 +145,11 @@ function ExpensesList({ expenses, refreshControl }) {
         renderItem={renderExpenseItem}
         keyExtractor={(item) => item.id}
         refreshControl={refreshControl}
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={10}
+        updateCellsBatchingPeriod={300}
+        initialNumToRender={10}
+        windowSize={10}
       />
     </Animated.View>
   );

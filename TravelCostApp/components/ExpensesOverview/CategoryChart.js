@@ -37,7 +37,6 @@ const CategoryChart = ({ inputData }) => {
         endAngle={90}
         animate={{
           duration: 500,
-          onLoad: { duration: 500 },
         }}
         innerRadius={70}
         padAngle={0}

@@ -11,7 +11,7 @@ import { UserContext } from "../store/user-context";
 import { toShortFormat } from "../util/date";
 import { getAllExpenses } from "../util/http";
 
-import { StyleSheet, Text, View, RefreshControl } from "react-native";
+import { StyleSheet, Text, View, RefreshControl, LogBox } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
@@ -39,15 +39,18 @@ function RecentExpenses({ navigation }) {
 
   const [open, setOpen] = useState(false);
   const [PeriodValue, setPeriodValue] = useState("day");
-
   useEffect(() => {
-    if (PeriodValue !== userCtx.periodName)
-      userCtx.setPeriodString(PeriodValue);
-  }, [PeriodValue]);
+    LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
+  }, []);
 
-  useEffect(() => {
-    if (PeriodValue !== userCtx.periodName) setPeriodValue(userCtx.periodName);
-  }, [userCtx.periodName]);
+  // useEffect(() => {
+  //   if (PeriodValue !== userCtx.periodName)
+  //     userCtx.setPeriodString(PeriodValue);
+  // }, [PeriodValue]);
+
+  // useEffect(() => {
+  //   if (PeriodValue !== userCtx.periodName) setPeriodValue(userCtx.periodName);
+  // }, [userCtx.periodName]);
 
   const [items, setItems] = useState([
     { label: i18n.t("todayLabel"), value: "day" },

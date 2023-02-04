@@ -6,7 +6,7 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
-import React, { useContext } from "react";
+import React, { memo, useContext, useCallback } from "react";
 import { ExpensesContext } from "../../../store/expenses-context";
 import {
   daysBetween,
@@ -264,6 +264,11 @@ const ExpenseGraph = ({ expenses, periodName }) => {
           }
           data={listExpenseSumBudgets}
           renderItem={renderItemRef}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={7}
+          updateCellsBatchingPeriod={300}
+          initialNumToRender={7}
+          windowSize={7}
         ></FlatList>
       </View>
     </Animated.View>
@@ -279,6 +284,7 @@ const styles = StyleSheet.create({
   },
   graphContainer: {
     flex: 1,
+    paddingTop: "5%",
   },
   itemContainer: {
     padding: 8,

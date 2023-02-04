@@ -39,14 +39,14 @@ const OverviewScreen = ({ navigation }) => {
   const [open, setOpen] = useState(false);
   const [PeriodValue, setPeriodValue] = useState(userCtx.periodName);
 
-  useEffect(() => {
-    if (PeriodValue !== userCtx.periodName)
-      userCtx.setPeriodString(PeriodValue);
-  }, [PeriodValue]);
+  // useEffect(() => {
+  //   if (PeriodValue !== userCtx.periodName)
+  //     userCtx.setPeriodString(PeriodValue);
+  // }, [PeriodValue]);
 
-  useEffect(() => {
-    if (PeriodValue !== userCtx.periodName) setPeriodValue(userCtx.periodName);
-  }, [userCtx.periodName]);
+  // useEffect(() => {
+  //   if (PeriodValue !== userCtx.periodName) setPeriodValue(userCtx.periodName);
+  // }, [userCtx.periodName]);
 
   const [items, setItems] = useState([
     { label: i18n.t("todayLabel"), value: "day" },

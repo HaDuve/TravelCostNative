@@ -1,6 +1,11 @@
-import React from "react";
+import React, { memo } from "react";
 import { StyleSheet, View } from "react-native";
-import { VictoryBar, VictoryChart, VictoryLine } from "victory-native";
+import {
+  VictoryBar,
+  VictoryChart,
+  VictoryLabel,
+  VictoryLine,
+} from "victory-native";
 import { GlobalStyles } from "../../constants/styles";
 import { getDateMinusDays } from "../../util/date";
 
@@ -12,6 +17,8 @@ const ExpenseChart = ({
   budget,
   daysRange,
 }) => {
+  console.log("ExpenseChart rendered");
+
   const data = inputData
     ? inputData
     : // DUMMYDATA BEGIN
@@ -43,7 +50,8 @@ const ExpenseChart = ({
     <View style={styles.container}>
       <VictoryChart
         height={200}
-        animate={{ duration: 1000 }}
+        animate={{ duration: 500 }}
+        padding={{ top: 10, bottom: 10, left: 10, right: 10 }}
         domainPadding={{ x: [10, 10], y: 5 }}
       >
         <VictoryBar
@@ -75,12 +83,11 @@ const ExpenseChart = ({
   );
 };
 
-export default ExpenseChart;
+export default memo(ExpenseChart);
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 4,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,

@@ -34,6 +34,14 @@ const Input = ({
         selectTextOnFocus={selectTextOnFocus}
         autoCorrect={false}
         placeholder={placeholder}
+        onChangeText={(entryValue) => {
+          // replacing , with . for decimal-pad
+          if (textInputConfig.keyboardType === "decimal-pad") {
+            textInputConfig.onChangeText(entryValue.replace(",", "."));
+          } else {
+            textInputConfig.onChangeText(entryValue);
+          }
+        }}
       />
     </View>
   );

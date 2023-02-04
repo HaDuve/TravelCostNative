@@ -23,19 +23,16 @@ export function calcSplitList(
     !splitTravellers ||
     splitTravellers.length < 1
   ) {
-    console.log("calcSplitlist failed");
+    console.warn("calcSplitlist failed");
     return;
   }
 
   let splitList = [];
   switch (splitType) {
     case "SELF":
-      console.log("SELF");
       return splitList;
-
-    case "EQUAL":
+    case "EQUAL": {
       const splitAmount = amount / splitTravellers.length;
-      console.log("splitAmount", splitAmount);
       splitTravellers.forEach((traveller) => {
         splitList.push({
           userName: traveller,
@@ -43,39 +40,38 @@ export function calcSplitList(
         });
       });
       return splitList;
-
+    }
     case "EXACT":
-      console.log("splitListInput EXACT", splitListInput);
       if (!splitList || splitList.length < 1) {
         const splitAmount = amount / splitTravellers.length;
-        console.log("splitAmount", splitAmount);
         splitTravellers.forEach((traveller) => {
           splitList.push({
             userName: traveller,
             amount: splitAmount.toFixed(2),
           });
         });
+        console.log("splitList", splitList);
         return splitList;
       }
 
+      break;
     case "PERCENT":
-      console.log("splitListInput PERCENT", splitListInput);
-      if (!splitList || splitList.length < 1) {
-        const splitAmount = 100 / splitTravellers.length;
-        console.log("splitAmount", splitAmount);
-        splitTravellers.forEach((traveller) => {
-          splitList.push({
-            userName: traveller,
-            amount: splitAmount.toFixed(2),
+      {
+        if (!splitList || splitList.length < 1) {
+          const splitAmount = 100 / splitTravellers.length;
+          splitTravellers.forEach((traveller) => {
+            splitList.push({
+              userName: traveller,
+              amount: splitAmount.toFixed(2),
+            });
           });
-        });
-        return splitList;
+          return splitList;
+        }
       }
-
+      break;
     default:
       console.log("[SplitExpense] Wrong splitType :", splitType);
       return [];
-      break;
   }
 }
 
@@ -86,7 +82,7 @@ export function validateSplitList(splitList, splitType, amount, changedIndex) {
       break;
     case "EQUAL":
       break;
-    case "EXACT":
+    case "EXACT": {
       const splitSum = splitList.reduce((sum, split) => {
         return sum + Number(split.amount);
       }, 0);
@@ -95,7 +91,7 @@ export function validateSplitList(splitList, splitType, amount, changedIndex) {
       const HiVal = splitSum < compAmount + minDiff;
       const LoVal = splitSum > compAmount - minDiff;
       return HiVal && LoVal;
-      break;
+    }
     case "PERCENT":
       break;
 
@@ -119,7 +115,6 @@ export function splitTypesDropdown() {
 }
 
 export function travellerToDropdown(travellers) {
-  // console.log("travellerToDropdown ~ travellers", travellers);
   if (!travellers || travellers?.length < 1) {
     console.log("travellertodropdown failed");
     return [];
@@ -168,7 +163,7 @@ export async function calcOpenSplitsTable(tripid) {
 
 export function simplifySplits(openSplits) {
   const Splitwise = require("splitwise-js-map");
-  listOfSplits = [];
+  const listOfSplits = [];
   openSplits.forEach((openSplit) => {
     if (listOfSplits.some((e) => e.paidBy === openSplit.whoPaid)) {
       /* list contains the element we're looking for */
@@ -191,7 +186,6 @@ export function simplifySplits(openSplits) {
   });
 
   const splits = Splitwise(listOfSplits);
-  // console.log("simplifySplits ~ splits", splits);
   const simplifiedItems = [];
   splits.forEach((simpleSplit) => {
     const from = simpleSplit[0];

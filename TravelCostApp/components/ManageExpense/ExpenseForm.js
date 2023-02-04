@@ -63,7 +63,6 @@ const ExpenseForm = ({
   const TripCtx = useContext(TripContext);
   const [hideAdvanced, sethideAdvanced] = useState(!isEditing);
   const [countryValue, setCountryValue] = useState("EUR");
-  console.log("defaultvalues.currency", defaultValues.currency);
 
   const [loadingTravellers, setLoadingTravellers] = useState(false);
   useEffect(() => {
@@ -724,14 +723,11 @@ const ExpenseForm = ({
                           borderWidth: 1,
                           borderRadius: 16,
                           padding: 8,
-                          margin: 14,
+                          margin: 8,
                         }}
                       >
                         <Text
                           style={{
-                            minHeight: 36,
-                            minWidth: Dimensions.get("window").width / 6,
-                            maxWidth: Dimensions.get("window").width / 6,
                             color: splitListValid
                               ? GlobalStyles.colors.textColor
                               : GlobalStyles.colors.error500,
@@ -739,34 +735,48 @@ const ExpenseForm = ({
                         >
                           {itemData.item.userName}
                         </Text>
-                        <Input
-                          inputStyle={
-                            splitTypeEqual && {
-                              color: GlobalStyles.colors.textColor,
-                            }
-                          }
-                          style={[
-                            styles.rowInput,
-                            {
-                              minWidth: Dimensions.get("window").width / 4,
-                              maxWidth: Dimensions.get("window").width / 4,
-                            },
-                          ]}
-                          label="Split"
-                          textInputConfig={{
-                            onFocus: () => {
-                              if (splitType === "EQUAL") Keyboard.dismiss();
-                            },
-                            keyboardType: "decimal-pad",
-                            onChangeText: inputSplitListHandler.bind(
-                              this,
-                              itemData.index,
-                              itemData.item
-                            ),
-                            // TODO: mask this input https://www.npmjs.com/package/react-native-mask-input and fix random response
-                            value: splitValue ? splitValue : "",
+                        {/* Horizontal container  */}
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            // place items at the bottom of the container
+                            justifyContent: "flex-end",
+                            // place items at the right of the container
+                            alignItems: "flex-end",
                           }}
-                        ></Input>
+                        >
+                          <Input
+                            inputStyle={
+                              splitTypeEqual && {
+                                color: GlobalStyles.colors.textColor,
+                              }
+                            }
+                            style={[
+                              styles.rowInput,
+                              {
+                                minWidth: "25%",
+                              },
+                            ]}
+                            textInputConfig={{
+                              onFocus: () => {
+                                if (splitType === "EQUAL") Keyboard.dismiss();
+                              },
+                              keyboardType: "decimal-pad",
+                              onChangeText: inputSplitListHandler.bind(
+                                this,
+                                itemData.index,
+                                itemData.item
+                              ),
+                              // TODO: mask this input https://www.npmjs.com/package/react-native-mask-input and fix random response
+                              value: splitValue ? splitValue : "",
+                            }}
+                          ></Input>
+                          <Text style={{ paddingBottom: 12 }}>
+                            {isEditing
+                              ? TripCtx.tripCurrency
+                              : inputs.currency.value}
+                          </Text>
+                        </View>
                       </View>
                     );
                   }}

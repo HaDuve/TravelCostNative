@@ -1,7 +1,7 @@
 // Debug asyncStorage, set to true if you want all storage to be reset and user logged out
 const DEBUG_RESET = false;
 // Debug OfflineMode, set to true if you want the simulator to be offline
-const DEBUG_OFFLINEMODE = false;
+const DEBUG_OFFLINEMODE = true;
 
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
@@ -260,10 +260,9 @@ function Home() {
         },
         tabBarActiveTintColor: GlobalStyles.colors.primary500,
         tabBarIndicatorStyle: {
-          backgroundColor:
-            UserCtx.onlineStatus == "online"
-              ? GlobalStyles.colors.primary500
-              : "black",
+          backgroundColor: UserCtx.isOnline
+            ? GlobalStyles.colors.primary500
+            : "black",
           padding: "0,5%",
         },
         tabBarBounces: true,
@@ -301,18 +300,20 @@ function Home() {
           }}
         />
       )}
-      <BottomTabs.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          // headerShown: false,
-          title: "Profile",
-          tabBarLabel: "Profile",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="person-circle-outline" size={24} color={color} />
-          ),
-        }}
-      />
+      {UserCtx.isOnline && (
+        <BottomTabs.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={{
+            // headerShown: false,
+            title: "Profile",
+            tabBarLabel: "Profile",
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="person-circle-outline" size={24} color={color} />
+            ),
+          }}
+        />
+      )}
       {!FreshlyCreated && (
         <BottomTabs.Screen
           name="Settings"
@@ -366,21 +367,24 @@ function Root() {
     // pingTimeout?: number = 10000,
     // shouldPing?: boolean = true,
     // method?: HTTPMethod = 'HEAD'
-    userCtx.setOnlineStatus(!isOfflineMode ? "online" : "offline");
+    userCtx.setIsOnline(!isOfflineMode);
     return isOfflineMode;
   }
 
-  async function setupOfflineMount(isOfflineMode: boolean) {
+  async function setupOfflineMount(
+    isOfflineMode: boolean,
+    storedToken: string
+  ) {
     if (!isOfflineMode) {
       console.log("Online mode");
       return null;
     }
     console.log("Offline mode");
-    // TODO: save offline data in asyncStore when online
-    const offlineExpenses = await asyncStoreGetObject("expenses");
-    const offlineActionQueue = await asyncStoreGetObject("actionQueue");
-    const offlineTripName = await asyncStoreGetObject("tripName");
-    const offlineUserName = await asyncStoreGetObject("userName");
+    expensesCtx.loadExpensesFromStorage();
+    userCtx.loadUserNameFromStorage();
+    tripCtx.loadTripDataFromStorage();
+    tripCtx.loadTravellersFromStorage();
+    authCtx.authenticate(storedToken);
   }
 
   useEffect(() => {
@@ -394,10 +398,6 @@ function Root() {
       const storedTripId = await asyncStoreGetItem("currentTripId");
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
 
-      // offline data
-      const isOffline = await checkOfflineMode();
-      setupOfflineMount(isOffline);
-
       console.log(
         "store loads: ",
         truncateString(storedToken, 10),
@@ -408,6 +408,18 @@ function Root() {
 
       if (storedToken) {
         //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
+        // check if user is online
+        if (await checkOfflineMode()) {
+          setupOfflineMount(true, storedToken);
+          setAppIsReady(true);
+          return;
+        }
+        // check if we have a queue stored
+        const queue = await asyncStoreGetObject("queue");
+        if (queue && queue.length > 0) {
+          console.log("queue", queue);
+        }
+
         // check if user was only freshly created
         if (freshlyCreated) {
           userCtx.setFreshlyCreatedTo(freshlyCreated);
@@ -431,12 +443,13 @@ function Root() {
 
         // setup context
         authCtx.setUserID(storedUid);
+        let tripData;
         try {
           const userData = checkUser;
           const tripid = userData.currentTrip;
           // console.log("onRootMount ~ userData", userData);
           userCtx.addUser(userData);
-          const tripData = await fetchTrip(tripid);
+          tripData = await fetchTrip(tripid);
           tripCtx.setCurrentTrip(tripid, tripData);
         } catch (error) {
           Alert.alert(error);

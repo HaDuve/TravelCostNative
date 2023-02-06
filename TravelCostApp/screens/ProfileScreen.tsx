@@ -48,7 +48,8 @@ const ProfileScreen = ({ navigation }) => {
 
   // TODO: all of this has to be moved into TripContext to be loaded correctly
   async function refreshHandler() {
-    if (FreshlyCreated) return;
+    // check freshly and offlinemode
+    if (FreshlyCreated || !UserCtx.isOnline) return;
     allTripsList = [];
     const tripHistory = await fetchTripHistory(uid);
     if (!tripHistory.length) {

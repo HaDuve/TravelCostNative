@@ -5,6 +5,7 @@ import {
   getPreviousMondayDate,
   toShortFormat,
 } from "../util/date";
+import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 
 export const ExpensesContext = createContext({
   expenses: [],
@@ -38,20 +39,23 @@ export const ExpensesContext = createContext({
     }
   ) => {},
   getRecentExpenses: (rangestring) => {},
-  getYearlyExpenses: (yearsBack: number) => {
+  getYearlyExpenses: (yearsBack) => {
     // firstDay, lastDay, yearlyExpenses;
   },
-  getMonthlyExpenses: (monthsBack: number) => {
+  getMonthlyExpenses: (monthsBack) => {
     // firstDay, lastDay, monthlyExpenses;
   },
-  getWeeklyExpenses: (weeksBack: number) => {
+  getWeeklyExpenses: (weeksBack) => {
     // firstDay, lastDay, weeklyExpenses;
   },
-  getDailyExpenses: (daysBack: number) => {},
-  getSpecificDayExpenses: (date: Date) => {},
-  getSpecificWeekExpenses: (date: Date) => {},
-  getSpecificMonthExpenses: (date: Date) => {},
-  getSpecificYearExpenses: (date: Date) => {},
+  getDailyExpenses: (daysBack) => {},
+  getSpecificDayExpenses: (date) => {},
+  getSpecificWeekExpenses: (date) => {},
+  getSpecificMonthExpenses: (date) => {},
+  getSpecificYearExpenses: (date) => {},
+
+  saveExpensesInStorage: (expenses) => {},
+  loadExpensesFromStorage: () => {},
 });
 
 function expensesReducer(state, action) {
@@ -227,6 +231,19 @@ function ExpensesContextProvider({ children }) {
     return yearlyExpenses;
   }
 
+  function saveExpensesInStorage(expenses = null) {
+    if (!expenses) asyncStoreSetObject("expenses", expensesState);
+    else asyncStoreSetObject("expenses", expenses);
+  }
+
+  function loadExpensesFromStorage() {
+    asyncStoreGetObject("expenses").then((expenses) => {
+      if (expenses) {
+        setExpenses(expenses);
+      }
+    });
+  }
+
   const value = {
     expenses: expensesState,
     addExpense: addExpense,
@@ -242,6 +259,8 @@ function ExpensesContextProvider({ children }) {
     getSpecificWeekExpenses: getSpecificWeekExpenses,
     getSpecificMonthExpenses: getSpecificMonthExpenses,
     getSpecificYearExpenses: getSpecificYearExpenses,
+    saveExpensesInStorage: saveExpensesInStorage,
+    loadExpensesFromStorage: loadExpensesFromStorage,
   };
 
   return (

@@ -61,12 +61,17 @@ function RecentExpenses({ navigation }) {
   ]);
 
   async function getExpenses(refresh) {
+    // check offlinemode
+    if (!userCtx.isOnline) {
+      return;
+    }
     if (!refresh) setIsFetching(true);
     setRefreshing(true);
     try {
       const expenses = await getAllExpenses(tripid, uid);
       // console.log("getExpenses ~ expenses", expenses);
       expensesCtx.setExpenses(expenses);
+      expensesCtx.saveExpensesInStorage();
       const expensesSum = expenses.reduce((sum, expense) => {
         return sum + expense.calcAmount;
       }, 0);

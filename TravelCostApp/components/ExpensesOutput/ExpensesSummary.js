@@ -13,7 +13,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const authCtx = useContext(AuthContext);
-  if (!expenses || !periodName || tripCtx.tripid === "") return <></>;
+  if (!expenses || !periodName) return <></>;
 
   const expensesSum = expenses.reduce((sum, expense) => {
     return sum + Number(expense.calcAmount);

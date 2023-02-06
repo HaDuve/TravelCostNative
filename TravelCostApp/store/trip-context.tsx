@@ -5,6 +5,7 @@ import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchTrip, getTravellers } from "../util/http";
 import { de } from "../i18n/supportedLanguages";
+import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 
 export const TripContext = createContext({
   tripid: "",
@@ -28,6 +29,10 @@ export const TripContext = createContext({
   setCurrentTrip: (tripid: string, trip) => {},
   deleteCurrentTrip: (uid: string) => {},
   fetchAndSetCurrentTrip: (tripid: string) => {},
+  saveTripDataInStorage: (tripData) => {},
+  loadTripDataFromStorage: () => {},
+  saveTravellersInStorage: (travellers) => {},
+  loadTravellersFromStorage: () => {},
 });
 
 function TripContextProvider({ children }) {
@@ -60,6 +65,7 @@ function TripContextProvider({ children }) {
     // updates the current Travellers in context
     try {
       const travellers = await getTravellers(tripid);
+      saveTravellersInStorage(travellers);
       setTravellers(travellers);
       return true;
     } catch (error) {
@@ -103,6 +109,7 @@ function TripContextProvider({ children }) {
     try {
       const trip = await fetchTrip(tripid);
       setCurrentTrip(tripid, trip);
+      saveTripDataInStorage(trip);
     } catch (error) {
       console.warn(
         "error while fetchCurrent Trip in trip-context searching for ",
@@ -134,6 +141,33 @@ function TripContextProvider({ children }) {
   function deleteTrip() {
     console.log("delete Trip NOT IMPLEMENTED");
   }
+
+  function saveTripDataInStorage(tripData) {
+    asyncStoreSetObject("currentTrip", tripData);
+  }
+
+  function loadTripDataFromStorage() {
+    asyncStoreGetObject("currentTrip").then((tripData) => {
+      if (tripData) {
+        // console.log("loadTripDataFromStorage ~ tripData", tripData);
+        setCurrentTrip(tripData.tripid, tripData);
+      }
+    });
+  }
+
+  function saveTravellersInStorage(travellers) {
+    asyncStoreSetObject("currentTravellers", travellers);
+  }
+
+  function loadTravellersFromStorage() {
+    asyncStoreGetObject("currentTravellers").then((travellers) => {
+      if (travellers) {
+        console.log("loadTravellersFromStorage ~ travellers", travellers);
+        setTravellers(travellers);
+      }
+    });
+  }
+
   const value = {
     tripid: tripid,
     tripName: tripName,
@@ -155,6 +189,10 @@ function TripContextProvider({ children }) {
     setCurrentTrip: setCurrentTrip,
     deleteCurrentTrip: deleteCurrentTrip,
     fetchAndSetCurrentTrip: fetchAndSetCurrentTrip,
+    saveTripDataInStorage: saveTripDataInStorage,
+    loadTripDataFromStorage: loadTripDataFromStorage,
+    saveTravellersInStorage: saveTravellersInStorage,
+    loadTravellersFromStorage: loadTravellersFromStorage,
   };
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>;

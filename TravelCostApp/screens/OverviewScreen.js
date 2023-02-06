@@ -58,6 +58,10 @@ const OverviewScreen = ({ navigation }) => {
 
   useEffect(() => {
     async function getExpenses() {
+      // check offlinemode
+      if (!userCtx.isOnline) {
+        return;
+      }
       setIsFetching(true);
       try {
         const expenses = await getAllExpenses(tripid, uid);

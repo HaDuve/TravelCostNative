@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import React, { createContext, useReducer, useState } from "react";
 import { Alert } from "react-native";
-import { asyncStoreSetObject } from "./async-storage";
+import { asyncStoreGetItem, asyncStoreSetObject } from "./async-storage";
 
 export const UserContext = createContext({
   userName: "",
@@ -22,8 +22,10 @@ export const UserContext = createContext({
   freshlyCreated: false,
   setFreshlyCreatedTo: (bool: boolean) => {},
 
-  onlineStatus: "offline",
-  setOnlineStatus: (status: string) => {},
+  isOnline: false,
+  setIsOnline: (bool: boolean) => {},
+  saveUserNameInStorage: (name: string) => {},
+  loadUserNameFromStorage: () => {},
 });
 
 function tripsReducer(state, action) {
@@ -45,7 +47,7 @@ function UserContextProvider({ children }) {
   const [userName, setName] = useState("");
   const [freshlyCreated, setFreshlyCreated] = useState(false);
   const [periodName, setPeriodName] = useState("day");
-  const [onlineStatus, setOnlineStatus] = useState("offline");
+  const [isOnline, setIsOnline] = useState(false);
   const [tripsState, dispatch] = useReducer(tripsReducer, []);
 
   function setPeriodString(periodName: string) {
@@ -73,6 +75,7 @@ function UserContextProvider({ children }) {
       return;
     }
     setUserName(UserData.userName);
+    saveUserNameInStorage(UserData.userName);
   }
 
   function setFreshlyCreatedTo(bool: boolean) {
@@ -96,6 +99,20 @@ function UserContextProvider({ children }) {
     return tripsState;
   }
 
+  function saveUserNameInStorage(name: string) {
+    // console.log("saveUserNameInStorage ~ userName", name);
+    asyncStoreSetObject("userName", name);
+  }
+
+  function loadUserNameFromStorage() {
+    console.log("loadUserNameFromStorage ~ userName", userName);
+    asyncStoreGetItem("userName").then((name) => {
+      if (name) {
+        setName(name);
+      }
+    });
+  }
+
   const value = {
     userName: userName,
     periodName: periodName,
@@ -112,8 +129,10 @@ function UserContextProvider({ children }) {
     addUser: addUser,
     deleteUser: deleteUser,
     setUserName: setUserName,
-    onlineStatus: onlineStatus,
-    setOnlineStatus: setOnlineStatus,
+    isOnline: isOnline,
+    setIsOnline: setIsOnline,
+    saveUserNameInStorage: saveUserNameInStorage,
+    loadUserNameFromStorage: loadUserNameFromStorage,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

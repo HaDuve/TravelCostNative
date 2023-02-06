@@ -13,9 +13,12 @@
       "backgroundColor": "#000000"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/dff7ffc5-6f1e-4ece-bb23-0c50cda19f46"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.travelexpense.app",
@@ -36,6 +39,9 @@
       "eas": {
         "projectId": "dff7ffc5-6f1e-4ece-bb23-0c50cda19f46"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }

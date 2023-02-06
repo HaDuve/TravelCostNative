@@ -110,7 +110,11 @@ const OverviewScreen = ({ navigation }) => {
         <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
       </View>
       <View style={styles.tempGrayBar1}></View>
-      <ExpensesOverview expenses={recentExpenses} periodName={PeriodValue} />
+      <ExpensesOverview
+        navigation={navigation}
+        expenses={recentExpenses}
+        periodName={PeriodValue}
+      />
     </View>
   );
 };

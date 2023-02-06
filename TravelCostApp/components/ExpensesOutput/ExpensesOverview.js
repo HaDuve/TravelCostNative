@@ -15,7 +15,7 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-const ExpensesOverview = ({ expenses, periodName }) => {
+const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const [toggleGraph, setToggleGraph] = useState(false);
   function toggleContent() {
     setToggleGraph(!toggleGraph);
@@ -45,7 +45,11 @@ const ExpensesOverview = ({ expenses, periodName }) => {
         <ExpenseCategories expenses={expenses} periodName={periodName} />
       )}
       {!toggleGraph && (
-        <ExpenseGraph expenses={expenses} periodName={periodName} />
+        <ExpenseGraph
+          navigation={navigation}
+          expenses={expenses}
+          periodName={periodName}
+        />
       )}
       <View
         style={[

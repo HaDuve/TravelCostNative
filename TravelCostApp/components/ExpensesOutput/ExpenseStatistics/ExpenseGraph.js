@@ -5,6 +5,7 @@ import {
   FlatList,
   ScrollView,
   Dimensions,
+  Pressable,
 } from "react-native";
 import React, { memo, useContext, useCallback } from "react";
 import { ExpensesContext } from "../../../store/expenses-context";
@@ -39,7 +40,7 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-const ExpenseGraph = ({ expenses, periodName }) => {
+const ExpenseGraph = ({ expenses, periodName, navigation }) => {
   const ExpenseCtx = useContext(ExpensesContext);
   const UserCtx = useContext(UserContext);
   const TripCtx = useContext(TripContext);
@@ -100,13 +101,24 @@ const ExpenseGraph = ({ expenses, periodName }) => {
           : formatExpenseString(item.expensesSum);
 
         return (
-          <View style={styles.itemContainer}>
+          <Pressable
+            onPress={() => {
+              const filteredExpenses = ExpenseCtx.getSpecificDayExpenses(
+                new Date(item.day)
+              );
+              navigation.navigate("FilteredExpenses", {
+                expenses: filteredExpenses,
+                dayString: dayString,
+              });
+            }}
+            style={styles.itemContainer}
+          >
             <Text style={styles.text1}>{dayString}</Text>
             <Text style={[styles.text1, colorCoding]}>
               {expenseString}
               {emptyValue ? "-" : TripCtx.tripCurrency}
             </Text>
-          </View>
+          </Pressable>
         );
       };
       break;
@@ -149,13 +161,24 @@ const ExpenseGraph = ({ expenses, periodName }) => {
           ? ""
           : formatExpenseString(item.expensesSum);
         return (
-          <View style={styles.itemContainer}>
+          <Pressable
+            onPress={() => {
+              const filteredExpenses = ExpenseCtx.getSpecificWeekExpenses(
+                new Date(item.firstDay)
+              );
+              navigation.navigate("FilteredExpenses", {
+                expenses: filteredExpenses,
+                dayString: weekString,
+              });
+            }}
+            style={styles.itemContainer}
+          >
             <Text style={styles.text1}>{weekString}</Text>
             <Text style={[styles.text1, colorCoding]}>
               {expenseString}
               {emptyValue ? "-" : TripCtx.tripCurrency}
             </Text>
-          </View>
+          </Pressable>
         );
       };
       break;
@@ -188,7 +211,18 @@ const ExpenseGraph = ({ expenses, periodName }) => {
           : formatExpenseString(item.expensesSum);
 
         return (
-          <View style={styles.itemContainer}>
+          <Pressable
+            onPress={() => {
+              const filteredExpenses = ExpenseCtx.getSpecificMonthExpenses(
+                new Date(item.firstDay)
+              );
+              navigation.navigate("FilteredExpenses", {
+                expenses: filteredExpenses,
+                dayString: month,
+              });
+            }}
+            style={styles.itemContainer}
+          >
             <Text style={styles.text1}>
               {month} {item.firstDay.getFullYear()}
             </Text>
@@ -196,7 +230,7 @@ const ExpenseGraph = ({ expenses, periodName }) => {
               {expenseString}
               {emptyValue ? "-" : TripCtx.tripCurrency}
             </Text>
-          </View>
+          </Pressable>
         );
       };
       break;
@@ -229,13 +263,24 @@ const ExpenseGraph = ({ expenses, periodName }) => {
           : formatExpenseString(item.expensesSum);
 
         return (
-          <View style={styles.itemContainer}>
+          <Pressable
+            onPress={() => {
+              const filteredExpenses = ExpenseCtx.getSpecificYearExpenses(
+                new Date(item.firstDay)
+              );
+              navigation.navigate("FilteredExpenses", {
+                expenses: filteredExpenses,
+                dayString: yearString,
+              });
+            }}
+            style={styles.itemContainer}
+          >
             <Text style={styles.text1}>{yearString}</Text>
             <Text style={[styles.text1, colorCoding]}>
               {expenseString}
               {emptyValue ? "-" : TripCtx.tripCurrency}
             </Text>
-          </View>
+          </Pressable>
         );
       };
       break;
@@ -285,14 +330,28 @@ const styles = StyleSheet.create({
   graphContainer: {
     flex: 1,
     paddingTop: "5%",
+    paddingBottom: "5%",
   },
   itemContainer: {
     padding: 8,
-    paddingBottom: 0,
     marginBottom: 8,
     paddingHorizontal: 24,
     flexDirection: "row",
     justifyContent: "space-between",
+    // card shadow
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: 10,
+    paddingBottom: 8,
+    marginHorizontal: 20,
+    marginVertical: 4,
   },
   text1: {
     fontSize: 20,

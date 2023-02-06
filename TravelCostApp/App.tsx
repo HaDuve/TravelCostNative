@@ -50,6 +50,7 @@ import {
 import { truncateString } from "./util/string";
 import LoadingOverlay from "./components/UI/LoadingOverlay";
 import ImportGSScreen from "./screens/ImportGSScreen";
+import FilteredExpenses from "./screens/FilteredExpenses";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
@@ -162,6 +163,14 @@ function AuthenticatedStack() {
           <Stack.Screen
             name="ImportGS"
             component={ImportGSScreen}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
+          <Stack.Screen
+            name="FilteredExpenses"
+            component={FilteredExpenses}
             options={{
               headerShown: false,
               presentation: "modal",

@@ -28,6 +28,7 @@ import { daysBetween, getDatePlusDays } from "../util/date";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
+import { storeExpenseOnlineOffline } from "../util/offline-queue";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -132,7 +133,17 @@ const ManageExpense = ({ route, navigation }) => {
           }
         } else {
           console.log("no ranged Data detected");
-          const id = await storeExpense(tripid, uid, expenseData);
+          const item = {
+            type: "add",
+            expense: {
+              tripid: tripid,
+              uid: uid,
+              expenseData: expenseData,
+            },
+          };
+          console.log("confirmHandler ~ tripid", tripid);
+          const id = await storeExpenseOnlineOffline(item, userCtx.isOnline);
+          // const id = await storeExpense(tripid, uid, expenseData);
           expenseCtx.addExpense({ ...expenseData, id: id });
         }
       }

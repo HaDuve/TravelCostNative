@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { truncateString } from "../util/string";
 
 /**
  * Read item from long-term Memory of the device.
@@ -22,6 +23,11 @@ export async function asyncStoreGetObject(key: string) {
   console.log("attempting to read from Memory > ", key + ": ");
   try {
     const jsonValue = await AsyncStorage.getItem(key);
+    console.log(
+      "asyncStoreGetObject ~ jsonValue",
+      truncateString(JSON.stringify(jsonValue), 50)
+    );
+    // TODO: find out why we get scramled data here
     return jsonValue != null ? JSON.parse(jsonValue) : null;
   } catch (error) {
     console.error(error);
@@ -58,7 +64,10 @@ export async function asyncStoreSetItem(
  * @param value The value of the object to be stored
  */
 export async function asyncStoreSetObject(key: string, value: unknown) {
-  console.log("attempting save in Memory an Obj > ", key + ": " + value);
+  console.log(
+    "attempting save in Memory an Obj > ",
+    key + ": " + truncateString(JSON.stringify(value), 50)
+  );
   try {
     const jsonValue = JSON.stringify(value);
     await AsyncStorage.setItem(key, jsonValue);

@@ -1,7 +1,7 @@
 // Debug asyncStorage, set to true if you want all storage to be reset and user logged out
 const DEBUG_RESET = false;
 // Debug OfflineMode, set to true if you want the simulator to be offline
-const DEBUG_OFFLINEMODE = true;
+const DEBUG_OFFLINEMODE = false;
 
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
@@ -46,11 +46,13 @@ import {
   asyncStoreGetItem,
   asyncStoreGetObject,
   asyncStoreSafeClear,
+  asyncStoreSetItem,
 } from "./store/async-storage";
 import { truncateString } from "./util/string";
 import LoadingOverlay from "./components/UI/LoadingOverlay";
 import ImportGSScreen from "./screens/ImportGSScreen";
 import FilteredExpenses from "./screens/FilteredExpenses";
+import { sendOfflineQueue } from "./util/offline-queue";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
@@ -380,10 +382,18 @@ function Root() {
       return null;
     }
     console.log("Offline mode");
-    expensesCtx.loadExpensesFromStorage();
-    userCtx.loadUserNameFromStorage();
-    tripCtx.loadTripDataFromStorage();
-    tripCtx.loadTravellersFromStorage();
+    const expenses = await asyncStoreGetObject("expenses");
+    if (expenses) {
+      console.log(
+        "loadExpensesFromStorage ~ expenses",
+        truncateString(expenses, 10)
+      );
+      expensesCtx.setExpenses(expenses);
+    }
+    console.log("Root ~ expensesCtx.expenses[0]", expensesCtx.expenses[0]);
+    await userCtx.loadUserNameFromStorage();
+    await tripCtx.loadTripDataFromStorage();
+    await tripCtx.loadTravellersFromStorage();
     authCtx.authenticate(storedToken);
   }
 
@@ -414,11 +424,16 @@ function Root() {
           setAppIsReady(true);
           return;
         }
-        // check if we have a queue stored
-        const queue = await asyncStoreGetObject("queue");
-        if (queue && queue.length > 0) {
-          console.log("queue", queue);
+        // set tripId in context
+        if (storedTripId) {
+          console.log("onRootMount ~ storedTripId", storedTripId);
+          tripCtx.fetchAndSetCurrentTrip(storedTripId);
+          tripCtx.setCurrentTravellers(storedTripId);
+          tripCtx.setTripid(storedTripId);
         }
+
+        // send offline queue if we have one
+        await sendOfflineQueue();
 
         // check if user was only freshly created
         if (freshlyCreated) {
@@ -451,13 +466,9 @@ function Root() {
           userCtx.addUser(userData);
           tripData = await fetchTrip(tripid);
           tripCtx.setCurrentTrip(tripid, tripData);
+          await asyncStoreSetItem("currentTripId", tripid);
         } catch (error) {
           Alert.alert(error);
-        }
-
-        if (storedTripId) {
-          tripCtx.fetchAndSetCurrentTrip(storedTripId);
-          tripCtx.setCurrentTravellers(storedTripId);
         }
 
         authCtx.authenticate(storedToken);

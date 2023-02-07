@@ -54,8 +54,7 @@ export const ExpensesContext = createContext({
   getSpecificMonthExpenses: (date) => {},
   getSpecificYearExpenses: (date) => {},
 
-  saveExpensesInStorage: (expenses) => {},
-  loadExpensesFromStorage: () => {},
+  loadExpensesFromStorage: async () => {},
 });
 
 function expensesReducer(state, action) {
@@ -231,17 +230,8 @@ function ExpensesContextProvider({ children }) {
     return yearlyExpenses;
   }
 
-  function saveExpensesInStorage(expenses = null) {
-    if (!expenses) asyncStoreSetObject("expenses", expensesState);
-    else asyncStoreSetObject("expenses", expenses);
-  }
-
-  function loadExpensesFromStorage() {
-    asyncStoreGetObject("expenses").then((expenses) => {
-      if (expenses) {
-        setExpenses(expenses);
-      }
-    });
+  function saveExpensesInStorage(expenses) {
+    asyncStoreSetObject("expenses", expenses);
   }
 
   const value = {
@@ -260,7 +250,6 @@ function ExpensesContextProvider({ children }) {
     getSpecificMonthExpenses: getSpecificMonthExpenses,
     getSpecificYearExpenses: getSpecificYearExpenses,
     saveExpensesInStorage: saveExpensesInStorage,
-    loadExpensesFromStorage: loadExpensesFromStorage,
   };
 
   return (

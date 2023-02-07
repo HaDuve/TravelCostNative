@@ -29,10 +29,10 @@ export const TripContext = createContext({
   setCurrentTrip: (tripid: string, trip) => {},
   deleteCurrentTrip: (uid: string) => {},
   fetchAndSetCurrentTrip: (tripid: string) => {},
-  saveTripDataInStorage: (tripData) => {},
-  loadTripDataFromStorage: () => {},
-  saveTravellersInStorage: (travellers) => {},
-  loadTravellersFromStorage: () => {},
+  saveTripDataInStorage: async (tripData) => {},
+  loadTripDataFromStorage: async () => {},
+  saveTravellersInStorage: async (travellers) => {},
+  loadTravellersFromStorage: async () => {},
 });
 
 function TripContextProvider({ children }) {
@@ -142,25 +142,26 @@ function TripContextProvider({ children }) {
     console.log("delete Trip NOT IMPLEMENTED");
   }
 
-  function saveTripDataInStorage(tripData) {
-    asyncStoreSetObject("currentTrip", tripData);
+  async function saveTripDataInStorage(tripData) {
+    await asyncStoreSetObject("currentTrip", tripData);
   }
 
-  function loadTripDataFromStorage() {
-    asyncStoreGetObject("currentTrip").then((tripData) => {
+  async function loadTripDataFromStorage() {
+    await asyncStoreGetObject("currentTrip").then((tripData) => {
       if (tripData) {
         // console.log("loadTripDataFromStorage ~ tripData", tripData);
         setCurrentTrip(tripData.tripid, tripData);
+        return tripData;
       }
     });
   }
 
-  function saveTravellersInStorage(travellers) {
-    asyncStoreSetObject("currentTravellers", travellers);
+  async function saveTravellersInStorage(travellers) {
+    await asyncStoreSetObject("currentTravellers", travellers);
   }
 
-  function loadTravellersFromStorage() {
-    asyncStoreGetObject("currentTravellers").then((travellers) => {
+  async function loadTravellersFromStorage() {
+    await asyncStoreGetObject("currentTravellers").then((travellers) => {
       if (travellers) {
         console.log("loadTravellersFromStorage ~ travellers", travellers);
         setTravellers(travellers);

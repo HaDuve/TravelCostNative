@@ -66,6 +66,7 @@ const OverviewScreen = ({ navigation }) => {
       try {
         const expenses = await getAllExpenses(tripid, uid);
         expensesCtx.setExpenses(expenses);
+        expensesCtx.saveExpensesInStorage(expenses);
       } catch (error) {
         console.error(error);
       }

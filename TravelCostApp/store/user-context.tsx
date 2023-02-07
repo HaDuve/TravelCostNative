@@ -24,8 +24,8 @@ export const UserContext = createContext({
 
   isOnline: false,
   setIsOnline: (bool: boolean) => {},
-  saveUserNameInStorage: (name: string) => {},
-  loadUserNameFromStorage: () => {},
+  saveUserNameInStorage: async (name: string) => {},
+  loadUserNameFromStorage: async () => {},
 });
 
 function tripsReducer(state, action) {
@@ -95,16 +95,15 @@ function UserContextProvider({ children }) {
   }
 
   function getTripHistory() {
-    console.warn("!!!!!!!!!!!!!! getTripHistory ~ tripsState", tripsState);
     return tripsState;
   }
 
-  function saveUserNameInStorage(name: string) {
+  async function saveUserNameInStorage(name: string) {
     // console.log("saveUserNameInStorage ~ userName", name);
-    asyncStoreSetObject("userName", name);
+    await asyncStoreSetObject("userName", name);
   }
 
-  function loadUserNameFromStorage() {
+  async function loadUserNameFromStorage() {
     console.log("loadUserNameFromStorage ~ userName", userName);
     asyncStoreGetItem("userName").then((name) => {
       if (name) {

@@ -1,29 +1,17 @@
-import { Alert, FlatList, Button } from "react-native";
+import { Alert, FlatList } from "react-native";
 
 import ExpenseItem from "./ExpenseItem";
 
-import React, { Component, useContext } from "react";
+import React, { useContext } from "react";
 import { View } from "react-native";
 
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { GlobalStyles } from "../../constants/styles";
 import { deleteExpense } from "../../util/http";
 import { TripContext } from "../../store/trip-context";
-import { AuthContext } from "../../store/auth-context";
 import { ExpensesContext } from "../../store/expenses-context";
 import IconButton from "../UI/IconButton";
-import Animated, {
-  SlideInUp,
-  SlideInDown,
-  SlideInLeft,
-  SlideInRight,
-  SlideOutLeft,
-  SlideOutDown,
-  FadeInRight,
-  FadeOutLeft,
-  JumpingTransition,
-} from "react-native-reanimated";
-import { CurvedTransition } from "react-native-reanimated";
+import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -38,61 +26,61 @@ var tripid = "";
 var expenseCtx = {};
 let row = [];
 let prevOpenedRow;
-
+// swipe left to delete
+const renderRightActions = (progress, dragX, onClick) => {
+  return (
+    <View
+      style={{
+        margin: 0,
+        paddingTop: 12,
+        paddingLeft: 20,
+        alignContent: "flex-end",
+        justifyContent: "center",
+        width: 70,
+        backgroundColor: GlobalStyles.colors.error500,
+      }}
+    >
+      <IconButton
+        icon="trash"
+        color={GlobalStyles.colors.backgroundColor}
+        size={36}
+        onPress={onClick}
+        buttonStyle={{ marginLeft: 30 }}
+      />
+    </View>
+  );
+};
 function renderExpenseItem(itemData) {
-  // swipe left to delete
-  const renderRightActions = (progress, dragX, onClick) => {
-    return (
-      <View
-        style={{
-          margin: 0,
-          paddingTop: 12,
-          paddingLeft: 20,
-          alignContent: "flex-end",
-          justifyContent: "center",
-          width: 70,
-          backgroundColor: GlobalStyles.colors.error500,
-        }}
-      >
-        <IconButton
-          icon="trash"
-          color={GlobalStyles.colors.backgroundColor}
-          size={36}
-          onPress={onClick}
-          buttonStyle={{ marginLeft: 30 }}
-        />
-      </View>
-    );
-  };
   const index = itemData.index;
   return (
-    <Swipeable
-      renderRightActions={(progress, dragX) =>
-        renderRightActions(progress, dragX, onClick.bind(this, itemData))
-      }
-      onSwipeableOpen={closeRow.bind(this, index)}
-      ref={(ref) => (row[index] = ref)}
-      rightOpenValue={-100}
-      overshootFriction={8}
-    >
-      <ExpenseItem {...itemData.item} />
-    </Swipeable>
+    <View style={{ height: 50, width: "100%" }}>
+      <Swipeable
+        renderRightActions={(progress, dragX) =>
+          renderRightActions(progress, dragX, onClick.bind(this, itemData))
+        }
+        onSwipeableOpen={closeRow.bind(this, index)}
+        ref={(ref) => (row[index] = ref)}
+        rightOpenValue={-100}
+        overshootFriction={8}
+      >
+        <ExpenseItem {...itemData.item} />
+      </Swipeable>
+    </View>
   );
 }
 
 function onClick({ item, index }) {
   const editedExpenseId = item.id;
   const uid = item.uid;
-
-  async function deleteExpenseHandler() {
-    async function deleteExp() {
-      try {
-        await deleteExpense(tripid, uid, editedExpenseId);
-        expenseCtx.deleteExpense(editedExpenseId);
-      } catch (error) {
-        console.log(i18n.t("deleteError"), error);
-      }
+  async function deleteExp() {
+    try {
+      await deleteExpense(tripid, uid, editedExpenseId);
+      expenseCtx.deleteExpense(editedExpenseId);
+    } catch (error) {
+      console.log(i18n.t("deleteError"), error);
     }
+  }
+  async function deleteExpenseHandler() {
     Alert.alert(i18n.t("sure"), i18n.t("sureExt"), [
       // The "No" button
       // Does nothing but dismiss the dialog when tapped
@@ -145,11 +133,11 @@ function ExpensesList({ expenses, refreshControl }) {
         renderItem={renderExpenseItem}
         keyExtractor={(item) => item.id}
         refreshControl={refreshControl}
-        removeClippedSubviews={true}
-        maxToRenderPerBatch={10}
-        updateCellsBatchingPeriod={300}
-        initialNumToRender={10}
-        windowSize={10}
+        getItemLayout={(data, index) => ({
+          length: 50,
+          offset: 50 * index,
+          index,
+        })}
       />
     </Animated.View>
   );

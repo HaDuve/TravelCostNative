@@ -8,6 +8,7 @@ export const AuthContext = createContext({
   token: "",
   isAuthenticated: false,
   authenticate: (token) => {},
+  offlineAuthenticate: (token) => {},
   logout: () => {},
   setUserID: (uid) => {},
 });
@@ -20,6 +21,10 @@ function AuthContextProvider({ children }) {
     setAuthToken(token);
     AsyncStorage.setItem("token", token);
     setAxiosAccessToken(token);
+  }
+  function offlineAuthenticate(token) {
+    setAuthToken(token);
+    AsyncStorage.setItem("token", token);
   }
 
   function logout() {
@@ -38,6 +43,7 @@ function AuthContextProvider({ children }) {
     token: authToken,
     isAuthenticated: !!authToken,
     authenticate: authenticate,
+    offlineAuthenticate: offlineAuthenticate,
     logout: logout,
     setUserID: setUserID,
   };

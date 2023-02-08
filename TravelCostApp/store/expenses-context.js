@@ -54,6 +54,7 @@ export const ExpensesContext = createContext({
   getSpecificMonthExpenses: (date) => {},
   getSpecificYearExpenses: (date) => {},
 
+  saveExpensesInStorage: async () => {},
   loadExpensesFromStorage: async () => {},
 });
 
@@ -230,8 +231,9 @@ function ExpensesContextProvider({ children }) {
     return yearlyExpenses;
   }
 
-  function saveExpensesInStorage(expenses) {
-    asyncStoreSetObject("expenses", expenses);
+  async function saveExpensesInStorage(expenses) {
+    console.warn("saveExpensesInStorage ~ expenses", expenses);
+    await asyncStoreSetObject("expenses", expenses);
   }
 
   const value = {

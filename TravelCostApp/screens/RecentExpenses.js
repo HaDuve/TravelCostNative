@@ -71,7 +71,7 @@ function RecentExpenses({ navigation }) {
       const expenses = await getAllExpenses(tripid, uid);
       // console.log("getExpenses ~ expenses", expenses);
       expensesCtx.setExpenses(expenses);
-      expensesCtx.saveExpensesInStorage(expenses);
+      await expensesCtx.saveExpensesInStorage(expenses);
 
       const expensesSum = expenses.reduce((sum, expense) => {
         return sum + expense.calcAmount;

@@ -1,7 +1,7 @@
 // Debug asyncStorage, set to true if you want all storage to be reset and user logged out
 const DEBUG_RESET = false;
 // Debug OfflineMode, set to true if you want the simulator to be offline
-const DEBUG_OFFLINEMODE = false;
+const DEBUG_OFFLINEMODE = true;
 
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
@@ -384,17 +384,15 @@ function Root() {
     console.log("Offline mode");
     const expenses = await asyncStoreGetObject("expenses");
     if (expenses) {
-      console.log(
-        "loadExpensesFromStorage ~ expenses",
-        truncateString(expenses, 10)
-      );
+      console.log("loadExpensesFromStorage ~ expenses", expenses);
       expensesCtx.setExpenses(expenses);
+      console.log("expenses nr 1", expenses[0]);
     }
     console.log("Root ~ expensesCtx.expenses[0]", expensesCtx.expenses[0]);
     await userCtx.loadUserNameFromStorage();
     await tripCtx.loadTripDataFromStorage();
     await tripCtx.loadTravellersFromStorage();
-    authCtx.authenticate(storedToken);
+    authCtx.offlineAuthenticate(storedToken);
   }
 
   useEffect(() => {
@@ -420,7 +418,9 @@ function Root() {
         //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
         // check if user is online
         if (await checkOfflineMode()) {
-          setupOfflineMount(true, storedToken);
+          console.log("OFFLINE SETUP STARTED");
+          await setupOfflineMount(true, storedToken);
+          console.log("OFFLINE SETUP FINISHED");
           setAppIsReady(true);
           return;
         }

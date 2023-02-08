@@ -1,4 +1,5 @@
 import {
+  asyncStoreGetItem,
   asyncStoreGetObject,
   asyncStoreSetObject,
 } from "../store/async-storage";
@@ -34,8 +35,8 @@ export const storeExpenseOnlineOffline = async (
   online: boolean
 ) => {
   // load tripid from asyncstore to fix the tripctx tripid bug
-  const tripid = await asyncStoreGetObject("currentTripId");
-  console.log("async tripid", tripid);
+  const tripid = await asyncStoreGetItem("currentTripId");
+  console.log("storeExpenseOnlineOffline ~ async tripid", tripid);
   item.expense.tripid = tripid;
   console.log("storeExpenseOnlineOffline ~ online", online);
   if (online) {

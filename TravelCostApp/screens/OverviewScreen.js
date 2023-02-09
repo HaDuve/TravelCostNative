@@ -59,7 +59,10 @@ const OverviewScreen = ({ navigation }) => {
   useEffect(() => {
     async function getExpenses() {
       // check offlinemode
+      // check offlinemode
       if (!userCtx.isOnline) {
+        await expensesCtx.loadExpensesFromStorage();
+        setIsFetching(false);
         return;
       }
       setIsFetching(true);

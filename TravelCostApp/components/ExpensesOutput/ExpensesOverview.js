@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
   titleContainer: {},
   titleText: {
-    paddingTop: 20,
+    paddingTop: 12,
     paddingRight: 20,
     textAlign: "center",
     fontSize: 20,

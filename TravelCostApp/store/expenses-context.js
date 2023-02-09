@@ -236,6 +236,20 @@ function ExpensesContextProvider({ children }) {
     await asyncStoreSetObject("expenses", expenses);
   }
 
+  async function loadExpensesFromStorage() {
+    if (expensesState.length !== 0) {
+      console.log("expenses not empty, will not load again");
+      return;
+    }
+    const expenses = await asyncStoreGetObject("expenses");
+    if (expenses) {
+      expenses.forEach((expense) => {
+        expense.date = new Date(expense.date);
+        addExpense(expense);
+      });
+    }
+  }
+
   const value = {
     expenses: expensesState,
     addExpense: addExpense,
@@ -252,6 +266,7 @@ function ExpensesContextProvider({ children }) {
     getSpecificMonthExpenses: getSpecificMonthExpenses,
     getSpecificYearExpenses: getSpecificYearExpenses,
     saveExpensesInStorage: saveExpensesInStorage,
+    loadExpensesFromStorage: loadExpensesFromStorage,
   };
 
   return (

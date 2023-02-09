@@ -21,12 +21,12 @@ function SignupScreen() {
     try {
       const { token, uid } = await createUser(email, password);
       //CLEAR
-      asyncStoreSafeClear();
+      await asyncStoreSafeClear();
       userCtx.setTripHistory([]);
       //NEW
       const userData = { userName: name };
-      storeUser(uid, userData);
-      updateUser(uid, {
+      await storeUser(uid, userData);
+      await updateUser(uid, {
         userName: name,
       });
       userCtx.setUserName(name);

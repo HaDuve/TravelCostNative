@@ -355,9 +355,9 @@ function Root() {
   const expensesCtx = useContext(ExpensesContext);
 
   async function checkOfflineMode() {
-    const force = DEBUG_OFFLINEMODE;
+    const forceOffline = DEBUG_OFFLINEMODE;
     const isOfflineMode = !(await checkInternetConnection(
-      force
+      forceOffline
         ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
         : "https://www.google.com/",
       10000,
@@ -382,13 +382,7 @@ function Root() {
       return null;
     }
     console.log("Offline mode");
-    const expenses = await asyncStoreGetObject("expenses");
-    if (expenses) {
-      console.log("loadExpensesFromStorage ~ expenses", expenses);
-      expensesCtx.setExpenses(expenses);
-      console.log("expenses nr 1", expenses[0]);
-    }
-    console.log("Root ~ expensesCtx.expenses[0]", expensesCtx.expenses[0]);
+    await expensesCtx.loadExpensesFromStorage();
     await userCtx.loadUserNameFromStorage();
     await tripCtx.loadTripDataFromStorage();
     await tripCtx.loadTravellersFromStorage();
@@ -526,7 +520,9 @@ export default function App() {
             <TripContextProvider>
               <UserContextProvider>
                 <NetworkProvider>
-                  <Root />
+                  <ExpensesContextProvider>
+                    <Root />
+                  </ExpensesContextProvider>
                 </NetworkProvider>
               </UserContextProvider>
             </TripContextProvider>

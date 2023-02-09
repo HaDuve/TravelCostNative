@@ -63,6 +63,9 @@ function RecentExpenses({ navigation }) {
   async function getExpenses(refresh) {
     // check offlinemode
     if (!userCtx.isOnline) {
+      await expensesCtx.loadExpensesFromStorage();
+      setRefreshing(false);
+      setIsFetching(false);
       return;
     }
     if (!refresh) setIsFetching(true);

@@ -1,7 +1,7 @@
 // Debug asyncStorage, set to true if you want all storage to be reset and user logged out
 const DEBUG_RESET = false;
 // Debug OfflineMode, set to true if you want the simulator to be offline
-const DEBUG_OFFLINEMODE = true;
+const DEBUG_OFFLINEMODE = false;
 
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
@@ -38,6 +38,7 @@ import OverviewScreen from "./screens/OverviewScreen";
 import CategoryPickScreen from "./screens/CategoryPickScreen";
 import SplitSummaryScreen from "./screens/SplitSummaryScreen";
 import SettingsScreen from "./screens/SettingsScreen";
+import DeviceInfo from "react-native-device-info";
 
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
@@ -355,7 +356,13 @@ function Root() {
   const expensesCtx = useContext(ExpensesContext);
 
   async function checkOfflineMode() {
-    const forceOffline = DEBUG_OFFLINEMODE;
+    let forceOffline = DEBUG_OFFLINEMODE;
+    // if app is not running on emulator, always set forceOffline to false
+    DeviceInfo.isEmulator().then((isEmulator) => {
+      if (!isEmulator) {
+        forceOffline = false;
+      }
+    });
     const isOfflineMode = !(await checkInternetConnection(
       forceOffline
         ? "https://www.existiertnichtasdasjdnkajsdjnads.de"

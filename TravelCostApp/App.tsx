@@ -38,8 +38,7 @@ import OverviewScreen from "./screens/OverviewScreen";
 import CategoryPickScreen from "./screens/CategoryPickScreen";
 import SplitSummaryScreen from "./screens/SplitSummaryScreen";
 import SettingsScreen from "./screens/SettingsScreen";
-import DeviceInfo from "react-native-device-info";
-
+import * as Device from "expo-device";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "./i18n/supportedLanguages";
@@ -358,11 +357,9 @@ function Root() {
   async function checkOfflineMode() {
     let forceOffline = DEBUG_OFFLINEMODE;
     // if app is not running on emulator, always set forceOffline to false
-    DeviceInfo.isEmulator().then((isEmulator) => {
-      if (!isEmulator) {
-        forceOffline = false;
-      }
-    });
+    if (Device.isDevice) {
+      forceOffline = false;
+    }
     const isOfflineMode = !(await checkInternetConnection(
       forceOffline
         ? "https://www.existiertnichtasdasjdnkajsdjnads.de"

@@ -65,6 +65,7 @@ const ManageExpense = ({ route, navigation }) => {
       setIsSubmitting(true);
       try {
         await deleteExpense(tripid, uid, editedExpenseId);
+        // TODO: add onlineoffline for update and delete
         expenseCtx.deleteExpense(editedExpenseId);
         navigation.goBack();
       } catch (error) {
@@ -109,6 +110,7 @@ const ManageExpense = ({ route, navigation }) => {
       });
 
       if (isEditing) {
+        // TODO: add onlineoffline for update and delete
         expenseCtx.updateExpense(editedExpenseId, expenseData);
         await updateExpense(tripid, uid, editedExpenseId, expenseData);
       } else {
@@ -127,8 +129,8 @@ const ManageExpense = ({ route, navigation }) => {
 
             expenseData.date = expenseData.endDate = newDate;
             console.log("Storing New Date: ", newDate);
+            // TODO: add onlineoffline for update and delete and ranged expenses
             const id = await storeExpense(tripid, uid, expenseData);
-            console.log("id", id);
             expenseCtx.addExpense({ ...expenseData, id: id });
           }
         } else {
@@ -142,6 +144,7 @@ const ManageExpense = ({ route, navigation }) => {
             },
           };
           console.log("confirmHandler ~ tripid", tripid);
+          // TODO: add onlineoffline for update and delete
           const id = await storeExpenseOnlineOffline(item, userCtx.isOnline);
           // const id = await storeExpense(tripid, uid, expenseData);
           expenseCtx.addExpense({ ...expenseData, id: id });

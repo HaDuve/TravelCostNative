@@ -74,6 +74,7 @@ function onClick({ item, index }) {
   const uid = item.uid;
   async function deleteExp() {
     try {
+      // TODO: add onlineoffline for update and delete
       await deleteExpense(tripid, uid, editedExpenseId);
       expenseCtx.deleteExpense(editedExpenseId);
     } catch (error) {

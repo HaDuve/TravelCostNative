@@ -2,7 +2,8 @@
 export interface Expense {
   tripid: string;
   uid: string;
-  expenseData: ExpenseData;
+  id?: string;
+  expenseData?: ExpenseData;
 }
 
 export interface ExpenseData {

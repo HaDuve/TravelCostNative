@@ -28,7 +28,11 @@ import { daysBetween, getDatePlusDays } from "../util/date";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
-import { storeExpenseOnlineOffline } from "../util/offline-queue";
+import {
+  deleteExpenseOnlineOffline,
+  storeExpenseOnlineOffline,
+  updateExpenseOnlineOffline,
+} from "../util/offline-queue";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -64,8 +68,15 @@ const ManageExpense = ({ route, navigation }) => {
     async function deleteExp() {
       setIsSubmitting(true);
       try {
-        await deleteExpense(tripid, uid, editedExpenseId);
-        // TODO: add onlineoffline for update and delete
+        const item = {
+          type: "delete",
+          expense: {
+            tripid: tripid,
+            uid: uid,
+            id: editedExpenseId,
+          },
+        };
+        await deleteExpenseOnlineOffline(item, userCtx.isOnline);
         expenseCtx.deleteExpense(editedExpenseId);
         navigation.goBack();
       } catch (error) {
@@ -110,10 +121,26 @@ const ManageExpense = ({ route, navigation }) => {
       });
 
       if (isEditing) {
-        // TODO: add onlineoffline for update and delete
+        const item = {
+          type: "update",
+          expense: {
+            tripid: tripid,
+            uid: uid,
+            expenseData: expenseData,
+            id: editedExpenseId,
+          },
+        };
         expenseCtx.updateExpense(editedExpenseId, expenseData);
-        await updateExpense(tripid, uid, editedExpenseId, expenseData);
+        await updateExpenseOnlineOffline(item, userCtx.isOnline);
       } else {
+        const item = {
+          type: "add",
+          expense: {
+            tripid: tripid,
+            uid: uid,
+            expenseData: expenseData,
+          },
+        };
         // Check for ranged Expense
         console.log("expenseData:", expenseData);
         if (expenseData.date.toString() !== expenseData.endDate.toString()) {
@@ -129,8 +156,7 @@ const ManageExpense = ({ route, navigation }) => {
 
             expenseData.date = expenseData.endDate = newDate;
             console.log("Storing New Date: ", newDate);
-            // TODO: add onlineoffline for update and delete and ranged expenses
-            const id = await storeExpense(tripid, uid, expenseData);
+            const id = await storeExpenseOnlineOffline(item, userCtx.isOnline);
             expenseCtx.addExpense({ ...expenseData, id: id });
           }
         } else {
@@ -144,9 +170,7 @@ const ManageExpense = ({ route, navigation }) => {
             },
           };
           console.log("confirmHandler ~ tripid", tripid);
-          // TODO: add onlineoffline for update and delete
           const id = await storeExpenseOnlineOffline(item, userCtx.isOnline);
-          // const id = await storeExpense(tripid, uid, expenseData);
           expenseCtx.addExpense({ ...expenseData, id: id });
         }
       }

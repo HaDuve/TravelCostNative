@@ -232,7 +232,6 @@ function ExpensesContextProvider({ children }) {
   }
 
   async function saveExpensesInStorage(expenses) {
-    console.warn("saveExpensesInStorage ~ expenses", expenses);
     await asyncStoreSetObject("expenses", expenses);
   }
 

@@ -2,6 +2,8 @@
 import React, { createContext, useReducer, useState } from "react";
 import { Alert } from "react-native";
 import { asyncStoreGetItem, asyncStoreSetObject } from "./async-storage";
+import * as Device from "expo-device";
+import { checkInternetConnection } from "react-native-offline";
 
 export const UserContext = createContext({
   userName: "",
@@ -26,6 +28,9 @@ export const UserContext = createContext({
   setIsOnline: (bool: boolean) => {},
   saveUserNameInStorage: async (name: string) => {},
   loadUserNameFromStorage: async () => {},
+  checkConnectionUpdateUser: async (forceOffline = false) => {
+    return true;
+  },
 });
 
 function tripsReducer(state, action) {
@@ -112,6 +117,24 @@ function UserContextProvider({ children }) {
     });
   }
 
+  async function checkConnectionUpdateUser(forceOffline = false) {
+    // if app is not running on emulator, always set forceOffline to false
+    if (Device.isDevice) {
+      forceOffline = false;
+    }
+    const isOnline = await checkInternetConnection(
+      forceOffline
+        ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
+        : "https://www.google.com/",
+      10000,
+      true,
+      "HEAD"
+    );
+    console.log("checkConnection ~ isOnline", isOnline);
+    setIsOnline(isOnline);
+    return isOnline;
+  }
+
   const value = {
     userName: userName,
     periodName: periodName,
@@ -132,6 +155,7 @@ function UserContextProvider({ children }) {
     setIsOnline: setIsOnline,
     saveUserNameInStorage: saveUserNameInStorage,
     loadUserNameFromStorage: loadUserNameFromStorage,
+    checkConnectionUpdateUser: checkConnectionUpdateUser,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

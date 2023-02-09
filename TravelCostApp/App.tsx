@@ -1,7 +1,7 @@
 // Debug asyncStorage, set to true if you want all storage to be reset and user logged out
 const DEBUG_RESET = false;
 // Debug OfflineMode, set to true if you want the simulator to be offline
-const DEBUG_OFFLINEMODE = false;
+const DEBUG_FORCE_OFFLINE = false;
 
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
@@ -354,29 +354,6 @@ function Root() {
   const tripCtx = useContext(TripContext);
   const expensesCtx = useContext(ExpensesContext);
 
-  async function checkOfflineMode() {
-    let forceOffline = DEBUG_OFFLINEMODE;
-    // if app is not running on emulator, always set forceOffline to false
-    if (Device.isDevice) {
-      forceOffline = false;
-    }
-    const isOfflineMode = !(await checkInternetConnection(
-      forceOffline
-        ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
-        : "https://www.google.com/",
-      10000,
-      true,
-      "HEAD"
-    ));
-    console.log("checkOfflineMode ~ isOfflineMode", isOfflineMode);
-    // url?: string = 'https://www.google.com/',
-    // pingTimeout?: number = 10000,
-    // shouldPing?: boolean = true,
-    // method?: HTTPMethod = 'HEAD'
-    userCtx.setIsOnline(!isOfflineMode);
-    return isOfflineMode;
-  }
-
   async function setupOfflineMount(
     isOfflineMode: boolean,
     storedToken: string
@@ -415,7 +392,7 @@ function Root() {
       if (storedToken) {
         //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
         // check if user is online
-        if (await checkOfflineMode()) {
+        if (!(await userCtx.checkConnectionUpdateUser(DEBUG_FORCE_OFFLINE))) {
           console.log("OFFLINE SETUP STARTED");
           await setupOfflineMount(true, storedToken);
           console.log("OFFLINE SETUP FINISHED");

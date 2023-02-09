@@ -4,7 +4,7 @@ import {
   asyncStoreSetObject,
 } from "../store/async-storage";
 import { Expense } from "./expense";
-import { storeExpense } from "./http";
+import { storeExpense, updateExpense, deleteExpense } from "./http";
 
 // interface of offline queue manage expense item
 export interface OfflineQueueManageExpenseItem {
@@ -27,6 +27,53 @@ export const pushOfflineQueue = async (item: OfflineQueueManageExpenseItem) => {
 export const getOfflineQueue = async () => {
   const offlineQueue = await asyncStoreGetObject("offlineQueue");
   return offlineQueue || [];
+};
+
+// delete item online if online flag is set, otherwise store in offline queue
+export const deleteExpenseOnlineOffline = async (
+  item: OfflineQueueManageExpenseItem,
+  online: boolean
+) => {
+  // load tripid from asyncstore to fix the tripctx tripid bug
+  const tripid = await asyncStoreGetItem("currentTripId");
+  console.log("deleteExpenseOnlineOffline ~ async tripid", tripid);
+  item.expense.tripid = tripid;
+  console.log("deleteExpenseOnlineOffline ~ online", online);
+  if (online) {
+    // delete item online
+    const res = await deleteExpense(
+      item.expense.tripid,
+      item.expense.uid,
+      item.expense.id
+    );
+  } else {
+    // delete item offline
+    const res = await pushOfflineQueue(item);
+  }
+};
+
+// update item online if online flag is set, othwerwise store in offline queue
+export const updateExpenseOnlineOffline = async (
+  item: OfflineQueueManageExpenseItem,
+  online: boolean
+) => {
+  // load tripid from asyncstore to fix the tripctx tripid bug
+  const tripid = await asyncStoreGetItem("currentTripId");
+  console.log("updateExpenseOnlineOffline ~ async tripid", tripid);
+  item.expense.tripid = tripid;
+  console.log("updateExpenseOnlineOffline ~ online", online);
+  if (online) {
+    // update item online
+    const res = await updateExpense(
+      item.expense.tripid,
+      item.expense.uid,
+      item.expense.id,
+      item.expense.expenseData
+    );
+  } else {
+    // update item offline
+    const res = await pushOfflineQueue(item);
+  }
 };
 
 // store item online if online flag is set, otherwise store in offline queue
@@ -74,9 +121,18 @@ export const sendOfflineQueue = async () => {
         );
         console.log("id", id);
       } else if (item.type === "update") {
-        // await updateExpenseOnlineOffline(item, true);
+        await updateExpense(
+          item.expense.tripid,
+          item.expense.uid,
+          item.expense.id,
+          item.expense.expenseData
+        );
       } else if (item.type === "delete") {
-        // await deleteExpenseOnlineOffline(item, true);
+        await deleteExpense(
+          item.expense.tripid,
+          item.expense.uid,
+          item.expense.id
+        );
       } else {
         console.log("unknown type");
       }

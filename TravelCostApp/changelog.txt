@@ -1,5 +1,13 @@
 Changelog Travel Expense App
 
+1.0.40
+- fully functional offline-mode
+- fixed alot of bugs
+- polished design
+- reduced data and battery consumption
+- fixed import via FoodForNomads Button
+- added animations
+
 1.0.34
 - added import function from FoodForNomads GoogleSheets (need to convert to xlsx first, whoPaid still missing)
 

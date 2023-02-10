@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import React, { createContext, useReducer, useState } from "react";
+import React, { createContext, useState } from "react";
 import { Alert } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchTrip, getTravellers } from "../util/http";
-import { de } from "../i18n/supportedLanguages";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 
 export const TripContext = createContext({
@@ -76,7 +74,7 @@ function TripContextProvider({ children }) {
 
   async function setCurrentTrip(tripid: string, trip) {
     if (!trip) return;
-    console.log("setCurrentTrip ~ setCurrentTrip", setCurrentTrip);
+    console.log("setCurrentTrip ~ setCurrentTrip", tripid, trip);
     if (tripid === "reset") {
       console.log("resetting Trip to empty!");
       _setTripid("");
@@ -143,14 +141,22 @@ function TripContextProvider({ children }) {
   }
 
   async function saveTripDataInStorage(tripData) {
+    // TODO: save and load trip correctly
     await asyncStoreSetObject("currentTrip", tripData);
   }
 
   async function loadTripDataFromStorage() {
     await asyncStoreGetObject("currentTrip").then((tripData) => {
       if (tripData) {
+        // TODO: save and load trip correctly
         // console.log("loadTripDataFromStorage ~ tripData", tripData);
-        setCurrentTrip(tripData.tripid, tripData);
+        // setCurrentTrip(tripData.tripid, tripData);
+        // _setTripid(tripid);
+        // setTripName(trip.tripName);
+        // setTotalBudget(trip.totalBudget.toString());
+        // setTripCurrency(trip.tripCurrency);
+        // setdailyBudget(trip.dailyBudget.toString());
+        // setCurrentTravellers(tripid);
         return tripData;
       }
     });

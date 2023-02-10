@@ -7,6 +7,9 @@ Changelog Travel Expense App
 - reduced data and battery consumption
 - fixed import via FoodForNomads Button
 - added animations
+- added shadows
+- capped expensechart at 10x the budget
+- added indicators who paid and shared
 
 1.0.34
 - added import function from FoodForNomads GoogleSheets (need to convert to xlsx first, whoPaid still missing)

@@ -27,17 +27,21 @@ import Animated, {
   SlideOutLeft,
   CurvedTransition,
 } from "react-native-reanimated";
+import { FlatList } from "react-native-gesture-handler";
 
-function ExpenseItem({
-  id,
-  description,
-  amount,
-  date,
-  category,
-  whoPaid,
-  currency,
-  calcAmount,
-}): JSX.Element {
+function ExpenseItem(props): JSX.Element {
+  const {
+    id,
+    description,
+    amount,
+    date,
+    category,
+    whoPaid,
+    currency,
+    calcAmount,
+    splitList,
+  } = props;
+  console.log("ExpenseItem ~ props", props);
   const navigation = useNavigation();
   const TripCtx = useContext(TripContext);
   const homeCurrency = TripCtx.tripCurrency;
@@ -67,6 +71,35 @@ function ExpenseItem({
   ) : (
     <></>
   );
+
+  const longList =
+    splitList && splitList.length > 2 ? splitList.slice(0, 2) : null;
+  longList?.push({ userName: "+" });
+  const sharedList =
+    splitList && splitList.length > 0 ? (
+      <View>
+        <FlatList
+          data={longList ? longList : splitList}
+          horizontal={true}
+          renderItem={({ item }) => (
+            <View
+              style={[styles.avatar, GlobalStyles.shadow, { marginBottom: 16 }]}
+            >
+              <Text style={styles.avatarText}>{item.userName.slice(0, 1)}</Text>
+            </View>
+          )}
+          contentContainerStyle={styles.avatarContainer}
+          keyExtractor={(item) => item + Math.random()}
+        ></FlatList>
+      </View>
+    ) : (
+      <View style={styles.avatarContainer}>
+        <View style={[styles.avatar, GlobalStyles.shadow]}>
+          <Text style={styles.avatarText}>{whoPaid.slice(0, 1)}</Text>
+        </View>
+      </View>
+    );
+
   if (!id) return <></>;
   return (
     <Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
@@ -84,12 +117,13 @@ function ExpenseItem({
           </View>
           <View style={styles.leftItem}>
             <Text style={[styles.textBase, styles.description]}>
-              {descriptionString}
+              {truncateString(descriptionString, 16)}
             </Text>
             <Text style={[styles.textBase, styles.secondaryText]}>
               {toShortFormat(date)}
             </Text>
           </View>
+          <View>{sharedList}</View>
           <View style={styles.amountContainer}>
             <Text style={styles.amount}>
               {calcAmountString}
@@ -159,6 +193,9 @@ const styles = StyleSheet.create({
     minWidth: 80,
   },
   amount: {
+    minWidth: 100,
+    maxWidth: 100,
+    textAlign: "right",
     fontSize: 20,
     fontWeight: "300",
     color: GlobalStyles.colors.error300,
@@ -166,5 +203,30 @@ const styles = StyleSheet.create({
   originalCurrencyText: {
     fontSize: 12,
     fontWeight: "300",
+  },
+  avatarContainer: {
+    maxWidth: 50,
+    minWidth: 50,
+    paddingTop: 8,
+    paddingRight: 18,
+    // center items left
+    flexDirection: "row",
+    justifyContent: "flex-start",
+  },
+  avatar: {
+    marginRight: -6,
+    minHeight: 20,
+    minWidth: 20,
+    borderRadius: 60,
+    borderWidth: 1,
+    borderColor: GlobalStyles.colors.primary700,
+    backgroundColor: GlobalStyles.colors.gray500,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: GlobalStyles.colors.primary700,
   },
 });

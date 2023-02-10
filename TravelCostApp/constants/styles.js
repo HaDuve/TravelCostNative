@@ -51,18 +51,25 @@ export const GlobalStyles = {
     fontWeight: "300",
   },
   shadow: {
-    elevation: 3,
+    elevation: 2,
+    borderColor: "#BFBFBF",
+    shadowColor: "#BFBFBF",
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.75,
+  },
+  strongShadow: {
+    elevation: 4,
     borderColor: "#BFBFBF",
     shadowColor: "#BFBFBF",
     shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 10,
+    shadowOpacity: 1,
   },
   shadowPrimary: {
-    elevation: 3,
+    elevation: 2,
     borderColor: "#538076",
     shadowColor: "#538076",
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 10,
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.75,
   },
 };
 export const CatColors = [

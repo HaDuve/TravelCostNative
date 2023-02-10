@@ -42,7 +42,7 @@ const ProfileScreen = ({ navigation }) => {
   const [tripsList, setTripsList] = useState([]);
 
   useEffect(() => {
-    if (FreshlyCreated) return;
+    if (FreshlyCreated || !UserCtx.isOnline) return;
     refreshHandler();
   }, [TripCtx.refreshState]);
 

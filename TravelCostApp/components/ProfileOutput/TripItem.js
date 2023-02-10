@@ -20,6 +20,7 @@ import LoadingOverlay from "../UI/LoadingOverlay";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../../i18n/supportedLanguages";
+import { UserContext } from "../../store/user-context";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -39,14 +40,15 @@ function TripItem({
     dailyBudget,
     tripCurrency,
   };
-  if (!tripid) return <Text>no id</Text>;
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
+  const userCtx = useContext(UserContext);
   const [travellers, setTravellers] = useState([]);
   const [isFetching, setIsFetching] = useState(true);
 
   useEffect(() => {
     async function getTripTravellers() {
+      if (userCtx.isOnline === false) return;
       setIsFetching(true);
       try {
         const listTravellers = await getTravellers(tripid);
@@ -64,6 +66,7 @@ function TripItem({
   }, []);
 
   function tripPressHandler() {
+    if (userCtx.isOnline === false) return;
     // NOTE: Android can only handle alert with 2 actions, so this needs to be changed or actions will go missing
     console.log("pressed: ", tripid);
     travellers.length > 1 &&
@@ -89,10 +92,6 @@ function TripItem({
 
   const activeProgress = tripCtx.totalSum / totalBudget;
 
-  if (isFetching) {
-    return <LoadingOverlay />;
-  }
-
   function renderTravellers(item) {
     return (
       <View style={styles.travellerCard}>
@@ -114,6 +113,10 @@ function TripItem({
       </View>
     );
   }
+  if (isFetching) {
+    return <LoadingOverlay />;
+  }
+  if (!tripid) return <Text>no id</Text>;
 
   return (
     <Pressable

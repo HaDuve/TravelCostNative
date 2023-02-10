@@ -122,7 +122,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
         style={[
           styles.itemContainer,
           styles.buttonStyle,
-          GlobalStyles.shadow,
+          GlobalStyles.strongShadow,
           styles.widthConstraint,
           { transform: [{ translateX: item.shakeAnimation }] },
         ]}
@@ -193,20 +193,19 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   listStyle: {
-    paddingTop: 12,
+    paddingTop: "2%",
   },
   container: {
     flex: 1,
-    padding: 4,
-    paddingTop: 0,
-    paddingHorizontal: 20,
+    padding: "1%",
+    paddingTop: "2%",
+    paddingHorizontal: "4%",
   },
   widthConstraint: {
-    minWidth: Dimensions.get("window").width / 2.7,
-    maxWidth: Dimensions.get("window").width / 2.7,
+    minWidth: "30%",
+    maxWidth: "100%",
   },
   rowContainer: {
-    paddingVertical: 12,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
@@ -217,33 +216,33 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: "4%",
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
   },
   buttonStyle: {
     backgroundColor: GlobalStyles.colors.gray500,
-    paddingBottom: 8,
+    paddingVertical: "4%",
+    paddingHorizontal: "1%",
     borderRadius: 12,
-    paddingHorizontal: 4,
   },
   itemContainer: {
     flex: 1,
-    padding: 0,
-    margin: 16,
+    margin: "3%",
   },
   onPressStyleItem: {
     backgroundColor: GlobalStyles.colors.primary400,
   },
   itemText: {
     fontSize: 16,
+    marginTop: "-6%",
     color: GlobalStyles.colors.textColor,
     fontWeight: "200",
     fontStyle: "italic",
   },
   continueButtonStyle: {
-    paddingVertical: 16,
-    paddingHorizontal: 44,
+    paddingVertical: "12%",
+    paddingHorizontal: "12%",
   },
 });

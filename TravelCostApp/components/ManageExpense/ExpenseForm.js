@@ -41,6 +41,7 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../../i18n/supportedLanguages";
 import CurrencyPicker from "../Currency/CurrencyPicker";
+import { truncateString } from "../../util/string";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -461,185 +462,236 @@ const ExpenseForm = ({
   return (
     <>
       {datepickerJSX}
-      <KeyboardAvoidingView style={styles.form}>
-        <View style={styles.inputsRow}>
-          <Input
-            style={styles.rowInput}
-            label={i18n.t("priceIn") + inputs.currency.value}
-            textInputConfig={{
-              keyboardType: "decimal-pad",
-              onChangeText: inputChangedHandler.bind(this, "amount"),
-              value: inputs.amount.value,
-            }}
-            invalid={!inputs.amount.isValid}
-            // autoFocus={true}
-          />
-          <IconButton
-            icon={
-              defaultValues
-                ? newCat
-                  ? getCatSymbol(pickedCat)
-                  : getCatSymbol(defaultValues.category)
-                : getCatSymbol(pickedCat)
-            }
-            color={GlobalStyles.colors.primary500}
-            size={36}
-            onPress={() => {
-              navigation.navigate("CategoryPick", {
-                editedExpenseId: editedExpenseId,
-              });
-            }}
-          />
-        </View>
-        {/* always show more options when editing */}
-        {!isEditing && (
-          <Pressable onPress={toggleAdvancedHandler}>
-            <View style={styles.advancedRow}>
-              <IconButton
-                icon={
-                  hideAdvanced
-                    ? "arrow-down-circle-outline"
-                    : "arrow-forward-circle-outline"
-                }
-                color={GlobalStyles.colors.primary500}
-                size={28}
-                onPress={toggleAdvancedHandler}
-              />
-              {hideAdvanced && (
-                <Text style={styles.advancedText}>
-                  {i18n.t("showMoreOptions")}
-                </Text>
-              )}
-              {!hideAdvanced && (
-                <Text style={styles.advancedText}>
-                  {i18n.t("showLessOptions")}
-                </Text>
-              )}
-            </View>
-          </Pressable>
-        )}
-        {/* toggleable content */}
-        {!hideAdvanced && (
-          <>
-            <View style={styles.currencyContainer}>
-              {/* <Text style={styles.currencyLabel}>
+      <View style={styles.container}>
+        <KeyboardAvoidingView style={styles.form}>
+          <View style={styles.inputsRow}>
+            <Input
+              style={styles.rowInput}
+              label={i18n.t("priceIn") + inputs.currency.value}
+              textInputConfig={{
+                keyboardType: "decimal-pad",
+                onChangeText: inputChangedHandler.bind(this, "amount"),
+                value: inputs.amount.value,
+              }}
+              invalid={!inputs.amount.isValid}
+              // autoFocus={true}
+            />
+            <IconButton
+              icon={
+                defaultValues
+                  ? newCat
+                    ? getCatSymbol(pickedCat)
+                    : getCatSymbol(defaultValues.category)
+                  : getCatSymbol(pickedCat)
+              }
+              color={GlobalStyles.colors.primary500}
+              size={36}
+              onPress={() => {
+                navigation.navigate("CategoryPick", {
+                  editedExpenseId: editedExpenseId,
+                });
+              }}
+            />
+          </View>
+          {/* always show more options when editing */}
+          {!isEditing && (
+            <Pressable onPress={toggleAdvancedHandler}>
+              <View style={styles.advancedRow}>
+                <IconButton
+                  icon={
+                    hideAdvanced
+                      ? "arrow-down-circle-outline"
+                      : "arrow-forward-circle-outline"
+                  }
+                  color={GlobalStyles.colors.primary500}
+                  size={28}
+                  onPress={toggleAdvancedHandler}
+                />
+                {hideAdvanced && (
+                  <Text style={styles.advancedText}>
+                    {i18n.t("showMoreOptions")}
+                  </Text>
+                )}
+                {!hideAdvanced && (
+                  <Text style={styles.advancedText}>
+                    {i18n.t("showLessOptions")}
+                  </Text>
+                )}
+              </View>
+            </Pressable>
+          )}
+          {/* toggleable content */}
+          {!hideAdvanced && (
+            <>
+              <View style={styles.currencyContainer}>
+                {/* <Text style={styles.currencyLabel}>
                 {i18n.t("currencyLabel")}
               </Text> */}
-              <CurrencyPicker
-                countryValue={countryValue}
-                setCountryValue={setCountryValue}
-                onChangeValue={updateCurrency}
-                placeholder={isEditing ? defaultValues.currency : null}
-              ></CurrencyPicker>
-            </View>
-            <Input
-              label={i18n.t("descriptionLabel")}
-              placeholder={pickedCat}
-              textInputConfig={{
-                onChangeText: inputChangedHandler.bind(this, "description"),
-                value: inputs.description.value,
-                // multiline: true,
-              }}
-              invalid={!inputs.description.isValid}
-            />
-
-            <View style={styles.dateLabel}>
-              <Text style={styles.dateLabelText}>{i18n.t("dateLabel")}</Text>
-            </View>
-            <View style={styles.dateContainer}>
-              <View style={styles.dateIconContainer}>
-                <IconButton
-                  icon={"calendar-outline"}
-                  size={24}
-                  color={GlobalStyles.colors.primary500}
-                  style={styles.button}
-                  onPress={openDatePickerRange}
-                />
+                <CurrencyPicker
+                  countryValue={countryValue}
+                  setCountryValue={setCountryValue}
+                  onChangeValue={updateCurrency}
+                  placeholder={isEditing ? defaultValues.currency : null}
+                ></CurrencyPicker>
               </View>
-              <View>
-                <Text style={styles.advancedText}>
-                  {startDate && toShortFormat(new Date(startDate))}
-                </Text>
-                {dateIsRanged && (
-                  <Text style={styles.advancedText}>- duplicate until - </Text>
-                )}
-                {dateIsRanged && (
+              <Input
+                label={i18n.t("descriptionLabel")}
+                placeholder={pickedCat}
+                textInputConfig={{
+                  onChangeText: inputChangedHandler.bind(this, "description"),
+                  value: inputs.description.value,
+                  // multiline: true,
+                }}
+                invalid={!inputs.description.isValid}
+              />
+
+              <View style={styles.dateLabel}>
+                <Text style={styles.dateLabelText}>{i18n.t("dateLabel")}</Text>
+              </View>
+              <View style={styles.dateContainer}>
+                <View style={styles.dateIconContainer}>
+                  <IconButton
+                    icon={"calendar-outline"}
+                    size={24}
+                    color={GlobalStyles.colors.primary500}
+                    style={styles.button}
+                    onPress={openDatePickerRange}
+                  />
+                </View>
+                <View>
                   <Text style={styles.advancedText}>
-                    {endDate && toShortFormat(new Date(endDate))}
+                    {startDate && toShortFormat(new Date(startDate))}
                   </Text>
-                )}
-              </View>
-            </View>
-
-            <View style={styles.inputsRowSecond}>
-              {/* !IsSoloTraveller && */}
-              {showWhoPaid && !IsSoloTraveller && (
-                <View style={styles.whoPaidContainer}>
-                  <Text
-                    style={[
-                      styles.currencyLabel,
-                      !inputs.whoPaid.isValid && styles.invalidLabel,
-                    ]}
-                  >
-                    {i18n.t("whoPaid")}
-                  </Text>
-                  {!loadingTravellers && (
-                    <DropDownPicker
-                      open={open}
-                      value={whoPaid}
-                      items={items}
-                      setOpen={setOpen}
-                      setValue={setWhoPaid}
-                      setItems={setItems}
-                      onClose={setOpenSplitTypes}
-                      listMode="MODAL"
-                      modalProps={{
-                        animationType: "slide",
-                        presentationStyle: "pageSheet",
-                      }}
-                      searchable={false}
-                      modalTitle={i18n.t("whoPaid")}
-                      modalContentContainerStyle={{
-                        backgroundColor: GlobalStyles.colors.backgroundColor,
-                        marginTop: "2%",
-                        elevation: 2,
-                        shadowColor: GlobalStyles.colors.textColor,
-                        shadowOffset: { width: 1, height: 1 },
-                        shadowOpacity: 0.35,
-                        shadowRadius: 4,
-                      }}
-                      placeholder={UserCtx.userName}
-                      containerStyle={styles.dropdownContainer}
-                      style={
-                        !inputs.whoPaid.isValid
-                          ? [styles.dropdown, styles.invalidInput]
-                          : styles.dropdown
-                      }
-                      textStyle={styles.dropdownTextStyle}
-                    />
+                  {dateIsRanged && (
+                    <Text style={styles.advancedText}>
+                      - duplicate until -{" "}
+                    </Text>
+                  )}
+                  {dateIsRanged && (
+                    <Text style={styles.advancedText}>
+                      {endDate && toShortFormat(new Date(endDate))}
+                    </Text>
                   )}
                 </View>
-              )}
-              {whoPaidValid && (
+              </View>
+
+              <View style={styles.inputsRowSecond}>
+                {/* !IsSoloTraveller && */}
+                {showWhoPaid && !IsSoloTraveller && (
+                  <View style={styles.whoPaidContainer}>
+                    <Text
+                      style={[
+                        styles.currencyLabel,
+                        !inputs.whoPaid.isValid && styles.invalidLabel,
+                      ]}
+                    >
+                      {i18n.t("whoPaid")}
+                    </Text>
+                    {!loadingTravellers && (
+                      <DropDownPicker
+                        open={open}
+                        value={whoPaid}
+                        items={items}
+                        setOpen={setOpen}
+                        setValue={setWhoPaid}
+                        setItems={setItems}
+                        onClose={setOpenSplitTypes}
+                        listMode="MODAL"
+                        modalProps={{
+                          animationType: "slide",
+                          presentationStyle: "pageSheet",
+                        }}
+                        searchable={false}
+                        modalTitle={i18n.t("whoPaid")}
+                        modalContentContainerStyle={{
+                          backgroundColor: GlobalStyles.colors.backgroundColor,
+                          marginTop: "2%",
+                          elevation: 2,
+                          shadowColor: GlobalStyles.colors.textColor,
+                          shadowOffset: { width: 1, height: 1 },
+                          shadowOpacity: 0.35,
+                          shadowRadius: 4,
+                        }}
+                        placeholder={UserCtx.userName}
+                        containerStyle={styles.dropdownContainer}
+                        style={
+                          !inputs.whoPaid.isValid
+                            ? [styles.dropdown, styles.invalidInput]
+                            : styles.dropdown
+                        }
+                        textStyle={styles.dropdownTextStyle}
+                      />
+                    )}
+                  </View>
+                )}
+                {whoPaidValid && (
+                  <DropDownPicker
+                    open={openSplitTypes}
+                    value={splitType}
+                    items={splitItems}
+                    setOpen={setOpenSplitTypes}
+                    setValue={setSplitType}
+                    setItems={setSplitTypeItems}
+                    onClose={openTravellerMultiPicker}
+                    listMode="MODAL"
+                    modalProps={{
+                      animationType: "slide",
+                      presentationStyle: "pageSheet",
+                    }}
+                    searchable={false}
+                    modalTitle={i18n.t("howShared")}
+                    modalContentContainerStyle={{
+                      backgroundColor: GlobalStyles.colors.backgroundColor,
+                    }}
+                    placeholder="Shared expense?"
+                    containerStyle={[
+                      styles.dropdownContainer,
+                      hidePickers && styles.hidePickersStyle,
+                    ]}
+                    style={[
+                      styles.dropdown,
+                      hidePickers && styles.hidePickersStyle,
+                    ]}
+                    textStyle={styles.dropdownTextStyle}
+                  />
+                )}
+              </View>
+              {!loadingTravellers && (
                 <DropDownPicker
-                  open={openSplitTypes}
-                  value={splitType}
-                  items={splitItems}
-                  setOpen={setOpenSplitTypes}
-                  setValue={setSplitType}
-                  setItems={setSplitTypeItems}
-                  onClose={openTravellerMultiPicker}
+                  open={openEQUAL}
+                  value={listEQUAL}
+                  items={splitItemsEQUAL}
+                  setOpen={setOpenEQUAL}
+                  setValue={setListEQUAL}
+                  setItems={setSplitItemsEQUAL}
+                  onClose={splitHandler}
                   listMode="MODAL"
+                  multiple={true}
+                  CloseIconComponent={({ style }) => (
+                    <Text
+                      style={{
+                        color: GlobalStyles.colors.textColor,
+                        fontSize: 24,
+                        fontWeight: "bold",
+                        padding: 4,
+                      }}
+                    >
+                      {i18n.t("confirm2")}
+                    </Text>
+                  )}
+                  min={1}
+                  max={99}
+                  labelProps={{ style: { padding: 40 } }}
                   modalProps={{
                     animationType: "slide",
                     presentationStyle: "pageSheet",
                   }}
                   searchable={false}
-                  modalTitle={i18n.t("howShared")}
+                  modalTitle={i18n.t("whoShared")}
                   modalContentContainerStyle={{
                     backgroundColor: GlobalStyles.colors.backgroundColor,
                   }}
-                  placeholder="Shared expense?"
+                  placeholder="Shared between ... ?"
                   containerStyle={[
                     styles.dropdownContainer,
                     hidePickers && styles.hidePickersStyle,
@@ -651,151 +703,126 @@ const ExpenseForm = ({
                   textStyle={styles.dropdownTextStyle}
                 />
               )}
-            </View>
-            {!loadingTravellers && (
-              <DropDownPicker
-                open={openEQUAL}
-                value={listEQUAL}
-                items={splitItemsEQUAL}
-                setOpen={setOpenEQUAL}
-                setValue={setListEQUAL}
-                setItems={setSplitItemsEQUAL}
-                onClose={splitHandler}
-                listMode="MODAL"
-                multiple={true}
-                CloseIconComponent={({ style }) => (
+              <View styles={[styles.advancedRowSplit]}>
+                {!splitTypeSelf && whoPaidValid && !IsSoloTraveller && (
                   <Text
-                    style={{
-                      color: GlobalStyles.colors.textColor,
-                      fontSize: 24,
-                      fontWeight: "bold",
-                      padding: 4,
-                    }}
+                    style={[
+                      styles.currencyLabel,
+                      { marginTop: 16, marginLeft: 16 },
+                    ]}
                   >
-                    {i18n.t("confirm2")}
+                    {i18n.t("whoShared")}
                   </Text>
                 )}
-                min={1}
-                max={99}
-                labelProps={{ style: { padding: 40 } }}
-                modalProps={{
-                  animationType: "slide",
-                  presentationStyle: "pageSheet",
-                }}
-                searchable={false}
-                modalTitle={i18n.t("whoShared")}
-                modalContentContainerStyle={{
-                  backgroundColor: GlobalStyles.colors.backgroundColor,
-                }}
-                placeholder="Shared between ... ?"
-                containerStyle={[
-                  styles.dropdownContainer,
-                  hidePickers && styles.hidePickersStyle,
-                ]}
-                style={[
-                  styles.dropdown,
-                  hidePickers && styles.hidePickersStyle,
-                ]}
-                textStyle={styles.dropdownTextStyle}
-              />
-            )}
-            <View styles={[styles.advancedRowSplit]}>
-              {!splitTypeSelf && whoPaidValid && !IsSoloTraveller && (
-                <Text
-                  style={[
-                    styles.currencyLabel,
-                    { marginTop: 16, marginLeft: 16 },
-                  ]}
-                >
-                  {i18n.t("whoShared")}
-                </Text>
-              )}
-              {!splitTypeSelf && (
-                <FlatList
-                  // numColumns={2}
-                  data={splitList}
-                  horizontal={true}
-                  renderItem={(itemData) => {
-                    const splitValue = itemData.item.amount.toString();
-                    return (
-                      <View
-                        style={{
-                          borderWidth: 1,
-                          borderRadius: 16,
-                          padding: 8,
-                          margin: 8,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            color: splitListValid
-                              ? GlobalStyles.colors.textColor
-                              : GlobalStyles.colors.error500,
-                          }}
-                        >
-                          {itemData.item.userName}
-                        </Text>
-                        {/* Horizontal container  */}
+                {!splitTypeSelf && (
+                  <FlatList
+                    // numColumns={2}
+                    data={splitList}
+                    horizontal={true}
+                    contentContainerStyle={{
+                      flex: 1,
+                      minWidth: "150%",
+                      justifyContent: "flex-start",
+                      alignItems: "flex-start",
+                    }}
+                    renderItem={(itemData) => {
+                      const splitValue = itemData.item.amount.toString();
+                      return (
                         <View
-                          style={{
-                            flexDirection: "row",
-                            // place items at the bottom of the container
-                            justifyContent: "flex-end",
-                            // place items at the right of the container
-                            alignItems: "flex-end",
-                          }}
+                          style={[
+                            {
+                              flex: 1,
+                              minWidth: 120,
+                              maxWidth: 120,
+                              borderWidth: 1,
+                              borderRadius: 16,
+                              padding: 8,
+                              margin: 8,
+                              backgroundColor:
+                                GlobalStyles.colors.backgroundColor,
+                            },
+                            GlobalStyles.strongShadow,
+                          ]}
                         >
-                          <Input
-                            inputStyle={
-                              splitTypeEqual && {
-                                color: GlobalStyles.colors.textColor,
-                              }
-                            }
-                            style={[
-                              styles.rowInput,
-                              {
-                                minWidth: "25%",
-                              },
-                            ]}
-                            textInputConfig={{
-                              onFocus: () => {
-                                if (splitType === "EQUAL") Keyboard.dismiss();
-                              },
-                              keyboardType: "decimal-pad",
-                              onChangeText: inputSplitListHandler.bind(
-                                this,
-                                itemData.index,
-                                itemData.item
-                              ),
-                              // TODO: mask this input https://www.npmjs.com/package/react-native-mask-input and fix random response
-                              value: splitValue ? splitValue : "",
+                          <Text
+                            style={{
+                              color: splitListValid
+                                ? GlobalStyles.colors.textColor
+                                : GlobalStyles.colors.error500,
                             }}
-                          ></Input>
-                          <Text style={{ paddingBottom: 12 }}>
-                            {isEditing
-                              ? TripCtx.tripCurrency
-                              : inputs.currency.value}
+                          >
+                            {truncateString(itemData.item.userName, 15)}
                           </Text>
+                          {/* Horizontal container  */}
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              // place items at the bottom of the container
+                              justifyContent: "flex-end",
+                              // place items at the right of the container
+                              alignItems: "flex-end",
+                            }}
+                          >
+                            <Input
+                              inputStyle={[
+                                splitTypeEqual && {
+                                  color: GlobalStyles.colors.textColor,
+                                },
+                                { paddingBottom: 4 },
+                                {
+                                  backgroundColor:
+                                    GlobalStyles.colors.backgroundColor,
+                                },
+                              ]}
+                              style={[
+                                styles.rowInput,
+                                {
+                                  minWidth: "25%",
+                                },
+                              ]}
+                              textInputConfig={{
+                                onFocus: () => {
+                                  if (splitType === "EQUAL") Keyboard.dismiss();
+                                },
+                                keyboardType: "decimal-pad",
+                                onChangeText: inputSplitListHandler.bind(
+                                  this,
+                                  itemData.index,
+                                  itemData.item
+                                ),
+                                // TODO: mask this input https://www.npmjs.com/package/react-native-mask-input and fix random response
+                                value: splitValue ? splitValue : "",
+                              }}
+                            ></Input>
+                            <Text style={{ paddingBottom: 12 }}>
+                              {isEditing
+                                ? TripCtx.tripCurrency
+                                : inputs.currency.value}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
-                    );
-                  }}
-                ></FlatList>
-              )}
-            </View>
-          </>
-        )}
-        {formIsInvalid && !hideAdvanced && (
-          <Text style={styles.errorText}>{i18n.t("invalidInput")} </Text>
-        )}
-      </KeyboardAvoidingView>
-      <View style={styles.buttonContainer}>
-        <FlatButton style={styles.button} onPress={onCancel}>
-          {i18n.t("cancel")}
-        </FlatButton>
-        <Button style={styles.button} onPress={advancedSubmitHandler}>
-          {submitButtonLabel}
-        </Button>
+                      );
+                    }}
+                  ></FlatList>
+                )}
+              </View>
+            </>
+          )}
+          {formIsInvalid && !hideAdvanced && (
+            <Text style={styles.errorText}>{i18n.t("invalidInput")} </Text>
+          )}
+        </KeyboardAvoidingView>
+        <View
+          style={[styles.spacerViewAdvanced, hideAdvanced && styles.spacerView]}
+        ></View>
+        <View style={styles.buttonContainer}>
+          <FlatButton style={styles.button} onPress={onCancel}>
+            {i18n.t("cancel")}
+          </FlatButton>
+          <Button style={styles.button} onPress={advancedSubmitHandler}>
+            {submitButtonLabel}
+          </Button>
+        </View>
       </View>
     </>
   );
@@ -804,7 +831,12 @@ const ExpenseForm = ({
 export default ExpenseForm;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginBottom: "10%",
+  },
   form: {
+    flex: 1,
     margin: 16,
     padding: 12,
     paddingBottom: 24,
@@ -858,7 +890,6 @@ const styles = StyleSheet.create({
     margin: 8,
   },
   buttonContainer: {
-    flex: 1,
     flexDirection: "row",
     justifyContent: "space-evenly",
     alignItems: "baseline",
@@ -942,5 +973,13 @@ const styles = StyleSheet.create({
   },
   invalidInput: {
     backgroundColor: GlobalStyles.colors.error50,
+  },
+  spacerView: {
+    flex: 1,
+    minHeight: "50%",
+  },
+  spacerViewAdvanced: {
+    flex: 1,
+    minHeight: "4%",
   },
 });

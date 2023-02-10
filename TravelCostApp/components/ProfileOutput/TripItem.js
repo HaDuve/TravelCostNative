@@ -94,8 +94,8 @@ function TripItem({
 
   function renderTravellers(item) {
     return (
-      <View style={styles.travellerCard}>
-        <View style={styles.avatar}>
+      <View style={[styles.travellerCard, GlobalStyles.strongShadow]}>
+        <View style={[styles.avatar, GlobalStyles.shadowPrimary]}>
           <Text style={styles.avatarText}>
             {/* TODO: Profile Picture for now replaced with first char of the name */}
             {item.item.userName.charAt(0)}

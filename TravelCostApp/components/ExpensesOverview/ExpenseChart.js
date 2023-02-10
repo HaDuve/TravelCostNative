@@ -46,6 +46,22 @@ const ExpenseChart = ({
       }
     }
   });
+  // cap expensesSum at 5*dailyBudget 5*weeklyBudget 5*monthlyBudget 5*yearlyBudget respectively
+  const CAP = 10;
+  inputData?.forEach((obj) => {
+    if (obj.expensesSum > CAP * obj.yearlyBudget) {
+      obj.expensesSum = CAP * obj.yearlyBudget;
+    }
+    if (obj.expensesSum > CAP * obj.monthlyBudget) {
+      obj.expensesSum = CAP * obj.monthlyBudget;
+    }
+    if (obj.expensesSum > CAP * obj.weeklyBudget) {
+      obj.expensesSum = CAP * obj.weeklyBudget;
+    }
+    if (obj.expensesSum > CAP * obj.dailyBudget) {
+      obj.expensesSum = CAP * obj.dailyBudget;
+    }
+  });
   return (
     <View style={styles.container}>
       <VictoryChart

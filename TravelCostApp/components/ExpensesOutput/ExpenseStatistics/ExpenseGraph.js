@@ -76,7 +76,6 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
           return sum + expense.calcAmount;
         }, 0);
         const dailyBudget = TripCtx.dailyBudget;
-        if (expensesSum > dailyBudget * 5) expensesSum = dailyBudget * 5;
         budget = dailyBudget;
         daysRange = lastDays;
         const obj = { day, expensesSum, dailyBudget };

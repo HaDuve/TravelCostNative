@@ -1,10 +1,12 @@
 import React, { memo } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Vibration, View } from "react-native";
 import {
   VictoryBar,
   VictoryChart,
   VictoryLabel,
   VictoryLine,
+  VictoryTooltip,
+  VictoryVoronoiContainer,
 } from "victory-native";
 import { GlobalStyles } from "../../constants/styles";
 import { getDateMinusDays } from "../../util/date";
@@ -16,6 +18,7 @@ const ExpenseChart = ({
   budgetAxis,
   budget,
   daysRange,
+  currency,
 }) => {
   console.log("ExpenseChart rendered");
 
@@ -47,7 +50,7 @@ const ExpenseChart = ({
     }
   });
   // cap expensesSum at 5*dailyBudget 5*weeklyBudget 5*monthlyBudget 5*yearlyBudget respectively
-  const CAP = 10;
+  const CAP = 2;
   inputData?.forEach((obj) => {
     if (obj.expensesSum > CAP * obj.yearlyBudget) {
       obj.expensesSum = CAP * obj.yearlyBudget;
@@ -65,34 +68,97 @@ const ExpenseChart = ({
   return (
     <View style={styles.container}>
       <VictoryChart
-        height={200}
+        height={150}
         animate={{ duration: 500 }}
-        padding={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        domainPadding={{ x: [10, 10], y: 5 }}
+        padding={{ top: 40, bottom: 0, left: 10, right: 40 }}
+        domainPadding={{ x: [0, 25] }}
+        // domain={{ y: [0, 2 * budget] }}
+        containerComponent={<VictoryVoronoiContainer />}
       >
+        <VictoryLine
+          labelComponent={<VictoryTooltip renderInPortal={false} />}
+          data={[
+            {
+              x: getDateMinusDays(new Date(), Math.floor(daysRange / 1)),
+              y: Number(budget),
+              label: `Budget: ${budget} ${currency}`,
+            },
+            {
+              x: getDateMinusDays(new Date(), Math.floor(daysRange / 1.2)),
+              y: Number(budget),
+              label: `Budget: ${budget} ${currency}`,
+            },
+            {
+              x: getDateMinusDays(new Date(), Math.floor(daysRange / 1.4)),
+              y: Number(budget),
+              label: `Budget: ${budget} ${currency}`,
+            },
+            {
+              x: getDateMinusDays(new Date(), Math.floor(daysRange / 1.6)),
+              y: Number(budget),
+              label: `Budget: ${budget} ${currency}`,
+            },
+            {
+              x: getDateMinusDays(new Date(), Math.floor(daysRange / 1.8)),
+              y: Number(budget),
+              label: `Budget: ${budget} ${currency}`,
+            },
+            {
+              x: getDateMinusDays(new Date(), Math.floor(daysRange / 2)),
+              y: Number(budget),
+              label: `Budget: ${budget} ${currency}`,
+            },
+            {
+              x: getDateMinusDays(new Date(), Math.floor(daysRange / 3)),
+              y: Number(budget),
+              label: `Budget: ${budget} ${currency}`,
+            },
+            {
+              x: getDateMinusDays(new Date(), Math.floor(daysRange / 4)),
+              y: Number(budget),
+              label: `Budget: ${budget} ${currency}`,
+            },
+            {
+              x: getDateMinusDays(new Date(), Math.floor(daysRange / 5)),
+              y: Number(budget),
+              label: `Budget: ${budget} ${currency}`,
+            },
+            {
+              x: new Date(),
+              y: Number(budget),
+              label: `Budget: ${budget} ${currency}`,
+            },
+          ]}
+          standalone={false}
+          style={{
+            data: {
+              stroke: GlobalStyles.colors.gray700,
+              strokeWidth: 1,
+            },
+          }}
+        />
         <VictoryBar
+          labelComponent={<VictoryTooltip renderInPortal={false} />}
           style={{
             data: {
               fill: ({ datum }) => datum.fill,
+              strokeWidth: ({ active }) => (active ? 4 : 0),
             },
           }}
           standalone={false}
           data={data}
           x={xAxisString}
           y={yAxisString}
-        />
-        <VictoryLine
-          data={[
+          events={[
             {
-              x: getDateMinusDays(new Date(), daysRange),
-              y: Number(budget),
+              target: "data",
+              eventHandlers: {
+                onPressIn: () => {
+                  Vibration.vibrate(10);
+                },
+              },
             },
-            { x: new Date(), y: Number(budget) },
           ]}
-          standalone={false}
-          style={{
-            data: { stroke: GlobalStyles.colors.gray700, strokeWidth: 2 },
-          }}
         />
       </VictoryChart>
     </View>
@@ -104,6 +170,7 @@ export default memo(ExpenseChart);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginLeft: "8%",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,

@@ -59,8 +59,8 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
   let budgetAxis = "";
   let budget = 0;
   let daysRange = 0;
-  const lastDays = 35;
-  const lastWeeks = 20;
+  const lastDays = 15;
+  const lastWeeks = 15;
   const lastMonths = 15;
   const lastYears = 10;
 
@@ -76,9 +76,12 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
           return sum + expense.calcAmount;
         }, 0);
         const dailyBudget = TripCtx.dailyBudget;
+        const formattedDay = toDayMonthString(day);
+        const formattedSum = formatExpenseString(expensesSum);
+        const label = `${formattedDay} - ${formattedSum}${TripCtx.tripCurrency}`;
         budget = dailyBudget;
         daysRange = lastDays;
-        const obj = { day, expensesSum, dailyBudget };
+        const obj = { day, expensesSum, dailyBudget, label };
         listExpenseSumBudgets.push(obj);
       }
       renderItemRef = function renderItem({ item }) {
@@ -133,9 +136,12 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
           return sum + expense.calcAmount;
         }, 0);
         const weeklyBudget = TripCtx.dailyBudget * 7;
+        const formattedDay = toDayMonthString(firstDay);
+        const formattedSum = formatExpenseString(expensesSum);
+        const label = `${formattedDay} - ${formattedSum}${TripCtx.tripCurrency}`;
         budget = weeklyBudget;
         daysRange = lastWeeks * 7;
-        const obj = { firstDay, lastDay, expensesSum, weeklyBudget };
+        const obj = { firstDay, lastDay, expensesSum, weeklyBudget, label };
         listExpenseSumBudgets.push(obj);
       }
       renderItemRef = function renderItem({ item }) {
@@ -193,9 +199,12 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
           return sum + expense.calcAmount;
         }, 0);
         const monthlyBudget = TripCtx.dailyBudget * 30;
+        const formattedDay = toDayMonthString(firstDay);
+        const formattedSum = formatExpenseString(expensesSum);
+        const label = `${formattedDay} - ${formattedSum}${TripCtx.tripCurrency}`;
         budget = monthlyBudget;
         daysRange = lastMonths * 30;
-        const obj = { firstDay, lastDay, expensesSum, monthlyBudget };
+        const obj = { firstDay, lastDay, expensesSum, monthlyBudget, label };
         listExpenseSumBudgets.push(obj);
       }
 
@@ -246,9 +255,12 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
           return sum + expense.calcAmount;
         }, 0);
         const yearlyBudget = TripCtx.dailyBudget * 365;
+        const formattedDay = toDayMonthString(firstDay);
+        const formattedSum = formatExpenseString(expensesSum);
+        const label = `${formattedDay} - ${formattedSum}${TripCtx.tripCurrency}`;
         budget = yearlyBudget;
         daysRange = lastYears * 365;
-        const obj = { firstDay, lastDay, expensesSum, yearlyBudget };
+        const obj = { firstDay, lastDay, expensesSum, yearlyBudget, label };
         listExpenseSumBudgets.push(obj);
       }
       renderItemRef = function renderItem({ item }) {
@@ -292,20 +304,21 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
       exiting={FadeOutLeft.duration(1000)}
       style={styles.container}
     >
-      <View>
+      {/* ListHeaderComponent={ */}
+      <View style={styles.graphContainer}>
+        <ExpenseChart
+          inputData={listExpenseSumBudgets}
+          xAxis={xAxis}
+          yAxis={yAxis}
+          budgetAxis={budgetAxis}
+          budget={budget}
+          daysRange={daysRange}
+          currency={TripCtx.tripCurrency}
+        ></ExpenseChart>
+      </View>
+      {/* } */}
+      <View style={styles.listContainer}>
         <FlatList
-          ListHeaderComponent={
-            <View style={styles.graphContainer}>
-              <ExpenseChart
-                inputData={listExpenseSumBudgets}
-                xAxis={xAxis}
-                yAxis={yAxis}
-                budgetAxis={budgetAxis}
-                budget={budget}
-                daysRange={daysRange}
-              ></ExpenseChart>
-            </View>
-          }
           data={listExpenseSumBudgets}
           renderItem={renderItemRef}
           removeClippedSubviews={true}
@@ -313,6 +326,11 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
           updateCellsBatchingPeriod={300}
           initialNumToRender={7}
           windowSize={7}
+          getItemLayout={(data, index) => ({
+            length: 50,
+            offset: 50 * index,
+            index,
+          })}
         ></FlatList>
       </View>
     </Animated.View>
@@ -327,9 +345,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
   graphContainer: {
-    flex: 1,
+    minHeight: 158,
     paddingTop: "5%",
     paddingBottom: "5%",
+  },
+  listContainer: {
+    flex: 1,
   },
   itemContainer: {
     padding: 8,

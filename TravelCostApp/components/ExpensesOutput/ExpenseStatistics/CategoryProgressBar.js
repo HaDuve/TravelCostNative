@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.primary500,
   },
   sum: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "300",
     color: GlobalStyles.colors.primary500,
   },

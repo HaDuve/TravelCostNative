@@ -68,58 +68,20 @@ const ExpenseChart = ({
   return (
     <View style={styles.container}>
       <VictoryChart
-        height={150}
+        height={160}
         animate={{ duration: 500 }}
-        padding={{ top: 40, bottom: 0, left: 10, right: 40 }}
+        padding={{ top: 10, bottom: 36, left: 30, right: 40 }}
         domainPadding={{ x: [0, 25] }}
         // domain={{ y: [0, 2 * budget] }}
-        containerComponent={<VictoryVoronoiContainer />}
+        containerComponent={<VictoryVoronoiContainer voronoiDimension="x" />}
       >
         <VictoryLine
-          labelComponent={<VictoryTooltip renderInPortal={false} />}
+          labelComponent={
+            <VictoryTooltip center={{ x: 80, y: 25 }} renderInPortal={false} />
+          }
           data={[
             {
               x: getDateMinusDays(new Date(), Math.floor(daysRange / 1)),
-              y: Number(budget),
-              label: `Budget: ${budget} ${currency}`,
-            },
-            {
-              x: getDateMinusDays(new Date(), Math.floor(daysRange / 1.2)),
-              y: Number(budget),
-              label: `Budget: ${budget} ${currency}`,
-            },
-            {
-              x: getDateMinusDays(new Date(), Math.floor(daysRange / 1.4)),
-              y: Number(budget),
-              label: `Budget: ${budget} ${currency}`,
-            },
-            {
-              x: getDateMinusDays(new Date(), Math.floor(daysRange / 1.6)),
-              y: Number(budget),
-              label: `Budget: ${budget} ${currency}`,
-            },
-            {
-              x: getDateMinusDays(new Date(), Math.floor(daysRange / 1.8)),
-              y: Number(budget),
-              label: `Budget: ${budget} ${currency}`,
-            },
-            {
-              x: getDateMinusDays(new Date(), Math.floor(daysRange / 2)),
-              y: Number(budget),
-              label: `Budget: ${budget} ${currency}`,
-            },
-            {
-              x: getDateMinusDays(new Date(), Math.floor(daysRange / 3)),
-              y: Number(budget),
-              label: `Budget: ${budget} ${currency}`,
-            },
-            {
-              x: getDateMinusDays(new Date(), Math.floor(daysRange / 4)),
-              y: Number(budget),
-              label: `Budget: ${budget} ${currency}`,
-            },
-            {
-              x: getDateMinusDays(new Date(), Math.floor(daysRange / 5)),
               y: Number(budget),
               label: `Budget: ${budget} ${currency}`,
             },
@@ -138,14 +100,19 @@ const ExpenseChart = ({
           }}
         />
         <VictoryBar
-          labelComponent={<VictoryTooltip renderInPortal={false} />}
+          labelComponent={
+            <VictoryTooltip
+              center={{ x: 178, y: 24 }}
+              renderInPortal={false}
+              constrainToVisibleArea
+            />
+          }
           style={{
             data: {
               fill: ({ datum }) => datum.fill,
               strokeWidth: ({ active }) => (active ? 4 : 0),
             },
           }}
-          standalone={false}
           data={data}
           x={xAxisString}
           y={yAxisString}

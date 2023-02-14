@@ -59,9 +59,9 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
   let budgetAxis = "";
   let budget = 0;
   let daysRange = 0;
-  const lastDays = 15;
-  const lastWeeks = 15;
-  const lastMonths = 15;
+  const lastDays = 10;
+  const lastWeeks = 10;
+  const lastMonths = 10;
   const lastYears = 10;
 
   switch (periodName) {

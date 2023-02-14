@@ -314,6 +314,7 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
           budget={budget}
           daysRange={daysRange}
           currency={TripCtx.tripCurrency}
+          navigation={navigation}
         ></ExpenseChart>
       </View>
       {/* } */}

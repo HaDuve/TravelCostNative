@@ -8,6 +8,8 @@ import {
   VictoryPie,
   VictoryScatter,
   VictoryTheme,
+  VictoryTooltip,
+  VictoryVoronoiContainer,
 } from "victory-native";
 import { GlobalStyles } from "../../constants/styles";
 import Animated, {
@@ -51,10 +53,17 @@ const CategoryChart = ({ inputData }) => {
             fill: (d) => d.slice.data.color,
           },
         }}
-        labels={
-          ({ datum }) => ""
-          //   `${datum.x[0].toUpperCase()}${datum.x.slice(1, 3)}`
+        labelComponent={
+          <VictoryTooltip
+            center={{ x: 184, y: 94 }}
+            constrainToVisibleArea
+            renderInPortal={false}
+            pointerLength={0}
+          />
         }
+        labels={({ datum }) => {
+          return `${datum.x[0].toUpperCase()}${datum.x.slice(1)}`;
+        }}
       />
     </Animated.View>
   );

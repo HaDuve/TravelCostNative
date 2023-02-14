@@ -42,7 +42,7 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
         <Ionicons name={icon} size={30} color={color} />
         <Text style={[styles.sum, { color: budgetColor }]}>
           {stylingSpace}
-          {catString}
+          {`${catString[0].toUpperCase()}${catString.slice(1)}`}
         </Text>
         <View style={{ flex: 1 }}></View>
         <Text style={[styles.sum, { color: GlobalStyles.colors.error300 }]}>

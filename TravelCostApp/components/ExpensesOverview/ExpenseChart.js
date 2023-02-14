@@ -1,5 +1,6 @@
 import React, { memo } from "react";
 import { StyleSheet, Vibration, View } from "react-native";
+import * as Haptics from "expo-haptics";
 import {
   VictoryBar,
   VictoryChart,
@@ -19,6 +20,7 @@ const ExpenseChart = ({
   budget,
   daysRange,
   currency,
+  navigation,
 }) => {
   console.log("ExpenseChart rendered");
 
@@ -73,7 +75,9 @@ const ExpenseChart = ({
         padding={{ top: 10, bottom: 36, left: 30, right: 40 }}
         domainPadding={{ x: [0, 25] }}
         // domain={{ y: [0, 2 * budget] }}
-        containerComponent={<VictoryVoronoiContainer voronoiDimension="x" />}
+        containerComponent={
+          <VictoryVoronoiContainer mouseFollowTooltip voronoiDimension="x" />
+        }
       >
         <VictoryLine
           labelComponent={
@@ -88,7 +92,7 @@ const ExpenseChart = ({
             {
               x: new Date(),
               y: Number(budget),
-              label: `Budget: ${budget} ${currency}`,
+              // label: `Budget: ${budget} ${currency}`,
             },
           ]}
           standalone={false}
@@ -121,7 +125,8 @@ const ExpenseChart = ({
               target: "data",
               eventHandlers: {
                 onPressIn: () => {
-                  Vibration.vibrate(10);
+                  console.log("press");
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 },
               },
             },

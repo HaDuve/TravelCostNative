@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native";
 
 import React from "react";
@@ -8,7 +8,7 @@ import CategoryChart from "../../ExpensesOverview/CategoryChart";
 import { ScrollView } from "react-native-gesture-handler";
 import { G } from "react-native-svg";
 
-const ExpenseCategories = ({ expenses, periodName }) => {
+const ExpenseCategories = ({ expenses, periodName, navigation }) => {
   if (!expenses)
     return (
       <View style={styles.container}>
@@ -44,17 +44,35 @@ const ExpenseCategories = ({ expenses, periodName }) => {
   categoryList.forEach((cat) => {
     const catExpenses = getAllExpensesWithCat(cat);
     const sumCat = getSumExpenses(catExpenses);
-    catSumCat.push({ cat: cat, sumCat: sumCat, color: "" });
+    catSumCat.push({
+      cat: cat,
+      sumCat: sumCat,
+      color: "",
+      catExpenses: catExpenses,
+    });
   });
 
   function renderItem(itemData) {
     return (
-      <CategoryProgressBar
-        color={itemData.item.color}
-        cat={itemData.item.cat}
-        totalCost={totalSum}
-        catCost={itemData.item.sumCat}
-      />
+      <Pressable
+        style={styles.categoryCard}
+        onPress={() =>
+          navigation.navigate("FilteredExpenses", {
+            expenses: itemData.item.catExpenses,
+            dayString:
+              itemData.item.cat +
+              (periodName !== "total" ? " this " : " ") +
+              periodName,
+          })
+        }
+      >
+        <CategoryProgressBar
+          color={itemData.item.color}
+          cat={itemData.item.cat}
+          totalCost={totalSum}
+          catCost={itemData.item.sumCat}
+        />
+      </Pressable>
     );
   }
 
@@ -107,5 +125,22 @@ const styles = StyleSheet.create({
     marginTop: "-50%",
     alignItems: "center",
     justifyContent: "flex-start",
+  },
+  categoryCard: {
+    marginVertical: 4,
+    marginBottom: 12,
+    marginHorizontal: 8,
+    paddingBottom: 4,
+    // card shadow
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: 10,
   },
 });

@@ -28,16 +28,16 @@ var expenseCtx = {};
 let row = [];
 let prevOpenedRow;
 // swipe left to delete
-const renderRightActions = (progress, dragX, onClick) => {
+const renderLeftActions = (progress, dragX, onClick) => {
   return (
     <View
       style={{
-        margin: 0,
-        paddingTop: 12,
-        paddingLeft: 20,
-        alignContent: "flex-end",
+        marginBottom: 2,
+        paddingTop: 14,
+        paddingLeft: 10,
+        alignContent: "center",
         justifyContent: "center",
-        width: 70,
+        width: 55,
         backgroundColor: GlobalStyles.colors.error500,
       }}
     >
@@ -46,7 +46,7 @@ const renderRightActions = (progress, dragX, onClick) => {
         color={GlobalStyles.colors.backgroundColor}
         size={36}
         onPress={onClick}
-        buttonStyle={{ marginLeft: 30 }}
+        buttonStyle={{ marginRight: 30 }}
       />
     </View>
   );
@@ -54,14 +54,15 @@ const renderRightActions = (progress, dragX, onClick) => {
 function renderExpenseItem(itemData) {
   const index = itemData.index;
   return (
-    <View style={{ height: 50, width: "100%" }}>
+    <View style={{ height: 55, width: "100%", overflow: "visible" }}>
       <Swipeable
-        renderRightActions={(progress, dragX) =>
-          renderRightActions(progress, dragX, onClick.bind(this, itemData))
+        renderLeftActions={(progress, dragX) =>
+          renderLeftActions(progress, dragX, onClick.bind(this, itemData))
         }
         onSwipeableOpen={closeRow.bind(this, index)}
         ref={(ref) => (row[index] = ref)}
-        rightOpenValue={-100}
+        leftOpenValue={-100}
+        disableRightSwipe={true}
         overshootFriction={8}
       >
         <ExpenseItem {...itemData.item} />
@@ -117,7 +118,7 @@ function closeRow(index) {
 
   setTimeout(() => {
     forceCloseRow(index);
-  }, 1000);
+  }, 1500);
 }
 
 function forceCloseRow(index) {
@@ -136,6 +137,11 @@ function ExpensesList({ expenses, refreshControl }) {
       // layout={JumpingTransition.duration(5000)}
       entering={FadeInRight.duration(600)}
       exiting={FadeOutLeft.duration(500)}
+      style={{
+        marginRight: 20,
+        backgroundColor: GlobalStyles.colors.backgroundColor,
+        overflow: "visible",
+      }}
     >
       <FlatList
         data={expenses}

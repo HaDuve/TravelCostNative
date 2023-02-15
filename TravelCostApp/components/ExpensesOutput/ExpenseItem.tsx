@@ -41,16 +41,14 @@ function ExpenseItem(props): JSX.Element {
     calcAmount,
     splitList,
   } = props;
-  console.log("ExpenseItem ~ props", props);
   const navigation = useNavigation();
   const TripCtx = useContext(TripContext);
   const homeCurrency = TripCtx.tripCurrency;
   const calcAmountString = formatExpenseString(calcAmount);
   const amountString = formatExpenseString(amount);
   const widthInChars = parseInt(
-    (Dimensions.get("window").width / 17).toString()
+    (Dimensions.get("window").width / 10).toString()
   );
-  const descriptionString = truncateString(description, widthInChars);
   const iconString = getCatSymbol(category);
   const sameCurrency = homeCurrency === currency;
 
@@ -77,13 +75,17 @@ function ExpenseItem(props): JSX.Element {
   longList?.push({ userName: "+" });
   const sharedList =
     splitList && splitList.length > 0 ? (
-      <View>
+      <View style={{ overflow: "visible" }}>
         <FlatList
           data={longList ? longList : splitList}
           horizontal={true}
           renderItem={({ item }) => (
             <View
-              style={[styles.avatar, GlobalStyles.shadow, { marginBottom: 16 }]}
+              style={[
+                styles.avatar,
+                GlobalStyles.shadow,
+                { marginBottom: 16, overflow: "visible" },
+              ]}
             >
               <Text style={styles.avatarText}>{item.userName.slice(0, 1)}</Text>
             </View>
@@ -102,7 +104,11 @@ function ExpenseItem(props): JSX.Element {
 
   if (!id) return <></>;
   return (
-    <Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
+    <Animated.View
+      entering={SlideInRight}
+      exiting={SlideOutLeft}
+      style={{ height: 55, overflow: "visible" }}
+    >
       <Pressable
         onPress={memoizedCallback}
         style={({ pressed }) => pressed && styles.pressed}
@@ -117,7 +123,7 @@ function ExpenseItem(props): JSX.Element {
           </View>
           <View style={styles.leftItem}>
             <Text style={[styles.textBase, styles.description]}>
-              {truncateString(descriptionString, 16)}
+              {truncateString(description, 100)}
             </Text>
             <Text style={[styles.textBase, styles.secondaryText]}>
               {toShortFormat(date)}
@@ -153,20 +159,25 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
   expenseItem: {
+    height: 55,
     borderWidth: 0,
     borderColor: "black",
-    padding: 8,
-    paddingRight: 28,
-    marginLeft: 28,
+    paddingVertical: 8,
+    paddingRight: 0,
+    paddingLeft: 20,
+    marginLeft: 8,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     flexDirection: "row",
     justifyContent: "space-between",
   },
   textBase: {
+    marginTop: 2,
     marginLeft: 4,
     color: GlobalStyles.colors.textColor,
   },
   description: {
+    flex: 1,
+    width: "90%",
     fontStyle: "italic",
     fontWeight: "300",
     fontSize: 15,
@@ -202,16 +213,15 @@ const styles = StyleSheet.create({
   },
   originalCurrencyText: {
     fontSize: 12,
+    marginLeft: 16,
     fontWeight: "300",
   },
   avatarContainer: {
-    maxWidth: 50,
-    minWidth: 50,
-    paddingTop: 8,
-    paddingRight: 18,
+    maxHeight: 50,
+    padding: 4,
+    paddingRight: 10,
     // center items left
     flexDirection: "row",
-    justifyContent: "flex-start",
   },
   avatar: {
     marginRight: -6,

@@ -4,7 +4,7 @@ import ExpenseCategories from "./ExpenseStatistics/ExpenseCategories";
 import IconButton from "../UI/IconButton";
 import ExpenseGraph from "./ExpenseStatistics/ExpenseGraph";
 import { GlobalStyles } from "../../constants/styles";
-
+import * as Haptics from "expo-haptics";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
@@ -18,6 +18,7 @@ i18n.enableFallback = true;
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const [toggleGraph, setToggleGraph] = useState(false);
   function toggleContent() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setToggleGraph(!toggleGraph);
   }
 
@@ -61,7 +62,10 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           // styles.toggleButton
         ]}
       >
-        <Pressable onPress={toggleContent}>
+        <Pressable
+          onPress={toggleContent}
+          style={({ pressed }) => pressed && styles.pressed}
+        >
           <ToggleButton></ToggleButton>
         </Pressable>
       </View>
@@ -76,6 +80,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   titleContainer: {},
+  pressed: {
+    opacity: 0.65,
+  },
   titleText: {
     paddingTop: 12,
     paddingRight: 20,

@@ -34,6 +34,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingBottom: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
+    overflow: "visible",
   },
   header: {
     flexDirection: "row",

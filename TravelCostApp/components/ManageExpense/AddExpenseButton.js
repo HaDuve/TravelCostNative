@@ -1,12 +1,15 @@
 import React, { Dimensions, Pressable, StyleSheet, View } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import IconButton from "../UI/IconButton";
+import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 
 const AddExpenseButton = ({ navigation }) => {
   return (
     <Pressable
       onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
         navigation.navigate("CategoryPick");
       }}
     >
@@ -19,6 +22,7 @@ const AddExpenseButton = ({ navigation }) => {
           size={42}
           color={"white"}
           onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             navigation.navigate("CategoryPick");
           }}
         />

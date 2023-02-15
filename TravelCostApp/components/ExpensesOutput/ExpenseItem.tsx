@@ -1,11 +1,4 @@
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  Dimensions,
-} from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import PropTypes from "prop-types";
 
@@ -14,19 +7,11 @@ import { toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
 import { getCatSymbol } from "../../util/category";
 import { memo, useContext, useCallback } from "react";
-import { UserContext } from "../../store/user-context";
 import { TripContext } from "../../store/trip-context";
-import { formatExpenseString, truncateString } from "../../util/string";
+import { formatExpenseString } from "../../util/string";
 import React from "react";
 
-import Animated, {
-  SlideInUp,
-  SlideInDown,
-  SlideInLeft,
-  SlideInRight,
-  SlideOutLeft,
-  CurvedTransition,
-} from "react-native-reanimated";
+import Animated, { SlideInRight, SlideOutLeft } from "react-native-reanimated";
 import { FlatList } from "react-native-gesture-handler";
 
 function ExpenseItem(props): JSX.Element {
@@ -46,9 +31,6 @@ function ExpenseItem(props): JSX.Element {
   const homeCurrency = TripCtx.tripCurrency;
   const calcAmountString = formatExpenseString(calcAmount);
   const amountString = formatExpenseString(amount);
-  const widthInChars = parseInt(
-    (Dimensions.get("window").width / 10).toString()
-  );
   const iconString = getCatSymbol(category);
   const sameCurrency = homeCurrency === currency;
 
@@ -123,7 +105,7 @@ function ExpenseItem(props): JSX.Element {
           </View>
           <View style={styles.leftItem}>
             <Text style={[styles.textBase, styles.description]}>
-              {truncateString(description, 100)}
+              {description}
             </Text>
             <Text style={[styles.textBase, styles.secondaryText]}>
               {toShortFormat(date)}
@@ -148,10 +130,12 @@ ExpenseItem.propTypes = {
   id: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   amount: PropTypes.number.isRequired,
+  date: PropTypes.object.isRequired,
   category: PropTypes.string.isRequired,
   whoPaid: PropTypes.string.isRequired,
   currency: PropTypes.string.isRequired,
   calcAmount: PropTypes.number.isRequired,
+  splitList: PropTypes.array,
 };
 
 const styles = StyleSheet.create({

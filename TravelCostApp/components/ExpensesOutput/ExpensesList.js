@@ -17,6 +17,7 @@ import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../../i18n/supportedLanguages";
+import { deleteExpenseOnlineOffline } from "../../util/offline-queue";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -74,8 +75,15 @@ function onClick({ item, index }) {
   const uid = item.uid;
   async function deleteExp() {
     try {
-      // TODO: add onlineoffline for update and delete
-      await deleteExpense(tripid, uid, editedExpenseId);
+      const item = {
+        type: "delete",
+        expense: {
+          tripid: tripid,
+          uid: uid,
+          id: editedExpenseId,
+        },
+      };
+      await deleteExpenseOnlineOffline(item);
       expenseCtx.deleteExpense(editedExpenseId);
     } catch (error) {
       console.log(i18n.t("deleteError"), error);

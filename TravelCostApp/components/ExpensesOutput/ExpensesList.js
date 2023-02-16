@@ -60,7 +60,7 @@ const renderLeftActions = (progress, dragX, onClick) => {
 function renderExpenseItem(itemData) {
   const index = itemData.index;
   return (
-    <View style={{ height: 55, width: "100%", overflow: "visible" }}>
+    <View style={{ height: 55, width: "100%" }}>
       <Swipeable
         renderLeftActions={(progress, dragX) =>
           renderLeftActions(progress, dragX, onClick.bind(this, itemData))
@@ -147,7 +147,6 @@ function ExpensesList({ expenses, refreshControl }) {
       style={{
         marginRight: 20,
         backgroundColor: GlobalStyles.colors.backgroundColor,
-        overflow: "visible",
       }}
     >
       <Animated.FlatList

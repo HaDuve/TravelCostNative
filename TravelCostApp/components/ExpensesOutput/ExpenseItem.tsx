@@ -70,11 +70,7 @@ function ExpenseItem(props): JSX.Element {
           horizontal={true}
           renderItem={({ item }) => (
             <View
-              style={[
-                styles.avatar,
-                GlobalStyles.shadow,
-                { marginBottom: 16, overflow: "visible" },
-              ]}
+              style={[styles.avatar, GlobalStyles.shadow, { marginBottom: 16 }]}
             >
               <Text style={styles.avatarText}>{item.userName.slice(0, 1)}</Text>
             </View>
@@ -96,7 +92,7 @@ function ExpenseItem(props): JSX.Element {
     <Animated.View
       entering={FadeInRight}
       exiting={FadeOutLeft}
-      style={{ height: 55, overflow: "visible" }}
+      style={{ height: 55 }}
     >
       <Pressable
         onPress={memoizedCallback}

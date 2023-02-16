@@ -133,6 +133,7 @@ function RecentExpenses({ navigation }) {
       <View style={styles.tempGrayBar1}></View>
       <ExpensesOutput
         expenses={recentExpenses}
+        periodValue={PeriodValue}
         fallbackText={i18n.t("fallbackTextExpenses")}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

@@ -10,14 +10,19 @@ import Animated, {
   SlideOutLeft,
 } from "react-native-reanimated";
 
-function ExpensesOutput({ expenses, fallbackText, refreshControl }) {
+function ExpensesOutput({
+  expenses,
+  fallbackText,
+  refreshControl,
+  periodValue,
+}) {
   let content = (
     <Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
       <Text style={styles.infoText}>{fallbackText}</Text>
     </Animated.View>
   );
   if (expenses.length > 0) {
-    content = <ExpensesList expenses={expenses} />;
+    content = <ExpensesList periodValue={periodValue} expenses={expenses} />;
   }
   return (
     <ScrollView style={styles.container} refreshControl={refreshControl}>

@@ -2,7 +2,13 @@ import { Alert } from "react-native";
 
 import ExpenseItem from "./ExpenseItem";
 
-import React, { useContext } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { View } from "react-native";
 
 import Swipeable from "react-native-gesture-handler/Swipeable";
@@ -132,12 +138,33 @@ function forceCloseRow(index) {
 }
 
 // Displays a list of all expenses.
-function ExpensesList({ expenses, refreshControl }) {
+function ExpensesList({ expenses, refreshControl, periodValue }) {
+  // const flatListRef = useRef(null);
   const tripCtx = useContext(TripContext);
   expenseCtx = useContext(ExpensesContext);
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(true);
-
   tripid = tripCtx.tripid;
+
+  // // find the index of the first item in expenses with the date === new Date()
+  // // this is used to scroll to the current day
+  // useLayoutEffect(() => {
+  //   console.log("useEffect ~ flatListRef", flatListRef);
+  //   if (!flatListRef.current) {
+  //     return;
+  //   }
+  //   console.log("useEffect");
+  //   // Scroll to the today item after the component is rendered
+  //   const today = new Date();
+  //   const todayIndex = expenses.findIndex(
+  //     (expense) =>
+  //       expense.date.getDate() === today.getDate() &&
+  //       expense.date.getMonth() === today.getMonth() &&
+  //       expense.date.getFullYear() === today.getFullYear()
+  //   );
+  //   // if todayIndex is -1, then there are no expenses for today
+  //   // so we scroll to the first expense
+  //   flatListRef.current.scrollToIndex({ index: todayIndex, animated: true });
+  // }, [periodValue]);
 
   return (
     <Animated.View
@@ -147,6 +174,7 @@ function ExpensesList({ expenses, refreshControl }) {
       }}
     >
       <Animated.FlatList
+        // ref={flatListRef}
         itemLayoutAnimation={layoutAnim}
         data={expenses}
         renderItem={renderExpenseItem}
@@ -154,8 +182,8 @@ function ExpensesList({ expenses, refreshControl }) {
         keyExtractor={(item) => item.id}
         refreshControl={refreshControl}
         getItemLayout={(data, index) => ({
-          length: 50,
-          offset: 50 * index,
+          length: 55,
+          offset: 55 * index,
           index,
         })}
       />

@@ -14,6 +14,7 @@ import IconButton from "../UI/IconButton";
 import Animated, {
   FadeInRight,
   FadeOutLeft,
+  FadingTransition,
   Layout,
 } from "react-native-reanimated";
 
@@ -134,7 +135,7 @@ function forceCloseRow(index) {
 function ExpensesList({ expenses, refreshControl }) {
   const tripCtx = useContext(TripContext);
   expenseCtx = useContext(ExpensesContext);
-  const layoutAnim = Layout.springify();
+  const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(true);
 
   tripid = tripCtx.tripid;
 

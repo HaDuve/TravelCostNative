@@ -30,11 +30,7 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   const windowWidth = Dimensions.get("window").width;
 
   return (
-    <Animated.View
-      // entering={FadeInRight.duration(1000)}
-      // exiting={FadeOutLeft.duration(1000)}
-      style={styles.container}
-    >
+    <Animated.View entering={FadeInRight} style={styles.container}>
       <View style={styles.titleRow}>
         <Ionicons name={icon} size={30} color={color} />
         <Text style={[styles.sum, { color: budgetColor, marginLeft: 8 }]}>

@@ -16,7 +16,8 @@ import Animated, {
 } from "react-native-reanimated";
 
 const ExpenseCategories = ({ expenses, periodName, navigation }) => {
-  const layoutAnim = Layout.springify();
+  const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(true);
+
   if (!expenses)
     return (
       <View style={styles.container}>

@@ -1,10 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-empty-function */
 import React, { createContext, useReducer } from "react";
 import {
   getDateMinusDays,
   getDatePlusDays,
+  getFormattedDate,
   getPreviousMondayDate,
   toShortFormat,
 } from "../util/date";
+import { truncateString } from "../util/string";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 
 export const ExpensesContext = createContext({
@@ -63,8 +67,13 @@ function expensesReducer(state, action) {
     case "ADD":
       return [action.payload, ...state];
     case "SET": {
-      const inverted = action.payload.reverse();
-      return inverted;
+      console.log("SET CALLED");
+      const getSortedState = (data) =>
+        data.sort((a, b) => {
+          return new Date(b.date) - new Date(a.date);
+        });
+      const sorted = getSortedState(action.payload);
+      return sorted;
     }
     case "UPDATE": {
       const updatableExpenseIndex = state.findIndex(

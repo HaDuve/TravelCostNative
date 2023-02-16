@@ -3,7 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import PropTypes from "prop-types";
 
 import { GlobalStyles } from "../../constants/styles";
-import { toShortFormat } from "../../util/date";
+import { isToday, toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
 import { getCatSymbol } from "../../util/category";
 import { memo, useContext, useCallback } from "react";
@@ -21,12 +21,21 @@ import Animated, {
 } from "react-native-reanimated";
 import { FlatList } from "react-native-gesture-handler";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+
 function ExpenseItem(props): JSX.Element {
   const {
     id,
     description,
     amount,
     date,
+    startDate,
     category,
     whoPaid,
     currency,
@@ -88,6 +97,14 @@ function ExpenseItem(props): JSX.Element {
     );
 
   if (!id) return <></>;
+
+  console.log(props);
+  let dateString = date ? date : "no date";
+  // if date is today, show "Today" instead of date
+  if (isToday(new Date(date))) {
+    dateString =
+      date.getHours() + ":" + date.getMinutes() + " - " + i18n.t("today");
+  } else dateString = toShortFormat(date);
   return (
     <Animated.View
       entering={FadeInRight}
@@ -111,7 +128,7 @@ function ExpenseItem(props): JSX.Element {
               {description}
             </Text>
             <Text style={[styles.textBase, styles.secondaryText]}>
-              {toShortFormat(date)}
+              {dateString}
             </Text>
           </View>
           <View>{sharedList}</View>

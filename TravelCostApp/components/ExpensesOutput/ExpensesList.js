@@ -65,6 +65,7 @@ const renderLeftActions = (progress, dragX, onClick) => {
 };
 function renderExpenseItem(itemData) {
   const index = itemData.index;
+
   return (
     <View style={{ height: 55, width: "100%" }}>
       <Swipeable

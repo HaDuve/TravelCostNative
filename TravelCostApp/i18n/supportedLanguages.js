@@ -49,9 +49,9 @@ const en = {
 
   // Category Names
   catFoodString: "Food",
-  catIntTravString: "International Travel",
+  catIntTravString: "Flights",
   catAccoString: "Accomodation",
-  catNatTravString: "National Travel",
+  catNatTravString: "Transport",
   catOtherString: "Other",
   catNewString: "New Category",
 
@@ -141,9 +141,9 @@ const de = {
 
   // Category Names
   catFoodString: "Essen",
-  catIntTravString: "Internationale Reisen",
+  catIntTravString: "Flüge",
   catAccoString: "Unterkunft",
-  catNatTravString: "Nationale Reisen",
+  catNatTravString: "Transport",
   catOtherString: "Andere",
   catNewString: "Neue Kategorie",
 

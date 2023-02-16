@@ -113,13 +113,18 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
                 dayString: dayString,
               });
             }}
-            style={styles.itemContainer}
           >
-            <Text style={styles.text1}>{dayString}</Text>
-            <Text style={[styles.text1, colorCoding]}>
-              {expenseString}
-              {emptyValue ? "-" : TripCtx.tripCurrency}
-            </Text>
+            <Animated.View
+              entering={FadeInRight}
+              exiting={FadeOutLeft}
+              style={styles.itemContainer}
+            >
+              <Text style={styles.text1}>{dayString}</Text>
+              <Text style={[styles.text1, colorCoding]}>
+                {expenseString}
+                {emptyValue ? "-" : TripCtx.tripCurrency}
+              </Text>
+            </Animated.View>
           </Pressable>
         );
       };
@@ -176,13 +181,18 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
                 dayString: weekString,
               });
             }}
-            style={styles.itemContainer}
           >
-            <Text style={styles.text1}>{weekString}</Text>
-            <Text style={[styles.text1, colorCoding]}>
-              {expenseString}
-              {emptyValue ? "-" : TripCtx.tripCurrency}
-            </Text>
+            <Animated.View
+              entering={FadeInRight}
+              exiting={FadeOutLeft}
+              style={styles.itemContainer}
+            >
+              <Text style={styles.text1}>{weekString}</Text>
+              <Text style={[styles.text1, colorCoding]}>
+                {expenseString}
+                {emptyValue ? "-" : TripCtx.tripCurrency}
+              </Text>
+            </Animated.View>
           </Pressable>
         );
       };
@@ -229,15 +239,20 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
                 dayString: month,
               });
             }}
-            style={styles.itemContainer}
           >
-            <Text style={styles.text1}>
-              {month} {item.firstDay.getFullYear()}
-            </Text>
-            <Text style={[styles.text1, colorCoding]}>
-              {expenseString}
-              {emptyValue ? "-" : TripCtx.tripCurrency}
-            </Text>
+            <Animated.View
+              entering={FadeInRight}
+              exiting={FadeOutLeft}
+              style={styles.itemContainer}
+            >
+              <Text style={styles.text1}>
+                {month} {item.firstDay.getFullYear()}
+              </Text>
+              <Text style={[styles.text1, colorCoding]}>
+                {expenseString}
+                {emptyValue ? "-" : TripCtx.tripCurrency}
+              </Text>
+            </Animated.View>
           </Pressable>
         );
       };
@@ -284,13 +299,18 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
                 dayString: yearString,
               });
             }}
-            style={styles.itemContainer}
           >
-            <Text style={styles.text1}>{yearString}</Text>
-            <Text style={[styles.text1, colorCoding]}>
-              {expenseString}
-              {emptyValue ? "-" : TripCtx.tripCurrency}
-            </Text>
+            <Animated.View
+              entering={FadeInRight}
+              exiting={FadeOutLeft}
+              style={styles.itemContainer}
+            >
+              <Text style={styles.text1}>{yearString}</Text>
+              <Text style={[styles.text1, colorCoding]}>
+                {expenseString}
+                {emptyValue ? "-" : TripCtx.tripCurrency}
+              </Text>
+            </Animated.View>
           </Pressable>
         );
       };
@@ -300,8 +320,8 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
   }
   return (
     <Animated.View
-      entering={FadeInRight.duration(1000)}
-      exiting={FadeOutLeft.duration(1000)}
+      entering={FadeInRight}
+      exiting={FadeOutLeft}
       style={styles.container}
     >
       {/* ListHeaderComponent={ */}
@@ -318,8 +338,14 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
         ></ExpenseChart>
       </View>
       {/* } */}
-      <View style={styles.listContainer}>
-        <FlatList
+      <Animated.View
+        entering={FadeInRight.duration(500)}
+        exiting={FadeOutLeft.duration(500)}
+        style={styles.listContainer}
+      >
+        <Animated.FlatList
+          entering={FadeInRight.duration(500)}
+          exiting={FadeOutLeft.duration(500)}
           data={listExpenseSumBudgets}
           renderItem={renderItemRef}
           removeClippedSubviews={true}
@@ -332,8 +358,8 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
             offset: 50 * index,
             index,
           })}
-        ></FlatList>
-      </View>
+        ></Animated.FlatList>
+      </Animated.View>
     </Animated.View>
   );
 };

@@ -7,8 +7,16 @@ import { CatColors, GlobalStyles } from "../../../constants/styles";
 import CategoryChart from "../../ExpensesOverview/CategoryChart";
 import { ScrollView } from "react-native-gesture-handler";
 import { G } from "react-native-svg";
+import Animated, {
+  FadeInRight,
+  FadeInUp,
+  FadeOutLeft,
+  Layout,
+  Transition,
+} from "react-native-reanimated";
 
 const ExpenseCategories = ({ expenses, periodName, navigation }) => {
+  const layoutAnim = Layout.springify();
   if (!expenses)
     return (
       <View style={styles.container}>
@@ -92,14 +100,16 @@ const ExpenseCategories = ({ expenses, periodName, navigation }) => {
   });
 
   return (
-    <View style={styles.container}>
-      <FlatList
+    <Animated.View style={styles.container}>
+      <Animated.FlatList
+        itemLayoutAnimation={layoutAnim}
         data={catSumCat}
         renderItem={renderItem}
         keyExtractor={(item) => item.cat}
         ListHeaderComponent={
           <CategoryChart inputData={dataList}></CategoryChart>
         }
+        ListFooterComponent={<View style={{ marginBottom: 50 }}></View>}
         ListEmptyComponent={
           <View style={styles.fallbackTextContainer}>
             <Text>
@@ -109,7 +119,7 @@ const ExpenseCategories = ({ expenses, periodName, navigation }) => {
           </View>
         }
       />
-    </View>
+    </Animated.View>
   );
 };
 

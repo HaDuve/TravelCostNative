@@ -1,4 +1,4 @@
-import { Alert, FlatList } from "react-native";
+import { Alert } from "react-native";
 
 import ExpenseItem from "./ExpenseItem";
 
@@ -11,13 +11,18 @@ import { deleteExpense } from "../../util/http";
 import { TripContext } from "../../store/trip-context";
 import { ExpensesContext } from "../../store/expenses-context";
 import IconButton from "../UI/IconButton";
-import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
+import Animated, {
+  FadeInRight,
+  FadeOutLeft,
+  Layout,
+} from "react-native-reanimated";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../../i18n/supportedLanguages";
 import { deleteExpenseOnlineOffline } from "../../util/offline-queue";
+import { FlatList } from "react-native-gesture-handler";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -129,23 +134,26 @@ function forceCloseRow(index) {
 function ExpensesList({ expenses, refreshControl }) {
   const tripCtx = useContext(TripContext);
   expenseCtx = useContext(ExpensesContext);
+  const layoutAnim = Layout.springify();
 
   tripid = tripCtx.tripid;
 
   return (
     <Animated.View
-      // layout={JumpingTransition.duration(5000)}
-      entering={FadeInRight.duration(600)}
-      exiting={FadeOutLeft.duration(500)}
+      //
+      // entering={FadeInRight.duration(600)}
+      // exiting={FadeOutLeft.duration(500)}
       style={{
         marginRight: 20,
         backgroundColor: GlobalStyles.colors.backgroundColor,
         overflow: "visible",
       }}
     >
-      <FlatList
+      <Animated.FlatList
+        itemLayoutAnimation={layoutAnim}
         data={expenses}
         renderItem={renderExpenseItem}
+        ListFooterComponent={<View style={{ height: 100 }} />}
         keyExtractor={(item) => item.id}
         refreshControl={refreshControl}
         getItemLayout={(data, index) => ({

@@ -33,8 +33,8 @@ const CategoryChart = ({ inputData }) => {
 
   return (
     <Animated.View
-      entering={FadeInRight.duration(1000)}
-      exiting={FadeOutLeft.duration(1000)}
+      entering={FadeInRight}
+      exiting={FadeOutLeft}
       style={styles.container}
     >
       <VictoryPie

@@ -11,7 +11,14 @@ import { TripContext } from "../../store/trip-context";
 import { formatExpenseString } from "../../util/string";
 import React from "react";
 
-import Animated, { SlideInRight, SlideOutLeft } from "react-native-reanimated";
+import Animated, {
+  FadeInRight,
+  FadeOutLeft,
+  SlideInRight,
+  SlideInUp,
+  SlideOutDown,
+  SlideOutLeft,
+} from "react-native-reanimated";
 import { FlatList } from "react-native-gesture-handler";
 
 function ExpenseItem(props): JSX.Element {
@@ -87,8 +94,8 @@ function ExpenseItem(props): JSX.Element {
   if (!id) return <></>;
   return (
     <Animated.View
-      entering={SlideInRight}
-      exiting={SlideOutLeft}
+      entering={FadeInRight}
+      exiting={FadeOutLeft}
       style={{ height: 55, overflow: "visible" }}
     >
       <Pressable

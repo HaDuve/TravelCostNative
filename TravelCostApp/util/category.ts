@@ -1,4 +1,13 @@
-export function getCatSymbol(cat) {
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
+export function getCatSymbol(cat: string) {
   switch (cat) {
     case "food":
       return "fast-food-outline";
@@ -34,5 +43,24 @@ export function getCatSymbol(cat) {
       return "happy-outline";
     default:
       return "help-outline";
+  }
+}
+
+export function getCatString(cat: string) {
+  switch (cat) {
+    case "food":
+      return i18n.t("catFoodString");
+    case "Food":
+      return i18n.t("catFoodString");
+    case "national-travel":
+      return i18n.t("catNatTravString");
+    case "international-travel":
+      return i18n.t("catIntTravString");
+    case "accomodation":
+      return i18n.t("catAccoString");
+    case "other":
+      return i18n.t("catOtherString");
+    default:
+      return cat;
   }
 }

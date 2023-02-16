@@ -17,6 +17,7 @@ import Animated, {
   FadeInUp,
   FadeOutLeft,
 } from "react-native-reanimated";
+import { getCatString } from "../../util/category";
 
 const CategoryChart = ({ inputData }) => {
   const [useDummyData, setUseDummyData] = useState(true);
@@ -62,7 +63,8 @@ const CategoryChart = ({ inputData }) => {
           />
         }
         labels={({ datum }) => {
-          return `${datum.x[0].toUpperCase()}${datum.x.slice(1)}`;
+          return getCatString(datum.x);
+          // return `${datum.x[0].toUpperCase()}${datum.x.slice(1)}`;
         }}
       />
     </Animated.View>

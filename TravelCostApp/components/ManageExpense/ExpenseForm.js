@@ -23,7 +23,7 @@ import { AuthContext } from "../../store/auth-context";
 import IconButton from "../UI/IconButton";
 import { UserContext } from "../../store/user-context";
 import FlatButton from "../UI/FlatButton";
-import { getCatSymbol } from "../../util/category";
+import { getCatString, getCatSymbol } from "../../util/category";
 import DropDownPicker from "react-native-dropdown-picker";
 // import CurrencyPicker from "react-native-currency-picker";
 import DatePicker from "react-native-neat-date-picker";
@@ -340,7 +340,7 @@ const ExpenseForm = ({
       amount: +inputs.amount.value,
       date: new Date(),
       endDate: new Date(),
-      description: pickedCat,
+      description: getCatString(pickedCat),
       category: pickedCat,
       country: UserCtx.lastCountry ? UserCtx.lastCountry : UserCtx.homeCountry,
       currency: UserCtx.lastCurrency

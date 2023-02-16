@@ -23,16 +23,17 @@ import { deleteExpense, storeExpense, updateExpense } from "../util/http";
 import { GlobalStyles } from "./../constants/styles";
 import { getRate } from "./../util/currencyExchange";
 import { daysBetween, getDatePlusDays } from "../util/date";
-
-//Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de } from "../i18n/supportedLanguages";
 import {
   deleteExpenseOnlineOffline,
   storeExpenseOnlineOffline,
   updateExpenseOnlineOffline,
 } from "../util/offline-queue";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../i18n/supportedLanguages";
+import { getCatString } from "../util/category";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -107,6 +108,9 @@ const ManageExpense = ({ route, navigation }) => {
   async function confirmHandler(expenseData) {
     setIsSubmitting(true);
     try {
+      // set the category to the corresponting catstring
+      expenseData.categoryString = getCatString(expenseData.category);
+
       // calc calcAmount from amount, currency and TripCtx.tripCurrency and add it to expenseData
       const base = expenseData.currency;
       const target = tripCtx.tripCurrency;

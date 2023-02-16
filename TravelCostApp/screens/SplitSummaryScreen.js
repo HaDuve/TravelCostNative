@@ -74,6 +74,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
       <FlatList
         style={{ maxHeight: Dimensions.get("screen").height / 1.5 }}
         data={splits}
+        ListFooterComponent={<View style={{ height: 100 }}></View>}
         renderItem={renderSplitItem}
       />
       <View style={styles.buttonContainer}>

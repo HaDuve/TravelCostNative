@@ -110,7 +110,7 @@ const ExpenseCategories = ({ expenses, periodName, navigation }) => {
         ListHeaderComponent={
           <CategoryChart inputData={dataList}></CategoryChart>
         }
-        ListFooterComponent={<View style={{ marginBottom: 50 }}></View>}
+        ListFooterComponent={<View style={{ height: 100 }}></View>}
         ListEmptyComponent={
           <View style={styles.fallbackTextContainer}>
             <Text>

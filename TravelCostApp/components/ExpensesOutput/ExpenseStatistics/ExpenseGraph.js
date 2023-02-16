@@ -348,6 +348,7 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
           exiting={FadeOutLeft.duration(500)}
           data={listExpenseSumBudgets}
           renderItem={renderItemRef}
+          ListFooterComponent={<View style={{ height: 100 }}></View>}
           removeClippedSubviews={true}
           maxToRenderPerBatch={7}
           updateCellsBatchingPeriod={300}

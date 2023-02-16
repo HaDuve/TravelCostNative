@@ -725,6 +725,7 @@ const ExpenseForm = ({
                       justifyContent: "flex-start",
                       alignItems: "flex-start",
                     }}
+                    ListFooterComponent={<View style={{ width: 100 }}></View>}
                     renderItem={(itemData) => {
                       const splitValue = itemData.item.amount.toString();
                       return (

@@ -30,6 +30,7 @@ function TripList({ trips, refreshControl, setRefreshing }) {
       <FlatList
         data={trips}
         refreshControl={refreshControl}
+        ListFooterComponent={<View style={{ height: 300 }}></View>}
         renderItem={renderTripItem}
         keyExtractor={(item) => {
           if (typeof item === "string" || item instanceof String) return item;

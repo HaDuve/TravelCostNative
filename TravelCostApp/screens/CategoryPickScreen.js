@@ -161,6 +161,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
         numColumns={2}
         data={CATLIST}
         renderItem={renderCatItem}
+        ListFooterComponent={<View style={{ height: 100 }}></View>}
         style={styles.listStyle}
       ></FlatList>
       <View style={styles.buttonContainer}>

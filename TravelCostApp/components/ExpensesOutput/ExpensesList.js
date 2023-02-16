@@ -141,9 +141,6 @@ function ExpensesList({ expenses, refreshControl }) {
 
   return (
     <Animated.View
-      //
-      // entering={FadeInRight.duration(600)}
-      // exiting={FadeOutLeft.duration(500)}
       style={{
         marginRight: 20,
         backgroundColor: GlobalStyles.colors.backgroundColor,

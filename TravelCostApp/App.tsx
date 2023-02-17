@@ -39,9 +39,6 @@ import CategoryPickScreen from "./screens/CategoryPickScreen";
 import SplitSummaryScreen from "./screens/SplitSummaryScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import * as Device from "expo-device";
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de } from "./i18n/supportedLanguages";
 import {
   asyncStoreGetItem,
   asyncStoreGetObject,
@@ -53,6 +50,11 @@ import LoadingOverlay from "./components/UI/LoadingOverlay";
 import ImportGSScreen from "./screens/ImportGSScreen";
 import FilteredExpenses from "./screens/FilteredExpenses";
 import { sendOfflineQueue } from "./util/offline-queue";
+
+//localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "./i18n/supportedLanguages";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
@@ -402,7 +404,7 @@ function Root() {
         // set tripId in context
         if (storedTripId) {
           console.log("onRootMount ~ storedTripId", storedTripId);
-          tripCtx.fetchAndSetCurrentTrip(storedTripId);
+          await tripCtx.fetchAndSetCurrentTrip(storedTripId);
           tripCtx.setCurrentTravellers(storedTripId);
           tripCtx.setTripid(storedTripId);
         }

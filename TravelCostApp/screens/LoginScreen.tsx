@@ -48,7 +48,7 @@ function LoginScreen() {
           asyncStoreSetItem("currentTripId", tripid);
           tripCtx.setTripid(tripid);
           userCtx.addUser(userData);
-          tripCtx.fetchAndSetCurrentTrip(tripid);
+          await tripCtx.fetchAndSetCurrentTrip(tripid);
           tripCtx.refresh();
         }
       } catch (error) {

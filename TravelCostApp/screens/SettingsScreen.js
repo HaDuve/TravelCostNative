@@ -17,6 +17,7 @@ import {
 } from "../components/ImportExport/ImportFromGoogleXlsx";
 import { exportAllExpensesToXLSX } from "../components/ImportExport/ExportToGoogleXlsx";
 import { ScrollView } from "react-native-gesture-handler";
+import { simplifySplits } from "../util/split";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -92,6 +93,14 @@ const SettingsScreen = ({ navigation }) => {
         {/* in die heruntergeladene GoogleSheets als Xlsx */}
         {/* danach muss zurueck konvertiert werden  */}
         Export FoodForNomads
+      </Button>
+      <Button
+        onPress={() => {
+          navigation.navigate("SplitSummary", { tripid: tripCtx.tripid });
+        }}
+        style={styles.settingsButton}
+      >
+        Simplify Splits
       </Button>
     </ScrollView>
   );

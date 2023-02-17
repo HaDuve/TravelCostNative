@@ -67,7 +67,6 @@ function expensesReducer(state, action) {
     case "ADD":
       return [action.payload, ...state];
     case "SET": {
-      console.log("SET CALLED");
       const getSortedState = (data) =>
         data.sort((a, b) => {
           return new Date(b.date) - new Date(a.date);

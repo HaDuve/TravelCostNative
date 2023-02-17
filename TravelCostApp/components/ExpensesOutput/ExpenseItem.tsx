@@ -98,12 +98,12 @@ function ExpenseItem(props): JSX.Element {
 
   if (!id) return <></>;
 
-  console.log(props);
   let dateString = date ? date : "no date";
   // if date is today, show "Today" instead of date
   if (isToday(new Date(date))) {
     dateString =
-      date.getHours() + ":" + date.getMinutes() + " - " + i18n.t("today");
+      // date.getHours() + ":" + date.getMinutes() + " - " +
+      i18n.t("today");
   } else dateString = toShortFormat(date);
   return (
     <Animated.View

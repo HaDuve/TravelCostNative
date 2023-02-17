@@ -19,7 +19,6 @@ export async function asyncStoreSetItem(
   } catch (error) {
     console.error(error);
   }
-  console.log("Done.");
 }
 
 /**
@@ -35,7 +34,6 @@ export async function asyncStoreSetObject(key: string, value: unknown) {
   } catch (error) {
     console.error(error);
   }
-  console.log("Done.");
 }
 
 /**
@@ -49,7 +47,6 @@ export async function asyncStoreGetItem(key: string) {
   } catch (error) {
     console.error(error);
   }
-  console.log("Done.");
 }
 
 /**
@@ -63,7 +60,6 @@ export async function asyncStoreGetObject(key: string) {
   } catch (error) {
     console.error(error);
   }
-  console.log("Done.");
 }
 
 /**
@@ -86,6 +82,4 @@ export async function asyncStoreSafeClear() {
     // remove error
     console.error(error);
   }
-
-  console.log("Done");
 }

@@ -66,23 +66,13 @@ function TripItem({
   }, []);
 
   function tripPressHandler() {
-    if (userCtx.isOnline === false) return;
+    if (userCtx.isOnline === false) {
+      Alert.alert("You are offline", "Please go online to manage your trip");
+      return;
+    }
     // NOTE: Android can only handle alert with 2 actions, so this needs to be changed or actions will go missing
     console.log("pressed: ", tripid);
-    travellers.length > 1 &&
-      Alert.alert(tripName, i18n.t("chooseAction"), [
-        {
-          text: i18n.t("cancel"),
-          onPress: () => navigation.navigate("Profile"),
-          style: "cancel",
-        },
-        travellers.length > 1 && {
-          text: i18n.t("calcOpenSplits"),
-          onPress: () => {
-            navigation.navigate("SplitSummary", { tripid: tripid });
-          },
-        },
-      ]);
+    navigation.navigate("ManageTrip", { tripId: tripid });
   }
 
   const activeBorder =

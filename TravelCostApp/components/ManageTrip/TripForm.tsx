@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useLayoutEffect } from "react";
 import { View, Text, Alert } from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
@@ -11,6 +11,7 @@ import {
   updateUser,
   fetchTrip,
   updateTripHistory,
+  updateTrip,
 } from "../../util/http";
 import * as Updates from "expo-updates";
 
@@ -24,18 +25,15 @@ import CurrencyPicker from "../Currency/CurrencyPicker";
 import CurrencyInput from "react-currency-input-field";
 import { asyncStoreSetItem } from "../../store/async-storage";
 
-const TripForm = ({ navigation }) => {
-  const tripCtx = useContext(TripContext);
-  const authCtx = useContext(AuthContext);
-  const userCtx = useContext(UserContext);
-  const expenseCtx = useContext(ExpensesContext);
-
-  const [countryValue, setCountryValue] = useState("DE");
-
-  const uid = authCtx.uid;
-  const userName = userCtx.userName;
-  // let currencyPickerRef = undefined;
-
+//localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+// i18n.locale = "en";
+i18n.enableFallback = true;
+const TripForm = ({ navigation, route }) => {
   const [inputs, setInputs] = useState({
     tripName: {
       value: "",
@@ -46,7 +44,7 @@ const TripForm = ({ navigation }) => {
       isValid: true,
     },
     tripCurrency: {
-      value: "EUR",
+      value: "",
       isValid: true,
     },
     dailyBudget: {
@@ -54,6 +52,35 @@ const TripForm = ({ navigation }) => {
       isValid: true,
     },
   });
+
+  const editedTripId = route.params?.tripId;
+  const isEditing = !!editedTripId;
+
+  useLayoutEffect(() => {
+    const setEditedTrip = async () => {
+      const selectedTrip = await fetchTrip(editedTripId);
+      inputChangedHandler("tripName", selectedTrip.tripName);
+      inputChangedHandler("tripCurrency", selectedTrip.tripCurrency);
+      inputChangedHandler("dailyBudget", selectedTrip.dailyBudget.toString());
+      inputChangedHandler("totalBudget", selectedTrip.totalBudget.toString());
+    };
+    if (isEditing) {
+      setEditedTrip();
+    }
+  }, [editedTripId, isEditing]);
+
+  const tripCtx = useContext(TripContext);
+  const authCtx = useContext(AuthContext);
+  const userCtx = useContext(UserContext);
+  const expenseCtx = useContext(ExpensesContext);
+
+  const [countryValue, setCountryValue] = useState(
+    inputs?.tripCurrency ? inputs.tripCurrency.value : i18n.t("currencyLabel")
+  );
+
+  const uid = authCtx.uid;
+  const userName = userCtx.userName;
+  // let currencyPickerRef = undefined;
 
   function inputChangedHandler(inputIdentifier, enteredValue) {
     setInputs((curInputs) => {
@@ -67,7 +94,7 @@ const TripForm = ({ navigation }) => {
     navigation.navigate("Profile");
   }
 
-  async function submitHandler() {
+  async function submitHandler(setActive: boolean) {
     const tripData = {
       tripName: inputs.tripName.value,
       totalBudget: +inputs.totalBudget.value,
@@ -79,6 +106,9 @@ const TripForm = ({ navigation }) => {
     // Tripname should not be empty
     const tripNameIsValid =
       tripData.tripName !== "" && tripData.tripName.length > 0;
+    // tripCurrency should not be empty
+    const tripCurrencyIsValid =
+      tripData.tripCurrency !== "" && tripData.tripCurrency.length > 0;
     // Total budget should be a number between 1 and 3B
     const totalBudgetIsValid =
       !isNaN(tripData.totalBudget) &&
@@ -106,6 +136,20 @@ const TripForm = ({ navigation }) => {
       return;
     }
 
+    if (!tripCurrencyIsValid) {
+      inputs.tripCurrency.isValid = tripCurrencyIsValid;
+      Alert.alert("Please select a Currency");
+      return;
+    }
+    // if isEditing update Trip, else store
+    if (isEditing) {
+      await updateTrip(editedTripId, tripData);
+      if (editedTripId === tripCtx.tripid || setActive)
+        await tripCtx.fetchAndSetCurrentTrip(editedTripId);
+      tripCtx.refresh();
+      navigation.navigate("Profile");
+      return;
+    }
     const tripid = await storeTrip(tripData);
     asyncStoreSetItem("currentTripId", tripid);
     await storeTravellerToTrip(tripid, { userName: userName, uid: uid });
@@ -136,12 +180,15 @@ const TripForm = ({ navigation }) => {
     inputChangedHandler("tripCurrency", countryValue.split(" ")[0]);
   }
 
+  const titleString = isEditing ? "Edit Trip Budget" : "New Trip Budget";
+
   return (
     <View style={styles.form}>
       <View style={styles.card}>
-        <Text style={styles.title}>New Trip Budget</Text>
+        <Text style={styles.title}>{titleString}</Text>
         <View style={styles.currencyPickerContainer}>
           <CurrencyPicker
+            placeholder={inputs.tripCurrency.value}
             countryValue={countryValue}
             setCountryValue={setCountryValue}
             onChangeValue={updateCurrency}
@@ -199,6 +246,14 @@ const TripForm = ({ navigation }) => {
           Save Trip
         </Button>
       </View>
+      <Button
+        buttonStyle={{}}
+        mode={""}
+        style={[styles.button, { marginBottom: 8, marginHorizontal: 24 }]}
+        onPress={submitHandler.bind(this, { setActive: true })}
+      >
+        Set Trip Active and Save
+      </Button>
     </View>
   );
 };

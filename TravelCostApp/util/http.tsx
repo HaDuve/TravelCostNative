@@ -238,6 +238,15 @@ export async function storeTrip(tripData) {
   return id;
 }
 
+export async function updateTrip(tripid: string, tripData) {
+  // console.log("https: ~ updateTrip ~ tripData", tripData);
+  const res = await axios.patch(
+    BACKEND_URL + "/trips/" + `${tripid}.json` + QPAR,
+    tripData
+  );
+  return res;
+}
+
 export async function fetchTrip(tripid: string) {
   if (!tripid) return null;
   // console.log("https: ~ fetchTrip ~ tripid", tripid);

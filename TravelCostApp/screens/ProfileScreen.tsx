@@ -46,7 +46,7 @@ const ProfileScreen = ({ navigation }) => {
     refreshHandler();
   }, [TripCtx.refreshState]);
 
-  // TODO: all of this has to be moved into TripContext to be loaded correctly
+  // refreshHandler() could be moved into TripContext to be loaded correctly
   async function refreshHandler() {
     // check freshly and offlinemode
     if (FreshlyCreated || !UserCtx.isOnline) return;
@@ -57,7 +57,7 @@ const ProfileScreen = ({ navigation }) => {
       return;
     }
     allTripsList = [...tripHistory];
-    TripCtx.fetchAndSetCurrentTrip(TripCtx.tripid);
+    await TripCtx.fetchAndSetCurrentTrip(TripCtx.tripid);
     addTripFromContext();
     // console.log("allTripsList length: ", allTripsList.length);
     setTripsList(allTripsList.reverse());

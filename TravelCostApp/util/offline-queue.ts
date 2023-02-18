@@ -15,11 +15,9 @@ export interface OfflineQueueManageExpenseItem {
 
 // retrieve offlinequeue and push new item
 export const pushOfflineQueue = async (item: OfflineQueueManageExpenseItem) => {
-  console.log("pushOfflineQueue ~ item", item);
   const offlineQueue = await getOfflineQueue();
   offlineQueue.push(item);
   const res = await asyncStoreSetObject("offlineQueue", offlineQueue);
-  console.log("pushOfflineQueue ~ offlineQueue", offlineQueue);
   return res;
 };
 
@@ -36,9 +34,7 @@ export const deleteExpenseOnlineOffline = async (
 ) => {
   // load tripid from asyncstore to fix the tripctx tripid bug
   const tripid = await asyncStoreGetItem("currentTripId");
-  console.log("deleteExpenseOnlineOffline ~ async tripid", tripid);
   item.expense.tripid = tripid;
-  console.log("deleteExpenseOnlineOffline ~ online", online);
   if (online) {
     // delete item online
     const res = await deleteExpense(
@@ -59,9 +55,7 @@ export const updateExpenseOnlineOffline = async (
 ) => {
   // load tripid from asyncstore to fix the tripctx tripid bug
   const tripid = await asyncStoreGetItem("currentTripId");
-  console.log("updateExpenseOnlineOffline ~ async tripid", tripid);
   item.expense.tripid = tripid;
-  console.log("updateExpenseOnlineOffline ~ online", online);
   if (online) {
     // update item online
     const res = await updateExpense(
@@ -83,9 +77,7 @@ export const storeExpenseOnlineOffline = async (
 ) => {
   // load tripid from asyncstore to fix the tripctx tripid bug
   const tripid = await asyncStoreGetItem("currentTripId");
-  console.log("storeExpenseOnlineOffline ~ async tripid", tripid);
   item.expense.tripid = tripid;
-  console.log("storeExpenseOnlineOffline ~ online", online);
   if (online) {
     // store item online
     const id = await storeExpense(
@@ -112,14 +104,12 @@ export const sendOfflineQueue = async () => {
     // for each OfflineQueueManageExpenseItem in queue activate
     for (let i = 0; i < queue.length; i++) {
       const item = queue[i];
-      console.log("item", item);
       if (item.type === "add") {
         const id = await storeExpense(
           item.expense.tripid,
           item.expense.uid,
           item.expense.expenseData
         );
-        console.log("id", id);
       } else if (item.type === "update") {
         await updateExpense(
           item.expense.tripid,

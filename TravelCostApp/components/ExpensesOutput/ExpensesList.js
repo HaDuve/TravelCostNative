@@ -30,6 +30,7 @@ import { I18n } from "i18n-js";
 import { en, de } from "../../i18n/supportedLanguages";
 import { deleteExpenseOnlineOffline } from "../../util/offline-queue";
 import { FlatList } from "react-native-gesture-handler";
+import { UserContext } from "../../store/user-context";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -63,19 +64,23 @@ const renderLeftActions = (progress, dragX, onClick) => {
     </View>
   );
 };
-function renderExpenseItem(itemData) {
+function renderExpenseItem(isOnline, itemData) {
   const index = itemData.index;
 
   return (
     <View style={{ height: 55, width: "100%" }}>
       <Swipeable
-        renderLeftActions={(progress, dragX) =>
-          renderLeftActions(progress, dragX, onClick.bind(this, itemData))
+        renderRightActions={(progress, dragX) =>
+          renderLeftActions(
+            progress,
+            dragX,
+            onClick.bind(this, itemData, isOnline)
+          )
         }
         onSwipeableOpen={closeRow.bind(this, index)}
         ref={(ref) => (row[index] = ref)}
-        leftOpenValue={-100}
-        disableRightSwipe={true}
+        rightOpenValue={-100}
+        disableLeftSwipe={true}
         overshootFriction={8}
       >
         <ExpenseItem {...itemData.item} />
@@ -84,9 +89,13 @@ function renderExpenseItem(itemData) {
   );
 }
 
-function onClick({ item, index }) {
+function onClick({ item, index }, isOnline) {
+  // console.log("onClick ~ isOnline", isOnline);
+  // console.log("onClick ~ index", index);
+  // console.log("onClick ~ item", item);
   const editedExpenseId = item.id;
   const uid = item.uid;
+  console.log("onClick ~ uid", uid);
   async function deleteExp() {
     try {
       const item = {
@@ -97,7 +106,7 @@ function onClick({ item, index }) {
           id: editedExpenseId,
         },
       };
-      await deleteExpenseOnlineOffline(item);
+      await deleteExpenseOnlineOffline(item, isOnline);
       expenseCtx.deleteExpense(editedExpenseId);
     } catch (error) {
       console.log(i18n.t("deleteError"), error);
@@ -141,6 +150,8 @@ function forceCloseRow(index) {
 // Displays a list of all expenses.
 function ExpensesList({ expenses, refreshControl, periodValue }) {
   // const flatListRef = useRef(null);
+  const userCtx = useContext(UserContext);
+  const isOnline = userCtx.isOnline;
   const tripCtx = useContext(TripContext);
   expenseCtx = useContext(ExpensesContext);
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(true);
@@ -170,7 +181,7 @@ function ExpensesList({ expenses, refreshControl, periodValue }) {
   return (
     <Animated.View
       style={{
-        marginRight: 20,
+        paddingLeft: 0,
         backgroundColor: GlobalStyles.colors.backgroundColor,
       }}
     >
@@ -178,7 +189,7 @@ function ExpensesList({ expenses, refreshControl, periodValue }) {
         // ref={flatListRef}
         itemLayoutAnimation={layoutAnim}
         data={expenses}
-        renderItem={renderExpenseItem}
+        renderItem={renderExpenseItem.bind(this, isOnline)}
         ListFooterComponent={<View style={{ height: 100 }} />}
         keyExtractor={(item) => item.id}
         refreshControl={refreshControl}

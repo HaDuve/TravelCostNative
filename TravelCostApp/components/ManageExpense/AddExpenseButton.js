@@ -3,8 +3,12 @@ import { GlobalStyles } from "../../constants/styles";
 import IconButton from "../UI/IconButton";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
+import { UserContext } from "../../store/user-context";
+import { useContext } from "react";
 
 const AddExpenseButton = ({ navigation }) => {
+  const userCtx = useContext(UserContext);
+  const isOnline = userCtx.isOnline;
   return (
     <Pressable
       onPress={() => {
@@ -15,7 +19,13 @@ const AddExpenseButton = ({ navigation }) => {
     >
       <Animated.View
         entering={FadeInDown.duration(600)}
-        style={styles.addButton}
+        style={[
+          styles.addButton,
+          !isOnline && {
+            borderWidth: 1,
+            borderColor: GlobalStyles.colors.primary800,
+          },
+        ]}
       >
         <IconButton
           icon="add-outline"

@@ -145,7 +145,7 @@ const ExpenseForm = ({
     currentTravellersAsItems
   );
   const [openEQUAL, setOpenEQUAL] = useState(false);
-  const [listEQUAL, setListEQUAL] = useState(
+  const [splitTravellersList, setListEQUAL] = useState(
     defaultValues ? defaultValues.listEQUAL : currentTravellers
   );
 
@@ -166,7 +166,7 @@ const ExpenseForm = ({
     if (splitType === "EQUAL") return;
     const tempList = [...splitList];
     // TODO: this Number(value) makes it impossible to enter decimal numbers (eg.: 1.9)
-    const tempValue = { amount: Number(value), userName: props.userName };
+    const tempValue = { amount: value, userName: props.userName };
     tempList[index] = tempValue;
     setSplitList(tempList);
     setSplitListValid(
@@ -230,7 +230,7 @@ const ExpenseForm = ({
     // calculate splits
     let listSplits = [];
 
-    const splitTravellers = listEQUAL;
+    const splitTravellers = splitTravellersList;
     listSplits = calcSplitList(
       splitType,
       inputs.amount.value,
@@ -256,7 +256,7 @@ const ExpenseForm = ({
       whoPaid: whoPaid, // TODO: convert this to uid
       owePerc: +inputs.owePerc.value,
       splitType: splitType,
-      listEQUAL: listEQUAL,
+      listEQUAL: splitTravellersList,
       splitList: splitList,
     };
 
@@ -463,7 +463,11 @@ const ExpenseForm = ({
     <>
       {datepickerJSX}
       <View style={styles.container}>
-        <KeyboardAvoidingView style={styles.form}>
+        <KeyboardAvoidingView
+          behavior={"position"}
+          contentContainerStyle={{ flex: 1 }}
+          style={styles.form}
+        >
           <View style={styles.inputsRow}>
             <Input
               style={styles.rowInput}
@@ -659,7 +663,7 @@ const ExpenseForm = ({
               {!loadingTravellers && (
                 <DropDownPicker
                   open={openEQUAL}
-                  value={listEQUAL}
+                  value={splitTravellersList}
                   items={splitItemsEQUAL}
                   setOpen={setOpenEQUAL}
                   setValue={setListEQUAL}
@@ -796,9 +800,7 @@ const ExpenseForm = ({
                               }}
                             ></Input>
                             <Text style={{ paddingBottom: 12 }}>
-                              {isEditing
-                                ? TripCtx.tripCurrency
-                                : inputs.currency.value}
+                              {inputs.currency.value}
                             </Text>
                           </View>
                         </View>
@@ -834,7 +836,7 @@ export default ExpenseForm;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginBottom: "10%",
+    marginBottom: "50%",
   },
   form: {
     flex: 1,

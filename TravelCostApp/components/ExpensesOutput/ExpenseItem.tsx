@@ -68,13 +68,19 @@ function ExpenseItem(props): JSX.Element {
     <></>
   );
 
+  const splitListHasNonZeroEntries = splitList?.some(
+    (item) => item.amount !== 0
+  );
   const longList =
-    splitList && splitList.length > 2 ? splitList.slice(0, 2) : null;
+    splitList && splitList.length > 2 && splitListHasNonZeroEntries
+      ? splitList.slice(0, 2)
+      : null;
   longList?.push({ userName: "+" });
   const sharedList =
     splitList && splitList.length > 0 ? (
       <View style={{ overflow: "visible" }}>
         <FlatList
+          scrollEnabled={false}
           data={longList ? longList : splitList}
           horizontal={true}
           renderItem={({ item }) => (
@@ -91,7 +97,7 @@ function ExpenseItem(props): JSX.Element {
     ) : (
       <View style={styles.avatarContainer}>
         <View style={[styles.avatar, GlobalStyles.shadow]}>
-          <Text style={styles.avatarText}>{whoPaid.slice(0, 1)}</Text>
+          <Text style={styles.avatarText}>{whoPaid?.slice(0, 1)}</Text>
         </View>
       </View>
     );
@@ -167,9 +173,9 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     borderColor: "black",
     paddingVertical: 8,
-    paddingRight: 0,
-    paddingLeft: 20,
-    marginLeft: 8,
+    paddingLeft: 16,
+    paddingRight: 16,
+    marginLeft: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -193,7 +199,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     marginTop: 4,
     marginRight: 8,
-    marginLeft: -12,
+    marginLeft: 0,
   },
   leftItem: {
     flex: 1,

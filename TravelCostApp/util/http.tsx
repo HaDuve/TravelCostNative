@@ -168,7 +168,9 @@ export function updateExpense(
 }
 
 export function deleteExpense(tripid: string, uid: string, id: string) {
-  // console.log("https: ~ deleteExpense ~ tripid", tripid);
+  console.log("https: ~ deleteExpense ~ tripid", tripid);
+  console.log("deleteExpense ~ uid", uid);
+  console.log("deleteExpense ~ id", id);
   return axios.delete(
     BACKEND_URL +
       "/trips/" +

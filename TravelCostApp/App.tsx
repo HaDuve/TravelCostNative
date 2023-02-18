@@ -377,6 +377,9 @@ function Root() {
       console.log("onRootMount ~ onRootMount");
       if (DEBUG_RESET) await asyncStoreSafeClear();
 
+      // offline check and set context
+      await userCtx.checkConnectionUpdateUser(DEBUG_FORCE_OFFLINE);
+
       // fetch token and trip
       const storedToken = await asyncStoreGetItem("token");
       const storedUid = await asyncStoreGetItem("uid");

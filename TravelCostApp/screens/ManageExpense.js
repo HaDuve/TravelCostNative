@@ -57,6 +57,7 @@ const ManageExpense = ({ route, navigation }) => {
   const selectedExpense = expenseCtx.expenses.find(
     (expense) => expense.id === editedExpenseId
   );
+  const selectedExpenseAuthorUid = selectedExpense?.uid;
   //TODO: add tempValues to selected Expense
 
   useLayoutEffect(() => {
@@ -73,7 +74,7 @@ const ManageExpense = ({ route, navigation }) => {
           type: "delete",
           expense: {
             tripid: tripid,
-            uid: uid,
+            uid: selectedExpenseAuthorUid,
             id: editedExpenseId,
           },
         };
@@ -118,18 +119,33 @@ const ManageExpense = ({ route, navigation }) => {
       const calcAmount = expenseData.amount * rate;
       expenseData.calcAmount = calcAmount;
 
-      // change the splits to calcAmount aswell, nobody cares original currency
-      expenseData.splitList?.forEach((split) => {
-        const calcAmount = split.amount * rate;
-        split.amount = calcAmount.toFixed(2);
-      });
+      // if splitType is SELF, set splitList to empty array []
+      if (expenseData.splitType === "SELF") {
+        expenseData.splitList = [];
+      }
+
+      // keep the splits in the original currency
+
+      // expenseData.splitList?.forEach((split) => {
+      //   const calcAmount = split.amount * rate;
+      //   split.amount = calcAmount.toFixed(2);
+      // });
 
       if (isEditing) {
+        if (expenseData.date.toString() !== expenseData.endDate.toString()) {
+          console.log("ranged Data detected");
+          Alert.alert(
+            "Ranged Data detected",
+            "Updating Data with multiple days is not supported yet."
+          );
+          setIsSubmitting(false);
+          return;
+        }
         const item = {
           type: "update",
           expense: {
             tripid: tripid,
-            uid: uid,
+            uid: selectedExpenseAuthorUid,
             expenseData: expenseData,
             id: editedExpenseId,
           },
@@ -146,7 +162,6 @@ const ManageExpense = ({ route, navigation }) => {
           },
         };
         // Check for ranged Expense
-        console.log("expenseData:", expenseData);
         if (expenseData.date.toString() !== expenseData.endDate.toString()) {
           console.log("ranged Data detected");
           // get number of days
@@ -159,7 +174,6 @@ const ManageExpense = ({ route, navigation }) => {
             const newDate = getDatePlusDays(day1, i);
 
             expenseData.date = expenseData.endDate = newDate;
-            console.log("Storing New Date: ", newDate);
             const id = await storeExpenseOnlineOffline(item, userCtx.isOnline);
             expenseCtx.addExpense({ ...expenseData, id: id });
           }
@@ -173,7 +187,6 @@ const ManageExpense = ({ route, navigation }) => {
               expenseData: expenseData,
             },
           };
-          console.log("confirmHandler ~ tripid", tripid);
           const id = await storeExpenseOnlineOffline(item, userCtx.isOnline);
           expenseCtx.addExpense({ ...expenseData, id: id });
         }

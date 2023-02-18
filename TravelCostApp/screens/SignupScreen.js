@@ -18,8 +18,16 @@ function SignupScreen() {
 
   async function signupHandler({ name, email, password }) {
     setIsAuthenticating(true);
+    // Check internet connection first
+    if (userCtx.isOnline === false) {
+      Alert.alert("No internet connection", "Please try again later.");
+      setIsAuthenticating(false);
+      return;
+    }
     try {
+      // We are online and ready to create User
       const { token, uid } = await createUser(email, password);
+
       //CLEAR
       await asyncStoreSafeClear();
       userCtx.setTripHistory([]);

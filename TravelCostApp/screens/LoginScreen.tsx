@@ -18,6 +18,12 @@ function LoginScreen() {
 
   async function loginHandler({ email, password }) {
     setIsAuthenticating(true);
+    // Check internet connection first
+    if (userCtx.isOnline === false) {
+      Alert.alert("No internet connection", "Please try again later.");
+      setIsAuthenticating(false);
+      return;
+    }
     try {
       const { token, uid } = await login(email, password);
       //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx

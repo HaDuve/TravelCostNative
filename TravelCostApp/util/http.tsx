@@ -293,21 +293,21 @@ export async function getTravellers(tripid: string) {
   // console.log("getTravellers ~ tripid", tripid);
   const response = await fetchTripsTravellers(tripid);
   const travellerids = [];
-  const travellers = [];
+  const travelerNames = [];
   for (const key in response) {
-    const traveller = response[key].userName;
+    const travelerName = response[key].userName;
     const uid = response[key].uid;
     if (
       !travellerids.includes(uid) &&
-      !travellers.includes(traveller) &&
-      traveller &&
-      traveller.length > 0
+      !travelerNames.includes(travelerName) &&
+      travelerName &&
+      travelerName.length > 0
     ) {
       travellerids.push(uid);
-      travellers.push(traveller);
+      travelerNames.push(travelerName);
     }
   }
-  return travellers;
+  return travelerNames;
 }
 
 export async function getUIDs(tripid: string) {
@@ -385,4 +385,48 @@ export async function fetchTripName(tripId: string): Promise<string> {
     BACKEND_URL + `/trips/${tripId}.json` + QPAR
   );
   return response.data.tripName;
+}
+
+export async function touchTraveler(
+  tripid: string,
+  firebaseId: string,
+  isTouched: boolean
+) {
+  const response = await axios.patch(
+    BACKEND_URL + `/trips/${tripid}/travellers/${firebaseId}.json` + QPAR,
+    { touched: isTouched }
+  );
+  return response;
+}
+
+export async function touchAllTravelers(tripid: string, flag: boolean) {
+  const response = await fetchTripsTravellers(tripid);
+  for (const key in response) {
+    console.log("touching: ", response[key].userName);
+    await touchTraveler(tripid, key, flag);
+  }
+}
+
+export async function unTouchTraveler(tripid: string, uid: string) {
+  const response = await fetchTripsTravellers(tripid);
+  for (const key in response) {
+    if (uid !== response[key].uid) return;
+    console.log("untouching: ", response[key].userName);
+    await touchTraveler(tripid, key, false);
+  }
+}
+export async function fetchTravelerIsTouched(tripid: string, uid: string) {
+  // only fatch the flag if the uid is the same as the uid in key in response
+  const allTravelersRes = await fetchTripsTravellers(tripid);
+  let returnIsTouched = null;
+  for (const key in allTravelersRes) {
+    const DatabaseUid = allTravelersRes[key].uid;
+    if (DatabaseUid !== uid) continue;
+    console.log(
+      "Fetching traveler:" + allTravelersRes[key].userName + " isTouched: ",
+      allTravelersRes[key].touched
+    );
+    returnIsTouched = allTravelersRes[key].touched;
+  }
+  return returnIsTouched;
 }

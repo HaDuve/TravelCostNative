@@ -1,7 +1,7 @@
 // Debug asyncStorage, set to true if you want all storage to be reset and user logged out
 const DEBUG_RESET = false;
 // Debug OfflineMode, set to true if you want the simulator to be offline
-const DEBUG_FORCE_OFFLINE = false;
+export const DEBUG_FORCE_OFFLINE = false;
 
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";

@@ -19,7 +19,12 @@ import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
-import { deleteExpense, storeExpense, updateExpense } from "../util/http";
+import {
+  deleteExpense,
+  storeExpense,
+  touchAllTravelers,
+  updateExpense,
+} from "../util/http";
 import { GlobalStyles } from "./../constants/styles";
 import { getRate } from "./../util/currencyExchange";
 import { daysBetween, getDatePlusDays } from "../util/date";
@@ -80,6 +85,7 @@ const ManageExpense = ({ route, navigation }) => {
         };
         await deleteExpenseOnlineOffline(item, userCtx.isOnline);
         expenseCtx.deleteExpense(editedExpenseId);
+        await touchAllTravelers(tripid, true);
         navigation.goBack();
       } catch (error) {
         setError("Could not delete expense - please try again later!");
@@ -191,6 +197,7 @@ const ManageExpense = ({ route, navigation }) => {
           expenseCtx.addExpense({ ...expenseData, id: id });
         }
       }
+      await touchAllTravelers(tripid, true);
       navigation.navigate("RecentExpenses");
     } catch (error) {
       setError("Could not save data - please try again later!" + error);

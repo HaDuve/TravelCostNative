@@ -2,6 +2,8 @@
 const DEBUG_RESET = false;
 // Debug OfflineMode, set to true if you want the simulator to be offline
 export const DEBUG_FORCE_OFFLINE = false;
+// Debug polling interval
+export const DEBUG_POLLING_INTERVAL = 1000;
 
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";

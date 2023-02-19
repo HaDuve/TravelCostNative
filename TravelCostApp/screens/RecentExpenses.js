@@ -25,7 +25,7 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
 import { useInterval } from "../components/Hooks/useInterval";
-import { DEBUG_FORCE_OFFLINE } from "../App";
+import { DEBUG_FORCE_OFFLINE, DEBUG_POLLING_INTERVAL } from "../App";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -66,7 +66,7 @@ function RecentExpenses({ navigation }) {
       };
       asyncPolling();
     },
-    10000,
+    DEBUG_POLLING_INTERVAL,
     true
   );
 

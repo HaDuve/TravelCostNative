@@ -1,3 +1,6 @@
+Cite ChatGPT:
+"Travel on a budget without compromising on quality. TravelCostNative helps you keep track of your travel expenses and provides useful insights to make your trip affordable and memorable. Start your journey with TravelCostNative now!"
+
 # TravelCostNative
 React Native App for iOS and Android to calculate and present travel costs.
  

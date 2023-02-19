@@ -57,11 +57,6 @@ function RecentExpenses({ navigation }) {
           DEBUG_FORCE_OFFLINE
         );
         if (!isOnline) return;
-        // fetching isTouched
-        const isTouched = await fetchTravelerIsTouched(tripid, uid);
-        if (!isTouched) return;
-        console.log("we are touched and fetching expenses");
-        unTouchTraveler(tripid, uid);
         getExpenses(true, true);
       };
       asyncPolling();
@@ -95,6 +90,10 @@ function RecentExpenses({ navigation }) {
       setIsFetching(false);
       return;
     }
+    // checking isTouched
+    const isTouched = await fetchTravelerIsTouched(tripid, uid);
+    if (!isTouched) return;
+    console.log("we are touched and fetching expenses");
     if (!showRefIndicator && !showAnyIndicator) setIsFetching(true);
     if (!showAnyIndicator) setRefreshing(true);
     try {
@@ -107,6 +106,7 @@ function RecentExpenses({ navigation }) {
         return sum + expense.calcAmount;
       }, 0);
       tripCtx.setTotalSum(expensesSum);
+      unTouchTraveler(tripid, uid);
     } catch (error) {
       setError(i18n.t("fetchError") + error);
     }

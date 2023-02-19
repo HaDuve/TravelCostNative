@@ -13,7 +13,7 @@ import { View } from "react-native";
 
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { GlobalStyles } from "../../constants/styles";
-import { deleteExpense } from "../../util/http";
+import { deleteExpense, touchAllTravelers } from "../../util/http";
 import { TripContext } from "../../store/trip-context";
 import { ExpensesContext } from "../../store/expenses-context";
 import IconButton from "../UI/IconButton";
@@ -108,6 +108,7 @@ function onClick({ item, index }, isOnline) {
       };
       await deleteExpenseOnlineOffline(item, isOnline);
       expenseCtx.deleteExpense(editedExpenseId);
+      await touchAllTravelers(tripid, true);
     } catch (error) {
       console.log(i18n.t("deleteError"), error);
     }

@@ -428,5 +428,5 @@ export async function fetchTravelerIsTouched(tripid: string, uid: string) {
     );
     returnIsTouched = allTravelersRes[key].touched;
   }
-  return returnIsTouched;
+  return returnIsTouched === null || returnIsTouched;
 }

@@ -410,7 +410,7 @@ export async function touchAllTravelers(tripid: string, flag: boolean) {
 export async function unTouchTraveler(tripid: string, uid: string) {
   const response = await fetchTripsTravellers(tripid);
   for (const key in response) {
-    if (uid !== response[key].uid) return;
+    if (uid !== response[key].uid) continue;
     console.log("untouching: ", response[key].userName);
     await touchTraveler(tripid, key, false);
   }
@@ -422,11 +422,15 @@ export async function fetchTravelerIsTouched(tripid: string, uid: string) {
   for (const key in allTravelersRes) {
     const DatabaseUid = allTravelersRes[key].uid;
     if (DatabaseUid !== uid) continue;
-    console.log(
-      "Fetching traveler:" + allTravelersRes[key].userName + " isTouched: ",
-      allTravelersRes[key].touched
-    );
+    // console.log(
+    //   "Fetching traveler:" + allTravelersRes[key].userName + " isTouched: ",
+    //   allTravelersRes[key].touched
+    // );
     returnIsTouched = allTravelersRes[key].touched;
   }
-  return returnIsTouched === null || returnIsTouched;
+  // catch undefined and null values of return as a default true
+  // either we didnt find the user, or the user was never touched
+  // we want to fetch new data and then set touched to false later
+  if (returnIsTouched == null) returnIsTouched = true;
+  return returnIsTouched;
 }

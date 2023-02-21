@@ -33,7 +33,7 @@ const OverviewScreen = ({ navigation }) => {
   const uid = authCtx.uid;
   const token = authCtx.token;
 
-  const [isFetching, setIsFetching] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState();
 
   const [open, setOpen] = useState(false);
@@ -56,28 +56,28 @@ const OverviewScreen = ({ navigation }) => {
     { label: i18n.t("totalLabel"), value: "total" },
   ]);
 
-  useEffect(() => {
-    async function getExpenses() {
-      // check offlinemode
-      // check offlinemode
-      if (!userCtx.isOnline) {
-        await expensesCtx.loadExpensesFromStorage();
-        setIsFetching(false);
-        return;
-      }
-      setIsFetching(true);
-      try {
-        const expenses = await getAllExpenses(tripid, uid);
-        expensesCtx.setExpenses(expenses);
-        expensesCtx.saveExpensesInStorage(expenses);
-      } catch (error) {
-        console.error(error);
-      }
-      setIsFetching(false);
-    }
+  // useEffect(() => {
+  //   async function getExpenses() {
+  //     // check offlinemode
+  //     // check offlinemode
+  //     if (!userCtx.isOnline) {
+  //       await expensesCtx.loadExpensesFromStorage();
+  //       setIsFetching(false);
+  //       return;
+  //     }
+  //     setIsFetching(true);
+  //     try {
+  //       const expenses = await getAllExpenses(tripid, uid);
+  //       expensesCtx.setExpenses(expenses);
+  //       expensesCtx.saveExpensesInStorage(expenses);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //     setIsFetching(false);
+  //   }
 
-    getExpenses();
-  }, []);
+  //   getExpenses();
+  // }, []);
 
   function errorHandler() {
     setError(null);

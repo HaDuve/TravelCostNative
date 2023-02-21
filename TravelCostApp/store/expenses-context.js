@@ -58,7 +58,7 @@ export const ExpensesContext = createContext({
   getSpecificMonthExpenses: (date) => {},
   getSpecificYearExpenses: (date) => {},
 
-  saveExpensesInStorage: async () => {},
+  saveExpensesInStorage: async (expenses) => {},
   loadExpensesFromStorage: async () => {},
 });
 

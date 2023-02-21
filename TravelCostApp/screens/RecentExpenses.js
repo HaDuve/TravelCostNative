@@ -52,18 +52,25 @@ function RecentExpenses({ navigation }) {
   useInterval(
     () => {
       const asyncPolling = async () => {
-        // check if offline
-        const isOnline = await userCtx.checkConnectionUpdateUser(
-          DEBUG_FORCE_OFFLINE
-        );
-        if (!isOnline) return;
+        if (!userCtx.isOnline) return;
         getExpenses(true, true);
       };
+      // console.log("polling realtime ...");
       asyncPolling();
     },
     DEBUG_POLLING_INTERVAL,
     true
   );
+
+  useInterval(() => {
+    const updateOnline = async () => {
+      // check if offline
+      userCtx.setIsOnline(
+        await userCtx.checkConnectionUpdateUser(DEBUG_FORCE_OFFLINE)
+      );
+    };
+    updateOnline();
+  }, DEBUG_POLLING_INTERVAL * 10);
 
   // useEffect(() => {
   //   if (PeriodValue !== userCtx.periodName)
@@ -92,7 +99,11 @@ function RecentExpenses({ navigation }) {
     }
     // checking isTouched
     const isTouched = await fetchTravelerIsTouched(tripid, uid);
-    if (!isTouched) return;
+    if (!isTouched) {
+      setRefreshing(false);
+      setIsFetching(false);
+      return;
+    }
     console.log("we are touched and fetching expenses");
     if (!showRefIndicator && !showAnyIndicator) setIsFetching(true);
     if (!showAnyIndicator) setRefreshing(true);
@@ -106,12 +117,12 @@ function RecentExpenses({ navigation }) {
         return sum + expense.calcAmount;
       }, 0);
       tripCtx.setTotalSum(expensesSum);
-      unTouchTraveler(tripid, uid);
+      await unTouchTraveler(tripid, uid);
     } catch (error) {
       setError(i18n.t("fetchError") + error);
     }
-    if (!showRefIndicator) setIsFetching(false);
-    setRefreshing(false);
+    if (!showRefIndicator && !showAnyIndicator) setIsFetching(false);
+    if (!showAnyIndicator) setRefreshing(false);
   }
 
   useEffect(() => {

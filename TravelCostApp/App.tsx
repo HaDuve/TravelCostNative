@@ -460,13 +460,10 @@ function Root() {
         } catch (error) {
           Alert.alert(error);
         }
-
         authCtx.authenticate(storedToken);
       } else {
         authCtx.logout();
       }
-
-      //TODO: we should fetch the expenses before setting this + implement the dirty system
       setAppIsReady(true);
     }
 

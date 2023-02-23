@@ -114,7 +114,6 @@ function RecentExpenses({ navigation }) {
     if (!showAnyIndicator) setRefreshing(true);
     try {
       const expenses = await getAllExpenses(tripid, uid);
-      // console.log("getExpenses ~ expenses", expenses);
       expensesCtx.setExpenses(expenses);
       await expensesCtx.saveExpensesInStorage(expenses);
 

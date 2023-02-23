@@ -74,9 +74,9 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
   if (!tripid || !uidlist || DEBUG_NO_DATA) return [];
   const expenses = [];
   const axios_calls = [];
+  console.log("loading expense list...");
   uidlist.forEach((uid) => {
     try {
-      console.log("loading expense list...");
       const new_axios_call = axios.get(
         BACKEND_URL + "/trips/" + tripid + "/" + uid + "/expenses.json" + QPAR
       );

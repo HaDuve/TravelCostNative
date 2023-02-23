@@ -104,7 +104,7 @@ const TripForm = ({ navigation, route }) => {
       // i18n.t("deleteTripTitle"),
       "Delete Trip",
       // i18n.t("deleteTripMessage"),
-      "Are you sure you want to delete this Trip?",
+      "Are you sure you want to delete this Trip? [Delete Function coming soon ...]",
       [
         {
           text: i18n.t("cancel"),
@@ -115,6 +115,7 @@ const TripForm = ({ navigation, route }) => {
           text: "Delete",
           style: "destructive",
           onPress: async () => {
+            // TODO: find out how the whole routine should work
             // await deleteTrip(editedTripId);
             navigation.navigate("Profile");
           },

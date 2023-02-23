@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Category } from "./category";
 
 const DEBUG_NO_DATA = false;
 
@@ -453,13 +454,19 @@ export async function fetchTravelerIsTouched(tripid: string, uid: string) {
   return returnIsTouched;
 }
 
-export async function updateAdditionalCategories(
-  tripid: string,
-  categories: string[]
-) {
+export async function storeCategories(tripid: string, categories: Category[]) {
+  const response = await axios.put(
+    BACKEND_URL + `/trips/${tripid}/categories.json` + QPAR,
+    categories
+  );
+  return response.data;
+}
+
+export async function updateCategories(tripid: string, categories: Category[]) {
+  console.log("categories:", categories);
   const response = await axios.patch(
     BACKEND_URL + `/trips/${tripid}.json` + QPAR,
-    { additionalCategories: categories }
+    { categories: categories }
   );
   return response;
 }

@@ -70,6 +70,7 @@ i18n.enableFallback = true;
 
 // // NOTE: for beta testing we leave this here
 // import { LogBox } from "react-native";
+import ManageCategoryScreen from "./screens/ManageCategoryScreen";
 // LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
 // LogBox.ignoreAllLogs(); //Ignore all log notifications
 
@@ -135,6 +136,14 @@ function AuthenticatedStack() {
           <Stack.Screen
             name="CategoryPick"
             component={CategoryPickScreen}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
+          <Stack.Screen
+            name="ManageCategory"
+            component={ManageCategoryScreen}
             options={{
               headerShown: false,
               presentation: "modal",

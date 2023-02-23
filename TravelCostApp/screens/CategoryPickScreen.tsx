@@ -18,48 +18,60 @@ import { GlobalStyles } from "../constants/styles";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
+import { Category } from "../util/category";
+import { storeCategories, updateCategories } from "../util/http";
+import { useContext } from "react";
+import { TripContext } from "../store/trip-context";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
 const CategoryPickScreen = ({ route, navigation }) => {
+  const tripCtx = useContext(TripContext);
+  const tripid = tripCtx.tripid;
   const { editedExpenseId } = route.params ? route.params : "null";
   console.log("CategoryPickScreen ~ editedExpenseId", editedExpenseId);
   const [isShaking, setIsShaking] = useState(false);
 
   const CATLIST = [
     {
+      id: 1,
       icon: "fast-food-outline",
       color: GlobalStyles.colors.textColor,
       cat: "food",
       catString: i18n.t("catFoodString"),
     },
     {
+      id: 2,
       icon: "airplane-outline",
       color: GlobalStyles.colors.textColor,
       cat: "international-travel",
       catString: i18n.t("catIntTravString"),
     },
     {
+      id: 3,
       icon: "bed-outline",
       color: GlobalStyles.colors.textColor,
       cat: "accomodation",
       catString: i18n.t("catAccoString"),
     },
     {
+      id: 4,
       icon: "car-outline",
       color: GlobalStyles.colors.textColor,
       cat: "national-travel",
       catString: i18n.t("catNatTravString"),
     },
     {
+      id: 5,
       icon: "basket-outline",
       color: GlobalStyles.colors.textColor,
       cat: "other",
       catString: i18n.t("catOtherString"),
     },
     {
+      id: 6,
       icon: "add-outline",
       color: GlobalStyles.colors.textColor,
       cat: "newCat",
@@ -67,10 +79,29 @@ const CategoryPickScreen = ({ route, navigation }) => {
     },
   ];
 
-  function catPressHandler(item) {
+  async function catPressHandler(item) {
     setIsShaking(false);
     if (item.cat === "newCat") {
       Alert.alert("New Category function coming soon... ");
+      const storeCatList: Category[] = [];
+      CATLIST.forEach((cat) => {
+        if (cat.cat !== "newCat") {
+          storeCatList.push({
+            id: cat.id,
+            icon: cat.icon,
+            color: cat.color,
+            catString: cat.catString,
+            cat: cat.cat,
+          });
+        }
+      });
+      // navigate to ManageCategory
+      navigation.navigate("ManageCategory", { storeCatList });
+      // try {
+      //   await updateCategories(tripid, storeCatList);
+      // } catch (error) {
+      //   console.log(error);
+      // }
     } else
       navigation.navigate("ManageExpense", {
         pickedCat: item.cat,

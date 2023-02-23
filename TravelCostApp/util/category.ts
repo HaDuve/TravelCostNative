@@ -7,6 +7,15 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
+// interface of category objects with id, name, iconName and color
+export interface Category {
+  id: number;
+  cat: string;
+  catString: string;
+  icon: string;
+  color: string;
+}
+
 export function getCatSymbol(cat: string) {
   switch (cat) {
     case "food":

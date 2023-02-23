@@ -42,18 +42,18 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
         )}
       </View>
 
-      {toggleGraph && (
-        <ExpenseCategories
-          expenses={expenses}
-          periodName={periodName}
-          navigation={navigation}
-        />
-      )}
       {!toggleGraph && (
         <ExpenseGraph
           navigation={navigation}
           expenses={expenses}
           periodName={periodName}
+        />
+      )}
+      {toggleGraph && (
+        <ExpenseCategories
+          expenses={expenses}
+          periodName={periodName}
+          navigation={navigation}
         />
       )}
       <View

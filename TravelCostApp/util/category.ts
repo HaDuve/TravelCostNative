@@ -69,7 +69,10 @@ export function getCatString(cat: string) {
       return i18n.t("catAccoString");
     case "other":
       return i18n.t("catOtherString");
-    default:
-      return cat;
+    default: {
+      if (cat == "") return cat;
+      const capitalized = cat.charAt(0).toUpperCase() + cat.slice(1);
+      return capitalized;
+    }
   }
 }

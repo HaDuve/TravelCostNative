@@ -14,6 +14,7 @@ import Animated, {
   Layout,
   Transition,
 } from "react-native-reanimated";
+import { getCatString } from "../../../util/category";
 
 const ExpenseCategories = ({ expenses, periodName, navigation }) => {
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(true);
@@ -69,7 +70,7 @@ const ExpenseCategories = ({ expenses, periodName, navigation }) => {
           navigation.navigate("FilteredExpenses", {
             expenses: itemData.item.catExpenses,
             dayString:
-              itemData.item.cat +
+              getCatString(itemData.item.cat) +
               (periodName !== "total" ? " this " : " ") +
               periodName,
           })

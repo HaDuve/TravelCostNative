@@ -7,13 +7,7 @@ import { useContext } from "react";
 import { UserContext } from "../../../store/user-context";
 import { TripContext } from "../../../store/trip-context";
 import { formatExpenseString, truncateString } from "../../../util/string";
-import Animated, {
-  FadeInRight,
-  FadeInUp,
-  FadeOut,
-  FadeOutLeft,
-  Layout,
-} from "react-native-reanimated";
+import Animated, { FadeInRight } from "react-native-reanimated";
 
 const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   const tripCtx = useContext(TripContext);

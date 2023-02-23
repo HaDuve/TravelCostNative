@@ -25,7 +25,6 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
 import { useInterval } from "../components/Hooks/useInterval";
-import { DEBUG_FORCE_OFFLINE, DEBUG_POLLING_INTERVAL } from "../App";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -45,8 +44,13 @@ function RecentExpenses({ navigation }) {
 
   const [open, setOpen] = useState(false);
   const [PeriodValue, setPeriodValue] = useState("day");
+
   useEffect(() => {
     LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
+  }, []);
+
+  useEffect(() => {
+    getExpenses(true, true);
   }, []);
 
   useInterval(
@@ -58,19 +62,17 @@ function RecentExpenses({ navigation }) {
       // console.log("polling realtime ...");
       asyncPolling();
     },
-    DEBUG_POLLING_INTERVAL,
+    1000,
     true
   );
 
   useInterval(() => {
     const updateOnline = async () => {
       // check if offline
-      userCtx.setIsOnline(
-        await userCtx.checkConnectionUpdateUser(DEBUG_FORCE_OFFLINE)
-      );
+      userCtx.setIsOnline(await userCtx.checkConnectionUpdateUser(false));
     };
     updateOnline();
-  }, DEBUG_POLLING_INTERVAL * 10);
+  }, 1000 * 10);
 
   // useEffect(() => {
   //   if (PeriodValue !== userCtx.periodName)
@@ -89,7 +91,10 @@ function RecentExpenses({ navigation }) {
     { label: i18n.t("totalLabel"), value: "total" },
   ]);
 
-  async function getExpenses(showRefIndicator, showAnyIndicator = false) {
+  async function getExpenses(
+    showRefIndicator = false,
+    showAnyIndicator = false
+  ) {
     // check offlinemode
     if (!userCtx.isOnline) {
       await expensesCtx.loadExpensesFromStorage();
@@ -124,10 +129,6 @@ function RecentExpenses({ navigation }) {
     if (!showRefIndicator && !showAnyIndicator) setIsFetching(false);
     if (!showAnyIndicator) setRefreshing(false);
   }
-
-  useEffect(() => {
-    getExpenses();
-  }, []);
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = getExpenses.bind(this, true);

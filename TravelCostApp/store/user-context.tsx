@@ -8,12 +8,17 @@ import { checkInternetConnection } from "react-native-offline";
 
 export const UserContext = createContext({
   userName: "",
+  setUserName: (name: string) => {},
   periodName: "day",
   setPeriodString: (string: string) => {},
 
+  lastCurrency: "",
+  setLastCurrency: (string: string) => {},
+  lastCountry: "",
+  setLastCountry: (string: string) => {},
+
   addUser: ({ userName }) => {},
   deleteUser: (uid: string) => {},
-  setUserName: (name: string) => {},
 
   addTripHistory: (tripid: string) => {},
   setTripHistory: (trips: string[]) => {},
@@ -55,6 +60,8 @@ function UserContextProvider({ children }) {
   const [periodName, setPeriodName] = useState("day");
   const [isOnline, setIsOnline] = useState(false);
   const [tripsState, dispatch] = useReducer(tripsReducer, []);
+  const [lastCurrency, setLastCurrency] = useState("");
+  const [lastCountry, setLastCountry] = useState("");
 
   function setPeriodString(periodName: string) {
     setPeriodName(periodName);
@@ -138,6 +145,7 @@ function UserContextProvider({ children }) {
 
   const value = {
     userName: userName,
+    setUserName: setUserName,
     periodName: periodName,
     setPeriodString: setPeriodString,
 
@@ -149,9 +157,13 @@ function UserContextProvider({ children }) {
     getTripHistory: getTripHistory,
     deleteTripHistory: deleteTripHistory,
 
+    lastCurrency: lastCurrency,
+    setLastCurrency: setLastCurrency,
+    lastCountry: lastCountry,
+    setLastCountry: setLastCountry,
+
     addUser: addUser,
     deleteUser: deleteUser,
-    setUserName: setUserName,
     isOnline: isOnline,
     setIsOnline: setIsOnline,
     saveUserNameInStorage: saveUserNameInStorage,

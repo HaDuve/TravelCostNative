@@ -415,6 +415,16 @@ export async function unTouchTraveler(tripid: string, uid: string) {
     await touchTraveler(tripid, key, false);
   }
 }
+
+export async function touchMyTraveler(tripid: string, uid: string) {
+  const response = await fetchTripsTravellers(tripid);
+  for (const key in response) {
+    if (uid !== response[key].uid) continue;
+    console.log("TOUCHING: ", response[key].userName);
+    await touchTraveler(tripid, key, true);
+  }
+}
+
 export async function fetchTravelerIsTouched(tripid: string, uid: string) {
   // only fatch the flag if the uid is the same as the uid in key in response
   const allTravelersRes = await fetchTripsTravellers(tripid);

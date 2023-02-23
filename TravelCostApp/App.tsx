@@ -30,7 +30,13 @@ import ExpensesContextProvider, {
 } from "./store/expenses-context";
 import ProfileScreen from "./screens/ProfileScreen";
 import UserContextProvider, { UserContext } from "./store/user-context";
-import { fetchUser, fetchTrip } from "./util/http";
+import {
+  fetchUser,
+  fetchTrip,
+  touchTraveler,
+  getAllExpenses,
+  touchMyTraveler,
+} from "./util/http";
 import TripContextProvider, { TripContext } from "./store/trip-context";
 import TripForm from "./components/ManageTrip/TripForm";
 import OnboardingScreen from "./screens/OnboardingScreen";
@@ -441,14 +447,16 @@ function Root() {
         // setup context
         authCtx.setUserID(storedUid);
         let tripData;
+        // console.log("getExpenses ~ expenses", expenses);
         try {
           const userData = checkUser;
           const tripid = userData.currentTrip;
-          // console.log("onRootMount ~ userData", userData);
+          console.log("onRootMount ~ userData", userData);
           userCtx.addUser(userData);
           tripData = await fetchTrip(tripid);
           tripCtx.setCurrentTrip(tripid, tripData);
           await asyncStoreSetItem("currentTripId", tripid);
+          await touchMyTraveler(tripid, storedUid);
         } catch (error) {
           Alert.alert(error);
         }

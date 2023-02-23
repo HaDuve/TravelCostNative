@@ -123,7 +123,8 @@ function RecentExpenses({ navigation }) {
       tripCtx.setTotalSum(expensesSum);
       await unTouchTraveler(tripid, uid);
     } catch (error) {
-      setError(i18n.t("fetchError") + error);
+      console.error(error);
+      // setError(i18n.t("fetchError") + error);
     }
     if (!showRefIndicator && !showAnyIndicator) setIsFetching(false);
     if (!showAnyIndicator) setRefreshing(false);

@@ -26,27 +26,10 @@ i18n.enableFallback = true;
 
 const OverviewScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
-  const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
-  const tripCtx = useContext(TripContext);
-  const tripid = tripCtx.tripid;
-  const uid = authCtx.uid;
-  const token = authCtx.token;
-
-  const [isFetching, setIsFetching] = useState(false);
-  const [error, setError] = useState();
 
   const [open, setOpen] = useState(false);
   const [PeriodValue, setPeriodValue] = useState(userCtx.periodName);
-
-  // useEffect(() => {
-  //   if (PeriodValue !== userCtx.periodName)
-  //     userCtx.setPeriodString(PeriodValue);
-  // }, [PeriodValue]);
-
-  // useEffect(() => {
-  //   if (PeriodValue !== userCtx.periodName) setPeriodValue(userCtx.periodName);
-  // }, [userCtx.periodName]);
 
   const [items, setItems] = useState([
     { label: i18n.t("todayLabel"), value: "day" },
@@ -56,47 +39,11 @@ const OverviewScreen = ({ navigation }) => {
     { label: i18n.t("totalLabel"), value: "total" },
   ]);
 
-  // useEffect(() => {
-  //   async function getExpenses() {
-  //     // check offlinemode
-  //     // check offlinemode
-  //     if (!userCtx.isOnline) {
-  //       await expensesCtx.loadExpensesFromStorage();
-  //       setIsFetching(false);
-  //       return;
-  //     }
-  //     setIsFetching(true);
-  //     try {
-  //       const expenses = await getAllExpenses(tripid, uid);
-  //       expensesCtx.setExpenses(expenses);
-  //       expensesCtx.saveExpensesInStorage(expenses);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //     setIsFetching(false);
-  //   }
-
-  //   getExpenses();
-  // }, []);
-
-  function errorHandler() {
-    setError(null);
-  }
-
-  if (error && !isFetching) {
-    return <ErrorOverlay message={error} onConfirm={errorHandler} />;
-  }
-  if (isFetching) {
-    return <LoadingOverlay />;
-  }
-
   let recentExpenses = [];
   recentExpenses = expensesCtx.getRecentExpenses(PeriodValue);
 
   let todayDateString = new Date();
   todayDateString = toShortFormat(todayDateString);
-
-  const valid = recentExpenses.length > 0;
 
   return (
     <View style={styles.container}>

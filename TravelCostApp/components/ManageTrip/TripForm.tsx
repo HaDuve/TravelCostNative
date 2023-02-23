@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useContext, useEffect, useLayoutEffect } from "react";
-import { View, Text, Alert } from "react-native";
+import { View, Text, Alert, KeyboardAvoidingView } from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
@@ -12,6 +12,7 @@ import {
   fetchTrip,
   updateTripHistory,
   updateTrip,
+  deleteTrip,
 } from "../../util/http";
 import * as Updates from "expo-updates";
 
@@ -29,11 +30,13 @@ import { asyncStoreSetItem } from "../../store/async-storage";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../../i18n/supportedLanguages";
+import LoadingOverlay from "../UI/LoadingOverlay";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
 i18n.enableFallback = true;
 const TripForm = ({ navigation, route }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [inputs, setInputs] = useState({
     tripName: {
       value: "",
@@ -58,11 +61,13 @@ const TripForm = ({ navigation, route }) => {
 
   useLayoutEffect(() => {
     const setEditedTrip = async () => {
+      setIsLoading(true);
       const selectedTrip = await fetchTrip(editedTripId);
       inputChangedHandler("tripName", selectedTrip.tripName);
       inputChangedHandler("tripCurrency", selectedTrip.tripCurrency);
       inputChangedHandler("dailyBudget", selectedTrip.dailyBudget.toString());
       inputChangedHandler("totalBudget", selectedTrip.totalBudget.toString());
+      setIsLoading(false);
     };
     if (isEditing) {
       setEditedTrip();
@@ -94,7 +99,32 @@ const TripForm = ({ navigation, route }) => {
     navigation.navigate("Profile");
   }
 
-  async function submitHandler(setActive: boolean) {
+  function deleteHandler() {
+    Alert.alert(
+      // i18n.t("deleteTripTitle"),
+      "Delete Trip",
+      // i18n.t("deleteTripMessage"),
+      "Are you sure you want to delete this Trip?",
+      [
+        {
+          text: i18n.t("cancel"),
+          style: "cancel",
+        },
+        {
+          // text: i18n.t("delete"),
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            // await deleteTrip(editedTripId);
+            navigation.navigate("Profile");
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  }
+
+  async function submitHandler(setActive = false) {
     const tripData = {
       tripName: inputs.tripName.value,
       totalBudget: +inputs.totalBudget.value,
@@ -142,10 +172,12 @@ const TripForm = ({ navigation, route }) => {
       return;
     }
     // if isEditing update Trip, else store
+    console.log("submitHandler ~ setActive:", setActive);
     if (isEditing) {
       await updateTrip(editedTripId, tripData);
-      if (editedTripId === tripCtx.tripid || setActive)
+      if (editedTripId === tripCtx.tripid || setActive) {
         await tripCtx.fetchAndSetCurrentTrip(editedTripId);
+      }
       tripCtx.refresh();
       navigation.navigate("Profile");
       return;
@@ -173,7 +205,7 @@ const TripForm = ({ navigation, route }) => {
     expenseCtx.setExpenses([]);
 
     tripCtx.refresh();
-    navigation.navigate("RecentExpenses");
+    navigation.navigate("Profile");
   }
 
   function updateCurrency() {
@@ -182,18 +214,14 @@ const TripForm = ({ navigation, route }) => {
 
   const titleString = isEditing ? "Edit Trip Budget" : "New Trip Budget";
 
+  if (isLoading) {
+    return <LoadingOverlay />;
+  }
   return (
     <View style={styles.form}>
       <View style={styles.card}>
         <Text style={styles.title}>{titleString}</Text>
-        <View style={styles.currencyPickerContainer}>
-          <CurrencyPicker
-            placeholder={inputs.tripCurrency.value}
-            countryValue={countryValue}
-            setCountryValue={setCountryValue}
-            onChangeValue={updateCurrency}
-          ></CurrencyPicker>
-        </View>
+
         <Input
           label="Trip Name"
           style={{ flex: 1 }}
@@ -205,6 +233,7 @@ const TripForm = ({ navigation, route }) => {
           invalid={!inputs.tripName.isValid}
           autoFocus={false}
         />
+
         <View style={styles.categoryRow}>
           <Input
             label={`Total Budget in ${inputs.tripCurrency.value}`}
@@ -233,27 +262,62 @@ const TripForm = ({ navigation, route }) => {
             invalid={!inputs.dailyBudget.isValid}
           />
         </View>
+        <View style={styles.currencyPickerContainer}>
+          <CurrencyPicker
+            placeholder={inputs.tripCurrency.value}
+            countryValue={countryValue}
+            setCountryValue={setCountryValue}
+            onChangeValue={updateCurrency}
+          ></CurrencyPicker>
+        </View>
       </View>
       {/* Add Currency Input field */}
       <View style={styles.buttonContainer}>
         <FlatButton onPress={cancelHandler}>Cancel</FlatButton>
-        <Button
-          buttonStyle={{}}
-          mode={""}
-          style={styles.button}
-          onPress={submitHandler}
-        >
-          Save Trip
-        </Button>
+        {!isEditing ? (
+          <Button
+            buttonStyle={{}}
+            mode={""}
+            style={styles.button}
+            onPress={submitHandler.bind(this, true /* setActive */)}
+          >
+            Save Changes
+          </Button>
+        ) : (
+          <FlatButton
+            buttonStyle={{}}
+            mode={""}
+            style={styles.button}
+            onPress={submitHandler.bind(this, false /* setActive */)}
+          >
+            Save Changes{" "}
+          </FlatButton>
+        )}
       </View>
-      <Button
-        buttonStyle={{}}
-        mode={""}
-        style={[styles.button, { marginBottom: 8, marginHorizontal: 24 }]}
-        onPress={submitHandler.bind(this, { setActive: true })}
-      >
-        Set Trip Active and Save
-      </Button>
+      {/* Horizontal container */}
+
+      <View style={styles.buttonContainer}>
+        {isEditing && (
+          <Button
+            buttonStyle={{ backgroundColor: GlobalStyles.colors.error300 }}
+            mode={""}
+            style={[styles.button, { marginBottom: 8, marginHorizontal: 24 }]}
+            onPress={deleteHandler}
+          >
+            Delete
+          </Button>
+        )}
+        {isEditing && (
+          <Button
+            buttonStyle={{}}
+            mode={""}
+            style={[styles.button, { marginBottom: 8, marginHorizontal: 24 }]}
+            onPress={submitHandler.bind(this, true /* setActive */)}
+          >
+            Set Active
+          </Button>
+        )}
+      </View>
     </View>
   );
 };
@@ -309,11 +373,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    marginVertical: "20%",
-    marginHorizontal: "10%",
+
+    marginTop: "4%",
+    marginHorizontal: "4%",
   },
   button: {
-    minWidth: 120,
-    marginHorizontal: 8,
+    minWidth: "35%",
+    marginHorizontal: 0,
   },
 });

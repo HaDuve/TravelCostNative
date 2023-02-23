@@ -258,6 +258,14 @@ export async function fetchTrip(tripid: string) {
   return response.data;
 }
 
+export async function deleteTrip(tripid: string) {
+  // console.log("https: ~ deleteTrip ~ tripid", tripid);
+  const response = await axios.delete(
+    BACKEND_URL + "/trips/" + `${tripid}.json` + QPAR
+  );
+  return response;
+}
+
 export async function storeTravellerToTrip(tripid: string, traveller) {
   // console.log("https: ~ storeTravellerToTrip ~ traveller", traveller);
   // TODO: add traveller interface for TypeScript ({ userName: userName, uid: uid })

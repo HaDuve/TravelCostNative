@@ -452,3 +452,14 @@ export async function fetchTravelerIsTouched(tripid: string, uid: string) {
   if (returnIsTouched == null) returnIsTouched = true;
   return returnIsTouched;
 }
+
+export async function updateAdditionalCategories(
+  tripid: string,
+  categories: string[]
+) {
+  const response = await axios.patch(
+    BACKEND_URL + `/trips/${tripid}.json` + QPAR,
+    { additionalCategories: categories }
+  );
+  return response;
+}

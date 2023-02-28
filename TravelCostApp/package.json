@@ -54,6 +54,7 @@
     "react-native-screens": "~3.11.1",
     "react-native-svg": "12.3.0",
     "react-native-tab-view": "^3.3.4",
+    "react-native-toast-message": "^2.1.5",
     "react-native-web": "0.17.7",
     "rn-fetch-blob": "^0.12.0",
     "splitwise-js-map": "^1.0.3",

@@ -58,6 +58,7 @@ import LoadingOverlay from "./components/UI/LoadingOverlay";
 import ImportGSScreen from "./screens/ImportGSScreen";
 import FilteredExpenses from "./screens/FilteredExpenses";
 import { sendOfflineQueue } from "./util/offline-queue";
+import Toast from "react-native-toast-message";
 
 //localization
 import * as Localization from "expo-localization";
@@ -524,6 +525,7 @@ export default function App() {
                 <NetworkProvider>
                   <ExpensesContextProvider>
                     <Root />
+                    <Toast />
                   </ExpensesContextProvider>
                 </NetworkProvider>
               </UserContextProvider>

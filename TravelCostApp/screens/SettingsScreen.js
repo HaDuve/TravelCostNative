@@ -5,6 +5,7 @@ import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
+import Toast from "react-native-toast-message";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -53,6 +54,15 @@ const SettingsScreen = ({ navigation }) => {
       },
     ]);
   }
+  const showToast = () => {
+    Toast.show({
+      type: "success",
+      text1: "Hello",
+      text2: "This is some something 👋",
+      position: "bottom",
+      bottomOffset: 80,
+    });
+  };
 
   return (
     <ScrollView
@@ -102,6 +112,7 @@ const SettingsScreen = ({ navigation }) => {
       >
         Simplify Splits
       </Button>
+      <Button onPress={showToast}>Show Toast</Button>
     </ScrollView>
   );
 };

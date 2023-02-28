@@ -529,7 +529,7 @@ export default function App() {
                 <NetworkProvider>
                   <ExpensesContextProvider>
                     <Root />
-                    <Toast />
+                    <Toast position="bottom" bottomOffset={80} />
                   </ExpensesContextProvider>
                 </NetworkProvider>
               </UserContextProvider>

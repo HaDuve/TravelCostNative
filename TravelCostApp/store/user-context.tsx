@@ -5,6 +5,7 @@ import { Alert } from "react-native";
 import { asyncStoreGetItem, asyncStoreSetObject } from "./async-storage";
 import * as Device from "expo-device";
 import { checkInternetConnection } from "react-native-offline";
+import Toast from "react-native-toast-message";
 
 export const UserContext = createContext({
   userName: "",
@@ -58,7 +59,7 @@ function UserContextProvider({ children }) {
   const [userName, setName] = useState("");
   const [freshlyCreated, setFreshlyCreated] = useState(false);
   const [periodName, setPeriodName] = useState("day");
-  const [isOnline, setIsOnline] = useState(false);
+  const [isOnline, setIsOnline] = useState(true);
   const [tripsState, dispatch] = useReducer(tripsReducer, []);
   const [lastCurrency, setLastCurrency] = useState("");
   const [lastCountry, setLastCountry] = useState("");
@@ -130,7 +131,7 @@ function UserContextProvider({ children }) {
     if (Device.isDevice) {
       forceOffline = false;
     }
-    const isOnline = await checkInternetConnection(
+    const newIsOnline = await checkInternetConnection(
       forceOffline
         ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
         : "https://www.google.com/",
@@ -138,7 +139,21 @@ function UserContextProvider({ children }) {
       true,
       "HEAD"
     );
-    console.log("checkConnection ~ isOnline", isOnline);
+    console.log("checkConnection ~ newIsOnline", newIsOnline);
+
+    // if state changes, show info toast
+    if (newIsOnline != isOnline) {
+      console.log(
+        "checkConnectionUpdateUser ~ newIsOnline != isOnline:",
+        newIsOnline,
+        isOnline
+      );
+      Toast.show({
+        type: newIsOnline ? "success" : "error",
+        text1: "Connection",
+        text2: newIsOnline ? "You are online" : "You are offline",
+      });
+    }
     setIsOnline(isOnline);
     return isOnline;
   }

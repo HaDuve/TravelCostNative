@@ -25,6 +25,7 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
 import { useInterval } from "../components/Hooks/useInterval";
+import Toast from "react-native-toast-message";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -69,7 +70,7 @@ function RecentExpenses({ navigation }) {
   useInterval(() => {
     const updateOnline = async () => {
       // check if offline
-      userCtx.setIsOnline(await userCtx.checkConnectionUpdateUser(false));
+      await userCtx.checkConnectionUpdateUser(false);
     };
     updateOnline();
   }, 1000 * 10);
@@ -123,6 +124,11 @@ function RecentExpenses({ navigation }) {
       tripCtx.setTotalSum(expensesSum);
       await unTouchTraveler(tripid, uid);
     } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Could not fetch trip data",
+      });
       console.error(error);
       // setError(i18n.t("fetchError") + error);
     }

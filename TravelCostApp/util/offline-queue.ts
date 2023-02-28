@@ -5,6 +5,7 @@ import {
 } from "../store/async-storage";
 import { Expense } from "./expense";
 import { storeExpense, updateExpense, deleteExpense } from "./http";
+import Toast from "react-native-toast-message";
 
 // interface of offline queue manage expense item
 export interface OfflineQueueManageExpenseItem {
@@ -37,14 +38,30 @@ export const deleteExpenseOnlineOffline = async (
   item.expense.tripid = tripid;
   if (online) {
     // delete item online
-    const res = await deleteExpense(
-      item.expense.tripid,
-      item.expense.uid,
-      item.expense.id
-    );
+    try {
+      const res = await deleteExpense(
+        item.expense.tripid,
+        item.expense.uid,
+        item.expense.id
+      );
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Could not delete Expense",
+      });
+    }
   } else {
     // delete item offline
-    const res = await pushOfflineQueue(item);
+    try {
+      const res = await pushOfflineQueue(item);
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Could not delete Expense",
+      });
+    }
   }
 };
 
@@ -58,15 +75,31 @@ export const updateExpenseOnlineOffline = async (
   item.expense.tripid = tripid;
   if (online) {
     // update item online
-    const res = await updateExpense(
-      item.expense.tripid,
-      item.expense.uid,
-      item.expense.id,
-      item.expense.expenseData
-    );
+    try {
+      const res = await updateExpense(
+        item.expense.tripid,
+        item.expense.uid,
+        item.expense.id,
+        item.expense.expenseData
+      );
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Could not update Expense",
+      });
+    }
   } else {
     // update item offline
-    const res = await pushOfflineQueue(item);
+    try {
+      const res = await pushOfflineQueue(item);
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Could not update Expense",
+      });
+    }
   }
 };
 
@@ -80,19 +113,35 @@ export const storeExpenseOnlineOffline = async (
   item.expense.tripid = tripid;
   if (online) {
     // store item online
-    const id = await storeExpense(
-      item.expense.tripid,
-      item.expense.uid,
-      item.expense.expenseData
-    );
-    return id;
+    try {
+      const id = await storeExpense(
+        item.expense.tripid,
+        item.expense.uid,
+        item.expense.expenseData
+      );
+      return id;
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Could not store Expense",
+      });
+    }
   } else {
     // store item offline
-    const res = await pushOfflineQueue(item);
-    return (
-      Math.random().toString(36).substring(2, 15) +
-      Math.random().toString(36).substring(2, 15)
-    );
+    try {
+      const res = await pushOfflineQueue(item);
+      return (
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15)
+      );
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Could not store Expense",
+      });
+    }
   }
 };
 

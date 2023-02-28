@@ -6,6 +6,7 @@ import { asyncStoreGetItem, asyncStoreSetObject } from "./async-storage";
 import * as Device from "expo-device";
 import { checkInternetConnection } from "react-native-offline";
 import Toast from "react-native-toast-message";
+import { DEBUG_FORCE_OFFLINE } from "../appConfig";
 
 export const UserContext = createContext({
   userName: "",
@@ -35,7 +36,7 @@ export const UserContext = createContext({
   setIsOnline: (bool: boolean) => {},
   saveUserNameInStorage: async (name: string) => {},
   loadUserNameFromStorage: async () => {},
-  checkConnectionUpdateUser: async (forceOffline = false) => {
+  checkConnectionUpdateUser: async () => {
     return true;
   },
 });
@@ -121,41 +122,29 @@ function UserContextProvider({ children }) {
     console.log("loadUserNameFromStorage ~ userName", userName);
     asyncStoreGetItem("userName").then((name) => {
       if (name) {
-        setName(name);
+        console.log("asyncStoreGetItem ~ name:", name);
+        setName(name.replaceAll('"', ""));
       }
     });
   }
 
-  async function checkConnectionUpdateUser(forceOffline = false) {
+  async function checkConnectionUpdateUser() {
     // if app is not running on emulator, always set forceOffline to false
-    if (Device.isDevice) {
-      forceOffline = false;
-    }
-    const newIsOnline = await checkInternetConnection(
-      forceOffline
-        ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
-        : "https://www.google.com/",
-      10000,
-      true,
-      "HEAD"
-    );
-    console.log("checkConnection ~ newIsOnline", newIsOnline);
-
-    // if state changes, show info toast
-    if (newIsOnline != isOnline) {
-      console.log(
-        "checkConnectionUpdateUser ~ newIsOnline != isOnline:",
-        newIsOnline,
-        isOnline
+    const forceOffline = !Device.isDevice && DEBUG_FORCE_OFFLINE;
+    try {
+      const newIsOnline = await checkInternetConnection(
+        forceOffline
+          ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
+          : "https://www.google.com/",
+        10000,
+        true,
+        "HEAD"
       );
-      Toast.show({
-        type: newIsOnline ? "success" : "error",
-        text1: "Connection",
-        text2: newIsOnline ? "You are online" : "You are offline",
-      });
+      setIsOnline(newIsOnline);
+      return newIsOnline;
+    } catch (error) {
+      console.log(error);
     }
-    setIsOnline(isOnline);
-    return isOnline;
   }
 
   const value = {

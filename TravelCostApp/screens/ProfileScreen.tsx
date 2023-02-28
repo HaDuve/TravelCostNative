@@ -78,7 +78,7 @@ const ProfileScreen = ({ navigation }) => {
 
   const visibleContent = FreshlyCreated ? (
     <></>
-  ) : (
+  ) : UserCtx.isOnline ? (
     <>
       <View style={styles.tripContainer}>
         <View style={styles.horizontalContainer}>
@@ -123,6 +123,13 @@ const ProfileScreen = ({ navigation }) => {
         </View>
       </View>
     </>
+  ) : (
+    <View style={styles.offlineWarningContainer}>
+      <Text style={styles.offlineWarningText}>
+        {" "}
+        My Trips are not available in Offline Mode yet, sorry!
+      </Text>
+    </View>
   );
 
   return (
@@ -212,5 +219,19 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.35,
     shadowRadius: 4,
+  },
+  offlineWarningContainer: {
+    // center content
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    alignContent: "center",
+  },
+  offlineWarningText: {
+    fontSize: 14,
+    paddingVertical: "2%",
+    paddingHorizontal: "2%",
+    color: GlobalStyles.colors.gray700,
+    fontWeight: "300",
   },
 });

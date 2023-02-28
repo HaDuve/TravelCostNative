@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { G } from "react-native-svg";
+import Toast from "react-native-toast-message";
 import Button from "../components/UI/Button";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import FlatButton from "../components/UI/FlatButton";
@@ -33,7 +34,14 @@ const SplitSummaryScreen = ({ route, navigation }) => {
       console.log("getOpenSplits ~ response", response);
       setSplits(response);
     } catch (error) {
-      setError("Could not fetch splits from the web database! " + error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Could not fetch splits!",
+        visibilityTime: 1000,
+      });
+      console.error(error);
+      // setError("Could not fetch splits from the web database! " + error);
     }
     setIsFetching(false);
   }

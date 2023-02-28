@@ -26,6 +26,7 @@ import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
 import { useInterval } from "../components/Hooks/useInterval";
 import Toast from "react-native-toast-message";
+import { DEBUG_POLLING_INTERVAL } from "../appConfig";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -39,7 +40,6 @@ function RecentExpenses({ navigation }) {
 
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
-  const token = authCtx.token;
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
 
@@ -51,38 +51,20 @@ function RecentExpenses({ navigation }) {
   }, []);
 
   useEffect(() => {
+    if (!userCtx.isOnline) return;
     getExpenses(true, true);
   }, []);
 
   useInterval(
     () => {
       const asyncPolling = async () => {
-        if (!userCtx.isOnline) return;
-        getExpenses(true, true);
+        await getExpenses(true, true);
       };
-      // console.log("polling realtime ...");
       asyncPolling();
     },
-    1000,
+    DEBUG_POLLING_INTERVAL,
     true
   );
-
-  useInterval(() => {
-    const updateOnline = async () => {
-      // check if offline
-      await userCtx.checkConnectionUpdateUser(false);
-    };
-    updateOnline();
-  }, 1000 * 10);
-
-  // useEffect(() => {
-  //   if (PeriodValue !== userCtx.periodName)
-  //     userCtx.setPeriodString(PeriodValue);
-  // }, [PeriodValue]);
-
-  // useEffect(() => {
-  //   if (PeriodValue !== userCtx.periodName) setPeriodValue(userCtx.periodName);
-  // }, [userCtx.periodName]);
 
   const [items, setItems] = useState([
     { label: i18n.t("todayLabel"), value: "day" },
@@ -97,6 +79,7 @@ function RecentExpenses({ navigation }) {
     showAnyIndicator = false
   ) {
     // check offlinemode
+    await userCtx.checkConnectionUpdateUser();
     if (!userCtx.isOnline) {
       await expensesCtx.loadExpensesFromStorage();
       setRefreshing(false);
@@ -128,6 +111,7 @@ function RecentExpenses({ navigation }) {
         type: "error",
         text1: "Error",
         text2: "Could not fetch trip data",
+        visibilityTime: 1000,
       });
       console.error(error);
       // setError(i18n.t("fetchError") + error);

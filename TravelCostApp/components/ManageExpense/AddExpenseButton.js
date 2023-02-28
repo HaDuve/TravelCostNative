@@ -19,13 +19,7 @@ const AddExpenseButton = ({ navigation }) => {
     >
       <Animated.View
         entering={FadeInDown.duration(600)}
-        style={[
-          styles.addButton,
-          !isOnline && {
-            borderWidth: 1,
-            borderColor: GlobalStyles.colors.primary800,
-          },
-        ]}
+        style={[styles.addButton]}
       >
         <IconButton
           icon="add-outline"

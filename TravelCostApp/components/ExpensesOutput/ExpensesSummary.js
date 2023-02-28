@@ -74,7 +74,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
     //     authCtx.logout();
     //   }
     // );
-    return <Text> Error: Number is NAN </Text>;
+    return <Text> Error: Not a Number </Text>;
   }
 
   return (

@@ -1,4 +1,4 @@
-import { useContext, useLayoutEffect, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -65,6 +65,11 @@ const ManageExpense = ({ route, navigation }) => {
   const selectedExpenseAuthorUid = selectedExpense?.uid;
   //TODO: add tempValues to selected Expense
 
+  useEffect(() => {
+    const update = async () => await userCtx.checkConnectionUpdateUser();
+    update();
+  }, []);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: isEditing ? i18n.t("editExp") : i18n.t("addExp"),
@@ -83,12 +88,13 @@ const ManageExpense = ({ route, navigation }) => {
             id: editedExpenseId,
           },
         };
+        navigation.goBack();
         await deleteExpenseOnlineOffline(item, userCtx.isOnline);
         expenseCtx.deleteExpense(editedExpenseId);
         await touchAllTravelers(tripid, true);
-        navigation.goBack();
       } catch (error) {
-        setError("Could not delete expense - please try again later!");
+        // setError("Could not delete expense - please try again later!");
+        console.error(error);
         setIsSubmitting(false);
       }
     }
@@ -197,21 +203,22 @@ const ManageExpense = ({ route, navigation }) => {
           expenseCtx.addExpense({ ...expenseData, id: id });
         }
       }
-      await touchAllTravelers(tripid, true);
       navigation.navigate("RecentExpenses");
+      await touchAllTravelers(tripid, true);
     } catch (error) {
-      setError("Could not save data - please try again later!" + error);
+      // setError("Could not save data - please try again later!" + error);
+      console.error(error);
       setIsSubmitting(false);
     }
   }
 
-  function errorHandler() {
-    setError(null);
-  }
+  // function errorHandler() {
+  //   setError(null);
+  // }
 
-  if (error && !isSubmitting) {
-    return <ErrorOverlay message={error} onConfirm={errorHandler} />;
-  }
+  // if (error && !isSubmitting) {
+  //   return <ErrorOverlay message={error} onConfirm={errorHandler} />;
+  // }
 
   if (isSubmitting) {
     return <LoadingOverlay />;

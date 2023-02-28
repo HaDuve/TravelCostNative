@@ -254,6 +254,8 @@ function ExpensesContextProvider({ children }) {
         expense.date = new Date(expense.date);
         addExpense(expense);
       });
+    } else {
+      console.warn("no Expenses loaded from Storage!");
     }
   }
 

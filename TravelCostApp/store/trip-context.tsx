@@ -5,6 +5,17 @@ import { Alert } from "react-native";
 import { fetchTrip, getTravellers } from "../util/http";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 
+export interface TripData {
+  tripName: string;
+  totalBudget: string;
+  dailyBudget: string;
+  tripCurrency: string;
+  travellers: object;
+  tripid?: string;
+  totalSum?: number;
+  tripProgress?: number;
+}
+
 export const TripContext = createContext({
   tripid: "",
   tripName: "",
@@ -106,6 +117,7 @@ function TripContextProvider({ children }) {
   async function fetchAndSetCurrentTrip(tripid: string) {
     try {
       const trip = await fetchTrip(tripid);
+      trip.tripid = tripid;
       setCurrentTrip(tripid, trip);
       saveTripDataInStorage(trip);
     } catch (error) {
@@ -140,36 +152,38 @@ function TripContextProvider({ children }) {
     console.log("delete Trip NOT IMPLEMENTED");
   }
 
-  async function saveTripDataInStorage(tripData) {
-    // TODO: save and load trip correctly
-    await asyncStoreSetObject("currentTrip", tripData);
+  async function saveTripDataInStorage(trip: TripData) {
+    await asyncStoreSetObject("currentTrip", trip);
   }
 
   async function loadTripDataFromStorage() {
-    await asyncStoreGetObject("currentTrip").then((tripData) => {
-      if (tripData) {
-        // TODO: save and load trip correctly
-        // console.log("loadTripDataFromStorage ~ tripData", tripData);
-        // setCurrentTrip(tripData.tripid, tripData);
-        // _setTripid(tripid);
-        // setTripName(trip.tripName);
-        // setTotalBudget(trip.totalBudget.toString());
-        // setTripCurrency(trip.tripCurrency);
-        // setdailyBudget(trip.dailyBudget.toString());
-        // setCurrentTravellers(tripid);
-        return tripData;
-      }
-    });
+    const tripData = await asyncStoreGetObject("currentTrip");
+    if (tripData) {
+      _setTripid(tripData.tripid);
+      setTripName(tripData.tripName);
+      setTotalBudget(tripData.totalBudget.toString());
+      setTripCurrency(tripData.tripCurrency);
+      setdailyBudget(tripData.dailyBudget.toString());
+      await loadTravellersFromStorage();
+      return tripData;
+    } else {
+      console.warn("no tripdata loaded from Storage!");
+    }
   }
 
   async function saveTravellersInStorage(travellers) {
+    console.log("saveTravellersInStorage ~ travellers:", travellers);
     await asyncStoreSetObject("currentTravellers", travellers);
   }
 
   async function loadTravellersFromStorage() {
     await asyncStoreGetObject("currentTravellers").then((travellers) => {
       if (travellers) {
-        console.log("loadTravellersFromStorage ~ travellers", travellers);
+        const travellerList = [];
+        // travellers.forEach((traveller) => {
+        //   console.log("awaitasyncStoreGetObject ~ traveller:", traveller);
+        //   setTravellers(["test"]);
+        // });
         setTravellers(travellers);
       }
     });

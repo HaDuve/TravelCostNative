@@ -1,24 +1,19 @@
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet } from "react-native";
 import React, { useContext } from "react";
 import { importExcelFile } from "../components/ImportExport/OpenXLSXPicker";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
-import Toast from "react-native-toast-message";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../../TravelCostApp/i18n/supportedLanguages";
 import Button from "../components/UI/Button";
-import {
-  importGoogleExcelFile,
-  OpenGoogleXlsxPicker,
-} from "../components/ImportExport/ImportFromGoogleXlsx";
 import { exportAllExpensesToXLSX } from "../components/ImportExport/ExportToGoogleXlsx";
 import { ScrollView } from "react-native-gesture-handler";
-import { simplifySplits } from "../util/split";
+
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -54,15 +49,6 @@ const SettingsScreen = ({ navigation }) => {
       },
     ]);
   }
-  const showToast = () => {
-    Toast.show({
-      type: "success",
-      text1: "Hello",
-      text2: "This is some something 👋",
-      position: "bottom",
-      bottomOffset: 80,
-    });
-  };
 
   return (
     <ScrollView
@@ -112,7 +98,6 @@ const SettingsScreen = ({ navigation }) => {
       >
         Simplify Splits
       </Button>
-      <Button onPress={showToast}>Show Toast</Button>
     </ScrollView>
   );
 };

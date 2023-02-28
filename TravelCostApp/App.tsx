@@ -1,10 +1,3 @@
-// Debug asyncStorage, set to true if you want all storage to be reset and user logged out
-const DEBUG_RESET = false;
-// Debug OfflineMode, set to true if you want the simulator to be offline
-export const DEBUG_FORCE_OFFLINE = false;
-// Debug polling interval
-export const DEBUG_POLLING_INTERVAL = 1000;
-
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
 import { Alert, Text, SafeAreaView, View, Keyboard } from "react-native";
@@ -58,7 +51,6 @@ import LoadingOverlay from "./components/UI/LoadingOverlay";
 import ImportGSScreen from "./screens/ImportGSScreen";
 import FilteredExpenses from "./screens/FilteredExpenses";
 import { sendOfflineQueue } from "./util/offline-queue";
-import Toast from "react-native-toast-message";
 
 //localization
 import * as Localization from "expo-localization";
@@ -72,6 +64,9 @@ i18n.enableFallback = true;
 // // NOTE: for beta testing we leave this here
 // import { LogBox } from "react-native";
 import ManageCategoryScreen from "./screens/ManageCategoryScreen";
+import ToastComponent from "./components/UI/ToastComponent";
+import { DEBUG_FORCE_OFFLINE, DEBUG_RESET } from "./appConfig";
+import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
 // LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
 // LogBox.ignoreAllLogs(); //Ignore all log notifications
 
@@ -285,7 +280,6 @@ function Home() {
           backgroundColor: UserCtx.isOnline
             ? GlobalStyles.colors.primary500
             : "black",
-          padding: "0,5%",
         },
         tabBarBounces: true,
       })}
@@ -322,20 +316,20 @@ function Home() {
           }}
         />
       )}
-      {UserCtx.isOnline && (
-        <BottomTabs.Screen
-          name="Profile"
-          component={ProfileScreen}
-          options={{
-            // headerShown: false,
-            title: "Profile",
-            tabBarLabel: "Profile",
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="person-circle-outline" size={24} color={color} />
-            ),
-          }}
-        />
-      )}
+
+      <BottomTabs.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          // headerShown: false,
+          title: "Profile",
+          tabBarLabel: "Profile",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="person-circle-outline" size={24} color={color} />
+          ),
+        }}
+      />
+
       {!FreshlyCreated && (
         <BottomTabs.Screen
           name="Settings"
@@ -396,7 +390,7 @@ function Root() {
       if (DEBUG_RESET) await asyncStoreSafeClear();
 
       // offline check and set context
-      await userCtx.checkConnectionUpdateUser(DEBUG_FORCE_OFFLINE);
+      await userCtx.checkConnectionUpdateUser();
 
       // fetch token and trip
       const storedToken = await asyncStoreGetItem("token");
@@ -415,7 +409,7 @@ function Root() {
       if (storedToken) {
         //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
         // check if user is online
-        if (!(await userCtx.checkConnectionUpdateUser(DEBUG_FORCE_OFFLINE))) {
+        if (!(await userCtx.checkConnectionUpdateUser())) {
           console.log("OFFLINE SETUP STARTED");
           await setupOfflineMount(true, storedToken);
           console.log("OFFLINE SETUP FINISHED");
@@ -492,7 +486,7 @@ function Root() {
   }, [appIsReady]);
 
   if (!appIsReady) {
-    return null;
+    return <SplashScreenOverlay></SplashScreenOverlay>;
   }
 
   return <Navigation />;
@@ -529,7 +523,7 @@ export default function App() {
                 <NetworkProvider>
                   <ExpensesContextProvider>
                     <Root />
-                    <Toast position="bottom" bottomOffset={80} />
+                    <ToastComponent />
                   </ExpensesContextProvider>
                 </NetworkProvider>
               </UserContextProvider>

@@ -1,7 +1,7 @@
 import axios from "axios";
+import { DEBUG_NO_DATA } from "../appConfig";
 import { Category } from "./category";
-
-const DEBUG_NO_DATA = false;
+import { TripData } from "../store/trip-context";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -250,7 +250,7 @@ export async function updateTrip(tripid: string, tripData) {
   return res;
 }
 
-export async function fetchTrip(tripid: string) {
+export async function fetchTrip(tripid: string): Promise<TripData> {
   if (!tripid) return null;
   // console.log("https: ~ fetchTrip ~ tripid", tripid);
   const response = await axios.get(

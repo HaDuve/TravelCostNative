@@ -468,7 +468,11 @@ function Root() {
           await asyncStoreSetItem("currentTripId", tripid);
           await touchMyTraveler(tripid, storedUid);
         } catch (error) {
-          Alert.alert(error);
+          Toast.show({
+            type: "error",
+            text1: "Error",
+            text2: "Could not fetch trip data",
+          });
         }
         authCtx.authenticate(storedToken);
       } else {

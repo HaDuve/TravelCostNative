@@ -476,6 +476,7 @@ function Root() {
     }
 
     onRootMount();
+    return () => console.log("!onRootMount ~ !onRootMount END");
   }, []);
 
   useLayoutEffect(() => {

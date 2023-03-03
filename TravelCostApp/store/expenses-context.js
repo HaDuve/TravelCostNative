@@ -246,17 +246,27 @@ function ExpensesContextProvider({ children }) {
   async function loadExpensesFromStorage() {
     if (expensesState.length !== 0) {
       console.log("expenses not empty, will not load again");
-      return;
+      return false;
     }
     const expenses = await asyncStoreGetObject("expenses");
     if (expenses) {
       expenses.forEach((expense) => {
         expense.date = new Date(expense.date);
-        addExpense(expense);
+        // check if expense is already in state
+        const expenseInState = expensesState.find((e) => {
+          return e.id === expense.id;
+        });
+        console.log("expenseInState ~ expenseInState:", expenseInState);
+        if (expenseInState) {
+          console.log("expense already in state");
+        } else {
+          addExpense(expense);
+        }
       });
     } else {
       console.warn("no Expenses loaded from Storage!");
     }
+    return true;
   }
 
   const value = {

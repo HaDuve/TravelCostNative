@@ -120,6 +120,7 @@ function TripContextProvider({ children }) {
       trip.tripid = tripid;
       setCurrentTrip(tripid, trip);
       saveTripDataInStorage(trip);
+      return trip;
     } catch (error) {
       console.warn(
         "error while fetchCurrent Trip in trip-context searching for ",
@@ -172,7 +173,6 @@ function TripContextProvider({ children }) {
   }
 
   async function saveTravellersInStorage(travellers) {
-    console.log("saveTravellersInStorage ~ travellers:", travellers);
     await asyncStoreSetObject("currentTravellers", travellers);
   }
 

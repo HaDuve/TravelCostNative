@@ -2,6 +2,7 @@ import axios from "axios";
 import { DEBUG_NO_DATA } from "../appConfig";
 import { Category } from "./category";
 import { TripData } from "../store/trip-context";
+import Toast from "react-native-toast-message";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -86,29 +87,38 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
       console.warn("error while fetchingExpenses of user: ", uid, error);
     }
   });
-  const responseArray = await Promise.all(axios_calls);
-  responseArray.forEach((response) => {
-    for (const key in response.data) {
-      const r = response.data[key];
-      const expenseObj = {
-        id: key,
-        amount: r.amount,
-        date: new Date(r.date),
-        description: r.description,
-        category: r.category,
-        country: r.country,
-        currency: r.currency,
-        whoPaid: r.whoPaid,
-        owePerc: r.owePerc,
-        uid: r.uid,
-        calcAmount: r.calcAmount,
-        splitType: r.splitType,
-        listEQUAL: r.listEQUAL,
-        splitList: r.splitList,
-      };
-      expenses.push(expenseObj);
-    }
-  });
+  try {
+    const responseArray = await Promise.all(axios_calls);
+    responseArray.forEach((response) => {
+      for (const key in response.data) {
+        const r = response.data[key];
+        const expenseObj = {
+          id: key,
+          amount: r.amount,
+          date: new Date(r.date),
+          description: r.description,
+          category: r.category,
+          country: r.country,
+          currency: r.currency,
+          whoPaid: r.whoPaid,
+          owePerc: r.owePerc,
+          uid: r.uid,
+          calcAmount: r.calcAmount,
+          splitType: r.splitType,
+          listEQUAL: r.listEQUAL,
+          splitList: r.splitList,
+        };
+        expenses.push(expenseObj);
+      }
+    });
+  } catch (error) {
+    Toast.show({
+      type: "error",
+      text1: "Error while fetching expenses",
+      text2: "Please try again later",
+    });
+    console.log("error while fetching expenses: ", error);
+  }
 
   return expenses;
 }
@@ -251,6 +261,7 @@ export async function updateTrip(tripid: string, tripData) {
 }
 
 export async function fetchTrip(tripid: string): Promise<TripData> {
+  console.log("!fetchTrip ~ fetchTrip expensive call!");
   if (!tripid) return null;
   // console.log("https: ~ fetchTrip ~ tripid", tripid);
   const response = await axios.get(
@@ -429,8 +440,12 @@ export async function touchMyTraveler(tripid: string, uid: string) {
   const response = await fetchTripsTravellers(tripid);
   for (const key in response) {
     if (uid !== response[key].uid) continue;
-    console.log("TOUCHING: ", response[key].userName);
-    await touchTraveler(tripid, key, true);
+    console.log("touching: ", response[key].userName);
+    try {
+      await touchTraveler(tripid, key, true);
+    } catch (error) {
+      console.log("touching:", error);
+    }
   }
 }
 

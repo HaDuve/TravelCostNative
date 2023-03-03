@@ -81,7 +81,8 @@ function RecentExpenses({ navigation }) {
     // check offlinemode
     await userCtx.checkConnectionUpdateUser();
     if (!userCtx.isOnline) {
-      await expensesCtx.loadExpensesFromStorage();
+      const isLoaded = await expensesCtx.loadExpensesFromStorage();
+      console.log("RecentExpenses ~ isLoaded:", isLoaded);
       setRefreshing(false);
       setIsFetching(false);
       return;

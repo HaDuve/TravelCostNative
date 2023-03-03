@@ -41,10 +41,10 @@ const ProfileScreen = ({ navigation }) => {
   let allTripsList = [];
   const [tripsList, setTripsList] = useState([]);
 
-  useEffect(() => {
-    if (FreshlyCreated || !UserCtx.isOnline) return;
-    refreshHandler();
-  }, [TripCtx.refreshState]);
+  // useEffect(() => {
+  //   if (FreshlyCreated || !UserCtx.isOnline) return;
+  //   refreshHandler();
+  // }, [TripCtx.refreshState]);
 
   // refreshHandler() could be moved into TripContext to be loaded correctly
   async function refreshHandler() {

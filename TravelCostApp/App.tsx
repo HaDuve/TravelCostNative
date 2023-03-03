@@ -67,6 +67,7 @@ import ManageCategoryScreen from "./screens/ManageCategoryScreen";
 import ToastComponent from "./components/UI/ToastComponent";
 import { DEBUG_FORCE_OFFLINE, DEBUG_RESET } from "./appConfig";
 import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
+import Toast from "react-native-toast-message";
 // LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
 // LogBox.ignoreAllLogs(); //Ignore all log notifications
 
@@ -399,7 +400,7 @@ function Root() {
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
 
       console.log(
-        "store loads: ",
+        "store loaded: ",
         truncateString(storedToken, 10),
         truncateString(storedUid, 10),
         truncateString(storedTripId, 10),
@@ -409,7 +410,7 @@ function Root() {
       if (storedToken) {
         //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
         // check if user is online
-        if (!(await userCtx.checkConnectionUpdateUser())) {
+        if (!userCtx.isOnline) {
           console.log("OFFLINE SETUP STARTED");
           await setupOfflineMount(true, storedToken);
           console.log("OFFLINE SETUP FINISHED");
@@ -417,9 +418,10 @@ function Root() {
           return;
         }
         // set tripId in context
+        let tripData;
         if (storedTripId) {
           console.log("onRootMount ~ storedTripId", storedTripId);
-          await tripCtx.fetchAndSetCurrentTrip(storedTripId);
+          tripData = await tripCtx.fetchAndSetCurrentTrip(storedTripId);
           tripCtx.setCurrentTravellers(storedTripId);
           tripCtx.setTripid(storedTripId);
         }
@@ -435,10 +437,14 @@ function Root() {
         const checkUser = await fetchUser(storedUid);
         // Check if the user logged in but there is no userName, we deleted the account
         if (!checkUser || !checkUser.userName) {
-          Alert.alert(
-            "Your Account was deleted or AppData was reset, please create a new account!"
-          );
-          await AsyncStorage.clear();
+          Toast.show({
+            type: "error",
+            text1: "Account not found",
+            text2:
+              "Your Account was deleted or the App Database was reset, please create a new account!",
+            visibilityTime: 5000,
+          });
+          await asyncStoreSafeClear();
           setAppIsReady(true);
           return;
         }
@@ -450,24 +456,15 @@ function Root() {
 
         // setup context
         authCtx.setUserID(storedUid);
-        let tripData;
+
         // console.log("getExpenses ~ expenses", expenses);
-        try {
-          const userData = checkUser;
-          const tripid = userData.currentTrip;
-          console.log("onRootMount ~ userData", userData);
-          userCtx.addUser(userData);
-          tripData = await fetchTrip(tripid);
-          tripCtx.setCurrentTrip(tripid, tripData);
-          await asyncStoreSetItem("currentTripId", tripid);
-          await touchMyTraveler(tripid, storedUid);
-        } catch (error) {
-          Toast.show({
-            type: "error",
-            text1: "Error",
-            text2: "Could not fetch trip data",
-          });
-        }
+
+        const userData = checkUser;
+        const tripid = userData.currentTrip;
+        console.log("onRootMount ~ userData", userData);
+        userCtx.addUser(userData);
+        tripCtx.setCurrentTrip(tripid, tripData);
+        await asyncStoreSetItem("currentTripId", tripid);
         authCtx.authenticate(storedToken);
       } else {
         authCtx.logout();

@@ -41,7 +41,6 @@ export async function asyncStoreSetObject(key: string, value: unknown) {
  * @param key The name of the item to be stored
  */
 export async function asyncStoreGetItem(key: string) {
-  console.log("attempting to read from Memory > ", key + ": ");
   try {
     return await AsyncStorage.getItem(key);
   } catch (error) {

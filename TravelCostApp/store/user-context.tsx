@@ -6,7 +6,7 @@ import { asyncStoreGetItem, asyncStoreSetObject } from "./async-storage";
 import * as Device from "expo-device";
 import { checkInternetConnection } from "react-native-offline";
 import Toast from "react-native-toast-message";
-import { DEBUG_FORCE_OFFLINE } from "../appConfig";
+import { DEBUG_FORCE_OFFLINE } from "../confApp";
 
 export const UserContext = createContext({
   userName: "",
@@ -130,7 +130,8 @@ function UserContextProvider({ children }) {
 
   async function checkConnectionUpdateUser() {
     // if app is not running on emulator, always set forceOffline to false
-    const forceOffline = !Device.isDevice && DEBUG_FORCE_OFFLINE;
+    // if force is false set to false if we are on a device and true if we are on an emulator
+    const forceOffline = DEBUG_FORCE_OFFLINE ? true : !Device.isDevice;
     try {
       const newIsOnline = await checkInternetConnection(
         forceOffline

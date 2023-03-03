@@ -26,7 +26,7 @@ import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
 import { useInterval } from "../components/Hooks/useInterval";
 import Toast from "react-native-toast-message";
-import { DEBUG_POLLING_INTERVAL } from "../appConfig";
+import { DEBUG_POLLING_INTERVAL } from "../confApp";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -63,7 +63,7 @@ function RecentExpenses({ navigation }) {
       asyncPolling();
     },
     DEBUG_POLLING_INTERVAL,
-    true
+    false
   );
 
   const [items, setItems] = useState([

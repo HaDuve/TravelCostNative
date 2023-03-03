@@ -29,6 +29,7 @@ import {
   touchTraveler,
   getAllExpenses,
   touchMyTraveler,
+  dataResponseTime,
 } from "./util/http";
 import TripContextProvider, { TripContext } from "./store/trip-context";
 import TripForm from "./components/ManageTrip/TripForm";
@@ -65,7 +66,7 @@ i18n.enableFallback = true;
 // import { LogBox } from "react-native";
 import ManageCategoryScreen from "./screens/ManageCategoryScreen";
 import ToastComponent from "./components/UI/ToastComponent";
-import { DEBUG_FORCE_OFFLINE, DEBUG_RESET } from "./appConfig";
+import { DEBUG_FORCE_OFFLINE, DEBUG_RESET } from "./confApp";
 import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
 import Toast from "react-native-toast-message";
 // LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
@@ -387,6 +388,11 @@ function Root() {
 
   useEffect(() => {
     async function onRootMount() {
+      const test_tripCtx_fetchAndSetCurrentTrip = dataResponseTime(
+        tripCtx.fetchAndSetCurrentTrip
+      );
+      const test_fetchUser = dataResponseTime(fetchUser);
+      const test_touchMyTraveler = dataResponseTime(touchMyTraveler);
       console.log("onRootMount ~ onRootMount");
       if (DEBUG_RESET) await asyncStoreSafeClear();
 
@@ -421,7 +427,7 @@ function Root() {
         let tripData;
         if (storedTripId) {
           console.log("onRootMount ~ storedTripId", storedTripId);
-          tripData = await tripCtx.fetchAndSetCurrentTrip(storedTripId);
+          tripData = await test_tripCtx_fetchAndSetCurrentTrip(storedTripId);
           tripCtx.setCurrentTravellers(storedTripId);
           tripCtx.setTripid(storedTripId);
         }
@@ -434,7 +440,7 @@ function Root() {
           userCtx.setFreshlyCreatedTo(freshlyCreated);
         }
         // check if user was deleted
-        const checkUser = await fetchUser(storedUid);
+        const checkUser = await test_fetchUser(storedUid);
         // Check if the user logged in but there is no userName, we deleted the account
         if (!checkUser || !checkUser.userName) {
           Toast.show({
@@ -465,6 +471,7 @@ function Root() {
         userCtx.addUser(userData);
         tripCtx.setCurrentTrip(tripid, tripData);
         await asyncStoreSetItem("currentTripId", tripid);
+        await test_touchMyTraveler(tripid, storedUid);
         authCtx.authenticate(storedToken);
       } else {
         authCtx.logout();

@@ -252,16 +252,7 @@ function ExpensesContextProvider({ children }) {
     if (expenses) {
       expenses.forEach((expense) => {
         expense.date = new Date(expense.date);
-        // check if expense is already in state
-        const expenseInState = expensesState.find((e) => {
-          return e.id === expense.id;
-        });
-        console.log("expenseInState ~ expenseInState:", expenseInState);
-        if (expenseInState) {
-          console.log("expense already in state");
-        } else {
-          addExpense(expense);
-        }
+        addExpense(expense);
       });
     } else {
       console.warn("no Expenses loaded from Storage!");

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { DEBUG_NO_DATA } from "../appConfig";
+import { DEBUG_NO_DATA } from "../confApp";
 import { Category } from "./category";
 import { TripData } from "../store/trip-context";
 import Toast from "react-native-toast-message";
@@ -40,6 +40,19 @@ axios.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+/*
+ * development decorator to time the execution of an async function
+ */
+export const dataResponseTime = (func) => {
+  return async (...args) => {
+    const start = Date.now();
+    const result = await func(...args);
+    const end = Date.now();
+    console.log(`Time taken by ${func.name} is ${end - start} ms`);
+    return result;
+  };
+};
 
 /**
  * storeExpense posts expense data under the specified path:
@@ -421,31 +434,58 @@ export async function touchTraveler(
 
 export async function touchAllTravelers(tripid: string, flag: boolean) {
   const response = await fetchTripsTravellers(tripid);
+  const axios_calls = [];
   for (const key in response) {
     console.log("touching: ", response[key].userName);
-    await touchTraveler(tripid, key, flag);
+    const new_axios_call = touchTraveler(tripid, key, flag);
+    axios_calls.push(new_axios_call);
+  }
+  try {
+    await Promise.all(axios_calls);
+  } catch (error) {
+    console.log("touching:", error);
+    Toast.show({
+      text1: "Error",
+      text2: "Internet connection error while syncing travellers",
+    });
   }
 }
 
 export async function unTouchTraveler(tripid: string, uid: string) {
   const response = await fetchTripsTravellers(tripid);
+  const axios_calls = [];
   for (const key in response) {
     if (uid !== response[key].uid) continue;
     console.log("untouching: ", response[key].userName);
-    await touchTraveler(tripid, key, false);
+    axios_calls.push(touchTraveler(tripid, key, false));
+  }
+  try {
+    await Promise.all(axios_calls);
+  } catch (error) {
+    console.log("touching:", error);
+    Toast.show({
+      text1: "Error",
+      text2: "Internet connection error while syncing travellers",
+    });
   }
 }
 
 export async function touchMyTraveler(tripid: string, uid: string) {
   const response = await fetchTripsTravellers(tripid);
+  const axios_calls = [];
   for (const key in response) {
     if (uid !== response[key].uid) continue;
     console.log("touching: ", response[key].userName);
-    try {
-      await touchTraveler(tripid, key, true);
-    } catch (error) {
-      console.log("touching:", error);
-    }
+    axios_calls.push(touchTraveler(tripid, key, true));
+  }
+  try {
+    await Promise.all(axios_calls);
+  } catch (error) {
+    console.log("touching:", error);
+    Toast.show({
+      text1: "Error",
+      text2: "Internet connection error while syncing travellers",
+    });
   }
 }
 

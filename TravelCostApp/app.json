@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "Travel Expense",
-    "slug": "Travel-Expense",
-    "scheme": "travel-expense",
+    "name": "Budget for Nomads",
+    "slug": "Budget-For-Nomads",
+    "scheme": "budget-for-nomads",
     "version": "1.0.40",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splashNomads.png",
       "resizeMode": "cover",
       "backgroundColor": "#000000"
     },
@@ -18,11 +18,11 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.travelexpense.app",
+      "bundleIdentifier": "com.budgetfornomads.app",
       "buildNumber": "1.0.40"
     },
     "android": {
-      "package": "com.travelexpense.app",
+      "package": "com.budgetfornomads.app",
       "versionCode": 1040,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",

@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "Budget for Nomads",
-    "slug": "Budget-For-Nomads",
-    "scheme": "budget-for-nomads",
+    "slug": "Travel-Expense",
+    "scheme": "travel-expense",
     "version": "1.0.40",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

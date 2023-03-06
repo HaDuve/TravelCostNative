@@ -145,7 +145,11 @@ function closeRow(index) {
 }
 
 function forceCloseRow(index) {
-  row[index].close();
+  try {
+    row[index].close();
+  } catch (error) {
+    console.log("forceCloseRow ~ error", error);
+  }
 }
 
 // Displays a list of all expenses.

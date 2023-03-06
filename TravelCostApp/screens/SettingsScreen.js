@@ -15,6 +15,7 @@ import { exportAllExpensesToXLSX } from "../components/ImportExport/ExportToGoog
 import { ScrollView } from "react-native-gesture-handler";
 import { GlobalStyles } from "../constants/styles";
 import LinkingButton from "../components/UI/LinkButton";
+import { DEV } from "../confApp";
 
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
@@ -30,13 +31,9 @@ const SettingsScreen = ({ navigation }) => {
   const tripid = tripCtx.tripid;
   const userName = userCtx.userName;
   const addExpense = expensesCtx.addExpense;
-  const [isDEV, setIsDEV] = useState(false);
+  const [isDEV, setIsDEV] = useState(DEV);
 
-  if (__DEV__) {
-    // do dev stuff 🤘
-    if (!isDEV) setIsDEV(true);
-  }
-  const DEVCONTENT = (
+  const DEVCONTENT = isDEV && (
     <View>
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>DEVCONTENT</Text>

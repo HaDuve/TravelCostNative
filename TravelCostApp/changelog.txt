@@ -1,5 +1,23 @@
 Changelog Travel Expense App
 
+1.0.50
+- new Name: "Budget For Nomads"
+- added realtime updates
+- added new icons and splashscreen
+- added Toast flyovers to inform about whats going on (infos, errors & successes)
+- added LinkButtons for navigating to URLs (e.g: https://www.foodfornomads.com)
+- added indicators for who paid and shared
+- improved button feedback via scaling
+- improved fonts consistency
+- improved expense sorting by date
+- improved interactive charts
+- overhauled settings screens
+- fixed empty Split Summary
+- fixed bugs with deleting expenses
+- fixed connection issues
+- fixed issues with exact Split
+
+
 1.0.40
 - fully functional offline-mode
 - fixed alot of bugs

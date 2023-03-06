@@ -72,7 +72,7 @@ const JoinTrip = ({ navigation, route }) => {
   async function joinHandler(join: boolean) {
     // either we press the confirm or the cancel button (join=true/false)
     if (!join) {
-      navigation.navigate("Profile");
+      navigation.pop();
     } else {
       tripid = joinTripid;
       console.log("joinHandler ~ tripid", tripid);

@@ -46,6 +46,9 @@ function RecentExpenses({ navigation }) {
   const [open, setOpen] = useState(false);
   const [PeriodValue, setPeriodValue] = useState("day");
 
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = getExpenses.bind(this, true);
+
   useEffect(() => {
     LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
   }, []);
@@ -119,9 +122,6 @@ function RecentExpenses({ navigation }) {
     if (!showRefIndicator && !showAnyIndicator) setIsFetching(false);
     if (!showAnyIndicator) setRefreshing(false);
   }
-
-  const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = getExpenses.bind(this, true);
 
   function errorHandler() {
     setError(null);

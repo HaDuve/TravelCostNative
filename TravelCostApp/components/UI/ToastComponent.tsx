@@ -64,7 +64,7 @@ const toastConfig = {
 };
 
 const ToastComponent = () => {
-  return <Toast topOffset={100} config={toastConfig} />;
+  return <Toast topOffset={100} config={toastConfig} position={"bottom"} />;
 };
 
 export default ToastComponent;

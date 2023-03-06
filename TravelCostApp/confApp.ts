@@ -8,3 +8,6 @@ export const DEBUG_NO_DATA = false;
 export const DEBUG_POLLING_INTERVAL = 5000;
 // Debug polling interval online status
 export const DEBUG_POLLING_INTERVAL_ONLINE = 10000;
+
+// toast tweaks
+export const TOAST_LOCATION = "bottom";

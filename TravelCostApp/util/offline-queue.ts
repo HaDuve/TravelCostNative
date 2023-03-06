@@ -48,11 +48,11 @@ export const deleteExpenseOnlineOffline = async (
         item.expense.uid,
         item.expense.id
       );
-      Toast.show({
-        type: "success",
-        text1: "Deleted!",
-        text2: "Successfully deleted the Expense!",
-      });
+      // Toast.show({
+      //   type: "success",
+      //   text1: "Deleted!",
+      //   text2: "Successfully deleted the Expense!",
+      // });
     } catch (error) {
       Toast.show({
         type: "error",
@@ -64,11 +64,11 @@ export const deleteExpenseOnlineOffline = async (
     // delete item offline
     try {
       const res = await pushOfflineQueue(item);
-      Toast.show({
-        type: "success",
-        text1: "Deleted!",
-        text2: "Successfully deleted Expense!",
-      });
+      // Toast.show({
+      //   type: "success",
+      //   text1: "Deleted!",
+      //   text2: "Successfully deleted Expense!",
+      // });
     } catch (error) {
       Toast.show({
         type: "error",
@@ -96,11 +96,11 @@ export const updateExpenseOnlineOffline = async (
         item.expense.id,
         item.expense.expenseData
       );
-      Toast.show({
-        type: "success",
-        text1: "Updated!",
-        text2: "Successfully updated the Expense!",
-      });
+      // Toast.show({
+      //   type: "success",
+      //   text1: "Updated!",
+      //   text2: "Successfully updated the Expense!",
+      // });
     } catch (error) {
       Toast.show({
         type: "error",
@@ -112,11 +112,11 @@ export const updateExpenseOnlineOffline = async (
     // update item offline
     try {
       const res = await pushOfflineQueue(item);
-      Toast.show({
-        type: "success",
-        text1: "Updated!",
-        text2: "Successfully updated the Expense!",
-      });
+      // Toast.show({
+      //   type: "success",
+      //   text1: "Updated!",
+      //   text2: "Successfully updated the Expense!",
+      // });
     } catch (error) {
       Toast.show({
         type: "error",
@@ -143,11 +143,11 @@ export const storeExpenseOnlineOffline = async (
         item.expense.uid,
         item.expense.expenseData
       );
-      Toast.show({
-        type: "success",
-        text1: "Stored!",
-        text2: "Successfully stored the Expense!",
-      });
+      // Toast.show({
+      //   type: "success",
+      //   text1: "Stored!",
+      //   text2: "Successfully stored the Expense!",
+      // });
       return id;
     } catch (error) {
       Toast.show({
@@ -160,11 +160,11 @@ export const storeExpenseOnlineOffline = async (
     // store item offline
     try {
       const res = await pushOfflineQueue(item);
-      Toast.show({
-        type: "success",
-        text1: "Stored!",
-        text2: "Successfully stored the Expense!",
-      });
+      // Toast.show({
+      //   type: "success",
+      //   text1: "Stored!",
+      //   text2: "Successfully stored the Expense!",
+      // });
       return (
         Math.random().toString(36).substring(2, 15) +
         Math.random().toString(36).substring(2, 15)

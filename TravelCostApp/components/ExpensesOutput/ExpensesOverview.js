@@ -87,8 +87,11 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingRight: 20,
     textAlign: "center",
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
+    fontStyle: "italic",
+    color: GlobalStyles.colors.gray700,
+    marginLeft: "2%",
   },
   toggleButton: {
     flex: 0,

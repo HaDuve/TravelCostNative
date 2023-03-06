@@ -1,5 +1,8 @@
 Changelog Travel Expense App
 
+1.0.51
+- fixed slow connection login bug
+
 1.0.50
 - new Name: "Budget For Nomads"
 - added realtime updates

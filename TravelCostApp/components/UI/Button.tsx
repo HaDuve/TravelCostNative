@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.primary200,
   },
   pressed: {
+    transform: [{ scale: 0.95 }],
     opacity: 0.75,
     backgroundColor: GlobalStyles.colors.primary100,
     borderRadius: 16,

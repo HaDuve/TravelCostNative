@@ -96,7 +96,7 @@ const TripForm = ({ navigation, route }) => {
     });
   }
   function cancelHandler() {
-    navigation.navigate("Profile");
+    navigation.pop();
   }
 
   function deleteHandler() {
@@ -117,7 +117,7 @@ const TripForm = ({ navigation, route }) => {
           onPress: async () => {
             // TODO: find out how the whole routine should work
             // await deleteTrip(editedTripId);
-            navigation.navigate("Profile");
+            navigation.pop();
           },
         },
       ],
@@ -180,7 +180,7 @@ const TripForm = ({ navigation, route }) => {
         await tripCtx.fetchAndSetCurrentTrip(editedTripId);
       }
       tripCtx.refresh();
-      navigation.navigate("Profile");
+      navigation.pop();
       return;
     }
     const tripid = await storeTrip(tripData);

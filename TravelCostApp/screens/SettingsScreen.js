@@ -1,5 +1,5 @@
-import { Alert, StyleSheet } from "react-native";
-import React, { useContext } from "react";
+import { Alert, StyleSheet, View, Text, Linking } from "react-native";
+import React, { useContext, useState } from "react";
 import { importExcelFile } from "../components/ImportExport/OpenXLSXPicker";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
@@ -13,6 +13,8 @@ import { en, de } from "../../TravelCostApp/i18n/supportedLanguages";
 import Button from "../components/UI/Button";
 import { exportAllExpensesToXLSX } from "../components/ImportExport/ExportToGoogleXlsx";
 import { ScrollView } from "react-native-gesture-handler";
+import { GlobalStyles } from "../constants/styles";
+import LinkingButton from "../components/UI/LinkButton";
 
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
@@ -28,41 +30,17 @@ const SettingsScreen = ({ navigation }) => {
   const tripid = tripCtx.tripid;
   const userName = userCtx.userName;
   const addExpense = expensesCtx.addExpense;
+  const [isDEV, setIsDEV] = useState(false);
 
-  function joinInviteHandler() {
-    navigation.navigate("Join");
+  if (__DEV__) {
+    // do dev stuff 🤘
+    if (!isDEV) setIsDEV(true);
   }
-
-  function logoutHandler() {
-    return Alert.alert(i18n.t("sure"), i18n.t("signOutAlertMess"), [
-      // The "No" button
-      // Does nothing but dismiss the dialog when tapped
-      {
-        text: i18n.t("no"),
-      },
-      // The "Yes" button
-      {
-        text: i18n.t("yes"),
-        onPress: () => {
-          authCtx.logout();
-        },
-      },
-    ]);
-  }
-
-  return (
-    <ScrollView
-      style={{
-        flex: 1,
-        padding: "4%",
-      }}
-    >
-      <Button style={styles.settingsButton} onPress={logoutHandler}>
-        Logout
-      </Button>
-      <Button style={styles.settingsButton} onPress={joinInviteHandler}>
-        Join Trip
-      </Button>
+  const DEVCONTENT = (
+    <View>
+      <View style={styles.titleContainer}>
+        <Text style={styles.titleText}>DEVCONTENT</Text>
+      </View>
       <Button
         onPress={importExcelFile.bind(this, uid, tripid, userName, addExpense)}
         style={styles.settingsButton}
@@ -90,6 +68,48 @@ const SettingsScreen = ({ navigation }) => {
         {/* danach muss zurueck konvertiert werden  */}
         Export FoodForNomads
       </Button>
+    </View>
+  );
+
+  function joinInviteHandler() {
+    navigation.navigate("Join");
+  }
+
+  function logoutHandler() {
+    return Alert.alert(i18n.t("sure"), i18n.t("signOutAlertMess"), [
+      // The "No" button
+      // Does nothing but dismiss the dialog when tapped
+      {
+        text: i18n.t("no"),
+      },
+      // The "Yes" button
+      {
+        text: i18n.t("yes"),
+        onPress: () => {
+          authCtx.logout();
+        },
+      },
+    ]);
+  }
+
+  return (
+    <ScrollView
+      scrollEnabled={false}
+      style={{
+        flex: 1,
+        padding: "4%",
+      }}
+    >
+      <View style={styles.titleContainer}>
+        <Text style={styles.titleText}>Settings</Text>
+      </View>
+      <Button style={styles.settingsButton} onPress={logoutHandler}>
+        Logout
+      </Button>
+      <Button style={styles.settingsButton} onPress={joinInviteHandler}>
+        Join Trip
+      </Button>
+
       <Button
         onPress={() => {
           navigation.navigate("SplitSummary", { tripid: tripCtx.tripid });
@@ -98,6 +118,13 @@ const SettingsScreen = ({ navigation }) => {
       >
         Simplify Splits
       </Button>
+      <LinkingButton
+        style={styles.settingsButton}
+        URL="https://foodfornomads.com/"
+      >
+        FoodForNomads Website
+      </LinkingButton>
+      {DEVCONTENT}
     </ScrollView>
   );
 };
@@ -105,7 +132,23 @@ const SettingsScreen = ({ navigation }) => {
 export default SettingsScreen;
 
 const styles = StyleSheet.create({
+  titleContainer: {
+    flexDirection: "row",
+
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: "2%",
+    paddingHorizontal: "4%",
+  },
+  titleText: {
+    fontSize: 22,
+    fontWeight: "bold",
+    fontStyle: "italic",
+    color: GlobalStyles.colors.gray700,
+    marginLeft: "2%",
+  },
   settingsButton: {
     paddingVertical: "2%",
+    paddingHorizontal: "8%",
   },
 });

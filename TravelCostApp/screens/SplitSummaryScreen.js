@@ -19,6 +19,7 @@ import { calcOpenSplitsTable, simplifySplits } from "../util/split";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
   const { tripid } = route.params;
+  console.log("SplitSummaryScreen ~ tripid:", tripid);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
 
@@ -33,6 +34,14 @@ const SplitSummaryScreen = ({ route, navigation }) => {
       const response = await calcOpenSplitsTable(tripid);
       console.log("getOpenSplits ~ response", response);
       setSplits(response);
+      if (splits.length < 1 && !isFetching) {
+        Toast.show({
+          type: "error",
+          text1: "No Splits!",
+          text2: "All debts are already settled!",
+        });
+        navigation.pop();
+      }
     } catch (error) {
       Toast.show({
         type: "error",
@@ -98,7 +107,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         </FlatButton>
         {showSimplify && (
           <Button
-            style={{ marginLeft: 24 }}
+            style={styles.button}
             onPress={() => {
               setSplits(simplifySplits(splits));
               setShowSimplify(false);
@@ -109,9 +118,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
           </Button>
         )}
         <Button
-          style={{
-            marginLeft: 24,
-          }}
+          style={styles.button}
           buttonStyle={{ backgroundColor: GlobalStyles.colors.errorGrayed }}
           onPress={() => {
             Alert.alert("Settle Splits function coming soon...");
@@ -131,6 +138,9 @@ const styles = StyleSheet.create({
     padding: 4,
     paddingTop: 24,
     alignItems: "center",
+  },
+  button: {
+    marginLeft: 24,
   },
   titleText: {
     fontSize: 24,

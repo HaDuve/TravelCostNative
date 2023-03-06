@@ -3,6 +3,7 @@ import { getAllExpenses } from "./http";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
+import Toast from "react-native-toast-message";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -144,7 +145,10 @@ export async function calcOpenSplitsTable(tripid) {
   } catch (error) {
     console.log(error);
   }
-  if (!expenses || expenses.length < 1) return;
+  if (!expenses || expenses.length < 1) {
+    console.log("no expenses!");
+    return;
+  }
   let openSplits = [];
   expenses.forEach((expense) => {
     if (expense.splitType === "SELF" || !expense.splitList) return;
@@ -155,6 +159,10 @@ export async function calcOpenSplitsTable(tripid) {
       }
     });
   });
+  console.log("openSplits", openSplits);
+  if (openSplits.length < 1) {
+    return openSplits;
+  }
   openSplits = sumUpSamePairs(openSplits);
   openSplits = cancelDifferences(openSplits);
 

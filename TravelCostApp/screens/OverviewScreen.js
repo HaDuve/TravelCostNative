@@ -19,7 +19,6 @@ import ExpensesOverview from "../components/ExpensesOutput/ExpensesOverview";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
-import { useFocusEffect } from "@react-navigation/native";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -40,12 +39,7 @@ const OverviewScreen = ({ navigation }) => {
     { label: i18n.t("totalLabel"), value: "total" },
   ]);
 
-  let recentExpenses = [];
-  useFocusEffect(
-    React.useCallback(() => {
-      recentExpenses = expensesCtx.getRecentExpenses(PeriodValue);
-    }, [PeriodValue])
-  );
+  const recentExpenses = expensesCtx.getRecentExpenses(PeriodValue);
 
   let todayDateString = new Date();
   todayDateString = toShortFormat(todayDateString);

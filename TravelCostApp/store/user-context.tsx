@@ -132,7 +132,6 @@ function UserContextProvider({ children }) {
     // if app is not running on emulator, always set forceOffline to false
     let forceOffline = DEBUG_FORCE_OFFLINE;
     if (Device.isDevice) forceOffline = false;
-    console.log("checkConnectionUpdateUser ~ forceOffline:", forceOffline);
     try {
       const newIsOnline = await checkInternetConnection(
         forceOffline
@@ -143,7 +142,6 @@ function UserContextProvider({ children }) {
         "HEAD"
       );
       setIsOnline(newIsOnline);
-      console.log("checkConnectionUpdateUser ~ newIsOnline:", newIsOnline);
       return newIsOnline;
     } catch (error) {
       console.log(error);

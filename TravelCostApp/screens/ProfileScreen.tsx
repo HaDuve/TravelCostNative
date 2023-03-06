@@ -23,6 +23,7 @@ import { en, de } from "../i18n/supportedLanguages";
 import { fetchTrip, fetchTripHistory, fetchUser } from "../util/http";
 import { AuthContext } from "../store/auth-context";
 import React from "react";
+import { useFocusEffect } from "@react-navigation/native";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -41,10 +42,10 @@ const ProfileScreen = ({ navigation }) => {
   let allTripsList = [];
   const [tripsList, setTripsList] = useState([]);
 
-  // useEffect(() => {
-  //   if (FreshlyCreated || !UserCtx.isOnline) return;
-  //   refreshHandler();
-  // }, [TripCtx.refreshState]);
+  useFocusEffect(() => {
+    if (tripsList.length > 0) return;
+    refreshHandler();
+  });
 
   // refreshHandler() could be moved into TripContext to be loaded correctly
   async function refreshHandler() {

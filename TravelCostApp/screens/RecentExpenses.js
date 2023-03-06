@@ -51,7 +51,6 @@ function RecentExpenses({ navigation }) {
   }, []);
 
   useEffect(() => {
-    if (!userCtx.isOnline) return;
     getExpenses(true, true);
   }, []);
 

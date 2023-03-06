@@ -19,7 +19,7 @@ function SignupScreen() {
   async function signupHandler({ name, email, password }) {
     setIsAuthenticating(true);
     // Check internet connection first
-    if (userCtx.isOnline === false) {
+    if (!(await userCtx.checkConnectionUpdateUser())) {
       Alert.alert("No internet connection", "Please try again later.");
       setIsAuthenticating(false);
       return;

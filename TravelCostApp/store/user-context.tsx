@@ -137,7 +137,7 @@ function UserContextProvider({ children }) {
         forceOffline
           ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
           : "https://www.google.com/",
-        10000,
+        15000,
         true,
         "HEAD"
       );

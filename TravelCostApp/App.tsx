@@ -388,11 +388,13 @@ function Root() {
 
   useEffect(() => {
     async function onRootMount() {
+      // wrap functions to test dataResponseTime
       const test_tripCtx_fetchAndSetCurrentTrip = dataResponseTime(
         tripCtx.fetchAndSetCurrentTrip
       );
       const test_fetchUser = dataResponseTime(fetchUser);
       const test_touchMyTraveler = dataResponseTime(touchMyTraveler);
+      // end wrap
       console.log("onRootMount ~ onRootMount");
       if (DEBUG_RESET) await asyncStoreSafeClear();
 

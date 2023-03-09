@@ -155,9 +155,9 @@ const ExpenseForm = ({
   }
 
   function openTravellerMultiPicker() {
-    // add person who paid automatically to shared list
+    // add whole traveling group who paid automatically to shared list
     if (!defaultValues) {
-      setListEQUAL([whoPaid]);
+      setListEQUAL([...currentTravellers]);
     }
     setOpenEQUAL(true);
   }

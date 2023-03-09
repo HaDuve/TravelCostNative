@@ -10,6 +10,7 @@ import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 import { toShortFormat } from "../util/date";
 import {
+  dataResponseTime,
   fetchTravelerIsTouched,
   getAllExpenses,
   unTouchTraveler,
@@ -27,6 +28,11 @@ import { en, de } from "../i18n/supportedLanguages";
 import { useInterval } from "../components/Hooks/useInterval";
 import Toast from "react-native-toast-message";
 import { DEBUG_POLLING_INTERVAL } from "../confApp";
+import { asyncStoreGetItem, asyncStoreSetItem } from "../store/async-storage";
+import {
+  fetchAndSetExpenses,
+  offlineLoad,
+} from "../components/ExpensesOutput/RecentExpensesUtil";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -51,10 +57,6 @@ function RecentExpenses({ navigation }) {
 
   useEffect(() => {
     LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
-  }, []);
-
-  useEffect(() => {
-    getExpenses(true, true);
   }, []);
 
   useInterval(
@@ -82,45 +84,35 @@ function RecentExpenses({ navigation }) {
   ) {
     // check offlinemode
     await userCtx.checkConnectionUpdateUser();
+    // console.log("RecentExpenses ~ userCtx.isOnline:", userCtx.isOnline);
     if (!userCtx.isOnline) {
-      const isLoaded = await expensesCtx.loadExpensesFromStorage();
-      console.log("RecentExpenses ~ isLoaded:", isLoaded);
-      setRefreshing(false);
-      setIsFetching(false);
+      console.log("RecentExpenses ~ userCtx.isOnline:", userCtx.isOnline);
+      setIsFetching(
+        await offlineLoad(expensesCtx, setRefreshing, setIsFetching)
+      );
       return;
     }
-    // checking isTouched
-    const isTouched = await fetchTravelerIsTouched(tripid, uid);
+    // checking isTouched or firstLoad
+    let isTouched = await fetchTravelerIsTouched(tripid, uid);
+    // console.log("RecentExpenses ~ isTouched:", isTouched);
     if (!isTouched) {
       setRefreshing(false);
       setIsFetching(false);
       return;
     }
     console.log("we are touched and fetching expenses");
-    if (!showRefIndicator && !showAnyIndicator) setIsFetching(true);
-    if (!showAnyIndicator) setRefreshing(true);
-    try {
-      const expenses = await getAllExpenses(tripid, uid);
-      expensesCtx.setExpenses(expenses);
-      await expensesCtx.saveExpensesInStorage(expenses);
-
-      const expensesSum = expenses.reduce((sum, expense) => {
-        return sum + expense.calcAmount;
-      }, 0);
-      tripCtx.setTotalSum(expensesSum);
-      await unTouchTraveler(tripid, uid);
-    } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Could not fetch trip data",
-        visibilityTime: 1000,
-      });
-      console.error(error);
-      // setError(i18n.t("fetchError") + error);
-    }
-    if (!showRefIndicator && !showAnyIndicator) setIsFetching(false);
-    if (!showAnyIndicator) setRefreshing(false);
+    // fetch and set expenses
+    const test_fetchAndSetExpenses = dataResponseTime(fetchAndSetExpenses);
+    await test_fetchAndSetExpenses(
+      showRefIndicator,
+      showAnyIndicator,
+      setIsFetching,
+      setRefreshing,
+      expensesCtx,
+      tripid,
+      uid,
+      tripCtx
+    );
   }
 
   function errorHandler() {

@@ -1,14 +1,39 @@
-import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ActivityIndicator,
+  ImageBackground,
+  Image,
+  StatusBar,
+} from "react-native";
 import React from "react";
 import { GlobalStyles } from "../../constants/styles";
-import { Image } from "react-native-svg";
 const loadingColor = GlobalStyles.colors.primaryGrayed;
 const SplashScreenOverlay = (containerStyle) => {
+  const image = { uri: "/assets/splash.png" };
   return (
-    <View style={[styles.container, containerStyle]}>
-      <ActivityIndicator size={"large"} color={loadingColor} />
-      <Text style={styles.text}>{"Loading your Trip ... "}</Text>
-    </View>
+    <>
+      <StatusBar hidden />
+      <View style={{ flex: 1 }}>
+        <ImageBackground
+          source={require("../../assets/splash.png")}
+          resizeMode={"cover"}
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <View
+            style={{
+              paddingTop: "60%",
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ActivityIndicator size={"large"} color={loadingColor} />
+          </View>
+        </ImageBackground>
+      </View>
+    </>
   );
 };
 
@@ -19,7 +44,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 24,
+    padding: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   text: {

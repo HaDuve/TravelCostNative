@@ -69,6 +69,7 @@ import ToastComponent from "./components/UI/ToastComponent";
 import { DEBUG_FORCE_OFFLINE, DEBUG_RESET } from "./confApp";
 import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
 import Toast from "react-native-toast-message";
+import { offlineLoad } from "./components/ExpensesOutput/RecentExpensesUtil";
 // LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
 // LogBox.ignoreAllLogs(); //Ignore all log notifications
 
@@ -394,12 +395,17 @@ function Root() {
       );
       const test_fetchUser = dataResponseTime(fetchUser);
       const test_touchMyTraveler = dataResponseTime(touchMyTraveler);
+      const test_userCtx_checkConnectionUpdateUser = dataResponseTime(
+        userCtx.checkConnectionUpdateUser
+      );
       // end wrap
       console.log("onRootMount ~ onRootMount");
       if (DEBUG_RESET) await asyncStoreSafeClear();
 
       // offline check and set context
-      await userCtx.checkConnectionUpdateUser();
+      const online = await test_userCtx_checkConnectionUpdateUser();
+      console.log("onRootMount ~ online:", online);
+      // await userCtx.checkConnectionUpdateUser();
 
       // fetch token and trip
       const storedToken = await asyncStoreGetItem("token");
@@ -407,13 +413,13 @@ function Root() {
       const storedTripId = await asyncStoreGetItem("currentTripId");
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
 
-      console.log(
-        "store loaded: ",
-        truncateString(storedToken, 10),
-        truncateString(storedUid, 10),
-        truncateString(storedTripId, 10),
-        freshlyCreated
-      );
+      // console.log(
+      //   "store loaded: ",
+      //   truncateString(storedToken, 10),
+      //   truncateString(storedUid, 10),
+      //   truncateString(storedTripId, 10),
+      //   freshlyCreated
+      // );
 
       if (storedToken) {
         //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
@@ -428,7 +434,7 @@ function Root() {
         // set tripId in context
         let tripData;
         if (storedTripId) {
-          console.log("onRootMount ~ storedTripId", storedTripId);
+          // console.log("onRootMount ~ storedTripId", storedTripId);
           tripData = await test_tripCtx_fetchAndSetCurrentTrip(storedTripId);
           tripCtx.setCurrentTravellers(storedTripId);
           tripCtx.setTripid(storedTripId);
@@ -473,8 +479,11 @@ function Root() {
         userCtx.addUser(userData);
         tripCtx.setCurrentTrip(tripid, tripData);
         await asyncStoreSetItem("currentTripId", tripid);
-        await test_touchMyTraveler(tripid, storedUid);
+        const isLoaded = await offlineLoad(expensesCtx);
+        console.log("onRootMount ~ isLoaded:", isLoaded);
         authCtx.authenticate(storedToken);
+        await touchMyTraveler(tripid, storedUid);
+        console.log("Root end reached");
       } else {
         authCtx.logout();
       }
@@ -482,7 +491,10 @@ function Root() {
     }
 
     onRootMount();
-    return () => console.log("!onRootMount ~ !onRootMount END");
+    return () => {
+      expensesCtx.saveExpensesInStorage(expensesCtx.expenses);
+      console.log("!onRootMount ~ !onRootMount END");
+    };
   }, []);
 
   useLayoutEffect(() => {

@@ -8,6 +8,7 @@ import { UserContext } from "../store/user-context";
 import { fetchUser } from "../util/http";
 import { TripContext } from "../store/trip-context";
 import { asyncStoreSetItem, asyncStoreSetObject } from "../store/async-storage";
+import Toast from "react-native-toast-message";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -31,9 +32,13 @@ function LoginScreen() {
       console.log("loginHandler ~ checkUser", checkUser);
       // Check if the user logged in but there is no userName, we deleted the account
       if (!checkUser || !checkUser.userName) {
-        Alert.alert(
-          "Your Account was deleted or AppData was reset, please create a new account!"
-        );
+        Toast.show({
+          type: "error",
+          position: "top",
+          text1: "Exceptional Error",
+          text2: "Please try again later!",
+          visibilityTime: 4000,
+        });
         authCtx.logout();
       }
       if (checkUser.userName && !checkUser.currentTrip) {

@@ -96,7 +96,7 @@ function ExpenseItem(props): JSX.Element {
       </View>
     ) : (
       <View style={styles.avatarContainer}>
-        <View style={[styles.avatar, GlobalStyles.shadow]}>
+        <View style={[GlobalStyles.shadow, styles.avatar]}>
           <Text style={styles.avatarText}>{whoPaid?.slice(0, 1)}</Text>
         </View>
       </View>
@@ -119,7 +119,7 @@ function ExpenseItem(props): JSX.Element {
     >
       <Pressable
         onPress={memoizedCallback}
-        style={({ pressed }) => pressed && styles.pressed}
+        style={({ pressed }) => pressed && GlobalStyles.pressed}
       >
         <View style={styles.expenseItem}>
           <View style={styles.iconContainer}>
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     minWidth: 20,
     borderRadius: 60,
     borderWidth: 1,
-    borderColor: GlobalStyles.colors.primary700,
+    borderColor: GlobalStyles.colors.primaryGrayed,
     backgroundColor: GlobalStyles.colors.gray500,
     alignItems: "center",
     justifyContent: "center",

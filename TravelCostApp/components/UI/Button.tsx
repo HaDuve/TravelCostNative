@@ -13,11 +13,13 @@ const Button = ({
     <View style={style}>
       <Pressable
         onPress={onPress}
-        style={({ pressed }) => pressed && styles.pressed}
+        style={({ pressed }) => [
+          styles.button,
+          buttonStyle,
+          pressed && GlobalStyles.pressedWithShadow,
+        ]}
       >
-        <View
-          style={[styles.button, buttonStyle, mode === "flat" && styles.flat]}
-        >
+        <View style={[mode === "flat" && styles.flat]}>
           <Text
             style={[
               GlobalStyles.buttonTextPrimary,
@@ -40,9 +42,9 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.primary500,
     borderRadius: 16,
     elevation: 3,
-    shadowColor: GlobalStyles.colors.primary800,
-    shadowRadius: 4,
-    shadowOffset: { width: 1, height: 4 },
+    shadowColor: GlobalStyles.colors.textColor,
+    shadowRadius: 3,
+    shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.4,
     overflow: "visible",
   },

@@ -5,31 +5,24 @@ import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import { UserContext } from "../../store/user-context";
 import { useContext } from "react";
+import { Ionicons } from "@expo/vector-icons";
 
 const AddExpenseButton = ({ navigation }) => {
   const userCtx = useContext(UserContext);
   const isOnline = userCtx.isOnline;
   return (
     <Pressable
+      style={({ pressed }) => [
+        styles.addButton,
+        pressed && GlobalStyles.pressedWithShadow,
+      ]}
       onPress={() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
         navigation.navigate("CategoryPick");
       }}
     >
-      <Animated.View
-        entering={FadeInDown.duration(600)}
-        style={[styles.addButton]}
-      >
-        <IconButton
-          icon="add-outline"
-          size={42}
-          color={"white"}
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            navigation.navigate("CategoryPick");
-          }}
-        />
+      <Animated.View entering={FadeInDown.duration(600)}>
+        <Ionicons name={"add-outline"} size={42} color={"white"} />
       </Animated.View>
     </Pressable>
   );
@@ -40,20 +33,20 @@ export default AddExpenseButton;
 const styles = StyleSheet.create({
   addButton: {
     backgroundColor: GlobalStyles.colors.primary400,
-    flex: 1,
     borderRadius: 999,
-    marginHorizontal: "41.5%",
-    marginTop: "-17%",
-    paddingTop: "4.3%",
-    paddingLeft: "1.0%",
+    marginHorizontal: "40%",
+    marginTop: "-100%",
+    marginBottom: "1%",
+    paddingVertical: "3.8%",
+    paddingLeft: "0.8%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
 
     elevation: 2,
     shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 1, height: 1 },
+    shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.35,
-    shadowRadius: 4,
+    shadowRadius: 3.8,
   },
 });

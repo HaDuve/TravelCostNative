@@ -5,7 +5,7 @@ import { Colors, GlobalStyles } from "../../constants/styles";
 function FlatButton({ children, onPress }) {
   return (
     <Pressable
-      style={({ pressed }) => [styles.button, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.button, pressed && GlobalStyles.pressed]}
       onPress={onPress}
     >
       <View>

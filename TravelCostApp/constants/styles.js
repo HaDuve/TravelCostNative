@@ -52,17 +52,17 @@ export const GlobalStyles = {
   },
   shadow: {
     elevation: 2,
-    borderColor: "#BFBFBF",
     shadowColor: "#BFBFBF",
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.75,
+    shadowRadius: 1.3,
   },
   strongShadow: {
     elevation: 4,
-    borderColor: "#BFBFBF",
-    shadowColor: "#BFBFBF",
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 1,
+    shadowColor: "black",
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 1.3,
   },
   shadowPrimary: {
     elevation: 2,
@@ -70,6 +70,19 @@ export const GlobalStyles = {
     shadowColor: "#538076",
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.75,
+  },
+  pressedWithShadow: {
+    elevation: 0,
+    transform: [{ scale: 0.95 }],
+    shadowOpacity: 0.12,
+    shadowOffset: { width: 1, height: 1 },
+    shadowRadius: 1,
+    opacity: 0.9,
+  },
+  pressed: {
+    elevation: 0,
+    transform: [{ scale: 0.95 }],
+    opacity: 0.9,
   },
 };
 export const CatColors = [

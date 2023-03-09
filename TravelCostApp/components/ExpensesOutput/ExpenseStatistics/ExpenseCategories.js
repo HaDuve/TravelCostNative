@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native";
+import * as Haptics from "expo-haptics";
 
 import React from "react";
 import CategoryProgressBar from "./CategoryProgressBar";
@@ -65,16 +66,20 @@ const ExpenseCategories = ({ expenses, periodName, navigation }) => {
   function renderItem(itemData) {
     return (
       <Pressable
-        style={styles.categoryCard}
-        onPress={() =>
+        style={({ pressed }) => [
+          styles.categoryCard,
+          pressed && GlobalStyles.pressedWithShadow,
+        ]}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigation.navigate("FilteredExpenses", {
             expenses: itemData.item.catExpenses,
             dayString:
               getCatString(itemData.item.cat) +
               (periodName !== "total" ? " this " : " ") +
               periodName,
-          })
-        }
+          });
+        }}
       >
         <CategoryProgressBar
           color={itemData.item.color}
@@ -130,6 +135,7 @@ export default ExpenseCategories;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginHorizontal: 6,
   },
   fallbackTextContainer: {
     flex: 1,
@@ -143,14 +149,13 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     marginHorizontal: 8,
     paddingBottom: 4,
-    // card shadow
     shadowColor: "#000",
     shadowOffset: {
-      width: 0,
+      width: 1,
       height: 2,
     },
     shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowRadius: 2.84,
     elevation: 5,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 10,

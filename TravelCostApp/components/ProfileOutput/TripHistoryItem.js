@@ -159,7 +159,7 @@ function TripHistoryItem({ tripid, setRefreshing }) {
   return (
     <Pressable
       onPress={tripPressHandler}
-      style={({ pressed }) => pressed && styles.pressed}
+      style={({ pressed }) => pressed && GlobalStyles.pressed}
     >
       <View style={[styles.tripItem, activeBorder]}>
         <View style={styles.topRow}>

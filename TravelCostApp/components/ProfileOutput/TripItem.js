@@ -111,7 +111,7 @@ function TripItem({
   return (
     <Pressable
       onPress={tripPressHandler}
-      style={({ pressed }) => pressed && styles.pressed}
+      style={({ pressed }) => pressed && GlobalStyles.pressedWithShadow}
     >
       <View style={[styles.tripItem, activeBorder]}>
         <View style={styles.topRow}>

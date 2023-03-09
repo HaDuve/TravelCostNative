@@ -7,6 +7,8 @@ import {
   Dimensions,
   Pressable,
 } from "react-native";
+import * as Haptics from "expo-haptics";
+
 import React, { memo, useContext, useCallback } from "react";
 import { ExpensesContext } from "../../../store/expenses-context";
 import {
@@ -104,7 +106,12 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
 
         return (
           <Pressable
+            style={({ pressed }) => [
+              styles.categoryCard,
+              pressed && GlobalStyles.pressedWithShadow,
+            ]}
             onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const filteredExpenses = ExpenseCtx.getSpecificDayExpenses(
                 new Date(item.day)
               );
@@ -172,7 +179,12 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
           : formatExpenseString(item.expensesSum);
         return (
           <Pressable
+            style={({ pressed }) => [
+              styles.categoryCard,
+              pressed && GlobalStyles.pressedWithShadow,
+            ]}
             onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const filteredExpenses = ExpenseCtx.getSpecificWeekExpenses(
                 new Date(item.firstDay)
               );
@@ -230,7 +242,12 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
 
         return (
           <Pressable
+            style={({ pressed }) => [
+              styles.categoryCard,
+              pressed && GlobalStyles.pressedWithShadow,
+            ]}
             onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const filteredExpenses = ExpenseCtx.getSpecificMonthExpenses(
                 new Date(item.firstDay)
               );
@@ -290,7 +307,12 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
 
         return (
           <Pressable
+            style={({ pressed }) => [
+              styles.categoryCard,
+              pressed && GlobalStyles.pressedWithShadow,
+            ]}
             onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const filteredExpenses = ExpenseCtx.getSpecificYearExpenses(
                 new Date(item.firstDay)
               );
@@ -349,16 +371,16 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
           data={listExpenseSumBudgets}
           renderItem={renderItemRef}
           ListFooterComponent={<View style={{ height: 100 }}></View>}
-          removeClippedSubviews={true}
-          maxToRenderPerBatch={7}
-          updateCellsBatchingPeriod={300}
-          initialNumToRender={7}
-          windowSize={7}
-          getItemLayout={(data, index) => ({
-            length: 50,
-            offset: 50 * index,
-            index,
-          })}
+          // removeClippedSubviews={true}
+          // maxToRenderPerBatch={7}
+          // updateCellsBatchingPeriod={300}
+          // initialNumToRender={7}
+          // windowSize={7}
+          // getItemLayout={(data, index) => ({
+          //   length: 50,
+          //   offset: 50 * index,
+          //   index,
+          // })}
         ></Animated.FlatList>
       </Animated.View>
     </Animated.View>
@@ -380,29 +402,32 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
   },
-  itemContainer: {
-    padding: 8,
-    marginBottom: 8,
-    paddingHorizontal: 24,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    // card shadow
+  categoryCard: {
     shadowColor: "#000",
     shadowOffset: {
-      width: 0,
+      width: 1,
       height: 2,
     },
     shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowRadius: 2.84,
     elevation: 5,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 10,
-    paddingBottom: 8,
+  },
+
+  itemContainer: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
     marginHorizontal: 20,
-    marginVertical: 4,
+    marginTop: 4,
+    marginBottom: 8,
+    borderRadius: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   text1: {
     fontSize: 20,
+    color: GlobalStyles.colors.textColor,
+    fontWeight: "300",
   },
   green: {
     color: GlobalStyles.colors.primary500,

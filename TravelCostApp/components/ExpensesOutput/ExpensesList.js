@@ -199,11 +199,11 @@ function ExpensesList({ expenses, refreshControl, periodValue }) {
         ListFooterComponent={<View style={{ height: 100 }} />}
         keyExtractor={(item) => item.id}
         refreshControl={refreshControl}
-        getItemLayout={(data, index) => ({
-          length: 55,
-          offset: 55 * index,
-          index,
-        })}
+        // getItemLayout={(data, index) => ({
+        //   length: 55,
+        //   offset: 55 * index,
+        //   index,
+        // })}
       />
     </Animated.View>
   );

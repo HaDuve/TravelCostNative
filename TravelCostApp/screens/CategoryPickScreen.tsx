@@ -22,6 +22,8 @@ import { Category } from "../util/category";
 import { storeCategories, updateCategories } from "../util/http";
 import { useContext } from "react";
 import { TripContext } from "../store/trip-context";
+import Toast from "react-native-toast-message";
+import { Ionicons } from "@expo/vector-icons";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -82,7 +84,12 @@ const CategoryPickScreen = ({ route, navigation }) => {
   async function catPressHandler(item) {
     setIsShaking(false);
     if (item.cat === "newCat") {
-      Alert.alert("New Category function coming soon... ");
+      Toast.show({
+        type: "error",
+        text1: "Not yet implemented",
+        text2: "This function will be available soon!",
+      });
+      navigation.pop();
       const storeCatList: Category[] = [];
       CATLIST.forEach((cat) => {
         if (cat.cat !== "newCat") {
@@ -96,7 +103,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
         }
       });
       // navigate to ManageCategory
-      navigation.navigate("ManageCategory", { storeCatList });
+      // navigation.navigate("ManageCategory", { storeCatList });
       // try {
       //   await updateCategories(tripid, storeCatList);
       // } catch (error) {
@@ -149,22 +156,22 @@ const CategoryPickScreen = ({ route, navigation }) => {
     item.shakeAnimation = new Animated.Value(0);
     if (isShaking) startShake(item);
     return (
-      <Animated.View
-        style={[
+      <Pressable
+        style={({ pressed }) => [
+          styles.widthConstraint,
+          GlobalStyles.strongShadow,
           styles.itemContainer,
           styles.buttonStyle,
-          GlobalStyles.strongShadow,
-          styles.widthConstraint,
-          { transform: [{ translateX: item.shakeAnimation }] },
+          pressed && GlobalStyles.pressedWithShadow,
         ]}
+        onPress={catPressHandler.bind(this, item)}
+        // onLongPress={catLongPressHandler.bind(this, item)}
       >
-        <Pressable
-          style={({ pressed }) => [
+        <Animated.View
+          style={[
             styles.widthConstraint,
-            pressed && styles.pressed,
+            { transform: [{ translateX: item.shakeAnimation }] },
           ]}
-          onPress={catPressHandler.bind(this, item)}
-          onLongPress={catLongPressHandler.bind(this, item)}
         >
           <Animated.View
             style={[
@@ -172,17 +179,11 @@ const CategoryPickScreen = ({ route, navigation }) => {
               { transform: [{ translateX: item.shakeAnimation }] },
             ]}
           >
-            <IconButton
-              icon={item.icon}
-              size={42}
-              color={item.color}
-              onPress={catPressHandler.bind(this, item)}
-              onLongPress={catLongPressHandler.bind(this, item)}
-            ></IconButton>
+            <Ionicons name={item.icon} size={42} color={item.color} />
             <Text style={styles.itemText}>{item.catString}</Text>
           </Animated.View>
-        </Pressable>
-      </Animated.View>
+        </Animated.View>
+      </Pressable>
     );
   }
 
@@ -243,7 +244,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   centerStyle: {
-    justifyContent: "flex-start",
+    flex: 1,
+
+    justifyContent: "center",
     alignItems: "center",
   },
   buttonContainer: {
@@ -268,7 +271,7 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 16,
-    marginTop: "-6%",
+    marginTop: "2%",
     color: GlobalStyles.colors.textColor,
     fontWeight: "200",
     fontStyle: "italic",

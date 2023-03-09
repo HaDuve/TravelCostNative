@@ -22,11 +22,13 @@ const LinkingButton = ({
     <View style={style}>
       <Pressable
         onPress={handleClick}
-        style={({ pressed }) => pressed && styles.pressed}
+        style={({ pressed }) => [
+          styles.button,
+          buttonStyle,
+          pressed && GlobalStyles.pressedWithShadow,
+        ]}
       >
-        <View
-          style={[styles.button, buttonStyle, mode === "flat" && styles.flat]}
-        >
+        <View style={[mode === "flat" && styles.flat]}>
           <Text
             style={[
               GlobalStyles.buttonTextPrimary,

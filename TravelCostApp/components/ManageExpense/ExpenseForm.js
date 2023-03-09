@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
+import * as Haptics from "expo-haptics";
 import {
   Alert,
   StyleSheet,
@@ -10,6 +11,7 @@ import {
   Keyboard,
   Platform,
   KeyboardAvoidingView,
+  LayoutAnimation,
 } from "react-native";
 import Input from "./Input";
 import Button from "../UI/Button";
@@ -42,6 +44,14 @@ import { I18n } from "i18n-js";
 import { en, de } from "../../i18n/supportedLanguages";
 import CurrencyPicker from "../Currency/CurrencyPicker";
 import { truncateString } from "../../util/string";
+import Toast from "react-native-toast-message";
+import { Ionicons } from "@expo/vector-icons";
+import Animated, {
+  FadeInRight,
+  FadeOutLeft,
+  SlideInRight,
+  SlideOutLeft,
+} from "react-native-reanimated";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -405,6 +415,7 @@ const ExpenseForm = ({
   }
 
   function toggleAdvancedHandler() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (hideAdvanced) {
       sethideAdvanced(false);
     } else {
@@ -500,16 +511,15 @@ const ExpenseForm = ({
           {/* always show more options when editing */}
           {!isEditing && (
             <Pressable onPress={toggleAdvancedHandler}>
-              <View style={styles.advancedRow}>
-                <IconButton
-                  icon={
+              <Animated.View style={styles.advancedRow}>
+                <Ionicons
+                  name={
                     hideAdvanced
                       ? "arrow-down-circle-outline"
                       : "arrow-forward-circle-outline"
                   }
-                  color={GlobalStyles.colors.primary500}
                   size={28}
-                  onPress={toggleAdvancedHandler}
+                  color={GlobalStyles.colors.primary500}
                 />
                 {hideAdvanced && (
                   <Text style={styles.advancedText}>
@@ -521,7 +531,7 @@ const ExpenseForm = ({
                     {i18n.t("showLessOptions")}
                   </Text>
                 )}
-              </View>
+              </Animated.View>
             </Pressable>
           )}
           {/* toggleable content */}
@@ -735,18 +745,20 @@ const ExpenseForm = ({
                       return (
                         <View
                           style={[
+                            GlobalStyles.strongShadow,
                             {
                               flex: 1,
                               minWidth: 120,
-                              maxWidth: 120,
+                              maxWidth: 145,
+                              marginBottom: 16,
                               borderWidth: 1,
                               borderRadius: 16,
                               padding: 8,
                               margin: 8,
                               backgroundColor:
                                 GlobalStyles.colors.backgroundColor,
+                              borderColor: GlobalStyles.colors.gray700,
                             },
-                            GlobalStyles.strongShadow,
                           ]}
                         >
                           <Text
@@ -795,7 +807,6 @@ const ExpenseForm = ({
                                   itemData.index,
                                   itemData.item
                                 ),
-                                // TODO: mask this input https://www.npmjs.com/package/react-native-mask-input and fix random response
                                 value: splitValue ? splitValue : "",
                               }}
                             ></Input>
@@ -883,6 +894,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   advancedRow: {
+    marginTop: "6%",
+    marginLeft: "2%",
     flexDirection: "row",
     justifyContent: "flex-start",
   },
@@ -916,7 +929,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 0,
   },
   advancedText: {
-    marginTop: 14,
+    marginTop: 9,
+    marginLeft: 12,
     fontSize: 12,
     fontStyle: "italic",
     fontWeight: "300",

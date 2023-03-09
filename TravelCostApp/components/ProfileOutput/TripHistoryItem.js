@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import * as Updates from "expo-updates";
+import * as Haptics from "expo-haptics";
 
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
@@ -120,6 +121,7 @@ function TripHistoryItem({ tripid, setRefreshing }) {
   }
 
   function tripPressHandler() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (userCtx.isOnline === false) {
       Alert.alert("You are offline", "Please go online to manage your trip");
       return;

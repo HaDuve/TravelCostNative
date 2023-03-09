@@ -104,12 +104,17 @@ const ExpenseForm = ({
       ? getFormattedDate(defaultValues.date)
       : getFormattedDate(new Date())
   );
-  const openDatePickerRange = () => setShowDatePickerRange(true);
+  const openDatePickerRange = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setShowDatePickerRange(true);
+  };
   const onCancelRange = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(false);
   };
 
   const onConfirmRange = (output) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(false);
     // hotfixing datebug for asian countries
     const startDatePlus1 = getDatePlusDays(output.startDate, 1);
@@ -254,6 +259,7 @@ const ExpenseForm = ({
   }
 
   function submitHandler() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const expenseData = {
       uid: AuthCtx.uid,
       amount: +inputs.amount.value,
@@ -345,6 +351,7 @@ const ExpenseForm = ({
   }
 
   function fastSubmit() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const expenseData = {
       uid: AuthCtx.uid,
       amount: +inputs.amount.value,
@@ -502,6 +509,7 @@ const ExpenseForm = ({
               color={GlobalStyles.colors.primary500}
               size={36}
               onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 navigation.navigate("CategoryPick", {
                   editedExpenseId: editedExpenseId,
                 });

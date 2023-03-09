@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Pressable } from "react-native";
 import React from "react";
 import { GlobalStyles } from "../../constants/styles";
+import * as Haptics from "expo-haptics";
 
 const Button = ({
   children,
@@ -9,10 +10,15 @@ const Button = ({
   style = {},
   buttonStyle = {},
 }) => {
+  const onPressHandler = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onPress();
+    return;
+  };
   return (
     <View style={style}>
       <Pressable
-        onPress={onPress}
+        onPress={onPressHandler}
         style={({ pressed }) => [
           styles.button,
           buttonStyle,

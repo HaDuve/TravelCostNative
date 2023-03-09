@@ -8,6 +8,8 @@ import {
   Text,
   View,
 } from "react-native";
+import * as Haptics from "expo-haptics";
+
 import React, { useState } from "react";
 import IconButton from "../components/UI/IconButton";
 import Button from "../components/UI/Button";
@@ -82,6 +84,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
   ];
 
   async function catPressHandler(item) {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setIsShaking(false);
     if (item.cat === "newCat") {
       Toast.show({

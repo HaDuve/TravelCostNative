@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { memo, useContext, useEffect, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 
 import ErrorOverlay from "../components/UI/ErrorOverlay";
@@ -25,6 +25,7 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 const OverviewScreen = ({ navigation }) => {
+
   const expensesCtx = useContext(ExpensesContext);
   const userCtx = useContext(UserContext);
 
@@ -40,7 +41,6 @@ const OverviewScreen = ({ navigation }) => {
   ]);
 
   const recentExpenses = expensesCtx.getRecentExpenses(PeriodValue);
-
   let todayDateString = new Date();
   todayDateString = toShortFormat(todayDateString);
 

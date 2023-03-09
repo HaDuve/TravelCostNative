@@ -192,6 +192,7 @@ function ExpensesList({ expenses, refreshControl, periodValue }) {
     >
       <Animated.FlatList
         // ref={flatListRef}
+        scrollEnabled={false}
         itemLayoutAnimation={layoutAnim}
         data={expenses}
         renderItem={renderExpenseItem.bind(this, isOnline)}

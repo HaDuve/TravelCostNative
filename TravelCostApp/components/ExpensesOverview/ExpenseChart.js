@@ -22,8 +22,6 @@ const ExpenseChart = ({
   currency,
   navigation,
 }) => {
-  console.log("ExpenseChart rendered");
-
   const data = inputData
     ? inputData
     : // DUMMYDATA BEGIN
@@ -67,6 +65,7 @@ const ExpenseChart = ({
       obj.expensesSum = CAP * obj.dailyBudget;
     }
   });
+  console.log("expenseChart");
   return (
     <View style={styles.container}>
       <VictoryChart
@@ -137,7 +136,7 @@ const ExpenseChart = ({
   );
 };
 
-export default memo(ExpenseChart);
+export default ExpenseChart;
 
 const styles = StyleSheet.create({
   container: {

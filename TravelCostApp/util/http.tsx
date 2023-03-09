@@ -274,7 +274,6 @@ export async function updateTrip(tripid: string, tripData) {
 }
 
 export async function fetchTrip(tripid: string): Promise<TripData> {
-  console.log("!fetchTrip ~ fetchTrip expensive call!");
   if (!tripid) return null;
   // console.log("https: ~ fetchTrip ~ tripid", tripid);
   const response = await axios.get(

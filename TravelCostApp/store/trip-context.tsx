@@ -118,8 +118,8 @@ function TripContextProvider({ children }) {
     try {
       const trip = await fetchTrip(tripid);
       trip.tripid = tripid;
-      setCurrentTrip(tripid, trip);
-      saveTripDataInStorage(trip);
+      await setCurrentTrip(tripid, trip);
+      await saveTripDataInStorage(trip);
       return trip;
     } catch (error) {
       console.warn(

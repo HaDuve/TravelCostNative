@@ -55,7 +55,7 @@ function ExpenseItem(props): JSX.Element {
       navigation.navigate("ManageExpense", {
         expenseId: id,
       }),
-    []
+    [id, navigation]
   );
   const originalCurrency = !sameCurrency ? (
     <>
@@ -150,7 +150,7 @@ function ExpenseItem(props): JSX.Element {
     </Animated.View>
   );
 }
-export default memo(ExpenseItem);
+export default ExpenseItem;
 
 ExpenseItem.propTypes = {
   id: PropTypes.string.isRequired,

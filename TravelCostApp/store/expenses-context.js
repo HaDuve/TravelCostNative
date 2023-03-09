@@ -244,16 +244,22 @@ function ExpensesContextProvider({ children }) {
   }
 
   async function loadExpensesFromStorage() {
+    console.log(
+      "loadExpensesFromStorage ~ loadExpensesFromStorage:",
+      loadExpensesFromStorage
+    );
     if (expensesState.length !== 0) {
       console.log("expenses not empty, will not load again");
       return false;
     }
     const expenses = await asyncStoreGetObject("expenses");
+    const expArray = [];
     if (expenses) {
       expenses.forEach((expense) => {
         expense.date = new Date(expense.date);
-        addExpense(expense);
+        expArray.push(expense);
       });
+      setExpenses(expArray);
     } else {
       console.warn("no Expenses loaded from Storage!");
     }

@@ -1,5 +1,12 @@
 Changelog Travel Expense App
 
+1.0.52
+- improved Loading Screen
+- improved Button feedback for User Experience
+- faster Startup Time
+- improved equally shared Split Logic and Text
+- hidden DEV content
+
 1.0.51
 - fixed slow connection login bug
 

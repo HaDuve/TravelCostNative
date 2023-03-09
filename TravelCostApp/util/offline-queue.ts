@@ -232,7 +232,7 @@ export const sendOfflineQueue = async () => {
     Toast.show({
       type: "success",
       text1: "Online again!",
-      text2: "Synchronized " + queue.length + " offline Changes!",
+      text2: "Synchronizing " + queue.length + " offline Changes!",
     });
   } else {
     console.log("no queue");

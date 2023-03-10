@@ -1,5 +1,9 @@
 Changelog Travel Expense App
 
+1.0.54
+- improved calendar colours
+- adjusted styling for different devices
+
 1.0.53
 - improved time representation
 - fixed time zone bugs

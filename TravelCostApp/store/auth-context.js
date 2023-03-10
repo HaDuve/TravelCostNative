@@ -12,7 +12,7 @@ export const AuthContext = createContext({
   isAuthenticated: false,
   authenticate: (token) => {},
   offlineAuthenticate: (token) => {},
-  logout: () => {},
+  logout: async () => {},
   setUserID: (uid) => {},
 });
 
@@ -30,10 +30,10 @@ function AuthContextProvider({ children }) {
     AsyncStorage.setItem("token", token);
   }
 
-  function logout() {
+  async function logout() {
     setAuthToken(null);
-    AsyncStorage.removeItem("token");
-    AsyncStorage.removeItem("uid");
+    await AsyncStorage.removeItem("token");
+    await AsyncStorage.removeItem("uid");
   }
 
   function setUserID(uid) {

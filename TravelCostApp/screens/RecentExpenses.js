@@ -39,6 +39,7 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 function RecentExpenses({ navigation }) {
+  const test_getExpenses = dataResponseTime(getExpenses);
   const expensesCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
@@ -53,7 +54,7 @@ function RecentExpenses({ navigation }) {
   const [PeriodValue, setPeriodValue] = useState("day");
 
   const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = getExpenses.bind(this, true);
+  const onRefresh = test_getExpenses.bind(this, true);
 
   useEffect(() => {
     LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
@@ -62,7 +63,8 @@ function RecentExpenses({ navigation }) {
   useInterval(
     () => {
       const asyncPolling = async () => {
-        await getExpenses(true, true);
+        await test_getExpenses(true, true);
+        // await getExpenses(true, true);
       };
       asyncPolling();
     },

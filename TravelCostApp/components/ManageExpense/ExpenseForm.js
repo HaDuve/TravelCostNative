@@ -52,6 +52,7 @@ import Animated, {
   SlideInRight,
   SlideOutLeft,
 } from "react-native-reanimated";
+import { asyncStoreSetItem } from "../../store/async-storage";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -345,8 +346,10 @@ const ExpenseForm = ({
     }
 
     // update lastcountry and lastcurrency
-    UserCtx.lastCountry = inputs.country.value;
-    UserCtx.lastCurrency = inputs.currency.value;
+    UserCtx.setLastCountry(inputs.country.value);
+    asyncStoreSetItem("lastCountry", inputs.country.value);
+    UserCtx.setLastCurrency(inputs.currency.value);
+    asyncStoreSetItem("lastCurrency", inputs.currency.value);
     onSubmit(expenseData);
   }
 

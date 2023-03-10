@@ -438,6 +438,17 @@ function Root() {
           tripData = await test_tripCtx_fetchAndSetCurrentTrip(storedTripId);
           tripCtx.setCurrentTravellers(storedTripId);
           tripCtx.setTripid(storedTripId);
+        } else {
+          Toast.show({
+            type: "error",
+            text1: "Trip not found",
+            text2: "Please login again!",
+            visibilityTime: 5000,
+          });
+          await asyncStoreSafeClear();
+          await authCtx.logout();
+          setAppIsReady(true);
+          return;
         }
 
         // send offline queue if we have one
@@ -454,8 +465,7 @@ function Root() {
           Toast.show({
             type: "error",
             text1: "Account not found",
-            text2:
-              "Your Account was deleted or the App Database was reset, please create a new account!",
+            text2: "Please create a new account!",
             visibilityTime: 5000,
           });
           await asyncStoreSafeClear();
@@ -477,6 +487,10 @@ function Root() {
         const tripid = userData.currentTrip;
         console.log("onRootMount ~ userData", userData);
         userCtx.addUser(userData);
+        const lastCountry = await asyncStoreGetItem("lastCountry");
+        const lastCurrency = await asyncStoreGetItem("lastCurrency");
+        if (lastCountry) userCtx.setLastCountry(lastCountry);
+        if (lastCurrency) userCtx.setLastCurrency(lastCurrency);
         tripCtx.setCurrentTrip(tripid, tripData);
         await asyncStoreSetItem("currentTripId", tripid);
         const isLoaded = await offlineLoad(expensesCtx);
@@ -489,8 +503,9 @@ function Root() {
       }
       setAppIsReady(true);
     }
-
-    onRootMount();
+    const test_onRootMount = dataResponseTime(onRootMount);
+    test_onRootMount();
+    // onRootMount();
     return () => {
       expensesCtx.saveExpensesInStorage(expensesCtx.expenses);
       console.log("!onRootMount ~ !onRootMount END");

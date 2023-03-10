@@ -462,6 +462,19 @@ const ExpenseForm = ({
       <DatePicker
         isVisible={showDatePickerRange}
         mode={"range"}
+        startDate={DateTime.now().toJSDate()}
+        endDate={DateTime.now().plus({ day: 1 }).toJSDate()}
+        colorOptions={{
+          headerColor: GlobalStyles.colors.primaryGrayed,
+          headerTextColor: GlobalStyles.colors.backgroundColor,
+          backgroundColor: GlobalStyles.colors.backgroundColor,
+          changeYearModalColor: GlobalStyles.colors.backgroundColor,
+          selectedDateTextColor: GlobalStyles.colors.backgroundColor,
+          dateTextColor: GlobalStyles.colors.textColor,
+          selectedDateBackgroundColor: GlobalStyles.colors.primaryGrayed,
+          confirmButtonColor: GlobalStyles.colors.primary700,
+          weekDaysColor: GlobalStyles.colors.primary700,
+        }}
         onCancel={onCancelRange}
         onConfirm={onConfirmRange}
         startDate={DateTime.now().toJSDate()}
@@ -473,6 +486,17 @@ const ExpenseForm = ({
     <DatePicker
       isVisible={showDatePickerRange}
       mode={"range"}
+      colorOptions={{
+        headerColor: GlobalStyles.colors.primaryGrayed,
+        headerTextColor: GlobalStyles.colors.backgroundColor,
+        backgroundColor: GlobalStyles.colors.backgroundColor,
+        changeYearModalColor: GlobalStyles.colors.backgroundColor,
+        selectedDateTextColor: GlobalStyles.colors.backgroundColor,
+        dateTextColor: GlobalStyles.colors.textColor,
+        selectedDateBackgroundColor: GlobalStyles.colors.primaryGrayed,
+        confirmButtonColor: GlobalStyles.colors.primary700,
+        weekDaysColor: GlobalStyles.colors.primary700,
+      }}
       onCancel={onCancelRange}
       onConfirm={onConfirmRange}
       startDate={DateTime.now().toJSDate()}
@@ -503,6 +527,7 @@ const ExpenseForm = ({
               // autoFocus={true}
             />
             <IconButton
+              buttonStyle={{ padding: "4%" }}
               icon={
                 defaultValues
                   ? newCat
@@ -696,7 +721,7 @@ const ExpenseForm = ({
                   />
                 )}
               </View>
-              {!loadingTravellers && (
+              {!loadingTravellers && !splitTypeSelf && (
                 <DropDownPicker
                   open={openEQUAL}
                   value={splitTravellersList}
@@ -873,7 +898,7 @@ export default ExpenseForm;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginBottom: "50%",
+    marginBottom: "20%",
   },
   form: {
     flex: 1,

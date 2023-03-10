@@ -589,9 +589,23 @@ const ExpenseForm = ({
                     {startDate && toShortFormat(new Date(startDate))}
                   </Text>
                   {dateIsRanged && (
-                    <Text style={styles.advancedText}>
-                      - duplicate until -{" "}
-                    </Text>
+                    <Pressable
+                      onPress={() => {
+                        Alert.alert(
+                          "Not implemented yet",
+                          "Sorry, this feature is not implemented yet.",
+                          [
+                            {
+                              text: "OK",
+                              onPress: () => console.log("OK Pressed"),
+                              style: "cancel",
+                            },
+                          ]
+                        );
+                      }}
+                    >
+                      <Text style={styles.advancedText}>- duplicate - </Text>
+                    </Pressable>
                   )}
                   {dateIsRanged && (
                     <Text style={styles.advancedText}>

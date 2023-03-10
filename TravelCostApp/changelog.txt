@@ -1,5 +1,12 @@
 Changelog Travel Expense App
 
+1.0.53
+- improved time representation
+- fixed time zone bugs
+- improved memory of last currency
+- finalized button haptic feedback
+
+
 1.0.52
 - improved Loading Screen
 - improved Button feedback for User Experience

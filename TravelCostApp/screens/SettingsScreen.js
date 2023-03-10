@@ -16,6 +16,8 @@ import { ScrollView } from "react-native-gesture-handler";
 import { GlobalStyles } from "../constants/styles";
 import LinkingButton from "../components/UI/LinkButton";
 import { DEV } from "../confApp";
+import { useFocusEffect } from "@react-navigation/native";
+import { DateTime } from "luxon";
 
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
@@ -32,6 +34,28 @@ const SettingsScreen = ({ navigation }) => {
   const userName = userCtx.userName;
   const addExpense = expensesCtx.addExpense;
   const [isDEV, setIsDEV] = useState(DEV);
+  const [timeZoneString, setTimeZoneString] = useState("");
+
+  // Show detailed timezone info
+  useFocusEffect(
+    React.useCallback(() => {
+      // Do something when the screen is focused
+      console.log("SettingsScreen ~ useFocusEffect");
+      const timeZone =
+        DateTime.now().setLocale(i18n.locale).toLocaleString({
+          weekday: "short",
+          month: "short",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        }) +
+        " " +
+        DateTime.now().zoneName +
+        " " +
+        DateTime.now().toFormat("ZZZZ");
+      setTimeZoneString(timeZone);
+    }, [])
+  );
 
   const DEVCONTENT = isDEV && (
     <View>
@@ -65,6 +89,7 @@ const SettingsScreen = ({ navigation }) => {
         {/* danach muss zurueck konvertiert werden  */}
         Export FoodForNomads
       </Button>
+      <Text>{timeZoneString}</Text>
     </View>
   );
 
@@ -121,6 +146,15 @@ const SettingsScreen = ({ navigation }) => {
       >
         FoodForNomads Website
       </LinkingButton>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingVertical: "2%",
+          paddingHorizontal: "4%",
+        }}
+      ></View>
       {DEVCONTENT}
     </ScrollView>
   );

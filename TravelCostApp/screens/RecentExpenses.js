@@ -33,6 +33,8 @@ import {
   fetchAndSetExpenses,
   offlineLoad,
 } from "../components/ExpensesOutput/RecentExpensesUtil";
+import { _toShortFormat } from "../util/dateTime";
+import { useFocusEffect } from "@react-navigation/native";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -56,6 +58,14 @@ function RecentExpenses({ navigation }) {
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = test_getExpenses.bind(this, true);
+
+  const [dateTimeString, setDateTimeString] = useState("");
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setDateTimeString(_toShortFormat(DateTime.now()));
+    }, [])
+  );
 
   useEffect(() => {
     LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
@@ -132,13 +142,10 @@ function RecentExpenses({ navigation }) {
   let recentExpenses = [];
   recentExpenses = expensesCtx.getRecentExpenses(PeriodValue);
 
-  let todayDateString = DateTime.now().toLocaleString(DateTime.DATE_FULL);
-  // todayDateString = toShortFormat(todayDateString);
-
   return (
     <View style={styles.container}>
       <View style={styles.dateHeader}>
-        <Text style={styles.dateString}>{todayDateString}</Text>
+        <Text style={styles.dateString}>{dateTimeString}</Text>
       </View>
       <View style={styles.header}>
         <DropDownPicker

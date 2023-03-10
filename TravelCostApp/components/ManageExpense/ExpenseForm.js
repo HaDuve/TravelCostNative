@@ -53,6 +53,7 @@ import Animated, {
   SlideOutLeft,
 } from "react-native-reanimated";
 import { asyncStoreSetItem } from "../../store/async-storage";
+import { DateTime } from "luxon";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -98,12 +99,12 @@ const ExpenseForm = ({
   const [startDate, setStartDate] = useState(
     defaultValues
       ? getFormattedDate(defaultValues.date)
-      : getFormattedDate(new Date())
+      : getFormattedDate(DateTime.now())
   );
   const [endDate, setEndDate] = useState(
     defaultValues
       ? getFormattedDate(defaultValues.date)
-      : getFormattedDate(new Date())
+      : getFormattedDate(DateTime.now())
   );
   const openDatePickerRange = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -358,8 +359,8 @@ const ExpenseForm = ({
     const expenseData = {
       uid: AuthCtx.uid,
       amount: +inputs.amount.value,
-      date: new Date(),
-      endDate: new Date(),
+      date: DateTime.now(),
+      endDate: DateTime.now(),
       description: getCatString(pickedCat),
       category: pickedCat,
       country: UserCtx.lastCountry ? UserCtx.lastCountry : UserCtx.homeCountry,
@@ -384,7 +385,7 @@ const ExpenseForm = ({
     }
 
     if (!inputs.date.isValid) {
-      const today = new Date();
+      const today = DateTime.now();
       setStartDate(today);
       setEndDate(today);
       // inputChangedHandler("date", getFormattedDate(today));
@@ -463,8 +464,8 @@ const ExpenseForm = ({
         mode={"range"}
         onCancel={onCancelRange}
         onConfirm={onConfirmRange}
-        startDate={new Date()}
-        endDate={new Date()}
+        startDate={DateTime.now()}
+        endDate={DateTime.now()}
         language={Localization.locale.slice(0, 2)}
       />
     </View>
@@ -474,8 +475,8 @@ const ExpenseForm = ({
       mode={"range"}
       onCancel={onCancelRange}
       onConfirm={onConfirmRange}
-      startDate={new Date()}
-      endDate={new Date()}
+      startDate={DateTime.now()}
+      endDate={DateTime.now()}
       language={Localization.locale.slice(0, 2)}
     />
   );

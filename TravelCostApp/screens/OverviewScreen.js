@@ -19,18 +19,28 @@ import ExpensesOverview from "../components/ExpensesOutput/ExpensesOverview";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
+import { DateTime } from "luxon";
+import { _toShortFormat } from "../util/dateTime";
+import { useFocusEffect } from "@react-navigation/native";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
 const OverviewScreen = ({ navigation }) => {
-
   const expensesCtx = useContext(ExpensesContext);
   const userCtx = useContext(UserContext);
 
   const [open, setOpen] = useState(false);
   const [PeriodValue, setPeriodValue] = useState(userCtx.periodName);
+
+  const [dateTimeString, setDateTimeString] = useState("");
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setDateTimeString(_toShortFormat(DateTime.now()));
+    }, [])
+  );
 
   const [items, setItems] = useState([
     { label: i18n.t("todayLabel"), value: "day" },
@@ -41,13 +51,11 @@ const OverviewScreen = ({ navigation }) => {
   ]);
 
   const recentExpenses = expensesCtx.getRecentExpenses(PeriodValue);
-  let todayDateString = new Date();
-  todayDateString = toShortFormat(todayDateString);
 
   return (
     <View style={styles.container}>
       <View style={styles.dateHeader}>
-        <Text style={styles.dateString}>{todayDateString}</Text>
+        <Text style={styles.dateString}>{dateTimeString}</Text>
       </View>
       <View style={styles.header}>
         <DropDownPicker

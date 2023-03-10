@@ -184,7 +184,7 @@ const ManageExpense = ({ route, navigation }) => {
           for (let i = 0; i <= days; i++) {
             console.log("day nr: ", i);
             const newDate = getDatePlusDays(day1, i);
-
+            newDate.setHours(new Date().getHours(), new Date().getMinutes());
             expenseData.date = expenseData.endDate = newDate;
             const id = await storeExpenseOnlineOffline(item, userCtx.isOnline);
             expenseCtx.addExpense({ ...expenseData, id: id });

@@ -55,6 +55,7 @@ function RecentExpenses({ navigation }) {
 
   const [open, setOpen] = useState(false);
   const [PeriodValue, setPeriodValue] = useState("day");
+  userCtx.setPeriodString(PeriodValue);
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = test_getExpenses.bind(this, true);

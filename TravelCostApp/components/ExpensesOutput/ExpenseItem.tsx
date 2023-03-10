@@ -25,6 +25,8 @@ import { FlatList } from "react-native-gesture-handler";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../../i18n/supportedLanguages";
+import { DateTime } from "luxon";
+import { UserContext } from "../../store/user-context";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -44,6 +46,7 @@ function ExpenseItem(props): JSX.Element {
   } = props;
   const navigation = useNavigation();
   const TripCtx = useContext(TripContext);
+  const UserCtx = useContext(UserContext);
   const homeCurrency = TripCtx.tripCurrency;
   const calcAmountString = formatExpenseString(calcAmount);
   const amountString = formatExpenseString(amount);
@@ -106,11 +109,13 @@ function ExpenseItem(props): JSX.Element {
 
   let dateString = date ? date : "no date";
   // if date is today, show "Today" instead of date
+  // if periodName is "today" dont show "today"
+  const todayString = UserCtx.periodName === "day" ? "" : `${i18n.t("today")} `;
+  const hourAndMinuteString = DateTime.fromJSDate(date).toFormat("HH:mm");
   if (isToday(new Date(date))) {
-    dateString =
-      // date.getHours() + ":" + date.getMinutes() + " - " +
-      i18n.t("today");
+    dateString = `${todayString}${hourAndMinuteString}`;
   } else dateString = toShortFormat(date);
+
   return (
     <Animated.View
       entering={FadeInRight}

@@ -119,10 +119,10 @@ const ExpenseForm = ({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(false);
     // hotfixing datebug for asian countries
-    const startDatePlus1 = getDatePlusDays(output.startDate, 1);
-    const endDatePlus1 = getDatePlusDays(output.endDate, 1);
-    const startDateFormat = getFormattedDate(startDatePlus1);
-    const endDateFormat = getFormattedDate(endDatePlus1);
+    const startDate = DateTime.fromJSDate(output.startDate);
+    const endDate = DateTime.fromJSDate(output.endDate);
+    const startDateFormat = getFormattedDate(startDate);
+    const endDateFormat = getFormattedDate(endDate);
     setStartDate(startDateFormat);
     setEndDate(endDateFormat);
   };
@@ -359,8 +359,8 @@ const ExpenseForm = ({
     const expenseData = {
       uid: AuthCtx.uid,
       amount: +inputs.amount.value,
-      date: DateTime.now(),
-      endDate: DateTime.now(),
+      date: DateTime.now().toJSDate(),
+      endDate: DateTime.now().toJSDate(),
       description: getCatString(pickedCat),
       category: pickedCat,
       country: UserCtx.lastCountry ? UserCtx.lastCountry : UserCtx.homeCountry,
@@ -385,7 +385,7 @@ const ExpenseForm = ({
     }
 
     if (!inputs.date.isValid) {
-      const today = DateTime.now();
+      const today = DateTime.now().toJSDate();
       setStartDate(today);
       setEndDate(today);
       // inputChangedHandler("date", getFormattedDate(today));
@@ -464,8 +464,8 @@ const ExpenseForm = ({
         mode={"range"}
         onCancel={onCancelRange}
         onConfirm={onConfirmRange}
-        startDate={DateTime.now()}
-        endDate={DateTime.now()}
+        startDate={DateTime.now().toJSDate()}
+        endDate={DateTime.now().toJSDate()}
         language={Localization.locale.slice(0, 2)}
       />
     </View>
@@ -475,8 +475,8 @@ const ExpenseForm = ({
       mode={"range"}
       onCancel={onCancelRange}
       onConfirm={onConfirmRange}
-      startDate={DateTime.now()}
-      endDate={DateTime.now()}
+      startDate={DateTime.now().toJSDate()}
+      endDate={DateTime.now().toJSDate()}
       language={Localization.locale.slice(0, 2)}
     />
   );

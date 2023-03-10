@@ -132,8 +132,8 @@ function RecentExpenses({ navigation }) {
   let recentExpenses = [];
   recentExpenses = expensesCtx.getRecentExpenses(PeriodValue);
 
-  let todayDateString = new Date();
-  todayDateString = toShortFormat(todayDateString);
+  let todayDateString = DateTime.now().toLocaleString(DateTime.DATE_FULL);
+  // todayDateString = toShortFormat(todayDateString);
 
   return (
     <View style={styles.container}>

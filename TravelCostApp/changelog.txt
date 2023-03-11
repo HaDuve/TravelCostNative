@@ -1,4 +1,10 @@
-Changelog Travel Expense App
+Change log Travel Expense App
+
+1.0.55
+- load expenses faster (especially with bad internet or offline)
+- does not fetch new data when in background anymore
+- improves fast submitting using advanced options
+- checking in intervals if offline changes can be uploaded
 
 1.0.54
 - improved calendar colours

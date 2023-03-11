@@ -66,10 +66,16 @@ i18n.enableFallback = true;
 // import { LogBox } from "react-native";
 import ManageCategoryScreen from "./screens/ManageCategoryScreen";
 import ToastComponent from "./components/UI/ToastComponent";
-import { DEBUG_FORCE_OFFLINE, DEBUG_RESET } from "./confApp";
+import {
+  DEBUG_FORCE_OFFLINE,
+  DEBUG_RESET,
+  DEBUG_POLLING_INTERVAL,
+} from "./confApp";
 import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
 import Toast from "react-native-toast-message";
 import { offlineLoad } from "./components/ExpensesOutput/RecentExpensesUtil";
+import { useInterval } from "./components/Hooks/useInterval";
+import { isForeground } from "./util/appState";
 // LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
 // LogBox.ignoreAllLogs(); //Ignore all log notifications
 
@@ -371,6 +377,19 @@ function Root() {
   const tripCtx = useContext(TripContext);
   const expensesCtx = useContext(ExpensesContext);
 
+  // check regularly
+  useInterval(
+    () => {
+      if (isForeground() && authCtx.isAuthenticated) {
+        const asyncQueue = async () => {
+          await sendOfflineQueue();
+        };
+        asyncQueue();
+      }
+    },
+    DEBUG_POLLING_INTERVAL * 1.7,
+    false
+  );
   async function setupOfflineMount(
     isOfflineMode: boolean,
     storedToken: string
@@ -424,7 +443,7 @@ function Root() {
       if (storedToken) {
         //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
         // check if user is online
-        if (!userCtx.isOnline) {
+        if (!online) {
           console.log("OFFLINE SETUP STARTED");
           await setupOfflineMount(true, storedToken);
           console.log("OFFLINE SETUP FINISHED");

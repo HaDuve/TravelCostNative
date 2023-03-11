@@ -189,7 +189,7 @@ export const sendOfflineQueue = async () => {
       forceOffline
         ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
         : "https://www.google.com/",
-      10000,
+      9000,
       true,
       "HEAD"
     );
@@ -205,7 +205,7 @@ export const sendOfflineQueue = async () => {
       console.log("sendOfflineQueue ~ item.type:", item.type);
 
       if (item.type === "add") {
-        const id = await storeExpense(
+        await storeExpense(
           item.expense.tripid,
           item.expense.uid,
           item.expense.expenseData
@@ -235,6 +235,6 @@ export const sendOfflineQueue = async () => {
       text2: "Synchronizing " + queue.length + " offline Changes!",
     });
   } else {
-    console.log("no queue");
+    // console.log("no queue");
   }
 };

@@ -66,8 +66,8 @@ const ManageExpense = ({ route, navigation }) => {
   //TODO: add tempValues to selected Expense
 
   useEffect(() => {
-    const update = async () => await userCtx.checkConnectionUpdateUser();
-    update();
+    const checkOnline = async () => await userCtx.checkConnectionUpdateUser();
+    checkOnline();
   }, []);
 
   useLayoutEffect(() => {

@@ -279,7 +279,11 @@ const ExpenseForm = ({
     };
 
     // SoloTravellers always pay for themselves
-    if (IsSoloTraveller) expenseData.whoPaid = UserCtx.userName;
+    if (IsSoloTraveller || expenseData.whoPaid === null)
+      expenseData.whoPaid = UserCtx.userName;
+    // If left completely empty, set to  placeholder
+    if (expenseData.description === "")
+      expenseData.description = getCatString(expenseData.category);
 
     // validate the expenseData
     const amountIsValid =
@@ -288,8 +292,7 @@ const ExpenseForm = ({
       expenseData.amount < 34359738368;
     const dateIsValid = expenseData.date.toString() !== "Invalid Date";
     const descriptionIsValid = expenseData.description.trim().length > 0;
-    const whoPaidIsValid = expenseData.whoPaid !== null;
-
+    const whoPaidIsValid = true;
     const categoryIsValid = true;
     const countryIsValid = true;
     const currencyIsValid = true;

@@ -46,6 +46,7 @@ axios.interceptors.request.use(
  */
 export const dataResponseTime = (func) => {
   return async (...args) => {
+    console.log(`Timing ${func.name} now!`);
     const start = Date.now();
     const result = await func(...args);
     const end = Date.now();

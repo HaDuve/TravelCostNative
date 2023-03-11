@@ -16,7 +16,14 @@ import {
   unTouchTraveler,
 } from "../util/http";
 
-import { StyleSheet, Text, View, RefreshControl, LogBox } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  RefreshControl,
+  LogBox,
+  AppState,
+} from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
@@ -35,14 +42,13 @@ import {
 } from "../components/ExpensesOutput/RecentExpensesUtil";
 import { _toShortFormat } from "../util/dateTime";
 import { useFocusEffect } from "@react-navigation/native";
+import { isForeground } from "../util/appState";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
 function RecentExpenses({ navigation }) {
-  const test_getExpenses = dataResponseTime(getExpenses);
-
   const expensesCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
@@ -50,21 +56,41 @@ function RecentExpenses({ navigation }) {
 
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
-  const [isFetching, setIsFetching] = useState(true);
+  const [isFocused, setIsFocused] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState();
 
   const [open, setOpen] = useState(false);
   const [PeriodValue, setPeriodValue] = useState("day");
   userCtx.setPeriodString(PeriodValue);
 
+  const [dateTimeString, setDateTimeString] = useState("");
+
+  const test_getExpenses = dataResponseTime(getExpenses);
+  const test_userCtx_checkConnectionUpdateUser = dataResponseTime(
+    userCtx.checkConnectionUpdateUser
+  );
+  const test_offlineLoad = dataResponseTime(offlineLoad);
+  const test_fetchTravelerIsTouched = dataResponseTime(fetchTravelerIsTouched);
+  const test_fetchAndSetExpenses = dataResponseTime(fetchAndSetExpenses);
+
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = test_getExpenses.bind(this, true);
 
-  const [dateTimeString, setDateTimeString] = useState("");
-
   useFocusEffect(
     React.useCallback(() => {
+      setIsFocused(true);
+      console.log("focused");
+      async function poll() {
+        await test_getExpenses(true, true);
+      }
+
       setDateTimeString(_toShortFormat(DateTime.now()));
+      poll();
+      return () => {
+        console.log("unfocused");
+        setIsFocused(false);
+      };
     }, [])
   );
 
@@ -74,11 +100,13 @@ function RecentExpenses({ navigation }) {
 
   useInterval(
     () => {
-      const asyncPolling = async () => {
-        await test_getExpenses(true, true);
-        // await getExpenses(true, true);
-      };
-      asyncPolling();
+      if (isForeground() && isFocused) {
+        const asyncPolling = async () => {
+          await test_getExpenses(true, true);
+          // await getExpenses(true, true);
+        };
+        asyncPolling();
+      }
     },
     DEBUG_POLLING_INTERVAL,
     false
@@ -97,18 +125,24 @@ function RecentExpenses({ navigation }) {
     showAnyIndicator = false
   ) {
     // check offlinemode
-    await userCtx.checkConnectionUpdateUser();
+    const online = await test_userCtx_checkConnectionUpdateUser();
+    console.log("RecentExpenses ~ online:", online);
+    // await userCtx.checkConnectionUpdateUser();
     // console.log("RecentExpenses ~ userCtx.isOnline:", userCtx.isOnline);
-    if (!userCtx.isOnline) {
-      console.log("RecentExpenses ~ userCtx.isOnline:", userCtx.isOnline);
-      setIsFetching(
-        await offlineLoad(expensesCtx, setRefreshing, setIsFetching)
+    if (!online) {
+      setIsFetching(true);
+      const loaded = await test_offlineLoad(
+        expensesCtx,
+        setRefreshing,
+        setIsFetching
       );
+      console.log("RecentExpenses ~ OfflineLoaded:", loaded);
+      setIsFetching(false);
       return;
     }
     // checking isTouched or firstLoad
-    let isTouched = await fetchTravelerIsTouched(tripid, uid);
-    // console.log("RecentExpenses ~ isTouched:", isTouched);
+    let isTouched = await test_fetchTravelerIsTouched(tripid, uid);
+    console.log("RecentExpenses ~ isTouched:", isTouched);
     if (!isTouched) {
       setRefreshing(false);
       setIsFetching(false);
@@ -116,7 +150,7 @@ function RecentExpenses({ navigation }) {
     }
     console.log("we are touched and fetching expenses");
     // fetch and set expenses
-    const test_fetchAndSetExpenses = dataResponseTime(fetchAndSetExpenses);
+
     await test_fetchAndSetExpenses(
       showRefIndicator,
       showAnyIndicator,

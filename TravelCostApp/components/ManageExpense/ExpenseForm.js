@@ -70,6 +70,7 @@ const ExpenseForm = ({
   editedExpenseId,
   newCat,
 }) => {
+  console.log("~~~~ defaultValues", defaultValues);
   // set context
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
@@ -98,13 +99,13 @@ const ExpenseForm = ({
   const [showDatePickerRange, setShowDatePickerRange] = useState(false);
   const [startDate, setStartDate] = useState(
     defaultValues
-      ? getFormattedDate(defaultValues.date)
-      : getFormattedDate(DateTime.now())
+      ? getFormattedDate(DateTime.fromJSDate(defaultValues.date).toJSDate())
+      : getFormattedDate(DateTime.now().toJSDate())
   );
   const [endDate, setEndDate] = useState(
     defaultValues
-      ? getFormattedDate(defaultValues.date)
-      : getFormattedDate(DateTime.now())
+      ? getFormattedDate(DateTime.fromJSDate(defaultValues.date).toJSDate())
+      : getFormattedDate(DateTime.now().toJSDate())
   );
   const openDatePickerRange = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -182,7 +183,6 @@ const ExpenseForm = ({
   function inputSplitListHandler(index, props, value) {
     if (splitType === "EQUAL") return;
     const tempList = [...splitList];
-    // TODO: this Number(value) makes it impossible to enter decimal numbers (eg.: 1.9)
     const tempValue = { amount: value, userName: props.userName };
     tempList[index] = tempValue;
     setSplitList(tempList);
@@ -197,7 +197,9 @@ const ExpenseForm = ({
       isValid: true,
     },
     date: {
-      value: defaultValues ? getFormattedDate(defaultValues.date) : "",
+      value: defaultValues
+        ? getFormattedDate(defaultValues.date)
+        : getFormattedDate(DateTime.now()),
       isValid: true,
     },
     description: {
@@ -277,6 +279,8 @@ const ExpenseForm = ({
       listEQUAL: splitTravellersList,
       splitList: splitList,
     };
+    console.log("~~~~ date", expenseData.date);
+    console.log("~~~~ typeof", typeof expenseData.date);
 
     // SoloTravellers always pay for themselves
     if (IsSoloTraveller || expenseData.whoPaid === null)
@@ -346,6 +350,7 @@ const ExpenseForm = ({
       // Alert.alert("Invalid Input", "Please check your input values");
       addDefaultValues(pickedCat);
       // alertDefaultValues();
+      console.log("~~~~ expense.date", expenseData.date);
       return;
     }
 
@@ -376,6 +381,7 @@ const ExpenseForm = ({
       listEQUAL: currentTravellers,
       splitList: [],
     };
+    console.log("~~~~ expense.date", expenseData.date);
     onSubmit(expenseData);
   }
 
@@ -389,6 +395,7 @@ const ExpenseForm = ({
 
     if (!inputs.date.isValid) {
       const today = DateTime.now().toJSDate();
+      console.log("addDefaultValues ~ today:", today);
       setStartDate(today);
       setEndDate(today);
       // inputChangedHandler("date", getFormattedDate(today));
@@ -454,7 +461,8 @@ const ExpenseForm = ({
   const splitTypeEqual = splitType === "EQUAL";
   const splitTypeSelf = splitType === "SELF";
   const hidePickers = true;
-  const dateIsRanged = startDate.toString() !== endDate.toString();
+  const dateIsRanged =
+    startDate.toString().slice(0, 10) !== endDate.toString().slice(0, 10);
   const android = Platform.OS === "android";
   const datepickerJSX = android ? (
     <View
@@ -465,8 +473,6 @@ const ExpenseForm = ({
       <DatePicker
         isVisible={showDatePickerRange}
         mode={"range"}
-        startDate={DateTime.now().toJSDate()}
-        endDate={DateTime.now().plus({ day: 1 }).toJSDate()}
         colorOptions={{
           headerColor: GlobalStyles.colors.primaryGrayed,
           headerTextColor: GlobalStyles.colors.backgroundColor,
@@ -480,8 +486,6 @@ const ExpenseForm = ({
         }}
         onCancel={onCancelRange}
         onConfirm={onConfirmRange}
-        startDate={DateTime.now().toJSDate()}
-        endDate={DateTime.now().toJSDate()}
         language={Localization.locale.slice(0, 2)}
       />
     </View>
@@ -502,11 +506,11 @@ const ExpenseForm = ({
       }}
       onCancel={onCancelRange}
       onConfirm={onConfirmRange}
-      startDate={DateTime.now().toJSDate()}
-      endDate={DateTime.now().toJSDate()}
       language={Localization.locale.slice(0, 2)}
     />
   );
+
+  console.log("~~~~~ inputs date", inputs.date.value);
 
   return (
     <>

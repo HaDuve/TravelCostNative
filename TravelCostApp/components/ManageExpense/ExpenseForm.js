@@ -168,7 +168,7 @@ const ExpenseForm = ({
   );
 
   // dont show EQUAL share picker when "SELF" is picked
-  if (splitType === "SELF") {
+  if (splitType === "SELF" || IsSoloTraveller || splitType === "EQUAL") {
     if (openEQUAL) setOpenEQUAL(false);
   }
 
@@ -178,6 +178,7 @@ const ExpenseForm = ({
       setListEQUAL([...currentTravellers]);
     }
     setOpenEQUAL(true);
+    splitHandler();
   }
 
   function inputSplitListHandler(index, props, value) {

@@ -12,7 +12,7 @@ getDatePlusDays
 getPreviousMondayDate
 */
 export function _getFormattedDate(dateTime: DateTime): string {
-  return dateTime.toFormat("yyyy-MM-dd");
+  return dateTime.toISO();
 }
 export function _isToday(dateTime: DateTime): boolean {
   return dateTime.hasSame(DateTime.now(), "day");

@@ -6,7 +6,15 @@ import * as i18nIsoCountries from "i18n-iso-countries";
 import { useState } from "react";
 
 import { GlobalStyles } from "../../constants/styles";
+//localization
 import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../../i18n/supportedLanguages";
+import LoadingOverlay from "../UI/LoadingOverlay";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+// i18n.locale = "en";
+i18n.enableFallback = true;
 
 const CurrencyPicker = ({
   countryValue,
@@ -44,7 +52,7 @@ const CurrencyPicker = ({
         onChangeValue={onChangeValue}
         setValue={setCountryValue}
         setItems={setItems}
-        placeholder={placeholder ? placeholder : "Currency"}
+        placeholder={placeholder ? placeholder : i18n.t("currencyLabel")}
         containerStyle={{
           backgroundColor: GlobalStyles.colors.gray500,
           marginHorizontal: "1%",

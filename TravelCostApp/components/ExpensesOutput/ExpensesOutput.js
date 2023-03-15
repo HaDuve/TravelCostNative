@@ -9,6 +9,9 @@ import Animated, {
   SlideInRight,
   SlideOutLeft,
 } from "react-native-reanimated";
+import LoadingOverlay from "../UI/LoadingOverlay";
+import SplashScreenOverlay from "../UI/SplashScreenOverlay";
+import { useEffect, useState } from "react";
 
 function ExpensesOutput({
   expenses,
@@ -16,9 +19,17 @@ function ExpensesOutput({
   refreshControl,
   periodValue,
 }) {
+  const [showLoading, setShowLoading] = useState(true);
+  useEffect(() => {
+    setTimeout(toggleLoading, 3000);
+  }, []);
+
+  const toggleLoading = () => setShowLoading((prev) => !prev);
+
   let content = (
-    <Animated.View entering={SlideInRight} exiting={SlideOutLeft}>
-      <Text style={styles.infoText}>{fallbackText}</Text>
+    <Animated.View exiting={SlideOutLeft}>
+      {showLoading && <LoadingOverlay></LoadingOverlay>}
+      {!showLoading && <Text style={styles.infoText}>{fallbackText}</Text>}
     </Animated.View>
   );
   if (expenses.length > 0) {

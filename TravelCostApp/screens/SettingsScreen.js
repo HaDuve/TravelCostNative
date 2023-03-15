@@ -35,6 +35,8 @@ const SettingsScreen = ({ navigation }) => {
   const addExpense = expensesCtx.addExpense;
   const [isDEV, setIsDEV] = useState(DEV);
   const [timeZoneString, setTimeZoneString] = useState("");
+  const multiTraveller = tripCtx.travellers.length > 1 ?? false;
+  // const soloTraveller = !multiTraveller;
 
   // Show detailed timezone info
   useFocusEffect(
@@ -132,14 +134,16 @@ const SettingsScreen = ({ navigation }) => {
         Join Trip
       </Button>
 
-      <Button
-        onPress={() => {
-          navigation.navigate("SplitSummary", { tripid: tripCtx.tripid });
-        }}
-        style={styles.settingsButton}
-      >
-        Simplify Splits
-      </Button>
+      {multiTraveller && (
+        <Button
+          onPress={() => {
+            navigation.navigate("SplitSummary", { tripid: tripCtx.tripid });
+          }}
+          style={styles.settingsButton}
+        >
+          Simplify Splits
+        </Button>
+      )}
       <LinkingButton
         style={styles.settingsButton}
         URL="https://foodfornomads.com/"

@@ -7,3 +7,7 @@ export function getAppState() {
 export function isForeground() {
   return getAppState() === "active";
 }
+
+export function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

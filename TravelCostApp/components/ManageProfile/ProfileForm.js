@@ -18,6 +18,7 @@ import FlatButton from "../UI/FlatButton";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../../i18n/supportedLanguages";
+import LoadingOverlay from "../UI/LoadingOverlay";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -28,6 +29,7 @@ const ProfileForm = ({ navigation }) => {
   const UserCtx = useContext(UserContext);
   const TripCtx = useContext(TripContext);
   const freshlyCreated = UserCtx.freshlyCreated;
+  const [isFetchingLogout, setIsFetchingLogout] = useState(false);
 
   function logoutHandler() {
     return Alert.alert(i18n.t("sure"), i18n.t("signOutAlertMess"), [
@@ -40,12 +42,26 @@ const ProfileForm = ({ navigation }) => {
       {
         text: i18n.t("yes"),
         onPress: () => {
+          setIsFetchingLogout(true);
           TripCtx.setCurrentTrip("reset", "null");
           AuthCtx.logout();
+          setIsFetchingLogout(true);
         },
       },
     ]);
   }
+  const iconButtonJSX = isFetchingLogout ? (
+    <LoadingOverlay></LoadingOverlay>
+  ) : (
+    <IconButton
+      icon={"exit-outline"}
+      size={36}
+      color={GlobalStyles.colors.textColor}
+      style={styles.button}
+      onPress={logoutHandler}
+    />
+  );
+
   const [inputs, setInputs] = useState({
     userName: {
       value: !UserCtx.userName ? "" : UserCtx.userName,
@@ -146,13 +162,7 @@ const ProfileForm = ({ navigation }) => {
             </Text>
           </View>
         </Pressable>
-        <IconButton
-          icon={"exit-outline"}
-          size={36}
-          color={GlobalStyles.colors.textColor}
-          style={styles.button}
-          onPress={logoutHandler}
-        />
+        {iconButtonJSX}
       </View>
       <View style={styles.inputsRow}>
         <Input

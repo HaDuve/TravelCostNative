@@ -1,4 +1,4 @@
-import { Alert } from "react-native";
+import { Alert, Dimensions } from "react-native";
 
 import ExpenseItem from "./ExpenseItem";
 
@@ -196,7 +196,9 @@ function ExpensesList({ expenses, refreshControl, periodValue }) {
         itemLayoutAnimation={layoutAnim}
         data={expenses}
         renderItem={renderExpenseItem.bind(this, isOnline)}
-        ListFooterComponent={<View style={{ height: 100 }} />}
+        ListFooterComponent={
+          <View style={{ height: Dimensions.get("window").height }} />
+        }
         keyExtractor={(item) => item.id}
         refreshControl={refreshControl}
         // getItemLayout={(data, index) => ({

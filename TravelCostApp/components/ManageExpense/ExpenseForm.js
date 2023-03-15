@@ -100,13 +100,19 @@ const ExpenseForm = ({
   const [startDate, setStartDate] = useState(
     defaultValues
       ? getFormattedDate(DateTime.fromJSDate(defaultValues.date).toJSDate())
-      : getFormattedDate(DateTime.now().toJSDate())
+      : getFormattedDate(DateTime.now())
   );
   const [endDate, setEndDate] = useState(
     defaultValues
       ? getFormattedDate(DateTime.fromJSDate(defaultValues.date).toJSDate())
-      : getFormattedDate(DateTime.now().toJSDate())
+      : getFormattedDate(DateTime.now())
   );
+
+  console.log("### startDate:", startDate);
+  console.log("### typeof startDate:", typeof startDate);
+  console.log("### endDate:", endDate);
+  console.log("### typeof endDate:", typeof endDate);
+
   const openDatePickerRange = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(true);
@@ -120,8 +126,8 @@ const ExpenseForm = ({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(false);
     // hotfixing datebug for asian countries
-    const startDate = DateTime.fromJSDate(output.startDate);
-    const endDate = DateTime.fromJSDate(output.endDate);
+    const startDate = DateTime.fromJSDate(output.startDate).toJSDate();
+    const endDate = DateTime.fromJSDate(output.endDate).toJSDate();
     const startDateFormat = getFormattedDate(startDate);
     const endDateFormat = getFormattedDate(endDate);
     setStartDate(startDateFormat);
@@ -200,7 +206,7 @@ const ExpenseForm = ({
     date: {
       value: defaultValues
         ? getFormattedDate(defaultValues.date)
-        : getFormattedDate(DateTime.now()),
+        : getFormattedDate(DateTime.now().toJSDate()),
       isValid: true,
     },
     description: {
@@ -268,8 +274,9 @@ const ExpenseForm = ({
     const expenseData = {
       uid: AuthCtx.uid,
       amount: +inputs.amount.value,
-      date: new Date(startDate),
-      endDate: new Date(endDate),
+      date: DateTime.fromISO(inputs.date.value).toJSDate(),
+      startDate: DateTime.fromISO(startDate).toJSDate(),
+      endDate: DateTime.fromISO(endDate).toJSDate(),
       description: inputs.description.value,
       category: newCat ? pickedCat : inputs.category.value,
       country: inputs.country.value,
@@ -368,8 +375,9 @@ const ExpenseForm = ({
     const expenseData = {
       uid: AuthCtx.uid,
       amount: +inputs.amount.value,
-      date: DateTime.now().toJSDate(),
-      endDate: DateTime.now().toJSDate(),
+      date: DateTime.fromISO(startDate).toJSDate(),
+      startDate: DateTime.fromISO(startDate).toJSDate(),
+      endDate: DateTime.fromISO(endDate).toJSDate(),
       description: getCatString(pickedCat),
       category: pickedCat,
       country: UserCtx.lastCountry ? UserCtx.lastCountry : UserCtx.homeCountry,
@@ -394,13 +402,13 @@ const ExpenseForm = ({
       inputChangedHandler("category", arg);
     }
 
-    if (!inputs.date.isValid) {
-      const today = DateTime.now().toJSDate();
-      console.log("addDefaultValues ~ today:", today);
-      setStartDate(today);
-      setEndDate(today);
-      // inputChangedHandler("date", getFormattedDate(today));
-    }
+    // if (!inputs.date.isValid) {
+    //   const today = DateTime.now().toJSDate();
+    //   console.log("addDefaultValues ~ today:", today);
+    //   setStartDate(today);
+    //   setEndDate(today);
+    //   // inputChangedHandler("date", getFormattedDate(today));
+    // }
     // for now set default values to every field so everything goes fast
     if (!inputs.country.isValid) {
       inputChangedHandler("country", UserCtx.lastCountry);
@@ -449,6 +457,7 @@ const ExpenseForm = ({
 
   function updateCurrency() {
     inputChangedHandler("currency", countryValue.split(" ")[0]);
+    inputChangedHandler("country", countryValue.split("- ")[1]);
   }
 
   const formIsInvalid =

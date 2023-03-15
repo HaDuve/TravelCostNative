@@ -41,7 +41,7 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-function TripHistoryItem({ tripid, setRefreshing }) {
+function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const expenseCtx = useContext(ExpensesContext);
@@ -128,7 +128,7 @@ function TripHistoryItem({ tripid, setRefreshing }) {
     }
     // NOTE: Android can only handle alert with 2 actions, so this needs to be changed or actions will go missing
     console.log("pressed: ", tripid);
-    navigation.navigate("ManageTrip", { tripId: tripid });
+    navigation.navigate("ManageTrip", { tripId: tripid, trips: trips });
   }
 
   const activeBorder =

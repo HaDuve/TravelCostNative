@@ -6,9 +6,7 @@ import { GlobalStyles } from "../../constants/styles";
 import LoadingOverlay from "../UI/LoadingOverlay";
 
 function TripList({ trips, refreshControl, setRefreshing }) {
-  if (!trips) return <></>;
-
-  if (trips.length < 1) return <LoadingOverlay></LoadingOverlay>;
+  if (!trips || trips.length < 1) return <LoadingOverlay></LoadingOverlay>;
 
   function renderTripItem(itemData) {
     if (!itemData || !itemData.item) return <></>;
@@ -16,11 +14,11 @@ function TripList({ trips, refreshControl, setRefreshing }) {
       return (
         <TripHistoryItem
           setRefreshing={setRefreshing}
-          {...{ tripid: itemData.item }}
+          {...{ tripid: itemData.item, trips: trips }}
         />
       );
     }
-    return <TripItem {...itemData.item} />;
+    return <TripItem {...itemData.item} {...{ trips: trips }} />;
   }
   return (
     <View

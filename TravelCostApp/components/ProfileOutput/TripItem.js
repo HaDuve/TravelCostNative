@@ -33,6 +33,7 @@ function TripItem({
   totalBudget,
   dailyBudget,
   tripCurrency,
+  trips,
 }) {
   const tripData = {
     tripid,
@@ -74,7 +75,7 @@ function TripItem({
     }
     // NOTE: Android can only handle alert with 2 actions, so this needs to be changed or actions will go missing
     console.log("pressed: ", tripid);
-    navigation.navigate("ManageTrip", { tripId: tripid });
+    navigation.navigate("ManageTrip", { tripId: tripid, trips: trips });
   }
 
   const activeBorder =

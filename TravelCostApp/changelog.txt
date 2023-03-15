@@ -1,5 +1,14 @@
 Change log Travel Expense App
 
+1.0.60
+- fixed wrong expense times due to different timezones
+- hides split summary button for solo travellers
+- localized currency picker
+- hotfix for offline mode bugs (still a bit wonky)
+- added smooth splashscreen animations for app entry
+- improved splashscreen design
+- fixed currency change bug
+
 1.0.55
 - load expenses faster (especially with bad internet or offline)
 - does not fetch new data when in background anymore

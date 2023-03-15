@@ -35,6 +35,7 @@ const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
 i18n.enableFallback = true;
+
 const TripForm = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [inputs, setInputs] = useState({
@@ -83,6 +84,9 @@ const TripForm = ({ navigation, route }) => {
     inputs?.tripCurrency ? inputs.tripCurrency.value : i18n.t("currencyLabel")
   );
 
+  const trips = userCtx.getTripHistory();
+  console.log("TripForm ~ trips:", trips);
+
   const uid = authCtx.uid;
   const userName = userCtx.userName;
   // let currencyPickerRef = undefined;
@@ -99,6 +103,12 @@ const TripForm = ({ navigation, route }) => {
     navigation.pop();
   }
 
+  async function deleteAcceptHandler() {
+    const trips = route.params.trips;
+    console.log("deleteAcceptHandler ~ trips:", trips);
+    // if triplist.length == 1 userCtx.setFreshlyCreatedTo(true);
+    // await deleteTrip(editedTripId);
+  }
   function deleteHandler() {
     Alert.alert(
       // i18n.t("deleteTripTitle"),
@@ -115,8 +125,7 @@ const TripForm = ({ navigation, route }) => {
           text: "Delete",
           style: "destructive",
           onPress: async () => {
-            // TODO: find out how the whole routine should work
-            // await deleteTrip(editedTripId);
+            deleteAcceptHandler();
             navigation.pop();
           },
         },
@@ -214,6 +223,22 @@ const TripForm = ({ navigation, route }) => {
   }
 
   const titleString = isEditing ? "Edit Trip Budget" : "New Trip Budget";
+  const currencyView = isEditing ? (
+    <></>
+  ) : (
+    <View style={styles.currencyPickerContainer}>
+      <CurrencyPicker
+        placeholder={
+          inputs.tripCurrency.value
+            ? inputs.tripCurrency.value
+            : i18n.t("baseCurrency")
+        }
+        countryValue={countryValue.split(" ")[0]}
+        setCountryValue={setCountryValue}
+        onChangeValue={updateCurrency}
+      ></CurrencyPicker>
+    </View>
+  );
 
   if (isLoading) {
     return <LoadingOverlay />;
@@ -234,6 +259,7 @@ const TripForm = ({ navigation, route }) => {
           invalid={!inputs.tripName.isValid}
           autoFocus={false}
         />
+        {currencyView}
 
         <View style={styles.categoryRow}>
           <Input
@@ -262,14 +288,6 @@ const TripForm = ({ navigation, route }) => {
             }}
             invalid={!inputs.dailyBudget.isValid}
           />
-        </View>
-        <View style={styles.currencyPickerContainer}>
-          <CurrencyPicker
-            placeholder={inputs.tripCurrency.value}
-            countryValue={countryValue}
-            setCountryValue={setCountryValue}
-            onChangeValue={updateCurrency}
-          ></CurrencyPicker>
         </View>
       </View>
       {/* Add Currency Input field */}

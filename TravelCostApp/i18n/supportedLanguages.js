@@ -61,6 +61,7 @@ const en = {
   showMoreOptions: "Show more options",
   showLessOptions: "Show less options",
   currencyLabel: "Currency",
+  baseCurrency: "Base currency",
   descriptionLabel: "Description",
   dateLabel: "Date",
 
@@ -153,6 +154,7 @@ const de = {
   showMoreOptions: "Zeige mehr Optionen",
   showLessOptions: "Zeige weniger Optionen",
   currencyLabel: "Währung",
+  baseCurrency: "Basiswährung",
   descriptionLabel: "Beschreibung",
   dateLabel: "Datum",
 

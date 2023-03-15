@@ -191,6 +191,9 @@ const ManageExpense = ({ route, navigation }) => {
           }
         } else {
           console.log("no ranged Data detected");
+          // hotfix the date clock bug
+          expenseData.date = expenseData.startDate;
+
           const item = {
             type: "add",
             expense: {
@@ -203,8 +206,9 @@ const ManageExpense = ({ route, navigation }) => {
           expenseCtx.addExpense({ ...expenseData, id: id });
         }
       }
+      if (userCtx.isOnline) await touchAllTravelers(tripid, true);
+      await expenseCtx.saveExpensesInStorage(expenseCtx.expenses);
       navigation.navigate("RecentExpenses");
-      await touchAllTravelers(tripid, true);
     } catch (error) {
       // setError("Could not save data - please try again later!" + error);
       console.error(error);

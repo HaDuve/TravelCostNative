@@ -31,11 +31,10 @@
   },
   "submit": {
     "production": {
-      "ios":{
+      "ios": {
         "appleId": "hionoe@hotmail.de",
         "ascAppId": "6446042796",
         "appleTeamId": "AK62F8767Z"
-      }
       }
     }
   }

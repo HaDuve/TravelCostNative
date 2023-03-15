@@ -59,6 +59,7 @@ function RecentExpenses({ navigation }) {
   const [isFocused, setIsFocused] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState();
+  const [firstFocus, setFirstFocus] = useState(false);
 
   const [open, setOpen] = useState(false);
   const [PeriodValue, setPeriodValue] = useState("day");
@@ -79,13 +80,12 @@ function RecentExpenses({ navigation }) {
 
   useFocusEffect(
     React.useCallback(() => {
-      setIsFocused(true);
       console.log("focused");
+      setIsFocused(true);
+      setFirstFocus(true);
       async function poll() {
-        await test_getExpenses(true, true);
+        const online = await test_getExpenses(true, true);
       }
-
-      setDateTimeString(_toShortFormat(DateTime.now()));
       poll();
       return () => {
         console.log("unfocused");
@@ -100,6 +100,7 @@ function RecentExpenses({ navigation }) {
 
   useInterval(
     () => {
+      setDateTimeString(_toShortFormat(DateTime.now()));
       if (isForeground() && isFocused) {
         const asyncPolling = async () => {
           await test_getExpenses(true, true);
@@ -109,7 +110,7 @@ function RecentExpenses({ navigation }) {
       }
     },
     DEBUG_POLLING_INTERVAL,
-    false
+    true
   );
 
   const [items, setItems] = useState([
@@ -130,14 +131,15 @@ function RecentExpenses({ navigation }) {
     // await userCtx.checkConnectionUpdateUser();
     // console.log("RecentExpenses ~ userCtx.isOnline:", userCtx.isOnline);
     if (!online) {
+      if (!firstFocus) return;
       setIsFetching(true);
       const loaded = await test_offlineLoad(
         expensesCtx,
         setRefreshing,
         setIsFetching
       );
-      console.log("RecentExpenses ~ OfflineLoaded:", loaded);
       setIsFetching(false);
+      setFirstFocus(false);
       return;
     }
     // checking isTouched or firstLoad

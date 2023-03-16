@@ -1,5 +1,8 @@
 Change log Travel Expense App
 
+1.0.61
+- added a walkthrough for new users (highlighting features)
+
 1.0.60
 - added smooth splashscreen animations for app entry
 - improved splashscreen design

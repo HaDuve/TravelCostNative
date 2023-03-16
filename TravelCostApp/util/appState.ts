@@ -1,3 +1,4 @@
+import * as Updates from "expo-updates";
 import { AppState } from "react-native";
 
 export function getAppState() {
@@ -10,4 +11,8 @@ export function isForeground() {
 
 export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function reloadApp() {
+  await Updates.reloadAsync();
 }

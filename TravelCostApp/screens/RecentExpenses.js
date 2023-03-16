@@ -43,6 +43,7 @@ import {
 import { _toShortFormat } from "../util/dateTime";
 import { useFocusEffect } from "@react-navigation/native";
 import { isForeground } from "../util/appState";
+import { TourGuideZone } from "rn-tourguide";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -181,9 +182,30 @@ function RecentExpenses({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <TourGuideZone
+        text={"Welcome to Budget for Nomads"}
+        zone={1}
+        maskOffset={-4}
+        tooltipBottomOffset={200}
+      ></TourGuideZone>
+      <TourGuideZone
+        text={"Enjoy your journey with Budget for Nomads 🎉"}
+        zone={8}
+        maskOffset={-4}
+        tooltipBottomOffset={-200}
+      ></TourGuideZone>
+      <TourGuideZone
+        text={
+          "Here you can see your budget for today! Try switching from today to this month!  🎉"
+        }
+        maskOffset={200}
+        tooltipBottomOffset={-200}
+        zone={3}
+      ></TourGuideZone>
       <View style={styles.dateHeader}>
         <Text style={styles.dateString}>{dateTimeString}</Text>
       </View>
+
       <View style={styles.header}>
         <DropDownPicker
           open={open}
@@ -196,9 +218,12 @@ function RecentExpenses({ navigation }) {
           style={styles.dropdown}
           textStyle={styles.dropdownTextStyle}
         />
+
         <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
       </View>
+
       <View style={styles.tempGrayBar1}></View>
+
       <ExpensesOutput
         expenses={recentExpenses}
         periodValue={PeriodValue}
@@ -207,6 +232,7 @@ function RecentExpenses({ navigation }) {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       />
+
       <AddExpenseButton navigation={navigation} />
     </View>
   );

@@ -10,6 +10,7 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../../i18n/supportedLanguages";
 import ToggleButton from "../../assets/SVG/toggleButton";
+import { TourGuideZone } from "rn-tourguide";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -56,18 +57,28 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           navigation={navigation}
         />
       )}
+
       <View
         style={[
           styles.toggleButton,
           // styles.toggleButton
         ]}
       >
-        <Pressable
-          onPress={toggleContent}
-          style={({ pressed }) => pressed && styles.pressed}
+        <TourGuideZone
+          text={
+            "Here you can toggle between Daily-Overview and Category-Overview 🎉"
+          }
+          tooltipBottomOffset={66}
+          maskOffset={60}
+          zone={4}
         >
-          <ToggleButton></ToggleButton>
-        </Pressable>
+          <Pressable
+            onPress={toggleContent}
+            style={({ pressed }) => [pressed && styles.pressed]}
+          >
+            <ToggleButton></ToggleButton>
+          </Pressable>
+        </TourGuideZone>
       </View>
     </View>
   );

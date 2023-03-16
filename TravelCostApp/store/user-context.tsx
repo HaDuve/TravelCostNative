@@ -31,6 +31,8 @@ export const UserContext = createContext({
 
   freshlyCreated: false,
   setFreshlyCreatedTo: (bool: boolean) => {},
+  needsTour: false,
+  setNeedsTour: (bool: boolean) => {},
 
   isOnline: false,
   setIsOnline: (bool: boolean) => {},
@@ -59,6 +61,7 @@ function tripsReducer(state, action) {
 function UserContextProvider({ children }) {
   const [userName, setName] = useState("");
   const [freshlyCreated, setFreshlyCreated] = useState(false);
+  const [needsTour, setNeedsTour] = useState(false);
   const [periodName, setPeriodName] = useState("day");
   const [isOnline, setIsOnline] = useState(true);
   const [tripsState, dispatch] = useReducer(tripsReducer, []);
@@ -156,6 +159,9 @@ function UserContextProvider({ children }) {
 
     freshlyCreated: freshlyCreated,
     setFreshlyCreatedTo: setFreshlyCreatedTo,
+
+    needsTour: needsTour,
+    setNeedsTour: setNeedsTour,
 
     addTripHistory: addTripHistory,
     setTripHistory: setTripHistory,

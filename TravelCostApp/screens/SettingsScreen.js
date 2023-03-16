@@ -18,6 +18,10 @@ import LinkingButton from "../components/UI/LinkButton";
 import { DEV } from "../confApp";
 import { useFocusEffect } from "@react-navigation/native";
 import { DateTime } from "luxon";
+import { TourGuideZone, useTourGuideController } from "rn-tourguide";
+import { asyncStoreGetItem } from "../store/async-storage";
+import { resetTour, saveStoppedTour } from "../util/tourUtil";
+import { reloadApp } from "../util/appState";
 
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
@@ -35,6 +39,7 @@ const SettingsScreen = ({ navigation }) => {
   const addExpense = expensesCtx.addExpense;
   const [isDEV, setIsDEV] = useState(DEV);
   const [timeZoneString, setTimeZoneString] = useState("");
+  const [shouldShowTour, setShouldShowTour] = useState(false);
   const multiTraveller = tripCtx.travellers.length > 1 ?? false;
   // const soloTraveller = !multiTraveller;
 
@@ -118,7 +123,7 @@ const SettingsScreen = ({ navigation }) => {
 
   return (
     <ScrollView
-      scrollEnabled={false}
+      scrollEnabled={true}
       style={{
         flex: 1,
         padding: "4%",
@@ -144,11 +149,20 @@ const SettingsScreen = ({ navigation }) => {
           Simplify Splits
         </Button>
       )}
+      <Button
+        style={styles.settingsButton}
+        onPress={() => {
+          resetTour();
+          reloadApp();
+        }}
+      >
+        Reset App Introduction
+      </Button>
       <LinkingButton
         style={styles.settingsButton}
         URL="https://foodfornomads.com/"
       >
-        FoodForNomads Website
+        Visit FoodForNomads
       </LinkingButton>
       <View
         style={{
@@ -160,6 +174,7 @@ const SettingsScreen = ({ navigation }) => {
         }}
       ></View>
       {DEVCONTENT}
+      <View style={{ flex: 1, minHeight: 100 }}></View>
     </ScrollView>
   );
 };

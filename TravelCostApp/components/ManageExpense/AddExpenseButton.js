@@ -12,6 +12,7 @@ import Animated, {
 import { UserContext } from "../../store/user-context";
 import { useContext } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { TourGuideZone } from "rn-tourguide";
 
 const AddExpenseButton = ({ navigation }) => {
   const userCtx = useContext(UserContext);
@@ -21,6 +22,14 @@ const AddExpenseButton = ({ navigation }) => {
       style={styles.margin}
       entering={FadeIn.duration(600).delay(3000)}
     >
+      <TourGuideZone
+        text={"With this Button, you can add your expenses. Try it out now!"}
+        borderRadius={16}
+        shape={"circle"}
+        maskOffset={40}
+        tooltipBottomOffset={80}
+        zone={2}
+      ></TourGuideZone>
       <Pressable
         style={({ pressed }) => [
           styles.addButton,

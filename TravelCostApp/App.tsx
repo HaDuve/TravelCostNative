@@ -76,6 +76,8 @@ import Toast from "react-native-toast-message";
 import { offlineLoad } from "./components/ExpensesOutput/RecentExpensesUtil";
 import { useInterval } from "./components/Hooks/useInterval";
 import { isForeground } from "./util/appState";
+import { TourGuideProvider } from "rn-tourguide";
+import { loadTourConfig } from "./util/tourUtil";
 // LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
 // LogBox.ignoreAllLogs(); //Ignore all log notifications
 
@@ -460,7 +462,7 @@ function Root() {
         } else {
           Toast.show({
             type: "error",
-            text1: "Trip not found",
+            text1: "Login error",
             text2: "Please login again!",
             visibilityTime: 5000,
           });
@@ -516,6 +518,9 @@ function Root() {
         console.log("onRootMount ~ isLoaded:", isLoaded);
         authCtx.authenticate(storedToken);
         await touchMyTraveler(tripid, storedUid);
+        const needsTour = await loadTourConfig();
+        console.log("onRootMount ~ needsTour:", needsTour);
+        userCtx.setNeedsTour(needsTour);
         console.log("Root end reached");
       } else {
         authCtx.logout();
@@ -575,8 +580,12 @@ export default function App() {
               <UserContextProvider>
                 <NetworkProvider>
                   <ExpensesContextProvider>
-                    <Root />
-                    <ToastComponent />
+                    <TourGuideProvider
+                      {...{ borderRadius: 16, key: "settings" }}
+                    >
+                      <Root />
+                      <ToastComponent />
+                    </TourGuideProvider>
                   </ExpensesContextProvider>
                 </NetworkProvider>
               </UserContextProvider>

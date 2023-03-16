@@ -24,6 +24,11 @@ import { fetchTrip, fetchTripHistory, fetchUser } from "../util/http";
 import { AuthContext } from "../store/auth-context";
 import React from "react";
 import { useFocusEffect } from "@react-navigation/native";
+import { saveStoppedTour } from "../util/tourUtil";
+import { TourGuideZone, useTourGuideController } from "rn-tourguide";
+import { sleep } from "../util/appState";
+import { useInterval } from "../components/Hooks/useInterval";
+import { DEBUG_POLLING_INTERVAL } from "../confApp";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -32,6 +37,7 @@ i18n.enableFallback = true;
 const ProfileScreen = ({ navigation }) => {
   const UserCtx = useContext(UserContext);
   const FreshlyCreated = UserCtx.freshlyCreated;
+  const [tourIsRunning, setTourIsRunning] = useState(false);
   // // // console.log("ProfileScreen ~ FreshlyCreated", FreshlyCreated);
   const TripCtx = useContext(TripContext);
   const AuthCtx = useContext(AuthContext);
@@ -41,6 +47,17 @@ const ProfileScreen = ({ navigation }) => {
 
   let allTripsList = [];
   const [tripsList, setTripsList] = useState([]);
+
+  useInterval(
+    () => {
+      if (canStart && UserCtx.needsTour && !tourIsRunning) {
+        // 👈 test if you can start otherwise nothing will happen
+        sleepyStartTour();
+      }
+    },
+    3000,
+    false
+  );
 
   useFocusEffect(() => {
     if (tripsList.length > 0) return;
@@ -77,6 +94,81 @@ const ProfileScreen = ({ navigation }) => {
     });
   }
 
+  // Tourguide Test
+
+  const {
+    canStart, // a boolean indicate if you can start tour guide
+    start, // a function to start the tourguide
+    stop, // a function  to stopping it
+    eventEmitter, // an object for listening some events
+  } = useTourGuideController();
+  // Can start at mount 🎉
+  // you need to wait until everything is registered 😁
+  async function sleepyStartTour() {
+    setTourIsRunning(true);
+    await sleep(1000);
+    start();
+  }
+  React.useEffect(() => {
+    if (canStart && UserCtx.needsTour) {
+      // 👈 test if you can start otherwise nothing will happen
+      sleepyStartTour();
+    }
+  }, [canStart]); // 👈 don't miss it!
+
+  const handleOnStart = () => {
+    navigation.navigate("RecentExpenses");
+    console.log("start");
+  };
+  const handleOnStop = () => {
+    saveStoppedTour();
+    UserCtx.setNeedsTour(false);
+    setTourIsRunning(false);
+    console.log("stop");
+  };
+  const handleOnStepChange = async (step) => {
+    console.log(`stepChange, name: ${step?.name} order: ${step?.order}`);
+    switch (step?.order) {
+      case 1:
+        await navigation.navigate("RecentExpenses");
+        break;
+      case 2:
+        await navigation.navigate("RecentExpenses");
+        break;
+      case 3:
+        await navigation.navigate("RecentExpenses");
+        break;
+      case 4:
+        await navigation.navigate("Overview");
+        break;
+      case 5:
+        await navigation.navigate("Profile");
+        break;
+      case 6:
+        await navigation.navigate("Profile");
+        break;
+      case 7:
+        await navigation.navigate("Profile");
+        break;
+      case 8:
+      default:
+        navigation.navigate("RecentExpenses");
+        break;
+    }
+  };
+
+  React.useEffect(() => {
+    eventEmitter.on("start", handleOnStart);
+    eventEmitter.on("stop", handleOnStop);
+    eventEmitter.on("stepChange", handleOnStepChange);
+
+    return () => {
+      eventEmitter.off("start", handleOnStart);
+      eventEmitter.off("stop", handleOnStop);
+      eventEmitter.off("stepChange", handleOnStepChange);
+    };
+  }, []);
+
   const visibleContent = FreshlyCreated ? (
     <></>
   ) : UserCtx.isOnline ? (
@@ -89,39 +181,63 @@ const ProfileScreen = ({ navigation }) => {
             style={styles.newTripButtonContainer}
           >
             <Text style={{ color: GlobalStyles.colors.primary700 }}>+</Text>
-            <IconButton
-              icon={"ios-earth"}
-              size={36}
-              color={GlobalStyles.colors.primary400}
-              buttonStyle={styles.createButton}
-              onPress={navigation.navigate.bind(this, "ManageTrip")}
-            />
+            <TourGuideZone
+              text={"Here you can create a new Trip 🎉"}
+              shape={"circle"}
+              maskOffset={24}
+              zone={5}
+            >
+              <IconButton
+                icon={"ios-earth"}
+                size={36}
+                color={GlobalStyles.colors.primary400}
+                buttonStyle={styles.createButton}
+                onPress={navigation.navigate.bind(this, "ManageTrip")}
+              />
+            </TourGuideZone>
           </Pressable>
         </View>
-        <TripList
-          trips={tripsList}
-          setRefreshing={setRefreshing}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={refreshHandler}
-              // progressViewOffset={-100000}
-            />
+        <TourGuideZone
+          text={
+            "Here you can see all your Trips. Your active Trip is highlighted in green 🎉"
           }
-        ></TripList>
+          maskOffset={200}
+          tooltipBottomOffset={250}
+          zone={6}
+        >
+          <TripList
+            trips={tripsList}
+            setRefreshing={setRefreshing}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={refreshHandler}
+                // progressViewOffset={-100000}
+              />
+            }
+          ></TripList>
+        </TourGuideZone>
       </View>
       {/* <AddExpenseButton navigation={navigation} /> */}
+
       <View style={styles.horizontalButtonContainer}>
-        <View style={styles.addButton}>
-          <IconButton
-            icon="person-add-outline"
-            size={42}
-            color={"white"}
-            onPress={() => {
-              onShare(TripCtx.tripid, navigation);
-            }}
-          />
-        </View>
+        <TourGuideZone
+          text={"Here you can invite another traveller to your active Trip 🎉"}
+          maskOffset={50}
+          tooltipBottomOffset={50}
+          zone={7}
+        >
+          <View style={styles.addButton}>
+            <IconButton
+              icon="person-add-outline"
+              size={42}
+              color={"white"}
+              onPress={() => {
+                onShare(TripCtx.tripid, navigation);
+              }}
+            />
+          </View>
+        </TourGuideZone>
       </View>
     </>
   ) : (
@@ -136,7 +252,10 @@ const ProfileScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
-        <ProfileForm navigation={navigation}></ProfileForm>
+        <ProfileForm
+          navigation={navigation}
+          sleepyStartHandler={sleepyStartTour}
+        ></ProfileForm>
       </View>
       {visibleContent}
     </View>
@@ -209,11 +328,12 @@ const styles = StyleSheet.create({
     flex: 0,
     borderRadius: 999,
     minWidth: "18%",
-    paddingTop: "3%",
+    paddingTop: "12%",
     paddingHorizontal: "4%",
     alignItems: "center",
     justifyContent: "center",
     zIndex: 0,
+    flexDirection: "row",
 
     elevation: 2,
     shadowColor: GlobalStyles.colors.textColor,

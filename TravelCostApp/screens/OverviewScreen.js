@@ -22,6 +22,7 @@ import { en, de } from "../i18n/supportedLanguages";
 import { DateTime } from "luxon";
 import { _toShortFormat } from "../util/dateTime";
 import { useFocusEffect } from "@react-navigation/native";
+import { TourGuideZoneByPosition } from "rn-tourguide";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -72,6 +73,7 @@ const OverviewScreen = ({ navigation }) => {
         <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
       </View>
       <View style={styles.tempGrayBar1}></View>
+
       <ExpensesOverview
         navigation={navigation}
         expenses={recentExpenses}

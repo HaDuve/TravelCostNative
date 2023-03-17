@@ -1,5 +1,11 @@
 Change log Travel Expense App
 
+1.0.62
+- Better walkthrough text for introduction
+- Fixed password field being overlapped by keyboard
+- Fixed equally shared expense not working sometimes
+- Added alot of translations
+
 1.0.61
 - added a walkthrough for new users (highlighting features)
 

@@ -302,7 +302,7 @@ function Home() {
           options={{
             // headerShown: false,
             // title: "Recent Expenses",
-            tabBarLabel: "Expenses",
+            tabBarLabel: i18n.t("expensesTab"),
             tabBarIcon: ({ color }) => (
               <Ionicons name="ios-list" size={24} color={color} />
             ),
@@ -315,8 +315,8 @@ function Home() {
           component={OverviewScreen}
           options={{
             // headerShown: false,
-            title: "Overview",
-            tabBarLabel: "Overview",
+            title: i18n.t("overviewTab"),
+            tabBarLabel: i18n.t("overviewTab"),
             tabBarIcon: ({ color }) => (
               <Ionicons
                 name="ios-stats-chart-outline"
@@ -333,8 +333,8 @@ function Home() {
         component={ProfileScreen}
         options={{
           // headerShown: false,
-          title: "Profile",
-          tabBarLabel: "Profile",
+          title: i18n.t("profileTab"),
+          tabBarLabel: i18n.t("profileTab"),
           tabBarIcon: ({ color }) => (
             <Ionicons name="person-circle-outline" size={24} color={color} />
           ),
@@ -347,8 +347,8 @@ function Home() {
           component={SettingsScreen}
           options={{
             // headerShown: false,
-            title: "Settings",
-            tabBarLabel: "Settings",
+            title: i18n.t("settingsTab"),
+            tabBarLabel: i18n.t("settingsTab"),
             tabBarIcon: ({ color }) => (
               <Ionicons name="cog-outline" size={24} color={color} />
             ),

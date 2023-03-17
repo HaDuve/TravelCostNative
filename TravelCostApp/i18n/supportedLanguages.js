@@ -108,6 +108,30 @@ const en = {
     "Bring a friend along on your travels! 👫 Invite a fellow nomad to your active trip and budget together. 💸",
   walk8:
     "Enjoy your journey with Budget for Nomads! 🎉 We're here to help you stay on budget while you explore the world. 🌍",
+
+  // Tabbar labels
+  expensesTab: "Expenses",
+  overviewTab: "Overview",
+  profileTab: "Profile",
+  settingsTab: "Settings",
+
+  // Settings Labels
+  logoutLabel: "Logout",
+  joinTripLabel: "Join Trip",
+  simplifySplitsLabel: "Simplify Splits",
+  resetAppIntroductionLabel: "Reset App Introduction",
+  visitFoodForNomadsLabel: "Visit Food For Nomads",
+
+  // Trip Form Labels
+  tripFormTitleNew: "New Trip Budget",
+  tripFormTitleEdit: "Edit Trip Budget",
+  tripNameLabel: "Trip Name",
+  baseCurrencyLabel: "Base Currency",
+  totalBudgetLabel: "Total Budget in",
+  dailyBudgetLabel: "Daily Budget in",
+
+  loadingYourTrip: "Loading your Trip...",
+  loading: "Loading...",
 };
 const de = {
   // standard strings
@@ -223,5 +247,29 @@ const de = {
     "Nimm einen Freund auf deine Reisen mit! 👫 Lade einen anderen Nomaden zu deiner aktiven Reise ein und budgetiert gemeinsam. 💸",
   walk8:
     "Genieße deine Reise mit Budget for Nomads! 🎉 Wir sind hier, um dir zu helfen, dein Budget im Blick zu behalten, während du die Welt erkundest. 🌍",
+
+  // Tabbar labels
+  expensesTab: "Ausgaben",
+  overviewTab: "Übersicht",
+  profileTab: "Profil",
+  settingsTab: "Optionen",
+
+  // Settings Labels
+  logoutLabel: "Ausloggen",
+  joinTripLabel: "Reise beitreten",
+  simplifySplitsLabel: "Splits vereinfachen",
+  resetAppIntroductionLabel: "App Einführung wiederholen",
+  visitFoodForNomadsLabel: "Food For Nomads besuchen",
+
+  // Trip Form Labels
+  tripFormTitleNew: "Neue Reise erstellen",
+  tripFormTitleEdit: "Reise bearbeiten",
+  tripNameLabel: "Name der Reise",
+  tripCurrencyLabel: "Deine Heimat-Währung in",
+  totalBudgetLabel: "Gesamtbudget in",
+  dailyBudgetLabel: "Tägliches Budget in",
+
+  loading: "Laden...",
+  loadingYourTrip: "Lade deine Reise...",
 };
 export { en, de };

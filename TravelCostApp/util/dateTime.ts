@@ -25,13 +25,21 @@ export function _toShortFormat(dateTime: DateTime): string {
   });
 }
 export function _toDayMonthString(dateTime: DateTime): string {
-  return dateTime.toFormat("dd MMM");
+  // return localized day and month string
+  return dateTime.toLocaleString({
+    // weekday: "short",
+    month: "long",
+    day: "2-digit",
+  });
 }
 // export function _toDayMonthString2(dateTime: DateTime): string {
 //   return dateTime.toFormat("dd MMMM");
 // }
 export function _toMonthString(dateTime: DateTime): string {
-  return dateTime.toFormat("MMMM");
+  return dateTime.toLocaleString({
+    // weekday: "short",
+    month: "long",
+  });
 }
 export function _getDateMinusDays(dateTime: DateTime, days: number): DateTime {
   return dateTime.minus({ days });

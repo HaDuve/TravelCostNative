@@ -228,7 +228,9 @@ const TripForm = ({ navigation, route }) => {
     inputChangedHandler("tripCurrency", countryValue.split(" ")[0]);
   }
 
-  const titleString = isEditing ? "Edit Trip Budget" : "New Trip Budget";
+  const titleString = isEditing
+    ? i18n.t("tripFormTitleEdit")
+    : i18n.t("tripFormTitleNew");
   const currencyView = isEditing ? (
     <></>
   ) : (
@@ -255,7 +257,7 @@ const TripForm = ({ navigation, route }) => {
         <Text style={styles.title}>{titleString}</Text>
 
         <Input
-          label="Trip Name"
+          label={i18n.t("tripNameLabel")}
           style={{ flex: 1 }}
           inputStyle={{}}
           textInputConfig={{
@@ -269,7 +271,7 @@ const TripForm = ({ navigation, route }) => {
 
         <View style={styles.categoryRow}>
           <Input
-            label={`Total Budget in ${inputs.tripCurrency.value}`}
+            label={`${i18n.t("totalBudgetLabel")} ${inputs.tripCurrency.value}`}
             style={{ flex: 1 }}
             inputStyle={{}}
             autoFocus={false}
@@ -286,7 +288,7 @@ const TripForm = ({ navigation, route }) => {
             style={{ flex: 1 }}
             inputStyle={{}}
             autoFocus={false}
-            label={`Daily Budget in ${inputs.tripCurrency.value}`}
+            label={`${i18n.t("dailyBudgetLabel")} ${inputs.tripCurrency.value}`}
             textInputConfig={{
               keyboardType: "decimal-pad",
               onChangeText: inputChangedHandler.bind(this, "dailyBudget"),
@@ -298,7 +300,7 @@ const TripForm = ({ navigation, route }) => {
       </View>
       {/* Add Currency Input field */}
       <View style={styles.buttonContainer}>
-        <FlatButton onPress={cancelHandler}>Cancel</FlatButton>
+        <FlatButton onPress={cancelHandler}>{i18n.t("cancel")}</FlatButton>
         {!isEditing ? (
           <Button
             buttonStyle={{}}
@@ -306,7 +308,7 @@ const TripForm = ({ navigation, route }) => {
             style={styles.button}
             onPress={submitHandler.bind(this, true /* setActive */)}
           >
-            Save Changes
+            {i18n.t("confirm2")}
           </Button>
         ) : (
           <FlatButton

@@ -133,10 +133,10 @@ const SettingsScreen = ({ navigation }) => {
         <Text style={styles.titleText}>Settings</Text>
       </View>
       <Button style={styles.settingsButton} onPress={logoutHandler}>
-        Logout
+        {i18n.t("logoutLabel")}
       </Button>
       <Button style={styles.settingsButton} onPress={joinInviteHandler}>
-        Join Trip
+        {i18n.t("joinTripLabel")}
       </Button>
 
       {multiTraveller && (
@@ -146,7 +146,7 @@ const SettingsScreen = ({ navigation }) => {
           }}
           style={styles.settingsButton}
         >
-          Simplify Splits
+          {i18n.t("simplifySplitsLabel")}
         </Button>
       )}
       <Button
@@ -156,13 +156,13 @@ const SettingsScreen = ({ navigation }) => {
           reloadApp();
         }}
       >
-        Reset App Introduction
+        {i18n.t("resetAppIntroductionLabel")}
       </Button>
       <LinkingButton
         style={styles.settingsButton}
         URL="https://foodfornomads.com/"
       >
-        Visit FoodForNomads
+        {i18n.t("visitFoodForNomadsLabel")}
       </LinkingButton>
       <View
         style={{

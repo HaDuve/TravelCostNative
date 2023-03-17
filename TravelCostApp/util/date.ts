@@ -68,30 +68,32 @@ export function toShortFormat(date: DateOrDateTime) {
 export function toDayMonthString(date: DateOrDateTime) {
   if (date instanceof DateTime) {
     return _toDayMonthString(date);
+  } else {
+    return _toDayMonthString(DateTime.fromJSDate(date));
   }
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  // const monthNames = [
+  //   "January",
+  //   "February",
+  //   "March",
+  //   "April",
+  //   "May",
+  //   "June",
+  //   "July",
+  //   "August",
+  //   "September",
+  //   "October",
+  //   "November",
+  //   "December",
+  // ];
 
-  const day = date.getDate();
+  // const day = date.getDate();
 
-  const monthIndex = date.getMonth();
-  const monthName = monthNames[monthIndex];
+  // const monthIndex = date.getMonth();
+  // const monthName = monthNames[monthIndex];
 
-  // const year = date.getFullYear();
+  // // const year = date.getFullYear();
 
-  return `${day} ${monthName}`;
+  // return `${day} ${monthName}`;
 }
 
 export function toDayMonthString2(
@@ -132,24 +134,27 @@ export function toDayMonthString2(
 
 export function toMonthString(date: DateOrDateTime) {
   if (date instanceof DateTime) return _toMonthString(date);
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  else {
+    return _toMonthString(DateTime.fromJSDate(date));
+  }
+  // const monthNames = [
+  //   "January",
+  //   "February",
+  //   "March",
+  //   "April",
+  //   "May",
+  //   "June",
+  //   "July",
+  //   "August",
+  //   "September",
+  //   "October",
+  //   "November",
+  //   "December",
+  // ];
 
-  const monthIndex = date.getMonth();
-  const monthName = monthNames[monthIndex];
-  return monthName;
+  // const monthIndex = date.getMonth();
+  // const monthName = monthNames[monthIndex];
+  // return monthName;
 }
 
 export function getDateMinusDays(date: DateOrDateTime, days: number) {

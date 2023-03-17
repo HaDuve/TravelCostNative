@@ -183,21 +183,19 @@ function RecentExpenses({ navigation }) {
   return (
     <View style={styles.container}>
       <TourGuideZone
-        text={"Welcome to Budget for Nomads"}
+        text={i18n.t("walk1")}
         zone={1}
         maskOffset={-4}
         tooltipBottomOffset={200}
       ></TourGuideZone>
       <TourGuideZone
-        text={"Enjoy your journey with Budget for Nomads 🎉"}
+        text={i18n.t("walk8")}
         zone={8}
         maskOffset={-4}
         tooltipBottomOffset={-200}
       ></TourGuideZone>
       <TourGuideZone
-        text={
-          "Here you can see your budget for today! Try switching from today to this month!  🎉"
-        }
+        text={i18n.t("walk3")}
         maskOffset={200}
         tooltipBottomOffset={-200}
         zone={3}

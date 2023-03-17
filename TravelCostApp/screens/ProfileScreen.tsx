@@ -182,7 +182,7 @@ const ProfileScreen = ({ navigation }) => {
           >
             <Text style={{ color: GlobalStyles.colors.primary700 }}>+</Text>
             <TourGuideZone
-              text={"Here you can create a new Trip 🎉"}
+              text={i18n.t("walk5")}
               shape={"circle"}
               maskOffset={24}
               zone={5}
@@ -198,9 +198,7 @@ const ProfileScreen = ({ navigation }) => {
           </Pressable>
         </View>
         <TourGuideZone
-          text={
-            "Here you can see all your Trips. Your active Trip is highlighted in green 🎉"
-          }
+          text={i18n.t("walk6")}
           maskOffset={200}
           tooltipBottomOffset={250}
           zone={6}
@@ -222,7 +220,7 @@ const ProfileScreen = ({ navigation }) => {
 
       <View style={styles.horizontalButtonContainer}>
         <TourGuideZone
-          text={"Here you can invite another traveller to your active Trip 🎉"}
+          text={i18n.t("walk7")}
           maskOffset={50}
           tooltipBottomOffset={50}
           zone={7}

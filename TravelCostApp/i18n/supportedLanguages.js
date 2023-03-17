@@ -90,6 +90,24 @@ const en = {
     "No expenses in this time period yet. Add new expenses with the Button below!",
   fallbackTimeFrame: "Please choose a Time Frame in the Dropdown Bar.",
   invalidInput: "Invalid input values - please check your entered data!",
+
+  // Walkthrough Texts
+  walk1:
+    "Welcome to Budget for Nomads! 🎉 We're excited to have you join us on your finance travel journey!",
+  walk2:
+    "Let's get started by adding your expenses. 🛍️ Just tap the '+' button and enter your expense details. Go ahead and give it a try now!",
+  walk3:
+    "Keep track of your budget on a daily or monthly basis. 📊 Use the button to switch between time periods and stay on top of your spending! 🤑",
+  walk4:
+    "View your expenses by category or daily overview. 📈 Use the toggle to switch between the two and get a detailed view of your finances! 🤑",
+  walk5:
+    "Ready for your next adventure? 🌎 Create a new trip and start budgeting for your travels! 🧳",
+  walk6:
+    "View all your trips and keep track of your current one. 🗺️ Your active trip will be highlighted in green. 🟢",
+  walk7:
+    "Bring a friend along on your travels! 👫 Invite a fellow nomad to your active trip and budget together. 💸",
+  walk8:
+    "Enjoy your journey with Budget for Nomads! 🎉 We're here to help you stay on budget while you explore the world. 🌍",
 };
 const de = {
   // standard strings
@@ -187,5 +205,23 @@ const de = {
   fallbackTimeFrame:
     "Bitte wählen Sie einen Zeitraum oben in der Dropdown-Leiste.",
   invalidInput: "Ungültige Eingabe - Bitte überprüfe die eingegebenen Daten!",
+
+  // Walkthrough Texts
+  walk1:
+    "Herzlich willkommen bei Budget for Nomads! 🎉 Wir freuen uns, dass du uns auf deiner Finanzreise begleitest!",
+  walk2:
+    "Lass uns loslegen, indem du deine Ausgaben hinzufügst. 🛍️ Tippe einfach auf das '+' Symbol und gib deine Ausgabendetails ein. Probiere es jetzt einfach aus!",
+  walk3:
+    "Behalte dein Budget täglich oder monatlich im Auge. 📊 Verwende den Schalter, um zwischen den Optionen zu wechseln und behalte deine Ausgaben im Blick! 🤑",
+  walk4:
+    "Schau dir deine Ausgaben nach Kategorie oder täglichem Überblick an. 📈 Verwende den Schalter, um zwischen den beiden Optionen zu wechseln und erhalte eine detaillierte Ansicht deiner Finanzen! 🤑",
+  walk5:
+    "Bereit für dein nächstes Abenteuer? 🌎 Erstelle eine neue Reise und beginne mit der Budgetierung für deine Reisen! 🧳",
+  walk6:
+    "Sieh dir alle deine Reisen an und behalte deine aktuelle im Blick. 🗺️ Deine aktive Reise wird grün hervorgehoben. 🟢",
+  walk7:
+    "Nimm einen Freund auf deine Reisen mit! 👫 Lade einen anderen Nomaden zu deiner aktiven Reise ein und budgetiert gemeinsam. 💸",
+  walk8:
+    "Genieße deine Reise mit Budget for Nomads! 🎉 Wir sind hier, um dir zu helfen, dein Budget im Blick zu behalten, während du die Welt erkundest. 🌍",
 };
 export { en, de };

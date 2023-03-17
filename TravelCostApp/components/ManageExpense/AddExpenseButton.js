@@ -14,6 +14,16 @@ import { useContext } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TourGuideZone } from "rn-tourguide";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../../i18n/supportedLanguages";
+import ToggleButton from "../../assets/SVG/toggleButton";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 const AddExpenseButton = ({ navigation }) => {
   const userCtx = useContext(UserContext);
   const isOnline = userCtx.isOnline;
@@ -23,7 +33,7 @@ const AddExpenseButton = ({ navigation }) => {
       entering={FadeIn.duration(600).delay(3000)}
     >
       <TourGuideZone
-        text={"With this Button, you can add your expenses. Try it out now!"}
+        text={i18n.t("walk2")}
         borderRadius={16}
         shape={"circle"}
         maskOffset={40}

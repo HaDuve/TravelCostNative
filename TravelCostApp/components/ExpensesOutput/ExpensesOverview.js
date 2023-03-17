@@ -65,9 +65,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
         ]}
       >
         <TourGuideZone
-          text={
-            "Here you can toggle between Daily-Overview and Category-Overview 🎉"
-          }
+          text={i18n.t("walk4")}
           tooltipBottomOffset={66}
           maskOffset={60}
           zone={4}

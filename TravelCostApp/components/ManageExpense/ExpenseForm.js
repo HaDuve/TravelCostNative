@@ -167,31 +167,6 @@ const ExpenseForm = ({
     defaultValues ? defaultValues.listEQUAL : currentTravellers
   );
 
-  // dont show EQUAL share picker when "SELF" is picked
-  if (splitType === "SELF" || IsSoloTraveller || splitType === "EQUAL") {
-    if (openEQUAL) setOpenEQUAL(false);
-  }
-
-  function openTravellerMultiPicker() {
-    console.log("splitType", splitType);
-    // add whole traveling group who paid automatically to shared list
-    if (!defaultValues) {
-      setListEQUAL([...currentTravellers]);
-    }
-    setOpenEQUAL(true);
-  }
-
-  function inputSplitListHandler(index, props, value) {
-    if (splitType === "EQUAL") return;
-    const tempList = [...splitList];
-    const tempValue = { amount: value, userName: props.userName };
-    tempList[index] = tempValue;
-    setSplitList(tempList);
-    setSplitListValid(
-      validateSplitList(tempList, splitType, inputs.amount.value, index)
-    );
-  }
-
   const [inputs, setInputs] = useState({
     amount: {
       value: defaultValues ? defaultValues.amount?.toString() : "",
@@ -244,6 +219,37 @@ const ExpenseForm = ({
         [inputIdentifier]: { value: enteredValue, isValid: true },
       };
     });
+  }
+
+  if (splitType === "SELF" || IsSoloTraveller) {
+    if (openEQUAL) {
+      setOpenEQUAL(false);
+    }
+  }
+
+  if (splitType === "EQUAL" && openEQUAL) {
+    splitHandler();
+    setOpenEQUAL(false);
+  }
+
+  function openTravellerMultiPicker() {
+    console.log("splitType", splitType);
+    // add whole traveling group who paid automatically to shared list
+    if (!defaultValues) {
+      setListEQUAL([...currentTravellers]);
+    }
+    setOpenEQUAL(true);
+  }
+
+  function inputSplitListHandler(index, props, value) {
+    if (splitType === "EQUAL") return;
+    const tempList = [...splitList];
+    const tempValue = { amount: value, userName: props.userName };
+    tempList[index] = tempValue;
+    setSplitList(tempList);
+    setSplitListValid(
+      validateSplitList(tempList, splitType, inputs.amount.value, index)
+    );
   }
 
   function splitHandler() {

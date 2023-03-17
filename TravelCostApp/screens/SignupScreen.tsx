@@ -1,7 +1,7 @@
 /* eslint-disable react/react-in-jsx-scope */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useContext, useState } from "react";
-import { Alert } from "react-native";
+import React, { Alert, KeyboardAvoidingView } from "react-native";
 
 import AuthContent from "../components/Auth/AuthContent";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
@@ -56,7 +56,11 @@ function SignupScreen() {
     return <LoadingOverlay message="Creating user..." />;
   }
 
-  return <AuthContent onAuthenticate={signupHandler} />;
+  return (
+    <KeyboardAvoidingView behavior={"position"}>
+      <AuthContent isLogin={false} onAuthenticate={signupHandler} />
+    </KeyboardAvoidingView>
+  );
 }
 
 export default SignupScreen;

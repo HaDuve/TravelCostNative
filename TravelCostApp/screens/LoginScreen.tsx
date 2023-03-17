@@ -9,6 +9,7 @@ import { fetchUser } from "../util/http";
 import { TripContext } from "../store/trip-context";
 import { asyncStoreSetItem, asyncStoreSetObject } from "../store/async-storage";
 import Toast from "react-native-toast-message";
+import { KeyboardAvoidingView } from "react-native";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -82,7 +83,11 @@ function LoginScreen() {
     return <LoadingOverlay message="Logging in user..." />;
   }
 
-  return <AuthContent isLogin onAuthenticate={loginHandler} />;
+  return (
+    <KeyboardAvoidingView behavior={"position"}>
+      <AuthContent isLogin onAuthenticate={loginHandler} />
+    </KeyboardAvoidingView>
+  );
 }
 
 export default LoginScreen;

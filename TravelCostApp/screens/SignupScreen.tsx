@@ -10,6 +10,7 @@ import { UserContext } from "../store/user-context";
 import { createUser } from "../util/auth";
 import { storeUser, updateUser } from "../util/http";
 import { AuthContext } from "../store/auth-context";
+import Toast from "react-native-toast-message";
 
 function SignupScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -20,7 +21,11 @@ function SignupScreen() {
     setIsAuthenticating(true);
     // Check internet connection first
     if (!(await userCtx.checkConnectionUpdateUser())) {
-      Alert.alert("No internet connection", "Please try again later.");
+      Toast.show({
+        type: "error",
+        text1: "No internet connection",
+        text2: "Please check your internet connection and try again",
+      });
       setIsAuthenticating(false);
       return;
     }

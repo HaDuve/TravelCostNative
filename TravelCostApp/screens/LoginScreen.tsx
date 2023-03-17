@@ -22,7 +22,11 @@ function LoginScreen() {
     setIsAuthenticating(true);
     // Check internet connection first
     if (!(await userCtx.checkConnectionUpdateUser())) {
-      Alert.alert("No internet connection", "Please try again later.");
+      Toast.show({
+        type: "error",
+        text1: "No internet connection",
+        text2: "Please check your internet connection and try again",
+      });
       setIsAuthenticating(false);
       return;
     }

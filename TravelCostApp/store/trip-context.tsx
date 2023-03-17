@@ -4,6 +4,7 @@ import React, { createContext, useState } from "react";
 import { Alert } from "react-native";
 import { fetchTrip, getTravellers } from "../util/http";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
+import Toast from "react-native-toast-message";
 
 export interface TripData {
   tripName: string;
@@ -36,7 +37,6 @@ export const TripContext = createContext({
   deleteTrip: (tripid: string) => {},
   getcurrentTrip: () => {},
   setCurrentTrip: (tripid: string, trip) => {},
-  deleteCurrentTrip: (uid: string) => {},
   fetchAndSetCurrentTrip: async (tripid: string) => {},
   saveTripDataInStorage: async (tripData) => {},
   loadTripDataFromStorage: async () => {},
@@ -108,10 +108,6 @@ function TripContextProvider({ children }) {
 
   function setTotalSum(amount: number) {
     setTotalSumTrip(amount);
-  }
-
-  function deleteCurrentTrip(id: string) {
-    Alert.alert("deleteCurrentTrip not implemented");
   }
 
   async function fetchAndSetCurrentTrip(tripid: string) {
@@ -208,7 +204,6 @@ function TripContextProvider({ children }) {
     deleteTrip: deleteTrip,
     getcurrentTrip: getcurrentTrip,
     setCurrentTrip: setCurrentTrip,
-    deleteCurrentTrip: deleteCurrentTrip,
     fetchAndSetCurrentTrip: fetchAndSetCurrentTrip,
     saveTripDataInStorage: saveTripDataInStorage,
     loadTripDataFromStorage: loadTripDataFromStorage,

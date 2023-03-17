@@ -70,7 +70,6 @@ const ExpenseForm = ({
   editedExpenseId,
   newCat,
 }) => {
-  console.log("~~~~ defaultValues", defaultValues);
   // set context
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
@@ -107,11 +106,6 @@ const ExpenseForm = ({
       ? getFormattedDate(DateTime.fromJSDate(defaultValues.date).toJSDate())
       : getFormattedDate(DateTime.now())
   );
-
-  console.log("### startDate:", startDate);
-  console.log("### typeof startDate:", typeof startDate);
-  console.log("### endDate:", endDate);
-  console.log("### typeof endDate:", typeof endDate);
 
   const openDatePickerRange = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -179,12 +173,12 @@ const ExpenseForm = ({
   }
 
   function openTravellerMultiPicker() {
+    console.log("splitType", splitType);
     // add whole traveling group who paid automatically to shared list
     if (!defaultValues) {
       setListEQUAL([...currentTravellers]);
     }
     setOpenEQUAL(true);
-    splitHandler();
   }
 
   function inputSplitListHandler(index, props, value) {
@@ -287,8 +281,6 @@ const ExpenseForm = ({
       listEQUAL: splitTravellersList,
       splitList: splitList,
     };
-    console.log("~~~~ date", expenseData.date);
-    console.log("~~~~ typeof", typeof expenseData.date);
 
     // SoloTravellers always pay for themselves
     if (IsSoloTraveller || expenseData.whoPaid === null)
@@ -358,7 +350,6 @@ const ExpenseForm = ({
       // Alert.alert("Invalid Input", "Please check your input values");
       addDefaultValues(pickedCat);
       // alertDefaultValues();
-      console.log("~~~~ expense.date", expenseData.date);
       return;
     }
 
@@ -390,7 +381,6 @@ const ExpenseForm = ({
       listEQUAL: currentTravellers,
       splitList: [],
     };
-    console.log("~~~~ expense.date", expenseData.date);
     onSubmit(expenseData);
   }
 
@@ -519,8 +509,6 @@ const ExpenseForm = ({
       language={Localization.locale.slice(0, 2)}
     />
   );
-
-  console.log("~~~~~ inputs date", inputs.date.value);
 
   return (
     <>

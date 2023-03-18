@@ -1,4 +1,7 @@
 Change log Travel Expense App
+1.0.63
+- added date range support for trips, you can now easily calculate total budget or daily budget from the calendar
+- more translations
 
 1.0.62
 - Better walkthrough text for introduction

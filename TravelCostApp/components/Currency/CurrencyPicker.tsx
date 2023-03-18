@@ -11,6 +11,7 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../../i18n/supportedLanguages";
 import LoadingOverlay from "../UI/LoadingOverlay";
+import * as Haptics from "expo-haptics";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
@@ -49,6 +50,12 @@ const CurrencyPicker = ({
         searchable={true}
         listMode="MODAL"
         setOpen={setOpen}
+        onOpen={() => {
+          Haptics.ImpactFeedbackStyle.Light;
+        }}
+        onClose={() => {
+          Haptics.ImpactFeedbackStyle.Light;
+        }}
         onChangeValue={onChangeValue}
         setValue={setCountryValue}
         setItems={setItems}

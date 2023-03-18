@@ -7,6 +7,8 @@ const en = {
   confirm2: "Confirm",
   continue: "Continue",
   cancel: "Cancel",
+  delete: "Delete",
+  saveChanges: "Save Changes",
   add: "Add",
   update: "Update",
   sure: "Are you sure?",
@@ -129,7 +131,14 @@ const en = {
   baseCurrencyLabel: "Base Currency",
   totalBudgetLabel: "Total Budget in",
   dailyBudgetLabel: "Daily Budget in",
+  enterNameAlert: "Please enter a Name for your new Trip Budget",
+  enterBudgetAlert: "Please enter a Total Budget higher than Daily Budget",
+  selectCurrencyAlert: "Please select a Base Currency for your Trip Budget",
+  deleteTrip: "Delete Trip",
+  deleteTripSure: "Are you sure you want to delete this Trip?",
+  setActive: "Set as active Trip",
 
+  // Loading Strings
   loadingYourTrip: "Loading your Trip...",
   loading: "Loading...",
 };
@@ -142,6 +151,8 @@ const de = {
   confirm2: "Bestätigen",
   continue: "Weiter",
   cancel: "Abbrechen",
+  delete: "Löschen",
+  saveChanges: "Änderungen speichern",
   add: "Hinzufügen",
   update: "Aktualisieren",
   sure: "Sind Sie sicher?",
@@ -268,7 +279,14 @@ const de = {
   tripCurrencyLabel: "Deine Heimat-Währung in",
   totalBudgetLabel: "Gesamtbudget in",
   dailyBudgetLabel: "Tägliches Budget in",
+  enterNameAlert: "Bitte gib einen Namen für deine Reise ein!",
+  enterBudgetAlert: "Bitte gib ein höheres Gesamtbudget als Tagesbudget ein!",
+  selectCurrencyAlert: "Bitte wähle deine Heimatwährung aus!",
+  deleteTrip: "Reise löschen",
+  deleteTripSure: "Bist du dir sicher, dass du diese Reise löschen möchtest?",
+  setActive: "Als aktive Reise markieren",
 
+  // Loading Strings
   loading: "Laden...",
   loadingYourTrip: "Lade deine Reise...",
 };

@@ -111,10 +111,8 @@ const TripForm = ({ navigation, route }) => {
   }
   function deleteHandler() {
     Alert.alert(
-      // i18n.t("deleteTripTitle"),
-      "Delete Trip",
-      // i18n.t("deleteTripMessage"),
-      "Are you sure you want to delete this Trip? [Delete Function coming soon ...]",
+      i18n.t("deleteTrip"),
+      i18n.t("deleteTripSure"),
       [
         {
           text: i18n.t("cancel"),
@@ -122,7 +120,7 @@ const TripForm = ({ navigation, route }) => {
         },
         {
           // text: i18n.t("delete"),
-          text: "Delete",
+          text: i18n.t("delete"),
           style: "destructive",
           onPress: async () => {
             deleteAcceptHandler();
@@ -163,22 +161,20 @@ const TripForm = ({ navigation, route }) => {
 
     if (!tripNameIsValid) {
       inputs.tripName.isValid = tripNameIsValid;
-      Alert.alert("Please enter a Name for your new Trip Budget");
+      Alert.alert(i18n.t("enterNameAlert"));
       return;
     }
 
     if (!totalBudgetIsValid || !dailyBudgetIsValid) {
       inputs.totalBudget.isValid = totalBudgetIsValid;
       inputs.dailyBudget.isValid = dailyBudgetIsValid;
-      Alert.alert(
-        "Please enter positive Numbers (Total Budget cannot be lower than Daily Budget)"
-      );
+      Alert.alert(i18n.t("enterBudgetAlert"));
       return;
     }
 
     if (!tripCurrencyIsValid) {
       inputs.tripCurrency.isValid = tripCurrencyIsValid;
-      Alert.alert("Please select a Currency");
+      Alert.alert(i18n.t("selectCurrencyAlert"));
       return;
     }
     // if isEditing update Trip, else store
@@ -315,7 +311,7 @@ const TripForm = ({ navigation, route }) => {
             style={styles.button}
             onPress={submitHandler.bind(this, false /* setActive */)}
           >
-            Save Changes{" "}
+            {i18n.t("saveChanges")}
           </FlatButton>
         )}
       </View>
@@ -329,7 +325,7 @@ const TripForm = ({ navigation, route }) => {
             style={[styles.button, { marginBottom: 8, marginHorizontal: 24 }]}
             onPress={deleteHandler}
           >
-            Delete
+            {i18n.t("deleteTrip")}
           </Button>
         )}
         {isEditing && (
@@ -339,7 +335,7 @@ const TripForm = ({ navigation, route }) => {
             style={[styles.button, { marginBottom: 8, marginHorizontal: 24 }]}
             onPress={submitHandler.bind(this, true /* setActive */)}
           >
-            Set Active
+            {i18n.t("setActive")}
           </Button>
         )}
       </View>

@@ -37,8 +37,6 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 
 const TripForm = ({ navigation, route }) => {
-  const sleepyStartTour = route.params?.callback;
-  console.log("TripForm ~ sleepyStartTour:", sleepyStartTour);
   const [isLoading, setIsLoading] = useState(false);
   const [inputs, setInputs] = useState({
     tripName: {

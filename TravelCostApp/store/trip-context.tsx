@@ -15,6 +15,8 @@ export interface TripData {
   tripid?: string;
   totalSum?: number;
   tripProgress?: number;
+  startDate?: string;
+  endDate?: string;
 }
 
 export const TripContext = createContext({

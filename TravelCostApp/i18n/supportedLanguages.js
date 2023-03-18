@@ -137,6 +137,7 @@ const en = {
   deleteTrip: "Delete Trip",
   deleteTripSure: "Are you sure you want to delete this Trip?",
   setActive: "Set as active Trip",
+  datePickerLabel: "Trip Start and End",
 
   // Loading Strings
   loadingYourTrip: "Loading your Trip...",
@@ -285,6 +286,7 @@ const de = {
   deleteTrip: "Reise löschen",
   deleteTripSure: "Bist du dir sicher, dass du diese Reise löschen möchtest?",
   setActive: "Als aktive Reise markieren",
+  datePickerLabel: "Reise Start und Ende",
 
   // Loading Strings
   loading: "Laden...",

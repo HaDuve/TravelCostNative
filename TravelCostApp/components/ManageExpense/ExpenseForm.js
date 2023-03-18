@@ -42,6 +42,11 @@ import {
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import CurrencyPicker from "../Currency/CurrencyPicker";
 import { truncateString } from "../../util/string";
 import Toast from "react-native-toast-message";
@@ -54,10 +59,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { asyncStoreSetItem } from "../../store/async-storage";
 import { DateTime } from "luxon";
-const i18n = new I18n({ en, de });
-i18n.locale = Localization.locale.slice(0, 2);
-i18n.enableFallback = true;
-// i18n.locale = "en";
+import DatePickerModal from "../UI/DatePickerModal";
+import DatePickerContainer from "../UI/DatePickerContainer";
 
 const ExpenseForm = ({
   onCancel,
@@ -455,66 +458,25 @@ const ExpenseForm = ({
     inputChangedHandler("currency", countryValue.split(" ")[0]);
     inputChangedHandler("country", countryValue.split("- ")[1]);
   }
-
   const formIsInvalid =
     !inputs.amount.isValid ||
     !inputs.description.isValid ||
     !inputs.currency.isValid;
-
-  // NOTE: for DEBUG the pickers
   const showWhoPaid = inputs.amount.value !== "";
   const whoPaidValid = whoPaid !== null;
   const splitTypeEqual = splitType === "EQUAL";
   const splitTypeSelf = splitType === "SELF";
+  const splitListHasNonZeroEntries = splitList?.some(
+    (item) => item.amount !== 0
+  );
   const hidePickers = true;
   const dateIsRanged =
     startDate.toString().slice(0, 10) !== endDate.toString().slice(0, 10);
-  const android = Platform.OS === "android";
-  const datepickerJSX = android ? (
-    <View
-      style={
-        showDatePickerRange && { minHeight: Dimensions.get("screen").height }
-      }
-    >
-      <DatePicker
-        isVisible={showDatePickerRange}
-        mode={"range"}
-        colorOptions={{
-          headerColor: GlobalStyles.colors.primaryGrayed,
-          headerTextColor: GlobalStyles.colors.backgroundColor,
-          backgroundColor: GlobalStyles.colors.backgroundColor,
-          changeYearModalColor: GlobalStyles.colors.backgroundColor,
-          selectedDateTextColor: GlobalStyles.colors.backgroundColor,
-          dateTextColor: GlobalStyles.colors.textColor,
-          selectedDateBackgroundColor: GlobalStyles.colors.primaryGrayed,
-          confirmButtonColor: GlobalStyles.colors.primary700,
-          weekDaysColor: GlobalStyles.colors.primary700,
-        }}
-        onCancel={onCancelRange}
-        onConfirm={onConfirmRange}
-        language={Localization.locale.slice(0, 2)}
-      />
-    </View>
-  ) : (
-    <DatePicker
-      isVisible={showDatePickerRange}
-      mode={"range"}
-      colorOptions={{
-        headerColor: GlobalStyles.colors.primaryGrayed,
-        headerTextColor: GlobalStyles.colors.backgroundColor,
-        backgroundColor: GlobalStyles.colors.backgroundColor,
-        changeYearModalColor: GlobalStyles.colors.backgroundColor,
-        selectedDateTextColor: GlobalStyles.colors.backgroundColor,
-        dateTextColor: GlobalStyles.colors.textColor,
-        selectedDateBackgroundColor: GlobalStyles.colors.primaryGrayed,
-        confirmButtonColor: GlobalStyles.colors.primary700,
-        weekDaysColor: GlobalStyles.colors.primary700,
-      }}
-      onCancel={onCancelRange}
-      onConfirm={onConfirmRange}
-      language={Localization.locale.slice(0, 2)}
-    />
-  );
+  const datepickerJSX = DatePickerModal({
+    showDatePickerRange,
+    onCancelRange,
+    onConfirmRange,
+  });
 
   return (
     <>
@@ -547,7 +509,7 @@ const ExpenseForm = ({
                   : getCatSymbol(pickedCat)
               }
               color={GlobalStyles.colors.primary500}
-              size={36}
+              size={48}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 navigation.navigate("CategoryPick", {
@@ -610,46 +572,12 @@ const ExpenseForm = ({
               <View style={styles.dateLabel}>
                 <Text style={styles.dateLabelText}>{i18n.t("dateLabel")}</Text>
               </View>
-              <View style={styles.dateContainer}>
-                <View style={styles.dateIconContainer}>
-                  <IconButton
-                    icon={"calendar-outline"}
-                    size={24}
-                    color={GlobalStyles.colors.primary500}
-                    style={styles.button}
-                    onPress={openDatePickerRange}
-                  />
-                </View>
-                <View>
-                  <Text style={styles.advancedText}>
-                    {startDate && toShortFormat(new Date(startDate))}
-                  </Text>
-                  {dateIsRanged && (
-                    <Pressable
-                      onPress={() => {
-                        Alert.alert(
-                          "Not implemented yet",
-                          "Sorry, this feature is not implemented yet.",
-                          [
-                            {
-                              text: "OK",
-                              onPress: () => console.log("OK Pressed"),
-                              style: "cancel",
-                            },
-                          ]
-                        );
-                      }}
-                    >
-                      <Text style={styles.advancedText}>- duplicate - </Text>
-                    </Pressable>
-                  )}
-                  {dateIsRanged && (
-                    <Text style={styles.advancedText}>
-                      {endDate && toShortFormat(new Date(endDate))}
-                    </Text>
-                  )}
-                </View>
-              </View>
+              {DatePickerContainer({
+                openDatePickerRange,
+                startDate,
+                endDate,
+                dateIsRanged,
+              })}
 
               <View style={styles.inputsRowSecond}>
                 {/* !IsSoloTraveller && */}
@@ -780,16 +708,19 @@ const ExpenseForm = ({
                 />
               )}
               <View styles={[styles.advancedRowSplit]}>
-                {!splitTypeSelf && whoPaidValid && !IsSoloTraveller && (
-                  <Text
-                    style={[
-                      styles.currencyLabel,
-                      { marginTop: 16, marginLeft: 16 },
-                    ]}
-                  >
-                    {i18n.t("whoShared")}
-                  </Text>
-                )}
+                {!splitTypeSelf &&
+                  whoPaidValid &&
+                  !IsSoloTraveller &&
+                  splitListHasNonZeroEntries && (
+                    <Text
+                      style={[
+                        styles.currencyLabel,
+                        { marginTop: 16, marginLeft: 16 },
+                      ]}
+                    >
+                      {i18n.t("whoShared")}
+                    </Text>
+                  )}
                 {!splitTypeSelf && (
                   <FlatList
                     // numColumns={2}

@@ -21,10 +21,15 @@ Build in JavaScript with React-Native, this is my app for travellers to track th
 
 ## Developement Screenshots:
 
-![Simulator Screen Shot - iPhone SE (3rd generation) - 2023-03-19 at 09 30 05](https://user-images.githubusercontent.com/48185176/226154767-b68aaf91-fa0f-4eee-be0c-3c36eb99bba3.png)
-![Simulator Screen Shot - iPhone SE (3rd generation) - 2023-03-19 at 09 30 57](https://user-images.githubusercontent.com/48185176/226154768-8ebceb28-cee6-498c-aa13-bdc6ecc4e497.png)
-![Simulator Screen Shot - iPhone SE (3rd generation) - 2023-03-19 at 09 31 07](https://user-images.githubusercontent.com/48185176/226154769-7fa8240d-79a5-4028-ad64-7bb19d6c0374.png)
-![Simulator Screen Shot - iPhone SE (3rd generation) - 2023-03-19 at 09 31 16](https://user-images.githubusercontent.com/48185176/226154771-33ee169c-4390-4218-9373-4618943ed3b2.png)
+
+<img src="https://user-images.githubusercontent.com/48185176/226154767-b68aaf91-fa0f-4eee-be0c-3c36eb99bba3.png" width="300">
+
+<img src="https://user-images.githubusercontent.com/48185176/226154768-8ebceb28-cee6-498c-aa13-bdc6ecc4e497.png" width="300">
+
+<img src="https://user-images.githubusercontent.com/48185176/226154769-7fa8240d-79a5-4028-ad64-7bb19d6c0374.png" width="300">
+
+<img src="https://user-images.githubusercontent.com/48185176/226154771-33ee169c-4390-4218-9373-4618943ed3b2.png" width="300">
+
 
 Google Drive has more Screenshots:
 

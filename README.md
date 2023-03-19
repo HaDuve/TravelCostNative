@@ -20,15 +20,10 @@ Build in JavaScript with React-Native, this is my app for travellers to track th
 - Import From Excel Sheets (eg.: FoodForNomads, GehMalReisen)
 
 ## Developement Screenshots:
-Google Drive has the newest Screenshots:
+
+ <img src="https://user-images.githubusercontent.com/48185176/226154768-8ebceb28-cee6-498c-aa13-bdc6ecc4e497.png" width="300"> <img src="https://user-images.githubusercontent.com/48185176/226154769-7fa8240d-79a5-4028-ad64-7bb19d6c0374.png" width="300">  <img src="https://user-images.githubusercontent.com/48185176/226154771-33ee169c-4390-4218-9373-4618943ed3b2.png" width="300"> 
+
+
+Google Drive has more Screenshots:
 
 https://drive.google.com/drive/folders/1-3xQV7rxPB9MWz0-QEnE7xA4QCxM0LAb?usp=sharing
-
-
-<img width="200" alt="image" src="https://user-images.githubusercontent.com/48185176/193550651-ac166a59-af01-458f-b939-0f5fc8dcf478.png"><img width="200" alt="image" src="https://user-images.githubusercontent.com/48185176/193573966-1ec592d8-9ecf-4792-b644-293e5782b731.png">
-
-
-
-
-https://user-images.githubusercontent.com/48185176/216894386-ed5544ce-9bd8-4a0c-ae10-cc337c63321f.MP4
-

@@ -1,9 +1,11 @@
 import React, { Share, View, Button } from "react-native";
+import * as Linking from "expo-linking";
 import * as Haptics from "expo-haptics";
 
 export async function onShare(shareId, navigation) {
   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  const link = "exp://192.168.100.102:19000/--/join/" + shareId;
+  const link = Linking.createURL("join/" + shareId);
+  // const link = "exp://192.168.100.102:19000/--/join/" + shareId;
   try {
     const result = await Share.share({
       message: `Invite to trip: ${shareId}  You are welcome to join me on TripExpense!`,

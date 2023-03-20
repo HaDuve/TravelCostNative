@@ -17,7 +17,6 @@ Build in JavaScript with React-Native, this is my app for travellers to track th
 - Invite Friends & Family to share the trip with
 - Share Costs and simplify transactions (like Splitwise/Splid)
 - Works Online and Offline
-- Import From Excel Sheets (eg.: FoodForNomads, GehMalReisen)
 
 ## Developement Screenshots:
 

@@ -28,26 +28,27 @@ import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
 import { DateTime } from "luxon";
+
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de } from "../i18n/supportedLanguages";
-import { useInterval } from "../components/Hooks/useInterval";
-import Toast from "react-native-toast-message";
-import { DEBUG_POLLING_INTERVAL } from "../confApp";
-import { asyncStoreGetItem, asyncStoreSetItem } from "../store/async-storage";
-import {
-  fetchAndSetExpenses,
-  offlineLoad,
-} from "../components/ExpensesOutput/RecentExpensesUtil";
-import { _toShortFormat } from "../util/dateTime";
-import { useFocusEffect } from "@react-navigation/native";
-import { isForeground } from "../util/appState";
-import { TourGuideZone } from "rn-tourguide";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
+
+import { useInterval } from "../components/Hooks/useInterval";
+import { DEBUG_POLLING_INTERVAL } from "../confApp";
+import {
+  fetchAndSetExpenses,
+  offlineLoad,
+} from "../components/ExpensesOutput/RecentExpensesUtil";
+import { asyncStoreGetItem, asyncStoreSetItem } from "../store/async-storage";
+import { _toShortFormat } from "../util/dateTime";
+import { useFocusEffect } from "@react-navigation/native";
+import { isForeground } from "../util/appState";
+import { TourGuideZone } from "rn-tourguide";
 
 function RecentExpenses({ navigation }) {
   const expensesCtx = useContext(ExpensesContext);

@@ -188,7 +188,20 @@ const ManageExpense = ({ route, navigation }) => {
           const day1 = new Date(expenseData.startDate);
           const day2 = new Date(expenseData.endDate);
           const days = daysBetween(day2, day1);
-          // TODO: hotfix choice between duplicate and split up ranged expenses
+
+          // get correct amount
+          if (expenseData.duplOrSplit === 0) {
+            Alert.alert("wrong duplOrSplit value");
+            return;
+          }
+          // 0 is null, 1 is dupl (default), 2 is split
+          if (expenseData.duplOrSplit === 2) {
+            const splitCalcAmount = expenseData.calcAmount / (days + 1);
+            expenseData.calcAmount = Number(splitCalcAmount).toFixed(2);
+            const splitAmount = expenseData.amount / (days + 1);
+            expenseData.amount = Number(splitAmount).toFixed(2);
+          }
+
           // iterate over number of days between and change date and endDate to the first date + iterator
           for (let i = 0; i <= days; i++) {
             console.log("day nr: ", i);

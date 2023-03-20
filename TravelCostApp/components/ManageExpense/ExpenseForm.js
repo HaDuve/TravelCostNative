@@ -119,6 +119,17 @@ const ExpenseForm = ({
     setShowDatePickerRange(false);
   };
 
+  // 1 is dupl, 2 is enum, 0 is null
+  const [duplOrSplit, setDuplOrSplit] = useState(
+    defaultValues ? defaultValues.duplOrSplit : 0
+  );
+  const duplOrSplitString =
+    duplOrSplit === 1
+      ? i18n.t("duplicateExpensesText")
+      : duplOrSplit === 2
+      ? i18n.t("splitUpExpensesText")
+      : "";
+
   const onConfirmRange = (output) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(false);
@@ -129,6 +140,22 @@ const ExpenseForm = ({
     const endDateFormat = getFormattedDate(endDate);
     setStartDate(startDateFormat);
     setEndDate(endDateFormat);
+    Alert.alert(i18n.t("rangedDatesTitle"), i18n.t("rangedDatesText"), [
+      {
+        text: i18n.t("duplicateExpenses"),
+        onPress: async () => {
+          console.log("duplicate");
+          setDuplOrSplit(1);
+        },
+      },
+      {
+        text: i18n.t("splitUpExpenses"),
+        onPress: async () => {
+          console.log("split up");
+          setDuplOrSplit(2);
+        },
+      },
+    ]);
   };
 
   // list of all splits owed
@@ -289,6 +316,7 @@ const ExpenseForm = ({
       splitType: splitType,
       listEQUAL: splitTravellersList,
       splitList: splitList,
+      duplOrSplit: duplOrSplit,
     };
 
     // SoloTravellers always pay for themselves
@@ -570,7 +598,9 @@ const ExpenseForm = ({
               />
 
               <View style={styles.dateLabel}>
-                <Text style={styles.dateLabelText}>{i18n.t("dateLabel")}</Text>
+                <Text style={styles.dateLabelText}>
+                  {i18n.t("dateLabel")} {duplOrSplitString}
+                </Text>
               </View>
               {DatePickerContainer({
                 openDatePickerRange,

@@ -189,6 +189,14 @@ const en = {
 
   // Filtered expenses
   noExpensesText: "No expenses -",
+  duplicateExpensesText: " - duplicate expenses",
+  splitUpExpensesText: " - split up expenses",
+
+  // duplOrSplitUp
+  rangedDatesTitle: "Long-term expenses",
+  rangedDatesText: "Duplicate or split up?",
+  duplicateExpenses: "Duplicate",
+  splitUpExpenses: "Split Up",
 };
 const de = {
   // standard strings
@@ -386,6 +394,14 @@ const de = {
 
   // Filtered expenses
   noExpensesText: "Keine Ausgaben -",
+  duplicateExpensesText: " - duplizierte Ausgaben",
+  splitUpExpensesText: " - aufgeteilte Ausgaben",
+
+  // duplOrSplitUp
+  rangedDatesTitle: "Langfristige Ausgaben",
+  rangedDatesText: "Duplizieren oder aufsplitten?",
+  duplicateExpenses: "Duplizieren",
+  splitUpExpenses: "Aufsplitten",
 };
 const fr = {
   // standard strings
@@ -585,5 +601,13 @@ const fr = {
 
   // Filtered expenses
   noExpensesText: "Aucune dépense -",
+
+  // duplOrSplit
+  duplicateExpensesText: " - dépenses dupliquées",
+  splitUpExpensesText: " - dépenses partagées",
+  rangedDatesTitle: "Dépenses à long terme",
+  rangedDatesText: "Dupliquer ou séparer les dépenses ?",
+  duplicateExpenses: "Dupliquer",
+  splitUpExpenses: "Séparer",
 };
 export { en, de, fr };

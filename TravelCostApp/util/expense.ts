@@ -16,4 +16,5 @@ export interface ExpenseData {
   whoPaid: string;
   owePerc: number;
   calcAmount: number;
+  duplOrSplit: number;
 }

@@ -3,9 +3,19 @@ import React, { useContext, useState } from "react";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { login } from "../util/auth";
 import { Alert } from "react-native";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import { AuthContext } from "../store/auth-context";
 import { UserContext } from "../store/user-context";
-import { fetchUser } from "../util/http";
+import { fetchUser, touchMyTraveler } from "../util/http";
 import { TripContext } from "../store/trip-context";
 import { asyncStoreSetItem, asyncStoreSetObject } from "../store/async-storage";
 import Toast from "react-native-toast-message";
@@ -24,8 +34,8 @@ function LoginScreen() {
     if (!(await userCtx.checkConnectionUpdateUser())) {
       Toast.show({
         type: "error",
-        text1: "No internet connection",
-        text2: "Please check your internet connection and try again",
+        text1: i18n.t("noConnection"),
+        text2: i18n.t("checkConnectionError"),
       });
       setIsAuthenticating(false);
       return;
@@ -40,8 +50,8 @@ function LoginScreen() {
         Toast.show({
           type: "error",
           position: "top",
-          text1: "Exceptional Error",
-          text2: "Please try again later!",
+          text1: i18n.t("exceptionError"),
+          text2: i18n.t("tryAgain"),
           visibilityTime: 4000,
         });
         authCtx.logout();
@@ -55,36 +65,30 @@ function LoginScreen() {
       }
       //// END OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
       try {
-        const userData = await fetchUser(uid);
+        const userData = checkUser;
         console.log("loginHandler ~ userData", userData);
         const tripid = userData.currentTrip;
-        if (!userData) {
-          console.error("no userData");
-        } else {
-          asyncStoreSetItem("currentTripId", tripid);
-          tripCtx.setTripid(tripid);
-          userCtx.addUser(userData);
-          await tripCtx.fetchAndSetCurrentTrip(tripid);
-          tripCtx.refresh();
-        }
+        await asyncStoreSetItem("currentTripId", tripid);
+        touchMyTraveler(tripid, uid);
+        tripCtx.setTripid(tripid);
+        userCtx.addUser(userData);
+        await tripCtx.fetchAndSetCurrentTrip(tripid);
+        tripCtx.refresh();
       } catch (error) {
-        Alert.alert("Error while logging in: ", error);
+        Alert.alert(i18n.t("noConnection"), i18n.t("tryAgain"));
       }
       authCtx.setUserID(uid);
       authCtx.authenticate(token);
     } catch (error) {
       console.error(error);
       setIsAuthenticating(false);
-      Alert.alert(
-        "Authentication failed!",
-        "Failed to login. Wrong password or Username? Please try again later."
-      );
+      Alert.alert(i18n.t("authError"), i18n.t("authErrorText"));
       authCtx.logout();
     }
   }
 
   if (isAuthenticating) {
-    return <LoadingOverlay message="Logging in user..." />;
+    return <LoadingOverlay message={i18n.t("loginLoadText")} />;
   }
 
   return (

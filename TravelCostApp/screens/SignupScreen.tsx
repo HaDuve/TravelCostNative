@@ -3,6 +3,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useContext, useState } from "react";
 import React, { Alert, KeyboardAvoidingView } from "react-native";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import AuthContent from "../components/Auth/AuthContent";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { asyncStoreSafeClear } from "../store/async-storage";
@@ -23,8 +32,8 @@ function SignupScreen() {
     if (!(await userCtx.checkConnectionUpdateUser())) {
       Toast.show({
         type: "error",
-        text1: "No internet connection",
-        text2: "Please check your internet connection and try again",
+        text1: i18n.t("noConnection"),
+        text2: i18n.t("checkConnectionError"),
       });
       setIsAuthenticating(false);
       return;
@@ -48,17 +57,14 @@ function SignupScreen() {
       authCtx.authenticate(token);
     } catch (error) {
       console.log("signupHandler ~ error2", error);
-      Alert.alert(
-        "Authentication failed",
-        "Could not create user, please check your input and try again later."
-      );
+      Alert.alert(i18n.t("authError"), i18n.t("createErrorText"));
 
       setIsAuthenticating(false);
     }
   }
 
   if (isAuthenticating) {
-    return <LoadingOverlay message="Creating user..." />;
+    return <LoadingOverlay message={i18n.t("createUserLoadText")} />;
   }
 
   return (

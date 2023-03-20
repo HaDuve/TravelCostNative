@@ -1,6 +1,15 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { StyleSheet, View, Text, Image, Pressable, Alert } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
 
 import Button from "../UI/Button";
 import Input from "./Input";
@@ -49,25 +58,25 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
         </View>
         <View style={styles.titleContainer}>
           <Text style={styles.titleText}>
-            {isLogin ? "Login" : "Create account"}
+            {isLogin ? i18n.t("loginText") : i18n.t("createAccountText")}
           </Text>
           <Text style={styles.subTitleText}>
             {isLogin
-              ? "Welcome back, sign in to continue using the Expense Tracker"
-              : "Enter your credentials here or signup easily via Google."}
+              ? i18n.t("welcomeSigninText")
+              : i18n.t("welcomeCreateAccountText")}
           </Text>
         </View>
 
         {!isLogin && (
           <Input
-            label="Name"
+            label={i18n.t("nameLabel")}
             onUpdateValue={updateInputValueHandler.bind(this, "name")}
             value={enteredName}
             isInvalid={nameIsInvalid}
           />
         )}
         <Input
-          label="Email Address"
+          label={i18n.t("emailLabel")}
           onUpdateValue={updateInputValueHandler.bind(this, "email")}
           value={enteredEmail}
           keyboardType="email-address"
@@ -75,7 +84,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
         />
 
         <Input
-          label="Password"
+          label={i18n.t("passwordLabel")}
           onUpdateValue={updateInputValueHandler.bind(this, "password")}
           secure
           value={enteredPassword}
@@ -84,20 +93,18 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
 
         <View style={styles.buttons}>
           <Button onPress={submitHandler} style>
-            {isLogin ? "Login" : "Create account"}
+            {isLogin ? i18n.t("loginText") : i18n.t("createAccountText")}
           </Button>
         </View>
         <View style={styles.orTextContainer}>
           {/* <Text style={styles.orText}>Or With</Text> */}
           <Pressable
-            onPress={() =>
-              Alert.alert(
-                "Sign Up / Login with Google function coming soon... "
-              )
-            }
+            onPress={() => Alert.alert(i18n.t("signupComingSoonAlert"))}
           >
             <View style={styles.google}>
-              <Text style={styles.googleText}>Sign Up with Google</Text>
+              <Text style={styles.googleText}>
+                {i18n.t("signupGoogleText")}
+              </Text>
             </View>
           </Pressable>
         </View>

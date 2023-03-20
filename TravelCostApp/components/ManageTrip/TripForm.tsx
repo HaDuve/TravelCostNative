@@ -241,7 +241,7 @@ const TripForm = ({ navigation, route }) => {
       return;
     }
     const tripid = await storeTrip(tripData);
-    asyncStoreSetItem("currentTripId", tripid);
+    await asyncStoreSetItem("currentTripId", tripid);
     await storeTravellerToTrip(tripid, { userName: userName, uid: uid });
 
     const newTripData = await fetchTrip(tripid);

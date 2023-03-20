@@ -96,10 +96,10 @@ function UserContextProvider({ children }) {
     saveUserNameInStorage(UserData.userName);
   }
 
-  function setFreshlyCreatedTo(bool: boolean) {
+  async function setFreshlyCreatedTo(bool: boolean) {
     // console.log("setFreshlyCreatedTo ~ bool", bool);
     setFreshlyCreated(bool);
-    asyncStoreSetObject("freshlyCreated", bool);
+    await asyncStoreSetObject("freshlyCreated", bool);
   }
 
   function deleteUser(id: string) {
@@ -123,7 +123,7 @@ function UserContextProvider({ children }) {
 
   async function loadUserNameFromStorage() {
     console.log("loadUserNameFromStorage ~ userName", userName);
-    asyncStoreGetItem("userName").then((name) => {
+    await asyncStoreGetItem("userName").then((name) => {
       if (name) {
         console.log("asyncStoreGetItem ~ name:", name);
         setName(name.replaceAll('"', ""));

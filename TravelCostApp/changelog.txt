@@ -2,7 +2,9 @@ Change log Travel Expense App
 
 1.0.66
 - added french translation
+- translated almost everything in the app (en,de,fr)
 - added more haptic feedback
+- fixed a bug where no expenses were shown after login
 - fixed and improved Invite and Join Trip flow
 
 1.0.63

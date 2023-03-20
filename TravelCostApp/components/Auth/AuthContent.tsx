@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Alert,
   StyleSheet,
@@ -7,6 +7,16 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import { useNavigation } from "@react-navigation/native";
 
 import FlatButton from "../UI/FlatButton";
@@ -43,7 +53,7 @@ function AuthContent({ isLogin, onAuthenticate }) {
     const passwordIsValid = password.length > 6;
 
     if ((!nameIsValid || !emailIsValid || !passwordIsValid) && !isLogin) {
-      Alert.alert("Invalid input", "Please check your entered credentials.");
+      Alert.alert(i18n.t("authError"), i18n.t("invalidInput"));
       setCredentialsInvalid({
         name: !nameIsValid,
         email: !emailIsValid,
@@ -63,10 +73,10 @@ function AuthContent({ isLogin, onAuthenticate }) {
       />
       <View style={styles.buttons}>
         <Text style={styles.secondaryText}>
-          {isLogin ? "Don't have an account?" : "Already have an account?"}
+          {isLogin ? i18n.t("noAccountText") : i18n.t("alreadyAccountText")}
         </Text>
         <FlatButton onPress={switchAuthModeHandler}>
-          {isLogin ? "Create a new user" : "Log in instead"}
+          {isLogin ? i18n.t("createNewUser") : i18n.t("loginInstead")}
         </FlatButton>
       </View>
     </View>
@@ -91,7 +101,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   buttons: {
-    flexDirection: "row",
+    flexDirection: i18n.locale == "fr" ? "column" : "row",
     marginTop: "4%",
     alignItems: "center",
     justifyContent: "center",

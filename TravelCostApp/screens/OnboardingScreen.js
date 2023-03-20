@@ -1,5 +1,15 @@
 import { useContext } from "react";
 import React, { StyleSheet, Text, View, Image } from "react-native";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import Onboarding from "react-native-onboarding-swiper";
 import { GlobalStyles } from "../constants/styles";
 import { UserContext } from "../store/user-context";
@@ -8,10 +18,6 @@ const OnboardingScreen = ({ navigation }) => {
   const titleStyle = styles.titleStyle;
   const userCtx = useContext(UserContext);
   const needsOnboarding = userCtx.needsTour;
-  if (!needsOnboarding) {
-    navigation.replace("Login");
-    return <></>;
-  }
   return (
     <Onboarding
       onDone={() => navigation.replace("Signup")}
@@ -22,9 +28,8 @@ const OnboardingScreen = ({ navigation }) => {
           image: (
             <Image source={require("../assets/Onboarding/Illustration1.png")} />
           ),
-          title: "Travel in Style on a Budget",
-          subtitle:
-            "Maximize your travel budget without sacrificing comfort or experiences.",
+          title: i18n.t("onb1"),
+          subtitle: i18n.t("onb1t"),
           titleStyles: titleStyle,
         },
         {
@@ -32,9 +37,8 @@ const OnboardingScreen = ({ navigation }) => {
           image: (
             <Image source={require("../assets/Onboarding/Illustration2.png")} />
           ),
-          title: "Simplify Group Travel Expenses",
-          subtitle:
-            "Easily split and track travel costs with friends and family, and make the most of your budget.",
+          title: i18n.t("onb2"),
+          subtitle: i18n.t("onb2t"),
           titleStyles: titleStyle,
         },
         {
@@ -42,9 +46,8 @@ const OnboardingScreen = ({ navigation }) => {
           image: (
             <Image source={require("../assets/Onboarding/Illustration3.png")} />
           ),
-          title: "Achieve Your Financial Goals",
-          subtitle:
-            "Take control of your finances and plan your dream trip with Budget for Nomads budgeting and tracking tools.",
+          title: i18n.t("onb3"),
+          subtitle: i18n.t("onb3t"),
           titleStyles: titleStyle,
         },
       ]}

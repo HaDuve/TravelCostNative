@@ -272,7 +272,7 @@ const ExpenseForm = ({
     }
   }
 
-  function submitHandler() {
+  async function submitHandler() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const expenseData = {
       uid: AuthCtx.uid,
@@ -364,9 +364,9 @@ const ExpenseForm = ({
 
     // update lastcountry and lastcurrency
     UserCtx.setLastCountry(inputs.country.value);
-    asyncStoreSetItem("lastCountry", inputs.country.value);
+    await asyncStoreSetItem("lastCountry", inputs.country.value);
     UserCtx.setLastCurrency(inputs.currency.value);
-    asyncStoreSetItem("lastCurrency", inputs.currency.value);
+    await asyncStoreSetItem("lastCurrency", inputs.currency.value);
     onSubmit(expenseData);
   }
 

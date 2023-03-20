@@ -148,6 +148,43 @@ const en = {
     "Hey there! I'm using Budget For Nomads to plan my next trip and I wanted to invite you to join me. Before you click on the link below, make sure to install the app first. Once you're done, just click the link and join our trip. Let's make this trip unforgettable together!",
   noTrip: "Could not find trip!",
   tryAgain: "Please try again later.",
+
+  // Login and Signup Screen
+  noConnection: "No internet connection",
+  checkConnectionError: "Please check your internet connection and try again",
+  exceptionError: "Exceptional Error",
+  authError: "Authentication failed!",
+  createErrorText:
+    "Could not create user, please check your input and try again later.",
+  authErrorText:
+    "Failed to login. Wrong password or Username? Please try again later.",
+  loginLoadText: "Logging in user...",
+  createUserLoadText: "Creating user...",
+  noAccountText: "Don't have an account?",
+  alreadyAccountText: "Already have an account?",
+  createNewUser: "Create a new user",
+  loginInstead: "Log in instead",
+  loginText: "Login",
+  createAccountText: "Create account",
+  welcomeSigninText:
+    "Welcome back, sign in to continue using the Expense Tracker",
+  welcomeCreateAccountText:
+    "Enter your credentials here or signup easily via Google.",
+  emailLabel: "Email Address",
+  passwordLabel: "Password",
+  signupComingSoonAlert: "Sign Up / Login with Google function coming soon... ",
+  signupGoogleText: "Sign Up with Google",
+
+  // Onboarding Screens
+  onb1: "Travel in Style on a Budget",
+  onb1t:
+    "Maximize your travel budget without sacrificing comfort or experiences.",
+  onb2: "Simplify Group Travel Expenses",
+  onb2t:
+    "Easily split and track travel costs with friends and family, and make the most of your budget.",
+  onb3: "Achieve Your Financial Goals",
+  onb3t:
+    "Take control of your finances and plan your dream trip with Budget for Nomads budgeting and tracking tools.",
 };
 const de = {
   // standard strings
@@ -301,9 +338,46 @@ const de = {
 
   // Invite Screen
   inviteMessage:
-    "Hey! Ich benutze Budget For Nomads, um meine nächste Reise zu planen, und ich möchte dich einladen, mitzukommen. Bevor du auf den unten stehenden Link klickst, stelle sicher, dass du die App zuerst installierst. Sobald du fertig bist, klicke einfach auf den Link und schließe dich unserer Reise an. Lass uns diese Reise zusammen unvergesslich machen!",
+    "Hey! Ich benutze Budget For Nomads, um meine nächste Reise zu planen, und ich möchte dich einladen. Bevor du auf den unten stehenden Link klickst, stelle sicher, dass du die App zuerst installierst. Sobald du fertig bist, klicke einfach auf den Link und schließe dich unserer Reise an. Lass uns diese Reise zusammen unvergesslich machen!",
   noTrip: "Reise nicht gefunden!",
   tryAgain: "Bitte versuche es später erneut!",
+
+  // Login and Signup Screen
+  noConnection: "Keine Internetverbindung",
+  checkConnectionError:
+    "Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut",
+  exceptionError: "Außergewöhnlicher Fehler",
+  authError: "Authentifizierung fehlgeschlagen!",
+  createErrorText:
+    "Benutzer konnte nicht erstellt werden, bitte überprüfen Sie Ihre Eingabe und versuchen Sie es später erneut.",
+  authErrorText:
+    "Anmeldung fehlgeschlagen. Falsches Passwort oder Benutzername? Bitte versuchen Sie es später erneut.",
+  loginLoadText: "Benutzer anmelden...",
+  createUserLoadText: "Benutzer erstellen...",
+  noAccountText: "Sie haben noch kein Konto?",
+  alreadyAccountText: "Haben Sie bereits ein Konto?",
+  createNewUser: "Neuen Benutzer erstellen",
+  loginInstead: "Stattdessen anmelden",
+  loginText: "Anmelden",
+  createAccountText: "Konto erstellen",
+  welcomeSigninText:
+    "Willkommen zurück, melden Sie sich an, um die Expense Tracker weiter zu nutzen",
+  welcomeCreateAccountText:
+    "Geben Sie hier Ihre Anmeldeinformationen ein oder melden Sie sich einfach über Google an.",
+  emailLabel: "E-Mail-Adresse",
+  passwordLabel: "Passwort",
+  signupComingSoonAlert:
+    "Anmelden / Einloggen mit Google Funktion kommt bald... ",
+  signupGoogleText: "Mit Google anmelden",
+  onb1: "Reisen Sie stilvoll mit kleinem Budget",
+  onb1t:
+    "Maximieren Sie Ihr Reisebudget, ohne auf Komfort oder Erlebnisse zu verzichten.",
+  onb2: "Vereinfachen Sie die Gruppenreisekosten",
+  onb2t:
+    "Teilen und verfolgen Sie Reisekosten mit Freunden und Familie einfach und machen Sie das Beste aus Ihrem Budget.",
+  onb3: "Erreichen Sie Ihre finanziellen Ziele",
+  onb3t:
+    "Übernehmen Sie die Kontrolle über Ihre Finanzen und planen Sie Ihre Traumreise mit Budget for Nomads Budgetierung und Tracking-Tools.",
 };
 const fr = {
   // standard strings
@@ -460,5 +534,44 @@ const fr = {
     "Salut ! J'utilise Budget For Nomads pour planifier mon prochain voyage et je voulais t'inviter à me rejoindre. Avant de cliquer sur le lien ci-dessous, assure-toi d'avoir installé l'application. Une fois que c'est fait, il te suffit de cliquer sur le lien et de rejoindre notre voyage. Faisons de ce voyage inoubliable ensemble !",
   noTrip: "Impossible de trouver le voyage !",
   tryAgain: "Veuillez réessayer ultérieurement.",
+
+  // Login and Signup Screen
+  noConnection: "Pas de connexion internet",
+  checkConnectionError:
+    "Veuillez vérifier votre connexion internet et réessayer",
+  exceptionError: "Erreur exceptionnelle",
+  authError: "Authentification échouée!",
+  createErrorText:
+    "Impossible de créer l'utilisateur, veuillez vérifier vos informations et réessayer plus tard.",
+  authErrorText:
+    "Échec de la connexion. Mot de passe ou nom d'utilisateur incorrect ? Veuillez réessayer plus tard.",
+  loginLoadText: "Connexion de l'utilisateur...",
+  createUserLoadText: "Création de l'utilisateur...",
+  noAccountText: "Vous n'avez pas de compte?",
+  alreadyAccountText: "Vous avez déjà un compte?",
+  createNewUser: "Créer un nouvel utilisateur",
+  loginInstead: "Se connecter plutôt",
+  loginText: "Se connecter",
+  createAccountText: "Créer un compte",
+  welcomeSigninText:
+    "Bienvenue, connectez-vous pour continuer à utiliser l'application de suivi des dépenses",
+  welcomeCreateAccountText:
+    "Entrez vos identifiants ici ou inscrivez-vous facilement via Google.",
+  emailLabel: "Adresse e-mail",
+  passwordLabel: "Mot de passe",
+  signupComingSoonAlert:
+    "La fonctionnalité S'inscrire / Se connecter avec Google arrive bientôt... ",
+  signupGoogleText: "S'inscrire avec Google",
+
+  //Onboarding Screens
+  onb1: "Voyagez avec style avec un petit budget",
+  onb1t:
+    "Optimisez votre budget de voyage sans sacrifier le confort ou les expériences.",
+  onb2: "Simplifiez les dépenses de voyage en groupe",
+  onb2t:
+    "Répartissez et suivez facilement les coûts de voyage avec des amis et de la famille, et tirez le meilleur parti de votre budget.",
+  onb3: "Atteignez vos objectifs financiers",
+  onb3t:
+    "Prenez le contrôle de vos finances et planifiez votre voyage de rêve avec les outils de budgétisation et de suivi de Budget for Nomads.",
 };
 export { en, de, fr };

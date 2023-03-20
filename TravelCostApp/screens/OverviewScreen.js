@@ -18,12 +18,12 @@ import ExpensesOverview from "../components/ExpensesOutput/ExpensesOverview";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de } from "../i18n/supportedLanguages";
+import { en, de, fr } from "../i18n/supportedLanguages";
 import { DateTime } from "luxon";
 import { _toShortFormat } from "../util/dateTime";
 import { useFocusEffect } from "@react-navigation/native";
 import { TourGuideZoneByPosition } from "rn-tourguide";
-const i18n = new I18n({ en, de });
+const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   dropdownTextStyle: {
-    fontSize: 34,
+    fontSize: i18n.locale == "fr" ? 20 : 34,
     fontWeight: "bold",
   },
   zBehind: {

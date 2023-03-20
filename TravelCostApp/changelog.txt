@@ -1,8 +1,9 @@
 Change log Travel Expense App
 
 1.0.66
+- added french translation
 - added more haptic feedback
-- adjusted invite links to work again
+- fixed and improved Invite and Join Trip flow
 
 1.0.63
 - added date range support for trips, you can now easily calculate total budget or daily budget from the calendar

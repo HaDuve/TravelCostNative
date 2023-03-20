@@ -19,7 +19,7 @@ import { onShare } from "../components/ProfileOutput/ShareTrip";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de } from "../i18n/supportedLanguages";
+import { en, de, fr } from "../i18n/supportedLanguages";
 import { fetchTrip, fetchTripHistory, fetchUser } from "../util/http";
 import { AuthContext } from "../store/auth-context";
 import React from "react";
@@ -29,7 +29,7 @@ import { TourGuideZone, useTourGuideController } from "rn-tourguide";
 import { sleep } from "../util/appState";
 import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confApp";
-const i18n = new I18n({ en, de });
+const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "de";

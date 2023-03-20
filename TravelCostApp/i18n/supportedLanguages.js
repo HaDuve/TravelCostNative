@@ -305,4 +305,160 @@ const de = {
   noTrip: "Reise nicht gefunden!",
   tryAgain: "Bitte versuche es später erneut!",
 };
-export { en, de };
+const fr = {
+  // standard strings
+  signoutBtn: "Se déconnecter",
+  signOutAlertTitle: "Annuler",
+  signOutAlertMess: "Êtes-vous sûr(e) de vouloir vous déconnecter ?",
+  confirm: "D'accord",
+  confirm2: "Confirmer",
+  continue: "Continuer",
+  cancel: "Annuler",
+  delete: "Supprimer",
+  saveChanges: "Enregistrer les modifications",
+  add: "Ajouter",
+  update: "Mettre à jour",
+  sure: "Êtes-vous sûr(e) ?",
+  sureExt: "Êtes-vous sûr(e) de vouloir supprimer cette dépense ?",
+  resetBtn: "Réinitialiser le mot de passe",
+  yes: "Oui",
+  no: "Non",
+
+  // Other Strings
+  overview: "Aperçu",
+  categories: "Catégories",
+  invitationText: "J'ai une invitation d'un(e) autre voyageur(se) !",
+  joinTrip: "Voulez-vous rejoindre le voyage ?",
+  joinLink: "Vous pouvez coller votre lien d'invitation ici !",
+  join: "Rejoindre",
+  createFirstTrip: "Créer un premier voyage",
+  myTrips: "Mes voyages",
+  chooseAction: "Veuillez choisir une action :",
+  inviteTravellers: "Inviter d'autres voyageurs",
+  setActiveTrip: "Définir comme voyage actif",
+  calcOpenSplits: "Calculer les dépenses partagées ouvertes",
+  daily: "Quotidien",
+
+  // today - yesterday etc.
+  today: "Aujourd'hui",
+  yesterday: "Hier",
+  thisWeek: "Cette semaine",
+  lastWeek: "La semaine dernière",
+  thisMonth: "Ce mois-ci",
+  lastMonth: "Le mois dernier",
+  thisYear: "Cette année",
+  lastYear: "L'année dernière",
+
+  // last periodname
+  last: "Dernier",
+  days: "jours",
+  weeks: "semaines",
+  months: "mois",
+  years: "années",
+
+  // Category Names
+  catFoodString: "Nourriture",
+  catIntTravString: "Vols",
+  catAccoString: "Hébergement",
+  catNatTravString: "Transport",
+  catOtherString: "Autre",
+  catNewString: "Nouvelle catégorie",
+
+  // Form Labels
+  nameLabel: "Nom",
+  priceIn: "Prix en ",
+  showMoreOptions: "Afficher plus d'options",
+  showLessOptions: "Afficher moins d'options",
+  currencyLabel: "Devise",
+  baseCurrency: "Devise de base",
+  descriptionLabel: "Description",
+  dateLabel: "Date",
+
+  // Modal Titles
+  editExp: "Modifier la dépense",
+  addExp: "Ajouter une dépense",
+  whoPaid: "Qui a payé ?",
+  howShared: "Comment les coûts sont-ils partagés ?",
+  whoShared: "Avec qui les coûts sont-ils partagés ?",
+  paidSelf: "Payé pour soi-même",
+  sharedEq: "Partagé également",
+  sharedEx: "Partagé individuellement",
+
+  // Dropdown Labels
+  todayLabel: "Aujourd'hui",
+  weekLabel: "Semaine",
+  monthLabel: "Mois",
+  yearLabel: "Année",
+  totalLabel: "Total",
+
+  // Error Messages
+  fetchError: "Impossible de récupérer les dépenses de la base de données !",
+  deleteError:
+    "Impossible de supprimer la dépense - veuillez réessayer ultérieurement !",
+  profileError:
+    "Impossible d'enregistrer le profil - veuillez réessayer ultérieurement !",
+  fallbackTextExpenses:
+    "Aucune dépense pour cette période. Ajoutez de nouvelles dépenses avec le bouton ci-dessous !",
+  fallbackTimeFrame: "Veuillez choisir une période dans la barre de sélection.",
+  invalidInput:
+    "Valeurs d'entrée invalides - veuillez vérifier les données entrées !",
+
+  // Walkthrough Texts
+  walk1:
+    "Bienvenue sur Budget For Nomads! 🎉 Nous sommes ravis de vous accompagner dans votre parcours financier de voyage!",
+  walk2:
+    "Commençons par ajouter vos dépenses. 🛍️ Il suffit de cliquer sur le bouton '+' et de saisir les détails de votre dépense. Essayez dès maintenant!",
+  walk3:
+    "Suivez votre budget quotidiennement ou mensuellement. 📊 Utilisez le bouton pour changer de période et restez au top de vos dépenses! 🤑",
+  walk4:
+    "Consultez vos dépenses par catégorie ou par vue d'ensemble quotidienne. 📈 Utilisez le bouton pour basculer entre les deux et obtenir une vue détaillée de vos finances! 🤑",
+  walk5:
+    "Prêt pour votre prochaine aventure? 🌎 Créez un nouveau voyage et commencez à budgétiser pour vos voyages! 🧳",
+  walk6:
+    "Consultez tous vos voyages et suivez votre voyage actif. 🗺️ Votre voyage actif sera mis en évidence en vert. 🟢",
+  walk7:
+    "Invitez un ami à vous accompagner dans vos voyages! 👫 Invitez un autre nomade à rejoindre votre voyage actif et budgétisez ensemble. 💸",
+  walk8:
+    "Profitez de votre voyage avec Budget For Nomads! 🎉 Nous sommes là pour vous aider à rester dans votre budget tout en explorant le monde. 🌍",
+
+  // Tabbar labels
+  expensesTab: "Dépenses",
+  overviewTab: "Vue d'ensemble",
+  profileTab: "Profil",
+  settingsTab: "Paramètres",
+
+  // Settings Labels
+  logoutLabel: "Déconnexion",
+  joinTripLabel: "Rejoindre un voyage",
+  simplifySplitsLabel: "Simplifier les partages",
+  resetAppIntroductionLabel: "Réinitialiser l'introduction de l'application",
+  visitFoodForNomadsLabel: "Visitez Food For Nomads",
+
+  // Trip Form Labels
+  tripFormTitleNew: "Nouveau budget de voyage",
+  tripFormTitleEdit: "Modifier le budget de voyage",
+  tripNameLabel: "Nom du voyage",
+  baseCurrencyLabel: "Devise de référence",
+  totalBudgetLabel: "Budget total en",
+  dailyBudgetLabel: "Budget quotidien en",
+  enterNameAlert: "Veuillez entrer un nom pour votre nouveau budget de voyage",
+  enterBudgetAlert:
+    "Veuillez entrer un budget total supérieur au budget quotidien",
+  selectCurrencyAlert:
+    "Veuillez sélectionner une devise de référence pour votre budget de voyage",
+  deleteTrip: "Supprimer le voyage",
+  deleteTripSure: "Êtes-vous sûr de vouloir supprimer ce voyage?",
+  setActive: "Définir comme voyage actif",
+  datePickerLabel: "Début et fin du voyage",
+
+  // Loading Strings
+  loadingYourTrip: "Chargement de votre voyage...",
+  loading: "Chargement...",
+
+  // Invite Screen
+  inviteMessage:
+    "Salut ! J'utilise Budget For Nomads pour planifier mon prochain voyage et je voulais t'inviter à me rejoindre. Avant de cliquer sur le lien ci-dessous, assure-toi d'avoir installé l'application. Une fois que c'est fait, il te suffit de cliquer sur le lien et de rejoindre notre voyage. Faisons de ce voyage inoubliable ensemble !",
+  noTrip: "Impossible de trouver le voyage !",
+  tryAgain: "Veuillez réessayer ultérieurement.",
+};
+export { en, de, fr };

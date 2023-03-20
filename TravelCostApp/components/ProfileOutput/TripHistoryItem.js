@@ -32,11 +32,11 @@ import LoadingOverlay from "../UI/LoadingOverlay";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de } from "../../i18n/supportedLanguages";
+import { en, de, fr } from "../../i18n/supportedLanguages";
 import { ExpensesContext } from "../../store/expenses-context";
 import { UserContext } from "../../store/user-context";
 import { AuthContext } from "../../store/auth-context";
-const i18n = new I18n({ en, de });
+const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";

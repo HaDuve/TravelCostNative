@@ -10,6 +10,7 @@ const OnboardingScreen = ({ navigation }) => {
   const needsOnboarding = userCtx.needsTour;
   if (!needsOnboarding) {
     navigation.replace("Login");
+    return <></>;
   }
   return (
     <Onboarding

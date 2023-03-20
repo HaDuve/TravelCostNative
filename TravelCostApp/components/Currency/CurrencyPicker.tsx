@@ -9,10 +9,10 @@ import { GlobalStyles } from "../../constants/styles";
 //localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de } from "../../i18n/supportedLanguages";
+import { en, de, fr } from "../../i18n/supportedLanguages";
 import LoadingOverlay from "../UI/LoadingOverlay";
 import * as Haptics from "expo-haptics";
-const i18n = new I18n({ en, de });
+const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
 i18n.enableFallback = true;

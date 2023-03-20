@@ -8,10 +8,10 @@ import * as Haptics from "expo-haptics";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de } from "../../i18n/supportedLanguages";
+import { en, de, fr } from "../../i18n/supportedLanguages";
 import ToggleButton from "../../assets/SVG/toggleButton";
 import { TourGuideZone } from "rn-tourguide";
-const i18n = new I18n({ en, de });
+const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";

@@ -24,7 +24,7 @@ import * as Updates from "expo-updates";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de } from "../i18n/supportedLanguages";
+import { en, de, fr } from "../i18n/supportedLanguages";
 import { ExpensesContext } from "../store/expenses-context";
 import React from "react";
 import FlatButton from "../components/UI/FlatButton";
@@ -32,7 +32,7 @@ import Button from "../components/UI/Button";
 import { G } from "react-native-svg";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { ActivityIndicator } from "react-native";
-const i18n = new I18n({ en, de });
+const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";

@@ -69,7 +69,7 @@ function LoginScreen() {
         console.log("loginHandler ~ userData", userData);
         const tripid = userData.currentTrip;
         await asyncStoreSetItem("currentTripId", tripid);
-        touchMyTraveler(tripid, uid);
+        await touchMyTraveler(tripid, uid);
         tripCtx.setTripid(tripid);
         userCtx.addUser(userData);
         await tripCtx.fetchAndSetCurrentTrip(tripid);

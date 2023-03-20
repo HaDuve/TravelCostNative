@@ -30,6 +30,8 @@ import React from "react";
 import FlatButton from "../components/UI/FlatButton";
 import Button from "../components/UI/Button";
 import { G } from "react-native-svg";
+import LoadingOverlay from "../components/UI/LoadingOverlay";
+import { ActivityIndicator } from "react-native";
 const i18n = new I18n({ en, de });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -45,28 +47,30 @@ const JoinTrip = ({ navigation, route }) => {
   const expenseCtx = useContext(ExpensesContext);
   const uid = authCtx.uid;
   let tripid = route.params ? route.params.id : "";
-
+  const [clickedOnLink, setClickedOnLink] = useState(tripid ? true : false);
   const [joinTripid, setJoinTripid] = useState("");
   const [tripdata, setTripdata] = useState({});
   const [tripName, setTripName] = useState("");
   const [freshLink, setFreshLink] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
 
   async function getTrip(tripID: string) {
+    if (!tripID) return;
+    setIsFetching(true);
+    setFreshLink(false);
     try {
       const trip = await fetchTrip(tripID);
       setTripName(trip.tripName);
       setTripdata(trip);
-      setFreshLink(false);
+      setClickedOnLink(true);
     } catch (e) {
-      Alert.alert(
-        "Could not find trip!",
-        " Please try another invitation or try again later."
-      );
+      Alert.alert(i18n.t("noTrip"), i18n.t("tryAgain"));
     }
+    setIsFetching(false);
   }
 
   useLayoutEffect(() => {
-    // getTrip(joinTripid);
+    if (clickedOnLink) getTrip(tripid);
   }, []);
 
   async function joinHandler(join: boolean) {
@@ -110,10 +114,11 @@ const JoinTrip = ({ navigation, route }) => {
     setTripName("");
     if (joinTripid.length > 25) {
       // find the tripid from long string
-      const index_start = joinTripid.indexOf("-");
-      const temp_string = joinTripid.slice(index_start);
-      const index_end = temp_string.indexOf(" ");
-      const final_link_string = temp_string.slice(0, index_end);
+      // we are assuming this link has the following form
+      // "--/join/[tripid]"
+      const index_start1 = joinTripid.indexOf("--");
+      const final_link_string = joinTripid.slice(index_start1 + 8);
+      console.log("joinLinkHandler ~ final_link_string:", final_link_string);
       setJoinTripid(final_link_string);
       getTrip(final_link_string);
     } else {
@@ -124,33 +129,43 @@ const JoinTrip = ({ navigation, route }) => {
   return (
     <KeyboardAvoidingView style={styles.card}>
       <View style={styles.titleContainer}>
-        <Text style={styles.titleText}>Join Trip</Text>
+        <Text style={styles.titleText}>{i18n.t("joinTripLabel")}</Text>
+        <View style={{ marginLeft: "5%" }}>
+          {isFetching && (
+            <ActivityIndicator
+              size={"large"}
+              color={GlobalStyles.colors.primaryGrayed}
+            />
+          )}
+        </View>
       </View>
-      <View style={styles.linkInputContainer}>
-        <Text> {i18n.t("joinLink")}</Text>
-        <Input
-          value={joinTripid}
-          onUpdateValue={(value) => {
-            setJoinTripid(value);
-            setFreshLink(true);
-          }}
-          label={""}
-          secure={false}
-          keyboardType={"default"}
-          isInvalid={false}
-        ></Input>
-        <Button
-          style={{ maxWidth: "100%", marginTop: "5%" }}
-          buttonStyle={{
-            backgroundColor: freshLink
-              ? GlobalStyles.colors.primaryGrayed
-              : GlobalStyles.colors.gray700,
-          }}
-          onPress={joinLinkHandler}
-        >
-          Update
-        </Button>
-      </View>
+      {!clickedOnLink && (
+        <View style={styles.linkInputContainer}>
+          <Text> {i18n.t("joinLink")}</Text>
+          <Input
+            value={joinTripid}
+            onUpdateValue={(value) => {
+              setJoinTripid(value);
+              setFreshLink(true);
+            }}
+            label={""}
+            secure={false}
+            keyboardType={"default"}
+            isInvalid={false}
+          ></Input>
+          <Button
+            style={{ maxWidth: "100%", marginTop: "5%" }}
+            buttonStyle={{
+              backgroundColor: freshLink
+                ? GlobalStyles.colors.primaryGrayed
+                : GlobalStyles.colors.gray700,
+            }}
+            onPress={joinLinkHandler}
+          >
+            {i18n.t("update")}
+          </Button>
+        </View>
+      )}
       {tripName?.length > 1 && (
         <Text style={{ padding: 16, fontSize: 22 }}>{i18n.t("joinTrip")}?</Text>
       )}
@@ -195,6 +210,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   titleContainer: {
+    marginLeft: "7,5%",
+    flexDirection: "row",
     padding: 12,
     marginBottom: 24,
   },

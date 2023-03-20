@@ -142,6 +142,12 @@ const en = {
   // Loading Strings
   loadingYourTrip: "Loading your Trip...",
   loading: "Loading...",
+
+  // Invite Screen
+  inviteMessage:
+    "Hey there! I'm using Budget For Nomads to plan my next trip and I wanted to invite you to join me. Before you click on the link below, make sure to install the app first. Once you're done, just click the link and join our trip. Let's make this trip unforgettable together!",
+  noTrip: "Could not find trip!",
+  tryAgain: "Please try again later.",
 };
 const de = {
   // standard strings
@@ -167,7 +173,8 @@ const de = {
   categories: "Kategorien",
   invitationText: "Ich habe eine Einladung von einem anderen Reisenden!",
   joinTrip: "Möchtest du der Reise beitreten",
-  joinLink: "Ich habe einen Einladungs-Link bekommen!",
+  joinLink:
+    "Du kannst dein Einladungslink hier reinkopieren um der Reise beizutreten",
   join: "Beitreten",
   createFirstTrip: "Erste Reise erstellen",
   myTrips: "Meine Reisen",
@@ -291,5 +298,11 @@ const de = {
   // Loading Strings
   loading: "Laden...",
   loadingYourTrip: "Lade deine Reise...",
+
+  // Invite Screen
+  inviteMessage:
+    "Hey! Ich benutze Budget For Nomads, um meine nächste Reise zu planen, und ich möchte dich einladen, mitzukommen. Bevor du auf den unten stehenden Link klickst, stelle sicher, dass du die App zuerst installierst. Sobald du fertig bist, klicke einfach auf den Link und schließe dich unserer Reise an. Lass uns diese Reise zusammen unvergesslich machen!",
+  noTrip: "Reise nicht gefunden!",
+  tryAgain: "Bitte versuche es später erneut!",
 };
 export { en, de };

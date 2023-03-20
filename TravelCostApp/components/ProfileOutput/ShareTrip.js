@@ -1,4 +1,14 @@
 import React, { Share, View, Button } from "react-native";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import * as Linking from "expo-linking";
 import * as Haptics from "expo-haptics";
 
@@ -8,7 +18,7 @@ export async function onShare(shareId, navigation) {
   // const link = "exp://192.168.100.102:19000/--/join/" + shareId;
   try {
     const result = await Share.share({
-      message: `Invite to trip: ${shareId}  You are welcome to join me on TripExpense!`,
+      message: i18n.t("inviteMessage"),
       url: link,
     });
     if (result.action === Share.sharedAction) {

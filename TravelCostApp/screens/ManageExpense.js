@@ -39,6 +39,7 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../i18n/supportedLanguages";
 import { getCatString } from "../util/category";
+import { alertYesNo } from "../components/Errors/Alert";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -119,6 +120,7 @@ const ManageExpense = ({ route, navigation }) => {
   }
 
   async function confirmHandler(expenseData) {
+    console.log("confirmHandler ~ expenseData:", expenseData);
     setIsSubmitting(true);
     try {
       // set the category to the corresponting catstring
@@ -144,11 +146,14 @@ const ManageExpense = ({ route, navigation }) => {
       // });
 
       if (isEditing) {
-        if (expenseData.date.toString() !== expenseData.endDate.toString()) {
+        if (
+          expenseData.startDate.toString().slice(0, 10) !==
+          expenseData.endDate.toString().slice(0, 10)
+        ) {
           console.log("ranged Data detected");
           Alert.alert(
-            "Ranged Data detected",
-            "Updating Data with multiple days is not supported yet."
+            "Ranged Dates",
+            "Updating Expenses over multiple days is not supported yet."
           );
           setIsSubmitting(false);
           return;
@@ -174,18 +179,25 @@ const ManageExpense = ({ route, navigation }) => {
           },
         };
         // Check for ranged Expense
-        if (expenseData.date.toString() !== expenseData.endDate.toString()) {
+        if (
+          expenseData.startDate.toString().slice(0, 10) !==
+          expenseData.endDate.toString().slice(0, 10)
+        ) {
           console.log("ranged Data detected");
           // get number of days
-          const day1 = new Date(expenseData.date);
+          const day1 = new Date(expenseData.startDate);
           const day2 = new Date(expenseData.endDate);
           const days = daysBetween(day2, day1);
+          // TODO: hotfix choice between duplicate and split up ranged expenses
           // iterate over number of days between and change date and endDate to the first date + iterator
           for (let i = 0; i <= days; i++) {
             console.log("day nr: ", i);
             const newDate = getDatePlusDays(day1, i);
             newDate.setHours(new Date().getHours(), new Date().getMinutes());
-            expenseData.date = expenseData.endDate = newDate;
+            expenseData.startDate =
+              expenseData.date =
+              expenseData.endDate =
+                newDate;
             const id = await storeExpenseOnlineOffline(item, userCtx.isOnline);
             expenseCtx.addExpense({ ...expenseData, id: id });
           }

@@ -6,6 +6,7 @@ const en = {
   confirm: "Okay",
   confirm2: "Confirm",
   continue: "Continue",
+  back: "Back",
   cancel: "Cancel",
   delete: "Delete",
   saveChanges: "Save Changes",
@@ -185,6 +186,9 @@ const en = {
   onb3: "Achieve Your Financial Goals",
   onb3t:
     "Take control of your finances and plan your dream trip with Budget for Nomads budgeting and tracking tools.",
+
+  // Filtered expenses
+  noExpensesText: "No expenses -",
 };
 const de = {
   // standard strings
@@ -194,6 +198,7 @@ const de = {
   confirm: "Okay",
   confirm2: "Bestätigen",
   continue: "Weiter",
+  back: "Zurück",
   cancel: "Abbrechen",
   delete: "Löschen",
   saveChanges: "Änderungen speichern",
@@ -378,6 +383,9 @@ const de = {
   onb3: "Erreichen Sie Ihre finanziellen Ziele",
   onb3t:
     "Übernehmen Sie die Kontrolle über Ihre Finanzen und planen Sie Ihre Traumreise mit Budget for Nomads Budgetierung und Tracking-Tools.",
+
+  // Filtered expenses
+  noExpensesText: "Keine Ausgaben -",
 };
 const fr = {
   // standard strings
@@ -387,6 +395,7 @@ const fr = {
   confirm: "D'accord",
   confirm2: "Confirmer",
   continue: "Continuer",
+  back: "Retour",
   cancel: "Annuler",
   delete: "Supprimer",
   saveChanges: "Enregistrer les modifications",
@@ -573,5 +582,8 @@ const fr = {
   onb3: "Atteignez vos objectifs financiers",
   onb3t:
     "Prenez le contrôle de vos finances et planifiez votre voyage de rêve avec les outils de budgétisation et de suivi de Budget for Nomads.",
+
+  // Filtered expenses
+  noExpensesText: "Aucune dépense -",
 };
 export { en, de, fr };

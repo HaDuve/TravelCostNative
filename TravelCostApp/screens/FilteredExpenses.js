@@ -1,22 +1,31 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
 import FlatButton from "../components/UI/FlatButton";
 import { GlobalStyles } from "../constants/styles";
+import Toast from "react-native-toast-message";
 
 const FilteredExpenses = ({ route, navigation }) => {
   const { expenses, dayString } = route.params;
-  console.log("FilteredExpenses ~ expenses", expenses);
-  // show fallback if no data is passed
+  // show error Toast if no data is passed
   if (!expenses || expenses.length < 1) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.titleText}>No expenses - {dayString}</Text>
-        </View>
-        <FlatButton onPress={() => navigation.pop()}>Back</FlatButton>
-      </View>
-    );
+    Toast.show({
+      type: "error",
+      text1: `${i18n.t("noExpensesText")} ${dayString}`,
+      visibilityTime: 1000,
+    });
+    navigation.pop();
+    return <></>;
   }
   return (
     <View style={styles.container}>
@@ -25,7 +34,7 @@ const FilteredExpenses = ({ route, navigation }) => {
       </View>
       <View style={styles.shadow}></View>
       <ExpensesOutput expenses={expenses}></ExpensesOutput>
-      <FlatButton onPress={() => navigation.pop()}>Back</FlatButton>
+      <FlatButton onPress={() => navigation.pop()}>{i18n.t("back")}</FlatButton>
     </View>
   );
 };

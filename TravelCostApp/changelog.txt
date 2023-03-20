@@ -3,7 +3,7 @@ Change log Travel Expense App
 1.0.67
 - added splitting up expenses over multiple days
 - fixed a bug where the app crashed because of corrupt data
-- hot fixed a bug which prevented expenses from being saved in other days than today
+- fixed a bug which prevented expenses from being saved in other days than today
 
 1.0.66
 - added french translation

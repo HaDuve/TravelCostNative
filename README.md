@@ -12,7 +12,7 @@ Build in JavaScript with React-Native, this is my app for travellers to track th
 ## Features:
 - Easy, fun and fast to use
 - Get a great overview with dynamic Charts and Diagrams
-- Classic and modern design
+- Clear and tidy design for unconfusing overview
 - Automatic Currency Conversion
 - Invite Friends & Family to share the trip with
 - Share Costs and simplify transactions (like Splitwise/Splid)

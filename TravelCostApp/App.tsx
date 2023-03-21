@@ -1,6 +1,15 @@
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
-import { Alert, Text, SafeAreaView, View, Keyboard } from "react-native";
+import {
+  Alert,
+  Text,
+  SafeAreaView,
+  View,
+  Keyboard,
+  Platform,
+} from "react-native";
+import Purchases, { PurchasesOffering } from "react-native-purchases";
+
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -78,6 +87,8 @@ import { useInterval } from "./components/Hooks/useInterval";
 import { isForeground } from "./util/appState";
 import { TourGuideProvider } from "rn-tourguide";
 import { loadTourConfig } from "./util/tourUtil";
+import PremiumScreen from "./screens/PremiumScreen";
+import { API_KEY } from "./components/Premium/PremiumConstants";
 // LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
 // LogBox.ignoreAllLogs(); //Ignore all log notifications
 
@@ -167,6 +178,14 @@ function AuthenticatedStack() {
           <Stack.Screen
             name="Join"
             component={JoinTrip}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
+          <Stack.Screen
+            name="Premium"
+            component={PremiumScreen}
             options={{
               headerShown: false,
               presentation: "modal",
@@ -421,6 +440,15 @@ function Root() {
       );
       // end wrap
       console.log("onRootMount ~ onRootMount");
+
+      if (Platform.OS === "android") {
+        // Purchases
+        Purchases.configure({ apiKey: "<public_google_sdk_key>" });
+      } else if (Platform.OS === "ios") {
+        // Purchases
+        Purchases.configure({ apiKey: API_KEY });
+      }
+
       if (DEBUG_RESET) await asyncStoreSafeClear();
 
       // offline check and set context

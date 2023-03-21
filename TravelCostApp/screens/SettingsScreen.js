@@ -1,5 +1,6 @@
 import { Alert, StyleSheet, View, Text, Linking } from "react-native";
 import React, { useContext, useState } from "react";
+import Purchases, { PurchasesOffering } from "react-native-purchases";
 import { importExcelFile } from "../components/ImportExport/OpenXLSXPicker";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
@@ -41,7 +42,7 @@ const SettingsScreen = ({ navigation }) => {
   const [timeZoneString, setTimeZoneString] = useState("");
   const [shouldShowTour, setShouldShowTour] = useState(false);
   const multiTraveller = tripCtx.travellers.length > 1 ?? false;
-  // const soloTraveller = !multiTraveller;
+  // // const soloTraveller = !multiTraveller;
 
   // Show detailed timezone info
   useFocusEffect(
@@ -69,6 +70,9 @@ const SettingsScreen = ({ navigation }) => {
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>DEVCONTENT</Text>
       </View>
+      <Button onPress={() => navigation.navigate("Premium")}>
+        Become a Premium Nomad!
+      </Button>
       <Button
         onPress={importExcelFile.bind(this, uid, tripid, userName, addExpense)}
         style={styles.settingsButton}

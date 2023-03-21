@@ -194,7 +194,8 @@ const en = {
 
   // duplOrSplitUp
   rangedDatesTitle: "Long-term expenses",
-  rangedDatesText: "Duplicate or split up?",
+  rangedDatesText:
+    "Do you want to duplicate or split the costs over several days?",
   duplicateExpenses: "Duplicate",
   splitUpExpenses: "Split Up",
 };
@@ -399,7 +400,8 @@ const de = {
 
   // duplOrSplitUp
   rangedDatesTitle: "Langfristige Ausgaben",
-  rangedDatesText: "Duplizieren oder aufsplitten?",
+  rangedDatesText:
+    "Möchten Sie die Kosten über mehrere Tage duplizieren oder aufsplitten?",
   duplicateExpenses: "Duplizieren",
   splitUpExpenses: "Aufsplitten",
 };
@@ -606,7 +608,8 @@ const fr = {
   duplicateExpensesText: " - dépenses dupliquées",
   splitUpExpensesText: " - dépenses partagées",
   rangedDatesTitle: "Dépenses à long terme",
-  rangedDatesText: "Dupliquer ou séparer les dépenses ?",
+  rangedDatesText:
+    "Vous souhaitez dupliquer ou fractionner les coûts sur plusieurs jours ?",
   duplicateExpenses: "Dupliquer",
   splitUpExpenses: "Séparer",
 };

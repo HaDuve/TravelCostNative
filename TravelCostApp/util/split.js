@@ -4,6 +4,7 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../i18n/supportedLanguages";
 import Toast from "react-native-toast-message";
+import { getRate } from "./currencyExchange";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -137,9 +138,11 @@ export function travellerToDropdown(travellers) {
   return listOfLabelValues;
 }
 
-export async function calcOpenSplitsTable(tripid) {
+export async function calcOpenSplitsTable(tripid, tripCurrency) {
   // cleanup all expenses where payer === debtor
   let expenses = [];
+  let rates = {};
+  rates[tripCurrency] = 1;
   try {
     expenses = await getAllExpenses(tripid);
   } catch (error) {
@@ -150,16 +153,26 @@ export async function calcOpenSplitsTable(tripid) {
     return;
   }
   let openSplits = [];
-  expenses.forEach((expense) => {
-    if (expense.splitType === "SELF" || !expense.splitList) return;
-    expense.splitList.forEach((split) => {
-      if (split.userName !== expense.whoPaid) {
-        split.whoPaid = expense.whoPaid;
-        openSplits.push(split);
+  const asyncSplitList = async () => {
+    for (const expense of expenses) {
+      if (expense.splitType === "SELF" || !expense.splitList) return;
+      for (const split of expense.splitList) {
+        if (split.userName !== expense.whoPaid) {
+          // check if rate is already in rates
+          if (!rates[expense.currency]) {
+            // get rate
+            const rate = await getRate(expense.currency, tripCurrency);
+            rates[expense.currency] = rate;
+            split.amount = split.amount * rate;
+          }
+          split.whoPaid = expense.whoPaid;
+          openSplits.push(split);
+        }
       }
-    });
-  });
-  console.log("openSplits", openSplits);
+    }
+  };
+  await asyncSplitList();
+  // console.log("openSplits", openSplits);
   if (openSplits.length < 1) {
     return openSplits;
   }
@@ -210,6 +223,7 @@ export function simplifySplits(openSplits) {
 }
 
 function sumUpSamePairs(openSplits) {
+  console.log("sumUpSamePairs ~ sumUpSamePairs:", sumUpSamePairs);
   // add up all the sums of the same payer and debtor pair
 
   if (!openSplits || openSplits.length < 1) return;

@@ -27,11 +27,20 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const [showSimplify, setShowSimplify] = useState(true);
   const [titleText, setTitleText] = useState("Open Splits!");
   const TripCtx = useContext(TripContext);
+  const tripCurrency = TripCtx.tripCurrency;
 
   async function getOpenSplits() {
     setIsFetching(true);
     try {
-      const response = await calcOpenSplitsTable(tripid);
+      const response = await calcOpenSplitsTable(tripid, tripCurrency);
+      // if (!response || (response.length < 1 && !isFetching)) {
+      //   Toast.show({
+      //     type: "error",
+      //     text1: "No Splits!",
+      //     text2: "All debts are already settled!",
+      //   });
+      //   navigation.pop();
+      // }
       console.log("getOpenSplits ~ response", response);
       setSplits(response);
       if (splits.length < 1 && !isFetching) {
@@ -47,8 +56,9 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         type: "error",
         text1: "Error",
         text2: "Could not fetch splits!",
-        visibilityTime: 1000,
+        visibilityTime: 2000,
       });
+      navigation.pop();
       console.error(error);
       // setError("Could not fetch splits from the web database! " + error);
     }

@@ -40,19 +40,7 @@ const Offerings = () => {
   }
   return (
     <View style={styles.container}>
-      {/* <Text>Offerings</Text>
-      <Text>Current Offering: {offering.identifier}</Text>
-      <Text>Package Count: {offering.availablePackages.length}</Text>
-      <Text>
-        Product Identifier: {offering.availablePackages[0].identifier}
-      </Text>
-      <Text>Product Title: {offering.availablePackages[0].product.title}</Text>
-      <Text>
-        Product PriceString: {offering.availablePackages[0].product.priceString}
-      </Text>
-      <Text>
-        Product Description: {offering.availablePackages[0].product.description}
-      </Text> */}
+
       <PaywallScreen></PaywallScreen>
     </View>
   );

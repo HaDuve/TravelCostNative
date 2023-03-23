@@ -3,6 +3,7 @@ import { View, Text, Pressable, Alert, StyleSheet } from "react-native";
 import Purchases from "react-native-purchases";
 import { useNavigation } from "@react-navigation/native";
 import { ENTITLEMENT_ID } from "../Premium/PremiumConstants";
+import { GlobalStyles } from "../../constants/styles";
 
 const PackageItem = ({ purchasePackage, setIsPurchasing }) => {
   const {
@@ -34,11 +35,16 @@ const PackageItem = ({ purchasePackage, setIsPurchasing }) => {
   };
 
   return (
-    <Pressable onPress={onSelection} style={styles.container}>
-      <View style={styles.left}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.terms}>{description}</Text>
-      </View>
+    <Pressable
+      onPress={onSelection}
+      style={({ pressed }) => [
+        pressed && GlobalStyles.pressed,
+        styles.container,
+        GlobalStyles.strongShadow,
+      ]}
+    >
+      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.terms}>{description}</Text>
       <Text style={styles.title}>{priceString}</Text>
     </Pressable>
   );
@@ -48,8 +54,19 @@ export default PackageItem;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    justifyContent: "space-between",
     alignItems: "center",
-    justifyContent: "center",
+    padding: "4%",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: 10,
+    margin: "2%",
+  },
+  title: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  terms: {
+    color: "darkgrey",
   },
 });

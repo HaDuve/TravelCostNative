@@ -89,6 +89,7 @@ import { TourGuideProvider } from "rn-tourguide";
 import { loadTourConfig } from "./util/tourUtil";
 import PremiumScreen from "./screens/PremiumScreen";
 import { API_KEY } from "./components/Premium/PremiumConstants";
+import PaywallScreen from "./components/Premium/PayWall";
 // LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
 // LogBox.ignoreAllLogs(); //Ignore all log notifications
 
@@ -184,8 +185,8 @@ function AuthenticatedStack() {
             }}
           />
           <Stack.Screen
-            name="Premium"
-            component={PremiumScreen}
+            name="Paywall"
+            component={PaywallScreen}
             options={{
               headerShown: false,
               presentation: "modal",

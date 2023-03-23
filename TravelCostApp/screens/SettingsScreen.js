@@ -23,6 +23,7 @@ import { TourGuideZone, useTourGuideController } from "rn-tourguide";
 import { asyncStoreGetItem } from "../store/async-storage";
 import { resetTour, saveStoppedTour } from "../util/tourUtil";
 import { reloadApp } from "../util/appState";
+import { ENTITLEMENT_ID } from "../components/Premium/PremiumConstants";
 
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
@@ -65,12 +66,37 @@ const SettingsScreen = ({ navigation }) => {
     }, [])
   );
 
+  const [premiumStatus, setPremiumStatus] = useState(false);
+  // show entitlement status
+  useFocusEffect(
+    React.useCallback(() => {
+      async function getPuchaserInformation() {
+        try {
+          // access latest purchaserInfo
+          const purchaserInfo = await Purchases.getPurchaserInfo();
+
+          if (
+            typeof purchaserInfo.entitlements.active[ENTITLEMENT_ID] !==
+            "undefined"
+          ) {
+            setPremiumStatus(true);
+          } else {
+            setPremiumStatus(false);
+          }
+        } catch (e) {
+          Alert.alert("Error fetching purchaser info", e.message);
+        }
+      }
+      getPuchaserInformation();
+    }, [])
+  );
+
   const DEVCONTENT = isDEV && (
     <View>
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>DEVCONTENT</Text>
       </View>
-      <Button onPress={() => navigation.navigate("Premium")}>
+      <Button onPress={() => navigation.navigate("Paywall")}>
         Become a Premium Nomad!
       </Button>
       <Button
@@ -101,6 +127,8 @@ const SettingsScreen = ({ navigation }) => {
         Export FoodForNomads
       </Button>
       <Text>{timeZoneString}</Text>
+      {premiumStatus && <Text>I am a Premium Nomad!</Text>}
+      {!premiumStatus && <Text>I am NOT a Premium Nomad!</Text>}
     </View>
   );
 

@@ -1,8 +1,3 @@
-/**
- * @file Configuration file for your app's RevenueCat settings.
- * @author Vadim Savin
- */
-
 /*
  The API key for your app from the RevenueCat dashboard: https://app.revenuecat.com
  */

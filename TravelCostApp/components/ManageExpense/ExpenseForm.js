@@ -140,6 +140,7 @@ const ExpenseForm = ({
     const endDateFormat = getFormattedDate(endDate);
     setStartDate(startDateFormat);
     setEndDate(endDateFormat);
+    if (startDateFormat === endDateFormat) return;
     Alert.alert(i18n.t("rangedDatesTitle"), i18n.t("rangedDatesText"), [
       {
         text: i18n.t("duplicateExpenses"),

@@ -13,6 +13,8 @@ i18n.enableFallback = true;
 
 import Button from "../UI/Button";
 import Input from "./Input";
+import * as AppleAuthentication from "expo-apple-authentication";
+import Toast from "react-native-toast-message";
 
 function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
   const [enteredEmail, setEnteredEmail] = useState("");
@@ -45,6 +47,11 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
       email: enteredEmail,
       password: enteredPassword,
     });
+  }
+
+  function appleAuth(credentials) {
+    console.log("appleAuth");
+    onSubmit(credentials, true);
   }
 
   return (
@@ -97,8 +104,58 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
           </Button>
         </View>
         <View style={styles.orTextContainer}>
-          {/* <Text style={styles.orText}>Or With</Text> */}
-          <Pressable
+          <AppleAuthentication.AppleAuthenticationButton
+            buttonType={
+              AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
+            }
+            buttonStyle={
+              AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE
+            }
+            cornerRadius={5}
+            style={{ width: 200, height: 44 }}
+            onPress={async () => {
+              try {
+                const credential = await AppleAuthentication.signInAsync({
+                  requestedScopes: [
+                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                    AppleAuthentication.AppleAuthenticationScope.EMAIL,
+                  ],
+                });
+                console.log("onPress={ ~ credential:", credential);
+                Toast.show({
+                  type: "success",
+                  text1: "Apple Sign In",
+                  text2:
+                    credential.fullName.givenName +
+                    " " +
+                    credential.fullName.familyName +
+                    " " +
+                    credential.email,
+                });
+                appleAuth(credential);
+                // signed in
+              } catch (e) {
+                if (e.code === "ERR_REQUEST_CANCELED") {
+                  // handle that the user canceled the sign-in flow
+                  console.log("onPress={ ~ e:", e);
+                  Toast.show({
+                    type: "error",
+                    text1: "Apple Sign In",
+                    text2: "User canceled the sign-in flow",
+                  });
+                } else {
+                  // handle other errors
+                  console.log("onPress={ ~ e:", e);
+                  Toast.show({
+                    type: "error",
+                    text1: "Apple Sign In",
+                    text2: e.message,
+                  });
+                }
+              }
+            }}
+          />
+          {/* <Pressable
             onPress={() => Alert.alert(i18n.t("signupComingSoonAlert"))}
           >
             <View style={styles.google}>
@@ -106,7 +163,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
                 {i18n.t("signupGoogleText")}
               </Text>
             </View>
-          </Pressable>
+          </Pressable> */}
         </View>
       </View>
     </View>
@@ -145,7 +202,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   orTextContainer: {
-    margin: 12,
+    marginTop: "8%",
     justifyContent: "center",
     alignItems: "center",
   },

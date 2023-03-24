@@ -20,6 +20,7 @@ import { TripContext } from "../store/trip-context";
 import { asyncStoreSetItem, asyncStoreSetObject } from "../store/async-storage";
 import Toast from "react-native-toast-message";
 import { KeyboardAvoidingView } from "react-native";
+import * as AppleAuthentication from "expo-apple-authentication";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);

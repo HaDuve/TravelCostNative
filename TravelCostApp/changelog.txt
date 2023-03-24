@@ -1,5 +1,8 @@
 Change log Travel Expense App
 
+1.0.70 - 71
+--- DEV test apple login
+
 1.0.69
 - added Premium Membership and Paywall Screen (No real transactions until release)
 - simplify splits calculates the current rate of currencies again

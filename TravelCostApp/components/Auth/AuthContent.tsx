@@ -22,6 +22,7 @@ import { useNavigation } from "@react-navigation/native";
 import FlatButton from "../UI/FlatButton";
 import AuthForm from "./AuthForm";
 import { GlobalStyles } from "../../constants/styles";
+import { AppleAuthenticationCredential } from "expo-apple-authentication";
 
 function AuthContent({ isLogin, onAuthenticate }) {
   const navigation = useNavigation();
@@ -41,7 +42,20 @@ function AuthContent({ isLogin, onAuthenticate }) {
     }
   }
 
-  function submitHandler(credentials) {
+  function submitHandlerApple(credentials: AppleAuthenticationCredential) {
+    const name =
+      credentials.fullName.givenName + " " + credentials.fullName.familyName;
+    const email = credentials.user + "@apple.com";
+    const password = credentials.user + "@apple.com.p4sW0r-_d";
+    const newCredentials = { name, email, password };
+    submitHandler(newCredentials);
+  }
+
+  function submitHandler(credentials, isApple = false) {
+    if (isApple) {
+      submitHandlerApple(credentials);
+      return;
+    }
     let { name, email, password } = credentials;
 
     name = name.trim();

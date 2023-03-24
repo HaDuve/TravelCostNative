@@ -7,6 +7,7 @@ import * as Device from "expo-device";
 import { checkInternetConnection } from "react-native-offline";
 import Toast from "react-native-toast-message";
 import { DEBUG_FORCE_OFFLINE } from "../confApp";
+import { isPremiumMember } from "../components/Premium/PremiumConstants";
 
 export const UserContext = createContext({
   userName: "",
@@ -41,6 +42,10 @@ export const UserContext = createContext({
   checkConnectionUpdateUser: async () => {
     return true;
   },
+  isPremium: false,
+  checkPremium: async (): Promise<boolean> => {
+    return false;
+  },
 });
 
 function tripsReducer(state, action) {
@@ -67,6 +72,13 @@ function UserContextProvider({ children }) {
   const [tripsState, dispatch] = useReducer(tripsReducer, []);
   const [lastCurrency, setLastCurrency] = useState("");
   const [lastCountry, setLastCountry] = useState("");
+  const [isPremium, setIsPremium] = useState(false);
+
+  async function checkPremium() {
+    const isPremiumNow = await isPremiumMember();
+    setIsPremium(isPremiumNow);
+    return isPremiumNow;
+  }
 
   function setPeriodString(periodName: string) {
     setPeriodName(periodName);
@@ -180,6 +192,9 @@ function UserContextProvider({ children }) {
     saveUserNameInStorage: saveUserNameInStorage,
     loadUserNameFromStorage: loadUserNameFromStorage,
     checkConnectionUpdateUser: checkConnectionUpdateUser,
+
+    isPremium: isPremium,
+    checkPremium: checkPremium,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

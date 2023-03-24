@@ -10,7 +10,7 @@ import { ExpensesContext } from "../store/expenses-context";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr } from "../../TravelCostApp/i18n/supportedLanguages";
+import { en, de, fr } from "../i18n/supportedLanguages";
 import Button from "../components/UI/Button";
 import { exportAllExpensesToXLSX } from "../components/ImportExport/ExportToGoogleXlsx";
 import { ScrollView } from "react-native-gesture-handler";
@@ -24,6 +24,8 @@ import { asyncStoreGetItem } from "../store/async-storage";
 import { resetTour, saveStoppedTour } from "../util/tourUtil";
 import { reloadApp } from "../util/appState";
 import { ENTITLEMENT_ID } from "../components/Premium/PremiumConstants";
+import PropTypes from "prop-types";
+import GradientButton from "../components/UI/GradientButton";
 
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
@@ -67,27 +69,20 @@ const SettingsScreen = ({ navigation }) => {
   );
 
   const [premiumStatus, setPremiumStatus] = useState(false);
-  // show entitlement status
+  const buttonstring1 = "Manage Premium Account";
+  const buttonstring2 = "Become a Premium Nomad!";
+
+  const [premiumButtonString, setPremiumButtonString] = useState(
+    premiumStatus ? buttonstring1 : buttonstring2
+  );
   useFocusEffect(
     React.useCallback(() => {
-      async function getPuchaserInformation() {
-        try {
-          // access latest purchaserInfo
-          const purchaserInfo = await Purchases.getPurchaserInfo();
-
-          if (
-            typeof purchaserInfo.entitlements.active[ENTITLEMENT_ID] !==
-            "undefined"
-          ) {
-            setPremiumStatus(true);
-          } else {
-            setPremiumStatus(false);
-          }
-        } catch (e) {
-          Alert.alert("Error fetching purchaser info", e.message);
-        }
+      async function setPremiumNow() {
+        const isPremium = await userCtx.checkPremium();
+        setPremiumStatus(isPremium);
+        setPremiumButtonString(premiumStatus ? buttonstring1 : buttonstring2);
       }
-      getPuchaserInformation();
+      setPremiumNow();
     }, [])
   );
 
@@ -96,9 +91,7 @@ const SettingsScreen = ({ navigation }) => {
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>DEVCONTENT</Text>
       </View>
-      <Button onPress={() => navigation.navigate("Paywall")}>
-        Become a Premium Nomad!
-      </Button>
+
       <Button
         onPress={importExcelFile.bind(this, uid, tripid, userName, addExpense)}
         style={styles.settingsButton}
@@ -127,8 +120,6 @@ const SettingsScreen = ({ navigation }) => {
         Export FoodForNomads
       </Button>
       <Text>{timeZoneString}</Text>
-      {premiumStatus && <Text>I am a Premium Nomad!</Text>}
-      {!premiumStatus && <Text>I am NOT a Premium Nomad!</Text>}
     </View>
   );
 
@@ -196,6 +187,12 @@ const SettingsScreen = ({ navigation }) => {
       >
         {i18n.t("visitFoodForNomadsLabel")}
       </LinkingButton>
+      <GradientButton
+        style={[styles.settingsButton]}
+        onPress={() => navigation.navigate("Paywall")}
+      >
+        {premiumButtonString}
+      </GradientButton>
       <View
         style={{
           flexDirection: "row",
@@ -212,6 +209,10 @@ const SettingsScreen = ({ navigation }) => {
 };
 
 export default SettingsScreen;
+
+SettingsScreen.propTypes = {
+  navigation: PropTypes.object.isRequired,
+};
 
 const styles = StyleSheet.create({
   titleContainer: {
@@ -232,5 +233,6 @@ const styles = StyleSheet.create({
   settingsButton: {
     paddingVertical: "2%",
     paddingHorizontal: "8%",
+    borderRadius: 16,
   },
 });

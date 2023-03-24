@@ -33,8 +33,16 @@ export const GlobalStyles = {
     cat8: "#0097e5",
     cat9: "#e10a8e",
   },
+  gradientColors: ["#FEEF60", "#FBF0A8", "#A1D8C1"],
+  gradientColorsButton: ["#FEEF60", "#FBF0A8", "#A1D8C1"],
   buttonTextPrimary: {
     color: "#FFFFFF",
+    textAlign: "center",
+    fontStyle: "italic",
+    fontWeight: "300",
+  },
+  buttonTextGradient: {
+    color: "#002A22",
     textAlign: "center",
     fontStyle: "italic",
     fontWeight: "300",

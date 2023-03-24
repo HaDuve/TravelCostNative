@@ -23,10 +23,13 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const [toggleGraph, setToggleGraph] = useState(false);
   const userCtx = useContext(UserContext);
 
-  function toggleContent() {
-    if (!userCtx.checkPremium()) {
+  async function toggleContent() {
+    const isPremium = await userCtx.checkPremium();
+    if (!isPremium) {
       navigation.navigate("Paywall");
+      return;
     }
+
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setToggleGraph(!toggleGraph);
   }

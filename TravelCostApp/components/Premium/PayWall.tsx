@@ -70,7 +70,7 @@ const PaywallScreen = ({ navigation }) => {
   return (
     <>
       <BackgroundGradient
-        colors={["#FEEF60", "#FBF0A8", "#A1D8C1"]}
+        colors={GlobalStyles.gradientColors}
         style={styles.container}
       >
         <FlatList

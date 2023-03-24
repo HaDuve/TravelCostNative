@@ -1,5 +1,11 @@
 Change log Travel Expense App
 
+1.0.69
+- added Premium Membership and Paywall Screen (No real transactions until release)
+- simplify splits calculates the current rate of currencies again
+- adjusted split up expenses text
+- fixed a bug where you could split an expense of a single day
+
 1.0.67
 - added splitting up expenses over multiple days
 - fixed a bug where the app crashed because of corrupt data

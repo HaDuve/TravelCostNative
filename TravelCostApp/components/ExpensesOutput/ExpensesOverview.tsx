@@ -1,5 +1,5 @@
 import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import ExpenseCategories from "./ExpenseStatistics/ExpenseCategories";
 import IconButton from "../UI/IconButton";
 import ExpenseGraph from "./ExpenseStatistics/ExpenseGraph";
@@ -9,16 +9,24 @@ import * as Haptics from "expo-haptics";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../../i18n/supportedLanguages";
-import ToggleButton from "../../assets/SVG/toggleButton";
-import { TourGuideZone } from "rn-tourguide";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
+import ToggleButton from "../../assets/SVG/toggleButton";
+import { TourGuideZone } from "rn-tourguide";
+import { UserContext } from "../../store/user-context";
+import PropTypes from "prop-types";
+
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const [toggleGraph, setToggleGraph] = useState(false);
+  const userCtx = useContext(UserContext);
+
   function toggleContent() {
+    if (!userCtx.checkPremium()) {
+      navigation.navigate("Paywall");
+    }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setToggleGraph(!toggleGraph);
   }
@@ -83,6 +91,12 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
 };
 
 export default ExpensesOverview;
+
+ExpensesOverview.propTypes = {
+  expenses: PropTypes.array.isRequired,
+  periodName: PropTypes.string.isRequired,
+  navigation: PropTypes.object.isRequired,
+};
 
 const styles = StyleSheet.create({
   container: {

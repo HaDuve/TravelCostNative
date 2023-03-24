@@ -5,7 +5,7 @@
     "scheme": "budgetfornomads",
     "version": "1.0.71",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon2.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/launchBorderWhite.png",

@@ -64,7 +64,8 @@
     "victory": "^36.6.5",
     "victory-native": "^36.6.8",
     "xlsx": "^0.18.5",
-    "expo-linear-gradient": "~11.3.0"
+    "expo-linear-gradient": "~11.3.0",
+    "expo-apple-authentication": "~4.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

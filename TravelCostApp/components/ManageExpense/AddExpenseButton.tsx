@@ -19,6 +19,7 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../../i18n/supportedLanguages";
 import ToggleButton from "../../assets/SVG/toggleButton";
+import PropTypes from "prop-types";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -30,7 +31,7 @@ const AddExpenseButton = ({ navigation }) => {
   return (
     <Animated.View
       style={styles.margin}
-      entering={FadeIn.duration(600).delay(3000)}
+      // entering={FadeIn.duration(600).delay(3000)}
     >
       <TourGuideZone
         text={i18n.t("walk2")}
@@ -57,6 +58,10 @@ const AddExpenseButton = ({ navigation }) => {
 };
 
 export default AddExpenseButton;
+
+AddExpenseButton.propTypes = {
+  navigation: PropTypes.object.isRequired,
+};
 
 const styles = StyleSheet.create({
   margin: { marginTop: "-100%", marginHorizontal: "40%" },

@@ -38,6 +38,16 @@ function SignupScreen() {
       setIsAuthenticating(false);
       return;
     }
+    if (!name) {
+      Toast.show({
+        type: "error",
+        text1: "No Name found",
+        text2:
+          "There might be a problem with the apple signin process. Please try again with a different method.",
+      });
+      setIsAuthenticating(false);
+      return;
+    }
     try {
       // We are online and ready to create User
       const { token, uid } = await createUser(email, password);

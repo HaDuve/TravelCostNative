@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { Colors, GlobalStyles } from "../../constants/styles";
+import { GlobalStyles } from "../../constants/styles";
+import PropTypes from "prop-types";
 
 function FlatButton({ children, onPress, textStyle }) {
   return (
@@ -16,6 +17,12 @@ function FlatButton({ children, onPress, textStyle }) {
 }
 
 export default FlatButton;
+
+FlatButton.propTypes = {
+  children: PropTypes.string.isRequired,
+  onPress: PropTypes.func.isRequired,
+  textStyle: PropTypes.object,
+};
 
 const styles = StyleSheet.create({
   button: {

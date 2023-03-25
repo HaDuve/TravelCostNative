@@ -15,6 +15,7 @@ import Button from "../UI/Button";
 import Input from "./Input";
 import * as AppleAuthentication from "expo-apple-authentication";
 import Toast from "react-native-toast-message";
+import PropTypes from "prop-types";
 
 function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
   const [enteredEmail, setEnteredEmail] = useState("");
@@ -51,7 +52,12 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
 
   function appleAuth(credentials) {
     console.log("appleAuth");
-    onSubmit(credentials, true);
+    const name =
+      credentials.fullName.givenName + " " + credentials.fullName.familyName;
+    const email = credentials.user + "@apple.com";
+    const password = credentials.user + "@apple.com.p4sW0r-_d";
+    const newCredentials = { name: name, email: email, password: password };
+    onSubmit(newCredentials);
   }
 
   return (
@@ -79,6 +85,8 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
             label={i18n.t("nameLabel")}
             onUpdateValue={updateInputValueHandler.bind(this, "name")}
             value={enteredName}
+            secure={false}
+            keyboardType="default"
             isInvalid={nameIsInvalid}
           />
         )}
@@ -86,6 +94,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
           label={i18n.t("emailLabel")}
           onUpdateValue={updateInputValueHandler.bind(this, "email")}
           value={enteredEmail}
+          secure={false}
           keyboardType="email-address"
           isInvalid={emailIsInvalid}
         />
@@ -94,6 +103,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
           label={i18n.t("passwordLabel")}
           onUpdateValue={updateInputValueHandler.bind(this, "password")}
           secure
+          keyboardType="default"
           value={enteredPassword}
           isInvalid={passwordIsInvalid}
         />
@@ -124,7 +134,10 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
                 console.log("onPress={ ~ credential:", credential);
                 Toast.show({
                   type: "success",
-                  text1: "Apple Sign In",
+                  text1:
+                    credential.user + isLogin
+                      ? " Apple Login"
+                      : " Apple Sign In",
                   text2:
                     credential.fullName.givenName +
                     " " +
@@ -171,6 +184,12 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
 }
 
 export default AuthForm;
+
+AuthForm.propTypes = {
+  isLogin: PropTypes.bool.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  credentialsInvalid: PropTypes.object.isRequired,
+};
 
 const styles = StyleSheet.create({
   form: {},

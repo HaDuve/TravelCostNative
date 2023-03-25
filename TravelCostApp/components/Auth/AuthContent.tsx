@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import {
+import { useState } from "react";
+import React, {
   Alert,
   StyleSheet,
   View,
@@ -23,15 +23,15 @@ import FlatButton from "../UI/FlatButton";
 import AuthForm from "./AuthForm";
 import { GlobalStyles } from "../../constants/styles";
 import { AppleAuthenticationCredential } from "expo-apple-authentication";
+import PropTypes from "prop-types";
 
 function AuthContent({ isLogin, onAuthenticate }) {
   const navigation = useNavigation();
 
   const [credentialsInvalid, setCredentialsInvalid] = useState({
+    name: false,
     email: false,
     password: false,
-    confirmEmail: false,
-    confirmPassword: false,
   });
 
   function switchAuthModeHandler() {
@@ -42,20 +42,7 @@ function AuthContent({ isLogin, onAuthenticate }) {
     }
   }
 
-  function submitHandlerApple(credentials: AppleAuthenticationCredential) {
-    const name =
-      credentials.fullName.givenName + " " + credentials.fullName.familyName;
-    const email = credentials.user + "@apple.com";
-    const password = credentials.user + "@apple.com.p4sW0r-_d";
-    const newCredentials = { name, email, password };
-    submitHandler(newCredentials);
-  }
-
-  function submitHandler(credentials, isApple = false) {
-    if (isApple) {
-      submitHandlerApple(credentials);
-      return;
-    }
+  function submitHandler(credentials) {
     let { name, email, password } = credentials;
 
     name = name.trim();
@@ -99,6 +86,11 @@ function AuthContent({ isLogin, onAuthenticate }) {
 
 export default AuthContent;
 
+AuthContent.propType = {
+  isLogin: PropTypes.bool.isRequired,
+  onAuthenticate: PropTypes.func.isRequired,
+};
+
 const styles = StyleSheet.create({
   authContent: {
     padding: "6%",
@@ -115,7 +107,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   buttons: {
-    flexDirection: i18n.locale == "fr" ? "column" : "row",
+    flexDirection: i18n.locale !== "en" ? "column" : "row",
     marginTop: "4%",
     alignItems: "center",
     justifyContent: "center",

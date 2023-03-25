@@ -8,7 +8,7 @@
     "icon": "./assets/icon2.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/launchBorderWhite.png",
+      "image": "./assets/launch2.png",
       "resizeMode": "cover",
       "backgroundColor": "#000000"
     },

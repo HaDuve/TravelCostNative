@@ -41,7 +41,7 @@ const SplashScreenOverlay = (containerStyle) => {
         }}
       >
         <ImageBackground
-          source={require("../../assets/LaunchScreenwhite2.png")}
+          source={require("../../assets/launch2.png")}
           resizeMode={"cover"}
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >

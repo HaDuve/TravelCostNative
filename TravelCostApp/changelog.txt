@@ -1,7 +1,8 @@
 Change log Travel Expense App
 
-1.0.70 - 71
---- DEV test apple login
+1.0.76
+- added apple authentication for login and Signup
+- new design for icon and loding screen
 
 1.0.69
 - added Premium Membership and Paywall Screen (No real transactions until release)

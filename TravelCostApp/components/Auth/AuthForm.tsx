@@ -87,13 +87,6 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
       email: appleEmail,
       password: password,
     };
-    Alert.alert(
-      "Apple Signin",
-      `name ${name.slice(0, 10)} /n email ${appleEmail.slice(
-        0,
-        10
-      )} /n password ${password.slice(0, 10)}`
-    );
     onSubmit(newCredentials);
   }
 

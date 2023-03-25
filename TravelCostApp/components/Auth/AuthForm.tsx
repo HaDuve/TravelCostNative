@@ -16,6 +16,10 @@ import Input from "./Input";
 import * as AppleAuthentication from "expo-apple-authentication";
 import Toast from "react-native-toast-message";
 import PropTypes from "prop-types";
+import {
+  asyncStoreGetItem,
+  asyncStoreSetItem,
+} from "../../store/async-storage";
 
 function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
   const [enteredEmail, setEnteredEmail] = useState("");
@@ -50,13 +54,44 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
     });
   }
 
-  function appleAuth(credentials) {
-    console.log("appleAuth");
+  async function appleAuth(
+    credentials: AppleAuthentication.AppleAuthenticationCredential
+  ) {
+    let appleEmail = "";
+    if (credentials.email !== null) {
+      await asyncStoreSetItem(
+        "@userEmail" + credentials.user,
+        credentials.email
+      );
+      appleEmail = credentials.email;
+    } else {
+      const storedMail = await asyncStoreGetItem(credentials.user);
+      if (storedMail !== null) {
+        appleEmail = storedMail;
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "No email found",
+          text2: "Please try again with a different method.",
+        });
+        return;
+      }
+    }
     const name =
       credentials.fullName.givenName + " " + credentials.fullName.familyName;
-    const email = credentials.user + "@apple.com";
-    const password = credentials.user + "@apple.com.p4sW0r-_d";
-    const newCredentials = { name: name, email: email, password: password };
+    const password = credentials.user.slice(0, 20) + "@apple.com.p4sW0r-_d";
+    const newCredentials = {
+      name: name,
+      email: appleEmail,
+      password: password,
+    };
+    Alert.alert(
+      "Apple Signin",
+      `name ${name.slice(0, 10)} /n email ${email.slice(
+        0,
+        10
+      )} /n password ${password.slice(0, 10)}`
+    );
     onSubmit(newCredentials);
   }
 
@@ -132,20 +167,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
                   ],
                 });
                 console.log("onPress={ ~ credential:", credential);
-                Toast.show({
-                  type: "success",
-                  text1:
-                    credential.user + isLogin
-                      ? " Apple Login"
-                      : " Apple Sign In",
-                  text2:
-                    credential.fullName.givenName +
-                    " " +
-                    credential.fullName.familyName +
-                    " " +
-                    credential.email,
-                });
-                appleAuth(credential);
+                await appleAuth(credential);
                 // signed in
               } catch (e) {
                 if (e.code === "ERR_REQUEST_CANCELED") {

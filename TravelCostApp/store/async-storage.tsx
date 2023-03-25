@@ -68,6 +68,10 @@ export async function asyncStoreGetObject(key: string) {
  */
 export async function asyncStoreSafeClear() {
   console.log("attempting to clear all async stored Memory > ");
+
+  // add keys(prefixes) which should never be deleted
+  const neverDelete = ["@userEmail"];
+
   let keys: readonly string[];
   try {
     keys = await AsyncStorage.getAllKeys();
@@ -75,6 +79,16 @@ export async function asyncStoreSafeClear() {
     // read key error
     console.error(error);
   }
+  // remove all keys except the keys which have a neverDelete prefix
+  keys = keys.filter((key) => {
+    for (let i = 0; i < neverDelete.length; i++) {
+      if (key.startsWith(neverDelete[i])) {
+        return false;
+      }
+    }
+    return true;
+  });
+
   try {
     await AsyncStorage.multiRemove(keys);
   } catch (error) {

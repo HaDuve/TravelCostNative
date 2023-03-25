@@ -3,7 +3,7 @@
     "name": "Budget",
     "slug": "Travel-Expense",
     "scheme": "budgetfornomads",
-    "version": "1.0.74",
+    "version": "1.0.75",
     "orientation": "portrait",
     "icon": "./assets/icon2.png",
     "userInterfaceStyle": "light",
@@ -19,18 +19,18 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.budgetfornomads.app",
-      "buildNumber": "1.0.74"
+      "buildNumber": "1.0.75"
     },
     "android": {
       "package": "com.budgetfornomads.app",
-      "versionCode": 1074,
+      "versionCode": 1075,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
+        "foregroundImage": "./assets/icon2.png",
         "backgroundColor": "#FFFFFF"
       }
     },
     "web": {
-      "favicon": "./assets/icon.png"
+      "favicon": "./assets/icon2.png"
     },
     "extra": {
       "eas": {

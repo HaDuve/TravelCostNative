@@ -49,8 +49,8 @@ function AuthContent({ isLogin, onAuthenticate }) {
     email = email.trim();
     password = password.trim();
 
-    const nameIsValid = name.length > 0;
-    const emailIsValid = email.includes("@");
+    const nameIsValid = name.length > 0 && name.length < 256;
+    const emailIsValid = email.includes("@") && email.includes(".");
     const passwordIsValid = password.length > 6;
 
     if ((!nameIsValid || !emailIsValid || !passwordIsValid) && !isLogin) {

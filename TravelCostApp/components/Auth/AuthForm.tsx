@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, Image, Pressable, Alert } from "react-native";
+import { StyleSheet, View, Text, Image, Alert } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 
 //Localization
@@ -65,7 +65,9 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
       );
       appleEmail = credentials.email;
     } else {
-      const storedMail = await asyncStoreGetItem(credentials.user);
+      const storedMail = await asyncStoreGetItem(
+        "@userEmail" + credentials.user
+      );
       if (storedMail !== null) {
         appleEmail = storedMail;
       } else {
@@ -87,7 +89,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
     };
     Alert.alert(
       "Apple Signin",
-      `name ${name.slice(0, 10)} /n email ${email.slice(
+      `name ${name.slice(0, 10)} /n email ${appleEmail.slice(
         0,
         10
       )} /n password ${password.slice(0, 10)}`
@@ -100,7 +102,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
       <View>
         <View style={styles.iconContainer}>
           <Image
-            source={require("../../assets/icon.png")}
+            source={require("../../assets/icon2.png")}
             style={{ width: 60, height: 60 }}
           />
         </View>
@@ -159,15 +161,14 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
             cornerRadius={5}
             style={{ width: 200, height: 44 }}
             onPress={async () => {
+              let credentials: AppleAuthentication.AppleAuthenticationCredential;
               try {
-                const credential = await AppleAuthentication.signInAsync({
+                credentials = await AppleAuthentication.signInAsync({
                   requestedScopes: [
                     AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
                     AppleAuthentication.AppleAuthenticationScope.EMAIL,
                   ],
                 });
-                console.log("onPress={ ~ credential:", credential);
-                await appleAuth(credential);
                 // signed in
               } catch (e) {
                 if (e.code === "ERR_REQUEST_CANCELED") {
@@ -188,6 +189,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
                   });
                 }
               }
+              await appleAuth(credentials);
             }}
           />
           {/* <Pressable

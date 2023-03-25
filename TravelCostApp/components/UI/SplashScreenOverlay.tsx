@@ -25,7 +25,7 @@ import Animated, {
   ZoomOutDown,
 } from "react-native-reanimated";
 
-const loadingColor = GlobalStyles.colors.primaryGrayed;
+const loadingColor = GlobalStyles.colors.backgroundColor;
 const SplashScreenOverlay = (containerStyle) => {
   return (
     <>

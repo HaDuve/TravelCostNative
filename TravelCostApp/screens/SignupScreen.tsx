@@ -50,6 +50,12 @@ function SignupScreen() {
     }
     try {
       // We are online and ready to create User
+      Toast.show({
+        type: "success",
+        text1: email,
+        text2: password,
+        visibilityTime: 6000,
+      });
       const { token, uid } = await createUser(email, password);
 
       //CLEAR

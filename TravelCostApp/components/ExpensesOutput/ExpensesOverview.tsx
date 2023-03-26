@@ -17,9 +17,12 @@ import ToggleButton from "../../assets/SVG/toggleButton";
 import { TourGuideZone } from "rn-tourguide";
 import { UserContext } from "../../store/user-context";
 import PropTypes from "prop-types";
+import ExpenseCountries from "./ExpenseStatistics/ExpenseCountries";
+import ExpenseTravellers from "./ExpenseStatistics/ExpenseTravellers";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
-  const [toggleGraph, setToggleGraph] = useState(false);
+  // enum => 1 = graph, 2 = categories, 3 = traveller, 4 = country
+  const [toggleGraph, setToggleGraph] = useState(1);
   const userCtx = useContext(UserContext);
 
   async function toggleContent() {
@@ -30,7 +33,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
     }
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setToggleGraph(!toggleGraph);
+    setToggleGraph(toggleGraph == 4 ? 1 : toggleGraph + 1);
   }
 
   let titleString = "";
@@ -53,20 +56,22 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
         )}
       </View>
 
-      {!toggleGraph && (
+      {toggleGraph == 1 && (
         <ExpenseGraph
           navigation={navigation}
           expenses={expenses}
           periodName={periodName}
         />
       )}
-      {toggleGraph && (
+      {toggleGraph == 2 && (
         <ExpenseCategories
           expenses={expenses}
           periodName={periodName}
           navigation={navigation}
         />
       )}
+      {toggleGraph == 3 && <ExpenseCountries></ExpenseCountries>}
+      {toggleGraph == 4 && <ExpenseTravellers></ExpenseTravellers>}
 
       <View
         style={[

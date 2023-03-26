@@ -75,6 +75,7 @@ function UserContextProvider({ children }) {
   const [isPremium, setIsPremium] = useState(false);
 
   async function checkPremium() {
+    // allow offline users to get premium
     if (!isOnline) {
       setIsPremium(true);
       return true;

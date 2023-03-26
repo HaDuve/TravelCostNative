@@ -11,7 +11,7 @@ export const DEBUG_POLLING_INTERVAL_ONLINE = 10000;
 // Dev constant
 export const DEV = false;
 // Premium consts
-export const PREMIUM = true;
+export const PREMIUM = false;
 
 // toast tweaks
 export const TOAST_LOCATION = "bottom";

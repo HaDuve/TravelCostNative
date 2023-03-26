@@ -1,5 +1,10 @@
 Change log Travel Expense App
 
+1.0.77
+- fixed premium subscription not getting checked
+- improved paywall screen
+- improvements to animations and spacing of diagrams and overviews
+
 1.0.76
 - added apple authentication for login and Signup
 - new design for icon and loding screen

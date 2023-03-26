@@ -90,6 +90,48 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
     onSubmit(newCredentials);
   }
 
+  const AppleAuthenticationJSX = (
+    <AppleAuthentication.AppleAuthenticationButton
+      buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+      buttonStyle={
+        AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE
+      }
+      cornerRadius={5}
+      style={{ width: 200, height: 44 }}
+      onPress={async () => {
+        let credentials: AppleAuthentication.AppleAuthenticationCredential;
+        try {
+          credentials = await AppleAuthentication.signInAsync({
+            requestedScopes: [
+              AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+              AppleAuthentication.AppleAuthenticationScope.EMAIL,
+            ],
+          });
+          // signed in
+        } catch (e) {
+          if (e.code === "ERR_REQUEST_CANCELED") {
+            // handle that the user canceled the sign-in flow
+            console.log("onPress={ ~ e:", e);
+            Toast.show({
+              type: "error",
+              text1: "Apple Sign In",
+              text2: "User canceled the sign-in flow",
+            });
+          } else {
+            // handle other errors
+            console.log("onPress={ ~ e:", e);
+            Toast.show({
+              type: "error",
+              text1: "Apple Sign In",
+              text2: e.message,
+            });
+          }
+        }
+        await appleAuth(credentials);
+      }}
+    />
+  );
+
   return (
     <View style={styles.form}>
       <View>
@@ -144,47 +186,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
           </Button>
         </View>
         <View style={styles.orTextContainer}>
-          <AppleAuthentication.AppleAuthenticationButton
-            buttonType={
-              AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
-            }
-            buttonStyle={
-              AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE
-            }
-            cornerRadius={5}
-            style={{ width: 200, height: 44 }}
-            onPress={async () => {
-              let credentials: AppleAuthentication.AppleAuthenticationCredential;
-              try {
-                credentials = await AppleAuthentication.signInAsync({
-                  requestedScopes: [
-                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-                    AppleAuthentication.AppleAuthenticationScope.EMAIL,
-                  ],
-                });
-                // signed in
-              } catch (e) {
-                if (e.code === "ERR_REQUEST_CANCELED") {
-                  // handle that the user canceled the sign-in flow
-                  console.log("onPress={ ~ e:", e);
-                  Toast.show({
-                    type: "error",
-                    text1: "Apple Sign In",
-                    text2: "User canceled the sign-in flow",
-                  });
-                } else {
-                  // handle other errors
-                  console.log("onPress={ ~ e:", e);
-                  Toast.show({
-                    type: "error",
-                    text1: "Apple Sign In",
-                    text2: e.message,
-                  });
-                }
-              }
-              await appleAuth(credentials);
-            }}
-          />
+          {/* {AppleAuthenticationJSX} */}
           {/* <Pressable
             onPress={() => Alert.alert(i18n.t("signupComingSoonAlert"))}
           >

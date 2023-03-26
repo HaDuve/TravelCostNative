@@ -1,15 +1,8 @@
-import React, { memo, useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 
-import ErrorOverlay from "../components/UI/ErrorOverlay";
-import LoadingOverlay from "../components/UI/LoadingOverlay";
-import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
-import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
-import { toShortFormat } from "../util/date";
-import { getAllExpenses } from "../util/http";
-
 import { StyleSheet, Text, View } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
@@ -22,7 +15,7 @@ import { en, de, fr } from "../i18n/supportedLanguages";
 import { DateTime } from "luxon";
 import { _toShortFormat } from "../util/dateTime";
 import { useFocusEffect } from "@react-navigation/native";
-import { TourGuideZoneByPosition } from "rn-tourguide";
+import PropTypes from "prop-types";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -84,6 +77,10 @@ const OverviewScreen = ({ navigation }) => {
 };
 
 export default OverviewScreen;
+
+OverviewScreen.propTypes = {
+  navigation: PropTypes.object.isRequired,
+};
 
 const styles = StyleSheet.create({
   container: {

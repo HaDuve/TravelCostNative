@@ -1,5 +1,10 @@
 Change log Travel Expense App
 
+1.0.78
+- added a chart carousel
+- added a traveller pie chart (who paid how much after all splits are paid back?)
+- added a country/currency pie chart (for now only which currency was paid in)
+
 1.0.77
 - fixed premium subscription not getting checked
 - improved paywall screen

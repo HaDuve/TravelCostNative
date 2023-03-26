@@ -5,6 +5,7 @@ import React from "react";
 import { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setAxiosAccessToken } from "../util/http";
+import PropTypes from "prop-types";
 
 export const AuthContext = createContext({
   uid: "",
@@ -55,3 +56,7 @@ function AuthContextProvider({ children }) {
 }
 
 export default AuthContextProvider;
+
+AuthContextProvider.propTypes = {
+  children: PropTypes.node,
+};

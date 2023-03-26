@@ -4,14 +4,10 @@ import { ScrollView } from "react-native-gesture-handler";
 import { GlobalStyles } from "../../constants/styles";
 import ExpensesList from "./ExpensesList";
 import React from "react-native";
-import Animated, {
-  SlideInLeft,
-  SlideInRight,
-  SlideOutLeft,
-} from "react-native-reanimated";
+import Animated, { SlideOutLeft } from "react-native-reanimated";
 import LoadingOverlay from "../UI/LoadingOverlay";
-import SplashScreenOverlay from "../UI/SplashScreenOverlay";
 import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 
 function ExpensesOutput({
   expenses,
@@ -43,6 +39,13 @@ function ExpensesOutput({
 }
 
 export default ExpensesOutput;
+
+ExpensesOutput.propTypes = {
+  expenses: PropTypes.array,
+  fallbackText: PropTypes.string,
+  refreshControl: PropTypes.object,
+  periodValue: PropTypes.string,
+};
 
 const styles = StyleSheet.create({
   container: {

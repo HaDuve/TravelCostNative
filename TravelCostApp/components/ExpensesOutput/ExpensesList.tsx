@@ -2,46 +2,39 @@ import { Alert, Dimensions } from "react-native";
 
 import ExpenseItem from "./ExpenseItem";
 
-import React, {
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useContext } from "react";
 import { View } from "react-native";
 
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { GlobalStyles } from "../../constants/styles";
-import { deleteExpense, touchAllTravelers } from "../../util/http";
+import { touchAllTravelers } from "../../util/http";
 import { TripContext } from "../../store/trip-context";
 import { ExpensesContext } from "../../store/expenses-context";
 import IconButton from "../UI/IconButton";
-import Animated, {
-  FadeInRight,
-  FadeOutLeft,
-  FadingTransition,
-  Layout,
-} from "react-native-reanimated";
+import Animated, { Layout } from "react-native-reanimated";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../../i18n/supportedLanguages";
-import { deleteExpenseOnlineOffline } from "../../util/offline-queue";
-import { FlatList } from "react-native-gesture-handler";
+import {
+  deleteExpenseOnlineOffline,
+  OfflineQueueManageExpenseItem,
+} from "../../util/offline-queue";
 import { UserContext } from "../../store/user-context";
+import { ExpenseData, Expense } from "../../util/expense";
+import PropTypes from "prop-types";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 
 // GLOBALS across all expenseItems
-var tripid = "";
-var expenseCtx = {};
-let row = [];
+let tripid = "";
+let expenseCtx;
+const row = [];
 let prevOpenedRow;
 // swipe left to delete
-const renderLeftActions = (progress, dragX, onClick) => {
+const renderRightActions = (progress, dragX, onClick) => {
   return (
     <View
       style={{
@@ -71,7 +64,7 @@ function renderExpenseItem(isOnline, itemData) {
     <View style={{ height: 55, width: "100%" }}>
       <Swipeable
         renderRightActions={(progress, dragX) =>
-          renderLeftActions(
+          renderRightActions(
             progress,
             dragX,
             onClick.bind(this, itemData, isOnline)
@@ -98,7 +91,7 @@ function onClick({ item, index }, isOnline) {
   console.log("onClick ~ uid", uid);
   async function deleteExp() {
     try {
-      const item = {
+      const item: OfflineQueueManageExpenseItem = {
         type: "delete",
         expense: {
           tripid: tripid,
@@ -107,7 +100,7 @@ function onClick({ item, index }, isOnline) {
         },
       };
       await deleteExpenseOnlineOffline(item, isOnline);
-      expenseCtx.deleteExpense(editedExpenseId);
+      expenseCtx?.deleteExpense(editedExpenseId);
       await touchAllTravelers(tripid, true);
     } catch (error) {
       console.log(i18n.t("deleteError"), error);
@@ -159,7 +152,7 @@ function ExpensesList({ expenses, refreshControl, periodValue }) {
   const isOnline = userCtx.isOnline;
   const tripCtx = useContext(TripContext);
   expenseCtx = useContext(ExpensesContext);
-  const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(true);
+  const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(1);
   tripid = tripCtx.tripid;
 
   // // find the index of the first item in expenses with the date === new Date()
@@ -199,7 +192,7 @@ function ExpensesList({ expenses, refreshControl, periodValue }) {
         ListFooterComponent={
           <View style={{ height: Dimensions.get("window").height }} />
         }
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item: Expense) => item.id}
         refreshControl={refreshControl}
         // getItemLayout={(data, index) => ({
         //   length: 55,
@@ -212,3 +205,19 @@ function ExpensesList({ expenses, refreshControl, periodValue }) {
 }
 
 export default ExpensesList;
+
+ExpensesList.propTypes = {
+  expenses: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+      amount: PropTypes.number.isRequired,
+      date: PropTypes.instanceOf(Date).isRequired,
+      currency: PropTypes.string.isRequired,
+      category: PropTypes.string.isRequired,
+      uid: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  refreshControl: PropTypes.element,
+  periodValue: PropTypes.string.isRequired,
+};

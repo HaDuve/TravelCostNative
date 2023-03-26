@@ -1,6 +1,7 @@
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import React, { View, Text, TextInput, StyleSheet } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
+import PropTypes from "prop-types";
 
 function Input({
   label,
@@ -28,6 +29,15 @@ function Input({
 }
 
 export default Input;
+
+Input.propTypes = {
+  label: PropTypes.string.isRequired,
+  keyboardType: PropTypes.string,
+  secure: PropTypes.bool,
+  onUpdateValue: PropTypes.func.isRequired,
+  value: PropTypes.string.isRequired,
+  isInvalid: PropTypes.bool,
+};
 
 const styles = StyleSheet.create({
   inputContainer: {

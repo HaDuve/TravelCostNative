@@ -1,23 +1,19 @@
 import React, { useState } from "react";
 import { StyleSheet } from "react-native";
-import {
-  VictoryAxis,
-  VictoryBar,
-  VictoryChart,
-  VictoryLine,
-  VictoryPie,
-  VictoryScatter,
-  VictoryTheme,
-  VictoryTooltip,
-  VictoryVoronoiContainer,
-} from "victory-native";
+import { VictoryPie, VictoryTooltip } from "victory-native";
 import { GlobalStyles } from "../../constants/styles";
 import Animated, {
   FadeInRight,
-  FadeInUp,
   FadeOutLeft,
+  ZoomIn,
+  ZoomInEasyUp,
+  ZoomInRight,
+  ZoomOut,
+  ZoomOutEasyUp,
+  ZoomOutLeft,
 } from "react-native-reanimated";
 import { getCatString } from "../../util/category";
+import PropTypes from "prop-types";
 
 const CategoryChart = ({ inputData }) => {
   const [useDummyData, setUseDummyData] = useState(true);
@@ -32,11 +28,7 @@ const CategoryChart = ({ inputData }) => {
   }
 
   return (
-    <Animated.View
-      entering={FadeInRight}
-      exiting={FadeOutLeft}
-      style={styles.container}
-    >
+    <Animated.View exiting={ZoomOut} entering={ZoomIn} style={styles.container}>
       <VictoryPie
         data={chartDataForRender}
         height={200}
@@ -44,6 +36,7 @@ const CategoryChart = ({ inputData }) => {
         endAngle={90}
         animate={{
           duration: 500,
+          onLoad: { duration: 0 },
         }}
         innerRadius={70}
         padAngle={0}
@@ -72,6 +65,10 @@ const CategoryChart = ({ inputData }) => {
 };
 
 export default CategoryChart;
+
+CategoryChart.propTypes = {
+  inputData: PropTypes.array,
+};
 
 const styles = StyleSheet.create({
   container: {

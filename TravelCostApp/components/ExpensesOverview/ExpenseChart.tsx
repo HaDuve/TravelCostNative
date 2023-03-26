@@ -4,13 +4,13 @@ import * as Haptics from "expo-haptics";
 import {
   VictoryBar,
   VictoryChart,
-  VictoryLabel,
   VictoryLine,
   VictoryTooltip,
   VictoryVoronoiContainer,
 } from "victory-native";
 import { GlobalStyles } from "../../constants/styles";
 import { getDateMinusDays } from "../../util/date";
+import PropTypes from "prop-types";
 
 const ExpenseChart = ({
   inputData,
@@ -71,12 +71,10 @@ const ExpenseChart = ({
       <VictoryChart
         height={160}
         animate={{ duration: 500 }}
-        padding={{ top: 10, bottom: 36, left: 30, right: 40 }}
+        padding={{ top: 10, bottom: 30, left: 60, right: 55 }}
         domainPadding={{ x: [0, 25] }}
         // domain={{ y: [0, 2 * budget] }}
-        containerComponent={
-          <VictoryVoronoiContainer mouseFollowTooltip voronoiDimension="x" />
-        }
+        containerComponent={<VictoryVoronoiContainer voronoiDimension="x" />}
       >
         <VictoryLine
           labelComponent={
@@ -112,8 +110,11 @@ const ExpenseChart = ({
           }
           style={{
             data: {
-              fill: ({ datum }) => datum.fill,
-              strokeWidth: ({ active }) => (active ? 4 : 0),
+              fill: ({ datum, active }) =>
+                active ? GlobalStyles.colors.primary200 : datum.fill,
+              strokeWidth: ({ active }) => (active ? 1 : 0),
+              stroke: ({ active }) =>
+                active ? GlobalStyles.colors.gray700 : "",
             },
           }}
           data={data}
@@ -138,10 +139,20 @@ const ExpenseChart = ({
 
 export default ExpenseChart;
 
+ExpenseChart.propTypes = {
+  inputData: PropTypes.array,
+  xAxis: PropTypes.string,
+  yAxis: PropTypes.string,
+  budgetAxis: PropTypes.string,
+  budget: PropTypes.number,
+  daysRange: PropTypes.number,
+  currency: PropTypes.string,
+  navigation: PropTypes.object,
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginLeft: "8%",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,

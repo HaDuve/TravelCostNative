@@ -15,19 +15,30 @@ import Animated, {
   Layout,
   Transition,
 } from "react-native-reanimated";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr } from "../../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import { getCatString } from "../../../util/category";
+import PropTypes from "prop-types";
 
 const ExpenseCategories = ({ expenses, periodName, navigation }) => {
-  const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(true);
+  const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
 
   if (!expenses)
     return (
       <View style={styles.container}>
-        <Text>No expenses</Text>;
+        <Text>{i18n.t("fallbackTextExpenses")}</Text>;
       </View>
     );
 
-  let categoryList = [];
+  const categoryList = [];
   expenses.forEach((expense) => {
     const cat = expense.category;
     if (!categoryList.includes(cat)) {
@@ -49,8 +60,8 @@ const ExpenseCategories = ({ expenses, periodName, navigation }) => {
   }
   const totalSum = getSumExpenses(expenses);
 
-  let catSumCat = [];
-  let dataList = [];
+  const catSumCat = [];
+  const dataList = [];
 
   categoryList.forEach((cat) => {
     const catExpenses = getAllExpensesWithCat(cat);
@@ -119,10 +130,7 @@ const ExpenseCategories = ({ expenses, periodName, navigation }) => {
         ListFooterComponent={<View style={{ height: 100 }}></View>}
         ListEmptyComponent={
           <View style={styles.fallbackTextContainer}>
-            <Text>
-              No expenses for this Timeframe, try choosing another period in the
-              dropdown menu or adding new expenses!
-            </Text>
+            <Text>{i18n.t("fallbackTextExpenses")}</Text>;
           </View>
         }
       />
@@ -131,6 +139,12 @@ const ExpenseCategories = ({ expenses, periodName, navigation }) => {
 };
 
 export default ExpenseCategories;
+
+ExpenseCategories.propTypes = {
+  expenses: PropTypes.array,
+  periodName: PropTypes.string,
+  navigation: PropTypes.object,
+};
 
 const styles = StyleSheet.create({
   container: {

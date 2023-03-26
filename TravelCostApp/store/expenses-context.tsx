@@ -10,6 +10,8 @@ import {
 } from "../util/date";
 import { truncateString } from "../util/string";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
+import PropTypes from "prop-types";
+import { Expense } from "../util/expense";
 
 export const ExpensesContext = createContext({
   expenses: [],
@@ -52,11 +54,21 @@ export const ExpensesContext = createContext({
   getWeeklyExpenses: (weeksBack) => {
     // firstDay, lastDay, weeklyExpenses;
   },
-  getDailyExpenses: (daysBack) => {},
-  getSpecificDayExpenses: (date) => {},
-  getSpecificWeekExpenses: (date) => {},
-  getSpecificMonthExpenses: (date) => {},
-  getSpecificYearExpenses: (date) => {},
+  getDailyExpenses: (daysBack): Array<Expense> => {
+    return [];
+  },
+  getSpecificDayExpenses: (date): Array<Expense> => {
+    return [];
+  },
+  getSpecificWeekExpenses: (date): Array<Expense> => {
+    return [];
+  },
+  getSpecificMonthExpenses: (date): Array<Expense> => {
+    return [];
+  },
+  getSpecificYearExpenses: (date): Array<Expense> => {
+    return [];
+  },
 
   saveExpensesInStorage: async (expenses) => {},
   loadExpensesFromStorage: async () => {},
@@ -69,7 +81,7 @@ function expensesReducer(state, action) {
     case "SET": {
       const getSortedState = (data) =>
         data.sort((a, b) => {
-          return new Date(b.date) - new Date(a.date);
+          return Number(new Date(b.date)) - Number(new Date(a.date));
         });
       const sorted = getSortedState(action.payload);
       return sorted;
@@ -153,7 +165,7 @@ function ExpensesContextProvider({ children }) {
     });
     return { firstDay, lastDay, yearlyExpenses };
   }
-  function getMonthlyExpenses(monthsBack) {
+  function getMonthlyExpenses(monthsBack: number) {
     /*
      *  Returns an object containing the first date, last date of a month and
      *  the expenses in that range.
@@ -173,7 +185,7 @@ function ExpensesContextProvider({ children }) {
     });
     return { firstDay, lastDay, monthlyExpenses };
   }
-  function getWeeklyExpenses(weeksBack) {
+  function getWeeklyExpenses(weeksBack: number) {
     /*
      *  Returns an object containing the first date, last date of a month and
      *  the expenses in that range.
@@ -191,7 +203,7 @@ function ExpensesContextProvider({ children }) {
     });
     return { firstDay, lastDay, weeklyExpenses };
   }
-  function getDailyExpenses(daysBack) {
+  function getDailyExpenses(daysBack: number) {
     const today = new Date();
     const dayBack = getDateMinusDays(today, daysBack);
     const dayExpenses = expensesState.filter((expense) => {
@@ -293,3 +305,6 @@ function ExpensesContextProvider({ children }) {
 }
 
 export default ExpensesContextProvider;
+ExpensesContextProvider.propTypes = {
+  children: PropTypes.node,
+};

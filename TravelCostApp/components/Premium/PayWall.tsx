@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Alert, StyleSheet } from "react-native";
+import { View, Text, FlatList, Alert, StyleSheet, Image } from "react-native";
 import Purchases from "react-native-purchases";
 import { GlobalStyles } from "../../constants/styles";
 import PackageItem from "../Premium/PackageItem";
@@ -41,8 +41,23 @@ const PaywallScreen = ({ navigation }) => {
       >
         Back
       </FlatButton>
-      <View>
-        <Text style={[styles.text, { padding: 44 }]}>Image Placeholder</Text>
+      <View
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          margin: "2%",
+        }}
+      >
+        {/* Image of icon2.png scaled to 10% of screenheight */}
+        <Image
+          source={require("../../assets/icon2.png")}
+          style={{
+            width: "40%",
+            height: "40%",
+            resizeMode: "contain",
+            margin: "2%",
+          }}
+        />
       </View>
       <Text style={styles.headerTitleText}>Go Pro!</Text>
       <Text style={styles.headerSubtitleText}>
@@ -113,7 +128,7 @@ const styles = StyleSheet.create({
   },
   headerTitleText: {
     fontSize: 64,
-    padding: 24,
+    padding: "2%",
     fontWeight: "bold",
     textAlign: "center",
     color: GlobalStyles.colors.primary700,

@@ -4,14 +4,14 @@ import { GlobalStyles } from "../../../constants/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { getCatString, getCatSymbol } from "../../../util/category";
 import { useContext } from "react";
-import { UserContext } from "../../../store/user-context";
 import { TripContext } from "../../../store/trip-context";
-import { formatExpenseString, truncateString } from "../../../util/string";
+import { formatExpenseString } from "../../../util/string";
 import Animated, { FadeInRight } from "react-native-reanimated";
+import PropTypes from "prop-types";
 
 const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   const tripCtx = useContext(TripContext);
-  let budgetProgress = (catCost / totalCost) * 1;
+  const budgetProgress = (catCost / totalCost) * 1;
   if (Number.isNaN(budgetProgress)) {
     console.error("NaN budgetProgress passed to CategoryProgressBar");
     return <></>;
@@ -50,6 +50,13 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
 };
 
 export default CategoryProgressBar;
+
+CategoryProgressBar.propTypes = {
+  cat: PropTypes.string.isRequired,
+  color: PropTypes.string.isRequired,
+  totalCost: PropTypes.number.isRequired,
+  catCost: PropTypes.number.isRequired,
+};
 
 const styles = StyleSheet.create({
   container: {

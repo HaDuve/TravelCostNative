@@ -1,14 +1,14 @@
-import { getAllExpenses } from "./http";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../i18n/supportedLanguages";
-import Toast from "react-native-toast-message";
 import { getRate } from "./currencyExchange";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
+
+import { getAllExpenses } from "./http";
 
 export function calcSplitList(
   splitType,
@@ -29,7 +29,7 @@ export function calcSplitList(
     return;
   }
 
-  let splitList = [];
+  const splitList = [];
   switch (splitType) {
     case "SELF":
       return splitList;
@@ -141,7 +141,7 @@ export function travellerToDropdown(travellers) {
 export async function calcOpenSplitsTable(tripid, tripCurrency) {
   // cleanup all expenses where payer === debtor
   let expenses = [];
-  let rates = {};
+  const rates = {};
   rates[tripCurrency] = 1;
   try {
     expenses = await getAllExpenses(tripid);
@@ -197,7 +197,7 @@ export function simplifySplits(openSplits) {
         );
       }
     } else {
-      let newSplit = {
+      const newSplit = {
         paidBy: openSplit.whoPaid,
         paidFor: {},
       };
@@ -242,7 +242,7 @@ function sumUpSamePairs(openSplits) {
         listOfSums[index].amount += Number(split.amount);
       }
     } else {
-      let obj = {
+      const obj = {
         userName: split.userName,
         whoPaid: split.whoPaid,
         amount: Number(split.amount),

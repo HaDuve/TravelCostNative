@@ -16,18 +16,22 @@ import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { GlobalStyles } from "../constants/styles";
 import { TripContext } from "../store/trip-context";
 import { calcOpenSplitsTable, simplifySplits } from "../util/split";
+import PropTypes from "prop-types";
+import { UserContext } from "../store/user-context";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
   const { tripid } = route.params;
   console.log("SplitSummaryScreen ~ tripid:", tripid);
+  const TripCtx = useContext(TripContext);
+  const tripCurrency = TripCtx.tripCurrency;
+  const userCtx = useContext(UserContext);
+
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
 
   const [splits, setSplits] = useState([]);
   const [showSimplify, setShowSimplify] = useState(true);
   const [titleText, setTitleText] = useState("Open Splits!");
-  const TripCtx = useContext(TripContext);
-  const tripCurrency = TripCtx.tripCurrency;
 
   async function getOpenSplits() {
     setIsFetching(true);
@@ -118,7 +122,12 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         {showSimplify && (
           <Button
             style={styles.button}
-            onPress={() => {
+            onPress={async () => {
+              const isPremium = await userCtx.checkPremium();
+              if (!isPremium) {
+                navigation.navigate("Paywall");
+                return;
+              }
               setSplits(simplifySplits(splits));
               setShowSimplify(false);
               setTitleText("Simplified Open Splits!");
@@ -142,6 +151,11 @@ const SplitSummaryScreen = ({ route, navigation }) => {
 };
 
 export default SplitSummaryScreen;
+
+SplitSummaryScreen.propTypes = {
+  route: PropTypes.object.isRequired,
+  navigation: PropTypes.object.isRequired,
+};
 
 const styles = StyleSheet.create({
   container: {

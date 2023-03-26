@@ -1,25 +1,14 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  ScrollView,
-  Dimensions,
-  Pressable,
-} from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React, { memo, useContext, useCallback } from "react";
+import React, { useContext } from "react";
 import { ExpensesContext } from "../../../store/expenses-context";
 import {
-  daysBetween,
   getDateMinusDays,
   getPreviousMondayDate,
-  toDayMonth,
   toDayMonthString,
   toDayMonthString2,
   toMonthString,
-  toShortFormat,
 } from "../../../util/date";
 import { UserContext } from "../../../store/user-context";
 import { TripContext } from "../../../store/trip-context";
@@ -31,23 +20,22 @@ import ExpenseChart from "../../ExpensesOverview/ExpenseChart";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../../../i18n/supportedLanguages";
-import Animated, {
-  FadeInRight,
-  FadeOutLeft,
-  SlideInRight,
-  SlideOutLeft,
-} from "react-native-reanimated";
+import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
+import { Expense } from "../../../util/expense";
+import PropTypes from "prop-types";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
 const ExpenseGraph = ({ expenses, periodName, navigation }) => {
-  const ExpenseCtx = useContext(ExpensesContext);
-  const UserCtx = useContext(UserContext);
-  const TripCtx = useContext(TripContext);
+  const expenseCtx = useContext(ExpensesContext);
+  const tripCtx = useContext(TripContext);
   const today = new Date();
-  function renderItemRef() {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  function renderItemRef() {
+    return <> </>;
+  }
 
   // list the last ?? and compare their respective expenseSum to their budget
   // day
@@ -73,15 +61,15 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
       budgetAxis = "dailyBudget";
       for (let i = 0; i < lastDays; i++) {
         const day = getDateMinusDays(today, i);
-        const dayExpenses = ExpenseCtx.getDailyExpenses(i);
-        let expensesSum = dayExpenses.reduce((sum, expense) => {
+        const dayExpenses = expenseCtx.getDailyExpenses(i);
+        const expensesSum = dayExpenses.reduce((sum, expense) => {
           return sum + expense.calcAmount;
         }, 0);
-        const dailyBudget = TripCtx.dailyBudget;
+        const dailyBudget = tripCtx.dailyBudget;
         const formattedDay = toDayMonthString(day);
         const formattedSum = formatExpenseString(expensesSum);
-        const label = `${formattedDay} - ${formattedSum}${TripCtx.tripCurrency}`;
-        budget = dailyBudget;
+        const label = `${formattedDay} - ${formattedSum}${tripCtx.tripCurrency}`;
+        budget = Number(dailyBudget);
         daysRange = lastDays;
         const obj = { day, expensesSum, dailyBudget, label };
         listExpenseSumBudgets.push(obj);
@@ -112,7 +100,7 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
             ]}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              const filteredExpenses = ExpenseCtx.getSpecificDayExpenses(
+              const filteredExpenses = expenseCtx.getSpecificDayExpenses(
                 new Date(item.day)
               );
               navigation.navigate("FilteredExpenses", {
@@ -129,7 +117,7 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
               <Text style={styles.text1}>{dayString}</Text>
               <Text style={[styles.text1, colorCoding]}>
                 {expenseString}
-                {emptyValue ? "-" : TripCtx.tripCurrency}
+                {emptyValue ? "-" : tripCtx.tripCurrency}
               </Text>
             </Animated.View>
           </Pressable>
@@ -143,14 +131,14 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
 
       for (let i = 0; i < lastWeeks; i++) {
         const { firstDay, lastDay, weeklyExpenses } =
-          ExpenseCtx.getWeeklyExpenses(i);
+          expenseCtx.getWeeklyExpenses(i);
         const expensesSum = weeklyExpenses.reduce((sum, expense) => {
           return sum + expense.calcAmount;
         }, 0);
-        const weeklyBudget = TripCtx.dailyBudget * 7;
+        const weeklyBudget = Number(tripCtx.dailyBudget) * 7;
         const formattedDay = toDayMonthString(firstDay);
         const formattedSum = formatExpenseString(expensesSum);
-        const label = `${formattedDay} - ${formattedSum}${TripCtx.tripCurrency}`;
+        const label = `${formattedDay} - ${formattedSum}${tripCtx.tripCurrency}`;
         budget = weeklyBudget;
         daysRange = lastWeeks * 7;
         const obj = { firstDay, lastDay, expensesSum, weeklyBudget, label };
@@ -185,7 +173,7 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
             ]}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              const filteredExpenses = ExpenseCtx.getSpecificWeekExpenses(
+              const filteredExpenses = expenseCtx.getSpecificWeekExpenses(
                 new Date(item.firstDay)
               );
               navigation.navigate("FilteredExpenses", {
@@ -202,7 +190,7 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
               <Text style={styles.text1}>{weekString}</Text>
               <Text style={[styles.text1, colorCoding]}>
                 {expenseString}
-                {emptyValue ? "-" : TripCtx.tripCurrency}
+                {emptyValue ? "-" : tripCtx.tripCurrency}
               </Text>
             </Animated.View>
           </Pressable>
@@ -216,14 +204,14 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
 
       for (let i = 0; i < lastMonths; i++) {
         const { firstDay, lastDay, monthlyExpenses } =
-          ExpenseCtx.getMonthlyExpenses(i);
+          expenseCtx.getMonthlyExpenses(i);
         const expensesSum = monthlyExpenses.reduce((sum, expense) => {
           return sum + expense.calcAmount;
         }, 0);
-        const monthlyBudget = TripCtx.dailyBudget * 30;
+        const monthlyBudget = Number(tripCtx.dailyBudget) * 30;
         const formattedDay = toDayMonthString(firstDay);
         const formattedSum = formatExpenseString(expensesSum);
-        const label = `${formattedDay} - ${formattedSum}${TripCtx.tripCurrency}`;
+        const label = `${formattedDay} - ${formattedSum}${tripCtx.tripCurrency}`;
         budget = monthlyBudget;
         daysRange = lastMonths * 30;
         const obj = { firstDay, lastDay, expensesSum, monthlyBudget, label };
@@ -248,7 +236,7 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
             ]}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              const filteredExpenses = ExpenseCtx.getSpecificMonthExpenses(
+              const filteredExpenses = expenseCtx.getSpecificMonthExpenses(
                 new Date(item.firstDay)
               );
               navigation.navigate("FilteredExpenses", {
@@ -267,7 +255,7 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
               </Text>
               <Text style={[styles.text1, colorCoding]}>
                 {expenseString}
-                {emptyValue ? "-" : TripCtx.tripCurrency}
+                {emptyValue ? "-" : tripCtx.tripCurrency}
               </Text>
             </Animated.View>
           </Pressable>
@@ -282,14 +270,14 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
 
       for (let i = 0; i < lastYears; i++) {
         const { firstDay, lastDay, yearlyExpenses } =
-          ExpenseCtx.getYearlyExpenses(i);
+          expenseCtx.getYearlyExpenses(i);
         const expensesSum = yearlyExpenses.reduce((sum, expense) => {
           return sum + expense.calcAmount;
         }, 0);
-        const yearlyBudget = TripCtx.dailyBudget * 365;
+        const yearlyBudget = Number(tripCtx.dailyBudget) * 365;
         const formattedDay = toDayMonthString(firstDay);
         const formattedSum = formatExpenseString(expensesSum);
-        const label = `${formattedDay} - ${formattedSum}${TripCtx.tripCurrency}`;
+        const label = `${formattedDay} - ${formattedSum}${tripCtx.tripCurrency}`;
         budget = yearlyBudget;
         daysRange = lastYears * 365;
         const obj = { firstDay, lastDay, expensesSum, yearlyBudget, label };
@@ -313,7 +301,7 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
             ]}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              const filteredExpenses = ExpenseCtx.getSpecificYearExpenses(
+              const filteredExpenses = expenseCtx.getSpecificYearExpenses(
                 new Date(item.firstDay)
               );
               navigation.navigate("FilteredExpenses", {
@@ -330,7 +318,7 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
               <Text style={styles.text1}>{yearString}</Text>
               <Text style={[styles.text1, colorCoding]}>
                 {expenseString}
-                {emptyValue ? "-" : TripCtx.tripCurrency}
+                {emptyValue ? "-" : tripCtx.tripCurrency}
               </Text>
             </Animated.View>
           </Pressable>
@@ -355,7 +343,7 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
           budgetAxis={budgetAxis}
           budget={budget}
           daysRange={daysRange}
-          currency={TripCtx.tripCurrency}
+          currency={tripCtx.tripCurrency}
           navigation={navigation}
         ></ExpenseChart>
       </View>
@@ -388,6 +376,10 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
 };
 
 export default ExpenseGraph;
+
+ExpenseGraph.propTypes = {
+  navigation: PropTypes.object,
+};
 
 const styles = StyleSheet.create({
   container: {

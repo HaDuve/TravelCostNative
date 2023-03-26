@@ -1,18 +1,13 @@
-import { Alert, StyleSheet, Text, View } from "react-native";
-import React, { useContext, useEffect } from "react";
-import { GlobalStyles } from "./../../constants/styles";
+import { StyleSheet, Text, View } from "react-native";
+import React, { useContext } from "react";
+import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
-import { UserContext } from "../../store/user-context";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseString } from "../../util/string";
-import { AuthContext } from "../../store/auth-context";
-import { alertNoYes, alertYesNo } from "../Errors/Alert";
+import PropTypes from "prop-types";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
-  // console.log("ExpensesSummary ~ expenses", expenses);
-  const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
-  const authCtx = useContext(AuthContext);
   if (!expenses || !periodName) return <></>;
 
   const expensesSum = expenses.reduce((sum, expense) => {
@@ -97,6 +92,11 @@ const ExpensesSummary = ({ expenses, periodName }) => {
 };
 
 export default ExpensesSummary;
+
+ExpensesSummary.propTypes = {
+  expenses: PropTypes.array.isRequired,
+  periodName: PropTypes.string.isRequired,
+};
 
 const styles = StyleSheet.create({
   container: {

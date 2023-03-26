@@ -75,6 +75,10 @@ function UserContextProvider({ children }) {
   const [isPremium, setIsPremium] = useState(false);
 
   async function checkPremium() {
+    if (!isOnline) {
+      setIsPremium(true);
+      return true;
+    }
     const isPremiumNow = await isPremiumMember();
     setIsPremium(isPremiumNow);
     return isPremiumNow;

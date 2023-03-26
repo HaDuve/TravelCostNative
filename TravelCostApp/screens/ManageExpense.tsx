@@ -1,35 +1,22 @@
 import { useContext, useEffect, useLayoutEffect, useState } from "react";
-import {
-  Alert,
-  KeyboardAvoidingView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Alert, KeyboardAvoidingView, StyleSheet, View } from "react-native";
 import React from "react";
 import { ScrollView } from "react-native";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 
-import Button from "../components/UI/Button";
-import ErrorOverlay from "../components/UI/ErrorOverlay";
 import IconButton from "../components/UI/IconButton";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
-import {
-  deleteExpense,
-  storeExpense,
-  touchAllTravelers,
-  updateExpense,
-} from "../util/http";
-import { GlobalStyles } from "./../constants/styles";
-import { getRate } from "./../util/currencyExchange";
+import { touchAllTravelers } from "../util/http";
+import { GlobalStyles } from "../constants/styles";
+import { getRate } from "../util/currencyExchange";
 import { daysBetween, getDatePlusDays } from "../util/date";
 import {
   deleteExpenseOnlineOffline,
+  OfflineQueueManageExpenseItem,
   storeExpenseOnlineOffline,
   updateExpenseOnlineOffline,
 } from "../util/offline-queue";
@@ -39,7 +26,7 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../i18n/supportedLanguages";
 import { getCatString } from "../util/category";
-import { alertYesNo } from "../components/Errors/Alert";
+import PropTypes from "prop-types";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -49,7 +36,6 @@ const ManageExpense = ({ route, navigation }) => {
   const { pickedCat, tempValues, newCat } = route.params;
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState();
   const expenseCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const tripCtx = useContext(TripContext);
@@ -81,7 +67,7 @@ const ManageExpense = ({ route, navigation }) => {
     async function deleteExp() {
       setIsSubmitting(true);
       try {
-        const item = {
+        const item: OfflineQueueManageExpenseItem = {
           type: "delete",
           expense: {
             tripid: tripid,
@@ -133,6 +119,13 @@ const ManageExpense = ({ route, navigation }) => {
       const calcAmount = expenseData.amount * rate;
       expenseData.calcAmount = calcAmount;
 
+      // if expenseData has a splitlist, add the rate to each split
+      if (expenseData.splitList && expenseData.splitList.length > 0) {
+        expenseData.splitList.forEach((split) => {
+          split.rate = rate;
+        });
+      }
+
       // if splitType is SELF, set splitList to empty array []
       if (expenseData.splitType === "SELF") {
         expenseData.splitList = [];
@@ -158,7 +151,7 @@ const ManageExpense = ({ route, navigation }) => {
           setIsSubmitting(false);
           return;
         }
-        const item = {
+        const item: OfflineQueueManageExpenseItem = {
           type: "update",
           expense: {
             tripid: tripid,
@@ -219,7 +212,7 @@ const ManageExpense = ({ route, navigation }) => {
           // hotfix the date clock bug
           expenseData.date = expenseData.startDate;
 
-          const item = {
+          const item: OfflineQueueManageExpenseItem = {
             type: "add",
             expense: {
               tripid: tripid,
@@ -285,6 +278,11 @@ const ManageExpense = ({ route, navigation }) => {
 };
 
 export default ManageExpense;
+
+ManageExpense.propTypes = {
+  navigation: PropTypes.object,
+  route: PropTypes.object,
+};
 
 const styles = StyleSheet.create({
   container: {

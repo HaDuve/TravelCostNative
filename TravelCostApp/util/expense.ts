@@ -17,4 +17,11 @@ export interface ExpenseData {
   owePerc: number;
   calcAmount: number;
   duplOrSplit: number;
+  splitList?: Split[];
+}
+
+export interface Split {
+  userName: string;
+  amount: number;
+  rate?: number;
 }

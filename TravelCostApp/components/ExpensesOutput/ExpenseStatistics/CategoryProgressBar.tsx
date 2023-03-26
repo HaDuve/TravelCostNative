@@ -9,7 +9,13 @@ import { formatExpenseString } from "../../../util/string";
 import Animated, { FadeInRight } from "react-native-reanimated";
 import PropTypes from "prop-types";
 
-const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
+const CategoryProgressBar = ({
+  cat,
+  color,
+  totalCost,
+  catCost,
+  iconOverride,
+}) => {
   const tripCtx = useContext(TripContext);
   const budgetProgress = (catCost / totalCost) * 1;
   if (Number.isNaN(budgetProgress)) {
@@ -18,7 +24,7 @@ const CategoryProgressBar = ({ cat, color, totalCost, catCost }) => {
   }
   const budgetColor = color;
   const unfilledColor = GlobalStyles.colors.gray500Accent;
-  const icon = getCatSymbol(cat);
+  const icon = iconOverride ?? getCatSymbol(cat);
   const userCurrency = tripCtx.tripCurrency;
   const catCostString = formatExpenseString(catCost);
   const windowWidth = Dimensions.get("window").width;
@@ -56,6 +62,7 @@ CategoryProgressBar.propTypes = {
   color: PropTypes.string.isRequired,
   totalCost: PropTypes.number.isRequired,
   catCost: PropTypes.number.isRequired,
+  iconOverride: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

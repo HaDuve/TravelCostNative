@@ -9,17 +9,11 @@ import {
   FlatList,
   Dimensions,
   Keyboard,
-  Platform,
   KeyboardAvoidingView,
-  LayoutAnimation,
 } from "react-native";
 import Input from "./Input";
 import Button from "../UI/Button";
-import {
-  getDatePlusDays,
-  getFormattedDate,
-  toShortFormat,
-} from "../../util/date";
+import { getFormattedDate } from "../../util/date";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
 import IconButton from "../UI/IconButton";
@@ -28,11 +22,9 @@ import FlatButton from "../UI/FlatButton";
 import { getCatString, getCatSymbol } from "../../util/category";
 import DropDownPicker from "react-native-dropdown-picker";
 // import CurrencyPicker from "react-native-currency-picker";
-import DatePicker from "react-native-neat-date-picker";
 import { TripContext } from "../../store/trip-context";
 import {
   calcSplitList,
-  splitExpense,
   splitTypesDropdown,
   travellerToDropdown,
   validateSplitList,
@@ -49,18 +41,13 @@ i18n.enableFallback = true;
 
 import CurrencyPicker from "../Currency/CurrencyPicker";
 import { truncateString } from "../../util/string";
-import Toast from "react-native-toast-message";
 import { Ionicons } from "@expo/vector-icons";
-import Animated, {
-  FadeInRight,
-  FadeOutLeft,
-  SlideInRight,
-  SlideOutLeft,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { asyncStoreSetItem } from "../../store/async-storage";
 import { DateTime } from "luxon";
 import DatePickerModal from "../UI/DatePickerModal";
 import DatePickerContainer from "../UI/DatePickerContainer";
+import PropTypes from "prop-types";
 
 const ExpenseForm = ({
   onCancel,
@@ -867,6 +854,18 @@ const ExpenseForm = ({
 };
 
 export default ExpenseForm;
+
+ExpenseForm.propTypes = {
+  onCancel: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  isEditing: PropTypes.bool,
+  defaultValues: PropTypes.object,
+  pickedCat: PropTypes.string,
+  submitButtonLabel: PropTypes.string,
+  navigation: PropTypes.object,
+  editedExpenseId: PropTypes.string,
+  newCat: PropTypes.bool,
+};
 
 const styles = StyleSheet.create({
   container: {

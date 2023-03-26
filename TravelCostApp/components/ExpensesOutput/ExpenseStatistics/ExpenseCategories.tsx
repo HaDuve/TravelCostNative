@@ -149,7 +149,7 @@ ExpenseCategories.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginHorizontal: 6,
+    marginHorizontal: 4,
   },
   fallbackTextContainer: {
     flex: 1,

@@ -19,10 +19,23 @@ import { UserContext } from "../../store/user-context";
 import PropTypes from "prop-types";
 import ExpenseCountries from "./ExpenseStatistics/ExpenseCountries";
 import ExpenseTravellers from "./ExpenseStatistics/ExpenseTravellers";
+import IconButton from "../UI/IconButton";
+import { FadeInRight, FadeOutLeft } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  FadeInLeft,
+  FadeInUp,
+  FadeOut,
+  FadeOutDown,
+  FadeOutRight,
+  FadeOutUp,
+} from "react-native-reanimated";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
-  // enum => 1 = graph, 2 = categories, 3 = traveller, 4 = country
-  const [toggleGraph, setToggleGraph] = useState(1);
+  const [toggleGraph, setToggleGraph] = useState(true);
+  // enum =>  0 = categories, 1 = traveller, 2= country
+  const [toggleGraphEnum, setToggleGraphEnum] = useState(1);
   const userCtx = useContext(UserContext);
 
   async function toggleContent() {
@@ -33,7 +46,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
     }
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setToggleGraph(toggleGraph == 4 ? 1 : toggleGraph + 1);
+    setToggleGraph(!toggleGraph);
   }
 
   let titleString = "";
@@ -50,28 +63,99 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
-        {!toggleGraph && <Text style={styles.titleText}> {titleString}</Text>}
         {toggleGraph && (
-          <Text style={styles.titleText}> {i18n.t("categories")} </Text>
+          <Animated.View
+            style={styles.chevronContainer}
+            entering={FadeInUp}
+            exiting={FadeOutDown}
+          >
+            <Text style={styles.titleText}> {titleString} </Text>
+          </Animated.View>
+        )}
+        {!toggleGraph && (
+          <Animated.View
+            entering={FadeInLeft}
+            exiting={FadeOutLeft}
+            style={styles.chevronContainer}
+          >
+            <IconButton
+              icon={"chevron-back-outline"}
+              size={24}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setToggleGraphEnum(
+                  toggleGraphEnum == 0 ? 2 : toggleGraphEnum - 1
+                );
+              }}
+              color={GlobalStyles.colors.primaryGrayed}
+            ></IconButton>
+          </Animated.View>
+        )}
+        {!toggleGraph && toggleGraphEnum == 0 && (
+          <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
+            <Text style={styles.titleText}> {i18n.t("categories")} </Text>
+          </Animated.View>
+        )}
+        {!toggleGraph && toggleGraphEnum == 1 && (
+          <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
+            <Text style={styles.titleText}> Travellers </Text>
+          </Animated.View>
+        )}
+        {!toggleGraph && toggleGraphEnum == 2 && (
+          <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
+            <Text style={styles.titleText}> Countries </Text>
+          </Animated.View>
+        )}
+        {!toggleGraph && (
+          <Animated.View
+            entering={FadeInRight}
+            exiting={FadeOutRight}
+            style={styles.chevronContainer}
+          >
+            <IconButton
+              icon={"chevron-forward-outline"}
+              size={24}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+                setToggleGraphEnum(
+                  toggleGraphEnum == 2 ? 0 : toggleGraphEnum + 1
+                );
+              }}
+              color={GlobalStyles.colors.primaryGrayed}
+            ></IconButton>
+          </Animated.View>
         )}
       </View>
 
-      {toggleGraph == 1 && (
+      {toggleGraph && (
         <ExpenseGraph
           navigation={navigation}
           expenses={expenses}
           periodName={periodName}
         />
       )}
-      {toggleGraph == 2 && (
+      {!toggleGraph && toggleGraphEnum == 0 && (
         <ExpenseCategories
           expenses={expenses}
           periodName={periodName}
           navigation={navigation}
         />
       )}
-      {toggleGraph == 3 && <ExpenseCountries></ExpenseCountries>}
-      {toggleGraph == 4 && <ExpenseTravellers></ExpenseTravellers>}
+      {!toggleGraph && toggleGraphEnum == 1 && (
+        <ExpenseTravellers
+          expenses={expenses}
+          periodName={periodName}
+          navigation={navigation}
+        ></ExpenseTravellers>
+      )}
+      {!toggleGraph && toggleGraphEnum == 2 && (
+        <ExpenseCountries
+          expenses={expenses}
+          periodName={periodName}
+          navigation={navigation}
+        ></ExpenseCountries>
+      )}
 
       <View
         style={[
@@ -109,13 +193,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  titleContainer: {},
+  titleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  chevronContainer: {
+    marginTop: "4%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   pressed: {
     opacity: 0.65,
   },
   titleText: {
-    paddingTop: 12,
-    paddingRight: 20,
+    marginTop: "2%",
+    minWidth: 200,
+    maxWidth: 200,
     textAlign: "center",
     fontSize: 22,
     fontWeight: "bold",

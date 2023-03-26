@@ -389,7 +389,9 @@ const styles = StyleSheet.create({
   graphContainer: {
     minHeight: 158,
     paddingTop: "5%",
+    marginTop: "2.5%",
     paddingBottom: "5%",
+    marginBottom: "5%",
   },
   listContainer: {
     flex: 1,

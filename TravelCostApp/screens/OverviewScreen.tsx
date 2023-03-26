@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
-
 import { ExpensesContext } from "../store/expenses-context";
 import { UserContext } from "../store/user-context";
 import { StyleSheet, Text, View } from "react-native";

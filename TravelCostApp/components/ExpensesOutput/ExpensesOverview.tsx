@@ -1,7 +1,6 @@
-import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useContext, useState } from "react";
 import ExpenseCategories from "./ExpenseStatistics/ExpenseCategories";
-import IconButton from "../UI/IconButton";
 import ExpenseGraph from "./ExpenseStatistics/ExpenseGraph";
 import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";

@@ -1,6 +1,8 @@
 Change log Travel Expense App
 
-1.0.80
+1.0.81
+- replaced currency text (EUR) with symbols (€)
+- added country flags (will be optional soon)
 - fixed a premium subscription bug
 - re-add apple login button
 - improved button style

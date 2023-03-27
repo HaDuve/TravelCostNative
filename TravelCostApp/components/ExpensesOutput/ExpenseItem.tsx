@@ -28,6 +28,7 @@ import { en, de, fr } from "../../i18n/supportedLanguages";
 import { DateTime } from "luxon";
 import { UserContext } from "../../store/user-context";
 import getSymbolFromCurrency from "currency-symbol-map";
+import ExpenseCountryFlag from "./ExpenseCountryFlag";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -40,6 +41,7 @@ function ExpenseItem(props): JSX.Element {
     date,
     startDate,
     category,
+    country,
     whoPaid,
     currency,
     calcAmount,
@@ -145,6 +147,12 @@ function ExpenseItem(props): JSX.Element {
               {dateString}
             </Text>
           </View>
+          <View>
+            <ExpenseCountryFlag
+              countryName={country}
+              style={styles.countryFlag}
+            />
+          </View>
           <View>{sharedList}</View>
           <View style={styles.amountContainer}>
             <Text style={styles.amount}>
@@ -166,6 +174,7 @@ ExpenseItem.propTypes = {
   amount: PropTypes.number.isRequired,
   date: PropTypes.object.isRequired,
   category: PropTypes.string.isRequired,
+  country: PropTypes.string.isRequired,
   whoPaid: PropTypes.string.isRequired,
   currency: PropTypes.string.isRequired,
   calcAmount: PropTypes.number.isRequired,
@@ -233,6 +242,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: "center",
     fontWeight: "300",
+  },
+  countryFlag: {
+    width: 45,
+    height: 30,
+    marginTop: 2,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: GlobalStyles.colors.textColor,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
   },
   avatarContainer: {
     maxHeight: 50,

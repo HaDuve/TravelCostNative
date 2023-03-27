@@ -475,9 +475,8 @@ const ExpenseForm = ({
   function updateCurrency() {
     // split the countryValue into country and currency
     const currency = countryValue.split("- ")[1].split(" ")[0];
-    const country = countryValue.split(" ")[0];
+    const country = countryValue.split("- ")[0];
     inputChangedHandler("currency", currency);
-
     inputChangedHandler("country", country);
   }
   const formIsInvalid =

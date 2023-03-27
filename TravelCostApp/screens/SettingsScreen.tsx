@@ -156,24 +156,24 @@ const SettingsScreen = ({ navigation }) => {
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>Settings</Text>
       </View>
-      <Button style={styles.settingsButton} onPress={logoutHandler}>
+      <GradientButton style={styles.settingsButton} onPress={logoutHandler}>
         {i18n.t("logoutLabel")}
-      </Button>
-      <Button style={styles.settingsButton} onPress={joinInviteHandler}>
+      </GradientButton>
+      <GradientButton style={styles.settingsButton} onPress={joinInviteHandler}>
         {i18n.t("joinTripLabel")}
-      </Button>
+      </GradientButton>
 
       {multiTraveller && (
-        <Button
+        <GradientButton
           onPress={() => {
             navigation.navigate("SplitSummary", { tripid: tripCtx.tripid });
           }}
           style={styles.settingsButton}
         >
           {i18n.t("simplifySplitsLabel")}
-        </Button>
+        </GradientButton>
       )}
-      <Button
+      <GradientButton
         style={styles.settingsButton}
         onPress={() => {
           resetTour();
@@ -181,7 +181,7 @@ const SettingsScreen = ({ navigation }) => {
         }}
       >
         {i18n.t("resetAppIntroductionLabel")}
-      </Button>
+      </GradientButton>
       <LinkingButton
         style={styles.settingsButton}
         URL="https://foodfornomads.com/"
@@ -190,6 +190,8 @@ const SettingsScreen = ({ navigation }) => {
       </LinkingButton>
       <GradientButton
         style={[styles.settingsButton]}
+        darkText
+        colors={GlobalStyles.gradientColorsButton}
         onPress={() => navigation.navigate("Paywall")}
       >
         {premiumButtonString}

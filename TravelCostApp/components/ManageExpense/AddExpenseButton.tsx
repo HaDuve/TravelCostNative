@@ -20,6 +20,7 @@ import { I18n } from "i18n-js";
 import { en, de, fr } from "../../i18n/supportedLanguages";
 import ToggleButton from "../../assets/SVG/toggleButton";
 import PropTypes from "prop-types";
+import { LinearGradient } from "expo-linear-gradient";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -41,6 +42,7 @@ const AddExpenseButton = ({ navigation }) => {
         tooltipBottomOffset={80}
         zone={2}
       ></TourGuideZone>
+
       <Pressable
         style={({ pressed }) => [
           styles.addButton,

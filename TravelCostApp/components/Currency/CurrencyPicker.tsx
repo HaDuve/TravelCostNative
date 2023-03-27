@@ -57,6 +57,12 @@ const CurrencyPicker = ({
           Haptics.ImpactFeedbackStyle.Light;
         }}
         onChangeValue={onChangeValue}
+        modalContentContainerStyle={{
+          backgroundColor: GlobalStyles.colors.backgroundColor,
+        }}
+        modalProps={{
+          animationType: "slide",
+        }}
         setValue={setCountryValue}
         setItems={setItems}
         placeholder={placeholder ? placeholder : i18n.t("currencyLabel")}

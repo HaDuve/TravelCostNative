@@ -26,6 +26,7 @@ import { useContext } from "react";
 import { TripContext } from "../store/trip-context";
 import Toast from "react-native-toast-message";
 import { Ionicons } from "@expo/vector-icons";
+import GradientButton from "../components/UI/GradientButton";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -207,7 +208,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
         >
           {i18n.t("cancel")}
         </FlatButton>
-        <Button
+        <GradientButton
           buttonStyle={styles.continueButtonStyle}
           onPress={() => {
             navigation.navigate("ManageExpense", {
@@ -216,7 +217,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
           }}
         >
           {i18n.t("continue")}
-        </Button>
+        </GradientButton>
       </View>
     </View>
   );

@@ -4,13 +4,15 @@ import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";
 import BackgroundGradient from "./BackgroundGradient";
 import { LinearGradient } from "expo-linear-gradient";
+import PropTypes from "prop-types";
 
 const GradientButton = ({
   children,
   onPress,
-  mode = "",
+  buttonStyle,
+  darkText = false,
   style = {},
-  colors = GlobalStyles.gradientColorsButton,
+  colors = GlobalStyles.gradientPrimaryButton,
 }) => {
   const onPressHandler = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -18,7 +20,7 @@ const GradientButton = ({
     return;
   };
   return (
-    <View style={[style]}>
+    <View style={[style, GlobalStyles.shadowPrimary]}>
       <Pressable
         onPress={onPressHandler}
         style={({ pressed }) => [pressed && GlobalStyles.pressedWithShadow]}
@@ -26,12 +28,12 @@ const GradientButton = ({
         <LinearGradient
           start={{ x: 0.51, y: -1.3 }}
           colors={colors}
-          style={[styles.button]}
+          style={[styles.button, buttonStyle, { overflow: "hidden" }]}
         >
           <Text
             style={[
               GlobalStyles.buttonTextGradient,
-              mode === "flat" && styles.flatText,
+              darkText && { color: GlobalStyles.colors.textColor },
             ]}
           >
             {children}
@@ -43,6 +45,14 @@ const GradientButton = ({
 };
 
 export default GradientButton;
+GradientButton.propTypes = {
+  children: PropTypes.node.isRequired,
+  onPress: PropTypes.func.isRequired,
+  buttonStyle: PropTypes.object,
+  darkText: PropTypes.bool,
+  style: PropTypes.object,
+  colors: PropTypes.array,
+};
 
 const styles = StyleSheet.create({
   button: {

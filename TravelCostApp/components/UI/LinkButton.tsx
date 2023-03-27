@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Pressable, Linking } from "react-native";
 import React from "react";
 import { GlobalStyles } from "../../constants/styles";
+import GradientButton from "./GradientButton";
 
 const LinkingButton = ({
   children,
@@ -19,27 +20,9 @@ const LinkingButton = ({
     });
   };
   return (
-    <View style={style}>
-      <Pressable
-        onPress={handleClick}
-        style={({ pressed }) => [
-          styles.button,
-          buttonStyle,
-          pressed && GlobalStyles.pressedWithShadow,
-        ]}
-      >
-        <View style={[mode === "flat" && styles.flat]}>
-          <Text
-            style={[
-              GlobalStyles.buttonTextPrimary,
-              mode === "flat" && styles.flatText,
-            ]}
-          >
-            {children}
-          </Text>
-        </View>
-      </Pressable>
-    </View>
+    <GradientButton onPress={handleClick} style={style}>
+      {children}
+    </GradientButton>
   );
 };
 

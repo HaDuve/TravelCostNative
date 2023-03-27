@@ -48,6 +48,7 @@ import { DateTime } from "luxon";
 import DatePickerModal from "../UI/DatePickerModal";
 import DatePickerContainer from "../UI/DatePickerContainer";
 import PropTypes from "prop-types";
+import GradientButton from "../UI/GradientButton";
 
 const ExpenseForm = ({
   onCancel,
@@ -841,12 +842,10 @@ const ExpenseForm = ({
           style={[styles.spacerViewAdvanced, hideAdvanced && styles.spacerView]}
         ></View>
         <View style={styles.buttonContainer}>
-          <FlatButton style={styles.button} onPress={onCancel}>
-            {i18n.t("cancel")}
-          </FlatButton>
-          <Button style={styles.button} onPress={advancedSubmitHandler}>
+          <FlatButton onPress={onCancel}>{i18n.t("cancel")}</FlatButton>
+          <GradientButton style={styles.button} onPress={advancedSubmitHandler}>
             {submitButtonLabel}
-          </Button>
+          </GradientButton>
         </View>
       </View>
     </>

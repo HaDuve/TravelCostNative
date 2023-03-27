@@ -55,10 +55,14 @@ const OverviewScreen = ({ navigation }) => {
           open={open}
           value={PeriodValue}
           items={items}
+          modalProps={{
+            animationType: "slide",
+          }}
           setOpen={setOpen}
           setValue={setPeriodValue}
           setItems={setItems}
           containerStyle={styles.dropdownContainer}
+          customItemLabelStyle={styles.dropdownItemLabel}
           style={styles.dropdown}
           textStyle={styles.dropdownTextStyle}
         />

@@ -17,6 +17,11 @@ function FlatButton({ children, onPress, textStyle }) {
 }
 
 export default FlatButton;
+FlatButton.propTypes = {
+  children: PropTypes.string.isRequired,
+  onPress: PropTypes.func.isRequired,
+  textStyle: PropTypes.object,
+};
 
 FlatButton.propTypes = {
   children: PropTypes.string.isRequired,

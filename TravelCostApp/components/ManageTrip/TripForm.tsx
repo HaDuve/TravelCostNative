@@ -37,6 +37,7 @@ import * as Haptics from "expo-haptics";
 import DatePickerModal from "../UI/DatePickerModal";
 import IconButton from "../UI/IconButton";
 import DatePickerContainer from "../UI/DatePickerContainer";
+import GradientButton from "../UI/GradientButton";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
@@ -401,14 +402,13 @@ const TripForm = ({ navigation, route }) => {
         <View style={styles.buttonContainer}>
           <FlatButton onPress={cancelHandler}>{i18n.t("cancel")}</FlatButton>
           {!isEditing ? (
-            <Button
+            <GradientButton
               buttonStyle={{}}
-              mode={""}
               style={styles.button}
               onPress={submitHandler.bind(this, true /* setActive */)}
             >
               {i18n.t("confirm2")}
-            </Button>
+            </GradientButton>
           ) : (
             <FlatButton
               onPress={submitHandler.bind(this, false /* setActive */)}
@@ -421,24 +421,23 @@ const TripForm = ({ navigation, route }) => {
 
         <View style={styles.buttonContainer}>
           {isEditing && (
-            <Button
+            <GradientButton
               buttonStyle={{ backgroundColor: GlobalStyles.colors.error300 }}
-              mode={""}
               style={[styles.button, { marginBottom: 8, marginHorizontal: 24 }]}
               onPress={deleteHandler}
+              colors={GlobalStyles.gradientErrorButton}
             >
               {i18n.t("deleteTrip")}
-            </Button>
+            </GradientButton>
           )}
           {isEditing && (
-            <Button
+            <GradientButton
               buttonStyle={{}}
-              mode={""}
               style={[styles.button, { marginBottom: 8, marginHorizontal: 24 }]}
               onPress={submitHandler.bind(this, true /* setActive */)}
             >
               {i18n.t("setActive")}
-            </Button>
+            </GradientButton>
           )}
         </View>
       </View>

@@ -18,6 +18,7 @@ import { TripContext } from "../store/trip-context";
 import { calcOpenSplitsTable, simplifySplits } from "../util/split";
 import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
+import GradientButton from "../components/UI/GradientButton";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
   const { tripid } = route.params;
@@ -120,7 +121,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
           Back
         </FlatButton>
         {showSimplify && (
-          <Button
+          <GradientButton
             style={styles.button}
             onPress={async () => {
               const isPremium = await userCtx.checkPremium();
@@ -134,17 +135,18 @@ const SplitSummaryScreen = ({ route, navigation }) => {
             }}
           >
             Simplify Splits
-          </Button>
+          </GradientButton>
         )}
-        <Button
+        <GradientButton
           style={styles.button}
+          colors={GlobalStyles.gradientErrorButton}
           buttonStyle={{ backgroundColor: GlobalStyles.colors.errorGrayed }}
           onPress={() => {
             Alert.alert("Settle Splits function coming soon...");
           }}
         >
           Settle Splits
-        </Button>
+        </GradientButton>
       </View>
     </View>
   );

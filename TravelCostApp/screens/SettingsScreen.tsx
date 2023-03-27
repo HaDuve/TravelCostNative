@@ -26,6 +26,7 @@ import { reloadApp } from "../util/appState";
 import { ENTITLEMENT_ID } from "../components/Premium/PremiumConstants";
 import PropTypes from "prop-types";
 import GradientButton from "../components/UI/GradientButton";
+import SettingsSection from "../components/UI/SettingsSection";
 
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
@@ -156,6 +157,7 @@ const SettingsScreen = ({ navigation }) => {
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>Settings</Text>
       </View>
+      <SettingsSection></SettingsSection>
       <GradientButton style={styles.settingsButton} onPress={logoutHandler}>
         {i18n.t("logoutLabel")}
       </GradientButton>

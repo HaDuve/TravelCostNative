@@ -29,6 +29,7 @@ import { DateTime } from "luxon";
 import { UserContext } from "../../store/user-context";
 import getSymbolFromCurrency from "currency-symbol-map";
 import ExpenseCountryFlag from "./ExpenseCountryFlag";
+import { SettingsContext } from "../../store/settings-context";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -57,6 +58,10 @@ function ExpenseItem(props): JSX.Element {
   const amountString = formatExpenseString(amount);
   const iconString = getCatSymbol(category);
   const sameCurrency = homeCurrency === currency;
+
+  const { settings, saveSettings } = useContext(SettingsContext);
+  const toggle1 = settings.showFlags;
+  const toggle2 = settings.showWhoPaid;
 
   const memoizedCallback = useCallback(
     () =>
@@ -147,13 +152,15 @@ function ExpenseItem(props): JSX.Element {
               {dateString}
             </Text>
           </View>
-          <View>
-            <ExpenseCountryFlag
-              countryName={country}
-              style={styles.countryFlag}
-            />
-          </View>
-          <View>{sharedList}</View>
+          {toggle1 && (
+            <View>
+              <ExpenseCountryFlag
+                countryName={country}
+                style={styles.countryFlag}
+              />
+            </View>
+          )}
+          {toggle2 && <View>{sharedList}</View>}
           <View style={styles.amountContainer}>
             <Text style={styles.amount}>
               {calcAmountString}

@@ -92,6 +92,7 @@ import { API_KEY } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
 import { BottomTabBar } from "@react-navigation/bottom-tabs";
 import BottomTabsBar from "./components/UI/BottomTabBar";
+import { SettingsProvider } from "./store/settings-context";
 // LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
 // LogBox.ignoreAllLogs(); //Ignore all log notifications
 
@@ -610,16 +611,18 @@ export default function App() {
           <AuthContextProvider>
             <TripContextProvider>
               <UserContextProvider>
-                <NetworkProvider>
-                  <ExpensesContextProvider>
-                    <TourGuideProvider
-                      {...{ borderRadius: 16, key: "settings" }}
-                    >
-                      <Root />
-                      <ToastComponent />
-                    </TourGuideProvider>
-                  </ExpensesContextProvider>
-                </NetworkProvider>
+                <SettingsProvider>
+                  <NetworkProvider>
+                    <ExpensesContextProvider>
+                      <TourGuideProvider
+                        {...{ borderRadius: 16, key: "settings" }}
+                      >
+                        <Root />
+                        <ToastComponent />
+                      </TourGuideProvider>
+                    </ExpensesContextProvider>
+                  </NetworkProvider>
+                </SettingsProvider>
               </UserContextProvider>
             </TripContextProvider>
           </AuthContextProvider>

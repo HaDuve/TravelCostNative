@@ -1,12 +1,5 @@
 import { useState } from "react";
-import React, {
-  Alert,
-  StyleSheet,
-  View,
-  Text,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
+import React, { Alert, StyleSheet, View, Text } from "react-native";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -22,7 +15,6 @@ import { useNavigation } from "@react-navigation/native";
 import FlatButton from "../UI/FlatButton";
 import AuthForm from "./AuthForm";
 import { GlobalStyles } from "../../constants/styles";
-import { AppleAuthenticationCredential } from "expo-apple-authentication";
 import PropTypes from "prop-types";
 
 function AuthContent({ isLogin, onAuthenticate }) {
@@ -42,7 +34,11 @@ function AuthContent({ isLogin, onAuthenticate }) {
     }
   }
 
-  function submitHandler(credentials) {
+  function submitHandler(credentials: {
+    name: string;
+    email: string;
+    password: string;
+  }) {
     let { name, email, password } = credentials;
 
     name = name.trim();
@@ -87,8 +83,8 @@ function AuthContent({ isLogin, onAuthenticate }) {
 export default AuthContent;
 
 AuthContent.propType = {
-  isLogin: PropTypes.bool.isRequired,
   onAuthenticate: PropTypes.func.isRequired,
+  isLogin: PropTypes.bool,
 };
 
 const styles = StyleSheet.create({

@@ -5,6 +5,7 @@ export const GlobalStyles = {
     primary200: "#00A181",
     primary400: "#008C70",
     // primary500: "#007A61",
+    // primary500: "#538076",
     primary500: "#538076",
     primary700: "#006A55",
     primary800: "#005645",
@@ -35,6 +36,7 @@ export const GlobalStyles = {
   },
   gradientColors: ["#FEEF60", "#FBF0A8", "#A1D8C1"],
   gradientColorsButton: ["#FEEF60", "#FBF0A8", "#A1D8C1"],
+  tabBarColors: ["#FFFFFF", "#FBF0A8", "#A1D8C1", "#538076", "#DCDCDC"],
   buttonTextPrimary: {
     color: "#FFFFFF",
     textAlign: "center",

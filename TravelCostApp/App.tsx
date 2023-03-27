@@ -90,6 +90,8 @@ import { loadTourConfig } from "./util/tourUtil";
 import PremiumScreen from "./screens/PremiumScreen";
 import { API_KEY } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
+import { BottomTabBar } from "@react-navigation/bottom-tabs";
+import BottomTabsBar from "./components/UI/BottomTabBar";
 // LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
 // LogBox.ignoreAllLogs(); //Ignore all log notifications
 
@@ -286,6 +288,7 @@ function Home() {
       initialRouteName={FirstScreen}
       backBehavior={"history"}
       tabBarPosition={"bottom"}
+      // tabBar={(props) => <BottomTabsBar {...props} />}
       screenOptions={({ navigation }) => ({
         headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
         headerTintColor: GlobalStyles.colors.backgroundColor,

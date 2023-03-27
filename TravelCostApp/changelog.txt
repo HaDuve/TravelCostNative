@@ -2,6 +2,7 @@ Change log Travel Expense App
 
 1.0.79
 - fixed a premium subscription bug
+- re-add apple login button
 
 1.0.78
 - added a chart carousel

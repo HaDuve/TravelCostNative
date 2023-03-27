@@ -1,8 +1,12 @@
 Change log Travel Expense App
 
-1.0.79
+1.0.80
 - fixed a premium subscription bug
 - re-add apple login button
+- improved button style
+- improved colorpalette (less strain on the eye)
+- improved overlays and background colors
+
 
 1.0.78
 - added a chart carousel

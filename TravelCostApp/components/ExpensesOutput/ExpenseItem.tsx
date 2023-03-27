@@ -27,6 +27,7 @@ import { I18n } from "i18n-js";
 import { en, de, fr } from "../../i18n/supportedLanguages";
 import { DateTime } from "luxon";
 import { UserContext } from "../../store/user-context";
+import getSymbolFromCurrency from "currency-symbol-map";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -48,6 +49,8 @@ function ExpenseItem(props): JSX.Element {
   const TripCtx = useContext(TripContext);
   const UserCtx = useContext(UserContext);
   const homeCurrency = TripCtx.tripCurrency;
+  const homeCurrencySymbol = getSymbolFromCurrency(homeCurrency);
+  const currencySymbol = getSymbolFromCurrency(currency);
   const calcAmountString = formatExpenseString(calcAmount);
   const amountString = formatExpenseString(amount);
   const iconString = getCatSymbol(category);
@@ -60,11 +63,11 @@ function ExpenseItem(props): JSX.Element {
       }),
     [id, navigation]
   );
-  const originalCurrency = !sameCurrency ? (
+  const originalCurrencyJSX = !sameCurrency ? (
     <>
       <Text style={styles.originalCurrencyText}>
         {amountString}
-        {currency}
+        {currencySymbol}
       </Text>
     </>
   ) : (
@@ -146,9 +149,9 @@ function ExpenseItem(props): JSX.Element {
           <View style={styles.amountContainer}>
             <Text style={styles.amount}>
               {calcAmountString}
-              {homeCurrency}
+              {homeCurrencySymbol}
             </Text>
-            {originalCurrency}
+            {originalCurrencyJSX}
           </View>
         </View>
       </Pressable>
@@ -179,7 +182,7 @@ const styles = StyleSheet.create({
     borderColor: "black",
     paddingVertical: 8,
     paddingLeft: 16,
-    paddingRight: 16,
+    paddingRight: 0,
     marginLeft: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     flexDirection: "row",
@@ -221,14 +224,14 @@ const styles = StyleSheet.create({
   amount: {
     minWidth: 100,
     maxWidth: 100,
-    textAlign: "right",
+    textAlign: "center",
     fontSize: 20,
     fontWeight: "300",
     color: GlobalStyles.colors.error300,
   },
   originalCurrencyText: {
     fontSize: 12,
-    marginLeft: 16,
+    textAlign: "center",
     fontWeight: "300",
   },
   avatarContainer: {

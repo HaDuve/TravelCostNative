@@ -8,6 +8,7 @@ import { TripContext } from "../../../store/trip-context";
 import { formatExpenseString } from "../../../util/string";
 import Animated, { FadeInRight } from "react-native-reanimated";
 import PropTypes from "prop-types";
+import getSymbolFromCurrency from "currency-symbol-map";
 
 const CategoryProgressBar = ({
   cat,
@@ -26,6 +27,7 @@ const CategoryProgressBar = ({
   const unfilledColor = GlobalStyles.colors.gray500Accent;
   const icon = iconOverride ?? getCatSymbol(cat);
   const userCurrency = tripCtx.tripCurrency;
+  const userCurrencySymbol = getSymbolFromCurrency(userCurrency);
   const catCostString = formatExpenseString(catCost);
   const windowWidth = Dimensions.get("window").width;
 
@@ -39,7 +41,7 @@ const CategoryProgressBar = ({
         <View style={{ flex: 1 }}></View>
         <Text style={[styles.sum, { color: GlobalStyles.colors.error300 }]}>
           {catCostString}
-          {userCurrency}
+          {userCurrencySymbol}
         </Text>
       </View>
       <Progress.Bar

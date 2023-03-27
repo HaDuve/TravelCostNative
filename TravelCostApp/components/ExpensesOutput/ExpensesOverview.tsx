@@ -35,7 +35,7 @@ import Animated, {
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const [toggleGraph, setToggleGraph] = useState(true);
   // enum =>  0 = categories, 1 = traveller, 2= country
-  const [toggleGraphEnum, setToggleGraphEnum] = useState(1);
+  const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
   const userCtx = useContext(UserContext);
 
   async function toggleContent() {

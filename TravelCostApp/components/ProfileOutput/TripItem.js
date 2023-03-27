@@ -22,6 +22,7 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../../i18n/supportedLanguages";
 import { UserContext } from "../../store/user-context";
+import getSymbolFromCurrency from "currency-symbol-map";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -42,11 +43,14 @@ function TripItem({
     dailyBudget,
     tripCurrency,
   };
+
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   const [travellers, setTravellers] = useState([]);
   const [isFetching, setIsFetching] = useState(true);
+
+  const tripCurrencySymbol = getSymbolFromCurrency(tripCurrency);
 
   useEffect(() => {
     async function getTripTravellers() {
@@ -125,13 +129,13 @@ function TripItem({
             <Text style={styles.textBase}>
               {i18n.t("daily")}
               {": " + dailyBudget}
-              {" " + tripCurrency}
+              {" " + tripCurrencySymbol}
             </Text>
           </View>
           <View style={styles.amountContainer}>
             <Text style={styles.amount}>
               {totalBudget}
-              {" " + tripCurrency}
+              {" " + tripCurrencySymbol}
             </Text>
             <Progress.Bar
               color={GlobalStyles.colors.primary500}

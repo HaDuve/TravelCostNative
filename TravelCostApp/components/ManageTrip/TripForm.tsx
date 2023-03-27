@@ -272,7 +272,7 @@ const TripForm = ({ navigation, route }) => {
   }
 
   function updateCurrency() {
-    inputChangedHandler("tripCurrency", countryValue.split(" ")[0]);
+    inputChangedHandler("tripCurrency", countryValue.split(" ")[2]);
   }
 
   const titleString = isEditing

@@ -36,6 +36,7 @@ import { en, de, fr } from "../../i18n/supportedLanguages";
 import { ExpensesContext } from "../../store/expenses-context";
 import { UserContext } from "../../store/user-context";
 import { AuthContext } from "../../store/auth-context";
+import getSymbolFromCurrency from "currency-symbol-map";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -54,6 +55,8 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const [totalBudget, setTotalBudget] = useState("100");
   const [dailyBudget, setDailyBudget] = useState("10");
   const [tripCurrency, setTripCurrency] = useState("EUR");
+
+  const tripCurrencySymbol = getSymbolFromCurrency(tripCurrency);
 
   useEffect(() => {
     if (!tripid) return;
@@ -172,13 +175,13 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
             <Text style={styles.textBase}>
               {i18n.t("daily")}
               {": " + dailyBudget}
-              {" " + tripCurrency}
+              {" " + tripCurrencySymbol}
             </Text>
           </View>
           <View style={styles.amountContainer}>
             <Text style={styles.amount}>
               {totalBudget}
-              {" " + tripCurrency}
+              {" " + tripCurrencySymbol}
             </Text>
             <Progress.Bar
               color={GlobalStyles.colors.primary500}

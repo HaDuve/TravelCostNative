@@ -12,6 +12,7 @@ import { I18n } from "i18n-js";
 import { en, de, fr } from "../../i18n/supportedLanguages";
 import LoadingOverlay from "../UI/LoadingOverlay";
 import * as Haptics from "expo-haptics";
+import getSymbolFromCurrency from "currency-symbol-map";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
@@ -34,8 +35,12 @@ const CurrencyPicker = ({
   i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/de.json"));
 
   const countryOptions = Object.keys(countries.getNames("en")).map((code) => ({
-    label: `${countryToCurrency[code]} - ${countries.getName(code, CC)}`,
-    value: `${countryToCurrency[code]} - ${countries.getName(code, CC)}`,
+    label: `${countries.getName(code, CC)} - ${
+      countryToCurrency[code]
+    } | ${getSymbolFromCurrency(countryToCurrency[code])}`,
+    value: `${countries.getName(code, CC)} - ${
+      countryToCurrency[code]
+    } | ${getSymbolFromCurrency(countryToCurrency[code])}`,
   }));
 
   const [open, setOpen] = useState(false);
@@ -50,6 +55,7 @@ const CurrencyPicker = ({
         searchable={true}
         listMode="MODAL"
         setOpen={setOpen}
+        autoScroll
         onOpen={() => {
           Haptics.ImpactFeedbackStyle.Light;
         }}

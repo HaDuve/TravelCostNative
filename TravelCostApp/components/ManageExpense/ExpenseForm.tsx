@@ -49,6 +49,7 @@ import DatePickerModal from "../UI/DatePickerModal";
 import DatePickerContainer from "../UI/DatePickerContainer";
 import PropTypes from "prop-types";
 import GradientButton from "../UI/GradientButton";
+import getSymbolFromCurrency from "currency-symbol-map";
 
 const ExpenseForm = ({
   onCancel,
@@ -472,8 +473,12 @@ const ExpenseForm = ({
   const advancedSubmitHandler = hideAdvanced ? fastSubmit : submitHandler;
 
   function updateCurrency() {
-    inputChangedHandler("currency", countryValue.split(" ")[0]);
-    inputChangedHandler("country", countryValue.split("- ")[1]);
+    // split the countryValue into country and currency
+    const currency = countryValue.split("- ")[1].split(" ")[0];
+    const country = countryValue.split(" ")[0];
+    inputChangedHandler("currency", currency);
+
+    inputChangedHandler("country", country);
   }
   const formIsInvalid =
     !inputs.amount.isValid ||
@@ -507,7 +512,9 @@ const ExpenseForm = ({
           <View style={styles.inputsRow}>
             <Input
               style={styles.rowInput}
-              label={i18n.t("priceIn") + inputs.currency.value}
+              label={
+                i18n.t("priceIn") + getSymbolFromCurrency(inputs.currency.value)
+              }
               textInputConfig={{
                 keyboardType: "decimal-pad",
                 onChangeText: inputChangedHandler.bind(this, "amount"),
@@ -536,6 +543,7 @@ const ExpenseForm = ({
             />
           </View>
           {/* always show more options when editing */}
+          {isEditing && <View style={{ marginTop: "6%" }}></View>}
           {!isEditing && (
             <Pressable onPress={toggleAdvancedHandler}>
               <Animated.View style={styles.advancedRow}>
@@ -572,7 +580,13 @@ const ExpenseForm = ({
                   countryValue={countryValue}
                   setCountryValue={setCountryValue}
                   onChangeValue={updateCurrency}
-                  placeholder={isEditing ? defaultValues.currency : null}
+                  placeholder={
+                    isEditing
+                      ? defaultValues.currency +
+                        " | " +
+                        getSymbolFromCurrency(defaultValues.currency)
+                      : null
+                  }
                 ></CurrencyPicker>
               </View>
               <Input

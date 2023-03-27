@@ -19,13 +19,16 @@
     "axios": "^0.27.2",
     "chart.js": "^3.9.1",
     "country-to-currency": "^1.0.6",
+    "currency-symbol-map": "^5.1.0",
     "expo": "~45.0.0",
     "expo-app-loading": "~2.0.0",
+    "expo-apple-authentication": "~4.2.1",
     "expo-dev-client": "~1.0.1",
     "expo-device": "~4.2.0",
     "expo-document-picker": "~10.2.1",
     "expo-file-system": "~14.0.0",
     "expo-haptics": "~11.2.0",
+    "expo-linear-gradient": "~11.3.0",
     "expo-linking": "~3.1.0",
     "expo-localization": "~13.0.0",
     "expo-splash-screen": "~0.15.1",
@@ -63,9 +66,7 @@
     "splitwise-js-map": "^1.0.3",
     "victory": "^36.6.5",
     "victory-native": "^36.6.8",
-    "xlsx": "^0.18.5",
-    "expo-linear-gradient": "~11.3.0",
-    "expo-apple-authentication": "~4.2.1"
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

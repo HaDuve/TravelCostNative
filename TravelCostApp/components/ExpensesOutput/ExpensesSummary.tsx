@@ -5,6 +5,7 @@ import * as Progress from "react-native-progress";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseString } from "../../util/string";
 import PropTypes from "prop-types";
+import getSymbolFromCurrency from "currency-symbol-map";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
   const tripCtx = useContext(TripContext);
@@ -17,6 +18,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
 
   const expensesSumString = formatExpenseString(expensesSum);
   const userCurrency = tripCtx.tripCurrency;
+  const currencySymbol = getSymbolFromCurrency(userCurrency);
   let dailyBudgetNum = Number(tripCtx.dailyBudget);
   const expenseSumNum = Number(expensesSum);
   const totalBudget = Number(tripCtx.totalBudget);
@@ -76,7 +78,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
     <View style={styles.container}>
       <Text style={[styles.sum, { color: budgetColor }]}>
         {expensesSumString}
-        {userCurrency}
+        {currencySymbol}
       </Text>
       <Progress.Bar
         color={budgetColor}
@@ -110,6 +112,8 @@ const styles = StyleSheet.create({
   sum: {
     fontSize: 30,
     fontWeight: "bold",
+    // move text to the right end of the bar
+
     color: GlobalStyles.colors.primary500,
   },
 });

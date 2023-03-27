@@ -186,7 +186,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
           </Button>
         </View>
         <View style={styles.orTextContainer}>
-          {/* {AppleAuthenticationJSX} */}
+          {AppleAuthenticationJSX}
           {/* <Pressable
             onPress={() => Alert.alert(i18n.t("signupComingSoonAlert"))}
           >

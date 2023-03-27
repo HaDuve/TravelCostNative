@@ -76,10 +76,12 @@ const ExpensesSummary = ({ expenses, periodName }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.sum, { color: budgetColor }]}>
-        {expensesSumString}
-        {currencySymbol}
-      </Text>
+      <View style={styles.sumTextContainer}>
+        <Text style={[styles.sum, { color: budgetColor }]}>
+          {expensesSumString}
+          {currencySymbol}
+        </Text>
+      </View>
       <Progress.Bar
         color={budgetColor}
         unfilledColor={unfilledColor}
@@ -105,15 +107,12 @@ const styles = StyleSheet.create({
     padding: "2%",
     marginRight: "-4%",
   },
-  period: {
-    fontSize: 12,
-    color: GlobalStyles.colors.primary500,
+  sumTextContainer: {
+    alignItems: "center",
   },
   sum: {
-    fontSize: 30,
+    fontSize: 32,
     fontWeight: "bold",
-    // move text to the right end of the bar
-
     color: GlobalStyles.colors.primary500,
   },
 });

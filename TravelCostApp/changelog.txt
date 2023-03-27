@@ -9,6 +9,8 @@ Change log Travel Expense App
 - improved colorpalette (less strain on the eye)
 - improved overlays and background colors
 
+1.0.82
+- added a settings SettingsSection
 
 1.0.78
 - added a chart carousel

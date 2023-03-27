@@ -4,6 +4,7 @@ import Purchases from "react-native-purchases";
 import { useNavigation } from "@react-navigation/native";
 import { ENTITLEMENT_ID } from "../Premium/PremiumConstants";
 import { GlobalStyles } from "../../constants/styles";
+import PropTypes from "prop-types";
 
 const PackageItem = ({ purchasePackage, setIsPurchasing }) => {
   const {
@@ -16,12 +17,11 @@ const PackageItem = ({ purchasePackage, setIsPurchasing }) => {
     setIsPurchasing(true);
 
     try {
-      const { purchaserInfo } = await Purchases.purchasePackage(
-        purchasePackage
-      );
+      const { customerInfo, productIdentifier } =
+        await Purchases.purchasePackage(purchasePackage);
 
       if (
-        typeof purchaserInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined"
+        typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined"
       ) {
         navigation.goBack();
       }
@@ -51,6 +51,11 @@ const PackageItem = ({ purchasePackage, setIsPurchasing }) => {
 };
 
 export default PackageItem;
+
+PackageItem.propTypes = {
+  purchasePackage: PropTypes.object.isRequired,
+  setIsPurchasing: PropTypes.func.isRequired,
+};
 
 const styles = StyleSheet.create({
   container: {

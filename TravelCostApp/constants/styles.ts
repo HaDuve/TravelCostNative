@@ -67,7 +67,7 @@ export const GlobalStyles = {
   },
   strongShadow: {
     elevation: 4,
-    shadowColor: "black",
+    shadowColor: "#002A22",
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 1.3,

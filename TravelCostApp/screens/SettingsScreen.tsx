@@ -150,6 +150,7 @@ const SettingsScreen = ({ navigation }) => {
       style={{
         flex: 1,
         padding: "4%",
+        backgroundColor: GlobalStyles.colors.backgroundColor,
       }}
     >
       <View style={styles.titleContainer}>

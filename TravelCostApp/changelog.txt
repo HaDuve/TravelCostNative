@@ -1,5 +1,10 @@
 Change log Travel Expense App
 
+1.0.84
+- categories can be customized now
+- removed paywall restrictions until all bugs are fixed
+- improved settingsswitch user experience
+
 1.0.83
 - fixed a bug where the app doesnt start
 - improved flags style

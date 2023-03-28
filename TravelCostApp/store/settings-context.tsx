@@ -2,6 +2,7 @@ import React, { createContext, useEffect, useState } from "react";
 import { loadSettings } from "../components/UI/SettingsSection";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SplashScreenOverlay from "../components/UI/SplashScreenOverlay";
+import PropTypes from "prop-types";
 
 export const SettingsContext = createContext({
   settings: {},
@@ -53,3 +54,5 @@ export const SettingsProvider = ({ children }) => {
     </SettingsContext.Provider>
   );
 };
+
+SettingsProvider.propTypes = { children: PropTypes.node.isRequired };

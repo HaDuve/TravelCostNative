@@ -153,7 +153,7 @@ function ExpenseItem(props): JSX.Element {
             </Text>
           </View>
           {toggle1 && (
-            <View>
+            <View style={[styles.countryFlagContainer, GlobalStyles.shadow]}>
               <ExpenseCountryFlag
                 countryName={country}
                 style={styles.countryFlag}
@@ -250,13 +250,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "300",
   },
+  countryFlagContainer: {
+    marginRight: "1%",
+  },
   countryFlag: {
-    width: 45,
-    height: 30,
-    marginTop: 2,
-    borderRadius: 5,
+    width: 30,
+    height: 25,
+    marginTop: "6%",
+    borderRadius: 1000,
     borderWidth: 1,
-    borderColor: GlobalStyles.colors.textColor,
+    borderColor: GlobalStyles.colors.gray700,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,

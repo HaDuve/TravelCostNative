@@ -6,7 +6,6 @@ import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
 
 const ExpenseCountryFlag = ({ countryName, style }) => {
-  console.log("ExpenseCountryFlag ~ countryName:", countryName);
   if (!countryName) return <></>;
   const countryCode = countryToAlpha2(countryName);
   if (!countryCode) return <></>;

@@ -1,8 +1,9 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, Switch, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SettingsContext } from "../../store/settings-context";
 import { GlobalStyles } from "../../constants/styles";
+import SettingsSwitch from "./SettingsSwitch";
 
 const SettingsSection = () => {
   const { settings, saveSettings } = useContext(SettingsContext);
@@ -23,14 +24,21 @@ const SettingsSection = () => {
 
   return (
     <View>
-      <View style={styles.switchContainer}>
+      {/* <View style={styles.switchContainer}>
         <Text style={GlobalStyles.secondaryText}>Show Flags icons</Text>
-        <Switch onValueChange={toggleShowFlags} value={showFlags} />
-      </View>
-      <View style={styles.switchContainer}>
-        <Text style={GlobalStyles.secondaryText}>Show Traveller icons</Text>
-        <Switch onValueChange={toggleShowWhoPaid} value={showWhoPaid} />
-      </View>
+        <Switch onValueChange={toggleShowFlags} value={showFlags} /> */}
+      <SettingsSwitch
+        label="Show Flags icons"
+        style={styles.switchContainer}
+        state={showFlags}
+        toggleState={toggleShowFlags}
+      />
+      <SettingsSwitch
+        label="Show Traveller icons"
+        style={styles.switchContainer}
+        state={showWhoPaid}
+        toggleState={toggleShowWhoPaid}
+      />
     </View>
   );
 };
@@ -49,7 +57,7 @@ export const loadSettings = async () => {
 
 const styles = StyleSheet.create({
   switchContainer: {
-    paddingHorizontal: "10%",
+    marginHorizontal: "10%",
     marginVertical: "4%",
     justifyContent: "space-between",
     flexDirection: "row",

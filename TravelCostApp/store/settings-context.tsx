@@ -5,7 +5,9 @@ import SplashScreenOverlay from "../components/UI/SplashScreenOverlay";
 
 export const SettingsContext = createContext({
   settings: {},
-  saveSettings: (settings) => {},
+  saveSettings: (settings: object): void => {
+    return;
+  },
 });
 
 export const SettingsProvider = ({ children }) => {

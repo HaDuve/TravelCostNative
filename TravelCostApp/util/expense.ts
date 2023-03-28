@@ -18,6 +18,7 @@ export interface ExpenseData {
   calcAmount: number;
   duplOrSplit: number;
   splitList?: Split[];
+  iconName: string;
 }
 
 export interface Split {

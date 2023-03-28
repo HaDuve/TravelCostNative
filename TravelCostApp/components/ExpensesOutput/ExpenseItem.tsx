@@ -6,7 +6,7 @@ import { GlobalStyles } from "../../constants/styles";
 import { isToday, toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
 import { getCatSymbol } from "../../util/category";
-import { memo, useContext, useCallback } from "react";
+import { memo, useContext, useCallback, useState } from "react";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseString } from "../../util/string";
 import React from "react";
@@ -30,6 +30,7 @@ import { UserContext } from "../../store/user-context";
 import getSymbolFromCurrency from "currency-symbol-map";
 import ExpenseCountryFlag from "./ExpenseCountryFlag";
 import { SettingsContext } from "../../store/settings-context";
+import { useEffect } from "react";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -47,6 +48,7 @@ function ExpenseItem(props): JSX.Element {
     currency,
     calcAmount,
     splitList,
+    iconName,
   } = props;
   const navigation = useNavigation();
   const TripCtx = useContext(TripContext);
@@ -56,7 +58,16 @@ function ExpenseItem(props): JSX.Element {
   const currencySymbol = getSymbolFromCurrency(currency);
   const calcAmountString = formatExpenseString(calcAmount);
   const amountString = formatExpenseString(amount);
-  const iconString = getCatSymbol(category);
+  if (iconName) console.log(iconName);
+  const [catSymbol, setCatSymbol] = useState(iconName ? iconName : "");
+  useEffect(() => {
+    async function setCatSymbolAsync() {
+      const cat = await getCatSymbol(category);
+      setCatSymbol(cat);
+    }
+    setCatSymbolAsync();
+  }, [category]);
+
   const sameCurrency = homeCurrency === currency;
 
   const { settings, saveSettings } = useContext(SettingsContext);
@@ -139,7 +150,7 @@ function ExpenseItem(props): JSX.Element {
         <View style={styles.expenseItem}>
           <View style={styles.iconContainer}>
             <Ionicons
-              name={iconString}
+              name={catSymbol}
               size={28}
               color={GlobalStyles.colors.textColor}
             />
@@ -181,11 +192,13 @@ ExpenseItem.propTypes = {
   amount: PropTypes.number.isRequired,
   date: PropTypes.object.isRequired,
   category: PropTypes.string.isRequired,
-  country: PropTypes.string.isRequired,
+  country: PropTypes.string,
   whoPaid: PropTypes.string.isRequired,
   currency: PropTypes.string.isRequired,
   calcAmount: PropTypes.number.isRequired,
   splitList: PropTypes.array,
+  iconName: PropTypes.string,
+  startDate: PropTypes.object,
 };
 
 const styles = StyleSheet.create({

@@ -157,7 +157,7 @@ const SettingsScreen = ({ navigation }) => {
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>Settings</Text>
       </View>
-      <SettingsSection></SettingsSection>
+      <SettingsSection multiTraveller={multiTraveller}></SettingsSection>
       <GradientButton style={styles.settingsButton} onPress={logoutHandler}>
         {i18n.t("logoutLabel")}
       </GradientButton>

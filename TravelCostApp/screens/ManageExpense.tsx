@@ -33,7 +33,7 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 const ManageExpense = ({ route, navigation }) => {
-  const { pickedCat, tempValues, newCat } = route.params;
+  const { pickedCat, tempValues, newCat, iconName } = route.params;
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const expenseCtx = useContext(ExpensesContext);
@@ -254,6 +254,7 @@ const ManageExpense = ({ route, navigation }) => {
             onCancel={cancelHandler}
             onSubmit={confirmHandler}
             pickedCat={pickedCat}
+            iconName={iconName}
             navigation={navigation}
             isEditing={isEditing}
             submitButtonLabel={isEditing ? i18n.t("update") : i18n.t("add")}

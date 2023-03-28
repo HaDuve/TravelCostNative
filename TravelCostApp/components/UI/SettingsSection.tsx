@@ -4,8 +4,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SettingsContext } from "../../store/settings-context";
 import { GlobalStyles } from "../../constants/styles";
 import SettingsSwitch from "./SettingsSwitch";
+import PropTypes from "prop-types";
 
-const SettingsSection = () => {
+const SettingsSection = ({ multiTraveller }) => {
   const { settings, saveSettings } = useContext(SettingsContext);
   const [showFlags, setShowFlags] = useState(settings.showFlags);
   const [showWhoPaid, setShowWhoPaid] = useState(settings.showWhoPaid);
@@ -33,17 +34,23 @@ const SettingsSection = () => {
         state={showFlags}
         toggleState={toggleShowFlags}
       />
-      <SettingsSwitch
-        label="Show Traveller icons"
-        style={styles.switchContainer}
-        state={showWhoPaid}
-        toggleState={toggleShowWhoPaid}
-      />
+      {multiTraveller && (
+        <SettingsSwitch
+          label="Show Traveller icons"
+          style={styles.switchContainer}
+          state={showWhoPaid}
+          toggleState={toggleShowWhoPaid}
+        />
+      )}
     </View>
   );
 };
 
 export default SettingsSection;
+
+SettingsSection.propTypes = {
+  multiTraveller: PropTypes.bool,
+};
 
 export const loadSettings = async () => {
   try {

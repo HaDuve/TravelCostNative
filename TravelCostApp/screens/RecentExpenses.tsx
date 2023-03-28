@@ -49,6 +49,8 @@ import { _toShortFormat } from "../util/dateTime";
 import { useFocusEffect } from "@react-navigation/native";
 import { isForeground } from "../util/appState";
 import { TourGuideZone } from "rn-tourguide";
+import PropTypes from "prop-types";
+import { ExpenseData } from "../util/expense";
 
 function RecentExpenses({ navigation }) {
   const expensesCtx = useContext(ExpensesContext);
@@ -133,19 +135,19 @@ function RecentExpenses({ navigation }) {
     // await userCtx.checkConnectionUpdateUser();
     // console.log("RecentExpenses ~ userCtx.isOnline:", userCtx.isOnline);
     if (!online) {
-      if (!firstFocus) return;
-      setIsFetching(true);
-      const loaded = await test_offlineLoad(
-        expensesCtx,
-        setRefreshing,
-        setIsFetching
-      );
-      setIsFetching(false);
-      setFirstFocus(false);
-      return;
+      // if (!firstFocus) return;
+      // setIsFetching(true);
+      // const loaded = await test_offlineLoad(
+      //   expensesCtx,
+      //   setRefreshing,
+      //   setIsFetching
+      // );
+      // setIsFetching(false);
+      // setFirstFocus(false);
+      // return;
     }
     // checking isTouched or firstLoad
-    let isTouched = await test_fetchTravelerIsTouched(tripid, uid);
+    const isTouched = await test_fetchTravelerIsTouched(tripid, uid);
     console.log("RecentExpenses ~ isTouched:", isTouched);
     if (!isTouched) {
       setRefreshing(false);
@@ -178,7 +180,7 @@ function RecentExpenses({ navigation }) {
     return <LoadingOverlay />;
   }
 
-  let recentExpenses = [];
+  let recentExpenses: Array<ExpenseData> = [];
   recentExpenses = expensesCtx.getRecentExpenses(PeriodValue);
 
   return (
@@ -238,6 +240,9 @@ function RecentExpenses({ navigation }) {
 }
 
 export default RecentExpenses;
+RecentExpenses.propTypes = {
+  navigation: PropTypes.object,
+};
 
 const styles = StyleSheet.create({
   container: {

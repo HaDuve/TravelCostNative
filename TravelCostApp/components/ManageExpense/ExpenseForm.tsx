@@ -61,6 +61,7 @@ const ExpenseForm = ({
   navigation,
   editedExpenseId,
   newCat,
+  iconName,
 }) => {
   // set context
   const AuthCtx = useContext(AuthContext);
@@ -68,8 +69,28 @@ const ExpenseForm = ({
   const TripCtx = useContext(TripContext);
   const [hideAdvanced, sethideAdvanced] = useState(!isEditing);
   const [countryValue, setCountryValue] = useState("EUR");
-
   const [loadingTravellers, setLoadingTravellers] = useState(false);
+
+  const [defaultCatSymbol, setCatSymbol] = useState(iconName ? iconName : "");
+  useEffect(() => {
+    async function setCatSymbolAsync() {
+      const cat = await getCatSymbol(defaultValues.category);
+      setCatSymbol(cat);
+    }
+    setCatSymbolAsync();
+  }, []);
+
+  const [pickedCatSymbol, setCatSymbolPicked] = useState(
+    pickedCat ? pickedCat : ""
+  );
+  useEffect(() => {
+    async function setCatSymbolAsync() {
+      const cat = await getCatSymbol(pickedCat);
+      setCatSymbolPicked(cat);
+    }
+    setCatSymbolAsync();
+  }, []);
+
   useEffect(() => {
     async function setTravellers() {
       setLoadingTravellers(true);
@@ -307,6 +328,7 @@ const ExpenseForm = ({
       listEQUAL: splitTravellersList,
       splitList: splitList,
       duplOrSplit: duplOrSplit,
+      iconName: iconName,
     };
 
     // SoloTravellers always pay for themselves
@@ -407,6 +429,7 @@ const ExpenseForm = ({
       splitType: "SELF",
       listEQUAL: currentTravellers,
       splitList: [],
+      iconName: iconName,
     };
     onSubmit(expenseData);
   }
@@ -525,11 +548,15 @@ const ExpenseForm = ({
             <IconButton
               buttonStyle={{ padding: "4%" }}
               icon={
-                defaultValues
-                  ? newCat
-                    ? getCatSymbol(pickedCat)
-                    : getCatSymbol(defaultValues.category)
-                  : getCatSymbol(pickedCat)
+                iconName
+                  ? iconName
+                  : defaultValues
+                  ? defaultValues.iconName
+                    ? defaultValues.iconName
+                    : newCat
+                    ? pickedCatSymbol
+                    : defaultCatSymbol
+                  : pickedCatSymbol
               }
               color={GlobalStyles.colors.primary500}
               size={48}
@@ -877,6 +904,7 @@ ExpenseForm.propTypes = {
   navigation: PropTypes.object,
   editedExpenseId: PropTypes.string,
   newCat: PropTypes.bool,
+  iconName: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

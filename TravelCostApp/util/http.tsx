@@ -55,6 +55,30 @@ export const dataResponseTime = (func) => {
   };
 };
 
+// fetch categories function from /trips/tripid/categories
+export async function fetchCategories(tripid: string) {
+  try {
+    const response = await axios.get(
+      BACKEND_URL + "/trips/" + tripid + "/categories.json" + QPAR
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// post categories
+export async function postCategories(tripid, categoryList) {
+  try {
+    await axios.patch(
+      BACKEND_URL + "/trips/" + tripid + "/categories.json" + QPAR,
+      categoryList
+    );
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 /**
  * storeExpense posts expense data under the specified path:
  * #### trips/$tripid/$user/expenses.json

@@ -9,6 +9,8 @@ import { formatExpenseString } from "../../../util/string";
 import Animated, { FadeInRight } from "react-native-reanimated";
 import PropTypes from "prop-types";
 import getSymbolFromCurrency from "currency-symbol-map";
+import { useEffect } from "react";
+import { useState } from "react";
 
 const CategoryProgressBar = ({
   cat,
@@ -19,22 +21,33 @@ const CategoryProgressBar = ({
 }) => {
   const tripCtx = useContext(TripContext);
   const budgetProgress = (catCost / totalCost) * 1;
-  if (Number.isNaN(budgetProgress)) {
-    console.error("NaN budgetProgress passed to CategoryProgressBar");
-    return <></>;
-  }
+
+  const [catSymbol, setCatSymbol] = useState(null);
+  useEffect(() => {
+    async function setCatSymbolAsync() {
+      const newCatSymbol = await getCatSymbol(cat);
+      setCatSymbol(newCatSymbol);
+      iconOverride && setCatSymbol(iconOverride);
+    }
+    setCatSymbolAsync();
+  }, []);
+
   const budgetColor = color;
   const unfilledColor = GlobalStyles.colors.gray500Accent;
-  const icon = iconOverride ?? getCatSymbol(cat);
+
   const userCurrency = tripCtx.tripCurrency;
   const userCurrencySymbol = getSymbolFromCurrency(userCurrency);
   const catCostString = formatExpenseString(catCost);
   const windowWidth = Dimensions.get("window").width;
 
+  if (Number.isNaN(budgetProgress)) {
+    console.error("NaN budgetProgress passed to CategoryProgressBar");
+    return <></>;
+  }
   return (
     <Animated.View entering={FadeInRight} style={styles.container}>
       <View style={styles.titleRow}>
-        <Ionicons name={icon} size={30} color={color} />
+        <Ionicons name={catSymbol} size={30} color={color} />
         <Text style={[styles.sum, { color: budgetColor, marginLeft: 8 }]}>
           {getCatString(cat)}
         </Text>

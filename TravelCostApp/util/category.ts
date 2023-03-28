@@ -2,6 +2,7 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../i18n/supportedLanguages";
+import { asyncStoreGetObject } from "../store/async-storage";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -16,7 +17,7 @@ export interface Category {
   color: string;
 }
 
-export function getCatSymbol(cat: string) {
+export async function getCatSymbol(cat: string) {
   switch (cat) {
     case "food":
       return "fast-food-outline";
@@ -52,8 +53,18 @@ export function getCatSymbol(cat: string) {
       return "call-outline";
     case "VERGNÜGEN":
       return "happy-outline";
-    default:
+    default: {
+      // if not, return "help-outline"
+      // check asyncstore for categoryList, if we find cat there, return iconName
+      const categoryList = await asyncStoreGetObject("categoryList");
+      if (categoryList) {
+        const catObj = categoryList.find((c) => c.name === cat);
+        if (catObj) {
+          return catObj.icon;
+        }
+      }
       return "help-outline";
+    }
   }
 }
 
@@ -72,9 +83,7 @@ export function getCatString(cat: string) {
     case "other":
       return i18n.t("catOtherString");
     default: {
-      if (cat == "") return cat;
-      const capitalized = cat.charAt(0).toUpperCase() + cat.slice(1);
-      return capitalized;
+      return cat;
     }
   }
 }

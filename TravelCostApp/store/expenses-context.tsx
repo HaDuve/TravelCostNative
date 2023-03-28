@@ -11,7 +11,7 @@ import {
 import { truncateString } from "../util/string";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 import PropTypes from "prop-types";
-import { Expense } from "../util/expense";
+import { Expense, ExpenseData } from "../util/expense";
 
 export const ExpensesContext = createContext({
   expenses: [],
@@ -26,6 +26,7 @@ export const ExpensesContext = createContext({
     whoPaid,
     owePerc,
     calcAmount,
+    iconName,
   }) => {},
   setExpenses: (expenses) => {},
   deleteExpense: (id) => {},
@@ -42,9 +43,12 @@ export const ExpensesContext = createContext({
       whoPaid,
       owePerc,
       calcAmount,
+      iconName,
     }
   ) => {},
-  getRecentExpenses: (rangestring) => {},
+  getRecentExpenses: (rangestring): Array<ExpenseData> => {
+    return [];
+  },
   getYearlyExpenses: (yearsBack) => {
     // firstDay, lastDay, yearlyExpenses;
   },

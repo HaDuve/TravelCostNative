@@ -21,12 +21,19 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../i18n/supportedLanguages";
 import { Category } from "../util/category";
-import { storeCategories, updateCategories } from "../util/http";
+import {
+  fetchCategories,
+  storeCategories,
+  updateCategories,
+} from "../util/http";
 import { useContext } from "react";
 import { TripContext } from "../store/trip-context";
 import Toast from "react-native-toast-message";
 import { Ionicons } from "@expo/vector-icons";
 import GradientButton from "../components/UI/GradientButton";
+import useEffect from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { asyncStoreGetObject } from "../store/async-storage";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -84,6 +91,49 @@ const CategoryPickScreen = ({ route, navigation }) => {
     },
   ];
 
+  const [categoryList, setCategoryList] = useState(CATLIST);
+
+  // load categories from server or asyncstore
+  useFocusEffect(
+    React.useCallback(() => {
+      const loadCategories = async () => {
+        const categories = await fetchCategories(tripid);
+        console.log("CategoryPickScreen ~ categories", categories);
+        if (categories) {
+          for (const key in categories) {
+            const categoryList = categories[key];
+            console.log("fetchCategoryList ~ categoryList:", categoryList);
+            categoryList.push({
+              id: 6,
+              icon: "add-outline",
+              color: GlobalStyles.colors.textColor,
+              cat: "newCat",
+              catString: i18n.t("catNewString"),
+            });
+            setCategoryList(categoryList);
+          }
+        }
+      };
+
+      // first try to load categories from asyncstore
+      const loadCategoryList = async () => {
+        const categories = await asyncStoreGetObject("categoryList");
+        if (categories) {
+          categories.push({
+            id: 6,
+            icon: "add-outline",
+            color: GlobalStyles.colors.textColor,
+            cat: "newCat",
+            catString: i18n.t("catNewString"),
+          });
+          setCategoryList(categories);
+        }
+      };
+      loadCategoryList();
+      // loadCategories();
+    }, [])
+  );
+
   async function catPressHandler(item) {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setIsShaking(false);
@@ -93,30 +143,12 @@ const CategoryPickScreen = ({ route, navigation }) => {
         text1: "Not yet implemented",
         text2: "This function will be available soon!",
       });
-      navigation.pop();
-      const storeCatList: Category[] = [];
-      CATLIST.forEach((cat) => {
-        if (cat.cat !== "newCat") {
-          storeCatList.push({
-            id: cat.id,
-            icon: cat.icon,
-            color: cat.color,
-            catString: cat.catString,
-            cat: cat.cat,
-          });
-        }
-      });
-      // navigate to ManageCategory
-      // navigation.navigate("ManageCategory", { storeCatList });
-      // try {
-      //   await updateCategories(tripid, storeCatList);
-      // } catch (error) {
-      //   console.log(error);
-      // }
+      navigation.navigate("ManageCategory");
     } else
       navigation.navigate("ManageExpense", {
-        pickedCat: item.cat,
+        pickedCat: item.cat ?? item.name,
         newCat: true,
+        iconName: item.icon,
         expenseId: editedExpenseId,
       });
   }
@@ -157,6 +189,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
 
   function renderCatItem(itemData) {
     const item = itemData.item;
+    if (!item.catString) item.catString = item.name;
     item.shakeAnimation = new Animated.Value(0);
     if (isShaking) startShake(item);
     return (
@@ -195,30 +228,31 @@ const CategoryPickScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       <FlatList
         numColumns={2}
-        data={CATLIST}
+        data={categoryList}
         renderItem={renderCatItem}
-        ListFooterComponent={<View style={{ height: 100 }}></View>}
+        ListFooterComponent={
+          <View style={styles.buttonContainer}>
+            <FlatButton
+              onPress={() => {
+                navigation.goBack();
+              }}
+            >
+              {i18n.t("cancel")}
+            </FlatButton>
+            <GradientButton
+              buttonStyle={styles.continueButtonStyle}
+              onPress={() => {
+                navigation.navigate("ManageExpense", {
+                  pickedCat: "other",
+                });
+              }}
+            >
+              {i18n.t("continue")}
+            </GradientButton>
+          </View>
+        }
         style={styles.listStyle}
       ></FlatList>
-      <View style={styles.buttonContainer}>
-        <FlatButton
-          onPress={() => {
-            navigation.goBack();
-          }}
-        >
-          {i18n.t("cancel")}
-        </FlatButton>
-        <GradientButton
-          buttonStyle={styles.continueButtonStyle}
-          onPress={() => {
-            navigation.navigate("ManageExpense", {
-              pickedCat: "other",
-            });
-          }}
-        >
-          {i18n.t("continue")}
-        </GradientButton>
-      </View>
     </View>
   );
 };

@@ -40,10 +40,10 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
 
   async function toggleContent() {
     const isPremium = await userCtx.checkPremium();
-    if (!isPremium) {
-      navigation.navigate("Paywall");
-      return;
-    }
+    // if (!isPremium) {
+    //   navigation.navigate("Paywall");
+    //   return;
+    // }
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setToggleGraph(!toggleGraph);

@@ -194,7 +194,9 @@ const SettingsScreen = ({ navigation }) => {
         style={[styles.settingsButton]}
         darkText
         colors={GlobalStyles.gradientColorsButton}
-        onPress={() => navigation.navigate("Paywall")}
+        onPress={() => {
+          if (premiumStatus) navigation.navigate("Paywall");
+        }}
       >
         {premiumButtonString}
       </GradientButton>

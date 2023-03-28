@@ -125,10 +125,10 @@ const SplitSummaryScreen = ({ route, navigation }) => {
             style={styles.button}
             onPress={async () => {
               const isPremium = await userCtx.checkPremium();
-              if (!isPremium) {
-                navigation.navigate("Paywall");
-                return;
-              }
+              // if (!isPremium) {
+              //   navigation.navigate("Paywall");
+              //   return;
+              // }
               setSplits(simplifySplits(splits));
               setShowSimplify(false);
               setTitleText("Simplified Open Splits!");

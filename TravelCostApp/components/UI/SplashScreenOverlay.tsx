@@ -65,18 +65,4 @@ const SplashScreenOverlay = (containerStyle) => {
 
 export default SplashScreenOverlay;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 0,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-  },
-  text: {
-    color: loadingColor,
-    fontSize: 18,
-    fontWeight: "300",
-    marginTop: 12,
-  },
-});
+const styles = StyleSheet.create({});

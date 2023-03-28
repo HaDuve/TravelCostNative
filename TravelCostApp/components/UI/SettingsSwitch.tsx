@@ -16,7 +16,7 @@ const SettingsSwitch = ({ style, toggleState, state, label }) => {
       <Switch
         trackColor={{
           false: GlobalStyles.colors.gray500,
-          true: GlobalStyles.colors.primary400,
+          true: GlobalStyles.colors.primary500,
         }}
         thumbColor={
           state

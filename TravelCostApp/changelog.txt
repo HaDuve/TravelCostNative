@@ -1,5 +1,11 @@
 Change log Travel Expense App
 
+
+1.0.82
+- added a settings SettingsSection
+- added option to show flags
+- added option to show whoPaid icons
+
 1.0.81
 - replaced currency text (EUR) with symbols (€)
 - added country flags (will be optional soon)
@@ -8,9 +14,6 @@ Change log Travel Expense App
 - improved button style
 - improved colorpalette (less strain on the eye)
 - improved overlays and background colors
-
-1.0.82
-- added a settings SettingsSection
 
 1.0.78
 - added a chart carousel

@@ -1,4 +1,4 @@
-import { StyleSheet, Switch, Text, View } from "react-native";
+import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import React from "react";
 import PropTypes from "prop-types";
 import { LinearGradient } from "expo-linear-gradient";
@@ -6,7 +6,7 @@ import { GlobalStyles } from "../../constants/styles";
 
 const SettingsSwitch = ({ style, toggleState, state, label }) => {
   return (
-    <View style={[styles.container, style]}>
+    <Pressable onPress={() => toggleState()} style={[styles.container, style]}>
       {/* <LinearGradient
         start={{ x: 0.51, y: -1.3 }}
         colors={GlobalStyles.gradientPrimaryButton}
@@ -28,7 +28,7 @@ const SettingsSwitch = ({ style, toggleState, state, label }) => {
         style={[{ marginBottom: 8 }, GlobalStyles.shadowPrimary]}
       />
       {/* </LinearGradient> */}
-    </View>
+    </Pressable>
   );
 };
 export default SettingsSwitch;

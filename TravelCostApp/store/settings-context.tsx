@@ -5,6 +5,7 @@ import SplashScreenOverlay from "../components/UI/SplashScreenOverlay";
 
 export const SettingsContext = createContext({
   settings: {},
+  saveSettings: (settings) => {},
 });
 
 export const SettingsProvider = ({ children }) => {
@@ -16,7 +17,11 @@ export const SettingsProvider = ({ children }) => {
       if (settingsString) {
         const loadedSettings = JSON.parse(settingsString);
         setSettings(loadedSettings);
-      }
+      } else
+        setSettings({
+          showFlags: false,
+          showWhoPaid: false,
+        });
     };
     loadSettingsAsync();
   }, []);

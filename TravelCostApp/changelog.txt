@@ -1,5 +1,9 @@
 Change log Travel Expense App
 
+1.0.83
+- fixed a bug where the app doesnt start
+- improved flags style
+- improved settings switch style
 
 1.0.82
 - added a settings SettingsSection

@@ -27,7 +27,10 @@ const PackageItem = ({ purchasePackage, setIsPurchasing }) => {
       }
     } catch (e) {
       if (!e.userCancelled) {
-        Alert.alert("Error purchasing package", e.message);
+        Alert.alert(
+          "Error purchasing package",
+          e.message + " Please restart the app and try again."
+        );
       }
     } finally {
       setIsPurchasing(false);

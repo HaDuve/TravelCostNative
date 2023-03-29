@@ -2,7 +2,7 @@ import AuthContent from "../components/Auth/AuthContent";
 import React, { useContext, useState } from "react";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { login } from "../util/auth";
-import { Alert } from "react-native";
+import { Alert, Platform } from "react-native";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -21,6 +21,8 @@ import { asyncStoreSetItem, asyncStoreSetObject } from "../store/async-storage";
 import Toast from "react-native-toast-message";
 import { KeyboardAvoidingView } from "react-native";
 import * as AppleAuthentication from "expo-apple-authentication";
+import Purchases from "react-native-purchases";
+import { API_KEY } from "../components/Premium/PremiumConstants";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -65,6 +67,18 @@ function LoginScreen() {
         userCtx.setFreshlyCreatedTo(true);
       }
       //// END OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
+      // setup purchases
+      if (Platform.OS === "android") {
+        // Purchases
+        Purchases.configure({
+          apiKey: "<public_google_sdk_key>",
+          appUserID: uid,
+        });
+      } else if (Platform.OS === "ios") {
+        // Purchases
+        Purchases.configure({ apiKey: API_KEY, appUserID: uid });
+        console.log("LoginScreen ~ uid:", uid);
+      }
       try {
         const userData = checkUser;
         console.log("loginHandler ~ userData", userData);

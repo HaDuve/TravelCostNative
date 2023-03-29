@@ -20,6 +20,9 @@ import { createUser } from "../util/auth";
 import { storeUser, updateUser } from "../util/http";
 import { AuthContext } from "../store/auth-context";
 import Toast from "react-native-toast-message";
+import { Platform } from "react-native";
+import Purchases from "react-native-purchases";
+import { API_KEY } from "../components/Premium/PremiumConstants";
 
 function SignupScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -51,7 +54,18 @@ function SignupScreen() {
     try {
       // We are online and ready to create User
       const { token, uid } = await createUser(email, password);
-
+      // setup purchases
+      if (Platform.OS === "android") {
+        // Purchases
+        Purchases.configure({
+          apiKey: "<public_google_sdk_key>",
+          appUserID: uid,
+        });
+      } else if (Platform.OS === "ios") {
+        // Purchases
+        Purchases.configure({ apiKey: API_KEY, appUserID: uid });
+        console.log("SignupScreen ~ uid:", uid);
+      }
       //CLEAR
       await asyncStoreSafeClear();
       userCtx.setTripHistory([]);

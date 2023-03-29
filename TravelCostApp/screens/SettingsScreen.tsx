@@ -80,6 +80,7 @@ const SettingsScreen = ({ navigation }) => {
     React.useCallback(() => {
       async function setPremiumNow() {
         const isPremium = await userCtx.checkPremium();
+        console.log("setPremiumNow ~ isPremium:", isPremium);
         setPremiumStatus(isPremium);
         setPremiumButtonString(premiumStatus ? buttonstring1 : buttonstring2);
       }
@@ -191,11 +192,12 @@ const SettingsScreen = ({ navigation }) => {
         {i18n.t("visitFoodForNomadsLabel")}
       </LinkingButton>
       <GradientButton
-        style={[styles.settingsButton]}
+        style={styles.settingsButton}
         darkText
         colors={GlobalStyles.gradientColorsButton}
         onPress={() => {
-          if (premiumStatus) navigation.navigate("Paywall");
+          console.log("pressed premium button");
+          if (!premiumStatus) navigation.navigate("Paywall");
         }}
       >
         {premiumButtonString}

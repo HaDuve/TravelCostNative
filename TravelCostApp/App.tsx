@@ -446,14 +446,6 @@ function Root() {
       // end wrap
       console.log("onRootMount ~ onRootMount");
 
-      if (Platform.OS === "android") {
-        // Purchases
-        Purchases.configure({ apiKey: "<public_google_sdk_key>" });
-      } else if (Platform.OS === "ios") {
-        // Purchases
-        Purchases.configure({ apiKey: API_KEY });
-      }
-
       if (DEBUG_RESET) await asyncStoreSafeClear();
 
       // offline check and set context
@@ -484,6 +476,18 @@ function Root() {
           console.log("OFFLINE SETUP FINISHED");
           setAppIsReady(true);
           return;
+        }
+        // setup purchases
+        if (Platform.OS === "android") {
+          // Purchases
+          Purchases.configure({
+            apiKey: "<public_google_sdk_key>",
+            appUserID: storedUid,
+          });
+        } else if (Platform.OS === "ios") {
+          // Purchases
+          Purchases.configure({ apiKey: API_KEY, appUserID: storedUid });
+          console.log("onRootMount ~ storedUid:", storedUid);
         }
         // set tripId in context
         let tripData;

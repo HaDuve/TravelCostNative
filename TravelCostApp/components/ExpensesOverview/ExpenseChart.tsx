@@ -50,7 +50,7 @@ const ExpenseChart = ({
     }
   });
   // cap expensesSum at 5*dailyBudget 5*weeklyBudget 5*monthlyBudget 5*yearlyBudget respectively
-  const CAP = 2;
+  const CAP = 3;
   inputData?.forEach((obj) => {
     if (obj.expensesSum > CAP * obj.yearlyBudget) {
       obj.expensesSum = CAP * obj.yearlyBudget;
@@ -78,7 +78,11 @@ const ExpenseChart = ({
       >
         <VictoryLine
           labelComponent={
-            <VictoryTooltip center={{ x: 80, y: 25 }} renderInPortal={false} />
+            <VictoryTooltip
+              center={{ x: 210, y: 26 }}
+              constrainToVisibleArea
+              renderInPortal={false}
+            />
           }
           data={[
             {

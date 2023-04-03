@@ -1,6 +1,11 @@
 Change log Travel Expense App
 
-1.0.85
+1.0.87
+- improved expense graph design
+- improved dropdown layout
+- only show what the traveller had to pay when filtering for travellers in overviews expense list
+
+1.0.86
 - expense summary (header budget) is now touchable and shows information about the budget and money left
 - fixed alot of bugs (most were related to offline mode) and made it easier to fix them in the future
 - alot of debugging updates

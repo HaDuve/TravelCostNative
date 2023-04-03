@@ -49,6 +49,7 @@ function ExpenseItem(props): JSX.Element {
     calcAmount,
     splitList,
     iconName,
+    showSumForTravellerName,
   } = props;
   const navigation = useNavigation();
   const TripCtx = useContext(TripContext);
@@ -56,8 +57,30 @@ function ExpenseItem(props): JSX.Element {
   const homeCurrency = TripCtx.tripCurrency;
   const homeCurrencySymbol = getSymbolFromCurrency(homeCurrency);
   const currencySymbol = getSymbolFromCurrency(currency);
-  const calcAmountString = formatExpenseString(calcAmount);
-  const amountString = formatExpenseString(amount);
+  const rate = calcAmount / amount;
+  let calcTravellerSum = 0;
+  let travellerSum = 0;
+  let calcTravellerSumString = "";
+  let travellerSumString = "";
+  if (splitList && splitList.length > 0 && showSumForTravellerName) {
+    splitList.forEach((split) => {
+      console.log("splitList.forEach ~ split:", split);
+      if (split.userName === showSumForTravellerName) {
+        calcTravellerSum += Number(split.amount) * rate;
+        travellerSum += Number(split.amount);
+      }
+    });
+    calcTravellerSumString = formatExpenseString(Number(calcTravellerSum));
+    travellerSumString = formatExpenseString(Number(travellerSum));
+  }
+  const calcAmountString = calcTravellerSum
+    ? `${calcTravellerSumString}`
+    : formatExpenseString(calcAmount);
+
+  const amountString = travellerSum
+    ? `${travellerSumString}`
+    : formatExpenseString(amount);
+
   if (iconName) console.log(iconName);
   const [catSymbol, setCatSymbol] = useState(iconName ? iconName : "");
   useEffect(() => {
@@ -201,6 +224,7 @@ ExpenseItem.propTypes = {
   splitList: PropTypes.array,
   iconName: PropTypes.string,
   startDate: PropTypes.object,
+  showSumForTravellerName: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

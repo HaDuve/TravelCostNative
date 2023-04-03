@@ -33,6 +33,7 @@ let tripid = "";
 let expenseCtx;
 const row = [];
 let prevOpenedRow;
+let travellerName = "";
 // swipe left to delete
 const renderRightActions = (progress, dragX, onClick) => {
   return (
@@ -57,7 +58,7 @@ const renderRightActions = (progress, dragX, onClick) => {
     </View>
   );
 };
-function renderExpenseItem(isOnline, itemData) {
+function renderExpenseItem(isOnline: boolean, itemData) {
   const index = itemData.index;
 
   return (
@@ -76,7 +77,10 @@ function renderExpenseItem(isOnline, itemData) {
         disableLeftSwipe={true}
         overshootFriction={8}
       >
-        <ExpenseItem {...itemData.item} />
+        <ExpenseItem
+          showSumForTravellerName={travellerName}
+          {...itemData.item}
+        />
       </Swipeable>
     </View>
   );
@@ -146,7 +150,12 @@ function forceCloseRow(index) {
 }
 
 // Displays a list of all expenses.
-function ExpensesList({ expenses, refreshControl, periodValue }) {
+function ExpensesList({
+  expenses,
+  refreshControl,
+  periodValue,
+  showSumForTravellerName,
+}) {
   // const flatListRef = useRef(null);
   const userCtx = useContext(UserContext);
   const isOnline = userCtx.isOnline;
@@ -154,7 +163,7 @@ function ExpensesList({ expenses, refreshControl, periodValue }) {
   expenseCtx = useContext(ExpensesContext);
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(1);
   tripid = tripCtx.tripid;
-
+  travellerName = showSumForTravellerName;
   // // find the index of the first item in expenses with the date === new Date()
   // // this is used to scroll to the current day
   // useLayoutEffect(() => {
@@ -220,4 +229,5 @@ ExpensesList.propTypes = {
   ).isRequired,
   refreshControl: PropTypes.element,
   periodValue: PropTypes.string.isRequired,
+  showSumForTravellerName: PropTypes.string,
 };

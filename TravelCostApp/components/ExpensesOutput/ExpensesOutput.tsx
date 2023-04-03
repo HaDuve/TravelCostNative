@@ -14,6 +14,7 @@ function ExpensesOutput({
   fallbackText,
   refreshControl,
   periodValue,
+  showSumForTravellerName,
 }) {
   const [showLoading, setShowLoading] = useState(true);
   useEffect(() => {
@@ -29,7 +30,13 @@ function ExpensesOutput({
     </Animated.View>
   );
   if (expenses.length > 0) {
-    content = <ExpensesList periodValue={periodValue} expenses={expenses} />;
+    content = (
+      <ExpensesList
+        periodValue={periodValue}
+        expenses={expenses}
+        showSumForTravellerName={showSumForTravellerName}
+      />
+    );
   }
   return (
     <ScrollView style={styles.container} refreshControl={refreshControl}>
@@ -45,6 +52,7 @@ ExpensesOutput.propTypes = {
   fallbackText: PropTypes.string,
   refreshControl: PropTypes.object,
   periodValue: PropTypes.string,
+  showSumForTravellerName: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

@@ -133,6 +133,7 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
           pressed && GlobalStyles.pressedWithShadow,
         ]}
         onPress={() => {
+          console.log("pressed name:", itemData.item.cat);
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigation.navigate("FilteredExpenses", {
             expenses: itemData.item.catExpenses,
@@ -140,6 +141,7 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
               getCatString(itemData.item.cat) +
               (periodName !== "total" ? " this " : " ") +
               periodName,
+            showSumForTravellerName: itemData.item.cat,
           });
         }}
       >

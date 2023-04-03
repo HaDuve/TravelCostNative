@@ -23,7 +23,7 @@ function ExpensesOutput({
   const toggleLoading = () => setShowLoading((prev) => !prev);
 
   let content = (
-    <Animated.View exiting={SlideOutLeft}>
+    <Animated.View exiting={SlideOutLeft} style={styles.fallbackContainer}>
       {showLoading && <LoadingOverlay></LoadingOverlay>}
       {!showLoading && <Text style={styles.infoText}>{fallbackText}</Text>}
     </Animated.View>
@@ -53,6 +53,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingBottom: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  fallbackContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "12%",
   },
   header: {
     flexDirection: "row",

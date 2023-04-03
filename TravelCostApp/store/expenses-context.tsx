@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import React, { createContext, useReducer } from "react";
+import React, { createContext, useEffect, useReducer } from "react";
 import {
   getDateMinusDays,
   getDatePlusDays,
@@ -12,6 +12,7 @@ import { truncateString } from "../util/string";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 import PropTypes from "prop-types";
 import { Expense, ExpenseData } from "../util/expense";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const ExpensesContext = createContext({
   expenses: [],
@@ -74,7 +75,6 @@ export const ExpensesContext = createContext({
     return [];
   },
 
-  saveExpensesInStorage: async (expenses) => {},
   loadExpensesFromStorage: async () => {},
 });
 
@@ -255,27 +255,21 @@ function ExpensesContextProvider({ children }) {
     return yearlyExpenses;
   }
 
-  async function saveExpensesInStorage(expenses) {
-    await asyncStoreSetObject("expenses", expenses);
-  }
-
   async function loadExpensesFromStorage() {
-    console.log(
-      "loadExpensesFromStorage ~ loadExpensesFromStorage:",
-      loadExpensesFromStorage
-    );
+    console.log("loadExpensesFromStorage ~ loadExpensesFromStorage:");
     if (expensesState.length !== 0) {
       console.log("expenses not empty, will not load again");
       return false;
     }
-    const expenses = await asyncStoreGetObject("expenses");
+    const loadedExpenses = await asyncStoreGetObject("expenses");
     const expArray = [];
-    if (expenses) {
-      expenses.forEach((expense) => {
+    if (loadedExpenses) {
+      loadedExpenses.forEach((expense) => {
         expense.date = new Date(expense.date);
         expArray.push(expense);
       });
       setExpenses(expArray);
+      console.log("loadExpensesFromStorage ~ expArray:", expArray);
     } else {
       console.warn("no Expenses loaded from Storage!");
     }
@@ -297,7 +291,6 @@ function ExpensesContextProvider({ children }) {
     getSpecificWeekExpenses: getSpecificWeekExpenses,
     getSpecificMonthExpenses: getSpecificMonthExpenses,
     getSpecificYearExpenses: getSpecificYearExpenses,
-    saveExpensesInStorage: saveExpensesInStorage,
     loadExpensesFromStorage: loadExpensesFromStorage,
   };
 

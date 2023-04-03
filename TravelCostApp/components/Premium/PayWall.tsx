@@ -51,12 +51,16 @@ const PaywallScreen = ({ navigation }) => {
         {/* Image of icon2.png scaled to 10% of screenheight */}
         <Image
           source={require("../../assets/icon2.png")}
-          style={{
-            width: "40%",
-            height: "40%",
-            resizeMode: "contain",
-            margin: "2%",
-          }}
+          style={[
+            {
+              width: "40%",
+              height: "40%",
+              resizeMode: "contain",
+              margin: "2%",
+            },
+            GlobalStyles.shadowPrimary,
+            { overflow: "visible" },
+          ]}
         />
       </View>
       <Text style={styles.headerTitleText}>Go Pro!</Text>
@@ -94,6 +98,7 @@ const PaywallScreen = ({ navigation }) => {
             <PackageItem
               purchasePackage={item}
               setIsPurchasing={setIsPurchasing}
+              navigation={navigation}
             />
           )}
           keyExtractor={(item) => item.identifier}
@@ -102,7 +107,6 @@ const PaywallScreen = ({ navigation }) => {
           ListFooterComponent={footer}
           ListFooterComponentStyle={styles.headerFooterContainer}
         />
-
         {isPurchasing && <View style={styles.overlay} />}
       </BackgroundGradient>
     </>
@@ -140,6 +144,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   footerText: {
+    // center text
+    textAlign: "center",
+    // text color
+    color: GlobalStyles.colors.primary700,
+    // text size
     fontSize: 12,
   },
   backButtonTextStyle: {
@@ -150,6 +159,6 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.2)",
   },
 });

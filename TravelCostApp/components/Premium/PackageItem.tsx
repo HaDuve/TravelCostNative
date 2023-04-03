@@ -6,12 +6,10 @@ import { ENTITLEMENT_ID } from "../Premium/PremiumConstants";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
 
-const PackageItem = ({ purchasePackage, setIsPurchasing }) => {
+const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
   const {
     product: { title, description, priceString },
   } = purchasePackage;
-
-  const navigation = useNavigation();
 
   const onSelection = async () => {
     setIsPurchasing(true);
@@ -19,11 +17,12 @@ const PackageItem = ({ purchasePackage, setIsPurchasing }) => {
     try {
       const { customerInfo, productIdentifier } =
         await Purchases.purchasePackage(purchasePackage);
+      // Toast the result of the purchase
 
       if (
         typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined"
       ) {
-        navigation.goBack();
+        navigation.pop();
       }
     } catch (e) {
       if (!e.userCancelled) {
@@ -58,6 +57,7 @@ export default PackageItem;
 PackageItem.propTypes = {
   purchasePackage: PropTypes.object.isRequired,
   setIsPurchasing: PropTypes.func.isRequired,
+  navigation: PropTypes.object.isRequired,
 };
 
 const styles = StyleSheet.create({

@@ -29,19 +29,18 @@ import { TourGuideZone, useTourGuideController } from "rn-tourguide";
 import { sleep } from "../util/appState";
 import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confApp";
+import Toast from "react-native-toast-message";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "de";
 
 const ProfileScreen = ({ navigation }) => {
-  const UserCtx = useContext(UserContext);
-  const FreshlyCreated = UserCtx.freshlyCreated;
+  const userCtx = useContext(UserContext);
   const [tourIsRunning, setTourIsRunning] = useState(false);
-  // // // console.log("ProfileScreen ~ FreshlyCreated", FreshlyCreated);
-  const TripCtx = useContext(TripContext);
-  const AuthCtx = useContext(AuthContext);
-  const uid = AuthCtx.uid;
+  const tripCtx = useContext(TripContext);
+  const authCtx = useContext(AuthContext);
+  const uid = authCtx.uid;
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -50,7 +49,7 @@ const ProfileScreen = ({ navigation }) => {
 
   useInterval(
     () => {
-      if (canStart && UserCtx.needsTour && !tourIsRunning) {
+      if (canStart && userCtx.needsTour && !tourIsRunning) {
         // 👈 test if you can start otherwise nothing will happen
         sleepyStartTour();
       }
@@ -67,7 +66,7 @@ const ProfileScreen = ({ navigation }) => {
   // refreshHandler() could be moved into TripContext to be loaded correctly
   async function refreshHandler() {
     // check freshly and offlinemode
-    if (FreshlyCreated || !UserCtx.isOnline) return;
+    if (userCtx.freshlyCreated || !userCtx.isOnline) return;
     allTripsList = [];
     const tripHistory = await fetchTripHistory(uid);
     if (!tripHistory.length) {
@@ -75,22 +74,22 @@ const ProfileScreen = ({ navigation }) => {
       return;
     }
     allTripsList = [...tripHistory];
-    await TripCtx.fetchAndSetCurrentTrip(TripCtx.tripid);
+    await tripCtx.fetchAndSetCurrentTrip(tripCtx.tripid);
     addTripFromContext();
     // console.log("allTripsList length: ", allTripsList.length);
     setTripsList(allTripsList.reverse());
   }
   function addTripFromContext() {
-    console.log("addTripFromContext ~ addTripFromContext", TripCtx.tripName);
-    if (!TripCtx.tripid || TripCtx.tripid.length < 1) return;
-    allTripsList = allTripsList.filter((trip) => trip !== TripCtx.tripid);
+    console.log("addTripFromContext ~ addTripFromContext", tripCtx.tripName);
+    if (!tripCtx.tripid || tripCtx.tripid.length < 1) return;
+    allTripsList = allTripsList.filter((trip) => trip !== tripCtx.tripid);
     allTripsList.push({
-      tripid: TripCtx.tripid,
-      tripName: TripCtx.tripName,
-      totalBudget: TripCtx.totalBudget,
-      dailyBudget: TripCtx.dailyBudget,
-      tripCurrency: TripCtx.tripCurrency,
-      travellers: TripCtx.travellers,
+      tripid: tripCtx.tripid,
+      tripName: tripCtx.tripName,
+      totalBudget: tripCtx.totalBudget,
+      dailyBudget: tripCtx.dailyBudget,
+      tripCurrency: tripCtx.tripCurrency,
+      travellers: tripCtx.travellers,
     });
   }
 
@@ -99,7 +98,7 @@ const ProfileScreen = ({ navigation }) => {
   const {
     canStart, // a boolean indicate if you can start tour guide
     start, // a function to start the tourguide
-    stop, // a function  to stopping it
+    // stop, // a function  to stopping it
     eventEmitter, // an object for listening some events
   } = useTourGuideController();
   // Can start at mount 🎉
@@ -110,7 +109,7 @@ const ProfileScreen = ({ navigation }) => {
     start();
   }
   React.useEffect(() => {
-    if (canStart && UserCtx.needsTour) {
+    if (canStart && userCtx.needsTour) {
       // 👈 test if you can start otherwise nothing will happen
       sleepyStartTour();
     }
@@ -122,7 +121,7 @@ const ProfileScreen = ({ navigation }) => {
   };
   const handleOnStop = () => {
     saveStoppedTour();
-    UserCtx.setNeedsTour(false);
+    userCtx.setNeedsTour(false);
     setTourIsRunning(false);
     console.log("stop");
   };
@@ -169,9 +168,9 @@ const ProfileScreen = ({ navigation }) => {
     };
   }, []);
 
-  const visibleContent = FreshlyCreated ? (
+  const visibleContent = userCtx.freshlyCreated ? (
     <></>
-  ) : UserCtx.isOnline ? (
+  ) : userCtx.isOnline ? (
     <>
       <View style={styles.tripContainer}>
         <View style={styles.horizontalContainer}>
@@ -231,7 +230,7 @@ const ProfileScreen = ({ navigation }) => {
               size={42}
               color={"white"}
               onPress={() => {
-                onShare(TripCtx.tripid, navigation);
+                onShare(tripCtx.tripid, navigation);
               }}
             />
           </View>

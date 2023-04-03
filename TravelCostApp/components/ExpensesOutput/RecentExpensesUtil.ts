@@ -1,20 +1,6 @@
 import { getAllExpenses, unTouchTraveler } from "../../util/http";
 import Toast from "react-native-toast-message";
-
-export async function offlineLoad(
-  expensesCtx,
-  setRefreshing = (b) => {
-    return;
-  },
-  setIsFetching = (b) => {
-    return;
-  }
-) {
-  const isLoaded = await expensesCtx.loadExpensesFromStorage();
-  setRefreshing(false);
-  setIsFetching(false);
-  return isLoaded;
-}
+import { asyncStoreSetObject } from "../../store/async-storage";
 
 export async function fetchAndSetExpenses(
   showRefIndicator: () => boolean,
@@ -41,7 +27,7 @@ export async function fetchAndSetExpenses(
       }, 0);
       tripCtx.setTotalSum(expensesSum);
 
-      await expensesCtx.saveExpensesInStorage(expenses);
+      await asyncStoreSetObject("expenses", expenses);
       await unTouchTraveler(tripid, uid);
     }
   } catch (error) {

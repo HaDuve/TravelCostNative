@@ -39,6 +39,16 @@ export const deleteExpenseOnlineOffline = async (
 ) => {
   // load tripid from asyncstore to fix the tripctx tripid bug
   const tripid = await asyncStoreGetItem("currentTripId");
+  if (!tripid) {
+    Toast.show({
+      type: "error",
+      text1: "Error",
+      text2: "Could not store Expense, please try again!",
+    });
+    throw new Error(
+      "No tripid found in asyncStore! (storeExpenseOnlineOffline)"
+    );
+  }
   item.expense.tripid = tripid;
   if (online) {
     // delete item online
@@ -86,6 +96,16 @@ export const updateExpenseOnlineOffline = async (
 ) => {
   // load tripid from asyncstore to fix the tripctx tripid bug
   const tripid = await asyncStoreGetItem("currentTripId");
+  if (!tripid) {
+    Toast.show({
+      type: "error",
+      text1: "Error",
+      text2: "Could not store Expense, please try again!",
+    });
+    throw new Error(
+      "No tripid found in asyncStore! (storeExpenseOnlineOffline)"
+    );
+  }
   item.expense.tripid = tripid;
   if (online) {
     // update item online
@@ -134,6 +154,16 @@ export const storeExpenseOnlineOffline = async (
 ) => {
   // load tripid from asyncstore to fix the tripctx tripid bug
   const tripid = await asyncStoreGetItem("currentTripId");
+  if (!tripid) {
+    Toast.show({
+      type: "error",
+      text1: "Error",
+      text2: "Could not store Expense, please try again!",
+    });
+    throw new Error(
+      "No tripid found in asyncStore! (storeExpenseOnlineOffline)"
+    );
+  }
   item.expense.tripid = tripid;
   if (online) {
     // store item online

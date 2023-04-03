@@ -38,6 +38,8 @@ import DatePickerModal from "../UI/DatePickerModal";
 import IconButton from "../UI/IconButton";
 import DatePickerContainer from "../UI/DatePickerContainer";
 import GradientButton from "../UI/GradientButton";
+import { StackActions } from "@react-navigation/native";
+import PropTypes from "prop-types";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
@@ -446,6 +448,11 @@ const TripForm = ({ navigation, route }) => {
 };
 
 export default TripForm;
+
+TripForm.propTypes = {
+  navigation: PropTypes.object,
+  route: PropTypes.object,
+};
 
 const styles = StyleSheet.create({
   form: {

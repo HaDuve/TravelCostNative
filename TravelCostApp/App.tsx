@@ -55,6 +55,7 @@ import {
   asyncStoreGetObject,
   asyncStoreSafeClear,
   asyncStoreSetItem,
+  asyncStoreSetObject,
 } from "./store/async-storage";
 import { truncateString } from "./util/string";
 import LoadingOverlay from "./components/UI/LoadingOverlay";
@@ -82,7 +83,6 @@ import {
 } from "./confApp";
 import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
 import Toast from "react-native-toast-message";
-import { offlineLoad } from "./components/ExpensesOutput/RecentExpensesUtil";
 import { useInterval } from "./components/Hooks/useInterval";
 import { isForeground } from "./util/appState";
 import { TourGuideProvider } from "rn-tourguide";
@@ -406,16 +406,54 @@ function Root() {
   // check regularly
   useInterval(
     () => {
+      // async function asyncLength() {
+      //   const expenses = await asyncStoreGetObject("expenses");
+      //   const length = expenses ? expenses.length : 0;
+      //   expenses ? console.log(" ~~~~~  asyncLength ~ length:", length) : null;
+      // }
       if (isForeground() && authCtx.isAuthenticated) {
         const asyncQueue = async () => {
           await sendOfflineQueue();
         };
         asyncQueue();
       }
+      // debug asyncstore expenses
+      // asyncLength();
+      // debug premium
+      // useEffect to track premium
+      // async function checkPremium() {
+      //   const isPremium = await userCtx.checkPremium();
+      //   Toast.show({
+      //     type: isPremium ? "success" : "error",
+      //     text1: "Premium Status",
+      //     text2: isPremium ? "Premium" : "Not Premium",
+      //   });
+      // }
+      // checkPremium();
     },
-    DEBUG_POLLING_INTERVAL * 1.7,
+    DEBUG_POLLING_INTERVAL * 1.01,
     false
   );
+
+  // useEffect to track isOnline
+  useEffect(() => {
+    async function listener() {
+      // only listen to isOnline if we dont have an offline queue
+      const queue = await asyncStoreGetObject("offlineQueue");
+      if (queue && queue.length > 0) {
+        return;
+      } else {
+        Toast.show({
+          type: userCtx.isOnline ? "success" : "error",
+          text1: "Status Update",
+          text2: userCtx.isOnline ? "Online" : "Offline",
+          visibilityTime: 1000,
+        });
+      }
+    }
+    listener();
+  }, [userCtx.isOnline]);
+
   async function setupOfflineMount(
     isOfflineMode: boolean,
     storedToken: string
@@ -551,7 +589,7 @@ function Root() {
         if (lastCurrency) userCtx.setLastCurrency(lastCurrency);
         tripCtx.setCurrentTrip(tripid, tripData);
         await asyncStoreSetItem("currentTripId", tripid);
-        const isLoaded = await offlineLoad(expensesCtx);
+        const isLoaded = await expensesCtx.loadExpensesFromStorage();
         console.log("onRootMount ~ isLoaded:", isLoaded);
         authCtx.authenticate(storedToken);
         await touchMyTraveler(tripid, storedUid);
@@ -567,11 +605,7 @@ function Root() {
     const test_onRootMount = dataResponseTime(onRootMount);
     test_onRootMount();
     // onRootMount();
-    return () => {
-      expensesCtx.saveExpensesInStorage(expensesCtx.expenses);
-      console.log("!onRootMount ~ !onRootMount END");
-    };
-  }, []);
+  }, [UserContext]);
 
   useLayoutEffect(() => {
     async function hideSplashScreen() {

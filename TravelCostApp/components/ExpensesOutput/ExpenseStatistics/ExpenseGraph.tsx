@@ -24,6 +24,7 @@ import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import { Expense } from "../../../util/expense";
 import PropTypes from "prop-types";
 import getSymbolFromCurrency from "currency-symbol-map";
+import { isForeground } from "../../../util/appState";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -35,6 +36,10 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
   const today = new Date();
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   function renderItemRef() {
+    return <> </>;
+  }
+  if (!isForeground) {
+    console.log("ExpenseGraph: not in foreground, return empty view");
     return <> </>;
   }
 
@@ -50,7 +55,7 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
   let budgetAxis = "";
   let budget = 0;
   let daysRange = 0;
-  const lastDays = 10;
+  const lastDays = 8;
   const lastWeeks = 10;
   const lastMonths = 10;
   const lastYears = 10;

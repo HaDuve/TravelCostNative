@@ -40,10 +40,7 @@ i18n.enableFallback = true;
 
 import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confApp";
-import {
-  fetchAndSetExpenses,
-  offlineLoad,
-} from "../components/ExpensesOutput/RecentExpensesUtil";
+import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpensesUtil";
 import { asyncStoreGetItem, asyncStoreSetItem } from "../store/async-storage";
 import { _toShortFormat } from "../util/dateTime";
 import { useFocusEffect } from "@react-navigation/native";
@@ -51,6 +48,7 @@ import { isForeground } from "../util/appState";
 import { TourGuideZone } from "rn-tourguide";
 import PropTypes from "prop-types";
 import { ExpenseData } from "../util/expense";
+import Toast from "react-native-toast-message";
 
 function RecentExpenses({ navigation }) {
   const expensesCtx = useContext(ExpensesContext);
@@ -75,7 +73,9 @@ function RecentExpenses({ navigation }) {
   const test_userCtx_checkConnectionUpdateUser = dataResponseTime(
     userCtx.checkConnectionUpdateUser
   );
-  const test_offlineLoad = dataResponseTime(offlineLoad);
+  const test_offlineLoad = dataResponseTime(
+    expensesCtx.loadExpensesFromStorage
+  );
   const test_fetchTravelerIsTouched = dataResponseTime(fetchTravelerIsTouched);
   const test_fetchAndSetExpenses = dataResponseTime(fetchAndSetExpenses);
 
@@ -135,16 +135,12 @@ function RecentExpenses({ navigation }) {
     // await userCtx.checkConnectionUpdateUser();
     // console.log("RecentExpenses ~ userCtx.isOnline:", userCtx.isOnline);
     if (!online) {
-      // if (!firstFocus) return;
+      if (!firstFocus) return;
       // setIsFetching(true);
-      // const loaded = await test_offlineLoad(
-      //   expensesCtx,
-      //   setRefreshing,
-      //   setIsFetching
-      // );
+      await test_offlineLoad(expensesCtx, setRefreshing, setIsFetching);
       // setIsFetching(false);
-      // setFirstFocus(false);
-      // return;
+      setFirstFocus(false);
+      return;
     }
     // checking isTouched or firstLoad
     const isTouched = await test_fetchTravelerIsTouched(tripid, uid);

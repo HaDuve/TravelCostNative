@@ -6,6 +6,8 @@ import { TripContext } from "../../store/trip-context";
 import { formatExpenseString } from "../../util/string";
 import PropTypes from "prop-types";
 import getSymbolFromCurrency from "currency-symbol-map";
+import { Pressable } from "react-native";
+import Toast from "react-native-toast-message";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
   const tripCtx = useContext(TripContext);
@@ -19,7 +21,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   const expensesSumString = formatExpenseString(expensesSum);
   const userCurrency = tripCtx.tripCurrency;
   const currencySymbol = getSymbolFromCurrency(userCurrency);
-  let dailyBudgetNum = Number(tripCtx.dailyBudget);
+  let budgetNumber = Number(tripCtx.dailyBudget);
   const expenseSumNum = Number(expensesSum);
   const totalBudget = Number(tripCtx.totalBudget);
   //TODO: change the dailybudget system to make calculating this unified
@@ -29,25 +31,25 @@ const ExpensesSummary = ({ expenses, periodName }) => {
       break;
     case "week":
       budgetMult = 7;
-      dailyBudgetNum = dailyBudgetNum * budgetMult;
+      budgetNumber = budgetNumber * budgetMult;
       break;
     case "month":
       budgetMult = 30;
-      dailyBudgetNum = dailyBudgetNum * budgetMult;
+      budgetNumber = budgetNumber * budgetMult;
 
       break;
     case "year":
       budgetMult = 365;
-      dailyBudgetNum = dailyBudgetNum * budgetMult;
+      budgetNumber = budgetNumber * budgetMult;
       break;
     case "total":
-      dailyBudgetNum = totalBudget;
+      budgetNumber = totalBudget;
       break;
     default:
       break;
   }
 
-  let budgetProgress = (expenseSumNum / dailyBudgetNum) * 1;
+  let budgetProgress = (expenseSumNum / budgetNumber) * 1;
   const budgetColor =
     budgetProgress <= 1
       ? GlobalStyles.colors.primary500
@@ -74,8 +76,28 @@ const ExpensesSummary = ({ expenses, periodName }) => {
     return <Text> Error: Not a Number </Text>;
   }
 
+  const pressBudgetHandler = () => {
+    // show Toast containing budget info
+    Toast.show({
+      type: budgetNumber > expenseSumNum ? "success" : "error",
+      position: "bottom",
+      text2:
+        budgetNumber > expenseSumNum
+          ? `You have ${(budgetNumber - expenseSumNum).toFixed(
+              2
+            )} ${currencySymbol} left to spend!`
+          : `You have exceeded your budget by ${(
+              expenseSumNum - budgetNumber
+            ).toFixed(2)} ${currencySymbol}`,
+      text1: `${
+        periodName.charAt(0).toUpperCase() + periodName.slice(1)
+      } Budget: ${budgetNumber} ${currencySymbol}`,
+      visibilityTime: 5000,
+    });
+  };
+
   return (
-    <View style={styles.container}>
+    <Pressable onPress={() => pressBudgetHandler()} style={styles.container}>
       <View style={styles.sumTextContainer}>
         <Text style={[styles.sum, { color: budgetColor }]}>
           {expensesSumString}
@@ -91,7 +113,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
         height={12}
         width={150}
       />
-    </View>
+    </Pressable>
   );
 };
 

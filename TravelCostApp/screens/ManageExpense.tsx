@@ -27,6 +27,7 @@ import { I18n } from "i18n-js";
 import { en, de, fr } from "../i18n/supportedLanguages";
 import { getCatString } from "../util/category";
 import PropTypes from "prop-types";
+import { asyncStoreSetObject } from "../store/async-storage";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -225,7 +226,7 @@ const ManageExpense = ({ route, navigation }) => {
         }
       }
       if (userCtx.isOnline) await touchAllTravelers(tripid, true);
-      await expenseCtx.saveExpensesInStorage(expenseCtx.expenses);
+      await asyncStoreSetObject("expenses", expenseCtx.expenses);
       navigation.navigate("RecentExpenses");
     } catch (error) {
       // setError("Could not save data - please try again later!" + error);

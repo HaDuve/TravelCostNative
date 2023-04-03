@@ -1,21 +1,25 @@
-import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { countryToAlpha2, countryToAlpha3 } from "country-to-iso";
+import { countryToAlpha2 } from "country-to-iso";
 import CountryFlag from "react-native-country-flag";
 import PropTypes from "prop-types";
-import { GlobalStyles } from "../../constants/styles";
+import { View } from "react-native";
 
-const ExpenseCountryFlag = ({ countryName, style }) => {
+const ExpenseCountryFlag = ({ countryName, style, containerStyle }) => {
   if (!countryName) return <></>;
   const countryCode = countryToAlpha2(countryName);
   if (!countryCode) return <></>;
-  return <CountryFlag isoCode={countryCode} size={20} style={[style]} />;
+  return (
+    <View style={containerStyle}>
+      <CountryFlag isoCode={countryCode} size={20} style={[style]} />
+    </View>
+  );
 };
 
 export default ExpenseCountryFlag;
 ExpenseCountryFlag.propTypes = {
-  countryName: PropTypes.string.isRequired,
+  countryName: PropTypes.string,
   style: PropTypes.object,
+  containerStyle: PropTypes.object,
 };
 
-const styles = StyleSheet.create({});
+// const styles = StyleSheet.create({});

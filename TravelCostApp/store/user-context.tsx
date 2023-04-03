@@ -149,9 +149,9 @@ function UserContextProvider({ children }) {
   }
 
   async function checkConnectionUpdateUser() {
-    // if app is not running on emulator, always set forceOffline to false
     let forceOffline = DEBUG_FORCE_OFFLINE;
     if (Device.isDevice) forceOffline = false;
+
     try {
       const newIsOnline = await checkInternetConnection(
         forceOffline
@@ -165,6 +165,38 @@ function UserContextProvider({ children }) {
       return newIsOnline;
     } catch (error) {
       console.log(error);
+
+      // Retry the check up to 3 times if the error is a timeout error
+      if (error.name === "TimeoutError") {
+        let retries = 3;
+        while (retries > 0) {
+          retries--;
+          console.log(`Retrying connection check (${retries} retries left)...`);
+          try {
+            const newIsOnline = await checkInternetConnection(
+              forceOffline
+                ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
+                : "https://www.google.com/",
+              2000,
+              true,
+              "HEAD"
+            );
+            setIsOnline(newIsOnline);
+            return newIsOnline;
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      }
+
+      // Display an error message to the user
+      Toast.show({
+        text1: "No internet connection",
+        text2: "Please check your connection and try again",
+        type: "error",
+      });
+
+      return false;
     }
   }
 

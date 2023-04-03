@@ -74,10 +74,12 @@ const ExpenseForm = ({
   const [defaultCatSymbol, setCatSymbol] = useState(iconName ? iconName : "");
   useEffect(() => {
     async function setCatSymbolAsync() {
+      if (!defaultValues) return;
       const cat = await getCatSymbol(defaultValues.category);
       setCatSymbol(cat);
     }
     setCatSymbolAsync();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [pickedCatSymbol, setCatSymbolPicked] = useState(

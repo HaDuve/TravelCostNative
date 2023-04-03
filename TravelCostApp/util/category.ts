@@ -56,12 +56,16 @@ export async function getCatSymbol(cat: string) {
     default: {
       // if not, return "help-outline"
       // check asyncstore for categoryList, if we find cat there, return iconName
-      const categoryList = await asyncStoreGetObject("categoryList");
-      if (categoryList) {
-        const catObj = categoryList.find((c) => c.name === cat);
-        if (catObj) {
-          return catObj.icon;
+      try {
+        const categoryList = await asyncStoreGetObject("categoryList");
+        if (categoryList) {
+          const catObj = categoryList.find((c) => c.name === cat);
+          if (catObj) {
+            return catObj.icon;
+          }
         }
+      } catch (error) {
+        return "help-outline";
       }
       return "help-outline";
     }

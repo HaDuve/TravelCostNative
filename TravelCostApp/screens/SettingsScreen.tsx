@@ -27,6 +27,8 @@ import { ENTITLEMENT_ID } from "../components/Premium/PremiumConstants";
 import PropTypes from "prop-types";
 import GradientButton from "../components/UI/GradientButton";
 import SettingsSection from "../components/UI/SettingsSection";
+import Toast from "react-native-toast-message";
+import { useEffect } from "react";
 
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
@@ -53,6 +55,8 @@ const SettingsScreen = ({ navigation }) => {
     React.useCallback(() => {
       // Do something when the screen is focused
       console.log("SettingsScreen ~ useFocusEffect");
+
+      // checking timezone in DEV MODE
       const timeZone =
         DateTime.now().setLocale(i18n.locale).toLocaleString({
           weekday: "short",
@@ -73,6 +77,16 @@ const SettingsScreen = ({ navigation }) => {
   const buttonstring1 = "Manage Premium Account";
   const buttonstring2 = "Become a Premium Nomad!";
 
+  // useEffect setPremium status from userContext.isPremium
+  useEffect(() => {
+    async function setPremiumNow() {
+      const isPremium = await userCtx.checkPremium();
+      // console.log("setPremiumNow ~ isPremium:", isPremium);
+      setPremiumStatus(isPremium);
+    }
+    setPremiumNow();
+  }, [userCtx, userCtx.isPremium]);
+
   const [premiumButtonString, setPremiumButtonString] = useState(
     premiumStatus ? buttonstring1 : buttonstring2
   );
@@ -80,7 +94,7 @@ const SettingsScreen = ({ navigation }) => {
     React.useCallback(() => {
       async function setPremiumNow() {
         const isPremium = await userCtx.checkPremium();
-        console.log("setPremiumNow ~ isPremium:", isPremium);
+        // console.log("setPremiumNow ~ isPremium:", isPremium);
         setPremiumStatus(isPremium);
         setPremiumButtonString(premiumStatus ? buttonstring1 : buttonstring2);
       }
@@ -197,7 +211,8 @@ const SettingsScreen = ({ navigation }) => {
         colors={GlobalStyles.gradientColorsButton}
         onPress={() => {
           console.log("pressed premium button");
-          if (!premiumStatus) navigation.navigate("Paywall");
+          if (premiumStatus) navigation.navigate("Profile");
+          else navigation.navigate("Paywall");
         }}
       >
         {premiumButtonString}

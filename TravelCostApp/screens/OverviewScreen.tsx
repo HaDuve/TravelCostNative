@@ -108,13 +108,10 @@ const styles = StyleSheet.create({
     zIndex: 10,
     marginTop: "6%",
     paddingHorizontal: "4%",
-    paddingBottom: "4%",
-
-    borderBottomWidth: 0,
-    borderBottomColor: GlobalStyles.colors.gray600,
+    marginBottom: "4%",
   },
   dropdownContainer: {
-    maxWidth: 160,
+    maxWidth: "50%",
     marginTop: "2%",
     elevation: 2,
     shadowColor: GlobalStyles.colors.textColor,

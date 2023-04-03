@@ -71,7 +71,7 @@ const ExpenseChart = ({
       <VictoryChart
         height={160}
         animate={{ duration: 500 }}
-        padding={{ top: 10, bottom: 30, left: 60, right: 55 }}
+        padding={{ top: 10, bottom: 30, left: 60, right: 30 }}
         domainPadding={{ x: [0, 25] }}
         // domain={{ y: [0, 2 * budget] }}
         containerComponent={<VictoryVoronoiContainer voronoiDimension="x" />}
@@ -111,7 +111,7 @@ const ExpenseChart = ({
           style={{
             data: {
               fill: ({ datum, active }) =>
-                active ? GlobalStyles.colors.primary200 : datum.fill,
+                active ? GlobalStyles.colors.gray500 : datum.fill,
               strokeWidth: ({ active }) => (active ? 1 : 0),
               stroke: ({ active }) =>
                 active ? GlobalStyles.colors.gray700 : "",

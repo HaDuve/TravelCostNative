@@ -14,8 +14,9 @@ import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
 import FlatButton from "../components/UI/FlatButton";
 import { GlobalStyles } from "../constants/styles";
 import Toast from "react-native-toast-message";
+import PropTypes from "prop-types";
 
-const FilteredExpenses = ({ route, navigation }) => {
+const FilteredExpenses = ({ route, navigation, isTraveller }) => {
   const { expenses, dayString } = route.params;
   // show error Toast if no data is passed
   if (!expenses || expenses.length < 1) {
@@ -40,6 +41,12 @@ const FilteredExpenses = ({ route, navigation }) => {
 };
 
 export default FilteredExpenses;
+
+FilteredExpenses.propTypes = {
+  route: PropTypes.object.isRequired,
+  navigation: PropTypes.object.isRequired,
+  isTraveller: PropTypes.bool,
+};
 
 const styles = StyleSheet.create({
   container: {

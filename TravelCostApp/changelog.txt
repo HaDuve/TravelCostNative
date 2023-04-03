@@ -1,5 +1,11 @@
 Change log Travel Expense App
 
+1.0.85
+- expense summary (header budget) is now touchable and shows information about the budget and money left
+- fixed alot of bugs (most were related to offline mode) and made it easier to fix them in the future
+- alot of debugging updates
+- you are now informed about being in online/offline mode (this is temporary)
+
 1.0.84
 - categories can be customized now
 - removed paywall restrictions until all bugs are fixed

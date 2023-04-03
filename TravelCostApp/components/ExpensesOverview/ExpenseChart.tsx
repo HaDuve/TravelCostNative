@@ -103,7 +103,7 @@ const ExpenseChart = ({
         <VictoryBar
           labelComponent={
             <VictoryTooltip
-              center={{ x: 178, y: 24 }}
+              center={{ x: 212, y: 14 }}
               renderInPortal={false}
               constrainToVisibleArea
             />

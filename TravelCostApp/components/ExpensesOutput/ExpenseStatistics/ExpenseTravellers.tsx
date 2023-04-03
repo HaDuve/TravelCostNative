@@ -87,13 +87,13 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
         // if it is the same, the expense has no calcAmount
         const hasCalcAmount = expense.calcAmount !== expense.amount;
         if (!hasCalcAmount) {
-          return sum + expense.calcAmount - split.amount;
+          return sum + split.amount;
         } else {
           // calculate the rate of the split
           const rate = expense.calcAmount / expense.amount;
           // calculate the amount of the split
           const splitAmount = split.amount * rate;
-          return sum + expense.calcAmount - splitAmount;
+          return sum + splitAmount;
         }
       }
     }, 0);

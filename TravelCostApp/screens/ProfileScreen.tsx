@@ -30,6 +30,13 @@ import { sleep } from "../util/appState";
 import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confApp";
 import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  asyncStoreGetItem,
+  asyncStoreGetObject,
+  asyncStoreSetItem,
+  asyncStoreSetObject,
+} from "../store/async-storage";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -60,8 +67,61 @@ const ProfileScreen = ({ navigation }) => {
 
   useFocusEffect(() => {
     if (tripsList.length > 0) return;
+    loadFromAsyncStore();
+    if (tripsList.length > 0) return;
     refreshHandler();
   });
+
+  async function loadFromAsyncStore() {
+    const tripid = await asyncStoreGetItem("PROFILE_tripid");
+    console.log("loadFromAsyncStore ~ tripid:", tripid);
+    const tripName = await asyncStoreGetItem("PROFILE_tripName");
+    console.log("loadFromAsyncStore ~ tripName:", tripName);
+    const totalBudget = await asyncStoreGetItem("PROFILE_totalBudget");
+    console.log("loadFromAsyncStore ~ totalBudget:", totalBudget);
+    const dailyBudget = await asyncStoreGetItem("PROFILE_dailyBudget");
+    console.log("loadFromAsyncStore ~ dailyBudget:", dailyBudget);
+    const tripCurrency = await asyncStoreGetItem("PROFILE_tripCurrency");
+    console.log("loadFromAsyncStore ~ tripCurrency:", tripCurrency);
+    const travellers = await asyncStoreGetObject("PROFILE_travellers");
+    console.log("loadFromAsyncStore ~ travellers:", travellers);
+    if (
+      !tripid ||
+      !tripName ||
+      !totalBudget ||
+      !dailyBudget ||
+      !tripCurrency ||
+      !travellers
+    ) {
+      console.log("not loaded!!!!!!!!!!!");
+      return;
+    }
+    allTripsList = allTripsList.filter((trip) => trip !== tripid);
+    allTripsList.push({
+      tripid: tripid,
+      tripName: tripName,
+      totalBudget: totalBudget,
+      dailyBudget: dailyBudget,
+      tripCurrency: tripCurrency,
+      travellers: travellers,
+    });
+    setTripsList(allTripsList.reverse());
+  }
+
+  async function saveTripFromContext() {
+    asyncStoreSetItem("PROFILE_tripid", tripCtx.tripid);
+    asyncStoreSetItem("PROFILE_tripName", tripCtx.tripName);
+    asyncStoreSetItem("PROFILE_totalBudget", tripCtx.totalBudget);
+    asyncStoreSetItem("PROFILE_dailyBudget", tripCtx.dailyBudget);
+    asyncStoreSetItem("PROFILE_tripCurrency", tripCtx.tripCurrency);
+    asyncStoreSetObject("PROFILE_travellers", tripCtx.travellers);
+  }
+  // tripid: tripCtx.tripid,
+  //     tripName: tripCtx.tripName,
+  //     totalBudget: tripCtx.totalBudget,
+  //     dailyBudget: tripCtx.dailyBudget,
+  //     tripCurrency: tripCtx.tripCurrency,
+  //     travellers: tripCtx.travellers,
 
   // refreshHandler() could be moved into TripContext to be loaded correctly
   async function refreshHandler() {
@@ -76,6 +136,7 @@ const ProfileScreen = ({ navigation }) => {
     allTripsList = [...tripHistory];
     await tripCtx.fetchAndSetCurrentTrip(tripCtx.tripid);
     addTripFromContext();
+    saveTripFromContext();
     // console.log("allTripsList length: ", allTripsList.length);
     setTripsList(allTripsList.reverse());
   }
@@ -273,8 +334,9 @@ const styles = StyleSheet.create({
   },
   tripContainer: {
     flex: 1,
-    minHeight: "40%",
+    minHeight: "68%",
     margin: 16,
+    marginBottom: -100,
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   horizontalContainer: {
@@ -286,6 +348,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    // make it appear behind the triplist
+    // zIndex: -1,
   },
   newTripButtonContainer: {
     flexDirection: "row",
@@ -329,7 +393,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: "4%",
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 0,
+    zIndex: -1,
     flexDirection: "row",
 
     elevation: 2,

@@ -13,6 +13,7 @@ import {
   updateTripHistory,
   updateTrip,
   deleteTrip,
+  getAllExpenses,
 } from "../../util/http";
 import * as Updates from "expo-updates";
 
@@ -237,7 +238,15 @@ const TripForm = ({ navigation, route }) => {
     if (isEditing) {
       await updateTrip(editedTripId, tripData);
       if (editedTripId === tripCtx.tripid || setActive) {
-        await tripCtx.fetchAndSetCurrentTrip(editedTripId);
+        updateUser(uid, {
+          currentTrip: editedTripId,
+        });
+        tripCtx.setCurrentTrip(editedTripId, tripData);
+        tripCtx.setCurrentTravellers(editedTripId);
+        userCtx.setFreshlyCreatedTo(false);
+        const expenses = await getAllExpenses(editedTripId, uid);
+        expenseCtx.setExpenses(expenses);
+        await Updates.reloadAsync();
       }
       tripCtx.refresh();
       navigation.pop();
@@ -266,11 +275,12 @@ const TripForm = ({ navigation, route }) => {
       userCtx.setNeedsTour(true);
     }
     userCtx.setFreshlyCreatedTo(false);
+    // restart app with Updates
+    await Updates.reloadAsync();
+    // expenseCtx.setExpenses([]);
 
-    expenseCtx.setExpenses([]);
-
-    tripCtx.refresh();
-    navigation.navigate("Profile");
+    // tripCtx.refresh();
+    // navigation.navigate("Profile");
   }
 
   function updateCurrency() {

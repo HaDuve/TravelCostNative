@@ -234,7 +234,11 @@ const ExpenseForm = ({
       isValid: true,
     },
     country: {
-      value: defaultValues ? defaultValues.country : "",
+      value: defaultValues
+        ? defaultValues.country
+        : UserCtx.lastCountry
+        ? UserCtx.lastCountry
+        : "",
       isValid: true,
     },
     currency: {
@@ -422,7 +426,7 @@ const ExpenseForm = ({
       endDate: DateTime.fromISO(endDate).toJSDate(),
       description: getCatString(pickedCat),
       category: pickedCat,
-      country: UserCtx.lastCountry ? UserCtx.lastCountry : UserCtx.homeCountry,
+      country: UserCtx.lastCountry ? UserCtx.lastCountry : "",
       currency: UserCtx.lastCurrency
         ? UserCtx.lastCurrency
         : TripCtx.tripCurrency,

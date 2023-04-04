@@ -50,6 +50,8 @@ import DatePickerContainer from "../UI/DatePickerContainer";
 import PropTypes from "prop-types";
 import GradientButton from "../UI/GradientButton";
 import getSymbolFromCurrency from "currency-symbol-map";
+import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
+import CountryFlag from "react-native-country-flag";
 
 const ExpenseForm = ({
   onCancel,
@@ -507,10 +509,32 @@ const ExpenseForm = ({
 
   function updateCurrency() {
     // split the countryValue into country and currency
-    const currency = countryValue.split("- ")[1].split(" ")[0];
-    const country = countryValue.split("- ")[0];
+    const currency = countryValue.split("- ")[1].split(" ")[0].trim();
+    const country = countryValue.split("- ")[0].trim();
     inputChangedHandler("currency", currency);
-    inputChangedHandler("country", country);
+    Alert.alert(
+      "Change the country aswell?",
+      "This will change the country to " +
+        country +
+        ". Otherwise, only the currency will be changed to " +
+        currency +
+        " | " +
+        getSymbolFromCurrency(currency) +
+        ".",
+      [
+        {
+          text: "Currency only",
+          onPress: () => false,
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: () => {
+            inputChangedHandler("country", country);
+          },
+        },
+      ]
+    );
   }
   const formIsInvalid =
     !inputs.amount.isValid ||
@@ -608,6 +632,17 @@ const ExpenseForm = ({
           {/* toggleable content */}
           {!hideAdvanced && (
             <>
+              <Input
+                label={i18n.t("descriptionLabel")}
+                style={{ marginTop: "6%" }}
+                placeholder={pickedCat}
+                textInputConfig={{
+                  onChangeText: inputChangedHandler.bind(this, "description"),
+                  value: inputs.description.value,
+                  // multiline: true,
+                }}
+                invalid={!inputs.description.isValid}
+              />
               <View style={styles.currencyContainer}>
                 {/* <Text style={styles.currencyLabel}>
                 {i18n.t("currencyLabel")}
@@ -625,16 +660,25 @@ const ExpenseForm = ({
                   }
                 ></CurrencyPicker>
               </View>
-              <Input
-                label={i18n.t("descriptionLabel")}
-                placeholder={pickedCat}
-                textInputConfig={{
-                  onChangeText: inputChangedHandler.bind(this, "description"),
-                  value: inputs.description.value,
-                  // multiline: true,
-                }}
-                invalid={!inputs.description.isValid}
-              />
+              <View style={[styles.inputsRowSecond]}>
+                <Input
+                  label={i18n.t("countryLabel")}
+                  style={{ minWidth: "60%" }}
+                  placeholder={
+                    UserCtx.lastCountry ?? i18n.t("countryPlaceholder")
+                  }
+                  textInputConfig={{
+                    onChangeText: inputChangedHandler.bind(this, "country"),
+                    value: inputs.country.value,
+                  }}
+                  invalid={!inputs.country.isValid}
+                />
+                <ExpenseCountryFlag
+                  countryName={inputs.country.value}
+                  containerStyle={styles.countryFlagContainer}
+                  style={styles.countryFlag}
+                ></ExpenseCountryFlag>
+              </View>
 
               <View style={styles.dateLabel}>
                 <Text style={styles.dateLabelText}>
@@ -939,6 +983,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignContent: "stretch",
   },
+  countryFlagContainer: {
+    marginRight: "5%",
+    marginTop: 20,
+  },
+  countryFlag: {
+    width: 60,
+    height: 40,
+    borderRadius: 4,
+  },
+
   topCurrencyPressableContainer: {
     padding: 8,
     marginLeft: -120,

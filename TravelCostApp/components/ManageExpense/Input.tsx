@@ -1,6 +1,7 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { Keyboard, StyleSheet, Text, TextInput, View } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
+import PropTypes from "prop-types";
 
 const Input = ({
   label,
@@ -48,6 +49,18 @@ const Input = ({
 };
 
 export default Input;
+
+Input.propTypes = {
+  label: PropTypes.string.isRequired,
+  style: PropTypes.object,
+  textInputConfig: PropTypes.object.isRequired,
+  invalid: PropTypes.bool,
+  autoFocus: PropTypes.bool,
+  inputStyle: PropTypes.object,
+  placeholder: PropTypes.string,
+  editable: PropTypes.bool,
+  selectTextOnFocus: PropTypes.bool,
+};
 
 const styles = StyleSheet.create({
   inputContainer: {

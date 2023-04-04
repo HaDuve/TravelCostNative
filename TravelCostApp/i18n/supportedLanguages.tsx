@@ -67,6 +67,7 @@ const en = {
   baseCurrency: "Base currency",
   descriptionLabel: "Description",
   dateLabel: "Date",
+  countryLabel: "Country",
 
   // Modal Titles
   editExp: "Edit Expense",

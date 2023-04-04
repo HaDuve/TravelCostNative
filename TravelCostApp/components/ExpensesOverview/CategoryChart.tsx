@@ -15,9 +15,15 @@ import Animated, {
 } from "react-native-reanimated";
 import { getCatString } from "../../util/category";
 import PropTypes from "prop-types";
+import { useContext } from "react";
+import { TripContext } from "../../store/trip-context";
+import getSymbolFromCurrency from "currency-symbol-map";
 
 const CategoryChart = ({ inputData }) => {
+  const tripCtx = useContext(TripContext);
+  const tripCurrency = tripCtx.tripCurrency;
   const [useDummyData, setUseDummyData] = useState(true);
+
   let chartDataForRender = Array.from(inputData);
   // this little trick is necessary to make the pie animate on load.  For the very first render, pare down
   // the chartData array to just one element, then, for all future renders, use the fully array
@@ -50,14 +56,16 @@ const CategoryChart = ({ inputData }) => {
         }}
         labelComponent={
           <VictoryTooltip
-            center={{ x: 184, y: 94 }}
+            center={{ x: 207, y: 96 }}
             constrainToVisibleArea
             renderInPortal={false}
             pointerLength={0}
           />
         }
         labels={({ datum }) => {
-          return getCatString(datum.x);
+          return `${getCatString(datum.x)} ${Number(datum.y).toFixed(
+            2
+          )} ${getSymbolFromCurrency(tripCurrency)}`;
           // return `${datum.x[0].toUpperCase()}${datum.x.slice(1)}`;
         }}
       />

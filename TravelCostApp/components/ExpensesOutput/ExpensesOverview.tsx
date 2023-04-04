@@ -45,7 +45,6 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
     //   navigation.navigate("Paywall");
     //   return;
     // }
-
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setToggleGraph(!toggleGraph);
   }

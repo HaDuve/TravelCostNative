@@ -21,6 +21,7 @@ import ExpenseCountries from "./ExpenseStatistics/ExpenseCountries";
 import ExpenseTravellers from "./ExpenseStatistics/ExpenseTravellers";
 import IconButton from "../UI/IconButton";
 import { FadeInRight, FadeOutLeft } from "react-native-reanimated";
+import ExpenseCurrencies from "./ExpenseStatistics/ExpenseCurrencies";
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -34,7 +35,7 @@ import Animated, {
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const [toggleGraph, setToggleGraph] = useState(true);
-  // enum =>  0 = categories, 1 = traveller, 2= country
+  // enum =>  0 = categories, 1 = traveller, 2 = country, 3 = currency
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
   const userCtx = useContext(UserContext);
 
@@ -84,7 +85,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setToggleGraphEnum(
-                  toggleGraphEnum == 0 ? 2 : toggleGraphEnum - 1
+                  toggleGraphEnum == 0 ? 3 : toggleGraphEnum - 1
                 );
               }}
               color={GlobalStyles.colors.primaryGrayed}
@@ -106,6 +107,11 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
             <Text style={styles.titleText}> Countries </Text>
           </Animated.View>
         )}
+        {!toggleGraph && toggleGraphEnum == 3 && (
+          <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
+            <Text style={styles.titleText}> Currencies </Text>
+          </Animated.View>
+        )}
         {!toggleGraph && (
           <Animated.View
             entering={FadeInRight}
@@ -119,7 +125,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
                 setToggleGraphEnum(
-                  toggleGraphEnum == 2 ? 0 : toggleGraphEnum + 1
+                  toggleGraphEnum == 3 ? 0 : toggleGraphEnum + 1
                 );
               }}
               color={GlobalStyles.colors.primaryGrayed}
@@ -155,6 +161,13 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           periodName={periodName}
           navigation={navigation}
         ></ExpenseCountries>
+      )}
+      {!toggleGraph && toggleGraphEnum == 3 && (
+        <ExpenseCurrencies
+          expenses={expenses}
+          periodName={periodName}
+          navigation={navigation}
+        ></ExpenseCurrencies>
       )}
 
       <View

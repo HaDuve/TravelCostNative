@@ -20,7 +20,7 @@ import { getCatString } from "../../../util/category";
 import PropTypes from "prop-types";
 import { ExpenseData } from "../../../util/expense";
 
-const ExpenseCountries = ({ expenses, periodName, navigation }) => {
+const ExpenseCurrencies = ({ expenses, periodName, navigation }) => {
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
 
   if (!expenses)
@@ -32,19 +32,15 @@ const ExpenseCountries = ({ expenses, periodName, navigation }) => {
 
   const countryList = [];
   expenses.forEach((expense: ExpenseData) => {
-    let countryName = expense.country;
-    if (!countryName || !countryName.trim())
-      countryName = "Worldwide / Unknown";
-    if (!countryList.includes(countryName)) {
-      countryList.push(countryName);
+    const currencyName = expense.currency;
+    if (!countryList.includes(currencyName)) {
+      countryList.push(currencyName);
     }
   });
 
-  function getAllExpensesWithCat(country: string) {
+  function getAllExpensesWithCat(currency: string) {
     return expenses.filter((expense: ExpenseData) => {
-      if (country == "Worldwide / Unknown")
-        return !expense.country || !expense.country.trim();
-      return expense.country === country;
+      return expense.currency === currency;
     });
   }
 
@@ -135,9 +131,9 @@ const ExpenseCountries = ({ expenses, periodName, navigation }) => {
   );
 };
 
-export default ExpenseCountries;
+export default ExpenseCurrencies;
 
-ExpenseCountries.propTypes = {
+ExpenseCurrencies.propTypes = {
   expenses: PropTypes.array,
   periodName: PropTypes.string,
   navigation: PropTypes.object,

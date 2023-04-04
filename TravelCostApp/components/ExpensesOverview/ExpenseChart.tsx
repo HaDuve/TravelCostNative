@@ -93,11 +93,9 @@ const ExpenseChart = ({
               label: `Budget: ${budget} ${getSymbolFromCurrency(currency)}`,
             },
             {
-              x: DateTime.now()
-                .set({ hour: 12, minute: 0, millisecond: 0 })
-                .toJSDate(),
+              x: DateTime.now().toJSDate(),
               y: Number(budget),
-              label: `Budget: ${budget} ${getSymbolFromCurrency(currency)}`,
+              // label: `Budget: ${budget} ${getSymbolFromCurrency(currency)}`,
             },
           ]}
           standalone={false}

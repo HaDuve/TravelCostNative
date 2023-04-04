@@ -29,12 +29,13 @@ import { getCatString } from "../../../util/category";
 import PropTypes from "prop-types";
 
 const ExpenseCategories = ({ expenses, periodName, navigation }) => {
+  console.log("ExpenseCategories ~ expenses:", expenses);
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
 
   if (!expenses)
     return (
       <View style={styles.container}>
-        <Text>{i18n.t("fallbackTextExpenses")}</Text>;
+        <Text>{i18n.t("fallbackTextExpenses")}</Text>
       </View>
     );
 
@@ -130,7 +131,7 @@ const ExpenseCategories = ({ expenses, periodName, navigation }) => {
         ListFooterComponent={<View style={{ height: 100 }}></View>}
         ListEmptyComponent={
           <View style={styles.fallbackTextContainer}>
-            <Text>{i18n.t("fallbackTextExpenses")}</Text>;
+            <Text>{i18n.t("fallbackTextExpenses")}</Text>
           </View>
         }
       />

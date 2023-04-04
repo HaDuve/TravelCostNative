@@ -4,6 +4,7 @@ import React from "react";
 import TripItem from "./TripItem";
 import { GlobalStyles } from "../../constants/styles";
 import LoadingOverlay from "../UI/LoadingOverlay";
+import PropTypes from "prop-types";
 
 function TripList({ trips, refreshControl, setRefreshing }) {
   if (!trips || trips.length < 1) return <LoadingOverlay></LoadingOverlay>;
@@ -43,3 +44,9 @@ function TripList({ trips, refreshControl, setRefreshing }) {
 }
 
 export default TripList;
+
+TripList.propTypes = {
+  trips: PropTypes.array,
+  refreshControl: PropTypes.object,
+  setRefreshing: PropTypes.func,
+};

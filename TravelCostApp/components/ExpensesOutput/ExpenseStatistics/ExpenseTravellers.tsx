@@ -29,7 +29,7 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
   if (!expenses)
     return (
       <View style={styles.container}>
-        <Text>{i18n.t("fallbackTextExpenses")}</Text>;
+        <Text>{i18n.t("fallbackTextExpenses")}</Text>
       </View>
     );
 
@@ -191,7 +191,7 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
         ListFooterComponent={<View style={{ height: 100 }}></View>}
         ListEmptyComponent={
           <View style={styles.fallbackTextContainer}>
-            <Text>{i18n.t("fallbackTextExpenses")}</Text>;
+            <Text>{i18n.t("fallbackTextExpenses")}</Text>
           </View>
         }
       />

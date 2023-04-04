@@ -11,7 +11,7 @@ export interface ExpenseData {
   amount: number;
   date: string;
   category: string;
-  country: string;
+  country?: string;
   currency: string;
   whoPaid: string;
   owePerc: number;

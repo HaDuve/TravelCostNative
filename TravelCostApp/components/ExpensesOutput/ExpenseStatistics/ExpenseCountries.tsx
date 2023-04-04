@@ -30,11 +30,11 @@ const ExpenseCountries = ({ expenses, periodName, navigation }) => {
       </View>
     );
 
+  const fallbackCountry = "Worldwide / Unknown";
   const countryList = [];
   expenses.forEach((expense: ExpenseData) => {
-    let countryName = expense.country;
-    if (!countryName || !countryName.trim())
-      countryName = "Worldwide / Unknown";
+    let countryName = expense.country?.trim();
+    if (!countryName || !countryName.trim()) countryName = fallbackCountry;
     if (!countryList.includes(countryName)) {
       countryList.push(countryName);
     }
@@ -42,9 +42,9 @@ const ExpenseCountries = ({ expenses, periodName, navigation }) => {
 
   function getAllExpensesWithCat(country: string) {
     return expenses.filter((expense: ExpenseData) => {
-      if (country == "Worldwide / Unknown")
+      if (country == fallbackCountry)
         return !expense.country || !expense.country.trim();
-      return expense.country === country;
+      return expense.country?.trim() === country;
     });
   }
 

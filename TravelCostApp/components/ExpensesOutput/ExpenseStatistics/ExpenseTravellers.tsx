@@ -68,35 +68,37 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
 
   function getSumExpenses(expenses, traveller) {
     // return the sum of expenses for a given traveller
-    // sum up either the expense.calcAmount if no splitlist exists
-    // or the expense.calcAmount - split.amount if a splitlist exists
-    const expensesSum = expenses.reduce((sum, expense: ExpenseData) => {
-      const hasSplits = expense.splitList && expense.splitList?.length !== 0;
+    const expensesSum = expenses.reduce((sum: number, expense: ExpenseData) => {
+      const hasSplits = expense.splitList && expense.splitList.length > 0;
       if (!hasSplits) {
         const correct = traveller == expense.whoPaid;
         if (!correct) return sum;
-        return sum + expense.calcAmount;
+        if (!expense.calcAmount) return sum + Number(expense.amount);
+        return sum + Number(expense.calcAmount);
       } else {
         const split = expense.splitList.find(
           (split) => split.userName === traveller
         );
         const correct = split;
-        if (!correct) return sum;
+        if (!correct || !split) return sum;
 
         // check if the expense has a calcAmount by comparing it to the amount
         // if it is the same, the expense has no calcAmount
-        const hasCalcAmount = expense.calcAmount !== expense.amount;
-        if (!hasCalcAmount) {
-          return sum + split.amount;
+        if (!expense.calcAmount || !expense.amount)
+          return sum + Number(split.amount);
+        const hasConversionRate = expense.calcAmount !== expense.amount;
+        if (!hasConversionRate) {
+          return sum + Number(split.amount);
         } else {
           // calculate the rate of the split
           const rate = expense.calcAmount / expense.amount;
           // calculate the amount of the split
           const splitAmount = split.amount * rate;
-          return sum + splitAmount;
+          return sum + Number(splitAmount);
         }
       }
     }, 0);
+    console.log("getSumExpenses ~ expensesSum:", expensesSum);
     return expensesSum;
   }
 
@@ -107,7 +109,7 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
     }, 0);
     return expensesSum;
   }
-  const totalSum = getSumAllExpenses(expenses);
+  const totalSum = Number(getSumAllExpenses(expenses)).toFixed(2);
 
   const catSumCat = [];
   const dataList = [];
@@ -116,7 +118,10 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
     const catExpenses = getAllExpensesWithTraveller(
       travellerList[travellerIndex]
     );
-    const sumCat = getSumExpenses(catExpenses, travellerList[travellerIndex]);
+    const sumCat = Number(
+      getSumExpenses(catExpenses, travellerList[travellerIndex])
+    );
+    console.log("ExpenseTravellers ~ sumCat:", sumCat);
     catSumCat.push({
       cat: travellerList[travellerIndex],
       sumCat: sumCat,
@@ -126,6 +131,8 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
   }
 
   function renderItem(itemData) {
+    console.log("renderItem ~ totalSum:", totalSum);
+    console.log("renderItem ~ itemData.item.sumCat:", itemData.item.sumCat);
     return (
       <Pressable
         style={({ pressed }) => [

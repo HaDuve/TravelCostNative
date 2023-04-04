@@ -409,10 +409,14 @@ const ExpenseForm = ({
     }
 
     // update lastcountry and lastcurrency
-    UserCtx.setLastCountry(inputs.country.value);
-    await asyncStoreSetItem("lastCountry", inputs.country.value);
-    UserCtx.setLastCurrency(inputs.currency.value);
-    await asyncStoreSetItem("lastCurrency", inputs.currency.value);
+    if (inputs.country.value && inputs.country.value !== "") {
+      UserCtx.setLastCountry(inputs.country.value);
+      await asyncStoreSetItem("lastCountry", inputs.country.value);
+    }
+    if (inputs.currency.value && inputs.currency.value !== "") {
+      UserCtx.setLastCurrency(inputs.currency.value);
+      await asyncStoreSetItem("lastCurrency", inputs.currency.value);
+    }
     onSubmit(expenseData);
   }
 

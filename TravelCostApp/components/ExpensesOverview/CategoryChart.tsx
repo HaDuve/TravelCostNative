@@ -4,6 +4,7 @@ import { VictoryPie, VictoryTooltip } from "victory-native";
 import { GlobalStyles } from "../../constants/styles";
 import Animated, {
   FadeInRight,
+  FadeOut,
   FadeOutLeft,
   ZoomIn,
   ZoomInEasyUp,
@@ -28,7 +29,7 @@ const CategoryChart = ({ inputData }) => {
   }
 
   return (
-    <Animated.View exiting={ZoomOut} entering={ZoomIn} style={styles.container}>
+    <Animated.View exiting={FadeOut} entering={ZoomIn} style={styles.container}>
       <VictoryPie
         data={chartDataForRender}
         height={200}
@@ -76,6 +77,8 @@ const styles = StyleSheet.create({
     padding: 4,
     justifyContent: "center",
     alignItems: "center",
+    marginHorizontal: "25%",
+    borderRadius: 9999,
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
 });

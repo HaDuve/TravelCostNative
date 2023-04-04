@@ -6,7 +6,14 @@ import { getCatString, getCatSymbol } from "../../../util/category";
 import { useContext } from "react";
 import { TripContext } from "../../../store/trip-context";
 import { formatExpenseString } from "../../../util/string";
-import Animated, { FadeInRight } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  FadeInRight,
+  ZoomIn,
+  ZoomInEasyDown,
+  ZoomInEasyUp,
+  ZoomInRotate,
+} from "react-native-reanimated";
 import PropTypes from "prop-types";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { useEffect } from "react";
@@ -30,7 +37,7 @@ const CategoryProgressBar = ({
       iconOverride && setCatSymbol(iconOverride);
     }
     setCatSymbolAsync();
-  }, []);
+  }, [cat, iconOverride]);
 
   const budgetColor = color;
   const unfilledColor = GlobalStyles.colors.gray500Accent;
@@ -45,7 +52,7 @@ const CategoryProgressBar = ({
     return <></>;
   }
   return (
-    <Animated.View entering={FadeInRight} style={styles.container}>
+    <Animated.View entering={ZoomIn} style={styles.container}>
       <View style={styles.titleRow}>
         <Ionicons name={catSymbol} size={30} color={color} />
         <Text style={[styles.sum, { color: budgetColor, marginLeft: 8 }]}>

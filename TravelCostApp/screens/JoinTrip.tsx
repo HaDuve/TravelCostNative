@@ -115,8 +115,8 @@ const JoinTrip = ({ navigation, route }) => {
     if (joinTripid.length > 25) {
       // find the tripid from long string
       // we are assuming this link has the following form
-      // "--/join/[tripid]"
-      const index_start1 = joinTripid.indexOf("--");
+      // "://join/[tripid]"
+      const index_start1 = joinTripid.indexOf("://join/");
       const final_link_string = joinTripid.slice(index_start1 + 8);
       console.log("joinLinkHandler ~ final_link_string:", final_link_string);
       setJoinTripid(final_link_string);

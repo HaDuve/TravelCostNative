@@ -1,5 +1,18 @@
 Change log Travel Expense App
 
+1.0.88
+- fix join link copypasta
+- improved category chart animations and tooltips
+- tweaked expense chart
+- use last country as a reference for new expenses
+- fixed a bug with saving last country
+- improved currency pie chart
+- added country pie chart
+- fixed some chart bugs
+- fixed long loading of profile trips
+- added keyboardavoiding view to tripform
+- fixed new user experience and some crashes
+
 1.0.87
 - improved expense graph design
 - improved dropdown layout

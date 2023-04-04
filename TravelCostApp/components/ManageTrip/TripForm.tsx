@@ -313,146 +313,159 @@ const TripForm = ({ navigation, route }) => {
   return (
     <>
       {datepickerJSX}
+      <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
+        <View style={styles.form}>
+          <View style={styles.card}>
+            <Text style={styles.title}>{titleString}</Text>
 
-      <View style={styles.form}>
-        <View style={styles.card}>
-          <Text style={styles.title}>{titleString}</Text>
-
-          <Input
-            label={i18n.t("tripNameLabel")}
-            style={{ flex: 1 }}
-            inputStyle={{}}
-            textInputConfig={{
-              onChangeText: inputChangedHandler.bind(this, "tripName"),
-              value: inputs.tripName.value,
-            }}
-            invalid={!inputs.tripName.isValid}
-            autoFocus={false}
-          />
-
-          {currencyView}
-
-          <View style={styles.categoryRow}>
-            {/* TODO: add recalculate button */}
             <Input
-              label={`${i18n.t("totalBudgetLabel")} ${
-                inputs.tripCurrency.value
-              }`}
+              label={i18n.t("tripNameLabel")}
               style={{ flex: 1 }}
               inputStyle={{}}
-              autoFocus={false}
               textInputConfig={{
-                keyboardType: "decimal-pad",
-                onChangeText: inputChangedHandler.bind(this, "totalBudget"),
-                value: inputs.totalBudget.value,
+                onChangeText: inputChangedHandler.bind(this, "tripName"),
+                value: inputs.tripName.value,
               }}
-              invalid={!inputs.totalBudget.isValid}
-            />
-            <IconButton
-              icon="ios-git-compare-outline"
-              color={GlobalStyles.colors.primary500}
-              size={36}
-              onPress={() => {
-                console.log("recalculate");
-                console.log("Start Date:", startDate);
-                console.log("End Date:", endDate);
-                const diffDays =
-                  daysBetween(new Date(endDate), new Date(startDate)) + 1;
-                console.log("Days:", diffDays);
-                const calcTotalBudget =
-                  Number(inputs.dailyBudget.value) * diffDays;
-                console.log("Total calc:", calcTotalBudget);
-                inputChangedHandler("totalBudget", calcTotalBudget.toString());
-              }}
-            />
-          </View>
-          <View style={styles.categoryRow}>
-            <Input
-              style={{ flex: 1 }}
-              inputStyle={{}}
+              invalid={!inputs.tripName.isValid}
               autoFocus={false}
-              label={`${i18n.t("dailyBudgetLabel")} ${
-                inputs.tripCurrency.value
-              }`}
-              textInputConfig={{
-                keyboardType: "decimal-pad",
-                onChangeText: inputChangedHandler.bind(this, "dailyBudget"),
-                value: inputs.dailyBudget.value,
-              }}
-              invalid={!inputs.dailyBudget.isValid}
             />
-            <IconButton
-              icon="ios-git-compare-outline"
-              color={GlobalStyles.colors.primary500}
-              size={36}
-              onPress={() => {
-                console.log("recalculate");
-                console.log("Start Date:", startDate);
-                console.log("End Date:", endDate);
-                const diffDays =
-                  daysBetween(new Date(endDate), new Date(startDate)) + 1;
-                console.log("Days:", diffDays);
-                const calcDailyBudget = (
-                  Number(inputs.totalBudget.value) / diffDays
-                ).toFixed(2);
-                console.log("Daily calc:", calcDailyBudget);
-                inputChangedHandler("dailyBudget", calcDailyBudget.toString());
-              }}
-            />
-          </View>
-          <Text style={[styles.label, { marginLeft: "5%" }]}>
-            {i18n.t("datePickerLabel")}
-          </Text>
-          {DatePickerContainer({
-            openDatePickerRange,
-            startDate,
-            endDate,
-            dateIsRanged: true,
-          })}
-        </View>
-        {/* Add Currency Input field */}
-        <View style={styles.buttonContainer}>
-          <FlatButton onPress={cancelHandler}>{i18n.t("cancel")}</FlatButton>
-          {!isEditing ? (
-            <GradientButton
-              buttonStyle={{}}
-              style={styles.button}
-              onPress={submitHandler.bind(this, true /* setActive */)}
-            >
-              {i18n.t("confirm2")}
-            </GradientButton>
-          ) : (
-            <FlatButton
-              onPress={submitHandler.bind(this, false /* setActive */)}
-            >
-              {i18n.t("saveChanges")}
-            </FlatButton>
-          )}
-        </View>
-        {/* Horizontal container */}
 
-        <View style={styles.buttonContainer}>
-          {isEditing && (
-            <GradientButton
-              buttonStyle={{ backgroundColor: GlobalStyles.colors.error300 }}
-              style={[styles.button, { marginBottom: 8, marginHorizontal: 24 }]}
-              onPress={deleteHandler}
-              colors={GlobalStyles.gradientErrorButton}
-            >
-              {i18n.t("deleteTrip")}
-            </GradientButton>
-          )}
-          {isEditing && (
-            <GradientButton
-              buttonStyle={{}}
-              style={[styles.button, { marginBottom: 8, marginHorizontal: 24 }]}
-              onPress={submitHandler.bind(this, true /* setActive */)}
-            >
-              {i18n.t("setActive")}
-            </GradientButton>
-          )}
+            {currencyView}
+
+            <View style={styles.categoryRow}>
+              {/* TODO: add recalculate button */}
+              <Input
+                label={`${i18n.t("totalBudgetLabel")} ${
+                  inputs.tripCurrency.value
+                }`}
+                style={{ flex: 1 }}
+                inputStyle={{}}
+                autoFocus={false}
+                textInputConfig={{
+                  keyboardType: "decimal-pad",
+                  onChangeText: inputChangedHandler.bind(this, "totalBudget"),
+                  value: inputs.totalBudget.value,
+                }}
+                invalid={!inputs.totalBudget.isValid}
+              />
+              <IconButton
+                icon="ios-git-compare-outline"
+                color={GlobalStyles.colors.primary500}
+                size={36}
+                onPress={() => {
+                  console.log("recalculate");
+                  console.log("Start Date:", startDate);
+                  console.log("End Date:", endDate);
+                  const diffDays =
+                    daysBetween(new Date(endDate), new Date(startDate)) + 1;
+                  console.log("Days:", diffDays);
+                  const calcTotalBudget =
+                    Number(inputs.dailyBudget.value) * diffDays;
+                  console.log("Total calc:", calcTotalBudget);
+                  inputChangedHandler(
+                    "totalBudget",
+                    calcTotalBudget.toString()
+                  );
+                }}
+              />
+            </View>
+            <View style={styles.categoryRow}>
+              <Input
+                style={{ flex: 1 }}
+                inputStyle={{}}
+                autoFocus={false}
+                label={`${i18n.t("dailyBudgetLabel")} ${
+                  inputs.tripCurrency.value
+                }`}
+                textInputConfig={{
+                  keyboardType: "decimal-pad",
+                  onChangeText: inputChangedHandler.bind(this, "dailyBudget"),
+                  value: inputs.dailyBudget.value,
+                }}
+                invalid={!inputs.dailyBudget.isValid}
+              />
+              <IconButton
+                icon="ios-git-compare-outline"
+                color={GlobalStyles.colors.primary500}
+                size={36}
+                onPress={() => {
+                  console.log("recalculate");
+                  console.log("Start Date:", startDate);
+                  console.log("End Date:", endDate);
+                  const diffDays =
+                    daysBetween(new Date(endDate), new Date(startDate)) + 1;
+                  console.log("Days:", diffDays);
+                  const calcDailyBudget = (
+                    Number(inputs.totalBudget.value) / diffDays
+                  ).toFixed(2);
+                  console.log("Daily calc:", calcDailyBudget);
+                  inputChangedHandler(
+                    "dailyBudget",
+                    calcDailyBudget.toString()
+                  );
+                }}
+              />
+            </View>
+            <Text style={[styles.label, { marginLeft: "5%" }]}>
+              {i18n.t("datePickerLabel")}
+            </Text>
+            {DatePickerContainer({
+              openDatePickerRange,
+              startDate,
+              endDate,
+              dateIsRanged: true,
+            })}
+          </View>
+          {/* Add Currency Input field */}
+          <View style={styles.buttonContainer}>
+            <FlatButton onPress={cancelHandler}>{i18n.t("cancel")}</FlatButton>
+            {!isEditing ? (
+              <GradientButton
+                buttonStyle={{}}
+                style={styles.button}
+                onPress={submitHandler.bind(this, true /* setActive */)}
+              >
+                {i18n.t("confirm2")}
+              </GradientButton>
+            ) : (
+              <FlatButton
+                onPress={submitHandler.bind(this, false /* setActive */)}
+              >
+                {i18n.t("saveChanges")}
+              </FlatButton>
+            )}
+          </View>
+          {/* Horizontal container */}
+
+          <View style={styles.buttonContainer}>
+            {isEditing && (
+              <GradientButton
+                buttonStyle={{ backgroundColor: GlobalStyles.colors.error300 }}
+                style={[
+                  styles.button,
+                  { marginBottom: 8, marginHorizontal: 24 },
+                ]}
+                onPress={deleteHandler}
+                colors={GlobalStyles.gradientErrorButton}
+              >
+                {i18n.t("deleteTrip")}
+              </GradientButton>
+            )}
+            {isEditing && (
+              <GradientButton
+                buttonStyle={{}}
+                style={[
+                  styles.button,
+                  { marginBottom: 8, marginHorizontal: 24 },
+                ]}
+                onPress={submitHandler.bind(this, true /* setActive */)}
+              >
+                {i18n.t("setActive")}
+              </GradientButton>
+            )}
+          </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </>
   );
 };

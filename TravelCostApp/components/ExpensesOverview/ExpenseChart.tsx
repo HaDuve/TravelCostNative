@@ -9,8 +9,10 @@ import {
   VictoryVoronoiContainer,
 } from "victory-native";
 import { GlobalStyles } from "../../constants/styles";
-import { getDateMinusDays } from "../../util/date";
+import { getDateMinusDays, getDatePlusDays } from "../../util/date";
 import PropTypes from "prop-types";
+import { DateTime } from "luxon";
+import getSymbolFromCurrency from "currency-symbol-map";
 
 const ExpenseChart = ({
   inputData,
@@ -70,9 +72,9 @@ const ExpenseChart = ({
     <View style={styles.container}>
       <VictoryChart
         height={160}
-        animate={{ duration: 500 }}
+        animate={{ duration: 450, onEnter: { duration: 100 } }}
         padding={{ top: 10, bottom: 30, left: 60, right: 30 }}
-        domainPadding={{ x: [0, 25] }}
+        domainPadding={{ x: [0, 40] }}
         // domain={{ y: [0, 2 * budget] }}
         containerComponent={<VictoryVoronoiContainer voronoiDimension="x" />}
       >
@@ -88,12 +90,14 @@ const ExpenseChart = ({
             {
               x: getDateMinusDays(new Date(), Math.floor(daysRange / 1)),
               y: Number(budget),
-              label: `Budget: ${budget} ${currency}`,
+              label: `Budget: ${budget} ${getSymbolFromCurrency(currency)}`,
             },
             {
-              x: new Date(),
+              x: DateTime.now()
+                .set({ hour: 12, minute: 0, millisecond: 0 })
+                .toJSDate(),
               y: Number(budget),
-              // label: `Budget: ${budget} ${currency}`,
+              label: `Budget: ${budget} ${getSymbolFromCurrency(currency)}`,
             },
           ]}
           standalone={false}

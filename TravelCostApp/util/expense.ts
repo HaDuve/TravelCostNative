@@ -26,6 +26,7 @@ export interface ExpenseData {
   duplOrSplit?: number;
   splitList?: Split[];
   iconName?: string;
+  rangeId?: string;
 }
 
 export interface ExpenseDataOnline {
@@ -47,6 +48,7 @@ export interface ExpenseDataOnline {
   duplOrSplit?: number;
   splitList?: Split[];
   iconName?: string;
+  rangeId?: string;
 }
 
 export interface Split {

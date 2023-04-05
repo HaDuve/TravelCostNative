@@ -70,12 +70,9 @@ const ExpenseForm = ({
   const UserCtx = useContext(UserContext);
   const TripCtx = useContext(TripContext);
 
-  if (isEditing) {
-    // console.log("defaultValues: ", defaultValues);
-    console.log("startDate: ", defaultValues.startDate);
-    console.log("endDate: ", defaultValues.endDate);
-    console.log("date: ", defaultValues.date);
-  }
+  //console log the defaultValues.rangeId
+  console.log("defaultValues.rangeId", defaultValues?.rangeId);
+
   const [hideAdvanced, sethideAdvanced] = useState(!isEditing);
   const [countryValue, setCountryValue] = useState("EUR");
   const [loadingTravellers, setLoadingTravellers] = useState(false);
@@ -122,16 +119,34 @@ const ExpenseForm = ({
   const [showDatePickerRange, setShowDatePickerRange] = useState(false);
   const [startDate, setStartDate] = useState(
     defaultValues
-      ? getFormattedDate(DateTime.fromJSDate(defaultValues.date).toJSDate())
+      ? getFormattedDate(
+          DateTime.fromJSDate(defaultValues.startDate).toJSDate()
+        )
       : getFormattedDate(DateTime.now())
   );
   const [endDate, setEndDate] = useState(
     defaultValues
-      ? getFormattedDate(DateTime.fromJSDate(defaultValues.date).toJSDate())
+      ? getFormattedDate(DateTime.fromJSDate(defaultValues.endDate).toJSDate())
       : getFormattedDate(DateTime.now())
   );
 
   const openDatePickerRange = () => {
+    // if isEditing show alert, saying this feature is not available yet
+    if (isEditing && dateIsRanged) {
+      Alert.alert(
+        "Sorry",
+        "Changing the dates of expenses with a range of dates is not yet possible.",
+        [
+          {
+            text: i18n.t("confirm"),
+            onPress: () => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            },
+          },
+        ]
+      );
+      return;
+    }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(true);
   };
@@ -161,7 +176,10 @@ const ExpenseForm = ({
     const endDateFormat = getFormattedDate(endDate);
     setStartDate(startDateFormat);
     setEndDate(endDateFormat);
-    if (startDateFormat === endDateFormat) return;
+    if (startDateFormat === endDateFormat) {
+      inputChangedHandler("date", startDateFormat);
+      return;
+    }
     Alert.alert(i18n.t("rangedDatesTitle"), i18n.t("rangedDatesText"), [
       {
         text: i18n.t("duplicateExpenses"),

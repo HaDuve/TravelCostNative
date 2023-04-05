@@ -135,36 +135,73 @@ const ManageExpense = ({ route, navigation }) => {
       }
 
       if (isEditing) {
+        // editing the expense
         if (
           expenseData.startDate.toString().slice(0, 10) !==
           expenseData.endDate.toString().slice(0, 10)
         ) {
+          // editing ranged Data
           console.log("ranged Data detected");
-          Alert.alert(
-            "Ranged Dates",
-            "Updating Expenses over multiple days is not supported yet."
+          // find all the expenses that have the same identifying rangeId
+          const expensesInRange = expenseCtx.expenses.filter(
+            (expense) =>
+              expense.rangeId && expense.rangeId === selectedExpense.rangeId
           );
-          setIsSubmitting(false);
-          return;
+          // sort the expenses by date, oldest expense first
+          expensesInRange.sort((a, b) => {
+            return new Date(a.date).getTime() - new Date(b.date).getTime();
+          });
+          // update the expenses one by one
+          for (let i = 0; i < expensesInRange.length; i++) {
+            const expense = expensesInRange[i];
+            // set the correct new date
+            const newDate = getDatePlusDays(expenseData.startDate, i);
+            newDate.setHours(new Date().getHours(), new Date().getMinutes());
+            expenseData.date = newDate;
+            // sanity fix
+            expenseData.rangeId = expense.rangeId;
+            const item: OfflineQueueManageExpenseItem = {
+              type: "update",
+              expense: {
+                tripid: tripid,
+                uid: selectedExpenseAuthorUid,
+                expenseData: expenseData,
+                id: expense.id,
+              },
+            };
+            expenseCtx.updateExpense(expense.id, expenseData);
+            await updateExpenseOnlineOffline(item, userCtx.isOnline);
+            console.log("updated expense nr: " + (i + 1), expense.rangeId);
+          }
+        } else {
+          // editing normal expense (no-ranged)
+          const item: OfflineQueueManageExpenseItem = {
+            type: "update",
+            expense: {
+              tripid: tripid,
+              uid: selectedExpenseAuthorUid,
+              expenseData: expenseData,
+              id: editedExpenseId,
+            },
+          };
+          expenseCtx.updateExpense(editedExpenseId, expenseData);
+          await updateExpenseOnlineOffline(item, userCtx.isOnline);
         }
-        const item: OfflineQueueManageExpenseItem = {
-          type: "update",
-          expense: {
-            tripid: tripid,
-            uid: selectedExpenseAuthorUid,
-            expenseData: expenseData,
-            id: editedExpenseId,
-          },
-        };
-        expenseCtx.updateExpense(editedExpenseId, expenseData);
-        await updateExpenseOnlineOffline(item, userCtx.isOnline);
+        navigation.navigate("RecentExpenses");
       } else {
+        // adding a new expense (no-editing)
         // Check for ranged Expense
         if (
           expenseData.startDate.toString().slice(0, 10) !==
           expenseData.endDate.toString().slice(0, 10)
         ) {
+          // adding a new ranged expense (no-editing)
           console.log("ranged Data detected");
+          // the date.now() is used as a rangeId to identify all the expenses that belong to the same range
+          const rangeId =
+            Date.now().toString() + Math.random().toString(36).substring(2, 15);
+          expenseData.rangeId = rangeId;
+
           // get number of days
           const day1 = new Date(expenseData.startDate);
           const day2 = new Date(expenseData.endDate);
@@ -207,6 +244,7 @@ const ManageExpense = ({ route, navigation }) => {
             expenseCtx.addExpense({ ...expenseData, id: id });
           }
         } else {
+          // adding a new normal expense (no-editing, no-ranged)
           console.log("no ranged Data detected");
           // hotfix the date clock bug
           expenseData.date = expenseData.startDate;

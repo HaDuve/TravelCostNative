@@ -36,7 +36,6 @@ export const ExpensesContext = createContext({
   updateExpense: (
     id,
     {
-      uid,
       description,
       amount,
       date,
@@ -47,7 +46,7 @@ export const ExpensesContext = createContext({
       owePerc,
       calcAmount,
       iconName,
-    }
+    }: ExpenseData
   ) => {},
   getRecentExpenses: (rangestring): Array<ExpenseData> => {
     return [];

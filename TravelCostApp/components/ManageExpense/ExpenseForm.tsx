@@ -69,6 +69,13 @@ const ExpenseForm = ({
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
   const TripCtx = useContext(TripContext);
+
+  if (isEditing) {
+    // console.log("defaultValues: ", defaultValues);
+    console.log("startDate: ", defaultValues.startDate);
+    console.log("endDate: ", defaultValues.endDate);
+    console.log("date: ", defaultValues.date);
+  }
   const [hideAdvanced, sethideAdvanced] = useState(!isEditing);
   const [countryValue, setCountryValue] = useState("EUR");
   const [loadingTravellers, setLoadingTravellers] = useState(false);

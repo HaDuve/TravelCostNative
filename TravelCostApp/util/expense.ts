@@ -1,3 +1,4 @@
+import { DateOrDateTime } from "./date";
 // expense interface
 export interface Expense {
   tripid: string;
@@ -7,6 +8,33 @@ export interface Expense {
 }
 
 export interface ExpenseData {
+  id?: string;
+  uid?: string;
+  splitType: string;
+  startDate: DateOrDateTime;
+  endDate: DateOrDateTime;
+  categoryString: string;
+  description: string;
+  amount: number;
+  date: DateOrDateTime;
+  category: string;
+  country?: string;
+  currency: string;
+  whoPaid: string;
+  owePerc: number;
+  calcAmount: number;
+  duplOrSplit?: number;
+  splitList?: Split[];
+  iconName?: string;
+}
+
+export interface ExpenseDataOnline {
+  id?: string;
+  uid?: string;
+  splitType: string;
+  startDate: string;
+  endDate: string;
+  categoryString: string;
   description: string;
   amount: number;
   date: string;
@@ -16,9 +44,9 @@ export interface ExpenseData {
   whoPaid: string;
   owePerc: number;
   calcAmount: number;
-  duplOrSplit: number;
+  duplOrSplit?: number;
   splitList?: Split[];
-  iconName: string;
+  iconName?: string;
 }
 
 export interface Split {

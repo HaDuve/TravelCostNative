@@ -3,6 +3,7 @@ import { DEBUG_NO_DATA } from "../confApp";
 import { Category } from "./category";
 import { TripData } from "../store/trip-context";
 import Toast from "react-native-toast-message";
+import { ExpenseData, ExpenseDataOnline } from "./expense";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -128,11 +129,13 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
     const responseArray = await Promise.all(axios_calls);
     responseArray.forEach((response) => {
       for (const key in response.data) {
-        const r = response.data[key];
-        const expenseObj = {
+        const r: ExpenseDataOnline = response.data[key];
+        const expenseObj: ExpenseData = {
           id: key,
           amount: r.amount,
           date: new Date(r.date),
+          startDate: new Date(r.startDate),
+          endDate: new Date(r.endDate),
           description: r.description,
           category: r.category,
           country: r.country,
@@ -142,8 +145,8 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
           uid: r.uid,
           calcAmount: r.calcAmount,
           splitType: r.splitType,
-          listEQUAL: r.listEQUAL,
           splitList: r.splitList,
+          categoryString: r.categoryString,
         };
         expenses.push(expenseObj);
       }
@@ -169,19 +172,26 @@ export async function fetchExpenses(tripid: string, uid: string) {
     );
     const expenses = [];
 
+    // ExpenseData
     for (const key in response.data) {
-      const expenseObj = {
+      const data: ExpenseDataOnline = response.data[key];
+      const expenseObj: ExpenseData = {
         id: key,
-        amount: response.data[key].amount,
-        date: new Date(response.data[key].date),
-        description: response.data[key].description,
-        category: response.data[key].category,
-        country: response.data[key].country,
-        currency: response.data[key].currency,
-        whoPaid: response.data[key].whoPaid,
-        owePerc: response.data[key].owePerc,
-        uid: response.data[key].uid,
-        calcAmount: response.data[key].calcAmount,
+        amount: data.amount,
+        date: new Date(data.date),
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate),
+        description: data.description,
+        category: data.category,
+        country: data.country,
+        currency: data.currency,
+        whoPaid: data.whoPaid,
+        owePerc: data.owePerc,
+        uid: data.uid,
+        calcAmount: data.calcAmount,
+        splitType: data.splitType,
+        splitList: data.splitList,
+        categoryString: data.categoryString,
       };
       expenses.push(expenseObj);
     }

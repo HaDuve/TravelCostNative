@@ -21,6 +21,8 @@ export const ExpensesContext = createContext({
     description,
     amount,
     date,
+    startDate,
+    endDate,
     category,
     country,
     currency,
@@ -78,13 +80,13 @@ export const ExpensesContext = createContext({
   loadExpensesFromStorage: async () => {},
 });
 
-function expensesReducer(state, action) {
+function expensesReducer(state: ExpenseData[], action) {
   switch (action.type) {
     case "ADD":
       return [action.payload, ...state];
     case "SET": {
-      const getSortedState = (data) =>
-        data.sort((a, b) => {
+      const getSortedState = (data: ExpenseData[]) =>
+        data.sort((a: ExpenseData, b: ExpenseData) => {
           return Number(new Date(b.date)) - Number(new Date(a.date));
         });
       const sorted = getSortedState(action.payload);
@@ -110,22 +112,22 @@ function expensesReducer(state, action) {
 function ExpensesContextProvider({ children }) {
   const [expensesState, dispatch] = useReducer(expensesReducer, []);
 
-  function addExpense(expenseData) {
+  function addExpense(expenseData: ExpenseData) {
     dispatch({ type: "ADD", payload: expenseData });
   }
 
-  function setExpenses(expenses) {
+  function setExpenses(expenses: ExpenseData[]) {
     dispatch({ type: "SET", payload: expenses });
   }
 
-  function deleteExpense(id) {
+  function deleteExpense(id: string) {
     dispatch({ type: "DELETE", payload: id });
   }
 
-  function updateExpense(id, expenseData) {
+  function updateExpense(id: string, expenseData: ExpenseData) {
     dispatch({ type: "UPDATE", payload: { id: id, data: expenseData } });
   }
-  function getRecentExpenses(rangestring) {
+  function getRecentExpenses(rangestring: string) {
     let expenses = [];
     switch (rangestring) {
       case "day":
@@ -146,7 +148,7 @@ function ExpensesContextProvider({ children }) {
         return expensesState;
     }
   }
-  function getYearlyExpenses(yearsBack) {
+  function getYearlyExpenses(yearsBack: number) {
     /*
      *  Returns an object containing the first date, last date of a month and
      *  the expenses in that range.

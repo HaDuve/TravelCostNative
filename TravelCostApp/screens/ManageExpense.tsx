@@ -28,6 +28,8 @@ import { en, de, fr } from "../i18n/supportedLanguages";
 import { getCatString } from "../util/category";
 import PropTypes from "prop-types";
 import { asyncStoreSetObject } from "../store/async-storage";
+import { Expense, ExpenseData } from "../util/expense";
+import { DateTime } from "luxon";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -106,7 +108,7 @@ const ManageExpense = ({ route, navigation }) => {
     navigation.goBack();
   }
 
-  async function confirmHandler(expenseData) {
+  async function confirmHandler(expenseData: ExpenseData) {
     console.log("confirmHandler ~ expenseData:", expenseData);
     setIsSubmitting(true);
     try {
@@ -131,13 +133,6 @@ const ManageExpense = ({ route, navigation }) => {
       if (expenseData.splitType === "SELF") {
         expenseData.splitList = [];
       }
-
-      // keep the splits in the original currency
-
-      // expenseData.splitList?.forEach((split) => {
-      //   const calcAmount = split.amount * rate;
-      //   split.amount = calcAmount.toFixed(2);
-      // });
 
       if (isEditing) {
         if (
@@ -164,14 +159,6 @@ const ManageExpense = ({ route, navigation }) => {
         expenseCtx.updateExpense(editedExpenseId, expenseData);
         await updateExpenseOnlineOffline(item, userCtx.isOnline);
       } else {
-        const item = {
-          type: "add",
-          expense: {
-            tripid: tripid,
-            uid: uid,
-            expenseData: expenseData,
-          },
-        };
         // Check for ranged Expense
         if (
           expenseData.startDate.toString().slice(0, 10) !==
@@ -191,9 +178,9 @@ const ManageExpense = ({ route, navigation }) => {
           // 0 is null, 1 is dupl (default), 2 is split
           if (expenseData.duplOrSplit === 2) {
             const splitCalcAmount = expenseData.calcAmount / (days + 1);
-            expenseData.calcAmount = Number(splitCalcAmount).toFixed(2);
+            expenseData.calcAmount = Number(splitCalcAmount.toFixed(2));
             const splitAmount = expenseData.amount / (days + 1);
-            expenseData.amount = Number(splitAmount).toFixed(2);
+            expenseData.amount = Number(splitAmount.toFixed(2));
           }
 
           // iterate over number of days between and change date and endDate to the first date + iterator
@@ -201,10 +188,21 @@ const ManageExpense = ({ route, navigation }) => {
             console.log("day nr: ", i);
             const newDate = getDatePlusDays(day1, i);
             newDate.setHours(new Date().getHours(), new Date().getMinutes());
-            expenseData.startDate =
-              expenseData.date =
-              expenseData.endDate =
-                newDate;
+            // expenseData.startDate =
+            // expenseData.endDate =
+            expenseData.date = newDate;
+            console.log("expenseData.date: ", expenseData.date);
+            console.log("expenseData.startDate: ", expenseData.startDate);
+            console.log("expenseData.endDate: ", expenseData.endDate);
+
+            const item: OfflineQueueManageExpenseItem = {
+              type: "add",
+              expense: {
+                tripid: tripid,
+                uid: uid,
+                expenseData: expenseData,
+              },
+            };
             const id = await storeExpenseOnlineOffline(item, userCtx.isOnline);
             expenseCtx.addExpense({ ...expenseData, id: id });
           }

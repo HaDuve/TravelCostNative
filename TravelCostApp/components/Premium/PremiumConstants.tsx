@@ -1,6 +1,7 @@
 import Purchases, { CustomerInfo } from "react-native-purchases";
 import { PREMIUM } from "../../confApp";
 import { Alert } from "react-native";
+import Toast from "react-native-toast-message";
 /*
  The API key for your app from the RevenueCat dashboard: https://app.revenuecat.com
  */
@@ -27,9 +28,10 @@ export async function isPremiumMember() {
   } catch (e) {
     // Error fetching customer info
     console.error(e);
-    Alert.alert(
-      "Error fetching premium status",
-      "Please try again later or contact support."
-    );
+    Toast.show({
+      type: "error",
+      text1: "Error fetching premium status",
+      text2: e.message,
+    });
   }
 }

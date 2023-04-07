@@ -36,11 +36,11 @@ SelectCategoryIcon.propTypes = {
 
 const styles = StyleSheet.create({
   iconButton: {
-    padding: 8,
-    marginHorizontal: 8,
+    padding: 4,
+    marginHorizontal: 4,
     borderRadius: 16,
   },
   selectedIconButton: {
-    backgroundColor: GlobalStyles.colors.gray500Accent,
+    backgroundColor: GlobalStyles.colors.primary50,
   },
 });

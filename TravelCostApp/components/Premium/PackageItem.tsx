@@ -19,10 +19,8 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
       const { customerInfo, productIdentifier } =
         await Purchases.purchasePackage(purchasePackage);
 
-      console.log(
-        "onSelection ~ purchased productIdentifier:",
-        productIdentifier
-      );
+      console.log("onSelection ~ customerInfo:", customerInfo);
+      console.log("onSelection ~ productIdentifier:", productIdentifier);
 
       if (
         typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined"

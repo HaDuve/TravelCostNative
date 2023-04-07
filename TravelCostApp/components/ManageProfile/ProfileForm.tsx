@@ -2,7 +2,7 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { useState, useContext } from "react";
 import { View, Text, Alert, Keyboard, Pressable } from "react-native";
-import { StyleSheet } from "react-native";
+import React, { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
 import { UserContext } from "../../store/user-context";
@@ -57,7 +57,7 @@ const ProfileForm = ({ navigation, sleepyStartHandler }) => {
       icon={"exit-outline"}
       size={36}
       color={GlobalStyles.colors.textColor}
-      style={styles.button}
+      // style={styles.button}
       onPress={logoutHandler}
     />
   );
@@ -79,7 +79,7 @@ const ProfileForm = ({ navigation, sleepyStartHandler }) => {
   }
 
   async function submitHandler() {
-    const userData = {};
+    const userData = { userName: "" };
     userData.userName = inputs.userName.value;
 
     const invalid =
@@ -121,14 +121,14 @@ const ProfileForm = ({ navigation, sleepyStartHandler }) => {
         icon={"close-outline"}
         size={36}
         color={GlobalStyles.colors.accent500}
-        style={styles.button}
+        // style={styles.button}
         onPress={cancelHandler}
       />
       <IconButton
         icon={"checkmark"}
         size={36}
         color={GlobalStyles.colors.primary500}
-        style={styles.button}
+        // style={styles.button}
         onPress={submitHandler}
       />
     </View>
@@ -140,7 +140,10 @@ const ProfileForm = ({ navigation, sleepyStartHandler }) => {
 
   const freshlyNavigationButtons = freshlyCreated && (
     <View style={styles.navButtonContainer}>
-      <FlatButton style={[styles.navButton]} onPress={joinInviteHandler}>
+      <FlatButton
+        // style={styles.navButton}
+        onPress={joinInviteHandler}
+      >
         {i18n.t("invitationText")}
       </FlatButton>
       <Button

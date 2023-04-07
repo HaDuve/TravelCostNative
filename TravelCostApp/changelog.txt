@@ -1,7 +1,13 @@
 Change log Travel Expense App
 
+1.0.92
+- Users can now "subscribe" to Budget for Nomads Premium (no transactions will occur in Testflight)
+- While the testflight is going, all premium functions will be available for everyone
+- Fixed backend problems with the paywall
+- "New category" fixed and improved
+
 1.0.89
-- ranged expenses are now grouped together and will be updated together if the user changes stuff
+- Ranged expenses are now grouped together and will be updated together if the user changes stuff
 
 1.0.88
 - fix join link copypasta

@@ -257,7 +257,6 @@ function ExpensesContextProvider({ children }) {
   }
 
   async function loadExpensesFromStorage() {
-    console.log("loadExpensesFromStorage ~ loadExpensesFromStorage:");
     if (expensesState.length !== 0) {
       console.log("expenses not empty, will not load again");
       return false;

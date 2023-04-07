@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Alert, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  Alert,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 import Purchases from "react-native-purchases";
 import { GlobalStyles } from "../../constants/styles";
 import PackageItem from "../Premium/PackageItem";
 import BackgroundGradient from "../UI/BackgroundGradient";
 import Button from "../UI/Button";
 import FlatButton from "../UI/FlatButton";
+import LoadingOverlay from "../UI/LoadingOverlay";
+import PropTypes from "prop-types";
 
 const PaywallScreen = ({ navigation }) => {
   // - State for all available package
@@ -62,6 +72,12 @@ const PaywallScreen = ({ navigation }) => {
             { overflow: "visible" },
           ]}
         />
+        {isPurchasing && (
+          <ActivityIndicator
+            size={"large"}
+            color={GlobalStyles.colors.backgroundColor}
+          />
+        )}
       </View>
       <Text style={styles.headerTitleText}>Go Pro!</Text>
       <Text style={styles.headerSubtitleText}>
@@ -77,7 +93,7 @@ const PaywallScreen = ({ navigation }) => {
     // );
     return (
       <View>
-        <View style={{ margin: "2%" }}>
+        <View style={{ margin: "2%", marginBottom: "4%" }}>
           <Text style={styles.footerText}>
             By purchasing, you agree to the Terms of Use and Privacy Policy.
           </Text>
@@ -114,6 +130,10 @@ const PaywallScreen = ({ navigation }) => {
 };
 
 export default PaywallScreen;
+
+PaywallScreen.propTypes = {
+  navigation: PropTypes.object.isRequired,
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -159,6 +179,6 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.2)",
+    backgroundColor: "rgba(0,0,0,0.3)",
   },
 });

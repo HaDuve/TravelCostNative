@@ -20,11 +20,12 @@ import { GlobalStyles } from "../constants/styles";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../i18n/supportedLanguages";
-import { Category } from "../util/category";
 import {
+  deleteCategories,
   fetchCategories,
+  postCategories,
   storeCategories,
-  updateCategories,
+  updateTrip,
 } from "../util/http";
 import { useContext } from "react";
 import { TripContext } from "../store/trip-context";
@@ -34,6 +35,9 @@ import GradientButton from "../components/UI/GradientButton";
 import useEffect from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { asyncStoreGetObject } from "../store/async-storage";
+import { ActivityIndicator } from "react-native";
+import PropTypes from "prop-types";
+import { UserContext } from "../store/user-context";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -45,6 +49,8 @@ const CategoryPickScreen = ({ route, navigation }) => {
   const { editedExpenseId } = route.params ? route.params : "null";
   console.log("CategoryPickScreen ~ editedExpenseId", editedExpenseId);
   const [isShaking, setIsShaking] = useState(false);
+  const userCtx = useContext(UserContext);
+  const isOnline = userCtx.isOnline;
 
   const CATLIST = [
     {
@@ -92,27 +98,33 @@ const CategoryPickScreen = ({ route, navigation }) => {
   ];
 
   const [categoryList, setCategoryList] = useState(CATLIST);
+  // isfetching state
+  const [isFetching, setIsFetching] = useState(false);
 
   // load categories from server or asyncstore
   useFocusEffect(
     React.useCallback(() => {
       const loadCategories = async () => {
-        const categories = await fetchCategories(tripid);
-        console.log("CategoryPickScreen ~ categories", categories);
-        if (categories) {
-          for (const key in categories) {
-            const categoryList = categories[key];
-            console.log("fetchCategoryList ~ categoryList:", categoryList);
-            categoryList.push({
-              id: 6,
-              icon: "add-outline",
-              color: GlobalStyles.colors.textColor,
-              cat: "newCat",
-              catString: i18n.t("catNewString"),
-            });
-            setCategoryList(categoryList);
-          }
+        setIsFetching(true);
+        if (!isOnline) {
+          await loadCategoryList();
+          console.log("offline cats");
+          return;
         }
+        const categories = await fetchCategories(tripid);
+        // console.log("CategoryPickScreen ~ categories", categories);
+        if (categories) {
+          const tempList = [...categories];
+          tempList.push({
+            id: 6,
+            icon: "add-outline",
+            color: GlobalStyles.colors.textColor,
+            cat: "newCat",
+            catString: i18n.t("catNewString"),
+          });
+          setCategoryList(tempList);
+          setIsFetching(false);
+        } else await loadCategoryList();
       };
 
       // first try to load categories from asyncstore
@@ -128,10 +140,20 @@ const CategoryPickScreen = ({ route, navigation }) => {
           });
           setCategoryList(categories);
         }
+        setIsFetching(false);
       };
-      loadCategoryList();
-      // loadCategories();
-    }, [])
+
+      // const postCategoriesAsync = async () => {
+      //   setIsFetching(true);
+      //   await deleteCategories(tripid);
+      //   await updateTrip(tripid, { categories: CATLIST });
+      //   //log
+      //   console.log("CategoryPickScreen ~ finished posting categories");
+      // };
+
+      // postCategoriesAsync();
+      loadCategories();
+    }, [isOnline, tripid])
   );
 
   async function catPressHandler(item) {
@@ -251,6 +273,14 @@ const CategoryPickScreen = ({ route, navigation }) => {
             </GradientButton>
           </View>
         }
+        ListHeaderComponent={
+          isFetching && (
+            <ActivityIndicator
+              size="large"
+              color={GlobalStyles.colors.primary700}
+            />
+          )
+        }
         style={styles.listStyle}
       ></FlatList>
     </View>
@@ -258,6 +288,10 @@ const CategoryPickScreen = ({ route, navigation }) => {
 };
 
 export default CategoryPickScreen;
+
+CategoryPickScreen.propTypes = {
+  navigation: PropTypes.object,
+};
 
 const styles = StyleSheet.create({
   pressed: {

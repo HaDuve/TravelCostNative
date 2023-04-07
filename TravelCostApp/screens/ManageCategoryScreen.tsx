@@ -20,20 +20,35 @@ i18n.enableFallback = true;
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
-import { useContext } from "react";
+import { useContext, useLayoutEffect } from "react";
 import { TripContext } from "../store/trip-context";
 import { GlobalStyles } from "../constants/styles";
-import { fetchCategories, postCategories } from "../util/http";
+import { fetchCategories, updateTrip } from "../util/http";
 import { ScrollView } from "react-native-gesture-handler";
 import SelectCategoryIcon from "../components/UI/selectCategoryIcon";
 import Button from "../components/UI/Button";
 import GradientButton from "../components/UI/GradientButton";
+import BackgroundGradient from "../components/UI/BackgroundGradient";
+import FlatButton from "../components/UI/FlatButton";
+import { KeyboardAvoidingView, ActivityIndicator } from "react-native";
+import PropTypes from "prop-types";
+import { UserContext } from "../store/user-context";
+import LoadingOverlay from "../components/UI/LoadingOverlay";
+import * as Haptics from "expo-haptics";
+import Toast from "react-native-toast-message";
 
 const ManageCategoryScreen = ({ route, navigation }) => {
   const [categoryList, setCategoryList] = useState([]);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [selectedIconName, setSelectedIconName] = useState("");
+
   const [isFetching, setIsFetching] = useState(false);
+
+  // use state for is uploading
+  const [isUploading, setIsUploading] = useState(false);
+
+  const userCtx = useContext(UserContext);
+  const isOnline = userCtx.isOnline;
 
   const defaultCategoryList = [
     {
@@ -77,18 +92,16 @@ const ManageCategoryScreen = ({ route, navigation }) => {
 
   const fetchCategoryList = async () => {
     setIsFetching(true);
-    const fetchCatResponse = await fetchCategories(tripid);
-    if (fetchCatResponse) {
-      console.log("fetchCategoryList ~ fetchCatResponse:", fetchCatResponse);
-      for (const key in fetchCatResponse) {
-        const categoryList = fetchCatResponse[key];
-        console.log("fetchCategoryList ~ categoryList:", categoryList);
-        setCategoryList(categoryList);
-      }
+    if (!isOnline) {
+      await loadCategoryList();
+      return;
     }
-    if (categoryList.length === 0 || !categoryList[0].name) {
-      loadCategoryList();
-    }
+    const categories = await fetchCategories(tripid);
+    if (categories) {
+      const tempList = [...categories];
+      setCategoryList(tempList);
+      setIsFetching(false);
+    } else await loadCategoryList();
     setIsFetching(false);
   };
 
@@ -106,18 +119,31 @@ const ManageCategoryScreen = ({ route, navigation }) => {
   };
 
   const saveCategoryList = async (newCategoryList) => {
+    setIsUploading(true);
+    // if not isOnline, alert user
+
     try {
       await AsyncStorage.setItem(
         "categoryList",
         JSON.stringify(newCategoryList)
       );
-      await postCategories(tripid, categoryList);
+      if (!isOnline) {
+        Toast.show({
+          text1: "No Internet Connection",
+          text2: "Please try again later!",
+          type: "error",
+        });
+      } else {
+        await updateTrip(tripid, { categories: categoryList });
+      }
     } catch (error) {
       console.error(error);
     }
+    setIsUploading(false);
   };
 
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const newCategory = {
       name: newCategoryName,
       icon: selectedIconName,
@@ -125,41 +151,58 @@ const ManageCategoryScreen = ({ route, navigation }) => {
     };
     const newCategoryList = [...categoryList, newCategory];
     setCategoryList(newCategoryList);
-    saveCategoryList(newCategoryList);
+    await saveCategoryList(newCategoryList);
     setNewCategoryName("");
     setSelectedIconName("");
+    // navigate to category pick screen
+    // navigation.navigate("CategoryPick");
   };
 
-  const handleEditCategory = (index, newName) => {
+  const handleEditCategory = async (index, newName) => {
     const newCategoryList = [...categoryList];
     newCategoryList[index].name = newName;
+    newCategoryList[index].cat = newName;
     setCategoryList(newCategoryList);
-    saveCategoryList(newCategoryList);
+    await saveCategoryList(newCategoryList);
   };
 
-  const handleDeleteCategory = (index) => {
+  const handleDeleteCategory = async (index) => {
     const newCategoryList = [...categoryList];
     newCategoryList.splice(index, 1);
     setCategoryList(newCategoryList);
-    saveCategoryList(newCategoryList);
+    await saveCategoryList(newCategoryList);
   };
 
   useEffect(() => {
     fetchCategoryList();
   }, []);
 
+  useLayoutEffect(() => {
+    fetchCategoryList();
+  }, []);
+
   const renderCategoryItem = ({ item, index }) => {
     return (
-      <View style={styles.categoryItem}>
-        <Ionicons name={item.icon} size={24} color="#434343" />
+      <View style={[styles.categoryItem, GlobalStyles.strongShadow]}>
+        <Ionicons
+          name={item.icon}
+          size={24}
+          color={GlobalStyles.colors.textColor}
+        />
         <TextInput
           style={styles.categoryNameInput}
           value={item.name}
+          autoCapitalize="sentences"
+          autoComplete="off"
+          autoCorrect={false}
           onChangeText={(newName) => handleEditCategory(index, newName)}
         />
         <TouchableOpacity
           style={styles.deleteButton}
-          onPress={() => handleDeleteCategory(index)}
+          onPress={async () => {
+            await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            handleDeleteCategory(index);
+          }}
         >
           <Ionicons name="trash-outline" size={24} color="#434343" />
         </TouchableOpacity>
@@ -263,17 +306,15 @@ const ManageCategoryScreen = ({ route, navigation }) => {
   ];
 
   const arrays = [],
-    size = 3;
+    // 1-3 possible items per row
+    size = 2;
   while (ioniconsList.length > 0) arrays.push(ioniconsList.splice(0, size));
 
   function renderRowIconPicker({ item }) {
     return (
-      <View style={{ margin: 5 }}>
+      <View style={[{ margin: 5 }]}>
         <View
           style={{
-            // backgroundColor: "red",
-            // width: 200,
-            // height: 100,
             marginBottom: 1,
           }}
         >
@@ -286,9 +327,6 @@ const ManageCategoryScreen = ({ route, navigation }) => {
         {item.length > 1 ? (
           <View
             style={{
-              // backgroundColor: "green",
-              // width: 200,
-              // height: 100,
               marginBottom: 1,
             }}
           >
@@ -302,9 +340,6 @@ const ManageCategoryScreen = ({ route, navigation }) => {
         {item.length > 2 ? (
           <View
             style={{
-              // backgroundColor: "green",
-              // width: 200,
-              // height: 100,
               marginBottom: 1,
             }}
           >
@@ -320,81 +355,138 @@ const ManageCategoryScreen = ({ route, navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.newCategoryInput}
-          placeholder="New category name"
-          value={newCategoryName}
-          onChangeText={(text) => setNewCategoryName(text)}
+    <BackgroundGradient
+      colors={GlobalStyles.gradientColors}
+      style={styles.container}
+    >
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={"padding"}>
+        <View style={[styles.inputContainer, GlobalStyles.shadowPrimary]}>
+          <TextInput
+            autoFocus={true}
+            style={styles.newCategoryInput}
+            placeholder="New category name"
+            value={newCategoryName}
+            onChangeText={(text) => setNewCategoryName(text)}
+          />
+          <FlatList
+            horizontal
+            data={arrays}
+            renderItem={renderRowIconPicker}
+          ></FlatList>
+          {!isUploading && (
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={handleAddCategory}
+            >
+              <Text style={styles.addButtonText}>Add</Text>
+            </TouchableOpacity>
+          )}
+          {isUploading && (
+            <View style={styles.addButton}>
+              <ActivityIndicator size="small" color="#fff" />
+            </View>
+          )}
+        </View>
+        <View
+          style={{
+            height: 16,
+            width: "100%",
+            zIndex: 10,
+            //transparent border color
+            borderBottomWidth: 1,
+            borderBottomColor: GlobalStyles.colors.primary100,
+            // shadow over the flatlist
+            shadowColor: GlobalStyles.colors.primaryGrayed,
+            shadowOffset: {
+              width: 0,
+              height: 2,
+            },
+            shadowOpacity: 0.42,
+            shadowRadius: 2.42,
+            elevation: 3,
+          }}
         />
-        <FlatList
-          horizontal
-          data={arrays}
-          renderItem={renderRowIconPicker}
-        ></FlatList>
-        <TouchableOpacity style={styles.addButton} onPress={handleAddCategory}>
-          <Text style={styles.addButtonText}>Add</Text>
-        </TouchableOpacity>
-      </View>
-      <View
-        style={{
-          height: 16,
-          backgroundColor: "#A1D8C1",
-          borderBottomWidth: 2,
-          borderColor: "#FFFFFF",
-        }}
-      />
-      <FlatList
-        data={categoryList}
-        renderItem={renderCategoryItem}
-        keyExtractor={(item, index) => `${index}`}
-        refreshing={isFetching}
-        onRefresh={fetchCategoryList}
-      />
-      <View
-        style={{
-          height: 0,
-          backgroundColor: "#A1D8C1",
-          borderBottomWidth: 2,
-          borderColor: "#FFFFFF",
-        }}
-      />
-      <GradientButton
-        // colors={GlobalStyles.gradientErrorButton}
-        onPress={() => navigation.pop()}
-        style={{ margin: 16 }}
-      >
-        {i18n.t("saveChanges")}
-      </GradientButton>
-    </View>
+        {!isFetching && (
+          <FlatList
+            data={categoryList}
+            renderItem={renderCategoryItem}
+            keyExtractor={(item, index) => `${index}`}
+            refreshing={isFetching}
+            onRefresh={fetchCategoryList}
+          />
+        )}
+        {isFetching && (
+          <View style={{ flex: 1, justifyContent: "center" }}>
+            <ActivityIndicator
+              size="large"
+              color={GlobalStyles.colors.backgroundColor}
+            />
+          </View>
+        )}
+        <View
+          style={{
+            height: 16,
+            width: "100%",
+            zIndex: 10,
+            //transparent border color
+            borderTopWidth: 1,
+            borderTopColor: GlobalStyles.colors.primary100,
+            // shadow over the flatlist
+            shadowColor: GlobalStyles.colors.primaryGrayed,
+            shadowOffset: {
+              width: 0,
+              height: -2,
+            },
+            shadowOpacity: 0.42,
+            shadowRadius: 2.42,
+            elevation: 3,
+            overflow: "visible",
+          }}
+        />
+        <FlatButton
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            navigation.pop();
+          }}
+          // style={{ margin: 16 }}
+        >
+          {i18n.t("back")}
+        </FlatButton>
+      </KeyboardAvoidingView>
+    </BackgroundGradient>
   );
 };
 
 export default ManageCategoryScreen;
 
+ManageCategoryScreen.propTypes = {
+  navigation: PropTypes.object.isRequired,
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#A1D8C1",
   },
   inputContainer: {
     flex: 1,
     alignItems: "center",
-    minHeight: 320,
-    maxHeight: 320,
-    backgroundColor: "#FFFFFF",
+    minHeight: 220,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 8,
     marginBottom: 8,
-    paddingHorizontal: 16,
+    padding: 4,
+    // paddingHorizontal: 16,
   },
   newCategoryInput: {
+    // center
+    alignItems: "center",
     flex: 1,
     height: 40,
-    fontSize: 16,
-    color: "#434343",
-    marginRight: 16,
+    fontSize: 20,
+    color: GlobalStyles.colors.primary400,
+    borderBottomWidth: 1,
+    borderBottomColor: GlobalStyles.colors.primary500,
   },
   iconPicker: {
     flexDirection: "row",
@@ -414,25 +506,27 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     marginBottom: 12,
+    marginTop: -24,
   },
   addButtonText: {
     fontSize: 16,
-    color: "#FFFFFF",
+    color: GlobalStyles.colors.backgroundColor,
   },
   categoryItem: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 8,
-    marginBottom: 8,
+    margin: 8,
     padding: 16,
+    zIndex: 1,
   },
   categoryNameInput: {
-    flex: 1,
-    height: 40,
     fontSize: 16,
     color: "#434343",
     marginLeft: 16,
+    flex: 1,
   },
   deleteButton: {
     marginLeft: 16,

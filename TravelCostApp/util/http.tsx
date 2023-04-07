@@ -62,21 +62,37 @@ export async function fetchCategories(tripid: string) {
     const response = await axios.get(
       BACKEND_URL + "/trips/" + tripid + "/categories.json" + QPAR
     );
+    console.log("fetchCategories ~ response.data:", response.data);
     return response.data;
   } catch (error) {
     console.error(error);
   }
 }
 
-// post categories
-export async function postCategories(tripid, categoryList) {
+export async function deleteCategories(tripid: string) {
   try {
-    await axios.patch(
-      BACKEND_URL + "/trips/" + tripid + "/categories.json" + QPAR,
-      categoryList
+    const response = await axios.delete(
+      BACKEND_URL + `/trips/${tripid}/categories.json` + QPAR
     );
+    return response.data;
   } catch (error) {
-    console.error(error);
+    // log error
+    console.log("deleteCategories:", error);
+  }
+}
+
+export async function patchCategories(tripid: string, categories: Category[]) {
+  console.log("categories:", categories);
+  const json = JSON.stringify(categories);
+  try {
+    const response = await axios.post(
+      BACKEND_URL + `/trips/${tripid}/categories.json` + QPAR,
+      json
+    );
+    return response;
+  } catch (error) {
+    // log error
+    console.log("patchCategories:", error);
   }
 }
 
@@ -543,21 +559,4 @@ export async function fetchTravelerIsTouched(tripid: string, uid: string) {
   // we want to fetch new data and then set touched to false later
   if (returnIsTouched == null) returnIsTouched = true;
   return returnIsTouched;
-}
-
-export async function storeCategories(tripid: string, categories: Category[]) {
-  const response = await axios.put(
-    BACKEND_URL + `/trips/${tripid}/categories.json` + QPAR,
-    categories
-  );
-  return response.data;
-}
-
-export async function updateCategories(tripid: string, categories: Category[]) {
-  console.log("categories:", categories);
-  const response = await axios.patch(
-    BACKEND_URL + `/trips/${tripid}.json` + QPAR,
-    { categories: categories }
-  );
-  return response;
 }

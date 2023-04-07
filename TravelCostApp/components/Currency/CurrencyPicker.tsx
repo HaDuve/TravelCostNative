@@ -57,10 +57,10 @@ const CurrencyPicker = ({
         setOpen={setOpen}
         autoScroll
         onOpen={() => {
-          Haptics.ImpactFeedbackStyle.Light;
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }}
         onClose={() => {
-          Haptics.ImpactFeedbackStyle.Light;
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }}
         onChangeValue={onChangeValue}
         modalContentContainerStyle={{

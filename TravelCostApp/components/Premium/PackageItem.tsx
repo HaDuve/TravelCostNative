@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ENTITLEMENT_ID } from "../Premium/PremiumConstants";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
+import Toast from "react-native-toast-message";
 
 const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
   const {
@@ -17,12 +18,21 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
     try {
       const { customerInfo, productIdentifier } =
         await Purchases.purchasePackage(purchasePackage);
-      // Toast the result of the purchase
+
+      console.log(
+        "onSelection ~ purchased productIdentifier:",
+        productIdentifier
+      );
 
       if (
         typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined"
       ) {
         navigation.pop();
+        Toast.show({
+          type: "success",
+          text1: "Purchase successful",
+          text2: "You are now a premium Nomad member",
+        });
       }
     } catch (e) {
       if (!e.userCancelled) {

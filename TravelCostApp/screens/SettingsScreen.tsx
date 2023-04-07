@@ -90,11 +90,17 @@ const SettingsScreen = ({ navigation }) => {
   const [premiumButtonString, setPremiumButtonString] = useState(
     premiumStatus ? buttonstring1 : buttonstring2
   );
+
   useFocusEffect(
     React.useCallback(() => {
       async function setPremiumNow() {
         const isPremium = await userCtx.checkPremium();
         // console.log("setPremiumNow ~ isPremium:", isPremium);
+        Toast.show({
+          type: "success",
+          text1: "is Premium: " + isPremium,
+          text2: "is Premium: " + isPremium,
+        });
         setPremiumStatus(isPremium);
         setPremiumButtonString(premiumStatus ? buttonstring1 : buttonstring2);
       }

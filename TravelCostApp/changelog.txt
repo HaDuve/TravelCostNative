@@ -1,5 +1,10 @@
 Change log Travel Expense App
 
+1.0.93
+- Category management works well across multiple devices with and without internet now!
+- Connection issues with bad internet fixed
+- We cracked the 10.000 lines of written code! (~13.500)
+
 1.0.92
 - Users can now "subscribe" to Budget for Nomads Premium (no transactions will occur in Testflight)
 - While the testflight is going, all premium functions will be available for everyone

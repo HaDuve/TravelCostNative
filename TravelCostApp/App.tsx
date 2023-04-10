@@ -1,14 +1,7 @@
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
-import {
-  Alert,
-  Text,
-  SafeAreaView,
-  View,
-  Keyboard,
-  Platform,
-} from "react-native";
-import Purchases, { PurchasesOffering } from "react-native-purchases";
+import { SafeAreaView, View, Keyboard, Platform } from "react-native";
+import Purchases from "react-native-purchases";
 
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
@@ -16,8 +9,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import * as SplashScreen from "expo-splash-screen";
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NetworkProvider, checkInternetConnection } from "react-native-offline";
+import { NetworkProvider } from "react-native-offline";
 import { Ionicons } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 import SignupScreen from "./screens/SignupScreen";
@@ -32,14 +24,7 @@ import ExpensesContextProvider, {
 } from "./store/expenses-context";
 import ProfileScreen from "./screens/ProfileScreen";
 import UserContextProvider, { UserContext } from "./store/user-context";
-import {
-  fetchUser,
-  fetchTrip,
-  touchTraveler,
-  getAllExpenses,
-  touchMyTraveler,
-  dataResponseTime,
-} from "./util/http";
+import { fetchUser, touchMyTraveler, dataResponseTime } from "./util/http";
 import TripContextProvider, { TripContext } from "./store/trip-context";
 import TripForm from "./components/ManageTrip/TripForm";
 import OnboardingScreen from "./screens/OnboardingScreen";
@@ -49,15 +34,12 @@ import OverviewScreen from "./screens/OverviewScreen";
 import CategoryPickScreen from "./screens/CategoryPickScreen";
 import SplitSummaryScreen from "./screens/SplitSummaryScreen";
 import SettingsScreen from "./screens/SettingsScreen";
-import * as Device from "expo-device";
 import {
   asyncStoreGetItem,
   asyncStoreGetObject,
   asyncStoreSafeClear,
   asyncStoreSetItem,
-  asyncStoreSetObject,
 } from "./store/async-storage";
-import { truncateString } from "./util/string";
 import LoadingOverlay from "./components/UI/LoadingOverlay";
 import ImportGSScreen from "./screens/ImportGSScreen";
 import FilteredExpenses from "./screens/FilteredExpenses";
@@ -76,22 +58,15 @@ i18n.enableFallback = true;
 // import { LogBox } from "react-native";
 import ManageCategoryScreen from "./screens/ManageCategoryScreen";
 import ToastComponent from "./components/UI/ToastComponent";
-import {
-  DEBUG_FORCE_OFFLINE,
-  DEBUG_RESET,
-  DEBUG_POLLING_INTERVAL,
-} from "./confApp";
+import { DEBUG_RESET, DEBUG_POLLING_INTERVAL } from "./confApp";
 import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
 import Toast from "react-native-toast-message";
 import { useInterval } from "./components/Hooks/useInterval";
 import { isForeground } from "./util/appState";
 import { TourGuideProvider } from "rn-tourguide";
 import { loadTourConfig } from "./util/tourUtil";
-import PremiumScreen from "./screens/PremiumScreen";
 import { API_KEY } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
-import { BottomTabBar } from "@react-navigation/bottom-tabs";
-import BottomTabsBar from "./components/UI/BottomTabBar";
 import { SettingsProvider } from "./store/settings-context";
 // LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
 // LogBox.ignoreAllLogs(); //Ignore all log notifications

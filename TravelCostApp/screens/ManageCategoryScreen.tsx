@@ -33,7 +33,6 @@ import FlatButton from "../components/UI/FlatButton";
 import { KeyboardAvoidingView, ActivityIndicator } from "react-native";
 import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
-import LoadingOverlay from "../components/UI/LoadingOverlay";
 import * as Haptics from "expo-haptics";
 import Toast from "react-native-toast-message";
 
@@ -460,6 +459,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
 export default ManageCategoryScreen;
 
 ManageCategoryScreen.propTypes = {
+  route: PropTypes.object.isRequired,
   navigation: PropTypes.object.isRequired,
 };
 

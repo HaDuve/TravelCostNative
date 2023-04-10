@@ -53,9 +53,6 @@ const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
 i18n.enableFallback = true;
-
-// // NOTE: for beta testing we leave this here
-// import { LogBox } from "react-native";
 import ManageCategoryScreen from "./screens/ManageCategoryScreen";
 import ToastComponent from "./components/UI/ToastComponent";
 import { DEBUG_RESET, DEBUG_POLLING_INTERVAL } from "./confApp";
@@ -68,8 +65,6 @@ import { loadTourConfig } from "./util/tourUtil";
 import { API_KEY } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
 import { SettingsProvider } from "./store/settings-context";
-// LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
-// LogBox.ignoreAllLogs(); //Ignore all log notifications
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();

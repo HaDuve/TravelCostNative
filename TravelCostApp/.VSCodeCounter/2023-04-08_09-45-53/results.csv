@@ -1,0 +1,111 @@
+"filename", "language", "TypeScript JSX", "XML", "JavaScript", "JSON with Comments", "JSON", "TypeScript", "Markdown", "comment", "blank", "total"
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/## Configuration.md", "Markdown", 0, 0, 0, 0, 0, 0, 30, 0, 10, 40
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/.eslintrc.js", "JavaScript", 0, 0, 20, 0, 0, 0, 0, 0, 1, 21
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/.expo-shared/assets.json", "JSON", 0, 0, 0, 0, 4, 0, 0, 0, 1, 5
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/App.tsx", "TypeScript JSX", 569, 0, 0, 0, 0, 0, 0, 66, 37, 672
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/app.json", "JSON", 0, 0, 0, 0, 18, 0, 0, 24, 0, 42
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/assets/SVG/toggleButton.js", "JavaScript", 0, 0, 38, 0, 0, 0, 0, 0, 3, 41
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/assets/toggleGraph.svg", "XML", 0, 9, 0, 0, 0, 0, 0, 0, 1, 10
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/babel.config.js", "JavaScript", 0, 0, 7, 0, 0, 0, 0, 0, 1, 8
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Auth/AuthContent.tsx", "TypeScript JSX", 101, 0, 0, 0, 0, 0, 0, 2, 16, 119
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Auth/AuthForm.tsx", "TypeScript JSX", 236, 0, 0, 0, 0, 0, 0, 14, 16, 266
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Auth/Input.tsx", "TypeScript JSX", 60, 0, 0, 0, 0, 0, 0, 0, 6, 66
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Currency/CurrencyPicker.tsx", "TypeScript JSX", 89, 0, 0, 0, 0, 0, 0, 4, 10, 103
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Errors/Alert.tsx", "TypeScript JSX", 24, 0, 0, 0, 0, 0, 0, 4, 3, 31
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseCountryFlag.tsx", "TypeScript JSX", 21, 0, 0, 0, 0, 0, 0, 1, 4, 26
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseItem.tsx", "TypeScript JSX", 310, 0, 0, 0, 0, 0, 0, 4, 16, 330
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/CategoryProgressBar.tsx", "TypeScript JSX", 108, 0, 0, 0, 0, 0, 0, 0, 9, 117
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseCategories.tsx", "TypeScript JSX", 158, 0, 0, 0, 0, 0, 0, 2, 19, 179
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseCountries.tsx", "TypeScript JSX", 154, 0, 0, 0, 0, 0, 0, 2, 19, 175
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseCurrencies.tsx", "TypeScript JSX", 150, 0, 0, 0, 0, 0, 0, 2, 19, 171
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseGraph.tsx", "TypeScript JSX", 407, 0, 0, 0, 0, 0, 0, 21, 19, 447
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseTravellers.tsx", "TypeScript JSX", 208, 0, 0, 0, 0, 0, 0, 10, 21, 239
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpensesList.tsx", "TypeScript JSX", 182, 0, 0, 0, 0, 0, 0, 37, 15, 234
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpensesOutput.tsx", "TypeScript JSX", 74, 0, 0, 0, 0, 0, 0, 0, 8, 82
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpensesOverview.tsx", "TypeScript JSX", 228, 0, 0, 0, 0, 0, 0, 9, 13, 250
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpensesSummary.tsx", "TypeScript JSX", 115, 0, 0, 0, 0, 0, 0, 14, 12, 141
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/RecentExpensesUtil.ts", "TypeScript", 0, 0, 0, 0, 0, 41, 0, 0, 4, 45
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOverview/CategoryChart.tsx", "TypeScript JSX", 83, 0, 0, 0, 0, 0, 0, 3, 7, 93
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOverview/ExpenseChart.tsx", "TypeScript JSX", 157, 0, 0, 0, 0, 0, 0, 4, 6, 167
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Hooks/useInterval.ts", "TypeScript", 0, 0, 0, 0, 0, 19, 0, 7, 7, 33
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ImportExport/ExportToGoogleXlsx.ts", "TypeScript", 0, 0, 0, 0, 0, 31, 0, 3, 4, 38
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ImportExport/ImportExpense.ts", "TypeScript", 0, 0, 0, 0, 0, 51, 0, 29, 7, 87
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ImportExport/ImportFromGoogleXlsx.ts", "TypeScript", 0, 0, 0, 0, 0, 248, 0, 38, 17, 303
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ImportExport/OpenXLSXPicker.ts", "TypeScript", 0, 0, 0, 0, 0, 142, 0, 20, 16, 178
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageExpense/AddExpenseButton.tsx", "TypeScript JSX", 76, 0, 0, 0, 0, 0, 0, 3, 9, 88
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageExpense/ExpenseForm.tsx", "TypeScript JSX", 1059, 0, 0, 0, 0, 0, 0, 48, 48, 1155
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageExpense/ExpensePicker.js", "JavaScript", 0, 0, 55, 0, 0, 0, 0, 0, 4, 59
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageExpense/Input.tsx", "TypeScript JSX", 87, 0, 0, 0, 0, 0, 0, 2, 6, 95
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageProfile/ProfileForm.tsx", "TypeScript JSX", 245, 0, 0, 0, 0, 0, 0, 12, 17, 274
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageTrip/TripForm.tsx", "TypeScript JSX", 482, 0, 0, 0, 0, 0, 0, 26, 35, 543
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Premium/PackageItem.tsx", "TypeScript JSX", 79, 0, 0, 0, 0, 0, 0, 0, 10, 89
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Premium/PayWall.tsx", "TypeScript JSX", 164, 0, 0, 0, 0, 0, 0, 10, 11, 185
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Premium/PremiumConstants.tsx", "TypeScript JSX", 27, 0, 0, 0, 0, 0, 0, 10, 3, 40
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ProfileOutput/ShareTrip.js", "JavaScript", 0, 0, 40, 0, 0, 0, 0, 6, 7, 53
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ProfileOutput/TripHistoryItem.js", "JavaScript", 0, 0, 260, 0, 0, 0, 0, 6, 16, 282
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ProfileOutput/TripItem.tsx", "TypeScript JSX", 219, 0, 0, 0, 0, 0, 0, 4, 17, 240
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ProfileOutput/TripList.tsx", "TypeScript JSX", 48, 0, 0, 0, 0, 0, 0, 0, 5, 53
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/BackgroundGradient.tsx", "TypeScript JSX", 12, 0, 0, 0, 0, 0, 0, 0, 4, 16
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/BottomTabBar.tsx", "TypeScript JSX", 129, 0, 0, 0, 0, 0, 0, 2, 12, 143
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/Button.tsx", "TypeScript JSX", 67, 0, 0, 0, 0, 0, 0, 2, 4, 73
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/DatePickerContainer.tsx", "TypeScript JSX", 68, 0, 0, 0, 0, 0, 0, 0, 5, 73
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/DatePickerModal.tsx", "TypeScript JSX", 65, 0, 0, 0, 0, 0, 0, 2, 5, 72
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/ErrorOverlay.js", "JavaScript", 0, 0, 32, 0, 0, 0, 0, 0, 4, 36
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/FlatButton.tsx", "TypeScript JSX", 34, 0, 0, 0, 0, 0, 0, 0, 6, 40
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/GradientButton.tsx", "TypeScript JSX", 79, 0, 0, 0, 0, 0, 0, 2, 4, 85
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/IconButton.js", "JavaScript", 0, 0, 48, 0, 0, 0, 0, 0, 4, 52
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/LinkButton.tsx", "TypeScript JSX", 53, 0, 0, 0, 0, 0, 0, 2, 4, 59
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/LoadingOverlay.tsx", "TypeScript JSX", 34, 0, 0, 0, 0, 0, 0, 2, 5, 41
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/SettingsSection.tsx", "TypeScript JSX", 61, 0, 0, 0, 0, 0, 0, 3, 9, 73
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/SettingsSwitch.tsx", "TypeScript JSX", 49, 0, 0, 0, 0, 0, 0, 6, 4, 59
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/SplashScreenOverlay.tsx", "TypeScript JSX", 61, 0, 0, 0, 0, 0, 0, 4, 4, 69
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/ToastComponent.tsx", "TypeScript JSX", 40, 0, 0, 0, 0, 0, 0, 27, 4, 71
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/selectCategoryIcon.tsx", "TypeScript JSX", 42, 0, 0, 0, 0, 0, 0, 0, 5, 47
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/confApp.ts", "TypeScript", 0, 0, 0, 0, 0, 8, 0, 8, 2, 18
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/constants/styles.ts", "TypeScript", 0, 0, 0, 0, 0, 108, 0, 4, 2, 114
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/eas.json", "JSON", 0, 0, 0, 0, 49, 0, 0, 0, 1, 50
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/firebase/getFirebaseDatabase.js", "JavaScript", 0, 0, 5, 0, 0, 0, 0, 1, 2, 8
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/firebase/initializeFirebaseApp.js", "JavaScript", 0, 0, 14, 0, 0, 0, 0, 7, 3, 24
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/firebase/testAuth.js", "JavaScript", 0, 0, 21, 0, 0, 0, 0, 0, 3, 24
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/i18n/supportedLanguages.tsx", "TypeScript JSX", 507, 0, 0, 0, 0, 0, 0, 56, 55, 618
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/index.js", "JavaScript", 0, 0, 3, 0, 0, 0, 0, 3, 3, 9
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/jsconfig.json", "JSON with Comments", 0, 0, 0, 10, 0, 0, 0, 2, 0, 12
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/metro.config.js", "JavaScript", 0, 0, 2, 0, 0, 0, 0, 1, 2, 5
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/package-lock.json", "JSON", 0, 0, 0, 0, 36921, 0, 0, 0, 1, 36922
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/package.json", "JSON", 0, 0, 0, 0, 89, 0, 0, 0, 1, 90
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/CategoryPickScreen.tsx", "TypeScript JSX", 322, 0, 0, 0, 0, 0, 0, 15, 19, 356
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/FilteredExpenses.tsx", "TypeScript JSX", 74, 0, 0, 0, 0, 0, 0, 5, 7, 86
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ImportGSScreen.js", "JavaScript", 0, 0, 128, 0, 0, 0, 0, 1, 8, 137
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/JoinTrip.tsx", "TypeScript JSX", 214, 0, 0, 0, 0, 0, 0, 10, 13, 237
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/LoginScreen.tsx", "TypeScript JSX", 98, 0, 0, 0, 0, 0, 0, 10, 9, 117
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ManageCategoryScreen.tsx", "TypeScript JSX", 496, 0, 0, 0, 0, 0, 0, 14, 25, 535
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ManageExpense.tsx", "TypeScript JSX", 270, 0, 0, 0, 0, 0, 0, 38, 28, 336
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/OnboardingScreen.js", "JavaScript", 0, 0, 60, 0, 0, 0, 0, 2, 6, 68
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/OverviewScreen.tsx", "TypeScript JSX", 146, 0, 0, 0, 0, 0, 0, 3, 13, 162
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ProfileScreen.tsx", "TypeScript JSX", 376, 0, 0, 0, 0, 0, 0, 23, 21, 420
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/RecentExpenses.tsx", "TypeScript JSX", 265, 0, 0, 0, 0, 0, 0, 10, 28, 303
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/SettingsScreen.tsx", "TypeScript JSX", 225, 0, 0, 0, 0, 0, 0, 16, 19, 260
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/SignupScreen.tsx", "TypeScript JSX", 83, 0, 0, 0, 0, 0, 0, 10, 9, 102
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/SplitSummaryScreen.tsx", "TypeScript JSX", 178, 0, 0, 0, 0, 0, 0, 13, 14, 205
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/WelcomeScreen.js", "JavaScript", 0, 0, 40, 0, 0, 0, 0, 0, 7, 47
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/async-storage.tsx", "TypeScript JSX", 61, 0, 0, 0, 0, 0, 0, 29, 9, 99
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/auth-context.tsx", "TypeScript JSX", 50, 0, 0, 0, 0, 0, 0, 2, 11, 63
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/cache.tsx", "TypeScript JSX", 35, 0, 0, 0, 0, 0, 0, 0, 10, 45
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/expenses-context.tsx", "TypeScript JSX", 258, 0, 0, 0, 0, 0, 0, 20, 30, 308
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/settings-context.tsx", "TypeScript JSX", 50, 0, 0, 0, 0, 0, 0, 1, 8, 59
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/trip-context.tsx", "TypeScript JSX", 186, 0, 0, 0, 0, 0, 0, 12, 22, 220
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/user-context.tsx", "TypeScript JSX", 195, 0, 0, 0, 0, 0, 0, 13, 33, 241
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/tsconfig.json", "JSON with Comments", 0, 0, 0, 7, 0, 0, 0, 0, 1, 8
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/appState.ts", "TypeScript", 0, 0, 0, 0, 0, 14, 0, 0, 5, 19
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/auth.ts", "TypeScript", 0, 0, 0, 0, 0, 21, 0, 0, 6, 27
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/category.ts", "TypeScript", 0, 0, 0, 0, 0, 83, 0, 6, 5, 94
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/currencyExchange.ts", "TypeScript", 0, 0, 0, 0, 0, 10, 0, 2, 2, 14
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/date.ts", "TypeScript", 0, 0, 0, 0, 0, 125, 0, 40, 27, 192
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/dateTime.ts", "TypeScript", 0, 0, 0, 0, 0, 37, 0, 18, 1, 56
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/expense.ts", "TypeScript", 0, 0, 0, 0, 0, 54, 0, 1, 4, 59
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/http.tsx", "TypeScript JSX", 439, 0, 0, 0, 0, 0, 0, 82, 42, 563
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/offline-queue.ts", "TypeScript", 0, 0, 0, 0, 0, 213, 0, 49, 9, 271
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/split.ts", "TypeScript", 0, 0, 0, 0, 0, 244, 0, 20, 17, 281
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/string.ts", "TypeScript", 0, 0, 0, 0, 0, 18, 0, 0, 2, 20
+"/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/tourUtil.ts", "TypeScript", 0, 0, 0, 0, 0, 21, 0, 0, 5, 26
+"Total", "-", 11242, 9, 773, 17, 37081, 1488, 30, 1046, 1168, 52854

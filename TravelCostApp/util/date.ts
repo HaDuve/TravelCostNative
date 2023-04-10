@@ -22,7 +22,9 @@ export function getFormattedDate(date: DateOrDateTime) {
   if (date instanceof DateTime) {
     return _getFormattedDate(date);
   }
-  return date.toISOString();
+  if (date instanceof Date) {
+    return date.toISOString();
+  }
 }
 
 export const isToday = (someDate: DateOrDateTime) => {

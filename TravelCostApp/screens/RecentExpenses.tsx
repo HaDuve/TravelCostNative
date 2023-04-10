@@ -39,7 +39,7 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import { useInterval } from "../components/Hooks/useInterval";
-import { DEBUG_POLLING_INTERVAL } from "../confApp";
+import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpensesUtil";
 import { asyncStoreGetItem, asyncStoreSetItem } from "../store/async-storage";
 import { _toShortFormat } from "../util/dateTime";

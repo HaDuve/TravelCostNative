@@ -8,6 +8,8 @@ export const DEBUG_NO_DATA = false;
 export const DEBUG_POLLING_INTERVAL = 5000;
 // polling interval online status
 export const DEBUG_POLLING_INTERVAL_ONLINE = 10000;
+// Timeout constant
+export const TIMEOUT = 10000;
 // Dev constant
 export const DEV = false;
 // Premium consts

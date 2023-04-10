@@ -5,7 +5,7 @@ import { View, Text, Alert, Keyboard, Pressable } from "react-native";
 import React, { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
-import { UserContext } from "../../store/user-context";
+import { UserContext, UserData } from "../../store/user-context";
 import { updateUser } from "../../util/http";
 
 import Input from "../ManageExpense/Input";
@@ -79,7 +79,7 @@ const ProfileForm = ({ navigation, sleepyStartHandler }) => {
   }
 
   async function submitHandler() {
-    const userData = { userName: "" };
+    const userData: UserData = { userName: "" };
     userData.userName = inputs.userName.value;
 
     const invalid =

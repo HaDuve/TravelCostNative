@@ -4,21 +4,28 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import SplashScreenOverlay from "../components/UI/SplashScreenOverlay";
 import PropTypes from "prop-types";
 
+export interface Settings {
+  showFlags: boolean;
+  showWhoPaid: boolean;
+}
+
 export const SettingsContext = createContext({
-  settings: {},
-  saveSettings: (settings: object): void => {
+  settings: {} as Settings,
+  saveSettings: (settings: Settings): void => {
+    // saving settings
+    console.log(settings);
     return;
   },
 });
 
 export const SettingsProvider = ({ children }) => {
-  const [settings, setSettings] = useState(null);
+  const [settings, setSettings] = useState<Settings>(null);
 
   useEffect(() => {
     const loadSettingsAsync = async () => {
       const settingsString = await AsyncStorage.getItem("settings");
       if (settingsString) {
-        const loadedSettings = JSON.parse(settingsString);
+        const loadedSettings: Settings = JSON.parse(settingsString);
         setSettings(loadedSettings);
       } else
         setSettings({

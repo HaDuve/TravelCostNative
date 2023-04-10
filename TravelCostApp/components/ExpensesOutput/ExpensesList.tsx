@@ -116,7 +116,7 @@ function onClick({ item, index }, isOnline) {
       // Does nothing but dismiss the dialog when tapped
       {
         text: i18n.t("no"),
-        onPress: forceCloseRow(index),
+        onPress: () => forceCloseRow(index),
       },
       // The "Yes" button
       {

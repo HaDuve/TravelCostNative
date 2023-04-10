@@ -10,14 +10,16 @@ i18n.enableFallback = true;
 
 // interface of category objects with id, name, iconName and color
 export interface Category {
-  id: number;
+  // name is deprecated, use catString instead
+  name?: string;
+  id?: number;
   cat: string;
-  catString: string;
+  catString?: string;
   icon: string;
-  color: string;
+  color?: string;
 }
 
-export async function getCatSymbol(cat: string) {
+export function getCatSymbol(cat: string) {
   switch (cat) {
     case "food":
       return "fast-food-outline";
@@ -55,18 +57,7 @@ export async function getCatSymbol(cat: string) {
       return "happy-outline";
     default: {
       // if not, return "help-outline"
-      // check asyncstore for categoryList, if we find cat there, return iconName
-      try {
-        const categoryList = await asyncStoreGetObject("categoryList");
-        if (categoryList) {
-          const catObj = categoryList.find((c) => c.name === cat);
-          if (catObj) {
-            return catObj.icon;
-          }
-        }
-      } catch (error) {
-        return "help-outline";
-      }
+      console.log(`cat: ${cat} finally not found in categoryList`);
       return "help-outline";
     }
   }

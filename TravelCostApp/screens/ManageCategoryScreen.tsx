@@ -7,7 +7,16 @@ import {
   FlatList,
   StyleSheet,
 } from "react-native";
-
+// import animated from reanimated
+import Animated, {
+  FadeInDown,
+  FadeOutRight,
+  Layout,
+  ZoomIn,
+  ZoomInLeft,
+  ZoomOut,
+  ZoomOutRight,
+} from "react-native-reanimated";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
@@ -35,9 +44,53 @@ import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import * as Haptics from "expo-haptics";
 import Toast from "react-native-toast-message";
+import { Category } from "../util/category";
+import { useFocusEffect } from "@react-navigation/native";
+import Dimensions from "react-native";
+import { FadeInRight } from "react-native-reanimated";
+import FadeOutLeft from "react-native-reanimated";
 
 const ManageCategoryScreen = ({ route, navigation }) => {
-  const [categoryList, setCategoryList] = useState([]);
+  const defaultCategoryList: Category[] = [
+    {
+      id: 1,
+      icon: "fast-food-outline",
+      color: GlobalStyles.colors.textColor,
+      cat: "food",
+      catString: i18n.t("catFoodString"),
+    },
+    {
+      id: 2,
+      icon: "airplane-outline",
+      color: GlobalStyles.colors.textColor,
+      cat: "international-travel",
+      catString: i18n.t("catIntTravString"),
+    },
+    {
+      id: 3,
+      icon: "bed-outline",
+      color: GlobalStyles.colors.textColor,
+      cat: "accomodation",
+      catString: i18n.t("catAccoString"),
+    },
+    {
+      id: 4,
+      icon: "car-outline",
+      color: GlobalStyles.colors.textColor,
+      cat: "national-travel",
+      catString: i18n.t("catNatTravString"),
+    },
+    {
+      id: 5,
+      icon: "basket-outline",
+      color: GlobalStyles.colors.textColor,
+      cat: "other",
+      catString: i18n.t("catOtherString"),
+    },
+  ];
+
+  const [categoryList, setCategoryList] =
+    useState<Category[]>(defaultCategoryList);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [selectedIconName, setSelectedIconName] = useState("");
 
@@ -49,43 +102,6 @@ const ManageCategoryScreen = ({ route, navigation }) => {
   const userCtx = useContext(UserContext);
   const isOnline = userCtx.isOnline;
 
-  const defaultCategoryList = [
-    {
-      id: 1,
-      icon: "fast-food-outline",
-      color: GlobalStyles.colors.textColor,
-      cat: "food",
-      name: i18n.t("catFoodString"),
-    },
-    {
-      id: 2,
-      icon: "airplane-outline",
-      color: GlobalStyles.colors.textColor,
-      cat: "international-travel",
-      name: i18n.t("catIntTravString"),
-    },
-    {
-      id: 3,
-      icon: "bed-outline",
-      color: GlobalStyles.colors.textColor,
-      cat: "accomodation",
-      name: i18n.t("catAccoString"),
-    },
-    {
-      id: 4,
-      icon: "car-outline",
-      color: GlobalStyles.colors.textColor,
-      cat: "national-travel",
-      name: i18n.t("catNatTravString"),
-    },
-    {
-      id: 5,
-      icon: "basket-outline",
-      color: GlobalStyles.colors.textColor,
-      cat: "other",
-      name: i18n.t("catOtherString"),
-    },
-  ];
   const tripCtx = useContext(TripContext);
   const tripid = tripCtx.tripid;
 
@@ -95,46 +111,64 @@ const ManageCategoryScreen = ({ route, navigation }) => {
       await loadCategoryList();
       return;
     }
-    const categories = await fetchCategories(tripid);
-    if (categories) {
-      const tempList = [...categories];
-      setCategoryList(tempList);
-      setIsFetching(false);
-    } else await loadCategoryList();
-    setIsFetching(false);
+    try {
+      const categories = await fetchCategories(tripid);
+      if (categories) {
+        const tempList = [...categories];
+        setCategoryList(tempList);
+        setIsFetching(false);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    if (categoryList.length === 0) {
+      await loadCategoryList();
+    }
+    if (categoryList.length === 0) {
+      setCategoryList(defaultCategoryList);
+    }
   };
 
   const loadCategoryList = async () => {
     try {
       const categoryListString = await AsyncStorage.getItem("categoryList");
       if (categoryListString !== null) {
-        setCategoryList(JSON.parse(categoryListString));
+        const list = JSON.parse(categoryListString);
+        console.log("loadCategoryList ~ list:", list);
+        setCategoryList(list);
       } else {
         setCategoryList(defaultCategoryList);
       }
     } catch (error) {
       console.error(error);
     }
+    setIsFetching(false);
   };
 
   const saveCategoryList = async (newCategoryList) => {
     setIsUploading(true);
     // if not isOnline, alert user
-
+    if (!isOnline) {
+      Toast.show({
+        text1: "No Internet Connection",
+        text2: "Please try again later!",
+        type: "error",
+      });
+      navigation.pop(2);
+    }
     try {
       await AsyncStorage.setItem(
         "categoryList",
         JSON.stringify(newCategoryList)
       );
-      if (!isOnline) {
-        Toast.show({
-          text1: "No Internet Connection",
-          text2: "Please try again later!",
-          type: "error",
-        });
-      } else {
-        await updateTrip(tripid, { categories: categoryList });
-      }
+      console.log(
+        `updating trip categories with ${JSON.stringify(newCategoryList)}`
+      );
+      await updateTrip(tripid, {
+        categories: JSON.stringify(newCategoryList),
+      });
+      // todo: update this without another fetch
+      await userCtx.loadCatListFromAsyncInCtx(tripid);
     } catch (error) {
       console.error(error);
     }
@@ -143,8 +177,8 @@ const ManageCategoryScreen = ({ route, navigation }) => {
 
   const handleAddCategory = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const newCategory = {
-      name: newCategoryName,
+    const newCategory: Category = {
+      catString: newCategoryName,
       icon: selectedIconName,
       cat: newCategoryName,
     };
@@ -159,7 +193,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
 
   const handleEditCategory = async (index, newName) => {
     const newCategoryList = [...categoryList];
-    newCategoryList[index].name = newName;
+    newCategoryList[index].catString = newName;
     newCategoryList[index].cat = newName;
     setCategoryList(newCategoryList);
     await saveCategoryList(newCategoryList);
@@ -174,15 +208,15 @@ const ManageCategoryScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     fetchCategoryList();
-  }, []);
-
-  useLayoutEffect(() => {
-    fetchCategoryList();
-  }, []);
+  }, [isOnline]);
 
   const renderCategoryItem = ({ item, index }) => {
     return (
-      <View style={[styles.categoryItem, GlobalStyles.strongShadow]}>
+      <Animated.View
+        entering={ZoomInLeft}
+        exiting={ZoomOutRight}
+        style={[styles.categoryItem, GlobalStyles.strongShadow]}
+      >
         <Ionicons
           name={item.icon}
           size={24}
@@ -190,7 +224,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
         />
         <TextInput
           style={styles.categoryNameInput}
-          value={item.name}
+          value={item.catString}
           autoCapitalize="sentences"
           autoComplete="off"
           autoCorrect={false}
@@ -205,32 +239,20 @@ const ManageCategoryScreen = ({ route, navigation }) => {
         >
           <Ionicons name="trash-outline" size={24} color="#434343" />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
     );
   };
 
   const ioniconsList = [
-    "ios-briefcase-outline",
-    "ios-airplane-outline",
-    "ios-restaurant-outline",
     "ios-wallet-outline",
     "ios-cash-outline",
     "ios-card-outline",
-    "ios-calendar-outline",
-    "ios-settings-outline",
     "ios-list-outline",
-    "ios-globe-outline",
-    "ios-car-outline",
-    "ios-bed-outline",
-    "ios-camera-outline",
-    "ios-mail-outline",
     "ios-calculator-outline",
     "ios-pricetag-outline",
     "ios-cart-outline",
     "ios-compass-outline",
-    "ios-bus-outline",
     "ios-happy-outline",
-    "ios-alarm-outline",
     "ios-trophy-outline",
     "ios-gift-outline",
     "ios-pie-chart-outline",
@@ -303,10 +325,11 @@ const ManageCategoryScreen = ({ route, navigation }) => {
     "ios-walk-outline",
     "ios-water-outline",
   ];
-
-  const arrays = [],
-    // 1-3 possible items per row
-    size = 2;
+  // get dimensions
+  const bigDisplay = Dimensions.useWindowDimensions().height > 850;
+  const arrays = [];
+  // 1-3 possible items per row
+  const size = bigDisplay ? 3 : 2;
   while (ioniconsList.length > 0) arrays.push(ioniconsList.splice(0, size));
 
   function renderRowIconPicker({ item }) {
@@ -359,10 +382,16 @@ const ManageCategoryScreen = ({ route, navigation }) => {
       style={styles.container}
     >
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={"padding"}>
-        <View style={[styles.inputContainer, GlobalStyles.shadowPrimary]}>
+        <View
+          style={[
+            styles.inputContainer,
+            bigDisplay && { minHeight: 284, maxHeight: 284 },
+            GlobalStyles.shadowPrimary,
+          ]}
+        >
           <TextInput
             autoFocus={true}
-            style={styles.newCategoryInput}
+            style={[styles.newCategoryInput]}
             placeholder="New category name"
             value={newCategoryName}
             onChangeText={(text) => setNewCategoryName(text)}
@@ -372,14 +401,18 @@ const ManageCategoryScreen = ({ route, navigation }) => {
             data={arrays}
             renderItem={renderRowIconPicker}
           ></FlatList>
-          {!isUploading && (
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={handleAddCategory}
-            >
-              <Text style={styles.addButtonText}>Add</Text>
-            </TouchableOpacity>
-          )}
+          {!isUploading &&
+            newCategoryName.length > 0 &&
+            selectedIconName.length > 0 && (
+              <Animated.View entering={ZoomIn} exiting={ZoomOut}>
+                <TouchableOpacity
+                  style={styles.addButton}
+                  onPress={handleAddCategory}
+                >
+                  <Text style={styles.addButtonText}>Add</Text>
+                </TouchableOpacity>
+              </Animated.View>
+            )}
           {isUploading && (
             <View style={styles.addButton}>
               <ActivityIndicator size="small" color="#fff" />
@@ -406,8 +439,9 @@ const ManageCategoryScreen = ({ route, navigation }) => {
           }}
         />
         {!isFetching && (
-          <FlatList
+          <Animated.FlatList
             data={categoryList}
+            numColumns={2}
             renderItem={renderCategoryItem}
             keyExtractor={(item, index) => `${index}`}
             refreshing={isFetching}
@@ -472,6 +506,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     minHeight: 220,
+    maxHeight: 220,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 8,
     marginBottom: 8,
@@ -483,6 +518,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1,
     height: 40,
+    maxHeight: 40,
     fontSize: 20,
     color: GlobalStyles.colors.primary400,
     borderBottomWidth: 1,

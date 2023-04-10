@@ -1,5 +1,5 @@
 import Purchases, { CustomerInfo } from "react-native-purchases";
-import { PREMIUM } from "../../confApp";
+import { PREMIUM } from "../../confAppConstants";
 import { Alert } from "react-native";
 import Toast from "react-native-toast-message";
 /*

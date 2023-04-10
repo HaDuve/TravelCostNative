@@ -16,21 +16,24 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const ExpensesContext = createContext({
   expenses: [],
-  addExpense: ({
-    uid,
-    description,
-    amount,
-    date,
-    startDate,
-    endDate,
-    category,
-    country,
-    currency,
-    whoPaid,
-    owePerc,
-    calcAmount,
-    iconName,
-  }) => {},
+  addExpense: (
+    {
+      uid,
+      description,
+      amount,
+      date,
+      startDate,
+      endDate,
+      category,
+      country,
+      currency,
+      whoPaid,
+      owePerc,
+      calcAmount,
+      iconName,
+    }: ExpenseData,
+    id?: string
+  ) => {},
   setExpenses: (expenses) => {},
   deleteExpense: (id) => {},
   updateExpense: (
@@ -269,7 +272,7 @@ function ExpensesContextProvider({ children }) {
         expArray.push(expense);
       });
       setExpenses(expArray);
-      console.log("loadExpensesFromStorage ~ expArray:", expArray);
+      // console.log("loadExpensesFromStorage ~ expArray:", expArray);
     } else {
       console.warn("no Expenses loaded from Storage!");
     }

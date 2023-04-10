@@ -46,9 +46,9 @@ i18n.enableFallback = true;
 const CategoryPickScreen = ({ route, navigation }) => {
   const tripCtx = useContext(TripContext);
   const tripid = tripCtx.tripid;
-  const { editedExpenseId } = route.params ? route.params : "null";
+  const { editedExpenseId } = route.params ? route.params : "";
   console.log("CategoryPickScreen ~ editedExpenseId", editedExpenseId);
-  const [isShaking, setIsShaking] = useState(false);
+  // const [isShaking, setIsShaking] = useState(false);
   const userCtx = useContext(UserContext);
   const isOnline = userCtx.isOnline;
 
@@ -104,6 +104,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
   // load categories from server or asyncstore
   useFocusEffect(
     React.useCallback(() => {
+      console.log("CategoryPickScreen ~ isOnline", isOnline);
       const loadCategories = async () => {
         setIsFetching(true);
         if (!isOnline) {
@@ -114,6 +115,8 @@ const CategoryPickScreen = ({ route, navigation }) => {
         const categories = await fetchCategories(tripid);
         // console.log("CategoryPickScreen ~ categories", categories);
         if (categories) {
+          console.log("online cats");
+          console.log("loadCategories ~ categories:", categories);
           const tempList = [...categories];
           tempList.push({
             id: 6,
@@ -157,63 +160,57 @@ const CategoryPickScreen = ({ route, navigation }) => {
   );
 
   async function catPressHandler(item) {
+    setIsFetching(true);
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setIsShaking(false);
+    await userCtx.checkConnectionUpdateUser();
+    // setIsShaking(false);
     if (item.cat === "newCat") {
-      Toast.show({
-        type: "error",
-        text1: "Not yet implemented",
-        text2: "This function will be available soon!",
-      });
       navigation.navigate("ManageCategory");
-    } else
+    } else {
       navigation.navigate("ManageExpense", {
         pickedCat: item.cat ?? item.name,
         newCat: true,
         iconName: item.icon,
         expenseId: editedExpenseId,
       });
+    }
+    setIsFetching(false);
   }
 
-  function catLongPressHandler(item) {
-    setIsShaking(true);
-    console.log("long pressed", item);
-    Alert.alert("Customizing categories function coming soon... ");
-  }
-
-  function startShake(item) {
-    Animated.sequence([
-      Animated.timing(item.shakeAnimation, {
-        toValue: 5,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(item.shakeAnimation, {
-        toValue: -5,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(item.shakeAnimation, {
-        toValue: 5,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(item.shakeAnimation, {
-        toValue: 0,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-    ]).start();
-    setTimeout(() => {
-      if (isShaking) startShake(item);
-    }, 800);
-  }
+  // function startShake(item) {
+  //   Animated.sequence([
+  //     Animated.timing(item.shakeAnimation, {
+  //       toValue: 5,
+  //       duration: 100,
+  //       useNativeDriver: true,
+  //     }),
+  //     Animated.timing(item.shakeAnimation, {
+  //       toValue: -5,
+  //       duration: 100,
+  //       useNativeDriver: true,
+  //     }),
+  //     Animated.timing(item.shakeAnimation, {
+  //       toValue: 5,
+  //       duration: 100,
+  //       useNativeDriver: true,
+  //     }),
+  //     Animated.timing(item.shakeAnimation, {
+  //       toValue: 0,
+  //       duration: 100,
+  //       useNativeDriver: true,
+  //     }),
+  //   ]).start();
+  //   setTimeout(() => {
+  //     if (isShaking) startShake(item);
+  //   }, 800);
+  // }
 
   function renderCatItem(itemData) {
     const item = itemData.item;
     if (!item.catString) item.catString = item.name;
     item.shakeAnimation = new Animated.Value(0);
-    if (isShaking) startShake(item);
+    // if (isShaking) startShake(item);
+
     return (
       <Pressable
         style={({ pressed }) => [
@@ -253,33 +250,37 @@ const CategoryPickScreen = ({ route, navigation }) => {
         data={categoryList}
         renderItem={renderCatItem}
         ListFooterComponent={
-          <View style={styles.buttonContainer}>
-            <FlatButton
-              onPress={() => {
-                navigation.goBack();
-              }}
-            >
-              {i18n.t("cancel")}
-            </FlatButton>
-            <GradientButton
-              buttonStyle={styles.continueButtonStyle}
-              onPress={() => {
-                navigation.navigate("ManageExpense", {
-                  pickedCat: "other",
-                });
-              }}
-            >
-              {i18n.t("continue")}
-            </GradientButton>
+          <View>
+            <View style={styles.buttonContainer}>
+              <FlatButton
+                onPress={() => {
+                  navigation.goBack();
+                }}
+              >
+                {i18n.t("cancel")}
+              </FlatButton>
+              {true && (
+                <GradientButton
+                  buttonStyle={styles.continueButtonStyle}
+                  onPress={() => {
+                    navigation.navigate("ManageExpense", {
+                      pickedCat: "other",
+                    });
+                  }}
+                >
+                  {i18n.t("continue")}
+                </GradientButton>
+              )}
+            </View>
+            <View style={{ marginTop: 20, minHeight: 40 }}>
+              {isFetching && (
+                <ActivityIndicator
+                  size="large"
+                  color={GlobalStyles.colors.textColor}
+                />
+              )}
+            </View>
           </View>
-        }
-        ListHeaderComponent={
-          isFetching && (
-            <ActivityIndicator
-              size="large"
-              color={GlobalStyles.colors.primary700}
-            />
-          )
         }
         style={styles.listStyle}
       ></FlatList>
@@ -291,6 +292,7 @@ export default CategoryPickScreen;
 
 CategoryPickScreen.propTypes = {
   navigation: PropTypes.object,
+  route: PropTypes.object,
 };
 
 const styles = StyleSheet.create({

@@ -2,12 +2,30 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import React, { createContext, useReducer, useState } from "react";
 import { Alert } from "react-native";
-import { asyncStoreGetItem, asyncStoreSetObject } from "./async-storage";
+import {
+  asyncStoreGetItem,
+  asyncStoreGetObject,
+  asyncStoreSetObject,
+} from "./async-storage";
 import * as Device from "expo-device";
 import { checkInternetConnection } from "react-native-offline";
 import Toast from "react-native-toast-message";
-import { DEBUG_FORCE_OFFLINE } from "../confApp";
+import { DEBUG_FORCE_OFFLINE, TIMEOUT } from "../confAppConstants";
 import { isPremiumMember } from "../components/Premium/PremiumConstants";
+import { fetchCategories } from "../util/http";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+export interface UserData {
+  uid?: string;
+  userName?: string;
+  tripHistory?: string[];
+  currentTrip?: string;
+  lastCurrency?: string;
+  lastCountry?: string;
+  freshlyCreated?: boolean;
+  needsTour?: boolean;
+  isPremium?: boolean;
+}
 
 export const UserContext = createContext({
   userName: "",
@@ -20,7 +38,7 @@ export const UserContext = createContext({
   lastCountry: "",
   setLastCountry: (string: string) => {},
 
-  addUser: ({ userName }) => {},
+  addUser: ({ userName }: UserData) => {},
   deleteUser: (uid: string) => {},
 
   addTripHistory: (tripid: string) => {},
@@ -46,6 +64,8 @@ export const UserContext = createContext({
   checkPremium: async (): Promise<boolean> => {
     return false;
   },
+  loadCatListFromAsyncInCtx: async (tripid) => {},
+  catIconNames: [],
 });
 
 function tripsReducer(state, action) {
@@ -73,6 +93,8 @@ function UserContextProvider({ children }) {
   const [lastCurrency, setLastCurrency] = useState("");
   const [lastCountry, setLastCountry] = useState("");
   const [isPremium, setIsPremium] = useState(false);
+  // useState for cat iconName list
+  const [catIconNames, setCatIconNames] = useState([]);
 
   async function checkPremium() {
     // allow offline users to get premium
@@ -83,6 +105,33 @@ function UserContextProvider({ children }) {
     const isPremiumNow = await isPremiumMember();
     setIsPremium(isPremiumNow);
     return isPremiumNow;
+  }
+
+  async function _loadCatListFromAsync() {
+    try {
+      const categoryListString = await AsyncStorage.getItem("categoryList");
+      if (categoryListString !== null) {
+        const list = JSON.parse(categoryListString);
+        console.log("loadCategoryList ~ list:", list);
+        setCatIconNames(list);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function loadCatListFromAsyncInCtx(tripid: string) {
+    if (tripid == "async") {
+      await _loadCatListFromAsync();
+    } else {
+      try {
+        const catList = await fetchCategories(tripid);
+        setCatIconNames(catList);
+      } catch (error) {
+        await _loadCatListFromAsync();
+      }
+    }
   }
 
   function setPeriodString(periodName: string) {
@@ -103,14 +152,14 @@ function UserContextProvider({ children }) {
     dispatch({ type: "DELETE", payload: tripid });
   }
 
-  function addUser(UserData: any) {
+  function addUser(userData: UserData) {
     // console.log("addUser ~ UserData", UserData);
-    if (!UserData || !UserData.userName) {
+    if (!userData || !userData.userName) {
       console.log("addUser ~ no UserData to add Username!");
       return;
     }
-    setUserName(UserData.userName);
-    saveUserNameInStorage(UserData.userName);
+    setUserName(userData.userName);
+    saveUserNameInStorage(userData.userName);
   }
 
   async function setFreshlyCreatedTo(bool: boolean) {
@@ -157,7 +206,7 @@ function UserContextProvider({ children }) {
         forceOffline
           ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
           : "https://www.google.com/",
-        2000,
+        TIMEOUT,
         true,
         "HEAD"
       );
@@ -177,7 +226,7 @@ function UserContextProvider({ children }) {
               forceOffline
                 ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
                 : "https://www.google.com/",
-              2000,
+              TIMEOUT * (3 - retries),
               true,
               "HEAD"
             );
@@ -232,6 +281,8 @@ function UserContextProvider({ children }) {
 
     isPremium: isPremium,
     checkPremium: checkPremium,
+    loadCatListFromAsyncInCtx: loadCatListFromAsyncInCtx,
+    catIconNames: catIconNames,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

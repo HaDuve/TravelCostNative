@@ -1,4 +1,4 @@
-import { useContext, useEffect, useLayoutEffect, useState } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 import { Alert, KeyboardAvoidingView, StyleSheet, View } from "react-native";
 import React from "react";
 import { ScrollView } from "react-native";
@@ -30,6 +30,7 @@ import PropTypes from "prop-types";
 import { asyncStoreSetObject } from "../store/async-storage";
 import { Expense, ExpenseData } from "../util/expense";
 import { DateTime } from "luxon";
+import { useFocusEffect } from "@react-navigation/native";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -54,11 +55,6 @@ const ManageExpense = ({ route, navigation }) => {
   );
   const selectedExpenseAuthorUid = selectedExpense?.uid;
   //TODO: add tempValues to selected Expense
-
-  useEffect(() => {
-    const checkOnline = async () => await userCtx.checkConnectionUpdateUser();
-    checkOnline();
-  }, []);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -208,7 +204,7 @@ const ManageExpense = ({ route, navigation }) => {
           const days = daysBetween(day2, day1);
 
           // get correct amount
-          if (expenseData.duplOrSplit === 0) {
+          if (expenseData.duplOrSplit !== 1 && expenseData.duplOrSplit !== 2) {
             Alert.alert("wrong duplOrSplit value");
             return;
           }

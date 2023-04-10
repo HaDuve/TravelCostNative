@@ -32,6 +32,7 @@ import Button from "../components/UI/Button";
 import { G } from "react-native-svg";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { ActivityIndicator } from "react-native";
+import PropTypes from "prop-types";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -69,9 +70,9 @@ const JoinTrip = ({ navigation, route }) => {
     setIsFetching(false);
   }
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (clickedOnLink) getTrip(tripid);
-  }, []);
+  }, [clickedOnLink, tripid]);
 
   async function joinHandler(join: boolean) {
     // either we press the confirm or the cancel button (join=true/false)
@@ -191,7 +192,10 @@ const JoinTrip = ({ navigation, route }) => {
 };
 
 export default JoinTrip;
-
+JoinTrip.propTypes = {
+  navigation: PropTypes.object,
+  route: PropTypes.object,
+};
 const styles = StyleSheet.create({
   card: {
     flex: 1,

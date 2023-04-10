@@ -1,9 +1,10 @@
 import axios from "axios";
-import { DEBUG_NO_DATA } from "../confApp";
+import { DEBUG_NO_DATA } from "../confAppConstants";
 import { Category } from "./category";
 import { TripData } from "../store/trip-context";
 import Toast from "react-native-toast-message";
 import { ExpenseData, ExpenseDataOnline } from "./expense";
+import { UserData } from "../store/user-context";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -62,8 +63,7 @@ export async function fetchCategories(tripid: string) {
     const response = await axios.get(
       BACKEND_URL + "/trips/" + tripid + "/categories.json" + QPAR
     );
-    console.log("fetchCategories ~ response.data:", response.data);
-    return response.data;
+    if (response) return JSON.parse(response.data);
   } catch (error) {
     console.error(error);
   }
@@ -284,7 +284,7 @@ export async function storeUser(uid: string, userData: object) {
 /**
  * Updates User via axios.patch given uid and userdata to patch
  */
-export function updateUser(uid: string, userData: object) {
+export function updateUser(uid: string, userData: UserData) {
   // console.log("updateUser ~ userData", userData);
   return axios.patch(BACKEND_URL + "/users/" + `${uid}.json` + QPAR, userData);
 }
@@ -299,14 +299,15 @@ export async function fetchUser(uid: string) {
     const response = await axios.get(
       BACKEND_URL + "/users/" + `${uid}.json` + QPAR
     );
-    return response.data;
+    const userData: UserData = response.data;
+    return userData;
   } catch (error) {
     console.log(error);
     return null;
   }
 }
 
-export async function storeTrip(tripData) {
+export async function storeTrip(tripData: TripData) {
   // console.log("https: ~ storeTrip ~ tripData", tripData);
   //TODO: create tripData Interface for TypeScript
   const response = await axios.post(

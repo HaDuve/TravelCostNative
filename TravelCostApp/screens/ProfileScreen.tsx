@@ -28,7 +28,7 @@ import { saveStoppedTour } from "../util/tourUtil";
 import { TourGuideZone, useTourGuideController } from "rn-tourguide";
 import { sleep } from "../util/appState";
 import { useInterval } from "../components/Hooks/useInterval";
-import { DEBUG_POLLING_INTERVAL } from "../confApp";
+import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {

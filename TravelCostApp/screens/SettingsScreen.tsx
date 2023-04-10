@@ -16,7 +16,7 @@ import { exportAllExpensesToXLSX } from "../components/ImportExport/ExportToGoog
 import { ScrollView } from "react-native-gesture-handler";
 import { GlobalStyles } from "../constants/styles";
 import LinkingButton from "../components/UI/LinkButton";
-import { DEV } from "../confApp";
+import { DEV } from "../confAppConstants";
 import { useFocusEffect } from "@react-navigation/native";
 import { DateTime } from "luxon";
 import { TourGuideZone, useTourGuideController } from "rn-tourguide";

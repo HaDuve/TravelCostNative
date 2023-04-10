@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
 import { isToday, toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
-import { getCatSymbol } from "../../util/category";
+import { getCatSymbol, Category } from "../../util/category";
 import { memo, useContext, useCallback, useState } from "react";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseString } from "../../util/string";
@@ -84,26 +84,33 @@ function ExpenseItem(props): JSX.Element {
   if (iconName) console.log(iconName);
   const [catSymbol, setCatSymbol] = useState(iconName ? iconName : "");
   useEffect(() => {
-    async function setCatSymbolAsync() {
-      const cat = await getCatSymbol(category);
-      setCatSymbol(cat);
+    function setCatSymbolAsync() {
+      const listOfCats = UserCtx.catIconNames;
+      if (listOfCats) {
+        const cat: Category = listOfCats.find(({ cat }) => cat === category);
+        if (cat?.icon) {
+          setCatSymbol(cat.icon);
+          return;
+        }
+      }
+      const iconName = getCatSymbol(category);
+      setCatSymbol(iconName);
     }
     setCatSymbolAsync();
-  }, [category]);
+  }, [UserCtx.catIconNames, category]);
 
   const sameCurrency = homeCurrency === currency;
 
-  const { settings, saveSettings } = useContext(SettingsContext);
+  const { settings } = useContext(SettingsContext);
   const toggle1 = settings.showFlags;
   const toggle2 = settings.showWhoPaid;
 
-  const memoizedCallback = useCallback(
-    () =>
-      navigation.navigate("ManageExpense", {
-        expenseId: id,
-      }),
-    [id, navigation]
-  );
+  const memoizedCallback = useCallback(async () => {
+    await UserCtx.checkConnectionUpdateUser();
+    navigation.navigate("ManageExpense", {
+      expenseId: id,
+    });
+  }, [id, navigation]);
   const originalCurrencyJSX = !sameCurrency ? (
     <>
       <Text style={styles.originalCurrencyText}>

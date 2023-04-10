@@ -55,7 +55,7 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 import ManageCategoryScreen from "./screens/ManageCategoryScreen";
 import ToastComponent from "./components/UI/ToastComponent";
-import { DEBUG_RESET, DEBUG_POLLING_INTERVAL } from "./confApp";
+import { DEBUG_RESET, DEBUG_POLLING_INTERVAL } from "./confAppConstants";
 import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
 import Toast from "react-native-toast-message";
 import { useInterval } from "./components/Hooks/useInterval";
@@ -65,6 +65,7 @@ import { loadTourConfig } from "./util/tourUtil";
 import { API_KEY } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
 import { SettingsProvider } from "./store/settings-context";
+import { UserData } from "./store/user-context";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -122,7 +123,7 @@ function AuthenticatedStack() {
             component={ManageExpense}
             options={{
               headerShown: false,
-              presentation: "formSheet",
+              presentation: "modal",
             }}
           />
           <Stack.Screen
@@ -410,7 +411,7 @@ function Root() {
     async function listener() {
       // only listen to isOnline if we dont have an offline queue
       const queue = await asyncStoreGetObject("offlineQueue");
-      if (queue && queue.length > 0) {
+      if (!appIsReady || (queue && queue.length > 0)) {
         return;
       } else {
         Toast.show({
@@ -437,6 +438,7 @@ function Root() {
     await userCtx.loadUserNameFromStorage();
     await tripCtx.loadTripDataFromStorage();
     await tripCtx.loadTravellersFromStorage();
+    await userCtx.loadCatListFromAsyncInCtx("async");
     authCtx.offlineAuthenticate(storedToken);
   }
 
@@ -549,7 +551,7 @@ function Root() {
 
         // console.log("getExpenses ~ expenses", expenses);
 
-        const userData = checkUser;
+        const userData: UserData = checkUser;
         const tripid = userData.currentTrip;
         console.log("onRootMount ~ userData", userData);
         userCtx.addUser(userData);
@@ -566,6 +568,7 @@ function Root() {
         const needsTour = await loadTourConfig();
         console.log("onRootMount ~ needsTour:", needsTour);
         userCtx.setNeedsTour(needsTour);
+        await userCtx.loadCatListFromAsyncInCtx(tripid);
         console.log("Root end reached");
       } else {
         authCtx.logout();
@@ -574,8 +577,7 @@ function Root() {
     }
     const test_onRootMount = dataResponseTime(onRootMount);
     test_onRootMount();
-    // onRootMount();
-  }, [UserContext]);
+  }, []);
 
   useLayoutEffect(() => {
     async function hideSplashScreen() {

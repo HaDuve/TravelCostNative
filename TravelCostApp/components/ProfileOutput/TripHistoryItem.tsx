@@ -5,17 +5,15 @@ import {
   View,
   FlatList,
   Alert,
-  Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import * as Updates from "expo-updates";
 import * as Haptics from "expo-haptics";
 
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
 import React, { useContext, useEffect, useState } from "react";
 import { TripContext } from "../../store/trip-context";
-import { formatExpenseString, truncateString } from "../../util/string";
+import { truncateString } from "../../util/string";
 import {
   fetchTrip,
   fetchTripName,
@@ -25,8 +23,6 @@ import {
   updateTripHistory,
   updateUser,
 } from "../../util/http";
-import { onShare } from "./ShareTrip";
-import { calcOpenSplitsTable } from "../../util/split";
 import LoadingOverlay from "../UI/LoadingOverlay";
 
 //Localization
@@ -37,6 +33,7 @@ import { ExpensesContext } from "../../store/expenses-context";
 import { UserContext } from "../../store/user-context";
 import { AuthContext } from "../../store/auth-context";
 import getSymbolFromCurrency from "currency-symbol-map";
+import PropTypes from "prop-types";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -144,7 +141,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const activeProgress = 0;
 
   if (isFetching || (tripid && !totalBudget)) {
-    return <LoadingOverlay />;
+    return <> </>;
   }
 
   function renderTravellers(item) {
@@ -208,6 +205,12 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
 }
 
 export default TripHistoryItem;
+
+TripHistoryItem.propTypes = {
+  tripid: PropTypes.string,
+  setRefreshing: PropTypes.func,
+  trips: PropTypes.array,
+};
 
 const styles = StyleSheet.create({
   pressed: {

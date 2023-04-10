@@ -155,9 +155,9 @@ const ExpenseForm = ({
     setShowDatePickerRange(false);
   };
 
-  // 1 is dupl, 2 is enum, 0 is null
-  const [duplOrSplit, setDuplOrSplit] = useState(
-    defaultValues ? defaultValues.duplOrSplit : 0
+  // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
+  const [duplOrSplit, setDuplOrSplit] = useState<number>(
+    defaultValues ? Number(defaultValues.duplOrSplit) : 0
   );
   const duplOrSplitString =
     duplOrSplit === 1
@@ -180,22 +180,7 @@ const ExpenseForm = ({
       inputChangedHandler("date", startDateFormat);
       return;
     }
-    Alert.alert(i18n.t("rangedDatesTitle"), i18n.t("rangedDatesText"), [
-      {
-        text: i18n.t("duplicateExpenses"),
-        onPress: async () => {
-          console.log("duplicate");
-          setDuplOrSplit(1);
-        },
-      },
-      {
-        text: i18n.t("splitUpExpenses"),
-        onPress: async () => {
-          console.log("split up");
-          setDuplOrSplit(2);
-        },
-      },
-    ]);
+    setDuplOrSplit(1);
   };
 
   // list of all splits owed
@@ -428,10 +413,7 @@ const ExpenseForm = ({
           },
         };
       });
-      // show feedback
-      // Alert.alert("Invalid Input", "Please check your input values");
       addDefaultValues(pickedCat);
-      // alertDefaultValues();
       return;
     }
 
@@ -478,15 +460,6 @@ const ExpenseForm = ({
     if (!inputs.category.isValid) {
       inputChangedHandler("category", arg);
     }
-
-    // if (!inputs.date.isValid) {
-    //   const today = DateTime.now().toJSDate();
-    //   console.log("addDefaultValues ~ today:", today);
-    //   setStartDate(today);
-    //   setEndDate(today);
-    //   // inputChangedHandler("date", getFormattedDate(today));
-    // }
-    // for now set default values to every field so everything goes fast
     if (!inputs.country.isValid) {
       inputChangedHandler("country", UserCtx.lastCountry);
     }
@@ -499,26 +472,6 @@ const ExpenseForm = ({
     if (!inputs.owePerc.isValid) {
       inputChangedHandler("owePerc", "0");
     }
-  }
-
-  function alertDefaultValues() {
-    Alert.alert(
-      "Quick Expense?",
-      "Do you want to fill the advanced options with suggested default values? (Today as Date, Your Name, Category as Description, Your last Country and last Currency etc.)",
-      [
-        {
-          text: "Cancel",
-          onPress: () => false,
-          style: "cancel",
-        },
-        {
-          text: "Yes",
-          onPress: () => {
-            addDefaultValues(pickedCat);
-          },
-        },
-      ]
-    );
   }
 
   function toggleAdvancedHandler() {
@@ -537,30 +490,9 @@ const ExpenseForm = ({
     const currency = countryValue.split("- ")[1].split(" ")[0].trim();
     const country = countryValue.split("- ")[0].trim();
     inputChangedHandler("currency", currency);
-    Alert.alert(
-      "Change the country aswell?",
-      "This will change the country to " +
-        country +
-        ". Otherwise, only the currency will be changed to " +
-        currency +
-        " | " +
-        getSymbolFromCurrency(currency) +
-        ".",
-      [
-        {
-          text: "Currency only",
-          onPress: () => false,
-          style: "cancel",
-        },
-        {
-          text: "Yes",
-          onPress: () => {
-            inputChangedHandler("country", country);
-          },
-        },
-      ]
-    );
+    inputChangedHandler("country", country);
   }
+
   const formIsInvalid =
     !inputs.amount.isValid ||
     !inputs.description.isValid ||
@@ -705,11 +637,19 @@ const ExpenseForm = ({
                 ></ExpenseCountryFlag>
               </View>
 
-              <View style={styles.dateLabel}>
-                <Text style={styles.dateLabelText}>
-                  {i18n.t("dateLabel")} {duplOrSplitString}
+              <Pressable
+                onPress={() => {
+                  if (!dateIsRanged) return;
+                  if (duplOrSplit === 1) setDuplOrSplit(2);
+                  else setDuplOrSplit(1);
+                }}
+                style={styles.dateLabel}
+              >
+                <Text style={styles.dateLabelText}>{i18n.t("dateLabel")}</Text>
+                <Text style={styles.dateLabelDuplSplitText}>
+                  {duplOrSplitString}
                 </Text>
-              </View>
+              </Pressable>
               {DatePickerContainer({
                 openDatePickerRange,
                 startDate,
@@ -1089,13 +1029,22 @@ const styles = StyleSheet.create({
   },
   dateLabel: {
     marginTop: "4%",
-    marginLeft: "5.5%",
+    marginHorizontal: "5.5%",
+    // row
+    flexDirection: "row",
+    // justifyContent: "space-between",
   },
   dateLabelText: {
     fontSize: 12,
     fontWeight: "400",
     color: GlobalStyles.colors.textColor,
   },
+  dateLabelDuplSplitText: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: GlobalStyles.colors.primary500,
+  },
+
   dateIconContainer: {
     marginLeft: "2.5%",
   },

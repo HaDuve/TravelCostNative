@@ -88,6 +88,7 @@ function LoginScreen() {
         tripCtx.setTripid(tripid);
         userCtx.addUser(userData);
         await tripCtx.fetchAndSetCurrentTrip(tripid);
+        await userCtx.loadCatListFromAsyncInCtx(tripid);
         tripCtx.refresh();
       } catch (error) {
         Alert.alert(i18n.t("noConnection"), i18n.t("tryAgain"));

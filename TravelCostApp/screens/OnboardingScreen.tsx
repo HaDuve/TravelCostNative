@@ -13,6 +13,7 @@ i18n.enableFallback = true;
 import Onboarding from "react-native-onboarding-swiper";
 import { GlobalStyles } from "../constants/styles";
 import { UserContext } from "../store/user-context";
+import PropTypes from "prop-types";
 
 const OnboardingScreen = ({ navigation }) => {
   const titleStyle = styles.titleStyle;
@@ -21,7 +22,7 @@ const OnboardingScreen = ({ navigation }) => {
   return (
     <Onboarding
       onDone={() => navigation.replace("Signup")}
-      onSkip={() => navigation.replace("Login")}
+      onSkip={() => navigation.replace("Signup")}
       pages={[
         {
           backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -56,6 +57,10 @@ const OnboardingScreen = ({ navigation }) => {
 };
 
 export default OnboardingScreen;
+
+OnboardingScreen.propTypes = {
+  navigation: PropTypes.object.isRequired,
+};
 
 const styles = StyleSheet.create({
   titleStyle: {

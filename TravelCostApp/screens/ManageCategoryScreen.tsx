@@ -49,6 +49,8 @@ import { useFocusEffect } from "@react-navigation/native";
 import Dimensions from "react-native";
 import { FadeInRight } from "react-native-reanimated";
 import FadeOutLeft from "react-native-reanimated";
+import { alertYesNo } from "../components/Errors/Alert";
+import IconButton from "../components/UI/IconButton";
 
 const ManageCategoryScreen = ({ route, navigation }) => {
   const defaultCategoryList: Category[] = [
@@ -204,6 +206,12 @@ const ManageCategoryScreen = ({ route, navigation }) => {
     newCategoryList.splice(index, 1);
     setCategoryList(newCategoryList);
     await saveCategoryList(newCategoryList);
+  };
+
+  const handleResetCategoryList = async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setCategoryList(defaultCategoryList);
+    await saveCategoryList(defaultCategoryList);
   };
 
   useEffect(() => {
@@ -476,15 +484,48 @@ const ManageCategoryScreen = ({ route, navigation }) => {
             overflow: "visible",
           }}
         />
-        <FlatButton
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            navigation.pop();
-          }}
-          // style={{ margin: 16 }}
-        >
-          {i18n.t("back")}
-        </FlatButton>
+        <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+          <IconButton
+            icon={"chevron-back-outline"}
+            size={24}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              navigation.pop();
+            }}
+            color={GlobalStyles.colors.primaryGrayed}
+          ></IconButton>
+          <GradientButton
+            colors={GlobalStyles.gradientAccentButton}
+            darkText
+            onPress={() => {
+              alertYesNo(
+                "Reset",
+                "Reset all categories?",
+                handleResetCategoryList
+              );
+            }}
+          >
+            RESET
+          </GradientButton>
+          {/* <FlatButton
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              navigation.pop();
+            }}
+            // style={{ margin: 16 }}
+          >
+            {i18n.t("back")}
+          </FlatButton> */}
+
+          <GradientButton
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              navigation.pop();
+            }}
+          >
+            {i18n.t("confirm")}
+          </GradientButton>
+        </View>
       </KeyboardAvoidingView>
     </BackgroundGradient>
   );

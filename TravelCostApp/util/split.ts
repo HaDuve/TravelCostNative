@@ -3,12 +3,89 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../i18n/supportedLanguages";
 import { getRate } from "./currencyExchange";
+import { Split } from "./expense";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import { getAllExpenses } from "./http";
+
+export function calcExactSplits(splitList, amount) {
+  // number of travellers
+  const numberOfTravellers = splitList.length;
+  // normal split amount
+  const splitAmountNorm = amount / numberOfTravellers;
+  // splitrest can be 0, negative or positive
+  const splitRest =
+    amount -
+    splitList.reduce((sum, split) => {
+      return sum + Number(split.amount);
+    }, 0);
+  console.log("calcExactSplits ~ splitRest:", splitRest);
+
+  let numberOfTravellersWithoutSplit = 0;
+  // count number of travellers without split
+  splitList.forEach((split) => {
+    if (!split.amount) {
+      numberOfTravellersWithoutSplit++;
+    }
+  });
+
+  // TODO: change this from find one split to a list of travellers who share the rest
+  // if there are no travellers without split, find any split with amount equal to splitAmountNorm and adjust that so the rest becomes 0
+  if (numberOfTravellersWithoutSplit === 0) {
+    const foundNorm = splitList.find((split) => {
+      if (sameNumber(Number(split.amount), Number(splitAmountNorm))) {
+        split.amount = Number(Number(split.amount) + splitRest).toFixed(2);
+        return split;
+      }
+    });
+    // TODO: change this from find one split to a list of travellers who share the rest
+    // if not found, adjust the first split with last 2 chars "00" so the rest becomes 0
+    if (!foundNorm) {
+      const found00 = splitList.find((split) => {
+        if (split.amount.slice(-2) === "00") {
+          split.amount = Number(Number(split.amount) + splitRest).toFixed(2);
+          return split;
+        }
+      });
+      if (!found00) {
+        splitList[0].amount = Number(
+          Number(splitList[0].amount) + splitRest
+        ).toFixed(2);
+      }
+    }
+
+    for (let i = 0; i < splitList.length; i++) {
+      const split = splitList[i];
+      split.amount = Number(split.amount).toFixed(2);
+    }
+    return splitList;
+  }
+
+  // return a list of splits with the correct amount for unknown amounts
+  const exactSplitList = [];
+  splitList.forEach((split) => {
+    if (!split.amount) {
+      const splitAmount = splitRest / numberOfTravellersWithoutSplit;
+      exactSplitList.push({
+        userName: split.userName,
+        amount: Number(splitAmount).toFixed(2),
+      });
+    } else {
+      exactSplitList.push({
+        userName: split.userName,
+        amount: Number(split.amount).toFixed(2),
+      });
+    }
+  });
+  for (let i = 0; i < exactSplitList.length; i++) {
+    const split = exactSplitList[i];
+    split.amount = Number(split.amount).toFixed(2);
+  }
+  return exactSplitList;
+}
 
 export function calcSplitList(
   splitType,
@@ -52,7 +129,6 @@ export function calcSplitList(
             amount: splitAmount.toFixed(2),
           });
         });
-        console.log("splitList", splitList);
         return splitList;
       }
 
@@ -77,7 +153,12 @@ export function calcSplitList(
   }
 }
 
-export function validateSplitList(splitList, splitType, amount, changedIndex) {
+export function validateSplitList(
+  splitList: Split[],
+  splitType: string,
+  amount,
+  changedIndex = 0
+) {
   if (!splitList || !splitType || !amount || splitList.length < 1) return;
   switch (splitType) {
     case "SELF":
@@ -85,14 +166,18 @@ export function validateSplitList(splitList, splitType, amount, changedIndex) {
     case "EQUAL":
       break;
     case "EXACT": {
-      const splitSum = splitList.reduce((sum, split) => {
+      // check if any split.amount are empty, NaN or negative
+      for (let i = 0; i < splitList.length; i++) {
+        const split = splitList[i];
+        const splitAmount = Number(split.amount);
+        if (!splitAmount || splitAmount < 0 || Number.isNaN(splitAmount)) {
+          return false;
+        }
+      }
+      const splitSum = splitList.reduce((sum: number, split: Split) => {
         return sum + Number(split.amount);
       }, 0);
-      const minDiff = 0.02;
-      const compAmount = Number(amount);
-      const HiVal = splitSum < compAmount + minDiff;
-      const LoVal = splitSum > compAmount - minDiff;
-      return HiVal && LoVal;
+      return sameNumber(splitSum, Number(amount));
     }
     case "PERCENT":
       break;
@@ -100,7 +185,7 @@ export function validateSplitList(splitList, splitType, amount, changedIndex) {
     default:
       break;
   }
-  return splitList;
+  return true;
 }
 
 export function splitTypesDropdown() {
@@ -277,4 +362,8 @@ function cancelDifferences(openSplits) {
   });
 
   return listOfSums;
+}
+
+export function sameNumber(a: number, b: number, minDiff = 0.02) {
+  return Math.abs(a - b) < minDiff;
 }

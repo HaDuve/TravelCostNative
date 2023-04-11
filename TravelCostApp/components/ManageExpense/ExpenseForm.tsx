@@ -52,6 +52,7 @@ import GradientButton from "../UI/GradientButton";
 import getSymbolFromCurrency from "currency-symbol-map";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import CountryFlag from "react-native-country-flag";
+import { calcExactSplits } from "../../util/split";
 
 const ExpenseForm = ({
   onCancel,
@@ -483,6 +484,21 @@ const ExpenseForm = ({
     }
   }
 
+  function handleRecalculationSplits() {
+    {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      const newSplitList = calcExactSplits(splitList, inputs.amount.value);
+
+      setSplitList(newSplitList);
+      const isValidSplit = validateSplitList(
+        newSplitList,
+        splitType,
+        inputs.amount.value
+      );
+      setSplitListValid(isValidSplit);
+    }
+  }
+
   const advancedSubmitHandler = hideAdvanced ? fastSubmit : submitHandler;
 
   function updateCurrency() {
@@ -785,112 +801,146 @@ const ExpenseForm = ({
                   textStyle={styles.dropdownTextStyle}
                 />
               )}
-              <View styles={[styles.advancedRowSplit]}>
+              <View
+                style={[
+                  styles.advancedRowSplit,
+                  { marginTop: 12, marginLeft: 12 },
+                ]}
+              >
                 {!splitTypeSelf &&
                   whoPaidValid &&
                   !IsSoloTraveller &&
                   splitListHasNonZeroEntries && (
-                    <Text
-                      style={[
-                        styles.currencyLabel,
-                        { marginTop: 16, marginLeft: 16 },
-                      ]}
-                    >
+                    <Text style={[styles.currencyLabel, { marginTop: 16 }]}>
                       {i18n.t("whoShared")}
                     </Text>
                   )}
-                {!splitTypeSelf && (
-                  <FlatList
-                    // numColumns={2}
-                    data={splitList}
-                    horizontal={true}
-                    contentContainerStyle={{
-                      flex: 1,
-                      minWidth: "150%",
-                      justifyContent: "flex-start",
-                      alignItems: "flex-start",
-                    }}
-                    ListFooterComponent={<View style={{ width: 100 }}></View>}
-                    renderItem={(itemData) => {
-                      const splitValue = itemData.item.amount.toString();
-                      return (
-                        <View
-                          style={[
-                            GlobalStyles.strongShadow,
-                            {
-                              flex: 1,
-                              minWidth: 120,
-                              maxWidth: 145,
-                              marginBottom: 16,
-                              borderWidth: 1,
-                              borderRadius: 16,
-                              padding: 8,
-                              margin: 8,
-                              backgroundColor:
-                                GlobalStyles.colors.backgroundColor,
-                              borderColor: GlobalStyles.colors.gray700,
-                            },
-                          ]}
-                        >
-                          <Text
-                            style={{
-                              color: splitListValid
-                                ? GlobalStyles.colors.textColor
-                                : GlobalStyles.colors.error500,
-                            }}
-                          >
-                            {truncateString(itemData.item.userName, 15)}
-                          </Text>
-                          {/* Horizontal container  */}
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              // place items at the bottom of the container
-                              justifyContent: "flex-end",
-                              // place items at the right of the container
-                              alignItems: "flex-end",
-                            }}
-                          >
-                            <Input
-                              inputStyle={[
-                                splitTypeEqual && {
-                                  color: GlobalStyles.colors.textColor,
-                                },
-                                { paddingBottom: 4 },
-                                {
-                                  backgroundColor:
-                                    GlobalStyles.colors.backgroundColor,
-                                },
-                              ]}
-                              style={[
-                                styles.rowInput,
-                                {
-                                  minWidth: "25%",
-                                },
-                              ]}
-                              textInputConfig={{
-                                onFocus: () => {
-                                  if (splitType === "EQUAL") Keyboard.dismiss();
-                                },
-                                keyboardType: "decimal-pad",
-                                onChangeText: inputSplitListHandler.bind(
-                                  this,
-                                  itemData.index,
-                                  itemData.item
-                                ),
-                                value: splitValue ? splitValue : "",
-                              }}
-                            ></Input>
-                            <Text style={{ paddingBottom: 12 }}>
-                              {inputs.currency.value}
-                            </Text>
-                          </View>
-                        </View>
-                      );
-                    }}
-                  ></FlatList>
-                )}
+                <Pressable
+                  style={({ pressed }) => [
+                    {
+                      flexDirection: "column",
+                      alignContent: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginLeft: 16,
+                      marginBottom: 12,
+                      marginTop: 8,
+                      borderRadius: 8,
+                      backgroundColor: GlobalStyles.colors.backgroundColor,
+                      paddingTop: 12,
+                      paddingBottom: 0,
+                      paddingHorizontal: 24,
+
+                      borderWidth: 1,
+                      borderColor: GlobalStyles.colors.primary500,
+                    },
+                    GlobalStyles.strongShadow,
+                    pressed && GlobalStyles.pressedWithShadow,
+                  ]}
+                  onPress={() => handleRecalculationSplits()}
+                >
+                  {splitType == "EXACT" && (
+                    <IconButton
+                      icon="ios-git-compare-outline"
+                      color={GlobalStyles.colors.primary500}
+                      size={24}
+                      onPress={() => handleRecalculationSplits()}
+                    />
+                  )}
+                </Pressable>
               </View>
+
+              {!splitTypeSelf && (
+                <FlatList
+                  // numColumns={2}
+                  data={splitList}
+                  horizontal={true}
+                  contentContainerStyle={{
+                    flex: 1,
+                    minWidth: "150%",
+                    justifyContent: "flex-start",
+                    alignItems: "flex-start",
+                  }}
+                  ListFooterComponent={<View style={{ width: 100 }}></View>}
+                  renderItem={(itemData) => {
+                    const splitValue = itemData.item.amount.toString();
+                    return (
+                      <View
+                        style={[
+                          GlobalStyles.strongShadow,
+                          {
+                            flex: 1,
+                            minWidth: 120,
+                            maxWidth: 145,
+                            marginBottom: 16,
+                            borderWidth: 1,
+                            borderRadius: 16,
+                            padding: 8,
+                            margin: 8,
+                            backgroundColor:
+                              GlobalStyles.colors.backgroundColor,
+                            borderColor: GlobalStyles.colors.gray700,
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={{
+                            color: splitListValid
+                              ? GlobalStyles.colors.textColor
+                              : GlobalStyles.colors.error500,
+                          }}
+                        >
+                          {truncateString(itemData.item.userName, 15)}
+                        </Text>
+                        {/* Horizontal container  */}
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            // place items at the bottom of the container
+                            justifyContent: "flex-end",
+                            // place items at the right of the container
+                            alignItems: "flex-end",
+                          }}
+                        >
+                          <Input
+                            inputStyle={[
+                              splitTypeEqual && {
+                                color: GlobalStyles.colors.textColor,
+                              },
+                              { paddingBottom: 4 },
+                              {
+                                backgroundColor:
+                                  GlobalStyles.colors.backgroundColor,
+                              },
+                            ]}
+                            style={[
+                              styles.rowInput,
+                              {
+                                minWidth: "25%",
+                              },
+                            ]}
+                            textInputConfig={{
+                              onFocus: () => {
+                                if (splitType === "EQUAL") Keyboard.dismiss();
+                              },
+                              keyboardType: "decimal-pad",
+                              onChangeText: inputSplitListHandler.bind(
+                                this,
+                                itemData.index,
+                                itemData.item
+                              ),
+                              value: splitValue ? splitValue : "",
+                            }}
+                          ></Input>
+                          <Text style={{ paddingBottom: 12 }}>
+                            {inputs.currency.value}
+                          </Text>
+                        </View>
+                      </View>
+                    );
+                  }}
+                ></FlatList>
+              )}
             </>
           )}
           {formIsInvalid && !hideAdvanced && (

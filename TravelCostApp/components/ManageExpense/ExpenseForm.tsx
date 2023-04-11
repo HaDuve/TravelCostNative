@@ -815,39 +815,39 @@ const ExpenseForm = ({
                       {i18n.t("whoShared")}
                     </Text>
                   )}
-                <Pressable
-                  style={({ pressed }) => [
-                    {
-                      flexDirection: "column",
-                      alignContent: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      marginLeft: 16,
-                      marginBottom: 12,
-                      marginTop: 8,
-                      borderRadius: 8,
-                      backgroundColor: GlobalStyles.colors.backgroundColor,
-                      paddingTop: 12,
-                      paddingBottom: 0,
-                      paddingHorizontal: 24,
+                {splitType == "EXACT" && (
+                  <Pressable
+                    style={({ pressed }) => [
+                      {
+                        flexDirection: "column",
+                        alignContent: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginLeft: 16,
+                        marginBottom: 12,
+                        marginTop: 8,
+                        borderRadius: 8,
+                        backgroundColor: GlobalStyles.colors.backgroundColor,
+                        paddingTop: 12,
+                        paddingBottom: 0,
+                        paddingHorizontal: 24,
 
-                      borderWidth: 1,
-                      borderColor: GlobalStyles.colors.primary500,
-                    },
-                    GlobalStyles.strongShadow,
-                    pressed && GlobalStyles.pressedWithShadow,
-                  ]}
-                  onPress={() => handleRecalculationSplits()}
-                >
-                  {splitType == "EXACT" && (
+                        borderWidth: 1,
+                        borderColor: GlobalStyles.colors.primary500,
+                      },
+                      GlobalStyles.strongShadow,
+                      pressed && GlobalStyles.pressedWithShadow,
+                    ]}
+                    onPress={() => handleRecalculationSplits()}
+                  >
                     <IconButton
                       icon="ios-git-compare-outline"
                       color={GlobalStyles.colors.primary500}
                       size={24}
                       onPress={() => handleRecalculationSplits()}
                     />
-                  )}
-                </Pressable>
+                  </Pressable>
+                )}
               </View>
 
               {!splitTypeSelf && (

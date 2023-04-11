@@ -23,17 +23,15 @@ import IconButton from "../UI/IconButton";
 import { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import ExpenseCurrencies from "./ExpenseStatistics/ExpenseCurrencies";
 import Animated, {
-  FadeIn,
-  FadeInDown,
   FadeInLeft,
   FadeInUp,
-  FadeOut,
   FadeOutDown,
   FadeOutRight,
-  FadeOutUp,
 } from "react-native-reanimated";
+import { MAX_PERIOD_RANGE, MIN_PERIOD_RANGE } from "../../confAppConstants";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
+  const [periodRangeNumber, setPeriodRangeNumber] = useState(7);
   const [toggleGraph, setToggleGraph] = useState(true);
   // enum =>  0 = categories, 1 = traveller, 2 = country, 3 = currency
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
@@ -55,14 +53,42 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       titleString = i18n.t("overview");
       break;
     default:
-      // convert day into days etc. for localization
-      titleString = `${i18n.t("last")} ${i18n.t(periodName + "s")}`;
+      // TODO: convert day into days etc. for localization
+      titleString = `${i18n.t("last")} ${periodRangeNumber} ${i18n.t(
+        periodName + "s"
+      )}`;
       break;
   }
 
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
+        <Animated.View
+          entering={FadeInLeft}
+          exiting={FadeOutLeft}
+          style={styles.chevronContainer}
+        >
+          <IconButton
+            icon={"chevron-back-outline"}
+            size={24}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              if (toggleGraph) {
+                setPeriodRangeNumber(
+                  periodRangeNumber == MIN_PERIOD_RANGE
+                    ? MAX_PERIOD_RANGE
+                    : periodRangeNumber - 1
+                );
+              } else {
+                setToggleGraphEnum(
+                  toggleGraphEnum == 0 ? 3 : toggleGraphEnum - 1
+                );
+              }
+            }}
+            color={GlobalStyles.colors.primaryGrayed}
+          ></IconButton>
+        </Animated.View>
+
         {toggleGraph && (
           <Animated.View
             style={styles.chevronContainer}
@@ -72,25 +98,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
             <Text style={styles.titleText}> {titleString} </Text>
           </Animated.View>
         )}
-        {!toggleGraph && (
-          <Animated.View
-            entering={FadeInLeft}
-            exiting={FadeOutLeft}
-            style={styles.chevronContainer}
-          >
-            <IconButton
-              icon={"chevron-back-outline"}
-              size={24}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setToggleGraphEnum(
-                  toggleGraphEnum == 0 ? 3 : toggleGraphEnum - 1
-                );
-              }}
-              color={GlobalStyles.colors.primaryGrayed}
-            ></IconButton>
-          </Animated.View>
-        )}
+
         {!toggleGraph && toggleGraphEnum == 0 && (
           <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
             <Text style={styles.titleText}> {i18n.t("categories")} </Text>
@@ -111,26 +119,32 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
             <Text style={styles.titleText}> Currencies </Text>
           </Animated.View>
         )}
-        {!toggleGraph && (
-          <Animated.View
-            entering={FadeInRight}
-            exiting={FadeOutRight}
-            style={styles.chevronContainer}
-          >
-            <IconButton
-              icon={"chevron-forward-outline"}
-              size={24}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
+        <Animated.View
+          entering={FadeInRight}
+          exiting={FadeOutRight}
+          style={styles.chevronContainer}
+        >
+          <IconButton
+            icon={"chevron-forward-outline"}
+            size={24}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              if (toggleGraph) {
+                setPeriodRangeNumber(
+                  periodRangeNumber == MAX_PERIOD_RANGE
+                    ? MIN_PERIOD_RANGE
+                    : periodRangeNumber + 1
+                );
+              } else {
                 setToggleGraphEnum(
                   toggleGraphEnum == 3 ? 0 : toggleGraphEnum + 1
                 );
-              }}
-              color={GlobalStyles.colors.primaryGrayed}
-            ></IconButton>
-          </Animated.View>
-        )}
+              }
+            }}
+            color={GlobalStyles.colors.primaryGrayed}
+          ></IconButton>
+        </Animated.View>
       </View>
 
       {toggleGraph && (
@@ -138,6 +152,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           navigation={navigation}
           expenses={expenses}
           periodName={periodName}
+          periodRangeNumber={periodRangeNumber}
         />
       )}
       {!toggleGraph && toggleGraphEnum == 0 && (

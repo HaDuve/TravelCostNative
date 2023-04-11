@@ -10,7 +10,6 @@ import {
   toDayMonthString2,
   toMonthString,
 } from "../../../util/date";
-import { UserContext } from "../../../store/user-context";
 import { TripContext } from "../../../store/trip-context";
 import { formatExpenseString } from "../../../util/string";
 import { GlobalStyles } from "../../../constants/styles";
@@ -21,7 +20,6 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../../../i18n/supportedLanguages";
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
-import { Expense } from "../../../util/expense";
 import PropTypes from "prop-types";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { isForeground } from "../../../util/appState";
@@ -30,11 +28,10 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-const ExpenseGraph = ({ expenses, periodName, navigation }) => {
+const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
   const expenseCtx = useContext(ExpensesContext);
   const tripCtx = useContext(TripContext);
   const today = new Date();
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   function renderItemRef() {
     return <> </>;
   }
@@ -42,24 +39,16 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
     console.log("ExpenseGraph: not in foreground, return empty view");
     return <> </>;
   }
-
-  // list the last ?? and compare their respective expenseSum to their budget
-  // day
-  // week
-  // month
-  // year
-  // total
   const listExpenseSumBudgets = [];
+  const lastDays = periodRangeNumber ?? 8,
+    lastWeeks = periodRangeNumber ?? 10,
+    lastMonths = periodRangeNumber ?? 10,
+    lastYears = periodName == "total" ? 5 : periodRangeNumber ?? 10;
   let xAxis = "";
   let yAxis = "";
   let budgetAxis = "";
   let budget = 0;
   let daysRange = 0;
-  const lastDays = 8;
-  const lastWeeks = 10;
-  const lastMonths = 10;
-  const lastYears = 10;
-
   switch (periodName) {
     case "day":
       xAxis = "day";
@@ -274,6 +263,7 @@ const ExpenseGraph = ({ expenses, periodName, navigation }) => {
         );
       };
       break;
+
     case "total":
     case "year":
       xAxis = "firstDay";
@@ -393,6 +383,9 @@ export default ExpenseGraph;
 
 ExpenseGraph.propTypes = {
   navigation: PropTypes.object,
+  expenses: PropTypes.array,
+  periodName: PropTypes.string,
+  periodRangeNumber: PropTypes.number,
 };
 
 const styles = StyleSheet.create({

@@ -2,8 +2,10 @@ import React, { memo } from "react";
 import { StyleSheet, Vibration, View } from "react-native";
 import * as Haptics from "expo-haptics";
 import {
+  VictoryAxis,
   VictoryBar,
   VictoryChart,
+  VictoryLabel,
   VictoryLine,
   VictoryTooltip,
   VictoryVoronoiContainer,
@@ -18,11 +20,9 @@ const ExpenseChart = ({
   inputData,
   xAxis,
   yAxis,
-  budgetAxis,
   budget,
   daysRange,
   currency,
-  navigation,
 }) => {
   const data = inputData
     ? inputData
@@ -72,12 +72,25 @@ const ExpenseChart = ({
     <View style={styles.container}>
       <VictoryChart
         height={160}
-        animate={{ duration: 450, onEnter: { duration: 100 } }}
+        animate={{
+          duration: 1000,
+          onLoad: { duration: 1000 },
+        }}
         padding={{ top: 10, bottom: 30, left: 60, right: 30 }}
-        domainPadding={{ x: [0, 40] }}
-        // domain={{ y: [0, 2 * budget] }}
+        domainPadding={{ x: [0, 20] }}
         containerComponent={<VictoryVoronoiContainer voronoiDimension="x" />}
       >
+        <VictoryAxis dependentAxis={true} />
+        <VictoryAxis
+          tickCount={4}
+          tickFormat={(x) => {
+            // return x label as a DD MMM format
+            const date = new Date(x);
+            const day = date.toLocaleString("default", { day: "2-digit" });
+            const month = date.toLocaleString("default", { month: "short" });
+            return `${day} ${month}`;
+          }}
+        />
         <VictoryLine
           labelComponent={
             <VictoryTooltip

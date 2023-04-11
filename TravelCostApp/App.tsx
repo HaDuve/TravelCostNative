@@ -76,6 +76,8 @@ const BottomTabs = createMaterialTopTabNavigator();
 
 const prefix = Linking.createURL("/");
 function NotAuthenticatedStack() {
+  const userCtx = useContext(UserContext);
+  const needsOnboarding = userCtx.needsTour;
   return (
     <AuthStack.Navigator
       screenOptions={{
@@ -84,11 +86,13 @@ function NotAuthenticatedStack() {
         contentStyle: { backgroundColor: GlobalStyles.colors.backgroundColor },
       }}
     >
-      <AuthStack.Screen
-        name="Onboarding"
-        component={OnboardingScreen}
-        options={{ headerShown: false }}
-      />
+      {needsOnboarding && (
+        <AuthStack.Screen
+          name="Onboarding"
+          component={OnboardingScreen}
+          options={{ headerShown: false }}
+        />
+      )}
       <AuthStack.Screen
         name="Login"
         component={LoginScreen}

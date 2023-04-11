@@ -1,5 +1,4 @@
-import { useContext } from "react";
-import React, { StyleSheet, Text, View, Image } from "react-native";
+import React, { StyleSheet, Image } from "react-native";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -12,13 +11,9 @@ i18n.enableFallback = true;
 
 import Onboarding from "react-native-onboarding-swiper";
 import { GlobalStyles } from "../constants/styles";
-import { UserContext } from "../store/user-context";
 import PropTypes from "prop-types";
 
 const OnboardingScreen = ({ navigation }) => {
-  const titleStyle = styles.titleStyle;
-  const userCtx = useContext(UserContext);
-  const needsOnboarding = userCtx.needsTour;
   return (
     <Onboarding
       onDone={() => navigation.replace("Signup")}
@@ -31,7 +26,7 @@ const OnboardingScreen = ({ navigation }) => {
           ),
           title: i18n.t("onb1"),
           subtitle: i18n.t("onb1t"),
-          titleStyles: titleStyle,
+          titleStyles: styles.titleStyle,
         },
         {
           backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -40,7 +35,7 @@ const OnboardingScreen = ({ navigation }) => {
           ),
           title: i18n.t("onb2"),
           subtitle: i18n.t("onb2t"),
-          titleStyles: titleStyle,
+          titleStyles: styles.titleStyle,
         },
         {
           backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -49,7 +44,7 @@ const OnboardingScreen = ({ navigation }) => {
           ),
           title: i18n.t("onb3"),
           subtitle: i18n.t("onb3t"),
-          titleStyles: titleStyle,
+          titleStyles: styles.titleStyle,
         },
       ]}
     />

@@ -1,5 +1,11 @@
 Change log Travel Expense App
 
+1.0.94
+- Onboarding screen will now show only for users who never logged in
+- First screen after onboarding will now always be the "Signup" Screen
+- Fixed an issue with loading categories
+- Added a "reset categories" button
+
 1.0.93
 - Category management works well across multiple devices with and without internet now!
 - Connection issues with bad internet fixed

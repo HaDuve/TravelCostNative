@@ -40,6 +40,7 @@ export const GlobalStyles = {
   gradientPrimaryButton: ["#A1D8C1", "#A1D8C1", "#538076", "#005645"],
   gradientColorsButton: ["#FEEF60", "#FBF0A8", "#A1D8C1"],
   gradientErrorButton: ["#fcc4e4", "#fcc4e4", "#cf6157", "#B42113"],
+  gradientAccentButton: ["#FEEF60", "#FBF0A8", "#A1D8C1"],
 
   tabBarColors: ["#FFFFFF", "#FBF0A8", "#A1D8C1", "#538076", "#DCDCDC"],
   buttonTextPrimary: {

@@ -16,6 +16,6 @@ export const DEV = false;
 export const PREMIUM = false;
 // Maximum number of period range days/montsh/years
 export const MAX_PERIOD_RANGE = 30;
-export const MIN_PERIOD_RANGE = 2;
+export const MIN_PERIOD_RANGE = 3;
 // toast tweaks
 export const TOAST_LOCATION = "bottom";

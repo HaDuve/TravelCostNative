@@ -68,17 +68,20 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           exiting={FadeOutLeft}
           style={styles.chevronContainer}
         >
+          {/* "remove-outline" */}
           <IconButton
-            icon={"chevron-back-outline"}
+            icon={
+              isGraphNotPie ? "play-skip-back-outline" : "chevron-back-outline"
+            }
             size={24}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               if (isGraphNotPie) {
-                setPeriodRangeNumber(
-                  periodRangeNumber == MIN_PERIOD_RANGE
-                    ? MAX_PERIOD_RANGE
-                    : periodRangeNumber - 1
-                );
+                setPeriodRangeNumber(MIN_PERIOD_RANGE);
+                //   periodRangeNumber == MIN_PERIOD_RANGE
+                //     ? MAX_PERIOD_RANGE
+                //     : periodRangeNumber - 1
+                // );
               } else {
                 setToggleGraphEnum(
                   toggleGraphEnum == 0 ? 3 : toggleGraphEnum - 1
@@ -126,7 +129,9 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           style={styles.chevronContainer}
         >
           <IconButton
-            icon={"chevron-forward-outline"}
+            icon={
+              isGraphNotPie ? "add-circle-outline" : "chevron-forward-outline"
+            }
             size={24}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

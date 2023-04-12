@@ -5,6 +5,7 @@ import {
   VictoryAxis,
   VictoryBar,
   VictoryChart,
+  VictoryContainer,
   VictoryLabel,
   VictoryLine,
   VictoryTooltip,
@@ -24,26 +25,27 @@ const ExpenseChart = ({
   daysRange,
   currency,
 }) => {
-  const data = inputData
-    ? inputData
-    : // DUMMYDATA BEGIN
-      [
-        { quarter: 1, earnings: 13000 },
-        { quarter: 2, earnings: 16500 },
-        { quarter: 3, earnings: 14250 },
-        { quarter: 4, earnings: 19000 },
-      ];
-  const xAxisString = xAxis ? xAxis : "quarter";
-  const yAxisString = yAxis ? yAxis : "earnings";
-  // DUMMYDATA END
+  const data = inputData;
+  // console last day
+  const firstItem = inputData[0];
+  const [lastItem] = inputData.slice(-1);
+  const lastItemDate = new Date(firstItem.day ?? firstItem.firstDay);
 
+  const firstItemDate = getDateMinusDays(
+    new Date(lastItem.day ?? lastItem.lastDay),
+    1
+  );
+  // console.log("firstItemDate:", firstItemDate);
+  // console.log("lastItemDate:", lastItemDate);
+  const xAxisString = xAxis;
+  const yAxisString = yAxis;
+  const budgetCompare =
+    inputData[0]?.dailyBudget ||
+    inputData[0]?.weeklyBudget ||
+    inputData[0]?.monthlyBudget ||
+    inputData[0]?.yearlyBudget;
   inputData?.forEach((obj) => {
-    if (
-      obj.expensesSum > obj.dailyBudget ||
-      obj.expensesSum > obj.weeklyBudget ||
-      obj.expensesSum > obj.monthlyBudget ||
-      obj.expensesSum > obj.yearlyBudget
-    ) {
+    if (obj.expensesSum > budgetCompare) {
       obj.fill = GlobalStyles.colors.error300;
     } else {
       if (obj.expensesSum > 0) {
@@ -67,10 +69,11 @@ const ExpenseChart = ({
       obj.expensesSum = CAP * obj.dailyBudget;
     }
   });
-  console.log("expenseChart");
+
   return (
     <View style={styles.container}>
       <VictoryChart
+        domain={{ x: [firstItemDate, lastItemDate] }}
         height={160}
         animate={{
           duration: 1000,
@@ -78,7 +81,13 @@ const ExpenseChart = ({
         }}
         padding={{ top: 10, bottom: 30, left: 60, right: 30 }}
         domainPadding={{ x: [0, 20] }}
-        containerComponent={<VictoryVoronoiContainer voronoiDimension="x" />}
+        containerComponent={
+          // daysRange < 10 ? (
+          <VictoryVoronoiContainer voronoiDimension="x" />
+          // ) : (
+          // <VictoryContainer responsive={false} />
+          // )
+        }
       >
         <VictoryAxis dependentAxis={true} />
         <VictoryAxis
@@ -92,6 +101,7 @@ const ExpenseChart = ({
           }}
         />
         <VictoryLine
+          domain={{ x: [firstItemDate, lastItemDate] }}
           labelComponent={
             <VictoryTooltip
               center={{ x: 210, y: 26 }}
@@ -101,17 +111,17 @@ const ExpenseChart = ({
           }
           data={[
             {
-              x: getDateMinusDays(new Date(), Math.floor(daysRange / 1)),
+              // first point
+              x: firstItemDate,
               y: Number(budget),
-              label: `Budget: ${budget} ${getSymbolFromCurrency(currency)}`,
+              // label: `Budget: ${budget} ${getSymbolFromCurrency(currency)}`,
             },
             {
-              x: DateTime.now().toJSDate(),
+              x: lastItemDate,
               y: Number(budget),
               // label: `Budget: ${budget} ${getSymbolFromCurrency(currency)}`,
             },
           ]}
-          standalone={false}
           style={{
             data: {
               stroke: GlobalStyles.colors.gray700,

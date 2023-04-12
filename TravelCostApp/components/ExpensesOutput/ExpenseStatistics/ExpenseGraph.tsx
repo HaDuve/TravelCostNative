@@ -332,6 +332,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
     default:
       break;
   }
+
   return (
     <Animated.View
       entering={FadeInRight}
@@ -351,7 +352,6 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
           navigation={navigation}
         ></ExpenseChart>
       </View>
-      {/* } */}
       <Animated.View
         entering={FadeInRight.duration(500)}
         exiting={FadeOutLeft.duration(500)}

@@ -1,5 +1,11 @@
 Change log Travel Expense App
 
+1.0.97
+- added country flags to overview
+- improved performance in overview screen
+- improved expense graph  in overview screen
+- fixed custom category icons not showing in overview
+
 1.0.96
 - added a calculation button to (re)-calculate the exact splits for shared expenses
 - added number of days/weeks/months/years as an input in the expense graph overview

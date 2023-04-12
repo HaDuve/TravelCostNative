@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import React from "react";
 import { GlobalStyles } from "../../constants/styles";
 import Button from "./Button";
+import PropTypes from "prop-types";
 
 const ErrorOverlay = ({ message, onConfirm }) => {
   return (
@@ -14,6 +15,10 @@ const ErrorOverlay = ({ message, onConfirm }) => {
 };
 
 export default ErrorOverlay;
+ErrorOverlay.propTypes = {
+  message: PropTypes.string,
+  onConfirm: PropTypes.func,
+};
 
 const styles = StyleSheet.create({
   container: {

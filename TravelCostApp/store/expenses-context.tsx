@@ -63,19 +63,19 @@ export const ExpensesContext = createContext({
   getWeeklyExpenses: (weeksBack) => {
     // firstDay, lastDay, weeklyExpenses;
   },
-  getDailyExpenses: (daysBack): Array<Expense> => {
+  getDailyExpenses: (daysBack): Array<ExpenseData> => {
     return [];
   },
-  getSpecificDayExpenses: (date): Array<Expense> => {
+  getSpecificDayExpenses: (date): Array<ExpenseData> => {
     return [];
   },
-  getSpecificWeekExpenses: (date): Array<Expense> => {
+  getSpecificWeekExpenses: (date): Array<ExpenseData> => {
     return [];
   },
-  getSpecificMonthExpenses: (date): Array<Expense> => {
+  getSpecificMonthExpenses: (date): Array<ExpenseData> => {
     return [];
   },
-  getSpecificYearExpenses: (date): Array<Expense> => {
+  getSpecificYearExpenses: (date): Array<ExpenseData> => {
     return [];
   },
 

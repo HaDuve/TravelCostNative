@@ -2,7 +2,7 @@ import React, { StyleSheet, Text, View, Dimensions } from "react-native";
 import * as Progress from "react-native-progress";
 import { GlobalStyles } from "../../../constants/styles";
 import { Ionicons } from "@expo/vector-icons";
-import { getCatString, getCatSymbol } from "../../../util/category";
+import { Category, getCatString, getCatSymbol } from "../../../util/category";
 import { useContext } from "react";
 import { TripContext } from "../../../store/trip-context";
 import { formatExpenseString } from "../../../util/string";
@@ -18,6 +18,7 @@ import PropTypes from "prop-types";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { useEffect } from "react";
 import { useState } from "react";
+import { UserContext } from "../../../store/user-context";
 
 const CategoryProgressBar = ({
   cat,
@@ -27,17 +28,28 @@ const CategoryProgressBar = ({
   iconOverride,
 }) => {
   const tripCtx = useContext(TripContext);
+  const userCtx = useContext(UserContext);
   const budgetProgress = (catCost / totalCost) * 1;
 
   const [catSymbol, setCatSymbol] = useState(null);
   useEffect(() => {
     async function setCatSymbolAsync() {
-      const newCatSymbol = await getCatSymbol(cat);
+      const listOfCats = userCtx.catIconNames;
+      if (listOfCats) {
+        const categoryObj: Category = listOfCats.find(
+          ({ catString }) => catString === cat
+        );
+        if (categoryObj?.icon) {
+          setCatSymbol(categoryObj.icon);
+          return;
+        }
+      }
+      const newCatSymbol = getCatSymbol(cat);
       setCatSymbol(newCatSymbol);
       iconOverride && setCatSymbol(iconOverride);
     }
     setCatSymbolAsync();
-  }, [cat, iconOverride]);
+  }, [cat, iconOverride, userCtx.catIconNames]);
 
   const budgetColor = color;
   const unfilledColor = GlobalStyles.colors.gray500Accent;

@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   },
   fallbackTextContainer: {
     flex: 1,
-    padding: 24,
+    padding: "10%",
     marginTop: "-50%",
     alignItems: "center",
     justifyContent: "flex-start",

@@ -19,6 +19,7 @@ i18n.enableFallback = true;
 import { getCatString } from "../../../util/category";
 import PropTypes from "prop-types";
 import { ExpenseData } from "../../../util/expense";
+import ExpenseCountryFlag from "../ExpenseCountryFlag";
 
 const ExpenseCountries = ({ expenses, periodName, navigation }) => {
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
@@ -71,6 +72,15 @@ const ExpenseCountries = ({ expenses, periodName, navigation }) => {
   });
 
   function renderItem(itemData) {
+    const country = itemData.item.cat;
+    console.log("renderItem ~ country:", country);
+    const countryFlag = (
+      <ExpenseCountryFlag
+        countryName={country}
+        style={GlobalStyles.countryFlagStyle}
+        containerStyle={[styles.countryFlagContainerStyle, GlobalStyles.shadow]}
+      ></ExpenseCountryFlag>
+    );
     return (
       <Pressable
         style={({ pressed }) => [
@@ -93,7 +103,8 @@ const ExpenseCountries = ({ expenses, periodName, navigation }) => {
           cat={itemData.item.cat}
           totalCost={totalSum}
           catCost={itemData.item.sumCat}
-          iconOverride={"cash-outline"}
+          iconOverride={"globe-outline"}
+          iconJSXOverride={country == fallbackCountry ? null : countryFlag}
         />
       </Pressable>
     );
@@ -170,5 +181,8 @@ const styles = StyleSheet.create({
     elevation: 5,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 10,
+  },
+  countryFlagContainerStyle: {
+    marginBottom: "1%",
   },
 });

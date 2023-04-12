@@ -100,6 +100,15 @@ export const GlobalStyles = {
     transform: [{ scale: 0.9 }],
     opacity: 0.9,
   },
+  countryFlagStyle: {
+    width: 30,
+    height: 25,
+    borderRadius: 1000,
+    borderWidth: 1,
+    borderColor: "#626262",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 };
 export const CatColors = [
   GlobalStyles.colors.cat2,

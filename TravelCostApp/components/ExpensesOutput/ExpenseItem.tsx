@@ -196,7 +196,7 @@ function ExpenseItem(props): JSX.Element {
           {toggle1 && (
             <ExpenseCountryFlag
               countryName={country}
-              style={styles.countryFlag}
+              style={[GlobalStyles.countryFlagStyle, styles.countryFlag]}
               containerStyle={[
                 styles.countryFlagContainer,
                 GlobalStyles.shadow,
@@ -300,14 +300,7 @@ const styles = StyleSheet.create({
     marginRight: "1%",
   },
   countryFlag: {
-    width: 30,
-    height: 25,
     marginTop: "6%",
-    borderRadius: 1000,
-    borderWidth: 1,
-    borderColor: GlobalStyles.colors.gray700,
-    alignItems: "center",
-    justifyContent: "center",
     marginRight: 12,
   },
   avatarContainer: {

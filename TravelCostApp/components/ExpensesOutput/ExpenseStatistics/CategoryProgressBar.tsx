@@ -26,6 +26,7 @@ const CategoryProgressBar = ({
   totalCost,
   catCost,
   iconOverride,
+  iconJSXOverride,
 }) => {
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
@@ -66,7 +67,9 @@ const CategoryProgressBar = ({
   return (
     <Animated.View entering={ZoomIn} style={styles.container}>
       <View style={styles.titleRow}>
-        <Ionicons name={catSymbol} size={30} color={color} />
+        {iconJSXOverride ?? (
+          <Ionicons name={catSymbol} size={30} color={color} />
+        )}
         <Text style={[styles.sum, { color: budgetColor, marginLeft: 8 }]}>
           {getCatString(cat)}
         </Text>
@@ -97,6 +100,7 @@ CategoryProgressBar.propTypes = {
   totalCost: PropTypes.number.isRequired,
   catCost: PropTypes.number.isRequired,
   iconOverride: PropTypes.string,
+  iconJSXOverride: PropTypes.element,
 };
 
 const styles = StyleSheet.create({

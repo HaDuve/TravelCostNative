@@ -32,7 +32,7 @@ import { MAX_PERIOD_RANGE, MIN_PERIOD_RANGE } from "../../confAppConstants";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const [periodRangeNumber, setPeriodRangeNumber] = useState(7);
-  const [toggleGraph, setToggleGraph] = useState(true);
+  const [isGraphNotPie, setToggleGraph] = useState(true);
   // enum =>  0 = categories, 1 = traveller, 2 = country, 3 = currency
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
   const userCtx = useContext(UserContext);
@@ -44,7 +44,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
     //   return;
     // }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setToggleGraph(!toggleGraph);
+    setToggleGraph(!isGraphNotPie);
   }
 
   let titleString = "";
@@ -73,7 +73,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
             size={24}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              if (toggleGraph) {
+              if (isGraphNotPie) {
                 setPeriodRangeNumber(
                   periodRangeNumber == MIN_PERIOD_RANGE
                     ? MAX_PERIOD_RANGE
@@ -89,9 +89,9 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           ></IconButton>
         </Animated.View>
 
-        {toggleGraph && (
+        {isGraphNotPie && (
           <Animated.View
-            style={styles.chevronContainer}
+            style={styles.titleContainer}
             entering={FadeInUp}
             exiting={FadeOutDown}
           >
@@ -99,22 +99,22 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           </Animated.View>
         )}
 
-        {!toggleGraph && toggleGraphEnum == 0 && (
+        {!isGraphNotPie && toggleGraphEnum == 0 && (
           <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
             <Text style={styles.titleText}> {i18n.t("categories")} </Text>
           </Animated.View>
         )}
-        {!toggleGraph && toggleGraphEnum == 1 && (
+        {!isGraphNotPie && toggleGraphEnum == 1 && (
           <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
             <Text style={styles.titleText}> Travellers </Text>
           </Animated.View>
         )}
-        {!toggleGraph && toggleGraphEnum == 2 && (
+        {!isGraphNotPie && toggleGraphEnum == 2 && (
           <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
             <Text style={styles.titleText}> Countries </Text>
           </Animated.View>
         )}
-        {!toggleGraph && toggleGraphEnum == 3 && (
+        {!isGraphNotPie && toggleGraphEnum == 3 && (
           <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
             <Text style={styles.titleText}> Currencies </Text>
           </Animated.View>
@@ -130,7 +130,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
             size={24}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              if (toggleGraph) {
+              if (isGraphNotPie) {
                 setPeriodRangeNumber(
                   periodRangeNumber == MAX_PERIOD_RANGE
                     ? MIN_PERIOD_RANGE
@@ -147,7 +147,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
         </Animated.View>
       </View>
 
-      {toggleGraph && (
+      {isGraphNotPie && (
         <ExpenseGraph
           navigation={navigation}
           expenses={expenses}
@@ -155,28 +155,28 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           periodRangeNumber={periodRangeNumber}
         />
       )}
-      {!toggleGraph && toggleGraphEnum == 0 && (
+      {!isGraphNotPie && toggleGraphEnum == 0 && (
         <ExpenseCategories
           expenses={expenses}
           periodName={periodName}
           navigation={navigation}
         />
       )}
-      {!toggleGraph && toggleGraphEnum == 1 && (
+      {!isGraphNotPie && toggleGraphEnum == 1 && (
         <ExpenseTravellers
           expenses={expenses}
           periodName={periodName}
           navigation={navigation}
         ></ExpenseTravellers>
       )}
-      {!toggleGraph && toggleGraphEnum == 2 && (
+      {!isGraphNotPie && toggleGraphEnum == 2 && (
         <ExpenseCountries
           expenses={expenses}
           periodName={periodName}
           navigation={navigation}
         ></ExpenseCountries>
       )}
-      {!toggleGraph && toggleGraphEnum == 3 && (
+      {!isGraphNotPie && toggleGraphEnum == 3 && (
         <ExpenseCurrencies
           expenses={expenses}
           periodName={periodName}

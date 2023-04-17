@@ -3,7 +3,7 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../i18n/supportedLanguages";
 import { getRate } from "./currencyExchange";
-import { Split } from "./expense";
+import { Expense, Split, ExpenseData } from "./expense";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -223,32 +223,48 @@ export function travellerToDropdown(travellers) {
   return listOfLabelValues;
 }
 
-export async function calcOpenSplitsTable(tripid, tripCurrency) {
+export async function calcOpenSplitsTable(
+  tripid: string,
+  tripCurrency: string,
+  givenExpenses?: Expense[]
+) {
+  console.log("calcOpenSplitsTable:", calcOpenSplitsTable);
   // cleanup all expenses where payer === debtor
   let expenses = [];
   const rates = {};
   rates[tripCurrency] = 1;
-  try {
-    expenses = await getAllExpenses(tripid);
-  } catch (error) {
-    console.log(error);
+  if (givenExpenses && givenExpenses.length > 0) {
+    expenses = givenExpenses;
+  } else {
+    try {
+      expenses = await getAllExpenses(tripid);
+    } catch (error) {
+      console.log(error);
+    }
+    if (!expenses || expenses.length < 1) {
+      console.log("no expenses!");
+      return;
+    }
   }
-  if (!expenses || expenses.length < 1) {
-    console.log("no expenses!");
-    return;
-  }
+  console.log(expenses.length, "expenses");
+  console.log(expenses[0]);
   let openSplits = [];
   const asyncSplitList = async () => {
-    for (const expense of expenses) {
-      if (expense.splitType === "SELF" || !expense.splitList) return;
+    for (const exp of expenses) {
+      const expense: ExpenseData = exp;
+      if (expense.splitType === "SELF" || !expense.splitList) continue;
       for (const split of expense.splitList) {
         if (split.userName !== expense.whoPaid) {
           // check if rate is already in rates
           if (!rates[expense.currency]) {
             // get rate
-            const rate = await getRate(expense.currency, tripCurrency);
-            rates[expense.currency] = rate;
-            split.amount = split.amount * rate;
+            try {
+              const rate = expense.calcAmount / expense.amount;
+              rates[expense.currency] = rate;
+              split.amount = split.amount * rate;
+            } catch (error) {
+              console.error(error);
+            }
           }
           split.whoPaid = expense.whoPaid;
           openSplits.push(split);
@@ -257,7 +273,7 @@ export async function calcOpenSplitsTable(tripid, tripCurrency) {
     }
   };
   await asyncSplitList();
-  // console.log("openSplits", openSplits);
+  console.log(openSplits.length, "openSplits");
   if (openSplits.length < 1) {
     return openSplits;
   }

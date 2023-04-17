@@ -54,5 +54,6 @@ export interface ExpenseDataOnline {
 export interface Split {
   userName: string;
   amount: number;
+  whoPaid?: string;
   rate?: number;
 }

@@ -7,9 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { G } from "react-native-svg";
 import Toast from "react-native-toast-message";
-import Button from "../components/UI/Button";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import FlatButton from "../components/UI/FlatButton";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
@@ -19,13 +17,15 @@ import { calcOpenSplitsTable, simplifySplits } from "../util/split";
 import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import GradientButton from "../components/UI/GradientButton";
+import { ExpensesContext } from "../store/expenses-context";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
   const { tripid } = route.params;
   console.log("SplitSummaryScreen ~ tripid:", tripid);
-  const TripCtx = useContext(TripContext);
-  const tripCurrency = TripCtx.tripCurrency;
+  const tripCtx = useContext(TripContext);
+  const tripCurrency = tripCtx.tripCurrency;
   const userCtx = useContext(UserContext);
+  const expenseCtx = useContext(ExpensesContext);
 
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
@@ -37,25 +37,13 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   async function getOpenSplits() {
     setIsFetching(true);
     try {
-      const response = await calcOpenSplitsTable(tripid, tripCurrency);
-      // if (!response || (response.length < 1 && !isFetching)) {
-      //   Toast.show({
-      //     type: "error",
-      //     text1: "No Splits!",
-      //     text2: "All debts are already settled!",
-      //   });
-      //   navigation.pop();
-      // }
+      const response = await calcOpenSplitsTable(
+        tripid,
+        tripCurrency,
+        expenseCtx.expenses
+      );
       console.log("getOpenSplits ~ response", response);
       setSplits(response);
-      if (splits.length < 1 && !isFetching) {
-        Toast.show({
-          type: "error",
-          text1: "No Splits!",
-          text2: "All debts are already settled!",
-        });
-        navigation.pop();
-      }
     } catch (error) {
       Toast.show({
         type: "error",
@@ -63,7 +51,6 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         text2: "Could not fetch splits!",
         visibilityTime: 2000,
       });
-      navigation.pop();
       console.error(error);
       // setError("Could not fetch splits from the web database! " + error);
     }
@@ -93,7 +80,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         <Text style={styles.userText}>{item.userName} </Text>
         <Text style={styles.normalText}>owes </Text>
         <Text style={styles.amountText}>{item.amount} </Text>
-        <Text style={styles.amountText}>{TripCtx.tripCurrency} </Text>
+        <Text style={styles.amountText}>{tripCtx.tripCurrency} </Text>
         <Text style={styles.normalText}>to</Text>
         <Text style={styles.userText}> {item.whoPaid}!</Text>
       </View>

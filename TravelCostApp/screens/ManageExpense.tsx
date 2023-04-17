@@ -83,10 +83,10 @@ const ManageExpense = ({ route, navigation }) => {
             id: editedExpenseId,
           },
         };
-        navigation.goBack();
-        await deleteExpenseOnlineOffline(item, isOnline);
         expenseCtx.deleteExpense(editedExpenseId);
+        await deleteExpenseOnlineOffline(item, isOnline);
         await touchAllTravelers(tripid, true);
+        navigation.goBack();
       } catch (error) {
         // setError("Could not delete expense - please try again later!");
         console.error(error);
@@ -192,7 +192,6 @@ const ManageExpense = ({ route, navigation }) => {
           expenseCtx.updateExpense(editedExpenseId, expenseData);
           await updateExpenseOnlineOffline(item, userCtx.isOnline);
         }
-        navigation.navigate("RecentExpenses");
       } else {
         // adding a new expense (no-editing)
         // Check for ranged Expense
@@ -248,6 +247,7 @@ const ManageExpense = ({ route, navigation }) => {
             const id = await storeExpenseOnlineOffline(item, userCtx.isOnline);
             expenseCtx.addExpense({ ...expenseData, id: id });
           }
+          navigation.pop();
         } else {
           // adding a new normal expense (no-editing, no-ranged)
           console.log("no ranged Data detected");
@@ -268,7 +268,7 @@ const ManageExpense = ({ route, navigation }) => {
       }
       if (userCtx.isOnline) await touchAllTravelers(tripid, true);
       await asyncStoreSetObject("expenses", expenseCtx.expenses);
-      navigation.navigate("RecentExpenses");
+      navigation.pop(2);
     } catch (error) {
       // setError("Could not save data - please try again later!" + error);
       console.error(error);

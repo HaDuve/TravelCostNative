@@ -234,7 +234,7 @@ export async function calcOpenSplitsTable(
   const rates = {};
   rates[tripCurrency] = 1;
   if (givenExpenses && givenExpenses.length > 0) {
-    expenses = givenExpenses;
+    expenses = JSON.parse(JSON.stringify(givenExpenses));
   } else {
     try {
       expenses = await getAllExpenses(tripid);
@@ -283,10 +283,11 @@ export async function calcOpenSplitsTable(
   return openSplits;
 }
 
-export function simplifySplits(openSplits) {
+export function simplifySplits(openSplits: Split[]) {
   const Splitwise = require("splitwise-js-map");
+  const tempSplits = JSON.parse(JSON.stringify(openSplits));
   const listOfSplits = [];
-  openSplits.forEach((openSplit) => {
+  tempSplits.forEach((openSplit) => {
     if (listOfSplits.some((e) => e.paidBy === openSplit.whoPaid)) {
       /* list contains the element we're looking for */
       const index = listOfSplits.findIndex((e) => {
@@ -306,20 +307,30 @@ export function simplifySplits(openSplits) {
       listOfSplits.push(newSplit);
     }
   });
-
-  const splits = Splitwise(listOfSplits);
   const simplifiedItems = [];
-  splits.forEach((simpleSplit) => {
-    const from = simpleSplit[0];
-    const to = simpleSplit[1];
-    const value = simpleSplit[2];
+  console.log(listOfSplits);
+  try {
+    const splits = Splitwise(listOfSplits);
+    splits.forEach((simpleSplit) => {
+      const from = simpleSplit[0];
+      const to = simpleSplit[1];
+      const value = simpleSplit[2];
+      const item = {
+        amount: Number(value).toFixed(2),
+        userName: from,
+        whoPaid: to,
+      };
+      simplifiedItems.push(item);
+    });
+  } catch (error) {
+    console.log("error in simplifying splits", error);
     const item = {
-      amount: value,
-      userName: from,
-      whoPaid: to,
+      amount: 0,
+      userName: error.message,
+      whoPaid: "Error",
     };
     simplifiedItems.push(item);
-  });
+  }
   return simplifiedItems;
 }
 

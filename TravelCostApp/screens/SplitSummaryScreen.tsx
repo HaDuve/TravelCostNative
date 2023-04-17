@@ -20,6 +20,7 @@ import GradientButton from "../components/UI/GradientButton";
 import { ExpensesContext } from "../store/expenses-context";
 import BackgroundGradient from "../components/UI/BackgroundGradient";
 import { Split } from "../util/expense";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
   const { tripid } = route.params;
@@ -53,8 +54,18 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         tripCurrency,
         expenseCtx.expenses
       );
-      console.log("getOpenSplits ~ response", response);
-      setSplits(response);
+      const temp = [];
+      for (let i = 0; i < response.length; i++) {
+        const split: Split = response[i];
+        const tempObj = {
+          userName: split.userName,
+          whoPaid: split.whoPaid,
+          amount: Number(split.amount).toFixed(2),
+        };
+        temp.push(tempObj);
+      }
+      console.log("getOpenSplits ~ temp", temp);
+      setSplits(temp);
     } catch (error) {
       Toast.show({
         type: "error",
@@ -68,9 +79,38 @@ const SplitSummaryScreen = ({ route, navigation }) => {
     setIsFetching(false);
   }
 
+  const handleSimpflifySplits = async () => {
+    // const isPremium = await userCtx.checkPremium();
+    // if (!isPremium) {
+    //   navigation.navigate("Paywall");
+    //   return;
+    // }
+    try {
+      console.log("handleSimpflifySplits ~ splits:", splits);
+      const simpleSplits = simplifySplits(splits);
+      if (simpleSplits.length === 0) {
+        Alert.alert("No Splits to Simplify");
+        navigation.navigate("Settings");
+      }
+      if (simpleSplits.some((split) => split.whoPaid === "Error")) {
+        Alert.alert(
+          "Error",
+          "Could not simplify splits. Something must have gone wrong, sorry!"
+        );
+        navigation.navigate("Settings");
+      }
+      setSplits(simpleSplits);
+      setShowSimplify(false);
+      setTitleText(titleTextSimplified);
+      setSubTitleText(subTitleSimplified);
+    } catch (error) {
+      console.log("handleSimpflifySplits ~ error", error);
+    }
+  };
+
   useEffect(() => {
     getOpenSplits();
-  }, []);
+  }, [expenseCtx.expenses, tripid]);
 
   function errorHandler() {
     setError(null);
@@ -100,14 +140,18 @@ const SplitSummaryScreen = ({ route, navigation }) => {
 
   return (
     <BackgroundGradient style={styles.container}>
-      <View style={styles.headerContainer}>
+      <Animated.View
+        entering={FadeIn}
+        exiting={FadeOut}
+        style={styles.headerContainer}
+      >
         <View style={styles.titleContainer}>
           <Text style={styles.titleText}> {titleText}</Text>
         </View>
         <View style={styles.subTitleContainer}>
           <Text style={styles.subTitleText}> {subTitleText}</Text>
         </View>
-      </View>
+      </Animated.View>
       <FlatList
         style={{ maxHeight: Dimensions.get("screen").height / 1.5 }}
         data={splits}
@@ -127,20 +171,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
           Back
         </FlatButton>
         {showSimplify && (
-          <GradientButton
-            style={styles.button}
-            onPress={async () => {
-              const isPremium = await userCtx.checkPremium();
-              // if (!isPremium) {
-              //   navigation.navigate("Paywall");
-              //   return;
-              // }
-              setSplits(simplifySplits(splits));
-              setShowSimplify(false);
-              setTitleText(titleTextSimplified);
-              setSubTitleText(subTitleSimplified);
-            }}
-          >
+          <GradientButton style={styles.button} onPress={handleSimpflifySplits}>
             Simplify Splits
           </GradientButton>
         )}

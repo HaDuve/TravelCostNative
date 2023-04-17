@@ -289,7 +289,7 @@ const ManageExpense = ({ route, navigation }) => {
   }
 
   return (
-    <KeyboardAvoidingView behavior={"height"} style={styles.container}>
+    <KeyboardAvoidingView behavior={"padding"} style={styles.container}>
       <ScrollView style={styles.container}>
         <>
           <ExpenseForm

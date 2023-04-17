@@ -42,7 +42,7 @@ i18n.enableFallback = true;
 import CurrencyPicker from "../Currency/CurrencyPicker";
 import { truncateString } from "../../util/string";
 import { Ionicons } from "@expo/vector-icons";
-import Animated from "react-native-reanimated";
+import Animated, { ZoomIn, ZoomOut, FadeOut } from "react-native-reanimated";
 import { asyncStoreSetItem } from "../../store/async-storage";
 import { DateTime } from "luxon";
 import DatePickerModal from "../UI/DatePickerModal";
@@ -496,6 +496,12 @@ const ExpenseForm = ({
         inputs.amount.value
       );
       setSplitListValid(isValidSplit);
+      if (!isValidSplit) {
+        Alert.alert(
+          "Sorry!",
+          "I could not calculate a valid split. Please check your input."
+        );
+      }
     }
   }
 
@@ -815,38 +821,43 @@ const ExpenseForm = ({
                       {i18n.t("whoShared")}
                     </Text>
                   )}
-                {splitType == "EXACT" && (
-                  <Pressable
-                    style={({ pressed }) => [
-                      {
-                        flexDirection: "column",
-                        alignContent: "center",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        marginLeft: 16,
-                        marginBottom: 12,
-                        marginTop: 8,
-                        borderRadius: 8,
-                        backgroundColor: GlobalStyles.colors.backgroundColor,
-                        paddingTop: 12,
-                        paddingBottom: 0,
-                        paddingHorizontal: 24,
-
-                        borderWidth: 1,
-                        borderColor: GlobalStyles.colors.primary500,
-                      },
-                      GlobalStyles.strongShadow,
-                      pressed && GlobalStyles.pressedWithShadow,
-                    ]}
-                    onPress={() => handleRecalculationSplits()}
+                {splitType == "EXACT" && !splitListValid && (
+                  <Animated.View
+                    entering={ZoomIn}
+                    exiting={ZoomOut.duration(100)}
                   >
-                    <IconButton
-                      icon="ios-git-compare-outline"
-                      color={GlobalStyles.colors.primary500}
-                      size={24}
+                    <Pressable
+                      style={({ pressed }) => [
+                        {
+                          flexDirection: "column",
+                          alignContent: "center",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          marginLeft: 16,
+                          marginBottom: 12,
+                          marginTop: 8,
+                          borderRadius: 8,
+                          backgroundColor: GlobalStyles.colors.backgroundColor,
+                          paddingTop: 12,
+                          paddingBottom: 0,
+                          paddingHorizontal: 24,
+
+                          borderWidth: 1,
+                          borderColor: GlobalStyles.colors.primary500,
+                        },
+                        GlobalStyles.strongShadow,
+                        pressed && GlobalStyles.pressedWithShadow,
+                      ]}
                       onPress={() => handleRecalculationSplits()}
-                    />
-                  </Pressable>
+                    >
+                      <IconButton
+                        icon="ios-git-compare-outline"
+                        color={GlobalStyles.colors.primary500}
+                        size={24}
+                        onPress={() => handleRecalculationSplits()}
+                      />
+                    </Pressable>
+                  </Animated.View>
                 )}
               </View>
 
@@ -860,6 +871,7 @@ const ExpenseForm = ({
                     minWidth: "150%",
                     justifyContent: "flex-start",
                     alignItems: "flex-start",
+                    overflow: "visible",
                   }}
                   ListFooterComponent={<View style={{ width: 100 }}></View>}
                   renderItem={(itemData) => {
@@ -896,9 +908,7 @@ const ExpenseForm = ({
                         <View
                           style={{
                             flexDirection: "row",
-                            // place items at the bottom of the container
                             justifyContent: "flex-end",
-                            // place items at the right of the container
                             alignItems: "flex-end",
                           }}
                         >
@@ -980,6 +990,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginBottom: "20%",
+    overflow: "visible",
   },
   form: {
     flex: 1,

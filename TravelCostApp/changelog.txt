@@ -1,5 +1,8 @@
 Change log Travel Expense App
 
+1.0.98
+- improved "Split Summary" and "Simplify Splits" (fixed alot of bugs and improved performance)
+
 1.0.97
 - added country flags to overview
 - improved performance in overview screen

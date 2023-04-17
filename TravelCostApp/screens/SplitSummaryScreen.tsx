@@ -129,7 +129,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
           colors={GlobalStyles.gradientErrorButton}
           buttonStyle={{ backgroundColor: GlobalStyles.colors.errorGrayed }}
           onPress={() => {
-            Alert.alert("Settle Splits function coming soon...");
+            Alert.alert("Settle Splits with Paypal function coming soon...");
           }}
         >
           Settle Splits

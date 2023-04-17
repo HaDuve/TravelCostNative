@@ -18,6 +18,8 @@ import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import GradientButton from "../components/UI/GradientButton";
 import { ExpensesContext } from "../store/expenses-context";
+import BackgroundGradient from "../components/UI/BackgroundGradient";
+import { Split } from "../util/expense";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
   const { tripid } = route.params;
@@ -30,9 +32,18 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
 
-  const [splits, setSplits] = useState([]);
+  const [splits, setSplits] = useState<Split[]>([]);
   const [showSimplify, setShowSimplify] = useState(true);
-  const [titleText, setTitleText] = useState("Open Splits!");
+
+  // TODO: improve text and translate
+  const titleTextOriginal = "Split Summary";
+  const titleTextSimplified = "Simplified Split Summary";
+
+  const subTitleOriginal = "Overview of owed amounts between travellers";
+  const subTitleSimplified = "Simplified Summary of Optimal Transactions";
+
+  const [titleText, setTitleText] = useState(titleTextOriginal);
+  const [subTitleText, setSubTitleText] = useState(subTitleOriginal);
 
   async function getOpenSplits() {
     setIsFetching(true);
@@ -76,7 +87,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   function renderSplitItem(itemData) {
     const item = itemData.item;
     return (
-      <View style={styles.splitContainer}>
+      <View style={[styles.splitContainer, GlobalStyles.strongShadow]}>
         <Text style={styles.userText}>{item.userName} </Text>
         <Text style={styles.normalText}>owes </Text>
         <Text style={styles.amountText}>{item.amount} </Text>
@@ -88,8 +99,15 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.titleText}> {titleText}</Text>
+    <BackgroundGradient style={styles.container}>
+      <View style={styles.headerContainer}>
+        <View style={styles.titleContainer}>
+          <Text style={styles.titleText}> {titleText}</Text>
+        </View>
+        <View style={styles.subTitleContainer}>
+          <Text style={styles.subTitleText}> {subTitleText}</Text>
+        </View>
+      </View>
       <FlatList
         style={{ maxHeight: Dimensions.get("screen").height / 1.5 }}
         data={splits}
@@ -102,7 +120,8 @@ const SplitSummaryScreen = ({ route, navigation }) => {
             if (showSimplify) navigation.goBack();
             getOpenSplits();
             setShowSimplify(true);
-            setTitleText("Open Splits!");
+            setTitleText(titleTextOriginal);
+            setSubTitleText(subTitleOriginal);
           }}
         >
           Back
@@ -118,7 +137,8 @@ const SplitSummaryScreen = ({ route, navigation }) => {
               // }
               setSplits(simplifySplits(splits));
               setShowSimplify(false);
-              setTitleText("Simplified Open Splits!");
+              setTitleText(titleTextSimplified);
+              setSubTitleText(subTitleSimplified);
             }}
           >
             Simplify Splits
@@ -135,7 +155,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
           Settle Splits
         </GradientButton>
       </View>
-    </View>
+    </BackgroundGradient>
   );
 };
 
@@ -148,6 +168,7 @@ SplitSummaryScreen.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: 4,
     paddingTop: 24,
     alignItems: "center",
@@ -155,18 +176,17 @@ const styles = StyleSheet.create({
   button: {
     marginLeft: 24,
   },
-  titleText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    paddingBottom: 12,
-    color: GlobalStyles.colors.textColor,
-  },
   splitContainer: {
     flexDirection: "row",
     padding: 8,
     borderWidth: 1,
     margin: 8,
     borderRadius: 12,
+    // center
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "20%",
+    minWidth: "80%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderColor: GlobalStyles.colors.error300,
   },
@@ -178,14 +198,38 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   userText: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: "700",
     color: GlobalStyles.colors.textColor,
   },
-  normalText: { fontSize: 14, color: GlobalStyles.colors.textColor },
+  normalText: { fontSize: 16, color: GlobalStyles.colors.textColor },
   amountText: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: "700",
     color: GlobalStyles.colors.errorGrayed,
+  },
+  headerContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 24,
+  },
+  titleContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  titleText: {
+    fontSize: 32,
+    fontWeight: "bold",
+    paddingBottom: 12,
+    color: GlobalStyles.colors.textColor,
+  },
+  subTitleContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: "10%",
+  },
+  subTitleText: {
+    fontSize: 14,
+    color: GlobalStyles.colors.textColor,
   },
 });

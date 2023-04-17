@@ -1,7 +1,12 @@
 Change log Travel Expense App
 
 1.0.98
+- Added a filtered version of Pie Charts!
+- User can now navigate to the filtered Pie Charts from Overview Screen by short-tapping on any item on the list
+- Long-tapping in the overview Screen now navigates to the Filtered Expense List (like short-tapping did before)
 - improved "Split Summary" and "Simplify Splits" (fixed alot of bugs and improved performance)
+- improved Expense Form Recalculate Split Button (Feedback and Animation)
+- improved crash prevention
 
 1.0.97
 - added country flags to overview

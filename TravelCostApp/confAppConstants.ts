@@ -14,7 +14,7 @@ export const TIMEOUT = 10000;
 export const DEV = false;
 // Premium consts
 export const PREMIUM = false;
-// Maximum number of period range days/montsh/years
+// Maximum number of period range days/months/years
 export const MAX_PERIOD_RANGE = 30;
 export const MIN_PERIOD_RANGE = 3;
 // toast tweaks

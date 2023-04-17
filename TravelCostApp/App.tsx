@@ -66,6 +66,7 @@ import { API_KEY } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
 import { SettingsProvider } from "./store/settings-context";
 import { UserData } from "./store/user-context";
+import FilteredPieCharts from "./screens/FilteredPieCharts";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -197,6 +198,14 @@ function AuthenticatedStack() {
           <Stack.Screen
             name="FilteredExpenses"
             component={FilteredExpenses}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
+          <Stack.Screen
+            name="FilteredPieCharts"
+            component={FilteredPieCharts}
             options={{
               headerShown: false,
               presentation: "modal",

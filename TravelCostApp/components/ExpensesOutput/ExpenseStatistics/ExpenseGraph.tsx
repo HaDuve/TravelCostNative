@@ -19,14 +19,16 @@ import ExpenseChart from "../../ExpensesOverview/ExpenseChart";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../../../i18n/supportedLanguages";
-import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
-import PropTypes from "prop-types";
-import getSymbolFromCurrency from "currency-symbol-map";
-import { isForeground } from "../../../util/appState";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
+
+import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
+import PropTypes from "prop-types";
+import getSymbolFromCurrency from "currency-symbol-map";
+import { isForeground } from "../../../util/appState";
+import Toast from "react-native-toast-message";
 
 const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
   const expenseCtx = useContext(ExpensesContext);
@@ -95,12 +97,22 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
               styles.categoryCard,
               pressed && GlobalStyles.pressedWithShadow,
             ]}
-            onPress={() => {
+            onLongPress={() => {
+              console.log("longPress");
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const filteredExpenses = expenseCtx.getSpecificDayExpenses(
                 new Date(item.day)
               );
               navigation.navigate("FilteredExpenses", {
+                expenses: filteredExpenses,
+                dayString: dayString,
+              });
+            }}
+            onPress={() => {
+              const filteredExpenses = expenseCtx.getSpecificDayExpenses(
+                new Date(item.day)
+              );
+              navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
                 dayString: dayString,
               });
@@ -170,12 +182,21 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
               styles.categoryCard,
               pressed && GlobalStyles.pressedWithShadow,
             ]}
-            onPress={() => {
+            onLongPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const filteredExpenses = expenseCtx.getSpecificWeekExpenses(
                 new Date(item.firstDay)
               );
               navigation.navigate("FilteredExpenses", {
+                expenses: filteredExpenses,
+                dayString: weekString,
+              });
+            }}
+            onPress={() => {
+              const filteredExpenses = expenseCtx.getSpecificWeekExpenses(
+                new Date(item.firstDay)
+              );
+              navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
                 dayString: weekString,
               });
@@ -235,12 +256,21 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
               styles.categoryCard,
               pressed && GlobalStyles.pressedWithShadow,
             ]}
-            onPress={() => {
+            onLongPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const filteredExpenses = expenseCtx.getSpecificMonthExpenses(
                 new Date(item.firstDay)
               );
               navigation.navigate("FilteredExpenses", {
+                expenses: filteredExpenses,
+                dayString: month,
+              });
+            }}
+            onPress={() => {
+              const filteredExpenses = expenseCtx.getSpecificMonthExpenses(
+                new Date(item.firstDay)
+              );
+              navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
                 dayString: month,
               });
@@ -303,12 +333,21 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
               styles.categoryCard,
               pressed && GlobalStyles.pressedWithShadow,
             ]}
-            onPress={() => {
+            onLongPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const filteredExpenses = expenseCtx.getSpecificYearExpenses(
                 new Date(item.firstDay)
               );
               navigation.navigate("FilteredExpenses", {
+                expenses: filteredExpenses,
+                dayString: yearString,
+              });
+            }}
+            onPress={() => {
+              const filteredExpenses = expenseCtx.getSpecificYearExpenses(
+                new Date(item.firstDay)
+              );
+              navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
                 dayString: yearString,
               });

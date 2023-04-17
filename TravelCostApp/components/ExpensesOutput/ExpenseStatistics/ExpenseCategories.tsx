@@ -29,7 +29,6 @@ import { getCatString } from "../../../util/category";
 import PropTypes from "prop-types";
 
 const ExpenseCategories = ({ expenses, periodName, navigation }) => {
-  console.log("ExpenseCategories ~ expenses:", expenses);
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
 
   if (!expenses)

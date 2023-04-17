@@ -391,6 +391,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
           navigation={navigation}
         ></ExpenseChart>
       </View>
+      {/* <View style={styles.shadow}></View> */}
       <Animated.View
         entering={FadeInRight.duration(500)}
         exiting={FadeOutLeft.duration(500)}
@@ -474,5 +475,19 @@ const styles = StyleSheet.create({
   },
   red: {
     color: GlobalStyles.colors.error300,
+  },
+  shadow: {
+    borderTopWidth: 1,
+    borderBottomWidth: 0,
+    borderTopColor: GlobalStyles.colors.gray600,
+    borderBottomColor: GlobalStyles.colors.gray600,
+    minHeight: 1,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    elevation: 2,
+    shadowColor: GlobalStyles.colors.textColor,
+    shadowOffset: { width: 1, height: 2.5 },
+    shadowOpacity: 0.9,
+    shadowRadius: 4,
+    zIndex: 2,
   },
 });

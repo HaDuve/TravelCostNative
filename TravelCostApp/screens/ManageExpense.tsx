@@ -1,4 +1,4 @@
-import { useContext, useLayoutEffect, useState } from "react";
+import { useContext, useLayoutEffect, useState, useCallback } from "react";
 import { Alert, KeyboardAvoidingView, StyleSheet, View } from "react-native";
 import React from "react";
 import { ScrollView } from "react-native";
@@ -31,6 +31,7 @@ import { asyncStoreSetObject } from "../store/async-storage";
 import { Expense, ExpenseData } from "../util/expense";
 import { DateTime } from "luxon";
 import { useFocusEffect } from "@react-navigation/native";
+import { useEffect } from "react";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -38,12 +39,12 @@ i18n.enableFallback = true;
 
 const ManageExpense = ({ route, navigation }) => {
   const { pickedCat, tempValues, newCat, iconName } = route.params;
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const expenseCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
+  const [isOnline, setIsOnline] = useState(userCtx.isOnline);
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
 
@@ -55,6 +56,14 @@ const ManageExpense = ({ route, navigation }) => {
   );
   const selectedExpenseAuthorUid = selectedExpense?.uid;
   //TODO: add tempValues to selected Expense
+
+  useEffect(() => {
+    const updateIsOnline = async () => {
+      const isOnline = await userCtx.checkConnectionUpdateUser();
+      setIsOnline(isOnline);
+    };
+    updateIsOnline();
+  }, [userCtx]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -75,7 +84,7 @@ const ManageExpense = ({ route, navigation }) => {
           },
         };
         navigation.goBack();
-        await deleteExpenseOnlineOffline(item, userCtx.isOnline);
+        await deleteExpenseOnlineOffline(item, isOnline);
         expenseCtx.deleteExpense(editedExpenseId);
         await touchAllTravelers(tripid, true);
       } catch (error) {
@@ -112,10 +121,10 @@ const ManageExpense = ({ route, navigation }) => {
       expenseData.categoryString = getCatString(expenseData.category);
 
       // calc calcAmount from amount, currency and TripCtx.tripCurrency and add it to expenseData
-      const base = expenseData.currency;
-      const target = tripCtx.tripCurrency;
+      const base = tripCtx.tripCurrency;
+      const target = expenseData.currency;
       const rate = await getRate(base, target);
-      const calcAmount = expenseData.amount * rate;
+      const calcAmount = expenseData.amount / rate;
       expenseData.calcAmount = calcAmount;
 
       // if expenseData has a splitlist, add the rate to each split

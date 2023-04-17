@@ -16,7 +16,8 @@ export async function fetchAndSetExpenses(
   if (!showRefIndicator && !showAnyIndicator) setIsFetching(true);
   if (!showAnyIndicator) setRefreshing(true);
   try {
-    const expenses = await getAllExpenses(tripid, uid);
+    let expenses = await getAllExpenses(tripid, uid);
+    expenses = expenses.filter((expense) => !isNaN(Number(expense.calcAmount)));
     if (expenses && expenses.length !== 0) {
       expensesCtx.setExpenses(expenses);
 

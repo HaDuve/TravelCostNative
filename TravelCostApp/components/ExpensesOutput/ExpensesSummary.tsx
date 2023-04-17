@@ -14,9 +14,14 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   if (!expenses || !periodName) return <></>;
 
   const expensesSum = expenses.reduce((sum, expense) => {
-    return sum + Number(expense.calcAmount);
+    if (isNaN(Number(expense.calcAmount))) return sum;
+    return Number(sum + Number(expense.calcAmount));
   }, 0);
   // console.log("expensesSum ~ expensesSum", expensesSum);
+  if (isNaN(Number(expensesSum))) {
+    console.log("expensesSum is NaN");
+    return <></>;
+  }
 
   const expensesSumString = formatExpenseString(expensesSum);
   const userCurrency = tripCtx.tripCurrency;

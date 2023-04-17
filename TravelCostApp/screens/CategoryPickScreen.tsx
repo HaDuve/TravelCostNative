@@ -162,7 +162,6 @@ const CategoryPickScreen = ({ route, navigation }) => {
   async function catPressHandler(item) {
     setIsFetching(true);
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    await userCtx.checkConnectionUpdateUser();
     // setIsShaking(false);
     if (item.cat === "newCat") {
       navigation.navigate("ManageCategory");

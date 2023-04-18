@@ -11,7 +11,7 @@ i18n.enableFallback = true;
 
 import { getAllExpenses } from "./http";
 
-export function calcExactSplits(splitList, amount) {
+export function recalcSplitsForExact(splitList, amount) {
   // number of travellers
   const numberOfTravellers = splitList.length;
   // normal split amount

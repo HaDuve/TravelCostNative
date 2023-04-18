@@ -16,9 +16,21 @@ import { GlobalStyles } from "../constants/styles";
 import Toast from "react-native-toast-message";
 import PropTypes from "prop-types";
 
-const FilteredExpenses = ({ route, navigation }) => {
-  const { expenses, dayString, showSumForTravellerName } = route.params;
-  // show error Toast if no data is passed
+const FilteredExpenses = ({
+  route,
+  navigation,
+  expensesAsArg,
+  dayStringAsArg,
+}) => {
+  const { expenses, dayString, showSumForTravellerName } = expensesAsArg
+    ? {
+        expenses: expensesAsArg,
+        dayString: dayStringAsArg,
+        showSumForTravellerName: false,
+      }
+    : route.params;
+  const withArgs = expensesAsArg ? true : false;
+
   if (!expenses || expenses.length < 1) {
     Toast.show({
       type: "error",
@@ -30,15 +42,24 @@ const FilteredExpenses = ({ route, navigation }) => {
   }
   return (
     <View style={styles.container}>
-      <View style={styles.titleContainer}>
-        <Text style={styles.titleText}>{dayString}</Text>
-      </View>
-      <View style={styles.shadow}></View>
+      {!withArgs && (
+        <>
+          <View style={styles.titleContainer}>
+            <Text style={styles.titleText}>{dayString}</Text>
+          </View>
+
+          <View style={styles.shadow}></View>
+        </>
+      )}
       <ExpensesOutput
         expenses={expenses}
         showSumForTravellerName={showSumForTravellerName}
       />
-      <FlatButton onPress={() => navigation.pop()}>{i18n.t("back")}</FlatButton>
+      {!withArgs && (
+        <FlatButton onPress={() => navigation.pop()}>
+          {i18n.t("back")}
+        </FlatButton>
+      )}
     </View>
   );
 };
@@ -49,6 +70,8 @@ FilteredExpenses.propTypes = {
   route: PropTypes.object.isRequired,
   navigation: PropTypes.object.isRequired,
   showSumForTravellerName: PropTypes.string,
+  expensesAsArg: PropTypes.array,
+  dayStringAsArg: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

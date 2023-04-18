@@ -23,6 +23,7 @@ import ExpenseTravellers from "../components/ExpensesOutput/ExpenseStatistics/Ex
 import ExpenseCountries from "../components/ExpensesOutput/ExpenseStatistics/ExpenseCountries";
 import ExpenseCurrencies from "../components/ExpensesOutput/ExpenseStatistics/ExpenseCurrencies";
 import FlatButton from "../components/UI/FlatButton";
+import FilteredExpenses from "./FilteredExpenses";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -30,8 +31,69 @@ i18n.enableFallback = true;
 
 const FilteredPieCharts = ({ navigation, route }) => {
   const { expenses, dayString } = route.params;
+  const titleStrings = [
+    i18n.t("categories"),
+    "Travellers", // i18n.t("travellers"),
+    "Countries", // i18n.t("countries"),
+    "Currencies", // i18n.t("currencies"),
+    "Expenses", // i18n.t("expenses"),
+  ];
+
   // enum =>  0 = categories, 1 = traveller, 2 = country, 3 = currency
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
+
+  const contents = [
+    <ExpenseCategories
+      key={0}
+      expenses={expenses}
+      periodName={dayString}
+      navigation={navigation}
+    />,
+    <ExpenseTravellers
+      key={1}
+      expenses={expenses}
+      periodName={dayString}
+      navigation={navigation}
+    ></ExpenseTravellers>,
+    <ExpenseCountries
+      key={2}
+      expenses={expenses}
+      periodName={dayString}
+      navigation={navigation}
+    ></ExpenseCountries>,
+    <ExpenseCurrencies
+      key={3}
+      expenses={expenses}
+      periodName={dayString}
+      navigation={navigation}
+    ></ExpenseCurrencies>,
+    <FilteredExpenses
+      key={4}
+      expensesAsArg={expenses}
+      dayStringAsArg={dayString}
+    ></FilteredExpenses>,
+  ];
+
+  if (contents.length !== titleStrings.length)
+    throw new Error("Lengths do not match");
+
+  const CONTENTS_MAX_INDEX = titleStrings.length - 1;
+
+  const nextHandler = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    setToggleGraphEnum(
+      toggleGraphEnum == CONTENTS_MAX_INDEX ? 0 : toggleGraphEnum + 1
+    );
+  };
+
+  const previousHandler = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setToggleGraphEnum(
+      toggleGraphEnum == 0 ? CONTENTS_MAX_INDEX : toggleGraphEnum - 1
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.firstTitleContainer}>
@@ -48,35 +110,16 @@ const FilteredPieCharts = ({ navigation, route }) => {
           <IconButton
             icon={"chevron-back-outline"}
             size={24}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              setToggleGraphEnum(
-                toggleGraphEnum == 0 ? 3 : toggleGraphEnum - 1
-              );
-            }}
+            onPress={previousHandler}
             color={GlobalStyles.colors.primaryGrayed}
           ></IconButton>
         </Animated.View>
-        {toggleGraphEnum == 0 && (
-          <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-            <Text style={styles.titleText}> {i18n.t("categories")} </Text>
-          </Animated.View>
-        )}
-        {toggleGraphEnum == 1 && (
-          <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-            <Text style={styles.titleText}> Travellers </Text>
-          </Animated.View>
-        )}
-        {toggleGraphEnum == 2 && (
-          <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-            <Text style={styles.titleText}> Countries </Text>
-          </Animated.View>
-        )}
-        {toggleGraphEnum == 3 && (
-          <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-            <Text style={styles.titleText}> Currencies </Text>
-          </Animated.View>
-        )}
+        <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
+          <Text style={styles.titleText}>
+            {" "}
+            {titleStrings[toggleGraphEnum]}{" "}
+          </Text>
+        </Animated.View>
         <Animated.View
           entering={FadeInRight}
           exiting={FadeOutRight}
@@ -85,46 +128,13 @@ const FilteredPieCharts = ({ navigation, route }) => {
           <IconButton
             icon={"chevron-forward-outline"}
             size={24}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
-              setToggleGraphEnum(
-                toggleGraphEnum == 3 ? 0 : toggleGraphEnum + 1
-              );
-            }}
+            onPress={nextHandler}
             color={GlobalStyles.colors.primaryGrayed}
           ></IconButton>
         </Animated.View>
       </View>
       <View style={styles.shadow}></View>
-      {toggleGraphEnum == 0 && (
-        <ExpenseCategories
-          expenses={expenses}
-          periodName={dayString}
-          navigation={navigation}
-        />
-      )}
-      {toggleGraphEnum == 1 && (
-        <ExpenseTravellers
-          expenses={expenses}
-          periodName={dayString}
-          navigation={navigation}
-        ></ExpenseTravellers>
-      )}
-      {toggleGraphEnum == 2 && (
-        <ExpenseCountries
-          expenses={expenses}
-          periodName={dayString}
-          navigation={navigation}
-        ></ExpenseCountries>
-      )}
-      {toggleGraphEnum == 3 && (
-        <ExpenseCurrencies
-          expenses={expenses}
-          periodName={dayString}
-          navigation={navigation}
-        ></ExpenseCurrencies>
-      )}
+      {contents[toggleGraphEnum]}
       <FlatButton onPress={() => navigation.pop()}>{i18n.t("back")}</FlatButton>
     </View>
   );

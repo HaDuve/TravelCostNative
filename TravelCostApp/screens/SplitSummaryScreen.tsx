@@ -21,12 +21,13 @@ import { ExpensesContext } from "../store/expenses-context";
 import BackgroundGradient from "../components/UI/BackgroundGradient";
 import { Split } from "../util/expense";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import getSymbolFromCurrency from "currency-symbol-map";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
   const { tripid } = route.params;
-  console.log("SplitSummaryScreen ~ tripid:", tripid);
   const tripCtx = useContext(TripContext);
   const tripCurrency = tripCtx.tripCurrency;
+  const currencySymbol = getSymbolFromCurrency(tripCurrency);
   const userCtx = useContext(UserContext);
   const expenseCtx = useContext(ExpensesContext);
 
@@ -46,6 +47,15 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const [titleText, setTitleText] = useState(titleTextOriginal);
   const [subTitleText, setSubTitleText] = useState(subTitleOriginal);
 
+  const totalPaidBackTextOriginal = "Money you get back: ";
+  const [totalPaidBackText, setTotalPaidBackText] = useState(
+    totalPaidBackTextOriginal
+  );
+  const totalPayBackTextOriginal = "Money you still owe: ";
+  const [totalPayBackText, setTotalPayBackText] = useState(
+    totalPayBackTextOriginal
+  );
+
   async function getOpenSplits() {
     setIsFetching(true);
     try {
@@ -55,6 +65,8 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         expenseCtx.expenses
       );
       const temp = [];
+      let userGetsBack = 0;
+      let userHasToPay = 0;
       for (let i = 0; i < response.length; i++) {
         const split: Split = response[i];
         const tempObj = {
@@ -63,9 +75,26 @@ const SplitSummaryScreen = ({ route, navigation }) => {
           amount: Number(split.amount).toFixed(2),
         };
         temp.push(tempObj);
+        userGetsBack +=
+          split.whoPaid === userCtx.userName ? Number(split.amount) : Number(0);
+        userHasToPay +=
+          split.userName === userCtx.userName
+            ? Number(split.amount)
+            : Number(0);
       }
-      console.log("getOpenSplits ~ temp", temp);
       setSplits(temp);
+      setTotalPaidBackText(
+        totalPaidBackTextOriginal +
+          userGetsBack.toFixed(2) +
+          " " +
+          currencySymbol
+      );
+      setTotalPayBackText(
+        totalPayBackTextOriginal +
+          userHasToPay.toFixed(2) +
+          " " +
+          currencySymbol
+      );
     } catch (error) {
       Toast.show({
         type: "error",
@@ -86,7 +115,6 @@ const SplitSummaryScreen = ({ route, navigation }) => {
     //   return;
     // }
     try {
-      console.log("handleSimpflifySplits ~ splits:", splits);
       const simpleSplits = simplifySplits(splits);
       if (simpleSplits.length === 0) {
         Alert.alert("No Splits to Simplify");
@@ -131,7 +159,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         <Text style={styles.userText}>{item.userName} </Text>
         <Text style={styles.normalText}>owes </Text>
         <Text style={styles.amountText}>{item.amount} </Text>
-        <Text style={styles.amountText}>{tripCtx.tripCurrency} </Text>
+        <Text style={styles.amountText}>{currencySymbol} </Text>
         <Text style={styles.normalText}>to</Text>
         <Text style={styles.userText}> {item.whoPaid}!</Text>
       </View>
@@ -150,6 +178,12 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         </View>
         <View style={styles.subTitleContainer}>
           <Text style={styles.subTitleText}> {subTitleText}</Text>
+        </View>
+        <View style={styles.subTitleContainer}>
+          <Text style={styles.subTitleText}> {totalPaidBackText}</Text>
+        </View>
+        <View style={styles.subTitleContainer}>
+          <Text style={styles.subTitleText}> {totalPayBackText}</Text>
         </View>
       </Animated.View>
       <FlatList
@@ -227,6 +261,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    margin: "2%",
   },
   userText: {
     fontSize: 18,
@@ -257,7 +292,7 @@ const styles = StyleSheet.create({
   subTitleContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginHorizontal: "10%",
+    margin: "2%",
   },
   subTitleText: {
     fontSize: 14,

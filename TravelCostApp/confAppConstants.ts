@@ -14,6 +14,8 @@ export const TIMEOUT = 10000;
 export const DEV = false;
 // Premium consts
 export const PREMIUM = false;
+// Rating/Review consts
+export const DAYS_BEFORE_PROMPT = 2;
 // Maximum number of period range days/months/years
 export const MAX_PERIOD_RANGE = 30;
 export const MIN_PERIOD_RANGE = 3;

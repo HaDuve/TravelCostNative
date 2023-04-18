@@ -1,6 +1,6 @@
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
-import { SafeAreaView, View, Keyboard, Platform } from "react-native";
+import { SafeAreaView, View, Keyboard, Platform, AppState } from "react-native";
 import Purchases from "react-native-purchases";
 
 import { StatusBar } from "expo-status-bar";
@@ -67,6 +67,11 @@ import PaywallScreen from "./components/Premium/PayWall";
 import { SettingsProvider } from "./store/settings-context";
 import { UserData } from "./store/user-context";
 import FilteredPieCharts from "./screens/FilteredPieCharts";
+import {
+  handleFirstStart,
+  shouldPromptForRating,
+} from "./components/Rating/firstStartUtil";
+import RatingModal from "./screens/RatingModal";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -381,6 +386,7 @@ function Root() {
   }
 
   const [appIsReady, setAppIsReady] = useState(false);
+  const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
 
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
@@ -438,6 +444,12 @@ function Root() {
     listener();
   }, [userCtx.isOnline]);
 
+  const showModalIfNeeded = async () => {
+    if (await shouldPromptForRating()) {
+      setIsReviewModalVisible(true);
+    }
+  };
+
   async function setupOfflineMount(
     isOfflineMode: boolean,
     storedToken: string
@@ -457,6 +469,9 @@ function Root() {
 
   useEffect(() => {
     async function onRootMount() {
+      // first start
+      await handleFirstStart();
+
       // wrap functions to test dataResponseTime
       const test_tripCtx_fetchAndSetCurrentTrip = dataResponseTime(
         tripCtx.fetchAndSetCurrentTrip
@@ -592,6 +607,18 @@ function Root() {
     test_onRootMount();
   }, []);
 
+  useEffect(() => {
+    // only ask for review if the app goes from background to active
+    const handler = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        showModalIfNeeded();
+      }
+    });
+    return () => {
+      handler.remove();
+    };
+  }, []);
+
   useLayoutEffect(() => {
     async function hideSplashScreen() {
       await SplashScreen.hideAsync();
@@ -603,7 +630,15 @@ function Root() {
     return <SplashScreenOverlay></SplashScreenOverlay>;
   }
 
-  return <Navigation />;
+  return (
+    <>
+      <RatingModal
+        setIsModalVisible={setIsReviewModalVisible}
+        isModalVisible={isReviewModalVisible}
+      />
+      <Navigation />
+    </>
+  );
 }
 
 function handleUnhandledTouches() {

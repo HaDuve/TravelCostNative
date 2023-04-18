@@ -52,7 +52,7 @@ import GradientButton from "../UI/GradientButton";
 import getSymbolFromCurrency from "currency-symbol-map";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import CountryFlag from "react-native-country-flag";
-import { calcExactSplits } from "../../util/split";
+import { recalcSplitsForExact } from "../../util/split";
 
 const ExpenseForm = ({
   onCancel,
@@ -313,11 +313,9 @@ const ExpenseForm = ({
   }
 
   function splitHandler() {
-    // calculate splits
-    let listSplits = [];
-
     const splitTravellers = splitTravellersList;
-    listSplits = calcSplitList(
+    // calculate splits
+    const listSplits = calcSplitList(
       splitType,
       inputs.amount.value,
       whoPaid,
@@ -487,7 +485,7 @@ const ExpenseForm = ({
   function handleRecalculationSplits() {
     {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      const newSplitList = calcExactSplits(splitList, inputs.amount.value);
+      const newSplitList = recalcSplitsForExact(splitList, inputs.amount.value);
 
       setSplitList(newSplitList);
       const isValidSplit = validateSplitList(
@@ -849,12 +847,14 @@ const ExpenseForm = ({
                         pressed && GlobalStyles.pressedWithShadow,
                       ]}
                       onPress={() => handleRecalculationSplits()}
+                      onLongPress={() => splitHandler()}
                     >
                       <IconButton
                         icon="ios-git-compare-outline"
                         color={GlobalStyles.colors.primary500}
                         size={24}
                         onPress={() => handleRecalculationSplits()}
+                        onLongPress={() => splitHandler()}
                       />
                     </Pressable>
                   </Animated.View>

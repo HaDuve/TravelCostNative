@@ -31,6 +31,8 @@ i18n.enableFallback = true;
 
 const FilteredPieCharts = ({ navigation, route }) => {
   const { expenses, dayString } = route.params;
+  const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
+  // contents and titleStrings have to match in legth and correspond!
   const titleStrings = [
     i18n.t("categories"),
     "Travellers", // i18n.t("travellers"),
@@ -38,10 +40,6 @@ const FilteredPieCharts = ({ navigation, route }) => {
     "Currencies", // i18n.t("currencies"),
     "Expenses", // i18n.t("expenses"),
   ];
-
-  // enum =>  0 = categories, 1 = traveller, 2 = country, 3 = currency
-  const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
-
   const contents = [
     <ExpenseCategories
       key={0}
@@ -73,15 +71,12 @@ const FilteredPieCharts = ({ navigation, route }) => {
       dayStringAsArg={dayString}
     ></FilteredExpenses>,
   ];
-
   if (contents.length !== titleStrings.length)
     throw new Error("Lengths do not match");
-
   const CONTENTS_MAX_INDEX = titleStrings.length - 1;
 
   const nextHandler = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
     setToggleGraphEnum(
       toggleGraphEnum == CONTENTS_MAX_INDEX ? 0 : toggleGraphEnum + 1
     );

@@ -347,9 +347,9 @@ function Home() {
         options={{
           // headerShown: false,
           title: i18n.t("profileTab"),
-          tabBarLabel: i18n.t("profileTab"),
+          tabBarLabel: i18n.t("myTrips"),
           tabBarIcon: ({ color }) => (
-            <Ionicons name="person-circle-outline" size={24} color={color} />
+            <Ionicons name="globe-outline" size={24} color={color} />
           ),
         }}
       />

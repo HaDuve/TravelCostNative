@@ -1,6 +1,12 @@
 import React from "react";
 import { useState, useContext, useEffect, useLayoutEffect } from "react";
-import { View, Text, Alert, KeyboardAvoidingView } from "react-native";
+import {
+  View,
+  Text,
+  Alert,
+  KeyboardAvoidingView,
+  ScrollView,
+} from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
@@ -313,7 +319,7 @@ const TripForm = ({ navigation, route }) => {
   return (
     <>
       {datepickerJSX}
-      <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
+      <ScrollView behavior={"padding"} style={{ flex: 1 }}>
         <View style={styles.form}>
           <View style={styles.card}>
             <Text style={styles.title}>{titleString}</Text>
@@ -465,7 +471,7 @@ const TripForm = ({ navigation, route }) => {
             )}
           </View>
         </View>
-      </KeyboardAvoidingView>
+      </ScrollView>
     </>
   );
 };

@@ -534,11 +534,7 @@ const ExpenseForm = ({
     <>
       {datepickerJSX}
       <View style={styles.container}>
-        <KeyboardAvoidingView
-          behavior={"position"}
-          contentContainerStyle={{ flex: 1 }}
-          style={styles.form}
-        >
+        <View style={styles.form}>
           <View style={styles.inputsRow}>
             <Input
               style={styles.rowInput}
@@ -953,7 +949,7 @@ const ExpenseForm = ({
           {formIsInvalid && !hideAdvanced && (
             <Text style={styles.errorText}>{i18n.t("invalidInput")} </Text>
           )}
-        </KeyboardAvoidingView>
+        </View>
         <View
           style={[styles.spacerViewAdvanced, hideAdvanced && styles.spacerView]}
         ></View>

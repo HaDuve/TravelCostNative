@@ -289,34 +289,30 @@ const ManageExpense = ({ route, navigation }) => {
   }
 
   return (
-    <KeyboardAvoidingView behavior={"padding"} style={styles.container}>
-      <ScrollView style={styles.container}>
-        <>
-          <ExpenseForm
-            onCancel={cancelHandler}
-            onSubmit={confirmHandler}
-            pickedCat={pickedCat}
-            iconName={iconName}
-            navigation={navigation}
-            isEditing={isEditing}
-            submitButtonLabel={isEditing ? i18n.t("update") : i18n.t("add")}
-            defaultValues={selectedExpense}
-            editedExpenseId={editedExpenseId}
-            newCat={newCat}
+    <ScrollView style={styles.container}>
+      <ExpenseForm
+        onCancel={cancelHandler}
+        onSubmit={confirmHandler}
+        pickedCat={pickedCat}
+        iconName={iconName}
+        navigation={navigation}
+        isEditing={isEditing}
+        submitButtonLabel={isEditing ? i18n.t("update") : i18n.t("add")}
+        defaultValues={selectedExpense}
+        editedExpenseId={editedExpenseId}
+        newCat={newCat}
+      />
+      {isEditing && (
+        <View style={styles.deleteContainer}>
+          <IconButton
+            icon="trash"
+            color={GlobalStyles.colors.error500}
+            size={36}
+            onPress={deleteExpenseHandler}
           />
-          {isEditing && (
-            <View style={styles.deleteContainer}>
-              <IconButton
-                icon="trash"
-                color={GlobalStyles.colors.error500}
-                size={36}
-                onPress={deleteExpenseHandler}
-              />
-            </View>
-          )}
-        </>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </View>
+      )}
+    </ScrollView>
   );
 };
 
@@ -334,7 +330,7 @@ const styles = StyleSheet.create({
   },
   deleteContainer: {
     paddingTop: "2%",
-    marginBottom: "15%",
+    margin: "2%",
     alignItems: "center",
   },
 });

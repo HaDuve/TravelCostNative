@@ -1,5 +1,14 @@
 Change log Travel Expense App
 
+1.0.99
+- added split information (total payback to and from users)
+- added expense List to pie chart caroussell (to make it easy to find the list)
+- added a review prompt (appears afer 2 days)
+- long press on recalculate button now resets the splits (in expense form)
+- fixed the awkward keyboard avoiding view in Expense Form and Trip Form (now you can see the amount again!)
+- renamed "Profile" to "My Trips" and adjusted layout
+- fixed some crashes when creating multiple trips
+
 1.0.98
 - Added a filtered version of Pie Charts!
 - User can now navigate to the filtered Pie Charts from Overview Screen by short-tapping on any item on the list

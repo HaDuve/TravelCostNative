@@ -35,11 +35,11 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
   const tripCtx = useContext(TripContext);
   const today = new Date();
   function renderItemRef() {
-    return <> </>;
+    return <></>;
   }
   if (!isForeground) {
     console.log("ExpenseGraph: not in foreground, return empty view");
-    return <> </>;
+    return <></>;
   }
   const listExpenseSumBudgets = [];
   const lastDays = periodRangeNumber ?? 8,

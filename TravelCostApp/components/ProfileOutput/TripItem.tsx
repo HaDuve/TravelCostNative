@@ -23,6 +23,7 @@ import { I18n } from "i18n-js";
 import { en, de, fr } from "../../i18n/supportedLanguages";
 import { UserContext } from "../../store/user-context";
 import getSymbolFromCurrency from "currency-symbol-map";
+import PropTypes from "prop-types";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -33,6 +34,7 @@ function TripItem({
   tripName,
   totalBudget,
   dailyBudget,
+
   tripCurrency,
   trips,
 }) {
@@ -164,7 +166,12 @@ function TripItem({
 export default TripItem;
 
 TripItem.propTypes = {
-
+  tripid: PropTypes.string,
+  tripName: PropTypes.string,
+  totalBudget: PropTypes.number,
+  dailyBudget: PropTypes.number,
+  tripCurrency: PropTypes.string,
+  trips: PropTypes.array,
 };
 
 const styles = StyleSheet.create({

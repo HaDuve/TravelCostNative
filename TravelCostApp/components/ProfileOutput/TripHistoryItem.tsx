@@ -141,7 +141,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const activeProgress = 0;
 
   if (isFetching || (tripid && !totalBudget)) {
-    return <> </>;
+    return <></>;
   }
 
   function renderTravellers(item) {

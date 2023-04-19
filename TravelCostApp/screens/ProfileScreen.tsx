@@ -270,14 +270,11 @@ const ProfileScreen = ({ navigation }) => {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={refreshHandler}
-                // progressViewOffset={-100000}
               />
             }
           ></TripList>
         </TourGuideZone>
       </View>
-      {/* <AddExpenseButton navigation={navigation} /> */}
-
       <View style={styles.horizontalButtonContainer}>
         <TourGuideZone
           text={i18n.t("walk7")}
@@ -336,11 +333,11 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: "68%",
     margin: 16,
-    marginBottom: -100,
+    marginBottom: -30,
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   horizontalContainer: {
-    marginTop: "2%",
+    marginTop: "3%",
     flexDirection: "row",
     justifyContent: "space-between",
   },

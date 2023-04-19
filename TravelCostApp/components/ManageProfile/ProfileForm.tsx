@@ -45,7 +45,7 @@ const ProfileForm = ({ navigation, sleepyStartHandler }) => {
           setIsFetchingLogout(true);
           TripCtx.setCurrentTrip("reset", "null");
           AuthCtx.logout();
-          setIsFetchingLogout(true);
+          setIsFetchingLogout(false);
         },
       },
     ]);
@@ -121,14 +121,12 @@ const ProfileForm = ({ navigation, sleepyStartHandler }) => {
         icon={"close-outline"}
         size={36}
         color={GlobalStyles.colors.accent500}
-        // style={styles.button}
         onPress={cancelHandler}
       />
       <IconButton
         icon={"checkmark"}
         size={36}
         color={GlobalStyles.colors.primary500}
-        // style={styles.button}
         onPress={submitHandler}
       />
     </View>
@@ -156,32 +154,21 @@ const ProfileForm = ({ navigation, sleepyStartHandler }) => {
       </Button>
     </View>
   );
+
   return (
     <View style={styles.form}>
       <View style={styles.avatarBar}>
         <Pressable onPress={avatarHandler}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
-              {/* TODO: Profile Picture for now replaced with first char of the name */}
               {inputs.userName.value.charAt(0)}
             </Text>
           </View>
         </Pressable>
-        {iconButtonJSX}
-      </View>
-      <View style={styles.inputsRow}>
-        <Input
-          label={i18n.t("nameLabel")}
-          style={styles.rowInput}
-          inputStyle={styles.inputStyle}
-          textInputConfig={{
-            onChangeText: inputChangedHandler.bind(this, "userName"),
-            value: inputs.userName.value,
-          }}
-          invalid={!inputs.userName.isValid}
-          editable={false}
-          selectTextOnFocus={false}
-        />
+        <View style={styles.nameRow}>
+          <Text style={styles.userText}>{inputs.userName.value}</Text>
+        </View>
+        <View style={styles.logoutContainer}>{iconButtonJSX}</View>
       </View>
       <View style={styles.inputsRow}></View>
       {changedName && changedNameButtons}
@@ -195,12 +182,18 @@ export default ProfileForm;
 const styles = StyleSheet.create({
   form: {
     flex: 1,
-    marginTop: 10,
-    minHeight: 250,
+    marginTop: "2%",
+  },
+  nameRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1,
+    maxWidth: "40%",
   },
   avatarBar: {
-    marginTop: "6%",
-    marginHorizontal: "3%",
+    marginTop: "2%",
+    marginHorizontal: "4%",
     padding: "1%",
     minHeight: "20%",
     flexDirection: "row",
@@ -219,6 +212,16 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: "bold",
     color: GlobalStyles.colors.primary700,
+  },
+  userText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: GlobalStyles.colors.primary700,
+  },
+  logoutContainer: {
+    marginBottom: "-4%",
+    alignItems: "flex-end",
+    justifyContent: "flex-end",
   },
   title: {
     fontSize: 24,

@@ -71,9 +71,6 @@ const ExpenseForm = ({
   const UserCtx = useContext(UserContext);
   const TripCtx = useContext(TripContext);
 
-  //console log the defaultValues.rangeId
-  console.log("defaultValues.rangeId", defaultValues?.rangeId);
-
   const [hideAdvanced, sethideAdvanced] = useState(!isEditing);
   const [countryValue, setCountryValue] = useState("EUR");
   const [loadingTravellers, setLoadingTravellers] = useState(false);

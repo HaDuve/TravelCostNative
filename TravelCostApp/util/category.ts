@@ -63,6 +63,20 @@ export function getCatSymbol(cat: string) {
   }
 }
 
+export async function getCatSymbolAsync(cat: string) {
+  console.log("getCatSymbolAsync ~ getCatSymbolAsync:", getCatSymbolAsync);
+  const catList = await asyncStoreGetObject("categoryList");
+  console.log("getCatSymbolAsync ~ catList:", catList);
+  if (catList) {
+    const catObj = catList.find((catObj: Category) => catObj.catString === cat);
+    if (catObj) {
+      console.log("getCatSymbolAsync ~ catObj: FOUND", catObj.icon);
+      return catObj.icon;
+    }
+  }
+  return getCatSymbol(cat);
+}
+
 export function getCatString(cat: string) {
   switch (cat) {
     case "food":

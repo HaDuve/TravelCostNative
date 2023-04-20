@@ -20,24 +20,17 @@ import { GlobalStyles } from "../constants/styles";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../i18n/supportedLanguages";
-import {
-  deleteCategories,
-  fetchCategories,
-  postCategories,
-  storeCategories,
-  updateTrip,
-} from "../util/http";
+import { fetchCategories } from "../util/http";
 import { useContext } from "react";
 import { TripContext } from "../store/trip-context";
-import Toast from "react-native-toast-message";
 import { Ionicons } from "@expo/vector-icons";
 import GradientButton from "../components/UI/GradientButton";
-import useEffect from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { asyncStoreGetObject } from "../store/async-storage";
 import { ActivityIndicator } from "react-native";
 import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -116,7 +109,6 @@ const CategoryPickScreen = ({ route, navigation }) => {
         // console.log("CategoryPickScreen ~ categories", categories);
         if (categories) {
           console.log("online cats");
-          console.log("loadCategories ~ categories:", categories);
           const tempList = [...categories];
           tempList.push({
             id: 6,
@@ -126,6 +118,10 @@ const CategoryPickScreen = ({ route, navigation }) => {
             catString: i18n.t("catNewString"),
           });
           setCategoryList(tempList);
+          await AsyncStorage.setItem(
+            "categoryList",
+            JSON.stringify(categories)
+          );
           setIsFetching(false);
         } else await loadCategoryList();
       };

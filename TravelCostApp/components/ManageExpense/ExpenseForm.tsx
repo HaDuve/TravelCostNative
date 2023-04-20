@@ -19,7 +19,11 @@ import { AuthContext } from "../../store/auth-context";
 import IconButton from "../UI/IconButton";
 import { UserContext } from "../../store/user-context";
 import FlatButton from "../UI/FlatButton";
-import { getCatString, getCatSymbol } from "../../util/category";
+import {
+  getCatString,
+  getCatSymbol,
+  getCatSymbolAsync,
+} from "../../util/category";
 import DropDownPicker from "react-native-dropdown-picker";
 // import CurrencyPicker from "react-native-currency-picker";
 import { TripContext } from "../../store/trip-context";
@@ -62,6 +66,7 @@ import getSymbolFromCurrency from "currency-symbol-map";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import CountryFlag from "react-native-country-flag";
 import { recalcSplitsForExact } from "../../util/split";
+import { ExpenseData } from "../../util/expense";
 
 const ExpenseForm = ({
   onCancel,
@@ -79,6 +84,7 @@ const ExpenseForm = ({
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
   const TripCtx = useContext(TripContext);
+  const DEFAULTVALUES: ExpenseData = defaultValues;
 
   const [hideAdvanced, sethideAdvanced] = useState(!isEditing);
   const [countryValue, setCountryValue] = useState("EUR");
@@ -88,7 +94,7 @@ const ExpenseForm = ({
   useEffect(() => {
     async function setCatSymbolAsync() {
       if (!defaultValues) return;
-      const cat = await getCatSymbol(defaultValues.category);
+      const cat = await getCatSymbolAsync(defaultValues.category);
       setCatSymbol(cat);
     }
     setCatSymbolAsync();
@@ -346,11 +352,13 @@ const ExpenseForm = ({
       "EQUAL",
       inputs.amount.value,
       whoPaid,
-      splitTravellers,
-      splitList
+      splitTravellers
     );
     if (listSplits) {
       setSplitList(listSplits);
+      setSplitListValid(
+        validateSplitList(listSplits, splitType, inputs.amount.value)
+      );
     }
   }
 
@@ -907,7 +915,7 @@ const ExpenseForm = ({
                     horizontal={true}
                     contentContainerStyle={{
                       flex: 1,
-                      minWidth: "150%",
+                      minWidth: "110%",
                       justifyContent: "flex-start",
                       alignItems: "flex-start",
                       overflow: "visible",

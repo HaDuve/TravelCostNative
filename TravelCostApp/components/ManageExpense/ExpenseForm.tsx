@@ -532,7 +532,7 @@ const ExpenseForm = ({
       if (!isValidSplit) {
         Alert.alert(
           "Sorry!",
-          "I could not calculate a valid split. Please check your input."
+          "I could not calculate a valid split. Please check your input. \n\n You can also long-press the recalculate button to reset all splits!"
         );
       }
     }
@@ -851,49 +851,52 @@ const ExpenseForm = ({
                   whoPaidValid &&
                   !IsSoloTraveller &&
                   splitListHasNonZeroEntries && (
-                    <Text style={[styles.currencyLabel, { marginTop: 16 }]}>
+                    <Text
+                      style={[
+                        styles.currencyLabel,
+                        { marginTop: 20, marginBottom: 20 },
+                      ]}
+                    >
                       {i18n.t("whoShared")}
                     </Text>
                   )}
                 {splitType == "EXACT" && !splitListValid && (
                   <Animated.View
+                    style={{
+                      marginTop: 8,
+                      marginLeft: 8,
+                    }}
                     entering={ZoomIn}
                     exiting={ZoomOut.duration(100)}
                   >
-                    <Pressable
-                      style={({ pressed }) => [
+                    <Text style={styles.dateLabelDuplSplitText}>
+                      {"(Re)-Calculate"}
+                    </Text>
+                    <IconButton
+                      icon="ios-git-compare-outline"
+                      color={GlobalStyles.colors.primary500}
+                      onPressStyle={{ transform: [{ scale: 0.9 }] }}
+                      buttonStyle={[
                         {
                           flexDirection: "column",
                           alignContent: "center",
                           justifyContent: "center",
                           alignItems: "center",
                           marginLeft: 16,
-                          marginBottom: 12,
-                          marginTop: 8,
+                          marginTop: 4,
+                          marginBottom: 8,
                           borderRadius: 8,
                           backgroundColor: GlobalStyles.colors.backgroundColor,
-                          paddingTop: 12,
-                          paddingBottom: 0,
-                          paddingHorizontal: 24,
-
+                          padding: 12,
                           borderWidth: 1,
                           borderColor: GlobalStyles.colors.primary500,
                         },
                         GlobalStyles.strongShadow,
-                        pressed && GlobalStyles.pressedWithShadow,
                       ]}
+                      size={24}
                       onPress={() => handleRecalculationSplits()}
                       onLongPress={() => resetSplitHandler()}
-                    >
-                      <IconButton
-                        icon="ios-git-compare-outline"
-                        color={GlobalStyles.colors.primary500}
-                        onPressStyle={{ transform: [{ scale: 0.9 }] }}
-                        size={24}
-                        onPress={() => handleRecalculationSplits()}
-                        onLongPress={() => resetSplitHandler()}
-                      />
-                    </Pressable>
+                    />
                   </Animated.View>
                 )}
               </View>

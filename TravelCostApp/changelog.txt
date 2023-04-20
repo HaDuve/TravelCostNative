@@ -1,5 +1,14 @@
 Change log Travel Expense App
 
+1.0.991
+- added Animations to expense form (smooth)
+- improved layout of expense form (splits section)
+- improved styling and alert message of recalculate splits button
+- fixed weird pressing behaviour of recalculate splits button
+- fixed custom category symbols sometimes not showing in expense form
+- fixed some buttons having weird layout issues on different devices
+- changed changelog counting so i can publish version 1.1.000 as the first version :)
+
 1.0.99
 - added split information (total payback to and from users)
 - added expense List to pie chart caroussell (to make it easy to find the list)

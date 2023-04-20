@@ -2,7 +2,6 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../i18n/supportedLanguages";
-import { getRate } from "./currencyExchange";
 import { Expense, Split, ExpenseData } from "./expense";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
@@ -11,7 +10,8 @@ i18n.enableFallback = true;
 
 import { getAllExpenses } from "./http";
 
-export function recalcSplitsForExact(splitList, amount) {
+export function recalcSplitsForExact(splitList: Split[], amount: number) {
+  console.log("recalcSplitsForExact ~ splitList:", splitList);
   // number of travellers
   const numberOfTravellers = splitList.length;
   // normal split amount
@@ -160,8 +160,7 @@ export function calcSplitList(
 export function validateSplitList(
   splitList: Split[],
   splitType: string,
-  amount,
-  changedIndex = 0
+  amount: number
 ) {
   if (!splitList || !splitType || !amount || splitList.length < 1) return;
   switch (splitType) {

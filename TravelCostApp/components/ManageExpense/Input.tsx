@@ -1,5 +1,11 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { Keyboard, StyleSheet, Text, TextInput, View } from "react-native";
+import React, {
+  Keyboard,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
 
@@ -14,7 +20,7 @@ const Input = ({
   editable = true,
   selectTextOnFocus = true,
 }) => {
-  let inputStyles = [styles.input, inputStyle];
+  const inputStyles = [styles.input, inputStyle];
   if (textInputConfig && textInputConfig.multiline) {
     inputStyles.push(styles.inputMultiline);
   }
@@ -56,7 +62,7 @@ Input.propTypes = {
   textInputConfig: PropTypes.object.isRequired,
   invalid: PropTypes.bool,
   autoFocus: PropTypes.bool,
-  inputStyle: PropTypes.object,
+  inputStyle: PropTypes.object || PropTypes.array,
   placeholder: PropTypes.string,
   editable: PropTypes.bool,
   selectTextOnFocus: PropTypes.bool,

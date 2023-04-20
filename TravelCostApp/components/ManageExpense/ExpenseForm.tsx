@@ -42,7 +42,16 @@ i18n.enableFallback = true;
 import CurrencyPicker from "../Currency/CurrencyPicker";
 import { truncateString } from "../../util/string";
 import { Ionicons } from "@expo/vector-icons";
-import Animated, { ZoomIn, ZoomOut, FadeOut } from "react-native-reanimated";
+import Animated, {
+  ZoomIn,
+  ZoomOut,
+  FadeOut,
+  Layout,
+  Easing,
+  FadeInUp,
+  FadeOutDown,
+  FadeOutUp,
+} from "react-native-reanimated";
 import { asyncStoreSetItem } from "../../store/async-storage";
 import { DateTime } from "luxon";
 import DatePickerModal from "../UI/DatePickerModal";
@@ -531,10 +540,10 @@ const ExpenseForm = ({
   });
 
   return (
-    <>
+    <Animated.View layout={Layout}>
       {datepickerJSX}
-      <View style={styles.container}>
-        <View style={styles.form}>
+      <Animated.View layout={Layout} style={styles.container}>
+        <Animated.View layout={Layout} style={styles.form}>
           <View style={styles.inputsRow}>
             <Input
               style={styles.rowInput}
@@ -601,7 +610,12 @@ const ExpenseForm = ({
           )}
           {/* toggleable content */}
           {!hideAdvanced && (
-            <>
+            <Animated.View
+              entering={FadeInUp.duration(1000)
+                .easing(Easing.out(Easing.exp))
+                .delay(100)}
+              exiting={FadeOutUp.duration(50)}
+            >
               <Input
                 label={i18n.t("descriptionLabel")}
                 style={{ marginTop: "6%" }}
@@ -615,8 +629,8 @@ const ExpenseForm = ({
               />
               <View style={styles.currencyContainer}>
                 {/* <Text style={styles.currencyLabel}>
-                {i18n.t("currencyLabel")}
-              </Text> */}
+                  {i18n.t("currencyLabel")}
+                </Text> */}
                 <CurrencyPicker
                   countryValue={countryValue}
                   setCountryValue={setCountryValue}
@@ -855,101 +869,119 @@ const ExpenseForm = ({
               </View>
 
               {!splitTypeSelf && (
-                <FlatList
-                  // numColumns={2}
-                  data={splitList}
-                  horizontal={true}
+                <KeyboardAvoidingView
+                  behavior="position"
                   contentContainerStyle={{
                     flex: 1,
-                    minWidth: "150%",
                     justifyContent: "flex-start",
                     alignItems: "flex-start",
                     overflow: "visible",
                   }}
-                  ListFooterComponent={<View style={{ width: 100 }}></View>}
-                  renderItem={(itemData) => {
-                    const splitValue = itemData.item.amount.toString();
-                    return (
-                      <View
-                        style={[
-                          GlobalStyles.strongShadow,
-                          {
-                            flex: 1,
-                            minWidth: 120,
-                            maxWidth: 145,
-                            marginBottom: 16,
-                            borderWidth: 1,
-                            borderRadius: 16,
-                            padding: 8,
-                            margin: 8,
-                            backgroundColor:
-                              GlobalStyles.colors.backgroundColor,
-                            borderColor: GlobalStyles.colors.gray700,
-                          },
-                        ]}
-                      >
-                        <Text
-                          style={{
-                            color: splitListValid
-                              ? GlobalStyles.colors.textColor
-                              : GlobalStyles.colors.error500,
-                          }}
-                        >
-                          {truncateString(itemData.item.userName, 15)}
-                        </Text>
-                        {/* Horizontal container  */}
+                >
+                  <FlatList
+                    // numColumns={2}
+                    data={splitList}
+                    horizontal={true}
+                    contentContainerStyle={{
+                      flex: 1,
+                      minWidth: "150%",
+                      justifyContent: "flex-start",
+                      alignItems: "flex-start",
+                      overflow: "visible",
+                    }}
+                    ListFooterComponent={<View style={{ width: 100 }}></View>}
+                    renderItem={(itemData) => {
+                      const splitValue = itemData.item.amount.toString();
+                      return (
                         <View
-                          style={{
-                            flexDirection: "row",
-                            justifyContent: "flex-end",
-                            alignItems: "flex-end",
-                          }}
+                          style={[
+                            GlobalStyles.strongShadow,
+                            {
+                              flex: 1,
+                              minWidth: 100,
+                              maxWidth: 100,
+                              marginBottom: 16,
+                              borderWidth: 1,
+                              borderRadius: 16,
+                              padding: 8,
+                              margin: 8,
+                              backgroundColor:
+                                GlobalStyles.colors.backgroundColor,
+                              borderColor: GlobalStyles.colors.gray700,
+                            },
+                          ]}
                         >
-                          <Input
-                            inputStyle={[
-                              splitTypeEqual && {
-                                color: GlobalStyles.colors.textColor,
-                              },
-                              { paddingBottom: 4 },
-                              {
-                                backgroundColor:
-                                  GlobalStyles.colors.backgroundColor,
-                              },
-                            ]}
-                            style={[
-                              styles.rowInput,
-                              {
-                                minWidth: "25%",
-                              },
-                            ]}
-                            textInputConfig={{
-                              onFocus: () => {
-                                if (splitType === "EQUAL") Keyboard.dismiss();
-                              },
-                              keyboardType: "decimal-pad",
-                              onChangeText: inputSplitListHandler.bind(
-                                this,
-                                itemData.index,
-                                itemData.item
-                              ),
-                              value: splitValue ? splitValue : "",
+                          <Text
+                            style={{
+                              color: splitListValid
+                                ? GlobalStyles.colors.textColor
+                                : GlobalStyles.colors.error500,
+                              textAlign: "left",
+                              marginLeft: 12,
                             }}
-                          ></Input>
-                          <Text style={{ paddingBottom: 12 }}>
-                            {inputs.currency.value}
+                          >
+                            {truncateString(itemData.item.userName, 15)}
                           </Text>
+                          {/* Horizontal container  */}
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              justifyContent: "flex-end",
+                              alignItems: "flex-end",
+                            }}
+                          >
+                            <Input
+                              inputStyle={[
+                                splitTypeEqual && {
+                                  color: GlobalStyles.colors.textColor,
+                                },
+                                { paddingBottom: 4 },
+                                {
+                                  backgroundColor:
+                                    GlobalStyles.colors.backgroundColor,
+                                },
+                              ]}
+                              style={[
+                                styles.rowInput,
+                                {
+                                  minWidth: "25%",
+                                },
+                              ]}
+                              textInputConfig={{
+                                onFocus: () => {
+                                  if (splitType === "EQUAL") Keyboard.dismiss();
+                                },
+                                keyboardType: "decimal-pad",
+                                onChangeText: inputSplitListHandler.bind(
+                                  this,
+                                  itemData.index,
+                                  itemData.item
+                                ),
+                                value: splitValue ? splitValue : "",
+                              }}
+                            ></Input>
+                            <Text
+                              style={{
+                                paddingBottom: 11,
+                                marginLeft: -18,
+                                marginRight: 8,
+                              }}
+                            >
+                              {getSymbolFromCurrency(inputs.currency.value)}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
-                    );
-                  }}
-                ></FlatList>
+                      );
+                    }}
+                  ></FlatList>
+                </KeyboardAvoidingView>
               )}
-            </>
+            </Animated.View>
           )}
           {formIsInvalid && !hideAdvanced && (
             <Text style={styles.errorText}>{i18n.t("invalidInput")} </Text>
           )}
-        </View>
+        </Animated.View>
         <View
           style={[styles.spacerViewAdvanced, hideAdvanced && styles.spacerView]}
         ></View>
@@ -959,8 +991,8 @@ const ExpenseForm = ({
             {submitButtonLabel}
           </GradientButton>
         </View>
-      </View>
-    </>
+      </Animated.View>
+    </Animated.View>
   );
 };
 
@@ -987,20 +1019,20 @@ const styles = StyleSheet.create({
   },
   form: {
     flex: 1,
-    margin: 16,
-    padding: 12,
-    paddingBottom: 24,
-    marginTop: 30,
+    margin: "4.5%",
+    padding: "2%",
+    paddingBottom: "5%",
+    marginTop: "5%",
     backgroundColor: GlobalStyles.colors.gray500,
-    borderRadius: 10,
+    borderRadius: 5,
     borderWidth: 1,
     elevation: 3,
     borderColor: GlobalStyles.colors.gray600,
     shadowColor: GlobalStyles.colors.gray600,
     shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 10,
-    justifyContent: "space-around",
-    alignContent: "stretch",
+    shadowOpacity: 0.75,
+    // justifyContent: "space-around",
+    // alignContent: "stretch",
   },
   countryFlagContainer: {
     marginRight: "5%",
@@ -1148,7 +1180,7 @@ const styles = StyleSheet.create({
   },
   spacerView: {
     flex: 1,
-    minHeight: "50%",
+    minHeight: "105%",
   },
   spacerViewAdvanced: {
     flex: 1,

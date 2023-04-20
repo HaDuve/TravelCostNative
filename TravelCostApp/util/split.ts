@@ -88,20 +88,24 @@ export function recalcSplitsForExact(splitList, amount) {
 }
 
 export function calcSplitList(
-  splitType,
-  amount,
-  whoPaid,
-  splitTravellers,
-  splitListInput
+  splitType: string,
+  amount: number,
+  whoPaid: string,
+  splitTravellers: string[]
 ) {
   if (
     !splitType ||
     !amount ||
-    Number.isNaN(amount) ||
+    Number.isNaN(Number(amount)) ||
     !whoPaid ||
     !splitTravellers ||
     splitTravellers.length < 1
   ) {
+    console.log("splitTravellers.length:", splitTravellers.length);
+    console.log("splitTravellers:", splitTravellers);
+    console.log("whoPaid:", whoPaid);
+    console.log("splitType:", splitType);
+    console.log("amount:", amount);
     console.warn("calcSplitlist failed");
     return;
   }

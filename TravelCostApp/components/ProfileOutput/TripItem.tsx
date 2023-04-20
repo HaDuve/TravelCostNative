@@ -34,7 +34,6 @@ function TripItem({
   tripName,
   totalBudget,
   dailyBudget,
-
   tripCurrency,
   trips,
 }) {
@@ -168,8 +167,8 @@ export default TripItem;
 TripItem.propTypes = {
   tripid: PropTypes.string,
   tripName: PropTypes.string,
-  totalBudget: PropTypes.number,
-  dailyBudget: PropTypes.number,
+  totalBudget: PropTypes.number || PropTypes.string,
+  dailyBudget: PropTypes.number || PropTypes.string,
   tripCurrency: PropTypes.string,
   trips: PropTypes.array,
 };

@@ -31,7 +31,7 @@ export const TripContext = createContext({
   refresh: () => {},
   setTripProgress: (percent: number) => {},
   travellers: [],
-  setCurrentTravellers: (tripid: string) => {},
+  setCurrentTravellers: async (tripid: string) => {},
   setTotalSum: (amount: number) => {},
   setTripid: (tripid: string) => {},
 

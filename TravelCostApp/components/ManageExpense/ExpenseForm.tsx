@@ -109,15 +109,18 @@ const ExpenseForm = ({
   useEffect(() => {
     async function setTravellers() {
       setLoadingTravellers(true);
-      try {
-        TripCtx.setCurrentTravellers(TripCtx.tripid);
-      } catch (error) {
-        console.log("error loading travellers in expenseForm");
+      if (UserCtx.isOnline) {
+        try {
+          await TripCtx.setCurrentTravellers(TripCtx.tripid);
+        } catch (error) {
+          console.log("error loading travellers in expenseForm");
+        }
       }
+      if (TripCtx.travellers) setListEQUAL(TripCtx.travellers);
       setLoadingTravellers(false);
     }
     setTravellers();
-  }, []);
+  }, [UserCtx.isOnline]);
 
   // currencypicker reference for open/close
   // let currencyPickerRef = undefined;
@@ -319,6 +322,7 @@ const ExpenseForm = ({
   }
 
   function splitHandler() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const splitTravellers = splitTravellersList;
     // calculate splits
     const listSplits = calcSplitList(
@@ -333,8 +337,25 @@ const ExpenseForm = ({
     }
   }
 
+  async function resetSplitHandler() {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const splitTravellers = splitTravellersList;
+    console.log("resetSplitHandler ~ splitTravellers:", splitTravellers);
+    // calculate splits
+    const listSplits = calcSplitList(
+      "EQUAL",
+      inputs.amount.value,
+      whoPaid,
+      splitTravellers,
+      splitList
+    );
+    if (listSplits) {
+      setSplitList(listSplits);
+    }
+  }
+
   async function submitHandler() {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const expenseData = {
       uid: AuthCtx.uid,
       amount: +inputs.amount.value,
@@ -854,14 +875,15 @@ const ExpenseForm = ({
                         pressed && GlobalStyles.pressedWithShadow,
                       ]}
                       onPress={() => handleRecalculationSplits()}
-                      onLongPress={() => splitHandler()}
+                      onLongPress={() => resetSplitHandler()}
                     >
                       <IconButton
                         icon="ios-git-compare-outline"
                         color={GlobalStyles.colors.primary500}
+                        onPressStyle={{ transform: [{ scale: 0.9 }] }}
                         size={24}
                         onPress={() => handleRecalculationSplits()}
-                        onLongPress={() => splitHandler()}
+                        onLongPress={() => resetSplitHandler()}
                       />
                     </Pressable>
                   </Animated.View>
@@ -876,6 +898,7 @@ const ExpenseForm = ({
                     justifyContent: "flex-start",
                     alignItems: "flex-start",
                     overflow: "visible",
+                    backgroundColor: GlobalStyles.colors.gray500,
                   }}
                 >
                   <FlatList

@@ -236,26 +236,23 @@ const ProfileScreen = ({ navigation }) => {
       <View style={styles.tripContainer}>
         <View style={styles.horizontalContainer}>
           <Text style={styles.tripListTitle}>{i18n.t("myTrips")}</Text>
-          <Pressable
-            onPress={navigation.navigate.bind(this, "ManageTrip")}
-            style={styles.newTripButtonContainer}
+          {/* <Pressable onPress={navigation.navigate.bind(this, "ManageTrip")}> */}
+          {/* <Text style={{ color: GlobalStyles.colors.primary700 }}>+</Text> */}
+          <TourGuideZone
+            text={i18n.t("walk5")}
+            shape={"circle"}
+            maskOffset={24}
+            zone={5}
           >
-            <Text style={{ color: GlobalStyles.colors.primary700 }}>+</Text>
-            <TourGuideZone
-              text={i18n.t("walk5")}
-              shape={"circle"}
-              maskOffset={24}
-              zone={5}
-            >
-              <IconButton
-                icon={"ios-earth"}
-                size={36}
-                color={GlobalStyles.colors.primary400}
-                buttonStyle={styles.createButton}
-                onPress={navigation.navigate.bind(this, "ManageTrip")}
-              />
-            </TourGuideZone>
-          </Pressable>
+            <IconButton
+              icon={"ios-earth"}
+              size={36}
+              buttonStyle={styles.newTripButtonContainer}
+              color={GlobalStyles.colors.primary400}
+              onPress={navigation.navigate.bind(this, "ManageTrip")}
+            />
+          </TourGuideZone>
+          {/* </Pressable> */}
         </View>
         <TourGuideZone
           text={i18n.t("walk6")}
@@ -282,9 +279,10 @@ const ProfileScreen = ({ navigation }) => {
           tooltipBottomOffset={50}
           zone={7}
         >
-          <View style={styles.addButton}>
+          <View>
             <IconButton
               icon="person-add-outline"
+              buttonStyle={styles.addButton}
               size={42}
               color={"white"}
               onPress={() => {
@@ -338,6 +336,7 @@ const styles = StyleSheet.create({
   },
   horizontalContainer: {
     marginTop: "3%",
+    marginRight: "3%",
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -350,18 +349,20 @@ const styles = StyleSheet.create({
   },
   newTripButtonContainer: {
     flexDirection: "row",
-    padding: "2%",
-    paddingHorizontal: "4%",
-    marginRight: "4%",
+    padding: "10%",
+    paddingHorizontal: "12%",
     marginBottom: "2%",
     marginTop: "-4%",
+    marginRight: "-12%",
     borderRadius: 99,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     elevation: 2,
     shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.35,
+    shadowOffset: { width: 2.5, height: 2.2 },
+    shadowOpacity: 0.55,
     shadowRadius: 4,
+    //center
+    alignSelf: "center",
   },
   tripListTitle: {
     fontSize: 22,
@@ -377,27 +378,17 @@ const styles = StyleSheet.create({
     borderTopColor: GlobalStyles.colors.primary200,
     alignItems: "center",
   },
-  createButton: {
-    marginTop: -12,
-    marginRight: 16,
-  },
   addButton: {
     backgroundColor: GlobalStyles.colors.primary400,
-    flex: 0,
-    borderRadius: 999,
-    minWidth: "18%",
-    paddingTop: "12%",
-    paddingHorizontal: "4%",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: -1,
-    flexDirection: "row",
-
+    padding: 16,
+    paddingHorizontal: 18,
+    marginBottom: 4,
+    borderRadius: 99,
     elevation: 2,
     shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 1, height: 1 },
+    shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.35,
-    shadowRadius: 4,
+    shadowRadius: 3.8,
   },
   offlineWarningContainer: {
     // center content

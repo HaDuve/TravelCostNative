@@ -1,6 +1,7 @@
 import React, { Pressable, StyleSheet, Text, View, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
+import { GlobalStyles } from "../../constants/styles";
 
 const IconButton = ({
   icon,
@@ -17,10 +18,14 @@ const IconButton = ({
     <Pressable
       onPress={onPress}
       onLongPress={onLongPress}
-      style={({ pressed }) => pressed && [styles.pressed, onPressStyle]}
+      style={({ pressed }) => [
+        styles.buttonContainer,
+        buttonStyle,
+        pressed && styles.pressed,
+        pressed && onPressStyle,
+      ]}
     >
       {content}
-      <View style={[styles.buttonContainer, buttonStyle]}></View>
     </Pressable>
   );
 };
@@ -42,11 +47,10 @@ IconButton.propTypes = {
 const styles = StyleSheet.create({
   buttonContainer: {
     borderRadius: 24,
-    padding: 6,
-    marginHorizontal: 8,
-    marginVertical: 2,
+    padding: 8,
   },
   pressed: {
     opacity: 0.75,
+    transform: [{ scale: 0.8 }],
   },
 });

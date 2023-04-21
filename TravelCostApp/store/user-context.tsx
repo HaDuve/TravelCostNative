@@ -10,7 +10,7 @@ import {
 import * as Device from "expo-device";
 import { checkInternetConnection } from "react-native-offline";
 import Toast from "react-native-toast-message";
-import { DEBUG_FORCE_OFFLINE, TIMEOUT } from "../confAppConstants";
+import { DEBUG_FORCE_OFFLINE, RETRIES, TIMEOUT } from "../confAppConstants";
 import { isPremiumMember } from "../components/Premium/PremiumConstants";
 import { fetchCategories } from "../util/http";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -217,10 +217,16 @@ function UserContextProvider({ children }) {
 
       // Retry the check up to 3 times if the error is a timeout error
       if (error.name === "TimeoutError") {
-        let retries = 3;
+        let retries = RETRIES;
         while (retries > 0) {
           retries--;
           console.log(`Retrying connection check (${retries} retries left)...`);
+          // show toast informing about bad internet connection
+          Toast.show({
+            type: "error",
+            text1: "Bad internet connection",
+            text2: "Retrying connection check...",
+          });
           try {
             const newIsOnline = await checkInternetConnection(
               forceOffline

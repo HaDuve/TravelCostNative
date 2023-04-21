@@ -29,6 +29,8 @@ import GradientButton from "../components/UI/GradientButton";
 import SettingsSection from "../components/UI/SettingsSection";
 import Toast from "react-native-toast-message";
 import { useEffect } from "react";
+import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
+import LoadingOverlay from "../components/UI/LoadingOverlay";
 
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
@@ -104,6 +106,12 @@ const SettingsScreen = ({ navigation }) => {
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>DEVCONTENT</Text>
       </View>
+      <LoadingBarOverlay
+        progress={0.3}
+        progressAt={3}
+        progressMax={10}
+      ></LoadingBarOverlay>
+      <LoadingOverlay></LoadingOverlay>
 
       <Button
         onPress={importExcelFile.bind(this, uid, tripid, userName, addExpense)}

@@ -6,6 +6,7 @@ import { GlobalStyles } from "../../constants/styles";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../../i18n/supportedLanguages";
+import PropTypes from "prop-types";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
@@ -22,6 +23,10 @@ const LoadingOverlay = (containerStyle) => {
 };
 
 export default LoadingOverlay;
+
+LoadingOverlay.propTypes = {
+  containerStyle: PropTypes.object,
+};
 
 const styles = StyleSheet.create({
   container: {

@@ -32,6 +32,7 @@ import { Expense, ExpenseData } from "../util/expense";
 import { DateTime } from "luxon";
 import { useFocusEffect } from "@react-navigation/native";
 import { useEffect } from "react";
+import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -45,6 +46,10 @@ const ManageExpense = ({ route, navigation }) => {
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   const [isOnline, setIsOnline] = useState(userCtx.isOnline);
+  const [progress, setProgress] = useState(0);
+  const [progressAt, setProgressAt] = useState(0);
+  const [progressMax, setProgressMax] = useState(0);
+
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
 
@@ -157,7 +162,11 @@ const ManageExpense = ({ route, navigation }) => {
             return new Date(a.date).getTime() - new Date(b.date).getTime();
           });
           // update the expenses one by one
+          setProgressMax(expensesInRange.length);
           for (let i = 0; i < expensesInRange.length; i++) {
+            setProgressAt(i);
+            setProgress(i / expensesInRange.length);
+            console.log("progress", i / expensesInRange.length);
             const expense = expensesInRange[i];
             // set the correct new date
             const newDate = getDatePlusDays(expenseData.startDate, i);
@@ -225,8 +234,12 @@ const ManageExpense = ({ route, navigation }) => {
           }
 
           // iterate over number of days between and change date and endDate to the first date + iterator
+          setProgressMax(days);
           for (let i = 0; i <= days; i++) {
             console.log("day nr: ", i);
+            setProgressAt(i);
+            setProgress(i / days);
+            console.log("progress", i / days);
             const newDate = getDatePlusDays(day1, i);
             newDate.setHours(new Date().getHours(), new Date().getMinutes());
             // expenseData.startDate =
@@ -284,6 +297,15 @@ const ManageExpense = ({ route, navigation }) => {
   //   return <ErrorOverlay message={error} onConfirm={errorHandler} />;
   // }
 
+  if (isSubmitting && progress >= 0 && progress <= 1) {
+    return (
+      <LoadingBarOverlay
+        progress={progress}
+        progressAt={progressAt}
+        progressMax={progressMax}
+      />
+    );
+  }
   if (isSubmitting) {
     return <LoadingOverlay />;
   }

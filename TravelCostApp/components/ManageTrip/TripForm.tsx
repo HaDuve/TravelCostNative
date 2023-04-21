@@ -37,6 +37,11 @@ import { asyncStoreSetItem } from "../../store/async-storage";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr });
+i18n.locale = Localization.locale.slice(0, 2);
+// i18n.locale = "en";
+i18n.enableFallback = true;
+
 import LoadingOverlay from "../UI/LoadingOverlay";
 import { daysBetween, getFormattedDate } from "../../util/date";
 import { DateTime } from "luxon";
@@ -45,15 +50,14 @@ import DatePickerModal from "../UI/DatePickerModal";
 import IconButton from "../UI/IconButton";
 import DatePickerContainer from "../UI/DatePickerContainer";
 import GradientButton from "../UI/GradientButton";
-import { StackActions } from "@react-navigation/native";
 import PropTypes from "prop-types";
-const i18n = new I18n({ en, de, fr });
-i18n.locale = Localization.locale.slice(0, 2);
-// i18n.locale = "en";
-i18n.enableFallback = true;
+import InfoButton from "../UI/InfoButton";
+import Modal from "react-native-modal";
 
 const TripForm = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [infoIsVisible, setInfoIsVisible] = useState(false);
+
   const [inputs, setInputs] = useState({
     tripName: {
       value: "",
@@ -293,6 +297,46 @@ const TripForm = ({ navigation, route }) => {
     inputChangedHandler("tripCurrency", countryValue.split(" ")[2]);
   }
 
+  const [infoTitleText, setInfoTitleText] = useState("");
+  const [infoContentText, setInfoContentText] = useState("");
+
+  function showInfoHandler(infoIndex) {
+    let titleText = "";
+    let contentText = "";
+
+    switch (infoIndex) {
+      case 1:
+        titleText = "Home Currency Info"; //i18n.t("currencyInfoTitle");
+        contentText =
+          "Setup your home currency here (e.g. the currency from the country in which you live)." +
+          "\n\n This currency will be presented in the app and all other currencies you use on your trip will be converted into this one."; //i18n.t("currencyInfoContent");
+        break;
+      case 2:
+        titleText = "Total Budget Info";
+        contentText =
+          "Setup your total budget here (e.g. the amount of money for the entire trip)." +
+          "\n\n You can press the calculate button to auto-calculate the Total Budget from the Daily Budget * Trip Start and End Date."; //i18n.t("currencyInfoContent");
+        break;
+      case 3:
+        titleText = "Daily Budget Info";
+        contentText =
+          "Setup your Daily budget here (e.g. the amount of money for every day)." +
+          "\n\n You can press the calculate button to auto-calculate the Daily Budget from the Total Budget * Trip Start and End Date."; //i18n.t("currencyInfoContent");
+        break;
+      case 4:
+        titleText = "Trip Start and End Info";
+        contentText =
+          "Setup your Trip Start and End Date here (e.g. the dates of your trip)." +
+          "\n\n The trip start and end is optional.";
+        break;
+      default:
+        break;
+    }
+    setInfoTitleText(titleText);
+    setInfoContentText(contentText);
+    setInfoIsVisible(true);
+  }
+
   const titleString = isEditing
     ? i18n.t("tripFormTitleEdit")
     : i18n.t("tripFormTitleNew");
@@ -310,7 +354,37 @@ const TripForm = ({ navigation, route }) => {
         setCountryValue={setCountryValue}
         onChangeValue={updateCurrency}
       ></CurrencyPicker>
+      <InfoButton
+        onPress={showInfoHandler.bind(this, 1)}
+        containerStyle={{ marginTop: "7%" }}
+      ></InfoButton>
     </View>
+  );
+
+  const handleClose = () => {
+    setInfoIsVisible(false);
+  };
+
+  const modalJSX = (
+    <Modal
+      isVisible={infoIsVisible}
+      style={styles.modalStyle}
+      backdropOpacity={0.5}
+      // animationInTiming={400}
+      // animationOutTiming={800}
+      onSwipeComplete={handleClose}
+      swipeDirection={["up", "left", "right", "down"]}
+      onBackdropPress={handleClose}
+      onBackButtonPress={handleClose}
+    >
+      <View style={styles.infoModalContainer}>
+        <Text style={styles.infoTitleText}>{infoTitleText}</Text>
+        <Text style={styles.infoContentText}>{infoContentText}</Text>
+        <FlatButton onPress={setInfoIsVisible.bind(this, false)}>
+          Okay
+        </FlatButton>
+      </View>
+    </Modal>
   );
 
   if (isLoading) {
@@ -319,7 +393,8 @@ const TripForm = ({ navigation, route }) => {
   return (
     <>
       {datepickerJSX}
-      <ScrollView behavior={"padding"} style={{ flex: 1 }}>
+      {modalJSX}
+      <ScrollView style={{ flex: 1 }}>
         <View style={styles.form}>
           <View style={styles.card}>
             <Text style={styles.title}>{titleString}</Text>
@@ -374,6 +449,10 @@ const TripForm = ({ navigation, route }) => {
                   );
                 }}
               />
+              <InfoButton
+                onPress={showInfoHandler.bind(this, 2)}
+                containerStyle={{ marginTop: "4%" }}
+              ></InfoButton>
             </View>
             <View style={styles.categoryRow}>
               <Input
@@ -411,16 +490,26 @@ const TripForm = ({ navigation, route }) => {
                   );
                 }}
               />
+              <InfoButton
+                onPress={showInfoHandler.bind(this, 3)}
+                containerStyle={{ marginTop: "4%" }}
+              ></InfoButton>
             </View>
             <Text style={[styles.label, { marginLeft: "5%" }]}>
               {i18n.t("datePickerLabel")}
             </Text>
-            {DatePickerContainer({
-              openDatePickerRange,
-              startDate,
-              endDate,
-              dateIsRanged: true,
-            })}
+            <View style={{ flexDirection: "row" }}>
+              {DatePickerContainer({
+                openDatePickerRange,
+                startDate,
+                endDate,
+                dateIsRanged: true,
+              })}
+              <InfoButton
+                onPress={showInfoHandler.bind(this, 4)}
+                containerStyle={{ marginTop: "5%", marginLeft: -10 }}
+              ></InfoButton>
+            </View>
           </View>
           {/* Add Currency Input field */}
           <View style={styles.buttonContainer}>
@@ -509,6 +598,7 @@ const styles = StyleSheet.create({
   },
   currencyPickerContainer: {
     flex: 1,
+    flexDirection: "row",
     marginBottom: "4%",
   },
   title: {
@@ -544,5 +634,32 @@ const styles = StyleSheet.create({
   button: {
     minWidth: "35%",
     marginHorizontal: 0,
+  },
+  modalStyle: {
+    justifyContent: "center",
+    marginBottom: 40,
+  },
+  infoModalContainer: {
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: 10,
+    padding: "4%",
+    margin: "4%",
+  },
+  infoTitleText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: GlobalStyles.colors.textColor,
+    marginTop: 5,
+    marginBottom: 24,
+    textAlign: "center",
+  },
+  infoContentText: {
+    fontSize: 16,
+    color: GlobalStyles.colors.textColor,
+    marginBottom: 24,
+    textAlign: "center",
   },
 });

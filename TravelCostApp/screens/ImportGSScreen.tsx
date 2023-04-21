@@ -10,6 +10,7 @@ import {
 import DatePicker from "react-native-neat-date-picker";
 import { getDatePlusDays, getFormattedDate } from "../util/date";
 import IconButton from "../components/UI/IconButton";
+import PropTypes from "prop-types";
 
 const ImportGSScreen = (props) => {
   const { addExpense, tripid, uid, userName } = props.route.params;
@@ -72,7 +73,6 @@ const ImportGSScreen = (props) => {
               icon={"calendar-outline"}
               size={24}
               color={GlobalStyles.colors.primary500}
-              style={styles.button}
               onPress={openDatePicker}
             />
             {isPicked && <Text>{date}</Text>}
@@ -102,6 +102,15 @@ const ImportGSScreen = (props) => {
 };
 
 export default ImportGSScreen;
+
+ImportGSScreen.propTypes = {
+  route: PropTypes.object.isRequired,
+  navigation: PropTypes.object.isRequired,
+  addExpense: PropTypes.func.isRequired,
+  tripid: PropTypes.string.isRequired,
+  uid: PropTypes.string.isRequired,
+  userName: PropTypes.string.isRequired,
+};
 
 const styles = StyleSheet.create({
   container: {

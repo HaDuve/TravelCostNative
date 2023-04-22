@@ -32,6 +32,10 @@ export async function getOfflineRate(base: string, target: string) {
     "currencyExchange_base_" + base
   );
   if (currencyExchange) {
+    console.log(
+      "getOfflineRate ~ currencyExchange[target]:",
+      currencyExchange[target]
+    );
     return currencyExchange[target];
   }
 }

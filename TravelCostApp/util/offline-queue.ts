@@ -7,7 +7,7 @@ import { Expense } from "./expense";
 import { storeExpense, updateExpense, deleteExpense } from "./http";
 import Toast from "react-native-toast-message";
 import * as Device from "expo-device";
-import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
+import { DEBUG_FORCE_OFFLINE, TIMEOUT } from "../confAppConstants";
 import { checkInternetConnection } from "react-native-offline";
 
 // interface of offline queue manage expense item
@@ -219,7 +219,7 @@ export const sendOfflineQueue = async () => {
       forceOffline
         ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
         : "https://www.google.com/",
-      9000,
+      TIMEOUT,
       true,
       "HEAD"
     );

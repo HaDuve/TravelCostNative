@@ -9,7 +9,6 @@ export const NetworkContext = createContext({
 
 const NetworkContextProvider = ({ children }) => {
   const [isConnected, setIsConnected] = useState(true);
-  console.log("NetworkProvider ~ isConnected:", isConnected);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {

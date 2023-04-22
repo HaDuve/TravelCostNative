@@ -7,13 +7,10 @@ import {
   asyncStoreGetObject,
   asyncStoreSetObject,
 } from "./async-storage";
-import * as Device from "expo-device";
-import { checkInternetConnection } from "react-native-offline";
-import Toast from "react-native-toast-message";
-import { DEBUG_FORCE_OFFLINE, RETRIES, TIMEOUT } from "../confAppConstants";
 import { isPremiumMember } from "../components/Premium/PremiumConstants";
 import { fetchCategories } from "../util/http";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import PropTypes from "prop-types";
 
 export interface UserData {
   uid?: string;
@@ -295,3 +292,7 @@ function UserContextProvider({ children }) {
 }
 
 export default UserContextProvider;
+
+UserContextProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};

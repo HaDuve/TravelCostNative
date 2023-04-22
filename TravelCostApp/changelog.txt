@@ -2,6 +2,7 @@ Change log Travel Expense App
 
 1.0.992
 - added small info buttons (e.g.: to explain whats going on in Trip Form)
+- added the option to always show the complete expense form
 - added a loading bar (for uploading and editing multiple expenses, like rent for a month)
 - changing the category on a fresh expense does not reset all other expense fields anymore
 - changed the way network detection works

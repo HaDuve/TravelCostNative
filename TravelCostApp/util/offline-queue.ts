@@ -7,7 +7,7 @@ import { Expense } from "./expense";
 import { storeExpense, updateExpense, deleteExpense } from "./http";
 import Toast from "react-native-toast-message";
 import * as Device from "expo-device";
-import { DEBUG_FORCE_OFFLINE, TIMEOUT } from "../confAppConstants";
+import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
 
 import NetInfo from "@react-native-community/netinfo";
 

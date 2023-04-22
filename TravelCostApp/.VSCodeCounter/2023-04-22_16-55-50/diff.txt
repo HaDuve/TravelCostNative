@@ -1,0 +1,101 @@
+Date : 2023-04-22 16:55:50
+Directory : /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp
+Total : 58 files,  1174 codes, 99 comments, 82 blanks, all 1355 lines
+
+Languages
++----------------+------------+------------+------------+------------+------------+
+| language       | files      | code       | comment    | blank      | total      |
++----------------+------------+------------+------------+------------+------------+
+| TypeScript JSX |         42 |      1,275 |         82 |         99 |      1,456 |
+| TypeScript     |          9 |        189 |         20 |         12 |        221 |
+| JSON           |          2 |         18 |          0 |          0 |         18 |
+| JavaScript     |          5 |       -308 |         -3 |        -29 |       -340 |
++----------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                                           | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                              |         58 |      1,174 |         99 |         82 |      1,355 |
+| . (Files)                                                                                                                      |          4 |         66 |          6 |          3 |         75 |
+| components                                                                                                                     |         27 |        586 |         14 |         36 |        636 |
+| components/ExpensesOutput                                                                                                      |          9 |        103 |         -1 |          4 |        106 |
+| components/ExpensesOutput (Files)                                                                                              |          5 |         21 |          6 |          3 |         30 |
+| components/ExpensesOutput/ExpenseStatistics                                                                                    |          4 |         82 |         -7 |          1 |         76 |
+| components/ExpensesOverview                                                                                                    |          1 |         14 |          8 |          1 |         23 |
+| components/ManageExpense                                                                                                       |          3 |        153 |          0 |          4 |        157 |
+| components/ManageProfile                                                                                                       |          1 |          5 |         -3 |          1 |          3 |
+| components/ManageTrip                                                                                                          |          1 |        114 |          2 |          7 |        123 |
+| components/ProfileOutput                                                                                                       |          2 |         11 |          0 |         -1 |         10 |
+| components/Rating                                                                                                              |          1 |         40 |          4 |          4 |         48 |
+| components/UI                                                                                                                  |          9 |        146 |          4 |         16 |        166 |
+| constants                                                                                                                      |          1 |         10 |          0 |          0 |         10 |
+| screens                                                                                                                        |         18 |        399 |         13 |         25 |        437 |
+| store                                                                                                                          |          3 |        -23 |         55 |          9 |         41 |
+| util                                                                                                                           |          5 |        136 |         11 |          9 |        156 |
++--------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| filename                                                                                                                       | language       | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/App.tsx                                                             | TypeScript JSX |         46 |          1 |          4 |         51 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseItem.tsx                           | TypeScript JSX |          1 |          1 |          1 |          3 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/CategoryProgressBar.tsx | TypeScript JSX |         16 |          0 |          0 |         16 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseCategories.tsx   | TypeScript JSX |         -1 |          0 |          0 |         -1 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseCountries.tsx    | TypeScript JSX |         14 |          0 |          0 |         14 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseGraph.tsx        | TypeScript JSX |         53 |         -7 |          1 |         47 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpensesList.tsx                          | TypeScript JSX |          1 |          0 |          0 |          1 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpensesOverview.tsx                      | TypeScript JSX |         13 |          5 |          2 |         20 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpensesSummary.tsx                       | TypeScript JSX |          5 |          0 |          0 |          5 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/RecentExpensesUtil.ts                     | TypeScript     |          1 |          0 |          0 |          1 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOverview/ExpenseChart.tsx                        | TypeScript JSX |         14 |          8 |          1 |         23 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageExpense/AddExpenseButton.tsx                       | TypeScript JSX |         -1 |          0 |          0 |         -1 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageExpense/ExpenseForm.tsx                            | TypeScript JSX |        148 |          0 |          4 |        152 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageExpense/Input.tsx                                  | TypeScript JSX |          6 |          0 |          0 |          6 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageProfile/ProfileForm.tsx                            | TypeScript JSX |          5 |         -3 |          1 |          3 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageTrip/TripForm.tsx                                  | TypeScript JSX |        114 |          2 |          7 |        123 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ProfileOutput/TripHistoryItem.tsx                        | TypeScript JSX |          2 |          0 |          0 |          2 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ProfileOutput/TripItem.tsx                               | TypeScript JSX |          9 |          0 |         -1 |          8 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Rating/firstStartUtil.ts                                 | TypeScript     |         40 |          4 |          4 |         48 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/BackgroundGradient.tsx                                | TypeScript JSX |          9 |          0 |          1 |         10 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/ErrorOverlay.js                                       | JavaScript     |        -32 |          0 |         -4 |        -36 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/ErrorOverlay.tsx                                      | TypeScript JSX |         37 |          0 |          4 |         41 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/IconButton.js                                         | JavaScript     |        -48 |          0 |         -4 |        -52 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/IconButton.tsx                                        | TypeScript JSX |         51 |          0 |          6 |         57 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/InfoButton.tsx                                        | TypeScript JSX |         34 |          0 |          5 |         39 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/LoadingBarOverlay.tsx                                 | TypeScript JSX |         74 |          4 |          6 |         84 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/LoadingOverlay.tsx                                    | TypeScript JSX |          4 |          0 |          1 |          5 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/SettingsSection.tsx                                   | TypeScript JSX |         17 |          0 |          1 |         18 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/confAppConstants.ts                                                 | TypeScript     |          2 |          5 |         -1 |          6 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/constants/styles.ts                                                 | TypeScript     |         10 |          0 |          0 |         10 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/package-lock.json                                                   | JSON           |         16 |          0 |          0 |         16 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/package.json                                                        | JSON           |          2 |          0 |          0 |          2 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/CategoryPickScreen.tsx                                      | TypeScript JSX |         -4 |         -1 |          2 |         -3 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/FilteredExpenses.tsx                                        | TypeScript JSX |         22 |         -1 |          2 |         23 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/FilteredPieCharts.tsx                                       | TypeScript JSX |        177 |          5 |          9 |        191 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ImportGSScreen.js                                           | JavaScript     |       -128 |         -1 |         -8 |       -137 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ImportGSScreen.tsx                                          | TypeScript JSX |        136 |          1 |          9 |        146 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/JoinTrip.tsx                                                | TypeScript JSX |          1 |          0 |          0 |          1 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/LoginScreen.tsx                                             | TypeScript JSX |          3 |          0 |          0 |          3 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ManageCategoryScreen.tsx                                    | TypeScript JSX |         33 |          8 |          2 |         43 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ManageExpense.tsx                                           | TypeScript JSX |         27 |          0 |          1 |         28 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/OnboardingScreen.js                                         | JavaScript     |        -60 |         -2 |         -6 |        -68 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/OnboardingScreen.tsx                                        | TypeScript JSX |         59 |          2 |          7 |         68 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ProfileScreen.tsx                                           | TypeScript JSX |        -17 |          2 |         -1 |        -16 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/RatingModal.tsx                                             | TypeScript JSX |         88 |          3 |         10 |        101 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/RecentExpenses.tsx                                          | TypeScript JSX |         -2 |         -1 |          0 |         -3 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/SettingsScreen.tsx                                          | TypeScript JSX |          5 |          3 |          0 |          8 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/SignupScreen.tsx                                            | TypeScript JSX |          2 |          0 |          0 |          2 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/SplitSummaryScreen.tsx                                      | TypeScript JSX |         97 |         -5 |          5 |         97 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/WelcomeScreen.js                                            | JavaScript     |        -40 |          0 |         -7 |        -47 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/network-context.tsx                                           | TypeScript JSX |         25 |          0 |          8 |         33 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/settings-context.tsx                                          | TypeScript JSX |          1 |          0 |          0 |          1 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/user-context.tsx                                              | TypeScript JSX |        -49 |         55 |          1 |          7 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/category.ts                                                    | TypeScript     |         13 |          0 |          1 |         14 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/currencyExchange.ts                                            | TypeScript     |         24 |          2 |          2 |         28 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/expense.ts                                                     | TypeScript     |          1 |          0 |          0 |          1 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/offline-queue.ts                                               | TypeScript     |         -7 |          0 |          1 |         -6 |
+| /Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/split.ts                                                       | TypeScript     |        105 |          9 |          5 |        119 |
+| Total                                                                                                                          |                |      1,174 |         99 |         82 |      1,355 |
++--------------------------------------------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+

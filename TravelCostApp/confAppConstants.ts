@@ -11,7 +11,7 @@ export const DEBUG_POLLING_INTERVAL_ONLINE = 10000;
 // Timeout constant
 // export const TIMEOUT = 9000;
 // Retries after Timeout
-export const RETRIES = 1;
+// export const RETRIES = 1;
 // Dev constant
 export const DEV = false;
 // Premium consts

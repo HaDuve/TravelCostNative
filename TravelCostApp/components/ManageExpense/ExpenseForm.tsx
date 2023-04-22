@@ -67,6 +67,7 @@ import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import CountryFlag from "react-native-country-flag";
 import { recalcSplitsForExact } from "../../util/split";
 import { ExpenseData } from "../../util/expense";
+import { NetworkContext } from "../../store/network-context";
 
 const ExpenseForm = ({
   onCancel,
@@ -81,9 +82,10 @@ const ExpenseForm = ({
   iconName,
 }) => {
   // set context
-  const AuthCtx = useContext(AuthContext);
-  const UserCtx = useContext(UserContext);
-  const TripCtx = useContext(TripContext);
+  const authCtx = useContext(AuthContext);
+  const userCtx = useContext(UserContext);
+  const tripCtx = useContext(TripContext);
+  const netCtx = useContext(NetworkContext);
   const DEFAULTVALUES: ExpenseData = defaultValues;
 
   const [hideAdvanced, sethideAdvanced] = useState(!isEditing);
@@ -115,18 +117,18 @@ const ExpenseForm = ({
   useEffect(() => {
     async function setTravellers() {
       setLoadingTravellers(true);
-      if (UserCtx.isOnline) {
+      if (netCtx.isConnected) {
         try {
-          await TripCtx.setCurrentTravellers(TripCtx.tripid);
+          await tripCtx.setCurrentTravellers(tripCtx.tripid);
         } catch (error) {
           console.log("error loading travellers in expenseForm");
         }
       }
-      if (TripCtx.travellers) setListEQUAL(TripCtx.travellers);
+      if (tripCtx.travellers) setListEQUAL(tripCtx.travellers);
       setLoadingTravellers(false);
     }
     setTravellers();
-  }, [UserCtx.isOnline]);
+  }, [tripCtx.tripid, netCtx.isConnected]);
 
   // currencypicker reference for open/close
   // let currencyPickerRef = undefined;
@@ -206,7 +208,7 @@ const ExpenseForm = ({
   const [splitListValid, setSplitListValid] = useState(true);
 
   // dropdown for whoPaid picker
-  const currentTravellers = TripCtx.travellers;
+  const currentTravellers = tripCtx.travellers;
 
   const IsSoloTraveller = currentTravellers.length === 1;
   let currentTravellersAsItems = travellerToDropdown(currentTravellers);
@@ -264,17 +266,17 @@ const ExpenseForm = ({
     country: {
       value: defaultValues
         ? defaultValues.country
-        : UserCtx.lastCountry
-        ? UserCtx.lastCountry
+        : userCtx.lastCountry
+        ? userCtx.lastCountry
         : "",
       isValid: true,
     },
     currency: {
       value: defaultValues
         ? defaultValues.currency
-        : UserCtx.lastCurrency
-        ? UserCtx.lastCurrency
-        : TripCtx.tripCurrency,
+        : userCtx.lastCurrency
+        ? userCtx.lastCurrency
+        : tripCtx.tripCurrency,
       isValid: true,
     },
     whoPaid: {
@@ -365,7 +367,7 @@ const ExpenseForm = ({
   async function submitHandler() {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const expenseData = {
-      uid: AuthCtx.uid,
+      uid: authCtx.uid,
       amount: +inputs.amount.value,
       date: DateTime.fromISO(inputs.date.value).toJSDate(),
       startDate: DateTime.fromISO(startDate).toJSDate(),
@@ -385,7 +387,7 @@ const ExpenseForm = ({
 
     // SoloTravellers always pay for themselves
     if (IsSoloTraveller || expenseData.whoPaid === null)
-      expenseData.whoPaid = UserCtx.userName;
+      expenseData.whoPaid = userCtx.userName;
     // If left completely empty, set to  placeholder
     if (expenseData.description === "")
       expenseData.description = getCatString(expenseData.category);
@@ -453,11 +455,11 @@ const ExpenseForm = ({
 
     // update lastcountry and lastcurrency
     if (inputs.country.value && inputs.country.value !== "") {
-      UserCtx.setLastCountry(inputs.country.value);
+      userCtx.setLastCountry(inputs.country.value);
       await asyncStoreSetItem("lastCountry", inputs.country.value);
     }
     if (inputs.currency.value && inputs.currency.value !== "") {
-      UserCtx.setLastCurrency(inputs.currency.value);
+      userCtx.setLastCurrency(inputs.currency.value);
       await asyncStoreSetItem("lastCurrency", inputs.currency.value);
     }
     onSubmit(expenseData);
@@ -466,18 +468,18 @@ const ExpenseForm = ({
   function fastSubmit() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const expenseData = {
-      uid: AuthCtx.uid,
+      uid: authCtx.uid,
       amount: +inputs.amount.value,
       date: DateTime.fromISO(startDate).toJSDate(),
       startDate: DateTime.fromISO(startDate).toJSDate(),
       endDate: DateTime.fromISO(endDate).toJSDate(),
       description: getCatString(pickedCat),
       category: pickedCat,
-      country: UserCtx.lastCountry ? UserCtx.lastCountry : "",
-      currency: UserCtx.lastCurrency
-        ? UserCtx.lastCurrency
-        : TripCtx.tripCurrency,
-      whoPaid: UserCtx.userName,
+      country: userCtx.lastCountry ? userCtx.lastCountry : "",
+      currency: userCtx.lastCurrency
+        ? userCtx.lastCurrency
+        : tripCtx.tripCurrency,
+      whoPaid: userCtx.userName,
       owePerc: "0",
       splitType: "SELF",
       listEQUAL: currentTravellers,
@@ -495,13 +497,13 @@ const ExpenseForm = ({
       inputChangedHandler("category", arg);
     }
     if (!inputs.country.isValid) {
-      inputChangedHandler("country", UserCtx.lastCountry);
+      inputChangedHandler("country", userCtx.lastCountry);
     }
     if (!inputs.currency.isValid) {
-      inputChangedHandler("currency", UserCtx.lastCurrency);
+      inputChangedHandler("currency", userCtx.lastCurrency);
     }
     if (!inputs.whoPaid.isValid) {
-      setWhoPaid(UserCtx.userName);
+      setWhoPaid(userCtx.userName);
     }
     if (!inputs.owePerc.isValid) {
       inputChangedHandler("owePerc", "0");
@@ -678,7 +680,7 @@ const ExpenseForm = ({
                   label={i18n.t("countryLabel")}
                   style={{ minWidth: "60%" }}
                   placeholder={
-                    UserCtx.lastCountry ?? i18n.t("countryPlaceholder")
+                    userCtx.lastCountry ?? i18n.t("countryPlaceholder")
                   }
                   textInputConfig={{
                     onChangeText: inputChangedHandler.bind(this, "country"),
@@ -750,7 +752,7 @@ const ExpenseForm = ({
                           shadowOpacity: 0.35,
                           shadowRadius: 4,
                         }}
-                        placeholder={UserCtx.userName}
+                        placeholder={userCtx.userName}
                         containerStyle={styles.dropdownContainer}
                         style={
                           !inputs.whoPaid.isValid

@@ -51,6 +51,7 @@ import { FadeInRight } from "react-native-reanimated";
 import FadeOutLeft from "react-native-reanimated";
 import { alertYesNo } from "../components/Errors/Alert";
 import IconButton from "../components/UI/IconButton";
+import { NetworkContext } from "../store/network-context";
 
 const ManageCategoryScreen = ({ route, navigation }) => {
   const defaultCategoryList: Category[] = [
@@ -102,7 +103,8 @@ const ManageCategoryScreen = ({ route, navigation }) => {
   const [isUploading, setIsUploading] = useState(false);
 
   const userCtx = useContext(UserContext);
-  const isOnline = userCtx.isOnline;
+  const netCtx = useContext(NetworkContext);
+  const isOnline = netCtx.isConnected;
 
   const tripCtx = useContext(TripContext);
   const tripid = tripCtx.tripid;

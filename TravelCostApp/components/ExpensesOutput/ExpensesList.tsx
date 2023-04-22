@@ -24,6 +24,7 @@ import {
 import { UserContext } from "../../store/user-context";
 import { ExpenseData, Expense } from "../../util/expense";
 import PropTypes from "prop-types";
+import { NetworkContext } from "../../store/network-context";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -157,8 +158,8 @@ function ExpensesList({
   showSumForTravellerName,
 }) {
   // const flatListRef = useRef(null);
-  const userCtx = useContext(UserContext);
-  const isOnline = userCtx.isOnline;
+  const netCtx = useContext(NetworkContext);
+  const isOnline = netCtx.isConnected;
   const tripCtx = useContext(TripContext);
   expenseCtx = useContext(ExpensesContext);
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(1);

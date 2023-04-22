@@ -37,6 +37,7 @@ import {
   asyncStoreSetItem,
   asyncStoreSetObject,
 } from "../store/async-storage";
+import { NetworkContext } from "../store/network-context";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -44,15 +45,17 @@ i18n.enableFallback = true;
 
 const ProfileScreen = ({ navigation }) => {
   const userCtx = useContext(UserContext);
-  const [tourIsRunning, setTourIsRunning] = useState(false);
   const tripCtx = useContext(TripContext);
   const authCtx = useContext(AuthContext);
+  const netCtx = useContext(NetworkContext);
+
+  const [tourIsRunning, setTourIsRunning] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [tripsList, setTripsList] = useState([]);
+
   const uid = authCtx.uid;
 
-  const [refreshing, setRefreshing] = useState(false);
-
   let allTripsList = [];
-  const [tripsList, setTripsList] = useState([]);
 
   useInterval(
     () => {
@@ -126,7 +129,7 @@ const ProfileScreen = ({ navigation }) => {
   // refreshHandler() could be moved into TripContext to be loaded correctly
   async function refreshHandler() {
     // check freshly and offlinemode
-    if (userCtx.freshlyCreated || !userCtx.isOnline) return;
+    if (userCtx.freshlyCreated || !netCtx.isConnected) return;
     allTripsList = [];
     const tripHistory = await fetchTripHistory(uid);
     if (!tripHistory.length) {
@@ -231,7 +234,7 @@ const ProfileScreen = ({ navigation }) => {
 
   const visibleContent = userCtx.freshlyCreated ? (
     <></>
-  ) : userCtx.isOnline ? (
+  ) : (
     <>
       <View style={styles.tripContainer}>
         <View style={styles.horizontalContainer}>
@@ -293,13 +296,6 @@ const ProfileScreen = ({ navigation }) => {
         </TourGuideZone>
       </View>
     </>
-  ) : (
-    <View style={styles.offlineWarningContainer}>
-      <Text style={styles.offlineWarningText}>
-        {" "}
-        My Trips are not available in Offline Mode yet, sorry!
-      </Text>
-    </View>
   );
 
   return (

@@ -72,6 +72,9 @@ import {
   shouldPromptForRating,
 } from "./components/Rating/firstStartUtil";
 import RatingModal from "./screens/RatingModal";
+import NetworkContextProvider, {
+  NetworkContext,
+} from "./store/network-context";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -270,8 +273,9 @@ function Navigation() {
 }
 
 function Home() {
-  const UserCtx = useContext(UserContext);
-  const FreshlyCreated = UserCtx.freshlyCreated;
+  const userCtx = useContext(UserContext);
+  const netCtx = useContext(NetworkContext);
+  const FreshlyCreated = userCtx.freshlyCreated;
   const FirstScreen = FreshlyCreated ? "Profile" : "RecentExpenses";
   return (
     <BottomTabs.Navigator
@@ -301,7 +305,7 @@ function Home() {
         },
         tabBarActiveTintColor: GlobalStyles.colors.primary500,
         tabBarIndicatorStyle: {
-          backgroundColor: UserCtx.isOnline
+          backgroundColor: netCtx.isConnected
             ? GlobalStyles.colors.primary500
             : "black",
         },
@@ -391,6 +395,7 @@ function Root() {
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
+  const netCtx = useContext(NetworkContext);
   const expensesCtx = useContext(ExpensesContext);
 
   // check regularly
@@ -434,15 +439,15 @@ function Root() {
         return;
       } else {
         Toast.show({
-          type: userCtx.isOnline ? "success" : "error",
+          type: netCtx.isConnected ? "success" : "error",
           text1: "Status Update",
-          text2: userCtx.isOnline ? "Online" : "Offline",
+          text2: netCtx.isConnected ? "Online" : "Offline",
           visibilityTime: 1000,
         });
       }
     }
     listener();
-  }, [userCtx.isOnline]);
+  }, [netCtx.isConnected]);
 
   const showModalIfNeeded = async () => {
     if (await shouldPromptForRating()) {
@@ -477,19 +482,15 @@ function Root() {
         tripCtx.fetchAndSetCurrentTrip
       );
       const test_fetchUser = dataResponseTime(fetchUser);
-      const test_touchMyTraveler = dataResponseTime(touchMyTraveler);
-      const test_userCtx_checkConnectionUpdateUser = dataResponseTime(
-        userCtx.checkConnectionUpdateUser
-      );
+
       // end wrap
       console.log("onRootMount ~ onRootMount");
 
       if (DEBUG_RESET) await asyncStoreSafeClear();
 
       // offline check and set context
-      const online = await test_userCtx_checkConnectionUpdateUser();
+      const online = netCtx.isConnected;
       console.log("onRootMount ~ online:", online);
-      // await userCtx.checkConnectionUpdateUser();
 
       // fetch token and trip
       const storedToken = await asyncStoreGetItem("token");
@@ -531,7 +532,7 @@ function Root() {
         let tripData;
         if (storedTripId) {
           // console.log("onRootMount ~ storedTripId", storedTripId);
-          tripData = await test_tripCtx_fetchAndSetCurrentTrip(storedTripId);
+          tripData = await tripCtx.fetchAndSetCurrentTrip(storedTripId);
           tripCtx.setCurrentTravellers(storedTripId);
           tripCtx.setTripid(storedTripId);
         } else {
@@ -555,7 +556,7 @@ function Root() {
           userCtx.setFreshlyCreatedTo(freshlyCreated);
         }
         // check if user was deleted
-        const checkUser = await test_fetchUser(storedUid);
+        const checkUser = await fetchUser(storedUid);
         // Check if the user logged in but there is no userName, we deleted the account
         if (!checkUser || !checkUser.userName) {
           Toast.show({
@@ -667,22 +668,24 @@ export default function App() {
         >
           <StatusBar style="dark" />
           <AuthContextProvider>
-            <TripContextProvider>
-              <UserContextProvider>
-                <SettingsProvider>
-                  <NetworkProvider>
-                    <ExpensesContextProvider>
-                      <TourGuideProvider
-                        {...{ borderRadius: 16, key: "settings" }}
-                      >
-                        <Root />
-                        <ToastComponent />
-                      </TourGuideProvider>
-                    </ExpensesContextProvider>
-                  </NetworkProvider>
-                </SettingsProvider>
-              </UserContextProvider>
-            </TripContextProvider>
+            <NetworkContextProvider>
+              <TripContextProvider>
+                <UserContextProvider>
+                  <SettingsProvider>
+                    <NetworkProvider>
+                      <ExpensesContextProvider>
+                        <TourGuideProvider
+                          {...{ borderRadius: 16, key: "settings" }}
+                        >
+                          <Root />
+                          <ToastComponent />
+                        </TourGuideProvider>
+                      </ExpensesContextProvider>
+                    </NetworkProvider>
+                  </SettingsProvider>
+                </UserContextProvider>
+              </TripContextProvider>
+            </NetworkContextProvider>
           </AuthContextProvider>
         </SafeAreaView>
       </>

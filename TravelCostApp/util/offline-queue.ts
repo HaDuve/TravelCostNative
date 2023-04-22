@@ -8,7 +8,8 @@ import { storeExpense, updateExpense, deleteExpense } from "./http";
 import Toast from "react-native-toast-message";
 import * as Device from "expo-device";
 import { DEBUG_FORCE_OFFLINE, TIMEOUT } from "../confAppConstants";
-import { checkInternetConnection } from "react-native-offline";
+
+import NetInfo from "@react-native-community/netinfo";
 
 // interface of offline queue manage expense item
 export interface OfflineQueueManageExpenseItem {
@@ -53,7 +54,7 @@ export const deleteExpenseOnlineOffline = async (
   if (online) {
     // delete item online
     try {
-      const res = await deleteExpense(
+      await deleteExpense(
         item.expense.tripid,
         item.expense.uid,
         item.expense.id
@@ -73,7 +74,7 @@ export const deleteExpenseOnlineOffline = async (
   } else {
     // delete item offline
     try {
-      const res = await pushOfflineQueue(item);
+      await pushOfflineQueue(item);
       // Toast.show({
       //   type: "success",
       //   text1: "Deleted!",
@@ -110,7 +111,7 @@ export const updateExpenseOnlineOffline = async (
   if (online) {
     // update item online
     try {
-      const res = await updateExpense(
+      await updateExpense(
         item.expense.tripid,
         item.expense.uid,
         item.expense.id,
@@ -131,7 +132,7 @@ export const updateExpenseOnlineOffline = async (
   } else {
     // update item offline
     try {
-      const res = await pushOfflineQueue(item);
+      await pushOfflineQueue(item);
       // Toast.show({
       //   type: "success",
       //   text1: "Updated!",
@@ -189,7 +190,7 @@ export const storeExpenseOnlineOffline = async (
   } else {
     // store item offline
     try {
-      const res = await pushOfflineQueue(item);
+      await pushOfflineQueue(item);
       // Toast.show({
       //   type: "success",
       //   text1: "Stored!",
@@ -215,16 +216,9 @@ export const sendOfflineQueue = async () => {
   if (queue && queue.length > 0) {
     console.log("queue length", queue.length);
     const forceOffline = !Device.isDevice && DEBUG_FORCE_OFFLINE;
-    const isOnline = await checkInternetConnection(
-      forceOffline
-        ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
-        : "https://www.google.com/",
-      TIMEOUT,
-      true,
-      "HEAD"
-    );
+    const isOnline = await NetInfo.fetch();
     console.log("update connected =", isOnline);
-    if (!isOnline) {
+    if (!isOnline || !isOnline.isConnected || forceOffline) {
       console.log("sendOfflineQueue ~ still offline!");
       return;
     }

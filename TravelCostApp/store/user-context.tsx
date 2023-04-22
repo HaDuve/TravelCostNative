@@ -57,9 +57,9 @@ export const UserContext = createContext({
   setIsOnline: (bool: boolean) => {},
   saveUserNameInStorage: async (name: string) => {},
   loadUserNameFromStorage: async () => {},
-  checkConnectionUpdateUser: async () => {
-    return true;
-  },
+  // checkConnectionUpdateUser: async () => {
+  //   return true;
+  // },
   isPremium: false,
   checkPremium: async (): Promise<boolean> => {
     return false;
@@ -197,63 +197,63 @@ function UserContextProvider({ children }) {
     });
   }
 
-  async function checkConnectionUpdateUser() {
-    let forceOffline = DEBUG_FORCE_OFFLINE;
-    if (Device.isDevice) forceOffline = false;
+  // async function checkConnectionUpdateUser() {
+  //   let forceOffline = DEBUG_FORCE_OFFLINE;
+  //   if (Device.isDevice) forceOffline = false;
 
-    try {
-      const newIsOnline = await checkInternetConnection(
-        forceOffline
-          ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
-          : "https://www.google.com/",
-        TIMEOUT,
-        true,
-        "HEAD"
-      );
-      setIsOnline(newIsOnline);
-      return newIsOnline;
-    } catch (error) {
-      console.log(error);
+  //   try {
+  //     const newIsOnline = await checkInternetConnection(
+  //       forceOffline
+  //         ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
+  //         : "https://www.google.com/",
+  //       TIMEOUT,
+  //       true,
+  //       "HEAD"
+  //     );
+  //     setIsOnline(newIsOnline);
+  //     return newIsOnline;
+  //   } catch (error) {
+  //     console.log(error);
 
-      // Retry the check up to 3 times if the error is a timeout error
-      if (error.name === "TimeoutError") {
-        let retries = RETRIES;
-        while (retries > 0) {
-          retries--;
-          console.log(`Retrying connection check (${retries} retries left)...`);
-          // show toast informing about bad internet connection
-          Toast.show({
-            type: "error",
-            text1: "Bad internet connection",
-            text2: "Retrying connection check...",
-          });
-          try {
-            const newIsOnline = await checkInternetConnection(
-              forceOffline
-                ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
-                : "https://www.google.com/",
-              TIMEOUT * (3 - retries),
-              true,
-              "HEAD"
-            );
-            setIsOnline(newIsOnline);
-            return newIsOnline;
-          } catch (error) {
-            console.log(error);
-          }
-        }
-      }
+  //     // Retry the check up to 3 times if the error is a timeout error
+  //     if (error.name === "TimeoutError") {
+  //       let retries = RETRIES;
+  //       while (retries > 0) {
+  //         retries--;
+  //         console.log(`Retrying connection check (${retries} retries left)...`);
+  //         // show toast informing about bad internet connection
+  //         Toast.show({
+  //           type: "error",
+  //           text1: "Bad internet connection",
+  //           text2: "Retrying connection check...",
+  //         });
+  //         try {
+  //           const newIsOnline = await checkInternetConnection(
+  //             forceOffline
+  //               ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
+  //               : "https://www.google.com/",
+  //             TIMEOUT * (3 - retries),
+  //             true,
+  //             "HEAD"
+  //           );
+  //           setIsOnline(newIsOnline);
+  //           return newIsOnline;
+  //         } catch (error) {
+  //           console.log(error);
+  //         }
+  //       }
+  //     }
 
-      // Display an error message to the user
-      Toast.show({
-        text1: "No internet connection",
-        text2: "Please check your connection and try again",
-        type: "error",
-      });
+  //     // Display an error message to the user
+  //     Toast.show({
+  //       text1: "No internet connection",
+  //       text2: "Please check your connection and try again",
+  //       type: "error",
+  //     });
 
-      return false;
-    }
-  }
+  //     return false;
+  //   }
+  // }
 
   const value = {
     userName: userName,
@@ -283,7 +283,7 @@ function UserContextProvider({ children }) {
     setIsOnline: setIsOnline,
     saveUserNameInStorage: saveUserNameInStorage,
     loadUserNameFromStorage: loadUserNameFromStorage,
-    checkConnectionUpdateUser: checkConnectionUpdateUser,
+    // checkConnectionUpdateUser: checkConnectionUpdateUser,
 
     isPremium: isPremium,
     checkPremium: checkPremium,

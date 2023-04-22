@@ -3,8 +3,8 @@ import Toast from "react-native-toast-message";
 import { asyncStoreSetObject } from "../../store/async-storage";
 
 export async function fetchAndSetExpenses(
-  showRefIndicator: () => boolean,
-  showAnyIndicator: () => boolean,
+  showRefIndicator: boolean,
+  showAnyIndicator: boolean,
   setIsFetching: (isFetching: boolean) => void,
   setRefreshing: (isRefreshing: boolean) => void,
   expensesCtx: any,

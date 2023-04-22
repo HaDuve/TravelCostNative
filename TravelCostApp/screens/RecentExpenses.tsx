@@ -49,12 +49,14 @@ import { TourGuideZone } from "rn-tourguide";
 import PropTypes from "prop-types";
 import { ExpenseData } from "../util/expense";
 import Toast from "react-native-toast-message";
+import { NetworkContext } from "../store/network-context";
 
 function RecentExpenses({ navigation }) {
   const expensesCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
+  const netCtx = useContext(NetworkContext);
 
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
@@ -70,9 +72,6 @@ function RecentExpenses({ navigation }) {
   const [dateTimeString, setDateTimeString] = useState("");
 
   const test_getExpenses = dataResponseTime(getExpenses);
-  const test_userCtx_checkConnectionUpdateUser = dataResponseTime(
-    userCtx.checkConnectionUpdateUser
-  );
   const test_offlineLoad = dataResponseTime(
     expensesCtx.loadExpensesFromStorage
   );
@@ -88,7 +87,7 @@ function RecentExpenses({ navigation }) {
       setIsFocused(true);
       setFirstFocus(true);
       async function poll() {
-        const online = await test_getExpenses(true, true);
+        const online = await getExpenses(true, true);
       }
       poll();
       return () => {
@@ -107,7 +106,7 @@ function RecentExpenses({ navigation }) {
       setDateTimeString(_toShortFormat(DateTime.now()));
       if (isForeground() && isFocused) {
         const asyncPolling = async () => {
-          await test_getExpenses(true, true);
+          await getExpenses(true, true);
           // await getExpenses(true, true);
         };
         asyncPolling();
@@ -130,10 +129,8 @@ function RecentExpenses({ navigation }) {
     showAnyIndicator = false
   ) {
     // check offlinemode
-    const online = await test_userCtx_checkConnectionUpdateUser();
+    const online = netCtx.isConnected;
     console.log("RecentExpenses ~ online:", online);
-    // await userCtx.checkConnectionUpdateUser();
-    // console.log("RecentExpenses ~ userCtx.isOnline:", userCtx.isOnline);
     if (!online) {
       if (!firstFocus) return;
       // setIsFetching(true);
@@ -143,8 +140,8 @@ function RecentExpenses({ navigation }) {
       return;
     }
     // checking isTouched or firstLoad
-    const isTouched = await test_fetchTravelerIsTouched(tripid, uid);
-    console.log("RecentExpenses ~ isTouched:", isTouched);
+    const isTouched = await fetchTravelerIsTouched(tripid, uid);
+    // console.log("RecentExpenses ~ isTouched:", isTouched);
     if (!isTouched) {
       setRefreshing(false);
       setIsFetching(false);
@@ -153,7 +150,7 @@ function RecentExpenses({ navigation }) {
     console.log("we are touched and fetching expenses");
     // fetch and set expenses
 
-    await test_fetchAndSetExpenses(
+    await fetchAndSetExpenses(
       showRefIndicator,
       showAnyIndicator,
       setIsFetching,

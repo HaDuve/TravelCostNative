@@ -31,6 +31,7 @@ import getSymbolFromCurrency from "currency-symbol-map";
 import ExpenseCountryFlag from "./ExpenseCountryFlag";
 import { SettingsContext } from "../../store/settings-context";
 import { useEffect } from "react";
+import { NetworkContext } from "../../store/network-context";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -52,9 +53,10 @@ function ExpenseItem(props): JSX.Element {
     showSumForTravellerName,
   } = props;
   const navigation = useNavigation();
-  const TripCtx = useContext(TripContext);
-  const UserCtx = useContext(UserContext);
-  const homeCurrency = TripCtx.tripCurrency;
+  const tripCtx = useContext(TripContext);
+  const userCtx = useContext(UserContext);
+  const netCtx = useContext(NetworkContext);
+  const homeCurrency = tripCtx.tripCurrency;
   const homeCurrencySymbol = getSymbolFromCurrency(homeCurrency);
   const currencySymbol = getSymbolFromCurrency(currency);
   const rate = calcAmount / amount;
@@ -86,7 +88,7 @@ function ExpenseItem(props): JSX.Element {
   const [catSymbol, setCatSymbol] = useState(iconName ? iconName : "");
   useEffect(() => {
     function setCatSymbolAsync() {
-      const listOfCats = UserCtx.catIconNames;
+      const listOfCats = userCtx.catIconNames;
       if (listOfCats) {
         const cat: Category = listOfCats.find(({ cat }) => cat === category);
         if (cat?.icon) {
@@ -98,7 +100,7 @@ function ExpenseItem(props): JSX.Element {
       setCatSymbol(iconName);
     }
     setCatSymbolAsync();
-  }, [UserCtx.catIconNames, category]);
+  }, [userCtx.catIconNames, category]);
 
   const sameCurrency = homeCurrency === currency;
 
@@ -107,7 +109,6 @@ function ExpenseItem(props): JSX.Element {
   const toggle2 = settings.showWhoPaid;
 
   const memoizedCallback = useCallback(async () => {
-    await UserCtx.checkConnectionUpdateUser();
     navigation.navigate("ManageExpense", {
       expenseId: id,
     });
@@ -170,7 +171,7 @@ function ExpenseItem(props): JSX.Element {
   let dateString = date ? date : "no date";
   // if date is today, show "Today" instead of date
   // if periodName is "today" dont show "today"
-  const todayString = UserCtx.periodName === "day" ? "" : `${i18n.t("today")} `;
+  const todayString = userCtx.periodName === "day" ? "" : `${i18n.t("today")} `;
   const hourAndMinuteString = DateTime.fromJSDate(date).toFormat("HH:mm");
   if (isToday(new Date(date))) {
     dateString = `${todayString}${hourAndMinuteString}`;

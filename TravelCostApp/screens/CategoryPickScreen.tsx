@@ -31,19 +31,20 @@ import { ActivityIndicator } from "react-native";
 import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { NetworkContext } from "../store/network-context";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
 const CategoryPickScreen = ({ route, navigation }) => {
-  const tripCtx = useContext(TripContext);
-  const tripid = tripCtx.tripid;
   const { editedExpenseId } = route.params ? route.params : "";
-  console.log("CategoryPickScreen ~ editedExpenseId", editedExpenseId);
-  // const [isShaking, setIsShaking] = useState(false);
-  const userCtx = useContext(UserContext);
-  const isOnline = userCtx.isOnline;
+
+  const tripCtx = useContext(TripContext);
+  const netCtx = useContext(NetworkContext);
+
+  const isOnline = netCtx.isConnected;
+  const tripid = tripCtx.tripid;
 
   const CATLIST = [
     {

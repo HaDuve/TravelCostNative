@@ -23,6 +23,7 @@ import { KeyboardAvoidingView } from "react-native";
 import * as AppleAuthentication from "expo-apple-authentication";
 import Purchases from "react-native-purchases";
 import { API_KEY } from "../components/Premium/PremiumConstants";
+import { NetworkContext } from "../store/network-context";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -30,11 +31,12 @@ function LoginScreen() {
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
+  const netCtx = useContext(NetworkContext);
 
   async function loginHandler({ email, password }) {
     setIsAuthenticating(true);
     // Check internet connection first
-    if (!(await userCtx.checkConnectionUpdateUser())) {
+    if (!netCtx.isConnected) {
       Toast.show({
         type: "error",
         text1: i18n.t("noConnection"),

@@ -33,6 +33,7 @@ import { DateTime } from "luxon";
 import { useFocusEffect } from "@react-navigation/native";
 import { useEffect } from "react";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
+import { NetworkContext } from "../store/network-context";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -44,8 +45,8 @@ const ManageExpense = ({ route, navigation }) => {
   const expenseCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const tripCtx = useContext(TripContext);
-  const userCtx = useContext(UserContext);
-  const [isOnline, setIsOnline] = useState(userCtx.isOnline);
+  const netCtx = useContext(NetworkContext);
+  const [isOnline, setIsOnline] = useState(netCtx.isConnected);
   const [progress, setProgress] = useState(0);
   const [progressAt, setProgressAt] = useState(0);
   const [progressMax, setProgressMax] = useState(0);
@@ -64,11 +65,11 @@ const ManageExpense = ({ route, navigation }) => {
 
   useEffect(() => {
     const updateIsOnline = async () => {
-      const isOnline = await userCtx.checkConnectionUpdateUser();
+      const isOnline = netCtx.isConnected;
       setIsOnline(isOnline);
     };
     updateIsOnline();
-  }, [userCtx]);
+  }, [netCtx.isConnected]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -184,7 +185,7 @@ const ManageExpense = ({ route, navigation }) => {
               },
             };
             expenseCtx.updateExpense(expense.id, expenseData);
-            await updateExpenseOnlineOffline(item, userCtx.isOnline);
+            await updateExpenseOnlineOffline(item, isOnline);
             console.log("updated expense nr: " + (i + 1), expense.rangeId);
           }
         } else {
@@ -199,7 +200,7 @@ const ManageExpense = ({ route, navigation }) => {
             },
           };
           expenseCtx.updateExpense(editedExpenseId, expenseData);
-          await updateExpenseOnlineOffline(item, userCtx.isOnline);
+          await updateExpenseOnlineOffline(item, isOnline);
         }
       } else {
         // adding a new expense (no-editing)
@@ -257,7 +258,7 @@ const ManageExpense = ({ route, navigation }) => {
                 expenseData: expenseData,
               },
             };
-            const id = await storeExpenseOnlineOffline(item, userCtx.isOnline);
+            const id = await storeExpenseOnlineOffline(item, isOnline);
             expenseCtx.addExpense({ ...expenseData, id: id });
           }
           navigation.pop();
@@ -275,11 +276,11 @@ const ManageExpense = ({ route, navigation }) => {
               expenseData: expenseData,
             },
           };
-          const id = await storeExpenseOnlineOffline(item, userCtx.isOnline);
+          const id = await storeExpenseOnlineOffline(item, isOnline);
           expenseCtx.addExpense({ ...expenseData, id: id });
         }
       }
-      if (userCtx.isOnline) await touchAllTravelers(tripid, true);
+      if (isOnline) await touchAllTravelers(tripid, true);
       await asyncStoreSetObject("expenses", expenseCtx.expenses);
       navigation.pop(2);
     } catch (error) {

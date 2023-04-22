@@ -21,14 +21,13 @@ import { en, de, fr } from "../../i18n/supportedLanguages";
 import ToggleButton from "../../assets/SVG/toggleButton";
 import PropTypes from "prop-types";
 import { LinearGradient } from "expo-linear-gradient";
+import { NetworkContext } from "../../store/network-context";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
 const AddExpenseButton = ({ navigation }) => {
-  const userCtx = useContext(UserContext);
-  const isOnline = userCtx.isOnline;
   return (
     <Animated.View
       style={styles.margin}

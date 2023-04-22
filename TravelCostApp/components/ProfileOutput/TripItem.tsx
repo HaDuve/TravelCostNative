@@ -24,6 +24,7 @@ import { en, de, fr } from "../../i18n/supportedLanguages";
 import { UserContext } from "../../store/user-context";
 import getSymbolFromCurrency from "currency-symbol-map";
 import PropTypes from "prop-types";
+import { NetworkContext } from "../../store/network-context";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -48,6 +49,7 @@ function TripItem({
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
+  const netCtx = useContext(NetworkContext);
   const [travellers, setTravellers] = useState([]);
   const [isFetching, setIsFetching] = useState(true);
 
@@ -55,7 +57,7 @@ function TripItem({
 
   useEffect(() => {
     async function getTripTravellers() {
-      if (userCtx.isOnline === false) return;
+      if (netCtx.isConnected === false) return;
       setIsFetching(true);
       try {
         const listTravellers = await getTravellers(tripid);
@@ -74,7 +76,7 @@ function TripItem({
 
   function tripPressHandler() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (userCtx.isOnline === false) {
+    if (netCtx.isConnected === false) {
       Alert.alert("You are offline", "Please go online to manage your trip");
       return;
     }

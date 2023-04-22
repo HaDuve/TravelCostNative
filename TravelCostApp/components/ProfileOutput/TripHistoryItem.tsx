@@ -34,6 +34,7 @@ import { UserContext } from "../../store/user-context";
 import { AuthContext } from "../../store/auth-context";
 import getSymbolFromCurrency from "currency-symbol-map";
 import PropTypes from "prop-types";
+import { NetworkContext } from "../../store/network-context";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -44,6 +45,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const tripCtx = useContext(TripContext);
   const expenseCtx = useContext(ExpensesContext);
   const userCtx = useContext(UserContext);
+  const netCtx = useContext(NetworkContext);
   const authCtx = useContext(AuthContext);
   const uid = authCtx.uid;
   const [travellers, setTravellers] = useState([]);
@@ -122,7 +124,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
 
   function tripPressHandler() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (userCtx.isOnline === false) {
+    if (netCtx.isConnected === false) {
       Alert.alert("You are offline", "Please go online to manage your trip");
       return;
     }

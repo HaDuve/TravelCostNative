@@ -23,16 +23,18 @@ import Toast from "react-native-toast-message";
 import { Platform } from "react-native";
 import Purchases from "react-native-purchases";
 import { API_KEY } from "../components/Premium/PremiumConstants";
+import { NetworkContext } from "../store/network-context";
 
 function SignupScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
+  const netCtx = useContext(NetworkContext);
 
   async function signupHandler({ name, email, password }) {
     setIsAuthenticating(true);
     // Check internet connection first
-    if (!(await userCtx.checkConnectionUpdateUser())) {
+    if (!netCtx.isConnected) {
       Toast.show({
         type: "error",
         text1: i18n.t("noConnection"),

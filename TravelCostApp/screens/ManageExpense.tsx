@@ -321,7 +321,7 @@ const ManageExpense = ({ route, navigation }) => {
         navigation={navigation}
         isEditing={isEditing}
         submitButtonLabel={isEditing ? i18n.t("update") : i18n.t("add")}
-        defaultValues={selectedExpense}
+        defaultValues={tempValues ?? selectedExpense}
         editedExpenseId={editedExpenseId}
         newCat={newCat}
       />

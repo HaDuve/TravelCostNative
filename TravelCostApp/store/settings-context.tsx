@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 export interface Settings {
   showFlags: boolean;
   showWhoPaid: boolean;
+  alwaysShowAdvanced: boolean;
 }
 
 export const SettingsContext = createContext({

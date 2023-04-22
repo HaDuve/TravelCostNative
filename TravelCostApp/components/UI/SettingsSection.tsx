@@ -10,6 +10,9 @@ const SettingsSection = ({ multiTraveller }) => {
   const { settings, saveSettings } = useContext(SettingsContext);
   const [showFlags, setShowFlags] = useState(settings.showFlags);
   const [showWhoPaid, setShowWhoPaid] = useState(settings.showWhoPaid);
+  const [alwaysShowAdvanced, setAlwaysShowAdvanced] = useState(
+    settings.alwaysShowAdvanced
+  );
 
   const toggleShowFlags = () => {
     const newSettings = { ...settings, showFlags: !showFlags };
@@ -23,11 +26,26 @@ const SettingsSection = ({ multiTraveller }) => {
     saveSettings(newSettings);
   };
 
+  const toggleAlwaysShowAdvanced = () => {
+    const newSettings = {
+      ...settings,
+      alwaysShowAdvanced: !alwaysShowAdvanced,
+    };
+    setAlwaysShowAdvanced(!alwaysShowAdvanced);
+    saveSettings(newSettings);
+  };
+
   return (
     <View>
       {/* <View style={styles.switchContainer}>
         <Text style={GlobalStyles.secondaryText}>Show Flags icons</Text>
         <Switch onValueChange={toggleShowFlags} value={showFlags} /> */}
+      <SettingsSwitch
+        label="Always show more options"
+        style={styles.switchContainer}
+        state={alwaysShowAdvanced}
+        toggleState={toggleAlwaysShowAdvanced}
+      />
       <SettingsSwitch
         label="Show Flags icons"
         style={styles.switchContainer}

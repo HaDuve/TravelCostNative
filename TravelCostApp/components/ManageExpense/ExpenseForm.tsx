@@ -68,6 +68,7 @@ import CountryFlag from "react-native-country-flag";
 import { recalcSplitsForExact } from "../../util/split";
 import { ExpenseData } from "../../util/expense";
 import { NetworkContext } from "../../store/network-context";
+import { SettingsContext } from "../../store/settings-context";
 
 const ExpenseForm = ({
   onCancel,
@@ -86,9 +87,18 @@ const ExpenseForm = ({
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
+  const { settings } = useContext(SettingsContext);
+  const alwaysShowAdvancedSetting = settings.alwaysShowAdvanced;
   const DEFAULTVALUES: ExpenseData = defaultValues;
 
-  const [hideAdvanced, sethideAdvanced] = useState(!isEditing);
+  const hideAdvanceByDefault =
+    isEditing || DEFAULTVALUES || alwaysShowAdvancedSetting;
+  console.log("\n\nalwaysShowAdvancedSetting:", alwaysShowAdvancedSetting);
+  console.log("DEFAULTVALUES:", DEFAULTVALUES);
+  console.log("isEditing:", isEditing);
+  console.log("showAdvanced:", hideAdvanceByDefault);
+
+  const [hideAdvanced, sethideAdvanced] = useState(!hideAdvanceByDefault);
   const [countryValue, setCountryValue] = useState("EUR");
   const [loadingTravellers, setLoadingTravellers] = useState(false);
 
@@ -570,6 +580,25 @@ const ExpenseForm = ({
     onConfirmRange,
   });
 
+  const tempValues: ExpenseData = {
+    uid: authCtx.uid,
+    amount: +inputs.amount.value,
+    date: DateTime.fromISO(inputs.date.value).toJSDate(),
+    startDate: DateTime.fromISO(startDate).toJSDate(),
+    endDate: DateTime.fromISO(endDate).toJSDate(),
+    description: inputs.description.value,
+    category: newCat ? pickedCat : inputs.category.value,
+    country: inputs.country.value,
+    currency: inputs.currency.value,
+    whoPaid: whoPaid, // TODO: convert this to uid
+    owePerc: +inputs.owePerc.value,
+    splitType: splitType,
+    listEQUAL: splitTravellersList,
+    splitList: splitList,
+    duplOrSplit: duplOrSplit,
+    iconName: iconName,
+  };
+
   return (
     <Animated.View layout={Layout}>
       {datepickerJSX}
@@ -608,13 +637,14 @@ const ExpenseForm = ({
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 navigation.navigate("CategoryPick", {
                   editedExpenseId: editedExpenseId,
+                  tempValues: tempValues,
                 });
               }}
             />
           </View>
           {/* always show more options when editing */}
-          {isEditing && <View style={{ marginTop: "6%" }}></View>}
-          {!isEditing && (
+          {hideAdvanceByDefault && <View style={{ marginTop: "6%" }}></View>}
+          {!hideAdvanceByDefault && (
             <Pressable onPress={toggleAdvancedHandler}>
               <Animated.View style={styles.advancedRow}>
                 <Ionicons

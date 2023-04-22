@@ -38,7 +38,7 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 const CategoryPickScreen = ({ route, navigation }) => {
-  const { editedExpenseId } = route.params ? route.params : "";
+  const { editedExpenseId, tempValues } = route.params ? route.params : "";
 
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
@@ -168,6 +168,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
         newCat: true,
         iconName: item.icon,
         expenseId: editedExpenseId,
+        tempValues: tempValues,
       });
     }
     setIsFetching(false);

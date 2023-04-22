@@ -5,7 +5,7 @@ import {
   asyncStoreSetObject,
 } from "../store/async-storage";
 
-export async function getRate(base = "EUR", target = "USD") {
+export async function getRate(base: string, target: string) {
   // TODO: add a cache here, and only call the request again after 1 hour
   const requestURL = "https://api.exchangerate.host/latest?base=" + base;
   // save in asyncstore
@@ -26,7 +26,7 @@ export async function getRate(base = "EUR", target = "USD") {
   }
 }
 
-export async function getOfflineRate(base = "EUR", target = "USD") {
+export async function getOfflineRate(base: string, target: string) {
   // offline get from asyncstore
   const currencyExchange = await asyncStoreGetObject(
     "currencyExchange_base_" + base

@@ -16,6 +16,7 @@ export async function fetchAndSetExpenses(
   if (!showRefIndicator && !showAnyIndicator) setIsFetching(true);
   if (!showAnyIndicator) setRefreshing(true);
   try {
+    await unTouchTraveler(tripid, uid);
     let expenses = await getAllExpenses(tripid, uid);
     expenses = expenses.filter((expense) => !isNaN(Number(expense.calcAmount)));
     if (expenses && expenses.length !== 0) {
@@ -29,7 +30,6 @@ export async function fetchAndSetExpenses(
       tripCtx.setTotalSum(expensesSum);
 
       await asyncStoreSetObject("expenses", expenses);
-      await unTouchTraveler(tripid, uid);
     }
   } catch (error) {
     Toast.show({

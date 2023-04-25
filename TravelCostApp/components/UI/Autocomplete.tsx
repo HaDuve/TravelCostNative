@@ -35,7 +35,8 @@ const Autocomplete = ({
             setMenuVisible(true);
           }
         }}
-        onBlur={() => setMenuVisible(false)}
+        // maybe with a timeout
+        onBlur={async () => setTimeout(() => setMenuVisible(false), 1200)}
         label={label}
         right={right}
         left={left}

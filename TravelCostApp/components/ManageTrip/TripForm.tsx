@@ -300,30 +300,35 @@ const TripForm = ({ navigation, route }) => {
   const [infoTitleText, setInfoTitleText] = useState("");
   const [infoContentText, setInfoContentText] = useState("");
 
-  function showInfoHandler(infoIndex) {
+  enum infoEnum {
+    homeCurrency = 1,
+    totalBudget = 2,
+    dailyBudget = 3,
+    datePicker = 4,
+  }
+  function showInfoHandler(infoEnu: infoEnum) {
     let titleText = "";
     let contentText = "";
-
-    switch (infoIndex) {
-      case 1:
+    switch (infoEnu) {
+      case infoEnum.homeCurrency:
         titleText = "Home Currency Info"; //i18n.t("currencyInfoTitle");
         contentText =
           "Setup your home currency here (e.g. the currency from the country in which you live)." +
           "\n\n This currency will be presented in the app and all other currencies you use on your trip will be converted into this one."; //i18n.t("currencyInfoContent");
         break;
-      case 2:
+      case infoEnum.totalBudget:
         titleText = "Total Budget Info";
         contentText =
           "Setup your total budget here (e.g. the amount of money for the entire trip)." +
           "\n\n You can press the calculate button to auto-calculate the Total Budget from the Daily Budget * Trip Start and End Date."; //i18n.t("currencyInfoContent");
         break;
-      case 3:
+      case infoEnum.dailyBudget:
         titleText = "Daily Budget Info";
         contentText =
           "Setup your Daily budget here (e.g. the amount of money for every day)." +
           "\n\n You can press the calculate button to auto-calculate the Daily Budget from the Total Budget * Trip Start and End Date."; //i18n.t("currencyInfoContent");
         break;
-      case 4:
+      case infoEnum.datePicker:
         titleText = "Trip Start and End Info";
         contentText =
           "Setup your Trip Start and End Date here (e.g. the dates of your trip)." +
@@ -355,7 +360,7 @@ const TripForm = ({ navigation, route }) => {
         onChangeValue={updateCurrency}
       ></CurrencyPicker>
       <InfoButton
-        onPress={showInfoHandler.bind(this, 1)}
+        onPress={showInfoHandler.bind(this, infoEnum.homeCurrency)}
         containerStyle={{ marginTop: "7%" }}
       ></InfoButton>
     </View>
@@ -450,7 +455,7 @@ const TripForm = ({ navigation, route }) => {
                 }}
               />
               <InfoButton
-                onPress={showInfoHandler.bind(this, 2)}
+                onPress={showInfoHandler.bind(this, infoEnum.totalBudget)}
                 containerStyle={{ marginTop: "4%" }}
               ></InfoButton>
             </View>
@@ -491,7 +496,7 @@ const TripForm = ({ navigation, route }) => {
                 }}
               />
               <InfoButton
-                onPress={showInfoHandler.bind(this, 3)}
+                onPress={showInfoHandler.bind(this, infoEnum.dailyBudget)}
                 containerStyle={{ marginTop: "4%" }}
               ></InfoButton>
             </View>
@@ -506,7 +511,7 @@ const TripForm = ({ navigation, route }) => {
                 dateIsRanged: true,
               })}
               <InfoButton
-                onPress={showInfoHandler.bind(this, 4)}
+                onPress={showInfoHandler.bind(this, infoEnum.datePicker)}
                 containerStyle={{ marginTop: "5%", marginLeft: -10 }}
               ></InfoButton>
             </View>

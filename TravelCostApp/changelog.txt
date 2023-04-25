@@ -1,5 +1,11 @@
 Change log Travel Expense App
 
+1.0.994
+- total budget is now optional
+- adjusted trip form infotexts
+- made trashcan visible again (in swipeable expense)
+- improved loading times (faster!)
+
 1.0.993
 - added autocomplete suggestions to expense description
 - new expense starts from expense form now (skipping category pick screen)

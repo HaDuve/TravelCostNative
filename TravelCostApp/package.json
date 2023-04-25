@@ -55,6 +55,7 @@
     "react-native-offline": "^6.0.0",
     "react-native-onboarding-swiper": "^1.2.0",
     "react-native-pager-view": "5.4.15",
+    "react-native-paper": "^5.7.0",
     "react-native-progress": "^5.0.0",
     "react-native-purchases": "^5.13.0",
     "react-native-reanimated": "~2.8.0",

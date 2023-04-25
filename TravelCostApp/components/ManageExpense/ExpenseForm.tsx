@@ -69,6 +69,8 @@ import { recalcSplitsForExact } from "../../util/split";
 import { ExpenseData } from "../../util/expense";
 import { NetworkContext } from "../../store/network-context";
 import { SettingsContext } from "../../store/settings-context";
+import Autocomplete from "../UI/Autocomplete";
+import { ExpensesContext } from "../../store/expenses-context";
 
 const ExpenseForm = ({
   onCancel,
@@ -87,22 +89,25 @@ const ExpenseForm = ({
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
+  const expCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
   const alwaysShowAdvancedSetting = settings.alwaysShowAdvanced;
   const DEFAULTVALUES: ExpenseData = defaultValues;
 
   const hideAdvanceByDefault =
     isEditing || DEFAULTVALUES || alwaysShowAdvancedSetting;
-  console.log("\n\nalwaysShowAdvancedSetting:", alwaysShowAdvancedSetting);
-  console.log("DEFAULTVALUES:", DEFAULTVALUES);
-  console.log("isEditing:", isEditing);
-  console.log("showAdvanced:", hideAdvanceByDefault);
 
   const [hideAdvanced, sethideAdvanced] = useState(!hideAdvanceByDefault);
   const [countryValue, setCountryValue] = useState("EUR");
   const [loadingTravellers, setLoadingTravellers] = useState(false);
 
   const [defaultCatSymbol, setCatSymbol] = useState(iconName ? iconName : "");
+
+  // extract suggestions from all the descriptions of expense state into an array of strings
+  const suggestionData = expCtx
+    .getRecentExpenses("year")
+    .map((expense) => expense.description);
+
   useEffect(() => {
     async function setCatSymbolAsync() {
       if (!defaultValues) return;
@@ -677,7 +682,15 @@ const ExpenseForm = ({
                 .delay(100)}
               exiting={FadeOutUp.duration(50)}
             >
-              <Input
+              <Autocomplete
+                value={inputs.description.value}
+                containerStyle={styles.descriptionContainer}
+                onChange={inputChangedHandler.bind(this, "description")}
+                label={i18n.t("descriptionLabel")}
+                data={suggestionData}
+                style={styles.autoCompleteStyle}
+              ></Autocomplete>
+              {/* <Input
                 label={i18n.t("descriptionLabel")}
                 style={{ marginTop: "6%" }}
                 placeholder={pickedCat}
@@ -687,7 +700,7 @@ const ExpenseForm = ({
                   // multiline: true,
                 }}
                 invalid={!inputs.description.isValid}
-              />
+              /> */}
               <View style={styles.currencyContainer}>
                 {/* <Text style={styles.currencyLabel}>
                   {i18n.t("currencyLabel")}
@@ -1099,6 +1112,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.75,
     // justifyContent: "space-around",
     // alignContent: "stretch",
+  },
+  descriptionContainer: {
+    flex: 1,
+    marginTop: "5%",
+
+    marginHorizontal: "3.5%",
+    marginLeft: "5%",
+  },
+  autoCompleteStyle: {
+    flex: 1,
+    backgroundColor: GlobalStyles.colors.gray500,
+    borderRadius: 5,
   },
   countryFlagContainer: {
     marginRight: "5%",

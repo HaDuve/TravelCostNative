@@ -91,17 +91,19 @@ const ExpenseForm = ({
   const netCtx = useContext(NetworkContext);
   const expCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
-  const alwaysShowAdvancedSetting = settings.alwaysShowAdvanced;
+  const alwaysShowAdvancedSetting = settings.alwaysShowAdvanced || isEditing;
   const DEFAULTVALUES: ExpenseData = defaultValues;
 
-  const hideAdvanceByDefault =
-    isEditing || DEFAULTVALUES || alwaysShowAdvancedSetting;
-
-  const [hideAdvanced, sethideAdvanced] = useState(!hideAdvanceByDefault);
+  const [hideAdvanced, sethideAdvanced] = useState(true);
   const [countryValue, setCountryValue] = useState("EUR");
   const [loadingTravellers, setLoadingTravellers] = useState(false);
 
   const [defaultCatSymbol, setCatSymbol] = useState(iconName ? iconName : "");
+
+  useEffect(() => {
+    const hideAdvanceByDefault = isEditing || alwaysShowAdvancedSetting;
+    sethideAdvanced(!hideAdvanceByDefault);
+  }, [isEditing, alwaysShowAdvancedSetting, iconName]);
 
   // extract suggestions from all the descriptions of expense state into an array of strings
   const suggestionData = expCtx
@@ -648,8 +650,7 @@ const ExpenseForm = ({
             />
           </View>
           {/* always show more options when editing */}
-          {hideAdvanceByDefault && <View style={{ marginTop: "6%" }}></View>}
-          {!hideAdvanceByDefault && (
+          {!alwaysShowAdvancedSetting && (
             <Pressable onPress={toggleAdvancedHandler}>
               <Animated.View style={styles.advancedRow}>
                 <Ionicons

@@ -49,7 +49,9 @@ const AddExpenseButton = ({ navigation }) => {
         ]}
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          navigation.navigate("CategoryPick");
+          navigation.navigate("ManageExpense", {
+            pickedCat: "other",
+          });
         }}
       >
         <Ionicons name={"add-outline"} size={42} color={"white"} />

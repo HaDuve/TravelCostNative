@@ -5,6 +5,7 @@ import { Alert } from "react-native";
 import { fetchTrip, getTravellers } from "../util/http";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 import Toast from "react-native-toast-message";
+import { MAX_JS_NUMBER } from "../confAppConstants";
 
 export interface TripData {
   tripName: string;
@@ -102,7 +103,9 @@ function TripContextProvider({ children }) {
     // console.log("setCurrentTrip ~ tripid", tripid);
     _setTripid(tripid);
     setTripName(trip.tripName);
-    setTotalBudget(trip.totalBudget.toString());
+    setTotalBudget(
+      trip.totalBudget ? trip.totalBudget.toString() : MAX_JS_NUMBER.toString()
+    );
     setTripCurrency(trip.tripCurrency);
     setdailyBudget(trip.dailyBudget.toString());
     setCurrentTravellers(tripid);
@@ -160,7 +163,11 @@ function TripContextProvider({ children }) {
     if (tripData) {
       _setTripid(tripData.tripid);
       setTripName(tripData.tripName);
-      setTotalBudget(tripData.totalBudget.toString());
+      setTotalBudget(
+        tripData.totalBudget
+          ? tripData.totalBudget.toString()
+          : MAX_JS_NUMBER.toString()
+      );
       setTripCurrency(tripData.tripCurrency);
       setdailyBudget(tripData.dailyBudget.toString());
       await loadTravellersFromStorage();

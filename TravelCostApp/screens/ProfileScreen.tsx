@@ -28,7 +28,7 @@ import { saveStoppedTour } from "../util/tourUtil";
 import { TourGuideZone, useTourGuideController } from "rn-tourguide";
 import { sleep } from "../util/appState";
 import { useInterval } from "../components/Hooks/useInterval";
-import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
+import { DEBUG_POLLING_INTERVAL, MAX_JS_NUMBER } from "../confAppConstants";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -114,7 +114,10 @@ const ProfileScreen = ({ navigation }) => {
   async function saveTripFromContext() {
     asyncStoreSetItem("PROFILE_tripid", tripCtx.tripid);
     asyncStoreSetItem("PROFILE_tripName", tripCtx.tripName);
-    asyncStoreSetItem("PROFILE_totalBudget", tripCtx.totalBudget);
+    asyncStoreSetItem(
+      "PROFILE_totalBudget",
+      tripCtx.totalBudget ?? MAX_JS_NUMBER
+    );
     asyncStoreSetItem("PROFILE_dailyBudget", tripCtx.dailyBudget);
     asyncStoreSetItem("PROFILE_tripCurrency", tripCtx.tripCurrency);
     asyncStoreSetObject("PROFILE_travellers", tripCtx.travellers);
@@ -150,7 +153,7 @@ const ProfileScreen = ({ navigation }) => {
     allTripsList.push({
       tripid: tripCtx.tripid,
       tripName: tripCtx.tripName,
-      totalBudget: tripCtx.totalBudget,
+      totalBudget: tripCtx.totalBudget ?? MAX_JS_NUMBER,
       dailyBudget: tripCtx.dailyBudget,
       tripCurrency: tripCtx.tripCurrency,
       travellers: tripCtx.travellers,

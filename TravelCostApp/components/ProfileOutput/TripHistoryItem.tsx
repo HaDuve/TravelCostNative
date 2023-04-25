@@ -35,6 +35,7 @@ import { AuthContext } from "../../store/auth-context";
 import getSymbolFromCurrency from "currency-symbol-map";
 import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
+import { MAX_JS_NUMBER } from "../../confAppConstants";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -64,7 +65,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       const trip = await fetchTrip(tripid);
       // console.log("getTrip ~ trip", trip);
       const _dailyBudget = trip.dailyBudget;
-      const _totalBudget = trip.totalBudget;
+      const _totalBudget = trip.totalBudget ?? MAX_JS_NUMBER.toString();
       const _tripCurrency = trip.tripCurrency;
       setTotalBudget(_totalBudget);
       setDailyBudget(_dailyBudget);

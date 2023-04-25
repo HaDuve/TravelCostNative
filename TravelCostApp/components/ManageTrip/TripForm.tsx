@@ -53,6 +53,8 @@ import GradientButton from "../UI/GradientButton";
 import PropTypes from "prop-types";
 import InfoButton from "../UI/InfoButton";
 import Modal from "react-native-modal";
+import { MAX_JS_NUMBER } from "../../confAppConstants";
+import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 
 const TripForm = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -129,7 +131,10 @@ const TripForm = ({ navigation, route }) => {
         inputChangedHandler("tripName", selectedTrip.tripName);
         inputChangedHandler("tripCurrency", selectedTrip.tripCurrency);
         inputChangedHandler("dailyBudget", selectedTrip.dailyBudget.toString());
-        inputChangedHandler("totalBudget", selectedTrip.totalBudget.toString());
+        inputChangedHandler(
+          "totalBudget",
+          selectedTrip.totalBudget?.toString()
+        );
         setStartDate(selectedTrip.startDate);
         setEndDate(selectedTrip.endDate);
       } catch (error) {
@@ -213,17 +218,20 @@ const TripForm = ({ navigation, route }) => {
     // tripCurrency should not be empty
     const tripCurrencyIsValid =
       tripData.tripCurrency !== "" && tripData.tripCurrency.length > 0;
-    // Total budget should be a number between 1 and 3B
+    // Total budget should be a number between 0 and 3B
     const totalBudgetIsValid =
-      !isNaN(tripData.totalBudget) &&
-      tripData.totalBudget > 0 &&
-      tripData.totalBudget < 3435973836 &&
-      tripData.totalBudget > tripData.dailyBudget;
+      !inputs.totalBudget.value ||
+      (!isNaN(tripData.totalBudget) &&
+        tripData.totalBudget >= 0 &&
+        tripData.totalBudget < MAX_JS_NUMBER &&
+        tripData.totalBudget > tripData.dailyBudget);
+
     const dailyBudgetIsValid =
       !isNaN(tripData.dailyBudget) &&
       tripData.dailyBudget > 0 &&
-      tripData.dailyBudget < 3435973836 &&
-      tripData.dailyBudget < tripData.totalBudget;
+      tripData.dailyBudget < MAX_JS_NUMBER &&
+      (!inputs.totalBudget.value ||
+        tripData.dailyBudget < tripData.totalBudget);
 
     if (!tripNameIsValid) {
       inputs.tripName.isValid = tripNameIsValid;
@@ -314,13 +322,15 @@ const TripForm = ({ navigation, route }) => {
         titleText = "Home Currency Info"; //i18n.t("currencyInfoTitle");
         contentText =
           "Setup your home currency here (e.g. the currency from the country in which you live)." +
+          "\n\n The country will not be saved and is only helpful for finding your currency." +
           "\n\n This currency will be presented in the app and all other currencies you use on your trip will be converted into this one."; //i18n.t("currencyInfoContent");
         break;
       case infoEnum.totalBudget:
         titleText = "Total Budget Info";
         contentText =
           "Setup your total budget here (e.g. the amount of money for the entire trip)." +
-          "\n\n You can press the calculate button to auto-calculate the Total Budget from the Daily Budget * Trip Start and End Date."; //i18n.t("currencyInfoContent");
+          "\n\n You can press the calculate button to auto-calculate the Total Budget from the Daily Budget * Trip Start and End Date." + //i18n.t("currencyInfoContent");
+          "\n\n The total Budget is optional.";
         break;
       case infoEnum.dailyBudget:
         titleText = "Daily Budget Info";
@@ -365,6 +375,16 @@ const TripForm = ({ navigation, route }) => {
       ></InfoButton>
     </View>
   );
+
+  const validTotalBudgetEntry =
+    !isNaN(+inputs.totalBudget.value) &&
+    +inputs.totalBudget.value > 0 &&
+    +inputs.totalBudget.value < MAX_JS_NUMBER;
+
+  const validDailyBudgetEntry =
+    !isNaN(+inputs.dailyBudget.value) &&
+    +inputs.dailyBudget.value > 0 &&
+    +inputs.dailyBudget.value < MAX_JS_NUMBER;
 
   const handleClose = () => {
     setInfoIsVisible(false);
@@ -424,7 +444,7 @@ const TripForm = ({ navigation, route }) => {
                 label={`${i18n.t("totalBudgetLabel")} ${
                   inputs.tripCurrency.value
                 }`}
-                style={{ flex: 1 }}
+                style={{ flex: 1, marginTop: "-2%" }}
                 inputStyle={{}}
                 autoFocus={false}
                 textInputConfig={{
@@ -434,29 +454,37 @@ const TripForm = ({ navigation, route }) => {
                 }}
                 invalid={!inputs.totalBudget.isValid}
               />
-              <IconButton
-                icon="ios-git-compare-outline"
-                color={GlobalStyles.colors.primary500}
-                size={36}
-                onPress={() => {
-                  console.log("recalculate");
-                  console.log("Start Date:", startDate);
-                  console.log("End Date:", endDate);
-                  const diffDays =
-                    daysBetween(new Date(endDate), new Date(startDate)) + 1;
-                  console.log("Days:", diffDays);
-                  const calcTotalBudget =
-                    Number(inputs.dailyBudget.value) * diffDays;
-                  console.log("Total calc:", calcTotalBudget);
-                  inputChangedHandler(
-                    "totalBudget",
-                    calcTotalBudget.toString()
-                  );
-                }}
-              />
+              {validDailyBudgetEntry && (
+                <Animated.View
+                  entering={ZoomIn}
+                  exiting={ZoomOut}
+                  style={[styles.recalcButton, GlobalStyles.strongShadow]}
+                >
+                  <IconButton
+                    icon="ios-git-compare-outline"
+                    color={GlobalStyles.colors.primary500}
+                    size={36}
+                    onPress={() => {
+                      console.log("recalculate");
+                      console.log("Start Date:", startDate);
+                      console.log("End Date:", endDate);
+                      const diffDays =
+                        daysBetween(new Date(endDate), new Date(startDate)) + 1;
+                      console.log("Days:", diffDays);
+                      const calcTotalBudget =
+                        Number(inputs.dailyBudget.value) * diffDays;
+                      console.log("Total calc:", calcTotalBudget);
+                      inputChangedHandler(
+                        "totalBudget",
+                        calcTotalBudget.toString()
+                      );
+                    }}
+                  />
+                </Animated.View>
+              )}
               <InfoButton
                 onPress={showInfoHandler.bind(this, infoEnum.totalBudget)}
-                containerStyle={{ marginTop: "4%" }}
+                containerStyle={{ marginTop: "2%" }}
               ></InfoButton>
             </View>
             <View style={styles.categoryRow}>
@@ -474,33 +502,46 @@ const TripForm = ({ navigation, route }) => {
                 }}
                 invalid={!inputs.dailyBudget.isValid}
               />
-              <IconButton
-                icon="ios-git-compare-outline"
-                color={GlobalStyles.colors.primary500}
-                size={36}
-                onPress={() => {
-                  console.log("recalculate");
-                  console.log("Start Date:", startDate);
-                  console.log("End Date:", endDate);
-                  const diffDays =
-                    daysBetween(new Date(endDate), new Date(startDate)) + 1;
-                  console.log("Days:", diffDays);
-                  const calcDailyBudget = (
-                    Number(inputs.totalBudget.value) / diffDays
-                  ).toFixed(2);
-                  console.log("Daily calc:", calcDailyBudget);
-                  inputChangedHandler(
-                    "dailyBudget",
-                    calcDailyBudget.toString()
-                  );
-                }}
-              />
+              {validTotalBudgetEntry && (
+                <Animated.View
+                  entering={ZoomIn}
+                  exiting={ZoomOut}
+                  style={[styles.recalcButton, GlobalStyles.strongShadow]}
+                >
+                  <IconButton
+                    icon="ios-git-compare-outline"
+                    color={GlobalStyles.colors.primary500}
+                    size={36}
+                    onPress={() => {
+                      console.log("recalculate");
+                      console.log("Start Date:", startDate);
+                      console.log("End Date:", endDate);
+                      const diffDays =
+                        daysBetween(new Date(endDate), new Date(startDate)) + 1;
+                      console.log("Days:", diffDays);
+                      const calcDailyBudget = (
+                        Number(inputs.totalBudget.value) / diffDays
+                      ).toFixed(2);
+                      console.log("Daily calc:", calcDailyBudget);
+                      inputChangedHandler(
+                        "dailyBudget",
+                        calcDailyBudget.toString()
+                      );
+                    }}
+                  />
+                </Animated.View>
+              )}
               <InfoButton
                 onPress={showInfoHandler.bind(this, infoEnum.dailyBudget)}
-                containerStyle={{ marginTop: "4%" }}
+                containerStyle={{ marginTop: "5%" }}
               ></InfoButton>
             </View>
-            <Text style={[styles.label, { marginLeft: "5%" }]}>
+            <Text
+              style={[
+                styles.label,
+                { marginLeft: "5%", marginTop: "2%", marginBottom: "-4%" },
+              ]}
+            >
               {i18n.t("datePickerLabel")}
             </Text>
             <View style={{ flexDirection: "row" }}>
@@ -512,7 +553,7 @@ const TripForm = ({ navigation, route }) => {
               })}
               <InfoButton
                 onPress={showInfoHandler.bind(this, infoEnum.datePicker)}
-                containerStyle={{ marginTop: "5%", marginLeft: -10 }}
+                containerStyle={{ marginTop: "5%" }}
               ></InfoButton>
             </View>
           </View>
@@ -580,8 +621,19 @@ TripForm.propTypes = {
 const styles = StyleSheet.create({
   form: {
     flex: 1,
+    minHeight: "100%",
     padding: "2%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  recalcButton: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    maxHeight: "70%",
+    borderRadius: 99,
+    marginRight: "3%",
+    marginBottom: "5%",
+    paddingHorizontal: "2%",
+    paddingTop: "1%",
+    paddingLeft: "3%",
   },
   card: {
     flex: 1,
@@ -634,6 +686,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
 
     marginTop: "4%",
+    marginBottom: "2%",
     marginHorizontal: "4%",
   },
   button: {

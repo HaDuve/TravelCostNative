@@ -23,3 +23,5 @@ export const MAX_PERIOD_RANGE = 30;
 export const MIN_PERIOD_RANGE = 3;
 // toast tweaks
 export const TOAST_LOCATION = "bottom";
+// conservative maximum number for javascript not to crash
+export const MAX_JS_NUMBER = 3435973836;

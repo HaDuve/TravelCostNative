@@ -8,6 +8,7 @@ import PropTypes from "prop-types";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { Pressable } from "react-native";
 import Toast from "react-native-toast-message";
+import { MAX_JS_NUMBER } from "../../confAppConstants";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
   const tripCtx = useContext(TripContext);
@@ -27,6 +28,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   const userCurrency = tripCtx.tripCurrency;
   const currencySymbol = getSymbolFromCurrency(userCurrency);
   let budgetNumber = Number(tripCtx.dailyBudget);
+  let infinityString = "";
   const expenseSumNum = Number(expensesSum);
   const totalBudget = Number(tripCtx.totalBudget);
   //TODO: change the dailybudget system to make calculating this unified
@@ -48,12 +50,13 @@ const ExpensesSummary = ({ expenses, periodName }) => {
       budgetNumber = budgetNumber * budgetMult;
       break;
     case "total":
-      budgetNumber = totalBudget;
+      budgetNumber = totalBudget ?? MAX_JS_NUMBER;
       break;
     default:
       break;
   }
 
+  if (!budgetNumber || budgetNumber == MAX_JS_NUMBER) infinityString = "∞";
   let budgetProgress = (expenseSumNum / budgetNumber) * 1;
   const budgetColor =
     budgetProgress <= 1
@@ -82,6 +85,14 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   }
 
   const pressBudgetHandler = () => {
+    if (infinityString) {
+      Toast.show({
+        type: "error",
+        text1: "No Total Budget!",
+        text2: "You have " + infinityString + " left to spend!",
+      });
+      return;
+    }
     // show Toast containing budget info
     Toast.show({
       type: budgetNumber > expenseSumNum ? "success" : "error",
@@ -91,9 +102,9 @@ const ExpensesSummary = ({ expenses, periodName }) => {
           ? `You have ${(budgetNumber - expenseSumNum).toFixed(
               2
             )} ${currencySymbol} left to spend!`
-          : `You have exceeded your budget by ${(
-              expenseSumNum - budgetNumber
-            ).toFixed(2)} ${currencySymbol}`,
+          : `Exceeded the budget by ${(expenseSumNum - budgetNumber).toFixed(
+              2
+            )} ${currencySymbol}`,
       text1: `${
         periodName.charAt(0).toUpperCase() + periodName.slice(1)
       } Budget: ${budgetNumber} ${currencySymbol}`,

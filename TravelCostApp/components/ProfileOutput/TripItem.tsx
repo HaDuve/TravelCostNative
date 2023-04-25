@@ -25,6 +25,7 @@ import { UserContext } from "../../store/user-context";
 import getSymbolFromCurrency from "currency-symbol-map";
 import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
+import { MAX_JS_NUMBER } from "../../confAppConstants";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -45,7 +46,8 @@ function TripItem({
     dailyBudget,
     tripCurrency,
   };
-
+  let infinityString = "";
+  if (!totalBudget || totalBudget >= MAX_JS_NUMBER) infinityString = "∞";
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
@@ -90,7 +92,7 @@ function TripItem({
       ? { borderWidth: 1, borderColor: GlobalStyles.colors.primary400 }
       : {};
 
-  const activeProgress = tripCtx.totalSum / totalBudget;
+  const activeProgress = tripCtx.totalSum / (totalBudget ?? MAX_JS_NUMBER);
 
   function renderTravellers(item) {
     return (
@@ -137,18 +139,22 @@ function TripItem({
           </View>
           <View style={styles.amountContainer}>
             <Text style={styles.amount}>
-              {totalBudget}
+              {tripCtx.totalSum.toFixed(2)}
               {" " + tripCurrencySymbol}
+              {infinityString ? " / ∞" : " / " + totalBudget}
+              {infinityString ? "" : " " + tripCurrencySymbol}
             </Text>
-            <Progress.Bar
-              color={GlobalStyles.colors.primary500}
-              unfilledColor={GlobalStyles.colors.gray600}
-              borderWidth={0}
-              borderRadius={8}
-              progress={activeProgress}
-              height={12}
-              width={150}
-            />
+            {!infinityString && (
+              <Progress.Bar
+                color={GlobalStyles.colors.primary500}
+                unfilledColor={GlobalStyles.colors.gray600}
+                borderWidth={0}
+                borderRadius={8}
+                progress={activeProgress}
+                height={12}
+                width={150}
+              />
+            )}
           </View>
         </View>
         <FlatList

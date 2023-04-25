@@ -3,7 +3,7 @@ import { Alert, Dimensions } from "react-native";
 import ExpenseItem from "./ExpenseItem";
 
 import React, { useContext } from "react";
-import { View } from "react-native";
+import { View, Text } from "react-native";
 
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { GlobalStyles } from "../../constants/styles";
@@ -49,12 +49,17 @@ const renderRightActions = (progress, dragX, onClick) => {
         backgroundColor: GlobalStyles.colors.error500,
       }}
     >
+      {/* <Text>test</Text> */}
       <IconButton
         icon="trash"
         color={GlobalStyles.colors.backgroundColor}
         size={36}
         onPress={onClick}
-        buttonStyle={{ marginRight: 30 }}
+        buttonStyle={{
+          marginBottom: "0%",
+          marginTop: "-30%",
+          marginLeft: "-20%",
+        }}
       />
     </View>
   );

@@ -70,6 +70,7 @@ const Autocomplete = ({
                 style={[{ width: "100%" }, menuStyle]}
                 //   icon={icon}
                 onPress={() => {
+                  origOnChange(datum);
                   setValue(datum);
                   setMenuVisible(false);
                 }}

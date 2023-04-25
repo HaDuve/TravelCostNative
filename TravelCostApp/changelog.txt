@@ -1,5 +1,9 @@
 Change log Travel Expense App
 
+1.0.993
+- added autocomplete suggestions to expense description
+- new expense starts from expense form now (skipping category pick screen)
+
 1.0.992
 - added small info buttons (e.g.: to explain whats going on in Trip Form)
 - added the option to always show the complete expense form

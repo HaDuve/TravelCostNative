@@ -335,8 +335,9 @@ const TripForm = ({ navigation, route }) => {
       case infoEnum.dailyBudget:
         titleText = "Daily Budget Info";
         contentText =
-          "Setup your Daily budget here (e.g. the amount of money for every day)." +
-          "\n\n You can press the calculate button to auto-calculate the Daily Budget from the Total Budget * Trip Start and End Date."; //i18n.t("currencyInfoContent");
+          "Setup your Daily budget here (e.g. the average amount of money to spend per day)." +
+          "If you don't know how much exactly you want to spend, just write down an estimate." +
+          "\n\n You can press the calculate button to auto-calculate the Daily Budget from the Total Budget / Trip Start and End Date."; //i18n.t("currencyInfoContent");
         break;
       case infoEnum.datePicker:
         titleText = "Trip Start and End Info";

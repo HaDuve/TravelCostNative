@@ -8,6 +8,7 @@ import Animated, { SlideOutLeft } from "react-native-reanimated";
 import LoadingOverlay from "../UI/LoadingOverlay";
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
+import { EXPENSES_LOAD_TIMEOUT } from "../../confAppConstants";
 
 function ExpensesOutput({
   expenses,
@@ -18,7 +19,7 @@ function ExpensesOutput({
 }) {
   const [showLoading, setShowLoading] = useState(true);
   useEffect(() => {
-    setTimeout(toggleLoading, 3000);
+    setTimeout(toggleLoading, EXPENSES_LOAD_TIMEOUT);
   }, []);
 
   const toggleLoading = () => setShowLoading((prev) => !prev);

@@ -5,9 +5,9 @@ export const DEBUG_FORCE_OFFLINE = false;
 // no data, set to true if you want to load no data
 export const DEBUG_NO_DATA = false;
 // polling interval data
-export const DEBUG_POLLING_INTERVAL = 10000;
+export const DEBUG_POLLING_INTERVAL = 5000;
 // polling interval online status should probably be higher than timeout
-export const DEBUG_POLLING_INTERVAL_ONLINE = 10000;
+export const DEBUG_POLLING_INTERVAL_ONLINE = 5000;
 // Timeout constant
 // export const TIMEOUT = 9000;
 // Retries after Timeout
@@ -25,3 +25,7 @@ export const MIN_PERIOD_RANGE = 3;
 export const TOAST_LOCATION = "bottom";
 // conservative maximum number for javascript not to crash
 export const MAX_JS_NUMBER = 3435973836;
+// tweak loading splash screen overlay delay
+export const SPLASH_SCREEN_DELAY = 500;
+// tweak loading recent expenses overlay timeout
+export const EXPENSES_LOAD_TIMEOUT = 12000;

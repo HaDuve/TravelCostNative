@@ -24,8 +24,10 @@ import Animated, {
   ZoomOut,
   ZoomOutDown,
 } from "react-native-reanimated";
+import { SPLASH_SCREEN_DELAY } from "../../confAppConstants";
 
 const loadingColor = GlobalStyles.colors.backgroundColor;
+const delay = SPLASH_SCREEN_DELAY;
 const SplashScreenOverlay = (containerStyle) => {
   return (
     <>
@@ -34,7 +36,7 @@ const SplashScreenOverlay = (containerStyle) => {
         // entering={ZoomIn.duration(400)}
         // exiting={SlideOutLeft.duration(800).delay(3500)}
         // exiting={SlideOutDown.duration(1600).delay(3500)}
-        exiting={FadeOutDown.duration(800).delay(3500)}
+        exiting={FadeOutDown.duration(800).delay(delay + 500)}
         style={{
           flex: 1,
           backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -47,7 +49,7 @@ const SplashScreenOverlay = (containerStyle) => {
         >
           <Animated.View
             entering={ZoomInDown.duration(1200).delay(200)}
-            exiting={ZoomOutDown.duration(1200).delay(3000)}
+            exiting={ZoomOutDown.duration(1200).delay(delay)}
             style={{
               paddingTop: "60%",
               flex: 1,

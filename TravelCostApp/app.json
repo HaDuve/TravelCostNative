@@ -21,7 +21,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.budgetfornomads.app",
-      "buildNumber": "1.0.994"
+      "buildNumber": "1.0.995"
     },
     "android": {
       "package": "com.budgetfornomads.app",

@@ -1,0 +1,62 @@
+{
+  "configVersion": 0,
+  "apple": {
+    "version": "1.1.000",
+    "copyright": "2023 Hannes Duve",
+    "release": {
+      "automaticRelease": false
+    },
+    "info": {
+      "en-US": {
+        "description": "Easy, fun and fast to use\nGet a great overview with dynamic Charts and Diagrams\nClassic and modern design\nAutomatic Currency Conversion\nInvite Friends & Family to share the trip with\nShare Costs and simplify transactions\nWorks Online and Offline",
+        "keywords": [
+          "budget",
+          "travel",
+          "expense",
+          "tracker",
+          "cost",
+          "money",
+          "split",
+          "splid",
+          "splitwise",
+          "backpack",
+          "finance"
+        ],
+        "promoText": "Travel on a budget without compromising on quality.  Start your journey and keep track on your expenses with Budget for Nomads now!",
+        "supportUrl": "https://foodfornomads.com/",
+        "title": "Budget for Nomads"
+      }
+    },
+    "categories": [
+      "TRAVEL",
+      "FINANCE"
+    ],
+    "advisory": {
+      "alcoholTobaccoOrDrugUseOrReferences": "NONE",
+      "contests": "NONE",
+      "gamblingSimulated": "NONE",
+      "horrorOrFearThemes": "NONE",
+      "matureOrSuggestiveThemes": "NONE",
+      "medicalOrTreatmentInformation": "NONE",
+      "profanityOrCrudeHumor": "NONE",
+      "sexualContentGraphicAndNudity": "NONE",
+      "sexualContentOrNudity": "NONE",
+      "violenceCartoonOrFantasy": "NONE",
+      "violenceRealistic": "NONE",
+      "violenceRealisticProlongedGraphicOrSadistic": "NONE",
+      "gambling": false,
+      "unrestrictedWebAccess": false,
+      "kidsAgeBand": null,
+      "seventeenPlus": false
+    },
+    "review": {
+      "firstName": "Hannes",
+      "lastName": "Duve",
+      "email": "hannes.duve@outlook.com",
+      "phone": "+491779584519",
+      "demoUsername": "ta@ta.com",
+      "demoPassword": "1234567",
+      "demoRequired": true
+    }
+  }
+}

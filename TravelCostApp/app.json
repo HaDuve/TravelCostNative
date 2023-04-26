@@ -13,7 +13,8 @@
       "backgroundColor": "#000000"
     },
     "updates": {
-      "fallbackToCacheTimeout": 20000
+      "fallbackToCacheTimeout": 20000,
+      "url": "https://u.expo.dev/dff7ffc5-6f1e-4ece-bb23-0c50cda19f46"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -21,7 +22,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.budgetfornomads.app",
-      "buildNumber": "1.0.995"
+      "buildNumber": "1.0.997"
     },
     "android": {
       "package": "com.budgetfornomads.app",
@@ -38,6 +39,12 @@
       "eas": {
         "projectId": "dff7ffc5-6f1e-4ece-bb23-0c50cda19f46"
       }
-    }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "plugins": [
+      "expo-localization"
+    ]
   }
 }

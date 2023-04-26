@@ -22,4 +22,4 @@ export const MAX_JS_NUMBER = 3435973836;
 // tweak loading splash screen overlay delay
 export const SPLASH_SCREEN_DELAY = 500;
 // tweak loading recent expenses overlay timeout
-export const EXPENSES_LOAD_TIMEOUT = 12000;
+export const EXPENSES_LOAD_TIMEOUT = 6000;

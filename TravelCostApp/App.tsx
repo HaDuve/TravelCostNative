@@ -464,7 +464,6 @@ function Root() {
       return null;
     }
     console.log("Offline mode");
-    await expensesCtx.loadExpensesFromStorage();
     await userCtx.loadUserNameFromStorage();
     await tripCtx.loadTripDataFromStorage();
     await tripCtx.loadTravellersFromStorage();
@@ -578,8 +577,6 @@ function Root() {
         // setup context
         authCtx.setUserID(storedUid);
 
-        // console.log("getExpenses ~ expenses", expenses);
-
         const userData: UserData = checkUser;
         const tripid = userData.currentTrip;
         console.log("onRootMount ~ userData", userData);
@@ -593,7 +590,7 @@ function Root() {
         const isLoaded = await expensesCtx.loadExpensesFromStorage();
         console.log("onRootMount ~ isLoaded:", isLoaded);
         authCtx.authenticate(storedToken);
-        await touchMyTraveler(tripid, storedUid);
+        // await touchMyTraveler(tripid, storedUid);
         const needsTour = await loadTourConfig();
         console.log("onRootMount ~ needsTour:", needsTour);
         userCtx.setNeedsTour(needsTour);

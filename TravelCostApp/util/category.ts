@@ -57,7 +57,7 @@ export function getCatSymbol(cat: string) {
       return "happy-outline";
     default: {
       // if not, return "help-outline"
-      console.log(`cat: ${cat} finally not found in categoryList`);
+      // console.log(`cat: ${cat} finally not found in categoryList`);
       return "help-outline";
     }
   }

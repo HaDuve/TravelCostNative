@@ -119,6 +119,130 @@ const ManageExpense = ({ route, navigation }) => {
     navigation.goBack();
   }
 
+  const creatingNormalData = async (expenseData) => {
+    console.log("no ranged Data detected");
+    // hotfix the date clock bug
+    expenseData.date = expenseData.startDate;
+
+    const item: OfflineQueueManageExpenseItem = {
+      type: "add",
+      expense: {
+        tripid: tripid,
+        uid: uid,
+        expenseData: expenseData,
+      },
+    };
+    const id = await storeExpenseOnlineOffline(item, isOnline);
+    expenseCtx.addExpense({ ...expenseData, id: id });
+  };
+
+  const creatingRangedData = async (expenseData) => {
+    console.log("ranged Data detected");
+    // the date.now() is used as a rangeId to identify all the expenses that belong to the same range
+    const rangeId =
+      Date.now().toString() + Math.random().toString(36).substring(2, 15);
+    expenseData.rangeId = rangeId;
+
+    // get number of days
+    const day1 = new Date(expenseData.startDate);
+    const day2 = new Date(expenseData.endDate);
+    const days = daysBetween(day2, day1);
+
+    // get correct amount
+    if (expenseData.duplOrSplit !== 1 && expenseData.duplOrSplit !== 2) {
+      Alert.alert("wrong duplOrSplit value");
+      return;
+    }
+    // 0 is null, 1 is dupl (default), 2 is split
+    if (expenseData.duplOrSplit === 2) {
+      const splitCalcAmount = expenseData.calcAmount / (days + 1);
+      expenseData.calcAmount = Number(splitCalcAmount.toFixed(2));
+      const splitAmount = expenseData.amount / (days + 1);
+      expenseData.amount = Number(splitAmount.toFixed(2));
+    }
+
+    // iterate over number of days between and change date and endDate to the first date + iterator
+    setProgressMax(days);
+    for (let i = 0; i <= days; i++) {
+      console.log("day nr: ", i);
+      setProgressAt(i);
+      setProgress(i / days);
+      console.log("progress", i / days);
+      const newDate = getDatePlusDays(day1, i);
+      newDate.setHours(new Date().getHours(), new Date().getMinutes());
+      // expenseData.startDate =
+      // expenseData.endDate =
+      expenseData.date = newDate;
+      console.log("expenseData.date: ", expenseData.date);
+      console.log("expenseData.startDate: ", expenseData.startDate);
+      console.log("expenseData.endDate: ", expenseData.endDate);
+
+      const item: OfflineQueueManageExpenseItem = {
+        type: "add",
+        expense: {
+          tripid: tripid,
+          uid: uid,
+          expenseData: expenseData,
+        },
+      };
+      const id = await storeExpenseOnlineOffline(item, isOnline);
+      expenseCtx.addExpense({ ...expenseData, id: id });
+    }
+  };
+
+  const editingNormalData = async (expenseData) => {
+    const item: OfflineQueueManageExpenseItem = {
+      type: "update",
+      expense: {
+        tripid: tripid,
+        uid: selectedExpenseAuthorUid,
+        expenseData: expenseData,
+        id: editedExpenseId,
+      },
+    };
+    expenseCtx.updateExpense(editedExpenseId, expenseData);
+    await updateExpenseOnlineOffline(item, isOnline);
+  };
+
+  const editingRangedData = async (expenseData) => {
+    console.log("ranged Data detected");
+    // find all the expenses that have the same identifying rangeId
+    const expensesInRange = expenseCtx.expenses.filter(
+      (expense) =>
+        expense.rangeId && expense.rangeId === selectedExpense.rangeId
+    );
+    // sort the expenses by date, oldest expense first
+    expensesInRange.sort((a, b) => {
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    });
+    // update the expenses one by one
+    setProgressMax(expensesInRange.length);
+    for (let i = 0; i < expensesInRange.length; i++) {
+      setProgressAt(i);
+      setProgress(i / expensesInRange.length);
+      console.log("progress", i / expensesInRange.length);
+      const expense = expensesInRange[i];
+      // set the correct new date
+      const newDate = getDatePlusDays(expenseData.startDate, i);
+      newDate.setHours(new Date().getHours(), new Date().getMinutes());
+      expenseData.date = newDate;
+      // sanity fix
+      expenseData.rangeId = expense.rangeId;
+      const item: OfflineQueueManageExpenseItem = {
+        type: "update",
+        expense: {
+          tripid: tripid,
+          uid: selectedExpenseAuthorUid,
+          expenseData: expenseData,
+          id: expense.id,
+        },
+      };
+      expenseCtx.updateExpense(expense.id, expenseData);
+      await updateExpenseOnlineOffline(item, isOnline);
+      console.log("updated expense nr: " + (i + 1), expense.rangeId);
+    }
+  };
+
   async function confirmHandler(expenseData: ExpenseData) {
     console.log("confirmHandler ~ expenseData:", expenseData);
     setIsSubmitting(true);
@@ -152,55 +276,10 @@ const ManageExpense = ({ route, navigation }) => {
           expenseData.endDate.toString().slice(0, 10)
         ) {
           // editing ranged Data
-          console.log("ranged Data detected");
-          // find all the expenses that have the same identifying rangeId
-          const expensesInRange = expenseCtx.expenses.filter(
-            (expense) =>
-              expense.rangeId && expense.rangeId === selectedExpense.rangeId
-          );
-          // sort the expenses by date, oldest expense first
-          expensesInRange.sort((a, b) => {
-            return new Date(a.date).getTime() - new Date(b.date).getTime();
-          });
-          // update the expenses one by one
-          setProgressMax(expensesInRange.length);
-          for (let i = 0; i < expensesInRange.length; i++) {
-            setProgressAt(i);
-            setProgress(i / expensesInRange.length);
-            console.log("progress", i / expensesInRange.length);
-            const expense = expensesInRange[i];
-            // set the correct new date
-            const newDate = getDatePlusDays(expenseData.startDate, i);
-            newDate.setHours(new Date().getHours(), new Date().getMinutes());
-            expenseData.date = newDate;
-            // sanity fix
-            expenseData.rangeId = expense.rangeId;
-            const item: OfflineQueueManageExpenseItem = {
-              type: "update",
-              expense: {
-                tripid: tripid,
-                uid: selectedExpenseAuthorUid,
-                expenseData: expenseData,
-                id: expense.id,
-              },
-            };
-            expenseCtx.updateExpense(expense.id, expenseData);
-            await updateExpenseOnlineOffline(item, isOnline);
-            console.log("updated expense nr: " + (i + 1), expense.rangeId);
-          }
+          editingRangedData(expenseData);
         } else {
           // editing normal expense (no-ranged)
-          const item: OfflineQueueManageExpenseItem = {
-            type: "update",
-            expense: {
-              tripid: tripid,
-              uid: selectedExpenseAuthorUid,
-              expenseData: expenseData,
-              id: editedExpenseId,
-            },
-          };
-          expenseCtx.updateExpense(editedExpenseId, expenseData);
-          await updateExpenseOnlineOffline(item, isOnline);
+          editingNormalData(expenseData);
         }
       } else {
         // adding a new expense (no-editing)
@@ -210,78 +289,15 @@ const ManageExpense = ({ route, navigation }) => {
           expenseData.endDate.toString().slice(0, 10)
         ) {
           // adding a new ranged expense (no-editing)
-          console.log("ranged Data detected");
-          // the date.now() is used as a rangeId to identify all the expenses that belong to the same range
-          const rangeId =
-            Date.now().toString() + Math.random().toString(36).substring(2, 15);
-          expenseData.rangeId = rangeId;
-
-          // get number of days
-          const day1 = new Date(expenseData.startDate);
-          const day2 = new Date(expenseData.endDate);
-          const days = daysBetween(day2, day1);
-
-          // get correct amount
-          if (expenseData.duplOrSplit !== 1 && expenseData.duplOrSplit !== 2) {
-            Alert.alert("wrong duplOrSplit value");
-            return;
-          }
-          // 0 is null, 1 is dupl (default), 2 is split
-          if (expenseData.duplOrSplit === 2) {
-            const splitCalcAmount = expenseData.calcAmount / (days + 1);
-            expenseData.calcAmount = Number(splitCalcAmount.toFixed(2));
-            const splitAmount = expenseData.amount / (days + 1);
-            expenseData.amount = Number(splitAmount.toFixed(2));
-          }
-
-          // iterate over number of days between and change date and endDate to the first date + iterator
-          setProgressMax(days);
-          for (let i = 0; i <= days; i++) {
-            console.log("day nr: ", i);
-            setProgressAt(i);
-            setProgress(i / days);
-            console.log("progress", i / days);
-            const newDate = getDatePlusDays(day1, i);
-            newDate.setHours(new Date().getHours(), new Date().getMinutes());
-            // expenseData.startDate =
-            // expenseData.endDate =
-            expenseData.date = newDate;
-            console.log("expenseData.date: ", expenseData.date);
-            console.log("expenseData.startDate: ", expenseData.startDate);
-            console.log("expenseData.endDate: ", expenseData.endDate);
-
-            const item: OfflineQueueManageExpenseItem = {
-              type: "add",
-              expense: {
-                tripid: tripid,
-                uid: uid,
-                expenseData: expenseData,
-              },
-            };
-            const id = await storeExpenseOnlineOffline(item, isOnline);
-            expenseCtx.addExpense({ ...expenseData, id: id });
-          }
-          navigation.pop();
+          creatingRangedData(expenseData);
         } else {
           // adding a new normal expense (no-editing, no-ranged)
-          console.log("no ranged Data detected");
-          // hotfix the date clock bug
-          expenseData.date = expenseData.startDate;
-
-          const item: OfflineQueueManageExpenseItem = {
-            type: "add",
-            expense: {
-              tripid: tripid,
-              uid: uid,
-              expenseData: expenseData,
-            },
-          };
-          const id = await storeExpenseOnlineOffline(item, isOnline);
-          expenseCtx.addExpense({ ...expenseData, id: id });
+          creatingNormalData(expenseData);
         }
       }
-      if (isOnline) await touchAllTravelers(tripid, true);
       await asyncStoreSetObject("expenses", expenseCtx.expenses);
+      console.log("expenses context length", expenseCtx.expenses.length);
+      if (isOnline) await touchAllTravelers(tripid, true);
       navigation.pop(2);
     } catch (error) {
       // setError("Could not save data - please try again later!" + error);

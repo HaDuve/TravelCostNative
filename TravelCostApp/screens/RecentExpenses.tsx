@@ -57,6 +57,7 @@ function RecentExpenses({ navigation }) {
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
+  const online = netCtx.isConnected;
 
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
@@ -81,21 +82,16 @@ function RecentExpenses({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = test_getExpenses.bind(this, true);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      console.log("focused");
-      setIsFocused(true);
-      setFirstFocus(true);
-      async function poll() {
-        const online = await getExpenses(true, true);
-      }
-      poll();
-      return () => {
-        console.log("unfocused");
-        setIsFocused(false);
-      };
-    }, [])
-  );
+  useEffect(() => {
+    const asyncLoading = async () => {
+      await expensesCtx.loadExpensesFromStorage();
+    };
+
+    asyncLoading();
+    if (online) {
+      test_getExpenses();
+    }
+  }, [netCtx.isConnected]);
 
   useEffect(() => {
     LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
@@ -132,11 +128,9 @@ function RecentExpenses({ navigation }) {
     const online = netCtx.isConnected;
     console.log("RecentExpenses ~ online:", online);
     if (!online) {
-      if (!firstFocus) return;
       // setIsFetching(true);
       await test_offlineLoad(expensesCtx, setRefreshing, setIsFetching);
       // setIsFetching(false);
-      setFirstFocus(false);
       return;
     }
     // checking isTouched or firstLoad

@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 
-export const useInterval = (callback, interval, immediate) => {
+export const useInterval = (callback, interval: number, immediate: boolean) => {
   const ref = useRef();
 
   // keep reference to callback without restarting the interval

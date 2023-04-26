@@ -1,7 +1,7 @@
 Change log Travel Expense App
 
 
-1.0.993
+1.0.994
 - added autocomplete suggestions to expense description (it gives suggestions based on your old description texts)
 - total budget is now optional
 - new expense starts from expense form now (skipping category pick screen)

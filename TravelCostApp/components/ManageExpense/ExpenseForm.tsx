@@ -1097,7 +1097,8 @@ const ExpenseForm = ({
             onPress={askChatGPTHandler}
             darkText
           >
-            {"Ask ChatGPT: Is this a good deal?"}
+            {isEditing && "Ask ChatGPT: Was this a good deal?"}
+            {!isEditing && "Ask ChatGPT: How much should I pay?"}
           </GradientButton>
         </View>
       </Animated.View>

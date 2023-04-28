@@ -970,12 +970,12 @@ const ExpenseForm = ({
                           style={[
                             GlobalStyles.strongShadow,
                             {
-                              flex: 1,
-                              minWidth: 100,
-                              maxWidth: 100,
-                              marginBottom: 16,
+                              // flex: 1,
+                              // minWidth: 150,
+                              // maxWidth: 100,
+                              marginBottom: 4,
                               borderWidth: 1,
-                              borderRadius: 16,
+                              borderRadius: 12,
                               padding: 8,
                               margin: 8,
                               backgroundColor:
@@ -990,17 +990,21 @@ const ExpenseForm = ({
                                 ? GlobalStyles.colors.textColor
                                 : GlobalStyles.colors.error500,
                               textAlign: "left",
-                              marginLeft: 12,
+                              marginLeft: 8,
                             }}
                           >
-                            {truncateString(itemData.item.userName, 15)}
+                            {truncateString(itemData.item.userName, 10)}
                           </Text>
                           {/* Horizontal container  */}
                           <View
                             style={{
                               flexDirection: "row",
-                              justifyContent: "flex-end",
+                              justifyContent: "flex-start",
                               alignItems: "flex-end",
+                              overflow: "visible",
+                              // borderWidth: 1,
+                              marginLeft: -16,
+                              marginRight: -8,
                             }}
                           >
                             <Input
@@ -1012,12 +1016,6 @@ const ExpenseForm = ({
                                 {
                                   backgroundColor:
                                     GlobalStyles.colors.backgroundColor,
-                                },
-                              ]}
-                              style={[
-                                styles.rowInput,
-                                {
-                                  minWidth: "25%",
                                 },
                               ]}
                               textInputConfig={{
@@ -1176,7 +1174,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
   },
-  rowInput: {},
   errorText: {
     textAlign: "center",
     color: GlobalStyles.colors.error500,

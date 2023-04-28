@@ -256,18 +256,32 @@ export async function calcOpenSplitsTable(
     for (const exp of expenses) {
       const expense: ExpenseData = exp;
       if (expense.splitType === "SELF" || !expense.splitList) continue;
+      console.log("rates:", rates);
       for (const split of expense.splitList) {
         if (split.userName !== expense.whoPaid) {
           // check if rate is already in rates
           if (!rates[expense.currency]) {
             // get rate
             try {
-              const rate = expense.calcAmount / expense.amount;
+              const rate = expense.amount / expense.calcAmount;
+              console.log("asyncSplitList ~ rate:", rate);
               rates[expense.currency] = rate;
-              split.amount = split.amount * rate;
+              console.log(
+                "asyncSplitList ~ expense.currency:",
+                expense.currency
+              );
+              split.amount = split.amount / rate;
+              console.log("asyncSplitList ~ split.amount:", split.amount);
             } catch (error) {
               console.error(error);
             }
+          } else {
+            split.amount = split.amount / rates[expense.currency];
+            console.log(
+              "asyncSplitList ~ rates[expense.currency]:",
+              rates[expense.currency]
+            );
+            console.log("asyncSplitList ~ split.amount:", split.amount);
           }
           split.whoPaid = expense.whoPaid;
           openSplits.push(split);

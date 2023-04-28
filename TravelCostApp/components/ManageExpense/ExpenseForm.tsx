@@ -92,7 +92,15 @@ const ExpenseForm = ({
   const expCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
   const alwaysShowAdvancedSetting = settings.alwaysShowAdvanced || isEditing;
-  const DEFAULTVALUES: ExpenseData = defaultValues;
+  const editingValues: ExpenseData = defaultValues;
+  const lastCurrency = userCtx.lastCurrency
+    ? userCtx.lastCurrency
+    : tripCtx.tripCurrency;
+  const currencyPlaceholder = isEditing
+    ? editingValues.currency +
+      " | " +
+      getSymbolFromCurrency(editingValues.currency)
+    : lastCurrency + " | " + getSymbolFromCurrency(lastCurrency);
 
   const [hideAdvanced, sethideAdvanced] = useState(true);
   const [countryValue, setCountryValue] = useState("EUR");
@@ -112,8 +120,8 @@ const ExpenseForm = ({
 
   useEffect(() => {
     async function setCatSymbolAsync() {
-      if (!defaultValues) return;
-      const cat = await getCatSymbolAsync(defaultValues.category);
+      if (!editingValues) return;
+      const cat = await getCatSymbolAsync(editingValues.category);
       setCatSymbol(cat);
     }
     setCatSymbolAsync();
@@ -146,15 +154,15 @@ const ExpenseForm = ({
   // datepicker states
   const [showDatePickerRange, setShowDatePickerRange] = useState(false);
   const [startDate, setStartDate] = useState(
-    defaultValues
+    editingValues
       ? getFormattedDate(
-          DateTime.fromJSDate(defaultValues.startDate).toJSDate()
+          DateTime.fromJSDate(editingValues.startDate).toJSDate()
         )
       : getFormattedDate(DateTime.now())
   );
   const [endDate, setEndDate] = useState(
-    defaultValues
-      ? getFormattedDate(DateTime.fromJSDate(defaultValues.endDate).toJSDate())
+    editingValues
+      ? getFormattedDate(DateTime.fromJSDate(editingValues.endDate).toJSDate())
       : getFormattedDate(DateTime.now())
   );
 
@@ -185,7 +193,7 @@ const ExpenseForm = ({
 
   // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
   const [duplOrSplit, setDuplOrSplit] = useState<number>(
-    defaultValues ? Number(defaultValues.duplOrSplit) : 0
+    editingValues ? Number(editingValues.duplOrSplit) : 0
   );
   const duplOrSplitString =
     duplOrSplit === 1
@@ -213,7 +221,7 @@ const ExpenseForm = ({
 
   // list of all splits owed
   const [splitList, setSplitList] = useState(
-    defaultValues ? defaultValues.splitList : []
+    editingValues ? editingValues.splitList : []
   );
   const [splitListValid, setSplitListValid] = useState(true);
 
@@ -230,7 +238,7 @@ const ExpenseForm = ({
   const [items, setItems] = useState(currentTravellersAsItems);
   const [open, setOpen] = useState(false);
   const [whoPaid, setWhoPaid] = useState(
-    defaultValues ? defaultValues.whoPaid : null
+    editingValues ? editingValues.whoPaid : null
   );
 
   // dropdown for split/owe picker
@@ -238,7 +246,7 @@ const ExpenseForm = ({
   const [splitItems, setSplitTypeItems] = useState(splitTypesItems);
   const [openSplitTypes, setOpenSplitTypes] = useState(false);
   const [splitType, setSplitType] = useState(
-    defaultValues ? defaultValues.splitType : null
+    editingValues ? editingValues.splitType : null
   );
 
   // dropdown for EQUAL share picker
@@ -247,54 +255,54 @@ const ExpenseForm = ({
   );
   const [openEQUAL, setOpenEQUAL] = useState(false);
   const [splitTravellersList, setListEQUAL] = useState(
-    defaultValues ? defaultValues.listEQUAL : currentTravellers
+    editingValues ? editingValues.listEQUAL : currentTravellers
   );
 
   const [inputs, setInputs] = useState({
     amount: {
-      value: defaultValues ? defaultValues.amount?.toString() : "",
+      value: editingValues ? editingValues.amount?.toString() : "",
       isValid: true,
     },
     date: {
-      value: defaultValues
-        ? getFormattedDate(defaultValues.date)
+      value: editingValues
+        ? getFormattedDate(editingValues.date)
         : getFormattedDate(DateTime.now().toJSDate()),
       isValid: true,
     },
     description: {
-      value: defaultValues ? defaultValues.description : "",
+      value: editingValues ? editingValues.description : "",
       isValid: true,
     },
     category: {
-      value: defaultValues
+      value: editingValues
         ? newCat
           ? pickedCat
-          : defaultValues.category
+          : editingValues.category
         : pickedCat,
       isValid: true,
     },
     country: {
-      value: defaultValues
-        ? defaultValues.country
+      value: editingValues
+        ? editingValues.country
         : userCtx.lastCountry
         ? userCtx.lastCountry
         : "",
       isValid: true,
     },
     currency: {
-      value: defaultValues
-        ? defaultValues.currency
+      value: editingValues
+        ? editingValues.currency
         : userCtx.lastCurrency
         ? userCtx.lastCurrency
         : tripCtx.tripCurrency,
       isValid: true,
     },
     whoPaid: {
-      value: defaultValues ? defaultValues.whoPaid : "",
+      value: editingValues ? editingValues.whoPaid : "",
       isValid: true,
     },
     owePerc: {
-      value: defaultValues ? defaultValues.owePerc?.toString() : "",
+      value: editingValues ? editingValues.owePerc?.toString() : "",
       isValid: true,
     },
   });
@@ -322,7 +330,7 @@ const ExpenseForm = ({
   function openTravellerMultiPicker() {
     console.log("splitType", splitType);
     // add whole traveling group who paid automatically to shared list
-    if (!defaultValues) {
+    if (!editingValues) {
       setListEQUAL([...currentTravellers]);
     }
     setOpenEQUAL(true);
@@ -486,9 +494,7 @@ const ExpenseForm = ({
       description: getCatString(pickedCat),
       category: pickedCat,
       country: userCtx.lastCountry ? userCtx.lastCountry : "",
-      currency: userCtx.lastCurrency
-        ? userCtx.lastCurrency
-        : tripCtx.tripCurrency,
+      currency: lastCurrency,
       whoPaid: userCtx.userName,
       owePerc: "0",
       splitType: "SELF",
@@ -623,9 +629,9 @@ const ExpenseForm = ({
               icon={
                 iconName
                   ? iconName
-                  : defaultValues
-                  ? defaultValues.iconName
-                    ? defaultValues.iconName
+                  : editingValues
+                  ? editingValues.iconName
+                    ? editingValues.iconName
                     : newCat
                     ? pickedCatSymbol
                     : defaultCatSymbol
@@ -703,13 +709,7 @@ const ExpenseForm = ({
                   countryValue={countryValue}
                   setCountryValue={setCountryValue}
                   onChangeValue={updateCurrency}
-                  placeholder={
-                    isEditing
-                      ? defaultValues.currency +
-                        " | " +
-                        getSymbolFromCurrency(defaultValues.currency)
-                      : null
-                  }
+                  placeholder={currencyPlaceholder}
                 ></CurrencyPicker>
               </View>
               <View style={[styles.inputsRowSecond]}>

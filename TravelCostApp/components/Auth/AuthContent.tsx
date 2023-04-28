@@ -1,5 +1,12 @@
 import { useState } from "react";
-import React, { Alert, StyleSheet, View, Text } from "react-native";
+import React, {
+  Alert,
+  StyleSheet,
+  View,
+  Text,
+  ScrollView,
+  KeyboardAvoidingView,
+} from "react-native";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -62,21 +69,25 @@ function AuthContent({ isLogin, onAuthenticate }) {
   }
 
   return (
-    <View style={styles.authContent}>
-      <AuthForm
-        isLogin={isLogin}
-        onSubmit={submitHandler}
-        credentialsInvalid={credentialsInvalid}
-      />
-      <View style={styles.buttons}>
-        <Text style={styles.secondaryText}>
-          {isLogin ? i18n.t("noAccountText") : i18n.t("alreadyAccountText")}
-        </Text>
-        <FlatButton onPress={switchAuthModeHandler}>
-          {isLogin ? i18n.t("createNewUser") : i18n.t("loginInstead")}
-        </FlatButton>
-      </View>
-    </View>
+    <KeyboardAvoidingView behavior={"position"}>
+      <ScrollView>
+        <View style={styles.authContent}>
+          <AuthForm
+            isLogin={isLogin}
+            onSubmit={submitHandler}
+            credentialsInvalid={credentialsInvalid}
+          />
+          <View style={styles.buttons}>
+            <Text style={styles.secondaryText}>
+              {isLogin ? i18n.t("noAccountText") : i18n.t("alreadyAccountText")}
+            </Text>
+            <FlatButton onPress={switchAuthModeHandler}>
+              {isLogin ? i18n.t("createNewUser") : i18n.t("loginInstead")}
+            </FlatButton>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -89,9 +100,9 @@ AuthContent.propType = {
 
 const styles = StyleSheet.create({
   authContent: {
-    padding: "6%",
-    marginTop: "10%",
-    marginBottom: "8%",
+    padding: "4%",
+    marginTop: "8%",
+    marginBottom: "10%",
     marginHorizontal: "6%",
 
     borderRadius: 8,

@@ -1,12 +1,6 @@
 import React from "react";
 import { useState, useContext, useEffect, useLayoutEffect } from "react";
-import {
-  View,
-  Text,
-  Alert,
-  KeyboardAvoidingView,
-  ScrollView,
-} from "react-native";
+import { View, Text, Alert, ScrollView } from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";

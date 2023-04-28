@@ -17,10 +17,8 @@ import { AuthContext } from "../store/auth-context";
 import { UserContext } from "../store/user-context";
 import { fetchUser, touchMyTraveler } from "../util/http";
 import { TripContext } from "../store/trip-context";
-import { asyncStoreSetItem, asyncStoreSetObject } from "../store/async-storage";
+import { asyncStoreSetItem } from "../store/async-storage";
 import Toast from "react-native-toast-message";
-import { KeyboardAvoidingView } from "react-native";
-import * as AppleAuthentication from "expo-apple-authentication";
 import Purchases from "react-native-purchases";
 import { API_KEY } from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
@@ -109,11 +107,7 @@ function LoginScreen() {
     return <LoadingOverlay message={i18n.t("loginLoadText")} />;
   }
 
-  return (
-    <KeyboardAvoidingView behavior={"position"}>
-      <AuthContent isLogin onAuthenticate={loginHandler} />
-    </KeyboardAvoidingView>
-  );
+  return <AuthContent isLogin onAuthenticate={loginHandler} />;
 }
 
 export default LoginScreen;

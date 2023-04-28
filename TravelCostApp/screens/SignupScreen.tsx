@@ -93,11 +93,7 @@ function SignupScreen() {
     return <LoadingOverlay message={i18n.t("createUserLoadText")} />;
   }
 
-  return (
-    <KeyboardAvoidingView behavior={"position"}>
-      <AuthContent isLogin={false} onAuthenticate={signupHandler} />
-    </KeyboardAvoidingView>
-  );
+  return <AuthContent isLogin={false} onAuthenticate={signupHandler} />;
 }
 
 export default SignupScreen;

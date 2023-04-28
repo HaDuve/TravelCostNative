@@ -1,5 +1,5 @@
 import { useContext, useLayoutEffect, useState, useCallback } from "react";
-import { Alert, KeyboardAvoidingView, StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import React from "react";
 import { ScrollView } from "react-native";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";

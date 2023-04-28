@@ -20,6 +20,7 @@ import {
   asyncStoreGetItem,
   asyncStoreSetItem,
 } from "../../store/async-storage";
+import GradientButton from "../UI/GradientButton";
 
 function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
   const [enteredEmail, setEnteredEmail] = useState("");
@@ -181,11 +182,11 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
         />
 
         <View style={styles.buttons}>
-          <Button onPress={submitHandler} style>
+          <GradientButton onPress={submitHandler}>
             {isLogin ? i18n.t("loginText") : i18n.t("createAccountText")}
-          </Button>
+          </GradientButton>
         </View>
-        <View style={styles.orTextContainer}>
+        <View style={styles.appleAuthContainer}>
           {AppleAuthenticationJSX}
           {/* <Pressable
             onPress={() => Alert.alert(i18n.t("signupComingSoonAlert"))}
@@ -211,20 +212,20 @@ AuthForm.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  form: {},
+  form: {
+    flex: 1,
+  },
   buttons: {
     marginTop: 12,
   },
   iconContainer: {
-    marginBottom: 24,
-    backgroundColor: GlobalStyles.colors.error300,
+    marginTop: "-12%",
+    marginBottom: "4%",
     alignItems: "center",
     justifyContent: "center",
     flex: 1,
   },
   titleContainer: {
-    minHeight: 80,
-    marginVertical: 18,
     alignItems: "center",
     justifyContent: "space-around",
   },
@@ -233,13 +234,15 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
     fontSize: 28,
     fontWeight: "bold",
+    marginBottom: "4%",
   },
   subTitleText: {
     textAlign: "center",
     color: GlobalStyles.colors.gray700,
     fontSize: 14,
+    marginBottom: "4%",
   },
-  orTextContainer: {
+  appleAuthContainer: {
     marginTop: "8%",
     justifyContent: "center",
     alignItems: "center",

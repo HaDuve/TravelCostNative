@@ -538,13 +538,16 @@ const ExpenseForm = ({
   function handleRecalculationSplits() {
     {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      const newSplitList = recalcSplitsForExact(splitList, inputs.amount.value);
+      const newSplitList = recalcSplitsForExact(
+        splitList,
+        +inputs.amount.value
+      );
 
       setSplitList(newSplitList);
       const isValidSplit = validateSplitList(
         newSplitList,
         splitType,
-        inputs.amount.value
+        +inputs.amount.value
       );
       setSplitListValid(isValidSplit);
       if (!isValidSplit) {
@@ -555,6 +558,53 @@ const ExpenseForm = ({
       }
     }
   }
+
+  const recalcJSX = splitType == "EXACT" && !splitListValid && (
+    <Animated.View
+      style={{
+        marginTop: -8,
+        paddingTop: 8,
+        marginLeft: 8,
+        // borderWidth: 1,
+        // center the content
+        flex: 1,
+        alignContent: "center",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+      entering={ZoomIn}
+      exiting={ZoomOut.duration(100)}
+    >
+      <Text style={styles.dateLabelDuplSplitText}>{"(Re)-Calculate"}</Text>
+      <IconButton
+        icon="ios-git-compare-outline"
+        color={GlobalStyles.colors.primary500}
+        onPressStyle={{ transform: [{ scale: 0.9 }] }}
+        buttonStyle={[
+          {
+            flex: 1,
+            flexDirection: "column",
+            alignContent: "center",
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: 8,
+            marginLeft: 4,
+            borderRadius: 8,
+            minHeight: 50,
+            minWidth: 90,
+            marginRight: 8,
+            backgroundColor: GlobalStyles.colors.backgroundColor,
+            borderWidth: 1,
+            borderColor: GlobalStyles.colors.gray700,
+          },
+          GlobalStyles.strongShadow,
+        ]}
+        size={44}
+        onPress={() => handleRecalculationSplits()}
+        onLongPress={() => resetSplitHandler()}
+      />
+    </Animated.View>
+  );
 
   const advancedSubmitHandler = hideAdvanced ? fastSubmit : submitHandler;
 
@@ -625,7 +675,7 @@ const ExpenseForm = ({
               // autoFocus={true}
             />
             <IconButton
-              buttonStyle={[styles.iconButton, GlobalStyles.shadow]}
+              buttonStyle={[styles.iconButton, GlobalStyles.strongShadow]}
               icon={
                 iconName
                   ? iconName
@@ -899,45 +949,6 @@ const ExpenseForm = ({
                       {i18n.t("whoShared")}
                     </Text>
                   )}
-                {splitType == "EXACT" && !splitListValid && (
-                  <Animated.View
-                    style={{
-                      marginTop: 8,
-                      marginLeft: 8,
-                    }}
-                    entering={ZoomIn}
-                    exiting={ZoomOut.duration(100)}
-                  >
-                    <Text style={styles.dateLabelDuplSplitText}>
-                      {"(Re)-Calculate"}
-                    </Text>
-                    <IconButton
-                      icon="ios-git-compare-outline"
-                      color={GlobalStyles.colors.primary500}
-                      onPressStyle={{ transform: [{ scale: 0.9 }] }}
-                      buttonStyle={[
-                        {
-                          flexDirection: "column",
-                          alignContent: "center",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          marginLeft: 16,
-                          marginTop: 4,
-                          marginBottom: 8,
-                          borderRadius: 8,
-                          backgroundColor: GlobalStyles.colors.backgroundColor,
-                          padding: 12,
-                          borderWidth: 1,
-                          borderColor: GlobalStyles.colors.primary500,
-                        },
-                        GlobalStyles.strongShadow,
-                      ]}
-                      size={24}
-                      onPress={() => handleRecalculationSplits()}
-                      onLongPress={() => resetSplitHandler()}
-                    />
-                  </Animated.View>
-                )}
               </View>
 
               {!splitTypeSelf && (
@@ -962,6 +973,7 @@ const ExpenseForm = ({
                       alignItems: "flex-start",
                       overflow: "visible",
                     }}
+                    ListHeaderComponent={recalcJSX}
                     ListFooterComponent={<View style={{ width: 100 }}></View>}
                     renderItem={(itemData) => {
                       const splitValue = itemData.item.amount.toString();
@@ -971,9 +983,10 @@ const ExpenseForm = ({
                             GlobalStyles.strongShadow,
                             {
                               // flex: 1,
-                              // minWidth: 150,
+                              minWidth: 100,
                               // maxWidth: 100,
-                              marginBottom: 4,
+                              marginTop: 14,
+                              marginBottom: 8,
                               borderWidth: 1,
                               borderRadius: 12,
                               padding: 8,
@@ -981,6 +994,10 @@ const ExpenseForm = ({
                               backgroundColor:
                                 GlobalStyles.colors.backgroundColor,
                               borderColor: GlobalStyles.colors.gray700,
+                              //centering content
+                              justifyContent: "center",
+                              alignItems: "center",
+                              overflow: "visible",
                             },
                           ]}
                         >
@@ -991,6 +1008,8 @@ const ExpenseForm = ({
                                 : GlobalStyles.colors.error500,
                               textAlign: "left",
                               marginLeft: 8,
+                              paddingTop: 2,
+                              marginBottom: -16,
                             }}
                           >
                             {truncateString(itemData.item.userName, 10)}
@@ -1108,16 +1127,10 @@ const styles = StyleSheet.create({
   iconButton: {
     borderWidth: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderColor: GlobalStyles.colors.gray600,
+    borderColor: GlobalStyles.colors.gray700,
     borderRadius: 8,
     padding: 8,
     margin: 8,
-    //shadow
-    elevation: 4,
-    shadowColor: "#002A22",
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 1.3,
   },
   descriptionContainer: {
     flex: 1,

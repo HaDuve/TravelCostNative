@@ -608,6 +608,15 @@ const ExpenseForm = ({
 
   const advancedSubmitHandler = hideAdvanced ? fastSubmit : submitHandler;
 
+  const askChatGPTHandler = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // const result = await askChatGPT(inputs.description.value);
+    Alert.alert(
+      "Sorry!",
+      "This feature is not yet available. Please check back later!"
+    );
+  };
+
   function updateCurrency() {
     // split the countryValue into country and currency
     const currency = countryValue.split("- ")[1].split(" ")[0].trim();
@@ -1081,6 +1090,16 @@ const ExpenseForm = ({
             {submitButtonLabel}
           </GradientButton>
         </View>
+        <View style={styles.buttonContainer}>
+          <GradientButton
+            style={[styles.button, { marginTop: 28, minWidth: "80%" }]}
+            colors={GlobalStyles.gradientColorsButton}
+            onPress={askChatGPTHandler}
+            darkText
+          >
+            {"Ask ChatGPT: Is this a good deal?"}
+          </GradientButton>
+        </View>
       </Animated.View>
     </Animated.View>
   );
@@ -1214,6 +1233,7 @@ const styles = StyleSheet.create({
   button: {
     minWidth: 200,
     marginHorizontal: 0,
+    marginVertical: 4,
   },
   advancedText: {
     marginTop: 9,

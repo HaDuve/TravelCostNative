@@ -157,8 +157,8 @@ const ManageExpense = ({ route, navigation }) => {
     if (expenseData.duplOrSplit === 2) {
       const splitCalcAmount = expenseData.calcAmount / (days + 1);
       expenseData.calcAmount = Number(splitCalcAmount.toFixed(2));
-      const splitAmount = expenseData.amount / (days + 1);
-      expenseData.amount = Number(splitAmount.toFixed(2));
+      const splitDaysAmount = expenseData.amount / (days + 1);
+      expenseData.amount = Number(splitDaysAmount.toFixed(2));
     }
 
     // iterate over number of days between and change date and endDate to the first date + iterator
@@ -246,6 +246,7 @@ const ManageExpense = ({ route, navigation }) => {
   async function confirmHandler(expenseData: ExpenseData) {
     console.log("confirmHandler ~ expenseData:", expenseData);
     setIsSubmitting(true);
+    navigation.pop(2);
     try {
       // set the category to the corresponting catstring
       expenseData.categoryString = getCatString(expenseData.category);
@@ -298,7 +299,6 @@ const ManageExpense = ({ route, navigation }) => {
       await asyncStoreSetObject("expenses", expenseCtx.expenses);
       console.log("expenses context length", expenseCtx.expenses.length);
       if (isOnline) await touchAllTravelers(tripid, true);
-      navigation.pop(2);
     } catch (error) {
       // setError("Could not save data - please try again later!" + error);
       console.error(error);

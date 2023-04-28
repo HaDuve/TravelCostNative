@@ -42,7 +42,6 @@ function ExpenseItem(props): JSX.Element {
     description,
     amount,
     date,
-    startDate,
     category,
     country,
     whoPaid,
@@ -240,7 +239,6 @@ ExpenseItem.propTypes = {
   calcAmount: PropTypes.number.isRequired,
   splitList: PropTypes.array,
   iconName: PropTypes.string,
-  startDate: PropTypes.object,
   showSumForTravellerName: PropTypes.string,
 };
 

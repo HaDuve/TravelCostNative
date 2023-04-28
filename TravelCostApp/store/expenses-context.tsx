@@ -114,6 +114,10 @@ function expensesReducer(state: ExpenseData[], action) {
 function ExpensesContextProvider({ children }) {
   const [expensesState, dispatch] = useReducer(expensesReducer, []);
 
+  useEffect(() => {
+    loadExpensesFromStorage();
+  }, []);
+
   function addExpense(expenseData: ExpenseData) {
     dispatch({ type: "ADD", payload: expenseData });
   }

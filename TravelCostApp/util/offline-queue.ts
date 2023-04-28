@@ -4,7 +4,12 @@ import {
   asyncStoreSetObject,
 } from "../store/async-storage";
 import { Expense } from "./expense";
-import { storeExpense, updateExpense, deleteExpense } from "./http";
+import {
+  storeExpense,
+  updateExpense,
+  deleteExpense,
+  touchAllTravelers,
+} from "./http";
 import Toast from "react-native-toast-message";
 import * as Device from "expo-device";
 import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
@@ -223,11 +228,13 @@ export const sendOfflineQueue = async () => {
       return;
     }
     // for each OfflineQueueManageExpenseItem in queue activate
+    let tripid = "";
     for (let i = 0; i < queue.length; i++) {
       const item = queue[i];
+      tripid = item.expense.tripid;
+      await touchAllTravelers(tripid, true);
       console.log("sendOfflineQueue ~ item:", item);
       console.log("sendOfflineQueue ~ item.type:", item.type);
-
       if (item.type === "add") {
         await storeExpense(
           item.expense.tripid,
@@ -251,8 +258,10 @@ export const sendOfflineQueue = async () => {
         console.log("unknown type");
       }
     }
+
     // clear queue
     await asyncStoreSetObject("offlineQueue", []);
+
     Toast.show({
       type: "success",
       text1: "Online again!",

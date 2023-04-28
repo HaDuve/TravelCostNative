@@ -55,7 +55,7 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 import ManageCategoryScreen from "./screens/ManageCategoryScreen";
 import ToastComponent from "./components/UI/ToastComponent";
-import { DEBUG_RESET, DEBUG_POLLING_INTERVAL } from "./confAppConstants";
+import { DEBUG_RESET, DEBUG_POLLING_INTERVAL, DEV } from "./confAppConstants";
 import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
 import Toast from "react-native-toast-message";
 import { useInterval } from "./components/Hooks/useInterval";
@@ -75,6 +75,8 @@ import RatingModal from "./screens/RatingModal";
 import NetworkContextProvider, {
   NetworkContext,
 } from "./store/network-context";
+import { Text } from "react-native-paper";
+import ConnectionBar from "./components/UI/ConnectionBar";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -282,7 +284,7 @@ function Home() {
       initialRouteName={FirstScreen}
       backBehavior={"history"}
       tabBarPosition={"bottom"}
-      // tabBar={(props) => <BottomTabsBar {...props} />}
+      // tabBar={(props) => <TabBar {...props} />}
       screenOptions={({ navigation }) => ({
         headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
         headerTintColor: GlobalStyles.colors.backgroundColor,
@@ -406,7 +408,7 @@ function Root() {
       //   const length = expenses ? expenses.length : 0;
       //   expenses ? console.log(" ~~~~~  asyncLength ~ length:", length) : null;
       // }
-      if (isForeground() && authCtx.isAuthenticated) {
+      if (isForeground() && authCtx.isAuthenticated && netCtx.isConnected) {
         const asyncQueue = async () => {
           await sendOfflineQueue();
         };
@@ -506,15 +508,6 @@ function Root() {
       // );
 
       if (storedToken) {
-        //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
-        // check if user is online
-        if (!online) {
-          console.log("OFFLINE SETUP STARTED");
-          await setupOfflineMount(true, storedToken);
-          console.log("OFFLINE SETUP FINISHED");
-          setAppIsReady(true);
-          return;
-        }
         // setup purchases
         if (Platform.OS === "android") {
           // Purchases
@@ -527,6 +520,17 @@ function Root() {
           Purchases.configure({ apiKey: API_KEY, appUserID: storedUid });
           console.log("onRootMount ~ storedUid:", storedUid);
         }
+
+        //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
+        // check if user is online
+        if (!online) {
+          console.log("OFFLINE SETUP STARTED");
+          await setupOfflineMount(true, storedToken);
+          console.log("OFFLINE SETUP FINISHED");
+          setAppIsReady(true);
+          return;
+        }
+
         // set tripId in context
         let tripData;
         if (storedTripId) {
@@ -675,6 +679,7 @@ export default function App() {
                           {...{ borderRadius: 16, key: "settings" }}
                         >
                           <Root />
+                          {DEV && <ConnectionBar />}
                           <ToastComponent />
                         </TourGuideProvider>
                       </ExpensesContextProvider>

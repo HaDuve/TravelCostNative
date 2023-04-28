@@ -19,6 +19,7 @@ const DatePickerContainer = ({
           size={32}
           color={GlobalStyles.colors.primary500}
           onPress={openDatePickerRange}
+          buttonStyle={styles.buttonContainer}
         />
       </View>
       <View style={{ flexDirection: "row" }}>
@@ -52,6 +53,21 @@ DatePickerContainer.propTypes = {
 const styles = StyleSheet.create({
   dateIconContainer: {
     marginLeft: "2.5%",
+  },
+  buttonContainer: {
+    margin: 4,
+    padding: 4,
+    borderWidth: 1,
+
+    borderColor: GlobalStyles.colors.gray700,
+    borderRadius: 5,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    // shadow
+    elevation: 4,
+    shadowColor: "#002A22",
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 1.3,
   },
   dateContainer: {
     flexDirection: "row",

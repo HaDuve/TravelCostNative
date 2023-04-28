@@ -1114,10 +1114,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 8,
     margin: 8,
-    elevation: 3,
-    shadowColor: GlobalStyles.colors.gray600,
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.75,
+    //shadow
+    elevation: 4,
+    shadowColor: "#002A22",
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 1.3,
   },
   descriptionContainer: {
     flex: 1,

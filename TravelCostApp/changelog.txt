@@ -1,6 +1,19 @@
 Change log Travel Expense App
 
 
+1.0.0
+- made skipping the category screen optional (Settings)
+- improved user experience in Login Screen
+- improved user experience in Expense Form
+- improved button styling for icon buttons (Expense Form)
+- improved re-calculate button styling and position (Expense Form)
+- fixed clipping of splits input (Expense Form)
+- fixed singleton instance of revenue cat bug (Annoying toast is gone)
+- fixed offline expenses getting lost again (Offline mode)
+- fixed long loading screen even after having loaded fast (App start)
+- fixed wrong exchange rate calculations (Split summary)
+
+
 1.0.994
 - added autocomplete suggestions to expense description (it gives suggestions based on your old description texts)
 - total budget is now optional

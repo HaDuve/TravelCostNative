@@ -163,9 +163,9 @@ function RecentExpenses({ navigation }) {
   if (error && !isFetching) {
     return <ErrorOverlay message={error} onConfirm={errorHandler} />;
   }
-  if (isFetching) {
-    return <LoadingOverlay />;
-  }
+  // if (isFetching) {
+  //   return <LoadingOverlay />;
+  // }
 
   let recentExpenses: Array<ExpenseData> = [];
   recentExpenses = expensesCtx.getRecentExpenses(PeriodValue);

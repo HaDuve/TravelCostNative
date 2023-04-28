@@ -121,15 +121,8 @@ const ExpenseForm = ({
   }, []);
 
   const [pickedCatSymbol, setCatSymbolPicked] = useState(
-    pickedCat ? pickedCat : ""
+    pickedCat ? getCatSymbol(pickedCat) : ""
   );
-  useEffect(() => {
-    async function setCatSymbolAsync() {
-      const cat = await getCatSymbol(pickedCat);
-      setCatSymbolPicked(cat);
-    }
-    setCatSymbolAsync();
-  }, []);
 
   useEffect(() => {
     async function setTravellers() {
@@ -626,7 +619,7 @@ const ExpenseForm = ({
               // autoFocus={true}
             />
             <IconButton
-              buttonStyle={{ padding: "4%" }}
+              buttonStyle={[styles.iconButton, GlobalStyles.shadow]}
               icon={
                 iconName
                   ? iconName
@@ -1113,6 +1106,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.75,
     // justifyContent: "space-around",
     // alignContent: "stretch",
+  },
+  iconButton: {
+    borderWidth: 1,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderColor: GlobalStyles.colors.gray600,
+    borderRadius: 8,
+    padding: 8,
+    margin: 8,
+    elevation: 3,
+    shadowColor: GlobalStyles.colors.gray600,
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 0.75,
   },
   descriptionContainer: {
     flex: 1,

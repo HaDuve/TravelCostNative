@@ -13,6 +13,9 @@ const SettingsSection = ({ multiTraveller }) => {
   const [alwaysShowAdvanced, setAlwaysShowAdvanced] = useState(
     settings.alwaysShowAdvanced
   );
+  const [skipCategoryPickScreen, setSkipCategoryPickScreen] = useState(
+    settings.skipCategoryScreen
+  );
 
   const toggleShowFlags = () => {
     const newSettings = { ...settings, showFlags: !showFlags };
@@ -34,12 +37,25 @@ const SettingsSection = ({ multiTraveller }) => {
     setAlwaysShowAdvanced(!alwaysShowAdvanced);
     saveSettings(newSettings);
   };
-
+  const toggleSkipCategoryPickScreen = () => {
+    const newSettings = {
+      ...settings,
+      skipCategoryScreen: !skipCategoryPickScreen,
+    };
+    setSkipCategoryPickScreen(!skipCategoryPickScreen);
+    saveSettings(newSettings);
+  };
   return (
     <View>
       {/* <View style={styles.switchContainer}>
         <Text style={GlobalStyles.secondaryText}>Show Flags icons</Text>
         <Switch onValueChange={toggleShowFlags} value={showFlags} /> */}
+      <SettingsSwitch
+        label="Skip Category Picker"
+        style={styles.switchContainer}
+        state={skipCategoryPickScreen}
+        toggleState={toggleSkipCategoryPickScreen}
+      />
       <SettingsSwitch
         label="Always show more options"
         style={styles.switchContainer}

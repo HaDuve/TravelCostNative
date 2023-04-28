@@ -18,16 +18,17 @@ import { TourGuideZone } from "rn-tourguide";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../../i18n/supportedLanguages";
-import ToggleButton from "../../assets/SVG/toggleButton";
-import PropTypes from "prop-types";
-import { LinearGradient } from "expo-linear-gradient";
-import { NetworkContext } from "../../store/network-context";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
+import PropTypes from "prop-types";
+import { SettingsContext } from "../../store/settings-context";
+
 const AddExpenseButton = ({ navigation }) => {
+  const { settings } = useContext(SettingsContext);
+  const skipCatScreen = settings.skipCategoryScreen;
   return (
     <Animated.View
       style={styles.margin}
@@ -49,9 +50,11 @@ const AddExpenseButton = ({ navigation }) => {
         ]}
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          navigation.navigate("ManageExpense", {
-            pickedCat: "other",
-          });
+          skipCatScreen &&
+            navigation.navigate("ManageExpense", {
+              pickedCat: "undefined",
+            });
+          !skipCatScreen && navigation.navigate("CategoryPick");
         }}
       >
         <Ionicons name={"add-outline"} size={42} color={"white"} />

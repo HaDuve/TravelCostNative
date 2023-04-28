@@ -35,6 +35,8 @@ export function getCatSymbol(cat: string) {
       return "basket-outline";
     case "traveller":
       return "happy-outline";
+    case "undefined":
+      return "help-outline";
 
     // TODO: change this hotfix for GMR categories to real new categories (dynamically added)
     case "ANREISE":
@@ -91,6 +93,8 @@ export function getCatString(cat: string) {
       return i18n.t("catAccoString");
     case "other":
       return i18n.t("catOtherString");
+    case "undefined":
+      return "Undefined";
     default: {
       return cat;
     }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { StyleSheet, Modal, TextInput, View, Text } from "react-native";
 
 import React from "react";
@@ -13,6 +14,7 @@ import { en, de, fr } from "../../i18n/supportedLanguages";
 import LoadingOverlay from "../UI/LoadingOverlay";
 import * as Haptics from "expo-haptics";
 import getSymbolFromCurrency from "currency-symbol-map";
+import PropTypes from "prop-types";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
@@ -26,11 +28,12 @@ const CurrencyPicker = ({
 }) => {
   // Users Device CountryCode CC to translate Country names in picker
   // enforce a language we have registered, otherwise, english
-  var CC = Localization.locale.slice(0, 2);
+  let CC = Localization.locale.slice(0, 2);
   if (CC !== "de" && CC !== "en") CC = "en";
+  // const CC = "en";
 
   const countryToCurrency = require("country-to-currency");
-  var countries = require("i18n-iso-countries");
+  const countries = require("i18n-iso-countries");
   i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/en.json"));
   i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/de.json"));
 
@@ -93,6 +96,13 @@ const CurrencyPicker = ({
 };
 
 export default CurrencyPicker;
+
+CurrencyPicker.propTypes = {
+  countryValue: PropTypes.string.isRequired,
+  setCountryValue: PropTypes.func.isRequired,
+  onChangeValue: PropTypes.func.isRequired,
+  placeholder: PropTypes.string,
+};
 
 const styles = StyleSheet.create({
   container: { flex: 1, margin: 10 },

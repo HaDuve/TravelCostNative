@@ -1,5 +1,4 @@
 import React, { createContext, useEffect, useState } from "react";
-import { loadSettings } from "../components/UI/SettingsSection";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SplashScreenOverlay from "../components/UI/SplashScreenOverlay";
 import PropTypes from "prop-types";
@@ -8,6 +7,7 @@ export interface Settings {
   showFlags: boolean;
   showWhoPaid: boolean;
   alwaysShowAdvanced: boolean;
+  skipCategoryScreen: boolean;
 }
 
 export const SettingsContext = createContext({
@@ -32,6 +32,8 @@ export const SettingsProvider = ({ children }) => {
         setSettings({
           showFlags: false,
           showWhoPaid: false,
+          alwaysShowAdvanced: false,
+          skipCategoryScreen: false,
         });
     };
     loadSettingsAsync();

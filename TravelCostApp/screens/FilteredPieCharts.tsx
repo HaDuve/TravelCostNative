@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import { useState } from "react";
 import PropTypes from "prop-types";
 import Animated, {
@@ -14,6 +14,11 @@ import Animated, {
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import IconButton from "../components/UI/IconButton";
 import * as Haptics from "expo-haptics";
 import { GlobalStyles } from "../constants/styles";
@@ -24,13 +29,11 @@ import ExpenseCountries from "../components/ExpensesOutput/ExpenseStatistics/Exp
 import ExpenseCurrencies from "../components/ExpensesOutput/ExpenseStatistics/ExpenseCurrencies";
 import FlatButton from "../components/UI/FlatButton";
 import FilteredExpenses from "./FilteredExpenses";
-const i18n = new I18n({ en, de, fr });
-i18n.locale = Localization.locale.slice(0, 2);
-i18n.enableFallback = true;
-// i18n.locale = "en";
+import { UserContext } from "../store/user-context";
 
 const FilteredPieCharts = ({ navigation, route }) => {
   const { expenses, dayString } = route.params;
+  const userCtx = useContext(UserContext);
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
   // contents and titleStrings have to match in legth and correspond!
   const titleStrings = [
@@ -75,15 +78,27 @@ const FilteredPieCharts = ({ navigation, route }) => {
     throw new Error("Lengths do not match");
   const CONTENTS_MAX_INDEX = titleStrings.length - 1;
 
-  const nextHandler = () => {
+  const nextHandler = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const isPremium = await userCtx.checkPremium();
+    if (!isPremium) {
+      navigation.navigate("Paywall");
+      return;
+    }
     setToggleGraphEnum(
       toggleGraphEnum == CONTENTS_MAX_INDEX ? 0 : toggleGraphEnum + 1
     );
   };
 
-  const previousHandler = () => {
+  const previousHandler = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    const isPremium = await userCtx.checkPremium();
+    if (!isPremium) {
+      navigation.navigate("Paywall");
+      return;
+    }
+
     setToggleGraphEnum(
       toggleGraphEnum == 0 ? CONTENTS_MAX_INDEX : toggleGraphEnum - 1
     );

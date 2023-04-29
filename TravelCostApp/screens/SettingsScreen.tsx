@@ -187,7 +187,12 @@ const SettingsScreen = ({ navigation }) => {
 
       {multiTraveller && (
         <GradientButton
-          onPress={() => {
+          onPress={async () => {
+            const isPremium = await userCtx.checkPremium();
+            if (!isPremium) {
+              navigation.navigate("Paywall");
+              return;
+            }
             navigation.navigate("SplitSummary", { tripid: tripCtx.tripid });
           }}
           style={styles.settingsButton}
@@ -216,8 +221,13 @@ const SettingsScreen = ({ navigation }) => {
         colors={GlobalStyles.gradientColorsButton}
         onPress={() => {
           console.log("pressed premium button");
-          if (premiumStatus) navigation.navigate("Profile");
-          else navigation.navigate("Paywall");
+          if (premiumStatus) {
+            Toast.show({
+              type: "success",
+              text1: "Premium Nomad", //i18n.t("premiumToastTitle"),
+              text2: "You are a premium Nomad already!", //i18n.t("premiumToastText"),
+            });
+          } else navigation.navigate("Paywall");
         }}
       >
         {premiumButtonString}
@@ -246,7 +256,6 @@ SettingsScreen.propTypes = {
 const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: "row",
-
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: "2%",

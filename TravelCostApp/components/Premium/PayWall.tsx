@@ -12,9 +12,7 @@ import Purchases from "react-native-purchases";
 import { GlobalStyles } from "../../constants/styles";
 import PackageItem from "../Premium/PackageItem";
 import BackgroundGradient from "../UI/BackgroundGradient";
-import Button from "../UI/Button";
 import FlatButton from "../UI/FlatButton";
-import LoadingOverlay from "../UI/LoadingOverlay";
 import PropTypes from "prop-types";
 
 const PaywallScreen = ({ navigation }) => {
@@ -54,8 +52,9 @@ const PaywallScreen = ({ navigation }) => {
       <View
         style={{
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "flex-start",
           margin: "2%",
+          marginBottom: "-15%",
         }}
       >
         {/* Image of icon2.png scaled to 10% of screenheight */}
@@ -81,8 +80,17 @@ const PaywallScreen = ({ navigation }) => {
       </View>
       <Text style={styles.headerTitleText}>Go Pro!</Text>
       <Text style={styles.headerSubtitleText}>
-        Enjoy customizable Categories, Alerts, personalized budgeting Advice and
-        advanced Reports and Analytics.
+        {
+          "Enjoy these additional features:" +
+            "\n\n✓ Customizable Categories" +
+            "\n✓ Detailed Split Summaries " +
+            "\n✓ More advanced Charts" +
+            "\n✓ Interactive Analytics"
+          // "\n✓  Unlimited Budgets" +
+          // "\n✓  Unlimited Expenses" +
+          // "\n\n   Features coming soon:" +
+          // "\n + ChatGPT Deal-Check \n"
+        }
       </Text>
     </View>
   );
@@ -158,7 +166,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.primary700,
   },
   headerSubtitleText: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: "300",
     textAlign: "center",
     paddingHorizontal: 24,

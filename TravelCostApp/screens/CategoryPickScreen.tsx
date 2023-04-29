@@ -42,6 +42,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
 
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
+  const userCtx = useContext(UserContext);
 
   const isOnline = netCtx.isConnected;
   const tripid = tripCtx.tripid;
@@ -161,6 +162,12 @@ const CategoryPickScreen = ({ route, navigation }) => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     // setIsShaking(false);
     if (item.cat === "newCat") {
+      const isPremium = await userCtx.checkPremium();
+
+      if (!isPremium) {
+        navigation.navigate("Paywall");
+        return;
+      }
       navigation.navigate("ManageCategory");
     } else {
       navigation.navigate("ManageExpense", {

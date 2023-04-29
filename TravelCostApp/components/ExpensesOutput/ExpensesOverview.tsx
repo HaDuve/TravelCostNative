@@ -74,8 +74,14 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
               isGraphNotPie ? "play-skip-back-outline" : "chevron-back-outline"
             }
             size={24}
-            onPress={() => {
+            onPress={async () => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              const isPremium = await userCtx.checkPremium();
+
+              if (!isPremium) {
+                navigation.navigate("Paywall");
+                return;
+              }
               if (isGraphNotPie) {
                 setPeriodRangeNumber(MIN_PERIOD_RANGE);
                 //   periodRangeNumber == MIN_PERIOD_RANGE
@@ -133,8 +139,13 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
               isGraphNotPie ? "add-circle-outline" : "chevron-forward-outline"
             }
             size={24}
-            onPress={() => {
+            onPress={async () => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              const isPremium = await userCtx.checkPremium();
+              if (!isPremium) {
+                navigation.navigate("Paywall");
+                return;
+              }
               if (isGraphNotPie) {
                 setPeriodRangeNumber(
                   periodRangeNumber == MAX_PERIOD_RANGE

@@ -1,14 +1,14 @@
 {
   "configVersion": 0,
   "apple": {
-    "version": "1.1.000",
+    "version": "1.0",
     "copyright": "2023 Hannes Duve",
     "release": {
       "automaticRelease": false
     },
     "info": {
-      "en-US": {
-        "description": "Easy, fun and fast to use\nGet a great overview with dynamic Charts and Diagrams\nClassic and modern design\nAutomatic Currency Conversion\nInvite Friends & Family to share the trip with\nShare Costs and simplify transactions\nWorks Online and Offline",
+      "de-DE": {
+        "description": "Easy, fun and fast to use\nGet a great overview with dynamic Charts and Diagrams\nClassic and modern design\nAutomatic Currency Conversion\nInvite Friends & Family to share the trip with\nShare Costs and simplify transactions\nWorks Online and Offline\n\n*** A 2$ purchase will be applied to your iTunes account at the end of the 1 week trial. Subscriptions will automatically renew unless canceled within 24-hours before the end of the current period. You can cancel anytime with your iTunes account settings. Any unused portion of a free trial will be forfeited if you purchase a subscription. For more information, see our ToS and Privacy Policy. ***",
         "keywords": [
           "budget",
           "travel",
@@ -22,9 +22,30 @@
           "backpack",
           "finance"
         ],
-        "promoText": "Travel on a budget without compromising on quality.  Start your journey and keep track on your expenses with Budget for Nomads now!",
+        "promoText": "Travel with friends on a budget without compromising on quality.  Start your journey and keep track on your expenses with Budget for Nomads now!",
         "supportUrl": "https://foodfornomads.com/",
-        "title": "Budget for Nomads"
+        "title": "Budget for Nomads",
+        "privacyPolicyUrl": "https://foodfornomads.com/datenschutzerklaerung/"
+      },
+      "en-US": {
+        "description": "Easy, fun and fast to use\nGet a great overview with dynamic Charts and Diagrams\nClassic and modern design\nAutomatic Currency Conversion\nInvite Friends & Family to share the trip with\nShare Costs and simplify transactions\nWorks Online and Offline\n\n*** A 2$ purchase will be applied to your iTunes account at the end of the 1 week trial. Subscriptions will automatically renew unless canceled within 24-hours before the end of the current period. You can cancel anytime with your iTunes account settings. Any unused portion of a free trial will be forfeited if you purchase a subscription. For more information, see our ToS and Privacy Policy. ***",
+        "keywords": [
+          "budget",
+          "travel",
+          "expense",
+          "tracker",
+          "cost",
+          "money",
+          "split",
+          "splid",
+          "splitwise",
+          "backpack",
+          "finance"
+        ],
+        "promoText": "Travel with friends on a budget without compromising on quality.  Start your journey and keep track on your expenses with Budget for Nomads now!",
+        "supportUrl": "https://foodfornomads.com/",
+        "title": "Budget for Nomads",
+        "privacyPolicyUrl": "https://foodfornomads.com/datenschutzerklaerung/"
       }
     },
     "categories": [

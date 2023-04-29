@@ -7,6 +7,8 @@ import {
   StyleSheet,
   Image,
   ActivityIndicator,
+  TouchableOpacity,
+  Linking,
 } from "react-native";
 import Purchases from "react-native-purchases";
 import { GlobalStyles } from "../../constants/styles";
@@ -54,7 +56,7 @@ const PaywallScreen = ({ navigation }) => {
           alignItems: "center",
           justifyContent: "flex-start",
           margin: "2%",
-          marginBottom: "-15%",
+          marginBottom: "-28%",
         }}
       >
         {/* Image of icon2.png scaled to 10% of screenheight */}
@@ -62,10 +64,11 @@ const PaywallScreen = ({ navigation }) => {
           source={require("../../assets/icon2.png")}
           style={[
             {
-              width: "40%",
-              height: "40%",
+              width: "48%",
+              height: "48%",
               resizeMode: "contain",
               margin: "2%",
+              marginTop: "-4%",
             },
             GlobalStyles.shadowPrimary,
             { overflow: "visible" },
@@ -85,7 +88,8 @@ const PaywallScreen = ({ navigation }) => {
             "\n\n✓ Customizable Categories" +
             "\n✓ Detailed Split Summaries " +
             "\n✓ More advanced Charts" +
-            "\n✓ Interactive Analytics"
+            "\n✓ Interactive Analytics" +
+            "\n\n Start with a 1 Week free Trial."
           // "\n✓  Unlimited Budgets" +
           // "\n✓  Unlimited Expenses" +
           // "\n\n   Features coming soon:" +
@@ -101,10 +105,39 @@ const PaywallScreen = ({ navigation }) => {
     // );
     return (
       <View>
-        <View style={{ margin: "2%", marginBottom: "4%" }}>
-          <Text style={styles.footerText}>
-            By purchasing, you agree to the Terms of Use and Privacy Policy.
-          </Text>
+        <View
+          style={{
+            flexDirection: "row",
+            alignContent: "center",
+            justifyContent: "center",
+          }}
+        >
+          {/* <Text style={styles.footerText}>
+            By purchasing, you agree to the{" "}
+          </Text> */}
+          <TouchableOpacity
+            onPress={() =>
+              Linking.openURL(
+                "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
+              )
+            }
+          >
+            <Text style={[styles.footerText, { color: "blue" }]}>
+              Terms of Service
+            </Text>
+          </TouchableOpacity>
+          <Text style={styles.footerText}>and </Text>
+          <TouchableOpacity
+            onPress={() =>
+              Linking.openURL(
+                "https://foodfornomads.com/datenschutzerklaerung/"
+              )
+            }
+          >
+            <Text style={[styles.footerText, { color: "blue" }]}>
+              Privacy Policy.
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -161,6 +194,7 @@ const styles = StyleSheet.create({
   headerTitleText: {
     fontSize: 64,
     padding: "2%",
+    marginTop: "-10%",
     fontWeight: "bold",
     textAlign: "center",
     color: GlobalStyles.colors.primary700,
@@ -170,6 +204,7 @@ const styles = StyleSheet.create({
     fontWeight: "300",
     textAlign: "center",
     paddingHorizontal: 24,
+    marginBottom: "12%",
   },
   footerText: {
     // center text

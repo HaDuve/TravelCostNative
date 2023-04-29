@@ -1,4 +1,5 @@
 import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 // Optionally import the services that you want to use
 //import {...} from "firebase/auth";
 //import {...} from "firebase/database";
@@ -17,7 +18,12 @@ export default function initializeFirebaseApp() {
     storageBucket: "travelcostnative.appspot.com",
     messagingSenderId: "1083718280976",
   };
-
-  let myApp = initializeApp(firebaseConfig);
-  return myApp;
+  const app = initializeApp(firebaseConfig);
+  return app;
 }
+
+export default function getAuthFirebase() {
+  const auth = getAuth(initializeFirebaseApp());
+  return auth;
+}
+

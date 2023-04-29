@@ -1,4 +1,11 @@
-import { Alert, StyleSheet, View, Text, Linking } from "react-native";
+import {
+  Alert,
+  StyleSheet,
+  View,
+  Text,
+  Linking,
+  TouchableOpacity,
+} from "react-native";
 import React, { useContext, useState } from "react";
 import Purchases, { PurchasesOffering } from "react-native-purchases";
 import { importExcelFile } from "../components/ImportExport/OpenXLSXPicker";
@@ -148,6 +155,23 @@ const SettingsScreen = ({ navigation }) => {
     navigation.navigate("Join");
   }
 
+  function deleteAccountHandler() {
+    return Alert.alert(i18n.t("sure"), i18n.t("deleteAccountAlertMess"), [
+      // The "No" button
+      // Does nothing but dismiss the dialog when tapped
+      {
+        text: i18n.t("no"),
+      },
+      // The "Yes" button
+      {
+        text: i18n.t("yes"),
+        onPress: () => {
+          authCtx.deleteAccount();
+        },
+      },
+    ]);
+  }
+
   function logoutHandler() {
     return Alert.alert(i18n.t("sure"), i18n.t("signOutAlertMess"), [
       // The "No" button
@@ -202,9 +226,9 @@ const SettingsScreen = ({ navigation }) => {
       )}
       <GradientButton
         style={styles.settingsButton}
-        onPress={() => {
-          resetTour();
-          reloadApp();
+        onPress={async () => {
+          await resetTour();
+          await reloadApp();
         }}
       >
         {i18n.t("resetAppIntroductionLabel")}
@@ -232,12 +256,14 @@ const SettingsScreen = ({ navigation }) => {
       >
         {premiumButtonString}
       </GradientButton>
+      <TouchableOpacity onPress={() => deleteAccountHandler()}>
+        <Text style={[styles.textButton]}>Delete Account</Text>
+      </TouchableOpacity>
       <View
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          paddingVertical: "2%",
           paddingHorizontal: "4%",
         }}
       ></View>
@@ -272,5 +298,17 @@ const styles = StyleSheet.create({
     paddingVertical: "2%",
     paddingHorizontal: "8%",
     borderRadius: 16,
+  },
+  textButton: {
+    marginTop: "8%",
+    paddingVertical: "2%",
+    paddingHorizontal: "8%",
+    borderRadius: 16,
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "bold",
+    fontStyle: "italic",
+    color: GlobalStyles.colors.gray700,
+    marginLeft: "2%",
   },
 });

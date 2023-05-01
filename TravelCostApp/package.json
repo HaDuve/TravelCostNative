@@ -12,8 +12,6 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.17.11",
     "@react-native-community/netinfo": "9.3.7",
-    "@react-native-firebase/app": "^17.4.3",
-    "@react-native-firebase/auth": "^17.4.3",
     "@react-navigation/bottom-tabs": "^6.3.2",
     "@react-navigation/material-top-tabs": "^6.5.1",
     "@react-navigation/native": "^6.0.11",
@@ -39,7 +37,7 @@
     "expo-status-bar": "~1.4.4",
     "expo-store-review": "~6.2.1",
     "expo-updates": "~0.16.4",
-    "firebase": "^9.14.0",
+    "firebase": "^9.21.0",
     "i18n-iso-countries": "^7.5.0",
     "i18n-js": "^4.1.1",
     "luxon": "^3.3.0",
@@ -88,7 +86,14 @@
     "eslint": "^8.31.0",
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "metro": "^0.76.3",
+    "metro-core": "^0.76.3",
     "typescript": "^4.9.4"
   },
-  "private": true
+  "private": true,
+  "overrides": {
+    "@expo/config-plugins": "~6.0.0",
+    "@expo/prebuild-config": "~6.0.0",
+    "expo-modules-autolinking": "~1.1.0"
+  }
 }

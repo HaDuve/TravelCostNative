@@ -155,6 +155,24 @@ const SettingsScreen = ({ navigation }) => {
     navigation.navigate("Join");
   }
 
+  const [emailString, setEmailString] = useState("");
+  useFocusEffect(() => {
+    async function getEmail() {
+      const email = await asyncStoreGetItem("ENCM");
+      console.log("getEmail ~ email:", email);
+      setEmailString(email);
+    }
+    getEmail();
+  });
+  useEffect(() => {
+    async function getEmail() {
+      const email = await asyncStoreGetItem("ENCM");
+      console.log("getEmail ~ email:", email);
+      setEmailString(email);
+    }
+    getEmail();
+  }, []);
+
   function deleteAccountHandler() {
     return Alert.alert(i18n.t("sure"), i18n.t("deleteAccountAlertMess"), [
       // The "No" button
@@ -166,6 +184,7 @@ const SettingsScreen = ({ navigation }) => {
       {
         text: i18n.t("yes"),
         onPress: () => {
+          console.log("deleteAccountHandler ~ deleteAccountHandler");
           authCtx.deleteAccount();
         },
       },
@@ -256,9 +275,11 @@ const SettingsScreen = ({ navigation }) => {
       >
         {premiumButtonString}
       </GradientButton>
-      <TouchableOpacity onPress={() => deleteAccountHandler()}>
-        <Text style={[styles.textButton]}>Delete Account</Text>
-      </TouchableOpacity>
+      {emailString && (
+        <TouchableOpacity onPress={() => deleteAccountHandler()}>
+          <Text style={[styles.textButton]}>Delete Account {emailString}?</Text>
+        </TouchableOpacity>
+      )}
       <View
         style={{
           flexDirection: "row",

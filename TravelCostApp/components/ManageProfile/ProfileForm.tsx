@@ -19,6 +19,7 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../../i18n/supportedLanguages";
 import LoadingOverlay from "../UI/LoadingOverlay";
+import GradientButton from "../UI/GradientButton";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -111,6 +112,7 @@ const ProfileForm = ({ navigation, sleepyStartHandler }) => {
   }
 
   function avatarHandler() {
+    return;
     Alert.alert("Profile picture function coming soon... ");
   }
 
@@ -144,14 +146,14 @@ const ProfileForm = ({ navigation, sleepyStartHandler }) => {
       >
         {i18n.t("invitationText")}
       </FlatButton>
-      <Button
+      <GradientButton
         style={styles.navButton}
         onPress={() =>
           navigation.navigate("ManageTrip", { callback: sleepyStartHandler })
         }
       >
         {i18n.t("createFirstTrip")}
-      </Button>
+      </GradientButton>
     </View>
   );
 

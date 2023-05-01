@@ -14,8 +14,9 @@ async function authenticate(mode, email, password) {
   });
 
   //store email and password in async storage
-  await AsyncStorage.setItem("email", email);
-  await AsyncStorage.setItem("password", password);
+  await AsyncStorage.setItem("ENCM", email);
+  console.log("authenticate ~ email:", email);
+  await AsyncStorage.setItem("ENCP", password);
 
   const token = response.data.idToken;
   const uid = response.data.localId;

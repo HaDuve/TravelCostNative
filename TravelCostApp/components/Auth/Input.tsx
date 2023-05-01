@@ -10,6 +10,7 @@ function Input({
   onUpdateValue,
   value,
   isInvalid,
+  textContentType,
 }) {
   return (
     <View style={styles.inputContainer}>
@@ -23,6 +24,7 @@ function Input({
         secureTextEntry={secure}
         onChangeText={onUpdateValue}
         value={value}
+        textContentType={textContentType}
       />
     </View>
   );
@@ -37,6 +39,7 @@ Input.propTypes = {
   onUpdateValue: PropTypes.func.isRequired,
   value: PropTypes.string.isRequired,
   isInvalid: PropTypes.bool,
+  textContentType: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

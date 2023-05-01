@@ -12,9 +12,11 @@ import {
   deleteUser,
   signInWithCustomToken,
   signInWithEmailAndPassword,
+  initializeAuth,
 } from "firebase/auth";
 import { Alert } from "react-native";
 import { initializeApp } from "firebase/app";
+import { getReactNativePersistence } from "firebase/auth/react-native";
 
 export const AuthContext = createContext({
   uid: "",
@@ -65,11 +67,15 @@ function AuthContextProvider({ children }) {
       storageBucket: "travelcostnative.appspot.com",
       messagingSenderId: "1083718280976",
     };
+    // assuming initialize App and Auth has never been called before!
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    const auth = initializeAuth(app, {
+      persistence: getReactNativePersistence(AsyncStorage),
+    });
     // load email and password from async storage
-    const email = await AsyncStorage.getItem("email");
-    const password = await AsyncStorage.getItem("password");
+    const email = await AsyncStorage.getItem("ENCM");
+    console.log("deleteAccount ~ email:", email);
+    const password = await AsyncStorage.getItem("ENCP");
     signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
       // Signed in
       const user = userCredential.user;

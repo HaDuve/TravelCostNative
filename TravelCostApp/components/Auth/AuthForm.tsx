@@ -161,6 +161,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
             secure={false}
             keyboardType="default"
             isInvalid={nameIsInvalid}
+            textContentType="name"
           />
         )}
         <Input
@@ -170,6 +171,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
           secure={false}
           keyboardType="email-address"
           isInvalid={emailIsInvalid}
+          textContentType="emailAddress"
         />
 
         <Input
@@ -179,6 +181,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
           keyboardType="default"
           value={enteredPassword}
           isInvalid={passwordIsInvalid}
+          textContentType="password"
         />
 
         <View style={styles.buttons}>

@@ -54,6 +54,9 @@ function SignupScreen() {
       return;
     }
     try {
+      //CLEAR
+      await asyncStoreSafeClear();
+      userCtx.setTripHistory([]);
       // We are online and ready to create User
       const { token, uid } = await createUser(email, password);
       // setup purchases
@@ -68,9 +71,7 @@ function SignupScreen() {
         Purchases.configure({ apiKey: API_KEY, appUserID: uid });
         console.log("SignupScreen ~ uid:", uid);
       }
-      //CLEAR
-      await asyncStoreSafeClear();
-      userCtx.setTripHistory([]);
+
       //NEW
       const userData = { userName: name };
       await storeUser(uid, userData);

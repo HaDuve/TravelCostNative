@@ -1091,15 +1091,15 @@ const ExpenseForm = ({
           </GradientButton>
         </View>
         <View style={styles.buttonContainer}>
-          <GradientButton
+          {/* <GradientButton
             style={[styles.button, { marginTop: 28, minWidth: "80%" }]}
             colors={GlobalStyles.gradientColorsButton}
             onPress={askChatGPTHandler}
             darkText
           >
             {isEditing && "Ask ChatGPT: Was this a good deal?"}
-            {!isEditing && "Ask ChatGPT: How much should I pay?"}
-          </GradientButton>
+            {!isEditing && "Ask ChatGPxT: How much should I pay?"}
+          </GradientButton> */}
         </View>
       </Animated.View>
     </Animated.View>

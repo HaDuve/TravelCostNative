@@ -9,9 +9,6 @@ import {
 } from "react-native";
 // import animated from reanimated
 import Animated, {
-  FadeInDown,
-  FadeOutRight,
-  Layout,
   ZoomIn,
   ZoomInLeft,
   ZoomOut,
@@ -27,28 +24,21 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
 import { useContext, useLayoutEffect } from "react";
 import { TripContext } from "../store/trip-context";
 import { GlobalStyles } from "../constants/styles";
 import { fetchCategories, updateTrip } from "../util/http";
-import { ScrollView } from "react-native-gesture-handler";
 import SelectCategoryIcon from "../components/UI/selectCategoryIcon";
-import Button from "../components/UI/Button";
 import GradientButton from "../components/UI/GradientButton";
 import BackgroundGradient from "../components/UI/BackgroundGradient";
-import FlatButton from "../components/UI/FlatButton";
 import { KeyboardAvoidingView, ActivityIndicator } from "react-native";
 import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import * as Haptics from "expo-haptics";
 import Toast from "react-native-toast-message";
 import { Category } from "../util/category";
-import { useFocusEffect } from "@react-navigation/native";
 import Dimensions from "react-native";
-import { FadeInRight } from "react-native-reanimated";
-import FadeOutLeft from "react-native-reanimated";
 import { alertYesNo } from "../components/Errors/Alert";
 import IconButton from "../components/UI/IconButton";
 import { NetworkContext } from "../store/network-context";

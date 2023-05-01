@@ -414,9 +414,15 @@ const TripForm = ({ navigation, route }) => {
     <>
       {datepickerJSX}
       {modalJSX}
-      <ScrollView style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1, overflow: "visible" }}>
         <View style={styles.form}>
-          <View style={styles.card}>
+          <View
+            style={[
+              styles.card,
+              { minHeight: "80%" },
+              isEditing && { minHeight: "70%" },
+            ]}
+          >
             <Text style={styles.title}>{titleString}</Text>
 
             <Input
@@ -572,36 +578,31 @@ const TripForm = ({ navigation, route }) => {
             )}
           </View>
           {/* Horizontal container */}
-
-          <View style={styles.buttonContainer}>
-            {isEditing && (
-              <GradientButton
-                buttonStyle={{ backgroundColor: GlobalStyles.colors.error300 }}
-                style={[
-                  styles.button,
-                  { marginBottom: 8, marginHorizontal: 24 },
-                ]}
-                onPress={deleteHandler}
-                colors={GlobalStyles.gradientErrorButton}
-              >
-                {i18n.t("deleteTrip")}
-              </GradientButton>
-            )}
-            {isEditing && (
-              <GradientButton
-                buttonStyle={{}}
-                style={[
-                  styles.button,
-                  { marginBottom: 8, marginHorizontal: 24 },
-                ]}
-                onPress={submitHandler.bind(this, true /* setActive */)}
-              >
-                {i18n.t("setActive")}
-              </GradientButton>
-            )}
-          </View>
+          {isEditing && (
+            <GradientButton
+              buttonStyle={{}}
+              style={[
+                styles.button,
+                { marginVertical: 8, marginHorizontal: 24 },
+              ]}
+              onPress={submitHandler.bind(this, true /* setActive */)}
+            >
+              {i18n.t("setActive")}
+            </GradientButton>
+          )}
+          {/* {isEditing && (
+            <GradientButton
+              buttonStyle={{ backgroundColor: GlobalStyles.colors.error300 }}
+              style={[styles.button, { marginBottom: 8, marginHorizontal: 24 }]}
+              onPress={deleteHandler}
+              colors={GlobalStyles.gradientErrorButton}
+            >
+              {i18n.t("deleteTrip")}
+            </GradientButton>
+          )} */}
         </View>
       </ScrollView>
+      <View style={{ minHeight: 60, zIndex: -10 }}></View>
     </>
   );
 };

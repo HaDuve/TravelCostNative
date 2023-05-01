@@ -88,6 +88,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
   const [selectedIconName, setSelectedIconName] = useState("");
 
   const [isFetching, setIsFetching] = useState(false);
+  const [touched, setTouched] = useState(false);
 
   // use state for is uploading
   const [isUploading, setIsUploading] = useState(false);
@@ -178,6 +179,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
     };
     const newCategoryList = [...categoryList, newCategory];
     setCategoryList(newCategoryList);
+    setTouched(true);
     await saveCategoryList(newCategoryList);
     setNewCategoryName("");
     setSelectedIconName("");
@@ -190,6 +192,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
     newCategoryList[index].catString = newName;
     newCategoryList[index].cat = newName;
     setCategoryList(newCategoryList);
+    setTouched(true);
     await saveCategoryList(newCategoryList);
   };
 
@@ -197,12 +200,14 @@ const ManageCategoryScreen = ({ route, navigation }) => {
     const newCategoryList = [...categoryList];
     newCategoryList.splice(index, 1);
     setCategoryList(newCategoryList);
+    setTouched(true);
     await saveCategoryList(newCategoryList);
   };
 
   const handleResetCategoryList = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setCategoryList(defaultCategoryList);
+    setTouched(true);
     await saveCategoryList(defaultCategoryList);
   };
 
@@ -509,14 +514,17 @@ const ManageCategoryScreen = ({ route, navigation }) => {
             {i18n.t("back")}
           </FlatButton> */}
 
-          <GradientButton
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              navigation.pop();
-            }}
-          >
-            {i18n.t("confirm")}
-          </GradientButton>
+          {touched && (
+            <GradientButton
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setTouched(false);
+                navigation.pop();
+              }}
+            >
+              {i18n.t("confirm")}
+            </GradientButton>
+          )}
         </View>
       </KeyboardAvoidingView>
     </BackgroundGradient>

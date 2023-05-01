@@ -17,7 +17,7 @@ import { getCatString } from "../../util/category";
 import PropTypes from "prop-types";
 import { useContext } from "react";
 import { TripContext } from "../../store/trip-context";
-import getSymbolFromCurrency from "currency-symbol-map";
+import { getCurrencySymbol } from "../../util/currencySymbol";
 
 const CategoryChart = ({ inputData }) => {
   const tripCtx = useContext(TripContext);
@@ -65,7 +65,7 @@ const CategoryChart = ({ inputData }) => {
         labels={({ datum }) => {
           return `${getCatString(datum.x)} ${Number(datum.y).toFixed(
             2
-          )} ${getSymbolFromCurrency(tripCurrency)}`;
+          )} ${getCurrencySymbol(tripCurrency)}`;
           // return `${datum.x[0].toUpperCase()}${datum.x.slice(1)}`;
         }}
       />

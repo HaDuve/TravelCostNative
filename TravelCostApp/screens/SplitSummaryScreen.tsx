@@ -21,13 +21,13 @@ import { ExpensesContext } from "../store/expenses-context";
 import BackgroundGradient from "../components/UI/BackgroundGradient";
 import { Split } from "../util/expense";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import getSymbolFromCurrency from "currency-symbol-map";
+import { getCurrencySymbol } from "../util/currencySymbol";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
   const { tripid } = route.params;
   const tripCtx = useContext(TripContext);
   const tripCurrency = tripCtx.tripCurrency;
-  const currencySymbol = getSymbolFromCurrency(tripCurrency);
+  const currencySymbol = getCurrencySymbol(tripCurrency);
   const userCtx = useContext(UserContext);
   const expenseCtx = useContext(ExpensesContext);
 

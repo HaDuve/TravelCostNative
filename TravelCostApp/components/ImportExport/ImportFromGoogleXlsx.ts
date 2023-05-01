@@ -2,6 +2,7 @@ import * as XLSX from "xlsx";
 import { storeExpense } from "../../util/http";
 import * as Updates from "expo-updates";
 import { OpenXLSXPicker } from "./OpenXLSXPicker";
+import { reloadApp } from "../../util/appState";
 
 export const importGoogleExcelFileFROM = async (
   uid,
@@ -19,7 +20,7 @@ export const importGoogleExcelFileFROM = async (
     addExpense,
     fromDate
   );
-  await Updates.reloadAsync();
+  await reloadApp();
 };
 
 export const importGoogleExcelFile = async (
@@ -30,7 +31,7 @@ export const importGoogleExcelFile = async (
 ) => {
   const workbook = await OpenXLSXPicker();
   await getGoogleExcelData(workbook, uid, tripid, userName, addExpense);
-  await Updates.reloadAsync();
+  await reloadApp();
 };
 
 const getGoogleExcelData = async (

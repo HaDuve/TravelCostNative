@@ -49,6 +49,7 @@ import InfoButton from "../UI/InfoButton";
 import Modal from "react-native-modal";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
+import { reloadApp } from "../../util/appState";
 
 const TripForm = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -258,7 +259,8 @@ const TripForm = ({ navigation, route }) => {
         userCtx.setFreshlyCreatedTo(false);
         const expenses = await getAllExpenses(editedTripId, uid);
         expenseCtx.setExpenses(expenses);
-        await Updates.reloadAsync();
+        const r = await reloadApp();
+        if (r === -1) navigation.popToTop();
       }
       tripCtx.refresh();
       navigation.pop();
@@ -288,7 +290,8 @@ const TripForm = ({ navigation, route }) => {
     }
     userCtx.setFreshlyCreatedTo(false);
     // restart app with Updates
-    await Updates.reloadAsync();
+    const r = await reloadApp();
+    if (r === -1) navigation.popToTop();
     // expenseCtx.setExpenses([]);
 
     // tripCtx.refresh();

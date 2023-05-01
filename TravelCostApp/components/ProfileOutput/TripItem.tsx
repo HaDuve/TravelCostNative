@@ -22,10 +22,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../../i18n/supportedLanguages";
 import { UserContext } from "../../store/user-context";
-import getSymbolFromCurrency from "currency-symbol-map";
 import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
+import { getCurrencySymbol } from "../../util/currencySymbol";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -55,7 +55,7 @@ function TripItem({
   const [travellers, setTravellers] = useState([]);
   const [isFetching, setIsFetching] = useState(true);
 
-  const tripCurrencySymbol = getSymbolFromCurrency(tripCurrency);
+  const tripCurrencySymbol = getCurrencySymbol(tripCurrency);
 
   useEffect(() => {
     async function getTripTravellers() {

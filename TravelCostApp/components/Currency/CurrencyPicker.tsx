@@ -13,8 +13,8 @@ import { I18n } from "i18n-js";
 import { en, de, fr } from "../../i18n/supportedLanguages";
 import LoadingOverlay from "../UI/LoadingOverlay";
 import * as Haptics from "expo-haptics";
-import getSymbolFromCurrency from "currency-symbol-map";
 import PropTypes from "prop-types";
+import { getCurrencySymbol } from "../../util/currencySymbol";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
@@ -40,10 +40,10 @@ const CurrencyPicker = ({
   const countryOptions = Object.keys(countries.getNames("en")).map((code) => ({
     label: `${countries.getName(code, CC)} - ${
       countryToCurrency[code]
-    } | ${getSymbolFromCurrency(countryToCurrency[code])}`,
+    } | ${getCurrencySymbol(countryToCurrency[code])}`,
     value: `${countries.getName(code, CC)} - ${
       countryToCurrency[code]
-    } | ${getSymbolFromCurrency(countryToCurrency[code])}`,
+    } | ${getCurrencySymbol(countryToCurrency[code])}`,
   }));
 
   const [open, setOpen] = useState(false);

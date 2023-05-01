@@ -27,11 +27,11 @@ import { I18n } from "i18n-js";
 import { en, de, fr } from "../../i18n/supportedLanguages";
 import { DateTime } from "luxon";
 import { UserContext } from "../../store/user-context";
-import getSymbolFromCurrency from "currency-symbol-map";
 import ExpenseCountryFlag from "./ExpenseCountryFlag";
 import { SettingsContext } from "../../store/settings-context";
 import { useEffect } from "react";
 import { NetworkContext } from "../../store/network-context";
+import { getCurrencySymbol } from "../../util/currencySymbol";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -56,8 +56,8 @@ function ExpenseItem(props): JSX.Element {
   const userCtx = useContext(UserContext);
   const netCtx = useContext(NetworkContext);
   const homeCurrency = tripCtx.tripCurrency;
-  const homeCurrencySymbol = getSymbolFromCurrency(homeCurrency);
-  const currencySymbol = getSymbolFromCurrency(currency);
+  const homeCurrencySymbol = getCurrencySymbol(homeCurrency);
+  const currencySymbol = getCurrencySymbol(currency);
   const rate = calcAmount / amount;
 
   let calcTravellerSum = 0;

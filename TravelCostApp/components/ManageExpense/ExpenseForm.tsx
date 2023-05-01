@@ -62,7 +62,6 @@ import DatePickerModal from "../UI/DatePickerModal";
 import DatePickerContainer from "../UI/DatePickerContainer";
 import PropTypes from "prop-types";
 import GradientButton from "../UI/GradientButton";
-import getSymbolFromCurrency from "currency-symbol-map";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import CountryFlag from "react-native-country-flag";
 import { recalcSplitsForExact } from "../../util/split";
@@ -71,6 +70,7 @@ import { NetworkContext } from "../../store/network-context";
 import { SettingsContext } from "../../store/settings-context";
 import Autocomplete from "../UI/Autocomplete";
 import { ExpensesContext } from "../../store/expenses-context";
+import { getCurrencySymbol } from "../../util/currencySymbol";
 
 const ExpenseForm = ({
   onCancel,
@@ -97,10 +97,8 @@ const ExpenseForm = ({
     ? userCtx.lastCurrency
     : tripCtx.tripCurrency;
   const currencyPlaceholder = isEditing
-    ? editingValues.currency +
-      " | " +
-      getSymbolFromCurrency(editingValues.currency)
-    : lastCurrency + " | " + getSymbolFromCurrency(lastCurrency);
+    ? editingValues.currency + " | " + getCurrencySymbol(editingValues.currency)
+    : lastCurrency + " | " + getCurrencySymbol(lastCurrency);
 
   const [hideAdvanced, sethideAdvanced] = useState(true);
   const [countryValue, setCountryValue] = useState("EUR");
@@ -673,7 +671,7 @@ const ExpenseForm = ({
             <Input
               style={styles.rowInput}
               label={
-                i18n.t("priceIn") + getSymbolFromCurrency(inputs.currency.value)
+                i18n.t("priceIn") + getCurrencySymbol(inputs.currency.value)
               }
               textInputConfig={{
                 keyboardType: "decimal-pad",
@@ -1066,7 +1064,7 @@ const ExpenseForm = ({
                                 marginRight: 8,
                               }}
                             >
-                              {getSymbolFromCurrency(inputs.currency.value)}
+                              {getCurrencySymbol(inputs.currency.value)}
                             </Text>
                           </View>
                         </View>

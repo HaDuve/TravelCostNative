@@ -14,8 +14,7 @@ import {
 import { GlobalStyles } from "../../constants/styles";
 import { getDateMinusDays, getDatePlusDays } from "../../util/date";
 import PropTypes from "prop-types";
-import { DateTime } from "luxon";
-import getSymbolFromCurrency from "currency-symbol-map";
+import { getCurrencySymbol } from "../../util/currencySymbol";
 
 const ExpenseChart = ({
   inputData,
@@ -114,12 +113,12 @@ const ExpenseChart = ({
               // first point
               x: firstItemDate,
               y: Number(budget),
-              // label: `Budget: ${budget} ${getSymbolFromCurrency(currency)}`,
+              // label: `Budget: ${budget} ${getCurrencySymbol(currency)}`,
             },
             {
               x: lastItemDate,
               y: Number(budget),
-              // label: `Budget: ${budget} ${getSymbolFromCurrency(currency)}`,
+              // label: `Budget: ${budget} ${getCurrencySymbol(currency)}`,
             },
           ]}
           style={{

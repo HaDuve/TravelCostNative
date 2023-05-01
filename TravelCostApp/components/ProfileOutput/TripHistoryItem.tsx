@@ -32,10 +32,10 @@ import { en, de, fr } from "../../i18n/supportedLanguages";
 import { ExpensesContext } from "../../store/expenses-context";
 import { UserContext } from "../../store/user-context";
 import { AuthContext } from "../../store/auth-context";
-import getSymbolFromCurrency from "currency-symbol-map";
 import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
+import { getCurrencySymbol } from "../../util/currencySymbol";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -56,7 +56,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const [dailyBudget, setDailyBudget] = useState("10");
   const [tripCurrency, setTripCurrency] = useState("EUR");
 
-  const tripCurrencySymbol = getSymbolFromCurrency(tripCurrency);
+  const tripCurrencySymbol = getCurrencySymbol(tripCurrency);
 
   useEffect(() => {
     if (!tripid) return;

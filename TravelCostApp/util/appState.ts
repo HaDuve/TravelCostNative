@@ -14,5 +14,10 @@ export function sleep(ms: number) {
 }
 
 export async function reloadApp() {
-  await Updates.reloadAsync();
+  try {
+    await Updates.reloadAsync();
+  } catch (error) {
+    console.log("Updates.reloadAsync error, returning -1: ", error);
+    return -1;
+  }
 }

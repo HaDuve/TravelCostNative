@@ -15,10 +15,10 @@ import Animated, {
   ZoomInRotate,
 } from "react-native-reanimated";
 import PropTypes from "prop-types";
-import getSymbolFromCurrency from "currency-symbol-map";
 import { useEffect } from "react";
 import { useState } from "react";
 import { UserContext } from "../../../store/user-context";
+import { getCurrencySymbol } from "../../../util/currencySymbol";
 
 const CategoryProgressBar = ({
   cat,
@@ -56,7 +56,7 @@ const CategoryProgressBar = ({
   const unfilledColor = GlobalStyles.colors.gray500Accent;
 
   const userCurrency = tripCtx.tripCurrency;
-  const userCurrencySymbol = getSymbolFromCurrency(userCurrency);
+  const userCurrencySymbol = getCurrencySymbol(userCurrency);
   const catCostString = formatExpenseString(catCost);
   const windowWidth = Dimensions.get("window").width;
 

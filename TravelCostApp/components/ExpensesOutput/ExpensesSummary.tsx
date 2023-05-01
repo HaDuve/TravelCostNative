@@ -5,10 +5,10 @@ import * as Progress from "react-native-progress";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseString } from "../../util/string";
 import PropTypes from "prop-types";
-import getSymbolFromCurrency from "currency-symbol-map";
 import { Pressable } from "react-native";
 import Toast from "react-native-toast-message";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
+import { getCurrencySymbol } from "../../util/currencySymbol";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
   const tripCtx = useContext(TripContext);
@@ -26,7 +26,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
 
   const expensesSumString = formatExpenseString(expensesSum);
   const userCurrency = tripCtx.tripCurrency;
-  const currencySymbol = getSymbolFromCurrency(userCurrency);
+  const currencySymbol = getCurrencySymbol(userCurrency);
   let budgetNumber = Number(tripCtx.dailyBudget);
   let infinityString = "";
   const expenseSumNum = Number(expensesSum);

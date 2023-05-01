@@ -3,11 +3,12 @@ import * as FileSystem from "expo-file-system";
 import * as XLSX from "xlsx";
 import { importExpenseFromXLSX } from "./ImportExpense";
 import * as Updates from "expo-updates";
+import { reloadApp } from "../../util/appState";
 
 export const importExcelFile = async (uid, tripid, userName, addExpense) => {
   const workbook = await OpenXLSXPicker();
   await getExcelData(workbook, uid, tripid, userName, addExpense);
-  await Updates.reloadAsync();
+  await reloadApp();
 };
 
 export const OpenXLSXPicker = async () => {

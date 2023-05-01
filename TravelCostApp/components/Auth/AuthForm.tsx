@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, Image, Alert } from "react-native";
+import { StyleSheet, View, Text, Image } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 
 //Localization
@@ -11,7 +11,6 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import Button from "../UI/Button";
 import Input from "./Input";
 import * as AppleAuthentication from "expo-apple-authentication";
 import Toast from "react-native-toast-message";

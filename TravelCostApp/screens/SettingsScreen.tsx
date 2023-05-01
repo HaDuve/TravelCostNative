@@ -174,21 +174,27 @@ const SettingsScreen = ({ navigation }) => {
   }, []);
 
   function deleteAccountHandler() {
-    return Alert.alert(i18n.t("sure"), i18n.t("deleteAccountAlertMess"), [
-      // The "No" button
-      // Does nothing but dismiss the dialog when tapped
-      {
-        text: i18n.t("no"),
-      },
-      // The "Yes" button
-      {
-        text: i18n.t("yes"),
-        onPress: () => {
-          console.log("deleteAccountHandler ~ deleteAccountHandler");
-          authCtx.deleteAccount();
+    return Alert.alert(
+      i18n.t("sure"),
+      "This will unreversibly delete your Budget for Nomads Account!",
+      [
+        // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: i18n.t("back"),
         },
-      },
-    ]);
+        // The "Yes" button
+        // delete mode red
+        {
+          text: i18n.t("delete"),
+          style: "destructive",
+          onPress: () => {
+            console.log("deleteAccountHandler ~ deleteAccountHandler");
+            authCtx.deleteAccount();
+          },
+        },
+      ]
+    );
   }
 
   function logoutHandler() {

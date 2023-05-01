@@ -605,7 +605,13 @@ const TripForm = ({ navigation, route }) => {
           )} */}
         </View>
       </ScrollView>
-      <View style={{ minHeight: 60, zIndex: -10 }}></View>
+      <View
+        style={{
+          minHeight: 60,
+          zIndex: -10,
+          backgroundColor: GlobalStyles.colors.backgroundColor,
+        }}
+      ></View>
     </>
   );
 };
@@ -626,7 +632,6 @@ const styles = StyleSheet.create({
   },
   recalcButton: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    maxHeight: "70%",
     borderRadius: 99,
     marginRight: "3%",
     marginBottom: "5%",

@@ -669,7 +669,7 @@ const ExpenseForm = ({
         <Animated.View layout={Layout} style={styles.form}>
           <View style={styles.inputsRow}>
             <Input
-              style={styles.rowInput}
+              inputStyle={[styles.amountInput, GlobalStyles.strongShadow]}
               label={
                 i18n.t("priceIn") + getCurrencySymbol(inputs.currency.value)
               }
@@ -679,7 +679,7 @@ const ExpenseForm = ({
                 value: inputs.amount.value,
               }}
               invalid={!inputs.amount.isValid}
-              // autoFocus={true}
+              autoFocus={!isEditing ?? false}
             />
             <IconButton
               buttonStyle={[styles.iconButton, GlobalStyles.strongShadow]}
@@ -1142,6 +1142,16 @@ const styles = StyleSheet.create({
     // justifyContent: "space-around",
     // alignContent: "stretch",
   },
+  amountInput: {
+    minWidth: "50%",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: GlobalStyles.colors.gray700,
+    padding: 8,
+    margin: 8,
+  },
+
   iconButton: {
     borderWidth: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,

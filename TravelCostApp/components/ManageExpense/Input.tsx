@@ -62,7 +62,7 @@ Input.propTypes = {
   textInputConfig: PropTypes.object.isRequired,
   invalid: PropTypes.bool,
   autoFocus: PropTypes.bool,
-  inputStyle: PropTypes.object || PropTypes.array,
+  inputStyle: PropTypes.any,
   placeholder: PropTypes.string,
   editable: PropTypes.bool,
   selectTextOnFocus: PropTypes.bool,
@@ -86,6 +86,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     borderBottomColor: GlobalStyles.colors.gray700,
     borderBottomWidth: 1,
+    textAlign: "center",
   },
   inputMultiline: {
     minHeight: 100,

@@ -38,7 +38,7 @@ IconButton.propTypes = {
   color: PropTypes.string.isRequired,
   onPress: PropTypes.func.isRequired,
   onLongPress: PropTypes.func,
-  buttonStyle: PropTypes.object,
+  buttonStyle: PropTypes.any,
   rotate: PropTypes.number,
   onPressStyle: PropTypes.object,
   imageNumber: PropTypes.number,

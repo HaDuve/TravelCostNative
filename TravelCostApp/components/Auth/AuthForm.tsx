@@ -190,7 +190,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
           </GradientButton>
         </View>
         <View style={styles.appleAuthContainer}>
-          {AppleAuthenticationJSX}
+          {/* {AppleAuthenticationJSX} */}
           {/* <Pressable
             onPress={() => Alert.alert(i18n.t("signupComingSoonAlert"))}
           >

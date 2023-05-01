@@ -42,6 +42,9 @@ import Dimensions from "react-native";
 import { alertYesNo } from "../components/Errors/Alert";
 import IconButton from "../components/UI/IconButton";
 import { NetworkContext } from "../store/network-context";
+import InfoButton from "../components/UI/InfoButton";
+import Modal from "react-native-modal";
+import FlatButton from "../components/UI/FlatButton";
 
 const ManageCategoryScreen = ({ route, navigation }) => {
   const defaultCategoryList: Category[] = [
@@ -381,130 +384,199 @@ const ManageCategoryScreen = ({ route, navigation }) => {
     );
   }
 
-  return (
-    <BackgroundGradient
-      colors={GlobalStyles.gradientColors}
-      style={styles.container}
+  // useStates for info Modal
+  const [infoIsVisible, setInfoIsVisible] = useState(false);
+  const [infoTitleText, setInfoTitleText] = useState("");
+  const [infoContentText, setInfoContentText] = useState("");
+
+  enum infoEnum {
+    titleInfo = 1,
+  }
+  function showInfoHandler(infoEnu: infoEnum) {
+    let titleText = "";
+    let contentText = "";
+    switch (infoEnu) {
+      case infoEnum.titleInfo:
+        titleText = "New Category Info"; //i18n.t("currencyInfoTitle");
+        contentText =
+          "Enter a name for your Category and then press the symbol for your new Category." +
+          "\n\n Confirm your new Category with the <Add> button.";
+        break;
+      default:
+        break;
+    }
+    setInfoTitleText(titleText);
+    setInfoContentText(contentText);
+    setInfoIsVisible(true);
+  }
+
+  // handle close
+  function handleClose() {
+    setInfoIsVisible(false);
+  }
+
+  const modalJSX = (
+    <Modal
+      isVisible={infoIsVisible}
+      style={styles.modalStyle}
+      backdropOpacity={0.5}
+      onSwipeComplete={handleClose}
+      swipeDirection={["up", "left", "right", "down"]}
+      onBackdropPress={handleClose}
+      onBackButtonPress={handleClose}
     >
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={"padding"}>
-        <View
-          style={[
-            styles.inputContainer,
-            bigDisplay && { minHeight: 284, maxHeight: 284 },
-            GlobalStyles.shadowPrimary,
-          ]}
-        >
-          <TextInput
-            autoFocus={true}
-            style={[styles.newCategoryInput]}
-            placeholder="New category name"
-            value={newCategoryName}
-            onChangeText={(text) => setNewCategoryName(text)}
-          />
-          <FlatList
-            horizontal
-            data={arrays}
-            renderItem={renderRowIconPicker}
-          ></FlatList>
-          {!isUploading &&
-            newCategoryName.length > 0 &&
-            selectedIconName.length > 0 && (
-              <Animated.View entering={ZoomIn} exiting={ZoomOut}>
-                <TouchableOpacity
-                  style={styles.addButton}
-                  onPress={handleAddCategory}
-                >
-                  <Text style={styles.addButtonText}>Add</Text>
-                </TouchableOpacity>
-              </Animated.View>
+      <View style={styles.infoModalContainer}>
+        <Text style={styles.infoTitleText}>{infoTitleText}</Text>
+        <Text style={styles.infoContentText}>{infoContentText}</Text>
+        <FlatButton onPress={setInfoIsVisible.bind(this, false)}>
+          Okay
+        </FlatButton>
+      </View>
+    </Modal>
+  );
+
+  return (
+    <>
+      {modalJSX}
+      <BackgroundGradient
+        colors={GlobalStyles.gradientColors}
+        style={styles.container}
+      >
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={"padding"}>
+          <View
+            style={[
+              styles.inputContainer,
+              bigDisplay && { minHeight: 284, maxHeight: 284 },
+              GlobalStyles.shadowPrimary,
+            ]}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginLeft: "10%",
+                marginRight: "5%",
+              }}
+            >
+              <TextInput
+                autoFocus={true}
+                style={[styles.newCategoryInput]}
+                placeholder="New category name"
+                value={newCategoryName}
+                textAlign="center"
+                onChangeText={(text) => setNewCategoryName(text)}
+              />
+              <InfoButton
+                onPress={showInfoHandler.bind(this, infoEnum.titleInfo)}
+                containerStyle={{ marginTop: "2%", marginLeft: "8%" }}
+              ></InfoButton>
+            </View>
+            <FlatList
+              horizontal
+              data={arrays}
+              renderItem={renderRowIconPicker}
+            ></FlatList>
+            {!isUploading &&
+              newCategoryName.length > 0 &&
+              selectedIconName.length > 0 && (
+                <Animated.View entering={ZoomIn} exiting={ZoomOut}>
+                  <TouchableOpacity
+                    style={styles.addButton}
+                    onPress={handleAddCategory}
+                  >
+                    <Text style={styles.addButtonText}>Add</Text>
+                  </TouchableOpacity>
+                </Animated.View>
+              )}
+            {isUploading && (
+              <View style={styles.addButton}>
+                <ActivityIndicator size="small" color="#fff" />
+              </View>
             )}
-          {isUploading && (
-            <View style={styles.addButton}>
-              <ActivityIndicator size="small" color="#fff" />
+          </View>
+          <View
+            style={{
+              height: 16,
+              width: "100%",
+              zIndex: 10,
+              //transparent border color
+              borderBottomWidth: 1,
+              borderBottomColor: GlobalStyles.colors.primary100,
+              // shadow over the flatlist
+              shadowColor: GlobalStyles.colors.primaryGrayed,
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.42,
+              shadowRadius: 2.42,
+              elevation: 3,
+            }}
+          />
+          {!isFetching && (
+            <Animated.FlatList
+              data={categoryList}
+              numColumns={2}
+              renderItem={renderCategoryItem}
+              keyExtractor={(item, index) => `${index}`}
+              refreshing={isFetching}
+              onRefresh={fetchCategoryList}
+            />
+          )}
+          {isFetching && (
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              <ActivityIndicator
+                size="large"
+                color={GlobalStyles.colors.backgroundColor}
+              />
             </View>
           )}
-        </View>
-        <View
-          style={{
-            height: 16,
-            width: "100%",
-            zIndex: 10,
-            //transparent border color
-            borderBottomWidth: 1,
-            borderBottomColor: GlobalStyles.colors.primary100,
-            // shadow over the flatlist
-            shadowColor: GlobalStyles.colors.primaryGrayed,
-            shadowOffset: {
-              width: 0,
-              height: 2,
-            },
-            shadowOpacity: 0.42,
-            shadowRadius: 2.42,
-            elevation: 3,
-          }}
-        />
-        {!isFetching && (
-          <Animated.FlatList
-            data={categoryList}
-            numColumns={2}
-            renderItem={renderCategoryItem}
-            keyExtractor={(item, index) => `${index}`}
-            refreshing={isFetching}
-            onRefresh={fetchCategoryList}
+          <View
+            style={{
+              height: 16,
+              width: "100%",
+              zIndex: 10,
+              //transparent border color
+              borderTopWidth: 1,
+              borderTopColor: GlobalStyles.colors.primary100,
+              // shadow over the flatlist
+              shadowColor: GlobalStyles.colors.primaryGrayed,
+              shadowOffset: {
+                width: 0,
+                height: -2,
+              },
+              shadowOpacity: 0.42,
+              shadowRadius: 2.42,
+              elevation: 3,
+              overflow: "visible",
+            }}
           />
-        )}
-        {isFetching && (
-          <View style={{ flex: 1, justifyContent: "center" }}>
-            <ActivityIndicator
-              size="large"
-              color={GlobalStyles.colors.backgroundColor}
-            />
-          </View>
-        )}
-        <View
-          style={{
-            height: 16,
-            width: "100%",
-            zIndex: 10,
-            //transparent border color
-            borderTopWidth: 1,
-            borderTopColor: GlobalStyles.colors.primary100,
-            // shadow over the flatlist
-            shadowColor: GlobalStyles.colors.primaryGrayed,
-            shadowOffset: {
-              width: 0,
-              height: -2,
-            },
-            shadowOpacity: 0.42,
-            shadowRadius: 2.42,
-            elevation: 3,
-            overflow: "visible",
-          }}
-        />
-        <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-          <IconButton
-            icon={"chevron-back-outline"}
-            size={24}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              navigation.pop();
-            }}
-            color={GlobalStyles.colors.primaryGrayed}
-          ></IconButton>
-          <GradientButton
-            colors={GlobalStyles.gradientAccentButton}
-            darkText
-            onPress={() => {
-              alertYesNo(
-                "Reset",
-                "Reset all categories?",
-                handleResetCategoryList
-              );
-            }}
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-evenly" }}
           >
-            RESET
-          </GradientButton>
-          {/* <FlatButton
+            <IconButton
+              icon={"chevron-back-outline"}
+              size={24}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                navigation.pop();
+              }}
+              color={GlobalStyles.colors.primaryGrayed}
+            ></IconButton>
+            <GradientButton
+              colors={GlobalStyles.gradientAccentButton}
+              darkText
+              onPress={() => {
+                alertYesNo(
+                  "Reset",
+                  "Reset all categories?",
+                  handleResetCategoryList
+                );
+              }}
+            >
+              RESET
+            </GradientButton>
+            {/* <FlatButton
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               navigation.pop();
@@ -514,20 +586,21 @@ const ManageCategoryScreen = ({ route, navigation }) => {
             {i18n.t("back")}
           </FlatButton> */}
 
-          {touched && (
-            <GradientButton
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setTouched(false);
-                navigation.pop();
-              }}
-            >
-              {i18n.t("confirm")}
-            </GradientButton>
-          )}
-        </View>
-      </KeyboardAvoidingView>
-    </BackgroundGradient>
+            {touched && (
+              <GradientButton
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setTouched(false);
+                  navigation.pop();
+                }}
+              >
+                {i18n.t("confirm")}
+              </GradientButton>
+            )}
+          </View>
+        </KeyboardAvoidingView>
+      </BackgroundGradient>
+    </>
   );
 };
 
@@ -607,5 +680,63 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     marginLeft: 16,
+  },
+  modalStyle: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalContainer: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: 8,
+    padding: 16,
+    width: "80%",
+    height: "40%",
+    justifyContent: "space-evenly",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: GlobalStyles.colors.primary400,
+    textAlign: "center",
+  },
+  modalText: {
+    fontSize: 16,
+    color: GlobalStyles.colors.primary400,
+    textAlign: "center",
+  },
+  modalButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+  },
+  modalButton: {
+    backgroundColor: GlobalStyles.colors.primary400,
+    borderRadius: 8,
+    padding: 8,
+    width: "40%",
+  },
+  modalButtonText: {
+    fontSize: 16,
+    color: GlobalStyles.colors.backgroundColor,
+    textAlign: "center",
+  },
+  infoModalContainer: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: 8,
+    padding: 16,
+    width: "80%",
+    height: "40%",
+    justifyContent: "space-evenly",
+  },
+  infoTitleText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: GlobalStyles.colors.textColor,
+    textAlign: "center",
+  },
+  infoContentText: {
+    fontSize: 16,
+    color: GlobalStyles.colors.textColor,
+    textAlign: "center",
   },
 });

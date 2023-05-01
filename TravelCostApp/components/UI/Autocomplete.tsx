@@ -5,6 +5,15 @@ import { Menu, TextInput } from "react-native-paper";
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  SlideInUp,
+  SlideOutDown,
+  SlideOutUp,
+  ZoomInUp,
+  ZoomOutUp,
+} from "react-native-reanimated";
 
 const Autocomplete = ({
   value: origValue,
@@ -12,7 +21,6 @@ const Autocomplete = ({
   data,
   containerStyle,
   onChange: origOnChange,
-  icon = "bike",
   style = {},
   menuStyle = {},
   right = () => {},
@@ -38,9 +46,17 @@ const Autocomplete = ({
         // maybe with a timeout
         onBlur={async () => setTimeout(() => setMenuVisible(false), 1200)}
         label={label}
-        right={right}
-        left={left}
+        // right={right}
+        // left={left}
         style={style}
+        inputMode="text"
+        mode="outlined"
+        outlineColor={GlobalStyles.colors.primary700}
+        textColor={GlobalStyles.colors.textColor}
+        cursorColor={GlobalStyles.colors.textColor}
+        activeOutlineColor={GlobalStyles.colors.primary700}
+        underlineColor={GlobalStyles.colors.accent250}
+        selectionColor={GlobalStyles.colors.primary700}
         onChangeText={(text) => {
           origOnChange(text);
           if (text && text.length > 0) {
@@ -54,32 +70,34 @@ const Autocomplete = ({
         value={value}
       />
       {menuVisible && filteredData && (
-        <View
+        <Animated.View
+          entering={FadeIn}
+          exiting={FadeOut}
           style={{
             flex: 1,
-            backgroundColor: GlobalStyles.colors.gray500,
+            backgroundColor: GlobalStyles.colors.backgroundColor,
             borderWidth: 2,
             flexDirection: "column",
-            borderColor: "grey",
+            borderColor: GlobalStyles.colors.primaryGrayed,
           }}
         >
           {
             // only show the newest 3 items
-            filteredData.slice(0, 3).map((datum, i) => (
+            filteredData.slice(0, 3).map((autotext, i) => (
               <Menu.Item
                 key={i}
                 style={[{ width: "100%" }, menuStyle]}
                 //   icon={icon}
                 onPress={() => {
-                  origOnChange(datum);
-                  setValue(datum);
+                  origOnChange(autotext);
+                  setValue(autotext);
                   setMenuVisible(false);
                 }}
-                title={datum}
+                title={autotext}
               />
             ))
           }
-        </View>
+        </Animated.View>
       )}
     </View>
   );

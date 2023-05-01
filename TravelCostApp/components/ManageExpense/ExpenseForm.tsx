@@ -746,6 +746,7 @@ const ExpenseForm = ({
                 label={i18n.t("descriptionLabel")}
                 data={suggestionData}
                 style={styles.autoCompleteStyle}
+                menuStyle={styles.autoCompleteMenuStyle}
               ></Autocomplete>
               {/* <Input
                 label={i18n.t("descriptionLabel")}
@@ -1149,7 +1150,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: GlobalStyles.colors.gray700,
     padding: 8,
-    margin: 8,
+    marginTop: 8,
   },
 
   iconButton: {
@@ -1171,6 +1172,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: GlobalStyles.colors.gray500,
     borderRadius: 5,
+    // marginLeft: -8,
+  },
+  autoCompleteMenuStyle: {
+    marginLeft: 8,
+    marginBottom: -1,
+    borderBottomWidth: 1,
+    borderBottomColor: GlobalStyles.colors.primaryGrayed,
   },
   countryFlagContainer: {
     marginRight: "5%",

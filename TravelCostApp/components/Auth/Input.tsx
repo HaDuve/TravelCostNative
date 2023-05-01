@@ -25,6 +25,9 @@ function Input({
         onChangeText={onUpdateValue}
         value={value}
         textContentType={textContentType}
+        cursorColor={GlobalStyles.colors.textColor}
+        selectionColor={GlobalStyles.colors.primary700}
+        placeholderTextColor={GlobalStyles.colors.textColor}
       />
     </View>
   );

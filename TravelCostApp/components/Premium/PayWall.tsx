@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Linking,
+  Pressable,
 } from "react-native";
 import Purchases from "react-native-purchases";
 import { GlobalStyles } from "../../constants/styles";
@@ -16,6 +17,9 @@ import PackageItem from "../Premium/PackageItem";
 import BackgroundGradient from "../UI/BackgroundGradient";
 import FlatButton from "../UI/FlatButton";
 import PropTypes from "prop-types";
+import IconButton from "../UI/IconButton";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import ExpensesOutput from "../ExpensesOutput/ExpensesOutput";
 
 const PaywallScreen = ({ navigation }) => {
   // - State for all available package
@@ -23,6 +27,9 @@ const PaywallScreen = ({ navigation }) => {
 
   // - State for displaying an overlay view
   const [isPurchasing, setIsPurchasing] = useState(false);
+
+  // state for show EULA
+  const [showEULA, setShowEULA] = useState(false);
 
   useEffect(() => {
     // Get current available packages
@@ -64,8 +71,8 @@ const PaywallScreen = ({ navigation }) => {
           source={require("../../assets/icon2.png")}
           style={[
             {
-              width: "48%",
-              height: "48%",
+              width: "40%",
+              height: "40%",
               resizeMode: "contain",
               margin: "2%",
               marginTop: "-4%",
@@ -164,6 +171,28 @@ const PaywallScreen = ({ navigation }) => {
           ListFooterComponent={footer}
           ListFooterComponentStyle={styles.headerFooterContainer}
         />
+        <Pressable
+          onPress={() => setShowEULA(!showEULA)}
+          style={{ marginTop: 10 }}
+        >
+          <IconButton
+            icon={showEULA ? "chevron-up" : "chevron-down"}
+            onPress={() => setShowEULA(!showEULA)}
+          ></IconButton>
+          {showEULA && (
+            <Animated.View entering={FadeIn} exiting={FadeOut}>
+              <Text>
+                A 2$ purchase will be applied to your iTunes account at the end
+                of the 1 week trial. Subscriptions will automatically renew
+                unless canceled within 24-hours before the end of the current
+                period. You can cancel anytime with your iTunes account
+                settings. Any unused portion of a free trial will be forfeited
+                if you purchase a subscription. For more information, see our
+                ToS and Privacy Policy.
+              </Text>
+            </Animated.View>
+          )}
+        </Pressable>
         {isPurchasing && <View style={styles.overlay} />}
       </BackgroundGradient>
     </>

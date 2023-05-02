@@ -1,8 +1,7 @@
 import React, { ActivityIndicator, StyleSheet, View } from "react-native";
 import { useChatGpt } from "react-native-chatgpt";
-import ChatGPTChat from "./ChatGPTChat";
+import Chat from "./ChatGPTChat";
 import Login from "./ChatGPTLogin";
-import ChatGPTLogin from "./ChatGPTLogin";
 
 const ChatGPTScreen = () => {
   const { status } = useChatGpt();
@@ -23,7 +22,7 @@ const ChatGPTScreen = () => {
     );
   }
 
-  return <ChatGPTChat />;
+  return <Chat />;
 };
 
 export default ChatGPTScreen;

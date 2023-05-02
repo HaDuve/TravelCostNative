@@ -81,7 +81,7 @@ function SignupScreen() {
       userCtx.setUserName(name);
       userCtx.setFreshlyCreatedTo(true);
       authCtx.setUserID(uid);
-      authCtx.authenticate(token);
+      await authCtx.authenticate(token);
     } catch (error) {
       console.log("signupHandler ~ error2", error);
       Alert.alert(i18n.t("authError"), i18n.t("createErrorText"));

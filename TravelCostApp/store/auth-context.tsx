@@ -17,13 +17,13 @@ import {
 import { Alert } from "react-native";
 import { initializeApp } from "firebase/app";
 import { getReactNativePersistence } from "firebase/auth/react-native";
+import { secureStoreGetItem, secureStoreSetItem } from "./secure-storage";
 
 export const AuthContext = createContext({
   uid: "",
   token: "",
   isAuthenticated: false,
-  authenticate: (token) => {},
-  offlineAuthenticate: (token) => {},
+  authenticate: async (token) => {},
   logout: async () => {},
   setUserID: (uid) => {},
   deleteAccount: async () => {},
@@ -35,15 +35,10 @@ function AuthContextProvider({ children }) {
   const [customToken, setCustomToken] = useState("");
   console.log("AuthContextProvider ~ customToken:", customToken);
 
-  function authenticate(token) {
+  async function authenticate(token) {
+    await secureStoreSetItem("token", token);
     setAuthToken(token);
-    AsyncStorage.setItem("token", token);
     setAxiosAccessToken(token);
-  }
-
-  function offlineAuthenticate(token) {
-    setAuthToken(token);
-    AsyncStorage.setItem("token", token);
   }
 
   async function logout() {
@@ -73,9 +68,9 @@ function AuthContextProvider({ children }) {
       persistence: getReactNativePersistence(AsyncStorage),
     });
     // load email and password from async storage
-    const email = await AsyncStorage.getItem("ENCM");
+    const email = await secureStoreGetItem("ENCM");
     console.log("deleteAccount ~ email:", email);
-    const password = await AsyncStorage.getItem("ENCP");
+    const password = await secureStoreGetItem("ENCP");
     signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
       // Signed in
       const user = userCredential.user;
@@ -108,7 +103,6 @@ function AuthContextProvider({ children }) {
     token: authToken,
     isAuthenticated: !!authToken,
     authenticate: authenticate,
-    offlineAuthenticate: offlineAuthenticate,
     logout: logout,
     setUserID: setUserID,
     deleteAccount: deleteAccount,

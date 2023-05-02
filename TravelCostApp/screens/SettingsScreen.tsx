@@ -38,6 +38,7 @@ import Toast from "react-native-toast-message";
 import { useEffect } from "react";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
+import { secureStoreGetItem } from "../store/secure-storage";
 
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
@@ -158,7 +159,7 @@ const SettingsScreen = ({ navigation }) => {
   const [emailString, setEmailString] = useState("");
   useFocusEffect(() => {
     async function getEmail() {
-      const email = await asyncStoreGetItem("ENCM");
+      const email = await secureStoreGetItem("ENCM");
       console.log("getEmail ~ email:", email);
       setEmailString(email);
     }
@@ -166,7 +167,7 @@ const SettingsScreen = ({ navigation }) => {
   });
   useEffect(() => {
     async function getEmail() {
-      const email = await asyncStoreGetItem("ENCM");
+      const email = await secureStoreGetItem("ENCM");
       console.log("getEmail ~ email:", email);
       setEmailString(email);
     }

@@ -94,7 +94,7 @@ function LoginScreen() {
         Alert.alert(i18n.t("noConnection"), i18n.t("tryAgain"));
       }
       authCtx.setUserID(uid);
-      authCtx.authenticate(token);
+      await authCtx.authenticate(token);
     } catch (error) {
       console.error(error);
       setIsAuthenticating(false);

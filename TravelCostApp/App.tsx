@@ -79,6 +79,7 @@ import NetworkContextProvider, {
 import { Text } from "react-native-paper";
 import ConnectionBar from "./components/UI/ConnectionBar";
 import ChatGPTScreen from "./components/ChatGPT/ChatGPTScreen";
+import { secureStoreGetItem } from "./store/secure-storage";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -480,7 +481,7 @@ function Root() {
     await tripCtx.loadTripDataFromStorage();
     await tripCtx.loadTravellersFromStorage();
     await userCtx.loadCatListFromAsyncInCtx("async");
-    authCtx.offlineAuthenticate(storedToken);
+    await authCtx.authenticate(storedToken);
   }
 
   useEffect(() => {
@@ -504,7 +505,7 @@ function Root() {
       console.log("onRootMount ~ online:", online);
 
       // fetch token and trip
-      const storedToken = await asyncStoreGetItem("token");
+      const storedToken = await secureStoreGetItem("token");
       const storedUid = await asyncStoreGetItem("uid");
       const storedTripId = await asyncStoreGetItem("currentTripId");
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
@@ -603,7 +604,7 @@ function Root() {
         await asyncStoreSetItem("currentTripId", tripid);
         const isLoaded = await expensesCtx.loadExpensesFromStorage();
         console.log("onRootMount ~ isLoaded:", isLoaded);
-        authCtx.authenticate(storedToken);
+        await authCtx.authenticate(storedToken);
         // await touchMyTraveler(tripid, storedUid);
         const needsTour = await loadTourConfig();
         console.log("onRootMount ~ needsTour:", needsTour);

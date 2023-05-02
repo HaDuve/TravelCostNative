@@ -137,7 +137,7 @@ const PaywallScreen = ({ navigation }) => {
           <TouchableOpacity
             onPress={() =>
               Linking.openURL(
-                "https://foodfornomads.com/datenschutzerklaerung/"
+                "https://foodfornomads.com/budget-for-nomads_privacy-policy/"
               )
             }
           >

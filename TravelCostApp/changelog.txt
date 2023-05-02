@@ -1,7 +1,18 @@
 Change log Travel Expense App
 
+1.0.0b (AppStore ready)
+- re-added Paywall
+- added links to privacy policy and EULA for App AppStore (Paywall)
+- added privacy/TOS text to Paywall
+- added option to delete account (Settings)
+- removed apple authentication for now (until it is AppStore ready)
+- removed unused and non-ready functionalities
+- improved layout (Trip Form)
+- improved layout and UX Design (Expense Form)
+- added info Button to make it less confusing to add categories (Manage Category)
+- added secure Encryption for passwords, email addresses and tokens
 
-1.0.0
+1.0.0a
 - made skipping the category screen optional (Settings)
 - improved user experience in Login Screen
 - improved user experience in Expense Form

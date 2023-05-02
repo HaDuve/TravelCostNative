@@ -608,11 +608,7 @@ const ExpenseForm = ({
 
   const askChatGPTHandler = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    // const result = await askChatGPT(inputs.description.value);
-    Alert.alert(
-      "Sorry!",
-      "This feature is not yet available. Please check back later!"
-    );
+    navigation.navigate("ChatGPT");
   };
 
   function updateCurrency() {
@@ -1089,8 +1085,9 @@ const ExpenseForm = ({
             {submitButtonLabel}
           </GradientButton>
         </View>
-        <View style={styles.buttonContainer}>
-          {/* <GradientButton
+        {/* Commented out ChatGPT Button */}
+        {/* <View style={[styles.buttonContainer, { marginBottom: "20%" }]}>
+          <GradientButton
             style={[styles.button, { marginTop: 28, minWidth: "80%" }]}
             colors={GlobalStyles.gradientColorsButton}
             onPress={askChatGPTHandler}
@@ -1098,8 +1095,8 @@ const ExpenseForm = ({
           >
             {isEditing && "Ask ChatGPT: Was this a good deal?"}
             {!isEditing && "Ask ChatGPxT: How much should I pay?"}
-          </GradientButton> */}
-        </View>
+          </GradientButton>
+        </View> */}
       </Animated.View>
     </Animated.View>
   );
@@ -1326,7 +1323,7 @@ const styles = StyleSheet.create({
   },
   spacerView: {
     flex: 1,
-    minHeight: "105%",
+    minHeight: "55%",
   },
   spacerViewAdvanced: {
     flex: 1,

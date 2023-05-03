@@ -34,6 +34,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useEffect } from "react";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { NetworkContext } from "../store/network-context";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -47,6 +48,7 @@ const ManageExpense = ({ route, navigation }) => {
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
   const [isOnline, setIsOnline] = useState(netCtx.isConnected);
+  console.log("ManageExpense ~ isOnline:", isOnline);
   const [progress, setProgress] = useState(0);
   const [progressAt, setProgressAt] = useState(0);
   const [progressMax, setProgressMax] = useState(0);
@@ -71,12 +73,6 @@ const ManageExpense = ({ route, navigation }) => {
     updateIsOnline();
   }, [netCtx.isConnected]);
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      title: isEditing ? i18n.t("editExp") : i18n.t("addExp"),
-    });
-  }, [navigation, isEditing]);
-
   async function deleteExpenseHandler() {
     async function deleteExp() {
       setIsSubmitting(true);
@@ -92,7 +88,6 @@ const ManageExpense = ({ route, navigation }) => {
         expenseCtx.deleteExpense(editedExpenseId);
         await deleteExpenseOnlineOffline(item, isOnline);
         await touchAllTravelers(tripid, true);
-        navigation.goBack();
       } catch (error) {
         // setError("Could not delete expense - please try again later!");
         console.error(error);
@@ -246,7 +241,7 @@ const ManageExpense = ({ route, navigation }) => {
   async function confirmHandler(expenseData: ExpenseData) {
     console.log("confirmHandler ~ expenseData:", expenseData);
     setIsSubmitting(true);
-    navigation.pop(2);
+    navigation.navigate("RecentExpenses");
     try {
       // set the category to the corresponting catstring
       expenseData.categoryString = getCatString(expenseData.category);
@@ -255,6 +250,11 @@ const ManageExpense = ({ route, navigation }) => {
       const base = tripCtx.tripCurrency;
       const target = expenseData.currency;
       const rate = await getRate(base, target);
+      console.log("confirmHandler ~ rate:", rate);
+      if (rate === -1) {
+        Alert.alert("Error", "Something went wrong, please try again");
+        return;
+      }
       const calcAmount = expenseData.amount / rate;
       expenseData.calcAmount = calcAmount;
 
@@ -302,6 +302,11 @@ const ManageExpense = ({ route, navigation }) => {
     } catch (error) {
       // setError("Could not save data - please try again later!" + error);
       console.error(error);
+      Toast.show({
+        text1: "Could not save data",
+        text2: "Please try again later!",
+        type: "error",
+      });
       setIsSubmitting(false);
     }
   }

@@ -25,6 +25,7 @@ import { UserContext } from "../../store/user-context";
 import { ExpenseData, Expense } from "../../util/expense";
 import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -109,11 +110,16 @@ function onClick({ item, index }, isOnline) {
           id: editedExpenseId,
         },
       };
-      await deleteExpenseOnlineOffline(item, isOnline);
       expenseCtx?.deleteExpense(editedExpenseId);
+      await deleteExpenseOnlineOffline(item, isOnline);
       await touchAllTravelers(tripid, true);
     } catch (error) {
       console.log(i18n.t("deleteError"), error);
+      Toast.show({
+        text1: "Error",
+        text2: "Could not delete expense, sorry!",
+        type: "error",
+      });
     }
   }
   async function deleteExpenseHandler() {

@@ -118,6 +118,12 @@ function ExpensesContextProvider({ children }) {
     loadExpensesFromStorage();
   }, []);
 
+  useEffect(() => {
+    // save expenseState in async
+    console.log("saving expenses");
+    asyncStoreSetObject("expenses", expensesState);
+  }, [expensesState]);
+
   function addExpense(expenseData: ExpenseData) {
     dispatch({ type: "ADD", payload: expenseData });
   }

@@ -414,32 +414,15 @@ function Root() {
   // check regularly
   useInterval(
     () => {
-      // async function asyncLength() {
-      //   const expenses = await asyncStoreGetObject("expenses");
-      //   const length = expenses ? expenses.length : 0;
-      //   expenses ? console.log(" ~~~~~  asyncLength ~ length:", length) : null;
-      // }
-      if (isForeground() && authCtx.isAuthenticated && netCtx.isConnected) {
+      if (isForeground() && authCtx.isAuthenticated) {
         const asyncQueue = async () => {
           await sendOfflineQueue();
         };
+        console.log("Root ~ send asyncQueue:", asyncQueue);
         asyncQueue();
       }
-      // debug asyncstore expenses
-      // asyncLength();
-      // debug premium
-      // useEffect to track premium
-      // async function checkPremium() {
-      //   const isPremium = await userCtx.checkPremium();
-      //   Toast.show({
-      //     type: isPremium ? "success" : "error",
-      //     text1: "Premium Status",
-      //     text2: isPremium ? "Premium" : "Not Premium",
-      //   });
-      // }
-      // checkPremium();
     },
-    DEBUG_POLLING_INTERVAL * 1.01,
+    DEBUG_POLLING_INTERVAL * 1.7,
     false
   );
 
@@ -448,6 +431,7 @@ function Root() {
     async function listener() {
       // only listen to isOnline if we dont have an offline queue
       const queue = await asyncStoreGetObject("offlineQueue");
+      console.log("listener ~ queue:", queue);
       if (!appIsReady || (queue && queue.length > 0)) {
         return;
       } else {
@@ -460,7 +444,7 @@ function Root() {
       }
     }
     listener();
-  }, [netCtx.isConnected]);
+  }, [appIsReady, netCtx.isConnected]);
 
   const showModalIfNeeded = async () => {
     if (await shouldPromptForRating()) {

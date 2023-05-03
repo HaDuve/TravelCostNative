@@ -232,30 +232,39 @@ export const sendOfflineQueue = async () => {
     for (let i = 0; i < queue.length; i++) {
       const item = queue[i];
       tripid = item.expense.tripid;
-      await touchAllTravelers(tripid, true);
-      console.log("sendOfflineQueue ~ item:", item);
-      console.log("sendOfflineQueue ~ item.type:", item.type);
-      if (item.type === "add") {
-        await storeExpense(
-          item.expense.tripid,
-          item.expense.uid,
-          item.expense.expenseData
-        );
-      } else if (item.type === "update") {
-        await updateExpense(
-          item.expense.tripid,
-          item.expense.uid,
-          item.expense.id,
-          item.expense.expenseData
-        );
-      } else if (item.type === "delete") {
-        await deleteExpense(
-          item.expense.tripid,
-          item.expense.uid,
-          item.expense.id
-        );
-      } else {
-        console.log("unknown type");
+      try {
+        await touchAllTravelers(tripid, true);
+        console.log("sendOfflineQueue ~ item:", item);
+        console.log("sendOfflineQueue ~ item.type:", item.type);
+        if (item.type === "add") {
+          await storeExpense(
+            item.expense.tripid,
+            item.expense.uid,
+            item.expense.expenseData
+          );
+        } else if (item.type === "update") {
+          await updateExpense(
+            item.expense.tripid,
+            item.expense.uid,
+            item.expense.id,
+            item.expense.expenseData
+          );
+        } else if (item.type === "delete") {
+          await deleteExpense(
+            item.expense.tripid,
+            item.expense.uid,
+            item.expense.id
+          );
+        } else {
+          console.log("unknown type");
+        }
+      } catch (error) {
+        Toast.show({
+          text1: "Error syncing data",
+          text2: "I will try to sync again later!",
+          type: "error",
+        });
+        return;
       }
     }
 

@@ -158,14 +158,6 @@ function ExpenseItem(props): JSX.Element {
     );
 
   if (!id) return <></>;
-  // if any of the numbers is NaN, return <>Error</>
-  if (
-    isNaN(rate) ||
-    isNaN(Number(calcAmount)) ||
-    isNaN(Number(calcAmountString)) ||
-    isNaN(Number(amountString))
-  )
-    return <></>;
 
   let dateString = date ? date : "no date";
   // if date is today, show "Today" instead of date

@@ -260,7 +260,7 @@ export const sendOfflineQueue = async () => {
         }
       } catch (error) {
         Toast.show({
-          text1: "Error syncing data",
+          text1: "Bad Connection",
           text2: "I will try to sync again later!",
           type: "error",
         });
@@ -274,7 +274,7 @@ export const sendOfflineQueue = async () => {
     Toast.show({
       type: "success",
       text1: "Online again!",
-      text2: "Synchronizing " + queue.length + " offline Changes!",
+      text2: "Synchronized " + queue.length + " offline Changes!",
     });
   } else {
     // console.log("no queue");

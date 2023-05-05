@@ -1,5 +1,14 @@
 Change log Travel Expense App
 
+1.1.1 (AppStore ready)
+- fixed a bug that made expenses dissapear sometimes
+- fixed a bug that hid new expenses sometimes
+- fixed bugs with exchange rates and offline expenses
+- improved responsiveness of expense management
+- improved error catching
+- improved error feedback to the user
+- updated privacy policy link
+
 1.1.0b (AppStore ready)
 - re-added Paywall
 - added links to privacy policy and EULA for App AppStore (Paywall)

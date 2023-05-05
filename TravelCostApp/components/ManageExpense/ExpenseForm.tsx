@@ -666,13 +666,15 @@ const ExpenseForm = ({
     category: newCat ? pickedCat : inputs.category.value,
     country: inputs.country.value,
     currency: inputs.currency.value,
-    whoPaid: whoPaid, // TODO: convert this to uid
+    whoPaid: whoPaid,
     owePerc: +inputs.owePerc.value,
     splitType: splitType,
     listEQUAL: splitTravellersList,
     splitList: splitList,
     duplOrSplit: duplOrSplit,
     iconName: iconName,
+    categoryString: "",
+    calcAmount: 0,
   };
 
   return (

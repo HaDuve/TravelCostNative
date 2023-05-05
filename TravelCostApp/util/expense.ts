@@ -25,6 +25,7 @@ export interface ExpenseData {
   calcAmount: number;
   duplOrSplit?: number;
   splitList?: Split[];
+  listEQUAL?: string[];
   iconName?: string;
   rangeId?: string;
 }

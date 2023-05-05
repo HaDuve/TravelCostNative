@@ -71,8 +71,9 @@ import { ExpenseData } from "../../util/expense";
 import { NetworkContext } from "../../store/network-context";
 import { SettingsContext } from "../../store/settings-context";
 import Autocomplete from "../UI/Autocomplete";
-import { ExpensesContext } from "../../store/expenses-context";
+import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { getCurrencySymbol } from "../../util/currencySymbol";
+import { useFocusEffect } from "@react-navigation/native";
 
 const ExpenseForm = ({
   onCancel,
@@ -106,24 +107,17 @@ const ExpenseForm = ({
   const [countryValue, setCountryValue] = useState("EUR");
   const [loadingTravellers, setLoadingTravellers] = useState(false);
 
-  console.log("iconName:", iconName);
-  const [defaultCatSymbol, setCatSymbol] = useState(iconName ? iconName : "");
-  console.log("defaultCatSymbol:", defaultCatSymbol);
-  const [pickedCatSymbol, setCatSymbolPicked] = useState(
-    pickedCat ? getCatSymbol(pickedCat) : ""
-  );
-  console.log("pickedCatSymbol:", pickedCatSymbol);
-  const [iconString, setIconString] = useState(
-    iconName
-      ? iconName
-      : editingValues
-      ? editingValues.iconName
-        ? editingValues.iconName
-        : newCat
-        ? pickedCatSymbol
-        : defaultCatSymbol
-      : pickedCatSymbol
-  );
+  const iconString = iconName ? iconName : getCatSymbol(pickedCat);
+  const [icon, setIcon] = useState(iconString);
+  const getSetCatIcon = async (catString: string) => {
+    const icon = await getCatSymbolAsync(catString);
+    setIcon(icon);
+  };
+  useEffect(() => {
+    if (pickedCat) getSetCatIcon(pickedCat);
+    else if (editingValues?.category) getSetCatIcon(editingValues?.category);
+    else if (editingValues?.iconName) setIcon(editingValues.iconName);
+  }, [pickedCat, editingValues]);
 
   useEffect(() => {
     const hideAdvanceByDefault = isEditing || alwaysShowAdvancedSetting;
@@ -132,18 +126,8 @@ const ExpenseForm = ({
 
   // extract suggestions from all the descriptions of expense state into an array of strings
   const suggestionData = expCtx
-    .getRecentExpenses("year")
+    .getRecentExpenses(RangeString.year)
     .map((expense) => expense.description);
-
-  useEffect(() => {
-    async function setCatSymbolAsync() {
-      if (!editingValues) return;
-      const cat = await getCatSymbolAsync(editingValues.category);
-      setCatSymbol(cat);
-    }
-    setCatSymbolAsync();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     async function setTravellers() {
@@ -336,9 +320,7 @@ const ExpenseForm = ({
             ["category"]: { value: mappedCategory, isValid: true },
           };
         });
-        setCatSymbol(symbol);
-        setCatSymbolPicked(symbol);
-        setIconString(symbol);
+        setIcon(symbol);
       }
     }
     setInputs((curInputs) => {
@@ -714,7 +696,7 @@ const ExpenseForm = ({
             />
             <IconButton
               buttonStyle={[styles.iconButton, GlobalStyles.strongShadow]}
-              icon={iconString}
+              icon={icon}
               color={GlobalStyles.colors.primary500}
               size={48}
               onPress={() => {

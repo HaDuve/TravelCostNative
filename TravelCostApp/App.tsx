@@ -418,7 +418,6 @@ function Root() {
         const asyncQueue = async () => {
           await sendOfflineQueue();
         };
-        console.log("Root ~ send asyncQueue:", asyncQueue);
         asyncQueue();
       }
     },

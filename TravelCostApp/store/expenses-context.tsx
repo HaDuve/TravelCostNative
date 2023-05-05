@@ -13,6 +13,13 @@ import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 import PropTypes from "prop-types";
 import { Expense, ExpenseData } from "../util/expense";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+export enum RangeString {
+  day = "day",
+  week = "week",
+  month = "month",
+  year = "year",
+  total = "total",
+}
 
 export const ExpensesContext = createContext({
   expenses: [],
@@ -51,7 +58,7 @@ export const ExpensesContext = createContext({
       iconName,
     }: ExpenseData
   ) => {},
-  getRecentExpenses: (rangestring): Array<ExpenseData> => {
+  getRecentExpenses: (rangestring: RangeString): Array<ExpenseData> => {
     return [];
   },
   getYearlyExpenses: (yearsBack) => {
@@ -139,7 +146,8 @@ function ExpensesContextProvider({ children }) {
   function updateExpense(id: string, expenseData: ExpenseData) {
     dispatch({ type: "UPDATE", payload: { id: id, data: expenseData } });
   }
-  function getRecentExpenses(rangestring: string) {
+
+  function getRecentExpenses(rangestring: RangeString) {
     let expenses = [];
     switch (rangestring) {
       case "day":

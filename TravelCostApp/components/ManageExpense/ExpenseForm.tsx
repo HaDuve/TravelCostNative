@@ -106,10 +106,13 @@ const ExpenseForm = ({
   const [countryValue, setCountryValue] = useState("EUR");
   const [loadingTravellers, setLoadingTravellers] = useState(false);
 
+  console.log("iconName:", iconName);
   const [defaultCatSymbol, setCatSymbol] = useState(iconName ? iconName : "");
+  console.log("defaultCatSymbol:", defaultCatSymbol);
   const [pickedCatSymbol, setCatSymbolPicked] = useState(
     pickedCat ? getCatSymbol(pickedCat) : ""
   );
+  console.log("pickedCatSymbol:", pickedCatSymbol);
   const [iconString, setIconString] = useState(
     iconName
       ? iconName
@@ -334,6 +337,7 @@ const ExpenseForm = ({
           };
         });
         setCatSymbol(symbol);
+        setCatSymbolPicked(symbol);
         setIconString(symbol);
       }
     }

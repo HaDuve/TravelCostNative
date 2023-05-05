@@ -333,8 +333,8 @@ const ExpenseForm = ({
             ["category"]: { value: mappedCategory, isValid: true },
           };
         });
-        // setCatSymbol(symbol);
-        // setIconString(symbol);
+        setCatSymbol(symbol);
+        setIconString(symbol);
       }
     }
     setInputs((curInputs) => {

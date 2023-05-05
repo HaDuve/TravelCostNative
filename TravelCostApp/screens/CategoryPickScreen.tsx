@@ -32,6 +32,7 @@ import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NetworkContext } from "../store/network-context";
+import { DEFAULTCATEGORIES } from "../util/category";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -47,50 +48,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
   const isOnline = netCtx.isConnected;
   const tripid = tripCtx.tripid;
 
-  const CATLIST = [
-    {
-      id: 1,
-      icon: "fast-food-outline",
-      color: GlobalStyles.colors.textColor,
-      cat: "food",
-      catString: i18n.t("catFoodString"),
-    },
-    {
-      id: 2,
-      icon: "airplane-outline",
-      color: GlobalStyles.colors.textColor,
-      cat: "international-travel",
-      catString: i18n.t("catIntTravString"),
-    },
-    {
-      id: 3,
-      icon: "bed-outline",
-      color: GlobalStyles.colors.textColor,
-      cat: "accomodation",
-      catString: i18n.t("catAccoString"),
-    },
-    {
-      id: 4,
-      icon: "car-outline",
-      color: GlobalStyles.colors.textColor,
-      cat: "national-travel",
-      catString: i18n.t("catNatTravString"),
-    },
-    {
-      id: 5,
-      icon: "basket-outline",
-      color: GlobalStyles.colors.textColor,
-      cat: "other",
-      catString: i18n.t("catOtherString"),
-    },
-    {
-      id: 6,
-      icon: "add-outline",
-      color: GlobalStyles.colors.textColor,
-      cat: "newCat",
-      catString: i18n.t("catNewString"),
-    },
-  ];
+  const CATLIST = DEFAULTCATEGORIES;
 
   const [categoryList, setCategoryList] = useState(CATLIST);
   // isfetching state
@@ -268,7 +226,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
                   buttonStyle={styles.continueButtonStyle}
                   onPress={() => {
                     navigation.navigate("ManageExpense", {
-                      pickedCat: "other",
+                      pickedCat: "undefined",
                     });
                   }}
                 >

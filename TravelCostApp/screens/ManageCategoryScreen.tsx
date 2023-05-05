@@ -37,7 +37,7 @@ import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import * as Haptics from "expo-haptics";
 import Toast from "react-native-toast-message";
-import { Category } from "../util/category";
+import { Category, DEFAULTCATEGORIES } from "../util/category";
 import Dimensions from "react-native";
 import { alertYesNo } from "../components/Errors/Alert";
 import IconButton from "../components/UI/IconButton";
@@ -47,43 +47,11 @@ import Modal from "react-native-modal";
 import FlatButton from "../components/UI/FlatButton";
 
 const ManageCategoryScreen = ({ route, navigation }) => {
-  const defaultCategoryList: Category[] = [
-    {
-      id: 1,
-      icon: "fast-food-outline",
-      color: GlobalStyles.colors.textColor,
-      cat: "food",
-      catString: i18n.t("catFoodString"),
-    },
-    {
-      id: 2,
-      icon: "airplane-outline",
-      color: GlobalStyles.colors.textColor,
-      cat: "international-travel",
-      catString: i18n.t("catIntTravString"),
-    },
-    {
-      id: 3,
-      icon: "bed-outline",
-      color: GlobalStyles.colors.textColor,
-      cat: "accomodation",
-      catString: i18n.t("catAccoString"),
-    },
-    {
-      id: 4,
-      icon: "car-outline",
-      color: GlobalStyles.colors.textColor,
-      cat: "national-travel",
-      catString: i18n.t("catNatTravString"),
-    },
-    {
-      id: 5,
-      icon: "basket-outline",
-      color: GlobalStyles.colors.textColor,
-      cat: "other",
-      catString: i18n.t("catOtherString"),
-    },
-  ];
+  // defaultCategories minus the last element (-new cat element)
+  const defaultCategoryList: Category[] = DEFAULTCATEGORIES.slice(
+    0,
+    DEFAULTCATEGORIES.length - 1
+  );
 
   const [categoryList, setCategoryList] =
     useState<Category[]>(defaultCategoryList);

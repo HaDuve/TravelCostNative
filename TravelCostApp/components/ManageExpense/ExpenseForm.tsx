@@ -20,9 +20,11 @@ import IconButton from "../UI/IconButton";
 import { UserContext } from "../../store/user-context";
 import FlatButton from "../UI/FlatButton";
 import {
+  DEFAULTCATEGORIES,
   getCatString,
   getCatSymbol,
   getCatSymbolAsync,
+  mapDescriptionToCategory,
 } from "../../util/category";
 import DropDownPicker from "react-native-dropdown-picker";
 // import CurrencyPicker from "react-native-currency-picker";
@@ -105,6 +107,20 @@ const ExpenseForm = ({
   const [loadingTravellers, setLoadingTravellers] = useState(false);
 
   const [defaultCatSymbol, setCatSymbol] = useState(iconName ? iconName : "");
+  const [pickedCatSymbol, setCatSymbolPicked] = useState(
+    pickedCat ? getCatSymbol(pickedCat) : ""
+  );
+  const [iconString, setIconString] = useState(
+    iconName
+      ? iconName
+      : editingValues
+      ? editingValues.iconName
+        ? editingValues.iconName
+        : newCat
+        ? pickedCatSymbol
+        : defaultCatSymbol
+      : pickedCatSymbol
+  );
 
   useEffect(() => {
     const hideAdvanceByDefault = isEditing || alwaysShowAdvancedSetting;
@@ -125,10 +141,6 @@ const ExpenseForm = ({
     setCatSymbolAsync();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const [pickedCatSymbol, setCatSymbolPicked] = useState(
-    pickedCat ? getCatSymbol(pickedCat) : ""
-  );
 
   useEffect(() => {
     async function setTravellers() {
@@ -306,6 +318,25 @@ const ExpenseForm = ({
   });
 
   function inputChangedHandler(inputIdentifier, enteredValue) {
+    // calc category from description
+    if (inputIdentifier === "description" && pickedCat === "undefined") {
+      const mappedCategory = mapDescriptionToCategory(
+        enteredValue,
+        // TODO PUT ALL CATEGORIES
+        DEFAULTCATEGORIES
+      );
+      const symbol = getCatSymbol(mappedCategory);
+      if (mappedCategory) {
+        setInputs((curInputs) => {
+          return {
+            ...curInputs,
+            ["category"]: { value: mappedCategory, isValid: true },
+          };
+        });
+        // setCatSymbol(symbol);
+        // setIconString(symbol);
+      }
+    }
     setInputs((curInputs) => {
       return {
         ...curInputs,
@@ -679,17 +710,7 @@ const ExpenseForm = ({
             />
             <IconButton
               buttonStyle={[styles.iconButton, GlobalStyles.strongShadow]}
-              icon={
-                iconName
-                  ? iconName
-                  : editingValues
-                  ? editingValues.iconName
-                    ? editingValues.iconName
-                    : newCat
-                    ? pickedCatSymbol
-                    : defaultCatSymbol
-                  : pickedCatSymbol
-              }
+              icon={iconString}
               color={GlobalStyles.colors.primary500}
               size={48}
               onPress={() => {

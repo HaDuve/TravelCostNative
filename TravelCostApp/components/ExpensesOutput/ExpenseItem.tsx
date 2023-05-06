@@ -41,7 +41,7 @@ function ExpenseItem(props): JSX.Element {
     id,
     description,
     amount,
-    date,
+
     category,
     country,
     whoPaid,
@@ -51,6 +51,7 @@ function ExpenseItem(props): JSX.Element {
     iconName,
     showSumForTravellerName,
   } = props;
+  let { date } = props;
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
@@ -158,7 +159,7 @@ function ExpenseItem(props): JSX.Element {
     );
 
   if (!id) return <></>;
-
+  if (typeof date === "string") date = new Date(date);
   let dateString = date ? date : "no date";
   // if date is today, show "Today" instead of date
   // if periodName is "today" dont show "today"

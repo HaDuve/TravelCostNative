@@ -153,14 +153,16 @@ const ExpenseForm = ({
   const [startDate, setStartDate] = useState(
     editingValues
       ? getFormattedDate(
-          DateTime.fromJSDate(editingValues.startDate).toJSDate()
+          editingValues.startDate
+          // DateTime.fromJSDate(editingValues.startDate).toJSDate()
         )
       : getFormattedDate(DateTime.now())
   );
   const [endDate, setEndDate] = useState(
     editingValues
-      ? getFormattedDate(DateTime.fromJSDate(editingValues.endDate).toJSDate())
-      : getFormattedDate(DateTime.now())
+      ? getFormattedDate(editingValues.endDate)
+      : // DateTime.fromJSDate(editingValues.endDate).toJSDate())
+        getFormattedDate(DateTime.now())
   );
 
   const openDatePickerRange = () => {
@@ -430,7 +432,7 @@ const ExpenseForm = ({
       !isNaN(expenseData.amount) &&
       expenseData.amount > 0 &&
       expenseData.amount < 34359738368;
-    const dateIsValid = expenseData.date.toString() !== "Invalid Date";
+    const dateIsValid = expenseData.date?.toString() !== "Invalid Date";
     const descriptionIsValid = expenseData.description.trim().length > 0;
     const whoPaidIsValid = true;
     const categoryIsValid = true;
@@ -649,7 +651,7 @@ const ExpenseForm = ({
   );
   const hidePickers = true;
   const dateIsRanged =
-    startDate.toString().slice(0, 10) !== endDate.toString().slice(0, 10);
+    startDate?.toString().slice(0, 10) !== endDate?.toString().slice(0, 10);
   const datepickerJSX = DatePickerModal({
     showDatePickerRange,
     onCancelRange,

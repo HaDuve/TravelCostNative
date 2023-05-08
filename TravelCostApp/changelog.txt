@@ -1,5 +1,10 @@
 Change log Travel Expense App
 
+
+
+1.1.1b (AppStore ready)
+- added automatic category finder, when typing in a description without having a category defined yet
+
 1.1.1 (AppStore ready)
 - fixed a bug that made expenses dissapear sometimes
 - fixed a bug that hid new expenses sometimes

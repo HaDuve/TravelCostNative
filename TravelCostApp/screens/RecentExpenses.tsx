@@ -41,7 +41,7 @@ i18n.enableFallback = true;
 import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpensesUtil";
-import { asyncStoreGetItem, asyncStoreSetItem } from "../store/async-storage";
+import { asyncStoreGetObject, asyncStoreSetItem } from "../store/async-storage";
 import { _toShortFormat } from "../util/dateTime";
 import { useFocusEffect } from "@react-navigation/native";
 import { isForeground } from "../util/appState";
@@ -50,6 +50,8 @@ import PropTypes from "prop-types";
 import { ExpenseData } from "../util/expense";
 import Toast from "react-native-toast-message";
 import { NetworkContext } from "../store/network-context";
+import { isConnectionFastEnough } from "../util/connectionSpeed";
+import { sendOfflineQueue } from "../util/offline-queue";
 
 function RecentExpenses({ navigation }) {
   const expensesCtx = useContext(ExpensesContext);
@@ -126,8 +128,18 @@ function RecentExpenses({ navigation }) {
   ) {
     // check offlinemode
     const online = netCtx.isConnected;
+    const { isFastEnough, speed } = await isConnectionFastEnough();
+    const offlineQueue = await asyncStoreGetObject("offlineQueue");
+    const offlineQueueNonEmpty = offlineQueue && offlineQueue.length > 0;
     console.log("RecentExpenses ~ online:", online);
-    if (!online) {
+    console.log("RecentExpenses ~ isFastEnough:", isFastEnough);
+    console.log("RecentExpenses ~ speed:", speed);
+    console.log("RecentExpenses ~ offlineQueue.length:", offlineQueue?.length);
+    if (!online || !isFastEnough || offlineQueueNonEmpty) {
+      if (online && isFastEnough) {
+        console.log("RecentExpenses ~ sending offline queue");
+        await sendOfflineQueue();
+      }
       // setIsFetching(true);
       await test_offlineLoad(expensesCtx, setRefreshing, setIsFetching);
       // setIsFetching(false);

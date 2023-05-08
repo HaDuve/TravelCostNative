@@ -15,6 +15,7 @@ import * as Device from "expo-device";
 import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
 
 import NetInfo from "@react-native-community/netinfo";
+import { isConnectionFastEnough } from "./connectionSpeed";
 
 // interface of offline queue manage expense item
 export interface OfflineQueueManageExpenseItem {
@@ -56,7 +57,12 @@ export const deleteExpenseOnlineOffline = async (
     );
   }
   item.expense.tripid = tripid;
-  if (online) {
+
+  // if the internet is not fast enough, store in offline queue
+  const { isFastEnough, speed } = await isConnectionFastEnough();
+  console.log("isFastEnough:", isFastEnough);
+  console.log("speed:", speed, "bytes/second");
+  if (online && isFastEnough) {
     // delete item online
     try {
       await deleteExpense(
@@ -113,7 +119,11 @@ export const updateExpenseOnlineOffline = async (
     );
   }
   item.expense.tripid = tripid;
-  if (online) {
+  // if the internet is not fast enough, store in offline queue
+  const { isFastEnough, speed } = await isConnectionFastEnough();
+  console.log("isFastEnough:", isFastEnough);
+  console.log("speed:", speed, "bytes/second");
+  if (online && isFastEnough) {
     // update item online
     try {
       await updateExpense(
@@ -171,7 +181,11 @@ export const storeExpenseOnlineOffline = async (
     );
   }
   item.expense.tripid = tripid;
-  if (online) {
+  // if the internet is not fast enough, store in offline queue
+  const { isFastEnough, speed } = await isConnectionFastEnough();
+  console.log("isFastEnough:", isFastEnough);
+  console.log("speed:", speed, "bytes/second");
+  if (online && isFastEnough) {
     // store item online
     try {
       const id = await storeExpense(
@@ -223,7 +237,12 @@ export const sendOfflineQueue = async () => {
     const forceOffline = !Device.isDevice && DEBUG_FORCE_OFFLINE;
     const isOnline = await NetInfo.fetch();
     console.log("update connected =", isOnline);
-    if (!isOnline || !isOnline.isConnected || forceOffline) {
+    // if the internet is not fast enough, store in offline queue
+    const { isFastEnough, speed } = await isConnectionFastEnough();
+    console.log("isFastEnough:", isFastEnough);
+    console.log("speed:", speed, "bytes/second");
+
+    if (!isOnline || !isOnline.isConnected || !isFastEnough || forceOffline) {
       console.log("sendOfflineQueue ~ still offline!");
       return;
     }

@@ -41,7 +41,6 @@ function ExpenseItem(props): JSX.Element {
     id,
     description,
     amount,
-
     category,
     country,
     whoPaid,

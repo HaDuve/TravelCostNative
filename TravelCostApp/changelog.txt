@@ -1,6 +1,10 @@
 Change log Travel Expense App
 
-
+1.1.1c (AppStore ready)
+- fixed expense form render crash
+- added an internet speed test to check if connections is terrible (would happen sometimes even in wifi or 5G situations)
+- offline queue now prevents refreshing of expense list (so if the new data is not on the server yet you cant download old data)
+- these changes should finally fix all bugs regarding user expense data getting lost or hidden :)
 
 1.1.1b (AppStore ready)
 - added automatic category finder, when typing in a description without having a category defined yet

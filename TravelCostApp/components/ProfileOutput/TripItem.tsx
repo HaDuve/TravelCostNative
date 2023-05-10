@@ -59,7 +59,7 @@ function TripItem({
 
   useEffect(() => {
     async function getTripTravellers() {
-      if (netCtx.isConnected === false) return;
+      if (!netCtx.isConnected || !netCtx.strongConnection) return;
       setIsFetching(true);
       try {
         const listTravellers = await getTravellers(tripid);
@@ -78,7 +78,7 @@ function TripItem({
 
   function tripPressHandler() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (netCtx.isConnected === false) {
+    if (!netCtx.isConnected || !netCtx.strongConnection) {
       Alert.alert("You are offline", "Please go online to manage your trip");
       return;
     }

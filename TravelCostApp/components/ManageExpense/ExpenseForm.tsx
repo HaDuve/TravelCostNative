@@ -132,7 +132,7 @@ const ExpenseForm = ({
   useEffect(() => {
     async function setTravellers() {
       setLoadingTravellers(true);
-      if (netCtx.isConnected) {
+      if (netCtx.isConnected && netCtx.strongConnection) {
         try {
           await tripCtx.setCurrentTravellers(tripCtx.tripid);
         } catch (error) {
@@ -143,7 +143,7 @@ const ExpenseForm = ({
       setLoadingTravellers(false);
     }
     setTravellers();
-  }, [tripCtx.tripid, netCtx.isConnected]);
+  }, [tripCtx.tripid, netCtx.isConnected, netCtx.strongConnection]);
 
   // currencypicker reference for open/close
   // let currencyPickerRef = undefined;

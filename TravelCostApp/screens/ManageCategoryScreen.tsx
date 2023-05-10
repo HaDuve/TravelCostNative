@@ -66,7 +66,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
 
   const userCtx = useContext(UserContext);
   const netCtx = useContext(NetworkContext);
-  const isOnline = netCtx.isConnected;
+  const isOnline = netCtx.isConnected && netCtx.strongConnection;
 
   const tripCtx = useContext(TripContext);
   const tripid = tripCtx.tripid;

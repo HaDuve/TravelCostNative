@@ -47,7 +47,9 @@ const ManageExpense = ({ route, navigation }) => {
   const authCtx = useContext(AuthContext);
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
-  const [isOnline, setIsOnline] = useState(netCtx.isConnected);
+  const [isOnline, setIsOnline] = useState(
+    netCtx.isConnected && netCtx.strongConnection
+  );
   console.log("ManageExpense ~ isOnline:", isOnline);
   const [progress, setProgress] = useState(0);
   const [progressAt, setProgressAt] = useState(0);
@@ -67,11 +69,11 @@ const ManageExpense = ({ route, navigation }) => {
 
   useEffect(() => {
     const updateIsOnline = async () => {
-      const isOnline = netCtx.isConnected;
+      const isOnline = netCtx.isConnected && netCtx.strongConnection;
       setIsOnline(isOnline);
     };
     updateIsOnline();
-  }, [netCtx.isConnected]);
+  }, [netCtx.isConnected, netCtx.strongConnection]);
 
   async function deleteExpenseHandler() {
     async function deleteExp() {

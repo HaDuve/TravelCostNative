@@ -16,6 +16,7 @@ import { _toShortFormat } from "../util/dateTime";
 import { useFocusEffect } from "@react-navigation/native";
 import PropTypes from "prop-types";
 import Toast from "react-native-toast-message";
+import { NetworkContext } from "../store/network-context";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -24,11 +25,22 @@ i18n.enableFallback = true;
 const OverviewScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
   const userCtx = useContext(UserContext);
+  const netCtx = useContext(NetworkContext);
 
   const [open, setOpen] = useState(false);
   const [PeriodValue, setPeriodValue] = useState(userCtx.periodName);
 
   const [dateTimeString, setDateTimeString] = useState("");
+  // strong connection state
+  const [offlineString, setOfflineString] = useState("");
+  // set in useEffect
+  useEffect(() => {
+    if (netCtx.strongConnection) {
+      setOfflineString("");
+    } else {
+      setOfflineString(" - Offline");
+    }
+  }, [netCtx.strongConnection]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -49,7 +61,10 @@ const OverviewScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.dateHeader}>
-        <Text style={styles.dateString}>{dateTimeString}</Text>
+        <Text style={styles.dateString}>
+          {dateTimeString}
+          {offlineString}
+        </Text>
       </View>
       <View style={styles.header}>
         <DropDownPicker

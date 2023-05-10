@@ -318,9 +318,7 @@ function Home() {
         },
         tabBarActiveTintColor: GlobalStyles.colors.primary500,
         tabBarIndicatorStyle: {
-          backgroundColor: netCtx.isConnected
-            ? GlobalStyles.colors.primary500
-            : "black",
+          backgroundColor: GlobalStyles.colors.primary500,
         },
         tabBarBounces: true,
       })}
@@ -425,26 +423,6 @@ function Root() {
     false
   );
 
-  // useEffect to track isOnline
-  useEffect(() => {
-    async function listener() {
-      // only listen to isOnline if we dont have an offline queue
-      const queue = await asyncStoreGetObject("offlineQueue");
-      console.log("listener ~ queue:", queue);
-      if (!appIsReady || (queue && queue.length > 0)) {
-        return;
-      } else {
-        Toast.show({
-          type: netCtx.isConnected ? "success" : "error",
-          text1: "Status Update",
-          text2: netCtx.isConnected ? "Online" : "Offline",
-          visibilityTime: 1000,
-        });
-      }
-    }
-    listener();
-  }, [appIsReady, netCtx.isConnected]);
-
   const showModalIfNeeded = async () => {
     if (await shouldPromptForRating()) {
       setIsReviewModalVisible(true);
@@ -484,7 +462,7 @@ function Root() {
       if (DEBUG_RESET) await asyncStoreSafeClear();
 
       // offline check and set context
-      const online = netCtx.isConnected;
+      const online = netCtx.isConnected && netCtx.strongConnection;
       console.log("onRootMount ~ online:", online);
 
       // fetch token and trip

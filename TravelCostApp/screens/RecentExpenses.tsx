@@ -5,7 +5,7 @@ import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { AuthContext } from "../store/auth-context";
-import { ExpensesContext } from "../store/expenses-context";
+import { ExpensesContext, RangeString } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 import { toShortFormat } from "../util/date";
@@ -59,7 +59,7 @@ function RecentExpenses({ navigation }) {
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
-  const online = netCtx.isConnected;
+  const isOnline = netCtx.isConnected && netCtx.strongConnection;
 
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
@@ -67,7 +67,7 @@ function RecentExpenses({ navigation }) {
   const [error, setError] = useState();
 
   const [open, setOpen] = useState(false);
-  const [PeriodValue, setPeriodValue] = useState("day");
+  const [PeriodValue, setPeriodValue] = useState<RangeString>(RangeString.day);
   userCtx.setPeriodString(PeriodValue);
 
   const [dateTimeString, setDateTimeString] = useState("");
@@ -82,23 +82,21 @@ function RecentExpenses({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = test_getExpenses.bind(this, true);
 
-  // const offlineString = netCtx.strongConnection ? "" : " - Offline";
   // strong connection state
   const [offlineString, setOfflineString] = useState("");
   // set in useEffect
   useEffect(() => {
-    if (netCtx.strongConnection) {
+    if (isOnline) {
       setOfflineString("");
     } else {
       setOfflineString(" - Offline");
     }
-  }, [netCtx.strongConnection]);
+  }, [isOnline]);
 
   useEffect(() => {
     const asyncLoading = async () => {
       await expensesCtx.loadExpensesFromStorage();
     };
-
     asyncLoading();
     if (netCtx.isConnected && netCtx.strongConnection) {
       test_getExpenses();
@@ -115,7 +113,6 @@ function RecentExpenses({ navigation }) {
       if (isForeground()) {
         const asyncPolling = async () => {
           await getExpenses(true, true);
-          // await getExpenses(true, true);
         };
         asyncPolling();
       }
@@ -125,11 +122,11 @@ function RecentExpenses({ navigation }) {
   );
 
   const [items, setItems] = useState([
-    { label: i18n.t("todayLabel"), value: "day" },
-    { label: i18n.t("weekLabel"), value: "week" },
-    { label: i18n.t("monthLabel"), value: "month" },
-    { label: i18n.t("yearLabel"), value: "year" },
-    { label: i18n.t("totalLabel"), value: "total" },
+    { label: i18n.t("todayLabel"), value: RangeString.day },
+    { label: i18n.t("weekLabel"), value: RangeString.week },
+    { label: i18n.t("monthLabel"), value: RangeString.month },
+    { label: i18n.t("yearLabel"), value: RangeString.year },
+    { label: i18n.t("totalLabel"), value: RangeString.total },
   ]);
 
   async function getExpenses(
@@ -137,7 +134,7 @@ function RecentExpenses({ navigation }) {
     showAnyIndicator = false
   ) {
     // check offlinemode
-    const online = netCtx.isConnected;
+    const online = netCtx.isConnected && netCtx.strongConnection;
     const { isFastEnough, speed } = await isConnectionFastEnough();
     const offlineQueue = await asyncStoreGetObject("offlineQueue");
     const offlineQueueNonEmpty = offlineQueue && offlineQueue.length > 0;

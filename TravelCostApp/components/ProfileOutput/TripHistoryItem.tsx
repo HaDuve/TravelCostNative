@@ -125,7 +125,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
 
   function tripPressHandler() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (netCtx.isConnected === false) {
+    if (!netCtx.isConnected || !netCtx.strongConnection) {
       Alert.alert("You are offline", "Please go online to manage your trip");
       return;
     }

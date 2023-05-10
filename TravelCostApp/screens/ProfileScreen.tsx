@@ -132,7 +132,12 @@ const ProfileScreen = ({ navigation }) => {
   // refreshHandler() could be moved into TripContext to be loaded correctly
   async function refreshHandler() {
     // check freshly and offlinemode
-    if (userCtx.freshlyCreated || !netCtx.isConnected) return;
+    if (
+      userCtx.freshlyCreated ||
+      !netCtx.isConnected ||
+      !netCtx.strongConnection
+    )
+      return;
     allTripsList = [];
     const tripHistory = await fetchTripHistory(uid);
     if (!tripHistory.length) {

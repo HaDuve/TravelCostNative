@@ -45,7 +45,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
   const netCtx = useContext(NetworkContext);
   const userCtx = useContext(UserContext);
 
-  const isOnline = netCtx.isConnected;
+  const isOnline = netCtx.isConnected && netCtx.strongConnection;
   const tripid = tripCtx.tripid;
 
   const CATLIST = DEFAULTCATEGORIES;

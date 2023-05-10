@@ -45,7 +45,7 @@ const NetworkContextProvider = ({ children }) => {
       asyncSetConnectionSpeed();
     },
     DEBUG_POLLING_INTERVAL,
-    false
+    true
   );
 
   return (

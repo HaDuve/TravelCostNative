@@ -34,7 +34,7 @@ function LoginScreen() {
   async function loginHandler({ email, password }) {
     setIsAuthenticating(true);
     // Check internet connection first
-    if (!netCtx.isConnected) {
+    if (!netCtx.isConnected || !netCtx.strongConnection) {
       Toast.show({
         type: "error",
         text1: i18n.t("noConnection"),

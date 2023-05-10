@@ -149,6 +149,7 @@ function RecentExpenses({ navigation }) {
       if (online && isFastEnough) {
         console.log("RecentExpenses ~ sending offline queue");
         await sendOfflineQueue();
+        return;
       }
       // setIsFetching(true);
       await test_offlineLoad(expensesCtx, setRefreshing, setIsFetching);

@@ -1,7 +1,7 @@
 import NetInfo from "@react-native-community/netinfo";
 import axios from "axios";
 
-const requiredSpeed = 2; // 2Mbps
+const requiredSpeed = 1; // 2Mbps
 
 export interface ConnectionSpeedResult {
   isFastEnough: boolean;
@@ -32,7 +32,7 @@ async function getConnectionSpeed(): Promise<number> {
 
 export async function isConnectionFastEnough(): Promise<ConnectionSpeedResult> {
   const connectionInfo = await NetInfo.fetch();
-  if (!connectionInfo.isConnected) {
+  if (!connectionInfo.isConnected || !connectionInfo.isInternetReachable) {
     console.log("Not connected to the internet");
     return { isFastEnough: false };
   }

@@ -63,10 +63,8 @@ function RecentExpenses({ navigation }) {
 
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
-  const [isFocused, setIsFocused] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState();
-  const [firstFocus, setFirstFocus] = useState(false);
 
   const [open, setOpen] = useState(false);
   const [PeriodValue, setPeriodValue] = useState("day");
@@ -83,6 +81,8 @@ function RecentExpenses({ navigation }) {
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = test_getExpenses.bind(this, true);
+
+  const offlineString = netCtx.strongConnection ? "" : " - Offline";
 
   useEffect(() => {
     const asyncLoading = async () => {
@@ -102,7 +102,7 @@ function RecentExpenses({ navigation }) {
   useInterval(
     () => {
       setDateTimeString(_toShortFormat(DateTime.now()));
-      if (isForeground() && isFocused) {
+      if (isForeground()) {
         const asyncPolling = async () => {
           await getExpenses(true, true);
           // await getExpenses(true, true);
@@ -203,7 +203,10 @@ function RecentExpenses({ navigation }) {
         zone={3}
       ></TourGuideZone>
       <View style={styles.dateHeader}>
-        <Text style={styles.dateString}>{dateTimeString}</Text>
+        <Text style={styles.dateString}>
+          {dateTimeString}
+          {offlineString}
+        </Text>
       </View>
 
       <View style={styles.header}>

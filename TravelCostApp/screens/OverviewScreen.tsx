@@ -37,12 +37,14 @@ const OverviewScreen = ({ navigation }) => {
   const [offlineString, setOfflineString] = useState("");
   // set in useEffect
   useEffect(() => {
-    if (netCtx.strongConnection) {
+    if (netCtx.isConnected && netCtx.strongConnection) {
       setOfflineString("");
     } else {
-      setOfflineString(" - Offline");
+      if (netCtx.isConnected && !netCtx.strongConnection) {
+        setOfflineString(" - Slow Connection");
+      } else setOfflineString(" - Offline Mode");
     }
-  }, [netCtx.strongConnection]);
+  }, [netCtx.isConnected, netCtx.strongConnection]);
 
   useInterval(
     React.useCallback(() => {

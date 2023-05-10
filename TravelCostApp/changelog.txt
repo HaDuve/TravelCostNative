@@ -6,8 +6,9 @@ Change log Travel Expense App
 - app does now requires only 1Mbps-connection to use (might set that bar even lower, just testing for now)
 - fixed a bug with refreshing recent expenses
 - fixed not loading any data sometimes
-- there is a "Offline" text shown on the top of the screen now if you have a bad connection or offline (in Recent and Overview Screens)
+- there is a "Offline"/"Bad Connection" text shown on the top of the screen now if you have a bad connection or offline (in Recent and Overview Screens)
 - improved error handling by putting bad uploads into the offline queue for later (should help alot with the bugs)
+- added information about subscription period (PayWall)
 
 1.1.1c (AppStore ready)
 - fixed expense form render crash

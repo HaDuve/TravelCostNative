@@ -16,6 +16,10 @@ import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
 
 import NetInfo from "@react-native-community/netinfo";
 import { isConnectionFastEnough } from "./connectionSpeed";
+import {
+  secureStoreGetObject,
+  secureStoreSetObject,
+} from "../store/secure-storage";
 
 // interface of offline queue manage expense item
 export interface OfflineQueueManageExpenseItem {
@@ -28,14 +32,17 @@ export interface OfflineQueueManageExpenseItem {
 export const pushOfflineQueue = async (item: OfflineQueueManageExpenseItem) => {
   const offlineQueue = await getOfflineQueue();
   offlineQueue.push(item);
-  const res = await asyncStoreSetObject("offlineQueue", offlineQueue);
+  const res = await secureStoreSetObject("offlineQueue", offlineQueue);
   console.log("pushOfflineQueue ~ offlineQueue:", offlineQueue);
   return res;
 };
 
 // retrieve offlinequeue
 export const getOfflineQueue = async () => {
-  const offlineQueue = await asyncStoreGetObject("offlineQueue");
+  const offlineQueue = await secureStoreGetObject("offlineQueue");
+  if (!offlineQueue) {
+    console.log("retrieved no OfflineQueue!");
+  }
   return offlineQueue || [];
 };
 
@@ -231,9 +238,9 @@ export const storeExpenseOnlineOffline = async (
 
 // check if we have a queue stored
 export const sendOfflineQueue = async () => {
-  const queue = await asyncStoreGetObject("offlineQueue");
-  if (queue && queue.length > 0) {
-    console.log("queue length", queue.length);
+  const offlineQueue = (await secureStoreGetObject("offlineQueue")) || [];
+  if (offlineQueue && offlineQueue.length > 0) {
+    console.log("queue length", offlineQueue.length);
     const forceOffline = !Device.isDevice && DEBUG_FORCE_OFFLINE;
     const isOnline = await NetInfo.fetch();
     console.log("update connected =", isOnline);
@@ -246,15 +253,20 @@ export const sendOfflineQueue = async () => {
       console.log("sendOfflineQueue ~ still offline!");
       return;
     }
-    // for each OfflineQueueManageExpenseItem in queue activate
+
+    // send items in while loop
+    const processedItems = [];
+    let i = 0;
     let tripid = "";
-    for (let i = 0; i < queue.length; i++) {
-      const item = queue[i];
+
+    while (i < offlineQueue.length) {
+      const item = offlineQueue[i];
       tripid = item.expense.tripid;
+
       try {
-        await touchAllTravelers(tripid, true);
         console.log("sendOfflineQueue ~ item:", item);
         console.log("sendOfflineQueue ~ item.type:", item.type);
+
         if (item.type === "add") {
           await storeExpense(
             item.expense.tripid,
@@ -275,26 +287,28 @@ export const sendOfflineQueue = async () => {
             item.expense.id
           );
         } else {
-          console.log("unknown type");
+          console.log("unknown offlineQ item type");
         }
+
+        // Add the processed item to the list
+        processedItems.push(item);
+        i++;
       } catch (error) {
-        Toast.show({
-          text1: "Bad Connection",
-          text2: "I will try to sync again later!",
-          type: "error",
-        });
-        return;
+        console.error("offlineQ error:", error);
+        break;
       }
     }
-
-    // clear queue
-    await asyncStoreSetObject("offlineQueue", []);
-
-    Toast.show({
-      type: "success",
-      text1: "Online again!",
-      text2: "Synchronized " + queue.length + " offline Changes!",
-    });
+    if (processedItems.length > 0) {
+      Toast.show({
+        type: "success",
+        text1: "Online again!",
+        text2: "Synchronized " + processedItems.length + " offline Changes!",
+      });
+      await touchAllTravelers(tripid, true);
+    }
+    // Remove the processed items from the queue
+    const remainingItems = offlineQueue.slice(i);
+    await secureStoreSetObject("offlineQueue", remainingItems);
   } else {
     // console.log("no queue");
   }

@@ -116,8 +116,10 @@ export async function storeExpense(tripid: string, uid: string, expenseData) {
     const id = response.data.name;
     return id;
   } catch (error) {
-    console.warn(error);
-    return null;
+    console.error(
+      `Failed to store expense for trip ${tripid}: ${error.message}`
+    );
+    throw new Error(`Failed to store expense for trip ${tripid}`);
   }
 }
 
@@ -139,6 +141,7 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
       axios_calls.push(new_axios_call);
     } catch (error) {
       console.warn("error while fetchingExpenses of user: ", uid, error);
+      throw new Error("error while fetchingExpenses of user: " + uid);
     }
   });
   try {
@@ -176,6 +179,7 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
       text2: "Please try again later",
     });
     console.log("error while fetching expenses: ", error);
+    throw new Error("error while fetching expenses");
   }
 
   return expenses;
@@ -219,7 +223,7 @@ export async function fetchExpenses(tripid: string, uid: string) {
     return expenses;
   } catch (error) {
     console.warn(error);
-    return [];
+    throw new Error("error while fetching expenses");
   }
 }
 
@@ -231,33 +235,45 @@ export function updateExpense(
 ) {
   // console.log("updateExpense ~ expenseData", expenseData);
   //TODO: create expenseData Interface for TypeScript
-  return axios.put(
-    BACKEND_URL +
-      "/trips/" +
-      tripid +
-      "/" +
-      uid +
-      "/expenses/" +
-      `${id}.json` +
-      QPAR,
-    expenseData
-  );
+  try {
+    const response = axios.put(
+      BACKEND_URL +
+        "/trips/" +
+        tripid +
+        "/" +
+        uid +
+        "/expenses/" +
+        `${id}.json` +
+        QPAR,
+      expenseData
+    );
+    return response;
+  } catch (error) {
+    console.warn(error);
+    throw new Error("error while updating expense");
+  }
 }
 
 export function deleteExpense(tripid: string, uid: string, id: string) {
   console.log("https: ~ deleteExpense ~ tripid", tripid);
   console.log("deleteExpense ~ uid", uid);
   console.log("deleteExpense ~ id", id);
-  return axios.delete(
-    BACKEND_URL +
-      "/trips/" +
-      tripid +
-      "/" +
-      uid +
-      "/expenses/" +
-      `${id}.json` +
-      QPAR
-  );
+  try {
+    const response = axios.delete(
+      BACKEND_URL +
+        "/trips/" +
+        tripid +
+        "/" +
+        uid +
+        "/expenses/" +
+        `${id}.json` +
+        QPAR
+    );
+    return response;
+  } catch (error) {
+    console.warn(error);
+    throw new Error("error while deleting expense");
+  }
 }
 
 /**
@@ -277,7 +293,7 @@ export async function storeUser(uid: string, userData: object) {
     return id;
   } catch (error) {
     console.warn(error);
-    return null;
+    throw new Error("error while storing user");
   }
 }
 
@@ -286,7 +302,14 @@ export async function storeUser(uid: string, userData: object) {
  */
 export function updateUser(uid: string, userData: UserData) {
   // console.log("updateUser ~ userData", userData);
-  return axios.patch(BACKEND_URL + "/users/" + `${uid}.json` + QPAR, userData);
+  try {
+    return axios.patch(
+      BACKEND_URL + "/users/" + `${uid}.json` + QPAR,
+      userData
+    );
+  } catch (error) {
+    throw new Error("error while updating user");
+  }
 }
 
 export async function fetchUser(uid: string) {
@@ -303,45 +326,61 @@ export async function fetchUser(uid: string) {
     return userData;
   } catch (error) {
     console.log(error);
-    return null;
+    throw new Error("error while fetching user");
   }
 }
 
 export async function storeTrip(tripData: TripData) {
   // console.log("https: ~ storeTrip ~ tripData", tripData);
   //TODO: create tripData Interface for TypeScript
-  const response = await axios.post(
-    BACKEND_URL + "/trips.json" + QPAR,
-    tripData
-  );
-  const id = response.data.name;
-  return id;
+  try {
+    const response = await axios.post(
+      BACKEND_URL + "/trips.json" + QPAR,
+      tripData
+    );
+    const id = response.data.name;
+    return id;
+  } catch (error) {
+    throw new Error("error while storing trip");
+  }
 }
 
 export async function updateTrip(tripid: string, tripData) {
   // console.log("https: ~ updateTrip ~ tripData", tripData);
-  const res = await axios.patch(
-    BACKEND_URL + "/trips/" + `${tripid}.json` + QPAR,
-    tripData
-  );
-  return res;
+  try {
+    const res = await axios.patch(
+      BACKEND_URL + "/trips/" + `${tripid}.json` + QPAR,
+      tripData
+    );
+    return res;
+  } catch (error) {
+    throw new Error("error while updating trip");
+  }
 }
 
 export async function fetchTrip(tripid: string): Promise<TripData> {
   if (!tripid) return null;
   // console.log("https: ~ fetchTrip ~ tripid", tripid);
-  const response = await axios.get(
-    BACKEND_URL + "/trips/" + `${tripid}.json` + QPAR
-  );
-  return response.data;
+  try {
+    const response = await axios.get(
+      BACKEND_URL + "/trips/" + `${tripid}.json` + QPAR
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("error while fetching trip");
+  }
 }
 
 export async function deleteTrip(tripid: string) {
   // console.log("https: ~ deleteTrip ~ tripid", tripid);
-  const response = await axios.delete(
-    BACKEND_URL + "/trips/" + `${tripid}.json` + QPAR
-  );
-  return response;
+  try {
+    const response = await axios.delete(
+      BACKEND_URL + "/trips/" + `${tripid}.json` + QPAR
+    );
+    return response;
+  } catch (error) {
+    throw new Error("error while deleting trip");
+  }
 }
 
 export async function storeTravellerToTrip(tripid: string, traveller) {
@@ -360,53 +399,69 @@ export async function storeTravellerToTrip(tripid: string, traveller) {
     console.log(traveller.userName + " already exists");
     return;
   }
-  const response = await axios.post(
-    BACKEND_URL + `/trips/${tripid}/travellers.json` + QPAR,
-    traveller
-  );
-  return response.data;
+  try {
+    const response = await axios.post(
+      BACKEND_URL + `/trips/${tripid}/travellers.json` + QPAR,
+      traveller
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("error while storing traveller to trip");
+  }
 }
 
 export async function fetchTripsTravellers(tripid: string) {
   // console.log("fetchTripsTravellers ~ tripid", tripid);
-  const response = await axios.get(
-    BACKEND_URL + `/trips/${tripid}/travellers.json` + QPAR
-  );
-  return response.data;
+  try {
+    const response = await axios.get(
+      BACKEND_URL + `/trips/${tripid}/travellers.json` + QPAR
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("error while fetching travellers of trip");
+  }
 }
 
 export async function getTravellers(tripid: string) {
   // console.log("getTravellers ~ tripid", tripid);
-  const response = await fetchTripsTravellers(tripid);
-  const travellerids = [];
-  const travelerNames = [];
-  for (const key in response) {
-    const travelerName = response[key].userName;
-    const uid = response[key].uid;
-    if (
-      !travellerids.includes(uid) &&
-      !travelerNames.includes(travelerName) &&
-      travelerName &&
-      travelerName.length > 0
-    ) {
-      travellerids.push(uid);
-      travelerNames.push(travelerName);
+  try {
+    const response = await fetchTripsTravellers(tripid);
+    const travellerids = [];
+    const travelerNames = [];
+    for (const key in response) {
+      const travelerName = response[key].userName;
+      const uid = response[key].uid;
+      if (
+        !travellerids.includes(uid) &&
+        !travelerNames.includes(travelerName) &&
+        travelerName &&
+        travelerName.length > 0
+      ) {
+        travellerids.push(uid);
+        travelerNames.push(travelerName);
+      }
     }
+    return travelerNames;
+  } catch (error) {
+    throw new Error("error while fetching travellers of trip");
   }
-  return travelerNames;
 }
 
 export async function getUIDs(tripid: string) {
   // console.log("getUIDs ~ tripid", tripid);
-  const response = await fetchTripsTravellers(tripid);
-  const travellerids: string[] = [];
-  for (const key in response) {
-    const uid = response[key].uid;
-    if (!travellerids.includes(uid) && uid && uid.length > 0) {
-      travellerids.push(uid);
+  try {
+    const response = await fetchTripsTravellers(tripid);
+    const travellerids: string[] = [];
+    for (const key in response) {
+      const uid = response[key].uid;
+      if (!travellerids.includes(uid) && uid && uid.length > 0) {
+        travellerids.push(uid);
+      }
     }
+    return travellerids;
+  } catch (error) {
+    throw new Error("error while fetching UIDs of trip");
   }
-  return travellerids;
 }
 
 export async function getAllExpenses(tripid: string, uid?: string) {
@@ -432,45 +487,65 @@ export async function updateTripHistory(userId: string, newTripid: string) {
 
 export async function storeTripHistory(userId: string, tripHistory: string[]) {
   // console.log("storeTripHistory ~ tripHistory", tripHistory);
-  const response = await axios.put(
-    BACKEND_URL + `/users/${userId}/tripHistory.json` + QPAR,
-    tripHistory
-  );
-  return response.data;
+  try {
+    const response = await axios.put(
+      BACKEND_URL + `/users/${userId}/tripHistory.json` + QPAR,
+      tripHistory
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("error while storing trip history");
+  }
 }
 
 export async function fetchTripHistory(userId: string) {
   // console.log("fetchTripHistory ~ userId", userId);
-  const response = await axios.get(
-    BACKEND_URL + `/users/${userId}/tripHistory.json` + QPAR
-  );
-  return response.data;
+  try {
+    const response = await axios.get(
+      BACKEND_URL + `/users/${userId}/tripHistory.json` + QPAR
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("error while fetching trip history");
+  }
 }
 
 export async function fetchCurrentTrip(userId: string) {
   // console.log("https: ~ fetchCurrentTrip ~ userId", userId);
-  const response = await axios.get(
-    BACKEND_URL + `/users/${userId}.json` + QPAR
-  );
-  // console.log("https: ~ fetchCurrentTrip ~ response", response.data);
-  if (!response?.data?.currentTrip)
-    console.warn("https: ~ could not find current trip of this user!");
-  return response.data.currentTrip;
+  try {
+    const response = await axios.get(
+      BACKEND_URL + `/users/${userId}.json` + QPAR
+    );
+    // console.log("https: ~ fetchCurrentTrip ~ response", response.data);
+    if (!response?.data?.currentTrip)
+      console.warn("https: ~ could not find current trip of this user!");
+    return response.data.currentTrip;
+  } catch (error) {
+    throw new Error("error while fetching current trip");
+  }
 }
 
 export async function fetchUserName(userId: string): Promise<string> {
-  const response = await axios.get(
-    BACKEND_URL + `/users/${userId}.json` + QPAR
-  );
-  // console.log("https: ~ fetchUserName ~ response", response.data);
-  return response.data.userName;
+  try {
+    const response = await axios.get(
+      BACKEND_URL + `/users/${userId}.json` + QPAR
+    );
+    // console.log("https: ~ fetchUserName ~ response", response.data);
+    return response.data.userName;
+  } catch (error) {
+    throw new Error("error while fetching user name");
+  }
 }
 
 export async function fetchTripName(tripId: string): Promise<string> {
-  const response = await axios.get(
-    BACKEND_URL + `/trips/${tripId}.json` + QPAR
-  );
-  return response.data.tripName;
+  try {
+    const response = await axios.get(
+      BACKEND_URL + `/trips/${tripId}.json` + QPAR
+    );
+    return response.data.tripName;
+  } catch (error) {
+    throw new Error("error while fetching trip name");
+  }
 }
 
 export async function touchTraveler(
@@ -478,11 +553,15 @@ export async function touchTraveler(
   firebaseId: string,
   isTouched: boolean
 ) {
-  const response = await axios.patch(
-    BACKEND_URL + `/trips/${tripid}/travellers/${firebaseId}.json` + QPAR,
-    { touched: isTouched }
-  );
-  return response;
+  try {
+    const response = await axios.patch(
+      BACKEND_URL + `/trips/${tripid}/travellers/${firebaseId}.json` + QPAR,
+      { touched: isTouched }
+    );
+    return response;
+  } catch (error) {
+    throw new Error("error while touching traveler");
+  }
 }
 
 export async function touchAllTravelers(tripid: string, flag: boolean) {

@@ -584,9 +584,12 @@ export async function touchAllTravelers(tripid: string, flag: boolean) {
 }
 
 export async function unTouchTraveler(tripid: string, uid: string) {
+  console.log("unTouchTraveler ~ uid:", uid);
+  console.log("unTouchTraveler ~ unTouchTraveler:", unTouchTraveler);
   const response = await fetchTripsTravellers(tripid);
   const axios_calls = [];
   for (const key in response) {
+    console.log("unTouchTraveler ~ key:", key);
     if (uid !== response[key].uid) continue;
     console.log("untouching: ", response[key].userName);
     axios_calls.push(touchTraveler(tripid, key, false));
@@ -622,21 +625,13 @@ export async function touchMyTraveler(tripid: string, uid: string) {
 }
 
 export async function fetchTravelerIsTouched(tripid: string, uid: string) {
-  // only fatch the flag if the uid is the same as the uid in key in response
   const allTravelersRes = await fetchTripsTravellers(tripid);
   let returnIsTouched = null;
   for (const key in allTravelersRes) {
     const DatabaseUid = allTravelersRes[key].uid;
     if (DatabaseUid !== uid) continue;
-    // console.log(
-    //   "Fetching traveler:" + allTravelersRes[key].userName + " isTouched: ",
-    //   allTravelersRes[key].touched
-    // );
     returnIsTouched = allTravelersRes[key].touched;
   }
-  // catch undefined and null values of return as a default true
-  // either we didnt find the user, or the user was never touched
-  // we want to fetch new data and then set touched to false later
-  if (returnIsTouched == null) returnIsTouched = true;
-  return returnIsTouched;
+  // return true if uid is not found in allTravelersRes
+  return returnIsTouched ?? true;
 }

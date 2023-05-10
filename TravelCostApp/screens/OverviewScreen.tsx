@@ -17,6 +17,8 @@ import { useFocusEffect } from "@react-navigation/native";
 import PropTypes from "prop-types";
 import Toast from "react-native-toast-message";
 import { NetworkContext } from "../store/network-context";
+import { useInterval } from "../components/Hooks/useInterval";
+import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -42,10 +44,12 @@ const OverviewScreen = ({ navigation }) => {
     }
   }, [netCtx.strongConnection]);
 
-  useFocusEffect(
+  useInterval(
     React.useCallback(() => {
       setDateTimeString(_toShortFormat(DateTime.now()));
-    }, [])
+    }, []),
+    DEBUG_POLLING_INTERVAL * 13,
+    true
   );
 
   const [items, setItems] = useState([

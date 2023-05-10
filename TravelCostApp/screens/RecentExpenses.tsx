@@ -62,7 +62,12 @@ function RecentExpenses({ navigation }) {
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
 
   const tripid = tripCtx.tripid;
-  const uid = authCtx.uid;
+  // uid as a state
+  const [uid, setuidString] = useState(authCtx.uid);
+  useEffect(() => {
+    setuidString(authCtx.uid);
+  }, [authCtx.uid]);
+
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState();
 

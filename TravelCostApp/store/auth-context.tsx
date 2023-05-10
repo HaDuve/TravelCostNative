@@ -17,7 +17,11 @@ import {
 import { Alert } from "react-native";
 import { initializeApp } from "firebase/app";
 import { getReactNativePersistence } from "firebase/auth/react-native";
-import { secureStoreGetItem, secureStoreSetItem } from "./secure-storage";
+import {
+  secureStoreGetItem,
+  secureStoreRemoveItem,
+  secureStoreSetItem,
+} from "./secure-storage";
 
 export const AuthContext = createContext({
   uid: "",
@@ -43,13 +47,13 @@ function AuthContextProvider({ children }) {
 
   async function logout() {
     setAuthToken(null);
-    await AsyncStorage.removeItem("token");
-    await AsyncStorage.removeItem("uid");
+    await secureStoreRemoveItem("token");
+    await secureStoreRemoveItem("uid");
   }
 
   function setUserID(uid) {
     setuidString(uid);
-    AsyncStorage.setItem("uid", uid);
+    secureStoreSetItem("uid", uid);
   }
 
   async function deleteAccount() {

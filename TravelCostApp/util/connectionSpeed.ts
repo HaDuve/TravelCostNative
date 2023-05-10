@@ -1,7 +1,8 @@
 import NetInfo from "@react-native-community/netinfo";
 import axios from "axios";
+import { MINIMUM_REQUIRED_SPEED } from "../confAppConstants";
 
-const requiredSpeed = 1; // 2Mbps
+const requiredSpeed = MINIMUM_REQUIRED_SPEED; // 2Mbps
 
 export interface ConnectionSpeedResult {
   isFastEnough: boolean;

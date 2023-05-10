@@ -23,3 +23,5 @@ export const MAX_JS_NUMBER = 3435973836;
 export const SPLASH_SCREEN_DELAY = 500;
 // tweak loading recent expenses overlay timeout
 export const EXPENSES_LOAD_TIMEOUT = 6000;
+// tweak minimum required internet speed in Mbit/s
+export const MINIMUM_REQUIRED_SPEED = 1;

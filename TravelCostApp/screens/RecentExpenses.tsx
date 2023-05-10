@@ -82,7 +82,17 @@ function RecentExpenses({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = test_getExpenses.bind(this, true);
 
-  const offlineString = netCtx.strongConnection ? "" : " - Offline";
+  // const offlineString = netCtx.strongConnection ? "" : " - Offline";
+  // strong connection state
+  const [offlineString, setOfflineString] = useState("");
+  // set in useEffect
+  useEffect(() => {
+    if (netCtx.strongConnection) {
+      setOfflineString("");
+    } else {
+      setOfflineString(" - Offline");
+    }
+  }, [netCtx.strongConnection]);
 
   useEffect(() => {
     const asyncLoading = async () => {
@@ -90,10 +100,10 @@ function RecentExpenses({ navigation }) {
     };
 
     asyncLoading();
-    if (online) {
+    if (netCtx.isConnected && netCtx.strongConnection) {
       test_getExpenses();
     }
-  }, [netCtx.isConnected]);
+  }, [netCtx.isConnected, netCtx.strongConnection]);
 
   useEffect(() => {
     LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);

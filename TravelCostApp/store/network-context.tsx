@@ -10,8 +10,8 @@ import { useInterval } from "../components/Hooks/useInterval";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
 
 export const NetworkContext = createContext({
-  isConnected: false,
-  strongConnection: false,
+  isConnected: true,
+  strongConnection: true,
 });
 
 const NetworkContextProvider = ({ children }) => {
@@ -42,7 +42,7 @@ const NetworkContextProvider = ({ children }) => {
         const { isFastEnough } = await isConnectionFastEnough();
         setStrongConnection(isFastEnough);
       }
-      asyncSetConnectionSpeed;
+      asyncSetConnectionSpeed();
     },
     DEBUG_POLLING_INTERVAL,
     false

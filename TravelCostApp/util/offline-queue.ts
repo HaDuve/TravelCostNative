@@ -83,7 +83,7 @@ export const deleteExpenseOnlineOffline = async (
   // if the internet is not fast enough, store in offline queue
   const { isFastEnough, speed } = await isConnectionFastEnough();
   console.log("isFastEnough:", isFastEnough);
-  console.log("speed:", speed, "bytes/second");
+  console.log("speed:", speed, "Mbps");
   if (online && isFastEnough) {
     // delete item online
     try {
@@ -122,7 +122,7 @@ export const updateExpenseOnlineOffline = async (
   // if the internet is not fast enough, store in offline queue
   const { isFastEnough, speed } = await isConnectionFastEnough();
   console.log("isFastEnough:", isFastEnough);
-  console.log("speed:", speed, "bytes/second");
+  console.log("speed:", speed, "Mbps");
   if (online && isFastEnough) {
     // update item online
     try {
@@ -162,7 +162,7 @@ export const storeExpenseOnlineOffline = async (
   // if the internet is not fast enough, store in offline queue
   const { isFastEnough, speed } = await isConnectionFastEnough();
   console.log("isFastEnough:", isFastEnough);
-  console.log("speed:", speed, "bytes/second");
+  console.log("speed:", speed, "Mbps");
   if (online && isFastEnough) {
     // store item online
     try {
@@ -192,7 +192,7 @@ export const sendOfflineQueue = async () => {
     // if the internet is not fast enough, store in offline queue
     const { isFastEnough, speed } = await isConnectionFastEnough();
     console.log("isFastEnough:", isFastEnough);
-    console.log("speed:", speed, "bytes/second");
+    console.log("speed:", speed, "Mbps");
 
     if (!isOnline || !isOnline.isConnected || !isFastEnough || forceOffline) {
       console.log("sendOfflineQueue ~ still offline!");

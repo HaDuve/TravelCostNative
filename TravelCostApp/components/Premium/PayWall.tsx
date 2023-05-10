@@ -40,6 +40,10 @@ const PaywallScreen = ({ navigation }) => {
           offerings.current !== null &&
           offerings.current.availablePackages.length !== 0
         ) {
+          // log available packages duration
+          console.log(
+            offerings.current.availablePackages[0].product.subscriptionPeriod
+          );
           setPackages(offerings.current.availablePackages);
         }
       } catch (e) {

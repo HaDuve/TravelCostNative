@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, Pressable, Alert, StyleSheet } from "react-native";
 import Purchases from "react-native-purchases";
-import { useNavigation } from "@react-navigation/native";
 import { ENTITLEMENT_ID } from "../Premium/PremiumConstants";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
@@ -9,9 +8,11 @@ import Toast from "react-native-toast-message";
 
 const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
   const {
-    product: { title, description, priceString },
+    product: { title, description, priceString, subscriptionPeriod },
   } = purchasePackage;
 
+  const subscriptionPeriodString =
+    subscriptionPeriod === "P1M" ? " monthly" : " yearly";
   const onSelection = async () => {
     setIsPurchasing(true);
 
@@ -55,7 +56,10 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
     >
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.terms}>{description}</Text>
-      <Text style={styles.title}>{priceString}</Text>
+      <Text style={styles.title}>
+        {priceString}
+        {subscriptionPeriodString}
+      </Text>
     </Pressable>
   );
 };

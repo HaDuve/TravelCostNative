@@ -94,9 +94,11 @@ function RecentExpenses({ navigation }) {
     if (isOnline) {
       setOfflineString("");
     } else {
-      setOfflineString(" - Offline");
+      if (netCtx.isConnected && !netCtx.strongConnection) {
+        setOfflineString(" - Slow Connection");
+      } else setOfflineString(" - Offline Mode");
     }
-  }, [isOnline]);
+  }, [isOnline, netCtx.isConnected, netCtx.strongConnection]);
 
   useEffect(() => {
     const asyncLoading = async () => {

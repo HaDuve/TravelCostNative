@@ -467,7 +467,7 @@ function Root() {
 
       // fetch token and trip
       const storedToken = await secureStoreGetItem("token");
-      const storedUid = await asyncStoreGetItem("uid");
+      const storedUid = await secureStoreGetItem("uid");
       const storedTripId = await asyncStoreGetItem("currentTripId");
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
 

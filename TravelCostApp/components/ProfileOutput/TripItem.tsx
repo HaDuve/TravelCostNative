@@ -139,7 +139,7 @@ function TripItem({
           </View>
           <View style={styles.amountContainer}>
             <Text style={styles.amount}>
-              {tripCtx.totalSum.toFixed(2)}
+              {tripCtx.totalSum.toFixed(0)}
               {" " + tripCurrencySymbol}
               {infinityString ? " / ∞" : " / " + totalBudget}
               {infinityString ? "" : " " + tripCurrencySymbol}

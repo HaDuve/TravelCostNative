@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { secureStoreSetItem } from "../store/secure-storage";
 
@@ -16,9 +15,7 @@ async function authenticate(mode: string, email: string, password: string) {
 
   //store email and password in secure storage
   await secureStoreSetItem("ENCM", email);
-  console.log("authenticate ~ email:", email);
   await secureStoreSetItem("ENCP", password);
-
   const token = response.data.idToken;
   const uid = response.data.localId;
   return { token, uid };

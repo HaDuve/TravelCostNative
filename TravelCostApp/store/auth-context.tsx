@@ -34,10 +34,16 @@ export const AuthContext = createContext({
 });
 
 function AuthContextProvider({ children }) {
-  const [authToken, setAuthToken] = useState();
+  const [authToken, setAuthToken] = useState("");
   const [uidString, setuidString] = useState("");
-  const [customToken, setCustomToken] = useState("");
-  console.log("AuthContextProvider ~ customToken:", customToken);
+
+  useEffect(() => {
+    async function loadUID() {
+      const uid = await secureStoreGetItem("uid");
+      setuidString(uid);
+    }
+    loadUID();
+  }, []);
 
   async function authenticate(token) {
     await secureStoreSetItem("token", token);

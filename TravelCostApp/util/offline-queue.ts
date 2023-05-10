@@ -37,6 +37,21 @@ export const pushOfflineQueue = async (item: OfflineQueueManageExpenseItem) => {
   return res;
 };
 
+// retrieve offlinequeue and push new item, return random id
+export const pushQueueReturnRndID = async (
+  item: OfflineQueueManageExpenseItem
+) => {
+  try {
+    await pushOfflineQueue(item);
+    return (
+      Math.random().toString(36).substring(2, 15) +
+      Math.random().toString(36).substring(2, 15)
+    );
+  } catch (error) {
+    throw new Error("pushQueueReturnRndID failed");
+  }
+};
+
 // retrieve offlinequeue
 export const getOfflineQueue = async () => {
   const offlineQueue = await secureStoreGetObject("offlineQueue");
@@ -57,7 +72,7 @@ export const deleteExpenseOnlineOffline = async (
     Toast.show({
       type: "error",
       text1: "Error",
-      text2: "Could not store Expense, please try again!",
+      text2: "Could not delete Expense, please try again!",
     });
     throw new Error(
       "No tripid found in asyncStore! (storeExpenseOnlineOffline)"
@@ -77,34 +92,12 @@ export const deleteExpenseOnlineOffline = async (
         item.expense.uid,
         item.expense.id
       );
-      // Toast.show({
-      //   type: "success",
-      //   text1: "Deleted!",
-      //   text2: "Successfully deleted the Expense!",
-      // });
     } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Could not delete Expense, please try again!",
-      });
+      await pushQueueReturnRndID(item);
     }
   } else {
     // delete item offline
-    try {
-      await pushOfflineQueue(item);
-      // Toast.show({
-      //   type: "success",
-      //   text1: "Deleted!",
-      //   text2: "Successfully deleted Expense!",
-      // });
-    } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Could not delete Expense, please try again!",
-      });
-    }
+    await pushQueueReturnRndID(item);
   }
 };
 
@@ -119,7 +112,7 @@ export const updateExpenseOnlineOffline = async (
     Toast.show({
       type: "error",
       text1: "Error",
-      text2: "Could not store Expense, please try again!",
+      text2: "Could not update Expense, please try again!",
     });
     throw new Error(
       "No tripid found in asyncStore! (storeExpenseOnlineOffline)"
@@ -139,34 +132,12 @@ export const updateExpenseOnlineOffline = async (
         item.expense.id,
         item.expense.expenseData
       );
-      // Toast.show({
-      //   type: "success",
-      //   text1: "Updated!",
-      //   text2: "Successfully updated the Expense!",
-      // });
     } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Could not update Expense, please try again!",
-      });
+      await pushQueueReturnRndID(item);
     }
   } else {
     // update item offline
-    try {
-      await pushOfflineQueue(item);
-      // Toast.show({
-      //   type: "success",
-      //   text1: "Updated!",
-      //   text2: "Successfully updated the Expense!",
-      // });
-    } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Could not update Expense, please try again!",
-      });
-    }
+    await pushQueueReturnRndID(item);
   }
 };
 
@@ -200,39 +171,13 @@ export const storeExpenseOnlineOffline = async (
         item.expense.uid,
         item.expense.expenseData
       );
-      // Toast.show({
-      //   type: "success",
-      //   text1: "Stored!",
-      //   text2: "Successfully stored the Expense!",
-      // });
       return id;
     } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Could not store Expense, please try again!",
-      });
+      return await pushQueueReturnRndID(item);
     }
   } else {
     // store item offline
-    try {
-      await pushOfflineQueue(item);
-      // Toast.show({
-      //   type: "success",
-      //   text1: "Stored!",
-      //   text2: "Successfully stored the Expense!",
-      // });
-      return (
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15)
-      );
-    } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Could not store Expense, please try again!",
-      });
-    }
+    return await pushQueueReturnRndID(item);
   }
 };
 
@@ -263,16 +208,17 @@ export const sendOfflineQueue = async () => {
       const item = offlineQueue[i];
       tripid = item.expense.tripid;
 
-      try {
-        console.log("sendOfflineQueue ~ item:", item);
-        console.log("sendOfflineQueue ~ item.type:", item.type);
+      console.log("sendOfflineQueue ~ item:", item);
+      console.log("sendOfflineQueue ~ item.type:", item.type);
 
+      try {
         if (item.type === "add") {
-          await storeExpense(
+          const id = await storeExpense(
             item.expense.tripid,
             item.expense.uid,
             item.expense.expenseData
           );
+          item.expense.id = id;
         } else if (item.type === "update") {
           await updateExpense(
             item.expense.tripid,
@@ -298,14 +244,16 @@ export const sendOfflineQueue = async () => {
         break;
       }
     }
+
     if (processedItems.length > 0) {
       Toast.show({
         type: "success",
         text1: "Online again!",
-        text2: "Synchronized " + processedItems.length + " offline Changes!",
+        text2: `Synchronized ${processedItems.length}/${offlineQueue.length} offline Changes!`,
       });
       await touchAllTravelers(tripid, true);
     }
+
     // Remove the processed items from the queue
     const remainingItems = offlineQueue.slice(i);
     await secureStoreSetObject("offlineQueue", remainingItems);

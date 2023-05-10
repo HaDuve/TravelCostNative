@@ -1,5 +1,14 @@
 Change log Travel Expense App
 
+1.1.1d (AppStore ready)
+- fixed reloading expenses from database too often (user re-login required)
+- app always checks for internet speed now before doing stuff online (should help with alot of bugs in bad connection situations)
+- app does now requires only 1Mbps-connection to use (might set that bar even lower, just testing for now)
+- fixed a bug with refreshing recent expenses
+- fixed not loading any data sometimes
+- there is a "Offline" text shown on the top of the screen now if you have a bad connection or offline (in Recent and Overview Screens)
+- improved error handling by putting bad uploads into the offline queue for later (should help alot with the bugs)
+
 1.1.1c (AppStore ready)
 - fixed expense form render crash
 - added an internet speed test to check if connections is terrible (would happen sometimes even in wifi or 5G situations)

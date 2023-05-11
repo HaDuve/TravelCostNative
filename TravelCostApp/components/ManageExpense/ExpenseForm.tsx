@@ -75,6 +75,7 @@ import Autocomplete from "../UI/Autocomplete";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { useFocusEffect } from "@react-navigation/native";
+import { secureStoreSetItem } from "../../store/secure-storage";
 
 const ExpenseForm = ({
   onCancel,
@@ -509,11 +510,11 @@ const ExpenseForm = ({
     // update lastcountry and lastcurrency
     if (inputs.country.value && inputs.country.value !== "") {
       userCtx.setLastCountry(inputs.country.value);
-      await asyncStoreSetItem("lastCountry", inputs.country.value);
+      await secureStoreSetItem("lastCountry", inputs.country.value);
     }
     if (inputs.currency.value && inputs.currency.value !== "") {
       userCtx.setLastCurrency(inputs.currency.value);
-      await asyncStoreSetItem("lastCurrency", inputs.currency.value);
+      await secureStoreSetItem("lastCurrency", inputs.currency.value);
     }
     onSubmit(expenseData);
   }

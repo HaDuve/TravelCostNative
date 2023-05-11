@@ -22,6 +22,7 @@ import Toast from "react-native-toast-message";
 import Purchases from "react-native-purchases";
 import { API_KEY } from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
+import { secureStoreSetItem } from "../store/secure-storage";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -83,7 +84,7 @@ function LoginScreen() {
         const userData = checkUser;
         console.log("loginHandler ~ userData", userData);
         const tripid = userData.currentTrip;
-        await asyncStoreSetItem("currentTripId", tripid);
+        await secureStoreSetItem("currentTripId", tripid);
         await touchMyTraveler(tripid, uid);
         tripCtx.setTripid(tripid);
         userCtx.addUser(userData);

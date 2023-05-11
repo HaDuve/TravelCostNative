@@ -557,8 +557,8 @@ function Root() {
         const tripid = userData.currentTrip;
         console.log("onRootMount ~ userData", userData);
         userCtx.addUser(userData);
-        const lastCountry = await asyncStoreGetItem("lastCountry");
-        const lastCurrency = await asyncStoreGetItem("lastCurrency");
+        const lastCountry = await secureStoreGetItem("lastCountry");
+        const lastCurrency = await secureStoreGetItem("lastCurrency");
         if (lastCountry) userCtx.setLastCountry(lastCountry);
         if (lastCurrency) userCtx.setLastCurrency(lastCurrency);
         tripCtx.setCurrentTrip(tripid, tripData);

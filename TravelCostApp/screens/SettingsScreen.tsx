@@ -58,7 +58,14 @@ const SettingsScreen = ({ navigation }) => {
   const [timeZoneString, setTimeZoneString] = useState("");
   const [shouldShowTour, setShouldShowTour] = useState(false);
   const multiTraveller = tripCtx.travellers.length > 1 ?? false;
-  // // const soloTraveller = !multiTraveller;
+  const [DEBUG_tripid, setDEBUG_tripid] = useState("");
+  const [DEBUG_uid, setDEBUG_uid] = useState("");
+
+  useEffect(() => {
+    setDEBUG_tripid(tripCtx.tripid);
+    setDEBUG_uid(authCtx.uid);
+  }, [tripCtx.tripid, authCtx.uid]);
+  const soloTraveller = !multiTraveller;
 
   // Show detailed timezone info
   useFocusEffect(
@@ -114,6 +121,8 @@ const SettingsScreen = ({ navigation }) => {
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>DEVCONTENT</Text>
       </View>
+      <Text>DEBUG_tripid: {DEBUG_tripid}</Text>
+      <Text>DEBUG_uid: {DEBUG_uid}</Text>
       <LoadingBarOverlay
         progress={0.3}
         progressAt={3}

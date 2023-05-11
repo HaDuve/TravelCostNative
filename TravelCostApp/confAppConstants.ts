@@ -7,9 +7,9 @@ export const DEBUG_NO_DATA = false;
 // polling interval data
 export const DEBUG_POLLING_INTERVAL = 5000;
 // DEV consts
-export const DEV = false;
+export const DEV = true;
 // Premium consts
-export const PREMIUM = true;
+export const PREMIUM = DEV;
 // Rating/Review consts
 export const DAYS_BEFORE_PROMPT = 2;
 // Maximum number of period range days/months/years

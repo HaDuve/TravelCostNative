@@ -112,11 +112,10 @@ export function mapDescriptionToCategory(
   const categoryMap = {};
   categories.forEach((category) => {
     const keywords = category.keywords ?? [];
-    keywords.push(category.catString);
+    keywords.push(category.cat);
     keywords.forEach((keyword) => {
       if (description.toLowerCase().includes(keyword.toLowerCase())) {
-        categoryMap[category.catString] =
-          (categoryMap[category.catString] || 0) + 1;
+        categoryMap[category.cat] = (categoryMap[category.cat] || 0) + 1;
       }
     });
   });

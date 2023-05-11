@@ -306,7 +306,7 @@ const ExpenseForm = ({
     },
   });
 
-  function inputChangedHandler(inputIdentifier, enteredValue) {
+  function autoCategory(inputIdentifier: string, enteredValue: string) {
     // calc category from description
     if (inputIdentifier === "description" && pickedCat === "undefined") {
       const mappedCategory = mapDescriptionToCategory(
@@ -314,7 +314,6 @@ const ExpenseForm = ({
         // TODO PUT ALL CATEGORIES
         DEFAULTCATEGORIES
       );
-      const symbol = getCatSymbol(mappedCategory);
       if (mappedCategory) {
         setInputs((curInputs) => {
           return {
@@ -322,15 +321,20 @@ const ExpenseForm = ({
             ["category"]: { value: mappedCategory, isValid: true },
           };
         });
+        const symbol = getCatSymbol(mappedCategory);
         setIcon(symbol);
       }
     }
+  }
+
+  function inputChangedHandler(inputIdentifier: string, enteredValue: string) {
     setInputs((curInputs) => {
       return {
         ...curInputs,
         [inputIdentifier]: { value: enteredValue, isValid: true },
       };
     });
+    autoCategory(inputIdentifier, enteredValue);
   }
 
   if (splitType === "SELF" || IsSoloTraveller) {

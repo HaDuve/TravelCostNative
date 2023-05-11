@@ -1,5 +1,11 @@
 Change log Travel Expense App
 
+1.1.1e (AppStore ready)
+- fixed categories from autocat
+- offline users are not auto premium anymore
+- heavily improved splitting algorithms (when splitting exact and for changing amount afterwards)
+- made important or often used entries secure so they wont get deleted after each update (tripID, userID, lastCurrency, lastCountry)
+
 1.1.1d (AppStore ready)
 - fixed reloading expenses from database too often (user re-login required)
 - app always checks for internet speed now before doing stuff online (should help with alot of bugs in bad connection situations)

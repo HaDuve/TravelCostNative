@@ -1,6 +1,5 @@
-import Purchases, { CustomerInfo } from "react-native-purchases";
+import Purchases from "react-native-purchases";
 import { PREMIUM } from "../../confAppConstants";
-import { Alert } from "react-native";
 import Toast from "react-native-toast-message";
 /*
  The API key for your app from the RevenueCat dashboard: https://app.revenuecat.com

@@ -3,7 +3,7 @@ Change log Travel Expense App
 1.1.1e (AppStore ready)
 - heavily improved splitting algorithms (when splitting exact and for changing the total amount afterwards)
 - made important or often used entries secure so they wont get deleted after each update (tripID, userID, lastCurrency, lastCountry)
-- fixed categories from autocat (other users could not see the correct category and autocategories were different in overviews from default categories)
+- fixed categories from auto-categories (other users could not see the correct category and autocategories were different in overviews from default categories)
 - fixed the infinity loading spinner in manage category
 - offline users are not auto premium anymore
 

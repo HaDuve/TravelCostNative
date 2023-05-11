@@ -31,6 +31,7 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { TripContext } from "../../store/trip-context";
 import {
   calcSplitList,
+  recalcSplitsLinearly,
   splitTypesDropdown,
   travellerToDropdown,
   validateSplitList,
@@ -306,6 +307,18 @@ const ExpenseForm = ({
     },
   });
 
+  function autoExpenseLinearSplitAdjust(
+    inputIdentifier: string,
+    value: string
+  ) {
+    // calc splitList from amount
+    if (inputIdentifier === "amount" && splitType === "EXACT") {
+      const newSplitList = recalcSplitsLinearly(splitList, +value);
+      setSplitList(newSplitList);
+      const isValidSplit = validateSplitList(newSplitList, splitType, +value);
+      setSplitListValid(isValidSplit);
+    }
+  }
   function autoCategory(inputIdentifier: string, enteredValue: string) {
     // calc category from description
     if (inputIdentifier === "description" && pickedCat === "undefined") {
@@ -335,6 +348,7 @@ const ExpenseForm = ({
       };
     });
     autoCategory(inputIdentifier, enteredValue);
+    autoExpenseLinearSplitAdjust(inputIdentifier, enteredValue);
   }
 
   if (splitType === "SELF" || IsSoloTraveller) {

@@ -10,81 +10,113 @@ i18n.enableFallback = true;
 
 import { getAllExpenses } from "./http";
 
-export function recalcSplitsForExact(splitList: Split[], amount: number) {
-  console.log("recalcSplitsForExact ~ splitList:", splitList);
-  // number of travellers
-  const numberOfTravellers = splitList.length;
-  // normal split amount
-  const splitAmountNorm = amount / numberOfTravellers;
-  // splitrest can be 0, negative or positive
-  const splitRest =
-    amount -
-    splitList.reduce((sum, split) => {
-      return sum + Number(split.amount);
-    }, 0);
-  console.log("calcExactSplits ~ splitRest:", splitRest);
+export function recalcSplitsLinearly(splitList: Split[], amount: number) {
+  // Calculate the total amount and the total split amount
+  const totalAmount = splitList.reduce(
+    (sum, split) => sum + Number(split.amount),
+    0
+  );
+  const totalSplitAmount =
+    splitList.length > 0 ? totalAmount / splitList.length : 0;
 
-  let numberOfTravellersWithoutSplit = 0;
-  // count number of travellers without split
-  splitList.forEach((split) => {
-    if (!split.amount) {
-      numberOfTravellersWithoutSplit++;
-    }
-  });
+  // Calculate the rest that needs to be split up
+  const rest = amount - totalAmount;
 
-  // TODO: change this from find one split to a list of travellers who share the rest
-  // if there are no travellers without split, find any split with amount equal to splitAmountNorm and adjust that so the rest becomes 0
-  if (numberOfTravellersWithoutSplit === 0) {
-    const foundNorm = splitList.find((split) => {
-      if (sameNumber(Number(split.amount), Number(splitAmountNorm))) {
-        split.amount = Number(Number(split.amount) + splitRest).toFixed(2);
-        return split;
-      }
-    });
-    // TODO: change this from find one split to a list of travellers who share the rest
-    // if not found, adjust the first split with last 2 chars "00" so the rest becomes 0
-    if (!foundNorm) {
-      const found00 = splitList.find((split) => {
-        if (split.amount.slice(-2) === "00") {
-          split.amount = Number(Number(split.amount) + splitRest).toFixed(2);
-          return split;
-        }
-      });
-      if (!found00) {
-        splitList[0].amount = Number(
-          Number(splitList[0].amount) + splitRest
-        ).toFixed(2);
-      }
-    }
-
-    for (let i = 0; i < splitList.length; i++) {
-      const split = splitList[i];
-      split.amount = Number(split.amount).toFixed(2);
-    }
+  // If the rest is zero, return the original split list
+  if (rest === 0) {
     return splitList;
   }
 
-  // return a list of splits with the correct amount for unknown amounts
-  const exactSplitList = [];
-  splitList.forEach((split) => {
-    if (!split.amount) {
-      const splitAmount = splitRest / numberOfTravellersWithoutSplit;
-      exactSplitList.push({
-        userName: split.userName,
-        amount: Number(splitAmount).toFixed(2),
+  // Calculate the adjustment factor for each split
+  const adjustmentFactor = (totalAmount + rest) / totalAmount;
+
+  // Apply the adjustment factor to each split
+  for (let i = 0; i < splitList.length; i++) {
+    const split = splitList[i];
+    split.amount = Number(Number(split.amount) * adjustmentFactor).toFixed(2);
+  }
+
+  // If the adjustment resulted in any negative amounts, distribute the difference among all splits
+  const negativeSplits = splitList.filter((split) => Number(split.amount) < 0);
+  if (negativeSplits.length > 0) {
+    const negativeAmount = negativeSplits.reduce(
+      (sum, split) => sum + Number(split.amount),
+      0
+    );
+    const positiveSplits = splitList.filter(
+      (split) => Number(split.amount) > 0
+    );
+    const positiveAmount = positiveSplits.reduce(
+      (sum, split) => sum + Number(split.amount),
+      0
+    );
+    const adjustmentFactor = (positiveAmount + negativeAmount) / positiveAmount;
+    for (let i = 0; i < splitList.length; i++) {
+      const split = splitList[i];
+      if (Number(split.amount) > 0) {
+        split.amount = Number(Number(split.amount) * adjustmentFactor).toFixed(
+          2
+        );
+      }
+    }
+  }
+
+  return splitList;
+}
+
+export function recalcSplitsForExact(splitList: Split[], amount: number) {
+  console.log("recalcSplitsForExact ~ splitList:", splitList);
+
+  const numberOfTravellers = splitList.length;
+  const splitAmountNorm = amount / numberOfTravellers;
+  const splitRest =
+    amount - splitList.reduce((sum, split) => sum + Number(split.amount), 0);
+
+  console.log("recalcSplitsForExact ~ splitRest:", splitRest);
+
+  // Count the number of travellers without a split amount
+  const travellersWithoutSplit = splitList.filter((split) => !split.amount);
+  const numberOfTravellersWithoutSplit = travellersWithoutSplit.length;
+
+  if (numberOfTravellersWithoutSplit === 0) {
+    // Find all splits with amount equal to splitAmountNorm
+    const splitsWithNormAmount = splitList.filter((split) =>
+      sameNumber(Number(split.amount), Number(splitAmountNorm))
+    );
+
+    // Split the rest equally among all splits with norm amount
+    if (splitsWithNormAmount.length > 0) {
+      const splitAmount = splitRest / splitsWithNormAmount.length;
+      splitsWithNormAmount.forEach((split) => {
+        split.amount = (Number(split.amount) + splitAmount).toFixed(2);
       });
     } else {
-      exactSplitList.push({
-        userName: split.userName,
-        amount: Number(split.amount).toFixed(2),
-      });
+      const splitsWithDecimalAmount = splitList.filter((split) =>
+        /\.\d{2}$/.test(split.amount)
+      );
+      if (splitsWithDecimalAmount.length > 0) {
+        splitsWithDecimalAmount.forEach((split) => {
+          split.amount = Number(
+            Number(split.amount) + splitRest / splitsWithDecimalAmount.length
+          ).toFixed(2);
+        });
+      } else {
+        splitList.forEach((split) => {
+          split.amount = Number(
+            Number(split.amount) + splitRest / splitList.length
+          ).toFixed(2);
+        });
+      }
     }
-  });
-  for (let i = 0; i < exactSplitList.length; i++) {
-    const split = exactSplitList[i];
-    split.amount = Number(split.amount).toFixed(2);
+  } else {
+    // Split the rest equally among all travellers without a split amount
+    const splitAmount = splitRest / numberOfTravellersWithoutSplit;
+    travellersWithoutSplit.forEach((split) => {
+      split.amount = splitAmount.toFixed(2);
+    });
   }
-  return exactSplitList;
+
+  return splitList;
 }
 
 export function calcSplitList(

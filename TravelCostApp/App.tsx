@@ -652,7 +652,7 @@ export default function App() {
                             {...{ borderRadius: 16, key: "settings" }}
                           >
                             <Root />
-                            {DEV && <ConnectionBar />}
+                            {/* {DEV && <ConnectionBar />} */}
                             <ToastComponent />
                           </TourGuideProvider>
                         </ExpensesContextProvider>

@@ -118,17 +118,20 @@ const SettingsScreen = ({ navigation }) => {
 
   const DEVCONTENT = isDEV && (
     <View>
+      {/* spacer View */}
+      <View style={{ flex: 1, minHeight: 100 }}></View>
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>DEVCONTENT</Text>
       </View>
       <Text>DEBUG_tripid: {DEBUG_tripid}</Text>
       <Text>DEBUG_uid: {DEBUG_uid}</Text>
+      <Text>{timeZoneString}</Text>
+
       <LoadingBarOverlay
         progress={0.3}
         progressAt={3}
         progressMax={10}
       ></LoadingBarOverlay>
-      <LoadingOverlay></LoadingOverlay>
 
       <Button
         onPress={importExcelFile.bind(this, uid, tripid, userName, addExpense)}
@@ -157,7 +160,6 @@ const SettingsScreen = ({ navigation }) => {
         {/* danach muss zurueck konvertiert werden  */}
         Export FoodForNomads
       </Button>
-      <Text>{timeZoneString}</Text>
     </View>
   );
 

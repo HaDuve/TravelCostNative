@@ -1,7 +1,5 @@
 import {
-  Alert,
   Animated,
-  Dimensions,
   FlatList,
   Pressable,
   StyleSheet,
@@ -11,8 +9,6 @@ import {
 import * as Haptics from "expo-haptics";
 
 import React, { useState } from "react";
-import IconButton from "../components/UI/IconButton";
-import Button from "../components/UI/Button";
 import FlatButton from "../components/UI/FlatButton";
 import { GlobalStyles } from "../constants/styles";
 
@@ -27,7 +23,7 @@ import { Ionicons } from "@expo/vector-icons";
 import GradientButton from "../components/UI/GradientButton";
 import { useFocusEffect } from "@react-navigation/native";
 import { asyncStoreGetObject } from "../store/async-storage";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, Alert } from "react-native";
 import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -115,18 +111,26 @@ const CategoryPickScreen = ({ route, navigation }) => {
     }, [isOnline, tripid])
   );
 
+  async function newCatPressHandler(item) {
+    const isPremium = await userCtx.checkPremium();
+
+    if (!isPremium) {
+      navigation.navigate("Paywall");
+      return;
+    }
+    if (!isOnline) {
+      Alert.alert("Offline", "You need to be online to add a new category");
+      return;
+    }
+    navigation.navigate("ManageCategory");
+  }
+
   async function catPressHandler(item) {
     setIsFetching(true);
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     // setIsShaking(false);
     if (item.cat === "newCat") {
-      const isPremium = await userCtx.checkPremium();
-
-      if (!isPremium) {
-        navigation.navigate("Paywall");
-        return;
-      }
-      navigation.navigate("ManageCategory");
+      newCatPressHandler(item);
     } else {
       navigation.navigate("ManageExpense", {
         pickedCat: item.cat ?? item.name,

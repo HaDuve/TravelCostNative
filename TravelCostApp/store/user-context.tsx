@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import React, { createContext, useReducer, useState } from "react";
+import React, { createContext, useEffect, useReducer, useState } from "react";
 import { Alert } from "react-native";
 import {
   asyncStoreGetItem,
@@ -11,6 +11,13 @@ import { isPremiumMember } from "../components/Premium/PremiumConstants";
 import { fetchCategories } from "../util/http";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PropTypes from "prop-types";
+import NetInfo from "@react-native-community/netinfo";
+import {
+  secureStoreGetObject,
+  secureStoreSetItem,
+  secureStoreSetObject,
+} from "./secure-storage";
+import { isConnectionFastEnough } from "../util/connectionSpeed";
 
 export interface UserData {
   uid?: string;
@@ -95,14 +102,30 @@ function UserContextProvider({ children }) {
 
   async function checkPremium() {
     // allow offline users to get premium
-    if (!isOnline) {
-      setIsPremium(true);
-      return true;
+    const { isFastEnough } = await isConnectionFastEnough();
+    if (!isFastEnough) {
+      return isPremium;
     }
     const isPremiumNow = await isPremiumMember();
+    await secureStoreSetObject("isPremium", isPremiumNow);
     setIsPremium(isPremiumNow);
     return isPremiumNow;
   }
+  useEffect(() => {
+    async function loadIsPremiumFromAsync() {
+      try {
+        const isPremiumString = await secureStoreGetObject("isPremium");
+        if (isPremiumString !== null) {
+          const isPremiumNow = JSON.parse(isPremiumString);
+          setIsPremium(isPremiumNow);
+          return;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    loadIsPremiumFromAsync();
+  }, []);
 
   async function _loadCatListFromAsync() {
     try {

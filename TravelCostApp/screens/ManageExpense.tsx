@@ -56,7 +56,9 @@ const ManageExpense = ({ route, navigation }) => {
   const [progressMax, setProgressMax] = useState(0);
 
   const tripid = tripCtx.tripid;
+  console.log("ManageExpense ~ tripid:", tripid);
   const uid = authCtx.uid;
+  console.log("ManageExpense ~ uid:", uid);
 
   const editedExpenseId = route.params?.expenseId;
   const isEditing = !!editedExpenseId;

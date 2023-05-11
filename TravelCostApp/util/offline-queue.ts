@@ -17,6 +17,7 @@ import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
 import NetInfo from "@react-native-community/netinfo";
 import { isConnectionFastEnough } from "./connectionSpeed";
 import {
+  secureStoreGetItem,
   secureStoreGetObject,
   secureStoreSetObject,
 } from "../store/secure-storage";

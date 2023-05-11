@@ -50,6 +50,7 @@ import Modal from "react-native-modal";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 import { reloadApp } from "../../util/appState";
+import { secureStoreSetItem } from "../../store/secure-storage";
 
 const TripForm = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -267,7 +268,7 @@ const TripForm = ({ navigation, route }) => {
       return;
     }
     const tripid = await storeTrip(tripData);
-    await asyncStoreSetItem("currentTripId", tripid);
+    await secureStoreSetItem("currentTripId", tripid);
     await storeTravellerToTrip(tripid, { userName: userName, uid: uid });
 
     const newTripData = await fetchTrip(tripid);

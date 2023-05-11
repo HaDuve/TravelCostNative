@@ -38,7 +38,7 @@ export async function isConnectionFastEnough(): Promise<ConnectionSpeedResult> {
     return { isFastEnough: false };
   }
   return getConnectionSpeed().then((speed) => {
-    console.log("Connection speed:", speed.toFixed(2), "Mbps");
+    // console.log("Connection speed:", speed.toFixed(2), "Mbps");
     return {
       isFastEnough: speed >= requiredSpeed,
       speed: speed,

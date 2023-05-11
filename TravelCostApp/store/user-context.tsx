@@ -109,7 +109,7 @@ function UserContextProvider({ children }) {
       const categoryListString = await AsyncStorage.getItem("categoryList");
       if (categoryListString !== null) {
         const list = JSON.parse(categoryListString);
-        console.log("loadCategoryList ~ list:", list);
+        // console.log("loadCategoryList ~ list:", list);
         setCatIconNames(list);
         return;
       }

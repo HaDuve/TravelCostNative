@@ -10,7 +10,7 @@ export async function asyncStoreSetItem(
   key: string,
   value: string | number | boolean
 ) {
-  console.log("attempting save in Memory > ", key + ": " + value);
+  // console.log("attempting save in Memory > ", key + ": " + value);
   if (typeof value !== "string") {
     value = value.toString();
   }

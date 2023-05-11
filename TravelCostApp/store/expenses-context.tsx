@@ -127,7 +127,7 @@ function ExpensesContextProvider({ children }) {
 
   useEffect(() => {
     // save expenseState in async
-    console.log("saving expenses");
+    // console.log("saving expenses");
     asyncStoreSetObject("expenses", expensesState);
   }, [expensesState]);
 
@@ -279,7 +279,7 @@ function ExpensesContextProvider({ children }) {
 
   async function loadExpensesFromStorage() {
     if (expensesState.length !== 0) {
-      console.log("expenses not empty, will not load again");
+      // console.log("expenses not empty, will not load again");
       return false;
     }
     const loadedExpenses = await asyncStoreGetObject("expenses");

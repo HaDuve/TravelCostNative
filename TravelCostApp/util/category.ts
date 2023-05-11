@@ -128,6 +128,7 @@ export function mapDescriptionToCategory(
       maxCategory = category;
     }
   });
+  console.log("mapDescriptionToCategory ~ maxCategory:", maxCategory);
   return maxCategory;
 }
 

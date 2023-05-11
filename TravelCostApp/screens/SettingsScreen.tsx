@@ -160,7 +160,7 @@ const SettingsScreen = ({ navigation }) => {
   useFocusEffect(() => {
     async function getEmail() {
       const email = await secureStoreGetItem("ENCM");
-      console.log("getEmail ~ email:", email);
+      // console.log("getEmail ~ email:", email);
       setEmailString(email);
     }
     getEmail();
@@ -168,7 +168,7 @@ const SettingsScreen = ({ navigation }) => {
   useEffect(() => {
     async function getEmail() {
       const email = await secureStoreGetItem("ENCM");
-      console.log("getEmail ~ email:", email);
+      // console.log("getEmail ~ email:", email);
       setEmailString(email);
     }
     getEmail();

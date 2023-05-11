@@ -67,7 +67,7 @@ export const deleteExpenseOnlineOffline = async (
   online: boolean
 ) => {
   // load tripid from asyncstore to fix the tripctx tripid bug
-  const tripid = await asyncStoreGetItem("currentTripId");
+  const tripid = await secureStoreGetItem("currentTripId");
   if (!tripid) {
     Toast.show({
       type: "error",
@@ -107,7 +107,7 @@ export const updateExpenseOnlineOffline = async (
   online: boolean
 ) => {
   // load tripid from asyncstore to fix the tripctx tripid bug
-  const tripid = await asyncStoreGetItem("currentTripId");
+  const tripid = await secureStoreGetItem("currentTripId");
   if (!tripid) {
     Toast.show({
       type: "error",
@@ -147,7 +147,7 @@ export const storeExpenseOnlineOffline = async (
   online: boolean
 ) => {
   // load tripid from asyncstore to fix the tripctx tripid bug
-  const tripid = await asyncStoreGetItem("currentTripId");
+  const tripid = await secureStoreGetItem("currentTripId");
   if (!tripid) {
     Toast.show({
       type: "error",

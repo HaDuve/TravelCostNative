@@ -625,13 +625,18 @@ export async function touchMyTraveler(tripid: string, uid: string) {
 }
 
 export async function fetchTravelerIsTouched(tripid: string, uid: string) {
-  const allTravelersRes = await fetchTripsTravellers(tripid);
-  let returnIsTouched = null;
-  for (const key in allTravelersRes) {
-    const DatabaseUid = allTravelersRes[key].uid;
-    if (DatabaseUid !== uid) continue;
-    returnIsTouched = allTravelersRes[key].touched;
+  try {
+    const allTravelersRes = await fetchTripsTravellers(tripid);
+    let returnIsTouched = null;
+    for (const key in allTravelersRes) {
+      const DatabaseUid = allTravelersRes[key].uid;
+      if (DatabaseUid !== uid) continue;
+      returnIsTouched = allTravelersRes[key].touched;
+    }
+    // return true if uid is not found in allTravelersRes
+    return returnIsTouched ?? true;
+  } catch (error) {
+    console.log("fetchTravelerIsTouched:", error);
+    return false;
   }
-  // return true if uid is not found in allTravelersRes
-  return returnIsTouched ?? true;
 }

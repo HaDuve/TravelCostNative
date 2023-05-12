@@ -188,7 +188,15 @@ export const storeExpenseOnlineOffline = async (
   }
 };
 
-// check if we have a queue stored
+/**
+ * This function sends offline queue data to the server when the device is back online and the internet connection is fast enough.
+ * It retrieves the offline queue data from the secure store and sends each item in a while loop.
+ * If the internet connection is not fast enough or the device is still offline, the function returns without sending any data.
+ * If any item in the queue fails to send, the function stops sending and returns an error.
+ * @async
+ * @function sendOfflineQueue
+ * @returns {Promise<void>}
+ */
 export const sendOfflineQueue = async () => {
   const offlineQueue = (await secureStoreGetObject("offlineQueue")) || [];
   if (offlineQueue && offlineQueue.length > 0) {

@@ -142,7 +142,13 @@ export const updateExpenseOnlineOffline = async (
   }
 };
 
-// store item online if online flag is set, otherwise store in offline queue
+/**
+ * This function stores an expense either online or offline based on the internet speed and availability.
+ * @param {OfflineQueueManageExpenseItem} item - The expense item to be stored.
+ * @param {boolean} online - A boolean value indicating whether the device is online or not.
+ * @returns {Promise<string>} - A promise that resolves to the ID of the stored expense.
+ * @throws {Error} - If there is no trip ID found in the async store.
+ */
 export const storeExpenseOnlineOffline = async (
   item: OfflineQueueManageExpenseItem,
   online: boolean

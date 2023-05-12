@@ -62,7 +62,14 @@ export const getOfflineQueue = async () => {
   return offlineQueue || [];
 };
 
-// delete item online if online flag is set, otherwise store in offline queue
+/**
+ * Deletes an expense either online or offline based on the provided parameters.
+ * @async
+ * @param {OfflineQueueManageExpenseItem} item - The expense item to be deleted.
+ * @param {boolean} online - A boolean value indicating whether the deletion should be performed online or offline.
+ * @throws {Error} Throws an error if no tripid is found in asyncStore.
+ * @returns {Promise<void>} Returns a Promise that resolves when the deletion is complete.
+ */
 export const deleteExpenseOnlineOffline = async (
   item: OfflineQueueManageExpenseItem,
   online: boolean
@@ -83,8 +90,8 @@ export const deleteExpenseOnlineOffline = async (
 
   // if the internet is not fast enough, store in offline queue
   const { isFastEnough, speed } = await isConnectionFastEnough();
-  console.log("isFastEnough:", isFastEnough);
-  console.log("speed:", speed.toFixed(2), "Mbps");
+  // console.log("isFastEnough:", isFastEnough);
+  // console.log("speed:", speed.toFixed(2), "Mbps");
   if (online && isFastEnough) {
     // delete item online
     try {
@@ -102,7 +109,14 @@ export const deleteExpenseOnlineOffline = async (
   }
 };
 
-// update item online if online flag is set, othwerwise store in offline queue
+/**
+ * Updates an expense item either online or offline depending on the internet connection speed.
+ * @async
+ * @param {OfflineQueueManageExpenseItem} item - The expense item to be updated.
+ * @param {boolean} online - A boolean value indicating whether the device is currently online or not.
+ * @throws {Error} Throws an error if there is no tripid found in asyncStore.
+ * @returns {Promise<void>} Returns a Promise that resolves when the update is complete.
+ */
 export const updateExpenseOnlineOffline = async (
   item: OfflineQueueManageExpenseItem,
   online: boolean
@@ -122,8 +136,8 @@ export const updateExpenseOnlineOffline = async (
   item.expense.tripid = tripid;
   // if the internet is not fast enough, store in offline queue
   const { isFastEnough, speed } = await isConnectionFastEnough();
-  console.log("isFastEnough:", isFastEnough);
-  console.log("speed:", speed.toFixed(2), "Mbps");
+  // console.log("isFastEnough:", isFastEnough);
+  // console.log("speed:", speed.toFixed(2), "Mbps");
   if (online && isFastEnough) {
     // update item online
     try {
@@ -168,8 +182,8 @@ export const storeExpenseOnlineOffline = async (
   item.expense.tripid = tripid;
   // if the internet is not fast enough, store in offline queue
   const { isFastEnough, speed } = await isConnectionFastEnough();
-  console.log("isFastEnough:", isFastEnough);
-  console.log("speed:", speed.toFixed(2), "Mbps");
+  // console.log("isFastEnough:", isFastEnough);
+  // console.log("speed:", speed.toFixed(2), "Mbps");
   if (online && isFastEnough) {
     // store item online
     try {
@@ -200,14 +214,14 @@ export const storeExpenseOnlineOffline = async (
 export const sendOfflineQueue = async () => {
   const offlineQueue = (await secureStoreGetObject("offlineQueue")) || [];
   if (offlineQueue && offlineQueue.length > 0) {
-    console.log("queue length", offlineQueue.length);
+    // console.log("queue length", offlineQueue.length);
     const forceOffline = !Device.isDevice && DEBUG_FORCE_OFFLINE;
     const isOnline = await NetInfo.fetch();
-    console.log("update connected =", isOnline);
+    // console.log("update connected =", isOnline);
     // if the internet is not fast enough, store in offline queue
     const { isFastEnough, speed } = await isConnectionFastEnough();
-    console.log("isFastEnough:", isFastEnough);
-    console.log("speed:", speed.toFixed(2), "Mbps");
+    // console.log("isFastEnough:", isFastEnough);
+    // console.log("speed:", speed.toFixed(2), "Mbps");
 
     if (!isOnline || !isOnline.isConnected || !isFastEnough || forceOffline) {
       console.log("sendOfflineQueue ~ still offline!");
@@ -223,8 +237,8 @@ export const sendOfflineQueue = async () => {
       const item = offlineQueue[i];
       tripid = item.expense.tripid;
 
-      console.log("sendOfflineQueue ~ item:", item);
-      console.log("sendOfflineQueue ~ item.type:", item.type);
+      // console.log("sendOfflineQueue ~ item:", item);
+      // console.log("sendOfflineQueue ~ item.type:", item.type);
 
       try {
         if (item.type === "add") {

@@ -98,6 +98,7 @@ const ExpenseForm = ({
   const { settings } = useContext(SettingsContext);
   const alwaysShowAdvancedSetting = settings.alwaysShowAdvanced || isEditing;
   const editingValues: ExpenseData = defaultValues;
+  console.log("userCtx.lastCurrency:", userCtx.lastCurrency);
   const lastCurrency = userCtx.lastCurrency
     ? userCtx.lastCurrency
     : tripCtx.tripCurrency;
@@ -419,6 +420,7 @@ const ExpenseForm = ({
   }
 
   async function submitHandler() {
+    navigation.navigate("RecentExpenses");
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const expenseData = {
       uid: authCtx.uid,
@@ -513,14 +515,17 @@ const ExpenseForm = ({
       await secureStoreSetItem("lastCountry", inputs.country.value);
     }
     if (inputs.currency.value && inputs.currency.value !== "") {
+      console.log("submitHandler ~ secureStoreSetItem:", "last Currency");
       userCtx.setLastCurrency(inputs.currency.value);
       await secureStoreSetItem("lastCurrency", inputs.currency.value);
     }
-    onSubmit(expenseData);
+    console.log("submitHandler ~ expenseData:", "expenseData");
+    await onSubmit(expenseData);
   }
 
-  function fastSubmit() {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  async function fastSubmit() {
+    navigation.navigate("RecentExpenses");
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const expenseData = {
       uid: authCtx.uid,
       amount: +inputs.amount.value,
@@ -538,7 +543,7 @@ const ExpenseForm = ({
       splitList: [],
       iconName: iconName,
     };
-    onSubmit(expenseData);
+    await onSubmit(expenseData);
   }
 
   function addDefaultValues(arg) {
@@ -1111,7 +1116,10 @@ const ExpenseForm = ({
         ></View>
         <View style={styles.buttonContainer}>
           <FlatButton onPress={onCancel}>{i18n.t("cancel")}</FlatButton>
-          <GradientButton style={styles.button} onPress={advancedSubmitHandler}>
+          <GradientButton
+            style={styles.button}
+            onPress={async () => await advancedSubmitHandler()}
+          >
             {submitButtonLabel}
           </GradientButton>
         </View>

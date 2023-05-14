@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import PropTypes from "prop-types";
 import NetInfo from "@react-native-community/netinfo";
 import {
+  secureStoreGetItem,
   secureStoreGetObject,
   secureStoreSetItem,
   secureStoreSetObject,
@@ -70,6 +71,7 @@ export const UserContext = createContext({
   },
   loadCatListFromAsyncInCtx: async (tripid) => {},
   catIconNames: [],
+  loadLastCurrencyCountryFromAsync: async () => {},
 });
 
 function tripsReducer(state, action) {
@@ -99,6 +101,27 @@ function UserContextProvider({ children }) {
   const [isPremium, setIsPremium] = useState(false);
   // useState for cat iconName list
   const [catIconNames, setCatIconNames] = useState([]);
+
+  async function loadLastCurrencyCountryFromAsync() {
+    console.log(
+      "loadLastCurrencyCountryFromAsync ~ loadLastCurrencyCountryFromAsync:",
+      loadLastCurrencyCountryFromAsync
+    );
+    try {
+      const lastCurrencyString = await secureStoreGetItem("lastCurrency");
+      const lastCountryString = await secureStoreGetItem("lastCountry");
+      if (lastCurrencyString !== null && lastCountryString !== null) {
+        setLastCountry(lastCountryString);
+        setLastCurrency(lastCurrencyString);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  useEffect(() => {
+    loadLastCurrencyCountryFromAsync();
+  }, []);
 
   async function checkPremium() {
     // allow offline users to get premium
@@ -309,6 +332,8 @@ function UserContextProvider({ children }) {
     checkPremium: checkPremium,
     loadCatListFromAsyncInCtx: loadCatListFromAsyncInCtx,
     catIconNames: catIconNames,
+
+    loadLastCurrencyCountryFromAsync: loadLastCurrencyCountryFromAsync,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

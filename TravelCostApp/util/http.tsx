@@ -18,6 +18,7 @@ const BACKEND_URL =
 let QPAR = "";
 /** Sets the ACCESS TOKEN for all future http requests */
 export function setAxiosAccessToken(token: string) {
+  console.log("setAxiosAccessToken ~ setAxiosAccessToken");
   if (!token || token.length < 2) {
     console.error("https: ~ wrong token error");
     return;

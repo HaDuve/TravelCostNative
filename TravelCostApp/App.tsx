@@ -79,7 +79,8 @@ import NetworkContextProvider, {
 import { Text } from "react-native-paper";
 import ConnectionBar from "./components/UI/ConnectionBar";
 import ChatGPTScreen from "./components/ChatGPT/ChatGPTScreen";
-import { secureStoreGetItem } from "./store/secure-storage";
+import { secureStoreGetItem, secureStoreSetItem } from "./store/secure-storage";
+import { isConnectionFastEnough } from "./util/connectionSpeed";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -417,6 +418,33 @@ function Root() {
           await sendOfflineQueue();
         };
         asyncQueue();
+
+        const delayedOnlineSetup = async () => {
+          const tripid = await secureStoreGetItem("currentTripId");
+          // console.log("Root ~ tripid:", tripid);
+          if (!tripid) {
+            // console.log(
+            //   "delayedOnlineSetup ~ delayedOnlineSetup:",
+            //   delayedOnlineSetup
+            // );
+
+            const { isFastEnough } = await isConnectionFastEnough();
+            if (isFastEnough) {
+              //prepare online setup
+              const storedUid = await secureStoreGetItem("uid");
+              if (storedUid) {
+                const checkUser = await fetchUser(storedUid);
+                const tripid = checkUser.currentTrip;
+                console.log("delayedOnlineSetup ~ storedUid", storedUid);
+                console.log("delayedOnlineSetup ~ tripid", tripid);
+                const tripData = await tripCtx.fetchAndSetCurrentTrip(tripid);
+                await onlineSetup(tripData, checkUser);
+              }
+            }
+          }
+        };
+
+        delayedOnlineSetup();
       }
     },
     DEBUG_POLLING_INTERVAL * 1.7,
@@ -428,6 +456,18 @@ function Root() {
       setIsReviewModalVisible(true);
     }
   };
+
+  async function onlineSetup(tripData, checkUser) {
+    const userData: UserData = checkUser;
+    const tripid = userData.currentTrip;
+    // console.log("onRootMount ~ userData", userData);
+    // save user Name in Ctx and async
+    userCtx.addUser(userData);
+    tripCtx.setCurrentTrip(tripid, tripData);
+    console.log("onlineSetup ~ tripid before setItem:", tripid)
+    await secureStoreSetItem("currentTripId", tripid);
+    await userCtx.loadCatListFromAsyncInCtx(tripid);
+  }
 
   async function setupOfflineMount(
     isOfflineMode: boolean,
@@ -462,12 +502,17 @@ function Root() {
       if (DEBUG_RESET) await asyncStoreSafeClear();
 
       // offline check and set context
-      const online = netCtx.isConnected && netCtx.strongConnection;
-      console.log("onRootMount ~ online:", online);
+      const { isFastEnough, speed } = await isConnectionFastEnough();
+      console.log("onRootMount ~ speed:", speed);
+      console.log("onRootMount ~ isFastEnough:", isFastEnough);
+      const online = isFastEnough;
+
+      console.log("onRootMount ~ online:", online, speed?.toFixed(2), " mbps");
 
       // fetch token and trip
       const storedToken = await secureStoreGetItem("token");
       const storedUid = await secureStoreGetItem("uid");
+      console.log("onRootMount ~ currentTripid");
       const storedTripId = await secureStoreGetItem("currentTripId");
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
 
@@ -552,25 +597,11 @@ function Root() {
 
         // setup context
         authCtx.setUserID(storedUid);
-
-        const userData: UserData = checkUser;
-        const tripid = userData.currentTrip;
-        console.log("onRootMount ~ userData", userData);
-        userCtx.addUser(userData);
-        const lastCountry = await secureStoreGetItem("lastCountry");
-        const lastCurrency = await secureStoreGetItem("lastCurrency");
-        if (lastCountry) userCtx.setLastCountry(lastCountry);
-        if (lastCurrency) userCtx.setLastCurrency(lastCurrency);
-        tripCtx.setCurrentTrip(tripid, tripData);
-        await asyncStoreSetItem("currentTripId", tripid);
-        const isLoaded = await expensesCtx.loadExpensesFromStorage();
-        console.log("onRootMount ~ isLoaded:", isLoaded);
+        await onlineSetup(tripData, checkUser);
         await authCtx.authenticate(storedToken);
         // await touchMyTraveler(tripid, storedUid);
         const needsTour = await loadTourConfig();
-        console.log("onRootMount ~ needsTour:", needsTour);
         userCtx.setNeedsTour(needsTour);
-        await userCtx.loadCatListFromAsyncInCtx(tripid);
         console.log("Root end reached");
       } else {
         authCtx.logout();
@@ -578,7 +609,11 @@ function Root() {
       setAppIsReady(true);
     }
     const test_onRootMount = dataResponseTime(onRootMount);
-    test_onRootMount();
+    try {
+      test_onRootMount();
+    } catch (error) {
+      console.error("onRootMount ~ error", error);
+    }
   }, []);
 
   useEffect(() => {

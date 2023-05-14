@@ -15,7 +15,7 @@ export async function secureStoreGetItem(key) {
     // console.log("🔐 Here's your value 🔐 \n", result.slice(0, 10));
     return result;
   } else {
-    console.log("No values stored under that key.");
+    console.log("No values stored under that key.", key);
   }
 }
 

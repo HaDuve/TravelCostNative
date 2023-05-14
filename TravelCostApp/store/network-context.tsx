@@ -38,11 +38,11 @@ const NetworkContextProvider = ({ children }) => {
         setStrongConnection(false);
         return;
       }
-      async function asyncSetConnectionSpeed() {
+      async function asyncCheckConnectionSpeed() {
         const { isFastEnough } = await isConnectionFastEnough();
         setStrongConnection(isFastEnough);
       }
-      asyncSetConnectionSpeed();
+      asyncCheckConnectionSpeed();
     },
     DEBUG_POLLING_INTERVAL,
     true

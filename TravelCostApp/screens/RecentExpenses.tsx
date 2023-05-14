@@ -145,10 +145,6 @@ function RecentExpenses({ navigation }) {
     const { isFastEnough, speed } = await isConnectionFastEnough();
     const offlineQueue = await asyncStoreGetObject("offlineQueue");
     const offlineQueueNonEmpty = offlineQueue && offlineQueue.length > 0;
-    // console.log("RecentExpenses ~ online:", online);
-    // console.log("RecentExpenses ~ isFastEnough:", isFastEnough);
-    // console.log("RecentExpenses ~ speed:", speed);
-    // console.log("RecentExpenses ~ offlineQueue.length:", offlineQueue?.length);
     if (!online || !isFastEnough || offlineQueueNonEmpty) {
       if (online && isFastEnough) {
         console.log("RecentExpenses ~ sending offline queue");
@@ -246,9 +242,18 @@ function RecentExpenses({ navigation }) {
         expenses={recentExpenses}
         periodValue={PeriodValue}
         fallbackText={i18n.t("fallbackTextExpenses")}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        // refreshControl={
+        //   <RefreshControl
+        //     refreshing={refreshing}
+        //     onRefresh={
+        //       isOnline
+        //         ? onRefresh
+        //         : () => {
+        //             return;
+        //           }
+        //     }
+        //   />
+        // }
       />
 
       <AddExpenseButton navigation={navigation} />

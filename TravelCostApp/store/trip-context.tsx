@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { fetchTrip, getTravellers } from "../util/http";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 import Toast from "react-native-toast-message";
 import { MAX_JS_NUMBER } from "../confAppConstants";
+import { secureStoreGetItem } from "./secure-storage";
 
 export interface TripData {
   tripName: string;
@@ -49,7 +50,6 @@ export const TripContext = createContext({
 
 function TripContextProvider({ children }) {
   const [travellers, setTravellers] = useState([]);
-
   const [tripid, setTripid] = useState("");
   const [tripName, setTripName] = useState("");
   const [totalBudget, setTotalBudget] = useState("");
@@ -58,6 +58,18 @@ function TripContextProvider({ children }) {
   const [totalSum, setTotalSumTrip] = useState(0);
   const [progress, setProgress] = useState(0);
   const [refreshState, setRefreshState] = useState(false);
+
+  useEffect(() => {
+    // set tripid from storage
+    async function loadTripidFromStorage() {
+      console.log("loadTripidFromStorage ~ loadTripidFromStorage");
+      const loadedTripid = await secureStoreGetItem("currentTripid");
+      if (loadedTripid) {
+        setTripid(loadedTripid);
+      }
+    }
+    loadTripidFromStorage();
+  }, []);
 
   function setTripProgress(percent: number) {
     if (percent < 0 || percent > 1) percent = 1;

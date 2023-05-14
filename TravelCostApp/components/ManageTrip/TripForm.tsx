@@ -18,7 +18,7 @@ import {
 import * as Updates from "expo-updates";
 
 import Input from "../ManageExpense/Input";
-import { TripContext } from "../../store/trip-context";
+import { TripContext, TripData } from "../../store/trip-context";
 import { UserContext } from "../../store/user-context";
 import Button from "../UI/Button";
 import FlatButton from "../UI/FlatButton";
@@ -198,14 +198,15 @@ const TripForm = ({ navigation, route }) => {
   }
 
   async function submitHandler(setActive = false) {
-    const tripData = {
+    const tripData: TripData = {
       tripName: inputs.tripName.value,
-      totalBudget: +inputs.totalBudget.value,
+      totalBudget: inputs.totalBudget.value,
       tripCurrency: inputs.tripCurrency.value,
-      dailyBudget: +inputs.dailyBudget.value,
+      dailyBudget: inputs.dailyBudget.value,
       startDate: startDate,
       endDate: endDate,
       tripid: "",
+      travellers: {},
     };
 
     // Tripname should not be empty
@@ -217,15 +218,15 @@ const TripForm = ({ navigation, route }) => {
     // Total budget should be a number between 0 and 3B
     const totalBudgetIsValid =
       !inputs.totalBudget.value ||
-      (!isNaN(tripData.totalBudget) &&
-        tripData.totalBudget >= 0 &&
-        tripData.totalBudget < MAX_JS_NUMBER &&
+      (!isNaN(+tripData.totalBudget) &&
+        +tripData.totalBudget >= 0 &&
+        +tripData.totalBudget < MAX_JS_NUMBER &&
         tripData.totalBudget > tripData.dailyBudget);
 
     const dailyBudgetIsValid =
-      !isNaN(tripData.dailyBudget) &&
-      tripData.dailyBudget > 0 &&
-      tripData.dailyBudget < MAX_JS_NUMBER &&
+      !isNaN(+tripData.dailyBudget) &&
+      +tripData.dailyBudget > 0 &&
+      +tripData.dailyBudget < MAX_JS_NUMBER &&
       (!inputs.totalBudget.value ||
         tripData.dailyBudget < tripData.totalBudget);
 
@@ -268,6 +269,7 @@ const TripForm = ({ navigation, route }) => {
       return;
     }
     const tripid = await storeTrip(tripData);
+    console.log("TripForm ~ tripid before setItem:", tripid);
     await secureStoreSetItem("currentTripId", tripid);
     await storeTravellerToTrip(tripid, { userName: userName, uid: uid });
 

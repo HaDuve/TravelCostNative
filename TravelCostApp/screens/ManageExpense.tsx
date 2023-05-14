@@ -245,7 +245,6 @@ const ManageExpense = ({ route, navigation }) => {
   async function confirmHandler(expenseData: ExpenseData) {
     console.log("confirmHandler ~ expenseData:", expenseData);
     setIsSubmitting(true);
-    navigation.navigate("RecentExpenses");
     try {
       // set the category to the corresponting catstring
       expenseData.categoryString = getCatString(expenseData.category);

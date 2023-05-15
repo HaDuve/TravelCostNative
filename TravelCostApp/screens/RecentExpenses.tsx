@@ -113,6 +113,7 @@ function RecentExpenses({ navigation }) {
   useEffect(() => {
     async function setTravellers() {
       if (netCtx.isConnected && netCtx.strongConnection) {
+        if (tripCtx.travellers && tripCtx.travellers.length > 1) return;
         try {
           await tripCtx.setCurrentTravellers(tripCtx.tripid);
         } catch (error) {

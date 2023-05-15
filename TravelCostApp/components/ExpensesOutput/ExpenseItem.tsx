@@ -64,6 +64,8 @@ function ExpenseItem(props): JSX.Element {
   let travellerSum = 0;
   let calcTravellerSumString = "";
   let travellerSumString = "";
+
+  // if showSumForTravellerName is set, show the sum of the expense for only this traveller
   if (splitList && splitList.length > 0 && showSumForTravellerName) {
     splitList.forEach((split) => {
       console.log("splitList.forEach ~ split:", split);

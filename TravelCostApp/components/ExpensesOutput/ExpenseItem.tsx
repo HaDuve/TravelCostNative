@@ -85,14 +85,6 @@ function ExpenseItem(props): JSX.Element {
     ? `${calcTravellerSumString}`
     : formatExpenseWithCurrency(calcAmount, currency);
 
-  console.log(
-    "calcAmount formatted:",
-    formatExpenseWithCurrency(calcAmount, currency)
-  );
-  console.log(
-    "homeAmount formatted:",
-    formatExpenseWithCurrency(amount, homeCurrency)
-  );
   const amountString = travellerSum
     ? `${travellerSumString}`
     : formatExpenseWithCurrency(amount, homeCurrency);

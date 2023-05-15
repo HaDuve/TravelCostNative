@@ -16,7 +16,7 @@ export function formatExpenseWithCurrency(
   const formatOptions: Intl.NumberFormatOptions = {
     style: "currency",
     currency: currency,
-    currencyDisplay: "symbol",
+    currencyDisplay: "narrowSymbol",
     maximumFractionDigits: 2,
     minimumFractionDigits: 0,
     ...options,

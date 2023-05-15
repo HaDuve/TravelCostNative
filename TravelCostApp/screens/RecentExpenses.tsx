@@ -111,6 +111,21 @@ function RecentExpenses({ navigation }) {
   }, [netCtx.isConnected, netCtx.strongConnection]);
 
   useEffect(() => {
+    async function setTravellers() {
+      if (netCtx.isConnected && netCtx.strongConnection) {
+        try {
+          await tripCtx.setCurrentTravellers(tripCtx.tripid);
+        } catch (error) {
+          console.log("error loading travellers in expenseForm");
+        }
+      } else {
+        await tripCtx.loadTravellersFromStorage();
+      }
+    }
+    setTravellers();
+  }, [tripCtx.tripid, netCtx.isConnected, netCtx.strongConnection]);
+
+  useEffect(() => {
     LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
   }, []);
 

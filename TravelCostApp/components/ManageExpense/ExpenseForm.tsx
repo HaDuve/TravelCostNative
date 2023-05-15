@@ -133,23 +133,9 @@ const ExpenseForm = ({
     .map((expense) => expense.description);
 
   useEffect(() => {
-    async function setTravellers() {
-      setLoadingTravellers(true);
-      if (netCtx.isConnected && netCtx.strongConnection) {
-        try {
-          await tripCtx.setCurrentTravellers(tripCtx.tripid);
-        } catch (error) {
-          console.log("error loading travellers in expenseForm");
-        }
-      }
-      if (tripCtx.travellers) setListEQUAL(tripCtx.travellers);
-      setLoadingTravellers(false);
-    }
-    setTravellers();
-  }, [tripCtx.tripid, netCtx.isConnected, netCtx.strongConnection]);
-
-  // currencypicker reference for open/close
-  // let currencyPickerRef = undefined;
+    // setlistequal with tripcontext.travellers
+    if (tripCtx.travellers) setListEQUAL(tripCtx.travellers);
+  }, [tripCtx.travellers]);
 
   // datepicker states
   const [showDatePickerRange, setShowDatePickerRange] = useState(false);

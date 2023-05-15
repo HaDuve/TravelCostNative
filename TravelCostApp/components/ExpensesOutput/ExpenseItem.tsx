@@ -1,14 +1,17 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import PropTypes from "prop-types";
+import { createMoney, convertAmount, getCurrency } from "@dinero.js/core";
+import * as currencies from "@dinero.js/currencies";
+import { format } from "@dinero.js/number";
 
 import { GlobalStyles } from "../../constants/styles";
 import { isToday, toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
 import { getCatSymbol, Category } from "../../util/category";
-import { memo, useContext, useCallback, useState } from "react";
+import { useContext, useCallback, useState } from "react";
 import { TripContext } from "../../store/trip-context";
-import { formatExpenseString } from "../../util/string";
+import { formatExpenseWithCurrency } from "../../util/string";
 import React from "react";
 
 import Animated, {
@@ -30,8 +33,6 @@ import { UserContext } from "../../store/user-context";
 import ExpenseCountryFlag from "./ExpenseCountryFlag";
 import { SettingsContext } from "../../store/settings-context";
 import { useEffect } from "react";
-import { NetworkContext } from "../../store/network-context";
-import { getCurrencySymbol } from "../../util/currencySymbol";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -54,10 +55,7 @@ function ExpenseItem(props): JSX.Element {
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
-  const netCtx = useContext(NetworkContext);
   const homeCurrency = tripCtx.tripCurrency;
-  const homeCurrencySymbol = getCurrencySymbol(homeCurrency);
-  const currencySymbol = getCurrencySymbol(currency);
   const rate = calcAmount / amount;
 
   let calcTravellerSum = 0;
@@ -74,16 +72,30 @@ function ExpenseItem(props): JSX.Element {
         travellerSum += Number(split.amount);
       }
     });
-    calcTravellerSumString = formatExpenseString(Number(calcTravellerSum));
-    travellerSumString = formatExpenseString(Number(travellerSum));
+    calcTravellerSumString = formatExpenseWithCurrency(
+      Number(calcTravellerSum),
+      currency
+    );
+    travellerSumString = formatExpenseWithCurrency(
+      Number(travellerSum),
+      homeCurrency
+    );
   }
   const calcAmountString = calcTravellerSum
     ? `${calcTravellerSumString}`
-    : formatExpenseString(calcAmount);
+    : formatExpenseWithCurrency(calcAmount, currency);
 
+  console.log(
+    "calcAmount formatted:",
+    formatExpenseWithCurrency(calcAmount, currency)
+  );
+  console.log(
+    "homeAmount formatted:",
+    formatExpenseWithCurrency(amount, homeCurrency)
+  );
   const amountString = travellerSum
     ? `${travellerSumString}`
-    : formatExpenseString(amount);
+    : formatExpenseWithCurrency(amount, homeCurrency);
 
   if (iconName) console.log(iconName);
   const [catSymbol, setCatSymbol] = useState(iconName ? iconName : "");
@@ -116,10 +128,7 @@ function ExpenseItem(props): JSX.Element {
   }, [id, navigation]);
   const originalCurrencyJSX = !sameCurrency ? (
     <>
-      <Text style={styles.originalCurrencyText}>
-        {amountString}
-        {currencySymbol}
-      </Text>
+      <Text style={styles.originalCurrencyText}>{amountString}</Text>
     </>
   ) : (
     <></>
@@ -208,10 +217,7 @@ function ExpenseItem(props): JSX.Element {
           )}
           {toggle2 && <View>{sharedList}</View>}
           <View style={styles.amountContainer}>
-            <Text style={styles.amount}>
-              {calcAmountString}
-              {homeCurrencySymbol}
-            </Text>
+            <Text style={styles.amount}>{calcAmountString}</Text>
             {originalCurrencyJSX}
           </View>
         </View>

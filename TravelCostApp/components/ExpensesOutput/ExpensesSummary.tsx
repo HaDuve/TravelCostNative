@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
 import { TripContext } from "../../store/trip-context";
-import { formatExpenseString } from "../../util/string";
+import { formatExpenseWithCurrency } from "../../util/string";
 import PropTypes from "prop-types";
 import { Pressable } from "react-native";
 import Toast from "react-native-toast-message";
@@ -24,8 +24,11 @@ const ExpensesSummary = ({ expenses, periodName }) => {
     return <></>;
   }
 
-  const expensesSumString = formatExpenseString(expensesSum);
   const userCurrency = tripCtx.tripCurrency;
+  const expensesSumString = formatExpenseWithCurrency(
+    expensesSum,
+    userCurrency
+  );
   const currencySymbol = getCurrencySymbol(userCurrency);
   let budgetNumber = Number(tripCtx.dailyBudget);
   let infinityString = "";
@@ -97,17 +100,19 @@ const ExpensesSummary = ({ expenses, periodName }) => {
     Toast.show({
       type: budgetNumber > expenseSumNum ? "success" : "error",
       position: "bottom",
-      text2:
-        budgetNumber > expenseSumNum
-          ? `You have ${(budgetNumber - expenseSumNum).toFixed(
-              2
-            )} ${currencySymbol} left to spend!`
-          : `Exceeded the budget by ${(expenseSumNum - budgetNumber).toFixed(
-              2
-            )} ${currencySymbol}`,
       text1: `${
         periodName.charAt(0).toUpperCase() + periodName.slice(1)
-      } Budget: ${budgetNumber} ${currencySymbol}`,
+      } Budget: ${formatExpenseWithCurrency(budgetNumber, userCurrency)}`,
+      text2:
+        budgetNumber > expenseSumNum
+          ? `You have ${formatExpenseWithCurrency(
+              budgetNumber - expenseSumNum,
+              userCurrency
+            )} left to spend!`
+          : `Exceeded the budget by ${formatExpenseWithCurrency(
+              expenseSumNum - budgetNumber,
+              userCurrency
+            )}!`,
       visibilityTime: 5000,
     });
   };
@@ -117,7 +122,6 @@ const ExpensesSummary = ({ expenses, periodName }) => {
       <View style={styles.sumTextContainer}>
         <Text style={[styles.sum, { color: budgetColor }]}>
           {expensesSumString}
-          {currencySymbol}
         </Text>
       </View>
       <Progress.Bar

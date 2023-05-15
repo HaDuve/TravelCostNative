@@ -5,20 +5,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { Category, getCatString, getCatSymbol } from "../../../util/category";
 import { useContext } from "react";
 import { TripContext } from "../../../store/trip-context";
-import { formatExpenseString } from "../../../util/string";
-import Animated, {
-  FadeIn,
-  FadeInRight,
-  ZoomIn,
-  ZoomInEasyDown,
-  ZoomInEasyUp,
-  ZoomInRotate,
-} from "react-native-reanimated";
+import { formatExpenseWithCurrency } from "../../../util/string";
+import Animated, { ZoomIn } from "react-native-reanimated";
 import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { useState } from "react";
 import { UserContext } from "../../../store/user-context";
-import { getCurrencySymbol } from "../../../util/currencySymbol";
 
 const CategoryProgressBar = ({
   cat,
@@ -56,8 +48,7 @@ const CategoryProgressBar = ({
   const unfilledColor = GlobalStyles.colors.gray500Accent;
 
   const userCurrency = tripCtx.tripCurrency;
-  const userCurrencySymbol = getCurrencySymbol(userCurrency);
-  const catCostString = formatExpenseString(catCost);
+  const catCostString = formatExpenseWithCurrency(catCost, userCurrency);
   const windowWidth = Dimensions.get("window").width;
 
   if (Number.isNaN(budgetProgress)) {
@@ -76,7 +67,6 @@ const CategoryProgressBar = ({
         <View style={{ flex: 1 }}></View>
         <Text style={[styles.sum, { color: GlobalStyles.colors.error300 }]}>
           {catCostString}
-          {userCurrencySymbol}
         </Text>
       </View>
       <Progress.Bar

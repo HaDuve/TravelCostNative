@@ -11,7 +11,7 @@ import {
   toMonthString,
 } from "../../../util/date";
 import { TripContext } from "../../../store/trip-context";
-import { formatExpenseString } from "../../../util/string";
+import { formatExpenseWithCurrency } from "../../../util/string";
 import { GlobalStyles } from "../../../constants/styles";
 import ExpenseChart from "../../ExpensesOverview/ExpenseChart";
 
@@ -64,10 +64,11 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
         }, 0);
         const dailyBudget = tripCtx.dailyBudget;
         const formattedDay = toDayMonthString(day);
-        const formattedSum = formatExpenseString(expensesSum);
-        const label = `${formattedDay} - ${formattedSum}${getCurrencySymbol(
+        const formattedSum = formatExpenseWithCurrency(
+          expensesSum,
           tripCtx.tripCurrency
-        )}`;
+        );
+        const label = `${formattedDay} - ${formattedSum}`;
         budget = Number(dailyBudget);
         daysRange = lastDays;
         const obj = { day, expensesSum, dailyBudget, label };
@@ -89,7 +90,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
         const emptyValue = item.expensesSum === 0;
         const expenseString = emptyValue
           ? ""
-          : formatExpenseString(item.expensesSum);
+          : formatExpenseWithCurrency(item.expensesSum, tripCtx.tripCurrency);
 
         return (
           <Pressable
@@ -126,7 +127,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
               <Text style={styles.text1}>{dayString}</Text>
               <Text style={[styles.text1, colorCoding]}>
                 {expenseString}
-                {emptyValue ? "-" : getCurrencySymbol(tripCtx.tripCurrency)}
+                {emptyValue ? "-" : ""}
               </Text>
             </Animated.View>
           </Pressable>
@@ -146,10 +147,11 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
         }, 0);
         const weeklyBudget = Number(tripCtx.dailyBudget) * 7;
         const formattedDay = toDayMonthString(firstDay);
-        const formattedSum = formatExpenseString(expensesSum);
-        const label = `${formattedDay} - ${formattedSum}${getCurrencySymbol(
+        const formattedSum = formatExpenseWithCurrency(
+          expensesSum,
           tripCtx.tripCurrency
-        )}`;
+        );
+        const label = `${formattedDay} - ${formattedSum}`;
         budget = weeklyBudget;
         daysRange = lastWeeks * 7;
         const obj = { firstDay, lastDay, expensesSum, weeklyBudget, label };
@@ -175,7 +177,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
         const emptyValue = item.expensesSum === 0;
         const expenseString = emptyValue
           ? ""
-          : formatExpenseString(item.expensesSum);
+          : formatExpenseWithCurrency(item.expensesSum, tripCtx.tripCurrency);
         return (
           <Pressable
             style={({ pressed }) => [
@@ -210,7 +212,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
               <Text style={styles.text1}>{weekString}</Text>
               <Text style={[styles.text1, colorCoding]}>
                 {expenseString}
-                {emptyValue ? "-" : getCurrencySymbol(tripCtx.tripCurrency)}
+                {emptyValue ? "-" : ""}
               </Text>
             </Animated.View>
           </Pressable>
@@ -230,10 +232,11 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
         }, 0);
         const monthlyBudget = Number(tripCtx.dailyBudget) * 30;
         const formattedDay = toDayMonthString(firstDay);
-        const formattedSum = formatExpenseString(expensesSum);
-        const label = `${formattedDay} - ${formattedSum}${getCurrencySymbol(
+        const formattedSum = formatExpenseWithCurrency(
+          expensesSum,
           tripCtx.tripCurrency
-        )}`;
+        );
+        const label = `${formattedDay} - ${formattedSum}`;
         budget = monthlyBudget;
         daysRange = lastMonths * 30;
         const obj = { firstDay, lastDay, expensesSum, monthlyBudget, label };
@@ -248,7 +251,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
         const emptyValue = item.expensesSum === 0;
         const expenseString = emptyValue
           ? ""
-          : formatExpenseString(item.expensesSum);
+          : formatExpenseWithCurrency(item.expensesSum, tripCtx.tripCurrency);
 
         return (
           <Pressable
@@ -286,7 +289,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
               </Text>
               <Text style={[styles.text1, colorCoding]}>
                 {expenseString}
-                {emptyValue ? "-" : getCurrencySymbol(tripCtx.tripCurrency)}
+                {emptyValue ? "-" : ""}
               </Text>
             </Animated.View>
           </Pressable>
@@ -308,10 +311,11 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
         }, 0);
         const yearlyBudget = Number(tripCtx.dailyBudget) * 365;
         const formattedDay = toDayMonthString(firstDay);
-        const formattedSum = formatExpenseString(expensesSum);
-        const label = `${formattedDay} - ${formattedSum}${getCurrencySymbol(
+        const formattedSum = formatExpenseWithCurrency(
+          expensesSum,
           tripCtx.tripCurrency
-        )}`;
+        );
+        const label = `${formattedDay} - ${formattedSum}`;
         budget = yearlyBudget;
         daysRange = lastYears * 365;
         const obj = { firstDay, lastDay, expensesSum, yearlyBudget, label };
@@ -325,7 +329,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
         const emptyValue = item.expensesSum === 0;
         const expenseString = emptyValue
           ? ""
-          : formatExpenseString(item.expensesSum);
+          : formatExpenseWithCurrency(item.expensesSum, tripCtx.tripCurrency);
 
         return (
           <Pressable
@@ -361,7 +365,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
               <Text style={styles.text1}>{yearString}</Text>
               <Text style={[styles.text1, colorCoding]}>
                 {expenseString}
-                {emptyValue ? "-" : getCurrencySymbol(tripCtx.tripCurrency)}
+                {emptyValue ? "-" : ""}
               </Text>
             </Animated.View>
           </Pressable>

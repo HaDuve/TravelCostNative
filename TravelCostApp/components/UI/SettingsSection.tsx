@@ -1,8 +1,7 @@
 import React, { useContext, useState } from "react";
-import { View, Text, Switch, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SettingsContext } from "../../store/settings-context";
-import { GlobalStyles } from "../../constants/styles";
 import SettingsSwitch from "./SettingsSwitch";
 import PropTypes from "prop-types";
 

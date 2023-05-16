@@ -54,13 +54,22 @@ const ProfileForm = ({ navigation, sleepyStartHandler }) => {
   const iconButtonJSX = isFetchingLogout ? (
     <LoadingOverlay></LoadingOverlay>
   ) : (
-    <IconButton
-      icon={"exit-outline"}
-      size={36}
-      color={GlobalStyles.colors.textColor}
-      // style={styles.button}
-      onPress={logoutHandler}
-    />
+    <View style={[styles.inputsRow, { marginTop: -12 }]}>
+      <IconButton
+        icon={"settings-outline"}
+        size={36}
+        color={GlobalStyles.colors.textColor}
+        // style={styles.button}
+        onPress={() => navigation.navigate("Settings")}
+      />
+      <IconButton
+        icon={"exit-outline"}
+        size={36}
+        color={GlobalStyles.colors.textColor}
+        // style={styles.button}
+        onPress={logoutHandler}
+      />
+    </View>
   );
 
   const [inputs, setInputs] = useState({

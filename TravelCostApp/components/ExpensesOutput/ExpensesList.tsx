@@ -1,7 +1,7 @@
 import { Alert, Dimensions } from "react-native";
 
 import ExpenseItem from "./ExpenseItem";
-
+import uniqBy from "lodash.uniqby";
 import React, { useContext } from "react";
 import { View, Text } from "react-native";
 
@@ -168,6 +168,7 @@ function ExpensesList({
   periodValue,
   showSumForTravellerName,
 }) {
+  const uniqueData = uniqBy(expenses, (e) => e.id);
   // const flatListRef = useRef(null);
   const netCtx = useContext(NetworkContext);
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
@@ -208,7 +209,7 @@ function ExpensesList({
         // ref={flatListRef}
         scrollEnabled={false}
         itemLayoutAnimation={layoutAnim}
-        data={expenses}
+        data={uniqueData}
         renderItem={renderExpenseItem.bind(this, isOnline)}
         ListFooterComponent={
           <View style={{ height: Dimensions.get("window").height }} />

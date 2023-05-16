@@ -18,6 +18,11 @@ import { ExpensesContext } from "../store/expenses-context";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import Button from "../components/UI/Button";
 import { exportAllExpensesToXLSX } from "../components/ImportExport/ExportToGoogleXlsx";
 import { ScrollView } from "react-native-gesture-handler";
@@ -39,11 +44,7 @@ import { useEffect } from "react";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { secureStoreGetItem } from "../store/secure-storage";
-
-const i18n = new I18n({ en, de, fr });
-i18n.locale = Localization.locale.slice(0, 2);
-i18n.enableFallback = true;
-// i18n.locale = "en";
+import IconButton from "../components/UI/IconButton";
 
 const SettingsScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
@@ -235,8 +236,32 @@ const SettingsScreen = ({ navigation }) => {
         backgroundColor: GlobalStyles.colors.backgroundColor,
       }}
     >
-      <View style={styles.titleContainer}>
-        <Text style={styles.titleText}>Settings</Text>
+      <View
+        style={{
+          // flex: 1,
+          flexDirection: "row",
+          alignItems: "center",
+          // paddingHorizontal: "4%",
+        }}
+      >
+        {/* Back button */}
+        <TouchableOpacity
+          onPress={() => {
+            navigation.goBack();
+          }}
+        >
+          <IconButton
+            icon="arrow-back-outline"
+            size={36}
+            color={GlobalStyles.colors.textColor}
+            // style={styles.button}
+            onPress={() => navigation.goBack()}
+          ></IconButton>
+        </TouchableOpacity>
+
+        <View style={styles.titleContainer}>
+          <Text style={styles.titleText}>Settings</Text>
+        </View>
       </View>
       <SettingsSection multiTraveller={multiTraveller}></SettingsSection>
       {/* <GradientButton style={styles.settingsButton} onPress={logoutHandler}>
@@ -324,7 +349,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: "2%",
-    paddingHorizontal: "4%",
+    paddingHorizontal: "20%",
   },
   titleText: {
     fontSize: 22,

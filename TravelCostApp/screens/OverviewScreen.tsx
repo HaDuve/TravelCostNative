@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
-import { ExpensesContext } from "../store/expenses-context";
+import { ExpensesContext, RangeString } from "../store/expenses-context";
 import { UserContext } from "../store/user-context";
 import { StyleSheet, Text, View } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
@@ -13,9 +13,7 @@ import { I18n } from "i18n-js";
 import { en, de, fr } from "../i18n/supportedLanguages";
 import { DateTime } from "luxon";
 import { _toShortFormat } from "../util/dateTime";
-import { useFocusEffect } from "@react-navigation/native";
 import PropTypes from "prop-types";
-import Toast from "react-native-toast-message";
 import { NetworkContext } from "../store/network-context";
 import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
@@ -30,7 +28,9 @@ const OverviewScreen = ({ navigation }) => {
   const netCtx = useContext(NetworkContext);
 
   const [open, setOpen] = useState(false);
-  const [PeriodValue, setPeriodValue] = useState(userCtx.periodName);
+  const [PeriodValue, setPeriodValue] = useState<RangeString>(
+    userCtx.periodName
+  );
 
   const [dateTimeString, setDateTimeString] = useState("");
   // strong connection state
@@ -84,7 +84,7 @@ const OverviewScreen = ({ navigation }) => {
           setValue={setPeriodValue}
           setItems={setItems}
           containerStyle={styles.dropdownContainer}
-          customItemLabelStyle={styles.dropdownItemLabel}
+          // customItemLabelStyle={styles.dropdownItemLabel}
           style={styles.dropdown}
           textStyle={styles.dropdownTextStyle}
         />

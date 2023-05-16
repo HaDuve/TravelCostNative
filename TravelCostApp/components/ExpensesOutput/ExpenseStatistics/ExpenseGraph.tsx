@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Pressable } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React, { useContext } from "react";
+import React, { useContext, useRef } from "react";
 import { ExpensesContext } from "../../../store/expenses-context";
 import {
   getDateMinusDays,
@@ -27,16 +27,12 @@ i18n.enableFallback = true;
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import PropTypes from "prop-types";
 import { isForeground } from "../../../util/appState";
-import Toast from "react-native-toast-message";
-import { getCurrencySymbol } from "../../../util/currencySymbol";
 
 const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
   const expenseCtx = useContext(ExpensesContext);
   const tripCtx = useContext(TripContext);
   const today = new Date();
-  function renderItemRef() {
-    return <></>;
-  }
+  const renderItemRef = useRef(null);
   if (!isForeground) {
     console.log("ExpenseGraph: not in foreground, return empty view");
     return <></>;
@@ -74,7 +70,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
         const obj = { day, expensesSum, dailyBudget, label };
         listExpenseSumBudgets.push(obj);
       }
-      renderItemRef = function renderItem({ item }) {
+      renderItemRef.current = function renderItem({ item }) {
         let dayString = "";
         if (
           item.day.toDateString() === getDateMinusDays(today, 1).toDateString()
@@ -157,7 +153,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
         const obj = { firstDay, lastDay, expensesSum, weeklyBudget, label };
         listExpenseSumBudgets.push(obj);
       }
-      renderItemRef = function renderItem({ item }) {
+      renderItemRef.current = function renderItem({ item }) {
         let weekString = "";
         if (
           item.firstDay.toDateString() ===
@@ -243,7 +239,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
         listExpenseSumBudgets.push(obj);
       }
 
-      renderItemRef = function renderItem({ item }) {
+      renderItemRef.current = function renderItem({ item }) {
         const month = toMonthString(item.firstDay);
         const debt = item.expensesSum > item.monthlyBudget;
         const colorCoding = !debt ? styles.green : styles.red;
@@ -321,7 +317,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
         const obj = { firstDay, lastDay, expensesSum, yearlyBudget, label };
         listExpenseSumBudgets.push(obj);
       }
-      renderItemRef = function renderItem({ item }) {
+      renderItemRef.current = function renderItem({ item }) {
         const yearString = item.firstDay.getFullYear();
         const debt = item.expensesSum > item.yearlyBudget;
         const colorCoding = !debt ? styles.green : styles.red;
@@ -405,7 +401,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
           entering={FadeInRight.duration(500)}
           exiting={FadeOutLeft.duration(500)}
           data={listExpenseSumBudgets}
-          renderItem={renderItemRef}
+          renderItem={renderItemRef.current}
           ListFooterComponent={<View style={{ height: 100 }}></View>}
           // removeClippedSubviews={true}
           // maxToRenderPerBatch={7}

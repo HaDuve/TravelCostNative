@@ -29,6 +29,8 @@ export const TripContext = createContext({
   tripCurrency: "",
   totalSum: 0,
   tripProgress: 0,
+  startDate: "",
+  endDate: "",
   refreshState: false,
   refresh: () => {},
   setTripProgress: (percent: number) => {},
@@ -58,6 +60,8 @@ function TripContextProvider({ children }) {
   const [totalSum, setTotalSumTrip] = useState(0);
   const [progress, setProgress] = useState(0);
   const [refreshState, setRefreshState] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   useEffect(() => {
     // set tripid from storage
@@ -109,6 +113,8 @@ function TripContextProvider({ children }) {
       setTripCurrency("");
       setdailyBudget("");
       setCurrentTravellers("");
+      setStartDate("");
+      setEndDate("");
       return;
     }
     // console.log("setCurrentTrip ~ trip", trip);
@@ -121,6 +127,8 @@ function TripContextProvider({ children }) {
     setTripCurrency(trip.tripCurrency);
     setdailyBudget(trip.dailyBudget.toString());
     setCurrentTravellers(tripid);
+    setStartDate(trip.startDate);
+    setEndDate(trip.endDate);
   }
 
   function setTotalSum(amount: number) {
@@ -214,6 +222,8 @@ function TripContextProvider({ children }) {
     tripCurrency: tripCurrency,
     totalSum: totalSum,
     tripProgress: progress,
+    startDate: startDate,
+    endDate: endDate,
     refresh: refresh,
     refreshState: refreshState,
     setTripProgress: setTripProgress,

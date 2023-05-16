@@ -8,9 +8,14 @@ export function formatExpenseWithCurrency(
   options?: Intl.NumberFormatOptions
 ): string {
   if (isNaN(amount)) {
-    throw new Error("Invalid amount");
+    console.log("calling formatExpenseWithCurrency without a number");
+    return "";
   }
 
+  if (!currency) {
+    console.log("calling formatExpenseWithCurrency without a currency");
+    return amount.toFixed(2);
+  }
   const locale = Localization.locale;
 
   const formatOptions: Intl.NumberFormatOptions = {

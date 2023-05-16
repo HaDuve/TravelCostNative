@@ -1,6 +1,13 @@
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
-import { SafeAreaView, View, Keyboard, Platform, AppState } from "react-native";
+import {
+  SafeAreaView,
+  View,
+  Keyboard,
+  Platform,
+  AppState,
+  Image,
+} from "react-native";
 import Purchases from "react-native-purchases";
 import { ChatGptProvider } from "react-native-chatgpt";
 
@@ -76,11 +83,12 @@ import RatingModal from "./screens/RatingModal";
 import NetworkContextProvider, {
   NetworkContext,
 } from "./store/network-context";
-import { Text } from "react-native-paper";
+import { Avatar, Text } from "react-native-paper";
 import ConnectionBar from "./components/UI/ConnectionBar";
 import ChatGPTScreen from "./components/ChatGPT/ChatGPTScreen";
 import { secureStoreGetItem, secureStoreSetItem } from "./store/secure-storage";
 import { isConnectionFastEnough } from "./util/connectionSpeed";
+import FinancialScreen from "./screens/FinancialScreen";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -233,6 +241,14 @@ function AuthenticatedStack() {
               presentation: "modal",
             }}
           />
+          <Stack.Screen
+            name="Settings"
+            component={SettingsScreen}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
         </Stack.Navigator>
       </>
     </ExpensesContextProvider>
@@ -356,7 +372,26 @@ function Home() {
           }}
         />
       )}
-
+      {/* {!FreshlyCreated && (
+        <BottomTabs.Screen
+          name="Financial"
+          component={FinancialScreen}
+          options={{
+            // headerShown: false,
+            title: i18n.t("settingsTab"),
+            tabBarLabel: "Financial", //i18n.t("settingsTab"),
+            tabBarIcon: ({ color }) => (
+              // image of a money bag
+              <Ionicons name="cash-outline" size={24} color={color} />
+              // probably needs a new build for this icon to work
+              // <Image
+              //   source={require("./assets/money-bag.png")}
+              //   style={{ width: 60, height: 60 }}
+              // />
+            ),
+          }}
+        />
+      )} */}
       <BottomTabs.Screen
         name="Profile"
         component={ProfileScreen}
@@ -370,7 +405,7 @@ function Home() {
         }}
       />
 
-      {!FreshlyCreated && (
+      {/* {!FreshlyCreated && (
         <BottomTabs.Screen
           name="Settings"
           component={SettingsScreen}
@@ -383,7 +418,7 @@ function Home() {
             ),
           }}
         />
-      )}
+      )} */}
     </BottomTabs.Navigator>
   );
 }
@@ -464,7 +499,7 @@ function Root() {
     // save user Name in Ctx and async
     userCtx.addUser(userData);
     tripCtx.setCurrentTrip(tripid, tripData);
-    console.log("onlineSetup ~ tripid before setItem:", tripid)
+    console.log("onlineSetup ~ tripid before setItem:", tripid);
     await secureStoreSetItem("currentTripId", tripid);
     await userCtx.loadCatListFromAsyncInCtx(tripid);
   }
@@ -674,7 +709,7 @@ export default function App() {
             backgroundColor: GlobalStyles.colors.gray500,
           }}
         >
-          <StatusBar style="dark" />
+          <StatusBar style="auto" />
           <AuthContextProvider>
             <NetworkContextProvider>
               <TripContextProvider>

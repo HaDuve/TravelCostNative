@@ -19,6 +19,7 @@ import {
   secureStoreSetObject,
 } from "./secure-storage";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
+import { RangeString } from "./expenses-context";
 
 export interface UserData {
   uid?: string;
@@ -35,7 +36,7 @@ export interface UserData {
 export const UserContext = createContext({
   userName: "",
   setUserName: (name: string) => {},
-  periodName: "day",
+  periodName: RangeString.day,
   setPeriodString: (string: string) => {},
 
   lastCurrency: "",

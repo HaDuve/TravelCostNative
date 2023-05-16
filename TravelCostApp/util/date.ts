@@ -19,11 +19,12 @@ import {
 export type DateOrDateTime = Date | DateTime;
 
 export function getFormattedDate(date: DateOrDateTime) {
+  if (!date || date.toString().length < 1) return "";
   if (date instanceof DateTime) {
     return _getFormattedDate(date);
   }
   if (date instanceof Date) {
-    return date.toISOString();
+    return _getFormattedDate(DateTime.fromJSDate(date));
   }
 }
 

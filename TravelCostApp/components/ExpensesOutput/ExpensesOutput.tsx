@@ -17,6 +17,7 @@ function ExpensesOutput({
   periodValue,
   showSumForTravellerName,
 }) {
+  // console.log("rerender ExpensesOutput - B");
   const [showLoading, setShowLoading] = useState(true);
   useEffect(() => {
     setTimeout(toggleLoading, EXPENSES_LOAD_TIMEOUT);

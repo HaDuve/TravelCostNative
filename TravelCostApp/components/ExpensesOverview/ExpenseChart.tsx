@@ -24,6 +24,7 @@ const ExpenseChart = ({
   daysRange,
   currency,
 }) => {
+  // console.log("rerender ExpenseChart - 3");
   const data = inputData;
   // console last day
   const firstItem = inputData[0];

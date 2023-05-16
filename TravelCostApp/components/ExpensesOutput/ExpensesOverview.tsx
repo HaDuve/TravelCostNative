@@ -31,6 +31,7 @@ import Animated, {
 import { MAX_PERIOD_RANGE, MIN_PERIOD_RANGE } from "../../confAppConstants";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
+  // console.log("rerender ExpensesOverview - 1");
   const [periodRangeNumber, setPeriodRangeNumber] = useState(7);
   const [isGraphNotPie, setToggleGraph] = useState(true);
   // enum =>  0 = categories, 1 = traveller, 2 = country, 3 = currency

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
@@ -52,8 +52,10 @@ import Toast from "react-native-toast-message";
 import { NetworkContext } from "../store/network-context";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { sendOfflineQueue } from "../util/offline-queue";
+import uniqBy from "lodash.uniqby";
 
 function RecentExpenses({ navigation }) {
+  // console.log("rerender RecentExpenses - A");
   const expensesCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
@@ -198,6 +200,11 @@ function RecentExpenses({ navigation }) {
   function errorHandler() {
     setError(null);
   }
+  let recentExpenses: Array<ExpenseData> = [];
+  recentExpenses = useMemo(
+    () => uniqBy(expensesCtx.getRecentExpenses(PeriodValue), "id"),
+    [PeriodValue, expensesCtx.expenses]
+  );
 
   if (error && !isFetching) {
     return <ErrorOverlay message={error} onConfirm={errorHandler} />;
@@ -205,9 +212,6 @@ function RecentExpenses({ navigation }) {
   // if (isFetching) {
   //   return <LoadingOverlay />;
   // }
-
-  let recentExpenses: Array<ExpenseData> = [];
-  recentExpenses = expensesCtx.getRecentExpenses(PeriodValue);
 
   return (
     <View style={styles.container}>

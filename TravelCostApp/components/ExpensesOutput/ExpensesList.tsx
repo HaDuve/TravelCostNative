@@ -168,7 +168,8 @@ function ExpensesList({
   periodValue,
   showSumForTravellerName,
 }) {
-  const uniqueData = uniqBy(expenses, (e) => e.id);
+  // console.log("rerender ExpensesList - C");
+  const uniqueData = expenses;
   // const flatListRef = useRef(null);
   const netCtx = useContext(NetworkContext);
   const isOnline = netCtx.isConnected && netCtx.strongConnection;

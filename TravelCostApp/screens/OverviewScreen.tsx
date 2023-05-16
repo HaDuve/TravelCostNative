@@ -23,6 +23,7 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 const OverviewScreen = ({ navigation }) => {
+  // console.log("rerender OverviewScreen - 0");
   const expensesCtx = useContext(ExpensesContext);
   const userCtx = useContext(UserContext);
   const netCtx = useContext(NetworkContext);

@@ -29,6 +29,7 @@ import PropTypes from "prop-types";
 import { isForeground } from "../../../util/appState";
 
 const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
+  // console.log("rerender ExpenseGraph - 2");
   const expenseCtx = useContext(ExpensesContext);
   const tripCtx = useContext(TripContext);
   const today = new Date();

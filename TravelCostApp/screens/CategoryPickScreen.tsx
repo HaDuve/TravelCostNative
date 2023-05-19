@@ -29,6 +29,8 @@ import { UserContext } from "../store/user-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NetworkContext } from "../store/network-context";
 import { DEFAULTCATEGORIES } from "../util/category";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import IconButton from "../components/UI/IconButton";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -109,6 +111,16 @@ const CategoryPickScreen = ({ route, navigation }) => {
       // postCategoriesAsync();
       loadCategories();
     }, [isOnline, tripid])
+  );
+
+  const backButtonJsx = (
+    <TouchableOpacity style={GlobalStyles.backButton} onPress={navigation.pop}>
+      <IconButton
+        icon="arrow-back-outline"
+        size={24}
+        color={GlobalStyles.colors.textColor}
+      ></IconButton>
+    </TouchableOpacity>
   );
 
   async function newCatPressHandler(item) {
@@ -211,6 +223,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
+      {backButtonJsx}
       <FlatList
         numColumns={2}
         data={categoryList}

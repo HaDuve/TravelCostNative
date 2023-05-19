@@ -76,6 +76,7 @@ import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { useFocusEffect } from "@react-navigation/native";
 import { secureStoreSetItem } from "../../store/secure-storage";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const ExpenseForm = ({
   onCancel,
@@ -131,6 +132,13 @@ const ExpenseForm = ({
   const suggestionData = expCtx
     .getRecentExpenses(RangeString.year)
     .map((expense) => expense.description);
+
+  useEffect(() => {
+    async function asyncSetTravellers() {
+      await tripCtx.setCurrentTravellers(tripCtx.tripid);
+    }
+    asyncSetTravellers();
+  }, []);
 
   useEffect(() => {
     // setlistequal with tripcontext.travellers
@@ -214,14 +222,25 @@ const ExpenseForm = ({
   const [splitListValid, setSplitListValid] = useState(true);
 
   // dropdown for whoPaid picker
-  const currentTravellers = tripCtx.travellers;
+  const [currentTravellers, setCurrentTravellers] = useState(
+    tripCtx.travellers
+  );
+  console.log("currentTravellers:", currentTravellers);
+  useEffect(() => {
+    if (netCtx.strongConnection) {
+      console.log("~~ currentTravellers:", tripCtx.travellers);
+      setCurrentTravellers(tripCtx.travellers);
+    }
+  }, [tripCtx.travellers, netCtx.strongConnection]);
 
   const IsSoloTraveller = currentTravellers.length === 1;
-  let currentTravellersAsItems = travellerToDropdown(currentTravellers);
+  const [currentTravellersAsItems, setCurrentTravellersAsItems] = useState(
+    travellerToDropdown(currentTravellers)
+  );
 
   useEffect(() => {
-    currentTravellersAsItems = travellerToDropdown(currentTravellers);
-  }, []);
+    setCurrentTravellersAsItems(travellerToDropdown(currentTravellers));
+  }, [currentTravellers]);
 
   const [items, setItems] = useState(currentTravellersAsItems);
   const [open, setOpen] = useState(false);
@@ -300,7 +319,10 @@ const ExpenseForm = ({
     value: string
   ) {
     // calc splitList from amount
-    if (inputIdentifier === "amount" && splitType === "EXACT") {
+    if (
+      inputIdentifier === "amount" &&
+      (splitType === "EXACT" || splitType === "EQUAL")
+    ) {
       const newSplitList = recalcSplitsLinearly(splitList, +value);
       setSplitList(newSplitList);
       const isValidSplit = validateSplitList(newSplitList, splitType, +value);
@@ -633,6 +655,16 @@ const ExpenseForm = ({
     </Animated.View>
   );
 
+  const backButtonJsx = (
+    <TouchableOpacity style={GlobalStyles.backButton} onPress={navigation.pop}>
+      <IconButton
+        icon="arrow-back-outline"
+        size={24}
+        color={GlobalStyles.colors.textColor}
+      ></IconButton>
+    </TouchableOpacity>
+  );
+
   const advancedSubmitHandler = hideAdvanced ? fastSubmit : submitHandler;
 
   const askChatGPTHandler = async () => {
@@ -693,6 +725,7 @@ const ExpenseForm = ({
     <Animated.View layout={Layout}>
       {datepickerJSX}
       <Animated.View layout={Layout} style={styles.container}>
+        {backButtonJsx}
         <Animated.View layout={Layout} style={styles.form}>
           <View style={styles.inputsRow}>
             <Input

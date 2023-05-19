@@ -83,11 +83,11 @@ function ExpenseItem(props): JSX.Element {
   }
   const calcAmountString = calcTravellerSum
     ? `${calcTravellerSumString}`
-    : formatExpenseWithCurrency(calcAmount, currency);
+    : formatExpenseWithCurrency(calcAmount, homeCurrency);
 
   const amountString = travellerSum
     ? `${travellerSumString}`
-    : formatExpenseWithCurrency(amount, homeCurrency);
+    : formatExpenseWithCurrency(amount, currency);
 
   if (iconName) console.log(iconName);
   const [catSymbol, setCatSymbol] = useState(iconName ? iconName : "");

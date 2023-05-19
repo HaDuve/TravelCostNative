@@ -11,6 +11,7 @@ i18n.enableFallback = true;
 import { getAllExpenses } from "./http";
 
 export function recalcSplitsLinearly(splitList: Split[], amount: number) {
+  if (amount == 0) return splitList;
   // Calculate the total amount and the total split amount
   const totalAmount = splitList.reduce(
     (sum, split) => sum + Number(split.amount),

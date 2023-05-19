@@ -588,7 +588,7 @@ function Root() {
         if (storedTripId) {
           // console.log("onRootMount ~ storedTripId", storedTripId);
           tripData = await tripCtx.fetchAndSetCurrentTrip(storedTripId);
-          tripCtx.setCurrentTravellers(storedTripId);
+          await tripCtx.setCurrentTravellers(storedTripId);
           tripCtx.setTripid(storedTripId);
         } else {
           Toast.show({

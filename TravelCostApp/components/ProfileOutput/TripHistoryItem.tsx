@@ -13,7 +13,7 @@ import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
 import React, { useContext, useEffect, useState } from "react";
 import { TripContext } from "../../store/trip-context";
-import { truncateString } from "../../util/string";
+import { formatExpenseWithCurrency, truncateString } from "../../util/string";
 import {
   fetchTrip,
   fetchTripName,
@@ -114,7 +114,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       currentTrip: tripid,
     });
     tripCtx.setCurrentTrip(tripid, tripData);
-    tripCtx.setCurrentTravellers(tripid);
+    await tripCtx.setCurrentTravellers(tripid);
     userCtx.setFreshlyCreatedTo(false);
     const expenses = await getAllExpenses(tripid, uid);
     expenseCtx.setExpenses(expenses);
@@ -122,6 +122,14 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
     setRefreshing(false);
     tripCtx.refresh();
   }
+  const totalBudgetString = formatExpenseWithCurrency(
+    Number(totalBudget),
+    tripCurrency
+  );
+  const dailyBudgetString = formatExpenseWithCurrency(
+    Number(dailyBudget),
+    tripCurrency
+  );
 
   function tripPressHandler() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -174,15 +182,11 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
             </Text>
             <Text style={styles.textBase}>
               {i18n.t("daily")}
-              {": " + dailyBudget}
-              {" " + tripCurrencySymbol}
+              {": " + dailyBudgetString}
             </Text>
           </View>
           <View style={styles.amountContainer}>
-            <Text style={styles.amount}>
-              {totalBudget}
-              {" " + tripCurrencySymbol}
-            </Text>
+            <Text style={styles.amount}>{totalBudgetString}</Text>
             <Progress.Bar
               color={GlobalStyles.colors.primary500}
               unfilledColor={GlobalStyles.colors.gray600}

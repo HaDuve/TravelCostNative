@@ -50,6 +50,10 @@ export const GlobalStyles = {
     fontStyle: "italic",
     fontWeight: "300",
   },
+  backButton: {
+    padding: 8,
+    marginBottom: -12,
+  },
   buttonTextGradient: {
     color: "#FFFFFF",
     textAlign: "center",

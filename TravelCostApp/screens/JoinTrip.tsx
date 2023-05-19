@@ -101,7 +101,7 @@ const JoinTrip = ({ navigation, route }) => {
         currentTrip: tripid,
       });
       tripCtx.setCurrentTrip(tripid, tripdata);
-      tripCtx.setCurrentTravellers(tripid);
+      await tripCtx.setCurrentTravellers(tripid);
       userCtx.setFreshlyCreatedTo(false);
       await userCtx.loadCatListFromAsyncInCtx(tripid);
       const expenses = await getAllExpenses(tripid, uid);

@@ -27,9 +27,13 @@ export function formatExpenseWithCurrency(
     ...options,
   };
 
-  return new Intl.NumberFormat(locale, formatOptions)
-    .format(amount)
-    .replace(currency, getCurrencySymbol(currency));
+  try {
+    return new Intl.NumberFormat(locale, formatOptions)
+      .format(amount)
+      .replace(currency, getCurrencySymbol(currency));
+  } catch (error) {
+    return amount.toFixed(2) + " " + getCurrencySymbol(currency);
+  }
 }
 
 export function truncateString(str: string, n: number) {

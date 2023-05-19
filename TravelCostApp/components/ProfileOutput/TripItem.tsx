@@ -13,7 +13,7 @@ import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
 import React, { useContext, useEffect, useState } from "react";
 import { TripContext } from "../../store/trip-context";
-import { truncateString } from "../../util/string";
+import { formatExpenseWithCurrency, truncateString } from "../../util/string";
 import { getTravellers } from "../../util/http";
 import LoadingOverlay from "../UI/LoadingOverlay";
 
@@ -87,6 +87,19 @@ function TripItem({
     navigation.navigate("ManageTrip", { tripId: tripid, trips: trips });
   }
 
+  const tripTotalSumString = formatExpenseWithCurrency(
+    tripCtx.totalSum,
+    tripCurrency
+  );
+  const totalBudgetString = formatExpenseWithCurrency(
+    totalBudget,
+    tripCurrency
+  );
+  const dailyBudgetString = formatExpenseWithCurrency(
+    dailyBudget,
+    tripCurrency
+  );
+
   const activeBorder =
     tripName === tripCtx.tripName
       ? { borderWidth: 1, borderColor: GlobalStyles.colors.primary400 }
@@ -133,16 +146,13 @@ function TripItem({
             </Text>
             <Text style={styles.textBase}>
               {i18n.t("daily")}
-              {": " + dailyBudget}
-              {" " + tripCurrencySymbol}
+              {": " + dailyBudgetString}
             </Text>
           </View>
           <View style={styles.amountContainer}>
             <Text style={styles.amount}>
-              {tripCtx.totalSum.toFixed(0)}
-              {" " + tripCurrencySymbol}
-              {infinityString ? " / ∞" : " / " + totalBudget}
-              {infinityString ? "" : " " + tripCurrencySymbol}
+              {tripTotalSumString}
+              {infinityString ? " / ∞" : " / " + totalBudgetString}
             </Text>
             {!infinityString && (
               <Progress.Bar

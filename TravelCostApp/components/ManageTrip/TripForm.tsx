@@ -257,7 +257,7 @@ const TripForm = ({ navigation, route }) => {
           currentTrip: editedTripId,
         });
         tripCtx.setCurrentTrip(editedTripId, tripData);
-        tripCtx.setCurrentTravellers(editedTripId);
+        await tripCtx.setCurrentTravellers(editedTripId);
         userCtx.setFreshlyCreatedTo(false);
         const expenses = await getAllExpenses(editedTripId, uid);
         expenseCtx.setExpenses(expenses);

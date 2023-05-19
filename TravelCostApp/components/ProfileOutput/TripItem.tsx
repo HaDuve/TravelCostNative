@@ -116,7 +116,9 @@ function TripItem({
             {item.item.userName.charAt(0)}
           </Text>
         </View>
-        <Text>{truncateString(item.item.userName, 10)}</Text>
+        <Text numberOfLines={1} style={styles.textWidth}>
+          {item.item.userName}
+        </Text>
       </View>
     );
   }
@@ -141,8 +143,11 @@ function TripItem({
       <View style={[styles.tripItem, activeBorder]}>
         <View style={styles.topRow}>
           <View>
-            <Text style={[styles.textBase, styles.description]}>
-              {truncateString(tripName, 11)}
+            <Text
+              numberOfLines={1}
+              style={[styles.textBase, styles.description, styles.textWidth]}
+            >
+              {tripName}
             </Text>
             <Text style={styles.textBase}>
               {i18n.t("daily")}
@@ -215,12 +220,17 @@ const styles = StyleSheet.create({
   textBase: {
     color: GlobalStyles.colors.primary500,
   },
+  textWidth: {
+    flex: 1,
+    width: "75%",
+  },
   description: {
     fontSize: 16,
     marginBottom: 4,
     fontWeight: "bold",
   },
   amountContainer: {
+    marginLeft: "-20%",
     paddingHorizontal: 12,
     paddingVertical: 4,
     justifyContent: "center",

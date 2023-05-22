@@ -315,6 +315,7 @@ const TripForm = ({ navigation, route }) => {
     datePicker = 4,
   }
   function showInfoHandler(infoEnu: infoEnum) {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     let titleText = "";
     let contentText = "";
     switch (infoEnu) {
@@ -465,13 +466,19 @@ const TripForm = ({ navigation, route }) => {
                 <Animated.View
                   entering={ZoomIn}
                   exiting={ZoomOut}
-                  style={[styles.recalcButton, GlobalStyles.strongShadow]}
+                  style={styles.recalcButtonContainer}
                 >
                   <IconButton
                     icon="ios-git-compare-outline"
                     color={GlobalStyles.colors.primary500}
                     size={36}
+                    buttonStyle={[
+                      styles.recalcButton,
+                      GlobalStyles.strongShadow,
+                    ]}
+                    onPressStyle={GlobalStyles.pressedWithShadow}
                     onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       console.log("recalculate");
                       console.log("Start Date:", startDate);
                       console.log("End Date:", endDate);
@@ -491,7 +498,7 @@ const TripForm = ({ navigation, route }) => {
               )}
               <InfoButton
                 onPress={showInfoHandler.bind(this, infoEnum.totalBudget)}
-                containerStyle={{ marginTop: "2%" }}
+                containerStyle={{ marginTop: "-3%" }}
               ></InfoButton>
             </View>
             <View style={styles.categoryRow}>
@@ -513,13 +520,19 @@ const TripForm = ({ navigation, route }) => {
                 <Animated.View
                   entering={ZoomIn}
                   exiting={ZoomOut}
-                  style={[styles.recalcButton, GlobalStyles.strongShadow]}
+                  style={styles.recalcButtonContainer}
                 >
                   <IconButton
                     icon="ios-git-compare-outline"
                     color={GlobalStyles.colors.primary500}
                     size={36}
+                    buttonStyle={[
+                      styles.recalcButton,
+                      GlobalStyles.strongShadow,
+                    ]}
+                    onPressStyle={GlobalStyles.pressedWithShadow}
                     onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       console.log("recalculate");
                       console.log("Start Date:", startDate);
                       console.log("End Date:", endDate);
@@ -540,7 +553,7 @@ const TripForm = ({ navigation, route }) => {
               )}
               <InfoButton
                 onPress={showInfoHandler.bind(this, infoEnum.dailyBudget)}
-                containerStyle={{ marginTop: "5%" }}
+                containerStyle={{ marginTop: "-3%" }}
               ></InfoButton>
             </View>
             <Text
@@ -560,7 +573,7 @@ const TripForm = ({ navigation, route }) => {
               })}
               <InfoButton
                 onPress={showInfoHandler.bind(this, infoEnum.datePicker)}
-                containerStyle={{ marginTop: "5%" }}
+                containerStyle={{ marginLeft: "-4%" }}
               ></InfoButton>
             </View>
           </View>
@@ -633,14 +646,19 @@ const styles = StyleSheet.create({
     padding: "2%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
+  recalcButtonContainer: {
+    marginRight: "2%",
+    marginTop: "-2%",
+  },
   recalcButton: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 99,
-    marginRight: "3%",
-    marginBottom: "5%",
-    paddingHorizontal: "2%",
-    paddingTop: "1%",
-    paddingLeft: "3%",
+    // minHeight: 36,
+    // marginRight: "3%",
+    // marginBottom: "5%",
+    // paddingHorizontal: "2%",
+    // paddingTop: "1%",
+    // paddingLeft: "3%",
   },
   card: {
     flex: 1,

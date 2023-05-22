@@ -12,7 +12,6 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import Input from "./Input";
-import Button from "../UI/Button";
 import { getFormattedDate } from "../../util/date";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
@@ -52,21 +51,17 @@ import { Ionicons } from "@expo/vector-icons";
 import Animated, {
   ZoomIn,
   ZoomOut,
-  FadeOut,
   Layout,
   Easing,
   FadeInUp,
-  FadeOutDown,
   FadeOutUp,
 } from "react-native-reanimated";
-import { asyncStoreSetItem } from "../../store/async-storage";
 import { DateTime } from "luxon";
 import DatePickerModal from "../UI/DatePickerModal";
 import DatePickerContainer from "../UI/DatePickerContainer";
 import PropTypes from "prop-types";
 import GradientButton from "../UI/GradientButton";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
-import CountryFlag from "react-native-country-flag";
 import { recalcSplitsForExact } from "../../util/split";
 import { ExpenseData } from "../../util/expense";
 import { NetworkContext } from "../../store/network-context";
@@ -74,9 +69,10 @@ import { SettingsContext } from "../../store/settings-context";
 import Autocomplete from "../UI/Autocomplete";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { getCurrencySymbol } from "../../util/currencySymbol";
-import { useFocusEffect } from "@react-navigation/native";
 import { secureStoreSetItem } from "../../store/secure-storage";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import LoadingOverlay from "../UI/LoadingOverlay";
+import { ActivityIndicator } from "react-native-paper";
 
 const ExpenseForm = ({
   onCancel,
@@ -109,7 +105,9 @@ const ExpenseForm = ({
 
   const [hideAdvanced, sethideAdvanced] = useState(true);
   const [countryValue, setCountryValue] = useState("EUR");
-  const [loadingTravellers, setLoadingTravellers] = useState(false);
+  const [loadingTravellers, setLoadingTravellers] = useState(
+    !tripCtx.travellers || tripCtx.travellers.length < 1
+  );
 
   const iconString = iconName ? iconName : getCatSymbol(pickedCat);
   const [icon, setIcon] = useState(iconString);
@@ -134,8 +132,10 @@ const ExpenseForm = ({
     .map((expense) => expense.description);
 
   useEffect(() => {
+    setLoadingTravellers(true);
     async function asyncSetTravellers() {
       await tripCtx.setCurrentTravellers(tripCtx.tripid);
+      setLoadingTravellers(false);
     }
     asyncSetTravellers();
   }, []);
@@ -388,7 +388,7 @@ const ExpenseForm = ({
     tempList[index] = tempValue;
     setSplitList(tempList);
     setSplitListValid(
-      validateSplitList(tempList, splitType, inputs.amount.value, index)
+      validateSplitList(tempList, splitType, +inputs.amount.value)
     );
   }
 
@@ -398,10 +398,9 @@ const ExpenseForm = ({
     // calculate splits
     const listSplits = calcSplitList(
       splitType,
-      inputs.amount.value,
+      +inputs.amount.value,
       whoPaid,
-      splitTravellers,
-      splitList
+      splitTravellers
     );
     if (listSplits) {
       setSplitList(listSplits);
@@ -415,14 +414,14 @@ const ExpenseForm = ({
     // calculate splits
     const listSplits = calcSplitList(
       "EQUAL",
-      inputs.amount.value,
+      +inputs.amount.value,
       whoPaid,
       splitTravellers
     );
     if (listSplits) {
       setSplitList(listSplits);
       setSplitListValid(
-        validateSplitList(listSplits, splitType, inputs.amount.value)
+        validateSplitList(listSplits, splitType, +inputs.amount.value)
       );
     }
   }
@@ -872,6 +871,12 @@ const ExpenseForm = ({
                     >
                       {i18n.t("whoPaid")}
                     </Text>
+                    {loadingTravellers && (
+                      <ActivityIndicator
+                        size={"large"}
+                        color={GlobalStyles.colors.backgroundColor}
+                      ></ActivityIndicator>
+                    )}
                     {!loadingTravellers && (
                       <DropDownPicker
                         open={open}

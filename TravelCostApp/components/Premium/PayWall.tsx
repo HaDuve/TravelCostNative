@@ -6,11 +6,12 @@ import {
   Alert,
   StyleSheet,
   Image,
-  ActivityIndicator,
   TouchableOpacity,
   Linking,
   Pressable,
 } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
+
 import Purchases from "react-native-purchases";
 import { GlobalStyles } from "../../constants/styles";
 import PackageItem from "../Premium/PackageItem";

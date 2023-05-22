@@ -1,4 +1,6 @@
-import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
+
 import React from "react";
 import { GlobalStyles } from "../../constants/styles";
 

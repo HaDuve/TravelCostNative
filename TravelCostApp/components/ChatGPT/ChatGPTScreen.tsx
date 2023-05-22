@@ -1,4 +1,6 @@
-import React, { ActivityIndicator, StyleSheet, View } from "react-native";
+import React, { StyleSheet, View } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
+
 import { useChatGpt } from "react-native-chatgpt";
 import Chat from "./ChatGPTChat";
 import Login from "./ChatGPTLogin";

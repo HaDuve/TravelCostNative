@@ -23,7 +23,9 @@ import { Ionicons } from "@expo/vector-icons";
 import GradientButton from "../components/UI/GradientButton";
 import { useFocusEffect } from "@react-navigation/native";
 import { asyncStoreGetObject } from "../store/async-storage";
-import { ActivityIndicator, Alert } from "react-native";
+import { Alert } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
+
 import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";

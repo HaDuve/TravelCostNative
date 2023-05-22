@@ -32,7 +32,9 @@ import { fetchCategories, updateTrip } from "../util/http";
 import SelectCategoryIcon from "../components/UI/selectCategoryIcon";
 import GradientButton from "../components/UI/GradientButton";
 import BackgroundGradient from "../components/UI/BackgroundGradient";
-import { KeyboardAvoidingView, ActivityIndicator } from "react-native";
+import { KeyboardAvoidingView } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
+
 import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import * as Haptics from "expo-haptics";

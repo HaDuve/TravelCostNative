@@ -31,8 +31,9 @@ import FlatButton from "../components/UI/FlatButton";
 import Button from "../components/UI/Button";
 import { G } from "react-native-svg";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
-import { ActivityIndicator } from "react-native";
 import PropTypes from "prop-types";
+import { ActivityIndicator } from "react-native-paper";
+
 import { reloadApp } from "../util/appState";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);

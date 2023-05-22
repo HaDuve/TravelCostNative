@@ -2,7 +2,6 @@ import {
   StyleSheet,
   Text,
   View,
-  ActivityIndicator,
   ImageBackground,
   Image,
   StatusBar,
@@ -25,6 +24,7 @@ import Animated, {
   ZoomOutDown,
 } from "react-native-reanimated";
 import { SPLASH_SCREEN_DELAY } from "../../confAppConstants";
+import { ActivityIndicator } from "react-native-paper";
 
 const loadingColor = GlobalStyles.colors.backgroundColor;
 const delay = SPLASH_SCREEN_DELAY;

@@ -28,9 +28,11 @@ export interface ExpenseData {
   listEQUAL?: string[];
   iconName?: string;
   rangeId?: string;
+  isPaid?: string;
 }
 
 export interface ExpenseDataOnline {
+  isPaid: string;
   id?: string;
   uid?: string;
   splitType: string;

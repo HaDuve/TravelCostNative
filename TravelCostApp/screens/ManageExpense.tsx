@@ -67,7 +67,6 @@ const ManageExpense = ({ route, navigation }) => {
     (expense) => expense.id === editedExpenseId
   );
   const selectedExpenseAuthorUid = selectedExpense?.uid;
-  //TODO: add tempValues to selected Expense
 
   useEffect(() => {
     const updateIsOnline = async () => {
@@ -280,10 +279,10 @@ const ManageExpense = ({ route, navigation }) => {
           expenseData.endDate.toString().slice(0, 10)
         ) {
           // editing ranged Data
-          editingRangedData(expenseData);
+          await editingRangedData(expenseData);
         } else {
           // editing normal expense (no-ranged)
-          editingNormalData(expenseData);
+          await editingNormalData(expenseData);
         }
       } else {
         // adding a new expense (no-editing)
@@ -293,10 +292,10 @@ const ManageExpense = ({ route, navigation }) => {
           expenseData.endDate.toString().slice(0, 10)
         ) {
           // adding a new ranged expense (no-editing)
-          creatingRangedData(expenseData);
+          await creatingRangedData(expenseData);
         } else {
           // adding a new normal expense (no-editing, no-ranged)
-          creatingNormalData(expenseData);
+          await creatingNormalData(expenseData);
         }
       }
       await asyncStoreSetObject("expenses", expenseCtx.expenses);

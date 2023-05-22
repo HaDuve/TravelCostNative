@@ -11,6 +11,8 @@ import {
   Keyboard,
   KeyboardAvoidingView,
 } from "react-native";
+
+import { SegmentedButtons } from "react-native-paper";
 import Input from "./Input";
 import { getFormattedDate } from "../../util/date";
 import { GlobalStyles } from "../../constants/styles";
@@ -95,7 +97,6 @@ const ExpenseForm = ({
   const { settings } = useContext(SettingsContext);
   const alwaysShowAdvancedSetting = settings.alwaysShowAdvanced || isEditing;
   const editingValues: ExpenseData = defaultValues;
-  console.log("userCtx.lastCurrency:", userCtx.lastCurrency);
   const lastCurrency = userCtx.lastCurrency
     ? userCtx.lastCurrency
     : tripCtx.tripCurrency;
@@ -187,6 +188,8 @@ const ExpenseForm = ({
     setShowDatePickerRange(false);
   };
 
+  const [isPaid, setIsPaid] = useState(editingValues?.isPaid ?? "not paid");
+
   // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
   const [duplOrSplit, setDuplOrSplit] = useState<number>(
     editingValues ? Number(editingValues.duplOrSplit) : 0
@@ -225,7 +228,6 @@ const ExpenseForm = ({
   const [currentTravellers, setCurrentTravellers] = useState(
     tripCtx.travellers
   );
-  console.log("currentTravellers:", currentTravellers);
   useEffect(() => {
     if (netCtx.strongConnection) {
       console.log("~~ currentTravellers:", tripCtx.travellers);
@@ -446,6 +448,7 @@ const ExpenseForm = ({
       splitList: splitList,
       duplOrSplit: duplOrSplit,
       iconName: iconName,
+      isPaid: isPaid,
     };
 
     // SoloTravellers always pay for themselves
@@ -526,7 +529,6 @@ const ExpenseForm = ({
       userCtx.setLastCurrency(inputs.currency.value);
       await secureStoreSetItem("lastCurrency", inputs.currency.value);
     }
-    console.log("submitHandler ~ expenseData:", "expenseData");
     await onSubmit(expenseData);
   }
 
@@ -549,6 +551,7 @@ const ExpenseForm = ({
       listEQUAL: currentTravellers,
       splitList: [],
       iconName: iconName,
+      isPaid: isPaid,
     };
     await onSubmit(expenseData);
   }
@@ -662,6 +665,42 @@ const ExpenseForm = ({
         color={GlobalStyles.colors.textColor}
       ></IconButton>
     </TouchableOpacity>
+  );
+
+  // todo: find out why this will not save on submit??
+  console.log("editingValues:", editingValues);
+  const isPaidJSX = (
+    <View style={styles.isPaidContainer}>
+      <SegmentedButtons
+        value={isPaid}
+        onValueChange={setIsPaid}
+        buttons={[
+          {
+            label: "Not paid yet",
+            value: "not paid",
+            // checkedColor: GlobalStyles.colors.accent500,
+            style: {
+              backgroundColor:
+                isPaid == "not paid"
+                  ? GlobalStyles.colors.gray500Accent
+                  : GlobalStyles.colors.gray300,
+            },
+          },
+          {
+            label: "Paid back",
+            value: "paid",
+            showSelectedCheck: true,
+            style: {
+              backgroundColor:
+                isPaid == "paid"
+                  ? GlobalStyles.colors.gray500Accent
+                  : GlobalStyles.colors.gray300,
+            },
+            // checkedColor: GlobalStyles.colors.primary500,
+          },
+        ]}
+      ></SegmentedButtons>
+    </View>
   );
 
   const advancedSubmitHandler = hideAdvanced ? fastSubmit : submitHandler;
@@ -1129,6 +1168,7 @@ const ExpenseForm = ({
                   ></FlatList>
                 </KeyboardAvoidingView>
               )}
+              {!splitTypeSelf && splitListHasNonZeroEntries && isPaidJSX}
             </Animated.View>
           )}
           {formIsInvalid && !hideAdvanced && (
@@ -1390,5 +1430,9 @@ const styles = StyleSheet.create({
   spacerViewAdvanced: {
     flex: 1,
     minHeight: "4%",
+  },
+  isPaidContainer: {
+    marginTop: "4%",
+    marginHorizontal: "3%",
   },
 });

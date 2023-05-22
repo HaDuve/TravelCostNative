@@ -169,6 +169,7 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
           categoryString: r.categoryString,
           duplOrSplit: r.duplOrSplit,
           rangeId: r.rangeId,
+          isPaid: r.isPaid,
         };
         expenses.push(expenseObj);
       }
@@ -217,6 +218,7 @@ export async function fetchExpenses(tripid: string, uid: string) {
         categoryString: data.categoryString,
         duplOrSplit: data.duplOrSplit,
         rangeId: data.rangeId,
+        isPaid: data.isPaid,
       };
       expenses.push(expenseObj);
     }

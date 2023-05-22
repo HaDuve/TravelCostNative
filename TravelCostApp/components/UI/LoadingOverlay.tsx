@@ -15,11 +15,16 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 
 const loadingColor = GlobalStyles.colors.primaryGrayed;
-const LoadingOverlay = (containerStyle) => {
+const LoadingOverlay = (props) => {
+  const { containerStyle, customText } = props;
+  const string =
+    customText && customText.length > 1
+      ? customText
+      : i18n.t("loadingYourTrip");
   return (
     <View style={[styles.container, containerStyle]}>
       <ActivityIndicator size={"large"} color={loadingColor} />
-      <Text style={styles.text}>{i18n.t("loadingYourTrip")}</Text>
+      <Text style={styles.text}>{string}</Text>
     </View>
   );
 };
@@ -28,6 +33,7 @@ export default LoadingOverlay;
 
 LoadingOverlay.propTypes = {
   containerStyle: PropTypes.object,
+  customText: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

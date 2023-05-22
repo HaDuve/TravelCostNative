@@ -51,6 +51,7 @@ export const GlobalStyles = {
     fontWeight: "300",
   },
   backButton: {
+    flex: 1,
     padding: 8,
     marginBottom: -12,
   },

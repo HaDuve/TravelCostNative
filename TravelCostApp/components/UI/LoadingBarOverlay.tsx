@@ -20,10 +20,10 @@ i18n.enableFallback = true;
 const loadingColor = GlobalStyles.colors.primary500;
 const unfilledColor = GlobalStyles.colors.gray600;
 const LoadingBarOverlay = (props) => {
-  const { containerStyle, progressAt, progressMax } = props;
+  const { containerStyle, progressAt, progressMax, customText } = props;
   let { progress } = props;
   // if progress is smaller than 0
-  if (!progress) return <LoadingOverlay />;
+  if (!progress) return <LoadingOverlay customText={customText} />;
   if (progress < 0) {
     progress = 0;
   }
@@ -60,6 +60,7 @@ LoadingBarOverlay.propTypes = {
   progress: PropTypes.number,
   progressAt: PropTypes.number,
   progressMax: PropTypes.number,
+  customText: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

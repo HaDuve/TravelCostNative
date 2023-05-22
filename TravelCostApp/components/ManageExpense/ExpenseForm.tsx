@@ -73,12 +73,12 @@ import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { secureStoreSetItem } from "../../store/secure-storage";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import LoadingOverlay from "../UI/LoadingOverlay";
 import { ActivityIndicator } from "react-native-paper";
 
 const ExpenseForm = ({
   onCancel,
   onSubmit,
+  setIsSubmitting,
   submitButtonLabel,
   isEditing,
   defaultValues,
@@ -107,7 +107,7 @@ const ExpenseForm = ({
   const [hideAdvanced, sethideAdvanced] = useState(true);
   const [countryValue, setCountryValue] = useState("EUR");
   const [loadingTravellers, setLoadingTravellers] = useState(
-    !tripCtx.travellers || tripCtx.travellers.length < 1
+    !tripCtx.travellers && tripCtx.travellers.length < 1
   );
 
   const iconString = iconName ? iconName : getCatSymbol(pickedCat);
@@ -133,7 +133,8 @@ const ExpenseForm = ({
     .map((expense) => expense.description);
 
   useEffect(() => {
-    setLoadingTravellers(true);
+    if (!tripCtx.travellers || tripCtx.travellers.length < 1)
+      setLoadingTravellers(true);
     async function asyncSetTravellers() {
       await tripCtx.setCurrentTravellers(tripCtx.tripid);
       setLoadingTravellers(false);
@@ -429,7 +430,7 @@ const ExpenseForm = ({
   }
 
   async function submitHandler() {
-    navigation.navigate("RecentExpenses");
+    setIsSubmitting(true);
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const expenseData = {
       uid: authCtx.uid,
@@ -533,7 +534,7 @@ const ExpenseForm = ({
   }
 
   async function fastSubmit() {
-    navigation.navigate("RecentExpenses");
+    setIsSubmitting(true);
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const expenseData = {
       uid: authCtx.uid,
@@ -656,6 +657,7 @@ const ExpenseForm = ({
       />
     </Animated.View>
   );
+  const advancedSubmitHandler = hideAdvanced ? fastSubmit : submitHandler;
 
   const backButtonJsx = (
     <TouchableOpacity style={GlobalStyles.backButton} onPress={navigation.pop}>
@@ -667,8 +669,19 @@ const ExpenseForm = ({
     </TouchableOpacity>
   );
 
-  // todo: find out why this will not save on submit??
-  console.log("editingValues:", editingValues);
+  const confirmButtonJSX = (
+    <TouchableOpacity
+      style={GlobalStyles.backButton}
+      onPress={advancedSubmitHandler}
+    >
+      <IconButton
+        icon="checkmark-outline"
+        color={GlobalStyles.colors.textColor}
+        size={26}
+      ></IconButton>
+    </TouchableOpacity>
+  );
+
   const isPaidJSX = (
     <View style={styles.isPaidContainer}>
       <SegmentedButtons
@@ -702,8 +715,6 @@ const ExpenseForm = ({
       ></SegmentedButtons>
     </View>
   );
-
-  const advancedSubmitHandler = hideAdvanced ? fastSubmit : submitHandler;
 
   const askChatGPTHandler = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -763,7 +774,23 @@ const ExpenseForm = ({
     <Animated.View layout={Layout}>
       {datepickerJSX}
       <Animated.View layout={Layout} style={styles.container}>
-        {backButtonJsx}
+        <View
+          style={{
+            // horizontal
+            flexDirection: "row",
+            // space between
+            justifyContent: "space-between",
+            // align items in the center
+            alignItems: "center",
+            // padding
+            paddingHorizontal: "2%",
+            // margin
+            marginBottom: "-2%",
+          }}
+        >
+          {backButtonJsx}
+          {confirmButtonJSX}
+        </View>
         <Animated.View layout={Layout} style={styles.form}>
           <View style={styles.inputsRow}>
             <Input
@@ -1209,6 +1236,7 @@ export default ExpenseForm;
 ExpenseForm.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  setIsSubmitting: PropTypes.func.isRequired,
   isEditing: PropTypes.bool,
   defaultValues: PropTypes.object,
   pickedCat: PropTypes.string,

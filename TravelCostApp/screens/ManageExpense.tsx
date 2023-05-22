@@ -298,6 +298,8 @@ const ManageExpense = ({ route, navigation }) => {
           await creatingNormalData(expenseData);
         }
       }
+      setIsSubmitting(false);
+      navigation.navigate("RecentExpenses");
       await asyncStoreSetObject("expenses", expenseCtx.expenses);
       console.log("expenses context length", expenseCtx.expenses.length);
       if (isOnline) await touchAllTravelers(tripid, true);
@@ -310,6 +312,7 @@ const ManageExpense = ({ route, navigation }) => {
         type: "error",
       });
       setIsSubmitting(false);
+      navigation.navigate("RecentExpenses");
     }
   }
 
@@ -331,7 +334,7 @@ const ManageExpense = ({ route, navigation }) => {
     );
   }
   if (isSubmitting) {
-    return <LoadingOverlay />;
+    return <LoadingOverlay customText="Saving your Expense!" />;
   }
 
   return (
@@ -339,6 +342,7 @@ const ManageExpense = ({ route, navigation }) => {
       <ExpenseForm
         onCancel={cancelHandler}
         onSubmit={confirmHandler}
+        setIsSubmitting={setIsSubmitting}
         pickedCat={pickedCat}
         iconName={iconName}
         navigation={navigation}

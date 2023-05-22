@@ -142,7 +142,7 @@ function TripItem({
     >
       <View style={[styles.tripItem, activeBorder]}>
         <View style={styles.topRow}>
-          <View>
+          <View style={styles.leftContainer}>
             <Text
               numberOfLines={1}
               style={[styles.textBase, styles.description, styles.textWidth]}
@@ -154,7 +154,7 @@ function TripItem({
               {": " + dailyBudgetString}
             </Text>
           </View>
-          <View style={styles.amountContainer}>
+          <View style={[styles.amountContainer, styles.rightContainer]}>
             <Text style={styles.amount}>
               {tripTotalSumString}
               {infinityString ? " / ∞" : " / " + totalBudgetString}
@@ -217,12 +217,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  leftContainer: {
+    flex: 1,
+    alignItems: "flex-start",
+  },
+  rightContainer: {
+    flex: 1,
+    alignItems: "flex-end",
+  },
   textBase: {
     color: GlobalStyles.colors.primary500,
   },
   textWidth: {
     flex: 1,
-    width: "75%",
+    width: "100%",
   },
   description: {
     fontSize: 16,

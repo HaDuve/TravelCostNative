@@ -128,10 +128,10 @@ const CategoryPickScreen = ({ route, navigation }) => {
   async function newCatPressHandler(item) {
     const isPremium = await userCtx.checkPremium();
 
-    if (!isPremium) {
-      navigation.navigate("Paywall");
-      return;
-    }
+    // if (!isPremium) {
+    //   navigation.navigate("Paywall");
+    //   return;
+    // }
     if (!isOnline) {
       Alert.alert("Offline", "You need to be online to add a new category");
       return;

@@ -79,10 +79,10 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const isPremium = await userCtx.checkPremium();
 
-              if (!isPremium) {
-                navigation.navigate("Paywall");
-                return;
-              }
+              // if (!isPremium) {
+              //   navigation.navigate("Paywall");
+              //   return;
+              // }
               if (isGraphNotPie) {
                 setPeriodRangeNumber(MIN_PERIOD_RANGE);
                 //   periodRangeNumber == MIN_PERIOD_RANGE
@@ -143,10 +143,10 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
             onPress={async () => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const isPremium = await userCtx.checkPremium();
-              if (!isPremium) {
-                navigation.navigate("Paywall");
-                return;
-              }
+              // if (!isPremium) {
+              //   navigation.navigate("Paywall");
+              //   return;
+              // }
               if (isGraphNotPie) {
                 setPeriodRangeNumber(
                   periodRangeNumber == MAX_PERIOD_RANGE

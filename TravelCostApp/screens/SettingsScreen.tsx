@@ -275,10 +275,10 @@ const SettingsScreen = ({ navigation }) => {
         <GradientButton
           onPress={async () => {
             const isPremium = await userCtx.checkPremium();
-            if (!isPremium) {
-              navigation.navigate("Paywall");
-              return;
-            }
+            // if (!isPremium) {
+            //   navigation.navigate("Paywall");
+            //   return;
+            // }
             navigation.navigate("SplitSummary", { tripid: tripCtx.tripid });
           }}
           style={styles.settingsButton}

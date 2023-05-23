@@ -2,7 +2,7 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr } from "../i18n/supportedLanguages";
-import { Expense, Split, ExpenseData } from "./expense";
+import { Expense, Split, ExpenseData, isPaidString } from "./expense";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -262,7 +262,7 @@ export function travellerToDropdown(travellers) {
 export async function calcOpenSplitsTable(
   tripid: string,
   tripCurrency: string,
-  givenExpenses?: Expense[]
+  givenExpenses?: ExpenseData[]
 ) {
   console.log("calcOpenSplitsTable:", calcOpenSplitsTable);
   // cleanup all expenses where payer === debtor
@@ -288,7 +288,12 @@ export async function calcOpenSplitsTable(
   const asyncSplitList = async () => {
     for (const exp of expenses) {
       const expense: ExpenseData = exp;
-      if (expense.splitType === "SELF" || !expense.splitList) continue;
+      if (
+        expense.splitType === "SELF" ||
+        !expense.splitList ||
+        expense.isPaid == isPaidString.paid
+      )
+        continue;
       console.log("rates:", rates);
       for (const split of expense.splitList) {
         if (split.userName !== expense.whoPaid) {

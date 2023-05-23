@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Dimensions,
@@ -17,11 +17,13 @@ import { calcOpenSplitsTable, simplifySplits } from "../util/split";
 import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import GradientButton from "../components/UI/GradientButton";
-import { ExpensesContext } from "../store/expenses-context";
+import { ExpensesContext, RangeString } from "../store/expenses-context";
 import BackgroundGradient from "../components/UI/BackgroundGradient";
-import { Split } from "../util/expense";
+import { ExpenseData, Split } from "../util/expense";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { getCurrencySymbol } from "../util/currencySymbol";
+import { settleAllSplits } from "../util/settleSplits";
+import uniqBy from "lodash.uniqby";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
   const { tripid } = route.params;
@@ -30,7 +32,10 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const currencySymbol = getCurrencySymbol(tripCurrency);
   const userCtx = useContext(UserContext);
   const expenseCtx = useContext(ExpensesContext);
-
+  const uniqueExpenses: Array<ExpenseData> = useMemo(
+    () => uniqBy(expenseCtx.getRecentExpenses(RangeString.total), "id"),
+    [expenseCtx.expenses]
+  );
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
 
@@ -62,7 +67,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
       const response = await calcOpenSplitsTable(
         tripid,
         tripCurrency,
-        expenseCtx.expenses
+        uniqueExpenses
       );
       const temp = [];
       let userGetsBack = 0;
@@ -144,6 +149,17 @@ const SplitSummaryScreen = ({ route, navigation }) => {
     setError(null);
   }
 
+  const settleSplitsHandler = async () => {
+    setIsFetching(true);
+    try {
+      await settleAllSplits(tripCtx.tripid, expenseCtx);
+    } catch (error) {
+      console.log("settleSplitsHandler ~ error", error);
+    }
+    setIsFetching(false);
+    navigation.navigate("Settings");
+  };
+
   if (error && !isFetching) {
     return <ErrorOverlay message={error} onConfirm={errorHandler} />;
   }
@@ -213,8 +229,23 @@ const SplitSummaryScreen = ({ route, navigation }) => {
           style={styles.button}
           colors={GlobalStyles.gradientErrorButton}
           buttonStyle={{ backgroundColor: GlobalStyles.colors.errorGrayed }}
-          onPress={() => {
-            Alert.alert("Settle Splits with Paypal function coming soon...");
+          onPress={async () => {
+            // alert ask user if he really wants to settle all Splits
+            // if yes, call settleSplitsHandler
+            Alert.alert(
+              "Settle Splits",
+              "Are you sure you want to settle all splits? This will pay back all open splits and cannot be undone!",
+              [
+                {
+                  text: "Cancel",
+                  style: "cancel",
+                },
+                {
+                  text: "Settle",
+                  onPress: async () => await settleSplitsHandler(),
+                },
+              ]
+            );
           }}
         >
           Settle Splits

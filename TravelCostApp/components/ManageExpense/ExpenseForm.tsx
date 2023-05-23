@@ -65,7 +65,7 @@ import PropTypes from "prop-types";
 import GradientButton from "../UI/GradientButton";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { recalcSplitsForExact } from "../../util/split";
-import { ExpenseData } from "../../util/expense";
+import { ExpenseData, isPaidString } from "../../util/expense";
 import { NetworkContext } from "../../store/network-context";
 import { SettingsContext } from "../../store/settings-context";
 import Autocomplete from "../UI/Autocomplete";
@@ -189,7 +189,9 @@ const ExpenseForm = ({
     setShowDatePickerRange(false);
   };
 
-  const [isPaid, setIsPaid] = useState(editingValues?.isPaid ?? "not paid");
+  const [isPaid, setIsPaid] = useState(
+    editingValues?.isPaid ?? isPaidString.notPaid
+  );
 
   // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
   const [duplOrSplit, setDuplOrSplit] = useState<number>(
@@ -690,22 +692,22 @@ const ExpenseForm = ({
         buttons={[
           {
             label: "Not paid yet",
-            value: "not paid",
+            value: isPaidString.notPaid,
             // checkedColor: GlobalStyles.colors.accent500,
             style: {
               backgroundColor:
-                isPaid == "not paid"
+                isPaid == isPaidString.notPaid
                   ? GlobalStyles.colors.gray500Accent
                   : GlobalStyles.colors.gray300,
             },
           },
           {
             label: "Paid back",
-            value: "paid",
+            value: isPaidString.paid,
             showSelectedCheck: true,
             style: {
               backgroundColor:
-                isPaid == "paid"
+                isPaid == isPaidString.paid
                   ? GlobalStyles.colors.gray500Accent
                   : GlobalStyles.colors.gray300,
             },

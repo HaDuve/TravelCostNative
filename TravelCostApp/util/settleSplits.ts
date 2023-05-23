@@ -1,15 +1,19 @@
-import { ExpenseData } from "./expense";
+import { ExpenseData, isPaidString } from "./expense";
 import {
   OfflineQueueManageExpenseItem,
   updateExpenseOnlineOffline,
 } from "./offline-queue";
 
-export async function settleAllSplits(tripid: string, expenseCtx) {
+export async function settleAllSplits(
+  tripid: string,
+  expenseCtx,
+  isPaid = isPaidString.paid
+) {
   const expenses: ExpenseData[] = expenseCtx.expenses;
   try {
     for (const expenseData of expenses) {
       if (expenseData.isPaid) continue;
-      expenseData.isPaid = "true";
+      expenseData.isPaid = isPaid;
       const item: OfflineQueueManageExpenseItem = {
         type: "update",
         expense: {
@@ -27,4 +31,8 @@ export async function settleAllSplits(tripid: string, expenseCtx) {
     console.warn(error);
     throw new Error("Error while settling expenses.");
   }
+}
+
+export async function unsettleAllSplits(tripid: string, expenseCtx) {
+  settleAllSplits(tripid, expenseCtx, isPaidString.notPaid);
 }

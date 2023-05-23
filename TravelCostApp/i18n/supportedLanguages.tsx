@@ -122,7 +122,7 @@ const en = {
   // Settings Labels
   logoutLabel: "Logout",
   joinTripLabel: "Join Trip",
-  simplifySplitsLabel: "Splits Summary",
+  simplifySplitsLabel: "Open Splits Summary",
   resetAppIntroductionLabel: "Reset App Introduction",
   visitFoodForNomadsLabel: "Visit Food For Nomads",
 
@@ -328,7 +328,7 @@ const de = {
   // Settings Labels
   logoutLabel: "Ausloggen",
   joinTripLabel: "Reise beitreten",
-  simplifySplitsLabel: "Splits Übersicht",
+  simplifySplitsLabel: "Offene Schulden Übersicht",
   resetAppIntroductionLabel: "App Einführung wiederholen",
   visitFoodForNomadsLabel: "Food For Nomads besuchen",
 

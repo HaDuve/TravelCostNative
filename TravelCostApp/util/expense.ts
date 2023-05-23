@@ -31,6 +31,11 @@ export interface ExpenseData {
   isPaid?: string;
 }
 
+export enum isPaidString {
+  paid = "paid",
+  notPaid = "not paid",
+}
+
 export interface ExpenseDataOnline {
   isPaid: string;
   id?: string;

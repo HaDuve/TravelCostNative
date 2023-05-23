@@ -45,6 +45,7 @@ import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { secureStoreGetItem } from "../store/secure-storage";
 import IconButton from "../components/UI/IconButton";
+import { unsettleAllSplits } from "../util/settleSplits";
 
 const SettingsScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
@@ -160,6 +161,14 @@ const SettingsScreen = ({ navigation }) => {
         {/* in die heruntergeladene GoogleSheets als Xlsx */}
         {/* danach muss zurueck konvertiert werden  */}
         Export FoodForNomads
+      </Button>
+      <Button
+        onPress={async () => {
+          await unsettleAllSplits(tripid, expensesCtx);
+        }}
+        style={styles.settingsButton}
+      >
+        UnsettleAllSplits
       </Button>
     </View>
   );

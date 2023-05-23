@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 import { ExpensesContext, RangeString } from "../store/expenses-context";
 import { UserContext } from "../store/user-context";
@@ -6,6 +6,7 @@ import { StyleSheet, Text, View } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
 import ExpensesOverview from "../components/ExpensesOutput/ExpensesOverview";
+import uniqBy from "lodash.uniqby";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -17,6 +18,7 @@ import PropTypes from "prop-types";
 import { NetworkContext } from "../store/network-context";
 import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
+import { ExpenseData } from "../util/expense";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -63,7 +65,10 @@ const OverviewScreen = ({ navigation }) => {
     { label: i18n.t("totalLabel"), value: "total" },
   ]);
 
-  const recentExpenses = expensesCtx.getRecentExpenses(PeriodValue);
+  const recentExpenses: Array<ExpenseData> = useMemo(
+    () => uniqBy(expensesCtx.getRecentExpenses(PeriodValue), "id"),
+    [PeriodValue, expensesCtx.expenses]
+  );
 
   return (
     <View style={styles.container}>

@@ -200,8 +200,7 @@ function RecentExpenses({ navigation }) {
   function errorHandler() {
     setError(null);
   }
-  let recentExpenses: Array<ExpenseData> = [];
-  recentExpenses = useMemo(
+  const recentExpenses: Array<ExpenseData> = useMemo(
     () => uniqBy(expensesCtx.getRecentExpenses(PeriodValue), "id"),
     [PeriodValue, expensesCtx.expenses]
   );

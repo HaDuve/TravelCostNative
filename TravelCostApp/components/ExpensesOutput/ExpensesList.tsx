@@ -1,9 +1,8 @@
 import { Alert, Dimensions } from "react-native";
 
 import ExpenseItem from "./ExpenseItem";
-import uniqBy from "lodash.uniqby";
 import React, { useContext } from "react";
-import { View, Text } from "react-native";
+import { View } from "react-native";
 
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { GlobalStyles } from "../../constants/styles";

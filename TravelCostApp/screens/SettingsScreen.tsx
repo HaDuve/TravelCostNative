@@ -279,6 +279,14 @@ const SettingsScreen = ({ navigation }) => {
       <GradientButton style={styles.settingsButton} onPress={joinInviteHandler}>
         {i18n.t("joinTripLabel")}
       </GradientButton>
+      <GradientButton
+        style={styles.settingsButton}
+        onPress={async () => {
+          navigation.navigate("Finder");
+        }}
+      >
+        {"FinderScreen"}
+      </GradientButton>
 
       {multiTraveller && (
         <GradientButton

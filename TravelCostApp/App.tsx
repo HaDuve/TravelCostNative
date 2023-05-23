@@ -89,6 +89,7 @@ import ChatGPTScreen from "./components/ChatGPT/ChatGPTScreen";
 import { secureStoreGetItem, secureStoreSetItem } from "./store/secure-storage";
 import { isConnectionFastEnough } from "./util/connectionSpeed";
 import FinancialScreen from "./screens/FinancialScreen";
+import FinderScreen from "./screens/FinderScreen";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -236,6 +237,14 @@ function AuthenticatedStack() {
           <Stack.Screen
             name="FilteredPieCharts"
             component={FilteredPieCharts}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
+          <Stack.Screen
+            name="Finder"
+            component={FinderScreen}
             options={{
               headerShown: false,
               presentation: "modal",

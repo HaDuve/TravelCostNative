@@ -63,6 +63,15 @@ const SplitSummaryScreen = ({ route, navigation }) => {
 
   async function getOpenSplits() {
     setIsFetching(true);
+    // first check if current trip is paid
+    if (tripCtx.isPaid === "paid") {
+      setSplits([]);
+      setIsFetching(false);
+      setTotalPaidBackText(totalPaidBackTextOriginal + "0 " + currencySymbol);
+      setTotalPayBackText(totalPayBackTextOriginal + "0 " + currencySymbol);
+      return;
+    }
+
     try {
       const response = await calcOpenSplitsTable(
         tripid,
@@ -152,6 +161,8 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const settleSplitsHandler = async () => {
     setIsFetching(true);
     try {
+      navigation.popToTop();
+      await tripCtx.fetchAndSettleCurrentTrip();
       await settleAllSplits(tripCtx.tripid, expenseCtx);
     } catch (error) {
       console.log("settleSplitsHandler ~ error", error);

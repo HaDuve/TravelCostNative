@@ -348,6 +348,18 @@ export async function storeTrip(tripData: TripData) {
   }
 }
 
+async function getTripIsPaid(tripid: string) {
+  try {
+    const trip = await fetchTrip(tripid);
+    return trip.isPaid;
+  } catch (error) {
+    console.warn(
+      "error while fetchCurrent Trip in trip-context searching for ",
+      tripid
+    );
+  }
+}
+
 export async function updateTrip(tripid: string, tripData) {
   // console.log("https: ~ updateTrip ~ tripData", tripData);
   try {

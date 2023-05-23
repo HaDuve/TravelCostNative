@@ -7,8 +7,10 @@ import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 import Toast from "react-native-toast-message";
 import { MAX_JS_NUMBER } from "../confAppConstants";
 import { secureStoreGetItem } from "./secure-storage";
+import { isPaidString } from "../util/expense";
 
 export interface TripData {
+  isPaid: isPaidString;
   tripName: string;
   totalBudget: string;
   dailyBudget: string;
@@ -48,6 +50,8 @@ export const TripContext = createContext({
   loadTripDataFromStorage: async () => {},
   saveTravellersInStorage: async (travellers) => {},
   loadTravellersFromStorage: async () => {},
+  fetchAndSettleCurrentTrip: async () => {},
+  isPaid: isPaidString.notPaid,
 });
 
 function TripContextProvider({ children }) {
@@ -62,6 +66,7 @@ function TripContextProvider({ children }) {
   const [refreshState, setRefreshState] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [isPaid, setIsPaid] = useState(isPaidString.notPaid);
 
   useEffect(() => {
     // set tripid from storage
@@ -129,6 +134,7 @@ function TripContextProvider({ children }) {
     setCurrentTravellers(tripid);
     setStartDate(trip.startDate);
     setEndDate(trip.endDate);
+    setIsPaid(trip.isPaid);
   }
 
   function setTotalSum(amount: number) {
@@ -149,6 +155,20 @@ function TripContextProvider({ children }) {
       );
     }
   }
+  async function fetchAndSettleCurrentTrip() {
+    try {
+      const trip = await fetchTrip(tripid);
+      trip.isPaid = isPaidString.paid;
+      await setCurrentTrip(tripid, trip);
+      await saveTripDataInStorage(trip);
+      return trip;
+    } catch (error) {
+      console.warn(
+        "error while fetchCurrent Trip in trip-context searching for ",
+        tripid
+      );
+    }
+  }
 
   function getcurrentTrip() {
     const curTripData = {
@@ -158,6 +178,7 @@ function TripContextProvider({ children }) {
       dailyBudget: dailyBudget,
       tripCurrency: tripCurrency,
       totalSum: totalSum,
+      isPaid: isPaid,
     };
     return curTripData;
   }
@@ -240,6 +261,8 @@ function TripContextProvider({ children }) {
     loadTripDataFromStorage: loadTripDataFromStorage,
     saveTravellersInStorage: saveTravellersInStorage,
     loadTravellersFromStorage: loadTravellersFromStorage,
+    fetchAndSettleCurrentTrip: fetchAndSettleCurrentTrip,
+    isPaid: isPaid,
   };
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>;

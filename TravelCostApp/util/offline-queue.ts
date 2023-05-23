@@ -119,7 +119,7 @@ export const deleteExpenseOnlineOffline = async (
  */
 export const updateExpenseOnlineOffline = async (
   item: OfflineQueueManageExpenseItem,
-  online: boolean
+  online = true
 ) => {
   // load tripid from asyncstore to fix the tripctx tripid bug
   const tripid = await secureStoreGetItem("currentTripId");
@@ -136,8 +136,7 @@ export const updateExpenseOnlineOffline = async (
   item.expense.tripid = tripid;
   // if the internet is not fast enough, store in offline queue
   const { isFastEnough, speed } = await isConnectionFastEnough();
-  // console.log("isFastEnough:", isFastEnough);
-  // console.log("speed:", speed.toFixed(2), "Mbps");
+  console.log("online", isFastEnough, "speed:", speed.toFixed(2), "Mbps");
   if (online && isFastEnough) {
     // update item online
     try {

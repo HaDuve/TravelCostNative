@@ -7,11 +7,12 @@ import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 import Toast from "react-native-toast-message";
 import { MAX_JS_NUMBER } from "../confAppConstants";
 import { secureStoreGetItem } from "./secure-storage";
-import { isPaidString } from "../util/expense";
+import { ExpenseData, isPaidString } from "../util/expense";
 
 export interface TripData {
   isPaid: isPaidString;
   tripName: string;
+  expenses: ExpenseData[];
   totalBudget: string;
   dailyBudget: string;
   tripCurrency: string;
@@ -198,6 +199,9 @@ function TripContextProvider({ children }) {
   }
 
   async function saveTripDataInStorage(trip: TripData) {
+    // cut away the trip.expenses
+    const tripData = trip;
+    delete tripData.expenses;
     await asyncStoreSetObject("currentTrip", trip);
   }
 

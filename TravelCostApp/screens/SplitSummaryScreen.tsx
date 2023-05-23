@@ -19,7 +19,7 @@ import { UserContext } from "../store/user-context";
 import GradientButton from "../components/UI/GradientButton";
 import { ExpensesContext, RangeString } from "../store/expenses-context";
 import BackgroundGradient from "../components/UI/BackgroundGradient";
-import { ExpenseData, Split } from "../util/expense";
+import { ExpenseData, isPaidString, Split } from "../util/expense";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { getCurrencySymbol } from "../util/currencySymbol";
 import { settleAllSplits } from "../util/settleSplits";
@@ -39,6 +39,13 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
 
+  const [tripIsPaid, setTripIsPaid] = useState(
+    tripCtx.isPaid === isPaidString.paid
+  );
+
+  useEffect(() => {
+    setTripIsPaid(tripCtx.isPaid === isPaidString.paid);
+  }, [tripCtx.isPaid]);
   const [splits, setSplits] = useState<Split[]>([]);
   const [showSimplify, setShowSimplify] = useState(true);
 
@@ -63,11 +70,14 @@ const SplitSummaryScreen = ({ route, navigation }) => {
 
   async function getOpenSplits() {
     setIsFetching(true);
+    console.log("getOpenSplits ~ tripCtx.isPaid:", tripCtx.isPaid);
     // first check if current trip is paid
-    if (tripCtx.isPaid === "paid") {
+    if (tripIsPaid) {
       setSplits([]);
       setIsFetching(false);
-      setTotalPaidBackText(totalPaidBackTextOriginal + "0 " + currencySymbol);
+      setTotalPaidBackText(
+        "PAID!: " + totalPaidBackTextOriginal + "0 " + currencySymbol
+      );
       setTotalPayBackText(totalPayBackTextOriginal + "0 " + currencySymbol);
       return;
     }

@@ -294,7 +294,7 @@ export async function calcOpenSplitsTable(
         expense.isPaid == isPaidString.paid
       )
         continue;
-      console.log("rates:", rates);
+      // console.log("rates:", rates);
       for (const split of expense.splitList) {
         if (split.userName !== expense.whoPaid) {
           // check if rate is already in rates
@@ -302,24 +302,24 @@ export async function calcOpenSplitsTable(
             // get rate
             try {
               const rate = expense.amount / expense.calcAmount;
-              console.log("asyncSplitList ~ rate:", rate);
+              // console.log("asyncSplitList ~ rate:", rate);
               rates[expense.currency] = rate;
-              console.log(
-                "asyncSplitList ~ expense.currency:",
-                expense.currency
-              );
+              // console.log(
+              //   "asyncSplitList ~ expense.currency:",
+              //   expense.currency
+              // );
               split.amount = split.amount / rate;
-              console.log("asyncSplitList ~ split.amount:", split.amount);
+              // console.log("asyncSplitList ~ split.amount:", split.amount);
             } catch (error) {
               console.error(error);
             }
           } else {
             split.amount = split.amount / rates[expense.currency];
-            console.log(
-              "asyncSplitList ~ rates[expense.currency]:",
-              rates[expense.currency]
-            );
-            console.log("asyncSplitList ~ split.amount:", split.amount);
+            // console.log(
+            //   "asyncSplitList ~ rates[expense.currency]:",
+            //   rates[expense.currency]
+            // );
+            // console.log("asyncSplitList ~ split.amount:", split.amount);
           }
           split.whoPaid = expense.whoPaid;
           openSplits.push(split);

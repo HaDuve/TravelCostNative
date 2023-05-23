@@ -75,6 +75,7 @@ function TripContextProvider({ children }) {
       const loadedTripid = await secureStoreGetItem("currentTripid");
       if (loadedTripid) {
         setTripid(loadedTripid);
+        fetchAndSetCurrentTrip(loadedTripid);
       }
     }
     loadTripidFromStorage();
@@ -134,6 +135,7 @@ function TripContextProvider({ children }) {
     setCurrentTravellers(tripid);
     setStartDate(trip.startDate);
     setEndDate(trip.endDate);
+    console.log("trip.isPaid:", trip.isPaid);
     setIsPaid(trip.isPaid);
   }
 

@@ -74,11 +74,11 @@ function ExpenseItem(props): JSX.Element {
     });
     calcTravellerSumString = formatExpenseWithCurrency(
       Number(calcTravellerSum),
-      currency
+      homeCurrency
     );
     travellerSumString = formatExpenseWithCurrency(
       Number(travellerSum),
-      homeCurrency
+      currency
     );
   }
   const calcAmountString = calcTravellerSum

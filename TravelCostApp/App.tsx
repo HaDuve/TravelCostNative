@@ -92,6 +92,7 @@ import { secureStoreGetItem, secureStoreSetItem } from "./store/secure-storage";
 import { isConnectionFastEnough } from "./util/connectionSpeed";
 import FinancialScreen from "./screens/FinancialScreen";
 import FinderScreen from "./screens/FinderScreen";
+import CustomerScreen from "./screens/CustomerScreen";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -247,6 +248,14 @@ function AuthenticatedStack() {
           <Stack.Screen
             name="Finder"
             component={FinderScreen}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
+          <Stack.Screen
+            name="Customer"
+            component={CustomerScreen}
             options={{
               headerShown: false,
               presentation: "modal",

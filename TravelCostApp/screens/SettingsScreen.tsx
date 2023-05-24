@@ -325,11 +325,12 @@ const SettingsScreen = ({ navigation }) => {
         onPress={() => {
           console.log("pressed premium button");
           if (premiumStatus) {
-            Toast.show({
-              type: "success",
-              text1: "Premium Nomad", //i18n.t("premiumToastTitle"),
-              text2: "You are a premium Nomad already!", //i18n.t("premiumToastText"),
-            });
+            // Toast.show({
+            //   type: "success",
+            //   text1: "Premium Nomad", //i18n.t("premiumToastTitle"),
+            //   text2: "You are a premium Nomad already!", //i18n.t("premiumToastText"),
+            // });
+            navigation.navigate("Customer");
           } else navigation.navigate("Paywall");
         }}
       >

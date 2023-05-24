@@ -16,11 +16,13 @@
       "fallbackToCacheTimeout": 20000,
       "url": "https://u.expo.dev/dff7ffc5-6f1e-4ece-bb23-0c50cda19f46"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.budgetfornomads.app",
-      "buildNumber": "1.0.1039",
+      "buildNumber": "1.0.1040",
       "config": {
         "usesNonExemptEncryption": false
       }
@@ -44,6 +46,8 @@
     "runtimeVersion": {
       "policy": "sdkVersion"
     },
-    "plugins": ["expo-localization"]
+    "plugins": [
+      "expo-localization"
+    ]
   }
 }

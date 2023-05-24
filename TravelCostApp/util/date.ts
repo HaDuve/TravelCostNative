@@ -1,16 +1,14 @@
 import { DateTime } from "luxon";
-import { _getPreviousMondayDate } from "./dateTime";
 import {
   _toMonthString,
   _getDateMinusDays,
   _daysBetween,
   _getDatePlusDays,
-} from "./dateTime";
-import {
   _getFormattedDate,
   _isToday,
   _toShortFormat,
   _toDayMonthString,
+  _getPreviousMondayDate,
 } from "./dateTime";
 
 // for every function, if typeof date is DateTime, return _functionName(date,...args)
@@ -44,28 +42,7 @@ export function toShortFormat(date: DateOrDateTime) {
   if (date instanceof DateTime) {
     return _toShortFormat(date);
   }
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  const day = date.getDate();
-  const monthIndex = date.getMonth();
-  const monthName = monthNames[monthIndex];
-
-  const year = date.getFullYear();
-
-  return `${day} ${monthName}, ${year}`;
+  return _toShortFormat(DateTime.fromJSDate(date));
 }
 
 export function toDayMonthString(date: DateOrDateTime) {

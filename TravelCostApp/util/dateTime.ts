@@ -19,9 +19,10 @@ export function _isToday(dateTime: DateTime): boolean {
 }
 export function _toShortFormat(dateTime: DateTime): string {
   return dateTime.toLocaleString({
-    weekday: "long",
-    month: "long",
-    day: "numeric",
+    // weekday: "short",
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
   });
 }
 export function _toDayMonthString(dateTime: DateTime): string {

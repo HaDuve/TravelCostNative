@@ -194,6 +194,12 @@ const SettingsScreen = ({ navigation }) => {
     }
     getEmail();
   }, []);
+  useEffect(() => {
+    async function setAttributesAsync() {
+      await Purchases.setAttributes({ name: userName, email: emailString });
+    }
+    setAttributesAsync();
+  }, [emailString, userName]);
 
   function deleteAccountHandler() {
     return Alert.alert(

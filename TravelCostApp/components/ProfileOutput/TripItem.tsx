@@ -190,8 +190,8 @@ export default TripItem;
 TripItem.propTypes = {
   tripid: PropTypes.string,
   tripName: PropTypes.string,
-  totalBudget: PropTypes.number || PropTypes.string,
-  dailyBudget: PropTypes.number || PropTypes.string,
+  totalBudget: PropTypes.string,
+  dailyBudget: PropTypes.string,
   tripCurrency: PropTypes.string,
   trips: PropTypes.array,
 };

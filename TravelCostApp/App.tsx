@@ -447,6 +447,7 @@ function Root() {
 
   const [appIsReady, setAppIsReady] = useState(false);
   const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
+  const [onlineSetupDone, setOnlineSetupDone] = useState(false);
 
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
@@ -466,7 +467,7 @@ function Root() {
         const delayedOnlineSetup = async () => {
           const tripid = await secureStoreGetItem("currentTripId");
           // console.log("Root ~ tripid:", tripid);
-          if (!tripid) {
+          if (!onlineSetupDone) {
             // console.log(
             //   "delayedOnlineSetup ~ delayedOnlineSetup:",
             //   delayedOnlineSetup
@@ -476,14 +477,14 @@ function Root() {
             if (isFastEnough) {
               //prepare online setup
               const storedUid = await secureStoreGetItem("uid");
-              if (storedUid) {
-                const checkUser = await fetchUser(storedUid);
-                const tripid = checkUser.currentTrip;
-                console.log("delayedOnlineSetup ~ storedUid", storedUid);
-                console.log("delayedOnlineSetup ~ tripid", tripid);
-                const tripData = await tripCtx.fetchAndSetCurrentTrip(tripid);
-                await onlineSetup(tripData, checkUser);
-              }
+              const checkUser = await fetchUser(storedUid);
+              const tripid = checkUser.currentTrip;
+              console.log("delayedOnlineSetup ~ storedUid", storedUid);
+              console.log("delayedOnlineSetup ~ tripid", tripid);
+              const tripData = await tripCtx.fetchAndSetCurrentTrip(tripid);
+              await onlineSetup(tripData, checkUser);
+              console.log("delayedOnlineSetup ~ DONE");
+              setOnlineSetupDone(true);
             }
           }
         };

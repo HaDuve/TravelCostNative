@@ -5,7 +5,12 @@ import {
   ImageBackground,
   Image,
   StatusBar,
+  ActivityIndicator,
 } from "react-native";
+// TODO: find out why other activity indicators dont animate?
+// import { ActivityIndicator } from "react-native-paper";
+// import * as Progress from "react-native-progress";
+
 import React from "react";
 import { GlobalStyles } from "../../constants/styles";
 import Animated, {
@@ -24,7 +29,6 @@ import Animated, {
   ZoomOutDown,
 } from "react-native-reanimated";
 import { SPLASH_SCREEN_DELAY } from "../../confAppConstants";
-import { ActivityIndicator } from "react-native-paper";
 
 const loadingColor = GlobalStyles.colors.backgroundColor;
 const delay = SPLASH_SCREEN_DELAY;
@@ -58,6 +62,7 @@ const SplashScreenOverlay = (containerStyle) => {
             }}
           >
             <ActivityIndicator size={"large"} color={loadingColor} />
+            {/* <Progress.CircleSnail color={["red", "green", "blue"]} /> */}
           </Animated.View>
         </ImageBackground>
       </Animated.View>

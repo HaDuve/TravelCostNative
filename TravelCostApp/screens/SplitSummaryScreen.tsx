@@ -22,7 +22,6 @@ import BackgroundGradient from "../components/UI/BackgroundGradient";
 import { ExpenseData, isPaidString, Split } from "../util/expense";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { getCurrencySymbol } from "../util/currencySymbol";
-import { settleAllSplits } from "../util/settleSplits";
 import uniqBy from "lodash.uniqby";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
@@ -46,6 +45,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   useEffect(() => {
     setTripIsPaid(tripCtx.isPaid === isPaidString.paid);
   }, [tripCtx.isPaid]);
+
   const [splits, setSplits] = useState<Split[]>([]);
   const [showSimplify, setShowSimplify] = useState(true);
 
@@ -70,23 +70,12 @@ const SplitSummaryScreen = ({ route, navigation }) => {
 
   async function getOpenSplits() {
     setIsFetching(true);
-    console.log("getOpenSplits ~ tripCtx.isPaid:", tripCtx.isPaid);
-    // first check if current trip is paid
-    if (tripIsPaid) {
-      setSplits([]);
-      setIsFetching(false);
-      setTotalPaidBackText(
-        "PAID!: " + totalPaidBackTextOriginal + "0 " + currencySymbol
-      );
-      setTotalPayBackText(totalPayBackTextOriginal + "0 " + currencySymbol);
-      return;
-    }
-
     try {
       const response = await calcOpenSplitsTable(
         tripid,
         tripCurrency,
-        uniqueExpenses
+        uniqueExpenses,
+        tripCtx.isPaidDate
       );
       const temp = [];
       let userGetsBack = 0;
@@ -171,23 +160,13 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const settleSplitsHandler = async () => {
     setIsFetching(true);
     try {
-      navigation.popToTop();
       await tripCtx.fetchAndSettleCurrentTrip();
-      await settleAllSplits(tripCtx.tripid, expenseCtx);
     } catch (error) {
       console.log("settleSplitsHandler ~ error", error);
     }
     setIsFetching(false);
     navigation.navigate("Settings");
   };
-
-  if (error && !isFetching) {
-    return <ErrorOverlay message={error} onConfirm={errorHandler} />;
-  }
-
-  if (isFetching) {
-    return <LoadingOverlay />;
-  }
 
   function renderSplitItem(itemData) {
     const item = itemData.item;
@@ -201,6 +180,14 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         <Text style={styles.userText}> {item.whoPaid}!</Text>
       </View>
     );
+  }
+
+  if (error && !isFetching) {
+    return <ErrorOverlay message={error} onConfirm={errorHandler} />;
+  }
+
+  if (isFetching) {
+    return <LoadingOverlay />;
   }
 
   return (
@@ -232,11 +219,14 @@ const SplitSummaryScreen = ({ route, navigation }) => {
       <View style={styles.buttonContainer}>
         <FlatButton
           onPress={() => {
-            if (showSimplify) navigation.goBack();
-            getOpenSplits();
-            setShowSimplify(true);
-            setTitleText(titleTextOriginal);
-            setSubTitleText(subTitleOriginal);
+            if (showSimplify) {
+              navigation.goBack();
+            } else {
+              getOpenSplits();
+              setShowSimplify(true);
+              setTitleText(titleTextOriginal);
+              setSubTitleText(subTitleOriginal);
+            }
           }}
         >
           Back

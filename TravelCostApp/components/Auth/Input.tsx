@@ -36,7 +36,7 @@ function Input({
 export default Input;
 
 Input.propTypes = {
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   keyboardType: PropTypes.string,
   secure: PropTypes.bool,
   onUpdateValue: PropTypes.func.isRequired,

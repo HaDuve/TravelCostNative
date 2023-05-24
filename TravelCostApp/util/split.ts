@@ -1,6 +1,7 @@
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
+import { DateTime } from "luxon";
 import { en, de, fr } from "../i18n/supportedLanguages";
 import { Expense, Split, ExpenseData, isPaidString } from "./expense";
 const i18n = new I18n({ en, de, fr });
@@ -262,10 +263,12 @@ export function travellerToDropdown(travellers) {
 export async function calcOpenSplitsTable(
   tripid: string,
   tripCurrency: string,
-  givenExpenses?: ExpenseData[]
+  givenExpenses?: ExpenseData[],
+  isPaidDate?: string
 ) {
   console.log("calcOpenSplitsTable:", calcOpenSplitsTable);
   // cleanup all expenses where payer === debtor
+
   let expenses = [];
   const rates = {};
   rates[tripCurrency] = 1;
@@ -285,13 +288,23 @@ export async function calcOpenSplitsTable(
   console.log(expenses.length, "expenses");
   console.log(expenses[0]);
   let openSplits = [];
+  console.log("paidBackDate:", isPaidDate);
+  console.log("expenses[0].startDate:", expenses[0].startDate);
+  console.log("expenses[0].date:", expenses[0].date);
+  console.log("expenses[0].endDate:", expenses[0].endDate);
   const asyncSplitList = async () => {
     for (const exp of expenses) {
       const expense: ExpenseData = exp;
       if (
         expense.splitType === "SELF" ||
         !expense.splitList ||
-        expense.isPaid == isPaidString.paid
+        expense.isPaid == isPaidString.paid ||
+        DateTime.fromISO(expense.startDate) <
+          DateTime.fromISO(isPaidDate).toJSDate() ||
+        DateTime.fromISO(expense.date) <
+          DateTime.fromISO(isPaidDate).toJSDate() ||
+        DateTime.fromISO(expense.endDate) <
+          DateTime.fromISO(isPaidDate).toJSDate()
       )
         continue;
       // console.log("rates:", rates);

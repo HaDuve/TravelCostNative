@@ -193,6 +193,20 @@ const ExpenseForm = ({
     editingValues?.isPaid ?? isPaidString.notPaid
   );
 
+  useEffect(() => {
+    console.log("useEffect ~ tripCtx.isPaidDate", tripCtx.isPaidDate);
+    console.log("useEffect ~ startDate", startDate);
+    console.log("useEffect ~ editingValues.date", editingValues.date);
+    if (
+      tripCtx.isPaidDate &&
+      (new Date(tripCtx.isPaidDate) > new Date(startDate) ||
+        new Date(tripCtx.isPaidDate) > editingValues.date)
+    ) {
+      console.log("paid by tripctx");
+      setIsPaid(isPaidString.paid);
+    }
+  }, [tripCtx.isPaidDate, startDate]);
+
   // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
   const [duplOrSplit, setDuplOrSplit] = useState<number>(
     editingValues ? Number(editingValues.duplOrSplit) : 0

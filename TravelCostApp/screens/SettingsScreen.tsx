@@ -45,7 +45,6 @@ import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { secureStoreGetItem } from "../store/secure-storage";
 import IconButton from "../components/UI/IconButton";
-import { unsettleAllSplits } from "../util/settleSplits";
 
 const SettingsScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
@@ -164,7 +163,8 @@ const SettingsScreen = ({ navigation }) => {
       </Button>
       <Button
         onPress={async () => {
-          await unsettleAllSplits(tripid, expensesCtx);
+          await tripCtx.fetchAndSettleCurrentTrip(true);
+          navigation.pop();
         }}
         style={styles.settingsButton}
       >

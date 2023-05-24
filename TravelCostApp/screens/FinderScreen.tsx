@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 import React, { useContext, useState } from "react";
 import DatePickerModal from "../components/UI/DatePickerModal";
 import DatePickerContainer from "../components/UI/DatePickerContainer";
-import { getFormattedDate } from "../util/date";
+import { getFormattedDate, toShortFormat } from "../util/date";
 import { DateTime } from "luxon";
 import * as Haptics from "expo-haptics";
 import { Searchbar } from "react-native-paper";
@@ -51,8 +51,14 @@ const FinderScreen = () => {
   const expenses = uniqBy(expenseCtx.expenses, "id");
   const filteredExpenses = expenses.filter((expense) => {
     const expenseDate = expense.startDate;
+    const expenseDateIsSameDay =
+      expenseDate?.toString().slice(0, 10) ===
+        startDate?.toString().slice(0, 10) ||
+      expense.date?.toString().slice(0, 10) ===
+        startDate?.toString().slice(0, 10);
     const expenseDateIsInRange =
-      expenseDate >= startDate && expenseDate <= endDate;
+      expenseDateIsSameDay ||
+      (expenseDate >= startDate && expenseDate <= endDate);
     const expenseDescriptionIsInSearchQuery = expense.description
       ?.toLowerCase()
       .includes(searchQuery?.toLowerCase());
@@ -65,9 +71,14 @@ const FinderScreen = () => {
     const expenseCountryIsInSearchQuery = expense.country
       ?.toLowerCase()
       .includes(searchQuery?.toLowerCase());
-    const expenseTravellerIsInSearchQuery = expense.traveller
-      ?.toLowerCase()
-      .includes(searchQuery?.toLowerCase());
+    const expenseTravellerIsInSearchQuery =
+      // return true if searchQuery?.toLowerCase() is in expense.splitList
+      expense.splitList?.some((split) => {
+        const travellerName = split.userName;
+        return travellerName
+          ?.toLowerCase()
+          .includes(searchQuery?.toLowerCase());
+      });
 
     return (
       expenseDateIsInRange &&
@@ -80,17 +91,25 @@ const FinderScreen = () => {
     );
   });
 
+  const dayStringFromDateQuery =
+    (searchQuery ? searchQuery + " : " : "") +
+    DateTime.fromISO(startDate).toLocaleString() +
+    " - " +
+    DateTime.fromISO(endDate).toLocaleString();
+
+  console.log("FinderScreen ~ dayStringFromDateQuery:", dayStringFromDateQuery);
   const findPressedHandler = () => {
     console.log("find pressed");
     navigation.navigate("FilteredPieCharts", {
       expenses: filteredExpenses,
-      dayString: "Finder",
+      dayString: dayStringFromDateQuery,
     });
   };
 
   console.log("FinderScreen ~ expenses:", expenses?.length);
   console.log("filteredExpenses ~ filteredExpenses:", filteredExpenses?.length);
-
+  const numberOfResults = filteredExpenses?.length;
+  const foundResults = filteredExpenses?.length > 0 ? true : false;
   return (
     <View style={styles.container}>
       {datepickerJSX}
@@ -113,7 +132,7 @@ const FinderScreen = () => {
         onPress={() => findPressedHandler()}
         style={styles.findButton}
       >
-        FIND
+        {foundResults ? `Show ${numberOfResults} Results` : "No Results"}
       </GradientButton>
     </View>
   );

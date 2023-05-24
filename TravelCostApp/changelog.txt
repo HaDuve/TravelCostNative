@@ -1,5 +1,20 @@
 Change log Travel Expense App
 
+1.1.3
+- fixed bugs with consistency, connection, duplicates, loading travellers
+- amount + currency strings (e.g $5.4) will be localized now (e.g. for germans = 5,4$)
+- when the user updates an expense amount with shared costs, the shared costs will be fairly updated
+- improved trip item layout
+- improved activity indicator design
+- added an "is Paid" field for expenses (to track if the costs are still owed)
+- added an "settle all splits" button to flag a whole trip as "is Paid"
+- added alot of back buttons on top of forms and modals (better UX)
+- removed paywall for the rest of testflight
+- added "Finder" screen, allowing the user to find specifig expenses easily (filter for description query, travellers, country, currency, date or date range etc.)
+- fixed trip Item sometimes not showing the sum of expenses
+- improved datepicker modal and texts
+- created first crude version of customer screen (showing premium customer info)
+
 1.1.1e (AppStore ready)
 - heavily improved splitting algorithms (when splitting exact and for changing the total amount afterwards)
 - made important or often used entries secure so they wont get deleted after each update (tripID, userID, lastCurrency, lastCountry)

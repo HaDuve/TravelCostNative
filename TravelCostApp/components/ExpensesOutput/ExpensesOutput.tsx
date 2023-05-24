@@ -16,6 +16,7 @@ function ExpensesOutput({
   refreshControl,
   periodValue,
   showSumForTravellerName,
+  isFiltered,
 }) {
   // console.log("rerender ExpensesOutput - B");
   const [showLoading, setShowLoading] = useState(true);
@@ -37,6 +38,7 @@ function ExpensesOutput({
         periodValue={periodValue}
         expenses={expenses}
         showSumForTravellerName={showSumForTravellerName}
+        isFiltered={isFiltered}
       />
     );
   }
@@ -55,6 +57,7 @@ ExpensesOutput.propTypes = {
   refreshControl: PropTypes.object,
   periodValue: PropTypes.string,
   showSumForTravellerName: PropTypes.string,
+  isFiltered: PropTypes.bool,
 };
 
 const styles = StyleSheet.create({

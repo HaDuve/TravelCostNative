@@ -299,7 +299,7 @@ const ManageExpense = ({ route, navigation }) => {
         }
       }
       setIsSubmitting(false);
-      navigation.navigate("RecentExpenses");
+      navigation.popToTop();
       await asyncStoreSetObject("expenses", expenseCtx.expenses);
       console.log("expenses context length", expenseCtx.expenses.length);
       if (isOnline) await touchAllTravelers(tripid, true);

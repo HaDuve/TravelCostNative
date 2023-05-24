@@ -50,6 +50,7 @@ function ExpenseItem(props): JSX.Element {
     splitList,
     iconName,
     showSumForTravellerName,
+    filtered,
   } = props;
   let { date } = props;
   const navigation = useNavigation();
@@ -116,6 +117,7 @@ function ExpenseItem(props): JSX.Element {
   const memoizedCallback = useCallback(async () => {
     navigation.navigate("ManageExpense", {
       expenseId: id,
+      filtered: filtered,
     });
   }, [id, navigation]);
   const originalCurrencyJSX = !sameCurrency ? (
@@ -232,6 +234,7 @@ ExpenseItem.propTypes = {
   splitList: PropTypes.array,
   iconName: PropTypes.string,
   showSumForTravellerName: PropTypes.string,
+  filtered: PropTypes.bool,
 };
 
 const styles = StyleSheet.create({

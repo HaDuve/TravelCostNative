@@ -54,6 +54,7 @@ const FilteredExpenses = ({
       <ExpensesOutput
         expenses={expenses}
         showSumForTravellerName={showSumForTravellerName}
+        isFiltered
       />
       {!withArgs && (
         <FlatButton onPress={() => navigation.pop()}>

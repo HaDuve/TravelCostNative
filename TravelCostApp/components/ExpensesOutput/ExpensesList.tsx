@@ -25,6 +25,7 @@ import { ExpenseData, Expense } from "../../util/expense";
 import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
+import { useNavigation } from "@react-navigation/native";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -32,6 +33,8 @@ i18n.enableFallback = true;
 // GLOBALS across all expenseItems
 let tripid = "";
 let expenseCtx;
+let filtered = false;
+let navigation;
 const row = [];
 let prevOpenedRow;
 let travellerName = "";
@@ -85,6 +88,7 @@ function renderExpenseItem(isOnline: boolean, itemData) {
       >
         <ExpenseItem
           showSumForTravellerName={travellerName}
+          filtered={filtered}
           {...itemData.item}
         />
       </Swipeable>
@@ -112,6 +116,7 @@ function onClick({ item, index }, isOnline) {
       expenseCtx?.deleteExpense(editedExpenseId);
       await deleteExpenseOnlineOffline(item, isOnline);
       await touchAllTravelers(tripid, true);
+      navigation?.popToTop();
     } catch (error) {
       console.log(i18n.t("deleteError"), error);
       Toast.show({
@@ -166,8 +171,10 @@ function ExpensesList({
   refreshControl,
   periodValue,
   showSumForTravellerName,
+  isFiltered,
 }) {
   // console.log("rerender ExpensesList - C");
+  navigation = useNavigation();
   const uniqueData = expenses;
   // const flatListRef = useRef(null);
   const netCtx = useContext(NetworkContext);
@@ -177,6 +184,7 @@ function ExpensesList({
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(1);
   tripid = tripCtx.tripid;
   travellerName = showSumForTravellerName;
+  if (isFiltered) filtered = true;
   // // find the index of the first item in expenses with the date === new Date()
   // // this is used to scroll to the current day
   // useLayoutEffect(() => {
@@ -243,4 +251,5 @@ ExpensesList.propTypes = {
   refreshControl: PropTypes.element,
   periodValue: PropTypes.string.isRequired,
   showSumForTravellerName: PropTypes.string,
+  isFiltered: PropTypes.bool,
 };

@@ -195,9 +195,9 @@ const ExpenseForm = ({
   );
 
   useEffect(() => {
-    console.log("useEffect ~ tripCtx.isPaidDate", tripCtx.isPaidDate);
+    console.log("useEffect ~ tripCtx.isPaidDate", tripCtx?.isPaidDate);
     console.log("useEffect ~ startDate", startDate);
-    console.log("useEffect ~ editingValues.date", editingValues.date);
+    console.log("useEffect ~ editingValues.date", editingValues?.date);
     if (
       tripCtx.isPaidDate &&
       (new Date(tripCtx.isPaidDate) > new Date(startDate) ||

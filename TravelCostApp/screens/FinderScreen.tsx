@@ -212,6 +212,10 @@ const styles = StyleSheet.create({
     marginBottom: "5%",
     //center
     textAlign: "center",
+    // thin text
+    fontWeight: "200",
+    //cursive
+    fontStyle: "italic",
   },
   findButton: {
     marginHorizontal: "20%",

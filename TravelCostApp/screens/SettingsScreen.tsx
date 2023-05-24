@@ -285,7 +285,7 @@ const SettingsScreen = ({ navigation }) => {
           navigation.navigate("Finder");
         }}
       >
-        {"FinderScreen"}
+        {"Finder"}
       </GradientButton>
 
       {multiTraveller && (

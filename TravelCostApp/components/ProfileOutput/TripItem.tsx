@@ -26,6 +26,7 @@ import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
 import { getCurrencySymbol } from "../../util/currencySymbol";
+import { ExpensesContext } from "../../store/expenses-context";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -51,9 +52,19 @@ function TripItem({
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
+  const expCtx = useContext(ExpensesContext);
   const netCtx = useContext(NetworkContext);
   const [travellers, setTravellers] = useState([]);
   const [isFetching, setIsFetching] = useState(true);
+
+  const expensesSum = expCtx.expenses.reduce((sum, expense) => {
+    if (isNaN(Number(expense.calcAmount))) return sum;
+    return Number(sum + Number(expense.calcAmount));
+  }, 0);
+  const expensesSumString = formatExpenseWithCurrency(
+    expensesSum,
+    tripCurrency
+  );
 
   const tripCurrencySymbol = getCurrencySymbol(tripCurrency);
 
@@ -105,7 +116,7 @@ function TripItem({
       ? { borderWidth: 1, borderColor: GlobalStyles.colors.primary400 }
       : {};
 
-  const activeProgress = tripCtx.totalSum / (totalBudget ?? MAX_JS_NUMBER);
+  const activeProgress = expensesSum / (totalBudget ?? MAX_JS_NUMBER);
 
   function renderTravellers(item) {
     return (
@@ -156,7 +167,7 @@ function TripItem({
           </View>
           <View style={[styles.amountContainer, styles.rightContainer]}>
             <Text style={styles.amount}>
-              {tripTotalSumString}
+              {expensesSumString}
               {infinityString ? " / ∞" : " / " + totalBudgetString}
             </Text>
             {!infinityString && (
@@ -219,10 +230,13 @@ const styles = StyleSheet.create({
   },
   leftContainer: {
     flex: 1,
+    paddingRight: 4,
     alignItems: "flex-start",
   },
   rightContainer: {
     flex: 1,
+    marginRight: -8,
+    marginTop: -8,
     alignItems: "flex-end",
   },
   textBase: {

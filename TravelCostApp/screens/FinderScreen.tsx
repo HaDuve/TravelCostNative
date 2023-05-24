@@ -97,7 +97,6 @@ const FinderScreen = () => {
     " - " +
     DateTime.fromISO(endDate).toLocaleString();
 
-  console.log("FinderScreen ~ dayStringFromDateQuery:", dayStringFromDateQuery);
   const findPressedHandler = () => {
     console.log("find pressed");
     navigation.navigate("FilteredPieCharts", {
@@ -106,8 +105,6 @@ const FinderScreen = () => {
     });
   };
 
-  console.log("FinderScreen ~ expenses:", expenses?.length);
-  console.log("filteredExpenses ~ filteredExpenses:", filteredExpenses?.length);
   const numberOfResults = filteredExpenses?.length;
   const foundResults = filteredExpenses?.length > 0 ? true : false;
   return (

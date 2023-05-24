@@ -23,6 +23,7 @@ import { ExpenseData, isPaidString, Split } from "../util/expense";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { getCurrencySymbol } from "../util/currencySymbol";
 import uniqBy from "lodash.uniqby";
+import BackButton from "../components/UI/BackButton";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
   const { tripid } = route.params;
@@ -198,6 +199,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         style={styles.headerContainer}
       >
         <View style={styles.titleContainer}>
+          <BackButton></BackButton>
           <Text style={styles.titleText}> {titleText}</Text>
         </View>
         <View style={styles.subTitleContainer}>
@@ -324,6 +326,9 @@ const styles = StyleSheet.create({
   titleContainer: {
     alignItems: "center",
     justifyContent: "center",
+    marginLeft: "-8%",
+    // row
+    flexDirection: "row",
   },
   titleText: {
     fontSize: 32,

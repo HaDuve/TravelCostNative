@@ -51,6 +51,7 @@ import { MAX_JS_NUMBER } from "../../confAppConstants";
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 import { reloadApp } from "../../util/appState";
 import { secureStoreSetItem } from "../../store/secure-storage";
+import BackButton from "../UI/BackButton";
 
 const TripForm = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -423,6 +424,7 @@ const TripForm = ({ navigation, route }) => {
       {modalJSX}
       <ScrollView style={{ flex: 1, overflow: "visible" }}>
         <View style={styles.form}>
+          <BackButton></BackButton>
           <View
             style={[
               styles.card,

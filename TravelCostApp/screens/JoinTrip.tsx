@@ -35,6 +35,7 @@ import PropTypes from "prop-types";
 import { ActivityIndicator } from "react-native-paper";
 
 import { reloadApp } from "../util/appState";
+import BackButton from "../components/UI/BackButton";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -133,7 +134,9 @@ const JoinTrip = ({ navigation, route }) => {
   return (
     <KeyboardAvoidingView style={styles.card}>
       <View style={styles.titleContainer}>
+        <BackButton></BackButton>
         <Text style={styles.titleText}>{i18n.t("joinTripLabel")}</Text>
+
         <View style={{ marginLeft: "5%" }}>
           {isFetching && (
             <ActivityIndicator
@@ -217,10 +220,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   titleContainer: {
-    marginLeft: "7,5%",
+    marginLeft: "-7,5%",
+    minHeight: "12%",
     flexDirection: "row",
-    padding: 12,
-    marginBottom: 24,
+    padding: "2%",
+    marginBottom: "2%",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   titleText: {
     fontSize: 30,

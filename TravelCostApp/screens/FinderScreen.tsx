@@ -10,6 +10,7 @@ import GradientButton from "../components/UI/GradientButton";
 import { ExpensesContext } from "../store/expenses-context";
 import uniqBy from "lodash.uniqby";
 import { useNavigation } from "@react-navigation/native";
+import BackButton from "../components/UI/BackButton";
 
 const FinderScreen = () => {
   const navigation = useNavigation();
@@ -93,7 +94,10 @@ const FinderScreen = () => {
   return (
     <View style={styles.container}>
       {datepickerJSX}
-      <Text style={styles.titleText}>Finder</Text>
+      <View style={{ flexDirection: "row", minHeight: "10%" }}>
+        <BackButton></BackButton>
+        <Text style={styles.titleText}>Finder</Text>
+      </View>
       <Searchbar
         placeholder="Search"
         onChangeText={onChangeSearch}

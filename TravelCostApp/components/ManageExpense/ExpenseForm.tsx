@@ -74,6 +74,7 @@ import { getCurrencySymbol } from "../../util/currencySymbol";
 import { secureStoreSetItem } from "../../store/secure-storage";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { ActivityIndicator } from "react-native-paper";
+import BackButton from "../UI/BackButton";
 
 const ExpenseForm = ({
   onCancel,
@@ -675,15 +676,7 @@ const ExpenseForm = ({
   );
   const advancedSubmitHandler = hideAdvanced ? fastSubmit : submitHandler;
 
-  const backButtonJsx = (
-    <TouchableOpacity style={GlobalStyles.backButton} onPress={navigation.pop}>
-      <IconButton
-        icon="arrow-back-outline"
-        size={24}
-        color={GlobalStyles.colors.textColor}
-      ></IconButton>
-    </TouchableOpacity>
-  );
+  const backButtonJsx = <BackButton />;
 
   const confirmButtonJSX = (
     <TouchableOpacity

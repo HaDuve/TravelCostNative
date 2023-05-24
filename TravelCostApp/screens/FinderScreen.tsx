@@ -126,54 +126,56 @@ const FinderScreen = () => {
   const numberOfResults = filteredExpenses?.length;
   const foundResults = filteredExpenses?.length > 0 ? true : false;
   return (
-    <View style={styles.container}>
+    <>
       {datepickerJSX}
-      <View style={styles.headerContainer}>
-        <BackButton></BackButton>
-        <Text style={styles.titleText}>Finder</Text>
-      </View>
-      <View style={styles.rowContainer}>
-        <View style={{ borderWidth: 1, borderRadius: 99, marginRight: 8 }}>
-          <Checkbox
-            status={checkedQuery ? "checked" : "unchecked"}
-            onPress={() => {
-              setCheckedQuery(!checkedQuery);
-            }}
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <BackButton></BackButton>
+          <Text style={styles.titleText}>Finder</Text>
+        </View>
+        <View style={styles.rowContainer}>
+          <View style={{ borderWidth: 1, borderRadius: 99, marginRight: 8 }}>
+            <Checkbox
+              status={checkedQuery ? "checked" : "unchecked"}
+              onPress={() => {
+                setCheckedQuery(!checkedQuery);
+              }}
+            />
+          </View>
+          <Searchbar
+            placeholder="Search"
+            onChangeText={onChangeSearch}
+            value={searchQuery}
+            style={{ width: "80%" }}
           />
         </View>
-        <Searchbar
-          placeholder="Search"
-          onChangeText={onChangeSearch}
-          value={searchQuery}
-          style={{ width: "80%" }}
-        />
-      </View>
-      <View style={styles.rowContainer}>
-        <View style={{ borderWidth: 1, borderRadius: 99, marginRight: -8 }}>
-          <Checkbox
-            status={checkedDate ? "checked" : "unchecked"}
-            onPress={() => {
-              setCheckedDate(!checkedDate);
-            }}
-          />
+        <View style={styles.rowContainer}>
+          <View style={{ borderWidth: 1, borderRadius: 99, marginRight: -8 }}>
+            <Checkbox
+              status={checkedDate ? "checked" : "unchecked"}
+              onPress={() => {
+                setCheckedDate(!checkedDate);
+              }}
+            />
+          </View>
+          {DatePickerContainer({
+            openDatePickerRange,
+            startDate,
+            endDate,
+            dateIsRanged,
+          })}
         </View>
-        {DatePickerContainer({
-          openDatePickerRange,
-          startDate,
-          endDate,
-          dateIsRanged,
-        })}
+        <Text style={styles.queryText}>
+          Finding :{queryString} {dateString}
+        </Text>
+        <GradientButton
+          onPress={() => findPressedHandler()}
+          style={styles.findButton}
+        >
+          {foundResults ? `Show ${numberOfResults} Results` : "No Results"}
+        </GradientButton>
       </View>
-      <Text style={styles.queryText}>
-        Finding :{queryString} {dateString}
-      </Text>
-      <GradientButton
-        onPress={() => findPressedHandler()}
-        style={styles.findButton}
-      >
-        {foundResults ? `Show ${numberOfResults} Results` : "No Results"}
-      </GradientButton>
-    </View>
+    </>
   );
 };
 

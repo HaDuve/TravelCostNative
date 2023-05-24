@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import Purchases, { CustomerInfo } from "react-native-purchases";
 import { ScrollView } from "react-native-gesture-handler";
+import { DateTime } from "luxon";
 
 const CustomerScreen = () => {
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>(null);
@@ -17,7 +18,7 @@ const CustomerScreen = () => {
     }
     getCustomerInfo();
   }, []);
-  const reqDate = customerInfo?.requestDate;
+  const reqDate = DateTime.fromISO(customerInfo?.requestDate).toLocaleString();
   const originalAppUserID = customerInfo?.originalAppUserId;
   const firstSeen = customerInfo?.firstSeen;
   const originalAppVersion = customerInfo?.originalApplicationVersion;
@@ -33,46 +34,88 @@ const CustomerScreen = () => {
   const isActive = entitlementInfo?.isActive;
   const willRenew = entitlementInfo?.willRenew;
   const periodType = entitlementInfo?.periodType;
-  const latestPurchaseDate = entitlementInfo?.latestPurchaseDate;
+  const latestPurchaseDate = DateTime.fromISO(
+    entitlementInfo?.latestPurchaseDate
+  ).toLocaleString();
   const originalPurchaseDateEntitlement = entitlementInfo?.originalPurchaseDate;
-  const expirationDate = entitlementInfo?.expirationDate;
+  const expirationDate = DateTime.fromISO(
+    entitlementInfo?.expirationDate
+  ).toLocaleString();
   const store = entitlementInfo?.store;
   const isSandbox = entitlementInfo?.isSandbox;
   const unsubscribeDetectedAt = entitlementInfo?.unsubscribeDetectedAt;
   const billingIssueDetectedAt = entitlementInfo?.billingIssueDetectedAt;
 
   return (
-    <ScrollView>
-      <Text>CustomerScreen</Text>
-      <Text>req Date: {reqDate}</Text>
-      <Text>originalAppUserID: {originalAppUserID}</Text>
-      <Text>firstSeen: {firstSeen}</Text>
-      <Text>originalAppVersion: {originalAppVersion}</Text>
-      <Text>originalPurchaseDate: {originalPurchaseDate}</Text>
-      <Text>managementURL: {managementURL}</Text>
-      <Text>
-        allPurchasedProductIdentifiers: {allPurchasedProductIdentifiers}
-      </Text>
-      <Text>activeSubscriptions: {activeSubscriptions}</Text>
+    <ScrollView style={styles.container}>
+      <View style={styles.section}>
+        <Text style={styles.label}>User ID:</Text>
+        <Text style={styles.info}>{originalAppUserID}</Text>
+      </View>
+      <View style={styles.section}>
+        <Text style={styles.label}>Active Subscriptions:</Text>
+        <Text style={styles.info}>{activeSubscriptions}</Text>
+      </View>
 
-      <Text>identifier: {identifier}</Text>
-      <Text>productIdentifier: {productIdentifier}</Text>
-      <Text>isActive: {isActive}</Text>
-      <Text>willRenew: {willRenew}</Text>
-      <Text>periodType: {periodType}</Text>
-      <Text>latestPurchaseDate: {latestPurchaseDate}</Text>
-      <Text>
-        originalPurchaseDateEntitlement: {originalPurchaseDateEntitlement}
-      </Text>
-      <Text>expirationDate: {expirationDate}</Text>
-      <Text>store: {store}</Text>
-      <Text>isSandbox: {isSandbox}</Text>
-      <Text>unsubscribeDetectedAt: {unsubscribeDetectedAt}</Text>
-      <Text>billingIssueDetectedAt: {billingIssueDetectedAt}</Text>
+      <View style={styles.section}>
+        <Text style={styles.label}>Manage Subscription:</Text>
+        <Text style={styles.info}>{managementURL}</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.label}>Expiration Date:</Text>
+        <Text style={styles.info}>{expirationDate}</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.label}>Latest Purchase Date:</Text>
+        <Text style={styles.info}>{latestPurchaseDate}</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.label}>Original Purchase Date:</Text>
+        <Text style={styles.info}>{originalPurchaseDate}</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.label}>Period Type:</Text>
+        <Text style={styles.info}>{periodType}</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.label}>Will Renew:</Text>
+        <Text style={styles.info}>{willRenew}</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.label}>Store:</Text>
+        <Text style={styles.info}>{store}</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.label}>Request Date:</Text>
+        <Text style={styles.info}>{reqDate}</Text>
+      </View>
     </ScrollView>
   );
 };
 
 export default CustomerScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  section: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  info: {
+    fontSize: 14,
+  },
+});

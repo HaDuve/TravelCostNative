@@ -219,6 +219,31 @@ const SettingsScreen = ({ navigation }) => {
     );
   }
 
+  async function restorePurchases() {
+    try {
+      const restore = await Purchases.restorePurchases();
+      // ... check restored purchaserInfo to see if entitlement is now active
+      console.log("restorePurchases ~ restore:", restore);
+      if (restore.entitlements.all[ENTITLEMENT_ID].isActive) {
+        // ... grant user entitlement
+        console.log("restorePurchases ~ restore.entitlements.all:", restore);
+        await userCtx.checkPremium();
+        Toast.show({
+          type: "success",
+          text1: "Premium Nomad", //i18n.t("premiumToastTitle"),
+          text2: "You are a premium Nomad now!", //i18n.t("premiumToastText"),
+        });
+      }
+    } catch (e) {
+      Toast.show({
+        type: "error",
+        text1: "Premium Nomad", //i18n.t("premiumToastTitle"),
+        text2: "Something went wrong!", //i18n.t("premiumToastText"),
+      });
+      console.log("restorePurchases ~ e:", e);
+    }
+  }
+
   function logoutHandler() {
     return Alert.alert(i18n.t("sure"), i18n.t("signOutAlertMess"), [
       // The "No" button
@@ -336,6 +361,9 @@ const SettingsScreen = ({ navigation }) => {
       >
         {premiumButtonString}
       </GradientButton>
+      <TouchableOpacity onPress={() => restorePurchases()}>
+        <Text style={[styles.textButton]}>Restore Purchases?</Text>
+      </TouchableOpacity>
       {emailString && (
         <TouchableOpacity onPress={() => deleteAccountHandler()}>
           <Text style={[styles.textButton]}>Delete Account {emailString}?</Text>

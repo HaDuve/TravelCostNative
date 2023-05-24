@@ -750,6 +750,10 @@ const ExpenseForm = ({
     (item) => item.amount !== 0
   );
   const hidePickers = true;
+  // console log all 3 dates
+  console.log("startDate", startDate);
+  console.log("endDate", endDate);
+  console.log("date", inputs.date.value);
   const dateIsRanged =
     startDate?.toString().slice(0, 10) !== endDate?.toString().slice(0, 10);
   const datepickerJSX = DatePickerModal({

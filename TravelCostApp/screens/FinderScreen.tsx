@@ -54,11 +54,13 @@ const FinderScreen = () => {
     const expenseDateIsSameDay =
       expenseDate?.toString().slice(0, 10) ===
         startDate?.toString().slice(0, 10) ||
-      expense.date?.toString().slice(0, 10) ===
+      DateTime.fromJSDate(expense.date).toString()?.slice(0, 10) ===
         startDate?.toString().slice(0, 10);
     const expenseDateIsInRange =
       expenseDateIsSameDay ||
-      (expenseDate >= startDate && expenseDate <= endDate);
+      (expenseDate >= startDate && expenseDate <= endDate) ||
+      (DateTime.fromJSDate(expense.date).toString() >= startDate &&
+        DateTime.fromJSDate(expense.date).toString() <= endDate);
     const expenseDescriptionIsInSearchQuery = expense.description
       ?.toLowerCase()
       .includes(searchQuery?.toLowerCase());

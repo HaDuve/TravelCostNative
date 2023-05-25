@@ -1,5 +1,15 @@
 Change log Travel Expense App
 
+1.1.3b
+- improved customer screen
+- improved split summary
+- improved finder
+- improved backButton
+- improved isPaid buttons
+- added longpress to overview period (+)button test
+- added haptics
+- saving last finder filter
+
 1.1.3
 - fixed bugs with consistency, connection, duplicates, loading travellers
 - amount + currency strings (e.g $5.4) will be localized now (e.g. for germans = 5,4$)

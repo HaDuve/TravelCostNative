@@ -12,7 +12,10 @@ const BackButton = ({ style }) => {
   return (
     <TouchableOpacity
       style={[GlobalStyles.backButton, style]}
-      onPress={navigation.pop}
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        navigation.pop();
+      }}
     >
       <IconButton
         icon="arrow-back-outline"

@@ -20,6 +20,7 @@ import { I18n } from "i18n-js";
 import { en, de, fr } from "../../i18n/supportedLanguages";
 import LoadingOverlay from "../UI/LoadingOverlay";
 import GradientButton from "../UI/GradientButton";
+import * as Haptics from "expo-haptics";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -60,7 +61,10 @@ const ProfileForm = ({ navigation, sleepyStartHandler }) => {
         size={36}
         color={GlobalStyles.colors.textColor}
         // style={styles.button}
-        onPress={() => navigation.navigate("Settings")}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          navigation.navigate("Settings");
+        }}
       />
       <IconButton
         icon={"exit-outline"}

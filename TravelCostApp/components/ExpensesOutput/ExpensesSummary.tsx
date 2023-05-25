@@ -120,7 +120,14 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   };
 
   return (
-    <Pressable onPress={() => pressBudgetHandler()} style={styles.container}>
+    <Pressable
+      onPress={() => pressBudgetHandler()}
+      style={({ pressed }) => [
+        styles.container,
+        GlobalStyles.shadow,
+        pressed && GlobalStyles.pressedWithShadow,
+      ]}
+    >
       <View style={styles.sumTextContainer}>
         <Text style={[styles.sum, { color: budgetColor }]}>
           {expensesSumString}

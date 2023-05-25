@@ -969,6 +969,16 @@ const ExpenseForm = ({
                         setValue={setWhoPaid}
                         setItems={setItems}
                         onClose={setOpenSplitTypes}
+                        onOpen={() => {
+                          Haptics.impactAsync(
+                            Haptics.ImpactFeedbackStyle.Light
+                          );
+                        }}
+                        onSelectItem={() => {
+                          Haptics.impactAsync(
+                            Haptics.ImpactFeedbackStyle.Light
+                          );
+                        }}
                         listMode="MODAL"
                         modalProps={{
                           animationType: "slide",
@@ -1006,6 +1016,12 @@ const ExpenseForm = ({
                     setValue={setSplitType}
                     setItems={setSplitTypeItems}
                     onClose={openTravellerMultiPicker}
+                    onOpen={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                    onSelectItem={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
                     listMode="MODAL"
                     modalProps={{
                       animationType: "slide",
@@ -1035,6 +1051,12 @@ const ExpenseForm = ({
                   value={splitTravellersList}
                   items={splitItemsEQUAL}
                   setOpen={setOpenEQUAL}
+                  onOpen={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                  onSelectItem={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
                   setValue={setListEQUAL}
                   setItems={setSplitItemsEQUAL}
                   onClose={splitHandler}

@@ -65,6 +65,9 @@ const CurrencyPicker = ({
         onClose={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }}
+        onSelectItem={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }}
         onChangeValue={onChangeValue}
         modalContentContainerStyle={{
           backgroundColor: GlobalStyles.colors.backgroundColor,

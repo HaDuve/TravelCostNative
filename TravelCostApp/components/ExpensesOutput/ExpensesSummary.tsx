@@ -9,6 +9,7 @@ import { Pressable } from "react-native";
 import Toast from "react-native-toast-message";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
 import { getCurrencySymbol } from "../../util/currencySymbol";
+import * as Haptics from "expo-haptics";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
   const tripCtx = useContext(TripContext);
@@ -88,6 +89,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
   }
 
   const pressBudgetHandler = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (infinityString) {
       Toast.show({
         type: "error",

@@ -53,6 +53,7 @@ import { NetworkContext } from "../store/network-context";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { sendOfflineQueue } from "../util/offline-queue";
 import uniqBy from "lodash.uniqby";
+import * as Haptics from "expo-haptics";
 
 function RecentExpenses({ navigation }) {
   // console.log("rerender RecentExpenses - A");
@@ -245,6 +246,15 @@ function RecentExpenses({ navigation }) {
           value={PeriodValue}
           items={items}
           setOpen={setOpen}
+          onOpen={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
+          onClose={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
+          onSelectItem={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
           setValue={setPeriodValue}
           setItems={setItems}
           containerStyle={styles.dropdownContainer}

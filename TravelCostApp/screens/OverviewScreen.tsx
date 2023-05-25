@@ -19,6 +19,7 @@ import { NetworkContext } from "../store/network-context";
 import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { ExpenseData } from "../util/expense";
+import * as Haptics from "expo-haptics";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -87,6 +88,15 @@ const OverviewScreen = ({ navigation }) => {
             animationType: "slide",
           }}
           setOpen={setOpen}
+          onOpen={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
+          onClose={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
+          onSelectItem={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
           setValue={setPeriodValue}
           setItems={setItems}
           containerStyle={styles.dropdownContainer}

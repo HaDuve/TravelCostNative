@@ -1,5 +1,5 @@
 import Purchases from "react-native-purchases";
-import { PREMIUM } from "../../confAppConstants";
+import { FORCE_PREMIUM } from "../../confAppConstants";
 import Toast from "react-native-toast-message";
 /*
  The API key for your app from the RevenueCat dashboard: https://app.revenuecat.com
@@ -13,7 +13,7 @@ export const ENTITLEMENT_ID = "Premium";
 
 export async function isPremiumMember() {
   // dev const is set
-  if (PREMIUM) return true;
+  if (FORCE_PREMIUM) return true;
   try {
     // access latest customerInfo
     const customerInfo = await Purchases.getCustomerInfo();

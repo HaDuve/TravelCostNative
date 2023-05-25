@@ -583,7 +583,6 @@ export async function touchAllTravelers(tripid: string, flag: boolean) {
   const response = await fetchTripsTravellers(tripid);
   const axios_calls = [];
   for (const key in response) {
-    console.log("touching: ", response[key].userName);
     const new_axios_call = touchTraveler(tripid, key, flag);
     axios_calls.push(new_axios_call);
   }
@@ -606,7 +605,6 @@ export async function unTouchTraveler(tripid: string, uid: string) {
   for (const key in response) {
     console.log("unTouchTraveler ~ key:", key);
     if (uid !== response[key].uid) continue;
-    console.log("untouching: ", response[key].userName);
     axios_calls.push(touchTraveler(tripid, key, false));
   }
   try {
@@ -625,7 +623,6 @@ export async function touchMyTraveler(tripid: string, uid: string) {
   const axios_calls = [];
   for (const key in response) {
     if (uid !== response[key].uid) continue;
-    console.log("touching: ", response[key].userName);
     axios_calls.push(touchTraveler(tripid, key, true));
   }
   try {

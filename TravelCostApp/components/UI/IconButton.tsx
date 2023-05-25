@@ -8,6 +8,8 @@ const IconButton = ({
   size,
   color,
   onPress,
+  onPressIn,
+  onPressOut,
   onLongPress,
   buttonStyle = {},
   onPressStyle = {},
@@ -18,6 +20,8 @@ const IconButton = ({
     <Pressable
       onPress={onPress}
       onLongPress={onLongPress}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
       style={({ pressed }) => [
         styles.buttonContainer,
         buttonStyle,
@@ -37,6 +41,8 @@ IconButton.propTypes = {
   size: PropTypes.number.isRequired,
   color: PropTypes.string.isRequired,
   onPress: PropTypes.func.isRequired,
+  onPressIn: PropTypes.func,
+  onPressOut: PropTypes.func,
   onLongPress: PropTypes.func,
   buttonStyle: PropTypes.any,
   rotate: PropTypes.number,

@@ -9,11 +9,11 @@ export const DEBUG_POLLING_INTERVAL = 5000;
 // DEV consts
 export const DEV = false;
 // Premium consts
-export const PREMIUM = DEV;
+export const FORCE_PREMIUM = DEV;
 // Rating/Review consts
 export const DAYS_BEFORE_PROMPT = 2;
 // Maximum number of period range days/months/years
-export const MAX_PERIOD_RANGE = 30;
+export const MAX_PERIOD_RANGE = 33;
 export const MIN_PERIOD_RANGE = 3;
 // toast tweaks
 export const TOAST_LOCATION = "bottom";

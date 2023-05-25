@@ -59,7 +59,9 @@ const FinderScreen = () => {
   const dateIsRanged =
     startDate?.toString().slice(0, 10) !== endDate?.toString().slice(0, 10);
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 750);
+  // const [debouncedSearchQuery] = useDebounce(searchQuery, 500, {
+  //   leading: true,
+  // });
 
   const onChangeSearch = (query) => {
     setSearchQuery(query);
@@ -85,23 +87,23 @@ const FinderScreen = () => {
         DateTime.fromJSDate(expense.date).toString() <= endDate);
     const expenseDescriptionIsInSearchQuery = expense.description
       ?.toLowerCase()
-      .includes(debouncedSearchQuery?.toLowerCase());
+      .includes(searchQuery?.toLowerCase());
     const expenseCategoryIsInSearchQuery = expense.category
       ?.toLowerCase()
-      .includes(debouncedSearchQuery?.toLowerCase());
+      .includes(searchQuery?.toLowerCase());
     const expenseCurrencyIsInSearchQuery = expense.currency
       ?.toLowerCase()
-      .includes(debouncedSearchQuery?.toLowerCase());
+      .includes(searchQuery?.toLowerCase());
     const expenseCountryIsInSearchQuery = expense.country
       ?.toLowerCase()
-      .includes(debouncedSearchQuery?.toLowerCase());
+      .includes(searchQuery?.toLowerCase());
     const expenseTravellerIsInSearchQuery =
       // return true if searchQuery?.toLowerCase() is in expense.splitList
       expense.splitList?.some((split) => {
         const travellerName = split.userName;
         return travellerName
           ?.toLowerCase()
-          .includes(debouncedSearchQuery?.toLowerCase());
+          .includes(searchQuery?.toLowerCase());
       });
 
     return (

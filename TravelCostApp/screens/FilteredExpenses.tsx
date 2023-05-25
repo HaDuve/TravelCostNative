@@ -97,7 +97,6 @@ const styles = StyleSheet.create({
   titleContainer: {
     marginVertical: "4%",
     flexDirection: "row",
-    minHeight: 40,
   },
   shadow: {
     borderTopWidth: 1,

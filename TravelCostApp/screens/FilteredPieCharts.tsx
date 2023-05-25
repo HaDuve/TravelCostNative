@@ -30,6 +30,7 @@ import ExpenseCurrencies from "../components/ExpensesOutput/ExpenseStatistics/Ex
 import FlatButton from "../components/UI/FlatButton";
 import FilteredExpenses from "./FilteredExpenses";
 import { UserContext } from "../store/user-context";
+import BackButton from "../components/UI/BackButton";
 
 const FilteredPieCharts = ({ navigation, route }) => {
   const { expenses, dayString } = route.params;
@@ -107,6 +108,7 @@ const FilteredPieCharts = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <View style={styles.firstTitleContainer}>
+        <BackButton style={{ marginTop: -16 }}></BackButton>
         <Text style={styles.firstTitleText}>{dayString}</Text>
       </View>
 
@@ -169,6 +171,7 @@ const styles = StyleSheet.create({
   },
   firstTitleContainer: {
     marginVertical: "4%",
+    flexDirection: "row",
   },
   shadow: {
     borderTopWidth: 1,

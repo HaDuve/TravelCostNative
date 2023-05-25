@@ -237,16 +237,24 @@ export const sendOfflineQueue = async () => {
       tripid = item.expense.tripid;
 
       // console.log("sendOfflineQueue ~ item:", item);
-      // console.log("sendOfflineQueue ~ item.type:", item.type);
+      console.log("sendOfflineQueue ~ item.type:", item.type);
 
       try {
         if (item.type === "add") {
+          const oldId = item.expense.id;
           const id = await storeExpense(
             item.expense.tripid,
             item.expense.uid,
             item.expense.expenseData
           );
           item.expense.id = id;
+          // change item.expense.id for every other item.type == "update" or "delete" in the queue
+          for (let j = i + 1; j < offlineQueue.length - i; j++) {
+            const item2 = offlineQueue[j];
+            if (!item2 || item2.expense.id !== oldId || item2.type === "add")
+              continue;
+            item2.expense.id = id;
+          }
         } else if (item.type === "update") {
           await updateExpense(
             item.expense.tripid,

@@ -5,6 +5,7 @@ import { GlobalStyles } from "../../constants/styles";
 import IconButton from "./IconButton";
 import { useNavigation } from "@react-navigation/native";
 import PropTypes from "prop-types";
+import * as Haptics from "expo-haptics";
 
 const BackButton = ({ style }) => {
   const navigation = useNavigation();

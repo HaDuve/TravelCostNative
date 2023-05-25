@@ -10,7 +10,10 @@ const DatePickerContainer = ({
   startDate,
   endDate,
   dateIsRanged,
+  narrow,
 }) => {
+  console.log("narrow:", narrow);
+
   return (
     <View style={styles.dateContainer}>
       <View style={styles.dateIconContainer}>
@@ -22,7 +25,7 @@ const DatePickerContainer = ({
           buttonStyle={styles.buttonContainer}
         />
       </View>
-      <View style={{ flexDirection: "row" }}>
+      <View style={{ flexDirection: narrow ? "column" : "row" }}>
         <Text style={styles.advancedText}>
           {startDate && toShortFormat(new Date(startDate))}
         </Text>
@@ -48,6 +51,7 @@ DatePickerContainer.propTypes = {
   startDate: PropTypes.string,
   endDate: PropTypes.string,
   dateIsRanged: PropTypes.bool.isRequired,
+  narrow: PropTypes.bool,
 };
 
 const styles = StyleSheet.create({

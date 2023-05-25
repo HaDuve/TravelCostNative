@@ -226,6 +226,7 @@ const FinderScreen = () => {
               startDate,
               endDate,
               dateIsRanged,
+              narrow: true,
             })}
           </View>
           <Text style={styles.queryText}>

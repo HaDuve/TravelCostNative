@@ -10,10 +10,8 @@ const DatePickerContainer = ({
   startDate,
   endDate,
   dateIsRanged,
-  narrow,
+  narrow = false,
 }) => {
-  console.log("narrow:", narrow);
-
   return (
     <View style={styles.dateContainer}>
       <View style={styles.dateIconContainer}>

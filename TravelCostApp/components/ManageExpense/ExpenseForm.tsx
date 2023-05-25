@@ -695,29 +695,39 @@ const ExpenseForm = ({
     <View style={styles.isPaidContainer}>
       <SegmentedButtons
         value={isPaid}
-        onValueChange={setIsPaid}
+        onValueChange={(value: string) => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          setIsPaid(value);
+        }}
         buttons={[
           {
             label: "Not paid yet",
             value: isPaidString.notPaid,
             // checkedColor: GlobalStyles.colors.accent500,
-            style: {
-              backgroundColor:
-                isPaid == isPaidString.notPaid
-                  ? GlobalStyles.colors.gray500Accent
-                  : GlobalStyles.colors.gray300,
-            },
+            showSelectedCheck: true,
+            style: [
+              {
+                backgroundColor:
+                  isPaid == isPaidString.paid
+                    ? GlobalStyles.colors.gray500
+                    : GlobalStyles.colors.gray300,
+              },
+              isPaid == isPaidString.paid ? GlobalStyles.strongShadow : null,
+            ],
           },
           {
             label: "Paid back",
             value: isPaidString.paid,
             showSelectedCheck: true,
-            style: {
-              backgroundColor:
-                isPaid == isPaidString.paid
-                  ? GlobalStyles.colors.gray500Accent
-                  : GlobalStyles.colors.gray300,
-            },
+            style: [
+              {
+                backgroundColor:
+                  isPaid == isPaidString.notPaid
+                    ? GlobalStyles.colors.gray500
+                    : GlobalStyles.colors.gray300,
+              },
+              isPaid == isPaidString.notPaid ? GlobalStyles.strongShadow : null,
+            ],
             // checkedColor: GlobalStyles.colors.primary500,
           },
         ]}

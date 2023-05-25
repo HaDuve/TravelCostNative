@@ -135,9 +135,18 @@ const FinderScreen = () => {
   const numberOfResults = filteredExpenses?.length;
   const foundResults = filteredExpenses?.length > 0 ? true : false;
 
+  const [hasLoaded, setHasLoaded] = useState(false);
   // save all state variables into async storage
   useEffect(() => {
     const saveData = async () => {
+      console.log(
+        "saveData ~ saveData:",
+        checkedQuery,
+        checkedDate,
+        startDate,
+        endDate,
+        searchQuery
+      );
       try {
         await asyncStoreSetObject("FINDER_checkedQuery", checkedQuery);
         await asyncStoreSetObject("FINDER_checkedDate", checkedDate);
@@ -148,7 +157,7 @@ const FinderScreen = () => {
         console.log(err);
       }
     };
-    saveData();
+    if (hasLoaded) saveData();
   }, [checkedQuery, checkedDate, startDate, endDate, searchQuery]);
   // load all state variables from async storage
   useEffect(() => {
@@ -169,8 +178,10 @@ const FinderScreen = () => {
         if (startDate) setStartDate(startDate);
         if (endDate) setEndDate(endDate);
         if (searchQuery) setSearchQuery(searchQuery);
+        setHasLoaded(true);
       } catch (err) {
         console.log(err);
+        setHasLoaded(true);
       }
     };
     loadData();

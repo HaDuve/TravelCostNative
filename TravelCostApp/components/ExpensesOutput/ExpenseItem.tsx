@@ -33,6 +33,7 @@ import { UserContext } from "../../store/user-context";
 import ExpenseCountryFlag from "./ExpenseCountryFlag";
 import { SettingsContext } from "../../store/settings-context";
 import { useEffect } from "react";
+import * as Haptics from "expo-haptics";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -114,6 +115,7 @@ function ExpenseItem(props): JSX.Element {
   const toggle2 = settings.showWhoPaid;
 
   const memoizedCallback = useCallback(async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     navigation.navigate("ManageExpense", {
       expenseId: id,
       filtered: filtered,

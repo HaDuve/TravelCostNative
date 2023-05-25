@@ -107,6 +107,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
               });
             }}
             onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const filteredExpenses = expenseCtx.getSpecificDayExpenses(
                 new Date(item.day)
               );
@@ -192,6 +193,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
               });
             }}
             onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const filteredExpenses = expenseCtx.getSpecificWeekExpenses(
                 new Date(item.firstDay)
               );
@@ -267,6 +269,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
               });
             }}
             onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const filteredExpenses = expenseCtx.getSpecificMonthExpenses(
                 new Date(item.firstDay)
               );
@@ -345,6 +348,7 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
               });
             }}
             onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const filteredExpenses = expenseCtx.getSpecificYearExpenses(
                 new Date(item.firstDay)
               );

@@ -15,6 +15,7 @@ import FlatButton from "../components/UI/FlatButton";
 import { GlobalStyles } from "../constants/styles";
 import Toast from "react-native-toast-message";
 import PropTypes from "prop-types";
+import BackButton from "../components/UI/BackButton";
 
 const FilteredExpenses = ({
   route,
@@ -45,6 +46,9 @@ const FilteredExpenses = ({
       {!withArgs && (
         <>
           <View style={styles.titleContainer}>
+            <BackButton
+              style={{ marginTop: -14, marginBottom: 0, padding: 4 }}
+            ></BackButton>
             <Text style={styles.titleText}>{dayString}</Text>
           </View>
 
@@ -88,9 +92,12 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
     // center text
     textAlign: "center",
+    width: "80%",
   },
   titleContainer: {
     marginVertical: "4%",
+    flexDirection: "row",
+    minHeight: 40,
   },
   shadow: {
     borderTopWidth: 1,

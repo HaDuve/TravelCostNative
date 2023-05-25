@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import DatePickerModal from "../components/UI/DatePickerModal";
 import DatePickerContainer from "../components/UI/DatePickerContainer";
 import { getFormattedDate, toShortFormat } from "../util/date";
@@ -13,14 +13,20 @@ import { useNavigation } from "@react-navigation/native";
 import BackButton from "../components/UI/BackButton";
 import { Checkbox } from "react-native-paper";
 import { useDebounce } from "use-debounce";
+import {
+  asyncStoreGetItem,
+  asyncStoreGetObject,
+  asyncStoreSetItem,
+  asyncStoreSetObject,
+} from "../store/async-storage";
 
 const FinderScreen = () => {
   const navigation = useNavigation();
   const expenseCtx = useContext(ExpensesContext);
   const [checkedQuery, setCheckedQuery] = React.useState(false);
-  console.log("FinderScreen ~ checkedQuery:", checkedQuery);
+  // console.log("FinderScreen ~ checkedQuery:", checkedQuery);
   const [checkedDate, setCheckedDate] = React.useState(false);
-  console.log("FinderScreen ~ checkedDate:", checkedDate);
+  // console.log("FinderScreen ~ checkedDate:", checkedDate);
 
   const [showDatePickerRange, setShowDatePickerRange] = useState(false);
   const [startDate, setStartDate] = useState(getFormattedDate(DateTime.now()));
@@ -43,6 +49,7 @@ const FinderScreen = () => {
     const endDateFormat = getFormattedDate(endDate);
     setStartDate(startDateFormat);
     setEndDate(endDateFormat);
+    setCheckedDate(true);
   };
   const datepickerJSX = DatePickerModal({
     showDatePickerRange,
@@ -125,6 +132,48 @@ const FinderScreen = () => {
 
   const numberOfResults = filteredExpenses?.length;
   const foundResults = filteredExpenses?.length > 0 ? true : false;
+
+  // save all state variables into async storage
+  useEffect(() => {
+    const saveData = async () => {
+      try {
+        await asyncStoreSetObject("FINDER_checkedQuery", checkedQuery);
+        await asyncStoreSetObject("FINDER_checkedDate", checkedDate);
+        await asyncStoreSetItem("FINDER_startDate", startDate);
+        await asyncStoreSetItem("FINDER_endDate", endDate);
+        await asyncStoreSetItem("FINDER_searchQuery", searchQuery);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    saveData();
+  }, [checkedQuery, checkedDate, startDate, endDate, searchQuery]);
+  // load all state variables from async storage
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const checkedQuery = await asyncStoreGetObject("FINDER_checkedQuery");
+        console.log("loadData ~ checkedQuery:", checkedQuery);
+        const checkedDate = await asyncStoreGetObject("FINDER_checkedDate");
+        console.log("loadData ~ checkedDate:", checkedDate);
+        const startDate = await asyncStoreGetItem("FINDER_startDate");
+        console.log("loadData ~ startDate:", startDate);
+        const endDate = await asyncStoreGetItem("FINDER_endDate");
+        console.log("loadData ~ endDate:", endDate);
+        const searchQuery = await asyncStoreGetItem("FINDER_searchQuery");
+        console.log("loadData ~ searchQuery:", searchQuery);
+        if (checkedQuery) setCheckedQuery(checkedQuery);
+        if (checkedDate) setCheckedDate(checkedDate);
+        if (startDate) setStartDate(startDate);
+        if (endDate) setEndDate(endDate);
+        if (searchQuery) setSearchQuery(searchQuery);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    loadData();
+  }, []);
+
   return (
     <>
       {datepickerJSX}
@@ -133,47 +182,49 @@ const FinderScreen = () => {
           <BackButton></BackButton>
           <Text style={styles.titleText}>Finder</Text>
         </View>
-        <View style={styles.rowContainer}>
-          <View style={{ borderWidth: 1, borderRadius: 99, marginRight: 8 }}>
-            <Checkbox
-              status={checkedQuery ? "checked" : "unchecked"}
-              onPress={() => {
-                setCheckedQuery(!checkedQuery);
-              }}
+        <View style={styles.cardContainer}>
+          <View style={styles.rowContainer}>
+            <View style={{ borderWidth: 1, borderRadius: 99, marginRight: 8 }}>
+              <Checkbox
+                status={checkedQuery ? "checked" : "unchecked"}
+                onPress={() => {
+                  setCheckedQuery(!checkedQuery);
+                }}
+              />
+            </View>
+            <Searchbar
+              placeholder="Search"
+              onChangeText={onChangeSearch}
+              value={searchQuery}
+              style={{ width: "80%" }}
             />
           </View>
-          <Searchbar
-            placeholder="Search"
-            onChangeText={onChangeSearch}
-            value={searchQuery}
-            style={{ width: "80%" }}
-          />
-        </View>
-        <View style={styles.rowContainer}>
-          <View style={{ borderWidth: 1, borderRadius: 99, marginRight: -8 }}>
-            <Checkbox
-              status={checkedDate ? "checked" : "unchecked"}
-              onPress={() => {
-                setCheckedDate(!checkedDate);
-              }}
-            />
+          <View style={styles.rowContainer}>
+            <View style={{ borderWidth: 1, borderRadius: 99, marginRight: -8 }}>
+              <Checkbox
+                status={checkedDate ? "checked" : "unchecked"}
+                onPress={() => {
+                  setCheckedDate(!checkedDate);
+                }}
+              />
+            </View>
+            {DatePickerContainer({
+              openDatePickerRange,
+              startDate,
+              endDate,
+              dateIsRanged,
+            })}
           </View>
-          {DatePickerContainer({
-            openDatePickerRange,
-            startDate,
-            endDate,
-            dateIsRanged,
-          })}
+          <Text style={styles.queryText}>
+            Finding :{queryString} {dateString}
+          </Text>
+          <GradientButton
+            onPress={() => findPressedHandler()}
+            style={styles.findButton}
+          >
+            {foundResults ? `Show ${numberOfResults} Results` : "No Results"}
+          </GradientButton>
         </View>
-        <Text style={styles.queryText}>
-          Finding :{queryString} {dateString}
-        </Text>
-        <GradientButton
-          onPress={() => findPressedHandler()}
-          style={styles.findButton}
-        >
-          {foundResults ? `Show ${numberOfResults} Results` : "No Results"}
-        </GradientButton>
       </View>
     </>
   );
@@ -185,8 +236,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: "4%",
-    padding: "4%",
+    padding: "8%",
   },
+  cardContainer: {
+    flex: 1,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: "8%",
+    elevation: 5,
+    // add card style with shadow
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",

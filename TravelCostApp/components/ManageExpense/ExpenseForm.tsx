@@ -754,8 +754,12 @@ const ExpenseForm = ({
   console.log("startDate", startDate);
   console.log("endDate", endDate);
   console.log("date", inputs.date.value);
-  const dateIsRanged =
+  let dateIsRanged =
     startDate?.toString().slice(0, 10) !== endDate?.toString().slice(0, 10);
+  // if no startDate or no endDate, then date is not ranged
+  if (!startDate || !endDate) {
+    dateIsRanged = false;
+  }
   const datepickerJSX = DatePickerModal({
     showDatePickerRange,
     onCancelRange,

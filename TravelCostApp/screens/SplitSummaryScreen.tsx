@@ -24,6 +24,7 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { getCurrencySymbol } from "../util/currencySymbol";
 import uniqBy from "lodash.uniqby";
 import BackButton from "../components/UI/BackButton";
+import { formatExpenseWithCurrency, truncateString } from "../util/string";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
   const { tripid } = route.params;
@@ -52,7 +53,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
 
   // TODO: improve text and translate
   const titleTextOriginal = "Split Summary";
-  const titleTextSimplified = "Simplified Split Summary";
+  const titleTextSimplified = "Split Summary";
 
   const subTitleOriginal = "Overview of owed amounts between travellers";
   const subTitleSimplified = "Simplified Summary of Optimal Transactions";
@@ -60,11 +61,12 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const [titleText, setTitleText] = useState(titleTextOriginal);
   const [subTitleText, setSubTitleText] = useState(subTitleOriginal);
 
-  const totalPaidBackTextOriginal = "Money you get back: ";
+  const tripName = truncateString(tripCtx.tripName, 10);
+  const totalPaidBackTextOriginal = `Money you get back from ${tripName}: `;
   const [totalPaidBackText, setTotalPaidBackText] = useState(
     totalPaidBackTextOriginal
   );
-  const totalPayBackTextOriginal = "Money you still owe: ";
+  const totalPayBackTextOriginal = `Money you still owe from ${tripName}: `;
   const [totalPayBackText, setTotalPayBackText] = useState(
     totalPayBackTextOriginal
   );
@@ -99,15 +101,11 @@ const SplitSummaryScreen = ({ route, navigation }) => {
       setSplits(temp);
       setTotalPaidBackText(
         totalPaidBackTextOriginal +
-          userGetsBack.toFixed(2) +
-          " " +
-          currencySymbol
+          formatExpenseWithCurrency(userGetsBack, tripCurrency)
       );
       setTotalPayBackText(
         totalPayBackTextOriginal +
-          userHasToPay.toFixed(2) +
-          " " +
-          currencySymbol
+          formatExpenseWithCurrency(userHasToPay, tripCurrency)
       );
     } catch (error) {
       Toast.show({
@@ -247,7 +245,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
             // if yes, call settleSplitsHandler
             Alert.alert(
               "Settle Splits",
-              "Are you sure you want to settle all splits? This will pay back all open splits and cannot be undone!",
+              "Are you sure you want to settle all splits? Has everyone gotten their money back?",
               [
                 {
                   text: "Cancel",

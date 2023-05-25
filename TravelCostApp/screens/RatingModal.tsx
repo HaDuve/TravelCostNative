@@ -10,7 +10,8 @@ import FlatButton from "../components/UI/FlatButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //TODO: set the according URLS when we are live!
-export const APP_STORE_URL = "https://apps.apple.com/app/id1234567890";
+export const APP_STORE_URL =
+  "https://apps.apple.com/de/app/budget-for-nomads/id6446042796";
 export const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=com.example.app";
 

@@ -59,7 +59,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
 
   const tripName = truncateString(tripCtx.tripName, 25);
   const subTitleOriginal =
-    "Overview of owed amounts between travellers in the trip:  " + tripName;
+    "Overview of owed amounts in the trip:\n  " + tripName;
   const subTitleSimplified =
     "Simplified Summary of Optimal Transactions in the trip:  " + tripName;
 
@@ -174,7 +174,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   function renderSplitItem(itemData) {
     const item = itemData.item;
     return (
-      <View style={[styles.splitContainer, GlobalStyles.strongShadow]}>
+      <View style={[styles.splitContainer, GlobalStyles.wideStrongShadow]}>
         <Text style={styles.userText}>{item.userName} </Text>
         <Text style={styles.normalText}>owes </Text>
         <Text style={styles.amountText}>{item.amount} </Text>
@@ -283,8 +283,8 @@ SplitSummaryScreen.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 4,
-    paddingTop: 24,
+    // padding: 4,
+    // paddingTop: 24,
     alignItems: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
@@ -293,8 +293,9 @@ const styles = StyleSheet.create({
   },
   splitContainer: {
     flexDirection: "row",
-    padding: 8,
-    borderWidth: 1,
+    padding: 16,
+    paddingHorizontal: 24,
+    // borderWidth: 1,
     margin: 8,
     borderRadius: 12,
     // center
@@ -302,11 +303,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     // minHeight: "20%",
     minWidth: "80%",
-    backgroundColor: GlobalStyles.colors.backgroundColor,
+    backgroundColor: "white",
     borderColor: GlobalStyles.colors.gray500,
   },
   buttonContainer: {
-    marginTop: 24,
+    marginVertical: "10%",
     minWidth: 150,
     flexDirection: "row",
     alignItems: "center",
@@ -337,13 +338,13 @@ const styles = StyleSheet.create({
   headerContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 24,
+    marginVertical: "8%",
     //card
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 12,
-    borderWidth: 1,
+    backgroundColor: "white",
+    borderRadius: 20,
+    // borderWidth: 1,
     borderColor: GlobalStyles.colors.gray500,
-    padding: 12,
+    padding: "7%",
     margin: "5%",
   },
   titleContainer: {

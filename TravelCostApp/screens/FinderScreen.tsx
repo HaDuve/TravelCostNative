@@ -19,6 +19,7 @@ import {
   asyncStoreSetItem,
   asyncStoreSetObject,
 } from "../store/async-storage";
+import { GlobalStyles } from "../constants/styles";
 
 const FinderScreen = () => {
   const navigation = useNavigation();
@@ -193,9 +194,9 @@ const FinderScreen = () => {
       <View style={styles.container}>
         {/* <View style={styles.headerContainer}>
           <BackButton></BackButton>
-          <Text style={styles.titleText}>Finder</Text>
         </View> */}
-        <View style={styles.cardContainer}>
+        <View style={[styles.cardContainer, GlobalStyles.wideStrongShadow]}>
+          <Text style={styles.titleText}>Finder</Text>
           <View style={styles.rowContainer}>
             <View style={{ borderWidth: 1, borderRadius: 99, marginRight: 8 }}>
               <Checkbox
@@ -257,15 +258,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 20,
     padding: "8%",
-    elevation: 5,
-    // add card style with shadow
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    justifyContent: "space-around",
   },
 
   headerContainer: {
@@ -281,10 +274,12 @@ const styles = StyleSheet.create({
     minHeight: 90,
   },
   titleText: {
-    fontSize: 24,
-    marginLeft: "20%",
+    fontSize: 32,
     fontWeight: "bold",
-    marginBottom: "2%",
+    paddingBottom: 12,
+    color: GlobalStyles.colors.textColor,
+    // center
+    textAlign: "center",
   },
   queryText: {
     fontSize: 16,

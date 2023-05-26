@@ -241,10 +241,11 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       )}
 
       <View
-        style={[
-          styles.toggleButton,
-          // styles.toggleButton
-        ]}
+        style={
+          [
+            // styles.toggleButton
+          ]
+        }
       >
         <TourGuideZone
           text={i18n.t("walk4")}
@@ -254,7 +255,11 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
         >
           <Pressable
             onPress={toggleContent}
-            style={({ pressed }) => [pressed && styles.pressed]}
+            style={({ pressed }) => [
+              styles.toggleButton,
+              GlobalStyles.shadowGlowPrimary,
+              pressed && GlobalStyles.pressedWithShadow,
+            ]}
           >
             <ToggleButton></ToggleButton>
           </Pressable>
@@ -310,11 +315,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1,
-
-    elevation: 2,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
   },
 });

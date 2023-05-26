@@ -46,6 +46,7 @@ const AddExpenseButton = ({ navigation }) => {
       <Pressable
         style={({ pressed }) => [
           styles.addButton,
+          GlobalStyles.shadowGlowPrimary,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
         onPress={() => {
@@ -81,11 +82,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-
-    elevation: 2,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.35,
-    shadowRadius: 3.8,
   },
 });

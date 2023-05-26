@@ -293,7 +293,7 @@ const ProfileScreen = ({ navigation }) => {
           <View>
             <IconButton
               icon="person-add-outline"
-              buttonStyle={styles.addButton}
+              buttonStyle={[styles.addButton, GlobalStyles.shadowGlowPrimary]}
               size={42}
               color={"white"}
               onPress={() => {
@@ -388,11 +388,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     marginBottom: 4,
     borderRadius: 99,
-    elevation: 2,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.35,
-    shadowRadius: 3.8,
   },
   offlineWarningContainer: {
     // center content

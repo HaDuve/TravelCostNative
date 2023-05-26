@@ -30,7 +30,6 @@ const ExpensesSummary = ({ expenses, periodName }) => {
     expensesSum,
     userCurrency
   );
-  const currencySymbol = getCurrencySymbol(userCurrency);
   let budgetNumber = Number(tripCtx.dailyBudget);
   let infinityString = "";
   const expenseSumNum = Number(expensesSum);

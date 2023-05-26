@@ -74,7 +74,7 @@ export const UserContext = createContext({
   catIconNames: [],
   loadLastCurrencyCountryFromAsync: async () => {},
   setIsShowingGraph: (bool: boolean) => {},
-  isShowingGraph: false,
+  isShowingGraph: true,
 });
 
 function tripsReducer(state, action) {
@@ -104,7 +104,7 @@ function UserContextProvider({ children }) {
   const [isPremium, setIsPremium] = useState(false);
   // useState for cat iconName list
   const [catIconNames, setCatIconNames] = useState([]);
-  const [isShowingGraph, setIsShowingGraph] = useState(false);
+  const [isShowingGraph, setIsShowingGraph] = useState(true);
 
   async function loadLastCurrencyCountryFromAsync() {
     console.log(

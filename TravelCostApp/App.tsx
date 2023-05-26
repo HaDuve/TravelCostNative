@@ -343,7 +343,7 @@ function Home() {
         headerTintColor: GlobalStyles.colors.backgroundColor,
         tabBarStyle: {
           backgroundColor: GlobalStyles.colors.gray500,
-          paddingTop: 4,
+          // paddingTop: 4,
           borderTopWidth: 1,
           borderTopColor: GlobalStyles.colors.gray600,
         },
@@ -351,9 +351,10 @@ function Home() {
           // width: "40%",
           borderWidth: 0,
           padding: "0%",
-          margin: "0%",
-          marginBottom: "1%",
-          paddingBottom: "1%",
+          // margin: "0%",
+          marginTop: "-2%",
+          // marginBottom: "1%",
+          // paddingBottom: "1%",
         },
         tabBarLabelStyle: {
           fontSize: 10,
@@ -370,11 +371,12 @@ function Home() {
           name="RecentExpenses"
           component={RecentExpenses}
           options={{
+            tabBarShowLabel: false,
             // headerShown: false,
             // title: "Recent Expenses",
             tabBarLabel: i18n.t("expensesTab"),
             tabBarIcon: ({ color }) => (
-              <Ionicons name="ios-list" size={24} color={color} />
+              <Ionicons name="home-outline" size={24} color={color} />
             ),
           }}
         />
@@ -385,11 +387,16 @@ function Home() {
           component={OverviewScreen}
           options={{
             // headerShown: false,
+            tabBarShowLabel: false,
             title: i18n.t("overviewTab"),
             tabBarLabel: i18n.t("overviewTab"),
             tabBarIcon: ({ color }) => (
               <Ionicons
-                name="ios-stats-chart-outline"
+                name={
+                  userCtx.isShowingGraph
+                    ? "bar-chart-outline"
+                    : "pie-chart-outline"
+                }
                 size={24}
                 color={color}
               />
@@ -404,6 +411,8 @@ function Home() {
           options={{
             // headerShown: false,
             title: i18n.t("settingsTab"),
+            tabBarShowLabel: false,
+
             tabBarLabel: "Finder", //i18n.t("settingsTab"),
             tabBarIcon: ({ color }) => (
               // image of a money bag
@@ -424,6 +433,8 @@ function Home() {
           options={{
             // headerShown: false,
             title: i18n.t("settingsTab"),
+            tabBarShowLabel: false,
+
             tabBarLabel: "Financial", //i18n.t("settingsTab"),
             tabBarIcon: ({ color }) => (
               // image of a money bag
@@ -443,6 +454,8 @@ function Home() {
         options={{
           // headerShown: false,
           title: i18n.t("profileTab"),
+          tabBarShowLabel: false,
+
           tabBarLabel: i18n.t("myTrips"),
           tabBarIcon: ({ color }) => (
             <Ionicons name="globe-outline" size={24} color={color} />

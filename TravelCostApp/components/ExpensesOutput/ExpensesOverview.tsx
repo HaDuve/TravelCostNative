@@ -51,6 +51,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
     //   return;
     // }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    userCtx.setIsShowingGraph(!isGraphNotPie);
     setToggleGraph(!isGraphNotPie);
   }
 

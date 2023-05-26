@@ -86,12 +86,26 @@ export const GlobalStyles = {
     shadowOpacity: 0.3,
     shadowRadius: 1.3,
   },
+  wideStrongShadow: {
+    elevation: 4,
+    shadowColor: "#002A22",
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 3.3,
+  },
   shadowPrimary: {
     elevation: 2,
     borderColor: "#538076",
     shadowColor: "#538076",
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.75,
+  },
+  shadowGlowPrimary: {
+    elevation: 4,
+    shadowColor: "#005645",
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 0.45,
+    shadowRadius: 3.8,
   },
   pressedWithShadow: {
     elevation: 0,

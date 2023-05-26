@@ -13,7 +13,7 @@ const toastConfig = {
       {...props}
       style={[
         { borderLeftColor: GlobalStyles.colors.primary500 },
-        GlobalStyles.strongShadow,
+        GlobalStyles.wideStrongShadow,
       ]}
       contentContainerStyle={{ paddingHorizontal: 15 }}
       text1Style={{
@@ -24,6 +24,7 @@ const toastConfig = {
         fontSize: 15,
         fontWeight: "400",
       }}
+      onPress={() => Toast.hide()}
     />
   ),
   /*
@@ -33,7 +34,10 @@ const toastConfig = {
   error: (props) => (
     <ErrorToast
       {...props}
-      style={{ borderLeftColor: GlobalStyles.colors.error500 }}
+      style={[
+        { borderLeftColor: GlobalStyles.colors.error500 },
+        GlobalStyles.wideStrongShadow,
+      ]}
       contentContainerStyle={{ paddingHorizontal: 15 }}
       text1Style={{
         fontSize: 17,
@@ -43,6 +47,7 @@ const toastConfig = {
         fontSize: 15,
         fontWeight: "400",
       }}
+      onPress={() => Toast.hide()}
     />
   ),
   /*

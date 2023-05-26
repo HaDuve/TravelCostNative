@@ -11,7 +11,10 @@ const toastConfig = {
   success: (props) => (
     <BaseToast
       {...props}
-      style={{ borderLeftColor: GlobalStyles.colors.primary500 }}
+      style={[
+        { borderLeftColor: GlobalStyles.colors.primary500 },
+        GlobalStyles.strongShadow,
+      ]}
       contentContainerStyle={{ paddingHorizontal: 15 }}
       text1Style={{
         fontSize: 17,

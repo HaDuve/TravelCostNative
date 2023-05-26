@@ -1,7 +1,7 @@
 import { Alert, Dimensions } from "react-native";
 
 import ExpenseItem from "./ExpenseItem";
-import React, { useContext } from "react";
+import React, { memo, useContext, useEffect, useMemo } from "react";
 import { View } from "react-native";
 
 import Swipeable from "react-native-gesture-handler/Swipeable";
@@ -26,6 +26,8 @@ import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { useNavigation } from "@react-navigation/native";
+import { useState } from "react";
+import uniqBy from "lodash.uniqby";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -173,9 +175,37 @@ function ExpensesList({
   showSumForTravellerName,
   isFiltered,
 }) {
+  const uniqueData = expenses;
+  console.log("uniqueData:", uniqueData.length);
+  useEffect(() => {
+    setPage(1);
+    setData(uniqueData.slice(0, 10));
+  }, [uniqueData]);
+
+  //add pagination
+  const [page, setPage] = useState(0);
+  console.log("page:", page);
+  const [data, setData] = useState(uniqueData.slice(0, page * 10));
+  console.log("data:", data.length);
+
+  function addExpensesToData(page) {
+    const newExpenses = [];
+    for (let i = page * 10; i < (page + 1) * 10; i++) {
+      if (uniqueData[i]) {
+        newExpenses.push(uniqueData[i]);
+      }
+    }
+    setData([...data, ...newExpenses]);
+  }
+
+  function onScrollHandler() {
+    console.log("onScrollHandler ~ page before:", page);
+    setPage(page + 1);
+    addExpensesToData(page);
+  }
+
   // console.log("rerender ExpensesList - C");
   navigation = useNavigation();
-  const uniqueData = expenses;
   // const flatListRef = useRef(null);
   const netCtx = useContext(NetworkContext);
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
@@ -217,18 +247,20 @@ function ExpensesList({
         // ref={flatListRef}
         scrollEnabled={false}
         itemLayoutAnimation={layoutAnim}
-        data={uniqueData}
+        data={data}
+        onEndReached={onScrollHandler}
+        onEndReachedThreshold={0}
         renderItem={renderExpenseItem.bind(this, isOnline)}
         ListFooterComponent={
-          <View style={{ height: Dimensions.get("window").height }} />
+          <View style={{ height: Dimensions.get("screen").height / 1.8 }} />
         }
         keyExtractor={(item: Expense) => item.id}
         refreshControl={refreshControl}
-        // getItemLayout={(data, index) => ({
-        //   length: 55,
-        //   offset: 55 * index,
-        //   index,
-        // })}
+        getItemLayout={(data, index) => ({
+          length: 55,
+          offset: 55 * index,
+          index,
+        })}
       />
     </Animated.View>
   );

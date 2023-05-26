@@ -1,5 +1,10 @@
 Change log Travel Expense App
 
+1.1.4
+- new layout (moved Finder and Split Summary into Tab Bar)
+- improved UI in multiple places (prettier)
+- improved performance of long expense lists (pagination)
+
 1.1.3b
 - improved customer screen
 - improved split summary

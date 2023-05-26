@@ -191,10 +191,10 @@ const FinderScreen = () => {
     <>
       {datepickerJSX}
       <View style={styles.container}>
-        <View style={styles.headerContainer}>
+        {/* <View style={styles.headerContainer}>
           <BackButton></BackButton>
           <Text style={styles.titleText}>Finder</Text>
-        </View>
+        </View> */}
         <View style={styles.cardContainer}>
           <View style={styles.rowContainer}>
             <View style={{ borderWidth: 1, borderRadius: 99, marginRight: 8 }}>
@@ -249,7 +249,7 @@ export default FinderScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: "4%",
+    // margin: "4%",
     padding: "8%",
   },
   cardContainer: {

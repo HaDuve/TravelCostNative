@@ -141,9 +141,9 @@ function TripItem({
       </View>
     );
   }
-  if (isFetching) {
-    return <LoadingOverlay />;
-  }
+  // if (isFetching) {
+  //   return <LoadingOverlay />;
+  // }
   if (!tripid) return <Text>no id</Text>;
 
   return (

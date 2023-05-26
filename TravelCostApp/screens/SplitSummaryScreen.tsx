@@ -27,8 +27,10 @@ import BackButton from "../components/UI/BackButton";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
-  const { tripid } = route.params;
+  // let { tripid } = route.params;
   const tripCtx = useContext(TripContext);
+  // if (!tripid)
+  const tripid = tripCtx.tripid;
   const tripCurrency = tripCtx.tripCurrency;
   const currencySymbol = getCurrencySymbol(tripCurrency);
   const userCtx = useContext(UserContext);
@@ -55,18 +57,20 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const titleTextOriginal = "Split Summary";
   const titleTextSimplified = "Split Summary";
 
-  const subTitleOriginal = "Overview of owed amounts between travellers";
-  const subTitleSimplified = "Simplified Summary of Optimal Transactions";
+  const tripName = truncateString(tripCtx.tripName, 25);
+  const subTitleOriginal =
+    "Overview of owed amounts between travellers in the trip:  " + tripName;
+  const subTitleSimplified =
+    "Simplified Summary of Optimal Transactions in the trip:  " + tripName;
 
   const [titleText, setTitleText] = useState(titleTextOriginal);
   const [subTitleText, setSubTitleText] = useState(subTitleOriginal);
 
-  const tripName = truncateString(tripCtx.tripName, 10);
-  const totalPaidBackTextOriginal = `Money you get back from ${tripName}: `;
+  const totalPaidBackTextOriginal = `Your money back:  `;
   const [totalPaidBackText, setTotalPaidBackText] = useState(
     totalPaidBackTextOriginal
   );
-  const totalPayBackTextOriginal = `Money you still owe from ${tripName}: `;
+  const totalPayBackTextOriginal = `You still owe: `;
   const [totalPayBackText, setTotalPayBackText] = useState(
     totalPayBackTextOriginal
   );
@@ -190,14 +194,14 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   }
 
   return (
-    <BackgroundGradient style={styles.container}>
+    <View style={[styles.container]}>
       <Animated.View
         entering={FadeIn}
         exiting={FadeOut}
-        style={styles.headerContainer}
+        style={[styles.headerContainer, GlobalStyles.wideStrongShadow]}
       >
         <View style={styles.titleContainer}>
-          <BackButton></BackButton>
+          {/* <BackButton></BackButton> */}
           <Text style={styles.titleText}> {titleText}</Text>
         </View>
         <View style={styles.subTitleContainer}>
@@ -211,26 +215,28 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         </View>
       </Animated.View>
       <FlatList
-        style={{ maxHeight: Dimensions.get("screen").height / 1.5 }}
+        // style={{ maxHeight: Dimensions.get("screen").height / 1.5 }}
         data={splits}
-        ListFooterComponent={<View style={{ height: 100 }}></View>}
+        ListFooterComponent={<View style={{ height: 10 }}></View>}
         renderItem={renderSplitItem}
       />
       <View style={styles.buttonContainer}>
-        <FlatButton
-          onPress={() => {
-            if (showSimplify) {
-              navigation.goBack();
-            } else {
-              getOpenSplits();
-              setShowSimplify(true);
-              setTitleText(titleTextOriginal);
-              setSubTitleText(subTitleOriginal);
-            }
-          }}
-        >
-          Back
-        </FlatButton>
+        {!showSimplify && (
+          <FlatButton
+            onPress={() => {
+              if (showSimplify) {
+                navigation.goBack();
+              } else {
+                getOpenSplits();
+                setShowSimplify(true);
+                setTitleText(titleTextOriginal);
+                setSubTitleText(subTitleOriginal);
+              }
+            }}
+          >
+            Back
+          </FlatButton>
+        )}
         {showSimplify && (
           <GradientButton style={styles.button} onPress={handleSimpflifySplits}>
             Simplify Splits
@@ -238,7 +244,8 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         )}
         <GradientButton
           style={styles.button}
-          colors={GlobalStyles.gradientErrorButton}
+          colors={GlobalStyles.gradientColors}
+          darkText
           buttonStyle={{ backgroundColor: GlobalStyles.colors.errorGrayed }}
           onPress={async () => {
             // alert ask user if he really wants to settle all Splits
@@ -262,7 +269,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
           Settle Splits
         </GradientButton>
       </View>
-    </BackgroundGradient>
+    </View>
   );
 };
 
@@ -279,6 +286,7 @@ const styles = StyleSheet.create({
     padding: 4,
     paddingTop: 24,
     alignItems: "center",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   button: {
     marginLeft: 24,
@@ -292,10 +300,10 @@ const styles = StyleSheet.create({
     // center
     alignItems: "center",
     justifyContent: "center",
-    minHeight: "20%",
+    // minHeight: "20%",
     minWidth: "80%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderColor: GlobalStyles.colors.error300,
+    borderColor: GlobalStyles.colors.gray500,
   },
   buttonContainer: {
     marginTop: 24,
@@ -309,17 +317,34 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     color: GlobalStyles.colors.textColor,
+    // center
+    alignItems: "center",
+    alignContent: "center",
   },
-  normalText: { fontSize: 16, color: GlobalStyles.colors.textColor },
+  normalText: {
+    fontSize: 16,
+    color: GlobalStyles.colors.textColor, // center
+    alignItems: "center",
+    alignContent: "center",
+  },
   amountText: {
     fontSize: 18,
     fontWeight: "700",
     color: GlobalStyles.colors.errorGrayed,
+    // center
+    alignItems: "center",
   },
   headerContainer: {
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 24,
+    //card
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: GlobalStyles.colors.gray500,
+    padding: 12,
+    margin: "5%",
   },
   titleContainer: {
     alignItems: "center",
@@ -333,14 +358,22 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     paddingBottom: 12,
     color: GlobalStyles.colors.textColor,
+    // center
+    alignItems: "center",
+    alignContent: "center",
   },
   subTitleContainer: {
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
     margin: "2%",
+    // center
+    alignContent: "flex-start",
   },
   subTitleText: {
     fontSize: 14,
     color: GlobalStyles.colors.textColor,
+    // center
+    alignItems: "flex-start",
+    alignContent: "flex-start",
   },
 });

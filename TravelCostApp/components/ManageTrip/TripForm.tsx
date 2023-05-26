@@ -424,7 +424,23 @@ const TripForm = ({ navigation, route }) => {
       {modalJSX}
       <ScrollView style={{ flex: 1, overflow: "visible" }}>
         <View style={styles.form}>
-          <BackButton></BackButton>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginHorizontal: 8,
+              marginBottom: -8,
+            }}
+          >
+            <BackButton style={{ marginTop: -8 }}></BackButton>
+            <FlatButton
+              onPress={() => {
+                navigation.navigate("Join");
+              }}
+            >
+              {i18n.t("joinTripLabel")}
+            </FlatButton>
+          </View>
           <View
             style={[
               styles.card,

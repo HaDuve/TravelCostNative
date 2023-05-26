@@ -324,8 +324,13 @@ function Navigation() {
 
 function Home() {
   const userCtx = useContext(UserContext);
+  const expensesCtx = useContext(ExpensesContext);
+  const tripCtx = useContext(TripContext);
+  const hasExpenses = expensesCtx.expenses.length > 0;
   const netCtx = useContext(NetworkContext);
   const FreshlyCreated = userCtx.freshlyCreated;
+  const multiTraveller = tripCtx.travellers.length > 1 ?? false;
+
   const FirstScreen = FreshlyCreated ? "Profile" : "RecentExpenses";
   return (
     <BottomTabs.Navigator
@@ -374,7 +379,7 @@ function Home() {
           }}
         />
       )}
-      {!FreshlyCreated && (
+      {!FreshlyCreated && hasExpenses && (
         <BottomTabs.Screen
           name="Overview"
           component={OverviewScreen}
@@ -392,10 +397,30 @@ function Home() {
           }}
         />
       )}
-      {/* {!FreshlyCreated && (
+      {!FreshlyCreated && hasExpenses && (
+        <BottomTabs.Screen
+          name="Finder"
+          component={FinderScreen}
+          options={{
+            // headerShown: false,
+            title: i18n.t("settingsTab"),
+            tabBarLabel: "Finder", //i18n.t("settingsTab"),
+            tabBarIcon: ({ color }) => (
+              // image of a money bag
+              <Ionicons name="search-outline" size={24} color={color} />
+              // probably needs a new build for this icon to work
+              // <Image
+              //   source={require("./assets/money-bag.png")}
+              //   style={{ width: 60, height: 60 }}
+              // />
+            ),
+          }}
+        />
+      )}
+      {!FreshlyCreated && hasExpenses && multiTraveller && (
         <BottomTabs.Screen
           name="Financial"
-          component={FinancialScreen}
+          component={SplitSummaryScreen}
           options={{
             // headerShown: false,
             title: i18n.t("settingsTab"),
@@ -411,7 +436,7 @@ function Home() {
             ),
           }}
         />
-      )} */}
+      )}
       <BottomTabs.Screen
         name="Profile"
         component={ProfileScreen}

@@ -67,48 +67,59 @@ const ProfileScreen = ({ navigation }) => {
     3000,
     false
   );
+  async function loadTrips() {
+    if (tripsList.length > 0) return;
+    if (await refreshHandler()) return;
+    if (await loadFromAsyncStore()) return;
+  }
+
+  useEffect(() => {
+    loadTrips();
+  }, []);
 
   useFocusEffect(() => {
-    if (tripsList.length > 0) return;
-    loadFromAsyncStore();
-    if (tripsList.length > 0) return;
-    refreshHandler();
+    loadTrips();
   });
 
   async function loadFromAsyncStore() {
-    const tripid = await asyncStoreGetItem("PROFILE_tripid");
-    console.log("loadFromAsyncStore ~ tripid:", tripid);
-    const tripName = await asyncStoreGetItem("PROFILE_tripName");
-    console.log("loadFromAsyncStore ~ tripName:", tripName);
-    const totalBudget = await asyncStoreGetItem("PROFILE_totalBudget");
-    console.log("loadFromAsyncStore ~ totalBudget:", totalBudget);
-    const dailyBudget = await asyncStoreGetItem("PROFILE_dailyBudget");
-    console.log("loadFromAsyncStore ~ dailyBudget:", dailyBudget);
-    const tripCurrency = await asyncStoreGetItem("PROFILE_tripCurrency");
-    console.log("loadFromAsyncStore ~ tripCurrency:", tripCurrency);
-    const travellers = await asyncStoreGetObject("PROFILE_travellers");
-    console.log("loadFromAsyncStore ~ travellers:", travellers);
-    if (
-      !tripid ||
-      !tripName ||
-      !totalBudget ||
-      !dailyBudget ||
-      !tripCurrency ||
-      !travellers
-    ) {
-      console.log("not loaded!!!!!!!!!!!");
-      return;
+    try {
+      const tripid = await asyncStoreGetItem("PROFILE_tripid");
+      console.log("loadFromAsyncStore ~ tripid:", tripid);
+      const tripName = await asyncStoreGetItem("PROFILE_tripName");
+      console.log("loadFromAsyncStore ~ tripName:", tripName);
+      const totalBudget = await asyncStoreGetItem("PROFILE_totalBudget");
+      console.log("loadFromAsyncStore ~ totalBudget:", totalBudget);
+      const dailyBudget = await asyncStoreGetItem("PROFILE_dailyBudget");
+      console.log("loadFromAsyncStore ~ dailyBudget:", dailyBudget);
+      const tripCurrency = await asyncStoreGetItem("PROFILE_tripCurrency");
+      console.log("loadFromAsyncStore ~ tripCurrency:", tripCurrency);
+      const travellers = await asyncStoreGetObject("PROFILE_travellers");
+      console.log("loadFromAsyncStore ~ travellers:", travellers);
+      if (
+        !tripid ||
+        !tripName ||
+        !totalBudget ||
+        !dailyBudget ||
+        !tripCurrency ||
+        !travellers
+      ) {
+        console.log("not loaded!!!!!!!!!!!");
+        return;
+      }
+      allTripsList = allTripsList.filter((trip) => trip !== tripid);
+      allTripsList.push({
+        tripid: tripid,
+        tripName: tripName,
+        totalBudget: totalBudget,
+        dailyBudget: dailyBudget,
+        tripCurrency: tripCurrency,
+        travellers: travellers,
+      });
+      setTripsList(allTripsList.reverse());
+      return true;
+    } catch (error) {
+      return false;
     }
-    allTripsList = allTripsList.filter((trip) => trip !== tripid);
-    allTripsList.push({
-      tripid: tripid,
-      tripName: tripName,
-      totalBudget: totalBudget,
-      dailyBudget: dailyBudget,
-      tripCurrency: tripCurrency,
-      travellers: travellers,
-    });
-    setTripsList(allTripsList.reverse());
   }
 
   async function saveTripFromContext() {
@@ -137,12 +148,12 @@ const ProfileScreen = ({ navigation }) => {
       !netCtx.isConnected ||
       !netCtx.strongConnection
     )
-      return;
+      return false;
     allTripsList = [];
     const tripHistory = await fetchTripHistory(uid);
     if (!tripHistory.length) {
       console.log("no tripHistory fetched");
-      return;
+      return false;
     }
     allTripsList = [...tripHistory];
     await tripCtx.fetchAndSetCurrentTrip(tripCtx.tripid);
@@ -150,6 +161,7 @@ const ProfileScreen = ({ navigation }) => {
     saveTripFromContext();
     // console.log("allTripsList length: ", allTripsList.length);
     setTripsList(allTripsList.reverse());
+    return true;
   }
   function addTripFromContext() {
     console.log("addTripFromContext ~ addTripFromContext", tripCtx.tripName);

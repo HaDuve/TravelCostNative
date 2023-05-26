@@ -307,19 +307,19 @@ const SettingsScreen = ({ navigation }) => {
       {/* <GradientButton style={styles.settingsButton} onPress={logoutHandler}>
         {i18n.t("logoutLabel")}
       </GradientButton> */}
-      <GradientButton style={styles.settingsButton} onPress={joinInviteHandler}>
+      {/* <GradientButton style={styles.settingsButton} onPress={joinInviteHandler}>
         {i18n.t("joinTripLabel")}
-      </GradientButton>
-      <GradientButton
+      </GradientButton> */}
+      {/* <GradientButton
         style={styles.settingsButton}
         onPress={async () => {
           navigation.navigate("Finder");
         }}
       >
         {"Finder"}
-      </GradientButton>
+      </GradientButton> */}
 
-      {multiTraveller && (
+      {/* {multiTraveller && (
         <GradientButton
           onPress={async () => {
             const isPremium = await userCtx.checkPremium();
@@ -333,7 +333,7 @@ const SettingsScreen = ({ navigation }) => {
         >
           {i18n.t("simplifySplitsLabel")}
         </GradientButton>
-      )}
+      )} */}
       <GradientButton
         style={styles.settingsButton}
         onPress={async () => {

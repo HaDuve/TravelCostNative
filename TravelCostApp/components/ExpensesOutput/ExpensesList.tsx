@@ -176,7 +176,6 @@ function ExpensesList({
   isFiltered,
 }) {
   const uniqueData = expenses;
-  console.log("uniqueData:", uniqueData.length);
   useEffect(() => {
     setPage(1);
     setData(uniqueData.slice(0, 10));
@@ -184,9 +183,7 @@ function ExpensesList({
 
   //add pagination
   const [page, setPage] = useState(0);
-  console.log("page:", page);
   const [data, setData] = useState(uniqueData.slice(0, page * 10));
-  console.log("data:", data.length);
 
   function addExpensesToData(page) {
     const newExpenses = [];

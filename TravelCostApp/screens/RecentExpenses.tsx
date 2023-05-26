@@ -81,14 +81,14 @@ function RecentExpenses({ navigation }) {
   const [dateTimeString, setDateTimeString] = useState("");
 
   const test_getExpenses = dataResponseTime(getExpenses);
-  const test_offlineLoad = dataResponseTime(
-    expensesCtx.loadExpensesFromStorage
-  );
-  const test_fetchTravelerIsTouched = dataResponseTime(fetchTravelerIsTouched);
-  const test_fetchAndSetExpenses = dataResponseTime(fetchAndSetExpenses);
+  // const test_offlineLoad = dataResponseTime(
+  //   expensesCtx.loadExpensesFromStorage
+  // );
+  // const test_fetchTravelerIsTouched = dataResponseTime(fetchTravelerIsTouched);
+  // const test_fetchAndSetExpenses = dataResponseTime(fetchAndSetExpenses);
 
-  const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = test_getExpenses.bind(this, true);
+  // const [refreshing, setRefreshing] = useState(false);
+  // const onRefresh = test_getExpenses.bind(this, true);
 
   // strong connection state
   const [offlineString, setOfflineString] = useState("");
@@ -171,7 +171,8 @@ function RecentExpenses({ navigation }) {
         return;
       }
       // setIsFetching(true);
-      await test_offlineLoad(expensesCtx, setRefreshing, setIsFetching);
+      // await test_offlineLoad(expensesCtx, setRefreshing, setIsFetching);
+      await expensesCtx.loadExpensesFromStorage();
       // setIsFetching(false);
       return;
     }

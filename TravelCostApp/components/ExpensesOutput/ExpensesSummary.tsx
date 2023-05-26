@@ -8,7 +8,6 @@ import PropTypes from "prop-types";
 import { Pressable } from "react-native";
 import Toast from "react-native-toast-message";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
-import { getCurrencySymbol } from "../../util/currencySymbol";
 import * as Haptics from "expo-haptics";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
@@ -17,7 +16,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
 
   const expensesSum = expenses.reduce((sum, expense) => {
     if (isNaN(Number(expense.calcAmount))) return sum;
-    return Number(sum + Number(expense.calcAmount));
+    return sum + Number(expense.calcAmount);
   }, 0);
   // console.log("expensesSum ~ expensesSum", expensesSum);
   if (isNaN(Number(expensesSum))) {

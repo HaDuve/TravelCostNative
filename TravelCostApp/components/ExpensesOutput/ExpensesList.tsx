@@ -25,7 +25,7 @@ import { ExpenseData, Expense } from "../../util/expense";
 import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useScrollToTop } from "@react-navigation/native";
 import { useState } from "react";
 import uniqBy from "lodash.uniqby";
 const i18n = new I18n({ en, de, fr });
@@ -203,6 +203,9 @@ function ExpensesList({
 
   // console.log("rerender ExpensesList - C");
   navigation = useNavigation();
+
+  const ref = React.useRef(null);
+  useScrollToTop(ref);
   // const flatListRef = useRef(null);
   const netCtx = useContext(NetworkContext);
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
@@ -245,8 +248,9 @@ function ExpensesList({
         scrollEnabled={false}
         itemLayoutAnimation={layoutAnim}
         data={data}
+        ref={ref}
         onEndReached={onScrollHandler}
-        onEndReachedThreshold={0}
+        onEndReachedThreshold={0.5}
         renderItem={renderExpenseItem.bind(this, isOnline)}
         ListFooterComponent={
           <View style={{ height: Dimensions.get("screen").height / 1.8 }} />

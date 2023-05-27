@@ -531,7 +531,7 @@ function Root() {
               console.log("delayedOnlineSetup ~ storedUid", storedUid);
               console.log("delayedOnlineSetup ~ tripid", tripid);
               const tripData = await tripCtx.fetchAndSetCurrentTrip(tripid);
-              await onlineSetup(tripData, checkUser);
+              await onlineSetup(tripData, checkUser, tripid, storedUid);
               console.log("delayedOnlineSetup ~ DONE");
               setOnlineSetupDone(true);
             }
@@ -551,7 +551,7 @@ function Root() {
     }
   };
 
-  async function onlineSetup(tripData, checkUser) {
+  async function onlineSetup(tripData, checkUser, storedTripId, storedUid) {
     const userData: UserData = checkUser;
     const tripid = userData.currentTrip;
     // console.log("onRootMount ~ userData", userData);
@@ -561,6 +561,10 @@ function Root() {
     console.log("onlineSetup ~ tripid before setItem:", tripid);
     await secureStoreSetItem("currentTripId", tripid);
     await userCtx.loadCatListFromAsyncInCtx(tripid);
+    if (expensesCtx.expenses?.length === 0) {
+      console.log("Touching my traveler");
+      await touchMyTraveler(storedTripId, storedUid);
+    }
   }
 
   async function setupOfflineMount(
@@ -691,11 +695,8 @@ function Root() {
 
         // setup context
         authCtx.setUserID(storedUid);
-        await onlineSetup(tripData, checkUser);
+        await onlineSetup(tripData, checkUser, storedTripId, storedUid);
         await authCtx.authenticate(storedToken);
-        if (expensesCtx.expenses?.length === 0) {
-          await touchMyTraveler(storedTripId, storedUid);
-        }
         const needsTour = await loadTourConfig();
         userCtx.setNeedsTour(needsTour);
         console.log("Root end reached");

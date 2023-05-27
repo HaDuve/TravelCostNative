@@ -798,99 +798,100 @@ const ExpenseForm = ({
   };
 
   return (
-    <Animated.View layout={Layout}>
+    <>
       {datepickerJSX}
-      <Animated.View layout={Layout} style={styles.container}>
-        <View
-          style={{
-            // horizontal
-            flexDirection: "row",
-            // space between
-            justifyContent: "space-between",
-            // align items in the center
-            alignItems: "center",
-            // padding
-            paddingHorizontal: "2%",
-            // margin
-            marginBottom: "-2%",
-          }}
-        >
-          {backButtonJsx}
-          {confirmButtonJSX}
-        </View>
-        <Animated.View layout={Layout} style={styles.form}>
-          <View style={styles.inputsRow}>
-            <Input
-              inputStyle={[styles.amountInput, GlobalStyles.strongShadow]}
-              label={
-                i18n.t("priceIn") + getCurrencySymbol(inputs.currency.value)
-              }
-              textInputConfig={{
-                keyboardType: "decimal-pad",
-                onChangeText: inputChangedHandler.bind(this, "amount"),
-                value: inputs.amount.value,
-              }}
-              invalid={!inputs.amount.isValid}
-              autoFocus={!isEditing ?? false}
-            />
-            <IconButton
-              buttonStyle={[styles.iconButton, GlobalStyles.strongShadow]}
-              icon={icon}
-              color={GlobalStyles.colors.primary500}
-              size={48}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                navigation.navigate("CategoryPick", {
-                  editedExpenseId: editedExpenseId,
-                  tempValues: tempValues,
-                });
-              }}
-            />
+      <Animated.View layout={Layout}>
+        <Animated.View layout={Layout} style={styles.container}>
+          <View
+            style={{
+              // horizontal
+              flexDirection: "row",
+              // space between
+              justifyContent: "space-between",
+              // align items in the center
+              alignItems: "center",
+              // padding
+              paddingHorizontal: "2%",
+              // margin
+              marginBottom: "-2%",
+            }}
+          >
+            {backButtonJsx}
+            {confirmButtonJSX}
           </View>
-          {/* always show more options when editing */}
-          {!alwaysShowAdvancedSetting && (
-            <Pressable onPress={toggleAdvancedHandler}>
-              <Animated.View style={styles.advancedRow}>
-                <Ionicons
-                  name={
-                    hideAdvanced
-                      ? "arrow-down-circle-outline"
-                      : "arrow-forward-circle-outline"
-                  }
-                  size={28}
-                  color={GlobalStyles.colors.primary500}
-                />
-                {hideAdvanced && (
-                  <Text style={styles.advancedText}>
-                    {i18n.t("showMoreOptions")}
-                  </Text>
-                )}
-                {!hideAdvanced && (
-                  <Text style={styles.advancedText}>
-                    {i18n.t("showLessOptions")}
-                  </Text>
-                )}
-              </Animated.View>
-            </Pressable>
-          )}
-          {/* toggleable content */}
-          {!hideAdvanced && (
-            <Animated.View
-              entering={FadeInUp.duration(1000)
-                .easing(Easing.out(Easing.exp))
-                .delay(100)}
-              exiting={FadeOutUp.duration(50)}
-            >
-              <Autocomplete
-                value={inputs.description.value}
-                containerStyle={styles.descriptionContainer}
-                onChange={inputChangedHandler.bind(this, "description")}
-                label={i18n.t("descriptionLabel")}
-                data={suggestionData}
-                style={styles.autoCompleteStyle}
-                menuStyle={styles.autoCompleteMenuStyle}
-              ></Autocomplete>
-              {/* <Input
+          <Animated.View layout={Layout} style={styles.form}>
+            <View style={styles.inputsRow}>
+              <Input
+                inputStyle={[styles.amountInput, GlobalStyles.strongShadow]}
+                label={
+                  i18n.t("priceIn") + getCurrencySymbol(inputs.currency.value)
+                }
+                textInputConfig={{
+                  keyboardType: "decimal-pad",
+                  onChangeText: inputChangedHandler.bind(this, "amount"),
+                  value: inputs.amount.value,
+                }}
+                invalid={!inputs.amount.isValid}
+                autoFocus={!isEditing ?? false}
+              />
+              <IconButton
+                buttonStyle={[styles.iconButton, GlobalStyles.strongShadow]}
+                icon={icon}
+                color={GlobalStyles.colors.primary500}
+                size={48}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  navigation.navigate("CategoryPick", {
+                    editedExpenseId: editedExpenseId,
+                    tempValues: tempValues,
+                  });
+                }}
+              />
+            </View>
+            {/* always show more options when editing */}
+            {!alwaysShowAdvancedSetting && (
+              <Pressable onPress={toggleAdvancedHandler}>
+                <Animated.View style={styles.advancedRow}>
+                  <Ionicons
+                    name={
+                      hideAdvanced
+                        ? "arrow-down-circle-outline"
+                        : "arrow-forward-circle-outline"
+                    }
+                    size={28}
+                    color={GlobalStyles.colors.primary500}
+                  />
+                  {hideAdvanced && (
+                    <Text style={styles.advancedText}>
+                      {i18n.t("showMoreOptions")}
+                    </Text>
+                  )}
+                  {!hideAdvanced && (
+                    <Text style={styles.advancedText}>
+                      {i18n.t("showLessOptions")}
+                    </Text>
+                  )}
+                </Animated.View>
+              </Pressable>
+            )}
+            {/* toggleable content */}
+            {!hideAdvanced && (
+              <Animated.View
+                entering={FadeInUp.duration(1000)
+                  .easing(Easing.out(Easing.exp))
+                  .delay(100)}
+                exiting={FadeOutUp.duration(50)}
+              >
+                <Autocomplete
+                  value={inputs.description.value}
+                  containerStyle={styles.descriptionContainer}
+                  onChange={inputChangedHandler.bind(this, "description")}
+                  label={i18n.t("descriptionLabel")}
+                  data={suggestionData}
+                  style={styles.autoCompleteStyle}
+                  menuStyle={styles.autoCompleteMenuStyle}
+                ></Autocomplete>
+                {/* <Input
                 label={i18n.t("descriptionLabel")}
                 style={{ marginTop: "6%" }}
                 placeholder={pickedCat}
@@ -901,148 +902,205 @@ const ExpenseForm = ({
                 }}
                 invalid={!inputs.description.isValid}
               /> */}
-              <View style={styles.currencyContainer}>
-                {/* <Text style={styles.currencyLabel}>
+                <View style={styles.currencyContainer}>
+                  {/* <Text style={styles.currencyLabel}>
                   {i18n.t("currencyLabel")}
                 </Text> */}
-                <CurrencyPicker
-                  countryValue={countryValue}
-                  setCountryValue={setCountryValue}
-                  onChangeValue={updateCurrency}
-                  placeholder={currencyPlaceholder}
-                ></CurrencyPicker>
-              </View>
-              <View style={[styles.inputsRowSecond]}>
-                <Input
-                  label={i18n.t("countryLabel")}
-                  style={{ minWidth: "60%" }}
-                  placeholder={
-                    userCtx.lastCountry ?? i18n.t("countryPlaceholder")
-                  }
-                  textInputConfig={{
-                    onChangeText: inputChangedHandler.bind(this, "country"),
-                    value: inputs.country.value,
+                  <CurrencyPicker
+                    countryValue={countryValue}
+                    setCountryValue={setCountryValue}
+                    onChangeValue={updateCurrency}
+                    placeholder={currencyPlaceholder}
+                  ></CurrencyPicker>
+                </View>
+                <View style={[styles.inputsRowSecond]}>
+                  <Input
+                    label={i18n.t("countryLabel")}
+                    style={{ minWidth: "60%" }}
+                    placeholder={
+                      userCtx.lastCountry ?? i18n.t("countryPlaceholder")
+                    }
+                    textInputConfig={{
+                      onChangeText: inputChangedHandler.bind(this, "country"),
+                      value: inputs.country.value,
+                    }}
+                    invalid={!inputs.country.isValid}
+                  />
+                  <ExpenseCountryFlag
+                    countryName={inputs.country.value}
+                    containerStyle={styles.countryFlagContainer}
+                    style={styles.countryFlag}
+                  ></ExpenseCountryFlag>
+                </View>
+
+                <Pressable
+                  onPress={() => {
+                    if (!dateIsRanged) return;
+                    if (duplOrSplit === 1) setDuplOrSplit(2);
+                    else setDuplOrSplit(1);
                   }}
-                  invalid={!inputs.country.isValid}
-                />
-                <ExpenseCountryFlag
-                  countryName={inputs.country.value}
-                  containerStyle={styles.countryFlagContainer}
-                  style={styles.countryFlag}
-                ></ExpenseCountryFlag>
-              </View>
+                  style={styles.dateLabel}
+                >
+                  <Text style={styles.dateLabelText}>
+                    {i18n.t("dateLabel")}
+                  </Text>
+                  <Text style={styles.dateLabelDuplSplitText}>
+                    {duplOrSplitString}
+                  </Text>
+                </Pressable>
+                {DatePickerContainer({
+                  openDatePickerRange,
+                  startDate,
+                  endDate,
+                  dateIsRanged,
+                })}
 
-              <Pressable
-                onPress={() => {
-                  if (!dateIsRanged) return;
-                  if (duplOrSplit === 1) setDuplOrSplit(2);
-                  else setDuplOrSplit(1);
-                }}
-                style={styles.dateLabel}
-              >
-                <Text style={styles.dateLabelText}>{i18n.t("dateLabel")}</Text>
-                <Text style={styles.dateLabelDuplSplitText}>
-                  {duplOrSplitString}
-                </Text>
-              </Pressable>
-              {DatePickerContainer({
-                openDatePickerRange,
-                startDate,
-                endDate,
-                dateIsRanged,
-              })}
-
-              <View style={styles.inputsRowSecond}>
-                {/* !IsSoloTraveller && */}
-                {showWhoPaid && !IsSoloTraveller && (
-                  <View style={styles.whoPaidContainer}>
-                    <Text
-                      style={[
-                        styles.currencyLabel,
-                        !inputs.whoPaid.isValid && styles.invalidLabel,
+                <View style={styles.inputsRowSecond}>
+                  {/* !IsSoloTraveller && */}
+                  {showWhoPaid && !IsSoloTraveller && (
+                    <View style={styles.whoPaidContainer}>
+                      <Text
+                        style={[
+                          styles.currencyLabel,
+                          !inputs.whoPaid.isValid && styles.invalidLabel,
+                        ]}
+                      >
+                        {i18n.t("whoPaid")}
+                      </Text>
+                      {loadingTravellers && (
+                        <ActivityIndicator
+                          size={"large"}
+                          color={GlobalStyles.colors.backgroundColor}
+                        ></ActivityIndicator>
+                      )}
+                      {!loadingTravellers && (
+                        <DropDownPicker
+                          open={open}
+                          value={whoPaid}
+                          items={items}
+                          setOpen={setOpen}
+                          setValue={setWhoPaid}
+                          setItems={setItems}
+                          onClose={setOpenSplitTypes}
+                          onOpen={() => {
+                            Haptics.impactAsync(
+                              Haptics.ImpactFeedbackStyle.Light
+                            );
+                          }}
+                          onSelectItem={() => {
+                            Haptics.impactAsync(
+                              Haptics.ImpactFeedbackStyle.Light
+                            );
+                          }}
+                          listMode="MODAL"
+                          modalProps={{
+                            animationType: "slide",
+                            presentationStyle: "pageSheet",
+                          }}
+                          searchable={false}
+                          modalTitle={i18n.t("whoPaid")}
+                          modalContentContainerStyle={{
+                            backgroundColor:
+                              GlobalStyles.colors.backgroundColor,
+                            marginTop: "2%",
+                            elevation: 2,
+                            shadowColor: GlobalStyles.colors.textColor,
+                            shadowOffset: { width: 1, height: 1 },
+                            shadowOpacity: 0.35,
+                            shadowRadius: 4,
+                          }}
+                          placeholder={userCtx.userName}
+                          containerStyle={styles.dropdownContainer}
+                          style={
+                            !inputs.whoPaid.isValid
+                              ? [styles.dropdown, styles.invalidInput]
+                              : styles.dropdown
+                          }
+                          textStyle={styles.dropdownTextStyle}
+                        />
+                      )}
+                    </View>
+                  )}
+                  {whoPaidValid && (
+                    <DropDownPicker
+                      open={openSplitTypes}
+                      value={splitType}
+                      items={splitItems}
+                      setOpen={setOpenSplitTypes}
+                      setValue={setSplitType}
+                      setItems={setSplitTypeItems}
+                      onClose={openTravellerMultiPicker}
+                      onOpen={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }}
+                      onSelectItem={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }}
+                      listMode="MODAL"
+                      modalProps={{
+                        animationType: "slide",
+                        presentationStyle: "pageSheet",
+                      }}
+                      searchable={false}
+                      modalTitle={i18n.t("howShared")}
+                      modalContentContainerStyle={{
+                        backgroundColor: GlobalStyles.colors.backgroundColor,
+                      }}
+                      placeholder="Shared expense?"
+                      containerStyle={[
+                        styles.dropdownContainer,
+                        hidePickers && styles.hidePickersStyle,
                       ]}
-                    >
-                      {i18n.t("whoPaid")}
-                    </Text>
-                    {loadingTravellers && (
-                      <ActivityIndicator
-                        size={"large"}
-                        color={GlobalStyles.colors.backgroundColor}
-                      ></ActivityIndicator>
-                    )}
-                    {!loadingTravellers && (
-                      <DropDownPicker
-                        open={open}
-                        value={whoPaid}
-                        items={items}
-                        setOpen={setOpen}
-                        setValue={setWhoPaid}
-                        setItems={setItems}
-                        onClose={setOpenSplitTypes}
-                        onOpen={() => {
-                          Haptics.impactAsync(
-                            Haptics.ImpactFeedbackStyle.Light
-                          );
-                        }}
-                        onSelectItem={() => {
-                          Haptics.impactAsync(
-                            Haptics.ImpactFeedbackStyle.Light
-                          );
-                        }}
-                        listMode="MODAL"
-                        modalProps={{
-                          animationType: "slide",
-                          presentationStyle: "pageSheet",
-                        }}
-                        searchable={false}
-                        modalTitle={i18n.t("whoPaid")}
-                        modalContentContainerStyle={{
-                          backgroundColor: GlobalStyles.colors.backgroundColor,
-                          marginTop: "2%",
-                          elevation: 2,
-                          shadowColor: GlobalStyles.colors.textColor,
-                          shadowOffset: { width: 1, height: 1 },
-                          shadowOpacity: 0.35,
-                          shadowRadius: 4,
-                        }}
-                        placeholder={userCtx.userName}
-                        containerStyle={styles.dropdownContainer}
-                        style={
-                          !inputs.whoPaid.isValid
-                            ? [styles.dropdown, styles.invalidInput]
-                            : styles.dropdown
-                        }
-                        textStyle={styles.dropdownTextStyle}
-                      />
-                    )}
-                  </View>
-                )}
-                {whoPaidValid && (
+                      style={[
+                        styles.dropdown,
+                        hidePickers && styles.hidePickersStyle,
+                      ]}
+                      textStyle={styles.dropdownTextStyle}
+                    />
+                  )}
+                </View>
+                {!loadingTravellers && !splitTypeSelf && (
                   <DropDownPicker
-                    open={openSplitTypes}
-                    value={splitType}
-                    items={splitItems}
-                    setOpen={setOpenSplitTypes}
-                    setValue={setSplitType}
-                    setItems={setSplitTypeItems}
-                    onClose={openTravellerMultiPicker}
+                    open={openEQUAL}
+                    value={splitTravellersList}
+                    items={splitItemsEQUAL}
+                    setOpen={setOpenEQUAL}
                     onOpen={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }}
                     onSelectItem={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }}
+                    setValue={setListEQUAL}
+                    setItems={setSplitItemsEQUAL}
+                    onClose={splitHandler}
                     listMode="MODAL"
+                    multiple={true}
+                    CloseIconComponent={({ style }) => (
+                      <Text
+                        style={{
+                          color: GlobalStyles.colors.textColor,
+                          fontSize: 24,
+                          fontWeight: "bold",
+                          padding: 4,
+                        }}
+                      >
+                        {i18n.t("confirm2")}
+                      </Text>
+                    )}
+                    min={1}
+                    max={99}
+                    labelProps={{ style: { padding: 40 } }}
                     modalProps={{
                       animationType: "slide",
                       presentationStyle: "pageSheet",
                     }}
                     searchable={false}
-                    modalTitle={i18n.t("howShared")}
+                    modalTitle={i18n.t("whoShared")}
                     modalContentContainerStyle={{
                       backgroundColor: GlobalStyles.colors.backgroundColor,
                     }}
-                    placeholder="Shared expense?"
+                    placeholder="Shared between ... ?"
                     containerStyle={[
                       styles.dropdownContainer,
                       hidePickers && styles.hidePickersStyle,
@@ -1054,217 +1112,167 @@ const ExpenseForm = ({
                     textStyle={styles.dropdownTextStyle}
                   />
                 )}
-              </View>
-              {!loadingTravellers && !splitTypeSelf && (
-                <DropDownPicker
-                  open={openEQUAL}
-                  value={splitTravellersList}
-                  items={splitItemsEQUAL}
-                  setOpen={setOpenEQUAL}
-                  onOpen={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  }}
-                  onSelectItem={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  }}
-                  setValue={setListEQUAL}
-                  setItems={setSplitItemsEQUAL}
-                  onClose={splitHandler}
-                  listMode="MODAL"
-                  multiple={true}
-                  CloseIconComponent={({ style }) => (
-                    <Text
-                      style={{
-                        color: GlobalStyles.colors.textColor,
-                        fontSize: 24,
-                        fontWeight: "bold",
-                        padding: 4,
-                      }}
-                    >
-                      {i18n.t("confirm2")}
-                    </Text>
-                  )}
-                  min={1}
-                  max={99}
-                  labelProps={{ style: { padding: 40 } }}
-                  modalProps={{
-                    animationType: "slide",
-                    presentationStyle: "pageSheet",
-                  }}
-                  searchable={false}
-                  modalTitle={i18n.t("whoShared")}
-                  modalContentContainerStyle={{
-                    backgroundColor: GlobalStyles.colors.backgroundColor,
-                  }}
-                  placeholder="Shared between ... ?"
-                  containerStyle={[
-                    styles.dropdownContainer,
-                    hidePickers && styles.hidePickersStyle,
-                  ]}
+                <View
                   style={[
-                    styles.dropdown,
-                    hidePickers && styles.hidePickersStyle,
+                    styles.advancedRowSplit,
+                    { marginTop: 12, marginLeft: 12 },
                   ]}
-                  textStyle={styles.dropdownTextStyle}
-                />
-              )}
-              <View
-                style={[
-                  styles.advancedRowSplit,
-                  { marginTop: 12, marginLeft: 12 },
-                ]}
-              >
-                {!splitTypeSelf &&
-                  whoPaidValid &&
-                  !IsSoloTraveller &&
-                  splitListHasNonZeroEntries && (
-                    <Text
-                      style={[
-                        styles.currencyLabel,
-                        { marginTop: 20, marginBottom: 20 },
-                      ]}
-                    >
-                      {i18n.t("whoShared")}
-                    </Text>
-                  )}
-              </View>
-
-              {!splitTypeSelf && (
-                <KeyboardAvoidingView
-                  behavior="position"
-                  contentContainerStyle={{
-                    flex: 1,
-                    justifyContent: "flex-start",
-                    alignItems: "flex-start",
-                    overflow: "visible",
-                    backgroundColor: GlobalStyles.colors.gray500,
-                  }}
                 >
-                  <FlatList
-                    // numColumns={2}
-                    data={splitList}
-                    horizontal={true}
+                  {!splitTypeSelf &&
+                    whoPaidValid &&
+                    !IsSoloTraveller &&
+                    splitListHasNonZeroEntries && (
+                      <Text
+                        style={[
+                          styles.currencyLabel,
+                          { marginTop: 20, marginBottom: 20 },
+                        ]}
+                      >
+                        {i18n.t("whoShared")}
+                      </Text>
+                    )}
+                </View>
+
+                {!splitTypeSelf && (
+                  <KeyboardAvoidingView
+                    behavior="position"
                     contentContainerStyle={{
                       flex: 1,
-                      minWidth: "110%",
                       justifyContent: "flex-start",
                       alignItems: "flex-start",
                       overflow: "visible",
+                      backgroundColor: GlobalStyles.colors.gray500,
                     }}
-                    ListHeaderComponent={recalcJSX}
-                    ListFooterComponent={<View style={{ width: 100 }}></View>}
-                    renderItem={(itemData) => {
-                      const splitValue = itemData.item.amount.toString();
-                      return (
-                        <View
-                          style={[
-                            GlobalStyles.strongShadow,
-                            {
-                              // flex: 1,
-                              minWidth: 100,
-                              // maxWidth: 100,
-                              marginTop: 14,
-                              marginBottom: 8,
-                              borderWidth: 1,
-                              borderRadius: 12,
-                              padding: 8,
-                              margin: 8,
-                              backgroundColor:
-                                GlobalStyles.colors.backgroundColor,
-                              borderColor: GlobalStyles.colors.gray700,
-                              //centering content
-                              justifyContent: "center",
-                              alignItems: "center",
-                              overflow: "visible",
-                            },
-                          ]}
-                        >
-                          <Text
-                            style={{
-                              color: splitListValid
-                                ? GlobalStyles.colors.textColor
-                                : GlobalStyles.colors.error500,
-                              textAlign: "left",
-                              marginLeft: 8,
-                              paddingTop: 2,
-                              marginBottom: -16,
-                            }}
-                          >
-                            {truncateString(itemData.item.userName, 10)}
-                          </Text>
-                          {/* Horizontal container  */}
+                  >
+                    <FlatList
+                      // numColumns={2}
+                      data={splitList}
+                      horizontal={true}
+                      contentContainerStyle={{
+                        flex: 1,
+                        minWidth: "110%",
+                        justifyContent: "flex-start",
+                        alignItems: "flex-start",
+                        overflow: "visible",
+                      }}
+                      ListHeaderComponent={recalcJSX}
+                      ListFooterComponent={<View style={{ width: 100 }}></View>}
+                      renderItem={(itemData) => {
+                        const splitValue = itemData.item.amount.toString();
+                        return (
                           <View
-                            style={{
-                              flexDirection: "row",
-                              justifyContent: "flex-start",
-                              alignItems: "flex-end",
-                              overflow: "visible",
-                              // borderWidth: 1,
-                              marginLeft: -16,
-                              marginRight: -8,
-                            }}
+                            style={[
+                              GlobalStyles.strongShadow,
+                              {
+                                // flex: 1,
+                                minWidth: 100,
+                                // maxWidth: 100,
+                                marginTop: 14,
+                                marginBottom: 8,
+                                borderWidth: 1,
+                                borderRadius: 12,
+                                padding: 8,
+                                margin: 8,
+                                backgroundColor:
+                                  GlobalStyles.colors.backgroundColor,
+                                borderColor: GlobalStyles.colors.gray700,
+                                //centering content
+                                justifyContent: "center",
+                                alignItems: "center",
+                                overflow: "visible",
+                              },
+                            ]}
                           >
-                            <Input
-                              inputStyle={[
-                                splitTypeEqual && {
-                                  color: GlobalStyles.colors.textColor,
-                                },
-                                { paddingBottom: 4 },
-                                {
-                                  backgroundColor:
-                                    GlobalStyles.colors.backgroundColor,
-                                },
-                              ]}
-                              textInputConfig={{
-                                onFocus: () => {
-                                  if (splitType === "EQUAL") Keyboard.dismiss();
-                                },
-                                keyboardType: "decimal-pad",
-                                onChangeText: inputSplitListHandler.bind(
-                                  this,
-                                  itemData.index,
-                                  itemData.item
-                                ),
-                                value: splitValue ? splitValue : "",
-                              }}
-                            ></Input>
                             <Text
                               style={{
-                                paddingBottom: 11,
-                                marginLeft: -18,
-                                marginRight: 8,
+                                color: splitListValid
+                                  ? GlobalStyles.colors.textColor
+                                  : GlobalStyles.colors.error500,
+                                textAlign: "left",
+                                marginLeft: 8,
+                                paddingTop: 2,
+                                marginBottom: -16,
                               }}
                             >
-                              {getCurrencySymbol(inputs.currency.value)}
+                              {truncateString(itemData.item.userName, 10)}
                             </Text>
+                            {/* Horizontal container  */}
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                justifyContent: "flex-start",
+                                alignItems: "flex-end",
+                                overflow: "visible",
+                                // borderWidth: 1,
+                                marginLeft: -16,
+                                marginRight: -8,
+                              }}
+                            >
+                              <Input
+                                inputStyle={[
+                                  splitTypeEqual && {
+                                    color: GlobalStyles.colors.textColor,
+                                  },
+                                  { paddingBottom: 4 },
+                                  {
+                                    backgroundColor:
+                                      GlobalStyles.colors.backgroundColor,
+                                  },
+                                ]}
+                                textInputConfig={{
+                                  onFocus: () => {
+                                    if (splitType === "EQUAL")
+                                      Keyboard.dismiss();
+                                  },
+                                  keyboardType: "decimal-pad",
+                                  onChangeText: inputSplitListHandler.bind(
+                                    this,
+                                    itemData.index,
+                                    itemData.item
+                                  ),
+                                  value: splitValue ? splitValue : "",
+                                }}
+                              ></Input>
+                              <Text
+                                style={{
+                                  paddingBottom: 11,
+                                  marginLeft: -18,
+                                  marginRight: 8,
+                                }}
+                              >
+                                {getCurrencySymbol(inputs.currency.value)}
+                              </Text>
+                            </View>
                           </View>
-                        </View>
-                      );
-                    }}
-                  ></FlatList>
-                </KeyboardAvoidingView>
-              )}
-              {!splitTypeSelf && splitListHasNonZeroEntries && isPaidJSX}
-            </Animated.View>
-          )}
-          {formIsInvalid && !hideAdvanced && (
-            <Text style={styles.errorText}>{i18n.t("invalidInput")} </Text>
-          )}
-        </Animated.View>
-        <View
-          style={[styles.spacerViewAdvanced, hideAdvanced && styles.spacerView]}
-        ></View>
-        <View style={styles.buttonContainer}>
-          <FlatButton onPress={onCancel}>{i18n.t("cancel")}</FlatButton>
-          <GradientButton
-            style={styles.button}
-            onPress={async () => await advancedSubmitHandler()}
-          >
-            {submitButtonLabel}
-          </GradientButton>
-        </View>
-        {/* Commented out ChatGPT Button */}
-        {/* <View style={[styles.buttonContainer, { marginBottom: "20%" }]}>
+                        );
+                      }}
+                    ></FlatList>
+                  </KeyboardAvoidingView>
+                )}
+                {!splitTypeSelf && splitListHasNonZeroEntries && isPaidJSX}
+              </Animated.View>
+            )}
+            {formIsInvalid && !hideAdvanced && (
+              <Text style={styles.errorText}>{i18n.t("invalidInput")} </Text>
+            )}
+          </Animated.View>
+          <View
+            style={[
+              styles.spacerViewAdvanced,
+              hideAdvanced && styles.spacerView,
+            ]}
+          ></View>
+          <View style={styles.buttonContainer}>
+            <FlatButton onPress={onCancel}>{i18n.t("cancel")}</FlatButton>
+            <GradientButton
+              style={styles.button}
+              onPress={async () => await advancedSubmitHandler()}
+            >
+              {submitButtonLabel}
+            </GradientButton>
+          </View>
+          {/* Commented out ChatGPT Button */}
+          {/* <View style={[styles.buttonContainer, { marginBottom: "20%" }]}>
           <GradientButton
             style={[styles.button, { marginTop: 28, minWidth: "80%" }]}
             colors={GlobalStyles.gradientColorsButton}
@@ -1275,8 +1283,9 @@ const ExpenseForm = ({
             {!isEditing && "Ask ChatGPxT: How much should I pay?"}
           </GradientButton>
         </View> */}
+        </Animated.View>
       </Animated.View>
-    </Animated.View>
+    </>
   );
 };
 

@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import ExpenseCategories from "./ExpenseStatistics/ExpenseCategories";
 import ExpenseGraph from "./ExpenseStatistics/ExpenseGraph";
 import { GlobalStyles } from "../../constants/styles";
@@ -39,6 +39,8 @@ import { useInterval } from "../Hooks/useInterval";
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   // console.log("rerender ExpensesOverview - 1");
   const periodRangeNumber = useRef(7);
+  // rerender on periodRangeNumber change
+
   const [isGraphNotPie, setToggleGraph] = useState(true);
   // enum =>  0 = categories, 1 = traveller, 2 = country, 3 = currency
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
@@ -68,18 +70,23 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       break;
   }
 
-  const [autoIncrement, setAutoIncrement] = useState(false);
+  const [autoIncrement, setAutoIncrement] = useState<NodeJS.Timer>(null);
 
   const startAutoIncrement = async () => {
     // TODO: add a state variable and a useInterval, if the state is set to true, call rightNavButtonHandler
     console.log("startAutoIncrement ~ startAutoIncrement:");
-    setAutoIncrement(true);
+    // setAutoIncrement(true);
+    const interval = setInterval(() => {
+      console.log("startAutoIncrement ~ interval tick");
+      rightNavButtonHandler();
+    }, 600);
+    setAutoIncrement(interval);
     return;
   };
-
   const stopAutoIncrement = async () => {
     console.log("stopAutoIncrement ~ stopAutoIncrement");
-    setAutoIncrement(false);
+    // setAutoIncrement(false);
+    clearInterval(autoIncrement);
     return;
   };
 

@@ -35,6 +35,7 @@ import { useEffect } from "react";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { NetworkContext } from "../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
+import * as Haptics from "expo-haptics";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -51,7 +52,7 @@ const ManageExpense = ({ route, navigation }) => {
     netCtx.isConnected && netCtx.strongConnection
   );
   console.log("ManageExpense ~ isOnline:", isOnline);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(-1);
   const [progressAt, setProgressAt] = useState(0);
   const [progressMax, setProgressMax] = useState(0);
 
@@ -298,10 +299,10 @@ const ManageExpense = ({ route, navigation }) => {
           await creatingNormalData(expenseData);
         }
       }
+      await asyncStoreSetObject("expenses", expenseCtx.expenses);
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setIsSubmitting(false);
       navigation.popToTop();
-      await asyncStoreSetObject("expenses", expenseCtx.expenses);
-      console.log("expenses context length", expenseCtx.expenses.length);
       if (isOnline) await touchAllTravelers(tripid, true);
     } catch (error) {
       // setError("Could not save data - please try again later!" + error);
@@ -311,8 +312,9 @@ const ManageExpense = ({ route, navigation }) => {
         text2: "Please try again later!",
         type: "error",
       });
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setIsSubmitting(false);
-      navigation.navigate("RecentExpenses");
+      navigation.popToTop();
     }
   }
 

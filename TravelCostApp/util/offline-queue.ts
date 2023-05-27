@@ -223,7 +223,10 @@ export const sendOfflineQueue = async () => {
     // console.log("speed:", speed.toFixed(2), "Mbps");
 
     if (!isOnline || !isOnline.isConnected || !isFastEnough || forceOffline) {
-      console.log("sendOfflineQueue ~ still offline!");
+      console.log(
+        "sendOfflineQueue ~ still offline! Length:",
+        offlineQueue?.length
+      );
       return;
     }
 

@@ -87,8 +87,8 @@ function RecentExpenses({ navigation }) {
   // const test_fetchTravelerIsTouched = dataResponseTime(fetchTravelerIsTouched);
   // const test_fetchAndSetExpenses = dataResponseTime(fetchAndSetExpenses);
 
-  // const [refreshing, setRefreshing] = useState(false);
-  // const onRefresh = test_getExpenses.bind(this, true);
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = getExpenses.bind(this, true);
 
   // strong connection state
   const [offlineString, setOfflineString] = useState("");
@@ -105,12 +105,10 @@ function RecentExpenses({ navigation }) {
 
   useEffect(() => {
     const asyncLoading = async () => {
+      await getExpenses();
       await expensesCtx.loadExpensesFromStorage();
     };
     asyncLoading();
-    if (netCtx.isConnected && netCtx.strongConnection) {
-      test_getExpenses();
-    }
   }, [netCtx.isConnected, netCtx.strongConnection]);
 
   useEffect(() => {
@@ -170,16 +168,17 @@ function RecentExpenses({ navigation }) {
         await sendOfflineQueue();
         return;
       }
-      // setIsFetching(true);
+      setIsFetching(true);
       // await test_offlineLoad(expensesCtx, setRefreshing, setIsFetching);
       await expensesCtx.loadExpensesFromStorage();
-      // setIsFetching(false);
+      setIsFetching(false);
       return;
     }
     // checking isTouched or firstLoad
     const isTouched = await fetchTravelerIsTouched(tripid, uid);
-    // console.log("RecentExpenses ~ isTouched:", isTouched);
+    console.log("RecentExpenses ~ isTouched:", isTouched);
     if (!isTouched) {
+      // await short delay for feel
       setRefreshing(false);
       setIsFetching(false);
       return;
@@ -272,18 +271,18 @@ function RecentExpenses({ navigation }) {
         expenses={recentExpenses}
         periodValue={PeriodValue}
         fallbackText={i18n.t("fallbackTextExpenses")}
-        // refreshControl={
-        //   <RefreshControl
-        //     refreshing={refreshing}
-        //     onRefresh={
-        //       isOnline
-        //         ? onRefresh
-        //         : () => {
-        //             return;
-        //           }
-        //     }
-        //   />
-        // }
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing || isFetching}
+            onRefresh={
+              netCtx.isConnected && netCtx.strongConnection
+                ? onRefresh
+                : () => {
+                    return;
+                  }
+            }
+          />
+        }
       />
 
       <AddExpenseButton navigation={navigation} />

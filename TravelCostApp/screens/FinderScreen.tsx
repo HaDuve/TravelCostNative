@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import DatePickerModal from "../components/UI/DatePickerModal";
 import DatePickerContainer from "../components/UI/DatePickerContainer";
 import { getFormattedDate, toShortFormat } from "../util/date";
@@ -127,6 +127,7 @@ const FinderScreen = () => {
 
   const findPressedHandler = () => {
     console.log("find pressed");
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     navigation.navigate("FilteredPieCharts", {
       expenses: filteredExpenses,
       dayString: queryString + " " + dateString,
@@ -187,7 +188,7 @@ const FinderScreen = () => {
     };
     loadData();
   }, []);
-
+  const searchRef = useRef(null);
   return (
     <>
       {datepickerJSX}
@@ -202,12 +203,21 @@ const FinderScreen = () => {
               <Checkbox
                 status={checkedQuery ? "checked" : "unchecked"}
                 onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   setCheckedQuery(!checkedQuery);
                 }}
               />
             </View>
             <Searchbar
               placeholder="Search"
+              ref={searchRef}
+              onIconPress={() => {
+                //focus searchbar
+                searchRef.current.focus();
+              }}
+              onFocus={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
               onChangeText={onChangeSearch}
               value={searchQuery}
               style={{ width: "80%" }}
@@ -218,6 +228,7 @@ const FinderScreen = () => {
               <Checkbox
                 status={checkedDate ? "checked" : "unchecked"}
                 onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   setCheckedDate(!checkedDate);
                 }}
               />
@@ -252,6 +263,7 @@ const styles = StyleSheet.create({
     flex: 1,
     // margin: "4%",
     padding: "8%",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   cardContainer: {
     flex: 1,

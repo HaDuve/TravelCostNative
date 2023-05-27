@@ -174,7 +174,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   function renderSplitItem(itemData) {
     const item = itemData.item;
     return (
-      <View style={[styles.splitContainer, GlobalStyles.wideStrongShadow]}>
+      <View style={[styles.splitContainer]}>
         <Text style={styles.userText}>{item.userName} </Text>
         <Text style={styles.normalText}>owes </Text>
         <Text style={styles.amountText}>{item.amount} </Text>
@@ -198,77 +198,82 @@ const SplitSummaryScreen = ({ route, navigation }) => {
       <Animated.View
         entering={FadeIn}
         exiting={FadeOut}
-        style={[styles.headerContainer, GlobalStyles.wideStrongShadow]}
+        style={[styles.cardContainer, GlobalStyles.wideStrongShadow]}
       >
         <View style={styles.titleContainer}>
           {/* <BackButton></BackButton> */}
           <Text style={styles.titleText}> {titleText}</Text>
         </View>
-        <View style={styles.subTitleContainer}>
+        {/* <View style={styles.subTitleContainer}>
           <Text style={styles.subTitleText}> {subTitleText}</Text>
-        </View>
+        </View> */}
         <View style={styles.subTitleContainer}>
           <Text style={styles.subTitleText}> {totalPaidBackText}</Text>
         </View>
         <View style={styles.subTitleContainer}>
           <Text style={styles.subTitleText}> {totalPayBackText}</Text>
         </View>
-      </Animated.View>
-      <FlatList
-        // style={{ maxHeight: Dimensions.get("screen").height / 1.5 }}
-        data={splits}
-        ListFooterComponent={<View style={{ height: 10 }}></View>}
-        renderItem={renderSplitItem}
-      />
-      <View style={styles.buttonContainer}>
-        {!showSimplify && (
-          <FlatButton
-            onPress={() => {
-              if (showSimplify) {
-                navigation.goBack();
-              } else {
-                getOpenSplits();
-                setShowSimplify(true);
-                setTitleText(titleTextOriginal);
-                setSubTitleText(subTitleOriginal);
-              }
+
+        <FlatList
+          // style={{ maxHeight: Dimensions.get("screen").height / 1.5 }}
+          data={splits}
+          ListFooterComponent={<View style={{ height: 10 }}></View>}
+          ListHeaderComponent={<View style={{ height: 40 }}></View>}
+          renderItem={renderSplitItem}
+        />
+        <View style={styles.buttonContainer}>
+          {!showSimplify && (
+            <FlatButton
+              onPress={() => {
+                if (showSimplify) {
+                  navigation.goBack();
+                } else {
+                  getOpenSplits();
+                  setShowSimplify(true);
+                  setTitleText(titleTextOriginal);
+                  setSubTitleText(subTitleOriginal);
+                }
+              }}
+            >
+              Back
+            </FlatButton>
+          )}
+          {showSimplify && (
+            <GradientButton
+              style={styles.button}
+              onPress={handleSimpflifySplits}
+            >
+              Simplify Splits
+            </GradientButton>
+          )}
+          <GradientButton
+            style={styles.button}
+            colors={GlobalStyles.gradientColors}
+            darkText
+            buttonStyle={{ backgroundColor: GlobalStyles.colors.errorGrayed }}
+            onPress={async () => {
+              // alert ask user if he really wants to settle all Splits
+              // if yes, call settleSplitsHandler
+              Alert.alert(
+                "Settle Splits",
+                "Are you sure you want to settle all splits? Has everyone gotten their money back?",
+                [
+                  {
+                    text: "Cancel",
+                    style: "cancel",
+                  },
+                  {
+                    text: "Settle",
+                    onPress: async () => await settleSplitsHandler(),
+                  },
+                ]
+              );
             }}
           >
-            Back
-          </FlatButton>
-        )}
-        {showSimplify && (
-          <GradientButton style={styles.button} onPress={handleSimpflifySplits}>
-            Simplify Splits
+            Settle Splits
           </GradientButton>
-        )}
-        <GradientButton
-          style={styles.button}
-          colors={GlobalStyles.gradientColors}
-          darkText
-          buttonStyle={{ backgroundColor: GlobalStyles.colors.errorGrayed }}
-          onPress={async () => {
-            // alert ask user if he really wants to settle all Splits
-            // if yes, call settleSplitsHandler
-            Alert.alert(
-              "Settle Splits",
-              "Are you sure you want to settle all splits? Has everyone gotten their money back?",
-              [
-                {
-                  text: "Cancel",
-                  style: "cancel",
-                },
-                {
-                  text: "Settle",
-                  onPress: async () => await settleSplitsHandler(),
-                },
-              ]
-            );
-          }}
-        >
-          Settle Splits
-        </GradientButton>
-      </View>
+        </View>
+      </Animated.View>
     </View>
   );
 };
@@ -283,40 +288,51 @@ SplitSummaryScreen.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: 4,
-    // paddingTop: 24,
     alignItems: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  cardContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    margin: "8%",
+    padding: "2%",
+    paddingVertical: "4%",
+    paddingTop: "12%",
+    //card
+    backgroundColor: "white",
+    borderRadius: 20,
+    // borderWidth: 1,
+    borderColor: GlobalStyles.colors.gray500,
   },
   button: {
     marginLeft: 24,
   },
   splitContainer: {
     flexDirection: "row",
-    padding: 16,
-    paddingHorizontal: 24,
+    // padding: 16,
+    marginVertical: 4,
+    // paddingHorizontal: 24,
     // borderWidth: 1,
-    margin: 8,
+    // margin: 8,
     borderRadius: 12,
-    // center
-    alignItems: "center",
-    justifyContent: "center",
-    // minHeight: "20%",
-    minWidth: "80%",
-    backgroundColor: "white",
-    borderColor: GlobalStyles.colors.gray500,
+    // align text on the bottom
+    alignItems: "flex-end",
   },
   buttonContainer: {
-    marginVertical: "10%",
-    minWidth: 150,
+    // marginVertical: "10%",
+    // minWidth: 150,
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    margin: "2%",
+    marginRight: "5%",
+    marginBottom: "7%",
+    // alignItems: "center",
+    // justifyContent: "space-between",
+    // margin: "2%",
   },
   userText: {
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "500",
+    //italics
+    fontStyle: "italic",
     color: GlobalStyles.colors.textColor,
     // center
     alignItems: "center",
@@ -324,29 +340,22 @@ const styles = StyleSheet.create({
   },
   normalText: {
     fontSize: 16,
+    fontWeight: "300",
     color: GlobalStyles.colors.textColor, // center
     alignItems: "center",
     alignContent: "center",
+    fontStyle: "italic",
   },
   amountText: {
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "500",
+    fontStyle: "italic",
+
     color: GlobalStyles.colors.errorGrayed,
     // center
     alignItems: "center",
   },
-  headerContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: "8%",
-    //card
-    backgroundColor: "white",
-    borderRadius: 20,
-    // borderWidth: 1,
-    borderColor: GlobalStyles.colors.gray500,
-    padding: "7%",
-    margin: "5%",
-  },
+
   titleContainer: {
     alignItems: "center",
     justifyContent: "center",
@@ -371,7 +380,10 @@ const styles = StyleSheet.create({
     alignContent: "flex-start",
   },
   subTitleText: {
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: "300",
+    fontStyle: "italic",
+
     color: GlobalStyles.colors.textColor,
     // center
     alignItems: "flex-start",

@@ -68,7 +68,7 @@ const OverviewScreen = ({ navigation }) => {
 
   const recentExpenses: Array<ExpenseData> = useMemo(
     () => uniqBy(expensesCtx.getRecentExpenses(PeriodValue), "id"),
-    [PeriodValue, expensesCtx.expenses]
+    [PeriodValue, expensesCtx.expenses, dateTimeString]
   );
 
   return (

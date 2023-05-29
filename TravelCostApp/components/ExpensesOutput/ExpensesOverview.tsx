@@ -70,25 +70,25 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       break;
   }
 
-  const [autoIncrement, setAutoIncrement] = useState<NodeJS.Timer>(null);
+  // const [autoIncrement, setAutoIncrement] = useState<NodeJS.Timer>(null);
 
-  const startAutoIncrement = async () => {
-    // TODO: add a state variable and a useInterval, if the state is set to true, call rightNavButtonHandler
-    console.log("startAutoIncrement ~ startAutoIncrement:");
-    // setAutoIncrement(true);
-    const interval = setInterval(() => {
-      console.log("startAutoIncrement ~ interval tick");
-      rightNavButtonHandler();
-    }, 600);
-    setAutoIncrement(interval);
-    return;
-  };
-  const stopAutoIncrement = async () => {
-    console.log("stopAutoIncrement ~ stopAutoIncrement");
-    // setAutoIncrement(false);
-    clearInterval(autoIncrement);
-    return;
-  };
+  // const startAutoIncrement = async () => {
+  //   // TODO: add a state variable and a useInterval, if the state is set to true, call rightNavButtonHandler
+  //   console.log("startAutoIncrement ~ startAutoIncrement:");
+  //   // setAutoIncrement(true);
+  //   const interval = setInterval(() => {
+  //     console.log("startAutoIncrement ~ interval tick");
+  //     rightNavButtonHandler();
+  //   }, 600);
+  //   setAutoIncrement(interval);
+  //   return;
+  // };
+  // const stopAutoIncrement = async () => {
+  //   console.log("stopAutoIncrement ~ stopAutoIncrement");
+  //   // setAutoIncrement(false);
+  //   clearInterval(autoIncrement);
+  //   return;
+  // };
 
   const rightNavButtonHandler = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -112,16 +112,16 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
     }
   };
 
-  useInterval(
-    React.useCallback(() => {
-      async function callAutoIncAsync() {
-        await rightNavButtonHandler();
-      }
-      if (autoIncrement) callAutoIncAsync();
-    }, [autoIncrement]),
-    500,
-    true
-  );
+  // useInterval(
+  //   React.useCallback(() => {
+  //     async function callAutoIncAsync() {
+  //       await rightNavButtonHandler();
+  //     }
+  //     if (autoIncrement) callAutoIncAsync();
+  //   }, [autoIncrement]),
+  //   500,
+  //   true
+  // );
 
   return (
     <View style={styles.container}>
@@ -203,8 +203,8 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
               isGraphNotPie ? "add-circle-outline" : "chevron-forward-outline"
             }
             size={24}
-            onLongPress={startAutoIncrement}
-            onPressOut={stopAutoIncrement}
+            // onLongPress={startAutoIncrement}
+            // onPressOut={stopAutoIncrement}
             onPress={rightNavButtonHandler}
             color={GlobalStyles.colors.primaryGrayed}
           ></IconButton>

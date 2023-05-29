@@ -88,7 +88,11 @@ function RecentExpenses({ navigation }) {
   // const test_fetchAndSetExpenses = dataResponseTime(fetchAndSetExpenses);
 
   const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = getExpenses.bind(this, true);
+  async function onRefresh() {
+    setRefreshing(true);
+    await getExpenses(true, true, true);
+    setRefreshing(false);
+  }
 
   // strong connection state
   const [offlineString, setOfflineString] = useState("");
@@ -155,8 +159,11 @@ function RecentExpenses({ navigation }) {
 
   async function getExpenses(
     showRefIndicator = false,
-    showAnyIndicator = false
+    showAnyIndicator = false,
+    ignoreTouched = false
   ) {
+    if (ignoreTouched)
+      console.log("getExpenses ~ ignoreTouched:", ignoreTouched);
     // check offlinemode
     const online = netCtx.isConnected && netCtx.strongConnection;
     const { isFastEnough, speed } = await isConnectionFastEnough();
@@ -175,7 +182,8 @@ function RecentExpenses({ navigation }) {
       return;
     }
     // checking isTouched or firstLoad
-    const isTouched = await fetchTravelerIsTouched(tripid, uid);
+    const isTouched =
+      ignoreTouched || (await fetchTravelerIsTouched(tripid, uid));
     console.log("RecentExpenses ~ isTouched:", isTouched);
     if (!isTouched) {
       // await short delay for feel
@@ -274,13 +282,10 @@ function RecentExpenses({ navigation }) {
         refreshControl={
           <RefreshControl
             refreshing={refreshing || isFetching}
-            onRefresh={
-              netCtx.isConnected && netCtx.strongConnection
-                ? onRefresh
-                : () => {
-                    return;
-                  }
-            }
+            onRefresh={async () => {
+              console.log("onREFRESH");
+              await onRefresh();
+            }}
           />
         }
       />

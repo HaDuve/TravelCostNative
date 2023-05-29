@@ -107,6 +107,13 @@ function onClick({ item, index }, isOnline) {
   console.log("onClick ~ uid", uid);
   async function deleteExp() {
     try {
+      navigation?.popToTop();
+      Toast.show({
+        type: "loading",
+        text1: "Deleting",
+        text2: "Please leave the app open...",
+        autoHide: false,
+      });
       const item: OfflineQueueManageExpenseItem = {
         type: "delete",
         expense: {
@@ -118,7 +125,7 @@ function onClick({ item, index }, isOnline) {
       expenseCtx?.deleteExpense(editedExpenseId);
       await deleteExpenseOnlineOffline(item, isOnline);
       await touchAllTravelers(tripid, true);
-      navigation?.popToTop();
+      Toast.hide();
     } catch (error) {
       console.log(i18n.t("deleteError"), error);
       Toast.show({

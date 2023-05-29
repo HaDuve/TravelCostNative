@@ -79,8 +79,14 @@ const ManageExpense = ({ route, navigation }) => {
 
   async function deleteExpenseHandler() {
     async function deleteExp() {
-      setIsSubmitting(true);
+      // setIsSubmitting(true);
       try {
+        Toast.show({
+          type: "loading",
+          text1: "Deleting Expense",
+          text2: "Please leave the app open...",
+          autoHide: false,
+        });
         const item: OfflineQueueManageExpenseItem = {
           type: "delete",
           expense: {
@@ -92,10 +98,11 @@ const ManageExpense = ({ route, navigation }) => {
         expenseCtx.deleteExpense(editedExpenseId);
         await deleteExpenseOnlineOffline(item, isOnline);
         await touchAllTravelers(tripid, true);
+        Toast.hide();
       } catch (error) {
         // setError("Could not delete expense - please try again later!");
         console.error(error);
-        setIsSubmitting(false);
+        // setIsSubmitting(false);
       }
     }
     Alert.alert(i18n.t("sure"), i18n.t("sureExt"), [
@@ -244,7 +251,7 @@ const ManageExpense = ({ route, navigation }) => {
 
   async function confirmHandler(expenseData: ExpenseData) {
     console.log("confirmHandler ~ expenseData:", expenseData);
-    setIsSubmitting(true);
+    // setIsSubmitting(true);
     try {
       // set the category to the corresponting catstring
       expenseData.categoryString = getCatString(expenseData.category);
@@ -301,7 +308,7 @@ const ManageExpense = ({ route, navigation }) => {
       }
       await asyncStoreSetObject("expenses", expenseCtx.expenses);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setIsSubmitting(false);
+      // setIsSubmitting(false);
       navigation.popToTop();
       if (isOnline) await touchAllTravelers(tripid, true);
     } catch (error) {
@@ -313,7 +320,7 @@ const ManageExpense = ({ route, navigation }) => {
         type: "error",
       });
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setIsSubmitting(false);
+      // setIsSubmitting(false);
       navigation.popToTop();
     }
   }

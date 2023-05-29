@@ -185,7 +185,6 @@ function RecentExpenses({ navigation }) {
     // checking isTouched or firstLoad
     const isTouched =
       ignoreTouched || (await fetchTravelerIsTouched(tripid, uid));
-    console.log("RecentExpenses ~ isTouched:", isTouched);
     if (!isTouched) {
       // await short delay for feel
       setRefreshing(false);

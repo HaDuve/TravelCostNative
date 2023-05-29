@@ -75,6 +75,7 @@ import { secureStoreSetItem } from "../../store/secure-storage";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { ActivityIndicator } from "react-native-paper";
 import BackButton from "../UI/BackButton";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 const ExpenseForm = ({
   onCancel,
@@ -447,8 +448,6 @@ const ExpenseForm = ({
   }
 
   async function submitHandler() {
-    setIsSubmitting(true);
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const expenseData = {
       uid: authCtx.uid,
       amount: +inputs.amount.value,
@@ -551,8 +550,6 @@ const ExpenseForm = ({
   }
 
   async function fastSubmit() {
-    setIsSubmitting(true);
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const expenseData = {
       uid: authCtx.uid,
       amount: +inputs.amount.value,
@@ -674,7 +671,19 @@ const ExpenseForm = ({
       />
     </Animated.View>
   );
-  const advancedSubmitHandler = hideAdvanced ? fastSubmit : submitHandler;
+  const advancedSubmitHandler = async () => {
+    // setIsSubmitting(true);
+    Toast.show({
+      type: "loading",
+      text1: "Saving changes",
+      text2: "Please leave the app open...",
+      autoHide: false,
+    });
+    navigation.popToTop();
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    hideAdvanced ? await fastSubmit() : await submitHandler();
+    Toast.hide();
+  };
 
   const backButtonJsx = <BackButton />;
 

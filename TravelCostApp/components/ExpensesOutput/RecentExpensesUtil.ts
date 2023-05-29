@@ -23,8 +23,6 @@ export async function fetchAndSetExpenses(
       expensesCtx.setExpenses(expenses);
 
       const expensesSum = expenses.reduce((sum, expense) => {
-        if (expense.iconName)
-          console.log("expense iconName: " + expense.iconName);
         return sum + expense.calcAmount;
       }, 0);
       tripCtx.setTotalSum(expensesSum);

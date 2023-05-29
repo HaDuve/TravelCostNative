@@ -37,8 +37,15 @@ import { async } from "../../util/http";
 import { useInterval } from "../Hooks/useInterval";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
-  // console.log("rerender ExpensesOverview - 1");
-  const periodRangeNumber = useRef(7);
+  console.log("rerender ExpensesOverview - 1");
+  // const periodRangeNumber = useRef(7);
+  // periodRangeNumber useState is used to rerender the component when the periodRangeNumber changes
+  const realPeriodNumber = useRef(7);
+  console.log("ExpensesOverview ~ realPeriodNumber:", realPeriodNumber);
+  const [periodRangeNumber, setPeriodRangeNumber] = useState(
+    realPeriodNumber.current
+  );
+  console.log("ExpensesOverview ~ periodRangeNumber:", periodRangeNumber);
   // rerender on periodRangeNumber change
 
   const [isGraphNotPie, setToggleGraph] = useState(true);
@@ -64,64 +71,50 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       break;
     default:
       // TODO: convert day into days etc. for localization
-      titleString = `${i18n.t("last")} ${periodRangeNumber.current} ${i18n.t(
+      titleString = `${i18n.t("last")} ${periodRangeNumber} ${i18n.t(
         periodName + "s"
       )}`;
       break;
   }
 
-  // const [autoIncrement, setAutoIncrement] = useState<NodeJS.Timer>(null);
+  const [autoIncrement, setAutoIncrement] = useState<NodeJS.Timer>(null);
 
-  // const startAutoIncrement = async () => {
-  //   // TODO: add a state variable and a useInterval, if the state is set to true, call rightNavButtonHandler
-  //   console.log("startAutoIncrement ~ startAutoIncrement:");
-  //   // setAutoIncrement(true);
-  //   const interval = setInterval(() => {
-  //     console.log("startAutoIncrement ~ interval tick");
-  //     rightNavButtonHandler();
-  //   }, 600);
-  //   setAutoIncrement(interval);
-  //   return;
-  // };
-  // const stopAutoIncrement = async () => {
-  //   console.log("stopAutoIncrement ~ stopAutoIncrement");
-  //   // setAutoIncrement(false);
-  //   clearInterval(autoIncrement);
-  //   return;
-  // };
+  const startAutoIncrement = async () => {
+    // TODO: add a state variable and a useInterval, if the state is set to true, call rightNavButtonHandler
+    console.log("startAutoIncrement ~ startAutoIncrement:");
+    rightNavButtonHandler();
+    const interval = setInterval(() => {
+      console.log("startAutoIncrement ~ interval tick");
+      rightNavButtonHandler();
+    }, 600);
+    setAutoIncrement(interval);
+    return;
+  };
+  const stopAutoIncrement = () => {
+    console.log("stopAutoIncrement ~ stopAutoIncrement");
+    // setAutoIncrement(false);
+    clearInterval(autoIncrement);
+    return;
+  };
 
-  const rightNavButtonHandler = async () => {
+  const rightNavButtonHandler = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     // const isPremium = await userCtx.checkPremium();
     // if (!isPremium) {
     //   navigation.navigate("Paywall");
     //   return;
     // }
+    console.log("pressed right button");
     if (isGraphNotPie) {
-      periodRangeNumber.current =
-        periodRangeNumber.current == MAX_PERIOD_RANGE
+      realPeriodNumber.current =
+        realPeriodNumber.current == MAX_PERIOD_RANGE
           ? MAX_PERIOD_RANGE
-          : periodRangeNumber.current + 1;
-      // setPeriodRangeNumber(
-      //   periodRangeNumber == MAX_PERIOD_RANGE
-      //     ? MAX_PERIOD_RANGE
-      //     : periodRangeNumber + 1
-      // );
+          : realPeriodNumber.current + 1;
+      setPeriodRangeNumber(realPeriodNumber.current);
     } else {
       setToggleGraphEnum(toggleGraphEnum == 3 ? 0 : toggleGraphEnum + 1);
     }
   };
-
-  // useInterval(
-  //   React.useCallback(() => {
-  //     async function callAutoIncAsync() {
-  //       await rightNavButtonHandler();
-  //     }
-  //     if (autoIncrement) callAutoIncAsync();
-  //   }, [autoIncrement]),
-  //   500,
-  //   true
-  // );
 
   return (
     <View style={styles.container}>
@@ -146,12 +139,8 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
               //   return;
               // }
               if (isGraphNotPie) {
-                periodRangeNumber.current = MIN_PERIOD_RANGE;
-                // setPeriodRangeNumber(MIN_PERIOD_RANGE);
-                //   periodRangeNumber == MIN_PERIOD_RANGE
-                //     ? MAX_PERIOD_RANGE
-                //     : periodRangeNumber - 1
-                // );
+                realPeriodNumber.current = MIN_PERIOD_RANGE;
+                setPeriodRangeNumber(realPeriodNumber.current);
               } else {
                 setToggleGraphEnum(
                   toggleGraphEnum == 0 ? 3 : toggleGraphEnum - 1
@@ -203,9 +192,9 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
               isGraphNotPie ? "add-circle-outline" : "chevron-forward-outline"
             }
             size={24}
-            // onLongPress={startAutoIncrement}
-            // onPressOut={stopAutoIncrement}
-            onPress={rightNavButtonHandler}
+            onPressIn={startAutoIncrement}
+            onPressOut={stopAutoIncrement}
+            // onPress={rightNavButtonHandler}
             color={GlobalStyles.colors.primaryGrayed}
           ></IconButton>
         </Animated.View>
@@ -216,7 +205,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           navigation={navigation}
           expenses={expenses}
           periodName={periodName}
-          periodRangeNumber={periodRangeNumber.current}
+          periodRangeNumber={periodRangeNumber}
         />
       )}
       {!isGraphNotPie && toggleGraphEnum == 0 && (

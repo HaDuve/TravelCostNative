@@ -211,6 +211,12 @@ export const storeExpenseOnlineOffline = async (
  * @returns {Promise<void>}
  */
 export const sendOfflineQueue = async () => {
+  Toast.show({
+    type: "loading",
+    text1: "Synchronizing offline changes",
+    text2: "Please leave the app open...",
+    autoHide: false,
+  });
   const offlineQueue = (await secureStoreGetObject("offlineQueue")) || [];
   if (offlineQueue && offlineQueue.length > 0) {
     // console.log("queue length", offlineQueue.length);
@@ -284,18 +290,18 @@ export const sendOfflineQueue = async () => {
       }
     }
 
+    // Remove the processed items from the queue
+    const remainingItems = offlineQueue.slice(i);
+    await secureStoreSetObject("offlineQueue", remainingItems);
+    Toast.hide();
     if (processedItems.length > 0) {
+      await touchAllTravelers(tripid, true);
       Toast.show({
         type: "success",
         text1: "Online again!",
         text2: `Synchronized ${processedItems.length}/${offlineQueue.length} offline Changes!`,
       });
-      await touchAllTravelers(tripid, true);
     }
-
-    // Remove the processed items from the queue
-    const remainingItems = offlineQueue.slice(i);
-    await secureStoreSetObject("offlineQueue", remainingItems);
   } else {
     // console.log("no queue");
   }

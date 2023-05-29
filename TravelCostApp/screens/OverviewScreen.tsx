@@ -5,7 +5,9 @@ import { UserContext } from "../store/user-context";
 import { StyleSheet, Text, View } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
-import ExpensesOverview from "../components/ExpensesOutput/ExpensesOverview";
+import ExpensesOverview, {
+  MemoizedExpensesOverview,
+} from "../components/ExpensesOutput/ExpensesOverview";
 import uniqBy from "lodash.uniqby";
 
 //Localization
@@ -108,7 +110,7 @@ const OverviewScreen = ({ navigation }) => {
       </View>
       <View style={styles.tempGrayBar1}></View>
 
-      <ExpensesOverview
+      <MemoizedExpensesOverview
         navigation={navigation}
         expenses={recentExpenses}
         periodName={PeriodValue}

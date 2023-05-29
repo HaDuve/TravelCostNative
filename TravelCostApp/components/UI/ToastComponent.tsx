@@ -78,11 +78,6 @@ const toastConfig = {
         fontSize: 15,
         fontWeight: "400",
       }}
-      // renderLeadingIcon={() => (
-      //   <View style={{ flex: 1, maxHeight: 55, maxWidth: 55 }}>
-      //     <LoadingBarOverlay></LoadingBarOverlay>
-      //   </View>
-      // )}
       renderTrailingIcon={() => (
         <View
           style={{
@@ -98,23 +93,10 @@ const toastConfig = {
       )}
       onPress={() => Toast.hide()}
     />
-    // <View
-    //   style={[
-    //     {
-    //       borderLeftColor: GlobalStyles.colors.primary500,
-    //       borderLeftWidth: 5,
-    //       backgroundColor: GlobalStyles.colors.backgroundColor,
-    //     },
-    //     GlobalStyles.wideStrongShadow,
-    //   ]}
-    // >
-    //   <Text>{text1}</Text>
-    //   <Text>{text2}</Text>
-    // </View>
   ),
-  // call tomatoToast like this:
+  // call loading like this:
   // Toast.show({
-  //   type: 'tomatoToast',
+  //   type: 'loading',
   //   // And I can pass any custom props I want
   //   props: { uuid: 'bba1a7d0-6ab2-4a0a-a76e-ebbe05ae6d70' }
   // });

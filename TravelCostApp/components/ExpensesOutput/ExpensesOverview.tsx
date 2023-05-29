@@ -267,6 +267,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
 };
 
 export default ExpensesOverview;
+export const MemoizedExpensesOverview = React.memo(ExpensesOverview);
 
 ExpensesOverview.propTypes = {
   expenses: PropTypes.array.isRequired,

@@ -211,12 +211,6 @@ export const storeExpenseOnlineOffline = async (
  * @returns {Promise<void>}
  */
 export const sendOfflineQueue = async () => {
-  Toast.show({
-    type: "loading",
-    text1: "Synchronizing offline changes",
-    text2: "Please leave the app open...",
-    autoHide: false,
-  });
   const offlineQueue = (await secureStoreGetObject("offlineQueue")) || [];
   if (offlineQueue && offlineQueue.length > 0) {
     // console.log("queue length", offlineQueue.length);
@@ -235,6 +229,13 @@ export const sendOfflineQueue = async () => {
       );
       return;
     }
+    // indicate loading
+    Toast.show({
+      type: "loading",
+      text1: "Synchronizing offline changes",
+      text2: "Please leave the app open...",
+      autoHide: false,
+    });
 
     // send items in while loop
     const processedItems = [];

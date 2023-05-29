@@ -23,7 +23,8 @@ const LoadingBarOverlay = (props) => {
   const { containerStyle, progressAt, progressMax, customText } = props;
   let { progress } = props;
   // if progress is smaller than 0
-  if (!progress) return <LoadingOverlay customText={customText} />;
+  if (!progress || isNaN(Number(progress)))
+    return <LoadingOverlay customText={customText} />;
   if (progress < 0) {
     progress = 0;
   }

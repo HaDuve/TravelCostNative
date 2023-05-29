@@ -68,11 +68,11 @@ const PaywallScreen = ({ navigation }) => {
           alignItems: "center",
           justifyContent: "flex-start",
           margin: "2%",
-          marginBottom: "-28%",
+          // marginBottom: "-28%",
         }}
       >
         {/* Image of icon2.png scaled to 10% of screenheight */}
-        <Image
+        {/* <Image
           source={require("../../assets/icon2.png")}
           style={[
             {
@@ -85,7 +85,7 @@ const PaywallScreen = ({ navigation }) => {
             GlobalStyles.shadowPrimary,
             { overflow: "visible" },
           ]}
-        />
+        /> */}
         {isPurchasing && (
           <ActivityIndicator
             size={"large"}

@@ -181,6 +181,7 @@ function ExpensesList({
   periodValue,
   showSumForTravellerName,
   isFiltered,
+  listRef,
 }) {
   const uniqueData = expenses;
   useEffect(() => {
@@ -211,8 +212,6 @@ function ExpensesList({
   // console.log("rerender ExpensesList - C");
   navigation = useNavigation();
 
-  const ref = React.useRef(null);
-  useScrollToTop(ref);
   // const flatListRef = useRef(null);
   const netCtx = useContext(NetworkContext);
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
@@ -255,7 +254,7 @@ function ExpensesList({
         scrollEnabled={false}
         itemLayoutAnimation={layoutAnim}
         data={data}
-        ref={ref}
+        ref={listRef}
         onEndReached={onScrollHandler}
         onEndReachedThreshold={0.5}
         renderItem={renderExpenseItem.bind(this, isOnline)}

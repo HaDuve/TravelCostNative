@@ -9,6 +9,7 @@ import LoadingOverlay from "../UI/LoadingOverlay";
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { EXPENSES_LOAD_TIMEOUT } from "../../confAppConstants";
+import { memo } from "react";
 
 function ExpensesOutput({
   expenses,
@@ -17,14 +18,14 @@ function ExpensesOutput({
   periodValue,
   showSumForTravellerName,
   isFiltered,
+  listRef,
 }) {
-  // console.log("rerender ExpensesOutput - B");
   const [showLoading, setShowLoading] = useState(true);
   useEffect(() => {
-    setTimeout(toggleLoading, EXPENSES_LOAD_TIMEOUT);
+    setTimeout(() => setShowLoading(false), EXPENSES_LOAD_TIMEOUT);
   }, []);
 
-  const toggleLoading = () => setShowLoading((prev) => !prev);
+  // const toggleLoading = () => setShowLoading((prev) => !prev);
 
   let content = (
     <Animated.View exiting={SlideOutLeft} style={styles.fallbackContainer}>
@@ -39,6 +40,7 @@ function ExpensesOutput({
         expenses={expenses}
         showSumForTravellerName={showSumForTravellerName}
         isFiltered={isFiltered}
+        listRef={listRef}
       />
     );
   }
@@ -50,6 +52,7 @@ function ExpensesOutput({
 }
 
 export default ExpensesOutput;
+export const MemoizedExpensesOutput = memo(ExpensesOutput);
 
 ExpensesOutput.propTypes = {
   expenses: PropTypes.array,

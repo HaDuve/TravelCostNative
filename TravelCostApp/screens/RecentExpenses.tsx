@@ -1,7 +1,9 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 
-import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
+import ExpensesOutput, {
+  MemoizedExpensesOutput,
+} from "../components/ExpensesOutput/ExpensesOutput";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { AuthContext } from "../store/auth-context";
@@ -43,7 +45,7 @@ import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpensesUtil";
 import { asyncStoreGetObject, asyncStoreSetItem } from "../store/async-storage";
 import { _toShortFormat } from "../util/dateTime";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
 import { isForeground } from "../util/appState";
 import { TourGuideZone } from "rn-tourguide";
 import PropTypes from "prop-types";
@@ -63,6 +65,9 @@ function RecentExpenses({ navigation }) {
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
+
+  const listRef = React.useRef(null);
+  useScrollToTop(listRef);
 
   const tripid = tripCtx.tripid;
   // uid as a state
@@ -279,6 +284,7 @@ function RecentExpenses({ navigation }) {
         expenses={recentExpenses}
         periodValue={PeriodValue}
         fallbackText={i18n.t("fallbackTextExpenses")}
+        listRef={listRef}
         refreshControl={
           <RefreshControl
             refreshing={refreshing || isFetching}

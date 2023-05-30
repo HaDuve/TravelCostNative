@@ -561,10 +561,7 @@ function Root() {
     console.log("onlineSetup ~ tripid before setItem:", tripid);
     await secureStoreSetItem("currentTripId", tripid);
     await userCtx.loadCatListFromAsyncInCtx(tripid);
-    if (expensesCtx.expenses?.length === 0) {
-      console.log("Touching my traveler");
-      await touchMyTraveler(storedTripId, storedUid);
-    }
+    await touchMyTraveler(storedTripId, storedUid);
   }
 
   async function setupOfflineMount(

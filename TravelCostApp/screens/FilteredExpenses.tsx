@@ -72,8 +72,8 @@ const FilteredExpenses = ({
 export default FilteredExpenses;
 
 FilteredExpenses.propTypes = {
-  route: PropTypes.object.isRequired,
-  navigation: PropTypes.object.isRequired,
+  route: PropTypes.object,
+  navigation: PropTypes.object,
   showSumForTravellerName: PropTypes.string,
   expensesAsArg: PropTypes.array,
   dayStringAsArg: PropTypes.string,

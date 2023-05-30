@@ -8,7 +8,6 @@ import * as Haptics from "expo-haptics";
 import { Searchbar } from "react-native-paper";
 import GradientButton from "../components/UI/GradientButton";
 import { ExpensesContext } from "../store/expenses-context";
-import uniqBy from "lodash.uniqby";
 import { useNavigation } from "@react-navigation/native";
 import BackButton from "../components/UI/BackButton";
 import { Checkbox } from "react-native-paper";
@@ -72,7 +71,7 @@ const FinderScreen = () => {
     }
   };
 
-  const expenses = uniqBy(expenseCtx.expenses, "id");
+  const expenses = expenseCtx.expenses;
   const filteredExpenses = expenses.filter((expense) => {
     const expenseDate = expense.startDate;
     const expenseDateIsSameDay =

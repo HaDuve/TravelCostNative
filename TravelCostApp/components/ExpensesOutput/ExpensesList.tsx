@@ -27,7 +27,6 @@ import { NetworkContext } from "../../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { useNavigation, useScrollToTop } from "@react-navigation/native";
 import { useState } from "react";
-import uniqBy from "lodash.uniqby";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;

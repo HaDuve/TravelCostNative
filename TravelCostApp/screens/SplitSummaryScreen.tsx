@@ -22,7 +22,6 @@ import BackgroundGradient from "../components/UI/BackgroundGradient";
 import { ExpenseData, isPaidString, Split } from "../util/expense";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { getCurrencySymbol } from "../util/currencySymbol";
-import uniqBy from "lodash.uniqby";
 import BackButton from "../components/UI/BackButton";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
 
@@ -36,7 +35,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const userCtx = useContext(UserContext);
   const expenseCtx = useContext(ExpensesContext);
   const uniqueExpenses: Array<ExpenseData> = useMemo(
-    () => uniqBy(expenseCtx.getRecentExpenses(RangeString.total), "id"),
+    () => expenseCtx.getRecentExpenses(RangeString.total),
     [expenseCtx.expenses]
   );
   const [isFetching, setIsFetching] = useState(true);

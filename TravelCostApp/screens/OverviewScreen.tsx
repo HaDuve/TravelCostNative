@@ -8,7 +8,6 @@ import { GlobalStyles } from "../constants/styles";
 import ExpensesOverview, {
   MemoizedExpensesOverview,
 } from "../components/ExpensesOutput/ExpensesOverview";
-import uniqBy from "lodash.uniqby";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -69,7 +68,7 @@ const OverviewScreen = ({ navigation }) => {
   ]);
 
   const recentExpenses: Array<ExpenseData> = useMemo(
-    () => uniqBy(expensesCtx.getRecentExpenses(PeriodValue), "id"),
+    () => expensesCtx.getRecentExpenses(PeriodValue),
     [PeriodValue, expensesCtx.expenses, dateTimeString]
   );
 

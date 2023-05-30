@@ -13,6 +13,7 @@ import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 import PropTypes from "prop-types";
 import { Expense, ExpenseData } from "../util/expense";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import uniqBy from "lodash.uniqby";
 export enum RangeString {
   day = "day",
   week = "week",
@@ -98,7 +99,8 @@ function expensesReducer(state: ExpenseData[], action) {
         data.sort((a: ExpenseData, b: ExpenseData) => {
           return Number(new Date(b.date)) - Number(new Date(a.date));
         });
-      const sorted = getSortedState(action.payload);
+
+      const sorted = uniqBy(getSortedState(action.payload), "id");
       return sorted;
     }
     case "UPDATE": {

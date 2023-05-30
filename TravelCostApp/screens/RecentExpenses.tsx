@@ -54,7 +54,6 @@ import Toast from "react-native-toast-message";
 import { NetworkContext } from "../store/network-context";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { sendOfflineQueue } from "../util/offline-queue";
-import uniqBy from "lodash.uniqby";
 import * as Haptics from "expo-haptics";
 
 function RecentExpenses({ navigation }) {
@@ -215,7 +214,7 @@ function RecentExpenses({ navigation }) {
     setError(null);
   }
   const recentExpenses: Array<ExpenseData> = useMemo(
-    () => uniqBy(expensesCtx.getRecentExpenses(PeriodValue), "id"),
+    () => expensesCtx.getRecentExpenses(PeriodValue),
     [PeriodValue, expensesCtx.expenses, dateTimeString]
   );
 

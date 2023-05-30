@@ -1,5 +1,13 @@
 Change log Travel Expense App
 
+1.1.5
+- fixed refreshing
+- expenses update on a new day (not showing the old day after midnight anymore)
+- fixed longpress on expenseOverview "add days" button
+- improved layout
+- added a loading toast component to let the user still do stuff but warn him not to close the app
+- added more offerings to paywall
+
 1.1.4
 - new layout (moved Finder and Split Summary into Tab Bar)
 - improved UI in multiple places (prettier)

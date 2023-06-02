@@ -76,7 +76,6 @@
     "rn-fetch-blob": "^0.12.0",
     "rn-tourguide": "^3.3.0",
     "splitwise-js-map": "^1.0.3",
-    "use-debounce": "^9.0.4",
     "victory": "^36.6.5",
     "victory-native": "^36.6.8",
     "xlsx": "^0.18.5"

@@ -85,7 +85,7 @@ function TripItem({
       setIsFetching(false);
     }
     getTripTravellers();
-  }, []);
+  }, [netCtx.isConnected, netCtx.strongConnection]);
 
   function tripPressHandler() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

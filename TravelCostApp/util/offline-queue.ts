@@ -230,6 +230,7 @@ export const sendOfflineQueue = async () => {
       return;
     }
     // indicate loading
+    Toast.hide();
     Toast.show({
       type: "loading",
       text1: "Synchronizing offline changes",
@@ -293,6 +294,7 @@ export const sendOfflineQueue = async () => {
 
     // Remove the processed items from the queue
     const remainingItems = offlineQueue.slice(i);
+    console.log("sendOfflineQueue ~ remainingItems:", remainingItems);
     await secureStoreSetObject("offlineQueue", remainingItems);
     Toast.hide();
     if (processedItems.length > 0) {

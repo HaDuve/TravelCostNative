@@ -179,15 +179,16 @@ function RecentExpenses({ navigation }) {
       console.log("getExpenses ~ ignoreTouched:", ignoreTouched);
     // check offlinemode
     const online = netCtx.isConnected && netCtx.strongConnection;
-    const { isFastEnough, speed } = await isConnectionFastEnough();
     const offlineQueue = await asyncStoreGetObject("offlineQueue");
-    const offlineQueueNonEmpty = offlineQueue && offlineQueue.length > 0;
-    if (!online || !isFastEnough || offlineQueueNonEmpty) {
-      if (online && isFastEnough) {
+    const queueBlocked = offlineQueue && offlineQueue.length > 0;
+    if (!online || queueBlocked) {
+      // if online, send offline queue
+      if (online) {
         console.log("RecentExpenses ~ sending offline queue");
         await sendOfflineQueue();
         return;
       }
+      // if offline, load from storage
       setIsFetching(true);
       // await test_offlineLoad(expensesCtx, setRefreshing, setIsFetching);
       await expensesCtx.loadExpensesFromStorage();
@@ -198,7 +199,6 @@ function RecentExpenses({ navigation }) {
     const isTouched =
       ignoreTouched || (await fetchTravelerIsTouched(tripid, uid));
     if (!isTouched) {
-      // await short delay for feel
       setRefreshing(false);
       setIsFetching(false);
       return;

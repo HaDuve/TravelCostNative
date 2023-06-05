@@ -383,20 +383,6 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
       exiting={FadeOutLeft}
       style={styles.container}
     >
-      {/* ListHeaderComponent={ */}
-      <View style={styles.graphContainer}>
-        <ExpenseChart
-          inputData={listExpenseSumBudgets}
-          xAxis={xAxis}
-          yAxis={yAxis}
-          budgetAxis={budgetAxis}
-          budget={budget}
-          daysRange={daysRange}
-          currency={tripCtx.tripCurrency}
-          navigation={navigation}
-        ></ExpenseChart>
-      </View>
-      {/* <View style={styles.shadow}></View> */}
       <Animated.View
         entering={FadeInRight.duration(500)}
         exiting={FadeOutLeft.duration(500)}
@@ -407,6 +393,20 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
           exiting={FadeOutLeft.duration(500)}
           data={listExpenseSumBudgets}
           renderItem={renderItemRef.current}
+          ListHeaderComponent={
+            <View style={styles.graphContainer}>
+              <ExpenseChart
+                inputData={listExpenseSumBudgets}
+                xAxis={xAxis}
+                yAxis={yAxis}
+                budgetAxis={budgetAxis}
+                budget={budget}
+                daysRange={daysRange}
+                currency={tripCtx.tripCurrency}
+                navigation={navigation}
+              ></ExpenseChart>
+            </View>
+          }
           ListFooterComponent={<View style={{ height: 100 }}></View>}
           // removeClippedSubviews={true}
           // maxToRenderPerBatch={7}
@@ -436,11 +436,12 @@ ExpenseGraph.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 0,
+    // marginTop: 60,
+    // paddingTop: 60,
   },
   graphContainer: {
     minHeight: 158,
-    paddingTop: "5%",
+    paddingTop: "15%",
     marginTop: "2.5%",
     paddingBottom: "5%",
     marginBottom: "5%",

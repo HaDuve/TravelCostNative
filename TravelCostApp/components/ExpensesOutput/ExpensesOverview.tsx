@@ -35,6 +35,7 @@ import {
 } from "../../confAppConstants";
 import { async } from "../../util/http";
 import { useInterval } from "../Hooks/useInterval";
+import { BlurView } from "expo-blur";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   console.log("rerender ExpensesOverview - 1");
@@ -116,90 +117,92 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
     }
   };
 
+  const titleContainerJSX = (
+    <BlurView style={styles.titleContainerBlur}>
+      <Animated.View
+        // entering={FadeInLeft}
+        // exiting={FadeOutLeft}
+        style={styles.chevronContainer}
+      >
+        {/* "remove-outline" */}
+        <IconButton
+          icon={
+            isGraphNotPie ? "play-skip-back-outline" : "chevron-back-outline"
+          }
+          size={24}
+          onPress={async () => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            const isPremium = await userCtx.checkPremium();
+
+            // if (!isPremium) {
+            //   navigation.navigate("Paywall");
+            //   return;
+            // }
+            if (isGraphNotPie) {
+              realPeriodNumber.current = MIN_PERIOD_RANGE;
+              setPeriodRangeNumber(realPeriodNumber.current);
+            } else {
+              setToggleGraphEnum(
+                toggleGraphEnum == 0 ? 3 : toggleGraphEnum - 1
+              );
+            }
+          }}
+          color={GlobalStyles.colors.primaryGrayed}
+        ></IconButton>
+      </Animated.View>
+
+      {isGraphNotPie && (
+        <Animated.View
+          style={styles.titleContainer}
+          entering={FadeInUp}
+          exiting={FadeOutDown}
+        >
+          <Text style={styles.titleText}> {titleString} </Text>
+        </Animated.View>
+      )}
+
+      {!isGraphNotPie && toggleGraphEnum == 0 && (
+        <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
+          <Text style={styles.titleText}> {i18n.t("categories")} </Text>
+        </Animated.View>
+      )}
+      {!isGraphNotPie && toggleGraphEnum == 1 && (
+        <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
+          <Text style={styles.titleText}> Travellers </Text>
+        </Animated.View>
+      )}
+      {!isGraphNotPie && toggleGraphEnum == 2 && (
+        <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
+          <Text style={styles.titleText}> Countries </Text>
+        </Animated.View>
+      )}
+      {!isGraphNotPie && toggleGraphEnum == 3 && (
+        <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
+          <Text style={styles.titleText}> Currencies </Text>
+        </Animated.View>
+      )}
+
+      <Animated.View
+        entering={FadeInRight}
+        exiting={FadeOutRight}
+        style={styles.chevronContainer}
+      >
+        <IconButton
+          icon={
+            isGraphNotPie ? "add-circle-outline" : "chevron-forward-outline"
+          }
+          size={24}
+          onPressIn={startAutoIncrement}
+          onPressOut={stopAutoIncrement}
+          // onPress={rightNavButtonHandler}
+          color={GlobalStyles.colors.primaryGrayed}
+        ></IconButton>
+      </Animated.View>
+    </BlurView>
+  );
+
   return (
     <View style={styles.container}>
-      <View style={styles.titleContainer}>
-        <Animated.View
-          entering={FadeInLeft}
-          exiting={FadeOutLeft}
-          style={styles.chevronContainer}
-        >
-          {/* "remove-outline" */}
-          <IconButton
-            icon={
-              isGraphNotPie ? "play-skip-back-outline" : "chevron-back-outline"
-            }
-            size={24}
-            onPress={async () => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              const isPremium = await userCtx.checkPremium();
-
-              // if (!isPremium) {
-              //   navigation.navigate("Paywall");
-              //   return;
-              // }
-              if (isGraphNotPie) {
-                realPeriodNumber.current = MIN_PERIOD_RANGE;
-                setPeriodRangeNumber(realPeriodNumber.current);
-              } else {
-                setToggleGraphEnum(
-                  toggleGraphEnum == 0 ? 3 : toggleGraphEnum - 1
-                );
-              }
-            }}
-            color={GlobalStyles.colors.primaryGrayed}
-          ></IconButton>
-        </Animated.View>
-
-        {isGraphNotPie && (
-          <Animated.View
-            style={styles.titleContainer}
-            entering={FadeInUp}
-            exiting={FadeOutDown}
-          >
-            <Text style={styles.titleText}> {titleString} </Text>
-          </Animated.View>
-        )}
-
-        {!isGraphNotPie && toggleGraphEnum == 0 && (
-          <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-            <Text style={styles.titleText}> {i18n.t("categories")} </Text>
-          </Animated.View>
-        )}
-        {!isGraphNotPie && toggleGraphEnum == 1 && (
-          <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-            <Text style={styles.titleText}> Travellers </Text>
-          </Animated.View>
-        )}
-        {!isGraphNotPie && toggleGraphEnum == 2 && (
-          <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-            <Text style={styles.titleText}> Countries </Text>
-          </Animated.View>
-        )}
-        {!isGraphNotPie && toggleGraphEnum == 3 && (
-          <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-            <Text style={styles.titleText}> Currencies </Text>
-          </Animated.View>
-        )}
-
-        <Animated.View
-          entering={FadeInRight}
-          exiting={FadeOutRight}
-          style={styles.chevronContainer}
-        >
-          <IconButton
-            icon={
-              isGraphNotPie ? "add-circle-outline" : "chevron-forward-outline"
-            }
-            size={24}
-            onPressIn={startAutoIncrement}
-            onPressOut={stopAutoIncrement}
-            // onPress={rightNavButtonHandler}
-            color={GlobalStyles.colors.primaryGrayed}
-          ></IconButton>
-        </Animated.View>
-      </View>
-
       {isGraphNotPie && (
         <ExpenseGraph
           navigation={navigation}
@@ -236,7 +239,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           navigation={navigation}
         ></ExpenseCurrencies>
       )}
-
+      {titleContainerJSX}
       <View
         style={
           [
@@ -278,6 +281,16 @@ ExpensesOverview.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    overflow: "visible",
+  },
+  titleContainerBlur: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    width: "100%",
+    paddingBottom: "2%",
+    // height: "5%",
   },
   titleContainer: {
     flexDirection: "row",

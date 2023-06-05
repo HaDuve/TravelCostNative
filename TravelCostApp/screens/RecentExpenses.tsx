@@ -10,6 +10,7 @@ import { AuthContext } from "../store/auth-context";
 import { ExpensesContext, RangeString } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
+import { getOfflineQueue } from "../util/offline-queue";
 import { toShortFormat } from "../util/date";
 import {
   dataResponseTime,
@@ -94,6 +95,13 @@ function RecentExpenses({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   async function onRefresh() {
     setRefreshing(true);
+    // check if we have a offline queue
+    const offlineQueue = await getOfflineQueue();
+    // if we have a offline queue return
+    if (offlineQueue && offlineQueue.length > 0) {
+      setRefreshing(false);
+      return;
+    }
     await getExpenses(true, true, true);
     setRefreshing(false);
   }

@@ -114,8 +114,9 @@ const ManageExpense = ({ route, navigation }) => {
       // The "Yes" button
       {
         text: i18n.t("yes"),
-        onPress: () => {
-          deleteExp();
+        onPress: async () => {
+          navigation.popToTop();
+          await deleteExp();
         },
       },
     ]);

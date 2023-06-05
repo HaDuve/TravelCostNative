@@ -118,7 +118,6 @@ function ExpenseItem(props): JSX.Element {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     navigation.navigate("ManageExpense", {
       expenseId: id,
-      filtered: filtered,
     });
   }, [id, navigation]);
   const originalCurrencyJSX = !sameCurrency ? (

@@ -182,31 +182,31 @@ function ExpensesList({
   isFiltered,
   listRef,
 }) {
-  const uniqueData = expenses;
-  useEffect(() => {
-    setPage(1);
-    setData(uniqueData.slice(0, 10));
-  }, [uniqueData]);
+  // const uniqueData = expenses;
+  // useEffect(() => {
+  //   setPage(1);
+  //   setData(uniqueData.slice(0, 10));
+  // }, [uniqueData]);
 
-  //add pagination
-  const [page, setPage] = useState(0);
-  const [data, setData] = useState(uniqueData.slice(0, page * 10));
+  // //add pagination
+  // const [page, setPage] = useState(0);
+  // const [data, setData] = useState(uniqueData.slice(0, page * 10));
 
-  function addExpensesToData(page) {
-    const newExpenses = [];
-    for (let i = page * 10; i < (page + 1) * 10; i++) {
-      if (uniqueData[i]) {
-        newExpenses.push(uniqueData[i]);
-      }
-    }
-    setData([...data, ...newExpenses]);
-  }
+  // function addExpensesToData(page) {
+  //   const newExpenses = [];
+  //   for (let i = page * 10; i < (page + 1) * 10; i++) {
+  //     if (uniqueData[i]) {
+  //       newExpenses.push(uniqueData[i]);
+  //     }
+  //   }
+  //   setData([...data, ...newExpenses]);
+  // }
 
-  function onScrollHandler() {
-    console.log("onScrollHandler ~ page before:", page);
-    setPage(page + 1);
-    addExpensesToData(page);
-  }
+  // function onScrollHandler() {
+  //   console.log("onScrollHandler ~ page before:", page);
+  //   setPage(page + 1);
+  //   addExpensesToData(page);
+  // }
 
   // console.log("rerender ExpensesList - C");
   navigation = useNavigation();
@@ -252,10 +252,10 @@ function ExpensesList({
         // ref={flatListRef}
         scrollEnabled={false}
         itemLayoutAnimation={layoutAnim}
-        data={data}
-        ref={listRef}
-        onEndReached={onScrollHandler}
-        onEndReachedThreshold={0.5}
+        data={expenses}
+        // ref={listRef}
+        // onEndReached={onScrollHandler}
+        // onEndReachedThreshold={0.5}
         renderItem={renderExpenseItem.bind(this, isOnline)}
         ListFooterComponent={
           <View style={{ height: Dimensions.get("screen").height / 1.8 }} />

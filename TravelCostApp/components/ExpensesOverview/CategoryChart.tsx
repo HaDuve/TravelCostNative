@@ -88,6 +88,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginHorizontal: "25%",
     borderRadius: 9999,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
+    // backgroundColor: GlobalStyles.colors,
   },
 });

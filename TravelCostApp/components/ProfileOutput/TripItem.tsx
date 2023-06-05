@@ -27,6 +27,7 @@ import { NetworkContext } from "../../store/network-context";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { ExpensesContext } from "../../store/expenses-context";
+
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -151,7 +152,9 @@ function TripItem({
       onPress={tripPressHandler}
       style={({ pressed }) => pressed && GlobalStyles.pressedWithShadow}
     >
-      <View style={[styles.tripItem, activeBorder]}>
+      <View
+        style={[styles.tripItem, GlobalStyles.wideStrongShadow, activeBorder]}
+      >
         <View style={styles.topRow}>
           <View style={styles.leftContainer}>
             <Text
@@ -215,13 +218,8 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 12,
     margin: 12,
-    backgroundColor: GlobalStyles.colors.gray500,
-    borderRadius: 6,
-    elevation: 2,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
+    backgroundColor: "white",
+    borderRadius: 12,
   },
   topRow: {
     marginVertical: 8,
@@ -240,7 +238,9 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   textBase: {
-    color: GlobalStyles.colors.primary500,
+    color: GlobalStyles.colors.textColor,
+    fontSize: 14,
+    fontWeight: "300",
   },
   textWidth: {
     flex: 1,
@@ -249,7 +249,8 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     marginBottom: 4,
-    fontWeight: "bold",
+    fontWeight: "300",
+    fontStyle: "italic",
   },
   amountContainer: {
     marginLeft: "-20%",
@@ -273,10 +274,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     maxWidth: "47%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
-  },
-  travellerText: {
-    fontSize: 12,
-    color: GlobalStyles.colors.textColor,
   },
   avatar: {
     minHeight: 20,

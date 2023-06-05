@@ -174,7 +174,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       onPress={tripPressHandler}
       style={({ pressed }) => pressed && GlobalStyles.pressed}
     >
-      <View style={[styles.tripItem, activeBorder]}>
+      <View style={[styles.tripItem, GlobalStyles.wideStrongShadow]}>
         <View style={styles.topRow}>
           <View>
             <Text style={[styles.textBase, styles.description]}>
@@ -227,13 +227,8 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 12,
     margin: 12,
-    backgroundColor: GlobalStyles.colors.gray500,
-    borderRadius: 6,
-    elevation: 2,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
+    backgroundColor: "white",
+    borderRadius: 12,
   },
   topRow: {
     marginVertical: 8,
@@ -241,12 +236,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   textBase: {
-    color: GlobalStyles.colors.primary500,
+    color: GlobalStyles.colors.textColor,
+    fontSize: 14,
+    fontWeight: "300",
   },
   description: {
     fontSize: 16,
     marginBottom: 4,
-    fontWeight: "bold",
+    fontWeight: "300",
+    fontStyle: "italic",
   },
   amountContainer: {
     paddingHorizontal: 12,
@@ -269,10 +267,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     maxWidth: "47%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
-  },
-  travellerText: {
-    fontSize: 12,
-    color: GlobalStyles.colors.textColor,
   },
   avatar: {
     minHeight: 20,

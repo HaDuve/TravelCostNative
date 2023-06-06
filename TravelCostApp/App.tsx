@@ -11,7 +11,6 @@ import {
   Image,
 } from "react-native";
 import Purchases from "react-native-purchases";
-import { ChatGptProvider } from "react-native-chatgpt";
 
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
@@ -87,7 +86,6 @@ import NetworkContextProvider, {
 } from "./store/network-context";
 import { Avatar, Text } from "react-native-paper";
 import ConnectionBar from "./components/UI/ConnectionBar";
-import ChatGPTScreen from "./components/ChatGPT/ChatGPTScreen";
 import { secureStoreGetItem, secureStoreSetItem } from "./store/secure-storage";
 import { isConnectionFastEnough } from "./util/connectionSpeed";
 import FinancialScreen from "./screens/FinancialScreen";
@@ -197,14 +195,6 @@ function AuthenticatedStack() {
             options={{
               headerShown: false,
               presentation: "modal",
-            }}
-          />
-          <Stack.Screen
-            name="ChatGPT"
-            component={ChatGPTScreen}
-            options={{
-              headerShown: false,
-              // presentation: "modal",
             }}
           />
           <Stack.Screen
@@ -793,17 +783,15 @@ export default function App() {
                 <UserContextProvider>
                   <SettingsProvider>
                     <NetworkProvider>
-                      <ChatGptProvider>
-                        <ExpensesContextProvider>
-                          <TourGuideProvider
-                            {...{ borderRadius: 16, key: "settings" }}
-                          >
-                            <Root />
-                            {/* {DEV && <ConnectionBar />} */}
-                            <ToastComponent />
-                          </TourGuideProvider>
-                        </ExpensesContextProvider>
-                      </ChatGptProvider>
+                      <ExpensesContextProvider>
+                        <TourGuideProvider
+                          {...{ borderRadius: 16, key: "settings" }}
+                        >
+                          <Root />
+                          {/* {DEV && <ConnectionBar />} */}
+                          <ToastComponent />
+                        </TourGuideProvider>
+                      </ExpensesContextProvider>
                     </NetworkProvider>
                   </SettingsProvider>
                 </UserContextProvider>

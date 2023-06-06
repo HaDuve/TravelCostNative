@@ -367,9 +367,9 @@ const SettingsScreen = ({ navigation }) => {
       >
         {premiumButtonString}
       </GradientButton>
-      <TouchableOpacity onPress={() => navigation.navigate("CategoryMapTest")}>
+      {/* <TouchableOpacity onPress={() => navigation.navigate("CategoryMapTest")}>
         <Text style={[styles.textButton]}>CatMapTest</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <TouchableOpacity onPress={() => restorePurchases()}>
         <Text style={[styles.textButton]}>Restore Purchases?</Text>
       </TouchableOpacity>

@@ -1,4 +1,9 @@
-export const CATEGORY_KEYWORDS = [
+export interface CategoryKeywords {
+  cat: string;
+  keywords: string[];
+}
+
+export const CATEGORY_KEYWORDS: CategoryKeywords[] = [
   {
     cat: "food",
     keywords: [

@@ -93,6 +93,7 @@ import { isConnectionFastEnough } from "./util/connectionSpeed";
 import FinancialScreen from "./screens/FinancialScreen";
 import FinderScreen from "./screens/FinderScreen";
 import CustomerScreen from "./screens/CustomerScreen";
+import CategoryMapTestScreen from "./screens/CategoryMapTestScreen";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -256,6 +257,14 @@ function AuthenticatedStack() {
           <Stack.Screen
             name="Customer"
             component={CustomerScreen}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
+          <Stack.Screen
+            name="CategoryMapTest"
+            component={CategoryMapTestScreen}
             options={{
               headerShown: false,
               presentation: "modal",

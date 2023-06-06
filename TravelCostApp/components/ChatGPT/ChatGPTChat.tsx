@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { GiftedChat, IMessage } from "react-native-gifted-chat";
+// import { GiftedChat, IMessage } from "react-native-gifted-chat";
 import { useChatGpt } from "react-native-chatgpt";
 import { Button, Snackbar } from "react-native-paper";
 import { Dimensions, StyleSheet, View } from "react-native";
@@ -27,85 +27,86 @@ const createBotMessage = (text: string) => {
 const Chat = () => {
   const { sendMessage } = useChatGpt();
   const insets = useSafeAreaInsets();
-  const [messages, setMessages] = useState<IMessage[]>([]);
+  // const [messages, setMessages] = useState<IMessage[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const messageId = useRef("");
   const conversationId = useRef("");
   const navigation = useNavigation();
 
-  useEffect(() => {
-    setMessages([createBotMessage("Ask me anything :)")]);
-  }, []);
+  // useEffect(() => {
+  //   setMessages([createBotMessage("Ask me anything :)")]);
+  // }, []);
 
-  useEffect(() => {
-    if (messages.length) {
-      const lastMessage = messages[0];
-      if (!lastMessage || lastMessage.user._id === CHAT_GPT_ID) return;
+  // useEffect(() => {
+  //   if (messages.length) {
+  //     const lastMessage = messages[0];
+  //     if (!lastMessage || lastMessage.user._id === CHAT_GPT_ID) return;
 
-      setMessages((prevMessages) => [createBotMessage("..."), ...prevMessages]);
-    }
-  }, [messages]);
+  //     setMessages((prevMessages) => [createBotMessage("..."), ...prevMessages]);
+  //   }
+  // }, [messages]);
 
-  useEffect(() => {
-    const lastMessage = messages[0];
-    if (
-      lastMessage &&
-      lastMessage.user._id === CHAT_GPT_ID &&
-      lastMessage.text === "..."
-    ) {
-      sendMessage({
-        message: messages[1]?.text as string,
-        options:
-          messageId.current && conversationId.current
-            ? {
-                messageId: messageId.current,
-                conversationId: conversationId.current,
-              }
-            : undefined,
-        onAccumulatedResponse: (accumulatedResponse) => {
-          messageId.current = accumulatedResponse.messageId;
-          conversationId.current = accumulatedResponse.conversationId;
-          // Attach to last message
-          setMessages((previousMessages) => {
-            const newMessages = [...previousMessages];
-            newMessages[0] = {
-              ...previousMessages[0],
-              text: accumulatedResponse.message,
-            };
-            return newMessages;
-          });
-        },
-        onError: (e) => {
-          setErrorMessage(`${e.statusCode} ${e.message}`);
-          setMessages((previousMessages) => {
-            const newMessages = [...previousMessages];
-            newMessages[0] = {
-              ...previousMessages[0],
-              text: "Sorry, I couldn't process your request",
-            };
-            return newMessages;
-          });
-        },
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages]);
+  // useEffect(() => {
+  //   const lastMessage = messages[0];
+  //   if (
+  //     lastMessage &&
+  //     lastMessage.user._id === CHAT_GPT_ID &&
+  //     lastMessage.text === "..."
+  //   ) {
+  //     sendMessage({
+  //       message: messages[1]?.text as string,
+  //       options:
+  //         messageId.current && conversationId.current
+  //           ? {
+  //               messageId: messageId.current,
+  //               conversationId: conversationId.current,
+  //             }
+  //           : undefined,
+  //       onAccumulatedResponse: (accumulatedResponse) => {
+  //         messageId.current = accumulatedResponse.messageId;
+  //         conversationId.current = accumulatedResponse.conversationId;
+  //         // Attach to last message
+  //         setMessages((previousMessages) => {
+  //           const newMessages = [...previousMessages];
+  //           newMessages[0] = {
+  //             ...previousMessages[0],
+  //             text: accumulatedResponse.message,
+  //           };
+  //           return newMessages;
+  //         });
+  //       },
+  //       onError: (e) => {
+  //         setErrorMessage(`${e.statusCode} ${e.message}`);
+  //         setMessages((previousMessages) => {
+  //           const newMessages = [...previousMessages];
+  //           newMessages[0] = {
+  //             ...previousMessages[0],
+  //             text: "Sorry, I couldn't process your request",
+  //           };
+  //           return newMessages;
+  //         });
+  //       },
+  //     });
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [messages]);
 
-  const onSend = useCallback((msgs: IMessage[] = []) => {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, msgs)
-    );
-  }, []);
+  // const onSend = useCallback((msgs: IMessage[] = []) => {
+  //   // setMessages((previousMessages) =>
+  //   // GiftedChat.append(previousMessages, msgs)
+  //   console.log("GiftedChat not installed");
+  //   // );
+  // }, []);
 
   return (
     <View style={styles.container}>
-      <GiftedChat
+      {/* <GiftedChat
         messages={messages}
         onSend={onSend}
         user={{
           _id: 1,
         }}
-      />
+      /> */}
       <Snackbar
         visible={!!errorMessage}
         onDismiss={() => setErrorMessage("")}

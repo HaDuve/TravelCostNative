@@ -211,6 +211,17 @@ export const storeExpenseOnlineOffline = async (
  * @returns {Promise<void>}
  */
 export const sendOfflineQueue = async () => {
+  // mutex
+  console.log(
+    "sendOfflineQueue ~ global.sendingOfflineQueue:",
+    global.sendingOfflineQueue
+  );
+  if (global.sendingOfflineQueue) {
+    console.log("sendOfflineQueue ~ already sending");
+    return;
+  }
+  global.sendingOfflineQueue = true;
+
   const offlineQueue = (await secureStoreGetObject("offlineQueue")) || [];
   if (offlineQueue && offlineQueue.length > 0) {
     // console.log("queue length", offlineQueue.length);
@@ -308,4 +319,5 @@ export const sendOfflineQueue = async () => {
   } else {
     // console.log("no queue");
   }
+  global.sendingOfflineQueue = false;
 };

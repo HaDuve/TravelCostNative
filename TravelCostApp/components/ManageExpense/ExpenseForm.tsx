@@ -196,9 +196,9 @@ const ExpenseForm = ({
   );
 
   useEffect(() => {
-    console.log("useEffect ~ tripCtx.isPaidDate", tripCtx?.isPaidDate);
-    console.log("useEffect ~ startDate", startDate);
-    console.log("useEffect ~ editingValues.date", editingValues?.date);
+    // console.log("useEffect ~ tripCtx.isPaidDate", tripCtx?.isPaidDate);
+    // console.log("useEffect ~ startDate", startDate);
+    // console.log("useEffect ~ editingValues.date", editingValues?.date);
     if (
       tripCtx.isPaidDate &&
       (new Date(tripCtx.isPaidDate) > new Date(startDate) ||
@@ -249,7 +249,7 @@ const ExpenseForm = ({
   );
   useEffect(() => {
     if (netCtx.strongConnection) {
-      console.log("~~ currentTravellers:", tripCtx.travellers);
+      // console.log("~~ currentTravellers:", tripCtx.travellers);
       setCurrentTravellers(tripCtx.travellers);
     }
   }, [tripCtx.travellers, netCtx.strongConnection]);
@@ -746,7 +746,12 @@ const ExpenseForm = ({
 
   const askChatGPTHandler = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    navigation.navigate("ChatGPT");
+    navigation.navigate("GPTDeal", {
+      price: inputs.amount.value,
+      currency: inputs.currency.value,
+      country: inputs.country.value,
+      product: inputs.description.value,
+    });
   };
 
   function updateCurrency() {
@@ -770,9 +775,9 @@ const ExpenseForm = ({
   );
   const hidePickers = true;
   // console log all 3 dates
-  console.log("startDate", startDate);
-  console.log("endDate", endDate);
-  console.log("date", inputs.date.value);
+  // console.log("startDate", startDate);
+  // console.log("endDate", endDate);
+  // console.log("date", inputs.date.value);
   let dateIsRanged =
     startDate?.toString().slice(0, 10) !== endDate?.toString().slice(0, 10);
   // if no startDate or no endDate, then date is not ranged
@@ -1281,17 +1286,17 @@ const ExpenseForm = ({
             </GradientButton>
           </View>
           {/* Commented out ChatGPT Button */}
-          {/* <View style={[styles.buttonContainer, { marginBottom: "20%" }]}>
-          <GradientButton
-            style={[styles.button, { marginTop: 28, minWidth: "80%" }]}
-            colors={GlobalStyles.gradientColorsButton}
-            onPress={askChatGPTHandler}
-            darkText
-          >
-            {isEditing && "Ask ChatGPT: Was this a good deal?"}
-            {!isEditing && "Ask ChatGPxT: How much should I pay?"}
-          </GradientButton>
-        </View> */}
+          <View style={[styles.buttonContainer, { marginBottom: "20%" }]}>
+            <GradientButton
+              style={[styles.button, { marginTop: 28, minWidth: "80%" }]}
+              colors={GlobalStyles.gradientColorsButton}
+              onPress={askChatGPTHandler}
+              darkText
+            >
+              {isEditing && "Ask ChatGPT: Was this a good deal?"}
+              {!isEditing && "Ask ChatGPT: Would this be a good deal?"}
+            </GradientButton>
+          </View>
         </Animated.View>
       </Animated.View>
     </>

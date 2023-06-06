@@ -3,5 +3,6 @@
     "jsx": "react"
   },
   "extends": "expo/tsconfig.base",
-  "noImplicitAny": true
+  "noImplicitAny": true,
+  "typeRoots": ["./types"]
 }

@@ -15,6 +15,9 @@ const SettingsSection = ({ multiTraveller }) => {
   const [skipCategoryPickScreen, setSkipCategoryPickScreen] = useState(
     settings.skipCategoryScreen
   );
+  const [showInternetSpeed, setShowInternetSpeed] = useState(
+    settings.showInternetSpeed
+  );
 
   const toggleShowFlags = () => {
     const newSettings = { ...settings, showFlags: !showFlags };
@@ -44,6 +47,14 @@ const SettingsSection = ({ multiTraveller }) => {
     setSkipCategoryPickScreen(!skipCategoryPickScreen);
     saveSettings(newSettings);
   };
+  const toggleShowInternetSpeed = () => {
+    const newSettings = {
+      ...settings,
+      showInternetSpeed: !showInternetSpeed,
+    };
+    setShowInternetSpeed(!showInternetSpeed);
+    saveSettings(newSettings);
+  };
   return (
     <View>
       {/* <View style={styles.switchContainer}>
@@ -66,6 +77,12 @@ const SettingsSection = ({ multiTraveller }) => {
         style={styles.switchContainer}
         state={showFlags}
         toggleState={toggleShowFlags}
+      />
+      <SettingsSwitch
+        label="Show Internet Speed"
+        style={styles.switchContainer}
+        state={showInternetSpeed}
+        toggleState={toggleShowInternetSpeed}
       />
       {multiTraveller && (
         <SettingsSwitch

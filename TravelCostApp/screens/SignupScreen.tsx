@@ -22,7 +22,7 @@ import { AuthContext } from "../store/auth-context";
 import Toast from "react-native-toast-message";
 import { Platform } from "react-native";
 import Purchases from "react-native-purchases";
-import { API_KEY } from "../components/Premium/PremiumConstants";
+import { REVCAT_API_KEY } from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
 
 function SignupScreen() {
@@ -68,7 +68,7 @@ function SignupScreen() {
         });
       } else if (Platform.OS === "ios") {
         // Purchases
-        Purchases.configure({ apiKey: API_KEY, appUserID: uid });
+        Purchases.configure({ apiKey: REVCAT_API_KEY, appUserID: uid });
         console.log("SignupScreen ~ uid:", uid);
       }
 

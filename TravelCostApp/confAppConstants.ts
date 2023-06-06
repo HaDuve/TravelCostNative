@@ -25,3 +25,9 @@ export const SPLASH_SCREEN_DELAY = 500;
 export const EXPENSES_LOAD_TIMEOUT = 6000;
 // tweak minimum required internet speed in Mbit/s
 export const MINIMUM_REQUIRED_SPEED = 1;
+// gpt header
+export const GPTHEADER = {
+  "content-type": "application/json",
+  "X-RapidAPI-Key": "ee892f25f1msh7b58e66c617672dp1d7c37jsn9339224154d5",
+  "X-RapidAPI-Host": "chatgpt53.p.rapidapi.com",
+};

@@ -8,6 +8,7 @@ export interface Settings {
   showWhoPaid: boolean;
   alwaysShowAdvanced: boolean;
   skipCategoryScreen: boolean;
+  showInternetSpeed: boolean;
 }
 
 export const SettingsContext = createContext({
@@ -34,6 +35,7 @@ export const SettingsProvider = ({ children }) => {
           showWhoPaid: false,
           alwaysShowAdvanced: false,
           skipCategoryScreen: false,
+          showInternetSpeed: false,
         });
     };
     loadSettingsAsync();

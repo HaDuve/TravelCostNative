@@ -72,7 +72,7 @@ import { useInterval } from "./components/Hooks/useInterval";
 import { isForeground } from "./util/appState";
 import { TourGuideProvider } from "rn-tourguide";
 import { loadTourConfig } from "./util/tourUtil";
-import { API_KEY } from "./components/Premium/PremiumConstants";
+import { REVCAT_API_KEY } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
 import { SettingsProvider } from "./store/settings-context";
 import { UserData } from "./store/user-context";
@@ -94,6 +94,7 @@ import FinancialScreen from "./screens/FinancialScreen";
 import FinderScreen from "./screens/FinderScreen";
 import CustomerScreen from "./screens/CustomerScreen";
 import CategoryMapTestScreen from "./screens/CategoryMapTestScreen";
+import GPTDealScreen from "./screens/GPTDealScreen";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -265,6 +266,14 @@ function AuthenticatedStack() {
           <Stack.Screen
             name="CategoryMapTest"
             component={CategoryMapTestScreen}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
+          <Stack.Screen
+            name="GPTDeal"
+            component={GPTDealScreen}
             options={{
               headerShown: false,
               presentation: "modal",
@@ -638,7 +647,7 @@ function Root() {
           });
         } else if (Platform.OS === "ios") {
           // Purchases
-          Purchases.configure({ apiKey: API_KEY, appUserID: storedUid });
+          Purchases.configure({ apiKey: REVCAT_API_KEY, appUserID: storedUid });
           console.log("onRootMount ~ storedUid:", storedUid);
         }
 

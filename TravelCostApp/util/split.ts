@@ -285,13 +285,7 @@ export async function calcOpenSplitsTable(
       return;
     }
   }
-  console.log(expenses.length, "expenses");
-  console.log(expenses[0]);
   let openSplits = [];
-  console.log("paidBackDate:", isPaidDate);
-  console.log("expenses[0].startDate:", expenses[0].startDate);
-  console.log("expenses[0].date:", expenses[0].date);
-  console.log("expenses[0].endDate:", expenses[0].endDate);
   const asyncSplitList = async () => {
     for (const exp of expenses) {
       const expense: ExpenseData = exp;

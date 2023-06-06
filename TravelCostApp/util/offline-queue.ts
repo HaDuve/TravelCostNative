@@ -212,10 +212,6 @@ export const storeExpenseOnlineOffline = async (
  */
 export const sendOfflineQueue = async () => {
   // mutex
-  console.log(
-    "sendOfflineQueue ~ global.sendingOfflineQueue:",
-    global.sendingOfflineQueue
-  );
   if (global.sendingOfflineQueue) {
     console.log("sendOfflineQueue ~ already sending");
     return;

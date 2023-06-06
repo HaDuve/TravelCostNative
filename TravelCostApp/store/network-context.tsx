@@ -12,11 +12,13 @@ import { isConnectionFastEnough } from "../util/connectionSpeed";
 export const NetworkContext = createContext({
   isConnected: true,
   strongConnection: true,
+  lastConnectionSpeedInMbps: 0,
 });
 
 const NetworkContextProvider = ({ children }) => {
   const [isConnected, setIsConnected] = useState(!DEBUG_FORCE_OFFLINE);
   const [strongConnection, setStrongConnection] = useState(false);
+  const [lastConnectionSpeedInMbps, setLastConnectionSpeedInMbps] = useState(0);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
@@ -39,7 +41,8 @@ const NetworkContextProvider = ({ children }) => {
         return;
       }
       async function asyncCheckConnectionSpeed() {
-        const { isFastEnough } = await isConnectionFastEnough();
+        const { isFastEnough, speed } = await isConnectionFastEnough();
+        setLastConnectionSpeedInMbps(speed);
         setStrongConnection(isFastEnough);
       }
       asyncCheckConnectionSpeed();
@@ -49,7 +52,9 @@ const NetworkContextProvider = ({ children }) => {
   );
 
   return (
-    <NetworkContext.Provider value={{ isConnected, strongConnection }}>
+    <NetworkContext.Provider
+      value={{ isConnected, strongConnection, lastConnectionSpeedInMbps }}
+    >
       {children}
     </NetworkContext.Provider>
   );

@@ -115,7 +115,7 @@ export function mapDescriptionToCategory(
     const keywords = category.keywords ?? [];
     keywords.push(category.cat);
     keywords.forEach((keyword) => {
-      if (description.toLowerCase().includes(keyword.toLowerCase())) {
+      if (description.toLowerCase()?.includes(keyword?.toLowerCase())) {
         categoryMap[category.cat] = (categoryMap[category.cat] || 0) + 1;
       }
     });
@@ -139,7 +139,9 @@ export const DEFAULTCATEGORIES: Category[] = [
     color: GlobalStyles.colors.textColor,
     cat: "food",
     catString: i18n.t("catFoodString"),
-    keywords: CATEGORY_KEYWORDS[0].keywords,
+    keywords: CATEGORY_KEYWORDS.find(
+      (CATEGORY_KEYWORD) => CATEGORY_KEYWORD.cat === "food"
+    ).keywords,
   },
   {
     id: 2,
@@ -147,7 +149,9 @@ export const DEFAULTCATEGORIES: Category[] = [
     color: GlobalStyles.colors.textColor,
     cat: "international-travel",
     catString: i18n.t("catIntTravString"),
-    keywords: CATEGORY_KEYWORDS[1].keywords,
+    keywords: CATEGORY_KEYWORDS.find(
+      (CATEGORY_KEYWORD) => CATEGORY_KEYWORD.cat === "international-travel"
+    ).keywords,
   },
   {
     id: 3,
@@ -155,7 +159,9 @@ export const DEFAULTCATEGORIES: Category[] = [
     color: GlobalStyles.colors.textColor,
     cat: "accomodation",
     catString: i18n.t("catAccoString"),
-    keywords: CATEGORY_KEYWORDS[2].keywords,
+    keywords: CATEGORY_KEYWORDS.find(
+      (CATEGORY_KEYWORD) => CATEGORY_KEYWORD.cat === "accomodation"
+    ).keywords,
   },
   {
     id: 4,
@@ -163,7 +169,9 @@ export const DEFAULTCATEGORIES: Category[] = [
     color: GlobalStyles.colors.textColor,
     cat: "national-travel",
     catString: i18n.t("catNatTravString"),
-    keywords: CATEGORY_KEYWORDS[3].keywords,
+    keywords: CATEGORY_KEYWORDS.find(
+      (CATEGORY_KEYWORD) => CATEGORY_KEYWORD.cat === "national-travel"
+    ).keywords,
   },
   {
     id: 5,
@@ -171,7 +179,9 @@ export const DEFAULTCATEGORIES: Category[] = [
     color: GlobalStyles.colors.textColor,
     cat: "other",
     catString: i18n.t("catOtherString"),
-    keywords: CATEGORY_KEYWORDS[4].keywords,
+    keywords: CATEGORY_KEYWORDS.find(
+      (CATEGORY_KEYWORD) => CATEGORY_KEYWORD.cat === "other"
+    ).keywords,
   },
   {
     id: 6,

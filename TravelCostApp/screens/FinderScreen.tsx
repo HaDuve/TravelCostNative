@@ -165,15 +165,10 @@ const FinderScreen = () => {
     const loadData = async () => {
       try {
         const checkedQuery = await asyncStoreGetObject("FINDER_checkedQuery");
-        console.log("loadData ~ checkedQuery:", checkedQuery);
         const checkedDate = await asyncStoreGetObject("FINDER_checkedDate");
-        console.log("loadData ~ checkedDate:", checkedDate);
         const startDate = await asyncStoreGetItem("FINDER_startDate");
-        console.log("loadData ~ startDate:", startDate);
         const endDate = await asyncStoreGetItem("FINDER_endDate");
-        console.log("loadData ~ endDate:", endDate);
         const searchQuery = await asyncStoreGetItem("FINDER_searchQuery");
-        console.log("loadData ~ searchQuery:", searchQuery);
         if (checkedQuery) setCheckedQuery(checkedQuery);
         if (checkedDate) setCheckedDate(checkedDate);
         if (startDate) setStartDate(startDate);

@@ -20,7 +20,7 @@ import { TripContext } from "../store/trip-context";
 import { asyncStoreSetItem } from "../store/async-storage";
 import Toast from "react-native-toast-message";
 import Purchases from "react-native-purchases";
-import { API_KEY } from "../components/Premium/PremiumConstants";
+import { REVCAT_API_KEY } from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
 import { secureStoreSetItem } from "../store/secure-storage";
 
@@ -77,7 +77,7 @@ function LoginScreen() {
         });
       } else if (Platform.OS === "ios") {
         // Purchases
-        Purchases.configure({ apiKey: API_KEY, appUserID: uid });
+        Purchases.configure({ apiKey: REVCAT_API_KEY, appUserID: uid });
         console.log("LoginScreen ~ uid:", uid);
       }
       try {

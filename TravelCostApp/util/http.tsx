@@ -598,8 +598,6 @@ export async function touchAllTravelers(tripid: string, flag: boolean) {
 }
 
 export async function unTouchTraveler(tripid: string, uid: string) {
-  console.log("unTouchTraveler ~ uid:", uid);
-  console.log("unTouchTraveler ~ unTouchTraveler:", unTouchTraveler);
   const response = await fetchTripsTravellers(tripid);
   const axios_calls = [];
   for (const key in response) {

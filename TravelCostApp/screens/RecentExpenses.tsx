@@ -56,6 +56,7 @@ import { NetworkContext } from "../store/network-context";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { sendOfflineQueue } from "../util/offline-queue";
 import * as Haptics from "expo-haptics";
+import { SettingsContext } from "../store/settings-context";
 
 function RecentExpenses({ navigation }) {
   // console.log("rerender RecentExpenses - A");
@@ -65,7 +66,9 @@ function RecentExpenses({ navigation }) {
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
-
+  const { settings } = useContext(SettingsContext);
+  const showInternetSpeed = settings.showInternetSpeed;
+  const lastConnectionSpeedInMbps = netCtx.lastConnectionSpeedInMbps;
   const listRef = React.useRef(null);
   useScrollToTop(listRef);
 
@@ -108,16 +111,24 @@ function RecentExpenses({ navigation }) {
 
   // strong connection state
   const [offlineString, setOfflineString] = useState("");
+  const connectionSpeedString = showInternetSpeed
+    ? " - " + lastConnectionSpeedInMbps?.toFixed(2) + " Mbps"
+    : "";
   // set in useEffect
   useEffect(() => {
     if (isOnline) {
-      setOfflineString("");
+      setOfflineString(connectionSpeedString);
     } else {
       if (netCtx.isConnected && !netCtx.strongConnection) {
-        setOfflineString(" - Slow Connection");
+        setOfflineString(" - Slow Connection" + connectionSpeedString);
       } else setOfflineString(" - Offline Mode");
     }
-  }, [isOnline, netCtx.isConnected, netCtx.strongConnection]);
+  }, [
+    isOnline,
+    netCtx.isConnected,
+    netCtx.strongConnection,
+    connectionSpeedString,
+  ]);
 
   useEffect(() => {
     const asyncLoading = async () => {

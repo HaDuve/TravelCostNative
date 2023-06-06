@@ -51,15 +51,15 @@ const ManageExpense = ({ route, navigation }) => {
   const [isOnline, setIsOnline] = useState(
     netCtx.isConnected && netCtx.strongConnection
   );
-  console.log("ManageExpense ~ isOnline:", isOnline);
+  // console.log("ManageExpense ~ isOnline:", isOnline);
   const [progress, setProgress] = useState(-1);
   const [progressAt, setProgressAt] = useState(0);
   const [progressMax, setProgressMax] = useState(0);
 
   const tripid = tripCtx.tripid;
-  console.log("ManageExpense ~ tripid:", tripid);
+  // console.log("ManageExpense ~ tripid:", tripid);
   const uid = authCtx.uid;
-  console.log("ManageExpense ~ uid:", uid);
+  // console.log("ManageExpense ~ uid:", uid);
 
   const editedExpenseId = route.params?.expenseId;
   const isEditing = !!editedExpenseId;
@@ -180,9 +180,9 @@ const ManageExpense = ({ route, navigation }) => {
       // expenseData.startDate =
       // expenseData.endDate =
       expenseData.date = newDate;
-      console.log("expenseData.date: ", expenseData.date);
-      console.log("expenseData.startDate: ", expenseData.startDate);
-      console.log("expenseData.endDate: ", expenseData.endDate);
+      // console.log("expenseData.date: ", expenseData.date);
+      // console.log("expenseData.startDate: ", expenseData.startDate);
+      // console.log("expenseData.endDate: ", expenseData.endDate);
 
       const item: OfflineQueueManageExpenseItem = {
         type: "add",

@@ -21,7 +21,7 @@ export const TOAST_LOCATION = "bottom";
 // conservative maximum number for javascript not to crash
 export const MAX_JS_NUMBER = 3435973836;
 // tweak loading splash screen overlay delay
-export const SPLASH_SCREEN_DELAY = 500;
+export const SPLASH_SCREEN_DELAY = 1000;
 // tweak loading recent expenses overlay timeout
 export const EXPENSES_LOAD_TIMEOUT = 6000;
 // tweak minimum required internet speed in Mbit/s

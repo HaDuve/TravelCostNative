@@ -48,16 +48,22 @@ const OverviewScreen = ({ navigation }) => {
   const connectionSpeedString = showInternetSpeed
     ? " - " + lastConnectionSpeedInMbps?.toFixed(2) + " Mbps"
     : "";
+  const isOnline = netCtx.isConnected && netCtx.strongConnection;
+
   useEffect(() => {
-    if (netCtx.isConnected && netCtx.strongConnection) {
+    if (isOnline) {
       setOfflineString(connectionSpeedString);
     } else {
       if (netCtx.isConnected && !netCtx.strongConnection) {
         setOfflineString(" - Slow Connection" + connectionSpeedString);
       } else setOfflineString(" - Offline Mode");
     }
-  }, [netCtx.isConnected, netCtx.strongConnection]);
-
+  }, [
+    isOnline,
+    netCtx.isConnected,
+    netCtx.strongConnection,
+    connectionSpeedString,
+  ]);
   useInterval(
     React.useCallback(() => {
       setDateTimeString(_toShortFormat(DateTime.now()));

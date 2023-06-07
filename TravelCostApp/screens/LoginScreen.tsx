@@ -99,13 +99,14 @@ function LoginScreen() {
     } catch (error) {
       console.error(error);
       setIsAuthenticating(false);
-      Alert.alert(i18n.t("authError"), i18n.t("authErrorText"));
+      // Alert.alert(i18n.t("authError"), i18n.t("authErrorText"));
+      Alert.alert(i18n.t("authError"), error.message);
       authCtx.logout();
     }
   }
 
   if (isAuthenticating) {
-    return <LoadingOverlay message={i18n.t("loginLoadText")} />;
+    return <LoadingOverlay customText={i18n.t("loginLoadText")} />;
   }
 
   return <AuthContent isLogin onAuthenticate={loginHandler} />;

@@ -22,6 +22,7 @@ const unfilledColor = GlobalStyles.colors.gray600;
 const LoadingBarOverlay = (props) => {
   const { containerStyle, progressAt, progressMax, customText } = props;
   let { progress } = props;
+  const renderedText = customText ? customText : "Uploading your Expenses ... "; //i18n.t("uploadingExpenses");
   // if progress is smaller than 0
   if (!progress || isNaN(Number(progress)))
     return <LoadingOverlay customText={customText} />;
@@ -36,7 +37,7 @@ const LoadingBarOverlay = (props) => {
     <View style={[styles.container, containerStyle]}>
       <View style={styles.headerContainer}>
         <ActivityIndicator size={"large"} color={loadingColor} />
-        <Text style={styles.text}>Uploading your Expenses ... </Text>
+        <Text style={styles.text}>{renderedText}</Text>
       </View>
       <Progress.Bar
         color={loadingColor}

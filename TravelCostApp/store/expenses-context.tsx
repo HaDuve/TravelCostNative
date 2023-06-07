@@ -135,7 +135,8 @@ function ExpensesContextProvider({ children }) {
     // save expenseState in async
     // console.log("saving expenses");
     async function asyncSaveExpenses() {
-      await asyncStoreSetObject("expenses", expensesState);
+      if (expensesState.length > 0)
+        await asyncStoreSetObject("expenses", expensesState);
     }
     asyncSaveExpenses();
   }, [expensesState]);

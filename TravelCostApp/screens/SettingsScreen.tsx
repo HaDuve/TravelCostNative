@@ -45,6 +45,7 @@ import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { secureStoreGetItem } from "../store/secure-storage";
 import IconButton from "../components/UI/IconButton";
+import { BlurView } from "expo-blur";
 
 const SettingsScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
@@ -270,18 +271,17 @@ const SettingsScreen = ({ navigation }) => {
   return (
     <ScrollView
       scrollEnabled={true}
+      stickyHeaderIndices={[0]}
       style={{
         flex: 1,
-        padding: "4%",
+        paddingHorizontal: "4%",
         backgroundColor: GlobalStyles.colors.backgroundColor,
       }}
     >
-      <View
+      <BlurView
+        intensity={90}
         style={{
-          // flex: 1,
           flexDirection: "row",
-          alignItems: "center",
-          // paddingHorizontal: "4%",
         }}
       >
         {/* Back button */}
@@ -294,7 +294,7 @@ const SettingsScreen = ({ navigation }) => {
             icon="arrow-back-outline"
             size={36}
             color={GlobalStyles.colors.textColor}
-            // style={styles.button}
+            buttonStyle={styles.backButton}
             onPress={() => navigation.goBack()}
           ></IconButton>
         </TouchableOpacity>
@@ -302,7 +302,7 @@ const SettingsScreen = ({ navigation }) => {
         <View style={styles.titleContainer}>
           <Text style={styles.titleText}>Settings</Text>
         </View>
-      </View>
+      </BlurView>
       <SettingsSection multiTraveller={multiTraveller}></SettingsSection>
       {/* <GradientButton style={styles.settingsButton} onPress={logoutHandler}>
         {i18n.t("logoutLabel")}
@@ -403,9 +403,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: "2%",
-    paddingHorizontal: "20%",
+    marginLeft: "30%",
+    paddingVertical: "3%",
   },
+  backButton: { marginBottom: "-14%" },
   titleText: {
     fontSize: 22,
     fontWeight: "bold",

@@ -124,13 +124,20 @@ function ExpensesContextProvider({ children }) {
   const [expensesState, dispatch] = useReducer(expensesReducer, []);
 
   useEffect(() => {
-    loadExpensesFromStorage();
+    async function asyncLoadExpenses() {
+      console.log("-----------------\n first time load");
+      await loadExpensesFromStorage(true);
+    }
+    asyncLoadExpenses();
   }, []);
 
   useEffect(() => {
     // save expenseState in async
     // console.log("saving expenses");
-    asyncStoreSetObject("expenses", expensesState);
+    async function asyncSaveExpenses() {
+      await asyncStoreSetObject("expenses", expensesState);
+    }
+    asyncSaveExpenses();
   }, [expensesState]);
 
   function addExpense(expenseData: ExpenseData) {
@@ -279,12 +286,16 @@ function ExpensesContextProvider({ children }) {
     return yearlyExpenses;
   }
 
-  async function loadExpensesFromStorage() {
-    if (expensesState.length !== 0) {
+  async function loadExpensesFromStorage(forceLoad = false) {
+    if (!forceLoad && expensesState.length !== 0) {
       // console.log("expenses not empty, will not load again");
       return false;
     }
     const loadedExpenses = await asyncStoreGetObject("expenses");
+    console.log(
+      "loadExpensesFromStorage ~ loadedExpenses:",
+      loadedExpenses?.length
+    );
     const expArray = [];
     if (loadedExpenses) {
       loadedExpenses.forEach((expense) => {

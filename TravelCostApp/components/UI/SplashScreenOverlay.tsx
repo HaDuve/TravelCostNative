@@ -7,6 +7,7 @@ import {
   StatusBar,
   ActivityIndicator,
 } from "react-native";
+import { reloadApp } from "../../util/appState";
 // TODO: find out why other activity indicators dont animate?
 // import { ActivityIndicator } from "react-native-paper";
 // import * as Progress from "react-native-progress";
@@ -29,6 +30,8 @@ import Animated, {
   ZoomOutDown,
 } from "react-native-reanimated";
 import { SPLASH_SCREEN_DELAY } from "../../confAppConstants";
+import FlatButton from "./FlatButton";
+import { asyncStoreSafeClear } from "../../store/async-storage";
 
 const loadingColor = GlobalStyles.colors.backgroundColor;
 const delay = SPLASH_SCREEN_DELAY;
@@ -63,6 +66,17 @@ const SplashScreenOverlay = (containerStyle) => {
           >
             <ActivityIndicator size={"large"} color={loadingColor} />
             {/* <Progress.CircleSnail color={["red", "green", "blue"]} /> */}
+          </Animated.View>
+          <Animated.View entering={ZoomInDown.duration(300).delay(5000)}>
+            <FlatButton
+              textStyle={{ color: "black" }}
+              onPress={async () => {
+                await asyncStoreSafeClear();
+                await reloadApp();
+              }}
+            >
+              Login / Signup
+            </FlatButton>
           </Animated.View>
         </ImageBackground>
       </Animated.View>

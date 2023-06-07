@@ -19,6 +19,8 @@ import {
   asyncStoreSetObject,
 } from "../store/async-storage";
 import { GlobalStyles } from "../constants/styles";
+import IconButton from "../components/UI/IconButton";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 const FinderScreen = () => {
   const navigation = useNavigation();
@@ -31,6 +33,7 @@ const FinderScreen = () => {
   const [showDatePickerRange, setShowDatePickerRange] = useState(false);
   const [startDate, setStartDate] = useState(getFormattedDate(DateTime.now()));
   const [endDate, setEndDate] = useState(getFormattedDate(DateTime.now()));
+  const dateOtherThanToday = startDate !== getFormattedDate(DateTime.now());
   const openDatePickerRange = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(true);
@@ -234,6 +237,23 @@ const FinderScreen = () => {
               dateIsRanged,
               narrow: true,
             })}
+            {checkedDate && (
+              <IconButton
+                icon="close-outline"
+                size={26}
+                buttonStyle={{ marginLeft: "8%" }}
+                onPressStyle={{
+                  backgroundColor: GlobalStyles.colors.gray500,
+                  borderRadius: 99,
+                }}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setCheckedDate(false);
+                  setStartDate(getFormattedDate(DateTime.now()));
+                  setEndDate(getFormattedDate(DateTime.now()));
+                }}
+              ></IconButton>
+            )}
           </View>
           <Text style={styles.queryText}>
             Finding :{queryString} {dateString}

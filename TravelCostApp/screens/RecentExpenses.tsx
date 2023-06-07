@@ -134,7 +134,7 @@ function RecentExpenses({ navigation }) {
     const asyncLoading = async () => {
       // if expenses not empty, return
       await getExpenses();
-      await expensesCtx.loadExpensesFromStorage();
+      // await expensesCtx.loadExpensesFromStorage();
     };
     asyncLoading();
   }, [netCtx.isConnected, netCtx.strongConnection]);

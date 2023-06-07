@@ -67,8 +67,6 @@ function RecentExpenses({ navigation }) {
   const netCtx = useContext(NetworkContext);
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
   const { settings } = useContext(SettingsContext);
-  const showInternetSpeed = settings.showInternetSpeed;
-  const lastConnectionSpeedInMbps = netCtx.lastConnectionSpeedInMbps;
   const listRef = React.useRef(null);
   useScrollToTop(listRef);
 
@@ -111,6 +109,8 @@ function RecentExpenses({ navigation }) {
 
   // strong connection state
   const [offlineString, setOfflineString] = useState("");
+  const lastConnectionSpeedInMbps = netCtx.lastConnectionSpeedInMbps;
+  const showInternetSpeed = settings.showInternetSpeed;
   const connectionSpeedString = showInternetSpeed
     ? " - " + lastConnectionSpeedInMbps?.toFixed(2) + " Mbps"
     : "";

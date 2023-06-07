@@ -21,6 +21,7 @@ import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { ExpenseData } from "../util/expense";
 import * as Haptics from "expo-haptics";
+import { SettingsContext } from "../store/settings-context";
 const i18n = new I18n({ en, de, fr });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -31,6 +32,7 @@ const OverviewScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
   const userCtx = useContext(UserContext);
   const netCtx = useContext(NetworkContext);
+  const { settings } = useContext(SettingsContext);
 
   const [open, setOpen] = useState(false);
   const [PeriodValue, setPeriodValue] = useState<RangeString>(
@@ -41,12 +43,17 @@ const OverviewScreen = ({ navigation }) => {
   // strong connection state
   const [offlineString, setOfflineString] = useState("");
   // set in useEffect
+  const showInternetSpeed = settings.showInternetSpeed;
+  const lastConnectionSpeedInMbps = netCtx.lastConnectionSpeedInMbps;
+  const connectionSpeedString = showInternetSpeed
+    ? " - " + lastConnectionSpeedInMbps?.toFixed(2) + " Mbps"
+    : "";
   useEffect(() => {
     if (netCtx.isConnected && netCtx.strongConnection) {
-      setOfflineString("");
+      setOfflineString(connectionSpeedString);
     } else {
       if (netCtx.isConnected && !netCtx.strongConnection) {
-        setOfflineString(" - Slow Connection");
+        setOfflineString(" - Slow Connection" + connectionSpeedString);
       } else setOfflineString(" - Offline Mode");
     }
   }, [netCtx.isConnected, netCtx.strongConnection]);

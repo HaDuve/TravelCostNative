@@ -32,6 +32,7 @@ import Animated, {
 import { SPLASH_SCREEN_DELAY } from "../../confAppConstants";
 import FlatButton from "./FlatButton";
 import { asyncStoreSafeClear } from "../../store/async-storage";
+import IconButton from "./IconButton";
 
 const loadingColor = GlobalStyles.colors.backgroundColor;
 const delay = SPLASH_SCREEN_DELAY;
@@ -67,7 +68,19 @@ const SplashScreenOverlay = (containerStyle) => {
             <ActivityIndicator size={"large"} color={loadingColor} />
             {/* <Progress.CircleSnail color={["red", "green", "blue"]} /> */}
           </Animated.View>
-          <Animated.View entering={ZoomInDown.duration(300).delay(5000)}>
+          <Animated.View
+            entering={ZoomInDown.duration(1200).delay(3500)}
+            style={{ flexDirection: "row" }}
+          >
+            <IconButton
+              onPress={async () => {
+                await asyncStoreSafeClear();
+                await reloadApp();
+              }}
+              icon={"chevron-back-outline"}
+              size={24}
+              color={"black"}
+            ></IconButton>
             <FlatButton
               textStyle={{ color: "black" }}
               onPress={async () => {

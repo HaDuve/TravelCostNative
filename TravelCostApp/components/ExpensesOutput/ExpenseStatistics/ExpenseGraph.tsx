@@ -424,7 +424,15 @@ const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
   );
 };
 
-export default ExpenseGraph;
+const areEqual = (prevProps, nextProps) => {
+  return (
+    prevProps.periodName === nextProps.periodName &&
+    prevProps.periodRangeNumber === nextProps.periodRangeNumber &&
+    prevProps.expenses?.length === nextProps.expenses?.length
+  );
+};
+
+export default React.memo(ExpenseGraph, areEqual);
 
 ExpenseGraph.propTypes = {
   navigation: PropTypes.object,

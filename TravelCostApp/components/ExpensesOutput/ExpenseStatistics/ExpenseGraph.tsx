@@ -28,10 +28,14 @@ import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import PropTypes from "prop-types";
 import { isForeground } from "../../../util/appState";
 
-const ExpenseGraph = ({ periodName, periodRangeNumber, navigation }) => {
-  // console.log("rerender ExpenseGraph - 2");
-  const expenseCtx = useContext(ExpensesContext);
-  const tripCtx = useContext(TripContext);
+const ExpenseGraph = ({
+  periodName,
+  periodRangeNumber,
+  expenseCtx,
+  tripCtx,
+  navigation,
+}) => {
+  console.log("rerender ExpenseGraph - 2");
   const today = new Date();
   const renderItemRef = useRef(null);
   if (!isForeground) {
@@ -428,7 +432,8 @@ const areEqual = (prevProps, nextProps) => {
   return (
     prevProps.periodName === nextProps.periodName &&
     prevProps.periodRangeNumber === nextProps.periodRangeNumber &&
-    prevProps.expenses?.length === nextProps.expenses?.length
+    prevProps.expenseCtx.expenses?.length ===
+      nextProps.expenseCtx.expenses?.length
   );
 };
 
@@ -439,6 +444,8 @@ ExpenseGraph.propTypes = {
   expenses: PropTypes.array,
   periodName: PropTypes.string,
   periodRangeNumber: PropTypes.number,
+  expenseCtx: PropTypes.object,
+  tripCtx: PropTypes.object,
 };
 
 const styles = StyleSheet.create({

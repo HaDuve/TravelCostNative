@@ -36,18 +36,19 @@ import {
 import { async } from "../../util/http";
 import { useInterval } from "../Hooks/useInterval";
 import { BlurView } from "expo-blur";
+import { TripContext } from "../../store/trip-context";
+import { ExpensesContext } from "../../store/expenses-context";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   console.log("rerender ExpensesOverview - 1");
+  const expenseCtx = useContext(ExpensesContext);
+  const tripCtx = useContext(TripContext);
   // const periodRangeNumber = useRef(7);
   // periodRangeNumber useState is used to rerender the component when the periodRangeNumber changes
   const realPeriodNumber = useRef(7);
-  console.log("ExpensesOverview ~ realPeriodNumber:", realPeriodNumber);
   const [periodRangeNumber, setPeriodRangeNumber] = useState(
     realPeriodNumber.current
   );
-  console.log("ExpensesOverview ~ periodRangeNumber:", periodRangeNumber);
-  // rerender on periodRangeNumber change
 
   const [isGraphNotPie, setToggleGraph] = useState(true);
   // enum =>  0 = categories, 1 = traveller, 2 = country, 3 = currency
@@ -209,6 +210,8 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           expenses={expenses}
           periodName={periodName}
           periodRangeNumber={periodRangeNumber}
+          expenseCtx={expenseCtx}
+          tripCtx={tripCtx}
         />
       )}
       {!isGraphNotPie && toggleGraphEnum == 0 && (
@@ -270,7 +273,15 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
 };
 
 export default ExpensesOverview;
-export const MemoizedExpensesOverview = React.memo(ExpensesOverview);
+
+const areEqual = (prevProps, nextProps) => {
+  return (
+    prevProps.expenses?.length === nextProps.expenses?.length &&
+    prevProps.periodName === nextProps.periodName
+  );
+};
+
+export const MemoizedExpensesOverview = React.memo(ExpensesOverview, areEqual);
 
 ExpensesOverview.propTypes = {
   expenses: PropTypes.array.isRequired,

@@ -15,7 +15,7 @@ import Animated, { Layout } from "react-native-reanimated";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr } from "../../i18n/supportedLanguages";
+import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 import {
   deleteExpenseOnlineOffline,
   OfflineQueueManageExpenseItem,
@@ -27,7 +27,7 @@ import { NetworkContext } from "../../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { useNavigation, useScrollToTop } from "@react-navigation/native";
 import { useState } from "react";
-const i18n = new I18n({ en, de, fr });
+const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 

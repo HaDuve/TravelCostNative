@@ -19,7 +19,7 @@ import { onShare } from "../components/ProfileOutput/ShareTrip";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr } from "../i18n/supportedLanguages";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
 import { fetchTrip, fetchTripHistory, fetchUser } from "../util/http";
 import { AuthContext } from "../store/auth-context";
 import React from "react";
@@ -38,7 +38,7 @@ import {
   asyncStoreSetObject,
 } from "../store/async-storage";
 import { NetworkContext } from "../store/network-context";
-const i18n = new I18n({ en, de, fr });
+const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "de";

@@ -15,7 +15,7 @@ import { GlobalStyles } from "../constants/styles";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr } from "../i18n/supportedLanguages";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
 import { fetchCategories } from "../util/http";
 import { useContext } from "react";
 import { TripContext } from "../store/trip-context";
@@ -34,7 +34,7 @@ import { DEFAULTCATEGORIES } from "../util/category";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import IconButton from "../components/UI/IconButton";
 import BackButton from "../components/UI/BackButton";
-const i18n = new I18n({ en, de, fr });
+const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";

@@ -12,7 +12,7 @@ import ExpensesOverview, {
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr } from "../i18n/supportedLanguages";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
 import { DateTime } from "luxon";
 import { _toShortFormat } from "../util/dateTime";
 import PropTypes from "prop-types";
@@ -22,7 +22,7 @@ import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { ExpenseData } from "../util/expense";
 import * as Haptics from "expo-haptics";
 import { SettingsContext } from "../store/settings-context";
-const i18n = new I18n({ en, de, fr });
+const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";

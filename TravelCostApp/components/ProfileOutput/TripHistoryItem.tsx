@@ -28,7 +28,7 @@ import LoadingOverlay from "../UI/LoadingOverlay";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr } from "../../i18n/supportedLanguages";
+import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 import { ExpensesContext } from "../../store/expenses-context";
 import { UserContext } from "../../store/user-context";
 import { AuthContext } from "../../store/auth-context";
@@ -36,7 +36,7 @@ import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
 import { getCurrencySymbol } from "../../util/currencySymbol";
-const i18n = new I18n({ en, de, fr });
+const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";

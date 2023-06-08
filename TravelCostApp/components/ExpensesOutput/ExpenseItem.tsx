@@ -27,14 +27,14 @@ import { FlatList } from "react-native-gesture-handler";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr } from "../../i18n/supportedLanguages";
+import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 import { DateTime } from "luxon";
 import { UserContext } from "../../store/user-context";
 import ExpenseCountryFlag from "./ExpenseCountryFlag";
 import { SettingsContext } from "../../store/settings-context";
 import { useEffect } from "react";
 import * as Haptics from "expo-haptics";
-const i18n = new I18n({ en, de, fr });
+const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 

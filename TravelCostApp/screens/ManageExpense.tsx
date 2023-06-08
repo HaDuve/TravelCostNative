@@ -24,7 +24,7 @@ import {
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr } from "../i18n/supportedLanguages";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
 import { getCatString } from "../util/category";
 import PropTypes from "prop-types";
 import { asyncStoreSetObject } from "../store/async-storage";
@@ -36,7 +36,7 @@ import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { NetworkContext } from "../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import * as Haptics from "expo-haptics";
-const i18n = new I18n({ en, de, fr });
+const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";

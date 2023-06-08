@@ -1,5 +1,18 @@
 Change log Travel Expense App
 
+1.1.7
+- added russian translation (not everything is translated yet, let me know if you have suggestions!)
+- added more keywords for automatic category finder
+- added blurred headers
+- added askChatGPT for a good deal button
+- fixed pieChart background
+- fixed crash on delete expense
+- fixed 5 second dissapearing items
+- fixed endless loading screen on Startup
+- fixed showing 0 expenses on startup bug
+- improved trip list design
+- improved performance in general and specifically in expense graph
+
 1.1.5
 - fixed refreshing
 - expenses update on a new day (not showing the old day after midnight anymore)

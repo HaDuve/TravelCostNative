@@ -17,7 +17,7 @@ import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { asyncStoreSafeClear } from "../store/async-storage";
 import { UserContext } from "../store/user-context";
 import { createUser } from "../util/auth";
-import { storeUser, updateUser } from "../util/http";
+import { setAxiosAccessToken, storeUser, updateUser } from "../util/http";
 import { AuthContext } from "../store/auth-context";
 import Toast from "react-native-toast-message";
 import { Platform } from "react-native";
@@ -69,22 +69,23 @@ function SignupScreen() {
       } else if (Platform.OS === "ios") {
         // Purchases
         Purchases.configure({ apiKey: REVCAT_API_KEY, appUserID: uid });
-        console.log("SignupScreen ~ uid:", uid);
+        console.log("SignupScreen REVCAT ~ uid:", uid);
       }
 
       //NEW
       const userData = { userName: name };
+      userCtx.setUserName(name);
+      userCtx.setFreshlyCreatedTo(true);
+      authCtx.setUserID(uid);
+      setAxiosAccessToken(token);
       await storeUser(uid, userData);
       await updateUser(uid, {
         userName: name,
       });
-      userCtx.setUserName(name);
-      userCtx.setFreshlyCreatedTo(true);
-      authCtx.setUserID(uid);
       await authCtx.authenticate(token);
     } catch (error) {
       console.log("signupHandler ~ error2", error);
-      Alert.alert(i18n.t("authError"), i18n.t("createErrorText"));
+      Alert.alert(i18n.t("authError"), error.message); // i18n.t("createErrorText"));
 
       setIsAuthenticating(false);
     }

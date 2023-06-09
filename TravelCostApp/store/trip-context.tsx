@@ -115,7 +115,7 @@ function TripContextProvider({ children }) {
 
   async function setCurrentTrip(tripid: string, trip) {
     if (!trip) return;
-    // console.log("setCurrentTrip ~ setCurrentTrip", tripid, trip);
+    console.log("setCurrentTrip ~ setCurrentTrip", tripid);
     if (tripid === "reset") {
       console.log("resetting Trip to empty!");
       _setTripid("");

@@ -5,6 +5,7 @@ import { TripData } from "../store/trip-context";
 import Toast from "react-native-toast-message";
 import { ExpenseData, ExpenseDataOnline } from "./expense";
 import { UserData } from "../store/user-context";
+import { truncateString } from "./string";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -15,15 +16,17 @@ const BACKEND_URL =
 // });
 
 /** ACCESS TOKEN */
-let QPAR = "";
 /** Sets the ACCESS TOKEN for all future http requests */
 export function setAxiosAccessToken(token: string) {
-  console.log("setAxiosAccessToken ~ setAxiosAccessToken");
+  console.log(
+    "setAxiosAccessToken ~ setAxiosAccessToken",
+    truncateString(token, 5)
+  );
   if (!token || token.length < 2) {
     console.error("https: ~ wrong token error");
     return;
   }
-  QPAR = `?auth=${token}`;
+  global.QPAR = `?auth=${token}`;
 }
 
 /** Axios Logger */
@@ -286,7 +289,8 @@ export function deleteExpense(tripid: string, uid: string, id: string) {
  * @returns uid
  */
 export async function storeUser(uid: string, userData: object) {
-  // console.log("https: ~ storeUser ~ userData", userData);
+  console.log("https: ~ storeUser ~ uid:", uid);
+  console.log("https: ~ storeUser ~ userData", userData);
   try {
     const response = await axios.post(
       BACKEND_URL + "/users/" + `${uid}`,
@@ -296,7 +300,8 @@ export async function storeUser(uid: string, userData: object) {
     return id;
   } catch (error) {
     console.warn(error);
-    throw new Error("error while storing user");
+    // throw new Error("error while storing user", error.message);
+    return null;
   }
 }
 

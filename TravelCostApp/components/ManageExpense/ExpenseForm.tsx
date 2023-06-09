@@ -1286,17 +1286,19 @@ const ExpenseForm = ({
             </GradientButton>
           </View>
           {/* Commented out ChatGPT Button */}
-          <View style={[styles.buttonContainer, { marginBottom: "20%" }]}>
-            <GradientButton
-              style={[styles.button, { marginTop: 28, minWidth: "80%" }]}
-              colors={GlobalStyles.gradientColorsButton}
-              onPress={askChatGPTHandler}
-              darkText
-            >
-              {isEditing && "Ask ChatGPT: Was this a good deal?"}
-              {!isEditing && "Ask ChatGPT: Would this be a good deal?"}
-            </GradientButton>
-          </View>
+          {!hideAdvanced && (
+            <View style={[styles.buttonContainer, { marginBottom: "20%" }]}>
+              <GradientButton
+                style={[styles.button, { marginTop: 28, minWidth: "80%" }]}
+                colors={GlobalStyles.gradientColorsButton}
+                onPress={askChatGPTHandler}
+                darkText
+              >
+                {isEditing && "Ask ChatGPT: Was this a good deal?"}
+                {!isEditing && "Ask ChatGPT: Would this be a good deal?"}
+              </GradientButton>
+            </View>
+          )}
         </Animated.View>
       </Animated.View>
     </>

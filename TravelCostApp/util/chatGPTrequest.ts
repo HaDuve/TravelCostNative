@@ -1,4 +1,5 @@
-import { GPT_API_KEY } from "@env";
+// import { GPT_API_KEY } from "@env";
+const GPT_API_KEY = "ee892f25f1msh7b58e66c617672dp1d7c37jsn9339224154d5";
 
 export function chatGPTcontentKeywords(customCategory: string) {
   const content =

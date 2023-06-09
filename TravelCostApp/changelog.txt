@@ -1,5 +1,9 @@
 Change log Travel Expense App
 
+1.1.7b
+- fixed login and signup issues
+- removed first time app-tour (for now)
+
 1.1.7
 - added russian translation (not everything is translated yet, let me know if you have suggestions!)
 - added more keywords for automatic category finder

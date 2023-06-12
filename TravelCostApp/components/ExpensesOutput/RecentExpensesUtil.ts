@@ -41,3 +41,10 @@ export async function fetchAndSetExpenses(
   if (!showRefIndicator && !showAnyIndicator) setIsFetching(false);
   if (!showAnyIndicator) setRefreshing(false);
 }
+
+export function getDateRangeExpenses(startDate, endDate, expenses) {
+  const rangeExpenses = expenses.filter((expense) => {
+    return expense.date >= startDate && expense.date <= endDate;
+  });
+  return rangeExpenses;
+}

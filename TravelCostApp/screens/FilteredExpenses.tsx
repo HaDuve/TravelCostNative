@@ -47,7 +47,7 @@ const FilteredExpenses = ({
         <>
           <View style={styles.titleContainer}>
             <BackButton
-              style={{ marginTop: -14, marginBottom: 0, padding: 4 }}
+              style={{ marginTop: -20, marginBottom: 0, padding: 4 }}
             ></BackButton>
             <Text style={styles.titleText}>{dayString}</Text>
           </View>

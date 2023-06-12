@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import { DateOrDateTime } from "./date";
 /* *
 getFormattedDate
 isToday
@@ -53,4 +54,19 @@ export function _getDatePlusDays(dateTime: DateTime, days: number): DateTime {
 }
 export function _getPreviousMondayDate(dateTime: DateTime): DateTime {
   return dateTime.startOf("week");
+}
+
+export function isSameDay(dateTime1: any, dateTime2: any): boolean {
+  if (!dateTime1 || !dateTime2) return false;
+  if (typeof dateTime1 === "string") dateTime1 = DateTime.fromISO(dateTime1);
+  if (typeof dateTime2 === "string") dateTime2 = DateTime.fromISO(dateTime2);
+  if (typeof dateTime1 === "number") dateTime1 = DateTime.fromMillis(dateTime1);
+  if (typeof dateTime2 === "number") dateTime2 = DateTime.fromMillis(dateTime2);
+  if (typeof dateTime1 === typeof Date)
+    dateTime1 = DateTime.fromJSDate(dateTime1);
+  if (typeof dateTime2 === typeof Date)
+    dateTime2 = DateTime.fromJSDate(dateTime2);
+  return (
+    dateTime1?.toString().slice(0, 10) === dateTime2?.toString().slice(0, 10)
+  );
 }

@@ -12,9 +12,16 @@ import {
   VictoryVoronoiContainer,
 } from "victory-native";
 import { GlobalStyles } from "../../constants/styles";
-import { getDateMinusDays, getDatePlusDays } from "../../util/date";
+import {
+  getDateMinusDays,
+  getDatePlusDays,
+  toDayMonthString,
+} from "../../util/date";
 import PropTypes from "prop-types";
 import { getCurrencySymbol } from "../../util/currencySymbol";
+import { formatExpenseWithCurrency } from "../../util/string";
+import { isSameDay } from "../../util/dateTime";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 const ExpenseChart = ({
   inputData,
@@ -23,6 +30,8 @@ const ExpenseChart = ({
   budget,
   daysRange,
   currency,
+  navigation,
+  expenses,
 }) => {
   // console.log("rerender ExpenseChart - 3");
   const data = inputData;
@@ -153,9 +162,66 @@ const ExpenseChart = ({
             {
               target: "data",
               eventHandlers: {
-                onPressIn: () => {
-                  console.log("press");
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                onPress: () => {
+                  return [
+                    {
+                      target: "data",
+                      mutation: ({ datum }) => {
+                        console.log(datum);
+                        const budget =
+                          datum.dailyBudget ||
+                          datum.weeklyBudget ||
+                          datum.monthlyBudget ||
+                          datum.yearlyBudget;
+                        const overUnder = budget - datum.expensesSum;
+                        const overUnderBool = overUnder > 0;
+                        const overUnderString = overUnderBool
+                          ? `You still have ${formatExpenseWithCurrency(
+                              overUnder,
+                              currency
+                            )} to spend`
+                          : `You are over budget by ${formatExpenseWithCurrency(
+                              +overUnder,
+                              currency
+                            )}`;
+                        Toast.show({
+                          type: "success",
+                          text1: `${datum.label}`,
+                          text2: overUnderString,
+                        });
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      },
+                    },
+                  ];
+                },
+                onLongPress: () => {
+                  return [
+                    {
+                      target: "data",
+                      mutation: ({ datum }) => {
+                        console.log(datum);
+                        let filteredExpenses = [];
+                        if (datum.firstDay && datum.lastDay) {
+                          filteredExpenses = expenses.filter(
+                            (expense) =>
+                              expense.date >= datum.firstDay &&
+                              expense.date <= datum.lastDay
+                          );
+                        } else if (datum.day) {
+                          filteredExpenses = expenses.filter((expense) =>
+                            isSameDay(expense.date, datum.day)
+                          );
+                        }
+                        Haptics.notificationAsync(
+                          Haptics.NotificationFeedbackType.Success
+                        );
+                        navigation.navigate("FilteredPieCharts", {
+                          expenses: filteredExpenses,
+                          dayString: `${datum.label}`,
+                        });
+                      },
+                    },
+                  ];
                 },
               },
             },
@@ -177,6 +243,7 @@ ExpenseChart.propTypes = {
   daysRange: PropTypes.number,
   currency: PropTypes.string,
   navigation: PropTypes.object,
+  expenses: PropTypes.array,
 };
 
 const styles = StyleSheet.create({

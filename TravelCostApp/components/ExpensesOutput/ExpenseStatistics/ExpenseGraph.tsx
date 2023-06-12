@@ -101,7 +101,9 @@ const ExpenseGraph = ({
             ]}
             onLongPress={() => {
               console.log("longPress");
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              Haptics.notificationAsync(
+                Haptics.NotificationFeedbackType.Success
+              );
               const filteredExpenses = expenseCtx.getSpecificDayExpenses(
                 new Date(item.day)
               );
@@ -187,7 +189,9 @@ const ExpenseGraph = ({
               pressed && GlobalStyles.pressedWithShadow,
             ]}
             onLongPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              Haptics.notificationAsync(
+                Haptics.NotificationFeedbackType.Success
+              );
               const filteredExpenses = expenseCtx.getSpecificWeekExpenses(
                 new Date(item.firstDay)
               );
@@ -263,7 +267,9 @@ const ExpenseGraph = ({
               pressed && GlobalStyles.pressedWithShadow,
             ]}
             onLongPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              Haptics.notificationAsync(
+                Haptics.NotificationFeedbackType.Success
+              );
               const filteredExpenses = expenseCtx.getSpecificMonthExpenses(
                 new Date(item.firstDay)
               );
@@ -342,7 +348,9 @@ const ExpenseGraph = ({
               pressed && GlobalStyles.pressedWithShadow,
             ]}
             onLongPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              Haptics.notificationAsync(
+                Haptics.NotificationFeedbackType.Success
+              );
               const filteredExpenses = expenseCtx.getSpecificYearExpenses(
                 new Date(item.firstDay)
               );
@@ -408,6 +416,7 @@ const ExpenseGraph = ({
                 daysRange={daysRange}
                 currency={tripCtx.tripCurrency}
                 navigation={navigation}
+                expenses={expenseCtx.expenses}
               ></ExpenseChart>
             </View>
           }

@@ -429,7 +429,7 @@ const ExpenseForm = ({
   }
 
   async function resetSplitHandler() {
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     const splitTravellers = splitTravellersList;
     console.log("resetSplitHandler ~ splitTravellers:", splitTravellers);
     // calculate splits

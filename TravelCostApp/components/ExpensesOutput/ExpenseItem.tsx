@@ -1,4 +1,10 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import PropTypes from "prop-types";
 import { createMoney, convertAmount, getCurrency } from "@dinero.js/core";
@@ -114,6 +120,9 @@ function ExpenseItem(props): JSX.Element {
   const toggle1 = settings.showFlags;
   const toggle2 = settings.showWhoPaid;
 
+  const { fontScale } = useWindowDimensions();
+  const isScaledUp = fontScale > 1;
+
   const memoizedCallback = useCallback(async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     navigation.navigate("ManageExpense", {
@@ -192,10 +201,16 @@ function ExpenseItem(props): JSX.Element {
             />
           </View>
           <View style={styles.leftItem}>
-            <Text style={[styles.textBase, styles.description]}>
+            <Text
+              maxFontSizeMultiplier={1.2}
+              style={[styles.textBase, styles.description]}
+            >
               {description}
             </Text>
-            <Text style={[styles.textBase, styles.secondaryText]}>
+            <Text
+              maxFontSizeMultiplier={1}
+              style={[styles.textBase, styles.secondaryText]}
+            >
               {dateString}
             </Text>
           </View>
@@ -264,10 +279,12 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     fontWeight: "300",
     fontSize: 15,
+    zIndex: 2,
   },
   secondaryText: {
     color: GlobalStyles.colors.gray700,
     fontSize: 13,
+    zIndex: 1,
   },
   iconContainer: {
     marginTop: 4,

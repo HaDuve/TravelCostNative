@@ -4,11 +4,11 @@ import App from "./App";
 
 // this could disable FontScaling alltogether, but would be bad for accessability
 // TODO: work around this by using  maxFontSizeMultiplier prop on Text and TextInput
-Text.defaultProps = Text.defaultProps || {};
-Text.defaultProps.allowFontScaling = false;
+// Text.defaultProps = Text.defaultProps || {};
+// Text.defaultProps.allowFontScaling = false;
 // Text.defaultProps.maxFontSizeMultiplier = 1.1;
-TextInput.defaultProps = TextInput.defaultProps || {};
-TextInput.defaultProps.allowFontScaling = false;
+// TextInput.defaultProps = TextInput.defaultProps || {};
+// TextInput.defaultProps.allowFontScaling = false;
 // TextInput.defaultProps.maxFontSizeMultiplier = 1.1;
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);

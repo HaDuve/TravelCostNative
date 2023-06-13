@@ -26,6 +26,7 @@ import {
   RefreshControl,
   LogBox,
   AppState,
+  useWindowDimensions,
 } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
@@ -237,6 +238,9 @@ function RecentExpenses({ navigation }) {
     [PeriodValue, expensesCtx.expenses, dateTimeString]
   );
 
+  const { fontScale } = useWindowDimensions();
+  const isScaledUp = fontScale > 1;
+
   if (error && !isFetching) {
     return <ErrorOverlay message={error} onConfirm={errorHandler} />;
   }
@@ -271,7 +275,7 @@ function RecentExpenses({ navigation }) {
         </Text>
       </View>
 
-      <View style={styles.header}>
+      <View style={[styles.header, isScaledUp && { flexDirection: "column" }]}>
         <DropDownPicker
           open={open}
           value={PeriodValue}

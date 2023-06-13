@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 import { ExpensesContext, RangeString } from "../store/expenses-context";
 import { UserContext } from "../store/user-context";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
 import ExpensesOverview, {
@@ -85,6 +85,8 @@ const OverviewScreen = ({ navigation }) => {
     [PeriodValue, expensesCtx.expenses, dateTimeString]
   );
 
+  const { fontScale } = useWindowDimensions();
+  const isScaledUp = fontScale > 1;
   return (
     <View style={styles.container}>
       <View style={styles.dateHeader}>
@@ -93,7 +95,7 @@ const OverviewScreen = ({ navigation }) => {
           {offlineString}
         </Text>
       </View>
-      <View style={styles.header}>
+      <View style={[styles.header, isScaledUp && { flexDirection: "column" }]}>
         <DropDownPicker
           open={open}
           value={PeriodValue}
@@ -177,6 +179,9 @@ const styles = StyleSheet.create({
   dropdownTextStyle: {
     fontSize: i18n.locale == "fr" ? 20 : 34,
     fontWeight: "bold",
+  },
+  scaledUpTextStyle: {
+    fontSize: 18,
   },
   zBehind: {
     zIndex: 10,

@@ -1,5 +1,13 @@
 Change log Travel Expense App
 
+1.1.7c
+- expense graph bar chart is now interactive (press and long press)
+- made font scaling more sensible (bigger text does not destroy the styling anymore)
+- fixed a backend bug with database access tokens
+- fixed a bug where new trip would invalidate budgets even though they were correct
+- fixed a bug where you would see old trip expenses after changing the active trip
+- updated and translated paywall text
+
 1.1.7b
 - fixed login and signup issues
 - removed first time app-tour (for now)

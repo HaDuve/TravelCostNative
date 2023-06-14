@@ -25,7 +25,10 @@ import FlatButton from "../UI/FlatButton";
 import { ExpensesContext } from "../../store/expenses-context";
 import CurrencyPicker from "../Currency/CurrencyPicker";
 import CurrencyInput from "react-currency-input-field";
-import { asyncStoreSetItem } from "../../store/async-storage";
+import {
+  asyncStoreSetItem,
+  asyncStoreSetObject,
+} from "../../store/async-storage";
 
 //localization
 import * as Localization from "expo-localization";
@@ -258,10 +261,12 @@ const TripForm = ({ navigation, route }) => {
           currentTrip: editedTripId,
         });
         tripCtx.setCurrentTrip(editedTripId, tripData);
+
         await tripCtx.setCurrentTravellers(editedTripId);
         userCtx.setFreshlyCreatedTo(false);
         const expenses = await getAllExpenses(editedTripId, uid);
         expenseCtx.setExpenses(expenses);
+        await asyncStoreSetObject("expenses", expenses);
         const r = await reloadApp();
         if (r === -1) navigation.popToTop();
       }
@@ -277,6 +282,9 @@ const TripForm = ({ navigation, route }) => {
     const newTripData = await fetchTrip(tripid);
 
     tripCtx.setCurrentTrip(tripid, newTripData);
+    await asyncStoreSetObject("expenses", []);
+    expenseCtx.setExpenses([]);
+
     // if fresh store TripHistory else update TripHistory
     if (userCtx.freshlyCreated) {
       await storeTripHistory(uid, [tripid]);
@@ -296,7 +304,6 @@ const TripForm = ({ navigation, route }) => {
     // restart app with Updates
     const r = await reloadApp();
     if (r === -1) navigation.popToTop();
-    // expenseCtx.setExpenses([]);
 
     // tripCtx.refresh();
     // navigation.navigate("Profile");

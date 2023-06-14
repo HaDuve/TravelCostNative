@@ -36,6 +36,7 @@ import { ActivityIndicator } from "react-native-paper";
 
 import { reloadApp } from "../util/appState";
 import BackButton from "../components/UI/BackButton";
+import { asyncStoreSetItem, asyncStoreSetObject } from "../store/async-storage";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -82,35 +83,42 @@ const JoinTrip = ({ navigation, route }) => {
     if (!join) {
       navigation.pop();
     } else {
-      tripid = joinTripid;
-      console.log("joinHandler ~ tripid", tripid);
-
-      // if fresh store history else update
-      if (userCtx.freshlyCreated) {
-        await storeTripHistory(uid, [tripid]);
-      } else {
-        await updateTripHistory(uid, tripid);
-      }
+      setIsFetching(true);
       try {
+        tripid = joinTripid;
+        console.log("joinHandler ~ tripid", tripid);
+
+        // if fresh store history else update
+        if (userCtx.freshlyCreated) {
+          await storeTripHistory(uid, [tripid]);
+        } else {
+          await updateTripHistory(uid, tripid);
+        }
+
         await storeTravellerToTrip(tripid, {
           userName: userCtx.userName,
           uid: uid,
         });
+
+        updateUser(uid, {
+          currentTrip: tripid,
+        });
+        tripCtx.setCurrentTrip(tripid, tripdata);
+        await tripCtx.setCurrentTravellers(tripid);
+        userCtx.setFreshlyCreatedTo(false);
+        await userCtx.loadCatListFromAsyncInCtx(tripid);
+        const expenses = await getAllExpenses(tripid, uid);
+        await asyncStoreSetObject("currentTrip", tripdata);
+        await asyncStoreSetItem("currentTripId", tripid);
+        await asyncStoreSetObject("expenses", expenses);
+
+        // Immediately reload the React Native Bundle
+        await reloadApp();
       } catch (error) {
+        Alert.alert("Error", "Please try again later.\n" + error.message);
         console.error(error);
       }
-      updateUser(uid, {
-        currentTrip: tripid,
-      });
-      tripCtx.setCurrentTrip(tripid, tripdata);
-      await tripCtx.setCurrentTravellers(tripid);
-      userCtx.setFreshlyCreatedTo(false);
-      await userCtx.loadCatListFromAsyncInCtx(tripid);
-      const expenses = await getAllExpenses(tripid, uid);
-      expenseCtx.setExpenses(expenses);
-
-      // Immediately reload the React Native Bundle
-      await reloadApp();
+      setIsFetching(false);
     }
   }
 
@@ -160,17 +168,19 @@ const JoinTrip = ({ navigation, route }) => {
             keyboardType={"default"}
             isInvalid={false}
           ></Input>
-          <Button
-            style={{ maxWidth: "100%", marginTop: "5%" }}
-            buttonStyle={{
-              backgroundColor: freshLink
-                ? GlobalStyles.colors.primaryGrayed
-                : GlobalStyles.colors.gray700,
-            }}
-            onPress={joinLinkHandler}
-          >
-            {i18n.t("update")}
-          </Button>
+          {!isFetching && (
+            <Button
+              style={{ maxWidth: "100%", marginTop: "5%" }}
+              buttonStyle={{
+                backgroundColor: freshLink
+                  ? GlobalStyles.colors.primaryGrayed
+                  : GlobalStyles.colors.gray700,
+              }}
+              onPress={joinLinkHandler}
+            >
+              {i18n.t("update")}
+            </Button>
+          )}
         </View>
       )}
       {tripName?.length > 1 && (

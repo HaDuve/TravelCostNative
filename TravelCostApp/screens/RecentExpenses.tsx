@@ -275,7 +275,16 @@ function RecentExpenses({ navigation }) {
         </Text>
       </View>
 
-      <View style={[styles.header, isScaledUp && { flexDirection: "column" }]}>
+      <View
+        style={[
+          styles.header,
+          isScaledUp && {
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          },
+        ]}
+      >
         <DropDownPicker
           open={open}
           value={PeriodValue}

@@ -221,18 +221,18 @@ const TripForm = ({ navigation, route }) => {
       tripData.tripCurrency !== "" && tripData.tripCurrency.length > 0;
     // Total budget should be a number between 0 and 3B
     const totalBudgetIsValid =
-      !inputs.totalBudget.value ||
-      (!isNaN(+tripData.totalBudget) &&
-        +tripData.totalBudget >= 0 &&
-        +tripData.totalBudget < MAX_JS_NUMBER &&
-        tripData.totalBudget > tripData.dailyBudget);
+      !isNaN(+tripData.totalBudget) &&
+      +tripData.totalBudget >= 0 &&
+      +tripData.totalBudget < MAX_JS_NUMBER &&
+      +tripData.totalBudget > +tripData.dailyBudget;
 
+    console.log("submitHandler ~ totalBudgetIsValid:", totalBudgetIsValid);
     const dailyBudgetIsValid =
       !isNaN(+tripData.dailyBudget) &&
       +tripData.dailyBudget > 0 &&
       +tripData.dailyBudget < MAX_JS_NUMBER &&
-      (!inputs.totalBudget.value ||
-        tripData.dailyBudget < tripData.totalBudget);
+      +tripData.dailyBudget < +tripData.totalBudget;
+    console.log("submitHandler ~ dailyBudgetIsValid:", dailyBudgetIsValid);
 
     if (!tripNameIsValid) {
       inputs.tripName.isValid = tripNameIsValid;

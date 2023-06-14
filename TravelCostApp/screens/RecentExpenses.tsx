@@ -25,7 +25,6 @@ import {
   View,
   RefreshControl,
   LogBox,
-  AppState,
   useWindowDimensions,
 } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";

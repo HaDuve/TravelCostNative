@@ -10,6 +10,16 @@ import {
   Linking,
   Pressable,
 } from "react-native";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import { ActivityIndicator } from "react-native-paper";
 
 import Purchases from "react-native-purchases";
@@ -19,7 +29,13 @@ import BackgroundGradient from "../UI/BackgroundGradient";
 import FlatButton from "../UI/FlatButton";
 import PropTypes from "prop-types";
 import IconButton from "../UI/IconButton";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  Layout,
+  SlideInDown,
+  SlideOutDown,
+} from "react-native-reanimated";
 import ExpensesOutput from "../ExpensesOutput/ExpensesOutput";
 
 const PaywallScreen = ({ navigation }) => {
@@ -93,20 +109,21 @@ const PaywallScreen = ({ navigation }) => {
           />
         )}
       </View>
-      <Text style={styles.headerTitleText}>Go Pro!</Text>
+      <Text style={styles.headerTitleText}>{i18n.t("paywallTitle")}</Text>
       <Text style={styles.headerSubtitleText}>
-        {
-          "Enjoy these additional features:" +
-            "\n\n✓ Customizable Categories" +
-            "\n✓ Detailed Split Summaries " +
-            "\n✓ More advanced Charts" +
-            "\n✓ Interactive Analytics" +
-            "\n\n Start with a 1 Week free Trial."
-          // "\n✓  Unlimited Budgets" +
-          // "\n✓  Unlimited Expenses" +
-          // "\n\n   Features coming soon:" +
-          // "\n + ChatGPT Deal-Check \n"
-        }
+        {i18n.t("paywallSubtitle") +
+          "\n\n" +
+          i18n.t("paywallFeature1") +
+          "\n" +
+          i18n.t("paywallFeature2") +
+          "\n" +
+          i18n.t("paywallFeature3") +
+          "\n" +
+          i18n.t("paywallFeature4") +
+          "\n" +
+          i18n.t("paywallFeature5") +
+          "\n\n" +
+          i18n.t("paywallFeature6")}
       </Text>
     </View>
   );
@@ -135,10 +152,10 @@ const PaywallScreen = ({ navigation }) => {
             }
           >
             <Text style={[styles.footerText, { color: "blue" }]}>
-              Terms of Service
+              {i18n.t("paywallToS")}
             </Text>
           </TouchableOpacity>
-          <Text style={styles.footerText}>and </Text>
+          <Text style={styles.footerText}>{"&  "}</Text>
           <TouchableOpacity
             onPress={() =>
               Linking.openURL(
@@ -147,10 +164,34 @@ const PaywallScreen = ({ navigation }) => {
             }
           >
             <Text style={[styles.footerText, { color: "blue" }]}>
-              Privacy Policy.
+              {i18n.t("paywallPP")}
             </Text>
           </TouchableOpacity>
         </View>
+        <Animated.View
+          entering={FadeIn}
+          exiting={FadeOut}
+          style={{ justifyContent: "center", alignItems: "center" }}
+        >
+          <Pressable
+            onPress={() => setShowEULA(!showEULA)}
+            style={{ marginTop: 10 }}
+          >
+            <IconButton
+              icon={showEULA ? "chevron-up" : "chevron-down"}
+              onPress={() => setShowEULA(!showEULA)}
+            ></IconButton>
+            {showEULA && (
+              <Animated.View
+                entering={FadeIn}
+                exiting={FadeOut}
+                style={{ borderWidth: 1, padding: "4%", margin: "4%" }}
+              >
+                <Text>{i18n.t("paywallLegal1")}</Text>
+              </Animated.View>
+            )}
+          </Pressable>
+        </Animated.View>
       </View>
     );
   };
@@ -176,28 +217,7 @@ const PaywallScreen = ({ navigation }) => {
           ListFooterComponent={footer}
           ListFooterComponentStyle={styles.headerFooterContainer}
         />
-        <Pressable
-          onPress={() => setShowEULA(!showEULA)}
-          style={{ marginTop: 10 }}
-        >
-          <IconButton
-            icon={showEULA ? "chevron-up" : "chevron-down"}
-            onPress={() => setShowEULA(!showEULA)}
-          ></IconButton>
-          {showEULA && (
-            <Animated.View entering={FadeIn} exiting={FadeOut}>
-              <Text>
-                A 2$ purchase will be applied to your iTunes account at the end
-                of the 1 week trial. Subscriptions will automatically renew
-                unless canceled within 24-hours before the end of the current
-                period. You can cancel anytime with your iTunes account
-                settings. Any unused portion of a free trial will be forfeited
-                if you purchase a subscription. For more information, see our
-                ToS and Privacy Policy.
-              </Text>
-            </Animated.View>
-          )}
-        </Pressable>
+
         {isPurchasing && <View style={styles.overlay} />}
       </BackgroundGradient>
     </>
@@ -226,9 +246,10 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   headerTitleText: {
-    fontSize: 64,
-    padding: "2%",
+    fontSize: 44,
+    paddingHorizontal: "4%",
     marginTop: "-10%",
+    marginBottom: "6%",
     fontWeight: "bold",
     textAlign: "center",
     color: GlobalStyles.colors.primary700,

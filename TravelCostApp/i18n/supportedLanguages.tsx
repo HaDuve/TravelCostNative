@@ -199,6 +199,19 @@ const en = {
     "Do you want to multiply or split the costs over several days?",
   duplicateExpenses: "Duplicate",
   splitUpExpenses: "Split Up",
+
+  paywallTitle: "Become a Premium Nomad!",
+  paywallSubtitle: "Make your journey even easier with additional features:",
+  paywallFeature1: "✓ Create your own categories",
+  paywallFeature2: "✓ Simplify debt settlements",
+  paywallFeature3: "✓ Better overview with advanced charts",
+  paywallFeature4: "✓ Search expenses with filtering options",
+  paywallFeature5: "✓ Ask ChatGPT if you got a good deal",
+  paywallFeature6: "Start your 1-week trial subscription now.",
+  paywallLegal1:
+    "At the end of the 1-week trial period, your iTunes account will be charged $2. The subscription will automatically renew unless canceled within 24 hours before the end of the current period. You can cancel anytime through your iTunes account. Any unused portion of a free trial will be forfeited upon subscription purchase. For more information, please refer to our terms and conditions and privacy policy.",
+  paywallToS: "Terms of Service",
+  paywallPP: "Privacy Policy",
 };
 const de = {
   // standard strings
@@ -405,6 +418,27 @@ const de = {
     "Möchten Sie die Kosten über mehrere Tage vervielfachen oder aufsplitten?",
   duplicateExpenses: "Vervielfachen",
   splitUpExpenses: "Aufsplitten",
+
+  // Paywall and Premium
+  paywallTitle: "Werde Premium Nomad!",
+  paywallSubtitle:
+    "Lass dir deine Reise mit noch mehr Funktionen erleichtern: ",
+  paywallFeature1: "✓ Erstelle eigene Kategorien",
+  paywallFeature2: "✓ Vereinfache Schuldenbegleichungen",
+  paywallFeature3: "✓ Behalte mehr Überblick mit erweiterten Diagrammen",
+  paywallFeature4: "✓ Suche Ausgaben mit Filterfunktionen",
+  paywallFeature5: "✓ Frage ChatGPT ob du einen guten Deal gemacht hast",
+  paywallFeature6: "Beginne jetzt dein 1-wöchiges Probeabo. ",
+  paywallLegal1:
+    "Am Ende der 1-wöchigen Testphase wird dein iTunes-Konto mit einem " +
+    "Betrag von 2$ belastet. Das Abonnement verlängert sich automatisch, " +
+    "wenn es nicht innerhalb von 24 Stunden vor Ablauf der aktuellen Periode" +
+    " gekündigt wird. Du kannst jederzeit über deinen iTunes-Account kündigen. " +
+    "Jeder ungenutzte Teil einer kostenlosen Testversion verfällt, wenn du ein " +
+    "Abonnement erwirbst. Weitere Informationen findest du in unseren AGBs und " +
+    "Datenschutzrichtlinien.",
+  paywallToS: "Nutzungsbedingungen",
+  paywallPP: "Datenschutzbestimmungen",
 };
 const fr = {
   // standard strings
@@ -613,6 +647,22 @@ const fr = {
     "Souhaitez-vous multiplier ou fractionner les coûts sur plusieurs jours ?",
   duplicateExpenses: "Dupliquer",
   splitUpExpenses: "Séparer",
+
+  paywallTitle: "Devenez un Nomade Premium !",
+  paywallSubtitle:
+    "Facilitez votre voyage avec des fonctionnalités supplémentaires :",
+  paywallFeature1: "✓ Créez vos propres catégories",
+  paywallFeature2: "✓ Simplifiez le règlement des dettes",
+  paywallFeature3:
+    "✓ Gardez une meilleure vue d'ensemble avec des graphiques avancés",
+  paywallFeature4: "✓ Recherchez des dépenses avec des options de filtrage",
+  paywallFeature5: "✓ Demandez à ChatGPT si vous avez fait une bonne affaire",
+  paywallFeature6:
+    "Commencez votre essai gratuit d'une semaine dès maintenant.",
+  paywallLegal1:
+    "À la fin de la période d'essai d'une semaine, votre compte iTunes sera facturé 2 $. L'abonnement se renouvellera automatiquement sauf s'il est annulé dans les 24 heures précédant la fin de la période en cours. Vous pouvez annuler à tout moment via votre compte iTunes. Toute partie inutilisée de l'essai gratuit sera perdue lors de l'achat de l'abonnement. Pour plus d'informations, veuillez consulter nos conditions générales et notre politique de confidentialité.",
+  paywallToS: "Conditions d'utilisation",
+  paywallPP: "Politique de confidentialité",
 };
 const ru = {
   // standard strings
@@ -817,5 +867,19 @@ const ru = {
   rangedDatesText: "Хотите умножить или разделить затраты на несколько дней?",
   duplicateExpenses: "Дублировать",
   splitUpExpenses: "Разделить",
+
+  paywallTitle: "Станьте Премиум-Номадом!",
+  paywallSubtitle: "Упростите свое путешествие с дополнительными функциями:",
+  paywallFeature1: "✓ Создавайте собственные категории,",
+  paywallFeature2: "✓ Упрощайте расчеты по долгам,",
+  paywallFeature3:
+    "✓ Поддерживайте лучший обзор с помощью расширенных графиков,",
+  paywallFeature4: "✓ Ищите расходы с помощью функций фильтрации,",
+  paywallFeature5: "✓ Спросите у ChatGPT, получили ли вы хорошую сделку,",
+  paywallFeature6: "Начните пробный период на 1 неделю сейчас,",
+  paywallLegal1:
+    "По истечении 1-недельного пробного периода ваш аккаунт iTunes будет списан на $2. Подписка автоматически продлится, если не будет отменена в течение 24 часов перед окончанием текущего периода. Вы можете отменить подписку в любое время через свой аккаунт iTunes. Любая неиспользованная часть бесплатного пробного периода будет аннулирована при покупке подписки. Дополнительную информацию можно найти в наших условиях использования и политике конфиденциальности.",
+  paywallToS: "Условия использования",
+  paywallPP: "Политика конфиденциальности",
 };
 export { en, de, fr, ru };

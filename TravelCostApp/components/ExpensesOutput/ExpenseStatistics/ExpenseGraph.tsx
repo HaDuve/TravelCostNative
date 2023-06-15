@@ -61,7 +61,8 @@ const ExpenseGraph = ({
         const day = getDateMinusDays(today, i);
         const dayExpenses = expenseCtx.getDailyExpenses(i);
         const expensesSum = dayExpenses.reduce((sum, expense) => {
-          return sum + expense.calcAmount;
+          if (isNaN(Number(expense.calcAmount))) return sum;
+          return sum + Number(expense.calcAmount.toFixed(2));
         }, 0);
         const dailyBudget = tripCtx.dailyBudget;
         const formattedDay = toDayMonthString(day);
@@ -147,7 +148,8 @@ const ExpenseGraph = ({
         const { firstDay, lastDay, weeklyExpenses } =
           expenseCtx.getWeeklyExpenses(i);
         const expensesSum = weeklyExpenses.reduce((sum, expense) => {
-          return sum + expense.calcAmount;
+          if (isNaN(Number(expense.calcAmount))) return sum;
+          return sum + Number(expense.calcAmount.toFixed(2));
         }, 0);
         const weeklyBudget = Number(tripCtx.dailyBudget) * 7;
         const formattedDay = toDayMonthString(firstDay);
@@ -235,7 +237,8 @@ const ExpenseGraph = ({
         const { firstDay, lastDay, monthlyExpenses } =
           expenseCtx.getMonthlyExpenses(i);
         const expensesSum = monthlyExpenses.reduce((sum, expense) => {
-          return sum + expense.calcAmount;
+          if (isNaN(Number(expense.calcAmount))) return sum;
+          return sum + Number(expense.calcAmount.toFixed(2));
         }, 0);
         const monthlyBudget = Number(tripCtx.dailyBudget) * 30;
         const formattedDay = toDayMonthString(firstDay);
@@ -317,8 +320,10 @@ const ExpenseGraph = ({
         const { firstDay, lastDay, yearlyExpenses } =
           expenseCtx.getYearlyExpenses(i);
         const expensesSum = yearlyExpenses.reduce((sum, expense) => {
-          return sum + expense.calcAmount;
+          if (isNaN(Number(expense.calcAmount))) return sum;
+          return sum + Number(expense.calcAmount.toFixed(2));
         }, 0);
+
         const yearlyBudget = Number(tripCtx.dailyBudget) * 365;
         const formattedDay = toDayMonthString(firstDay);
         const formattedSum = formatExpenseWithCurrency(

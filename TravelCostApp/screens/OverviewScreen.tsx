@@ -127,7 +127,10 @@ const OverviewScreen = ({ navigation }) => {
           containerStyle={styles.dropdownContainer}
           // customItemLabelStyle={styles.dropdownItemLabel}
           style={styles.dropdown}
-          textStyle={styles.dropdownTextStyle}
+          textStyle={[
+            styles.dropdownTextStyle,
+            isScaledUp && styles.scaledUpTextStyle,
+          ]}
         />
         <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
       </View>
@@ -190,7 +193,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   scaledUpTextStyle: {
-    fontSize: 18,
+    fontSize: 24,
   },
   zBehind: {
     zIndex: 10,

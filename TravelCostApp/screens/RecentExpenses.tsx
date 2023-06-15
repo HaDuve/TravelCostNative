@@ -302,7 +302,10 @@ function RecentExpenses({ navigation }) {
           setItems={setItems}
           containerStyle={styles.dropdownContainer}
           style={styles.dropdown}
-          textStyle={styles.dropdownTextStyle}
+          textStyle={[
+            styles.dropdownTextStyle,
+            isScaledUp && styles.scaledUpTextStyle,
+          ]}
         />
 
         <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
@@ -377,6 +380,9 @@ const styles = StyleSheet.create({
   dropdownTextStyle: {
     fontSize: i18n.locale == "fr" ? 20 : 34,
     fontWeight: "bold",
+  },
+  scaledUpTextStyle: {
+    fontSize: 24,
   },
   zBehind: {
     zIndex: 10,

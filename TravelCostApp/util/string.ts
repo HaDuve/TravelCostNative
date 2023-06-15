@@ -18,21 +18,39 @@ export function formatExpenseWithCurrency(
   }
   const locale = Localization.locale;
 
+  const fractionOptions: Intl.NumberFormatOptions = {
+    style: "currency",
+    currency: currency,
+    currencyDisplay: "narrowSymbol",
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+    ...options,
+  };
   const formatOptions: Intl.NumberFormatOptions = {
     style: "currency",
     currency: currency,
     currencyDisplay: "narrowSymbol",
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 0,
+    // maximumFractionDigits: 0,
+    minimumFractionDigits: 2,
     ...options,
   };
 
-  try {
-    return new Intl.NumberFormat(locale, formatOptions)
-      .format(amount)
-      .replace(currency, getCurrencySymbol(currency));
-  } catch (error) {
-    return amount.toFixed(2) + " " + getCurrencySymbol(currency);
+  if (amount % 1 == 0) {
+    try {
+      return new Intl.NumberFormat(locale, fractionOptions)
+        .format(amount)
+        .replace(currency, getCurrencySymbol(currency));
+    } catch (error) {
+      return amount.toFixed(2) + " " + getCurrencySymbol(currency);
+    }
+  } else {
+    try {
+      return new Intl.NumberFormat(locale, formatOptions)
+        .format(amount)
+        .replace(currency, getCurrencySymbol(currency));
+    } catch (error) {
+      return amount.toFixed(0) + " " + getCurrencySymbol(currency);
+    }
   }
 }
 

@@ -5,6 +5,7 @@ import {
   View,
   FlatList,
   Alert,
+  useWindowDimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
@@ -146,7 +147,8 @@ function TripItem({
   //   return <LoadingOverlay />;
   // }
   if (!tripid) return <Text>no id</Text>;
-
+  const { fontScale } = useWindowDimensions();
+  const isScaledUp = fontScale > 1;
   return (
     <Pressable
       onPress={tripPressHandler}
@@ -159,7 +161,12 @@ function TripItem({
           <View style={styles.leftContainer}>
             <Text
               numberOfLines={1}
-              style={[styles.textBase, styles.description, styles.textWidth]}
+              style={[
+                styles.textBase,
+                styles.description,
+                styles.textWidth,
+                isScaledUp && { width: "75%" },
+              ]}
             >
               {tripName}
             </Text>

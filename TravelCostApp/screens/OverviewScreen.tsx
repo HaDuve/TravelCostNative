@@ -22,6 +22,8 @@ import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { ExpenseData } from "../util/expense";
 import * as Haptics from "expo-haptics";
 import { SettingsContext } from "../store/settings-context";
+import { formatExpenseWithCurrency } from "../util/string";
+import { TripContext } from "../store/trip-context";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -30,6 +32,7 @@ i18n.enableFallback = true;
 const OverviewScreen = ({ navigation }) => {
   // console.log("rerender OverviewScreen - 0");
   const expensesCtx = useContext(ExpensesContext);
+  const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   const netCtx = useContext(NetworkContext);
   const { settings } = useContext(SettingsContext);
@@ -84,9 +87,18 @@ const OverviewScreen = ({ navigation }) => {
     () => expensesCtx.getRecentExpenses(PeriodValue),
     [PeriodValue, expensesCtx.expenses, dateTimeString]
   );
-
+  const expensesSum = recentExpenses.reduce((sum, expense) => {
+    if (isNaN(Number(expense.calcAmount))) return sum;
+    return sum + Number(expense.calcAmount);
+  }, 0);
+  const expensesSumString = formatExpenseWithCurrency(
+    expensesSum,
+    tripCtx.tripCurrency
+  );
+  const isLongNumber = expensesSumString.length > 10;
   const { fontScale } = useWindowDimensions();
   const isScaledUp = fontScale > 1;
+  const useMoreSpace = isScaledUp || isLongNumber;
   return (
     <View style={styles.container}>
       <View style={styles.dateHeader}>
@@ -98,7 +110,7 @@ const OverviewScreen = ({ navigation }) => {
       <View
         style={[
           styles.header,
-          isScaledUp && {
+          useMoreSpace && {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",

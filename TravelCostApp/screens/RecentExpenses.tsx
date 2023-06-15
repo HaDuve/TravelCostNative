@@ -57,6 +57,7 @@ import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { sendOfflineQueue } from "../util/offline-queue";
 import * as Haptics from "expo-haptics";
 import { SettingsContext } from "../store/settings-context";
+import { formatExpenseWithCurrency } from "../util/string";
 
 function RecentExpenses({ navigation }) {
   // console.log("rerender RecentExpenses - A");
@@ -237,8 +238,18 @@ function RecentExpenses({ navigation }) {
     [PeriodValue, expensesCtx.expenses, dateTimeString]
   );
 
+  const expensesSum = recentExpenses.reduce((sum, expense) => {
+    if (isNaN(Number(expense.calcAmount))) return sum;
+    return sum + Number(expense.calcAmount);
+  }, 0);
+  const expensesSumString = formatExpenseWithCurrency(
+    expensesSum,
+    tripCtx.tripCurrency
+  );
+  const isLongNumber = expensesSumString.length > 10;
   const { fontScale } = useWindowDimensions();
   const isScaledUp = fontScale > 1;
+  const useMoreSpace = isScaledUp || isLongNumber;
 
   if (error && !isFetching) {
     return <ErrorOverlay message={error} onConfirm={errorHandler} />;
@@ -277,7 +288,7 @@ function RecentExpenses({ navigation }) {
       <View
         style={[
           styles.header,
-          isScaledUp && {
+          useMoreSpace && {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",

@@ -931,9 +931,7 @@ const ExpenseForm = ({
                   <Input
                     label={i18n.t("countryLabel")}
                     style={{ minWidth: "60%" }}
-                    placeholder={
-                      userCtx.lastCountry ?? i18n.t("countryPlaceholder")
-                    }
+                    placeholder={userCtx.lastCountry ?? i18n.t("countryLabel")}
                     textInputConfig={{
                       onChangeText: inputChangedHandler.bind(this, "country"),
                       value: inputs.country.value,

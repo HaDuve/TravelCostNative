@@ -33,7 +33,7 @@ export const SettingsProvider = ({ children }) => {
         setSettings({
           showFlags: false,
           showWhoPaid: false,
-          alwaysShowAdvanced: false,
+          alwaysShowAdvanced: true,
           skipCategoryScreen: false,
           showInternetSpeed: false,
         });

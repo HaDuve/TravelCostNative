@@ -55,8 +55,17 @@ import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 import { reloadApp } from "../../util/appState";
 import { secureStoreSetItem } from "../../store/secure-storage";
 import BackButton from "../UI/BackButton";
+import { onShare } from "../ProfileOutput/ShareTrip";
+import { NetworkContext } from "../../store/network-context";
 
 const TripForm = ({ navigation, route }) => {
+  const netCtx = useContext(NetworkContext);
+  const isOnline = netCtx.isConnected;
+  const isFast = netCtx.strongConnection;
+  const [isConnected, setIsConnected] = useState(isOnline && isFast);
+  useEffect(() => {
+    setIsConnected(isOnline && isFast);
+  }, [isOnline, isFast]);
   const [isLoading, setIsLoading] = useState(false);
   const [infoIsVisible, setInfoIsVisible] = useState(false);
 
@@ -202,6 +211,10 @@ const TripForm = ({ navigation, route }) => {
   }
 
   async function submitHandler(setActive = false) {
+    if (!isConnected) {
+      Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
+      return;
+    }
     const tripData: TripData = {
       tripName: inputs.tripName.value,
       totalBudget: inputs.totalBudget.value,
@@ -269,7 +282,7 @@ const TripForm = ({ navigation, route }) => {
         expenseCtx.setExpenses(expenses);
         await asyncStoreSetObject("expenses", expenses);
         const r = await reloadApp();
-        if (r === -1) navigation.popToTop();
+        if (r == -1) navigation.popToTop();
       }
       tripCtx.refresh();
       navigation.pop();
@@ -304,7 +317,7 @@ const TripForm = ({ navigation, route }) => {
     userCtx.setFreshlyCreatedTo(false);
     // restart app with Updates
     const r = await reloadApp();
-    if (r === -1) navigation.popToTop();
+    if (r == -1) navigation.popToTop();
 
     // tripCtx.refresh();
     // navigation.navigate("Profile");
@@ -441,13 +454,24 @@ const TripForm = ({ navigation, route }) => {
             }}
           >
             <BackButton style={{ marginTop: -8 }}></BackButton>
-            <FlatButton
-              onPress={() => {
-                navigation.navigate("Join");
-              }}
-            >
-              {i18n.t("joinTripLabel")}
-            </FlatButton>
+            {!isEditing && (
+              <FlatButton
+                onPress={() => {
+                  navigation.navigate("Join");
+                }}
+              >
+                {i18n.t("joinTripLabel")}
+              </FlatButton>
+            )}
+            {isEditing && (
+              <FlatButton
+                onPress={() => {
+                  onShare(tripCtx.tripid, navigation);
+                }}
+              >
+                {i18n.t("shareTripLabel")}
+              </FlatButton>
+            )}
           </View>
           <View
             style={[

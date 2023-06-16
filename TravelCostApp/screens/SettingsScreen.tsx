@@ -46,12 +46,15 @@ import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { secureStoreGetItem } from "../store/secure-storage";
 import IconButton from "../components/UI/IconButton";
 import { BlurView } from "expo-blur";
+import { NetworkContext } from "../store/network-context";
 
 const SettingsScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
+  const netCtx = useContext(NetworkContext);
+  const isConnected = netCtx.isConnected && netCtx.strongConnection;
   const uid = authCtx.uid;
   const tripid = tripCtx.tripid;
   const userName = userCtx.userName;
@@ -218,6 +221,13 @@ const SettingsScreen = ({ navigation }) => {
           text: i18n.t("delete"),
           style: "destructive",
           onPress: () => {
+            if (!isConnected) {
+              Alert.alert(
+                i18n.t("noConnection"),
+                i18n.t("checkConnectionError")
+              );
+              return;
+            }
             console.log("deleteAccountHandler ~ deleteAccountHandler");
             authCtx.deleteAccount();
           },
@@ -354,6 +364,10 @@ const SettingsScreen = ({ navigation }) => {
         darkText
         colors={GlobalStyles.gradientColorsButton}
         onPress={() => {
+          if (!isConnected) {
+            Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
+            return;
+          }
           console.log("pressed premium button");
           if (premiumStatus) {
             // Toast.show({

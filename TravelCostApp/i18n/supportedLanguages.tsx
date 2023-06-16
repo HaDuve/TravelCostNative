@@ -218,6 +218,9 @@ const en = {
   emailInvalidInfoText: "Please enter a valid email address!",
   passwordInvalidInfoText:
     "Please enter a password with at least 6 characters!",
+
+  // new stuff
+  shareTripLabel: "Share Trip",
 };
 const de = {
   // standard strings

@@ -17,6 +17,7 @@ const BACKEND_URL =
 
 /** ACCESS TOKEN */
 /** Sets the ACCESS TOKEN for all future http requests */
+global.QPAR = "";
 export function setAxiosAccessToken(token: string) {
   console.log(
     "setAxiosAccessToken ~ setAxiosAccessToken",

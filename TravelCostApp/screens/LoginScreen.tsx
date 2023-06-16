@@ -1,5 +1,5 @@
 import AuthContent from "../components/Auth/AuthContent";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { login } from "../util/auth";
 import { Alert, Platform } from "react-native";
@@ -31,11 +31,16 @@ function LoginScreen() {
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
+  const [isConnected, setIsConnected] = useState(
+    netCtx.isConnected && netCtx.strongConnection
+  );
+  useEffect(() => {
+    console.log("LoginScreen ~ isConnected", isConnected);
+    setIsConnected(netCtx.isConnected && netCtx.strongConnection);
+  }, [netCtx.isConnected, netCtx.strongConnection]);
 
   async function loginHandler({ email, password }) {
-    setIsAuthenticating(true);
-    // Check internet connection first
-    if (!netCtx.isConnected || !netCtx.strongConnection) {
+    if (!isConnected) {
       Toast.show({
         type: "error",
         text1: i18n.t("noConnection"),
@@ -44,8 +49,11 @@ function LoginScreen() {
       setIsAuthenticating(false);
       return;
     }
+    console.log(netCtx.isConnected, netCtx.strongConnection);
+    setIsAuthenticating(true);
     try {
       const { token, uid } = await login(email, password);
+      console.log("loginHandler ~ uid:", uid);
       //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
       const checkUser = await fetchUser(uid);
       console.log("loginHandler ~ checkUser", checkUser);
@@ -58,6 +66,7 @@ function LoginScreen() {
           text2: i18n.t("tryAgain"),
           visibilityTime: 4000,
         });
+        console.log("loginHandler exectption error");
         authCtx.logout();
       }
       if (checkUser.userName && !checkUser.currentTrip) {
@@ -80,28 +89,24 @@ function LoginScreen() {
         Purchases.configure({ apiKey: REVCAT_API_KEY, appUserID: uid });
         console.log("LoginScreen ~ uid:", uid);
       }
-      try {
-        const userData = checkUser;
-        console.log("loginHandler ~ userData", userData);
-        const tripid = userData.currentTrip;
-        await secureStoreSetItem("currentTripId", tripid);
-        await touchMyTraveler(tripid, uid);
-        tripCtx.setTripid(tripid);
-        userCtx.addUser(userData);
-        await tripCtx.fetchAndSetCurrentTrip(tripid);
-        await userCtx.loadCatListFromAsyncInCtx(tripid);
-        tripCtx.refresh();
-      } catch (error) {
-        Alert.alert(i18n.t("noConnection"), i18n.t("tryAgain"));
-      }
+      const userData = checkUser;
+      console.log("loginHandler ~ userData", userData);
+      const tripid = userData.currentTrip;
+      await secureStoreSetItem("currentTripId", tripid);
+      await touchMyTraveler(tripid, uid);
+      tripCtx.setTripid(tripid);
+      userCtx.addUser(userData);
+      await tripCtx.fetchAndSetCurrentTrip(tripid);
+      await userCtx.loadCatListFromAsyncInCtx(tripid);
+      tripCtx.refresh();
       authCtx.setUserID(uid);
       await authCtx.authenticate(token);
     } catch (error) {
       console.error(error);
       setIsAuthenticating(false);
-      Alert.alert(i18n.t("authError"), i18n.t("authErrorText"));
-      // Alert.alert(i18n.t("authError"), error.message);
-      authCtx.logout();
+      // Alert.alert(i18n.t("authError"), i18n.t("authErrorText"));
+      // // Alert.alert(i18n.t("authError"), error.message);
+      // authCtx.logout();
     }
   }
 

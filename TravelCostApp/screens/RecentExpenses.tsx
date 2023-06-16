@@ -175,6 +175,7 @@ function RecentExpenses({ navigation }) {
 
   useInterval(
     () => {
+      if (userCtx.freshlyCreated) return;
       setDateTimeString(_toShortFormat(DateTime.now()));
       if (isForeground()) {
         const asyncPolling = async () => {

@@ -37,6 +37,7 @@ import { ActivityIndicator } from "react-native-paper";
 import { reloadApp } from "../util/appState";
 import BackButton from "../components/UI/BackButton";
 import { asyncStoreSetItem, asyncStoreSetObject } from "../store/async-storage";
+import { NetworkContext } from "../store/network-context";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -49,6 +50,8 @@ const JoinTrip = ({ navigation, route }) => {
   const userCtx = useContext(UserContext);
   const authCtx = useContext(AuthContext);
   const tripCtx = useContext(TripContext);
+  const netCtx = useContext(NetworkContext);
+  const isConnected = netCtx.isConnected && netCtx.strongConnection;
   const expenseCtx = useContext(ExpensesContext);
   const uid = authCtx.uid;
   let tripid = route.params ? route.params.id : "";
@@ -60,6 +63,10 @@ const JoinTrip = ({ navigation, route }) => {
   const [isFetching, setIsFetching] = useState(false);
 
   async function getTrip(tripID: string) {
+    if (!isConnected) {
+      Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
+      return;
+    }
     if (!tripID) return;
     setIsFetching(true);
     setFreshLink(false);
@@ -79,6 +86,10 @@ const JoinTrip = ({ navigation, route }) => {
   }, [clickedOnLink, tripid]);
 
   async function joinHandler(join: boolean) {
+    if (!isConnected) {
+      Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
+      return;
+    }
     // either we press the confirm or the cancel button (join=true/false)
     if (!join) {
       navigation.pop();
@@ -113,7 +124,10 @@ const JoinTrip = ({ navigation, route }) => {
         await asyncStoreSetObject("expenses", expenses);
 
         // Immediately reload the React Native Bundle
-        await reloadApp();
+        const r = await reloadApp();
+        if (r == -1) {
+          navigation.popToTop();
+        }
       } catch (error) {
         Alert.alert("Error", "Please try again later.\n" + error.message);
         console.error(error);

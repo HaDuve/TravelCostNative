@@ -17,7 +17,7 @@ async function authenticate(mode: string, email: string, password: string) {
   await secureStoreSetItem("ENCM", email);
   await secureStoreSetItem("ENCP", password);
   const token = response.data.idToken;
-  console.log("authenticate ~ token:", token);
+  // console.log("authenticate ~ token:", token);
   const uid = response.data.localId;
   return { token, uid };
 }

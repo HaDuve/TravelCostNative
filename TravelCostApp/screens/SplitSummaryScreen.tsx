@@ -90,6 +90,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   );
 
   async function getOpenSplits() {
+    if (expenseCtx.expenses.length === 0) return;
     setIsFetching(true);
     try {
       const response = await calcOpenSplitsTable(
@@ -168,7 +169,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     getOpenSplits();
-  }, [expenseCtx.expenses, tripid]);
+  }, [expenseCtx.expenses, tripid, tripIsPaid, tripCurrency]);
 
   function errorHandler() {
     setError(null);

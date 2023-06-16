@@ -246,9 +246,9 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   headerTitleText: {
-    fontSize: 44,
-    paddingHorizontal: "4%",
-    marginTop: "-10%",
+    fontSize: 32,
+    // paddingHorizontal: "4%",
+    marginTop: "-5%",
     marginBottom: "6%",
     fontWeight: "bold",
     textAlign: "center",
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "300",
     textAlign: "center",
-    paddingHorizontal: 24,
+    paddingHorizontal: "4%",
     marginBottom: "12%",
   },
   footerText: {

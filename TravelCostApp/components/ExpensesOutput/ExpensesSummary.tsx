@@ -9,6 +9,7 @@ import { Pressable } from "react-native";
 import Toast from "react-native-toast-message";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
 import * as Haptics from "expo-haptics";
+import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
   const tripCtx = useContext(TripContext);
@@ -71,19 +72,8 @@ const ExpensesSummary = ({ expenses, periodName }) => {
 
   if (budgetProgress > 1) budgetProgress -= 1;
   if (Number.isNaN(budgetProgress)) {
-    console.log("NaN budgetProgress passed to Summary");
-    // alertYesNo(
-    //   "Trip NaN Error",
-    //   "Some Error probably made your Trip unreadable. Do you want to reset this account? (Create New Trip)",
-    //   () => {
-    //     userCtx.setFreshlyCreatedTo(true);
-    //     authCtx.logout();
-    //   },
-    //   () => {
-    //     authCtx.logout();
-    //   }
-    // );
-    return <Text> Error: Not a Number </Text>;
+    console.log("NaN budgetProgress");
+    return <></>;
   }
 
   const pressBudgetHandler = () => {

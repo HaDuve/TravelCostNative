@@ -63,9 +63,6 @@ export const UserContext = createContext({
   setIsOnline: (bool: boolean) => {},
   saveUserNameInStorage: async (name: string) => {},
   loadUserNameFromStorage: async () => {},
-  // checkConnectionUpdateUser: async () => {
-  //   return true;
-  // },
   isPremium: false,
   checkPremium: async (): Promise<boolean> => {
     return false;

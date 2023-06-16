@@ -211,6 +211,7 @@ const TripForm = ({ navigation, route }) => {
       endDate: endDate,
       tripid: "",
       travellers: {},
+      expenses: [],
     };
 
     // Tripname should not be empty

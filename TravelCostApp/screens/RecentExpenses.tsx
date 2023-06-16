@@ -71,6 +71,19 @@ function RecentExpenses({ navigation }) {
   const listRef = React.useRef(null);
   useScrollToTop(listRef);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userCtx.freshlyCreated) {
+        Toast.show({
+          type: "success",
+          text1: "Welcome to Budget for Nomads",
+          text2: "Please Create or Join a Trip to get started!",
+        });
+        navigation.navigate("Profile");
+      }
+    }, [userCtx.freshlyCreated, navigation])
+  );
+
   const tripid = tripCtx.tripid;
   // uid as a state
   const [uid, setuidString] = useState(authCtx.uid);

@@ -24,6 +24,7 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { getCurrencySymbol } from "../util/currencySymbol";
 import BackButton from "../components/UI/BackButton";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
+import { useFocusEffect } from "@react-navigation/native";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
   // let { tripid } = route.params;
@@ -38,6 +39,20 @@ const SplitSummaryScreen = ({ route, navigation }) => {
     () => expenseCtx.getRecentExpenses(RangeString.total),
     [expenseCtx.expenses]
   );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userCtx.freshlyCreated) {
+        Toast.show({
+          type: "success",
+          text1: "Welcome to Budget for Nomads",
+          text2: "Please Create or Join a Trip to get started!",
+        });
+        navigation.navigate("Profile");
+      }
+    }, [userCtx.freshlyCreated, navigation])
+  );
+
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
 

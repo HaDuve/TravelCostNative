@@ -10,6 +10,7 @@ function Input({
   onUpdateValue,
   value,
   isInvalid,
+  isInvalidInfoText,
   textContentType,
 }) {
   return (
@@ -29,6 +30,9 @@ function Input({
         selectionColor={GlobalStyles.colors.primary700}
         placeholderTextColor={GlobalStyles.colors.textColor}
       />
+      {isInvalid && isInvalidInfoText && (
+        <Text style={styles.errorText}>{isInvalidInfoText}</Text>
+      )}
     </View>
   );
 }
@@ -42,6 +46,7 @@ Input.propTypes = {
   onUpdateValue: PropTypes.func.isRequired,
   value: PropTypes.string.isRequired,
   isInvalid: PropTypes.bool,
+  isInvalidInfoText: PropTypes.string,
   textContentType: PropTypes.string,
 };
 
@@ -67,5 +72,11 @@ const styles = StyleSheet.create({
   inputInvalid: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderBottomColor: GlobalStyles.colors.error300,
+  },
+  errorText: {
+    fontSize: 12,
+    color: GlobalStyles.colors.error500,
+    fontWeight: "300",
+    marginLeft: "2%",
   },
 });

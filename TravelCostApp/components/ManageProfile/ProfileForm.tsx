@@ -21,12 +21,13 @@ import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 import LoadingOverlay from "../UI/LoadingOverlay";
 import GradientButton from "../UI/GradientButton";
 import * as Haptics from "expo-haptics";
+import PropTypes from "prop-types";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-const ProfileForm = ({ navigation, sleepyStartHandler }) => {
+const ProfileForm = ({ navigation }) => {
   const AuthCtx = useContext(AuthContext);
   const UserCtx = useContext(UserContext);
   const TripCtx = useContext(TripContext);
@@ -161,9 +162,7 @@ const ProfileForm = ({ navigation, sleepyStartHandler }) => {
       </FlatButton>
       <GradientButton
         style={styles.navButton}
-        onPress={() =>
-          navigation.navigate("ManageTrip", { callback: sleepyStartHandler })
-        }
+        onPress={() => navigation.navigate("ManageTrip")}
       >
         {i18n.t("createFirstTrip")}
       </GradientButton>
@@ -193,6 +192,10 @@ const ProfileForm = ({ navigation, sleepyStartHandler }) => {
 };
 
 export default ProfileForm;
+
+ProfileForm.propTypes = {
+  navigation: PropTypes.object,
+};
 
 const styles = StyleSheet.create({
   form: {

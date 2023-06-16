@@ -195,9 +195,9 @@ const ProfileScreen = ({ navigation }) => {
   React.useEffect(() => {
     if (canStart && userCtx.needsTour) {
       // 👈 test if you can start otherwise nothing will happen
-      sleepyStartTour();
+      // sleepyStartTour();
     }
-  }, [canStart]); // 👈 don't miss it!
+  }, [canStart, userCtx.needsTour]); // 👈 don't miss it!
 
   const handleOnStart = () => {
     navigation.navigate("RecentExpenses");
@@ -321,10 +321,7 @@ const ProfileScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
-        <ProfileForm
-          navigation={navigation}
-          sleepyStartHandler={sleepyStartTour}
-        ></ProfileForm>
+        <ProfileForm navigation={navigation}></ProfileForm>
       </View>
       {visibleContent}
     </View>

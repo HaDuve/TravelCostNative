@@ -54,7 +54,7 @@ function AuthContent({ isLogin, onAuthenticate }) {
 
     const nameIsValid = name.length > 0 && name.length < 256;
     const emailIsValid = email.includes("@") && email.includes(".");
-    const passwordIsValid = password.length > 6;
+    const passwordIsValid = password.length > 5;
 
     if ((!nameIsValid || !emailIsValid || !passwordIsValid) && !isLogin) {
       Alert.alert(i18n.t("authError"), i18n.t("invalidInput"));

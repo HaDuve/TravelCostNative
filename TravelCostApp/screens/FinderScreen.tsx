@@ -8,7 +8,7 @@ import * as Haptics from "expo-haptics";
 import { Searchbar } from "react-native-paper";
 import GradientButton from "../components/UI/GradientButton";
 import { ExpensesContext } from "../store/expenses-context";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import BackButton from "../components/UI/BackButton";
 import { Checkbox } from "react-native-paper";
 import { useDebounce } from "use-debounce";
@@ -21,10 +21,27 @@ import {
 import { GlobalStyles } from "../constants/styles";
 import IconButton from "../components/UI/IconButton";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { UserContext } from "../store/user-context";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 const FinderScreen = () => {
   const navigation = useNavigation();
   const expenseCtx = useContext(ExpensesContext);
+  const userCtx = useContext(UserContext);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userCtx.freshlyCreated) {
+        Toast.show({
+          type: "success",
+          text1: "Welcome to Budget for Nomads",
+          text2: "Please Create or Join a Trip to get started!",
+        });
+        navigation.navigate("Profile");
+      }
+    }, [userCtx.freshlyCreated, navigation])
+  );
+
   const [checkedQuery, setCheckedQuery] = React.useState(false);
   // console.log("FinderScreen ~ checkedQuery:", checkedQuery);
   const [checkedDate, setCheckedDate] = React.useState(false);

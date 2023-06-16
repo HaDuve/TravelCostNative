@@ -212,6 +212,12 @@ const en = {
     "At the end of the 1-week trial period, your iTunes account will be charged $2. The subscription will automatically renew unless canceled within 24 hours before the end of the current period. You can cancel anytime through your iTunes account. Any unused portion of a free trial will be forfeited upon subscription purchase. For more information, please refer to our terms and conditions and privacy policy.",
   paywallToS: "Terms of Service",
   paywallPP: "Privacy Policy",
+
+  //auth form
+  nameInvalidInfoText: "Please enter a name!",
+  emailInvalidInfoText: "Please enter a valid email address!",
+  passwordInvalidInfoText:
+    "Please enter a password with at least 6 characters!",
 };
 const de = {
   // standard strings
@@ -439,6 +445,12 @@ const de = {
     "Datenschutzrichtlinien.",
   paywallToS: "Nutzungsbedingungen",
   paywallPP: "Datenschutzbestimmungen",
+
+  // auth form
+  nameInvalidInfoText: "Bitte gib einen Namen ein!",
+  emailInvalidInfoText: "Bitte gib eine gültige E-Mail-Adresse ein!",
+  passwordInvalidInfoText:
+    "Bitte gib ein Passwort mit mindestens 6 Zeichen ein!",
 };
 const fr = {
   // standard strings
@@ -663,6 +675,12 @@ const fr = {
     "À la fin de la période d'essai d'une semaine, votre compte iTunes sera facturé 2 $. L'abonnement se renouvellera automatiquement sauf s'il est annulé dans les 24 heures précédant la fin de la période en cours. Vous pouvez annuler à tout moment via votre compte iTunes. Toute partie inutilisée de l'essai gratuit sera perdue lors de l'achat de l'abonnement. Pour plus d'informations, veuillez consulter nos conditions générales et notre politique de confidentialité.",
   paywallToS: "Conditions d'utilisation",
   paywallPP: "Politique de confidentialité",
+
+  // auth form
+  nameInvalidInfoText: "Veuillez entrer un nom !",
+  emailInvalidInfoText: "Veuillez entrer une adresse e-mail valide !",
+  passwordInvalidInfoText:
+    "Veuillez entrer un mot de passe d'au moins 6 caractères !",
 };
 const ru = {
   // standard strings
@@ -881,5 +899,11 @@ const ru = {
     "По истечении 1-недельного пробного периода ваш аккаунт iTunes будет списан на $2. Подписка автоматически продлится, если не будет отменена в течение 24 часов перед окончанием текущего периода. Вы можете отменить подписку в любое время через свой аккаунт iTunes. Любая неиспользованная часть бесплатного пробного периода будет аннулирована при покупке подписки. Дополнительную информацию можно найти в наших условиях использования и политике конфиденциальности.",
   paywallToS: "Условия использования",
   paywallPP: "Политика конфиденциальности",
+  // auth form
+  nameInvalidInfoText: "Пожалуйста, введите имя!",
+  emailInvalidInfoText:
+    "Пожалуйста, введите действительный адрес электронной почты!",
+  passwordInvalidInfoText:
+    "Пожалуйста, введите пароль длиной не менее 6 символов!",
 };
 export { en, de, fr, ru };

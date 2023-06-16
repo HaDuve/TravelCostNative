@@ -11,6 +11,7 @@ i18n.enableFallback = true;
 
 import * as Linking from "expo-linking";
 import * as Haptics from "expo-haptics";
+import PropTypes from "prop-types";
 
 export async function onShare(shareId, navigation) {
   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -50,3 +51,8 @@ const ShareTripButton = ({ route, navigation }) => {
 };
 
 export default ShareTripButton;
+
+ShareTripButton.propTypes = {
+  route: PropTypes.object.isRequired,
+  navigation: PropTypes.object.isRequired,
+};

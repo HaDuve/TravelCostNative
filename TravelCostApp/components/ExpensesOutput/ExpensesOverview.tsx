@@ -40,7 +40,7 @@ import { TripContext } from "../../store/trip-context";
 import { ExpensesContext } from "../../store/expenses-context";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
-  console.log("rerender ExpensesOverview - 1");
+  // console.log("rerender ExpensesOverview - 1");
   const expenseCtx = useContext(ExpensesContext);
   const tripCtx = useContext(TripContext);
   // const periodRangeNumber = useRef(7);

@@ -374,88 +374,81 @@ function Home() {
         tabBarBounces: true,
       })}
     >
-      {!FreshlyCreated && (
-        <BottomTabs.Screen
-          name="RecentExpenses"
-          component={RecentExpenses}
-          options={{
-            tabBarShowLabel: false,
-            // headerShown: false,
-            // title: "Recent Expenses",
-            tabBarLabel: i18n.t("expensesTab"),
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="home-outline" size={24} color={color} />
-            ),
-          }}
-        />
-      )}
-      {!FreshlyCreated && hasExpenses && (
-        <BottomTabs.Screen
-          name="Overview"
-          component={OverviewScreen}
-          options={{
-            // headerShown: false,
-            tabBarShowLabel: false,
-            title: i18n.t("overviewTab"),
-            tabBarLabel: i18n.t("overviewTab"),
-            tabBarIcon: ({ color }) => (
-              <Ionicons
-                name={
-                  userCtx.isShowingGraph
-                    ? "bar-chart-outline"
-                    : "pie-chart-outline"
-                }
-                size={24}
-                color={color}
-              />
-            ),
-          }}
-        />
-      )}
-      {!FreshlyCreated && hasExpenses && (
-        <BottomTabs.Screen
-          name="Finder"
-          component={FinderScreen}
-          options={{
-            // headerShown: false,
-            title: i18n.t("settingsTab"),
-            tabBarShowLabel: false,
+      <BottomTabs.Screen
+        name="RecentExpenses"
+        component={RecentExpenses}
+        options={{
+          tabBarShowLabel: false,
+          // headerShown: false,
+          // title: "Recent Expenses",
+          tabBarLabel: i18n.t("expensesTab"),
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="home-outline" size={24} color={color} />
+          ),
+        }}
+      />
 
-            tabBarLabel: "Finder", //i18n.t("settingsTab"),
-            tabBarIcon: ({ color }) => (
-              // image of a money bag
-              <Ionicons name="search-outline" size={24} color={color} />
-              // probably needs a new build for this icon to work
-              // <Image
-              //   source={require("./assets/money-bag.png")}
-              //   style={{ width: 60, height: 60 }}
-              // />
-            ),
-          }}
-        />
-      )}
-      {!FreshlyCreated && hasExpenses && multiTraveller && (
-        <BottomTabs.Screen
-          name="Financial"
-          component={SplitSummaryScreen}
-          options={{
-            // headerShown: false,
-            title: i18n.t("settingsTab"),
-            tabBarShowLabel: false,
+      <BottomTabs.Screen
+        name="Overview"
+        component={OverviewScreen}
+        options={{
+          // headerShown: false,
+          tabBarShowLabel: false,
+          title: i18n.t("overviewTab"),
+          tabBarLabel: i18n.t("overviewTab"),
+          tabBarIcon: ({ color }) => (
+            <Ionicons
+              name={
+                userCtx.isShowingGraph
+                  ? "bar-chart-outline"
+                  : "pie-chart-outline"
+              }
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <BottomTabs.Screen
+        name="Finder"
+        component={FinderScreen}
+        options={{
+          // headerShown: false,
+          title: i18n.t("settingsTab"),
+          tabBarShowLabel: false,
 
-            tabBarLabel: "Financial", //i18n.t("settingsTab"),
-            tabBarIcon: ({ color }) => (
-              // image of a money bag
-              <Ionicons name="cash-outline" size={24} color={color} />
-              // probably needs a new build for this icon to work
-              // <Image
-              //   source={require("./assets/money-bag.png")}
-              //   style={{ width: 60, height: 60 }}
-              // />
-            ),
-          }}
-        />
-      )}
+          tabBarLabel: "Finder", //i18n.t("settingsTab"),
+          tabBarIcon: ({ color }) => (
+            // image of a money bag
+            <Ionicons name="search-outline" size={24} color={color} />
+            // probably needs a new build for this icon to work
+            // <Image
+            //   source={require("./assets/money-bag.png")}
+            //   style={{ width: 60, height: 60 }}
+            // />
+          ),
+        }}
+      />
+      <BottomTabs.Screen
+        name="Financial"
+        component={SplitSummaryScreen}
+        options={{
+          // headerShown: false,
+          title: i18n.t("settingsTab"),
+          tabBarShowLabel: false,
+
+          tabBarLabel: "Financial", //i18n.t("settingsTab"),
+          tabBarIcon: ({ color }) => (
+            // image of a money bag
+            <Ionicons name="cash-outline" size={24} color={color} />
+            // probably needs a new build for this icon to work
+            // <Image
+            //   source={require("./assets/money-bag.png")}
+            //   style={{ width: 60, height: 60 }}
+            // />
+          ),
+        }}
+      />
       <BottomTabs.Screen
         name="Profile"
         component={ProfileScreen}
@@ -470,21 +463,6 @@ function Home() {
           ),
         }}
       />
-
-      {/* {!FreshlyCreated && (
-        <BottomTabs.Screen
-          name="Settings"
-          component={SettingsScreen}
-          options={{
-            // headerShown: false,
-            title: i18n.t("settingsTab"),
-            tabBarLabel: i18n.t("settingsTab"),
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="cog-outline" size={24} color={color} />
-            ),
-          }}
-        />
-      )} */}
     </BottomTabs.Navigator>
   );
 }

@@ -20,6 +20,7 @@ import {
   asyncStoreSetItem,
 } from "../../store/async-storage";
 import GradientButton from "../UI/GradientButton";
+import { TextInput } from "react-native-paper";
 
 function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
   const [enteredEmail, setEnteredEmail] = useState("");
@@ -160,6 +161,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
             secure={false}
             keyboardType="default"
             isInvalid={nameIsInvalid}
+            isInvalidInfoText={i18n.t("nameInvalidInfoText")}
             textContentType="name"
           />
         )}
@@ -170,6 +172,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
           secure={false}
           keyboardType="email-address"
           isInvalid={emailIsInvalid}
+          isInvalidInfoText={i18n.t("emailInvalidInfoText")}
           textContentType="emailAddress"
         />
 
@@ -180,6 +183,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
           keyboardType="default"
           value={enteredPassword}
           isInvalid={passwordIsInvalid}
+          isInvalidInfoText={i18n.t("passwordInvalidInfoText")}
           textContentType="password"
         />
 

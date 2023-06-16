@@ -85,7 +85,8 @@ function SignupScreen() {
       await authCtx.authenticate(token);
     } catch (error) {
       console.log("signupHandler ~ error2", error);
-      Alert.alert(i18n.t("authError"), error.message); // i18n.t("createErrorText"));
+      // Alert.alert(i18n.t("authError"), error.message);
+      Alert.alert(i18n.t("authError"), i18n.t("createErrorText"));
 
       setIsAuthenticating(false);
     }

@@ -99,8 +99,8 @@ function LoginScreen() {
     } catch (error) {
       console.error(error);
       setIsAuthenticating(false);
-      // Alert.alert(i18n.t("authError"), i18n.t("authErrorText"));
-      Alert.alert(i18n.t("authError"), error.message);
+      Alert.alert(i18n.t("authError"), i18n.t("authErrorText"));
+      // Alert.alert(i18n.t("authError"), error.message);
       authCtx.logout();
     }
   }

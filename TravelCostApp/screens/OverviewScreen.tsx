@@ -24,6 +24,8 @@ import * as Haptics from "expo-haptics";
 import { SettingsContext } from "../store/settings-context";
 import { formatExpenseWithCurrency } from "../util/string";
 import { TripContext } from "../store/trip-context";
+import { useFocusEffect } from "@react-navigation/native";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -52,6 +54,19 @@ const OverviewScreen = ({ navigation }) => {
     ? " - " + lastConnectionSpeedInMbps?.toFixed(2) + " Mbps"
     : "";
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userCtx.freshlyCreated) {
+        Toast.show({
+          type: "success",
+          text1: "Welcome to Budget for Nomads",
+          text2: "Please Create or Join a Trip to get started!",
+        });
+        navigation.navigate("Profile");
+      }
+    }, [userCtx.freshlyCreated, navigation])
+  );
 
   useEffect(() => {
     if (isOnline) {

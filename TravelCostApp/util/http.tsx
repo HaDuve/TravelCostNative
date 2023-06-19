@@ -328,10 +328,10 @@ export async function storeUser(uid: string, userData: object) {
 /**
  * Updates User via axios.patch given uid and userdata to patch
  */
-export function updateUser(uid: string, userData: UserData) {
+export async function updateUser(uid: string, userData: UserData) {
   // console.log("updateUser ~ userData", userData);
   try {
-    return axios.patch(
+    await axios.patch(
       BACKEND_URL + "/users/" + `${uid}.json` + global.QPAR,
       userData
     );

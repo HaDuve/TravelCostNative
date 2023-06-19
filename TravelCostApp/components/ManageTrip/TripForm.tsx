@@ -210,6 +210,72 @@ const TripForm = ({ navigation, route }) => {
     );
   }
 
+  async function editingTripData(tripData: TripData, setActive = false) {
+    try {
+      console.log("TripForm ~ tripid in editingTripData:", editedTripId);
+      await updateTrip(editedTripId, tripData);
+      if (editedTripId === tripCtx.tripid || setActive) {
+        await secureStoreSetItem("currentTripId", editedTripId);
+        await tripCtx.setCurrentTrip(editedTripId, tripData);
+        await updateUser(uid, {
+          currentTrip: editedTripId,
+        });
+        await tripCtx.setCurrentTravellers(editedTripId);
+        await userCtx.setFreshlyCreatedTo(false);
+        const expenses = await getAllExpenses(editedTripId, uid);
+        expenseCtx.setExpenses(expenses);
+        await asyncStoreSetObject("expenses", expenses);
+        const token = authCtx.token;
+        console.log("submitHandler ~ token:", token);
+        const r = await reloadApp();
+        if (r == -1) navigation.popToTop();
+      }
+      tripCtx.refresh();
+      navigation.pop();
+      return;
+    } catch (error) {
+      console.log("editingTripData ~ error:", error);
+      Alert.alert("Error", "Error while saving trip, please try again!");
+      return;
+    }
+  }
+
+  async function saveTripData(tripData: TripData) {
+    const tripid = await storeTrip(tripData);
+    console.log("TripForm ~ tripid in saveTripData:", tripid);
+    await secureStoreSetItem("currentTripId", tripid);
+    await storeTravellerToTrip(tripid, { userName: userName, uid: uid });
+
+    const newTripData = await fetchTrip(tripid);
+
+    await tripCtx.setCurrentTrip(tripid, newTripData);
+    expenseCtx.setExpenses([]);
+    await asyncStoreSetObject("expenses", []);
+
+    // if fresh store TripHistory else update TripHistory
+    if (userCtx.freshlyCreated) {
+      await storeTripHistory(uid, [tripid]);
+    } else {
+      await updateTripHistory(uid, tripid);
+    }
+
+    await updateUser(uid, {
+      userName: userName,
+      currentTrip: tripid,
+    });
+
+    if (userCtx.freshlyCreated) {
+      userCtx.setNeedsTour(true);
+    }
+    await userCtx.setFreshlyCreatedTo(false);
+    // restart app with Updates
+    const r = await reloadApp();
+    if (r == -1) navigation.popToTop();
+
+    // tripCtx.refresh();
+    // navigation.navigate("Profile");
+  }
+
   async function submitHandler(setActive = false) {
     if (!isConnected) {
       Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
@@ -269,58 +335,10 @@ const TripForm = ({ navigation, route }) => {
     // if isEditing update Trip, else store
     console.log("submitHandler ~ setActive:", setActive);
     if (isEditing) {
-      await updateTrip(editedTripId, tripData);
-      if (editedTripId === tripCtx.tripid || setActive) {
-        updateUser(uid, {
-          currentTrip: editedTripId,
-        });
-        tripCtx.setCurrentTrip(editedTripId, tripData);
-
-        await tripCtx.setCurrentTravellers(editedTripId);
-        userCtx.setFreshlyCreatedTo(false);
-        const expenses = await getAllExpenses(editedTripId, uid);
-        expenseCtx.setExpenses(expenses);
-        await asyncStoreSetObject("expenses", expenses);
-        const r = await reloadApp();
-        if (r == -1) navigation.popToTop();
-      }
-      tripCtx.refresh();
-      navigation.pop();
-      return;
-    }
-    const tripid = await storeTrip(tripData);
-    console.log("TripForm ~ tripid before setItem:", tripid);
-    await secureStoreSetItem("currentTripId", tripid);
-    await storeTravellerToTrip(tripid, { userName: userName, uid: uid });
-
-    const newTripData = await fetchTrip(tripid);
-
-    tripCtx.setCurrentTrip(tripid, newTripData);
-    await asyncStoreSetObject("expenses", []);
-    expenseCtx.setExpenses([]);
-
-    // if fresh store TripHistory else update TripHistory
-    if (userCtx.freshlyCreated) {
-      await storeTripHistory(uid, [tripid]);
+      await editingTripData(tripData, setActive);
     } else {
-      await updateTripHistory(uid, tripid);
+      await saveTripData(tripData);
     }
-
-    updateUser(uid, {
-      userName: userName,
-      currentTrip: tripid,
-    });
-
-    if (userCtx.freshlyCreated) {
-      userCtx.setNeedsTour(true);
-    }
-    userCtx.setFreshlyCreatedTo(false);
-    // restart app with Updates
-    const r = await reloadApp();
-    if (r == -1) navigation.popToTop();
-
-    // tripCtx.refresh();
-    // navigation.navigate("Profile");
   }
 
   function updateCurrency() {

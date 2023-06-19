@@ -55,7 +55,7 @@ export const UserContext = createContext({
   deleteTripHistory: (tripid: string) => {},
 
   freshlyCreated: false,
-  setFreshlyCreatedTo: (bool: boolean) => {},
+  setFreshlyCreatedTo: async (bool: boolean) => {},
   needsTour: false,
   setNeedsTour: (bool: boolean) => {},
 

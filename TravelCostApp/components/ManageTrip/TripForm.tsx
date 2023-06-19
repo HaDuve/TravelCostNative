@@ -277,6 +277,7 @@ const TripForm = ({ navigation, route }) => {
   }
 
   async function submitHandler(setActive = false) {
+    setIsLoading(true);
     if (!isConnected) {
       Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
       return;
@@ -339,6 +340,7 @@ const TripForm = ({ navigation, route }) => {
     } else {
       await saveTripData(tripData);
     }
+    setIsLoading(false);
   }
 
   function updateCurrency() {

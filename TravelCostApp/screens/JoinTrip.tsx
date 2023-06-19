@@ -207,7 +207,7 @@ const JoinTrip = ({ navigation, route }) => {
         <FlatButton onPress={joinHandler.bind(this, false)}>
           {i18n.t("cancel")}
         </FlatButton>
-        {tripName?.length > 0 && (
+        {tripName?.length > 0 && !isFetching && (
           <Button
             style={{ marginLeft: "10%" }}
             buttonStyle={{ paddingHorizontal: "20%" }}

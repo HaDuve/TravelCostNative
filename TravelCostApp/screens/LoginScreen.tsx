@@ -84,7 +84,7 @@ function LoginScreen() {
           apiKey: "<public_google_sdk_key>",
           appUserID: uid,
         });
-      } else if (Platform.OS === "ios") {
+      } else if (Platform.OS === "ios" || Platform.OS === "macos") {
         // Purchases
         Purchases.configure({ apiKey: REVCAT_API_KEY, appUserID: uid });
         console.log("LoginScreen ~ uid:", uid);

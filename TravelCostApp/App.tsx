@@ -613,7 +613,7 @@ function Root() {
             apiKey: "<public_google_sdk_key>",
             appUserID: storedUid,
           });
-        } else if (Platform.OS === "ios") {
+        } else if (Platform.OS === "ios" || Platform.OS === "macos") {
           // Purchases
           Purchases.configure({ apiKey: REVCAT_API_KEY, appUserID: storedUid });
           console.log("onRootMount ~ storedUid:", storedUid);

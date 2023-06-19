@@ -346,6 +346,9 @@ function RecentExpenses({ navigation }) {
         refreshControl={
           <RefreshControl
             refreshing={refreshing || isFetching}
+            tintColor="transparent"
+            colors={["transparent"]}
+            style={{ backgroundColor: "transparent" }}
             onRefresh={async () => {
               console.log("onREFRESH");
               await onRefresh();

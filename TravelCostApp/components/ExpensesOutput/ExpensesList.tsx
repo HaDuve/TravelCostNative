@@ -27,6 +27,8 @@ import { NetworkContext } from "../../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { useNavigation, useScrollToTop } from "@react-navigation/native";
 import { useState } from "react";
+import LoadingBarOverlay from "../UI/LoadingBarOverlay";
+import { Text } from "react-native-paper";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -246,8 +248,21 @@ function ExpensesList({
       style={{
         paddingLeft: 0,
         backgroundColor: GlobalStyles.colors.backgroundColor,
+        height: Dimensions.get("window").height,
       }}
     >
+      <View
+        style={{
+          position: "absolute",
+          width: Dimensions.get("window").width,
+          height: 60,
+          alignItems: "center",
+          justifyContent: "center",
+          marginTop: -60,
+        }}
+      >
+        <LoadingBarOverlay></LoadingBarOverlay>
+      </View>
       <Animated.FlatList
         // ref={flatListRef}
         scrollEnabled={false}

@@ -17,7 +17,7 @@ export async function reloadApp() {
   try {
     await Updates.reloadAsync();
   } catch (error) {
-    console.log("Updates.reloadAsync error, returning -1: ", error);
+    console.log("Updates.reloadAsync error, returning -1");
     return -1;
   }
 }

@@ -62,7 +62,8 @@ const SettingsScreen = ({ navigation }) => {
   const [isDEV, setIsDEV] = useState(DEV);
   const [timeZoneString, setTimeZoneString] = useState("");
   const [shouldShowTour, setShouldShowTour] = useState(false);
-  const multiTraveller = tripCtx.travellers.length > 1 ?? false;
+  const multiTraveller =
+    (tripCtx.travellers && tripCtx.travellers.length > 1) ?? false;
   const [DEBUG_tripid, setDEBUG_tripid] = useState("");
   const [DEBUG_uid, setDEBUG_uid] = useState("");
 
@@ -260,24 +261,6 @@ const SettingsScreen = ({ navigation }) => {
       console.log("restorePurchases ~ e:", e);
     }
   }
-
-  function logoutHandler() {
-    return Alert.alert(i18n.t("sure"), i18n.t("signOutAlertMess"), [
-      // The "No" button
-      // Does nothing but dismiss the dialog when tapped
-      {
-        text: i18n.t("no"),
-      },
-      // The "Yes" button
-      {
-        text: i18n.t("yes"),
-        onPress: () => {
-          authCtx.logout();
-        },
-      },
-    ]);
-  }
-
   return (
     <ScrollView
       scrollEnabled={true}

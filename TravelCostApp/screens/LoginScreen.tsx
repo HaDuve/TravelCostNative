@@ -35,11 +35,11 @@ function LoginScreen() {
     netCtx.isConnected && netCtx.strongConnection
   );
   useEffect(() => {
-    console.log("LoginScreen ~ isConnected", isConnected);
     setIsConnected(netCtx.isConnected && netCtx.strongConnection);
   }, [netCtx.isConnected, netCtx.strongConnection]);
 
   async function loginHandler({ email, password }) {
+    setIsAuthenticating(true);
     if (!isConnected) {
       Toast.show({
         type: "error",
@@ -49,8 +49,6 @@ function LoginScreen() {
       setIsAuthenticating(false);
       return;
     }
-    console.log(netCtx.isConnected, netCtx.strongConnection);
-    setIsAuthenticating(true);
     try {
       const { token, uid } = await login(email, password);
       console.log("loginHandler ~ uid:", uid);
@@ -67,14 +65,16 @@ function LoginScreen() {
           visibilityTime: 4000,
         });
         console.log("loginHandler exectption error");
-        authCtx.logout();
+        await authCtx.logout();
       }
+      let freshlyCreated = checkUser.freshlyCreated || userCtx.freshlyCreated;
       if (checkUser.userName && !checkUser.currentTrip) {
         // we infer freshly created if no current trip exists but we assigned a name already
         console.log(
           "loginHandler ~ we set to freshly because username but no current trip!"
         );
-        userCtx.setFreshlyCreatedTo(true);
+        await userCtx.setFreshlyCreatedTo(true);
+        freshlyCreated = true;
       }
       //// END OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
       // setup purchases
@@ -90,16 +90,19 @@ function LoginScreen() {
         console.log("LoginScreen ~ uid:", uid);
       }
       const userData = checkUser;
+      await userCtx.addUserName(userData);
+      await authCtx.setUserID(uid);
       console.log("loginHandler ~ userData", userData);
       const tripid = userData.currentTrip;
+      if (!tripid && freshlyCreated) {
+        await authCtx.authenticate(token);
+      }
       await secureStoreSetItem("currentTripId", tripid);
       await touchMyTraveler(tripid, uid);
       tripCtx.setTripid(tripid);
-      userCtx.addUser(userData);
       await tripCtx.fetchAndSetCurrentTrip(tripid);
       await userCtx.loadCatListFromAsyncInCtx(tripid);
       tripCtx.refresh();
-      authCtx.setUserID(uid);
       await authCtx.authenticate(token);
     } catch (error) {
       console.error(error);
@@ -108,13 +111,20 @@ function LoginScreen() {
       // // Alert.alert(i18n.t("authError"), error.message);
       // authCtx.logout();
     }
+    console.log("end reached?");
   }
 
   if (isAuthenticating) {
     return <LoadingOverlay customText={i18n.t("loginLoadText")} />;
   }
 
-  return <AuthContent isLogin onAuthenticate={loginHandler} />;
+  return (
+    <AuthContent
+      isLogin
+      isConnected={isConnected}
+      onAuthenticate={loginHandler}
+    />
+  );
 }
 
 export default LoginScreen;

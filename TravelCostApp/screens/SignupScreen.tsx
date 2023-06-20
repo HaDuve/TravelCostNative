@@ -1,6 +1,6 @@
 /* eslint-disable react/react-in-jsx-scope */
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import React, { Alert, KeyboardAvoidingView } from "react-native";
 
 //Localization
@@ -31,10 +31,17 @@ function SignupScreen() {
   const userCtx = useContext(UserContext);
   const netCtx = useContext(NetworkContext);
 
+  const [isConnected, setIsConnected] = useState(
+    netCtx.isConnected && netCtx.strongConnection
+  );
+  useEffect(() => {
+    setIsConnected(netCtx.isConnected && netCtx.strongConnection);
+  }, [netCtx.isConnected, netCtx.strongConnection]);
+
   async function signupHandler({ name, email, password }) {
     setIsAuthenticating(true);
     // Check internet connection first
-    if (!netCtx.isConnected) {
+    if (!isConnected) {
       Toast.show({
         type: "error",
         text1: i18n.t("noConnection"),
@@ -75,8 +82,8 @@ function SignupScreen() {
       //NEW
       const userData = { userName: name };
       userCtx.setUserName(name);
-      userCtx.setFreshlyCreatedTo(true);
-      authCtx.setUserID(uid);
+      await userCtx.setFreshlyCreatedTo(true);
+      await authCtx.setUserID(uid);
       setAxiosAccessToken(token);
       await storeUser(uid, userData);
       await updateUser(uid, {
@@ -87,7 +94,6 @@ function SignupScreen() {
       console.log("signupHandler ~ error2", error);
       // Alert.alert(i18n.t("authError"), error.message);
       Alert.alert(i18n.t("authError"), i18n.t("createErrorText"));
-
       setIsAuthenticating(false);
     }
   }
@@ -96,7 +102,13 @@ function SignupScreen() {
     return <LoadingOverlay message={i18n.t("createUserLoadText")} />;
   }
 
-  return <AuthContent isLogin={false} onAuthenticate={signupHandler} />;
+  return (
+    <AuthContent
+      isConnected={netCtx.isConnected && netCtx.strongConnection}
+      isLogin={false}
+      onAuthenticate={signupHandler}
+    />
+  );
 }
 
 export default SignupScreen;

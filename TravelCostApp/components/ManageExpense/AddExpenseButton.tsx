@@ -10,7 +10,7 @@ import Animated, {
   SlideInUp,
 } from "react-native-reanimated";
 import { UserContext } from "../../store/user-context";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TourGuideZone } from "rn-tourguide";
 
@@ -25,10 +25,59 @@ i18n.enableFallback = true;
 
 import PropTypes from "prop-types";
 import { SettingsContext } from "../../store/settings-context";
+import { TripContext } from "../../store/trip-context";
+import { AuthContext } from "../../store/auth-context";
+import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 
 const AddExpenseButton = ({ navigation }) => {
   const { settings } = useContext(SettingsContext);
+  const tripCtx = useContext(TripContext);
+  const authCtx = useContext(AuthContext);
+  const [valid, setvalid] = useState(true);
+  useEffect(() => {
+    setvalid(
+      tripCtx.tripid &&
+        authCtx.uid &&
+        tripCtx.travellers &&
+        tripCtx.travellers.length > 0
+    );
+  }, [tripCtx.tripid, authCtx.uid, tripCtx.travellers]);
+  console.log("AddExpenseButton ~ authCtx.uid:", authCtx.uid);
+  // console.log(
+  console.log("AddExpenseButton ~ tripCtx.tripid:", tripCtx.tripid);
+  //   "AddExpenseButton:, tripCtx.tripid, authCtx.uid, tripCtx.travellers",
+  //   tripCtx.tripid,
+  //   authCtx.uid,
+  //   tripCtx.travellers
+  // );
+  // const valid = uid && tripid && travellers && travellers.length > 0;
+  // console.log("AddExpenseButton ~ valid:", valid);
   const skipCatScreen = settings.skipCategoryScreen;
+  if (!valid) {
+    return (
+      <Animated.View
+        style={[styles.margin]}
+        entering={FadeIn.duration(600).delay(8000)}
+      >
+        <View
+          style={[
+            styles.addButton,
+            GlobalStyles.shadowGlowPrimary,
+            styles.addButtonInactive,
+          ]}
+        >
+          <LoadingBarOverlay
+            containerStyle={{
+              backgroundColor: "transparent",
+              maxHeight: 44,
+              marginLeft: -4,
+            }}
+            noText
+          ></LoadingBarOverlay>
+        </View>
+      </Animated.View>
+    );
+  }
   return (
     <Animated.View
       style={styles.margin}
@@ -82,5 +131,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+  },
+  addButtonInactive: {
+    backgroundColor: GlobalStyles.colors.primary800,
   },
 });

@@ -22,6 +22,7 @@ import {
   secureStoreRemoveItem,
   secureStoreSetItem,
 } from "./secure-storage";
+import { reloadApp } from "../util/appState";
 
 export const AuthContext = createContext({
   uid: "",
@@ -29,7 +30,7 @@ export const AuthContext = createContext({
   isAuthenticated: false,
   authenticate: async (token) => {},
   logout: async () => {},
-  setUserID: (uid) => {},
+  setUserID: async (uid) => {},
   deleteAccount: async () => {},
 });
 
@@ -53,13 +54,11 @@ function AuthContextProvider({ children }) {
 
   async function logout() {
     setAuthToken(null);
-    await secureStoreRemoveItem("token");
-    await secureStoreRemoveItem("uid");
   }
 
-  function setUserID(uid) {
+  async function setUserID(uid) {
     setuidString(uid);
-    secureStoreSetItem("uid", uid);
+    await secureStoreSetItem("uid", uid);
   }
 
   async function deleteAccount() {
@@ -94,8 +93,9 @@ function AuthContextProvider({ children }) {
             text2: "Your account has been deleted successfully.",
             visibilityTime: 3000,
             autoHide: true,
-            onHide: () => {
+            onHide: async () => {
               logout();
+              await reloadApp();
             },
           });
         })

@@ -47,7 +47,8 @@ const FinancialScreen = () => {
   const restCash =
     Number(daysFromStartToToday) * Number(tripCtx.dailyBudget) - expensesSum;
   tripCtx.setTotalSum(expensesSum);
-  const multiTraveller = tripCtx.travellers.length > 1 ? true : false;
+  const multiTraveller =
+    tripCtx.travellers && tripCtx.travellers.length > 1 ? true : false;
   // if (restCash < 0) restCash = 0;
   console.log("FinancialScreen ~ restCash:", restCash);
   return (

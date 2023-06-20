@@ -149,14 +149,18 @@ const SplitSummaryScreen = ({ route, navigation }) => {
       const simpleSplits = simplifySplits(splits);
       if (simpleSplits.length === 0) {
         Alert.alert("No Splits to Simplify");
-        navigation.navigate("Settings");
+        navigation.pop();
       }
       if (simpleSplits.some((split) => split.whoPaid === "Error")) {
+        setTitleText(titleTextSimplified);
+        setSubTitleText(subTitleSimplified);
+        setShowSimplify(false);
+        return;
         Alert.alert(
           "Error",
           "Could not simplify splits. Something must have gone wrong, sorry!"
         );
-        navigation.navigate("Settings");
+        navigation.pop();
       }
       setSplits(simpleSplits);
       setShowSimplify(false);
@@ -318,6 +322,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     // borderWidth: 1,
     borderColor: GlobalStyles.colors.gray500,
+    minWidth: "80%",
   },
   button: {
     marginLeft: 24,

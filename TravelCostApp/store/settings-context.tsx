@@ -31,11 +31,11 @@ export const SettingsProvider = ({ children }) => {
         setSettings(loadedSettings);
       } else
         setSettings({
-          showFlags: false,
-          showWhoPaid: false,
+          showFlags: true,
+          showWhoPaid: true,
           alwaysShowAdvanced: true,
-          skipCategoryScreen: false,
-          showInternetSpeed: false,
+          skipCategoryScreen: true,
+          showInternetSpeed: true,
         });
     };
     loadSettingsAsync();

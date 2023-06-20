@@ -25,6 +25,7 @@ const CurrencyPicker = ({
   setCountryValue,
   onChangeValue,
   placeholder,
+  valid = true,
 }) => {
   // Users Device CountryCode CC to translate Country names in picker
   // enforce a language we have registered, otherwise, english
@@ -89,7 +90,9 @@ const CurrencyPicker = ({
           borderRadius: 0,
           borderWidth: 0,
           borderBottomWidth: 1,
-          backgroundColor: GlobalStyles.colors.gray500,
+          backgroundColor: valid
+            ? GlobalStyles.colors.gray500
+            : GlobalStyles.colors.error50,
           borderColor: GlobalStyles.colors.gray700,
         }}
         textStyle={{ color: GlobalStyles.colors.textColor }}
@@ -105,6 +108,7 @@ CurrencyPicker.propTypes = {
   setCountryValue: PropTypes.func.isRequired,
   onChangeValue: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
+  valid: PropTypes.bool,
 };
 
 const styles = StyleSheet.create({

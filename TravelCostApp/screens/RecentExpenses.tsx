@@ -158,7 +158,7 @@ function RecentExpenses({ navigation }) {
       if (netCtx.isConnected && netCtx.strongConnection) {
         if (tripCtx.travellers && tripCtx.travellers.length > 1) return;
         try {
-          await tripCtx.setCurrentTravellers(tripCtx.tripid);
+          await tripCtx.fetchAndSetTravellers(tripCtx.tripid);
         } catch (error) {
           console.log("error loading travellers in expenseForm");
         }
@@ -201,6 +201,7 @@ function RecentExpenses({ navigation }) {
     showAnyIndicator = false,
     ignoreTouched = false
   ) {
+    if (userCtx.freshlyCreated) return;
     if (ignoreTouched)
       console.log("getExpenses ~ ignoreTouched:", ignoreTouched);
     // check offlinemode
@@ -229,7 +230,7 @@ function RecentExpenses({ navigation }) {
       setIsFetching(false);
       return;
     }
-    console.log("we are touched and fetching expenses");
+    console.log("we are touched and fetching expenses", tripid);
     // fetch and set expenses
 
     await fetchAndSetExpenses(

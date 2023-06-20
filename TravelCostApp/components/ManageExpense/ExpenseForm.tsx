@@ -138,7 +138,7 @@ const ExpenseForm = ({
     if (!tripCtx.travellers || tripCtx.travellers.length < 1)
       setLoadingTravellers(true);
     async function asyncSetTravellers() {
-      await tripCtx.setCurrentTravellers(tripCtx.tripid);
+      await tripCtx.fetchAndSetTravellers(tripCtx.tripid);
       setLoadingTravellers(false);
     }
     asyncSetTravellers();

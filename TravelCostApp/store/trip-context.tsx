@@ -9,14 +9,15 @@ import { MAX_JS_NUMBER } from "../confAppConstants";
 import { secureStoreGetItem } from "./secure-storage";
 import { ExpenseData, isPaidString } from "../util/expense";
 import { err } from "react-native-svg/lib/typescript/xml";
+import { Traveller } from "../util/traveler";
 
 export interface TripData {
-  tripName: string;
-  expenses: ExpenseData[];
-  totalBudget: string;
-  dailyBudget: string;
-  tripCurrency: string;
-  travellers: object;
+  tripName?: string;
+  expenses?: ExpenseData[];
+  totalBudget?: string;
+  dailyBudget?: string;
+  tripCurrency?: string;
+  travellers?: Traveller[];
   tripid?: string;
   totalSum?: number;
   tripProgress?: number;
@@ -40,7 +41,7 @@ export const TripContext = createContext({
   refresh: () => {},
   setTripProgress: (percent: number) => {},
   travellers: [],
-  setCurrentTravellers: async (tripid: string) => {},
+  fetchAndSetTravellers: async (tripid: string) => {},
   setTotalSum: (amount: number) => {},
   setTripid: (tripid: string) => {},
 
@@ -74,42 +75,49 @@ function TripContextProvider({ children }) {
   const [isPaidDate, setIsPaidDate] = useState("");
 
   useEffect(() => {
-    // set tripid from storage
-    async function loadTripidFromStorage() {
-      console.log("loadTripidFromStorage ~ loadTripidFromStorage");
-      const loadedTripid = await secureStoreGetItem("currentTripid");
-      if (loadedTripid) {
-        setTripid(loadedTripid);
-        fetchAndSetCurrentTrip(loadedTripid);
+    async function loadAsyncTripid() {
+      const tripid = await secureStoreGetItem("currentTripid");
+      if (tripid) setTripid(tripid);
+    }
+    loadAsyncTripid();
+  }, []);
+
+  useEffect(() => {
+    async function loadAsyncTravellers() {
+      const travellers = await asyncStoreGetObject("currentTravellers");
+      if (travellers) {
+        console.log("loadAsyncTravellers ~ travellers:", travellers);
+        setTravellers(travellers);
       }
     }
-    loadTripidFromStorage();
+    loadAsyncTravellers();
   }, []);
 
   function setTripProgress(percent: number) {
     if (percent < 0 || percent > 1) percent = 1;
     setProgress(percent);
   }
-
+  //
   function refresh() {
     console.log("refresh ~ refresh", refresh);
     setRefreshState(!refreshState);
   }
 
-  async function setCurrentTravellers(tripid: string) {
+  async function fetchAndSetTravellers(tripid: string) {
     if (tripid === "") {
       setTravellers([]);
-      return;
+      return false;
     }
     // updates the current Travellers in context
     try {
       const travellers = await getTravellers(tripid);
+      if (travellers.length < 1) throw new Error("no travellers found");
       saveTravellersInStorage(travellers);
       setTravellers(travellers);
       return true;
     } catch (error) {
       // console.log("setCurrentTravellers ~ error", error);
-      return false;
+      throw new Error("no travellers found");
     }
   }
 
@@ -123,13 +131,13 @@ function TripContextProvider({ children }) {
       setTotalBudget("");
       setTripCurrency("");
       setdailyBudget("");
-      setCurrentTravellers("");
+      setTravellers([]);
       setStartDate("");
       setEndDate("");
       return;
     }
     // console.log("setCurrentTrip ~ trip", trip);
-    // console.log("setCurrentTrip ~ tripid", tripid);
+    console.log("setCurrentTrip ~ tripid", tripid);
     _setTripid(tripid);
     setTripName(trip.tripName);
     setTotalBudget(
@@ -137,17 +145,14 @@ function TripContextProvider({ children }) {
     );
     setTripCurrency(trip.tripCurrency);
     setdailyBudget(trip.dailyBudget.toString());
-    setCurrentTravellers(tripid);
     setStartDate(trip.startDate);
     setEndDate(trip.endDate);
-    console.log("trip.isPaid:", trip.isPaid);
     setIsPaid(trip.isPaid);
     setIsPaidDate(trip.isPaidDate);
-    try {
-      await updateTrip(tripid, trip);
-    } catch (error) {
-      console.log(error);
-    }
+
+    // bug here?
+    console.log("setCurrentTrip ~ trip.travellers:", trip.travellers);
+    setTravellers(trip.travellers);
   }
 
   function setTotalSum(amount: number) {
@@ -231,6 +236,7 @@ function TripContextProvider({ children }) {
           ? tripData.totalBudget.toString()
           : MAX_JS_NUMBER.toString()
       );
+
       setTripCurrency(tripData.tripCurrency);
       setdailyBudget(tripData.dailyBudget.toString());
       await loadTravellersFromStorage();
@@ -241,20 +247,16 @@ function TripContextProvider({ children }) {
   }
 
   async function saveTravellersInStorage(travellers) {
+    console.log("~~~~ saveTravellersInStorage ~ travellers:", travellers);
     await asyncStoreSetObject("currentTravellers", travellers);
   }
 
   async function loadTravellersFromStorage() {
-    await asyncStoreGetObject("currentTravellers").then((travellers) => {
-      if (travellers) {
-        const travellerList = [];
-        // travellers.forEach((traveller) => {
-        //   console.log("awaitasyncStoreGetObject ~ traveller:", traveller);
-        //   setTravellers(["test"]);
-        // });
-        setTravellers(travellers);
-      }
-    });
+    const travellers = await asyncStoreGetObject("currentTravellers");
+    if (travellers) {
+      console.log("awaitasyncStoreGetObject ~ travellers:", travellers);
+      setTravellers(travellers);
+    }
   }
 
   const value = {
@@ -271,7 +273,7 @@ function TripContextProvider({ children }) {
     refreshState: refreshState,
     setTripProgress: setTripProgress,
     travellers: travellers,
-    setCurrentTravellers: setCurrentTravellers,
+    fetchAndSetTravellers: fetchAndSetTravellers,
     setTotalSum: setTotalSum,
     setTripid: _setTripid,
     addTrip: addTrip,

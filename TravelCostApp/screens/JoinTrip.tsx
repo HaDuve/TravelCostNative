@@ -10,10 +10,9 @@ import {
   fetchTrip,
   getAllExpenses,
   storeTripHistory,
-  storeTravellerToTrip,
   updateUser,
-  fetchTripHistory,
   updateTripHistory,
+  putTravelerInTrip,
 } from "../util/http";
 import { UserContext } from "../store/user-context";
 import { AuthContext } from "../store/auth-context";
@@ -38,6 +37,8 @@ import { reloadApp } from "../util/appState";
 import BackButton from "../components/UI/BackButton";
 import { asyncStoreSetItem, asyncStoreSetObject } from "../store/async-storage";
 import { NetworkContext } from "../store/network-context";
+import uniqBy from "lodash.uniqby";
+import { secureStoreSetItem } from "../store/secure-storage";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -105,32 +106,34 @@ const JoinTrip = ({ navigation, route }) => {
         } else {
           await updateTripHistory(uid, tripid);
         }
+        userCtx.setTripHistory(uniqBy([...userCtx.tripHistory, tripid]));
 
-        await storeTravellerToTrip(tripid, {
-          userName: userCtx.userName,
+        await putTravelerInTrip(tripid, {
           uid: uid,
+          userName: userCtx.userName,
         });
 
         updateUser(uid, {
           currentTrip: tripid,
         });
-        tripCtx.setCurrentTrip(tripid, tripdata);
-        await tripCtx.setCurrentTravellers(tripid);
-        userCtx.setFreshlyCreatedTo(false);
+        await tripCtx.setCurrentTrip(tripid, tripdata);
+        await tripCtx.fetchAndSetTravellers(tripid);
+        await userCtx.setFreshlyCreatedTo(false);
         await userCtx.loadCatListFromAsyncInCtx(tripid);
         const expenses = await getAllExpenses(tripid, uid);
+        expenseCtx.setExpenses(expenses);
         await asyncStoreSetObject("currentTrip", tripdata);
-        await asyncStoreSetItem("currentTripId", tripid);
+        await secureStoreSetItem("currentTripId", tripid);
         await asyncStoreSetObject("expenses", expenses);
 
-        // Immediately reload the React Native Bundle
-        const r = await reloadApp();
-        if (r == -1) {
-          navigation.popToTop();
-        }
+        // // Immediately reload the React Native Bundle
+        // const r = await reloadApp();
+        // if (r == -1)
+        navigation.popToTop();
       } catch (error) {
-        Alert.alert("Error", "Please try again later.\n" + error.message);
+        Alert.alert("Exception", "Please try again later.\n" + error.message);
         console.error(error);
+        navigation.popToTop();
       }
       setIsFetching(false);
     }
@@ -144,7 +147,7 @@ const JoinTrip = ({ navigation, route }) => {
       // we are assuming this link has the following form
       // "://join/[tripid]"
       const index_start1 = joinTripid.indexOf("://join/");
-      const final_link_string = joinTripid.slice(index_start1 + 8);
+      const final_link_string = joinTripid.slice(index_start1 + 8).trim();
       console.log("joinLinkHandler ~ final_link_string:", final_link_string);
       setJoinTripid(final_link_string);
       getTrip(final_link_string);

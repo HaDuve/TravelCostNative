@@ -20,12 +20,18 @@ i18n.enableFallback = true;
 const loadingColor = GlobalStyles.colors.primary500;
 const unfilledColor = GlobalStyles.colors.gray600;
 const LoadingBarOverlay = (props) => {
-  const { containerStyle, progressAt, progressMax, customText } = props;
+  const { containerStyle, progressAt, progressMax, customText, noText } = props;
   let { progress } = props;
-  const renderedText = customText ? customText : "Uploading your Expenses ... "; //i18n.t("uploadingExpenses");
+  const renderedText = customText ?? "Uploading your Expenses ... "; //i18n.t("uploadingExpenses");
   // if progress is smaller than 0
   if (!progress || isNaN(Number(progress)))
-    return <LoadingOverlay customText={customText} />;
+    return (
+      <LoadingOverlay
+        containerStyle={containerStyle}
+        customText={customText}
+        noText={noText}
+      />
+    );
   if (progress < 0) {
     progress = 0;
   }
@@ -37,7 +43,7 @@ const LoadingBarOverlay = (props) => {
     <View style={[styles.container, containerStyle]}>
       <View style={styles.headerContainer}>
         <ActivityIndicator size={"large"} color={loadingColor} />
-        <Text style={styles.text}>{renderedText}</Text>
+        {!noText && <Text style={styles.text}>{renderedText}</Text>}
       </View>
       <Progress.Bar
         color={loadingColor}
@@ -63,6 +69,7 @@ LoadingBarOverlay.propTypes = {
   progressAt: PropTypes.number,
   progressMax: PropTypes.number,
   customText: PropTypes.string,
+  noText: PropTypes.bool,
 };
 
 const styles = StyleSheet.create({

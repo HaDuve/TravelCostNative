@@ -17,6 +17,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import * as SplashScreen from "expo-splash-screen";
+import { shouldShowOnboarding } from "./components/Rating/firstStartUtil";
 
 import { NetworkProvider } from "react-native-offline";
 import { Ionicons } from "@expo/vector-icons";
@@ -103,8 +104,14 @@ const BottomTabs = createMaterialTopTabNavigator();
 
 const prefix = Linking.createURL("/");
 function NotAuthenticatedStack() {
-  const userCtx = useContext(UserContext);
-  const needsOnboarding = userCtx.needsTour;
+  const [needOnboarding, setNeedOnboarding] = useState(false);
+  useEffect(() => {
+    async function checkOnboarding() {
+      const need = await shouldShowOnboarding();
+      // setNeedOnboarding(need);
+    }
+    checkOnboarding();
+  }, []);
   return (
     <AuthStack.Navigator
       screenOptions={{
@@ -113,7 +120,7 @@ function NotAuthenticatedStack() {
         contentStyle: { backgroundColor: GlobalStyles.colors.backgroundColor },
       }}
     >
-      {needsOnboarding && (
+      {needOnboarding && (
         <AuthStack.Screen
           name="Onboarding"
           component={OnboardingScreen}
@@ -332,14 +339,10 @@ function Navigation() {
 
 function Home() {
   const userCtx = useContext(UserContext);
-  const expensesCtx = useContext(ExpensesContext);
-  const tripCtx = useContext(TripContext);
-  const hasExpenses = expensesCtx.expenses.length > 0;
-  const netCtx = useContext(NetworkContext);
   const FreshlyCreated = userCtx.freshlyCreated;
-  const multiTraveller = tripCtx.travellers.length > 1 ?? false;
 
   const FirstScreen = FreshlyCreated ? "Profile" : "RecentExpenses";
+
   return (
     <BottomTabs.Navigator
       initialRouteName={FirstScreen}
@@ -500,22 +503,14 @@ function Root() {
         asyncQueue();
 
         const delayedOnlineSetup = async () => {
-          const tripid = await secureStoreGetItem("currentTripId");
-          // console.log("Root ~ tripid:", tripid);
+          if (userCtx.freshlyCreated) return;
           if (!onlineSetupDone) {
-            // console.log(
-            //   "delayedOnlineSetup ~ delayedOnlineSetup:",
-            //   delayedOnlineSetup
-            // );
-
             const { isFastEnough } = await isConnectionFastEnough();
             if (isFastEnough) {
               //prepare online setup
               const storedUid = await secureStoreGetItem("uid");
               const checkUser = await fetchUser(storedUid);
               const tripid = checkUser.currentTrip;
-              console.log("delayedOnlineSetup ~ storedUid", storedUid);
-              console.log("delayedOnlineSetup ~ tripid", tripid);
               const tripData = await tripCtx.fetchAndSetCurrentTrip(tripid);
               await onlineSetup(tripData, checkUser, tripid, storedUid);
               console.log("delayedOnlineSetup ~ DONE");
@@ -524,7 +519,7 @@ function Root() {
           }
         };
 
-        delayedOnlineSetup();
+        // delayedOnlineSetup();
       }
     },
     DEBUG_POLLING_INTERVAL * 1.7,
@@ -540,14 +535,19 @@ function Root() {
   async function onlineSetup(tripData, checkUser, storedTripId, storedUid) {
     const userData: UserData = checkUser;
     const tripid = userData.currentTrip;
+    if (!tripid || tripid?.length < 2) return;
     // console.log("onRootMount ~ userData", userData);
     // save user Name in Ctx and async
-    userCtx.addUser(userData);
-    tripCtx.setCurrentTrip(tripid, tripData);
-    console.log("onlineSetup ~ tripid before setItem:", tripid);
-    await secureStoreSetItem("currentTripId", tripid);
-    await userCtx.loadCatListFromAsyncInCtx(tripid);
-    await touchMyTraveler(storedTripId, storedUid);
+    try {
+      await userCtx.addUserName(userData);
+      await tripCtx.setCurrentTrip(tripid, tripData);
+      console.log("onlineSetup ~ tripid before setItem:", tripid);
+      await userCtx.loadCatListFromAsyncInCtx(tripid);
+      await touchMyTraveler(storedTripId, storedUid);
+    } catch (error) {
+      console.log("onlineSetup ~ error", error);
+      await tripCtx.loadTripDataFromStorage();
+    }
   }
 
   async function setupOfflineMount(
@@ -593,7 +593,6 @@ function Root() {
       // fetch token and trip
       const storedToken = await secureStoreGetItem("token");
       const storedUid = await secureStoreGetItem("uid");
-      console.log("onRootMount ~ currentTripid");
       const storedTripId = await secureStoreGetItem("currentTripId");
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
 
@@ -634,7 +633,7 @@ function Root() {
         if (storedTripId) {
           // console.log("onRootMount ~ storedTripId", storedTripId);
           tripData = await tripCtx.fetchAndSetCurrentTrip(storedTripId);
-          await tripCtx.setCurrentTravellers(storedTripId);
+          await tripCtx.fetchAndSetTravellers(storedTripId);
           tripCtx.setTripid(storedTripId);
         } else {
           Toast.show({
@@ -654,10 +653,11 @@ function Root() {
 
         // check if user was only freshly created
         if (freshlyCreated) {
-          userCtx.setFreshlyCreatedTo(freshlyCreated);
+          await userCtx.setFreshlyCreatedTo(freshlyCreated);
         }
         // check if user was deleted
         const checkUser = await fetchUser(storedUid);
+        console.log("onRootMount ~ checkUser:", checkUser);
         // Check if the user logged in but there is no userName, we deleted the account
         if (!checkUser || !checkUser.userName) {
           Toast.show({
@@ -671,20 +671,21 @@ function Root() {
           return;
         }
         if (checkUser.userName && !checkUser.currentTrip) {
-          userCtx.setFreshlyCreatedTo(true);
+          await userCtx.setFreshlyCreatedTo(true);
         }
         // TODO: fix status when user disconnedcted while freshlyCreated=true
         //// END OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
 
         // setup context
-        authCtx.setUserID(storedUid);
+        await authCtx.setUserID(storedUid);
         await onlineSetup(tripData, checkUser, storedTripId, storedUid);
         await authCtx.authenticate(storedToken);
         const needsTour = await loadTourConfig();
         userCtx.setNeedsTour(needsTour);
         console.log("Root end reached");
       } else {
-        authCtx.logout();
+        await asyncStoreSafeClear();
+        await authCtx.logout();
       }
       setAppIsReady(true);
     }

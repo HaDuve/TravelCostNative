@@ -24,7 +24,7 @@ import AuthForm from "./AuthForm";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
 
-function AuthContent({ isLogin, onAuthenticate }) {
+function AuthContent({ isLogin, onAuthenticate, isConnected }) {
   const navigation = useNavigation();
 
   const [credentialsInvalid, setCredentialsInvalid] = useState({
@@ -74,6 +74,7 @@ function AuthContent({ isLogin, onAuthenticate }) {
         <View style={styles.authContent}>
           <AuthForm
             isLogin={isLogin}
+            isConnected={isConnected}
             onSubmit={submitHandler}
             credentialsInvalid={credentialsInvalid}
           />
@@ -93,9 +94,10 @@ function AuthContent({ isLogin, onAuthenticate }) {
 
 export default AuthContent;
 
-AuthContent.propType = {
+AuthContent.propTypes = {
   onAuthenticate: PropTypes.func.isRequired,
   isLogin: PropTypes.bool,
+  isConnected: PropTypes.bool,
 };
 
 const styles = StyleSheet.create({

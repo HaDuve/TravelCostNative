@@ -21,8 +21,9 @@ import {
 } from "../../store/async-storage";
 import GradientButton from "../UI/GradientButton";
 import { TextInput } from "react-native-paper";
+import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 
-function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
+function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
   const [enteredEmail, setEnteredEmail] = useState("");
   const [enteredName, setenteredName] = useState("");
   const [enteredPassword, setEnteredPassword] = useState("");
@@ -188,7 +189,17 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
         />
 
         <View style={styles.buttons}>
-          <GradientButton onPress={submitHandler}>
+          <GradientButton
+            colors={
+              isConnected
+                ? GlobalStyles.gradientPrimaryButton
+                : [
+                    GlobalStyles.colors.primary500,
+                    GlobalStyles.colors.primaryGrayed,
+                  ]
+            }
+            onPress={submitHandler}
+          >
             {isLogin ? i18n.t("loginText") : i18n.t("createAccountText")}
           </GradientButton>
         </View>
@@ -215,6 +226,7 @@ AuthForm.propTypes = {
   isLogin: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
   credentialsInvalid: PropTypes.object.isRequired,
+  isConnected: PropTypes.bool,
 };
 
 const styles = StyleSheet.create({

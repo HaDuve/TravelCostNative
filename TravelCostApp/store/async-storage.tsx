@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
+import { secureStoreRemoveItem } from "./secure-storage";
 
 /**
  * Store item in long-term Memory of the device.
@@ -92,10 +93,14 @@ export async function asyncStoreSafeClear() {
 
   try {
     await AsyncStorage.multiRemove(keys);
-    await SecureStore.deleteItemAsync("token");
-    await SecureStore.deleteItemAsync("uid");
-    await SecureStore.deleteItemAsync("currentTripId");
-    await SecureStore.deleteItemAsync("freshlyCreated");
+    await secureStoreRemoveItem("token");
+    await secureStoreRemoveItem("uid");
+    await secureStoreRemoveItem("currentTripId");
+    await secureStoreRemoveItem("freshlyCreated");
+    await secureStoreRemoveItem("lastCountry");
+    await secureStoreRemoveItem("lastCurrency");
+    await secureStoreRemoveItem("ENCM");
+    await secureStoreRemoveItem("ENCP");
   } catch (error) {
     // remove error
     console.error(error);

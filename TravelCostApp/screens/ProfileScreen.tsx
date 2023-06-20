@@ -38,6 +38,7 @@ import {
   asyncStoreSetObject,
 } from "../store/async-storage";
 import { NetworkContext } from "../store/network-context";
+import TripHistoryItem from "../components/ProfileOutput/TripHistoryItem";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -51,7 +52,12 @@ const ProfileScreen = ({ navigation }) => {
 
   const [tourIsRunning, setTourIsRunning] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [tripsList, setTripsList] = useState([]);
+  const [tripHistory, setTripHistory] = useState([]);
+  console.log("ProfileScreen ~ tripHistory:", tripHistory);
+  useEffect(() => {
+    setTripHistory(userCtx.tripHistory);
+    console.log("useEffect ~ userCtx.tripHistory:", userCtx.tripHistory);
+  }, [userCtx.tripHistory]);
 
   const uid = authCtx.uid;
 
@@ -67,23 +73,22 @@ const ProfileScreen = ({ navigation }) => {
     3000,
     false
   );
-  async function loadTrips() {
-    if (tripsList.length > 0) return;
-    if (await refreshHandler()) return;
-    if (await loadFromAsyncStore()) return;
-  }
 
-  useEffect(() => {
-    loadTrips();
-  }, []);
+  // useEffect(() => {
+  //   async function loadTrips() {
+  //     if (tripsList.length > 0) return;
+  //     console.log("loadTrips ~ tripsList.length", tripsList.length);
+  //     if (await refreshHandler()) return;
+  //     console.log("loadTrips stage offline");
+  //     if (await loadFromAsyncStore(tripCtx.tripid)) return;
+  //   }
+  //   loadTrips();
+  // }, [tripsList.length, netCtx.isConnected]);
 
-  useFocusEffect(() => {
-    loadTrips();
-  });
-
-  async function loadFromAsyncStore() {
+  async function loadFromAsyncStore(currentTripid: string) {
     try {
       const tripid = await asyncStoreGetItem("PROFILE_tripid");
+      if (tripid != currentTripid) return;
       console.log("loadFromAsyncStore ~ tripid:", tripid);
       const tripName = await asyncStoreGetItem("PROFILE_tripName");
       console.log("loadFromAsyncStore ~ tripName:", tripName);
@@ -115,7 +120,7 @@ const ProfileScreen = ({ navigation }) => {
         tripCurrency: tripCurrency,
         travellers: travellers,
       });
-      setTripsList(allTripsList.reverse());
+      setTripHistory(allTripsList.reverse());
       return true;
     } catch (error) {
       return false;
@@ -133,51 +138,6 @@ const ProfileScreen = ({ navigation }) => {
     asyncStoreSetItem("PROFILE_tripCurrency", tripCtx.tripCurrency);
     asyncStoreSetObject("PROFILE_travellers", tripCtx.travellers);
   }
-  // tripid: tripCtx.tripid,
-  //     tripName: tripCtx.tripName,
-  //     totalBudget: tripCtx.totalBudget,
-  //     dailyBudget: tripCtx.dailyBudget,
-  //     tripCurrency: tripCtx.tripCurrency,
-  //     travellers: tripCtx.travellers,
-
-  // refreshHandler() could be moved into TripContext to be loaded correctly
-  async function refreshHandler() {
-    // check freshly and offlinemode
-    if (
-      userCtx.freshlyCreated ||
-      !netCtx.isConnected ||
-      !netCtx.strongConnection
-    )
-      return false;
-    allTripsList = [];
-    const tripHistory = await fetchTripHistory(uid);
-    if (!tripHistory.length) {
-      console.log("no tripHistory fetched");
-      return false;
-    }
-    allTripsList = [...tripHistory];
-    await tripCtx.fetchAndSetCurrentTrip(tripCtx.tripid);
-    addTripFromContext();
-    saveTripFromContext();
-    // console.log("allTripsList length: ", allTripsList.length);
-    setTripsList(allTripsList.reverse());
-    return true;
-  }
-  function addTripFromContext() {
-    console.log("addTripFromContext ~ addTripFromContext", tripCtx.tripName);
-    if (!tripCtx.tripid || tripCtx.tripid.length < 1) return;
-    allTripsList = allTripsList.filter((trip) => trip !== tripCtx.tripid);
-    allTripsList.push({
-      tripid: tripCtx.tripid,
-      tripName: tripCtx.tripName,
-      totalBudget: tripCtx.totalBudget ?? MAX_JS_NUMBER,
-      dailyBudget: tripCtx.dailyBudget,
-      tripCurrency: tripCtx.tripCurrency,
-      travellers: tripCtx.travellers,
-    });
-  }
-
-  // Tourguide Test
 
   const {
     canStart, // a boolean indicate if you can start tour guide
@@ -284,12 +244,12 @@ const ProfileScreen = ({ navigation }) => {
           zone={6}
         >
           <TripList
-            trips={tripsList}
+            trips={tripHistory}
             setRefreshing={setRefreshing}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
-                onRefresh={refreshHandler}
+                // onRefresh={refreshHandler}
               />
             }
           ></TripList>

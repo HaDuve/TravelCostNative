@@ -5,10 +5,11 @@ import { Alert } from "react-native";
 import {
   asyncStoreGetItem,
   asyncStoreGetObject,
+  asyncStoreSetItem,
   asyncStoreSetObject,
 } from "./async-storage";
 import { isPremiumMember } from "../components/Premium/PremiumConstants";
-import { fetchCategories } from "../util/http";
+import { fetchCategories, fetchTripHistory } from "../util/http";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PropTypes from "prop-types";
 import NetInfo from "@react-native-community/netinfo";
@@ -44,20 +45,16 @@ export const UserContext = createContext({
   lastCountry: "",
   setLastCountry: (string: string) => {},
 
-  addUser: ({ userName }: UserData) => {},
+  addUserName: async ({ userName }: UserData) => {},
   deleteUser: (uid: string) => {},
-
-  addTripHistory: (tripid: string) => {},
-  setTripHistory: (trips: string[]) => {},
-  getTripHistory: (): string[] => {
-    return [""];
-  },
-  deleteTripHistory: (tripid: string) => {},
 
   freshlyCreated: false,
   setFreshlyCreatedTo: async (bool: boolean) => {},
   needsTour: false,
   setNeedsTour: (bool: boolean) => {},
+
+  tripHistory: [],
+  setTripHistory: (tripHistory: string[]) => {},
 
   isOnline: false,
   setIsOnline: (bool: boolean) => {},
@@ -74,34 +71,19 @@ export const UserContext = createContext({
   isShowingGraph: true,
 });
 
-function tripsReducer(state, action) {
-  switch (action.type) {
-    case "ADD":
-      return [action.payload, ...state];
-    case "SET": {
-      const inverted = action.payload.reverse();
-      return inverted;
-    }
-    case "DELETE":
-      return state.filter((trip) => trip.id !== action.payload);
-    default:
-      return state;
-  }
-}
-
 function UserContextProvider({ children }) {
   const [userName, setName] = useState("");
   const [freshlyCreated, setFreshlyCreated] = useState(false);
   const [needsTour, setNeedsTour] = useState(false);
   const [periodName, setPeriodName] = useState("day");
   const [isOnline, setIsOnline] = useState(true);
-  const [tripsState, dispatch] = useReducer(tripsReducer, []);
   const [lastCurrency, setLastCurrency] = useState("");
   const [lastCountry, setLastCountry] = useState("");
   const [isPremium, setIsPremium] = useState(false);
   // useState for cat iconName list
   const [catIconNames, setCatIconNames] = useState([]);
   const [isShowingGraph, setIsShowingGraph] = useState(true);
+  const [tripHistory, setTripHistory] = useState([]);
 
   async function loadLastCurrencyCountryFromAsync() {
     console.log(
@@ -122,6 +104,24 @@ function UserContextProvider({ children }) {
   }
   useEffect(() => {
     loadLastCurrencyCountryFromAsync();
+  }, []);
+
+  useEffect(() => {
+    //
+    // Trip History fetch
+    async function fetch() {
+      const uid = await secureStoreGetItem("uid");
+      console.log("fetch ~ uid:", uid);
+      if (!uid) return;
+      try {
+        const tripHistoryResponse = await fetchTripHistory(uid);
+        console.log("fetch ~ tripHistoryResponse:", tripHistoryResponse);
+        setTripHistory(tripHistoryResponse);
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+    fetch();
   }, []);
 
   async function checkPremium() {
@@ -165,7 +165,14 @@ function UserContextProvider({ children }) {
     }
   }
 
-  async function loadCatListFromAsyncInCtx(tripid: string) {
+  /**
+   * @param tripid
+   * @returns void
+   * @description
+   * 1. fetches the category list from the server
+   * 2. if tripid == "async", it loads the category list from async storage
+   **/
+  async function fetchOrLoadCatList(tripid: string) {
     if (tripid == "async") {
       await _loadCatListFromAsync();
     } else {
@@ -181,29 +188,15 @@ function UserContextProvider({ children }) {
   function setPeriodString(periodName: string) {
     setPeriodName(periodName);
   }
-  function addTripHistory(tripid: string) {
-    // console.log("!!!!!!! addTripHistory ~ tripid", tripid);
-    dispatch({ type: "ADD", payload: [tripid] });
-  }
 
-  function setTripHistory(trips: string[]) {
-    // console.log("setTripHistory ~ trips", trips);
-    dispatch({ type: "SET", payload: trips });
-  }
-
-  function deleteTripHistory(tripid: string) {
-    // console.log("deleteTripHistory ~ tripid", tripid);
-    dispatch({ type: "DELETE", payload: tripid });
-  }
-
-  function addUser(userData: UserData) {
+  async function addUserName(userData: UserData) {
     // console.log("addUser ~ UserData", UserData);
     if (!userData || !userData.userName) {
       console.log("addUser ~ no UserData to add Username!");
       return;
     }
     setUserName(userData.userName);
-    saveUserNameInStorage(userData.userName);
+    await saveUserNameInStorage(userData.userName);
   }
 
   async function setFreshlyCreatedTo(bool: boolean) {
@@ -222,13 +215,9 @@ function UserContextProvider({ children }) {
     setName(name);
   }
 
-  function getTripHistory() {
-    return tripsState;
-  }
-
   async function saveUserNameInStorage(name: string) {
     // console.log("saveUserNameInStorage ~ userName", name);
-    await asyncStoreSetObject("userName", name);
+    await asyncStoreSetItem("userName", name);
   }
 
   async function loadUserNameFromStorage() {
@@ -240,64 +229,6 @@ function UserContextProvider({ children }) {
       }
     });
   }
-
-  // async function checkConnectionUpdateUser() {
-  //   let forceOffline = DEBUG_FORCE_OFFLINE;
-  //   if (Device.isDevice) forceOffline = false;
-
-  //   try {
-  //     const newIsOnline = await checkInternetConnection(
-  //       forceOffline
-  //         ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
-  //         : "https://www.google.com/",
-  //       TIMEOUT,
-  //       true,
-  //       "HEAD"
-  //     );
-  //     setIsOnline(newIsOnline);
-  //     return newIsOnline;
-  //   } catch (error) {
-  //     console.log(error);
-
-  //     // Retry the check up to 3 times if the error is a timeout error
-  //     if (error.name === "TimeoutError") {
-  //       let retries = RETRIES;
-  //       while (retries > 0) {
-  //         retries--;
-  //         console.log(`Retrying connection check (${retries} retries left)...`);
-  //         // show toast informing about bad internet connection
-  //         Toast.show({
-  //           type: "error",
-  //           text1: "Bad internet connection",
-  //           text2: "Retrying connection check...",
-  //         });
-  //         try {
-  //           const newIsOnline = await checkInternetConnection(
-  //             forceOffline
-  //               ? "https://www.existiertnichtasdasjdnkajsdjnads.de"
-  //               : "https://www.google.com/",
-  //             TIMEOUT * (3 - retries),
-  //             true,
-  //             "HEAD"
-  //           );
-  //           setIsOnline(newIsOnline);
-  //           return newIsOnline;
-  //         } catch (error) {
-  //           console.log(error);
-  //         }
-  //       }
-  //     }
-
-  //     // Display an error message to the user
-  //     Toast.show({
-  //       text1: "No internet connection",
-  //       text2: "Please check your connection and try again",
-  //       type: "error",
-  //     });
-
-  //     return false;
-  //   }
-  // }
 
   const value = {
     userName: userName,
@@ -311,17 +242,15 @@ function UserContextProvider({ children }) {
     needsTour: needsTour,
     setNeedsTour: setNeedsTour,
 
-    addTripHistory: addTripHistory,
+    tripHistory: tripHistory,
     setTripHistory: setTripHistory,
-    getTripHistory: getTripHistory,
-    deleteTripHistory: deleteTripHistory,
 
     lastCurrency: lastCurrency,
     setLastCurrency: setLastCurrency,
     lastCountry: lastCountry,
     setLastCountry: setLastCountry,
 
-    addUser: addUser,
+    addUserName: addUserName,
     deleteUser: deleteUser,
     isOnline: isOnline,
     setIsOnline: setIsOnline,
@@ -331,7 +260,7 @@ function UserContextProvider({ children }) {
 
     isPremium: isPremium,
     checkPremium: checkPremium,
-    loadCatListFromAsyncInCtx: loadCatListFromAsyncInCtx,
+    loadCatListFromAsyncInCtx: fetchOrLoadCatList,
     catIconNames: catIconNames,
 
     loadLastCurrencyCountryFromAsync: loadLastCurrencyCountryFromAsync,

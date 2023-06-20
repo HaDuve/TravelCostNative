@@ -22,17 +22,22 @@ import LoadingOverlay from "../UI/LoadingOverlay";
 import GradientButton from "../UI/GradientButton";
 import * as Haptics from "expo-haptics";
 import PropTypes from "prop-types";
+import { ExpensesContext } from "../../store/expenses-context";
+import { asyncStoreSafeClear } from "../../store/async-storage";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
 const ProfileForm = ({ navigation }) => {
-  const AuthCtx = useContext(AuthContext);
-  const UserCtx = useContext(UserContext);
-  const TripCtx = useContext(TripContext);
-  const freshlyCreated = UserCtx.freshlyCreated;
+  const authCtx = useContext(AuthContext);
+  const userCtx = useContext(UserContext);
+  const tripCtx = useContext(TripContext);
+  const expCtx = useContext(ExpensesContext);
+  const freshlyCreated = userCtx.freshlyCreated;
   const [isFetchingLogout, setIsFetchingLogout] = useState(false);
+
+  console.log(userCtx.userName, tripCtx.tripid, authCtx.uid);
 
   function logoutHandler() {
     return Alert.alert(i18n.t("sure"), i18n.t("signOutAlertMess"), [
@@ -44,10 +49,14 @@ const ProfileForm = ({ navigation }) => {
       // The "Yes" button
       {
         text: i18n.t("yes"),
-        onPress: () => {
+        onPress: async () => {
           setIsFetchingLogout(true);
-          TripCtx.setCurrentTrip("reset", "null");
-          AuthCtx.logout();
+          await tripCtx.setCurrentTrip("reset", "null");
+          expCtx.setExpenses([]);
+          userCtx.setTripHistory([]);
+          userCtx.setUserName("");
+          await asyncStoreSafeClear();
+          await authCtx.logout();
           setIsFetchingLogout(false);
         },
       },
@@ -79,7 +88,7 @@ const ProfileForm = ({ navigation }) => {
 
   const [inputs, setInputs] = useState({
     userName: {
-      value: !UserCtx.userName ? "" : UserCtx.userName,
+      value: !userCtx.userName ? "" : userCtx.userName,
       isValid: true,
     },
   });
@@ -104,10 +113,10 @@ const ProfileForm = ({ navigation }) => {
       Alert.alert("Check your profile for invalid entries please!");
       return;
     }
-    UserCtx.addUser(userData);
+    await userCtx.addUserName(userData);
     try {
-      await updateUser(AuthCtx.uid, userData);
-      if (!UserCtx.freshlyCreated) {
+      await updateUser(authCtx.uid, userData);
+      if (!userCtx.freshlyCreated) {
         return;
       }
     } catch (error) {
@@ -119,7 +128,7 @@ const ProfileForm = ({ navigation }) => {
     setInputs((curInputs) => {
       return {
         ...curInputs,
-        ["userName"]: { value: UserCtx.userName, isValid: true },
+        ["userName"]: { value: userCtx.userName, isValid: true },
       };
     });
     Keyboard.dismiss();
@@ -130,7 +139,7 @@ const ProfileForm = ({ navigation }) => {
     Alert.alert("Profile picture function coming soon... ");
   }
 
-  const changedName = inputs.userName.value !== UserCtx.userName;
+  const changedName = inputs.userName.value !== userCtx.userName;
   const changedNameButtons = (
     <View style={styles.buttonContainer}>
       <IconButton
@@ -175,7 +184,7 @@ const ProfileForm = ({ navigation }) => {
         <Pressable onPress={avatarHandler}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
-              {inputs.userName.value.charAt(0)}
+              {inputs.userName.value?.charAt(0)}
             </Text>
           </View>
         </Pressable>

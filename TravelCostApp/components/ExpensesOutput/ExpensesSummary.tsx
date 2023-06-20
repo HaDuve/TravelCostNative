@@ -10,10 +10,12 @@ import Toast from "react-native-toast-message";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
 import * as Haptics from "expo-haptics";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
+import { UserContext } from "../../store/user-context";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
   const tripCtx = useContext(TripContext);
-  if (!expenses || !periodName) return <></>;
+  const userCtx = useContext(UserContext);
+  if (!expenses || !periodName || userCtx.freshlyCreated) return <></>;
 
   const expensesSum = expenses.reduce((sum, expense) => {
     if (isNaN(Number(expense.calcAmount))) return sum;
@@ -91,7 +93,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
       type: budgetNumber > expenseSumNum ? "success" : "error",
       position: "bottom",
       text1: `${
-        periodName.charAt(0).toUpperCase() + periodName.slice(1)
+        periodName?.charAt(0).toUpperCase() + periodName?.slice(1)
       } Budget: ${formatExpenseWithCurrency(budgetNumber, userCurrency)}`,
       text2:
         budgetNumber > expenseSumNum

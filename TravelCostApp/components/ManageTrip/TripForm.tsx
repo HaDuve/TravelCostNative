@@ -7,13 +7,13 @@ import { AuthContext } from "../../store/auth-context";
 import {
   storeTrip,
   storeTripHistory,
-  storeTravellerToTrip,
   updateUser,
   fetchTrip,
   updateTripHistory,
   updateTrip,
   deleteTrip,
   getAllExpenses,
+  putTravelerInTrip,
 } from "../../util/http";
 import * as Updates from "expo-updates";
 
@@ -51,7 +51,7 @@ import PropTypes from "prop-types";
 import InfoButton from "../UI/InfoButton";
 import Modal from "react-native-modal";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
+import Animated, { set, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { reloadApp } from "../../util/appState";
 import { secureStoreSetItem } from "../../store/secure-storage";
 import BackButton from "../UI/BackButton";
@@ -146,6 +146,7 @@ const TripForm = ({ navigation, route }) => {
         );
         setStartDate(selectedTrip.startDate);
         setEndDate(selectedTrip.endDate);
+        console.log("travellers", selectedTrip.travellers);
       } catch (error) {
         console.error(error);
       }
@@ -184,7 +185,7 @@ const TripForm = ({ navigation, route }) => {
   async function deleteAcceptHandler() {
     const trips = route.params.trips;
     console.log("deleteAcceptHandler ~ trips:", trips);
-    // if triplist.length == 1 userCtx.setFreshlyCreatedTo(true);
+    // if triplist.length == 1 await userCtx.setFreshlyCreatedTo(true);
     // await deleteTrip(editedTripId);
   }
   function deleteHandler() {
@@ -220,38 +221,44 @@ const TripForm = ({ navigation, route }) => {
         await updateUser(uid, {
           currentTrip: editedTripId,
         });
-        await tripCtx.setCurrentTravellers(editedTripId);
+        await tripCtx.fetchAndSetTravellers(editedTripId);
         await userCtx.setFreshlyCreatedTo(false);
         const expenses = await getAllExpenses(editedTripId, uid);
-        expenseCtx.setExpenses(expenses);
+        expenseCtx.setExpenses([]);
+        expenses.forEach((element) => {
+          expenseCtx.addExpense(element);
+        });
         await asyncStoreSetObject("expenses", expenses);
         const token = authCtx.token;
         console.log("submitHandler ~ token:", token);
-        const r = await reloadApp();
-        if (r == -1) navigation.popToTop();
+        navigation.popToTop();
+        return;
       }
       tripCtx.refresh();
       navigation.pop();
       return;
     } catch (error) {
       console.log("editingTripData ~ error:", error);
-      Alert.alert("Error", "Error while saving trip, please try again!");
-      return;
+      // Alert.alert("Error", "Error while saving trip, please try again!");
+      navigation.popToTop();
     }
   }
 
-  async function saveTripData(tripData: TripData) {
+  async function createTripData(tripData: TripData) {
     const tripid = await storeTrip(tripData);
+    await putTravelerInTrip(tripid, { userName: userName, uid: uid });
     console.log("TripForm ~ tripid in saveTripData:", tripid);
     await secureStoreSetItem("currentTripId", tripid);
-    await storeTravellerToTrip(tripid, { userName: userName, uid: uid });
-
-    const newTripData = await fetchTrip(tripid);
-
-    await tripCtx.setCurrentTrip(tripid, newTripData);
-    expenseCtx.setExpenses([]);
     await asyncStoreSetObject("expenses", []);
+    await userCtx.setFreshlyCreatedTo(false);
 
+    // the following context state functions are unnecessary as long as we reload
+    await tripCtx.setCurrentTrip(tripid, tripData);
+    expenseCtx.setExpenses([]);
+    if (userCtx.freshlyCreated) {
+      userCtx.setNeedsTour(true);
+    }
+    userCtx.setTripHistory([...userCtx.tripHistory, tripid]);
     // if fresh store TripHistory else update TripHistory
     if (userCtx.freshlyCreated) {
       await storeTripHistory(uid, [tripid]);
@@ -264,13 +271,10 @@ const TripForm = ({ navigation, route }) => {
       currentTrip: tripid,
     });
 
-    if (userCtx.freshlyCreated) {
-      userCtx.setNeedsTour(true);
-    }
-    await userCtx.setFreshlyCreatedTo(false);
     // restart app with Updates
-    const r = await reloadApp();
-    if (r == -1) navigation.popToTop();
+    // const r = await reloadApp();
+    // if (r == -1)
+    navigation.popToTop();
 
     // tripCtx.refresh();
     // navigation.navigate("Profile");
@@ -280,6 +284,7 @@ const TripForm = ({ navigation, route }) => {
     setIsLoading(true);
     if (!isConnected) {
       Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
+      setIsLoading(false);
       return;
     }
     const tripData: TripData = {
@@ -289,17 +294,14 @@ const TripForm = ({ navigation, route }) => {
       dailyBudget: inputs.dailyBudget.value,
       startDate: startDate,
       endDate: endDate,
-      tripid: "",
-      travellers: {},
-      expenses: [],
     };
 
-    // Tripname should not be empty
+    // Tripname should not be empty or spaces
     const tripNameIsValid =
-      tripData.tripName !== "" && tripData.tripName.length > 0;
+      tripData.tripName && tripData.tripName.trim().length > 0;
     // tripCurrency should not be empty
     const tripCurrencyIsValid =
-      tripData.tripCurrency !== "" && tripData.tripCurrency.length > 0;
+      tripData.tripCurrency && tripData.tripCurrency.length > 0;
     // Total budget should be a number between 0 and 3B
     const totalBudgetIsValid =
       !isNaN(+tripData.totalBudget) &&
@@ -318,6 +320,7 @@ const TripForm = ({ navigation, route }) => {
     if (!tripNameIsValid) {
       inputs.tripName.isValid = tripNameIsValid;
       Alert.alert(i18n.t("enterNameAlert"));
+      setIsLoading(false);
       return;
     }
 
@@ -325,20 +328,29 @@ const TripForm = ({ navigation, route }) => {
       inputs.totalBudget.isValid = totalBudgetIsValid;
       inputs.dailyBudget.isValid = dailyBudgetIsValid;
       Alert.alert(i18n.t("enterBudgetAlert"));
+      setIsLoading(false);
       return;
     }
 
     if (!tripCurrencyIsValid) {
       inputs.tripCurrency.isValid = tripCurrencyIsValid;
       Alert.alert(i18n.t("selectCurrencyAlert"));
+      setIsLoading(false);
       return;
     }
     // if isEditing update Trip, else store
+
     console.log("submitHandler ~ setActive:", setActive);
-    if (isEditing) {
-      await editingTripData(tripData, setActive);
-    } else {
-      await saveTripData(tripData);
+    try {
+      if (isEditing) {
+        await editingTripData(tripData, setActive);
+      } else {
+        await createTripData(tripData);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.log("submitHandler ~ error:", error);
+      return;
     }
     setIsLoading(false);
   }
@@ -412,6 +424,7 @@ const TripForm = ({ navigation, route }) => {
         countryValue={countryValue.split(" ")[0]}
         setCountryValue={setCountryValue}
         onChangeValue={updateCurrency}
+        valid={inputs.tripCurrency.isValid}
       ></CurrencyPicker>
       <InfoButton
         onPress={showInfoHandler.bind(this, infoEnum.homeCurrency)}
@@ -486,7 +499,7 @@ const TripForm = ({ navigation, route }) => {
             {isEditing && (
               <FlatButton
                 onPress={() => {
-                  onShare(tripCtx.tripid, navigation);
+                  onShare(editedTripId, navigation);
                 }}
               >
                 {i18n.t("shareTripLabel")}

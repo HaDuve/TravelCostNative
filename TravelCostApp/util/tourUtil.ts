@@ -1,3 +1,4 @@
+import { shouldShowOnboarding } from "../components/Rating/firstStartUtil";
 import {
   asyncStoreGetItem,
   asyncStoreGetObject,
@@ -11,8 +12,7 @@ export async function loadTourConfig() {
   const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
   console.log("loadTourConfig ~ freshlyCreated:", freshlyCreated);
   const needsTour = !hadTour;
-  console.log("loadTourConfig ~ needsTour:", needsTour)
-
+  console.log("loadTourConfig ~ needsTour:", needsTour);
   return needsTour;
 }
 

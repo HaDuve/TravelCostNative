@@ -19,7 +19,7 @@ import {
   fetchTripName,
   getAllExpenses,
   getTravellers,
-  storeTravellerToTrip,
+  putTravelerInTrip,
   updateTripHistory,
   updateUser,
 } from "../../util/http";
@@ -36,6 +36,8 @@ import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
 import { getCurrencySymbol } from "../../util/currencySymbol";
+import { ExpenseData } from "../../util/expense";
+import { isForeground } from "../../util/appState";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -45,37 +47,47 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const expenseCtx = useContext(ExpensesContext);
-  const userCtx = useContext(UserContext);
   const netCtx = useContext(NetworkContext);
-  const authCtx = useContext(AuthContext);
-  const uid = authCtx.uid;
   const [travellers, setTravellers] = useState([]);
   const [isFetching, setIsFetching] = useState(true);
-  const [tripName, setTripName] = useState(tripid);
+  const [tripName, setTripName] = useState("...");
   const [totalBudget, setTotalBudget] = useState("100");
-  const [dailyBudget, setDailyBudget] = useState("10");
+  const [dailyBudget, setDailyBudget] = useState("50");
   const [tripCurrency, setTripCurrency] = useState("EUR");
-
-  const tripCurrencySymbol = getCurrencySymbol(tripCurrency);
+  const [sumOfExpenses, setSumOfExpenses] = useState(0);
+  const [progress, setProgress] = useState(0.5);
 
   useEffect(() => {
-    if (!tripid) return;
+    if (!tripid) {
+      console.log("no tripid in tripITEM");
+      return;
+    }
     async function getTrip() {
+      if (!isForeground()) return;
       setIsFetching(true);
       const trip = await fetchTrip(tripid);
       // console.log("getTrip ~ trip", trip);
       const _dailyBudget = trip.dailyBudget;
       const _totalBudget = trip.totalBudget ?? MAX_JS_NUMBER.toString();
       const _tripCurrency = trip.tripCurrency;
+      const _expenses = await getAllExpenses(tripid);
+      const sumOfExpenses = _expenses.reduce((acc, expense: ExpenseData) => {
+        if (isNaN(Number(expense.calcAmount))) return acc;
+        return acc + Number(expense.calcAmount);
+      }, 0);
       setTotalBudget(_totalBudget);
       setDailyBudget(_dailyBudget);
       setTripCurrency(_tripCurrency);
+      setSumOfExpenses(sumOfExpenses);
+      setProgress(sumOfExpenses / Number(_totalBudget));
       setIsFetching(false);
     }
     async function getTripTravellers() {
+      if (!isForeground()) return;
       setIsFetching(true);
       try {
         const listTravellers = await getTravellers(tripid);
+        console.log("getTripTravellers ~ listTravellers:", listTravellers);
         const objTravellers = [];
         listTravellers.forEach((traveller) => {
           objTravellers.push({ userName: traveller });
@@ -87,47 +99,35 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       setIsFetching(false);
     }
     async function getTripName() {
+      if (!isForeground()) return;
       const name = await fetchTripName(tripid);
       setTripName(name);
     }
-    getTrip(tripid);
-    getTripName();
-    getTripTravellers();
-  }, [tripid]);
+    if (netCtx.isConnected && netCtx.strongConnection) {
+      getTripName();
+      getTrip();
+      getTripTravellers();
+    }
+  }, [
+    tripid,
+    tripName,
+    expenseCtx.expenses,
+    netCtx.isConnected,
+    netCtx.strongConnection,
+  ]);
 
   if (!tripid) return <Text>no id</Text>;
-  if (tripid === tripCtx.tripid) {
-    return <></>;
-  }
 
-  async function joinRoutine(tripid) {
-    setRefreshing(true);
-    setIsFetching(true);
-    const trip = await fetchTrip(tripid);
-    const tripData = trip;
-    await updateTripHistory(uid, tripid);
-    await storeTravellerToTrip(tripid, {
-      userName: userCtx.userName,
-      uid: uid,
-    });
-    updateUser(uid, {
-      currentTrip: tripid,
-    });
-    tripCtx.setCurrentTrip(tripid, tripData);
-    await tripCtx.setCurrentTravellers(tripid);
-    userCtx.setFreshlyCreatedTo(false);
-    const expenses = await getAllExpenses(tripid, uid);
-    expenseCtx.setExpenses(expenses);
-    setIsFetching(false);
-    setRefreshing(false);
-    tripCtx.refresh();
-  }
   const totalBudgetString = formatExpenseWithCurrency(
     Number(totalBudget),
     tripCurrency
   );
   const dailyBudgetString = formatExpenseWithCurrency(
     Number(dailyBudget),
+    tripCurrency
+  );
+  const sumOfExpensesString = formatExpenseWithCurrency(
+    Number(sumOfExpenses),
     tripCurrency
   );
 
@@ -143,25 +143,25 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   }
 
   const activeBorder =
-    tripName === tripCtx.tripName
+    tripid === tripCtx.tripid
       ? { borderWidth: 1, borderColor: GlobalStyles.colors.primary400 }
       : {};
 
-  // TODO: get sum
-  // const activeProgress = tripCtx.totalSum / totalBudget;
-  const activeProgress = 0;
+  const activeProgress = progress;
+  const isOverBudget = Number(sumOfExpenses) > Number(totalBudget);
 
   if (isFetching || (tripid && !totalBudget)) {
     return <></>;
   }
 
   function renderTravellers(item) {
+    if (!item.item?.userName) return <></>;
     return (
       <View style={[styles.travellerCard, GlobalStyles.strongShadow]}>
         <View style={[styles.avatar, GlobalStyles.shadowPrimary]}>
           <Text style={styles.avatarText}>
             {/* TODO: Profile Picture for now replaced with first char of the name */}
-            {item.item.userName.charAt(0)}
+            {item.item?.userName?.charAt(0)}
           </Text>
         </View>
         <Text>{truncateString(item.item.userName, 10)}</Text>
@@ -174,7 +174,9 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       onPress={tripPressHandler}
       style={({ pressed }) => pressed && GlobalStyles.pressed}
     >
-      <View style={[styles.tripItem, GlobalStyles.wideStrongShadow]}>
+      <View
+        style={[styles.tripItem, GlobalStyles.wideStrongShadow, activeBorder]}
+      >
         <View style={styles.topRow}>
           <View>
             <Text style={[styles.textBase, styles.description]}>
@@ -186,9 +188,20 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
             </Text>
           </View>
           <View style={styles.amountContainer}>
-            <Text style={styles.amount}>{totalBudgetString}</Text>
+            <Text
+              style={[
+                styles.amount,
+                isOverBudget && { color: GlobalStyles.colors.errorGrayed },
+              ]}
+            >
+              {sumOfExpensesString}/{totalBudgetString}
+            </Text>
             <Progress.Bar
-              color={GlobalStyles.colors.primary500}
+              color={
+                isOverBudget
+                  ? GlobalStyles.colors.errorGrayed
+                  : GlobalStyles.colors.primary500
+              }
               unfilledColor={GlobalStyles.colors.gray600}
               borderWidth={0}
               borderRadius={8}

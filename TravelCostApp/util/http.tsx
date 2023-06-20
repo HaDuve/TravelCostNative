@@ -6,6 +6,8 @@ import Toast from "react-native-toast-message";
 import { ExpenseData, ExpenseDataOnline } from "./expense";
 import { UserData } from "../store/user-context";
 import { truncateString } from "./string";
+import { Traveler, Traveller } from "./traveler";
+import uniqBy from "lodash.uniqby";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -311,18 +313,13 @@ export function deleteExpense(tripid: string, uid: string, id: string) {
 export async function storeUser(uid: string, userData: object) {
   console.log("https: ~ storeUser ~ uid:", uid);
   console.log("https: ~ storeUser ~ userData", userData);
-  try {
-    const response = await axios.post(
-      BACKEND_URL + "/users/" + `${uid}`,
-      userData
-    );
-    const id = response.data.name;
-    return id;
-  } catch (error) {
-    console.warn(error);
-    // throw new Error("error while storing user", error.message);
-    return null;
-  }
+  console.log("https: ~ storeUser ~ global QPAR", global.QPAR);
+  const response = await axios.put(
+    BACKEND_URL + "/users/" + `${uid}.json` + global.QPAR,
+    userData
+  );
+  const id = response.data.name;
+  return id;
 }
 
 /**
@@ -423,30 +420,27 @@ export async function deleteTrip(tripid: string) {
   }
 }
 
-export async function storeTravellerToTrip(tripid: string, traveller) {
-  // console.log("https: ~ storeTravellerToTrip ~ traveller", traveller);
-  // TODO: add traveller interface for TypeScript ({ userName: userName, uid: uid })
-
-  // TODO: check if Traveller already exists
-  const listTravellers = await getTravellers(tripid);
-  const objTravellers = [];
-  listTravellers.forEach((traveller) => {
-    objTravellers.push({ userName: traveller });
-  });
-  console.log("storeTravellerToTrip ~ objTravellers", objTravellers);
-  // // look for newTripid inside of oldTripHistory
-  if (objTravellers.indexOf(traveller.userName) > -1) {
-    console.log(traveller.userName + " already exists");
-    return;
-  }
+export async function putTravelerInTrip(tripid: string, traveller: Traveller) {
+  console.log("https: ~ putTravelerInTrip ~ traveller", traveller);
   try {
-    const response = await axios.post(
-      BACKEND_URL + `/trips/${tripid}/travellers.json` + global.QPAR,
-      traveller
+    if (
+      !traveller ||
+      !traveller.userName ||
+      !traveller.uid ||
+      traveller.uid === undefined
+    ) {
+      throw new Error("traveller.uid is undefined");
+    }
+    const response = await axios.put(
+      BACKEND_URL +
+        `/trips/${tripid}/travellers/${traveller.uid}.json` +
+        global.QPAR,
+      { uid: traveller.uid, userName: traveller.userName }
     );
     return response.data;
   } catch (error) {
-    throw new Error("error while storing traveller to trip");
+    console.log(error.message);
+    throw new Error("error while putting traveller to trip", error.message);
   }
 }
 
@@ -463,9 +457,10 @@ export async function fetchTripsTravellers(tripid: string) {
 }
 
 export async function getTravellers(tripid: string) {
-  // console.log("getTravellers ~ tripid", tripid);
+  console.log("getTravellers ~ tripid", tripid);
   try {
     const response = await fetchTripsTravellers(tripid);
+    console.log("getTravellers ~ response:", response);
     const travellerids = [];
     const travelerNames = [];
     for (const key in response) {
@@ -481,7 +476,7 @@ export async function getTravellers(tripid: string) {
         travelerNames.push(travelerName);
       }
     }
-    return travelerNames;
+    return uniqBy(travelerNames);
   } catch (error) {
     throw new Error("error while fetching travellers of trip");
   }

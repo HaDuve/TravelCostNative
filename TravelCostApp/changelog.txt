@@ -1,5 +1,8 @@
 Change log Travel Expense App
 
+1.1.8
+- fixed alot of bugs
+
 1.1.7c
 - expense graph bar chart is now interactive (press and long press)
 - made font scaling more sensible (bigger text does not destroy the styling anymore)

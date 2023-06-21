@@ -1,7 +1,10 @@
 Change log Travel Expense App
 
 1.1.8
-- fixed alot of bugs
+- fixed alot of bugs (trips organization)
+- re-added onboarding
+- fixed sync sometimes not working
+- added blur over premium features
 
 1.1.7c
 - expense graph bar chart is now interactive (press and long press)

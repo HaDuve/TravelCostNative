@@ -262,29 +262,39 @@ const ExpenseForm = ({
   const [duplOrSplit, setDuplOrSplit] = useState<number>(
     editingValues ? Number(editingValues.duplOrSplit) : 0
   );
+  const expenseString = `${formatExpenseWithCurrency(
+    Number(inputs.amount.value),
+    inputs.currency.value
+  )}`;
   const duplOrSplitString =
     duplOrSplit === 1
       ? !isEditing
-        ? `${formatExpenseWithCurrency(
-            Number(inputs.amount.value),
-            inputs.currency.value
-          )}${i18n.t("duplicateExpensesText")}`
+        ? `${expenseString}${i18n.t("duplicateExpensesText")}\nover ${
+            daysBetween(new Date(endDate), new Date(startDate)) + 1
+          } days`
         : `${formatExpenseWithCurrency(
             Number(inputs.amount.value) *
               (daysBetween(new Date(endDate), new Date(startDate)) + 1),
             inputs.currency.value
-          )}${i18n.t("duplicateExpensesText")}`
+          )} = total expense amount \nover ${
+            daysBetween(new Date(endDate), new Date(startDate)) + 1
+          } days`
       : duplOrSplit === 2
       ? !isEditing
         ? `${formatExpenseWithCurrency(
             Number(inputs.amount.value) /
               (daysBetween(new Date(endDate), new Date(startDate)) + 1),
             inputs.currency.value
-          )}${i18n.t("splitUpExpensesText")}`
+          )}${i18n.t("splitUpExpensesText")}\nover ${
+            daysBetween(new Date(endDate), new Date(startDate)) + 1
+          } days`
         : `${formatExpenseWithCurrency(
-            Number(inputs.amount.value),
+            Number(inputs.amount.value) *
+              (daysBetween(new Date(endDate), new Date(startDate)) + 1),
             inputs.currency.value
-          )}${i18n.t("splitUpExpensesText")}`
+          )} = total expense amount \nover ${
+            daysBetween(new Date(endDate), new Date(startDate)) + 1
+          } days`
       : "";
 
   const onConfirmRange = (output) => {

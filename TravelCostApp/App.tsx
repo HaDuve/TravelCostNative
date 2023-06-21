@@ -13,7 +13,7 @@ import {
 import Purchases from "react-native-purchases";
 
 import { StatusBar } from "expo-status-bar";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import * as SplashScreen from "expo-splash-screen";
@@ -105,10 +105,13 @@ const BottomTabs = createMaterialTopTabNavigator();
 const prefix = Linking.createURL("/");
 function NotAuthenticatedStack() {
   const [needOnboarding, setNeedOnboarding] = useState(false);
+  const navigation = useNavigation();
   useEffect(() => {
     async function checkOnboarding() {
       const need = await shouldShowOnboarding();
-      // setNeedOnboarding(need);
+      if (!need) return;
+      setNeedOnboarding(need);
+      navigation.navigate("Onboarding");
     }
     checkOnboarding();
   }, []);

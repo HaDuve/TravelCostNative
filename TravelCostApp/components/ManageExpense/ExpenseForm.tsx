@@ -264,16 +264,27 @@ const ExpenseForm = ({
   );
   const duplOrSplitString =
     duplOrSplit === 1
-      ? `${formatExpenseWithCurrency(
-          Number(inputs.amount.value),
-          inputs.currency.value
-        )}${i18n.t("duplicateExpensesText")}`
+      ? !isEditing
+        ? `${formatExpenseWithCurrency(
+            Number(inputs.amount.value),
+            inputs.currency.value
+          )}${i18n.t("duplicateExpensesText")}`
+        : `${formatExpenseWithCurrency(
+            Number(inputs.amount.value) *
+              (daysBetween(new Date(endDate), new Date(startDate)) + 1),
+            inputs.currency.value
+          )}${i18n.t("duplicateExpensesText")}`
       : duplOrSplit === 2
-      ? `${formatExpenseWithCurrency(
-          Number(inputs.amount.value) /
-            (daysBetween(new Date(endDate), new Date(startDate)) + 1),
-          inputs.currency.value
-        )}${i18n.t("splitUpExpensesText")}`
+      ? !isEditing
+        ? `${formatExpenseWithCurrency(
+            Number(inputs.amount.value) /
+              (daysBetween(new Date(endDate), new Date(startDate)) + 1),
+            inputs.currency.value
+          )}${i18n.t("splitUpExpensesText")}`
+        : `${formatExpenseWithCurrency(
+            Number(inputs.amount.value),
+            inputs.currency.value
+          )}${i18n.t("splitUpExpensesText")}`
       : "";
 
   const onConfirmRange = (output) => {
@@ -955,6 +966,24 @@ const ExpenseForm = ({
                 <Pressable
                   onPress={() => {
                     if (!dateIsRanged) return;
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    if (isEditing && dateIsRanged) {
+                      Alert.alert(
+                        "Sorry",
+                        "Changing the splitting of expenses with a range of dates is not yet possible.",
+                        [
+                          {
+                            text: i18n.t("confirm"),
+                            onPress: () => {
+                              Haptics.impactAsync(
+                                Haptics.ImpactFeedbackStyle.Light
+                              );
+                            },
+                          },
+                        ]
+                      );
+                      return;
+                    }
                     if (duplOrSplit === 1) setDuplOrSplit(2);
                     else setDuplOrSplit(1);
                   }}

@@ -148,6 +148,7 @@ const ManageExpense = ({ route, navigation }) => {
     // the date.now() is used as a rangeId to identify all the expenses that belong to the same range
     const rangeId =
       Date.now().toString() + Math.random().toString(36).substring(2, 15);
+    console.log("creatingRangedData ~ rangeId:", rangeId);
     expenseData.rangeId = rangeId;
 
     // get number of days

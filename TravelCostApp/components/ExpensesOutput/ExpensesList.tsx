@@ -6,7 +6,7 @@ import { View } from "react-native";
 
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { GlobalStyles } from "../../constants/styles";
-import { touchAllTravelers } from "../../util/http";
+import { getAllExpenses, touchAllTravelers } from "../../util/http";
 import { TripContext } from "../../store/trip-context";
 import { ExpensesContext } from "../../store/expenses-context";
 import IconButton from "../UI/IconButton";
@@ -29,6 +29,7 @@ import { useNavigation, useScrollToTop } from "@react-navigation/native";
 import { useState } from "react";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { Text } from "react-native-paper";
+import { formatExpenseWithCurrency } from "../../util/string";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -106,7 +107,7 @@ function onClick({ item, index }, isOnline) {
   const editedExpenseId = item.id;
   const uid = item.uid;
   console.log("onClick ~ uid", uid);
-  async function deleteExp() {
+  async function deleteAllExpenses() {
     try {
       navigation?.popToTop();
       Toast.show({
@@ -115,25 +116,122 @@ function onClick({ item, index }, isOnline) {
         text2: "Please leave the app open...",
         autoHide: false,
       });
-      const item: OfflineQueueManageExpenseItem = {
-        type: "delete",
-        expense: {
-          tripid: tripid,
-          uid: uid,
-          id: editedExpenseId,
-        },
-      };
-      expenseCtx?.deleteExpense(editedExpenseId);
-      await deleteExpenseOnlineOffline(item, isOnline);
+      const allExpenses = await getAllExpenses(tripid);
+      for (let i = 0; i < allExpenses.length; i++) {
+        const expense = allExpenses[i];
+        if (expense?.rangeId == item?.rangeId) {
+          const queueItem: OfflineQueueManageExpenseItem = {
+            type: "delete",
+            expense: {
+              tripid: tripid,
+              uid: uid,
+              id: expense.id,
+            },
+          };
+          expenseCtx?.deleteExpense(expense.id);
+          await deleteExpenseOnlineOffline(queueItem, isOnline);
+        }
+      }
       await touchAllTravelers(tripid, true);
       Toast.hide();
     } catch (error) {
-      console.log(i18n.t("deleteError"), error);
+      console.log("delete All Error:", error);
       Toast.show({
         text1: "Error",
         text2: "Could not delete expense, sorry!",
         type: "error",
       });
+    }
+  }
+
+  async function deleteExp() {
+    if (item.rangeId) {
+      // do you want to delete one or all expenses with this rangeId?
+      Alert.alert(
+        `Delete grouped range expenses?`,
+        `This will delete all entries that belong to ${
+          item.description
+        } for ${formatExpenseWithCurrency(
+          Number(item.calcAmount),
+          item.currency
+        )}!`,
+        [
+          //i18n.t("deleteAllExpenses"), i18n.t("deleteAllExpensesExt")
+          // The "No" button
+          // Does nothing but dismiss the dialog when tapped
+          {
+            text: i18n.t("no"),
+            onPress: async () => {
+              try {
+                navigation?.popToTop();
+                Toast.show({
+                  type: "loading",
+                  text1: "Deleting",
+                  text2: "Please leave the app open...",
+                  autoHide: false,
+                });
+                const item: OfflineQueueManageExpenseItem = {
+                  type: "delete",
+                  expense: {
+                    tripid: tripid,
+                    uid: uid,
+                    id: editedExpenseId,
+                  },
+                };
+                expenseCtx?.deleteExpense(editedExpenseId);
+                await deleteExpenseOnlineOffline(item, isOnline);
+                await touchAllTravelers(tripid, true);
+                Toast.hide();
+              } catch (error) {
+                console.log(i18n.t("deleteError"), error);
+                Toast.show({
+                  text1: "Error",
+                  text2: "Could not delete expense, sorry!",
+                  type: "error",
+                });
+              }
+            },
+          },
+          // The "Yes" button
+          {
+            text: i18n.t("yes"),
+            onPress: async () => {
+              await deleteAllExpenses();
+              return;
+            },
+          },
+        ]
+      );
+    } else {
+      // single id
+      try {
+        navigation?.popToTop();
+        Toast.show({
+          type: "loading",
+          text1: "Deleting",
+          text2: "Please leave the app open...",
+          autoHide: false,
+        });
+        const item: OfflineQueueManageExpenseItem = {
+          type: "delete",
+          expense: {
+            tripid: tripid,
+            uid: uid,
+            id: editedExpenseId,
+          },
+        };
+        expenseCtx?.deleteExpense(editedExpenseId);
+        await deleteExpenseOnlineOffline(item, isOnline);
+        await touchAllTravelers(tripid, true);
+        Toast.hide();
+      } catch (error) {
+        console.log(i18n.t("deleteError"), error);
+        Toast.show({
+          text1: "Error",
+          text2: "Could not delete expense, sorry!",
+          type: "error",
+        });
+      }
     }
   }
   async function deleteExpenseHandler() {

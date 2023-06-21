@@ -11,8 +11,9 @@ import {
   Keyboard,
   KeyboardAvoidingView,
 } from "react-native";
+import { daysBetween } from "../../util/date";
 
-import { SegmentedButtons } from "react-native-paper";
+import { Card, SegmentedButtons } from "react-native-paper";
 import Input from "./Input";
 import { getFormattedDate } from "../../util/date";
 import { GlobalStyles } from "../../constants/styles";
@@ -27,6 +28,7 @@ import {
   getCatSymbolAsync,
   mapDescriptionToCategory,
 } from "../../util/category";
+import { formatExpenseWithCurrency } from "../../util/string";
 import DropDownPicker from "react-native-dropdown-picker";
 // import CurrencyPicker from "react-native-currency-picker";
 import { TripContext } from "../../store/trip-context";
@@ -111,7 +113,54 @@ const ExpenseForm = ({
   const [loadingTravellers, setLoadingTravellers] = useState(
     !tripCtx.travellers && tripCtx.travellers.length < 1
   );
-
+  const [inputs, setInputs] = useState({
+    amount: {
+      value: editingValues ? editingValues.amount?.toString() : "",
+      isValid: true,
+    },
+    date: {
+      value: editingValues
+        ? getFormattedDate(editingValues.date)
+        : getFormattedDate(DateTime.now().toJSDate()),
+      isValid: true,
+    },
+    description: {
+      value: editingValues ? editingValues.description : "",
+      isValid: true,
+    },
+    category: {
+      value: editingValues
+        ? newCat
+          ? pickedCat
+          : editingValues.category
+        : pickedCat,
+      isValid: true,
+    },
+    country: {
+      value: editingValues
+        ? editingValues.country
+        : userCtx.lastCountry
+        ? userCtx.lastCountry
+        : "",
+      isValid: true,
+    },
+    currency: {
+      value: editingValues
+        ? editingValues.currency
+        : userCtx.lastCurrency
+        ? userCtx.lastCurrency
+        : tripCtx.tripCurrency,
+      isValid: true,
+    },
+    whoPaid: {
+      value: editingValues ? editingValues.whoPaid : "",
+      isValid: true,
+    },
+    owePerc: {
+      value: editingValues ? editingValues.owePerc?.toString() : "",
+      isValid: true,
+    },
+  });
   const iconString = iconName ? iconName : getCatSymbol(pickedCat);
   const [icon, setIcon] = useState(iconString);
   const getSetCatIcon = async (catString: string) => {
@@ -215,9 +264,16 @@ const ExpenseForm = ({
   );
   const duplOrSplitString =
     duplOrSplit === 1
-      ? i18n.t("duplicateExpensesText")
+      ? `${formatExpenseWithCurrency(
+          Number(inputs.amount.value),
+          inputs.currency.value
+        )}${i18n.t("duplicateExpensesText")}`
       : duplOrSplit === 2
-      ? i18n.t("splitUpExpensesText")
+      ? `${formatExpenseWithCurrency(
+          Number(inputs.amount.value) /
+            (daysBetween(new Date(endDate), new Date(startDate)) + 1),
+          inputs.currency.value
+        )}${i18n.t("splitUpExpensesText")}`
       : "";
 
   const onConfirmRange = (output) => {
@@ -285,55 +341,6 @@ const ExpenseForm = ({
   const [splitTravellersList, setListEQUAL] = useState(
     editingValues ? editingValues.listEQUAL : currentTravellers
   );
-
-  const [inputs, setInputs] = useState({
-    amount: {
-      value: editingValues ? editingValues.amount?.toString() : "",
-      isValid: true,
-    },
-    date: {
-      value: editingValues
-        ? getFormattedDate(editingValues.date)
-        : getFormattedDate(DateTime.now().toJSDate()),
-      isValid: true,
-    },
-    description: {
-      value: editingValues ? editingValues.description : "",
-      isValid: true,
-    },
-    category: {
-      value: editingValues
-        ? newCat
-          ? pickedCat
-          : editingValues.category
-        : pickedCat,
-      isValid: true,
-    },
-    country: {
-      value: editingValues
-        ? editingValues.country
-        : userCtx.lastCountry
-        ? userCtx.lastCountry
-        : "",
-      isValid: true,
-    },
-    currency: {
-      value: editingValues
-        ? editingValues.currency
-        : userCtx.lastCurrency
-        ? userCtx.lastCurrency
-        : tripCtx.tripCurrency,
-      isValid: true,
-    },
-    whoPaid: {
-      value: editingValues ? editingValues.whoPaid : "",
-      isValid: true,
-    },
-    owePerc: {
-      value: editingValues ? editingValues.owePerc?.toString() : "",
-      isValid: true,
-    },
-  });
 
   function autoExpenseLinearSplitAdjust(
     inputIdentifier: string,
@@ -956,9 +963,13 @@ const ExpenseForm = ({
                   <Text style={styles.dateLabelText}>
                     {i18n.t("dateLabel")}
                   </Text>
-                  <Text style={styles.dateLabelDuplSplitText}>
-                    {duplOrSplitString}
-                  </Text>
+                  {duplOrSplit !== 0 && (
+                    <Card elevation={4} style={styles.card}>
+                      <Text style={styles.dateLabelDuplSplitText}>
+                        {duplOrSplitString}
+                      </Text>
+                    </Card>
+                  )}
                 </Pressable>
                 {DatePickerContainer({
                   openDatePickerRange,
@@ -1534,5 +1545,20 @@ const styles = StyleSheet.create({
   isPaidContainer: {
     marginTop: "4%",
     marginHorizontal: "3%",
+  },
+  card: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: GlobalStyles.colors.gray700,
+    padding: 8,
+    // marginTop: 8,
+    marginLeft: "25%",
+    // marginRight: 8,
+    // marginBottom: 8,
+    //centering content
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "visible",
   },
 });

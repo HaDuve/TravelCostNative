@@ -3,8 +3,12 @@ Change log Travel Expense App
 1.1.8
 - fixed alot of bugs (trips organization)
 - re-added onboarding
+- re-added tour guide
 - fixed sync sometimes not working
 - added blur over premium features
+- made it easier to see the duplicate or split feature
+- made it easier to understand what going on in the duplicate or split feature
+- added option to delete the complete range expense (e.g.: hotel costs over 1 month)
 
 1.1.7c
 - expense graph bar chart is now interactive (press and long press)

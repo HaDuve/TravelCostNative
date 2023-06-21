@@ -258,6 +258,7 @@ function ExpensesList({
           height: 60,
           alignItems: "center",
           justifyContent: "center",
+          paddingTop: 4,
           marginTop: -60,
         }}
       >

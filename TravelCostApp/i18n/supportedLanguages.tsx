@@ -221,6 +221,10 @@ const en = {
 
   // new stuff
   shareTripLabel: "Share Trip",
+  tourGuideLabelPrevious: "Previous",
+  tourGuideLabelNext: "Next",
+  tourGuideLabelSkip: "Skip",
+  tourGuideLabelFinish: "Finish",
 };
 const de = {
   // standard strings
@@ -429,7 +433,7 @@ const de = {
   splitUpExpenses: "Aufsplitten",
 
   // Paywall and Premium
-  paywallTitle: "Werde Premium Nomad!",
+  paywallTitle: "Werde Premium Nomade!",
   paywallSubtitle:
     "Lass dir deine Reise mit noch mehr Funktionen erleichtern: ",
   paywallFeature1: "✓ Erstelle eigene Kategorien",

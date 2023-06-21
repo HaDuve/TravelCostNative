@@ -621,6 +621,10 @@ function Root() {
           console.log("onRootMount ~ storedUid:", storedUid);
         }
 
+        const needsTour = await loadTourConfig();
+        console.log("onRootMount ~ needsTour:", needsTour);
+        userCtx.setNeedsTour(needsTour);
+
         //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
         // check if user is online
         if (!online) {
@@ -683,9 +687,6 @@ function Root() {
         await authCtx.setUserID(storedUid);
         await onlineSetup(tripData, checkUser, storedTripId, storedUid);
         await authCtx.authenticate(storedToken);
-        const needsTour = await loadTourConfig();
-        console.log("onRootMount ~ needsTour:", needsTour);
-        userCtx.setNeedsTour(needsTour);
         console.log("Root end reached");
       } else {
         await asyncStoreSafeClear();
@@ -768,7 +769,16 @@ export default function App() {
                     <NetworkProvider>
                       <ExpensesContextProvider>
                         <TourGuideProvider
-                          {...{ borderRadius: 16, key: "settings" }}
+                          {...{
+                            borderRadius: 16,
+                            key: "settings",
+                            labels: {
+                              previous: i18n.t("tourGuideLabelPrevious"),
+                              next: i18n.t("tourGuideLabelNext"),
+                              skip: i18n.t("tourGuideLabelSkip"),
+                              finish: i18n.t("tourGuideLabelFinish"),
+                            },
+                          }}
                         >
                           <Root />
                           {/* {DEV && <ConnectionBar />} */}

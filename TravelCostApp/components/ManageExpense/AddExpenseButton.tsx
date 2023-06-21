@@ -28,6 +28,7 @@ import { SettingsContext } from "../../store/settings-context";
 import { TripContext } from "../../store/trip-context";
 import { AuthContext } from "../../store/auth-context";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
+import { reloadApp } from "../../util/appState";
 
 const AddExpenseButton = ({ navigation }) => {
   const { settings } = useContext(SettingsContext);
@@ -59,7 +60,10 @@ const AddExpenseButton = ({ navigation }) => {
         style={[styles.margin]}
         entering={FadeIn.duration(600).delay(8000)}
       >
-        <View
+        <Pressable
+          onPress={() => {
+            reloadApp();
+          }}
           style={[
             styles.addButton,
             GlobalStyles.shadowGlowPrimary,
@@ -74,7 +78,7 @@ const AddExpenseButton = ({ navigation }) => {
             }}
             noText
           ></LoadingBarOverlay>
-        </View>
+        </Pressable>
       </Animated.View>
     );
   }

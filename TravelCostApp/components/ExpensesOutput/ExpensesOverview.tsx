@@ -236,9 +236,10 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       >
         <TourGuideZone
           text={i18n.t("walk4")}
-          tooltipBottomOffset={66}
+          tooltipBottomOffset={166}
           maskOffset={60}
           zone={4}
+          shape={"circle"}
         >
           <Pressable
             onPress={toggleContent}

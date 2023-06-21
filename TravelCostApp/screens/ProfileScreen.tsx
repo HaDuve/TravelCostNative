@@ -30,10 +30,10 @@ const ProfileScreen = ({ navigation }) => {
   const [tourIsRunning, setTourIsRunning] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [tripHistory, setTripHistory] = useState([]);
-  console.log("ProfileScreen ~ tripHistory:", tripHistory);
+  // console.log("ProfileScreen ~ tripHistory:", tripHistory);
   useEffect(() => {
-    setTripHistory(userCtx.tripHistory.reverse());
-    console.log("useEffect ~ userCtx.tripHistory:", userCtx.tripHistory);
+    setTripHistory(userCtx.tripHistory);
+    // console.log("useEffect ~ userCtx.tripHistory:", userCtx.tripHistory);
   }, [userCtx.tripHistory]);
 
   useInterval(
@@ -56,14 +56,17 @@ const ProfileScreen = ({ navigation }) => {
   // Can start at mount 🎉
   // you need to wait until everything is registered 😁
   async function sleepyStartTour() {
+    console.log("sleepyStartTour ~ sleepyStartTour:", sleepyStartTour);
     setTourIsRunning(true);
     await sleep(1000);
     start();
   }
-  React.useEffect(() => {
+  useEffect(() => {
+    console.log("useEffect ~ canStart:", canStart);
+    console.log("useEffect ~ userCtx.needsTour:", userCtx.needsTour);
     if (canStart && userCtx.needsTour) {
       // 👈 test if you can start otherwise nothing will happen
-      // sleepyStartTour();
+      sleepyStartTour();
     }
   }, [canStart, userCtx.needsTour]); // 👈 don't miss it!
 

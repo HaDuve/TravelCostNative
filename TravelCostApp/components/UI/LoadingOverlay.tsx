@@ -16,7 +16,7 @@ i18n.enableFallback = true;
 
 const loadingColor = GlobalStyles.colors.primaryGrayed;
 const LoadingOverlay = (props) => {
-  const { containerStyle, customText, noText, size } = props;
+  const { containerStyle, customText, noText, size = "large" } = props;
   const string =
     customText && customText.length > 0
       ? customText
@@ -35,7 +35,7 @@ LoadingOverlay.propTypes = {
   containerStyle: PropTypes.object,
   customText: PropTypes.string,
   noText: PropTypes.bool,
-  size: PropTypes.string.isRequired,
+  size: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

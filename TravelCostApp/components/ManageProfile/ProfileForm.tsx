@@ -37,8 +37,6 @@ const ProfileForm = ({ navigation }) => {
   const freshlyCreated = userCtx.freshlyCreated;
   const [isFetchingLogout, setIsFetchingLogout] = useState(false);
 
-  console.log(userCtx.userName, tripCtx.tripid, authCtx.uid);
-
   function logoutHandler() {
     return Alert.alert(i18n.t("sure"), i18n.t("signOutAlertMess"), [
       // The "No" button

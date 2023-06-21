@@ -96,7 +96,7 @@ const BlurPremium = ({ canBack = false }) => {
                 navigation.navigate("Paywall");
               }}
             >
-              {"Become a Premium Nomad!"}
+              {i18n.t("paywallTitle")}
             </GradientButton>
             {canBack && (
               <FlatButton

@@ -27,6 +27,10 @@ const BlurPremium = ({ canBack = false }) => {
   const netCtx = useContext(NetworkContext);
   const userCtx = useContext(UserContext);
   const [isPremium, setIsPremium] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const startIntensity = 5;
+  const [blurIntensity, setBlurIntensity] = useState(startIntensity);
+  const navigation = useNavigation();
 
   useEffect(() => {
     async function checkPremium() {
@@ -37,30 +41,28 @@ const BlurPremium = ({ canBack = false }) => {
   }, []);
 
   const isConnected = netCtx.isConnected && netCtx.strongConnection;
-  const [focused, setFocused] = useState(false);
-  const [blurIntensity, setBlurIntensity] = useState(1);
-  const navigation = useNavigation();
+
   const timeSteps = [
     30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30,
     30,
   ];
   const blurIntensities = [
-    1, 2, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8, 9, 10, 11, 12, 13, 15,
+    1, 2, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 9, 9, 9, 9, 9,
   ];
 
   async function increaseIntensity() {
     for (let i = 0; i < timeSteps.length; i++) {
       const sleepTime = timeSteps[i];
       await sleep(sleepTime);
-      setBlurIntensity(blurIntensities[i]);
+      setBlurIntensity(blurIntensity + blurIntensities[i]);
     }
   }
   useFocusEffect(
     React.useCallback(() => {
       setFocused(true);
-      if (blurIntensity < 2) increaseIntensity();
+      if (blurIntensity < 20) increaseIntensity();
       return () => {
-        setBlurIntensity(1);
+        setBlurIntensity(startIntensity);
         setFocused(false);
       };
     }, [])

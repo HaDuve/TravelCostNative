@@ -43,16 +43,6 @@ const AddExpenseButton = ({ navigation }) => {
         tripCtx.travellers.length > 0
     );
   }, [tripCtx.tripid, authCtx.uid, tripCtx.travellers]);
-  // console.log("AddExpenseButton ~ authCtx.uid:", authCtx.uid);
-  // console.log(
-  // console.log("AddExpenseButton ~ tripCtx.tripid:", tripCtx.tripid);
-  //   "AddExpenseButton:, tripCtx.tripid, authCtx.uid, tripCtx.travellers",
-  //   tripCtx.tripid,
-  //   authCtx.uid,
-  //   tripCtx.travellers
-  // );
-  // const valid = uid && tripid && travellers && travellers.length > 0;
-  // console.log("AddExpenseButton ~ valid:", valid);
   const skipCatScreen = settings.skipCategoryScreen;
   if (!valid) {
     return (

@@ -1,12 +1,5 @@
 /* eslint-disable react/prop-types */
-import {
-  Dimensions,
-  Pressable,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { RefreshControl, StyleSheet, Text, View } from "react-native";
 import { GlobalStyles } from "../constants/styles";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
@@ -20,25 +13,11 @@ import { onShare } from "../components/ProfileOutput/ShareTrip";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
-import { fetchTrip, fetchTripHistory, fetchUser } from "../util/http";
-import { AuthContext } from "../store/auth-context";
 import React from "react";
-import { useFocusEffect } from "@react-navigation/native";
 import { saveStoppedTour } from "../util/tourUtil";
 import { TourGuideZone, useTourGuideController } from "rn-tourguide";
 import { sleep } from "../util/appState";
 import { useInterval } from "../components/Hooks/useInterval";
-import { DEBUG_POLLING_INTERVAL, MAX_JS_NUMBER } from "../confAppConstants";
-import Toast from "react-native-toast-message";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  asyncStoreGetItem,
-  asyncStoreGetObject,
-  asyncStoreSetItem,
-  asyncStoreSetObject,
-} from "../store/async-storage";
-import { NetworkContext } from "../store/network-context";
-import TripHistoryItem from "../components/ProfileOutput/TripHistoryItem";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -47,21 +26,15 @@ i18n.enableFallback = true;
 const ProfileScreen = ({ navigation }) => {
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
-  const authCtx = useContext(AuthContext);
-  const netCtx = useContext(NetworkContext);
 
   const [tourIsRunning, setTourIsRunning] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [tripHistory, setTripHistory] = useState([]);
   console.log("ProfileScreen ~ tripHistory:", tripHistory);
   useEffect(() => {
-    setTripHistory(userCtx.tripHistory);
+    setTripHistory(userCtx.tripHistory.reverse());
     console.log("useEffect ~ userCtx.tripHistory:", userCtx.tripHistory);
   }, [userCtx.tripHistory]);
-
-  const uid = authCtx.uid;
-
-  let allTripsList = [];
 
   useInterval(
     () => {
@@ -73,71 +46,6 @@ const ProfileScreen = ({ navigation }) => {
     3000,
     false
   );
-
-  // useEffect(() => {
-  //   async function loadTrips() {
-  //     if (tripsList.length > 0) return;
-  //     console.log("loadTrips ~ tripsList.length", tripsList.length);
-  //     if (await refreshHandler()) return;
-  //     console.log("loadTrips stage offline");
-  //     if (await loadFromAsyncStore(tripCtx.tripid)) return;
-  //   }
-  //   loadTrips();
-  // }, [tripsList.length, netCtx.isConnected]);
-
-  async function loadFromAsyncStore(currentTripid: string) {
-    try {
-      const tripid = await asyncStoreGetItem("PROFILE_tripid");
-      if (tripid != currentTripid) return;
-      console.log("loadFromAsyncStore ~ tripid:", tripid);
-      const tripName = await asyncStoreGetItem("PROFILE_tripName");
-      console.log("loadFromAsyncStore ~ tripName:", tripName);
-      const totalBudget = await asyncStoreGetItem("PROFILE_totalBudget");
-      console.log("loadFromAsyncStore ~ totalBudget:", totalBudget);
-      const dailyBudget = await asyncStoreGetItem("PROFILE_dailyBudget");
-      console.log("loadFromAsyncStore ~ dailyBudget:", dailyBudget);
-      const tripCurrency = await asyncStoreGetItem("PROFILE_tripCurrency");
-      console.log("loadFromAsyncStore ~ tripCurrency:", tripCurrency);
-      const travellers = await asyncStoreGetObject("PROFILE_travellers");
-      console.log("loadFromAsyncStore ~ travellers:", travellers);
-      if (
-        !tripid ||
-        !tripName ||
-        !totalBudget ||
-        !dailyBudget ||
-        !tripCurrency ||
-        !travellers
-      ) {
-        console.log("not loaded!!!!!!!!!!!");
-        return;
-      }
-      allTripsList = allTripsList.filter((trip) => trip !== tripid);
-      allTripsList.push({
-        tripid: tripid,
-        tripName: tripName,
-        totalBudget: totalBudget,
-        dailyBudget: dailyBudget,
-        tripCurrency: tripCurrency,
-        travellers: travellers,
-      });
-      setTripHistory(allTripsList.reverse());
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  async function saveTripFromContext() {
-    asyncStoreSetItem("PROFILE_tripid", tripCtx.tripid);
-    asyncStoreSetItem("PROFILE_tripName", tripCtx.tripName);
-    asyncStoreSetItem(
-      "PROFILE_totalBudget",
-      tripCtx.totalBudget ?? MAX_JS_NUMBER
-    );
-    asyncStoreSetItem("PROFILE_dailyBudget", tripCtx.dailyBudget);
-    asyncStoreSetItem("PROFILE_tripCurrency", tripCtx.tripCurrency);
-    asyncStoreSetObject("PROFILE_travellers", tripCtx.travellers);
-  }
 
   const {
     canStart, // a boolean indicate if you can start tour guide

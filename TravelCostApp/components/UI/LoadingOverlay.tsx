@@ -16,14 +16,14 @@ i18n.enableFallback = true;
 
 const loadingColor = GlobalStyles.colors.primaryGrayed;
 const LoadingOverlay = (props) => {
-  const { containerStyle, customText, noText } = props;
+  const { containerStyle, customText, noText, size } = props;
   const string =
     customText && customText.length > 0
       ? customText
       : i18n.t("loadingYourTrip");
   return (
     <View style={[styles.container, containerStyle]}>
-      <ActivityIndicator size={"large"} color={loadingColor} />
+      <ActivityIndicator size={size} color={loadingColor} />
       {!noText && <Text style={styles.text}>{string}</Text>}
     </View>
   );
@@ -35,6 +35,7 @@ LoadingOverlay.propTypes = {
   containerStyle: PropTypes.object,
   customText: PropTypes.string,
   noText: PropTypes.bool,
+  size: PropTypes.string.isRequired,
 };
 
 const styles = StyleSheet.create({

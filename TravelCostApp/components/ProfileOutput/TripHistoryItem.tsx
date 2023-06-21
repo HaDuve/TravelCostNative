@@ -38,6 +38,7 @@ import { MAX_JS_NUMBER } from "../../confAppConstants";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { ExpenseData } from "../../util/expense";
 import { isForeground } from "../../util/appState";
+import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -50,41 +51,45 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const netCtx = useContext(NetworkContext);
   const [travellers, setTravellers] = useState([]);
   const [isFetching, setIsFetching] = useState(true);
-  const [tripName, setTripName] = useState("...");
-  const [totalBudget, setTotalBudget] = useState("100");
-  const [dailyBudget, setDailyBudget] = useState("50");
-  const [tripCurrency, setTripCurrency] = useState("EUR");
+  const [tripName, setTripName] = useState("");
+  const [totalBudget, setTotalBudget] = useState("");
+  const [dailyBudget, setDailyBudget] = useState("");
+  const [tripCurrency, setTripCurrency] = useState("");
   const [sumOfExpenses, setSumOfExpenses] = useState(0);
   const [progress, setProgress] = useState(0.5);
+  const [allLoaded, setAllLoaded] = useState(false);
+
+  // TODO: make a async store entry for tripid+all the data and preload the async data before fetching online
 
   useEffect(() => {
+    if (allLoaded) return;
     if (!tripid) {
       console.log("no tripid in tripITEM");
       return;
     }
     async function getTrip() {
-      if (!isForeground()) return;
-      setIsFetching(true);
-      const trip = await fetchTrip(tripid);
-      // console.log("getTrip ~ trip", trip);
-      const _dailyBudget = trip.dailyBudget;
-      const _totalBudget = trip.totalBudget ?? MAX_JS_NUMBER.toString();
-      const _tripCurrency = trip.tripCurrency;
-      const _expenses = await getAllExpenses(tripid);
-      const sumOfExpenses = _expenses.reduce((acc, expense: ExpenseData) => {
-        if (isNaN(Number(expense.calcAmount))) return acc;
-        return acc + Number(expense.calcAmount);
-      }, 0);
-      setTotalBudget(_totalBudget);
-      setDailyBudget(_dailyBudget);
-      setTripCurrency(_tripCurrency);
-      setSumOfExpenses(sumOfExpenses);
-      setProgress(sumOfExpenses / Number(_totalBudget));
-      setIsFetching(false);
+      try {
+        const trip = await fetchTrip(tripid);
+        // console.log("getTrip ~ trip", trip);
+        const _dailyBudget = trip.dailyBudget;
+        const _totalBudget = trip.totalBudget ?? MAX_JS_NUMBER.toString();
+        const _tripCurrency = trip.tripCurrency;
+        const _expenses = await getAllExpenses(tripid);
+        const sumOfExpenses = _expenses.reduce((acc, expense: ExpenseData) => {
+          if (isNaN(Number(expense.calcAmount))) return acc;
+          return acc + Number(expense.calcAmount);
+        }, 0);
+        setTotalBudget(_totalBudget);
+        setDailyBudget(_dailyBudget);
+        setTripCurrency(_tripCurrency);
+        setSumOfExpenses(sumOfExpenses);
+        setProgress(sumOfExpenses / Number(_totalBudget));
+        setIsFetching(false);
+      } catch (error) {
+        return;
+      }
     }
     async function getTripTravellers() {
-      if (!isForeground()) return;
-      setIsFetching(true);
       try {
         const listTravellers = await getTravellers(tripid);
         console.log("getTripTravellers ~ listTravellers:", listTravellers);
@@ -94,19 +99,30 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
         });
         setTravellers(objTravellers);
       } catch (error) {
-        console.log("error caught while get Travellers!");
+        return;
       }
-      setIsFetching(false);
     }
     async function getTripName() {
-      if (!isForeground()) return;
-      const name = await fetchTripName(tripid);
-      setTripName(name);
+      try {
+        const name = await fetchTripName(tripid);
+        setTripName(name);
+      } catch (error) {
+        return;
+      }
+    }
+    if (tripCtx.tripid == tripid) {
+      setTripName(tripCtx.tripName);
+      setTotalBudget(tripCtx.totalBudget);
+      setDailyBudget(tripCtx.dailyBudget);
+      setTripCurrency(tripCtx.tripCurrency);
+      setIsFetching(false);
     }
     if (netCtx.isConnected && netCtx.strongConnection) {
       getTripName();
       getTrip();
       getTripTravellers();
+      setIsFetching(false);
+      setAllLoaded(true);
     }
   }, [
     tripid,
@@ -114,6 +130,13 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
     expenseCtx.expenses,
     netCtx.isConnected,
     netCtx.strongConnection,
+    tripCtx.tripid,
+    tripCtx.travellers,
+    tripCtx.tripName,
+    tripCtx.totalBudget,
+    tripCtx.dailyBudget,
+    tripCtx.tripCurrency,
+    allLoaded,
   ]);
 
   if (!tripid) return <Text>no id</Text>;
@@ -151,7 +174,54 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const isOverBudget = Number(sumOfExpenses) > Number(totalBudget);
 
   if (isFetching || (tripid && !totalBudget)) {
-    return <></>;
+    return (
+      <Pressable
+        onPress={tripPressHandler}
+        style={({ pressed }) => pressed && GlobalStyles.pressed}
+      >
+        <View
+          style={[styles.tripItem, GlobalStyles.wideStrongShadow, activeBorder]}
+        >
+          <View style={styles.topRow}>
+            <View>
+              {/* <Text style={[styles.textBase, styles.description]}>{"..."}</Text> */}
+              <LoadingBarOverlay
+                size="small"
+                customText=" "
+                containerStyle={{
+                  backgroundColor: "transparent",
+                  maxHeight: 0,
+                  maxWidth: 0,
+                }}
+              ></LoadingBarOverlay>
+              <Text style={styles.textBase}>
+                {i18n.t("daily")}
+                {": "}
+              </Text>
+            </View>
+            <View style={styles.amountContainer}>
+              <Text
+                style={[
+                  styles.amount,
+                  isOverBudget && { color: GlobalStyles.colors.errorGrayed },
+                ]}
+              >
+                {"0"}/{"0"}
+              </Text>
+              <Progress.Bar
+                color={GlobalStyles.colors.errorGrayed}
+                unfilledColor={GlobalStyles.colors.gray600}
+                borderWidth={0}
+                borderRadius={8}
+                progress={activeProgress}
+                height={12}
+                width={150}
+              />
+            </View>
+          </View>
+        </View>
+      </Pressable>
+    );
   }
 
   function renderTravellers(item) {

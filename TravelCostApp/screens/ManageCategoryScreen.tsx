@@ -47,6 +47,7 @@ import { NetworkContext } from "../store/network-context";
 import InfoButton from "../components/UI/InfoButton";
 import Modal from "react-native-modal";
 import FlatButton from "../components/UI/FlatButton";
+import BlurPremium from "../components/Premium/BlurPremium";
 
 const ManageCategoryScreen = ({ route, navigation }) => {
   // defaultCategories minus the last element (-new cat element)
@@ -570,6 +571,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
           </View>
         </KeyboardAvoidingView>
       </BackgroundGradient>
+      <BlurPremium canBack />
     </>
   );
 };

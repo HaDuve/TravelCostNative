@@ -22,6 +22,7 @@ import { ExpenseData } from "../../../util/expense";
 import { travellerToDropdown } from "../../../util/split";
 import useContext from "react";
 import { TripContext } from "../../../store/trip-context";
+import BlurPremium from "../../Premium/BlurPremium";
 
 const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
@@ -195,6 +196,7 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
           </View>
         }
       />
+      <BlurPremium />
     </Animated.View>
   );
 };

@@ -15,7 +15,7 @@ const BackButton = ({ style }) => {
       style={[GlobalStyles.backButton, style]}
       onPress={() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        navigation.pop();
+        navigation.goBack();
       }}
     >
       <IconButton

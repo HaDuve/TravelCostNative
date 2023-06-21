@@ -16,6 +16,7 @@ import { GlobalStyles } from "../constants/styles";
 import Toast from "react-native-toast-message";
 import PropTypes from "prop-types";
 import BackButton from "../components/UI/BackButton";
+import BlurPremium from "../components/Premium/BlurPremium";
 
 const FilteredExpenses = ({
   route,
@@ -60,6 +61,7 @@ const FilteredExpenses = ({
         showSumForTravellerName={showSumForTravellerName}
         isFiltered
       />
+      <BlurPremium />
       {!withArgs && (
         <FlatButton onPress={() => navigation.pop()}>
           {i18n.t("back")}

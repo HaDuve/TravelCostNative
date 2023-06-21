@@ -1,0 +1,132 @@
+import { Alert, StyleSheet } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { BlurView } from "expo-blur";
+import GradientButton from "../UI/GradientButton";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { GlobalStyles } from "../../constants/styles";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
+import Animated, { SlideInDown } from "react-native-reanimated";
+import { Card } from "react-native-paper";
+import { sleep } from "../../util/appState";
+import { NetworkContext } from "../../store/network-context";
+import { UserContext } from "../../store/user-context";
+import BackButton from "../UI/BackButton";
+import FlatButton from "../UI/FlatButton";
+import PropTypes from "prop-types";
+
+const BlurPremium = ({ canBack = false }) => {
+  const netCtx = useContext(NetworkContext);
+  const userCtx = useContext(UserContext);
+  const [isPremium, setIsPremium] = useState(false);
+
+  useEffect(() => {
+    async function checkPremium() {
+      const checkPremi = await userCtx.checkPremium();
+      setIsPremium(checkPremi);
+    }
+    checkPremium();
+  }, []);
+
+  const isConnected = netCtx.isConnected && netCtx.strongConnection;
+  const [focused, setFocused] = useState(false);
+  const [blurIntensity, setBlurIntensity] = useState(1);
+  const navigation = useNavigation();
+  const timeSteps = [
+    30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30,
+    30,
+  ];
+  const blurIntensities = [
+    1, 2, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8, 9, 10, 11, 12, 13, 15,
+  ];
+
+  async function increaseIntensity() {
+    for (let i = 0; i < timeSteps.length; i++) {
+      const sleepTime = timeSteps[i];
+      await sleep(sleepTime);
+      setBlurIntensity(blurIntensities[i]);
+    }
+  }
+  useFocusEffect(
+    React.useCallback(() => {
+      setFocused(true);
+      if (blurIntensity < 2) increaseIntensity();
+      return () => {
+        setBlurIntensity(1);
+        setFocused(false);
+      };
+    }, [])
+  );
+
+  const showCardJSX = (
+    <BlurView intensity={blurIntensity} style={styles.titleContainerBlur}>
+      {focused && (
+        <Animated.View
+          entering={SlideInDown.delay(600).springify().damping(11)}
+        >
+          <Card
+            elevation={1}
+            style={{
+              //   backgroundColor: GlobalStyles.colors.gray300,
+              padding: 30,
+              // marginLeft: -55,
+            }}
+          >
+            <GradientButton
+              darkText
+              colors={GlobalStyles.gradientColorsButton}
+              onPress={() => {
+                if (!isConnected) {
+                  Alert.alert(
+                    i18n.t("noConnection"),
+                    i18n.t("checkConnectionError")
+                  );
+                  return;
+                }
+                navigation.navigate("Paywall");
+              }}
+            >
+              {"Become a Premium Nomad!"}
+            </GradientButton>
+            {canBack && (
+              <FlatButton
+                onPress={() => navigation.goBack()}
+                textStyle={{ marginTop: 12, marginBottom: -12 }}
+              >
+                Back
+              </FlatButton>
+            )}
+          </Card>
+        </Animated.View>
+      )}
+    </BlurView>
+  );
+
+  return <>{!isPremium && showCardJSX}</>;
+};
+
+export default BlurPremium;
+
+BlurPremium.propTypes = {
+  canBack: PropTypes.bool,
+};
+
+const styles = StyleSheet.create({
+  titleContainerBlur: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    paddingBottom: "2%",
+  },
+});

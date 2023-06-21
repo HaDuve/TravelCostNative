@@ -25,6 +25,7 @@ import { getCurrencySymbol } from "../util/currencySymbol";
 import BackButton from "../components/UI/BackButton";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { useFocusEffect } from "@react-navigation/native";
+import BlurPremium from "../components/Premium/BlurPremium";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
   // let { tripid } = route.params;
@@ -140,11 +141,6 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   }
 
   const handleSimpflifySplits = async () => {
-    // const isPremium = await userCtx.checkPremium();
-    // if (!isPremium) {
-    //   navigation.navigate("Paywall");
-    //   return;
-    // }
     try {
       const simpleSplits = simplifySplits(splits);
       if (simpleSplits.length === 0) {
@@ -293,6 +289,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
           </GradientButton>
         </View>
       </Animated.View>
+      <BlurPremium />
     </View>
   );
 };

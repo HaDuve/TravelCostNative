@@ -107,7 +107,6 @@ function UserContextProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    //
     // Trip History fetch
     async function fetch() {
       const uid = await secureStoreGetItem("uid");

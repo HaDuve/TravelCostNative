@@ -70,11 +70,6 @@ const FinancialScreen = () => {
         colors={GlobalStyles.gradientAccentButton}
         darkText
         onPress={async () => {
-          const isPremium = await userCtx.checkPremium();
-          // if (!isPremium) {
-          //   navigation.navigate("Paywall");
-          //   return;
-          // }
           navigation.navigate("SplitSummary", { tripid: tripCtx.tripid });
         }}
         style={styles.button}

@@ -684,6 +684,7 @@ function Root() {
         await onlineSetup(tripData, checkUser, storedTripId, storedUid);
         await authCtx.authenticate(storedToken);
         const needsTour = await loadTourConfig();
+        console.log("onRootMount ~ needsTour:", needsTour);
         userCtx.setNeedsTour(needsTour);
         console.log("Root end reached");
       } else {

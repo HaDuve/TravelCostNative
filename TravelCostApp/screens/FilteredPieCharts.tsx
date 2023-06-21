@@ -81,11 +81,6 @@ const FilteredPieCharts = ({ navigation, route }) => {
 
   const nextHandler = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const isPremium = await userCtx.checkPremium();
-    // if (!isPremium) {
-    //   navigation.navigate("Paywall");
-    //   return;
-    // }
     setToggleGraphEnum(
       toggleGraphEnum == CONTENTS_MAX_INDEX ? 0 : toggleGraphEnum + 1
     );
@@ -93,13 +88,6 @@ const FilteredPieCharts = ({ navigation, route }) => {
 
   const previousHandler = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
-    const isPremium = await userCtx.checkPremium();
-    // if (!isPremium) {
-    //   navigation.navigate("Paywall");
-    //   return;
-    // }
-
     setToggleGraphEnum(
       toggleGraphEnum == 0 ? CONTENTS_MAX_INDEX : toggleGraphEnum - 1
     );

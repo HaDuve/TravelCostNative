@@ -56,11 +56,6 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const userCtx = useContext(UserContext);
 
   async function toggleContent() {
-    const isPremium = await userCtx.checkPremium();
-    // if (!isPremium) {
-    //   navigation.navigate("Paywall");
-    //   return;
-    // }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     userCtx.setIsShowingGraph(!isGraphNotPie);
     setToggleGraph(!isGraphNotPie);
@@ -101,11 +96,6 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
 
   const rightNavButtonHandler = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    // const isPremium = await userCtx.checkPremium();
-    // if (!isPremium) {
-    //   navigation.navigate("Paywall");
-    //   return;
-    // }
     console.log("pressed right button");
     if (isGraphNotPie) {
       realPeriodNumber.current =
@@ -133,12 +123,6 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           size={24}
           onPress={async () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            const isPremium = await userCtx.checkPremium();
-
-            // if (!isPremium) {
-            //   navigation.navigate("Paywall");
-            //   return;
-            // }
             if (isGraphNotPie) {
               realPeriodNumber.current = MIN_PERIOD_RANGE;
               setPeriodRangeNumber(realPeriodNumber.current);

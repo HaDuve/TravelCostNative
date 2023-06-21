@@ -40,7 +40,7 @@ const ProfileScreen = ({ navigation }) => {
     () => {
       if (canStart && userCtx.needsTour && !tourIsRunning) {
         // 👈 test if you can start otherwise nothing will happen
-        // sleepyStartTour();
+        sleepyStartTour();
       }
     },
     3000,

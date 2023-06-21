@@ -27,6 +27,7 @@ i18n.enableFallback = true;
 
 import { getCatString } from "../../../util/category";
 import PropTypes from "prop-types";
+import BlurPremium from "../../Premium/BlurPremium";
 
 const ExpenseCategories = ({ expenses, periodName, navigation }) => {
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
@@ -134,6 +135,7 @@ const ExpenseCategories = ({ expenses, periodName, navigation }) => {
           </View>
         }
       />
+      <BlurPremium />
     </Animated.View>
   );
 };

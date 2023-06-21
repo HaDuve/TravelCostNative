@@ -23,6 +23,9 @@ import IconButton from "../components/UI/IconButton";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import { UserContext } from "../store/user-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
+import { BlurView } from "expo-blur";
+import Animated from "react-native-reanimated";
+import BlurPremium from "../components/Premium/BlurPremium";
 
 const FinderScreen = () => {
   const navigation = useNavigation();
@@ -203,6 +206,7 @@ const FinderScreen = () => {
     loadData();
   }, []);
   const searchRef = useRef(null);
+
   return (
     <>
       {datepickerJSX}
@@ -212,6 +216,7 @@ const FinderScreen = () => {
         </View> */}
         <View style={[styles.cardContainer, GlobalStyles.wideStrongShadow]}>
           <Text style={styles.titleText}>Finder</Text>
+
           <View style={styles.rowContainer}>
             <View style={{ borderWidth: 1, borderRadius: 99, marginRight: 8 }}>
               <Checkbox
@@ -283,6 +288,7 @@ const FinderScreen = () => {
           </GradientButton>
         </View>
       </View>
+      <BlurPremium />
     </>
   );
 };

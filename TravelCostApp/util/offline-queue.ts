@@ -210,6 +210,7 @@ export const storeExpenseOnlineOffline = async (
  * @function sendOfflineQueue
  * @returns {Promise<void>}
  */
+global.sendingOfflineQueue = false;
 export const sendOfflineQueue = async () => {
   // mutex
   if (global.sendingOfflineQueue) {
@@ -217,103 +218,106 @@ export const sendOfflineQueue = async () => {
     return;
   }
   global.sendingOfflineQueue = true;
+  try {
+    const offlineQueue = (await secureStoreGetObject("offlineQueue")) || [];
+    if (offlineQueue && offlineQueue.length > 0) {
+      // console.log("queue length", offlineQueue.length);
+      const forceOffline = !Device.isDevice && DEBUG_FORCE_OFFLINE;
+      const isOnline = await NetInfo.fetch();
+      // console.log("update connected =", isOnline);
+      // if the internet is not fast enough, store in offline queue
+      const { isFastEnough, speed } = await isConnectionFastEnough();
+      // console.log("isFastEnough:", isFastEnough);
+      // console.log("speed:", speed.toFixed(2), "Mbps");
 
-  const offlineQueue = (await secureStoreGetObject("offlineQueue")) || [];
-  if (offlineQueue && offlineQueue.length > 0) {
-    // console.log("queue length", offlineQueue.length);
-    const forceOffline = !Device.isDevice && DEBUG_FORCE_OFFLINE;
-    const isOnline = await NetInfo.fetch();
-    // console.log("update connected =", isOnline);
-    // if the internet is not fast enough, store in offline queue
-    const { isFastEnough, speed } = await isConnectionFastEnough();
-    // console.log("isFastEnough:", isFastEnough);
-    // console.log("speed:", speed.toFixed(2), "Mbps");
-
-    if (!isOnline || !isOnline.isConnected || !isFastEnough || forceOffline) {
-      console.log(
-        "sendOfflineQueue ~ still offline! Length:",
-        offlineQueue?.length
-      );
-      return;
-    }
-    // indicate loading
-    Toast.hide();
-    Toast.show({
-      type: "loading",
-      text1: "Synchronizing offline changes",
-      text2: "Please leave the app open...",
-      autoHide: false,
-    });
-
-    // send items in while loop
-    const processedItems = [];
-    let i = 0;
-    let tripid = "";
-
-    while (i < offlineQueue.length) {
-      const item = offlineQueue[i];
-      tripid = item.expense.tripid;
-
-      // console.log("sendOfflineQueue ~ item:", item);
-      console.log("sendOfflineQueue ~ item.type:", item.type);
-
-      try {
-        if (item.type === "add") {
-          const oldId = item.expense.id;
-          const id = await storeExpense(
-            item.expense.tripid,
-            item.expense.uid,
-            item.expense.expenseData
-          );
-          item.expense.id = id;
-          // change item.expense.id for every other item.type == "update" or "delete" in the queue
-          for (let j = i + 1; j < offlineQueue.length - i; j++) {
-            const item2 = offlineQueue[j];
-            if (!item2 || item2.expense.id !== oldId || item2.type === "add")
-              continue;
-            item2.expense.id = id;
-          }
-        } else if (item.type === "update") {
-          await updateExpense(
-            item.expense.tripid,
-            item.expense.uid,
-            item.expense.id,
-            item.expense.expenseData
-          );
-        } else if (item.type === "delete") {
-          await deleteExpense(
-            item.expense.tripid,
-            item.expense.uid,
-            item.expense.id
-          );
-        } else {
-          console.log("unknown offlineQ item type");
-        }
-
-        // Add the processed item to the list
-        processedItems.push(item);
-        i++;
-      } catch (error) {
-        console.error("offlineQ error:", error);
-        break;
+      if (!isOnline || !isOnline.isConnected || !isFastEnough || forceOffline) {
+        console.log(
+          "sendOfflineQueue ~ still offline! Length:",
+          offlineQueue?.length
+        );
+        return;
       }
-    }
-
-    // Remove the processed items from the queue
-    const remainingItems = offlineQueue.slice(i);
-    console.log("sendOfflineQueue ~ remainingItems:", remainingItems);
-    await secureStoreSetObject("offlineQueue", remainingItems);
-    Toast.hide();
-    if (processedItems.length > 0) {
-      await touchAllTravelers(tripid, true);
+      // indicate loading
+      Toast.hide();
       Toast.show({
-        type: "success",
-        text1: "Online again!",
-        text2: `Synchronized ${processedItems.length}/${offlineQueue.length} offline Changes!`,
+        type: "loading",
+        text1: "Synchronizing offline changes",
+        text2: "Please leave the app open...",
+        autoHide: false,
       });
+
+      // send items in while loop
+      const processedItems = [];
+      let i = 0;
+      let tripid = "";
+
+      while (i < offlineQueue.length) {
+        const item = offlineQueue[i];
+        tripid = item.expense.tripid;
+
+        // console.log("sendOfflineQueue ~ item:", item);
+        console.log("sendOfflineQueue ~ item.type:", item.type);
+
+        try {
+          if (item.type === "add") {
+            const oldId = item.expense.id;
+            const id = await storeExpense(
+              item.expense.tripid,
+              item.expense.uid,
+              item.expense.expenseData
+            );
+            item.expense.id = id;
+            // change item.expense.id for every other item.type == "update" or "delete" in the queue
+            for (let j = i + 1; j < offlineQueue.length - i; j++) {
+              const item2 = offlineQueue[j];
+              if (!item2 || item2.expense.id !== oldId || item2.type === "add")
+                continue;
+              item2.expense.id = id;
+            }
+          } else if (item.type === "update") {
+            await updateExpense(
+              item.expense.tripid,
+              item.expense.uid,
+              item.expense.id,
+              item.expense.expenseData
+            );
+          } else if (item.type === "delete") {
+            await deleteExpense(
+              item.expense.tripid,
+              item.expense.uid,
+              item.expense.id
+            );
+          } else {
+            console.log("unknown offlineQ item type");
+          }
+
+          // Add the processed item to the list
+          processedItems.push(item);
+          i++;
+        } catch (error) {
+          console.error("offlineQ error:", error);
+          break;
+        }
+      }
+
+      // Remove the processed items from the queue
+      const remainingItems = offlineQueue.slice(i);
+      console.log("sendOfflineQueue ~ remainingItems:", remainingItems);
+      await secureStoreSetObject("offlineQueue", remainingItems);
+      Toast.hide();
+      if (processedItems.length > 0) {
+        await touchAllTravelers(tripid, true);
+        Toast.show({
+          type: "success",
+          text1: "Online again!",
+          text2: `Synchronized ${processedItems.length}/${offlineQueue.length} offline Changes!`,
+        });
+      }
+    } else {
+      // console.log("no queue");
     }
-  } else {
-    // console.log("no queue");
+  } catch (error) {
+    global.sendingOfflineQueue = false;
   }
   global.sendingOfflineQueue = false;
 };

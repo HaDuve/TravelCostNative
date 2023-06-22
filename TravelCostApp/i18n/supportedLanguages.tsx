@@ -148,6 +148,7 @@ const en = {
   // Invite Screen
   inviteMessage:
     "Hey there! I'm using Budget For Nomads to plan my next trip and I wanted to invite you to join me. Before you click on the link below, make sure to install the app first. Once you're done, just click the link and join our trip. Let's make this trip unforgettable together!",
+
   noTrip: "Could not find trip!",
   tryAgain: "Please try again later.",
 
@@ -475,7 +476,7 @@ const de = {
   walk5:
     "Du planst bereits dein nächstes Abenteuer? 🌎\n\nHier kannst du eine neue Reise erstellen.",
   walk6:
-    "Sieh dir deine Reisen an.🗺️ \n\nDeine aktive Reise wird grün hervorgehoben.",
+    "Sieh dir deine Reisen an. 🗺️ \n\nDeine aktive Reise wird grün hervorgehoben.",
   walk7:
     "Nimm Freunde und Familie auf deine Reisen mit! 👫\n\nLade einen anderen Nomaden zu deiner aktiven Reise ein und teilt eure Ausgaben.",
   walk8:
@@ -515,7 +516,14 @@ const de = {
 
   // Invite Screen
   inviteMessage:
-    "Hey! Ich benutze Budget For Nomads, um meine nächste Reise zu planen, und ich möchte dich einladen. Bevor du auf den unten stehenden Link klickst, stelle sicher, dass du die App zuerst installierst. Sobald du fertig bist, klicke einfach auf den Link und schließe dich unserer Reise an. Lass uns diese Reise zusammen unvergesslich machen!",
+    "Hey!\n" +
+    "Kennst du schon Budget for Nomads?\n" +
+    "Die App macht es kinderleicht, alle Ausgaben auf Reisen und gegenseitige Schulden im Blick zu behalten.\n" +
+    "Für unsere bevorstehende Reise möchte ich dich auch zu der App einladen!" +
+    " Lass uns gemeinsam unsere Kosten tracken und unbeschwert reisen.\n" +
+    "Lade hier die App kostenlos herunter:\n" +
+    "https://apps.apple.com/app/id1530393349" +
+    "\nNachdem du die App installiert hast, schließe dich hier unserer Reise an:\n",
   noTrip: "Reise nicht gefunden!",
   tryAgain: "Bitte versuche es später erneut!",
 
@@ -690,8 +698,8 @@ const de = {
     "\n\n Das Gesamtbudget ist optional.",
   infoDailyBudgetTitle: "Tagesbudget Info",
   infoDailyBudgetText:
-    "Richte hier dein Tagesbudget ein (z. B. den durchschnittlichen Geldbetrag, den du pro Tag ausgeben möchten)." +
-    "Wenn du nicht genau weisst, wie viel du ausgeben möchtest, gib einfach eine Schätzung ein." +
+    "Richte hier dein Tagesbudget ein \n(z. B. den durchschnittlichen Geldbetrag, den du pro Tag ausgeben möchten). " +
+    "Wenn du nicht genau weißt, wie viel du ausgeben möchtest, gib einfach eine Schätzung ein." +
     "\n\n Du kannst auf die Schaltfläche rechts drücken, um das Tagesbudget aus dem Gesamtbudget / Reiseanfangs- und Reiseenddatum automatisch berechnen zu lassen.",
   infoTripDatesTitle: "Trip-Start und Enddaten",
   infoTripDatesText:
@@ -859,7 +867,7 @@ const fr = {
   walk5:
     "Vous planifiez déjà votre prochaine aventure ? 🌎\n\nVous pouvez créer un nouveau voyage ici.",
   walk6:
-    "Consultez vos voyages.🗺️ \n\nVotre voyage actif sera mis en évidence en vert.",
+    "Consultez vos voyages. 🗺️ \n\nVotre voyage actif sera mis en évidence en vert.",
   walk7:
     "Invitez des amis et votre famille à vous accompagner lors de vos voyages ! 👫\n\nInvitez un autre nomade à rejoindre votre voyage actif et partagez vos dépenses.",
   walk8:
@@ -1238,7 +1246,7 @@ const ru = {
   walk5:
     "Уже планируете свое следующее приключение? 🌎\n\nЗдесь вы можете создать новое путешествие.",
   walk6:
-    "Посмотрите свои путешествия.🗺️ \n\nВаше активное путешествие будет выделено зеленым цветом.",
+    "Посмотрите свои путешествия. 🗺️ \n\nВаше активное путешествие будет выделено зеленым цветом.",
   walk7:
     "Пригласите друзей и семью в свои путешествия! 👫\n\nПригласите другого номада в ваше активное путешествие и разделите ваши расходы.",
   walk8:

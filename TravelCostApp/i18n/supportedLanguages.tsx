@@ -292,12 +292,12 @@ const en = {
   settingsShowInternetSpeed: "Show Internet Speed",
   settingsShowTravellerIcon: "Show Traveller Icons",
   // new Stuff part 2
-  newCatNamePlaceholder: "Enter new category name ...",
+  newCatNamePlaceholder: "New category name ...",
   reset: "Reset",
   sureResetCategories: "Are you sure you want to reset your categories?",
   infoNewCatTitle: "New Category Info",
   infoNewCatText:
-    "Enter a name for your Category and then press the symbol for your new Category." +
+    "Enter a name for your category and then choose a suitable symbol for your category." +
     "\n\n Confirm your new Category with the <Add> button.",
   infoHomeCurrencyTitle: "Home Currency Info",
   infoHomeCurrencyText:
@@ -678,13 +678,14 @@ const de = {
   settingsShowInternetSpeed: "Internetgeschwindigkeit anzeigen",
   settingsShowTravellerIcon: "Reisende-Symbole anzeigen",
   // new Stuff part 2
-  newCatNamePlaceholder: "Gib den Namen der neuen Kategorie ein...",
+  newCatNamePlaceholder: "Neuer Kategoriename ...",
+
   reset: "Zurücksetzen",
   sureResetCategories:
     "Bist du sicher, dass du die Kategorien zurücksetzen möchten?",
   infoNewCatTitle: "Neue Kategorie Info",
   infoNewCatText:
-    "Gib einen Namen für deine Kategorie ein und drücke dann auf das Symbol für deine neue Kategorie." +
+    "Gib einen Namen für deine Kategorie ein und suche dir dann ein passendes Symbol für deine Kategorie aus." +
     "\n\n Bestätige deine neue Kategorie mit der Schaltfläche <Hinzufügen>.",
   infoHomeCurrencyTitle: "Heimatwährung Info",
   infoHomeCurrencyText:
@@ -1058,13 +1059,13 @@ const fr = {
   settingsShowFlags: "Afficher les icônes de drapeau",
   settingsShowInternetSpeed: "Afficher la vitesse d'Internet",
   settingsShowTravellerIcon: "Afficher les icônes de voyageur",
-  newCatNamePlaceholder: "Entrez le nouveau nom de catégorie...",
+  newCatNamePlaceholder: "Nouveau nom de catégorie ...",
   reset: "Réinitialiser",
   sureResetCategories:
     "Êtes-vous sûr de vouloir réinitialiser vos catégories ?",
   infoNewCatTitle: "Informations sur la nouvelle catégorie",
   infoNewCatText:
-    "Entrez un nom pour votre catégorie, puis appuyez sur le symbole de votre nouvelle catégorie." +
+    "Entrez un nom pour votre catégorie, puis choisissez un symbole approprié pour votre catégorie." +
     "\n\n Confirmez votre nouvelle catégorie avec le bouton <Ajouter>.",
   infoHomeCurrencyTitle: "Informations sur la devise locale",
   infoHomeCurrencyText:
@@ -1432,12 +1433,12 @@ const ru = {
   settingsShowInternetSpeed: "Показывать скорость интернета",
   settingsShowTravellerIcon: "Показывать значки путешественников",
   // new Stuff part 2
-  newCatNamePlaceholder: "Введите название новой категории...",
+  newCatNamePlaceholder: "Новое название категории ...",
   reset: "Сбросить",
   sureResetCategories: "Вы уверены, что хотите сбросить свои категории?",
   infoNewCatTitle: "Информация о новой категории",
   infoNewCatText:
-    "Введите название для вашей категории, а затем нажмите символ для вашей новой категории." +
+    "Введите имя для вашей категории, а затем выберите подходящий символ для вашей категории." +
     "\n\n Подтвердите вашу новую категорию кнопкой <Добавить>.",
   infoHomeCurrencyTitle: "Информация о домашней валюте",
   infoHomeCurrencyText:

@@ -698,12 +698,12 @@ const de = {
     "\n\n Das Gesamtbudget ist optional.",
   infoDailyBudgetTitle: "Tagesbudget Info",
   infoDailyBudgetText:
-    "Richte hier dein Tagesbudget ein \n(z. B. den durchschnittlichen Geldbetrag, den du pro Tag ausgeben möchten). " +
+    "Richte hier dein Tagesbudget ein \n(den durchschnittlichen Geldbetrag, den du pro Tag ausgeben möchten). " +
     "Wenn du nicht genau weißt, wie viel du ausgeben möchtest, gib einfach eine Schätzung ein." +
     "\n\n Du kannst auf die Schaltfläche rechts drücken, um das Tagesbudget aus dem Gesamtbudget / Reiseanfangs- und Reiseenddatum automatisch berechnen zu lassen.",
-  infoTripDatesTitle: "Trip-Start und Enddaten",
+  infoTripDatesTitle: "Reise Start- und Enddatum",
   infoTripDatesText:
-    "Lege hier das Start- und Enddatum deiner Reise fest (z. B. die Daten Ihrer Reise).\n\n Der Start und das Ende der Reise sind optional.",
+    "Lege hier das Start- und Enddatum deiner Reise fest (die Daten deiner Reise).\n\n Der Start und das Ende der Reise sind optional.",
   comingSoon: "Demnächst...",
   comingSoonRangedDates:
     "Das Ändern der Ausgaben mit einem Datumsbereich ist noch nicht möglich.",

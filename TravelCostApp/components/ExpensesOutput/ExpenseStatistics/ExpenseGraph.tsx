@@ -108,6 +108,7 @@ const ExpenseGraph = ({
               const filteredExpenses = expenseCtx.getSpecificDayExpenses(
                 new Date(item.day)
               );
+              if (!filteredExpenses || filteredExpenses.length === 0) return;
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
                 dayString: dayString,
@@ -118,6 +119,7 @@ const ExpenseGraph = ({
               const filteredExpenses = expenseCtx.getSpecificDayExpenses(
                 new Date(item.day)
               );
+              if (!filteredExpenses || filteredExpenses.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
                 dayString: dayString,
@@ -197,6 +199,7 @@ const ExpenseGraph = ({
               const filteredExpenses = expenseCtx.getSpecificWeekExpenses(
                 new Date(item.firstDay)
               );
+              if (!filteredExpenses || filteredExpenses.length === 0) return;
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
                 dayString: weekString,
@@ -207,6 +210,7 @@ const ExpenseGraph = ({
               const filteredExpenses = expenseCtx.getSpecificWeekExpenses(
                 new Date(item.firstDay)
               );
+              if (!filteredExpenses || filteredExpenses.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
                 dayString: weekString,
@@ -276,6 +280,7 @@ const ExpenseGraph = ({
               const filteredExpenses = expenseCtx.getSpecificMonthExpenses(
                 new Date(item.firstDay)
               );
+              if (!filteredExpenses || filteredExpenses.length === 0) return;
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
                 dayString: month,
@@ -286,6 +291,7 @@ const ExpenseGraph = ({
               const filteredExpenses = expenseCtx.getSpecificMonthExpenses(
                 new Date(item.firstDay)
               );
+              if (!filteredExpenses || filteredExpenses.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
                 dayString: month,
@@ -359,6 +365,7 @@ const ExpenseGraph = ({
               const filteredExpenses = expenseCtx.getSpecificYearExpenses(
                 new Date(item.firstDay)
               );
+              if (!filteredExpenses || filteredExpenses.length === 0) return;
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
                 dayString: yearString,
@@ -369,6 +376,7 @@ const ExpenseGraph = ({
               const filteredExpenses = expenseCtx.getSpecificYearExpenses(
                 new Date(item.firstDay)
               );
+              if (!filteredExpenses || filteredExpenses.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
                 dayString: yearString,

@@ -153,7 +153,7 @@ const en = {
     "For our upcoming trip, I also want to invite you to the app!" +
     " Let's track our costs together and travel carefree.\n" +
     "Download the app for free here:\n" +
-    "https://apps.apple.com/us/app/budget-for-nomads/id6446042796" +
+    "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=en" +
     "\nAfter installing the app, join our trip here:\n",
   noTrip: "Could not find trip!",
   tryAgain: "Please try again later.",
@@ -528,7 +528,7 @@ const de = {
     "Für unsere bevorstehende Reise möchte ich dich auch zu der App einladen!" +
     " Lass uns gemeinsam unsere Kosten tracken und unbeschwert reisen.\n" +
     "Lade hier die App kostenlos herunter:\n" +
-    "https://apps.apple.com/us/app/budget-for-nomads/id6446042796" +
+    "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=de" +
     "\nNachdem du die App installiert hast, schließe dich hier unserer Reise an:\n",
   noTrip: "Reise nicht gefunden!",
   tryAgain: "Bitte versuche es später erneut!",
@@ -921,7 +921,7 @@ const fr = {
     "Pour notre prochain voyage, je souhaite également t'inviter à utiliser l'application !" +
     " Suivons ensemble nos dépenses et voyageons en toute tranquillité.\n" +
     "Télécharge l'application gratuitement ici :\n" +
-    "https://apps.apple.com/us/app/budget-for-nomads/id6446042796" +
+    "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=fr" +
     "\nAprès avoir installé l'application, rejoins notre voyage ici :\n",
 
   noTrip: "Impossible de trouver le voyage !",
@@ -1307,7 +1307,7 @@ const ru = {
     "Для нашей предстоящей поездки я также хочу пригласить тебя в это приложение!" +
     " Давай отслеживать наши расходы вместе и путешествовать беззаботно.\n" +
     "Скачай приложение бесплатно здесь:\n" +
-    "https://apps.apple.com/us/app/budget-for-nomads/id6446042796" +
+    "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=ru" +
     "\nПосле установки приложения, присоединяйся к нашей поездке здесь:\n",
 
   noTrip: "Не удалось найти поездку!",

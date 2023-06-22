@@ -147,8 +147,14 @@ const en = {
 
   // Invite Screen
   inviteMessage:
-    "Hey there! I'm using Budget For Nomads to plan my next trip and I wanted to invite you to join me. Before you click on the link below, make sure to install the app first. Once you're done, just click the link and join our trip. Let's make this trip unforgettable together!",
-
+    "Hey!\n" +
+    "Do you already know Budget for Nomads?\n" +
+    "The app makes it super easy to keep track of all expenses while traveling and mutual debts.\n" +
+    "For our upcoming trip, I also want to invite you to the app!" +
+    " Let's track our costs together and travel carefree.\n" +
+    "Download the app for free here:\n" +
+    "https://apps.apple.com/us/app/budget-for-nomads/id6446042796" +
+    "\nAfter installing the app, join our trip here:\n",
   noTrip: "Could not find trip!",
   tryAgain: "Please try again later.",
 
@@ -522,7 +528,7 @@ const de = {
     "Für unsere bevorstehende Reise möchte ich dich auch zu der App einladen!" +
     " Lass uns gemeinsam unsere Kosten tracken und unbeschwert reisen.\n" +
     "Lade hier die App kostenlos herunter:\n" +
-    "https://apps.apple.com/app/id1530393349" +
+    "https://apps.apple.com/us/app/budget-for-nomads/id6446042796" +
     "\nNachdem du die App installiert hast, schließe dich hier unserer Reise an:\n",
   noTrip: "Reise nicht gefunden!",
   tryAgain: "Bitte versuche es später erneut!",
@@ -909,7 +915,15 @@ const fr = {
 
   // Invite Screen
   inviteMessage:
-    "Salut ! J'utilise Budget For Nomads pour planifier mon prochain voyage et je voulais t'inviter à me rejoindre. Avant de cliquer sur le lien ci-dessous, assure-toi d'avoir installé l'application. Une fois que c'est fait, il te suffit de cliquer sur le lien et de rejoindre notre voyage. Faisons de ce voyage inoubliable ensemble !",
+    "Salut !\n" +
+    "Connais-tu déjà Budget for Nomads ?\n" +
+    "Cette application facilite grandement le suivi de toutes les dépenses lors de voyages et des dettes mutuelles.\n" +
+    "Pour notre prochain voyage, je souhaite également t'inviter à utiliser l'application !" +
+    " Suivons ensemble nos dépenses et voyageons en toute tranquillité.\n" +
+    "Télécharge l'application gratuitement ici :\n" +
+    "https://apps.apple.com/us/app/budget-for-nomads/id6446042796" +
+    "\nAprès avoir installé l'application, rejoins notre voyage ici :\n",
+
   noTrip: "Impossible de trouver le voyage !",
   tryAgain: "Veuillez réessayer ultérieurement.",
 
@@ -1287,7 +1301,15 @@ const ru = {
 
   // Invite Screen
   inviteMessage:
-    "Привет! Я использую Budget For Nomads для планирования моей следующей поездки и хотел пригласить вас присоединиться ко мне. Прежде чем нажать на ссылку ниже, убедитесь, что установили приложение. Как только закончите, просто нажмите ссылку и присоединяйтесь к нашей поездке. Давайте вместе сделаем эту поездку незабываемой!",
+    "Привет!\n" +
+    "Ты уже знаком с Budget for Nomads?\n" +
+    "Это приложение позволяет легко отслеживать все расходы во время путешествий и взаимные долги.\n" +
+    "Для нашей предстоящей поездки я также хочу пригласить тебя в это приложение!" +
+    " Давай отслеживать наши расходы вместе и путешествовать беззаботно.\n" +
+    "Скачай приложение бесплатно здесь:\n" +
+    "https://apps.apple.com/us/app/budget-for-nomads/id6446042796" +
+    "\nПосле установки приложения, присоединяйся к нашей поездке здесь:\n",
+
   noTrip: "Не удалось найти поездку!",
   tryAgain: "Пожалуйста, попробуйте еще раз позже.",
 

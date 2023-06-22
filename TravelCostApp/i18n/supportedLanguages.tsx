@@ -605,7 +605,7 @@ const de = {
   tourGuideLabelFinish: "Fertig",
   countryLabel: "Land",
   askChatGptPost: "Frage ChatGPT: War das ein gutes Angebot?",
-  askChatGptPre: "Frage ChatGPT: Wäre das ein gutes Angebot?",
+  askChatGptPre: "Frage ChatGPT: Ist das ein gutes Angebot?",
   askChatGptTitle: "Frage ChatGPT",
   askingChatGpt: "Frage ChatGPT nach einem guten Angebot...",
   day: "Tag",

@@ -602,7 +602,7 @@ const de = {
   tourGuideLabelPrevious: "Zurück",
   tourGuideLabelNext: "Weiter",
   tourGuideLabelSkip: "Überspringen",
-  tourGuideLabelFinish: "Fertigstellen",
+  tourGuideLabelFinish: "Fertig",
   countryLabel: "Land",
   askChatGptPost: "Frage ChatGPT: War das ein gutes Angebot?",
   askChatGptPre: "Frage ChatGPT: Wäre das ein gutes Angebot?",

@@ -97,21 +97,21 @@ const en = {
 
   // Walkthrough Texts
   walk1:
-    "Welcome to Budget for Nomads! 🎉 We're excited to have you join us on your finance travel journey!",
+    "Welcome to Budget for Nomads! 🎉 \n\nWe are excited to support you on your journey.",
   walk2:
-    "Let's get started by adding your expenses. 🛍️ Just tap the '+' button and enter your expense details. Go ahead and give it a try now!",
+    "Get started by adding your expenses. 🛍️ \n\nTap on the '+' symbol and enter as many details as you want. Give it a try now!",
   walk3:
-    "Keep track of your budget on a daily or monthly basis. 📊 Use the button to switch between time periods and stay on top of your spending! 🤑",
+    "Keep an eye on your budget daily or monthly. 📊 \n\nPress the downward arrow to switch between the options. \n\nTo find out how much money you have left, tap on the number in the top right corner.",
   walk4:
-    "View your expenses by category or daily overview. 📈 Use the toggle to switch between the two and get a detailed view of your finances! 🤑",
+    "View your expenses by category or daily overview. 📈 \n\nUse the toggle switch to switch between the two options.",
   walk5:
-    "Ready for your next adventure? 🌎 Create a new trip and start budgeting for your travels! 🧳",
+    "Are you already planning your next adventure? 🌎\n\nYou can create a new trip here.",
   walk6:
-    "View all your trips and keep track of your current one. 🗺️ Your active trip will be highlighted in green. 🟢",
+    "View your trips. 🗺️ \n\nYour active trip will be highlighted in green.",
   walk7:
-    "Bring a friend along on your travels! 👫 Invite a fellow nomad to your active trip and budget together. 💸",
+    "Bring friends and family on your travels! 👫\n\nInvite another nomad to join your active trip and share your expenses.",
   walk8:
-    "Enjoy your journey with Budget for Nomads! 🎉 We're here to help you stay on budget while you explore the world. 🌍",
+    "Now you're ready to go. 🚀 \n\nEnjoy your journey and keep an eye on your budget as you explore the world.",
 
   // Tabbar labels
   expensesTab: "Expenses",
@@ -185,7 +185,10 @@ const en = {
     "Share and track travel expenses with friends and family and see who owes whom how much.",
   onb3: "Achieve your financial goals",
   onb3t:
-    "Take control of your expenses and see how much money you still have available on your journey.",
+    "Take control of your expenses and see how much money you have left for your journey.",
+  onbskip: "Skip",
+  onbcontinue: "Continue",
+  onbprevious: "Back",
   // Filtered expenses
   noExpensesText: "No expenses -",
   duplicateExpensesText: " - duplicate expenses",
@@ -462,21 +465,21 @@ const de = {
 
   // Walkthrough Texts
   walk1:
-    "Herzlich Willkommen bei Budget for Nomads! 🎉 Wir freuen uns, dass du uns auf deiner Finanzreise begleitest!",
+    "Herzlich Willkommen bei Budget for Nomads! 🎉 \n\nWir freuen uns, dass wir dich auf deiner Reise unterstützen dürfen.",
   walk2:
-    "Tippe einfach auf das '+' Symbol und gib deine Ausgabendetails ein. Probiere es jetzt einfach aus!",
+    "Leg los indem du deine Ausgaben hinzufügst. 🛍️ \n\nTippe auf das '+' Symbol und gib so viele Details ein, wie du möchtest. Probiere es jetzt einfach aus!",
   walk3:
-    "Behalte dein Budget täglich oder monatlich im Auge. 📊 Verwende den Schalter, um zwischen den Optionen zu wechseln und behalte deine Ausgaben im Blick! 🤑",
+    "Behalte dein Budget täglich oder monatlich im Auge. 📊 \n\nDrücke auf den Pfeil nach unten, um zwischen den Optionen zu wechseln. \n\nUm zu erfahren, wie viel Geld du noch zur verfügung hast, drücke auf die Zahl rechts oben.",
   walk4:
-    "Schau dir deine Ausgaben nach Kategorie oder täglichem Überblick an. 📈 Verwende den Schalter, um zwischen den beiden Optionen zu wechseln und erhalte eine detaillierte Ansicht deiner Finanzen! 🤑",
+    "Schau dir deine Ausgaben nach Kategorie oder täglichem Überblick an. 📈 \n\nVerwende den Schalter, um zwischen den beiden Optionen zu wechseln.",
   walk5:
-    "Bereit für dein nächstes Abenteuer? 🌎 Erstelle eine neue Reise und beginne mit der Budgetierung für deine Reisen! 🧳",
+    "Du planst bereits dein nächstes Abenteuer? 🌎\n\nHier kannst du eine neue Reise erstellen.",
   walk6:
-    "Sieh dir alle deine Reisen an und behalte deine aktuelle im Blick. 🗺️ Deine aktive Reise wird grün hervorgehoben. 🟢",
+    "Sieh dir deine Reisen an.🗺️ \n\nDeine aktive Reise wird grün hervorgehoben.",
   walk7:
-    "Nimm einen Freund auf deine Reisen mit! 👫 Lade einen anderen Nomaden zu deiner aktiven Reise ein und budgetiert gemeinsam. 💸",
+    "Nimm Freunde und Familie auf deine Reisen mit! 👫\n\nLade einen anderen Nomaden zu deiner aktiven Reise ein und teilt eure Ausgaben.",
   walk8:
-    "Genieße deine Reise mit Budget for Nomads! 🎉 Wir sind hier, um dir zu helfen, dein Budget im Blick zu behalten, während du die Welt erkundest. 🌍",
+    "Jetzt bist du startklar. 🚀 \n\nGenieße deine Reise und behalte dein Budget im Blick während du die Welt erkundest.",
 
   // Tabbar labels
   expensesTab: "Ausgaben",
@@ -551,6 +554,9 @@ const de = {
   onb3: "Erreiche deine finanziellen Ziele",
   onb3t:
     "Übernimm die Kontrolle über deine Ausgaben und schau nach, wie viel Geld du noch auf deiner Reise zur Verfügung hast.",
+  onbskip: "Überspringen",
+  onbcontinue: "Weiter",
+  onbprevious: "Zurück",
 
   // Filtered expenses
   noExpensesText: "Keine Ausgaben -",
@@ -843,22 +849,21 @@ const fr = {
 
   // Walkthrough Texts
   walk1:
-    "Bienvenue sur Budget For Nomads! 🎉 Nous sommes ravis de vous accompagner dans votre parcours financier de voyage!",
+    "Bienvenue sur Budget for Nomads ! 🎉 \n\nNous sommes ravis de pouvoir vous aider pendant votre voyage.",
   walk2:
-    "Commençons par ajouter vos dépenses. 🛍️ Il suffit de cliquer sur le bouton '+' et de saisir les détails de votre dépense. Essayez dès maintenant!",
+    "Commencez par ajouter vos dépenses. 🛍️ \n\nAppuyez sur le symbole '+' et saisissez autant de détails que vous le souhaitez. Essayez maintenant !",
   walk3:
-    "Suivez votre budget quotidiennement ou mensuellement. 📊 Utilisez le bouton pour changer de période et restez au top de vos dépenses! 🤑",
+    "Surveillez votre budget quotidiennement ou mensuellement. 📊 \n\nAppuyez sur la flèche vers le bas pour basculer entre les options. \n\nPour connaître le montant d'argent qu'il vous reste, appuyez sur le chiffre en haut à droite.",
   walk4:
-    "Consultez vos dépenses par catégorie ou par vue d'ensemble quotidienne. 📈 Utilisez le bouton pour basculer entre les deux et obtenir une vue détaillée de vos finances! 🤑",
+    "Consultez vos dépenses par catégorie ou vue quotidienne. 📈 \n\nUtilisez le commutateur pour basculer entre les deux options.",
   walk5:
-    "Prêt pour votre prochaine aventure? 🌎 Créez un nouveau voyage et commencez à budgétiser pour vos voyages! 🧳",
+    "Vous planifiez déjà votre prochaine aventure ? 🌎\n\nVous pouvez créer un nouveau voyage ici.",
   walk6:
-    "Consultez tous vos voyages et suivez votre voyage actif. 🗺️ Votre voyage actif sera mis en évidence en vert. 🟢",
+    "Consultez vos voyages.🗺️ \n\nVotre voyage actif sera mis en évidence en vert.",
   walk7:
-    "Invitez un ami à vous accompagner dans vos voyages! 👫 Invitez un autre nomade à rejoindre votre voyage actif et budgétisez ensemble. 💸",
+    "Invitez des amis et votre famille à vous accompagner lors de vos voyages ! 👫\n\nInvitez un autre nomade à rejoindre votre voyage actif et partagez vos dépenses.",
   walk8:
-    "Profitez de votre voyage avec Budget For Nomads! 🎉 Nous sommes là pour vous aider à rester dans votre budget tout en explorant le monde. 🌍",
-
+    "Vous êtes prêt à partir maintenant. 🚀 \n\nProfitez de votre voyage et surveillez votre budget pendant que vous explorez le monde.",
   // Tabbar labels
   expensesTab: "Dépenses",
   overviewTab: "Vue d'ensemble",
@@ -927,15 +932,18 @@ const fr = {
   signupGoogleText: "S'inscrire avec Google",
 
   //Onboarding Screens
-  onb1: "Bienvenue chez Budget for Nomads",
+  onb1: "Bienvenue sur Budget for Nomads",
   onb1t:
     "Explorez le monde sans stress financier et commencez dès maintenant à suivre rapidement vos dépenses de voyage.",
-  onb2: "Simplifiez les paiements de groupe en voyage",
+  onb2: "Simplifiez les paiements en groupe pendant les voyages",
   onb2t:
     "Partagez et suivez les dépenses de voyage avec vos amis et votre famille, et vérifiez qui doit combien à qui.",
   onb3: "Atteignez vos objectifs financiers",
   onb3t:
-    "Prenez le contrôle de vos dépenses et consultez combien d'argent il vous reste pour votre voyage.",
+    "Prenez le contrôle de vos dépenses et consultez le montant d'argent qu'il vous reste disponible pour votre voyage.",
+  onbskip: "Passer",
+  onbcontinue: "Continuer",
+  onbprevious: "Précédent",
   // Filtered expenses
   noExpensesText: "Aucune dépense -",
 
@@ -1220,21 +1228,21 @@ const ru = {
 
   // Walkthrough Texts
   walk1:
-    "Добро пожаловать в Budget for Nomads! 🎉 Мы рады приветствовать вас в вашем финансовом путешествии!",
+    "Добро пожаловать в Budget for Nomads! 🎉 \n\nМы рады поддерживать вас в вашем путешествии.",
   walk2:
-    "Начните с добавления своих расходов. 🛍️ Просто нажмите кнопку '+' и введите детали вашего расхода. Давайте попробуем сейчас!",
+    "Начните, добавляя свои расходы. 🛍️ \n\nНажмите на символ '+', и введите все необходимые детали. Просто попробуйте сейчас!",
   walk3:
-    "Отслеживайте свой бюджет ежедневно или ежемесячно. 📊 Используйте кнопку для переключения между временными периодами и следите за своими расходами! 🤑",
+    "Следите за своим бюджетом ежедневно или ежемесячно. 📊 \n\nНажмите стрелку вниз, чтобы переключаться между опциями. \n\nЧтобы узнать, сколько денег у вас еще осталось, нажмите на число в правом верхнем углу.",
   walk4:
-    "Просматривайте свои расходы по категориям или общему обзору за день. 📈 Используйте переключатель, чтобы переключаться между ними и получить подробный вид своих финансов! 🤑",
+    "Просмотрите свои расходы по категориям или в ежедневном обзоре. 📈 \n\nИспользуйте переключатель для переключения между этими двумя опциями.",
   walk5:
-    "Готовы к следующему приключению? 🌎 Создайте новую поездку и начните планировать бюджет для своих путешествий! 🧳",
+    "Уже планируете свое следующее приключение? 🌎\n\nЗдесь вы можете создать новое путешествие.",
   walk6:
-    "Просмотрите все свои поездки и отслеживайте активную. 🗺️ Ваша активная поездка будет выделена зеленым цветом. 🟢",
+    "Посмотрите свои путешествия.🗺️ \n\nВаше активное путешествие будет выделено зеленым цветом.",
   walk7:
-    "Пригласите друга в свои путешествия! 👫 Пригласите другого путешественника в вашу активную поездку и планируйте бюджет вместе. 💸",
+    "Пригласите друзей и семью в свои путешествия! 👫\n\nПригласите другого номада в ваше активное путешествие и разделите ваши расходы.",
   walk8:
-    "Наслаждайтесь путешествием с Budget for Nomads! 🎉 Мы здесь, чтобы помочь вам оставаться в рамках бюджета, пока вы исследуете мир. 🌍",
+    "Теперь вы готовы к старту. 🚀 \n\nНаслаждайтесь путешествием и следите за своим бюджетом, пока исследуете мир.",
 
   // Tabbar labels
   expensesTab: "Расходы",
@@ -1305,13 +1313,16 @@ const ru = {
   // Onboarding Screens
   onb1: "Добро пожаловать в Budget for Nomads",
   onb1t:
-    "Исследуйте мир без финансового стресса и начните отслеживать свои расходы во время путешествия быстро и легко.",
-  onb2: "Упростите групповые платежи во время путешествий",
+    "Исследуйте мир без финансового стресса и начните быстро отслеживать свои расходы во время путешествия.",
+  onb2: "Упростите групповые платежи во время поездок",
   onb2t:
-    "Делитесь и отслеживайте расходы на путешествия с друзьями и семьей и узнайте, кто кому сколько должен.",
+    "Делитесь и отслеживайте расходы во время путешествия с друзьями и семьей и смотрите, кто кому сколько должен.",
   onb3: "Достигайте своих финансовых целей",
   onb3t:
-    "Займите контроль над своими расходами и узнайте, сколько денег у вас осталось на вашем путешествии.",
+    "Займите контроль над своими расходами и посмотрите, сколько денег у вас еще есть во время путешествия.",
+  onbskip: "Пропустить",
+  onbcontinue: "Продолжить",
+  onbprevious: "Назад",
   // Filtered expenses
   noExpensesText: "Нет расходов -",
   duplicateExpensesText: " - повторяющиеся расходы",

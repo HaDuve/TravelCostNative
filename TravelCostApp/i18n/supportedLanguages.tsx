@@ -169,25 +169,23 @@ const en = {
   loginText: "Login",
   createAccountText: "Create account",
   welcomeSigninText:
-    "Welcome back, sign in to continue using the Expense Tracker",
-  welcomeCreateAccountText:
-    "Enter your credentials here or signup easily via Google.",
+    "Welcome back, sign in to continue using Budget for Nomads",
+  welcomeCreateAccountText: "Enter your credentials here.",
   emailLabel: "Email Address",
   passwordLabel: "Password",
   signupComingSoonAlert: "Sign Up / Login with Google function coming soon... ",
   signupGoogleText: "Sign Up with Google",
 
   // Onboarding Screens
-  onb1: "Travel in Style on a Budget",
+  onb1: "Welcome to Budget for Nomads",
   onb1t:
-    "Maximize your travel budget without sacrificing comfort or experiences.",
-  onb2: "Simplify Group Travel Expenses",
+    "Explore the world without financial stress and start tracking your travel expenses quickly.",
+  onb2: "Simplify group payments while traveling",
   onb2t:
-    "Easily split and track travel costs with friends and family, and make the most of your budget.",
-  onb3: "Achieve Your Financial Goals",
+    "Share and track travel expenses with friends and family and see who owes whom how much.",
+  onb3: "Achieve your financial goals",
   onb3t:
-    "Take control of your finances and plan your dream trip with Budget for Nomads budgeting and tracking tools.",
-
+    "Take control of your expenses and see how much money you still have available on your journey.",
   // Filtered expenses
   noExpensesText: "No expenses -",
   duplicateExpensesText: " - duplicate expenses",
@@ -366,7 +364,7 @@ const de = {
   // standard strings
   signoutBtn: "Abmelden",
   signOutAlertTitle: "Abbrechen",
-  signOutAlertMess: "Sind Sie sicher, dass Sie sich abmelden wollen?",
+  signOutAlertMess: "Bist du sicher, dass du dich abmelden willst?",
   confirm: "Okay",
   confirm2: "Bestätigen",
   continue: "Weiter",
@@ -376,8 +374,8 @@ const de = {
   saveChanges: "Änderungen speichern",
   add: "Hinzufügen",
   update: "Aktualisieren",
-  sure: "Sind Sie sicher?",
-  sureExt: "Sind Sie sicher, dass Sie diese Ausgabe löschen wollen?",
+  sure: "Bist du sicher?",
+  sureExt: "Bist du sicher, dass du diese Ausgabe löschen willst?",
   resetBtn: "Passwort zurücksetzen",
   yes: "Ja",
   no: "Nein",
@@ -388,11 +386,11 @@ const de = {
   invitationText: "Ich habe eine Einladung von einem anderen Reisenden!",
   joinTrip: "Möchtest du der Reise beitreten",
   joinLink:
-    "Du kannst dein Einladungslink hier reinkopieren um der Reise beizutreten",
+    "Du kannst deinen Einladungslink hier reinkopieren um der Reise beizutreten.",
   join: "Beitreten",
   createFirstTrip: "Erste Reise erstellen",
   myTrips: "Meine Reisen",
-  chooseAction: "Bitte wählen Sie eine Aktion aus:",
+  chooseAction: "Bitte wähle eine Aktion aus:",
   inviteTravellers: "Andere Reisende einladen",
   setActiveTrip: "Als aktive Reise markieren",
   calcOpenSplits: "Berechne offene Schulden",
@@ -453,21 +451,20 @@ const de = {
   // Error Messages
   fetchError: "Konnte die Ausgaben nicht von der Datenbank abrufen! ",
   deleteError:
-    "Die Ausgabe konnte nicht gelöscht werden. Versuchen Sie es später noch einmal!",
+    "Die Ausgabe konnte nicht gelöscht werden. Versuche es später noch einmal!",
   profileError:
-    "Das Profil konnte nicht gespeichert werden. Versuchen Sie es später noch einmal!",
+    "Das Profil konnte nicht gespeichert werden. Versuche es später noch einmal!",
 
   fallbackTextExpenses:
     "Noch keine Ausgaben in diesem Zeitraum. Neue Ausgaben mit der Schaltfläche unten hinzufügen!",
-  fallbackTimeFrame:
-    "Bitte wählen Sie einen Zeitraum oben in der Dropdown-Leiste.",
+  fallbackTimeFrame: "Bitte wähle einen Zeitraum oben in der Dropdown-Leiste.",
   invalidInput: "Ungültige Eingabe - Bitte überprüfe die eingegebenen Daten!",
 
   // Walkthrough Texts
   walk1:
-    "Herzlich willkommen bei Budget for Nomads! 🎉 Wir freuen uns, dass du uns auf deiner Finanzreise begleitest!",
+    "Herzlich Willkommen bei Budget for Nomads! 🎉 Wir freuen uns, dass du uns auf deiner Finanzreise begleitest!",
   walk2:
-    "Lass uns loslegen, indem du deine Ausgaben hinzufügst. 🛍️ Tippe einfach auf das '+' Symbol und gib deine Ausgabendetails ein. Probiere es jetzt einfach aus!",
+    "Tippe einfach auf das '+' Symbol und gib deine Ausgabendetails ein. Probiere es jetzt einfach aus!",
   walk3:
     "Behalte dein Budget täglich oder monatlich im Auge. 📊 Verwende den Schalter, um zwischen den Optionen zu wechseln und behalte deine Ausgaben im Blick! 🤑",
   walk4:
@@ -522,39 +519,38 @@ const de = {
   // Login and Signup Screen
   noConnection: "Keine Internetverbindung",
   checkConnectionError:
-    "Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut",
+    "Bitte überprüfe deine Internetverbindung und versuche es erneut",
   exceptionError: "Außergewöhnlicher Fehler",
   authError: "Authentifizierung fehlgeschlagen!",
   createErrorText:
-    "Benutzer konnte nicht erstellt werden, bitte überprüfen Sie Ihre Eingabe und versuchen Sie es später erneut.",
+    "Benutzer konnte nicht erstellt werden, bitte überprüfe deine Eingabe und versuche es später erneut.",
   authErrorText:
-    "Anmeldung fehlgeschlagen. Falsches Passwort oder Benutzername? Bitte versuchen Sie es später erneut.",
+    "Anmeldung fehlgeschlagen. Falsches Passwort oder Benutzername? Bitte versuche es später erneut.",
   loginLoadText: "Benutzer anmelden...",
   createUserLoadText: "Benutzer erstellen...",
-  noAccountText: "Sie haben noch kein Konto?",
-  alreadyAccountText: "Haben Sie bereits ein Konto?",
+  noAccountText: "Du hast noch kein Konto?",
+  alreadyAccountText: "Hast du bereits ein Konto?",
   createNewUser: "Neuen Benutzer erstellen",
   loginInstead: "Stattdessen anmelden",
   loginText: "Anmelden",
   createAccountText: "Konto erstellen",
   welcomeSigninText:
-    "Willkommen zurück, melden Sie sich an, um die Expense Tracker weiter zu nutzen",
-  welcomeCreateAccountText:
-    "Geben Sie hier Ihre Anmeldeinformationen ein oder melden Sie sich einfach über Google an.",
+    "Willkommen zurück, melde dich an, um Budget for Nomads weiter zu nutzen",
+  welcomeCreateAccountText: "Gib hier deine Anmeldeinformationen ein.",
   emailLabel: "E-Mail-Adresse",
   passwordLabel: "Passwort",
   signupComingSoonAlert:
     "Anmelden / Einloggen mit Google Funktion kommt bald... ",
   signupGoogleText: "Mit Google anmelden",
-  onb1: "Reisen Sie stilvoll mit kleinem Budget",
+  onb1: "Willkommen bei Budget for Nomads",
   onb1t:
-    "Maximieren Sie Ihr Reisebudget, ohne auf Komfort oder Erlebnisse zu verzichten.",
-  onb2: "Vereinfachen Sie die Gruppenreisekosten",
+    "Erkunde die Welt ohne finanziellen Stress und beginne jetzt blitzschnell deine Reisekosten zu tracken.",
+  onb2: "Vereinfache Gruppenzahlungen auf Reisen",
   onb2t:
-    "Teilen und verfolgen Sie Reisekosten mit Freunden und Familie einfach und machen Sie das Beste aus Ihrem Budget.",
-  onb3: "Erreichen Sie Ihre finanziellen Ziele",
+    "Teile und verfolge Reisekosten mit Freunden und Familie auf  und schau nach, wer wem wie viel schuldet.",
+  onb3: "Erreiche deine finanziellen Ziele",
   onb3t:
-    "Übernehmen Sie die Kontrolle über Ihre Finanzen und planen Sie Ihre Traumreise mit Budget for Nomads Budgetierung und Tracking-Tools.",
+    "Übernimm die Kontrolle über deine Ausgaben und schau nach, wie viel Geld du noch auf deiner Reise zur Verfügung hast.",
 
   // Filtered expenses
   noExpensesText: "Keine Ausgaben -",
@@ -564,7 +560,7 @@ const de = {
   // duplOrSplitUp
   rangedDatesTitle: "Langfristige Ausgaben",
   rangedDatesText:
-    "Möchten Sie die Kosten über mehrere Tage vervielfachen oder aufsplitten?",
+    "Möchtest du die Kosten über mehrere Tage vervielfachen oder aufsplitten?",
   duplicateExpenses: "Vervielfachen",
   splitUpExpenses: "Aufsplitten",
 
@@ -602,9 +598,9 @@ const de = {
   tourGuideLabelSkip: "Überspringen",
   tourGuideLabelFinish: "Fertigstellen",
   countryLabel: "Land",
-  askChatGptPost: "Fragen Sie ChatGPT: War das ein gutes Angebot?",
-  askChatGptPre: "Fragen Sie ChatGPT: Wäre das ein gutes Angebot?",
-  askChatGptTitle: "Fragen Sie ChatGPT",
+  askChatGptPost: "Frage ChatGPT: War das ein gutes Angebot?",
+  askChatGptPre: "Frage ChatGPT: Wäre das ein gutes Angebot?",
+  askChatGptTitle: "Frage ChatGPT",
   askingChatGpt: "Frage ChatGPT nach einem guten Angebot...",
   day: "Tag",
   week: "Woche",
@@ -613,12 +609,12 @@ const de = {
   total: "Gesamt",
   budget: "Budget",
   noTotalBudget: "Kein Gesamtbudget!",
-  infinityLeftToSpend: "Sie haben ∞ übrig zum Ausgeben!",
-  youHaveXLeftToSpend1: "Sie haben noch ",
+  infinityLeftToSpend: "Du hast ∞ übrig zum Ausgeben!",
+  youHaveXLeftToSpend1: "Du hast noch ",
   youHaveXLeftToSpend2: " übrig zum Ausgeben!",
   underBudget: "Unter dem Budget um",
   overBudget: "Über dem Budget um",
-  exceededBudgetByX1: "Sie haben Ihr Budget um ",
+  exceededBudgetByX1: "Über dem Budget um ",
   slowConnection: "Langsame Verbindung",
   megaBytePerSecond: "Mbps",
   offlineMode: "Offline-Modus",
@@ -630,16 +626,16 @@ const de = {
   expenses: "Ausgaben",
   welcomeToBudgetForNomads: "Willkommen bei Budget for Nomads",
   pleaseCreateTrip:
-    "Bitte erstellen oder treten Sie einer Reise bei, um zu beginnen!",
+    "Bitte erstelle oder trete einer Reise bei, um zu beginnen!",
   finderTitle: "Finder",
   search: "Suche",
   finding: "Suche",
   showXResults1: "Zeige",
   showXResults2: "Ergebnisse",
   noResults: "Keine Ergebnisse",
-  splitSummaryTitle: "Aufteilungszusammenfassung",
-  yourMoneyBack: "Ihr Geld zurück",
-  youStillOwe: "Sie schulden noch",
+  splitSummaryTitle: "Aufteilungen",
+  yourMoneyBack: "Dein Geld zurück",
+  youStillOwe: "Du schuldest noch",
   error: "Fehler",
   errorSplits: "Aufteilungen konnten nicht abgerufen werden!",
   alertNoSplits: "Keine Aufteilungen zum Vereinfachen",
@@ -649,51 +645,51 @@ const de = {
   settleSplits: "Aufteilungen begleichen",
   confirmSettle: "Begleichen",
   sureSettleSplits:
-    "Sind Sie sicher, dass Sie alle Aufteilungen begleichen möchten? Hat jeder sein Geld zurückerhalten?",
+    "Sind Sie sicher, dass Sie alle Schulden begleichen möchten? Hat jeder sein Geld zurückbekommen?",
   sureDeleteAccount:
-    "Dies löscht Ihren Budget for Nomads Account unwiderruflich!",
+    "Dies löscht deinen Budget for Nomads Account unwiderruflich!",
   premiumNomad: "Premium-Nomade",
-  premiumNomadActiveNow: "Sie sind jetzt ein Premium-Nomade!",
-  youArePremium: "Sie sind ein Premium-Nomade!",
-  becomePremium: "Werden Sie ein Premium-Nomade!",
-  premiumNomadInactive: "Sie sind noch kein Premium-Nomade!",
+  premiumNomadActiveNow: "Du bist jetzt ein Premium-Nomade!",
+  youArePremium: "Du bist ein Premium-Nomade!",
+  becomePremium: "Werde ein Premium-Nomade!",
+  premiumNomadInactive: "Du bist noch kein Premium-Nomade!",
   premiumNomadError:
-    "Etwas ist schiefgegangen. Premium-Nomade konnte nicht aktiviert werden!",
+    "Etwas ist schiefgegangen. Premium konnte nicht aktiviert werden!",
   settingsTitle: "Einstellungen",
   restorePurchases: "Käufe wiederherstellen",
   deleteAccount: "Account löschen",
   settingsSkipCat: "Kategorieauswahl überspringen",
-  settingsShowAdvanced: "Immer mehr Optionen anzeigen",
+  settingsShowAdvanced: "Immer Optionen anzeigen",
   settingsShowFlags: "Länderflaggen anzeigen",
   settingsShowInternetSpeed: "Internetgeschwindigkeit anzeigen",
-  settingsShowTravellerIcon: "Reisendensymbole anzeigen",
+  settingsShowTravellerIcon: "Reisende-Symbole anzeigen",
   // new Stuff part 2
-  newCatNamePlaceholder: "Geben Sie den Namen der neuen Kategorie ein...",
+  newCatNamePlaceholder: "Gib den Namen der neuen Kategorie ein...",
   reset: "Zurücksetzen",
   sureResetCategories:
-    "Sind Sie sicher, dass Sie Ihre Kategorien zurücksetzen möchten?",
+    "Bist du sicher, dass du die Kategorien zurücksetzen möchten?",
   infoNewCatTitle: "Neue Kategorie Info",
   infoNewCatText:
-    "Geben Sie einen Namen für Ihre Kategorie ein und drücken Sie dann das Symbol für Ihre neue Kategorie." +
-    "\n\n Bestätigen Sie Ihre neue Kategorie mit der Schaltfläche <Hinzufügen>.",
+    "Gib einen Namen für deine Kategorie ein und drücke dann auf das Symbol für deine neue Kategorie." +
+    "\n\n Bestätige deine neue Kategorie mit der Schaltfläche <Hinzufügen>.",
   infoHomeCurrencyTitle: "Heimatwährung Info",
   infoHomeCurrencyText:
-    "Richten Sie hier Ihre Heimatwährung ein (z. B. die Währung des Landes, in dem Sie leben)." +
-    "\n\n Das Land wird nicht gespeichert und dient nur zur Ermittlung Ihrer Währung." +
-    "\n\n Diese Währung wird in der App angezeigt, und alle anderen Währungen, die Sie auf Ihrer Reise verwenden, werden in diese Währung umgerechnet.",
+    "Richte hier deine Heimatwährung ein, also die Währung des Landes, in dem du üblicherweise zuhause bist." +
+    "\n\n Das Land wird nicht gespeichert und dient nur zur Ermittlung deiner Währung." +
+    "\n\n Die Heimatwährung wird in Übersichten angezeigt, und alle anderen Währungen, die du auf dieser Reise verwendest, werden in die Heimatwährung umgerechnet.",
   infoTotalBudgetTitle: "Gesamtbudget Info",
   infoTotalBudgetText:
-    "Richten Sie hier Ihr Gesamtbudget ein (z. B. den Geldbetrag für die gesamte Reise)." +
-    "\n\n Sie können auf die Schaltfläche Berechnen drücken, um das Gesamtbudget aus dem Tagesbudget * Reiseanfangs- und Reiseenddatum automatisch berechnen zu lassen." +
+    "Richte hier dein Gesamtbudget ein (z. B. den Geldbetrag für die gesamte Reise)." +
+    "\n\n Du kannst auf die Schaltfläche rechts drücken, um das Gesamtbudget aus dem Tagesbudget * Reiseanfangs- und Reiseenddatum automatisch berechnen zu lassen." +
     "\n\n Das Gesamtbudget ist optional.",
   infoDailyBudgetTitle: "Tagesbudget Info",
   infoDailyBudgetText:
-    "Richten Sie hier Ihr Tagesbudget ein (z. B. den durchschnittlichen Geldbetrag, den Sie pro Tag ausgeben möchten)." +
-    "Wenn Sie nicht genau wissen, wie viel Sie ausgeben möchten, geben Sie einfach eine Schätzung ein." +
-    "\n\n Sie können auf die Schaltfläche Berechnen drücken, um das Tagesbudget aus dem Gesamtbudget / Reiseanfangs- und Reiseenddatum automatisch berechnen zu lassen.",
+    "Richte hier dein Tagesbudget ein (z. B. den durchschnittlichen Geldbetrag, den du pro Tag ausgeben möchten)." +
+    "Wenn du nicht genau weisst, wie viel du ausgeben möchtest, gib einfach eine Schätzung ein." +
+    "\n\n Du kannst auf die Schaltfläche rechts drücken, um das Tagesbudget aus dem Gesamtbudget / Reiseanfangs- und Reiseenddatum automatisch berechnen zu lassen.",
   infoTripDatesTitle: "Trip-Start und Enddaten",
   infoTripDatesText:
-    "Legen Sie hier das Start- und Enddatum Ihrer Reise fest (z. B. die Daten Ihrer Reise).\n\n Der Start und das Ende der Reise sind optional.",
+    "Lege hier das Start- und Enddatum deiner Reise fest (z. B. die Daten Ihrer Reise).\n\n Der Start und das Ende der Reise sind optional.",
   comingSoon: "Demnächst...",
   comingSoonRangedDates:
     "Das Ändern der Ausgaben mit einem Datumsbereich ist noch nicht möglich.",
@@ -701,47 +697,47 @@ const de = {
     "Das Ändern der Aufteilung von Ausgaben mit einem Datumsbereich ist noch nicht möglich.",
   sorry: "Entschuldigung!",
   sorrySplitList:
-    "Ich konnte eine gültige Aufteilung nicht berechnen. Bitte überprüfen Sie Ihre Eingabe.\n\n Sie können auch lange auf die Neuberechnen-Schaltfläche drücken, um alle Aufteilungen zurückzusetzen!",
+    "Ich konnte keine gültige Aufteilung berechnen. Bitte überprüfe deine Eingabe.\n\n Du kannst auch lange auf die Neuberechnen-Schaltfläche gedrückt halten, um alle Aufteilungen zurückzusetzen!",
   errorPurchasePackage: "Fehler beim Kauf des Pakets",
   errorPurchasePackageText:
-    "Bitte starten Sie die App neu oder versuchen Sie es später erneut.",
+    "Bitte starte die App neu oder versuche es später erneut.",
   errorGetOffers: "Fehler beim Abrufen von Angeboten",
   errorGetOffersText:
-    "Bitte starten Sie die App neu oder versuchen Sie es später erneut.",
+    "Bitte starte die App neu oder versuche es später erneut.",
   errorShareTrip: "Fehler beim Teilen der Reise",
   errorShareTripText:
-    "Bitte starten Sie die App neu oder versuchen Sie es später erneut.",
+    "Bitte starte die App neu oder versuche es später erneut.",
   inviteTraveller: "Andere Reisende einladen",
   toastLoginError1: "Anmeldefehler",
-  toastLoginError2: "Bitte melden Sie sich erneut an!",
+  toastLoginError2: "Bitte melde dich erneut an!",
   toastAccountError1: "Konto nicht gefunden",
-  toastAccountError2: "Bitte erstellen Sie zuerst ein neues Konto!",
+  toastAccountError2: "Bitte erstelle zuerst ein neues Konto!",
   toastEmailError1: "Keine E-Mail gefunden",
-  toastEmailError2: "Bitte versuchen Sie es erneut mit einer anderen Methode.",
+  toastEmailError2: "Bitte versuche es erneut mit einer anderen Methode.",
   toastAppleError1: "Apple-Anmeldefehler",
   toastAppleError2: "Benutzer hat den Anmeldevorgang abgebrochen",
   toastDeleting1: "Löschen",
-  toastDeleting2: "Bitte lassen Sie die App geöffnet...",
-  error2: "Bitte versuchen Sie es später erneut.",
+  toastDeleting2: "Bitte lasse die App geöffnet...",
+  error2: "Bitte versuche es später erneut.",
   toastSaving1: "Änderungen speichern",
-  toastSaving2: "Bitte lassen Sie die App geöffnet...",
+  toastSaving2: "Bitte lasse die App geöffnet...",
   toastPurchaseSuccess1: "Kauf erfolgreich",
-  toastPurchaseSuccess2: "Sie sind jetzt ein Premium-Nomadenmitglied",
+  toastPurchaseSuccess2: "Du bist jetzt ein Premium-Nomadenmitglied",
   toastPremiumFetchError: "Fehler beim Abrufen des Premium-Status",
   toastSavingError1: "Daten konnten nicht gespeichert werden",
   toastNameError1: "Kein Name gefunden",
   toastNameError2:
-    "Es könnte ein Problem mit dem Apple-Anmeldevorgang geben. Bitte versuchen Sie es erneut mit einer anderen Methode.",
+    "Es könnte ein Problem mit dem Apple-Anmeldevorgang geben. Bitte versuche es erneut mit einer anderen Methode.",
   toastAccDeleted1: "Konto gelöscht",
-  toastAccDeleted2: "Ihr Konto wurde erfolgreich gelöscht.",
+  toastAccDeleted2: "Dein Konto wurde erfolgreich gelöscht.",
   toastErrorDeleteExp:
-    "Ausgabe konnte nicht gelöscht werden, bitte versuchen Sie es erneut!",
+    "Ausgabe konnte nicht gelöscht werden, bitte versuche es erneut!",
   toastErrorUpdateExp:
-    "Ausgabe konnte nicht aktualisiert werden, bitte versuchen Sie es erneut!",
+    "Ausgabe konnte nicht aktualisiert werden, bitte versuche es erneut!",
   toastErrorStoreExp:
-    "Ausgabe konnte nicht gespeichert werden, bitte versuchen Sie es erneut!",
+    "Ausgabe konnte nicht gespeichert werden, bitte versuche es erneut!",
   toastSyncChanges1: "Synchronisiere Offline-Änderungen",
-  toastSyncChanges2: "Bitte lassen Sie die App geöffnet...",
+  toastSyncChanges2: "Bitte lasse die App geöffnet...",
   toastSyncFinished1: "Wieder online!",
   toastSyncFinished21: "Synchronisiert",
   toastSyncFinished22: "Offline-Änderungen!",
@@ -922,9 +918,8 @@ const fr = {
   loginText: "Se connecter",
   createAccountText: "Créer un compte",
   welcomeSigninText:
-    "Bienvenue, connectez-vous pour continuer à utiliser l'application de suivi des dépenses",
-  welcomeCreateAccountText:
-    "Entrez vos identifiants ici ou inscrivez-vous facilement via Google.",
+    "Bienvenue, connectez-vous pour continuer à utiliser Budget for Nomads",
+  welcomeCreateAccountText: "Entrez vos identifiants ici.",
   emailLabel: "Adresse e-mail",
   passwordLabel: "Mot de passe",
   signupComingSoonAlert:
@@ -932,16 +927,15 @@ const fr = {
   signupGoogleText: "S'inscrire avec Google",
 
   //Onboarding Screens
-  onb1: "Voyagez avec style avec un petit budget",
+  onb1: "Bienvenue chez Budget for Nomads",
   onb1t:
-    "Optimisez votre budget de voyage sans sacrifier le confort ou les expériences.",
-  onb2: "Simplifiez les dépenses de voyage en groupe",
+    "Explorez le monde sans stress financier et commencez dès maintenant à suivre rapidement vos dépenses de voyage.",
+  onb2: "Simplifiez les paiements de groupe en voyage",
   onb2t:
-    "Répartissez et suivez facilement les coûts de voyage avec des amis et de la famille, et tirez le meilleur parti de votre budget.",
+    "Partagez et suivez les dépenses de voyage avec vos amis et votre famille, et vérifiez qui doit combien à qui.",
   onb3: "Atteignez vos objectifs financiers",
   onb3t:
-    "Prenez le contrôle de vos finances et planifiez votre voyage de rêve avec les outils de budgétisation et de suivi de Budget for Nomads.",
-
+    "Prenez le contrôle de vos dépenses et consultez combien d'argent il vous reste pour votre voyage.",
   // Filtered expenses
   noExpensesText: "Aucune dépense -",
 
@@ -1309,16 +1303,15 @@ const ru = {
   signupGoogleText: "Зарегистрироваться с помощью Google",
 
   // Onboarding Screens
-  onb1: "Путешествуйте стильно с ограниченным бюджетом",
+  onb1: "Добро пожаловать в Budget for Nomads",
   onb1t:
-    "Максимизируйте свой бюджет для путешествий, не жертвуя комфортом и впечатлениями.",
-  onb2: "Упрощение расходов в групповых поездках",
+    "Исследуйте мир без финансового стресса и начните отслеживать свои расходы во время путешествия быстро и легко.",
+  onb2: "Упростите групповые платежи во время путешествий",
   onb2t:
-    "Легко разделите и отслеживайте расходы на путешествия с друзьями и семьей, чтобы максимально использовать свой бюджет.",
-  onb3: "Достигайте финансовых целей",
+    "Делитесь и отслеживайте расходы на путешествия с друзьями и семьей и узнайте, кто кому сколько должен.",
+  onb3: "Достигайте своих финансовых целей",
   onb3t:
-    "Управляйте своими финансами и планируйте свою мечту поездки с помощью инструментов для бюджетирования и отслеживания Budget for Nomads.",
-
+    "Займите контроль над своими расходами и узнайте, сколько денег у вас осталось на вашем путешествии.",
   // Filtered expenses
   noExpensesText: "Нет расходов -",
   duplicateExpensesText: " - повторяющиеся расходы",

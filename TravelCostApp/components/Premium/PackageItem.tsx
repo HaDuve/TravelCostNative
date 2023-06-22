@@ -2,6 +2,16 @@ import React from "react";
 import { View, Text, Pressable, Alert, StyleSheet } from "react-native";
 import Purchases from "react-native-purchases";
 import { ENTITLEMENT_ID } from "../Premium/PremiumConstants";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
 import Toast from "react-native-toast-message";
@@ -38,15 +48,15 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
         navigation.pop();
         Toast.show({
           type: "success",
-          text1: "Purchase successful",
-          text2: "You are now a premium Nomad member",
+          text1: i18n.t("toastPurchaseSuccess1"),
+          text2: i18n.t("toastPurchaseSuccess2"),
         });
       }
     } catch (e) {
       if (!e.userCancelled) {
         Alert.alert(
-          "Error purchasing package",
-          e.message + " Please restart the app and try again."
+          i18n.t("errorPurchasePackage"),
+          i18n.t("errorPurchasePackageText")
         );
       }
     } finally {

@@ -374,31 +374,20 @@ const TripForm = ({ navigation, route }) => {
     let contentText = "";
     switch (infoEnu) {
       case infoEnum.homeCurrency:
-        titleText = "Home Currency Info"; //i18n.t("currencyInfoTitle");
-        contentText =
-          "Setup your home currency here (e.g. the currency from the country in which you live)." +
-          "\n\n The country will not be saved and is only helpful for finding your currency." +
-          "\n\n This currency will be presented in the app and all other currencies you use on your trip will be converted into this one."; //i18n.t("currencyInfoContent");
+        titleText = i18n.t("infoHomeCurrencyTitle");
+        contentText = i18n.t("infoHomeCurrencyText");
         break;
       case infoEnum.totalBudget:
-        titleText = "Total Budget Info";
-        contentText =
-          "Setup your total budget here (e.g. the amount of money for the entire trip)." +
-          "\n\n You can press the calculate button to auto-calculate the Total Budget from the Daily Budget * Trip Start and End Date." + //i18n.t("currencyInfoContent");
-          "\n\n The total Budget is optional.";
+        titleText = i18n.t("infoTotalBudgetTitle");
+        contentText = i18n.t("infoTotalBudgetText");
         break;
       case infoEnum.dailyBudget:
-        titleText = "Daily Budget Info";
-        contentText =
-          "Setup your Daily budget here (e.g. the average amount of money to spend per day)." +
-          "If you don't know how much exactly you want to spend, just write down an estimate." +
-          "\n\n You can press the calculate button to auto-calculate the Daily Budget from the Total Budget / Trip Start and End Date."; //i18n.t("currencyInfoContent");
+        titleText = i18n.t("infoDailyBudgetTitle");
+        contentText = i18n.t("infoDailyBudgetText");
         break;
       case infoEnum.datePicker:
-        titleText = "Trip Start and End Info";
-        contentText =
-          "Setup your Trip Start and End Date here (e.g. the dates of your trip)." +
-          "\n\n The trip start and end is optional.";
+        titleText = i18n.t("infoTripDatesTitle");
+        contentText = i18n.t("infoTripDatesText");
         break;
       default:
         break;
@@ -463,7 +452,7 @@ const TripForm = ({ navigation, route }) => {
         <Text style={styles.infoTitleText}>{infoTitleText}</Text>
         <Text style={styles.infoContentText}>{infoContentText}</Text>
         <FlatButton onPress={setInfoIsVisible.bind(this, false)}>
-          Okay
+          {i18n.t("confirm")}
         </FlatButton>
       </View>
     </Modal>

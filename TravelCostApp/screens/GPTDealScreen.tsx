@@ -3,6 +3,15 @@ import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import FlatButton from "../components/UI/FlatButton";
 import axios from "axios";
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import { chatGPT_getGoodDeal } from "../util/chatGPTrequest";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { GlobalStyles } from "../constants/styles";
@@ -42,16 +51,20 @@ const GPTDealScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.titleText}>Ask ChatGPT</Text>
+        <Text style={styles.titleText}>{i18n.t("askChatGptTitle")}</Text>
       </View>
       <View style={[styles.answerContainer, GlobalStyles.strongShadow]}>
         {isFetching && (
-          <LoadingBarOverlay customText="Asking ChatGPT for a good deal..."></LoadingBarOverlay>
+          <LoadingBarOverlay
+            customText={i18n.t("askingChatGpt")}
+          ></LoadingBarOverlay>
         )}
         {!isFetching && <Text style={[styles.answerText]}>{answer}</Text>}
       </View>
       <View style={styles.buttonContainer}>
-        <FlatButton onPress={() => navigation.pop()}>Back</FlatButton>
+        <FlatButton onPress={() => navigation.pop()}>
+          {i18n.t("back")}
+        </FlatButton>
       </View>
     </View>
   );

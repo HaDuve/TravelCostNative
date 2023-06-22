@@ -1,3 +1,4 @@
+import { simplifySplits } from "../util/split";
 const en = {
   // standard strings
   signoutBtn: "Sign out",
@@ -67,7 +68,6 @@ const en = {
   baseCurrency: "Home currency",
   descriptionLabel: "Description",
   dateLabel: "Date",
-  countryLabel: "Country",
 
   // Modal Titles
   editExp: "Edit Expense",
@@ -225,6 +225,142 @@ const en = {
   tourGuideLabelNext: "Next",
   tourGuideLabelSkip: "Skip",
   tourGuideLabelFinish: "Finish",
+  countryLabel: "Country",
+  askChatGptPost: "Ask ChatGPT: Was this a good deal?",
+  askChatGptPre: "Ask ChatGPT: Would this be a good deal?",
+  askChatGptTitle: "Ask ChatGPT",
+  askingChatGpt: "Asking ChatGPT for a good deal...",
+  day: "Day",
+  week: "Week",
+  month: "Month",
+  year: "Year",
+  total: "Total",
+  budget: "Budget",
+  noTotalBudget: "No Total Budget!",
+  infinityLeftToSpend: "You have ∞ left to spend!",
+  youHaveXLeftToSpend1: "You have ",
+  youHaveXLeftToSpend2: " left to spend!",
+  underBudget: "Under the budget by",
+  overBudget: "Over the budget by",
+  exceededBudgetByX1: "You exceeded your budget by ",
+  slowConnection: "Slow Connection",
+  megaBytePerSecond: "Mbps",
+  offlineMode: "Offline Mode",
+  notPaidLabel: "Not Paid Yet",
+  paidLabel: "Paid Back",
+  travellers: "Travellers",
+  countries: "Countries",
+  currencies: "Currencies",
+  expenses: "Expenses",
+  welcomeToBudgetForNomads: "Welcome to Budget for Nomads",
+  pleaseCreateTrip: "Please Create or Join a Trip to get started!",
+  finderTitle: "Finder",
+  search: "Search",
+  finding: "Finding",
+  showXResults1: "Show",
+  showXResults2: "Results",
+  noResults: "No Results",
+  splitSummaryTitle: "Split Summary",
+  yourMoneyBack: "Your money back",
+  youStillOwe: "You still owe",
+  error: "Error",
+  errorSplits: "Could not fetch splits!",
+  alertNoSplits: "No Splits to Simplify",
+  XowesYtoZ1: "owes",
+  XowesYtoZ2: "to",
+  simplifySplits: "Simplify Splits",
+  settleSplits: "Settle Splits",
+  confirmSettle: "Settle",
+  sureSettleSplits:
+    "Are you sure you want to settle all splits? Has everyone gotten their money back?",
+  sureDeleteAccount:
+    "This will unreversibly delete your Budget for Nomads Account!",
+  premiumNomad: "Premium Nomad",
+  premiumNomadActiveNow: "You are a premium Nomad now!",
+  youArePremium: "You are a Premium Nomad!",
+  becomePremium: "Become a Premium Nomad!",
+  premiumNomadInactive: "You are not a premium Nomad yet!",
+  premiumNomadError: "Something went wrong, could not activate premium nomad!",
+  settingsTitle: "Settings",
+  restorePurchases: "Restore Purchases",
+  deleteAccount: "Delete Account",
+  settingsSkipCat: "Skip Category Picker",
+  settingsShowAdvanced: "Always Show More Options",
+  settingsShowFlags: "Show Flag Icons",
+  settingsShowInternetSpeed: "Show Internet Speed",
+  settingsShowTravellerIcon: "Show Traveller Icons",
+  // new Stuff part 2
+  newCatNamePlaceholder: "Enter new category name ...",
+  reset: "Reset",
+  sureResetCategories: "Are you sure you want to reset your categories?",
+  infoNewCatTitle: "New Category Info",
+  infoNewCatText:
+    "Enter a name for your Category and then press the symbol for your new Category." +
+    "\n\n Confirm your new Category with the <Add> button.",
+  infoHomeCurrencyTitle: "Home Currency Info",
+  infoHomeCurrencyText:
+    "Setup your home currency here (e.g. the currency from the country in which you live)." +
+    "\n\n The country will not be saved and is only helpful for finding your currency." +
+    "\n\n This currency will be presented in the app and all other currencies you use on your trip will be converted into this one.",
+  infoTotalBudgetTitle: "Total Budget Info",
+  infoTotalBudgetText:
+    "Setup your total budget here (e.g. the amount of money for the entire trip)." +
+    "\n\n You can press the calculate button to auto-calculate the Total Budget from the Daily Budget * Trip Start and End Date." + //i18n.t("currencyInfoContent");
+    "\n\n The total Budget is optional.",
+  infoDailyBudgetTitle: "Daily Budget Info",
+  infoDailyBudgetText:
+    "Setup your Daily budget here (e.g. the average amount of money to spend per day)." +
+    "If you don't know how much exactly you want to spend, just write down an estimate." +
+    "\n\n You can press the calculate button to auto-calculate the Daily Budget from the Total Budget / Trip Start and End Date.",
+  infoTripDatesTitle: "Trip Start and End Info",
+  infoTripDatesText:
+    "Setup your Trip Start and End Date here (e.g. the dates of your trip)." +
+    "\n\n The trip start and end is optional.",
+  comingSoon: "Coming Soon...",
+  comingSoonRangedDates:
+    "Changing the dates of expenses with a range of dates is not yet possible.",
+  comingSoonDuplOrSplit:
+    "Changing the splitting of expenses with a range of dates is not yet possible.",
+  sorry: "Sorry!",
+  sorrySplitList:
+    "I could not calculate a valid split. Please check your input. \n\n You can also long-press the recalculate button to reset all splits!",
+  errorPurchasePackage: "Error purchasing package",
+  errorPurchasePackageText: "Please restart the app or try again later.",
+  errorGetOffers: "Error getting offers",
+  errorGetOffersText: "Please restart the app or try again later.",
+  errorShareTrip: "Error sharing the trip",
+  errorShareTripText: "Please restart the app or try again later.",
+  inviteTraveller: "Invite other Traveller",
+  toastLoginError1: "Login error",
+  toastLoginError2: "Please login again!",
+  toastAccountError1: "Account not found",
+  toastAccountError2: "Please create a new account first!",
+  toastEmailError1: "No email found",
+  toastEmailError2: "Please try again with a different method.",
+  toastAppleError1: "Apple Sign In Error",
+  toastAppleError2: "User canceled the sign-in flow",
+  toastDeleting1: "Deleting",
+  toastDeleting2: "Please leave the app open...",
+  error2: "Please try again later.",
+  toastSaving1: "Saving Changes",
+  toastSaving2: "Please leave the app open...",
+  toastPurchaseSuccess1: "Purchase successful",
+  toastPurchaseSuccess2: "You are now a Premium Nomad Member",
+  toastPremiumFetchError: "Error fetching premium status",
+  toastSavingError1: "Could not save data",
+  toastNameError1: "No Name found",
+  toastNameError2:
+    "There might be a problem with the apple signin process. Please try again with a different method.",
+  toastAccDeleted1: "Account Deleted",
+  toastAccDeleted2: "Your account has been deleted successfully.",
+  toastErrorDeleteExp: "Could not delete Expense, please try again!",
+  toastErrorUpdateExp: "Could not update Expense, please try again!",
+  toastErrorStoreExp: "Could not store Expense, please try again!",
+  toastSyncChanges1: "Synchronizing offline changes",
+  toastSyncChanges2: "Please leave the app open...",
+  toastSyncFinished1: "Online again!",
+  toastSyncFinished21: "Synchronized",
+  toastSyncFinished22: "offline Changes!",
 };
 const de = {
   // standard strings
@@ -458,6 +594,157 @@ const de = {
   emailInvalidInfoText: "Bitte gib eine gültige E-Mail-Adresse ein!",
   passwordInvalidInfoText:
     "Bitte gib ein Passwort mit mindestens 6 Zeichen ein!",
+
+  // new stuff
+  shareTripLabel: "Reise teilen",
+  tourGuideLabelPrevious: "Zurück",
+  tourGuideLabelNext: "Weiter",
+  tourGuideLabelSkip: "Überspringen",
+  tourGuideLabelFinish: "Fertigstellen",
+  countryLabel: "Land",
+  askChatGptPost: "Fragen Sie ChatGPT: War das ein gutes Angebot?",
+  askChatGptPre: "Fragen Sie ChatGPT: Wäre das ein gutes Angebot?",
+  askChatGptTitle: "Fragen Sie ChatGPT",
+  askingChatGpt: "Frage ChatGPT nach einem guten Angebot...",
+  day: "Tag",
+  week: "Woche",
+  month: "Monat",
+  year: "Jahr",
+  total: "Gesamt",
+  budget: "Budget",
+  noTotalBudget: "Kein Gesamtbudget!",
+  infinityLeftToSpend: "Sie haben ∞ übrig zum Ausgeben!",
+  youHaveXLeftToSpend1: "Sie haben noch ",
+  youHaveXLeftToSpend2: " übrig zum Ausgeben!",
+  underBudget: "Unter dem Budget um",
+  overBudget: "Über dem Budget um",
+  exceededBudgetByX1: "Sie haben Ihr Budget um ",
+  slowConnection: "Langsame Verbindung",
+  megaBytePerSecond: "Mbps",
+  offlineMode: "Offline-Modus",
+  notPaidLabel: "Noch nicht bezahlt",
+  paidLabel: "Zurückgezahlt",
+  travellers: "Reisende",
+  countries: "Länder",
+  currencies: "Währungen",
+  expenses: "Ausgaben",
+  welcomeToBudgetForNomads: "Willkommen bei Budget for Nomads",
+  pleaseCreateTrip:
+    "Bitte erstellen oder treten Sie einer Reise bei, um zu beginnen!",
+  finderTitle: "Finder",
+  search: "Suche",
+  finding: "Suche",
+  showXResults1: "Zeige",
+  showXResults2: "Ergebnisse",
+  noResults: "Keine Ergebnisse",
+  splitSummaryTitle: "Aufteilungszusammenfassung",
+  yourMoneyBack: "Ihr Geld zurück",
+  youStillOwe: "Sie schulden noch",
+  error: "Fehler",
+  errorSplits: "Aufteilungen konnten nicht abgerufen werden!",
+  alertNoSplits: "Keine Aufteilungen zum Vereinfachen",
+  XowesYtoZ1: "schuldet",
+  XowesYtoZ2: "zu",
+  simplifySplits: "Aufteilungen vereinfachen",
+  settleSplits: "Aufteilungen begleichen",
+  confirmSettle: "Begleichen",
+  sureSettleSplits:
+    "Sind Sie sicher, dass Sie alle Aufteilungen begleichen möchten? Hat jeder sein Geld zurückerhalten?",
+  sureDeleteAccount:
+    "Dies löscht Ihren Budget for Nomads Account unwiderruflich!",
+  premiumNomad: "Premium-Nomade",
+  premiumNomadActiveNow: "Sie sind jetzt ein Premium-Nomade!",
+  youArePremium: "Sie sind ein Premium-Nomade!",
+  becomePremium: "Werden Sie ein Premium-Nomade!",
+  premiumNomadInactive: "Sie sind noch kein Premium-Nomade!",
+  premiumNomadError:
+    "Etwas ist schiefgegangen. Premium-Nomade konnte nicht aktiviert werden!",
+  settingsTitle: "Einstellungen",
+  restorePurchases: "Käufe wiederherstellen",
+  deleteAccount: "Account löschen",
+  settingsSkipCat: "Kategorieauswahl überspringen",
+  settingsShowAdvanced: "Immer mehr Optionen anzeigen",
+  settingsShowFlags: "Länderflaggen anzeigen",
+  settingsShowInternetSpeed: "Internetgeschwindigkeit anzeigen",
+  settingsShowTravellerIcon: "Reisendensymbole anzeigen",
+  // new Stuff part 2
+  newCatNamePlaceholder: "Geben Sie den Namen der neuen Kategorie ein...",
+  reset: "Zurücksetzen",
+  sureResetCategories:
+    "Sind Sie sicher, dass Sie Ihre Kategorien zurücksetzen möchten?",
+  infoNewCatTitle: "Neue Kategorie Info",
+  infoNewCatText:
+    "Geben Sie einen Namen für Ihre Kategorie ein und drücken Sie dann das Symbol für Ihre neue Kategorie." +
+    "\n\n Bestätigen Sie Ihre neue Kategorie mit der Schaltfläche <Hinzufügen>.",
+  infoHomeCurrencyTitle: "Heimatwährung Info",
+  infoHomeCurrencyText:
+    "Richten Sie hier Ihre Heimatwährung ein (z. B. die Währung des Landes, in dem Sie leben)." +
+    "\n\n Das Land wird nicht gespeichert und dient nur zur Ermittlung Ihrer Währung." +
+    "\n\n Diese Währung wird in der App angezeigt, und alle anderen Währungen, die Sie auf Ihrer Reise verwenden, werden in diese Währung umgerechnet.",
+  infoTotalBudgetTitle: "Gesamtbudget Info",
+  infoTotalBudgetText:
+    "Richten Sie hier Ihr Gesamtbudget ein (z. B. den Geldbetrag für die gesamte Reise)." +
+    "\n\n Sie können auf die Schaltfläche Berechnen drücken, um das Gesamtbudget aus dem Tagesbudget * Reiseanfangs- und Reiseenddatum automatisch berechnen zu lassen." +
+    "\n\n Das Gesamtbudget ist optional.",
+  infoDailyBudgetTitle: "Tagesbudget Info",
+  infoDailyBudgetText:
+    "Richten Sie hier Ihr Tagesbudget ein (z. B. den durchschnittlichen Geldbetrag, den Sie pro Tag ausgeben möchten)." +
+    "Wenn Sie nicht genau wissen, wie viel Sie ausgeben möchten, geben Sie einfach eine Schätzung ein." +
+    "\n\n Sie können auf die Schaltfläche Berechnen drücken, um das Tagesbudget aus dem Gesamtbudget / Reiseanfangs- und Reiseenddatum automatisch berechnen zu lassen.",
+  infoTripDatesTitle: "Trip-Start und Enddaten",
+  infoTripDatesText:
+    "Legen Sie hier das Start- und Enddatum Ihrer Reise fest (z. B. die Daten Ihrer Reise).\n\n Der Start und das Ende der Reise sind optional.",
+  comingSoon: "Demnächst...",
+  comingSoonRangedDates:
+    "Das Ändern der Ausgaben mit einem Datumsbereich ist noch nicht möglich.",
+  comingSoonDuplOrSplit:
+    "Das Ändern der Aufteilung von Ausgaben mit einem Datumsbereich ist noch nicht möglich.",
+  sorry: "Entschuldigung!",
+  sorrySplitList:
+    "Ich konnte eine gültige Aufteilung nicht berechnen. Bitte überprüfen Sie Ihre Eingabe.\n\n Sie können auch lange auf die Neuberechnen-Schaltfläche drücken, um alle Aufteilungen zurückzusetzen!",
+  errorPurchasePackage: "Fehler beim Kauf des Pakets",
+  errorPurchasePackageText:
+    "Bitte starten Sie die App neu oder versuchen Sie es später erneut.",
+  errorGetOffers: "Fehler beim Abrufen von Angeboten",
+  errorGetOffersText:
+    "Bitte starten Sie die App neu oder versuchen Sie es später erneut.",
+  errorShareTrip: "Fehler beim Teilen der Reise",
+  errorShareTripText:
+    "Bitte starten Sie die App neu oder versuchen Sie es später erneut.",
+  inviteTraveller: "Andere Reisende einladen",
+  toastLoginError1: "Anmeldefehler",
+  toastLoginError2: "Bitte melden Sie sich erneut an!",
+  toastAccountError1: "Konto nicht gefunden",
+  toastAccountError2: "Bitte erstellen Sie zuerst ein neues Konto!",
+  toastEmailError1: "Keine E-Mail gefunden",
+  toastEmailError2: "Bitte versuchen Sie es erneut mit einer anderen Methode.",
+  toastAppleError1: "Apple-Anmeldefehler",
+  toastAppleError2: "Benutzer hat den Anmeldevorgang abgebrochen",
+  toastDeleting1: "Löschen",
+  toastDeleting2: "Bitte lassen Sie die App geöffnet...",
+  error2: "Bitte versuchen Sie es später erneut.",
+  toastSaving1: "Änderungen speichern",
+  toastSaving2: "Bitte lassen Sie die App geöffnet...",
+  toastPurchaseSuccess1: "Kauf erfolgreich",
+  toastPurchaseSuccess2: "Sie sind jetzt ein Premium-Nomadenmitglied",
+  toastPremiumFetchError: "Fehler beim Abrufen des Premium-Status",
+  toastSavingError1: "Daten konnten nicht gespeichert werden",
+  toastNameError1: "Kein Name gefunden",
+  toastNameError2:
+    "Es könnte ein Problem mit dem Apple-Anmeldevorgang geben. Bitte versuchen Sie es erneut mit einer anderen Methode.",
+  toastAccDeleted1: "Konto gelöscht",
+  toastAccDeleted2: "Ihr Konto wurde erfolgreich gelöscht.",
+  toastErrorDeleteExp:
+    "Ausgabe konnte nicht gelöscht werden, bitte versuchen Sie es erneut!",
+  toastErrorUpdateExp:
+    "Ausgabe konnte nicht aktualisiert werden, bitte versuchen Sie es erneut!",
+  toastErrorStoreExp:
+    "Ausgabe konnte nicht gespeichert werden, bitte versuchen Sie es erneut!",
+  toastSyncChanges1: "Synchronisiere Offline-Änderungen",
+  toastSyncChanges2: "Bitte lassen Sie die App geöffnet...",
+  toastSyncFinished1: "Wieder online!",
+  toastSyncFinished21: "Synchronisiert",
+  toastSyncFinished22: "Offline-Änderungen!",
 };
 const fr = {
   // standard strings
@@ -688,6 +975,157 @@ const fr = {
   emailInvalidInfoText: "Veuillez entrer une adresse e-mail valide !",
   passwordInvalidInfoText:
     "Veuillez entrer un mot de passe d'au moins 6 caractères !",
+
+  // new stuff
+  shareTripLabel: "Partager le voyage",
+  tourGuideLabelPrevious: "Précédent",
+  tourGuideLabelNext: "Suivant",
+  tourGuideLabelSkip: "Passer",
+  tourGuideLabelFinish: "Terminer",
+  countryLabel: "Pays",
+  askChatGptPost: "Demander à ChatGPT : Est-ce une bonne affaire ?",
+  askChatGptPre:
+    "Demander à ChatGPT : Est-ce que ce serait une bonne affaire ?",
+  askChatGptTitle: "Demander à ChatGPT",
+  askingChatGpt: "Demander à ChatGPT pour une bonne affaire...",
+  day: "Jour",
+  week: "Semaine",
+  month: "Mois",
+  year: "Année",
+  total: "Total",
+  budget: "Budget",
+  noTotalBudget: "Pas de budget total !",
+  infinityLeftToSpend: "Il vous reste ∞ à dépenser !",
+  youHaveXLeftToSpend1: "Il vous reste ",
+  youHaveXLeftToSpend2: " à dépenser !",
+  underBudget: "Sous le budget de",
+  overBudget: "Au-dessus du budget de",
+  exceededBudgetByX1: "Vous avez dépassé votre budget de ",
+  slowConnection: "Connexion lente",
+  megaBytePerSecond: "Mbps",
+  offlineMode: "Mode hors ligne",
+  notPaidLabel: "Pas encore payé",
+  paidLabel: "Remboursé",
+  travellers: "Voyageurs",
+  countries: "Pays",
+  currencies: "Devises",
+  expenses: "Dépenses",
+  welcomeToBudgetForNomads: "Bienvenue dans Budget for Nomads",
+  pleaseCreateTrip: "Veuillez créer ou rejoindre un voyage pour commencer !",
+  finderTitle: "Recherche",
+  search: "Rechercher",
+  finding: "Recherche en cours",
+  showXResults1: "Afficher",
+  showXResults2: "résultats",
+  noResults: "Aucun résultat",
+  splitSummaryTitle: "Résumé des dépenses",
+  yourMoneyBack: "Votre argent est de retour",
+  youStillOwe: "Vous devez toujours",
+  error: "Erreur",
+  errorSplits: "Impossible de récupérer les dépenses partagées !",
+  alertNoSplits: "Aucune dépense à simplifier",
+  XowesYtoZ1: "doit",
+  XowesYtoZ2: "à",
+  simplifySplits: "Simplifier les dépenses",
+  settleSplits: "Régler les dépenses",
+  confirmSettle: "Régler",
+  sureSettleSplits:
+    "Êtes-vous sûr de vouloir régler toutes les dépenses ? Tout le monde a-t-il récupéré son argent ?",
+  sureDeleteAccount:
+    "Cela supprimera définitivement votre compte Budget for Nomads !",
+  premiumNomad: "Nomade Premium",
+  premiumNomadActiveNow: "Vous êtes maintenant un nomade premium !",
+  youArePremium: "Vous êtes un nomade Premium !",
+  becomePremium: "Devenir un nomade Premium !",
+  premiumNomadInactive: "Vous n'êtes pas encore un nomade Premium !",
+  premiumNomadError:
+    "Une erreur s'est produite, impossible d'activer le nomade premium !",
+  settingsTitle: "Paramètres",
+  restorePurchases: "Restaurer les achats",
+  deleteAccount: "Supprimer le compte",
+  settingsSkipCat: "Passer la sélection de catégorie",
+  settingsShowAdvanced: "Toujours afficher plus d'options",
+  settingsShowFlags: "Afficher les icônes de drapeau",
+  settingsShowInternetSpeed: "Afficher la vitesse d'Internet",
+  settingsShowTravellerIcon: "Afficher les icônes de voyageur",
+  newCatNamePlaceholder: "Entrez le nouveau nom de catégorie...",
+  reset: "Réinitialiser",
+  sureResetCategories:
+    "Êtes-vous sûr de vouloir réinitialiser vos catégories ?",
+  infoNewCatTitle: "Informations sur la nouvelle catégorie",
+  infoNewCatText:
+    "Entrez un nom pour votre catégorie, puis appuyez sur le symbole de votre nouvelle catégorie." +
+    "\n\n Confirmez votre nouvelle catégorie avec le bouton <Ajouter>.",
+  infoHomeCurrencyTitle: "Informations sur la devise locale",
+  infoHomeCurrencyText:
+    "Configurez ici votre devise locale (par exemple, la devise du pays dans lequel vous résidez)." +
+    "\n\n Le pays ne sera pas enregistré et est seulement utile pour trouver votre devise." +
+    "\n\n Cette devise sera affichée dans l'application et toutes les autres devises que vous utiliserez lors de votre voyage seront converties en celle-ci.",
+  infoTotalBudgetTitle: "Informations sur le budget total",
+  infoTotalBudgetText:
+    "Configurez ici votre budget total (par exemple, le montant d'argent pour l'ensemble du voyage)." +
+    "\n\n Vous pouvez appuyer sur le bouton de calcul pour auto-calculer le budget total à partir du budget quotidien * dates de début et de fin du voyage." +
+    "\n\n Le budget total est facultatif.",
+  infoDailyBudgetTitle: "Informations sur le budget quotidien",
+  infoDailyBudgetText:
+    "Configurez ici votre budget quotidien (par exemple, le montant moyen d'argent à dépenser par jour)." +
+    "Si vous ne savez pas exactement combien vous souhaitez dépenser, indiquez simplement une estimation." +
+    "\n\n Vous pouvez appuyer sur le bouton de calcul pour auto-calculer le budget quotidien à partir du budget total / dates de début et de fin du voyage.",
+  infoTripDatesTitle: "Informations sur les dates de début et de fin du voyage",
+  infoTripDatesText:
+    "Configurez ici les dates de début et de fin de votre voyage (par exemple, les dates de votre voyage)." +
+    "\n\n Le début et la fin du voyage sont facultatifs.",
+  comingSoon: "Bientôt disponible...",
+  comingSoonRangedDates:
+    "Il n'est pas encore possible de modifier les dates des dépenses avec une plage de dates.",
+  comingSoonDuplOrSplit:
+    "Il n'est pas encore possible de modifier la répartition des dépenses avec une plage de dates.",
+  sorry: "Désolé !",
+  sorrySplitList:
+    "Je n'ai pas pu calculer une répartition valide. Veuillez vérifier vos données. \n\n Vous pouvez également appuyer longuement sur le bouton de recalcul pour réinitialiser toutes les répartitions !",
+  errorPurchasePackage: "Erreur lors de l'achat du package",
+  errorPurchasePackageText:
+    "Veuillez redémarrer l'application ou réessayer ultérieurement.",
+  errorGetOffers: "Erreur lors de l'obtention des offres",
+  errorGetOffersText:
+    "Veuillez redémarrer l'application ou réessayer ultérieurement.",
+  errorShareTrip: "Erreur lors du partage du voyage",
+  errorShareTripText:
+    "Veuillez redémarrer l'application ou réessayer ultérieurement.",
+  inviteTraveller: "Inviter un autre voyageur",
+  toastLoginError1: "Erreur de connexion",
+  toastLoginError2: "Veuillez vous connecter à nouveau !",
+  toastAccountError1: "Compte introuvable",
+  toastAccountError2: "Veuillez d'abord créer un nouveau compte !",
+  toastEmailError1: "Aucun e-mail trouvé",
+  toastEmailError2: "Veuillez réessayer avec une méthode différente.",
+  toastAppleError1: "Erreur de connexion Apple",
+  toastAppleError2: "L'utilisateur a annulé le processus de connexion",
+  toastDeleting1: "Suppression",
+  toastDeleting2: "Veuillez laisser l'application ouverte...",
+  error2: "Veuillez réessayer ultérieurement.",
+  toastSaving1: "Enregistrement des modifications",
+  toastSaving2: "Veuillez laisser l'application ouverte...",
+  toastPurchaseSuccess1: "Achat réussi",
+  toastPurchaseSuccess2: "Vous êtes maintenant membre Premium Nomad",
+  toastPremiumFetchError: "Erreur lors de la récupération du statut premium",
+  toastSavingError1: "Impossible d'enregistrer les données",
+  toastNameError1: "Aucun nom trouvé",
+  toastNameError2:
+    "Il pourrait y avoir un problème avec le processus de connexion Apple. Veuillez réessayer avec une méthode différente.",
+  toastAccDeleted1: "Compte supprimé",
+  toastAccDeleted2: "Votre compte a été supprimé avec succès.",
+  toastErrorDeleteExp:
+    "Impossible de supprimer la dépense, veuillez réessayer !",
+  toastErrorUpdateExp:
+    "Impossible de mettre à jour la dépense, veuillez réessayer !",
+  toastErrorStoreExp:
+    "Impossible d'enregistrer la dépense, veuillez réessayer !",
+  toastSyncChanges1: "Synchronisation des modifications hors ligne",
+  toastSyncChanges2: "Veuillez laisser l'application ouverte...",
+  toastSyncFinished1: "En ligne à nouveau !",
+  toastSyncFinished21: "Synchronisé",
+  toastSyncFinished22: "modifications hors ligne !",
 };
 const ru = {
   // standard strings
@@ -758,7 +1196,6 @@ const ru = {
   baseCurrency: "Домашняя валюта",
   descriptionLabel: "Описание",
   dateLabel: "Дата",
-  countryLabel: "Страна",
 
   // Modal Titles
   editExp: "Изменить статью расходов",
@@ -912,5 +1349,165 @@ const ru = {
     "Пожалуйста, введите действительный адрес электронной почты!",
   passwordInvalidInfoText:
     "Пожалуйста, введите пароль длиной не менее 6 символов!",
+  shareTripLabel: "Поделиться поездкой",
+  tourGuideLabelPrevious: "Предыдущий",
+  tourGuideLabelNext: "Следующий",
+  tourGuideLabelSkip: "Пропустить",
+  tourGuideLabelFinish: "Завершить",
+  countryLabel: "Страна",
+  askChatGptPost: "Спросить у ChatGPT: Это хорошая сделка?",
+  askChatGptPre: "Спросить у ChatGPT: Будет ли это хорошая сделка?",
+  askChatGptTitle: "Спросить у ChatGPT",
+  askingChatGpt: "Запрашиваю мнение ChatGPT о хорошей сделке...",
+  day: "День",
+  week: "Неделя",
+  month: "Месяц",
+  year: "Год",
+  total: "Всего",
+  budget: "Бюджет",
+  noTotalBudget: "Нет общего бюджета!",
+  infinityLeftToSpend: "У вас осталось ∞ для траты!",
+  youHaveXLeftToSpend1: "У вас осталось ",
+  youHaveXLeftToSpend2: " для траты!",
+  underBudget: "Меньше бюджета на",
+  overBudget: "Больше бюджета на",
+  exceededBudgetByX1: "Вы превысили бюджет на ",
+  slowConnection: "Медленное подключение",
+  megaBytePerSecond: "Мб/с",
+  offlineMode: "Офлайн режим",
+  notPaidLabel: "Еще не оплачено",
+  paidLabel: "Оплачено",
+  travellers: "Путешественники",
+  countries: "Страны",
+  currencies: "Валюты",
+  expenses: "Расходы",
+  welcomeToBudgetForNomads: "Добро пожаловать в Budget for Nomads",
+  pleaseCreateTrip:
+    "Пожалуйста, создайте или присоединитесь к поездке, чтобы начать!",
+  finderTitle: "Поиск",
+  search: "Поиск",
+  finding: "Поиск",
+  showXResults1: "Показать",
+  showXResults2: "результаты",
+  noResults: "Нет результатов",
+  splitSummaryTitle: "Разделить сумму",
+  yourMoneyBack: "Ваши деньги вернутся",
+  youStillOwe: "Вы все еще должны",
+  error: "Ошибка",
+  errorSplits: "Не удалось получить разделы!",
+  alertNoSplits: "Нет разделов для упрощения",
+  XowesYtoZ1: "должен",
+  XowesYtoZ2: "для",
+  simplifySplits: "Упростить разделы",
+  settleSplits: "Расчет разделов",
+  confirmSettle: "Расчет",
+  sureSettleSplits:
+    "Вы уверены, что хотите рассчитать все разделы? Все ли получили свои деньги?",
+  sureDeleteAccount: "Это безвозвратно удалит ваш аккаунт в Budget for Nomads!",
+  premiumNomad: "Премиум-намбад",
+  premiumNomadActiveNow: "Теперь вы являетесь премиум-намбадом!",
+  youArePremium: "Вы являетесь премиум-намбадом!",
+  becomePremium: "Станьте премиум-намбадом!",
+  premiumNomadInactive: "Вы еще не являетесь премиум-намбадом!",
+  premiumNomadError:
+    "Что-то пошло не так, не удалось активировать премиум-намбад!",
+  settingsTitle: "Настройки",
+  restorePurchases: "Восстановить покупки",
+  deleteAccount: "Удалить аккаунт",
+  settingsSkipCat: "Пропустить выбор категории",
+  settingsShowAdvanced: "Всегда показывать дополнительные опции",
+  settingsShowFlags: "Показывать значки флагов",
+  settingsShowInternetSpeed: "Показывать скорость интернета",
+  settingsShowTravellerIcon: "Показывать значки путешественников",
+  // new Stuff part 2
+  newCatNamePlaceholder: "Введите название новой категории...",
+  reset: "Сбросить",
+  sureResetCategories: "Вы уверены, что хотите сбросить свои категории?",
+  infoNewCatTitle: "Информация о новой категории",
+  infoNewCatText:
+    "Введите название для вашей категории, а затем нажмите символ для вашей новой категории." +
+    "\n\n Подтвердите вашу новую категорию кнопкой <Добавить>.",
+  infoHomeCurrencyTitle: "Информация о домашней валюте",
+  infoHomeCurrencyText:
+    "Установите здесь вашу домашнюю валюту (например, валюту страны, в которой вы живете)." +
+    "\n\n Страна не будет сохранена и используется только для поиска вашей валюты." +
+    "\n\n Эта валюта будет отображаться в приложении, и все остальные валюты, которые вы используете во время путешествия, будут конвертироваться в эту.",
+  infoTotalBudgetTitle: "Информация об общем бюджете",
+  infoTotalBudgetText:
+    "Настройте ваш общий бюджет здесь (например, сумму денег на весь путешествие)." +
+    '\n\n Вы можете нажать кнопку "Рассчитать" для автоматического расчета общего бюджета на основе ежедневного бюджета * даты начала и окончания путешествия.' +
+    "\n\n Общий бюджет является необязательным.",
+
+  infoDailyBudgetTitle: "Информация о ежедневном бюджете",
+  infoDailyBudgetText:
+    "Настройте ваш ежедневный бюджет здесь (например, среднюю сумму денег, которую вы планируете тратить в день)." +
+    "Если вы не знаете точно, сколько вы хотите потратить, просто укажите приблизительную сумму." +
+    '\n\n Вы можете нажать кнопку "Рассчитать" для автоматического расчета ежедневного бюджета на основе общего бюджета / даты начала и окончания путешествия.',
+
+  infoTripDatesTitle: "Информация о датах начала и окончания путешествия",
+  infoTripDatesText:
+    "Настройте даты начала и окончания путешествия здесь (например, даты вашего путешествия)." +
+    "\n\n Даты начала и окончания путешествия являются необязательными.",
+
+  comingSoon: "Скоро появится...",
+
+  comingSoonRangedDates:
+    "Изменение дат расходов с диапазоном дат пока невозможно.",
+
+  comingSoonDuplOrSplit:
+    "Изменение разделения расходов с диапазоном дат пока невозможно.",
+
+  sorry: "Извините!",
+
+  sorrySplitList:
+    'Не удалось рассчитать допустимое разделение. Пожалуйста, проверьте введенные данные. \n\n Также вы можете долго нажать кнопку "Пересчитать", чтобы сбросить все разделения!',
+
+  errorPurchasePackage: "Ошибка при покупке пакета",
+
+  errorPurchasePackageText:
+    "Пожалуйста, перезапустите приложение или попробуйте позже.",
+
+  errorGetOffers: "Ошибка при получении предложений",
+
+  errorGetOffersText:
+    "Пожалуйста, перезапустите приложение или попробуйте позже.",
+
+  errorShareTrip: "Ошибка при передаче путешествия",
+  errorShareTripText:
+    "Пожалуйста, перезапустите приложение или попробуйте позже.",
+  inviteTraveller: "Пригласить другого путешественника",
+  toastLoginError1: "Ошибка входа",
+  toastLoginError2: "Пожалуйста, войдите снова!",
+  toastAccountError1: "Аккаунт не найден",
+  toastAccountError2: "Пожалуйста, создайте новый аккаунт!",
+  toastEmailError1: "Email не найден",
+  toastEmailError2: "Пожалуйста, попробуйте еще раз с другим методом.",
+  toastAppleError1: "Ошибка входа через Apple",
+  toastAppleError2: "Пользователь отменил процесс входа",
+  toastDeleting1: "Удаление",
+  toastDeleting2: "Пожалуйста, не закрывайте приложение...",
+  error2: "Пожалуйста, попробуйте позже.",
+  toastSaving1: "Сохранение изменений",
+  toastSaving2: "Пожалуйста, не закрывайте приложение...",
+  toastPurchaseSuccess1: "Покупка успешна",
+  toastPurchaseSuccess2: "Теперь вы являетесь премиум-пользователем Nomad",
+  toastPremiumFetchError: "Ошибка получения статуса премиума",
+  toastSavingError1: "Не удалось сохранить данные",
+  toastNameError1: "Имя не найдено",
+  toastNameError2:
+    "Возможна проблема с процессом входа через Apple. Пожалуйста, попробуйте еще раз с другим методом.",
+  toastAccDeleted1: "Аккаунт удален",
+  toastAccDeleted2: "Ваш аккаунт успешно удален.",
+  toastErrorDeleteExp:
+    "Не удалось удалить расход, пожалуйста, попробуйте снова!",
+  toastErrorUpdateExp:
+    "Не удалось обновить расход, пожалуйста, попробуйте снова!",
+  toastErrorStoreExp:
+    "Не удалось сохранить расход, пожалуйста, попробуйте снова!",
+  toastSyncChanges1: "Синхронизация офлайн изменений",
+  toastSyncChanges2: "Пожалуйста, не закрывайте приложение...",
+  toastSyncFinished1: "Снова онлайн!",
+  toastSyncFinished21: "Синхронизированы",
+  toastSyncFinished22: "офлайн изменения!",
 };
 export { en, de, fr, ru };

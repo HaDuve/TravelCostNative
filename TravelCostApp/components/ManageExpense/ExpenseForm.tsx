@@ -218,18 +218,14 @@ const ExpenseForm = ({
   const openDatePickerRange = () => {
     // if isEditing show alert, saying this feature is not available yet
     if (isEditing && dateIsRanged) {
-      Alert.alert(
-        "Sorry",
-        "Changing the dates of expenses with a range of dates is not yet possible.",
-        [
-          {
-            text: i18n.t("confirm"),
-            onPress: () => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            },
+      Alert.alert(i18n.t("comingSoon"), i18n.t("comingSoonRangedDates"), [
+        {
+          text: i18n.t("confirm"),
+          onPress: () => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           },
-        ]
-      );
+        },
+      ]);
       return;
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -645,10 +641,7 @@ const ExpenseForm = ({
       );
       setSplitListValid(isValidSplit);
       if (!isValidSplit) {
-        Alert.alert(
-          "Sorry!",
-          "I could not calculate a valid split. Please check your input. \n\n You can also long-press the recalculate button to reset all splits!"
-        );
+        Alert.alert(i18n.t("sorry"), i18n.t("sorrySplitList"));
       }
     }
   }
@@ -703,8 +696,8 @@ const ExpenseForm = ({
     // setIsSubmitting(true);
     Toast.show({
       type: "loading",
-      text1: "Saving changes",
-      text2: "Please leave the app open...",
+      text1: i18n.t("toastSaving1"),
+      text2: i18n.t("toastSaving2"),
       autoHide: false,
     });
     navigation.popToTop();
@@ -738,7 +731,7 @@ const ExpenseForm = ({
         }}
         buttons={[
           {
-            label: "Not paid yet",
+            label: i18n.t("notPaidLabel"),
             value: isPaidString.notPaid,
             // checkedColor: GlobalStyles.colors.accent500,
             showSelectedCheck: true,
@@ -753,7 +746,7 @@ const ExpenseForm = ({
             ],
           },
           {
-            label: "Paid back",
+            label: i18n.t("paidLabel"),
             value: isPaidString.paid,
             showSelectedCheck: true,
             style: [
@@ -979,8 +972,8 @@ const ExpenseForm = ({
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     if (isEditing && dateIsRanged) {
                       Alert.alert(
-                        "Sorry",
-                        "Changing the splitting of expenses with a range of dates is not yet possible.",
+                        i18n.t("comingSoon"),
+                        i18n.t("comingSoonDuplOrSplit"),
                         [
                           {
                             text: i18n.t("confirm"),
@@ -1334,7 +1327,7 @@ const ExpenseForm = ({
             </GradientButton>
           </View>
           {/* Commented out ChatGPT Button */}
-          {!hideAdvanced && (
+          {!hideAdvanced && inputs.amount.value && inputs.description.value && (
             <View style={[styles.buttonContainer, { marginBottom: "20%" }]}>
               <GradientButton
                 style={[styles.button, { marginTop: 28, minWidth: "80%" }]}
@@ -1342,8 +1335,8 @@ const ExpenseForm = ({
                 onPress={askChatGPTHandler}
                 darkText
               >
-                {isEditing && "Ask ChatGPT: Was this a good deal?"}
-                {!isEditing && "Ask ChatGPT: Would this be a good deal?"}
+                {isEditing && i18n.t("askChatGptPost")}
+                {!isEditing && i18n.t("askChatGptPre")}
               </GradientButton>
             </View>
           )}

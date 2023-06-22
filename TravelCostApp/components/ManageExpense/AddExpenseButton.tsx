@@ -10,7 +10,7 @@ import Animated, {
   SlideInUp,
 } from "react-native-reanimated";
 import { UserContext } from "../../store/user-context";
-import { useContext, useEffect, useState } from "react";
+import { createRef, useContext, useEffect, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TourGuideZone } from "rn-tourguide";
 
@@ -34,6 +34,20 @@ const AddExpenseButton = ({ navigation }) => {
   const { settings } = useContext(SettingsContext);
   const tripCtx = useContext(TripContext);
   const authCtx = useContext(AuthContext);
+  const buttonRef = useRef(null);
+  // if (buttonRef.current)
+  //   console.log(
+  //     "measureInWindow: ",
+  //     buttonRef.current.measureInWindow((fx, fy, width, height, px, py) => {
+  //       console.log("Component width is: " + width);
+  //       console.log("Component height is: " + height);
+  //       console.log("X offset to frame: " + fx);
+  //       console.log("Y offset to frame: " + fy);
+  //       console.log("X offset to page: " + px);
+  //       console.log("Y offset to page: " + py);
+  //     })
+  //   );
+
   const [valid, setvalid] = useState(true);
   useEffect(() => {
     setvalid(
@@ -92,6 +106,7 @@ const AddExpenseButton = ({ navigation }) => {
           GlobalStyles.shadowGlowPrimary,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
+        ref={buttonRef}
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           skipCatScreen &&

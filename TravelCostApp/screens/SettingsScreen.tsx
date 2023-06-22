@@ -97,8 +97,8 @@ const SettingsScreen = ({ navigation }) => {
   );
 
   const [premiumStatus, setPremiumStatus] = useState(false);
-  const buttonstring1 = "You are a Premium Nomad!";
-  const buttonstring2 = "Become a Premium Nomad!";
+  const buttonstring1 = i18n.t("youArePremium");
+  const buttonstring2 = i18n.t("becomePremium");
   const premiumButtonString = premiumStatus ? buttonstring1 : buttonstring2;
 
   // useEffect setPremium status from userContext.isPremium
@@ -207,34 +207,27 @@ const SettingsScreen = ({ navigation }) => {
   }, [emailString, userName]);
 
   function deleteAccountHandler() {
-    return Alert.alert(
-      i18n.t("sure"),
-      "This will unreversibly delete your Budget for Nomads Account!",
-      [
-        // The "No" button
-        // Does nothing but dismiss the dialog when tapped
-        {
-          text: i18n.t("back"),
+    return Alert.alert(i18n.t("sure"), i18n.t("sureDeleteAccount"), [
+      // The "No" button
+      // Does nothing but dismiss the dialog when tapped
+      {
+        text: i18n.t("back"),
+      },
+      // The "Yes" button
+      // delete mode red
+      {
+        text: i18n.t("delete"),
+        style: "destructive",
+        onPress: () => {
+          if (!isConnected) {
+            Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
+            return;
+          }
+          console.log("deleteAccountHandler ~ deleteAccountHandler");
+          authCtx.deleteAccount();
         },
-        // The "Yes" button
-        // delete mode red
-        {
-          text: i18n.t("delete"),
-          style: "destructive",
-          onPress: () => {
-            if (!isConnected) {
-              Alert.alert(
-                i18n.t("noConnection"),
-                i18n.t("checkConnectionError")
-              );
-              return;
-            }
-            console.log("deleteAccountHandler ~ deleteAccountHandler");
-            authCtx.deleteAccount();
-          },
-        },
-      ]
-    );
+      },
+    ]);
   }
 
   async function restorePurchases() {
@@ -248,15 +241,15 @@ const SettingsScreen = ({ navigation }) => {
         await userCtx.checkPremium();
         Toast.show({
           type: "success",
-          text1: "Premium Nomad", //i18n.t("premiumToastTitle"),
-          text2: "You are a premium Nomad now!", //i18n.t("premiumToastText"),
+          text1: i18n.t("premiumNomad"),
+          text2: i18n.t("premiumNomadActiveNow"),
         });
       }
     } catch (e) {
       Toast.show({
         type: "error",
-        text1: "Premium Nomad", //i18n.t("premiumToastTitle"),
-        text2: "Something went wrong!", //i18n.t("premiumToastText"),
+        text1: i18n.t("premiumNomad"),
+        text2: i18n.t("premiumNomadError"),
       });
       console.log("restorePurchases ~ e:", e);
     }
@@ -293,40 +286,10 @@ const SettingsScreen = ({ navigation }) => {
         </TouchableOpacity>
 
         <View style={styles.titleContainer}>
-          <Text style={styles.titleText}>Settings</Text>
+          <Text style={styles.titleText}>{i18n.t("settingsTitle")}</Text>
         </View>
       </BlurView>
       <SettingsSection multiTraveller={multiTraveller}></SettingsSection>
-      {/* <GradientButton style={styles.settingsButton} onPress={logoutHandler}>
-        {i18n.t("logoutLabel")}
-      </GradientButton> */}
-      {/* <GradientButton style={styles.settingsButton} onPress={joinInviteHandler}>
-        {i18n.t("joinTripLabel")}
-      </GradientButton> */}
-      {/* <GradientButton
-        style={styles.settingsButton}
-        onPress={async () => {
-          navigation.navigate("Finder");
-        }}
-      >
-        {"Finder"}
-      </GradientButton> */}
-
-      {/* {multiTraveller && (
-        <GradientButton
-          onPress={async () => {
-            const isPremium = await userCtx.checkPremium();
-            // if (!isPremium) {
-            //   navigation.navigate("Paywall");
-            //   return;
-            // }
-            navigation.navigate("SplitSummary", { tripid: tripCtx.tripid });
-          }}
-          style={styles.settingsButton}
-        >
-          {i18n.t("simplifySplitsLabel")}
-        </GradientButton>
-      )} */}
       <GradientButton
         style={styles.settingsButton}
         onPress={async () => {
@@ -368,11 +331,13 @@ const SettingsScreen = ({ navigation }) => {
         <Text style={[styles.textButton]}>CatMapTest</Text>
       </TouchableOpacity> */}
       <TouchableOpacity onPress={() => restorePurchases()}>
-        <Text style={[styles.textButton]}>Restore Purchases?</Text>
+        <Text style={[styles.textButton]}>{i18n.t("restorePurchases")}</Text>
       </TouchableOpacity>
       {emailString && (
         <TouchableOpacity onPress={() => deleteAccountHandler()}>
-          <Text style={[styles.textButton]}>Delete Account {emailString}?</Text>
+          <Text style={[styles.textButton]}>
+            {i18n.t("deleteAccount")} {emailString}
+          </Text>
         </TouchableOpacity>
       )}
       <View

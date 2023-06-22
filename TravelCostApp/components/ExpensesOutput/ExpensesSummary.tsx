@@ -3,13 +3,22 @@ import React, { useContext } from "react";
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
 import { TripContext } from "../../store/trip-context";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import { formatExpenseWithCurrency } from "../../util/string";
 import PropTypes from "prop-types";
 import { Pressable } from "react-native";
 import Toast from "react-native-toast-message";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
 import * as Haptics from "expo-haptics";
-import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { UserContext } from "../../store/user-context";
 
 const ExpensesSummary = ({ expenses, periodName }) => {
@@ -83,8 +92,8 @@ const ExpensesSummary = ({ expenses, periodName }) => {
     if (infinityString) {
       Toast.show({
         type: "error",
-        text1: "No Total Budget!",
-        text2: "You have " + infinityString + " left to spend!",
+        text1: i18n.t("noTotalBudget"),
+        text2: i18n.t("infinityLeftToSpend"),
       });
       return;
     }
@@ -92,19 +101,19 @@ const ExpensesSummary = ({ expenses, periodName }) => {
     Toast.show({
       type: budgetNumber > expenseSumNum ? "success" : "error",
       position: "bottom",
-      text1: `${
-        periodName?.charAt(0).toUpperCase() + periodName?.slice(1)
-      } Budget: ${formatExpenseWithCurrency(budgetNumber, userCurrency)}`,
+      text1: `${i18n.t(periodName)} ${i18n.t(
+        "budget"
+      )}: ${formatExpenseWithCurrency(budgetNumber, userCurrency)}`,
       text2:
         budgetNumber > expenseSumNum
-          ? `You have ${formatExpenseWithCurrency(
+          ? `${i18n.t("youHaveXLeftToSpend1")}${formatExpenseWithCurrency(
               budgetNumber - expenseSumNum,
               userCurrency
-            )} left to spend!`
-          : `Exceeded the budget by ${formatExpenseWithCurrency(
+            )}${i18n.t("youHaveXLeftToSpend2")}`
+          : `${i18n.t("exceededBudgetByX1")}${formatExpenseWithCurrency(
               expenseSumNum - budgetNumber,
               userCurrency
-            )}!`,
+            )} !`,
       visibilityTime: 5000,
     });
   };

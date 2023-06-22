@@ -1,6 +1,15 @@
 // import { GPT_API_KEY } from "@env";
 const GPT_API_KEY = "ee892f25f1msh7b58e66c617672dp1d7c37jsn9339224154d5";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 export function chatGPTcontentKeywords(customCategory: string) {
   const content =
     "Give me a list of 50 strings containing single words that are semantically similar to " +
@@ -20,7 +29,7 @@ export function chatGPTcontentGoodDealPost(
   country: string
 ) {
   // Is 3500Rs a good price for Surfboard Rental 1 hour in Sri Lanka? Tell me the normal price range. Restrict your answer to one sentence of maximum 15 words.
-  const content = `Is ${price} ${currency} a good price fore ${product} in ${country}? Tell me the normal price range. Restrict your answer to one sentence of maximum 15 words.`;
+  const content = `Is ${price} ${currency} a good price fore ${product} in ${country}? Also tell me the normal price range. Restrict your answer to two sentences of maximum 15 words. Be critical and tell me when you need more info. Give me your answer in the following locale translation: ${i18n.locale}`;
   return content;
 }
 

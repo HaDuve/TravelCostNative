@@ -5,6 +5,16 @@ import React from "react";
 import { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setAxiosAccessToken } from "../util/http";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import PropTypes from "prop-types";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import {
@@ -89,12 +99,12 @@ function AuthContextProvider({ children }) {
           console.log("User deleted.");
           Toast.show({
             type: "success",
-            text1: "Account Deleted",
-            text2: "Your account has been deleted successfully.",
+            text1: i18n.t("toastAccDeleted1"),
+            text2: i18n.t("toastAccDeleted2"),
             visibilityTime: 3000,
             autoHide: true,
             onHide: async () => {
-              logout();
+              await logout();
               await reloadApp();
             },
           });

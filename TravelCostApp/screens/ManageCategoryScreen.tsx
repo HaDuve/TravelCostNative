@@ -119,8 +119,8 @@ const ManageCategoryScreen = ({ route, navigation }) => {
     // if not isOnline, alert user
     if (!isOnline) {
       Toast.show({
-        text1: "No Internet Connection",
-        text2: "Please try again later!",
+        text1: i18n.t("noConnection"),
+        text2: i18n.t("checkConnectionError"),
         type: "error",
       });
       navigation.pop(2);
@@ -368,10 +368,8 @@ const ManageCategoryScreen = ({ route, navigation }) => {
     let contentText = "";
     switch (infoEnu) {
       case infoEnum.titleInfo:
-        titleText = "New Category Info"; //i18n.t("currencyInfoTitle");
-        contentText =
-          "Enter a name for your Category and then press the symbol for your new Category." +
-          "\n\n Confirm your new Category with the <Add> button.";
+        titleText = i18n.t("infoNewCatTitle"); //i18n.t("currencyInfoTitle");
+        contentText = i18n.t("infoNewCatText");
         break;
       default:
         break;
@@ -400,7 +398,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
         <Text style={styles.infoTitleText}>{infoTitleText}</Text>
         <Text style={styles.infoContentText}>{infoContentText}</Text>
         <FlatButton onPress={setInfoIsVisible.bind(this, false)}>
-          Okay
+          {i18n.t("confirm")}
         </FlatButton>
       </View>
     </Modal>
@@ -432,7 +430,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
               <TextInput
                 autoFocus={true}
                 style={[styles.newCategoryInput]}
-                placeholder="New category name"
+                placeholder={i18n.t("newCatNamePlaceholder")}
                 value={newCategoryName}
                 textAlign="center"
                 onChangeText={(text) => setNewCategoryName(text)}
@@ -455,7 +453,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
                     style={styles.addButton}
                     onPress={handleAddCategory}
                   >
-                    <Text style={styles.addButtonText}>Add</Text>
+                    <Text style={styles.addButtonText}>{i18n.t("add")}</Text>
                   </TouchableOpacity>
                 </Animated.View>
               )}
@@ -539,23 +537,14 @@ const ManageCategoryScreen = ({ route, navigation }) => {
               darkText
               onPress={() => {
                 alertYesNo(
-                  "Reset",
-                  "Reset all categories?",
+                  i18n.t("reset"),
+                  i18n.t("sureResetCategories"),
                   handleResetCategoryList
                 );
               }}
             >
-              RESET
+              {i18n.t("reset")}
             </GradientButton>
-            {/* <FlatButton
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              navigation.pop();
-            }}
-            // style={{ margin: 16 }}
-          >
-            {i18n.t("back")}
-          </FlatButton> */}
 
             {touched && (
               <GradientButton

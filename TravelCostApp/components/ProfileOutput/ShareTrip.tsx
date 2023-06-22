@@ -1,4 +1,4 @@
-import React, { Share, View, Button } from "react-native";
+import React, { Share, View, Button, Alert } from "react-native";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -32,7 +32,8 @@ export async function onShare(shareId, navigation) {
       // dismissed
     }
   } catch (error) {
-    alert(error.message);
+    console.log(error.message);
+    Alert.alert(i18n.t("errorShareTripText"), i18n.t("errorShareTripText"));
   }
   navigation.navigate("Profile");
 }
@@ -44,7 +45,7 @@ const ShareTripButton = ({ route, navigation }) => {
     <View style={{ marginTop: 50 }}>
       <Button
         onPress={onShare.bind(this, shareId)}
-        title="Invite other Traveller"
+        title={i18n.t("inviteTraveller")}
       />
     </View>
   );

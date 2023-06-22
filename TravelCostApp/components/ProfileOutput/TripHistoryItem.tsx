@@ -157,7 +157,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   function tripPressHandler() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (!netCtx.isConnected || !netCtx.strongConnection) {
-      Alert.alert("You are offline", "Please go online to manage your trip");
+      Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
       return;
     }
     // NOTE: Android can only handle alert with 2 actions, so this needs to be changed or actions will go missing

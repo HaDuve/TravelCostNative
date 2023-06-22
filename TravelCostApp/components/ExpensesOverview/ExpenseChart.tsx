@@ -11,6 +11,16 @@ import {
   VictoryTooltip,
   VictoryVoronoiContainer,
 } from "victory-native";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import { GlobalStyles } from "../../constants/styles";
 import {
   getDateMinusDays,
@@ -176,16 +186,20 @@ const ExpenseChart = ({
                         const overUnder = budget - datum.expensesSum;
                         const overUnderBool = overUnder > 0;
                         const overUnderString = overUnderBool
-                          ? `You still have ${formatExpenseWithCurrency(
+                          ? `${i18n.t(
+                              "underBudget"
+                            )} ${formatExpenseWithCurrency(
                               overUnder,
                               currency
-                            )} to spend`
-                          : `You are over budget by ${formatExpenseWithCurrency(
-                              +overUnder,
+                            )}`
+                          : `${i18n.t(
+                              "overBudget"
+                            )} ${formatExpenseWithCurrency(
+                              +overUnder * -1,
                               currency
                             )}`;
                         Toast.show({
-                          type: "success",
+                          type: overUnderBool ? "success" : "error",
                           text1: `${datum.label}`,
                           text2: overUnderString,
                         });

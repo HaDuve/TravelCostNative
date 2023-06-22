@@ -10,6 +10,16 @@ import {
   deleteExpense,
   touchAllTravelers,
 } from "./http";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import Toast from "react-native-toast-message";
 import * as Device from "expo-device";
 import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
@@ -79,8 +89,8 @@ export const deleteExpenseOnlineOffline = async (
   if (!tripid) {
     Toast.show({
       type: "error",
-      text1: "Error",
-      text2: "Could not delete Expense, please try again!",
+      text1: i18n.t("error"),
+      text2: i18n.t("toastErrorDeleteExp"),
     });
     throw new Error(
       "No tripid found in asyncStore! (storeExpenseOnlineOffline)"
@@ -126,8 +136,8 @@ export const updateExpenseOnlineOffline = async (
   if (!tripid) {
     Toast.show({
       type: "error",
-      text1: "Error",
-      text2: "Could not update Expense, please try again!",
+      text1: i18n.t("error"),
+      text2: i18n.t("toastErrorUpdateExp"),
     });
     throw new Error(
       "No tripid found in asyncStore! (storeExpenseOnlineOffline)"
@@ -171,8 +181,8 @@ export const storeExpenseOnlineOffline = async (
   if (!tripid) {
     Toast.show({
       type: "error",
-      text1: "Error",
-      text2: "Could not store Expense, please try again!",
+      text1: i18n.t("error"),
+      text2: i18n.t("toastErrorStoreExp"),
     });
     throw new Error(
       "No tripid found in asyncStore! (storeExpenseOnlineOffline)"
@@ -241,8 +251,8 @@ export const sendOfflineQueue = async () => {
     Toast.hide();
     Toast.show({
       type: "loading",
-      text1: "Synchronizing offline changes",
-      text2: "Please leave the app open...",
+      text1: i18n.t("toastSyncChanges1"),
+      text2: i18n.t("toastSyncChanges2"),
       autoHide: false,
     });
 
@@ -309,8 +319,10 @@ export const sendOfflineQueue = async () => {
       await touchAllTravelers(tripid, true);
       Toast.show({
         type: "success",
-        text1: "Online again!",
-        text2: `Synchronized ${processedItems.length}/${offlineQueue.length} offline Changes!`,
+        text1: i18n.t("toastSyncFinished1"),
+        text2: `${i18n.t("toastSyncFinished21")} ${processedItems.length}/${
+          offlineQueue.length
+        } ${i18n.t("toastSyncFinished22")}`,
       });
     }
   } else {

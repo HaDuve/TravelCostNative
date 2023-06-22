@@ -83,8 +83,8 @@ const ManageExpense = ({ route, navigation }) => {
       try {
         Toast.show({
           type: "loading",
-          text1: "Deleting Expense",
-          text2: "Please leave the app open...",
+          text1: i18n.t("toastDeleting1"),
+          text2: i18n.t("toastDeleting2"),
           autoHide: false,
         });
         const item: OfflineQueueManageExpenseItem = {
@@ -317,8 +317,8 @@ const ManageExpense = ({ route, navigation }) => {
       // setError("Could not save data - please try again later!" + error);
       console.error(error);
       Toast.show({
-        text1: "Could not save data",
-        text2: "Please try again later!",
+        text1: i18n.t("toastSavingError1"),
+        text2: i18n.t("error2"),
         type: "error",
       });
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);

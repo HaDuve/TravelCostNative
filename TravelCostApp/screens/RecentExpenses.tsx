@@ -76,8 +76,8 @@ function RecentExpenses({ navigation }) {
       if (userCtx.freshlyCreated) {
         Toast.show({
           type: "success",
-          text1: "Welcome to Budget for Nomads",
-          text2: "Please Create or Join a Trip to get started!",
+          text1: i18n.t("welcomeToBudgetForNomads"),
+          text2: i18n.t("pleaseCreateTrip"),
         });
         navigation.navigate("Profile");
       }
@@ -126,7 +126,9 @@ function RecentExpenses({ navigation }) {
   const lastConnectionSpeedInMbps = netCtx.lastConnectionSpeedInMbps;
   const showInternetSpeed = settings.showInternetSpeed;
   const connectionSpeedString = showInternetSpeed
-    ? " - " + lastConnectionSpeedInMbps?.toFixed(2) + " Mbps"
+    ? " - " +
+      lastConnectionSpeedInMbps?.toFixed(2) +
+      ` ${i18n.t("megaBytePerSecond")}`
     : "";
   // set in useEffect
   useEffect(() => {
@@ -134,8 +136,10 @@ function RecentExpenses({ navigation }) {
       setOfflineString(connectionSpeedString);
     } else {
       if (netCtx.isConnected && !netCtx.strongConnection) {
-        setOfflineString(" - Slow Connection" + connectionSpeedString);
-      } else setOfflineString(" - Offline Mode");
+        setOfflineString(
+          ` - ${i18n.t("slowConnection")}` + connectionSpeedString
+        );
+      } else setOfflineString(` - ${i18n.t("offlineMode")}`);
     }
   }, [
     isOnline,

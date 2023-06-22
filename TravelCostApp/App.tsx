@@ -645,8 +645,8 @@ function Root() {
         } else {
           Toast.show({
             type: "error",
-            text1: "Login error",
-            text2: "Please login again!",
+            text1: i18n.t("toastLoginError1"),
+            text2: i18n.t("toastLoginError2"),
             visibilityTime: 5000,
           });
           await asyncStoreSafeClear();
@@ -669,8 +669,8 @@ function Root() {
         if (!checkUser || !checkUser.userName) {
           Toast.show({
             type: "error",
-            text1: "Account not found",
-            text2: "Please create a new account!",
+            text1: i18n.t("toastAccountError1"),
+            text2: i18n.t("toastAccountError1"),
             visibilityTime: 5000,
           });
           await asyncStoreSafeClear();

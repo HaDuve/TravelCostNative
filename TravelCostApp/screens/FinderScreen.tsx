@@ -4,6 +4,16 @@ import DatePickerModal from "../components/UI/DatePickerModal";
 import DatePickerContainer from "../components/UI/DatePickerContainer";
 import { getFormattedDate, toShortFormat } from "../util/date";
 import { DateTime } from "luxon";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import * as Haptics from "expo-haptics";
 import { Searchbar } from "react-native-paper";
 import GradientButton from "../components/UI/GradientButton";
@@ -11,7 +21,6 @@ import { ExpensesContext } from "../store/expenses-context";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import BackButton from "../components/UI/BackButton";
 import { Checkbox } from "react-native-paper";
-import { useDebounce } from "use-debounce";
 import {
   asyncStoreGetItem,
   asyncStoreGetObject,
@@ -37,8 +46,8 @@ const FinderScreen = () => {
       if (userCtx.freshlyCreated) {
         Toast.show({
           type: "success",
-          text1: "Welcome to Budget for Nomads",
-          text2: "Please Create or Join a Trip to get started!",
+          text1: i18n.t("welcomeToBudgetForNomads"),
+          text2: i18n.t("pleaseCreateTrip"),
         });
         navigation.navigate("Profile");
       }
@@ -211,12 +220,8 @@ const FinderScreen = () => {
     <>
       {datepickerJSX}
       <View style={styles.container}>
-        {/* <View style={styles.headerContainer}>
-          <BackButton></BackButton>
-        </View> */}
         <View style={[styles.cardContainer, GlobalStyles.wideStrongShadow]}>
-          <Text style={styles.titleText}>Finder</Text>
-
+          <Text style={styles.titleText}>{i18n.t("finderTitle")}</Text>
           <View style={styles.rowContainer}>
             <View style={{ borderWidth: 1, borderRadius: 99, marginRight: 8 }}>
               <Checkbox
@@ -228,7 +233,7 @@ const FinderScreen = () => {
               />
             </View>
             <Searchbar
-              placeholder="Search"
+              placeholder={i18n.t("search")}
               ref={searchRef}
               onIconPress={() => {
                 //focus searchbar
@@ -278,13 +283,18 @@ const FinderScreen = () => {
             )}
           </View>
           <Text style={styles.queryText}>
-            Finding :{queryString} {dateString}
+            {(queryString || dateString) && i18n.t("finding")} :{queryString}{" "}
+            {dateString}
           </Text>
           <GradientButton
             onPress={() => findPressedHandler()}
             style={styles.findButton}
           >
-            {foundResults ? `Show ${numberOfResults} Results` : "No Results"}
+            {foundResults
+              ? `${i18n.t("showXResults1")} ${numberOfResults} ${i18n.t(
+                  "showXResults2"
+                )}`
+              : i18n.t("noResults")}
           </GradientButton>
         </View>
       </View>

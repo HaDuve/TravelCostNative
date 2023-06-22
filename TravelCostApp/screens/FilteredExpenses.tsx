@@ -61,7 +61,7 @@ const FilteredExpenses = ({
         showSumForTravellerName={showSumForTravellerName}
         isFiltered
       />
-      <BlurPremium />
+      <BlurPremium canBack />
       {!withArgs && (
         <FlatButton onPress={() => navigation.pop()}>
           {i18n.t("back")}

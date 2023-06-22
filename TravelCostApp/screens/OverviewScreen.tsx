@@ -51,7 +51,9 @@ const OverviewScreen = ({ navigation }) => {
   const showInternetSpeed = settings.showInternetSpeed;
   const lastConnectionSpeedInMbps = netCtx.lastConnectionSpeedInMbps;
   const connectionSpeedString = showInternetSpeed
-    ? " - " + lastConnectionSpeedInMbps?.toFixed(2) + " Mbps"
+    ? " - " +
+      lastConnectionSpeedInMbps?.toFixed(2) +
+      ` ${i18n.t("megaBytePerSecond")}`
     : "";
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
 
@@ -60,8 +62,8 @@ const OverviewScreen = ({ navigation }) => {
       if (userCtx.freshlyCreated) {
         Toast.show({
           type: "success",
-          text1: "Welcome to Budget for Nomads",
-          text2: "Please Create or Join a Trip to get started!",
+          text1: i18n.t("welcomeToBudgetForNomads"),
+          text2: i18n.t("pleaseCreateTrip"),
         });
         navigation.navigate("Profile");
       }
@@ -73,8 +75,10 @@ const OverviewScreen = ({ navigation }) => {
       setOfflineString(connectionSpeedString);
     } else {
       if (netCtx.isConnected && !netCtx.strongConnection) {
-        setOfflineString(" - Slow Connection" + connectionSpeedString);
-      } else setOfflineString(" - Offline Mode");
+        setOfflineString(
+          ` - ${i18n.t("slowConnection")}` + connectionSpeedString
+        );
+      } else setOfflineString(` - ${i18n.t("offlineMode")}`);
     }
   }, [
     isOnline,

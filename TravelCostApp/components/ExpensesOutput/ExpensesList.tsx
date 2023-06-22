@@ -112,8 +112,8 @@ function onClick({ item, index }, isOnline) {
       navigation?.popToTop();
       Toast.show({
         type: "loading",
-        text1: "Deleting",
-        text2: "Please leave the app open...",
+        text1: i18n.t("toastDeleting1"),
+        text2: i18n.t("toastDeleting2"),
         autoHide: false,
       });
       const allExpenses = await getAllExpenses(tripid);
@@ -137,8 +137,8 @@ function onClick({ item, index }, isOnline) {
     } catch (error) {
       console.log("delete All Error:", error);
       Toast.show({
-        text1: "Error",
-        text2: "Could not delete expense, sorry!",
+        text1: i18n.t("error"),
+        text2: i18n.t("error2"),
         type: "error",
       });
     }
@@ -166,8 +166,8 @@ function onClick({ item, index }, isOnline) {
                 navigation?.popToTop();
                 Toast.show({
                   type: "loading",
-                  text1: "Deleting",
-                  text2: "Please leave the app open...",
+                  text1: i18n.t("toastDeleting1"),
+                  text2: i18n.t("toastDeleting2"),
                   autoHide: false,
                 });
                 const item: OfflineQueueManageExpenseItem = {
@@ -185,8 +185,8 @@ function onClick({ item, index }, isOnline) {
               } catch (error) {
                 console.log(i18n.t("deleteError"), error);
                 Toast.show({
-                  text1: "Error",
-                  text2: "Could not delete expense, sorry!",
+                  text1: i18n.t("error"),
+                  text2: i18n.t("error2"),
                   type: "error",
                 });
               }
@@ -208,8 +208,8 @@ function onClick({ item, index }, isOnline) {
         navigation?.popToTop();
         Toast.show({
           type: "loading",
-          text1: "Deleting",
-          text2: "Please leave the app open...",
+          text1: i18n.t("toastDeleting1"),
+          text2: i18n.t("toastDeleting2"),
           autoHide: false,
         });
         const item: OfflineQueueManageExpenseItem = {
@@ -227,8 +227,8 @@ function onClick({ item, index }, isOnline) {
       } catch (error) {
         console.log(i18n.t("deleteError"), error);
         Toast.show({
-          text1: "Error",
-          text2: "Could not delete expense, sorry!",
+          text1: i18n.t("error"),
+          text2: i18n.t("error2"),
           type: "error",
         });
       }

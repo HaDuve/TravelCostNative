@@ -108,7 +108,6 @@ const ProfileForm = ({ navigation }) => {
       userData.userName.length == 0 || userData.userName.length > 20;
 
     if (invalid) {
-      Alert.alert("Check your profile for invalid entries please!");
       return;
     }
     await userCtx.addUserName(userData);
@@ -134,7 +133,6 @@ const ProfileForm = ({ navigation }) => {
 
   function avatarHandler() {
     return;
-    Alert.alert("Profile picture function coming soon... ");
   }
 
   const changedName = inputs.userName.value !== userCtx.userName;

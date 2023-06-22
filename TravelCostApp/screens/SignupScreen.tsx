@@ -53,9 +53,8 @@ function SignupScreen() {
     if (!name) {
       Toast.show({
         type: "error",
-        text1: "No Name found",
-        text2:
-          "There might be a problem with the apple signin process. Please try again with a different method.",
+        text1: i18n.t("toastNameError1"),
+        text2: i18n.t("toastNameError2"),
       });
       setIsAuthenticating(false);
       return;

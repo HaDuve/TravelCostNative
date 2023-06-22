@@ -75,8 +75,8 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
       } else {
         Toast.show({
           type: "error",
-          text1: "No email found",
-          text2: "Please try again with a different method.",
+          text1: i18n.t("toastEmailError1"),
+          text2: i18n.t("toastEmailError2"),
         });
         return;
       }
@@ -116,15 +116,15 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
             console.log("onPress={ ~ e:", e);
             Toast.show({
               type: "error",
-              text1: "Apple Sign In",
-              text2: "User canceled the sign-in flow",
+              text1: i18n.t("toastAppleError1"),
+              text2: i18n.t("toastAppleError2"),
             });
           } else {
             // handle other errors
             console.log("onPress={ ~ e:", e);
             Toast.show({
               type: "error",
-              text1: "Apple Sign In",
+              text1: i18n.t("toastAppleError1"),
               text2: e.message,
             });
           }

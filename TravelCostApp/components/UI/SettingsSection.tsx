@@ -1,6 +1,16 @@
 import React, { useContext, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import { SettingsContext } from "../../store/settings-context";
 import SettingsSwitch from "./SettingsSwitch";
 import PropTypes from "prop-types";
@@ -61,32 +71,32 @@ const SettingsSection = ({ multiTraveller }) => {
         <Text style={GlobalStyles.secondaryText}>Show Flags icons</Text>
         <Switch onValueChange={toggleShowFlags} value={showFlags} /> */}
       <SettingsSwitch
-        label="Skip Category Picker"
+        label={i18n.t("settingsSkipCat")}
         style={styles.switchContainer}
         state={skipCategoryPickScreen}
         toggleState={toggleSkipCategoryPickScreen}
       />
       <SettingsSwitch
-        label="Always show more options"
+        label={i18n.t("settingsShowAdvanced")}
         style={styles.switchContainer}
         state={alwaysShowAdvanced}
         toggleState={toggleAlwaysShowAdvanced}
       />
       <SettingsSwitch
-        label="Show Flags icons"
+        label={i18n.t("settingsShowFlags")}
         style={styles.switchContainer}
         state={showFlags}
         toggleState={toggleShowFlags}
       />
       <SettingsSwitch
-        label="Show Internet Speed"
+        label={i18n.t("settingsShowInternetSpeed")}
         style={styles.switchContainer}
         state={showInternetSpeed}
         toggleState={toggleShowInternetSpeed}
       />
       {multiTraveller && (
         <SettingsSwitch
-          label="Show Traveller icons"
+          label={i18n.t("settingsShowTravellerIcon")}
           style={styles.switchContainer}
           state={showWhoPaid}
           toggleState={toggleShowWhoPaid}

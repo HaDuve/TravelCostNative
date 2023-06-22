@@ -153,17 +153,17 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       )}
       {!isGraphNotPie && toggleGraphEnum == 1 && (
         <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-          <Text style={styles.titleText}> Travellers </Text>
+          <Text style={styles.titleText}> {i18n.t("travellers")} </Text>
         </Animated.View>
       )}
       {!isGraphNotPie && toggleGraphEnum == 2 && (
         <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-          <Text style={styles.titleText}> Countries </Text>
+          <Text style={styles.titleText}> {i18n.t("countries")} </Text>
         </Animated.View>
       )}
       {!isGraphNotPie && toggleGraphEnum == 3 && (
         <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-          <Text style={styles.titleText}> Currencies </Text>
+          <Text style={styles.titleText}> {i18n.t("currencies")} </Text>
         </Animated.View>
       )}
 

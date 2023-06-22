@@ -39,10 +39,10 @@ const FilteredPieCharts = ({ navigation, route }) => {
   // contents and titleStrings have to match in legth and correspond!
   const titleStrings = [
     i18n.t("categories"),
-    "Travellers", // i18n.t("travellers"),
-    "Countries", // i18n.t("countries"),
-    "Currencies", // i18n.t("currencies"),
-    "Expenses", // i18n.t("expenses"),
+    i18n.t("travellers"),
+    i18n.t("countries"),
+    i18n.t("currencies"),
+    i18n.t("expenses"),
   ];
   const contents = [
     <ExpenseCategories

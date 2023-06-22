@@ -194,11 +194,6 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
       }
     });
   } catch (error) {
-    Toast.show({
-      type: "error",
-      text1: "Error while fetching expenses",
-      text2: "Please try again later",
-    });
     console.log("error while fetching expenses: ", error);
     throw new Error("error while fetching expenses");
   }
@@ -612,10 +607,6 @@ export async function touchAllTravelers(tripid: string, flag: boolean) {
     await Promise.all(axios_calls);
   } catch (error) {
     console.log("touching:", error);
-    Toast.show({
-      text1: "Error",
-      text2: "Internet connection error while syncing travellers",
-    });
   }
 }
 
@@ -631,10 +622,6 @@ export async function unTouchTraveler(tripid: string, uid: string) {
     await Promise.all(axios_calls);
   } catch (error) {
     console.log("touching:", error);
-    Toast.show({
-      text1: "Error",
-      text2: "Internet connection error while syncing travellers",
-    });
   }
 }
 
@@ -649,10 +636,6 @@ export async function touchMyTraveler(tripid: string, uid: string) {
     await Promise.all(axios_calls);
   } catch (error) {
     console.log("touching:", error);
-    Toast.show({
-      text1: "Error",
-      text2: "Internet connection error while syncing travellers",
-    });
   }
 }
 

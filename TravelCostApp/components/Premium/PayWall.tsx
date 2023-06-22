@@ -64,7 +64,7 @@ const PaywallScreen = ({ navigation }) => {
           setPackages(offerings.current.availablePackages);
         }
       } catch (e) {
-        Alert.alert("Error getting offers", e.message);
+        Alert.alert(i18n.t("errorGetOffers"), i18n.t("errorGetOffersText"));
       }
     };
 

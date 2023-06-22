@@ -1,6 +1,16 @@
 import Purchases from "react-native-purchases";
 import { FORCE_PREMIUM } from "../../confAppConstants";
 import Toast from "react-native-toast-message";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import { CAT_API_KEY } from "@env";
 /*
  The API key for your app from the RevenueCat dashboard: https://app.revenuecat.com
@@ -32,8 +42,8 @@ export async function isPremiumMember() {
     console.error(e);
     Toast.show({
       type: "error",
-      text1: "Error fetching premium status",
-      text2: e.message,
+      text1: i18n.t("toastPremiumFetchError"),
+      text2: i18n.t("error2"),
     });
   }
 }

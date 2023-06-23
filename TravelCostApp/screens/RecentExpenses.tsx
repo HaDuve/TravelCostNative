@@ -123,7 +123,7 @@ function RecentExpenses({ navigation }) {
 
   // strong connection state
   const [offlineString, setOfflineString] = useState("");
-  const lastConnectionSpeedInMbps = netCtx.lastConnectionSpeedInMbps;
+  const lastConnectionSpeedInMbps = netCtx.lastConnectionSpeedInMbps ?? 0;
   const showInternetSpeed = settings.showInternetSpeed;
   const connectionSpeedString = showInternetSpeed
     ? " - " +
@@ -299,7 +299,7 @@ function RecentExpenses({ navigation }) {
       ></TourGuideZone>
       <View style={styles.dateHeader}>
         <Text style={styles.dateString}>
-          {dateTimeString}
+          {tripCtx.tripName} - {dateTimeString}
           {offlineString}
         </Text>
       </View>

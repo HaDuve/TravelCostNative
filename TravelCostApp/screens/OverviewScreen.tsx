@@ -22,7 +22,7 @@ import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { ExpenseData } from "../util/expense";
 import * as Haptics from "expo-haptics";
 import { SettingsContext } from "../store/settings-context";
-import { formatExpenseWithCurrency } from "../util/string";
+import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { TripContext } from "../store/trip-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
@@ -49,7 +49,7 @@ const OverviewScreen = ({ navigation }) => {
   const [offlineString, setOfflineString] = useState("");
   // set in useEffect
   const showInternetSpeed = settings.showInternetSpeed;
-  const lastConnectionSpeedInMbps = netCtx.lastConnectionSpeedInMbps;
+  const lastConnectionSpeedInMbps = netCtx.lastConnectionSpeedInMbps ?? 0;
   const connectionSpeedString = showInternetSpeed
     ? " - " +
       lastConnectionSpeedInMbps?.toFixed(2) +
@@ -122,7 +122,7 @@ const OverviewScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.dateHeader}>
         <Text style={styles.dateString}>
-          {dateTimeString}
+          {truncateString(tripCtx.tripName, 15)} - {dateTimeString}
           {offlineString}
         </Text>
       </View>

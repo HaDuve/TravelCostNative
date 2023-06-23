@@ -364,7 +364,7 @@ function ExpensesList({
       </View>
       <Animated.FlatList
         // ref={flatListRef}
-        scrollEnabled={false}
+        scrollEnabled={true}
         itemLayoutAnimation={layoutAnim}
         data={expenses}
         // ref={listRef}

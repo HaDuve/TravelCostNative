@@ -1,5 +1,10 @@
 Change log Travel Expense App
 
+1.1.8b
+- show trip name
+- fix disabled scroll bug
+- fixed layout issues with long strings and scaled text
+
 1.1.8
 - fixed alot of bugs (trips organization)
 - re-added onboarding

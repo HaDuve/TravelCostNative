@@ -57,6 +57,9 @@ const AddExpenseButton = ({ navigation }) => {
         tripCtx.travellers.length > 0
     );
   }, [tripCtx.tripid, authCtx.uid, tripCtx.travellers]);
+  console.log("AddExpenseButton ~ tripCtx.travellers:", tripCtx.travellers);
+  console.log("AddExpenseButton ~ authCtx.uid:", authCtx.uid);
+  console.log("AddExpenseButton ~ tripCtx.tripid:", tripCtx.tripid);
   const skipCatScreen = settings.skipCategoryScreen;
   if (!valid) {
     return (

@@ -163,7 +163,11 @@ const OverviewScreen = ({ navigation }) => {
             isScaledUp && styles.scaledUpTextStyle,
           ]}
         />
-        <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
+        <ExpensesSummary
+          useMoreSpace
+          expenses={recentExpenses}
+          periodName={PeriodValue}
+        />
       </View>
       <View style={styles.tempGrayBar1}></View>
 

@@ -215,8 +215,10 @@ const TripForm = ({ navigation, route }) => {
     try {
       console.log("TripForm ~ tripid in editingTripData:", editedTripId);
       await updateTrip(editedTripId, tripData);
+      console.log("editingTripData ~ editedTripId:", editedTripId);
       if (editedTripId === tripCtx.tripid || setActive) {
         await secureStoreSetItem("currentTripId", editedTripId);
+        await tripCtx.saveTripDataInStorage(tripData);
         await tripCtx.setCurrentTrip(editedTripId, tripData);
         await updateUser(uid, {
           currentTrip: editedTripId,

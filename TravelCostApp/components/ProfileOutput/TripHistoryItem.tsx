@@ -5,6 +5,7 @@ import {
   View,
   FlatList,
   Alert,
+  useWindowDimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
@@ -139,8 +140,6 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
     allLoaded,
   ]);
 
-  if (!tripid) return <Text>no id</Text>;
-
   const totalBudgetString = formatExpenseWithCurrency(
     Number(totalBudget),
     tripCurrency
@@ -153,6 +152,12 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
     Number(sumOfExpenses),
     tripCurrency
   );
+
+  const { fontScale } = useWindowDimensions();
+  const megaLongText =
+    dailyBudgetString.length + sumOfExpensesString.length > 22;
+  const isScaledUp = fontScale > 1 || megaLongText;
+  console.log("TripHistoryItem ~ isScaledUp:", isScaledUp);
 
   function tripPressHandler() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -173,6 +178,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const activeProgress = progress;
   const isOverBudget = Number(sumOfExpenses) > Number(totalBudget);
 
+  if (!tripid) return <Text>no id</Text>;
   if (isFetching || (tripid && !totalBudget)) {
     return (
       <Pressable
@@ -182,7 +188,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
         <View
           style={[styles.tripItem, GlobalStyles.wideStrongShadow, activeBorder]}
         >
-          <View style={styles.topRow}>
+          <View style={[styles.topRow]}>
             <View>
               {/* <Text style={[styles.textBase, styles.description]}>{"..."}</Text> */}
               <LoadingBarOverlay
@@ -247,12 +253,22 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       <View
         style={[styles.tripItem, GlobalStyles.wideStrongShadow, activeBorder]}
       >
-        <View style={styles.topRow}>
+        <View
+          style={[styles.topRow, isScaledUp && { flexDirection: "column" }]}
+        >
           <View>
-            <Text style={[styles.textBase, styles.description]}>
-              {truncateString(tripName, 11)}
+            <Text
+              style={[
+                styles.textBase,
+                styles.description,
+                isScaledUp && { textAlign: "center" },
+              ]}
+            >
+              {truncateString(tripName, megaLongText ? 30 : 11)}
             </Text>
-            <Text style={styles.textBase}>
+            <Text
+              style={[styles.textBase, isScaledUp && { textAlign: "center" }]}
+            >
               {i18n.t("daily")}
               {": " + dailyBudgetString}
             </Text>

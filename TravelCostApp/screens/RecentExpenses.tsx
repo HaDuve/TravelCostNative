@@ -338,7 +338,11 @@ function RecentExpenses({ navigation }) {
           ]}
         />
 
-        <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
+        <ExpensesSummary
+          useMoreSpace
+          expenses={recentExpenses}
+          periodName={PeriodValue}
+        />
       </View>
 
       <View style={styles.tempGrayBar1}></View>

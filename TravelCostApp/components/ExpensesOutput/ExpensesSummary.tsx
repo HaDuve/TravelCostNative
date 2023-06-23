@@ -21,7 +21,7 @@ import { MAX_JS_NUMBER } from "../../confAppConstants";
 import * as Haptics from "expo-haptics";
 import { UserContext } from "../../store/user-context";
 
-const ExpensesSummary = ({ expenses, periodName }) => {
+const ExpensesSummary = ({ expenses, periodName, useMoreSpace }) => {
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   if (!expenses || !periodName || userCtx.freshlyCreated) return <></>;
@@ -139,7 +139,7 @@ const ExpensesSummary = ({ expenses, periodName }) => {
         borderRadius={8}
         progress={budgetProgress}
         height={12}
-        width={150}
+        width={useMoreSpace ? 300 : 150}
       />
     </Pressable>
   );
@@ -150,6 +150,7 @@ export default ExpensesSummary;
 ExpensesSummary.propTypes = {
   expenses: PropTypes.array.isRequired,
   periodName: PropTypes.string.isRequired,
+  useMoreSpace: PropTypes.bool,
 };
 
 const styles = StyleSheet.create({

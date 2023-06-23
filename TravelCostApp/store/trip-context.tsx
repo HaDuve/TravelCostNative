@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import React, { createContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
-import { fetchTrip, getTravellers, updateTrip } from "../util/http";
+import { fetchTrip, fetchUser, getTravellers, updateTrip } from "../util/http";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 import Toast from "react-native-toast-message";
 import { MAX_JS_NUMBER } from "../confAppConstants";
@@ -10,6 +10,7 @@ import { secureStoreGetItem } from "./secure-storage";
 import { ExpenseData, isPaidString } from "../util/expense";
 import { err } from "react-native-svg/lib/typescript/xml";
 import { Traveller } from "../util/traveler";
+import { isConnectionFastEnough } from "../util/connectionSpeed";
 
 export interface TripData {
   tripName?: string;
@@ -76,8 +77,17 @@ function TripContextProvider({ children }) {
 
   useEffect(() => {
     async function loadAsyncTripid() {
-      const tripid = await secureStoreGetItem("currentTripid");
-      if (tripid) setTripid(tripid);
+      const stored_tripid = await secureStoreGetItem("currentTripId");
+      console.log("loadAsyncTripid ~ stored_tripid:", stored_tripid);
+      const stored_uid = await secureStoreGetItem("uid");
+      if (stored_tripid) setTripid(stored_tripid);
+      const { isFastEnough } = await isConnectionFastEnough();
+      if (stored_tripid && isFastEnough) {
+        const checkUser = await fetchUser(stored_uid);
+        const fetched_tripid = checkUser.currentTrip;
+        await fetchAndSetCurrentTrip(fetched_tripid ?? stored_tripid);
+        await fetchAndSetTravellers(fetched_tripid);
+      }
     }
     loadAsyncTripid();
   }, []);
@@ -229,7 +239,6 @@ function TripContextProvider({ children }) {
   async function loadTripDataFromStorage() {
     const tripData = await asyncStoreGetObject("currentTrip");
     if (tripData) {
-      _setTripid(tripData.tripid);
       setTripName(tripData.tripName);
       setTotalBudget(
         tripData.totalBudget

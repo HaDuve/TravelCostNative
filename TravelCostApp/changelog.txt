@@ -1,11 +1,12 @@
 Change log Travel Expense App
 
 
-1.1.8d
+1.1.8e
 - fix settings resetting with each update
 - made invalid add button more subtle (pressing leads to restart of app)
-- improved chatGPT screen layout
+- improved chatGPT screen layout and design
 - improved chatGPT translation and prompt > leading to better answers
+- added chatGPT infoButton
 
 1.1.8c
 - tour guide and onboarding wont show up for every new update anymore

@@ -61,34 +61,34 @@ const AddExpenseButton = ({ navigation }) => {
   console.log("AddExpenseButton ~ authCtx.uid:", authCtx.uid);
   console.log("AddExpenseButton ~ tripCtx.tripid:", tripCtx.tripid);
   const skipCatScreen = settings.skipCategoryScreen;
-  if (!valid) {
-    return (
-      <Animated.View
-        style={[styles.margin]}
-        entering={FadeIn.duration(600).delay(8000)}
-      >
-        <Pressable
-          onPress={() => {
-            reloadApp();
-          }}
-          style={[
-            styles.addButton,
-            GlobalStyles.shadowGlowPrimary,
-            styles.addButtonInactive,
-          ]}
-        >
-          <LoadingBarOverlay
-            containerStyle={{
-              backgroundColor: "transparent",
-              maxHeight: 44,
-              marginLeft: -4,
-            }}
-            noText
-          ></LoadingBarOverlay>
-        </Pressable>
-      </Animated.View>
-    );
-  }
+  // if (!valid) {
+  //   return (
+  //     <Animated.View
+  //       style={[styles.margin]}
+  //       entering={FadeIn.duration(600).delay(8000)}
+  //     >
+  //       <Pressable
+  //         onPress={() => {
+  //           reloadApp();
+  //         }}
+  //         style={[
+  //           styles.addButton,
+  //           GlobalStyles.shadowGlowPrimary,
+  //           styles.addButtonInactive,
+  //         ]}
+  //       >
+  //         <LoadingBarOverlay
+  //           containerStyle={{
+  //             backgroundColor: "transparent",
+  //             maxHeight: 44,
+  //             marginLeft: -4,
+  //           }}
+  //           noText
+  //         ></LoadingBarOverlay>
+  //       </Pressable>
+  //     </Animated.View>
+  //   );
+  // }
   return (
     <Animated.View
       style={styles.margin}
@@ -106,11 +106,13 @@ const AddExpenseButton = ({ navigation }) => {
       <Pressable
         style={({ pressed }) => [
           styles.addButton,
+          !valid && styles.addButtonInactive,
           GlobalStyles.shadowGlowPrimary,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
         ref={buttonRef}
-        onPress={() => {
+        onPress={async () => {
+          if (!valid) await reloadApp();
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           skipCatScreen &&
             navigation.navigate("ManageExpense", {
@@ -145,6 +147,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   addButtonInactive: {
-    backgroundColor: GlobalStyles.colors.primary800,
+    backgroundColor: GlobalStyles.colors.primary500,
   },
 });

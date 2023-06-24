@@ -3,7 +3,7 @@ Change log Travel Expense App
 
 1.1.8d
 - fix settings resetting with each update
-- made invalid add button more subtle (leading to restart of app)
+- made invalid add button more subtle (pressing leads to restart of app)
 - improved chatGPT translation and prompt - leading to better answers
 
 1.1.8c

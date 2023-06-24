@@ -34,7 +34,7 @@ export function chatGPTcontentGoodDealPost(
   country: string
 ) {
   // Is 3500Rs a good price for Surfboard Rental 1 hour in Sri Lanka? Tell me the normal price range. Restrict your answer to one sentence of maximum 15 words.
-  const content = `Is ${price} ${currency} a good price for ${product} in ${country}? Also tell me the normal price range. Restrict your answer to two sentences of maximum 15 words. Translate me your answer in ${languageName}.`;
+  const content = `Is ${price} ${currency} a good price for ${product} in ${country}? Answer me in ${languageName} with facts.  Also tell me the normal price range.`;
   return content;
 }
 

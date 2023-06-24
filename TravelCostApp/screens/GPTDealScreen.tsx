@@ -15,6 +15,7 @@ i18n.enableFallback = true;
 import { chatGPT_getGoodDeal } from "../util/chatGPTrequest";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { GlobalStyles } from "../constants/styles";
+import { Image } from "react-native";
 
 const GPTDealScreen = ({ route, navigation }) => {
   const { price, currency, country, product } = route.params;
@@ -51,16 +52,25 @@ const GPTDealScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
+        <View style={[styles.image, GlobalStyles.shadowGlowPrimary]}>
+          <Image
+            source={require("../assets/chatgpt-logo.jpeg")}
+            style={{ width: 40, height: 40 }}
+          />
+        </View>
         <Text style={styles.titleText}>{i18n.t("askChatGptTitle")}</Text>
       </View>
-      <ScrollView style={[styles.answerContainer, GlobalStyles.strongShadow]}>
-        {isFetching && (
-          <LoadingBarOverlay
-            customText={i18n.t("askingChatGpt")}
-          ></LoadingBarOverlay>
-        )}
-        {!isFetching && <Text style={[styles.answerText]}>{answer}</Text>}
-      </ScrollView>
+
+      <View style={[styles.answerContainer, GlobalStyles.strongShadow]}>
+        <ScrollView>
+          {isFetching && (
+            <LoadingBarOverlay
+              customText={i18n.t("askingChatGpt")}
+            ></LoadingBarOverlay>
+          )}
+          {!isFetching && <Text style={[styles.answerText]}>{answer}</Text>}
+        </ScrollView>
+      </View>
       <View style={styles.buttonContainer}>
         <FlatButton onPress={() => navigation.pop()}>
           {i18n.t("back")}
@@ -84,6 +94,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  image: {
+    width: 60,
+    height: 60,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
+  },
   headerContainer: {
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -101,7 +118,8 @@ const styles = StyleSheet.create({
     borderColor: GlobalStyles.colors.primaryGrayed,
   },
   titleText: {
-    fontSize: 20,
+    marginTop: 4,
+    fontSize: 24,
     fontWeight: "bold",
     color: GlobalStyles.colors.textColor,
   },

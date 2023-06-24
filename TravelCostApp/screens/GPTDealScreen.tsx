@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, ScrollView } from "react-native";
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import FlatButton from "../components/UI/FlatButton";
@@ -53,14 +53,14 @@ const GPTDealScreen = ({ route, navigation }) => {
       <View style={styles.headerContainer}>
         <Text style={styles.titleText}>{i18n.t("askChatGptTitle")}</Text>
       </View>
-      <View style={[styles.answerContainer, GlobalStyles.strongShadow]}>
+      <ScrollView style={[styles.answerContainer, GlobalStyles.strongShadow]}>
         {isFetching && (
           <LoadingBarOverlay
             customText={i18n.t("askingChatGpt")}
           ></LoadingBarOverlay>
         )}
         {!isFetching && <Text style={[styles.answerText]}>{answer}</Text>}
-      </View>
+      </ScrollView>
       <View style={styles.buttonContainer}>
         <FlatButton onPress={() => navigation.pop()}>
           {i18n.t("back")}

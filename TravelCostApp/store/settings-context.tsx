@@ -2,6 +2,7 @@ import React, { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SplashScreenOverlay from "../components/UI/SplashScreenOverlay";
 import PropTypes from "prop-types";
+import { secureStoreGetItem, secureStoreSetItem } from "./secure-storage";
 
 export interface Settings {
   showFlags: boolean;
@@ -25,7 +26,7 @@ export const SettingsProvider = ({ children }) => {
 
   useEffect(() => {
     const loadSettingsAsync = async () => {
-      const settingsString = await AsyncStorage.getItem("settings");
+      const settingsString = await secureStoreGetItem("settings");
       if (settingsString) {
         const loadedSettings: Settings = JSON.parse(settingsString);
         setSettings(loadedSettings);
@@ -44,7 +45,7 @@ export const SettingsProvider = ({ children }) => {
   const saveSettings = async (newSettings) => {
     try {
       const settingsString = JSON.stringify(newSettings);
-      await AsyncStorage.setItem("settings", settingsString);
+      await secureStoreSetItem("settings", settingsString);
       setSettings(newSettings);
     } catch (error) {
       console.log(error);

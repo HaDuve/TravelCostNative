@@ -14,6 +14,7 @@ i18n.enableFallback = true;
 import { SettingsContext } from "../../store/settings-context";
 import SettingsSwitch from "./SettingsSwitch";
 import PropTypes from "prop-types";
+import { secureStoreGetItem } from "../../store/secure-storage";
 
 const SettingsSection = ({ multiTraveller }) => {
   const { settings, saveSettings } = useContext(SettingsContext);
@@ -114,7 +115,7 @@ SettingsSection.propTypes = {
 
 export const loadSettings = async () => {
   try {
-    const settings = await AsyncStorage.getItem("settings");
+    const settings = await secureStoreGetItem("settings");
     return JSON.parse(settings);
   } catch (error) {
     console.log(error);

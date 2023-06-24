@@ -57,7 +57,7 @@ import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { sendOfflineQueue } from "../util/offline-queue";
 import * as Haptics from "expo-haptics";
 import { SettingsContext } from "../store/settings-context";
-import { formatExpenseWithCurrency } from "../util/string";
+import { formatExpenseWithCurrency, truncateString } from "../util/string";
 
 function RecentExpenses({ navigation }) {
   // console.log("rerender RecentExpenses - A");
@@ -299,7 +299,7 @@ function RecentExpenses({ navigation }) {
       ></TourGuideZone>
       <View style={styles.dateHeader}>
         <Text style={styles.dateString}>
-          {tripCtx.tripName} - {dateTimeString}
+          {truncateString(tripCtx.tripName, 23)} - {dateTimeString}
           {offlineString}
         </Text>
       </View>
@@ -339,7 +339,7 @@ function RecentExpenses({ navigation }) {
         />
 
         <ExpensesSummary
-          useMoreSpace
+          useMoreSpace={useMoreSpace}
           expenses={recentExpenses}
           periodName={PeriodValue}
         />

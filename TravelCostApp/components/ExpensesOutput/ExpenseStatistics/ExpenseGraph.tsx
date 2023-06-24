@@ -27,6 +27,7 @@ i18n.enableFallback = true;
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import PropTypes from "prop-types";
 import { isForeground } from "../../../util/appState";
+import { MAX_JS_NUMBER } from "../../../confAppConstants";
 
 const ExpenseGraph = ({
   periodName,
@@ -42,6 +43,7 @@ const ExpenseGraph = ({
     console.log("ExpenseGraph: not in foreground, return empty view");
     return <></>;
   }
+  const totalBudget = Number(tripCtx.totalBudget) ?? MAX_JS_NUMBER;
   const listExpenseSumBudgets = [];
   const lastDays = periodRangeNumber ?? 8,
     lastWeeks = periodRangeNumber ?? 10,
@@ -153,7 +155,8 @@ const ExpenseGraph = ({
           if (isNaN(Number(expense.calcAmount))) return sum;
           return sum + Number(expense.calcAmount.toFixed(2));
         }, 0);
-        const weeklyBudget = Number(tripCtx.dailyBudget) * 7;
+        let weeklyBudget = Number(tripCtx.dailyBudget) * 7;
+        if (weeklyBudget > totalBudget) weeklyBudget = totalBudget;
         const formattedDay = toDayMonthString(firstDay);
         const formattedSum = formatExpenseWithCurrency(
           expensesSum,
@@ -244,7 +247,8 @@ const ExpenseGraph = ({
           if (isNaN(Number(expense.calcAmount))) return sum;
           return sum + Number(expense.calcAmount.toFixed(2));
         }, 0);
-        const monthlyBudget = Number(tripCtx.dailyBudget) * 30;
+        let monthlyBudget = Number(tripCtx.dailyBudget) * 30;
+        if (monthlyBudget > totalBudget) monthlyBudget = totalBudget;
         const formattedDay = toDayMonthString(firstDay);
         const formattedSum = formatExpenseWithCurrency(
           expensesSum,
@@ -330,7 +334,8 @@ const ExpenseGraph = ({
           return sum + Number(expense.calcAmount.toFixed(2));
         }, 0);
 
-        const yearlyBudget = Number(tripCtx.dailyBudget) * 365;
+        let yearlyBudget = Number(tripCtx.dailyBudget) * 365;
+        if (yearlyBudget > totalBudget) yearlyBudget = totalBudget;
         const formattedDay = toDayMonthString(firstDay);
         const formattedSum = formatExpenseWithCurrency(
           expensesSum,

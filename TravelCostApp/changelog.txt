@@ -1,5 +1,12 @@
 Change log Travel Expense App
 
+
+1.1.8c
+- tour guide and onboarding wont show up for every new update anymore
+- improved rating CTA
+- fixed long progress bar bug
+- fixed monthly budget being higher than the total budget sometimes
+
 1.1.8b
 - show trip name
 - fix disabled scroll bug

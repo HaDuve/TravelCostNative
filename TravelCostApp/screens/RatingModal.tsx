@@ -1,22 +1,32 @@
-import { Button, StyleSheet, Text, View } from "react-native";
+import { Button, StyleSheet, Text, View, Image, Pressable } from "react-native";
 import React, { useState } from "react";
 import Modal from "react-native-modal";
 import { Linking, Platform } from "react-native";
 import * as StoreReview from "expo-store-review";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import PropTypes from "prop-types";
 import { GlobalStyles } from "../constants/styles";
 import GradientButton from "../components/UI/GradientButton";
 import FlatButton from "../components/UI/FlatButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { secureStoreSetObject } from "../store/secure-storage";
 
 //TODO: set the according URLS when we are live!
-export const APP_STORE_URL =
-  "https://apps.apple.com/de/app/budget-for-nomads/id6446042796";
+export const APP_STORE_URL = `https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=${i18n.locale}`;
 export const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=com.example.app";
 
 export const neverAskAgain = async () => {
-  await AsyncStorage.setItem("neverAskAgain", JSON.stringify(true));
+  await secureStoreSetObject("neverAskAgain", true);
 };
 
 const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
@@ -34,7 +44,7 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
   };
 
   const handleClose = async () => {
-    await AsyncStorage.setItem("remindLater", JSON.stringify(Date.now()));
+    await secureStoreSetObject("remindLater", Date.now());
     setIsModalVisible(false);
   };
 
@@ -54,16 +64,50 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
       onBackdropPress={handleClose}
       onBackButtonPress={handleClose}
     >
-      <View style={styles.reviewContainer}>
+      <Pressable onPress={handleRate} style={styles.reviewContainer}>
         <View style={styles.titleContainer}>
-          <Text>Would you like to rate our app?</Text>
+          <Text style={styles.titleText}>{i18n.t("rateModalTitle")}</Text>
+        </View>
+        <Image
+          source={require("../assets/icon2.png")}
+          style={[
+            {
+              width: "20%",
+              height: "20%",
+              margin: "4%",
+              // marginTop: "-4%",
+            },
+            GlobalStyles.shadowPrimary,
+            { overflow: "visible" },
+          ]}
+        />
+
+        <Image
+          source={require("../assets/stars.png")}
+          style={[
+            {
+              width: "80%",
+              height: "10%",
+              marginBottom: "20%",
+            },
+            GlobalStyles.shadowPrimary,
+            { overflow: "visible" },
+          ]}
+        />
+
+        <View style={styles.subTitleContainer}>
+          <Text style={styles.subTitleText}>{i18n.t("rateModalSubTitle")}</Text>
         </View>
         <View style={styles.buttonContainer}>
-          <FlatButton onPress={handleNeverAskAgain}>{"Never"}</FlatButton>
-          <FlatButton onPress={handleClose}>{"Later"}</FlatButton>
-          <GradientButton onPress={handleRate}>{"Rate now!"}</GradientButton>
+          <FlatButton onPress={handleNeverAskAgain}>
+            {i18n.t("never")}
+          </FlatButton>
+          <FlatButton onPress={handleClose}>{i18n.t("later")}</FlatButton>
+          <GradientButton onPress={handleRate}>
+            {i18n.t("rateModalButton")}
+          </GradientButton>
         </View>
-      </View>
+      </Pressable>
     </Modal>
   );
 };
@@ -80,10 +124,31 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     marginBottom: 40,
   },
+  imageContainer: {
+    overflow: "visible",
+
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
   titleContainer: {
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
+  },
+  titleText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: GlobalStyles.colors.textColor,
+  },
+  subTitleContainer: {
+    marginBottom: 20,
+  },
+  subTitleText: {
+    fontSize: 16,
+    textAlign: "center",
+    color: GlobalStyles.colors.textColor,
   },
   buttonContainer: {
     flexDirection: "row",

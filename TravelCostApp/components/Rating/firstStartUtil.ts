@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DAYS_BEFORE_PROMPT } from "../../confAppConstants";
 import {
   secureStoreGetObject,
@@ -19,7 +18,7 @@ export const handleFirstStart = async () => {
 
 export const shouldPromptForRating = async () => {
   try {
-    const neverAskAgain = await AsyncStorage.getItem("neverAskAgain");
+    const neverAskAgain = await secureStoreGetObject("neverAskAgain");
     if (neverAskAgain) {
       return false;
     }
@@ -29,7 +28,7 @@ export const shouldPromptForRating = async () => {
   try {
     const firstStart = await secureStoreGetObject("firstStart");
     if (firstStart) {
-      const remindLater = await AsyncStorage.getItem("remindLater");
+      const remindLater = await secureStoreGetObject("remindLater");
       return remindLater
         ? isOlderThanOneDay(remindLater)
         : isOlderThanOneDay(firstStart);

@@ -21,7 +21,7 @@ import { MAX_JS_NUMBER } from "../../confAppConstants";
 import * as Haptics from "expo-haptics";
 import { UserContext } from "../../store/user-context";
 
-const ExpensesSummary = ({ expenses, periodName, useMoreSpace }) => {
+const ExpensesSummary = ({ expenses, periodName, useMoreSpace = false }) => {
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   if (!expenses || !periodName || userCtx.freshlyCreated) return <></>;
@@ -71,6 +71,7 @@ const ExpensesSummary = ({ expenses, periodName, useMoreSpace }) => {
   }
 
   if (!budgetNumber || budgetNumber == MAX_JS_NUMBER) infinityString = "∞";
+  if (budgetNumber > totalBudget ?? MAX_JS_NUMBER) budgetNumber = totalBudget;
   let budgetProgress = (expenseSumNum / budgetNumber) * 1;
   const budgetColor =
     budgetProgress <= 1

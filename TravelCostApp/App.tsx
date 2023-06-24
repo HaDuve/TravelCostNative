@@ -599,14 +599,6 @@ function Root() {
       const storedTripId = await secureStoreGetItem("currentTripId");
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
 
-      // console.log(
-      //   "store loaded: ",
-      //   truncateString(storedToken, 10),
-      //   truncateString(storedUid, 10),
-      //   truncateString(storedTripId, 10),
-      //   freshlyCreated
-      // );
-
       if (storedToken && storedUid && storedTripId) {
         // setup purchases
         if (Platform.OS === "android") {

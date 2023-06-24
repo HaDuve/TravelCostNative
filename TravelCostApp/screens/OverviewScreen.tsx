@@ -122,7 +122,7 @@ const OverviewScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.dateHeader}>
         <Text style={styles.dateString}>
-          {truncateString(tripCtx.tripName, 15)} - {dateTimeString}
+          {truncateString(tripCtx.tripName, 23)} - {dateTimeString}
           {offlineString}
         </Text>
       </View>
@@ -164,7 +164,7 @@ const OverviewScreen = ({ navigation }) => {
           ]}
         />
         <ExpensesSummary
-          useMoreSpace
+          useMoreSpace={useMoreSpace}
           expenses={recentExpenses}
           periodName={PeriodValue}
         />

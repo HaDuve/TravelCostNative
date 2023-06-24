@@ -369,6 +369,15 @@ const en = {
   toastSyncFinished1: "Online again!",
   toastSyncFinished21: "Synchronized",
   toastSyncFinished22: "offline Changes!",
+
+  // rate modal
+  rateModalTitle: "Enjoying Budget for Nomads?",
+  rateModalSubTitle:
+    "Help us improve your experience!" +
+    "\n\nShape the Future of Budget for Nomads with Your Feedback!",
+  rateModalButton: "Rate Now",
+  never: "Never",
+  later: "Later",
 };
 const de = {
   // standard strings
@@ -762,6 +771,14 @@ const de = {
   toastSyncFinished1: "Wieder online!",
   toastSyncFinished21: "Synchronisiert",
   toastSyncFinished22: "Offline-Änderungen!",
+  // rate modal
+  rateModalTitle: "Gefällt dir Budget for Nomads?",
+  rateModalSubTitle:
+    "Hilf uns, deine Erfahrung zu verbessern!" +
+    "\n\nGestalte die Zukunft von Budget for Nomads mit deinem Feedback!",
+  rateModalButton: "Jetzt bewerten",
+  never: "Nie",
+  later: "Später",
 };
 const fr = {
   // standard strings
@@ -1151,6 +1168,14 @@ const fr = {
   toastSyncFinished1: "En ligne à nouveau !",
   toastSyncFinished21: "Synchronisé",
   toastSyncFinished22: "modifications hors ligne !",
+  // rate modal
+  rateModalTitle: "Vous appréciez Budget for Nomads ?",
+  rateModalSubTitle:
+    "Aidez-nous à améliorer votre expérience !" +
+    "\n\nDonnez votre avis pour façonner l'avenir de Budget for Nomads !",
+  rateModalButton: "Évaluer maintenant",
+  never: "Jamais",
+  later: "Plus tard",
 };
 const ru = {
   // standard strings
@@ -1544,5 +1569,13 @@ const ru = {
   toastSyncFinished1: "Снова онлайн!",
   toastSyncFinished21: "Синхронизированы",
   toastSyncFinished22: "офлайн изменения!",
+  // rate modal
+  rateModalTitle: "Нравится Budget for Nomads?",
+  rateModalSubTitle:
+    "Помогите нам улучшить ваш опыт!" +
+    "\n\nСформируйте будущее Budget for Nomads своим отзывом!",
+  rateModalButton: "Оценить сейчас",
+  never: "Никогда",
+  later: "Позже",
 };
 export { en, de, fr, ru };

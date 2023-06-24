@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView, Alert } from "react-native";
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import FlatButton from "../components/UI/FlatButton";
@@ -16,6 +16,7 @@ import { chatGPT_getGoodDeal } from "../util/chatGPTrequest";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { GlobalStyles } from "../constants/styles";
 import { Image } from "react-native";
+import InfoButton from "../components/UI/InfoButton";
 
 const GPTDealScreen = ({ route, navigation }) => {
   const { price, currency, country, product } = route.params;
@@ -58,7 +59,16 @@ const GPTDealScreen = ({ route, navigation }) => {
             style={{ width: 40, height: 40 }}
           />
         </View>
-        <Text style={styles.titleText}>{i18n.t("askChatGptTitle")}</Text>
+        <View style={{ flexDirection: "row" }}>
+          <Text style={styles.titleText}>{i18n.t("askChatGptTitle")}</Text>
+          <InfoButton
+            onPress={() =>
+              Alert.alert(
+                "chatGPT Info",
+              )
+            }
+          ></InfoButton>
+        </View>
       </View>
 
       <View style={[styles.answerContainer, GlobalStyles.strongShadow]}>
@@ -99,7 +109,8 @@ const styles = StyleSheet.create({
     height: 60,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 8,
+    marginBottom: 4,
+    paddingTop: 8,
   },
   headerContainer: {
     flex: 1,

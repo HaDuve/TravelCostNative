@@ -378,6 +378,10 @@ const en = {
   rateModalButton: "Rate Now",
   never: "Never",
   later: "Later",
+  // gpt
+  gptInfoTitle: "ChatGPT Info",
+  gptInfoText:
+    "When using the \"ask ChatGPT for a good deal\" feature, input your travel expenses for evaluation. ChatGPT assesses and analyzes the expenses to determine if they're a good deal, considering factors like market prices, data, and reviews. Remember, ChatGPT is an AI system, not a financial expert. Use its evaluation as a reference, not professional advice. Note that ChatGPT's information is based on data until September 2021 and may not reflect current conditions. It's wise to consult a financial advisor or do additional research. For accurate evaluations, include as much relevant information as possible in your expense description. Your feedback is valuable in improving the system's accuracy and usefulness.",
 };
 const de = {
   // standard strings
@@ -779,6 +783,10 @@ const de = {
   rateModalButton: "Jetzt bewerten",
   never: "Nie",
   later: "Später",
+  // gpt
+  gptInfoTitle: "ChatGPT Info",
+  gptInfoText:
+    'Wenn du die Funktion "Frag ChatGPT nach einem guten Angebot" nutzt, gib deine Reisekosten zur Bewertung ein. ChatGPT bewertet und analysiert deine Ausgaben, um festzustellen, ob sie ein gutes Geschäft sind. Dabei berücksichtigt es Faktoren wie Marktpreise, Daten und Bewertungen. Denk daran, dass ChatGPT ein KI-System ist und kein Finanzexperte. Verwende seine Bewertung als Referenz, nicht als professionellen Rat. Beachte, dass die Informationen von ChatGPT auf Daten bis September 2021 beruhen und möglicherweise nicht die aktuellen Bedingungen widerspiegeln. Es ist ratsam, einen Finanzberater zu konsultieren oder zusätzliche Nachforschungen anzustellen. Um genaue Bewertungen zu erhalten, solltest du so viele relevante Informationen wie möglich in deine Ausgabenbeschreibung aufnehmen. Dein Feedback ist wertvoll, um die Genauigkeit und Nützlichkeit des Systems zu verbessern.',
 };
 const fr = {
   // standard strings
@@ -1176,6 +1184,11 @@ const fr = {
   rateModalButton: "Évaluer maintenant",
   never: "Jamais",
   later: "Plus tard",
+
+  // gpt
+  gptInfoTitle: "Informations sur ChatGPT",
+  gptInfoText:
+    "Si tu utilises la fonction \"Demandez une bonne affaire à ChatGPT\", entrez vos frais de déplacement pour les évaluer. ChatGPT évalue et analyse tes dépenses pour déterminer si elles constituent une bonne affaire. Il prend en compte des facteurs tels que les prix du marché, les dates et les évaluations. N'oublie pas que ChatGPT est un système d'intelligence artificielle et non un expert financier. Utilise son évaluation comme référence, pas comme un conseil professionnel. Note que les informations de ChatGPT sont basées sur des données jusqu'en septembre 2021 et peuvent ne pas refléter les conditions actuelles. Il est conseillé de consulter un conseiller financier ou de faire des recherches supplémentaires. Pour obtenir des évaluations précises, tu dois inclure autant d'informations pertinentes que possible dans la description de tes dépenses. Ton feedback est précieux pour améliorer la précision et l'utilité du système",
 };
 const ru = {
   // standard strings
@@ -1577,5 +1590,10 @@ const ru = {
   rateModalButton: "Оценить сейчас",
   never: "Никогда",
   later: "Позже",
+
+  // gpt
+  gptInfoTitle: "Информация о ChatGPT",
+  gptInfoText:
+    'Когда вы используете функцию "Попросить ChatGPT о хорошей сделке", введите свои расходы на поездку для оценки. ChatGPT оценивает и анализирует ваши расходы, чтобы определить, являются ли они выгодной сделкой. Он принимает во внимание такие факторы, как рыночные цены, даты и оценки. Помните, что ChatGPT - это система искусственного интеллекта, а не финансовый эксперт. Используйте его оценку как справочник, а не как профессиональный совет. Обратите внимание, что информация ChatGPT основана на данных по сентябрь 2021 года и может не отражать текущие условия. Рекомендуется проконсультироваться с финансовым консультантом или провести дополнительное исследование. Чтобы получить точные рейтинги, вы должны включить как можно больше релевантной информации в описание ваших расходов. Ваши отзывы ценны для повышения точности и полезности системы',
 };
 export { en, de, fr, ru };

@@ -44,6 +44,6 @@
     "runtimeVersion": {
       "policy": "sdkVersion"
     },
-    "plugins": ["expo-localization"]
+    "plugins": ["expo-localization", "@config-plugins/react-native-branch"]
   }
 }

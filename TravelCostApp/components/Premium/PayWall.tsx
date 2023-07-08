@@ -37,6 +37,45 @@ import Animated, {
   SlideOutDown,
 } from "react-native-reanimated";
 import ExpensesOutput from "../ExpensesOutput/ExpensesOutput";
+import branch, { BranchEvent } from "react-native-branch";
+
+async function trackBranchEvent() {
+  // branch tracking
+  const buo = await branch.createBranchUniversalObject("item/12345", {
+    canonicalUrl: "https://branch.io/item/12345",
+    title: "My Item Title",
+    contentMetadata: {
+      quantity: 1,
+      price: 23.2,
+      sku: "1994320302",
+      productName: "my_product_name1",
+      productBrand: "my_prod_Brand1",
+      customMetadata: {
+        custom_key1: "custom_value1",
+        custom_key2: "custom_value2",
+      },
+    },
+  });
+
+  const params = {
+    transaction_id: "tras_Id_1232343434",
+    currency: "USD",
+    revenue: 180.2,
+    shipping: 10.5,
+    tax: 13.5,
+    coupon: "promo-1234",
+    affiliation: "high_fi",
+    description: "Preferred purchase",
+    purchase_loc: "Palo Alto",
+    store_pickup: "unavailable",
+    customData: {
+      Custom_Event_Property_Key1: "Custom_Event_Property_val1",
+      Custom_Event_Property_Key2: "Custom_Event_Property_val2",
+    },
+  };
+  const event = new BranchEvent(BranchEvent.Purchase, [buo], params);
+  event.logEvent();
+}
 
 const PaywallScreen = ({ navigation }) => {
   // - State for all available package
@@ -145,11 +184,12 @@ const PaywallScreen = ({ navigation }) => {
             By purchasing, you agree to the{" "}
           </Text> */}
           <TouchableOpacity
-            onPress={() =>
+            onPress={async () => {
+              await trackBranchEvent();
               Linking.openURL(
                 "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
-              )
-            }
+              );
+            }}
           >
             <Text style={[styles.footerText, { color: "blue" }]}>
               {i18n.t("paywallToS")}

@@ -44,6 +44,15 @@
     "runtimeVersion": {
       "policy": "sdkVersion"
     },
-    "plugins": ["expo-localization", "@config-plugins/react-native-branch"]
+    "plugins": [
+      "expo-localization",
+      [
+        "@config-plugins/react-native-branch",
+        {
+          "apiKey": "key_live_iqcoQ4YydC3EcES8JDDxfekozubmwZiC",
+          "iosAppDomain": "budgetfornomads.app.link"
+        }
+      ]
+    ]
   }
 }

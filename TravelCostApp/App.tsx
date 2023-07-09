@@ -206,9 +206,18 @@ function AuthenticatedStack() {
       }
     },
   });
+  async function showParams() {
+    const latestParams = await branch.getLatestReferringParams(); // Params from last open
+    const installParams = await branch.getFirstReferringParams(); // Params from original install
+    console.log("showParams", latestParams, installParams);
+    Toast.show({
+      type: "info",
+      text1: "showParams",
+      text2: latestParams + " " + installParams,
+    });
+  }
+  showParams();
 
-  const latestParams = await branch.getLatestReferringParams(); // Params from last open
-  const installParams = await branch.getFirstReferringParams(); // Params from original install
   return (
     <ExpensesContextProvider>
       <>

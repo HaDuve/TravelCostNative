@@ -149,64 +149,6 @@ function NotAuthenticatedStack() {
 }
 
 function AuthenticatedStack() {
-  // Listener
-  branch.subscribe({
-    onOpenStart: ({ uri, cachedInitialEvent }) => {
-      console.log(
-        "subscribe onOpenStart, will open " +
-          uri +
-          " cachedInitialEvent is " +
-          cachedInitialEvent
-      );
-      Alert.alert(
-        "onOpenStart",
-        "will open " + uri + " cachedInitialEvent is " + cachedInitialEvent
-      );
-    },
-    onOpenComplete: ({ error, params, uri }) => {
-      if (error) {
-        console.error(
-          "subscribe onOpenComplete, Error from opening uri: " +
-            uri +
-            " error: " +
-            error
-        );
-        Alert.alert(
-          "onOpenComplete",
-          "Error from opening uri: " + uri + " error: " + error
-        );
-        return;
-      } else if (params) {
-        if (!params["+clicked_branch_link"]) {
-          if (params["+non_branch_link"]) {
-            console.log("non_branch_link: " + uri);
-            Alert.alert("non_branch_link", uri);
-            // Route based on non-Branch links
-            return;
-          }
-        } else {
-          // Handle params
-          const deepLinkPath = params.$deeplink_path as string;
-          const canonicalUrl = params.$canonical_url as string;
-          Alert.alert("deepLinkPath", deepLinkPath);
-          Alert.alert("canonicalUrl", canonicalUrl);
-          // Route based on Branch link data
-          return;
-        }
-      }
-    },
-  });
-  async function showParams() {
-    const latestParams = await branch.getLatestReferringParams(); // Params from last open
-    const installParams = await branch.getFirstReferringParams(); // Params from original install
-    // console.log("showParams", latestParams, installParams);
-    Alert.alert(
-      "showParams\n",
-      JSON.stringify(latestParams) + "\n\n" + JSON.stringify(installParams)
-    );
-  }
-  showParams();
-
   return (
     <ExpensesContextProvider>
       <>

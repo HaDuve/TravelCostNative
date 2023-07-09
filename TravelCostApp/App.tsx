@@ -158,12 +158,10 @@ function AuthenticatedStack() {
           " cachedInitialEvent is " +
           cachedInitialEvent
       );
-      Toast.show({
-        type: "info",
-        text1: "Opening Branch link",
-        text2: uri,
-        visibilityTime: 5000,
-      });
+      Alert.alert(
+        "onOpenStart",
+        "will open " + uri + " cachedInitialEvent is " + cachedInitialEvent
+      );
     },
     onOpenComplete: ({ error, params, uri }) => {
       if (error) {
@@ -173,23 +171,16 @@ function AuthenticatedStack() {
             " error: " +
             error
         );
-        Toast.show({
-          type: "error",
-          text1: "Error from opening uri",
-          text2: uri,
-          visibilityTime: 5000,
-        });
+        Alert.alert(
+          "onOpenComplete",
+          "Error from opening uri: " + uri + " error: " + error
+        );
         return;
       } else if (params) {
         if (!params["+clicked_branch_link"]) {
           if (params["+non_branch_link"]) {
             console.log("non_branch_link: " + uri);
-            Toast.show({
-              type: "info",
-              text1: "non_branch_link",
-              text2: uri,
-              visibilityTime: 5000,
-            });
+            Alert.alert("non_branch_link", uri);
             // Route based on non-Branch links
             return;
           }
@@ -197,12 +188,8 @@ function AuthenticatedStack() {
           // Handle params
           const deepLinkPath = params.$deeplink_path as string;
           const canonicalUrl = params.$canonical_url as string;
-          Toast.show({
-            type: "info",
-            text1: "deepLinkPath + canonicalUrl",
-            text2: deepLinkPath + " " + canonicalUrl,
-            visibilityTime: 5000,
-          });
+          Alert.alert("deepLinkPath", deepLinkPath);
+          Alert.alert("canonicalUrl", canonicalUrl);
           // Route based on Branch link data
           return;
         }
@@ -212,12 +199,11 @@ function AuthenticatedStack() {
   async function showParams() {
     const latestParams = await branch.getLatestReferringParams(); // Params from last open
     const installParams = await branch.getFirstReferringParams(); // Params from original install
-    console.log("showParams", latestParams, installParams);
-    Toast.show({
-      type: "info",
-      text1: "showParams",
-      text2: latestParams + " " + installParams,
-    });
+    // console.log("showParams", latestParams, installParams);
+    Alert.alert(
+      "showParams\n",
+      JSON.stringify(latestParams) + "\n\n" + JSON.stringify(installParams)
+    );
   }
   showParams();
 

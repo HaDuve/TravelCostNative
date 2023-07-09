@@ -97,9 +97,11 @@ export async function trackBranchEvent() {
   const referrer = await branch.getLatestReferringParams();
   let referrerString = "";
   if (referrer) {
-    referrerString = referrer["+referrer"];
+    referrerString = referrer["~channel"];
   }
   const event = new BranchEvent(BranchEvent.Purchase, [buo], params);
   event.logEvent();
   console.log("event logged, refferrer:", referrerString);
+
+  console.log("trackBranchEvent ~ trackBranchEvent: end");
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
-import { LogBox } from "react-native";
+import { Alert, LogBox } from "react-native";
 LogBox.ignoreAllLogs(); //Ignore all log notifications
 import {
   SafeAreaView,
@@ -54,6 +54,7 @@ import LoadingOverlay from "./components/UI/LoadingOverlay";
 import ImportGSScreen from "./screens/ImportGSScreen";
 import FilteredExpenses from "./screens/FilteredExpenses";
 import { sendOfflineQueue } from "./util/offline-queue";
+import branch from "react-native-branch";
 
 //localization
 import * as Localization from "expo-localization";
@@ -145,6 +146,69 @@ function NotAuthenticatedStack() {
 }
 
 function AuthenticatedStack() {
+  // Listener
+  branch.subscribe({
+    onOpenStart: ({ uri, cachedInitialEvent }) => {
+      console.log(
+        "subscribe onOpenStart, will open " +
+          uri +
+          " cachedInitialEvent is " +
+          cachedInitialEvent
+      );
+      Toast.show({
+        type: "info",
+        text1: "Opening Branch link",
+        text2: uri,
+        visibilityTime: 5000,
+      });
+    },
+    onOpenComplete: ({ error, params, uri }) => {
+      if (error) {
+        console.error(
+          "subscribe onOpenComplete, Error from opening uri: " +
+            uri +
+            " error: " +
+            error
+        );
+        Toast.show({
+          type: "error",
+          text1: "Error from opening uri",
+          text2: uri,
+          visibilityTime: 5000,
+        });
+        return;
+      } else if (params) {
+        if (!params["+clicked_branch_link"]) {
+          if (params["+non_branch_link"]) {
+            console.log("non_branch_link: " + uri);
+            Toast.show({
+              type: "info",
+              text1: "non_branch_link",
+              text2: uri,
+              visibilityTime: 5000,
+            });
+            // Route based on non-Branch links
+            return;
+          }
+        } else {
+          // Handle params
+          const deepLinkPath = params.$deeplink_path as string;
+          const canonicalUrl = params.$canonical_url as string;
+          Toast.show({
+            type: "info",
+            text1: "deepLinkPath + canonicalUrl",
+            text2: deepLinkPath + " " + canonicalUrl,
+            visibilityTime: 5000,
+          });
+          // Route based on Branch link data
+          return;
+        }
+      }
+    },
+  });
+
+  const latestParams = await branch.getLatestReferringParams(); // Params from last open
+  const installParams = await branch.getFirstReferringParams(); // Params from original install
   return (
     <ExpensesContextProvider>
       <>

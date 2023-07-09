@@ -98,6 +98,7 @@ import FinderScreen from "./screens/FinderScreen";
 import CustomerScreen from "./screens/CustomerScreen";
 import CategoryMapTestScreen from "./screens/CategoryMapTestScreen";
 import GPTDealScreen from "./screens/GPTDealScreen";
+import { initBranch } from "./components/Referral/branch";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -588,14 +589,10 @@ function Root() {
 
   useEffect(() => {
     async function onRootMount() {
+      // setup branch
+      initBranch();
       // first start
       await handleFirstStart();
-
-      // wrap functions to test dataResponseTime
-      const test_tripCtx_fetchAndSetCurrentTrip = dataResponseTime(
-        tripCtx.fetchAndSetCurrentTrip
-      );
-      const test_fetchUser = dataResponseTime(fetchUser);
 
       // end wrap
       console.log("onRootMount ~ onRootMount");

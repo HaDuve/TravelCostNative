@@ -50,8 +50,9 @@ import { NetworkContext } from "../store/network-context";
 import {
   initBranch,
   showBranchParams,
-  trackBranchEvent,
+  trackPurchaseEvent,
 } from "../components/Referral/branch";
+import branch from "react-native-branch";
 
 const SettingsScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
@@ -154,9 +155,9 @@ const SettingsScreen = ({ navigation }) => {
 
       <Button
         style={styles.settingsButton}
-        onPress={async () => await trackBranchEvent()}
+        onPress={async () => await trackPurchaseEvent()}
       >
-        trackBranchEvent
+        trackPurchaseEvent
       </Button>
 
       <LoadingBarOverlay
@@ -227,10 +228,24 @@ const SettingsScreen = ({ navigation }) => {
   }, []);
   useEffect(() => {
     async function setAttributesAsync() {
-      await Purchases.setAttributes({ name: userName, email: emailString });
+      try {
+        if (emailString) await Purchases.setAttributes({ email: emailString });
+        if (userName) await Purchases.setAttributes({ name: userName });
+        if (!isConnected) return;
+        const params = await branch.getLatestReferringParams();
+        if (params) {
+          if (params["~channel"])
+            await Purchases.setAttributes({ channel: params["~channel"] });
+        }
+      } catch (error) {
+        console.log(
+          "setAttributesAsync - Settings - ForRevCat ~ error:",
+          error
+        );
+      }
     }
     setAttributesAsync();
-  }, [emailString, userName]);
+  }, [emailString, userName, isConnected]);
 
   function deleteAccountHandler() {
     return Alert.alert(i18n.t("sure"), i18n.t("sureDeleteAccount"), [

@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Pressable, Alert, StyleSheet } from "react-native";
 import Purchases from "react-native-purchases";
 import { ENTITLEMENT_ID } from "../Premium/PremiumConstants";
+import branch, { BranchEvent } from "react-native-branch";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -41,7 +42,6 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
 
       console.log("onSelection ~ customerInfo:", customerInfo);
       console.log("onSelection ~ productIdentifier:", productIdentifier);
-
       if (
         typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined"
       ) {
@@ -51,6 +51,11 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
           text1: i18n.t("toastPurchaseSuccess1"),
           text2: i18n.t("toastPurchaseSuccess2"),
         });
+        const branchEvent = isLifetime
+          ? BranchEvent.Purchase
+          : BranchEvent.StartTrial;
+        const event = new BranchEvent(branchEvent);
+        event.logEvent();
       }
     } catch (e) {
       if (!e.userCancelled) {

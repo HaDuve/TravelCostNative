@@ -59,8 +59,8 @@ export async function showBranchParams() {
   );
 }
 
-export async function trackBranchEvent() {
-  console.log("trackBranchEvent ~ trackBranchEvent:");
+export async function trackPurchaseEvent() {
+  console.log("trackPurchaseEvent ~ trackPurchaseEvent:");
   // branch tracking
   const buo = await branch.createBranchUniversalObject("item/12345", {
     canonicalUrl: "https://branch.io/item/12345",
@@ -103,5 +103,5 @@ export async function trackBranchEvent() {
   event.logEvent();
   console.log("event logged, refferrer:", referrerString);
 
-  console.log("trackBranchEvent ~ trackBranchEvent: end");
+  console.log("trackPurchaseEvent ~ trackPurchaseEvent: end");
 }

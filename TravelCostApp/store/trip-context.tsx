@@ -50,7 +50,9 @@ export const TripContext = createContext({
   deleteTrip: (tripid: string) => {},
   getcurrentTrip: () => {},
   setCurrentTrip: async (tripid: string, trip) => {},
-  fetchAndSetCurrentTrip: async (tripid: string) => {},
+  fetchAndSetCurrentTrip: async (tripid: string): Promise<TripData> => {
+    return {};
+  },
   saveTripDataInStorage: async (tripData) => {},
   loadTripDataFromStorage: async () => {},
   saveTravellersInStorage: async (travellers) => {},

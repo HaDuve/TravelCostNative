@@ -35,7 +35,10 @@ import ExpensesContextProvider, {
 import ProfileScreen from "./screens/ProfileScreen";
 import UserContextProvider, { UserContext } from "./store/user-context";
 import { fetchUser, touchMyTraveler, dataResponseTime } from "./util/http";
-import TripContextProvider, { TripContext } from "./store/trip-context";
+import TripContextProvider, {
+  TripContext,
+  TripData,
+} from "./store/trip-context";
 import TripForm from "./components/ManageTrip/TripForm";
 import OnboardingScreen from "./screens/OnboardingScreen";
 import JoinTrip from "./screens/JoinTrip";
@@ -583,19 +586,27 @@ function Root() {
           if (!onlineSetupDone) {
             const { isFastEnough } = await isConnectionFastEnough();
             if (isFastEnough) {
-              //prepare online setup
-              const storedUid = await secureStoreGetItem("uid");
-              const checkUser = await fetchUser(storedUid);
-              const tripid = checkUser.currentTrip;
-              const tripData = await tripCtx.fetchAndSetCurrentTrip(tripid);
-              await onlineSetup(tripData, checkUser, tripid, storedUid);
-              console.log("delayedOnlineSetup ~ DONE");
               setOnlineSetupDone(true);
+              try {
+                //prepare online setup
+                const storedUid = await secureStoreGetItem("uid");
+                if (!storedUid) return;
+                const checkUser = await fetchUser(storedUid);
+                if (!checkUser) return;
+                const tripid = checkUser.currentTrip;
+                const tripData = await tripCtx.fetchAndSetCurrentTrip(tripid);
+                if (!tripData) return;
+                await onlineSetup(tripData, checkUser, tripid, storedUid);
+                console.log("delayedOnlineSetup ~ DONE");
+              } catch (error) {
+                console.log("delayedOnlineSetup ~ error", error);
+                setOnlineSetupDone(false);
+              }
             }
           }
         };
 
-        // delayedOnlineSetup();
+        delayedOnlineSetup();
       }
     },
     DEBUG_POLLING_INTERVAL * 1.7,
@@ -608,7 +619,12 @@ function Root() {
     }
   };
 
-  async function onlineSetup(tripData, checkUser, storedTripId, storedUid) {
+  async function onlineSetup(
+    tripData: TripData,
+    checkUser: UserData,
+    storedTripId: string,
+    storedUid: string
+  ) {
     const userData: UserData = checkUser;
     const tripid = userData.currentTrip;
     if (!tripid || tripid?.length < 2) return;

@@ -74,8 +74,14 @@ export async function trackBranchEvent() {
       Custom_Event_Property_Key2: "Custom_Event_Property_val2",
     },
   };
+  const referrer = await branch.getLatestReferringParams();
+  let referrerString = "";
+  if (referrer) {
+    referrerString = referrer["+referrer"];
+  }
   const event = new BranchEvent(BranchEvent.Purchase, [buo], params);
   event.logEvent();
+  Alert.alert("event logged, refferrer:", referrerString);
 }
 
 const PaywallScreen = ({ navigation }) => {

@@ -39,7 +39,8 @@ import Animated, {
 import ExpensesOutput from "../ExpensesOutput/ExpensesOutput";
 import branch, { BranchEvent } from "react-native-branch";
 
-async function trackBranchEvent() {
+export async function trackBranchEvent() {
+  console.log("trackBranchEvent ~ trackBranchEvent:");
   // branch tracking
   const buo = await branch.createBranchUniversalObject("item/12345", {
     canonicalUrl: "https://branch.io/item/12345",
@@ -185,7 +186,6 @@ const PaywallScreen = ({ navigation }) => {
           </Text> */}
           <TouchableOpacity
             onPress={async () => {
-              await trackBranchEvent();
               Linking.openURL(
                 "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
               );

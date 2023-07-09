@@ -47,6 +47,7 @@ import { secureStoreGetItem } from "../store/secure-storage";
 import IconButton from "../components/UI/IconButton";
 import { BlurView } from "expo-blur";
 import { NetworkContext } from "../store/network-context";
+import { trackBranchEvent } from "../components/Premium/PayWall";
 
 const SettingsScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
@@ -132,6 +133,13 @@ const SettingsScreen = ({ navigation }) => {
       <Text>DEBUG_tripid: {DEBUG_tripid}</Text>
       <Text>DEBUG_uid: {DEBUG_uid}</Text>
       <Text>{timeZoneString}</Text>
+
+      <Button
+        style={styles.settingsButton}
+        onPress={async () => await trackBranchEvent()}
+      >
+        trackBranchEvent
+      </Button>
 
       <LoadingBarOverlay
         progress={0.3}

@@ -216,17 +216,17 @@ function UserContextProvider({ children }) {
 
   async function saveUserNameInStorage(name: string) {
     // console.log("saveUserNameInStorage ~ userName", name);
-    await asyncStoreSetItem("userName", name);
+    await secureStoreSetItem("userName", name);
   }
 
   async function loadUserNameFromStorage() {
     console.log("loadUserNameFromStorage ~ userName", userName);
-    await asyncStoreGetItem("userName").then((name) => {
-      if (name) {
-        console.log("asyncStoreGetItem ~ name:", name);
-        setName(name.replaceAll('"', ""));
-      }
-    });
+    const _userName = await secureStoreGetItem("userName");
+    if (_userName) {
+      const trimmedName = _userName.replaceAll('"', "").trim();
+      setName(trimmedName);
+      await saveUserNameInStorage(trimmedName);
+    }
   }
 
   const value = {

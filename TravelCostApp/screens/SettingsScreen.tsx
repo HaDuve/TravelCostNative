@@ -222,6 +222,12 @@ const SettingsScreen = ({ navigation }) => {
     const referrer = await branch.getLatestReferringParams();
     if (referrer) await Purchases.setCampaign(referrer["~channel"]);
   }
+  useEffect(() => {
+    userCtx.loadUserNameFromStorage();
+  }, []);
+  useFocusEffect(() => {
+    userCtx.loadUserNameFromStorage();
+  });
   useFocusEffect(() => {
     getEmail();
   });

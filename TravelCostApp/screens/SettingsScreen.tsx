@@ -65,6 +65,7 @@ const SettingsScreen = ({ navigation }) => {
   const tripid = tripCtx.tripid;
   const userName = userCtx.userName;
   const addExpense = expensesCtx.addExpense;
+  const [isRestoringPurchases, setIsRestoringPurchases] = useState(false);
   const [isDEV, setIsDEV] = useState(DEV);
   const [timeZoneString, setTimeZoneString] = useState("");
   const [shouldShowTour, setShouldShowTour] = useState(false);
@@ -286,6 +287,7 @@ const SettingsScreen = ({ navigation }) => {
   }
 
   async function restorePurchases() {
+    setIsRestoringPurchases(true);
     try {
       const restore = await Purchases.restorePurchases();
       // ... check restored purchaserInfo to see if entitlement is now active
@@ -308,6 +310,7 @@ const SettingsScreen = ({ navigation }) => {
       });
       console.log("restorePurchases ~ e:", e);
     }
+    setIsRestoringPurchases(false);
   }
   return (
     <ScrollView
@@ -345,6 +348,7 @@ const SettingsScreen = ({ navigation }) => {
         </View>
       </BlurView>
       <SettingsSection multiTraveller={multiTraveller}></SettingsSection>
+
       <GradientButton
         style={styles.settingsButton}
         onPress={async () => {
@@ -354,6 +358,7 @@ const SettingsScreen = ({ navigation }) => {
       >
         {i18n.t("resetAppIntroductionLabel")}
       </GradientButton>
+
       <LinkingButton
         style={styles.settingsButton}
         URL="https://foodfornomads.com/"
@@ -385,9 +390,16 @@ const SettingsScreen = ({ navigation }) => {
       {/* <TouchableOpacity onPress={() => navigation.navigate("CategoryMapTest")}>
         <Text style={[styles.textButton]}>CatMapTest</Text>
       </TouchableOpacity> */}
-      <TouchableOpacity onPress={() => restorePurchases()}>
-        <Text style={[styles.textButton]}>{i18n.t("restorePurchases")}</Text>
-      </TouchableOpacity>
+      {!isRestoringPurchases && (
+        <TouchableOpacity onPress={() => restorePurchases()}>
+          <Text style={[styles.textButton]}>{i18n.t("restorePurchases")}</Text>
+        </TouchableOpacity>
+      )}
+      {isRestoringPurchases && (
+        <LoadingBarOverlay
+          customText={i18n.t("restorePurchases") + "..."}
+        ></LoadingBarOverlay>
+      )}
       {emailString && (
         <TouchableOpacity onPress={() => deleteAccountHandler()}>
           <Text style={[styles.textButton]}>

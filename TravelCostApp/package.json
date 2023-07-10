@@ -58,6 +58,7 @@
     "react-native-dotenv": "^3.4.8",
     "react-native-dropdown-picker": "^5.4.2",
     "react-native-gesture-handler": "~2.9.0",
+    "react-native-mmkv-storage": "^0.9.1",
     "react-native-modal": "^13.0.1",
     "react-native-neat-date-picker": "^1.4.5",
     "react-native-offline": "^6.0.0",

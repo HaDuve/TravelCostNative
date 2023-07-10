@@ -12,7 +12,9 @@ const SettingsSwitch = ({ style, toggleState, state, label }) => {
         colors={GlobalStyles.gradientPrimaryButton}
         style={[{ overflow: "hidden" }]}
       > */}
-      <Text style={GlobalStyles.secondaryText}>{label}</Text>
+      <View style={{ flex: 1 }}>
+        <Text style={GlobalStyles.secondaryText}>{label}</Text>
+      </View>
       <Switch
         trackColor={{
           false: GlobalStyles.colors.gray500,
@@ -42,6 +44,7 @@ SettingsSwitch.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

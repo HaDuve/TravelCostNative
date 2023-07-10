@@ -38,7 +38,7 @@ const BlurPremium = ({ canBack = false }) => {
       setIsPremium(checkPremi);
     }
     checkPremium();
-  }, []);
+  }, [userCtx.isPremium]);
 
   const isConnected = netCtx.isConnected && netCtx.strongConnection;
 

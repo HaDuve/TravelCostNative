@@ -20,7 +20,10 @@ import { TripContext } from "../store/trip-context";
 import { asyncStoreSetItem } from "../store/async-storage";
 import Toast from "react-native-toast-message";
 import Purchases from "react-native-purchases";
-import { REVCAT_API_KEY } from "../components/Premium/PremiumConstants";
+import {
+  isPremiumMember,
+  REVCAT_API_KEY,
+} from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
 import { secureStoreSetItem } from "../store/secure-storage";
 
@@ -87,6 +90,7 @@ function LoginScreen() {
       } else if (Platform.OS === "ios" || Platform.OS === "macos") {
         // Purchases
         Purchases.configure({ apiKey: REVCAT_API_KEY, appUserID: uid });
+        await userCtx.checkPremium();
         console.log("LoginScreen ~ uid:", uid);
       }
       const userData = checkUser;

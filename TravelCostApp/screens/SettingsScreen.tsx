@@ -296,6 +296,7 @@ const SettingsScreen = ({ navigation }) => {
         // ... grant user entitlement
         console.log("restorePurchases ~ restore.entitlements.all:", restore);
         await userCtx.checkPremium();
+        navigation.pop();
         Toast.show({
           type: "success",
           text1: i18n.t("premiumNomad"),

@@ -29,7 +29,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { GlobalStyles } from "../constants/styles";
 import LinkingButton from "../components/UI/LinkButton";
 import { DEV } from "../confAppConstants";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import { DateTime } from "luxon";
 import { TourGuideZone, useTourGuideController } from "rn-tourguide";
 import { asyncStoreGetItem } from "../store/async-storage";
@@ -210,20 +210,28 @@ const SettingsScreen = ({ navigation }) => {
   }
 
   const [emailString, setEmailString] = useState("");
-  useFocusEffect(() => {
-    async function getEmail() {
-      const email = await secureStoreGetItem("ENCM");
-      // console.log("getEmail ~ email:", email);
+  async function getEmail() {
+    const email = await secureStoreGetItem("ENCM");
+    if (email) {
       setEmailString(email);
     }
+  }
+  async function setAttributesAsync() {
+    if (emailString) await Purchases.setEmail(emailString);
+    if (userName) await Purchases.setDisplayName(userName);
+    const referrer = await branch.getLatestReferringParams();
+    if (referrer) await Purchases.setCampaign(referrer["~channel"]);
+  }
+  useFocusEffect(() => {
     getEmail();
   });
+  useFocusEffect(() => {
+    setAttributesAsync();
+  });
   useEffect(() => {
-    async function getEmail() {
-      const email = await secureStoreGetItem("ENCM");
-      // console.log("getEmail ~ email:", email);
-      setEmailString(email);
-    }
+    setAttributesAsync();
+  }, [emailString, userName]);
+  useEffect(() => {
     getEmail();
   }, []);
   useEffect(() => {

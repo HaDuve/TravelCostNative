@@ -5,7 +5,6 @@ import {
   FlatList,
   Alert,
   StyleSheet,
-  Image,
   TouchableOpacity,
   Linking,
   Pressable,
@@ -29,15 +28,7 @@ import BackgroundGradient from "../UI/BackgroundGradient";
 import FlatButton from "../UI/FlatButton";
 import PropTypes from "prop-types";
 import IconButton from "../UI/IconButton";
-import Animated, {
-  FadeIn,
-  FadeOut,
-  Layout,
-  SlideInDown,
-  SlideOutDown,
-} from "react-native-reanimated";
-import ExpensesOutput from "../ExpensesOutput/ExpensesOutput";
-import branch, { BranchEvent } from "react-native-branch";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 const PaywallScreen = ({ navigation }) => {
   // - State for all available package

@@ -109,7 +109,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   };
 
   const titleContainerJSX = (
-    <BlurView style={styles.titleContainerBlur}>
+    <BlurView intensity={90} style={styles.titleContainerBlur}>
       <Animated.View
         // entering={FadeInLeft}
         // exiting={FadeOutLeft}

@@ -14,6 +14,7 @@ import PropTypes from "prop-types";
 import { Expense, ExpenseData } from "../util/expense";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import uniqBy from "lodash.uniqby";
+import { getMMKVObject, setMMKVObject } from "./mmkv";
 export enum RangeString {
   day = "day",
   week = "week",
@@ -136,7 +137,8 @@ function ExpensesContextProvider({ children }) {
     // console.log("saving expenses");
     async function asyncSaveExpenses() {
       if (expensesState.length > 0)
-        await asyncStoreSetObject("expenses", expensesState);
+        // await asyncStoreSetObject("expenses", expensesState);
+        setMMKVObject("expenses", expensesState);
     }
     asyncSaveExpenses();
   }, [expensesState]);
@@ -292,7 +294,8 @@ function ExpensesContextProvider({ children }) {
       // console.log("expenses not empty, will not load again");
       return false;
     }
-    const loadedExpenses = await asyncStoreGetObject("expenses");
+    // const loadedExpenses = await asyncStoreGetObject("expenses");
+    const loadedExpenses = getMMKVObject("expenses");
     console.log(
       "loadExpensesFromStorage ~ loadedExpenses:",
       loadedExpenses?.length

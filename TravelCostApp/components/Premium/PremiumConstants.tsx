@@ -1,6 +1,7 @@
 import Purchases from "react-native-purchases";
 import { FORCE_PREMIUM } from "../../confAppConstants";
 import Toast from "react-native-toast-message";
+import * as Device from "expo-device";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -24,7 +25,7 @@ export const ENTITLEMENT_ID = "Premium";
 
 export async function isPremiumMember() {
   // dev const is set
-  if (FORCE_PREMIUM) return true;
+  if (!Device.isDevice || FORCE_PREMIUM) return true;
   try {
     // access latest customerInfo
     const customerInfo = await Purchases.getCustomerInfo();
@@ -40,10 +41,10 @@ export async function isPremiumMember() {
   } catch (e) {
     // Error fetching customer info
     console.error(e);
-    Toast.show({
-      type: "error",
-      text1: i18n.t("toastPremiumFetchError"),
-      text2: i18n.t("error2"),
-    });
+    // Toast.show({
+    //   type: "error",
+    //   text1: i18n.t("toastPremiumFetchError"),
+    //   text2: i18n.t("error2"),
+    // });
   }
 }

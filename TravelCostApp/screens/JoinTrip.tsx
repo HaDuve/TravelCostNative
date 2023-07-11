@@ -39,6 +39,7 @@ import { asyncStoreSetItem, asyncStoreSetObject } from "../store/async-storage";
 import { NetworkContext } from "../store/network-context";
 import uniqBy from "lodash.uniqby";
 import { secureStoreSetItem } from "../store/secure-storage";
+import { setMMKVObject } from "../store/mmkv";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -124,7 +125,8 @@ const JoinTrip = ({ navigation, route }) => {
         expenseCtx.setExpenses(expenses);
         await asyncStoreSetObject("currentTrip", tripdata);
         await secureStoreSetItem("currentTripId", tripid);
-        await asyncStoreSetObject("expenses", expenses);
+        // await asyncStoreSetObject("expenses", expenses);
+        setMMKVObject("expenses", expenses);
 
         // // Immediately reload the React Native Bundle
         // const r = await reloadApp();

@@ -57,6 +57,7 @@ import { secureStoreSetItem } from "../../store/secure-storage";
 import BackButton from "../UI/BackButton";
 import { onShare } from "../ProfileOutput/ShareTrip";
 import { NetworkContext } from "../../store/network-context";
+import { setMMKVObject } from "../../store/mmkv";
 
 const TripForm = ({ navigation, route }) => {
   const netCtx = useContext(NetworkContext);
@@ -230,7 +231,8 @@ const TripForm = ({ navigation, route }) => {
         expenses.forEach((element) => {
           expenseCtx.addExpense(element);
         });
-        await asyncStoreSetObject("expenses", expenses);
+        // await asyncStoreSetObject("expenses", expenses);
+        setMMKVObject("expenses", expenses);
         const token = authCtx.token;
         console.log("submitHandler ~ token:", token);
         navigation.popToTop();
@@ -251,7 +253,8 @@ const TripForm = ({ navigation, route }) => {
     await putTravelerInTrip(tripid, { userName: userName, uid: uid });
     console.log("TripForm ~ tripid in saveTripData:", tripid);
     await secureStoreSetItem("currentTripId", tripid);
-    await asyncStoreSetObject("expenses", []);
+    // await asyncStoreSetObject("expenses", []);
+    setMMKVObject("expenses", []);
     await userCtx.setFreshlyCreatedTo(false);
 
     // the following context state functions are unnecessary as long as we reload

@@ -36,6 +36,7 @@ import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { NetworkContext } from "../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import * as Haptics from "expo-haptics";
+import { setMMKVObject } from "../store/mmkv";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -308,7 +309,8 @@ const ManageExpense = ({ route, navigation }) => {
           await creatingNormalData(expenseData);
         }
       }
-      await asyncStoreSetObject("expenses", expenseCtx.expenses);
+      // await asyncStoreSetObject("expenses", expenseCtx.expenses);
+      setMMKVObject("expenses", expenseCtx.expenses);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       // setIsSubmitting(false);
       navigation.popToTop();

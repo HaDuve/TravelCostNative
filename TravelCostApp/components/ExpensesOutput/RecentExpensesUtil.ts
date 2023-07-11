@@ -11,6 +11,7 @@ i18n.enableFallback = true;
 
 import Toast from "react-native-toast-message";
 import { asyncStoreSetObject } from "../../store/async-storage";
+import { setMMKVObject } from "../../store/mmkv";
 
 export async function fetchAndSetExpenses(
   showRefIndicator: boolean,
@@ -31,13 +32,13 @@ export async function fetchAndSetExpenses(
     expenses = expenses.filter((expense) => !isNaN(Number(expense.calcAmount)));
     if (expenses && expenses.length !== 0) {
       expensesCtx.setExpenses(expenses);
-
       const expensesSum = expenses.reduce((sum, expense) => {
         return sum + expense.calcAmount;
       }, 0);
       tripCtx.setTotalSum(expensesSum);
 
-      await asyncStoreSetObject("expenses", expenses);
+      // await asyncStoreSetObject("expenses", expenses);
+      setMMKVObject("expenses", expenses);
     }
   } catch (error) {
     console.error(error);

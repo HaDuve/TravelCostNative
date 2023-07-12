@@ -1,4 +1,4 @@
-import { Alert, StyleSheet } from "react-native";
+import { Alert, Platform, StyleSheet } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { BlurView } from "expo-blur";
 import GradientButton from "../UI/GradientButton";
@@ -31,7 +31,7 @@ const BlurPremium = ({ canBack = false }) => {
   const startIntensity = 5;
   const [blurIntensity, setBlurIntensity] = useState(startIntensity);
   const navigation = useNavigation();
-
+  const isAndroid = Platform.OS === "android";
   useEffect(() => {
     async function checkPremium() {
       const checkPremi = await userCtx.checkPremium();
@@ -69,7 +69,10 @@ const BlurPremium = ({ canBack = false }) => {
   );
 
   const showCardJSX = (
-    <BlurView intensity={blurIntensity} style={styles.titleContainerBlur}>
+    <BlurView
+      intensity={isAndroid ? blurIntensity * 22 : blurIntensity}
+      style={styles.titleContainerBlur}
+    >
       {focused && (
         <Animated.View
           entering={SlideInDown.delay(600).springify().damping(11)}
@@ -101,7 +104,7 @@ const BlurPremium = ({ canBack = false }) => {
             {canBack && (
               <FlatButton
                 onPress={() => navigation.goBack()}
-                textStyle={{ marginTop: 12, marginBottom: -12 }}
+                textStyle={{ marginTop: 12, marginBottom: isAndroid ? 0 : -12 }}
               >
                 Back
               </FlatButton>

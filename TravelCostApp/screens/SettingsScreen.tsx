@@ -5,6 +5,7 @@ import {
   Text,
   Linking,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import React, { useContext, useState } from "react";
 import Purchases, { PurchasesOffering } from "react-native-purchases";
@@ -313,6 +314,7 @@ const SettingsScreen = ({ navigation }) => {
     }
     setIsRestoringPurchases(false);
   }
+  const isAndroid = Platform.OS === "android";
   return (
     <ScrollView
       scrollEnabled={true}
@@ -324,7 +326,7 @@ const SettingsScreen = ({ navigation }) => {
       }}
     >
       <BlurView
-        intensity={90}
+        intensity={isAndroid ? 280 : 90}
         style={{
           flexDirection: "row",
         }}

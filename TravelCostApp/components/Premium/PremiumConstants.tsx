@@ -25,7 +25,8 @@ export const ENTITLEMENT_ID = "Premium";
 
 export async function isPremiumMember() {
   // dev const is set
-  if (!Device.isDevice || FORCE_PREMIUM) return true;
+  // !Device.isDevice ||
+  if (FORCE_PREMIUM) return true;
   try {
     // access latest customerInfo
     const customerInfo = await Purchases.getCustomerInfo();

@@ -1,5 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useContext, useRef, useState } from "react";
 import ExpenseCategories from "./ExpenseStatistics/ExpenseCategories";
 import ExpenseGraph from "./ExpenseStatistics/ExpenseGraph";
 import { GlobalStyles } from "../../constants/styles";
@@ -20,21 +20,14 @@ import PropTypes from "prop-types";
 import ExpenseCountries from "./ExpenseStatistics/ExpenseCountries";
 import ExpenseTravellers from "./ExpenseStatistics/ExpenseTravellers";
 import IconButton from "../UI/IconButton";
-import { FadeInRight, FadeOutLeft } from "react-native-reanimated";
+import { FadeInRight } from "react-native-reanimated";
 import ExpenseCurrencies from "./ExpenseStatistics/ExpenseCurrencies";
 import Animated, {
-  FadeInLeft,
   FadeInUp,
   FadeOutDown,
   FadeOutRight,
 } from "react-native-reanimated";
-import {
-  DEBUG_POLLING_INTERVAL,
-  MAX_PERIOD_RANGE,
-  MIN_PERIOD_RANGE,
-} from "../../confAppConstants";
-import { async } from "../../util/http";
-import { useInterval } from "../Hooks/useInterval";
+import { MAX_PERIOD_RANGE, MIN_PERIOD_RANGE } from "../../confAppConstants";
 import { BlurView } from "expo-blur";
 import { TripContext } from "../../store/trip-context";
 import { ExpensesContext } from "../../store/expenses-context";
@@ -108,8 +101,13 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
     }
   };
 
+  const isAndroid = Platform.OS === "android";
+
   const titleContainerJSX = (
-    <BlurView intensity={90} style={styles.titleContainerBlur}>
+    <BlurView
+      intensity={isAndroid ? 280 : 90}
+      style={styles.titleContainerBlur}
+    >
       <Animated.View
         // entering={FadeInLeft}
         // exiting={FadeOutLeft}
@@ -188,6 +186,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
 
   return (
     <View style={styles.container}>
+      {/* {isAndroid && titleContainerJSX} */}
       {isGraphNotPie && (
         <ExpenseGraph
           navigation={navigation}

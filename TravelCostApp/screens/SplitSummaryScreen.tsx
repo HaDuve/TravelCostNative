@@ -287,9 +287,9 @@ const SplitSummaryScreen = ({ route, navigation }) => {
           >
             Settle Splits
           </GradientButton>
+          <BlurPremium></BlurPremium>
         </View>
       </Animated.View>
-      <BlurPremium />
     </View>
   );
 };
@@ -323,6 +323,8 @@ const styles = StyleSheet.create({
   },
   button: {
     marginLeft: 24,
+    marginTop: "50%",
+    borderRadius: 12,
   },
   splitContainer: {
     flexDirection: "row",
@@ -341,6 +343,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginRight: "5%",
     marginBottom: "7%",
+    flex: 1,
     // alignItems: "center",
     // justifyContent: "space-between",
     // margin: "2%",

@@ -394,6 +394,7 @@ const styles = StyleSheet.create({
   deleteContainer: {
     paddingTop: "2%",
     margin: "2%",
+    marginTop: "-12%",
     alignItems: "center",
   },
 });

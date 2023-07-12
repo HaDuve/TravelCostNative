@@ -26,6 +26,7 @@ import {
 } from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
 import { secureStoreSetItem } from "../store/secure-storage";
+import { ExpensesContext } from "../store/expenses-context";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -34,6 +35,7 @@ function LoginScreen() {
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
+  const expCtx = useContext(ExpensesContext);
   const [isConnected, setIsConnected] = useState(
     netCtx.isConnected && netCtx.strongConnection
   );
@@ -102,10 +104,12 @@ function LoginScreen() {
         await authCtx.authenticate(token);
       }
       await secureStoreSetItem("currentTripId", tripid);
+      await secureStoreSetItem("uid", uid);
       await touchMyTraveler(tripid, uid);
       tripCtx.setTripid(tripid);
       await tripCtx.fetchAndSetCurrentTrip(tripid);
       await userCtx.loadCatListFromAsyncInCtx(tripid);
+      await userCtx.updateTripHistory();
       tripCtx.refresh();
       await authCtx.authenticate(token);
     } catch (error) {

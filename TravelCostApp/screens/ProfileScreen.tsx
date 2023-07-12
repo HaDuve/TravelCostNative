@@ -18,6 +18,10 @@ import { saveStoppedTour } from "../util/tourUtil";
 import { TourGuideZone, useTourGuideController } from "rn-tourguide";
 import { sleep } from "../util/appState";
 import { useInterval } from "../components/Hooks/useInterval";
+import { useFocusEffect } from "@react-navigation/native";
+import { secureStoreGetItem } from "../store/secure-storage";
+import { fetchTripHistory } from "../util/http";
+import { AuthContext } from "../store/auth-context";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -26,15 +30,34 @@ i18n.enableFallback = true;
 const ProfileScreen = ({ navigation }) => {
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
+  const authCtx = useContext(AuthContext);
+  const uid = authCtx.uid;
 
   const [tourIsRunning, setTourIsRunning] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [tripHistory, setTripHistory] = useState([]);
   // console.log("ProfileScreen ~ tripHistory:", tripHistory);
+
   useEffect(() => {
     setTripHistory(userCtx.tripHistory);
+    async function fetchHistory() {
+      console.log("fetchHistory ~ fetchHistory:", fetchHistory);
+      if (!userCtx.tripHistory || userCtx.tripHistory.length < 1) {
+        const uid = await secureStoreGetItem("uid");
+        console.log("fetch ~ uid:", uid);
+        if (!uid) return;
+        try {
+          const tripHistoryResponse = await fetchTripHistory(uid);
+          console.log("fetch ~ tripHistoryResponse:", tripHistoryResponse);
+          userCtx.setTripHistory(tripHistoryResponse);
+        } catch (error) {
+          console.log(error.message);
+        }
+      }
+    }
     // console.log("useEffect ~ userCtx.tripHistory:", userCtx.tripHistory);
-  }, [userCtx.tripHistory]);
+    fetchHistory();
+  }, [userCtx.tripHistory, uid, tripCtx.tripid, userCtx]);
 
   useInterval(
     () => {

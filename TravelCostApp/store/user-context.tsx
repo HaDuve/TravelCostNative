@@ -55,7 +55,7 @@ export const UserContext = createContext({
 
   tripHistory: [],
   setTripHistory: (tripHistory: string[]) => {},
-
+  updateTripHistory: async () => {},
   isOnline: false,
   setIsOnline: (bool: boolean) => {},
   saveUserNameInStorage: async (name: string) => {},
@@ -106,21 +106,22 @@ function UserContextProvider({ children }) {
     loadLastCurrencyCountryFromAsync();
   }, []);
 
+  async function updateTripHistory() {
+    const uid = await secureStoreGetItem("uid");
+    console.log("fetch ~ uid:", uid);
+    if (!uid) return;
+    try {
+      const tripHistoryResponse = await fetchTripHistory(uid);
+      console.log("fetch ~ tripHistoryResponse:", tripHistoryResponse);
+      setTripHistory(tripHistoryResponse);
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
   useEffect(() => {
     // Trip History fetch
-    async function fetch() {
-      const uid = await secureStoreGetItem("uid");
-      console.log("fetch ~ uid:", uid);
-      if (!uid) return;
-      try {
-        const tripHistoryResponse = await fetchTripHistory(uid);
-        console.log("fetch ~ tripHistoryResponse:", tripHistoryResponse);
-        setTripHistory(tripHistoryResponse);
-      } catch (error) {
-        console.log(error.message);
-      }
-    }
-    fetch();
+
+    updateTripHistory();
   }, []);
 
   async function checkPremium() {
@@ -271,6 +272,7 @@ function UserContextProvider({ children }) {
 
     setIsShowingGraph: setIsShowingGraph,
     isShowingGraph: isShowingGraph,
+    updateTripHistory: updateTripHistory,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

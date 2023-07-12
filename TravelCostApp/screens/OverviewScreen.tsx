@@ -2,7 +2,13 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 import { ExpensesContext, RangeString } from "../store/expenses-context";
 import { UserContext } from "../store/user-context";
-import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
 import ExpensesOverview, {
@@ -191,6 +197,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     // justifyContent: "flex-start",
+    ...Platform.select({
+      ios: {
+        padding: 0,
+      },
+      android: {
+        paddingTop: "3%",
+      },
+    }),
   },
   dateHeader: {
     marginVertical: "4%",
@@ -212,12 +226,19 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     maxWidth: "50%",
-    marginTop: "2%",
-    elevation: 2,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
+    ...Platform.select({
+      ios: {
+        shadowColor: GlobalStyles.colors.textColor,
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 0.35,
+        shadowRadius: 4,
+      },
+      android: {
+        marginTop: "4%",
+        elevation: 8,
+        borderRadius: 12,
+      },
+    }),
   },
   dropdown: {
     borderRadius: 10,

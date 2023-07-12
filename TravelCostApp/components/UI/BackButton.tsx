@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { GlobalStyles } from "../../constants/styles";
@@ -9,7 +9,9 @@ import * as Haptics from "expo-haptics";
 
 const BackButton = ({ style }) => {
   const navigation = useNavigation();
-
+  if (Platform.OS === "android") {
+    return <></>;
+  }
   return (
     <TouchableOpacity
       style={[GlobalStyles.backButton, style]}

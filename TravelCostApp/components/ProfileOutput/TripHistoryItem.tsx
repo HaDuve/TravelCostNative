@@ -158,7 +158,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const megaLongText =
     dailyBudgetString.length + sumOfExpensesString.length > 22;
   const isScaledUp = fontScale > 1 || megaLongText;
-  console.log("TripHistoryItem ~ isScaledUp:", isScaledUp);
+  // console.log("TripHistoryItem ~ isScaledUp:", isScaledUp);
 
   function tripPressHandler() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Pressable } from "react-native";
+import { StyleSheet, Text, View, Pressable, Platform } from "react-native";
 import * as Haptics from "expo-haptics";
 
 import React, { useContext, useRef } from "react";
@@ -492,14 +492,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   categoryCard: {
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 1,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 2.84,
-    elevation: 5,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 1,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 2.84,
+      },
+      android: {
+        elevation: 0,
+        borderRadius: 1000,
+        borderWidth: 1,
+        borderColor: GlobalStyles.colors.gray600,
+        marginHorizontal: 12,
+        marginVertical: 4,
+      },
+    }),
   },
 
   itemContainer: {

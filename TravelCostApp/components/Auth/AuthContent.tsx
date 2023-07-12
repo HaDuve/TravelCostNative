@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
 
     borderRadius: 8,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    elevation: 2,
+    elevation: 4,
     shadowColor: GlobalStyles.colors.textColor,
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.35,

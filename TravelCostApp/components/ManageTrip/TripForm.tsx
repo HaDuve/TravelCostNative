@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useContext, useEffect, useLayoutEffect } from "react";
-import { View, Text, Alert, ScrollView } from "react-native";
+import { View, Text, Alert, ScrollView, Platform } from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
@@ -470,7 +470,7 @@ const TripForm = ({ navigation, route }) => {
     <>
       {datepickerJSX}
       {modalJSX}
-      <ScrollView style={{ flex: 1, overflow: "visible" }}>
+      <View style={{ flex: 1, overflow: "visible" }}>
         <View style={styles.form}>
           <View
             style={{
@@ -697,7 +697,7 @@ const TripForm = ({ navigation, route }) => {
             </GradientButton>
           )} */}
         </View>
-      </ScrollView>
+      </View>
       <View
         style={{
           minHeight: 60,
@@ -720,8 +720,16 @@ const styles = StyleSheet.create({
   form: {
     flex: 1,
     minHeight: "100%",
-    padding: "2%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
+    ...Platform.select({
+      ios: {
+        padding: "2%",
+      },
+      android: {
+        padding: "3%",
+        paddingTop: "5%",
+      },
+    }),
   },
   recalcButtonContainer: {
     marginRight: "2%",

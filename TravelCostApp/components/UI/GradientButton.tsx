@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Pressable } from "react-native";
+import { StyleSheet, Text, View, Pressable, Platform } from "react-native";
 import React from "react";
 import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";
@@ -59,12 +59,20 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: GlobalStyles.colors.primary500,
     borderRadius: 16,
-    elevation: 3,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowRadius: 3,
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.4,
+
     overflow: "visible",
+
+    ...Platform.select({
+      ios: {
+        shadowColor: GlobalStyles.colors.textColor,
+        shadowRadius: 3,
+        shadowOffset: { width: 2, height: 2 },
+        shadowOpacity: 0.4,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
   },
   flat: {
     // TODO: find another way android

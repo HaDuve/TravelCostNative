@@ -323,6 +323,14 @@ const SettingsScreen = ({ navigation }) => {
         flex: 1,
         paddingHorizontal: "4%",
         backgroundColor: GlobalStyles.colors.backgroundColor,
+        ...Platform.select({
+          ios: {
+            padding: 0,
+          },
+          android: {
+            paddingTop: "6%",
+          },
+        }),
       }}
     >
       <BlurView
@@ -447,8 +455,8 @@ const styles = StyleSheet.create({
     marginLeft: "2%",
   },
   settingsButton: {
-    paddingVertical: "2%",
-    paddingHorizontal: "8%",
+    marginVertical: "2%",
+    marginHorizontal: "8%",
     borderRadius: 16,
   },
   textButton: {

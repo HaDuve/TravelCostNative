@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { RefreshControl, StyleSheet, Text, View } from "react-native";
+import { Platform, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { GlobalStyles } from "../constants/styles";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
@@ -206,6 +206,14 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
+    ...Platform.select({
+      ios: {
+        padding: 0,
+      },
+      android: {
+        paddingTop: "3%",
+      },
+    }),
   },
   innerContainer: {
     flex: 2,
@@ -240,7 +248,7 @@ const styles = StyleSheet.create({
     marginRight: "-12%",
     borderRadius: 99,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    elevation: 2,
+    elevation: 8,
     shadowColor: GlobalStyles.colors.textColor,
     shadowOffset: { width: 2.5, height: 2.2 },
     shadowOpacity: 0.55,

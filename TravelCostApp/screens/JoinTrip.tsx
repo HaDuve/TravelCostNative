@@ -1,6 +1,7 @@
 import {
   Alert,
   KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   View,
@@ -247,15 +248,28 @@ const styles = StyleSheet.create({
 
     alignContent: "center",
     alignItems: "center",
+    ...Platform.select({
+      ios: {},
+      android: {
+        marginTop: "10%",
+      },
+    }),
   },
   titleContainer: {
-    marginLeft: "-7,5%",
     minHeight: "12%",
     flexDirection: "row",
     padding: "2%",
     marginBottom: "2%",
     alignItems: "center",
     justifyContent: "space-between",
+    ...Platform.select({
+      ios: {
+        marginLeft: "-7,5%",
+      },
+      android: {
+        padding: "3%",
+      },
+    }),
   },
   titleText: {
     fontSize: 30,

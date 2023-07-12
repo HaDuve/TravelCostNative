@@ -58,6 +58,7 @@ import { sendOfflineQueue } from "../util/offline-queue";
 import * as Haptics from "expo-haptics";
 import { SettingsContext } from "../store/settings-context";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
+import { Platform } from "react-native";
 
 function RecentExpenses({ navigation }) {
   // console.log("rerender RecentExpenses - A");
@@ -382,6 +383,14 @@ const styles = StyleSheet.create({
     padding: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     justifyContent: "flex-start",
+    ...Platform.select({
+      ios: {
+        padding: 0,
+      },
+      android: {
+        paddingTop: "3%",
+      },
+    }),
   },
   dateHeader: {
     marginVertical: "4%",
@@ -404,11 +413,19 @@ const styles = StyleSheet.create({
   dropdownContainer: {
     maxWidth: "50%",
     marginTop: "2%",
-    elevation: 2,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
+    ...Platform.select({
+      ios: {
+        shadowColor: GlobalStyles.colors.textColor,
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 0.35,
+        shadowRadius: 4,
+      },
+      android: {
+        marginTop: "4%",
+        elevation: 8,
+        borderRadius: 12,
+      },
+    }),
   },
   dropdown: {
     borderRadius: 10,

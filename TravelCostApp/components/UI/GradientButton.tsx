@@ -82,6 +82,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.primary200,
   },
   pressed: {
+    elevation: 0,
     transform: [{ scale: 0.9 }],
     opacity: 0.75,
     backgroundColor: GlobalStyles.colors.primary100,

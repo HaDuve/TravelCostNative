@@ -10,6 +10,7 @@ import {
   Dimensions,
   Keyboard,
   KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { daysBetween } from "../../util/date";
 
@@ -849,10 +850,15 @@ const ExpenseForm = ({
               paddingHorizontal: "2%",
               // margin
               marginBottom: "-2%",
+              ...Platform.select({
+                android: {
+                  marginTop: "8%",
+                },
+              }),
             }}
           >
             {backButtonJsx}
-            {confirmButtonJSX}
+            {Platform.OS == "ios" && confirmButtonJSX}
           </View>
           <Animated.View layout={Layout} style={styles.form}>
             <View style={styles.inputsRow}>

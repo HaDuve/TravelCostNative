@@ -3,6 +3,7 @@ import {
   Alert,
   Dimensions,
   FlatList,
+  Platform,
   StyleSheet,
   Text,
   View,
@@ -323,7 +324,15 @@ const styles = StyleSheet.create({
   },
   button: {
     marginLeft: 24,
-    marginTop: "50%",
+    ...Platform.select({
+      ios: {
+        marginTop: "30%",
+      },
+      android: {
+        marginTop: "50%",
+      },
+    }),
+
     borderRadius: 12,
   },
   splitContainer: {

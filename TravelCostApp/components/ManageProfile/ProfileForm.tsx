@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/react-in-jsx-scope */
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { View, Text, Alert, Keyboard, Pressable } from "react-native";
 import React, { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
@@ -90,6 +90,15 @@ const ProfileForm = ({ navigation }) => {
       isValid: true,
     },
   });
+
+  useEffect(() => {
+    setInputs((curInputs) => {
+      return {
+        ...curInputs,
+        ["userName"]: { value: userCtx.userName, isValid: true },
+      };
+    });
+  }, [userCtx.userName]);
 
   function inputChangedHandler(inputIdentifier, enteredValue) {
     setInputs((curInputs) => {

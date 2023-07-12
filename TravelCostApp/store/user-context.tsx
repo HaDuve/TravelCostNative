@@ -130,16 +130,21 @@ function UserContextProvider({ children }) {
       return isPremium;
     }
     const isPremiumNow = await isPremiumMember();
-    await secureStoreSetObject("isPremium", isPremiumNow);
+    const uid = await secureStoreGetItem("uid");
+    await secureStoreSetObject(uid ?? "" + "isPremium", isPremiumNow);
     setIsPremium(isPremiumNow);
     return isPremiumNow;
   }
   useEffect(() => {
     async function loadIsPremiumFromAsync() {
       try {
-        const isPremiumString = await secureStoreGetObject("isPremium");
+        const uid = await secureStoreGetItem("uid");
+        const isPremiumString = await secureStoreGetObject(
+          uid ?? "" + "isPremium"
+        );
         if (isPremiumString !== null) {
           const isPremiumNow = JSON.parse(isPremiumString);
+          console.log("loadIsPremiumFromAsync ~ isPremiumNow:", isPremiumNow);
           setIsPremium(isPremiumNow);
           return;
         }

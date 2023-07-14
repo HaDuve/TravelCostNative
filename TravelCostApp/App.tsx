@@ -97,7 +97,7 @@ import FinancialScreen from "./screens/FinancialScreen";
 import FinderScreen from "./screens/FinderScreen";
 import CustomerScreen from "./screens/CustomerScreen";
 import CategoryMapTestScreen from "./screens/CategoryMapTestScreen";
-import GPTDealScreen from "./screens/GPTDealScreen";
+import GPTDealScreen from "./screens/ChatGPTDealScreen";
 import { initBranch } from "./components/Referral/branch";
 
 // Keep the splash screen visible while we fetch resources
@@ -561,7 +561,7 @@ function Root() {
     // save user Name in Ctx and async
     try {
       await userCtx.addUserName(userData);
-      await tripCtx.setCurrentTrip(tripid, tripData);
+      // await tripCtx.setCurrentTrip(tripid, tripData);
       console.log("onlineSetup ~ tripid before setItem:", tripid);
       await userCtx.loadCatListFromAsyncInCtx(tripid);
       await touchMyTraveler(storedTripId, storedUid);

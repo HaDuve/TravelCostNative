@@ -1,5 +1,6 @@
 // import { GPT_API_KEY } from "@env";
-const GPT_API_KEY = "ee892f25f1msh7b58e66c617672dp1d7c37jsn9339224154d5";
+const GPT_API_KEY = "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";
+//  "ee892f25f1msh7b58e66c617672dp1d7c37jsn9339224154d5";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -14,6 +15,8 @@ const languageObj = LANGUAGE_LIST.find(
   (language) => language.code === i18n.locale
 );
 const languageName = languageObj?.name;
+
+import { Configuration, OpenAIApi } from "openai";
 
 export function chatGPTcontentKeywords(customCategory: string) {
   const content =
@@ -60,21 +63,39 @@ export function chatGPT_getKeywords(customCategory: string) {
   return options;
 }
 
-export function chatGPT_getGoodDeal(
+export async function chatGPT_getGoodDeal(
   product: string,
   price: string,
   currency: string,
   country: string
 ) {
+  const configuration = new Configuration({
+    apiKey: GPT_API_KEY,
+  });
+  const openai = new OpenAIApi(configuration);
+
+  console.log("openai", openai);
+  const chatCompletion = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [{ role: "user", content: "Hello world" }],
+  });
+  console.log(chatCompletion.data.choices[0].message);
+
   const options = {
     method: "POST",
-    url: "https://chatgpt53.p.rapidapi.com/",
+    url: "https://api.openai.com/v1/chat/completions",
+    // "https://chatgpt53.p.rapidapi.com/",
     headers: {
       "content-type": "application/json",
-      "X-RapidAPI-Key": GPT_API_KEY,
-      "X-RapidAPI-Host": "chatgpt53.p.rapidapi.com",
+      apiKey: GPT_API_KEY,
     },
+    // {
+    //   "content-type": "application/json",
+    //   "X-RapidAPI-Key": GPT_API_KEY,
+    //   "X-RapidAPI-Host": "chatgpt53.p.rapidapi.com",
+    // },
     data: {
+      model: "gpt-3.5-turbo",
       messages: [
         {
           role: "user",

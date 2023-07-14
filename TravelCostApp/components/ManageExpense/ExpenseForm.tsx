@@ -323,7 +323,7 @@ const ExpenseForm = ({
   );
   useEffect(() => {
     if (netCtx.strongConnection) {
-      // console.log("~~ currentTravellers:", tripCtx.travellers);
+      console.log("~~ currentTravellers:", tripCtx.travellers);
       setCurrentTravellers(tripCtx.travellers);
     }
   }, [tripCtx.travellers, netCtx.strongConnection]);
@@ -355,6 +355,9 @@ const ExpenseForm = ({
   const [splitItemsEQUAL, setSplitItemsEQUAL] = useState(
     currentTravellersAsItems
   );
+  useEffect(() => {
+    setSplitItemsEQUAL(currentTravellersAsItems);
+  }, [currentTravellersAsItems]);
   const [openEQUAL, setOpenEQUAL] = useState(false);
   const [splitTravellersList, setListEQUAL] = useState(
     editingValues ? editingValues.listEQUAL : currentTravellers

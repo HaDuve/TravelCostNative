@@ -63,9 +63,7 @@ const GPTDealScreen = ({ route, navigation }) => {
           <Text style={styles.titleText}>{i18n.t("askChatGptTitle")}</Text>
           <InfoButton
             onPress={() =>
-              Alert.alert(
-                "chatGPT Info",
-              )
+              Alert.alert(i18n.t("gptInfoTitle"), i18n.t("gptInfoText"))
             }
           ></InfoButton>
         </View>

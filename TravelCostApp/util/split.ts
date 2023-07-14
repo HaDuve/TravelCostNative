@@ -247,17 +247,27 @@ export function travellerToDropdown(travellers) {
   // sometimes this is not an array but an object
   try {
     travellers.forEach((traveller) => {
+      console.log("travellers.forEach ~ traveller:", traveller);
       // TODO: make value uid based and not name based
       listOfLabelValues.push({ label: traveller, value: traveller });
     });
   } catch (error) {
-    console.log("travellers is an object");
-    Object.keys(travellers).forEach((traveller) => {
-      // TODO: make value uid based and not name based
-      listOfLabelValues.push({ label: traveller, value: traveller });
+    console.log("travellers is an object", travellers);
+    // get travellers.user.username
+    Object.keys(travellers).forEach((key) => {
+      console.log("Object.keys ~ key:", key);
+      console.log("Object.keys ~ travellers[key]:", travellers[key]);
+      console.log(
+        "Object.keys ~ travellers[key][userName]:",
+        travellers[key]["userName"]
+      );
+      listOfLabelValues.push({
+        label: travellers[key]["userName"],
+        value: travellers[key]["userName"],
+      });
     });
   }
-  return listOfLabelValues;
+  return [...listOfLabelValues];
 }
 
 export async function calcOpenSplitsTable(

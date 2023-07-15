@@ -333,9 +333,9 @@ const ExpenseForm = ({
     travellerToDropdown(currentTravellers)
   );
 
-  useEffect(() => {
-    setCurrentTravellersAsItems(travellerToDropdown(currentTravellers));
-  }, [currentTravellers]);
+  // useEffect(() => {
+  //   setCurrentTravellersAsItems(travellerToDropdown(currentTravellers));
+  // }, [currentTravellers]);
 
   const [items, setItems] = useState(currentTravellersAsItems);
   const [open, setOpen] = useState(false);

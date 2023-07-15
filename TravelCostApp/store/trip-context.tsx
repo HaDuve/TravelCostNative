@@ -164,7 +164,17 @@ function TripContextProvider({ children }) {
 
     // bug here?
     console.log("setCurrentTrip ~ trip.travellers:", trip.travellers);
-    setTravellers(trip.travellers);
+    const extractedTravellers = [];
+    Object.keys(trip.travellers).forEach((key) => {
+      console.log("Object.keys ~ key:", key);
+      console.log("Object.keys ~ travellers[key]:", travellers[key]);
+      console.log(
+        "Object.keys ~ travellers[key][userName]:",
+        travellers[key]["userName"]
+      );
+      extractedTravellers.push(travellers[key]["userName"]);
+    });
+    setTravellers(extractedTravellers);
   }
 
   function setTotalSum(amount: number) {

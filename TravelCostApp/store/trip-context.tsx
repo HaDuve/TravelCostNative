@@ -164,17 +164,21 @@ function TripContextProvider({ children }) {
 
     // bug here?
     console.log("setCurrentTrip ~ trip.travellers:", trip.travellers);
-    const extractedTravellers = [];
-    Object.keys(trip.travellers).forEach((key) => {
-      console.log("Object.keys ~ key:", key);
-      console.log("Object.keys ~ travellers[key]:", travellers[key]);
-      console.log(
-        "Object.keys ~ travellers[key][userName]:",
-        travellers[key]["userName"]
-      );
-      extractedTravellers.push(travellers[key]["userName"]);
-    });
-    setTravellers(extractedTravellers);
+    if (typeof trip.travellers[1] === "string") {
+      setTravellers(trip.travellers);
+    } else {
+      const extractedTravellers = [];
+      Object.keys(trip.travellers).forEach((key) => {
+        console.log("Object.keys ~ key:", key);
+        console.log("Object.keys ~ travellers[key]:", travellers[key]);
+        console.log(
+          "Object.keys ~ travellers[key][userName]:",
+          travellers[key]["userName"]
+        );
+        extractedTravellers.push(travellers[key]["userName"]);
+      });
+      setTravellers(extractedTravellers);
+    }
   }
 
   function setTotalSum(amount: number) {

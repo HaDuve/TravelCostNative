@@ -25,4 +25,4 @@ export const SPLASH_SCREEN_DELAY = 1000;
 // tweak loading recent expenses overlay timeout
 export const EXPENSES_LOAD_TIMEOUT = 6000;
 // tweak minimum required internet speed in Mbit/s
-export const MINIMUM_REQUIRED_SPEED = 1;
+export const MINIMUM_REQUIRED_SPEED = 0.5;

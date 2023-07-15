@@ -81,9 +81,7 @@ const OverviewScreen = ({ navigation }) => {
       setOfflineString(connectionSpeedString);
     } else {
       if (netCtx.isConnected && !netCtx.strongConnection) {
-        setOfflineString(
-          ` - ${i18n.t("slowConnection")}` + connectionSpeedString
-        );
+        setOfflineString(` - ` + connectionSpeedString);
       } else setOfflineString(` - ${i18n.t("offlineMode")}`);
     }
   }, [

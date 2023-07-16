@@ -1,17 +1,8 @@
 {
-  "plugins": [["module:react-native-dotenv"]],
+  "plugins": ["module:react-native-dotenv"],
   "env": {
     "production": {
-      "plugins": [
-        [
-          "transform-remove-console",
-          {
-            "envName": "APP_ENV",
-            "moduleName": "@env",
-            "path": ".env"
-          }
-        ]
-      ]
+      "plugins": ["transform-remove-console"]
     }
   }
 }

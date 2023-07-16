@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 import { GlobalStyles } from "../../constants/styles";
@@ -10,15 +10,14 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { EXPENSES_LOAD_TIMEOUT } from "../../confAppConstants";
 import { memo } from "react";
+import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 
 function ExpensesOutput({
   expenses,
   fallbackText,
   refreshControl,
-  periodValue,
   showSumForTravellerName,
   isFiltered,
-  listRef,
 }) {
   const [showLoading, setShowLoading] = useState(true);
   useEffect(() => {
@@ -29,18 +28,18 @@ function ExpensesOutput({
 
   let content = (
     <Animated.View exiting={SlideOutLeft} style={styles.fallbackContainer}>
-      {showLoading && <LoadingOverlay></LoadingOverlay>}
-      {!showLoading && <Text style={styles.infoText}>{fallbackText}</Text>}
+      <View style={styles.fallbackInnerContainer}>
+        {showLoading && <LoadingOverlay></LoadingOverlay>}
+        {!showLoading && <Text style={styles.infoText}>{fallbackText}</Text>}
+      </View>
     </Animated.View>
   );
   if (expenses.length > 0) {
     content = (
       <ExpensesList
-        periodValue={periodValue}
         expenses={expenses}
         showSumForTravellerName={showSumForTravellerName}
         isFiltered={isFiltered}
-        listRef={listRef}
       />
     );
   }
@@ -58,7 +57,6 @@ ExpensesOutput.propTypes = {
   expenses: PropTypes.array,
   fallbackText: PropTypes.string,
   refreshControl: PropTypes.object,
-  periodValue: PropTypes.string,
   showSumForTravellerName: PropTypes.string,
   isFiltered: PropTypes.bool,
 };
@@ -74,7 +72,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: "12%",
+    margin: "12%",
+  },
+  fallbackInnerContainer: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   header: {
     flexDirection: "row",

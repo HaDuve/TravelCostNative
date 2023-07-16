@@ -277,41 +277,11 @@ function forceCloseRow(index) {
 function ExpensesList({
   expenses,
   refreshControl,
-  periodValue,
   showSumForTravellerName,
   isFiltered,
-  listRef,
 }) {
-  // const uniqueData = expenses;
-  // useEffect(() => {
-  //   setPage(1);
-  //   setData(uniqueData.slice(0, 10));
-  // }, [uniqueData]);
-
-  // //add pagination
-  // const [page, setPage] = useState(0);
-  // const [data, setData] = useState(uniqueData.slice(0, page * 10));
-
-  // function addExpensesToData(page) {
-  //   const newExpenses = [];
-  //   for (let i = page * 10; i < (page + 1) * 10; i++) {
-  //     if (uniqueData[i]) {
-  //       newExpenses.push(uniqueData[i]);
-  //     }
-  //   }
-  //   setData([...data, ...newExpenses]);
-  // }
-
-  // function onScrollHandler() {
-  //   console.log("onScrollHandler ~ page before:", page);
-  //   setPage(page + 1);
-  //   addExpensesToData(page);
-  // }
-
-  // console.log("rerender ExpensesList - C");
   navigation = useNavigation();
 
-  // const flatListRef = useRef(null);
   const netCtx = useContext(NetworkContext);
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
   const tripCtx = useContext(TripContext);
@@ -320,26 +290,6 @@ function ExpensesList({
   tripid = tripCtx.tripid;
   travellerName = showSumForTravellerName;
   if (isFiltered) filtered = true;
-  // // find the index of the first item in expenses with the date === new Date()
-  // // this is used to scroll to the current day
-  // useLayoutEffect(() => {
-  //   console.log("useEffect ~ flatListRef", flatListRef);
-  //   if (!flatListRef.current) {
-  //     return;
-  //   }
-  //   console.log("useEffect");
-  //   // Scroll to the today item after the component is rendered
-  //   const today = new Date();
-  //   const todayIndex = expenses.findIndex(
-  //     (expense) =>
-  //       expense.date.getDate() === today.getDate() &&
-  //       expense.date.getMonth() === today.getMonth() &&
-  //       expense.date.getFullYear() === today.getFullYear()
-  //   );
-  //   // if todayIndex is -1, then there are no expenses for today
-  //   // so we scroll to the first expense
-  //   flatListRef.current.scrollToIndex({ index: todayIndex, animated: true });
-  // }, [periodValue]);
 
   return (
     <Animated.View
@@ -400,8 +350,7 @@ ExpensesList.propTypes = {
       uid: PropTypes.string.isRequired,
     })
   ).isRequired,
-  refreshControl: PropTypes.element,
-  periodValue: PropTypes.string.isRequired,
+  refreshControl: PropTypes.object,
   showSumForTravellerName: PropTypes.string,
   isFiltered: PropTypes.bool,
 };

@@ -20,12 +20,27 @@ function ExpensesOutput({
   isFiltered,
 }) {
   const [showLoading, setShowLoading] = useState(true);
+  const [fallback, setFallback] = useState(true);
   useEffect(() => {
     setTimeout(() => setShowLoading(false), EXPENSES_LOAD_TIMEOUT);
   }, []);
 
   // const toggleLoading = () => setShowLoading((prev) => !prev);
-
+  const loadingSpinner = (
+    <View
+      style={{
+        position: "absolute",
+        width: Dimensions.get("window").width,
+        height: 60,
+        alignItems: "center",
+        justifyContent: "center",
+        paddingTop: 4,
+        marginTop: "12%",
+      }}
+    >
+      <LoadingBarOverlay></LoadingBarOverlay>
+    </View>
+  );
   let content = (
     <Animated.View exiting={SlideOutLeft} style={styles.fallbackContainer}>
       <View style={styles.fallbackInnerContainer}>
@@ -35,6 +50,7 @@ function ExpensesOutput({
     </Animated.View>
   );
   if (expenses.length > 0) {
+    setFallback(false);
     content = (
       <ExpensesList
         expenses={expenses}
@@ -44,9 +60,12 @@ function ExpensesOutput({
     );
   }
   return (
-    <ScrollView style={styles.container} refreshControl={refreshControl}>
-      <View>{content}</View>
-    </ScrollView>
+    <View style={{ flex: 1 }}>
+      {loadingSpinner}
+      <ScrollView style={styles.container} refreshControl={refreshControl}>
+        <View>{content}</View>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -66,13 +85,15 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 0,
     paddingBottom: 0,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
+    // backgroundColor: GlobalStyles.colors.backgroundColor,
+    // borderWidth: 1,
   },
   fallbackContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    margin: "12%",
+    // borderWidth: 1,
+    margin: "10%",
   },
   fallbackInnerContainer: {
     backgroundColor: GlobalStyles.colors.backgroundColor,

@@ -81,7 +81,7 @@ const OverviewScreen = ({ navigation }) => {
       setOfflineString(connectionSpeedString);
     } else {
       if (netCtx.isConnected && !netCtx.strongConnection) {
-        setOfflineString(` - ` + connectionSpeedString);
+        setOfflineString(`` + connectionSpeedString);
       } else setOfflineString(` - ${i18n.t("offlineMode")}`);
     }
   }, [
@@ -171,6 +171,7 @@ const OverviewScreen = ({ navigation }) => {
           useMoreSpace={useMoreSpace}
           expenses={recentExpenses}
           periodName={PeriodValue}
+          style={styles.customSummaryStyle}
         />
       </View>
       <View style={styles.tempGrayBar1}></View>
@@ -207,7 +208,7 @@ const styles = StyleSheet.create({
   dateHeader: {
     marginVertical: "4%",
     marginLeft: "6%",
-    marginBottom: "-6%",
+    marginBottom: "-4%",
   },
   dateString: {
     fontSize: 12,
@@ -279,5 +280,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.9,
     shadowRadius: 4,
     zIndex: 0,
+  },
+  customSummaryStyle: {
+    marginTop: "-2%",
   },
 });

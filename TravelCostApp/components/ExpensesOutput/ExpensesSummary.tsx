@@ -21,7 +21,12 @@ import { MAX_JS_NUMBER } from "../../confAppConstants";
 import * as Haptics from "expo-haptics";
 import { UserContext } from "../../store/user-context";
 
-const ExpensesSummary = ({ expenses, periodName, useMoreSpace = false }) => {
+const ExpensesSummary = ({
+  expenses,
+  periodName,
+  useMoreSpace = false,
+  style = {},
+}) => {
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   if (!expenses || !periodName || userCtx.freshlyCreated) return <></>;
@@ -124,6 +129,7 @@ const ExpensesSummary = ({ expenses, periodName, useMoreSpace = false }) => {
       onPress={() => pressBudgetHandler()}
       style={({ pressed }) => [
         styles.container,
+        style,
         GlobalStyles.shadow,
         pressed && GlobalStyles.pressedWithShadow,
       ]}
@@ -152,12 +158,15 @@ ExpensesSummary.propTypes = {
   expenses: PropTypes.array.isRequired,
   periodName: PropTypes.string.isRequired,
   useMoreSpace: PropTypes.bool,
+  style: PropTypes.object,
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: "2%",
-    marginRight: "-4%",
+    paddingTop: "1%",
+    paddingLeft: "2%",
+    marginRight: "-5%",
+    marginBottom: "-2%",
   },
   sumTextContainer: {
     alignItems: "center",

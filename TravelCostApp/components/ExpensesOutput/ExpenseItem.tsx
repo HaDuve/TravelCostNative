@@ -204,7 +204,11 @@ function ExpenseItem(props): JSX.Element {
           <View style={styles.leftItem}>
             <Text
               maxFontSizeMultiplier={1.2}
-              style={[styles.textBase, styles.description]}
+              style={[
+                styles.textBase,
+                styles.description,
+                toggle1 && toggle2 && { width: "90%" },
+              ]}
             >
               {description}
             </Text>
@@ -284,11 +288,13 @@ const styles = StyleSheet.create({
   },
   description: {
     flex: 1,
-    width: "90%",
+    // width: "110%",
     fontStyle: "italic",
     fontWeight: "300",
     fontSize: 15,
     zIndex: 2,
+    flexWrap: "wrap",
+    flexDirection: "row",
   },
   secondaryText: {
     color: GlobalStyles.colors.gray700,

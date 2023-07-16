@@ -50,7 +50,7 @@ function ExpensesOutput({
     </Animated.View>
   );
   if (expenses.length > 0) {
-    setFallback(false);
+    if (fallback) setFallback(false);
     content = (
       <ExpensesList
         expenses={expenses}

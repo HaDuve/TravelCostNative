@@ -60,6 +60,7 @@ import { SettingsContext } from "../store/settings-context";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { Platform } from "react-native";
 import { REACT_APP_CAT_API_KEY, REACT_APP_GPT_API_KEY } from "@env";
+import * as Device from "expo-device";
 
 function RecentExpenses({ navigation }) {
   // console.log("rerender RecentExpenses - A");
@@ -276,10 +277,11 @@ function RecentExpenses({ navigation }) {
   // if (isFetching) {
   //   return <LoadingOverlay />;
   // }
-  const apikey = REACT_APP_CAT_API_KEY || "TEst";
+  // const apikey = REACT_APP_CAT_API_KEY || "TEst";
+  // console.log("RecentExpenses ~ apikey:", apikey);
   return (
     <View style={styles.container}>
-      <Text> {apikey}</Text>
+      {/* <Text>{!Device.isDevice && apikey}</Text> */}
       <TourGuideZone
         text={i18n.t("walk1")}
         zone={1}

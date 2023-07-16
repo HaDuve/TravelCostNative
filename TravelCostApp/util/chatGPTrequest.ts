@@ -1,4 +1,4 @@
-// import { GPT_API_KEY } from "@env";
+// import { REACT_APP_GPT_API_KEY } from "@env";
 const GPT_API_KEY = "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";
 //  "ee892f25f1msh7b58e66c617672dp1d7c37jsn9339224154d5";
 

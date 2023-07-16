@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
-
 import ExpensesOutput, {
   MemoizedExpensesOutput,
 } from "../components/ExpensesOutput/ExpensesOutput";
@@ -41,6 +40,7 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
+import Config from "react-native-config";
 import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpensesUtil";
@@ -59,6 +59,7 @@ import * as Haptics from "expo-haptics";
 import { SettingsContext } from "../store/settings-context";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { Platform } from "react-native";
+import { REACT_APP_CAT_API_KEY, REACT_APP_GPT_API_KEY } from "@env";
 
 function RecentExpenses({ navigation }) {
   // console.log("rerender RecentExpenses - A");
@@ -275,9 +276,10 @@ function RecentExpenses({ navigation }) {
   // if (isFetching) {
   //   return <LoadingOverlay />;
   // }
-
+  const apikey = REACT_APP_CAT_API_KEY || "TEst";
   return (
     <View style={styles.container}>
+      <Text> {apikey}</Text>
       <TourGuideZone
         text={i18n.t("walk1")}
         zone={1}
@@ -343,9 +345,7 @@ function RecentExpenses({ navigation }) {
           periodName={PeriodValue}
         />
       </View>
-
       <View style={styles.tempGrayBar1}></View>
-
       <ExpensesOutput
         expenses={recentExpenses}
         periodValue={PeriodValue}

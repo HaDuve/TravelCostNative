@@ -22,7 +22,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.budgetfornomads.app",
-      "buildNumber": "1.0.1113",
+      "buildNumber": "1.0.1120",
       "config": {
         "usesNonExemptEncryption": false
       }

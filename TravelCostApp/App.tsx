@@ -626,6 +626,7 @@ function Root() {
           Purchases.configure({ apiKey: REVCAT_API_KEY, appUserID: storedUid });
           console.log("onRootMount ~ storedUid:", storedUid);
         }
+        await Purchases.collectDeviceIdentifiers();
 
         const needsTour = await loadTourConfig();
         console.log("onRootMount ~ needsTour:", needsTour);

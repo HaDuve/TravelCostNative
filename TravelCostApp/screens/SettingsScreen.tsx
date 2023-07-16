@@ -54,6 +54,7 @@ import {
   trackPurchaseEvent,
 } from "../components/Referral/branch";
 import branch from "react-native-branch";
+import { REACT_APP_CAT_API_KEY } from "@env";
 
 const SettingsScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
@@ -315,6 +316,8 @@ const SettingsScreen = ({ navigation }) => {
     setIsRestoringPurchases(false);
   }
   const isAndroid = Platform.OS === "android";
+  const apikey = REACT_APP_CAT_API_KEY || "TEst";
+
   return (
     <ScrollView
       scrollEnabled={true}
@@ -428,6 +431,7 @@ const SettingsScreen = ({ navigation }) => {
       ></View>
       {DEVCONTENT}
       <View style={{ flex: 1, minHeight: 100 }}></View>
+      <Text>{apikey}</Text>
     </ScrollView>
   );
 };

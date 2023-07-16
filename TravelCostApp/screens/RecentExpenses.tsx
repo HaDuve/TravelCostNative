@@ -277,11 +277,10 @@ function RecentExpenses({ navigation }) {
   // if (isFetching) {
   //   return <LoadingOverlay />;
   // }
-  // const apikey = REACT_APP_CAT_API_KEY || "TEst";
+
   // console.log("RecentExpenses ~ apikey:", apikey);
   return (
     <View style={styles.container}>
-      {/* <Text>{!Device.isDevice && apikey}</Text> */}
       <TourGuideZone
         text={i18n.t("walk1")}
         zone={1}

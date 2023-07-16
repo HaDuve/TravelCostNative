@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import React, { useContext } from "react";
 import { useState } from "react";
 import PropTypes from "prop-types";
@@ -160,6 +160,12 @@ const styles = StyleSheet.create({
   firstTitleContainer: {
     marginVertical: "4%",
     flexDirection: "row",
+    ...Platform.select({
+      android: {
+        paddingLeft: "5%",
+        paddingTop: "5%",
+      },
+    }),
   },
   shadow: {
     borderTopWidth: 1,

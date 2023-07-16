@@ -243,9 +243,9 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           <Pressable
             onPress={toggleContent}
             style={({ pressed }) => [
-              styles.toggleButton,
               GlobalStyles.shadowGlowPrimary,
               pressed && GlobalStyles.pressedWithShadow,
+              styles.toggleButton,
             ]}
           >
             <ToggleButton></ToggleButton>
@@ -312,8 +312,8 @@ const styles = StyleSheet.create({
     marginLeft: "2%",
   },
   toggleButton: {
-    flex: 0,
-    borderRadius: 999,
+    flex: 1,
+    // borderRadius: 10,
     marginHorizontal: 150,
     marginBottom: "-2%",
     marginTop: "-20%",
@@ -321,5 +321,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1,
+    elevation: 0,
   },
 });

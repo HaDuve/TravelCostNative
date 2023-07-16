@@ -1,4 +1,5 @@
 import {
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -260,13 +261,21 @@ const styles = StyleSheet.create({
     height: 55,
     borderWidth: 0,
     borderColor: "black",
-    paddingVertical: 8,
+
     paddingLeft: 16,
     paddingRight: 0,
     marginLeft: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     flexDirection: "row",
     justifyContent: "space-between",
+    ...Platform.select({
+      ios: {
+        paddingVertical: 8,
+      },
+      android: {
+        paddingVertical: 6,
+      },
+    }),
   },
   textBase: {
     marginTop: 2,
@@ -340,6 +349,12 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.gray500,
     alignItems: "center",
     justifyContent: "center",
+    ...Platform.select({
+      android: {
+        minHeight: 22,
+        minWidth: 22,
+      },
+    }),
   },
   avatarText: {
     fontSize: 14,

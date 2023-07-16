@@ -356,6 +356,7 @@ const styles = StyleSheet.create({
     // alignItems: "center",
     // justifyContent: "space-between",
     // margin: "2%",
+    minHeight: 25,
   },
   userText: {
     fontSize: 18,

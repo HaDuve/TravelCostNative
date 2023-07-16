@@ -1,3 +1,5 @@
+import { Platform } from "react-native";
+
 export const GlobalStyles = {
   colors: {
     primary50: "#C5E5D5",
@@ -87,11 +89,18 @@ export const GlobalStyles = {
     shadowRadius: 1.3,
   },
   wideStrongShadow: {
-    elevation: 8,
-    shadowColor: "#002A22",
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 3.3,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#002A22",
+        shadowOffset: { width: 4, height: 4 },
+        shadowOpacity: 0.4,
+        shadowRadius: 3.3,
+      },
+      android: {
+        elevation: 10,
+        shadowColor: "rgba(0, 0, 0, 1)",
+      },
+    }),
   },
   shadowPrimary: {
     elevation: 4,
@@ -101,7 +110,7 @@ export const GlobalStyles = {
     shadowOpacity: 0.75,
   },
   shadowGlowPrimary: {
-    // elevation: 1,
+    elevation: 10,
     shadowColor: "#005645",
     shadowOffset: { width: 4, height: 4 },
     shadowOpacity: 0.45,

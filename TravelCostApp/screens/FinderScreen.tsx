@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import DatePickerModal from "../components/UI/DatePickerModal";
 import DatePickerContainer from "../components/UI/DatePickerContainer";
@@ -223,7 +223,7 @@ const FinderScreen = () => {
         <View style={[styles.cardContainer, GlobalStyles.wideStrongShadow]}>
           <Text style={styles.titleText}>{i18n.t("finderTitle")}</Text>
           <View style={styles.rowContainer}>
-            <View style={{ borderWidth: 1, borderRadius: 99, marginRight: 8 }}>
+            <View style={styles.checkBoxContainer}>
               <Checkbox
                 status={checkedQuery ? "checked" : "unchecked"}
                 onPress={() => {
@@ -248,7 +248,7 @@ const FinderScreen = () => {
             />
           </View>
           <View style={styles.rowContainer}>
-            <View style={{ borderWidth: 1, borderRadius: 99, marginRight: -8 }}>
+            <View style={styles.checkBoxContainer}>
               <Checkbox
                 status={checkedDate ? "checked" : "unchecked"}
                 onPress={() => {
@@ -319,7 +319,13 @@ const styles = StyleSheet.create({
     padding: "8%",
     justifyContent: "space-around",
   },
-
+  checkBoxContainer: {
+    borderRadius: 99,
+    marginRight: 8,
+    ...Platform.select({
+      ios: { borderWidth: 1 },
+    }),
+  },
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -354,5 +360,6 @@ const styles = StyleSheet.create({
   },
   findButton: {
     marginHorizontal: "20%",
+    borderRadius: 99,
   },
 });

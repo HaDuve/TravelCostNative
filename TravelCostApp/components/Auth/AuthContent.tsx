@@ -6,6 +6,7 @@ import React, {
   Text,
   ScrollView,
   KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 
 //Localization
@@ -70,7 +71,7 @@ function AuthContent({ isLogin, onAuthenticate, isConnected }) {
 
   return (
     <KeyboardAvoidingView behavior={"position"}>
-      <ScrollView>
+      <ScrollView style={styles.container}>
         <View style={styles.authContent}>
           <AuthForm
             isLogin={isLogin}
@@ -101,19 +102,34 @@ AuthContent.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    // flex: 1,
+    // backgroundColor: GlobalStyles.colors.backgroundColor,
+    ...Platform.select({
+      ios: {},
+      android: {
+        paddingTop: "15%",
+      },
+    }),
+  },
   authContent: {
     padding: "4%",
     marginTop: "8%",
     marginBottom: "10%",
     marginHorizontal: "6%",
-
     borderRadius: 8,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    elevation: 4,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
+    ...Platform.select({
+      ios: {
+        shadowColor: GlobalStyles.colors.textColor,
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 0.35,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 10,
+      },
+    }),
   },
   buttons: {
     flexDirection: i18n.locale !== "en" ? "column" : "row",

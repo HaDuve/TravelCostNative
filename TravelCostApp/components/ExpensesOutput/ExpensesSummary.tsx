@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import React, { useContext } from "react";
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
@@ -163,10 +163,20 @@ ExpensesSummary.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: "1%",
-    paddingLeft: "2%",
-    marginRight: "-5%",
-    marginBottom: "-2%",
+    ...Platform.select({
+      ios: {
+        paddingTop: "1%",
+        paddingLeft: "2%",
+        marginRight: "-5%",
+        marginBottom: "-2%",
+      },
+      android: {
+        paddingTop: "3%",
+        paddingLeft: "2%",
+        marginRight: "-5%",
+        marginBottom: "-2%",
+      },
+    }),
   },
   sumTextContainer: {
     alignItems: "center",
@@ -175,5 +185,12 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "bold",
     color: GlobalStyles.colors.primary500,
+    ...Platform.select({
+      android: {
+        textShadowColor: "rgba(0, 0, 0, 0.15)",
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 4,
+      },
+    }),
   },
 });

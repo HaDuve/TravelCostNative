@@ -282,6 +282,13 @@ const styles = StyleSheet.create({
     zIndex: 0,
   },
   customSummaryStyle: {
-    marginTop: "-2%",
+    ...Platform.select({
+      ios: {
+        marginTop: "-2%",
+      },
+      android: {
+        marginTop: "0%",
+      },
+    }),
   },
 });

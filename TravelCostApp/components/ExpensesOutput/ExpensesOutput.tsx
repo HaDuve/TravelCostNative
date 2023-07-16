@@ -6,11 +6,12 @@ import ExpensesList from "./ExpensesList";
 import React from "react-native";
 import Animated, { SlideOutLeft } from "react-native-reanimated";
 import LoadingOverlay from "../UI/LoadingOverlay";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { EXPENSES_LOAD_TIMEOUT } from "../../confAppConstants";
 import { memo } from "react";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
+import { TripContext } from "../../store/trip-context";
 
 function ExpensesOutput({
   expenses,
@@ -19,11 +20,18 @@ function ExpensesOutput({
   showSumForTravellerName,
   isFiltered,
 }) {
+  const tripCtx = useContext(TripContext);
   const [showLoading, setShowLoading] = useState(true);
   const [fallback, setFallback] = useState(true);
   useEffect(() => {
-    setTimeout(() => setShowLoading(false), EXPENSES_LOAD_TIMEOUT);
+    setTimeout(() => {
+      if (tripCtx.tripName) setShowLoading(false);
+    }, EXPENSES_LOAD_TIMEOUT);
   }, []);
+
+  useEffect(() => {
+    if (tripCtx.tripName) setShowLoading(false);
+  }, [tripCtx.tripName]);
 
   // const toggleLoading = () => setShowLoading((prev) => !prev);
   const loadingSpinner = (

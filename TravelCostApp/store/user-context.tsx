@@ -221,7 +221,7 @@ function UserContextProvider({ children }) {
   }
 
   async function saveUserNameInStorage(name: string) {
-    // console.log("saveUserNameInStorage ~ userName", name);
+    console.log("saveUserNameInStorage ~ userName", name);
     await secureStoreSetItem("userName", name);
   }
 

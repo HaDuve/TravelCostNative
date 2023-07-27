@@ -54,6 +54,10 @@
         "appleId": "hionoe@hotmail.de",
         "ascAppId": "6446042796",
         "appleTeamId": "AK62F8767Z"
+      },
+      "android": {
+        "track": "production",
+        "serviceAccountKeyPath": "/Users/hiono/Documents/TravelCost Business/pc-api-7584935131253304096-379-9df8ea4ca4de.json"
       }
     }
   }

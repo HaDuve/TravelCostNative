@@ -57,7 +57,8 @@
       },
       "android": {
         "track": "production",
-        "serviceAccountKeyPath": "/Users/hiono/Documents/TravelCost Business/pc-api-7584935131253304096-379-9df8ea4ca4de.json"
+        "serviceAccountKeyPath": "/Users/hiono/Documents/TravelCost Business/pc-api-7584935131253304096-379-9df8ea4ca4de.json",
+        "releaseStatus": "completed"
       }
     }
   }

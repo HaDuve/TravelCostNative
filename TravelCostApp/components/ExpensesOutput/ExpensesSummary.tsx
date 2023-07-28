@@ -22,7 +22,6 @@ import * as Haptics from "expo-haptics";
 import { UserContext } from "../../store/user-context";
 import { NetworkContext } from "../../store/network-context";
 import { getRate } from "../../util/currencyExchange";
-import { async } from "@firebase/util";
 
 const ExpensesSummary = ({
   expenses,

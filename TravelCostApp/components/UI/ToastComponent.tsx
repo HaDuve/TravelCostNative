@@ -1,6 +1,6 @@
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import React from "react";
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import LoadingBarOverlay from "./LoadingBarOverlay";
 

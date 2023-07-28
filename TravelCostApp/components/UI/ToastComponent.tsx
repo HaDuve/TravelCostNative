@@ -14,7 +14,7 @@ const toastConfig = {
     <BaseToast
       {...props}
       style={[
-        { borderLeftColor: GlobalStyles.colors.primary500 },
+        { borderLeftColor: GlobalStyles.colors.primary500, minHeight: 70 },
         GlobalStyles.wideStrongShadow,
       ]}
       contentContainerStyle={CONTENTCONTAINERSTYLE}
@@ -39,7 +39,7 @@ const toastConfig = {
     <ErrorToast
       {...props}
       style={[
-        { borderLeftColor: GlobalStyles.colors.error500 },
+        { borderLeftColor: GlobalStyles.colors.error500, minHeight: 70 },
         GlobalStyles.wideStrongShadow,
       ]}
       contentContainerStyle={CONTENTCONTAINERSTYLE}

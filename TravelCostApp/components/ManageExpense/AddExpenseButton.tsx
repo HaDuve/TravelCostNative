@@ -129,7 +129,11 @@ const AddExpenseButton = ({ navigation }) => {
           !skipCatScreen && navigation.navigate("CategoryPick");
         }}
       >
-        <Ionicons name={"add-outline"} size={42} color={"white"} />
+        <Ionicons
+          name={valid ? "add-outline" : "alert"}
+          size={42}
+          color={"white"}
+        />
       </Pressable>
     </Animated.View>
   );

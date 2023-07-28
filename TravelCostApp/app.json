@@ -22,14 +22,14 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.budgetfornomads.app",
-      "buildNumber": "1.0.1127",
+      "buildNumber": "1.0.1128",
       "config": {
         "usesNonExemptEncryption": false
       }
     },
     "android": {
       "package": "com.budgetfornomads.app",
-      "versionCode": 101032,
+      "versionCode": 101033,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon2.png",
         "backgroundColor": "#FFFFFF"

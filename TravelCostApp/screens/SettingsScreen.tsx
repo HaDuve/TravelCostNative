@@ -429,7 +429,6 @@ const SettingsScreen = ({ navigation }) => {
       ></View>
       {DEVCONTENT}
       <View style={{ flex: 1, minHeight: 100 }}></View>
-      <Text>{apikey}</Text>
     </ScrollView>
   );
 };

@@ -4,6 +4,7 @@ import { View, Text } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import LoadingBarOverlay from "./LoadingBarOverlay";
 
+const CONTENTCONTAINERSTYLE = { paddingLeft: 10 };
 const toastConfig = {
   /*
       Overwrite 'success' type,
@@ -16,7 +17,7 @@ const toastConfig = {
         { borderLeftColor: GlobalStyles.colors.primary500 },
         GlobalStyles.wideStrongShadow,
       ]}
-      contentContainerStyle={{ paddingHorizontal: 15 }}
+      contentContainerStyle={CONTENTCONTAINERSTYLE}
       text1Style={{
         fontSize: 17,
         fontWeight: "500",
@@ -25,6 +26,8 @@ const toastConfig = {
         fontSize: 15,
         fontWeight: "400",
       }}
+      text1NumberOfLines={1}
+      text2NumberOfLines={2}
       onPress={() => Toast.hide()}
     />
   ),
@@ -39,7 +42,7 @@ const toastConfig = {
         { borderLeftColor: GlobalStyles.colors.error500 },
         GlobalStyles.wideStrongShadow,
       ]}
-      contentContainerStyle={{ paddingHorizontal: 15 }}
+      contentContainerStyle={CONTENTCONTAINERSTYLE}
       text1Style={{
         fontSize: 17,
         fontWeight: "500",
@@ -48,6 +51,8 @@ const toastConfig = {
         fontSize: 15,
         fontWeight: "400",
       }}
+      text1NumberOfLines={1}
+      text2NumberOfLines={3}
       onPress={() => Toast.hide()}
     />
   ),
@@ -69,7 +74,7 @@ const toastConfig = {
         },
         GlobalStyles.wideStrongShadow,
       ]}
-      contentContainerStyle={{ paddingHorizontal: 15 }}
+      contentContainerStyle={CONTENTCONTAINERSTYLE}
       text1Style={{
         fontSize: 17,
         fontWeight: "500",
@@ -78,6 +83,8 @@ const toastConfig = {
         fontSize: 15,
         fontWeight: "400",
       }}
+      text1NumberOfLines={1}
+      text2NumberOfLines={2}
       renderTrailingIcon={() => (
         <View
           style={{

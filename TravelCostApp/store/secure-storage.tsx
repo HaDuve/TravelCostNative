@@ -2,7 +2,8 @@ import { async } from "@firebase/util";
 import * as SecureStore from "expo-secure-store";
 
 export async function secureStoreSetItem(key, value) {
-  // console.log("attempting secure save in Memory > ", key + ": " + value);
+  console.log("attempting secure save in Memory > ", key + ": " + value);
+  if (!value) return;
   await SecureStore.setItemAsync(key, value);
 }
 
@@ -21,6 +22,8 @@ export async function secureStoreGetItem(key) {
 
 export async function secureStoreSetObject(key, value) {
   const jsonValue = JSON.stringify(value);
+  console.log("secureStoreSetObject ~ key, jsonValue:", key, jsonValue);
+  if (!jsonValue) return;
   await SecureStore.setItemAsync(key, jsonValue);
 }
 

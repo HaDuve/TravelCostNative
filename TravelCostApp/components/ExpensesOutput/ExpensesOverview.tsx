@@ -72,6 +72,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const startAutoIncrement = async () => {
     // TODO: add a state variable and a useInterval, if the state is set to true, call rightNavButtonHandler
     console.log("startAutoIncrement ~ startAutoIncrement:");
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     rightNavButtonHandler();
     const interval = setInterval(() => {
       console.log("startAutoIncrement ~ interval tick");
@@ -88,7 +89,6 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   };
 
   const rightNavButtonHandler = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     console.log("pressed right button");
     if (isGraphNotPie) {
       realPeriodNumber.current =
@@ -97,6 +97,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           : realPeriodNumber.current + 1;
       setPeriodRangeNumber(realPeriodNumber.current);
     } else {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setToggleGraphEnum(toggleGraphEnum == 3 ? 0 : toggleGraphEnum + 1);
     }
   };
@@ -124,6 +125,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
             if (isGraphNotPie) {
               realPeriodNumber.current = MIN_PERIOD_RANGE;
               setPeriodRangeNumber(realPeriodNumber.current);
+              stopAutoIncrement();
             } else {
               setToggleGraphEnum(
                 toggleGraphEnum == 0 ? 3 : toggleGraphEnum - 1
@@ -177,7 +179,10 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           size={24}
           onPressIn={startAutoIncrement}
           onPressOut={stopAutoIncrement}
-          // onPress={rightNavButtonHandler}
+          // onPress={() => {
+          //   // rightNavButtonHandler();
+          //   // stopAutoIncrement();
+          // }}
           color={GlobalStyles.colors.primaryGrayed}
         ></IconButton>
       </Animated.View>

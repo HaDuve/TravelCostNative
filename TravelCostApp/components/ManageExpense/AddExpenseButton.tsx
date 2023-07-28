@@ -29,11 +29,14 @@ import { TripContext } from "../../store/trip-context";
 import { AuthContext } from "../../store/auth-context";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { reloadApp } from "../../util/appState";
+import { NetworkContext } from "../../store/network-context";
 
 const AddExpenseButton = ({ navigation }) => {
   const { settings } = useContext(SettingsContext);
   const tripCtx = useContext(TripContext);
   const authCtx = useContext(AuthContext);
+  const netCtx = useContext(NetworkContext);
+  const isFast = netCtx.isConnected && netCtx.strongConnection;
   const buttonRef = useRef(null);
   // if (buttonRef.current)
   //   console.log(
@@ -112,7 +115,12 @@ const AddExpenseButton = ({ navigation }) => {
         ]}
         ref={buttonRef}
         onPress={async () => {
-          if (!valid) await reloadApp();
+          if (!valid && !isFast) await reloadApp();
+          if (!valid && isFast) {
+            await authCtx.logout();
+            await reloadApp();
+          }
+          if (!valid) return;
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           skipCatScreen &&
             navigation.navigate("ManageExpense", {

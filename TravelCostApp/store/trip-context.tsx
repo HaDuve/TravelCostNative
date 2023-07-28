@@ -88,7 +88,7 @@ function TripContextProvider({ children }) {
         const checkUser = await fetchUser(stored_uid);
         const fetched_tripid = checkUser.currentTrip;
         await fetchAndSetCurrentTrip(fetched_tripid ?? stored_tripid);
-        await fetchAndSetTravellers(fetched_tripid);
+        await fetchAndSetTravellers(fetched_tripid ?? stored_tripid);
       }
     }
     loadAsyncTripid();

@@ -152,7 +152,8 @@ function RecentExpenses({ navigation }) {
   useEffect(() => {
     const asyncLoading = async () => {
       // if expenses not empty, return
-      await getExpenses();
+
+      await getExpenses(true, true, true);
       // await expensesCtx.loadExpensesFromStorage();
     };
     asyncLoading();

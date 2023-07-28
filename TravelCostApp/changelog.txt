@@ -1,7 +1,18 @@
 Change log Travel Expense App
 
-1.2.3
--
+1.2.4
+- created android build
+- re-created the styling for androids build
+- added a referral system
+- fixed some issues with bad internet
+- fixed some issues with loading user information on start (username, trip, trip history)
+- fixed some issues with premium status
+- fixed a crash that happened while entering expenses
+- improved settings switch layout
+- implemented faster storage (mmkv faster read/write)
+- added Split Summary partially to free content (only the buttons will stay behind premium paywall)
+- removed chatGPT function until all issues are fixed
+- improved app performance in bad connection situations/countries
 
 1.1.8e
 - fix settings resetting with each update

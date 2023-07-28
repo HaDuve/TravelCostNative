@@ -1,5 +1,5 @@
 import { Platform, StyleSheet, Text, View } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
 import { TripContext } from "../../store/trip-context";
@@ -20,6 +20,9 @@ import Toast from "react-native-toast-message";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
 import * as Haptics from "expo-haptics";
 import { UserContext } from "../../store/user-context";
+import { NetworkContext } from "../../store/network-context";
+import { getRate } from "../../util/currencyExchange";
+import { async } from "@firebase/util";
 
 const ExpensesSummary = ({
   expenses,
@@ -29,6 +32,23 @@ const ExpensesSummary = ({
 }) => {
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
+  const netCtx = useContext(NetworkContext);
+  const isFast = netCtx.isConnected && netCtx.strongConnection;
+  const [lastRate, setLastRate] = useState(1);
+  console.log("lastRate:", lastRate);
+  console.log("asyncGetRate ~ userCtx.lastCurrency:", userCtx.lastCurrency);
+  console.log("asyncGetRate ~ tripCtx.tripCurrency:", tripCtx.tripCurrency);
+  useEffect(() => {
+    async function asyncGetRate() {
+      if (!userCtx.lastCurrency || !tripCtx.tripCurrency) {
+        setLastRate(1);
+        return;
+      }
+      setLastRate(await getRate(tripCtx.tripCurrency, userCtx.lastCurrency));
+    }
+    asyncGetRate();
+  }, [userCtx.lastCurrency, tripCtx.tripCurrency, isFast]);
+
   if (!expenses || !periodName || userCtx.freshlyCreated) return <></>;
 
   const expensesSum = expenses.reduce((sum, expense) => {
@@ -46,6 +66,12 @@ const ExpensesSummary = ({
     expensesSum,
     userCurrency
   );
+
+  const calcExpensesSumString =
+    lastRate == 1
+      ? ""
+      : formatExpenseWithCurrency(expensesSum * lastRate, userCtx.lastCurrency);
+
   let budgetNumber = Number(tripCtx.dailyBudget);
   let infinityString = "";
   const expenseSumNum = Number(expensesSum);
@@ -93,6 +119,27 @@ const ExpensesSummary = ({
     return <></>;
   }
 
+  const calcLeftToSpend = formatExpenseWithCurrency(
+    (budgetNumber - expenseSumNum) * lastRate,
+    userCtx.lastCurrency
+  );
+  const leftToSpendString = `${i18n.t(
+    "youHaveXLeftToSpend1"
+  )}${formatExpenseWithCurrency(budgetNumber - expenseSumNum, userCurrency)}${
+    lastRate !== 1 && " | "
+  }${calcLeftToSpend}${i18n.t("youHaveXLeftToSpend2")}`;
+
+  const calcOverBudget = formatExpenseWithCurrency(
+    (expenseSumNum - budgetNumber) * lastRate,
+    userCtx.lastCurrency
+  );
+
+  const overBudgetString = `${i18n.t(
+    "exceededBudgetByX1"
+  )}${formatExpenseWithCurrency(expenseSumNum - budgetNumber, userCurrency)}${
+    lastRate !== 1 && " | "
+  }${calcOverBudget} !`;
+
   const pressBudgetHandler = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (infinityString) {
@@ -107,19 +154,13 @@ const ExpensesSummary = ({
     Toast.show({
       type: budgetNumber > expenseSumNum ? "success" : "error",
       position: "bottom",
-      text1: `${i18n.t(periodName)} ${i18n.t(
-        "budget"
-      )}: ${formatExpenseWithCurrency(budgetNumber, userCurrency)}`,
+      text1: `${i18n.t(periodName)} ${i18n.t("budget")}: ${expensesSumString} ${
+        lastRate !== 1 && "|"
+      } ${calcExpensesSumString}`,
       text2:
         budgetNumber > expenseSumNum
-          ? `${i18n.t("youHaveXLeftToSpend1")}${formatExpenseWithCurrency(
-              budgetNumber - expenseSumNum,
-              userCurrency
-            )}${i18n.t("youHaveXLeftToSpend2")}`
-          : `${i18n.t("exceededBudgetByX1")}${formatExpenseWithCurrency(
-              expenseSumNum - budgetNumber,
-              userCurrency
-            )} !`,
+          ? `${leftToSpendString}`
+          : `${overBudgetString}`,
       visibilityTime: 5000,
     });
   };

@@ -68,9 +68,7 @@ const SettingsScreen = ({ navigation }) => {
   const userName = userCtx.userName;
   const addExpense = expensesCtx.addExpense;
   const [isRestoringPurchases, setIsRestoringPurchases] = useState(false);
-  const [isDEV, setIsDEV] = useState(DEV);
   const [timeZoneString, setTimeZoneString] = useState("");
-  const [shouldShowTour, setShouldShowTour] = useState(false);
   const multiTraveller =
     (tripCtx.travellers && tripCtx.travellers.length > 1) ?? false;
   const [DEBUG_tripid, setDEBUG_tripid] = useState("");
@@ -131,7 +129,7 @@ const SettingsScreen = ({ navigation }) => {
     }, [])
   );
 
-  const DEVCONTENT = isDEV && (
+  const DEVCONTENT = DEV && (
     <View>
       {/* spacer View */}
       <View style={{ flex: 1, minHeight: 100 }}></View>

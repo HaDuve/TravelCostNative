@@ -4,6 +4,7 @@ Change log Travel Expense App
 - created android build
 - re-created the styling for androids build
 - added a referral system
+- added automatic calculation of summary (top right button) to last used currency
 - fixed some issues with bad internet
 - fixed some issues with loading user information on start (username, trip, trip history)
 - fixed some issues with premium status

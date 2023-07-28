@@ -35,9 +35,6 @@ const ExpensesSummary = ({
   const netCtx = useContext(NetworkContext);
   const isFast = netCtx.isConnected && netCtx.strongConnection;
   const [lastRate, setLastRate] = useState(1);
-  console.log("lastRate:", lastRate);
-  console.log("asyncGetRate ~ userCtx.lastCurrency:", userCtx.lastCurrency);
-  console.log("asyncGetRate ~ tripCtx.tripCurrency:", tripCtx.tripCurrency);
   useEffect(() => {
     async function asyncGetRate() {
       if (!userCtx.lastCurrency || !tripCtx.tripCurrency) {

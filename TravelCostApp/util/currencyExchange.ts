@@ -1,7 +1,7 @@
 import axios from "axios";
 import { DateTime } from "luxon";
 import { Alert } from "react-native";
-import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
+import { CACHE_NUM_HOURS, DEBUG_FORCE_OFFLINE } from "../confAppConstants";
 import {
   asyncStoreGetObject,
   asyncStoreSetItem,
@@ -12,13 +12,12 @@ export async function getRate(base: string, target: string) {
   if (base === target) {
     return 1;
   }
-  // cache: only call the request again after 1 hour
   const lastUpdate = await asyncStoreGetObject("currencyExchange_lastUpdate");
   if (lastUpdate) {
     const lastUpdateDateTime = DateTime.fromISO(lastUpdate);
     const now = DateTime.now();
     const diff = now.diff(lastUpdateDateTime, "hours").hours;
-    if (diff < 1) {
+    if (diff < CACHE_NUM_HOURS) {
       // get from asyncstore
       return getOfflineRate(base, target);
     }

@@ -26,3 +26,5 @@ export const SPLASH_SCREEN_DELAY = 1000;
 export const EXPENSES_LOAD_TIMEOUT = 6000;
 // tweak minimum required internet speed in Mbit/s
 export const MINIMUM_REQUIRED_SPEED = 0.5;
+// cache: only call the getRate request again after X numbers of hours
+export const CACHE_NUM_HOURS = 6;

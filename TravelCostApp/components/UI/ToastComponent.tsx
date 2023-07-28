@@ -52,7 +52,7 @@ const toastConfig = {
         fontWeight: "400",
       }}
       text1NumberOfLines={1}
-      text2NumberOfLines={3}
+      text2NumberOfLines={2}
       onPress={() => Toast.hide()}
     />
   ),

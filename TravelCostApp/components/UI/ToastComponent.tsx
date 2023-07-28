@@ -5,6 +5,7 @@ import { GlobalStyles } from "../../constants/styles";
 import LoadingBarOverlay from "./LoadingBarOverlay";
 
 const CONTENTCONTAINERSTYLE = { paddingLeft: 10 };
+const MINHEIGHT = 80;
 const toastConfig = {
   /*
       Overwrite 'success' type,
@@ -14,7 +15,10 @@ const toastConfig = {
     <BaseToast
       {...props}
       style={[
-        { borderLeftColor: GlobalStyles.colors.primary500, minHeight: 70 },
+        {
+          borderLeftColor: GlobalStyles.colors.primary500,
+          minHeight: MINHEIGHT,
+        },
         GlobalStyles.wideStrongShadow,
       ]}
       contentContainerStyle={CONTENTCONTAINERSTYLE}
@@ -26,7 +30,7 @@ const toastConfig = {
         fontSize: 15,
         fontWeight: "400",
       }}
-      text1NumberOfLines={1}
+      text1NumberOfLines={2}
       text2NumberOfLines={2}
       onPress={() => Toast.hide()}
     />
@@ -39,7 +43,7 @@ const toastConfig = {
     <ErrorToast
       {...props}
       style={[
-        { borderLeftColor: GlobalStyles.colors.error500, minHeight: 70 },
+        { borderLeftColor: GlobalStyles.colors.error500, minHeight: MINHEIGHT },
         GlobalStyles.wideStrongShadow,
       ]}
       contentContainerStyle={CONTENTCONTAINERSTYLE}
@@ -51,7 +55,7 @@ const toastConfig = {
         fontSize: 15,
         fontWeight: "400",
       }}
-      text1NumberOfLines={1}
+      text1NumberOfLines={2}
       text2NumberOfLines={2}
       onPress={() => Toast.hide()}
     />
@@ -83,7 +87,7 @@ const toastConfig = {
         fontSize: 15,
         fontWeight: "400",
       }}
-      text1NumberOfLines={1}
+      text1NumberOfLines={2}
       text2NumberOfLines={2}
       renderTrailingIcon={() => (
         <View

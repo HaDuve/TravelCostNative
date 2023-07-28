@@ -13,7 +13,7 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { formatExpenseWithCurrency } from "../../util/string";
+import { formatExpenseWithCurrency, truncateNumber } from "../../util/string";
 import PropTypes from "prop-types";
 import { Pressable } from "react-native";
 import Toast from "react-native-toast-message";
@@ -59,14 +59,17 @@ const ExpensesSummary = ({
 
   const userCurrency = tripCtx.tripCurrency;
   const expensesSumString = formatExpenseWithCurrency(
-    expensesSum,
+    truncateNumber(expensesSum, 1000, true),
     userCurrency
   );
 
   const calcExpensesSumString =
     lastRate == 1
       ? ""
-      : formatExpenseWithCurrency(expensesSum * lastRate, userCtx.lastCurrency);
+      : formatExpenseWithCurrency(
+          truncateNumber(expensesSum * lastRate, 1000, true),
+          userCtx.lastCurrency
+        );
 
   let budgetNumber = Number(tripCtx.dailyBudget);
   let infinityString = "";
@@ -114,27 +117,32 @@ const ExpensesSummary = ({
     console.log("NaN budgetProgress");
     return <></>;
   }
-
+  const calcbudget = ((budgetNumber - expenseSumNum) * lastRate).toFixed(2);
+  console.log("calcbudget:", calcbudget);
   const calcLeftToSpend = formatExpenseWithCurrency(
-    (budgetNumber - expenseSumNum) * lastRate,
+    truncateNumber((budgetNumber - expenseSumNum) * lastRate, 1000, true),
     userCtx.lastCurrency
   );
   const leftToSpendString = `${i18n.t(
     "youHaveXLeftToSpend1"
-  )}${formatExpenseWithCurrency(budgetNumber - expenseSumNum, userCurrency)}${
-    lastRate !== 1 && " | "
-  }${calcLeftToSpend}${i18n.t("youHaveXLeftToSpend2")}`;
+  )}${formatExpenseWithCurrency(
+    truncateNumber(budgetNumber - expenseSumNum, 1000, true),
+    userCurrency
+  )}${lastRate !== 1 && " | "}${calcLeftToSpend}${i18n.t(
+    "youHaveXLeftToSpend2"
+  )}`;
 
   const calcOverBudget = formatExpenseWithCurrency(
-    (expenseSumNum - budgetNumber) * lastRate,
+    truncateNumber((expenseSumNum - budgetNumber) * lastRate, 1000, true),
     userCtx.lastCurrency
   );
 
   const overBudgetString = `${i18n.t(
     "exceededBudgetByX1"
-  )}${formatExpenseWithCurrency(expenseSumNum - budgetNumber, userCurrency)}${
-    lastRate !== 1 && " | "
-  }${calcOverBudget} !`;
+  )}${formatExpenseWithCurrency(
+    truncateNumber(expenseSumNum - budgetNumber, 1000, true),
+    userCurrency
+  )}${lastRate !== 1 && " | "}${calcOverBudget} !`;
 
   const pressBudgetHandler = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -150,7 +158,9 @@ const ExpensesSummary = ({
     Toast.show({
       type: budgetNumber > expenseSumNum ? "success" : "error",
       position: "bottom",
-      text1: `${i18n.t(periodName)} ${i18n.t("budget")}: ${expensesSumString} ${
+      text1: `${i18n.t(periodName)} ${i18n.t(
+        "expenses"
+      )}: ${expensesSumString} ${
         lastRate !== 1 && "|"
       } ${calcExpensesSumString}`,
       text2:

@@ -11,6 +11,7 @@ import { ExpenseData, isPaidString } from "../util/expense";
 import { err } from "react-native-svg/lib/typescript/xml";
 import { Traveller } from "../util/traveler";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
+import { useInterval } from "../components/Hooks/useInterval";
 
 export interface TripData {
   tripName?: string;
@@ -77,22 +78,32 @@ function TripContextProvider({ children }) {
   const [isPaid, setIsPaid] = useState(isPaidString.notPaid);
   const [isPaidDate, setIsPaidDate] = useState("");
 
-  useEffect(() => {
-    async function loadAsyncTripid() {
-      const stored_tripid = await secureStoreGetItem("currentTripId");
-      console.log("loadAsyncTripid ~ stored_tripid:", stored_tripid);
-      const stored_uid = await secureStoreGetItem("uid");
-      if (stored_tripid) setTripid(stored_tripid);
-      const { isFastEnough } = await isConnectionFastEnough();
-      if (stored_tripid && isFastEnough) {
+  async function loadTripidFetchTrip() {
+    const stored_tripid = await secureStoreGetItem("currentTripId");
+    console.log("loadAsyncTripid ~ stored_tripid:", stored_tripid);
+    const stored_uid = await secureStoreGetItem("uid");
+    if (stored_tripid) setTripid(stored_tripid);
+    const { isFastEnough } = await isConnectionFastEnough();
+    if (stored_tripid && isFastEnough) {
+      try {
         const checkUser = await fetchUser(stored_uid);
         const fetched_tripid = checkUser.currentTrip;
         await fetchAndSetCurrentTrip(fetched_tripid ?? stored_tripid);
         await fetchAndSetTravellers(fetched_tripid ?? stored_tripid);
+      } catch (error) {
+        console.log("loadTripidFetchTrip ~ error", error);
       }
     }
-    loadAsyncTripid();
-  }, []);
+  }
+
+  useInterval(
+    () => {
+      if (tripid && tripName) return;
+      loadTripidFetchTrip();
+    },
+    10000,
+    true
+  );
 
   useEffect(() => {
     async function loadAsyncTravellers() {
@@ -199,6 +210,7 @@ function TripContextProvider({ children }) {
       );
     }
   }
+
   async function fetchAndSettleCurrentTrip(unSettle = false) {
     try {
       const trip = await fetchTrip(tripid);

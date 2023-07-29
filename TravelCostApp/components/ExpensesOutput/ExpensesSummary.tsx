@@ -34,6 +34,7 @@ const ExpensesSummary = ({
   const netCtx = useContext(NetworkContext);
   const isFast = netCtx.isConnected && netCtx.strongConnection;
   const [lastRate, setLastRate] = useState(1);
+  const lastRateUnequal1 = lastRate !== 1;
   useEffect(() => {
     async function asyncGetRate() {
       if (!userCtx.lastCurrency || !tripCtx.tripCurrency) {
@@ -117,32 +118,34 @@ const ExpensesSummary = ({
     console.log("NaN budgetProgress");
     return <></>;
   }
-  const calcbudget = ((budgetNumber - expenseSumNum) * lastRate).toFixed(2);
-  console.log("calcbudget:", calcbudget);
-  const calcLeftToSpend = formatExpenseWithCurrency(
-    truncateNumber((budgetNumber - expenseSumNum) * lastRate, 1000, true),
-    userCtx.lastCurrency
-  );
+  const calcLeftToSpend = lastRateUnequal1
+    ? formatExpenseWithCurrency(
+        truncateNumber((budgetNumber - expenseSumNum) * lastRate, 1000, true),
+        userCtx.lastCurrency
+      )
+    : "";
   const leftToSpendString = `${i18n.t(
     "youHaveXLeftToSpend1"
   )}${formatExpenseWithCurrency(
     truncateNumber(budgetNumber - expenseSumNum, 1000, true),
     userCurrency
-  )}${lastRate !== 1 && " | "}${calcLeftToSpend}${i18n.t(
+  )}${lastRateUnequal1 ? " | " : ""}${calcLeftToSpend}${i18n.t(
     "youHaveXLeftToSpend2"
   )}`;
 
-  const calcOverBudget = formatExpenseWithCurrency(
-    truncateNumber((expenseSumNum - budgetNumber) * lastRate, 1000, true),
-    userCtx.lastCurrency
-  );
+  const calcOverBudget = lastRateUnequal1
+    ? formatExpenseWithCurrency(
+        truncateNumber((expenseSumNum - budgetNumber) * lastRate, 1000, true),
+        userCtx.lastCurrency
+      )
+    : "";
 
   const overBudgetString = `${i18n.t(
     "exceededBudgetByX1"
   )}${formatExpenseWithCurrency(
     truncateNumber(expenseSumNum - budgetNumber, 1000, true),
     userCurrency
-  )}${lastRate !== 1 && " | "}${calcOverBudget} !`;
+  )}${lastRateUnequal1 ? " | " : ""}${calcOverBudget} !`;
 
   const pressBudgetHandler = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -161,7 +164,7 @@ const ExpensesSummary = ({
       text1: `${i18n.t(periodName)} ${i18n.t(
         "expenses"
       )}: ${expensesSumString} ${
-        lastRate !== 1 && "|"
+        lastRateUnequal1 ? "|" : ""
       } ${calcExpensesSumString}`,
       text2:
         budgetNumber > expenseSumNum

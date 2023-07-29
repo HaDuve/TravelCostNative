@@ -506,6 +506,9 @@ export async function getAllExpenses(tripid: string, uid?: string) {
 export async function updateTripHistory(userId: string, newTripid: string) {
   // console.log("updateTripHistory ~ newTripid", newTripid);
   const tripHistory = await fetchTripHistory(userId);
+  console.log("updateTripHistory ~ tripHistory:", tripHistory);
+  // if triphistory empty, just await storeTripHistory(uid, [tripid]);
+  if (!tripHistory) return storeTripHistory(userId, [newTripid]);
   // look for newTripid inside of oldTripHistory
   if (tripHistory.indexOf(newTripid) > -1) return;
   tripHistory.push(newTripid);

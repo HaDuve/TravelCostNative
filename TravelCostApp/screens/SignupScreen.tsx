@@ -22,7 +22,10 @@ import { AuthContext } from "../store/auth-context";
 import Toast from "react-native-toast-message";
 import { Platform } from "react-native";
 import Purchases from "react-native-purchases";
-import { REACT_APP_REVCAT_API_KEY } from "../components/Premium/PremiumConstants";
+import {
+  REVCAT_API_KEY_A,
+  REVCAT_API_KEY_G,
+} from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
 
 function SignupScreen() {
@@ -65,20 +68,24 @@ function SignupScreen() {
       userCtx.setTripHistory([]);
       // We are online and ready to create User
       const { token, uid } = await createUser(email, password);
-      // setup purchases
-      if (Platform.OS === "android") {
-        // Purchases
-        Purchases.configure({
-          apiKey: "<public_google_sdk_key>",
-          appUserID: uid,
-        });
-      } else if (Platform.OS === "ios" || Platform.OS === "macos") {
-        // Purchases
-        Purchases.configure({
-          apiKey: REACT_APP_REVCAT_API_KEY,
-          appUserID: uid,
-        });
-        console.log("SignupScreen REVCAT ~ uid:", uid);
+      // setup purchases with a inner trycatch so that account gets created anyway
+      try {
+        if (Platform.OS === "android") {
+          // Purchases
+          Purchases.configure({
+            apiKey: REVCAT_API_KEY_G,
+            appUserID: uid,
+          });
+        } else if (Platform.OS === "ios" || Platform.OS === "macos") {
+          // Purchases
+          Purchases.configure({
+            apiKey: REVCAT_API_KEY_A,
+            appUserID: uid,
+          });
+          console.log("SignupScreen REVCAT ~ uid:", uid);
+        }
+      } catch (error) {
+        console.log("SignupScreen ~ revcat error", error);
       }
 
       //NEW

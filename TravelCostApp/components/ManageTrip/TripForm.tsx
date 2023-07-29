@@ -256,20 +256,50 @@ const TripForm = ({ navigation, route }) => {
     // await asyncStoreSetObject("expenses", []);
     setMMKVObject("expenses", []);
     await userCtx.setFreshlyCreatedTo(false);
+    console.log(
+      "createTripData ~ userCtx.freshlyCreated:",
+      userCtx.freshlyCreated
+    );
+    console.log("createTripData ~ bp 1");
 
     // the following context state functions are unnecessary as long as we reload
-    await tripCtx.setCurrentTrip(tripid, tripData);
-    expenseCtx.setExpenses([]);
-    if (userCtx.freshlyCreated) {
-      userCtx.setNeedsTour(true);
+    try {
+      console.log("createTripData ~ tripid:", tripid);
+      console.log("createTripData ~ tripData:", tripData);
+      console.log(
+        "createTripData ~ userCtx.freshlyCreated:",
+        userCtx.freshlyCreated
+      );
+      await tripCtx.setCurrentTrip(tripid, tripData);
+      expenseCtx.setExpenses([]);
+      if (userCtx.freshlyCreated) {
+        userCtx.setNeedsTour(true);
+      }
+    } catch (error) {
+      console.log("error with setting context", error.message);
     }
-    userCtx.setTripHistory([...userCtx.tripHistory, tripid]);
+    console.log("createTripData ~ bp 2");
+
+    try {
+
+      userCtx.setTripHistory([...userCtx.tripHistory, tripid]);
+    } catch (error) {
+      console.log("error with setting tripHistory in context", error.message)
+    }
+
+    console.log("createTripData ~ bp 3");
+
     // if fresh store TripHistory else update TripHistory
-    if (userCtx.freshlyCreated) {
-      await storeTripHistory(uid, [tripid]);
-    } else {
-      await updateTripHistory(uid, tripid);
+    try {
+      if (userCtx.freshlyCreated) {
+        await storeTripHistory(uid, [tripid]);
+      } else {
+        await updateTripHistory(uid, tripid);
+      }
+    } catch (error) {
+      console.log("error whith triphistory:", error.message);
     }
+    console.log("createTripData ~ bp 4");
 
     await updateUser(uid, {
       userName: userName,
@@ -355,6 +385,11 @@ const TripForm = ({ navigation, route }) => {
     } catch (error) {
       setIsLoading(false);
       console.log("submitHandler ~ error:", error);
+      Alert.alert(
+        "Sorry! We got an unexpected Error, please try again!",
+        error.message
+      );
+      if (!isEditing) await authCtx.logout();
       return;
     }
     setIsLoading(false);

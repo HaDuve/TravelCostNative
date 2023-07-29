@@ -76,7 +76,7 @@ import { useInterval } from "./components/Hooks/useInterval";
 import { isForeground } from "./util/appState";
 import { TourGuideProvider } from "rn-tourguide";
 import { loadTourConfig } from "./util/tourUtil";
-import { REVCAT_API_KEY } from "./components/Premium/PremiumConstants";
+import { REVCAT_API_KEY_A, REVCAT_API_KEY_G } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
 import { SettingsProvider } from "./store/settings-context";
 import { UserData } from "./store/user-context";
@@ -618,12 +618,15 @@ function Root() {
         if (Platform.OS === "android") {
           // Purchases
           Purchases.configure({
-            apiKey: "<public_google_sdk_key>",
+            apiKey: REVCAT_API_KEY_G,
             appUserID: storedUid,
           });
         } else if (Platform.OS === "ios" || Platform.OS === "macos") {
           // Purchases
-          Purchases.configure({ apiKey: REVCAT_API_KEY, appUserID: storedUid });
+          Purchases.configure({
+            apiKey: REVCAT_API_KEY_A,
+            appUserID: storedUid,
+          });
           console.log("onRootMount ~ storedUid:", storedUid);
         }
         await Purchases.collectDeviceIdentifiers();

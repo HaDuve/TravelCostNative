@@ -22,11 +22,13 @@ import Toast from "react-native-toast-message";
 import Purchases from "react-native-purchases";
 import {
   isPremiumMember,
-  REVCAT_API_KEY,
+  REVCAT_API_KEY_A,
 } from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
 import { secureStoreSetItem } from "../store/secure-storage";
 import { ExpensesContext } from "../store/expenses-context";
+import { REVCAT_API_KEY_G } from "../components/Premium/PremiumConstants";
+import { mmkvstorage, setMMKVObject } from "../store/mmkv";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -86,12 +88,12 @@ function LoginScreen() {
       if (Platform.OS === "android") {
         // Purchases
         Purchases.configure({
-          apiKey: "<public_google_sdk_key>",
+          apiKey: REVCAT_API_KEY_G,
           appUserID: uid,
         });
       } else if (Platform.OS === "ios" || Platform.OS === "macos") {
         // Purchases
-        Purchases.configure({ apiKey: REVCAT_API_KEY, appUserID: uid });
+        Purchases.configure({ apiKey: REVCAT_API_KEY_A, appUserID: uid });
         await userCtx.checkPremium();
         console.log("LoginScreen ~ uid:", uid);
       }
@@ -111,6 +113,9 @@ function LoginScreen() {
       await userCtx.loadCatListFromAsyncInCtx(tripid);
       await userCtx.updateTripHistory();
       tripCtx.refresh();
+      expCtx.setExpenses([]);
+      setMMKVObject("expenses", []);
+
       await authCtx.authenticate(token);
     } catch (error) {
       console.error(error);

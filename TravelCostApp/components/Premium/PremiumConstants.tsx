@@ -1,7 +1,5 @@
 import Purchases from "react-native-purchases";
 import { FORCE_PREMIUM } from "../../confAppConstants";
-import Toast from "react-native-toast-message";
-import * as Device from "expo-device";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -12,11 +10,11 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { REACT_APP_CAT_API_KEY } from "@env";
 /*
  The API key for your app from the RevenueCat dashboard: https://app.revenuecat.com
  */
-export const REVCAT_API_KEY = "appl_whxTjURHsRibiuipBsnAoEGCckd";
+export const REVCAT_API_KEY_A = "appl_whxTjURHsRibiuipBsnAoEGCckd";
+export const REVCAT_API_KEY_G = "goog_DeNvfwzfeMvLittmCJGdvueSbOl";
 
 /*
   The entitlement ID from the RevenueCat dashboard that is activated upon successful in-app purchase for the duration of the purchase.

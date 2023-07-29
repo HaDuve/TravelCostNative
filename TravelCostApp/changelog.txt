@@ -1,5 +1,13 @@
 Change log Travel Expense App
 
+1.2.4b
+- fixed loading trip
+- fixed infinite loading on profile screen
+- fixed expenses summary text when no last currency is present
+- fixed login issues
+- fixed signup issues
+- fixed issues when creating a new trip
+
 1.2.4
 - created android build
 - re-created the styling for androids build

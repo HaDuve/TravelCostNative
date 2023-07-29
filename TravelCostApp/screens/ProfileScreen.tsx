@@ -179,13 +179,13 @@ const ProfileScreen = ({ navigation }) => {
         >
           <TripList
             trips={tripHistory}
-            setRefreshing={setRefreshing}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                // onRefresh={refreshHandler}
-              />
-            }
+            // setRefreshing={setRefreshing}
+            // refreshControl={
+            //   <RefreshControl
+            //     refreshing={refreshing}
+            //     // onRefresh={refreshHandler}
+            //   />
+            // }
           ></TripList>
         </TourGuideZone>
       </View>

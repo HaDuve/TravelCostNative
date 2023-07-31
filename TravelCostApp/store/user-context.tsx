@@ -8,7 +8,10 @@ import {
   asyncStoreSetItem,
   asyncStoreSetObject,
 } from "./async-storage";
-import { isPremiumMember } from "../components/Premium/PremiumConstants";
+import {
+  ENTITLEMENT_ID,
+  isPremiumMember,
+} from "../components/Premium/PremiumConstants";
 import { fetchCategories, fetchTripHistory } from "../util/http";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PropTypes from "prop-types";
@@ -21,6 +24,7 @@ import {
 } from "./secure-storage";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { RangeString } from "./expenses-context";
+import Purchases from "react-native-purchases";
 
 export interface UserData {
   uid?: string;
@@ -136,6 +140,20 @@ function UserContextProvider({ children }) {
     setIsPremium(isPremiumNow);
     return isPremiumNow;
   }
+  useEffect(() => {
+    Purchases.addCustomerInfoUpdateListener((info) => {
+      // handle any changes to purchaserInfo
+      if (typeof info.entitlements.active[ENTITLEMENT_ID] !== "undefined") {
+        // Grant user "premium" access
+        console.log("User is premium member");
+        setIsPremium(true);
+      } else {
+        console.log("User is not premium member");
+        setIsPremium(false);
+      }
+    });
+  }, []);
+
   useEffect(() => {
     async function loadIsPremiumFromAsync() {
       try {

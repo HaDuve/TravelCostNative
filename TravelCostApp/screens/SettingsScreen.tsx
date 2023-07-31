@@ -402,6 +402,17 @@ const SettingsScreen = ({ navigation }) => {
       {/* <TouchableOpacity onPress={() => navigation.navigate("CategoryMapTest")}>
         <Text style={[styles.textButton]}>CatMapTest</Text>
       </TouchableOpacity> */}
+      <TouchableOpacity
+        onPress={() => {
+          const subject = "Budget For Nomads Support";
+          const message = "Hi, I have a question about ...";
+          Linking.openURL(
+            `mailto:budgetfornomads@outlook.com?subject=${subject}&body=${message}`
+          );
+        }}
+      >
+        <Text style={[styles.textButton]}>Need Help?</Text>
+      </TouchableOpacity>
       {!isRestoringPurchases && (
         <TouchableOpacity onPress={() => restorePurchases()}>
           <Text style={[styles.textButton]}>{i18n.t("restorePurchases")}</Text>

@@ -281,10 +281,9 @@ const TripForm = ({ navigation, route }) => {
     console.log("createTripData ~ bp 2");
 
     try {
-
       userCtx.setTripHistory([...userCtx.tripHistory, tripid]);
     } catch (error) {
-      console.log("error with setting tripHistory in context", error.message)
+      console.log("error with setting tripHistory in context", error.message);
     }
 
     console.log("createTripData ~ bp 3");
@@ -305,6 +304,9 @@ const TripForm = ({ navigation, route }) => {
       userName: userName,
       currentTrip: tripid,
     });
+
+    expenseCtx.setExpenses([]);
+    setMMKVObject("expenses", []);
 
     // restart app with Updates
     // const r = await reloadApp();

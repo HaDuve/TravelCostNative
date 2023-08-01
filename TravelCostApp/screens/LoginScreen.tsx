@@ -29,6 +29,7 @@ import { secureStoreSetItem } from "../store/secure-storage";
 import { ExpensesContext } from "../store/expenses-context";
 import { REVCAT_API_KEY_G } from "../components/Premium/PremiumConstants";
 import { mmkvstorage, setMMKVObject } from "../store/mmkv";
+import { BranchEvent } from "react-native-branch";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -115,7 +116,8 @@ function LoginScreen() {
       tripCtx.refresh();
       expCtx.setExpenses([]);
       setMMKVObject("expenses", []);
-
+      const event = new BranchEvent(BranchEvent.Login);
+      await event.logEvent();
       await authCtx.authenticate(token);
     } catch (error) {
       console.error(error);

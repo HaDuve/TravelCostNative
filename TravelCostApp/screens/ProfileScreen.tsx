@@ -22,6 +22,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { secureStoreGetItem } from "../store/secure-storage";
 import { fetchTripHistory } from "../util/http";
 import { AuthContext } from "../store/auth-context";
+import { BranchEvent } from "react-native-branch";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -101,6 +102,8 @@ const ProfileScreen = ({ navigation }) => {
     saveStoppedTour();
     userCtx.setNeedsTour(false);
     setTourIsRunning(false);
+    const event = new BranchEvent(BranchEvent.CompleteTutorial);
+    event.logEvent();
     console.log("stop");
   };
   const handleOnStepChange = async (step) => {

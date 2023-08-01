@@ -55,7 +55,7 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
           ? BranchEvent.Purchase
           : BranchEvent.StartTrial;
         const event = new BranchEvent(branchEvent);
-        event.logEvent();
+        await event.logEvent();
       }
     } catch (e) {
       if (!e.userCancelled) {

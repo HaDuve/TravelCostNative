@@ -27,6 +27,7 @@ import {
   REVCAT_API_KEY_G,
 } from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
+import { BranchEvent } from "react-native-branch";
 
 function SignupScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -98,6 +99,8 @@ function SignupScreen() {
       await updateUser(uid, {
         userName: name,
       });
+      const event = new BranchEvent(BranchEvent.CompleteRegistration);
+      await event.logEvent();
       await authCtx.authenticate(token);
     } catch (error) {
       console.log("signupHandler ~ error2", error);

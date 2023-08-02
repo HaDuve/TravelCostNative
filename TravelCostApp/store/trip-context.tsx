@@ -80,11 +80,12 @@ function TripContextProvider({ children }) {
 
   async function loadTripidFetchTrip() {
     const stored_tripid = await secureStoreGetItem("currentTripId");
-    console.log("loadAsyncTripid ~ stored_tripid:", stored_tripid);
     const stored_uid = await secureStoreGetItem("uid");
-    if (stored_tripid) setTripid(stored_tripid);
+    if (!(stored_tripid || stored_uid)) return;
+    setTripid(stored_tripid ?? "");
+    console.log("loadAsyncTripid ~ stored_tripid:", stored_tripid);
     const { isFastEnough } = await isConnectionFastEnough();
-    if (stored_tripid && isFastEnough) {
+    if (isFastEnough) {
       try {
         const checkUser = await fetchUser(stored_uid);
         const fetched_tripid = checkUser.currentTrip;

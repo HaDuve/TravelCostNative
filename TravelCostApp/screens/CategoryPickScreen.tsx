@@ -1,6 +1,7 @@
 import {
   Animated,
   FlatList,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -270,9 +271,19 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: "1%",
-    paddingTop: "2%",
-    paddingHorizontal: "4%",
+
+    ...Platform.select({
+      ios: {
+        padding: "1%",
+        paddingTop: "2%",
+        paddingHorizontal: "4%",
+      },
+      android: {
+        padding: "0%",
+        paddingTop: "5%",
+        paddingHorizontal: "5%",
+      },
+    }),
   },
   widthConstraint: {
     minWidth: "30%",

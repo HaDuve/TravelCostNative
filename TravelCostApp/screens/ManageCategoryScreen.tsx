@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  Platform,
 } from "react-native";
 // import animated from reanimated
 import Animated, {
@@ -75,12 +76,12 @@ const ManageCategoryScreen = ({ route, navigation }) => {
   const tripid = tripCtx.tripid;
 
   const fetchCategoryList = async () => {
-    setIsFetching(true);
     if (!isOnline) {
       await loadCategoryList();
       return;
     }
     try {
+      setIsFetching(true);
       const categories = await fetchCategories(tripid);
       if (categories) {
         const tempList = [...categories];
@@ -479,7 +480,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
               },
               shadowOpacity: 0.42,
               shadowRadius: 2.42,
-              elevation: 3,
+              // elevation: 1,
             }}
           />
           {!isFetching && (
@@ -516,7 +517,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
               },
               shadowOpacity: 0.42,
               shadowRadius: 2.42,
-              elevation: 3,
+              // elevation: 3,
               overflow: "visible",
             }}
           />

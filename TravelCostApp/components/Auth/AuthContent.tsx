@@ -9,6 +9,8 @@ import React, {
   Platform,
 } from "react-native";
 
+import { useHeaderHeight } from "@react-navigation/elements";
+
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
@@ -69,8 +71,16 @@ function AuthContent({ isLogin, onAuthenticate, isConnected }) {
     onAuthenticate({ name, email, password });
   }
 
+  const headerHeight = useHeaderHeight();
+
   return (
-    <KeyboardAvoidingView behavior={"position"}>
+    <KeyboardAvoidingView
+      behavior={Platform.select({ android: undefined, ios: "position" })}
+      keyboardVerticalOffset={Platform.select({
+        android: headerHeight,
+        ios: 0,
+      })}
+    >
       <ScrollView style={styles.container}>
         <View style={styles.authContent}>
           <AuthForm
@@ -108,7 +118,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {},
       android: {
-        paddingTop: "15%",
+        paddingTop: "10%",
       },
     }),
   },
@@ -117,6 +127,11 @@ const styles = StyleSheet.create({
     marginTop: "8%",
     marginBottom: "10%",
     marginHorizontal: "6%",
+    ...Platform.select({
+      android: {
+        marginBottom: "20%",
+      },
+    }),
     borderRadius: 8,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     ...Platform.select({

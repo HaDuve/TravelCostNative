@@ -17,6 +17,8 @@ import {
 } from "../../util/http";
 import * as Updates from "expo-updates";
 
+import { KeyboardAvoidingView } from "react-native";
+
 import Input from "../ManageExpense/Input";
 import { TripContext, TripData } from "../../store/trip-context";
 import { UserContext } from "../../store/user-context";
@@ -29,6 +31,7 @@ import {
   asyncStoreSetItem,
   asyncStoreSetObject,
 } from "../../store/async-storage";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 //localization
 import * as Localization from "expo-localization";
@@ -153,7 +156,7 @@ const TripForm = ({ navigation, route }) => {
       }
       setIsLoading(false);
     };
-    if (isEditing) {
+    if (isEditing && editedTripId) {
       setEditedTrip();
     }
   }, [editedTripId, isEditing]);
@@ -500,15 +503,36 @@ const TripForm = ({ navigation, route }) => {
     </Modal>
   );
 
+  const headerHeight = useHeaderHeight();
   if (isLoading) {
     return <LoadingOverlay />;
   }
   return (
-    <>
+    <ScrollView
+      style={{
+        flex: 1,
+        backgroundColor: GlobalStyles.colors.backgroundColor,
+      }}
+    >
       {datepickerJSX}
       {modalJSX}
-      <View style={{ flex: 1, overflow: "visible" }}>
-        <View style={styles.form}>
+      <View
+        style={Platform.select({
+          ios: { flex: 1, overflow: "visible" },
+          android: {
+            flex: 1,
+          },
+        })}
+      >
+        <KeyboardAvoidingView
+          style={styles.form}
+          behavior={Platform.select({ android: undefined, ios: "position" })}
+          enabled={Platform.select({ android: true, ios: true })}
+          keyboardVerticalOffset={Platform.select({
+            android: headerHeight,
+            ios: -100,
+          })}
+        >
           <View
             style={{
               flexDirection: "row",
@@ -733,7 +757,7 @@ const TripForm = ({ navigation, route }) => {
               {i18n.t("deleteTrip")}
             </GradientButton>
           )} */}
-        </View>
+        </KeyboardAvoidingView>
       </View>
       <View
         style={{
@@ -742,7 +766,7 @@ const TripForm = ({ navigation, route }) => {
           backgroundColor: GlobalStyles.colors.backgroundColor,
         }}
       ></View>
-    </>
+    </ScrollView>
   );
 };
 
@@ -755,16 +779,17 @@ TripForm.propTypes = {
 
 const styles = StyleSheet.create({
   form: {
-    flex: 1,
-    minHeight: "100%",
+    // flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     ...Platform.select({
       ios: {
         padding: "2%",
+        minHeight: "100%",
       },
       android: {
         padding: "3%",
         paddingTop: "5%",
+        // minHeight: "105%",
       },
     }),
   },

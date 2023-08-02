@@ -13,6 +13,7 @@ import {
   Platform,
 } from "react-native";
 import { daysBetween } from "../../util/date";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 import { Card, SegmentedButtons } from "react-native-paper";
 import Input from "./Input";
@@ -836,6 +837,8 @@ const ExpenseForm = ({
     calcAmount: 0,
   };
 
+  const headerHeight = useHeaderHeight();
+
   return (
     <>
       {datepickerJSX}
@@ -1199,7 +1202,14 @@ const ExpenseForm = ({
 
                 {!splitTypeSelf && (
                   <KeyboardAvoidingView
-                    behavior="position"
+                    behavior={Platform.select({
+                      android: undefined,
+                      ios: "position",
+                    })}
+                    keyboardVerticalOffset={Platform.select({
+                      android: headerHeight,
+                      ios: 0,
+                    })}
                     contentContainerStyle={{
                       flex: 1,
                       justifyContent: "flex-start",

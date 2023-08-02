@@ -58,7 +58,6 @@ const styles = StyleSheet.create({
   button: {
     padding: 16,
     backgroundColor: GlobalStyles.colors.primary500,
-    borderRadius: 16,
 
     overflow: "visible",
 
@@ -68,6 +67,7 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         shadowOffset: { width: 2, height: 2 },
         shadowOpacity: 0.4,
+        borderRadius: 16,
       },
       android: {
         elevation: 5,

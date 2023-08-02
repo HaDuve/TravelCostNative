@@ -1,7 +1,6 @@
 /* eslint-disable react/react-in-jsx-scope */
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useContext, useEffect, useState } from "react";
-import React, { Alert, KeyboardAvoidingView } from "react-native";
+import React, { Alert } from "react-native";
 
 //Localization
 import * as Localization from "expo-localization";

@@ -6,6 +6,8 @@ import {
   Text,
   View,
 } from "react-native";
+import { useHeaderHeight } from "@react-navigation/elements";
+
 import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
   fetchTrip,
@@ -159,8 +161,18 @@ const JoinTrip = ({ navigation, route }) => {
     }
   }
 
+  const headerHeight = useHeaderHeight();
+
   return (
-    <KeyboardAvoidingView style={styles.card}>
+    <KeyboardAvoidingView
+      behavior={Platform.select({ android: undefined, ios: "position" })}
+      enabled={Platform.select({ android: true, ios: true })}
+      keyboardVerticalOffset={Platform.select({
+        android: headerHeight,
+        ios: -100,
+      })}
+      style={styles.card}
+    >
       <View style={styles.titleContainer}>
         <BackButton></BackButton>
         <Text style={styles.titleText}>{i18n.t("joinTripLabel")}</Text>
@@ -252,6 +264,7 @@ const styles = StyleSheet.create({
       ios: {},
       android: {
         marginTop: "10%",
+        flex: 1,
       },
     }),
   },
@@ -283,6 +296,7 @@ const styles = StyleSheet.create({
   },
   linkInputContainer: {
     flex: 1,
+    minHeight: "50%",
     padding: 24,
     margin: 16,
     marginBottom: 32,

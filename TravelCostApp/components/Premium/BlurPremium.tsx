@@ -130,8 +130,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     position: "absolute",
-    width: "100%",
-    height: "100%",
-    paddingBottom: "2%",
+
+    ...Platform.select({
+      ios: {
+        paddingBottom: "2%",
+        width: "100%",
+        height: "100%",
+      },
+      android: {
+        paddingBottom: "0%",
+        width: "100%",
+        height: "105%",
+      },
+    }),
   },
 });

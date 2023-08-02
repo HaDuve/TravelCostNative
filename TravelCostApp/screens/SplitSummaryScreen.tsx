@@ -324,16 +324,17 @@ const styles = StyleSheet.create({
   },
   button: {
     marginLeft: 24,
+
     ...Platform.select({
       ios: {
         marginTop: "30%",
+        borderRadius: 12,
       },
       android: {
-        marginTop: "50%",
+        // marginTop: "50%",
+        elevation: 0,
       },
     }),
-
-    borderRadius: 12,
   },
   splitContainer: {
     flexDirection: "row",
@@ -350,13 +351,18 @@ const styles = StyleSheet.create({
     // marginVertical: "10%",
     // minWidth: 150,
     flexDirection: "row",
-    marginRight: "5%",
-    marginBottom: "7%",
+
     flex: 1,
     // alignItems: "center",
     // justifyContent: "space-between",
     // margin: "2%",
-    minHeight: 25,
+    // minHeight: 250,
+    ...Platform.select({
+      ios: {},
+      android: {
+        height: 55,
+      },
+    }),
   },
   userText: {
     fontSize: 18,

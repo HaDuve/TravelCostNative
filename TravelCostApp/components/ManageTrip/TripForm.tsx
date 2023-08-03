@@ -314,10 +314,11 @@ const TripForm = ({ navigation, route }) => {
     // restart app with Updates
     // const r = await reloadApp();
     // if (r == -1)
-    navigation.popToTop();
+    // navigation.popToTop();
 
     // tripCtx.refresh();
     // navigation.navigate("Profile");
+    navigation.navigate("RecentExpenses");
   }
 
   async function submitHandler(setActive = false) {

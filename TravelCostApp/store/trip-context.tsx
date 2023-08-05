@@ -62,6 +62,7 @@ export const TripContext = createContext({
   fetchAndSettleCurrentTrip: async (unSettle = false) => {},
   isPaid: isPaidString.notPaid,
   isPaidDate: "",
+  isLoading: false,
 });
 
 function TripContextProvider({ children }) {
@@ -78,6 +79,7 @@ function TripContextProvider({ children }) {
   const [endDate, setEndDate] = useState("");
   const [isPaid, setIsPaid] = useState(isPaidString.notPaid);
   const [isPaidDate, setIsPaidDate] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   async function loadTripidFetchTrip() {
     const stored_tripid = await secureStoreGetItem("currentTripId");
@@ -99,14 +101,17 @@ function TripContextProvider({ children }) {
       console.log("loading from storage in offline mode~");
       await loadTripDataFromStorage();
     }
+    setIsLoading(false);
   }
 
   useInterval(
     () => {
       if (tripid && tripName) return;
+      if (isLoading) return;
+      setIsLoading(true);
       loadTripidFetchTrip();
     },
-    10000,
+    2000,
     true
   );
 
@@ -353,6 +358,7 @@ function TripContextProvider({ children }) {
     fetchAndSettleCurrentTrip: fetchAndSettleCurrentTrip,
     isPaid: isPaid,
     isPaidDate: isPaidDate,
+    isLoading: isLoading,
   };
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>;

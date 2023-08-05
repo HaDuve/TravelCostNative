@@ -76,7 +76,10 @@ import { useInterval } from "./components/Hooks/useInterval";
 import { isForeground } from "./util/appState";
 import { TourGuideProvider } from "rn-tourguide";
 import { loadTourConfig } from "./util/tourUtil";
-import { REVCAT_API_KEY_A, REVCAT_API_KEY_G } from "./components/Premium/PremiumConstants";
+import {
+  REVCAT_API_KEY_A,
+  REVCAT_API_KEY_G,
+} from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
 import { SettingsProvider } from "./store/settings-context";
 import { UserData } from "./store/user-context";
@@ -728,10 +731,11 @@ function Root() {
     async function hideSplashScreen() {
       await SplashScreen.hideAsync();
     }
+    if (tripCtx.isLoading) return;
     hideSplashScreen();
-  }, [appIsReady]);
+  }, [appIsReady, tripCtx.isLoading]);
 
-  if (!appIsReady) {
+  if (!appIsReady || tripCtx.isLoading) {
     return <SplashScreenOverlay></SplashScreenOverlay>;
   }
 

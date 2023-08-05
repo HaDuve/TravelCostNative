@@ -1,6 +1,12 @@
 Change log Travel Expense App
 
-1.2.4b
+1.2.6
+- navigate to recent expenses after creating a new Trip
+- fixed and improved loading trip data
+- fixed tourguide not starting sometimes
+- added swipe (right) to delete expenses on android
+
+1.2.5
 - fixed loading trip
 - fixed infinite loading on profile screen
 - fixed expenses summary text when no last currency is present

@@ -72,10 +72,19 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
           source={require("../assets/icon2.png")}
           style={[
             {
-              width: "20%",
-              height: "20%",
-              margin: "4%",
-              // marginTop: "-4%",
+              ...Platform.select({
+                ios: {
+                  width: 125,
+                  height: 125,
+                  margin: "4%",
+                  // marginTop: "-4%",
+                },
+                android: {
+                  width: 125,
+                  height: 125,
+                  margin: "4%",
+                },
+              }),
             },
             GlobalStyles.shadowPrimary,
             { overflow: "visible" },

@@ -1,10 +1,11 @@
-import { Alert, Dimensions } from "react-native";
+import { Alert, Dimensions, Platform } from "react-native";
 
 import ExpenseItem from "./ExpenseItem";
 import React, { memo, useContext, useEffect, useMemo } from "react";
 import { View } from "react-native";
 
 import Swipeable from "react-native-gesture-handler/Swipeable";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { GlobalStyles } from "../../constants/styles";
 import { getAllExpenses, touchAllTravelers } from "../../util/http";
 import { TripContext } from "../../store/trip-context";
@@ -71,9 +72,34 @@ const renderRightActions = (progress, dragX, onClick) => {
     </View>
   );
 };
+
 function renderExpenseItem(isOnline: boolean, itemData) {
   const index = itemData.index;
-
+  if (Platform.OS === "android")
+    return (
+      <View style={{ height: 55, width: "100%" }}>
+        <GestureHandlerRootView>
+          <Swipeable
+            renderLeftActions={(progress, dragX) =>
+              renderRightActions(
+                progress,
+                dragX,
+                onClick.bind(this, itemData, isOnline)
+              )
+            }
+            onSwipeableOpen={closeRow.bind(this, index)}
+            ref={(ref) => (row[index] = ref)}
+            overshootFriction={8}
+          >
+            <ExpenseItem
+              showSumForTravellerName={travellerName}
+              filtered={filtered}
+              {...itemData.item}
+            />
+          </Swipeable>
+        </GestureHandlerRootView>
+      </View>
+    );
   return (
     <View style={{ height: 55, width: "100%" }}>
       <Swipeable

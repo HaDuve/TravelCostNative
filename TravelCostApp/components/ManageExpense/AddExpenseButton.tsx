@@ -1,4 +1,10 @@
-import React, { Dimensions, Pressable, StyleSheet, View } from "react-native";
+import React, {
+  Alert,
+  Dimensions,
+  Pressable,
+  StyleSheet,
+  View,
+} from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import IconButton from "../UI/IconButton";
 import * as Haptics from "expo-haptics";
@@ -64,6 +70,46 @@ const AddExpenseButton = ({ navigation }) => {
   // console.log("AddExpenseButton ~ authCtx.uid:", authCtx.uid);
   // console.log("AddExpenseButton ~ tripCtx.tripid:", tripCtx.tripid);
   const skipCatScreen = settings.skipCategoryScreen;
+
+  const pressHandler = async () => {
+    if (!valid) {
+      // error haptic
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      Alert.alert(
+        "Error",
+        "Data is missing. Please restart the App or Login again.",
+        [
+          // cancel button
+          {
+            text: "Cancel",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
+          },
+          {
+            text: "Restart",
+            onPress: () => {
+              reloadApp();
+            },
+          },
+          {
+            text: "Login",
+            onPress: () => {
+              authCtx.logout();
+              reloadApp();
+            },
+          },
+        ]
+      );
+    } else {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      skipCatScreen &&
+        navigation.navigate("ManageExpense", {
+          pickedCat: "undefined",
+        });
+      !skipCatScreen && navigation.navigate("CategoryPick");
+    }
+  };
+
   // if (!valid) {
   //   return (
   //     <Animated.View
@@ -114,20 +160,7 @@ const AddExpenseButton = ({ navigation }) => {
           pressed && GlobalStyles.pressedWithShadow,
         ]}
         ref={buttonRef}
-        onPress={async () => {
-          if (!valid && !isFast) await reloadApp();
-          if (!valid && isFast) {
-            await authCtx.logout();
-            await reloadApp();
-          }
-          if (!valid) return;
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          skipCatScreen &&
-            navigation.navigate("ManageExpense", {
-              pickedCat: "undefined",
-            });
-          !skipCatScreen && navigation.navigate("CategoryPick");
-        }}
+        onPress={pressHandler}
       >
         <Ionicons
           name={valid ? "add-outline" : "alert"}

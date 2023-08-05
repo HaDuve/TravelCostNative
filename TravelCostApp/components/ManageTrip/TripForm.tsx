@@ -61,6 +61,7 @@ import BackButton from "../UI/BackButton";
 import { onShare } from "../ProfileOutput/ShareTrip";
 import { NetworkContext } from "../../store/network-context";
 import { setMMKVObject } from "../../store/mmkv";
+import { useTourGuideController } from "rn-tourguide";
 
 const TripForm = ({ navigation, route }) => {
   const netCtx = useContext(NetworkContext);
@@ -72,6 +73,12 @@ const TripForm = ({ navigation, route }) => {
   }, [isOnline, isFast]);
   const [isLoading, setIsLoading] = useState(false);
   const [infoIsVisible, setInfoIsVisible] = useState(false);
+  const {
+    canStart, // a boolean indicate if you can start tour guide
+    start, // a function to start the tourguide
+    // stop, // a function  to stopping it
+    eventEmitter, // an object for listening some events
+  } = useTourGuideController();
 
   const [inputs, setInputs] = useState({
     tripName: {
@@ -258,7 +265,7 @@ const TripForm = ({ navigation, route }) => {
     await secureStoreSetItem("currentTripId", tripid);
     // await asyncStoreSetObject("expenses", []);
     setMMKVObject("expenses", []);
-    await userCtx.setFreshlyCreatedTo(false);
+
     console.log(
       "createTripData ~ userCtx.freshlyCreated:",
       userCtx.freshlyCreated
@@ -311,6 +318,13 @@ const TripForm = ({ navigation, route }) => {
     expenseCtx.setExpenses([]);
     setMMKVObject("expenses", []);
 
+    // Tourguide
+    await userCtx.setFreshlyCreatedTo(false);
+    if (canStart && userCtx.needsTour) {
+      start();
+    }
+    navigation.navigate("RecentExpenses");
+
     // restart app with Updates
     // const r = await reloadApp();
     // if (r == -1)
@@ -318,7 +332,6 @@ const TripForm = ({ navigation, route }) => {
 
     // tripCtx.refresh();
     // navigation.navigate("Profile");
-    navigation.navigate("RecentExpenses");
   }
 
   async function submitHandler(setActive = false) {

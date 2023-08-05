@@ -19,7 +19,7 @@ import {
 } from "../util/http";
 import { UserContext } from "../store/user-context";
 import { AuthContext } from "../store/auth-context";
-import { TripContext } from "../store/trip-context";
+import { TripContext, TripData } from "../store/trip-context";
 import { GlobalStyles } from "../constants/styles";
 import Input from "../components/Auth/Input";
 import * as Updates from "expo-updates";
@@ -62,7 +62,7 @@ const JoinTrip = ({ navigation, route }) => {
   let tripid = route.params ? route.params.id : "";
   const [clickedOnLink, setClickedOnLink] = useState(tripid ? true : false);
   const [joinTripid, setJoinTripid] = useState("");
-  const [tripdata, setTripdata] = useState({});
+  const [tripdata, setTripdata] = useState<TripData>({});
   const [tripName, setTripName] = useState("");
   const [freshLink, setFreshLink] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
@@ -126,7 +126,8 @@ const JoinTrip = ({ navigation, route }) => {
         await userCtx.loadCatListFromAsyncInCtx(tripid);
         const expenses = await getAllExpenses(tripid, uid);
         expenseCtx.setExpenses(expenses);
-        await asyncStoreSetObject("currentTrip", tripdata);
+        tripdata.expenses = [];
+        setMMKVObject("currentTrip", tripdata);
         await secureStoreSetItem("currentTripId", tripid);
         // await asyncStoreSetObject("expenses", expenses);
         setMMKVObject("expenses", expenses);

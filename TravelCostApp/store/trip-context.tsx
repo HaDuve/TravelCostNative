@@ -12,6 +12,7 @@ import { err } from "react-native-svg/lib/typescript/xml";
 import { Traveller } from "../util/traveler";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { useInterval } from "../components/Hooks/useInterval";
+import { setMMKVObject, getMMKVObject } from "./mmkv";
 
 export interface TripData {
   tripName?: string;
@@ -50,11 +51,11 @@ export const TripContext = createContext({
   addTrip: ({ tripName, tripTotalBudget }) => {},
   deleteTrip: (tripid: string) => {},
   getcurrentTrip: () => {},
-  setCurrentTrip: async (tripid: string, trip) => {},
+  setCurrentTrip: async (tripid: string, trip: TripData) => {},
   fetchAndSetCurrentTrip: async (tripid: string): Promise<TripData> => {
     return {};
   },
-  saveTripDataInStorage: async (tripData) => {},
+  saveTripDataInStorage: async (tripData: TripData) => {},
   loadTripDataFromStorage: async () => {},
   saveTravellersInStorage: async (travellers) => {},
   loadTravellersFromStorage: async () => {},
@@ -94,6 +95,9 @@ function TripContextProvider({ children }) {
       } catch (error) {
         console.log("loadTripidFetchTrip ~ error", error);
       }
+    } else {
+      console.log("loading from storage in offline mode~");
+      await loadTripDataFromStorage();
     }
   }
 
@@ -145,7 +149,7 @@ function TripContextProvider({ children }) {
     }
   }
 
-  async function setCurrentTrip(tripid: string, trip) {
+  async function setCurrentTrip(tripid: string, trip: TripData) {
     if (!trip) return;
     console.log("setCurrentTrip ~ setCurrentTrip", tripid);
     if (tripid === "reset") {
@@ -177,10 +181,13 @@ function TripContextProvider({ children }) {
     // bug here?
     console.log("setCurrentTrip ~ trip.travellers:", trip.travellers);
     if (typeof trip.travellers[1] === "string") {
+      console.log("setCurrentTrip ~ trip.travellers:", trip.travellers);
       setTravellers(trip.travellers);
     } else {
       const extractedTravellers = [];
       Object.keys(trip.travellers).forEach((key) => {
+        //skip undefined keys
+        if (!key || !travellers[key]) return;
         console.log("Object.keys ~ key:", key);
         console.log("Object.keys ~ travellers[key]:", travellers[key]);
         console.log(
@@ -198,8 +205,12 @@ function TripContextProvider({ children }) {
   }
 
   async function fetchAndSetCurrentTrip(tripid: string) {
+    if (!tripid) return;
+    const { isFastEnough } = await isConnectionFastEnough();
+    if (!isFastEnough) return;
     try {
-      const trip = await fetchTrip(tripid);
+      const trip: TripData = await fetchTrip(tripid);
+      if (!trip) throw new Error("no trip found");
       trip.tripid = tripid;
       await setCurrentTrip(tripid, trip);
       await saveTripDataInStorage(trip);
@@ -207,7 +218,8 @@ function TripContextProvider({ children }) {
     } catch (error) {
       console.warn(
         "error while fetchCurrent Trip in trip-context searching for ",
-        tripid
+        tripid,
+        error.message
       );
     }
   }
@@ -234,7 +246,7 @@ function TripContextProvider({ children }) {
   }
 
   function getcurrentTrip() {
-    const curTripData = {
+    const curTripData: TripData = {
       tripid: tripid,
       tripName: tripName,
       totalBudget: totalBudget,
@@ -258,16 +270,29 @@ function TripContextProvider({ children }) {
     console.log("delete Trip NOT IMPLEMENTED");
   }
 
-  async function saveTripDataInStorage(trip: TripData) {
-    // cut away the trip.expenses
-    const tripData = trip;
-    delete tripData.expenses;
-    await asyncStoreSetObject("currentTrip", trip);
+  async function saveTripDataInStorage(tripData: TripData) {
+    console.log(
+      "saveTripDataInStorage ~ saveTripDataInStorage:",
+      saveTripDataInStorage
+    );
+    // cut away the trip.expenses array
+    tripData.expenses = [];
+    // await asyncStoreSetObject("currentTrip", tripData);
+    // save in mmkv
+    setMMKVObject("currentTrip", tripData);
   }
 
   async function loadTripDataFromStorage() {
-    const tripData = await asyncStoreGetObject("currentTrip");
+    // const tripData: TripData = await asyncStoreGetObject("currentTrip");
+    // load from mmkv
+    const tripData: TripData = getMMKVObject("currentTrip");
     if (tripData) {
+      console.log(
+        "loadTripDataFromStorage ~ tripData:",
+        tripData.tripName,
+        tripData.totalBudget,
+        tripData.tripCurrency
+      );
       setTripName(tripData.tripName);
       setTotalBudget(
         tripData.totalBudget

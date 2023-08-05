@@ -1,6 +1,9 @@
 import NetInfo from "@react-native-community/netinfo";
 import axios from "axios";
-import { MINIMUM_REQUIRED_SPEED } from "../confAppConstants";
+import {
+  DEBUG_FORCE_OFFLINE,
+  MINIMUM_REQUIRED_SPEED,
+} from "../confAppConstants";
 
 const requiredSpeed = MINIMUM_REQUIRED_SPEED; // in Mbps
 
@@ -32,6 +35,9 @@ async function getConnectionSpeed(): Promise<number> {
 }
 
 export async function isConnectionFastEnough(): Promise<ConnectionSpeedResult> {
+  if (DEBUG_FORCE_OFFLINE) {
+    return { isFastEnough: false };
+  }
   const connectionInfo = await NetInfo.fetch();
   if (!connectionInfo.isConnected || !connectionInfo.isInternetReachable) {
     console.log("Not connected to the internet");

@@ -16,18 +16,20 @@
       "fallbackToCacheTimeout": 20000,
       "url": "https://u.expo.dev/dff7ffc5-6f1e-4ece-bb23-0c50cda19f46"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.budgetfornomads.app",
-      "buildNumber": "1.0.1136",
+      "buildNumber": "1.0.1138",
       "config": {
         "usesNonExemptEncryption": false
       }
     },
     "android": {
       "package": "com.budgetfornomads.app",
-      "versionCode": 101038,
+      "versionCode": 101040,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon2.png",
         "backgroundColor": "#FFFFFF"

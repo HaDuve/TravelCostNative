@@ -65,6 +65,23 @@ export const dataResponseTime = (func) => {
   };
 };
 
+// fetch server info
+const fetchServerInfo = async () => {
+  try {
+    const response = await axios.get(`${BACKEND_URL}/server.json`);
+
+    // Process the response data here
+    const data = response.data;
+    console.log("Data from Firebase:", data);
+
+    // Return or set the data to your state or do other operations as needed
+    if (response) return JSON.parse(response.data);
+  } catch (error) {
+    console.error("Error fetching server info from Firebase:", error);
+    // Handle errors as per your app's requirements
+  }
+};
+
 // fetch categories function from /trips/tripid/categories
 export async function fetchCategories(tripid: string) {
   try {

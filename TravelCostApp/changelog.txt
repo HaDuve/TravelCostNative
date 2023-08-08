@@ -1,5 +1,9 @@
 Change log Travel Expense App
 
+1.2.6b
+- improved tracking of user data for promo reasons
+- Reimplemented ChatGPT functionality (fixed a security issue)
+
 1.2.6
 - navigate to recent expenses after creating a new Trip
 - fixed and improved loading trip data

@@ -103,7 +103,7 @@ function RecentExpenses({ navigation }) {
 
   const [dateTimeString, setDateTimeString] = useState("");
 
-  const test_getExpenses = dataResponseTime(getExpenses);
+  // const test_getExpenses = dataResponseTime(getExpenses);
   // const test_offlineLoad = dataResponseTime(
   //   expensesCtx.loadExpensesFromStorage
   // );

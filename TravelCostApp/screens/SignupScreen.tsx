@@ -22,8 +22,8 @@ import Toast from "react-native-toast-message";
 import { Platform } from "react-native";
 import Purchases from "react-native-purchases";
 import {
-  REVCAT_API_KEY_A,
-  REVCAT_API_KEY_G,
+  loadRevCatKeys,
+  RevCatKeys,
   setAttributesAsync,
 } from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
@@ -70,17 +70,18 @@ function SignupScreen() {
       // We are online and ready to create User
       const { token, uid } = await createUser(email, password);
       // setup purchases with a inner trycatch so that account gets created anyway
+      const { REVCAT_G, REVCAT_A }: RevCatKeys = await loadRevCatKeys();
       try {
         if (Platform.OS === "android") {
           // Purchases
           Purchases.configure({
-            apiKey: REVCAT_API_KEY_G,
+            apiKey: REVCAT_G,
             appUserID: uid,
           });
         } else if (Platform.OS === "ios" || Platform.OS === "macos") {
           // Purchases
           Purchases.configure({
-            apiKey: REVCAT_API_KEY_A,
+            apiKey: REVCAT_A,
             appUserID: uid,
           });
           console.log("SignupScreen REVCAT ~ uid:", uid);

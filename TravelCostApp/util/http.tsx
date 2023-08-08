@@ -66,16 +66,20 @@ export const dataResponseTime = (func) => {
 };
 
 // fetch server info
-const fetchServerInfo = async () => {
+export const fetchServerInfo = async () => {
   try {
-    const response = await axios.get(`${BACKEND_URL}/server.json`);
+    const response = await axios.get(
+      `${BACKEND_URL}/server.json${global.QPAR}`
+    );
 
     // Process the response data here
+    if (!response) throw new Error("No response from server");
     const data = response.data;
-    console.log("Data from Firebase:", data);
+    if (!data) throw new Error("No data on the server");
+    console.log("fetchServerInfo ~ data:", data);
 
     // Return or set the data to your state or do other operations as needed
-    if (response) return JSON.parse(response.data);
+    return data;
   } catch (error) {
     console.error("Error fetching server info from Firebase:", error);
     // Handle errors as per your app's requirements

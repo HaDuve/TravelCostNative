@@ -34,7 +34,12 @@ import ExpensesContextProvider, {
 } from "./store/expenses-context";
 import ProfileScreen from "./screens/ProfileScreen";
 import UserContextProvider, { UserContext } from "./store/user-context";
-import { fetchUser, touchMyTraveler, dataResponseTime } from "./util/http";
+import {
+  fetchUser,
+  touchMyTraveler,
+  dataResponseTime,
+  fetchServerInfo,
+} from "./util/http";
 import TripContextProvider, {
   TripContext,
   TripData,
@@ -77,9 +82,8 @@ import { isForeground } from "./util/appState";
 import { TourGuideProvider } from "rn-tourguide";
 import { loadTourConfig } from "./util/tourUtil";
 import {
-  REVCAT_API_KEY_A,
-  REVCAT_API_KEY_G,
-  setAttributesAsync,
+  loadRevCatKeys,
+  RevCatKeys,
 } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
 import { SettingsProvider } from "./store/settings-context";
@@ -563,6 +567,7 @@ function Root() {
     if (!tripid || tripid?.length < 2) return;
     // console.log("onRootMount ~ userData", userData);
     // save user Name in Ctx and async
+    await fetchServerInfo();
     try {
       await userCtx.addUserName(userData);
       // await tripCtx.setCurrentTrip(tripid, tripData);
@@ -617,18 +622,20 @@ function Root() {
       const storedTripId = await secureStoreGetItem("currentTripId");
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
 
+      const { REVCAT_G, REVCAT_A }: RevCatKeys = await loadRevCatKeys();
+
       if (storedToken && storedUid && storedTripId) {
         // setup purchases
         if (Platform.OS === "android") {
           // Purchases
           Purchases.configure({
-            apiKey: REVCAT_API_KEY_G,
+            apiKey: REVCAT_G,
             appUserID: storedUid,
           });
         } else if (Platform.OS === "ios" || Platform.OS === "macos") {
           // Purchases
           Purchases.configure({
-            apiKey: REVCAT_API_KEY_A,
+            apiKey: REVCAT_A,
             appUserID: storedUid,
           });
           console.log("onRootMount ~ storedUid:", storedUid);
@@ -709,7 +716,9 @@ function Root() {
       }
       setAppIsReady(true);
     }
-    const test_onRootMount = dataResponseTime(onRootMount);
+    // const test_onRootMount = dataResponseTime(onRootMount);
+    const test_onRootMount = onRootMount;
+
     try {
       test_onRootMount();
     } catch (error) {

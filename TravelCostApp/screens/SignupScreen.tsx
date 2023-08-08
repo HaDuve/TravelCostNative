@@ -24,6 +24,7 @@ import Purchases from "react-native-purchases";
 import {
   REVCAT_API_KEY_A,
   REVCAT_API_KEY_G,
+  setAttributesAsync,
 } from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
 import { BranchEvent } from "react-native-branch";
@@ -90,6 +91,7 @@ function SignupScreen() {
 
       //NEW
       const userData = { userName: name };
+      await setAttributesAsync(email, userData.userName);
       userCtx.setUserName(name);
       await userCtx.setFreshlyCreatedTo(true);
       await authCtx.setUserID(uid);
@@ -100,6 +102,8 @@ function SignupScreen() {
       });
       const event = new BranchEvent(BranchEvent.CompleteRegistration);
       await event.logEvent();
+      const event2 = new BranchEvent(BranchEvent.Login);
+      await event2.logEvent();
       await authCtx.authenticate(token);
     } catch (error) {
       console.log("signupHandler ~ error2", error);

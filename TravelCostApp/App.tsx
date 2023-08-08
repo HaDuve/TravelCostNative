@@ -57,7 +57,7 @@ import LoadingOverlay from "./components/UI/LoadingOverlay";
 import ImportGSScreen from "./screens/ImportGSScreen";
 import FilteredExpenses from "./screens/FilteredExpenses";
 import { sendOfflineQueue } from "./util/offline-queue";
-import branch from "react-native-branch";
+import branch, { BranchEvent } from "react-native-branch";
 
 //localization
 import * as Localization from "expo-localization";
@@ -79,6 +79,7 @@ import { loadTourConfig } from "./util/tourUtil";
 import {
   REVCAT_API_KEY_A,
   REVCAT_API_KEY_G,
+  setAttributesAsync,
 } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
 import { SettingsProvider } from "./store/settings-context";
@@ -633,7 +634,8 @@ function Root() {
           console.log("onRootMount ~ storedUid:", storedUid);
         }
         await Purchases.collectDeviceIdentifiers();
-
+        const event = new BranchEvent(BranchEvent.Login);
+        await event.logEvent();
         const needsTour = await loadTourConfig();
         console.log("onRootMount ~ needsTour:", needsTour);
         userCtx.setNeedsTour(needsTour);

@@ -23,6 +23,7 @@ import Purchases from "react-native-purchases";
 import {
   isPremiumMember,
   REVCAT_API_KEY_A,
+  setAttributesAsync,
 } from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
 import { secureStoreSetItem } from "../store/secure-storage";
@@ -99,6 +100,7 @@ function LoginScreen() {
         console.log("LoginScreen ~ uid:", uid);
       }
       const userData = checkUser;
+      await setAttributesAsync(email, userData.userName);
       await userCtx.addUserName(userData);
       await authCtx.setUserID(uid);
       console.log("loginHandler ~ userData", userData);

@@ -5,6 +5,7 @@ import { FORCE_PREMIUM } from "../../confAppConstants";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+import branch from "react-native-branch";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -46,4 +47,11 @@ export async function isPremiumMember() {
     //   text2: i18n.t("error2"),
     // });
   }
+}
+
+export async function setAttributesAsync(emailString = "", userName = "") {
+  if (emailString) await Purchases.setEmail(emailString);
+  if (userName) await Purchases.setDisplayName(userName);
+  const referrer = await branch.getLatestReferringParams();
+  if (referrer) await Purchases.setCampaign(referrer["~channel"]);
 }

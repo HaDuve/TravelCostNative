@@ -36,7 +36,10 @@ import { TourGuideZone, useTourGuideController } from "rn-tourguide";
 import { asyncStoreGetItem } from "../store/async-storage";
 import { resetTour, saveStoppedTour } from "../util/tourUtil";
 import { reloadApp } from "../util/appState";
-import { ENTITLEMENT_ID } from "../components/Premium/PremiumConstants";
+import {
+  ENTITLEMENT_ID,
+  setAttributesAsync,
+} from "../components/Premium/PremiumConstants";
 import PropTypes from "prop-types";
 import GradientButton from "../components/UI/GradientButton";
 import SettingsSection from "../components/UI/SettingsSection";
@@ -217,12 +220,7 @@ const SettingsScreen = ({ navigation }) => {
       setEmailString(email);
     }
   }
-  async function setAttributesAsync() {
-    if (emailString) await Purchases.setEmail(emailString);
-    if (userName) await Purchases.setDisplayName(userName);
-    const referrer = await branch.getLatestReferringParams();
-    if (referrer) await Purchases.setCampaign(referrer["~channel"]);
-  }
+
   useEffect(() => {
     userCtx.loadUserNameFromStorage();
   }, []);
@@ -233,10 +231,10 @@ const SettingsScreen = ({ navigation }) => {
     getEmail();
   });
   useFocusEffect(() => {
-    setAttributesAsync();
+    setAttributesAsync(emailString, userName);
   });
   useEffect(() => {
-    setAttributesAsync();
+    setAttributesAsync(emailString, userName);
   }, [emailString, userName]);
   useEffect(() => {
     getEmail();

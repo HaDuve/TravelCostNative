@@ -1346,7 +1346,7 @@ const ExpenseForm = ({
             </GradientButton>
           </View>
           {/* Commented out ChatGPT Button */}
-          {/* {!hideAdvanced &&
+          {!hideAdvanced &&
             inputs.amount.value &&
             inputs.description.value &&
             inputs.country.value && (
@@ -1361,7 +1361,7 @@ const ExpenseForm = ({
                   {!isEditing && i18n.t("askChatGptPre")}
                 </GradientButton>
               </View>
-            )} */}
+            )}
         </Animated.View>
       </Animated.View>
     </>

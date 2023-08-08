@@ -29,14 +29,13 @@ const GPTDealScreen = ({ route, navigation }) => {
     async function getGoodDeal() {
       setIsFetching(true);
       try {
-        const response = await axios.request(
-          chatGPT_getGoodDeal(product, price, currency, country)
+        const response = await chatGPT_getGoodDeal(
+          product,
+          price,
+          currency,
+          country
         );
-        console.log(response.data);
-        if (response.data.choices[0].message.content) {
-          console.log(response.data.choices[0].message.content);
-          setAnswer(response.data.choices[0].message.content);
-        }
+        if (response) setAnswer(response.content);
       } catch (error) {
         console.error(error);
         setAnswer("Error: " + error);

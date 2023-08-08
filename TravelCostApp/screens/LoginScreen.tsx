@@ -20,8 +20,8 @@ import { TripContext } from "../store/trip-context";
 import Toast from "react-native-toast-message";
 import Purchases from "react-native-purchases";
 import {
-  loadRevCatKeys,
-  RevCatKeys,
+  loadKeys,
+  Keys,
   setAttributesAsync,
 } from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
@@ -84,7 +84,7 @@ function LoginScreen() {
         freshlyCreated = true;
       }
       //// END OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
-      const { REVCAT_G, REVCAT_A }: RevCatKeys = await loadRevCatKeys();
+      const { REVCAT_G, REVCAT_A }: Keys = await loadKeys();
 
       // setup purchases
       if (Platform.OS === "android") {

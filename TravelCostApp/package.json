@@ -75,6 +75,7 @@
     "react-native-svg": "13.4.0",
     "react-native-tab-view": "^3.3.4",
     "react-native-toast-message": "^2.1.5",
+    "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.18.10",
     "react-native-webview": "11.26.0",
     "rn-fetch-blob": "^0.12.0",

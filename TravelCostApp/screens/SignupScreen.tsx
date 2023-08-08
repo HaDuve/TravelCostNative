@@ -22,8 +22,8 @@ import Toast from "react-native-toast-message";
 import { Platform } from "react-native";
 import Purchases from "react-native-purchases";
 import {
-  loadRevCatKeys,
-  RevCatKeys,
+  loadKeys,
+  Keys,
   setAttributesAsync,
 } from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
@@ -70,7 +70,7 @@ function SignupScreen() {
       // We are online and ready to create User
       const { token, uid } = await createUser(email, password);
       // setup purchases with a inner trycatch so that account gets created anyway
-      const { REVCAT_G, REVCAT_A }: RevCatKeys = await loadRevCatKeys();
+      const { REVCAT_G, REVCAT_A }: Keys = await loadKeys();
       try {
         if (Platform.OS === "android") {
           // Purchases

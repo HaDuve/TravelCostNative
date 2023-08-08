@@ -17,6 +17,7 @@ const languageObj = LANGUAGE_LIST.find(
 const languageName = languageObj?.name;
 
 import { Configuration, OpenAIApi } from "openai";
+import { Keys, loadKeys } from "../components/Premium/PremiumConstants";
 
 export function chatGPTcontentKeywords(customCategory: string) {
   const content =
@@ -41,74 +42,34 @@ export function chatGPTcontentGoodDealPost(
   return content;
 }
 
-export function chatGPT_getKeywords(customCategory: string) {
-  const options = {
-    method: "POST",
-    url: "https://chatgpt53.p.rapidapi.com/",
-    headers: {
-      "content-type": "application/json",
-      "X-RapidAPI-Key": GPT_API_KEY,
-      "X-RapidAPI-Host": "chatgpt53.p.rapidapi.com",
-    },
-    data: {
-      messages: [
-        {
-          role: "user",
-          content: chatGPTcontentKeywords(customCategory),
-        },
-      ],
-      temperature: 1,
-    },
-  };
-  return options;
-}
-
 export async function chatGPT_getGoodDeal(
   product: string,
   price: string,
   currency: string,
   country: string
 ) {
+  const { OPENAI }: Keys = await loadKeys();
   const configuration = new Configuration({
-    apiKey: GPT_API_KEY,
+    apiKey: OPENAI,
   });
   const openai = new OpenAIApi(configuration);
 
-  console.log("openai", openai);
-  const chatCompletion = await openai.createChatCompletion({
+  const response = await openai.createChatCompletion({
     model: "gpt-3.5-turbo",
-    messages: [{ role: "user", content: "Hello world" }],
+    messages: [
+      {
+        role: "user",
+        content: chatGPTcontentGoodDealPost(product, price, currency, country),
+      },
+    ],
+    temperature: 0.75,
+    max_tokens: 1280,
+    top_p: 1,
+    frequency_penalty: 0,
+    presence_penalty: 0,
   });
-  console.log(chatCompletion.data.choices[0].message);
-
-  const options = {
-    method: "POST",
-    url: "https://api.openai.com/v1/chat/completions",
-    // "https://chatgpt53.p.rapidapi.com/",
-    headers: {
-      "content-type": "application/json",
-      apiKey: GPT_API_KEY,
-    },
-    // {
-    //   "content-type": "application/json",
-    //   "X-RapidAPI-Key": GPT_API_KEY,
-    //   "X-RapidAPI-Host": "chatgpt53.p.rapidapi.com",
-    // },
-    data: {
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "user",
-          content: chatGPTcontentGoodDealPost(
-            product,
-            price,
-            currency,
-            country
-          ),
-        },
-      ],
-      temperature: 1,
-    },
-  };
-  return options;
+  const responseText = response.data.choices[0].message;
+  console.log("response.data:", response.data);
+  console.log("responseText:", responseText);
+  return responseText;
 }

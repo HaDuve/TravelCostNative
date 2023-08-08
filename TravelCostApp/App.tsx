@@ -81,10 +81,7 @@ import { useInterval } from "./components/Hooks/useInterval";
 import { isForeground } from "./util/appState";
 import { TourGuideProvider } from "rn-tourguide";
 import { loadTourConfig } from "./util/tourUtil";
-import {
-  loadRevCatKeys,
-  RevCatKeys,
-} from "./components/Premium/PremiumConstants";
+import { loadKeys, Keys } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
 import { SettingsProvider } from "./store/settings-context";
 import { UserData } from "./store/user-context";
@@ -622,7 +619,7 @@ function Root() {
       const storedTripId = await secureStoreGetItem("currentTripId");
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
 
-      const { REVCAT_G, REVCAT_A }: RevCatKeys = await loadRevCatKeys();
+      const { REVCAT_G, REVCAT_A }: Keys = await loadKeys();
 
       if (storedToken && storedUid && storedTripId) {
         // setup purchases

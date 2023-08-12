@@ -333,18 +333,18 @@ const ManageExpense = ({ route, navigation }) => {
   //   return <ErrorOverlay message={error} onConfirm={errorHandler} />;
   // }
 
-  if (isSubmitting && progress >= 0 && progress <= 1) {
-    return (
-      <LoadingBarOverlay
-        progress={progress}
-        progressAt={progressAt}
-        progressMax={progressMax}
-      />
-    );
-  }
-  if (isSubmitting) {
-    return <LoadingOverlay customText="Saving your Expense!" />;
-  }
+  // if (isSubmitting && progress >= 0 && progress <= 1) {
+  //   return (
+  //     <LoadingBarOverlay
+  //       progress={progress}
+  //       progressAt={progressAt}
+  //       progressMax={progressMax}
+  //     />
+  //   );
+  // }
+  // if (isSubmitting) {
+  //   return <LoadingOverlay customText="Saving your Expense!" />;
+  // }
 
   return (
     <ScrollView style={styles.container}>

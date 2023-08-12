@@ -739,11 +739,11 @@ function Root() {
     async function hideSplashScreen() {
       await SplashScreen.hideAsync();
     }
-    if (tripCtx.isLoading) return;
+    if (!userCtx.freshlyCreated && tripCtx.isLoading) return;
     hideSplashScreen();
-  }, [appIsReady, tripCtx.isLoading]);
+  }, [appIsReady, tripCtx.isLoading, userCtx.freshlyCreated]);
 
-  if (!appIsReady || tripCtx.isLoading) {
+  if (!appIsReady || (!userCtx.freshlyCreated && tripCtx.isLoading)) {
     return <SplashScreenOverlay></SplashScreenOverlay>;
   }
 

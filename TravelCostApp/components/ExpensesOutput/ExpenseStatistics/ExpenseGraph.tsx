@@ -32,13 +32,13 @@ import { MAX_JS_NUMBER } from "../../../confAppConstants";
 const ExpenseGraph = ({
   periodName,
   periodRangeNumber,
-  expenseCtx,
   tripCtx,
   navigation,
 }) => {
   // console.log("rerender ExpenseGraph - 2");
   const today = new Date();
   const renderItemRef = useRef(null);
+  const expenseCtx = useContext(ExpensesContext);
   if (!isForeground) {
     console.log("ExpenseGraph: not in foreground, return empty view");
     return <></>;

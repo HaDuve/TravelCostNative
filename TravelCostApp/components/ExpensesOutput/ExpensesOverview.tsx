@@ -30,11 +30,14 @@ import Animated, {
 import { MAX_PERIOD_RANGE, MIN_PERIOD_RANGE } from "../../confAppConstants";
 import { BlurView } from "expo-blur";
 import { TripContext } from "../../store/trip-context";
-import { ExpensesContext } from "../../store/expenses-context";
 
-const ExpensesOverview = ({ navigation, expenses, periodName }) => {
+const ExpensesOverview = ({
+  navigation,
+  expenses,
+  periodName,
+  dateTimeString,
+}) => {
   // console.log("rerender ExpensesOverview - 1");
-  const expenseCtx = useContext(ExpensesContext);
   const tripCtx = useContext(TripContext);
   // const periodRangeNumber = useRef(7);
   // periodRangeNumber useState is used to rerender the component when the periodRangeNumber changes
@@ -198,7 +201,6 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           expenses={expenses}
           periodName={periodName}
           periodRangeNumber={periodRangeNumber}
-          expenseCtx={expenseCtx}
           tripCtx={tripCtx}
         />
       )}
@@ -266,7 +268,8 @@ export default ExpensesOverview;
 const areEqual = (prevProps, nextProps) => {
   return (
     prevProps.expenses?.length === nextProps.expenses?.length &&
-    prevProps.periodName === nextProps.periodName
+    prevProps.periodName === nextProps.periodName &&
+    prevProps.dateTimeString === nextProps.dateTimeString
   );
 };
 
@@ -276,6 +279,7 @@ ExpensesOverview.propTypes = {
   expenses: PropTypes.array.isRequired,
   periodName: PropTypes.string.isRequired,
   navigation: PropTypes.object.isRequired,
+  dateTimeString: PropTypes.string.isRequired,
 };
 
 const styles = StyleSheet.create({

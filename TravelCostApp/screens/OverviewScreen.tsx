@@ -180,6 +180,7 @@ const OverviewScreen = ({ navigation }) => {
         navigation={navigation}
         expenses={recentExpenses}
         periodName={PeriodValue}
+        dateTimeString={dateTimeString}
       />
     </View>
   );

@@ -84,7 +84,6 @@ import { Toast } from "react-native-toast-message/lib/src/Toast";
 const ExpenseForm = ({
   onCancel,
   onSubmit,
-  setIsSubmitting,
   submitButtonLabel,
   isEditing,
   defaultValues,
@@ -1143,7 +1142,7 @@ const ExpenseForm = ({
                     onClose={splitHandler}
                     listMode="MODAL"
                     multiple={true}
-                    CloseIconComponent={({ style }) => (
+                    CloseIconComponent={() => (
                       <Text
                         style={{
                           color: GlobalStyles.colors.textColor,

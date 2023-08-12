@@ -96,10 +96,12 @@ function TripContextProvider({ children }) {
         await fetchAndSetTravellers(fetched_tripid ?? stored_tripid);
       } catch (error) {
         console.log("loadTripidFetchTrip ~ error", error);
+        setIsLoading(false);
       }
     } else {
       console.log("loading from storage in offline mode~");
       await loadTripDataFromStorage();
+      setIsLoading(false);
     }
     setIsLoading(false);
   }
@@ -310,9 +312,12 @@ function TripContextProvider({ children }) {
       setTripCurrency(tripData.tripCurrency);
       setdailyBudget(tripData.dailyBudget.toString());
       await loadTravellersFromStorage();
+      setIsLoading(false);
+
       return tripData;
     } else {
       console.warn("no tripdata loaded from Storage!");
+      setIsLoading(false);
     }
   }
 

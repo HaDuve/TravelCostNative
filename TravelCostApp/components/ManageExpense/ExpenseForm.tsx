@@ -383,7 +383,7 @@ const ExpenseForm = ({
     if (inputIdentifier === "description" && pickedCat === "undefined") {
       const mappedCategory = mapDescriptionToCategory(
         enteredValue,
-        // TODO PUT ALL CATEGORIES
+        // TODO: PUT ALL CATEGORIES
         DEFAULTCATEGORIES
       );
       if (mappedCategory) {

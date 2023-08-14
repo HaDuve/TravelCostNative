@@ -708,6 +708,7 @@ function Root() {
         await authCtx.authenticate(storedToken);
         console.log("Root end reached");
       } else {
+        tripCtx.setIsLoading(false);
         await asyncStoreSafeClear();
         await authCtx.logout();
       }
@@ -739,11 +740,10 @@ function Root() {
     async function hideSplashScreen() {
       await SplashScreen.hideAsync();
     }
-    if (!userCtx.freshlyCreated && tripCtx.isLoading) return;
     hideSplashScreen();
-  }, [appIsReady, tripCtx.isLoading, userCtx.freshlyCreated]);
+  }, [appIsReady, tripCtx.isLoading]);
 
-  if (!appIsReady || (!userCtx.freshlyCreated && tripCtx.isLoading)) {
+  if (!appIsReady || (authCtx.token && tripCtx.isLoading)) {
     return <SplashScreenOverlay></SplashScreenOverlay>;
   }
 

@@ -23,6 +23,7 @@ import { secureStoreGetItem } from "../store/secure-storage";
 import { fetchTripHistory } from "../util/http";
 import { AuthContext } from "../store/auth-context";
 import { BranchEvent } from "react-native-branch";
+import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -37,6 +38,8 @@ const ProfileScreen = ({ navigation }) => {
   const [tourIsRunning, setTourIsRunning] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [tripHistory, setTripHistory] = useState([]);
+  const [isFetchingLogout, setIsFetchingLogout] = useState(false);
+
   // console.log("ProfileScreen ~ tripHistory:", tripHistory);
 
   useEffect(() => {
@@ -215,10 +218,18 @@ const ProfileScreen = ({ navigation }) => {
     </>
   );
 
+  if (isFetchingLogout)
+    return (
+      <LoadingBarOverlay customText="Logging you out..."></LoadingBarOverlay>
+    );
+
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
-        <ProfileForm navigation={navigation}></ProfileForm>
+        <ProfileForm
+          navigation={navigation}
+          setIsFetchingLogout={setIsFetchingLogout}
+        ></ProfileForm>
       </View>
       {visibleContent}
     </View>

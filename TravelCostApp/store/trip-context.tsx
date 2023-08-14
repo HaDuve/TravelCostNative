@@ -63,6 +63,7 @@ export const TripContext = createContext({
   isPaid: isPaidString.notPaid,
   isPaidDate: "",
   isLoading: false,
+  setIsLoading: (isLoading: boolean) => {},
 });
 
 function TripContextProvider({ children }) {
@@ -108,7 +109,10 @@ function TripContextProvider({ children }) {
 
   useInterval(
     () => {
-      if (tripid && tripName) return;
+      if (tripid && tripName) {
+        setIsLoading(false);
+        return;
+      }
       if (isLoading) return;
       setIsLoading(true);
       loadTripidFetchTrip();
@@ -127,6 +131,13 @@ function TripContextProvider({ children }) {
     }
     loadAsyncTravellers();
   }, []);
+
+  useEffect(() => {
+    if (!travellers || (travellers.length === 0 && tripid)) {
+      console.log("fetching travellers");
+      fetchAndSetTravellers(tripid);
+    }
+  }, [travellers, tripid]);
 
   function setTripProgress(percent: number) {
     if (percent < 0 || percent > 1) percent = 1;
@@ -311,7 +322,11 @@ function TripContextProvider({ children }) {
 
       setTripCurrency(tripData.tripCurrency);
       setdailyBudget(tripData.dailyBudget.toString());
-      await loadTravellersFromStorage();
+      try {
+        await loadTravellersFromStorage();
+      } catch (error) {
+        console.log("error loading travellers from storage:", error.message);
+      }
       setIsLoading(false);
 
       return tripData;
@@ -364,6 +379,7 @@ function TripContextProvider({ children }) {
     isPaid: isPaid,
     isPaidDate: isPaidDate,
     isLoading: isLoading,
+    setIsLoading: setIsLoading,
   };
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>;

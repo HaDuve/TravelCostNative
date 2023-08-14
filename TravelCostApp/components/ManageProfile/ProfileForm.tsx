@@ -24,18 +24,18 @@ import * as Haptics from "expo-haptics";
 import PropTypes from "prop-types";
 import { ExpensesContext } from "../../store/expenses-context";
 import { asyncStoreSafeClear } from "../../store/async-storage";
+import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-const ProfileForm = ({ navigation }) => {
+const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const expCtx = useContext(ExpensesContext);
   const freshlyCreated = userCtx.freshlyCreated;
-  const [isFetchingLogout, setIsFetchingLogout] = useState(false);
 
   function logoutHandler() {
     return Alert.alert(i18n.t("sure"), i18n.t("signOutAlertMess"), [
@@ -49,7 +49,7 @@ const ProfileForm = ({ navigation }) => {
         text: i18n.t("yes"),
         onPress: async () => {
           setIsFetchingLogout(true);
-          await tripCtx.setCurrentTrip("reset", "null");
+          await tripCtx.setCurrentTrip("reset", null);
           expCtx.setExpenses([]);
           userCtx.setTripHistory([]);
           userCtx.setUserName("");
@@ -60,9 +60,7 @@ const ProfileForm = ({ navigation }) => {
       },
     ]);
   }
-  const iconButtonJSX = isFetchingLogout ? (
-    <LoadingOverlay></LoadingOverlay>
-  ) : (
+  const iconButtonJSX = (
     <View style={[styles.inputsRow, { marginTop: -12 }]}>
       <IconButton
         icon={"settings-outline"}

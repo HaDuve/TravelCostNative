@@ -35,12 +35,12 @@ const ExpenseGraph = ({
   tripCtx,
   navigation,
 }) => {
-  // console.log("rerender ExpenseGraph - 2");
+  console.log("rerender ExpenseGraph - 2");
   const today = new Date();
   const renderItemRef = useRef(null);
   const expenseCtx = useContext(ExpensesContext);
-  if (!isForeground) {
-    console.log("ExpenseGraph: not in foreground, return empty view");
+  if (!isForeground || !expenseCtx.expenses) {
+    console.log("ExpenseGraph: not ready, return empty view");
     return <></>;
   }
   const totalBudget = Number(tripCtx.totalBudget) ?? MAX_JS_NUMBER;
@@ -458,13 +458,11 @@ const ExpenseGraph = ({
 const areEqual = (prevProps, nextProps) => {
   return (
     prevProps.periodName === nextProps.periodName &&
-    prevProps.periodRangeNumber === nextProps.periodRangeNumber &&
-    prevProps.expenseCtx.expenses?.length ===
-      nextProps.expenseCtx.expenses?.length
+    prevProps.periodRangeNumber === nextProps.periodRangeNumber
   );
 };
 
-export default React.memo(ExpenseGraph, areEqual);
+export default ExpenseGraph;
 
 ExpenseGraph.propTypes = {
   navigation: PropTypes.object,

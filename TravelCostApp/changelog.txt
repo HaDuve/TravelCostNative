@@ -1,8 +1,19 @@
 Change log Travel Expense App
 
-1.2.6b
+1.2.611
+- added the option to mark expenses as special
+- added the option to hide special expenses from showing
+- hidden special expenses wont be calculated for home summary or expense graph or piecharts
+- hidden special expenses will still be available for finder, split summaries and trip summary
+- fixed app not starting for new users sometimes
+- fixed expense graph not updating sometimes
+- fixed trip data not loading sometimes
+
+1.2.601
 - improved tracking of user data for promo reasons
 - Reimplemented ChatGPT functionality (fixed a security issue)
+- fixed app not loading sometimes
+- fixed expense graph not updating sometimes
 
 1.2.6
 - navigate to recent expenses after creating a new Trip

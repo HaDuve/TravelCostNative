@@ -80,6 +80,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { ActivityIndicator } from "react-native-paper";
 import BackButton from "../UI/BackButton";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
+import SettingsSwitch from "../UI/SettingsSwitch";
 
 const ExpenseForm = ({
   onCancel,
@@ -100,6 +101,7 @@ const ExpenseForm = ({
   const netCtx = useContext(NetworkContext);
   const expCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
+  const hideSpecial = settings.hideSpecialExpenses;
   const alwaysShowAdvancedSetting = settings.alwaysShowAdvanced || isEditing;
   const editingValues: ExpenseData = defaultValues;
   const lastCurrency = userCtx.lastCurrency
@@ -240,6 +242,10 @@ const ExpenseForm = ({
   const [isPaid, setIsPaid] = useState(
     editingValues?.isPaid ?? isPaidString.notPaid
   );
+  const [isSpecialExpense, setIsSpecialExpense] = useState(
+    editingValues?.isSpecialExpense ?? false
+  );
+  console.log("rerender: special:", isSpecialExpense);
 
   useEffect(() => {
     // console.log("useEffect ~ tripCtx.isPaidDate", tripCtx?.isPaidDate);
@@ -494,6 +500,7 @@ const ExpenseForm = ({
       duplOrSplit: duplOrSplit,
       iconName: iconName,
       isPaid: isPaid,
+      isSpecialExpense: isSpecialExpense,
     };
 
     // SoloTravellers always pay for themselves
@@ -595,6 +602,7 @@ const ExpenseForm = ({
       splitList: [],
       iconName: iconName,
       isPaid: isPaid,
+      isSpecialExpense: isSpecialExpense,
     };
     await onSubmit(expenseData);
   }
@@ -766,6 +774,22 @@ const ExpenseForm = ({
           },
         ]}
       ></SegmentedButtons>
+    </View>
+  );
+  const hideSpecialTooltip = hideSpecial
+    ? "(hidden)"
+    : "\n(can be hidden via settings)";
+  const isSpecialExpenseJSX = (
+    <View style={styles.isSpecialContainer}>
+      <SettingsSwitch
+        toggleState={() => setIsSpecialExpense(!isSpecialExpense)}
+        label={
+          isSpecialExpense
+            ? "Special Expense " + hideSpecialTooltip
+            : "Special Expense?"
+        }
+        state={isSpecialExpense}
+      ></SettingsSwitch>
     </View>
   );
 
@@ -1323,6 +1347,7 @@ const ExpenseForm = ({
                   </KeyboardAvoidingView>
                 )}
                 {!splitTypeSelf && splitListHasNonZeroEntries && isPaidJSX}
+                {isSpecialExpenseJSX}
               </Animated.View>
             )}
             {formIsInvalid && !hideAdvanced && (
@@ -1598,6 +1623,10 @@ const styles = StyleSheet.create({
   isPaidContainer: {
     marginTop: "4%",
     marginHorizontal: "3%",
+  },
+  isSpecialContainer: {
+    marginTop: "8%",
+    marginHorizontal: "6%",
   },
   card: {
     backgroundColor: GlobalStyles.colors.backgroundColor,

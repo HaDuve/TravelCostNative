@@ -7,11 +7,6 @@ import { GlobalStyles } from "../../constants/styles";
 const SettingsSwitch = ({ style, toggleState, state, label }) => {
   return (
     <Pressable onPress={() => toggleState()} style={[styles.container, style]}>
-      {/* <LinearGradient
-        start={{ x: 0.51, y: -1.3 }}
-        colors={GlobalStyles.gradientPrimaryButton}
-        style={[{ overflow: "hidden" }]}
-      > */}
       <View style={{ flex: 1 }}>
         <Text style={GlobalStyles.secondaryText}>{label}</Text>
       </View>

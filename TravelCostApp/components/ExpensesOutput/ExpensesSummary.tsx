@@ -22,6 +22,8 @@ import * as Haptics from "expo-haptics";
 import { UserContext } from "../../store/user-context";
 import { NetworkContext } from "../../store/network-context";
 import { getRate } from "../../util/currencyExchange";
+import { SettingsContext } from "../../store/settings-context";
+import { ExpenseData } from "../../util/expense";
 
 const ExpensesSummary = ({
   expenses,
@@ -32,6 +34,8 @@ const ExpensesSummary = ({
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   const netCtx = useContext(NetworkContext);
+  const { settings } = useContext(SettingsContext);
+  const hideSpecial = settings.hideSpecialExpenses;
   const isFast = netCtx.isConnected && netCtx.strongConnection;
   const [lastRate, setLastRate] = useState(1);
   const lastRateUnequal1 = lastRate !== 1;
@@ -48,8 +52,12 @@ const ExpensesSummary = ({
 
   if (!expenses || !periodName || userCtx.freshlyCreated) return <></>;
 
-  const expensesSum = expenses.reduce((sum, expense) => {
-    if (isNaN(Number(expense.calcAmount))) return sum;
+  const expensesSum = expenses.reduce((sum: number, expense: ExpenseData) => {
+    if (
+      isNaN(Number(expense.calcAmount)) ||
+      (hideSpecial && expense.isSpecialExpense)
+    )
+      return sum;
     return sum + Number(expense.calcAmount);
   }, 0);
   // console.log("expensesSum ~ expensesSum", expensesSum);

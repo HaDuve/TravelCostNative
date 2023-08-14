@@ -29,6 +29,7 @@ export interface ExpenseData {
   iconName?: string;
   rangeId?: string;
   isPaid?: string;
+  isSpecialExpense?: boolean;
 }
 
 export enum isPaidString {
@@ -57,6 +58,7 @@ export interface ExpenseDataOnline {
   splitList?: Split[];
   iconName?: string;
   rangeId?: string;
+  isSpecialExpense?: boolean;
 }
 
 export interface Split {

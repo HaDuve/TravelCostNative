@@ -210,6 +210,7 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
           duplOrSplit: r.duplOrSplit,
           rangeId: r.rangeId,
           isPaid: r.isPaid,
+          isSpecialExpense: r.isSpecialExpense,
         };
         expenses.push(expenseObj);
       }
@@ -260,6 +261,7 @@ export async function fetchExpenses(tripid: string, uid: string) {
         duplOrSplit: data.duplOrSplit,
         rangeId: data.rangeId,
         isPaid: data.isPaid,
+        isSpecialExpense: data.isSpecialExpense,
       };
       expenses.push(expenseObj);
     }
@@ -383,18 +385,6 @@ export async function storeTrip(tripData: TripData) {
     return id;
   } catch (error) {
     throw new Error("error while storing trip");
-  }
-}
-
-async function getTripIsPaid(tripid: string) {
-  try {
-    const trip = await fetchTrip(tripid);
-    return trip.isPaid;
-  } catch (error) {
-    console.warn(
-      "error while fetchCurrent Trip in trip-context searching for ",
-      tripid
-    );
   }
 }
 

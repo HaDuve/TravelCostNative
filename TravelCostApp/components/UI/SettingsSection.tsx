@@ -29,6 +29,9 @@ const SettingsSection = ({ multiTraveller }) => {
   const [showInternetSpeed, setShowInternetSpeed] = useState(
     settings.showInternetSpeed
   );
+  const [hideSpecialExpenses, setHideSpecialExpenses] = useState(
+    settings.hideSpecialExpenses
+  );
 
   const toggleShowFlags = () => {
     const newSettings = { ...settings, showFlags: !showFlags };
@@ -66,11 +69,25 @@ const SettingsSection = ({ multiTraveller }) => {
     setShowInternetSpeed(!showInternetSpeed);
     saveSettings(newSettings);
   };
+  const toggleHideSpecialExpenses = () => {
+    const newSettings = {
+      ...settings,
+      hideSpecialExpenses: !hideSpecialExpenses,
+    };
+    setHideSpecialExpenses(!hideSpecialExpenses);
+    saveSettings(newSettings);
+  };
   return (
     <View>
       {/* <View style={styles.switchContainer}>
         <Text style={GlobalStyles.secondaryText}>Show Flags icons</Text>
         <Switch onValueChange={toggleShowFlags} value={showFlags} /> */}
+      <SettingsSwitch
+        label={"Hide special expenses"}
+        style={styles.switchContainer}
+        state={hideSpecialExpenses}
+        toggleState={toggleHideSpecialExpenses}
+      />
       <SettingsSwitch
         label={i18n.t("settingsSkipCat")}
         style={styles.switchContainer}

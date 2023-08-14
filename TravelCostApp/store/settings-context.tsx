@@ -10,15 +10,13 @@ export interface Settings {
   alwaysShowAdvanced: boolean;
   skipCategoryScreen: boolean;
   showInternetSpeed: boolean;
+  hideSpecialExpenses: boolean;
 }
 
 export const SettingsContext = createContext({
   settings: {} as Settings,
-  saveSettings: (settings: Settings): void => {
-    // saving settings
-    console.log(settings);
-    return;
-  },
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  saveSettings: async (settings: Settings): Promise<void> => {},
 });
 
 export const SettingsProvider = ({ children }) => {
@@ -37,6 +35,7 @@ export const SettingsProvider = ({ children }) => {
           alwaysShowAdvanced: true,
           skipCategoryScreen: true,
           showInternetSpeed: true,
+          hideSpecialExpenses: true,
         });
     };
     loadSettingsAsync();

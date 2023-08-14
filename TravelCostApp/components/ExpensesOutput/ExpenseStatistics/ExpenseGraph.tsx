@@ -28,6 +28,7 @@ import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import PropTypes from "prop-types";
 import { isForeground } from "../../../util/appState";
 import { MAX_JS_NUMBER } from "../../../confAppConstants";
+import { SettingsContext } from "../../../store/settings-context";
 
 const ExpenseGraph = ({
   periodName,
@@ -39,6 +40,9 @@ const ExpenseGraph = ({
   const today = new Date();
   const renderItemRef = useRef(null);
   const expenseCtx = useContext(ExpensesContext);
+  const { settings } = useContext(SettingsContext);
+  const hideSpecial = settings.hideSpecialExpenses;
+
   if (!isForeground || !expenseCtx.expenses) {
     console.log("ExpenseGraph: not ready, return empty view");
     return <></>;
@@ -63,7 +67,11 @@ const ExpenseGraph = ({
         const day = getDateMinusDays(today, i);
         const dayExpenses = expenseCtx.getDailyExpenses(i);
         const expensesSum = dayExpenses.reduce((sum, expense) => {
-          if (isNaN(Number(expense.calcAmount))) return sum;
+          if (
+            isNaN(Number(expense.calcAmount)) ||
+            (hideSpecial && expense.isSpecialExpense)
+          )
+            return sum;
           return sum + Number(expense.calcAmount.toFixed(2));
         }, 0);
         const dailyBudget = tripCtx.dailyBudget;
@@ -107,9 +115,13 @@ const ExpenseGraph = ({
               Haptics.notificationAsync(
                 Haptics.NotificationFeedbackType.Success
               );
-              const filteredExpenses = expenseCtx.getSpecificDayExpenses(
-                new Date(item.day)
-              );
+              const filteredExpenses = expenseCtx
+                .getSpecificDayExpenses(new Date(item.day))
+                .filter(
+                  (item) =>
+                    !item.isSpecialExpense ||
+                    (item.isSpecialExpense && !hideSpecial)
+                );
               if (!filteredExpenses || filteredExpenses.length === 0) return;
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
@@ -118,9 +130,13 @@ const ExpenseGraph = ({
             }}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              const filteredExpenses = expenseCtx.getSpecificDayExpenses(
-                new Date(item.day)
-              );
+              const filteredExpenses = expenseCtx
+                .getSpecificDayExpenses(new Date(item.day))
+                .filter(
+                  (item) =>
+                    !item.isSpecialExpense ||
+                    (item.isSpecialExpense && !hideSpecial)
+                );
               if (!filteredExpenses || filteredExpenses.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
@@ -152,7 +168,11 @@ const ExpenseGraph = ({
         const { firstDay, lastDay, weeklyExpenses } =
           expenseCtx.getWeeklyExpenses(i);
         const expensesSum = weeklyExpenses.reduce((sum, expense) => {
-          if (isNaN(Number(expense.calcAmount))) return sum;
+          if (
+            isNaN(Number(expense.calcAmount)) ||
+            (hideSpecial && expense.isSpecialExpense)
+          )
+            return sum;
           return sum + Number(expense.calcAmount.toFixed(2));
         }, 0);
         let weeklyBudget = Number(tripCtx.dailyBudget) * 7;
@@ -199,9 +219,13 @@ const ExpenseGraph = ({
               Haptics.notificationAsync(
                 Haptics.NotificationFeedbackType.Success
               );
-              const filteredExpenses = expenseCtx.getSpecificWeekExpenses(
-                new Date(item.firstDay)
-              );
+              const filteredExpenses = expenseCtx
+                .getSpecificWeekExpenses(new Date(item.firstDay))
+                .filter(
+                  (item) =>
+                    !item.isSpecialExpense ||
+                    (item.isSpecialExpense && !hideSpecial)
+                );
               if (!filteredExpenses || filteredExpenses.length === 0) return;
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
@@ -210,9 +234,13 @@ const ExpenseGraph = ({
             }}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              const filteredExpenses = expenseCtx.getSpecificWeekExpenses(
-                new Date(item.firstDay)
-              );
+              const filteredExpenses = expenseCtx
+                .getSpecificWeekExpenses(new Date(item.firstDay))
+                .filter(
+                  (item) =>
+                    !item.isSpecialExpense ||
+                    (item.isSpecialExpense && !hideSpecial)
+                );
               if (!filteredExpenses || filteredExpenses.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
@@ -244,7 +272,11 @@ const ExpenseGraph = ({
         const { firstDay, lastDay, monthlyExpenses } =
           expenseCtx.getMonthlyExpenses(i);
         const expensesSum = monthlyExpenses.reduce((sum, expense) => {
-          if (isNaN(Number(expense.calcAmount))) return sum;
+          if (
+            isNaN(Number(expense.calcAmount)) ||
+            (hideSpecial && expense.isSpecialExpense)
+          )
+            return sum;
           return sum + Number(expense.calcAmount.toFixed(2));
         }, 0);
         let monthlyBudget = Number(tripCtx.dailyBudget) * 30;
@@ -281,9 +313,13 @@ const ExpenseGraph = ({
               Haptics.notificationAsync(
                 Haptics.NotificationFeedbackType.Success
               );
-              const filteredExpenses = expenseCtx.getSpecificMonthExpenses(
-                new Date(item.firstDay)
-              );
+              const filteredExpenses = expenseCtx
+                .getSpecificMonthExpenses(new Date(item.firstDay))
+                .filter(
+                  (item) =>
+                    !item.isSpecialExpense ||
+                    (item.isSpecialExpense && !hideSpecial)
+                );
               if (!filteredExpenses || filteredExpenses.length === 0) return;
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
@@ -292,9 +328,13 @@ const ExpenseGraph = ({
             }}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              const filteredExpenses = expenseCtx.getSpecificMonthExpenses(
-                new Date(item.firstDay)
-              );
+              const filteredExpenses = expenseCtx
+                .getSpecificMonthExpenses(new Date(item.firstDay))
+                .filter(
+                  (item) =>
+                    !item.isSpecialExpense ||
+                    (item.isSpecialExpense && !hideSpecial)
+                );
               if (!filteredExpenses || filteredExpenses.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
@@ -330,7 +370,11 @@ const ExpenseGraph = ({
         const { firstDay, lastDay, yearlyExpenses } =
           expenseCtx.getYearlyExpenses(i);
         const expensesSum = yearlyExpenses.reduce((sum, expense) => {
-          if (isNaN(Number(expense.calcAmount))) return sum;
+          if (
+            isNaN(Number(expense.calcAmount)) ||
+            (hideSpecial && expense.isSpecialExpense)
+          )
+            return sum;
           return sum + Number(expense.calcAmount.toFixed(2));
         }, 0);
 
@@ -367,9 +411,13 @@ const ExpenseGraph = ({
               Haptics.notificationAsync(
                 Haptics.NotificationFeedbackType.Success
               );
-              const filteredExpenses = expenseCtx.getSpecificYearExpenses(
-                new Date(item.firstDay)
-              );
+              const filteredExpenses = expenseCtx
+                .getSpecificYearExpenses(new Date(item.firstDay))
+                .filter(
+                  (item) =>
+                    !item.isSpecialExpense ||
+                    (item.isSpecialExpense && !hideSpecial)
+                );
               if (!filteredExpenses || filteredExpenses.length === 0) return;
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
@@ -378,9 +426,13 @@ const ExpenseGraph = ({
             }}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              const filteredExpenses = expenseCtx.getSpecificYearExpenses(
-                new Date(item.firstDay)
-              );
+              const filteredExpenses = expenseCtx
+                .getSpecificYearExpenses(new Date(item.firstDay))
+                .filter(
+                  (item) =>
+                    !item.isSpecialExpense ||
+                    (item.isSpecialExpense && !hideSpecial)
+                );
               if (!filteredExpenses || filteredExpenses.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,

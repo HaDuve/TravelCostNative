@@ -41,6 +41,8 @@ import ExpenseCountryFlag from "./ExpenseCountryFlag";
 import { SettingsContext } from "../../store/settings-context";
 import { useEffect } from "react";
 import * as Haptics from "expo-haptics";
+import { ExpenseData } from "../../util/expense";
+import { hide } from "expo-splash-screen";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -57,9 +59,9 @@ function ExpenseItem(props): JSX.Element {
     calcAmount,
     splitList,
     iconName,
-    showSumForTravellerName,
-    filtered,
-  } = props;
+    isSpecialExpense,
+  }: ExpenseData = props;
+  const { showSumForTravellerName, filtered } = props;
   let { date } = props;
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
@@ -120,6 +122,8 @@ function ExpenseItem(props): JSX.Element {
   const { settings } = useContext(SettingsContext);
   const toggle1 = settings.showFlags;
   const toggle2 = settings.showWhoPaid;
+  const toggle3 = settings.hideSpecialExpenses;
+  const hideSpecial = toggle3 && isSpecialExpense;
 
   const { fontScale } = useWindowDimensions();
   const isScaledUp = fontScale > 1;
@@ -132,7 +136,16 @@ function ExpenseItem(props): JSX.Element {
   }, [id, navigation]);
   const originalCurrencyJSX = !sameCurrency ? (
     <>
-      <Text style={styles.originalCurrencyText}>{amountString}</Text>
+      <Text
+        style={[
+          styles.originalCurrencyText,
+          hideSpecial && {
+            color: GlobalStyles.colors.textHidden,
+          },
+        ]}
+      >
+        {amountString}
+      </Text>
     </>
   ) : (
     <></>
@@ -187,7 +200,7 @@ function ExpenseItem(props): JSX.Element {
     <Animated.View
       entering={FadeInRight}
       exiting={FadeOutLeft}
-      style={{ height: 55 }}
+      style={[{ height: 55 }, hideSpecial && { opacity: 0.75 }]}
     >
       <Pressable
         onPress={memoizedCallback}
@@ -198,7 +211,11 @@ function ExpenseItem(props): JSX.Element {
             <Ionicons
               name={catSymbol}
               size={28}
-              color={GlobalStyles.colors.textColor}
+              color={
+                hideSpecial
+                  ? GlobalStyles.colors.textHidden
+                  : GlobalStyles.colors.textColor
+              }
             />
           </View>
           <View style={styles.leftItem}>
@@ -208,13 +225,18 @@ function ExpenseItem(props): JSX.Element {
                 styles.textBase,
                 styles.description,
                 toggle1 && toggle2 && { width: "90%" },
+                hideSpecial && { color: GlobalStyles.colors.textHidden },
               ]}
             >
               {description}
             </Text>
             <Text
               maxFontSizeMultiplier={1}
-              style={[styles.textBase, styles.secondaryText]}
+              style={[
+                styles.textBase,
+                styles.secondaryText,
+                hideSpecial && { color: GlobalStyles.colors.textHidden },
+              ]}
             >
               {dateString}
             </Text>
@@ -231,7 +253,16 @@ function ExpenseItem(props): JSX.Element {
           )}
           {toggle2 && <View>{sharedList}</View>}
           <View style={styles.amountContainer}>
-            <Text style={styles.amount}>{calcAmountString}</Text>
+            <Text
+              style={[
+                styles.amount,
+                hideSpecial && {
+                  color: GlobalStyles.colors.errorHidden,
+                },
+              ]}
+            >
+              {calcAmountString}
+            </Text>
             {originalCurrencyJSX}
           </View>
         </View>
@@ -255,6 +286,7 @@ ExpenseItem.propTypes = {
   iconName: PropTypes.string,
   showSumForTravellerName: PropTypes.string,
   filtered: PropTypes.bool,
+  isSpecialExpense: PropTypes.bool,
 };
 
 const styles = StyleSheet.create({
@@ -326,6 +358,7 @@ const styles = StyleSheet.create({
     fontWeight: "300",
     color: GlobalStyles.colors.error300,
   },
+
   originalCurrencyText: {
     fontSize: 12,
     textAlign: "center",

@@ -707,10 +707,12 @@ function Root() {
         await onlineSetup(tripData, checkUser, storedTripId, storedUid);
         await authCtx.authenticate(storedToken);
         console.log("Root end reached");
+        setAppIsReady(true);
       } else {
         tripCtx.setIsLoading(false);
         await asyncStoreSafeClear();
         await authCtx.logout();
+        setAppIsReady(true);
       }
       setAppIsReady(true);
     }
@@ -741,9 +743,9 @@ function Root() {
       await SplashScreen.hideAsync();
     }
     hideSplashScreen();
-  }, [appIsReady, tripCtx.isLoading]);
+  }, [appIsReady]);
 
-  if (!appIsReady || (authCtx.token && tripCtx.isLoading)) {
+  if (!appIsReady) {
     return <SplashScreenOverlay></SplashScreenOverlay>;
   }
 

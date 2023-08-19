@@ -43,6 +43,7 @@ import { NetworkContext } from "../store/network-context";
 import uniqBy from "lodash.uniqby";
 import { secureStoreSetItem } from "../store/secure-storage";
 import { setMMKVObject } from "../store/mmkv";
+import { err } from "react-native-svg/lib/typescript/xml";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -103,14 +104,18 @@ const JoinTrip = ({ navigation, route }) => {
       try {
         tripid = joinTripid;
         console.log("joinHandler ~ tripid", tripid);
-
+        console.log("joinHandler ~ uid:", uid);
+        console.log("joinHandler ~ userCtx.tripHistory:", userCtx.tripHistory);
+        console.log("joinHandler ~ userCtx.userName:", userCtx.userName);
         // if fresh store history else update
         if (userCtx.freshlyCreated) {
           await storeTripHistory(uid, [tripid]);
         } else {
           await updateTripHistory(uid, tripid);
         }
-        userCtx.setTripHistory(uniqBy([...userCtx.tripHistory, tripid]));
+        userCtx.setTripHistory(
+          uniqBy([...(userCtx.tripHistory ?? []), tripid])
+        );
 
         await putTravelerInTrip(tripid, {
           uid: uid,
@@ -120,11 +125,18 @@ const JoinTrip = ({ navigation, route }) => {
         updateUser(uid, {
           currentTrip: tripid,
         });
-        await tripCtx.setCurrentTrip(tripid, tripdata);
-        await tripCtx.fetchAndSetTravellers(tripid);
-        await userCtx.setFreshlyCreatedTo(false);
-        await userCtx.loadCatListFromAsyncInCtx(tripid);
+        try {
+          await tripCtx.setCurrentTrip(tripid, tripdata);
+          await tripCtx.fetchAndSetTravellers(tripid);
+          await userCtx.setFreshlyCreatedTo(false);
+          await userCtx.loadCatListFromAsyncInCtx(tripid);
+        } catch (error) {
+          console.log(error.message);
+          throw new Error("Error while updating user in context");
+        }
+
         const expenses = await getAllExpenses(tripid, uid);
+        console.log("joinHandler ~ expenses length:", expenses.length);
         expenseCtx.setExpenses(expenses);
         tripdata.expenses = [];
         setMMKVObject("currentTrip", tripdata);
@@ -156,7 +168,7 @@ const JoinTrip = ({ navigation, route }) => {
       const final_link_string = joinTripid.slice(index_start1 + 8).trim();
       console.log("joinLinkHandler ~ final_link_string:", final_link_string);
       setJoinTripid(final_link_string);
-      getTrip(final_link_string);
+      await getTrip(final_link_string);
     } else {
       await getTrip(joinTripid);
     }

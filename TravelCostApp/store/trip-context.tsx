@@ -207,14 +207,15 @@ function TripContextProvider({ children }) {
       const extractedTravellers = [];
       Object.keys(trip.travellers).forEach((key) => {
         //skip undefined keys
-        // if (!key || !travellers[key]) return;
-        console.log("Object.keys ~ key:", key);
-        console.log("Object.keys ~ travellers[key]:", travellers[key]);
-        console.log(
-          "Object.keys ~ travellers[key][userName]:",
-          travellers[key]["userName"]
-        );
-        extractedTravellers.push(travellers[key]["userName"]);
+        if (key && travellers[key]) {
+          console.log("Object.keys ~ key:", key);
+          console.log("Object.keys ~ travellers[key]:", travellers[key]);
+          console.log(
+            "Object.keys ~ travellers[key][userName]:",
+            travellers[key]["userName"]
+          );
+          extractedTravellers.push(travellers[key]["userName"]);
+        }
       });
       setTravellers(extractedTravellers);
     }

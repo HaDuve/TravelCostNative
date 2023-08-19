@@ -269,36 +269,46 @@ const ExpenseForm = ({
     Number(inputs.amount.value),
     inputs.currency.value
   )}`;
-  const duplOrSplitString =
-    duplOrSplit === 1
-      ? !isEditing
-        ? `${expenseString}${i18n.t("duplicateExpensesText")}\nover ${
-            daysBetween(new Date(endDate), new Date(startDate)) + 1
-          } days`
-        : `${formatExpenseWithCurrency(
-            Number(inputs.amount.value) *
-              (daysBetween(new Date(endDate), new Date(startDate)) + 1),
-            inputs.currency.value
-          )} = total expense amount \nover ${
-            daysBetween(new Date(endDate), new Date(startDate)) + 1
-          } days`
+
+  const duplEditingString = `${expenseString}${i18n.t(
+    "duplicateExpensesText"
+  )}\nover ${daysBetween(new Date(endDate), new Date(startDate)) + 1} days`;
+
+  const duplNewString = `${formatExpenseWithCurrency(
+    Number(inputs.amount.value) *
+      (daysBetween(new Date(endDate), new Date(startDate)) + 1),
+    inputs.currency.value
+  )} = total expense amount \nover ${
+    daysBetween(new Date(endDate), new Date(startDate)) + 1
+  } days`;
+
+  const duplString = !isEditing ? duplEditingString : duplNewString;
+
+  const splitEditingString = `${formatExpenseWithCurrency(
+    Number(inputs.amount.value) /
+      (daysBetween(new Date(endDate), new Date(startDate)) + 1),
+    inputs.currency.value
+  )}${i18n.t("splitUpExpensesText")}\nover ${
+    daysBetween(new Date(endDate), new Date(startDate)) + 1
+  } days`;
+
+  const splitNewString = `${formatExpenseWithCurrency(
+    Number(inputs.amount.value) *
+      (daysBetween(new Date(endDate), new Date(startDate)) + 1),
+    inputs.currency.value
+  )} = total expense amount \nover ${
+    daysBetween(new Date(endDate), new Date(startDate)) + 1
+  } days`;
+
+  const splitString = !isEditing ? splitEditingString : splitNewString;
+
+  const duplOrSplitString = (duplOrSplitNum: number) => {
+    return duplOrSplitNum === 1
+      ? duplString
       : duplOrSplit === 2
-      ? !isEditing
-        ? `${formatExpenseWithCurrency(
-            Number(inputs.amount.value) /
-              (daysBetween(new Date(endDate), new Date(startDate)) + 1),
-            inputs.currency.value
-          )}${i18n.t("splitUpExpensesText")}\nover ${
-            daysBetween(new Date(endDate), new Date(startDate)) + 1
-          } days`
-        : `${formatExpenseWithCurrency(
-            Number(inputs.amount.value) *
-              (daysBetween(new Date(endDate), new Date(startDate)) + 1),
-            inputs.currency.value
-          )} = total expense amount \nover ${
-            daysBetween(new Date(endDate), new Date(startDate)) + 1
-          } days`
+      ? splitString
       : "";
+  };
 
   const onConfirmRange = (output) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -314,7 +324,33 @@ const ExpenseForm = ({
       inputChangedHandler("date", startDateFormat);
       return;
     }
-    setDuplOrSplit(1);
+    // Alert ask if Dupl or Split
+    console.log(
+      `Duplicate: ${duplOrSplitString(1)} or Split: ${duplOrSplitString(2)}`
+    );
+    Alert.alert(
+      "dupl or split?", //i18n.t("duplOrSplit"),
+      `Duplicate: ${duplOrSplitString(1)} or Split: ${duplOrSplitString(2)}`, //i18n.t("duplOrSplitText"),
+      [
+        {
+          text: "duplicate", //i18n.t("duplicate"),
+          onPress: () => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setDuplOrSplit(1);
+            inputChangedHandler("date", startDateFormat);
+          },
+        },
+        {
+          text: "split", //i18n.t("split"),
+          onPress: () => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setDuplOrSplit(2);
+            inputChangedHandler("date", startDateFormat);
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   // list of all splits owed
@@ -378,6 +414,21 @@ const ExpenseForm = ({
       inputIdentifier === "amount" &&
       (splitType === "EXACT" || splitType === "EQUAL")
     ) {
+      // split into equal parts if we are splitting over a ranged date and are editing
+      if (duplOrSplit === 2 && isEditing) {
+        const newSplitList = recalcSplitsLinearly(
+          splitList,
+          +inputs.amount.value /
+            (daysBetween(new Date(endDate), new Date(startDate)) + 1)
+        );
+        setSplitList(newSplitList);
+        const isValidSplit = validateSplitList(
+          newSplitList,
+          splitType,
+          +inputs.amount.value
+        );
+        setSplitListValid(isValidSplit);
+      }
       const newSplitList = recalcSplitsLinearly(splitList, +value);
       setSplitList(newSplitList);
       const isValidSplit = validateSplitList(newSplitList, splitType, +value);
@@ -522,6 +573,22 @@ const ExpenseForm = ({
     const countryIsValid = true;
     const currencyIsValid = true;
     const owePercIsValid = true;
+
+    // split into equal parts if we are splitting over a ranged date and are editing
+    if (duplOrSplit === 2 && !isEditing) {
+      const newSplitList = recalcSplitsLinearly(
+        splitList,
+        +inputs.amount.value /
+          (daysBetween(new Date(endDate), new Date(startDate)) + 1)
+      );
+      setSplitList(newSplitList);
+      const isValidSplit = validateSplitList(
+        newSplitList,
+        splitType,
+        +inputs.amount.value
+      );
+      setSplitListValid(isValidSplit);
+    }
 
     if (
       !amountIsValid ||
@@ -1033,7 +1100,7 @@ const ExpenseForm = ({
                   {duplOrSplit !== 0 && (
                     <Card elevation={4} style={styles.card}>
                       <Text style={styles.dateLabelDuplSplitText}>
-                        {duplOrSplitString}
+                        {duplOrSplitString(duplOrSplit)}
                       </Text>
                     </Card>
                   )}

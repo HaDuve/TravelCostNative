@@ -1,5 +1,9 @@
 Change log Travel Expense App
 
+1.2.612
+- hotfixed joinTrip
+- fixed wrong division of amounts when splitting over multiple days and travellers
+
 1.2.611
 - added the option to mark expenses as special
 - added the option to hide special expenses from showing

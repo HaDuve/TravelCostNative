@@ -461,10 +461,10 @@ export async function fetchTripsTravellers(tripid: string) {
 }
 
 export async function getTravellers(tripid: string) {
-  console.log("getTravellers ~ tripid", tripid);
+  // console.log("getTravellers ~ tripid", tripid);
   try {
     const response = await fetchTripsTravellers(tripid);
-    console.log("getTravellers ~ response:", response);
+    // console.log("getTravellers ~ response:", response);
     const travellerids = [];
     const travelerNames = [];
     for (const key in response) {

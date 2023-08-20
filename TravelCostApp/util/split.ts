@@ -247,7 +247,7 @@ export function travellerToDropdown(travellers) {
   // sometimes this is not an array but an object
   try {
     travellers.forEach((traveller) => {
-      console.log("travellers.forEach ~ traveller:", traveller);
+      // console.log("travellers.forEach ~ traveller:", traveller);
       // TODO: make value uid based and not name based
       listOfLabelValues.push({ label: traveller, value: traveller });
     });

@@ -49,7 +49,7 @@ const CurrencyPicker = ({
   const nonEnglish = CC !== "en";
   const nonEnglishCountryString = (code) => {
     if (!nonEnglish) return "";
-    return `- ${nonEnglish && countries.getName(code, CC)}`;
+    return ` - ${nonEnglish && countries.getName(code, CC)}`;
   };
 
   const countryOptions = Object.keys(countries.getNames("en")).map((code) => ({

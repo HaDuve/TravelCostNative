@@ -1,7 +1,11 @@
 Change log Travel Expense App
 
+1.2.621
+- translated currency and country picker labels
+- fixed loading toast size being too small in some languages
+
 1.2.620
-- added dropdown with search for countries
+- added dropdown with search for countries (similar to currency)
 
 1.2.612
 - hotfixed joinTrip

@@ -81,6 +81,7 @@ import { ActivityIndicator } from "react-native-paper";
 import BackButton from "../UI/BackButton";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import SettingsSwitch from "../UI/SettingsSwitch";
+import CountryPicker from "../Currency/CountryPicker";
 
 const ExpenseForm = ({
   onCancel,
@@ -107,12 +108,20 @@ const ExpenseForm = ({
   const lastCurrency = userCtx.lastCurrency
     ? userCtx.lastCurrency
     : tripCtx.tripCurrency;
+  const lastCountry = userCtx.lastCountry ? userCtx.lastCountry : "";
   const currencyPlaceholder = isEditing
     ? editingValues.currency + " | " + getCurrencySymbol(editingValues.currency)
     : lastCurrency + " | " + getCurrencySymbol(lastCurrency);
-
+  const countryPlaceholder = isEditing
+    ? editingValues.country
+    : userCtx.lastCountry ?? "";
   const [hideAdvanced, sethideAdvanced] = useState(true);
-  const [countryValue, setCountryValue] = useState("EUR");
+  const [currencyPickerValue, setCurrencyPickerValue] = useState(
+    isEditing ? editingValues.currency : lastCurrency
+  );
+  const [countryPickerValue, setCountryPickerValue] = useState(
+    isEditing ? editingValues.country : userCtx.lastCountry
+  );
   const [loadingTravellers, setLoadingTravellers] = useState(
     !tripCtx.travellers && tripCtx.travellers.length < 1
   );
@@ -241,7 +250,7 @@ const ExpenseForm = ({
   const [isSpecialExpense, setIsSpecialExpense] = useState(
     editingValues?.isSpecialExpense ?? false
   );
-  console.log("rerender: special:", isSpecialExpense);
+  // console.log("rerender: special:", isSpecialExpense);
 
   useEffect(() => {
     // console.log("useEffect ~ tripCtx.isPaidDate", tripCtx?.isPaidDate);
@@ -854,10 +863,14 @@ const ExpenseForm = ({
 
   function updateCurrency() {
     // split the countryValue into country and currency
-    const currency = countryValue.split("- ")[1].split(" ")[0].trim();
-    const country = countryValue.split("- ")[0].trim();
+    const currency = currencyPickerValue?.split("- ")[0]?.split(" ")[0]?.trim();
+    // const country = currencyPickerValue?.split("- ")[1].trim();
     inputChangedHandler("currency", currency);
-    inputChangedHandler("country", country);
+  }
+
+  function updateCountry() {
+    const country_EN = countryPickerValue?.split("- ")[0].trim();
+    inputChangedHandler("country", country_EN);
   }
 
   const formIsInvalid =
@@ -1020,19 +1033,28 @@ const ExpenseForm = ({
                 }}
                 invalid={!inputs.description.isValid}
               /> */}
+
                 <View style={styles.currencyContainer}>
                   {/* <Text style={styles.currencyLabel}>
                   {i18n.t("currencyLabel")}
                 </Text> */}
                   <CurrencyPicker
-                    countryValue={countryValue}
-                    setCountryValue={setCountryValue}
+                    countryValue={currencyPickerValue}
+                    setCountryValue={setCurrencyPickerValue}
                     onChangeValue={updateCurrency}
                     placeholder={currencyPlaceholder}
                   ></CurrencyPicker>
                 </View>
                 <View style={[styles.inputsRowSecond]}>
-                  <Input
+                  <View style={styles.countryContainer}>
+                    <CountryPicker
+                      countryValue={countryPickerValue}
+                      setCountryValue={setCountryPickerValue}
+                      onChangeValue={updateCountry}
+                      placeholder={countryPlaceholder}
+                    ></CountryPicker>
+                  </View>
+                  {/* <Input
                     label={i18n.t("countryLabel")}
                     style={{ minWidth: "60%" }}
                     placeholder={userCtx.lastCountry ?? i18n.t("countryLabel")}
@@ -1041,7 +1063,7 @@ const ExpenseForm = ({
                       value: inputs.country.value,
                     }}
                     invalid={!inputs.country.isValid}
-                  />
+                  /> */}
                   <ExpenseCountryFlag
                     countryName={inputs.country.value}
                     containerStyle={styles.countryFlagContainer}
@@ -1570,9 +1592,14 @@ const styles = StyleSheet.create({
     alignItems: "baseline",
   },
   currencyContainer: {
+    maxWidth: "100%",
     marginBottom: "2%",
     // borderBottomWidth: 1,
     // borderBottomColor: GlobalStyles.colors.gray700,
+  },
+  countryContainer: {
+    maxWidth: "75%",
+    marginLeft: "1%",
   },
   currencyLabel: {
     fontSize: 13,

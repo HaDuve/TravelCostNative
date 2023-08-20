@@ -20,7 +20,7 @@ i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
 i18n.enableFallback = true;
 
-const CurrencyPicker = ({
+const CountryPicker = ({
   countryValue,
   setCountryValue,
   onChangeValue,
@@ -31,20 +31,15 @@ const CurrencyPicker = ({
   // enforce a language we have registered, otherwise, english
   let CC = Localization.locale.slice(0, 2);
   if (CC !== "de" && CC !== "en") CC = "en";
-  // const CC = "en";
+  //   const CC = "en";
 
-  const countryToCurrency = require("country-to-currency");
   const countries = require("i18n-iso-countries");
   i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/en.json"));
   i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/de.json"));
 
   const countryOptions = Object.keys(countries.getNames("en")).map((code) => ({
-    label: `${countryToCurrency[code]} | ${getCurrencySymbol(
-      countryToCurrency[code]
-    )} - ${countries.getName(code, "en")} - ${countries.getName(code, CC)}`,
-    value: `${countryToCurrency[code]} | ${getCurrencySymbol(
-      countryToCurrency[code]
-    )} - ${countries.getName(code, "en")} -  ${countries.getName(code, CC)}`,
+    label: `${countries.getName(code, "en")} - ${countries.getName(code, CC)}`,
+    value: `${countries.getName(code, "en")} - ${countries.getName(code, CC)}`,
   }));
 
   const [open, setOpen] = useState(false);
@@ -101,9 +96,9 @@ const CurrencyPicker = ({
   );
 };
 
-export default CurrencyPicker;
+export default CountryPicker;
 
-CurrencyPicker.propTypes = {
+CountryPicker.propTypes = {
   countryValue: PropTypes.string.isRequired,
   setCountryValue: PropTypes.func.isRequired,
   onChangeValue: PropTypes.func.isRequired,

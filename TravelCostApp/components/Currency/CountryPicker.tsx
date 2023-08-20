@@ -30,16 +30,30 @@ const CountryPicker = ({
   // Users Device CountryCode CC to translate Country names in picker
   // enforce a language we have registered, otherwise, english
   let CC = Localization.locale.slice(0, 2);
-  if (CC !== "de" && CC !== "en") CC = "en";
+  if (CC !== "de" && CC !== "en" && CC !== "fr" && CC !== "ru") CC = "en";
   //   const CC = "en";
 
   const countries = require("i18n-iso-countries");
   i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/en.json"));
   i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/de.json"));
+  i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/fr.json"));
+  i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/ru.json"));
+  // i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/es.json"));
+  // i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/zh.json"));
+  // i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/hi.json"));
+  // i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/ar.json"));
+  // i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/pt.json"));
+  // i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/ja.json"));
+
+  const nonEnglish = CC !== "en";
+  const nonEnglishCountryString = (code) => {
+    if (!nonEnglish) return "";
+    return `- ${nonEnglish && countries.getName(code, CC)}`;
+  };
 
   const countryOptions = Object.keys(countries.getNames("en")).map((code) => ({
-    label: `${countries.getName(code, "en")} - ${countries.getName(code, CC)}`,
-    value: `${countries.getName(code, "en")} - ${countries.getName(code, CC)}`,
+    label: `${countries.getName(code, "en")}` + nonEnglishCountryString(code),
+    value: `${countries.getName(code, "en")}` + nonEnglishCountryString(code),
   }));
 
   const [open, setOpen] = useState(false);

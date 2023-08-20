@@ -37,7 +37,6 @@ export const ExpensesContext = createContext({
       country,
       currency,
       whoPaid,
-      owePerc,
       calcAmount,
       iconName,
     }: ExpenseData,
@@ -55,7 +54,6 @@ export const ExpensesContext = createContext({
       country,
       currency,
       whoPaid,
-      owePerc,
       calcAmount,
       iconName,
     }: ExpenseData

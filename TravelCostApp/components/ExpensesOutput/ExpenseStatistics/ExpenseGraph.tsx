@@ -36,7 +36,7 @@ const ExpenseGraph = ({
   tripCtx,
   navigation,
 }) => {
-  console.log("rerender ExpenseGraph - 2");
+  // console.log("rerender ExpenseGraph - 2");
   const today = new Date();
   const renderItemRef = useRef(null);
   const expenseCtx = useContext(ExpensesContext);

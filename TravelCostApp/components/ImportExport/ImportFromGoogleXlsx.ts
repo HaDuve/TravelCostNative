@@ -276,8 +276,6 @@ async function importCostDataFromGSXlsx(
           : expenseObj.whoPaid == "T"
           ? "Tina"
           : expenseObj.whoPaid,
-      // owePerc is outdated
-      owePerc: 0,
       splitType: "EXACT",
       // hardcoded for now
       listEQUAL: ["Hannes", "Tina"],
@@ -285,13 +283,6 @@ async function importCostDataFromGSXlsx(
         { amount: splitString[0], userName: "Hannes" },
         { amount: splitString[1], userName: "Tina" },
       ],
-    };
-    const performTimeConsumingTask = async () => {
-      return new Promise((resolve) =>
-        setTimeout(() => {
-          resolve("result");
-        }, 10)
-      );
     };
     if (fromDate != null && new Date(fromDate) > new Date(expenseData.date)) {
       continue; // too old

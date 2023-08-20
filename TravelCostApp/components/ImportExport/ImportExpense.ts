@@ -47,7 +47,6 @@ export async function importCategory(
       country: "",
       currency: "EUR",
       whoPaid: userName,
-      owePerc: 0,
       splitType: "SELF",
       listEQUAL: [userName],
       splitList: [],
@@ -56,31 +55,3 @@ export async function importCategory(
     await storeImportedExpense(expenseData);
   }
 }
-
-// For reference
-
-// ~~ From ExpenseForm
-// function fastSubmit() {
-//   const expenseData = {
-//     uid: AuthCtx.uid,
-//     amount: +inputs.amount.value,
-//     date: new Date(),
-//     endDate: new Date(),
-//     description: pickedCat,
-//     category: pickedCat,
-//     country: UserCtx.lastCountry ? UserCtx.lastCountry : UserCtx.homeCountry,
-//     currency: UserCtx.lastCurrency
-//       ? UserCtx.lastCurrency
-//       : TripCtx.tripCurrency,
-//     whoPaid: UserCtx.userName,
-//     owePerc: "0",
-//     splitType: "SELF",
-//     listEQUAL: currentTravellers,
-//     splitList: [],
-//   };
-//   onSubmit(expenseData);
-// }
-
-// ~~From ManageExpense
-//   const id = await storeExpense(tripid, uid, expenseData);
-//   expenseCtx.addExpense({ ...expenseData, id: id });

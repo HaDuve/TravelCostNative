@@ -159,10 +159,6 @@ const ExpenseForm = ({
       value: editingValues ? editingValues.whoPaid : "",
       isValid: true,
     },
-    owePerc: {
-      value: editingValues ? editingValues.owePerc?.toString() : "",
-      isValid: true,
-    },
   });
   const iconString = iconName ? iconName : getCatSymbol(pickedCat);
   const [icon, setIcon] = useState(iconString);
@@ -386,7 +382,7 @@ const ExpenseForm = ({
   const [splitItems, setSplitTypeItems] = useState(splitTypesItems);
   const [openSplitTypes, setOpenSplitTypes] = useState(false);
   const [splitType, setSplitType] = useState(
-    editingValues ? editingValues.splitType : null
+    editingValues ? editingValues.splitType : "SELF"
   );
 
   // dropdown for EQUAL share picker
@@ -540,7 +536,6 @@ const ExpenseForm = ({
       country: inputs.country.value,
       currency: inputs.currency.value,
       whoPaid: whoPaid, // TODO: convert this to uid
-      owePerc: +inputs.owePerc.value,
       splitType: splitType,
       listEQUAL: splitTravellersList,
       splitList: splitList,
@@ -568,7 +563,6 @@ const ExpenseForm = ({
     const categoryIsValid = true;
     const countryIsValid = true;
     const currencyIsValid = true;
-    const owePercIsValid = true;
 
     // split into equal parts if we are splitting over a ranged date and are editing
     if (duplOrSplit === 2 && !isEditing) {
@@ -594,7 +588,6 @@ const ExpenseForm = ({
       !countryIsValid ||
       !currencyIsValid ||
       !whoPaidIsValid ||
-      !owePercIsValid ||
       !splitListValid
     ) {
       setInputs((curInputs) => {
@@ -623,10 +616,6 @@ const ExpenseForm = ({
           whoPaid: {
             value: curInputs.whoPaid.value,
             isValid: whoPaidIsValid,
-          },
-          owePerc: {
-            value: curInputs.owePerc.value,
-            isValid: owePercIsValid,
           },
         };
       });
@@ -659,13 +648,13 @@ const ExpenseForm = ({
       country: userCtx.lastCountry ? userCtx.lastCountry : "",
       currency: lastCurrency,
       whoPaid: userCtx.userName,
-      owePerc: "0",
-      splitType: "SELF",
+      splitType: splitType,
       listEQUAL: currentTravellers,
-      splitList: [],
+      splitList: splitList,
       iconName: iconName,
       isPaid: isPaid,
       isSpecialExpense: isSpecialExpense,
+      duplOrSplit: duplOrSplit,
     };
     await onSubmit(expenseData);
   }
@@ -685,9 +674,6 @@ const ExpenseForm = ({
     }
     if (!inputs.whoPaid.isValid) {
       setWhoPaid(userCtx.userName);
-    }
-    if (!inputs.owePerc.isValid) {
-      inputChangedHandler("owePerc", "0");
     }
   }
 
@@ -913,7 +899,6 @@ const ExpenseForm = ({
     country: inputs.country.value,
     currency: inputs.currency.value,
     whoPaid: whoPaid,
-    owePerc: +inputs.owePerc.value,
     splitType: splitType,
     listEQUAL: splitTravellersList,
     splitList: splitList,

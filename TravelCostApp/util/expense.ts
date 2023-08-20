@@ -21,7 +21,6 @@ export interface ExpenseData {
   country?: string;
   currency: string;
   whoPaid: string;
-  owePerc: number;
   calcAmount: number;
   duplOrSplit?: number;
   splitList?: Split[];
@@ -52,7 +51,6 @@ export interface ExpenseDataOnline {
   country?: string;
   currency: string;
   whoPaid: string;
-  owePerc: number;
   calcAmount: number;
   duplOrSplit?: number;
   splitList?: Split[];

@@ -75,6 +75,7 @@ const toastConfig = {
         {
           borderLeftColor: GlobalStyles.colors.cat8,
           backgroundColor: GlobalStyles.colors.backgroundColor,
+          minHeight: MINHEIGHT,
         },
         GlobalStyles.wideStrongShadow,
       ]}

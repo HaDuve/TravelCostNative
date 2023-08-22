@@ -66,8 +66,8 @@ const ManageExpense = ({ route, navigation }) => {
     (expense) => expense.id === editedExpenseId
   );
   console.log(
-    "ManageExpense ~ selectedExpense.rangeId:",
-    selectedExpense.rangeId
+    "ManageExpense ~ selectedExpense?.rangeId:",
+    selectedExpense?.rangeId
   );
   const selectedExpenseAuthorUid = selectedExpense?.uid;
 
@@ -115,6 +115,11 @@ const ManageExpense = ({ route, navigation }) => {
             expenseCtx?.deleteExpense(expense.id);
             await deleteExpenseOnlineOffline(queueItem, isOnline);
             console.log("deleted expense nr: " + expCounter, expense.id);
+            Toast.hide();
+            console.log(
+              "progress / countRangedExpensesMax",
+              expCounter / countRangedExpensesMax
+            );
             Toast.show({
               type: "loading",
               text1: i18n.t("toastDeleting1"),
@@ -175,15 +180,15 @@ const ManageExpense = ({ route, navigation }) => {
       {
         text: i18n.t("yes"),
         onPress: async () => {
-          if (selectedExpense.rangeId) {
+          if (selectedExpense?.rangeId) {
             // do you want to delete one or all expenses with this rangeId?
             Alert.alert(
               `Delete grouped range expenses?`,
               `This will delete all entries that belong to ${
-                selectedExpense.description
+                selectedExpense?.description
               } for ${formatExpenseWithCurrency(
-                Number(selectedExpense.calcAmount),
-                selectedExpense.currency
+                Number(selectedExpense?.calcAmount),
+                selectedExpense?.currency
               )}!`,
               [
                 //i18n.t("deleteAllExpenses"), i18n.t("deleteAllExpensesExt")
@@ -336,7 +341,7 @@ const ManageExpense = ({ route, navigation }) => {
     // find all the expenses that have the same identifying rangeId
     const expensesInRange = expenseCtx.expenses.filter(
       (expense) =>
-        expense.rangeId && expense.rangeId === selectedExpense.rangeId
+        expense.rangeId && expense.rangeId === selectedExpense?.rangeId
     );
     // if we dont find any expenses, it must have been a non-ranged expense, so update it to a ranged expense
     if (expensesInRange.length === 0) {

@@ -67,7 +67,7 @@ const toastConfig = {
       I can consume any custom `props` I want.
       They will be passed when calling the `show` method (see below)
     */
-  loading: (props) => (
+  loading: ({ progress, size, ...props }) => (
     // props.progress - is a number from 0 to 1 or -1 (indeterminate)
     <BaseToast
       {...props}
@@ -100,7 +100,10 @@ const toastConfig = {
             marginRight: 10,
           }}
         >
-          <LoadingBarOverlay progress={props.progress}></LoadingBarOverlay>
+          <LoadingBarOverlay
+            progress={Number(progress)}
+            size={size}
+          ></LoadingBarOverlay>
         </View>
       )}
       onPress={() => Toast.hide()}

@@ -299,6 +299,18 @@ const ManageExpense = ({ route, navigation }) => {
       console.log("day nr: ", i);
       setProgressAt(i);
       setProgress(i / days);
+      Toast.show({
+        type: "loading",
+        text1: i18n.t("toastSaving1"),
+        text2: i18n.t("toastSaving2") + " " + (i + 1) + "/" + (days + 1),
+        autoHide: false,
+        props: {
+          progress: i / days,
+          progressAt: i,
+          progressMax: days,
+          size: "small",
+        },
+      });
       console.log("progress", i / days);
       const newDate = getDatePlusDays(day1, i);
       newDate.setHours(new Date().getHours(), new Date().getMinutes());

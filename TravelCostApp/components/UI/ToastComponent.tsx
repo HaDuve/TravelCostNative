@@ -100,7 +100,7 @@ const toastConfig = {
             marginRight: 10,
           }}
         >
-          <LoadingBarOverlay></LoadingBarOverlay>
+          <LoadingBarOverlay progress={props.progress}></LoadingBarOverlay>
         </View>
       )}
       onPress={() => Toast.hide()}

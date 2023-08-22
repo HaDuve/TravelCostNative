@@ -9,7 +9,7 @@ import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
-import { touchAllTravelers } from "../util/http";
+import { getAllExpenses, touchAllTravelers } from "../util/http";
 import { GlobalStyles } from "../constants/styles";
 import { getRate } from "../util/currencyExchange";
 import { daysBetween, getDatePlusDays } from "../util/date";
@@ -33,6 +33,7 @@ import { NetworkContext } from "../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import * as Haptics from "expo-haptics";
 import { setMMKVObject } from "../store/mmkv";
+import { formatExpenseWithCurrency } from "../util/string";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -61,8 +62,12 @@ const ManageExpense = ({ route, navigation }) => {
   const editedExpenseId = route.params?.expenseId;
   const isEditing = !!editedExpenseId;
 
-  const selectedExpense = expenseCtx.expenses.find(
+  const selectedExpense: ExpenseData = expenseCtx.expenses.find(
     (expense) => expense.id === editedExpenseId
+  );
+  console.log(
+    "ManageExpense ~ selectedExpense.rangeId:",
+    selectedExpense.rangeId
   );
   const selectedExpenseAuthorUid = selectedExpense?.uid;
 
@@ -75,6 +80,64 @@ const ManageExpense = ({ route, navigation }) => {
   }, [netCtx.isConnected, netCtx.strongConnection]);
 
   async function deleteExpenseHandler() {
+    async function deleteAllExpenses() {
+      try {
+        navigation?.popToTop();
+        Toast.show({
+          type: "loading",
+          text1: i18n.t("toastDeleting1"),
+          text2: i18n.t("toastDeleting2"),
+          autoHide: false,
+        });
+        const allExpenses = await getAllExpenses(tripid);
+
+        const rangedExpenses = allExpenses.filter(
+          (expense) => expense?.rangeId == selectedExpense?.rangeId
+        );
+        const countRangedExpensesMax = rangedExpenses.length;
+        console.log(
+          "deleteAllExpenses ~ countRangedExpensesMax:",
+          countRangedExpensesMax
+        );
+        let expCounter = 0;
+        for (let i = 0; i < allExpenses.length; i++) {
+          const expense: ExpenseData = allExpenses[i];
+          if (expense?.rangeId == selectedExpense?.rangeId) {
+            expCounter++;
+            const queueItem: OfflineQueueManageExpenseItem = {
+              type: "delete",
+              expense: {
+                tripid: tripid,
+                uid: expense.uid,
+                id: expense.id,
+              },
+            };
+            expenseCtx?.deleteExpense(expense.id);
+            await deleteExpenseOnlineOffline(queueItem, isOnline);
+            console.log("deleted expense nr: " + expCounter, expense.id);
+            Toast.show({
+              type: "loading",
+              text1: i18n.t("toastDeleting1"),
+              text2: i18n.t("toastDeleting2"),
+              autoHide: false,
+              props: {
+                progress: expCounter / countRangedExpensesMax,
+              },
+            });
+          }
+        }
+        await touchAllTravelers(tripid, true);
+        Toast.hide();
+      } catch (error) {
+        console.log("delete All Error:", error);
+        Toast.show({
+          text1: i18n.t("error"),
+          text2: i18n.t("error2"),
+          type: "error",
+        });
+      }
+    }
+
     async function deleteExp() {
       // setIsSubmitting(true);
       try {
@@ -112,8 +175,67 @@ const ManageExpense = ({ route, navigation }) => {
       {
         text: i18n.t("yes"),
         onPress: async () => {
-          navigation.popToTop();
-          await deleteExp();
+          if (selectedExpense.rangeId) {
+            // do you want to delete one or all expenses with this rangeId?
+            Alert.alert(
+              `Delete grouped range expenses?`,
+              `This will delete all entries that belong to ${
+                selectedExpense.description
+              } for ${formatExpenseWithCurrency(
+                Number(selectedExpense.calcAmount),
+                selectedExpense.currency
+              )}!`,
+              [
+                //i18n.t("deleteAllExpenses"), i18n.t("deleteAllExpensesExt")
+                // The "No" button
+                // Does nothing but dismiss the dialog when tapped
+                {
+                  text: i18n.t("no"),
+                  onPress: async () => {
+                    try {
+                      navigation?.popToTop();
+                      Toast.show({
+                        type: "loading",
+                        text1: i18n.t("toastDeleting1"),
+                        text2: i18n.t("toastDeleting2"),
+                        autoHide: false,
+                      });
+                      const item: OfflineQueueManageExpenseItem = {
+                        type: "delete",
+                        expense: {
+                          tripid: tripid,
+                          uid: uid,
+                          id: editedExpenseId,
+                        },
+                      };
+                      expenseCtx?.deleteExpense(editedExpenseId);
+                      await deleteExpenseOnlineOffline(item, isOnline);
+                      await touchAllTravelers(tripid, true);
+                      Toast.hide();
+                    } catch (error) {
+                      console.log(i18n.t("deleteError"), error);
+                      Toast.show({
+                        text1: i18n.t("error"),
+                        text2: i18n.t("error2"),
+                        type: "error",
+                      });
+                    }
+                  },
+                },
+                // The "Yes" button
+                {
+                  text: i18n.t("yes"),
+                  onPress: async () => {
+                    await deleteAllExpenses();
+                    return;
+                  },
+                },
+              ]
+            );
+          } else {
+            navigation.popToTop();
+            await deleteExp();
+          }
         },
       },
     ]);
@@ -216,6 +338,23 @@ const ManageExpense = ({ route, navigation }) => {
       (expense) =>
         expense.rangeId && expense.rangeId === selectedExpense.rangeId
     );
+    // if we dont find any expenses, it must have been a non-ranged expense, so update it to a ranged expense
+    if (expensesInRange.length === 0) {
+      console.log("no expenses in range found");
+      await creatingRangedData(expenseData);
+      // delete the original expense
+      const item: OfflineQueueManageExpenseItem = {
+        type: "delete",
+        expense: {
+          tripid: tripid,
+          uid: selectedExpenseAuthorUid,
+          id: editedExpenseId,
+        },
+      };
+      expenseCtx.deleteExpense(editedExpenseId);
+      await deleteExpenseOnlineOffline(item, isOnline);
+      return;
+    }
     // sort the expenses by date, oldest expense first
     expensesInRange.sort((a, b) => {
       return new Date(a.date).getTime() - new Date(b.date).getTime();

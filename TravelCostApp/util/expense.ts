@@ -31,6 +31,12 @@ export interface ExpenseData {
   isSpecialExpense?: boolean;
 }
 
+export enum DuplicateOption {
+  null = 0,
+  duplicate = 1,
+  split = 2,
+}
+
 export enum isPaidString {
   paid = "paid",
   notPaid = "not paid",

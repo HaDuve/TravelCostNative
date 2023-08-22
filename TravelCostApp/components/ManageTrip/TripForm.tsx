@@ -261,7 +261,6 @@ const TripForm = ({ navigation, route }) => {
         expenses.forEach((element) => {
           expenseCtx.addExpense(element);
         });
-        // await asyncStoreSetObject("expenses", expenses);
         setMMKVObject("expenses", expenses);
         navigation.navigate("RecentExpenses");
         return;
@@ -548,6 +547,7 @@ const TripForm = ({ navigation, route }) => {
     return (
       <LoadingBarOverlay
         customText="Loading new trip..."
+        containerStyle={GlobalStyles.wideStrongShadow}
         progress={loadingProgress == 0 ? null : loadingProgress / 9}
         // progressMax={10}
         // progressAt={loadingProgress}

@@ -69,7 +69,7 @@ import PropTypes from "prop-types";
 import GradientButton from "../UI/GradientButton";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { recalcSplitsForExact } from "../../util/split";
-import { ExpenseData, isPaidString } from "../../util/expense";
+import { DuplicateOption, ExpenseData, isPaidString } from "../../util/expense";
 import { NetworkContext } from "../../store/network-context";
 import { SettingsContext } from "../../store/settings-context";
 import Autocomplete from "../UI/Autocomplete";
@@ -267,8 +267,8 @@ const ExpenseForm = ({
   }, [tripCtx.isPaidDate, startDate]);
 
   // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
-  const [duplOrSplit, setDuplOrSplit] = useState<number>(
-    editingValues ? Number(editingValues.duplOrSplit) : 0
+  const [duplOrSplit, setDuplOrSplit] = useState<DuplicateOption>(
+    editingValues ? Number(editingValues.duplOrSplit) : DuplicateOption.null
   );
   const expenseString = `${formatExpenseWithCurrency(
     Number(inputs.amount.value),
@@ -315,12 +315,12 @@ const ExpenseForm = ({
       : "";
   };
 
-  const onConfirmRange = (output) => {
+  const onConfirmRange = (expenseOut) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(false);
     // hotfixing datebug for asian countries
-    const startDate = DateTime.fromJSDate(output.startDate).toJSDate();
-    const endDate = DateTime.fromJSDate(output.endDate).toJSDate();
+    const startDate = DateTime.fromJSDate(expenseOut.startDate).toJSDate();
+    const endDate = DateTime.fromJSDate(expenseOut.endDate).toJSDate();
     const startDateFormat = getFormattedDate(startDate);
     const endDateFormat = getFormattedDate(endDate);
     setStartDate(startDateFormat);
@@ -333,12 +333,15 @@ const ExpenseForm = ({
     console.log(
       `Duplicate: ${duplOrSplitString(1)} or Split: ${duplOrSplitString(2)}`
     );
+    // TODO: make this pretty
     Alert.alert(
-      "dupl or split?", //i18n.t("duplOrSplit"),
-      `Duplicate: ${duplOrSplitString(1)} or Split: ${duplOrSplitString(2)}`, //i18n.t("duplOrSplitText"),
+      "Duplicate or split?", //i18n.t("duplOrSplit"),
+      `Duplicate the expense: ${duplOrSplitString(
+        1
+      )} or Split the expense: ${duplOrSplitString(2)}`, //i18n.t("duplOrSplitText"),
       [
         {
-          text: "duplicate", //i18n.t("duplicate"),
+          text: "Duplicate", //i18n.t("duplicate"),
           onPress: () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setDuplOrSplit(1);
@@ -346,7 +349,7 @@ const ExpenseForm = ({
           },
         },
         {
-          text: "split", //i18n.t("split"),
+          text: "Split", //i18n.t("split"),
           onPress: () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setDuplOrSplit(2);

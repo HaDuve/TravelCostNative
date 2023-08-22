@@ -20,7 +20,14 @@ i18n.enableFallback = true;
 const loadingColor = GlobalStyles.colors.primary500;
 const unfilledColor = GlobalStyles.colors.gray600;
 const LoadingBarOverlay = (props) => {
-  const { containerStyle, progressAt, progressMax, customText, noText } = props;
+  const {
+    containerStyle,
+    progressAt,
+    progressMax,
+    customText,
+    noText,
+    barWidth = 100,
+  } = props;
   let { progress, size } = props;
   const renderedText = customText ?? "Uploading your Expenses ... "; //i18n.t("uploadingExpenses");
   if (!size) size = "large";
@@ -42,6 +49,11 @@ const LoadingBarOverlay = (props) => {
   if (progress > 1) {
     progress = 1;
   }
+  const progressMaxGiven = progressMax && !isNaN(Number(progressMax));
+  const progressAtGiven = progressAt && !isNaN(Number(progressAt));
+  const progressMaxIsBiggerThanProgressAt =
+    progressMaxGiven && progressAtGiven && progressMax > progressAt;
+  const validProgress = progressMaxIsBiggerThanProgressAt;
   return (
     <View style={[styles.container, containerStyle]}>
       <View style={styles.headerContainer}>
@@ -55,11 +67,13 @@ const LoadingBarOverlay = (props) => {
         borderRadius={8}
         progress={progress}
         height={14}
-        width={100}
+        width={barWidth}
       />
-      <Text style={styles.text}>
-        {progressAt}/{progressMax}
-      </Text>
+      {validProgress && (
+        <Text style={styles.text}>
+          {progressAt}/{progressMax}
+        </Text>
+      )}
     </View>
   );
 };
@@ -74,6 +88,7 @@ LoadingBarOverlay.propTypes = {
   customText: PropTypes.string,
   noText: PropTypes.bool,
   size: PropTypes.string,
+  barWidth: PropTypes.number,
 };
 
 const styles = StyleSheet.create({

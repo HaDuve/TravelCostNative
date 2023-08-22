@@ -1,6 +1,13 @@
 import React from "react";
 import { useState, useContext, useEffect, useLayoutEffect } from "react";
-import { View, Text, Alert, ScrollView, Platform } from "react-native";
+import {
+  View,
+  Text,
+  Alert,
+  ScrollView,
+  Platform,
+  Dimensions,
+} from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
@@ -62,6 +69,8 @@ import { onShare } from "../ProfileOutput/ShareTrip";
 import { NetworkContext } from "../../store/network-context";
 import { setMMKVObject } from "../../store/mmkv";
 import { useTourGuideController } from "rn-tourguide";
+import LoadingBarOverlay from "../UI/LoadingBarOverlay";
+import { useWindowDimensions } from "react-native";
 
 const TripForm = ({ navigation, route }) => {
   const netCtx = useContext(NetworkContext);
@@ -72,6 +81,7 @@ const TripForm = ({ navigation, route }) => {
     setIsConnected(isOnline && isFast);
   }, [isOnline, isFast]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const [infoIsVisible, setInfoIsVisible] = useState(false);
   const {
     canStart, // a boolean indicate if you can start tour guide
@@ -113,6 +123,7 @@ const TripForm = ({ navigation, route }) => {
     //   :
     getFormattedDate(DateTime.now().plus({ days: 7 }))
   );
+  const [travellers, setTravellers] = useState([]);
 
   const openDatePickerRange = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -157,6 +168,7 @@ const TripForm = ({ navigation, route }) => {
         );
         setStartDate(selectedTrip.startDate);
         setEndDate(selectedTrip.endDate);
+        setTravellers(selectedTrip.travellers);
         console.log("travellers", selectedTrip.travellers);
       } catch (error) {
         console.error(error);
@@ -172,6 +184,7 @@ const TripForm = ({ navigation, route }) => {
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
   const expenseCtx = useContext(ExpensesContext);
+  const windowWidth = useWindowDimensions().width;
 
   const [countryValue, setCountryValue] = useState(
     inputs?.tripCurrency ? inputs.tripCurrency.value : i18n.t("currencyLabel")
@@ -226,26 +239,31 @@ const TripForm = ({ navigation, route }) => {
     try {
       console.log("TripForm ~ tripid in editingTripData:", editedTripId);
       await updateTrip(editedTripId, tripData);
+      setLoadingProgress(1);
       console.log("editingTripData ~ editedTripId:", editedTripId);
       if (editedTripId === tripCtx.tripid || setActive) {
         await secureStoreSetItem("currentTripId", editedTripId);
         await tripCtx.saveTripDataInStorage(tripData);
+        setLoadingProgress(2);
         await tripCtx.setCurrentTrip(editedTripId, tripData);
+        setLoadingProgress(4);
         await updateUser(uid, {
           currentTrip: editedTripId,
         });
+        setLoadingProgress(5);
         await tripCtx.fetchAndSetTravellers(editedTripId);
+        setLoadingProgress(7);
         await userCtx.setFreshlyCreatedTo(false);
+        setLoadingProgress(8);
         const expenses = await getAllExpenses(editedTripId, uid);
+        setLoadingProgress(9);
         expenseCtx.setExpenses([]);
         expenses.forEach((element) => {
           expenseCtx.addExpense(element);
         });
         // await asyncStoreSetObject("expenses", expenses);
         setMMKVObject("expenses", expenses);
-        const token = authCtx.token;
-        console.log("submitHandler ~ token:", token);
-        navigation.popToTop();
+        navigation.navigate("RecentExpenses");
         return;
       }
       tripCtx.refresh();
@@ -259,8 +277,12 @@ const TripForm = ({ navigation, route }) => {
   }
 
   async function createTripData(tripData: TripData) {
+    setLoadingProgress(1);
     const tripid = await storeTrip(tripData);
+    setLoadingProgress(2);
     await putTravelerInTrip(tripid, { userName: userName, uid: uid });
+    setLoadingProgress(4);
+
     console.log("TripForm ~ tripid in saveTripData:", tripid);
     await secureStoreSetItem("currentTripId", tripid);
     // await asyncStoreSetObject("expenses", []);
@@ -281,6 +303,8 @@ const TripForm = ({ navigation, route }) => {
         userCtx.freshlyCreated
       );
       await tripCtx.setCurrentTrip(tripid, tripData);
+      setLoadingProgress(5);
+
       expenseCtx.setExpenses([]);
       if (userCtx.freshlyCreated) {
         userCtx.setNeedsTour(true);
@@ -309,12 +333,12 @@ const TripForm = ({ navigation, route }) => {
       console.log("error whith triphistory:", error.message);
     }
     console.log("createTripData ~ bp 4");
-
+    setLoadingProgress(7);
     await updateUser(uid, {
       userName: userName,
       currentTrip: tripid,
     });
-
+    setLoadingProgress(9);
     expenseCtx.setExpenses([]);
     setMMKVObject("expenses", []);
 
@@ -348,6 +372,8 @@ const TripForm = ({ navigation, route }) => {
       dailyBudget: inputs.dailyBudget.value,
       startDate: startDate,
       endDate: endDate,
+      tripid: editedTripId,
+      travellers: travellers,
     };
 
     // Tripname should not be empty or spaces
@@ -519,7 +545,15 @@ const TripForm = ({ navigation, route }) => {
 
   const headerHeight = useHeaderHeight();
   if (isLoading) {
-    return <LoadingOverlay />;
+    return (
+      <LoadingBarOverlay
+        customText="Loading new trip..."
+        progress={loadingProgress == 0 ? null : loadingProgress / 9}
+        // progressMax={10}
+        // progressAt={loadingProgress}
+        barWidth={windowWidth * 0.8}
+      />
+    );
   }
   return (
     <ScrollView

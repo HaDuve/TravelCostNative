@@ -10,7 +10,7 @@ const ExpenseCountryFlag = ({ countryName, style, containerStyle }) => {
   if (!countryCode) return <></>;
   return (
     <View style={containerStyle}>
-      <CountryFlag isoCode={countryCode} size={20} style={[style]} />
+      <CountryFlag isoCode={countryCode} size={20} style={style} />
     </View>
   );
 };

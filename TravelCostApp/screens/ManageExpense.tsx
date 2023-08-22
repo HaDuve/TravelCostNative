@@ -382,6 +382,23 @@ const ManageExpense = ({ route, navigation }) => {
       setProgressAt(i);
       setProgress(i / expensesInRange.length);
       console.log("progress", i / expensesInRange.length);
+      Toast.show({
+        type: "loading",
+        text1: i18n.t("toastSaving1"),
+        text2:
+          i18n.t("toastSaving2") +
+          " " +
+          (i + 1) +
+          "/" +
+          (expensesInRange.length + 1),
+        autoHide: false,
+        props: {
+          progress: i / expensesInRange.length,
+          progressAt: i,
+          progressMax: expensesInRange.length,
+          size: "small",
+        },
+      });
       const expense = expensesInRange[i];
       // set the correct new date
       const newDate = getDatePlusDays(expenseData.startDate, i);

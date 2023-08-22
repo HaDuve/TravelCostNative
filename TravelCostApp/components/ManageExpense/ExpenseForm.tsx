@@ -1057,21 +1057,6 @@ const ExpenseForm = ({
                       placeholder={countryPlaceholder}
                     ></CountryPicker>
                   </View>
-                  {/* <Input
-                    label={i18n.t("countryLabel")}
-                    style={{ minWidth: "60%" }}
-                    placeholder={userCtx.lastCountry ?? i18n.t("countryLabel")}
-                    textInputConfig={{
-                      onChangeText: inputChangedHandler.bind(this, "country"),
-                      value: inputs.country.value,
-                    }}
-                    invalid={!inputs.country.isValid}
-                  /> */}
-                  <ExpenseCountryFlag
-                    countryName={inputs.country.value}
-                    containerStyle={styles.countryFlagContainer}
-                    style={styles.countryFlag}
-                  ></ExpenseCountryFlag>
                 </View>
 
                 <Pressable
@@ -1601,7 +1586,7 @@ const styles = StyleSheet.create({
     // borderBottomColor: GlobalStyles.colors.gray700,
   },
   countryContainer: {
-    maxWidth: "75%",
+    maxWidth: "100%",
     marginLeft: "1%",
   },
   currencyLabel: {

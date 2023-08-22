@@ -140,6 +140,11 @@ export const GlobalStyles = {
     alignItems: "center",
     justifyContent: "center",
   },
+  countryFlagStyleBig: {
+    width: 50,
+    height: 35,
+    borderRadius: 4,
+  },
 };
 export const CatColors = [
   GlobalStyles.colors.cat2,

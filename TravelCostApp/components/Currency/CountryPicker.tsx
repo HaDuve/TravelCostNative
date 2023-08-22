@@ -15,6 +15,8 @@ import LoadingOverlay from "../UI/LoadingOverlay";
 import * as Haptics from "expo-haptics";
 import PropTypes from "prop-types";
 import { getCurrencySymbol } from "../../util/currencySymbol";
+import CountryFlag from "react-native-country-flag";
+import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
@@ -54,6 +56,13 @@ const CountryPicker = ({
   const countryOptions = Object.keys(countries.getNames("en")).map((code) => ({
     label: `${countries.getName(code, "en")}` + nonEnglishCountryString(code),
     value: `${countries.getName(code, "en")}` + nonEnglishCountryString(code),
+    icon: () => (
+      <ExpenseCountryFlag
+        countryName={code}
+        style={GlobalStyles.countryFlagStyleBig}
+        containerStyle={GlobalStyles.countryFlagStyleBig}
+      />
+    ),
   }));
 
   const [open, setOpen] = useState(false);
@@ -67,8 +76,11 @@ const CountryPicker = ({
         items={items}
         searchable={true}
         listMode="MODAL"
+        itemSeparator={true}
+        itemSeparatorStyle={{
+          backgroundColor: "transparent",
+        }}
         setOpen={setOpen}
-        autoScroll
         onOpen={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }}
@@ -87,7 +99,7 @@ const CountryPicker = ({
         }}
         setValue={setCountryValue}
         setItems={setItems}
-        placeholder={placeholder ? placeholder : i18n.t("currencyLabel")}
+        placeholder={placeholder ? placeholder : i18n.t("countryLabel")}
         containerStyle={{
           backgroundColor: GlobalStyles.colors.gray500,
           marginHorizontal: "1%",

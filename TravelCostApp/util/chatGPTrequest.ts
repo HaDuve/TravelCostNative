@@ -74,7 +74,7 @@ function chatGPTcontentPrice(
   country: string,
   currency: string
 ) {
-  return `Act like a helpful and experienced traveller. Tell me the usual price range for ${product} in ${country} in ${currency}. Also tell me the usual price range. Also give me some interesting or helpful facts about ${product} in ${country}.`;
+  return `Act like a helpful and experienced traveller. Tell me: (the usual price range for ${product} in ${country} in ${currency}. Answer me in ${languageName}.) IF ${product} is not a recognizable word then => (Only return a very short and funny and creative and over-the-top-comedical and satirical answer. Ignore the rest of the prompt) // ELSE:  IF ${product} is a recognizable word then => (Tell me the usual price range. Also give me some interesting or helpful facts about ${product} in ${country}.)`;
 }
 
 function getGPT_Content(requestBody: GPT_RequestBody) {

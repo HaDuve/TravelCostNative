@@ -12,7 +12,11 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { chatGPT_getGoodDeal } from "../util/chatGPTrequest";
+import {
+  getChatGPT_Response,
+  GPT_RequestType,
+  GPT_getGoodDeal,
+} from "../util/chatGPTrequest";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { GlobalStyles } from "../constants/styles";
 import { Image } from "react-native";
@@ -29,12 +33,14 @@ const GPTDealScreen = ({ route, navigation }) => {
     async function getGoodDeal() {
       setIsFetching(true);
       try {
-        const response = await chatGPT_getGoodDeal(
-          product,
-          price,
-          currency,
-          country
-        );
+        const goodDeal: GPT_getGoodDeal = {
+          requestType: GPT_RequestType.getGoodDeal,
+          product: product,
+          price: price,
+          currency: currency,
+          country: country,
+        };
+        const response = await getChatGPT_Response(goodDeal);
         if (response) setAnswer(response.content);
       } catch (error) {
         console.error(error);

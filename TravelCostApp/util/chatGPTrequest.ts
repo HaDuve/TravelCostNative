@@ -42,12 +42,36 @@ export function chatGPTcontentGoodDealPost(
   return content;
 }
 
-export async function chatGPT_getGoodDeal(
-  product: string,
-  price: string,
-  currency: string,
-  country: string
-) {
+export enum GPT_RequestType {
+  "getGoodDeal",
+  "getKeywords",
+  "getPrice",
+}
+
+export interface GPT_RequestBody {
+  requestType: GPT_RequestType;
+}
+
+export interface GPT_getGoodDeal extends GPT_RequestBody {
+  requestType: GPT_RequestType.getGoodDeal;
+  product: string;
+  price: string;
+  currency: string;
+  country: string;
+}
+export interface GPT_getPrice extends GPT_RequestBody {
+  requestType: GPT_RequestType.getPrice;
+  product: string;
+  country: string;
+  curency: string;
+}
+
+export interface GPT_getKeywords extends GPT_RequestBody {
+  requestType: GPT_RequestType.getKeywords;
+  customCategory: string;
+}
+
+export async function getChatGPT_Response(requestBody: GPT_RequestBody) {
   const { OPENAI }: Keys = await loadKeys();
   const configuration = new Configuration({
     apiKey: OPENAI,
@@ -59,7 +83,7 @@ export async function chatGPT_getGoodDeal(
     messages: [
       {
         role: "user",
-        content: chatGPTcontentGoodDealPost(product, price, currency, country),
+        content: getGPT_Content(requestBody),
       },
     ],
     temperature: 0.75,
@@ -72,4 +96,27 @@ export async function chatGPT_getGoodDeal(
   console.log("response.data:", response.data);
   console.log("responseText:", responseText);
   return responseText;
+}
+
+function getGPT_Content(requestBody: GPT_RequestBody) {
+  switch (requestBody.requestType) {
+    case GPT_RequestType.getGoodDeal:
+      return chatGPTcontentGoodDealPost(
+        (requestBody as GPT_getGoodDeal).product,
+        (requestBody as GPT_getGoodDeal).price,
+        (requestBody as GPT_getGoodDeal).currency,
+        (requestBody as GPT_getGoodDeal).country
+      );
+    case GPT_RequestType.getKeywords:
+      return chatGPTcontentKeywords(
+        (requestBody as GPT_getKeywords).customCategory
+      );
+    case GPT_RequestType.getPrice:
+      return chatGPTcontentGoodDealPost(
+        (requestBody as GPT_getPrice).product,
+        (requestBody as GPT_getPrice).curency,
+        (requestBody as GPT_getPrice).country,
+        (requestBody as GPT_getPrice).country
+      );
+  }
 }

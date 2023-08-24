@@ -1,5 +1,12 @@
 Change log Travel Expense App
 
+1.2.630
+- added the option to ask chatGPT for a price before entering an amount
+- added the option to either split up or duplicate the costs of an existing expense over multiple days
+- added the option to delete ranged expenses from inside the expense form
+- improved chatGPTs answers with helpful info -> also try nonsense inputs :D
+- improved the country picker flag icons
+
 1.2.621
 - translated currency and country picker labels
 - fixed loading toast size being too small in some languages

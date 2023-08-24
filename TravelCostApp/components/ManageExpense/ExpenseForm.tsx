@@ -1429,8 +1429,8 @@ const ExpenseForm = ({
           </View>
           {/* Commented out ChatGPT Button */}
           {!hideAdvanced &&
-            inputs.amount.value &&
             inputs.description.value &&
+            inputs.currency.value &&
             inputs.country.value && (
               <View style={[styles.buttonContainer, { marginBottom: "5%" }]}>
                 <GradientButton
@@ -1439,8 +1439,11 @@ const ExpenseForm = ({
                   onPress={askChatGPTHandler}
                   darkText
                 >
-                  {isEditing && i18n.t("askChatGptPost")}
-                  {!isEditing && i18n.t("askChatGptPre")}
+                  {/* {!inputs.amount.value && i18n.t("askChatGptPre")} */}
+                  {!inputs.amount.value &&
+                    "AskGPT: What would be a good Price?"}
+                  {inputs.amount.value && isEditing && i18n.t("askChatGptPost")}
+                  {inputs.amount.value && !isEditing && i18n.t("askChatGptPre")}
                 </GradientButton>
               </View>
             )}

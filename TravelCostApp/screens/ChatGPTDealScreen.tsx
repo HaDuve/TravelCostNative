@@ -16,6 +16,7 @@ import {
   getChatGPT_Response,
   GPT_RequestType,
   GPT_getGoodDeal,
+  GPT_getPrice,
 } from "../util/chatGPTrequest";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { GlobalStyles } from "../constants/styles";
@@ -31,8 +32,26 @@ const GPTDealScreen = ({ route, navigation }) => {
   const [answer, setAnswer] = React.useState("- no answer yet -");
 
   useEffect(() => {
-    async function getGoodDeal() {
+    async function getGPT_Response() {
       setIsFetching(true);
+      if (!price || price === "" || isNaN(Number(price))) {
+        console.log("GPTDealScreen ~no price:", price);
+        try {
+          const getPrice: GPT_getPrice = {
+            requestType: GPT_RequestType.getPrice,
+            product: product,
+            currency: currency,
+            country: country,
+          };
+          const response = await getChatGPT_Response(getPrice);
+          if (response) setAnswer(response.content);
+        } catch (error) {
+          console.error(error);
+          setAnswer("Error: " + error);
+        }
+        setIsFetching(false);
+        return;
+      }
       try {
         const goodDeal: GPT_getGoodDeal = {
           requestType: GPT_RequestType.getGoodDeal,
@@ -49,7 +68,7 @@ const GPTDealScreen = ({ route, navigation }) => {
       }
       setIsFetching(false);
     }
-    getGoodDeal();
+    getGPT_Response();
     console.log("GPTDealScreen ~ product:", product);
     console.log("GPTDealScreen ~ country:", country);
     console.log("GPTDealScreen ~ currency:", currency);

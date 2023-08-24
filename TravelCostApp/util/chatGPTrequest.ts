@@ -19,29 +19,6 @@ const languageName = languageObj?.name;
 import { Configuration, OpenAIApi } from "openai";
 import { Keys, loadKeys } from "../components/Premium/PremiumConstants";
 
-export function chatGPTcontentKeywords(customCategory: string) {
-  const content =
-    "Give me a list of 50 strings containing single words that are semantically similar to " +
-    customCategory +
-    ". Choose the strings so any word that is vaguely related to " +
-    customCategory +
-    "can be mapped to this category in the context of a expense tracker. Be very careful to only add words to the list that contain activities or subjects in relation to" +
-    customCategory +
-    ', especially ones that you have to pay for. The format of your answer must be  ["string","string", ... ], not containing any flavour text or decoration at all, only the list.';
-  return content;
-}
-
-export function chatGPTcontentGoodDealPost(
-  product: string,
-  price: string,
-  currency: string,
-  country: string
-) {
-  // Is 3500Rs a good price for Surfboard Rental 1 hour in Sri Lanka? Tell me the normal price range. Restrict your answer to one sentence of maximum 15 words.
-  const content = `Is ${price} ${currency} a good price for ${product} in ${country}? Answer me in ${languageName} with facts.  Also tell me the normal price range.`;
-  return content;
-}
-
 export enum GPT_RequestType {
   "getGoodDeal",
   "getKeywords",
@@ -71,6 +48,29 @@ export interface GPT_getKeywords extends GPT_RequestBody {
   customCategory: string;
 }
 
+export function chatGPTcontentKeywords(customCategory: string) {
+  const content =
+    "Give me a list of 50 strings containing single words that are semantically similar to " +
+    customCategory +
+    ". Choose the strings so any word that is vaguely related to " +
+    customCategory +
+    "can be mapped to this category in the context of a expense tracker. Be very careful to only add words to the list that contain activities or subjects in relation to" +
+    customCategory +
+    ', especially ones that you have to pay for. The format of your answer must be  ["string","string", ... ], not containing any flavour text or decoration at all, only the list.';
+  return content;
+}
+
+export function chatGPTcontentGoodDealPost(
+  product: string,
+  price: string,
+  currency: string,
+  country: string
+) {
+  // Is 3500Rs a good price for Surfboard Rental 1 hour in Sri Lanka? Tell me the normal price range. Restrict your answer to one sentence of maximum 15 words.
+  const content = `Act like a helpful and experienced traveller. Tell me: (Is ${price} ${currency} a good price for ${product} in ${country}? Answer me in ${languageName}.) IF ${product} is not a recognizable word then => (Only return a very short and funny and creative and over-the-top-comedical and satirical answer. Ignore the rest of the prompt) // ELSE: IF ${product} is a recognizable word then => (Tell me the usual price range. Also give me some interesting or helpful facts about ${product} in ${country}.)`;
+  return content;
+}
+
 export async function getChatGPT_Response(requestBody: GPT_RequestBody) {
   const { OPENAI }: Keys = await loadKeys();
   const configuration = new Configuration({
@@ -87,7 +87,7 @@ export async function getChatGPT_Response(requestBody: GPT_RequestBody) {
       },
     ],
     temperature: 0.75,
-    max_tokens: 1280,
+    max_tokens: 2780,
     top_p: 1,
     frequency_penalty: 0,
     presence_penalty: 0,

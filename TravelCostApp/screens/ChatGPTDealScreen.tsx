@@ -21,6 +21,7 @@ import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { GlobalStyles } from "../constants/styles";
 import { Image } from "react-native";
 import InfoButton from "../components/UI/InfoButton";
+import GradientButton from "../components/UI/GradientButton";
 
 const GPTDealScreen = ({ route, navigation }) => {
   const { price, currency, country, product } = route.params;
@@ -55,6 +56,25 @@ const GPTDealScreen = ({ route, navigation }) => {
     console.log("GPTDealScreen ~ price:", price);
   }, [country, currency, price, product]);
 
+  async function handleRegenerate() {
+    // regenerate getGoodDeal and set new answer
+    setIsFetching(true);
+    try {
+      const goodDeal: GPT_getGoodDeal = {
+        requestType: GPT_RequestType.getGoodDeal,
+        product: product,
+        price: price,
+        currency: currency,
+        country: country,
+      };
+      const response = await getChatGPT_Response(goodDeal);
+      if (response) setAnswer(response.content);
+    } catch (error) {
+      console.error(error);
+      setAnswer("Error: " + error);
+    }
+    setIsFetching(false);
+  }
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -77,9 +97,11 @@ const GPTDealScreen = ({ route, navigation }) => {
       <View style={[styles.answerContainer, GlobalStyles.strongShadow]}>
         <ScrollView>
           {isFetching && (
-            <LoadingBarOverlay
-              customText={i18n.t("askingChatGpt")}
-            ></LoadingBarOverlay>
+            <View style={[styles.loadingContainer, GlobalStyles.strongShadow]}>
+              <LoadingBarOverlay
+                customText={i18n.t("askingChatGpt")}
+              ></LoadingBarOverlay>
+            </View>
           )}
           {!isFetching && <Text style={[styles.answerText]}>{answer}</Text>}
         </ScrollView>
@@ -88,6 +110,14 @@ const GPTDealScreen = ({ route, navigation }) => {
         <FlatButton onPress={() => navigation.pop()}>
           {i18n.t("back")}
         </FlatButton>
+        {!isFetching && (
+          <GradientButton
+            style={{ paddingHorizontal: 20 }}
+            onPress={handleRegenerate}
+          >
+            Regenerate
+          </GradientButton>
+        )}
       </View>
     </View>
   );
@@ -124,12 +154,19 @@ const styles = StyleSheet.create({
   answerContainer: {
     flex: 4,
     margin: 20,
-    padding: 20,
+    // padding: 20,
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
     borderColor: GlobalStyles.colors.primaryGrayed,
+  },
+  loadingContainer: {
+    margin: 20,
+    flex: 1,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    alignItems: "center",
+    justifyContent: "center",
   },
   titleText: {
     marginTop: 4,
@@ -138,16 +175,18 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
   },
   answerText: {
+    padding: 20,
     fontSize: 16,
     fontWeight: "300",
     fontStyle: "italic",
     marginHorizontal: 20,
-    color: GlobalStyles.colors.primaryGrayed,
+    color: GlobalStyles.colors.textColor,
   },
   buttonContainer: {
     flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
     backgroundColor: GlobalStyles.colors.backgroundColor,
     alignItems: "center",
-    justifyContent: "center",
   },
 });

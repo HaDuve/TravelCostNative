@@ -56,7 +56,11 @@ import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { useWindowDimensions } from "react-native";
 
 const TripForm = ({ navigation, route }) => {
+  const tripCtx = useContext(TripContext);
+  const authCtx = useContext(AuthContext);
+  const userCtx = useContext(UserContext);
   const netCtx = useContext(NetworkContext);
+  const expenseCtx = useContext(ExpensesContext);
   const isOnline = netCtx.isConnected;
   const isFast = netCtx.strongConnection;
   const [isConnected, setIsConnected] = useState(isOnline && isFast);
@@ -66,6 +70,7 @@ const TripForm = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [infoIsVisible, setInfoIsVisible] = useState(false);
+  const windowWidth = useWindowDimensions().width;
   const {
     canStart, // a boolean indicate if you can start tour guide
     start, // a function to start the tourguide
@@ -138,7 +143,7 @@ const TripForm = ({ navigation, route }) => {
   const isEditing = !!editedTripId;
 
   useLayoutEffect(() => {
-    const setEditedTrip = async () => {
+    const loadTripData = async () => {
       setIsLoading(true);
       try {
         const selectedTrip = await fetchTrip(editedTripId);
@@ -158,16 +163,31 @@ const TripForm = ({ navigation, route }) => {
       }
       setIsLoading(false);
     };
-    if (isEditing && editedTripId) {
-      setEditedTrip();
+    function loadTripDataFromContext() {
+      if (tripCtx.tripid == editedTripId) {
+        inputChangedHandler("tripName", tripCtx.tripName);
+        inputChangedHandler("totalBudget", tripCtx.totalBudget);
+        inputChangedHandler("dailyBudget", tripCtx.dailyBudget);
+        inputChangedHandler("tripCurrency", tripCtx.tripCurrency);
+        setIsLoading(false);
+        console.log("loaded from context");
+        return;
+      }
     }
-  }, [editedTripId, isEditing]);
 
-  const tripCtx = useContext(TripContext);
-  const authCtx = useContext(AuthContext);
-  const userCtx = useContext(UserContext);
-  const expenseCtx = useContext(ExpensesContext);
-  const windowWidth = useWindowDimensions().width;
+    if (isEditing && editedTripId) {
+      loadTripDataFromContext();
+      loadTripData();
+    }
+  }, [
+    editedTripId,
+    isEditing,
+    tripCtx.dailyBudget,
+    tripCtx.totalBudget,
+    tripCtx.tripCurrency,
+    tripCtx.tripName,
+    tripCtx.tripid,
+  ]);
 
   const [countryValue, setCountryValue] = useState(
     inputs?.tripCurrency ? inputs.tripCurrency.value : i18n.t("currencyLabel")

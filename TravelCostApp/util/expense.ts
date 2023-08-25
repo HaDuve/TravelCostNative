@@ -32,10 +32,15 @@ export interface ExpenseData {
 }
 
 export enum DuplicateOption {
-  null = 0,
-  duplicate = 1,
-  split = 2,
+  singleExpense = 0,
+  duplicateRanged = 1,
+  splitRanged = 2,
   splitFromSingle = 3,
+  duplFromSingle = 4,
+  duplFromRangedSplit = 5,
+  splitFromRangedDupl = 6,
+  singleFromRangedSplit = 7,
+  singleFromRangedDupl = 8,
 }
 
 export enum isPaidString {

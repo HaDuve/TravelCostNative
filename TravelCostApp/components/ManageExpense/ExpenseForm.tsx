@@ -267,7 +267,9 @@ const ExpenseForm = ({
 
   // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
   const [duplOrSplit, setDuplOrSplit] = useState<DuplicateOption>(
-    editingValues ? Number(editingValues.duplOrSplit) : DuplicateOption.null
+    editingValues
+      ? Number(editingValues.duplOrSplit)
+      : DuplicateOption.singleExpense
   );
   const expenseString = `${formatExpenseWithCurrency(
     Number(inputs.amount.value),
@@ -314,9 +316,9 @@ const ExpenseForm = ({
   console.log("splitStringFromSingle:", splitStringFromSingle);
 
   const duplOrSplitString = (duplOrSplitNum: DuplicateOption) => {
-    return duplOrSplitNum === DuplicateOption.duplicate
+    return duplOrSplitNum === DuplicateOption.duplicateRanged
       ? duplString
-      : duplOrSplitNum === DuplicateOption.split
+      : duplOrSplitNum === DuplicateOption.splitRanged
       ? splitString
       : duplOrSplitNum === DuplicateOption.splitFromSingle
       ? splitStringFromSingle

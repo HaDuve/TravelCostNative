@@ -64,7 +64,6 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   // TODO: make a async store entry for tripid+all the data and preload the async data before fetching online
 
   useEffect(() => {
-    if (allLoaded) return;
     if (!tripid) {
       console.log("no tripid in tripITEM");
       return;
@@ -112,6 +111,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
         return;
       }
     }
+
     if (tripCtx.tripid == tripid) {
       setTripName(tripCtx.tripName);
       setTotalBudget(tripCtx.totalBudget);
@@ -119,10 +119,15 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       setTripCurrency(tripCtx.tripCurrency);
       setIsFetching(false);
     }
+
+    async function loadTripData() {
+      await getTripName();
+      await getTrip();
+      await getTripTravellers();
+    }
+    if (allLoaded) return;
     if (netCtx.isConnected && netCtx.strongConnection) {
-      getTripName();
-      getTrip();
-      getTripTravellers();
+      loadTripData();
       setIsFetching(false);
       setAllLoaded(true);
     }

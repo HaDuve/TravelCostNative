@@ -1,13 +1,6 @@
 import React from "react";
 import { useState, useContext, useEffect, useLayoutEffect } from "react";
-import {
-  View,
-  Text,
-  Alert,
-  ScrollView,
-  Platform,
-  Dimensions,
-} from "react-native";
+import { View, Text, Alert, ScrollView, Platform } from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
@@ -18,26 +11,18 @@ import {
   fetchTrip,
   updateTripHistory,
   updateTrip,
-  deleteTrip,
   getAllExpenses,
   putTravelerInTrip,
 } from "../../util/http";
-import * as Updates from "expo-updates";
 
 import { KeyboardAvoidingView } from "react-native";
 
 import Input from "../ManageExpense/Input";
 import { TripContext, TripData } from "../../store/trip-context";
 import { UserContext } from "../../store/user-context";
-import Button from "../UI/Button";
 import FlatButton from "../UI/FlatButton";
 import { ExpensesContext } from "../../store/expenses-context";
 import CurrencyPicker from "../Currency/CurrencyPicker";
-import CurrencyInput from "react-currency-input-field";
-import {
-  asyncStoreSetItem,
-  asyncStoreSetObject,
-} from "../../store/async-storage";
 import { useHeaderHeight } from "@react-navigation/elements";
 
 //localization
@@ -49,7 +34,6 @@ i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
 i18n.enableFallback = true;
 
-import LoadingOverlay from "../UI/LoadingOverlay";
 import { daysBetween, getFormattedDate } from "../../util/date";
 import { DateTime } from "luxon";
 import * as Haptics from "expo-haptics";
@@ -61,8 +45,7 @@ import PropTypes from "prop-types";
 import InfoButton from "../UI/InfoButton";
 import Modal from "react-native-modal";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
-import Animated, { set, ZoomIn, ZoomOut } from "react-native-reanimated";
-import { reloadApp } from "../../util/appState";
+import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 import { secureStoreSetItem } from "../../store/secure-storage";
 import BackButton from "../UI/BackButton";
 import { onShare } from "../ProfileOutput/ShareTrip";

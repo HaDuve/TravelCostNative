@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Platform, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import { GlobalStyles } from "../constants/styles";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
@@ -18,7 +18,6 @@ import { saveStoppedTour } from "../util/tourUtil";
 import { TourGuideZone, useTourGuideController } from "rn-tourguide";
 import { sleep } from "../util/appState";
 import { useInterval } from "../components/Hooks/useInterval";
-import { useFocusEffect } from "@react-navigation/native";
 import { secureStoreGetItem } from "../store/secure-storage";
 import { fetchTripHistory } from "../util/http";
 import { AuthContext } from "../store/auth-context";

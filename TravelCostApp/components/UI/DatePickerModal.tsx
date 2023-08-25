@@ -40,7 +40,15 @@ const DatePickerModal = ({
         }}
         onCancel={onCancelRange}
         onConfirm={onConfirmRange}
-        language={Localization.locale.slice(0, 2)}
+        // @enum 'en' | 'cn' | 'de' | 'es' | 'fr' | 'pt'
+        // if Localization.locale.slice(0, 2) is one of these, it will be used
+        // otherwise, the default language is 'en'
+        language={
+          Localization.locale.slice(0, 2) === "de" ||
+          Localization.locale.slice(0, 2) === "fr"
+            ? Localization.locale.slice(0, 2)
+            : "en"
+        }
       />
     </View>
   ) : (
@@ -60,7 +68,13 @@ const DatePickerModal = ({
       }}
       onCancel={onCancelRange}
       onConfirm={onConfirmRange}
-      language={Localization.locale.slice(0, 2)}
+      //@enum 'en' | 'cn' | 'de' | 'es' | 'fr' | 'pt'
+      language={
+        Localization.locale.slice(0, 2) === "de" ||
+        Localization.locale.slice(0, 2) === "fr"
+          ? Localization.locale.slice(0, 2)
+          : "en"
+      }
     />
   );
   return datepickerJSX;

@@ -67,7 +67,6 @@ import DatePickerModal from "../UI/DatePickerModal";
 import DatePickerContainer from "../UI/DatePickerContainer";
 import PropTypes from "prop-types";
 import GradientButton from "../UI/GradientButton";
-import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { recalcSplitsForExact } from "../../util/split";
 import { DuplicateOption, ExpenseData, isPaidString } from "../../util/expense";
 import { NetworkContext } from "../../store/network-context";
@@ -306,11 +305,12 @@ const ExpenseForm = ({
   } days`;
 
   const splitString = !isEditing ? splitEditingString : splitNewString;
+  console.log("splitString:", splitString);
 
   const duplOrSplitString = (duplOrSplitNum: number) => {
     return duplOrSplitNum === 1
       ? duplString
-      : duplOrSplit === 2
+      : duplOrSplitNum === 2
       ? splitString
       : "";
   };
@@ -330,15 +330,15 @@ const ExpenseForm = ({
       return;
     }
     // Alert ask if Dupl or Split
-    console.log(
-      `Duplicate: ${duplOrSplitString(1)} or Split: ${duplOrSplitString(2)}`
-    );
+    const alertDuplSplitString = `Duplicate the expense: ${duplOrSplitString(
+      1
+    )} or Split the expense: ${duplOrSplitString(2)}`;
+    console.log(" ~ alertDuplSplitString:", alertDuplSplitString);
+
     // TODO: make this pretty
     Alert.alert(
       "Duplicate or split?", //i18n.t("duplOrSplit"),
-      `Duplicate the expense: ${duplOrSplitString(
-        1
-      )} or Split the expense: ${duplOrSplitString(2)}`, //i18n.t("duplOrSplitText"),
+      alertDuplSplitString, //i18n.t("duplOrSplitText"),
       [
         {
           text: "Duplicate", //i18n.t("duplicate"),

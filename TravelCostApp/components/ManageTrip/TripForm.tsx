@@ -143,7 +143,7 @@ const TripForm = ({ navigation, route }) => {
   const isEditing = !!editedTripId;
 
   useLayoutEffect(() => {
-    const loadTripData = async () => {
+    const fetchTripData = async () => {
       setIsLoading(true);
       try {
         const selectedTrip = await fetchTrip(editedTripId);
@@ -164,6 +164,8 @@ const TripForm = ({ navigation, route }) => {
       setIsLoading(false);
     };
     function loadTripDataFromContext() {
+      // if we are editing a trip, we load the data from the context
+      // no need to fetch it from the server in that case
       if (tripCtx.tripid == editedTripId) {
         inputChangedHandler("tripName", tripCtx.tripName);
         inputChangedHandler("totalBudget", tripCtx.totalBudget);
@@ -177,7 +179,7 @@ const TripForm = ({ navigation, route }) => {
 
     if (isEditing && editedTripId) {
       loadTripDataFromContext();
-      loadTripData();
+      fetchTripData();
     }
   }, [
     editedTripId,

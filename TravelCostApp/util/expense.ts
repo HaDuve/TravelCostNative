@@ -35,6 +35,7 @@ export enum DuplicateOption {
   null = 0,
   duplicate = 1,
   split = 2,
+  splitFromSingle = 3,
 }
 
 export enum isPaidString {

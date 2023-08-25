@@ -45,7 +45,12 @@ import PropTypes from "prop-types";
 import InfoButton from "../UI/InfoButton";
 import Modal from "react-native-modal";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  ZoomIn,
+  ZoomOut,
+} from "react-native-reanimated";
 import { secureStoreSetItem } from "../../store/secure-storage";
 import BackButton from "../UI/BackButton";
 import { onShare } from "../ProfileOutput/ShareTrip";
@@ -569,7 +574,9 @@ const TripForm = ({ navigation, route }) => {
     >
       {datepickerJSX}
       {modalJSX}
-      <View
+      <Animated.View
+        entering={FadeIn.duration(500)}
+        exiting={FadeOut}
         style={Platform.select({
           ios: { flex: 1, overflow: "visible" },
           android: {
@@ -811,7 +818,7 @@ const TripForm = ({ navigation, route }) => {
             </GradientButton>
           )} */}
         </KeyboardAvoidingView>
-      </View>
+      </Animated.View>
       <View
         style={{
           minHeight: 60,

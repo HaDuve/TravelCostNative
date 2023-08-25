@@ -47,7 +47,9 @@ import Modal from "react-native-modal";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
 import Animated, {
   FadeIn,
+  FadeInDown,
   FadeOut,
+  SlideInDown,
   ZoomIn,
   ZoomOut,
 } from "react-native-reanimated";
@@ -575,7 +577,7 @@ const TripForm = ({ navigation, route }) => {
       {datepickerJSX}
       {modalJSX}
       <Animated.View
-        entering={FadeIn.duration(500)}
+        entering={FadeInDown.duration(300)}
         exiting={FadeOut}
         style={Platform.select({
           ios: { flex: 1, overflow: "visible" },

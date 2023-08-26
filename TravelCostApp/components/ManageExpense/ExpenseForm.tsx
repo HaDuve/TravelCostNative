@@ -305,13 +305,21 @@ const ExpenseForm = ({
   } days`;
 
   const splitString = !isEditing ? splitEditingString : splitNewString;
-  console.log("splitString:", splitString);
+  const splitStringFromSingle = `${formatExpenseWithCurrency(
+    Number(inputs.amount.value),
+    inputs.currency.value
+  )} = total expense amount \nover ${
+    daysBetween(new Date(endDate), new Date(startDate)) + 1
+  } days`;
+  console.log("splitStringFromSingle:", splitStringFromSingle);
 
-  const duplOrSplitString = (duplOrSplitNum: number) => {
-    return duplOrSplitNum === 1
+  const duplOrSplitString = (duplOrSplitNum: DuplicateOption) => {
+    return duplOrSplitNum === DuplicateOption.duplicate
       ? duplString
-      : duplOrSplitNum === 2
+      : duplOrSplitNum === DuplicateOption.split
       ? splitString
+      : duplOrSplitNum === DuplicateOption.splitFromSingle
+      ? splitStringFromSingle
       : "";
   };
 
@@ -332,7 +340,7 @@ const ExpenseForm = ({
     // Alert ask if Dupl or Split
     const alertDuplSplitString = `Duplicate the expense: ${duplOrSplitString(
       1
-    )} or Split the expense: ${duplOrSplitString(2)}`;
+    )} or Split the expense: ${duplOrSplitString(3)}`;
     console.log(" ~ alertDuplSplitString:", alertDuplSplitString);
 
     // TODO: make this pretty

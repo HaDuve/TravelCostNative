@@ -61,6 +61,7 @@ import Animated, {
   Easing,
   FadeInUp,
   FadeOutUp,
+  set,
 } from "react-native-reanimated";
 import { DateTime } from "luxon";
 import DatePickerModal from "../UI/DatePickerModal";
@@ -221,6 +222,19 @@ const ExpenseForm = ({
       : // DateTime.fromJSDate(editingValues.endDate).toJSDate())
         getFormattedDate(DateTime.now())
   );
+  const [daysBetweenState, setDaysBetweenState] = useState(
+    startDate &&
+      endDate &&
+      daysBetween(new Date(endDate), new Date(startDate)) + 1
+  );
+  console.log("daysBetweenState:", daysBetweenState);
+  useEffect(() => {
+    setDaysBetweenState(
+      startDate &&
+        endDate &&
+        daysBetween(new Date(endDate), new Date(startDate)) + 1
+    );
+  }, [startDate, endDate]);
 
   const openDatePickerRange = () => {
     // if isEditing show alert, saying this feature is not available yet
@@ -267,7 +281,9 @@ const ExpenseForm = ({
 
   // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
   const [duplOrSplit, setDuplOrSplit] = useState<DuplicateOption>(
-    editingValues ? Number(editingValues.duplOrSplit) : DuplicateOption.null
+    editingValues
+      ? Number(editingValues.duplOrSplit)
+      : DuplicateOption.singleExpense
   );
   const expenseString = `${formatExpenseWithCurrency(
     Number(inputs.amount.value),
@@ -276,50 +292,33 @@ const ExpenseForm = ({
 
   const duplEditingString = `${expenseString}${i18n.t(
     "duplicateExpensesText"
-  )}\nover ${daysBetween(new Date(endDate), new Date(startDate)) + 1} days`;
+  )}\nover ${daysBetweenState} days`;
 
   const duplNewString = `${formatExpenseWithCurrency(
-    Number(inputs.amount.value) *
-      (daysBetween(new Date(endDate), new Date(startDate)) + 1),
+    Number(inputs.amount.value) * daysBetweenState,
     inputs.currency.value
-  )} = total expense amount \nover ${
-    daysBetween(new Date(endDate), new Date(startDate)) + 1
-  } days`;
+  )} = total expense amount \nover ${daysBetweenState} days`;
 
   const duplString = !isEditing ? duplEditingString : duplNewString;
 
   const splitEditingString = `${formatExpenseWithCurrency(
-    Number(inputs.amount.value) /
-      (daysBetween(new Date(endDate), new Date(startDate)) + 1),
+    Number(inputs.amount.value) / daysBetweenState,
     inputs.currency.value
-  )}${i18n.t("splitUpExpensesText")}\nover ${
-    daysBetween(new Date(endDate), new Date(startDate)) + 1
-  } days`;
+  )}${i18n.t("splitUpExpensesText")}\nover ${daysBetweenState} days`;
 
   const splitNewString = `${formatExpenseWithCurrency(
-    Number(inputs.amount.value) *
-      (daysBetween(new Date(endDate), new Date(startDate)) + 1),
+    Number(inputs.amount.value) * daysBetweenState,
     inputs.currency.value
-  )} = total expense amount \nover ${
-    daysBetween(new Date(endDate), new Date(startDate)) + 1
-  } days`;
+  )} = total expense amount \nover ${daysBetweenState} days`;
 
   const splitString = !isEditing ? splitEditingString : splitNewString;
-  const splitStringFromSingle = `${formatExpenseWithCurrency(
-    Number(inputs.amount.value),
-    inputs.currency.value
-  )} = total expense amount \nover ${
-    daysBetween(new Date(endDate), new Date(startDate)) + 1
-  } days`;
-  console.log("splitStringFromSingle:", splitStringFromSingle);
+  console.log("splitString:", splitString);
 
-  const duplOrSplitString = (duplOrSplitNum: DuplicateOption) => {
-    return duplOrSplitNum === DuplicateOption.duplicate
+  const duplOrSplitString = (duplOrSplitNum: number) => {
+    return duplOrSplitNum === 1
       ? duplString
-      : duplOrSplitNum === DuplicateOption.split
+      : duplOrSplitNum === 2
       ? splitString
-      : duplOrSplitNum === DuplicateOption.splitFromSingle
-      ? splitStringFromSingle
       : "";
   };
 
@@ -335,15 +334,28 @@ const ExpenseForm = ({
     setEndDate(endDateFormat);
     if (startDateFormat === endDateFormat) {
       inputChangedHandler("date", startDateFormat);
+      switch (duplOrSplit) {
+        case DuplicateOption.duplicateRanged:
+        case DuplicateOption.duplFromSingle:
+        case DuplicateOption.duplFromRangedSplit:
+          setDuplOrSplit(DuplicateOption.singleExpense);
+          break;
+        case DuplicateOption.splitRanged:
+          setDuplOrSplit(DuplicateOption.singleExpense);
+          break;
+        case DuplicateOption.singleExpense:
+        default:
+          setDuplOrSplit(DuplicateOption.singleExpense);
+          break;
+      }
       return;
     }
     // Alert ask if Dupl or Split
     const alertDuplSplitString = `Duplicate the expense: ${duplOrSplitString(
       1
-    )} or Split the expense: ${duplOrSplitString(3)}`;
+    )} or Split the expense: ${duplOrSplitString(2)}`;
     console.log(" ~ alertDuplSplitString:", alertDuplSplitString);
-
-    // TODO: make this pretty
+    // TODO: make this structured
     Alert.alert(
       "Duplicate or split?", //i18n.t("duplOrSplit"),
       alertDuplSplitString, //i18n.t("duplOrSplitText"),
@@ -352,16 +364,36 @@ const ExpenseForm = ({
           text: "Duplicate", //i18n.t("duplicate"),
           onPress: () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setDuplOrSplit(1);
-            inputChangedHandler("date", startDateFormat);
+            switch (duplOrSplit) {
+              case DuplicateOption.singleExpense:
+                setDuplOrSplit(DuplicateOption.duplicateRanged);
+                break;
+              case DuplicateOption.splitRanged:
+                setDuplOrSplit(DuplicateOption.duplicateRanged);
+                break;
+              case DuplicateOption.duplicateRanged:
+              default:
+                setDuplOrSplit(DuplicateOption.duplicateRanged);
+                break;
+            }
           },
         },
         {
           text: "Split", //i18n.t("split"),
           onPress: () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setDuplOrSplit(2);
-            inputChangedHandler("date", startDateFormat);
+            switch (duplOrSplit) {
+              case DuplicateOption.singleExpense:
+                setDuplOrSplit(DuplicateOption.splitRanged);
+                break;
+              case DuplicateOption.duplicateRanged:
+                setDuplOrSplit(DuplicateOption.splitRanged);
+                break;
+              case DuplicateOption.splitRanged:
+              default:
+                setDuplOrSplit(DuplicateOption.splitRanged);
+                break;
+            }
           },
         },
       ],
@@ -430,8 +462,7 @@ const ExpenseForm = ({
       if (duplOrSplit === 2 && isEditing) {
         const newSplitList = recalcSplitsLinearly(
           splitList,
-          +inputs.amount.value /
-            (daysBetween(new Date(endDate), new Date(startDate)) + 1)
+          +inputs.amount.value / daysBetweenState
         );
         setSplitList(newSplitList);
         const isValidSplit = validateSplitList(
@@ -588,8 +619,7 @@ const ExpenseForm = ({
     if (duplOrSplit === 2 && !isEditing) {
       const newSplitList = recalcSplitsLinearly(
         splitList,
-        +inputs.amount.value /
-          (daysBetween(new Date(endDate), new Date(startDate)) + 1)
+        +inputs.amount.value / daysBetweenState
       );
       setSplitList(newSplitList);
       const isValidSplit = validateSplitList(

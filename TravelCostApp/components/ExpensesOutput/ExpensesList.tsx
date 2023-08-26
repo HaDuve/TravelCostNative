@@ -1,7 +1,21 @@
-import { Alert, Dimensions, Platform } from "react-native";
+import {
+  Alert,
+  Dimensions,
+  FlatList,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 
 import ExpenseItem from "./ExpenseItem";
-import React, { memo, useContext, useEffect, useMemo } from "react";
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { View } from "react-native";
 
 import Swipeable from "react-native-gesture-handler/Swipeable";
@@ -21,16 +35,17 @@ import {
   deleteExpenseOnlineOffline,
   OfflineQueueManageExpenseItem,
 } from "../../util/offline-queue";
-import { UserContext } from "../../store/user-context";
 import { ExpenseData, Expense } from "../../util/expense";
 import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { useNavigation, useScrollToTop } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { Text } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
+import Icon from "react-native-paper/lib/typescript/src/components/Icon";
+import { useInterval } from "../Hooks/useInterval";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -73,7 +88,13 @@ const renderRightActions = (progress, dragX, onClick) => {
   );
 };
 
-function renderExpenseItem(isOnline: boolean, itemData) {
+function renderExpenseItem(
+  isOnline: boolean,
+  selectable: boolean,
+  selected: ExpenseData[],
+  selectItem,
+  itemData
+) {
   const index = itemData.index;
   if (Platform.OS === "android")
     return (
@@ -116,6 +137,19 @@ function renderExpenseItem(isOnline: boolean, itemData) {
         disableLeftSwipe={true}
         overshootFriction={8}
       >
+        {selectable && (
+          <View style={{ flex: 0, position: "absolute", zIndex: 1 }}>
+            <IconButton
+              icon={
+                selected.includes(itemData.item.id)
+                  ? "ios-checkmark-circle"
+                  : "ios-checkmark-circle-outline"
+              }
+              size={12}
+              onPress={selectItem.bind(this, itemData.item.id)}
+            ></IconButton>
+          </View>
+        )}
         <ExpenseItem
           showSumForTravellerName={travellerName}
           filtered={filtered}
@@ -316,6 +350,128 @@ function ExpensesList({
   tripid = tripCtx.tripid;
   travellerName = showSumForTravellerName;
   if (isFiltered) filtered = true;
+  const [selectable, setSelectable] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
+  // autoscroll to the first item after the header
+  const flatListRef = useRef(null);
+  const listLong = expenses.length > 4;
+
+  useEffect(() => {
+    if (!listLong) setSelectable(false);
+  }, [listLong]);
+  const scrollTo = useCallback(
+    (index: number) => {
+      if (!flatListRef.current || !listLong || index > expenses.length + 1)
+        return;
+      if (flatListRef.current) {
+        flatListRef.current.scrollToIndex({
+          index: index,
+          animated: true,
+        });
+      }
+    },
+    [expenses.length, listLong]
+  );
+
+  useEffect(() => {
+    scrollTo(1);
+  }, [expenses, scrollTo]);
+
+  // useInterval(
+  //   () => {
+  //     if (expenses.length > 4 && !selectable) {
+  //       scrollTo(1);
+  //     }
+  //   },
+  //   10000,
+  //   true
+  // );
+
+  const selectItem = (item, id: object) => {
+    console.log("selectItem ~ item:", item);
+    if (selected.includes(item)) {
+      setSelected(selected.filter((newItem) => newItem !== item));
+    } else {
+      setSelected([...selected, item]);
+    }
+    console.log("selected", selected);
+  };
+  const selectAll = () => {
+    if (selected.length === expenses.length) {
+      setSelected([]);
+    } else {
+      setSelected(expenses.map((item) => item.id));
+    }
+  };
+  const deleteSelected = () => {
+    Alert.alert(
+      `Delete selected expenses?`,
+      `This will delete all selected entries!`,
+      [
+        //i18n.t("deleteAllExpenses"), i18n.t("deleteAllExpensesExt")
+        // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: i18n.t("no"),
+          onPress: () => {
+            return;
+          },
+        },
+        // The "Yes" button
+        {
+          text: i18n.t("yes"),
+          onPress: async () => {
+            try {
+              navigation?.popToTop();
+              scrollTo(1);
+              setSelected([]);
+              setSelectable(false);
+              Toast.show({
+                type: "loading",
+                text1: i18n.t("toastDeleting1"),
+                text2: i18n.t("toastDeleting2"),
+                autoHide: false,
+              });
+              for (let i = 0; i < selected.length; i++) {
+                const expenseItem = expenses.find(
+                  (item) => item.id === selected[i]
+                );
+                const item: OfflineQueueManageExpenseItem = {
+                  type: "delete",
+                  expense: {
+                    tripid: tripid,
+                    uid: expenseItem.uid,
+                    id: expenseItem.id,
+                  },
+                };
+                expenseCtx?.deleteExpense(expenseItem.id);
+                await deleteExpenseOnlineOffline(item, isOnline);
+              }
+              await touchAllTravelers(tripid, true);
+              Toast.hide();
+            } catch (error) {
+              console.log(i18n.t("deleteError"), error);
+              Toast.show({
+                text1: i18n.t("error"),
+                text2: i18n.t("error2"),
+                type: "error",
+              });
+            }
+          },
+        },
+      ]
+    );
+  };
+  function selectPressHandler() {
+    console.log("selectPressHandler ~ selectable", selectable);
+    if (selectable) {
+      setSelectable(false);
+      setSelected([]);
+      scrollTo(1);
+    } else {
+      setSelectable(true);
+    }
+  }
 
   return (
     <Animated.View
@@ -339,16 +495,51 @@ function ExpensesList({
         <LoadingBarOverlay></LoadingBarOverlay>
       </View>
       <Animated.FlatList
-        // ref={flatListRef}
         scrollEnabled={true}
-        itemLayoutAnimation={layoutAnim}
         data={expenses}
-        // ref={listRef}
-        // onEndReached={onScrollHandler}
-        // onEndReachedThreshold={0.5}
-        renderItem={renderExpenseItem.bind(this, isOnline)}
+        ref={flatListRef}
+        layout={layoutAnim}
+        renderItem={renderExpenseItem.bind(
+          this,
+          isOnline,
+          selectable,
+          selected,
+          selectItem
+        )}
         ListFooterComponent={
           <View style={{ height: Dimensions.get("screen").height / 1.8 }} />
+        }
+        ListHeaderComponent={
+          listLong && (
+            <View
+              style={{
+                paddingRight: 20,
+                marginTop: 12,
+                alignItems: "center",
+                justifyContent: "flex-end",
+                flexDirection: "row",
+              }}
+            >
+              {selectable && selected.length > 0 && (
+                <IconButton
+                  icon={"ios-trash-outline"}
+                  size={24}
+                  color={GlobalStyles.colors.gray700}
+                  onPress={deleteSelected}
+                ></IconButton>
+              )}
+              <IconButton
+                icon={
+                  selectable
+                    ? "ios-checkmark-circle"
+                    : "ios-checkmark-circle-outline"
+                }
+                size={24}
+                color={GlobalStyles.colors.gray700}
+                onPress={selectPressHandler}
+              ></IconButton>
+            </View>
+          )
         }
         keyExtractor={(item: Expense) => item.id}
         refreshControl={refreshControl}

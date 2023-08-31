@@ -26,7 +26,7 @@ import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 import { getCatString } from "../util/category";
 import PropTypes from "prop-types";
-import { ExpenseData } from "../util/expense";
+import { deleteAllExpensesByRangedId, ExpenseData } from "../util/expense";
 import { useEffect } from "react";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { NetworkContext } from "../store/network-context";
@@ -34,6 +34,7 @@ import { Toast } from "react-native-toast-message/lib/src/Toast";
 import * as Haptics from "expo-haptics";
 import { setMMKVObject } from "../store/mmkv";
 import { formatExpenseWithCurrency } from "../util/string";
+import { isSameDay } from "../util/dateTime";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -89,48 +90,13 @@ const ManageExpense = ({ route, navigation }) => {
           text2: i18n.t("toastDeleting2"),
           autoHide: false,
         });
-        const allExpenses = await getAllExpenses(tripid);
-
-        const rangedExpenses = allExpenses.filter(
-          (expense) => expense?.rangeId == selectedExpense?.rangeId
+        await deleteAllExpensesByRangedId(
+          tripid,
+          selectedExpense,
+          isOnline,
+          expenseCtx
         );
-        const countRangedExpensesMax = rangedExpenses.length;
-        console.log(
-          "deleteAllExpenses ~ countRangedExpensesMax:",
-          countRangedExpensesMax
-        );
-        let expCounter = 0;
-        for (let i = 0; i < allExpenses.length; i++) {
-          const expense: ExpenseData = allExpenses[i];
-          if (expense?.rangeId == selectedExpense?.rangeId) {
-            expCounter++;
-            const queueItem: OfflineQueueManageExpenseItem = {
-              type: "delete",
-              expense: {
-                tripid: tripid,
-                uid: expense.uid,
-                id: expense.id,
-              },
-            };
-            expenseCtx?.deleteExpense(expense.id);
-            await deleteExpenseOnlineOffline(queueItem, isOnline);
-            console.log("deleted expense nr: " + expCounter, expense.id);
-            Toast.hide();
-            console.log(
-              "progress / countRangedExpensesMax",
-              expCounter / countRangedExpensesMax
-            );
-            Toast.show({
-              type: "loading",
-              text1: i18n.t("toastDeleting1"),
-              text2: i18n.t("toastDeleting2"),
-              autoHide: false,
-              props: {
-                progress: expCounter / countRangedExpensesMax,
-              },
-            });
-          }
-        }
+        Toast.hide();
         await touchAllTravelers(tripid, true);
         Toast.hide();
       } catch (error) {
@@ -273,20 +239,26 @@ const ManageExpense = ({ route, navigation }) => {
     const rangeId =
       Date.now().toString() + Math.random().toString(36).substring(2, 15);
     console.log("creatingRangedData ~ rangeId:", rangeId);
-    expenseData.rangeId = rangeId;
+
+    // sanity check if the expenseData.date is unequal to expenseData.startDate and endDate
+    // if so, set the date to the startDate
+    if (isSameDay(expenseData.endDate, expenseData.startDate)) {
+      // delete the rangeId field
+      expenseData.rangeId = null;
+    } else {
+      expenseData.rangeId = rangeId;
+    }
 
     // get number of days
     const day1 = new Date(expenseData.startDate);
     const day2 = new Date(expenseData.endDate);
     const days = daysBetween(day2, day1);
 
-    // get correct amount
-    if (expenseData.duplOrSplit !== 1 && expenseData.duplOrSplit !== 2) {
-      Alert.alert("wrong duplOrSplit value");
-      return;
-    }
     // 0 is null, 1 is dupl (default), 2 is split
-    if (expenseData.duplOrSplit === 2) {
+    if (
+      expenseData.duplOrSplit === 2 &&
+      !expenseData.alreadyDividedAmountByDays
+    ) {
       const splitCalcAmount = expenseData.calcAmount / (days + 1);
       expenseData.calcAmount = Number(splitCalcAmount.toFixed(2));
       const splitDaysAmount = expenseData.amount / (days + 1);
@@ -350,6 +322,7 @@ const ManageExpense = ({ route, navigation }) => {
 
   const editingRangedData = async (expenseData) => {
     console.log("ranged Data detected");
+
     // find all the expenses that have the same identifying rangeId
     const expensesInRange = expenseCtx.expenses.filter(
       (expense) =>
@@ -358,8 +331,8 @@ const ManageExpense = ({ route, navigation }) => {
     // if we dont find any expenses, it must have been a non-ranged expense, so update it to a ranged expense
     if (expensesInRange.length === 0) {
       console.log("no expenses in range found");
-      await creatingRangedData(expenseData);
       // delete the original expense
+      expenseCtx.deleteExpense(editedExpenseId);
       const item: OfflineQueueManageExpenseItem = {
         type: "delete",
         expense: {
@@ -368,15 +341,34 @@ const ManageExpense = ({ route, navigation }) => {
           id: editedExpenseId,
         },
       };
-      expenseCtx.deleteExpense(editedExpenseId);
       await deleteExpenseOnlineOffline(item, isOnline);
+      await creatingRangedData(expenseData);
       return;
     }
     // sort the expenses by date, oldest expense first
     expensesInRange.sort((a, b) => {
       return new Date(a.date).getTime() - new Date(b.date).getTime();
     });
-    // update the expenses one by one
+
+    // check if the dates are the same, then update one by one or redo all
+    // get the first and last day from expenses in range
+    const oldStart = new Date(expensesInRange[0].date);
+    const oldEnd = new Date(expensesInRange[expensesInRange.length - 1].date);
+    // get days from expenseData
+    const newStart = new Date(expenseData.startDate);
+    const newEnd = new Date(expenseData.endDate);
+    if (!isSameDay(oldStart, newStart) || !isSameDay(oldEnd, newEnd)) {
+      // redo all and delete old ones
+      await deleteAllExpensesByRangedId(
+        tripid,
+        selectedExpense,
+        isOnline,
+        expenseCtx
+      );
+      await creatingRangedData(expenseData);
+      return;
+    }
+    //else update the expenses one by one
     setProgressMax(expensesInRange.length);
     for (let i = 0; i < expensesInRange.length; i++) {
       setProgressAt(i);
@@ -456,12 +448,15 @@ const ManageExpense = ({ route, navigation }) => {
         // editing the expense
         if (
           expenseData.startDate.toString().slice(0, 10) !==
-          expenseData.endDate.toString().slice(0, 10)
+            expenseData.endDate.toString().slice(0, 10) ||
+          selectedExpense.rangeId
         ) {
           // editing ranged Data
+          console.log("deciding to edit ranged data");
           await editingRangedData(expenseData);
         } else {
           // editing normal expense (no-ranged)
+          console.log("deciding to edit normal data");
           await editingNormalData(expenseData);
         }
       } else {
@@ -472,9 +467,11 @@ const ManageExpense = ({ route, navigation }) => {
           expenseData.endDate.toString().slice(0, 10)
         ) {
           // adding a new ranged expense (no-editing)
+          console.log("deciding to create ranged data");
           await creatingRangedData(expenseData);
         } else {
           // adding a new normal expense (no-editing, no-ranged)
+          console.log("deciding to create normal data");
           await creatingNormalData(expenseData);
         }
       }

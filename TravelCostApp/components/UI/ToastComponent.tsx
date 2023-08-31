@@ -96,8 +96,8 @@ const toastConfig = {
             flex: 1,
             maxHeight: 55,
             maxWidth: 55,
-            padding: 10,
-            marginRight: 10,
+            padding: 20,
+            marginRight: 20,
           }}
         >
           <LoadingBarOverlay

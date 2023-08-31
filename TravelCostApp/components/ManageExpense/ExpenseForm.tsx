@@ -1,4 +1,10 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, {
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import * as Haptics from "expo-haptics";
 import {
   Alert,
@@ -15,7 +21,7 @@ import {
 import { daysBetween } from "../../util/date";
 import { useHeaderHeight } from "@react-navigation/elements";
 
-import { Card, SegmentedButtons } from "react-native-paper";
+import { Card, SegmentedButtons, Switch } from "react-native-paper";
 import Input from "./Input";
 import { getFormattedDate } from "../../util/date";
 import { GlobalStyles } from "../../constants/styles";
@@ -82,6 +88,7 @@ import BackButton from "../UI/BackButton";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import SettingsSwitch from "../UI/SettingsSwitch";
 import CountryPicker from "../Currency/CountryPicker";
+import { alertDuplSplitString } from "./ExpenseFormUtil";
 
 const ExpenseForm = ({
   onCancel,
@@ -125,6 +132,9 @@ const ExpenseForm = ({
   const [loadingTravellers, setLoadingTravellers] = useState(
     !tripCtx.travellers && tripCtx.travellers.length < 1
   );
+
+  const [confirmedRange, setConfirmedRange] = useState(false);
+  const [helperStateForDividing, setHelperStateForDividing] = useState(false);
   const [inputs, setInputs] = useState({
     amount: {
       value: editingValues ? editingValues.amount?.toString() : "",
@@ -237,18 +247,6 @@ const ExpenseForm = ({
   }, [startDate, endDate]);
 
   const openDatePickerRange = () => {
-    // if isEditing show alert, saying this feature is not available yet
-    if (isEditing && dateIsRanged) {
-      Alert.alert(i18n.t("comingSoon"), i18n.t("comingSoonRangedDates"), [
-        {
-          text: i18n.t("confirm"),
-          onPress: () => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          },
-        },
-      ]);
-      return;
-    }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(true);
   };
@@ -281,46 +279,46 @@ const ExpenseForm = ({
 
   // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
   const [duplOrSplit, setDuplOrSplit] = useState<DuplicateOption>(
-    editingValues
-      ? Number(editingValues.duplOrSplit)
-      : DuplicateOption.singleExpense
+    editingValues ? Number(editingValues.duplOrSplit) : DuplicateOption.null
   );
   const expenseString = `${formatExpenseWithCurrency(
     Number(inputs.amount.value),
     inputs.currency.value
   )}`;
-
-  const duplEditingString = `${expenseString}${i18n.t(
-    "duplicateExpensesText"
-  )}\nover ${daysBetweenState} days`;
-
-  const duplNewString = `${formatExpenseWithCurrency(
+  const expenseTimesDaysString = formatExpenseWithCurrency(
     Number(inputs.amount.value) * daysBetweenState,
     inputs.currency.value
-  )} = total expense amount \nover ${daysBetweenState} days`;
-
-  const duplString = !isEditing ? duplEditingString : duplNewString;
-
-  const splitEditingString = `${formatExpenseWithCurrency(
+  );
+  const expenseDividedByDaysString = formatExpenseWithCurrency(
     Number(inputs.amount.value) / daysBetweenState,
     inputs.currency.value
-  )}${i18n.t("splitUpExpensesText")}\nover ${daysBetweenState} days`;
+  );
+  const duplString = `Duplicating ${expenseString} over ${daysBetweenState} days. \nResulting in a ${expenseTimesDaysString} ${i18n.t(
+    "total"
+  )}`;
 
-  const splitNewString = `${formatExpenseWithCurrency(
-    Number(inputs.amount.value) * daysBetweenState,
-    inputs.currency.value
-  )} = total expense amount \nover ${daysBetweenState} days`;
+  const newExpenseSplitString = `Splitting up the ${expenseString}\nover ${daysBetweenState} days, each ${expenseDividedByDaysString}`;
 
-  const splitString = !isEditing ? splitEditingString : splitNewString;
+  const editedSplitString = `Splitting up the ${expenseTimesDaysString}\nover ${daysBetweenState} days, each ${expenseString}`;
+
+  let alreadyDividedAmountByDays = isEditing && duplOrSplit === 2;
+  if (helperStateForDividing) alreadyDividedAmountByDays = false;
+
+  const splitString = alreadyDividedAmountByDays
+    ? editedSplitString
+    : newExpenseSplitString;
+
   console.log("splitString:", splitString);
-
-  const duplOrSplitString = (duplOrSplitNum: number) => {
-    return duplOrSplitNum === 1
-      ? duplString
-      : duplOrSplitNum === 2
-      ? splitString
-      : "";
-  };
+  const duplOrSplitString = useCallback(
+    (duplOrSplitNum: number) => {
+      return duplOrSplitNum === 1
+        ? duplString
+        : duplOrSplitNum === 2
+        ? splitString
+        : "";
+    },
+    [duplString, splitString]
+  );
 
   const onConfirmRange = (expenseOut) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -332,74 +330,87 @@ const ExpenseForm = ({
     const endDateFormat = getFormattedDate(endDate);
     setStartDate(startDateFormat);
     setEndDate(endDateFormat);
+
+    setDaysBetweenState(daysBetween(endDate, startDate) + 1);
+
+    // no range
     if (startDateFormat === endDateFormat) {
       inputChangedHandler("date", startDateFormat);
-      switch (duplOrSplit) {
-        case DuplicateOption.duplicateRanged:
-        case DuplicateOption.duplFromSingle:
-        case DuplicateOption.duplFromRangedSplit:
-          setDuplOrSplit(DuplicateOption.singleExpense);
-          break;
-        case DuplicateOption.splitRanged:
-          setDuplOrSplit(DuplicateOption.singleExpense);
-          break;
-        case DuplicateOption.singleExpense:
-        default:
-          setDuplOrSplit(DuplicateOption.singleExpense);
-          break;
+      // multiply amount by number of days to get total
+      if (duplOrSplit === DuplicateOption.split) {
+        inputChangedHandler(
+          "amount",
+          (Number(inputs.amount.value) * daysBetweenState).toFixed(2).toString()
+        );
       }
+      if (
+        duplOrSplit === DuplicateOption.split &&
+        !alreadyDividedAmountByDays
+      ) {
+        // divide amount by number of days
+        inputChangedHandler(
+          "amount",
+          (Number(inputs.amount.value) / daysBetweenState).toFixed(2).toString()
+        );
+      }
+      setDuplOrSplit(DuplicateOption.null);
       return;
     }
-    // Alert ask if Dupl or Split
-    const alertDuplSplitString = `Duplicate the expense: ${duplOrSplitString(
-      1
-    )} or Split the expense: ${duplOrSplitString(2)}`;
-    console.log(" ~ alertDuplSplitString:", alertDuplSplitString);
+    if (duplOrSplit == DuplicateOption.null) setConfirmedRange(true);
+
     // TODO: make this structured
+    console.log(daysBetweenState);
+  };
+  useLayoutEffect(() => {
+    if (!confirmedRange) return;
+    setConfirmedRange(false);
     Alert.alert(
-      "Duplicate or split?", //i18n.t("duplOrSplit"),
-      alertDuplSplitString, //i18n.t("duplOrSplitText"),
+      `${i18n.t("duplicateExpenses")} / ${i18n.t("splitUpExpenses")}`, //i18n.t("duplOrSplit"),
+      `${i18n.t("duplicateExpenses")}: ${duplOrSplitString(1)}\n\n ${i18n.t(
+        "splitUpExpenses"
+      )}: ${duplOrSplitString(2)}`, //i18n.t("duplOrSplitText"),
       [
         {
           text: "Duplicate", //i18n.t("duplicate"),
           onPress: () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            switch (duplOrSplit) {
-              case DuplicateOption.singleExpense:
-                setDuplOrSplit(DuplicateOption.duplicateRanged);
-                break;
-              case DuplicateOption.splitRanged:
-                setDuplOrSplit(DuplicateOption.duplicateRanged);
-                break;
-              case DuplicateOption.duplicateRanged:
-              default:
-                setDuplOrSplit(DuplicateOption.duplicateRanged);
-                break;
-            }
+            setDuplOrSplit(DuplicateOption.duplicate);
           },
         },
         {
           text: "Split", //i18n.t("split"),
           onPress: () => {
+            if (duplOrSplit !== 2) setHelperStateForDividing(true);
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            switch (duplOrSplit) {
-              case DuplicateOption.singleExpense:
-                setDuplOrSplit(DuplicateOption.splitRanged);
-                break;
-              case DuplicateOption.duplicateRanged:
-                setDuplOrSplit(DuplicateOption.splitRanged);
-                break;
-              case DuplicateOption.splitRanged:
-              default:
-                setDuplOrSplit(DuplicateOption.splitRanged);
-                break;
-            }
+            setDuplOrSplit(DuplicateOption.split);
           },
         },
       ],
       { cancelable: false }
     );
-  };
+  }, [
+    startDate,
+    endDate,
+    inputs.amount.value,
+    inputs.currency.value,
+    daysBetweenState,
+    duplOrSplit,
+    confirmedRange,
+    duplOrSplitString,
+  ]);
+
+  function toggleDuplOrSplit() {
+    if (duplOrSplit == 0) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    switch (duplOrSplit) {
+      case DuplicateOption.duplicate: // from dupl to split
+        setDuplOrSplit(2);
+        break;
+      case DuplicateOption.split: // from split to dupl
+        setDuplOrSplit(1);
+        break;
+    }
+  }
 
   // list of all splits owed
   const [splitList, setSplitList] = useState(
@@ -594,6 +605,7 @@ const ExpenseForm = ({
       iconName: iconName,
       isPaid: isPaid,
       isSpecialExpense: isSpecialExpense,
+      alreadyDividedAmountByDays: alreadyDividedAmountByDays,
     };
 
     // SoloTravellers always pay for themselves
@@ -963,7 +975,7 @@ const ExpenseForm = ({
   };
 
   const headerHeight = useHeaderHeight();
-
+  const hideBottomBorder = duplOrSplit == 1 || duplOrSplit == 2;
   return (
     <>
       {datepickerJSX}
@@ -1096,50 +1108,60 @@ const ExpenseForm = ({
                     ></CountryPicker>
                   </View>
                 </View>
-
-                <Pressable
-                  onPress={() => {
-                    if (!dateIsRanged) return;
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    if (isEditing && dateIsRanged) {
-                      Alert.alert(
-                        i18n.t("comingSoon"),
-                        i18n.t("comingSoonDuplOrSplit"),
-                        [
-                          {
-                            text: i18n.t("confirm"),
-                            onPress: () => {
-                              Haptics.impactAsync(
-                                Haptics.ImpactFeedbackStyle.Light
-                              );
-                            },
-                          },
-                        ]
-                      );
-                      return;
-                    }
-                    if (duplOrSplit === 1) setDuplOrSplit(2);
-                    else setDuplOrSplit(1);
-                  }}
-                  style={styles.dateLabel}
-                >
+                <View style={styles.dateLabel}>
                   <Text style={styles.dateLabelText}>
                     {i18n.t("dateLabel")}
                   </Text>
-                  {duplOrSplit !== 0 && (
-                    <Card elevation={4} style={styles.card}>
-                      <Text style={styles.dateLabelDuplSplitText}>
-                        {duplOrSplitString(duplOrSplit)}
-                      </Text>
-                    </Card>
-                  )}
-                </Pressable>
+                </View>
+
                 {DatePickerContainer({
                   openDatePickerRange,
                   startDate,
                   endDate,
                   dateIsRanged,
+                  hideBottomBorder,
                 })}
+
+                <Pressable
+                  style={
+                    duplOrSplit !== 0 && {
+                      paddingBottom: 5,
+                      marginHorizontal: "5%",
+                      borderBottomColor: GlobalStyles.colors.textColor,
+                      borderBottomWidth: 1,
+                    }
+                  }
+                  onPress={() => {
+                    // toggleDuplOrSplit();
+                  }}
+                >
+                  {duplOrSplit !== 0 && (
+                    <View style={styles.duplOrSplitContainer}>
+                      <Text style={styles.dateLabelDuplSplitText}>
+                        {duplOrSplitString(duplOrSplit)}
+                      </Text>
+                      {/* <Switch
+                        style={[
+                          // { marginLeft: "10%" },
+                          GlobalStyles.shadowPrimary,
+                        ]}
+                        trackColor={{
+                          false: GlobalStyles.colors.gray500,
+                          true: GlobalStyles.colors.primary500,
+                        }}
+                        thumbColor={
+                          duplOrSplit == 2
+                            ? GlobalStyles.colors.backgroundColor
+                            : GlobalStyles.colors.gray500Accent
+                        }
+                        value={duplOrSplit == 2}
+                        onChange={() => {
+                          toggleDuplOrSplit();
+                        }}
+                      ></Switch> */}
+                    </View>
+                  )}
+                </Pressable>
 
                 <View style={styles.inputsRowSecond}>
                   {/* !IsSoloTraveller && */}
@@ -1498,7 +1520,29 @@ ExpenseForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   setIsSubmitting: PropTypes.func.isRequired,
   isEditing: PropTypes.bool,
-  defaultValues: PropTypes.object,
+  defaultValues: PropTypes.shape({
+    amount: PropTypes.number,
+    date: PropTypes.instanceOf(Date),
+    description: PropTypes.string,
+    category: PropTypes.string,
+    country: PropTypes.string,
+    currency: PropTypes.string,
+    whoPaid: PropTypes.string,
+    splitType: PropTypes.string,
+    listEQUAL: PropTypes.arrayOf(
+      PropTypes.shape({
+        userName: PropTypes.string,
+        amount: PropTypes.number,
+      })
+    ),
+    splitList: PropTypes.arrayOf(
+      PropTypes.shape({
+        userName: PropTypes.string,
+        amount: PropTypes.number,
+      })
+    ),
+    duplOrSplit: PropTypes.number,
+  }),
   pickedCat: PropTypes.string,
   submitButtonLabel: PropTypes.string,
   navigation: PropTypes.object,
@@ -1665,8 +1709,10 @@ const styles = StyleSheet.create({
   },
   dateLabelDuplSplitText: {
     fontSize: 12,
-    fontWeight: "500",
-    color: GlobalStyles.colors.primary500,
+    fontWeight: "300",
+    fontStyle: "italic",
+    marginLeft: "2%",
+    color: GlobalStyles.colors.textColor,
   },
 
   dateIconContainer: {
@@ -1732,19 +1778,13 @@ const styles = StyleSheet.create({
     marginTop: "8%",
     marginHorizontal: "6%",
   },
-  card: {
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: GlobalStyles.colors.gray700,
+  duplOrSplitContainer: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "stretch",
     padding: 8,
-    // marginTop: 8,
-    marginLeft: "25%",
-    // marginRight: 8,
-    // marginBottom: 8,
-    //centering content
-    justifyContent: "center",
-    alignItems: "center",
+    margin: 4,
     overflow: "visible",
   },
 });

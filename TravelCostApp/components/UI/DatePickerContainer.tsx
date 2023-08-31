@@ -10,10 +10,13 @@ const DatePickerContainer = ({
   startDate,
   endDate,
   dateIsRanged,
+  hideBottomBorder = false,
   narrow = false,
 }) => {
   return (
-    <View style={styles.dateContainer}>
+    <View
+      style={[styles.dateContainer, !hideBottomBorder && styles.bottomBorder]}
+    >
       <View style={styles.dateIconContainer}>
         <IconButton
           icon={"calendar-outline"}
@@ -49,6 +52,7 @@ DatePickerContainer.propTypes = {
   startDate: PropTypes.string,
   endDate: PropTypes.string,
   dateIsRanged: PropTypes.bool.isRequired,
+  hideBottomBorder: PropTypes.bool,
   narrow: PropTypes.bool,
 };
 
@@ -74,8 +78,7 @@ const styles = StyleSheet.create({
   dateContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    borderBottomColor: GlobalStyles.colors.gray700,
-    borderBottomWidth: 1,
+
     marginHorizontal: "5%",
     marginTop: "4%",
     paddingBottom: 4,
@@ -86,5 +89,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontStyle: "italic",
     fontWeight: "300",
+  },
+  bottomBorder: {
+    borderBottomColor: GlobalStyles.colors.gray700,
+    borderBottomWidth: 1,
   },
 });

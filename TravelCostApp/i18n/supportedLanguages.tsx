@@ -207,6 +207,7 @@ const en = {
     "Do you want to multiply or split the costs over several days?",
   duplicateExpenses: "Duplicate",
   splitUpExpenses: "Split Up",
+  total: "total",
 
   paywallTitle: "Become a Premium Nomad!",
   paywallSubtitle: "Make your journey even easier with additional features:",
@@ -596,6 +597,7 @@ const de = {
     "Möchtest du die Kosten über mehrere Tage vervielfachen oder aufsplitten?",
   duplicateExpenses: "Vervielfachen",
   splitUpExpenses: "Aufsplitten",
+  total: "Gesamt",
 
   // Paywall and Premium
   paywallTitle: "Werde Premium Nomade!",

@@ -33,7 +33,7 @@ import { UserContext } from "../store/user-context";
 import BackButton from "../components/UI/BackButton";
 
 const FilteredPieCharts = ({ navigation, route }) => {
-  const { expenses, dayString } = route.params;
+  const { expenses, dayString, noList = false } = route.params;
   const userCtx = useContext(UserContext);
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
   // contents and titleStrings have to match in legth and correspond!
@@ -42,7 +42,7 @@ const FilteredPieCharts = ({ navigation, route }) => {
     i18n.t("travellers"),
     i18n.t("countries"),
     i18n.t("currencies"),
-    i18n.t("expenses"),
+    !noList && i18n.t("expenses"),
   ];
   const contents = [
     <ExpenseCategories
@@ -69,27 +69,31 @@ const FilteredPieCharts = ({ navigation, route }) => {
       periodName={dayString}
       navigation={navigation}
     ></ExpenseCurrencies>,
-    <FilteredExpenses
-      key={4}
-      expensesAsArg={expenses}
-      dayStringAsArg={dayString}
-    ></FilteredExpenses>,
+    !noList && (
+      <FilteredExpenses
+        key={4}
+        expensesAsArg={expenses}
+        dayStringAsArg={dayString}
+      ></FilteredExpenses>
+    ),
   ];
   if (contents.length !== titleStrings.length)
     throw new Error("Lengths do not match");
-  const CONTENTS_MAX_INDEX = titleStrings.length - 1;
+  let contentsMaxIndex = titleStrings.length - 1;
+  if (noList) contentsMaxIndex = titleStrings.length - 2;
+  console.log("FilteredPieCharts ~ CONTENTS_MAX_INDEX:", contentsMaxIndex);
 
   const nextHandler = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setToggleGraphEnum(
-      toggleGraphEnum == CONTENTS_MAX_INDEX ? 0 : toggleGraphEnum + 1
+      toggleGraphEnum == contentsMaxIndex ? 0 : toggleGraphEnum + 1
     );
   };
 
   const previousHandler = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setToggleGraphEnum(
-      toggleGraphEnum == 0 ? CONTENTS_MAX_INDEX : toggleGraphEnum - 1
+      toggleGraphEnum == 0 ? contentsMaxIndex : toggleGraphEnum - 1
     );
   };
 

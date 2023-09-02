@@ -29,7 +29,11 @@ import { ExpensesContext } from "../../store/expenses-context";
 import IconButton from "../UI/IconButton";
 import Animated, {
   Easing,
+  FadeInLeft,
+  FadeInRight,
   FadeInUp,
+  FadeOutLeft,
+  FadeOutRight,
   FadeOutUp,
   Layout,
   SlideInUp,
@@ -60,6 +64,7 @@ import { formatExpenseWithCurrency } from "../../util/string";
 import Icon from "react-native-paper/lib/typescript/src/components/Icon";
 import { useInterval } from "../Hooks/useInterval";
 import { addShadowItemsToExpenses } from "./ExpenseListUtil";
+import { UserContext } from "../../store/user-context";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -113,6 +118,35 @@ function renderExpenseItem(
   if (itemData.item.id.includes("shadow"))
     return <View style={{ height: 55, width: "100%" }}></View>;
   const index = itemData.index;
+  const selectableJSX = (
+    <Animated.View
+      entering={FadeInLeft}
+      exiting={FadeOutLeft}
+      style={{
+        flex: 0,
+        position: "absolute",
+        top: -36,
+        left: -46,
+        zIndex: 1,
+      }}
+    >
+      <IconButton
+        icon={
+          selected.includes(itemData.item.id)
+            ? "ios-checkmark-circle"
+            : "ellipse-outline"
+        }
+        color={
+          selected.includes(itemData.item.id)
+            ? GlobalStyles.colors.textColor
+            : GlobalStyles.colors.gray700
+        }
+        size={16}
+        onPress={selectItem.bind(this, itemData.item.id)}
+        buttonStyle={{ padding: 48 }}
+      ></IconButton>
+    </Animated.View>
+  );
   if (Platform.OS === "android")
     return (
       <View style={{ height: 55, width: "100%" }}>
@@ -129,6 +163,7 @@ function renderExpenseItem(
             ref={(ref) => (row[index] = ref)}
             overshootFriction={8}
           >
+            {selectable && selectableJSX}
             <ExpenseItem
               showSumForTravellerName={travellerName}
               filtered={filtered}
@@ -155,19 +190,7 @@ function renderExpenseItem(
         disableLeftSwipe={true}
         overshootFriction={8}
       >
-        {selectable && (
-          <View style={{ flex: 0, position: "absolute", zIndex: 1 }}>
-            <IconButton
-              icon={
-                selected.includes(itemData.item.id)
-                  ? "ios-checkmark-circle"
-                  : "ios-checkmark-circle-outline"
-              }
-              size={12}
-              onPress={selectItem.bind(this, itemData.item.id)}
-            ></IconButton>
-          </View>
-        )}
+        {selectable && selectableJSX}
         <ExpenseItem
           showSumForTravellerName={travellerName}
           filtered={filtered}
@@ -363,6 +386,7 @@ function ExpensesList({
   const netCtx = useContext(NetworkContext);
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
   const tripCtx = useContext(TripContext);
+  const userCtx = useContext(UserContext);
   expenseCtx = useContext(ExpensesContext);
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(1);
   tripid = tripCtx.tripid;
@@ -406,7 +430,21 @@ function ExpensesList({
       setSelected(expenses.map((item) => item.id));
     }
   };
+
+  function finderWithExpenses() {
+    if (selected.length === 0) return;
+    const finderExpenses = expenses.filter(
+      (item) => selected.includes(item.id) && !item.id.includes("shadow")
+    );
+    navigation.navigate("FilteredPieCharts", {
+      expenses: finderExpenses,
+      dayString: `${finderExpenses.length} selected Expenses from ${userCtx.periodName}`,
+      noList: true,
+    });
+  }
+
   const deleteSelected = () => {
+    if (selected.length === 0) return;
     Alert.alert(
       `Delete selected expenses?`,
       `This will delete all selected entries!`,
@@ -533,13 +571,35 @@ function ExpensesList({
               flexDirection: "row",
             }}
           >
-            {selectable && selected.length > 0 && (
-              <IconButton
-                icon={"ios-trash-outline"}
-                size={24}
-                color={GlobalStyles.colors.gray700}
-                onPress={deleteSelected}
-              ></IconButton>
+            {selectable && (
+              <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
+                <IconButton
+                  icon={"ios-trash-outline"}
+                  size={24}
+                  color={GlobalStyles.colors.gray700}
+                  onPress={deleteSelected}
+                ></IconButton>
+              </Animated.View>
+            )}
+            {selectable && (
+              <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
+                <IconButton
+                  icon={"search-circle-outline"}
+                  size={24}
+                  color={GlobalStyles.colors.gray700}
+                  onPress={finderWithExpenses}
+                ></IconButton>
+              </Animated.View>
+            )}
+            {selectable && (
+              <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
+                <IconButton
+                  icon={"checkmark-done-outline"}
+                  size={24}
+                  color={GlobalStyles.colors.gray700}
+                  onPress={selectAll}
+                ></IconButton>
+              </Animated.View>
             )}
             <IconButton
               icon={

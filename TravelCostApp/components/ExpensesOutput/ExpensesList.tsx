@@ -3,8 +3,10 @@ import {
   Dimensions,
   FlatList,
   Platform,
+  Pressable,
   ScrollView,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 
 import ExpenseItem from "./ExpenseItem";
@@ -25,7 +27,14 @@ import { getAllExpenses, touchAllTravelers } from "../../util/http";
 import { TripContext } from "../../store/trip-context";
 import { ExpensesContext } from "../../store/expenses-context";
 import IconButton from "../UI/IconButton";
-import Animated, { Layout } from "react-native-reanimated";
+import Animated, {
+  Easing,
+  FadeInUp,
+  FadeOutUp,
+  Layout,
+  SlideInUp,
+  SlideOutUp,
+} from "react-native-reanimated";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -46,6 +55,7 @@ import { Text } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
 import Icon from "react-native-paper/lib/typescript/src/components/Icon";
 import { useInterval } from "../Hooks/useInterval";
+import { addShadowItemsToExpenses } from "./ExpenseListUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -92,9 +102,12 @@ function renderExpenseItem(
   isOnline: boolean,
   selectable: boolean,
   selected: ExpenseData[],
-  selectItem,
+  selectItem: (item: ExpenseData, id: object) => void,
+  setSelectable: (selectable: boolean) => void,
   itemData
 ) {
+  if (itemData.item.id.includes("shadow"))
+    return <View style={{ height: 55, width: "100%" }}></View>;
   const index = itemData.index;
   if (Platform.OS === "android")
     return (
@@ -115,6 +128,7 @@ function renderExpenseItem(
             <ExpenseItem
               showSumForTravellerName={travellerName}
               filtered={filtered}
+              setSelectable={setSelectable}
               {...itemData.item}
             />
           </Swipeable>
@@ -354,15 +368,14 @@ function ExpensesList({
   const [selected, setSelected] = useState<string[]>([]);
   // autoscroll to the first item after the header
   const flatListRef = useRef(null);
-  const listLong = expenses.length > 4;
+  // for scroll to top
+  const [contentVerticalOffset, setContentVerticalOffset] = useState(0);
+  const CONTENT_OFFSET_THRESHOLD = 300;
+  if (expenses.length < 6) addShadowItemsToExpenses(expenses);
 
-  useEffect(() => {
-    if (!listLong) setSelectable(false);
-  }, [listLong]);
   const scrollTo = useCallback(
     (index: number) => {
-      if (!flatListRef.current || !listLong || index > expenses.length + 1)
-        return;
+      if (!flatListRef.current || index > expenses.length + 1) return;
       if (flatListRef.current) {
         flatListRef.current.scrollToIndex({
           index: index,
@@ -370,22 +383,8 @@ function ExpensesList({
         });
       }
     },
-    [expenses.length, listLong]
+    [expenses.length]
   );
-
-  useEffect(() => {
-    scrollTo(1);
-  }, [expenses, scrollTo]);
-
-  // useInterval(
-  //   () => {
-  //     if (expenses.length > 4 && !selectable) {
-  //       scrollTo(1);
-  //     }
-  //   },
-  //   10000,
-  //   true
-  // );
 
   const selectItem = (item, id: object) => {
     console.log("selectItem ~ item:", item);
@@ -423,7 +422,6 @@ function ExpensesList({
           onPress: async () => {
             try {
               navigation?.popToTop();
-              scrollTo(1);
               setSelected([]);
               setSelectable(false);
               Toast.show({
@@ -467,7 +465,6 @@ function ExpensesList({
     if (selectable) {
       setSelectable(false);
       setSelected([]);
-      scrollTo(1);
     } else {
       setSelectable(true);
     }
@@ -496,6 +493,10 @@ function ExpensesList({
       </View>
       <Animated.FlatList
         scrollEnabled={true}
+        initialScrollIndex={1}
+        onScroll={(event) => {
+          setContentVerticalOffset(event.nativeEvent.contentOffset.y);
+        }}
         data={expenses}
         ref={flatListRef}
         layout={layoutAnim}
@@ -504,42 +505,41 @@ function ExpensesList({
           isOnline,
           selectable,
           selected,
-          selectItem
+          selectItem,
+          setSelectable
         )}
         ListFooterComponent={
           <View style={{ height: Dimensions.get("screen").height / 1.8 }} />
         }
         ListHeaderComponent={
-          listLong && (
-            <View
-              style={{
-                paddingRight: 20,
-                marginTop: 12,
-                alignItems: "center",
-                justifyContent: "flex-end",
-                flexDirection: "row",
-              }}
-            >
-              {selectable && selected.length > 0 && (
-                <IconButton
-                  icon={"ios-trash-outline"}
-                  size={24}
-                  color={GlobalStyles.colors.gray700}
-                  onPress={deleteSelected}
-                ></IconButton>
-              )}
+          <View
+            style={{
+              paddingRight: 20,
+              marginTop: 12,
+              alignItems: "center",
+              justifyContent: "flex-end",
+              flexDirection: "row",
+            }}
+          >
+            {selectable && selected.length > 0 && (
               <IconButton
-                icon={
-                  selectable
-                    ? "ios-checkmark-circle"
-                    : "ios-checkmark-circle-outline"
-                }
+                icon={"ios-trash-outline"}
                 size={24}
                 color={GlobalStyles.colors.gray700}
-                onPress={selectPressHandler}
+                onPress={deleteSelected}
               ></IconButton>
-            </View>
-          )
+            )}
+            <IconButton
+              icon={
+                selectable
+                  ? "ios-checkmark-circle"
+                  : "ios-checkmark-circle-outline"
+              }
+              size={24}
+              color={GlobalStyles.colors.gray700}
+              onPress={selectPressHandler}
+            ></IconButton>
+          </View>
         }
         keyExtractor={(item: Expense) => item.id}
         refreshControl={refreshControl}
@@ -549,6 +549,17 @@ function ExpensesList({
           index,
         })}
       />
+      {contentVerticalOffset > CONTENT_OFFSET_THRESHOLD && (
+        <Animated.View
+          entering={FadeInUp.duration(250).easing(Easing.linear)}
+          exiting={FadeOutUp.duration(200).easing(Easing.linear)}
+          style={[styles.scrollToTopButton, GlobalStyles.shadowPrimary]}
+        >
+          <TouchableOpacity onPress={() => scrollTo(1)}>
+            <Text style={styles.scrollToTopText}>Scroll To Top</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      )}
     </Animated.View>
   );
 }
@@ -571,3 +582,23 @@ ExpensesList.propTypes = {
   showSumForTravellerName: PropTypes.string,
   isFiltered: PropTypes.bool,
 };
+
+const styles = StyleSheet.create({
+  scrollToTopButton: {
+    flex: 1,
+    position: "absolute",
+    top: 10,
+    left: "35%",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: 50,
+    borderColor: GlobalStyles.colors.primaryGrayed,
+    borderWidth: 1,
+  },
+  scrollToTopText: {
+    color: GlobalStyles.colors.primary700,
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+});

@@ -521,6 +521,7 @@ function ExpensesList({
     if (selectable) {
       setSelectable(false);
       setSelected([]);
+      scrollTo(1);
     } else {
       setSelectable(true);
     }
@@ -582,17 +583,25 @@ function ExpensesList({
                 <IconButton
                   icon={"ios-trash-outline"}
                   size={24}
-                  color={GlobalStyles.colors.gray700}
+                  color={
+                    selected.length > 0
+                      ? GlobalStyles.colors.gray700
+                      : GlobalStyles.colors.gray600
+                  }
                   onPress={deleteSelected}
                 ></IconButton>
               </Animated.View>
             )}
-            {selectable && !filtered && (
+            {selectable && !isFiltered && (
               <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
                 <IconButton
-                  icon={"search-circle-outline"}
+                  icon={"pie-chart-outline"}
                   size={24}
-                  color={GlobalStyles.colors.gray700}
+                  color={
+                    selected.length > 0
+                      ? GlobalStyles.colors.gray700
+                      : GlobalStyles.colors.gray600
+                  }
                   onPress={finderWithExpenses}
                 ></IconButton>
               </Animated.View>

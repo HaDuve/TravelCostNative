@@ -327,8 +327,10 @@ const styles = StyleSheet.create({
 
     ...Platform.select({
       ios: {
-        marginTop: "30%",
+        marginTop: "14%",
+        marginLeft: "4%",
         borderRadius: 12,
+        minHeight: 55,
       },
       android: {
         // marginTop: "50%",

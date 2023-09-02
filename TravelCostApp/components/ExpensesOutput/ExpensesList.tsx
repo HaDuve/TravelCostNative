@@ -44,7 +44,11 @@ import {
   deleteExpenseOnlineOffline,
   OfflineQueueManageExpenseItem,
 } from "../../util/offline-queue";
-import { ExpenseData, Expense } from "../../util/expense";
+import {
+  ExpenseData,
+  Expense,
+  deleteAllExpensesByRangedId,
+} from "../../util/expense";
 import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
@@ -434,6 +438,14 @@ function ExpensesList({
                 const expenseItem = expenses.find(
                   (item) => item.id === selected[i]
                 );
+                if (expenseItem.rangeId) {
+                  await deleteAllExpensesByRangedId(
+                    tripid,
+                    expenseItem,
+                    isOnline,
+                    expenseCtx
+                  );
+                }
                 const item: OfflineQueueManageExpenseItem = {
                   type: "delete",
                   expense: {

@@ -42,12 +42,13 @@ import { SettingsContext } from "../../store/settings-context";
 import { useEffect } from "react";
 import * as Haptics from "expo-haptics";
 import { ExpenseData } from "../../util/expense";
-import { hide } from "expo-splash-screen";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 
 function ExpenseItem(props): JSX.Element {
+  const { showSumForTravellerName, filtered } = props;
+  const { setSelectable } = props;
   const {
     id,
     description,
@@ -61,7 +62,6 @@ function ExpenseItem(props): JSX.Element {
     iconName,
     isSpecialExpense,
   }: ExpenseData = props;
-  const { showSumForTravellerName, filtered } = props;
   let { date } = props;
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
@@ -155,31 +155,64 @@ function ExpenseItem(props): JSX.Element {
     (item) => item.amount !== 0
   );
   const longList =
-    splitList && splitList.length > 2 && splitListHasNonZeroEntries
+    splitList && splitList.length > 3 && splitListHasNonZeroEntries
       ? splitList.slice(0, 2)
       : null;
-  longList?.push({ userName: "+" });
+  longList?.push({ userName: "+", amount: 0 });
   const sharedList =
     splitList && splitList.length > 0 ? (
       <View style={{ overflow: "visible" }}>
         <FlatList
           scrollEnabled={false}
-          data={longList ? longList : splitList}
+          data={
+            longList
+              ? longList.sort((a, b) => {
+                  // if username === + put last
+                  if (a.userName === "+") return 1;
+                  if (b.userName === "+") return -1;
+                  // put the whopaid user first, then alphabetically
+                  if (a.userName === whoPaid) return -1;
+                  if (b.userName === whoPaid) return 1;
+                  return a.userName.localeCompare(b.userName);
+                })
+              : splitList.sort((a, b) => {
+                  // if username === + put last
+                  if (a.userName === "+") return 1;
+                  if (b.userName === "+") return -1;
+                  // put the whopaid user first, then alphabetically
+                  if (a.userName === whoPaid) return -1;
+                  if (b.userName === whoPaid) return 1;
+                  return a.userName.localeCompare(b.userName);
+                })
+          }
           horizontal={true}
-          renderItem={({ item }) => (
-            <View
-              style={[styles.avatar, GlobalStyles.shadow, { marginBottom: 16 }]}
-            >
-              <Text style={styles.avatarText}>{item.userName.slice(0, 1)}</Text>
-            </View>
-          )}
+          renderItem={({ item }) => {
+            // if username == whopaid set color to primary
+            const userPaid = item.userName === whoPaid;
+            return (
+              <View
+                style={[
+                  styles.avatar,
+                  GlobalStyles.shadow,
+                  { marginBottom: 16 },
+                  userPaid && styles.avatarPaid,
+                ]}
+              >
+                <Text style={styles.avatarText}>
+                  {item.userName.slice(0, 1)}
+                </Text>
+              </View>
+            );
+          }}
           contentContainerStyle={styles.avatarContainer}
-          keyExtractor={(item) => item + Math.random()}
+          keyExtractor={(item) => {
+            return item.userName;
+          }}
         ></FlatList>
       </View>
     ) : (
       <View style={styles.avatarContainer}>
-        <View style={[GlobalStyles.shadow, styles.avatar]}>
+        <View style={[GlobalStyles.shadow, styles.avatar, styles.avatarPaid]}>
           <Text style={styles.avatarText}>{whoPaid?.slice(0, 1)}</Text>
         </View>
       </View>
@@ -204,6 +237,12 @@ function ExpenseItem(props): JSX.Element {
     >
       <Pressable
         onPress={memoizedCallback}
+        onLongPress={() => {
+          console.log("long press item");
+          console.log("ExpenseItem ~ setSelectable:", setSelectable);
+          if (setSelectable === undefined) return;
+          setSelectable(true);
+        }}
         style={({ pressed }) => pressed && GlobalStyles.pressed}
       >
         <View style={styles.expenseItem}>
@@ -287,6 +326,7 @@ ExpenseItem.propTypes = {
   showSumForTravellerName: PropTypes.string,
   filtered: PropTypes.bool,
   isSpecialExpense: PropTypes.bool,
+  setSelectable: PropTypes.func,
 };
 
 const styles = StyleSheet.create({
@@ -394,6 +434,10 @@ const styles = StyleSheet.create({
         minWidth: 22,
       },
     }),
+  },
+  avatarPaid: {
+    // borderWidth: 2,
+    borderColor: GlobalStyles.colors.primary700,
   },
   avatarText: {
     fontSize: 14,

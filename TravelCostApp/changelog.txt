@@ -1,5 +1,20 @@
 Change log Travel Expense App
 
+1.2.640
+- added option to select items from expense lists
+- added option to delete selected expenses from lists
+- added option to show pie charts from selected expenses from lists
+- added border and ordering of traveller icons to show who paid for the expense
+- added Scroll To Top Button for when you quickly want to get back to the newest expenses in a list
+- added a calculated Sum to the found Expenses of the Finder filters
+
+- added missing explanation when splitting expenses over multiple days
+- added animations to "Edit Trip"
+- fixed checking for currency rates too often (now checks correctly again after 1 hour)
+- fixed trip changes not being updated in Profile
+- faster loading active trip in Profile
+- improved locale detection
+
 1.2.630
 - added the option to ask chatGPT for a price before entering an amount
 - added the option to either split up or duplicate the costs of an existing expense over multiple days

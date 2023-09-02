@@ -399,6 +399,7 @@ function ExpensesList({
   // for scroll to top
   const [contentVerticalOffset, setContentVerticalOffset] = useState(0);
   const CONTENT_OFFSET_THRESHOLD = 300;
+  const showScrollToTop = contentVerticalOffset > CONTENT_OFFSET_THRESHOLD;
   if (expenses.length < 6) addShadowItemsToExpenses(expenses);
 
   const scrollTo = useCallback(
@@ -430,6 +431,11 @@ function ExpensesList({
       setSelected(expenses.map((item) => item.id));
     }
   };
+
+  function moveExpensesToTrip() {
+    if (selected.length === 0) return;
+    // TODO: finish this function
+  }
 
   function finderWithExpenses() {
     if (selected.length === 0) return;
@@ -602,11 +608,7 @@ function ExpensesList({
               </Animated.View>
             )}
             <IconButton
-              icon={
-                selectable
-                  ? "ios-checkmark-circle"
-                  : "ios-checkmark-circle-outline"
-              }
+              icon={"ellipsis-horizontal-circle-outline"}
               size={24}
               color={GlobalStyles.colors.gray700}
               onPress={selectPressHandler}
@@ -621,7 +623,7 @@ function ExpensesList({
           index,
         })}
       />
-      {contentVerticalOffset > CONTENT_OFFSET_THRESHOLD && (
+      {showScrollToTop && (
         <Animated.View
           entering={FadeInUp.duration(250).easing(Easing.linear)}
           exiting={FadeOutUp.duration(200).easing(Easing.linear)}

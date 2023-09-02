@@ -65,6 +65,7 @@ export async function getOfflineRate(base: string, target: string) {
     );
     return currencyExchange[target];
   } else {
+    console.log("getOfflineRate ~ error ~ no currencyExchange rate stored!");
     return -1;
   }
 }

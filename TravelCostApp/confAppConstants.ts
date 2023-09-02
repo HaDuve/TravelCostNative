@@ -27,4 +27,4 @@ export const EXPENSES_LOAD_TIMEOUT = 6000;
 // tweak minimum required internet speed in Mbit/s
 export const MINIMUM_REQUIRED_SPEED = 0.5;
 // cache: only call the getRate request again after X numbers of hours
-export const CACHE_NUM_HOURS = 6;
+export const CACHE_NUM_HOURS = 1;

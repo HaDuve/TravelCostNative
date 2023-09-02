@@ -35,11 +35,14 @@ import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { BlurView } from "expo-blur";
 import Animated from "react-native-reanimated";
 import BlurPremium from "../components/Premium/BlurPremium";
+import { formatExpenseWithCurrency } from "../util/string";
+import { TripContext } from "../store/trip-context";
 
 const FinderScreen = () => {
   const navigation = useNavigation();
   const expenseCtx = useContext(ExpensesContext);
   const userCtx = useContext(UserContext);
+  const tripCtx = useContext(TripContext);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -169,6 +172,10 @@ const FinderScreen = () => {
 
   const numberOfResults = filteredExpenses?.length;
   const foundResults = filteredExpenses?.length > 0 ? true : false;
+  const sumOfResults = filteredExpenses?.reduce(
+    (sum, expense) => sum + expense.calcAmount,
+    0
+  );
 
   const [hasLoaded, setHasLoaded] = useState(false);
   // save all state variables into async storage
@@ -287,6 +294,14 @@ const FinderScreen = () => {
           <Text style={styles.queryText}>
             {(queryString || dateString) && i18n.t("finding")} :{queryString}{" "}
             {dateString}
+          </Text>
+          <Text style={styles.queryText}>
+            {foundResults && "Sum of the Results: "}
+            {foundResults &&
+              formatExpenseWithCurrency(
+                sumOfResults,
+                tripCtx.tripCurrency
+              )}{" "}
           </Text>
           <GradientButton
             onPress={() => findPressedHandler()}

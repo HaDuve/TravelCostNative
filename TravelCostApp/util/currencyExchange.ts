@@ -17,6 +17,7 @@ export async function getRate(base: string, target: string) {
     const lastUpdateDateTime = DateTime.fromISO(lastUpdate);
     const now = DateTime.now();
     const diff = now.diff(lastUpdateDateTime, "hours").hours;
+    console.log("getRate ~ diff:", diff);
     if (diff < CACHE_NUM_HOURS) {
       // get from asyncstore
       return getOfflineRate(base, target);
@@ -40,7 +41,7 @@ export async function getRate(base: string, target: string) {
       );
       await asyncStoreSetObject("currencyExchange_base_" + base, rates);
       const timeStamp = DateTime.now().toISO();
-      await asyncStoreSetItem("currencyExchange_lastUpdate", timeStamp);
+      await asyncStoreSetObject("currencyExchange_lastUpdate", timeStamp);
     } else {
       // offline get from asyncstore
       return getOfflineRate(base, target);

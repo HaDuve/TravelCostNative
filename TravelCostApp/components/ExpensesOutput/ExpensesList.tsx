@@ -524,6 +524,7 @@ function ExpensesList({
       scrollTo(1);
     } else {
       setSelectable(true);
+      scrollTo(0);
     }
   }
 

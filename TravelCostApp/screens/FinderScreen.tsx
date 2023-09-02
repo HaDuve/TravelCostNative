@@ -155,13 +155,15 @@ const FinderScreen = () => {
       " - " +
       DateTime.fromISO(endDate).toLocaleString()
     : "";
+  const allEpensesQueryString =
+    queryString === "" && dateString === "" ? "All Expenses" : "";
 
   const findPressedHandler = () => {
     console.log("find pressed");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     navigation.navigate("FilteredPieCharts", {
       expenses: filteredExpenses,
-      dayString: queryString + " " + dateString,
+      dayString: allEpensesQueryString + queryString + " " + dateString,
     });
   };
 

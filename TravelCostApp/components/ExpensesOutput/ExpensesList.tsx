@@ -587,7 +587,7 @@ function ExpensesList({
                 ></IconButton>
               </Animated.View>
             )}
-            {selectable && (
+            {selectable && !filtered && (
               <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
                 <IconButton
                   icon={"search-circle-outline"}

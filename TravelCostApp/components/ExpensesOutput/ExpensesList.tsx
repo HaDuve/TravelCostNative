@@ -610,7 +610,11 @@ function ExpensesList({
             {selectable && (
               <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
                 <IconButton
-                  icon={"checkmark-done-outline"}
+                  icon={
+                    selected.length > 0
+                      ? "close-outline"
+                      : "checkmark-done-outline"
+                  }
                   size={24}
                   color={GlobalStyles.colors.gray700}
                   onPress={selectAll}

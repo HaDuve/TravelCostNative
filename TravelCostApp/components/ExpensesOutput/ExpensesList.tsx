@@ -149,7 +149,13 @@ function renderExpenseItem(
   );
   if (Platform.OS === "android")
     return (
-      <View style={{ height: 55, width: "100%" }}>
+      <View
+        style={{
+          height: 55,
+          width: "100%",
+          backgroundColor: GlobalStyles.colors.backgroundColor,
+        }}
+      >
         <GestureHandlerRootView>
           <Swipeable
             renderLeftActions={(progress, dragX) =>

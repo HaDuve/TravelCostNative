@@ -196,7 +196,7 @@ function ExpenseItem(props): JSX.Element {
                 <View
                   style={[
                     styles.avatar,
-                    GlobalStyles.shadow,
+                    // GlobalStyles.shadow,
                     { marginBottom: 16 },
                     userPaid && styles.avatarPaid,
                   ]}
@@ -215,7 +215,7 @@ function ExpenseItem(props): JSX.Element {
         </View>
       ) : (
         <View style={styles.avatarContainer}>
-          <View style={[GlobalStyles.shadow, styles.avatar, styles.avatarPaid]}>
+          <View style={[styles.avatar, styles.avatarPaid]}>
             <Text style={styles.avatarText}>{whoPaid?.slice(0, 1)}</Text>
           </View>
         </View>
@@ -297,10 +297,7 @@ function ExpenseItem(props): JSX.Element {
             <ExpenseCountryFlag
               countryName={country}
               style={[GlobalStyles.countryFlagStyle, styles.countryFlag]}
-              containerStyle={[
-                styles.countryFlagContainer,
-                GlobalStyles.shadow,
-              ]}
+              containerStyle={styles.countryFlagContainer}
             />
           )}
           {toggle2 && <View>{sharedList()}</View>}
@@ -422,7 +419,7 @@ const styles = StyleSheet.create({
   },
   countryFlag: {
     marginTop: "6%",
-    marginRight: 12,
+    // marginRight: 12,
   },
   avatarContainer: {
     maxHeight: 50,

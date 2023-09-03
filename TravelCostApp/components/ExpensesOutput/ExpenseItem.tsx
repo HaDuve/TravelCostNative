@@ -13,7 +13,7 @@ import { GlobalStyles } from "../../constants/styles";
 import { isToday, toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
 import { getCatSymbol, Category } from "../../util/category";
-import { useContext, useCallback, useState } from "react";
+import { useContext, useCallback, useState, useMemo, memo } from "react";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseWithCurrency } from "../../util/string";
 import React from "react";
@@ -56,9 +56,8 @@ function ExpenseItem(props): JSX.Element {
   }: ExpenseData = props;
   let { date } = props;
   const navigation = useNavigation();
-  const tripCtx = useContext(TripContext);
-  const userCtx = useContext(UserContext);
-  const homeCurrency = tripCtx.tripCurrency;
+  const { tripCurrency } = useContext(TripContext);
+  const { periodName, catIconNames } = useContext(UserContext);
   const rate = calcAmount / amount;
 
   const calcTravellerSum = useRef(0);
@@ -77,29 +76,37 @@ function ExpenseItem(props): JSX.Element {
       });
       calcTravellerSumString.current = formatExpenseWithCurrency(
         Number(calcTravellerSum.current),
-        homeCurrency
+        tripCurrency
       );
       travellerSumString.current = formatExpenseWithCurrency(
         Number(travellerSum.current),
         currency
       );
     }
-  }, [splitList, showSumForTravellerName, rate, homeCurrency, currency]);
+  }, [splitList, showSumForTravellerName, rate, tripCurrency, currency]);
   calcSumForTraveller();
 
-  const calcAmountString = calcTravellerSum.current
-    ? `${calcTravellerSumString.current}`
-    : formatExpenseWithCurrency(calcAmount, homeCurrency);
+  const calcAmountString = useCallback(
+    () =>
+      calcTravellerSum.current
+        ? `${calcTravellerSumString.current}`
+        : formatExpenseWithCurrency(calcAmount, tripCurrency),
+    [calcAmount, tripCurrency]
+  );
 
-  const amountString = travellerSum.current
-    ? `${travellerSumString.current}`
-    : formatExpenseWithCurrency(amount, currency);
+  const amountString = useCallback(
+    () =>
+      travellerSum.current
+        ? `${travellerSumString.current}`
+        : formatExpenseWithCurrency(amount, currency),
+    [amount, currency]
+  );
 
-  if (iconName) console.log(iconName);
+  // if (iconName) console.log(iconName);
   const [catSymbol, setCatSymbol] = useState(iconName ? iconName : "");
   useEffect(() => {
     function setCatSymbolAsync() {
-      const listOfCats = userCtx.catIconNames;
+      const listOfCats = catIconNames;
       if (listOfCats) {
         const cat: Category = listOfCats.find(({ cat }) => cat === category);
         if (cat?.icon) {
@@ -111,9 +118,9 @@ function ExpenseItem(props): JSX.Element {
       setCatSymbol(iconName);
     }
     setCatSymbolAsync();
-  }, [userCtx.catIconNames, category]);
+  }, [catIconNames, category]);
 
-  const sameCurrency = homeCurrency === currency;
+  const sameCurrency = tripCurrency === currency;
 
   const { settings } = useContext(SettingsContext);
   const toggle1 = settings.showFlags;
@@ -139,7 +146,7 @@ function ExpenseItem(props): JSX.Element {
               },
             ]}
           >
-            {amountString}
+            {amountString()}
           </Text>
         </>
       ) : (
@@ -196,7 +203,7 @@ function ExpenseItem(props): JSX.Element {
                 <View
                   style={[
                     styles.avatar,
-                    // GlobalStyles.shadow,
+                    GlobalStyles.shadow,
                     { marginBottom: 16 },
                     userPaid && styles.avatarPaid,
                   ]}
@@ -215,7 +222,7 @@ function ExpenseItem(props): JSX.Element {
         </View>
       ) : (
         <View style={styles.avatarContainer}>
-          <View style={[styles.avatar, styles.avatarPaid]}>
+          <View style={[styles.avatar, styles.avatarPaid, GlobalStyles.shadow]}>
             <Text style={styles.avatarText}>{whoPaid?.slice(0, 1)}</Text>
           </View>
         </View>
@@ -228,8 +235,8 @@ function ExpenseItem(props): JSX.Element {
   // if date is today, show "Today" instead of date
   // if periodName is "today" dont show "today"
   const todayString = useCallback(
-    () => (userCtx.periodName === "day" ? "" : `${i18n.t("today")} `),
-    [userCtx.periodName]
+    () => (periodName === "day" ? "" : `${i18n.t("today")} `),
+    [periodName]
   );
 
   const configureDateString = useCallback(() => {
@@ -297,7 +304,10 @@ function ExpenseItem(props): JSX.Element {
             <ExpenseCountryFlag
               countryName={country}
               style={[GlobalStyles.countryFlagStyle, styles.countryFlag]}
-              containerStyle={styles.countryFlagContainer}
+              containerStyle={[
+                styles.countryFlagContainer,
+                GlobalStyles.shadow,
+              ]}
             />
           )}
           {toggle2 && <View>{sharedList()}</View>}
@@ -310,7 +320,7 @@ function ExpenseItem(props): JSX.Element {
                 },
               ]}
             >
-              {calcAmountString}
+              {calcAmountString()}
             </Text>
             {originalCurrencyJSX()}
           </View>
@@ -319,6 +329,23 @@ function ExpenseItem(props): JSX.Element {
     </Animated.View>
   );
 }
+
+const areEqual = (prevProps, nextProps) => {
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.description === nextProps.description &&
+    prevProps.amount === nextProps.amount &&
+    prevProps.category === nextProps.category &&
+    prevProps.country === nextProps.country &&
+    prevProps.whoPaid === nextProps.whoPaid &&
+    prevProps.currency === nextProps.currency &&
+    prevProps.calcAmount === nextProps.calcAmount &&
+    prevProps.splitList === nextProps.splitList &&
+    prevProps.iconName === nextProps.iconName &&
+    prevProps.isSpecialExpense === nextProps.isSpecialExpense
+  );
+};
+export const MemoizedExpenseItem = memo(ExpenseItem, areEqual);
 export default ExpenseItem;
 
 ExpenseItem.propTypes = {

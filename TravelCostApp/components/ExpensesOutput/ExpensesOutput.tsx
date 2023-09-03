@@ -6,12 +6,21 @@ import ExpensesList from "./ExpensesList";
 import React from "react-native";
 import Animated, { SlideOutLeft } from "react-native-reanimated";
 import LoadingOverlay from "../UI/LoadingOverlay";
-import { useContext, useEffect, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import PropTypes from "prop-types";
 import { EXPENSES_LOAD_TIMEOUT } from "../../confAppConstants";
 import { memo } from "react";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { TripContext } from "../../store/trip-context";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { MemoizedExpensesList } from "./ExpensesList";
 
 function ExpensesOutput({
   expenses,
@@ -20,65 +29,83 @@ function ExpensesOutput({
   showSumForTravellerName,
   isFiltered,
 }) {
-  const tripCtx = useContext(TripContext);
+  const { tripName } = useContext(TripContext);
   const [showLoading, setShowLoading] = useState(true);
   const [fallback, setFallback] = useState(true);
   useEffect(() => {
     setTimeout(() => {
-      if (tripCtx.tripName) setShowLoading(false);
+      if (tripName) setShowLoading(false);
     }, EXPENSES_LOAD_TIMEOUT);
   }, []);
 
   useEffect(() => {
-    if (tripCtx.tripName) setShowLoading(false);
-  }, [tripCtx.tripName]);
+    if (tripName) setShowLoading(false);
+  }, [tripName]);
 
   // const toggleLoading = () => setShowLoading((prev) => !prev);
-  const loadingSpinner = (
-    <View
-      style={{
-        position: "absolute",
-        width: Dimensions.get("window").width,
-        height: 60,
-        alignItems: "center",
-        justifyContent: "center",
-        paddingTop: 4,
-        marginTop: "12%",
-      }}
-    >
-      <LoadingBarOverlay></LoadingBarOverlay>
-    </View>
-  );
-  let content = (
-    <Animated.View exiting={SlideOutLeft} style={styles.fallbackContainer}>
-      <View style={styles.fallbackInnerContainer}>
-        {showLoading && <LoadingOverlay></LoadingOverlay>}
-        {!showLoading && <Text style={styles.infoText}>{fallbackText}</Text>}
+  const loadingSpinner = useCallback(
+    () => (
+      <View
+        style={{
+          position: "absolute",
+          width: Dimensions.get("window").width,
+          height: 60,
+          alignItems: "center",
+          justifyContent: "center",
+          paddingTop: 4,
+          marginTop: "12%",
+        }}
+      >
+        <LoadingBarOverlay></LoadingBarOverlay>
       </View>
-    </Animated.View>
+    ),
+    []
   );
-  if (expenses.length > 0) {
-    if (fallback) setFallback(false);
-    content = (
-      <ExpensesList
-        expenses={expenses}
-        showSumForTravellerName={showSumForTravellerName}
-        isFiltered={isFiltered}
-      />
+  const content = useRef(null);
+  const getContent = useCallback(() => {
+    content.current = (
+      <Animated.View exiting={SlideOutLeft} style={styles.fallbackContainer}>
+        <View style={styles.fallbackInnerContainer}>
+          {showLoading && <LoadingOverlay></LoadingOverlay>}
+          {!showLoading && <Text style={styles.infoText}>{fallbackText}</Text>}
+        </View>
+      </Animated.View>
     );
-  }
+    if (expenses.length > 0) {
+      if (fallback) setFallback(false);
+      content.current = (
+        <MemoizedExpensesList
+          expenses={expenses}
+          showSumForTravellerName={showSumForTravellerName}
+          isFiltered={isFiltered}
+        />
+      );
+    }
+  }, [
+    expenses,
+    fallback,
+    fallbackText,
+    isFiltered,
+    showLoading,
+    showSumForTravellerName,
+  ]);
+  getContent();
+
   return (
     <View style={{ flex: 1 }}>
-      {loadingSpinner}
+      {loadingSpinner()}
       <ScrollView style={styles.container} refreshControl={refreshControl}>
-        <View>{content}</View>
+        <View>{content.current}</View>
       </ScrollView>
     </View>
   );
 }
 
 export default ExpensesOutput;
-export const MemoizedExpensesOutput = memo(ExpensesOutput);
+const areEqual = (prevProps, nextProps) => {
+  return prevProps.expenses === nextProps.expenses;
+};
+export const MemoizedExpensesOutput = memo(ExpensesOutput, areEqual);
 
 ExpensesOutput.propTypes = {
   expenses: PropTypes.array,

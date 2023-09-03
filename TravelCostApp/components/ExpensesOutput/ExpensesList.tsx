@@ -9,7 +9,7 @@ import {
   StyleSheet,
 } from "react-native";
 
-import ExpenseItem from "./ExpenseItem";
+import ExpenseItem, { MemoizedExpenseItem } from "./ExpenseItem";
 import React, {
   memo,
   useCallback,
@@ -28,6 +28,7 @@ import { TripContext } from "../../store/trip-context";
 import { ExpensesContext } from "../../store/expenses-context";
 import IconButton from "../UI/IconButton";
 import Animated, {
+  add,
   Easing,
   FadeInLeft,
   FadeInRight,
@@ -69,8 +70,9 @@ const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 
+console.log("rerender list : ", Math.random().toFixed(3));
 // GLOBALS across all expenseItems
-let tripid = "";
+let tripID = "";
 let expenseCtx;
 let filtered = false;
 let navigation;
@@ -78,307 +80,6 @@ const row = [];
 let prevOpenedRow;
 let travellerName = "";
 // swipe left to delete
-const renderRightActions = (progress, dragX, onClick) => {
-  return (
-    <View
-      style={{
-        marginBottom: 2,
-        paddingTop: 14,
-        paddingLeft: 10,
-        alignContent: "center",
-        justifyContent: "center",
-        width: 55,
-        backgroundColor: GlobalStyles.colors.error500,
-      }}
-    >
-      {/* <Text>test</Text> */}
-      <IconButton
-        icon="trash"
-        color={GlobalStyles.colors.backgroundColor}
-        size={36}
-        onPress={onClick}
-        buttonStyle={{
-          marginBottom: "0%",
-          marginTop: "-30%",
-          marginLeft: "-20%",
-        }}
-      />
-    </View>
-  );
-};
-
-function renderExpenseItem(
-  isOnline: boolean,
-  selectable: boolean,
-  selected: ExpenseData[],
-  selectItem: (item: ExpenseData, id: object) => void,
-  setSelectable: (selectable: boolean) => void,
-  itemData
-) {
-  if (itemData.item.id.includes("shadow"))
-    return <View style={{ height: 55, width: "100%" }}></View>;
-  const index = itemData.index;
-  const selectableJSX = (
-    <Animated.View
-      entering={FadeInLeft}
-      exiting={FadeOutLeft}
-      style={{
-        flex: 0,
-        position: "absolute",
-        top: -36,
-        left: -46,
-        zIndex: 1,
-      }}
-    >
-      <IconButton
-        icon={
-          selected.includes(itemData.item.id)
-            ? "ios-checkmark-circle"
-            : "ellipse-outline"
-        }
-        color={
-          selected.includes(itemData.item.id)
-            ? GlobalStyles.colors.textColor
-            : GlobalStyles.colors.gray700
-        }
-        size={16}
-        onPress={selectItem.bind(this, itemData.item.id)}
-        buttonStyle={{ padding: 48 }}
-      ></IconButton>
-    </Animated.View>
-  );
-  if (Platform.OS === "android")
-    return (
-      <View
-        style={{
-          height: 55,
-          width: "100%",
-          backgroundColor: GlobalStyles.colors.backgroundColor,
-        }}
-      >
-        <GestureHandlerRootView>
-          <Swipeable
-            renderLeftActions={(progress, dragX) =>
-              renderRightActions(
-                progress,
-                dragX,
-                onClick.bind(this, itemData, isOnline)
-              )
-            }
-            onSwipeableOpen={closeRow.bind(this, index)}
-            ref={(ref) => (row[index] = ref)}
-            overshootFriction={8}
-          >
-            {selectable && selectableJSX}
-            <ExpenseItem
-              showSumForTravellerName={travellerName}
-              filtered={filtered}
-              setSelectable={setSelectable}
-              {...itemData.item}
-            />
-          </Swipeable>
-        </GestureHandlerRootView>
-      </View>
-    );
-  return (
-    <View style={{ height: 55, width: "100%" }}>
-      <Swipeable
-        renderRightActions={(progress, dragX) =>
-          renderRightActions(
-            progress,
-            dragX,
-            onClick.bind(this, itemData, isOnline)
-          )
-        }
-        onSwipeableOpen={closeRow.bind(this, index)}
-        ref={(ref) => (row[index] = ref)}
-        rightOpenValue={-100}
-        disableLeftSwipe={true}
-        overshootFriction={8}
-      >
-        {selectable && selectableJSX}
-        <ExpenseItem
-          showSumForTravellerName={travellerName}
-          filtered={filtered}
-          {...itemData.item}
-        />
-      </Swipeable>
-    </View>
-  );
-}
-
-function onClick({ item, index }, isOnline) {
-  // console.log("onClick ~ isOnline", isOnline);
-  // console.log("onClick ~ index", index);
-  // console.log("onClick ~ item", item);
-  const editedExpenseId = item.id;
-  const uid = item.uid;
-  console.log("onClick ~ uid", uid);
-  async function deleteAllExpenses() {
-    try {
-      navigation?.popToTop();
-      Toast.show({
-        type: "loading",
-        text1: i18n.t("toastDeleting1"),
-        text2: i18n.t("toastDeleting2"),
-        autoHide: false,
-      });
-      const allExpenses = await getAllExpenses(tripid);
-      for (let i = 0; i < allExpenses.length; i++) {
-        const expense = allExpenses[i];
-        if (expense?.rangeId == item?.rangeId) {
-          const queueItem: OfflineQueueManageExpenseItem = {
-            type: "delete",
-            expense: {
-              tripid: tripid,
-              uid: uid,
-              id: expense.id,
-            },
-          };
-          expenseCtx?.deleteExpense(expense.id);
-          await deleteExpenseOnlineOffline(queueItem, isOnline);
-        }
-      }
-      await touchAllTravelers(tripid, true);
-      Toast.hide();
-    } catch (error) {
-      console.log("delete All Error:", error);
-      Toast.show({
-        text1: i18n.t("error"),
-        text2: i18n.t("error2"),
-        type: "error",
-      });
-    }
-  }
-
-  async function deleteExp() {
-    if (item.rangeId) {
-      // do you want to delete one or all expenses with this rangeId?
-      Alert.alert(
-        `Delete grouped range expenses?`,
-        `This will delete all entries that belong to ${
-          item.description
-        } for ${formatExpenseWithCurrency(
-          Number(item.calcAmount),
-          item.currency
-        )}!`,
-        [
-          //i18n.t("deleteAllExpenses"), i18n.t("deleteAllExpensesExt")
-          // The "No" button
-          // Does nothing but dismiss the dialog when tapped
-          {
-            text: i18n.t("no"),
-            onPress: async () => {
-              try {
-                navigation?.popToTop();
-                Toast.show({
-                  type: "loading",
-                  text1: i18n.t("toastDeleting1"),
-                  text2: i18n.t("toastDeleting2"),
-                  autoHide: false,
-                });
-                const item: OfflineQueueManageExpenseItem = {
-                  type: "delete",
-                  expense: {
-                    tripid: tripid,
-                    uid: uid,
-                    id: editedExpenseId,
-                  },
-                };
-                expenseCtx?.deleteExpense(editedExpenseId);
-                await deleteExpenseOnlineOffline(item, isOnline);
-                await touchAllTravelers(tripid, true);
-                Toast.hide();
-              } catch (error) {
-                console.log(i18n.t("deleteError"), error);
-                Toast.show({
-                  text1: i18n.t("error"),
-                  text2: i18n.t("error2"),
-                  type: "error",
-                });
-              }
-            },
-          },
-          // The "Yes" button
-          {
-            text: i18n.t("yes"),
-            onPress: async () => {
-              await deleteAllExpenses();
-              return;
-            },
-          },
-        ]
-      );
-    } else {
-      // single id
-      try {
-        navigation?.popToTop();
-        Toast.show({
-          type: "loading",
-          text1: i18n.t("toastDeleting1"),
-          text2: i18n.t("toastDeleting2"),
-          autoHide: false,
-        });
-        const item: OfflineQueueManageExpenseItem = {
-          type: "delete",
-          expense: {
-            tripid: tripid,
-            uid: uid,
-            id: editedExpenseId,
-          },
-        };
-        expenseCtx?.deleteExpense(editedExpenseId);
-        await deleteExpenseOnlineOffline(item, isOnline);
-        await touchAllTravelers(tripid, true);
-        Toast.hide();
-      } catch (error) {
-        console.log(i18n.t("deleteError"), error);
-        Toast.show({
-          text1: i18n.t("error"),
-          text2: i18n.t("error2"),
-          type: "error",
-        });
-      }
-    }
-  }
-  async function deleteExpenseHandler() {
-    Alert.alert(i18n.t("sure"), i18n.t("sureExt"), [
-      // The "No" button
-      // Does nothing but dismiss the dialog when tapped
-      {
-        text: i18n.t("no"),
-        onPress: () => forceCloseRow(index),
-      },
-      // The "Yes" button
-      {
-        text: i18n.t("yes"),
-        onPress: () => {
-          deleteExp();
-        },
-      },
-    ]);
-  }
-  deleteExpenseHandler();
-}
-
-function closeRow(index) {
-  if (prevOpenedRow && prevOpenedRow !== row[index]) {
-    prevOpenedRow.close();
-  }
-  prevOpenedRow = row[index];
-
-  setTimeout(() => {
-    forceCloseRow(index);
-  }, 1500);
-}
-
-function forceCloseRow(index) {
-  try {
-    row[index].close();
-  } catch (error) {
-    console.log("forceCloseRow ~ error", error);
-  }
-}
 
 // Displays a list of all expenses.
 function ExpensesList({
@@ -389,13 +90,13 @@ function ExpensesList({
 }) {
   navigation = useNavigation();
 
-  const netCtx = useContext(NetworkContext);
-  const isOnline = netCtx.isConnected && netCtx.strongConnection;
-  const tripCtx = useContext(TripContext);
-  const userCtx = useContext(UserContext);
+  const { isConnected, strongConnection } = useContext(NetworkContext);
+  const isOnline = isConnected && strongConnection;
+  const { tripid } = useContext(TripContext);
+  const { periodName } = useContext(UserContext);
   expenseCtx = useContext(ExpensesContext);
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(1);
-  tripid = tripCtx.tripid;
+  tripID = tripid;
   travellerName = showSumForTravellerName;
   if (isFiltered) filtered = true;
   const [selectable, setSelectable] = useState(false);
@@ -404,9 +105,320 @@ function ExpensesList({
   const flatListRef = useRef(null);
   // for scroll to top
   const [contentVerticalOffset, setContentVerticalOffset] = useState(0);
+  const [hideScrollToTop, setHideScrollToTop] = useState(false);
   const CONTENT_OFFSET_THRESHOLD = 300;
   const showScrollToTop = contentVerticalOffset > CONTENT_OFFSET_THRESHOLD;
-  if (expenses.length < 6) addShadowItemsToExpenses(expenses);
+  useEffect(() => {
+    if (contentVerticalOffset < CONTENT_OFFSET_THRESHOLD)
+      setHideScrollToTop(false);
+  }, [contentVerticalOffset]);
+
+  const addShadow = useCallback(() => {
+    if (expenses.length < 6) addShadowItemsToExpenses(expenses);
+  }, [expenses]);
+  addShadow();
+
+  const forceCloseRow = useCallback((index) => {
+    try {
+      row[index].close();
+    } catch (error) {
+      console.log("forceCloseRow ~ error", error);
+    }
+  }, []);
+  const closeRow = useCallback((index) => {
+    if (prevOpenedRow && prevOpenedRow !== row[index]) {
+      prevOpenedRow.close();
+    }
+    prevOpenedRow = row[index];
+
+    setTimeout(() => {
+      forceCloseRow(index);
+    }, 1500);
+  }, []);
+
+  const renderRightActions = useCallback((progress, dragX, onClick) => {
+    return (
+      <View
+        style={{
+          marginBottom: 2,
+          paddingTop: 14,
+          paddingLeft: 10,
+          alignContent: "center",
+          justifyContent: "center",
+          width: 55,
+          backgroundColor: GlobalStyles.colors.error500,
+        }}
+      >
+        {/* <Text>test</Text> */}
+        <IconButton
+          icon="trash"
+          color={GlobalStyles.colors.backgroundColor}
+          size={36}
+          onPress={onClick}
+          buttonStyle={{
+            marginBottom: "0%",
+            marginTop: "-30%",
+            marginLeft: "-20%",
+          }}
+        />
+      </View>
+    );
+  }, []);
+  const onClick = useCallback(({ item, index }, isOnline) => {
+    // console.log("onClick ~ isOnline", isOnline);
+    // console.log("onClick ~ index", index);
+    // console.log("onClick ~ item", item);
+    const editedExpenseId = item.id;
+    const uid = item.uid;
+    console.log("onClick ~ uid", uid);
+    async function deleteAllExpenses() {
+      try {
+        navigation?.popToTop();
+        Toast.show({
+          type: "loading",
+          text1: i18n.t("toastDeleting1"),
+          text2: i18n.t("toastDeleting2"),
+          autoHide: false,
+        });
+        const allExpenses = await getAllExpenses(tripID);
+        for (let i = 0; i < allExpenses.length; i++) {
+          const expense = allExpenses[i];
+          if (expense?.rangeId == item?.rangeId) {
+            const queueItem: OfflineQueueManageExpenseItem = {
+              type: "delete",
+              expense: {
+                tripid: tripID,
+                uid: uid,
+                id: expense.id,
+              },
+            };
+            expenseCtx?.deleteExpense(expense.id);
+            await deleteExpenseOnlineOffline(queueItem, isOnline);
+          }
+        }
+        await touchAllTravelers(tripID, true);
+        Toast.hide();
+      } catch (error) {
+        console.log("delete All Error:", error);
+        Toast.show({
+          text1: i18n.t("error"),
+          text2: i18n.t("error2"),
+          type: "error",
+        });
+      }
+    }
+
+    async function deleteExp() {
+      if (item.rangeId) {
+        // do you want to delete one or all expenses with this rangeId?
+        Alert.alert(
+          `Delete grouped range expenses?`,
+          `This will delete all entries that belong to ${
+            item.description
+          } for ${formatExpenseWithCurrency(
+            Number(item.calcAmount),
+            item.currency
+          )}!`,
+          [
+            //i18n.t("deleteAllExpenses"), i18n.t("deleteAllExpensesExt")
+            // The "No" button
+            // Does nothing but dismiss the dialog when tapped
+            {
+              text: i18n.t("no"),
+              onPress: async () => {
+                try {
+                  navigation?.popToTop();
+                  Toast.show({
+                    type: "loading",
+                    text1: i18n.t("toastDeleting1"),
+                    text2: i18n.t("toastDeleting2"),
+                    autoHide: false,
+                  });
+                  const item: OfflineQueueManageExpenseItem = {
+                    type: "delete",
+                    expense: {
+                      tripid: tripID,
+                      uid: uid,
+                      id: editedExpenseId,
+                    },
+                  };
+                  expenseCtx?.deleteExpense(editedExpenseId);
+                  await deleteExpenseOnlineOffline(item, isOnline);
+                  await touchAllTravelers(tripID, true);
+                  Toast.hide();
+                } catch (error) {
+                  console.log(i18n.t("deleteError"), error);
+                  Toast.show({
+                    text1: i18n.t("error"),
+                    text2: i18n.t("error2"),
+                    type: "error",
+                  });
+                }
+              },
+            },
+            // The "Yes" button
+            {
+              text: i18n.t("yes"),
+              onPress: async () => {
+                await deleteAllExpenses();
+                return;
+              },
+            },
+          ]
+        );
+      } else {
+        // single id
+        try {
+          navigation?.popToTop();
+          Toast.show({
+            type: "loading",
+            text1: i18n.t("toastDeleting1"),
+            text2: i18n.t("toastDeleting2"),
+            autoHide: false,
+          });
+          const item: OfflineQueueManageExpenseItem = {
+            type: "delete",
+            expense: {
+              tripid: tripID,
+              uid: uid,
+              id: editedExpenseId,
+            },
+          };
+          expenseCtx?.deleteExpense(editedExpenseId);
+          await deleteExpenseOnlineOffline(item, isOnline);
+          await touchAllTravelers(tripID, true);
+          Toast.hide();
+        } catch (error) {
+          console.log(i18n.t("deleteError"), error);
+          Toast.show({
+            text1: i18n.t("error"),
+            text2: i18n.t("error2"),
+            type: "error",
+          });
+        }
+      }
+    }
+    async function deleteExpenseHandler() {
+      Alert.alert(i18n.t("sure"), i18n.t("sureExt"), [
+        // The "No" button
+        // Does nothing but dismiss the dialog when tapped
+        {
+          text: i18n.t("no"),
+          onPress: () => forceCloseRow(index),
+        },
+        // The "Yes" button
+        {
+          text: i18n.t("yes"),
+          onPress: () => {
+            deleteExp();
+          },
+        },
+      ]);
+    }
+    deleteExpenseHandler();
+  }, []);
+  const renderExpenseItem = useCallback(
+    (
+      isOnline: boolean,
+      selectable: boolean,
+      selected: ExpenseData[],
+      selectItem: (item: ExpenseData, id: object) => void,
+      setSelectable: (selectable: boolean) => void,
+      itemData
+    ) => {
+      if (itemData.item.id.includes("shadow"))
+        return <View style={{ height: 55, width: "100%" }}></View>;
+      const index = itemData.index;
+      const selectableJSX = (
+        <Animated.View
+          entering={FadeInLeft}
+          exiting={FadeOutLeft}
+          style={{
+            flex: 0,
+            position: "absolute",
+            top: -36,
+            left: -46,
+            zIndex: 1,
+          }}
+        >
+          <IconButton
+            icon={
+              selected.includes(itemData.item.id)
+                ? "ios-checkmark-circle"
+                : "ellipse-outline"
+            }
+            color={
+              selected.includes(itemData.item.id)
+                ? GlobalStyles.colors.textColor
+                : GlobalStyles.colors.gray700
+            }
+            size={16}
+            onPress={selectItem.bind(this, itemData.item.id)}
+            buttonStyle={{ padding: 48 }}
+          ></IconButton>
+        </Animated.View>
+      );
+      if (Platform.OS === "android")
+        return (
+          <View
+            style={{
+              height: 55,
+              width: "100%",
+              backgroundColor: GlobalStyles.colors.backgroundColor,
+            }}
+          >
+            <GestureHandlerRootView>
+              <Swipeable
+                renderLeftActions={(progress, dragX) =>
+                  renderRightActions(
+                    progress,
+                    dragX,
+                    onClick.bind(this, itemData, isOnline)
+                  )
+                }
+                onSwipeableOpen={closeRow.bind(this, index)}
+                ref={(ref) => (row[index] = ref)}
+                overshootFriction={8}
+              >
+                {selectable && selectableJSX}
+                <MemoizedExpenseItem
+                  showSumForTravellerName={travellerName}
+                  filtered={filtered}
+                  setSelectable={setSelectable}
+                  {...itemData.item}
+                />
+              </Swipeable>
+            </GestureHandlerRootView>
+          </View>
+        );
+      return (
+        <View style={{ height: 55, width: "100%" }}>
+          <Swipeable
+            renderRightActions={(progress, dragX) =>
+              renderRightActions(
+                progress,
+                dragX,
+                onClick.bind(this, itemData, isOnline)
+              )
+            }
+            onSwipeableOpen={closeRow.bind(this, index)}
+            ref={(ref) => (row[index] = ref)}
+            rightOpenValue={-100}
+            disableLeftSwipe={true}
+            overshootFriction={8}
+          >
+            {selectable && selectableJSX}
+            <MemoizedExpenseItem
+              showSumForTravellerName={travellerName}
+              filtered={filtered}
+              {...itemData.item}
+            />
+          </Swipeable>
+        </View>
+      );
+    },
+    [closeRow, onClick, renderRightActions]
+  );
 
   const scrollTo = useCallback(
     (index: number) => {
@@ -421,9 +433,14 @@ function ExpensesList({
     [expenses.length]
   );
 
+  const scrollToTopHandler = useCallback(() => {
+    scrollTo(1);
+    setHideScrollToTop(true);
+  }, [scrollTo]);
+
   useEffect(() => {
     scrollTo(1);
-  }, [scrollTo, userCtx.periodName]);
+  }, [scrollTo, periodName]);
 
   const selectItem = (item, id: object) => {
     console.log("selectItem ~ item:", item);
@@ -454,7 +471,7 @@ function ExpensesList({
     );
     navigation.navigate("FilteredPieCharts", {
       expenses: finderExpenses,
-      dayString: `${finderExpenses.length} selected Expenses from ${userCtx.periodName}`,
+      dayString: `${finderExpenses.length} selected Expenses from ${periodName}`,
       noList: true,
     });
   }
@@ -494,7 +511,7 @@ function ExpensesList({
                 );
                 if (expenseItem.rangeId) {
                   await deleteAllExpensesByRangedId(
-                    tripid,
+                    tripID,
                     expenseItem,
                     isOnline,
                     expenseCtx
@@ -503,7 +520,7 @@ function ExpensesList({
                 const item: OfflineQueueManageExpenseItem = {
                   type: "delete",
                   expense: {
-                    tripid: tripid,
+                    tripid: tripID,
                     uid: expenseItem.uid,
                     id: expenseItem.id,
                   },
@@ -511,7 +528,7 @@ function ExpensesList({
                 expenseCtx?.deleteExpense(expenseItem.id);
                 await deleteExpenseOnlineOffline(item, isOnline);
               }
-              await touchAllTravelers(tripid, true);
+              await touchAllTravelers(tripID, true);
               Toast.hide();
             } catch (error) {
               console.log(i18n.t("deleteError"), error);
@@ -647,13 +664,17 @@ function ExpensesList({
           index,
         })}
       />
-      {showScrollToTop && (
+      {showScrollToTop && !hideScrollToTop && (
         <Animated.View
           entering={FadeInUp.duration(250).easing(Easing.linear)}
           exiting={FadeOutUp.duration(200).easing(Easing.linear)}
           style={[styles.scrollToTopButton, GlobalStyles.shadowPrimary]}
         >
-          <TouchableOpacity onPress={() => scrollTo(1)}>
+          <TouchableOpacity
+            onPress={() => {
+              scrollToTopHandler();
+            }}
+          >
             <Text style={styles.scrollToTopText}>Scroll To Top</Text>
           </TouchableOpacity>
         </Animated.View>
@@ -663,6 +684,10 @@ function ExpensesList({
 }
 
 export default ExpensesList;
+const areEqual = (prevProps, nextProps) => {
+  return prevProps.expenses === nextProps.expenses;
+};
+export const MemoizedExpensesList = memo(ExpensesList, areEqual);
 
 ExpensesList.propTypes = {
   expenses: PropTypes.arrayOf(

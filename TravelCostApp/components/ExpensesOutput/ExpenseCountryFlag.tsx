@@ -25,6 +25,6 @@ ExpenseCountryFlag.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: GlobalStyles.colors.backgroundColor,
+    // backgroundColor: GlobalStyles.colors.backgroundColor,
   },
 });

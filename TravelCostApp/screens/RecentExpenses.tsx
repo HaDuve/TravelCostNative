@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 import ExpensesOutput, {
   MemoizedExpensesOutput,
@@ -61,6 +67,8 @@ import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { Platform } from "react-native";
 import { REACT_APP_CAT_API_KEY, REACT_APP_GPT_API_KEY } from "@env";
 import * as Device from "expo-device";
+import { memo } from "react";
+import { set } from "react-native-reanimated";
 
 function RecentExpenses({ navigation }) {
   // console.log("rerender RecentExpenses - A");
@@ -99,7 +107,9 @@ function RecentExpenses({ navigation }) {
 
   const [open, setOpen] = useState(false);
   const [PeriodValue, setPeriodValue] = useState<RangeString>(RangeString.day);
-  userCtx.setPeriodString(PeriodValue);
+  useEffect(() => {
+    userCtx.setPeriodString(PeriodValue);
+  }, [PeriodValue, userCtx]);
 
   const [dateTimeString, setDateTimeString] = useState("");
 
@@ -149,15 +159,28 @@ function RecentExpenses({ navigation }) {
     connectionSpeedString,
   ]);
 
+  const [loadedOnce, setLoadedOnce] = useState(false);
+
   useEffect(() => {
     const asyncLoading = async () => {
       // if expenses not empty, return
-
-      await getExpenses(true, true, true);
-      // await expensesCtx.loadExpensesFromStorage();
+      if (
+        !loadedOnce &&
+        expensesCtx.expenses &&
+        expensesCtx.expenses.length > 0
+      ) {
+        await getExpenses(true, true, true);
+        setLoadedOnce(true);
+      }
     };
     asyncLoading();
-  }, [netCtx.isConnected, netCtx.strongConnection]);
+  }, [
+    expensesCtx.expenses,
+    getExpenses,
+    loadedOnce,
+    netCtx.isConnected,
+    netCtx.strongConnection,
+  ]);
 
   useEffect(() => {
     async function setTravellers() {
@@ -202,67 +225,85 @@ function RecentExpenses({ navigation }) {
     { label: i18n.t("totalLabel"), value: RangeString.total },
   ]);
 
-  async function getExpenses(
-    showRefIndicator = false,
-    showAnyIndicator = false,
-    ignoreTouched = false
-  ) {
-    if (userCtx.freshlyCreated) return;
-    if (ignoreTouched)
-      console.log("getExpenses ~ ignoreTouched:", ignoreTouched);
-    // check offlinemode
-    const online = netCtx.isConnected && netCtx.strongConnection;
-    const offlineQueue = await asyncStoreGetObject("offlineQueue");
-    const queueBlocked = offlineQueue && offlineQueue.length > 0;
-    if (!online || queueBlocked) {
-      // if online, send offline queue
-      if (online) {
-        console.log("RecentExpenses ~ sending offline queue");
-        await sendOfflineQueue();
+  const getExpenses = useCallback(
+    async (
+      showRefIndicator = false,
+      showAnyIndicator = false,
+      ignoreTouched = false
+    ) => {
+      if (userCtx.freshlyCreated) return;
+      if (ignoreTouched)
+        console.log("getExpenses ~ ignoreTouched:", ignoreTouched);
+      // check offlinemode
+      const online = netCtx.isConnected && netCtx.strongConnection;
+      const offlineQueue = await asyncStoreGetObject("offlineQueue");
+      const queueBlocked = offlineQueue && offlineQueue.length > 0;
+      if (!online || queueBlocked) {
+        // if online, send offline queue
+        if (online) {
+          console.log("RecentExpenses ~ sending offline queue");
+          await sendOfflineQueue();
+          return;
+        }
+        // if offline, load from storage
+        setIsFetching(true);
+        // await test_offlineLoad(expensesCtx, setRefreshing, setIsFetching);
+        await expensesCtx.loadExpensesFromStorage();
+        setIsFetching(false);
         return;
       }
-      // if offline, load from storage
-      setIsFetching(true);
-      // await test_offlineLoad(expensesCtx, setRefreshing, setIsFetching);
-      await expensesCtx.loadExpensesFromStorage();
-      setIsFetching(false);
-      return;
-    }
-    // checking isTouched or firstLoad
-    const isTouched =
-      ignoreTouched || (await fetchTravelerIsTouched(tripid, uid));
-    if (!isTouched) {
-      setRefreshing(false);
-      setIsFetching(false);
-      return;
-    }
-    console.log("we are touched and fetching expenses", tripid);
-    // fetch and set expenses
+      // checking isTouched or firstLoad
+      const isTouched =
+        ignoreTouched || (await fetchTravelerIsTouched(tripid, uid));
+      if (!isTouched) {
+        setRefreshing(false);
+        setIsFetching(false);
+        return;
+      }
+      console.log("we are touched and fetching expenses", tripid);
+      // fetch and set expenses
 
-    await fetchAndSetExpenses(
-      showRefIndicator,
-      showAnyIndicator,
-      setIsFetching,
-      setRefreshing,
+      await fetchAndSetExpenses(
+        showRefIndicator,
+        showAnyIndicator,
+        setIsFetching,
+        setRefreshing,
+        expensesCtx,
+        tripid,
+        uid,
+        tripCtx
+      );
+    },
+    [
       expensesCtx,
+      netCtx.isConnected,
+      netCtx.strongConnection,
+      tripCtx,
       tripid,
       uid,
-      tripCtx
-    );
-  }
+      userCtx.freshlyCreated,
+    ]
+  );
 
   function errorHandler() {
     setError(null);
   }
-  const recentExpenses: Array<ExpenseData> = useMemo(
-    () => expensesCtx.getRecentExpenses(PeriodValue),
-    [PeriodValue, expensesCtx.expenses, dateTimeString]
-  );
 
-  const expensesSum = recentExpenses.reduce((sum, expense) => {
-    if (isNaN(Number(expense.calcAmount))) return sum;
-    return sum + Number(expense.calcAmount);
-  }, 0);
+  const getRecentExpenses = useCallback(
+    () => expensesCtx.getRecentExpenses(PeriodValue),
+    [expensesCtx, PeriodValue]
+  );
+  const recentExpenses = useMemo(getRecentExpenses, [getRecentExpenses]);
+
+  const getExpensesSum = useCallback(
+    () =>
+      recentExpenses.reduce((sum, expense) => {
+        if (isNaN(Number(expense.calcAmount))) return sum;
+        return sum + Number(expense.calcAmount);
+      }, 0),
+    [recentExpenses]
+  );
+  const expensesSum = useMemo(getExpensesSum, [getExpensesSum]);
   const expensesSumString = formatExpenseWithCurrency(
     expensesSum,
     tripCtx.tripCurrency
@@ -272,6 +313,32 @@ function RecentExpenses({ navigation }) {
   const isScaledUp = fontScale > 1;
   const useMoreSpace = isScaledUp || isLongNumber;
 
+  // console.log("RecentExpenses ~ apikey:", apikey);
+
+  const ExpensesOutputJSX = useCallback(
+    () => (
+      <MemoizedExpensesOutput
+        expenses={recentExpenses}
+        periodValue={PeriodValue}
+        fallbackText={i18n.t("fallbackTextExpenses")}
+        listRef={listRef}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing || isFetching}
+            tintColor="transparent"
+            colors={["transparent"]}
+            style={{ backgroundColor: "transparent" }}
+            onRefresh={async () => {
+              console.log("onREFRESH");
+              await onRefresh();
+            }}
+          />
+        }
+      />
+    ),
+    [PeriodValue, isFetching, onRefresh, recentExpenses, refreshing]
+  );
+
   if (error && !isFetching) {
     return <ErrorOverlay message={error} onConfirm={errorHandler} />;
   }
@@ -279,7 +346,6 @@ function RecentExpenses({ navigation }) {
   //   return <LoadingOverlay />;
   // }
 
-  // console.log("RecentExpenses ~ apikey:", apikey);
   return (
     <View style={styles.container}>
       <TourGuideZone
@@ -348,24 +414,7 @@ function RecentExpenses({ navigation }) {
         />
       </View>
       <View style={styles.tempGrayBar1}></View>
-      <ExpensesOutput
-        expenses={recentExpenses}
-        periodValue={PeriodValue}
-        fallbackText={i18n.t("fallbackTextExpenses")}
-        listRef={listRef}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing || isFetching}
-            tintColor="transparent"
-            colors={["transparent"]}
-            style={{ backgroundColor: "transparent" }}
-            onRefresh={async () => {
-              console.log("onREFRESH");
-              await onRefresh();
-            }}
-          />
-        }
-      />
+      {ExpensesOutputJSX()}
 
       <AddExpenseButton navigation={navigation} />
     </View>

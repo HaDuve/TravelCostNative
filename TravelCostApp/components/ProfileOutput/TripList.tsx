@@ -9,7 +9,7 @@ import { TripData } from "../../store/trip-context";
 function TripList({ trips, refreshControl, setRefreshing }) {
   if (!trips || trips.length < 1) return <LoadingOverlay></LoadingOverlay>;
   const uniqTrips: TripData[] = uniqBy(trips);
-  console.log("TripList ~ uniqTrips:", uniqTrips);
+  // console.log("TripList ~ uniqTrips:", uniqTrips);
 
   //log the trips and their travellers
   // const tripsandtravellers = [];

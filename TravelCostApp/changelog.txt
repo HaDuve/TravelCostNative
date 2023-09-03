@@ -1,5 +1,10 @@
 Change log Travel Expense App
 
+1.2.641
+- added scroll to top on period change name
+- fixed long loading of trip form (last fix did not work correctly)
+- drastically improved performance for big trips
+
 1.2.640
 - added option to select items from expense lists
 - added option to delete selected expenses from lists

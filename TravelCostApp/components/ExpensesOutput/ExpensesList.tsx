@@ -415,6 +415,10 @@ function ExpensesList({
     [expenses.length]
   );
 
+  useEffect(() => {
+    scrollTo(1);
+  }, [scrollTo, userCtx.periodName]);
+
   const selectItem = (item, id: object) => {
     console.log("selectItem ~ item:", item);
     if (selected.includes(item)) {

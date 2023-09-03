@@ -151,7 +151,6 @@ const TripForm = ({ navigation, route }) => {
 
   useLayoutEffect(() => {
     const fetchTripData = async () => {
-      setIsLoading(true);
       try {
         const selectedTrip = await fetchTrip(editedTripId);
         inputChangedHandler("tripName", selectedTrip.tripName);

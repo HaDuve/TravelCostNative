@@ -8,9 +8,6 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import PropTypes from "prop-types";
-import { createMoney, convertAmount, getCurrency } from "@dinero.js/core";
-import * as currencies from "@dinero.js/currencies";
-import { format } from "@dinero.js/number";
 
 import { GlobalStyles } from "../../constants/styles";
 import { isToday, toShortFormat } from "../../util/date";
@@ -21,14 +18,7 @@ import { TripContext } from "../../store/trip-context";
 import { formatExpenseWithCurrency } from "../../util/string";
 import React from "react";
 
-import Animated, {
-  FadeInRight,
-  FadeOutLeft,
-  SlideInRight,
-  SlideInUp,
-  SlideOutDown,
-  SlideOutLeft,
-} from "react-native-reanimated";
+import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import { FlatList } from "react-native-gesture-handler";
 
 //Localization
@@ -42,6 +32,8 @@ import { SettingsContext } from "../../store/settings-context";
 import { useEffect } from "react";
 import * as Haptics from "expo-haptics";
 import { ExpenseData } from "../../util/expense";
+import { calcSplitList } from "../../util/split";
+import { useRef } from "react";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -69,34 +61,38 @@ function ExpenseItem(props): JSX.Element {
   const homeCurrency = tripCtx.tripCurrency;
   const rate = calcAmount / amount;
 
-  let calcTravellerSum = 0;
-  let travellerSum = 0;
-  let calcTravellerSumString = "";
-  let travellerSumString = "";
+  const calcTravellerSum = useRef(0);
+  const travellerSum = useRef(0);
+  const calcTravellerSumString = useRef("");
+  const travellerSumString = useRef("");
 
   // if showSumForTravellerName is set, show the sum of the expense for only this traveller
-  if (splitList && splitList.length > 0 && showSumForTravellerName) {
-    splitList.forEach((split) => {
-      if (split.userName === showSumForTravellerName) {
-        calcTravellerSum += Number(split.amount) * rate;
-        travellerSum += Number(split.amount);
-      }
-    });
-    calcTravellerSumString = formatExpenseWithCurrency(
-      Number(calcTravellerSum),
-      homeCurrency
-    );
-    travellerSumString = formatExpenseWithCurrency(
-      Number(travellerSum),
-      currency
-    );
-  }
-  const calcAmountString = calcTravellerSum
-    ? `${calcTravellerSumString}`
+  const calcSumForTraveller = useCallback(() => {
+    if (splitList && splitList.length > 0 && showSumForTravellerName) {
+      splitList.forEach((split) => {
+        if (split.userName === showSumForTravellerName) {
+          calcTravellerSum.current += Number(split.amount) * rate;
+          travellerSum.current += Number(split.amount);
+        }
+      });
+      calcTravellerSumString.current = formatExpenseWithCurrency(
+        Number(calcTravellerSum.current),
+        homeCurrency
+      );
+      travellerSumString.current = formatExpenseWithCurrency(
+        Number(travellerSum.current),
+        currency
+      );
+    }
+  }, [splitList, showSumForTravellerName, rate, homeCurrency, currency]);
+  calcSumForTraveller();
+
+  const calcAmountString = calcTravellerSum.current
+    ? `${calcTravellerSumString.current}`
     : formatExpenseWithCurrency(calcAmount, homeCurrency);
 
-  const amountString = travellerSum
-    ? `${travellerSumString}`
+  const amountString = travellerSum.current
+    ? `${travellerSumString.current}`
     : formatExpenseWithCurrency(amount, currency);
 
   if (iconName) console.log(iconName);
@@ -125,110 +121,127 @@ function ExpenseItem(props): JSX.Element {
   const toggle3 = settings.hideSpecialExpenses;
   const hideSpecial = toggle3 && isSpecialExpense;
 
-  const { fontScale } = useWindowDimensions();
-  const isScaledUp = fontScale > 1;
-
-  const memoizedCallback = useCallback(async () => {
+  const navigateToExpense = useCallback(async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     navigation.navigate("ManageExpense", {
       expenseId: id,
     });
   }, [id, navigation]);
-  const originalCurrencyJSX = !sameCurrency ? (
-    <>
-      <Text
-        style={[
-          styles.originalCurrencyText,
-          hideSpecial && {
-            color: GlobalStyles.colors.textHidden,
-          },
-        ]}
-      >
-        {amountString}
-      </Text>
-    </>
-  ) : (
-    <></>
+  const originalCurrencyJSX = useCallback(
+    () =>
+      !sameCurrency ? (
+        <>
+          <Text
+            style={[
+              styles.originalCurrencyText,
+              hideSpecial && {
+                color: GlobalStyles.colors.textHidden,
+              },
+            ]}
+          >
+            {amountString}
+          </Text>
+        </>
+      ) : (
+        <></>
+      ),
+    [sameCurrency, amountString, hideSpecial]
   );
 
-  const splitListHasNonZeroEntries = splitList?.some(
-    (item) => item.amount !== 0
+  const splitListHasNonZeroEntries = useCallback(
+    () => splitList?.some((item) => item.amount !== 0),
+    [splitList]
   );
-  const longList =
-    splitList && splitList.length > 3 && splitListHasNonZeroEntries
-      ? splitList.slice(0, 2)
-      : null;
-  longList?.push({ userName: "+", amount: 0 });
-  const sharedList =
-    splitList && splitList.length > 0 ? (
-      <View style={{ overflow: "visible" }}>
-        <FlatList
-          scrollEnabled={false}
-          data={
-            longList
-              ? longList.sort((a, b) => {
-                  // if username === + put last
-                  if (a.userName === "+") return 1;
-                  if (b.userName === "+") return -1;
-                  // put the whopaid user first, then alphabetically
-                  if (a.userName === whoPaid) return -1;
-                  if (b.userName === whoPaid) return 1;
-                  return a.userName.localeCompare(b.userName);
-                })
-              : splitList.sort((a, b) => {
-                  // if username === + put last
-                  if (a.userName === "+") return 1;
-                  if (b.userName === "+") return -1;
-                  // put the whopaid user first, then alphabetically
-                  if (a.userName === whoPaid) return -1;
-                  if (b.userName === whoPaid) return 1;
-                  return a.userName.localeCompare(b.userName);
-                })
-          }
-          horizontal={true}
-          renderItem={({ item }) => {
-            // if username == whopaid set color to primary
-            const userPaid = item.userName === whoPaid;
-            return (
-              <View
-                style={[
-                  styles.avatar,
-                  GlobalStyles.shadow,
-                  { marginBottom: 16 },
-                  userPaid && styles.avatarPaid,
-                ]}
-              >
-                <Text style={styles.avatarText}>
-                  {item.userName.slice(0, 1)}
-                </Text>
-              </View>
-            );
-          }}
-          contentContainerStyle={styles.avatarContainer}
-          keyExtractor={(item) => {
-            return item.userName;
-          }}
-        ></FlatList>
-      </View>
-    ) : (
-      <View style={styles.avatarContainer}>
-        <View style={[GlobalStyles.shadow, styles.avatar, styles.avatarPaid]}>
-          <Text style={styles.avatarText}>{whoPaid?.slice(0, 1)}</Text>
+  const islongList = useCallback(
+    () =>
+      splitList && splitList.length > 3 && splitListHasNonZeroEntries
+        ? splitList.slice(0, 2)
+        : null,
+    [splitList, splitListHasNonZeroEntries]
+  );
+  const longList = islongList();
+  longList?.push({ userName: `+${splitList.length - 2}`, amount: 0 });
+  const sharedList = useCallback(
+    () =>
+      splitList && splitList.length > 0 ? (
+        <View style={{ overflow: "visible" }}>
+          <FlatList
+            scrollEnabled={false}
+            data={
+              longList
+                ? longList.sort((a, b) => {
+                    // if username === + put last
+                    if (a.userName === "+") return 1;
+                    if (b.userName === "+") return -1;
+                    // put the whopaid user first, then alphabetically
+                    if (a.userName === whoPaid) return -1;
+                    if (b.userName === whoPaid) return 1;
+                    return a.userName.localeCompare(b.userName);
+                  })
+                : splitList.sort((a, b) => {
+                    // if username === + put last
+                    if (a.userName === "+") return 1;
+                    if (b.userName === "+") return -1;
+                    // put the whopaid user first, then alphabetically
+                    if (a.userName === whoPaid) return -1;
+                    if (b.userName === whoPaid) return 1;
+                    return a.userName.localeCompare(b.userName);
+                  })
+            }
+            horizontal={true}
+            renderItem={({ item }) => {
+              // if username == whopaid set color to primary
+              const userPaid = item.userName === whoPaid;
+              return (
+                <View
+                  style={[
+                    styles.avatar,
+                    GlobalStyles.shadow,
+                    { marginBottom: 16 },
+                    userPaid && styles.avatarPaid,
+                  ]}
+                >
+                  <Text style={styles.avatarText}>
+                    {item.userName.slice(0, 1)}
+                  </Text>
+                </View>
+              );
+            }}
+            contentContainerStyle={styles.avatarContainer}
+            keyExtractor={(item) => {
+              return item.userName;
+            }}
+          ></FlatList>
         </View>
-      </View>
-    );
+      ) : (
+        <View style={styles.avatarContainer}>
+          <View style={[GlobalStyles.shadow, styles.avatar, styles.avatarPaid]}>
+            <Text style={styles.avatarText}>{whoPaid?.slice(0, 1)}</Text>
+          </View>
+        </View>
+      ),
+    [longList, splitList, whoPaid]
+  );
 
-  if (!id) return <></>;
   if (typeof date === "string") date = new Date(date);
-  let dateString = date ? date : "no date";
+  const dateString = useRef("");
   // if date is today, show "Today" instead of date
   // if periodName is "today" dont show "today"
-  const todayString = userCtx.periodName === "day" ? "" : `${i18n.t("today")} `;
-  const hourAndMinuteString = DateTime.fromJSDate(date).toFormat("HH:mm");
-  if (isToday(new Date(date))) {
-    dateString = `${todayString}${hourAndMinuteString}`;
-  } else dateString = toShortFormat(date);
+  const todayString = useCallback(
+    () => (userCtx.periodName === "day" ? "" : `${i18n.t("today")} `),
+    [userCtx.periodName]
+  );
 
+  const configureDateString = useCallback(() => {
+    dateString.current = date ? date : "no date";
+    const hourAndMinuteString = DateTime.fromJSDate(date).toFormat("HH:mm");
+    if (isToday(new Date(date))) {
+      dateString.current = `${todayString()}${hourAndMinuteString}`;
+    } else dateString.current = toShortFormat(date);
+  }, [date, todayString]);
+  configureDateString();
+
+  if (!id) return <></>;
   return (
     <Animated.View
       entering={FadeInRight}
@@ -236,7 +249,7 @@ function ExpenseItem(props): JSX.Element {
       style={[{ height: 55 }, hideSpecial && { opacity: 0.75 }]}
     >
       <Pressable
-        onPress={memoizedCallback}
+        onPress={navigateToExpense}
         onLongPress={() => {
           console.log("long press item");
           console.log("ExpenseItem ~ setSelectable:", setSelectable);
@@ -267,7 +280,7 @@ function ExpenseItem(props): JSX.Element {
                 hideSpecial && { color: GlobalStyles.colors.textHidden },
               ]}
             >
-              {description}
+              Test
             </Text>
             <Text
               maxFontSizeMultiplier={1}
@@ -277,7 +290,7 @@ function ExpenseItem(props): JSX.Element {
                 hideSpecial && { color: GlobalStyles.colors.textHidden },
               ]}
             >
-              {dateString}
+              {dateString.current}
             </Text>
           </View>
           {toggle1 && (
@@ -290,7 +303,7 @@ function ExpenseItem(props): JSX.Element {
               ]}
             />
           )}
-          {toggle2 && <View>{sharedList}</View>}
+          {toggle2 && <View>{sharedList()}</View>}
           <View style={styles.amountContainer}>
             <Text
               style={[
@@ -302,7 +315,7 @@ function ExpenseItem(props): JSX.Element {
             >
               {calcAmountString}
             </Text>
-            {originalCurrencyJSX}
+            {originalCurrencyJSX()}
           </View>
         </View>
       </Pressable>

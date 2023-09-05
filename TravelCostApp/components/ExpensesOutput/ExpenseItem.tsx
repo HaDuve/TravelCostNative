@@ -287,7 +287,7 @@ function ExpenseItem(props): JSX.Element {
                 hideSpecial && { color: GlobalStyles.colors.textHidden },
               ]}
             >
-              Test
+              {description}
             </Text>
             <Text
               maxFontSizeMultiplier={1}

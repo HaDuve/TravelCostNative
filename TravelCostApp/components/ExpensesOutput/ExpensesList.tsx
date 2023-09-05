@@ -89,6 +89,7 @@ function ExpensesList({
   isFiltered,
 }) {
   navigation = useNavigation();
+  console.log("expenses: ", expenses.length);
 
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;
@@ -188,7 +189,7 @@ function ExpensesList({
               type: "delete",
               expense: {
                 tripid: tripID,
-                uid: uid,
+                uid: expense.uid,
                 id: expense.id,
               },
             };
@@ -692,13 +693,13 @@ export const MemoizedExpensesList = memo(ExpensesList, areEqual);
 ExpensesList.propTypes = {
   expenses: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      description: PropTypes.string.isRequired,
-      amount: PropTypes.number.isRequired,
-      date: PropTypes.instanceOf(Date).isRequired,
-      currency: PropTypes.string.isRequired,
-      category: PropTypes.string.isRequired,
-      uid: PropTypes.string.isRequired,
+      id: PropTypes.string,
+      description: PropTypes.string,
+      amount: PropTypes.number,
+      date: PropTypes.instanceOf(Date),
+      currency: PropTypes.string,
+      category: PropTypes.string,
+      uid: PropTypes.string,
     })
   ).isRequired,
   refreshControl: PropTypes.object,

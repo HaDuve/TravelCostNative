@@ -166,7 +166,7 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
   // tripid
   // );
   if (!tripid || !uidlist || DEBUG_NO_DATA) return [];
-  const expenses = [];
+  const expenses: ExpenseData[] = [];
   const axios_calls = [];
   uidlist.forEach((uid) => {
     try {

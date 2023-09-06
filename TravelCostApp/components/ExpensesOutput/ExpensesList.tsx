@@ -382,7 +382,7 @@ function ExpensesList({
                 overshootFriction={8}
               >
                 {selectable && selectableJSX}
-                <MemoizedExpenseItem
+                <ExpenseItem
                   showSumForTravellerName={travellerName}
                   filtered={filtered}
                   setSelectable={setSelectable}
@@ -579,7 +579,6 @@ function ExpensesList({
       </View>
       <Animated.FlatList
         scrollEnabled={true}
-        initialScrollIndex={1}
         onScroll={(event) => {
           setContentVerticalOffset(event.nativeEvent.contentOffset.y);
         }}
@@ -664,6 +663,16 @@ function ExpensesList({
           offset: 55 * index,
           index,
         })}
+        initialScrollIndex={0}
+        onScrollToIndexFailed={(info) => {
+          const wait = new Promise((resolve) => setTimeout(resolve, 500));
+          wait.then(() => {
+            flatListRef.current?.scrollToIndex({
+              index: info.index,
+              animated: true,
+            });
+          });
+        }}
       />
       {showScrollToTop && !hideScrollToTop && (
         <Animated.View

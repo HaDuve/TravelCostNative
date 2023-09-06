@@ -317,7 +317,7 @@ function RecentExpenses({ navigation }) {
 
   const ExpensesOutputJSX = useCallback(
     () => (
-      <MemoizedExpensesOutput
+      <ExpensesOutput
         expenses={recentExpenses}
         periodValue={PeriodValue}
         fallbackText={i18n.t("fallbackTextExpenses")}

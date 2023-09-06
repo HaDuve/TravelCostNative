@@ -1,5 +1,12 @@
 import { Platform, StyleSheet, Text, View } from "react-native";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import DatePickerModal from "../components/UI/DatePickerModal";
 import DatePickerContainer from "../components/UI/DatePickerContainer";
 import { getFormattedDate, toShortFormat } from "../util/date";
@@ -70,11 +77,11 @@ const FinderScreen = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(true);
   };
-  const onCancelRange = () => {
+  const onCancelRange = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(false);
-  };
-  const onConfirmRange = (output) => {
+  }, []);
+  const onConfirmRange = useCallback((output) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(false);
     // hotfixing datebug for asian countries
@@ -85,7 +92,7 @@ const FinderScreen = () => {
     setStartDate(startDateFormat);
     setEndDate(endDateFormat);
     setCheckedDate(true);
-  };
+  }, []);
   const datepickerJSX = DatePickerModal({
     showDatePickerRange,
     onCancelRange,
@@ -107,50 +114,54 @@ const FinderScreen = () => {
   };
 
   const expenses = expenseCtx.expenses;
-  const filteredExpenses = expenses.filter((expense) => {
-    const expenseDate = expense.startDate;
-    const expenseDateIsSameDay =
-      !checkedDate ||
-      expenseDate?.toString().slice(0, 10) ===
-        startDate?.toString().slice(0, 10) ||
-      DateTime.fromJSDate(expense.date).toString()?.slice(0, 10) ===
-        startDate?.toString().slice(0, 10);
-    const expenseDateIsInRange =
-      expenseDateIsSameDay ||
-      (expenseDate >= startDate && expenseDate <= endDate) ||
-      (DateTime.fromJSDate(expense.date).toString() >= startDate &&
-        DateTime.fromJSDate(expense.date).toString() <= endDate);
-    const expenseDescriptionIsInSearchQuery = expense.description
-      ?.toLowerCase()
-      .includes(searchQuery?.toLowerCase());
-    const expenseCategoryIsInSearchQuery = expense.category
-      ?.toLowerCase()
-      .includes(searchQuery?.toLowerCase());
-    const expenseCurrencyIsInSearchQuery = expense.currency
-      ?.toLowerCase()
-      .includes(searchQuery?.toLowerCase());
-    const expenseCountryIsInSearchQuery = expense.country
-      ?.toLowerCase()
-      .includes(searchQuery?.toLowerCase());
-    const expenseTravellerIsInSearchQuery =
-      // return true if searchQuery?.toLowerCase() is in expense.splitList
-      expense.splitList?.some((split) => {
-        const travellerName = split.userName;
-        return travellerName
+  const filteredExpenses = useMemo(
+    () =>
+      expenses.filter((expense) => {
+        const expenseDate = expense.startDate;
+        const expenseDateIsSameDay =
+          !checkedDate ||
+          expenseDate?.toString().slice(0, 10) ===
+            startDate?.toString().slice(0, 10) ||
+          DateTime.fromJSDate(expense.date).toString()?.slice(0, 10) ===
+            startDate?.toString().slice(0, 10);
+        const expenseDateIsInRange =
+          expenseDateIsSameDay ||
+          (expenseDate >= startDate && expenseDate <= endDate) ||
+          (DateTime.fromJSDate(expense.date).toString() >= startDate &&
+            DateTime.fromJSDate(expense.date).toString() <= endDate);
+        const expenseDescriptionIsInSearchQuery = expense.description
           ?.toLowerCase()
           .includes(searchQuery?.toLowerCase());
-      });
+        const expenseCategoryIsInSearchQuery = expense.category
+          ?.toLowerCase()
+          .includes(searchQuery?.toLowerCase());
+        const expenseCurrencyIsInSearchQuery = expense.currency
+          ?.toLowerCase()
+          .includes(searchQuery?.toLowerCase());
+        const expenseCountryIsInSearchQuery = expense.country
+          ?.toLowerCase()
+          .includes(searchQuery?.toLowerCase());
+        const expenseTravellerIsInSearchQuery =
+          // return true if searchQuery?.toLowerCase() is in expense.splitList
+          expense.splitList?.some((split) => {
+            const travellerName = split.userName;
+            return travellerName
+              ?.toLowerCase()
+              .includes(searchQuery?.toLowerCase());
+          });
 
-    return (
-      expenseDateIsInRange &&
-      (!checkedQuery ||
-        expenseDescriptionIsInSearchQuery ||
-        expenseCategoryIsInSearchQuery ||
-        expenseCurrencyIsInSearchQuery ||
-        expenseCountryIsInSearchQuery ||
-        expenseTravellerIsInSearchQuery)
-    );
-  });
+        return (
+          expenseDateIsInRange &&
+          (!checkedQuery ||
+            expenseDescriptionIsInSearchQuery ||
+            expenseCategoryIsInSearchQuery ||
+            expenseCurrencyIsInSearchQuery ||
+            expenseCountryIsInSearchQuery ||
+            expenseTravellerIsInSearchQuery)
+        );
+      }),
+    [expenses, checkedDate, startDate, endDate, searchQuery, checkedQuery]
+  );
 
   const queryString = checkedQuery ? searchQuery : "";
   const dateString = checkedDate
@@ -161,14 +172,20 @@ const FinderScreen = () => {
   const allEpensesQueryString =
     queryString === "" && dateString === "" ? "All Expenses" : "";
 
-  const findPressedHandler = () => {
+  const findPressedHandler = useCallback(() => {
     console.log("find pressed");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     navigation.navigate("FilteredPieCharts", {
       expenses: filteredExpenses,
       dayString: allEpensesQueryString + queryString + " " + dateString,
     });
-  };
+  }, [
+    navigation,
+    filteredExpenses,
+    allEpensesQueryString,
+    queryString,
+    dateString,
+  ]);
 
   const numberOfResults = filteredExpenses?.length;
   const foundResults = filteredExpenses?.length > 0 ? true : false;

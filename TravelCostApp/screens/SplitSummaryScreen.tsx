@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   Alert,
   Dimensions,
@@ -39,7 +45,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const expenseCtx = useContext(ExpensesContext);
   const uniqueExpenses: Array<ExpenseData> = useMemo(
     () => expenseCtx.getRecentExpenses(RangeString.total),
-    [expenseCtx.expenses]
+    [expenseCtx]
   );
 
   useFocusEffect(
@@ -91,8 +97,10 @@ const SplitSummaryScreen = ({ route, navigation }) => {
     totalPayBackTextOriginal
   );
 
-  async function getOpenSplits() {
+  const getOpenSplits = useCallback(async () => {
     if (expenseCtx.expenses.length === 0) return;
+    if (!tripid) return;
+    if (splits.length > 0) return;
     setIsFetching(true);
     try {
       const response = await calcOpenSplitsTable(
@@ -139,9 +147,9 @@ const SplitSummaryScreen = ({ route, navigation }) => {
       // setError("Could not fetch splits from the web database! " + error);
     }
     setIsFetching(false);
-  }
+  }, [expenseCtx.expenses.length]);
 
-  const handleSimpflifySplits = async () => {
+  const handleSimpflifySplits = useCallback(async () => {
     try {
       const simpleSplits = simplifySplits(splits);
       if (simpleSplits.length === 0) {
@@ -166,17 +174,13 @@ const SplitSummaryScreen = ({ route, navigation }) => {
     } catch (error) {
       console.log("handleSimpflifySplits ~ error", error);
     }
-  };
-
-  useEffect(() => {
-    getOpenSplits();
-  }, [expenseCtx.expenses, tripid, tripIsPaid, tripCurrency]);
+  }, [navigation, splits, subTitleSimplified]);
 
   function errorHandler() {
     setError(null);
   }
 
-  const settleSplitsHandler = async () => {
+  const settleSplitsHandler = useCallback(async () => {
     setIsFetching(true);
     try {
       await tripCtx.fetchAndSettleCurrentTrip();
@@ -185,21 +189,24 @@ const SplitSummaryScreen = ({ route, navigation }) => {
     }
     setIsFetching(false);
     navigation.navigate("Settings");
-  };
+  }, [navigation, tripCtx]);
 
-  function renderSplitItem(itemData) {
-    const item = itemData.item;
-    return (
-      <View style={[styles.splitContainer]}>
-        <Text style={styles.userText}>{item.userName} </Text>
-        <Text style={styles.normalText}>owes </Text>
-        <Text style={styles.amountText}>{item.amount} </Text>
-        <Text style={styles.amountText}>{currencySymbol} </Text>
-        <Text style={styles.normalText}>to</Text>
-        <Text style={styles.userText}> {item.whoPaid}!</Text>
-      </View>
-    );
-  }
+  const renderSplitItem = useCallback(
+    (itemData) => {
+      const item = itemData.item;
+      return (
+        <View style={[styles.splitContainer]}>
+          <Text style={styles.userText}>{item.userName} </Text>
+          <Text style={styles.normalText}>owes </Text>
+          <Text style={styles.amountText}>{item.amount} </Text>
+          <Text style={styles.amountText}>{currencySymbol} </Text>
+          <Text style={styles.normalText}>to</Text>
+          <Text style={styles.userText}> {item.whoPaid}!</Text>
+        </View>
+      );
+    },
+    [currencySymbol]
+  );
 
   if (error && !isFetching) {
     return <ErrorOverlay message={error} onConfirm={errorHandler} />;
@@ -221,8 +228,8 @@ const SplitSummaryScreen = ({ route, navigation }) => {
           <Text style={styles.titleText}> {titleText}</Text>
         </View>
         {/* <View style={styles.subTitleContainer}>
-          <Text style={styles.subTitleText}> {subTitleText}</Text>
-        </View> */}
+            <Text style={styles.subTitleText}> {subTitleText}</Text>
+          </View> */}
         <View style={styles.subTitleContainer}>
           <Text style={styles.subTitleText}> {totalPaidBackText}</Text>
         </View>
@@ -240,11 +247,11 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         <View style={styles.buttonContainer}>
           {!showSimplify && (
             <FlatButton
-              onPress={() => {
+              onPress={async () => {
                 if (showSimplify) {
                   navigation.goBack();
                 } else {
-                  getOpenSplits();
+                  await getOpenSplits();
                   setShowSimplify(true);
                   setTitleText(titleTextOriginal);
                   setSubTitleText(subTitleOriginal);

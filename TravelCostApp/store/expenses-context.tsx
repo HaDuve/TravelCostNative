@@ -63,12 +63,27 @@ export const ExpensesContext = createContext({
   },
   getYearlyExpenses: (yearsBack) => {
     // firstDay, lastDay, yearlyExpenses;
+    return {
+      firstDay: new Date(),
+      lastDay: new Date(),
+      yearlyExpenses: [],
+    };
   },
   getMonthlyExpenses: (monthsBack) => {
     // firstDay, lastDay, monthlyExpenses;
+    return {
+      firstDay: new Date(),
+      lastDay: new Date(),
+      monthlyExpenses: [],
+    };
   },
   getWeeklyExpenses: (weeksBack) => {
     // firstDay, lastDay, weeklyExpenses;
+    return {
+      firstDay: new Date(),
+      lastDay: new Date(),
+      weeklyExpenses: [],
+    };
   },
   getDailyExpenses: (daysBack): Array<ExpenseData> => {
     return [];
@@ -182,7 +197,7 @@ function ExpensesContextProvider({ children }) {
     /*
      *  Returns an object containing the first date, last date of a month and
      *  the expenses in that range.
-     *  returns {firstDay, lastDay, monthlyExpenses}
+     *  returns {firstDay, lastDay, yearlyExpenses}
      */
     const daysBefore = yearsBack * 365;
     const today = new Date();

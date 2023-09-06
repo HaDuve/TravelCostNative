@@ -89,7 +89,7 @@ function ExpensesList({
   isFiltered,
 }) {
   navigation = useNavigation();
-  console.log("expenses: ", expenses.length);
+  // console.log("expenses: ", expenses.length);
 
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;

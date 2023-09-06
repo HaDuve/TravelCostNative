@@ -5,6 +5,7 @@ import { GlobalStyles } from "../constants/styles";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 import { asyncStoreGetObject } from "../store/async-storage";
 import { CATEGORY_KEYWORDS } from "./categoryKeywords";
+import { ExpenseData } from "./expense";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -108,18 +109,38 @@ export function getCatString(cat: string) {
 
 export function mapDescriptionToCategory(
   description: string,
-  categories: Category[]
+  categories: Category[],
+  expenses: ExpenseData[]
 ) {
+  // check if the description contains a keyword of a category
   const categoryMap = {};
   categories.forEach((category) => {
     const keywords = category.keywords ?? [];
     keywords.push(category.cat);
     keywords.forEach((keyword) => {
-      if (description.toLowerCase()?.includes(keyword?.toLowerCase())) {
+      if (
+        description
+          .toLowerCase()
+          ?.trim()
+          .includes(keyword?.toLowerCase().trim())
+      ) {
         categoryMap[category.cat] = (categoryMap[category.cat] || 0) + 1;
       }
     });
   });
+  // check if the description matches the description of an expense
+  expenses.forEach((expense) => {
+    if (
+      description
+        .toLowerCase()
+        ?.trim()
+        .includes(expense.description?.toLowerCase().trim())
+    ) {
+      console.log(description, "found a match with: ", expense.description);
+      categoryMap[expense.category] = (categoryMap[expense.category] || 0) + 1;
+    }
+  });
+  // return the category with the most matches
   let maxCategory = "";
   let maxCount = -1;
   Object.keys(categoryMap).forEach((category) => {

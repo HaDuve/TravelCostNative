@@ -237,7 +237,6 @@ const ExpenseForm = ({
       endDate &&
       daysBetween(new Date(endDate), new Date(startDate)) + 1
   );
-  console.log("daysBetweenState:", daysBetweenState);
   useEffect(() => {
     setDaysBetweenState(
       startDate &&
@@ -308,7 +307,6 @@ const ExpenseForm = ({
     ? editedSplitString
     : newExpenseSplitString;
 
-  console.log("splitString:", splitString);
   const duplOrSplitString = useCallback(
     (duplOrSplitNum: number) => {
       return duplOrSplitNum === 1
@@ -495,7 +493,8 @@ const ExpenseForm = ({
       const mappedCategory = mapDescriptionToCategory(
         enteredValue,
         // TODO: PUT ALL CATEGORIES
-        DEFAULTCATEGORIES
+        DEFAULTCATEGORIES,
+        expCtx.getYearlyExpenses(0).yearlyExpenses
       );
       if (mappedCategory) {
         setInputs((curInputs) => {
@@ -509,6 +508,12 @@ const ExpenseForm = ({
       }
     }
   }
+  useEffect(() => {
+    // if Icon is changed, asyncGetCatSymbol
+    getCatSymbolAsync(inputs.category.value).then((symbol) => {
+      setIcon(symbol);
+    });
+  }, [inputs.category.value]);
 
   function inputChangedHandler(inputIdentifier: string, enteredValue: string) {
     setInputs((curInputs) => {

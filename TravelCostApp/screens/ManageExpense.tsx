@@ -66,10 +66,10 @@ const ManageExpense = ({ route, navigation }) => {
   const selectedExpense: ExpenseData = expenseCtx.expenses.find(
     (expense) => expense.id === editedExpenseId
   );
-  console.log(
-    "ManageExpense ~ selectedExpense?.rangeId:",
-    selectedExpense?.rangeId
-  );
+  // console.log(
+  //   "ManageExpense ~ selectedExpense?.rangeId:",
+  //   selectedExpense?.rangeId
+  // );
   const selectedExpenseAuthorUid = selectedExpense?.uid;
 
   useEffect(() => {

@@ -1,5 +1,9 @@
 Change log Travel Expense App
 
+1.2.650
+- added automatically finding categories of expenses that have the same name as others
+- adjusted backend optimization
+
 1.2.642
 - hotfix for faulty "test" description
 

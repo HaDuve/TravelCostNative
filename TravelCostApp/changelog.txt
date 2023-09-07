@@ -1,5 +1,9 @@
 Change log Travel Expense App
 
+1.2.651
+- fixed splitsummary load
+- improved autocatfinder finding custom cats a little better (with mmkv we can improve the function even further)
+
 1.2.650
 - added automatically finding categories of expenses that have the same name as others
 - adjusted backend optimization

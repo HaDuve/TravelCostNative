@@ -89,6 +89,7 @@ import { Toast } from "react-native-toast-message/lib/src/Toast";
 import SettingsSwitch from "../UI/SettingsSwitch";
 import CountryPicker from "../Currency/CountryPicker";
 import { alertDuplSplitString } from "./ExpenseFormUtil";
+import { getMMKVObject } from "../../store/mmkv";
 
 const ExpenseForm = ({
   onCancel,
@@ -493,7 +494,7 @@ const ExpenseForm = ({
       const mappedCategory = mapDescriptionToCategory(
         enteredValue,
         // TODO: PUT ALL CATEGORIES
-        DEFAULTCATEGORIES,
+        getMMKVObject("categoryList") ?? DEFAULTCATEGORIES,
         expCtx.getYearlyExpenses(0).yearlyExpenses
       );
       if (mappedCategory) {

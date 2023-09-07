@@ -36,6 +36,7 @@ import BlurPremium from "../components/Premium/BlurPremium";
 
 const SplitSummaryScreen = ({ route, navigation }) => {
   // let { tripid } = route.params;
+  console.log("rerender SplitSummaryScreen");
   const tripCtx = useContext(TripContext);
   // if (!tripid)
   const tripid = tripCtx.tripid;
@@ -45,7 +46,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const expenseCtx = useContext(ExpensesContext);
   const uniqueExpenses: Array<ExpenseData> = useMemo(
     () => expenseCtx.getRecentExpenses(RangeString.total),
-    [expenseCtx]
+    [expenseCtx.expenses]
   );
 
   useFocusEffect(
@@ -100,7 +101,6 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const getOpenSplits = useCallback(async () => {
     if (expenseCtx.expenses.length === 0) return;
     if (!tripid) return;
-    if (splits.length > 0) return;
     setIsFetching(true);
     try {
       const response = await calcOpenSplitsTable(
@@ -147,7 +147,20 @@ const SplitSummaryScreen = ({ route, navigation }) => {
       // setError("Could not fetch splits from the web database! " + error);
     }
     setIsFetching(false);
-  }, [expenseCtx.expenses.length]);
+  }, [
+    expenseCtx.expenses.length,
+    totalPaidBackTextOriginal,
+    totalPayBackTextOriginal,
+    tripCtx.isPaidDate,
+    tripCurrency,
+    tripid,
+    uniqueExpenses,
+    userCtx.userName,
+  ]);
+
+  useEffect(() => {
+    getOpenSplits();
+  }, [expenseCtx.expenses, tripid, tripIsPaid, tripCurrency, getOpenSplits]);
 
   const handleSimpflifySplits = useCallback(async () => {
     try {

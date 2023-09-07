@@ -35,6 +35,8 @@ import { DEFAULTCATEGORIES } from "../util/category";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import IconButton from "../components/UI/IconButton";
 import BackButton from "../components/UI/BackButton";
+import { MMKV } from "react-native-mmkv";
+import { mmkvstorage, setMMKVObject } from "../store/mmkv";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -84,6 +86,8 @@ const CategoryPickScreen = ({ route, navigation }) => {
             "categoryList",
             JSON.stringify(categories)
           );
+          // MMKV save
+          setMMKVObject("categoryList", categories);
           setIsFetching(false);
         } else await loadCategoryList();
       };

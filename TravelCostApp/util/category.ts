@@ -107,39 +107,7 @@ export function getCatString(cat: string) {
   }
 }
 
-export function mapDescriptionToCategory(
-  description: string,
-  categories: Category[],
-  expenses: ExpenseData[]
-) {
-  // check if the description contains a keyword of a category
-  const categoryMap = {};
-  categories.forEach((category) => {
-    const keywords = category.keywords ?? [];
-    keywords.push(category.cat);
-    keywords.forEach((keyword) => {
-      if (
-        description
-          .toLowerCase()
-          ?.trim()
-          .includes(keyword?.toLowerCase().trim())
-      ) {
-        categoryMap[category.cat] = (categoryMap[category.cat] || 0) + 1;
-      }
-    });
-  });
-  // check if the description matches the description of an expense
-  expenses.forEach((expense) => {
-    if (
-      description
-        .toLowerCase()
-        ?.trim()
-        .includes(expense.description?.toLowerCase().trim())
-    ) {
-      console.log(description, "found a match with: ", expense.description);
-      categoryMap[expense.category] = (categoryMap[expense.category] || 0) + 1;
-    }
-  });
+function getMaxCategoryMap(categoryMap: any) {
   // return the category with the most matches
   let maxCategory = "";
   let maxCount = -1;
@@ -151,6 +119,43 @@ export function mapDescriptionToCategory(
   });
   if (maxCategory)
     console.log("mapDescriptionToCategory ~ maxCategory:", maxCategory);
+  return maxCategory;
+}
+
+export function mapDescriptionToCategory(
+  description: string,
+  categories: Category[],
+  expenses: ExpenseData[]
+) {
+  if (!description) return "";
+  if (!categories) return "";
+  if (description.length < 3) return "";
+  const descriptionWords = description.trim().toLowerCase().split(" ");
+
+  // check if the description contains a keyword of a category
+  const categoryMap = {};
+  categories.forEach((category) => {
+    console.log("category", category.cat);
+    const keywords = category.keywords ?? [];
+    keywords.push(category.cat);
+    keywords.forEach((keyword) => {
+      keyword = keyword.toLowerCase().trim();
+      if (descriptionWords.includes(keyword)) {
+        console.log("match found: ", keyword, "in", descriptionWords);
+        categoryMap[category.cat] = (categoryMap[category.cat] || 0) + 1;
+      }
+    });
+  });
+
+  // check if the description matches the description of an expense
+  expenses?.forEach((expense) => {
+    if (descriptionWords.includes(expense.description.toLowerCase().trim())) {
+      console.log(description, "found a match with: ", expense.description);
+      categoryMap[expense.category] = (categoryMap[expense.category] || 0) + 1;
+    }
+  });
+  const maxCategory = getMaxCategoryMap(categoryMap);
+
   return maxCategory;
 }
 

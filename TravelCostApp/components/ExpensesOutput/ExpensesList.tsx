@@ -57,7 +57,7 @@ import {
 import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { Text } from "react-native-paper";
@@ -382,7 +382,7 @@ function ExpensesList({
                 overshootFriction={8}
               >
                 {selectable && selectableJSX}
-                <ExpenseItem
+                <MemoizedExpenseItem
                   showSumForTravellerName={travellerName}
                   filtered={filtered}
                   setSelectable={setSelectable}
@@ -432,6 +432,14 @@ function ExpensesList({
       }
     },
     [expenses.length]
+  );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        scrollTo(1);
+      };
+    }, [scrollTo])
   );
 
   const scrollToTopHandler = useCallback(() => {

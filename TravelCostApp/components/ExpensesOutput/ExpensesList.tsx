@@ -70,7 +70,7 @@ const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 
-console.log("rerender list : ", Math.random().toFixed(3));
+// console.log("rerender list : ", Math.random().toFixed(3));
 // GLOBALS across all expenseItems
 let tripID = "";
 let expenseCtx;
@@ -318,108 +318,106 @@ function ExpensesList({
     }
     deleteExpenseHandler();
   }, []);
-  const renderExpenseItem = useCallback(
-    (
-      isOnline: boolean,
-      selectable: boolean,
-      selected: ExpenseData[],
-      selectItem: (item: ExpenseData, id: object) => void,
-      setSelectable: (selectable: boolean) => void,
-      itemData
-    ) => {
-      if (itemData.item.id.includes("shadow"))
-        return <View style={{ height: 55, width: "100%" }}></View>;
-      const index = itemData.index;
-      const selectableJSX = (
-        <Animated.View
-          entering={FadeInLeft}
-          exiting={FadeOutLeft}
+
+  const renderExpenseItem = (
+    isOnline: boolean,
+    selectable: boolean,
+    selected: ExpenseData[],
+    selectItem: (item: ExpenseData, id: object) => void,
+    setSelectable: (selectable: boolean) => void,
+    itemData
+  ) => {
+    if (itemData.item.id.includes("shadow"))
+      return <View style={{ height: 55, width: "100%" }}></View>;
+    const index = itemData.index;
+    const selectableJSX = (
+      <Animated.View
+        entering={FadeInLeft}
+        exiting={FadeOutLeft}
+        style={{
+          flex: 0,
+          position: "absolute",
+          top: -36,
+          left: -46,
+          zIndex: 1,
+        }}
+      >
+        <IconButton
+          icon={
+            selected.includes(itemData.item.id)
+              ? "ios-checkmark-circle"
+              : "ellipse-outline"
+          }
+          color={
+            selected.includes(itemData.item.id)
+              ? GlobalStyles.colors.textColor
+              : GlobalStyles.colors.gray700
+          }
+          size={16}
+          onPress={selectItem.bind(this, itemData.item.id)}
+          buttonStyle={{ padding: 48 }}
+        ></IconButton>
+      </Animated.View>
+    );
+    if (Platform.OS === "android")
+      return (
+        <View
           style={{
-            flex: 0,
-            position: "absolute",
-            top: -36,
-            left: -46,
-            zIndex: 1,
+            height: 55,
+            width: "100%",
+            backgroundColor: GlobalStyles.colors.backgroundColor,
           }}
         >
-          <IconButton
-            icon={
-              selected.includes(itemData.item.id)
-                ? "ios-checkmark-circle"
-                : "ellipse-outline"
-            }
-            color={
-              selected.includes(itemData.item.id)
-                ? GlobalStyles.colors.textColor
-                : GlobalStyles.colors.gray700
-            }
-            size={16}
-            onPress={selectItem.bind(this, itemData.item.id)}
-            buttonStyle={{ padding: 48 }}
-          ></IconButton>
-        </Animated.View>
-      );
-      if (Platform.OS === "android")
-        return (
-          <View
-            style={{
-              height: 55,
-              width: "100%",
-              backgroundColor: GlobalStyles.colors.backgroundColor,
-            }}
-          >
-            <GestureHandlerRootView>
-              <Swipeable
-                renderLeftActions={(progress, dragX) =>
-                  renderRightActions(
-                    progress,
-                    dragX,
-                    onClick.bind(this, itemData, isOnline)
-                  )
-                }
-                onSwipeableOpen={closeRow.bind(this, index)}
-                ref={(ref) => (row[index] = ref)}
-                overshootFriction={8}
-              >
-                {selectable && selectableJSX}
-                <MemoizedExpenseItem
-                  showSumForTravellerName={travellerName}
-                  filtered={filtered}
-                  setSelectable={setSelectable}
-                  {...itemData.item}
-                />
-              </Swipeable>
-            </GestureHandlerRootView>
-          </View>
-        );
-      return (
-        <View style={{ height: 55, width: "100%" }}>
-          <Swipeable
-            renderRightActions={(progress, dragX) =>
-              renderRightActions(
-                progress,
-                dragX,
-                onClick.bind(this, itemData, isOnline)
-              )
-            }
-            onSwipeableOpen={closeRow.bind(this, index)}
-            ref={(ref) => (row[index] = ref)}
-            rightOpenValue={-100}
-            disableLeftSwipe={true}
-            overshootFriction={8}
-          >
-            {selectable && selectableJSX}
-            <MemoizedExpenseItem
-              showSumForTravellerName={travellerName}
-              filtered={filtered}
-              {...itemData.item}
-            />
-          </Swipeable>
+          <GestureHandlerRootView>
+            <Swipeable
+              renderLeftActions={(progress, dragX) =>
+                renderRightActions(
+                  progress,
+                  dragX,
+                  onClick.bind(this, itemData, isOnline)
+                )
+              }
+              onSwipeableOpen={closeRow.bind(this, index)}
+              ref={(ref) => (row[index] = ref)}
+              overshootFriction={8}
+            >
+              {selectable && selectableJSX}
+              <MemoizedExpenseItem
+                showSumForTravellerName={travellerName}
+                filtered={filtered}
+                setSelectable={setSelectable}
+                {...itemData.item}
+              />
+            </Swipeable>
+          </GestureHandlerRootView>
         </View>
       );
-    },
-    [closeRow, onClick, renderRightActions]
-  );
+    return (
+      <View style={{ height: 55, width: "100%" }}>
+        <Swipeable
+          renderRightActions={(progress, dragX) =>
+            renderRightActions(
+              progress,
+              dragX,
+              onClick.bind(this, itemData, isOnline)
+            )
+          }
+          onSwipeableOpen={closeRow.bind(this, index)}
+          ref={(ref) => (row[index] = ref)}
+          rightOpenValue={-100}
+          disableLeftSwipe={true}
+          overshootFriction={8}
+        >
+          {selectable && selectableJSX}
+          <MemoizedExpenseItem
+            showSumForTravellerName={travellerName}
+            filtered={filtered}
+            {...itemData.item}
+          />
+        </Swipeable>
+      </View>
+    );
+  };
 
   const scrollTo = useCallback(
     (index: number) => {

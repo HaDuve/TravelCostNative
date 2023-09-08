@@ -626,7 +626,6 @@ export async function unTouchTraveler(tripid: string, uid: string) {
   const response = await fetchTripsTravellers(tripid);
   const axios_calls = [];
   for (const key in response) {
-    console.log("unTouchTraveler ~ key:", key);
     if (uid !== response[key].uid) continue;
     axios_calls.push(touchTraveler(tripid, key, false));
   }

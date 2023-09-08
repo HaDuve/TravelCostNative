@@ -330,22 +330,7 @@ function ExpenseItem(props): JSX.Element {
   );
 }
 
-const areEqual = (prevProps, nextProps) => {
-  return (
-    prevProps.id === nextProps.id &&
-    prevProps.description === nextProps.description &&
-    prevProps.amount === nextProps.amount &&
-    prevProps.category === nextProps.category &&
-    prevProps.country === nextProps.country &&
-    prevProps.whoPaid === nextProps.whoPaid &&
-    prevProps.currency === nextProps.currency &&
-    prevProps.calcAmount === nextProps.calcAmount &&
-    prevProps.splitList === nextProps.splitList &&
-    prevProps.iconName === nextProps.iconName &&
-    prevProps.isSpecialExpense === nextProps.isSpecialExpense
-  );
-};
-export const MemoizedExpenseItem = memo(ExpenseItem, areEqual);
+export const MemoizedExpenseItem = memo(ExpenseItem);
 export default ExpenseItem;
 
 ExpenseItem.propTypes = {

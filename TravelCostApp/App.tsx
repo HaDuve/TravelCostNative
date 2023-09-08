@@ -50,7 +50,9 @@ import JoinTrip from "./screens/JoinTrip";
 import ShareTripButton from "./components/ProfileOutput/ShareTrip";
 import OverviewScreen from "./screens/OverviewScreen";
 import CategoryPickScreen from "./screens/CategoryPickScreen";
-import SplitSummaryScreen from "./screens/SplitSummaryScreen";
+import SplitSummaryScreen, {
+  MemoizedSplitSummaryScreen,
+} from "./screens/SplitSummaryScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import {
   asyncStoreGetItem,
@@ -104,6 +106,7 @@ import CustomerScreen from "./screens/CustomerScreen";
 import CategoryMapTestScreen from "./screens/CategoryMapTestScreen";
 import GPTDealScreen from "./screens/ChatGPTDealScreen";
 import { initBranch } from "./components/Referral/branch";
+import { MemoizedRecentExpenses } from "./screens/RecentExpenses";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -227,7 +230,7 @@ function AuthenticatedStack() {
           />
           <Stack.Screen
             name="SplitSummary"
-            component={SplitSummaryScreen}
+            component={MemoizedSplitSummaryScreen}
             options={{
               headerShown: false,
               presentation: "modal",
@@ -392,7 +395,7 @@ function Home() {
     >
       <BottomTabs.Screen
         name="RecentExpenses"
-        component={RecentExpenses}
+        component={MemoizedRecentExpenses}
         options={{
           tabBarShowLabel: false,
           // headerShown: false,

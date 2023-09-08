@@ -4,6 +4,8 @@ import React, {
   useEffect,
   useCallback,
   useLayoutEffect,
+  memo,
+  useMemo,
 } from "react";
 import * as Haptics from "expo-haptics";
 import {
@@ -488,6 +490,14 @@ const ExpenseForm = ({
       setSplitListValid(isValidSplit);
     }
   }
+  const last500Daysexpenses = useMemo(
+    () =>
+      expCtx.expenses.filter(
+        (expense) =>
+          expense.date > DateTime.now().minus({ days: 500 }).toJSDate()
+      ),
+    [expCtx.expenses]
+  );
   function autoCategory(inputIdentifier: string, enteredValue: string) {
     // calc category from description
     if (inputIdentifier === "description" && pickedCat === "undefined") {
@@ -495,7 +505,7 @@ const ExpenseForm = ({
         enteredValue,
         // TODO: PUT ALL CATEGORIES
         getMMKVObject("categoryList") ?? DEFAULTCATEGORIES,
-        expCtx.getYearlyExpenses(0).yearlyExpenses
+        last500Daysexpenses
       );
       if (mappedCategory) {
         setInputs((curInputs) => {

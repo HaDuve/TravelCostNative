@@ -71,7 +71,6 @@ import { memo } from "react";
 import { set } from "react-native-reanimated";
 
 function RecentExpenses({ navigation }) {
-  // console.log("rerender RecentExpenses - A");
   const expensesCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
@@ -121,7 +120,9 @@ function RecentExpenses({ navigation }) {
   // const test_fetchAndSetExpenses = dataResponseTime(fetchAndSetExpenses);
 
   const [refreshing, setRefreshing] = useState(false);
-  async function onRefresh() {
+
+  const onRefresh = useCallback(async () => {
+    console.log("refreshing: ", refreshing);
     setRefreshing(true);
     // check if we have a offline queue
     const offlineQueue = await getOfflineQueue();
@@ -132,7 +133,7 @@ function RecentExpenses({ navigation }) {
     }
     await getExpenses(true, true, true);
     setRefreshing(false);
-  }
+  }, [getExpenses]);
 
   // strong connection state
   const [offlineString, setOfflineString] = useState("");
@@ -198,33 +199,6 @@ function RecentExpenses({ navigation }) {
     setTravellers();
   }, [tripCtx.tripid, netCtx.isConnected, netCtx.strongConnection]);
 
-  useEffect(() => {
-    LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
-  }, []);
-
-  useInterval(
-    () => {
-      if (userCtx.freshlyCreated) return;
-      setDateTimeString(_toShortFormat(DateTime.now()));
-      if (isForeground()) {
-        const asyncPolling = async () => {
-          await getExpenses(true, true);
-        };
-        asyncPolling();
-      }
-    },
-    DEBUG_POLLING_INTERVAL,
-    true
-  );
-
-  const [items, setItems] = useState([
-    { label: i18n.t("todayLabel"), value: RangeString.day },
-    { label: i18n.t("weekLabel"), value: RangeString.week },
-    { label: i18n.t("monthLabel"), value: RangeString.month },
-    { label: i18n.t("yearLabel"), value: RangeString.year },
-    { label: i18n.t("totalLabel"), value: RangeString.total },
-  ]);
-
   const getExpenses = useCallback(
     async (
       showRefIndicator = false,
@@ -284,6 +258,32 @@ function RecentExpenses({ navigation }) {
       userCtx.freshlyCreated,
     ]
   );
+  useEffect(() => {
+    LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
+  }, []);
+
+  useInterval(
+    () => {
+      if (userCtx.freshlyCreated) return;
+      setDateTimeString(_toShortFormat(DateTime.now()));
+      if (isForeground()) {
+        const asyncPolling = async () => {
+          await getExpenses(true, true);
+        };
+        asyncPolling();
+      }
+    },
+    DEBUG_POLLING_INTERVAL,
+    true
+  );
+
+  const [items, setItems] = useState([
+    { label: i18n.t("todayLabel"), value: RangeString.day },
+    { label: i18n.t("weekLabel"), value: RangeString.week },
+    { label: i18n.t("monthLabel"), value: RangeString.month },
+    { label: i18n.t("yearLabel"), value: RangeString.year },
+    { label: i18n.t("totalLabel"), value: RangeString.total },
+  ]);
 
   function errorHandler() {
     setError(null);
@@ -345,7 +345,6 @@ function RecentExpenses({ navigation }) {
   // if (isFetching) {
   //   return <LoadingOverlay />;
   // }
-
   return (
     <View style={styles.container}>
       <TourGuideZone
@@ -422,6 +421,7 @@ function RecentExpenses({ navigation }) {
 }
 
 export default RecentExpenses;
+export const MemoizedRecentExpenses = memo(RecentExpenses);
 RecentExpenses.propTypes = {
   navigation: PropTypes.object,
 };

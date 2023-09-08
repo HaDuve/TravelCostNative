@@ -34,24 +34,25 @@ import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { useFocusEffect } from "@react-navigation/native";
 import BlurPremium from "../components/Premium/BlurPremium";
 
-const SplitSummaryScreen = ({ route, navigation }) => {
-  // let { tripid } = route.params;
-  console.log("rerender SplitSummaryScreen");
-  const tripCtx = useContext(TripContext);
-  // if (!tripid)
-  const tripid = tripCtx.tripid;
-  const tripCurrency = tripCtx.tripCurrency;
-  const currencySymbol = getCurrencySymbol(tripCurrency);
-  const userCtx = useContext(UserContext);
-  const expenseCtx = useContext(ExpensesContext);
-  const uniqueExpenses: Array<ExpenseData> = useMemo(
-    () => expenseCtx.getRecentExpenses(RangeString.total),
-    [expenseCtx.expenses]
+const SplitSummaryScreen = ({ navigation }) => {
+  const {
+    tripid,
+    tripCurrency,
+    tripName,
+    fetchAndSettleCurrentTrip,
+    isPaid,
+    isPaidDate,
+  } = useContext(TripContext);
+  const currencySymbol = useMemo(
+    () => getCurrencySymbol(tripCurrency),
+    [tripCurrency]
   );
+  const { freshlyCreated, userName } = useContext(UserContext);
+  const { expenses } = useContext(ExpensesContext);
 
   useFocusEffect(
     React.useCallback(() => {
-      if (userCtx.freshlyCreated) {
+      if (freshlyCreated) {
         Toast.show({
           type: "success",
           text1: "Welcome to Budget for Nomads",
@@ -59,19 +60,17 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         });
         navigation.navigate("Profile");
       }
-    }, [userCtx.freshlyCreated, navigation])
+    }, [freshlyCreated, navigation])
   );
 
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
 
-  const [tripIsPaid, setTripIsPaid] = useState(
-    tripCtx.isPaid === isPaidString.paid
-  );
+  const [tripIsPaid, setTripIsPaid] = useState(isPaid === isPaidString.paid);
 
   useEffect(() => {
-    setTripIsPaid(tripCtx.isPaid === isPaidString.paid);
-  }, [tripCtx.isPaid]);
+    setTripIsPaid(isPaid === isPaidString.paid);
+  }, [isPaid]);
 
   const [splits, setSplits] = useState<Split[]>([]);
   const [showSimplify, setShowSimplify] = useState(true);
@@ -80,11 +79,12 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const titleTextOriginal = "Split Summary";
   const titleTextSimplified = "Split Summary";
 
-  const tripName = truncateString(tripCtx.tripName, 25);
+  const tripNameString = truncateString(tripName, 25);
   const subTitleOriginal =
-    "Overview of owed amounts in the trip:\n  " + tripName;
+    "Overview of owed amounts in the trip:\n  " + tripNameString;
   const subTitleSimplified =
-    "Simplified Summary of Optimal Transactions in the trip:  " + tripName;
+    "Simplified Summary of Optimal Transactions in the trip:  " +
+    tripNameString;
 
   const [titleText, setTitleText] = useState(titleTextOriginal);
   const [subTitleText, setSubTitleText] = useState(subTitleOriginal);
@@ -99,15 +99,15 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   );
 
   const getOpenSplits = useCallback(async () => {
-    if (expenseCtx.expenses.length === 0) return;
+    if (expenses.length === 0) return;
     if (!tripid) return;
     setIsFetching(true);
     try {
       const response = await calcOpenSplitsTable(
         tripid,
         tripCurrency,
-        uniqueExpenses,
-        tripCtx.isPaidDate
+        expenses,
+        isPaidDate
       );
       const temp = [];
       let userGetsBack = 0;
@@ -121,11 +121,9 @@ const SplitSummaryScreen = ({ route, navigation }) => {
         };
         temp.push(tempObj);
         userGetsBack +=
-          split.whoPaid === userCtx.userName ? Number(split.amount) : Number(0);
+          split.whoPaid === userName ? Number(split.amount) : Number(0);
         userHasToPay +=
-          split.userName === userCtx.userName
-            ? Number(split.amount)
-            : Number(0);
+          split.userName === userName ? Number(split.amount) : Number(0);
       }
       setSplits(temp);
       setTotalPaidBackText(
@@ -148,19 +146,18 @@ const SplitSummaryScreen = ({ route, navigation }) => {
     }
     setIsFetching(false);
   }, [
-    expenseCtx.expenses.length,
     totalPaidBackTextOriginal,
     totalPayBackTextOriginal,
-    tripCtx.isPaidDate,
+    isPaidDate,
     tripCurrency,
     tripid,
-    uniqueExpenses,
-    userCtx.userName,
+    expenses,
+    userName,
   ]);
 
   useEffect(() => {
     getOpenSplits();
-  }, [expenseCtx.expenses, tripid, tripIsPaid, tripCurrency, getOpenSplits]);
+  }, [expenses, tripid, tripIsPaid, tripCurrency, getOpenSplits]);
 
   const handleSimpflifySplits = useCallback(async () => {
     try {
@@ -196,13 +193,13 @@ const SplitSummaryScreen = ({ route, navigation }) => {
   const settleSplitsHandler = useCallback(async () => {
     setIsFetching(true);
     try {
-      await tripCtx.fetchAndSettleCurrentTrip();
+      await fetchAndSettleCurrentTrip();
     } catch (error) {
       console.log("settleSplitsHandler ~ error", error);
     }
     setIsFetching(false);
     navigation.navigate("Settings");
-  }, [navigation, tripCtx]);
+  }, [fetchAndSettleCurrentTrip, navigation]);
 
   const renderSplitItem = useCallback(
     (itemData) => {
@@ -316,6 +313,7 @@ const SplitSummaryScreen = ({ route, navigation }) => {
 };
 
 export default SplitSummaryScreen;
+export const MemoizedSplitSummaryScreen = React.memo(SplitSummaryScreen);
 
 SplitSummaryScreen.propTypes = {
   route: PropTypes.object.isRequired,

@@ -65,7 +65,7 @@ const AddExpenseButton = ({ navigation }) => {
         tripCtx.travellers &&
         tripCtx.travellers.length > 0
     );
-  }, [tripCtx.tripid, authCtx.uid, tripCtx.travellers]);
+  }, [tripCtx.tripid, authCtx.uid, tripCtx.travellers.length]);
   // console.log("AddExpenseButton ~ tripCtx.travellers:", tripCtx.travellers);
   // console.log("AddExpenseButton ~ authCtx.uid:", authCtx.uid);
   // console.log("AddExpenseButton ~ tripCtx.tripid:", tripCtx.tripid);

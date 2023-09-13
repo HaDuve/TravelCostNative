@@ -134,7 +134,7 @@ function RecentExpenses({ navigation }) {
   const [PeriodValue, setPeriodValue] = useState<RangeString>(RangeString.day);
   useEffect(() => {
     userCtx.setPeriodString(PeriodValue);
-  }, [PeriodValue, userCtx]);
+  }, [PeriodValue]);
 
   const [dateTimeString, setDateTimeString] = useState("");
 
@@ -315,11 +315,11 @@ function RecentExpenses({ navigation }) {
     setError(null);
   }
 
-  const getRecentExpenses = useCallback(
+  const getRecentExpenses = useMemo(
     () => expensesCtx.getRecentExpenses(PeriodValue),
-    [expensesCtx, PeriodValue]
+    [expensesCtx.expenses.length, PeriodValue]
   );
-  const recentExpenses = useMemo(getRecentExpenses, [getRecentExpenses]);
+  const recentExpenses = getRecentExpenses;
 
   const getExpensesSum = useCallback(
     () =>
@@ -327,7 +327,7 @@ function RecentExpenses({ navigation }) {
         if (isNaN(Number(expense.calcAmount))) return sum;
         return sum + Number(expense.calcAmount);
       }, 0),
-    [recentExpenses]
+    [recentExpenses.length]
   );
   const expensesSum = useMemo(getExpensesSum, [getExpensesSum]);
   const expensesSumString = formatExpenseWithCurrency(

@@ -60,7 +60,7 @@ const ProfileScreen = ({ navigation }) => {
     }
     // console.log("useEffect ~ userCtx.tripHistory:", userCtx.tripHistory);
     fetchHistory();
-  }, [userCtx.tripHistory, uid, tripCtx.tripid, userCtx]);
+  }, [userCtx.tripHistory.length, uid, tripCtx.tripid]);
 
   useInterval(
     () => {

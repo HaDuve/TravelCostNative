@@ -192,17 +192,12 @@ const ExpenseForm = ({
     if (pickedCat) getSetCatIcon(pickedCat);
     else if (editingValues?.category) getSetCatIcon(editingValues?.category);
     else if (editingValues?.iconName) setIcon(editingValues.iconName);
-  }, [pickedCat, editingValues]);
+  }, [pickedCat, editingValues?.category, editingValues?.iconName]);
 
   useEffect(() => {
     const hideAdvanceByDefault = isEditing || alwaysShowAdvancedSetting;
     sethideAdvanced(!hideAdvanceByDefault);
   }, [isEditing, alwaysShowAdvancedSetting, iconName]);
-
-  // extract suggestions from all the descriptions of expense state into an array of strings
-  const suggestionData = expCtx
-    .getRecentExpenses(RangeString.year)
-    .map((expense) => expense.description);
 
   useEffect(() => {
     if (!tripCtx.travellers || tripCtx.travellers.length < 1)
@@ -217,7 +212,7 @@ const ExpenseForm = ({
   useEffect(() => {
     // setlistequal with tripcontext.travellers
     if (tripCtx.travellers) setListEQUAL(tripCtx.travellers);
-  }, [tripCtx.travellers]);
+  }, [tripCtx.travellers.length]);
 
   // datepicker states
   const [showDatePickerRange, setShowDatePickerRange] = useState(false);
@@ -455,7 +450,7 @@ const ExpenseForm = ({
   );
   useEffect(() => {
     setSplitItemsEQUAL(currentTravellersAsItems);
-  }, [currentTravellersAsItems]);
+  }, [currentTravellersAsItems.length]);
   const [openEQUAL, setOpenEQUAL] = useState(false);
   const [splitTravellersList, setListEQUAL] = useState(
     editingValues ? editingValues.listEQUAL : currentTravellers
@@ -496,8 +491,13 @@ const ExpenseForm = ({
         (expense) =>
           expense.date > DateTime.now().minus({ days: 500 }).toJSDate()
       ),
-    [expCtx.expenses]
+    [expCtx.expenses.length]
   );
+  // extract suggestions from all the descriptions of expense state into an array of strings
+  const suggestionData = last500Daysexpenses.map(
+    (expense) => expense.description
+  );
+
   function autoCategory(inputIdentifier: string, enteredValue: string) {
     // calc category from description
     if (inputIdentifier === "description" && pickedCat === "undefined") {

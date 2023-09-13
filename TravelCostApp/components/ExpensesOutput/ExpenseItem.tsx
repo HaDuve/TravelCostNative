@@ -6,7 +6,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import PropTypes from "prop-types";
 
 import { GlobalStyles } from "../../constants/styles";
@@ -118,7 +118,9 @@ function ExpenseItem(props): JSX.Element {
       setCatSymbol(iconName);
     }
     setCatSymbolAsync();
-  }, [catIconNames, category]);
+    // need to disable eslint because of array in deps => rerender every tick problem
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category]);
 
   const sameCurrency = tripCurrency === currency;
 

@@ -70,17 +70,6 @@ const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 
-// console.log("rerender list : ", Math.random().toFixed(3));
-// GLOBALS across all expenseItems
-let tripID = "";
-let expenseCtx;
-let filtered = false;
-let navigation;
-const row = [];
-let prevOpenedRow;
-let travellerName = "";
-// swipe left to delete
-
 // Displays a list of all expenses.
 function ExpensesList({
   expenses,
@@ -88,14 +77,22 @@ function ExpensesList({
   showSumForTravellerName,
   isFiltered,
 }) {
-  navigation = useNavigation();
+  // GLOBALS across all expenseItems
+  let tripID = "";
+  // let expenseCtx;
+  let filtered = false;
+  // let navigation;
+  const row = useMemo(() => [], []);
+  const prevOpenedRow = useRef(null);
+  let travellerName = "";
+  const navigation = useNavigation();
   // console.log("expenses: ", expenses.length);
 
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;
   const { tripid } = useContext(TripContext);
   const { periodName } = useContext(UserContext);
-  expenseCtx = useContext(ExpensesContext);
+  const expenseCtx = useContext(ExpensesContext);
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(1);
   tripID = tripid;
   travellerName = showSumForTravellerName;
@@ -106,36 +103,34 @@ function ExpensesList({
   const flatListRef = useRef(null);
   // for scroll to top
   const [contentVerticalOffset, setContentVerticalOffset] = useState(0);
-  const [hideScrollToTop, setHideScrollToTop] = useState(false);
   const CONTENT_OFFSET_THRESHOLD = 300;
   const showScrollToTop = contentVerticalOffset > CONTENT_OFFSET_THRESHOLD;
-  useEffect(() => {
-    if (contentVerticalOffset < CONTENT_OFFSET_THRESHOLD)
-      setHideScrollToTop(false);
-  }, [contentVerticalOffset]);
 
-  const addShadow = useCallback(() => {
-    if (expenses.length < 6) addShadowItemsToExpenses(expenses);
-  }, [expenses]);
-  addShadow();
+  if (expenses.length < 6) addShadowItemsToExpenses(expenses);
 
-  const forceCloseRow = useCallback((index) => {
-    try {
-      row[index].close();
-    } catch (error) {
-      console.log("forceCloseRow ~ error", error);
-    }
-  }, []);
-  const closeRow = useCallback((index) => {
-    if (prevOpenedRow && prevOpenedRow !== row[index]) {
-      prevOpenedRow.close();
-    }
-    prevOpenedRow = row[index];
+  const forceCloseRow = useCallback(
+    (index) => {
+      try {
+        row[index].close();
+      } catch (error) {
+        console.log("forceCloseRow ~ error", error);
+      }
+    },
+    [row]
+  );
+  const closeRow = useCallback(
+    (index) => {
+      if (prevOpenedRow.current && prevOpenedRow.current !== row[index]) {
+        prevOpenedRow.current.close();
+      }
+      prevOpenedRow.current = row[index];
 
-    setTimeout(() => {
-      forceCloseRow(index);
-    }, 1500);
-  }, []);
+      setTimeout(() => {
+        forceCloseRow(index);
+      }, 1500);
+    },
+    [forceCloseRow, row]
+  );
 
   const renderRightActions = useCallback((progress, dragX, onClick) => {
     return (
@@ -319,113 +314,116 @@ function ExpensesList({
     deleteExpenseHandler();
   }, []);
 
-  const renderExpenseItem = (
-    isOnline: boolean,
-    selectable: boolean,
-    selected: ExpenseData[],
-    selectItem: (item: ExpenseData, id: object) => void,
-    setSelectable: (selectable: boolean) => void,
-    itemData
-  ) => {
-    if (itemData.item.id.includes("shadow"))
-      return <View style={{ height: 55, width: "100%" }}></View>;
-    const index = itemData.index;
-    const selectableJSX = (
-      <Animated.View
-        entering={FadeInLeft}
-        exiting={FadeOutLeft}
-        style={{
-          flex: 0,
-          position: "absolute",
-          top: -36,
-          left: -46,
-          zIndex: 1,
-        }}
-      >
-        <IconButton
-          icon={
-            selected.includes(itemData.item.id)
-              ? "ios-checkmark-circle"
-              : "ellipse-outline"
-          }
-          color={
-            selected.includes(itemData.item.id)
-              ? GlobalStyles.colors.textColor
-              : GlobalStyles.colors.gray700
-          }
-          size={16}
-          onPress={selectItem.bind(this, itemData.item.id)}
-          buttonStyle={{ padding: 48 }}
-        ></IconButton>
-      </Animated.View>
-    );
-    if (Platform.OS === "android")
-      return (
-        <View
+  const renderExpenseItem = useCallback(
+    (
+      isOnline: boolean,
+      selectable: boolean,
+      selected: ExpenseData[],
+      selectItem: (item: ExpenseData, id: object) => void,
+      setSelectable: (selectable: boolean) => void,
+      itemData
+    ) => {
+      if (itemData.item.id.includes("shadow"))
+        return <View style={{ height: 55, width: "100%" }}></View>;
+      const index = itemData.index;
+      const selectableJSX = (
+        <Animated.View
+          entering={FadeInLeft}
+          exiting={FadeOutLeft}
           style={{
-            height: 55,
-            width: "100%",
-            backgroundColor: GlobalStyles.colors.backgroundColor,
+            flex: 0,
+            position: "absolute",
+            top: -36,
+            left: -46,
+            zIndex: 1,
           }}
         >
-          <GestureHandlerRootView>
-            <Swipeable
-              renderLeftActions={(progress, dragX) =>
-                renderRightActions(
-                  progress,
-                  dragX,
-                  onClick.bind(this, itemData, isOnline)
-                )
-              }
-              onSwipeableOpen={closeRow.bind(this, index)}
-              ref={(ref) => (row[index] = ref)}
-              overshootFriction={8}
-            >
-              {selectable && selectableJSX}
-              <MemoizedExpenseItem
-                showSumForTravellerName={travellerName}
-                filtered={filtered}
-                setSelectable={setSelectable}
-                {...itemData.item}
-              />
-            </Swipeable>
-          </GestureHandlerRootView>
+          <IconButton
+            icon={
+              selected.includes(itemData.item.id)
+                ? "ios-checkmark-circle"
+                : "ellipse-outline"
+            }
+            color={
+              selected.includes(itemData.item.id)
+                ? GlobalStyles.colors.textColor
+                : GlobalStyles.colors.gray700
+            }
+            size={16}
+            onPress={selectItem.bind(this, itemData.item.id)}
+            buttonStyle={{ padding: 48 }}
+          ></IconButton>
+        </Animated.View>
+      );
+      if (Platform.OS === "android")
+        return (
+          <View
+            style={{
+              height: 55,
+              width: "100%",
+              backgroundColor: GlobalStyles.colors.backgroundColor,
+            }}
+          >
+            <GestureHandlerRootView>
+              <Swipeable
+                renderLeftActions={(progress, dragX) =>
+                  renderRightActions(
+                    progress,
+                    dragX,
+                    onClick.bind(this, itemData, isOnline)
+                  )
+                }
+                onSwipeableOpen={closeRow.bind(this, index)}
+                ref={(ref) => (row[index] = ref)}
+                overshootFriction={8}
+              >
+                {selectable && selectableJSX}
+                <MemoizedExpenseItem
+                  showSumForTravellerName={travellerName}
+                  filtered={filtered}
+                  setSelectable={setSelectable}
+                  {...itemData.item}
+                />
+              </Swipeable>
+            </GestureHandlerRootView>
+          </View>
+        );
+      return (
+        <View style={{ height: 55, width: "100%" }}>
+          <Swipeable
+            renderRightActions={(progress, dragX) =>
+              renderRightActions(
+                progress,
+                dragX,
+                onClick.bind(this, itemData, isOnline)
+              )
+            }
+            onSwipeableOpen={closeRow.bind(this, index)}
+            ref={(ref) => (row[index] = ref)}
+            rightOpenValue={-100}
+            disableLeftSwipe={true}
+            overshootFriction={8}
+          >
+            {selectable && selectableJSX}
+            <MemoizedExpenseItem
+              showSumForTravellerName={travellerName}
+              filtered={filtered}
+              {...itemData.item}
+            />
+          </Swipeable>
         </View>
       );
-    return (
-      <View style={{ height: 55, width: "100%" }}>
-        <Swipeable
-          renderRightActions={(progress, dragX) =>
-            renderRightActions(
-              progress,
-              dragX,
-              onClick.bind(this, itemData, isOnline)
-            )
-          }
-          onSwipeableOpen={closeRow.bind(this, index)}
-          ref={(ref) => (row[index] = ref)}
-          rightOpenValue={-100}
-          disableLeftSwipe={true}
-          overshootFriction={8}
-        >
-          {selectable && selectableJSX}
-          <MemoizedExpenseItem
-            showSumForTravellerName={travellerName}
-            filtered={filtered}
-            {...itemData.item}
-          />
-        </Swipeable>
-      </View>
-    );
-  };
+    },
+    [closeRow, travellerName, filtered, renderRightActions, onClick, row]
+  );
 
   const scrollTo = useCallback(
-    (index: number) => {
+    (index: number, animated = true) => {
       if (!flatListRef.current || index > expenses.length + 1) return;
       if (flatListRef.current) {
         flatListRef.current.scrollToIndex({
           index: index,
-          animated: true,
+          animated: animated,
         });
       }
     },
@@ -435,14 +433,14 @@ function ExpensesList({
   useFocusEffect(
     React.useCallback(() => {
       return () => {
-        scrollTo(1);
+        // if we are currently scrolled at 0
+        if (contentVerticalOffset < 50) scrollTo(1, false);
       };
-    }, [scrollTo])
+    }, [contentVerticalOffset, scrollTo])
   );
 
   const scrollToTopHandler = useCallback(() => {
     scrollTo(1);
-    setHideScrollToTop(true);
   }, [scrollTo]);
 
   useEffect(() => {
@@ -450,7 +448,7 @@ function ExpensesList({
   }, [scrollTo, periodName]);
 
   const selectItem = (item, id: object) => {
-    console.log("selectItem ~ item:", item);
+    console.log("selectItem ~ item:", item, id);
     if (selected.includes(item)) {
       setSelected(selected.filter((newItem) => newItem !== item));
     } else {
@@ -466,10 +464,14 @@ function ExpensesList({
     }
   };
 
-  function moveExpensesToTrip() {
-    if (selected.length === 0) return;
-    // TODO: finish this function
-  }
+  // function moveExpensesToTrip() {
+  //   if (selected.length === 0) return;
+  //   // TODO: finish this function
+  // }
+  // function editMultipleExpenses() {
+  //   if (selected.length === 0) return;
+  //   // TODO: finish this function
+  // }
 
   function finderWithExpenses() {
     if (selected.length === 0) return;
@@ -680,7 +682,7 @@ function ExpensesList({
           });
         }}
       />
-      {showScrollToTop && !hideScrollToTop && (
+      {showScrollToTop && (
         <Animated.View
           entering={FadeInUp.duration(250).easing(Easing.linear)}
           exiting={FadeOutUp.duration(200).easing(Easing.linear)}

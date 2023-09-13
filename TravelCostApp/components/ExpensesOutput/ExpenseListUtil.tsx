@@ -54,5 +54,4 @@ export function addShadowItemsToExpenses(expenses) {
     category: "",
     uid: "",
   });
-  return expenses;
 }

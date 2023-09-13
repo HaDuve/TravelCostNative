@@ -59,6 +59,7 @@ import { Text } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { addShadowItemsToExpenses } from "./ExpenseListUtil";
 import { UserContext } from "../../store/user-context";
+import * as Haptics from "expo-haptics";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -431,6 +432,7 @@ function ExpensesList({
   }, [scrollTo, periodName]);
 
   const selectItem = (item, id: object) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     console.log("selectItem ~ item:", item, id);
     if (selected.includes(item)) {
       setSelected(selected.filter((newItem) => newItem !== item));
@@ -439,13 +441,16 @@ function ExpensesList({
     }
     console.log("selected", selected);
   };
-  const selectAll = () => {
-    if (selected.length === expenses.length) {
-      setSelected([]);
-    } else {
-      setSelected(expenses.map((item) => item.id));
-    }
-  };
+  const selectAll = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    requestAnimationFrame(() => {
+      if (selected.length === expenses.length) {
+        setSelected([]);
+      } else {
+        setSelected(expenses.map((item) => item.id));
+      }
+    });
+  }, [expenses.length, selected.length]);
 
   // function moveExpensesToTrip() {
   //   if (selected.length === 0) return;
@@ -456,7 +461,8 @@ function ExpensesList({
   //   // TODO: finish this function
   // }
 
-  function finderWithExpenses() {
+  const finderWithExpenses = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (selected.length === 0) return;
     const finderExpenses = expenses.filter(
       (item) => selected.includes(item.id) && !item.id.includes("shadow")
@@ -466,9 +472,10 @@ function ExpensesList({
       dayString: `${finderExpenses.length} selected Expenses from ${periodName}`,
       noList: true,
     });
-  }
+  }, [expenses.length, periodName, selected.length]);
 
-  const deleteSelected = () => {
+  const deleteSelected = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (selected.length === 0) return;
     Alert.alert(
       `Delete selected expenses?`,
@@ -534,18 +541,91 @@ function ExpensesList({
         },
       ]
     );
-  };
-  function selectPressHandler() {
-    console.log("selectPressHandler ~ selectable", selectable);
-    if (selectable) {
-      setSelectable(false);
-      setSelected([]);
-      scrollTo(1);
-    } else {
-      setSelectable(true);
-      scrollTo(0);
-    }
-  }
+  }, [expenses.length, isOnline, selected.length, tripID]);
+
+  const selectPressHandler = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    requestAnimationFrame(() => {
+      console.log("selectPressHandler ~ selectable", selectable);
+      if (selectable) {
+        setSelectable(false);
+        setSelected([]);
+        scrollTo(1);
+      } else {
+        setSelectable(true);
+        scrollTo(0);
+      }
+    });
+  }, [scrollTo, selectable]);
+
+  const listHeaderJSX = useMemo(() => {
+    return (
+      <View
+        style={{
+          paddingRight: 20,
+          marginTop: 12,
+          alignItems: "center",
+          justifyContent: "flex-end",
+          flexDirection: "row",
+        }}
+      >
+        {selectable && (
+          <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
+            <IconButton
+              icon={"ios-trash-outline"}
+              size={24}
+              color={
+                selected.length > 0
+                  ? GlobalStyles.colors.gray700
+                  : GlobalStyles.colors.gray600
+              }
+              onPress={deleteSelected}
+            ></IconButton>
+          </Animated.View>
+        )}
+        {selectable && !isFiltered && (
+          <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
+            <IconButton
+              icon={"pie-chart-outline"}
+              size={24}
+              color={
+                selected.length > 0
+                  ? GlobalStyles.colors.gray700
+                  : GlobalStyles.colors.gray600
+              }
+              onPress={finderWithExpenses}
+            ></IconButton>
+          </Animated.View>
+        )}
+        {selectable && (
+          <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
+            <IconButton
+              icon={
+                selected.length > 0 ? "close-outline" : "checkmark-done-outline"
+              }
+              size={24}
+              color={GlobalStyles.colors.gray700}
+              onPress={selectAll}
+            ></IconButton>
+          </Animated.View>
+        )}
+        <IconButton
+          icon={"ellipsis-horizontal-circle-outline"}
+          size={24}
+          color={GlobalStyles.colors.gray700}
+          onPress={selectPressHandler}
+        ></IconButton>
+      </View>
+    );
+  }, [
+    selectable,
+    selected.length,
+    deleteSelected,
+    finderWithExpenses,
+    selectAll,
+    selectPressHandler,
+    isFiltered,
+  ]);
 
   return (
     <Animated.View
@@ -587,66 +667,7 @@ function ExpensesList({
         ListFooterComponent={
           <View style={{ height: Dimensions.get("screen").height / 1.8 }} />
         }
-        ListHeaderComponent={
-          <View
-            style={{
-              paddingRight: 20,
-              marginTop: 12,
-              alignItems: "center",
-              justifyContent: "flex-end",
-              flexDirection: "row",
-            }}
-          >
-            {selectable && (
-              <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
-                <IconButton
-                  icon={"ios-trash-outline"}
-                  size={24}
-                  color={
-                    selected.length > 0
-                      ? GlobalStyles.colors.gray700
-                      : GlobalStyles.colors.gray600
-                  }
-                  onPress={deleteSelected}
-                ></IconButton>
-              </Animated.View>
-            )}
-            {selectable && !isFiltered && (
-              <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
-                <IconButton
-                  icon={"pie-chart-outline"}
-                  size={24}
-                  color={
-                    selected.length > 0
-                      ? GlobalStyles.colors.gray700
-                      : GlobalStyles.colors.gray600
-                  }
-                  onPress={finderWithExpenses}
-                ></IconButton>
-              </Animated.View>
-            )}
-            {selectable && (
-              <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
-                <IconButton
-                  icon={
-                    selected.length > 0
-                      ? "close-outline"
-                      : "checkmark-done-outline"
-                  }
-                  size={24}
-                  color={GlobalStyles.colors.gray700}
-                  onPress={selectAll}
-                ></IconButton>
-              </Animated.View>
-            )}
-            <IconButton
-              icon={"ellipsis-horizontal-circle-outline"}
-              size={24}
-              color={GlobalStyles.colors.gray700}
-              onPress={selectPressHandler}
-            ></IconButton>
-          </View>
-        }
+        ListHeaderComponent={listHeaderJSX}
         keyExtractor={(item: Expense) => item.id}
         refreshControl={refreshControl}
         getItemLayout={(data, index) => ({

@@ -504,6 +504,9 @@ const ManageExpense = ({ route, navigation }) => {
       // setIsSubmitting(false);
       navigation.popToTop();
     }
+    // no matter what happens, add one expense to the expenseCtx and remove it for refresh
+    expenseCtx.addExpense({ ...expenseData, id: "temp" });
+    expenseCtx.deleteExpense("temp");
   }
 
   // function errorHandler() {

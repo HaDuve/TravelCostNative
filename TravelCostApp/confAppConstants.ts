@@ -28,3 +28,5 @@ export const EXPENSES_LOAD_TIMEOUT = 16000;
 export const MINIMUM_REQUIRED_SPEED = 0.5;
 // cache: only call the getRate request again after X numbers of hours
 export const CACHE_NUM_HOURS = 1;
+// maximum number of expenses before we start to show only text
+export const MAX_EXPENSES = 150;

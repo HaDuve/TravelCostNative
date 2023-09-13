@@ -60,6 +60,10 @@ import { formatExpenseWithCurrency } from "../../util/string";
 import { addShadowItemsToExpenses } from "./ExpenseListUtil";
 import { UserContext } from "../../store/user-context";
 import * as Haptics from "expo-haptics";
+import { Category } from "../../util/category";
+import { toShortFormat } from "../../util/date";
+import { getCurrencySymbol } from "../../util/currencySymbol";
+import { MAX_EXPENSES } from "../../confAppConstants";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -315,11 +319,48 @@ function ExpensesList({
       selected: ExpenseData[],
       selectItem: (item: ExpenseData, id: object) => void,
       setSelectable: (selectable: boolean) => void,
+      expensesLength: number,
       itemData
     ) => {
-      if (itemData.item.id.includes("shadow"))
+      if (
+        itemData.item.id[0] === "s" &&
+        itemData.item.id[1] === "h" &&
+        itemData.item.id[2] === "a" &&
+        itemData.item.id[3] === "d" &&
+        itemData.item.id[4] === "o" &&
+        itemData.item.id[5] === "w"
+      )
         return <View style={{ height: 55, width: "100%" }}></View>;
       const index = itemData.index;
+      const navigateToExpense = async () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        navigation.navigate("ManageExpense", {
+          expenseId: itemData.item.id,
+        });
+      };
+      if (expensesLength > MAX_EXPENSES)
+        return (
+          <TouchableOpacity
+            style={styles.fastExpenseContainer}
+            onPress={() => navigateToExpense()}
+          >
+            <View>
+              <Text style={styles.fastExpenseText}>
+                {"> " + toShortFormat(itemData.item?.date)}{" "}
+                {itemData.item?.description}{" "}
+              </Text>
+              <Text style={styles.fastExpenseText}>
+                {itemData.item?.category}{" "}
+              </Text>
+            </View>
+            <Text style={styles.fastExpenseText}>
+              {formatExpenseWithCurrency(
+                itemData.item?.amount || 0,
+                itemData.item?.currency
+              )}
+            </Text>
+          </TouchableOpacity>
+        );
       const selectableJSX = (
         <Animated.View
           entering={FadeInLeft}
@@ -382,6 +423,7 @@ function ExpensesList({
             </GestureHandlerRootView>
           </View>
         );
+
       return (
         <View style={{ height: 55, width: "100%" }}>
           <Swipeable
@@ -662,7 +704,8 @@ function ExpensesList({
           selectable,
           selected,
           selectItem,
-          setSelectable
+          setSelectable,
+          expenses.length
         )}
         ListFooterComponent={
           <View style={{ height: Dimensions.get("screen").height / 1.8 }} />
@@ -745,5 +788,20 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.primary700,
     fontSize: 12,
     fontWeight: "bold",
+  },
+  fastExpenseContainer: {
+    height: 55,
+    width: "100%",
+    flexDirection: "row",
+    alignContent: "center",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 10,
+  },
+  fastExpenseText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: 14,
+    fontWeight: "300",
+    paddingHorizontal: 10,
   },
 });

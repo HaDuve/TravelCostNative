@@ -4,6 +4,7 @@ import {
   deleteExpenseOnlineOffline,
   OfflineQueueManageExpenseItem,
 } from "./offline-queue";
+import { splitType } from "./split";
 // expense interface
 export interface Expense {
   tripid: string;
@@ -15,7 +16,7 @@ export interface Expense {
 export interface ExpenseData {
   id?: string;
   uid?: string;
-  splitType: string;
+  splitType: splitType;
   startDate: DateOrDateTime;
   endDate: DateOrDateTime;
   categoryString: string;
@@ -51,7 +52,7 @@ export interface ExpenseDataOnline {
   isPaid: string;
   id?: string;
   uid?: string;
-  splitType: string;
+  splitType: splitType;
   startDate: string;
   endDate: string;
   categoryString: string;

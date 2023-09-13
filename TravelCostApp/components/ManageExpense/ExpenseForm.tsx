@@ -45,6 +45,7 @@ import { TripContext } from "../../store/trip-context";
 import {
   calcSplitList,
   recalcSplitsLinearly,
+  splitType,
   splitTypesDropdown,
   travellerToDropdown,
   validateSplitList,
@@ -440,7 +441,7 @@ const ExpenseForm = ({
   const splitTypesItems = splitTypesDropdown();
   const [splitItems, setSplitTypeItems] = useState(splitTypesItems);
   const [openSplitTypes, setOpenSplitTypes] = useState(false);
-  const [splitType, setSplitType] = useState(
+  const [splitType, setSplitType] = useState<splitType>(
     editingValues ? editingValues.splitType : "SELF"
   );
 
@@ -1199,6 +1200,7 @@ const ExpenseForm = ({
                       )}
                       {!loadingTravellers && (
                         <View style={{ flexDirection: "row" }}>
+                          {/* equal share equal pay button scale waage */}
                           <IconButton
                             icon="share-social-outline"
                             size={36}
@@ -1207,14 +1209,24 @@ const ExpenseForm = ({
                               Haptics.impactAsync(
                                 Haptics.ImpactFeedbackStyle.Light
                               );
+                              const tempSplitType: splitType = "EXACT";
                               const listSplits = calcSplitList(
-                                "EQUAL",
+                                tempSplitType,
                                 +inputs.amount.value,
                                 userCtx.userName,
                                 currentTravellers
                               );
+                              console.log("listSplits:", listSplits);
                               if (listSplits) {
+                                setSplitType(tempSplitType);
                                 setSplitList(listSplits);
+                                setSplitListValid(
+                                  validateSplitList(
+                                    listSplits,
+                                    tempSplitType,
+                                    +inputs.amount.value
+                                  )
+                                );
                               }
                             }}
                           ></IconButton>

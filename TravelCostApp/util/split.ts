@@ -122,7 +122,7 @@ export function recalcSplitsForExact(splitList: Split[], amount: number) {
 }
 
 export function calcSplitList(
-  splitType: string,
+  splitType: splitType,
   amount: number,
   whoPaid: string,
   splitTravellers: string[]
@@ -193,7 +193,7 @@ export function calcSplitList(
 
 export function validateSplitList(
   splitList: Split[],
-  splitType: string,
+  splitType: splitType,
   amount: number
 ) {
   if (!splitList || !splitType || !amount || splitList.length < 1) return;
@@ -224,6 +224,7 @@ export function validateSplitList(
   }
   return true;
 }
+export type splitType = "EQUAL" | "SELF" | "EXACT" | "PERCENT";
 
 export function splitTypesDropdown() {
   // NOTE: optional styling possible

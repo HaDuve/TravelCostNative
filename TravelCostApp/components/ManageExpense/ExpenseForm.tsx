@@ -1238,6 +1238,7 @@ const ExpenseForm = ({
                             setValue={setWhoPaid}
                             setItems={setItems}
                             onClose={setOpenSplitTypes}
+                            containerStyle={styles.dropdownContainer}
                             onOpen={() => {
                               Haptics.impactAsync(
                                 Haptics.ImpactFeedbackStyle.Light
@@ -1266,7 +1267,6 @@ const ExpenseForm = ({
                               shadowRadius: 4,
                             }}
                             placeholder={userCtx.userName}
-                            containerStyle={styles.dropdownContainer}
                             style={
                               !inputs.whoPaid.isValid
                                 ? [
@@ -1785,8 +1785,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   whoPaidDropdownContainer: {
-    width: "85%",
-
+    width: "82%",
     backgroundColor: GlobalStyles.colors.gray500,
     borderWidth: 0,
     marginTop: 12,

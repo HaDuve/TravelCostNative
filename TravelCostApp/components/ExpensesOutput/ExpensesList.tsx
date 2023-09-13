@@ -12,6 +12,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
 } from "react";
@@ -421,16 +422,6 @@ function ExpensesList({
     },
     [expenses.length]
   );
-
-  useFocusEffect(
-    React.useCallback(() => {
-      return () => {
-        // if we are currently scrolled at 0
-        if (contentVerticalOffset < 50) scrollTo(1, false);
-      };
-    }, [contentVerticalOffset, scrollTo])
-  );
-
   const scrollToTopHandler = useCallback(() => {
     scrollTo(1);
   }, [scrollTo]);
@@ -663,7 +654,7 @@ function ExpensesList({
           offset: 55 * index,
           index,
         })}
-        initialScrollIndex={0}
+        initialScrollIndex={1}
         onScrollToIndexFailed={(info) => {
           const wait = new Promise((resolve) => setTimeout(resolve, 500));
           wait.then(() => {

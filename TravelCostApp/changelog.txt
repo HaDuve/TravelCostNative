@@ -1,5 +1,10 @@
 Change log Travel Expense App
 
+1.2.660
+- added equal pay button (for when you want to quickly share an expense equally between all travellers)
+- improved initial scroll of expenselist
+- optimizing app speed when loading a long trip
+
 1.2.651
 - fixed splitsummary load
 - improved autocatfinder finding custom cats a little better (with mmkv we can improve the function even further)

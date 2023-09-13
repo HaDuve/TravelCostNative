@@ -231,18 +231,10 @@ const ExpenseForm = ({
       : // DateTime.fromJSDate(editingValues.endDate).toJSDate())
         getFormattedDate(DateTime.now())
   );
-  const [daysBetweenState, setDaysBetweenState] = useState(
+  const daysBeween =
     startDate &&
-      endDate &&
-      daysBetween(new Date(endDate), new Date(startDate)) + 1
-  );
-  useEffect(() => {
-    setDaysBetweenState(
-      startDate &&
-        endDate &&
-        daysBetween(new Date(endDate), new Date(startDate)) + 1
-    );
-  }, [startDate, endDate]);
+    endDate &&
+    daysBetween(new Date(endDate), new Date(startDate)) + 1;
 
   const openDatePickerRange = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -284,20 +276,20 @@ const ExpenseForm = ({
     inputs.currency.value
   )}`;
   const expenseTimesDaysString = formatExpenseWithCurrency(
-    Number(inputs.amount.value) * daysBetweenState,
+    Number(inputs.amount.value) * daysBeween,
     inputs.currency.value
   );
   const expenseDividedByDaysString = formatExpenseWithCurrency(
-    Number(inputs.amount.value) / daysBetweenState,
+    Number(inputs.amount.value) / daysBeween,
     inputs.currency.value
   );
-  const duplString = `Duplicating ${expenseString} over ${daysBetweenState} days. \nResulting in a ${expenseTimesDaysString} ${i18n.t(
+  const duplString = `Duplicating ${expenseString} over ${daysBeween} days. \nResulting in a ${expenseTimesDaysString} ${i18n.t(
     "total"
   )}`;
 
-  const newExpenseSplitString = `Splitting up the ${expenseString}\nover ${daysBetweenState} days, each ${expenseDividedByDaysString}`;
+  const newExpenseSplitString = `Splitting up the ${expenseString}\nover ${daysBeween} days, each ${expenseDividedByDaysString}`;
 
-  const editedSplitString = `Splitting up the ${expenseTimesDaysString}\nover ${daysBetweenState} days, each ${expenseString}`;
+  const editedSplitString = `Splitting up the ${expenseTimesDaysString}\nover ${daysBeween} days, each ${expenseString}`;
 
   let alreadyDividedAmountByDays = isEditing && duplOrSplit === 2;
   if (helperStateForDividing) alreadyDividedAmountByDays = false;
@@ -327,9 +319,6 @@ const ExpenseForm = ({
     const endDateFormat = getFormattedDate(endDate);
     setStartDate(startDateFormat);
     setEndDate(endDateFormat);
-
-    setDaysBetweenState(daysBetween(endDate, startDate) + 1);
-
     // no range
     if (startDateFormat === endDateFormat) {
       inputChangedHandler("date", startDateFormat);
@@ -337,7 +326,7 @@ const ExpenseForm = ({
       if (duplOrSplit === DuplicateOption.split) {
         inputChangedHandler(
           "amount",
-          (Number(inputs.amount.value) * daysBetweenState).toFixed(2).toString()
+          (Number(inputs.amount.value) * daysBeween).toFixed(2).toString()
         );
       }
       if (
@@ -347,7 +336,7 @@ const ExpenseForm = ({
         // divide amount by number of days
         inputChangedHandler(
           "amount",
-          (Number(inputs.amount.value) / daysBetweenState).toFixed(2).toString()
+          (Number(inputs.amount.value) / daysBeween).toFixed(2).toString()
         );
       }
       setDuplOrSplit(DuplicateOption.null);
@@ -356,7 +345,7 @@ const ExpenseForm = ({
     if (duplOrSplit == DuplicateOption.null) setConfirmedRange(true);
 
     // TODO: make this structured
-    console.log(daysBetweenState);
+    console.log(daysBeween);
   };
   useLayoutEffect(() => {
     if (!confirmedRange) return;
@@ -390,7 +379,7 @@ const ExpenseForm = ({
     endDate,
     inputs.amount.value,
     inputs.currency.value,
-    daysBetweenState,
+    daysBeween,
     duplOrSplit,
     confirmedRange,
     duplOrSplitString,
@@ -470,7 +459,7 @@ const ExpenseForm = ({
       if (duplOrSplit === 2 && isEditing) {
         const newSplitList = recalcSplitsLinearly(
           splitList,
-          +inputs.amount.value / daysBetweenState
+          +inputs.amount.value / daysBeween
         );
         setSplitList(newSplitList);
         const isValidSplit = validateSplitList(
@@ -648,7 +637,7 @@ const ExpenseForm = ({
     if (duplOrSplit === 2 && !isEditing) {
       const newSplitList = recalcSplitsLinearly(
         splitList,
-        +inputs.amount.value / daysBetweenState
+        +inputs.amount.value / daysBeween
       );
       setSplitList(newSplitList);
       const isValidSplit = validateSplitList(

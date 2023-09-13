@@ -206,7 +206,7 @@ const ManageExpense = ({ route, navigation }) => {
     navigation.goBack();
   }
 
-  const creatingNormalData = async (expenseData) => {
+  const createSingleData = async (expenseData) => {
     console.log("no ranged Data detected");
     // hotfix the date clock bug
     expenseData.date = expenseData.startDate;
@@ -223,9 +223,9 @@ const ManageExpense = ({ route, navigation }) => {
     expenseCtx.addExpense({ ...expenseData, id: id });
   };
 
-  const creatingRangedData = async (expenseData) => {
+  const createRangedData = async (expenseData) => {
     console.log("ranged Data detected");
-    // the date.now() is used as a rangeId to identify all the expenses that belong to the same range
+    // rangeId to identify all the expenses that belong to the same range
     const rangeId =
       Date.now().toString() + Math.random().toString(36).substring(2, 15);
     console.log("creatingRangedData ~ rangeId:", rangeId);
@@ -249,6 +249,7 @@ const ManageExpense = ({ route, navigation }) => {
       expenseData.duplOrSplit === 2 &&
       !expenseData.alreadyDividedAmountByDays
     ) {
+      // split the amount and calcAmount by the number of days for split
       const splitCalcAmount = expenseData.calcAmount / (days + 1);
       expenseData.calcAmount = Number(splitCalcAmount.toFixed(2));
       const splitDaysAmount = expenseData.amount / (days + 1);
@@ -279,9 +280,21 @@ const ManageExpense = ({ route, navigation }) => {
       // expenseData.startDate =
       // expenseData.endDate =
       expenseData.date = newDate;
-      // console.log("expenseData.date: ", expenseData.date);
-      // console.log("expenseData.startDate: ", expenseData.startDate);
-      // console.log("expenseData.endDate: ", expenseData.endDate);
+      console.log(
+        "expenseData.date: ",
+        expenseData.date,
+        typeof expenseData.date
+      );
+      console.log(
+        "expenseData.startDate: ",
+        expenseData.startDate,
+        typeof expenseData.startDate
+      );
+      console.log(
+        "expenseData.endDate: ",
+        expenseData.endDate,
+        typeof expenseData.endDate
+      );
 
       const item: OfflineQueueManageExpenseItem = {
         type: "add",
@@ -296,7 +309,7 @@ const ManageExpense = ({ route, navigation }) => {
     }
   };
 
-  const editingNormalData = async (expenseData) => {
+  const editSingleData = async (expenseData) => {
     const item: OfflineQueueManageExpenseItem = {
       type: "update",
       expense: {
@@ -310,7 +323,7 @@ const ManageExpense = ({ route, navigation }) => {
     await updateExpenseOnlineOffline(item, isOnline);
   };
 
-  const editingRangedData = async (expenseData) => {
+  const editRangedData = async (expenseData) => {
     console.log("ranged Data detected");
 
     // find all the expenses that have the same identifying rangeId
@@ -332,7 +345,7 @@ const ManageExpense = ({ route, navigation }) => {
         },
       };
       await deleteExpenseOnlineOffline(item, isOnline);
-      await creatingRangedData(expenseData);
+      await createRangedData(expenseData);
       return;
     }
     // sort the expenses by date, oldest expense first
@@ -356,7 +369,7 @@ const ManageExpense = ({ route, navigation }) => {
     const differentDates =
       !isSameDay(oldStart, newStart) || !isSameDay(oldEnd, newEnd);
     if (differentDates) {
-      await creatingRangedData(expenseData);
+      await createRangedData(expenseData);
       // redo all and delete old ones
       await deleteAllExpensesByRangedId(
         tripid,
@@ -451,11 +464,11 @@ const ManageExpense = ({ route, navigation }) => {
         ) {
           // editing ranged Data
           console.log("deciding to edit ranged data");
-          await editingRangedData(expenseData);
+          await editRangedData(expenseData);
         } else {
           // editing normal expense (no-ranged)
           console.log("deciding to edit normal data");
-          await editingNormalData(expenseData);
+          await editSingleData(expenseData);
         }
       } else {
         // adding a new expense (no-editing)
@@ -466,11 +479,11 @@ const ManageExpense = ({ route, navigation }) => {
         ) {
           // adding a new ranged expense (no-editing)
           console.log("deciding to create ranged data");
-          await creatingRangedData(expenseData);
+          await createRangedData(expenseData);
         } else {
           // adding a new normal expense (no-editing, no-ranged)
           console.log("deciding to create normal data");
-          await creatingNormalData(expenseData);
+          await createSingleData(expenseData);
         }
       }
       // await asyncStoreSetObject("expenses", expenseCtx.expenses);

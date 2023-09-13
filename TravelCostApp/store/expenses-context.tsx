@@ -317,6 +317,8 @@ function ExpensesContextProvider({ children }) {
     if (loadedExpenses) {
       loadedExpenses.forEach((expense) => {
         expense.date = new Date(expense.date);
+        expense.startDate = new Date(expense.startDate);
+        expense.endDate = new Date(expense.endDate);
         expArray.push(expense);
       });
       setExpenses(expArray);

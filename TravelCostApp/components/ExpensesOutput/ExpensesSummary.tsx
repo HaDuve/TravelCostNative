@@ -1,5 +1,5 @@
 import { Platform, StyleSheet, Text, View } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
 import { TripContext } from "../../store/trip-context";
@@ -36,19 +36,21 @@ const ExpensesSummary = ({
   const netCtx = useContext(NetworkContext);
   const { settings } = useContext(SettingsContext);
   const hideSpecial = settings.hideSpecialExpenses;
-  const isFast = netCtx.isConnected && netCtx.strongConnection;
   const [lastRate, setLastRate] = useState(1);
   const lastRateUnequal1 = lastRate !== 1;
-  useEffect(() => {
-    async function asyncGetRate() {
-      if (!userCtx.lastCurrency || !tripCtx.tripCurrency) {
-        setLastRate(1);
-        return;
-      }
-      setLastRate(await getRate(tripCtx.tripCurrency, userCtx.lastCurrency));
+  const getRateCallback = useCallback(async () => {
+    if (!userCtx.lastCurrency || !tripCtx.tripCurrency) {
+      setLastRate(1);
+      return;
     }
-    asyncGetRate();
-  }, [userCtx.lastCurrency, tripCtx.tripCurrency, isFast]);
+    setLastRate(await getRate(tripCtx.tripCurrency, userCtx.lastCurrency));
+  }, [tripCtx.tripCurrency, userCtx.lastCurrency]);
+  useEffect(() => {
+    async function call() {
+      await getRateCallback();
+    }
+    call();
+  }, [userCtx.lastCurrency, tripCtx.tripCurrency, getRateCallback]);
 
   if (!expenses || !periodName || userCtx.freshlyCreated) return <></>;
 

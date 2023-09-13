@@ -62,45 +62,34 @@ function ExpenseItem(props): JSX.Element {
 
   const calcTravellerSum = useRef(0);
   const travellerSum = useRef(0);
-  const calcTravellerSumString = useRef("");
-  const travellerSumString = useRef("");
+  let calcTravellerSumString = "";
+  let travellerSumString = "";
 
   // if showSumForTravellerName is set, show the sum of the expense for only this traveller
-  const calcSumForTraveller = useCallback(() => {
-    if (splitList && splitList.length > 0 && showSumForTravellerName) {
-      splitList.forEach((split) => {
-        if (split.userName === showSumForTravellerName) {
-          calcTravellerSum.current += Number(split.amount) * rate;
-          travellerSum.current += Number(split.amount);
-        }
-      });
-      calcTravellerSumString.current = formatExpenseWithCurrency(
-        Number(calcTravellerSum.current),
-        tripCurrency
-      );
-      travellerSumString.current = formatExpenseWithCurrency(
-        Number(travellerSum.current),
-        currency
-      );
-    }
-  }, [splitList, showSumForTravellerName, rate, tripCurrency, currency]);
-  calcSumForTraveller();
+  if (splitList && splitList.length > 0 && showSumForTravellerName) {
+    splitList.forEach((split) => {
+      if (split.userName === showSumForTravellerName) {
+        calcTravellerSum.current += Number(split.amount) * rate;
+        travellerSum.current += Number(split.amount);
+      }
+    });
+    calcTravellerSumString = formatExpenseWithCurrency(
+      Number(calcTravellerSum.current),
+      tripCurrency
+    );
+    travellerSumString = formatExpenseWithCurrency(
+      Number(travellerSum.current),
+      currency
+    );
+  }
 
-  const calcAmountString = useCallback(
-    () =>
-      calcTravellerSum.current
-        ? `${calcTravellerSumString.current}`
-        : formatExpenseWithCurrency(calcAmount, tripCurrency),
-    [calcAmount, tripCurrency]
-  );
+  const calcAmountString = calcTravellerSum.current
+    ? `${calcTravellerSumString}`
+    : formatExpenseWithCurrency(calcAmount, tripCurrency);
 
-  const amountString = useCallback(
-    () =>
-      travellerSum.current
-        ? `${travellerSumString.current}`
-        : formatExpenseWithCurrency(amount, currency),
-    [amount, currency]
-  );
+  const amountString = travellerSum.current
+    ? `${travellerSumString}`
+    : formatExpenseWithCurrency(amount, currency);
 
   // if (iconName) console.log(iconName);
   const [catSymbol, setCatSymbol] = useState(iconName ? iconName : "");
@@ -136,7 +125,7 @@ function ExpenseItem(props): JSX.Element {
       expenseId: id,
     });
   }, [id, navigation]);
-  const originalCurrencyJSX = useCallback(
+  const originalCurrencyJSX = useMemo(
     () =>
       !sameCurrency ? (
         <>
@@ -148,7 +137,7 @@ function ExpenseItem(props): JSX.Element {
               },
             ]}
           >
-            {amountString()}
+            {amountString}
           </Text>
         </>
       ) : (
@@ -157,19 +146,16 @@ function ExpenseItem(props): JSX.Element {
     [sameCurrency, amountString, hideSpecial]
   );
 
-  const splitListHasNonZeroEntries = useCallback(
-    () => splitList?.some((item) => item.amount !== 0),
-    [splitList]
+  const splitListHasNonZeroEntries = splitList?.some(
+    (item) => item.amount !== 0
   );
-  const islongList = useCallback(
-    () =>
-      splitList && splitList.length > 3 && splitListHasNonZeroEntries
-        ? splitList.slice(0, 2)
-        : null,
-    [splitList, splitListHasNonZeroEntries]
-  );
-  const longList = islongList();
+  const islongListOrNull =
+    splitList && splitList.length > 3 && splitListHasNonZeroEntries
+      ? splitList.slice(0, 2)
+      : null;
+  const longList = islongListOrNull ? [...islongListOrNull] : null;
   longList?.push({ userName: `+${splitList.length - 2}`, amount: 0 });
+
   const sharedList = useCallback(
     () =>
       splitList && splitList.length > 0 ? (
@@ -229,7 +215,7 @@ function ExpenseItem(props): JSX.Element {
           </View>
         </View>
       ),
-    [longList, splitList, whoPaid]
+    [whoPaid]
   );
 
   if (typeof date === "string") date = new Date(date);
@@ -322,9 +308,9 @@ function ExpenseItem(props): JSX.Element {
                 },
               ]}
             >
-              {calcAmountString()}
+              {calcAmountString}
             </Text>
-            {originalCurrencyJSX()}
+            {originalCurrencyJSX}
           </View>
         </View>
       </Pressable>

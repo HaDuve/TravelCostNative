@@ -1,6 +1,6 @@
 import branch, { BranchEvent } from "react-native-branch";
 
-export async function initBranch() {
+export function initBranch() {
   // Listener
   branch.subscribe({
     onOpenStart: ({ uri, cachedInitialEvent }) => {

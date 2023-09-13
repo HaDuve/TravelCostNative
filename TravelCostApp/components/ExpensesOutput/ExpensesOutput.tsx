@@ -36,14 +36,14 @@ function ExpensesOutput({
     setTimeout(() => {
       if (tripName) setShowLoading(false);
     }, EXPENSES_LOAD_TIMEOUT);
-  }, []);
+  }, [tripName]);
 
   useEffect(() => {
     if (tripName) setShowLoading(false);
   }, [tripName]);
 
   // const toggleLoading = () => setShowLoading((prev) => !prev);
-  const loadingSpinner = useCallback(
+  const loadingSpinner = useMemo(
     () => (
       <View
         style={{
@@ -61,19 +61,10 @@ function ExpensesOutput({
     ),
     []
   );
-  const content = useRef(null);
-  const getContent = useCallback(() => {
-    content.current = (
-      <Animated.View exiting={SlideOutLeft} style={styles.fallbackContainer}>
-        <View style={styles.fallbackInnerContainer}>
-          {showLoading && <LoadingOverlay></LoadingOverlay>}
-          {!showLoading && <Text style={styles.infoText}>{fallbackText}</Text>}
-        </View>
-      </Animated.View>
-    );
+  const memoizedContent = useMemo(() => {
     if (expenses.length > 0) {
       if (fallback) setFallback(false);
-      content.current = (
+      return (
         <MemoizedExpensesList
           expenses={expenses}
           showSumForTravellerName={showSumForTravellerName}
@@ -81,31 +72,36 @@ function ExpensesOutput({
         />
       );
     }
+    return (
+      <Animated.View exiting={SlideOutLeft} style={styles.fallbackContainer}>
+        <View style={styles.fallbackInnerContainer}>
+          {showLoading && <LoadingOverlay></LoadingOverlay>}
+          {!showLoading && <Text style={styles.infoText}>{fallbackText}</Text>}
+        </View>
+      </Animated.View>
+    );
   }, [
-    expenses,
+    expenses.length,
     fallback,
     fallbackText,
     isFiltered,
     showLoading,
     showSumForTravellerName,
   ]);
-  getContent();
 
   return (
     <View style={{ flex: 1 }}>
-      {loadingSpinner()}
+      {loadingSpinner}
       <ScrollView style={styles.container} refreshControl={refreshControl}>
-        <View>{content.current}</View>
+        <View>{memoizedContent}</View>
       </ScrollView>
     </View>
   );
 }
 
 export default ExpensesOutput;
-const areEqual = (prevProps, nextProps) => {
-  return prevProps.expenses === nextProps.expenses;
-};
-export const MemoizedExpensesOutput = memo(ExpensesOutput, areEqual);
+
+export const MemoizedExpensesOutput = memo(ExpensesOutput);
 
 ExpensesOutput.propTypes = {
   expenses: PropTypes.array,

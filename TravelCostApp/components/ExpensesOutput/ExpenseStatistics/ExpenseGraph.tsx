@@ -491,16 +491,17 @@ const ExpenseGraph = ({
             </View>
           }
           ListFooterComponent={<View style={{ height: 100 }}></View>}
-          // removeClippedSubviews={true}
+          removeClippedSubviews={true}
           // maxToRenderPerBatch={7}
-          // updateCellsBatchingPeriod={300}
-          // initialNumToRender={7}
+          updateCellsBatchingPeriod={300}
+          initialNumToRender={20}
+          maxToRenderPerBatch={20}
           // windowSize={7}
-          // getItemLayout={(data, index) => ({
-          //   length: 50,
-          //   offset: 50 * index,
-          //   index,
-          // })}
+          getItemLayout={(data, index) => ({
+            length: 50,
+            offset: 50 * index,
+            index,
+          })}
         ></Animated.FlatList>
       </Animated.View>
     </Animated.View>

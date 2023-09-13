@@ -23,7 +23,7 @@ export const MAX_JS_NUMBER = 3435973836;
 // tweak loading splash screen overlay delay
 export const SPLASH_SCREEN_DELAY = 1500;
 // tweak loading recent expenses overlay timeout
-export const EXPENSES_LOAD_TIMEOUT = 6000;
+export const EXPENSES_LOAD_TIMEOUT = 16000;
 // tweak minimum required internet speed in Mbit/s
 export const MINIMUM_REQUIRED_SPEED = 0.5;
 // cache: only call the getRate request again after X numbers of hours

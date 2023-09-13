@@ -39,6 +39,7 @@ export async function isPremiumMember() {
   } catch (e) {
     // Error fetching customer info
     console.error(e);
+    return false;
   }
 }
 

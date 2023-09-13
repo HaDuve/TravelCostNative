@@ -81,6 +81,32 @@ function RecentExpenses({ navigation }) {
   const listRef = React.useRef(null);
   useScrollToTop(listRef);
 
+  //wrap fetchAndSetExpenses in a callback
+  const fetchExpenses = useCallback(
+    async (
+      showRefIndicator: boolean,
+      showAnyIndicator: boolean,
+      setIsFetching: (isFetching: boolean) => void,
+      setRefreshing: (isRefreshing: boolean) => void,
+      expensesCtx: any,
+      tripid: string,
+      uid: string,
+      tripCtx: any
+    ) => {
+      await fetchAndSetExpenses(
+        showRefIndicator,
+        showAnyIndicator,
+        setIsFetching,
+        setRefreshing,
+        expensesCtx,
+        tripid,
+        uid,
+        tripCtx
+      );
+    },
+    []
+  );
+
   useFocusEffect(
     React.useCallback(() => {
       if (userCtx.freshlyCreated) {
@@ -237,7 +263,7 @@ function RecentExpenses({ navigation }) {
       console.log("we are touched and fetching expenses", tripid);
       // fetch and set expenses
 
-      await fetchAndSetExpenses(
+      await fetchExpenses(
         showRefIndicator,
         showAnyIndicator,
         setIsFetching,
@@ -315,30 +341,26 @@ function RecentExpenses({ navigation }) {
 
   // console.log("RecentExpenses ~ apikey:", apikey);
 
-  const ExpensesOutputJSX = useCallback(
-    () => (
-      <ExpensesOutput
-        expenses={recentExpenses}
-        periodValue={PeriodValue}
-        fallbackText={i18n.t("fallbackTextExpenses")}
-        listRef={listRef}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing || isFetching}
-            tintColor="transparent"
-            colors={["transparent"]}
-            style={{ backgroundColor: "transparent" }}
-            onRefresh={async () => {
-              console.log("onREFRESH");
-              await onRefresh();
-            }}
-          />
-        }
-      />
-    ),
-    [PeriodValue, isFetching, onRefresh, recentExpenses, refreshing]
+  const ExpensesOutputJSX = (
+    <MemoizedExpensesOutput
+      expenses={recentExpenses}
+      periodValue={PeriodValue}
+      fallbackText={i18n.t("fallbackTextExpenses")}
+      listRef={listRef}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing || isFetching}
+          tintColor="transparent"
+          colors={["transparent"]}
+          style={{ backgroundColor: "transparent" }}
+          onRefresh={async () => {
+            console.log("onREFRESH");
+            await onRefresh();
+          }}
+        />
+      }
+    />
   );
-
   if (error && !isFetching) {
     return <ErrorOverlay message={error} onConfirm={errorHandler} />;
   }
@@ -413,7 +435,7 @@ function RecentExpenses({ navigation }) {
         />
       </View>
       <View style={styles.tempGrayBar1}></View>
-      {ExpensesOutputJSX()}
+      {ExpensesOutputJSX}
 
       <AddExpenseButton navigation={navigation} />
     </View>

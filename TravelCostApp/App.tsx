@@ -354,10 +354,9 @@ function Navigation() {
 }
 
 function Home() {
-  const userCtx = useContext(UserContext);
-  const FreshlyCreated = userCtx.freshlyCreated;
+  const { isShowingGraph, freshlyCreated } = useContext(UserContext);
 
-  const FirstScreen = FreshlyCreated ? "Profile" : "RecentExpenses";
+  const FirstScreen = freshlyCreated ? "Profile" : "RecentExpenses";
 
   return (
     <BottomTabs.Navigator
@@ -417,11 +416,7 @@ function Home() {
           tabBarLabel: i18n.t("overviewTab"),
           tabBarIcon: ({ color }) => (
             <Ionicons
-              name={
-                userCtx.isShowingGraph
-                  ? "bar-chart-outline"
-                  : "pie-chart-outline"
-              }
+              name={isShowingGraph ? "bar-chart-outline" : "pie-chart-outline"}
               size={24}
               color={color}
             />
@@ -506,8 +501,6 @@ function Root() {
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
-  const netCtx = useContext(NetworkContext);
-  const expensesCtx = useContext(ExpensesContext);
 
   // check regularly
   useInterval(
@@ -523,16 +516,16 @@ function Root() {
           if (!onlineSetupDone) {
             const { isFastEnough } = await isConnectionFastEnough();
             if (isFastEnough) {
-              setOnlineSetupDone(true);
+              //prepare online setup
+              const storedUid = await secureStoreGetItem("uid");
+              if (!storedUid) return;
+              const checkUser = await fetchUser(storedUid);
+              if (!checkUser) return;
+              const tripid = checkUser.currentTrip;
+              const tripData = await tripCtx.fetchAndSetCurrentTrip(tripid);
+              if (!tripData) return;
               try {
-                //prepare online setup
-                const storedUid = await secureStoreGetItem("uid");
-                if (!storedUid) return;
-                const checkUser = await fetchUser(storedUid);
-                if (!checkUser) return;
-                const tripid = checkUser.currentTrip;
-                const tripData = await tripCtx.fetchAndSetCurrentTrip(tripid);
-                if (!tripData) return;
+                setOnlineSetupDone(true);
                 await onlineSetup(tripData, checkUser, tripid, storedUid);
                 console.log("delayedOnlineSetup ~ DONE");
               } catch (error) {
@@ -719,8 +712,8 @@ function Root() {
       }
       setAppIsReady(true);
     }
-    // const test_onRootMount = dataResponseTime(onRootMount);
-    const test_onRootMount = onRootMount;
+    const test_onRootMount = dataResponseTime(onRootMount);
+    // const test_onRootMount = onRootMount;
 
     try {
       test_onRootMount();

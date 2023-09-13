@@ -1,15 +1,12 @@
 import {
   Alert,
   Dimensions,
-  FlatList,
   Platform,
-  Pressable,
-  ScrollView,
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
 
-import ExpenseItem, { MemoizedExpenseItem } from "./ExpenseItem";
+import { MemoizedExpenseItem } from "./ExpenseItem";
 import React, {
   memo,
   useCallback,
@@ -28,7 +25,6 @@ import { TripContext } from "../../store/trip-context";
 import { ExpensesContext } from "../../store/expenses-context";
 import IconButton from "../UI/IconButton";
 import Animated, {
-  add,
   Easing,
   FadeInLeft,
   FadeInRight,
@@ -37,8 +33,6 @@ import Animated, {
   FadeOutRight,
   FadeOutUp,
   Layout,
-  SlideInUp,
-  SlideOutUp,
 } from "react-native-reanimated";
 
 //Localization
@@ -62,8 +56,6 @@ import { useState } from "react";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { Text } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
-import Icon from "react-native-paper/lib/typescript/src/components/Icon";
-import { useInterval } from "../Hooks/useInterval";
 import { addShadowItemsToExpenses } from "./ExpenseListUtil";
 import { UserContext } from "../../store/user-context";
 const i18n = new I18n({ en, de, fr, ru });

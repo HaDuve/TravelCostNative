@@ -144,10 +144,15 @@ const OverviewScreen = ({ navigation }) => {
           open={open}
           value={PeriodValue}
           items={items}
+          placeholder={"..."}
           modalProps={{
             animationType: "slide",
           }}
-          setOpen={setOpen}
+          setOpen={() => {
+            requestAnimationFrame(() => {
+              setOpen(!open);
+            });
+          }}
           onOpen={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}
@@ -157,7 +162,11 @@ const OverviewScreen = ({ navigation }) => {
           onSelectItem={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}
-          setValue={setPeriodValue}
+          setValue={(value) => {
+            requestAnimationFrame(() => {
+              setPeriodValue(value);
+            });
+          }}
           setItems={setItems}
           containerStyle={styles.dropdownContainer}
           // customItemLabelStyle={styles.dropdownItemLabel}

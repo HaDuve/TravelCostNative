@@ -408,7 +408,12 @@ function RecentExpenses({ navigation }) {
           open={open}
           value={PeriodValue}
           items={items}
-          setOpen={setOpen}
+          setOpen={() => {
+            requestAnimationFrame(() => {
+              setOpen(!open);
+            });
+          }}
+          placeholder={"..."}
           onOpen={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}
@@ -418,7 +423,11 @@ function RecentExpenses({ navigation }) {
           onSelectItem={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}
-          setValue={setPeriodValue}
+          setValue={(value) => {
+            requestAnimationFrame(() => {
+              setPeriodValue(value);
+            });
+          }}
           setItems={setItems}
           containerStyle={styles.dropdownContainer}
           style={styles.dropdown}

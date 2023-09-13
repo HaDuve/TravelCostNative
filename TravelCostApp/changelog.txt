@@ -1,5 +1,14 @@
 Change log Travel Expense App
 
+1.2.662
+- added scaleImage as svg
+- improved equal pay button
+- improved initial scoll index of lists
+- add requestAnimationFrames to improve UX feedback for dropdown summary
+- add rAF for selectable list aswell
+- fixed missing dates bug (sometimes dates went missing and undefined after launch and offline)
+- fixed not updating the expense context correctly (sometimes changes would dissapear and reappear after about few seconds)
+
 1.2.660
 - added equal pay button (for when you want to quickly share an expense equally between all travellers)
 - improved initial scroll of expenselist

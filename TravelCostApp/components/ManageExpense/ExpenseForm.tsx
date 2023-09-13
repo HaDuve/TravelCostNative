@@ -1198,50 +1198,74 @@ const ExpenseForm = ({
                         ></ActivityIndicator>
                       )}
                       {!loadingTravellers && (
-                        <DropDownPicker
-                          open={open}
-                          value={whoPaid}
-                          items={items}
-                          setOpen={setOpen}
-                          setValue={setWhoPaid}
-                          setItems={setItems}
-                          onClose={setOpenSplitTypes}
-                          onOpen={() => {
-                            Haptics.impactAsync(
-                              Haptics.ImpactFeedbackStyle.Light
-                            );
-                          }}
-                          onSelectItem={() => {
-                            Haptics.impactAsync(
-                              Haptics.ImpactFeedbackStyle.Light
-                            );
-                          }}
-                          listMode="MODAL"
-                          modalProps={{
-                            animationType: "slide",
-                            presentationStyle: "pageSheet",
-                          }}
-                          searchable={false}
-                          modalTitle={i18n.t("whoPaid")}
-                          modalContentContainerStyle={{
-                            backgroundColor:
-                              GlobalStyles.colors.backgroundColor,
-                            marginTop: "2%",
-                            elevation: 2,
-                            shadowColor: GlobalStyles.colors.textColor,
-                            shadowOffset: { width: 1, height: 1 },
-                            shadowOpacity: 0.35,
-                            shadowRadius: 4,
-                          }}
-                          placeholder={userCtx.userName}
-                          containerStyle={styles.dropdownContainer}
-                          style={
-                            !inputs.whoPaid.isValid
-                              ? [styles.dropdown, styles.invalidInput]
-                              : styles.dropdown
-                          }
-                          textStyle={styles.dropdownTextStyle}
-                        />
+                        <View style={{ flexDirection: "row" }}>
+                          <IconButton
+                            icon="share-social-outline"
+                            size={36}
+                            color={GlobalStyles.colors.primary500}
+                            onPress={() => {
+                              Haptics.impactAsync(
+                                Haptics.ImpactFeedbackStyle.Light
+                              );
+                              const listSplits = calcSplitList(
+                                "EQUAL",
+                                +inputs.amount.value,
+                                userCtx.userName,
+                                currentTravellers
+                              );
+                              if (listSplits) {
+                                setSplitList(listSplits);
+                              }
+                            }}
+                          ></IconButton>
+                          <DropDownPicker
+                            open={open}
+                            value={whoPaid}
+                            items={items}
+                            setOpen={setOpen}
+                            setValue={setWhoPaid}
+                            setItems={setItems}
+                            onClose={setOpenSplitTypes}
+                            onOpen={() => {
+                              Haptics.impactAsync(
+                                Haptics.ImpactFeedbackStyle.Light
+                              );
+                            }}
+                            onSelectItem={() => {
+                              Haptics.impactAsync(
+                                Haptics.ImpactFeedbackStyle.Light
+                              );
+                            }}
+                            listMode="MODAL"
+                            modalProps={{
+                              animationType: "slide",
+                              presentationStyle: "pageSheet",
+                            }}
+                            searchable={false}
+                            modalTitle={i18n.t("whoPaid")}
+                            modalContentContainerStyle={{
+                              backgroundColor:
+                                GlobalStyles.colors.backgroundColor,
+                              marginTop: "2%",
+                              elevation: 2,
+                              shadowColor: GlobalStyles.colors.textColor,
+                              shadowOffset: { width: 1, height: 1 },
+                              shadowOpacity: 0.35,
+                              shadowRadius: 4,
+                            }}
+                            placeholder={userCtx.userName}
+                            containerStyle={styles.dropdownContainer}
+                            style={
+                              !inputs.whoPaid.isValid
+                                ? [
+                                    styles.whoPaidDropdownContainer,
+                                    styles.invalidInput,
+                                  ]
+                                : styles.whoPaidDropdownContainer
+                            }
+                            textStyle={styles.dropdownTextStyle}
+                          />
+                        </View>
                       )}
                     </View>
                   )}
@@ -1276,7 +1300,7 @@ const ExpenseForm = ({
                         hidePickers && styles.hidePickersStyle,
                       ]}
                       style={[
-                        styles.dropdown,
+                        styles.whoPaidDropdownContainer,
                         hidePickers && styles.hidePickersStyle,
                       ]}
                       textStyle={styles.dropdownTextStyle}
@@ -1330,7 +1354,7 @@ const ExpenseForm = ({
                       hidePickers && styles.hidePickersStyle,
                     ]}
                     style={[
-                      styles.dropdown,
+                      styles.whoPaidDropdownContainer,
                       hidePickers && styles.hidePickersStyle,
                     ]}
                     textStyle={styles.dropdownTextStyle}
@@ -1748,7 +1772,9 @@ const styles = StyleSheet.create({
     maxWidth: Dimensions.get("screen").width / 1.27,
     marginRight: 12,
   },
-  dropdown: {
+  whoPaidDropdownContainer: {
+    width: "85%",
+
     backgroundColor: GlobalStyles.colors.gray500,
     borderWidth: 0,
     marginTop: 12,

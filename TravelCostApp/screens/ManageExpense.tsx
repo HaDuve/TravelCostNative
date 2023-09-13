@@ -46,10 +46,8 @@ const ManageExpense = ({ route, navigation }) => {
   const expenseCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const tripCtx = useContext(TripContext);
-  const netCtx = useContext(NetworkContext);
-  const [isOnline, setIsOnline] = useState(
-    netCtx.isConnected && netCtx.strongConnection
-  );
+  const { isConnected, strongConnection } = useContext(NetworkContext);
+  const isOnline = isConnected && strongConnection;
   // console.log("ManageExpense ~ isOnline:", isOnline);
   const [progress, setProgress] = useState(-1);
   const [progressAt, setProgressAt] = useState(0);
@@ -71,14 +69,6 @@ const ManageExpense = ({ route, navigation }) => {
   //   selectedExpense?.rangeId
   // );
   const selectedExpenseAuthorUid = selectedExpense?.uid;
-
-  useEffect(() => {
-    const updateIsOnline = async () => {
-      const isOnline = netCtx.isConnected && netCtx.strongConnection;
-      setIsOnline(isOnline);
-    };
-    updateIsOnline();
-  }, [netCtx.isConnected, netCtx.strongConnection]);
 
   async function deleteExpenseHandler() {
     async function deleteAllExpenses() {
@@ -357,7 +347,16 @@ const ManageExpense = ({ route, navigation }) => {
     // get days from expenseData
     const newStart = new Date(expenseData.startDate);
     const newEnd = new Date(expenseData.endDate);
-    if (!isSameDay(oldStart, newStart) || !isSameDay(oldEnd, newEnd)) {
+    const validDates =
+      expensesInRange[0].date &&
+      expensesInRange[expensesInRange.length - 1].date &&
+      expenseData.startDate &&
+      expenseData.endDate;
+    console.log("editingRangedData ~ validDates:", validDates);
+    const differentDates =
+      !isSameDay(oldStart, newStart) || !isSameDay(oldEnd, newEnd);
+    if (differentDates) {
+      await creatingRangedData(expenseData);
       // redo all and delete old ones
       await deleteAllExpensesByRangedId(
         tripid,
@@ -365,7 +364,6 @@ const ManageExpense = ({ route, navigation }) => {
         isOnline,
         expenseCtx
       );
-      await creatingRangedData(expenseData);
       return;
     }
     //else update the expenses one by one

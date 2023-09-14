@@ -1,5 +1,8 @@
 Change log Travel Expense App
 
+1.2.663
+- improved translation and layout of expenseform
+
 1.2.662
 - added scaleImage as svg
 - improved equal pay button

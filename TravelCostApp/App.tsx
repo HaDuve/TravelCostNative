@@ -1,15 +1,8 @@
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
-import { Alert, LogBox } from "react-native";
+import { LogBox } from "react-native";
 LogBox.ignoreAllLogs(); //Ignore all log notifications
-import {
-  SafeAreaView,
-  View,
-  Keyboard,
-  Platform,
-  AppState,
-  Image,
-} from "react-native";
+import { SafeAreaView, View, Keyboard, Platform, AppState } from "react-native";
 import Purchases from "react-native-purchases";
 
 import { StatusBar } from "expo-status-bar";
@@ -26,12 +19,9 @@ import SignupScreen from "./screens/SignupScreen";
 import LoginScreen from "./screens/LoginScreen";
 
 import ManageExpense from "./screens/ManageExpense";
-import RecentExpenses from "./screens/RecentExpenses";
 import { GlobalStyles } from "./constants/styles";
 import AuthContextProvider, { AuthContext } from "./store/auth-context";
-import ExpensesContextProvider, {
-  ExpensesContext,
-} from "./store/expenses-context";
+import ExpensesContextProvider from "./store/expenses-context";
 import ProfileScreen from "./screens/ProfileScreen";
 import UserContextProvider, { UserContext } from "./store/user-context";
 import {
@@ -50,21 +40,17 @@ import JoinTrip from "./screens/JoinTrip";
 import ShareTripButton from "./components/ProfileOutput/ShareTrip";
 import OverviewScreen from "./screens/OverviewScreen";
 import CategoryPickScreen from "./screens/CategoryPickScreen";
-import SplitSummaryScreen, {
-  MemoizedSplitSummaryScreen,
-} from "./screens/SplitSummaryScreen";
+import SplitSummaryScreen from "./screens/SplitSummaryScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import {
-  asyncStoreGetItem,
   asyncStoreGetObject,
   asyncStoreSafeClear,
-  asyncStoreSetItem,
 } from "./store/async-storage";
 import LoadingOverlay from "./components/UI/LoadingOverlay";
 import ImportGSScreen from "./screens/ImportGSScreen";
 import FilteredExpenses from "./screens/FilteredExpenses";
 import { sendOfflineQueue } from "./util/offline-queue";
-import branch, { BranchEvent } from "react-native-branch";
+import { BranchEvent } from "react-native-branch";
 
 //localization
 import * as Localization from "expo-localization";
@@ -76,7 +62,7 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 import ManageCategoryScreen from "./screens/ManageCategoryScreen";
 import ToastComponent from "./components/UI/ToastComponent";
-import { DEBUG_RESET, DEBUG_POLLING_INTERVAL, DEV } from "./confAppConstants";
+import { DEBUG_RESET, DEBUG_POLLING_INTERVAL } from "./confAppConstants";
 import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
 import Toast from "react-native-toast-message";
 import { useInterval } from "./components/Hooks/useInterval";
@@ -93,14 +79,9 @@ import {
   shouldPromptForRating,
 } from "./components/Rating/firstStartUtil";
 import RatingModal from "./screens/RatingModal";
-import NetworkContextProvider, {
-  NetworkContext,
-} from "./store/network-context";
-import { Avatar, Text } from "react-native-paper";
-import ConnectionBar from "./components/UI/ConnectionBar";
-import { secureStoreGetItem, secureStoreSetItem } from "./store/secure-storage";
+import NetworkContextProvider from "./store/network-context";
+import { secureStoreGetItem } from "./store/secure-storage";
 import { isConnectionFastEnough } from "./util/connectionSpeed";
-import FinancialScreen from "./screens/FinancialScreen";
 import FinderScreen from "./screens/FinderScreen";
 import CustomerScreen from "./screens/CustomerScreen";
 import CategoryMapTestScreen from "./screens/CategoryMapTestScreen";
@@ -230,7 +211,7 @@ function AuthenticatedStack() {
           />
           <Stack.Screen
             name="SplitSummary"
-            component={MemoizedSplitSummaryScreen}
+            component={SplitSummaryScreen}
             options={{
               headerShown: false,
               presentation: "modal",

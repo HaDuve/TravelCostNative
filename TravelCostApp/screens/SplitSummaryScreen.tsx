@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {
   useCallback,
   useContext,
@@ -60,7 +61,7 @@ const SplitSummaryScreen = ({ navigation }) => {
         });
         navigation.navigate("Profile");
       }
-    }, [freshlyCreated, navigation])
+    }, [freshlyCreated])
   );
 
   const [isFetching, setIsFetching] = useState(true);
@@ -151,13 +152,13 @@ const SplitSummaryScreen = ({ navigation }) => {
     isPaidDate,
     tripCurrency,
     tripid,
-    expenses,
+    expenses.length,
     userName,
   ]);
 
   useEffect(() => {
     getOpenSplits();
-  }, [expenses, tripid, tripIsPaid, tripCurrency, getOpenSplits]);
+  }, [getOpenSplits]);
 
   const handleSimpflifySplits = useCallback(async () => {
     try {
@@ -184,7 +185,7 @@ const SplitSummaryScreen = ({ navigation }) => {
     } catch (error) {
       console.log("handleSimpflifySplits ~ error", error);
     }
-  }, [navigation, splits, subTitleSimplified]);
+  }, [splits.length, subTitleSimplified]);
 
   function errorHandler() {
     setError(null);
@@ -199,7 +200,7 @@ const SplitSummaryScreen = ({ navigation }) => {
     }
     setIsFetching(false);
     navigation.navigate("Settings");
-  }, [fetchAndSettleCurrentTrip, navigation]);
+  }, []);
 
   const renderSplitItem = useCallback(
     (itemData) => {
@@ -313,7 +314,6 @@ const SplitSummaryScreen = ({ navigation }) => {
 };
 
 export default SplitSummaryScreen;
-export const MemoizedSplitSummaryScreen = React.memo(SplitSummaryScreen);
 
 SplitSummaryScreen.propTypes = {
   route: PropTypes.object.isRequired,

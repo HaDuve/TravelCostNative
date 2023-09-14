@@ -102,6 +102,7 @@ const SplitSummaryScreen = ({ navigation }) => {
   const getOpenSplits = useCallback(async () => {
     if (expenses.length === 0) return;
     if (!tripid) return;
+    console.log("called getOpenSplits!");
     setIsFetching(true);
     try {
       const response = await calcOpenSplitsTable(

@@ -544,7 +544,7 @@ function Root() {
     await fetchServerInfo();
     try {
       await userCtx.addUserName(userData);
-      // await tripCtx.setCurrentTrip(tripid, tripData);
+      await tripCtx.setCurrentTrip(tripid, tripData);
       console.log("onlineSetup ~ tripid before setItem:", tripid);
       await userCtx.loadCatListFromAsyncInCtx(tripid);
       await touchMyTraveler(storedTripId, storedUid);

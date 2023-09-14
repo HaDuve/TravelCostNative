@@ -413,7 +413,7 @@ function RecentExpenses({ navigation }) {
               setOpen(!open);
             });
           }}
-          placeholder={"..."}
+          placeholder={""}
           onOpen={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}
@@ -424,9 +424,9 @@ function RecentExpenses({ navigation }) {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}
           setValue={(value) => {
-            requestAnimationFrame(() => {
-              setPeriodValue(value);
-            });
+            // requestAnimationFrame(() => {
+            setPeriodValue(value);
+            // });
           }}
           setItems={setItems}
           containerStyle={styles.dropdownContainer}

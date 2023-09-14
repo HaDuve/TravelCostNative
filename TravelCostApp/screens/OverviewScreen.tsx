@@ -163,9 +163,9 @@ const OverviewScreen = ({ navigation }) => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}
           setValue={(value) => {
-            requestAnimationFrame(() => {
-              setPeriodValue(value);
-            });
+            // requestAnimationFrame(() => {
+            setPeriodValue(value);
+            // });
           }}
           setItems={setItems}
           containerStyle={styles.dropdownContainer}

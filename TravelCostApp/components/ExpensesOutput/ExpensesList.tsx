@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Alert,
   Dimensions,
@@ -423,7 +424,7 @@ function ExpensesList({
             </GestureHandlerRootView>
           </View>
         );
-
+      //else platform ios
       return (
         <View style={{ height: 55, width: "100%" }}>
           <Swipeable

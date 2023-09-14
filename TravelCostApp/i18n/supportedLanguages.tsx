@@ -1,5 +1,18 @@
-import { simplifySplits } from "../util/split";
 const en = {
+  // special expense strings
+  specString1: "(hidden)",
+  specString2: "(can be hidden via settings)",
+  specString3: "Special Expense ",
+  specString4: "Special Expense?",
+  // duplstrings
+  duplString1: "Duplicating",
+  duplString2: "over",
+  duplString3: "days",
+  duplString4: "Resulting in a",
+  splitString1: "Splitting up the",
+  splitString2: "over",
+  splitString3: "days, each",
+
   // standard strings
   signoutBtn: "Sign out",
   signOutAlertTitle: "Cancel",
@@ -207,7 +220,6 @@ const en = {
     "Do you want to multiply or split the costs over several days?",
   duplicateExpenses: "Duplicate",
   splitUpExpenses: "Split Up",
-  total: "total",
 
   paywallTitle: "Become a Premium Nomad!",
   paywallSubtitle: "Make your journey even easier with additional features:",
@@ -385,6 +397,20 @@ const en = {
     "When using the \"ask ChatGPT for a good deal\" feature, input your travel expenses for evaluation. ChatGPT assesses and analyzes the expenses to determine if they're a good deal, considering factors like market prices, data, and reviews. Remember, ChatGPT is an AI system, not a financial expert. Use its evaluation as a reference, not professional advice. Note that ChatGPT's information is based on data until September 2021 and may not reflect current conditions. It's wise to consult a financial advisor or do additional research. For accurate evaluations, include as much relevant information as possible in your expense description. Your feedback is valuable in improving the system's accuracy and usefulness.",
 };
 const de = {
+  // special expense strings
+  specString1: "(versteckt)",
+  specString2: "(über Einstellungen ausblendbar)",
+  specString3: "Besondere Ausgabe ",
+  specString4: "Besondere Ausgabe?",
+  // duplstrings
+  duplString1: "Dupliziere",
+  duplString2: "über",
+  duplString3: "Tage",
+  duplString4: "Ergibt",
+  splitString1: "Aufteilen von",
+  splitString2: "über",
+  splitString3: "Tage, jeweils",
+
   // standard strings
   signoutBtn: "Abmelden",
   signOutAlertTitle: "Abbrechen",
@@ -597,7 +623,6 @@ const de = {
     "Möchtest du die Kosten über mehrere Tage vervielfachen oder aufsplitten?",
   duplicateExpenses: "Vervielfachen",
   splitUpExpenses: "Aufsplitten",
-  total: "Gesamt",
 
   // Paywall and Premium
   paywallTitle: "Werde Premium Nomade!",
@@ -791,6 +816,20 @@ const de = {
     'Wenn du die Funktion "Frag ChatGPT nach einem guten Angebot" nutzt, gib deine Reisekosten zur Bewertung ein. ChatGPT bewertet und analysiert deine Ausgaben, um festzustellen, ob sie ein gutes Geschäft sind. Dabei berücksichtigt es Faktoren wie Marktpreise, Daten und Bewertungen. Denk daran, dass ChatGPT ein KI-System ist und kein Finanzexperte. Verwende seine Bewertung als Referenz, nicht als professionellen Rat. Beachte, dass die Informationen von ChatGPT auf Daten bis September 2021 beruhen und möglicherweise nicht die aktuellen Bedingungen widerspiegeln. Es ist ratsam, einen Finanzberater zu konsultieren oder zusätzliche Nachforschungen anzustellen. Um genaue Bewertungen zu erhalten, solltest du so viele relevante Informationen wie möglich in deine Ausgabenbeschreibung aufnehmen. Dein Feedback ist wertvoll, um die Genauigkeit und Nützlichkeit des Systems zu verbessern.',
 };
 const fr = {
+  // special expense strings
+  specString1: "(caché)",
+  specString2: "(peut être masqué via les paramètres)",
+  specString3: "Dépense spéciale ",
+  specString4: "Dépense spéciale?",
+  // duplstrings
+  duplString1: "Duplication de",
+  duplString2: "sur",
+  duplString3: "jours.",
+  duplString4: "Résultant en un",
+  splitString1: "Répartition de ",
+  splitString2: "sur",
+  splitString3: "jours, chacun",
+
   // standard strings
   signoutBtn: "Se déconnecter",
   signOutAlertTitle: "Annuler",
@@ -1193,6 +1232,20 @@ const fr = {
     "Si tu utilises la fonction \"Demandez une bonne affaire à ChatGPT\", entrez vos frais de déplacement pour les évaluer. ChatGPT évalue et analyse tes dépenses pour déterminer si elles constituent une bonne affaire. Il prend en compte des facteurs tels que les prix du marché, les dates et les évaluations. N'oublie pas que ChatGPT est un système d'intelligence artificielle et non un expert financier. Utilise son évaluation comme référence, pas comme un conseil professionnel. Note que les informations de ChatGPT sont basées sur des données jusqu'en septembre 2021 et peuvent ne pas refléter les conditions actuelles. Il est conseillé de consulter un conseiller financier ou de faire des recherches supplémentaires. Pour obtenir des évaluations précises, tu dois inclure autant d'informations pertinentes que possible dans la description de tes dépenses. Ton feedback est précieux pour améliorer la précision et l'utilité du système",
 };
 const ru = {
+  // special expense strings
+  specString1: "(скрыто)",
+  specString2: "(может быть скрыто через настройки)",
+  specString3: "Специальный расход ",
+  specString4: "Специальный расход?",
+  // duplstrings
+  duplString1: "Дублирование",
+  duplString2: "на протяжении",
+  duplString3: "дней",
+  duplString4: "nИтог - ",
+  splitString1: "Разделение",
+  splitString2: "nна",
+  splitString3: "дней, каждый - ",
+
   // standard strings
   signoutBtn: "Выйти",
   signOutAlertTitle: "Отменить",

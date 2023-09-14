@@ -283,13 +283,23 @@ const ExpenseForm = ({
     Number(inputs.amount.value) / daysBeween,
     inputs.currency.value
   );
-  const duplString = `Duplicating ${expenseString} over ${daysBeween} days. \nResulting in a ${expenseTimesDaysString} ${i18n.t(
-    "total"
-  )}`;
+  const duplString = `${i18n.t("duplString1")} ${expenseString} ${i18n.t(
+    "duplString2"
+  )} ${daysBeween} ${i18n.t("duplString3")}. \n${i18n.t(
+    "duplString4"
+  )} ${expenseTimesDaysString} ${i18n.t("total")}`;
 
-  const newExpenseSplitString = `Splitting up the ${expenseString}\nover ${daysBeween} days, each ${expenseDividedByDaysString}`;
+  const newExpenseSplitString = `${i18n.t(
+    "splitString1"
+  )} ${expenseString}\n${i18n.t("splitString2")} ${daysBeween} ${i18n.t(
+    "splitString3"
+  )} ${expenseDividedByDaysString}`;
 
-  const editedSplitString = `Splitting up the ${expenseTimesDaysString}\nover ${daysBeween} days, each ${expenseString}`;
+  const editedSplitString = `${i18n.t(
+    "splitString1"
+  )} ${expenseTimesDaysString}\n${i18n.t(
+    "splitString2"
+  )} ${daysBeween} ${i18n.t("splitString3")} ${expenseString}`;
 
   let alreadyDividedAmountByDays = isEditing && duplOrSplit === 2;
   if (helperStateForDividing) alreadyDividedAmountByDays = false;
@@ -357,14 +367,14 @@ const ExpenseForm = ({
       )}: ${duplOrSplitString(2)}`, //i18n.t("duplOrSplitText"),
       [
         {
-          text: "Duplicate", //i18n.t("duplicate"),
+          text: i18n.t("duplicateExpenses"), //i18n.t("duplicate"),
           onPress: () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setDuplOrSplit(DuplicateOption.duplicate);
           },
         },
         {
-          text: "Split", //i18n.t("split"),
+          text: i18n.t("splitUpExpenses"), //i18n.t("split"),
           onPress: () => {
             if (duplOrSplit !== 2) setHelperStateForDividing(true);
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -805,7 +815,7 @@ const ExpenseForm = ({
             alignItems: "center",
             marginBottom: 8,
             marginLeft: 4,
-            borderRadius: 8,
+            borderRadius: 20,
             minHeight: 50,
             minWidth: 90,
             marginRight: 8,
@@ -894,16 +904,16 @@ const ExpenseForm = ({
     </View>
   );
   const hideSpecialTooltip = hideSpecial
-    ? "(hidden)"
-    : "\n(can be hidden via settings)";
+    ? i18n.t("specString1")
+    : "\n" + i18n.t("specString2");
   const isSpecialExpenseJSX = (
     <View style={styles.isSpecialContainer}>
       <SettingsSwitch
         toggleState={() => setIsSpecialExpense(!isSpecialExpense)}
         label={
           isSpecialExpense
-            ? "Special Expense " + hideSpecialTooltip
-            : "Special Expense?"
+            ? i18n.t("specString3") + hideSpecialTooltip
+            : i18n.t("specString4")
         }
         state={isSpecialExpense}
       ></SettingsSwitch>
@@ -1081,22 +1091,11 @@ const ExpenseForm = ({
                   style={styles.autoCompleteStyle}
                   menuStyle={styles.autoCompleteMenuStyle}
                 ></Autocomplete>
-                {/* <Input
-                label={i18n.t("descriptionLabel")}
-                style={{ marginTop: "6%" }}
-                placeholder={pickedCat}
-                textInputConfig={{
-                  onChangeText: inputChangedHandler.bind(this, "description"),
-                  value: inputs.description.value,
-                  // multiline: true,
-                }}
-                invalid={!inputs.description.isValid}
-              /> */}
 
                 <View style={styles.currencyContainer}>
-                  {/* <Text style={styles.currencyLabel}>
-                  {i18n.t("currencyLabel")}
-                </Text> */}
+                  <Text style={styles.currencyLabel}>
+                    {i18n.t("currencyLabel")}
+                  </Text>
                   <CurrencyPicker
                     countryValue={currencyPickerValue}
                     setCountryValue={setCurrencyPickerValue}
@@ -1106,6 +1105,9 @@ const ExpenseForm = ({
                 </View>
                 <View style={[styles.inputsRowSecond]}>
                   <View style={styles.countryContainer}>
+                    <Text style={styles.currencyLabel}>
+                      {i18n.t("countryLabel")}
+                    </Text>
                     <CountryPicker
                       countryValue={countryPickerValue}
                       setCountryValue={setCountryPickerValue}
@@ -1175,7 +1177,7 @@ const ExpenseForm = ({
                     <View style={styles.whoPaidContainer}>
                       <Text
                         style={[
-                          styles.currencyLabel,
+                          styles.whoPaidLabel,
                           !inputs.whoPaid.isValid && styles.invalidLabel,
                         ]}
                       >
@@ -1188,11 +1190,32 @@ const ExpenseForm = ({
                         ></ActivityIndicator>
                       )}
                       {!loadingTravellers && (
-                        <View style={{ flexDirection: "row" }}>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            marginLeft: 16,
+                            marginTop: 4,
+                          }}
+                        >
                           {/* equal share equal pay button scale waage */}
+                          {/* share-social-outline */}
+                          {/* checkmark-done-outline */}
+                          {/* "expand-outline" */}
                           <IconButton
-                            icon="share-social-outline"
-                            size={36}
+                            icon="people-circle-outline"
+                            size={28}
+                            buttonStyle={[
+                              {
+                                height: 48,
+                                backgroundColor:
+                                  GlobalStyles.colors.backgroundColor,
+                                borderRadius: 4,
+                                borderWidth: 1,
+                                borderColor: GlobalStyles.colors.gray700,
+                                marginRight: 8,
+                              },
+                              GlobalStyles.strongShadow,
+                            ]}
                             color={GlobalStyles.colors.primary500}
                             onPress={() => {
                               Haptics.impactAsync(
@@ -1220,6 +1243,7 @@ const ExpenseForm = ({
                             }}
                           ></IconButton>
                           <DropDownPicker
+                            containerStyle={styles.dropdownContainer}
                             open={open}
                             value={whoPaid}
                             items={items}
@@ -1227,7 +1251,6 @@ const ExpenseForm = ({
                             setValue={setWhoPaid}
                             setItems={setItems}
                             onClose={setOpenSplitTypes}
-                            containerStyle={styles.dropdownContainer}
                             onOpen={() => {
                               Haptics.impactAsync(
                                 Haptics.ImpactFeedbackStyle.Light
@@ -1339,7 +1362,7 @@ const ExpenseForm = ({
                     )}
                     min={1}
                     max={99}
-                    labelProps={{ style: { padding: 40 } }}
+                    labelProps={{ style: { padding: 4 } }}
                     modalProps={{
                       animationType: "slide",
                       presentationStyle: "pageSheet",
@@ -1371,12 +1394,7 @@ const ExpenseForm = ({
                     whoPaidValid &&
                     !IsSoloTraveller &&
                     splitListHasNonZeroEntries && (
-                      <Text
-                        style={[
-                          styles.currencyLabel,
-                          { marginTop: 20, marginBottom: 20 },
-                        ]}
-                      >
+                      <Text style={[styles.whoSharedLabel]}>
                         {i18n.t("whoShared")}
                       </Text>
                     )}
@@ -1406,13 +1424,14 @@ const ExpenseForm = ({
                       horizontal={true}
                       contentContainerStyle={{
                         flex: 1,
-                        minWidth: "110%",
+                        minWidth: splitList.length * 100 + 200,
+                        marginLeft: 8,
+                        marginRight: 8,
                         justifyContent: "flex-start",
                         alignItems: "flex-start",
-                        overflow: "visible",
                       }}
                       ListHeaderComponent={recalcJSX}
-                      ListFooterComponent={<View style={{ width: 100 }}></View>}
+                      ListFooterComponent={<View style={{ width: 300 }}></View>}
                       renderItem={(itemData) => {
                         const splitValue = itemData.item.amount.toString();
                         return (
@@ -1426,7 +1445,7 @@ const ExpenseForm = ({
                                 marginTop: 14,
                                 marginBottom: 8,
                                 borderWidth: 1,
-                                borderRadius: 12,
+                                borderRadius: 8,
                                 padding: 8,
                                 margin: 8,
                                 backgroundColor:
@@ -1716,12 +1735,26 @@ const styles = StyleSheet.create({
     marginLeft: "1%",
   },
   currencyLabel: {
-    fontSize: 13,
+    fontSize: 12,
+    color: GlobalStyles.colors.textColor,
+    marginTop: 12,
+    marginLeft: 14,
+    marginBottom: -8,
+  },
+  whoPaidLabel: {
+    fontSize: 12,
     color: GlobalStyles.colors.textColor,
     marginBottom: 4,
   },
+  whoSharedLabel: {
+    fontSize: 12,
+    color: GlobalStyles.colors.textColor,
+    marginTop: 8,
+    marginBottom: 0,
+    marginLeft: 8,
+  },
   whoPaidContainer: {
-    marginTop: 12,
+    marginTop: 20,
     marginHorizontal: 16,
   },
   button: {
@@ -1771,10 +1804,9 @@ const styles = StyleSheet.create({
   dropdownContainer: {
     marginTop: -12,
     maxWidth: Dimensions.get("screen").width / 1.27,
-    marginRight: 12,
   },
   whoPaidDropdownContainer: {
-    width: "82%",
+    width: "75%",
     backgroundColor: GlobalStyles.colors.gray500,
     borderWidth: 0,
     marginTop: 12,

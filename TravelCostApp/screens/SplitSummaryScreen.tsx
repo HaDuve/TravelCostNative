@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
         minHeight: 55,
       },
       android: {
-        // marginTop: "50%",
+        // marginTop: "38%",
         elevation: 0,
       },
     }),
@@ -375,13 +375,15 @@ const styles = StyleSheet.create({
 
     flex: 1,
     // alignItems: "center",
-    // justifyContent: "space-between",
+
     // margin: "2%",
     // minHeight: 250,
     ...Platform.select({
       ios: {},
       android: {
         height: 55,
+        justifyContent: "space-between",
+        alignItems: "center",
       },
     }),
   },

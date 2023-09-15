@@ -1,5 +1,8 @@
 Change log Travel Expense App
 
+1.2.664
+- hotfixed settle split not saving online
+
 1.2.663
 - improved translation and layout of expenseform
 

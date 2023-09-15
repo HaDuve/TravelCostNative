@@ -28,7 +28,7 @@ import GradientButton from "../components/UI/GradientButton";
 import { ExpensesContext, RangeString } from "../store/expenses-context";
 import BackgroundGradient from "../components/UI/BackgroundGradient";
 import { ExpenseData, isPaidString, Split } from "../util/expense";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, set } from "react-native-reanimated";
 import { getCurrencySymbol } from "../util/currencySymbol";
 import BackButton from "../components/UI/BackButton";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
@@ -195,12 +195,19 @@ const SplitSummaryScreen = ({ navigation }) => {
   const settleSplitsHandler = useCallback(async () => {
     setIsFetching(true);
     try {
-      await fetchAndSettleCurrentTrip();
+      await fetchAndSettleCurrentTrip(false);
+      await getOpenSplits();
+      setSplits([]);
+      setShowSimplify(false);
+      setTitleText(titleTextOriginal);
+      setSubTitleText(subTitleOriginal);
+      setTotalPaidBackText("");
+      setTotalPayBackText("");
     } catch (error) {
       console.log("settleSplitsHandler ~ error", error);
     }
     setIsFetching(false);
-    navigation.navigate("Settings");
+    navigation.popToTop();
   }, []);
 
   const renderSplitItem = useCallback(
@@ -291,7 +298,7 @@ const SplitSummaryScreen = ({ navigation }) => {
               // if yes, call settleSplitsHandler
               Alert.alert(
                 "Settle Splits",
-                "Are you sure you want to settle all splits? Has everyone gotten their money back?",
+                "Are you sure you want to settle all splits? Has everyone gotten their money back? (Because of technical issues, this will currently only settle splits from Today or Before, not splits from the future!)",
                 [
                   {
                     text: "Cancel",

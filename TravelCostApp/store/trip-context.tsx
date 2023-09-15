@@ -87,7 +87,6 @@ function TripContextProvider({ children }) {
     const stored_uid = await secureStoreGetItem("uid");
     if (!(stored_tripid || stored_uid)) return;
     setTripid(stored_tripid ?? "");
-    console.log("loadAsyncTripid ~ stored_tripid:", stored_tripid);
     const { isFastEnough } = await isConnectionFastEnough();
     if (isFastEnough) {
       try {
@@ -125,7 +124,6 @@ function TripContextProvider({ children }) {
     async function loadAsyncTravellers() {
       const travellers = await asyncStoreGetObject("currentTravellers");
       if (travellers) {
-        console.log("loadAsyncTravellers ~ travellers:", travellers);
         setTravellers(travellers);
       }
     }
@@ -171,7 +169,6 @@ function TripContextProvider({ children }) {
 
   async function setCurrentTrip(tripid: string, trip: TripData) {
     if (!trip) return;
-    console.log("setCurrentTrip ~ setCurrentTrip", tripid);
     if (tripid === "reset") {
       console.log("resetting Trip to empty!");
       _setTripid("");
@@ -184,8 +181,6 @@ function TripContextProvider({ children }) {
       setEndDate("");
       return;
     }
-    // console.log("setCurrentTrip ~ trip", trip);
-    console.log("setCurrentTrip ~ tripid", tripid);
     _setTripid(tripid);
     setTripName(trip.tripName);
     setTotalBudget(
@@ -197,23 +192,13 @@ function TripContextProvider({ children }) {
     setEndDate(trip.endDate);
     setIsPaid(trip.isPaid);
     setIsPaidDate(trip.isPaidDate);
-
-    // bug here?
-    console.log("setCurrentTrip ~ trip.travellers:", trip.travellers);
     if (typeof trip.travellers[1] === "string") {
-      console.log("setCurrentTrip ~ trip.travellers:", trip.travellers);
       setTravellers(trip.travellers);
     } else {
       const extractedTravellers = [];
       Object.keys(trip.travellers).forEach((key) => {
         //skip undefined keys
         if (key && travellers[key]) {
-          console.log("Object.keys ~ key:", key);
-          console.log("Object.keys ~ travellers[key]:", travellers[key]);
-          console.log(
-            "Object.keys ~ travellers[key][userName]:",
-            travellers[key]["userName"]
-          );
           extractedTravellers.push(travellers[key]["userName"]);
         }
       });
@@ -257,7 +242,7 @@ function TripContextProvider({ children }) {
       }
       await setCurrentTrip(tripid, trip);
       await saveTripDataInStorage(trip);
-      return trip;
+      await updateTrip(tripid, trip);
     } catch (error) {
       console.warn(
         "error while fetchCurrent Trip in trip-context searching for ",
@@ -292,10 +277,6 @@ function TripContextProvider({ children }) {
   }
 
   async function saveTripDataInStorage(tripData: TripData) {
-    console.log(
-      "saveTripDataInStorage ~ saveTripDataInStorage:",
-      saveTripDataInStorage
-    );
     // cut away the trip.expenses array
     tripData.expenses = [];
     // await asyncStoreSetObject("currentTrip", tripData);
@@ -308,12 +289,6 @@ function TripContextProvider({ children }) {
     // load from mmkv
     const tripData: TripData = getMMKVObject("currentTrip");
     if (tripData) {
-      console.log(
-        "loadTripDataFromStorage ~ tripData:",
-        tripData.tripName,
-        tripData.totalBudget,
-        tripData.tripCurrency
-      );
       setTripName(tripData.tripName);
       setTotalBudget(
         tripData.totalBudget
@@ -338,14 +313,12 @@ function TripContextProvider({ children }) {
   }
 
   async function saveTravellersInStorage(travellers) {
-    console.log("~~~~ saveTravellersInStorage ~ travellers:", travellers);
     await asyncStoreSetObject("currentTravellers", travellers);
   }
 
   async function loadTravellersFromStorage() {
     const travellers = await asyncStoreGetObject("currentTravellers");
     if (travellers) {
-      console.log("awaitasyncStoreGetObject ~ travellers:", travellers);
       setTravellers(travellers);
     }
   }

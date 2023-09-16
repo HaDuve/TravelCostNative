@@ -246,10 +246,10 @@ function RecentExpenses({ navigation }) {
           return;
         }
         // if offline, load from storage
-        setIsFetching(true);
+        // setIsFetching(true);
         // await test_offlineLoad(expensesCtx, setRefreshing, setIsFetching);
         await expensesCtx.loadExpensesFromStorage();
-        setIsFetching(false);
+        // setIsFetching(false);
         return;
       }
       // checking isTouched or firstLoad
@@ -275,18 +275,16 @@ function RecentExpenses({ navigation }) {
       );
     },
     [
-      expensesCtx,
+      // expensesCtx,
+      fetchExpenses,
       netCtx.isConnected,
       netCtx.strongConnection,
-      tripCtx,
+      // tripCtx,
       tripid,
       uid,
       userCtx.freshlyCreated,
     ]
   );
-  useEffect(() => {
-    LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
-  }, []);
 
   useInterval(
     () => {
@@ -314,10 +312,11 @@ function RecentExpenses({ navigation }) {
   function errorHandler() {
     setError(null);
   }
+  const today = DateTime.now().get("day");
 
   const getRecentExpenses = useMemo(
     () => expensesCtx.getRecentExpenses(PeriodValue),
-    [expensesCtx.expenses.length, PeriodValue]
+    [expensesCtx.expenses.length, PeriodValue, today]
   );
   const recentExpenses = getRecentExpenses;
 
@@ -344,9 +343,7 @@ function RecentExpenses({ navigation }) {
   const ExpensesOutputJSX = (
     <MemoizedExpensesOutput
       expenses={recentExpenses}
-      periodValue={PeriodValue}
       fallbackText={i18n.t("fallbackTextExpenses")}
-      listRef={listRef}
       refreshControl={
         <RefreshControl
           refreshing={refreshing || isFetching}

@@ -266,7 +266,7 @@ const ExpenseForm = ({
       console.log("paid by tripctx");
       setIsPaid(isPaidString.paid);
     }
-  }, [tripCtx.isPaidDate, startDate]);
+  }, [tripCtx.isPaidDate, startDate, editingValues?.date]);
 
   // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
   const [duplOrSplit, setDuplOrSplit] = useState<DuplicateOption>(

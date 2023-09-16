@@ -254,13 +254,14 @@ const ExpenseForm = ({
   // console.log("rerender: special:", isSpecialExpense);
 
   useEffect(() => {
-    // console.log("useEffect ~ tripCtx.isPaidDate", tripCtx?.isPaidDate);
-    // console.log("useEffect ~ startDate", startDate);
-    // console.log("useEffect ~ editingValues.date", editingValues?.date);
+    console.log("useEffect ~ tripCtx.isPaidDate", tripCtx?.isPaidDate);
+    console.log("useEffect ~ startDate", startDate);
+    console.log("useEffect ~ editingValues.date", editingValues?.date);
     if (
       tripCtx.isPaidDate &&
+      (startDate || editingValues?.date) &&
       (new Date(tripCtx.isPaidDate) > new Date(startDate) ||
-        new Date(tripCtx.isPaidDate) > editingValues.date)
+        new Date(tripCtx.isPaidDate) > editingValues?.date)
     ) {
       console.log("paid by tripctx");
       setIsPaid(isPaidString.paid);

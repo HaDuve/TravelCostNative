@@ -65,7 +65,7 @@ function ExpensesOutput({
     if (expenses.length > 0) {
       if (fallback) setFallback(false);
       return (
-        <MemoizedExpensesList
+        <ExpensesList
           expenses={expenses}
           showSumForTravellerName={showSumForTravellerName}
           isFiltered={isFiltered}

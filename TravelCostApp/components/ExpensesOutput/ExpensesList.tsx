@@ -339,15 +339,43 @@ function ExpensesList({
           expenseId: itemData.item.id,
         });
       };
-      if (expensesLength > MAX_EXPENSES)
+      if (expensesLength > MAX_EXPENSES) {
+        // const cheapSelectableJSX = (
+        //   <View
+        //     style={{
+        //       flex: 0,
+        //       position: "absolute",
+        //       top: -45,
+        //       left: -55,
+        //       zIndex: 1,
+        //     }}
+        //   >
+        //     <IconButton
+        //       icon={
+        //         selected.includes(itemData.item.id)
+        //           ? "ios-checkmark-circle"
+        //           : "ellipse-outline"
+        //       }
+        //       color={
+        //         selected.includes(itemData.item.id)
+        //           ? GlobalStyles.colors.textColor
+        //           : GlobalStyles.colors.gray700
+        //       }
+        //       size={16}
+        //       onPress={selectItem.bind(this, itemData.item.id)}
+        //       buttonStyle={{ padding: 48 }}
+        //     ></IconButton>
+        //   </View>
+        // );
         return (
           <TouchableOpacity
             style={styles.fastExpenseContainer}
             onPress={() => navigateToExpense()}
           >
             <View>
+              {/* {selectable && cheapSelectableJSX} */}
               <Text style={styles.fastExpenseText}>
-                {"> " + toShortFormat(itemData.item?.date)}{" "}
+                {" " + toShortFormat(itemData.item?.date)}{" "}
                 {itemData.item?.description}{" "}
               </Text>
               <Text style={styles.fastExpenseText}>
@@ -362,6 +390,7 @@ function ExpensesList({
             </Text>
           </TouchableOpacity>
         );
+      }
       const selectableJSX = (
         <Animated.View
           entering={FadeInLeft}
@@ -603,62 +632,66 @@ function ExpensesList({
 
   const listHeaderJSX = useMemo(() => {
     return (
-      <View
-        style={{
-          paddingRight: 20,
-          marginTop: 12,
-          alignItems: "center",
-          justifyContent: "flex-end",
-          flexDirection: "row",
-        }}
-      >
-        {selectable && (
-          <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
-            <IconButton
-              icon={"ios-trash-outline"}
-              size={24}
-              color={
-                selected.length > 0
-                  ? GlobalStyles.colors.gray700
-                  : GlobalStyles.colors.gray600
-              }
-              onPress={deleteSelected}
-            ></IconButton>
-          </Animated.View>
-        )}
-        {selectable && !isFiltered && (
-          <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
-            <IconButton
-              icon={"pie-chart-outline"}
-              size={24}
-              color={
-                selected.length > 0
-                  ? GlobalStyles.colors.gray700
-                  : GlobalStyles.colors.gray600
-              }
-              onPress={finderWithExpenses}
-            ></IconButton>
-          </Animated.View>
-        )}
-        {selectable && (
-          <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
-            <IconButton
-              icon={
-                selected.length > 0 ? "close-outline" : "checkmark-done-outline"
-              }
-              size={24}
-              color={GlobalStyles.colors.gray700}
-              onPress={selectAll}
-            ></IconButton>
-          </Animated.View>
-        )}
-        <IconButton
-          icon={"ellipsis-horizontal-circle-outline"}
-          size={24}
-          color={GlobalStyles.colors.gray700}
-          onPress={selectPressHandler}
-        ></IconButton>
-      </View>
+      expenses.length < MAX_EXPENSES && (
+        <View
+          style={{
+            paddingRight: 20,
+            marginTop: 12,
+            alignItems: "center",
+            justifyContent: "flex-end",
+            flexDirection: "row",
+          }}
+        >
+          {selectable && (
+            <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
+              <IconButton
+                icon={"ios-trash-outline"}
+                size={24}
+                color={
+                  selected.length > 0
+                    ? GlobalStyles.colors.gray700
+                    : GlobalStyles.colors.gray600
+                }
+                onPress={deleteSelected}
+              ></IconButton>
+            </Animated.View>
+          )}
+          {selectable && !isFiltered && (
+            <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
+              <IconButton
+                icon={"pie-chart-outline"}
+                size={24}
+                color={
+                  selected.length > 0
+                    ? GlobalStyles.colors.gray700
+                    : GlobalStyles.colors.gray600
+                }
+                onPress={finderWithExpenses}
+              ></IconButton>
+            </Animated.View>
+          )}
+          {selectable && (
+            <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
+              <IconButton
+                icon={
+                  selected.length > 0
+                    ? "close-outline"
+                    : "checkmark-done-outline"
+                }
+                size={24}
+                color={GlobalStyles.colors.gray700}
+                onPress={selectAll}
+              ></IconButton>
+            </Animated.View>
+          )}
+          <IconButton
+            icon={"ellipsis-horizontal-circle-outline"}
+            size={24}
+            color={GlobalStyles.colors.gray700}
+            onPress={selectPressHandler}
+          ></IconButton>
+        </View>
+      )
     );
   }, [
     selectable,
@@ -750,10 +783,6 @@ function ExpensesList({
 }
 
 export default ExpensesList;
-const areEqual = (prevProps, nextProps) => {
-  return prevProps.expenses === nextProps.expenses;
-};
-export const MemoizedExpensesList = memo(ExpensesList, areEqual);
 
 ExpensesList.propTypes = {
   expenses: PropTypes.arrayOf(

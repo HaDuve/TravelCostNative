@@ -1,23 +1,8 @@
-import React, {
-  Alert,
-  Dimensions,
-  Platform,
-  Pressable,
-  StyleSheet,
-  View,
-} from "react-native";
+import React, { Alert, Pressable, StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
-import IconButton from "../UI/IconButton";
 import * as Haptics from "expo-haptics";
-import Animated, {
-  FadeIn,
-  FadeInDown,
-  FadeOutDown,
-  SlideInDown,
-  SlideInUp,
-} from "react-native-reanimated";
-import { UserContext } from "../../store/user-context";
-import { createRef, useContext, useEffect, useRef, useState } from "react";
+import Animated, { FadeIn } from "react-native-reanimated";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TourGuideZone } from "rn-tourguide";
 

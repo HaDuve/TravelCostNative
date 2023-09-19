@@ -44,6 +44,11 @@ function SignupScreen() {
 
   async function signupHandler({ name, email, password }) {
     setIsAuthenticating(true);
+    const userData = { userName: name };
+    let { token = "", uid = "" } = {
+      token: "",
+      uid: "",
+    };
     // Check internet connection first
     if (!isConnected) {
       Toast.show({
@@ -64,54 +69,55 @@ function SignupScreen() {
       return;
     }
     try {
-      //CLEAR
+      // NECESSARY TRYCATCH
+      ({ token, uid } = await createUser(email, password));
+      await storeUser(uid, userData);
+      await updateUser(uid, {
+        userName: name,
+      });
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: i18n.t("toastEmailError1"),
+        text2: i18n.t("toastEmailError2"),
+      });
+      setIsAuthenticating(false);
+      return;
+    }
+    try {
+      // UNESSENTIAL TRYCATCH
       await asyncStoreSafeClear();
+      setAxiosAccessToken(token);
+      userCtx.setUserName(name);
       userCtx.setTripHistory([]);
-      // We are online and ready to create User
-      const { token, uid } = await createUser(email, password);
-      // setup purchases with a inner trycatch so that account gets created anyway
+
+      await userCtx.setFreshlyCreatedTo(true);
+      await authCtx.setUserID(uid);
       const { REVCAT_G, REVCAT_A }: Keys = await loadKeys();
-      try {
+      if (REVCAT_A || REVCAT_G) {
         if (Platform.OS === "android") {
-          // Purchases
           Purchases.configure({
             apiKey: REVCAT_G,
             appUserID: uid,
           });
         } else if (Platform.OS === "ios" || Platform.OS === "macos") {
-          // Purchases
           Purchases.configure({
             apiKey: REVCAT_A,
             appUserID: uid,
           });
-          console.log("SignupScreen REVCAT ~ uid:", uid);
         }
-      } catch (error) {
-        console.log("SignupScreen ~ revcat error", error);
       }
-
-      //NEW
-      const userData = { userName: name };
       await setAttributesAsync(email, userData.userName);
-      userCtx.setUserName(name);
-      await userCtx.setFreshlyCreatedTo(true);
-      await authCtx.setUserID(uid);
-      setAxiosAccessToken(token);
-      await storeUser(uid, userData);
-      await updateUser(uid, {
-        userName: name,
-      });
       const event = new BranchEvent(BranchEvent.CompleteRegistration);
       await event.logEvent();
       const event2 = new BranchEvent(BranchEvent.Login);
       await event2.logEvent();
-      await authCtx.authenticate(token);
+      throw new Error("SignupScreen ~ TESTERROR error");
     } catch (error) {
-      console.log("signupHandler ~ error2", error);
-      // Alert.alert(i18n.t("authError"), error.message);
-      Alert.alert(i18n.t("authError"), i18n.t("createErrorText"));
-      setIsAuthenticating(false);
+      await authCtx.authenticate(token);
+      console.log("error", error);
     }
+    await authCtx.authenticate(token);
   }
 
   if (isAuthenticating) {

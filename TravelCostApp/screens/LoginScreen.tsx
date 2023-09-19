@@ -74,7 +74,7 @@ function LoginScreen() {
         console.log("loginHandler exectption error");
         authCtx.logout();
       }
-      let freshlyCreated = checkUser.freshlyCreated || userCtx.freshlyCreated;
+      let freshlyCreated = checkUser.freshlyCreated;
       if (checkUser.userName && !checkUser.currentTrip) {
         // we infer freshly created if no current trip exists but we assigned a name already
         console.log(
@@ -102,6 +102,7 @@ function LoginScreen() {
       const userData = checkUser;
       await setAttributesAsync(email, userData.userName);
       await userCtx.addUserName(userData);
+      await userCtx.setFreshlyCreatedTo(freshlyCreated);
       await authCtx.setUserID(uid);
       console.log("loginHandler ~ userData", userData);
       const tripid = userData.currentTrip;

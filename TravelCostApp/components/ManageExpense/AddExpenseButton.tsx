@@ -1,6 +1,7 @@
 import React, {
   Alert,
   Dimensions,
+  Platform,
   Pressable,
   StyleSheet,
   View,
@@ -57,7 +58,7 @@ const AddExpenseButton = ({ navigation }) => {
   //     })
   //   );
 
-  const [valid, setvalid] = useState(true);
+  const [valid, setvalid] = useState(false);
   useEffect(() => {
     setvalid(
       tripCtx.tripid &&
@@ -75,9 +76,11 @@ const AddExpenseButton = ({ navigation }) => {
     if (!valid) {
       // error haptic
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      // Platform.select({
+      // ios: () =>
       Alert.alert(
-        "Error",
-        "Data is missing. Please restart the App or Login again.",
+        "Loading Data",
+        "Please try again later, alternatively login again or restart the App",
         [
           // cancel button
           {
@@ -100,6 +103,30 @@ const AddExpenseButton = ({ navigation }) => {
           },
         ]
       );
+      // ,
+      //   android: () => {
+      //     console.log("android pressed");
+      //     Alert.alert(
+      //       "Loading Data",
+      //       "Please try again later, if necessary restart the App or Login again.",
+      //       [
+      //         {
+      //           text: "Restart",
+      //           onPress: () => {
+      //             reloadApp();
+      //           },
+      //         },
+      //         {
+      //           text: "Login",
+      //           onPress: () => {
+      //             authCtx.logout();
+      //             reloadApp();
+      //           },
+      //         },
+      //       ]
+      //     );
+      //   },
+      // })();
     } else {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       skipCatScreen &&
@@ -110,34 +137,34 @@ const AddExpenseButton = ({ navigation }) => {
     }
   };
 
-  // if (!valid) {
-  //   return (
-  //     <Animated.View
-  //       style={[styles.margin]}
-  //       entering={FadeIn.duration(600).delay(8000)}
-  //     >
-  //       <Pressable
-  //         onPress={() => {
-  //           reloadApp();
-  //         }}
-  //         style={[
-  //           styles.addButton,
-  //           GlobalStyles.shadowGlowPrimary,
-  //           styles.addButtonInactive,
-  //         ]}
-  //       >
-  //         <LoadingBarOverlay
-  //           containerStyle={{
-  //             backgroundColor: "transparent",
-  //             maxHeight: 44,
-  //             marginLeft: -4,
-  //           }}
-  //           noText
-  //         ></LoadingBarOverlay>
-  //       </Pressable>
-  //     </Animated.View>
-  //   );
-  // }
+  if (!valid) {
+    return (
+      <Animated.View
+        style={[styles.margin]}
+        entering={FadeIn.duration(600).delay(8000)}
+      >
+        <Pressable
+          onPress={() => {
+            pressHandler();
+          }}
+          style={[
+            styles.addButton,
+            GlobalStyles.shadowGlowPrimary,
+            styles.addButtonInactive,
+          ]}
+        >
+          <LoadingBarOverlay
+            containerStyle={{
+              backgroundColor: "transparent",
+              maxHeight: 44,
+              marginLeft: -4,
+            }}
+            noText
+          ></LoadingBarOverlay>
+        </Pressable>
+      </Animated.View>
+    );
+  }
   return (
     <Animated.View
       style={styles.margin}

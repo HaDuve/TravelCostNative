@@ -849,7 +849,6 @@ const styles = StyleSheet.create({
       },
       android: {
         padding: "3%",
-        paddingTop: "5%",
         // minHeight: "105%",
       },
     }),

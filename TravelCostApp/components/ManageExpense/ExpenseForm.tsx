@@ -1010,11 +1010,6 @@ const ExpenseForm = ({
               paddingHorizontal: "2%",
               // margin
               marginBottom: "-2%",
-              ...Platform.select({
-                android: {
-                  marginTop: "8%",
-                },
-              }),
             }}
           >
             {backButtonJsx}

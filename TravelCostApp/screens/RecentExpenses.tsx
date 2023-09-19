@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
         padding: 0,
       },
       android: {
-        paddingTop: "3%",
+        // paddingTop: "3%",
       },
     }),
   },
@@ -498,7 +498,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
       },
       android: {
-        marginTop: "4%",
+        // marginTop: "4%",
         elevation: 8,
         borderRadius: 12,
       },

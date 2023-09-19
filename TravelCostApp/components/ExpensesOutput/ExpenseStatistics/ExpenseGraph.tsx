@@ -569,7 +569,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     marginHorizontal: 20,
     marginTop: 4,
-    elevation: 8,
+    ...Platform.select({
+      android: {
+        elevation: 5,
+        borderRadius: 10,
+      },
+    }),
     marginBottom: 8,
     borderRadius: 10,
     flexDirection: "row",

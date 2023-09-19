@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {},
       android: {
-        marginTop: "10%",
+        // marginTop: "10%",
         flex: 1,
       },
     }),

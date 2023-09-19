@@ -206,14 +206,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     // justifyContent: "flex-start",
-    ...Platform.select({
-      ios: {
-        padding: 0,
-      },
-      android: {
-        paddingTop: "3%",
-      },
-    }),
   },
   dateHeader: {
     marginVertical: "4%",
@@ -243,7 +235,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
       },
       android: {
-        marginTop: "4%",
+        // marginTop: "2%",
         elevation: 8,
         borderRadius: 12,
       },
@@ -292,13 +284,6 @@ const styles = StyleSheet.create({
     zIndex: 0,
   },
   customSummaryStyle: {
-    ...Platform.select({
-      ios: {
-        marginTop: "-2%",
-      },
-      android: {
-        marginTop: "0%",
-      },
-    }),
+    marginTop: "-2%",
   },
 });

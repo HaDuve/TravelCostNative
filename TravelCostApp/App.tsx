@@ -6,6 +6,7 @@ import { SafeAreaView, View, Keyboard, Platform, AppState } from "react-native";
 import Purchases from "react-native-purchases";
 
 import { StatusBar } from "expo-status-bar";
+import { StatusBar as StatusBarRN } from "react-native";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
@@ -753,6 +754,8 @@ export default function App() {
           style={{
             flex: 0,
             backgroundColor: GlobalStyles.colors.backgroundColor,
+            paddingTop:
+              Platform.OS === "android" ? StatusBarRN.currentHeight : 0,
           }}
         />
         <SafeAreaView
@@ -782,7 +785,6 @@ export default function App() {
                           }}
                         >
                           <Root />
-                          {/* {DEV && <ConnectionBar />} */}
                           <ToastComponent />
                         </TourGuideProvider>
                       </ExpensesContextProvider>

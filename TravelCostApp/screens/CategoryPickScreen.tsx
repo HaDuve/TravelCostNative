@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
       },
       android: {
         padding: "0%",
-        paddingTop: "5%",
+        paddingTop: "2%",
         paddingHorizontal: "5%",
       },
     }),

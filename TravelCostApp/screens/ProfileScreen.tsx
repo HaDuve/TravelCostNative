@@ -242,14 +242,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    ...Platform.select({
-      ios: {
-        padding: 0,
-      },
-      android: {
-        paddingTop: "3%",
-      },
-    }),
   },
   innerContainer: {
     flex: 2,

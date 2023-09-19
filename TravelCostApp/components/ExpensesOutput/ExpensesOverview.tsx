@@ -109,7 +109,7 @@ const ExpensesOverview = ({
 
   const titleContainerJSX = (
     <BlurView
-      intensity={isAndroid ? 280 : 90}
+      intensity={isAndroid ? 100 : 90}
       style={styles.titleContainerBlur}
     >
       <Animated.View

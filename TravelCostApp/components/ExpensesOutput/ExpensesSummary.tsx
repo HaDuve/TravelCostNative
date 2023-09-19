@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
         marginBottom: "-2%",
       },
       android: {
-        paddingTop: "3%",
+        paddingTop: "1%",
         paddingLeft: "2%",
         marginRight: "-5%",
         marginBottom: "-2%",
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
       android: {
         textShadowColor: "rgba(0, 0, 0, 0.15)",
         textShadowOffset: { width: 2, height: 2 },
-        textShadowRadius: 4,
+        textShadowRadius: 8,
       },
     }),
   },

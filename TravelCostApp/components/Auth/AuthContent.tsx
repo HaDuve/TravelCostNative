@@ -115,12 +115,6 @@ const styles = StyleSheet.create({
   container: {
     // flex: 1,
     // backgroundColor: GlobalStyles.colors.backgroundColor,
-    ...Platform.select({
-      ios: {},
-      android: {
-        paddingTop: "10%",
-      },
-    }),
   },
   authContent: {
     padding: "4%",

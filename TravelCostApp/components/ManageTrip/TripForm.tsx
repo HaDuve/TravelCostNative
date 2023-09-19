@@ -444,7 +444,7 @@ const TripForm = ({ navigation, route }) => {
         "Sorry! We got an unexpected Error, please try again!",
         error.message
       );
-      if (!isEditing) await authCtx.logout();
+      if (!isEditing) authCtx.logout();
       return;
     }
     setIsLoading(false);

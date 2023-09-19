@@ -72,7 +72,7 @@ function LoginScreen() {
           visibilityTime: 4000,
         });
         console.log("loginHandler exectption error");
-        await authCtx.logout();
+        authCtx.logout();
       }
       let freshlyCreated = checkUser.freshlyCreated || userCtx.freshlyCreated;
       if (checkUser.userName && !checkUser.currentTrip) {

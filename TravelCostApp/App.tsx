@@ -646,7 +646,7 @@ function Root() {
             visibilityTime: 5000,
           });
           await asyncStoreSafeClear();
-          await authCtx.logout();
+          authCtx.logout();
           setAppIsReady(true);
           return;
         }
@@ -688,7 +688,7 @@ function Root() {
       } else {
         tripCtx.setIsLoading(false);
         await asyncStoreSafeClear();
-        await authCtx.logout();
+        authCtx.logout();
         setAppIsReady(true);
       }
       setAppIsReady(true);

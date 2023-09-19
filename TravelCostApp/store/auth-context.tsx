@@ -39,7 +39,7 @@ export const AuthContext = createContext({
   token: "",
   isAuthenticated: false,
   authenticate: async (token) => {},
-  logout: async () => {},
+  logout: () => {},
   setUserID: async (uid) => {},
   deleteAccount: async () => {},
 });
@@ -62,7 +62,7 @@ function AuthContextProvider({ children }) {
     setAxiosAccessToken(token);
   }
 
-  async function logout() {
+  function logout() {
     setAuthToken(null);
   }
 
@@ -104,7 +104,7 @@ function AuthContextProvider({ children }) {
             visibilityTime: 3000,
             autoHide: true,
             onHide: async () => {
-              await logout();
+              logout();
               await reloadApp();
             },
           });

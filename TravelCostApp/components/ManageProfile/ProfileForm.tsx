@@ -54,7 +54,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
           userCtx.setTripHistory([]);
           userCtx.setUserName("");
           await asyncStoreSafeClear();
-          await authCtx.logout();
+          authCtx.logout();
           setIsFetchingLogout(false);
         },
       },

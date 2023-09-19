@@ -72,7 +72,7 @@ export async function asyncStoreSafeClear() {
   console.log("attempting to clear all async stored Memory > ");
 
   // add keys(prefixes) which should never be deleted
-  const neverDelete = ["@userEmail"];
+  const neverDelete = ["@userEmail", "firstStart"];
 
   let keys: readonly string[];
   try {

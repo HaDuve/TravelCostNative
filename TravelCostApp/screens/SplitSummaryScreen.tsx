@@ -64,7 +64,7 @@ const SplitSummaryScreen = ({ navigation }) => {
     }, [freshlyCreated])
   );
 
-  const [isFetching, setIsFetching] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState();
 
   const [tripIsPaid, setTripIsPaid] = useState(isPaid === isPaidString.paid);
@@ -100,8 +100,7 @@ const SplitSummaryScreen = ({ navigation }) => {
   );
 
   const getOpenSplits = useCallback(async () => {
-    if (expenses?.length === 0) return;
-    if (!tripid) return;
+    if (!tripid || expenses?.length === 0) return;
     console.log("called getOpenSplits!");
     setIsFetching(true);
     try {

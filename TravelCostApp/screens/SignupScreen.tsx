@@ -112,7 +112,6 @@ function SignupScreen() {
       await event.logEvent();
       const event2 = new BranchEvent(BranchEvent.Login);
       await event2.logEvent();
-      throw new Error("SignupScreen ~ TESTERROR error");
     } catch (error) {
       await authCtx.authenticate(token);
       console.log("error", error);

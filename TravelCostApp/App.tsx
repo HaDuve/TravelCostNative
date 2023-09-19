@@ -662,7 +662,7 @@ function Root() {
         const checkUser = await fetchUser(storedUid);
         console.log("onRootMount ~ checkUser:", checkUser);
         // Check if the user logged in but there is no userName, we deleted the account
-        if (!checkUser || !checkUser.userName) {
+        if (!checkUser.userName) {
           Toast.show({
             type: "error",
             text1: i18n.t("toastAccountError1"),

@@ -14,7 +14,7 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import { AuthContext } from "../store/auth-context";
-import { UserContext } from "../store/user-context";
+import { UserContext, UserData } from "../store/user-context";
 import { fetchUser, touchMyTraveler } from "../util/http";
 import { TripContext } from "../store/trip-context";
 import Toast from "react-native-toast-message";
@@ -56,36 +56,52 @@ function LoginScreen() {
       setIsAuthenticating(false);
       return;
     }
+    let { token = "", uid = "" } = { token: "", uid: "" };
+    let checkUser: UserData = {};
     try {
-      const { token, uid } = await login(email, password);
+      // NECESSARY TRYCATCH
+      ({ token, uid } = await login(email, password));
       console.log("loginHandler ~ uid:", uid);
       //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
-      const checkUser = await fetchUser(uid);
-      console.log("loginHandler ~ checkUser", checkUser);
-      // Check if the user logged in but there is no userName, we deleted the account
-      if (!checkUser || !checkUser.userName) {
-        Toast.show({
-          type: "error",
-          position: "top",
-          text1: i18n.t("exceptionError"),
-          text2: i18n.t("tryAgain"),
-          visibilityTime: 4000,
-        });
-        console.log("loginHandler exectption error");
-        authCtx.logout();
-      }
-      let freshlyCreated = checkUser.freshlyCreated;
-      if (checkUser.userName && !checkUser.currentTrip) {
-        // we infer freshly created if no current trip exists but we assigned a name already
-        console.log(
-          "loginHandler ~ we set to freshly because username but no current trip!"
-        );
-        await userCtx.setFreshlyCreatedTo(true);
-        freshlyCreated = true;
-      }
+      checkUser = await fetchUser(uid);
+      await userCtx.addUserName(checkUser);
+      await authCtx.setUserID(uid);
+    } catch (error) {
+      console.error(error);
+      setIsAuthenticating(false);
+      authCtx.logout();
+    }
+    const userData = checkUser;
+    tripCtx.setTripid(checkUser.currentTrip);
+
+    console.log("loginHandler ~ checkUser", checkUser);
+    // Check if the user logged in but there is no userName, we deleted the account
+    if (!checkUser.userName) {
+      Toast.show({
+        type: "error",
+        position: "top",
+        text1: i18n.t("exceptionError"),
+        text2: i18n.t("tryAgain"),
+        visibilityTime: 4000,
+      });
+      console.log("loginHandler exception error");
+      authCtx.logout();
+      return;
+    }
+    let freshlyCreated = checkUser.freshlyCreated;
+    if (!checkUser.currentTrip) {
+      // we infer freshly created if no current trip exists but we assigned a name already
+      console.log(
+        "loginHandler ~ we set to freshly because username but no current trip!"
+      );
+      await userCtx.setFreshlyCreatedTo(true);
+      freshlyCreated = true;
+    } else {
+      await userCtx.setFreshlyCreatedTo(freshlyCreated);
+    }
+    try {
       //// END OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
       const { REVCAT_G, REVCAT_A }: Keys = await loadKeys();
-
       // setup purchases
       if (Platform.OS === "android") {
         // Purchases
@@ -99,37 +115,35 @@ function LoginScreen() {
         await userCtx.checkPremium();
         console.log("LoginScreen ~ uid:", uid);
       }
-      const userData = checkUser;
+
       await setAttributesAsync(email, userData.userName);
-      await userCtx.addUserName(userData);
-      await userCtx.setFreshlyCreatedTo(freshlyCreated);
-      await authCtx.setUserID(uid);
+
+      const event = new BranchEvent(BranchEvent.Login);
+      await event.logEvent();
       console.log("loginHandler ~ userData", userData);
-      const tripid = userData.currentTrip;
-      if (!tripid && freshlyCreated) {
-        await authCtx.authenticate(token);
-      }
+    } catch (error) {
+      console.log("error", error);
+    }
+    const tripid = userData.currentTrip;
+    if (!tripid && freshlyCreated) {
+      await authCtx.authenticate(token);
+      return;
+    }
+    try {
       await secureStoreSetItem("currentTripId", tripid);
       await secureStoreSetItem("uid", uid);
       await touchMyTraveler(tripid, uid);
-      tripCtx.setTripid(tripid);
+
       await tripCtx.fetchAndSetCurrentTrip(tripid);
       await userCtx.loadCatListFromAsyncInCtx(tripid);
       await userCtx.updateTripHistory();
       tripCtx.refresh();
       expCtx.setExpenses([]);
       setMMKVObject("expenses", []);
-      const event = new BranchEvent(BranchEvent.Login);
-      await event.logEvent();
-      await authCtx.authenticate(token);
     } catch (error) {
-      console.error(error);
-      setIsAuthenticating(false);
-      // Alert.alert(i18n.t("authError"), i18n.t("authErrorText"));
-      // // Alert.alert(i18n.t("authError"), error.message);
-      // authCtx.logout();
+      console.log("error", error);
     }
-    console.log("end reached?");
+    await authCtx.authenticate(token);
   }
 
   if (isAuthenticating) {

@@ -18,7 +18,7 @@ const loadingColor = GlobalStyles.colors.primaryGrayed;
 const LoadingOverlay = (props) => {
   const { containerStyle, customText, noText, size = "large" } = props;
   const string =
-    customText && customText.length > 0
+    customText && customText?.length > 0
       ? customText
       : i18n.t("loadingYourTrip");
   return (

@@ -332,7 +332,7 @@ const ManageExpense = ({ route, navigation }) => {
         expense.rangeId && expense.rangeId === selectedExpense?.rangeId
     );
     // if we dont find any expenses, it must have been a non-ranged expense, so update it to a ranged expense
-    if (expensesInRange.length === 0) {
+    if (expensesInRange?.length === 0) {
       console.log("no expenses in range found");
       // delete the original expense
       expenseCtx.deleteExpense(editedExpenseId);
@@ -356,13 +356,13 @@ const ManageExpense = ({ route, navigation }) => {
     // check if the dates are the same, then update one by one or redo all
     // get the first and last day from expenses in range
     const oldStart = new Date(expensesInRange[0].date);
-    const oldEnd = new Date(expensesInRange[expensesInRange.length - 1].date);
+    const oldEnd = new Date(expensesInRange[expensesInRange?.length - 1].date);
     // get days from expenseData
     const newStart = new Date(expenseData.startDate);
     const newEnd = new Date(expenseData.endDate);
     const validDates =
       expensesInRange[0].date &&
-      expensesInRange[expensesInRange.length - 1].date &&
+      expensesInRange[expensesInRange?.length - 1].date &&
       expenseData.startDate &&
       expenseData.endDate;
     console.log("editingRangedData ~ validDates:", validDates);
@@ -380,11 +380,11 @@ const ManageExpense = ({ route, navigation }) => {
       return;
     }
     //else update the expenses one by one
-    setProgressMax(expensesInRange.length);
-    for (let i = 0; i < expensesInRange.length; i++) {
+    setProgressMax(expensesInRange?.length);
+    for (let i = 0; i < expensesInRange?.length; i++) {
       setProgressAt(i);
-      setProgress(i / expensesInRange.length);
-      console.log("progress", i / expensesInRange.length);
+      setProgress(i / expensesInRange?.length);
+      console.log("progress", i / expensesInRange?.length);
       Toast.show({
         type: "loading",
         text1: i18n.t("toastSaving1"),
@@ -393,12 +393,12 @@ const ManageExpense = ({ route, navigation }) => {
           " " +
           (i + 1) +
           "/" +
-          (expensesInRange.length + 1),
+          (expensesInRange?.length + 1),
         autoHide: false,
         props: {
-          progress: i / expensesInRange.length,
+          progress: i / expensesInRange?.length,
           progressAt: i,
-          progressMax: expensesInRange.length,
+          progressMax: expensesInRange?.length,
           size: "small",
         },
       });
@@ -444,7 +444,7 @@ const ManageExpense = ({ route, navigation }) => {
       expenseData.calcAmount = calcAmount;
 
       // if expenseData has a splitlist, add the rate to each split
-      if (expenseData.splitList && expenseData.splitList.length > 0) {
+      if (expenseData.splitList && expenseData.splitList?.length > 0) {
         expenseData.splitList.forEach((split) => {
           split.rate = rate;
         });

@@ -54,7 +54,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
   // defaultCategories minus the last element (-new cat element)
   const defaultCategoryList: Category[] = DEFAULTCATEGORIES.slice(
     0,
-    DEFAULTCATEGORIES.length - 1
+    DEFAULTCATEGORIES?.length - 1
   );
 
   const [categoryList, setCategoryList] =
@@ -91,10 +91,10 @@ const ManageCategoryScreen = ({ route, navigation }) => {
     } catch (error) {
       console.error(error);
     }
-    if (categoryList.length === 0) {
+    if (categoryList?.length === 0) {
       await loadCategoryList();
     }
-    if (categoryList.length === 0) {
+    if (categoryList?.length === 0) {
       setCategoryList(defaultCategoryList);
     }
   };
@@ -310,7 +310,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
   const arrays = [];
   // 1-3 possible items per row
   const size = bigDisplay ? 3 : 2;
-  while (ioniconsList.length > 0) arrays.push(ioniconsList.splice(0, size));
+  while (ioniconsList?.length > 0) arrays.push(ioniconsList.splice(0, size));
 
   function renderRowIconPicker({ item }) {
     return (
@@ -326,7 +326,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
             setSelectedIconName={setSelectedIconName}
           />
         </View>
-        {item.length > 1 ? (
+        {item?.length > 1 ? (
           <View
             style={{
               marginBottom: 1,
@@ -339,7 +339,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
             />
           </View>
         ) : null}
-        {item.length > 2 ? (
+        {item?.length > 2 ? (
           <View
             style={{
               marginBottom: 1,
@@ -447,8 +447,8 @@ const ManageCategoryScreen = ({ route, navigation }) => {
               renderItem={renderRowIconPicker}
             ></FlatList>
             {!isUploading &&
-              newCategoryName.length > 0 &&
-              selectedIconName.length > 0 && (
+              newCategoryName?.length > 0 &&
+              selectedIconName?.length > 0 && (
                 <Animated.View entering={ZoomIn} exiting={ZoomOut}>
                   <TouchableOpacity
                     style={styles.addButton}

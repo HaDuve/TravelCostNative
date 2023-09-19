@@ -70,8 +70,8 @@ const getGoogleExcelData = async (
     { cat: "other", start: 261, end: 302 },
   ];
   //TODO: iterate throu months and cats
-  for (let i = 0; i < listOfMonthsInt.length; i++) {
-    for (let j = 0; j < config.length; j++) {
+  for (let i = 0; i < listOfMonthsInt?.length; i++) {
+    for (let j = 0; j < config?.length; j++) {
       // console.log("Monat: ", listOfMonths[i], "Kategorie:", config[j].cat);
       const monthInt = listOfMonthsInt[i];
       const sheet = workbook.Sheets[workbook.SheetNames[monthInt]];
@@ -141,7 +141,7 @@ async function getDataObjects(sheet, start: number, end: number, cat: string) {
   );
   const textCostPairs = [];
 
-  for (let i = 0; i < costColumn.length; i++) {
+  for (let i = 0; i < costColumn?.length; i++) {
     const dateObj = dateColumn[i];
     const textObj = textColumn[i];
     const costObj = costColumn[i];
@@ -250,7 +250,7 @@ async function importCostDataFromGSXlsx(
     return splitCostList;
   }
 
-  for (let i = 0; i < data.length; i++) {
+  for (let i = 0; i < data?.length; i++) {
     const expenseObj = data[i];
     // if (i == 0) console.log("expenseObj", expenseObj);
 

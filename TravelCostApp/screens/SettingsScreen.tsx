@@ -73,7 +73,7 @@ const SettingsScreen = ({ navigation }) => {
   const [isRestoringPurchases, setIsRestoringPurchases] = useState(false);
   const [timeZoneString, setTimeZoneString] = useState("");
   const multiTraveller =
-    (tripCtx.travellers && tripCtx.travellers.length > 1) ?? false;
+    (tripCtx.travellers && tripCtx.travellers?.length > 1) ?? false;
   const [DEBUG_tripid, setDEBUG_tripid] = useState("");
   const [DEBUG_uid, setDEBUG_uid] = useState("");
 

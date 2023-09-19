@@ -97,7 +97,7 @@ async function getAllTextCostPairs(sheet, index: number) {
 
   const listOfCategoriesTextCostPairs = [];
 
-  for (let i = 0; i < config.length; i++) {
+  for (let i = 0; i < config?.length; i++) {
     const catRange = config[i];
     if (!(catRange && catRange.start && catRange.end && catRange.cat)) {
       console.log(" either no catRange, or no start end or category detected!");
@@ -139,7 +139,7 @@ async function getCatTextCostPairs(
   );
   const textCostPairs = [];
 
-  for (let i = 0; i < costColumn.length; i++) {
+  for (let i = 0; i < costColumn?.length; i++) {
     const textObj = textColumn[i];
     const costObj = costColumn[i];
     try {

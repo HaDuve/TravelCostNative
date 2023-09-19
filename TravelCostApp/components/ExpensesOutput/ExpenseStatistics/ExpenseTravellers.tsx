@@ -70,7 +70,7 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
   function getSumExpenses(expenses, traveller) {
     // return the sum of expenses for a given traveller
     const expensesSum = expenses.reduce((sum: number, expense: ExpenseData) => {
-      const hasSplits = expense.splitList && expense.splitList.length > 0;
+      const hasSplits = expense.splitList && expense.splitList?.length > 0;
       if (!hasSplits) {
         const correct = traveller == expense.whoPaid;
         if (!correct) return sum;
@@ -173,7 +173,7 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
   catSumCat.forEach((item) => {
     item.color = colorlist[color_i];
     color_i++;
-    if (color_i >= colorlist.length) {
+    if (color_i >= colorlist?.length) {
       color_i = 0;
     }
     dataList.push({ x: item.cat, y: item.sumCat, color: item.color });

@@ -134,7 +134,7 @@ const ExpenseForm = ({
     isEditing ? editingValues.country : userCtx.lastCountry
   );
   const [loadingTravellers, setLoadingTravellers] = useState(
-    !tripCtx.travellers && tripCtx.travellers.length < 1
+    !tripCtx.travellers && tripCtx.travellers?.length < 1
   );
 
   const [confirmedRange, setConfirmedRange] = useState(false);
@@ -201,7 +201,7 @@ const ExpenseForm = ({
   }, [isEditing, alwaysShowAdvancedSetting, iconName]);
 
   useEffect(() => {
-    if (!tripCtx.travellers || tripCtx.travellers.length < 1)
+    if (!tripCtx.travellers || tripCtx.travellers?.length < 1)
       setLoadingTravellers(true);
     async function asyncSetTravellers() {
       await tripCtx.fetchAndSetTravellers(tripCtx.tripid);
@@ -213,7 +213,7 @@ const ExpenseForm = ({
   useEffect(() => {
     // setlistequal with tripcontext.travellers
     if (tripCtx.travellers) setListEQUAL(tripCtx.travellers);
-  }, [tripCtx.travellers.length]);
+  }, [tripCtx.travellers?.length]);
 
   // datepicker states
   const [showDatePickerRange, setShowDatePickerRange] = useState(false);
@@ -426,7 +426,7 @@ const ExpenseForm = ({
     }
   }, [tripCtx.travellers, netCtx.strongConnection]);
 
-  const IsSoloTraveller = currentTravellers.length === 1;
+  const IsSoloTraveller = currentTravellers?.length === 1;
   const [currentTravellersAsItems, setCurrentTravellersAsItems] = useState(
     travellerToDropdown(currentTravellers)
   );
@@ -451,7 +451,7 @@ const ExpenseForm = ({
   );
   useEffect(() => {
     setSplitItemsEQUAL(currentTravellersAsItems);
-  }, [currentTravellersAsItems.length]);
+  }, [currentTravellersAsItems?.length]);
   const [openEQUAL, setOpenEQUAL] = useState(false);
   const [splitTravellersList, setListEQUAL] = useState(
     editingValues ? editingValues.listEQUAL : currentTravellers
@@ -492,7 +492,7 @@ const ExpenseForm = ({
         (expense) =>
           expense.date > DateTime.now().minus({ days: 500 }).toJSDate()
       ),
-    [expCtx.expenses.length]
+    [expCtx.expenses?.length]
   );
   // extract suggestions from all the descriptions of expense state into an array of strings
   const suggestionData = last500Daysexpenses.map(
@@ -638,7 +638,7 @@ const ExpenseForm = ({
       expenseData.amount > 0 &&
       expenseData.amount < 34359738368;
     const dateIsValid = expenseData.date?.toString() !== "Invalid Date";
-    const descriptionIsValid = expenseData.description.trim().length > 0;
+    const descriptionIsValid = expenseData.description.trim()?.length > 0;
     const whoPaidIsValid = true;
     const categoryIsValid = true;
     const countryIsValid = true;
@@ -1425,7 +1425,7 @@ const ExpenseForm = ({
                       horizontal={true}
                       contentContainerStyle={{
                         flex: 1,
-                        minWidth: splitList.length * 100 + 200,
+                        minWidth: splitList?.length * 100 + 200,
                         marginLeft: 8,
                         marginRight: 8,
                         justifyContent: "flex-start",

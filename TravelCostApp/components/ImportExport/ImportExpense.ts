@@ -7,7 +7,7 @@ export async function importExpenseFromXLSX(
   userName,
   addExpense
 ) {
-  for (let i = 0; i < excelData.length; i++) {
+  for (let i = 0; i < excelData?.length; i++) {
     const catArray = excelData[i];
     importCategory(catArray, uid, tripid, userName, addExpense);
   }
@@ -25,7 +25,7 @@ export async function importCategory(
   }
 
   const { DateTime } = require("luxon");
-  for (let i = 0; i < catArray.length; i++) {
+  for (let i = 0; i < catArray?.length; i++) {
     const expenseObj = catArray[i];
     //cat //cost //text
     // if text = newDate() then replace text with cat

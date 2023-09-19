@@ -100,7 +100,7 @@ const SplitSummaryScreen = ({ navigation }) => {
   );
 
   const getOpenSplits = useCallback(async () => {
-    if (expenses.length === 0) return;
+    if (expenses?.length === 0) return;
     if (!tripid) return;
     console.log("called getOpenSplits!");
     setIsFetching(true);
@@ -114,7 +114,7 @@ const SplitSummaryScreen = ({ navigation }) => {
       const temp = [];
       let userGetsBack = 0;
       let userHasToPay = 0;
-      for (let i = 0; i < response.length; i++) {
+      for (let i = 0; i < response?.length; i++) {
         const split: Split = response[i];
         const tempObj = {
           userName: split.userName,
@@ -153,7 +153,7 @@ const SplitSummaryScreen = ({ navigation }) => {
     isPaidDate,
     tripCurrency,
     tripid,
-    expenses.length,
+    expenses?.length,
     userName,
   ]);
 
@@ -164,7 +164,7 @@ const SplitSummaryScreen = ({ navigation }) => {
   const handleSimpflifySplits = useCallback(async () => {
     try {
       const simpleSplits = simplifySplits(splits);
-      if (simpleSplits.length === 0) {
+      if (simpleSplits?.length === 0) {
         Alert.alert("No Splits to Simplify");
         navigation.pop();
       }
@@ -186,7 +186,7 @@ const SplitSummaryScreen = ({ navigation }) => {
     } catch (error) {
       console.log("handleSimpflifySplits ~ error", error);
     }
-  }, [splits.length, subTitleSimplified]);
+  }, [splits?.length, subTitleSimplified]);
 
   function errorHandler() {
     setError(null);

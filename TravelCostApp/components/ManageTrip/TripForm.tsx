@@ -220,7 +220,7 @@ const TripForm = ({ navigation, route }) => {
   async function deleteAcceptHandler() {
     const trips = route.params.trips;
     console.log("deleteAcceptHandler ~ trips:", trips);
-    // if triplist.length == 1 await userCtx.setFreshlyCreatedTo(true);
+    // if triplist?.length == 1 await userCtx.setFreshlyCreatedTo(true);
     // await deleteTrip(editedTripId);
   }
   function deleteHandler() {
@@ -388,10 +388,10 @@ const TripForm = ({ navigation, route }) => {
 
     // Tripname should not be empty or spaces
     const tripNameIsValid =
-      tripData.tripName && tripData.tripName.trim().length > 0;
+      tripData.tripName && tripData.tripName.trim()?.length > 0;
     // tripCurrency should not be empty
     const tripCurrencyIsValid =
-      tripData.tripCurrency && tripData.tripCurrency.length > 0;
+      tripData.tripCurrency && tripData.tripCurrency?.length > 0;
     // Total budget should be a number between 0 and 3B
     const totalBudgetIsValid =
       !isNaN(+tripData.totalBudget) &&

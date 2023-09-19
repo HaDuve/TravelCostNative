@@ -30,7 +30,7 @@ export async function fetchAndSetExpenses(
     await unTouchTraveler(tripid, uid);
     let expenses = await getAllExpenses(tripid, uid);
     expenses = expenses.filter((expense) => !isNaN(Number(expense.calcAmount)));
-    if (expenses && expenses.length !== 0) {
+    if (expenses && expenses?.length !== 0) {
       expensesCtx.setExpenses(expenses);
       const expensesSum = expenses.reduce((sum, expense) => {
         return sum + expense.calcAmount;

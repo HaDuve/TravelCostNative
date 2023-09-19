@@ -234,7 +234,7 @@ function UserContextProvider({ children }) {
   }
   function setUserName(name: string) {
     // console.log("setUserName ~ name", name);
-    if (!name || name.length < 1) return;
+    if (!name || name?.length < 1) return;
     setName(name);
   }
 

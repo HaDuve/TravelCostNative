@@ -33,7 +33,7 @@ const FilteredExpenses = ({
     : route.params;
   const withArgs = expensesAsArg ? true : false;
 
-  if (!expenses || expenses.length < 1) {
+  if (!expenses || expenses?.length < 1) {
     Toast.show({
       type: "error",
       text1: `${i18n.t("noExpensesText")} ${dayString}`,

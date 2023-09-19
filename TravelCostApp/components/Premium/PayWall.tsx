@@ -47,7 +47,7 @@ const PaywallScreen = ({ navigation }) => {
         const offerings = await Purchases.getOfferings();
         if (
           offerings.current !== null &&
-          offerings.current.availablePackages.length !== 0
+          offerings.current.availablePackages?.length !== 0
         ) {
           // log available packages duration
           console.log(

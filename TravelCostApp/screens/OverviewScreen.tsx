@@ -118,7 +118,7 @@ const OverviewScreen = ({ navigation }) => {
     expensesSum,
     tripCtx.tripCurrency
   );
-  const isLongNumber = expensesSumString.length > 10;
+  const isLongNumber = expensesSumString?.length > 10;
   const { fontScale } = useWindowDimensions();
   const isScaledUp = fontScale > 1;
   const useMoreSpace = isScaledUp || isLongNumber;

@@ -19,7 +19,7 @@ export function recalcSplitsLinearly(splitList: Split[], amount: number) {
     0
   );
   const totalSplitAmount =
-    splitList.length > 0 ? totalAmount / splitList.length : 0;
+    splitList?.length > 0 ? totalAmount / splitList?.length : 0;
 
   // Calculate the rest that needs to be split up
   const rest = amount - totalAmount;
@@ -33,14 +33,14 @@ export function recalcSplitsLinearly(splitList: Split[], amount: number) {
   const adjustmentFactor = (totalAmount + rest) / totalAmount;
 
   // Apply the adjustment factor to each split
-  for (let i = 0; i < splitList.length; i++) {
+  for (let i = 0; i < splitList?.length; i++) {
     const split = splitList[i];
     split.amount = Number(Number(split.amount) * adjustmentFactor).toFixed(2);
   }
 
   // If the adjustment resulted in any negative amounts, distribute the difference among all splits
   const negativeSplits = splitList.filter((split) => Number(split.amount) < 0);
-  if (negativeSplits.length > 0) {
+  if (negativeSplits?.length > 0) {
     const negativeAmount = negativeSplits.reduce(
       (sum, split) => sum + Number(split.amount),
       0
@@ -53,7 +53,7 @@ export function recalcSplitsLinearly(splitList: Split[], amount: number) {
       0
     );
     const adjustmentFactor = (positiveAmount + negativeAmount) / positiveAmount;
-    for (let i = 0; i < splitList.length; i++) {
+    for (let i = 0; i < splitList?.length; i++) {
       const split = splitList[i];
       if (Number(split.amount) > 0) {
         split.amount = Number(Number(split.amount) * adjustmentFactor).toFixed(
@@ -69,7 +69,7 @@ export function recalcSplitsLinearly(splitList: Split[], amount: number) {
 export function recalcSplitsForExact(splitList: Split[], amount: number) {
   console.log("recalcSplitsForExact ~ splitList:", splitList);
 
-  const numberOfTravellers = splitList.length;
+  const numberOfTravellers = splitList?.length;
   const splitAmountNorm = amount / numberOfTravellers;
   const splitRest =
     amount - splitList.reduce((sum, split) => sum + Number(split.amount), 0);
@@ -78,7 +78,7 @@ export function recalcSplitsForExact(splitList: Split[], amount: number) {
 
   // Count the number of travellers without a split amount
   const travellersWithoutSplit = splitList.filter((split) => !split.amount);
-  const numberOfTravellersWithoutSplit = travellersWithoutSplit.length;
+  const numberOfTravellersWithoutSplit = travellersWithoutSplit?.length;
 
   if (numberOfTravellersWithoutSplit === 0) {
     // Find all splits with amount equal to splitAmountNorm
@@ -87,8 +87,8 @@ export function recalcSplitsForExact(splitList: Split[], amount: number) {
     );
 
     // Split the rest equally among all splits with norm amount
-    if (splitsWithNormAmount.length > 0) {
-      const splitAmount = splitRest / splitsWithNormAmount.length;
+    if (splitsWithNormAmount?.length > 0) {
+      const splitAmount = splitRest / splitsWithNormAmount?.length;
       splitsWithNormAmount.forEach((split) => {
         split.amount = (Number(split.amount) + splitAmount).toFixed(2);
       });
@@ -96,16 +96,16 @@ export function recalcSplitsForExact(splitList: Split[], amount: number) {
       const splitsWithDecimalAmount = splitList.filter((split) =>
         /\.\d{2}$/.test(split.amount)
       );
-      if (splitsWithDecimalAmount.length > 0) {
+      if (splitsWithDecimalAmount?.length > 0) {
         splitsWithDecimalAmount.forEach((split) => {
           split.amount = Number(
-            Number(split.amount) + splitRest / splitsWithDecimalAmount.length
+            Number(split.amount) + splitRest / splitsWithDecimalAmount?.length
           ).toFixed(2);
         });
       } else {
         splitList.forEach((split) => {
           split.amount = Number(
-            Number(split.amount) + splitRest / splitList.length
+            Number(split.amount) + splitRest / splitList?.length
           ).toFixed(2);
         });
       }
@@ -133,9 +133,9 @@ export function calcSplitList(
     Number.isNaN(Number(amount)) ||
     !whoPaid ||
     !splitTravellers ||
-    splitTravellers.length < 1
+    splitTravellers?.length < 1
   ) {
-    console.log("splitTravellers.length:", splitTravellers.length);
+    console.log("splitTravellers?.length:", splitTravellers?.length);
     console.log("splitTravellers:", splitTravellers);
     console.log("whoPaid:", whoPaid);
     console.log("splitType:", splitType);
@@ -149,7 +149,7 @@ export function calcSplitList(
     case "SELF":
       return splitList;
     case "EQUAL": {
-      const splitAmount = amount / splitTravellers.length;
+      const splitAmount = amount / splitTravellers?.length;
       splitTravellers.forEach((traveller) => {
         splitList.push({
           userName: traveller,
@@ -159,8 +159,8 @@ export function calcSplitList(
       return splitList;
     }
     case "EXACT":
-      if (!splitList || splitList.length < 1) {
-        const splitAmount = amount / splitTravellers.length;
+      if (!splitList || splitList?.length < 1) {
+        const splitAmount = amount / splitTravellers?.length;
         splitTravellers.forEach((traveller) => {
           splitList.push({
             userName: traveller,
@@ -173,8 +173,8 @@ export function calcSplitList(
       break;
     case "PERCENT":
       {
-        if (!splitList || splitList.length < 1) {
-          const splitAmount = 100 / splitTravellers.length;
+        if (!splitList || splitList?.length < 1) {
+          const splitAmount = 100 / splitTravellers?.length;
           splitTravellers.forEach((traveller) => {
             splitList.push({
               userName: traveller,
@@ -196,7 +196,7 @@ export function validateSplitList(
   splitType: splitType,
   amount: number
 ) {
-  if (!splitList || !splitType || !amount || splitList.length < 1) return;
+  if (!splitList || !splitType || !amount || splitList?.length < 1) return;
   switch (splitType) {
     case "SELF":
       break;
@@ -204,7 +204,7 @@ export function validateSplitList(
       break;
     case "EXACT": {
       // check if any split.amount are empty, NaN or negative
-      for (let i = 0; i < splitList.length; i++) {
+      for (let i = 0; i < splitList?.length; i++) {
         const split = splitList[i];
         const splitAmount = Number(split.amount);
         if (!splitAmount || splitAmount < 0 || Number.isNaN(splitAmount)) {
@@ -283,7 +283,7 @@ export async function calcOpenSplitsTable(
   let expenses = [];
   const rates = {};
   rates[tripCurrency] = 1;
-  if (givenExpenses && givenExpenses.length > 0) {
+  if (givenExpenses && givenExpenses?.length > 0) {
     expenses = JSON.parse(JSON.stringify(givenExpenses));
   } else {
     try {
@@ -291,7 +291,7 @@ export async function calcOpenSplitsTable(
     } catch (error) {
       console.log(error);
     }
-    if (!expenses || expenses.length < 1) {
+    if (!expenses || expenses?.length < 1) {
       console.log("no expenses!");
       return;
     }
@@ -346,8 +346,8 @@ export async function calcOpenSplitsTable(
     }
   };
   await asyncSplitList();
-  console.log(openSplits.length, "openSplits");
-  if (openSplits.length < 1) {
+  console.log(openSplits?.length, "openSplits");
+  if (openSplits?.length < 1) {
     return openSplits;
   }
   openSplits = sumUpSamePairs(openSplits);
@@ -411,7 +411,7 @@ function sumUpSamePairs(openSplits) {
   console.log("sumUpSamePairs ~ sumUpSamePairs:", sumUpSamePairs);
   // add up all the sums of the same payer and debtor pair
 
-  if (!openSplits || openSplits.length < 1) return;
+  if (!openSplits || openSplits?.length < 1) return;
   const listOfSums = [];
   openSplits.forEach((split) => {
     if (

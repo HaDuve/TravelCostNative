@@ -112,7 +112,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
     userData.userName = inputs.userName.value;
 
     const invalid =
-      userData.userName.length == 0 || userData.userName.length > 20;
+      userData.userName?.length == 0 || userData.userName?.length > 20;
 
     if (invalid) {
       return;

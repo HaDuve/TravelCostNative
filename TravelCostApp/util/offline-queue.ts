@@ -230,8 +230,8 @@ export const sendOfflineQueue = async () => {
   // global.sendingOfflineQueue = true;
   // try {
   const offlineQueue = (await secureStoreGetObject("offlineQueue")) || [];
-  if (offlineQueue && offlineQueue.length > 0) {
-    // console.log("queue length", offlineQueue.length);
+  if (offlineQueue && offlineQueue?.length > 0) {
+    // console.log("queue length", offlineQueue?.length);
     const forceOffline = !Device.isDevice && DEBUG_FORCE_OFFLINE;
     const isOnline = await NetInfo.fetch();
     // console.log("update connected =", isOnline);
@@ -261,7 +261,7 @@ export const sendOfflineQueue = async () => {
     let i = 0;
     let tripid = "";
 
-    while (i < offlineQueue.length) {
+    while (i < offlineQueue?.length) {
       const item = offlineQueue[i];
       tripid = item.expense.tripid;
 
@@ -278,7 +278,7 @@ export const sendOfflineQueue = async () => {
           );
           item.expense.id = id;
           // change item.expense.id for every other item.type == "update" or "delete" in the queue
-          for (let j = i + 1; j < offlineQueue.length - i; j++) {
+          for (let j = i + 1; j < offlineQueue?.length - i; j++) {
             const item2 = offlineQueue[j];
             if (!item2 || item2.expense.id !== oldId || item2.type === "add")
               continue;
@@ -315,13 +315,13 @@ export const sendOfflineQueue = async () => {
     console.log("sendOfflineQueue ~ remainingItems:", remainingItems);
     await secureStoreSetObject("offlineQueue", remainingItems);
     Toast.hide();
-    if (processedItems.length > 0) {
+    if (processedItems?.length > 0) {
       await touchAllTravelers(tripid, true);
       Toast.show({
         type: "success",
         text1: i18n.t("toastSyncFinished1"),
-        text2: `${i18n.t("toastSyncFinished21")} ${processedItems.length}/${
-          offlineQueue.length
+        text2: `${i18n.t("toastSyncFinished21")} ${processedItems?.length}/${
+          offlineQueue?.length
         } ${i18n.t("toastSyncFinished22")}`,
       });
     }

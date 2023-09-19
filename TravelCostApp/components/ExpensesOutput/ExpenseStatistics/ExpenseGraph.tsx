@@ -122,7 +122,7 @@ const ExpenseGraph = ({
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
-              if (!filteredExpenses || filteredExpenses.length === 0) return;
+              if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
                 dayString: dayString,
@@ -137,7 +137,7 @@ const ExpenseGraph = ({
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
-              if (!filteredExpenses || filteredExpenses.length === 0) return;
+              if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
                 dayString: dayString,
@@ -226,7 +226,7 @@ const ExpenseGraph = ({
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
-              if (!filteredExpenses || filteredExpenses.length === 0) return;
+              if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
                 dayString: weekString,
@@ -241,7 +241,7 @@ const ExpenseGraph = ({
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
-              if (!filteredExpenses || filteredExpenses.length === 0) return;
+              if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
                 dayString: weekString,
@@ -320,7 +320,7 @@ const ExpenseGraph = ({
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
-              if (!filteredExpenses || filteredExpenses.length === 0) return;
+              if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
                 dayString: month,
@@ -335,7 +335,7 @@ const ExpenseGraph = ({
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
-              if (!filteredExpenses || filteredExpenses.length === 0) return;
+              if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
                 dayString: month,
@@ -418,7 +418,7 @@ const ExpenseGraph = ({
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
-              if (!filteredExpenses || filteredExpenses.length === 0) return;
+              if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
                 dayString: yearString,
@@ -433,7 +433,7 @@ const ExpenseGraph = ({
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
-              if (!filteredExpenses || filteredExpenses.length === 0) return;
+              if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
                 dayString: yearString,

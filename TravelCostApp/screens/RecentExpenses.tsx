@@ -153,7 +153,7 @@ function RecentExpenses({ navigation }) {
     // check if we have a offline queue
     const offlineQueue = await getOfflineQueue();
     // if we have a offline queue return
-    if (offlineQueue && offlineQueue.length > 0) {
+    if (offlineQueue && offlineQueue?.length > 0) {
       setRefreshing(false);
       return;
     }
@@ -194,7 +194,7 @@ function RecentExpenses({ navigation }) {
       if (
         !loadedOnce &&
         expensesCtx.expenses &&
-        expensesCtx.expenses.length > 0
+        expensesCtx.expenses?.length > 0
       ) {
         await getExpenses(true, true, true);
         setLoadedOnce(true);
@@ -212,7 +212,7 @@ function RecentExpenses({ navigation }) {
   useEffect(() => {
     async function setTravellers() {
       if (netCtx.isConnected && netCtx.strongConnection) {
-        if (tripCtx.travellers && tripCtx.travellers.length > 1) return;
+        if (tripCtx.travellers && tripCtx.travellers?.length > 1) return;
         try {
           await tripCtx.fetchAndSetTravellers(tripCtx.tripid);
         } catch (error) {
@@ -237,7 +237,7 @@ function RecentExpenses({ navigation }) {
       // check offlinemode
       const online = netCtx.isConnected && netCtx.strongConnection;
       const offlineQueue = await asyncStoreGetObject("offlineQueue");
-      const queueBlocked = offlineQueue && offlineQueue.length > 0;
+      const queueBlocked = offlineQueue && offlineQueue?.length > 0;
       if (!online || queueBlocked) {
         // if online, send offline queue
         if (online) {
@@ -316,7 +316,7 @@ function RecentExpenses({ navigation }) {
 
   const getRecentExpenses = useMemo(
     () => expensesCtx.getRecentExpenses(PeriodValue),
-    [expensesCtx.expenses.length, PeriodValue, today]
+    [expensesCtx.expenses?.length, PeriodValue, today]
   );
   const recentExpenses = getRecentExpenses;
 
@@ -326,14 +326,14 @@ function RecentExpenses({ navigation }) {
         if (isNaN(Number(expense.calcAmount))) return sum;
         return sum + Number(expense.calcAmount);
       }, 0),
-    [recentExpenses.length]
+    [recentExpenses?.length]
   );
   const expensesSum = useMemo(getExpensesSum, [getExpensesSum]);
   const expensesSumString = formatExpenseWithCurrency(
     expensesSum,
     tripCtx.tripCurrency
   );
-  const isLongNumber = expensesSumString.length > 10;
+  const isLongNumber = expensesSumString?.length > 10;
   const { fontScale } = useWindowDimensions();
   const isScaledUp = fontScale > 1;
   const useMoreSpace = isScaledUp || isLongNumber;

@@ -112,7 +112,7 @@ const ExpenseCategories = ({ expenses, periodName, navigation }) => {
   catSumCat.forEach((item) => {
     item.color = colorlist[color_i];
     color_i++;
-    if (color_i >= colorlist.length) {
+    if (color_i >= colorlist?.length) {
       color_i = 0;
     }
     dataList.push({ x: item.cat, y: item.sumCat, color: item.color });

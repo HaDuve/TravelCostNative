@@ -77,10 +77,10 @@ const FilteredPieCharts = ({ navigation, route }) => {
       ></FilteredExpenses>
     ),
   ];
-  if (contents.length !== titleStrings.length)
+  if (contents?.length !== titleStrings?.length)
     throw new Error("Lengths do not match");
-  let contentsMaxIndex = titleStrings.length - 1;
-  if (noList) contentsMaxIndex = titleStrings.length - 2;
+  let contentsMaxIndex = titleStrings?.length - 1;
+  if (noList) contentsMaxIndex = titleStrings?.length - 2;
   console.log("FilteredPieCharts ~ CONTENTS_MAX_INDEX:", contentsMaxIndex);
 
   const nextHandler = async () => {

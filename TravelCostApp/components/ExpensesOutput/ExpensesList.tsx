@@ -105,7 +105,7 @@ function ExpensesList({
   const CONTENT_OFFSET_THRESHOLD = 300;
   const showScrollToTop = contentVerticalOffset > CONTENT_OFFSET_THRESHOLD;
 
-  if (expenses.length < 6) addShadowItemsToExpenses(expenses);
+  if (expenses?.length < 6) addShadowItemsToExpenses(expenses);
 
   const forceCloseRow = useCallback(
     (index) => {
@@ -176,7 +176,7 @@ function ExpensesList({
           autoHide: false,
         });
         const allExpenses = await getAllExpenses(tripID);
-        for (let i = 0; i < allExpenses.length; i++) {
+        for (let i = 0; i < allExpenses?.length; i++) {
           const expense = allExpenses[i];
           if (expense?.rangeId == item?.rangeId) {
             const queueItem: OfflineQueueManageExpenseItem = {
@@ -485,7 +485,7 @@ function ExpensesList({
 
   const scrollTo = useCallback(
     (index: number, animated = true) => {
-      if (!flatListRef.current || index > expenses.length + 1) return;
+      if (!flatListRef.current || index > expenses?.length + 1) return;
       if (flatListRef.current) {
         flatListRef.current.scrollToIndex({
           index: index,
@@ -493,7 +493,7 @@ function ExpensesList({
         });
       }
     },
-    [expenses.length]
+    [expenses?.length]
   );
   const scrollToTopHandler = useCallback(() => {
     scrollTo(1);
@@ -516,13 +516,13 @@ function ExpensesList({
   const selectAll = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     requestAnimationFrame(() => {
-      if (selected.length === expenses.length) {
+      if (selected?.length === expenses?.length) {
         setSelected([]);
       } else {
         setSelected(expenses.map((item) => item.id));
       }
     });
-  }, [expenses.length, selected.length]);
+  }, [expenses?.length, selected?.length]);
 
   // function moveExpensesToTrip() {
   //   if (selected.length === 0) return;
@@ -541,14 +541,14 @@ function ExpensesList({
     );
     navigation.navigate("FilteredPieCharts", {
       expenses: finderExpenses,
-      dayString: `${finderExpenses.length} selected Expenses from ${periodName}`,
+      dayString: `${finderExpenses?.length} selected Expenses from ${periodName}`,
       noList: true,
     });
-  }, [expenses.length, periodName, selected.length]);
+  }, [expenses?.length, periodName, selected?.length]);
 
   const deleteSelected = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (selected.length === 0) return;
+    if (selected?.length === 0) return;
     Alert.alert(
       `Delete selected expenses?`,
       `This will delete all selected entries!`,
@@ -576,7 +576,7 @@ function ExpensesList({
                 text2: i18n.t("toastDeleting2"),
                 autoHide: false,
               });
-              for (let i = 0; i < selected.length; i++) {
+              for (let i = 0; i < selected?.length; i++) {
                 const expenseItem = expenses.find(
                   (item) => item.id === selected[i]
                 );
@@ -613,7 +613,7 @@ function ExpensesList({
         },
       ]
     );
-  }, [expenses.length, isOnline, selected.length, tripID]);
+  }, [expenses?.length, isOnline, selected?.length, tripID]);
 
   const selectPressHandler = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -632,7 +632,7 @@ function ExpensesList({
 
   const listHeaderJSX = useMemo(() => {
     return (
-      expenses.length < MAX_EXPENSES && (
+      expenses?.length < MAX_EXPENSES && (
         <View
           style={{
             paddingRight: 20,
@@ -648,7 +648,7 @@ function ExpensesList({
                 icon={"ios-trash-outline"}
                 size={24}
                 color={
-                  selected.length > 0
+                  selected?.length > 0
                     ? GlobalStyles.colors.gray700
                     : GlobalStyles.colors.gray600
                 }
@@ -662,7 +662,7 @@ function ExpensesList({
                 icon={"pie-chart-outline"}
                 size={24}
                 color={
-                  selected.length > 0
+                  selected?.length > 0
                     ? GlobalStyles.colors.gray700
                     : GlobalStyles.colors.gray600
                 }
@@ -674,7 +674,7 @@ function ExpensesList({
             <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
               <IconButton
                 icon={
-                  selected.length > 0
+                  selected?.length > 0
                     ? "close-outline"
                     : "checkmark-done-outline"
                 }
@@ -695,7 +695,7 @@ function ExpensesList({
     );
   }, [
     selectable,
-    selected.length,
+    selected?.length,
     deleteSelected,
     finderWithExpenses,
     selectAll,
@@ -739,7 +739,7 @@ function ExpensesList({
           selected,
           selectItem,
           setSelectable,
-          expenses.length
+          expenses?.length
         )}
         ListFooterComponent={
           <View style={{ height: Dimensions.get("screen").height / 1.8 }} />

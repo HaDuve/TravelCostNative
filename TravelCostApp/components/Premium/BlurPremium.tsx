@@ -51,7 +51,7 @@ const BlurPremium = ({ canBack = false }) => {
   ];
 
   async function increaseIntensity() {
-    for (let i = 0; i < timeSteps.length; i++) {
+    for (let i = 0; i < timeSteps?.length; i++) {
       const sleepTime = timeSteps[i];
       await sleep(sleepTime);
       setBlurIntensity(blurIntensity + blurIntensities[i]);

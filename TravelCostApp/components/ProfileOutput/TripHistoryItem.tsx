@@ -161,7 +161,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
 
   const { fontScale } = useWindowDimensions();
   const megaLongText =
-    dailyBudgetString.length + sumOfExpensesString.length > 22;
+    dailyBudgetString?.length + sumOfExpensesString?.length > 22;
   const isScaledUp = fontScale > 1 || megaLongText;
   // console.log("TripHistoryItem ~ isScaledUp:", isScaledUp);
 

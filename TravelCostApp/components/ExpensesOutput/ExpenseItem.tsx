@@ -66,7 +66,7 @@ function ExpenseItem(props): JSX.Element {
   let travellerSumString = "";
 
   // if showSumForTravellerName is set, show the sum of the expense for only this traveller
-  if (splitList && splitList.length > 0 && showSumForTravellerName) {
+  if (splitList && splitList?.length > 0 && showSumForTravellerName) {
     splitList.forEach((split) => {
       if (split.userName === showSumForTravellerName) {
         calcTravellerSum.current += Number(split.amount) * rate;
@@ -150,15 +150,15 @@ function ExpenseItem(props): JSX.Element {
     (item) => item.amount !== 0
   );
   const islongListOrNull =
-    splitList && splitList.length > 3 && splitListHasNonZeroEntries
+    splitList && splitList?.length > 3 && splitListHasNonZeroEntries
       ? splitList.slice(0, 2)
       : null;
   const longList = islongListOrNull ? [...islongListOrNull] : null;
-  longList?.push({ userName: `+${splitList.length - 2}`, amount: 0 });
+  longList?.push({ userName: `+${splitList?.length - 2}`, amount: 0 });
 
   const sharedList = useCallback(
     () =>
-      splitList && splitList.length > 0 ? (
+      splitList && splitList?.length > 0 ? (
         <View style={{ overflow: "visible" }}>
           <FlatList
             scrollEnabled={false}

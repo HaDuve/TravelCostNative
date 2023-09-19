@@ -45,7 +45,7 @@ const ProfileScreen = ({ navigation }) => {
     setTripHistory(userCtx.tripHistory);
     async function fetchHistory() {
       console.log("fetchHistory ~ fetchHistory:", fetchHistory);
-      if (!userCtx.tripHistory || userCtx.tripHistory.length < 1) {
+      if (!userCtx.tripHistory || userCtx.tripHistory?.length < 1) {
         const uid = await secureStoreGetItem("uid");
         console.log("fetch ~ uid:", uid);
         if (!uid) return;
@@ -60,7 +60,7 @@ const ProfileScreen = ({ navigation }) => {
     }
     // console.log("useEffect ~ userCtx.tripHistory:", userCtx.tripHistory);
     fetchHistory();
-  }, [userCtx.tripHistory.length, uid, tripCtx.tripid]);
+  }, [userCtx.tripHistory?.length, uid, tripCtx.tripid]);
 
   useInterval(
     () => {

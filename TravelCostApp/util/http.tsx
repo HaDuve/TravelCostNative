@@ -25,7 +25,7 @@ export function setAxiosAccessToken(token: string) {
     "setAxiosAccessToken ~ setAxiosAccessToken",
     truncateString(token, 5)
   );
-  if (!token || token.length < 2) {
+  if (!token || token?.length < 2) {
     console.error("https: ~ wrong token error");
     global.QPAR = "";
     return;
@@ -474,7 +474,7 @@ export async function getTravellers(tripid: string) {
         !travellerids.includes(uid) &&
         !travelerNames.includes(travelerName) &&
         travelerName &&
-        travelerName.length > 0
+        travelerName?.length > 0
       ) {
         travellerids.push(uid);
         travelerNames.push(travelerName);
@@ -493,7 +493,7 @@ export async function getUIDs(tripid: string) {
     const travellerids: string[] = [];
     for (const key in response) {
       const uid = response[key].uid;
-      if (!travellerids.includes(uid) && uid && uid.length > 0) {
+      if (!travellerids.includes(uid) && uid && uid?.length > 0) {
         travellerids.push(uid);
       }
     }
@@ -507,7 +507,7 @@ export async function getAllExpenses(tripid: string, uid?: string) {
   // console.log("~~ https: ~ getAllExpenses ~ tripid", tripid);
   // console.log("~~ https: ~ getAllExpenses ~ uid", uid);
   const uids = await getUIDs(tripid);
-  if (uids.length < 1) uids.push(uid);
+  if (uids?.length < 1) uids.push(uid);
   const expenses = await fetchExpensesWithUIDs(tripid, uids);
   return expenses;
 }

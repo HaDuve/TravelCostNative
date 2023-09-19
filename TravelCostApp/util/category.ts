@@ -129,7 +129,7 @@ export function mapDescriptionToCategory(
 ) {
   if (!description) return "";
   if (!categories) return "";
-  if (description.length < 3) return "";
+  if (description?.length < 3) return "";
   const descriptionWords = description.trim().toLowerCase().split(" ");
 
   // check if the description contains a keyword of a category

@@ -83,7 +83,7 @@ export async function asyncStoreSafeClear() {
   }
   // remove all keys except the keys which have a neverDelete prefix
   keys = keys.filter((key) => {
-    for (let i = 0; i < neverDelete.length; i++) {
+    for (let i = 0; i < neverDelete?.length; i++) {
       if (key.startsWith(neverDelete[i])) {
         return false;
       }

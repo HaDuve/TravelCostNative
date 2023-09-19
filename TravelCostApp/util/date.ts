@@ -17,7 +17,7 @@ import {
 export type DateOrDateTime = Date | DateTime;
 
 export function getFormattedDate(date: DateOrDateTime) {
-  if (!date || date.toString().length < 1) return "";
+  if (!date || date?.toString()?.length < 1) return "";
   if (date instanceof DateTime) {
     return _getFormattedDate(date);
   }
@@ -98,13 +98,13 @@ export function toDayMonthString2(
   ];
 
   let day1 = date1.getDate().toString();
-  if (day1.length < 2) day1 = `${day1.toString()} `;
+  if (day1?.length < 2) day1 = `${day1.toString()} `;
 
   const monthIndex1 = date1.getMonth();
   const monthName1 = monthNames[monthIndex1];
 
   let day2 = date2.getDate().toString();
-  if (day2.length < 2) day2 = `${day2.toString()} `;
+  if (day2?.length < 2) day2 = `${day2.toString()} `;
 
   const monthIndex2 = date2.getMonth();
   const monthName2 = monthNames[monthIndex2];

@@ -56,8 +56,8 @@ export function formatExpenseWithCurrency(
 }
 
 export function truncateString(str: string, n: number) {
-  if (!str || str.length < 1 || n < 1) return "";
-  return str.length > n ? str.slice(0, n - 1) + "..." : str;
+  if (!str || str?.length < 1 || n < 1) return "";
+  return str?.length > n ? str.slice(0, n - 1) + "..." : str;
 }
 
 export function truncateNumber(

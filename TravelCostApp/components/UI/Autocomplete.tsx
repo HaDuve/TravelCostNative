@@ -39,7 +39,7 @@ const Autocomplete = ({
     <View style={[containerStyle]}>
       <TextInput
         onFocus={() => {
-          if (value.length === 0) {
+          if (value?.length === 0) {
             setMenuVisible(true);
           }
         }}
@@ -59,9 +59,9 @@ const Autocomplete = ({
         selectionColor={GlobalStyles.colors.primary700}
         onChangeText={(text) => {
           origOnChange(text);
-          if (text && text.length > 0) {
+          if (text && text?.length > 0) {
             setFilteredData(filterData(text));
-          } else if (text && text.length === 0) {
+          } else if (text && text?.length === 0) {
             setFilteredData(data);
           }
           setMenuVisible(true);

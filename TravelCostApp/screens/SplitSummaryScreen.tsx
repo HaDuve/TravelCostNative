@@ -298,7 +298,7 @@ const SplitSummaryScreen = ({ navigation }) => {
               // if yes, call settleSplitsHandler
               Alert.alert(
                 "Settle Splits",
-                "Are you sure you want to settle all splits? Has everyone gotten their money back? (Because of technical issues, this will currently only settle splits from Today or Before, not splits from the future!)",
+                "Are you sure you want to settle all splits? Has everyone gotten their money back? (This will only settle splits from Today or Before, but not open splits from the future!)",
                 [
                   {
                     text: "Cancel",
@@ -314,7 +314,6 @@ const SplitSummaryScreen = ({ navigation }) => {
           >
             Settle Splits
           </GradientButton>
-          <BlurPremium></BlurPremium>
         </View>
       </Animated.View>
     </View>

@@ -183,6 +183,13 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
 
   return (
     <View style={styles.form}>
+      {userCtx.freshlyCreated && (
+        <View style={styles.welcomeTextBar}>
+          <Text style={styles.welcomeText}>
+            {`Welcome ${inputs.userName.value}!`}
+          </Text>
+        </View>
+      )}
       <View style={styles.avatarBar}>
         <Pressable onPress={avatarHandler}>
           <View style={styles.avatar}>
@@ -220,6 +227,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1,
     maxWidth: "40%",
+  },
+  welcomeTextBar: {
+    marginTop: "2%",
+    marginHorizontal: "4%",
+    padding: "1%",
+    minHeight: "5%",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  welcomeText: {
+    fontSize: 36,
+    fontWeight: "bold",
+    color: GlobalStyles.colors.primary700,
   },
   avatarBar: {
     marginTop: "2%",

@@ -12,6 +12,10 @@ export async function asyncStoreSetItem(
   key: string,
   value: string | number | boolean
 ) {
+  if (!value) {
+    await AsyncStorage.removeItem(key);
+    return;
+  }
   // console.log("attempting save in Memory > ", key + ": " + value);
   if (typeof value !== "string") {
     value = value.toString();
@@ -30,6 +34,10 @@ export async function asyncStoreSetItem(
  * @param value The value of the object to be stored
  */
 export async function asyncStoreSetObject(key: string, value: unknown) {
+  if (!value) {
+    await AsyncStorage.removeItem(key);
+    return;
+  }
   try {
     const jsonValue = JSON.stringify(value);
     await AsyncStorage.setItem(key, jsonValue);

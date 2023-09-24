@@ -332,7 +332,7 @@ const FinderScreen = () => {
           </GradientButton>
         </View>
       </View>
-      <BlurPremium />
+      {/* <BlurPremium /> */}
     </>
   );
 };

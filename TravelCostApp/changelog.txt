@@ -1,5 +1,22 @@
 Change log Travel Expense App
 
+1.2.670
+- fixed login and signup error handling
+- fixed login error
+- dont show onboarding after every logout anymore
+- improved styling
+- removed endless loading in split summary
+- added a Welcome! text for freshly created accounts
+- prevented async store errors that could lead to crash
+- removed blur premium wall from finder (partially usable now)
+- correctly re-added chatGPT behind premium wall
+
+1.2.666
+- prevented possible crashes
+- fixed expenses not updating after midnight
+- improved invalid add expenses button ("!" -> loading spinner)
+- improved customer screen
+
 1.2.664
 - hotfixed settle split not saving online
 - fixed android ugly buttons on splitsummary

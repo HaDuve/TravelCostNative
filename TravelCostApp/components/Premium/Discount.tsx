@@ -5,7 +5,9 @@ import PropTypes from "prop-types";
 const Discount = ({ discountPercentage, style }) => {
   return (
     <View style={[styles.container, style]}>
-      <Text style={styles.discountText}>{discountPercentage}% Discount!</Text>
+      <Text style={styles.discountText}>
+        Save {discountPercentage}% to Monthly!
+      </Text>
     </View>
   );
 };
@@ -24,11 +26,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     // backgroundColor: "white",
     //rotate
-    transform: [{ rotate: "25deg" }],
+    transform: [{ rotate: "22deg" }],
     padding: 4,
     position: "absolute",
-    top: "-30%",
-    left: "61%",
+    top: "-40%",
+    left: "41%",
   },
   discountText: {
     fontSize: 20,

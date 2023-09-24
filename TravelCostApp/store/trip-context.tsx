@@ -150,7 +150,7 @@ function TripContextProvider({ children }) {
   async function fetchAndSetTravellers(tripid: string) {
     const { isFastEnough } = await isConnectionFastEnough();
     if (!isFastEnough) return;
-    if (tripid === "") {
+    if (!tripid || tripid === "") {
       setTravellers([]);
       return false;
     }

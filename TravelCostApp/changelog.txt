@@ -2,6 +2,7 @@ Change log Travel Expense App
 
 1.2.671
 - improved discount text
+
 1.2.670
 - fixed login and signup error handling
 - fixed login error

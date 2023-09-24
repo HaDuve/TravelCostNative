@@ -23,6 +23,7 @@ import { GlobalStyles } from "../constants/styles";
 import { Image } from "react-native";
 import InfoButton from "../components/UI/InfoButton";
 import GradientButton from "../components/UI/GradientButton";
+import BlurPremium from "../components/Premium/BlurPremium";
 
 const GPTDealScreen = ({ route, navigation }) => {
   const { price, currency, country, product } = route.params;
@@ -113,30 +114,35 @@ const GPTDealScreen = ({ route, navigation }) => {
         </View>
       </View>
 
-      <View style={[styles.answerContainer, GlobalStyles.strongShadow]}>
-        <ScrollView>
-          {isFetching && (
-            <View style={[styles.loadingContainer, GlobalStyles.strongShadow]}>
-              <LoadingBarOverlay
-                customText={i18n.t("askingChatGpt")}
-              ></LoadingBarOverlay>
-            </View>
+      <View style={styles.contentContainer}>
+        <View style={[styles.answerContainer, GlobalStyles.strongShadow]}>
+          <ScrollView>
+            {isFetching && (
+              <View
+                style={[styles.loadingContainer, GlobalStyles.strongShadow]}
+              >
+                <LoadingBarOverlay
+                  customText={i18n.t("askingChatGpt")}
+                ></LoadingBarOverlay>
+              </View>
+            )}
+            {!isFetching && <Text style={[styles.answerText]}>{answer}</Text>}
+          </ScrollView>
+        </View>
+        <View style={styles.buttonContainer}>
+          <FlatButton onPress={() => navigation.pop()}>
+            {i18n.t("back")}
+          </FlatButton>
+          {!isFetching && (
+            <GradientButton
+              style={{ paddingHorizontal: 20 }}
+              onPress={handleRegenerate}
+            >
+              Regenerate
+            </GradientButton>
           )}
-          {!isFetching && <Text style={[styles.answerText]}>{answer}</Text>}
-        </ScrollView>
-      </View>
-      <View style={styles.buttonContainer}>
-        <FlatButton onPress={() => navigation.pop()}>
-          {i18n.t("back")}
-        </FlatButton>
-        {!isFetching && (
-          <GradientButton
-            style={{ paddingHorizontal: 20 }}
-            onPress={handleRegenerate}
-          >
-            Regenerate
-          </GradientButton>
-        )}
+        </View>
+        <BlurPremium canBack></BlurPremium>
       </View>
     </View>
   );
@@ -192,6 +198,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: GlobalStyles.colors.textColor,
+  },
+  contentContainer: {
+    flex: 4,
+    marginHorizontal: "2%",
   },
   answerText: {
     padding: 20,

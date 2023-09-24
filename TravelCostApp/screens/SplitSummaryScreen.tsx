@@ -6,6 +6,16 @@ import React, {
   useMemo,
   useState,
 } from "react";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import {
   Alert,
   Dimensions,
@@ -56,8 +66,8 @@ const SplitSummaryScreen = ({ navigation }) => {
       if (freshlyCreated) {
         Toast.show({
           type: "success",
-          text1: "Welcome to Budget for Nomads",
-          text2: "Please Create or Join a Trip to get started!",
+          text1: i18n.t("welcomeToBudgetForNomads"),
+          text2: i18n.t("pleaseCreateTrip"),
         });
         navigation.navigate("Profile");
       }

@@ -31,7 +31,11 @@ import FlatButton from "../components/UI/FlatButton";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { GlobalStyles } from "../constants/styles";
 import { TripContext } from "../store/trip-context";
-import { calcOpenSplitsTable, simplifySplits } from "../util/split";
+import {
+  areSplitListsEqual,
+  calcOpenSplitsTable,
+  simplifySplits,
+} from "../util/split";
 import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import GradientButton from "../components/UI/GradientButton";
@@ -84,6 +88,7 @@ const SplitSummaryScreen = ({ navigation }) => {
   }, [isPaid]);
 
   const [splits, setSplits] = useState<Split[]>([]);
+  const hasOpenSplits = splits?.length > 0;
   const [showSimplify, setShowSimplify] = useState(true);
 
   // TODO: improve text and translate
@@ -165,6 +170,15 @@ const SplitSummaryScreen = ({ navigation }) => {
     expenses?.length,
     userName,
   ]);
+  const simpleSplits = useCallback(
+    () => simplifySplits(splits),
+    [splits.length]
+  )();
+  const sameList = useMemo(
+    () => areSplitListsEqual(splits, simpleSplits),
+    [splits.length, simpleSplits.length, getOpenSplits]
+  );
+  const noSimpleSplits = !simpleSplits || simpleSplits?.length < 1 || sameList;
 
   useEffect(() => {
     getOpenSplits();
@@ -172,8 +186,7 @@ const SplitSummaryScreen = ({ navigation }) => {
 
   const handleSimpflifySplits = useCallback(async () => {
     try {
-      const simpleSplits = simplifySplits(splits);
-      if (simpleSplits?.length === 0) {
+      if (noSimpleSplits) {
         Alert.alert("No Splits to Simplify");
         navigation.pop();
       }
@@ -273,7 +286,7 @@ const SplitSummaryScreen = ({ navigation }) => {
           renderItem={renderSplitItem}
         />
         <View style={styles.buttonContainer}>
-          {!showSimplify && (
+          {!showSimplify && !noSimpleSplits && (
             <FlatButton
               onPress={async () => {
                 if (showSimplify) {
@@ -289,7 +302,7 @@ const SplitSummaryScreen = ({ navigation }) => {
               Back
             </FlatButton>
           )}
-          {showSimplify && (
+          {showSimplify && !noSimpleSplits && (
             <GradientButton
               style={styles.button}
               onPress={handleSimpflifySplits}
@@ -297,32 +310,34 @@ const SplitSummaryScreen = ({ navigation }) => {
               Simplify Splits
             </GradientButton>
           )}
-          <GradientButton
-            style={styles.button}
-            colors={GlobalStyles.gradientColors}
-            darkText
-            buttonStyle={{ backgroundColor: GlobalStyles.colors.errorGrayed }}
-            onPress={async () => {
-              // alert ask user if he really wants to settle all Splits
-              // if yes, call settleSplitsHandler
-              Alert.alert(
-                "Settle Splits",
-                "Are you sure you want to settle all splits? Has everyone gotten their money back? (This will only settle splits from Today or Before, but not open splits from the future!)",
-                [
-                  {
-                    text: "Cancel",
-                    style: "cancel",
-                  },
-                  {
-                    text: "Settle",
-                    onPress: async () => await settleSplitsHandler(),
-                  },
-                ]
-              );
-            }}
-          >
-            Settle Splits
-          </GradientButton>
+          {hasOpenSplits && (
+            <GradientButton
+              style={styles.button}
+              colors={GlobalStyles.gradientColors}
+              darkText
+              buttonStyle={{ backgroundColor: GlobalStyles.colors.errorGrayed }}
+              onPress={async () => {
+                // alert ask user if he really wants to settle all Splits
+                // if yes, call settleSplitsHandler
+                Alert.alert(
+                  "Settle Splits",
+                  "Are you sure you want to settle all splits? Has everyone gotten their money back? (This will only settle splits from Today or Before, but not open splits from the future!)",
+                  [
+                    {
+                      text: "Cancel",
+                      style: "cancel",
+                    },
+                    {
+                      text: "Settle",
+                      onPress: async () => await settleSplitsHandler(),
+                    },
+                  ]
+                );
+              }}
+            >
+              Settle Splits
+            </GradientButton>
+          )}
         </View>
       </Animated.View>
     </View>

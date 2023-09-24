@@ -467,3 +467,44 @@ function cancelDifferences(openSplits) {
 export function sameNumber(a: number, b: number, minDiff = 0.02) {
   return Math.abs(a - b) < minDiff;
 }
+
+export function areSplitListsEqual(list1, list2) {
+  // Check if the lengths are the same
+  if (list1.length !== list2.length) {
+    return false;
+  }
+
+  // Iterate through the lists
+  for (let i = 0; i < list1.length; i++) {
+    const element1 = list1[i];
+    const element2 = list2[i];
+
+    // Compare elements (assuming elements are objects)
+    if (!areSplitObjectsEqual(element1, element2)) {
+      return false;
+    }
+  }
+
+  // If we reach this point, the lists are equal
+  return true;
+}
+
+export function areSplitObjectsEqual(obj1, obj2) {
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+
+  // Check if the objects have the same number of properties
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+
+  // Compare each property of the objects
+  for (const key of keys1) {
+    if (obj1[key] !== obj2[key]) {
+      return false;
+    }
+  }
+
+  // If we reach this point, the objects are equal
+  return true;
+}

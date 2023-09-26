@@ -89,6 +89,7 @@ import CategoryMapTestScreen from "./screens/CategoryMapTestScreen";
 import GPTDealScreen from "./screens/ChatGPTDealScreen";
 import { initBranch } from "./components/Referral/branch";
 import { MemoizedRecentExpenses } from "./screens/RecentExpenses";
+import TripSummaryScreen from "./screens/TripSummaryScreen";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -213,6 +214,14 @@ function AuthenticatedStack() {
           <Stack.Screen
             name="SplitSummary"
             component={SplitSummaryScreen}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
+          <Stack.Screen
+            name="TripSummary"
+            component={TripSummaryScreen}
             options={{
               headerShown: false,
               presentation: "modal",

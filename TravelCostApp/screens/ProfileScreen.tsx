@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { GlobalStyles } from "../constants/styles";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
@@ -7,7 +7,6 @@ import { useContext, useState, useEffect } from "react";
 import IconButton from "../components/UI/IconButton";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
-import { onShare } from "../components/ProfileOutput/ShareTrip";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -39,7 +38,9 @@ const ProfileScreen = ({ navigation }) => {
   const [tripHistory, setTripHistory] = useState([]);
   const [isFetchingLogout, setIsFetchingLogout] = useState(false);
 
-  // console.log("ProfileScreen ~ tripHistory:", tripHistory);
+  function onSummaryHandler() {
+    navigation.navigate("TripSummary");
+  }
 
   useEffect(() => {
     setTripHistory(userCtx.tripHistory);
@@ -88,8 +89,6 @@ const ProfileScreen = ({ navigation }) => {
     start();
   }
   useEffect(() => {
-    console.log("useEffect ~ canStart:", canStart);
-    console.log("useEffect ~ userCtx.needsTour:", userCtx.needsTour);
     if (canStart && userCtx.needsTour) {
       // 👈 test if you can start otherwise nothing will happen
       sleepyStartTour();
@@ -202,13 +201,16 @@ const ProfileScreen = ({ navigation }) => {
           zone={7}
         >
           <View>
+            {/* FAB */}
             <IconButton
-              icon="person-add-outline"
+              // icon="md-document-attach-outline"
+              icon="list-outline"
               buttonStyle={[styles.addButton, GlobalStyles.shadowGlowPrimary]}
               size={42}
               color={"white"}
               onPress={() => {
-                onShare(tripCtx.tripid, navigation);
+                // onShare(tripCtx.tripid, navigation);
+                onSummaryHandler();
               }}
             />
           </View>
@@ -247,6 +249,7 @@ const styles = StyleSheet.create({
     flex: 2,
     padding: 4,
   },
+
   tripContainer: {
     flex: 1,
     minHeight: "68%",
@@ -267,6 +270,7 @@ const styles = StyleSheet.create({
     // make it appear behind the triplist
     // zIndex: -1,
   },
+
   newTripButtonContainer: {
     flexDirection: "row",
     padding: "10%",

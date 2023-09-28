@@ -215,7 +215,7 @@ function ExpenseItem(props): JSX.Element {
           </View>
         </View>
       ),
-    [whoPaid]
+    [longList?.length, splitList?.length, whoPaid]
   );
 
   if (typeof date === "string") date = new Date(date);

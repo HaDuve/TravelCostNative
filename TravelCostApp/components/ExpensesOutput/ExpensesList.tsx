@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 
-import { MemoizedExpenseItem } from "./ExpenseItem";
+import ExpenseItem, { MemoizedExpenseItem } from "./ExpenseItem";
 import React, {
   memo,
   useCallback,
@@ -22,12 +22,17 @@ import { View } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { GlobalStyles } from "../../constants/styles";
-import { getAllExpenses, touchAllTravelers } from "../../util/http";
+import {
+  fetchTripName,
+  getAllExpenses,
+  touchAllTravelers,
+} from "../../util/http";
 import { TripContext } from "../../store/trip-context";
 import { ExpensesContext } from "../../store/expenses-context";
 import IconButton from "../UI/IconButton";
 import Animated, {
   Easing,
+  exp,
   FadeInLeft,
   FadeInRight,
   FadeInUp,
@@ -44,6 +49,7 @@ import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 import {
   deleteExpenseOnlineOffline,
   OfflineQueueManageExpenseItem,
+  storeExpenseOnlineOffline,
 } from "../../util/offline-queue";
 import {
   ExpenseData,
@@ -65,6 +71,9 @@ import { Category } from "../../util/category";
 import { toShortFormat } from "../../util/date";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { MAX_EXPENSES } from "../../confAppConstants";
+import { TripAsObject } from "../../screens/TripSummaryScreen";
+import { create } from "react-test-renderer";
+import { AuthContext } from "../../store/auth-context";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -89,9 +98,11 @@ function ExpensesList({
 
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;
-  const { tripid } = useContext(TripContext);
+  const { tripid, tripName } = useContext(TripContext);
+  const { uid } = useContext(AuthContext);
   const { periodName } = useContext(UserContext);
   const expenseCtx = useContext(ExpensesContext);
+  const userCtx = useContext(UserContext);
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(1);
   tripID = tripid;
   travellerName = showSumForTravellerName;
@@ -505,7 +516,6 @@ function ExpensesList({
 
   const selectItem = (item, id: object) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    console.log("selectItem ~ item:", item, id);
     if (selected.includes(item)) {
       setSelected(selected.filter((newItem) => newItem !== item));
     } else {
@@ -545,6 +555,127 @@ function ExpensesList({
       noList: true,
     });
   }, [expenses?.length, periodName, selected?.length]);
+
+  const [allTrips, setAllTrips] = useState<TripAsObject[]>([]);
+  useEffect(() => {
+    async function asyncSetAllTrips() {
+      if (!userCtx.tripHistory) return;
+      const allTripsAsObjects: TripAsObject[] = [];
+
+      for (let i = 0; i < userCtx.tripHistory.length; i++) {
+        const tripid = userCtx.tripHistory[i];
+        const tripName = await fetchTripName(tripid);
+        allTripsAsObjects.push({
+          tripid: tripid,
+          tripname: tripName,
+          selected: true,
+        });
+      }
+      setAllTrips(allTripsAsObjects);
+    }
+    asyncSetAllTrips();
+  }, [userCtx.tripHistory.length]);
+
+  const handleMoveToTripPress = useCallback(
+    async (_tripid, _tripname) => {
+      console.log("handleMoveToTripPress ~ tripid", _tripid);
+      console.log("handleMoveToTripPress ~ tripname", _tripname);
+      Toast.show({
+        type: "loading",
+        text1: `Moving ${selected?.length} expenses`,
+        text2: `from ${tripName} to ${_tripname}!`,
+        // autoHide: false,
+      });
+      navigation?.popToTop();
+      setSelected([]);
+      setSelectable(false);
+      for (let i = 0; i < selected?.length; i++) {
+        const expenseData = expenses.find((item) => item.id === selected[i]);
+        console.log("sanity check expData uid", expenseData?.uid);
+        console.log("sanity check expData id", expenseData?.id);
+        console.log("sanity check expData rangeId", expenseData?.rangeId);
+        console.log(
+          "sanity check tripid should be true and true",
+          tripid,
+          _tripid,
+          tripid === tripID,
+          tripID !== _tripid
+        );
+
+        try {
+          const expenseUid = expenseData.uid;
+          const expenseId = expenseData.id;
+          console.log("handleMoveToTripPress ~ expenseData", expenseData);
+          // if (expenseItem.rangeId) {
+          //   await deleteAllExpensesByRangedId(
+          //     tripID,
+          //     expenseItem,
+          //     isOnline,
+          //     expenseCtx
+          //   );
+          // }
+          expenseData.date = expenseData.startDate;
+          const itemCreate: OfflineQueueManageExpenseItem = {
+            type: "add",
+            expense: {
+              tripid: _tripid,
+              uid: expenseUid,
+              expenseData: expenseData,
+            },
+          };
+          await storeExpenseOnlineOffline(itemCreate, isOnline, _tripid);
+          const item: OfflineQueueManageExpenseItem = {
+            type: "delete",
+            expense: {
+              tripid: tripID,
+              uid: expenseUid,
+              id: expenseId,
+            },
+          };
+          expenseCtx?.deleteExpense(expenseId);
+          await deleteExpenseOnlineOffline(item, isOnline);
+          await touchAllTravelers(tripID, true);
+          await touchAllTravelers(_tripid, true);
+          Toast.hide();
+        } catch (error) {
+          console.log("Moving expenses error: ", error);
+          Toast.show({
+            text1: i18n.t("error"),
+            text2: i18n.t("error2"),
+            type: "error",
+          });
+        }
+      }
+    },
+    [selected.length, expenses?.length, tripID, tripName]
+  );
+
+  const moveSelectedToTrip = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (selected?.length === 0) return;
+    const buttonTripList = allTrips.map((trip) => {
+      if (trip.tripid === tripID)
+        return {
+          text: i18n.t("no"),
+          onPress: () => {
+            return;
+          },
+        };
+      return {
+        text: trip.tripname,
+        onPress: handleMoveToTripPress.bind(this, trip.tripid, trip.tripname),
+      };
+    });
+    // TODO: fix this for android, we cant seem to have multiple buttons in alert
+    Alert.alert(
+      `Move selected expenses to another trip?`,
+      `This will move them to another trip!`,
+      [
+        // add all the triplistbuttons
+        ...buttonTripList,
+      ]
+    );
+  }, [expenses?.length, isOnline, selected?.length, tripID]);
 
   const deleteSelected = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -673,6 +804,20 @@ function ExpensesList({
           {selectable && (
             <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
               <IconButton
+                icon={"md-arrow-undo-outline"}
+                size={24}
+                color={
+                  selected?.length > 0
+                    ? GlobalStyles.colors.gray700
+                    : GlobalStyles.colors.gray600
+                }
+                onPress={moveSelectedToTrip}
+              ></IconButton>
+            </Animated.View>
+          )}
+          {selectable && (
+            <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
+              <IconButton
                 icon={
                   selected?.length > 0
                     ? "close-outline"
@@ -684,6 +829,7 @@ function ExpensesList({
               ></IconButton>
             </Animated.View>
           )}
+
           <IconButton
             icon={"ellipsis-horizontal-circle-outline"}
             size={24}

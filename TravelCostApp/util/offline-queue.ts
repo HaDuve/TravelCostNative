@@ -174,10 +174,11 @@ export const updateExpenseOnlineOffline = async (
  */
 export const storeExpenseOnlineOffline = async (
   item: OfflineQueueManageExpenseItem,
-  online: boolean
+  online: boolean,
+  forceTripid = null
 ) => {
   // load tripid from asyncstore to fix the tripctx tripid bug
-  const tripid = await secureStoreGetItem("currentTripId");
+  const tripid = forceTripid ?? (await secureStoreGetItem("currentTripId"));
   if (!tripid) {
     Toast.show({
       type: "error",

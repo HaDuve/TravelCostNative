@@ -21,16 +21,16 @@ import { ExpenseData, Split } from "../util/expense";
 import { formatExpenseWithCurrency } from "../util/string";
 import { Traveller } from "../util/traveler";
 
-type TripAsObject = {
+export type TripAsObject = {
   tripid: string;
   tripname: string;
   selected: boolean;
 };
-type TravellerAndCost = {
+export type TravellerAndCost = {
   traveller: string;
   cost: number;
 };
-type TripsSummary = {
+export type TripsSummary = {
   numberOfTrips: number;
   totalCost: number;
   currency: string;

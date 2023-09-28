@@ -176,11 +176,12 @@ const SplitSummaryScreen = ({ navigation }) => {
   )();
   const sameList = useMemo(
     () => areSplitListsEqual(splits, simpleSplits),
-    [splits.length, simpleSplits.length, getOpenSplits]
+    [splits.length, simpleSplits.length]
   );
   const noSimpleSplits = !simpleSplits || simpleSplits?.length < 1 || sameList;
 
   useEffect(() => {
+    if (isFetching || !tripid || splits?.length > 1) return;
     getOpenSplits();
   }, [getOpenSplits]);
 

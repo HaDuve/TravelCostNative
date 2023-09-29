@@ -584,16 +584,16 @@ function ExpensesList({
         type: "loading",
         text1: `Moving ${selected?.length} expenses`,
         text2: `from ${tripName} to ${_tripname}!`,
-        // autoHide: false,
+        autoHide: false,
       });
       navigation?.popToTop();
-      setSelected([]);
-      setSelectable(false);
+
       for (let i = 0; i < selected?.length; i++) {
         const expenseData = expenses.find((item) => item.id === selected[i]);
         console.log("sanity check expData uid", expenseData?.uid);
         console.log("sanity check expData id", expenseData?.id);
         console.log("sanity check expData rangeId", expenseData?.rangeId);
+        console.log("sanity check selected[i]", selected[i]);
         console.log(
           "sanity check tripid should be true and true",
           tripid,
@@ -646,6 +646,8 @@ function ExpensesList({
           });
         }
       }
+      setSelected([]);
+      setSelectable(false);
     },
     [selected.length, expenses?.length, tripID, tripName]
   );

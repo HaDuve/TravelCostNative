@@ -231,6 +231,7 @@ export const sendOfflineQueue = async () => {
   // global.sendingOfflineQueue = true;
   // try {
   const offlineQueue = (await secureStoreGetObject("offlineQueue")) || [];
+
   if (offlineQueue && offlineQueue?.length > 0) {
     // console.log("queue length", offlineQueue?.length);
     const forceOffline = !Device.isDevice && DEBUG_FORCE_OFFLINE;

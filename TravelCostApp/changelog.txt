@@ -1,7 +1,10 @@
 Change log Travel Expense App
 
 1.2.671
+- added tripsummary to profile screen (shows costs of multiple trips combined)
+- added move expenses to another trip function
 - improved discount text
+- fixed avatars not updating after changing splitting of expenses
 
 1.2.670
 - fixed login and signup error handling

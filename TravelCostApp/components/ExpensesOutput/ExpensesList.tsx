@@ -590,30 +590,9 @@ function ExpensesList({
 
       for (let i = 0; i < selected?.length; i++) {
         const expenseData = expenses.find((item) => item.id === selected[i]);
-        console.log("sanity check expData uid", expenseData?.uid);
-        console.log("sanity check expData id", expenseData?.id);
-        console.log("sanity check expData rangeId", expenseData?.rangeId);
-        console.log("sanity check selected[i]", selected[i]);
-        console.log(
-          "sanity check tripid should be true and true",
-          tripid,
-          _tripid,
-          tripid === tripID,
-          tripID !== _tripid
-        );
-
         try {
           const expenseUid = expenseData.uid;
           const expenseId = expenseData.id;
-          console.log("handleMoveToTripPress ~ expenseData", expenseData);
-          // if (expenseItem.rangeId) {
-          //   await deleteAllExpensesByRangedId(
-          //     tripID,
-          //     expenseItem,
-          //     isOnline,
-          //     expenseCtx
-          //   );
-          // }
           expenseData.date = expenseData.startDate;
           const itemCreate: OfflineQueueManageExpenseItem = {
             type: "add",

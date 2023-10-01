@@ -2,12 +2,12 @@ import axios from "axios";
 import { DEBUG_NO_DATA } from "../confAppConstants";
 import { Category } from "./category";
 import { TripData } from "../store/trip-context";
-import Toast from "react-native-toast-message";
 import { ExpenseData, ExpenseDataOnline } from "./expense";
 import { UserData } from "../store/user-context";
 import { truncateString } from "./string";
-import { Traveler, Traveller } from "./traveler";
+import { Traveller } from "./traveler";
 import uniqBy from "lodash.uniqby";
+import { getMMKVString, setMMKVString } from "../store/mmkv";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -19,18 +19,14 @@ const BACKEND_URL =
 
 /** ACCESS TOKEN */
 /** Sets the ACCESS TOKEN for all future http requests */
-global.QPAR = "";
 export function setAxiosAccessToken(token: string) {
-  console.log(
-    "setAxiosAccessToken ~ setAxiosAccessToken",
-    truncateString(token, 5)
-  );
+  console.log("setAxiosAccessToken ~ setQPAR", truncateString(token, 5));
   if (!token || token?.length < 2) {
-    console.error("https: ~ wrong token error");
-    global.QPAR = "";
+    console.error("https: ~ setAxiosAccessToken ~ wrong token QPAR error");
+    setMMKVString("QPAR", "");
     return;
   }
-  global.QPAR = `?auth=${token}`;
+  setMMKVString("QPAR", `?auth=${token}`);
 }
 
 /** Axios Logger */
@@ -69,7 +65,7 @@ export const dataResponseTime = (func) => {
 export const fetchServerInfo = async () => {
   try {
     const response = await axios.get(
-      `${BACKEND_URL}/server.json${global.QPAR}`
+      `${BACKEND_URL}/server.json${getMMKVString("QPAR")}`
     );
 
     // Process the response data here
@@ -90,7 +86,11 @@ export const fetchServerInfo = async () => {
 export async function fetchCategories(tripid: string) {
   try {
     const response = await axios.get(
-      BACKEND_URL + "/trips/" + tripid + "/categories.json" + global.QPAR
+      BACKEND_URL +
+        "/trips/" +
+        tripid +
+        "/categories.json" +
+        getMMKVString("QPAR")
     );
     if (response) return JSON.parse(response.data);
   } catch (error) {
@@ -101,7 +101,7 @@ export async function fetchCategories(tripid: string) {
 export async function deleteCategories(tripid: string) {
   try {
     const response = await axios.delete(
-      BACKEND_URL + `/trips/${tripid}/categories.json` + global.QPAR
+      BACKEND_URL + `/trips/${tripid}/categories.json` + getMMKVString("QPAR")
     );
     return response.data;
   } catch (error) {
@@ -115,7 +115,7 @@ export async function patchCategories(tripid: string, categories: Category[]) {
   const json = JSON.stringify(categories);
   try {
     const response = await axios.post(
-      BACKEND_URL + `/trips/${tripid}/categories.json` + global.QPAR,
+      BACKEND_URL + `/trips/${tripid}/categories.json` + getMMKVString("QPAR"),
       json
     );
     return response;
@@ -145,7 +145,7 @@ export async function storeExpense(tripid: string, uid: string, expenseData) {
         "/" +
         uid +
         "/expenses.json" +
-        global.QPAR,
+        getMMKVString("QPAR"),
       expenseData
     );
     const id = response.data.name;
@@ -177,7 +177,7 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
           "/" +
           uid +
           "/expenses.json" +
-          global.QPAR
+          getMMKVString("QPAR")
       );
       axios_calls.push(new_axios_call);
     } catch (error) {
@@ -233,7 +233,7 @@ export async function fetchExpenses(tripid: string, uid: string) {
         "/" +
         uid +
         "/expenses.json" +
-        global.QPAR
+        getMMKVString("QPAR")
     );
     const expenses = [];
 
@@ -288,7 +288,7 @@ export function updateExpense(
         uid +
         "/expenses/" +
         `${id}.json` +
-        global.QPAR,
+        getMMKVString("QPAR"),
       expenseData
     );
     return response;
@@ -311,7 +311,7 @@ export function deleteExpense(tripid: string, uid: string, id: string) {
         uid +
         "/expenses/" +
         `${id}.json` +
-        global.QPAR
+        getMMKVString("QPAR")
     );
     return response;
   } catch (error) {
@@ -329,9 +329,9 @@ export function deleteExpense(tripid: string, uid: string, id: string) {
 export async function storeUser(uid: string, userData: object) {
   console.log("https: ~ storeUser ~ uid:", uid);
   console.log("https: ~ storeUser ~ userData", userData);
-  console.log("https: ~ storeUser ~ global QPAR", global.QPAR);
+  console.log("https: ~ storeUser ~ global QPAR", getMMKVString("QPAR"));
   const response = await axios.put(
-    BACKEND_URL + "/users/" + `${uid}.json` + global.QPAR,
+    BACKEND_URL + "/users/" + `${uid}.json` + getMMKVString("QPAR"),
     userData
   );
   const id = response.data.name;
@@ -345,7 +345,7 @@ export async function updateUser(uid: string, userData: UserData) {
   // console.log("updateUser ~ userData", userData);
   try {
     await axios.patch(
-      BACKEND_URL + "/users/" + `${uid}.json` + global.QPAR,
+      BACKEND_URL + "/users/" + `${uid}.json` + getMMKVString("QPAR"),
       userData
     );
   } catch (error) {
@@ -361,7 +361,7 @@ export async function fetchUser(uid: string) {
   }
   try {
     const response = await axios.get(
-      BACKEND_URL + "/users/" + `${uid}.json` + global.QPAR
+      BACKEND_URL + "/users/" + `${uid}.json` + getMMKVString("QPAR")
     );
     const userData: UserData = response.data;
     return userData;
@@ -376,7 +376,7 @@ export async function storeTrip(tripData: TripData) {
   //TODO: create tripData Interface for TypeScript
   try {
     const response = await axios.post(
-      BACKEND_URL + "/trips.json" + global.QPAR,
+      BACKEND_URL + "/trips.json" + getMMKVString("QPAR"),
       tripData
     );
     const id = response.data.name;
@@ -390,7 +390,7 @@ export async function updateTrip(tripid: string, tripData) {
   // console.log("https: ~ updateTrip ~ tripData", tripData);
   try {
     const res = await axios.patch(
-      BACKEND_URL + "/trips/" + `${tripid}.json` + global.QPAR,
+      BACKEND_URL + "/trips/" + `${tripid}.json` + getMMKVString("QPAR"),
       tripData
     );
     return res;
@@ -404,7 +404,7 @@ export async function fetchTrip(tripid: string): Promise<TripData> {
   // console.log("https: ~ fetchTrip ~ tripid", tripid);
   try {
     const response = await axios.get(
-      BACKEND_URL + "/trips/" + `${tripid}.json` + global.QPAR
+      BACKEND_URL + "/trips/" + `${tripid}.json` + getMMKVString("QPAR")
     );
     return response.data;
   } catch (error) {
@@ -416,7 +416,7 @@ export async function deleteTrip(tripid: string) {
   // console.log("https: ~ deleteTrip ~ tripid", tripid);
   try {
     const response = await axios.delete(
-      BACKEND_URL + "/trips/" + `${tripid}.json` + global.QPAR
+      BACKEND_URL + "/trips/" + `${tripid}.json` + getMMKVString("QPAR")
     );
     return response;
   } catch (error) {
@@ -438,7 +438,7 @@ export async function putTravelerInTrip(tripid: string, traveller: Traveller) {
     const response = await axios.put(
       BACKEND_URL +
         `/trips/${tripid}/travellers/${traveller.uid}.json` +
-        global.QPAR,
+        getMMKVString("QPAR"),
       { uid: traveller.uid, userName: traveller.userName }
     );
     return response.data;
@@ -452,7 +452,7 @@ export async function fetchTripsTravellers(tripid: string) {
   // console.log("fetchTripsTravellers ~ tripid", tripid);
   try {
     const response = await axios.get(
-      BACKEND_URL + `/trips/${tripid}/travellers.json` + global.QPAR
+      BACKEND_URL + `/trips/${tripid}/travellers.json` + getMMKVString("QPAR")
     );
     return response.data;
   } catch (error) {
@@ -522,7 +522,7 @@ export async function updateTripHistory(userId: string, newTripid: string) {
   if (tripHistory.indexOf(newTripid) > -1) return;
   tripHistory.push(newTripid);
   return axios.put(
-    BACKEND_URL + `/users/${userId}/tripHistory.json` + global.QPAR,
+    BACKEND_URL + `/users/${userId}/tripHistory.json` + getMMKVString("QPAR"),
     tripHistory
   );
 }
@@ -531,7 +531,7 @@ export async function storeTripHistory(userId: string, tripHistory: string[]) {
   // console.log("storeTripHistory ~ tripHistory", tripHistory);
   try {
     const response = await axios.put(
-      BACKEND_URL + `/users/${userId}/tripHistory.json` + global.QPAR,
+      BACKEND_URL + `/users/${userId}/tripHistory.json` + getMMKVString("QPAR"),
       tripHistory
     );
     return response.data;
@@ -544,7 +544,7 @@ export async function fetchTripHistory(userId: string) {
   // console.log("fetchTripHistory ~ userId", userId);
   try {
     const response = await axios.get(
-      BACKEND_URL + `/users/${userId}/tripHistory.json` + global.QPAR
+      BACKEND_URL + `/users/${userId}/tripHistory.json` + getMMKVString("QPAR")
     );
     return response.data;
   } catch (error) {
@@ -556,7 +556,7 @@ export async function fetchCurrentTrip(userId: string) {
   // console.log("https: ~ fetchCurrentTrip ~ userId", userId);
   try {
     const response = await axios.get(
-      BACKEND_URL + `/users/${userId}.json` + global.QPAR
+      BACKEND_URL + `/users/${userId}.json` + getMMKVString("QPAR")
     );
     // console.log("https: ~ fetchCurrentTrip ~ response", response.data);
     if (!response?.data?.currentTrip)
@@ -570,7 +570,7 @@ export async function fetchCurrentTrip(userId: string) {
 export async function fetchUserName(userId: string): Promise<string> {
   try {
     const response = await axios.get(
-      BACKEND_URL + `/users/${userId}.json` + global.QPAR
+      BACKEND_URL + `/users/${userId}.json` + getMMKVString("QPAR")
     );
     // console.log("https: ~ fetchUserName ~ response", response.data);
     return response.data.userName;
@@ -582,7 +582,7 @@ export async function fetchUserName(userId: string): Promise<string> {
 export async function fetchTripName(tripId: string): Promise<string> {
   try {
     const response = await axios.get(
-      BACKEND_URL + `/trips/${tripId}.json` + global.QPAR
+      BACKEND_URL + `/trips/${tripId}.json` + getMMKVString("QPAR")
     );
     return response.data.tripName;
   } catch (error) {
@@ -595,11 +595,12 @@ export async function touchTraveler(
   firebaseId: string,
   isTouched: boolean
 ) {
+  console.log("touching with QPAR", getMMKVString("QPAR"));
   try {
     const response = await axios.patch(
       BACKEND_URL +
         `/trips/${tripid}/travellers/${firebaseId}.json` +
-        global.QPAR,
+        getMMKVString("QPAR"),
       { touched: isTouched }
     );
     return response;

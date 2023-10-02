@@ -35,6 +35,7 @@ export interface ExpenseData {
   rangeId?: string;
   isPaid?: string;
   isSpecialExpense?: boolean;
+  editedTimestamp?: number;
 }
 
 export enum DuplicateOption {
@@ -69,6 +70,7 @@ export interface ExpenseDataOnline {
   iconName?: string;
   rangeId?: string;
   isSpecialExpense?: boolean;
+  editedTimestamp?: string;
 }
 
 export interface Split {

@@ -206,10 +206,11 @@ const ManageExpense = ({ route, navigation }) => {
     navigation.goBack();
   }
 
-  const createSingleData = async (expenseData) => {
+  const createSingleData = async (expenseData: ExpenseData) => {
     console.log("no ranged Data detected");
     // hotfix the date clock bug
     expenseData.date = expenseData.startDate;
+    expenseData.editedTimestamp = Date.now();
 
     const item: OfflineQueueManageExpenseItem = {
       type: "add",
@@ -280,6 +281,7 @@ const ManageExpense = ({ route, navigation }) => {
       // expenseData.startDate =
       // expenseData.endDate =
       expenseData.date = newDate;
+      expenseData.editedTimestamp = Date.now();
       console.log(
         "expenseData.date: ",
         expenseData.date,
@@ -309,7 +311,8 @@ const ManageExpense = ({ route, navigation }) => {
     }
   };
 
-  const editSingleData = async (expenseData) => {
+  const editSingleData = async (expenseData: ExpenseData) => {
+    expenseData.editedTimestamp = Date.now();
     const item: OfflineQueueManageExpenseItem = {
       type: "update",
       expense: {
@@ -407,6 +410,7 @@ const ManageExpense = ({ route, navigation }) => {
       const newDate = getDatePlusDays(expenseData.startDate, i);
       newDate.setHours(new Date().getHours(), new Date().getMinutes());
       expenseData.date = newDate;
+      expenseData.editedTimestamp = Date.now();
       // sanity fix
       expenseData.rangeId = expense.rangeId;
       const item: OfflineQueueManageExpenseItem = {

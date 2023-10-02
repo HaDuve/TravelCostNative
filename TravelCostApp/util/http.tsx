@@ -210,6 +210,7 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
           rangeId: r.rangeId,
           isPaid: r.isPaid,
           isSpecialExpense: r.isSpecialExpense,
+          editedTimestamp: +r.editedTimestamp,
         };
         expenses.push(expenseObj);
       }
@@ -260,6 +261,7 @@ export async function fetchExpenses(tripid: string, uid: string) {
         rangeId: data.rangeId,
         isPaid: data.isPaid,
         isSpecialExpense: data.isSpecialExpense,
+        editedTimestamp: +data.editedTimestamp,
       };
       expenses.push(expenseObj);
     }

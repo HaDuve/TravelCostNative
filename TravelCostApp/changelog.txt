@@ -1,7 +1,7 @@
 Change log Travel Expense App
 
 1.2.672
--
+- added last edited timestamps to expenses for future optimization
 
 1.2.671
 - added tripsummary to profile screen (shows costs of multiple trips combined)

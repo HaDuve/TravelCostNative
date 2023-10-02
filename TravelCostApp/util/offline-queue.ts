@@ -3,7 +3,7 @@ import {
   asyncStoreGetObject,
   asyncStoreSetObject,
 } from "../store/async-storage";
-import { Expense } from "./expense";
+import { Expense, ExpenseData } from "./expense";
 import {
   storeExpense,
   updateExpense,
@@ -31,6 +31,7 @@ import {
   secureStoreGetObject,
   secureStoreSetObject,
 } from "../store/secure-storage";
+import { getMMKVObject } from "../store/mmkv";
 
 // interface of offline queue manage expense item
 export interface OfflineQueueManageExpenseItem {
@@ -287,6 +288,19 @@ export const sendOfflineQueue = async () => {
             item2.expense.id = id;
           }
         } else if (item.type === "update") {
+          // compare timestamp of item with timestamp of expense in db
+          // if item.editedTimestamp < expense.editedTimestamp => update expense
+          // else => skip
+          const expenses: ExpenseData[] = getMMKVObject("expenses");
+          const oldExpense = expenses.find(
+            (expense) => expense.id === item.expense.id
+          );
+          if (
+            oldExpense?.editedTimestamp >=
+            item.expense.expenseData.editedTimestamp
+          ) {
+            continue;
+          }
           await updateExpense(
             item.expense.tripid,
             item.expense.uid,

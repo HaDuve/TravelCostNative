@@ -597,7 +597,7 @@ export async function touchTraveler(
   firebaseId: string,
   isTouched: boolean
 ) {
-  console.log("touching with QPAR", getMMKVString("QPAR"));
+  // console.log("touching with QPAR", getMMKVString("QPAR"));
   try {
     const response = await axios.patch(
       BACKEND_URL +

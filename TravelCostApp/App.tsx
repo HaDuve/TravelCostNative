@@ -1,12 +1,20 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
-import { LogBox } from "react-native";
 LogBox.ignoreAllLogs(); //Ignore all log notifications
-import { SafeAreaView, View, Keyboard, Platform, AppState } from "react-native";
+import {
+  SafeAreaView,
+  View,
+  Text,
+  Keyboard,
+  Platform,
+  AppState,
+  LogBox,
+  StatusBar as StatusBarRN,
+  Button,
+} from "react-native";
 import Purchases from "react-native-purchases";
 
 import { StatusBar } from "expo-status-bar";
-import { StatusBar as StatusBarRN } from "react-native";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
@@ -90,6 +98,10 @@ import GPTDealScreen from "./screens/ChatGPTDealScreen";
 import { initBranch } from "./components/Referral/branch";
 import { MemoizedRecentExpenses } from "./screens/RecentExpenses";
 import TripSummaryScreen from "./screens/TripSummaryScreen";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
+import PushScreen from "./screens/PushScreen";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -396,6 +408,19 @@ function Home() {
           ),
         }}
       />
+      <BottomTabs.Screen
+        name="Push"
+        component={PushScreen}
+        options={{
+          // headerShown: false,
+          tabBarShowLabel: false,
+          title: i18n.t("overviewTab"),
+          tabBarLabel: "Push",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name={"push"} size={24} color={color} />
+          ),
+        }}
+      ></BottomTabs.Screen>
 
       <BottomTabs.Screen
         name="Overview"
@@ -794,6 +819,7 @@ export default function App() {
                           }}
                         >
                           <Root />
+
                           <ToastComponent />
                         </TourGuideProvider>
                       </ExpensesContextProvider>

@@ -5,6 +5,7 @@ import { Text, View, Button, Platform } from "react-native";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
+import { ExpoPushToken } from "expo-notifications";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -78,7 +79,11 @@ const PushScreen = () => {
 
   useEffect(() => {
     registerForPushNotificationsAsync()
-      .then((token) => setExpoPushToken(token))
+      .then((pushToken: ExpoPushToken) => {
+        const token = pushToken.data;
+        console.log("token", token);
+        setExpoPushToken(token);
+      })
       .catch((e) => console.log("token error", e));
 
     notificationListener.current =

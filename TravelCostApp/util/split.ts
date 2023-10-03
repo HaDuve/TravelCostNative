@@ -67,7 +67,7 @@ export function recalcSplitsLinearly(splitList: Split[], amount: number) {
 }
 
 export function recalcSplitsForExact(splitList: Split[], amount: number) {
-  console.log("recalcSplitsForExact ~ splitList:", splitList);
+  // console.log("recalcSplitsForExact ~ splitList:", splitList);
 
   const numberOfTravellers = splitList?.length;
   const splitAmountNorm = amount / numberOfTravellers;
@@ -381,7 +381,7 @@ export function simplifySplits(openSplits: Split[]) {
     }
   });
   const simplifiedItems = [];
-  console.log(listOfSplits);
+  // console.log(listOfSplits);
   try {
     const splits = Splitwise(listOfSplits);
     splits.forEach((simpleSplit) => {
@@ -408,7 +408,7 @@ export function simplifySplits(openSplits: Split[]) {
 }
 
 function sumUpSamePairs(openSplits) {
-  console.log("sumUpSamePairs ~ sumUpSamePairs:", sumUpSamePairs);
+  // console.log("sumUpSamePairs ~ sumUpSamePairs:", sumUpSamePairs);
   // add up all the sums of the same payer and debtor pair
 
   if (!openSplits || openSplits?.length < 1) return;

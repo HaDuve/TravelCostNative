@@ -81,7 +81,9 @@
     "splitwise-js-map": "^1.0.3",
     "victory": "^36.6.5",
     "victory-native": "^36.6.8",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "expo-notifications": "~0.18.1",
+    "expo-constants": "~14.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

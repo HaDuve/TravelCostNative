@@ -6,6 +6,7 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { ExpoPushToken } from "expo-notifications";
+import { storeExpoPushTokenInTrip } from "../util/http";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -50,9 +51,12 @@ async function registerForPushNotificationsAsync() {
       alert("Failed to get push token for push notification!");
       return;
     }
+    // todo implement a later get if device is offline
     token = await Notifications.getExpoPushTokenAsync({
       projectId: Constants.expoConfig.extra.eas.projectId,
     });
+    // granted so we want to save the token in the trip
+    await storeExpoPushTokenInTrip(token, "");
     console.log(token);
   } else {
     alert("Must use physical device for Push Notifications");

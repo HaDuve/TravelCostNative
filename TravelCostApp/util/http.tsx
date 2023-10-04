@@ -8,6 +8,7 @@ import { truncateString } from "./string";
 import { Traveller } from "./traveler";
 import uniqBy from "lodash.uniqby";
 import { getMMKVString, setMMKVString } from "../store/mmkv";
+import { secureStoreGetItem } from "../store/secure-storage";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -667,5 +668,25 @@ export async function fetchTravelerIsTouched(tripid: string, uid: string) {
   } catch (error) {
     console.log("fetchTravelerIsTouched:", error);
     return false;
+  }
+}
+
+export async function storeExpoPushTokenInTrip(token: string, tripid: string) {
+  if (!token) return;
+  let usedTripID = tripid;
+  if (!tripid) usedTripID = await secureStoreGetItem("currentTripId");
+  if (!usedTripID) return;
+  console.log("storeExpoPushTokenInTrip ~ usedTripID", usedTripID);
+  // store token string under tripid/tokens adding to current tokens if any
+  try {
+    const response = await axios.post(
+      BACKEND_URL + `/trips/${usedTripID}/tokens.json` + getMMKVString("QPAR"),
+      { token }
+    );
+    console.log(" ~ successfully stored token in trip", response.data);
+    return response;
+  } catch (error) {
+    console.log("storeExpoPushTokenInTrip ~ error", error);
+    throw new Error("error while storing token in trip");
   }
 }

@@ -279,14 +279,10 @@ function TripContextProvider({ children }) {
   async function saveTripDataInStorage(tripData: TripData) {
     // cut away the trip.expenses array
     tripData.expenses = [];
-    // await asyncStoreSetObject("currentTrip", tripData);
-    // save in mmkv
     setMMKVObject("currentTrip", tripData);
   }
 
   async function loadTripDataFromStorage() {
-    // const tripData: TripData = await asyncStoreGetObject("currentTrip");
-    // load from mmkv
     const tripData: TripData = getMMKVObject("currentTrip");
     if (tripData) {
       setTripName(tripData.tripName);

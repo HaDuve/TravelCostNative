@@ -11,6 +11,8 @@ import { getMMKVString } from "../store/mmkv";
 import { secureStoreGetItem } from "../store/secure-storage";
 
 export async function getRate(base: string, target: string) {
+  console.log("getRate ~ target:", target);
+  console.log("getRate ~ base:", base);
   if (base === target) {
     return 1;
   }
@@ -26,14 +28,19 @@ export async function getRate(base: string, target: string) {
     }
   }
   const apiKey = await secureStoreGetItem("EXCHANGE");
+  if (!apiKey) {
+    Alert.alert("No API key for currency exchange");
+    return -1;
+  }
   console.log("getRate ~ apiKey:", apiKey);
   const requestURL =
-    `http://api.exchangeratesapi.io/v1/latest?access_key = ${apiKey}&base=` +
+    `http://api.exchangeratesapi.io/v1/latest?access_key=${apiKey}&base=` +
     base;
   // save in asyncstore
 
   try {
     const response = await axios.get(requestURL);
+    console.log("getRate ~ response:", response);
     const rates = response.data.rates;
     console.log("getRate ~ rates:", rates);
     if (response) {
@@ -50,6 +57,7 @@ export async function getRate(base: string, target: string) {
       await asyncStoreSetObject("currencyExchange_lastUpdate", timeStamp);
     } else {
       // offline get from asyncstore
+      console.log("getRate ~ offline get from asyncstore");
       return getOfflineRate(base, target);
     }
     return rates[target];

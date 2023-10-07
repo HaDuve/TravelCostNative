@@ -71,6 +71,11 @@ export async function loadKeys(): Promise<Keys> {
   await secureStoreSetItem("REVCAT_A", data.REVCAT_A);
   await secureStoreSetItem("OPENAI", data.OPENAI);
   await secureStoreSetItem("EXCHANGE", data.EXCHANGE);
+  console.log(
+    "loadKeys ~ secureStoreSetItem:",
+    "set item data.exchange",
+    data.EXCHANGE
+  );
   REVCAT_G = data.REVCAT_G;
   REVCAT_A = data.REVCAT_A;
   OPENAI = data.OPENAI;

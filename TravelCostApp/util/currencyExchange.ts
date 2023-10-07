@@ -29,7 +29,7 @@ export async function getRate(base: string, target: string) {
   }
   const apiKey = await secureStoreGetItem("EXCHANGE");
   if (!apiKey) {
-    Alert.alert("No API key for currency exchange");
+    console.log("error ~ No API key for currency exchange");
     return -1;
   }
   console.log("getRate ~ apiKey:", apiKey);

@@ -8,6 +8,7 @@ import {
   asyncStoreSetObject,
 } from "../store/async-storage";
 import { getMMKVString } from "../store/mmkv";
+import { secureStoreGetItem } from "../store/secure-storage";
 
 export async function getRate(base: string, target: string) {
   if (base === target) {
@@ -24,7 +25,8 @@ export async function getRate(base: string, target: string) {
       return getOfflineRate(base, target);
     }
   }
-  const apiKey = getMMKVString("EXCHANGE");
+  const apiKey = await secureStoreGetItem("EXCHANGE");
+  console.log("getRate ~ apiKey:", apiKey);
   const requestURL =
     `https://api.exchangerate.host/latest?access_key = ${apiKey}&base=` + base;
   // save in asyncstore

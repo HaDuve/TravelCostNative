@@ -633,8 +633,7 @@ function Root() {
       const storedTripId = await secureStoreGetItem("currentTripId");
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
 
-      const { REVCAT_G, REVCAT_A, EXCHANGE }: Keys = await loadKeys();
-      if (EXCHANGE) setMMKVString("EXCHANGE", EXCHANGE);
+      const { REVCAT_G, REVCAT_A }: Keys = await loadKeys();
 
       if (storedToken && storedUid && storedTripId) {
         // setup purchases

@@ -33,6 +33,10 @@ import * as Device from "expo-device";
 import Constants from "expo-constants";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import { NetworkContext } from "../store/network-context";
+import { useFocusEffect } from "@react-navigation/native";
+import { setAttributesAsync } from "../components/Premium/PremiumConstants";
+import Purchases from "react-native-purchases";
+import branch from "react-native-branch";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -53,7 +57,7 @@ async function registerForPushNotificationsAsync() {
       finalStatus = status;
     }
     if (finalStatus !== "granted") {
-      alert("Failed to get push token for push notification!");
+      // alert("Failed to get push token for push notification!");
       return;
     }
     // todo implement a later get if device is offline
@@ -144,7 +148,7 @@ const ProfileScreen = ({ navigation }) => {
       );
       Notifications.removeNotificationSubscription(responseListener.current);
     };
-  }, [expoPushToken, isConnected]);
+  }, []);
 
   useEffect(() => {
     if (!isConnected) return;
@@ -154,6 +158,54 @@ const ProfileScreen = ({ navigation }) => {
       storeToken();
     }
   }, [isConnected]);
+
+  const [emailString, setEmailString] = useState("");
+  async function getEmail() {
+    const email = await secureStoreGetItem("ENCM");
+    if (email) {
+      setEmailString(email);
+    }
+  }
+
+  useEffect(() => {
+    userCtx.loadUserNameFromStorage();
+  }, []);
+  useFocusEffect(() => {
+    userCtx.loadUserNameFromStorage();
+  });
+  useFocusEffect(() => {
+    getEmail();
+  });
+  useFocusEffect(() => {
+    setAttributesAsync(emailString, userCtx.userName);
+  });
+  useEffect(() => {
+    setAttributesAsync(emailString, userCtx.userName);
+  }, [emailString, userCtx.userName]);
+  useEffect(() => {
+    getEmail();
+  }, []);
+  useEffect(() => {
+    async function setAttributesAsync() {
+      try {
+        if (emailString) await Purchases.setAttributes({ email: emailString });
+        if (userCtx.userName)
+          await Purchases.setAttributes({ name: userCtx.userName });
+        if (!isConnected) return;
+        const params = await branch.getLatestReferringParams();
+        if (params) {
+          if (params["~channel"])
+            await Purchases.setAttributes({ channel: params["~channel"] });
+        }
+      } catch (error) {
+        console.log(
+          "setAttributesAsync - Settings - ForRevCat ~ error:",
+          error
+        );
+      }
+    }
+    setAttributesAsync();
+  }, [emailString, userCtx.userName, isConnected]);
 
   function onSummaryHandler() {
     navigation.navigate("TripSummary");

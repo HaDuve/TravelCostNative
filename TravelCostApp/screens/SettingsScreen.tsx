@@ -78,7 +78,17 @@ const SettingsScreen = ({ navigation }) => {
     setDEBUG_tripid(tripCtx.tripid);
     setDEBUG_uid(authCtx.uid);
   }, [tripCtx.tripid, authCtx.uid]);
-  const soloTraveller = !multiTraveller;
+
+  const [emailString, setEmailString] = useState("");
+  async function getEmail() {
+    const email = await secureStoreGetItem("ENCM");
+    if (email) {
+      setEmailString(email);
+    }
+  }
+  useEffect(() => {
+    getEmail();
+  }, []);
 
   // Show detailed timezone info
   useFocusEffect(
@@ -107,16 +117,6 @@ const SettingsScreen = ({ navigation }) => {
   const buttonstring1 = i18n.t("youArePremium");
   const buttonstring2 = i18n.t("becomePremium");
   const premiumButtonString = premiumStatus ? buttonstring1 : buttonstring2;
-
-  // useEffect setPremium status from userContext.isPremium
-  useEffect(() => {
-    async function setPremiumNow() {
-      const isPremium = await userCtx.checkPremium();
-      // console.log("setPremiumNow ~ isPremium:", isPremium);
-      setPremiumStatus(isPremium);
-    }
-    setPremiumNow();
-  }, [userCtx, userCtx.isPremium]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -209,53 +209,6 @@ const SettingsScreen = ({ navigation }) => {
   function joinInviteHandler() {
     navigation.navigate("Join");
   }
-
-  const [emailString, setEmailString] = useState("");
-  async function getEmail() {
-    const email = await secureStoreGetItem("ENCM");
-    if (email) {
-      setEmailString(email);
-    }
-  }
-
-  useEffect(() => {
-    userCtx.loadUserNameFromStorage();
-  }, []);
-  useFocusEffect(() => {
-    userCtx.loadUserNameFromStorage();
-  });
-  useFocusEffect(() => {
-    getEmail();
-  });
-  useFocusEffect(() => {
-    setAttributesAsync(emailString, userName);
-  });
-  useEffect(() => {
-    setAttributesAsync(emailString, userName);
-  }, [emailString, userName]);
-  useEffect(() => {
-    getEmail();
-  }, []);
-  useEffect(() => {
-    async function setAttributesAsync() {
-      try {
-        if (emailString) await Purchases.setAttributes({ email: emailString });
-        if (userName) await Purchases.setAttributes({ name: userName });
-        if (!isConnected) return;
-        const params = await branch.getLatestReferringParams();
-        if (params) {
-          if (params["~channel"])
-            await Purchases.setAttributes({ channel: params["~channel"] });
-        }
-      } catch (error) {
-        console.log(
-          "setAttributesAsync - Settings - ForRevCat ~ error:",
-          error
-        );
-      }
-    }
-    setAttributesAsync();
-  }, [emailString, userName, isConnected]);
 
   function deleteAccountHandler() {
     return Alert.alert(i18n.t("sure"), i18n.t("sureDeleteAccount"), [

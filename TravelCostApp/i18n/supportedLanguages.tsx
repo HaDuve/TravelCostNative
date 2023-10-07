@@ -122,7 +122,7 @@ const en = {
   walk6:
     "View your trips. 🗺️ \n\nYour active trip will be highlighted in green.",
   walk7:
-    "Bring friends and family on your travels! 👫\n\nInvite another nomad to join your active trip and share your expenses.",
+    "Get an overview! \n\nWith this button you can quickly show the summary for one or more trips.",
   walk8:
     "Now you're ready to go. 🚀 \n\nEnjoy your journey and keep an eye on your budget as you explore the world.",
 
@@ -524,7 +524,7 @@ const de = {
   walk6:
     "Sieh dir deine Reisen an. 🗺️ \n\nDeine aktive Reise wird grün hervorgehoben.",
   walk7:
-    "Nimm Freunde und Familie auf deine Reisen mit! 👫\n\nLade einen anderen Nomaden zu deiner aktiven Reise ein und teilt eure Ausgaben.",
+    "Erschaffe dir einen Überblick! \n\nMit dieser Schaltfläche kannst du schnell die Zusammenfassung für eine oder mehrere Reisen anzeigen.",
   walk8:
     "Jetzt bist du startklar. 🚀 \n\nGenieße deine Reise und behalte dein Budget im Blick während du die Welt erkundest.",
 
@@ -942,7 +942,7 @@ const fr = {
   walk6:
     "Consultez vos voyages. 🗺️ \n\nVotre voyage actif sera mis en évidence en vert.",
   walk7:
-    "Invitez des amis et votre famille à vous accompagner lors de vos voyages ! 👫\n\nInvitez un autre nomade à rejoindre votre voyage actif et partagez vos dépenses.",
+    "Obtenez un aperçu ! \n\nAvec ce bouton, vous pouvez rapidement afficher le résumé d'un ou de plusieurs voyages.",
   walk8:
     "Vous êtes prêt à partir maintenant. 🚀 \n\nProfitez de votre voyage et surveillez votre budget pendant que vous explorez le monde.",
   // Tabbar labels
@@ -1356,7 +1356,7 @@ const ru = {
   walk6:
     "Посмотрите свои путешествия. 🗺️ \n\nВаше активное путешествие будет выделено зеленым цветом.",
   walk7:
-    "Пригласите друзей и семью в свои путешествия! 👫\n\nПригласите другого номада в ваше активное путешествие и разделите ваши расходы.",
+    "Получите обзор! \n\nС помощью этой кнопки вы можете быстро просмотреть сводку для одной или нескольких поездок.",
   walk8:
     "Теперь вы готовы к старту. 🚀 \n\nНаслаждайтесь путешествием и следите за своим бюджетом, пока исследуете мир.",
 

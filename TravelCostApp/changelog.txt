@@ -1,4 +1,8 @@
 Change log Travel Expense App
+1.2.72
+- fixed bugs with storing and fetching data
+- fixed new user empty data bug
+- fixed exchangerates needing an api key leading to error when saving expenses
 
 1.2.700
 - added motivating push notifications for budget keeping (optional)

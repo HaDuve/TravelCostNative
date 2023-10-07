@@ -1,4 +1,12 @@
 Change log Travel Expense App
+
+1.2.73
+- new translations for new trip summary button
+- fixed a bug where a new account would get an old username
+- added a never ask again button for the pushNotification question
+- fixed a crash upon creating a new account
+- fixed issues with the new exchangerate api
+
 1.2.72
 - fixed bugs with storing and fetching data
 - fixed new user empty data bug

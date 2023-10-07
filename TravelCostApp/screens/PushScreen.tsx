@@ -8,14 +8,6 @@ import Constants from "expo-constants";
 import { ExpoPushToken } from "expo-notifications";
 import { storeExpoPushTokenInTrip } from "../util/http";
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
-
 // Can use this function below or use Expo's Push Notification Tool from: https://expo.dev/notifications
 async function sendPushNotification(expoPushToken) {
   const message = {
@@ -36,6 +28,14 @@ async function sendPushNotification(expoPushToken) {
     body: JSON.stringify(message),
   });
 }
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 async function registerForPushNotificationsAsync() {
   let token;

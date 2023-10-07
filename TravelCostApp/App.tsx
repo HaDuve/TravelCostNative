@@ -408,7 +408,8 @@ function Home() {
           ),
         }}
       />
-      <BottomTabs.Screen
+      {/* DEBUG for push notifications */}
+      {/* <BottomTabs.Screen
         name="Push"
         component={PushScreen}
         options={{
@@ -420,7 +421,7 @@ function Home() {
             <Ionicons name={"push"} size={24} color={color} />
           ),
         }}
-      ></BottomTabs.Screen>
+      ></BottomTabs.Screen> */}
 
       <BottomTabs.Screen
         name="Overview"

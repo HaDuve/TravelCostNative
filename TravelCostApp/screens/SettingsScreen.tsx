@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Platform,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import Purchases, { PurchasesOffering } from "react-native-purchases";
 import { importExcelFile } from "../components/ImportExport/OpenXLSXPicker";
 import { TripContext } from "../store/trip-context";
@@ -58,6 +58,63 @@ import {
 } from "../components/Referral/branch";
 import branch from "react-native-branch";
 import { REACT_APP_CAT_API_KEY } from "@env";
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
+import Constants from "expo-constants";
+import { storeExpoPushTokenInTrip } from "../util/http";
+import { getMMKVString, setMMKVString } from "../store/mmkv";
+import { ExpoPushToken } from "expo-notifications";
+
+async function registerForPushNotificationsAsync() {
+  let token;
+  if (Device.isDevice) {
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
+      return;
+    }
+    // todo implement a later get if device is offline
+    token = await Notifications.getExpoPushTokenAsync({
+      projectId: Constants.expoConfig.extra.eas.projectId,
+    });
+    // granted so we want to save the token in the trip
+    try {
+      await storeExpoPushTokenInTrip(token, "");
+    } catch {
+      console.log("storeExpoPushTokenInTrip failed, will try later");
+      setMMKVString("expoPushToken", token);
+    }
+    console.log(token);
+  } else {
+    alert("Must use physical device for Push Notifications");
+  }
+
+  if (Platform.OS === "android") {
+    Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FF231F7C",
+    });
+  }
+
+  return token;
+}
+
+async function storeToken(token: string) {
+  try {
+    await storeExpoPushTokenInTrip(token, "");
+  } catch (error) {
+    console.log("storeExpoPushTokenInTrip failed, will try later");
+    setMMKVString("expoPushToken", token);
+  }
+}
 
 const SettingsScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
@@ -82,6 +139,57 @@ const SettingsScreen = ({ navigation }) => {
     setDEBUG_uid(authCtx.uid);
   }, [tripCtx.tripid, authCtx.uid]);
   const soloTraveller = !multiTraveller;
+
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
+
+  // possible future use of notification display
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const [notification, setNotification] =
+    useState<Notifications.Notification>(null);
+  const notificationListener = useRef<Notifications.Subscription>();
+  const responseListener = useRef<Notifications.Subscription>();
+
+  useEffect(() => {
+    registerForPushNotificationsAsync()
+      .then((pushToken: ExpoPushToken) => {
+        const token = pushToken.data;
+        console.log("token", token);
+        setExpoPushToken(token);
+      })
+      .catch((e) => console.log("token error", e));
+
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification);
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(response);
+      });
+
+    return () => {
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isConnected) return;
+    const token = getMMKVString("expoPushToken");
+    if (token && token.length > 0) {
+      setMMKVString("expoPushToken", "");
+      storeToken(token);
+    }
+  }, [isConnected]);
 
   // Show detailed timezone info
   useFocusEffect(

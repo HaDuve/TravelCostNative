@@ -7,6 +7,7 @@ import {
   asyncStoreSetItem,
   asyncStoreSetObject,
 } from "../store/async-storage";
+import { getMMKVString } from "../store/mmkv";
 
 export async function getRate(base: string, target: string) {
   if (base === target) {
@@ -23,8 +24,9 @@ export async function getRate(base: string, target: string) {
       return getOfflineRate(base, target);
     }
   }
-
-  const requestURL = "https://api.exchangerate.host/latest?base=" + base;
+  const apiKey = getMMKVString("EXCHANGE");
+  const requestURL =
+    `https://api.exchangerate.host/latest?access_key = ${apiKey}&base=` + base;
   // save in asyncstore
 
   try {

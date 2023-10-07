@@ -54,6 +54,7 @@ export interface Keys {
   REVCAT_G: string;
   REVCAT_A: string;
   OPENAI: string;
+  EXCHANGE: string;
 }
 
 export async function loadKeys(): Promise<Keys> {
@@ -62,14 +63,17 @@ export async function loadKeys(): Promise<Keys> {
   let REVCAT_G = await secureStoreGetItem("REVCAT_G");
   let REVCAT_A = await secureStoreGetItem("REVCAT_A");
   let OPENAI = await secureStoreGetItem("OPENAI");
-  if (!isFastEnough) return { REVCAT_G, REVCAT_A, OPENAI };
+  let EXCHANGE = await secureStoreGetItem("EXCHANGE");
+  if (!isFastEnough) return { REVCAT_G, REVCAT_A, OPENAI, EXCHANGE };
   console.log("loadKeys ~ isFastEnough to load new keys:", isFastEnough);
   const data = await fetchServerInfo();
   await secureStoreSetItem("REVCAT_G", data.REVCAT_G);
   await secureStoreSetItem("REVCAT_A", data.REVCAT_A);
   await secureStoreSetItem("OPENAI", data.OPENAI);
+  await secureStoreSetItem("EXCHANGE", data.EXCHANGE);
   REVCAT_G = data.REVCAT_G;
   REVCAT_A = data.REVCAT_A;
   OPENAI = data.OPENAI;
-  return { REVCAT_G, REVCAT_A, OPENAI };
+  EXCHANGE = data.EXCHANGE;
+  return { REVCAT_G, REVCAT_A, OPENAI, EXCHANGE };
 }

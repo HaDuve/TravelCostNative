@@ -5,11 +5,10 @@ import { ScrollView } from "react-native";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 
 import IconButton from "../components/UI/IconButton";
-import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
-import { getAllExpenses, touchAllTravelers } from "../util/http";
+import { touchAllTravelers } from "../util/http";
 import { GlobalStyles } from "../constants/styles";
 import { getRate } from "../util/currencyExchange";
 import { daysBetween, getDatePlusDays } from "../util/date";
@@ -27,8 +26,6 @@ import { en, de, fr, ru } from "../i18n/supportedLanguages";
 import { getCatString } from "../util/category";
 import PropTypes from "prop-types";
 import { deleteAllExpensesByRangedId, ExpenseData } from "../util/expense";
-import { useEffect } from "react";
-import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { NetworkContext } from "../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import * as Haptics from "expo-haptics";
@@ -441,7 +438,10 @@ const ManageExpense = ({ route, navigation }) => {
       const rate = await getRate(base, target);
       console.log("confirmHandler ~ rate:", rate);
       if (rate === -1) {
-        Alert.alert("Error", "Something went wrong, please try again");
+        Alert.alert(
+          "Error",
+          "Could not find the latest exchangerates. Please try again later!"
+        );
         return;
       }
       const calcAmount = expenseData.amount / rate;

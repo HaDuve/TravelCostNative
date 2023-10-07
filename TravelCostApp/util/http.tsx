@@ -9,6 +9,7 @@ import { Traveller } from "./traveler";
 import uniqBy from "lodash.uniqby";
 import { getMMKVString, setMMKVString } from "../store/mmkv";
 import { secureStoreGetItem } from "../store/secure-storage";
+import { ExpoPushToken } from "expo-notifications";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -671,10 +672,14 @@ export async function fetchTravelerIsTouched(tripid: string, uid: string) {
   }
 }
 
-export async function storeExpoPushTokenInTrip(token: string, tripid: string) {
+export async function storeExpoPushTokenInTrip(
+  token: ExpoPushToken,
+  tripid: string
+) {
   if (!token) return;
   let usedTripID = tripid;
-  if (!tripid) usedTripID = await secureStoreGetItem("currentTripId");
+  if (!tripid || tripid.length < 1)
+    usedTripID = await secureStoreGetItem("currentTripId");
   if (!usedTripID) return;
   console.log("storeExpoPushTokenInTrip ~ usedTripID", usedTripID);
   // store token string under tripid/tokens adding to current tokens if any

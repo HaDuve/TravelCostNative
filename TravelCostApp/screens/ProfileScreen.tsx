@@ -145,7 +145,6 @@ const ProfileScreen = ({ navigation }) => {
   useEffect(() => {
     if (!isConnected) return;
     const token = getMMKVObject("expoPushToken");
-    console.log("useEffect ~ EXPOtoken:", token);
     if (token && token.length > 0) {
       setMMKVObject("expoPushToken", null);
       storeToken(token);

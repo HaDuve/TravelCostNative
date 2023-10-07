@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   Platform,
 } from "react-native";
-import React, { useContext, useRef, useState } from "react";
-import Purchases, { PurchasesOffering } from "react-native-purchases";
+import React, { useContext, useState } from "react";
+import Purchases from "react-native-purchases";
 import { importExcelFile } from "../components/ImportExport/OpenXLSXPicker";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
@@ -30,11 +30,9 @@ import { ScrollView } from "react-native-gesture-handler";
 import { GlobalStyles } from "../constants/styles";
 import LinkingButton from "../components/UI/LinkButton";
 import { DEV } from "../confAppConstants";
-import { useFocusEffect, useIsFocused } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import { DateTime } from "luxon";
-import { TourGuideZone, useTourGuideController } from "rn-tourguide";
-import { asyncStoreGetItem } from "../store/async-storage";
-import { resetTour, saveStoppedTour } from "../util/tourUtil";
+import { resetTour } from "../util/tourUtil";
 import { reloadApp } from "../util/appState";
 import {
   ENTITLEMENT_ID,
@@ -46,7 +44,6 @@ import SettingsSection from "../components/UI/SettingsSection";
 import Toast from "react-native-toast-message";
 import { useEffect } from "react";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
-import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { secureStoreGetItem } from "../store/secure-storage";
 import IconButton from "../components/UI/IconButton";
 import { BlurView } from "expo-blur";
@@ -58,16 +55,6 @@ import {
 } from "../components/Referral/branch";
 import branch from "react-native-branch";
 import { REACT_APP_CAT_API_KEY } from "@env";
-import * as Notifications from "expo-notifications";
-import * as Device from "expo-device";
-import Constants from "expo-constants";
-import { storeExpoPushTokenInTrip } from "../util/http";
-import {
-  getMMKVObject,
-  getMMKVString,
-  setMMKVObject,
-  setMMKVString,
-} from "../store/mmkv";
 
 const SettingsScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);

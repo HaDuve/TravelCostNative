@@ -57,16 +57,17 @@ async function registerForPushNotificationsAsync() {
       return;
     }
     // todo implement a later get if device is offline
-    token = await Notifications.getExpoPushTokenAsync({
-      projectId: Constants.expoConfig.extra.eas.projectId,
-    });
-    // granted so we want to save the token in the trip
+
     try {
+      token = await Notifications.getExpoPushTokenAsync({
+        projectId: Constants.expoConfig.extra.eas.projectId,
+      });
+      // granted so we want to save the token in the trip
       await storeExpoPushTokenInTrip(token, "");
       console.log("storeExpoPushTokenInTrip succeeded");
     } catch {
       console.log("storeExpoPushTokenInTrip failed, will try later");
-      setMMKVObject("expoPushToken", token);
+      setMMKVObject("expoPushTokenStatus", { failed: true });
     }
     console.log(token);
   } else {
@@ -85,13 +86,15 @@ async function registerForPushNotificationsAsync() {
   return token;
 }
 
-async function storeToken(token: ExpoPushToken) {
+async function storeToken() {
   try {
-    if (!token) return;
+    const token: ExpoPushToken = await Notifications.getExpoPushTokenAsync({
+      projectId: Constants.expoConfig.extra.eas.projectId,
+    });
     await storeExpoPushTokenInTrip(token, "");
   } catch (error) {
     console.log("storeExpoPushTokenInTrip failed, will try later");
-    setMMKVObject("expoPushToken", token);
+    setMMKVObject("expoPushTokenStatus", { failed: true });
   }
 }
 
@@ -110,6 +113,7 @@ const ProfileScreen = ({ navigation }) => {
 
   // possible future use of notification display
   const [expoPushToken, setExpoPushToken] = useState("");
+  console.log("ProfileScreen ~ expoPushToken:", expoPushToken);
   const [notification, setNotification] =
     useState<Notifications.Notification>(null);
   const notificationListener = useRef<Notifications.Subscription>();
@@ -140,14 +144,14 @@ const ProfileScreen = ({ navigation }) => {
       );
       Notifications.removeNotificationSubscription(responseListener.current);
     };
-  }, []);
+  }, [expoPushToken, isConnected]);
 
   useEffect(() => {
     if (!isConnected) return;
-    const token = getMMKVObject("expoPushToken");
-    if (token && token.length > 0) {
-      setMMKVObject("expoPushToken", null);
-      storeToken(token);
+    const status = getMMKVObject("expoPushTokenStatus");
+    if (status?.failed) {
+      setMMKVObject("expoPushTokenStatus", null);
+      storeToken();
     }
   }, [isConnected]);
 

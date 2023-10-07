@@ -88,7 +88,7 @@ function SignupScreen() {
       // UNESSENTIAL TRYCATCH
       await asyncStoreSafeClear();
       setAxiosAccessToken(token);
-      userCtx.setUserName(name);
+      await userCtx.setUserName(name);
       userCtx.setTripHistory([]);
 
       await userCtx.setFreshlyCreatedTo(true);

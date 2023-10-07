@@ -52,7 +52,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
           await tripCtx.setCurrentTrip("reset", null);
           expCtx.setExpenses([]);
           userCtx.setTripHistory([]);
-          userCtx.setUserName("");
+          await userCtx.setUserName("");
           await asyncStoreSafeClear();
           authCtx.logout();
           setIsFetchingLogout(false);

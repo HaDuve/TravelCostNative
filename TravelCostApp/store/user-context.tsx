@@ -40,7 +40,7 @@ export interface UserData {
 
 export const UserContext = createContext({
   userName: "",
-  setUserName: (name: string) => {},
+  setUserName: async (name: string) => {},
   periodName: RangeString.day,
   setPeriodString: (string: string) => {},
 
@@ -232,10 +232,11 @@ function UserContextProvider({ children }) {
     // console.log("deleteUser ~ id", id);
     Alert.alert("delete context not implemented");
   }
-  function setUserName(name: string) {
+  async function setUserName(name: string) {
     // console.log("setUserName ~ name", name);
     if (!name || name?.length < 1) return;
     setName(name);
+    await saveUserNameInStorage(name);
   }
 
   async function saveUserNameInStorage(name: string) {

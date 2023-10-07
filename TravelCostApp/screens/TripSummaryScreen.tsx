@@ -70,7 +70,7 @@ const TripSummaryScreen = ({ navigation }) => {
       setIsFetching(false);
     }
     asyncSetAllTrips();
-  }, [userCtx.tripHistory.length]);
+  }, [userCtx.tripHistory?.length]);
 
   const summarizeHandler = async () => {
     setIsFetching(true);

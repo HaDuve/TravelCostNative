@@ -574,7 +574,7 @@ function ExpensesList({
       setAllTrips(allTripsAsObjects);
     }
     asyncSetAllTrips();
-  }, [userCtx.tripHistory.length]);
+  }, [userCtx.tripHistory?.length]);
 
   const handleMoveToTripPress = useCallback(
     async (_tripid, _tripname) => {

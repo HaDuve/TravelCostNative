@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { StyleSheet, Text, View, Platform } from "react-native";
+import { StyleSheet, Text, View, Platform, Alert } from "react-native";
 import { GlobalStyles } from "../constants/styles";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
@@ -53,11 +53,34 @@ async function registerForPushNotificationsAsync() {
       await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== "granted") {
+      if (getMMKVObject("expoPushAsk")?.never) return;
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
     if (finalStatus !== "granted") {
       // alert("Failed to get push token for push notification!");
+      console.log("Failed to get push token for push notification!");
+      Alert.alert(
+        "Notifications",
+        "Please enable notifications in settings!",
+        // neveraskagain button
+        [
+          {
+            text: "Never ask again",
+            onPress: () => {
+              console.log("Never ask again");
+              setMMKVObject("expoPushAsk", { never: true });
+            },
+          },
+          {
+            text: "OK",
+            onPress: () => {
+              console.log("OK");
+            },
+          },
+        ],
+        { cancelable: false }
+      );
       return;
     }
     // todo implement a later get if device is offline

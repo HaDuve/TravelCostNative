@@ -1,8 +1,11 @@
 Change log Travel Expense App
 
+1.2.700
+- added motivating push notifications for budget keeping (optional)
+
 1.2.672
 - added last edited timestamps to expenses for future optimization
-- using timestamps to cancel changes that were older than other changes
+- using timestamps to cancel offline changes that were older than other changes
 
 1.2.671
 - added tripsummary to profile screen (shows costs of multiple trips combined)

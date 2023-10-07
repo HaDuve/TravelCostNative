@@ -28,12 +28,14 @@ export async function getRate(base: string, target: string) {
   const apiKey = await secureStoreGetItem("EXCHANGE");
   console.log("getRate ~ apiKey:", apiKey);
   const requestURL =
-    `https://api.exchangerate.host/latest?access_key = ${apiKey}&base=` + base;
+    `http://api.exchangeratesapi.io/v1/latest?access_key = ${apiKey}&base=` +
+    base;
   // save in asyncstore
 
   try {
     const response = await axios.get(requestURL);
     const rates = response.data.rates;
+    console.log("getRate ~ rates:", rates);
     if (response) {
       if (DEBUG_FORCE_OFFLINE) {
         return getOfflineRate(base, target);
@@ -52,7 +54,7 @@ export async function getRate(base: string, target: string) {
     }
     return rates[target];
   } catch (error) {
-    console.log("getRate ~ error");
+    console.log("getRate ~ error", error);
     return getOfflineRate(base, target);
   }
 }
@@ -70,6 +72,6 @@ export async function getOfflineRate(base: string, target: string) {
     return currencyExchange[target];
   } else {
     console.log("getOfflineRate ~ error ~ no currencyExchange rate stored!");
-    return -1;
+    return 1;
   }
 }

@@ -578,7 +578,7 @@ function Root() {
     if (!tripid || tripid?.length < 2) return;
     // console.log("onRootMount ~ userData", userData);
     // save user Name in Ctx and async
-    await fetchServerInfo();
+    await loadKeys();
     try {
       await userCtx.addUserName(userData);
       await tripCtx.setCurrentTrip(tripid, tripData);

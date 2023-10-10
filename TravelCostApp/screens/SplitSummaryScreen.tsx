@@ -190,7 +190,7 @@ const SplitSummaryScreen = ({ navigation }) => {
       if (noSimpleSplits) {
         // Alert.alert("No Splits to Simplify");
         Toast.show({
-          type: "info",
+          type: "error",
           text1: "No Splits to Simplify",
           visibilityTime: 2000,
         });

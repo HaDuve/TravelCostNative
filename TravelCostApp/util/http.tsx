@@ -683,6 +683,18 @@ export async function storeExpoPushTokenInTrip(
   if (!usedTripID) return;
   console.log("storeExpoPushTokenInTrip ~ usedTripID", usedTripID);
   // store token string under tripid/tokens adding to current tokens if any
+  const storedTokens = [];
+  const response = await axios.get(
+    BACKEND_URL + `/trips/${usedTripID}/tokens.json` + getMMKVString("QPAR")
+  );
+  if (response?.data) {
+    for (const key in response.data) {
+      if (!response.data[key] || storedTokens.includes(response.data[key]))
+        continue;
+      storedTokens.push(response.data[key]);
+    }
+  }
+  if (storedTokens.includes(token)) return;
   try {
     const response = await axios.post(
       BACKEND_URL + `/trips/${usedTripID}/tokens.json` + getMMKVString("QPAR"),

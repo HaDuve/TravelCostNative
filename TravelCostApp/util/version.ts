@@ -1,10 +1,17 @@
 import VersionCheck from "react-native-version-check-expo";
-import { Alert, Linking } from "react-native";
+import { Linking } from "react-native";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { getMMKVString, setMMKVString } from "../store/mmkv";
 
 export async function versionCheck() {
-  // check Timestamp from last "Later" press
+  // after testing it seems that the verion check library does not work correctly
+  // it always returns true for isNeeded
+  // in simulator - test current version is 1.2.673
+  // in simulator - test latest version is 1.10
+  // we are trying this feature with expo-updates
+
   const versionCheckTimeStamp = getMMKVString("versionCheckTimeStamp");
+
   console.log("versionCheck ~ versionCheckTimeStamp:", versionCheckTimeStamp);
   if (versionCheckTimeStamp) {
     const timeDiff =
@@ -15,27 +22,28 @@ export async function versionCheck() {
       return;
     }
   }
-  console.log("versionCheck ~ versionCheck:", versionCheck);
-  VersionCheck.needUpdate().then(async (res) => {
-    console.log("versionCheck ~ update is needed", res.isNeeded); // true
-    if (res.isNeeded) {
-      // Alert the user that a new version is available with later and okay options
-      Alert.alert(
-        "New version available",
-        "Please update the app to the latest version to get the fastest and most secure experience.",
-        [
-          {
-            text: "Later",
-            onPress: () => {
-              console.log("Cancel Pressed");
-              setMMKVString("versionCheckTimeStamp", new Date().toISOString());
-            },
-            style: "cancel",
-          },
-          { text: "OK", onPress: () => Linking.openURL(res.storeUrl) },
-        ],
-        { cancelable: false }
-      );
-    }
-  });
+
+  const updateResponse = await VersionCheck.needUpdate();
+  // isNeeded : boolean
+  // storeUrl : string
+  // currentVersion : string
+  // latestVersion : string
+  console.log("versionCheck ~ current version", updateResponse?.currentVersion);
+  console.log("versionCheck ~ latest version", updateResponse?.latestVersion);
+  if (updateResponse?.isNeeded && updateResponse?.storeUrl) {
+    Toast.show({
+      type: "success",
+      position: "top",
+      text1: "Update Available",
+      text2: "Press to update to the latest version from Store",
+      visibilityTime: 5000,
+      autoHide: true,
+      topOffset: 30,
+      bottomOffset: 40,
+      onPress: async () => {
+        await Linking.openURL(updateResponse?.storeUrl);
+      },
+    });
+    setMMKVString("versionCheckTimeStamp", new Date().toISOString());
+  }
 }

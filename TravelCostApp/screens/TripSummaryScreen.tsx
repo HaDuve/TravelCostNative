@@ -20,6 +20,7 @@ import FlatButton from "../components/UI/FlatButton";
 import { ExpenseData, Split } from "../util/expense";
 import { formatExpenseWithCurrency } from "../util/string";
 import { Traveller } from "../util/traveler";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 export type TripAsObject = {
   tripid: string;
@@ -92,7 +93,9 @@ const TripSummaryScreen = ({ navigation }) => {
       if (!tripData) continue;
       if (currency !== "" && currency !== tripData.tripCurrency) {
         // we are having diffenrent currencies that we cannot compare yet
+        // cant use toast because its a modal
         Alert.alert("Please select trips with the same currency");
+
         continue;
       }
       currency = tripData.tripCurrency;

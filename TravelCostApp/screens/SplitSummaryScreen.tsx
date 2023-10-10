@@ -188,19 +188,25 @@ const SplitSummaryScreen = ({ navigation }) => {
   const handleSimpflifySplits = useCallback(async () => {
     try {
       if (noSimpleSplits) {
-        Alert.alert("No Splits to Simplify");
+        // Alert.alert("No Splits to Simplify");
+        Toast.show({
+          type: "info",
+          text1: "No Splits to Simplify",
+          visibilityTime: 2000,
+        });
         navigation.pop();
       }
       if (simpleSplits.some((split) => split.whoPaid === "Error")) {
         setTitleText(titleTextSimplified);
         setSubTitleText(subTitleSimplified);
         setShowSimplify(false);
+        Toast.show({
+          type: "error",
+          text1: "Could not simplify splits",
+          text2: "Something must have gone wrong, sorry!",
+          visibilityTime: 2000,
+        });
         return;
-        Alert.alert(
-          "Error",
-          "Could not simplify splits. Something must have gone wrong, sorry!"
-        );
-        navigation.pop();
       }
       setSplits(simpleSplits);
       setShowSimplify(false);

@@ -7,6 +7,7 @@ import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { ExpoPushToken } from "expo-notifications";
 import { storeExpoPushTokenInTrip } from "../util/http";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 // Can use this function below or use Expo's Push Notification Tool from: https://expo.dev/notifications
 async function sendPushNotification(expoPushToken) {
@@ -48,7 +49,13 @@ async function registerForPushNotificationsAsync() {
       finalStatus = status;
     }
     if (finalStatus !== "granted") {
-      alert("Failed to get push token for push notification!");
+      // alert("Failed to get push token for push notification!");
+      Toast.show({
+        type: "error",
+        text1: "Failed to get permissions for push notification!",
+        visibilityTime: 1000,
+        autoHide: true,
+      });
       return;
     }
     // todo implement a later get if device is offline
@@ -59,7 +66,13 @@ async function registerForPushNotificationsAsync() {
     await storeExpoPushTokenInTrip(token, "");
     console.log(token);
   } else {
-    alert("Must use physical device for Push Notifications");
+    // alert("Must use physical device for Push Notifications");
+    Toast.show({
+      type: "error",
+      text1: "Must use physical device for Push Notifications",
+      visibilityTime: 1000,
+      autoHide: true,
+    });
   }
 
   if (Platform.OS === "android") {

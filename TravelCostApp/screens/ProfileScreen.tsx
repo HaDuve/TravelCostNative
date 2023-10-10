@@ -140,7 +140,6 @@ const ProfileScreen = ({ navigation }) => {
 
   // possible future use of notification display
   const [expoPushToken, setExpoPushToken] = useState("");
-  console.log("ProfileScreen ~ expoPushToken:", expoPushToken);
   const [notification, setNotification] =
     useState<Notifications.Notification>(null);
   const notificationListener = useRef<Notifications.Subscription>();
@@ -149,6 +148,7 @@ const ProfileScreen = ({ navigation }) => {
   useEffect(() => {
     registerForPushNotificationsAsync()
       .then((pushToken: ExpoPushToken) => {
+        if (!pushToken) return;
         const token = pushToken.data;
         console.log("token", token);
         setExpoPushToken(token);

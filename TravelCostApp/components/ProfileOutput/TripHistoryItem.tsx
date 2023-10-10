@@ -45,6 +45,7 @@ import { getCurrencySymbol } from "../../util/currencySymbol";
 import { ExpenseData } from "../../util/expense";
 import { isForeground } from "../../util/appState";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
+import { set } from "react-native-reanimated";
 
 function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const navigation = useNavigation();
@@ -112,33 +113,44 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       }
     }
 
-    if (tripCtx.tripid == tripid) {
+    const contextTrip = tripCtx.tripid == tripid;
+    if (contextTrip) {
       setTripName(tripCtx.tripName);
       setTotalBudget(tripCtx.totalBudget);
       setDailyBudget(tripCtx.dailyBudget);
       setTripCurrency(tripCtx.tripCurrency);
+      const _expenses = expenseCtx.expenses;
+      const sumOfExpenses = _expenses.reduce((acc, expense: ExpenseData) => {
+        if (isNaN(Number(expense.calcAmount))) return acc;
+        return acc + Number(expense.calcAmount);
+      }, 0);
+      setSumOfExpenses(sumOfExpenses);
       setIsFetching(false);
     }
 
-    async function loadTripData() {
+    async function fetchAndSetTripData() {
       await getTripName();
       await getTrip();
       await getTripTravellers();
     }
-    if (allLoaded) return;
+    if (allLoaded || contextTrip) return;
     if (netCtx.isConnected && netCtx.strongConnection) {
-      loadTripData();
+      try {
+        fetchAndSetTripData();
+        setAllLoaded(true);
+      } catch (error) {
+        console.log("error while fetching TripData", error);
+      }
       setIsFetching(false);
-      setAllLoaded(true);
     }
   }, [
     tripid,
     tripName,
-    expenseCtx.expenses,
+    expenseCtx.expenses.length,
     netCtx.isConnected,
     netCtx.strongConnection,
     tripCtx.tripid,
-    tripCtx.travellers,
+    tripCtx.travellers.length,
     tripCtx.tripName,
     tripCtx.totalBudget,
     tripCtx.dailyBudget,

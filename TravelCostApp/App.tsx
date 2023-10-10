@@ -103,6 +103,7 @@ import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import PushScreen from "./screens/PushScreen";
 import { setMMKVString } from "./store/mmkv";
+import { versionCheck } from "./util/version";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -626,7 +627,9 @@ function Root() {
       const online = isFastEnough;
 
       console.log("onRootMount ~ online:", online, speed?.toFixed(2), " mbps");
-
+      if (online) {
+        await versionCheck();
+      }
       // fetch token and trip
       const storedToken = await secureStoreGetItem("token");
       const storedUid = await secureStoreGetItem("uid");

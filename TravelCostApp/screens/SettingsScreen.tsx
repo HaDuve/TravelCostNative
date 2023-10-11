@@ -55,6 +55,8 @@ import {
 } from "../components/Referral/branch";
 import branch from "react-native-branch";
 import { REACT_APP_CAT_API_KEY } from "@env";
+import { versionCheck, versionCheckResponse } from "../util/version";
+import { async } from "@firebase/util";
 
 const SettingsScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
@@ -129,6 +131,21 @@ const SettingsScreen = ({ navigation }) => {
     }, [])
   );
 
+  const [latestVersion, setLatestVersion] = useState("");
+  const [currentVersion, setCurrentVersion] = useState("");
+
+  useEffect(() => {
+    async function checkVersion() {
+      if (isConnected) {
+        const data: versionCheckResponse = await versionCheck();
+        const latestVersion = data.latestVersion;
+        const currentVersion = data.currentVersion;
+        setLatestVersion(latestVersion);
+        setCurrentVersion(currentVersion);
+      }
+    }
+    checkVersion();
+  }, [isConnected]);
   const DEVCONTENT = DEV && (
     <View>
       {/* spacer View */}
@@ -352,8 +369,8 @@ const SettingsScreen = ({ navigation }) => {
       </TouchableOpacity> */}
       <TouchableOpacity
         onPress={() => {
-          const subject = "Budget For Nomads Support";
-          const message = "Hi, I have a question about ...";
+          const subject = encodeURIComponent("Budget For Nomads Support");
+          const message = encodeURIComponent("Hi, I have a question about ...");
           Linking.openURL(
             `mailto:budgetfornomads@outlook.com?subject=${subject}&body=${message}`
           );
@@ -387,6 +404,10 @@ const SettingsScreen = ({ navigation }) => {
         }}
       ></View>
       {DEVCONTENT}
+      <View style={{ padding: 12, flex: 1 }}>
+        {currentVersion && <Text>Current Version: {currentVersion}</Text>}
+        {latestVersion && <Text>Latest Version: {latestVersion}</Text>}
+      </View>
       <View style={{ flex: 1, minHeight: 100 }}></View>
     </ScrollView>
   );

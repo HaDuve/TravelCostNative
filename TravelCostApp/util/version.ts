@@ -3,6 +3,12 @@ import { Linking } from "react-native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { getMMKVString, setMMKVString } from "../store/mmkv";
 
+export interface versionCheckResponse {
+  latestVersion: string;
+  currentVersion: string;
+  isNeeded: boolean;
+  storeUrl: string;
+}
 export async function versionCheck() {
   // after testing it seems that the verion check library does not work correctly
   // it always returns true for isNeeded
@@ -23,7 +29,7 @@ export async function versionCheck() {
     }
   }
 
-  const updateResponse = await VersionCheck.needUpdate();
+  const updateResponse: versionCheckResponse = await VersionCheck.needUpdate();
   // isNeeded : boolean
   // storeUrl : string
   // currentVersion : string
@@ -46,4 +52,6 @@ export async function versionCheck() {
     });
     setMMKVString("versionCheckTimeStamp", new Date().toISOString());
   }
+  // return {latestVersion, currentVersion, isNeeded, storeUrl}
+  return updateResponse;
 }

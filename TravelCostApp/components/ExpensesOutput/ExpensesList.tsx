@@ -576,6 +576,16 @@ function ExpensesList({
     asyncSetAllTrips();
   }, [userCtx.tripHistory?.length]);
 
+  const handleEditMultipleExpenses = useCallback(async () => {
+    if (!selected || selected.length === 0) return;
+    if (selected.length === 1) {
+      navigation.navigate("ManageExpense", { expenseId: selected[0] });
+    }
+    // else we have an array of expenseIds which we want to simultaneously edit
+    // TODO: implement this in ManageMultipleExpenses.tsx and App.tsx
+    // navigation.navigate("ManageMultipleExpenses", { multipleIds: selected });
+  }, [selected.length]);
+
   const handleMoveToTripPress = useCallback(
     async (_tripid, _tripname) => {
       console.log("handleMoveToTripPress ~ tripid", _tripid);
@@ -754,6 +764,20 @@ function ExpensesList({
             flexDirection: "row",
           }}
         >
+          {selectable && (
+            <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
+              <IconButton
+                icon={"document-outline"}
+                size={24}
+                color={
+                  selected?.length > 0
+                    ? GlobalStyles.colors.gray700
+                    : GlobalStyles.colors.gray600
+                }
+                onPress={handleEditMultipleExpenses}
+              ></IconButton>
+            </Animated.View>
+          )}
           {selectable && (
             <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
               <IconButton

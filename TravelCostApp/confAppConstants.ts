@@ -9,7 +9,7 @@ export const DEBUG_POLLING_INTERVAL = 5000;
 // DEV consts
 export const DEV = false;
 // Premium consts
-export const FORCE_PREMIUM = DEV;
+export const FORCE_PREMIUM = true;
 // Rating/Review consts
 export const DAYS_BEFORE_PROMPT = 2;
 // Maximum number of period range days/months/years

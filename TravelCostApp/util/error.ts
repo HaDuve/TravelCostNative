@@ -25,6 +25,8 @@ export function getError(error: unknown) {
     message = error;
   } else if (typeof error === "object" && error !== null) {
     message = JSON.stringify(error);
+  } else {
+    message = "Unknown error";
   }
   return message;
 }

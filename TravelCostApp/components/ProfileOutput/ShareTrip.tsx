@@ -12,6 +12,7 @@ i18n.enableFallback = true;
 import * as Linking from "expo-linking";
 import * as Haptics from "expo-haptics";
 import PropTypes from "prop-types";
+import safeLogError from "../../util/error";
 
 export async function onShare(shareId, navigation) {
   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -32,7 +33,7 @@ export async function onShare(shareId, navigation) {
       // dismissed
     }
   } catch (error) {
-    console.log(error.message);
+    safeLogError(error);
     Alert.alert(i18n.t("errorShareTripText"), i18n.t("errorShareTripText"));
   }
   navigation.navigate("Profile");

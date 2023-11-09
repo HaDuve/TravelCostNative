@@ -4,6 +4,7 @@ import * as XLSX from "xlsx";
 import { importExpenseFromXLSX } from "./ImportExpense";
 import * as Updates from "expo-updates";
 import { reloadApp } from "../../util/appState";
+import safeLogError from "../../util/error";
 
 export const importExcelFile = async (uid, tripid, userName, addExpense) => {
   const workbook = await OpenXLSXPicker();
@@ -148,7 +149,7 @@ async function getCatTextCostPairs(
       }
       textCostPairs.push({ text: textObj.w, cost: costObj.v, cat: cat });
     } catch (error) {
-      console.log(error);
+      safeLogError(error);
     }
   }
   return textCostPairs;

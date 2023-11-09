@@ -3,6 +3,7 @@ import {
   secureStoreGetObject,
   secureStoreSetObject,
 } from "../../store/secure-storage";
+import safeLogError from "../../util/error";
 
 export const handleFirstStart = async () => {
   try {
@@ -23,7 +24,7 @@ export const shouldPromptForRating = async () => {
       return false;
     }
   } catch (error) {
-    console.log(error);
+    safeLogError(error);
   }
   try {
     const firstStart = await secureStoreGetObject("firstStart");

@@ -3,6 +3,7 @@ import { storeExpense } from "../../util/http";
 import * as Updates from "expo-updates";
 import { OpenXLSXPicker } from "./OpenXLSXPicker";
 import { reloadApp } from "../../util/appState";
+import safeLogError from "../../util/error";
 
 export const importGoogleExcelFileFROM = async (
   uid,
@@ -180,7 +181,7 @@ async function getDataObjects(sheet, start: number, end: number, cat: string) {
         });
       }
     } catch (error) {
-      console.log(error);
+      safeLogError(error);
     }
   }
   return textCostPairs;

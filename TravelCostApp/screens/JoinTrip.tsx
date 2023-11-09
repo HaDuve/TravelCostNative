@@ -44,6 +44,7 @@ import uniqBy from "lodash.uniqby";
 import { secureStoreSetItem } from "../store/secure-storage";
 import { setMMKVObject } from "../store/mmkv";
 import { err } from "react-native-svg/lib/typescript/xml";
+import safeLogError from "../util/error";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -131,7 +132,7 @@ const JoinTrip = ({ navigation, route }) => {
           await userCtx.setFreshlyCreatedTo(false);
           await userCtx.loadCatListFromAsyncInCtx(tripid);
         } catch (error) {
-          console.log(error.message);
+          safeLogError(error);
           throw new Error("Error while updating user in context");
         }
 

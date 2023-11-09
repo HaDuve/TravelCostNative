@@ -10,6 +10,7 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import { getAllExpenses } from "./http";
+import safeLogError from "./error";
 
 export function recalcSplitsLinearly(splitList: Split[], amount: number) {
   if (amount == 0) return splitList;
@@ -289,7 +290,7 @@ export async function calcOpenSplitsTable(
     try {
       expenses = await getAllExpenses(tripid);
     } catch (error) {
-      console.log(error);
+      safeLogError(error);
     }
     if (!expenses || expenses?.length < 1) {
       console.log("no expenses!");

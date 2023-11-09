@@ -37,6 +37,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { setAttributesAsync } from "../components/Premium/PremiumConstants";
 import Purchases from "react-native-purchases";
 import branch from "react-native-branch";
+import safeLogError from "../util/error";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -248,7 +249,7 @@ const ProfileScreen = ({ navigation }) => {
           console.log("fetch ~ tripHistoryResponse:", tripHistoryResponse);
           userCtx.setTripHistory(tripHistoryResponse);
         } catch (error) {
-          console.log(error.message);
+          safeLogError(error);
         }
       }
     }

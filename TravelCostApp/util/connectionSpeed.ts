@@ -4,6 +4,7 @@ import {
   DEBUG_FORCE_OFFLINE,
   MINIMUM_REQUIRED_SPEED,
 } from "../confAppConstants";
+import safeLogError from "./error";
 
 const requiredSpeed = MINIMUM_REQUIRED_SPEED; // in Mbps
 
@@ -30,7 +31,7 @@ async function getConnectionSpeed(): Promise<number> {
       return 0;
     }
   } catch (error) {
-    console.log(error);
+    safeLogError(error);
   }
 }
 

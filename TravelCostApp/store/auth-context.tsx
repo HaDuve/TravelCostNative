@@ -33,6 +33,7 @@ import {
   secureStoreSetItem,
 } from "./secure-storage";
 import { reloadApp } from "../util/appState";
+import safeLogError from "../util/error";
 
 export const AuthContext = createContext({
   uid: "",
@@ -112,7 +113,7 @@ function AuthContextProvider({ children }) {
         .catch((error) => {
           // An error ocurred
           // ...
-          console.log(error);
+          safeLogError(error);
         });
     });
     // logout();

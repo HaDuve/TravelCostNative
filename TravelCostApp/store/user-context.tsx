@@ -25,6 +25,7 @@ import {
 import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { RangeString } from "./expenses-context";
 import Purchases from "react-native-purchases";
+import safeLogError from "../util/error";
 
 export interface UserData {
   uid?: string;
@@ -119,7 +120,7 @@ function UserContextProvider({ children }) {
       console.log("fetch ~ tripHistoryResponse:", tripHistoryResponse);
       setTripHistory(tripHistoryResponse);
     } catch (error) {
-      console.log(error.message);
+      safeLogError(error);
     }
   }
   useEffect(() => {

@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import SplashScreenOverlay from "../components/UI/SplashScreenOverlay";
 import PropTypes from "prop-types";
 import { secureStoreGetItem, secureStoreSetItem } from "./secure-storage";
+import safeLogError from "../util/error";
 
 export interface Settings {
   showFlags: boolean;
@@ -47,7 +48,7 @@ export const SettingsProvider = ({ children }) => {
       await secureStoreSetItem("settings", settingsString);
       setSettings(newSettings);
     } catch (error) {
-      console.log(error);
+      safeLogError(error);
     }
   };
 

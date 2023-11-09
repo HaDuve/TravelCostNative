@@ -15,6 +15,7 @@ import { SettingsContext } from "../../store/settings-context";
 import SettingsSwitch from "./SettingsSwitch";
 import PropTypes from "prop-types";
 import { secureStoreGetItem } from "../../store/secure-storage";
+import safeLogError from "../../util/error";
 
 const SettingsSection = ({ multiTraveller }) => {
   const { settings, saveSettings } = useContext(SettingsContext);
@@ -135,7 +136,7 @@ export const loadSettings = async () => {
     const settings = await secureStoreGetItem("settings");
     return JSON.parse(settings);
   } catch (error) {
-    console.log(error);
+    safeLogError(error);
     return {};
   }
 };

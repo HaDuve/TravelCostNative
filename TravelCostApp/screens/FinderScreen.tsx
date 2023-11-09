@@ -44,6 +44,7 @@ import Animated from "react-native-reanimated";
 import BlurPremium from "../components/Premium/BlurPremium";
 import { formatExpenseWithCurrency } from "../util/string";
 import { TripContext } from "../store/trip-context";
+import safeLogError from "../util/error";
 
 const FinderScreen = () => {
   const navigation = useNavigation();
@@ -212,8 +213,8 @@ const FinderScreen = () => {
         await asyncStoreSetItem("FINDER_startDate", startDate);
         await asyncStoreSetItem("FINDER_endDate", endDate);
         await asyncStoreSetItem("FINDER_searchQuery", searchQuery);
-      } catch (err) {
-        console.log(err);
+      } catch (error) {
+        safeLogError(error);
       }
     };
     if (hasLoaded) saveData();
@@ -233,8 +234,8 @@ const FinderScreen = () => {
         if (endDate) setEndDate(endDate);
         if (searchQuery) setSearchQuery(searchQuery);
         setHasLoaded(true);
-      } catch (err) {
-        console.log(err);
+      } catch (error) {
+        safeLogError(error);
         setHasLoaded(true);
       }
     };

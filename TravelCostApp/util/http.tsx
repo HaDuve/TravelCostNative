@@ -10,6 +10,7 @@ import uniqBy from "lodash.uniqby";
 import { getMMKVString, setMMKVString } from "../store/mmkv";
 import { secureStoreGetItem } from "../store/secure-storage";
 import { ExpoPushToken } from "expo-notifications";
+import safeLogError from "./error";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -370,8 +371,7 @@ export async function fetchUser(uid: string) {
     const userData: UserData = response.data;
     return userData;
   } catch (error) {
-    console.log(error);
-    throw new Error("error while fetching user");
+    safeLogError(error);
   }
 }
 
@@ -447,8 +447,7 @@ export async function putTravelerInTrip(tripid: string, traveller: Traveller) {
     );
     return response.data;
   } catch (error) {
-    console.log(error.message);
-    throw new Error("error while putting traveller to trip", error.message);
+    safeLogError(error);
   }
 }
 

@@ -6,30 +6,20 @@ import React, {
   useState,
 } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
-import ExpensesOutput, {
-  MemoizedExpensesOutput,
-} from "../components/ExpensesOutput/ExpensesOutput";
+import { MemoizedExpensesOutput } from "../components/ExpensesOutput/ExpensesOutput";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
-import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { AuthContext } from "../store/auth-context";
 import { ExpensesContext, RangeString } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 import { getOfflineQueue } from "../util/offline-queue";
-import { toShortFormat } from "../util/date";
-import {
-  dataResponseTime,
-  fetchTravelerIsTouched,
-  getAllExpenses,
-  unTouchTraveler,
-} from "../util/http";
+import { fetchTravelerIsTouched } from "../util/http";
 
 import {
   StyleSheet,
   Text,
   View,
   RefreshControl,
-  LogBox,
   useWindowDimensions,
 } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
@@ -46,35 +36,31 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import Config from "react-native-config";
 import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpensesUtil";
-import { asyncStoreGetObject, asyncStoreSetItem } from "../store/async-storage";
+import { asyncStoreGetObject } from "../store/async-storage";
 import { _toShortFormat } from "../util/dateTime";
 import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
 import { isForeground } from "../util/appState";
 import { TourGuideZone } from "rn-tourguide";
 import PropTypes from "prop-types";
-import { ExpenseData } from "../util/expense";
 import Toast from "react-native-toast-message";
 import { NetworkContext } from "../store/network-context";
-import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { sendOfflineQueue } from "../util/offline-queue";
 import * as Haptics from "expo-haptics";
 import { SettingsContext } from "../store/settings-context";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { Platform } from "react-native";
-import { REACT_APP_CAT_API_KEY, REACT_APP_GPT_API_KEY } from "@env";
-import * as Device from "expo-device";
 import { memo } from "react";
-import { set } from "react-native-reanimated";
 
 function RecentExpenses({ navigation }) {
   const expensesCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
+  const uid = authCtx.uid;
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
+  const tripid = tripCtx.tripid;
   const netCtx = useContext(NetworkContext);
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
   const { settings } = useContext(SettingsContext);
@@ -106,6 +92,66 @@ function RecentExpenses({ navigation }) {
     },
     []
   );
+  const getExpenses = useCallback(
+    async (
+      showRefIndicator = false,
+      showAnyIndicator = false,
+      ignoreTouched = false
+    ) => {
+      if (userCtx.freshlyCreated) return;
+      if (ignoreTouched)
+        console.log("getExpenses ~ ignoreTouched:", ignoreTouched);
+      // check offlinemode
+      const online = netCtx.isConnected && netCtx.strongConnection;
+      const offlineQueue = await asyncStoreGetObject("offlineQueue");
+      const queueBlocked = offlineQueue && offlineQueue?.length > 0;
+      if (!online || queueBlocked) {
+        // if online, send offline queue
+        if (online) {
+          console.log("RecentExpenses ~ sending offline queue");
+          await sendOfflineQueue();
+          return;
+        }
+        // if offline, load from storage
+        // setIsFetching(true);
+        // await test_offlineLoad(expensesCtx, setRefreshing, setIsFetching);
+        await expensesCtx.loadExpensesFromStorage();
+        // setIsFetching(false);
+        return;
+      }
+      // checking isTouched or firstLoad
+      const isTouched =
+        ignoreTouched || (await fetchTravelerIsTouched(tripid, uid));
+      if (!isTouched) {
+        setRefreshing(false);
+        setIsFetching(false);
+        return;
+      }
+      console.log("we are touched and fetching expenses", tripid);
+      // fetch and set expenses
+
+      await fetchExpenses(
+        showRefIndicator,
+        showAnyIndicator,
+        setIsFetching,
+        setRefreshing,
+        expensesCtx,
+        tripid,
+        uid,
+        tripCtx
+      );
+    },
+    [
+      // expensesCtx, // commented because react native does weird stuff with objects in dependencies
+      fetchExpenses,
+      netCtx.isConnected,
+      netCtx.strongConnection,
+      // tripCtx,
+      tripid,
+      uid,
+      userCtx.freshlyCreated,
+    ]
+  );
 
   useFocusEffect(
     React.useCallback(() => {
@@ -119,14 +165,6 @@ function RecentExpenses({ navigation }) {
       }
     }, [userCtx.freshlyCreated, navigation])
   );
-
-  const tripid = tripCtx.tripid;
-  // uid as a state
-  const [uid, setuidString] = useState(authCtx.uid);
-  useEffect(() => {
-    setuidString(authCtx.uid);
-  }, [authCtx.uid]);
-
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState();
 
@@ -134,7 +172,7 @@ function RecentExpenses({ navigation }) {
   const [PeriodValue, setPeriodValue] = useState<RangeString>(RangeString.day);
   useEffect(() => {
     userCtx.setPeriodString(PeriodValue);
-  }, [PeriodValue]);
+  }, [PeriodValue, userCtx]);
 
   const [dateTimeString, setDateTimeString] = useState("");
 
@@ -159,7 +197,7 @@ function RecentExpenses({ navigation }) {
     }
     await getExpenses(true, true, true);
     setRefreshing(false);
-  }, [getExpenses]);
+  }, [getExpenses, refreshing]);
 
   // strong connection state
   const [offlineString, setOfflineString] = useState("");
@@ -224,67 +262,6 @@ function RecentExpenses({ navigation }) {
     }
     setTravellers();
   }, [tripCtx.tripid, netCtx.isConnected, netCtx.strongConnection]);
-
-  const getExpenses = useCallback(
-    async (
-      showRefIndicator = false,
-      showAnyIndicator = false,
-      ignoreTouched = false
-    ) => {
-      if (userCtx.freshlyCreated) return;
-      if (ignoreTouched)
-        console.log("getExpenses ~ ignoreTouched:", ignoreTouched);
-      // check offlinemode
-      const online = netCtx.isConnected && netCtx.strongConnection;
-      const offlineQueue = await asyncStoreGetObject("offlineQueue");
-      const queueBlocked = offlineQueue && offlineQueue?.length > 0;
-      if (!online || queueBlocked) {
-        // if online, send offline queue
-        if (online) {
-          console.log("RecentExpenses ~ sending offline queue");
-          await sendOfflineQueue();
-          return;
-        }
-        // if offline, load from storage
-        // setIsFetching(true);
-        // await test_offlineLoad(expensesCtx, setRefreshing, setIsFetching);
-        await expensesCtx.loadExpensesFromStorage();
-        // setIsFetching(false);
-        return;
-      }
-      // checking isTouched or firstLoad
-      const isTouched =
-        ignoreTouched || (await fetchTravelerIsTouched(tripid, uid));
-      if (!isTouched) {
-        setRefreshing(false);
-        setIsFetching(false);
-        return;
-      }
-      console.log("we are touched and fetching expenses", tripid);
-      // fetch and set expenses
-
-      await fetchExpenses(
-        showRefIndicator,
-        showAnyIndicator,
-        setIsFetching,
-        setRefreshing,
-        expensesCtx,
-        tripid,
-        uid,
-        tripCtx
-      );
-    },
-    [
-      // expensesCtx,
-      fetchExpenses,
-      netCtx.isConnected,
-      netCtx.strongConnection,
-      // tripCtx,
-      tripid,
-      uid,
-      userCtx.freshlyCreated,
-    ]
-  );
 
   useInterval(
     () => {

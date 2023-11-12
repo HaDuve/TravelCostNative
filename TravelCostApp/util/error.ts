@@ -4,10 +4,18 @@
  * @param error - The error object to log.
  * @returns The error message that was logged.
  */
-export default function safeLogError(error: unknown) {
+export default function safeLogError(
+  error: unknown,
+  fileName = "",
+  lineNumber = 0
+) {
   if (!error) return;
   const message = getError(error);
-  console.log(message);
+  console.log(
+    `~~ error ${fileName ? "in:" : ""} ${fileName ? "fn: " + fileName : ""} ${
+      lineNumber ? "ln: " + lineNumber : ""
+    } ~~\n${message || "Unknown error"}`
+  );
   return message;
 }
 

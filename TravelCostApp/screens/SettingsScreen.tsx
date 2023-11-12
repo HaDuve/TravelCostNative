@@ -57,6 +57,8 @@ import branch from "react-native-branch";
 import { REACT_APP_CAT_API_KEY } from "@env";
 import { versionCheck, versionCheckResponse } from "../util/version";
 import { async } from "@firebase/util";
+import safeLogError from "../util/error";
+import { canOpenURL } from "expo-linking";
 
 const SettingsScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
@@ -138,8 +140,10 @@ const SettingsScreen = ({ navigation }) => {
     async function checkVersion() {
       if (isConnected) {
         const data: versionCheckResponse = await versionCheck();
-        const latestVersion = data.latestVersion;
-        const currentVersion = data.currentVersion;
+        console.log("checkVersion ~ versionCheckResponse:", data);
+        const latestVersion = data?.latestVersion;
+        const currentVersion = data?.currentVersion;
+        if (!latestVersion || !currentVersion) return;
         setLatestVersion(latestVersion);
         setCurrentVersion(currentVersion);
       }
@@ -368,15 +372,26 @@ const SettingsScreen = ({ navigation }) => {
         <Text style={[styles.textButton]}>CatMapTest</Text>
       </TouchableOpacity> */}
       <TouchableOpacity
-        onPress={() => {
+        onPress={async () => {
+          console.log("pressed support button");
           const subject = encodeURIComponent("Budget For Nomads Support");
           const message = encodeURIComponent("Hi, I have a question about ...");
-          Linking.openURL(
-            `mailto:budgetfornomads@outlook.com?subject=${subject}&body=${message}`
-          );
+          const url = `mailto:budgetfornomads@outlook.com?subject=${subject}&body=${message}`;
+          navigation.pop();
+          try {
+            const canOpen = await canOpenURL(url);
+            if (!canOpen) return;
+            await Linking.openURL(url);
+          } catch (error) {
+            safeLogError(error);
+            Alert.alert(
+              "No email client found",
+              "Please install an email client and try again."
+            );
+          }
         }}
       >
-        <Text style={[styles.textButton]}>Need Help?</Text>
+        <Text style={[styles.textButton]}>Support</Text>
       </TouchableOpacity>
       {!isRestoringPurchases && (
         <TouchableOpacity onPress={() => restorePurchases()}>

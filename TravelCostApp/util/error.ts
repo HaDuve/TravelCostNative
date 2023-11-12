@@ -13,10 +13,10 @@ export default function safeLogError(
 ) {
   if (!error) return;
   const message = getErrorMessage(error);
-  console.log(
-    `~~ error ${fileName ? "in:" : ""} ${fileName ? "fn: " + fileName : ""} ${
+  console.error(
+    `{fileName ? "in:" : ""} ${fileName ? "fn: " + fileName + " " : ""}${
       lineNumber ? "ln: " + lineNumber : ""
-    } ~~\n${message || "Unknown error"}`
+    }\n${message || "Unknown error"}`
   );
   return message;
 }

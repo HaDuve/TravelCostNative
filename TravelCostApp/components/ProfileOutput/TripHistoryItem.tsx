@@ -45,13 +45,13 @@ import { getCurrencySymbol } from "../../util/currencySymbol";
 import { ExpenseData } from "../../util/expense";
 import { isForeground } from "../../util/appState";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
-import { set } from "react-native-reanimated";
 
 function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const expenseCtx = useContext(ExpensesContext);
   const netCtx = useContext(NetworkContext);
+  // list of objects containing the userName key
   const [travellers, setTravellers] = useState([]);
   const [isFetching, setIsFetching] = useState(true);
   const [tripName, setTripName] = useState("");
@@ -125,6 +125,11 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
         return acc + Number(expense.calcAmount);
       }, 0);
       setSumOfExpenses(sumOfExpenses);
+      const objTravellers = [];
+      tripCtx.travellers.forEach((traveller) => {
+        objTravellers.push({ userName: traveller });
+      });
+      setTravellers(objTravellers);
       setIsFetching(false);
     }
 
@@ -155,6 +160,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
     tripCtx.totalBudget,
     tripCtx.dailyBudget,
     tripCtx.tripCurrency,
+    tripCtx.travellers,
     allLoaded,
   ]);
 

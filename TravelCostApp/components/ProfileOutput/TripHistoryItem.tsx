@@ -85,7 +85,13 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
         setDailyBudget(_dailyBudget);
         setTripCurrency(_tripCurrency);
         setSumOfExpenses(sumOfExpenses);
-        setProgress(sumOfExpenses / Number(_totalBudget));
+        const newProgress = sumOfExpenses / Number(_totalBudget);
+        if (isNaN(newProgress) || newProgress > 1) {
+          setProgress(1);
+        } else {
+          setProgress(newProgress);
+        }
+
         setIsFetching(false);
       } catch (error) {
         return;
@@ -125,7 +131,12 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
         if (isNaN(Number(expense.calcAmount))) return acc;
         return acc + Number(expense.calcAmount);
       }, 0);
-      setProgress(sumOfExpenses / Number(tripCtx.totalBudget));
+      const newProgress = sumOfExpenses / Number(tripCtx.totalBudget);
+      if (isNaN(newProgress) || newProgress > 1) {
+        setProgress(1);
+      } else {
+        setProgress(newProgress);
+      }
       setSumOfExpenses(sumOfExpenses);
       const objTravellers = [];
       tripCtx.travellers.forEach((traveller) => {

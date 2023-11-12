@@ -45,7 +45,8 @@ function TripList({ trips, refreshControl, setRefreshing }) {
         ListFooterComponent={<View style={{ height: 300 }}></View>}
         renderItem={renderTripItem}
         keyExtractor={(item: TripData) => {
-          if (typeof item === "string" || item instanceof String) return item;
+          if (typeof item === "string" || item instanceof String)
+            return item as string;
           return item.tripid + item.tripName;
         }}
       />

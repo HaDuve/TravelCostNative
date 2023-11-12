@@ -25,7 +25,7 @@ export const SPLASH_SCREEN_DELAY = 1500;
 // tweak loading recent expenses overlay timeout
 export const EXPENSES_LOAD_TIMEOUT = 16000;
 // tweak minimum required internet speed in Mbit/s
-export const MINIMUM_REQUIRED_SPEED = 0.5;
+export const MINIMUM_REQUIRED_SPEED = 0.1;
 // cache: only call the getRate request again after X numbers of hours
 export const CACHE_NUM_HOURS = 1;
 // maximum number of expenses before we start to show only text

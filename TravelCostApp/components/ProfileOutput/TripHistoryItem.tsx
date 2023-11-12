@@ -118,12 +118,14 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       setTripName(tripCtx.tripName);
       setTotalBudget(tripCtx.totalBudget);
       setDailyBudget(tripCtx.dailyBudget);
+
       setTripCurrency(tripCtx.tripCurrency);
       const _expenses = expenseCtx.expenses;
       const sumOfExpenses = _expenses.reduce((acc, expense: ExpenseData) => {
         if (isNaN(Number(expense.calcAmount))) return acc;
         return acc + Number(expense.calcAmount);
       }, 0);
+      setProgress(sumOfExpenses / Number(tripCtx.totalBudget));
       setSumOfExpenses(sumOfExpenses);
       const objTravellers = [];
       tripCtx.travellers.forEach((traveller) => {

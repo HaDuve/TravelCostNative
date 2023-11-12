@@ -1,7 +1,9 @@
 // Note: Error handling utilities
 /**
- * Logs an error message to the console if an error object is provided.
+ * Logs an error message to the console, including the file name and line number where the error occurred.
  * @param error - The error object to log.
+ * @param fileName - The name of the file where the error occurred.
+ * @param lineNumber - The line number where the error occurred.
  * @returns The error message that was logged.
  */
 export default function safeLogError(
@@ -29,6 +31,20 @@ export function getErrorMessage(error: unknown) {
   let message: string;
   if (error instanceof Error) {
     message = error.message;
+    // get line number and filename
+    const stack = error.stack;
+    if (stack) {
+      const stackLines = stack.split("\n");
+      if (stackLines?.length > 1) {
+        const line = stackLines[1];
+        const lineParts = line.split(":");
+        if (lineParts?.length > 1) {
+          const lineNumber = lineParts[lineParts.length - 2];
+          const fileName = lineParts[lineParts.length - 3];
+          message += ` (in ${fileName} at line ${lineNumber})`;
+        }
+      }
+    }
   } else if (typeof error === "string") {
     message = error;
   } else if (typeof error === "object" && error !== null) {

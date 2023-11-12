@@ -1,5 +1,13 @@
 Change log Travel Expense App
 
+1.2.799
+- fixed a crash that happened often lately when the app saved data in offline mode
+- fixed more rare crashes
+- improved user experience in many places
+- added version check for updates
+- fixed premium status check (online & offline)
+- updating alot of libraries to keep the app up to date with latest SDK (Play Store & App Store)
+
 1.2.73
 - new translations for new trip summary button
 - fixed a bug where a new account would get an old username

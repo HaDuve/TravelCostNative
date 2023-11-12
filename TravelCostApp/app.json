@@ -3,8 +3,8 @@
     "name": "Budget",
     "slug": "Travel-Expense",
     "scheme": "budgetfornomads",
-    // this version (at least until depth 3) has to be the same in AppStore Connect and probably Google Play to work with automatic update check
-    "version": "1.2.673",
+    // next version should be called 1.2.801 in appStore and here to work with auto-update
+    "version": "1.2.799",
     "orientation": "portrait",
     "icon": "./assets/icon2.png",
     "userInterfaceStyle": "light",
@@ -21,14 +21,14 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.budgetfornomads.app",
-      "buildNumber": "1.0.1169",
+      "buildNumber": "1.0.1170",
       "config": {
         "usesNonExemptEncryption": false
       }
     },
     "android": {
       "package": "com.budgetfornomads.app",
-      "versionCode": 101077,
+      "versionCode": 101078,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon2.png",
         "backgroundColor": "#FFFFFF"

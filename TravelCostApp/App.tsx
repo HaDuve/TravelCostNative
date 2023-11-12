@@ -780,9 +780,7 @@ function Root() {
 
 function handleUnhandledTouches() {
   Keyboard.dismiss();
-  // dismiss dropdowns
   Toast.hide();
-
   return false;
 }
 

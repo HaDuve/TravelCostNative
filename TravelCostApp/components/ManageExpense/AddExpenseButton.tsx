@@ -124,10 +124,7 @@ const AddExpenseButton = ({ navigation }) => {
 
   if (!valid) {
     return (
-      <Animated.View
-        style={[styles.margin]}
-        entering={FadeIn.duration(600).delay(8000)}
-      >
+      <Animated.View style={[styles.margin]} entering={FadeIn.duration(600)}>
         <Pressable
           onPress={() => {
             pressHandler();

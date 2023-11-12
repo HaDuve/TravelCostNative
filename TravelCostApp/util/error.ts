@@ -27,7 +27,7 @@ export default function safeLogError(
  * @returns The error message as a string, or undefined if the error is falsy.
  */
 export function getErrorMessage(error: unknown) {
-  if (!error) return;
+  if (!error) return "";
   let message: string;
   if (error instanceof Error) {
     message = error.message;

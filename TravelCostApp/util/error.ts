@@ -10,7 +10,7 @@ export default function safeLogError(
   lineNumber = 0
 ) {
   if (!error) return;
-  const message = getError(error);
+  const message = getErrorMessage(error);
   console.log(
     `~~ error ${fileName ? "in:" : ""} ${fileName ? "fn: " + fileName : ""} ${
       lineNumber ? "ln: " + lineNumber : ""
@@ -24,7 +24,7 @@ export default function safeLogError(
  * @param error - The error object, string, or JSON object.
  * @returns The error message as a string, or undefined if the error is falsy.
  */
-export function getError(error: unknown) {
+export function getErrorMessage(error: unknown) {
   if (!error) return;
   let message: string;
   if (error instanceof Error) {

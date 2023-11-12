@@ -22,9 +22,9 @@ export default function safeLogError(
 }
 
 /**
- * Returns the error message from an error object, string, or JSON object.
- * @param error - The error object, string, or JSON object.
- * @returns The error message as a string, or undefined if the error is falsy.
+ * Type-safely (string, Error, JSON) returns a string representation of the given error object.
+ * @param error - The error object to get the message for.
+ * @returns A string representation of the given error object.
  */
 export function getErrorMessage(error: unknown) {
   if (!error) return "";

@@ -180,6 +180,8 @@ const TripForm = ({ navigation, route }) => {
         setIsLoading(false);
         console.log("loaded from context");
         return;
+      } else {
+        setIsLoading(true);
       }
     }
 

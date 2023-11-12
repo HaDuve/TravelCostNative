@@ -14,6 +14,7 @@
     "@expo/cli": "^0.10.14",
     "@expo/config": "^8.1.2",
     "@expo/config-plugins": "^7.2.5",
+    "@expo/metro-config": "^0.10.7",
     "@expo/prebuild-config": "^6.2.6",
     "@react-native-async-storage/async-storage": "1.18.2",
     "@react-native-community/netinfo": "9.3.10",
@@ -102,6 +103,7 @@
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
     "metro": "^0.76.3",
+    "metro-config": "^0.80.1",
     "metro-core": "^0.76.3",
     "typescript": "^5.1.3"
   },

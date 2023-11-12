@@ -104,6 +104,7 @@ import Constants from "expo-constants";
 import PushScreen from "./screens/PushScreen";
 import { setMMKVString } from "./store/mmkv";
 import { versionCheck } from "./util/version";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -811,22 +812,24 @@ export default function App() {
                   <SettingsProvider>
                     <NetworkProvider>
                       <ExpensesContextProvider>
-                        <TourGuideProvider
-                          {...{
-                            borderRadius: 16,
-                            key: "settings",
-                            labels: {
-                              previous: i18n.t("tourGuideLabelPrevious"),
-                              next: i18n.t("tourGuideLabelNext"),
-                              skip: i18n.t("tourGuideLabelSkip"),
-                              finish: i18n.t("tourGuideLabelFinish"),
-                            },
-                          }}
-                        >
-                          <Root />
+                        <GestureHandlerRootView style={{ flex: 1 }}>
+                          <TourGuideProvider
+                            {...{
+                              borderRadius: 16,
+                              key: "settings",
+                              labels: {
+                                previous: i18n.t("tourGuideLabelPrevious"),
+                                next: i18n.t("tourGuideLabelNext"),
+                                skip: i18n.t("tourGuideLabelSkip"),
+                                finish: i18n.t("tourGuideLabelFinish"),
+                              },
+                            }}
+                          >
+                            <Root />
 
-                          <ToastComponent />
-                        </TourGuideProvider>
+                            <ToastComponent />
+                          </TourGuideProvider>
+                        </GestureHandlerRootView>
                       </ExpensesContextProvider>
                     </NetworkProvider>
                   </SettingsProvider>

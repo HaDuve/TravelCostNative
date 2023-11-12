@@ -12,6 +12,7 @@ import {
 } from "../../store/secure-storage";
 import { fetchServerInfo } from "../../util/http";
 import { isConnectionFastEnough } from "../../util/connectionSpeed";
+import safeLogError from "../../util/error";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -38,7 +39,7 @@ export async function isPremiumMember() {
     return false;
   } catch (e) {
     // Error fetching customer info
-    console.error(e);
+    safeLogError(e);
     return false;
   }
 }

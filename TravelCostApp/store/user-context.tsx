@@ -130,14 +130,8 @@ function UserContextProvider({ children }) {
   }, []);
 
   async function checkPremium() {
-    // allow offline users to get premium
-    const { isFastEnough } = await isConnectionFastEnough();
-    if (!isFastEnough) {
-      return isPremium;
-    }
     const isPremiumNow = await isPremiumMember();
-    const uid = await secureStoreGetItem("uid");
-    await secureStoreSetObject(uid ?? "" + "isPremium", isPremiumNow);
+    console.log("checkPremium ~ isPremiumNow:", isPremiumNow);
     setIsPremium(isPremiumNow);
     return isPremiumNow;
   }

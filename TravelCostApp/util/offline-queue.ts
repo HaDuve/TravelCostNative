@@ -288,19 +288,6 @@ export const sendOfflineQueue = async () => {
             item2.expense.id = id;
           }
         } else if (item.type === "update") {
-          // compare timestamp of item with timestamp of expense in db
-          // if item.editedTimestamp < expense.editedTimestamp => update expense
-          // else => skip
-          const expenses: ExpenseData[] = getMMKVObject("expenses");
-          const oldExpense = expenses.find(
-            (expense) => expense.id === item.expense.id
-          );
-          if (
-            oldExpense?.editedTimestamp >=
-            item.expense.expenseData.editedTimestamp
-          ) {
-            continue;
-          }
           await updateExpense(
             item.expense.tripid,
             item.expense.uid,

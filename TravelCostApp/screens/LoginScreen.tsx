@@ -29,6 +29,7 @@ import { secureStoreSetItem } from "../store/secure-storage";
 import { ExpensesContext } from "../store/expenses-context";
 import { setMMKVObject } from "../store/mmkv";
 import { BranchEvent } from "react-native-branch";
+import safeLogError from "../util/error";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -122,7 +123,7 @@ function LoginScreen() {
       await event.logEvent();
       console.log("loginHandler ~ userData", userData);
     } catch (error) {
-      console.log("error", error);
+      safeLogError(error);
     }
     const tripid = userData.currentTrip;
     if (!tripid && freshlyCreated) {
@@ -141,7 +142,7 @@ function LoginScreen() {
       expCtx.setExpenses([]);
       setMMKVObject("expenses", []);
     } catch (error) {
-      console.log("error", error);
+      safeLogError(error);
     }
     await authCtx.authenticate(token);
   }

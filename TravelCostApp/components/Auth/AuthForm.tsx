@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, Image } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 
@@ -22,11 +22,28 @@ import {
 import GradientButton from "../UI/GradientButton";
 import { TextInput } from "react-native-paper";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
+import { getMMKVString } from "../../store/mmkv";
+import {
+  secureStoreGetItem,
+  secureStoreSetItem,
+} from "../../store/secure-storage";
 
 function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
   const [enteredEmail, setEnteredEmail] = useState("");
   const [enteredName, setenteredName] = useState("");
   const [enteredPassword, setEnteredPassword] = useState("");
+
+  async function loadLastEmail() {
+    const lastEmail = await secureStoreGetItem("lastEmail");
+    if (lastEmail !== null) {
+      setEnteredEmail(lastEmail);
+    }
+  }
+
+  useEffect(() => {
+    if (!isLogin) return;
+    loadLastEmail();
+  }, []);
 
   const {
     name: nameIsInvalid,
@@ -48,8 +65,9 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
     }
   }
 
-  function submitHandler() {
-    onSubmit({
+  async function submitHandler() {
+    await secureStoreSetItem("lastEmail", enteredEmail);
+    await onSubmit({
       name: enteredName,
       email: enteredEmail,
       password: enteredPassword,
@@ -89,7 +107,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
       email: appleEmail,
       password: password,
     };
-    onSubmit(newCredentials);
+    await onSubmit(newCredentials);
   }
 
   const AppleAuthenticationJSX = (

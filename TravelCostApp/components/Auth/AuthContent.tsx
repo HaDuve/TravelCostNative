@@ -44,7 +44,7 @@ function AuthContent({ isLogin, onAuthenticate, isConnected }) {
     }
   }
 
-  function submitHandler(credentials: {
+  async function submitHandler(credentials: {
     name: string;
     email: string;
     password: string;
@@ -68,7 +68,7 @@ function AuthContent({ isLogin, onAuthenticate, isConnected }) {
       });
       return;
     }
-    onAuthenticate({ name, email, password });
+    await onAuthenticate({ name, email, password });
   }
 
   const headerHeight = useHeaderHeight();

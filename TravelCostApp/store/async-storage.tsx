@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import { secureStoreRemoveItem } from "./secure-storage";
+import safeLogError from "../util/error";
 
 /**
  * Store item in long-term Memory of the device.
@@ -86,8 +87,7 @@ export async function asyncStoreSafeClear() {
   try {
     keys = await AsyncStorage.getAllKeys();
   } catch (error) {
-    // read key error
-    console.error(error);
+    safeLogError(error);
   }
   // remove all keys except the keys which have a neverDelete prefix
   keys = keys.filter((key) => {
@@ -110,7 +110,6 @@ export async function asyncStoreSafeClear() {
     await secureStoreRemoveItem("ENCM");
     await secureStoreRemoveItem("ENCP");
   } catch (error) {
-    // remove error
-    console.error(error);
+    safeLogError(error);
   }
 }

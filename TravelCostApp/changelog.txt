@@ -1,5 +1,14 @@
 Change log Travel Expense App
 
+1.2.800
+- added: option to dynamically calculate your daily budget based on your total budget, trip length and expenses
+  -> (this option will show you accurately how much you can still spend daily until the end of the trip)
+- fixed a crash that happened in the country picker dropdown
+- fixed bugs which occured when no total budget was set
+- fixed a bug with the expenses progress bar
+- tweaked loading spinner when loading expenses
+- tweaked "add expenses" button
+
 1.2.799
 - fixed a crash that happened often lately when the app saved data in offline mode
 - fixed more rare crashes

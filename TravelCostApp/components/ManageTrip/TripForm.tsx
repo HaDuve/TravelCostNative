@@ -290,6 +290,7 @@ const TripForm = ({ navigation, route }) => {
           expenseCtx.addExpense(element);
         });
         setMMKVObject("expenses", expenses);
+        tripCtx.setdailyBudget(tripData.dailyBudget);
         navigation.navigate("RecentExpenses");
         return;
       }
@@ -836,18 +837,17 @@ const TripForm = ({ navigation, route }) => {
                 style={{ marginRight: "5%" }}
                 color={GlobalStyles.colors.primary500}
                 onValueChange={(value) => {
-                  if (
-                    !inputs.dailyBudget.value &&
-                    inputs.totalBudget.value &&
-                    value
-                  )
-                    inputChangedHandler(
-                      "dailyBudget",
-                      (
-                        +inputs.totalBudget.value /
-                        daysBetween(new Date(endDate), new Date(startDate))
-                      ).toString()
-                    );
+                  const calcNewDaily =
+                    +inputs.totalBudget.value /
+                    daysBetween(new Date(endDate), new Date(startDate));
+                  const isAPositiveInt =
+                    !isNaN(calcNewDaily) &&
+                    calcNewDaily > 0 &&
+                    calcNewDaily < MAX_JS_NUMBER;
+                  const newDailyBudget =
+                    isAPositiveInt && calcNewDaily.toFixed(2);
+                  if (!inputs.dailyBudget.value && inputs.totalBudget.value)
+                    inputChangedHandler("dailyBudget", newDailyBudget ?? "");
                   inputChangedHandler("isDynamicDailyBudget", value);
                 }}
               ></Switch>

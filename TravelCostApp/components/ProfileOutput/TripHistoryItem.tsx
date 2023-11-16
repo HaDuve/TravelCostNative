@@ -46,6 +46,7 @@ import { ExpenseData } from "../../util/expense";
 import { isForeground } from "../../util/appState";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { daysBetween } from "../../util/date";
+import set from "react-native-reanimated";
 
 function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const navigation = useNavigation();
@@ -60,11 +61,48 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const [dailyBudget, setDailyBudget] = useState("");
   const [tripCurrency, setTripCurrency] = useState("");
   const [sumOfExpenses, setSumOfExpenses] = useState(0);
-  const [progress, setProgress] = useState(0.5);
+  const [progress, setProgress] = useState(0);
   const [allLoaded, setAllLoaded] = useState(false);
   const [isDynamicDailyBudget, setIsDynamicDailyBudget] = useState(false);
+  const [days, setDays] = useState(0);
 
-  // TODO: make a async store entry for tripid+all the data and preload the async data before fetching online
+  useEffect(() => {
+    if (!days || !isDynamicDailyBudget) return;
+    let calcDynamicBudget = (Number(totalBudget) - sumOfExpenses) / days;
+    if (isNaN(calcDynamicBudget) || calcDynamicBudget < 0)
+      calcDynamicBudget = 0.01;
+    setDailyBudget(calcDynamicBudget.toFixed(2));
+    if (tripCtx.tripid == tripid)
+      tripCtx.setdailyBudget(calcDynamicBudget.toFixed(2));
+  }, [
+    sumOfExpenses,
+    totalBudget,
+    days,
+    isDynamicDailyBudget,
+    tripCtx.dailyBudget,
+    tripCtx.tripid,
+    tripid,
+  ]);
+
+  useEffect(() => {
+    if (tripid != tripCtx.tripid) return;
+    //calc expenses sum
+    const _expenses = expenseCtx.expenses;
+    const _expensesSum = _expenses.reduce(
+      (sum: number, expense: ExpenseData) => {
+        if (isNaN(Number(expense.calcAmount))) return sum;
+        return sum + Number(expense.calcAmount);
+      },
+      0
+    );
+    const newProgress = _expensesSum / Number(tripCtx.totalBudget);
+    if (isNaN(newProgress) || newProgress > 1) {
+      setProgress(1);
+    } else {
+      setProgress(newProgress);
+    }
+    setSumOfExpenses(_expensesSum);
+  }, [expenseCtx.expenses.length, tripCtx.tripid, tripCtx.totalBudget, tripid]);
 
   useEffect(() => {
     if (!tripid) {
@@ -88,13 +126,10 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
         const startDate = trip.startDate;
         const endDate = trip.endDate;
         const days = daysBetween(new Date(endDate), new Date(startDate));
-        console.log("getTrip ~ days:", days);
-        let calcDynamicBudget = Number(_totalBudget) - sumOfExpenses / days;
-        if (isNaN(calcDynamicBudget) || calcDynamicBudget < 0)
-          calcDynamicBudget = 0.001;
+        setDays(days);
 
         setTotalBudget(_totalBudget);
-        setDailyBudget(isDynamic ? calcDynamicBudget.toFixed(2) : _dailyBudget);
+        setDailyBudget(_dailyBudget);
         setTripCurrency(_tripCurrency);
         setSumOfExpenses(sumOfExpenses);
         const newProgress = sumOfExpenses / Number(_totalBudget);
@@ -137,7 +172,6 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       setIsDynamicDailyBudget(isDynamic);
       setTripName(tripCtx.tripName);
       setTotalBudget(tripCtx.totalBudget);
-      setDailyBudget(tripCtx.dailyBudget + (isDynamic ? " *" : ""));
 
       setTripCurrency(tripCtx.tripCurrency);
       const _expenses = expenseCtx.expenses;
@@ -151,7 +185,20 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       } else {
         setProgress(newProgress);
       }
+      const days = daysBetween(
+        new Date(tripCtx.endDate),
+        new Date(tripCtx.startDate)
+      );
+      console.log("useEffect ~ days:", days);
+      setDays(days);
       setSumOfExpenses(sumOfExpenses);
+      const dynamicDailyBudget = (
+        (+tripCtx.totalBudget - sumOfExpenses) /
+        days
+      ).toFixed(2);
+      // dont allow negative daily budget
+      if (isDynamic && Number(dynamicDailyBudget) < 0) setDailyBudget("0.01");
+      else setDailyBudget(isDynamic ? dynamicDailyBudget : tripCtx.dailyBudget);
       const objTravellers = [];
       tripCtx.travellers.forEach((traveller) => {
         objTravellers.push({ userName: traveller });

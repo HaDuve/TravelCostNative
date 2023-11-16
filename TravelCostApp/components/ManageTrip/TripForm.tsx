@@ -61,7 +61,8 @@ import { setMMKVObject } from "../../store/mmkv";
 import { useTourGuideController } from "rn-tourguide";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { useWindowDimensions } from "react-native";
-import { Checkbox } from "react-native-paper";
+import { Checkbox, Switch } from "react-native-paper";
+import { formatExpenseWithCurrency } from "../../util/string";
 
 const TripForm = ({ navigation, route }) => {
   const tripCtx = useContext(TripContext);
@@ -391,6 +392,7 @@ const TripForm = ({ navigation, route }) => {
       endDate: endDate,
       tripid: editedTripId,
       travellers: travellers,
+      isDynamicDailyBudget: inputs.isDynamicDailyBudget.value,
     };
 
     // Tripname should not be empty or spaces
@@ -469,11 +471,20 @@ const TripForm = ({ navigation, route }) => {
     totalBudget = 2,
     dailyBudget = 3,
     datePicker = 4,
+    dynamicDailyBudget = 5,
   }
   function showInfoHandler(infoEnu: infoEnum) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     let titleText = "";
     let contentText = "";
+    const diffDays = daysBetween(new Date(endDate), new Date(startDate)) + 1;
+    console.log("Days:", diffDays);
+    const calcDailyBudget = (
+      Number(inputs.totalBudget.value) / diffDays
+    ).toFixed(2);
+    console.log("Daily calc:", calcDailyBudget);
+    const totalBudget = inputs.totalBudget.value;
+    const currency = inputs.tripCurrency.value;
     switch (infoEnu) {
       case infoEnum.homeCurrency:
         titleText = i18n.t("infoHomeCurrencyTitle");
@@ -490,6 +501,18 @@ const TripForm = ({ navigation, route }) => {
       case infoEnum.datePicker:
         titleText = i18n.t("infoTripDatesTitle");
         contentText = i18n.t("infoTripDatesText");
+        break;
+      case infoEnum.dynamicDailyBudget:
+        titleText = "Dynamic Budget"; //i18n.t("infoDynamicDailyBudgetTitle");
+        contentText =
+          "See automatically how much you could spend daily for the rest of your trip to stay in your budget ! The dynamic budget will change with every expense that you enter." +
+          ` At the moment your daily Budget would be ${formatExpenseWithCurrency(
+            totalBudget,
+            currency
+          )}/ ${diffDays} days = ${formatExpenseWithCurrency(
+            calcDailyBudget,
+            currency
+          )}`; //i18n.t("infoDynamicDailyBudgetText");
         break;
       default:
         break;
@@ -707,63 +730,103 @@ const TripForm = ({ navigation, route }) => {
                 containerStyle={{ marginTop: "-3%" }}
               ></InfoButton>
             </View>
-            {/* <View>
-              <Text>isDynamicDailyBudget</Text>
-              <Checkbox status="checked"></Checkbox>
-            </View> */}
-            <View style={styles.categoryRow}>
-              <Input
-                style={{ flex: 1 }}
-                inputStyle={{}}
-                autoFocus={false}
-                label={`${i18n.t("dailyBudgetLabel")} ${
-                  inputs.tripCurrency.value
-                }`}
-                textInputConfig={{
-                  keyboardType: "decimal-pad",
-                  onChangeText: inputChangedHandler.bind(this, "dailyBudget"),
-                  value: inputs.dailyBudget.value,
-                }}
-                invalid={!inputs.dailyBudget.isValid}
-              />
-              {validTotalBudgetEntry && (
-                <Animated.View
-                  entering={ZoomIn}
-                  exiting={ZoomOut}
-                  style={styles.recalcButtonContainer}
-                >
-                  <IconButton
-                    icon="ios-git-compare-outline"
-                    color={GlobalStyles.colors.primary500}
-                    size={36}
-                    buttonStyle={[
-                      styles.recalcButton,
-                      GlobalStyles.strongShadow,
-                    ]}
-                    onPressStyle={GlobalStyles.pressedWithShadow}
-                    onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      console.log("recalculate");
-                      console.log("Start Date:", startDate);
-                      console.log("End Date:", endDate);
-                      const diffDays =
-                        daysBetween(new Date(endDate), new Date(startDate)) + 1;
-                      console.log("Days:", diffDays);
-                      const calcDailyBudget = (
-                        Number(inputs.totalBudget.value) / diffDays
-                      ).toFixed(2);
-                      console.log("Daily calc:", calcDailyBudget);
-                      inputChangedHandler(
-                        "dailyBudget",
-                        calcDailyBudget.toString()
-                      );
+
+            {!inputs.isDynamicDailyBudget.value && (
+              <View>
+                <View style={styles.categoryRow}>
+                  <Input
+                    style={{ flex: 1 }}
+                    inputStyle={{}}
+                    autoFocus={false}
+                    label={`${i18n.t("dailyBudgetLabel")} ${
+                      inputs.tripCurrency.value
+                    }`}
+                    textInputConfig={{
+                      keyboardType: "decimal-pad",
+                      onChangeText: inputChangedHandler.bind(
+                        this,
+                        "dailyBudget"
+                      ),
+                      value: inputs.dailyBudget.value,
                     }}
+                    invalid={!inputs.dailyBudget.isValid}
                   />
-                </Animated.View>
-              )}
+                  {validTotalBudgetEntry && (
+                    <Animated.View
+                      entering={ZoomIn}
+                      exiting={ZoomOut}
+                      style={styles.recalcButtonContainer}
+                    >
+                      <IconButton
+                        icon="ios-git-compare-outline"
+                        color={GlobalStyles.colors.primary500}
+                        size={36}
+                        buttonStyle={[
+                          styles.recalcButton,
+                          GlobalStyles.strongShadow,
+                        ]}
+                        onPressStyle={GlobalStyles.pressedWithShadow}
+                        onPress={() => {
+                          Haptics.impactAsync(
+                            Haptics.ImpactFeedbackStyle.Light
+                          );
+                          console.log("recalculate");
+                          console.log("Start Date:", startDate);
+                          console.log("End Date:", endDate);
+                          const diffDays =
+                            daysBetween(
+                              new Date(endDate),
+                              new Date(startDate)
+                            ) + 1;
+                          console.log("Days:", diffDays);
+                          const calcDailyBudget = (
+                            Number(inputs.totalBudget.value) / diffDays
+                          ).toFixed(2);
+                          console.log("Daily calc:", calcDailyBudget);
+                          inputChangedHandler(
+                            "dailyBudget",
+                            calcDailyBudget.toString()
+                          );
+                        }}
+                      />
+                    </Animated.View>
+                  )}
+                  <InfoButton
+                    onPress={showInfoHandler.bind(this, infoEnum.dailyBudget)}
+                    containerStyle={{ marginTop: "-3%" }}
+                  ></InfoButton>
+                </View>
+              </View>
+            )}
+            <View style={styles.dynamicDailyContainer}>
+              <Text style={styles.dynamicDailyLabel}>
+                Calculate Daily Budget dynamically
+              </Text>
+              <Switch
+                value={inputs.isDynamicDailyBudget.value}
+                style={{ marginRight: "5%" }}
+                onValueChange={(value) => {
+                  if (
+                    !inputs.dailyBudget.value &&
+                    inputs.totalBudget.value &&
+                    value
+                  )
+                    inputChangedHandler(
+                      "dailyBudget",
+                      (
+                        +inputs.totalBudget.value /
+                        daysBetween(new Date(endDate), new Date(startDate))
+                      ).toString()
+                    );
+                  inputChangedHandler("isDynamicDailyBudget", value);
+                }}
+              ></Switch>
               <InfoButton
-                onPress={showInfoHandler.bind(this, infoEnum.dailyBudget)}
-                containerStyle={{ marginTop: "-3%" }}
+                onPress={showInfoHandler.bind(
+                  this,
+                  infoEnum.dynamicDailyBudget
+                )}
+                containerStyle={{ marginLeft: "-4%" }}
               ></InfoButton>
             </View>
             <Text
@@ -863,6 +926,17 @@ const styles = StyleSheet.create({
         // minHeight: "105%",
       },
     }),
+  },
+  dynamicDailyContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: "5%",
+    marginTop: "2%",
+    justifyContent: "space-between",
+  },
+  dynamicDailyLabel: {
+    fontSize: 12,
+    color: GlobalStyles.colors.textColor,
   },
   recalcButtonContainer: {
     marginRight: "2%",

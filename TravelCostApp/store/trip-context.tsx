@@ -13,6 +13,7 @@ import { Traveller } from "../util/traveler";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { useInterval } from "../components/Hooks/useInterval";
 import { setMMKVObject, getMMKVObject } from "./mmkv";
+import set from "react-native-reanimated";
 
 export interface TripData {
   tripName?: string;
@@ -65,6 +66,7 @@ export const TripContext = createContext({
   isPaidDate: "",
   isLoading: false,
   setIsLoading: (isLoading: boolean) => {},
+  isDynamicDailyBudget: false,
 });
 
 function TripContextProvider({ children }) {
@@ -82,6 +84,7 @@ function TripContextProvider({ children }) {
   const [isPaid, setIsPaid] = useState(isPaidString.notPaid);
   const [isPaidDate, setIsPaidDate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isDynamicDailyBudget, setIsDynamicDailyBudget] = useState(false);
 
   async function loadTripidFetchTrip() {
     const stored_tripid = await secureStoreGetItem("currentTripId");
@@ -106,6 +109,27 @@ function TripContextProvider({ children }) {
     }
     setIsLoading(false);
   }
+
+  useEffect(() => {
+    function calcDynamicDailyBudget() {
+      if (isDynamicDailyBudget) {
+        const daysLeft = Math.floor(
+          (new Date(endDate).getTime() - new Date().getTime()) /
+            (1000 * 3600 * 24)
+        );
+        const totalBudgetLeft = Number(totalBudget) - Number(totalSum);
+        const dailyBudget = totalBudgetLeft / daysLeft;
+        // negative numbers are not allowed
+        if (isNaN(dailyBudget)) return;
+        if (dailyBudget < 0) {
+          setdailyBudget("0.0001");
+        } else {
+          setdailyBudget(dailyBudget.toFixed(2));
+        }
+      }
+    }
+    calcDynamicDailyBudget();
+  }, [isDynamicDailyBudget, totalBudget, totalSum, endDate]);
 
   useInterval(
     () => {
@@ -180,6 +204,10 @@ function TripContextProvider({ children }) {
       setTravellers([]);
       setStartDate("");
       setEndDate("");
+      setIsPaid(isPaidString.notPaid);
+      setIsPaidDate("");
+      setTotalSumTrip(0);
+      setIsLoading(false);
       return;
     }
     _setTripid(tripid);
@@ -188,11 +216,19 @@ function TripContextProvider({ children }) {
       trip.totalBudget ? trip.totalBudget.toString() : MAX_JS_NUMBER.toString()
     );
     setTripCurrency(trip.tripCurrency);
-    setdailyBudget(trip.dailyBudget.toString());
+    // negative Numbers are not allowed
+    if (Number(trip.dailyBudget) < 0) {
+      setdailyBudget("0.0001");
+    } else {
+      setdailyBudget(trip.dailyBudget.toString());
+    }
     setStartDate(trip.startDate);
     setEndDate(trip.endDate);
     setIsPaid(trip.isPaid);
     setIsPaidDate(trip.isPaidDate);
+    setTotalSumTrip(trip.totalSum);
+    setIsLoading(false);
+    setIsDynamicDailyBudget(trip.isDynamicDailyBudget);
     if (typeof trip.travellers[1] === "string") {
       setTravellers(trip.travellers);
     } else {
@@ -261,6 +297,12 @@ function TripContextProvider({ children }) {
       tripCurrency: tripCurrency,
       totalSum: totalSum,
       isPaid: isPaid,
+      isPaidDate: isPaidDate,
+      tripProgress: progress,
+      startDate: startDate,
+      endDate: endDate,
+      travellers: travellers,
+      isDynamicDailyBudget: isDynamicDailyBudget,
     };
     return curTripData;
   }
@@ -351,6 +393,7 @@ function TripContextProvider({ children }) {
     isPaidDate: isPaidDate,
     isLoading: isLoading,
     setIsLoading: setIsLoading,
+    isDynamicDailyBudget: isDynamicDailyBudget,
   };
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>;

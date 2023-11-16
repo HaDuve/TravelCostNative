@@ -45,6 +45,7 @@ import { getCurrencySymbol } from "../../util/currencySymbol";
 import { ExpenseData } from "../../util/expense";
 import { isForeground } from "../../util/appState";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
+import { daysBetween } from "../../util/date";
 
 function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const navigation = useNavigation();
@@ -61,6 +62,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const [sumOfExpenses, setSumOfExpenses] = useState(0);
   const [progress, setProgress] = useState(0.5);
   const [allLoaded, setAllLoaded] = useState(false);
+  const [isDynamicDailyBudget, setIsDynamicDailyBudget] = useState(false);
 
   // TODO: make a async store entry for tripid+all the data and preload the async data before fetching online
 
@@ -81,8 +83,18 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
           if (isNaN(Number(expense.calcAmount))) return acc;
           return acc + Number(expense.calcAmount);
         }, 0);
+        const isDynamic = trip.isDynamicDailyBudget;
+        setIsDynamicDailyBudget(isDynamic);
+        const startDate = trip.startDate;
+        const endDate = trip.endDate;
+        const days = daysBetween(new Date(endDate), new Date(startDate));
+        console.log("getTrip ~ days:", days);
+        let calcDynamicBudget = Number(_totalBudget) - sumOfExpenses / days;
+        if (isNaN(calcDynamicBudget) || calcDynamicBudget < 0)
+          calcDynamicBudget = 0.001;
+
         setTotalBudget(_totalBudget);
-        setDailyBudget(_dailyBudget);
+        setDailyBudget(isDynamic ? calcDynamicBudget.toFixed(2) : _dailyBudget);
         setTripCurrency(_tripCurrency);
         setSumOfExpenses(sumOfExpenses);
         const newProgress = sumOfExpenses / Number(_totalBudget);
@@ -105,7 +117,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
         listTravellers.forEach((traveller) => {
           objTravellers.push({ userName: traveller });
         });
-        setTravellers(objTravellers);
+        if (objTravellers.length > 0) setTravellers(objTravellers);
       } catch (error) {
         return;
       }
@@ -121,9 +133,11 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
 
     const contextTrip = tripCtx.tripid == tripid;
     if (contextTrip) {
+      const isDynamic = tripCtx.isDynamicDailyBudget;
+      setIsDynamicDailyBudget(isDynamic);
       setTripName(tripCtx.tripName);
       setTotalBudget(tripCtx.totalBudget);
-      setDailyBudget(tripCtx.dailyBudget);
+      setDailyBudget(tripCtx.dailyBudget + (isDynamic ? " *" : ""));
 
       setTripCurrency(tripCtx.tripCurrency);
       const _expenses = expenseCtx.expenses;
@@ -142,7 +156,8 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       tripCtx.travellers.forEach((traveller) => {
         objTravellers.push({ userName: traveller });
       });
-      setTravellers(objTravellers);
+      if (objTravellers.length > 0) setTravellers(objTravellers);
+
       setIsFetching(false);
     }
 
@@ -174,6 +189,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
     tripCtx.dailyBudget,
     tripCtx.tripCurrency,
     tripCtx.travellers,
+    tripCtx.isDynamicDailyBudget,
     allLoaded,
   ]);
 
@@ -306,7 +322,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
             <Text
               style={[styles.textBase, isScaledUp && { textAlign: "center" }]}
             >
-              {i18n.t("daily")}
+              {i18n.t("daily") + (isDynamicDailyBudget ? "*" : "")}
               {": " + dailyBudgetString}
             </Text>
           </View>

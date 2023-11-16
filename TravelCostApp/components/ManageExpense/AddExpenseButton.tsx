@@ -201,6 +201,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   addButtonInactive: {
-    backgroundColor: GlobalStyles.colors.primary500,
+    backgroundColor: GlobalStyles.colors.primary400,
   },
 });

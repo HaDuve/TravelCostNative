@@ -28,6 +28,7 @@ export interface TripData {
   endDate?: string;
   isPaidDate?: string;
   isPaid?: isPaidString;
+  isDynamicDailyBudget?: boolean;
 }
 
 export const TripContext = createContext({

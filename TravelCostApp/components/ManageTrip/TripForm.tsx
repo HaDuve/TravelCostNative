@@ -61,6 +61,7 @@ import { setMMKVObject } from "../../store/mmkv";
 import { useTourGuideController } from "rn-tourguide";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { useWindowDimensions } from "react-native";
+import { Checkbox } from "react-native-paper";
 
 const TripForm = ({ navigation, route }) => {
   const tripCtx = useContext(TripContext);
@@ -100,6 +101,10 @@ const TripForm = ({ navigation, route }) => {
     },
     dailyBudget: {
       value: "",
+      isValid: true,
+    },
+    isDynamicDailyBudget: {
+      value: false,
       isValid: true,
     },
   });
@@ -701,6 +706,10 @@ const TripForm = ({ navigation, route }) => {
                 onPress={showInfoHandler.bind(this, infoEnum.totalBudget)}
                 containerStyle={{ marginTop: "-3%" }}
               ></InfoButton>
+            </View>
+            <View>
+              <Text>isDynamicDailyBudget</Text>
+              <Checkbox status="checked"></Checkbox>
             </View>
             <View style={styles.categoryRow}>
               <Input

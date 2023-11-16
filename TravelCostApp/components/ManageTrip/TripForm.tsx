@@ -166,6 +166,10 @@ const TripForm = ({ navigation, route }) => {
           "totalBudget",
           selectedTrip.totalBudget?.toString()
         );
+        inputChangedHandler(
+          "isDynamicDailyBudget",
+          selectedTrip.isDynamicDailyBudget
+        );
         setStartDate(selectedTrip.startDate);
         setEndDate(selectedTrip.endDate);
         setTravellers(selectedTrip.travellers);
@@ -403,17 +407,27 @@ const TripForm = ({ navigation, route }) => {
       tripData.tripCurrency && tripData.tripCurrency?.length > 0;
     // Total budget should be a number between 0 and 3B
     const totalBudgetIsValid =
-      !isNaN(+tripData.totalBudget) &&
-      +tripData.totalBudget >= 0 &&
-      +tripData.totalBudget < MAX_JS_NUMBER &&
-      +tripData.totalBudget > +tripData.dailyBudget;
+      !tripData.totalBudget ||
+      (tripData.totalBudget &&
+        !isNaN(+tripData.totalBudget) &&
+        +tripData.totalBudget >= 0 &&
+        +tripData.totalBudget < MAX_JS_NUMBER &&
+        +tripData.totalBudget > +tripData.dailyBudget);
+
+    console.log(
+      "submitHandler ~ tripData.isDynamicDailyBudget:",
+      tripData.isDynamicDailyBudget
+    );
+    const dynamicIsValid =
+      !tripData.isDynamicDailyBudget ||
+      (tripData.isDynamicDailyBudget && totalBudgetIsValid);
 
     console.log("submitHandler ~ totalBudgetIsValid:", totalBudgetIsValid);
     const dailyBudgetIsValid =
       !isNaN(+tripData.dailyBudget) &&
       +tripData.dailyBudget > 0 &&
       +tripData.dailyBudget < MAX_JS_NUMBER &&
-      +tripData.dailyBudget < +tripData.totalBudget;
+      (!tripData.totalBudget || +tripData.dailyBudget < +tripData.totalBudget);
     console.log("submitHandler ~ dailyBudgetIsValid:", dailyBudgetIsValid);
 
     if (!tripNameIsValid) {
@@ -423,17 +437,24 @@ const TripForm = ({ navigation, route }) => {
       return;
     }
 
+    if (!dynamicIsValid) {
+      inputs.totalBudget.isValid = dynamicIsValid;
+      Alert.alert(i18n.t("error"), "Please enter a total Budget number!"); //(i18n.t("enterBudgetAlert"));
+      setIsLoading(false);
+      return;
+    }
+
     if (!totalBudgetIsValid || !dailyBudgetIsValid) {
       inputs.totalBudget.isValid = totalBudgetIsValid;
       inputs.dailyBudget.isValid = dailyBudgetIsValid;
-      Alert.alert(i18n.t("enterBudgetAlert"));
+      Alert.alert(i18n.t("error"), i18n.t("enterBudgetAlert"));
       setIsLoading(false);
       return;
     }
 
     if (!tripCurrencyIsValid) {
       inputs.tripCurrency.isValid = tripCurrencyIsValid;
-      Alert.alert(i18n.t("selectCurrencyAlert"));
+      Alert.alert(i18n.t("error"), i18n.t("selectCurrencyAlert"));
       setIsLoading(false);
       return;
     }
@@ -691,7 +712,7 @@ const TripForm = ({ navigation, route }) => {
                 }}
                 invalid={!inputs.totalBudget.isValid}
               />
-              {validDailyBudgetEntry && (
+              {validDailyBudgetEntry && !inputs.isDynamicDailyBudget.value && (
                 <Animated.View
                   entering={ZoomIn}
                   exiting={ZoomOut}
@@ -805,6 +826,7 @@ const TripForm = ({ navigation, route }) => {
               <Switch
                 value={inputs.isDynamicDailyBudget.value}
                 style={{ marginRight: "5%" }}
+                color={GlobalStyles.colors.primary500}
                 onValueChange={(value) => {
                   if (
                     !inputs.dailyBudget.value &&

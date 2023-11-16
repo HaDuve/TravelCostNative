@@ -113,17 +113,28 @@ const ExpensesSummary = ({
 
   if (!budgetNumber || budgetNumber == MAX_JS_NUMBER) infinityString = "∞";
   if (budgetNumber > totalBudget ?? MAX_JS_NUMBER) budgetNumber = totalBudget;
+  const noTotalBudget =
+    !tripCtx.totalBudget ||
+    tripCtx.totalBudget == "0" ||
+    tripCtx.totalBudget == "" ||
+    isNaN(Number(tripCtx.totalBudget)) ||
+    tripCtx.totalBudget >= MAX_JS_NUMBER.toString();
   let budgetProgress = (expenseSumNum / budgetNumber) * 1;
-  const budgetColor =
-    budgetProgress <= 1
-      ? GlobalStyles.colors.primary500
-      : GlobalStyles.colors.error300;
-  const unfilledColor =
-    budgetProgress <= 1
-      ? GlobalStyles.colors.gray600
-      : GlobalStyles.colors.errorGrayed;
+  const budgetColor = noTotalBudget
+    ? GlobalStyles.colors.primary500
+    : budgetProgress <= 1
+    ? GlobalStyles.colors.primary500
+    : GlobalStyles.colors.error300;
+  const unfilledColor = noTotalBudget
+    ? GlobalStyles.colors.primary500
+    : budgetProgress <= 1
+    ? GlobalStyles.colors.gray600
+    : GlobalStyles.colors.errorGrayed;
 
   if (budgetProgress > 1) budgetProgress -= 1;
+  if (noTotalBudget) {
+    budgetProgress = 0;
+  }
   if (Number.isNaN(budgetProgress)) {
     console.log("NaN budgetProgress");
     return <></>;

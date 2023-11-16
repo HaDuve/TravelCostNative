@@ -408,6 +408,7 @@ const TripForm = ({ navigation, route }) => {
     // Total budget should be a number between 0 and 3B
     const totalBudgetIsValid =
       !tripData.totalBudget ||
+      tripData.totalBudget === "0" ||
       (tripData.totalBudget &&
         !isNaN(+tripData.totalBudget) &&
         +tripData.totalBudget >= 0 &&
@@ -427,7 +428,9 @@ const TripForm = ({ navigation, route }) => {
       !isNaN(+tripData.dailyBudget) &&
       +tripData.dailyBudget > 0 &&
       +tripData.dailyBudget < MAX_JS_NUMBER &&
-      (!tripData.totalBudget || +tripData.dailyBudget < +tripData.totalBudget);
+      (!tripData.totalBudget ||
+        tripData.totalBudget === "0" ||
+        +tripData.dailyBudget < +tripData.totalBudget);
     console.log("submitHandler ~ dailyBudgetIsValid:", dailyBudgetIsValid);
 
     if (!tripNameIsValid) {

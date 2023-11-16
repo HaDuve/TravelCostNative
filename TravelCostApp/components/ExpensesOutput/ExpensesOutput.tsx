@@ -19,8 +19,6 @@ import { EXPENSES_LOAD_TIMEOUT } from "../../confAppConstants";
 import { memo } from "react";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { TripContext } from "../../store/trip-context";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
-import { MemoizedExpensesList } from "./ExpensesList";
 
 function ExpensesOutput({
   expenses,
@@ -39,8 +37,8 @@ function ExpensesOutput({
   }, [tripName]);
 
   useEffect(() => {
-    if (tripName) setShowLoading(false);
-  }, [tripName]);
+    if (tripName && expenses.length > 1) setShowLoading(false);
+  }, [tripName, expenses.length]);
 
   // const toggleLoading = () => setShowLoading((prev) => !prev);
   const loadingSpinner = useMemo(

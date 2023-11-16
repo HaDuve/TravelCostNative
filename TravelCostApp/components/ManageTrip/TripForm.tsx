@@ -459,7 +459,7 @@ const TripForm = ({ navigation, route }) => {
       return;
     }
     // if isEditing update Trip, else store
-
+    if (!tripData.totalBudget) tripData.totalBudget = "0";
     console.log("submitHandler ~ setActive:", setActive);
     try {
       if (isEditing) {

@@ -193,10 +193,15 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
     allLoaded,
   ]);
 
-  const totalBudgetString = formatExpenseWithCurrency(
-    Number(totalBudget),
-    tripCurrency
-  );
+  const noTotalBudget =
+    !totalBudget ||
+    totalBudget == "0" ||
+    totalBudget == "" ||
+    isNaN(Number(totalBudget)) ||
+    totalBudget >= MAX_JS_NUMBER.toString();
+  const totalBudgetString = noTotalBudget
+    ? "∞"
+    : formatExpenseWithCurrency(Number(totalBudget), tripCurrency);
   const dailyBudgetString = formatExpenseWithCurrency(
     Number(dailyBudget),
     tripCurrency
@@ -229,7 +234,9 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       : {};
 
   const activeProgress = progress;
-  const isOverBudget = Number(sumOfExpenses) > Number(totalBudget);
+  const isOverBudget = noTotalBudget
+    ? false
+    : Number(sumOfExpenses) > Number(totalBudget);
 
   if (!tripid) return <Text>no id</Text>;
   if (isFetching || (tripid && !totalBudget)) {

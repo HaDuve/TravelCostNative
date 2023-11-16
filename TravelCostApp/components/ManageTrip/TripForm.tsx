@@ -707,10 +707,10 @@ const TripForm = ({ navigation, route }) => {
                 containerStyle={{ marginTop: "-3%" }}
               ></InfoButton>
             </View>
-            <View>
+            {/* <View>
               <Text>isDynamicDailyBudget</Text>
               <Checkbox status="checked"></Checkbox>
-            </View>
+            </View> */}
             <View style={styles.categoryRow}>
               <Input
                 style={{ flex: 1 }}

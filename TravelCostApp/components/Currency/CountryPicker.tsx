@@ -56,13 +56,13 @@ const CountryPicker = ({
   const countryOptions = Object.keys(countries.getNames("en")).map((code) => ({
     label: `${countries.getName(code, "en")}` + nonEnglishCountryString(code),
     value: `${countries.getName(code, "en")}` + nonEnglishCountryString(code),
-    icon: () => (
-      <ExpenseCountryFlag
-        countryName={code}
-        style={GlobalStyles.countryFlagStyleBig}
-        containerStyle={GlobalStyles.countryFlagStyleBig}
-      />
-    ),
+    // icon: () => (
+    //   <ExpenseCountryFlag
+    //     countryName={code}
+    //     style={GlobalStyles.countryFlagStyleBig}
+    //     containerStyle={GlobalStyles.countryFlagStyleBig}
+    //   />
+    // ),
   }));
 
   const [open, setOpen] = useState(false);

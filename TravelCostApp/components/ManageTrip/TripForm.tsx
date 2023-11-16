@@ -187,6 +187,10 @@ const TripForm = ({ navigation, route }) => {
         inputChangedHandler("totalBudget", tripCtx.totalBudget);
         inputChangedHandler("dailyBudget", tripCtx.dailyBudget);
         inputChangedHandler("tripCurrency", tripCtx.tripCurrency);
+        inputChangedHandler(
+          "isDynamicDailyBudget",
+          tripCtx.isDynamicDailyBudget
+        );
         setIsLoading(false);
         console.log("loaded from context");
         return;
@@ -207,6 +211,7 @@ const TripForm = ({ navigation, route }) => {
     tripCtx.tripCurrency,
     tripCtx.tripName,
     tripCtx.tripid,
+    tripCtx.isDynamicDailyBudget,
   ]);
 
   const [countryValue, setCountryValue] = useState(

@@ -309,10 +309,10 @@ function ExpensesContextProvider({ children }) {
     }
     // const loadedExpenses = await asyncStoreGetObject("expenses");
     const loadedExpenses = getMMKVObject("expenses");
-    console.log(
-      "loadExpensesFromStorage ~ loadedExpenses:",
-      loadedExpenses?.length
-    );
+    // console.log(
+    //   "loadExpensesFromStorage ~ loadedExpenses:",
+    //   loadedExpenses?.length
+    // );
     const expArray = [];
     if (loadedExpenses) {
       loadedExpenses.forEach((expense) => {

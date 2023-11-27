@@ -501,12 +501,16 @@ const ExpenseForm = ({
     (expense) => expense.description
   );
 
+  /**
+   * Automatically determines the category based on the entered value of a specific input.
+   * @param inputIdentifier - The identifier of the input. Should be "description"
+   * @param enteredValue - The entered value of the input.
+   */
   function autoCategory(inputIdentifier: string, enteredValue: string) {
     // calc category from description
     if (inputIdentifier === "description" && pickedCat === "undefined") {
       const mappedCategory = mapDescriptionToCategory(
         enteredValue,
-        // TODO: PUT ALL CATEGORIES
         getMMKVObject("categoryList") ?? DEFAULTCATEGORIES,
         last500Daysexpenses
       );

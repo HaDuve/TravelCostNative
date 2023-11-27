@@ -5,6 +5,8 @@ Change log Travel Expense App
 - fixed an offline bug with ranged expenses
 - fixed offline changes sometimes duplicating the expenses when syncing
 
+__ AppStore version __
+
 1.2.800
 - added: option to dynamically calculate your daily budget based on your total budget, trip length and expenses
   -> (this option will show you accurately how much you can still spend daily until the end of the trip)
@@ -64,7 +66,7 @@ Change log Travel Expense App
 - improved invalid add expenses button ("!" -> loading spinner)
 - improved customer screen
 
-__ AppStore version __
+
 
 1.2.664
 - hotfixed settle split not saving online

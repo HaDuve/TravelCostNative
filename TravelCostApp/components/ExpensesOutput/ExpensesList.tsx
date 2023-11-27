@@ -70,7 +70,7 @@ import * as Haptics from "expo-haptics";
 import { Category } from "../../util/category";
 import { toShortFormat } from "../../util/date";
 import { getCurrencySymbol } from "../../util/currencySymbol";
-import { MAX_EXPENSES } from "../../confAppConstants";
+import { DEV, MAX_EXPENSES } from "../../confAppConstants";
 import { TripAsObject } from "../../screens/TripSummaryScreen";
 import { create } from "react-test-renderer";
 import { AuthContext } from "../../store/auth-context";
@@ -177,6 +177,7 @@ function ExpensesList({
     const editedExpenseId = item.id;
     const uid = item.uid;
     console.log("onClick ~ uid", uid);
+    console.log("onClick ~ rangedId", item?.rangeId);
     async function deleteAllExpenses() {
       try {
         navigation?.popToTop();
@@ -186,10 +187,13 @@ function ExpensesList({
           text2: i18n.t("toastDeleting2"),
           autoHide: false,
         });
-        const allExpenses = await getAllExpenses(tripID);
+        const allExpenses = isOnline
+          ? await getAllExpenses(tripID)
+          : expenseCtx?.expenses;
         for (let i = 0; i < allExpenses?.length; i++) {
           const expense = allExpenses[i];
           if (expense?.rangeId == item?.rangeId) {
+            console.log("found a ranged id match", expense?.rangeId);
             const queueItem: OfflineQueueManageExpenseItem = {
               type: "delete",
               expense: {
@@ -764,7 +768,8 @@ function ExpensesList({
             flexDirection: "row",
           }}
         >
-          {selectable && (
+          {/* hide until production ready */}
+          {selectable && DEV && (
             <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
               <IconButton
                 icon={"document-outline"}

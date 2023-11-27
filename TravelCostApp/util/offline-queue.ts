@@ -32,6 +32,7 @@ import {
   secureStoreSetObject,
 } from "../store/secure-storage";
 import { getMMKVObject } from "../store/mmkv";
+import safeLogError from "./error";
 
 // interface of offline queue manage expense item
 export interface OfflineQueueManageExpenseItem {
@@ -60,6 +61,7 @@ export const pushQueueReturnRndID = async (
       Math.random().toString(36).substring(2, 15)
     );
   } catch (error) {
+    safeLogError(error);
     throw new Error("pushQueueReturnRndID failed");
   }
 };
@@ -100,10 +102,11 @@ export const deleteExpenseOnlineOffline = async (
   item.expense.tripid = tripid;
 
   // if the internet is not fast enough, store in offline queue
-  const { isFastEnough, speed } = await isConnectionFastEnough();
-  // console.log("isFastEnough:", isFastEnough);
-  // console.log("speed:", speed.toFixed(2), "Mbps");
-  if (online && isFastEnough) {
+  // const { isFastEnough, speed } = await isConnectionFastEnough();
+  const netInfo = await NetInfo.fetch();
+  const reachable = netInfo.isConnected && netInfo.isInternetReachable;
+  console.log("reachable:", reachable);
+  if (online && reachable) {
     // delete item online
     try {
       await deleteExpense(
@@ -146,8 +149,7 @@ export const updateExpenseOnlineOffline = async (
   }
   item.expense.tripid = tripid;
   // if the internet is not fast enough, store in offline queue
-  const { isFastEnough, speed } = await isConnectionFastEnough();
-  console.log("online", isFastEnough, "speed:", speed.toFixed(2), "Mbps");
+  const { isFastEnough } = await isConnectionFastEnough();
   if (online && isFastEnough) {
     // update item online
     try {

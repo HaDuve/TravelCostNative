@@ -26,10 +26,10 @@ i18n.enableFallback = true;
 
 import Button from "../components/UI/Button";
 import { exportAllExpensesToXLSX } from "../components/ImportExport/ExportToGoogleXlsx";
-import { ScrollView } from "react-native-gesture-handler";
+import { FlatList, ScrollView } from "react-native-gesture-handler";
 import { GlobalStyles } from "../constants/styles";
 import LinkingButton from "../components/UI/LinkButton";
-import { DEV } from "../confAppConstants";
+import { DEBUG_POLLING_INTERVAL, DEV } from "../confAppConstants";
 import { useFocusEffect } from "@react-navigation/native";
 import { DateTime } from "luxon";
 import { resetTour } from "../util/tourUtil";
@@ -59,6 +59,11 @@ import { versionCheck, versionCheckResponse } from "../util/version";
 import { async } from "@firebase/util";
 import safeLogError from "../util/error";
 import { canOpenURL } from "expo-linking";
+import { asyncStoreGetObject } from "../store/async-storage";
+import set from "react-native-reanimated";
+import { useInterval } from "../components/Hooks/useInterval";
+import { getOfflineQueue } from "../util/offline-queue";
+import { Item } from "react-native-paper/lib/typescript/src/components/Drawer/Drawer";
 
 const SettingsScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
@@ -97,9 +102,6 @@ const SettingsScreen = ({ navigation }) => {
   // Show detailed timezone info
   useFocusEffect(
     React.useCallback(() => {
-      // Do something when the screen is focused
-      console.log("SettingsScreen ~ useFocusEffect");
-
       // checking timezone in DEV MODE
       const timeZone =
         DateTime.now().setLocale(i18n.locale).toLocaleString({
@@ -135,6 +137,23 @@ const SettingsScreen = ({ navigation }) => {
 
   const [latestVersion, setLatestVersion] = useState("");
   const [currentVersion, setCurrentVersion] = useState("");
+  const [offlineQueue, setOfflineQueue] = useState([]);
+
+  useInterval(
+    () => {
+      async function asyncGetOfflineQueue() {
+        const queue = await getOfflineQueue();
+        console.log("getOfflineQueue ~ queue:", queue?.length);
+        queue.forEach((Item) => {
+          console.log(Item.type, Item.expense.expenseData?.description);
+        });
+        setOfflineQueue(queue ?? []);
+      }
+      asyncGetOfflineQueue();
+    },
+    DEBUG_POLLING_INTERVAL,
+    true
+  );
 
   useEffect(() => {
     async function checkVersion() {
@@ -160,6 +179,23 @@ const SettingsScreen = ({ navigation }) => {
       <Text>DEBUG_tripid: {DEBUG_tripid}</Text>
       <Text>DEBUG_uid: {DEBUG_uid}</Text>
       <Text>{timeZoneString}</Text>
+      {/* render offline queue */}
+      {/* offqitem - > expense -> expenseData */}
+      <FlatList
+        data={offlineQueue}
+        renderItem={(item) => {
+          if (!item.item.expense) return null;
+          const index = item.index;
+          return (
+            <View style={{ flexDirection: "row" }}>
+              <Text>
+                {index + 1} {item.item.type}{" "}
+              </Text>
+              <Text>{item.item.expense?.expenseData?.description}</Text>
+            </View>
+          );
+        }}
+      ></FlatList>
 
       <Button
         style={styles.settingsButton}

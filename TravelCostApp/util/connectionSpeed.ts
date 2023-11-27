@@ -32,6 +32,7 @@ async function getConnectionSpeed(): Promise<number> {
     }
   } catch (error) {
     safeLogError(error);
+    return 0;
   }
 }
 
@@ -44,11 +45,9 @@ export async function isConnectionFastEnough(): Promise<ConnectionSpeedResult> {
     console.log("Not connected to the internet");
     return { isFastEnough: false };
   }
-  return getConnectionSpeed().then((speed) => {
-    // console.log("Connection speed:", speed.toFixed(2), "Mbps");
-    return {
-      isFastEnough: speed >= requiredSpeed,
-      speed: speed,
-    };
-  });
+  const speed = await getConnectionSpeed();
+  return {
+    isFastEnough: speed >= requiredSpeed,
+    speed: speed,
+  };
 }

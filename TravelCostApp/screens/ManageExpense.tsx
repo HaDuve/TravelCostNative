@@ -218,7 +218,7 @@ const ManageExpense = ({ route, navigation }) => {
       },
     };
     const id = await storeExpenseOnlineOffline(item, isOnline);
-    expenseCtx.addExpense({ ...expenseData, id: id });
+    expenseCtx.addExpense({ ...expenseData, id: id ?? "" });
   };
 
   const createRangedData = async (expenseData) => {

@@ -156,7 +156,9 @@ function ExpensesContextProvider({ children }) {
     asyncSaveExpenses();
   }, [expensesState]);
 
-  function addExpense(expenseData: ExpenseData) {
+  function addExpense(expenseData: ExpenseData, id?: string) {
+    if (!id) id = new Date().getTime().toString();
+    if (!expenseData.id) expenseData.id = id;
     dispatch({ type: "ADD", payload: expenseData });
   }
 

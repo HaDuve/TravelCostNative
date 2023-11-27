@@ -30,11 +30,19 @@ const Autocomplete = ({
   const [menuVisible, setMenuVisible] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
 
-  const filterData = (text) => {
-    return data.filter(
+  /**
+   * Filters the data array based on the provided text.
+   * @param {string} text - The text to filter the data array with.
+   * @returns {Array} - The filtered data array.
+   */
+  function filterData(text: string) {
+    const filteredData = data.filter(
       (val) => val?.toLowerCase()?.indexOf(text?.toLowerCase()) > -1
     );
-  };
+    // remove copies
+    return [...new Set(filteredData)];
+  }
+
   return (
     <View style={[containerStyle]}>
       <TextInput
@@ -44,7 +52,7 @@ const Autocomplete = ({
           }
         }}
         // maybe with a timeout
-        onBlur={async () => setTimeout(() => setMenuVisible(false), 1200)}
+        onBlur={async () => setTimeout(() => setMenuVisible(false), 700)}
         label={label}
         // right={right}
         // left={left}

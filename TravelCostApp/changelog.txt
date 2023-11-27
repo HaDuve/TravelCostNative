@@ -1,5 +1,9 @@
 Change log Travel Expense App
 
+1.2.802
+- removed redundant autocomplete copies of expense description
+- improved category finder algorithm (now uses split words)
+
 1.2.801
 - added a quick-add button for easy summing up of amounts in expense form
 - fixed an offline bug with ranged expenses

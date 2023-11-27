@@ -6,6 +6,7 @@ import React, {
   useLayoutEffect,
   memo,
   useMemo,
+  useRef,
 } from "react";
 import * as Haptics from "expo-haptics";
 import {
@@ -183,6 +184,7 @@ const ExpenseForm = ({
       isValid: true,
     },
   });
+  const [tempAmount, setTempAmount] = useState("");
   const iconString = iconName ? iconName : getCatSymbol(pickedCat);
   const [icon, setIcon] = useState(iconString);
   const getSetCatIcon = async (catString: string) => {
@@ -1030,6 +1032,43 @@ const ExpenseForm = ({
                 invalid={!inputs.amount.isValid}
                 autoFocus={!isEditing ?? false}
               />
+              {inputs.amount.value && (
+                <IconButton
+                  buttonStyle={[
+                    styles.quickAddButton,
+                    GlobalStyles.strongShadow,
+                  ]}
+                  icon={"add-outline"}
+                  color={GlobalStyles.colors.textColor}
+                  size={24}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    const _tempAmount = +tempAmount;
+                    const newAmount = _tempAmount + Number(inputs.amount.value);
+                    console.log("_tempAmount:", _tempAmount);
+                    setTempAmount(newAmount.toFixed(2));
+                    inputChangedHandler("amount", "");
+                  }}
+                />
+              )}
+              {!inputs.amount.value && tempAmount && (
+                <IconButton
+                  buttonStyle={[
+                    styles.quickAddButton,
+                    GlobalStyles.strongShadow,
+                  ]}
+                  icon={"return-down-back-outline"}
+                  color={GlobalStyles.colors.textColor}
+                  size={24}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    const _tempAmount = +tempAmount;
+                    inputChangedHandler("amount", _tempAmount.toFixed(2));
+                    setTempAmount("");
+                  }}
+                />
+              )}
+              {<Text style={styles.tempAmount}>{tempAmount}</Text>}
               <IconButton
                 buttonStyle={[styles.iconButton, GlobalStyles.strongShadow]}
                 icon={icon}
@@ -1639,7 +1678,17 @@ const styles = StyleSheet.create({
     padding: 8,
     marginTop: 8,
   },
-
+  quickAddButton: {
+    borderWidth: 1,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderColor: GlobalStyles.colors.gray700,
+    borderRadius: 8,
+    padding: 2,
+    margin: 4,
+    maxHeight: 32,
+    marginTop: "10.5%",
+    marginLeft: "-18%",
+  },
   iconButton: {
     borderWidth: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -1714,6 +1763,15 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: GlobalStyles.colors.error500,
     margin: 8,
+  },
+  tempAmount: {
+    // absolute
+    position: "absolute",
+    marginLeft: "30%",
+    marginTop: "1.5%",
+    fontSize: 12,
+    fontWeight: "300",
+    color: GlobalStyles.colors.textColor,
   },
   buttonContainer: {
     flexDirection: "row",

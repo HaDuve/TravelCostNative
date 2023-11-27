@@ -94,6 +94,8 @@ import SettingsSwitch from "../UI/SettingsSwitch";
 import CountryPicker from "../Currency/CountryPicker";
 import { alertDuplSplitString } from "./ExpenseFormUtil";
 import { getMMKVObject } from "../../store/mmkv";
+import CountryFlag from "react-native-country-flag";
+import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 
 const ExpenseForm = ({
   onCancel,
@@ -1147,12 +1149,30 @@ const ExpenseForm = ({
                     <Text style={styles.currencyLabel}>
                       {i18n.t("countryLabel")}
                     </Text>
-                    <CountryPicker
-                      countryValue={countryPickerValue}
-                      setCountryValue={setCountryPickerValue}
-                      onChangeValue={updateCountry}
-                      placeholder={countryPlaceholder}
-                    ></CountryPicker>
+                    <View style={{ flexDirection: "row" }}>
+                      <View
+                        style={[
+                          {
+                            minWidth: "77%",
+                            maxWidth: "77%",
+                          },
+                        ]}
+                      >
+                        <CountryPicker
+                          countryValue={countryPickerValue}
+                          setCountryValue={setCountryPickerValue}
+                          onChangeValue={updateCountry}
+                          placeholder={countryPlaceholder}
+                        ></CountryPicker>
+                      </View>
+                      <ExpenseCountryFlag
+                        countryName={inputs.country.value
+                          ?.split("- ")[0]
+                          .trim()}
+                        style={styles.countryFlag}
+                        containerStyle={styles.countryFlagContainer}
+                      ></ExpenseCountryFlag>
+                    </View>
                   </View>
                 </View>
                 <View style={styles.dateLabel}>

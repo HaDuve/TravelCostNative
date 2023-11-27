@@ -239,7 +239,7 @@ function ExpenseItem(props): JSX.Element {
   if (!id) return <></>;
   return (
     <Animated.View
-      entering={FadeInRight}
+      // entering={FadeInRight}
       exiting={FadeOutLeft}
       style={[{ height: 55 }, hideSpecial && { opacity: 0.75 }]}
     >

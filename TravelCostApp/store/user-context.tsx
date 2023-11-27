@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import React, { createContext, useEffect, useReducer, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 import { Alert } from "react-native";
 import {
   asyncStoreGetItem,
@@ -26,6 +32,7 @@ import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { RangeString } from "./expenses-context";
 import Purchases from "react-native-purchases";
 import safeLogError from "../util/error";
+import set from "react-native-reanimated";
 
 export interface UserData {
   uid?: string;
@@ -74,6 +81,8 @@ export const UserContext = createContext({
   loadLastCurrencyCountryFromAsync: async () => {},
   setIsShowingGraph: (bool: boolean) => {},
   isShowingGraph: true,
+  isSendingOfflineQueueMutex: false,
+  setIsSendingOfflineQueueMutex: (bool: boolean) => {},
 });
 
 function UserContextProvider({ children }) {
@@ -81,7 +90,7 @@ function UserContextProvider({ children }) {
   const [freshlyCreated, setFreshlyCreated] = useState(false);
   const [needsTour, setNeedsTour] = useState(false);
   const [periodName, setPeriodName] = useState("day");
-  const [isOnline, setIsOnline] = useState(true);
+  const [isOnline, setIsOnline] = useState(false);
   const [lastCurrency, setLastCurrency] = useState("");
   const [lastCountry, setLastCountry] = useState("");
   const [isPremium, setIsPremium] = useState(false);
@@ -89,8 +98,10 @@ function UserContextProvider({ children }) {
   const [catIconNames, setCatIconNames] = useState([]);
   const [isShowingGraph, setIsShowingGraph] = useState(true);
   const [tripHistory, setTripHistory] = useState([]);
+  const [isSendingOfflineQueueMutex, setIsSendingOfflineQueueMutex] =
+    useState(false);
 
-  async function loadLastCurrencyCountryFromAsync() {
+  const loadLastCurrencyCountryFromAsync = useCallback(async () => {
     console.log(
       "loadLastCurrencyCountryFromAsync ~ loadLastCurrencyCountryFromAsync:",
       loadLastCurrencyCountryFromAsync
@@ -106,10 +117,11 @@ function UserContextProvider({ children }) {
     } catch (error) {
       console.error(error);
     }
-  }
+  }, []);
+
   useEffect(() => {
     loadLastCurrencyCountryFromAsync();
-  }, []);
+  }, [loadLastCurrencyCountryFromAsync]);
 
   async function updateTripHistory() {
     const uid = await secureStoreGetItem("uid");
@@ -240,7 +252,6 @@ function UserContextProvider({ children }) {
   }
 
   async function loadUserNameFromStorage() {
-    console.log("loadUserNameFromStorage ~ userName", userName);
     const _userName = await secureStoreGetItem("userName");
     if (_userName) {
       const trimmedName = _userName.replaceAll('"', "").trim();
@@ -287,6 +298,8 @@ function UserContextProvider({ children }) {
     setIsShowingGraph: setIsShowingGraph,
     isShowingGraph: isShowingGraph,
     updateTripHistory: updateTripHistory,
+    isSendingOfflineQueueMutex: isSendingOfflineQueueMutex,
+    setIsSendingOfflineQueueMutex: setIsSendingOfflineQueueMutex,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

@@ -151,7 +151,7 @@ export async function storeExpense(tripid: string, uid: string, expenseData) {
         getMMKVString("QPAR"),
       expenseData
     );
-    const id = response.data.name;
+    const id: string = response.data.name;
     return id;
   } catch (error) {
     console.error(

@@ -527,7 +527,10 @@ function Root() {
     () => {
       if (isForeground() && authCtx.isAuthenticated) {
         const asyncQueue = async () => {
-          await sendOfflineQueue();
+          await sendOfflineQueue(
+            userCtx.isSendingOfflineQueueMutex,
+            userCtx.setIsSendingOfflineQueueMutex
+          );
         };
         asyncQueue();
 
@@ -691,9 +694,6 @@ function Root() {
           setAppIsReady(true);
           return;
         }
-
-        // send offline queue if we have one
-        await sendOfflineQueue();
 
         // check if user was only freshly created
         if (freshlyCreated) {

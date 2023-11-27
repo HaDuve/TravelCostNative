@@ -53,6 +53,7 @@ import { SettingsContext } from "../store/settings-context";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { Platform } from "react-native";
 import { memo } from "react";
+import { getMMKVObject } from "../store/mmkv";
 
 function RecentExpenses({ navigation }) {
   const expensesCtx = useContext(ExpensesContext);
@@ -103,13 +104,16 @@ function RecentExpenses({ navigation }) {
         console.log("getExpenses ~ ignoreTouched:", ignoreTouched);
       // check offlinemode
       const online = netCtx.isConnected && netCtx.strongConnection;
-      const offlineQueue = await asyncStoreGetObject("offlineQueue");
+      const offlineQueue = getMMKVObject("offlineQueue");
       const queueBlocked = offlineQueue && offlineQueue?.length > 0;
-      if (!online || queueBlocked) {
+      if (!online || queueBlocked || userCtx.isSendingOfflineQueueMutex) {
         // if online, send offline queue
         if (online) {
           console.log("RecentExpenses ~ sending offline queue");
-          await sendOfflineQueue();
+          await sendOfflineQueue(
+            userCtx.isSendingOfflineQueueMutex,
+            userCtx.setIsSendingOfflineQueueMutex
+          );
           return;
         }
         // if offline, load from storage
@@ -150,6 +154,7 @@ function RecentExpenses({ navigation }) {
       tripid,
       uid,
       userCtx.freshlyCreated,
+      userCtx.isSendingOfflineQueueMutex,
     ]
   );
 

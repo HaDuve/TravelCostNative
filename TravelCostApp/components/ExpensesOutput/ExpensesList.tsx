@@ -608,7 +608,7 @@ function ExpensesList({
           const expenseUid = expenseData.uid;
           const expenseId = expenseData.id;
           expenseData.date = expenseData.startDate;
-          const itemCreate: OfflineQueueManageExpenseItem = {
+          const itemToCreate: OfflineQueueManageExpenseItem = {
             type: "add",
             expense: {
               tripid: _tripid,
@@ -616,8 +616,12 @@ function ExpensesList({
               expenseData: expenseData,
             },
           };
-          await storeExpenseOnlineOffline(itemCreate, isOnline, _tripid);
-          const item: OfflineQueueManageExpenseItem = {
+          const id = await storeExpenseOnlineOffline(
+            itemToCreate,
+            isOnline,
+            _tripid
+          );
+          const itemToDelete: OfflineQueueManageExpenseItem = {
             type: "delete",
             expense: {
               tripid: tripID,
@@ -626,7 +630,7 @@ function ExpensesList({
             },
           };
           expenseCtx?.deleteExpense(expenseId);
-          await deleteExpenseOnlineOffline(item, isOnline);
+          await deleteExpenseOnlineOffline(itemToDelete, isOnline);
           await touchAllTravelers(tripID, true);
           await touchAllTravelers(_tripid, true);
           Toast.hide();

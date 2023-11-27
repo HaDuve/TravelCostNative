@@ -38,7 +38,7 @@ async function getConnectionSpeed(): Promise<number> {
 
 export async function isConnectionFastEnough(): Promise<ConnectionSpeedResult> {
   if (DEBUG_FORCE_OFFLINE) {
-    return { isFastEnough: false };
+    return { isFastEnough: false, speed: 0 };
   }
   const connectionInfo = await NetInfo.fetch();
   if (!connectionInfo.isConnected || !connectionInfo.isInternetReachable) {

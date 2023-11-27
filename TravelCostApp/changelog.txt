@@ -1,5 +1,10 @@
 Change log Travel Expense App
 
+1.2.801
+- added a quick-add button for easy summing up of amounts in expense form
+- fixed an offline bug with ranged expenses
+- fixed offline changes sometimes duplicating the expenses when syncing
+
 1.2.800
 - added: option to dynamically calculate your daily budget based on your total budget, trip length and expenses
   -> (this option will show you accurately how much you can still spend daily until the end of the trip)

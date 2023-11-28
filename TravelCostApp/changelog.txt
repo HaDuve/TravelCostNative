@@ -1,6 +1,11 @@
 Change log Travel Expense App
 
-1.2.802
+1.2.801 (3)
+- fix changing amount bug
+- improve expense content animation (entering smoothly)
+- improve filter modal titles
+
+1.2.801 (2)
 - removed redundant autocomplete copies of expense description
 - improved category finder algorithm (now uses split words)
 

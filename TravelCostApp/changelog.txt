@@ -2,6 +2,9 @@ Change log Travel Expense App
 
 __ AppStore version __
 
+1.2.801.7
+- implemented chatgpt 4 access
+
 1.2.801.6
 - added an additional exchange rate provider with more options, even Aussies can use the app now!
 - find homeCurrency (tripform default currency) automatically from locale

@@ -54,7 +54,8 @@ function ExpensesOutput({
           marginTop: "12%",
         }}
       >
-        <LoadingBarOverlay></LoadingBarOverlay>
+        {/* commented out because we have the same in expenselist */}
+        {/* <LoadingBarOverlay></LoadingBarOverlay> */}
       </View>
     ),
     []

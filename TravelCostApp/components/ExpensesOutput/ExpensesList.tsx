@@ -861,14 +861,10 @@ function ExpensesList({
           alignItems: "center",
           justifyContent: "center",
           paddingTop: 4,
-          marginTop: -60,
+          marginTop: -50,
         }}
       >
-        <LoadingBarOverlay
-          containerStyle={{
-            backgroundColor: GlobalStyles.colors.gray700,
-          }}
-        ></LoadingBarOverlay>
+        {!isFiltered && <LoadingBarOverlay></LoadingBarOverlay>}
       </View>
       <Animated.FlatList
         scrollEnabled={true}
@@ -892,7 +888,7 @@ function ExpensesList({
         }
         ListHeaderComponent={listHeaderJSX}
         keyExtractor={(item: Expense) => item.id}
-        refreshControl={refreshControl}
+        // refreshControl={refreshControl}
         getItemLayout={(data, index) => ({
           length: 55,
           offset: 55 * index,

@@ -66,6 +66,10 @@ import { formatExpenseWithCurrency } from "../../util/string";
 
 const TripForm = ({ navigation, route }) => {
   const tripCtx = useContext(TripContext);
+  const locales = Localization.getLocales();
+  // get the most fitting currency from the list of locales
+  const currencyList = locales.map((locale) => locale.currencyCode);
+  const standardCurrency = currencyList[0];
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
   const netCtx = useContext(NetworkContext);
@@ -97,7 +101,7 @@ const TripForm = ({ navigation, route }) => {
       isValid: true,
     },
     tripCurrency: {
-      value: "",
+      value: standardCurrency,
       isValid: true,
     },
     dailyBudget: {
@@ -215,7 +219,7 @@ const TripForm = ({ navigation, route }) => {
   ]);
 
   const [countryValue, setCountryValue] = useState(
-    inputs?.tripCurrency ? inputs.tripCurrency.value : i18n.t("currencyLabel")
+    inputs?.tripCurrency ? inputs.tripCurrency.value : standardCurrency
   );
 
   const uid = authCtx.uid;
@@ -563,7 +567,7 @@ const TripForm = ({ navigation, route }) => {
         placeholder={
           inputs.tripCurrency.value
             ? inputs.tripCurrency.value
-            : i18n.t("baseCurrency")
+            : standardCurrency
         }
         countryValue={countryValue.split(" ")[0]}
         setCountryValue={setCountryValue}

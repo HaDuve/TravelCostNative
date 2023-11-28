@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: GlobalStyles.colors.cat1,
     borderRadius: 10,
-    // backgroundColor: "white",
+    // backgroundColor: GlobalStyles.colors.backgroundColor,
     //rotate
     transform: [{ rotate: "22deg" }],
     padding: 4,

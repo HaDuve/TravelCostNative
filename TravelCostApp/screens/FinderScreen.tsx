@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: 20,
     padding: "8%",
     justifyContent: "space-around",

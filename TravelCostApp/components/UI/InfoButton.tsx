@@ -24,7 +24,7 @@ InfoButton.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: 50,
     width: 20,
     height: 20,

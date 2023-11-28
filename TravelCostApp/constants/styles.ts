@@ -17,6 +17,7 @@ export const GlobalStyles = {
     accent500: "#DC7813",
     accent700: "#AF7063",
     backgroundColor: "#F8F8F8",
+    backgroundColorLight: "#FBFBFB",
     // backgroundColor: "#FFF",
     // backgroundColor: "#F5F5F5",
     textColor: "#434343",

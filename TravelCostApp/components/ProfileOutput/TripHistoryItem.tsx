@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 12,
     margin: 12,
-    backgroundColor: "white",
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: 12,
   },
   topRow: {

@@ -401,7 +401,7 @@ const ProfileScreen = ({ navigation }) => {
               icon="list-outline"
               buttonStyle={[styles.addButton, GlobalStyles.shadowGlowPrimary]}
               size={42}
-              color={"white"}
+              color={GlobalStyles.colors.backgroundColor}
               onPress={() => {
                 // onShare(tripCtx.tripid, navigation);
                 onSummaryHandler();

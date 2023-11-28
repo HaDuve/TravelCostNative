@@ -845,7 +845,7 @@ function ExpensesList({
   return (
     <Animated.View
       entering={FadeIn.delay(isFiltered ? 0 : EXPENSES_LOAD_TIMEOUT).duration(
-        isFiltered ? 0 : 500
+        isFiltered ? 0 : 400
       )}
       style={{
         paddingLeft: 0,
@@ -864,7 +864,11 @@ function ExpensesList({
           marginTop: -60,
         }}
       >
-        <LoadingBarOverlay></LoadingBarOverlay>
+        <LoadingBarOverlay
+          containerStyle={{
+            backgroundColor: GlobalStyles.colors.gray700,
+          }}
+        ></LoadingBarOverlay>
       </View>
       <Animated.FlatList
         scrollEnabled={true}

@@ -174,7 +174,7 @@ const AddExpenseButton = ({ navigation }) => {
         <Ionicons
           name={valid ? "add-outline" : "alert"}
           size={42}
-          color={"white"}
+          color={GlobalStyles.colors.backgroundColor}
         />
       </Pressable>
     </Animated.View>

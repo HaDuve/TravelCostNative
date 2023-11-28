@@ -1,5 +1,5 @@
 import { Platform, StyleSheet, Text, View } from "react-native";
-import React, { useContext } from "react";
+import React from "react";
 import { useState } from "react";
 import PropTypes from "prop-types";
 import Animated, {
@@ -29,12 +29,10 @@ import ExpenseCountries from "../components/ExpensesOutput/ExpenseStatistics/Exp
 import ExpenseCurrencies from "../components/ExpensesOutput/ExpenseStatistics/ExpenseCurrencies";
 import FlatButton from "../components/UI/FlatButton";
 import FilteredExpenses from "./FilteredExpenses";
-import { UserContext } from "../store/user-context";
 import BackButton from "../components/UI/BackButton";
 
 const FilteredPieCharts = ({ navigation, route }) => {
   const { expenses, dayString, noList = false } = route.params;
-  const userCtx = useContext(UserContext);
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
   // contents and titleStrings have to match in legth and correspond!
   const titleStrings = [

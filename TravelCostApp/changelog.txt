@@ -2,6 +2,11 @@ Change log Travel Expense App
 
 __ AppStore version __
 
+1.2.801.5
+- fixed background color of loading spinner in expense lists
+- fixed double loading spinners when only one should be rendered
+- fixed loading spinner sometimes being visible in non-refreshable lists
+
 1.2.801.4
 - added touchable links to split expenses on the split summary screen
 - improved colors and animations

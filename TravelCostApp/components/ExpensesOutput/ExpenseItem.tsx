@@ -34,6 +34,7 @@ import * as Haptics from "expo-haptics";
 import { ExpenseData } from "../../util/expense";
 import { calcSplitList } from "../../util/split";
 import { useRef } from "react";
+import set from "react-native-reanimated";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -60,34 +61,38 @@ function ExpenseItem(props): JSX.Element {
   const { periodName, catIconNames } = useContext(UserContext);
   const rate = calcAmount / amount;
 
-  const calcTravellerSum = useRef(0);
-  const travellerSum = useRef(0);
-  let calcTravellerSumString = "";
-  let travellerSumString = "";
+  const [calcTravellerSum, setCalcTravellerSum] = useState(0);
+  const [travellerSum, setTravellerSum] = useState(0);
+  const [calcTravellerSumString, setCalcTravellerSumString] = useState("");
+  const [travellerSumString, setTravellerSumString] = useState("");
 
-  // if showSumForTravellerName is set, show the sum of the expense for only this traveller
-  if (splitList && splitList?.length > 0 && showSumForTravellerName) {
-    splitList.forEach((split) => {
-      if (split.userName === showSumForTravellerName) {
-        calcTravellerSum.current += Number(split.amount) * rate;
-        travellerSum.current += Number(split.amount);
-      }
-    });
-    calcTravellerSumString = formatExpenseWithCurrency(
-      Number(calcTravellerSum.current),
-      tripCurrency
-    );
-    travellerSumString = formatExpenseWithCurrency(
-      Number(travellerSum.current),
-      currency
-    );
-  }
-
-  const calcAmountString = calcTravellerSum.current
+  useEffect(() => {
+    // if showSumForTravellerName is set, show the sum of the expense for only this traveller
+    console.log("expenseItem useEffect in action!");
+    if (showSumForTravellerName && splitList && splitList?.length > 0) {
+      let tempCalcSum = 0;
+      let tempSum = 0;
+      splitList.forEach((split) => {
+        if (split.userName === showSumForTravellerName) {
+          tempCalcSum += calcTravellerSum + Number(split.amount) * rate;
+          tempSum += travellerSum + Number(split.amount);
+        }
+      });
+      setCalcTravellerSumString(
+        formatExpenseWithCurrency(Number(tempCalcSum), tripCurrency)
+      );
+      setTravellerSumString(
+        formatExpenseWithCurrency(Number(tempSum), currency)
+      );
+      setCalcTravellerSum(tempCalcSum);
+      setTravellerSum(tempSum);
+    }
+  }, [showSumForTravellerName]);
+  const calcAmountString = calcTravellerSum
     ? `${calcTravellerSumString}`
     : formatExpenseWithCurrency(calcAmount, tripCurrency);
 
-  const amountString = travellerSum.current
+  const amountString = travellerSum
     ? `${travellerSumString}`
     : formatExpenseWithCurrency(amount, currency);
 

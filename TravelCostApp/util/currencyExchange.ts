@@ -23,6 +23,7 @@ export async function getRate(base: string, target: string) {
       return -1;
     }
   }
+  return response;
 }
 
 export async function getRateAPI2(base: string, target: string) {

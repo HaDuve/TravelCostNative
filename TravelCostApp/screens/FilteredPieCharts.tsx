@@ -76,7 +76,7 @@ const FilteredPieCharts = ({ navigation, route }) => {
     ),
   ];
   if (contents?.length !== titleStrings?.length)
-    throw new Error("Lengths do not match");
+    console.error("Lengths do not match");
   let contentsMaxIndex = titleStrings?.length - 1;
   if (noList) contentsMaxIndex = titleStrings?.length - 2;
   console.log("FilteredPieCharts ~ CONTENTS_MAX_INDEX:", contentsMaxIndex);

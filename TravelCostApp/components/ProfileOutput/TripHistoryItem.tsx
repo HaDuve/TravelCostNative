@@ -228,15 +228,16 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
     tripName,
     expenseCtx.expenses.length,
     netCtx.isConnected,
-    netCtx.strongConnection,
     tripCtx.tripid,
     tripCtx.travellers.length,
     tripCtx.tripName,
     tripCtx.totalBudget,
     tripCtx.dailyBudget,
     tripCtx.tripCurrency,
-    tripCtx.travellers,
+    tripCtx.travellers.length,
     tripCtx.isDynamicDailyBudget,
+    tripCtx.startDate,
+    tripCtx.endDate,
     allLoaded,
   ]);
 

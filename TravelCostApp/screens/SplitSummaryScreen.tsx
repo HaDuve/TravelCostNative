@@ -48,6 +48,10 @@ import BackButton from "../components/UI/BackButton";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { useFocusEffect } from "@react-navigation/native";
 import BlurPremium from "../components/Premium/BlurPremium";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import * as Haptics from "expo-haptics";
+import { G } from "react-native-svg";
+import { Pressable } from "react-native";
 
 const SplitSummaryScreen = ({ navigation }) => {
   const {
@@ -125,7 +129,7 @@ const SplitSummaryScreen = ({ navigation }) => {
         expenses,
         isPaidDate
       );
-      const temp = [];
+      const formattedSplits = [];
       let userGetsBack = 0;
       let userHasToPay = 0;
       for (let i = 0; i < response?.length; i++) {
@@ -135,13 +139,13 @@ const SplitSummaryScreen = ({ navigation }) => {
           whoPaid: split.whoPaid,
           amount: Number(split.amount).toFixed(2),
         };
-        temp.push(tempObj);
+        formattedSplits.push(tempObj);
         userGetsBack +=
           split.whoPaid === userName ? Number(split.amount) : Number(0);
         userHasToPay +=
           split.userName === userName ? Number(split.amount) : Number(0);
       }
-      setSplits(temp);
+      setSplits(formattedSplits);
       setTotalPaidBackText(
         totalPaidBackTextOriginal +
           formatExpenseWithCurrency(userGetsBack, tripCurrency)
@@ -241,16 +245,50 @@ const SplitSummaryScreen = ({ navigation }) => {
 
   const renderSplitItem = useCallback(
     (itemData) => {
+      // get a list of all expenses where the item.userName and item.whoPaid is included in the expense.splitList as either whoPaid or userName
+      const expensesList = expenses.filter((expense: ExpenseData) => {
+        const splitList = expense?.splitList;
+        const splitListLength = splitList?.length;
+        for (let i = 0; i < splitListLength; i++) {
+          const split = splitList[i];
+          if (
+            (split.userName === itemData.item.userName &&
+              split.whoPaid === itemData.item.whoPaid) ||
+            split.userName === itemData.item.whoPaid ||
+            split.whoPaid === itemData.item.userName
+          ) {
+            return true;
+          }
+        }
+        return false;
+      });
+
+      const length = expensesList.length;
       const item = itemData.item;
       return (
-        <View style={[styles.splitContainer]}>
+        <Pressable
+          onPress={() => {
+            console.log("length of split expenses", length);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            navigation.navigate("FilteredExpenses", {
+              expenses: expensesList,
+              dayString: `${item.userName} ${i18n.t("owes")} ${
+                item.whoPaid
+              } ${formatExpenseWithCurrency(item.amount, tripCurrency)}`,
+            });
+          }}
+          style={({ pressed }) => [
+            styles.splitContainer,
+            GlobalStyles.strongShadow,
+            pressed && GlobalStyles.pressedWithShadow,
+          ]}
+        >
           <Text style={styles.userText}>{item.userName} </Text>
-          <Text style={styles.normalText}>owes </Text>
+          <Text style={styles.normalText}>{i18n.t("owes")} </Text>
+          <Text style={styles.userText}>{item.whoPaid} </Text>
           <Text style={styles.amountText}>{item.amount} </Text>
-          <Text style={styles.amountText}>{currencySymbol} </Text>
-          <Text style={styles.normalText}>to</Text>
-          <Text style={styles.userText}> {item.whoPaid}!</Text>
-        </View>
+          <Text style={styles.amountText}>{currencySymbol}</Text>
+        </Pressable>
       );
     },
     [currencySymbol]
@@ -372,7 +410,7 @@ const styles = StyleSheet.create({
     paddingVertical: "4%",
     paddingTop: "12%",
     //card
-    backgroundColor: "white",
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: 20,
     // borderWidth: 1,
     borderColor: GlobalStyles.colors.gray500,
@@ -396,14 +434,15 @@ const styles = StyleSheet.create({
   },
   splitContainer: {
     flexDirection: "row",
-    // padding: 16,
-    marginVertical: 4,
-    // paddingHorizontal: 24,
-    // borderWidth: 1,
-    // margin: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginHorizontal: 8,
+    marginVertical: 8,
+    borderWidth: 1,
+    borderColor: GlobalStyles.colors.backgroundColor,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 12,
-    // align text on the bottom
-    alignItems: "flex-end",
+    alignItems: "center",
   },
   buttonContainer: {
     // marginVertical: "10%",
@@ -416,7 +455,7 @@ const styles = StyleSheet.create({
     // margin: "2%",
     // minHeight: 250,
     ...Platform.select({
-      ios: {},
+      ios: { marginTop: "-20%" },
       android: {
         height: 55,
         justifyContent: "space-between",

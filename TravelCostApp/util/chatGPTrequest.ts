@@ -18,6 +18,7 @@ const languageName = languageObj?.name;
 
 import { Configuration, OpenAIApi } from "openai";
 import { Keys, loadKeys } from "../components/Premium/PremiumConstants";
+import safeLogError from "./error";
 
 export enum GPT_RequestType {
   "getGoodDeal",
@@ -109,22 +110,47 @@ export async function getChatGPT_Response(requestBody: GPT_RequestBody) {
   });
   const openai = new OpenAIApi(configuration);
 
-  const response = await openai.createChatCompletion({
-    model: "gpt-3.5-turbo",
-    messages: [
-      {
-        role: "user",
-        content: getGPT_Content(requestBody),
-      },
-    ],
-    temperature: 0.75,
-    max_tokens: 2780,
-    top_p: 1,
-    frequency_penalty: 0,
-    presence_penalty: 0,
-  });
-  const responseText = response.data.choices[0].message;
-  console.log("response.data:", response.data);
-  console.log("responseText:", responseText);
-  return responseText;
+  try {
+    const response = await openai.createChatCompletion({
+      model: "gpt-4",
+      messages: [
+        {
+          role: "user",
+          content: getGPT_Content(requestBody),
+        },
+      ],
+      temperature: 0.75,
+      max_tokens: 2780,
+      top_p: 1,
+      frequency_penalty: 0,
+      presence_penalty: 0,
+    });
+    const responseText = response.data.choices[0].message;
+    console.log("response.data: gpt-4:", response.data);
+    console.log("responseText: gpt-4:", responseText);
+    return responseText;
+  } catch (error) {
+    try {
+      const response = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "user",
+            content: getGPT_Content(requestBody),
+          },
+        ],
+        temperature: 0.75,
+        max_tokens: 2780,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+      });
+      const responseText = response.data.choices[0].message;
+      console.log("response.data: gpt-3.5-turbo:", response.data);
+      console.log("responseText: gpt-3.5-turbo:", responseText);
+    } catch (error) {
+      safeLogError(error);
+      return "Sorry, I am not sure about that.";
+    }
+  }
 }

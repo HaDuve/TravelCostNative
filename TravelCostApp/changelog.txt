@@ -2,6 +2,10 @@ Change log Travel Expense App
 
 __ AppStore version __
 
+1.2.801.6
+- added an additional exchange rate provider with more options, even Aussies can use the app now!
+- find homeCurrency (tripform default currency) automatically from locale
+
 1.2.801.5
 - fixed background color of loading spinner in expense lists
 - fixed double loading spinners when only one should be rendered

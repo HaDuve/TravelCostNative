@@ -1,11 +1,11 @@
 Change log Travel Expense App
 
+__ AppStore version __
+
 1.2.801.4
 - added touchable links to split expenses on the split summary screen
 - improved colors and animations
 - removed debug version string from settings
-
-__ AppStore version __
 
 1.2.801.3
 - fix changing amount bug

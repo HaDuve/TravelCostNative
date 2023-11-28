@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React from "react";
+import React, { useContext } from "react";
 import CategoryProgressBar from "./CategoryProgressBar";
 import { CatColors, GlobalStyles } from "../../../constants/styles";
 import CategoryChart from "../../ExpensesOverview/CategoryChart";
@@ -18,12 +18,14 @@ i18n.enableFallback = true;
 
 import { getCatString } from "../../../util/category";
 import PropTypes from "prop-types";
-import { ExpenseData } from "../../../util/expense";
+import { ExpenseData, getExpensesSum } from "../../../util/expense";
 import BlurPremium from "../../Premium/BlurPremium";
+import { processTitleStringFilteredPiecharts } from "../../../util/string";
+import { TripContext } from "../../../store/trip-context";
 
 const ExpenseCurrencies = ({ expenses, periodName, navigation }) => {
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
-
+  const { tripCurrency } = useContext(TripContext);
   if (!expenses)
     return (
       <View style={styles.container}>
@@ -39,26 +41,20 @@ const ExpenseCurrencies = ({ expenses, periodName, navigation }) => {
     }
   });
 
-  function getAllExpensesWithCat(currency: string) {
+  function getAllExpensesWithCur(currency: string) {
     return expenses.filter((expense: ExpenseData) => {
       return expense.currency === currency;
     });
   }
 
-  function getSumExpenses(expenses) {
-    const expensesSum = expenses.reduce((sum, expense) => {
-      return sum + expense.calcAmount;
-    }, 0);
-    return expensesSum;
-  }
-  const totalSum = getSumExpenses(expenses);
+  const totalSum = getExpensesSum(expenses);
 
   const catSumCat = [];
   const dataList = [];
 
-  countryList.forEach((cat) => {
-    const catExpenses = getAllExpensesWithCat(cat);
-    const sumCat = getSumExpenses(catExpenses);
+  countryList.forEach((cat: string) => {
+    const catExpenses: ExpenseData[] = getAllExpensesWithCur(cat);
+    const sumCat = getExpensesSum(catExpenses);
     catSumCat.push({
       cat: cat,
       sumCat: sumCat,
@@ -67,7 +63,20 @@ const ExpenseCurrencies = ({ expenses, periodName, navigation }) => {
     });
   });
 
-  function renderItem(itemData) {
+  function renderItem(itemData: {
+    item: {
+      cat: string;
+      sumCat: number;
+      color: string;
+      catExpenses: ExpenseData[];
+    };
+    index: number;
+  }) {
+    const newPeriodName = processTitleStringFilteredPiecharts(
+      periodName,
+      tripCurrency,
+      itemData
+    );
     return (
       <Pressable
         style={({ pressed }) => [
@@ -78,10 +87,7 @@ const ExpenseCurrencies = ({ expenses, periodName, navigation }) => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigation.navigate("FilteredExpenses", {
             expenses: itemData.item.catExpenses,
-            dayString:
-              getCatString(itemData.item.cat) +
-              (periodName !== "total" ? " this " : " ") +
-              periodName,
+            dayString: getCatString(itemData.item.cat) + " " + newPeriodName,
           });
         }}
       >

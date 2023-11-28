@@ -18,15 +18,19 @@ i18n.enableFallback = true;
 
 import { getCatString } from "../../../util/category";
 import PropTypes from "prop-types";
-import { ExpenseData } from "../../../util/expense";
+import { ExpenseData, getExpensesSum } from "../../../util/expense";
 import { travellerToDropdown } from "../../../util/split";
-import useContext from "react";
+import { useContext } from "react";
 import { TripContext } from "../../../store/trip-context";
 import BlurPremium from "../../Premium/BlurPremium";
+import {
+  formatExpenseWithCurrency,
+  processTitleStringFilteredPiecharts,
+} from "../../../util/string";
 
 const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
-
+  const { tripCurrency } = useContext(TripContext);
   if (!expenses)
     return (
       <View style={styles.container}>
@@ -103,14 +107,7 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
     return expensesSum;
   }
 
-  function getSumAllExpenses(expenses) {
-    // return the sum of all expenses
-    const expensesSum = expenses.reduce((sum, expense: ExpenseData) => {
-      return sum + expense.calcAmount;
-    }, 0);
-    return expensesSum;
-  }
-  const totalSum = Number(getSumAllExpenses(expenses)).toFixed(2);
+  const totalSum = getExpensesSum(expenses);
 
   const catSumCat = [];
   const dataList = [];
@@ -132,8 +129,12 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
   }
 
   function renderItem(itemData) {
-    console.log("renderItem ~ totalSum:", totalSum);
     console.log("renderItem ~ itemData.item.sumCat:", itemData.item.sumCat);
+    const newPeriodName = processTitleStringFilteredPiecharts(
+      periodName,
+      tripCurrency,
+      itemData
+    );
     return (
       <Pressable
         style={({ pressed }) => [
@@ -145,10 +146,7 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigation.navigate("FilteredExpenses", {
             expenses: itemData.item.catExpenses,
-            dayString:
-              getCatString(itemData.item.cat) +
-              (periodName !== "total" ? " this " : " ") +
-              periodName,
+            dayString: getCatString(itemData.item.cat) + " " + newPeriodName,
             showSumForTravellerName: itemData.item.cat,
           });
         }}

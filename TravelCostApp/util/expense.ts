@@ -116,3 +116,15 @@ export async function deleteAllExpensesByRangedId(
     }
   }
 }
+
+export function getExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
+  const sum = expenses.reduce((sum: number, expense: ExpenseData) => {
+    if (
+      isNaN(Number(expense.calcAmount)) ||
+      (hideSpecial && expense.isSpecialExpense)
+    )
+      return sum;
+    return sum + Number(expense.calcAmount);
+  }, 0);
+  return sum;
+}

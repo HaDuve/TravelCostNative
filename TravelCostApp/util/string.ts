@@ -55,6 +55,23 @@ export function formatExpenseWithCurrency(
   }
 }
 
+export function processTitleStringFilteredPiecharts(
+  periodName: string,
+  tripCurrency: string,
+  itemData: {
+    item: {
+      sumCat: number;
+    };
+  }
+) {
+  // to process the period name we must take out the last part of the string ending with "-"
+  const periodNameProcessed = periodName.slice(0, periodName.lastIndexOf("-"));
+  const newPeriodName =
+    periodNameProcessed +
+    formatExpenseWithCurrency(itemData.item.sumCat, tripCurrency);
+  return newPeriodName;
+}
+
 export function truncateString(str: string, n: number) {
   if (!str || str?.length < 1 || n < 1) return "";
   return str?.length > n ? str.slice(0, n - 1) + "..." : str;

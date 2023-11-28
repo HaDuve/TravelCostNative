@@ -29,6 +29,7 @@ import PropTypes from "prop-types";
 import { isForeground } from "../../../util/appState";
 import { MAX_JS_NUMBER } from "../../../confAppConstants";
 import { SettingsContext } from "../../../store/settings-context";
+import { getExpensesSum } from "../../../util/expense";
 
 const ExpenseGraph = ({
   periodName,
@@ -66,14 +67,7 @@ const ExpenseGraph = ({
       for (let i = 0; i < lastDays; i++) {
         const day = getDateMinusDays(today, i);
         const dayExpenses = expenseCtx.getDailyExpenses(i);
-        const expensesSum = dayExpenses.reduce((sum, expense) => {
-          if (
-            isNaN(Number(expense.calcAmount)) ||
-            (hideSpecial && expense.isSpecialExpense)
-          )
-            return sum;
-          return sum + Number(expense.calcAmount.toFixed(2));
-        }, 0);
+        const expensesSum = getExpensesSum(dayExpenses, hideSpecial);
         const dailyBudget = tripCtx.dailyBudget;
         const formattedDay = toDayMonthString(day);
         const formattedSum = formatExpenseWithCurrency(
@@ -97,6 +91,10 @@ const ExpenseGraph = ({
         } else {
           dayString = toDayMonthString(item.day);
         }
+        const titleStringFilteredPieCharts = `${dayString} - ${formatExpenseWithCurrency(
+          item.expensesSum,
+          tripCtx.tripCurrency
+        )}`;
         const debt = item.expensesSum > item.dailyBudget;
         const colorCoding = !debt ? styles.green : styles.red;
         const emptyValue = item.expensesSum === 0;
@@ -140,7 +138,7 @@ const ExpenseGraph = ({
               if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
-                dayString: dayString,
+                dayString: titleStringFilteredPieCharts,
               });
             }}
           >
@@ -167,14 +165,7 @@ const ExpenseGraph = ({
       for (let i = 0; i < lastWeeks; i++) {
         const { firstDay, lastDay, weeklyExpenses } =
           expenseCtx.getWeeklyExpenses(i);
-        const expensesSum = weeklyExpenses.reduce((sum, expense) => {
-          if (
-            isNaN(Number(expense.calcAmount)) ||
-            (hideSpecial && expense.isSpecialExpense)
-          )
-            return sum;
-          return sum + Number(expense.calcAmount.toFixed(2));
-        }, 0);
+        const expensesSum = getExpensesSum(weeklyExpenses, hideSpecial);
         let weeklyBudget = Number(tripCtx.dailyBudget) * 7;
         if (weeklyBudget > totalBudget) weeklyBudget = totalBudget;
         const formattedDay = toDayMonthString(firstDay);
@@ -203,6 +194,10 @@ const ExpenseGraph = ({
         } else {
           weekString = toDayMonthString2(item.firstDay, item.lastDay);
         }
+        const titleStringFilteredPieCharts = `${weekString} - ${formatExpenseWithCurrency(
+          item.expensesSum,
+          tripCtx.tripCurrency
+        )}`;
         const debt = item.expensesSum > item.weeklyBudget;
         const colorCoding = !debt ? styles.green : styles.red;
         const emptyValue = item.expensesSum === 0;
@@ -244,7 +239,7 @@ const ExpenseGraph = ({
               if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
-                dayString: weekString,
+                dayString: titleStringFilteredPieCharts,
               });
             }}
           >
@@ -271,14 +266,7 @@ const ExpenseGraph = ({
       for (let i = 0; i < lastMonths; i++) {
         const { firstDay, lastDay, monthlyExpenses } =
           expenseCtx.getMonthlyExpenses(i);
-        const expensesSum = monthlyExpenses.reduce((sum, expense) => {
-          if (
-            isNaN(Number(expense.calcAmount)) ||
-            (hideSpecial && expense.isSpecialExpense)
-          )
-            return sum;
-          return sum + Number(expense.calcAmount.toFixed(2));
-        }, 0);
+        const expensesSum = getExpensesSum(monthlyExpenses, hideSpecial);
         let monthlyBudget = Number(tripCtx.dailyBudget) * 30;
         if (monthlyBudget > totalBudget) monthlyBudget = totalBudget;
         const formattedDay = toDayMonthString(firstDay);
@@ -292,9 +280,12 @@ const ExpenseGraph = ({
         const obj = { firstDay, lastDay, expensesSum, monthlyBudget, label };
         listExpenseSumBudgets.push(obj);
       }
-
       renderItemRef.current = function renderItem({ item }) {
         const month = toMonthString(item.firstDay);
+        const titleStringFilteredPieCharts = `${month} - ${formatExpenseWithCurrency(
+          item.expensesSum,
+          tripCtx.tripCurrency
+        )}`;
         const debt = item.expensesSum > item.monthlyBudget;
         const colorCoding = !debt ? styles.green : styles.red;
 
@@ -338,7 +329,7 @@ const ExpenseGraph = ({
               if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
-                dayString: month,
+                dayString: titleStringFilteredPieCharts,
               });
             }}
           >
@@ -369,15 +360,7 @@ const ExpenseGraph = ({
       for (let i = 0; i < lastYears; i++) {
         const { firstDay, lastDay, yearlyExpenses } =
           expenseCtx.getYearlyExpenses(i);
-        const expensesSum = yearlyExpenses.reduce((sum, expense) => {
-          if (
-            isNaN(Number(expense.calcAmount)) ||
-            (hideSpecial && expense.isSpecialExpense)
-          )
-            return sum;
-          return sum + Number(expense.calcAmount.toFixed(2));
-        }, 0);
-
+        const expensesSum = getExpensesSum(yearlyExpenses, hideSpecial);
         let yearlyBudget = Number(tripCtx.dailyBudget) * 365;
         if (yearlyBudget > totalBudget) yearlyBudget = totalBudget;
         const formattedDay = toDayMonthString(firstDay);
@@ -393,6 +376,10 @@ const ExpenseGraph = ({
       }
       renderItemRef.current = function renderItem({ item }) {
         const yearString = item.firstDay.getFullYear();
+        const titleStringFilteredPieCharts = `${yearString} - ${formatExpenseWithCurrency(
+          item.expensesSum,
+          tripCtx.tripCurrency
+        )}`;
         const debt = item.expensesSum > item.yearlyBudget;
         const colorCoding = !debt ? styles.green : styles.red;
 
@@ -436,7 +423,7 @@ const ExpenseGraph = ({
               if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
-                dayString: yearString,
+                dayString: titleStringFilteredPieCharts,
               });
             }}
           >
@@ -505,13 +492,6 @@ const ExpenseGraph = ({
         ></Animated.FlatList>
       </Animated.View>
     </Animated.View>
-  );
-};
-
-const areEqual = (prevProps, nextProps) => {
-  return (
-    prevProps.periodName === nextProps.periodName &&
-    prevProps.periodRangeNumber === nextProps.periodRangeNumber
   );
 };
 

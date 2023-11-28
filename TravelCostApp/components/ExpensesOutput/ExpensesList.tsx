@@ -33,6 +33,7 @@ import IconButton from "../UI/IconButton";
 import Animated, {
   Easing,
   exp,
+  FadeIn,
   FadeInLeft,
   FadeInRight,
   FadeInUp,
@@ -70,7 +71,11 @@ import * as Haptics from "expo-haptics";
 import { Category } from "../../util/category";
 import { toShortFormat } from "../../util/date";
 import { getCurrencySymbol } from "../../util/currencySymbol";
-import { DEV, MAX_EXPENSES } from "../../confAppConstants";
+import {
+  DEV,
+  EXPENSES_LOAD_TIMEOUT,
+  MAX_EXPENSES,
+} from "../../confAppConstants";
 import { TripAsObject } from "../../screens/TripSummaryScreen";
 import { create } from "react-test-renderer";
 import { AuthContext } from "../../store/auth-context";
@@ -355,33 +360,7 @@ function ExpensesList({
         });
       };
       if (expensesLength > MAX_EXPENSES) {
-        // const cheapSelectableJSX = (
-        //   <View
-        //     style={{
-        //       flex: 0,
-        //       position: "absolute",
-        //       top: -45,
-        //       left: -55,
-        //       zIndex: 1,
-        //     }}
-        //   >
-        //     <IconButton
-        //       icon={
-        //         selected.includes(itemData.item.id)
-        //           ? "ios-checkmark-circle"
-        //           : "ellipse-outline"
-        //       }
-        //       color={
-        //         selected.includes(itemData.item.id)
-        //           ? GlobalStyles.colors.textColor
-        //           : GlobalStyles.colors.gray700
-        //       }
-        //       size={16}
-        //       onPress={selectItem.bind(this, itemData.item.id)}
-        //       buttonStyle={{ padding: 48 }}
-        //     ></IconButton>
-        //   </View>
-        // );
+        // show cheap JSX
         return (
           <TouchableOpacity
             style={styles.fastExpenseContainer}
@@ -865,6 +844,9 @@ function ExpensesList({
 
   return (
     <Animated.View
+      entering={FadeIn.delay(isFiltered ? 0 : EXPENSES_LOAD_TIMEOUT).duration(
+        isFiltered ? 0 : 500
+      )}
       style={{
         paddingLeft: 0,
         backgroundColor: GlobalStyles.colors.backgroundColor,

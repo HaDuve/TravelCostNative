@@ -285,6 +285,7 @@ export async function calcOpenSplitsTable(
   const rates = {};
   rates[tripCurrency] = 1;
   if (givenExpenses && givenExpenses?.length > 0) {
+    // create a copy
     expenses = JSON.parse(JSON.stringify(givenExpenses));
   } else {
     try {

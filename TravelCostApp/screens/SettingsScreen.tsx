@@ -172,6 +172,10 @@ const SettingsScreen = ({ navigation }) => {
   const DEVCONTENT = DEV && (
     <View>
       {/* spacer View */}
+      <View style={{ padding: 12, flex: 1 }}>
+        {currentVersion && <Text>Current Version: {currentVersion}</Text>}
+        {latestVersion && <Text>Latest Version: {latestVersion}</Text>}
+      </View>
       <View style={{ flex: 1, minHeight: 100 }}></View>
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>DEVCONTENT</Text>
@@ -455,10 +459,7 @@ const SettingsScreen = ({ navigation }) => {
         }}
       ></View>
       {DEVCONTENT}
-      <View style={{ padding: 12, flex: 1 }}>
-        {currentVersion && <Text>Current Version: {currentVersion}</Text>}
-        {latestVersion && <Text>Latest Version: {latestVersion}</Text>}
-      </View>
+
       <View style={{ flex: 1, minHeight: 100 }}></View>
     </ScrollView>
   );

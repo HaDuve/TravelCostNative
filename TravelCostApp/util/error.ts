@@ -14,7 +14,7 @@ export default function safeLogError(
   if (!error) return;
   const message = getErrorMessage(error);
   console.error(
-    `{fileName ? "in:" : ""} ${fileName ? "fn: " + fileName + " " : ""}${
+    `${fileName ? "in:" : ""} ${fileName ? "fn: " + fileName + " " : ""}${
       lineNumber ? "ln: " + lineNumber : ""
     }\n${message || "Unknown error"}`
   );

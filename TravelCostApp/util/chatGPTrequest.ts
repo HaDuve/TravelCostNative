@@ -15,6 +15,7 @@ const languageObj = LANGUAGE_LIST.find(
   (language) => language.code === i18n.locale
 );
 const languageName = languageObj?.name;
+console.log("languageName:", languageName);
 
 import { Configuration, OpenAIApi } from "openai";
 import { Keys, loadKeys } from "../components/Premium/PremiumConstants";
@@ -67,7 +68,7 @@ function chatGPTcontentGoodDealPost(
   currency: string,
   country: string
 ) {
-  return `Act like a helpful and experienced traveller. Tell me: (Is ${price} ${currency} a good price for ${product} in ${country}? Answer me in ${languageName}.) IF ${product} is not a recognizable word then => (Only return a very short and funny and creative and over-the-top-comedical and satirical answer. Ignore the rest of the prompt) // ELSE: IF ${product} is a recognizable word then => (Tell me the usual price range. Also give me some interesting or helpful facts about ${product} in ${country}.)`;
+  return `Tell me: (Is ${price} ${currency} a good price for ${product} in ${country}?.) IF ${product} is not a recognizable word then => (Only return a very short and funny and creative and over-the-top-comedical and satirical answer. Ignore the rest of the prompt) // ELSE: IF ${product} is a recognizable word then => (Tell me the usual price range. Also give me some interesting or helpful facts about ${product} in ${country}.)`;
 }
 
 function chatGPTcontentPrice(
@@ -75,7 +76,7 @@ function chatGPTcontentPrice(
   country: string,
   currency: string
 ) {
-  return `Act like a helpful and experienced traveller. Tell me: (the usual price range for ${product} in ${country} in ${currency}. Answer me in ${languageName}.) IF ${product} is not a recognizable word then => (Only return a very short and funny and creative and over-the-top-comedical and satirical answer. Ignore the rest of the prompt) // ELSE:  IF ${product} is a recognizable word then => (Tell me the usual price range. Also give me some interesting or helpful facts about ${product} in ${country}.)`;
+  return `Tell me: (the usual price range for ${product} in ${country} in ${currency}.) IF ${product} is not a recognizable word then => (Only return a very short and funny and creative and over-the-top-comedical and satirical answer. Ignore the rest of the prompt) // ELSE:  IF ${product} is a recognizable word then => (Tell me the usual price range. Also give me some interesting or helpful facts about ${product} in ${country}.)`;
 }
 
 function getGPT_Content(requestBody: GPT_RequestBody) {
@@ -115,15 +116,19 @@ export async function getChatGPT_Response(requestBody: GPT_RequestBody) {
       model: "gpt-4",
       messages: [
         {
+          role: "system",
+          content: `You are a helpful and experienced traveller. Answer me in ${languageName}. Dont answer the meta-aspects/instructions literally, only give helpful information and advice.`,
+        },
+        {
           role: "user",
           content: getGPT_Content(requestBody),
         },
       ],
       temperature: 0.75,
-      max_tokens: 2780,
-      top_p: 1,
-      frequency_penalty: 0,
-      presence_penalty: 0,
+      max_tokens: 1000,
+      top_p: 0.9,
+      frequency_penalty: 0.25,
+      presence_penalty: 0.15,
     });
     const responseText = response.data.choices[0].message;
     console.log("response.data: gpt-4:", response.data);

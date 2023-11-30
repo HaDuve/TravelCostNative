@@ -227,7 +227,7 @@ const en = {
   paywallFeature2: "✓ Simplify debt settlements",
   paywallFeature3: "✓ Better overview with advanced charts",
   paywallFeature4: "✓ Search expenses with filtering options",
-  paywallFeature5: "✓ Ask ChatGPT if you got a good deal",
+  paywallFeature5: "✓ Ask GPT-4 if you got a good deal",
   paywallFeature6: "Start your 1-week trial subscription now.",
   paywallLegal1:
     "At the end of the 1-week trial period, your iTunes account will be charged $2. The subscription will automatically renew unless canceled within 24 hours before the end of the current period. You can cancel anytime through your iTunes account. Any unused portion of a free trial will be forfeited upon subscription purchase. For more information, please refer to our terms and conditions and privacy policy.",
@@ -247,10 +247,10 @@ const en = {
   tourGuideLabelSkip: "Skip",
   tourGuideLabelFinish: "Finish",
   countryLabel: "Country",
-  askChatGptPost: "Ask ChatGPT: Was this a good deal?",
-  askChatGptPre: "Ask ChatGPT: Would this be a good deal?",
-  askChatGptTitle: "Ask ChatGPT",
-  askingChatGpt: "Asking ChatGPT for a good deal...",
+  askChatGptPost: "Ask GPT-4: Was this a good deal?",
+  askChatGptPre: "Ask GPT-4: Would this be a good deal?",
+  askChatGptTitle: "Ask GPT-4",
+  askingChatGpt: "Asking GPT-4 for a good deal...",
   day: "Day",
   week: "Week",
   month: "Month",
@@ -392,9 +392,9 @@ const en = {
   never: "Never",
   later: "Later",
   // gpt
-  gptInfoTitle: "ChatGPT Info",
+  gptInfoTitle: "GPT-4 Info",
   gptInfoText:
-    "When using the \"ask ChatGPT for a good deal\" feature, input your travel expenses for evaluation. ChatGPT assesses and analyzes the expenses to determine if they're a good deal, considering factors like market prices, data, and reviews. Remember, ChatGPT is an AI system, not a financial expert. Use its evaluation as a reference, not professional advice. Note that ChatGPT's information is based on data until September 2021 and may not reflect current conditions. It's wise to consult a financial advisor or do additional research. For accurate evaluations, include as much relevant information as possible in your expense description. Your feedback is valuable in improving the system's accuracy and usefulness.",
+    "When using the \"askGPT-4 for a good deal\" feature, enter your expenses for analysis. GPT-4 evaluates your costs considering factors like current market rates, data, and user reviews. Keep in mind, while GPT-4 is a powerful AI, it's not a certified financial advisor. Use its analysis as a guide, not definitive advice. GPT-4's data is updated up to September 2021 and might not reflect present conditions. Always consider consulting a professional or doing more research. For accurate analysis, provide as much detail as possible about your expenses. Your feedback helps enhance GPT-4's accuracy and usefulness.",
   owes: "owes",
 };
 const de = {
@@ -633,7 +633,7 @@ const de = {
   paywallFeature2: "✓ Vereinfache Schuldenbegleichungen",
   paywallFeature3: "✓ Behalte mehr Überblick mit erweiterten Diagrammen",
   paywallFeature4: "✓ Suche Ausgaben mit Filterfunktionen",
-  paywallFeature5: "✓ Frage ChatGPT ob du einen guten Deal gemacht hast",
+  paywallFeature5: "✓ Frage GPT-4 ob du einen guten Deal gemacht hast",
   paywallFeature6: "Beginne jetzt dein 1-wöchiges Probeabo. ",
   paywallLegal1:
     "Am Ende der 1-wöchigen Testphase wird dein iTunes-Konto mit einem " +
@@ -659,10 +659,10 @@ const de = {
   tourGuideLabelSkip: "Überspringen",
   tourGuideLabelFinish: "Fertig",
   countryLabel: "Land",
-  askChatGptPost: "Frage ChatGPT: War das ein gutes Angebot?",
-  askChatGptPre: "Frage ChatGPT: Ist das ein gutes Angebot?",
-  askChatGptTitle: "Frage ChatGPT",
-  askingChatGpt: "Frage ChatGPT nach einem guten Angebot...",
+  askChatGptPost: "Frage GPT-4: War das ein gutes Angebot?",
+  askChatGptPre: "Frage GPT-4: Ist das ein gutes Angebot?",
+  askChatGptTitle: "Frage GPT-4",
+  askingChatGpt: "Frage GPT-4 nach einem guten Angebot...",
   day: "Tag",
   week: "Woche",
   month: "Monat",
@@ -814,7 +814,7 @@ const de = {
   // gpt
   gptInfoTitle: "ChatGPT Info",
   gptInfoText:
-    'Wenn du die Funktion "Frag ChatGPT nach einem guten Angebot" nutzt, gib deine Reisekosten zur Bewertung ein. ChatGPT bewertet und analysiert deine Ausgaben, um festzustellen, ob sie ein gutes Geschäft sind. Dabei berücksichtigt es Faktoren wie Marktpreise, Daten und Bewertungen. Denk daran, dass ChatGPT ein KI-System ist und kein Finanzexperte. Verwende seine Bewertung als Referenz, nicht als professionellen Rat. Beachte, dass die Informationen von ChatGPT auf Daten bis September 2021 beruhen und möglicherweise nicht die aktuellen Bedingungen widerspiegeln. Es ist ratsam, einen Finanzberater zu konsultieren oder zusätzliche Nachforschungen anzustellen. Um genaue Bewertungen zu erhalten, solltest du so viele relevante Informationen wie möglich in deine Ausgabenbeschreibung aufnehmen. Dein Feedback ist wertvoll, um die Genauigkeit und Nützlichkeit des Systems zu verbessern.',
+    'Wenn du die Funktion "Frag GPT-4 nach einem guten Angebot" nutzt, gib deine Reisekosten zur Bewertung ein. GPT-4 bewertet und analysiert deine Ausgaben, um festzustellen, ob sie ein gutes Geschäft sind. Dabei berücksichtigt es Faktoren wie Marktpreise, Daten und Bewertungen. Denk daran, dass GPT-4 ein KI-System ist und kein Finanzexperte. Verwende seine Bewertung als Referenz, nicht als professionellen Rat. Beachte, dass die Informationen von GPT-4 auf Daten bis September 2021 beruhen und möglicherweise nicht die aktuellen Bedingungen widerspiegeln. Es ist ratsam, einen Finanzberater zu konsultieren oder zusätzliche Nachforschungen anzustellen. Um genaue Bewertungen zu erhalten, solltest du so viele relevante Informationen wie möglich in deine Ausgabenbeschreibung aufnehmen. Dein Feedback ist wertvoll, um die Genauigkeit und Nützlichkeit des Systems zu verbessern.',
   owes: "schuldet",
 };
 const fr = {
@@ -1055,7 +1055,7 @@ const fr = {
   paywallFeature3:
     "✓ Gardez une meilleure vue d'ensemble avec des graphiques avancés",
   paywallFeature4: "✓ Recherchez des dépenses avec des options de filtrage",
-  paywallFeature5: "✓ Demandez à ChatGPT si vous avez fait une bonne affaire",
+  paywallFeature5: "✓ Demandez à GPT-4 si vous avez fait une bonne affaire",
   paywallFeature6:
     "Commencez votre essai gratuit d'une semaine dès maintenant.",
   paywallLegal1:
@@ -1076,11 +1076,10 @@ const fr = {
   tourGuideLabelSkip: "Passer",
   tourGuideLabelFinish: "Terminer",
   countryLabel: "Pays",
-  askChatGptPost: "Demander à ChatGPT : Est-ce une bonne affaire ?",
-  askChatGptPre:
-    "Demander à ChatGPT : Est-ce que ce serait une bonne affaire ?",
-  askChatGptTitle: "Demander à ChatGPT",
-  askingChatGpt: "Demander à ChatGPT pour une bonne affaire...",
+  askChatGptPost: "Demander à GPT-4 : Est-ce une bonne affaire ?",
+  askChatGptPre: "Demander à GPT-4 : Est-ce que ce serait une bonne affaire ?",
+  askChatGptTitle: "Demander à GPT-4",
+  askingChatGpt: "Demander à GPT-4 pour une bonne affaire...",
   day: "Jour",
   week: "Semaine",
   month: "Mois",
@@ -1229,9 +1228,9 @@ const fr = {
   later: "Plus tard",
 
   // gpt
-  gptInfoTitle: "Informations sur ChatGPT",
+  gptInfoTitle: "Informations sur GPT-4",
   gptInfoText:
-    "Si tu utilises la fonction \"Demandez une bonne affaire à ChatGPT\", entrez vos frais de déplacement pour les évaluer. ChatGPT évalue et analyse tes dépenses pour déterminer si elles constituent une bonne affaire. Il prend en compte des facteurs tels que les prix du marché, les dates et les évaluations. N'oublie pas que ChatGPT est un système d'intelligence artificielle et non un expert financier. Utilise son évaluation comme référence, pas comme un conseil professionnel. Note que les informations de ChatGPT sont basées sur des données jusqu'en septembre 2021 et peuvent ne pas refléter les conditions actuelles. Il est conseillé de consulter un conseiller financier ou de faire des recherches supplémentaires. Pour obtenir des évaluations précises, tu dois inclure autant d'informations pertinentes que possible dans la description de tes dépenses. Ton feedback est précieux pour améliorer la précision et l'utilité du système",
+    "Si tu utilises la fonction \"Demandez une bonne affaire à GPT-4\", entrez vos frais de déplacement pour les évaluer. GPT-4 évalue et analyse tes dépenses pour déterminer si elles constituent une bonne affaire. Il prend en compte des facteurs tels que les prix du marché, les dates et les évaluations. N'oublie pas que GPT-4 est un système d'intelligence artificielle et non un expert financier. Utilise son évaluation comme référence, pas comme un conseil professionnel. Note que les informations de GPT-4 sont basées sur des données jusqu'en septembre 2021 et peuvent ne pas refléter les conditions actuelles. Il est conseillé de consulter un conseiller financier ou de faire des recherches supplémentaires. Pour obtenir des évaluations précises, tu dois inclure autant d'informations pertinentes que possible dans la description de tes dépenses. Ton feedback est précieux pour améliorer la précision et l'utilité du système",
   owes: "doit à",
 };
 const ru = {
@@ -1468,7 +1467,7 @@ const ru = {
   paywallFeature3:
     "✓ Поддерживайте лучший обзор с помощью расширенных графиков,",
   paywallFeature4: "✓ Ищите расходы с помощью функций фильтрации,",
-  paywallFeature5: "✓ Спросите у ChatGPT, получили ли вы хорошую сделку,",
+  paywallFeature5: "✓ Спросите у GPT-4, получили ли вы хорошую сделку,",
   paywallFeature6: "Начните пробный период на 1 неделю сейчас,",
   paywallLegal1:
     "По истечении 1-недельного пробного периода ваш аккаунт iTunes будет списан на $2. Подписка автоматически продлится, если не будет отменена в течение 24 часов перед окончанием текущего периода. Вы можете отменить подписку в любое время через свой аккаунт iTunes. Любая неиспользованная часть бесплатного пробного периода будет аннулирована при покупке подписки. Дополнительную информацию можно найти в наших условиях использования и политике конфиденциальности.",
@@ -1486,10 +1485,10 @@ const ru = {
   tourGuideLabelSkip: "Пропустить",
   tourGuideLabelFinish: "Завершить",
   countryLabel: "Страна",
-  askChatGptPost: "Спросить у ChatGPT: Это хорошая сделка?",
-  askChatGptPre: "Спросить у ChatGPT: Будет ли это хорошая сделка?",
-  askChatGptTitle: "Спросить у ChatGPT",
-  askingChatGpt: "Запрашиваю мнение ChatGPT о хорошей сделке...",
+  askChatGptPost: "Спросить у GPT-4: Это хорошая сделка?",
+  askChatGptPre: "Спросить у GPT-4: Будет ли это хорошая сделка?",
+  askChatGptTitle: "Спросить у GPT-4",
+  askingChatGpt: "Запрашиваю мнение GPT-4 о хорошей сделке...",
   day: "День",
   week: "Неделя",
   month: "Месяц",
@@ -1650,9 +1649,9 @@ const ru = {
   later: "Позже",
 
   // gpt
-  gptInfoTitle: "Информация о ChatGPT",
+  gptInfoTitle: "Информация о GPT-4",
   gptInfoText:
-    'Когда вы используете функцию "Попросить ChatGPT о хорошей сделке", введите свои расходы на поездку для оценки. ChatGPT оценивает и анализирует ваши расходы, чтобы определить, являются ли они выгодной сделкой. Он принимает во внимание такие факторы, как рыночные цены, даты и оценки. Помните, что ChatGPT - это система искусственного интеллекта, а не финансовый эксперт. Используйте его оценку как справочник, а не как профессиональный совет. Обратите внимание, что информация ChatGPT основана на данных по сентябрь 2021 года и может не отражать текущие условия. Рекомендуется проконсультироваться с финансовым консультантом или провести дополнительное исследование. Чтобы получить точные рейтинги, вы должны включить как можно больше релевантной информации в описание ваших расходов. Ваши отзывы ценны для повышения точности и полезности системы',
+    'Когда вы используете функцию "Попросить GPT-4 о хорошей сделке", введите свои расходы на поездку для оценки. GPT-4 оценивает и анализирует ваши расходы, чтобы определить, являются ли они выгодной сделкой. Он принимает во внимание такие факторы, как рыночные цены, даты и оценки. Помните, что GPT-4 - это система искусственного интеллекта, а не финансовый эксперт. Используйте его оценку как справочник, а не как профессиональный совет. Обратите внимание, что информация GPT-4 основана на данных по сентябрь 2021 года и может не отражать текущие условия. Рекомендуется проконсультироваться с финансовым консультантом или провести дополнительное исследование. Чтобы получить точные рейтинги, вы должны включить как можно больше релевантной информации в описание ваших расходов. Ваши отзывы ценны для повышения точности и полезности системы',
   owes: "должен",
 };
 export { en, de, fr, ru };

@@ -87,7 +87,15 @@ function ExpenseItem(props): JSX.Element {
       setCalcTravellerSum(tempCalcSum);
       setTravellerSum(tempSum);
     }
-  }, [showSumForTravellerName]);
+  }, [
+    calcTravellerSum,
+    currency,
+    rate,
+    showSumForTravellerName,
+    splitList?.length,
+    travellerSum,
+    tripCurrency,
+  ]);
   const calcAmountString = calcTravellerSum
     ? `${calcTravellerSumString}`
     : formatExpenseWithCurrency(calcAmount, tripCurrency);

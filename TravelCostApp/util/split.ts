@@ -398,7 +398,7 @@ export function simplifySplits(openSplits: Split[]) {
       simplifiedItems.push(item);
     });
   } catch (error) {
-    console.log("error in simplifying splits", error);
+    // console.log("error in simplifying splits", error);
     const item = {
       amount: 0,
       userName: error.message,

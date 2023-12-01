@@ -68,7 +68,8 @@ const SplitSummaryScreen = ({ navigation }) => {
   );
   const { freshlyCreated, userName } = useContext(UserContext);
   const { expenses } = useContext(ExpensesContext);
-
+  // avoid rerenders
+  const memoExpenses = useMemo(() => expenses, [expenses]);
   useFocusEffect(
     React.useCallback(() => {
       if (freshlyCreated) {
@@ -119,8 +120,8 @@ const SplitSummaryScreen = ({ navigation }) => {
   );
 
   const getOpenSplits = useCallback(async () => {
-    if (!tripid || expenses?.length === 0) return;
     console.log("called getOpenSplits!");
+    if (!tripid || expenses?.length === 0) return;
     setIsFetching(true);
     try {
       const response = await calcOpenSplitsTable(
@@ -171,7 +172,7 @@ const SplitSummaryScreen = ({ navigation }) => {
     isPaidDate,
     tripCurrency,
     tripid,
-    expenses?.length,
+    memoExpenses,
     userName,
   ]);
   const simpleSplits = useCallback(
@@ -185,7 +186,7 @@ const SplitSummaryScreen = ({ navigation }) => {
   const noSimpleSplits = !simpleSplits || simpleSplits?.length < 1 || sameList;
 
   useEffect(() => {
-    if (isFetching || !tripid || splits?.length > 1) return;
+    if (isFetching || !tripid) return;
     getOpenSplits();
   }, [getOpenSplits]);
 
@@ -305,8 +306,8 @@ const SplitSummaryScreen = ({ navigation }) => {
   return (
     <View style={[styles.container]}>
       <Animated.View
-        entering={FadeIn}
-        exiting={FadeOut}
+        // entering={FadeIn}
+        // exiting={FadeOut}
         style={[styles.cardContainer, GlobalStyles.wideStrongShadow]}
       >
         <View style={styles.titleContainer}>
@@ -400,15 +401,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    padding: "8%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   cardContainer: {
     alignItems: "center",
     justifyContent: "center",
-    margin: "8%",
-    padding: "2%",
-    paddingVertical: "4%",
-    paddingTop: "12%",
+    // marginVertical: "6%",
+    marginHorizontal: "0%",
+    padding: "8%",
     //card
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: 20,
@@ -434,7 +435,7 @@ const styles = StyleSheet.create({
   },
   splitContainer: {
     flexDirection: "row",
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
     paddingVertical: 8,
     marginHorizontal: 8,
     marginVertical: 8,
@@ -455,7 +456,7 @@ const styles = StyleSheet.create({
     // margin: "2%",
     // minHeight: 250,
     ...Platform.select({
-      ios: { marginTop: "-20%" },
+      ios: { marginTop: "-0%" },
       android: {
         height: 55,
         justifyContent: "space-between",

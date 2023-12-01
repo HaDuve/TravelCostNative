@@ -362,27 +362,28 @@ function ExpensesList({
       if (expensesLength > MAX_EXPENSES) {
         // show cheap JSX
         return (
-          <TouchableOpacity
-            style={styles.fastExpenseContainer}
-            onPress={() => navigateToExpense()}
-          >
-            <View>
-              {/* {selectable && cheapSelectableJSX} */}
+          <View>
+            <TouchableOpacity
+              style={styles.fastExpenseContainer}
+              onPress={() => navigateToExpense()}
+            >
+              <View>
+                {/* {selectable && cheapSelectableJSX} */}
+                <Text style={styles.descriptionText}>
+                  {itemData.item?.description}
+                </Text>
+                <Text style={styles.secondaryText}>
+                  {toShortFormat(itemData.item?.date)}{" "}
+                </Text>
+              </View>
               <Text style={styles.fastExpenseText}>
-                {" " + toShortFormat(itemData.item?.date)}{" "}
-                {itemData.item?.description}{" "}
+                {formatExpenseWithCurrency(
+                  itemData.item?.amount || 0,
+                  itemData.item?.currency
+                )}
               </Text>
-              <Text style={styles.fastExpenseText}>
-                {itemData.item?.category}{" "}
-              </Text>
-            </View>
-            <Text style={styles.fastExpenseText}>
-              {formatExpenseWithCurrency(
-                itemData.item?.amount || 0,
-                itemData.item?.currency
-              )}
-            </Text>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
         );
       }
       const selectableJSX = (
@@ -968,12 +969,28 @@ const styles = StyleSheet.create({
     alignContent: "center",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 10,
+    paddingLeft: "4%",
+    paddingRight: "2%",
   },
   fastExpenseText: {
     color: GlobalStyles.colors.textColor,
     fontSize: 14,
     fontWeight: "300",
     paddingHorizontal: 10,
+  },
+  descriptionText: {
+    // flex: 1,
+    // width: "110%",
+    fontStyle: "italic",
+    fontWeight: "300",
+    fontSize: 15,
+    zIndex: 2,
+    flexWrap: "wrap",
+    flexDirection: "row",
+  },
+  secondaryText: {
+    color: GlobalStyles.colors.gray700,
+    fontSize: 13,
+    zIndex: 1,
   },
 });

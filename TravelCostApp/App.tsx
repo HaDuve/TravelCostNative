@@ -71,7 +71,10 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 import ManageCategoryScreen from "./screens/ManageCategoryScreen";
 import ToastComponent from "./components/UI/ToastComponent";
-import { DEBUG_RESET, DEBUG_POLLING_INTERVAL } from "./confAppConstants";
+import {
+  DEBUG_RESET_STORAGE,
+  DEBUG_POLLING_INTERVAL,
+} from "./confAppConstants";
 import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
 import Toast from "react-native-toast-message";
 import { useInterval } from "./components/Hooks/useInterval";
@@ -622,7 +625,7 @@ function Root() {
       // end wrap
       console.log("onRootMount ~ onRootMount");
 
-      if (DEBUG_RESET) await asyncStoreSafeClear();
+      if (DEBUG_RESET_STORAGE) await asyncStoreSafeClear();
 
       // offline check and set context
       const { isFastEnough, speed } = await isConnectionFastEnough();

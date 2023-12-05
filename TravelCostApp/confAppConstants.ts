@@ -1,5 +1,5 @@
 // asyncStorage, set to true if you want all storage to be reset and user logged out
-export const DEBUG_RESET = false;
+export const DEBUG_RESET_STORAGE = false;
 // OfflineMode, set to true if you want the simulator to be offline
 export const DEBUG_FORCE_OFFLINE = false;
 // no data, set to true if you want to load no data

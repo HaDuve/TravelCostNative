@@ -256,7 +256,7 @@ function UserContextProvider({ children }) {
     if (_userName) {
       const trimmedName = _userName.replaceAll('"', "").trim();
       setName(trimmedName);
-      await saveUserNameInStorage(trimmedName);
+      if (trimmedName != _userName) await saveUserNameInStorage(trimmedName);
     }
   }
 

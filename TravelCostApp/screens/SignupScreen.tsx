@@ -14,7 +14,7 @@ i18n.enableFallback = true;
 import AuthContent from "../components/Auth/AuthContent";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { asyncStoreSafeClear } from "../store/async-storage";
-import { UserContext } from "../store/user-context";
+import { UserContext, UserData } from "../store/user-context";
 import { createUser } from "../util/auth";
 import { setAxiosAccessToken, storeUser, updateUser } from "../util/http";
 import { AuthContext } from "../store/auth-context";
@@ -44,7 +44,7 @@ function SignupScreen() {
 
   async function signupHandler({ name, email, password }) {
     setIsAuthenticating(true);
-    const userData = { userName: name };
+    const userData: UserData = { userName: name, locale: i18n.locale };
     let { token = "", uid = "" } = {
       token: "",
       uid: "",

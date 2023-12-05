@@ -6,8 +6,8 @@ export const DEBUG_FORCE_OFFLINE = false;
 export const DEBUG_NO_DATA = false;
 // polling interval data
 export const DEBUG_POLLING_INTERVAL = 5000;
-// DEV consts
-export const DEVELOPER_MODE = false;
+// DEV const for testing and getting developer information
+export const DEVELOPER_MODE = true;
 // Premium consts
 export const FORCE_PREMIUM = false;
 // Rating/Review consts
@@ -26,7 +26,7 @@ export const SPLASH_SCREEN_DELAY = 1500;
 export const EXPENSES_LOAD_TIMEOUT = 2000;
 // tweak minimum required internet speed in Mbit/s
 export const MINIMUM_REQUIRED_SPEED = 0.1;
-// cache: only call the getRate request again after X numbers of hours
+// cache: only call the exchange getRate request again after X numbers of hours
 export const CACHE_NUM_HOURS = 1;
-// maximum number of expenses before we start to show only text
+// maximum number of expenses before we start to show cheap text-based expenseItems
 export const MAX_EXPENSES = 150;

@@ -38,6 +38,7 @@ import {
   touchMyTraveler,
   dataResponseTime,
   fetchServerInfo,
+  updateUser,
 } from "./util/http";
 import TripContextProvider, {
   TripContext,
@@ -69,6 +70,7 @@ const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
 i18n.enableFallback = true;
+
 import ManageCategoryScreen from "./screens/ManageCategoryScreen";
 import ToastComponent from "./components/UI/ToastComponent";
 import {
@@ -548,6 +550,16 @@ function Root() {
               const checkUser = await fetchUser(storedUid);
               if (!checkUser) return;
               const tripid = checkUser.currentTrip;
+              const locale = checkUser.locale;
+              console.log("delayedOnlineSetup ~ locale:", locale);
+              if (!locale) {
+                checkUser.locale = i18n.locale;
+                console.log(
+                  "delayedOnlineSetup ~ checkUser.locale before updating:",
+                  checkUser.locale
+                );
+                await updateUser(storedUid, checkUser);
+              }
               const tripData = await tripCtx.fetchAndSetCurrentTrip(tripid);
               if (!tripData) return;
               try {

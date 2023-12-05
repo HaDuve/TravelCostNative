@@ -108,7 +108,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
   }
 
   async function submitHandler() {
-    const userData: UserData = { userName: "" };
+    const userData: UserData = { userName: "", locale: i18n.locale };
     userData.userName = inputs.userName.value;
 
     const invalid =

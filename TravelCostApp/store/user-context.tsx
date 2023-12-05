@@ -44,6 +44,7 @@ export interface UserData {
   freshlyCreated?: boolean;
   needsTour?: boolean;
   isPremium?: boolean;
+  locale?: string;
 }
 
 export const UserContext = createContext({

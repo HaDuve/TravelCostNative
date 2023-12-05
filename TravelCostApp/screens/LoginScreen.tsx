@@ -15,7 +15,7 @@ i18n.enableFallback = true;
 
 import { AuthContext } from "../store/auth-context";
 import { UserContext, UserData } from "../store/user-context";
-import { fetchUser, touchMyTraveler } from "../util/http";
+import { fetchUser, touchMyTraveler, updateUser } from "../util/http";
 import { TripContext } from "../store/trip-context";
 import Toast from "react-native-toast-message";
 import Purchases from "react-native-purchases";
@@ -65,6 +65,9 @@ function LoginScreen() {
       console.log("loginHandler ~ uid:", uid);
       //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
       checkUser = await fetchUser(uid);
+      // adding locale to database
+      checkUser.locale = i18n.locale;
+      await updateUser(uid, checkUser);
       await userCtx.addUserName(checkUser);
       await authCtx.setUserID(uid);
     } catch (error) {

@@ -3,12 +3,12 @@ import { Linking } from "react-native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { getMMKVString, setMMKVString } from "../store/mmkv";
 
-export interface versionCheckResponse {
+export type versionCheckResponse = {
   latestVersion: string;
   currentVersion: string;
   isNeeded: boolean;
   storeUrl: string;
-}
+};
 export async function versionCheck() {
   // after testing it seems that the verion check library does not work correctly
   // it always returns true for isNeeded
@@ -23,8 +23,8 @@ export async function versionCheck() {
     const timeDiff =
       (new Date().getTime() - new Date(versionCheckTimeStamp).getTime()) / 1000;
     console.log("versionCheck ~ timeDiff:", timeDiff);
-    if (timeDiff < 60 * 60 * 24 * 7) {
-      // 7 days
+    if (timeDiff < 60 * 60 * 24 * 1) {
+      // 1 day no annoying reminder
       return;
     }
   }
@@ -41,8 +41,8 @@ export async function versionCheck() {
       type: "success",
       position: "top",
       text1: "Update Available",
-      text2: "Press to update to the latest version from Store",
-      visibilityTime: 5000,
+      text2: "Press here to update to the latest version from Store",
+      visibilityTime: 7000,
       autoHide: true,
       topOffset: 30,
       bottomOffset: 40,

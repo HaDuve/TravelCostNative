@@ -7,7 +7,7 @@ export const DEBUG_NO_DATA = false;
 // polling interval data
 export const DEBUG_POLLING_INTERVAL = 5000;
 // DEV consts
-export const DEV = false;
+export const DEVELOPER_MODE = false;
 // Premium consts
 export const FORCE_PREMIUM = false;
 // Rating/Review consts

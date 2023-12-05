@@ -72,7 +72,7 @@ import { Category } from "../../util/category";
 import { toShortFormat } from "../../util/date";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import {
-  DEV,
+  DEVELOPER_MODE,
   EXPENSES_LOAD_TIMEOUT,
   MAX_EXPENSES,
 } from "../../confAppConstants";
@@ -753,7 +753,7 @@ function ExpensesList({
           }}
         >
           {/* hide until production ready */}
-          {selectable && DEV && (
+          {selectable && DEVELOPER_MODE && (
             <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
               <IconButton
                 icon={"document-outline"}

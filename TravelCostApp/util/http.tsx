@@ -1,10 +1,20 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { DEBUG_NO_DATA } from "../confAppConstants";
 import { Category } from "./category";
 import { TripData } from "../store/trip-context";
 import { ExpenseData, ExpenseDataOnline } from "./expense";
 import { UserData } from "../store/user-context";
 import { truncateString } from "./string";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import { Traveller } from "./traveler";
 import uniqBy from "lodash.uniqby";
 import { getMMKVString, setMMKVString } from "../store/mmkv";
@@ -671,6 +681,11 @@ export async function fetchTravelerIsTouched(tripid: string, uid: string) {
   }
 }
 
+export type localeExpoPushToken = {
+  tripid?: string;
+  locale?: string;
+} & ExpoPushToken;
+
 export async function storeExpoPushTokenInTrip(
   token: ExpoPushToken,
   tripid: string
@@ -680,29 +695,58 @@ export async function storeExpoPushTokenInTrip(
   if (!tripid || tripid.length < 1)
     usedTripID = await secureStoreGetItem("currentTripId");
   if (!usedTripID) return;
+  const localeToken: localeExpoPushToken = token;
+  localeToken.tripid = usedTripID;
+  localeToken.locale = i18n.locale;
+  console.log(
+    "storeExpoPushTokenInTrip ~ localeToken.locale:",
+    localeToken.locale
+  );
   console.log("storeExpoPushTokenInTrip ~ usedTripID", usedTripID);
   // store token string under tripid/tokens adding to current tokens if any
-  const storedTokens = [];
   const response = await axios.get(
     BACKEND_URL + `/trips/${usedTripID}/tokens.json` + getMMKVString("QPAR")
   );
-  if (response?.data) {
-    for (const key in response.data) {
-      if (!response.data[key] || storedTokens.includes(response.data[key]))
-        continue;
-      storedTokens.push(response.data[key]);
+  const res = response?.data;
+  const keysToDelete = [];
+  if (res) {
+    for (const key in res) {
+      const compareToken = res[key];
+      if (localeToken.data == compareToken.data) {
+        // delete all redundant tokens that have the same data as localeToken from database
+        keysToDelete.push(key);
+      }
     }
   }
-  if (storedTokens.includes(token)) return;
+  const axiosCalls = [];
+  for (const key of keysToDelete) {
+    axiosCalls.push(
+      axios.delete(
+        BACKEND_URL +
+          `/trips/${usedTripID}/tokens/${key}.json` +
+          getMMKVString("QPAR")
+      )
+    );
+  }
+
+  let finalResponse: AxiosResponse = null;
   try {
     const response = await axios.post(
       BACKEND_URL + `/trips/${usedTripID}/tokens.json` + getMMKVString("QPAR"),
-      { token }
+      { localeToken }
     );
     console.log(" ~ successfully stored token in trip", response.data);
-    return response;
+    finalResponse = response;
   } catch (error) {
-    console.log("storeExpoPushTokenInTrip ~ error", error);
-    throw new Error("error while storing token in trip");
+    console.error("error while storing token in trip");
+    safeLogError(error, "http.tsx", 735);
   }
+  try {
+    // delete all redundant tokens
+    const res = await Promise.all(axiosCalls);
+    console.log("storeExpoPushTokenInTrip ~ res", res);
+  } catch (error) {
+    safeLogError(error);
+  }
+  return finalResponse;
 }

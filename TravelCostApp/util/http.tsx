@@ -30,6 +30,7 @@ const BACKEND_URL =
 //   baseURL: BACKEND_URL,
 // });
 
+
 /** ACCESS TOKEN */
 /** Sets the ACCESS TOKEN for all future http requests */
 export function setAxiosAccessToken(token: string) {
@@ -40,6 +41,8 @@ export function setAxiosAccessToken(token: string) {
     return;
   }
   setMMKVString("QPAR", `?auth=${token}`);
+  // automatically set the token as authorization token for all axios requests
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 }
 
 /** Axios Logger */

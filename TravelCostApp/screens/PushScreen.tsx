@@ -87,7 +87,7 @@ async function registerForPushNotificationsAsync() {
   return token;
 }
 
-const PushScreen = () => {
+const TEST_PushScreen = () => {
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] =
     useState<Notifications.Notification>(null);
@@ -146,6 +146,6 @@ const PushScreen = () => {
   );
 };
 
-export default PushScreen;
+export default TEST_PushScreen;
 
 const styles = StyleSheet.create({});

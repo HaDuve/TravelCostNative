@@ -106,7 +106,7 @@ import TripSummaryScreen from "./screens/TripSummaryScreen";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
-import PushScreen from "./screens/PushScreen";
+import TEST_PushScreen from "./screens/PushScreen";
 import { setMMKVString } from "./store/mmkv";
 import { versionCheck } from "./util/version";
 import { GestureHandlerRootView } from "react-native-gesture-handler";

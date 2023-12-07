@@ -38,6 +38,7 @@ import { setAttributesAsync } from "../components/Premium/PremiumConstants";
 import Purchases from "react-native-purchases";
 import branch from "react-native-branch";
 import safeLogError from "../util/error";
+import Toast from "react-native-toast-message";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -121,6 +122,11 @@ async function storeToken() {
     });
     await storeExpoPushTokenInTrip(token, "");
   } catch (error) {
+    Toast.show({
+      type: "error",
+      text1: "Store permissions error",
+      text2: "Will try later",
+    });
     console.log("storeExpoPushTokenInTrip failed, will try later");
     setMMKVObject("expoPushTokenStatus", { failed: true });
   }
@@ -154,7 +160,7 @@ const ProfileScreen = ({ navigation }) => {
         console.log("token", token);
         setExpoPushToken(token);
       })
-      .catch((e) => console.log("token error", e));
+      .catch((e) => Alert.alert(e, e.message));
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {

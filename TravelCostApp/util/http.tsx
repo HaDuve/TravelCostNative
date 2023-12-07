@@ -692,12 +692,11 @@ export async function storeExpoPushTokenInTrip(
   token: ExpoPushToken,
   tripid: string
 ) {
-  if (!token) throw Error("no token provided to storeExpoPushTokenInTrip");
+  if (!token) return;
   let usedTripID = tripid;
   if (!tripid || tripid.length < 1)
     usedTripID = await secureStoreGetItem("currentTripId");
-  if (!usedTripID)
-    throw Error("no tripid provided to storeExpoPushTokenInTrip");
+  if (!usedTripID) return;
   const localeToken: localeExpoPushToken = token;
   localeToken.tripid = usedTripID;
   localeToken.locale = i18n.locale;

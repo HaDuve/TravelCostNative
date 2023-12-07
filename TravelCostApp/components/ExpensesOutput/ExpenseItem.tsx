@@ -251,9 +251,9 @@ function ExpenseItem(props): JSX.Element {
 
   if (!id) return <></>;
   return (
-    <Animated.View
+    <View
       // entering={FadeInRight}
-      exiting={FadeOutLeft}
+      // exiting={FadeOutLeft}
       style={[{ height: 55 }, hideSpecial && { opacity: 0.75 }]}
     >
       <Pressable
@@ -327,7 +327,7 @@ function ExpenseItem(props): JSX.Element {
           </View>
         </View>
       </Pressable>
-    </Animated.View>
+    </View>
   );
 }
 

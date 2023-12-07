@@ -20,17 +20,13 @@ import { SettingsContext } from "../../store/settings-context";
 import { TripContext } from "../../store/trip-context";
 import { AuthContext } from "../../store/auth-context";
 import { reloadApp } from "../../util/appState";
-import { NetworkContext } from "../../store/network-context";
 
 const AddExpenseButton = ({ navigation }) => {
   const { settings } = useContext(SettingsContext);
   const skipCatScreen = settings.skipCategoryScreen;
   const tripCtx = useContext(TripContext);
   const authCtx = useContext(AuthContext);
-  const netCtx = useContext(NetworkContext);
-  const buttonRef = useRef(null);
   const [valid, setvalid] = useState(false);
-  console.log("AddExpenseButton ~ valid:", valid);
   const [tryAgain, setTryAgain] = useState(false);
 
   useEffect(() => {
@@ -89,7 +85,6 @@ const AddExpenseButton = ({ navigation }) => {
   useEffect(() => {
     if (!tryAgain) return;
     if (!valid) return;
-    setTryAgain(false);
     pressHandler();
   }, [pressHandler, tryAgain, valid]);
 
@@ -139,7 +134,6 @@ const AddExpenseButton = ({ navigation }) => {
           GlobalStyles.shadowGlowPrimary,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
-        ref={buttonRef}
         onPress={pressHandler}
       >
         <Ionicons

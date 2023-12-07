@@ -2,6 +2,12 @@ Change log Travel Expense App
 
 __ AppStore version __
 
+1.2.801.8
+- translated push notifications
+- removed loading spinner from add expense button
+- improved splitsummary styling
+- improved cheap expense item render design
+
 1.2.801.7
 - implemented chatgpt 4 access
 

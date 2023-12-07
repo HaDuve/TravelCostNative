@@ -32,6 +32,9 @@ import {
   showBranchParams,
   trackPurchaseEvent,
 } from "../Referral/branch";
+import { storeExpoPushTokenInTrip } from "../../util/http";
+import { ExpoPushToken } from "expo-notifications";
+import safeLogError from "../../util/error";
 
 const DevContent = ({ navigation }) => {
   console.log("DevContent rendered");
@@ -47,6 +50,8 @@ const DevContent = ({ navigation }) => {
   const [DEBUG_tripid, setDEBUG_tripid] = useState("");
   const [DEBUG_uid, setDEBUG_uid] = useState("");
   const [offlineQueue, setOfflineQueue] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useInterval(
     () => {
@@ -140,6 +145,34 @@ const DevContent = ({ navigation }) => {
           );
         }}
       ></FlatList>
+      <Text>{errorMessage}</Text>
+      {!isFetching && (
+        <Button
+          style={styles.settingsButton}
+          onPress={async () => {
+            setIsFetching(true);
+            // testing the expo token routine
+            try {
+              const token: ExpoPushToken = {
+                data: "ExponentPushToken[3s-g4nEpxTm6ATLeXpKESm]",
+                type: "expo",
+              };
+              // await Notifications.getExpoPushTokenAsync({
+              //   projectId: Constants.expoConfig.extra.eas.projectId,
+              // });
+              // granted so we want to save the token in the trip
+              await storeExpoPushTokenInTrip(token, "");
+              console.log("storeExpoPushTokenInTrip succeeded");
+            } catch (error) {
+              const message = safeLogError(error);
+              setErrorMessage(message);
+            }
+            setIsFetching(false);
+          }}
+        >
+          Expo Token
+        </Button>
+      )}
 
       <Button
         style={styles.settingsButton}

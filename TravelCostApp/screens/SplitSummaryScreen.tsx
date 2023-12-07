@@ -18,7 +18,6 @@ i18n.enableFallback = true;
 
 import {
   Alert,
-  Dimensions,
   FlatList,
   Platform,
   StyleSheet,
@@ -39,18 +38,12 @@ import {
 import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import GradientButton from "../components/UI/GradientButton";
-import { ExpensesContext, RangeString } from "../store/expenses-context";
-import BackgroundGradient from "../components/UI/BackgroundGradient";
+import { ExpensesContext } from "../store/expenses-context";
 import { ExpenseData, isPaidString, Split } from "../util/expense";
-import Animated, { FadeIn, FadeOut, set } from "react-native-reanimated";
-import { getCurrencySymbol } from "../util/currencySymbol";
-import BackButton from "../components/UI/BackButton";
+import Animated from "react-native-reanimated";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { useFocusEffect } from "@react-navigation/native";
-import BlurPremium from "../components/Premium/BlurPremium";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
-import { G } from "react-native-svg";
 import { Pressable } from "react-native";
 
 const SplitSummaryScreen = ({ navigation }) => {
@@ -62,10 +55,6 @@ const SplitSummaryScreen = ({ navigation }) => {
     isPaid,
     isPaidDate,
   } = useContext(TripContext);
-  const currencySymbol = useMemo(
-    () => getCurrencySymbol(tripCurrency),
-    [tripCurrency]
-  );
   const { freshlyCreated, userName } = useContext(UserContext);
   const { expenses } = useContext(ExpensesContext);
   // avoid rerenders
@@ -284,15 +273,18 @@ const SplitSummaryScreen = ({ navigation }) => {
             pressed && GlobalStyles.pressedWithShadow,
           ]}
         >
-          <Text style={styles.userText}>{item.userName} </Text>
-          <Text style={styles.normalText}>{i18n.t("owes")} </Text>
-          <Text style={styles.userText}>{item.whoPaid} </Text>
-          <Text style={styles.amountText}>{item.amount} </Text>
-          <Text style={styles.amountText}>{currencySymbol}</Text>
+          <Text style={styles.splitText}>
+            <Text style={styles.userText}>{item.userName} </Text>
+            <Text style={styles.normalText}>{i18n.t("owes")} </Text>
+            <Text style={styles.userText}>{item.whoPaid} </Text>
+            <Text style={styles.amountText}>
+              {formatExpenseWithCurrency(item.amount, tripCurrency)}
+            </Text>
+          </Text>
         </Pressable>
       );
     },
-    [currencySymbol]
+    [tripCurrency]
   );
 
   if (error && !isFetching) {
@@ -325,7 +317,7 @@ const SplitSummaryScreen = ({ navigation }) => {
         </View>
 
         <FlatList
-          // style={{ maxHeight: Dimensions.get("screen").height / 1.5 }}
+          style={{ maxWidth: "100%", paddingHorizontal: "2%" }}
           data={splits}
           ListFooterComponent={<View style={{ height: 10 }}></View>}
           ListHeaderComponent={<View style={{ height: 40 }}></View>}
@@ -415,7 +407,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     // borderWidth: 1,
     borderColor: GlobalStyles.colors.gray500,
-    minWidth: "80%",
+    minWidth: "100%",
   },
   button: {
     marginLeft: 24,
@@ -434,15 +426,15 @@ const styles = StyleSheet.create({
     }),
   },
   splitContainer: {
+    flex: 1,
     flexDirection: "row",
-    paddingHorizontal: 8,
+    paddingHorizontal: 16,
     paddingVertical: 8,
-    marginHorizontal: 8,
     marginVertical: 8,
     borderWidth: 1,
     borderColor: GlobalStyles.colors.backgroundColor,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 12,
+    borderRadius: 44,
     alignItems: "center",
   },
   buttonContainer: {
@@ -463,6 +455,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
       },
     }),
+  },
+  splitText: {
+    maxWidth: "100%",
+    textAlign: "center",
   },
   userText: {
     fontSize: 18,

@@ -30,7 +30,6 @@ const BACKEND_URL =
 //   baseURL: BACKEND_URL,
 // });
 
-
 /** ACCESS TOKEN */
 /** Sets the ACCESS TOKEN for all future http requests */
 export function setAxiosAccessToken(token: string) {
@@ -42,7 +41,7 @@ export function setAxiosAccessToken(token: string) {
   }
   setMMKVString("QPAR", `?auth=${token}`);
   // automatically set the token as authorization token for all axios requests
-  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  // axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 }
 
 /** Axios Logger */
@@ -86,7 +85,7 @@ export const fetchServerInfo = async () => {
 
     // Process the response data here
     if (!response) throw new Error("No response from server");
-    const data = response.data;
+    const data = response?.data;
     if (!data) throw new Error("No data on the server");
     console.log("fetchServerInfo ~ data:", data);
 
@@ -119,7 +118,7 @@ export async function deleteCategories(tripid: string) {
     const response = await axios.delete(
       BACKEND_URL + `/trips/${tripid}/categories.json` + getMMKVString("QPAR")
     );
-    return response.data;
+    return response?.data;
   } catch (error) {
     // log error
     console.log("deleteCategories:", error);
@@ -693,11 +692,12 @@ export async function storeExpoPushTokenInTrip(
   token: ExpoPushToken,
   tripid: string
 ) {
-  if (!token) return;
+  if (!token) throw Error("no token provided to storeExpoPushTokenInTrip");
   let usedTripID = tripid;
   if (!tripid || tripid.length < 1)
     usedTripID = await secureStoreGetItem("currentTripId");
-  if (!usedTripID) return;
+  if (!usedTripID)
+    throw Error("no tripid provided to storeExpoPushTokenInTrip");
   const localeToken: localeExpoPushToken = token;
   localeToken.tripid = usedTripID;
   localeToken.locale = i18n.locale;
@@ -711,18 +711,28 @@ export async function storeExpoPushTokenInTrip(
     BACKEND_URL + `/trips/${usedTripID}/tokens.json` + getMMKVString("QPAR")
   );
   const res = response?.data;
+  // console.log("res:", res);
   const keysToDelete = [];
   if (res) {
     for (const key in res) {
-      const compareToken = res[key];
+      const compareToken = res[key].token ?? res[key].localeToken;
+      if (!compareToken) continue;
+      // console.log("compareToken:", compareToken);
+      console.log("compareToken.data:", compareToken?.data);
       if (localeToken.data == compareToken.data) {
         // delete all redundant tokens that have the same data as localeToken from database
+        console.log("found a match");
         keysToDelete.push(key);
       }
     }
   }
+  if (keysToDelete || keysToDelete.length < 1) console.log("found no match");
   const axiosCalls = [];
   for (const key of keysToDelete) {
+    console.log(
+      "url/key to delete:",
+      `/trips/${usedTripID}/tokens/${key}.json`
+    );
     axiosCalls.push(
       axios.delete(
         BACKEND_URL +
@@ -736,9 +746,9 @@ export async function storeExpoPushTokenInTrip(
   try {
     const response = await axios.post(
       BACKEND_URL + `/trips/${usedTripID}/tokens.json` + getMMKVString("QPAR"),
-      { localeToken }
+      { token: localeToken }
     );
-    console.log(" ~ successfully stored token in trip", response.data);
+    console.log(" ~ successfully stored token in trip", response?.data);
     finalResponse = response;
   } catch (error) {
     console.error("error while storing token in trip");
@@ -747,8 +757,11 @@ export async function storeExpoPushTokenInTrip(
   try {
     // delete all redundant tokens
     const res = await Promise.all(axiosCalls);
-    console.log("storeExpoPushTokenInTrip ~ res", res);
+    console.log(
+      `Successfully executed ${axiosCalls.length} axios.delete calls!`
+    );
   } catch (error) {
+    console.error("failing while deleting");
     safeLogError(error);
   }
   return finalResponse;

@@ -175,14 +175,18 @@ function TripContextProvider({ children }) {
 
   async function fetchAndSetTravellers(tripid: string) {
     const { isFastEnough } = await isConnectionFastEnough();
-    if (!isFastEnough) return;
+    if (!isFastEnough) {
+      await loadTravellersFromStorage();
+      return;
+    }
     if (!tripid || tripid === "") {
-      setTravellers([]);
+      // setTravellers([]);
       return false;
     }
     // updates the current Travellers in context
     try {
       const travellers = await getTravellers(tripid);
+      console.log("fetchAndSetTravellers ~ travellers:", travellers);
       if (travellers?.length < 1) throw new Error("no travellers found");
       saveTravellersInStorage(travellers);
       setTravellers(travellers);

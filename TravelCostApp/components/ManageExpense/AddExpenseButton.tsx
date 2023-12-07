@@ -1,8 +1,8 @@
 import React, { Alert, Pressable, StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";
-import Animated from "react-native-reanimated";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import Animated, { FadeIn } from "react-native-reanimated";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TourGuideZone } from "rn-tourguide";
 
@@ -19,16 +19,31 @@ import PropTypes from "prop-types";
 import { SettingsContext } from "../../store/settings-context";
 import { TripContext } from "../../store/trip-context";
 import { AuthContext } from "../../store/auth-context";
+import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { reloadApp } from "../../util/appState";
+import { NetworkContext } from "../../store/network-context";
 
 const AddExpenseButton = ({ navigation }) => {
   const { settings } = useContext(SettingsContext);
-  const skipCatScreen = settings.skipCategoryScreen;
   const tripCtx = useContext(TripContext);
   const authCtx = useContext(AuthContext);
-  const [valid, setvalid] = useState(false);
-  const [tryAgain, setTryAgain] = useState(false);
+  const netCtx = useContext(NetworkContext);
+  const isFast = netCtx.isConnected && netCtx.strongConnection;
+  const buttonRef = useRef(null);
+  // if (buttonRef.current)
+  //   console.log(
+  //     "measureInWindow: ",
+  //     buttonRef.current.measureInWindow((fx, fy, width, height, px, py) => {
+  //       console.log("Component width is: " + width);
+  //       console.log("Component height is: " + height);
+  //       console.log("X offset to frame: " + fx);
+  //       console.log("Y offset to frame: " + fy);
+  //       console.log("X offset to page: " + px);
+  //       console.log("Y offset to page: " + py);
+  //     })
+  //   );
 
+  const [valid, setvalid] = useState(false);
   useEffect(() => {
     setvalid(
       tripCtx.tripid &&
@@ -37,18 +52,19 @@ const AddExpenseButton = ({ navigation }) => {
         tripCtx.travellers?.length > 0
     );
   }, [tripCtx.tripid, authCtx.uid, tripCtx.travellers?.length]);
+  // console.log("AddExpenseButton ~ tripCtx.travellers:", tripCtx.travellers);
+  // console.log("AddExpenseButton ~ authCtx.uid:", authCtx.uid);
+  // console.log("AddExpenseButton ~ tripCtx.tripid:", tripCtx.tripid);
+  const skipCatScreen = settings.skipCategoryScreen;
 
-  const pressHandler = useCallback(async () => {
+  const pressHandler = async () => {
     if (!valid) {
       // error haptic
-      if (!tryAgain) {
-        setTryAgain(true);
-        return;
-      }
-      setTryAgain(false);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      // Platform.select({
+      // ios: () =>
       Alert.alert(
-        "Not ready yet!",
+        "Loading Data",
         "Please try again later, alternatively login again or restart the App",
         [
           // cancel button
@@ -72,6 +88,30 @@ const AddExpenseButton = ({ navigation }) => {
           },
         ]
       );
+      // ,
+      //   android: () => {
+      //     console.log("android pressed");
+      //     Alert.alert(
+      //       "Loading Data",
+      //       "Please try again later, if necessary restart the App or Login again.",
+      //       [
+      //         {
+      //           text: "Restart",
+      //           onPress: () => {
+      //             reloadApp();
+      //           },
+      //         },
+      //         {
+      //           text: "Login",
+      //           onPress: () => {
+      //             authCtx.logout();
+      //             reloadApp();
+      //           },
+      //         },
+      //       ]
+      //     );
+      //   },
+      // })();
     } else {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       skipCatScreen &&
@@ -80,39 +120,33 @@ const AddExpenseButton = ({ navigation }) => {
         });
       !skipCatScreen && navigation.navigate("CategoryPick");
     }
-  }, [skipCatScreen, tryAgain, valid]);
+  };
 
-  useEffect(() => {
-    if (!tryAgain) return;
-    if (!valid) return;
-    pressHandler();
-  }, [pressHandler, tryAgain, valid]);
-
-  // if (!valid) {
-  //   return (
-  //     <Animated.View style={[styles.margin]} entering={FadeIn.duration(600)}>
-  //       <Pressable
-  //         onPress={() => {
-  //           pressHandler();
-  //         }}
-  //         style={[
-  //           styles.addButton,
-  //           GlobalStyles.shadowGlowPrimary,
-  //           styles.addButtonInactive,
-  //         ]}
-  //       >
-  //         <LoadingBarOverlay
-  //           containerStyle={{
-  //             backgroundColor: "transparent",
-  //             maxHeight: 44,
-  //             marginLeft: -4,
-  //           }}
-  //           noText
-  //         ></LoadingBarOverlay>
-  //       </Pressable>
-  //     </Animated.View>
-  //   );
-  // }
+  if (!valid) {
+    return (
+      <Animated.View style={[styles.margin]} entering={FadeIn.duration(600)}>
+        <Pressable
+          onPress={() => {
+            pressHandler();
+          }}
+          style={[
+            styles.addButton,
+            GlobalStyles.shadowGlowPrimary,
+            styles.addButtonInactive,
+          ]}
+        >
+          <LoadingBarOverlay
+            containerStyle={{
+              backgroundColor: "transparent",
+              maxHeight: 44,
+              marginLeft: -4,
+            }}
+            noText
+          ></LoadingBarOverlay>
+        </Pressable>
+      </Animated.View>
+    );
+  }
   return (
     <Animated.View
       style={styles.margin}
@@ -130,15 +164,15 @@ const AddExpenseButton = ({ navigation }) => {
       <Pressable
         style={({ pressed }) => [
           styles.addButton,
-          // !valid && styles.addButtonInactive,
+          !valid && styles.addButtonInactive,
           GlobalStyles.shadowGlowPrimary,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
+        ref={buttonRef}
         onPress={pressHandler}
       >
         <Ionicons
-          // name={valid ? "add-outline" : "alert"}
-          name="add-outline"
+          name={valid ? "add-outline" : "alert"}
           size={42}
           color={GlobalStyles.colors.backgroundColor}
         />

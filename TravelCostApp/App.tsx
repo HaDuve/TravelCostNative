@@ -1,16 +1,14 @@
-import React, { useRef } from "react";
+import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
 LogBox.ignoreAllLogs(); //Ignore all log notifications
 import {
   SafeAreaView,
   View,
-  Text,
   Keyboard,
   Platform,
   AppState,
   LogBox,
   StatusBar as StatusBarRN,
-  Button,
 } from "react-native";
 import Purchases from "react-native-purchases";
 
@@ -37,7 +35,6 @@ import {
   fetchUser,
   touchMyTraveler,
   dataResponseTime,
-  fetchServerInfo,
   updateUser,
 } from "./util/http";
 import TripContextProvider, {
@@ -103,11 +100,6 @@ import GPTDealScreen from "./screens/ChatGPTDealScreen";
 import { initBranch } from "./components/Referral/branch";
 import { MemoizedRecentExpenses } from "./screens/RecentExpenses";
 import TripSummaryScreen from "./screens/TripSummaryScreen";
-import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
-import Constants from "expo-constants";
-import TEST_PushScreen from "./screens/PushScreen";
-import { setMMKVString } from "./store/mmkv";
 import { versionCheck } from "./util/version";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -565,6 +557,7 @@ function Root() {
               try {
                 setOnlineSetupDone(true);
                 await onlineSetup(tripData, checkUser, tripid, storedUid);
+
                 console.log("delayedOnlineSetup ~ DONE");
               } catch (error) {
                 console.log("delayedOnlineSetup ~ error", error);

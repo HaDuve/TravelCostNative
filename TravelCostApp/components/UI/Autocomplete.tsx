@@ -2,7 +2,7 @@
 
 import { View } from "react-native";
 import { Menu, TextInput } from "react-native-paper";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
 import Animated, {
@@ -21,6 +21,7 @@ const Autocomplete = ({
   data,
   containerStyle,
   onChange: origOnChange,
+  placeholder,
   style = {},
   menuStyle = {},
   right = () => {},
@@ -30,6 +31,9 @@ const Autocomplete = ({
   const [menuVisible, setMenuVisible] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
 
+  useEffect(() => {
+    setValue(origValue);
+  }, [origValue]);
   /**
    * Filters the data array based on the provided text.
    * @param {string} text - The text to filter the data array with.
@@ -62,6 +66,7 @@ const Autocomplete = ({
         outlineColor={GlobalStyles.colors.primary700}
         textColor={GlobalStyles.colors.textColor}
         cursorColor={GlobalStyles.colors.textColor}
+        placeholder={placeholder}
         activeOutlineColor={GlobalStyles.colors.primary700}
         underlineColor={GlobalStyles.colors.accent250}
         selectionColor={GlobalStyles.colors.primary700}
@@ -119,6 +124,7 @@ Autocomplete.propTypes = {
   data: PropTypes.array.isRequired,
   containerStyle: PropTypes.object,
   onChange: PropTypes.func.isRequired,
+  placeholder: PropTypes.string,
   icon: PropTypes.string,
   style: PropTypes.object,
   menuStyle: PropTypes.object,

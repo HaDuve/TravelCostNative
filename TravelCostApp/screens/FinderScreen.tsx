@@ -1,4 +1,4 @@
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View, ScrollView } from "react-native";
 import React, {
   useCallback,
   useContext,
@@ -45,10 +45,13 @@ import BlurPremium from "../components/Premium/BlurPremium";
 import { formatExpenseWithCurrency } from "../util/string";
 import { TripContext } from "../store/trip-context";
 import safeLogError from "../util/error";
+import Autocomplete from "../components/UI/Autocomplete";
+import { DEFAULTCATEGORIES } from "../util/category";
+import { ExpenseData } from "../util/expense";
 
 const FinderScreen = () => {
   const navigation = useNavigation();
-  const expenseCtx = useContext(ExpensesContext);
+  const expCtx = useContext(ExpensesContext);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
 
@@ -114,10 +117,10 @@ const FinderScreen = () => {
     }
   };
 
-  const expenses = expenseCtx.expenses;
+  const expenses = expCtx.expenses;
   const filteredExpenses = useMemo(
     () =>
-      expenses.filter((expense) => {
+      expenses.filter((expense: ExpenseData) => {
         const expenseDate = expense.startDate;
         const expenseDateIsSameDay =
           !checkedDate ||
@@ -134,6 +137,9 @@ const FinderScreen = () => {
           ?.toLowerCase()
           .includes(searchQuery?.toLowerCase());
         const expenseCategoryIsInSearchQuery = expense.category
+          ?.toLowerCase()
+          .includes(searchQuery?.toLowerCase());
+        const expenseCategoryIsInSearchQuery2 = expense.categoryString
           ?.toLowerCase()
           .includes(searchQuery?.toLowerCase());
         const expenseCurrencyIsInSearchQuery = expense.currency
@@ -156,6 +162,7 @@ const FinderScreen = () => {
           (!checkedQuery ||
             expenseDescriptionIsInSearchQuery ||
             expenseCategoryIsInSearchQuery ||
+            expenseCategoryIsInSearchQuery2 ||
             expenseCurrencyIsInSearchQuery ||
             expenseCountryIsInSearchQuery ||
             expenseTravellerIsInSearchQuery)
@@ -243,23 +250,48 @@ const FinderScreen = () => {
   }, []);
   const searchRef = useRef(null);
 
+  const last500Daysexpenses = useMemo(
+    () =>
+      expCtx.expenses.filter(
+        (expense) =>
+          expense.date > DateTime.now().minus({ days: 500 }).toJSDate()
+      ),
+    [expCtx.expenses?.length]
+  );
+  // extract suggestions from all the descriptions of expense state into an array of strings
+  const suggestionData: string[] = last500Daysexpenses.map(
+    (expense) => expense.description
+  );
+
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  useEffect(() => {
+    const suggestionsWithTravellers = [
+      ...suggestionData,
+      ...tripCtx.travellers,
+      ...DEFAULTCATEGORIES.map((cat) => cat.catString),
+    ];
+    setSuggestions(suggestionsWithTravellers);
+  }, [suggestionData.length, tripCtx.travellers.length]);
+
   return (
     <>
       {datepickerJSX}
       <View style={styles.container}>
         <View style={[styles.cardContainer, GlobalStyles.wideStrongShadow]}>
           <Text style={styles.titleText}>{i18n.t("finderTitle")}</Text>
-          <View style={styles.rowContainer}>
-            <View style={styles.checkBoxContainer}>
-              <Checkbox
-                status={checkedQuery ? "checked" : "unchecked"}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setCheckedQuery(!checkedQuery);
-                }}
-              />
-            </View>
-            <Searchbar
+          <ScrollView style={{ flex: 1 }}>
+            <View style={styles.rowContainer}>
+              <View style={styles.checkBoxContainer}>
+                <Checkbox
+                  status={checkedQuery ? "checked" : "unchecked"}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setCheckedQuery(!checkedQuery);
+                  }}
+                />
+              </View>
+              {/* <Searchbar
               placeholder={i18n.t("search")}
               ref={searchRef}
               onIconPress={() => {
@@ -272,47 +304,76 @@ const FinderScreen = () => {
               onChangeText={onChangeSearch}
               value={searchQuery}
               style={{ width: "80%" }}
-            />
-          </View>
-          <View style={styles.rowContainer}>
-            <View style={styles.checkBoxContainer}>
-              <Checkbox
-                status={checkedDate ? "checked" : "unchecked"}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setCheckedDate(!checkedDate);
-                }}
-              />
+            /> */}
+              <Autocomplete
+                value={searchQuery}
+                onChange={onChangeSearch}
+                data={suggestions}
+                // placeholder="Search for descriptions, categories, traveller names..."
+                label="Search"
+                containerStyle={[
+                  styles.queryContainer,
+                  GlobalStyles.shadowGlowPrimary,
+                ]}
+                style={styles.autoCompleteStyle}
+                menuStyle={[styles.autoCompleteMenuStyle]}
+              ></Autocomplete>
+              {checkedQuery && (
+                <IconButton
+                  icon="close-outline"
+                  size={26}
+                  buttonStyle={{ marginTop: "7%" }}
+                  onPressStyle={{
+                    backgroundColor: GlobalStyles.colors.gray500,
+                    borderRadius: 99,
+                  }}
+                  onPress={() => {
+                    setSearchQuery("");
+                    setCheckedQuery(false);
+                  }}
+                ></IconButton>
+              )}
             </View>
-            {DatePickerContainer({
-              openDatePickerRange,
-              startDate,
-              endDate,
-              dateIsRanged,
-              narrow: true,
-            })}
-            {checkedDate && (
-              <IconButton
-                icon="close-outline"
-                size={26}
-                buttonStyle={{ marginLeft: "8%" }}
-                onPressStyle={{
-                  backgroundColor: GlobalStyles.colors.gray500,
-                  borderRadius: 99,
-                }}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setCheckedDate(false);
-                  setStartDate(getFormattedDate(DateTime.now()));
-                  setEndDate(getFormattedDate(DateTime.now()));
-                }}
-              ></IconButton>
-            )}
-          </View>
-          <Text style={styles.queryText}>
-            {(queryString || dateString) && i18n.t("finding")} :{queryString}{" "}
-            {dateString}
-          </Text>
+            <View style={styles.rowContainer}>
+              <View style={styles.checkBoxContainer}>
+                <Checkbox
+                  status={checkedDate ? "checked" : "unchecked"}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setCheckedDate(!checkedDate);
+                  }}
+                />
+              </View>
+              {DatePickerContainer({
+                openDatePickerRange,
+                startDate,
+                endDate,
+                dateIsRanged,
+                narrow: true,
+              })}
+              {checkedDate && (
+                <IconButton
+                  icon="close-outline"
+                  size={26}
+                  buttonStyle={{ marginTop: "7%" }}
+                  onPressStyle={{
+                    backgroundColor: GlobalStyles.colors.gray500,
+                    borderRadius: 99,
+                  }}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setCheckedDate(false);
+                    setStartDate(getFormattedDate(DateTime.now()));
+                    setEndDate(getFormattedDate(DateTime.now()));
+                  }}
+                ></IconButton>
+              )}
+            </View>
+            <Text style={styles.queryText}>
+              {(queryString || dateString) && i18n.t("finding")} :{queryString}{" "}
+              {dateString}
+            </Text>
+          </ScrollView>
           <Text style={styles.queryText}>
             {foundResults && "Sum of the Results: "}
             {foundResults &&
@@ -357,6 +418,7 @@ const styles = StyleSheet.create({
   checkBoxContainer: {
     borderRadius: 99,
     marginRight: 8,
+    marginTop: "8%",
     ...Platform.select({
       ios: { borderWidth: 1 },
     }),
@@ -368,8 +430,9 @@ const styles = StyleSheet.create({
     minHeight: 90,
   },
   rowContainer: {
+    flex: 1,
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "flex-start",
     minHeight: 90,
   },
@@ -396,5 +459,28 @@ const styles = StyleSheet.create({
   findButton: {
     marginHorizontal: "20%",
     borderRadius: 99,
+  },
+  queryContainer: {
+    flex: 1,
+    marginTop: "3%",
+
+    // marginHorizontal: "3.5%",
+    marginLeft: "5%",
+    maxWidth: "60%",
+  },
+  autoCompleteStyle: {
+    // flex: 1,
+    zIndex: 0,
+
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
+    borderRadius: 5,
+    // marginLeft: -8,
+  },
+  autoCompleteMenuStyle: {
+    zIndex: 0,
+    marginLeft: 8,
+    marginBottom: -1,
+    borderBottomWidth: 1,
+    borderBottomColor: GlobalStyles.colors.primaryGrayed,
   },
 });

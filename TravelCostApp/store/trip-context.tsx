@@ -158,7 +158,6 @@ function TripContextProvider({ children }) {
 
   useEffect(() => {
     if (!travellers || (travellers?.length === 0 && tripid)) {
-      console.log("fetching travellers");
       fetchAndSetTravellers(tripid);
     }
   }, [travellers, tripid]);
@@ -185,6 +184,7 @@ function TripContextProvider({ children }) {
     }
     // updates the current Travellers in context
     try {
+      console.log("fetching travellers");
       const travellers = await getTravellers(tripid);
       console.log("fetchAndSetTravellers ~ travellers:", travellers);
       if (travellers?.length < 1) throw new Error("no travellers found");

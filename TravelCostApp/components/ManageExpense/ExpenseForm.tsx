@@ -4,9 +4,7 @@ import React, {
   useEffect,
   useCallback,
   useLayoutEffect,
-  memo,
   useMemo,
-  useRef,
 } from "react";
 import * as Haptics from "expo-haptics";
 import {
@@ -24,7 +22,7 @@ import {
 import { daysBetween } from "../../util/date";
 import { useHeaderHeight } from "@react-navigation/elements";
 
-import { Card, SegmentedButtons, Switch } from "react-native-paper";
+import { SegmentedButtons } from "react-native-paper";
 import Input from "./Input";
 import { getFormattedDate } from "../../util/date";
 import { GlobalStyles } from "../../constants/styles";
@@ -71,7 +69,6 @@ import Animated, {
   Easing,
   FadeInUp,
   FadeOutUp,
-  set,
 } from "react-native-reanimated";
 import { DateTime } from "luxon";
 import DatePickerModal from "../UI/DatePickerModal";
@@ -83,7 +80,7 @@ import { DuplicateOption, ExpenseData, isPaidString } from "../../util/expense";
 import { NetworkContext } from "../../store/network-context";
 import { SettingsContext } from "../../store/settings-context";
 import Autocomplete from "../UI/Autocomplete";
-import { ExpensesContext, RangeString } from "../../store/expenses-context";
+import { ExpensesContext } from "../../store/expenses-context";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { secureStoreSetItem } from "../../store/secure-storage";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -92,9 +89,7 @@ import BackButton from "../UI/BackButton";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import SettingsSwitch from "../UI/SettingsSwitch";
 import CountryPicker from "../Currency/CountryPicker";
-import { alertDuplSplitString } from "./ExpenseFormUtil";
 import { getMMKVObject } from "../../store/mmkv";
-import CountryFlag from "react-native-country-flag";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 
 const ExpenseForm = ({

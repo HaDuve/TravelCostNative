@@ -15,9 +15,9 @@ import {
   Pressable,
   FlatList,
   Dimensions,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
+  InputAccessoryView,
 } from "react-native";
 import { daysBetween } from "../../util/date";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -91,6 +91,7 @@ import SettingsSwitch from "../UI/SettingsSwitch";
 import CountryPicker from "../Currency/CountryPicker";
 import { getMMKVObject } from "../../store/mmkv";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
+import { Keyboard } from "react-native";
 
 const ExpenseForm = ({
   onCancel,
@@ -182,6 +183,7 @@ const ExpenseForm = ({
     },
   });
   const [tempAmount, setTempAmount] = useState("");
+  const amountValue = inputs.amount.value || tempAmount;
   const iconString = iconName ? iconName : getCatSymbol(pickedCat);
   const [icon, setIcon] = useState(iconString);
   const getSetCatIcon = async (catString: string) => {
@@ -272,15 +274,15 @@ const ExpenseForm = ({
     editingValues ? Number(editingValues.duplOrSplit) : DuplicateOption.null
   );
   const expenseString = `${formatExpenseWithCurrency(
-    Number(inputs.amount.value),
+    Number(amountValue),
     inputs.currency.value
   )}`;
   const expenseTimesDaysString = formatExpenseWithCurrency(
-    Number(inputs.amount.value) * daysBeween,
+    Number(amountValue) * daysBeween,
     inputs.currency.value
   );
   const expenseDividedByDaysString = formatExpenseWithCurrency(
-    Number(inputs.amount.value) / daysBeween,
+    Number(amountValue) / daysBeween,
     inputs.currency.value
   );
   const duplString = `${i18n.t("duplString1")} ${expenseString} ${i18n.t(
@@ -336,7 +338,7 @@ const ExpenseForm = ({
       if (duplOrSplit === DuplicateOption.split) {
         inputChangedHandler(
           "amount",
-          (Number(inputs.amount.value) * daysBeween).toFixed(2).toString()
+          (Number(amountValue) * daysBeween).toFixed(2).toString()
         );
       }
       if (
@@ -346,7 +348,7 @@ const ExpenseForm = ({
         // divide amount by number of days
         inputChangedHandler(
           "amount",
-          (Number(inputs.amount.value) / daysBeween).toFixed(2).toString()
+          (Number(amountValue) / daysBeween).toFixed(2).toString()
         );
       }
       setDuplOrSplit(DuplicateOption.null);
@@ -387,7 +389,7 @@ const ExpenseForm = ({
   }, [
     startDate,
     endDate,
-    inputs.amount.value,
+    amountValue,
     inputs.currency.value,
     daysBeween,
     duplOrSplit,
@@ -469,13 +471,13 @@ const ExpenseForm = ({
       if (duplOrSplit === 2 && isEditing) {
         const newSplitList = recalcSplitsLinearly(
           splitList,
-          +inputs.amount.value / daysBeween
+          +amountValue / daysBeween
         );
         setSplitList(newSplitList);
         const isValidSplit = validateSplitList(
           newSplitList,
           splitType,
-          +inputs.amount.value
+          +amountValue
         );
         setSplitListValid(isValidSplit);
       }
@@ -567,9 +569,7 @@ const ExpenseForm = ({
     const tempValue = { amount: value, userName: props.userName };
     tempList[index] = tempValue;
     setSplitList(tempList);
-    setSplitListValid(
-      validateSplitList(tempList, splitType, +inputs.amount.value)
-    );
+    setSplitListValid(validateSplitList(tempList, splitType, +amountValue));
   }
 
   function splitHandler() {
@@ -578,7 +578,7 @@ const ExpenseForm = ({
     // calculate splits
     const listSplits = calcSplitList(
       splitType,
-      +inputs.amount.value,
+      +amountValue,
       whoPaid,
       splitTravellers
     );
@@ -594,22 +594,20 @@ const ExpenseForm = ({
     // calculate splits
     const listSplits = calcSplitList(
       "EQUAL",
-      +inputs.amount.value,
+      +amountValue,
       whoPaid,
       splitTravellers
     );
     if (listSplits) {
       setSplitList(listSplits);
-      setSplitListValid(
-        validateSplitList(listSplits, splitType, +inputs.amount.value)
-      );
+      setSplitListValid(validateSplitList(listSplits, splitType, +amountValue));
     }
   }
 
   async function submitHandler() {
     const expenseData = {
       uid: authCtx.uid,
-      amount: +inputs.amount.value,
+      amount: +amountValue,
       date: DateTime.fromISO(inputs.date.value).toJSDate(),
       startDate: DateTime.fromISO(startDate).toJSDate(),
       endDate: DateTime.fromISO(endDate).toJSDate(),
@@ -651,13 +649,13 @@ const ExpenseForm = ({
     if (duplOrSplit === 2 && !isEditing) {
       const newSplitList = recalcSplitsLinearly(
         splitList,
-        +inputs.amount.value / daysBeween
+        +amountValue / daysBeween
       );
       setSplitList(newSplitList);
       const isValidSplit = validateSplitList(
         newSplitList,
         splitType,
-        +inputs.amount.value
+        +amountValue
       );
       setSplitListValid(isValidSplit);
     }
@@ -721,7 +719,7 @@ const ExpenseForm = ({
   async function fastSubmit() {
     const expenseData = {
       uid: authCtx.uid,
-      amount: +inputs.amount.value,
+      amount: +amountValue,
       date: DateTime.fromISO(startDate).toJSDate(),
       startDate: DateTime.fromISO(startDate).toJSDate(),
       endDate: DateTime.fromISO(endDate).toJSDate(),
@@ -771,16 +769,13 @@ const ExpenseForm = ({
   function handleRecalculationSplits() {
     {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      const newSplitList = recalcSplitsForExact(
-        splitList,
-        +inputs.amount.value
-      );
+      const newSplitList = recalcSplitsForExact(splitList, +amountValue);
 
       setSplitList(newSplitList);
       const isValidSplit = validateSplitList(
         newSplitList,
         splitType,
-        +inputs.amount.value
+        +amountValue
       );
       setSplitListValid(isValidSplit);
       if (!isValidSplit) {
@@ -927,7 +922,7 @@ const ExpenseForm = ({
   const askChatGPTHandler = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     navigation.navigate("GPTDeal", {
-      price: inputs.amount.value,
+      price: amountValue,
       currency: inputs.currency.value,
       country: inputs.country.value,
       product: inputs.description.value,
@@ -950,7 +945,7 @@ const ExpenseForm = ({
     !inputs.amount.isValid ||
     !inputs.description.isValid ||
     !inputs.currency.isValid;
-  const showWhoPaid = inputs.amount.value !== "";
+  const showWhoPaid = amountValue !== "";
   const whoPaidValid = whoPaid !== null;
   const splitTypeEqual = splitType === "EQUAL";
   const splitTypeSelf = splitType === "SELF";
@@ -976,7 +971,7 @@ const ExpenseForm = ({
 
   const tempValues: ExpenseData = {
     uid: authCtx.uid,
-    amount: +inputs.amount.value,
+    amount: +amountValue,
     date: DateTime.fromISO(inputs.date.value).toJSDate(),
     startDate: DateTime.fromISO(startDate).toJSDate(),
     endDate: DateTime.fromISO(endDate).toJSDate(),
@@ -1030,6 +1025,7 @@ const ExpenseForm = ({
                   onChangeText: inputChangedHandler.bind(this, "amount"),
                   value: inputs.amount.value,
                 }}
+                inputAccessoryViewID="amountID"
                 invalid={!inputs.amount.isValid}
                 autoFocus={!isEditing ?? false}
               />
@@ -1278,7 +1274,7 @@ const ExpenseForm = ({
                               const tempSplitType: splitType = "EXACT";
                               const listSplits = calcSplitList(
                                 tempSplitType,
-                                +inputs.amount.value,
+                                +amountValue,
                                 userCtx.userName,
                                 currentTravellers
                               );
@@ -1290,7 +1286,7 @@ const ExpenseForm = ({
                                   validateSplitList(
                                     listSplits,
                                     tempSplitType,
-                                    +inputs.amount.value
+                                    +amountValue
                                   )
                                 );
                               }
@@ -1613,16 +1609,92 @@ const ExpenseForm = ({
                   onPress={askChatGPTHandler}
                   darkText
                 >
-                  {/* {!inputs.amount.value && i18n.t("askChatGptPre")} */}
-                  {!inputs.amount.value &&
-                    "AskGPT: What would be a good Price?"}
-                  {inputs.amount.value && isEditing && i18n.t("askChatGptPost")}
-                  {inputs.amount.value && !isEditing && i18n.t("askChatGptPre")}
+                  {/* {!amountValue && i18n.t("askChatGptPre")} */}
+                  {!amountValue && "AskGPT: What would be a good Price?"}
+                  {amountValue && isEditing && i18n.t("askChatGptPost")}
+                  {amountValue && !isEditing && i18n.t("askChatGptPre")}
                 </GradientButton>
               </View>
             )}
         </Animated.View>
       </Animated.View>
+      <InputAccessoryView nativeID="amountID">
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "space-between",
+            paddingLeft: "44%",
+            paddingRight: "4%",
+            alignContent: "center",
+            alignItems: "center",
+            backgroundColor: GlobalStyles.colors.backgroundColorLight,
+            borderTopWidth: 1,
+            borderColor: GlobalStyles.colors.gray700,
+          }}
+        >
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "center",
+              alignContent: "center",
+              alignItems: "center",
+              // backgroundColor: "white",
+              // borderWidth: 1,
+              // borderColor: "black",
+            }}
+            onPress={() => {
+              console.log("taskbar pressed");
+              if (inputs.amount.value) {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                const _tempAmount = +tempAmount;
+                const newAmount = _tempAmount + Number(inputs.amount.value);
+                console.log("_tempAmount:", _tempAmount);
+                setTempAmount(newAmount.toFixed(2));
+                inputChangedHandler("amount", "");
+              } else if (tempAmount) {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                const _tempAmount = +tempAmount;
+                inputChangedHandler("amount", _tempAmount.toFixed(2));
+                setTempAmount("");
+              }
+            }}
+          >
+            {/* <Text style={{ borderWidth: 1, borderColor: "blue" }}>Test</Text> */}
+            {inputs.amount.value && (
+              <IconButton
+                buttonStyle={[styles.taskBarButtons, GlobalStyles.strongShadow]}
+                icon={"add-outline"}
+                color={GlobalStyles.colors.textColor}
+                size={24}
+                onPress={() => {
+                  console.log("add button pressed!");
+                }}
+              />
+            )}
+            {!inputs.amount.value && tempAmount && (
+              <IconButton
+                buttonStyle={[styles.taskBarButtons, GlobalStyles.strongShadow]}
+                icon={"return-down-back-outline"}
+                color={GlobalStyles.colors.textColor}
+                size={24}
+                onPress={() => {
+                  console.log("sum button pressed");
+                }}
+              />
+            )}
+          </TouchableOpacity>
+          {!inputs.amount.value ||
+            (!tempAmount && (
+              <TouchableOpacity>
+                <Text style={{ color: GlobalStyles.colors.primary700 }}>
+                  {i18n.t("confirm2")}
+                </Text>
+              </TouchableOpacity>
+            ))}
+        </View>
+      </InputAccessoryView>
     </>
   );
 };
@@ -1708,6 +1780,7 @@ const styles = StyleSheet.create({
     marginTop: "10.5%",
     marginLeft: "-18%",
   },
+  taskBarButtons: {},
   iconButton: {
     borderWidth: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,

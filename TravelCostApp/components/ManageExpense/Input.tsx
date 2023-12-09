@@ -16,6 +16,7 @@ const Input = ({
   invalid,
   autoFocus,
   inputStyle,
+  inputAccessoryViewID,
   placeholder = "",
   editable = true,
   selectTextOnFocus = true,
@@ -40,6 +41,7 @@ const Input = ({
         editable={editable}
         selectTextOnFocus={selectTextOnFocus}
         autoCorrect={false}
+        inputAccessoryViewID={inputAccessoryViewID}
         placeholder={placeholder}
         onChangeText={(entryValue) => {
           // replacing , with . for decimal-pad
@@ -61,6 +63,7 @@ Input.propTypes = {
   style: PropTypes.object,
   textInputConfig: PropTypes.object.isRequired,
   invalid: PropTypes.bool,
+  inputAccessoryViewID: PropTypes.string,
   autoFocus: PropTypes.bool,
   inputStyle: PropTypes.any,
   placeholder: PropTypes.string,

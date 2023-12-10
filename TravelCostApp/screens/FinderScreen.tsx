@@ -1,15 +1,14 @@
-import { Platform, StyleSheet, Text, View, ScrollView } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import React, {
   useCallback,
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import DatePickerModal from "../components/UI/DatePickerModal";
 import DatePickerContainer from "../components/UI/DatePickerContainer";
-import { getFormattedDate, toShortFormat } from "../util/date";
+import { getFormattedDate } from "../util/date";
 import { DateTime } from "luxon";
 
 //Localization
@@ -22,11 +21,9 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import * as Haptics from "expo-haptics";
-import { Searchbar } from "react-native-paper";
 import GradientButton from "../components/UI/GradientButton";
 import { ExpensesContext } from "../store/expenses-context";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import BackButton from "../components/UI/BackButton";
 import { Checkbox } from "react-native-paper";
 import {
   asyncStoreGetItem,
@@ -34,14 +31,11 @@ import {
   asyncStoreSetItem,
   asyncStoreSetObject,
 } from "../store/async-storage";
-import { GlobalStyles } from "../constants/styles";
+import { GlobalStyles, ListLayoutAnimation } from "../constants/styles";
 import IconButton from "../components/UI/IconButton";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import { UserContext } from "../store/user-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { BlurView } from "expo-blur";
 import Animated from "react-native-reanimated";
-import BlurPremium from "../components/Premium/BlurPremium";
 import { formatExpenseWithCurrency } from "../util/string";
 import { TripContext } from "../store/trip-context";
 import safeLogError from "../util/error";
@@ -69,14 +63,11 @@ const FinderScreen = () => {
   );
 
   const [checkedQuery, setCheckedQuery] = React.useState(false);
-  // console.log("FinderScreen ~ checkedQuery:", checkedQuery);
   const [checkedDate, setCheckedDate] = React.useState(false);
-  // console.log("FinderScreen ~ checkedDate:", checkedDate);
 
   const [showDatePickerRange, setShowDatePickerRange] = useState(false);
   const [startDate, setStartDate] = useState(getFormattedDate(DateTime.now()));
   const [endDate, setEndDate] = useState(getFormattedDate(DateTime.now()));
-  const dateOtherThanToday = startDate !== getFormattedDate(DateTime.now());
   const openDatePickerRange = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(true);
@@ -105,9 +96,6 @@ const FinderScreen = () => {
   const dateIsRanged =
     startDate?.toString().slice(0, 10) !== endDate?.toString().slice(0, 10);
   const [searchQuery, setSearchQuery] = React.useState("");
-  // const [debouncedSearchQuery] = useDebounce(searchQuery, 500, {
-  //   leading: true,
-  // });
 
   const onChangeSearch = (query) => {
     setSearchQuery(query);
@@ -248,7 +236,6 @@ const FinderScreen = () => {
     };
     loadData();
   }, []);
-  const searchRef = useRef(null);
 
   const last500Daysexpenses = useMemo(
     () =>
@@ -262,25 +249,20 @@ const FinderScreen = () => {
   const suggestionData: string[] = last500Daysexpenses.map(
     (expense) => expense.description
   );
+  const cats = DEFAULTCATEGORIES.map((cat) => {
+    if (cat.cat !== "newCat") return cat.catString;
+  });
+  const travellers = tripCtx.travellers;
 
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-
-  useEffect(() => {
-    const suggestionsWithTravellers = [
-      ...suggestionData,
-      ...tripCtx.travellers,
-      ...DEFAULTCATEGORIES.map((cat) => cat.catString),
-    ];
-    setSuggestions(suggestionsWithTravellers);
-  }, [suggestionData.length, tripCtx.travellers.length]);
+  const suggestions = [...travellers, ...cats, ...suggestionData];
 
   return (
     <>
       {datepickerJSX}
-      <View style={styles.container}>
+      <Animated.View layout={ListLayoutAnimation} style={styles.container}>
         <View style={[styles.cardContainer, GlobalStyles.wideStrongShadow]}>
           <Text style={styles.titleText}>{i18n.t("finderTitle")}</Text>
-          <ScrollView style={{ flex: 1 }}>
+          <Animated.ScrollView layout={ListLayoutAnimation} style={{ flex: 1 }}>
             <View style={styles.rowContainer}>
               <View style={styles.checkBoxContainer}>
                 <Checkbox
@@ -291,20 +273,6 @@ const FinderScreen = () => {
                   }}
                 />
               </View>
-              {/* <Searchbar
-              placeholder={i18n.t("search")}
-              ref={searchRef}
-              onIconPress={() => {
-                //focus searchbar
-                searchRef.current.focus();
-              }}
-              onFocus={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }}
-              onChangeText={onChangeSearch}
-              value={searchQuery}
-              style={{ width: "80%" }}
-            /> */}
               <Autocomplete
                 value={searchQuery}
                 onChange={onChangeSearch}
@@ -373,7 +341,7 @@ const FinderScreen = () => {
               {(queryString || dateString) && i18n.t("finding")} :{queryString}{" "}
               {dateString}
             </Text>
-          </ScrollView>
+          </Animated.ScrollView>
           <Text style={styles.queryText}>
             {foundResults && "Sum of the Results: "}
             {foundResults &&
@@ -393,7 +361,7 @@ const FinderScreen = () => {
               : i18n.t("noResults")}
           </GradientButton>
         </View>
-      </View>
+      </Animated.View>
       {/* <BlurPremium /> */}
     </>
   );
@@ -480,7 +448,5 @@ const styles = StyleSheet.create({
     zIndex: 0,
     marginLeft: 8,
     marginBottom: -1,
-    borderBottomWidth: 1,
-    borderBottomColor: GlobalStyles.colors.primaryGrayed,
   },
 });

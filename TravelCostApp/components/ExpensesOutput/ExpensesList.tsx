@@ -21,7 +21,7 @@ import { View } from "react-native";
 
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { GlobalStyles } from "../../constants/styles";
+import { GlobalStyles, ListLayoutAnimation } from "../../constants/styles";
 import {
   fetchTripName,
   getAllExpenses,
@@ -874,7 +874,7 @@ function ExpensesList({
         }}
         data={expenses}
         ref={flatListRef}
-        layout={layoutAnim}
+        layout={ListLayoutAnimation}
         renderItem={renderExpenseItem.bind(
           this,
           isOnline,

@@ -118,7 +118,6 @@ const ExpenseForm = ({
   const lastCurrency = userCtx.lastCurrency
     ? userCtx.lastCurrency
     : tripCtx.tripCurrency;
-  const lastCountry = userCtx.lastCountry ? userCtx.lastCountry : "";
   const currencyPlaceholder = isEditing
     ? editingValues.currency + " | " + getCurrencySymbol(editingValues.currency)
     : lastCurrency + " | " + getCurrencySymbol(lastCurrency);
@@ -396,19 +395,6 @@ const ExpenseForm = ({
     confirmedRange,
     duplOrSplitString,
   ]);
-
-  function toggleDuplOrSplit() {
-    if (duplOrSplit == 0) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    switch (duplOrSplit) {
-      case DuplicateOption.duplicate: // from dupl to split
-        setDuplOrSplit(2);
-        break;
-      case DuplicateOption.split: // from split to dupl
-        setDuplOrSplit(1);
-        break;
-    }
-  }
 
   // list of all splits owed
   const [splitList, setSplitList] = useState(

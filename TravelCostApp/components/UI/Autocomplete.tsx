@@ -5,15 +5,7 @@ import { Menu, TextInput } from "react-native-paper";
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
-import Animated, {
-  FadeIn,
-  FadeOut,
-  SlideInUp,
-  SlideOutDown,
-  SlideOutUp,
-  ZoomInUp,
-  ZoomOutUp,
-} from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 const Autocomplete = ({
   value: origValue,
@@ -33,6 +25,10 @@ const Autocomplete = ({
 
   useEffect(() => {
     setValue(origValue);
+  }, [origValue]);
+
+  useEffect(() => {
+    if (origValue == "") setMenuVisible(false);
   }, [origValue]);
   /**
    * Filters the data array based on the provided text.
@@ -75,19 +71,20 @@ const Autocomplete = ({
           if (text && text?.length > 0) {
             setFilteredData(filterData(text));
           } else if (text && text?.length === 0) {
-            setFilteredData(data);
+            setFilteredData([]);
           }
           setMenuVisible(true);
           setValue(text);
         }}
         value={value}
       />
-      {menuVisible && filteredData && (
+      {menuVisible && filteredData && filteredData.length > 0 && (
         <Animated.View
-          entering={FadeIn}
-          exiting={FadeOut}
+          entering={FadeIn.duration(500)}
+          // exiting={FadeOutUp}
           style={{
             flex: 1,
+            zIndex: 0,
             backgroundColor: GlobalStyles.colors.backgroundColor,
             borderWidth: 2,
             flexDirection: "column",

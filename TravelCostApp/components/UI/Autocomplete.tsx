@@ -12,6 +12,7 @@ const Autocomplete = ({
   label,
   data,
   containerStyle,
+  showOnEmpty,
   onChange: origOnChange,
   placeholder,
   style = {},
@@ -47,8 +48,17 @@ const Autocomplete = ({
     <View style={[containerStyle]}>
       <TextInput
         onFocus={() => {
+          console.log(
+            "focus",
+            "value:",
+            value,
+            "showOnEmpty:",
+            showOnEmpty,
+            data
+          );
           if (value?.length === 0) {
             setMenuVisible(true);
+            if (showOnEmpty) setFilteredData([...new Set(data)]);
           }
         }}
         // maybe with a timeout
@@ -121,6 +131,7 @@ Autocomplete.propTypes = {
   data: PropTypes.array.isRequired,
   containerStyle: PropTypes.object,
   onChange: PropTypes.func.isRequired,
+  showOnEmpty: PropTypes.bool,
   placeholder: PropTypes.string,
   icon: PropTypes.string,
   style: PropTypes.object,

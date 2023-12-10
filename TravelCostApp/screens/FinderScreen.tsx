@@ -254,7 +254,13 @@ const FinderScreen = () => {
   });
   const travellers = tripCtx.travellers;
 
-  const suggestions = [...travellers, ...cats, ...suggestionData];
+  const suggestions = searchQuery
+    ? [...travellers, ...cats, ...suggestionData]
+    : [
+        ...travellers.slice(0, 1),
+        ...cats.slice(0, 1),
+        ...suggestionData.slice(0, 1),
+      ];
 
   return (
     <>
@@ -277,6 +283,7 @@ const FinderScreen = () => {
                 value={searchQuery}
                 onChange={onChangeSearch}
                 data={suggestions}
+                showOnEmpty
                 // placeholder="Search for descriptions, categories, traveller names..."
                 label="Search"
                 containerStyle={[

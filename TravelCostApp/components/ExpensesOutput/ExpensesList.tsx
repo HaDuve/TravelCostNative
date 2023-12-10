@@ -112,6 +112,9 @@ function ExpensesList({
   tripID = tripid;
   travellerName = showSumForTravellerName;
   if (isFiltered) filtered = true;
+  const multipleTripsInHistory =
+    userCtx.tripHistory && userCtx.tripHistory.length > 1;
+
   const [selectable, setSelectable] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   // autoscroll to the first item after the header
@@ -635,10 +638,11 @@ function ExpensesList({
     const buttonTripList = allTrips.map((trip) => {
       if (trip.tripid === tripID)
         return {
-          text: i18n.t("no"),
+          text: i18n.t("cancel"),
           onPress: () => {
             return;
           },
+          style: "cancel",
         };
       return {
         text: trip.tripname,
@@ -795,7 +799,7 @@ function ExpensesList({
               ></IconButton>
             </Animated.View>
           )}
-          {selectable && (
+          {selectable && multipleTripsInHistory && (
             <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
               <IconButton
                 icon={"md-arrow-undo-outline"}

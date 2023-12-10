@@ -11,6 +11,7 @@ const GradientButton = ({
   onPress,
   buttonStyle,
   darkText = false,
+  textStyle = {},
   style = {},
   colors = GlobalStyles.gradientPrimaryButton,
 }) => {
@@ -34,6 +35,7 @@ const GradientButton = ({
             style={[
               GlobalStyles.buttonTextGradient,
               darkText && { color: GlobalStyles.colors.textColor },
+              textStyle,
             ]}
           >
             {children}
@@ -49,6 +51,7 @@ GradientButton.propTypes = {
   children: PropTypes.node.isRequired,
   onPress: PropTypes.func.isRequired,
   buttonStyle: PropTypes.object,
+  textStyle: PropTypes.object,
   darkText: PropTypes.bool,
   style: PropTypes.object,
   colors: PropTypes.array,

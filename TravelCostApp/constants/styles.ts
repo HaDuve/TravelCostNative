@@ -1,5 +1,5 @@
 import { Platform } from "react-native";
-import { CurvedTransition } from "react-native-reanimated";
+import { CurvedTransition, Layout } from "react-native-reanimated";
 
 export const GlobalStyles = {
   colors: {
@@ -160,4 +160,4 @@ export const CatColors = [
   GlobalStyles.colors.cat4,
 ];
 
-export const ListLayoutAnimation = CurvedTransition.duration(1500);
+export const ListLayoutAnimation = Layout;

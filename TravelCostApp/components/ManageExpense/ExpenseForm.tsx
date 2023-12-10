@@ -69,6 +69,8 @@ import Animated, {
   Easing,
   FadeInUp,
   FadeOutUp,
+  FadeIn,
+  FadeOut,
 } from "react-native-reanimated";
 import { DateTime } from "luxon";
 import DatePickerModal from "../UI/DatePickerModal";
@@ -423,6 +425,7 @@ const ExpenseForm = ({
   const [whoPaid, setWhoPaid] = useState(
     editingValues ? editingValues.whoPaid : null
   );
+  const isAndroid = Platform.OS == "android";
 
   // dropdown for split/owe picker
   const splitTypesItems = splitTypesDropdown();
@@ -829,9 +832,34 @@ const ExpenseForm = ({
     hideAdvanced ? await fastSubmit() : await submitHandler();
     Toast.hide();
   };
+  const askChatGPTHandler = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    navigation.navigate("GPTDeal", {
+      price: amountValue,
+      currency: inputs.currency.value,
+      country: inputs.country.value,
+      product: inputs.description.value,
+    });
+  };
 
   const backButtonJsx = <BackButton />;
-
+  const chatGPTemojiButton = !hideAdvanced &&
+    inputs.description.value &&
+    inputs.currency.value &&
+    inputs.country.value && (
+      <Animated.View entering={FadeIn} exiting={FadeOut}>
+        <GradientButton
+          style={{ marginTop: 16 }}
+          textStyle={{ fontSize: 24 }}
+          buttonStyle={{ padding: 4, paddingHorizontal: 8 }}
+          colors={GlobalStyles.gradientColorsButton}
+          onPress={askChatGPTHandler}
+          darkText
+        >
+          🤖
+        </GradientButton>
+      </Animated.View>
+    );
   const confirmButtonJSX = (
     <TouchableOpacity
       style={GlobalStyles.backButton}
@@ -904,16 +932,6 @@ const ExpenseForm = ({
       ></SettingsSwitch>
     </View>
   );
-
-  const askChatGPTHandler = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    navigation.navigate("GPTDeal", {
-      price: amountValue,
-      currency: inputs.currency.value,
-      country: inputs.country.value,
-      product: inputs.description.value,
-    });
-  };
 
   function updateCurrency() {
     // split the countryValue into country and currency
@@ -997,6 +1015,8 @@ const ExpenseForm = ({
             }}
           >
             {backButtonJsx}
+            {/* put gpt button here */}
+            {chatGPTemojiButton}
             {Platform.OS == "ios" && confirmButtonJSX}
           </View>
           <Animated.View layout={Layout} style={styles.form}>
@@ -1015,7 +1035,7 @@ const ExpenseForm = ({
                 invalid={!inputs.amount.isValid}
                 autoFocus={!isEditing ?? false}
               />
-              {inputs.amount.value && (
+              {inputs.amount.value && isAndroid && (
                 <IconButton
                   buttonStyle={[
                     styles.quickAddButton,
@@ -1034,7 +1054,7 @@ const ExpenseForm = ({
                   }}
                 />
               )}
-              {!inputs.amount.value && tempAmount && (
+              {!inputs.amount.value && tempAmount && isAndroid && (
                 <IconButton
                   buttonStyle={[
                     styles.quickAddButton,
@@ -1584,24 +1604,11 @@ const ExpenseForm = ({
             </GradientButton>
           </View>
           {/* Commented out ChatGPT Button */}
-          {!hideAdvanced &&
-            inputs.description.value &&
-            inputs.currency.value &&
-            inputs.country.value && (
-              <View style={[styles.buttonContainer, { marginBottom: "5%" }]}>
-                <GradientButton
-                  style={[styles.button, { marginTop: 28, minWidth: "80%" }]}
-                  colors={GlobalStyles.gradientColorsButton}
-                  onPress={askChatGPTHandler}
-                  darkText
-                >
-                  {/* {!amountValue && i18n.t("askChatGptPre")} */}
-                  {!amountValue && "AskGPT: What would be a good Price?"}
+
+          {/* {!amountValue && i18n.t("askChatGptPre")} */}
+          {/* {!amountValue && "AskGPT: What would be a good Price?"}
                   {amountValue && isEditing && i18n.t("askChatGptPost")}
-                  {amountValue && !isEditing && i18n.t("askChatGptPre")}
-                </GradientButton>
-              </View>
-            )}
+                  {amountValue && !isEditing && i18n.t("askChatGptPre")} */}
         </Animated.View>
       </Animated.View>
       <InputAccessoryView nativeID="amountID">

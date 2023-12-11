@@ -262,7 +262,6 @@ const FinderScreen = () => {
   const suggestionData: string[] = last500Daysexpenses.map(
     (expense) => expense.description
   );
-  console.log("FinderScreen ~ suggestionData:", suggestionData.length);
   const cats = DEFAULTCATEGORIES.map((cat) => {
     if (cat.cat !== "newCat") return cat.catString;
   });

@@ -159,18 +159,25 @@ const FinderScreen = () => {
         }
         const searchQuerySplit = searchQuery?.toLowerCase().trim().split(" ");
 
+        // we want to return a combined boolean value for all the filters
+        // return isSearchFilter(searchQuerySplit[0]);
         let isFiltered = isSearchFilter(searchQuerySplit[0]);
         if (searchQuerySplit && searchQuerySplit.length > 1) {
-          console.log("split search Query length:", searchQuerySplit.length);
-          for (const split in searchQuerySplit) {
-            console.log("expenses.filter ~ split:", split);
-            console.log("searchQuerySplit[split]", searchQuerySplit[split]);
-            isFiltered = isFiltered && isSearchFilter(searchQuerySplit[split]);
+          for (const query of searchQuerySplit) {
+            if (!query || query.length < 1) continue;
+            isFiltered = isFiltered && isSearchFilter(query);
           }
         }
         return isFiltered;
       }),
-    [expenses, checkedDate, startDate, endDate, searchQuery, checkedQuery]
+    [
+      expenses.length,
+      checkedDate,
+      startDate,
+      endDate,
+      searchQuery,
+      checkedQuery,
+    ]
   );
 
   const queryString = checkedQuery ? searchQuery : "";
@@ -255,6 +262,7 @@ const FinderScreen = () => {
   const suggestionData: string[] = last500Daysexpenses.map(
     (expense) => expense.description
   );
+  console.log("FinderScreen ~ suggestionData:", suggestionData.length);
   const cats = DEFAULTCATEGORIES.map((cat) => {
     if (cat.cat !== "newCat") return cat.catString;
   });

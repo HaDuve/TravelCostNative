@@ -919,7 +919,7 @@ const ExpenseForm = ({
   const hideSpecialTooltip = hideSpecial
     ? i18n.t("specString1")
     : "\n" + i18n.t("specString2");
-  const isSpecialExpenseJSX = (
+  const isSpecialExpenseJSX = hideSpecial && (
     <View style={styles.isSpecialContainer}>
       <SettingsSwitch
         toggleState={() => setIsSpecialExpense(!isSpecialExpense)}

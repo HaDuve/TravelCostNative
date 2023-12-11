@@ -194,6 +194,7 @@ const ExpensesSummary = ({
       style={({ pressed }) => [
         styles.container,
         style,
+        useMoreSpace && styles.useMoreSpaceContainer,
         GlobalStyles.shadow,
         pressed && GlobalStyles.pressedWithShadow,
       ]}
@@ -210,7 +211,7 @@ const ExpensesSummary = ({
         borderRadius={8}
         progress={budgetProgress}
         height={12}
-        width={useMoreSpace ? 300 : 150}
+        width={useMoreSpace ? 180 : 150}
       />
     </Pressable>
   );
@@ -242,12 +243,18 @@ const styles = StyleSheet.create({
       },
     }),
   },
+  useMoreSpaceContainer: {
+    paddingTop: "3%",
+    paddingBottom: "1%",
+    marginLeft: "-5%",
+  },
   sumTextContainer: {
     alignItems: "center",
   },
   sum: {
     fontSize: 32,
     fontWeight: "bold",
+    // padding: 4,
     color: GlobalStyles.colors.primary500,
     ...Platform.select({
       android: {

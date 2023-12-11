@@ -109,52 +109,66 @@ const FinderScreen = () => {
   const filteredExpenses = useMemo(
     () =>
       expenses.filter((expense: ExpenseData) => {
-        const expenseDate = expense.startDate;
-        const expenseDateIsSameDay =
-          !checkedDate ||
-          expenseDate?.toString().slice(0, 10) ===
-            startDate?.toString().slice(0, 10) ||
-          DateTime.fromJSDate(expense.date).toString()?.slice(0, 10) ===
-            startDate?.toString().slice(0, 10);
-        const expenseDateIsInRange =
-          expenseDateIsSameDay ||
-          (expenseDate >= startDate && expenseDate <= endDate) ||
-          (DateTime.fromJSDate(expense.date).toString() >= startDate &&
-            DateTime.fromJSDate(expense.date).toString() <= endDate);
-        const expenseDescriptionIsInSearchQuery = expense.description
-          ?.toLowerCase()
-          .includes(searchQuery?.toLowerCase());
-        const expenseCategoryIsInSearchQuery = expense.category
-          ?.toLowerCase()
-          .includes(searchQuery?.toLowerCase());
-        const expenseCategoryIsInSearchQuery2 = expense.categoryString
-          ?.toLowerCase()
-          .includes(searchQuery?.toLowerCase());
-        const expenseCurrencyIsInSearchQuery = expense.currency
-          ?.toLowerCase()
-          .includes(searchQuery?.toLowerCase());
-        const expenseCountryIsInSearchQuery = expense.country
-          ?.toLowerCase()
-          .includes(searchQuery?.toLowerCase());
-        const expenseTravellerIsInSearchQuery =
-          // return true if searchQuery?.toLowerCase() is in expense.splitList
-          expense.splitList?.some((split) => {
-            const travellerName = split.userName;
-            return travellerName
-              ?.toLowerCase()
-              .includes(searchQuery?.toLowerCase());
-          });
+        function isSearchFilter(_searchQuery: string) {
+          const expenseDate = expense.startDate;
+          const expenseDateIsSameDay =
+            !checkedDate ||
+            expenseDate?.toString().slice(0, 10) ===
+              startDate?.toString().slice(0, 10) ||
+            DateTime.fromJSDate(expense.date).toString()?.slice(0, 10) ===
+              startDate?.toString().slice(0, 10);
+          const expenseDateIsInRange =
+            expenseDateIsSameDay ||
+            (expenseDate >= startDate && expenseDate <= endDate) ||
+            (DateTime.fromJSDate(expense.date).toString() >= startDate &&
+              DateTime.fromJSDate(expense.date).toString() <= endDate);
+          const expenseDescriptionIsInSearchQuery = expense.description
+            ?.toLowerCase()
+            .includes(_searchQuery?.toLowerCase());
+          const expenseCategoryIsInSearchQuery = expense.category
+            ?.toLowerCase()
+            .includes(_searchQuery?.toLowerCase());
+          const expenseCategoryIsInSearchQuery2 = expense.categoryString
+            ?.toLowerCase()
+            .includes(_searchQuery?.toLowerCase());
+          const expenseCurrencyIsInSearchQuery = expense.currency
+            ?.toLowerCase()
+            .includes(_searchQuery?.toLowerCase());
+          const expenseCountryIsInSearchQuery = expense.country
+            ?.toLowerCase()
+            .includes(_searchQuery?.toLowerCase());
+          const expenseTravellerIsInSearchQuery =
+            // return true if _searchQuery?.toLowerCase() is in expense.splitList
+            expense.splitList?.some((split) => {
+              const travellerName = split.userName;
+              return travellerName
+                ?.toLowerCase()
+                .includes(_searchQuery?.toLowerCase());
+            });
 
-        return (
-          expenseDateIsInRange &&
-          (!checkedQuery ||
-            expenseDescriptionIsInSearchQuery ||
-            expenseCategoryIsInSearchQuery ||
-            expenseCategoryIsInSearchQuery2 ||
-            expenseCurrencyIsInSearchQuery ||
-            expenseCountryIsInSearchQuery ||
-            expenseTravellerIsInSearchQuery)
-        );
+          return (
+            expenseDateIsInRange &&
+            (!checkedQuery ||
+              expenseDescriptionIsInSearchQuery ||
+              expenseCategoryIsInSearchQuery ||
+              expenseCategoryIsInSearchQuery2 ||
+              expenseCurrencyIsInSearchQuery ||
+              expenseCountryIsInSearchQuery ||
+              expenseTravellerIsInSearchQuery)
+          );
+        }
+        const searchQuerySplit = searchQuery?.toLowerCase().trim().split(" ");
+
+        let isFiltered = isSearchFilter(searchQuerySplit[0]);
+        if (searchQuerySplit && searchQuerySplit.length > 1) {
+          console.log("split search Query length:", searchQuerySplit.length);
+          for (const split in searchQuerySplit) {
+            console.log("expenses.filter ~ split:", split);
+            console.log("searchQuerySplit[split]", searchQuerySplit[split]);
+            isFiltered = isFiltered && isSearchFilter(searchQuerySplit[split]);
+          }
+        }
+        return isFiltered;
       }),
     [expenses, checkedDate, startDate, endDate, searchQuery, checkedQuery]
   );
@@ -194,14 +208,6 @@ const FinderScreen = () => {
   // save all state variables into async storage
   useEffect(() => {
     const saveData = async () => {
-      console.log(
-        "saveData ~ saveData:",
-        checkedQuery,
-        checkedDate,
-        startDate,
-        endDate,
-        searchQuery
-      );
       try {
         await asyncStoreSetObject("FINDER_checkedQuery", checkedQuery);
         await asyncStoreSetObject("FINDER_checkedDate", checkedDate);

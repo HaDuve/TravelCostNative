@@ -11,12 +11,14 @@ import { Dimensions, Platform, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import DatePicker from "react-native-neat-date-picker";
 import { GlobalStyles } from "../../constants/styles";
+import { getLocaleDateFormat } from "../../util/date";
 
 const DatePickerModal = ({
   showDatePickerRange,
   onCancelRange,
   onConfirmRange,
 }) => {
+  const dateStringFormatLocale: DateStringOptions = getLocaleDateFormat();
   const android = Platform.OS === "android";
   const datepickerJSX = android ? (
     <View
@@ -25,6 +27,7 @@ const DatePickerModal = ({
       }
     >
       <DatePicker
+        dateStringFormat={dateStringFormatLocale}
         isVisible={showDatePickerRange}
         mode={"range"}
         colorOptions={{
@@ -53,6 +56,7 @@ const DatePickerModal = ({
     </View>
   ) : (
     <DatePicker
+      dateStringFormat={dateStringFormatLocale}
       isVisible={showDatePickerRange}
       mode={"range"}
       colorOptions={{

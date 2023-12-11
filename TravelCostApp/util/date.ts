@@ -169,3 +169,20 @@ export function getPreviousMondayDate(date: DateOrDateTime) {
   prevMonday = new Date(prevMonday.setHours(0, 0, 0)); // sets hours, mins, secs to 0
   return prevMonday;
 }
+
+export const getLocaleDateFormat = (separator = "-") => {
+  // A fake date and with each part different to be able to identify later
+  const fakeDate = new Date();
+  fakeDate.setDate(22);
+  fakeDate.setMonth(10); // index
+  fakeDate.setFullYear(1999);
+
+  const format = new Intl.DateTimeFormat(navigator.language)
+    .format(fakeDate)
+    .replace(fakeDate.getDate().toString(), "DD")
+    // also consider the month as an index
+    .replace((fakeDate.getMonth() + 1).toString(), "MM")
+    .replace(fakeDate.getFullYear().toString(), "YYYY");
+
+  return format.replace(/\W/g, separator);
+};

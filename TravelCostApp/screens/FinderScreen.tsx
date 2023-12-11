@@ -281,7 +281,10 @@ const FinderScreen = () => {
       <Animated.View layout={ListLayoutAnimation} style={styles.container}>
         <View style={[styles.cardContainer, GlobalStyles.wideStrongShadow]}>
           <Text style={styles.titleText}>{i18n.t("finderTitle")}</Text>
-          <Animated.ScrollView layout={ListLayoutAnimation} style={{ flex: 1 }}>
+          <Animated.ScrollView
+            layout={ListLayoutAnimation}
+            style={{ flex: 1, minHeight: "50%" }}
+          >
             <View style={styles.rowContainer}>
               <View style={styles.checkBoxContainer}>
                 <Checkbox

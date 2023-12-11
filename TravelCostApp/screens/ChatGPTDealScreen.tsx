@@ -1,4 +1,11 @@
-import { StyleSheet, Text, View, ScrollView, Alert } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Alert,
+  Platform,
+} from "react-native";
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import FlatButton from "../components/UI/FlatButton";
@@ -135,7 +142,10 @@ const GPTDealScreen = ({ route, navigation }) => {
           </FlatButton>
           {!isFetching && (
             <GradientButton
-              style={{ paddingHorizontal: 20 }}
+              style={[
+                Platform.OS == "ios" && { paddingHorizontal: 20 },
+                { elevation: 0 },
+              ]}
               onPress={handleRegenerate}
             >
               Regenerate
@@ -214,7 +224,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     backgroundColor: GlobalStyles.colors.backgroundColor,
     alignItems: "center",
   },

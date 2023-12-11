@@ -1,6 +1,6 @@
 // Autocomplete/index.js
 
-import { View } from "react-native";
+import { View, Platform } from "react-native";
 import { Menu, TextInput } from "react-native-paper";
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
@@ -62,7 +62,12 @@ const Autocomplete = ({
           }
         }}
         // maybe with a timeout
-        onBlur={async () => setTimeout(() => setMenuVisible(false), 700)}
+        onBlur={async () =>
+          setTimeout(
+            () => setMenuVisible(false),
+            Platform.OS == "ios" ? 700 : 1200
+          )
+        }
         label={label}
         // right={right}
         // left={left}

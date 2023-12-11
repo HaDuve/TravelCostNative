@@ -16,7 +16,6 @@ import {
   FlatList,
   Dimensions,
   KeyboardAvoidingView,
-  Platform,
   InputAccessoryView,
 } from "react-native";
 import { daysBetween } from "../../util/date";
@@ -93,7 +92,7 @@ import SettingsSwitch from "../UI/SettingsSwitch";
 import CountryPicker from "../Currency/CountryPicker";
 import { getMMKVObject } from "../../store/mmkv";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
-import { Keyboard } from "react-native";
+import { Keyboard, Platform } from "react-native";
 
 const ExpenseForm = ({
   onCancel,
@@ -1001,18 +1000,25 @@ const ExpenseForm = ({
       <Animated.View layout={Layout}>
         <Animated.View layout={Layout} style={styles.container}>
           <View
-            style={{
-              // horizontal
-              flexDirection: "row",
-              // space between
-              justifyContent: "space-between",
-              // align items in the center
-              alignItems: "center",
-              // padding
-              paddingHorizontal: "2%",
-              // margin
-              marginBottom: "-2%",
-            }}
+            style={[
+              {
+                // horizontal
+                flexDirection: "row",
+                // space between
+                justifyContent: "space-between",
+                // align items in the center
+                alignItems: "center",
+                // padding
+                paddingHorizontal: "2%",
+                // margin
+                marginBottom: "-2%",
+              },
+              Platform.OS == "android" && {
+                alignContent: "center",
+                justifyContent: "center",
+                alignItems: "center",
+              },
+            ]}
           >
             {backButtonJsx}
             {/* put gpt button here */}
@@ -1611,83 +1617,91 @@ const ExpenseForm = ({
                   {amountValue && !isEditing && i18n.t("askChatGptPre")} */}
         </Animated.View>
       </Animated.View>
-      <InputAccessoryView nativeID="amountID">
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingLeft: "44%",
-            paddingRight: "4%",
-            alignContent: "center",
-            alignItems: "center",
-            backgroundColor: GlobalStyles.colors.backgroundColorLight,
-            borderTopWidth: 1,
-            borderColor: GlobalStyles.colors.gray700,
-          }}
-        >
-          <TouchableOpacity
+      {Platform.OS == "ios" && (
+        <InputAccessoryView nativeID="amountID">
+          <View
             style={{
               flex: 1,
               flexDirection: "row",
-              justifyContent: "center",
+              justifyContent: "space-between",
+              paddingLeft: "44%",
+              paddingRight: "4%",
               alignContent: "center",
               alignItems: "center",
-              // backgroundColor: "white",
-              // borderWidth: 1,
-              // borderColor: "black",
-            }}
-            onPress={() => {
-              console.log("taskbar pressed");
-              if (inputs.amount.value) {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                const _tempAmount = +tempAmount;
-                const newAmount = _tempAmount + Number(inputs.amount.value);
-                console.log("_tempAmount:", _tempAmount);
-                setTempAmount(newAmount.toFixed(2));
-                inputChangedHandler("amount", "");
-              } else if (tempAmount) {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                const _tempAmount = +tempAmount;
-                inputChangedHandler("amount", _tempAmount.toFixed(2));
-                setTempAmount("");
-              }
+              backgroundColor: GlobalStyles.colors.backgroundColorLight,
+              borderTopWidth: 1,
+              borderColor: GlobalStyles.colors.gray700,
             }}
           >
-            {/* <Text style={{ borderWidth: 1, borderColor: "blue" }}>Test</Text> */}
-            {inputs.amount.value && (
-              <IconButton
-                buttonStyle={[styles.taskBarButtons, GlobalStyles.strongShadow]}
-                icon={"add-outline"}
-                color={GlobalStyles.colors.textColor}
-                size={24}
-                onPress={() => {
-                  console.log("add button pressed!");
-                }}
-              />
-            )}
-            {!inputs.amount.value && tempAmount && (
-              <IconButton
-                buttonStyle={[styles.taskBarButtons, GlobalStyles.strongShadow]}
-                icon={"return-down-back-outline"}
-                color={GlobalStyles.colors.textColor}
-                size={24}
-                onPress={() => {
-                  console.log("sum button pressed");
-                }}
-              />
-            )}
-          </TouchableOpacity>
-          {!inputs.amount.value ||
-            (!tempAmount && (
-              <TouchableOpacity>
-                <Text style={{ color: GlobalStyles.colors.primary700 }}>
-                  {i18n.t("confirm2")}
-                </Text>
-              </TouchableOpacity>
-            ))}
-        </View>
-      </InputAccessoryView>
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                justifyContent: "center",
+                alignContent: "center",
+                alignItems: "center",
+                // backgroundColor: "white",
+                // borderWidth: 1,
+                // borderColor: "black",
+              }}
+              onPress={() => {
+                console.log("taskbar pressed");
+                if (inputs.amount.value) {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  const _tempAmount = +tempAmount;
+                  const newAmount = _tempAmount + Number(inputs.amount.value);
+                  console.log("_tempAmount:", _tempAmount);
+                  setTempAmount(newAmount.toFixed(2));
+                  inputChangedHandler("amount", "");
+                } else if (tempAmount) {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  const _tempAmount = +tempAmount;
+                  inputChangedHandler("amount", _tempAmount.toFixed(2));
+                  setTempAmount("");
+                }
+              }}
+            >
+              {/* <Text style={{ borderWidth: 1, borderColor: "blue" }}>Test</Text> */}
+              {inputs.amount.value && (
+                <IconButton
+                  buttonStyle={[
+                    styles.taskBarButtons,
+                    GlobalStyles.strongShadow,
+                  ]}
+                  icon={"add-outline"}
+                  color={GlobalStyles.colors.textColor}
+                  size={24}
+                  onPress={() => {
+                    console.log("add button pressed!");
+                  }}
+                />
+              )}
+              {!inputs.amount.value && tempAmount && (
+                <IconButton
+                  buttonStyle={[
+                    styles.taskBarButtons,
+                    GlobalStyles.strongShadow,
+                  ]}
+                  icon={"return-down-back-outline"}
+                  color={GlobalStyles.colors.textColor}
+                  size={24}
+                  onPress={() => {
+                    console.log("sum button pressed");
+                  }}
+                />
+              )}
+            </TouchableOpacity>
+            {!inputs.amount.value ||
+              (!tempAmount && (
+                <TouchableOpacity>
+                  <Text style={{ color: GlobalStyles.colors.primary700 }}>
+                    {i18n.t("confirm2")}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+          </View>
+        </InputAccessoryView>
+      )}
     </>
   );
 };

@@ -436,6 +436,7 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 44,
     alignItems: "center",
+    justifyContent: "center",
   },
   buttonContainer: {
     // marginVertical: "10%",

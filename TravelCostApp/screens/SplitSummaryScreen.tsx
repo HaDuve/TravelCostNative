@@ -18,6 +18,7 @@ i18n.enableFallback = true;
 
 import {
   Alert,
+  Dimensions,
   FlatList,
   Platform,
   StyleSheet,
@@ -456,6 +457,9 @@ const styles = StyleSheet.create({
         alignItems: "center",
       },
     }),
+    position: "absolute",
+    // render on the bottom of the screen
+    top: Dimensions.get("window").height - 235,
   },
   splitText: {
     maxWidth: "100%",

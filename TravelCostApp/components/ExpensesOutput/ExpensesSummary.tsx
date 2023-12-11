@@ -246,7 +246,8 @@ const styles = StyleSheet.create({
   useMoreSpaceContainer: {
     paddingTop: "3%",
     paddingBottom: "1%",
-    marginLeft: "-5%",
+    marginLeft: "-2%",
+    paddingLeft: 0,
   },
   sumTextContainer: {
     alignItems: "center",

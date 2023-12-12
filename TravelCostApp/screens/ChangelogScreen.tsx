@@ -82,20 +82,21 @@ const ChangelogScreen = () => {
           { alignItems: "center", justifyContent: "space-between" },
         ]}
       >
-        <View style={GlobalStyles.row}>
-          <Text style={styles.changelogText}>
-            My current version: {currentVersion}
-          </Text>
-          <TouchableOpacity
-            style={{
-              paddingHorizontal: 14,
-            }}
-            onPress={() => setShowInfo(!showInfo)}
-          >
-            <InfoButton onPress={() => setShowInfo(!showInfo)}></InfoButton>
-          </TouchableOpacity>
-        </View>
-
+        {currentVersion && (
+          <View style={GlobalStyles.row}>
+            <Text style={styles.changelogText}>
+              My current version: {currentVersion}
+            </Text>
+            <TouchableOpacity
+              style={{
+                paddingHorizontal: 14,
+              }}
+              onPress={() => setShowInfo(!showInfo)}
+            >
+              <InfoButton onPress={() => setShowInfo(!showInfo)}></InfoButton>
+            </TouchableOpacity>
+          </View>
+        )}
         {showInfo && (
           <Text style={{ marginTop: 12 }}>
             The number after the last dot indicate minipatches that are applied

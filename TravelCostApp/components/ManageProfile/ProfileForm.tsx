@@ -27,6 +27,7 @@ import { asyncStoreSafeClear } from "../../store/async-storage";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { Badge } from "react-native-paper";
 import { getMMKVString } from "../../store/mmkv";
+import { NetworkContext } from "../../store/network-context";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -37,6 +38,8 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const expCtx = useContext(ExpensesContext);
+  const netCtx = useContext(NetworkContext);
+  const isConnected = netCtx.strongConnection;
   const freshlyCreated = userCtx.freshlyCreated;
 
   function logoutHandler() {
@@ -67,13 +70,15 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
   const [hasNewChanges, setHasNewChanges] = useState(false);
   useEffect(() => {
     async function checkNewChanges() {
-      const oldChangelog = getMMKVString("changelog.txt");
+      if (!isConnected) return;
       const newChangelog = await fetchChangelog();
-      if (!oldChangelog || !newChangelog) return;
-      if (oldChangelog == newChangelog) return;
+      if (!newChangelog) return;
       setHasNewChanges(true);
+      const oldChangelog = getMMKVString("changelog.txt");
+      if (oldChangelog == newChangelog) setHasNewChanges(false);
     }
-  }, []);
+    checkNewChanges();
+  }, [isConnected]);
   const iconButtonJSX = (
     <View style={[styles.inputsRow, { marginTop: -12 }]}>
       {/* TODO: add a "new changes" button that parses the changelog, if it has new changes, will show a "!"-badge */}

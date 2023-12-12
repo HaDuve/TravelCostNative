@@ -25,6 +25,7 @@ import PropTypes from "prop-types";
 import { ExpensesContext } from "../../store/expenses-context";
 import { asyncStoreSafeClear } from "../../store/async-storage";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
+import { Badge } from "react-native-paper";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -60,8 +61,31 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
       },
     ]);
   }
+
+  // new changes button
+  const [hasNewChanges, setHasNewChanges] = useState(false);
+  useEffect(() => {
+    if (userCtx.userName) {
+      setHasNewChanges(true);
+    }
+  }, [userCtx.userName]);
   const iconButtonJSX = (
     <View style={[styles.inputsRow, { marginTop: -12 }]}>
+      {/* TODO: add a "new changes" button that parses the changelog, if it has new changes, will show a "!"-badge */}
+      <IconButton
+        icon={"newspaper-outline"}
+        size={36}
+        color={GlobalStyles.colors.textColor}
+        // style={styles.button}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          navigation.navigate("Changelog");
+        }}
+        badge={true}
+        // badgeText={"!"}
+        badgeStyle={{ backgroundColor: GlobalStyles.colors.error500 }}
+      />
+
       <IconButton
         icon={"settings-outline"}
         size={36}

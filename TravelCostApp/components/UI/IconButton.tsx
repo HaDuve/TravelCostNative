@@ -2,11 +2,15 @@ import React, { Pressable, StyleSheet, Text, View, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
+import { Badge } from "react-native-paper";
 
 const IconButton = ({
   icon,
   size,
   color,
+  badge,
+  badgeText,
+  badgeStyle,
   onPress,
   onPressIn,
   onPressOut,
@@ -15,6 +19,15 @@ const IconButton = ({
   onPressStyle = {},
 }) => {
   const content = <Ionicons name={icon} size={size} color={color} />;
+  const badgeJSX = badge ? (
+    <View style={{ marginBottom: (-1 * size) / 4 }}>
+      <Badge style={badgeStyle} size={size / 4}>
+        {badgeText}
+      </Badge>
+    </View>
+  ) : (
+    <></>
+  );
 
   return (
     <Pressable
@@ -29,6 +42,7 @@ const IconButton = ({
         pressed && onPressStyle,
       ]}
     >
+      {badgeJSX}
       {content}
     </Pressable>
   );
@@ -40,6 +54,9 @@ IconButton.propTypes = {
   icon: PropTypes.string.isRequired,
   size: PropTypes.number.isRequired,
   color: PropTypes.string.isRequired,
+  badge: PropTypes.bool,
+  badgeText: PropTypes.string,
+  badgeStyle: PropTypes.object,
   onPress: PropTypes.func,
   onPressIn: PropTypes.func,
   onPressOut: PropTypes.func,

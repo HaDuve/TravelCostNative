@@ -102,6 +102,7 @@ import { MemoizedRecentExpenses } from "./screens/RecentExpenses";
 import TripSummaryScreen from "./screens/TripSummaryScreen";
 import { versionCheck } from "./util/version";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import ChangelogScreen from "./screens/ChangelogScreen";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -298,6 +299,14 @@ function AuthenticatedStack() {
           <Stack.Screen
             name="Settings"
             component={SettingsScreen}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
+          <Stack.Screen
+            name="Changelog"
+            component={ChangelogScreen}
             options={{
               headerShown: false,
               presentation: "modal",

@@ -1,5 +1,5 @@
 import { Platform } from "react-native";
-import { CurvedTransition, Layout } from "react-native-reanimated";
+import { Layout } from "react-native-reanimated";
 
 export const GlobalStyles = {
   colors: {
@@ -60,6 +60,14 @@ export const GlobalStyles = {
     flex: 1,
     padding: 8,
     marginBottom: -12,
+  },
+  row: { flexDirection: "row" },
+  titleText: {
+    textAlign: "center",
+    color: "#434343",
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: "4%",
   },
   buttonTextGradient: {
     color: "#FFFFFF",

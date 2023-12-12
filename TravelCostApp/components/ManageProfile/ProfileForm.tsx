@@ -6,7 +6,7 @@ import React, { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
 import { UserContext, UserData } from "../../store/user-context";
-import { updateUser } from "../../util/http";
+import { fetchChangelog, updateUser } from "../../util/http";
 
 import Input from "../ManageExpense/Input";
 import IconButton from "../UI/IconButton";
@@ -26,6 +26,7 @@ import { ExpensesContext } from "../../store/expenses-context";
 import { asyncStoreSafeClear } from "../../store/async-storage";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { Badge } from "react-native-paper";
+import { getMMKVString } from "../../store/mmkv";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -65,10 +66,14 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
   // new changes button
   const [hasNewChanges, setHasNewChanges] = useState(false);
   useEffect(() => {
-    if (userCtx.userName) {
+    async function checkNewChanges() {
+      const oldChangelog = getMMKVString("changelog.txt");
+      const newChangelog = await fetchChangelog();
+      if (!oldChangelog || !newChangelog) return;
+      if (oldChangelog == newChangelog) return;
       setHasNewChanges(true);
     }
-  }, [userCtx.userName]);
+  }, []);
   const iconButtonJSX = (
     <View style={[styles.inputsRow, { marginTop: -12 }]}>
       {/* TODO: add a "new changes" button that parses the changelog, if it has new changes, will show a "!"-badge */}
@@ -80,8 +85,9 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigation.navigate("Changelog");
+          setHasNewChanges(false);
         }}
-        badge={true}
+        badge={hasNewChanges}
         // badgeText={"!"}
         badgeStyle={{ backgroundColor: GlobalStyles.colors.error500 }}
       />

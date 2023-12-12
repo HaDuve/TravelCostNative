@@ -3,7 +3,7 @@ import { Linking } from "react-native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { getMMKVString, setMMKVString } from "../store/mmkv";
 
-export type versionCheckResponse = {
+export type VersionCheckResponse = {
   latestVersion: string;
   currentVersion: string;
   isNeeded: boolean;
@@ -29,7 +29,7 @@ export async function versionCheck() {
     }
   }
 
-  const updateResponse: versionCheckResponse = await VersionCheck.needUpdate();
+  const updateResponse: VersionCheckResponse = await VersionCheck.needUpdate();
   // isNeeded : boolean
   // storeUrl : string
   // currentVersion : string

@@ -765,3 +765,17 @@ export async function storeExpoPushTokenInTrip(
   }
   return finalResponse;
 }
+
+export async function fetchChangelog() {
+  try {
+    console.log("fetching changelog");
+    const response = await axios.get(
+      "https://raw.githubusercontent.com/HaDuve/TravelCostNative/main/TravelCostApp/changelog.txt"
+    );
+    let tempText = "";
+    if (response) tempText = response.data;
+    return tempText;
+  } catch (error) {
+    safeLogError(error);
+  }
+}

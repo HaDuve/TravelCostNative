@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useInterval } from "../Hooks/useInterval";
 import { getOfflineQueue } from "../../util/offline-queue";
 import { DEBUG_POLLING_INTERVAL, DEVELOPER_MODE } from "../../confAppConstants";
-import { versionCheck, versionCheckResponse } from "../../util/version";
+import { versionCheck, VersionCheckResponse } from "../../util/version";
 import { useFocusEffect } from "@react-navigation/native";
 import { DateTime } from "luxon";
 import { FlatList } from "react-native-gesture-handler";
@@ -77,7 +77,7 @@ const DevContent = ({ navigation }) => {
   useEffect(() => {
     async function checkVersion() {
       if (isConnected) {
-        const data: versionCheckResponse = await versionCheck();
+        const data: VersionCheckResponse = await versionCheck();
         console.log("checkVersion ~ versionCheckResponse:", data);
         const latestVersion = data?.latestVersion;
         const currentVersion = data?.currentVersion;

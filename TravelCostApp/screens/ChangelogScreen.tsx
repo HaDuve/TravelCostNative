@@ -5,43 +5,57 @@ import { GlobalStyles } from "../constants/styles";
 import axios from "axios";
 import safeLogError from "../util/error";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
+import DrawerCollapsedItem from "react-native-paper/lib/typescript/src/components/Drawer/DrawerCollapsedItem";
+import Constants from "expo-constants";
+import { getMMKVString, setMMKVString } from "../store/mmkv";
+import { fetchChangelog } from "../util/http";
+import { VersionCheckResponse, versionCheck } from "../util/version";
+import InfoButton from "../components/UI/InfoButton";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const ChangelogScreen = () => {
   const [isFetching, setIsFetching] = useState(true);
   const [changelogText, setChangelogText] = useState("");
-  console.log("ChangelogScreen ~ changelogText:", changelogText);
+  const [currentVersion, setCurrentVersion] = useState("");
+  const [showInfo, setShowInfo] = useState(false);
   const formatStringStart = "__Newest Changes:";
   const formatStringEnd = "__Other Changes:";
   const canBeFormattedIndex = changelogText.indexOf(formatStringStart);
-  console.log("ChangelogScreen ~ canBeFormattedIndex:", canBeFormattedIndex);
 
   let formattedTextNew = "";
   let formattedTextOld = "";
   if (canBeFormattedIndex !== -1) {
     const endOfNewIndex = changelogText.indexOf(formatStringEnd);
-    formattedTextNew = changelogText.slice(canBeFormattedIndex, endOfNewIndex);
-    console.log("ChangelogScreen ~ formattedTextNew:", formattedTextNew);
-    formattedTextOld = changelogText.slice(endOfNewIndex);
-    console.log("ChangelogScreen ~ formattedTextOld:", formattedTextOld);
+    formattedTextNew = changelogText.slice(
+      canBeFormattedIndex + 2,
+      endOfNewIndex
+    );
+    // const index1 = formattedTextNew.indexOf("\n");
+    // const index2 = formattedTextNew.indexOf("\n", formatStringStart.length + 1);
+    // const newestVersion = formattedTextNew.slice(index1, index2).trim();
+    formattedTextOld = changelogText.slice(endOfNewIndex + 2);
   } else {
     formattedTextOld = changelogText;
   }
   useEffect(() => {
-    async function fetchChangelog() {
+    async function setLog() {
       try {
-        console.log("fetching changelog");
-        const response = await axios.get(
-          "https://raw.githubusercontent.com/HaDuve/TravelCostNative/main/TravelCostApp/changelog.txt"
-        );
-        let tempText = "";
-        if (response) tempText = response.data;
-        setChangelogText(tempText);
+        const changelogText = await fetchChangelog();
+        setMMKVString("changelog.txt", changelogText);
+        setChangelogText(changelogText.replaceAll("- ", "\n • "));
+        const versionCheckResponse: VersionCheckResponse = await versionCheck();
+        if (versionCheckResponse)
+          setCurrentVersion(versionCheckResponse.currentVersion);
         setIsFetching(false);
       } catch (error) {
-        safeLogError(error);
+        const fallBackChangelog = getMMKVString("changelog.txt");
+        if (fallBackChangelog) {
+          setChangelogText(changelogText.replaceAll("- ", "\n • "));
+          setIsFetching(false);
+        }
       }
     }
-    fetchChangelog();
+    setLog();
   }, []);
 
   if (isFetching) {
@@ -55,9 +69,46 @@ const ChangelogScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <BackButton style={{ marginTop: -20, marginBottom: 0, padding: 4 }} />
-      <Text>{formattedTextNew}</Text>
-      <Text>{formattedTextOld}</Text>
+      <View style={[styles.headerContainer]}>
+        <BackButton style={{ padding: 12 }} />
+        <Text style={[GlobalStyles.titleText]}>
+          Budget for Nomads Changelog
+        </Text>
+      </View>
+      <View
+        style={[
+          styles.changelogContainer,
+          GlobalStyles.shadowPrimary,
+          { alignItems: "center", justifyContent: "space-between" },
+        ]}
+      >
+        <View style={GlobalStyles.row}>
+          <Text style={styles.changelogText}>
+            My current version: {currentVersion}
+          </Text>
+          <TouchableOpacity
+            style={{
+              paddingHorizontal: 14,
+            }}
+            onPress={() => setShowInfo(!showInfo)}
+          >
+            <InfoButton onPress={() => setShowInfo(!showInfo)}></InfoButton>
+          </TouchableOpacity>
+        </View>
+
+        {showInfo && (
+          <Text style={{ marginTop: 12 }}>
+            The number after the last dot indicate minipatches that are applied
+            automatically, eg.: {currentVersion}.XX
+          </Text>
+        )}
+      </View>
+      <View style={[styles.changelogContainer, GlobalStyles.shadowGlowPrimary]}>
+        <Text style={styles.changelogText}>{formattedTextNew}</Text>
+      </View>
+      <View style={[styles.changelogContainer, GlobalStyles.shadowPrimary]}>
+        <Text style={styles.changelogText}>{formattedTextOld}</Text>
+      </View>
     </ScrollView>
   );
 };
@@ -69,5 +120,20 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: "4%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  headerContainer: {
+    flex: 1,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    flexDirection: "row",
+  },
+  changelogContainer: {
+    margin: 12,
+    padding: 24,
+    paddingVertical: 12,
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
+    borderRadius: 24,
+  },
+  changelogText: {
+    fontSize: 18,
   },
 });

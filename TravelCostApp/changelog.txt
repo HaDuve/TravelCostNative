@@ -4,6 +4,7 @@ __Newest Changes:
 
 1.2.801.9
 - added a "New Changes" Button to Profile Screen
+- added a Changelog Screen, showing the newest changes and current version
 - added AND-Logic to allow users to find connected stuff e.g: "Hannes Tina Essen" will show any expense which includes "Hannes" and "Tina" in their splits, and which has to have either "Essen" as a Description or "Essen" as a Category.
 - added Autocomplete to Finder Search
 - moved the Sum Button into IOS keyboard view

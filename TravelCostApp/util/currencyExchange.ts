@@ -98,9 +98,7 @@ export async function getRateAPI1(base: string, target: string) {
 
   try {
     const response = await axios.get(requestURL);
-    console.log("getRate ~ response:", response);
     const rates = response.data.rates;
-    console.log("getRate ~ rates:", rates);
     if (response) {
       if (DEBUG_FORCE_OFFLINE) {
         return getOfflineRate(base, target);

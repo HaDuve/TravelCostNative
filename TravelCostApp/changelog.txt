@@ -1,11 +1,19 @@
-Change log Travel Expense App
+Changelog Travel Expense App
 
-__ AppStore version __
+__Newest Changes:
 
 1.2.801.9
-- brought the sum button into IOS keyboard view
-- added autocomplete to finder
-- fixed finder not finding categories
+- added a "New Changes" Button to Profile Screen
+- added AND-Logic to allow users to find connected stuff e.g: "Hannes Tina Essen" will show any expense which includes "Hannes" and "Tina" in their splits, and which has to have either "Essen" as a Description or "Essen" as a Category.
+- added Autocomplete to Finder Search
+- moved the Sum Button into IOS keyboard view
+- improved Loading Toast design
+- improved LongNumber/Scaled Layout of Top Bar Summary
+- improved SplitSummaryScreen Layout
+- improved Date Picker now using locale format (e.g: MM DD YYYY for americans)
+- fixed Finder not finding categories
+
+__Other Changes:
 
 1.2.801.8
 - translated push notifications

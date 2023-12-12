@@ -93,6 +93,7 @@ import CountryPicker from "../Currency/CountryPicker";
 import { getMMKVObject } from "../../store/mmkv";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { Keyboard, Platform } from "react-native";
+import ToastComponent from "../UI/ToastComponent";
 
 const ExpenseForm = ({
   onCancel,
@@ -1702,6 +1703,8 @@ const ExpenseForm = ({
           </View>
         </InputAccessoryView>
       )}
+      {/* We could actually show our Toast Component in this Modal here, but the loading modal would block important screen parts */}
+      {/* <ToastComponent /> */}
     </>
   );
 };

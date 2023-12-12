@@ -32,6 +32,7 @@ import * as Haptics from "expo-haptics";
 import { setMMKVObject } from "../store/mmkv";
 import { formatExpenseWithCurrency } from "../util/string";
 import { isSameDay } from "../util/dateTime";
+import ToastComponent from "../components/UI/ToastComponent";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -263,7 +264,7 @@ const ManageExpense = ({ route, navigation }) => {
       Toast.show({
         type: "loading",
         text1: i18n.t("toastSaving1"),
-        text2: i18n.t("toastSaving2") + " " + (i + 1) + "/" + (days + 1),
+        text2: i18n.t("toastSaving2"), //+ " " + (i + 1) + "/" + (days + 1)
         autoHide: false,
         props: {
           progress: i / days,
@@ -388,12 +389,7 @@ const ManageExpense = ({ route, navigation }) => {
       Toast.show({
         type: "loading",
         text1: i18n.t("toastSaving1"),
-        text2:
-          i18n.t("toastSaving2") +
-          " " +
-          (i + 1) +
-          "/" +
-          (expensesInRange?.length + 1),
+        text2: i18n.t("toastSaving2"), //+ " " + (i + 1) + "/" + (expensesInRange?.length + 1)
         autoHide: false,
         props: {
           progress: i / expensesInRange?.length,

@@ -2,7 +2,7 @@ import React, { Alert, Pressable, StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TourGuideZone } from "rn-tourguide";
 
@@ -21,108 +21,84 @@ import { TripContext } from "../../store/trip-context";
 import { AuthContext } from "../../store/auth-context";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { reloadApp } from "../../util/appState";
-import { NetworkContext } from "../../store/network-context";
 
 const AddExpenseButton = ({ navigation }) => {
   const { settings } = useContext(SettingsContext);
   const tripCtx = useContext(TripContext);
   const authCtx = useContext(AuthContext);
-  const netCtx = useContext(NetworkContext);
-  const isFast = netCtx.isConnected && netCtx.strongConnection;
-  const buttonRef = useRef(null);
-  // if (buttonRef.current)
-  //   console.log(
-  //     "measureInWindow: ",
-  //     buttonRef.current.measureInWindow((fx, fy, width, height, px, py) => {
-  //       console.log("Component width is: " + width);
-  //       console.log("Component height is: " + height);
-  //       console.log("X offset to frame: " + fx);
-  //       console.log("Y offset to frame: " + fy);
-  //       console.log("X offset to page: " + px);
-  //       console.log("Y offset to page: " + py);
-  //     })
-  //   );
 
-  const [valid, setvalid] = useState(false);
+  const valid = useRef(false);
+
   useEffect(() => {
-    setvalid(
+    valid.current =
       tripCtx.tripid &&
-        authCtx.uid &&
-        tripCtx.travellers &&
-        tripCtx.travellers?.length > 0
-    );
+      authCtx.uid &&
+      tripCtx.travellers &&
+      tripCtx.travellers?.length > 0;
   }, [tripCtx.tripid, authCtx.uid, tripCtx.travellers?.length]);
-  // console.log("AddExpenseButton ~ tripCtx.travellers:", tripCtx.travellers);
-  // console.log("AddExpenseButton ~ authCtx.uid:", authCtx.uid);
-  // console.log("AddExpenseButton ~ tripCtx.tripid:", tripCtx.tripid);
   const skipCatScreen = settings.skipCategoryScreen;
 
   const pressHandler = async () => {
-    if (!valid) {
-      // error haptic
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-      // Platform.select({
-      // ios: () =>
-      Alert.alert(
-        "Loading Data",
-        "Please try again later, alternatively login again or restart the App",
-        [
-          // cancel button
-          {
-            text: "Cancel",
-            onPress: () => console.log("Cancel Pressed"),
-            style: "cancel",
-          },
-          {
-            text: "Restart",
-            onPress: () => {
-              reloadApp();
-            },
-          },
-          {
-            text: "Login",
-            onPress: () => {
-              authCtx.logout();
-              reloadApp();
-            },
-          },
-        ]
-      );
-      // ,
-      //   android: () => {
-      //     console.log("android pressed");
-      //     Alert.alert(
-      //       "Loading Data",
-      //       "Please try again later, if necessary restart the App or Login again.",
-      //       [
-      //         {
-      //           text: "Restart",
-      //           onPress: () => {
-      //             reloadApp();
-      //           },
-      //         },
-      //         {
-      //           text: "Login",
-      //           onPress: () => {
-      //             authCtx.logout();
-      //             reloadApp();
-      //           },
-      //         },
-      //       ]
-      //     );
-      //   },
-      // })();
-    } else {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      skipCatScreen &&
-        navigation.navigate("ManageExpense", {
-          pickedCat: "undefined",
-        });
-      !skipCatScreen && navigation.navigate("CategoryPick");
-    }
+    const retryTimeout = 5000; // Adjust this timeout as needed
+    const startTime = Date.now();
+
+    const retryFunction = async () => {
+      // Your validation logic here
+      valid.current =
+        tripCtx.tripid &&
+        authCtx.uid &&
+        tripCtx.travellers &&
+        tripCtx.travellers?.length > 0;
+
+      if (!valid.current && Date.now() - startTime < retryTimeout) {
+        // Retry after a delay if still invalid
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Adjust delay as needed
+        await retryFunction();
+      } else {
+        if (!valid.current) {
+          // After retries, show the alert if still invalid
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          Alert.alert(
+            "Loading Data",
+            "Please try again later, alternatively login again or restart the App",
+            [
+              // cancel button
+              {
+                text: "Cancel",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel",
+              },
+              {
+                text: "Restart",
+                onPress: () => {
+                  reloadApp();
+                },
+              },
+              {
+                text: "Login",
+                onPress: () => {
+                  authCtx.logout();
+                  reloadApp();
+                },
+              },
+            ]
+          );
+        } else {
+          // If valid, proceed
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          skipCatScreen &&
+            navigation.navigate("ManageExpense", {
+              pickedCat: "undefined",
+            });
+          !skipCatScreen && navigation.navigate("CategoryPick");
+        }
+      }
+    };
+
+    retryFunction();
   };
 
-  if (!valid) {
+  if (!valid.current) {
     return (
       <Animated.View style={[styles.margin]} entering={FadeIn.duration(600)}>
         <Pressable
@@ -148,10 +124,7 @@ const AddExpenseButton = ({ navigation }) => {
     );
   }
   return (
-    <Animated.View
-      style={styles.margin}
-      // entering={FadeIn.duration(600).delay(3000)}
-    >
+    <Animated.View style={styles.margin} entering={FadeIn.duration(600)}>
       <TourGuideZone
         text={i18n.t("walk2")}
         borderRadius={16}
@@ -164,15 +137,13 @@ const AddExpenseButton = ({ navigation }) => {
       <Pressable
         style={({ pressed }) => [
           styles.addButton,
-          !valid && styles.addButtonInactive,
           GlobalStyles.shadowGlowPrimary,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
-        ref={buttonRef}
         onPress={pressHandler}
       >
         <Ionicons
-          name={valid ? "add-outline" : "alert"}
+          name={"add-outline"}
           size={42}
           color={GlobalStyles.colors.backgroundColor}
         />

@@ -4,6 +4,9 @@ __Newest Changes:
 
 1.2.801.10
 - improved error handling with the addExpense Button
+- added "New Changes" badge to bottom tabs bar
+
+__Other Changes:
 
 1.2.801.9
 - added a "New Changes" Button to Profile Screen
@@ -17,7 +20,7 @@ __Newest Changes:
 - improved Date Picker now using locale format (e.g: MM DD YYYY for americans)
 - fixed Finder not finding categories
 
-__Other Changes:
+
 
 1.2.801.8
 - translated push notifications

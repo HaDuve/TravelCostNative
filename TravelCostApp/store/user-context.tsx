@@ -84,6 +84,8 @@ export const UserContext = createContext({
   isShowingGraph: true,
   isSendingOfflineQueueMutex: false,
   setIsSendingOfflineQueueMutex: (bool: boolean) => {},
+  hasNewChanges: false,
+  setHasNewChanges: (bool: boolean) => {},
 });
 
 function UserContextProvider({ children }) {
@@ -101,6 +103,7 @@ function UserContextProvider({ children }) {
   const [tripHistory, setTripHistory] = useState([]);
   const [isSendingOfflineQueueMutex, setIsSendingOfflineQueueMutex] =
     useState(false);
+  const [hasNewChanges, setHasNewChanges] = useState(false);
 
   const loadLastCurrencyCountryFromAsync = useCallback(async () => {
     console.log(
@@ -301,6 +304,8 @@ function UserContextProvider({ children }) {
     updateTripHistory: updateTripHistory,
     isSendingOfflineQueueMutex: isSendingOfflineQueueMutex,
     setIsSendingOfflineQueueMutex: setIsSendingOfflineQueueMutex,
+    hasNewChanges: hasNewChanges,
+    setHasNewChanges: setHasNewChanges,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

@@ -103,6 +103,7 @@ import TripSummaryScreen from "./screens/TripSummaryScreen";
 import { versionCheck } from "./util/version";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ChangelogScreen from "./screens/ChangelogScreen";
+import { Badge } from "react-native-paper";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -366,7 +367,8 @@ function Navigation() {
 }
 
 function Home() {
-  const { isShowingGraph, freshlyCreated } = useContext(UserContext);
+  const { isShowingGraph, freshlyCreated, hasNewChanges } =
+    useContext(UserContext);
 
   const FirstScreen = freshlyCreated ? "Profile" : "RecentExpenses";
 
@@ -499,7 +501,12 @@ function Home() {
 
           tabBarLabel: i18n.t("myTrips"),
           tabBarIcon: ({ color }) => (
-            <Ionicons name="globe-outline" size={24} color={color} />
+            <View>
+              {hasNewChanges && (
+                <Badge style={{ position: "absolute" }} size={6} />
+              )}
+              <Ionicons name="globe-outline" size={24} color={color} />
+            </View>
           ),
         }}
       />

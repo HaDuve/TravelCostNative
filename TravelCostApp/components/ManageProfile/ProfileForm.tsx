@@ -67,15 +67,16 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
   }
 
   // new changes button
-  const [hasNewChanges, setHasNewChanges] = useState(false);
+  const hasNewChanges = userCtx.hasNewChanges;
   useEffect(() => {
+    // console.log("rerender profileform");
     async function checkNewChanges() {
       if (!isConnected) return;
       const newChangelog = await fetchChangelog();
       if (!newChangelog) return;
-      setHasNewChanges(true);
+      userCtx.setHasNewChanges(true);
       const oldChangelog = getMMKVString("changelog.txt");
-      if (oldChangelog == newChangelog) setHasNewChanges(false);
+      if (oldChangelog == newChangelog) userCtx.setHasNewChanges(false);
     }
     checkNewChanges();
   }, [isConnected]);
@@ -90,7 +91,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigation.navigate("Changelog");
-          setHasNewChanges(false);
+          userCtx.setHasNewChanges(false);
         }}
         badge={hasNewChanges}
         // badgeText={"!"}

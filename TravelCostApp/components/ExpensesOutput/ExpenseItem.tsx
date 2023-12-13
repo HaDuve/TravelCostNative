@@ -1,12 +1,5 @@
-import {
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import PropTypes from "prop-types";
 
 import { GlobalStyles } from "../../constants/styles";
@@ -18,7 +11,6 @@ import { TripContext } from "../../store/trip-context";
 import { formatExpenseWithCurrency } from "../../util/string";
 import React from "react";
 
-import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import { FlatList } from "react-native-gesture-handler";
 
 //Localization
@@ -32,9 +24,7 @@ import { SettingsContext } from "../../store/settings-context";
 import { useEffect } from "react";
 import * as Haptics from "expo-haptics";
 import { ExpenseData } from "../../util/expense";
-import { calcSplitList } from "../../util/split";
 import { useRef } from "react";
-import set from "react-native-reanimated";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;

@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, ScrollView } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import BackButton from "../components/UI/BackButton";
 import { GlobalStyles } from "../constants/styles";
 import axios from "axios";
@@ -17,6 +17,8 @@ import { TouchableRipple } from "react-native-paper";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { Pressable } from "react-native";
 import * as Haptics from "expo-haptics";
+import { NetworkContext } from "../store/network-context";
+import { LinkingContext } from "@react-navigation/native";
 
 function renderChangelogItem(item) {
   return (
@@ -29,7 +31,8 @@ function renderChangelogItem(item) {
   );
 }
 
-const ChangelogScreen = () => {
+const ChangelogScreen = ({ navigation }) => {
+  const { strongConnection } = useContext(NetworkContext);
   const [isFetching, setIsFetching] = useState(true);
   const [changelogText, setChangelogText] = useState("");
   const [currentVersion, setCurrentVersion] = useState("");
@@ -62,9 +65,9 @@ const ChangelogScreen = () => {
   useEffect(() => {
     async function setLog() {
       try {
-        const changelogText = await fetchChangelog();
-        setMMKVString("changelog.txt", changelogText);
-        setChangelogText(changelogText); //.replaceAll("- ", "\n • "));
+        const newChangelogText = await fetchChangelog();
+        setMMKVString("changelog.txt", newChangelogText);
+        setChangelogText(newChangelogText); //.replaceAll("- ", "\n • "));
         const versionCheckResponse: VersionCheckResponse = await versionCheck();
         if (versionCheckResponse)
           setCurrentVersion(versionCheckResponse.currentVersion);
@@ -72,13 +75,16 @@ const ChangelogScreen = () => {
       } catch (error) {
         const fallBackChangelog = getMMKVString("changelog.txt");
         if (fallBackChangelog) {
-          setChangelogText(changelogText); //.replaceAll("- ", "\n • "));
+          setChangelogText(fallBackChangelog); //.replaceAll("- ", "\n • "));
           setIsFetching(false);
+        } else {
+          navigation.pop();
         }
       }
     }
-    setLog();
-  }, []);
+    if (strongConnection && (!changelogText || changelogText.length < 1))
+      setLog();
+  }, [changelogText, strongConnection, navigation]);
 
   if (isFetching) {
     return (
@@ -170,8 +176,8 @@ const ChangelogScreen = () => {
         {showInfo && (
           <Animated.View entering={FadeInUp}>
             <Text style={[{ marginTop: 12 }, styles.changelogText]}>
-              The number after the last dot indicate minipatches that are
-              applied automatically, eg.: {currentVersion}.XX
+              The letter after the last dot indicate mini-updates that are
+              applied automatically, eg.: {currentVersion}.x
             </Text>
           </Animated.View>
         )}

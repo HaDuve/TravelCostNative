@@ -72,11 +72,11 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
     // console.log("rerender profileform");
     async function checkNewChanges() {
       if (!isConnected) return;
-      const newChangelog = await fetchChangelog();
-      if (!newChangelog) return;
+      const newestChangelog = await fetchChangelog();
+      if (!newestChangelog) return;
       userCtx.setHasNewChanges(true);
       const oldChangelog = getMMKVString("changelog.txt");
-      if (oldChangelog == newChangelog) userCtx.setHasNewChanges(false);
+      if (oldChangelog == newestChangelog) userCtx.setHasNewChanges(false);
     }
     checkNewChanges();
   }, [isConnected]);

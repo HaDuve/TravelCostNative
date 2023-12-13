@@ -2,6 +2,9 @@ Changelog Travel Expense App
 
 __Newest Changes:
 
+1.2.801.10
+- improved error handling with the addExpense Button
+
 1.2.801.9
 - added a "New Changes" Button to Profile Screen
 - added a Changelog Screen, showing the newest changes and current version
@@ -20,7 +23,7 @@ __Other Changes:
 - translated push notifications
 - removed loading spinner from add expense button
 - improved splitsummary styling
-- improved cheap expense item render design
+- improved expense item render design in long lists
 
 1.2.801.7
 - implemented chatgpt 4 access

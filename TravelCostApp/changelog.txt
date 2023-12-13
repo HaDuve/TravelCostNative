@@ -2,13 +2,13 @@ Changelog Travel Expense App
 
 __Newest Changes:
 
-1.2.801.10
+1.2.801i
 - improved error handling with the addExpense Button
 - added "New Changes" badge to bottom tabs bar
 
 __Other Changes:
 
-1.2.801.9
+1.2.801h
 - added a "New Changes" Button to Profile Screen
 - added a Changelog Screen, showing the newest changes and current version
 - added AND-Logic to allow users to find connected stuff e.g: "Hannes Tina Essen" will show any expense which includes "Hannes" and "Tina" in their splits, and which has to have either "Essen" as a Description or "Essen" as a Category.
@@ -22,35 +22,35 @@ __Other Changes:
 
 
 
-1.2.801.8
+1.2.801g
 - translated push notifications
 - removed loading spinner from add expense button
 - improved splitsummary styling
 - improved expense item render design in long lists
 
-1.2.801.7
+1.2.801f
 - implemented chatgpt 4 access
 
-1.2.801.6
+1.2.801e
 - added an additional exchange rate provider with more options, even Aussies can use the app now!
 - find homeCurrency (tripform default currency) automatically from locale
 
-1.2.801.5
+1.2.801d
 - fixed background color of loading spinner in expense lists
 - fixed double loading spinners when only one should be rendered
 - fixed loading spinner sometimes being visible in non-refreshable lists
 
-1.2.801.4
+1.2.801c
 - added touchable links to split expenses on the split summary screen
 - improved colors and animations
 - removed debug version string from settings
 
-1.2.801.3
+1.2.801b
 - fix changing amount bug
 - improve expense content animation (entering smoothly)
 - improve filter modal titles
 
-1.2.801.2
+1.2.801a
 - removed redundant autocomplete copies of expense description
 - improved category finder algorithm (now uses split words)
 

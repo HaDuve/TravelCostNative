@@ -11,7 +11,18 @@ import { getMMKVString, setMMKVString } from "../store/mmkv";
 import { fetchChangelog } from "../util/http";
 import { VersionCheckResponse, versionCheck } from "../util/version";
 import InfoButton from "../components/UI/InfoButton";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
+import { parseChangelog } from "../util/parseChangelog";
+
+function renderChangelogItem(item) {
+  console.log(item.item);
+  return (
+    <View style={[styles.changelogContainer, GlobalStyles.shadowGlowPrimary]}>
+      <Text style={styles.changelogText}>{item.item.versionString}</Text>
+      <Text style={styles.changelogText}>{item.item.changes}</Text>
+    </View>
+  );
+}
 
 const ChangelogScreen = () => {
   const [isFetching, setIsFetching] = useState(true);
@@ -37,12 +48,15 @@ const ChangelogScreen = () => {
   } else {
     formattedTextOld = changelogText;
   }
+  const parsedNewChanges = parseChangelog(formattedTextNew);
+  const parsedOldChanges = parseChangelog(formattedTextOld);
+
   useEffect(() => {
     async function setLog() {
       try {
         const changelogText = await fetchChangelog();
         setMMKVString("changelog.txt", changelogText);
-        setChangelogText(changelogText.replaceAll("- ", "\n • "));
+        setChangelogText(changelogText); //.replaceAll("- ", "\n • "));
         const versionCheckResponse: VersionCheckResponse = await versionCheck();
         if (versionCheckResponse)
           setCurrentVersion(versionCheckResponse.currentVersion);
@@ -50,7 +64,7 @@ const ChangelogScreen = () => {
       } catch (error) {
         const fallBackChangelog = getMMKVString("changelog.txt");
         if (fallBackChangelog) {
-          setChangelogText(changelogText.replaceAll("- ", "\n • "));
+          setChangelogText(changelogText); //.replaceAll("- ", "\n • "));
           setIsFetching(false);
         }
       }
@@ -104,12 +118,21 @@ const ChangelogScreen = () => {
           </Text>
         )}
       </View>
-      <View style={[styles.changelogContainer, GlobalStyles.shadowGlowPrimary]}>
-        <Text style={styles.changelogText}>{formattedTextNew}</Text>
-      </View>
-      <View style={[styles.changelogContainer, GlobalStyles.shadowPrimary]}>
-        <Text style={styles.changelogText}>{formattedTextOld}</Text>
-      </View>
+
+      <FlatList
+        ListHeaderComponent={() => (
+          <Text style={styles.changelogText}>Newest Changes</Text>
+        )}
+        data={parsedNewChanges}
+        renderItem={renderChangelogItem}
+      ></FlatList>
+      <FlatList
+        ListHeaderComponent={() => (
+          <Text style={styles.changelogText}>Other Changes</Text>
+        )}
+        data={parsedOldChanges}
+        renderItem={renderChangelogItem}
+      ></FlatList>
     </ScrollView>
   );
 };

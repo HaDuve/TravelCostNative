@@ -3,8 +3,9 @@ Changelog Travel Expense App
 __Newest Changes:
 
 1.2.801i
-- improved error handling with the addExpense Button
-- added "New Changes" badge to bottom tabs bar
+- improved Changelog Screen design and user experience
+- added "New Changes" indicator-badge to bottom tabs bar
+- improved error handling with the addExpense button (now retries for 5 seconds before alerting)
 
 __Other Changes:
 

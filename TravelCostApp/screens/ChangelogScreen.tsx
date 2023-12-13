@@ -13,13 +13,18 @@ import { VersionCheckResponse, versionCheck } from "../util/version";
 import InfoButton from "../components/UI/InfoButton";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import { parseChangelog } from "../util/parseChangelog";
+import { TouchableRipple } from "react-native-paper";
+import Animated, { FadeInUp } from "react-native-reanimated";
+import { Pressable } from "react-native";
+import * as Haptics from "expo-haptics";
 
 function renderChangelogItem(item) {
-  console.log(item.item);
   return (
-    <View style={[styles.changelogContainer, GlobalStyles.shadowGlowPrimary]}>
-      <Text style={styles.changelogText}>{item.item.versionString}</Text>
-      <Text style={styles.changelogText}>{item.item.changes}</Text>
+    <View style={[styles.changelogContainer, GlobalStyles.strongShadow]}>
+      <Text style={styles.changelogText}>
+        {item.item.versionString}
+        {item.item.changes} {"\n"}
+      </Text>
     </View>
   );
 }
@@ -29,6 +34,9 @@ const ChangelogScreen = () => {
   const [changelogText, setChangelogText] = useState("");
   const [currentVersion, setCurrentVersion] = useState("");
   const [showInfo, setShowInfo] = useState(false);
+  const [showNewChanges, setShowNewChanges] = useState(true);
+  const [showOldChanges, setShowOldChanges] = useState(false);
+
   const formatStringStart = "__Newest Changes:";
   const formatStringEnd = "__Other Changes:";
   const canBeFormattedIndex = changelogText.indexOf(formatStringStart);
@@ -85,54 +93,90 @@ const ChangelogScreen = () => {
     <ScrollView style={styles.container}>
       <View style={[styles.headerContainer]}>
         <BackButton style={{ padding: 12 }} />
-        <Text style={[GlobalStyles.titleText]}>
-          Budget for Nomads Changelog
-        </Text>
+        <Text style={GlobalStyles.titleText}>Budget for Nomads Changelog</Text>
       </View>
-      <View
-        style={[
+
+      <Pressable
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          setShowNewChanges(!showNewChanges);
+        }}
+        style={({ pressed }) => [
           styles.changelogContainer,
-          GlobalStyles.shadowPrimary,
+          GlobalStyles.shadowGlowPrimary,
+          pressed && GlobalStyles.pressedWithShadow,
+        ]}
+      >
+        <Text style={styles.subHeaderText}>Whats new?</Text>
+      </Pressable>
+      {showNewChanges && (
+        <Animated.FlatList
+          entering={FadeInUp}
+          data={parsedNewChanges}
+          renderItem={renderChangelogItem}
+        ></Animated.FlatList>
+      )}
+      <Pressable
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          setShowOldChanges(!showOldChanges);
+        }}
+        style={({ pressed }) => [
+          styles.changelogContainer,
+          GlobalStyles.shadowGlowPrimary,
+          pressed && GlobalStyles.pressedWithShadow,
+        ]}
+      >
+        <Text style={styles.subHeaderText}>Other Changes</Text>
+      </Pressable>
+      {showOldChanges && (
+        <Animated.FlatList
+          entering={FadeInUp}
+          data={parsedOldChanges}
+          renderItem={renderChangelogItem}
+        ></Animated.FlatList>
+      )}
+      <Pressable
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          setShowInfo(!showInfo);
+        }}
+        style={({ pressed }) => [
+          styles.changelogContainer,
+          GlobalStyles.shadowGlowPrimary,
           { alignItems: "center", justifyContent: "space-between" },
+          pressed && GlobalStyles.pressedWithShadow,
         ]}
       >
         {currentVersion && (
-          <View style={GlobalStyles.row}>
-            <Text style={styles.changelogText}>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={styles.subHeaderText}>
               My current version: {currentVersion}
             </Text>
-            <TouchableOpacity
+            <View
               style={{
                 paddingHorizontal: 14,
               }}
-              onPress={() => setShowInfo(!showInfo)}
             >
-              <InfoButton onPress={() => setShowInfo(!showInfo)}></InfoButton>
-            </TouchableOpacity>
+              <InfoButton
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setShowInfo(!showInfo);
+                }}
+              ></InfoButton>
+            </View>
           </View>
         )}
         {showInfo && (
-          <Text style={{ marginTop: 12 }}>
-            The number after the last dot indicate minipatches that are applied
-            automatically, eg.: {currentVersion}.XX
-          </Text>
+          <Animated.View entering={FadeInUp}>
+            <Text style={[{ marginTop: 12 }, styles.changelogText]}>
+              The number after the last dot indicate minipatches that are
+              applied automatically, eg.: {currentVersion}.XX
+            </Text>
+          </Animated.View>
         )}
-      </View>
-
-      <FlatList
-        ListHeaderComponent={() => (
-          <Text style={styles.changelogText}>Newest Changes</Text>
-        )}
-        data={parsedNewChanges}
-        renderItem={renderChangelogItem}
-      ></FlatList>
-      <FlatList
-        ListHeaderComponent={() => (
-          <Text style={styles.changelogText}>Other Changes</Text>
-        )}
-        data={parsedOldChanges}
-        renderItem={renderChangelogItem}
-      ></FlatList>
+      </Pressable>
+      <View style={{ minHeight: 24 }}></View>
     </ScrollView>
   );
 };
@@ -153,11 +197,22 @@ const styles = StyleSheet.create({
   changelogContainer: {
     margin: 12,
     padding: 24,
-    paddingVertical: 12,
+    paddingTop: 12,
+    paddingBottom: 12,
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: 24,
   },
   changelogText: {
     fontSize: 18,
+    lineHeight: 24,
+    fontWeight: "300",
+    color: GlobalStyles.colors.textColor,
+  },
+  subHeaderText: {
+    textAlign: "center",
+    fontSize: 18,
+    lineHeight: 24,
+    fontWeight: "400",
+    color: GlobalStyles.colors.textColor,
   },
 });

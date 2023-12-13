@@ -14,7 +14,11 @@ import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
 import React, { useContext, useEffect, useState } from "react";
 import { TripContext } from "../../store/trip-context";
-import { formatExpenseWithCurrency, truncateString } from "../../util/string";
+import {
+  formatExpenseWithCurrency,
+  truncateString,
+  truncateNumber,
+} from "../../util/string";
 import {
   fetchTrip,
   fetchTripName,
@@ -249,13 +253,16 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
     totalBudget >= MAX_JS_NUMBER.toString();
   const totalBudgetString = noTotalBudget
     ? "∞"
-    : formatExpenseWithCurrency(Number(totalBudget), tripCurrency);
+    : formatExpenseWithCurrency(
+        truncateNumber(Number(totalBudget)),
+        tripCurrency
+      );
   const dailyBudgetString = formatExpenseWithCurrency(
-    Number(dailyBudget),
+    truncateNumber(Number(dailyBudget)),
     tripCurrency
   );
   const sumOfExpensesString = formatExpenseWithCurrency(
-    Number(sumOfExpenses),
+    truncateNumber(Number(sumOfExpenses)),
     tripCurrency
   );
 

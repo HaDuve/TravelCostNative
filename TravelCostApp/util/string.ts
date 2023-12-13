@@ -77,18 +77,37 @@ export function truncateString(str: string, n: number) {
   return str?.length > n ? str.slice(0, n - 1) + "..." : str;
 }
 
+/**
+ * Truncates or limits a number to a specified border value,
+ * with options for formatting.
+ * @param num The number to truncate.
+ * @param border The border value to truncate the number. Default is 1000.
+ * @param asNumber Determines whether to return the result as a number (true) or string (false). Default is true.
+ * @param digits The number of digits after the decimal point for the truncated number. Default is 0.
+ * @returns The truncated number or string based on the provided parameters.
+ */
 export function truncateNumber(
-  num: number,
-  border?: number,
-  asNumber?: boolean,
+  num: number | undefined,
+  border = 1000,
+  asNumber = true,
   digits = 0
 ) {
+  if (num === undefined || num === null || isNaN(num)) {
+    return asNumber ? 0 : "";
+  }
+
+  const isNumGreaterThanBorder = num > border;
+
   if (asNumber) {
-    if (isNaN(num)) return 0;
-    if (num > border) return Number(num.toFixed(digits));
+    if (isNumGreaterThanBorder) {
+      return Number(num.toFixed(digits));
+    }
     return num;
   }
-  if (isNaN(num)) return "";
-  if (num > border) return num.toFixed(digits);
+
+  if (isNumGreaterThanBorder) {
+    return num.toFixed(digits);
+  }
+
   return num.toFixed(0);
 }

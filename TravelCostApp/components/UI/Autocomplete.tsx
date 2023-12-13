@@ -48,14 +48,6 @@ const Autocomplete = ({
     <View style={[containerStyle]}>
       <TextInput
         onFocus={() => {
-          console.log(
-            "focus",
-            "value:",
-            value,
-            "showOnEmpty:",
-            showOnEmpty,
-            data
-          );
           if (value?.length === 0) {
             setMenuVisible(true);
             if (showOnEmpty) setFilteredData([...new Set(data)]);

@@ -35,6 +35,7 @@ import {
 import { storeExpoPushTokenInTrip } from "../../util/http";
 import { ExpoPushToken } from "expo-notifications";
 import safeLogError from "../../util/error";
+import Toast from "react-native-toast-message";
 
 const DevContent = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
@@ -108,7 +109,7 @@ const DevContent = ({ navigation }) => {
     }, [])
   );
 
-  const developerOutput = DEVELOPER_MODE && (
+  return (
     <View>
       {/* spacer View */}
 
@@ -116,6 +117,22 @@ const DevContent = ({ navigation }) => {
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>DEVCONTENT</Text>
       </View>
+
+      <Button
+        style={styles.settingsButton}
+        onPress={async () => {
+          navigation.popToTop();
+          Toast.show({
+            type: "banner",
+            text1: "Premium Budget",
+            text2: "Save more money with the premium version!",
+            autoHide: false,
+          });
+        }}
+      >
+        showAdBanner
+      </Button>
+
       <View style={{ padding: 12, flex: 1 }}>
         {currentVersion && <Text>Current Version: {currentVersion}</Text>}
         {latestVersion && <Text>Latest Version: {latestVersion}</Text>}
@@ -244,8 +261,6 @@ const DevContent = ({ navigation }) => {
       </Button>
     </View>
   );
-
-  return developerOutput;
 };
 
 export default DevContent;

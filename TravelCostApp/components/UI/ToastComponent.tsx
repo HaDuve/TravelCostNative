@@ -4,12 +4,15 @@ import Toast, {
   ToastConfig,
 } from "react-native-toast-message";
 import React from "react";
-import { Dimensions, View } from "react-native";
+import { Dimensions, StyleSheet, View } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import LoadingBarOverlay from "./LoadingBarOverlay";
 import { Text } from "react-native";
 import { ProgressBar } from "react-native-paper";
 import * as Progress from "react-native-progress";
+import BackgroundGradient from "./BackgroundGradient";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import IconButton from "./IconButton";
 
 const CONTENTCONTAINERSTYLE = { paddingLeft: 10 };
 const MINHEIGHT = 60;
@@ -150,10 +153,19 @@ const toastConfig: ToastConfig = {
     );
   },
   banner: (props) => (
-    <View style={{ height: 60, width: "100%", backgroundColor: "tomato" }}>
-      <Text>{props.text1}</Text>
-      <Text>{props.text2}</Text>
-    </View>
+    <BackgroundGradient style={styles.bannerContainer}>
+      <View style={{ flexDirection: "row" }}>
+        <TouchableOpacity onPress={() => console.log("pressed banner y")}>
+          <Text style={styles.bannerText1}>{props.text1}</Text>
+          <Text style={styles.bannerText2}>{props.text2}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => console.log("pressed banner x")}>
+          <View style={{ padding: 12 }}>
+            <Text>X</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    </BackgroundGradient>
   ),
   // call loading like this:
   // Toast.show({
@@ -175,3 +187,25 @@ const ToastComponent = () => {
 };
 
 export default ToastComponent;
+
+const styles = StyleSheet.create({
+  bannerContainer: {
+    height: 60,
+    width: "90%",
+    borderRadius: 24,
+    paddingHorizontal: 24,
+    paddingVertical: 4,
+  },
+  bannerText1: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: GlobalStyles.colors.textColor,
+    textAlign: "center",
+  },
+  bannerText2: {
+    fontSize: 14,
+    fontWeight: "400",
+    color: GlobalStyles.colors.textColor,
+    textAlign: "center",
+  },
+});

@@ -26,7 +26,7 @@ i18n.enableFallback = true;
 import { ScrollView } from "react-native-gesture-handler";
 import { GlobalStyles } from "../constants/styles";
 import LinkingButton from "../components/UI/LinkButton";
-import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
+import { DEBUG_POLLING_INTERVAL, DEVELOPER_MODE } from "../confAppConstants";
 import { useFocusEffect } from "@react-navigation/native";
 import { DateTime } from "luxon";
 import { resetTour } from "../util/tourUtil";
@@ -182,7 +182,6 @@ const SettingsScreen = ({ navigation }) => {
         </View>
       </BlurView>
       <SettingsSection multiTraveller={multiTraveller}></SettingsSection>
-
       <GradientButton
         style={styles.settingsButton}
         onPress={async () => {
@@ -192,7 +191,6 @@ const SettingsScreen = ({ navigation }) => {
       >
         {i18n.t("resetAppIntroductionLabel")}
       </GradientButton>
-
       <LinkingButton
         style={styles.settingsButton}
         URL="https://foodfornomads.com/"
@@ -271,8 +269,7 @@ const SettingsScreen = ({ navigation }) => {
           paddingHorizontal: "4%",
         }}
       ></View>
-      {DevContent({ navigation })}
-
+      {DEVELOPER_MODE && <DevContent navigation={navigation} />}
       <View style={{ flex: 1, minHeight: 100 }}></View>
     </ScrollView>
   );

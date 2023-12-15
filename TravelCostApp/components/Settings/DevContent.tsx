@@ -37,7 +37,6 @@ import { ExpoPushToken } from "expo-notifications";
 import safeLogError from "../../util/error";
 
 const DevContent = ({ navigation }) => {
-  console.log("DevContent rendered");
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);

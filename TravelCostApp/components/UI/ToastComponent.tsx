@@ -13,6 +13,7 @@ import * as Progress from "react-native-progress";
 import BackgroundGradient from "./BackgroundGradient";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import IconButton from "./IconButton";
+import { G } from "react-native-svg";
 
 const CONTENTCONTAINERSTYLE = { paddingLeft: 10 };
 const MINHEIGHT = 60;
@@ -153,19 +154,41 @@ const toastConfig: ToastConfig = {
     );
   },
   banner: (props) => (
-    <BackgroundGradient style={styles.bannerContainer}>
-      <View style={{ flexDirection: "row" }}>
-        <TouchableOpacity onPress={() => console.log("pressed banner y")}>
-          <Text style={styles.bannerText1}>{props.text1}</Text>
-          <Text style={styles.bannerText2}>{props.text2}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => console.log("pressed banner x")}>
-          <View style={{ padding: 12 }}>
-            <Text>X</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    </BackgroundGradient>
+    <TouchableOpacity
+      onPress={() => {
+        console.log("Pressed Touchable in Config");
+        props.onPress();
+      }}
+      style={[styles.bannerContainerContainer, GlobalStyles.wideStrongShadow]}
+    >
+      <BackgroundGradient style={[styles.bannerContainer]}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <TouchableOpacity
+            onPress={() => {
+              console.log("Pressed Touchable in Config");
+              props.onPress();
+            }}
+          >
+            <View style={{ marginBottom: 8 }}>
+              <Text style={styles.bannerText1}>{props.text1}</Text>
+            </View>
+            <Text style={styles.bannerText2}>{props.text2}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              console.log("Pressed X in config");
+              Toast.hide();
+            }}
+          >
+            <View style={styles.xCloseContainer}>
+              <View style={styles.xCloseButton}>
+                <Text style={{ color: GlobalStyles.colors.gray700 }}>X</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </BackgroundGradient>
+    </TouchableOpacity>
   ),
   // call loading like this:
   // Toast.show({
@@ -189,12 +212,31 @@ const ToastComponent = () => {
 export default ToastComponent;
 
 const styles = StyleSheet.create({
-  bannerContainer: {
-    height: 60,
-    width: "90%",
+  bannerContainerContainer: {
+    // flex: 1,
+    borderColor: "black",
+    borderRadius: 999,
+    alignItems: "center",
+  },
+  xCloseContainer: {
+    marginTop: 18,
+    marginLeft: 4,
+  },
+  xCloseButton: {
     borderRadius: 24,
+    borderWidth: 1,
+    borderColor: "white",
+    padding: 4,
+    // paddingHorizontal: 8,
+    backgroundColor: "white",
+  },
+  bannerContainer: {
+    // flex: 1,
+    maxWidth: "95%",
+    borderColor: "black",
+    borderRadius: 999,
     paddingHorizontal: 24,
-    paddingVertical: 4,
+    paddingVertical: 12,
   },
   bannerText1: {
     fontSize: 16,

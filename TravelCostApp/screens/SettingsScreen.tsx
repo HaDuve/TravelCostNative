@@ -156,6 +156,7 @@ const SettingsScreen = ({ navigation }) => {
         }),
       }}
     >
+      {DEVELOPER_MODE && <DevContent navigation={navigation} />}
       <BlurView
         intensity={isAndroid ? 280 : 90}
         style={{
@@ -269,7 +270,6 @@ const SettingsScreen = ({ navigation }) => {
           paddingHorizontal: "4%",
         }}
       ></View>
-      {DEVELOPER_MODE && <DevContent navigation={navigation} />}
       <View style={{ flex: 1, minHeight: 100 }}></View>
     </ScrollView>
   );

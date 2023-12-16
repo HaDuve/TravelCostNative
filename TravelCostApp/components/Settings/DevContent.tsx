@@ -36,6 +36,7 @@ import { storeExpoPushTokenInTrip } from "../../util/http";
 import { ExpoPushToken } from "expo-notifications";
 import safeLogError from "../../util/error";
 import Toast from "react-native-toast-message";
+import BackButton from "../UI/BackButton";
 
 const DevContent = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
@@ -111,22 +112,27 @@ const DevContent = ({ navigation }) => {
 
   return (
     <View>
-      {/* spacer View */}
-
-      <View style={{ flex: 1, minHeight: 100 }}></View>
       <View style={styles.titleContainer}>
+        <BackButton />
         <Text style={styles.titleText}>DEVCONTENT</Text>
       </View>
 
       <Button
         style={styles.settingsButton}
         onPress={async () => {
-          navigation.popToTop();
+          navigation.navigate("RecentExpenses");
           Toast.show({
             type: "banner",
-            text1: "Premium Budget",
-            text2: "Save more money with the premium version!",
+            text1: "Become a Premium Nomad",
+            text2:
+              "Spend even less money with the latest functions of the premium version!",
             autoHide: false,
+            position: "top",
+            topOffset: 110,
+            onPress: () => {
+              console.log("pressed Onpress");
+              navigation.navigate("Paywall");
+            },
           });
         }}
       >

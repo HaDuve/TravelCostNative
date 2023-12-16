@@ -73,16 +73,36 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
     <Discount discountPercentage={40} style={styles.discountStyle}></Discount>
   );
 
+  const yearlyLabelJSX = isYearly && (
+    <View
+      style={{
+        borderWidth: 1,
+        borderColor: GlobalStyles.colors.cat2,
+        backgroundColor: GlobalStyles.colors.cat2,
+        borderRadius: 24,
+        padding: 4,
+        paddingHorizontal: 16,
+        alignItems: "center",
+        marginTop: "-10.5%",
+        marginBottom: 4,
+      }}
+    >
+      <Text style={{ color: "white" }}>POPULAR</Text>
+    </View>
+  );
+
   return (
     <Pressable
       onPress={onSelection}
       style={({ pressed }) => [
         pressed && GlobalStyles.pressed,
         styles.container,
+        isYearly && styles.yearlyContainer,
         GlobalStyles.strongShadow,
       ]}
     >
-      {discountJSX}
+      {yearlyLabelJSX}
+      {/* {discountJSX} */}
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.terms}>{description}</Text>
       <Text style={styles.title}>
@@ -106,11 +126,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: "4%",
-    // paddingHorizontal: "10%",
+    paddingHorizontal: "4%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 10,
     margin: "2%",
     marginHorizontal: "4%",
+  },
+  yearlyContainer: {
+    borderWidth: 4,
+    borderColor: GlobalStyles.colors.cat2,
   },
   title: {
     color: GlobalStyles.colors.textColor,

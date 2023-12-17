@@ -41,7 +41,6 @@ function TripList({ trips, refreshControl, setRefreshing }) {
     >
       <FlatList
         data={uniqTrips}
-        refreshControl={refreshControl}
         ListFooterComponent={<View style={{ height: 300 }}></View>}
         renderItem={renderTripItem}
         keyExtractor={(item: TripData) => {

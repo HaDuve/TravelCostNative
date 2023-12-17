@@ -74,7 +74,7 @@ import { getCurrencySymbol } from "../../util/currencySymbol";
 import {
   DEVELOPER_MODE,
   EXPENSES_LOAD_TIMEOUT,
-  MAX_EXPENSES,
+  MAX_EXPENSES_RENDER,
 } from "../../confAppConstants";
 import { TripAsObject } from "../../screens/TripSummaryScreen";
 import { create } from "react-test-renderer";
@@ -362,7 +362,7 @@ function ExpensesList({
           expenseId: itemData.item.id,
         });
       };
-      if (expensesLength > MAX_EXPENSES) {
+      if (expensesLength > MAX_EXPENSES_RENDER) {
         // show cheap JSX
         return (
           <View>
@@ -746,7 +746,7 @@ function ExpensesList({
 
   const listHeaderJSX = useMemo(() => {
     return (
-      expenses?.length < MAX_EXPENSES && (
+      expenses?.length < MAX_EXPENSES_RENDER && (
         <View
           style={{
             paddingRight: 20,

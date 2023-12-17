@@ -44,7 +44,7 @@ import GradientButton from "../UI/GradientButton";
 import PropTypes from "prop-types";
 import InfoButton from "../UI/InfoButton";
 import Modal from "react-native-modal";
-import { MAX_JS_NUMBER } from "../../confAppConstants";
+import { MAX_JS_NUMBER, MAX_TRIPS_NONPREMIUM } from "../../confAppConstants";
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -63,6 +63,7 @@ import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { useWindowDimensions } from "react-native";
 import { Checkbox, Switch } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
+import { isPremiumMember } from "../Premium/PremiumConstants";
 
 const TripForm = ({ navigation, route }) => {
   const tripCtx = useContext(TripContext);
@@ -390,7 +391,22 @@ const TripForm = ({ navigation, route }) => {
     // navigation.navigate("Profile");
   }
 
+  const isLimitedByPremium = async () => {
+    const isPremium = await isPremiumMember();
+    if (isPremium) return false;
+    const tripHistory = userCtx.tripHistory;
+    const tripHistoryLength = tripHistory?.length || 0;
+    const tooManyTrips = tripHistoryLength >= MAX_TRIPS_NONPREMIUM;
+    return tooManyTrips;
+  };
+
   async function submitHandler(setActive = false) {
+    if (!isEditing) {
+      if (await isLimitedByPremium()) {
+        navigation.navigate("Paywall");
+        return;
+      }
+    }
     setIsLoading(true);
     if (!isConnected) {
       Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));

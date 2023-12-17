@@ -31,4 +31,8 @@ export const EXPENSES_LOAD_TIMEOUT = 2000;
 // cache: only call the exchange getRate request again after X numbers of hours
 export const CACHE_NUM_HOURS = 1;
 // maximum number of expenses before we start to show cheap text-based expenseItems
-export const MAX_EXPENSES = 150;
+export const MAX_EXPENSES_RENDER = 150;
+
+// NON-PREMIUM LIMITATIONS
+export const MAX_TRIPS_NONPREMIUM = 2;
+export const MAX_EXPENSES_PERTRIP_NONPREMIUM = 500;

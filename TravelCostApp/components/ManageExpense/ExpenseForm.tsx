@@ -94,6 +94,8 @@ import { getMMKVObject } from "../../store/mmkv";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { Keyboard, Platform } from "react-native";
 import ToastComponent from "../UI/ToastComponent";
+import { isPremiumMember } from "../Premium/PremiumConstants";
+import { MAX_EXPENSES_PERTRIP_NONPREMIUM } from "../../confAppConstants";
 
 const ExpenseForm = ({
   onCancel,
@@ -819,8 +821,24 @@ const ExpenseForm = ({
       />
     </Animated.View>
   );
+  const isLimitedByPremium = async () => {
+    const isPremium = await isPremiumMember();
+    if (isPremium) return false;
+    const expenses = expCtx.expenses;
+    const expensesLength = expenses.length || 0;
+    const newExpenseDateRange = daysBeween || 1;
+    const tooManyTrips =
+      expensesLength + newExpenseDateRange >= MAX_EXPENSES_PERTRIP_NONPREMIUM;
+    return tooManyTrips;
+  };
   const advancedSubmitHandler = async () => {
     // setIsSubmitting(true);
+    if (!isEditing) {
+      if (await isLimitedByPremium()) {
+        navigation.navigate("Paywall");
+        return;
+      }
+    }
     Toast.show({
       type: "loading",
       text1: i18n.t("toastSaving1"),

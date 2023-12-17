@@ -381,16 +381,7 @@ const ProfileScreen = ({ navigation }) => {
           tooltipBottomOffset={250}
           zone={6}
         >
-          <TripList
-            trips={tripHistory}
-            // setRefreshing={setRefreshing}
-            // refreshControl={
-            //   <RefreshControl
-            //     refreshing={refreshing}
-            //     // onRefresh={refreshHandler}
-            //   />
-            // }
-          ></TripList>
+          <TripList trips={tripHistory}></TripList>
         </TourGuideZone>
       </View>
       <View style={styles.horizontalButtonContainer}>

@@ -8,12 +8,12 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import LoadingBarOverlay from "./LoadingBarOverlay";
 import { Text } from "react-native";
-import { ProgressBar } from "react-native-paper";
 import * as Progress from "react-native-progress";
 import BackgroundGradient from "./BackgroundGradient";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import IconButton from "./IconButton";
-import { G } from "react-native-svg";
+import { getMMKVString, setMMKVString } from "../../store/mmkv";
+import { DEVELOPER_MODE } from "../../confAppConstants";
+import { isPremiumMember } from "../Premium/PremiumConstants";
 
 const CONTENTCONTAINERSTYLE = { paddingLeft: 10 };
 const MINHEIGHT = 60;
@@ -181,7 +181,7 @@ const toastConfig: ToastConfig = {
             }}
           >
             <View style={styles.xCloseContainer}>
-              <View style={styles.xCloseButton}>
+              <View style={[styles.xCloseButton, GlobalStyles.strongShadow]}>
                 <Text style={{ color: GlobalStyles.colors.gray700 }}>X</Text>
               </View>
             </View>
@@ -197,6 +197,44 @@ const toastConfig: ToastConfig = {
   //   props: { uuid: 'bba1a7d0-6ab2-4a0a-a76e-ebbe05ae6d70' }
   // });
 };
+
+function isCalledToday() {
+  const bannerTime = getMMKVString("BannerTime");
+  console.log("isCalledToday ~ bannerTime:", bannerTime);
+  const today = new Date();
+  const bannerDate = new Date(bannerTime);
+  setMMKVString("BannerTime", today.toISOString());
+  if (DEVELOPER_MODE || !bannerTime) return false;
+  if (
+    today.getDate() === bannerDate.getDate() &&
+    today.getMonth() === bannerDate.getMonth() &&
+    today.getFullYear() === bannerDate.getFullYear()
+  ) {
+    return true;
+  }
+  return false;
+}
+
+// default banner call
+export async function showBanner(navigation, props = {}) {
+  const isPremium = !DEVELOPER_MODE && (await isPremiumMember());
+  if (isPremium || isCalledToday()) return;
+  Toast.show({
+    type: "banner",
+    // TODO: translate
+    text1: "Keep your Budget like a Pro!",
+    text2:
+      "Save even more money with the latest functions of the premium version!",
+    autoHide: false,
+    position: "top",
+    topOffset: 10,
+    onPress: () => {
+      console.log("pressed Onpress");
+      navigation.navigate("Paywall");
+    },
+    ...props,
+  });
+}
 
 const ToastComponent = () => {
   return (
@@ -239,14 +277,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   bannerText1: {
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: 18,
+    fontWeight: "400",
     color: GlobalStyles.colors.textColor,
     textAlign: "center",
   },
   bannerText2: {
-    fontSize: 14,
-    fontWeight: "400",
+    fontSize: 16,
+    fontWeight: "300",
     color: GlobalStyles.colors.textColor,
     textAlign: "center",
   },

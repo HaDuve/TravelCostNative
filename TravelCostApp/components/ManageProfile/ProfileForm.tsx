@@ -8,9 +8,7 @@ import { AuthContext } from "../../store/auth-context";
 import { UserContext, UserData } from "../../store/user-context";
 import { fetchChangelog, updateUser } from "../../util/http";
 
-import Input from "../ManageExpense/Input";
 import IconButton from "../UI/IconButton";
-import Button from "../UI/Button";
 import { TripContext } from "../../store/trip-context";
 import FlatButton from "../UI/FlatButton";
 
@@ -18,14 +16,11 @@ import FlatButton from "../UI/FlatButton";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
-import LoadingOverlay from "../UI/LoadingOverlay";
 import GradientButton from "../UI/GradientButton";
 import * as Haptics from "expo-haptics";
 import PropTypes from "prop-types";
 import { ExpensesContext } from "../../store/expenses-context";
 import { asyncStoreSafeClear } from "../../store/async-storage";
-import LoadingBarOverlay from "../UI/LoadingBarOverlay";
-import { Badge } from "react-native-paper";
 import { getMMKVString } from "../../store/mmkv";
 import { NetworkContext } from "../../store/network-context";
 const i18n = new I18n({ en, de, fr, ru });
@@ -83,31 +78,35 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
   const iconButtonJSX = (
     <View style={[styles.inputsRow, { marginTop: -12 }]}>
       {/* TODO: add a "new changes" button that parses the changelog, if it has new changes, will show a "!"-badge */}
-      <IconButton
-        icon={"newspaper-outline"}
-        size={36}
-        color={GlobalStyles.colors.textColor}
-        // style={styles.button}
-        onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          navigation.navigate("Changelog");
-          userCtx.setHasNewChanges(false);
-        }}
-        badge={hasNewChanges}
-        // badgeText={"!"}
-        badgeStyle={{ backgroundColor: GlobalStyles.colors.error500 }}
-      />
+      {!freshlyCreated && (
+        <IconButton
+          icon={"newspaper-outline"}
+          size={36}
+          color={GlobalStyles.colors.textColor}
+          // style={styles.button}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            navigation.navigate("Changelog");
+            userCtx.setHasNewChanges(false);
+          }}
+          badge={hasNewChanges}
+          // badgeText={"!"}
+          badgeStyle={{ backgroundColor: GlobalStyles.colors.error500 }}
+        />
+      )}
 
-      <IconButton
-        icon={"settings-outline"}
-        size={36}
-        color={GlobalStyles.colors.textColor}
-        // style={styles.button}
-        onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          navigation.navigate("Settings");
-        }}
-      />
+      {!freshlyCreated && (
+        <IconButton
+          icon={"settings-outline"}
+          size={36}
+          color={GlobalStyles.colors.textColor}
+          // style={styles.button}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            navigation.navigate("Settings");
+          }}
+        />
+      )}
       <IconButton
         icon={"exit-outline"}
         size={36}
@@ -240,7 +239,6 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
         <View style={styles.logoutContainer}>{iconButtonJSX}</View>
       </View>
       <View style={styles.inputsRow}></View>
-      {changedName && changedNameButtons}
       {freshlyNavigationButtons}
     </View>
   );

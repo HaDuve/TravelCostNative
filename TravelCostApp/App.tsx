@@ -28,7 +28,9 @@ import LoginScreen from "./screens/LoginScreen";
 import ManageExpense from "./screens/ManageExpense";
 import { GlobalStyles } from "./constants/styles";
 import AuthContextProvider, { AuthContext } from "./store/auth-context";
-import ExpensesContextProvider from "./store/expenses-context";
+import ExpensesContextProvider, {
+  ExpensesContext,
+} from "./store/expenses-context";
 import ProfileScreen from "./screens/ProfileScreen";
 import UserContextProvider, { UserContext } from "./store/user-context";
 import {
@@ -104,6 +106,7 @@ import { versionCheck } from "./util/version";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ChangelogScreen from "./screens/ChangelogScreen";
 import { Badge } from "react-native-paper";
+import { ExpenseData } from "./util/expense";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -371,7 +374,13 @@ function Home() {
     useContext(UserContext);
 
   const FirstScreen = freshlyCreated ? "Profile" : "RecentExpenses";
-
+  const expCtx = useContext(ExpensesContext);
+  const expenses = expCtx.expenses;
+  const hasExp = expenses?.length > 0;
+  const hasExpensesWithSplit = expenses?.some(
+    (exp: ExpenseData) => exp.splitList?.length > 0
+  );
+  const validSplitSummary = hasExp && hasExpensesWithSplit;
   return (
     <BottomTabs.Navigator
       initialRouteName={FirstScreen}
@@ -451,46 +460,50 @@ function Home() {
           ),
         }}
       />
-      <BottomTabs.Screen
-        name="Finder"
-        component={FinderScreen}
-        options={{
-          // headerShown: false,
-          title: i18n.t("settingsTab"),
-          tabBarShowLabel: false,
+      {hasExp && (
+        <BottomTabs.Screen
+          name="Finder"
+          component={FinderScreen}
+          options={{
+            // headerShown: false,
+            title: i18n.t("settingsTab"),
+            tabBarShowLabel: false,
 
-          tabBarLabel: "Finder", //i18n.t("settingsTab"),
-          tabBarIcon: ({ color }) => (
-            // image of a money bag
-            <Ionicons name="search-outline" size={24} color={color} />
-            // probably needs a new build for this icon to work
-            // <Image
-            //   source={require("./assets/money-bag.png")}
-            //   style={{ width: 60, height: 60 }}
-            // />
-          ),
-        }}
-      />
-      <BottomTabs.Screen
-        name="Financial"
-        component={SplitSummaryScreen}
-        options={{
-          // headerShown: false,
-          title: i18n.t("settingsTab"),
-          tabBarShowLabel: false,
+            tabBarLabel: "Finder", //i18n.t("settingsTab"),
+            tabBarIcon: ({ color }) => (
+              // image of a money bag
+              <Ionicons name="search-outline" size={24} color={color} />
+              // probably needs a new build for this icon to work
+              // <Image
+              //   source={require("./assets/money-bag.png")}
+              //   style={{ width: 60, height: 60 }}
+              // />
+            ),
+          }}
+        />
+      )}
+      {validSplitSummary && (
+        <BottomTabs.Screen
+          name="Financial"
+          component={SplitSummaryScreen}
+          options={{
+            // headerShown: false,
+            title: i18n.t("settingsTab"),
+            tabBarShowLabel: false,
 
-          tabBarLabel: "Financial", //i18n.t("settingsTab"),
-          tabBarIcon: ({ color }) => (
-            // image of a money bag
-            <Ionicons name="cash-outline" size={24} color={color} />
-            // probably needs a new build for this icon to work
-            // <Image
-            //   source={require("./assets/money-bag.png")}
-            //   style={{ width: 60, height: 60 }}
-            // />
-          ),
-        }}
-      />
+            tabBarLabel: "Financial", //i18n.t("settingsTab"),
+            tabBarIcon: ({ color }) => (
+              // image of a money bag
+              <Ionicons name="cash-outline" size={24} color={color} />
+              // probably needs a new build for this icon to work
+              // <Image
+              //   source={require("./assets/money-bag.png")}
+              //   style={{ width: 60, height: 60 }}
+              // />
+            ),
+          }}
+        />
+      )}
       <BottomTabs.Screen
         name="Profile"
         component={ProfileScreen}

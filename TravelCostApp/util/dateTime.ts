@@ -47,7 +47,9 @@ export function _getDateMinusDays(dateTime: DateTime, days: number): DateTime {
   return dateTime.minus({ days });
 }
 export function _daysBetween(dateTime1: DateTime, dateTime2: DateTime): number {
-  return dateTime1.diff(dateTime2, "days").days;
+  const days = dateTime1.diff(dateTime2, "days").days;
+  if (days < 0) return days * -1;
+  return days;
 }
 export function _getDatePlusDays(dateTime: DateTime, days: number): DateTime {
   return dateTime.plus({ days });

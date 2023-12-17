@@ -148,8 +148,9 @@ export function daysBetween(date_1: DateOrDateTime, date_2: DateOrDateTime) {
   if (date_1 instanceof DateTime) date_1 = date_1.toJSDate();
   if (date_2 instanceof DateTime) date_2 = date_2.toJSDate();
   const difference = date_1.getTime() - date_2.getTime();
-  const TotalDays = Math.ceil(difference / (1000 * 3600 * 24));
-  return TotalDays;
+  const days = Math.ceil(difference / (1000 * 3600 * 24));
+  if (days < 0) return days * -1;
+  return days;
 }
 
 export function getDatePlusDays(date: DateOrDateTime, days) {

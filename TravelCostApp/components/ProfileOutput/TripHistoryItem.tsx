@@ -6,6 +6,7 @@ import {
   FlatList,
   Alert,
   useWindowDimensions,
+  Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
@@ -345,6 +346,8 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
     );
   }
 
+  const dimensionChars = Dimensions.get("window").width / 20;
+
   function renderTravellers(item) {
     if (!item.item?.userName) return <></>;
     return (
@@ -379,7 +382,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
                 isScaledUp && { textAlign: "center" },
               ]}
             >
-              {truncateString(tripName, megaLongText ? 30 : 11)}
+              {truncateString(tripName, dimensionChars)}
             </Text>
             <Text
               style={[styles.textBase, isScaledUp && { textAlign: "center" }]}

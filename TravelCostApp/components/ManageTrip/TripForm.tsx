@@ -348,7 +348,9 @@ const TripForm = ({ navigation, route }) => {
     console.log("createTripData ~ bp 2");
 
     try {
-      userCtx.setTripHistory([...userCtx.tripHistory, tripid]);
+      if (userCtx.tripHistory?.length > 0)
+        userCtx.setTripHistory([...userCtx.tripHistory, tripid]);
+      else userCtx.setTripHistory([tripid]);
     } catch (error) {
       console.log("error with setting tripHistory in context", error.message);
     }

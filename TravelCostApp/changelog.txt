@@ -2,12 +2,17 @@ Changelog Travel Expense App
 
 __Newest Changes:
 
+1.2.801j
+- added a premium-ad-banner for non-premium users
+- added a fixed database usage limit for non-premium users (2 trips and 500 expenses)
+- bugfixes and performance improvements
+
+__Other Changes:
+
 1.2.801i
 - improved Changelog Screen design and user experience
 - added "New Changes" indicator-badge to bottom tabs bar
 - improved error handling with the addExpense button (now retries for 5 seconds before alerting)
-
-__Other Changes:
 
 1.2.801h
 - added a "New Changes" Button to Profile Screen

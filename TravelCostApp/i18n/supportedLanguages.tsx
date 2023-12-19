@@ -223,6 +223,7 @@ const en = {
 
   paywallTitle: "Become a Premium Nomad!",
   paywallSubtitle: "Make your journey even easier with additional features:",
+  paywallFeature0: "✓ Create infinite trips and expenses",
   paywallFeature1: "✓ Create your own categories",
   paywallFeature2: "✓ Simplify debt settlements",
   paywallFeature3: "✓ Better overview with advanced charts",
@@ -396,6 +397,11 @@ const en = {
   gptInfoText:
     "When using the \"askGPT-4 for a good deal\" feature, enter your expenses for analysis. GPT-4 evaluates your costs considering factors like current market rates, data, and user reviews. Keep in mind, while GPT-4 is a powerful AI, it's not a certified financial advisor. Use its analysis as a guide, not definitive advice. GPT-4's data is updated up to September 2021 and might not reflect present conditions. Always consider consulting a professional or doing more research. For accurate analysis, provide as much detail as possible about your expenses. Your feedback helps enhance GPT-4's accuracy and usefulness.",
   owes: "owes",
+
+  perYear: "yearly",
+  perMonth: "monthly",
+  popular: "popular",
+  freeTrial: "free trial",
 };
 const de = {
   // special expense strings
@@ -629,6 +635,7 @@ const de = {
   paywallTitle: "Werde Premium Nomade!",
   paywallSubtitle:
     "Lass dir deine Reise mit noch mehr Funktionen erleichtern: ",
+  paywallFeature0: "✓ Unbegrenzt Reisen und Ausgaben erstellen",
   paywallFeature1: "✓ Erstelle eigene Kategorien",
   paywallFeature2: "✓ Vereinfache Schuldenbegleichungen",
   paywallFeature3: "✓ Behalte mehr Überblick mit erweiterten Diagrammen",
@@ -816,6 +823,11 @@ const de = {
   gptInfoText:
     'Wenn du die Funktion "Frag GPT-4 nach einem guten Angebot" nutzt, gib deine Reisekosten zur Bewertung ein. GPT-4 bewertet und analysiert deine Ausgaben, um festzustellen, ob sie ein gutes Geschäft sind. Dabei berücksichtigt es Faktoren wie Marktpreise, Daten und Bewertungen. Denk daran, dass GPT-4 ein KI-System ist und kein Finanzexperte. Verwende seine Bewertung als Referenz, nicht als professionellen Rat. Beachte, dass die Informationen von GPT-4 auf Daten bis September 2021 beruhen und möglicherweise nicht die aktuellen Bedingungen widerspiegeln. Es ist ratsam, einen Finanzberater zu konsultieren oder zusätzliche Nachforschungen anzustellen. Um genaue Bewertungen zu erhalten, solltest du so viele relevante Informationen wie möglich in deine Ausgabenbeschreibung aufnehmen. Dein Feedback ist wertvoll, um die Genauigkeit und Nützlichkeit des Systems zu verbessern.',
   owes: "schuldet",
+
+  perYear: "jährlich",
+  perMonth: "monatlich",
+  popular: "beliebt",
+  freeTrial: "kostenlose Testzeit",
 };
 const fr = {
   // special expense strings
@@ -1050,6 +1062,7 @@ const fr = {
   paywallTitle: "Devenez un Nomade Premium !",
   paywallSubtitle:
     "Facilitez votre voyage avec des fonctionnalités supplémentaires :",
+  paywallFeature0: "✓ Créer des voyages et des dépenses infinis",
   paywallFeature1: "✓ Créez vos propres catégories",
   paywallFeature2: "✓ Simplifiez le règlement des dettes",
   paywallFeature3:
@@ -1232,6 +1245,11 @@ const fr = {
   gptInfoText:
     "Si tu utilises la fonction \"Demandez une bonne affaire à GPT-4\", entrez vos frais de déplacement pour les évaluer. GPT-4 évalue et analyse tes dépenses pour déterminer si elles constituent une bonne affaire. Il prend en compte des facteurs tels que les prix du marché, les dates et les évaluations. N'oublie pas que GPT-4 est un système d'intelligence artificielle et non un expert financier. Utilise son évaluation comme référence, pas comme un conseil professionnel. Note que les informations de GPT-4 sont basées sur des données jusqu'en septembre 2021 et peuvent ne pas refléter les conditions actuelles. Il est conseillé de consulter un conseiller financier ou de faire des recherches supplémentaires. Pour obtenir des évaluations précises, tu dois inclure autant d'informations pertinentes que possible dans la description de tes dépenses. Ton feedback est précieux pour améliorer la précision et l'utilité du système",
   owes: "doit à",
+
+  perYear: "annuel",
+  perMonth: "mensuel",
+  popular: "populaire",
+  freeTrial: "essai gratuit",
 };
 const ru = {
   // special expense strings
@@ -1462,6 +1480,7 @@ const ru = {
 
   paywallTitle: "Станьте Премиум-Номадом!",
   paywallSubtitle: "Упростите свое путешествие с дополнительными функциями:",
+  paywallFeature0: "✓ Créer des voyages et des dépenses infinis",
   paywallFeature1: "✓ Создавайте собственные категории,",
   paywallFeature2: "✓ Упрощайте расчеты по долгам,",
   paywallFeature3:
@@ -1653,5 +1672,10 @@ const ru = {
   gptInfoText:
     'Когда вы используете функцию "Попросить GPT-4 о хорошей сделке", введите свои расходы на поездку для оценки. GPT-4 оценивает и анализирует ваши расходы, чтобы определить, являются ли они выгодной сделкой. Он принимает во внимание такие факторы, как рыночные цены, даты и оценки. Помните, что GPT-4 - это система искусственного интеллекта, а не финансовый эксперт. Используйте его оценку как справочник, а не как профессиональный совет. Обратите внимание, что информация GPT-4 основана на данных по сентябрь 2021 года и может не отражать текущие условия. Рекомендуется проконсультироваться с финансовым консультантом или провести дополнительное исследование. Чтобы получить точные рейтинги, вы должны включить как можно больше релевантной информации в описание ваших расходов. Ваши отзывы ценны для повышения точности и полезности системы',
   owes: "должен",
+
+  perYear: "ежегодно",
+  perMonth: "ежемесячно",
+  popular: "популярный",
+  freeTrial: "бесплатная пробная версия",
 };
 export { en, de, fr, ru };

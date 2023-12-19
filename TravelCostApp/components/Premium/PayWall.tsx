@@ -29,6 +29,8 @@ import FlatButton from "../UI/FlatButton";
 import PropTypes from "prop-types";
 import IconButton from "../UI/IconButton";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import LoadingBarOverlay from "../UI/LoadingBarOverlay";
+import BackButton from "../UI/BackButton";
 
 const PaywallScreen = ({ navigation }) => {
   // - State for all available package
@@ -65,11 +67,12 @@ const PaywallScreen = ({ navigation }) => {
 
   const header = () => (
     <View>
+      {/* <BackButton></BackButton> */}
       <FlatButton
         textStyle={styles.backButtonTextStyle}
         onPress={() => navigation.pop()}
       >
-        Back
+        {i18n.t("back")}
       </FlatButton>
       <View
         style={{
@@ -101,22 +104,35 @@ const PaywallScreen = ({ navigation }) => {
           />
         )}
       </View>
-      <Text style={styles.headerTitleText}>{i18n.t("paywallTitle")}</Text>
-      <Text style={styles.headerSubtitleText}>
-        {i18n.t("paywallSubtitle") +
-          "\n\n" +
-          i18n.t("paywallFeature1") +
-          "\n" +
-          i18n.t("paywallFeature2") +
-          "\n" +
-          i18n.t("paywallFeature3") +
-          "\n" +
-          i18n.t("paywallFeature4") +
-          "\n" +
-          i18n.t("paywallFeature5") +
-          "\n\n" +
-          i18n.t("paywallFeature6")}
+      <Text style={[styles.headerTitleText, GlobalStyles.shadow]}>
+        {i18n.t("paywallTitle")}
       </Text>
+      <Text style={styles.headerSubtitleText}>
+        {i18n.t("paywallSubtitle") + "\n\n"}
+      </Text>
+      <View style={[styles.featureContainer]}>
+        <Text style={styles.featureText}>
+          {i18n.t("paywallFeature0") +
+            "\n" +
+            i18n.t("paywallFeature1") +
+            "\n" +
+            i18n.t("paywallFeature2") +
+            "\n" +
+            i18n.t("paywallFeature3") +
+            "\n" +
+            i18n.t("paywallFeature4") +
+            "\n" +
+            i18n.t("paywallFeature5")}
+        </Text>
+        {/*  +
+          "\n\n" +
+        i18n.t("paywallFeature6")} */}
+      </View>
+      {packages.length === 0 && (
+        <LoadingBarOverlay
+          containerStyle={{ backgroundColor: "transparent" }}
+        ></LoadingBarOverlay>
+      )}
     </View>
   );
 
@@ -228,6 +244,7 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "visible",
   },
   text: {
     fontSize: 20,
@@ -246,12 +263,28 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: GlobalStyles.colors.primary700,
   },
+  featureContainer: {
+    // paddingHorizontal: "4%",
+    marginBottom: "6%",
+    // paddingVertical: "1%",
+    // borderWidth: 1,
+    // borderColor: GlobalStyles.colors.primary700,
+    // backgroundColor: GlobalStyles.colors.backgroundColor,
+    overflow: "visible",
+  },
   headerSubtitleText: {
     fontSize: 18,
     fontWeight: "300",
     textAlign: "center",
     paddingHorizontal: "4%",
-    marginBottom: "12%",
+    // marginBottom: "6%",
+  },
+  featureText: {
+    fontSize: 18,
+    fontWeight: "300",
+    textAlign: "center",
+    paddingHorizontal: "4%",
+    // marginBottom: "6%",
   },
   footerText: {
     // center text
@@ -265,7 +298,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.accent250,
     fontSize: 16,
     fontWeight: "bold",
-    textAlign: "right",
+    textAlign: "left",
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,

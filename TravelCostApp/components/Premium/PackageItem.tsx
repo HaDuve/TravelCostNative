@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, Pressable, Alert, StyleSheet } from "react-native";
-import Purchases from "react-native-purchases";
+import Purchases, { PurchasesPackage } from "react-native-purchases";
 import { ENTITLEMENT_ID } from "../Premium/PremiumConstants";
 import branch, { BranchEvent } from "react-native-branch";
 
@@ -22,20 +22,35 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
   const {
     product: { title, description, priceString, subscriptionPeriod },
   } = purchasePackage;
+  const purchasePack: PurchasesPackage = purchasePackage;
+  const discount = purchasePack?.product?.introPrice;
+  // console.log("PackageItem ~ discount:", discount);
+  const hasAFreeTrial = discount?.price === 0;
+  console.log("PackageItem ~ hasAFreeTrial:", hasAFreeTrial);
+  const freeNumberOfUnits = discount?.periodNumberOfUnits;
+  // console.log("PackageItem ~ freeNumberOfUnits:", freeNumberOfUnits);
+  const freeUnit = discount?.periodUnit;
+  // console.log("PackageItem ~ freeUnit:", freeUnit);
+  const freePeriodString =
+    hasAFreeTrial &&
+    `${freeNumberOfUnits} ${i18n.t(freeUnit?.toLowerCase())} ${i18n.t(
+      "freeTrial"
+    )}`;
+  console.log("PackageItem ~ freePeriodString:", freePeriodString);
 
   const isMonthly = subscriptionPeriod === "P1M";
   const isYearly = subscriptionPeriod === "P1Y";
+  const isPopular = isYearly;
   const isLifetime = !isMonthly && !isYearly;
 
   const subscriptionPeriodString = isMonthly
-    ? " monthly"
+    ? ` ${i18n.t("perMonth")}`
     : isYearly
-    ? " yearly"
+    ? ` ${i18n.t("perYear")}`
     : "";
   const subscriptionCalcPriceString = priceString;
   const onSelection = async () => {
     setIsPurchasing(true);
-
     try {
       const { customerInfo, productIdentifier } =
         await Purchases.purchasePackage(purchasePackage);
@@ -73,7 +88,7 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
     <Discount discountPercentage={40} style={styles.discountStyle}></Discount>
   );
 
-  const yearlyLabelJSX = isYearly && (
+  const isPopularLabel = isPopular && (
     <View
       style={{
         borderWidth: 1,
@@ -87,7 +102,7 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
         marginBottom: 4,
       }}
     >
-      <Text style={{ color: "white" }}>POPULAR</Text>
+      <Text style={{ color: "white" }}>{i18n.t("popular").toUpperCase()}</Text>
     </View>
   );
 
@@ -97,14 +112,15 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
       style={({ pressed }) => [
         pressed && GlobalStyles.pressed,
         styles.container,
-        isYearly && styles.yearlyContainer,
+        isPopular && styles.isPopularContainer,
         GlobalStyles.strongShadow,
       ]}
     >
-      {yearlyLabelJSX}
+      {isPopularLabel}
       {/* {discountJSX} */}
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.terms}>{description}</Text>
+      {hasAFreeTrial && <Text style={styles.terms}>{freePeriodString}</Text>}
       <Text style={styles.title}>
         {subscriptionCalcPriceString}
         {subscriptionPeriodString}
@@ -132,7 +148,7 @@ const styles = StyleSheet.create({
     margin: "2%",
     marginHorizontal: "4%",
   },
-  yearlyContainer: {
+  isPopularContainer: {
     borderWidth: 4,
     borderColor: GlobalStyles.colors.cat2,
   },

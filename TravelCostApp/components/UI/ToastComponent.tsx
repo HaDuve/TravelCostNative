@@ -8,6 +8,16 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import LoadingBarOverlay from "./LoadingBarOverlay";
 import { Text } from "react-native";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import * as Progress from "react-native-progress";
 import BackgroundGradient from "./BackgroundGradient";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -222,9 +232,8 @@ export async function showBanner(navigation, props = {}) {
   Toast.show({
     type: "banner",
     // TODO: translate
-    text1: "Keep your Budget like a Pro!",
-    text2:
-      "Save even more money with the latest functions of the premium version!",
+    text1: i18n.t("bannerText1"),
+    text2: i18n.t("bannerText2"),
     autoHide: false,
     position: "top",
     topOffset: 10,
@@ -270,10 +279,10 @@ const styles = StyleSheet.create({
   },
   bannerContainer: {
     // flex: 1,
-    maxWidth: "95%",
+    maxWidth: "90%",
     borderColor: "black",
-    borderRadius: 999,
-    paddingHorizontal: 24,
+    borderRadius: 36,
+    paddingHorizontal: 30,
     paddingVertical: 12,
   },
   bannerText1: {

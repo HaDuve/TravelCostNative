@@ -402,6 +402,9 @@ const en = {
   perMonth: "monthly",
   popular: "popular",
   freeTrial: "free trial",
+  bannerText1: "Do you want to keep your budget like a true Nomad? 💎",
+  bannerText2:
+    "Save even more money with the latest functions of the premium version.\nStart your free trial today!",
 };
 const de = {
   // special expense strings
@@ -828,6 +831,9 @@ const de = {
   perMonth: "monatlich",
   popular: "beliebt",
   freeTrial: "kostenlose Testzeit",
+  bannerText1: "Möchtest du dein Budget wie ein echter Nomade verwalten? 💎",
+  bannerText2:
+    "Spare noch mehr Geld mit den neuesten Funktionen der Premium-Version.\nStarte noch heute deine kostenlose Testversion!",
 };
 const fr = {
   // special expense strings
@@ -1250,6 +1256,9 @@ const fr = {
   perMonth: "mensuel",
   popular: "populaire",
   freeTrial: "essai gratuit",
+  bannerText1: "Voulez-vous gérer votre budget comme un vrai Nomade ? 💎",
+  bannerText2:
+    "Économisez encore plus d'argent avec les dernières fonctionnalités de la version premium.\nCommencez votre essai gratuit dès aujourd'hui !",
 };
 const ru = {
   // special expense strings
@@ -1677,5 +1686,8 @@ const ru = {
   perMonth: "ежемесячно",
   popular: "популярный",
   freeTrial: "бесплатная пробная версия",
+  bannerText1: "Хотите вести свой бюджет, как настоящий номад? 💎",
+  bannerText2:
+    "Экономьте еще больше с последними функциями премиум-версии.\nНачните бесплатную пробную версию сегодня!",
 };
 export { en, de, fr, ru };

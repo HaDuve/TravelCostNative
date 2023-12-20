@@ -19,6 +19,11 @@ import ExpensesOverview, {
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import { DateTime } from "luxon";
 import { _toShortFormat } from "../util/dateTime";
 import PropTypes from "prop-types";
@@ -33,10 +38,6 @@ import { TripContext } from "../store/trip-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { showBanner } from "../components/UI/ToastComponent";
-const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = Localization.locale.slice(0, 2);
-i18n.enableFallback = true;
-// i18n.locale = "en";
 
 const OverviewScreen = ({ navigation }) => {
   // console.log("rerender OverviewScreen - 0");

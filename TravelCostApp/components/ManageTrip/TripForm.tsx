@@ -64,6 +64,8 @@ import { useWindowDimensions } from "react-native";
 import { Checkbox, Switch } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { isPremiumMember } from "../Premium/PremiumConstants";
+import Toast from "react-native-toast-message";
+import { sleep } from "../../util/appState";
 
 const TripForm = ({ navigation, route }) => {
   const tripCtx = useContext(TripContext);
@@ -270,7 +272,7 @@ const TripForm = ({ navigation, route }) => {
 
   async function editingTripData(tripData: TripData, setActive = false) {
     try {
-      console.log("TripForm ~ tripid in editingTripData:", editedTripId);
+      console.log("editingTripData ~ tripData:", tripData.tripName);
       await updateTrip(editedTripId, tripData);
       setLoadingProgress(1);
       console.log("editingTripData ~ editedTripId:", editedTripId);
@@ -290,22 +292,29 @@ const TripForm = ({ navigation, route }) => {
         setLoadingProgress(8);
         const expenses = await getAllExpenses(editedTripId, uid);
         setLoadingProgress(9);
-        expenseCtx.setExpenses([]);
-        expenses.forEach((element) => {
-          expenseCtx.addExpense(element);
-        });
+        expenseCtx.setExpenses([...expenses]);
+        // expenseCtx.setExpenses([]);
+        // expenses.forEach((element) => {
+        //   expenseCtx.addExpense(element);
+        // });
+        console.log(
+          "editingTripData ~ expenses:",
+          expenses.length,
+          "for:",
+          tripData.tripName
+        );
         setMMKVObject("expenses", expenses);
         tripCtx.setdailyBudget(tripData.dailyBudget);
-        navigation.navigate("RecentExpenses");
         return;
       }
       tripCtx.refresh();
-      navigation.pop();
+      Toast.hide();
       return;
     } catch (error) {
       console.log("editingTripData ~ error:", error);
       // Alert.alert("Error", "Error while saving trip, please try again!");
       navigation.popToTop();
+      Toast.hide();
     }
   }
 
@@ -402,31 +411,7 @@ const TripForm = ({ navigation, route }) => {
     return tooManyTrips;
   };
 
-  async function submitHandler(setActive = false) {
-    if (!isEditing) {
-      if (await isLimitedByPremium()) {
-        navigation.navigate("Paywall");
-        return;
-      }
-    }
-    setIsLoading(true);
-    if (!isConnected) {
-      Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
-      setIsLoading(false);
-      return;
-    }
-    const tripData: TripData = {
-      tripName: inputs.tripName.value,
-      totalBudget: inputs.totalBudget.value,
-      tripCurrency: inputs.tripCurrency.value,
-      dailyBudget: inputs.dailyBudget.value,
-      startDate: startDate,
-      endDate: endDate,
-      tripid: editedTripId,
-      travellers: travellers,
-      isDynamicDailyBudget: inputs.isDynamicDailyBudget.value,
-    };
-
+  function checkFormValidity(tripData: TripData) {
     // Tripname should not be empty or spaces
     const tripNameIsValid =
       tripData.tripName && tripData.tripName.trim()?.length > 0;
@@ -465,14 +450,16 @@ const TripForm = ({ navigation, route }) => {
       inputs.tripName.isValid = tripNameIsValid;
       Alert.alert(i18n.t("enterNameAlert"));
       setIsLoading(false);
-      return;
+      Toast.hide();
+      return false;
     }
 
     if (!dynamicIsValid) {
       inputs.totalBudget.isValid = dynamicIsValid;
       Alert.alert(i18n.t("error"), "Please enter a total Budget number!"); //(i18n.t("enterBudgetAlert"));
       setIsLoading(false);
-      return;
+      Toast.hide();
+      return false;
     }
 
     if (!totalBudgetIsValid || !dailyBudgetIsValid) {
@@ -480,15 +467,54 @@ const TripForm = ({ navigation, route }) => {
       inputs.dailyBudget.isValid = dailyBudgetIsValid;
       Alert.alert(i18n.t("error"), i18n.t("enterBudgetAlert"));
       setIsLoading(false);
-      return;
+      Toast.hide();
+      return false;
     }
 
     if (!tripCurrencyIsValid) {
       inputs.tripCurrency.isValid = tripCurrencyIsValid;
       Alert.alert(i18n.t("error"), i18n.t("selectCurrencyAlert"));
       setIsLoading(false);
+      Toast.hide();
+      return false;
+    }
+    return true;
+  }
+
+  async function submitHandler(setActive = false) {
+    if (!isEditing) {
+      if (await isLimitedByPremium()) {
+        navigation.navigate("Paywall");
+        return;
+      }
+    }
+    navigation.pop();
+    Toast.show({
+      type: "loading",
+      text1: i18n.t("toastSaving1"),
+      text2: i18n.t("toastSaving2"),
+      autoHide: false,
+    });
+    if (!isConnected) {
+      Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
+      setIsLoading(false);
+      Toast.hide();
       return;
     }
+    const tripData: TripData = {
+      tripName: inputs.tripName.value,
+      totalBudget: inputs.totalBudget.value,
+      tripCurrency: inputs.tripCurrency.value,
+      dailyBudget: inputs.dailyBudget.value,
+      startDate: startDate,
+      endDate: endDate,
+      tripid: editedTripId,
+      travellers: travellers,
+      isDynamicDailyBudget: inputs.isDynamicDailyBudget.value,
+    };
+
+    const formIsValid = checkFormValidity(tripData);
+    if (!formIsValid) return;
     // if isEditing update Trip, else store
     if (!tripData.totalBudget) tripData.totalBudget = "0";
     console.log("submitHandler ~ setActive:", setActive);
@@ -500,6 +526,7 @@ const TripForm = ({ navigation, route }) => {
       }
     } catch (error) {
       setIsLoading(false);
+      Toast.hide();
       console.log("submitHandler ~ error:", error);
       Alert.alert(
         "Sorry! We got an unexpected Error, please try again!",
@@ -509,6 +536,10 @@ const TripForm = ({ navigation, route }) => {
       return;
     }
     setIsLoading(false);
+    Toast.hide();
+    // sleep 1 second to let the toast disappear
+    await sleep(1000);
+    navigation.navigate("RecentExpenses");
   }
 
   function updateCurrency() {
@@ -639,7 +670,7 @@ const TripForm = ({ navigation, route }) => {
   if (isLoading) {
     return (
       <LoadingBarOverlay
-        customText="Loading new trip..."
+        customText={i18n.t("loadingYourTrip")}
         containerStyle={GlobalStyles.wideStrongShadow}
         progress={loadingProgress == 0 ? null : loadingProgress / 9}
         // progressMax={10}

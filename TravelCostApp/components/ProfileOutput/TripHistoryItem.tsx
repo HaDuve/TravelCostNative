@@ -193,7 +193,6 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
         new Date(tripCtx.endDate),
         new Date(tripCtx.startDate)
       );
-      console.log("useEffect ~ days:", days);
       setDays(days);
       setSumOfExpenses(sumOfExpenses);
       const dynamicDailyBudget = (
@@ -210,6 +209,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       if (objTravellers.length > 0) setTravellers(objTravellers);
 
       setIsFetching(false);
+      console.log("useEffect context success! for:", tripName);
     }
 
     async function fetchAndSetTripData() {
@@ -222,6 +222,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       try {
         fetchAndSetTripData();
         setAllLoaded(true);
+        console.log("useEffect fetch success! for:", tripName);
       } catch (error) {
         console.log("error while fetching TripData", error);
       }
@@ -238,11 +239,12 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
     tripCtx.totalBudget,
     tripCtx.dailyBudget,
     tripCtx.tripCurrency,
-    tripCtx.travellers.length,
     tripCtx.isDynamicDailyBudget,
     tripCtx.startDate,
     tripCtx.endDate,
     allLoaded,
+    contextTrip,
+    netCtx.strongConnection,
   ]);
 
   const noTotalBudget =

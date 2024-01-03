@@ -196,7 +196,7 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
       );
       axios_calls.push(new_axios_call);
     } catch (error) {
-      console.warn("error while fetchingExpenses of user: ", uid, error);
+      console.log("error while fetchingExpenses of user: ", uid, error);
       throw new Error("error while fetchingExpenses of user: " + uid);
     }
   });
@@ -283,7 +283,7 @@ export async function fetchExpenses(tripid: string, uid: string) {
 
     return expenses;
   } catch (error) {
-    console.warn(error);
+    console.log(error);
     throw new Error("error while fetching expenses");
   }
 }
@@ -310,7 +310,7 @@ export function updateExpense(
     );
     return response;
   } catch (error) {
-    console.warn(error);
+    console.log(error);
     throw new Error("error while updating expense");
   }
 }
@@ -332,7 +332,7 @@ export function deleteExpense(tripid: string, uid: string, id: string) {
     );
     return response;
   } catch (error) {
-    console.warn(error);
+    console.log(error);
     throw new Error("error while deleting expense");
   }
 }
@@ -373,7 +373,7 @@ export async function updateUser(uid: string, userData: UserData) {
 export async function fetchUser(uid: string) {
   // console.log("https: ~ fetchUser ~ uid", uid);
   if (!uid) {
-    console.warn("https: ~ fetchUser ~ uid is empty");
+    console.log("https: ~ fetchUser ~ uid is empty");
     return null;
   }
   try {
@@ -575,7 +575,7 @@ export async function fetchCurrentTrip(userId: string) {
     );
     // console.log("https: ~ fetchCurrentTrip ~ response", response.data);
     if (!response?.data?.currentTrip)
-      console.warn("https: ~ could not find current trip of this user!");
+      console.log("https: ~ could not find current trip of this user!");
     return response.data.currentTrip;
   } catch (error) {
     throw new Error("error while fetching current trip");

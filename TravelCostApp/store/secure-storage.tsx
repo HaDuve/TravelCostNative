@@ -25,7 +25,7 @@ export async function secureStoreGetItem(key: string) {
     // console.log("🔐 Here's your value 🔐 \n", result.slice(0, 10));
     return result;
   } else {
-    console.warn("No values stored under that key.", key);
+    console.log("No values stored under that key.", key);
     return "";
   }
 }
@@ -53,7 +53,7 @@ export async function secureStoreGetObject(key: string) {
     // parse the result and return it
     return JSON.parse(result);
   } else {
-    console.warn("No values stored under that key.", key);
+    console.log("No values stored under that key.", key);
   }
 }
 

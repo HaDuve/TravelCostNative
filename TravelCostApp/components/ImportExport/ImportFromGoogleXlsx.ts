@@ -246,7 +246,7 @@ async function importCostDataFromGSXlsx(
       splitCostList.push((percentage / 100) * amount);
       splitCostList.push(((100 - percentage) / 100) * amount);
     } else {
-      console.warn("Invalid whopaid");
+      console.log("Invalid whopaid");
     }
     return splitCostList;
   }

@@ -264,7 +264,7 @@ function TripContextProvider({ children }) {
       await saveTripDataInStorage(trip);
       return trip;
     } catch (error) {
-      console.warn(
+      console.log(
         "error while fetchCurrent Trip in trip-context searching for ",
         tripid,
         error.message
@@ -286,7 +286,7 @@ function TripContextProvider({ children }) {
       await saveTripDataInStorage(trip);
       await updateTrip(tripid, trip);
     } catch (error) {
-      console.warn(
+      console.log(
         "error while fetchCurrent Trip in trip-context searching for ",
         tripid
       );
@@ -351,7 +351,7 @@ function TripContextProvider({ children }) {
 
       return tripData;
     } else {
-      console.warn("no tripdata loaded from Storage!");
+      console.log("no tripdata loaded from Storage!");
       setIsLoading(false);
     }
   }

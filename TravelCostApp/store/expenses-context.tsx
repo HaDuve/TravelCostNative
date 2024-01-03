@@ -326,7 +326,7 @@ function ExpensesContextProvider({ children }) {
       setExpenses(expArray);
       // console.log("loadExpensesFromStorage ~ expArray:", expArray);
     } else {
-      console.warn("no Expenses loaded from Storage!");
+      // console.log("no Expenses loaded from Storage!");
     }
     return true;
   }

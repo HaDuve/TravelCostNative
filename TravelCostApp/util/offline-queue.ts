@@ -283,7 +283,7 @@ export async function sendOfflineQueue(
         if (item.type === "add") {
           const oldId = item.expense.id || item.expense.expenseData.id || null;
           if (!oldId)
-            console.warn(
+            console.log(
               "debugOQ no old ID in item.expense:",
               oldId,
               item.expense.expenseData.description

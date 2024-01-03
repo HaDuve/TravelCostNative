@@ -9,7 +9,7 @@ export function formatExpenseWithCurrency(
 ): string {
   if (typeof amount === "string") amount = Number(amount);
   if (isNaN(amount)) {
-    console.warn("calling formatExpenseWithCurrency without a number");
+    // console.log("calling formatExpenseWithCurrency without a number");
     return "";
   }
 

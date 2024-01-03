@@ -137,7 +137,7 @@ const PaywallScreen = ({ navigation }) => {
   );
 
   const footer = () => {
-    // console.warn(
+    // console.log(
     //   "Modify this value to reflect your app's Privacy Policy and Terms & Conditions agreements. Required to make it through App Review."
     // );
     return (

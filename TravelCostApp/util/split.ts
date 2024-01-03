@@ -141,7 +141,7 @@ export function calcSplitList(
     console.log("whoPaid:", whoPaid);
     console.log("splitType:", splitType);
     console.log("amount:", amount);
-    console.warn("calcSplitlist failed");
+    console.log("calcSplitlist failed");
     return;
   }
 

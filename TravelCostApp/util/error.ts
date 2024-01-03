@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // Note: Error handling utilities
 /**
  * Logs an error message to the console, including the file name and line number where the error occurred.

@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 
-import { useContext, useEffect, useLayoutEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   fetchTrip,
   getAllExpenses,
@@ -16,13 +16,14 @@ import {
   updateUser,
   updateTripHistory,
   putTravelerInTrip,
+  getTravellers,
+  TravellerNames,
 } from "../util/http";
 import { UserContext } from "../store/user-context";
 import { AuthContext } from "../store/auth-context";
 import { TripContext, TripData } from "../store/trip-context";
 import { GlobalStyles } from "../constants/styles";
 import Input from "../components/Auth/Input";
-import * as Updates from "expo-updates";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
@@ -31,20 +32,16 @@ import { ExpensesContext } from "../store/expenses-context";
 import React from "react";
 import FlatButton from "../components/UI/FlatButton";
 import Button from "../components/UI/Button";
-import { G } from "react-native-svg";
-import LoadingOverlay from "../components/UI/LoadingOverlay";
 import PropTypes from "prop-types";
 import { ActivityIndicator } from "react-native-paper";
 
-import { reloadApp } from "../util/appState";
 import BackButton from "../components/UI/BackButton";
-import { asyncStoreSetItem, asyncStoreSetObject } from "../store/async-storage";
 import { NetworkContext } from "../store/network-context";
 import uniqBy from "lodash.uniqby";
 import { secureStoreSetItem } from "../store/secure-storage";
 import { setMMKVObject } from "../store/mmkv";
-import { err } from "react-native-svg/lib/typescript/xml";
 import safeLogError from "../util/error";
+import Animated, { FadeIn } from "react-native-reanimated";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -100,62 +97,58 @@ const JoinTrip = ({ navigation, route }) => {
     // either we press the confirm or the cancel button (join=true/false)
     if (!join) {
       navigation.pop();
-    } else {
-      setIsFetching(true);
-      try {
-        tripid = joinTripid;
-        console.log("joinHandler ~ tripid", tripid);
-        console.log("joinHandler ~ uid:", uid);
-        console.log("joinHandler ~ userCtx.tripHistory:", userCtx.tripHistory);
-        console.log("joinHandler ~ userCtx.userName:", userCtx.userName);
-        // if fresh store history else update
-        if (userCtx.freshlyCreated) {
-          await storeTripHistory(uid, [tripid]);
-        } else {
-          await updateTripHistory(uid, tripid);
-        }
-        userCtx.setTripHistory(
-          uniqBy([...(userCtx.tripHistory ?? []), tripid])
-        );
+      return;
+    }
+    setIsFetching(true);
+    try {
+      tripid = joinTripid;
 
+      // if fresh store history else update
+      if (userCtx.freshlyCreated) {
+        await storeTripHistory(uid, [tripid]);
+      } else {
+        await updateTripHistory(uid, tripid);
+      }
+      userCtx.setTripHistory(uniqBy([...(userCtx.tripHistory ?? []), tripid]));
+
+      updateUser(uid, {
+        currentTrip: tripid,
+      });
+      try {
+        await tripCtx.setCurrentTrip(tripid, tripdata);
+        await tripCtx.fetchAndSetTravellers(tripid);
+        await userCtx.setFreshlyCreatedTo(false);
+        await userCtx.loadCatListFromAsyncInCtx(tripid);
+      } catch (error) {
+        safeLogError(error);
+        throw new Error("Error while updating user in context");
+      }
+
+      const expenses = await getAllExpenses(tripid, uid);
+      expenseCtx.setExpenses(expenses);
+      tripdata.expenses = [];
+      setMMKVObject("currentTrip", tripdata);
+      await secureStoreSetItem("currentTripId", tripid);
+      // await asyncStoreSetObject("expenses", expenses);
+      setMMKVObject("expenses", expenses);
+
+      const travellers: TravellerNames = await getTravellers(tripid);
+      // only put traveller in trip if not already in trip
+      if (!travellers[userCtx.userName])
         await putTravelerInTrip(tripid, {
           uid: uid,
           userName: userCtx.userName,
         });
-
-        updateUser(uid, {
-          currentTrip: tripid,
-        });
-        try {
-          await tripCtx.setCurrentTrip(tripid, tripdata);
-          await tripCtx.fetchAndSetTravellers(tripid);
-          await userCtx.setFreshlyCreatedTo(false);
-          await userCtx.loadCatListFromAsyncInCtx(tripid);
-        } catch (error) {
-          safeLogError(error);
-          throw new Error("Error while updating user in context");
-        }
-
-        const expenses = await getAllExpenses(tripid, uid);
-        console.log("joinHandler ~ expenses length:", expenses?.length);
-        expenseCtx.setExpenses(expenses);
-        tripdata.expenses = [];
-        setMMKVObject("currentTrip", tripdata);
-        await secureStoreSetItem("currentTripId", tripid);
-        // await asyncStoreSetObject("expenses", expenses);
-        setMMKVObject("expenses", expenses);
-
-        // // Immediately reload the React Native Bundle
-        // const r = await reloadApp();
-        // if (r == -1)
-        navigation.popToTop();
-      } catch (error) {
-        Alert.alert("Exception", "Please try again later.\n" + error.message);
-        console.error(error);
-        navigation.popToTop();
-      }
-      setIsFetching(false);
+      // // Immediately reload the React Native Bundle
+      // const r = await reloadApp();
+      // if (r == -1)
+      navigation.popToTop();
+    } catch (error) {
+      Alert.alert("Exception", "Please try again later.\n" + error.message);
+      safeLogError(error);
+      navigation.popToTop();
     }
+    setIsFetching(false);
   }
 
   async function joinLinkHandler() {
@@ -230,9 +223,24 @@ const JoinTrip = ({ navigation, route }) => {
         </View>
       )}
       {tripName?.length > 1 && (
-        <Text style={{ padding: 16, fontSize: 22 }}>{i18n.t("joinTrip")}?</Text>
+        <Text
+          style={{
+            alignSelf: "center",
+            padding: 16,
+            fontSize: 16,
+          }}
+        >
+          {i18n.t("joinTrip")}?
+        </Text>
       )}
-      <Text style={{ padding: 4, fontSize: 26, fontWeight: "bold" }}>
+      <Text
+        style={{
+          alignSelf: "center",
+          padding: 4,
+          fontSize: 26,
+          fontWeight: "bold",
+        }}
+      >
         {tripName}
       </Text>
       <View style={styles.buttonContainer}>
@@ -240,13 +248,15 @@ const JoinTrip = ({ navigation, route }) => {
           {i18n.t("cancel")}
         </FlatButton>
         {tripName?.length > 0 && !isFetching && (
-          <Button
-            style={{ marginLeft: "10%" }}
-            buttonStyle={{ paddingHorizontal: "20%" }}
-            onPress={joinHandler.bind(this, true)}
-          >
-            {i18n.t("confirm2")}
-          </Button>
+          <Animated.View entering={FadeIn}>
+            <Button
+              style={{ marginLeft: "10%" }}
+              buttonStyle={{ paddingHorizontal: "20%" }}
+              onPress={joinHandler.bind(this, true)}
+            >
+              {i18n.t("confirm2")}
+            </Button>
+          </Animated.View>
         )}
       </View>
     </KeyboardAvoidingView>
@@ -289,9 +299,10 @@ const styles = StyleSheet.create({
     marginBottom: "2%",
     alignItems: "center",
     justifyContent: "space-between",
+    alignSelf: "center",
     ...Platform.select({
       ios: {
-        marginLeft: "-7,5%",
+        marginLeft: "-7.5%",
       },
       android: {
         padding: "3%",

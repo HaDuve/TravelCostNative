@@ -475,7 +475,9 @@ export async function fetchTripsTravellers(tripid: string) {
   }
 }
 
-export async function getTravellers(tripid: string) {
+export type TravellerNames = string[];
+
+export async function getTravellers(tripid: string): Promise<TravellerNames> {
   // console.log("getTravellers ~ tripid", tripid);
   try {
     const response = await fetchTripsTravellers(tripid);
@@ -530,7 +532,6 @@ export async function getAllExpenses(tripid: string, uid?: string) {
 export async function updateTripHistory(userId: string, newTripid: string) {
   // console.log("updateTripHistory ~ newTripid", newTripid);
   const tripHistory = await fetchTripHistory(userId);
-  console.log("updateTripHistory ~ tripHistory:", tripHistory);
   // if triphistory empty, just await storeTripHistory(uid, [tripid]);
   if (!tripHistory) return storeTripHistory(userId, [newTripid]);
   // look for newTripid inside of oldTripHistory

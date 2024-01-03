@@ -199,7 +199,6 @@ const TripForm = ({ navigation, route }) => {
           tripCtx.isDynamicDailyBudget
         );
         setIsLoading(false);
-        console.log("loaded from context");
         return;
       } else {
         setIsLoading(true);
@@ -243,7 +242,6 @@ const TripForm = ({ navigation, route }) => {
 
   async function deleteAcceptHandler() {
     const trips = route.params.trips;
-    console.log("deleteAcceptHandler ~ trips:", trips);
     // if triplist?.length == 1 await userCtx.setFreshlyCreatedTo(true);
     // await deleteTrip(editedTripId);
   }
@@ -272,10 +270,8 @@ const TripForm = ({ navigation, route }) => {
 
   async function editingTripData(tripData: TripData, setActive = false) {
     try {
-      console.log("editingTripData ~ tripData:", tripData.tripName);
       await updateTrip(editedTripId, tripData);
       setLoadingProgress(1);
-      console.log("editingTripData ~ editedTripId:", editedTripId);
       if (editedTripId === tripCtx.tripid || setActive) {
         await secureStoreSetItem("currentTripId", editedTripId);
         await tripCtx.saveTripDataInStorage(tripData);
@@ -297,12 +293,6 @@ const TripForm = ({ navigation, route }) => {
         // expenses.forEach((element) => {
         //   expenseCtx.addExpense(element);
         // });
-        console.log(
-          "editingTripData ~ expenses:",
-          expenses.length,
-          "for:",
-          tripData.tripName
-        );
         setMMKVObject("expenses", expenses);
         tripCtx.setdailyBudget(tripData.dailyBudget);
         return;
@@ -311,8 +301,7 @@ const TripForm = ({ navigation, route }) => {
       Toast.hide();
       return;
     } catch (error) {
-      console.log("editingTripData ~ error:", error);
-      // Alert.alert("Error", "Error while saving trip, please try again!");
+      safeLogError(error);
       navigation.popToTop();
       Toast.hide();
     }
@@ -325,25 +314,12 @@ const TripForm = ({ navigation, route }) => {
     await putTravelerInTrip(tripid, { userName: userName, uid: uid });
     setLoadingProgress(4);
 
-    console.log("TripForm ~ tripid in saveTripData:", tripid);
     await secureStoreSetItem("currentTripId", tripid);
     // await asyncStoreSetObject("expenses", []);
     setMMKVObject("expenses", []);
 
-    console.log(
-      "createTripData ~ userCtx.freshlyCreated:",
-      userCtx.freshlyCreated
-    );
-    console.log("createTripData ~ bp 1");
-
     // the following context state functions are unnecessary as long as we reload
     try {
-      console.log("createTripData ~ tripid:", tripid);
-      console.log("createTripData ~ tripData:", tripData);
-      console.log(
-        "createTripData ~ userCtx.freshlyCreated:",
-        userCtx.freshlyCreated
-      );
       await tripCtx.setCurrentTrip(tripid, tripData);
       setLoadingProgress(5);
 
@@ -352,19 +328,16 @@ const TripForm = ({ navigation, route }) => {
         userCtx.setNeedsTour(true);
       }
     } catch (error) {
-      console.log("error with setting context", error.message);
+      safeLogError(error);
     }
-    console.log("createTripData ~ bp 2");
 
     try {
       if (userCtx.tripHistory?.length > 0)
         userCtx.setTripHistory([...userCtx.tripHistory, tripid]);
       else userCtx.setTripHistory([tripid]);
     } catch (error) {
-      console.log("error with setting tripHistory in context", error.message);
+      safeLogError(error);
     }
-
-    console.log("createTripData ~ bp 3");
 
     // if fresh store TripHistory else update TripHistory
     try {
@@ -374,9 +347,8 @@ const TripForm = ({ navigation, route }) => {
         await updateTripHistory(uid, tripid);
       }
     } catch (error) {
-      console.log("error whith triphistory:", error.message);
+      safeLogError(error);
     }
-    console.log("createTripData ~ bp 4");
     setLoadingProgress(7);
     await updateUser(uid, {
       userName: userName,
@@ -428,15 +400,10 @@ const TripForm = ({ navigation, route }) => {
         +tripData.totalBudget < MAX_JS_NUMBER &&
         +tripData.totalBudget > +tripData.dailyBudget);
 
-    console.log(
-      "submitHandler ~ tripData.isDynamicDailyBudget:",
-      tripData.isDynamicDailyBudget
-    );
     const dynamicIsValid =
       !tripData.isDynamicDailyBudget ||
       (tripData.isDynamicDailyBudget && totalBudgetIsValid);
 
-    console.log("submitHandler ~ totalBudgetIsValid:", totalBudgetIsValid);
     const dailyBudgetIsValid =
       !isNaN(+tripData.dailyBudget) &&
       +tripData.dailyBudget > 0 &&
@@ -444,7 +411,6 @@ const TripForm = ({ navigation, route }) => {
       (!tripData.totalBudget ||
         tripData.totalBudget === "0" ||
         +tripData.dailyBudget < +tripData.totalBudget);
-    console.log("submitHandler ~ dailyBudgetIsValid:", dailyBudgetIsValid);
 
     if (!tripNameIsValid) {
       inputs.tripName.isValid = tripNameIsValid;
@@ -517,7 +483,6 @@ const TripForm = ({ navigation, route }) => {
     if (!formIsValid) return;
     // if isEditing update Trip, else store
     if (!tripData.totalBudget) tripData.totalBudget = "0";
-    console.log("submitHandler ~ setActive:", setActive);
     try {
       if (isEditing) {
         await editingTripData(tripData, setActive);
@@ -525,9 +490,9 @@ const TripForm = ({ navigation, route }) => {
         await createTripData(tripData);
       }
     } catch (error) {
+      safeLogError(error);
       setIsLoading(false);
       Toast.hide();
-      console.log("submitHandler ~ error:", error);
       Alert.alert(
         "Sorry! We got an unexpected Error, please try again!",
         error.message
@@ -789,15 +754,10 @@ const TripForm = ({ navigation, route }) => {
                     onPressStyle={GlobalStyles.pressedWithShadow}
                     onPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      console.log("recalculate");
-                      console.log("Start Date:", startDate);
-                      console.log("End Date:", endDate);
                       const diffDays =
                         daysBetween(new Date(endDate), new Date(startDate)) + 1;
-                      console.log("Days:", diffDays);
                       const calcTotalBudget =
                         Number(inputs.dailyBudget.value) * diffDays;
-                      console.log("Total calc:", calcTotalBudget);
                       inputChangedHandler(
                         "totalBudget",
                         calcTotalBudget.toString()
@@ -851,19 +811,14 @@ const TripForm = ({ navigation, route }) => {
                           Haptics.impactAsync(
                             Haptics.ImpactFeedbackStyle.Light
                           );
-                          console.log("recalculate");
-                          console.log("Start Date:", startDate);
-                          console.log("End Date:", endDate);
                           const diffDays =
                             daysBetween(
                               new Date(endDate),
                               new Date(startDate)
                             ) + 1;
-                          console.log("Days:", diffDays);
                           const calcDailyBudget = (
                             Number(inputs.totalBudget.value) / diffDays
                           ).toFixed(2);
-                          console.log("Daily calc:", calcDailyBudget);
                           inputChangedHandler(
                             "dailyBudget",
                             calcDailyBudget.toString()

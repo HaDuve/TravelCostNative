@@ -66,6 +66,7 @@ import { formatExpenseWithCurrency } from "../../util/string";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import Toast from "react-native-toast-message";
 import { sleep } from "../../util/appState";
+import safeLogError from "../../util/error";
 
 const TripForm = ({ navigation, route }) => {
   const tripCtx = useContext(TripContext);
@@ -180,9 +181,8 @@ const TripForm = ({ navigation, route }) => {
         setStartDate(selectedTrip.startDate);
         setEndDate(selectedTrip.endDate);
         setTravellers(selectedTrip.travellers);
-        console.log("travellers", selectedTrip.travellers);
       } catch (error) {
-        console.error(error);
+        safeLogError(error);
       }
       setIsLoading(false);
     };
@@ -561,11 +561,9 @@ const TripForm = ({ navigation, route }) => {
     let titleText = "";
     let contentText = "";
     const diffDays = daysBetween(new Date(endDate), new Date(startDate)) + 1;
-    console.log("Days:", diffDays);
     const calcDailyBudget = (
       Number(inputs.totalBudget.value) / diffDays
     ).toFixed(2);
-    console.log("Daily calc:", calcDailyBudget);
     const totalBudget = inputs.totalBudget.value;
     const currency = inputs.tripCurrency.value;
     switch (infoEnu) {

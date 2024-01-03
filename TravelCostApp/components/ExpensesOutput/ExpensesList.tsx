@@ -79,6 +79,8 @@ import {
 import { TripAsObject } from "../../screens/TripSummaryScreen";
 import { create } from "react-test-renderer";
 import { AuthContext } from "../../store/auth-context";
+import { G } from "react-native-svg";
+import { Pressable } from "react-native";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -665,20 +667,21 @@ function ExpensesList({
     if (selected?.length === 0) return;
     Alert.alert(
       `Delete selected expenses?`,
-      `This will delete all selected entries!`,
+      `This will delete ${selected.length} selected entries!`,
       [
         //i18n.t("deleteAllExpenses"), i18n.t("deleteAllExpensesExt")
         // The "No" button
         // Does nothing but dismiss the dialog when tapped
         {
-          text: i18n.t("no"),
+          text: i18n.t("cancel"),
           onPress: () => {
             return;
           },
         },
         // The "Yes" button
         {
-          text: i18n.t("yes"),
+          text: i18n.t("delete"),
+          style: "destructive",
           onPress: async () => {
             try {
               navigation?.popToTop();
@@ -916,13 +919,14 @@ function ExpensesList({
           exiting={FadeOutUp.duration(200).easing(Easing.linear)}
           style={[styles.scrollToTopButton, GlobalStyles.shadowPrimary]}
         >
-          <TouchableOpacity
+          <Pressable
+            style={({ pressed }) => [pressed && GlobalStyles.pressedWithShadow]}
             onPress={() => {
               scrollToTopHandler();
             }}
           >
-            <Text style={styles.scrollToTopText}>Scroll To Top</Text>
-          </TouchableOpacity>
+            <Text style={styles.scrollToTopText}>⬆️ Scroll To Top</Text>
+          </Pressable>
         </Animated.View>
       )}
     </Animated.View>
@@ -953,7 +957,7 @@ const styles = StyleSheet.create({
     flex: 1,
     position: "absolute",
     top: 10,
-    left: "35%",
+    alignSelf: "center",
     paddingHorizontal: 8,
     paddingVertical: 4,
     backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -963,7 +967,7 @@ const styles = StyleSheet.create({
   },
   scrollToTopText: {
     color: GlobalStyles.colors.primary700,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "bold",
   },
   fastExpenseContainer: {

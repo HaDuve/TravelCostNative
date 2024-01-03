@@ -156,7 +156,6 @@ const SettingsScreen = ({ navigation }) => {
         }),
       }}
     >
-      {DEVELOPER_MODE && <DevContent navigation={navigation} />}
       <BlurView
         intensity={isAndroid ? 280 : 90}
         style={{
@@ -182,6 +181,7 @@ const SettingsScreen = ({ navigation }) => {
           <Text style={styles.titleText}>{i18n.t("settingsTitle")}</Text>
         </View>
       </BlurView>
+      {DEVELOPER_MODE && <DevContent navigation={navigation} />}
       <SettingsSection multiTraveller={multiTraveller}></SettingsSection>
       <GradientButton
         style={styles.settingsButton}

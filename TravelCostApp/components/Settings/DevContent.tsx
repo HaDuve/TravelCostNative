@@ -205,13 +205,15 @@ const DevContent = ({ navigation }) => {
       >
         trackPurchaseEvent
       </Button>
-
-      <LoadingBarOverlay
-        progress={0.3}
-        progressAt={3}
-        progressMax={10}
-      ></LoadingBarOverlay>
-
+      <Button
+        onPress={async () => {
+          await tripCtx.fetchAndSettleCurrentTrip(true);
+          navigation.pop();
+        }}
+        style={styles.settingsButton}
+      >
+        UnsettleAllSplits
+      </Button>
       <Button
         onPress={importExcelFile.bind(
           this,
@@ -244,15 +246,6 @@ const DevContent = ({ navigation }) => {
         {/* in die heruntergeladene GoogleSheets als Xlsx */}
         {/* danach muss zurueck konvertiert werden  */}
         Export FoodForNomads
-      </Button>
-      <Button
-        onPress={async () => {
-          await tripCtx.fetchAndSettleCurrentTrip(true);
-          navigation.pop();
-        }}
-        style={styles.settingsButton}
-      >
-        UnsettleAllSplits
       </Button>
     </View>
   );

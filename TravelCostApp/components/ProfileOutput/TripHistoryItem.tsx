@@ -57,6 +57,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const expenseCtx = useContext(ExpensesContext);
+  const contextTrip = tripCtx.tripid == tripid;
   const netCtx = useContext(NetworkContext);
   // list of objects containing the userName key
   const [travellers, setTravellers] = useState([]);
@@ -77,8 +78,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
     if (isNaN(calcDynamicBudget) || calcDynamicBudget < 0)
       calcDynamicBudget = 0.01;
     setDailyBudget(calcDynamicBudget.toFixed(2));
-    if (tripCtx.tripid == tripid)
-      tripCtx.setdailyBudget(calcDynamicBudget.toFixed(2));
+    if (contextTrip) tripCtx.setdailyBudget(calcDynamicBudget.toFixed(2));
   }, [
     sumOfExpenses,
     totalBudget,
@@ -171,7 +171,6 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       }
     }
 
-    const contextTrip = tripCtx.tripid == tripid;
     if (contextTrip) {
       const isDynamic = tripCtx.isDynamicDailyBudget;
       setIsDynamicDailyBudget(isDynamic);
@@ -284,10 +283,9 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
     navigation.navigate("ManageTrip", { tripId: tripid, trips: trips });
   }
 
-  const activeBorder =
-    tripid === tripCtx.tripid
-      ? { borderWidth: 1, borderColor: GlobalStyles.colors.primary400 }
-      : {};
+  const activeBorder = contextTrip
+    ? { borderWidth: 1, borderColor: GlobalStyles.colors.primary400 }
+    : {};
 
   const activeProgress = progress;
   const isOverBudget = noTotalBudget
@@ -302,7 +300,12 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
         style={({ pressed }) => pressed && GlobalStyles.pressed}
       >
         <View
-          style={[styles.tripItem, GlobalStyles.wideStrongShadow, activeBorder]}
+          style={[
+            styles.tripItem,
+            GlobalStyles.wideStrongShadow,
+            !contextTrip && styles.inactive,
+            activeBorder,
+          ]}
         >
           <View style={[styles.topRow]}>
             <View>
@@ -369,7 +372,12 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       style={({ pressed }) => pressed && GlobalStyles.pressed}
     >
       <View
-        style={[styles.tripItem, GlobalStyles.wideStrongShadow, activeBorder]}
+        style={[
+          styles.tripItem,
+          !contextTrip && styles.inactive,
+          GlobalStyles.wideStrongShadow,
+          activeBorder,
+        ]}
       >
         <View
           style={[styles.topRow, isScaledUp && { flexDirection: "column" }]}
@@ -446,6 +454,9 @@ const styles = StyleSheet.create({
     margin: 12,
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: 12,
+  },
+  inactive: {
+    opacity: 0.7,
   },
   topRow: {
     marginVertical: 8,

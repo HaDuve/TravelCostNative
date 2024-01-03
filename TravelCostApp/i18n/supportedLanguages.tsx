@@ -164,9 +164,9 @@ const en = {
     "Do you already know Budget for Nomads?\n" +
     "The app makes it super easy to keep track of all expenses while traveling and mutual debts.\n" +
     "For our upcoming trip, I also want to invite you to the app!" +
-    " Let's track our costs together and travel carefree.\n" +
-    "Download the app for free here:\n" +
-    "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=en" +
+    // " Let's track our costs together and travel carefree.\n" +
+    // "Download the app for free here:\n" +
+    // "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=en" +
     "\nAfter installing the app, join our trip here:\n",
   noTrip: "Could not find trip!",
   tryAgain: "Please try again later.",
@@ -576,9 +576,9 @@ const de = {
     "Kennst du schon Budget for Nomads?\n" +
     "Die App macht es kinderleicht, alle Ausgaben auf Reisen und gegenseitige Schulden im Blick zu behalten.\n" +
     "Für unsere bevorstehende Reise möchte ich dich auch zu der App einladen!" +
-    " Lass uns gemeinsam unsere Kosten tracken und unbeschwert reisen.\n" +
-    "Lade hier die App kostenlos herunter:\n" +
-    "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=de" +
+    // " Lass uns gemeinsam unsere Kosten tracken und unbeschwert reisen.\n" +
+    // "Lade hier die App kostenlos herunter:\n" +
+    // "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=de" +
     "\nNachdem du die App installiert hast, schließe dich hier unserer Reise an:\n",
   noTrip: "Reise nicht gefunden!",
   tryAgain: "Bitte versuche es später erneut!",
@@ -1005,9 +1005,9 @@ const fr = {
     "Connais-tu déjà Budget for Nomads ?\n" +
     "Cette application facilite grandement le suivi de toutes les dépenses lors de voyages et des dettes mutuelles.\n" +
     "Pour notre prochain voyage, je souhaite également t'inviter à utiliser l'application !" +
-    " Suivons ensemble nos dépenses et voyageons en toute tranquillité.\n" +
-    "Télécharge l'application gratuitement ici :\n" +
-    "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=fr" +
+    // " Suivons ensemble nos dépenses et voyageons en toute tranquillité.\n" +
+    // "Télécharge l'application gratuitement ici :\n" +
+    // "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=fr" +
     "\nAprès avoir installé l'application, rejoins notre voyage ici :\n",
 
   noTrip: "Impossible de trouver le voyage !",
@@ -1427,9 +1427,9 @@ const ru = {
     "Ты уже знаком с Budget for Nomads?\n" +
     "Это приложение позволяет легко отслеживать все расходы во время путешествий и взаимные долги.\n" +
     "Для нашей предстоящей поездки я также хочу пригласить тебя в это приложение!" +
-    " Давай отслеживать наши расходы вместе и путешествовать беззаботно.\n" +
-    "Скачай приложение бесплатно здесь:\n" +
-    "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=ru" +
+    // " Давай отслеживать наши расходы вместе и путешествовать беззаботно.\n" +
+    // "Скачай приложение бесплатно здесь:\n" +
+    // "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=ru" +
     "\nПосле установки приложения, присоединяйся к нашей поездке здесь:\n",
 
   noTrip: "Не удалось найти поездку!",

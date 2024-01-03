@@ -39,7 +39,7 @@ export async function onShare(shareId, navigation) {
   navigation.navigate("Profile");
 }
 
-const ShareTripButton = ({ route, navigation }) => {
+const ShareTripButton = ({ route }) => {
   const shareId = route.params?.tripId;
 
   return (

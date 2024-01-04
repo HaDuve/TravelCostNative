@@ -87,13 +87,9 @@ export const fetchServerInfo = async () => {
     if (!response) throw new Error("No response from server");
     const data = response?.data;
     if (!data) throw new Error("No data on the server");
-    console.log("fetchServerInfo ~ data:", data);
-
-    // Return or set the data to your state or do other operations as needed
     return data;
   } catch (error) {
-    console.error("Error fetching server info from Firebase:", error);
-    // Handle errors as per your app's requirements
+    safeLogError(error);
   }
 };
 
@@ -109,7 +105,7 @@ export async function fetchCategories(tripid: string) {
     );
     if (response) return JSON.parse(response.data);
   } catch (error) {
-    console.error(error);
+    safeLogError(error);
   }
 }
 
@@ -120,13 +116,11 @@ export async function deleteCategories(tripid: string) {
     );
     return response?.data;
   } catch (error) {
-    // log error
-    console.log("deleteCategories:", error);
+    safeLogError(error);
   }
 }
 
 export async function patchCategories(tripid: string, categories: Category[]) {
-  console.log("categories:", categories);
   const json = JSON.stringify(categories);
   try {
     const response = await axios.post(
@@ -136,7 +130,7 @@ export async function patchCategories(tripid: string, categories: Category[]) {
     return response;
   } catch (error) {
     // log error
-    console.log("patchCategories:", error);
+    safeLogError(error);
   }
 }
 
@@ -166,10 +160,7 @@ export async function storeExpense(tripid: string, uid: string, expenseData) {
     const id: string = response.data.name;
     return id;
   } catch (error) {
-    console.error(
-      `Failed to store expense for trip ${tripid}: ${error.message}`
-    );
-    throw new Error(`Failed to store expense for trip ${tripid}`);
+    safeLogError(error);
   }
 }
 
@@ -196,8 +187,7 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
       );
       axios_calls.push(new_axios_call);
     } catch (error) {
-      console.log("error while fetchingExpenses of user: ", uid, error);
-      throw new Error("error while fetchingExpenses of user: " + uid);
+      safeLogError(error);
     }
   });
   try {
@@ -231,8 +221,7 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
       }
     });
   } catch (error) {
-    console.log("error while fetching expenses: ", error);
-    throw new Error("error while fetching expenses");
+    safeLogError(error);
   }
 
   return expenses;
@@ -283,8 +272,7 @@ export async function fetchExpenses(tripid: string, uid: string) {
 
     return expenses;
   } catch (error) {
-    console.log(error);
-    throw new Error("error while fetching expenses");
+    safeLogError(error);
   }
 }
 
@@ -310,15 +298,11 @@ export function updateExpense(
     );
     return response;
   } catch (error) {
-    console.log(error);
-    throw new Error("error while updating expense");
+    safeLogError(error);
   }
 }
 
 export function deleteExpense(tripid: string, uid: string, id: string) {
-  console.log("https: ~ deleteExpense ~ tripid", tripid);
-  console.log("deleteExpense ~ uid", uid);
-  console.log("deleteExpense ~ id", id);
   try {
     const response = axios.delete(
       BACKEND_URL +
@@ -332,8 +316,7 @@ export function deleteExpense(tripid: string, uid: string, id: string) {
     );
     return response;
   } catch (error) {
-    console.log(error);
-    throw new Error("error while deleting expense");
+    safeLogError(error);
   }
 }
 
@@ -344,9 +327,6 @@ export function deleteExpense(tripid: string, uid: string, id: string) {
  * @returns uid
  */
 export async function storeUser(uid: string, userData: object) {
-  console.log("https: ~ storeUser ~ uid:", uid);
-  console.log("https: ~ storeUser ~ userData", userData);
-  console.log("https: ~ storeUser ~ global QPAR", getMMKVString("QPAR"));
   const response = await axios.put(
     BACKEND_URL + "/users/" + `${uid}.json` + getMMKVString("QPAR"),
     userData
@@ -373,7 +353,7 @@ export async function updateUser(uid: string, userData: UserData) {
 export async function fetchUser(uid: string) {
   // console.log("https: ~ fetchUser ~ uid", uid);
   if (!uid) {
-    console.log("https: ~ fetchUser ~ uid is empty");
+    safeLogError("fetchUser: uid is undefined", "http.tsx", 356);
     return null;
   }
   try {
@@ -417,7 +397,6 @@ export async function updateTrip(tripid: string, tripData) {
 
 export async function fetchTrip(tripid: string): Promise<TripData> {
   if (!tripid) return null;
-  // console.log("https: ~ fetchTrip ~ tripid", tripid);
   try {
     const response = await axios.get(
       BACKEND_URL + "/trips/" + `${tripid}.json` + getMMKVString("QPAR")
@@ -429,19 +408,17 @@ export async function fetchTrip(tripid: string): Promise<TripData> {
 }
 
 export async function deleteTrip(tripid: string) {
-  // console.log("https: ~ deleteTrip ~ tripid", tripid);
   try {
     const response = await axios.delete(
       BACKEND_URL + "/trips/" + `${tripid}.json` + getMMKVString("QPAR")
     );
     return response;
   } catch (error) {
-    throw new Error("error while deleting trip");
+    safeLogError(error);
   }
 }
 
 export async function putTravelerInTrip(tripid: string, traveller: Traveller) {
-  console.log("https: ~ putTravelerInTrip ~ traveller", traveller);
   try {
     if (
       !traveller ||
@@ -464,7 +441,6 @@ export async function putTravelerInTrip(tripid: string, traveller: Traveller) {
 }
 
 export async function fetchTripsTravellers(tripid: string) {
-  // console.log("fetchTripsTravellers ~ tripid", tripid);
   try {
     const response = await axios.get(
       BACKEND_URL + `/trips/${tripid}/travellers.json` + getMMKVString("QPAR")
@@ -478,10 +454,8 @@ export async function fetchTripsTravellers(tripid: string) {
 export type TravellerNames = string[];
 
 export async function getTravellers(tripid: string): Promise<TravellerNames> {
-  // console.log("getTravellers ~ tripid", tripid);
   try {
     const response = await fetchTripsTravellers(tripid);
-    // console.log("getTravellers ~ response:", response);
     const travellerids = [];
     const travelerNames = [];
     for (const key in response) {
@@ -499,12 +473,11 @@ export async function getTravellers(tripid: string): Promise<TravellerNames> {
     }
     return uniqBy(travelerNames);
   } catch (error) {
-    throw new Error("error while fetching travellers of trip");
+    safeLogError(error);
   }
 }
 
 export async function getUIDs(tripid: string) {
-  // console.log("getUIDs ~ tripid", tripid);
   try {
     const response = await fetchTripsTravellers(tripid);
     const travellerids: string[] = [];
@@ -516,7 +489,7 @@ export async function getUIDs(tripid: string) {
     }
     return travellerids;
   } catch (error) {
-    throw new Error("error while fetching UIDs of trip");
+    safeLogError(error);
   }
 }
 

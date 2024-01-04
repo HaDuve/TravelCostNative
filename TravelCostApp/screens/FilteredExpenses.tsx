@@ -28,7 +28,7 @@ const FilteredExpenses = ({
     ? {
         expenses: expensesAsArg,
         dayString: dayStringAsArg,
-        showSumForTravellerName: false,
+        showSumForTravellerName: "",
       }
     : route.params;
   const withArgs = expensesAsArg ? true : false;

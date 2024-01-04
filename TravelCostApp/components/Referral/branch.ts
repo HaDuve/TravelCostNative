@@ -1,6 +1,6 @@
 import branch, { BranchEvent } from "react-native-branch";
 
-export function initBranch() {
+export function initBranch(navigation) {
   // Listener
   branch.subscribe({
     onOpenStart: ({ uri, cachedInitialEvent }) => {
@@ -42,6 +42,8 @@ export function initBranch() {
           console.log("deepLinkPath", deepLinkPath);
           console.log("canonicalUrl", canonicalUrl);
           // Route based on Branch link data
+          if (deepLinkPath && deepLinkPath.split("/")[0] === "join")
+            navigation.navigate("Join", { id: deepLinkPath.split("/")[1] });
           return;
         }
       }

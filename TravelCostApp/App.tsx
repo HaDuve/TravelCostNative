@@ -649,10 +649,11 @@ function Root() {
     await authCtx.authenticate(storedToken);
   }
 
+  const navigation = useNavigation();
   useEffect(() => {
     async function onRootMount() {
       // setup branch
-      initBranch();
+      initBranch(navigation);
       // first start
       await handleFirstStart();
 

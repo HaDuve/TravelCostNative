@@ -78,6 +78,8 @@ const ExpenseCategories = ({ expenses, periodName, navigation }) => {
       tripCurrency,
       itemData
     );
+    const isShadow = itemData.item?.catExpenses[0]?.id == "shadow1";
+    if (isShadow) return <></>;
     return (
       <Pressable
         style={({ pressed }) => [
@@ -85,6 +87,7 @@ const ExpenseCategories = ({ expenses, periodName, navigation }) => {
           pressed && GlobalStyles.pressedWithShadow,
         ]}
         onPress={() => {
+          console.log("expenses", itemData.item.catExpenses);
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigation.navigate("FilteredExpenses", {
             expenses: itemData.item.catExpenses,

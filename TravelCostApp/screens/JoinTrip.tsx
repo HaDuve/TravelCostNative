@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import {
   fetchTrip,
   getAllExpenses,
@@ -42,6 +42,8 @@ import { secureStoreSetItem } from "../store/secure-storage";
 import { setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
 import Animated, { FadeIn } from "react-native-reanimated";
+import { isConnectionFastEnough } from "../util/connectionSpeed";
+import { sleep } from "../util/appState";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -66,28 +68,66 @@ const JoinTrip = ({ navigation, route }) => {
   const [freshLink, setFreshLink] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
 
-  async function getTrip(tripID: string) {
-    if (!isConnected) {
-      Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
-      return;
-    }
-    if (!tripID) return;
-    setIsFetching(true);
-    setFreshLink(false);
-    try {
-      const trip = await fetchTrip(tripID);
-      setTripName(trip.tripName);
-      setTripdata(trip);
-      setClickedOnLink(true);
-    } catch (e) {
-      Alert.alert(i18n.t("noTrip"), i18n.t("tryAgain"));
-    }
-    setIsFetching(false);
-  }
+  const getTrip = useCallback(
+    async (tripID: string) => {
+      setIsFetching(true);
+      if (!(await isConnectionFastEnough(true))) {
+        await sleep(3000);
+        if (!(await isConnectionFastEnough(true))) {
+          Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
+          return;
+        }
+      }
+      if (!tripID) return;
+      setFreshLink(false);
+      let tripName = "";
+      try {
+        const trip = await fetchTrip(tripID);
+        tripName = trip?.tripName;
+        setTripName(trip?.tripName);
+        setTripdata(trip ?? {});
+        setClickedOnLink(true);
+      } catch (e) {
+        Alert.alert(
+          i18n.t("noTrip"),
+          i18n.t("tryAgain") +
+            "\nid: " +
+            tripID +
+            "\nname:" +
+            tripName +
+            "\n" +
+            e,
+          [
+            {
+              style: "cancel",
+              text: i18n.t("cancel"),
+              onPress: () => {
+                navigation.popToTop();
+              },
+            },
+            {
+              // try again button
+              text: "Try Again", //i18n.t("tryAgain"),
+              onPress: async () => {
+                await getTrip(tripid);
+              },
+            },
+          ]
+        );
+      }
+      setIsFetching(false);
+    },
+    [tripid]
+  );
 
   useEffect(() => {
-    if (clickedOnLink) getTrip(tripid);
-  }, [clickedOnLink, tripid]);
+    async function getTripFromLink() {
+      if (await isConnectionFastEnough()) {
+        await getTrip(tripid);
+      }
+    }
+    if (clickedOnLink) getTripFromLink();
+  }, [clickedOnLink, getTrip, tripid]);
 
   async function joinHandler(join: boolean) {
     if (!isConnected) {
@@ -160,7 +200,6 @@ const JoinTrip = ({ navigation, route }) => {
       // "://join/[tripid]"
       const index_start1 = joinTripid.indexOf("://join/");
       const final_link_string = joinTripid.slice(index_start1 + 8).trim();
-      console.log("joinLinkHandler ~ final_link_string:", final_link_string);
       setJoinTripid(final_link_string);
       await getTrip(final_link_string);
     } else {

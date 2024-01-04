@@ -158,6 +158,11 @@ function NotAuthenticatedStack() {
 }
 
 function AuthenticatedStack() {
+  const navigation = useNavigation();
+  useEffect(() => {
+    // setup branch
+    initBranch(navigation);
+  });
   return (
     <ExpensesContextProvider>
       <>
@@ -649,11 +654,8 @@ function Root() {
     await authCtx.authenticate(storedToken);
   }
 
-  const navigation = useNavigation();
   useEffect(() => {
     async function onRootMount() {
-      // setup branch
-      initBranch(navigation);
       // first start
       await handleFirstStart();
 

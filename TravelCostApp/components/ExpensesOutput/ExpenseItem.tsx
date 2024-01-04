@@ -51,49 +51,47 @@ function ExpenseItem(props): JSX.Element {
   const { periodName, catIconNames } = useContext(UserContext);
   const rate = calcAmount / amount;
 
-  const [calcTravellerSum, setCalcTravellerSum] = useState(0);
-  const [travellerSum, setTravellerSum] = useState(0);
-  const [calcTravellerSumString, setCalcTravellerSumString] = useState("");
-  const [travellerSumString, setTravellerSumString] = useState("");
-
-  useEffect(() => {
-    // if showSumForTravellerName is set, show the sum of the expense for only this traveller
-    if (showSumForTravellerName && splitList && splitList?.length > 0) {
-      let tempCalcSum = 0;
-      let tempSum = 0;
-      splitList.forEach((split) => {
-        if (split.userName === showSumForTravellerName) {
-          tempCalcSum += calcTravellerSum + Number(split.amount) * rate;
-          tempSum += travellerSum + Number(split.amount);
-        }
-      });
-      setCalcTravellerSumString(
-        formatExpenseWithCurrency(Number(tempCalcSum), tripCurrency)
-      );
-      setTravellerSumString(
-        formatExpenseWithCurrency(Number(tempSum), currency)
-      );
-      setCalcTravellerSum(tempCalcSum);
-      setTravellerSum(tempSum);
+  const calculateSumForTraveller = useCallback(() => {
+    if (
+      !showSumForTravellerName ||
+      typeof showSumForTravellerName !== "string" ||
+      showSumForTravellerName.length < 1 ||
+      !splitList ||
+      splitList.length === 0
+    ) {
+      return { calcTravellerSumString: null, travellerSumString: null };
     }
-  }, [
-    calcTravellerSum,
-    currency,
-    rate,
-    showSumForTravellerName,
-    splitList?.length,
-    travellerSum,
-    tripCurrency,
-  ]);
-  const calcAmountString = calcTravellerSum
-    ? `${calcTravellerSumString}`
-    : formatExpenseWithCurrency(calcAmount, tripCurrency);
 
-  const amountString = travellerSum
-    ? `${travellerSumString}`
-    : formatExpenseWithCurrency(amount, currency);
+    let tempCalcSum = 0;
+    let tempSum = 0;
 
-  // if (iconName) console.log(iconName);
+    splitList.forEach((split) => {
+      if (split.userName === showSumForTravellerName) {
+        tempCalcSum += Number(split.amount) * rate;
+        tempSum += Number(split.amount);
+      }
+    });
+
+    const calcTravellerSumString = formatExpenseWithCurrency(
+      tempCalcSum,
+      tripCurrency
+    );
+    const travellerSumString = formatExpenseWithCurrency(tempSum, currency);
+
+    return { calcTravellerSumString, travellerSumString };
+  }, [showSumForTravellerName, splitList, rate, tripCurrency, currency]);
+
+  const { calcTravellerSumString, travellerSumString } = useMemo(
+    calculateSumForTraveller,
+    [calculateSumForTraveller]
+  );
+  const calcAmountString =
+    calcTravellerSumString ??
+    formatExpenseWithCurrency(calcAmount, tripCurrency);
+
+  const amountString =
+    travellerSumString ?? formatExpenseWithCurrency(amount, currency);
+
   const [catSymbol, setCatSymbol] = useState(iconName ? iconName : "");
   useEffect(() => {
     function setCatSymbolAsync() {
@@ -248,8 +246,6 @@ function ExpenseItem(props): JSX.Element {
       <Pressable
         onPress={navigateToExpense}
         onLongPress={() => {
-          console.log("long press item");
-          console.log("ExpenseItem ~ setSelectable:", setSelectable);
           if (setSelectable === undefined) return;
           setSelectable(true);
         }}

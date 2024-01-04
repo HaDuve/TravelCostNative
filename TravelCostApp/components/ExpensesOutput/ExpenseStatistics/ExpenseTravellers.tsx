@@ -56,19 +56,22 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
     }
   });
 
-  function getAllExpensesWithTraveller(traveller: string) {
-    return expenses.filter((expense: ExpenseData) => {
-      // check if the expense has a splitlist
-      const hasSplits = expense.splitList && expense.splitList?.length !== 0;
-      if (!hasSplits) {
-        return expense.whoPaid === traveller;
-      } else {
-        // return true if the splitlist contains the traveller
-        return expense.splitList.some((split) => {
-          return split.userName === traveller;
-        });
+  function getAllExpensesWithTraveller(traveller: string): ExpenseData[] {
+    const travellerExpenses: ExpenseData[] = expenses.filter(
+      (expense: ExpenseData) => {
+        // check if the expense has a splitlist
+        const hasSplits = expense.splitList && expense.splitList?.length !== 0;
+        if (!hasSplits) {
+          return expense.whoPaid === traveller;
+        } else {
+          // return true if the splitlist contains the traveller
+          return expense.splitList.some((split) => {
+            return split.userName === traveller;
+          });
+        }
       }
-    });
+    );
+    return travellerExpenses;
   }
 
   function getSumExpenses(expenses, traveller) {

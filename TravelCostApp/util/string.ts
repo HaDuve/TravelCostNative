@@ -1,5 +1,12 @@
 //Localization
 import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import { getCurrencySymbol } from "./currencySymbol";
 
 export function formatExpenseWithCurrency(
@@ -64,8 +71,30 @@ export function processTitleStringFilteredPiecharts(
     };
   }
 ) {
+  // period name can be translated or not
+  const nonTranslatedPeriodNames = ["day", "week", "month", "year", "all"];
+  const dictionaryToTranslate = {
+    day: "today",
+    week: "thisWeek",
+    month: "thisMonth",
+    year: "thisYear",
+    all: "totalLabel",
+  };
+  nonTranslatedPeriodNames.forEach((nonTranslatedString) => {
+    if (periodName.includes(nonTranslatedString)) {
+      periodName = periodName.replace(
+        nonTranslatedString,
+        i18n.t(dictionaryToTranslate[nonTranslatedString])
+      );
+    }
+  });
   // to process the period name we must take out the last part of the string ending with "-"
-  const periodNameProcessed = periodName.slice(0, periodName.lastIndexOf("-"));
+  // take into consideration that some strings dont have a "-" at the end
+  const lastDashIndex = periodName.lastIndexOf("-");
+  const noIndexFound = lastDashIndex === -1;
+  const periodNameProcessed = noIndexFound
+    ? periodName + " - "
+    : periodName.slice(0, lastDashIndex + 1) + " ";
   const newPeriodName =
     periodNameProcessed +
     formatExpenseWithCurrency(itemData.item.sumCat, tripCurrency);

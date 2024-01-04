@@ -19,14 +19,10 @@ i18n.enableFallback = true;
 import { getCatString } from "../../../util/category";
 import PropTypes from "prop-types";
 import { ExpenseData, getExpensesSum } from "../../../util/expense";
-import { travellerToDropdown } from "../../../util/split";
 import { useContext } from "react";
 import { TripContext } from "../../../store/trip-context";
 import BlurPremium from "../../Premium/BlurPremium";
-import {
-  formatExpenseWithCurrency,
-  processTitleStringFilteredPiecharts,
-} from "../../../util/string";
+import { processTitleStringFilteredPiecharts } from "../../../util/string";
 
 const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
@@ -74,7 +70,7 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
     return travellerExpenses;
   }
 
-  function getSumExpenses(expenses, traveller) {
+  function getSumExpenses(expenses: ExpenseData[], traveller: string) {
     // return the sum of expenses for a given traveller
     const expensesSum = expenses.reduce((sum: number, expense: ExpenseData) => {
       const hasSplits = expense.splitList && expense.splitList?.length > 0;
@@ -106,7 +102,6 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
         }
       }
     }, 0);
-    console.log("getSumExpenses ~ expensesSum:", expensesSum);
     return expensesSum;
   }
 
@@ -122,7 +117,6 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
     const sumCat = Number(
       getSumExpenses(catExpenses, travellerList[travellerIndex])
     );
-    console.log("ExpenseTravellers ~ sumCat:", sumCat);
     catSumCat.push({
       cat: travellerList[travellerIndex],
       sumCat: sumCat,
@@ -132,7 +126,6 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
   }
 
   function renderItem(itemData) {
-    console.log("renderItem ~ itemData.item.sumCat:", itemData.item.sumCat);
     const newPeriodName = processTitleStringFilteredPiecharts(
       periodName,
       tripCurrency,
@@ -145,7 +138,6 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
           pressed && GlobalStyles.pressedWithShadow,
         ]}
         onPress={() => {
-          console.log("pressed name:", itemData.item.cat);
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigation.navigate("FilteredExpenses", {
             expenses: itemData.item.catExpenses,

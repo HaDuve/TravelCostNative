@@ -57,6 +57,7 @@ export interface Keys {
   OPENAI: string;
   EXCHANGE: string;
   FREEEXCHANGE: string;
+  BRAN: string;
 }
 
 export async function loadKeys(): Promise<Keys> {
@@ -67,24 +68,21 @@ export async function loadKeys(): Promise<Keys> {
   let OPENAI = await secureStoreGetItem("OPENAI");
   let EXCHANGE = await secureStoreGetItem("EXCHANGE");
   let FREEEXCHANGE = await secureStoreGetItem("FREEEXCHANGE");
+  let BRAN = await secureStoreGetItem("BRAN");
   if (!isFastEnough)
-    return { REVCAT_G, REVCAT_A, OPENAI, EXCHANGE, FREEEXCHANGE };
-  console.log("loadKeys ~ isFastEnough to load new keys:", isFastEnough);
+    return { REVCAT_G, REVCAT_A, OPENAI, EXCHANGE, FREEEXCHANGE, BRAN };
   const data = await fetchServerInfo();
   await secureStoreSetItem("REVCAT_G", data.REVCAT_G);
   await secureStoreSetItem("REVCAT_A", data.REVCAT_A);
   await secureStoreSetItem("OPENAI", data.OPENAI);
   await secureStoreSetItem("EXCHANGE", data.EXCHANGE);
   await secureStoreSetItem("FREEEXCHANGE", data.FREEEXCHANGE);
-  console.log(
-    "loadKeys ~ secureStoreSetItem:",
-    "set item data.exchange",
-    data.EXCHANGE
-  );
+  await secureStoreSetItem("BRAN", data.BRAN);
   REVCAT_G = data.REVCAT_G;
   REVCAT_A = data.REVCAT_A;
   OPENAI = data.OPENAI;
   EXCHANGE = data.EXCHANGE;
   FREEEXCHANGE = data.FREEEXCHANGE;
-  return { REVCAT_G, REVCAT_A, OPENAI, EXCHANGE, FREEEXCHANGE };
+  BRAN = data.BRAN;
+  return { REVCAT_G, REVCAT_A, OPENAI, EXCHANGE, FREEEXCHANGE, BRAN };
 }

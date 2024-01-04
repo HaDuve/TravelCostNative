@@ -7,13 +7,11 @@ import {
   StyleSheet,
 } from "react-native";
 
-import ExpenseItem, { MemoizedExpenseItem } from "./ExpenseItem";
+import { MemoizedExpenseItem } from "./ExpenseItem";
 import React, {
-  memo,
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
 } from "react";
@@ -32,7 +30,6 @@ import { ExpensesContext } from "../../store/expenses-context";
 import IconButton from "../UI/IconButton";
 import Animated, {
   Easing,
-  exp,
   FadeIn,
   FadeInLeft,
   FadeInRight,
@@ -40,7 +37,6 @@ import Animated, {
   FadeOutLeft,
   FadeOutRight,
   FadeOutUp,
-  Layout,
 } from "react-native-reanimated";
 
 //Localization
@@ -60,7 +56,7 @@ import {
 import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { Text } from "react-native-paper";
@@ -68,30 +64,21 @@ import { formatExpenseWithCurrency } from "../../util/string";
 import { addShadowItemsToExpenses } from "./ExpenseListUtil";
 import { UserContext } from "../../store/user-context";
 import * as Haptics from "expo-haptics";
-import { Category } from "../../util/category";
 import { toShortFormat } from "../../util/date";
-import { getCurrencySymbol } from "../../util/currencySymbol";
 import {
   DEVELOPER_MODE,
   EXPENSES_LOAD_TIMEOUT,
   MAX_EXPENSES_RENDER,
 } from "../../confAppConstants";
 import { TripAsObject } from "../../screens/TripSummaryScreen";
-import { create } from "react-test-renderer";
-import { AuthContext } from "../../store/auth-context";
-import { G } from "react-native-svg";
 import { Pressable } from "react-native";
+import safeLogError from "../../util/error";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 
 // Displays a list of all expenses.
-function ExpensesList({
-  expenses,
-  refreshControl,
-  showSumForTravellerName,
-  isFiltered,
-}) {
+function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
   // GLOBALS across all expenseItems
   let tripID = "";
   // let expenseCtx;
@@ -106,11 +93,9 @@ function ExpensesList({
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;
   const { tripid, tripName } = useContext(TripContext);
-  const { uid } = useContext(AuthContext);
   const { periodName } = useContext(UserContext);
   const expenseCtx = useContext(ExpensesContext);
   const userCtx = useContext(UserContext);
-  const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(1);
   tripID = tripid;
   travellerName = showSumForTravellerName;
   if (isFiltered) filtered = true;
@@ -503,7 +488,7 @@ function ExpensesList({
     scrollTo(1);
   }, [scrollTo, periodName]);
 
-  const selectItem = (item, id: object) => {
+  const selectItem = (item) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (selected.includes(item)) {
       setSelected(selected.filter((newItem) => newItem !== item));
@@ -601,11 +586,6 @@ function ExpensesList({
               expenseData: expenseData,
             },
           };
-          const id = await storeExpenseOnlineOffline(
-            itemToCreate,
-            isOnline,
-            _tripid
-          );
           const itemToDelete: OfflineQueueManageExpenseItem = {
             type: "delete",
             expense: {
@@ -614,13 +594,14 @@ function ExpensesList({
               id: expenseId,
             },
           };
+          await storeExpenseOnlineOffline(itemToCreate, isOnline, _tripid);
           expenseCtx?.deleteExpense(expenseId);
           await deleteExpenseOnlineOffline(itemToDelete, isOnline);
           await touchAllTravelers(tripID, true);
           await touchAllTravelers(_tripid, true);
           Toast.hide();
         } catch (error) {
-          console.log("Moving expenses error: ", error);
+          safeLogError(error);
           Toast.show({
             text1: i18n.t("error"),
             text2: i18n.t("error2"),

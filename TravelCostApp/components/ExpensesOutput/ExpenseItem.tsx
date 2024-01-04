@@ -58,7 +58,6 @@ function ExpenseItem(props): JSX.Element {
 
   useEffect(() => {
     // if showSumForTravellerName is set, show the sum of the expense for only this traveller
-    console.log("expenseItem useEffect in action!");
     if (showSumForTravellerName && splitList && splitList?.length > 0) {
       let tempCalcSum = 0;
       let tempSum = 0;

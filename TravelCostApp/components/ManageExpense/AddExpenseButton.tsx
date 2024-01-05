@@ -1,4 +1,4 @@
-import React, { Alert, Pressable, StyleSheet } from "react-native";
+import React, { Alert, Dimensions, Pressable, StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";
 import Animated, {
@@ -30,7 +30,7 @@ import { SettingsContext } from "../../store/settings-context";
 import { TripContext } from "../../store/trip-context";
 import { AuthContext } from "../../store/auth-context";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
-import { reloadApp } from "../../util/appState";
+import { reloadApp, sleep } from "../../util/appState";
 import { ExpensesContext } from "../../store/expenses-context";
 import { FlatList } from "react-native";
 import { View } from "react-native";
@@ -166,28 +166,25 @@ const AddExpenseButton = ({ navigation }) => {
     retryFunction();
   };
 
-  const END_POSITION = 500;
-  const onLeft = useSharedValue(true);
+  const END_POSITION = Dimensions.get("window").height * 0.2;
   const position = useSharedValue(0);
 
   const panGesture = Gesture.Pan()
     .onUpdate((e) => {
-      if (onLeft.value) {
-        position.value = e.translationY;
-      } else {
-        position.value = END_POSITION + e.translationY;
+      position.value = e.translationY;
+      if (position.value < 0) {
+        position.value = 0;
       }
     })
     .onEnd((e) => {
-      if (position.value > END_POSITION / 2) {
-        position.value = withTiming(END_POSITION, { duration: 100 }, () =>
-          runOnJS(setLongPressed)(false)
-        );
-        onLeft.value = false;
+      if (position.value > END_POSITION) {
+        position.value = withTiming(END_POSITION * 5, { duration: 300 }, () => {
+          runOnJS(setLongPressed)(false);
+        });
       } else {
         position.value = withTiming(0, { duration: 100 });
-        onLeft.value = true;
       }
+      //
     });
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -203,12 +200,16 @@ const AddExpenseButton = ({ navigation }) => {
           exiting={SlideOutDown}
         >
           <Pressable
-            onPress={() => {
+            onPress={async () => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              position.value = withTiming(END_POSITION, { duration: 300 });
+              await sleep(300);
               setLongPressed(false);
             }}
-            onLongPress={() => {
+            onLongPress={async () => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              position.value = withTiming(END_POSITION, { duration: 300 });
+              await sleep(300);
               setLongPressed(false);
             }}
             style={({ pressed }) => [

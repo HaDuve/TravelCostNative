@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { useInterval } from "../Hooks/useInterval";
 import { getOfflineQueue } from "../../util/offline-queue";
@@ -194,7 +194,14 @@ const DevContent = ({ navigation }) => {
 
       <Button
         style={styles.settingsButton}
-        onPress={async () => await showBranchParams()}
+        onPress={async () => {
+          const { campaign, channel, feature, tags, stage, url } =
+            await showBranchParams();
+          Alert.alert(
+            "showBranchParams",
+            JSON.stringify({ campaign, channel, feature, tags, stage, url })
+          );
+        }}
       >
         showBranchParams
       </Button>

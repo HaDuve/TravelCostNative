@@ -160,8 +160,11 @@ function NotAuthenticatedStack() {
 function AuthenticatedStack() {
   const navigation = useNavigation();
   useEffect(() => {
-    // setup branch
-    initBranch(navigation);
+    async function startInit() {
+      // setup branch
+      await initBranch(navigation);
+    }
+    startInit();
   });
   return (
     <ExpensesContextProvider>

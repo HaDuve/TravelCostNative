@@ -34,6 +34,7 @@ import {
 } from "./secure-storage";
 import { reloadApp } from "../util/appState";
 import safeLogError from "../util/error";
+import branch from "react-native-branch";
 
 export const AuthContext = createContext({
   uid: "",
@@ -64,6 +65,7 @@ function AuthContextProvider({ children }) {
   }
 
   function logout() {
+    branch.logout();
     setAuthToken(null);
   }
 

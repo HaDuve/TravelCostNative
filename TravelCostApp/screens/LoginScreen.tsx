@@ -119,7 +119,7 @@ function LoginScreen() {
         await userCtx.checkPremium();
         console.log("LoginScreen ~ uid:", uid);
       }
-
+      await Purchases.collectDeviceIdentifiers();
       await setAttributesAsync(email, userData.userName);
 
       const event = new BranchEvent(BranchEvent.Login);

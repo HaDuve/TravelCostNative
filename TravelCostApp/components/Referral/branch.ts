@@ -1,6 +1,11 @@
-import branch, { BranchEvent } from "react-native-branch";
+import branch, { BranchEvent, BranchParams } from "react-native-branch";
+import { secureStoreGetItem } from "../../store/secure-storage";
+import Purchases from "react-native-purchases";
 
-export function initBranch(navigation) {
+export async function initBranch(navigation = null) {
+  const storedUid = await secureStoreGetItem("uid");
+  branch.setIdentity(storedUid);
+  await showBranchParams();
   // Listener
   branch.subscribe({
     onOpenStart: ({ uri, cachedInitialEvent }) => {
@@ -43,7 +48,7 @@ export function initBranch(navigation) {
           console.log("canonicalUrl", canonicalUrl);
           // Route based on Branch link data
           if (deepLinkPath && deepLinkPath.split("/")[0] === "join")
-            navigation.navigate("Join", { id: deepLinkPath.split("/")[1] });
+            navigation?.navigate("Join", { id: deepLinkPath.split("/")[1] });
           return;
         }
       }
@@ -52,13 +57,23 @@ export function initBranch(navigation) {
 }
 
 export async function showBranchParams() {
-  const latestParams = await branch.getLatestReferringParams(); // Params from last open
+  const latestParams: BranchParams = await branch.getLatestReferringParams(); // Params from last open
   const installParams = await branch.getFirstReferringParams(); // Params from original install
   // console.log("showParams", latestParams, installParams);
-  console.log(
-    "showParams\n",
-    JSON.stringify(latestParams) + "\n\n" + JSON.stringify(installParams)
-  );
+  const campaign = latestParams["~campaign"];
+  const channel = latestParams["~channel"];
+  const feature = latestParams["~feature"];
+  const tags = latestParams["~tags"];
+  const stage = latestParams["~stage"];
+  const url = latestParams["+url"];
+  await Purchases.setCampaign(campaign);
+  await Purchases.setAttributes({
+    channel,
+    feature,
+    stage,
+    url,
+  });
+  return { campaign, channel, feature, tags, stage, url };
 }
 
 export async function trackPurchaseEvent() {

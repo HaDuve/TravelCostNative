@@ -107,6 +107,7 @@ function SignupScreen() {
           });
         }
       }
+      await Purchases.collectDeviceIdentifiers();
       await setAttributesAsync(email, userData.userName);
       const event = new BranchEvent(BranchEvent.CompleteRegistration);
       await event.logEvent();

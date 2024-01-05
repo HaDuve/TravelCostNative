@@ -45,8 +45,10 @@ export async function isPremiumMember() {
 }
 
 export async function setAttributesAsync(emailString = "", userName = "") {
-  if (emailString) await Purchases.setEmail(emailString);
-  if (userName) await Purchases.setDisplayName(userName);
+  if (emailString && typeof emailString == "string")
+    await Purchases.setEmail(emailString);
+  if (userName && typeof userName == "string")
+    await Purchases.setDisplayName(userName);
   const referrer = await branch.getLatestReferringParams();
   if (referrer) await Purchases.setCampaign(referrer["~channel"]);
 }

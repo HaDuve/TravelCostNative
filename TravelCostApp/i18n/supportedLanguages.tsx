@@ -168,6 +168,8 @@ const en = {
     // "Download the app for free here:\n" +
     // "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=en" +
     "\nAfter installing the app, join our trip here:\n",
+  inviteLink:
+    "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=en",
   noTrip: "Could not find trip!",
   tryAgain: "Please try again later.",
 
@@ -580,6 +582,8 @@ const de = {
     // "Lade hier die App kostenlos herunter:\n" +
     // "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=de" +
     "\nNachdem du die App installiert hast, schließe dich hier unserer Reise an:\n",
+  inviteLink:
+    "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=de",
   noTrip: "Reise nicht gefunden!",
   tryAgain: "Bitte versuche es später erneut!",
 
@@ -1009,7 +1013,8 @@ const fr = {
     // "Télécharge l'application gratuitement ici :\n" +
     // "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=fr" +
     "\nAprès avoir installé l'application, rejoins notre voyage ici :\n",
-
+  inviteLink:
+    "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=fr",
   noTrip: "Impossible de trouver le voyage !",
   tryAgain: "Veuillez réessayer ultérieurement.",
 
@@ -1431,7 +1436,8 @@ const ru = {
     // "Скачай приложение бесплатно здесь:\n" +
     // "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=ru" +
     "\nПосле установки приложения, присоединяйся к нашей поездке здесь:\n",
-
+  inviteLink:
+    "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=ru",
   noTrip: "Не удалось найти поездку!",
   tryAgain: "Пожалуйста, попробуйте еще раз позже.",
 

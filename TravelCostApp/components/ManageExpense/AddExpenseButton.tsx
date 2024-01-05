@@ -1,7 +1,14 @@
 import React, { Alert, Pressable, StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";
-import Animated, { FadeIn } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TourGuideZone } from "rn-tourguide";
@@ -30,6 +37,9 @@ import { formatExpenseWithCurrency, truncateString } from "../../util/string";
 import { getCatString, getCatSymbol } from "../../util/category";
 import IconButton from "../UI/IconButton";
 import uniqBy from "lodash.uniqby";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { PanGesture } from "react-native-gesture-handler/lib/typescript/handlers/gestures/panGesture";
+import set from "react-native-reanimated";
 
 const AddExpenseButton = ({ navigation }) => {
   const { settings } = useContext(SettingsContext);
@@ -148,61 +158,98 @@ const AddExpenseButton = ({ navigation }) => {
     retryFunction();
   };
 
+  const END_POSITION = 500;
+  const onLeft = useSharedValue(true);
+  const position = useSharedValue(0);
+
+  const panGesture = Gesture.Pan()
+    .onUpdate((e) => {
+      if (onLeft.value) {
+        position.value = e.translationY;
+      } else {
+        position.value = END_POSITION + e.translationY;
+      }
+    })
+    .onEnd((e) => {
+      if (position.value > END_POSITION / 2) {
+        position.value = withTiming(END_POSITION, { duration: 100 }, () =>
+          runOnJS(setLongPressed)(false)
+        );
+
+        onLeft.value = false;
+      } else {
+        position.value = withTiming(0, { duration: 100 });
+        onLeft.value = true;
+      }
+    });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: position.value }],
+  }));
+
   if (longPressed) {
     return (
-      <Animated.View style={[styles.margin]} entering={FadeIn.duration(600)}>
-        <Pressable
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setLongPressed(false);
-          }}
-          onLongPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setLongPressed(false);
-          }}
-          style={({ pressed }) => [
-            styles.addButton,
-            GlobalStyles.shadowGlowPrimary,
-            styles.longPressedButton,
-            { flexDirection: "column" },
-            pressed && GlobalStyles.pressedWithShadowNoScale,
-          ]}
+      <GestureDetector gesture={panGesture}>
+        <Animated.View
+          style={[styles.margin, animatedStyle]}
+          entering={FadeIn.duration(600)}
         >
-          <View
-            style={{
-              flexDirection: "column",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 8,
-              borderRadius: 5,
+          <Pressable
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setLongPressed(false);
             }}
+            onLongPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setLongPressed(false);
+            }}
+            style={({ pressed }) => [
+              styles.addButton,
+              GlobalStyles.shadowGlowPrimary,
+              styles.longPressedButton,
+              { flexDirection: "column" },
+              pressed && GlobalStyles.pressedWithShadowNoScale,
+            ]}
           >
-            <Text
-              style={[
-                {
-                  fontWeight: "300",
-                  fontSize: 24,
-                  color: GlobalStyles.colors.gray300,
-                },
-              ]}
+            <View
+              style={{
+                flexDirection: "column",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 8,
+                borderRadius: 5,
+              }}
             >
-              Template Expenses
-            </Text>
-            <Text
-              style={[
-                {
-                  fontWeight: "300",
-                  fontSize: 24,
-                  color: GlobalStyles.colors.gray300,
-                },
-              ]}
-            >
-              ▼
-            </Text>
-          </View>
-          <FlatList data={slicedExpenses} renderItem={renderExpenseTemplates} />
-        </Pressable>
-      </Animated.View>
+              <Text
+                style={[
+                  {
+                    fontWeight: "300",
+                    fontSize: 24,
+                    color: GlobalStyles.colors.gray300,
+                  },
+                ]}
+              >
+                Template Expenses
+              </Text>
+              <Text
+                style={[
+                  {
+                    fontWeight: "300",
+                    fontSize: 24,
+                    color: GlobalStyles.colors.gray300,
+                  },
+                ]}
+              >
+                ▼
+              </Text>
+            </View>
+            <FlatList
+              data={slicedExpenses}
+              renderItem={renderExpenseTemplates}
+            />
+          </Pressable>
+        </Animated.View>
+      </GestureDetector>
     );
   }
 
@@ -250,6 +297,8 @@ const AddExpenseButton = ({ navigation }) => {
         ]}
         onPress={pressHandler}
         onLongPress={() => {
+          // reset Y position
+          position.value = withSpring(0, { duration: 300 });
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           setLongPressed(true);
         }}

@@ -136,6 +136,14 @@ export const GlobalStyles = {
     shadowRadius: 1,
     opacity: 0.9,
   },
+  pressedWithShadowNoScale: {
+    elevation: 0,
+    transform: [{ scale: 0.99 }],
+    shadowOpacity: 0.12,
+    shadowOffset: { width: 1, height: 1 },
+    shadowRadius: 1,
+    opacity: 0.99,
+  },
   pressed: {
     elevation: 0,
     transform: [{ scale: 0.9 }],

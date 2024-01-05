@@ -2,7 +2,7 @@ import React, { Alert, Pressable, StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TourGuideZone } from "rn-tourguide";
 
@@ -21,11 +21,31 @@ import { TripContext } from "../../store/trip-context";
 import { AuthContext } from "../../store/auth-context";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { reloadApp } from "../../util/appState";
+import { ExpensesContext } from "../../store/expenses-context";
+import { FlatList } from "react-native";
+import { View } from "react-native";
+import { Text } from "react-native";
+import { ExpenseData } from "../../util/expense";
+import { formatExpenseWithCurrency, truncateString } from "../../util/string";
+import { getCatString, getCatSymbol } from "../../util/category";
+import IconButton from "../UI/IconButton";
+import uniqBy from "lodash.uniqby";
 
 const AddExpenseButton = ({ navigation }) => {
   const { settings } = useContext(SettingsContext);
   const tripCtx = useContext(TripContext);
   const authCtx = useContext(AuthContext);
+  const expCtx = useContext(ExpensesContext);
+  // sort last expenses by editedTimestamp timestamp
+  const lastExpenses: ExpenseData[] = uniqBy(
+    expCtx.expenses.sort((a, b) => {
+      return b.editedTimestamp - a.editedTimestamp;
+    }),
+    "description"
+  );
+  const slicedExpenses = lastExpenses.slice(0, 20);
+
+  const [longPressed, setLongPressed] = useState(false);
 
   const valid = useRef(false);
 
@@ -37,6 +57,37 @@ const AddExpenseButton = ({ navigation }) => {
       tripCtx.travellers?.length > 0;
   }, [tripCtx.tripid, authCtx.uid, tripCtx.travellers?.length]);
   const skipCatScreen = settings.skipCategoryScreen;
+
+  const renderExpenseTemplates = ({ item }) => {
+    const data: ExpenseData = item;
+    const formattedAmount = formatExpenseWithCurrency(
+      data.amount,
+      data.currency
+    );
+    const formattedDescription = truncateString(data.description, 15);
+    const categoryIcon = getCatSymbol(data.category);
+    return (
+      <Pressable
+        style={({ pressed }) => [
+          styles.expenseTemplateContainer,
+          GlobalStyles.strongShadow,
+          pressed && GlobalStyles.pressedWithShadow,
+        ]}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          setLongPressed(false);
+          navigation.navigate("ManageExpense", {
+            pickedCat: data.category,
+            tempValues: { ...data },
+          });
+        }}
+      >
+        <IconButton size={24} icon={categoryIcon}></IconButton>
+        <Text style={styles.description}>{formattedDescription}</Text>
+        <Text style={{}}>{formattedAmount}</Text>
+      </Pressable>
+    );
+  };
 
   const pressHandler = async () => {
     const retryTimeout = 5000; // Adjust this timeout as needed
@@ -94,9 +145,66 @@ const AddExpenseButton = ({ navigation }) => {
         }
       }
     };
-
     retryFunction();
   };
+
+  if (longPressed) {
+    return (
+      <Animated.View style={[styles.margin]} entering={FadeIn.duration(600)}>
+        <Pressable
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setLongPressed(false);
+          }}
+          onLongPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setLongPressed(false);
+          }}
+          style={({ pressed }) => [
+            styles.addButton,
+            GlobalStyles.shadowGlowPrimary,
+            styles.longPressedButton,
+            { flexDirection: "column" },
+            pressed && GlobalStyles.pressedWithShadowNoScale,
+          ]}
+        >
+          <View
+            style={{
+              flexDirection: "column",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 8,
+              borderRadius: 5,
+            }}
+          >
+            <Text
+              style={[
+                {
+                  fontWeight: "300",
+                  fontSize: 24,
+                  color: GlobalStyles.colors.gray300,
+                },
+              ]}
+            >
+              Template Expenses
+            </Text>
+            <Text
+              style={[
+                {
+                  fontWeight: "300",
+                  fontSize: 24,
+                  color: GlobalStyles.colors.gray300,
+                },
+              ]}
+            >
+              ▼
+            </Text>
+          </View>
+          <FlatList data={slicedExpenses} renderItem={renderExpenseTemplates} />
+        </Pressable>
+      </Animated.View>
+    );
+  }
 
   if (!valid.current) {
     return (
@@ -141,6 +249,10 @@ const AddExpenseButton = ({ navigation }) => {
           pressed && GlobalStyles.pressedWithShadow,
         ]}
         onPress={pressHandler}
+        onLongPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          setLongPressed(true);
+        }}
       >
         <Ionicons
           name={"add-outline"}
@@ -166,12 +278,45 @@ const styles = StyleSheet.create({
 
     marginBottom: "10%",
     paddingVertical: "19.8%",
-    paddingLeft: "5.5%",
+    paddingHorizontal: "20%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    alignSelf: "center",
   },
   addButtonInactive: {
     backgroundColor: GlobalStyles.colors.primary400,
+  },
+  description: {
+    flex: 1,
+    // width: "110%",
+    fontStyle: "italic",
+    fontWeight: "300",
+    fontSize: 15,
+    flexWrap: "wrap",
+  },
+  longPressedButton: {
+    backgroundColor: GlobalStyles.colors.primary400,
+    maxHeight: 400,
+    // width: "400%",
+    minWidth: 330,
+    paddingVertical: 12,
+    paddingHorizontal: 0,
+    borderRadius: 5,
+    alignSelf: "center",
+    marginTop: 0,
+    marginHorizontal: 0,
+  },
+  expenseTemplateContainer: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    padding: 8,
+    paddingHorizontal: 16,
+    marginVertical: 4,
+    borderRadius: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    width: "76%",
+    alignSelf: "center",
+    justifyContent: "space-between",
   },
 });

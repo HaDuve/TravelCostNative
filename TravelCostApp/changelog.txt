@@ -2,13 +2,18 @@ Changelog Travel Expense App
 
 __Newest Changes:
 
+1.2.801k
+- added longpress on Add-Expense Button to open up a list of Template Expenses, based on your 20 latest Expenses
+- bugfixes and performance improvements
+
+__Other Changes:
+
 1.2.801j
 - improved the UI/UX for freshly created accounts
 - added a premium-ad-banner for non-premium users
 - added a fixed database usage limit for non-premium users (2 trips and 500 expenses)
 - bugfixes and performance improvements
 
-__Other Changes:
 
 1.2.801i
 - improved Changelog Screen design and user experience

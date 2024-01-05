@@ -3,6 +3,9 @@ import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";
 import Animated, {
   FadeIn,
+  FadeInDown,
+  SlideInDown,
+  SlideOutDown,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
@@ -32,7 +35,7 @@ import { ExpensesContext } from "../../store/expenses-context";
 import { FlatList } from "react-native";
 import { View } from "react-native";
 import { Text } from "react-native";
-import { ExpenseData } from "../../util/expense";
+import { DuplicateOption, ExpenseData } from "../../util/expense";
 import { formatExpenseWithCurrency, truncateString } from "../../util/string";
 import { getCatString, getCatSymbol } from "../../util/category";
 import IconButton from "../UI/IconButton";
@@ -86,6 +89,11 @@ const AddExpenseButton = ({ navigation }) => {
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           setLongPressed(false);
+          // set date to today
+          data.date = new Date();
+          data.startDate = new Date();
+          data.endDate = new Date();
+          data.duplOrSplit = DuplicateOption.null;
           navigation.navigate("ManageExpense", {
             pickedCat: data.category,
             tempValues: { ...data },
@@ -175,7 +183,6 @@ const AddExpenseButton = ({ navigation }) => {
         position.value = withTiming(END_POSITION, { duration: 100 }, () =>
           runOnJS(setLongPressed)(false)
         );
-
         onLeft.value = false;
       } else {
         position.value = withTiming(0, { duration: 100 });
@@ -192,7 +199,8 @@ const AddExpenseButton = ({ navigation }) => {
       <GestureDetector gesture={panGesture}>
         <Animated.View
           style={[styles.margin, animatedStyle]}
-          entering={FadeIn.duration(600)}
+          entering={SlideInDown.duration(600)}
+          exiting={SlideOutDown}
         >
           <Pressable
             onPress={() => {
@@ -255,7 +263,11 @@ const AddExpenseButton = ({ navigation }) => {
 
   if (!valid.current) {
     return (
-      <Animated.View style={[styles.margin]} entering={FadeIn.duration(600)}>
+      <Animated.View
+        style={[styles.margin]}
+        entering={SlideInDown.duration(600)}
+        exiting={SlideOutDown}
+      >
         <Pressable
           onPress={() => {
             pressHandler();
@@ -279,7 +291,11 @@ const AddExpenseButton = ({ navigation }) => {
     );
   }
   return (
-    <Animated.View style={styles.margin} entering={FadeIn.duration(600)}>
+    <Animated.View
+      style={styles.margin}
+      entering={SlideInDown}
+      exiting={SlideOutDown}
+    >
       <TourGuideZone
         text={i18n.t("walk2")}
         borderRadius={16}

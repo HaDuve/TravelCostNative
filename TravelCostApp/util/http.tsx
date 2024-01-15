@@ -550,9 +550,9 @@ export async function fetchCurrentTrip(userId: string) {
       BACKEND_URL + `/users/${userId}.json` + getMMKVString("QPAR")
     );
     // // console.log("https: ~ fetchCurrentTrip ~ response", response.data);
-    if (!response?.data?.currentTrip)
-      // console.log("https: ~ could not find current trip of this user!");
-      return response.data.currentTrip;
+    // if (!response?.data?.currentTrip)
+    // console.log("https: ~ could not find current trip of this user!");
+    return response.data.currentTrip;
   } catch (error) {
     throw new Error("error while fetching current trip");
   }
@@ -701,9 +701,9 @@ export async function storeExpoPushTokenInTrip(
       }
     }
   }
-  if (keysToDelete || keysToDelete.length < 1)
-    // console.log("found no match");
-    const axiosCalls = [];
+  // if (keysToDelete || keysToDelete.length < 1)
+  // console.log("found no match");
+  const axiosCalls = [];
   for (const key of keysToDelete) {
     // console.log(
     //   "url/key to delete:",

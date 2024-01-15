@@ -249,7 +249,7 @@ export async function sendOfflineQueue(
 
     if (!isOnline || !isOnline.isConnected || !isFastEnough || forceOffline) {
       // console.log(
-        // "sendOfflineQueue ~ still offline! Length:",
+      // "sendOfflineQueue ~ still offline! Length:",
       //   offlineQueue?.length
       // );
       if (setMutexFunction) setMutexFunction(false);
@@ -282,12 +282,12 @@ export async function sendOfflineQueue(
       try {
         if (item.type === "add") {
           const oldId = item.expense.id || item.expense.expenseData.id || null;
-          if (!oldId)
-            // console.log(
-              "debugOQ no old ID in item.expense:",
-              oldId,
-              item.expense.expenseData.description
-            );
+          // if (!oldId)
+          // console.log(
+          //   "debugOQ no old ID in item.expense:",
+          //   oldId,
+          //   item.expense.expenseData.description
+          // );
           const id = await storeExpense(
             item.expense.tripid,
             item.expense.uid,

@@ -265,10 +265,10 @@ function TripContextProvider({ children }) {
       return trip;
     } catch (error) {
       // console.log(
-        "error while fetchCurrent Trip in trip-context searching for ",
-        tripid,
-        error.message
-      );
+      // "error while fetchCurrent Trip in trip-context searching for ",
+      //   tripid,
+      //   error.message
+      // );
     }
   }
 
@@ -287,9 +287,9 @@ function TripContextProvider({ children }) {
       await updateTrip(tripid, trip);
     } catch (error) {
       // console.log(
-        "error while fetchCurrent Trip in trip-context searching for ",
-        tripid
-      );
+      //   "error while fetchCurrent Trip in trip-context searching for ",
+      //   tripid
+      // );
     }
   }
 

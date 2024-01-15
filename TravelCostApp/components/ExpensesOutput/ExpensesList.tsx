@@ -333,7 +333,9 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
       expensesLength: number,
       itemData
     ) => {
+      const id = itemData.item.id || null;
       if (
+        id &&
         itemData.item.id[0] === "s" &&
         itemData.item.id[1] === "h" &&
         itemData.item.id[2] === "a" &&

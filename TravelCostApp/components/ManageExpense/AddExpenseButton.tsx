@@ -93,7 +93,9 @@ const AddExpenseButton = ({ navigation }) => {
           data.date = new Date();
           data.startDate = new Date();
           data.endDate = new Date();
-          data.duplOrSplit = DuplicateOption.null;
+          delete data.id;
+          delete data.rangeId;
+          delete data.editedTimestamp;
           navigation.navigate("ManageExpense", {
             pickedCat: data.category,
             tempValues: { ...data },
@@ -134,7 +136,9 @@ const AddExpenseButton = ({ navigation }) => {
               // cancel button
               {
                 text: "Cancel",
-                onPress: () => // console.log("Cancel Pressed"),
+                onPress: () => {
+                  return;
+                }, // console.log("Cancel Pressed"),
                 style: "cancel",
               },
               {

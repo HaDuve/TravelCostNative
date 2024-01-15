@@ -249,9 +249,9 @@ export async function sendOfflineQueue(
 
     if (!isOnline || !isOnline.isConnected || !isFastEnough || forceOffline) {
       // console.log(
-        "sendOfflineQueue ~ still offline! Length:",
-        offlineQueue?.length
-      );
+        // "sendOfflineQueue ~ still offline! Length:",
+      //   offlineQueue?.length
+      // );
       if (setMutexFunction) setMutexFunction(false);
       return;
     }

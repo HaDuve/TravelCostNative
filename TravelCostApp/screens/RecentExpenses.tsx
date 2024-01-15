@@ -100,10 +100,10 @@ function RecentExpenses({ navigation }) {
       ignoreTouched = false
     ) => {
       if (userCtx.freshlyCreated) return;
-      if (ignoreTouched)
-        // console.log("getExpenses ~ ignoreTouched:", ignoreTouched);
-        // check offlinemode
-        const online = netCtx.isConnected && netCtx.strongConnection;
+      // if (ignoreTouched)
+      // console.log("getExpenses ~ ignoreTouched:", ignoreTouched);
+      // check offlinemode
+      const online = netCtx.isConnected && netCtx.strongConnection;
       const offlineQueue = getMMKVObject("offlineQueue");
       const queueBlocked = offlineQueue && offlineQueue?.length > 0;
       if (!online || queueBlocked || userCtx.isSendingOfflineQueueMutex) {

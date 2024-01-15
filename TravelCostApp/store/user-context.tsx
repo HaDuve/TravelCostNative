@@ -107,9 +107,9 @@ function UserContextProvider({ children }) {
 
   const loadLastCurrencyCountryFromAsync = useCallback(async () => {
     // console.log(
-      "loadLastCurrencyCountryFromAsync ~ loadLastCurrencyCountryFromAsync:",
-      loadLastCurrencyCountryFromAsync
-    );
+    //   "loadLastCurrencyCountryFromAsync ~ loadLastCurrencyCountryFromAsync:",
+    //   loadLastCurrencyCountryFromAsync
+    // );
     try {
       const lastCurrencyString = await secureStoreGetItem("lastCurrency");
       const lastCountryString = await secureStoreGetItem("lastCountry");

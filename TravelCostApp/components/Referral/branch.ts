@@ -10,15 +10,15 @@ export async function initBranch(navigation = null) {
   branch.subscribe({
     onOpenStart: ({ uri, cachedInitialEvent }) => {
       // console.log(
-        "subscribe onOpenStart, will open " +
-          uri +
-          " cachedInitialEvent is " +
-          cachedInitialEvent
-      );
+      //   "subscribe onOpenStart, will open " +
+      //     uri +
+      //     " cachedInitialEvent is " +
+      //     cachedInitialEvent
+      // );
       // console.log(
-        "onOpenStart",
-        "will open " + uri + " cachedInitialEvent is " + cachedInitialEvent
-      );
+      //   "onOpenStart",
+      //   "will open " + uri + " cachedInitialEvent is " + cachedInitialEvent
+      // );
     },
     onOpenComplete: ({ error, params, uri }) => {
       if (error) {
@@ -29,9 +29,9 @@ export async function initBranch(navigation = null) {
             error
         );
         // console.log(
-          "onOpenComplete",
-          "Error from opening uri: " + uri + " error: " + error
-        );
+        //   "onOpenComplete",
+        //   "Error from opening uri: " + uri + " error: " + error
+        // );
         return;
       } else if (params) {
         if (!params["+clicked_branch_link"]) {

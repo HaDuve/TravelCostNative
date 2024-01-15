@@ -543,8 +543,8 @@ function Root() {
     const methods = origMessageQueue._remoteMethodTable;
     global.findModuleByModuleAndMethodIds = (moduleId, methodId) => {
       // console.log(
-        `The problematic line code is in: ${modules[moduleId]}.${methods[moduleId][methodId]}`
-      );
+      //   `The problematic line code is in: ${modules[moduleId]}.${methods[moduleId][methodId]}`
+      // );
     };
   }
 
@@ -584,9 +584,9 @@ function Root() {
               if (!locale) {
                 checkUser.locale = i18n.locale;
                 // console.log(
-                  "delayedOnlineSetup ~ checkUser.locale before updating:",
-                  checkUser.locale
-                );
+                // "delayedOnlineSetup ~ checkUser.locale before updating:",
+                //   checkUser.locale
+                // );
                 await updateUser(storedUid, checkUser);
               }
               const tripData = await tripCtx.fetchAndSetCurrentTrip(tripid);

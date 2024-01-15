@@ -14,9 +14,9 @@ export async function exportAllExpensesToXLSX(expenses) {
     { cat: "other", start: 261, end: 302 },
   ];
   // console.log(
-    "exportAllExpensesToXLSX ~ workbook.SheetNames",
-    workbook.SheetNames
-  );
+  //   "exportAllExpensesToXLSX ~ workbook.SheetNames",
+  //   workbook.SheetNames
+  // );
   const sheet = workbook.SheetNames[6];
   const ws = workbook.Sheets[sheet];
 

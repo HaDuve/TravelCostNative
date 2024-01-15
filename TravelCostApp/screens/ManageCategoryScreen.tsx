@@ -132,8 +132,8 @@ const ManageCategoryScreen = ({ route, navigation }) => {
         JSON.stringify(newCategoryList)
       );
       // console.log(
-        `updating trip categories with ${JSON.stringify(newCategoryList)}`
-      );
+      //   `updating trip categories with ${JSON.stringify(newCategoryList)}`
+      // );
       await updateTrip(tripid, {
         categories: JSON.stringify(newCategoryList),
       });

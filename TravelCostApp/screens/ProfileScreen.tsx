@@ -229,9 +229,9 @@ const ProfileScreen = ({ navigation }) => {
         }
       } catch (error) {
         // console.log(
-          "setAttributesAsync - Settings - ForRevCat ~ error:",
-          error
-        );
+        //   "setAttributesAsync - Settings - ForRevCat ~ error:",
+        //   error
+        // );
       }
     }
     setAttributesAsync();

@@ -104,10 +104,10 @@ export async function getRateAPI1(base: string, target: string) {
         return getOfflineRate(base, target);
       }
       // console.log(
-        "\n\n!!! \n\n~~~~~~  storing rates in asyncstore",
-        base,
-        rates[target]
-      );
+      // "\n\n!!! \n\n~~~~~~  storing rates in asyncstore",
+      // base,
+      // rates[target]
+      // );
       await asyncStoreSetObject("currencyExchange_base_" + base, rates);
       const timeStamp = DateTime.now().toISO();
       await asyncStoreSetObject("currencyExchange_lastUpdate", timeStamp);
@@ -130,9 +130,9 @@ export async function getOfflineRate(base: string, target: string) {
   );
   if (currencyExchange) {
     // console.log(
-      "getOfflineRate ~ currencyExchange[target]:",
-      currencyExchange[target]
-    );
+    //   "getOfflineRate ~ currencyExchange[target]:",
+    //   currencyExchange[target]
+    // );
     return currencyExchange[target];
   } else {
     // console.log("getOfflineRate ~ error ~ no currencyExchange rate stored!");

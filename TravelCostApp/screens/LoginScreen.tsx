@@ -96,8 +96,8 @@ function LoginScreen() {
     if (!checkUser.currentTrip) {
       // we infer freshly created if no current trip exists but we assigned a name already
       // console.log(
-        "loginHandler ~ we set to freshly because username but no current trip!"
-      );
+      //   "loginHandler ~ we set to freshly because username but no current trip!"
+      // );
       await userCtx.setFreshlyCreatedTo(true);
       freshlyCreated = true;
     } else {

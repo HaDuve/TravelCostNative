@@ -260,9 +260,9 @@ export function travellerToDropdown(travellers) {
       // console.log("Object.keys ~ key:", key);
       // console.log("Object.keys ~ travellers[key]:", travellers[key]);
       // console.log(
-        "Object.keys ~ travellers[key][userName]:",
-        travellers[key]["userName"]
-      );
+      //   "Object.keys ~ travellers[key][userName]:",
+      //   travellers[key]["userName"]
+      // );
       listOfLabelValues.push({
         label: travellers[key]["userName"],
         value: travellers[key]["userName"],
@@ -331,7 +331,7 @@ export async function calcOpenSplitsTable(
               split.amount = split.amount / rate;
               // // console.log("asyncSplitList ~ split.amount:", split.amount);
             } catch (error) {
-              console.error(error);
+              safeLogError(error);
             }
           } else {
             split.amount = split.amount / rates[expense.currency];

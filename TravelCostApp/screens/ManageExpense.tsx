@@ -281,20 +281,20 @@ const ManageExpense = ({ route, navigation }) => {
       expenseData.date = newDate;
       expenseData.editedTimestamp = Date.now();
       // console.log(
-        "expenseData.date: ",
-        expenseData.date,
-        typeof expenseData.date
-      );
+      //   "expenseData.date: ",
+      //   expenseData.date,
+      //   typeof expenseData.date
+      // );
       // console.log(
-        "expenseData.startDate: ",
-        expenseData.startDate,
-        typeof expenseData.startDate
-      );
+      //   "expenseData.startDate: ",
+      //   expenseData.startDate,
+      //   typeof expenseData.startDate
+      // );
       // console.log(
-        "expenseData.endDate: ",
-        expenseData.endDate,
-        typeof expenseData.endDate
-      );
+      //   "expenseData.endDate: ",
+      //   expenseData.endDate,
+      //   typeof expenseData.endDate
+      // );
 
       const item: OfflineQueueManageExpenseItem = {
         type: "add",

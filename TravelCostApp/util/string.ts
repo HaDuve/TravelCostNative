@@ -8,6 +8,7 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import { getCurrencySymbol } from "./currencySymbol";
+import safeLogError from "./error";
 
 export function formatExpenseWithCurrency(
   amount: number | string,
@@ -16,7 +17,7 @@ export function formatExpenseWithCurrency(
 ): string {
   if (typeof amount === "string") amount = Number(amount);
   if (isNaN(amount)) {
-    // // console.log("calling formatExpenseWithCurrency without a number");
+    // safeLogError("calling formatExpenseWithCurrency with a NaN");
     return "";
   }
 

@@ -89,19 +89,19 @@ export async function deleteAllExpensesByRangedId(
 ) {
   const allExpenses = await getAllExpenses(tripid);
 
-  const rangedExpenses = allExpenses.filter(
-    (expense) => expense?.rangeId == selectedExpense?.rangeId
-  );
-  const countRangedExpensesMax = rangedExpenses?.length;
+  // const rangedExpenses = allExpenses.filter(
+  //   (expense) => expense?.rangeId == selectedExpense?.rangeId
+  // );
+  // const countRangedExpensesMax = rangedExpenses?.length;
   // console.log(
-    "deleteAllExpenses ~ countRangedExpensesMax:",
-    countRangedExpensesMax
-  );
-  let expCounter = 0;
+  //   "deleteAllExpenses ~ countRangedExpensesMax:",
+  //   countRangedExpensesMax
+  // );
+  // let expCounter = 0;
   for (let i = 0; i < allExpenses?.length; i++) {
     const expense: ExpenseData = allExpenses[i];
     if (expense?.rangeId == selectedExpense?.rangeId) {
-      expCounter++;
+      // expCounter++;
       const queueItem: OfflineQueueManageExpenseItem = {
         type: "delete",
         expense: {

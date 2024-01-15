@@ -552,7 +552,7 @@ export async function fetchCurrentTrip(userId: string) {
     // // console.log("https: ~ fetchCurrentTrip ~ response", response.data);
     if (!response?.data?.currentTrip)
       // console.log("https: ~ could not find current trip of this user!");
-    return response.data.currentTrip;
+      return response.data.currentTrip;
   } catch (error) {
     throw new Error("error while fetching current trip");
   }
@@ -677,9 +677,9 @@ export async function storeExpoPushTokenInTrip(
   localeToken.tripid = usedTripID;
   localeToken.locale = i18n.locale;
   // console.log(
-    "storeExpoPushTokenInTrip ~ localeToken.locale:",
-    localeToken.locale
-  );
+  //   "storeExpoPushTokenInTrip ~ localeToken.locale:",
+  //   localeToken.locale
+  // );
   // console.log("storeExpoPushTokenInTrip ~ usedTripID", usedTripID);
   // store token string under tripid/tokens adding to current tokens if any
   const response = await axios.get(
@@ -701,13 +701,14 @@ export async function storeExpoPushTokenInTrip(
       }
     }
   }
-  if (keysToDelete || keysToDelete.length < 1) // console.log("found no match");
-  const axiosCalls = [];
+  if (keysToDelete || keysToDelete.length < 1)
+    // console.log("found no match");
+    const axiosCalls = [];
   for (const key of keysToDelete) {
     // console.log(
-      "url/key to delete:",
-      `/trips/${usedTripID}/tokens/${key}.json`
-    );
+    //   "url/key to delete:",
+    //   `/trips/${usedTripID}/tokens/${key}.json`
+    // );
     axiosCalls.push(
       axios.delete(
         BACKEND_URL +
@@ -726,17 +727,15 @@ export async function storeExpoPushTokenInTrip(
     // console.log(" ~ successfully stored token in trip", response?.data);
     finalResponse = response;
   } catch (error) {
-    console.error("error while storing token in trip");
     safeLogError(error, "http.tsx", 735);
   }
   try {
     // delete all redundant tokens
-    const res = await Promise.all(axiosCalls);
-    // console.log(
-      `Successfully executed ${axiosCalls.length} axios.delete calls!`
-    );
+    await Promise.all(axiosCalls);
+    // // console.log(
+    //   `Successfully executed ${axiosCalls.length} axios.delete calls!`
+    // );
   } catch (error) {
-    console.error("failing while deleting");
     safeLogError(error);
   }
   return finalResponse;

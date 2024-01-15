@@ -24,7 +24,7 @@ export async function fetchAndSetExpenses(
   uid: string,
   tripCtx: any
 ) {
-  console.log("fetchAndSetExpenses called", "uid:", uid);
+  // console.log("fetchAndSetExpenses called", "uid:", uid);
   if (!showRefIndicator && !showAnyIndicator) setIsFetching(true);
   if (!showAnyIndicator) setRefreshing(true);
   try {

@@ -23,9 +23,9 @@ const CategoryMapTestScreen = () => {
     setIsFetching(true);
     try {
       const response = await axios.request(chatGPT_getKeywords(text));
-      console.log(response.data);
+      // console.log(response.data);
       if (response.data.choices[0].message.content) {
-        console.log(response.data.choices[0].message.content);
+        // console.log(response.data.choices[0].message.content);
         setAnswer(response.data.choices[0].message.content);
       }
     } catch (error) {
@@ -39,9 +39,9 @@ const CategoryMapTestScreen = () => {
       const response = await axios.request(
         chatGPT_getGoodDeal(text, "500", "LKR", "Sri Lanka")
       );
-      console.log(response.data);
+      // console.log(response.data);
       if (response.data.choices[0].message.content) {
-        console.log(response.data.choices[0].message.content);
+        // console.log(response.data.choices[0].message.content);
         setAnswer(response.data.choices[0].message.content);
       }
     } catch (error) {

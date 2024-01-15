@@ -134,7 +134,7 @@ const AddExpenseButton = ({ navigation }) => {
               // cancel button
               {
                 text: "Cancel",
-                onPress: () => console.log("Cancel Pressed"),
+                onPress: () => // console.log("Cancel Pressed"),
                 style: "cancel",
               },
               {

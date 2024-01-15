@@ -32,10 +32,10 @@ export async function isPremiumMember() {
       typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined"
     ) {
       // Grant user "pro" access
-      console.log("User is premium member");
+      // console.log("User is premium member");
       return true;
     } //else
-    console.log("User is not premium member");
+    // console.log("User is not premium member");
     return false;
   } catch (e) {
     // Error fetching customer info

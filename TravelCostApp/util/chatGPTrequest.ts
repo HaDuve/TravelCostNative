@@ -15,7 +15,7 @@ const languageObj = LANGUAGE_LIST.find(
   (language) => language.code === i18n.locale
 );
 const languageName = languageObj?.name;
-console.log("languageName:", languageName);
+// console.log("languageName:", languageName);
 
 import { Configuration, OpenAIApi } from "openai";
 import { Keys, loadKeys } from "../components/Premium/PremiumConstants";
@@ -82,7 +82,7 @@ function chatGPTcontentPrice(
 function getGPT_Content(requestBody: GPT_RequestBody) {
   switch (requestBody.requestType) {
     case GPT_RequestType.getGoodDeal:
-      console.log("requestType:", GPT_RequestType.getGoodDeal);
+      // console.log("requestType:", GPT_RequestType.getGoodDeal);
       return chatGPTcontentGoodDealPost(
         (requestBody as GPT_getGoodDeal).product,
         (requestBody as GPT_getGoodDeal).price,
@@ -90,12 +90,12 @@ function getGPT_Content(requestBody: GPT_RequestBody) {
         (requestBody as GPT_getGoodDeal).country
       );
     case GPT_RequestType.getKeywords:
-      console.log("requestType:", GPT_RequestType.getKeywords);
+      // console.log("requestType:", GPT_RequestType.getKeywords);
       return chatGPTcontentKeywords(
         (requestBody as GPT_getKeywords).customCategory
       );
     case GPT_RequestType.getPrice:
-      console.log("requestType:", GPT_RequestType.getPrice);
+      // console.log("requestType:", GPT_RequestType.getPrice);
       return chatGPTcontentPrice(
         (requestBody as GPT_getPrice).product,
         (requestBody as GPT_getPrice).country,
@@ -131,8 +131,8 @@ export async function getChatGPT_Response(requestBody: GPT_RequestBody) {
       presence_penalty: 0.15,
     });
     const responseText = response.data.choices[0].message;
-    console.log("response.data: gpt-4:", response.data);
-    console.log("responseText: gpt-4:", responseText);
+    // console.log("response.data: gpt-4:", response.data);
+    // console.log("responseText: gpt-4:", responseText);
     return responseText;
   } catch (error) {
     try {
@@ -151,8 +151,8 @@ export async function getChatGPT_Response(requestBody: GPT_RequestBody) {
         presence_penalty: 0,
       });
       const responseText = response.data.choices[0].message;
-      console.log("response.data: gpt-3.5-turbo:", response.data);
-      console.log("responseText: gpt-3.5-turbo:", responseText);
+      // console.log("response.data: gpt-3.5-turbo:", response.data);
+      // console.log("responseText: gpt-3.5-turbo:", responseText);
     } catch (error) {
       safeLogError(error);
       return "Sorry, I am not sure about that.";

@@ -15,7 +15,7 @@ const LinkingButton = ({
       if (supported) {
         Linking.openURL(URL);
       } else {
-        console.log("Don't know how to open URI: " + URL);
+        // console.log("Don't know how to open URI: " + URL);
       }
     });
   };

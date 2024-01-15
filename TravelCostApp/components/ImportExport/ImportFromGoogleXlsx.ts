@@ -45,7 +45,7 @@ const getGoogleExcelData = async (
 ) => {
   // Get the names of all the tables in the workbook
   // const sheetNames = workbook.SheetNames;
-  // console.log("}).then ~ sheetNames", sheetNames);
+  // // console.log("}).then ~ sheetNames", sheetNames);
 
   // const listOfMonths = [
   //   "Januar",
@@ -73,7 +73,7 @@ const getGoogleExcelData = async (
   //TODO: iterate throu months and cats
   for (let i = 0; i < listOfMonthsInt?.length; i++) {
     for (let j = 0; j < config?.length; j++) {
-      // console.log("Monat: ", listOfMonths[i], "Kategorie:", config[j].cat);
+      // // console.log("Monat: ", listOfMonths[i], "Kategorie:", config[j].cat);
       const monthInt = listOfMonthsInt[i];
       const sheet = workbook.Sheets[workbook.SheetNames[monthInt]];
       const catConfig = config[j];
@@ -246,14 +246,14 @@ async function importCostDataFromGSXlsx(
       splitCostList.push((percentage / 100) * amount);
       splitCostList.push(((100 - percentage) / 100) * amount);
     } else {
-      console.log("Invalid whopaid");
+      // console.log("Invalid whopaid");
     }
     return splitCostList;
   }
 
   for (let i = 0; i < data?.length; i++) {
     const expenseObj = data[i];
-    // if (i == 0) console.log("expenseObj", expenseObj);
+    // if (i == 0) // console.log("expenseObj", expenseObj);
 
     const splitString = calculateSplitCost(
       expenseObj.whoPaid,
@@ -288,7 +288,7 @@ async function importCostDataFromGSXlsx(
     if (fromDate != null && new Date(fromDate) > new Date(expenseData.date)) {
       continue; // too old
     }
-    console.log("expense not too old: " + expenseData.date, fromDate);
+    // console.log("expense not too old: " + expenseData.date, fromDate);
     await storeImportedExpense(expenseData);
   }
   return;

@@ -42,8 +42,8 @@ export type TripsSummary = {
 
 const TripSummaryScreen = ({ navigation }) => {
   const userCtx = useContext(UserContext);
-  console.log("TripSummaryScreen");
-  console.log("userCtx.tripHistory:", userCtx.tripHistory);
+  // console.log("TripSummaryScreen");
+  // console.log("userCtx.tripHistory:", userCtx.tripHistory);
   const [isFetching, setIsFetching] = useState(false);
   const [allTrips, setAllTrips] = useState<TripAsObject[]>([]);
   const [tripSummary, setTripSummary] = useState<TripsSummary>(null);
@@ -77,7 +77,7 @@ const TripSummaryScreen = ({ navigation }) => {
     setIsFetching(true);
     // get a summary of all selected trips
     const selectedTrips = allTrips.filter((trip) => trip.selected);
-    console.log("selectedTrips:", selectedTrips);
+    // console.log("selectedTrips:", selectedTrips);
     // gather all the data for tripssummary
     const numberOfTrips = selectedTrips?.length;
     let totalCost = 0;
@@ -102,7 +102,7 @@ const TripSummaryScreen = ({ navigation }) => {
 
       // console log all keys from tripdata
       for (const key in tripData) {
-        console.log("summarizeHandler ~ key:", key);
+        // console.log("summarizeHandler ~ key:", key);
       }
 
       const expenses = await getAllExpenses(trip.tripid);
@@ -164,7 +164,7 @@ const TripSummaryScreen = ({ navigation }) => {
       );
     }
     // set state
-    console.log("summarizeHandler ~ totalCost:", totalCost);
+    // console.log("summarizeHandler ~ totalCost:", totalCost);
     // sum up all travellers costs
 
     setTripSummary({

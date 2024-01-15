@@ -111,13 +111,13 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
 
   useEffect(() => {
     if (!tripid) {
-      console.log("no tripid in tripITEM");
+      // console.log("no tripid in tripITEM");
       return;
     }
     async function getTrip() {
       try {
         const trip = await fetchTrip(tripid);
-        // console.log("getTrip ~ trip", trip);
+        // // console.log("getTrip ~ trip", trip);
         const _dailyBudget = trip.dailyBudget;
         const _totalBudget = trip.totalBudget ?? MAX_JS_NUMBER.toString();
         const _tripCurrency = trip.tripCurrency;
@@ -152,7 +152,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
     async function getTripTravellers() {
       try {
         const listTravellers = await getTravellers(tripid);
-        console.log("getTripTravellers ~ listTravellers:", listTravellers);
+        // console.log("getTripTravellers ~ listTravellers:", listTravellers);
         const objTravellers = [];
         listTravellers.forEach((traveller) => {
           objTravellers.push({ userName: traveller });
@@ -209,7 +209,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       if (objTravellers.length > 0) setTravellers(objTravellers);
 
       setIsFetching(false);
-      console.log("useEffect context success! for:", tripName);
+      // console.log("useEffect context success! for:", tripName);
     }
 
     async function fetchAndSetTripData() {
@@ -222,9 +222,9 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       try {
         fetchAndSetTripData();
         setAllLoaded(true);
-        console.log("useEffect fetch success! for:", tripName);
+        // console.log("useEffect fetch success! for:", tripName);
       } catch (error) {
-        console.log("error while fetching TripData", error);
+        // console.log("error while fetching TripData", error);
       }
       setIsFetching(false);
     }
@@ -272,7 +272,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const megaLongText =
     dailyBudgetString?.length + sumOfExpensesString?.length > 22;
   const isScaledUp = fontScale > 1 || megaLongText;
-  // console.log("TripHistoryItem ~ isScaledUp:", isScaledUp);
+  // // console.log("TripHistoryItem ~ isScaledUp:", isScaledUp);
 
   function tripPressHandler() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -281,7 +281,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       return;
     }
     // NOTE: Android can only handle alert with 2 actions, so this needs to be changed or actions will go missing
-    console.log("pressed: ", tripid);
+    // console.log("pressed: ", tripid);
     navigation.navigate("ManageTrip", { tripId: tripid, trips: trips });
   }
 

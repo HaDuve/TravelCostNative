@@ -64,7 +64,7 @@ async function registerForPushNotificationsAsync() {
     });
     // granted so we want to save the token in the trip
     await storeExpoPushTokenInTrip(token, "");
-    console.log(token);
+    // console.log(token);
   } else {
     // alert("Must use physical device for Push Notifications");
     Toast.show({
@@ -98,10 +98,10 @@ const TEST_PushScreen = () => {
     registerForPushNotificationsAsync()
       .then((pushToken: ExpoPushToken) => {
         const token = pushToken.data;
-        console.log("token", token);
+        // console.log("token", token);
         setExpoPushToken(token);
       })
-      .catch((e) => console.log("token error", e));
+      .catch((e) => // console.log("token error", e));
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
@@ -110,7 +110,7 @@ const TEST_PushScreen = () => {
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response);
+        // console.log(response);
       });
 
     return () => {

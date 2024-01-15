@@ -78,7 +78,7 @@ const SettingsScreen = ({ navigation }) => {
     React.useCallback(() => {
       async function setPremiumNow() {
         const isPremium = await userCtx.checkPremium();
-        // console.log("setPremiumNow ~ isPremium:", isPremium);
+        // // console.log("setPremiumNow ~ isPremium:", isPremium);
         setPremiumStatus(isPremium);
       }
       setPremiumNow();
@@ -102,7 +102,7 @@ const SettingsScreen = ({ navigation }) => {
             Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
             return;
           }
-          console.log("deleteAccountHandler ~ deleteAccountHandler");
+          // console.log("deleteAccountHandler ~ deleteAccountHandler");
           authCtx.deleteAccount();
         },
       },
@@ -114,10 +114,10 @@ const SettingsScreen = ({ navigation }) => {
     try {
       const restore = await Purchases.restorePurchases();
       // ... check restored purchaserInfo to see if entitlement is now active
-      console.log("restorePurchases ~ restore:", restore);
+      // console.log("restorePurchases ~ restore:", restore);
       if (restore.entitlements.all[ENTITLEMENT_ID].isActive) {
         // ... grant user entitlement
-        console.log("restorePurchases ~ restore.entitlements.all:", restore);
+        // console.log("restorePurchases ~ restore.entitlements.all:", restore);
         await userCtx.checkPremium();
         navigation.pop();
         Toast.show({
@@ -132,7 +132,7 @@ const SettingsScreen = ({ navigation }) => {
         text1: i18n.t("premiumNomad"),
         text2: i18n.t("premiumNomadError"),
       });
-      console.log("restorePurchases ~ e:", e);
+      // console.log("restorePurchases ~ e:", e);
     }
     setIsRestoringPurchases(false);
   }
@@ -207,7 +207,7 @@ const SettingsScreen = ({ navigation }) => {
             Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
             return;
           }
-          console.log("pressed premium button");
+          // console.log("pressed premium button");
           if (premiumStatus) {
             // Toast.show({
             //   type: "success",
@@ -225,7 +225,7 @@ const SettingsScreen = ({ navigation }) => {
       </TouchableOpacity> */}
       <TouchableOpacity
         onPress={async () => {
-          console.log("pressed support button");
+          // console.log("pressed support button");
           const subject = encodeURIComponent("Budget For Nomads Support");
           const message = encodeURIComponent("Hi, I have a question about ...");
           const url = `mailto:budgetfornomads@outlook.com?subject=${subject}&body=${message}`;

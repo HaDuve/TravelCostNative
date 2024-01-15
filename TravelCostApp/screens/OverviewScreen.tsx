@@ -40,7 +40,7 @@ import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { showBanner } from "../components/UI/ToastComponent";
 
 const OverviewScreen = ({ navigation }) => {
-  // console.log("rerender OverviewScreen - 0");
+  // // console.log("rerender OverviewScreen - 0");
   const expensesCtx = useContext(ExpensesContext);
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
@@ -80,7 +80,7 @@ const OverviewScreen = ({ navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log("callback called");
+      // console.log("callback called");
       if (!userCtx.freshlyCreated) {
         showBanner(navigation);
       }

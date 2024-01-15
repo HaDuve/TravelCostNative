@@ -139,7 +139,7 @@ function ExpensesContextProvider({ children }) {
 
   useEffect(() => {
     async function asyncLoadExpenses() {
-      console.log("-----------------\n first time load");
+      // console.log("-----------------\n first time load");
       await loadExpensesFromStorage(true);
     }
     asyncLoadExpenses();
@@ -147,7 +147,7 @@ function ExpensesContextProvider({ children }) {
 
   useEffect(() => {
     // save expenseState in async
-    // console.log("saving expenses");
+    // // console.log("saving expenses");
     async function asyncSaveExpenses() {
       if (expensesState?.length > 0)
         // await asyncStoreSetObject("expenses", expensesState);
@@ -306,12 +306,12 @@ function ExpensesContextProvider({ children }) {
 
   async function loadExpensesFromStorage(forceLoad = false) {
     if (!forceLoad && expensesState?.length !== 0) {
-      // console.log("expenses not empty, will not load again");
+      // // console.log("expenses not empty, will not load again");
       return false;
     }
     // const loadedExpenses = await asyncStoreGetObject("expenses");
     const loadedExpenses = getMMKVObject("expenses");
-    // console.log(
+    // // console.log(
     //   "loadExpensesFromStorage ~ loadedExpenses:",
     //   loadedExpenses?.length
     // );
@@ -324,9 +324,9 @@ function ExpensesContextProvider({ children }) {
         expArray.push(expense);
       });
       setExpenses(expArray);
-      // console.log("loadExpensesFromStorage ~ expArray:", expArray);
+      // // console.log("loadExpensesFromStorage ~ expArray:", expArray);
     } else {
-      // console.log("no Expenses loaded from Storage!");
+      // // console.log("no Expenses loaded from Storage!");
     }
     return true;
   }

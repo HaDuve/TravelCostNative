@@ -9,13 +9,13 @@ export async function initBranch(navigation = null) {
   // Listener
   branch.subscribe({
     onOpenStart: ({ uri, cachedInitialEvent }) => {
-      console.log(
+      // console.log(
         "subscribe onOpenStart, will open " +
           uri +
           " cachedInitialEvent is " +
           cachedInitialEvent
       );
-      console.log(
+      // console.log(
         "onOpenStart",
         "will open " + uri + " cachedInitialEvent is " + cachedInitialEvent
       );
@@ -28,7 +28,7 @@ export async function initBranch(navigation = null) {
             " error: " +
             error
         );
-        console.log(
+        // console.log(
           "onOpenComplete",
           "Error from opening uri: " + uri + " error: " + error
         );
@@ -36,7 +36,7 @@ export async function initBranch(navigation = null) {
       } else if (params) {
         if (!params["+clicked_branch_link"]) {
           if (params["+non_branch_link"]) {
-            console.log("non_branch_link: " + uri);
+            // console.log("non_branch_link: " + uri);
             // Route based on non-Branch links
             return;
           }
@@ -44,8 +44,8 @@ export async function initBranch(navigation = null) {
           // Handle params
           const deepLinkPath = params.$deeplink_path as string;
           const canonicalUrl = params.$canonical_url as string;
-          console.log("deepLinkPath", deepLinkPath);
-          console.log("canonicalUrl", canonicalUrl);
+          // console.log("deepLinkPath", deepLinkPath);
+          // console.log("canonicalUrl", canonicalUrl);
           // Route based on Branch link data
           if (deepLinkPath && deepLinkPath.split("/")[0] === "join")
             navigation?.navigate("Join", { id: deepLinkPath.split("/")[1] });
@@ -59,7 +59,7 @@ export async function initBranch(navigation = null) {
 export async function showBranchParams() {
   const latestParams: BranchParams = await branch.getLatestReferringParams(); // Params from last open
   const installParams = await branch.getFirstReferringParams(); // Params from original install
-  // console.log("showParams", latestParams, installParams);
+  // // console.log("showParams", latestParams, installParams);
   const campaign = latestParams["~campaign"];
   const channel = latestParams["~channel"];
   const feature = latestParams["~feature"];
@@ -77,7 +77,7 @@ export async function showBranchParams() {
 }
 
 export async function trackPurchaseEvent() {
-  console.log("trackPurchaseEvent ~ trackPurchaseEvent:");
+  // console.log("trackPurchaseEvent ~ trackPurchaseEvent:");
   // branch tracking
   const buo = await branch.createBranchUniversalObject("item/12345", {
     canonicalUrl: "https://branch.io/item/12345",
@@ -118,7 +118,7 @@ export async function trackPurchaseEvent() {
   }
   const event = new BranchEvent(BranchEvent.Purchase, [buo], params);
   event.logEvent();
-  console.log("event logged, refferrer:", referrerString);
+  // console.log("event logged, refferrer:", referrerString);
 
-  console.log("trackPurchaseEvent ~ trackPurchaseEvent: end");
+  // console.log("trackPurchaseEvent ~ trackPurchaseEvent: end");
 }

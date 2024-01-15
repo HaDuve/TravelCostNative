@@ -131,7 +131,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
         } catch (e) {
           if (e.code === "ERR_REQUEST_CANCELED") {
             // handle that the user canceled the sign-in flow
-            console.log("onPress={ ~ e:", e);
+            // console.log("onPress={ ~ e:", e);
             Toast.show({
               type: "error",
               text1: i18n.t("toastAppleError1"),
@@ -139,7 +139,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
             });
           } else {
             // handle other errors
-            console.log("onPress={ ~ e:", e);
+            // console.log("onPress={ ~ e:", e);
             Toast.show({
               type: "error",
               text1: i18n.t("toastAppleError1"),

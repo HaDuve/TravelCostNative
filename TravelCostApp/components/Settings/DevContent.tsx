@@ -59,9 +59,9 @@ const DevContent = ({ navigation }) => {
     () => {
       async function asyncGetOfflineQueue() {
         const queue = await getOfflineQueue();
-        console.log("getOfflineQueue ~ queue:", queue?.length);
+        // console.log("getOfflineQueue ~ queue:", queue?.length);
         queue.forEach((Item) => {
-          console.log(Item.type, Item.expense.expenseData?.description);
+          // console.log(Item.type, Item.expense.expenseData?.description);
         });
         setOfflineQueue(queue ?? []);
       }
@@ -80,7 +80,7 @@ const DevContent = ({ navigation }) => {
     async function checkVersion() {
       if (isConnected) {
         const data: VersionCheckResponse = await versionCheck();
-        console.log("checkVersion ~ versionCheckResponse:", data);
+        // console.log("checkVersion ~ versionCheckResponse:", data);
         const latestVersion = data?.latestVersion;
         const currentVersion = data?.currentVersion;
         if (!latestVersion || !currentVersion) return;
@@ -173,7 +173,7 @@ const DevContent = ({ navigation }) => {
               // });
               // granted so we want to save the token in the trip
               await storeExpoPushTokenInTrip(token, "");
-              console.log("storeExpoPushTokenInTrip succeeded");
+              // console.log("storeExpoPushTokenInTrip succeeded");
             } catch (error) {
               const message = safeLogError(error);
               setErrorMessage(message);

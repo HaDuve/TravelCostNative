@@ -91,7 +91,7 @@ function AuthContextProvider({ children }) {
     });
     // load email and password from async storage
     const email = await secureStoreGetItem("ENCM");
-    console.log("deleteAccount ~ email:", email);
+    // console.log("deleteAccount ~ email:", email);
     const password = await secureStoreGetItem("ENCP");
     signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
       // Signed in
@@ -99,7 +99,7 @@ function AuthContextProvider({ children }) {
       deleteUser(user)
         .then(() => {
           // User deleted.
-          console.log("User deleted.");
+          // console.log("User deleted.");
           Toast.show({
             type: "success",
             text1: i18n.t("toastAccDeleted1"),

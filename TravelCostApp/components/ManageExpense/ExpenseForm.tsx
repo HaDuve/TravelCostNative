@@ -255,19 +255,19 @@ const ExpenseForm = ({
   const [isSpecialExpense, setIsSpecialExpense] = useState(
     editingValues?.isSpecialExpense ?? false
   );
-  // console.log("rerender: special:", isSpecialExpense);
+  // // console.log("rerender: special:", isSpecialExpense);
 
   useEffect(() => {
-    console.log("useEffect ~ tripCtx.isPaidDate", tripCtx?.isPaidDate);
-    console.log("useEffect ~ startDate", startDate);
-    console.log("useEffect ~ editingValues.date", editingValues?.date);
+    // console.log("useEffect ~ tripCtx.isPaidDate", tripCtx?.isPaidDate);
+    // console.log("useEffect ~ startDate", startDate);
+    // console.log("useEffect ~ editingValues.date", editingValues?.date);
     if (
       tripCtx.isPaidDate &&
       (startDate || editingValues?.date) &&
       (new Date(tripCtx.isPaidDate) > new Date(startDate) ||
         new Date(tripCtx.isPaidDate) > editingValues?.date)
     ) {
-      console.log("paid by tripctx");
+      // console.log("paid by tripctx");
       setIsPaid(isPaidString.paid);
     }
   }, [tripCtx.isPaidDate, startDate, editingValues?.date]);
@@ -360,7 +360,7 @@ const ExpenseForm = ({
     if (duplOrSplit == DuplicateOption.null) setConfirmedRange(true);
 
     // TODO: make this structured
-    console.log(daysBeween);
+    // console.log(daysBeween);
   };
   useLayoutEffect(() => {
     if (!confirmedRange) return;
@@ -412,7 +412,7 @@ const ExpenseForm = ({
   );
   useEffect(() => {
     if (netCtx.strongConnection) {
-      console.log("~~ currentTravellers:", tripCtx.travellers);
+      // console.log("~~ currentTravellers:", tripCtx.travellers);
       setCurrentTravellers(tripCtx.travellers);
     }
   }, [tripCtx.travellers, netCtx.strongConnection]);
@@ -546,7 +546,7 @@ const ExpenseForm = ({
   }
 
   function openTravellerMultiPicker() {
-    console.log("splitType", splitType);
+    // console.log("splitType", splitType);
     // add whole traveling group who paid automatically to shared list
     if (!editingValues) {
       setListEQUAL([...currentTravellers]);
@@ -581,7 +581,7 @@ const ExpenseForm = ({
   async function resetSplitHandler() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     const splitTravellers = splitTravellersList;
-    console.log("resetSplitHandler ~ splitTravellers:", splitTravellers);
+    // console.log("resetSplitHandler ~ splitTravellers:", splitTravellers);
     // calculate splits
     const listSplits = calcSplitList(
       "EQUAL",
@@ -700,7 +700,7 @@ const ExpenseForm = ({
       await secureStoreSetItem("lastCountry", inputs.country.value);
     }
     if (inputs.currency.value && inputs.currency.value !== "") {
-      console.log("submitHandler ~ secureStoreSetItem:", "last Currency");
+      // console.log("submitHandler ~ secureStoreSetItem:", "last Currency");
       userCtx.setLastCurrency(inputs.currency.value);
       await secureStoreSetItem("lastCurrency", inputs.currency.value);
     }
@@ -976,9 +976,9 @@ const ExpenseForm = ({
   );
   const hidePickers = true;
   // console log all 3 dates
-  // console.log("startDate", startDate);
-  // console.log("endDate", endDate);
-  // console.log("date", inputs.date.value);
+  // // console.log("startDate", startDate);
+  // // console.log("endDate", endDate);
+  // // console.log("date", inputs.date.value);
   let dateIsRanged =
     startDate?.toString().slice(0, 10) !== endDate?.toString().slice(0, 10);
   // if no startDate or no endDate, then date is not ranged
@@ -1073,7 +1073,7 @@ const ExpenseForm = ({
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     const _tempAmount = +tempAmount;
                     const newAmount = _tempAmount + Number(inputs.amount.value);
-                    console.log("_tempAmount:", _tempAmount);
+                    // console.log("_tempAmount:", _tempAmount);
                     setTempAmount(newAmount.toFixed(2));
                     inputChangedHandler("amount", "");
                   }}
@@ -1309,7 +1309,7 @@ const ExpenseForm = ({
                                 userCtx.userName,
                                 currentTravellers
                               );
-                              console.log("listSplits:", listSplits);
+                              // console.log("listSplits:", listSplits);
                               if (listSplits) {
                                 setSplitType(tempSplitType);
                                 setSplitList(listSplits);
@@ -1664,12 +1664,12 @@ const ExpenseForm = ({
                 // borderColor: "black",
               }}
               onPress={() => {
-                console.log("taskbar pressed");
+                // console.log("taskbar pressed");
                 if (inputs.amount.value) {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   const _tempAmount = +tempAmount;
                   const newAmount = _tempAmount + Number(inputs.amount.value);
-                  console.log("_tempAmount:", _tempAmount);
+                  // console.log("_tempAmount:", _tempAmount);
                   setTempAmount(newAmount.toFixed(2));
                   inputChangedHandler("amount", "");
                 } else if (tempAmount) {
@@ -1691,7 +1691,7 @@ const ExpenseForm = ({
                   color={GlobalStyles.colors.textColor}
                   size={24}
                   onPress={() => {
-                    console.log("add button pressed!");
+                    // console.log("add button pressed!");
                   }}
                 />
               )}
@@ -1705,7 +1705,7 @@ const ExpenseForm = ({
                   color={GlobalStyles.colors.textColor}
                   size={24}
                   onPress={() => {
-                    console.log("sum button pressed");
+                    // console.log("sum button pressed");
                   }}
                 />
               )}

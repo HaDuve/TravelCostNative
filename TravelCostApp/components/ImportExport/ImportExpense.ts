@@ -51,7 +51,7 @@ export async function importCategory(
       listEQUAL: [userName],
       splitList: [],
     };
-    console.log("expenseObj.cat", expenseObj.cat);
+    // console.log("expenseObj.cat", expenseObj.cat);
     await storeImportedExpense(expenseData);
   }
 }

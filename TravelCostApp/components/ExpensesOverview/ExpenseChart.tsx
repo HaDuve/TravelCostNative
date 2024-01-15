@@ -43,7 +43,7 @@ const ExpenseChart = ({
   navigation,
   expenses,
 }) => {
-  // console.log("rerender ExpenseChart - 3");
+  // // console.log("rerender ExpenseChart - 3");
   const data = inputData;
   // console last day
   const firstItem = inputData[0];
@@ -54,8 +54,8 @@ const ExpenseChart = ({
     new Date(lastItem.day ?? lastItem.lastDay),
     1
   );
-  // console.log("firstItemDate:", firstItemDate);
-  // console.log("lastItemDate:", lastItemDate);
+  // // console.log("firstItemDate:", firstItemDate);
+  // // console.log("lastItemDate:", lastItemDate);
   const xAxisString = xAxis;
   const yAxisString = yAxis;
   const budgetCompare =
@@ -177,7 +177,7 @@ const ExpenseChart = ({
                     {
                       target: "data",
                       mutation: ({ datum }) => {
-                        console.log(datum);
+                        // console.log(datum);
                         const budget =
                           datum.dailyBudget ||
                           datum.weeklyBudget ||
@@ -213,7 +213,7 @@ const ExpenseChart = ({
                     {
                       target: "data",
                       mutation: ({ datum }) => {
-                        console.log(datum);
+                        // console.log(datum);
                         let filteredExpenses = [];
                         if (datum.firstDay && datum.lastDay) {
                           filteredExpenses = expenses.filter(

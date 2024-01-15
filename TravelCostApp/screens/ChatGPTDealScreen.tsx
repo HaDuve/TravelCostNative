@@ -43,7 +43,7 @@ const GPTDealScreen = ({ route, navigation }) => {
     async function getGPT_Response() {
       setIsFetching(true);
       if (!price || price === "" || isNaN(Number(price))) {
-        console.log("GPTDealScreen ~no price:", price);
+        // console.log("GPTDealScreen ~no price:", price);
         try {
           const getPrice: GPT_getPrice = {
             requestType: GPT_RequestType.getPrice,
@@ -77,10 +77,10 @@ const GPTDealScreen = ({ route, navigation }) => {
       setIsFetching(false);
     }
     getGPT_Response();
-    console.log("GPTDealScreen ~ product:", product);
-    console.log("GPTDealScreen ~ country:", country);
-    console.log("GPTDealScreen ~ currency:", currency);
-    console.log("GPTDealScreen ~ price:", price);
+    // console.log("GPTDealScreen ~ product:", product);
+    // console.log("GPTDealScreen ~ country:", country);
+    // console.log("GPTDealScreen ~ currency:", currency);
+    // console.log("GPTDealScreen ~ price:", price);
   }, [country, currency, price, product]);
 
   async function handleRegenerate() {

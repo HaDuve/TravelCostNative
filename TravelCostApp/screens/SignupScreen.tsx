@@ -115,7 +115,7 @@ function SignupScreen() {
       await event2.logEvent();
     } catch (error) {
       await authCtx.authenticate(token);
-      console.log("error", error);
+      // console.log("error", error);
     }
     await authCtx.authenticate(token);
   }

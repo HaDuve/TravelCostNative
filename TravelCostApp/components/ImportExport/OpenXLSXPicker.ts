@@ -18,7 +18,7 @@ export const OpenXLSXPicker = async () => {
       copyToCacheDirectory: true,
       multiple: false,
     });
-    console.log("openFilePicker ~ ", res.name);
+    // console.log("openFilePicker ~ ", res.name);
     const fileData = await FileSystem.readAsStringAsync(res.uri, {
       encoding: FileSystem.EncodingType.Base64,
     }).then((b64) => XLSX.read(b64, { type: "base64" }));
@@ -101,7 +101,7 @@ async function getAllTextCostPairs(sheet, index: number) {
   for (let i = 0; i < config?.length; i++) {
     const catRange = config[i];
     if (!(catRange && catRange.start && catRange.end && catRange.cat)) {
-      console.log(" either no catRange, or no start end or category detected!");
+      // console.log(" either no catRange, or no start end or category detected!");
       continue;
     }
     listOfCategoriesTextCostPairs.push(

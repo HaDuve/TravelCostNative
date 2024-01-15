@@ -542,7 +542,7 @@ function Root() {
     const modules = origMessageQueue._remoteModuleTable;
     const methods = origMessageQueue._remoteMethodTable;
     global.findModuleByModuleAndMethodIds = (moduleId, methodId) => {
-      console.log(
+      // console.log(
         `The problematic line code is in: ${modules[moduleId]}.${methods[moduleId][methodId]}`
       );
     };
@@ -580,10 +580,10 @@ function Root() {
               if (!checkUser) return;
               const tripid = checkUser.currentTrip;
               const locale = checkUser.locale;
-              console.log("delayedOnlineSetup ~ locale:", locale);
+              // console.log("delayedOnlineSetup ~ locale:", locale);
               if (!locale) {
                 checkUser.locale = i18n.locale;
-                console.log(
+                // console.log(
                   "delayedOnlineSetup ~ checkUser.locale before updating:",
                   checkUser.locale
                 );
@@ -595,9 +595,9 @@ function Root() {
                 setOnlineSetupDone(true);
                 await onlineSetup(tripData, checkUser, tripid, storedUid);
 
-                console.log("delayedOnlineSetup ~ DONE");
+                // console.log("delayedOnlineSetup ~ DONE");
               } catch (error) {
-                console.log("delayedOnlineSetup ~ error", error);
+                // console.log("delayedOnlineSetup ~ error", error);
                 setOnlineSetupDone(false);
               }
             }
@@ -626,17 +626,17 @@ function Root() {
     const userData: UserData = checkUser;
     const tripid = userData.currentTrip;
     if (!tripid || tripid?.length < 2) return;
-    // console.log("onRootMount ~ userData", userData);
+    // // console.log("onRootMount ~ userData", userData);
     // save user Name in Ctx and async
     await loadKeys();
     try {
       await userCtx.addUserName(userData);
       await tripCtx.setCurrentTrip(tripid, tripData);
-      console.log("onlineSetup ~ tripid before setItem:", tripid);
+      // console.log("onlineSetup ~ tripid before setItem:", tripid);
       await userCtx.loadCatListFromAsyncInCtx(tripid);
       await touchMyTraveler(storedTripId, storedUid);
     } catch (error) {
-      console.log("onlineSetup ~ error", error);
+      // console.log("onlineSetup ~ error", error);
       await tripCtx.loadTripDataFromStorage();
     }
   }
@@ -646,10 +646,10 @@ function Root() {
     storedToken: string
   ) {
     if (!isOfflineMode) {
-      console.log("Online mode");
+      // console.log("Online mode");
       return null;
     }
-    console.log("Offline mode");
+    // console.log("Offline mode");
     await userCtx.loadUserNameFromStorage();
     await tripCtx.loadTripDataFromStorage();
     await tripCtx.loadTravellersFromStorage();
@@ -663,17 +663,17 @@ function Root() {
       await handleFirstStart();
 
       // end wrap
-      console.log("onRootMount ~ onRootMount");
+      // console.log("onRootMount ~ onRootMount");
 
       if (DEBUG_RESET_STORAGE) await asyncStoreSafeClear();
 
       // offline check and set context
       const { isFastEnough, speed } = await isConnectionFastEnough();
-      console.log("onRootMount ~ speed:", speed);
-      console.log("onRootMount ~ isFastEnough:", isFastEnough);
+      // console.log("onRootMount ~ speed:", speed);
+      // console.log("onRootMount ~ isFastEnough:", isFastEnough);
       const online = isFastEnough;
 
-      console.log("onRootMount ~ online:", online, speed?.toFixed(2), " mbps");
+      // console.log("onRootMount ~ online:", online, speed?.toFixed(2), " mbps");
       if (online) {
         await versionCheck();
       }
@@ -699,21 +699,21 @@ function Root() {
             apiKey: REVCAT_A,
             appUserID: storedUid,
           });
-          console.log("onRootMount ~ storedUid:", storedUid);
+          // console.log("onRootMount ~ storedUid:", storedUid);
         }
         await Purchases.collectDeviceIdentifiers();
         const event = new BranchEvent(BranchEvent.Login);
         await event.logEvent();
         const needsTour = await loadTourConfig();
-        console.log("onRootMount ~ needsTour:", needsTour);
+        // console.log("onRootMount ~ needsTour:", needsTour);
         userCtx.setNeedsTour(needsTour);
 
         //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
         // check if user is online
         if (!online) {
-          console.log("OFFLINE SETUP STARTED");
+          // console.log("OFFLINE SETUP STARTED");
           await setupOfflineMount(true, storedToken);
-          console.log("OFFLINE SETUP FINISHED");
+          // console.log("OFFLINE SETUP FINISHED");
           setAppIsReady(true);
           return;
         }
@@ -721,7 +721,7 @@ function Root() {
         // set tripId in context
         let tripData;
         if (storedTripId) {
-          // console.log("onRootMount ~ storedTripId", storedTripId);
+          // // console.log("onRootMount ~ storedTripId", storedTripId);
           tripData = await tripCtx.fetchAndSetCurrentTrip(storedTripId);
           await tripCtx.fetchAndSetTravellers(storedTripId);
           tripCtx.setTripid(storedTripId);
@@ -744,7 +744,7 @@ function Root() {
         }
         // check if user was deleted
         const checkUser = await fetchUser(storedUid);
-        console.log("onRootMount ~ checkUser:", checkUser);
+        // console.log("onRootMount ~ checkUser:", checkUser);
         // Check if the user logged in but there is no userName, we deleted the account
         if (!checkUser.userName) {
           Toast.show({
@@ -767,7 +767,7 @@ function Root() {
         await authCtx.setUserID(storedUid);
         await onlineSetup(tripData, checkUser, storedTripId, storedUid);
         await authCtx.authenticate(storedToken);
-        console.log("Root end reached");
+        // console.log("Root end reached");
         setAppIsReady(true);
       } else {
         tripCtx.setIsLoading(false);

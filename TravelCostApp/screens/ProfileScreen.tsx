@@ -61,7 +61,7 @@ async function registerForPushNotificationsAsync() {
     }
     if (finalStatus !== "granted") {
       // alert("Failed to get push token for push notification!");
-      console.log("Failed to get push token for push notification!");
+      // console.log("Failed to get push token for push notification!");
       Alert.alert(
         "Notifications",
         "Please enable notifications in settings!",
@@ -70,14 +70,14 @@ async function registerForPushNotificationsAsync() {
           {
             text: "Never ask again",
             onPress: () => {
-              console.log("Never ask again");
+              // console.log("Never ask again");
               setMMKVObject("expoPushAsk", { never: true });
             },
           },
           {
             text: "OK",
             onPress: () => {
-              console.log("OK");
+              // console.log("OK");
             },
           },
         ],
@@ -93,14 +93,14 @@ async function registerForPushNotificationsAsync() {
       });
       // granted so we want to save the token in the trip
       await storeExpoPushTokenInTrip(token, "");
-      console.log("storeExpoPushTokenInTrip succeeded");
+      // console.log("storeExpoPushTokenInTrip succeeded");
     } catch {
-      console.log("storeExpoPushTokenInTrip failed, will try later");
+      // console.log("storeExpoPushTokenInTrip failed, will try later");
       setMMKVObject("expoPushTokenStatus", { failed: true });
     }
-    console.log(token);
+    // console.log(token);
   } else {
-    console.log("Must use physical device for Push Notifications");
+    // console.log("Must use physical device for Push Notifications");
   }
 
   if (Platform.OS === "android") {
@@ -127,7 +127,7 @@ async function storeToken() {
       text1: "Store permissions error",
       text2: "Will try later",
     });
-    console.log("storeExpoPushTokenInTrip failed, will try later");
+    // console.log("storeExpoPushTokenInTrip failed, will try later");
     setMMKVObject("expoPushTokenStatus", { failed: true });
   }
 }
@@ -157,7 +157,7 @@ const ProfileScreen = ({ navigation }) => {
       .then((pushToken: ExpoPushToken) => {
         if (!pushToken) return;
         const token = pushToken.data;
-        console.log("token", token);
+        // console.log("token", token);
         setExpoPushToken(token);
       })
       .catch((e) => Alert.alert(e, e.message));
@@ -169,7 +169,7 @@ const ProfileScreen = ({ navigation }) => {
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response);
+        // console.log(response);
       });
 
     return () => {
@@ -228,7 +228,7 @@ const ProfileScreen = ({ navigation }) => {
             await Purchases.setAttributes({ channel: params["~channel"] });
         }
       } catch (error) {
-        console.log(
+        // console.log(
           "setAttributesAsync - Settings - ForRevCat ~ error:",
           error
         );
@@ -244,22 +244,22 @@ const ProfileScreen = ({ navigation }) => {
   useEffect(() => {
     setTripHistory(userCtx.tripHistory);
     async function fetchHistory() {
-      console.log("fetchHistory ~ fetchHistory:", fetchHistory);
+      // console.log("fetchHistory ~ fetchHistory:", fetchHistory);
       if (!userCtx.tripHistory || userCtx.tripHistory?.length < 1) {
         const uid = await secureStoreGetItem("uid");
-        console.log("fetch ~ uid:", uid);
+        // console.log("fetch ~ uid:", uid);
         if (!uid) return;
         try {
           // TODO: if failed fetch later
           const tripHistoryResponse = await fetchTripHistory(uid);
-          console.log("fetch ~ tripHistoryResponse:", tripHistoryResponse);
+          // console.log("fetch ~ tripHistoryResponse:", tripHistoryResponse);
           userCtx.setTripHistory(tripHistoryResponse);
         } catch (error) {
           safeLogError(error);
         }
       }
     }
-    // console.log("useEffect ~ userCtx.tripHistory:", userCtx.tripHistory);
+    // // console.log("useEffect ~ userCtx.tripHistory:", userCtx.tripHistory);
     fetchHistory();
   }, [userCtx.tripHistory?.length, uid, tripCtx.tripid]);
 
@@ -283,7 +283,7 @@ const ProfileScreen = ({ navigation }) => {
   // Can start at mount 🎉
   // you need to wait until everything is registered 😁
   async function sleepyStartTour() {
-    console.log("sleepyStartTour ~ sleepyStartTour:", sleepyStartTour);
+    // console.log("sleepyStartTour ~ sleepyStartTour:", sleepyStartTour);
     setTourIsRunning(true);
     await sleep(1000);
     start();
@@ -297,7 +297,7 @@ const ProfileScreen = ({ navigation }) => {
 
   const handleOnStart = () => {
     navigation.navigate("RecentExpenses");
-    console.log("start");
+    // console.log("start");
   };
   const handleOnStop = () => {
     saveStoppedTour();
@@ -305,10 +305,10 @@ const ProfileScreen = ({ navigation }) => {
     setTourIsRunning(false);
     const event = new BranchEvent(BranchEvent.CompleteTutorial);
     event.logEvent();
-    console.log("stop");
+    // console.log("stop");
   };
   const handleOnStepChange = async (step) => {
-    console.log(`stepChange, name: ${step?.name} order: ${step?.order}`);
+    // console.log(`stepChange, name: ${step?.name} order: ${step?.order}`);
     switch (step?.order) {
       case 1:
         await navigation.navigate("RecentExpenses");

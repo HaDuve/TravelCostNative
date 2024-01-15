@@ -37,7 +37,7 @@ const ExpensesOverview = ({
   periodName,
   dateTimeString,
 }) => {
-  // console.log("rerender ExpensesOverview - 1");
+  // // console.log("rerender ExpensesOverview - 1");
   const tripCtx = useContext(TripContext);
   // const periodRangeNumber = useRef(7);
   // periodRangeNumber useState is used to rerender the component when the periodRangeNumber changes
@@ -74,25 +74,25 @@ const ExpensesOverview = ({
 
   const startAutoIncrement = async () => {
     // TODO: add a state variable and a useInterval, if the state is set to true, call rightNavButtonHandler
-    console.log("startAutoIncrement ~ startAutoIncrement:");
+    // console.log("startAutoIncrement ~ startAutoIncrement:");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     rightNavButtonHandler();
     const interval = setInterval(() => {
-      console.log("startAutoIncrement ~ interval tick");
+      // console.log("startAutoIncrement ~ interval tick");
       rightNavButtonHandler();
     }, 600);
     setAutoIncrement(interval);
     return;
   };
   const stopAutoIncrement = () => {
-    console.log("stopAutoIncrement ~ stopAutoIncrement");
+    // console.log("stopAutoIncrement ~ stopAutoIncrement");
     // setAutoIncrement(false);
     clearInterval(autoIncrement);
     return;
   };
 
   const rightNavButtonHandler = () => {
-    console.log("pressed right button");
+    // console.log("pressed right button");
     if (isGraphNotPie) {
       realPeriodNumber.current =
         realPeriodNumber.current == MAX_PERIOD_RANGE

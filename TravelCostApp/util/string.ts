@@ -16,12 +16,12 @@ export function formatExpenseWithCurrency(
 ): string {
   if (typeof amount === "string") amount = Number(amount);
   if (isNaN(amount)) {
-    // console.log("calling formatExpenseWithCurrency without a number");
+    // // console.log("calling formatExpenseWithCurrency without a number");
     return "";
   }
 
   if (!currency) {
-    // console.log("calling formatExpenseWithCurrency without a currency");
+    // // console.log("calling formatExpenseWithCurrency without a currency");
     return amount.toFixed(2);
   }
   const locale = Localization.locale;

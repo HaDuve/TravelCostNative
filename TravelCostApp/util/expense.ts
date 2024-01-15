@@ -93,7 +93,7 @@ export async function deleteAllExpensesByRangedId(
     (expense) => expense?.rangeId == selectedExpense?.rangeId
   );
   const countRangedExpensesMax = rangedExpenses?.length;
-  console.log(
+  // console.log(
     "deleteAllExpenses ~ countRangedExpensesMax:",
     countRangedExpensesMax
   );
@@ -112,7 +112,7 @@ export async function deleteAllExpensesByRangedId(
       };
       expenseCtx?.deleteExpense(expense.id);
       await deleteExpenseOnlineOffline(queueItem, isOnline);
-      console.log("deleted expense nr: " + expCounter, expense.id);
+      // console.log("deleted expense nr: " + expCounter, expense.id);
     }
   }
 }

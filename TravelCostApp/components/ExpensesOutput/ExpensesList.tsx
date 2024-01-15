@@ -88,7 +88,7 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
   const prevOpenedRow = useRef(null);
   let travellerName = "";
   const navigation = useNavigation();
-  // console.log("expenses: ", expenses.length);
+  // // console.log("expenses: ", expenses.length);
 
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;
@@ -118,7 +118,7 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
       try {
         row[index].close();
       } catch (error) {
-        console.log("forceCloseRow ~ error", error);
+        // console.log("forceCloseRow ~ error", error);
       }
     },
     [row]
@@ -166,13 +166,13 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
     );
   }, []);
   const onClick = useCallback(({ item, index }, isOnline) => {
-    // console.log("onClick ~ isOnline", isOnline);
-    // console.log("onClick ~ index", index);
-    // console.log("onClick ~ item", item);
+    // // console.log("onClick ~ isOnline", isOnline);
+    // // console.log("onClick ~ index", index);
+    // // console.log("onClick ~ item", item);
     const editedExpenseId = item.id;
     const uid = item.uid;
-    console.log("onClick ~ uid", uid);
-    console.log("onClick ~ rangedId", item?.rangeId);
+    // console.log("onClick ~ uid", uid);
+    // console.log("onClick ~ rangedId", item?.rangeId);
     async function deleteAllExpenses() {
       try {
         navigation?.popToTop();
@@ -188,7 +188,7 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
         for (let i = 0; i < allExpenses?.length; i++) {
           const expense = allExpenses[i];
           if (expense?.rangeId == item?.rangeId) {
-            console.log("found a ranged id match", expense?.rangeId);
+            // console.log("found a ranged id match", expense?.rangeId);
             const queueItem: OfflineQueueManageExpenseItem = {
               type: "delete",
               expense: {
@@ -204,7 +204,7 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
         await touchAllTravelers(tripID, true);
         Toast.hide();
       } catch (error) {
-        console.log("delete All Error:", error);
+        // console.log("delete All Error:", error);
         Toast.show({
           text1: i18n.t("error"),
           text2: i18n.t("error2"),
@@ -252,7 +252,7 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
                   await touchAllTravelers(tripID, true);
                   Toast.hide();
                 } catch (error) {
-                  console.log(i18n.t("deleteError"), error);
+                  // console.log(i18n.t("deleteError"), error);
                   Toast.show({
                     text1: i18n.t("error"),
                     text2: i18n.t("error2"),
@@ -294,7 +294,7 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
           await touchAllTravelers(tripID, true);
           Toast.hide();
         } catch (error) {
-          console.log(i18n.t("deleteError"), error);
+          // console.log(i18n.t("deleteError"), error);
           Toast.show({
             text1: i18n.t("error"),
             text2: i18n.t("error2"),
@@ -495,7 +495,7 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
     } else {
       setSelected([...selected, item]);
     }
-    console.log("selected", selected);
+    // console.log("selected", selected);
   };
   const selectAll = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -562,8 +562,8 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
 
   const handleMoveToTripPress = useCallback(
     async (_tripid, _tripname) => {
-      console.log("handleMoveToTripPress ~ tripid", _tripid);
-      console.log("handleMoveToTripPress ~ tripname", _tripname);
+      // console.log("handleMoveToTripPress ~ tripid", _tripid);
+      // console.log("handleMoveToTripPress ~ tripname", _tripname);
       Toast.show({
         type: "loading",
         text1: `Moving ${selected?.length} expenses`,
@@ -700,7 +700,7 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
               await touchAllTravelers(tripID, true);
               Toast.hide();
             } catch (error) {
-              console.log(i18n.t("deleteError"), error);
+              // console.log(i18n.t("deleteError"), error);
               Toast.show({
                 text1: i18n.t("error"),
                 text2: i18n.t("error2"),
@@ -716,7 +716,7 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
   const selectPressHandler = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     requestAnimationFrame(() => {
-      console.log("selectPressHandler ~ selectable", selectable);
+      // console.log("selectPressHandler ~ selectable", selectable);
       if (selectable) {
         setSelectable(false);
         setSelected([]);

@@ -24,19 +24,19 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
   } = purchasePackage;
   const purchasePack: PurchasesPackage = purchasePackage;
   const discount = purchasePack?.product?.introPrice;
-  // console.log("PackageItem ~ discount:", discount);
+  // // console.log("PackageItem ~ discount:", discount);
   const hasAFreeTrial = discount?.price === 0;
-  console.log("PackageItem ~ hasAFreeTrial:", hasAFreeTrial);
+  // console.log("PackageItem ~ hasAFreeTrial:", hasAFreeTrial);
   const freeNumberOfUnits = discount?.periodNumberOfUnits;
-  // console.log("PackageItem ~ freeNumberOfUnits:", freeNumberOfUnits);
+  // // console.log("PackageItem ~ freeNumberOfUnits:", freeNumberOfUnits);
   const freeUnit = discount?.periodUnit;
-  // console.log("PackageItem ~ freeUnit:", freeUnit);
+  // // console.log("PackageItem ~ freeUnit:", freeUnit);
   const freePeriodString =
     hasAFreeTrial &&
     `${freeNumberOfUnits} ${i18n.t(freeUnit?.toLowerCase())} ${i18n.t(
       "freeTrial"
     )}`;
-  console.log("PackageItem ~ freePeriodString:", freePeriodString);
+  // console.log("PackageItem ~ freePeriodString:", freePeriodString);
 
   const isMonthly = subscriptionPeriod === "P1M";
   const isYearly = subscriptionPeriod === "P1Y";
@@ -55,8 +55,8 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
       const { customerInfo, productIdentifier } =
         await Purchases.purchasePackage(purchasePackage);
 
-      console.log("onSelection ~ customerInfo:", customerInfo);
-      console.log("onSelection ~ productIdentifier:", productIdentifier);
+      // console.log("onSelection ~ customerInfo:", customerInfo);
+      // console.log("onSelection ~ productIdentifier:", productIdentifier);
       if (
         typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined"
       ) {

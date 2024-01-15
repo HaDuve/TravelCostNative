@@ -9,7 +9,7 @@ import { TripData } from "../../store/trip-context";
 function TripList({ trips, refreshControl, setRefreshing }) {
   if (!trips || trips?.length < 1) return <LoadingOverlay></LoadingOverlay>;
   const uniqTrips: TripData[] = uniqBy(trips);
-  // console.log("TripList ~ uniqTrips:", uniqTrips);
+  // // console.log("TripList ~ uniqTrips:", uniqTrips);
 
   //log the trips and their travellers
   // const tripsandtravellers = [];
@@ -19,7 +19,7 @@ function TripList({ trips, refreshControl, setRefreshing }) {
   //     travellers: uniqTrips[i].travellers,
   //   });
   // }
-  // console.log("trips and their travellers:", tripsandtravellers);
+  // // console.log("trips and their travellers:", tripsandtravellers);
   function renderTripItem(itemData) {
     if (!itemData || !itemData.item) return <></>;
     if (typeof itemData.item === "string" || itemData.item instanceof String) {

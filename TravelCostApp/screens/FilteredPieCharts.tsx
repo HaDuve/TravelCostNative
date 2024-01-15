@@ -79,7 +79,7 @@ const FilteredPieCharts = ({ navigation, route }) => {
     console.error("Lengths do not match");
   let contentsMaxIndex = titleStrings?.length - 1;
   if (noList) contentsMaxIndex = titleStrings?.length - 2;
-  console.log("FilteredPieCharts ~ CONTENTS_MAX_INDEX:", contentsMaxIndex);
+  // console.log("FilteredPieCharts ~ CONTENTS_MAX_INDEX:", contentsMaxIndex);
 
   const nextHandler = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

@@ -64,7 +64,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
   // new changes button
   const hasNewChanges = userCtx.hasNewChanges;
   useEffect(() => {
-    // console.log("rerender profileform");
+    // // console.log("rerender profileform");
     async function checkNewChanges() {
       if (!isConnected) return;
       const newestChangelog = await fetchChangelog();

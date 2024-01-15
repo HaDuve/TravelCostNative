@@ -61,18 +61,18 @@ const CategoryPickScreen = ({ route, navigation }) => {
   // load categories from server or asyncstore
   useFocusEffect(
     React.useCallback(() => {
-      console.log("CategoryPickScreen ~ isOnline", isOnline);
+      // console.log("CategoryPickScreen ~ isOnline", isOnline);
       const loadCategories = async () => {
         setIsFetching(true);
         if (!isOnline) {
           await loadCategoryList();
-          console.log("offline cats");
+          // console.log("offline cats");
           return;
         }
         const categories = await fetchCategories(tripid);
-        // console.log("CategoryPickScreen ~ categories", categories);
+        // // console.log("CategoryPickScreen ~ categories", categories);
         if (categories) {
-          console.log("online cats");
+          // console.log("online cats");
           const tempList = [...categories];
           tempList.push({
             id: 6,
@@ -113,7 +113,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
       //   await deleteCategories(tripid);
       //   await updateTrip(tripid, { categories: CATLIST });
       //   //log
-      //   console.log("CategoryPickScreen ~ finished posting categories");
+      //   // console.log("CategoryPickScreen ~ finished posting categories");
       // };
 
       // postCategoriesAsync();

@@ -6,7 +6,7 @@ import * as SecureStore from "expo-secure-store";
  * @param value - The value to save.
  */
 export async function secureStoreSetItem(key: string, value: string) {
-  console.log("attempting secure save in Memory > ", key + ": " + value);
+  // console.log("attempting secure save in Memory > ", key + ": " + value);
   if (!value) return;
   await SecureStore.setItemAsync(key, value);
 }
@@ -21,11 +21,11 @@ export async function secureStoreGetItem(key: string) {
   if (result) {
     // show the result if it is not longer than 10 characters
 
-    // console.log("🔐 Here's your value 🔐 \n" + result);
-    // console.log("🔐 Here's your value 🔐 \n", result.slice(0, 10));
+    // // console.log("🔐 Here's your value 🔐 \n" + result);
+    // // console.log("🔐 Here's your value 🔐 \n", result.slice(0, 10));
     return result;
   } else {
-    console.log("No values stored under that key.", key);
+    // console.log("No values stored under that key.", key);
     return "";
   }
 }
@@ -37,7 +37,7 @@ export async function secureStoreGetItem(key: string) {
  */
 export async function secureStoreSetObject(key: string, value: object) {
   const jsonValue = JSON.stringify(value);
-  console.log("secureStoreSetObject ~ key, jsonValue:", key, jsonValue);
+  // console.log("secureStoreSetObject ~ key, jsonValue:", key, jsonValue);
   if (!jsonValue) return;
   await SecureStore.setItemAsync(key, jsonValue);
 }
@@ -53,7 +53,7 @@ export async function secureStoreGetObject(key: string) {
     // parse the result and return it
     return JSON.parse(result);
   } else {
-    console.log("No values stored under that key.", key);
+    // console.log("No values stored under that key.", key);
   }
 }
 

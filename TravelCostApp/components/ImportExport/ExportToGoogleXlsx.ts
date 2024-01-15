@@ -13,7 +13,7 @@ export async function exportAllExpensesToXLSX(expenses) {
     { cat: "food", start: 118, end: 253 },
     { cat: "other", start: 261, end: 302 },
   ];
-  console.log(
+  // console.log(
     "exportAllExpensesToXLSX ~ workbook.SheetNames",
     workbook.SheetNames
   );
@@ -31,7 +31,7 @@ export async function exportAllExpensesToXLSX(expenses) {
     { origin: { c: 0, r: 21 } }
   );
   const cellA22 = XLSX.utils.encode_cell({ c: 0, r: 21 });
-  console.log("exportAllExpensesToXLSX ~ cellA22", cellA22);
-  console.log(sheet[cellA22]);
+  // console.log("exportAllExpensesToXLSX ~ cellA22", cellA22);
+  // console.log(sheet[cellA22]);
   return true;
 }

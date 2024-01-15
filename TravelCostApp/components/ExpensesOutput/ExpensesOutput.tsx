@@ -61,7 +61,7 @@ function ExpensesOutput({
     []
   );
   const memoizedContent = useMemo(() => {
-    console.log("render content");
+    // console.log("render content");
     if (expenses?.length > 0) {
       if (fallback) setFallback(false);
       return (

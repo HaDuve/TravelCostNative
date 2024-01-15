@@ -46,15 +46,15 @@ const ManageExpense = ({ route, navigation }) => {
   const tripCtx = useContext(TripContext);
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;
-  // console.log("ManageExpense ~ isOnline:", isOnline);
+  // // console.log("ManageExpense ~ isOnline:", isOnline);
   const [progress, setProgress] = useState(-1);
   const [progressAt, setProgressAt] = useState(0);
   const [progressMax, setProgressMax] = useState(0);
 
   const tripid = tripCtx.tripid;
-  // console.log("ManageExpense ~ tripid:", tripid);
+  // // console.log("ManageExpense ~ tripid:", tripid);
   const uid = authCtx.uid;
-  // console.log("ManageExpense ~ uid:", uid);
+  // // console.log("ManageExpense ~ uid:", uid);
 
   const editedExpenseId = route.params?.expenseId;
   const isEditing = !!editedExpenseId;
@@ -62,7 +62,7 @@ const ManageExpense = ({ route, navigation }) => {
   const selectedExpense: ExpenseData = expenseCtx.expenses.find(
     (expense) => expense.id === editedExpenseId
   );
-  // console.log(
+  // // console.log(
   //   "ManageExpense ~ selectedExpense?.rangeId:",
   //   selectedExpense?.rangeId
   // );
@@ -88,7 +88,7 @@ const ManageExpense = ({ route, navigation }) => {
         await touchAllTravelers(tripid, true);
         Toast.hide();
       } catch (error) {
-        console.log("delete All Error:", error);
+        // console.log("delete All Error:", error);
         Toast.show({
           text1: i18n.t("error"),
           text2: i18n.t("error2"),
@@ -172,7 +172,7 @@ const ManageExpense = ({ route, navigation }) => {
                       await touchAllTravelers(tripid, true);
                       Toast.hide();
                     } catch (error) {
-                      console.log(i18n.t("deleteError"), error);
+                      // console.log(i18n.t("deleteError"), error);
                       Toast.show({
                         text1: i18n.t("error"),
                         text2: i18n.t("error2"),
@@ -205,7 +205,7 @@ const ManageExpense = ({ route, navigation }) => {
   }
 
   const createSingleData = async (expenseData: ExpenseData) => {
-    console.log("no ranged Data detected");
+    // console.log("no ranged Data detected");
     // hotfix the date clock bug
     expenseData.date = expenseData.startDate;
     expenseData.editedTimestamp = Date.now();
@@ -223,11 +223,11 @@ const ManageExpense = ({ route, navigation }) => {
   };
 
   const createRangedData = async (expenseData) => {
-    console.log("ranged Data detected");
+    // console.log("ranged Data detected");
     // rangeId to identify all the expenses that belong to the same range
     const rangeId =
       Date.now().toString() + Math.random().toString(36).substring(2, 15);
-    console.log("creatingRangedData ~ rangeId:", rangeId);
+    // console.log("creatingRangedData ~ rangeId:", rangeId);
 
     // sanity check if the expenseData.date is unequal to expenseData.startDate and endDate
     // if so, set the date to the startDate
@@ -258,7 +258,7 @@ const ManageExpense = ({ route, navigation }) => {
     // iterate over number of days between and change date and endDate to the first date + iterator
     setProgressMax(days);
     for (let i = 0; i <= days; i++) {
-      console.log("day nr: ", i);
+      // console.log("day nr: ", i);
       setProgressAt(i);
       setProgress(i / days);
       Toast.show({
@@ -273,24 +273,24 @@ const ManageExpense = ({ route, navigation }) => {
           size: "small",
         },
       });
-      console.log("progress", i / days);
+      // console.log("progress", i / days);
       const newDate = getDatePlusDays(day1, i);
       newDate.setHours(new Date().getHours(), new Date().getMinutes());
       // expenseData.startDate =
       // expenseData.endDate =
       expenseData.date = newDate;
       expenseData.editedTimestamp = Date.now();
-      console.log(
+      // console.log(
         "expenseData.date: ",
         expenseData.date,
         typeof expenseData.date
       );
-      console.log(
+      // console.log(
         "expenseData.startDate: ",
         expenseData.startDate,
         typeof expenseData.startDate
       );
-      console.log(
+      // console.log(
         "expenseData.endDate: ",
         expenseData.endDate,
         typeof expenseData.endDate
@@ -325,7 +325,7 @@ const ManageExpense = ({ route, navigation }) => {
   };
 
   const editRangedData = async (expenseData) => {
-    console.log("ranged Data detected");
+    // console.log("ranged Data detected");
 
     // find all the expenses that have the same identifying rangeId
     const expensesInRange = expenseCtx.expenses.filter(
@@ -334,7 +334,7 @@ const ManageExpense = ({ route, navigation }) => {
     );
     // if we dont find any expenses, it must have been a non-ranged expense, so update it to a ranged expense
     if (expensesInRange?.length === 0) {
-      console.log("no expenses in range found");
+      // console.log("no expenses in range found");
       // delete the original expense
       expenseCtx.deleteExpense(editedExpenseId);
       const item: OfflineQueueManageExpenseItem = {
@@ -366,7 +366,7 @@ const ManageExpense = ({ route, navigation }) => {
       expensesInRange[expensesInRange?.length - 1].date &&
       expenseData.startDate &&
       expenseData.endDate;
-    console.log("editingRangedData ~ validDates:", validDates);
+    // console.log("editingRangedData ~ validDates:", validDates);
     const differentDates =
       !isSameDay(oldStart, newStart) || !isSameDay(oldEnd, newEnd);
     if (differentDates) {
@@ -385,7 +385,7 @@ const ManageExpense = ({ route, navigation }) => {
     for (let i = 0; i < expensesInRange?.length; i++) {
       setProgressAt(i);
       setProgress(i / expensesInRange?.length);
-      console.log("progress", i / expensesInRange?.length);
+      // console.log("progress", i / expensesInRange?.length);
       Toast.show({
         type: "loading",
         text1: i18n.t("toastSaving1"),
@@ -417,12 +417,12 @@ const ManageExpense = ({ route, navigation }) => {
       };
       expenseCtx.updateExpense(expense.id, expenseData);
       await updateExpenseOnlineOffline(item, isOnline);
-      console.log("updated expense nr: " + (i + 1), expense.rangeId);
+      // console.log("updated expense nr: " + (i + 1), expense.rangeId);
     }
   };
 
   async function confirmHandler(expenseData: ExpenseData) {
-    console.log("confirmHandler ~ expenseData:", expenseData);
+    // console.log("confirmHandler ~ expenseData:", expenseData);
     // setIsSubmitting(true);
     try {
       // set the category to the corresponting catstring
@@ -432,7 +432,7 @@ const ManageExpense = ({ route, navigation }) => {
       const base = tripCtx.tripCurrency;
       const target = expenseData.currency;
       const rate = await getRate(base, target);
-      console.log("confirmHandler ~ rate:", rate);
+      // console.log("confirmHandler ~ rate:", rate);
       if (rate === -1) {
         Alert.alert(
           "Error",
@@ -463,11 +463,11 @@ const ManageExpense = ({ route, navigation }) => {
           selectedExpense.rangeId
         ) {
           // editing ranged Data
-          console.log("deciding to edit ranged data");
+          // console.log("deciding to edit ranged data");
           await editRangedData(expenseData);
         } else {
           // editing normal expense (no-ranged)
-          console.log("deciding to edit normal data");
+          // console.log("deciding to edit normal data");
           await editSingleData(expenseData);
         }
       } else {
@@ -478,11 +478,11 @@ const ManageExpense = ({ route, navigation }) => {
           expenseData.endDate.toString().slice(0, 10)
         ) {
           // adding a new ranged expense (no-editing)
-          console.log("deciding to create ranged data");
+          // console.log("deciding to create ranged data");
           await createRangedData(expenseData);
         } else {
           // adding a new normal expense (no-editing, no-ranged)
-          console.log("deciding to create normal data");
+          // console.log("deciding to create normal data");
           await createSingleData(expenseData);
         }
       }

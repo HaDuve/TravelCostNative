@@ -101,15 +101,15 @@ function RecentExpenses({ navigation }) {
     ) => {
       if (userCtx.freshlyCreated) return;
       if (ignoreTouched)
-        console.log("getExpenses ~ ignoreTouched:", ignoreTouched);
-      // check offlinemode
-      const online = netCtx.isConnected && netCtx.strongConnection;
+        // console.log("getExpenses ~ ignoreTouched:", ignoreTouched);
+        // check offlinemode
+        const online = netCtx.isConnected && netCtx.strongConnection;
       const offlineQueue = getMMKVObject("offlineQueue");
       const queueBlocked = offlineQueue && offlineQueue?.length > 0;
       if (!online || queueBlocked || userCtx.isSendingOfflineQueueMutex) {
         // if online, send offline queue
         if (online) {
-          console.log("RecentExpenses ~ sending offline queue");
+          // console.log("RecentExpenses ~ sending offline queue");
           await sendOfflineQueue(
             userCtx.isSendingOfflineQueueMutex,
             userCtx.setIsSendingOfflineQueueMutex
@@ -131,7 +131,7 @@ function RecentExpenses({ navigation }) {
         setIsFetching(false);
         return;
       }
-      console.log("we are touched and fetching expenses", tripid);
+      // console.log("we are touched and fetching expenses", tripid);
       // fetch and set expenses
 
       await fetchExpenses(
@@ -191,7 +191,7 @@ function RecentExpenses({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(async () => {
-    console.log("refreshing: ", refreshing);
+    // console.log("refreshing: ", refreshing);
     setRefreshing(true);
     // check if we have a offline queue
     const offlineQueue = await getOfflineQueue();
@@ -259,7 +259,7 @@ function RecentExpenses({ navigation }) {
         try {
           await tripCtx.fetchAndSetTravellers(tripCtx.tripid);
         } catch (error) {
-          console.log("error loading travellers in expenseForm");
+          // console.log("error loading travellers in expenseForm");
         }
       } else {
         await tripCtx.loadTravellersFromStorage();
@@ -320,7 +320,7 @@ function RecentExpenses({ navigation }) {
   const isScaledUp = fontScale > 1;
   const useMoreSpace = isScaledUp || isLongNumber;
 
-  // console.log("RecentExpenses ~ apikey:", apikey);
+  // // console.log("RecentExpenses ~ apikey:", apikey);
 
   const ExpensesOutputJSX = (
     <MemoizedExpensesOutput
@@ -333,7 +333,7 @@ function RecentExpenses({ navigation }) {
           colors={["transparent"]}
           style={{ backgroundColor: "transparent" }}
           onRefresh={async () => {
-            console.log("onREFRESH");
+            // console.log("onREFRESH");
             await onRefresh();
           }}
         />

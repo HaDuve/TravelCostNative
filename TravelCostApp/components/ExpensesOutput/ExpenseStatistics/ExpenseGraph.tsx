@@ -37,7 +37,7 @@ const ExpenseGraph = ({
   tripCtx,
   navigation,
 }) => {
-  // console.log("rerender ExpenseGraph - 2");
+  // // console.log("rerender ExpenseGraph - 2");
   const today = new Date();
   const renderItemRef = useRef(null);
   const expenseCtx = useContext(ExpensesContext);
@@ -45,7 +45,7 @@ const ExpenseGraph = ({
   const hideSpecial = settings.hideSpecialExpenses;
 
   if (!isForeground || !expenseCtx.expenses) {
-    console.log("ExpenseGraph: not ready, return empty view");
+    // console.log("ExpenseGraph: not ready, return empty view");
     return <></>;
   }
   const totalBudget = Number(tripCtx.totalBudget) ?? MAX_JS_NUMBER;
@@ -109,7 +109,7 @@ const ExpenseGraph = ({
               pressed && GlobalStyles.pressedWithShadow,
             ]}
             onLongPress={() => {
-              console.log("longPress");
+              // console.log("longPress");
               Haptics.notificationAsync(
                 Haptics.NotificationFeedbackType.Success
               );

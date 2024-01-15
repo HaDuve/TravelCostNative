@@ -100,11 +100,11 @@ function TripContextProvider({ children }) {
         await fetchAndSetCurrentTrip(fetched_tripid ?? stored_tripid);
         await fetchAndSetTravellers(fetched_tripid ?? stored_tripid);
       } catch (error) {
-        console.log("loadTripidFetchTrip ~ error", error);
+        // console.log("loadTripidFetchTrip ~ error", error);
         setIsLoading(false);
       }
     } else {
-      console.log("loading from storage in offline mode~");
+      // console.log("loading from storage in offline mode~");
       await loadTripDataFromStorage();
       setIsLoading(false);
     }
@@ -168,7 +168,7 @@ function TripContextProvider({ children }) {
   }
   //
   function refresh() {
-    console.log("refresh ~ refresh", refresh);
+    // console.log("refresh ~ refresh", refresh);
     setRefreshState(!refreshState);
   }
 
@@ -184,15 +184,15 @@ function TripContextProvider({ children }) {
     }
     // updates the current Travellers in context
     try {
-      console.log("fetching travellers");
+      // console.log("fetching travellers");
       const travellers = await getTravellers(tripid);
-      console.log("fetchAndSetTravellers ~ travellers:", travellers);
+      // console.log("fetchAndSetTravellers ~ travellers:", travellers);
       if (travellers?.length < 1) throw new Error("no travellers found");
       saveTravellersInStorage(travellers);
       setTravellers(travellers);
       return true;
     } catch (error) {
-      // console.log("setCurrentTravellers ~ error", error);
+      // // console.log("setCurrentTravellers ~ error", error);
       throw new Error("no travellers found");
     }
   }
@@ -200,7 +200,7 @@ function TripContextProvider({ children }) {
   async function setCurrentTrip(tripid: string, trip: TripData) {
     if (!trip) return;
     if (tripid === "reset") {
-      console.log("resetting Trip to empty!");
+      // console.log("resetting Trip to empty!");
       _setTripid("");
       setTripName("");
       setTotalBudget("");
@@ -264,7 +264,7 @@ function TripContextProvider({ children }) {
       await saveTripDataInStorage(trip);
       return trip;
     } catch (error) {
-      console.log(
+      // console.log(
         "error while fetchCurrent Trip in trip-context searching for ",
         tripid,
         error.message
@@ -286,7 +286,7 @@ function TripContextProvider({ children }) {
       await saveTripDataInStorage(trip);
       await updateTrip(tripid, trip);
     } catch (error) {
-      console.log(
+      // console.log(
         "error while fetchCurrent Trip in trip-context searching for ",
         tripid
       );
@@ -313,15 +313,15 @@ function TripContextProvider({ children }) {
   }
 
   function _setTripid(tripid: string) {
-    // console.log("_setTripid ~ tripid", tripid);
+    // // console.log("_setTripid ~ tripid", tripid);
     setTripid(tripid);
   }
 
   function addTrip() {
-    console.log("add Trip NOT IMPLEMENTED");
+    // console.log("add Trip NOT IMPLEMENTED");
   }
   function deleteTrip() {
-    console.log("delete Trip NOT IMPLEMENTED");
+    // console.log("delete Trip NOT IMPLEMENTED");
   }
 
   async function saveTripDataInStorage(tripData: TripData) {
@@ -345,13 +345,13 @@ function TripContextProvider({ children }) {
       try {
         await loadTravellersFromStorage();
       } catch (error) {
-        console.log("error loading travellers from storage:", error.message);
+        // console.log("error loading travellers from storage:", error.message);
       }
       setIsLoading(false);
 
       return tripData;
     } else {
-      console.log("no tripdata loaded from Storage!");
+      // console.log("no tripdata loaded from Storage!");
       setIsLoading(false);
     }
   }

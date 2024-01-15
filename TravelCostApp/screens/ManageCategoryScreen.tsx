@@ -104,7 +104,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
       const categoryListString = await AsyncStorage.getItem("categoryList");
       if (categoryListString !== null) {
         const list = JSON.parse(categoryListString);
-        // console.log("loadCategoryList ~ list:", list);
+        // // console.log("loadCategoryList ~ list:", list);
         setCategoryList(list);
       } else {
         setCategoryList(defaultCategoryList);
@@ -131,7 +131,7 @@ const ManageCategoryScreen = ({ route, navigation }) => {
         "categoryList",
         JSON.stringify(newCategoryList)
       );
-      console.log(
+      // console.log(
         `updating trip categories with ${JSON.stringify(newCategoryList)}`
       );
       await updateTrip(tripid, {

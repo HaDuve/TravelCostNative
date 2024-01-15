@@ -55,9 +55,9 @@ const ExpensesSummary = ({
   if (!expenses || !periodName || userCtx.freshlyCreated) return <></>;
 
   const expensesSum = getExpensesSum(expenses, hideSpecial);
-  // console.log("expensesSum ~ expensesSum", expensesSum);
+  // // console.log("expensesSum ~ expensesSum", expensesSum);
   if (isNaN(Number(expensesSum))) {
-    console.log("expensesSum is NaN");
+    // console.log("expensesSum is NaN");
     return <></>;
   }
 
@@ -129,7 +129,7 @@ const ExpensesSummary = ({
     budgetProgress = 0;
   }
   if (Number.isNaN(budgetProgress)) {
-    console.log("NaN budgetProgress");
+    // console.log("NaN budgetProgress");
     return <></>;
   }
   const calcLeftToSpend = lastRateUnequal1

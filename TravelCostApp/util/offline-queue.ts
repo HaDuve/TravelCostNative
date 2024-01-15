@@ -47,7 +47,7 @@ export const pushOfflineQueue = async (item: OfflineQueueManageExpenseItem) => {
   const offlineQueue = await getOfflineQueue();
   offlineQueue.push(item);
   const res = setMMKVObject("offlineQueue", offlineQueue);
-  console.log("pushOfflineQueue ~ offlineQueue:", offlineQueue);
+  // console.log("pushOfflineQueue ~ offlineQueue:", offlineQueue);
   return res;
 };
 
@@ -72,7 +72,7 @@ export const pushQueueReturnRndID = async (
 export const getOfflineQueue = async () => {
   const offlineQueue = getMMKVObject("offlineQueue");
   if (!offlineQueue) {
-    console.log("retrieved no OfflineQueue!");
+    // console.log("retrieved no OfflineQueue!");
   }
   return offlineQueue || [];
 };
@@ -107,7 +107,7 @@ export const deleteExpenseOnlineOffline = async (
   // const { isFastEnough, speed } = await isConnectionFastEnough();
   const netInfo = await NetInfo.fetch();
   const reachable = netInfo.isConnected && netInfo.isInternetReachable;
-  console.log("reachable:", reachable);
+  // console.log("reachable:", reachable);
   if (online && reachable) {
     // delete item online
     try {
@@ -197,7 +197,7 @@ export const storeExpenseOnlineOffline = async (
   item.expense.tripid = tripid;
   // if the internet is not fast enough, store in offline queue
   const { isFastEnough } = await isConnectionFastEnough();
-  // console.log("isFastEnough:", isFastEnough);
+  // // console.log("isFastEnough:", isFastEnough);
   if (online && isFastEnough) {
     // store item online
     try {
@@ -210,13 +210,13 @@ export const storeExpenseOnlineOffline = async (
     } catch (error) {
       safeLogError(error);
       const id = await pushQueueReturnRndID(item);
-      console.log("debugOQ id:", id);
+      // console.log("debugOQ id:", id);
       return id;
     }
   } else {
     // store item offline
     const id = await pushQueueReturnRndID(item);
-    console.log("debugOQ id:", id);
+    // console.log("debugOQ id:", id);
     return id;
   }
 };
@@ -233,22 +233,22 @@ export async function sendOfflineQueue(
   setMutexFunction: (mutexBool: boolean) => void
 ) {
   if (mutexBool) {
-    console.log("sendOfflineQueue ~ blocked by mutexBool:", mutexBool);
+    // console.log("sendOfflineQueue ~ blocked by mutexBool:", mutexBool);
     return;
   }
   if (setMutexFunction) setMutexFunction(true);
   let offlineQueue = getMMKVObject("offlineQueue") || [];
 
   if (offlineQueue && offlineQueue?.length > 0) {
-    // console.log("queue length", offlineQueue?.length);
+    // // console.log("queue length", offlineQueue?.length);
     const forceOffline = !Device.isDevice && DEBUG_FORCE_OFFLINE;
     const isOnline = await NetInfo.fetch();
-    // console.log("update connected =", isOnline);
+    // // console.log("update connected =", isOnline);
     // if the internet is not fast enough, store in offline queue
     const { isFastEnough } = await isConnectionFastEnough();
 
     if (!isOnline || !isOnline.isConnected || !isFastEnough || forceOffline) {
-      console.log(
+      // console.log(
         "sendOfflineQueue ~ still offline! Length:",
         offlineQueue?.length
       );
@@ -272,18 +272,18 @@ export async function sendOfflineQueue(
     while (i < offlineQueue?.length) {
       offlineQueue = getMMKVObject("offlineQueue") || [];
       const item = offlineQueue[i];
-      console.log("debugOQ item:", item);
-      console.log("debugOQ offlineQueue:", offlineQueue);
+      // console.log("debugOQ item:", item);
+      // console.log("debugOQ offlineQueue:", offlineQueue);
       tripid = item.expense.tripid;
 
-      // console.log("sendOfflineQueue ~ item:", item);
-      console.log("sendOfflineQueue ~ item.type:", item.type);
+      // // console.log("sendOfflineQueue ~ item:", item);
+      // console.log("sendOfflineQueue ~ item.type:", item.type);
 
       try {
         if (item.type === "add") {
           const oldId = item.expense.id || item.expense.expenseData.id || null;
           if (!oldId)
-            console.log(
+            // console.log(
               "debugOQ no old ID in item.expense:",
               oldId,
               item.expense.expenseData.description
@@ -293,8 +293,8 @@ export async function sendOfflineQueue(
             item.expense.uid,
             item.expense.expenseData
           );
-          console.log("debugOQ oldId:", oldId);
-          console.log("debugOQ new firebase id:", id);
+          // console.log("debugOQ oldId:", oldId);
+          // console.log("debugOQ new firebase id:", id);
           item.expense.id = id;
           // change item.expense.id for every other item.type == "update" or "delete" in the queue
           for (let j = i + 1; j < offlineQueue?.length - i; j++) {
@@ -318,7 +318,7 @@ export async function sendOfflineQueue(
             item.expense.id
           );
         } else {
-          console.log("unknown offlineQ item type");
+          // console.log("unknown offlineQ item type");
         }
 
         // Add the processed item to the list
@@ -333,7 +333,7 @@ export async function sendOfflineQueue(
 
     // Remove the processed items from the queue
     const remainingItems = offlineQueue.slice(i);
-    console.log("sendOfflineQueue ~ remainingItems:", remainingItems);
+    // console.log("sendOfflineQueue ~ remainingItems:", remainingItems);
     setMMKVObject("offlineQueue", remainingItems);
     Toast.hide();
     if (processedItems?.length > 0) {
@@ -347,7 +347,7 @@ export async function sendOfflineQueue(
       });
     }
   } else {
-    // console.log("no queue");
+    // // console.log("no queue");
   }
   if (setMutexFunction) setMutexFunction(false);
 }

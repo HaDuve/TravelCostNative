@@ -62,7 +62,7 @@ function LoginScreen() {
     try {
       // NECESSARY TRYCATCH
       ({ token, uid } = await login(email, password));
-      console.log("loginHandler ~ uid:", uid);
+      // console.log("loginHandler ~ uid:", uid);
       //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
       checkUser = await fetchUser(uid);
       // adding locale to database
@@ -78,7 +78,7 @@ function LoginScreen() {
     const userData = checkUser;
     tripCtx.setTripid(checkUser.currentTrip);
 
-    console.log("loginHandler ~ checkUser", checkUser);
+    // console.log("loginHandler ~ checkUser", checkUser);
     // Check if the user logged in but there is no userName, we deleted the account
     if (!checkUser.userName) {
       Toast.show({
@@ -88,14 +88,14 @@ function LoginScreen() {
         text2: i18n.t("tryAgain"),
         visibilityTime: 4000,
       });
-      console.log("loginHandler exception error");
+      // console.log("loginHandler exception error");
       authCtx.logout();
       return;
     }
     let freshlyCreated = checkUser.freshlyCreated;
     if (!checkUser.currentTrip) {
       // we infer freshly created if no current trip exists but we assigned a name already
-      console.log(
+      // console.log(
         "loginHandler ~ we set to freshly because username but no current trip!"
       );
       await userCtx.setFreshlyCreatedTo(true);
@@ -117,14 +117,14 @@ function LoginScreen() {
         // Purchases
         Purchases.configure({ apiKey: REVCAT_A, appUserID: uid });
         await userCtx.checkPremium();
-        console.log("LoginScreen ~ uid:", uid);
+        // console.log("LoginScreen ~ uid:", uid);
       }
       await Purchases.collectDeviceIdentifiers();
       await setAttributesAsync(email, userData.userName);
 
       const event = new BranchEvent(BranchEvent.Login);
       await event.logEvent();
-      console.log("loginHandler ~ userData", userData);
+      // console.log("loginHandler ~ userData", userData);
     } catch (error) {
       safeLogError(error);
     }

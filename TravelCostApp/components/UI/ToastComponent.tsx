@@ -166,7 +166,7 @@ const toastConfig: ToastConfig = {
   banner: (props) => (
     <TouchableOpacity
       onPress={() => {
-        console.log("Pressed Touchable in Config");
+        // console.log("Pressed Touchable in Config");
         props.onPress();
       }}
       style={[styles.bannerContainerContainer, GlobalStyles.wideStrongShadow]}
@@ -175,7 +175,7 @@ const toastConfig: ToastConfig = {
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <TouchableOpacity
             onPress={() => {
-              console.log("Pressed Touchable in Config");
+              // console.log("Pressed Touchable in Config");
               props.onPress();
             }}
           >
@@ -186,7 +186,7 @@ const toastConfig: ToastConfig = {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              console.log("Pressed X in config");
+              // console.log("Pressed X in config");
               Toast.hide();
             }}
           >
@@ -210,7 +210,7 @@ const toastConfig: ToastConfig = {
 
 function isCalledToday() {
   const bannerTime = getMMKVString("BannerTime");
-  console.log("isCalledToday ~ bannerTime:", bannerTime);
+  // console.log("isCalledToday ~ bannerTime:", bannerTime);
   const today = new Date();
   const bannerDate = new Date(bannerTime);
   setMMKVString("BannerTime", today.toISOString());
@@ -238,7 +238,7 @@ export async function showBanner(navigation, props = {}) {
     position: "top",
     topOffset: 10,
     onPress: () => {
-      console.log("pressed Onpress");
+      // console.log("pressed Onpress");
       navigation.navigate("Paywall");
     },
     ...props,

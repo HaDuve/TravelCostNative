@@ -47,6 +47,8 @@ export function setAxiosAccessToken(token: string) {
 /** Axios Logger */
 axios.interceptors.request.use(
   (config) => {
+    // set header
+    // config.headers.common["Authorization"] = `Bearer ${getMMKVString("QPAR")}`;
     // console.log(
     //   `\n--- AXIOS LOG ~~~ \n`,
     //   `${config.method.toUpperCase()} request sent to ${truncateString(

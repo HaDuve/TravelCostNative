@@ -35,7 +35,11 @@ import { ExpensesContext } from "../../store/expenses-context";
 import { FlatList } from "react-native";
 import { View } from "react-native";
 import { Text } from "react-native";
-import { DuplicateOption, ExpenseData } from "../../util/expense";
+import {
+  DuplicateOption,
+  ExpenseData,
+  findMostDuplicatedDescriptionExpenses,
+} from "../../util/expense";
 import { formatExpenseWithCurrency, truncateString } from "../../util/string";
 import { getCatString, getCatSymbol } from "../../util/category";
 import IconButton from "../UI/IconButton";
@@ -43,6 +47,9 @@ import uniqBy from "lodash.uniqby";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { PanGesture } from "react-native-gesture-handler/lib/typescript/handlers/gestures/panGesture";
 import set from "react-native-reanimated";
+import Button from "../UI/Button";
+
+const PageLength = 20;
 
 const AddExpenseButton = ({ navigation }) => {
   const { settings } = useContext(SettingsContext);
@@ -56,30 +63,28 @@ const AddExpenseButton = ({ navigation }) => {
     }),
     "description"
   );
-  // find expenses where the same description was used multiple times, excluding expenses with rangedId
-  const duplicates = lastExpenses.filter(
-    (item, index) =>
-      lastExpenses.findIndex((i) => i.description === item.description) !==
-        index && !item.rangeId
-  );
-  // inside the duplicates, find the 3 expenses which are duplicated the most
-  const topDuplicates = duplicates
-    .sort((a, b) => {
-      return (
-        lastExpenses.filter((i) => i.description === b.description).length -
-        lastExpenses.filter((i) => i.description === a.description).length
-      );
-    })
-    .slice(0, 3);
+
+  const topDuplicates = findMostDuplicatedDescriptionExpenses(lastExpenses);
+
+  const [lastExpensesNumber, setLastExpensesNumber] = useState(PageLength);
 
   const bestTemplateCandidates = [
     ...topDuplicates,
-    ...lastExpenses.slice(0, 20),
+    ...lastExpenses.slice(0, lastExpensesNumber).filter((exp) => {
+      // filter out duplicates
+      return !topDuplicates.some((e: ExpenseData) => e.id === exp.id);
+    }),
   ];
 
   const [longPressed, setLongPressed] = useState(false);
 
   const valid = useRef(false);
+
+  useEffect(() => {
+    if (longPressed && (!lastExpenses || lastExpenses.length < 1)) {
+      setLongPressed(false);
+    }
+  }, [lastExpenses, longPressed]);
 
   useEffect(() => {
     valid.current =
@@ -90,41 +95,65 @@ const AddExpenseButton = ({ navigation }) => {
   }, [tripCtx.tripid, authCtx.uid, tripCtx.travellers?.length]);
   const skipCatScreen = settings.skipCategoryScreen;
 
-  const renderExpenseTemplates = ({ item }) => {
-    const data: ExpenseData = item;
+  const renderExpenseTemplates = ({ item, index }) => {
+    const isFirst = index === 0;
+    const isThird = index === 3;
+    // shallow copy item or we will have problems with the expense context
+    const data: ExpenseData = JSON.parse(JSON.stringify(item));
     const formattedAmount = formatExpenseWithCurrency(
       data.amount,
       data.currency
     );
     const formattedDescription = truncateString(data.description, 15);
     const categoryIcon = getCatSymbol(data.category);
+    // is duplicate if data.id is the same as any expense.id of topDuplicates
+    const isDuplicate = topDuplicates.some(
+      (e: ExpenseData) => e.id === data.id
+    );
     return (
-      <Pressable
-        style={({ pressed }) => [
-          styles.expenseTemplateContainer,
-          GlobalStyles.strongShadow,
-          pressed && GlobalStyles.pressedWithShadow,
-        ]}
-        onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          setLongPressed(false);
-          // set date to today
-          data.date = new Date();
-          data.startDate = new Date();
-          data.endDate = new Date();
-          delete data.id;
-          delete data.rangeId;
-          delete data.editedTimestamp;
-          navigation.navigate("ManageExpense", {
-            pickedCat: data.category,
-            tempValues: { ...data },
-          });
+      <View
+        style={{
+          alignSelf: "center",
         }}
       >
-        <IconButton size={24} icon={categoryIcon}></IconButton>
-        <Text style={styles.description}>{formattedDescription}</Text>
-        <Text style={{}}>{formattedAmount}</Text>
-      </Pressable>
+        {isFirst && (
+          <Text style={styles.templateContainerSubtitle}>
+            Most used expenses
+          </Text>
+        )}
+        {isThird && (
+          <Text style={styles.templateContainerSubtitle}>
+            Last used expenses
+          </Text>
+        )}
+        <Pressable
+          style={({ pressed }) => [
+            styles.expenseTemplateContainer,
+            GlobalStyles.strongShadow,
+            pressed && GlobalStyles.pressedWithShadow,
+          ]}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setLongPressed(false);
+            setLastExpensesNumber(PageLength);
+            // set date to today
+            data.date = new Date();
+            data.startDate = new Date();
+            data.endDate = new Date();
+            delete data.id;
+            delete data.rangeId;
+            delete data.editedTimestamp;
+            navigation.navigate("ManageExpense", {
+              pickedCat: data.category,
+              tempValues: { ...data },
+            });
+          }}
+        >
+          <IconButton size={24} icon={categoryIcon}></IconButton>
+          <Text style={styles.description}>{formattedDescription}</Text>
+          <Text style={{}}>{formattedAmount}</Text>
+        </Pressable>
+      </View>
     );
   };
 
@@ -221,10 +250,11 @@ const AddExpenseButton = ({ navigation }) => {
     });
     await sleep(300);
     setLongPressed(false);
+    setLastExpensesNumber(PageLength);
   }
 
   // show the template expenses overlay
-  if (longPressed) {
+  if (longPressed && lastExpenses && lastExpenses.length > 0) {
     return (
       <GestureDetector gesture={panGesture}>
         <Animated.View
@@ -250,8 +280,19 @@ const AddExpenseButton = ({ navigation }) => {
               <Text style={styles.arrowDownSymbolText}>▼</Text>
             </View>
             <FlatList
+              directionalLockEnabled={true}
               data={bestTemplateCandidates}
               renderItem={renderExpenseTemplates}
+              onEndReachedThreshold={0.5}
+              onEndReached={() => {
+                console.log("Expense Template End Found");
+                const maxNumber = lastExpenses.length;
+                const newNumber = Math.max(
+                  maxNumber,
+                  lastExpensesNumber + PageLength
+                );
+                setLastExpensesNumber(newNumber);
+              }}
             />
           </Pressable>
         </Animated.View>
@@ -338,7 +379,6 @@ const styles = StyleSheet.create({
   addButton: {
     backgroundColor: GlobalStyles.colors.primary400,
     borderRadius: 999,
-
     marginBottom: "10%",
     paddingVertical: "19.8%",
     paddingHorizontal: "20%",
@@ -392,6 +432,11 @@ const styles = StyleSheet.create({
   templateContainerTitle: {
     fontWeight: "300",
     fontSize: 24,
+    color: GlobalStyles.colors.gray300,
+  },
+  templateContainerSubtitle: {
+    fontWeight: "300",
+    fontSize: 18,
     color: GlobalStyles.colors.gray300,
   },
   arrowDownSymbolText: {

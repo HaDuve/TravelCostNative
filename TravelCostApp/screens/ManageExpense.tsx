@@ -33,6 +33,7 @@ import { setMMKVObject } from "../store/mmkv";
 import { formatExpenseWithCurrency } from "../util/string";
 import { isSameDay } from "../util/dateTime";
 import ToastComponent from "../components/UI/ToastComponent";
+import safeLogError from "../util/error";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -59,10 +60,6 @@ const ManageExpense = ({ route, navigation }) => {
   const selectedExpense: ExpenseData = expenseCtx.expenses.find(
     (expense) => expense.id === editedExpenseId
   );
-  // // console.log(
-  //   "ManageExpense ~ selectedExpense?.rangeId:",
-  //   selectedExpense?.rangeId
-  // );
   const selectedExpenseAuthorUid = selectedExpense?.uid;
 
   async function deleteExpenseHandler() {
@@ -116,9 +113,12 @@ const ManageExpense = ({ route, navigation }) => {
         await touchAllTravelers(tripid, true);
         Toast.hide();
       } catch (error) {
-        // setError("Could not delete expense - please try again later!");
-        console.error(error);
-        // setIsSubmitting(false);
+        Toast.show({
+          text1: i18n.t("error"),
+          text2: i18n.t("deleteError"),
+          type: "error",
+        });
+        safeLogError(error);
       }
     }
     Alert.alert(i18n.t("sure"), i18n.t("sureExt"), [
@@ -206,7 +206,6 @@ const ManageExpense = ({ route, navigation }) => {
     // hotfix the date clock bug
     expenseData.date = expenseData.startDate;
     expenseData.editedTimestamp = Date.now();
-
     const item: OfflineQueueManageExpenseItem = {
       type: "add",
       expense: {

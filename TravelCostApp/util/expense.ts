@@ -5,6 +5,7 @@ import {
   OfflineQueueManageExpenseItem,
 } from "./offline-queue";
 import { splitType } from "./split";
+import uniqBy from "lodash.uniqby";
 // expense interface
 export interface Expense {
   tripid: string;
@@ -127,4 +128,38 @@ export function getExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
     return sum + Number(expense.calcAmount);
   }, 0);
   return sum;
+}
+
+/**
+ * Find the top 3 most duplicated objects in an array.
+ * @param {Array<ExpenseData>} objectsArray - The array of objects to search.
+ * @returns {Array<ExpenseData>} - An array containing the top 3 most duplicated objects.
+ */
+export function findMostDuplicatedDescriptionExpenses(objectsArray) {
+  const duplicatesMap = {};
+
+  // Step 1: Create a map with count as value to track duplicates
+  for (const obj of objectsArray) {
+    if (Object.prototype.hasOwnProperty.call(duplicatesMap, obj.description)) {
+      duplicatesMap[obj.description]++;
+    } else {
+      duplicatesMap[obj.description] = 1;
+    }
+  }
+
+  // Step 2: Sort the map by count
+  const sortedDuplicates = Object.entries(duplicatesMap).sort(
+    (a, b) => Number(b[1]) - Number(a[1])
+  );
+
+  // Step 3: Get the top 3 duplicates as ExpenseData objects
+  const top3Duplicates = sortedDuplicates.slice(0, 3).map(([description]) => {
+    // Find the original ExpenseData object with this description
+    const originalObject = objectsArray.find(
+      (obj) => obj.description === description
+    );
+    return originalObject;
+  });
+
+  return top3Duplicates;
 }

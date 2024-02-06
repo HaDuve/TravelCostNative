@@ -46,15 +46,12 @@ const ManageExpense = ({ route, navigation }) => {
   const tripCtx = useContext(TripContext);
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;
-  // // console.log("ManageExpense ~ isOnline:", isOnline);
   const [progress, setProgress] = useState(-1);
   const [progressAt, setProgressAt] = useState(0);
   const [progressMax, setProgressMax] = useState(0);
 
   const tripid = tripCtx.tripid;
-  // // console.log("ManageExpense ~ tripid:", tripid);
   const uid = authCtx.uid;
-  // // console.log("ManageExpense ~ uid:", uid);
 
   const editedExpenseId = route.params?.expenseId;
   const isEditing = !!editedExpenseId;

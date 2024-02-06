@@ -56,7 +56,26 @@ const AddExpenseButton = ({ navigation }) => {
     }),
     "description"
   );
-  const slicedExpenses = lastExpenses.slice(0, 20);
+  // find expenses where the same description was used multiple times, excluding expenses with rangedId
+  const duplicates = lastExpenses.filter(
+    (item, index) =>
+      lastExpenses.findIndex((i) => i.description === item.description) !==
+        index && !item.rangeId
+  );
+  // inside the duplicates, find the 3 expenses which are duplicated the most
+  const topDuplicates = duplicates
+    .sort((a, b) => {
+      return (
+        lastExpenses.filter((i) => i.description === b.description).length -
+        lastExpenses.filter((i) => i.description === a.description).length
+      );
+    })
+    .slice(0, 3);
+
+  const bestTemplateCandidates = [
+    ...topDuplicates,
+    ...lastExpenses.slice(0, 20),
+  ];
 
   const [longPressed, setLongPressed] = useState(false);
 
@@ -195,6 +214,16 @@ const AddExpenseButton = ({ navigation }) => {
     transform: [{ translateY: position.value }],
   }));
 
+  async function hideTempOverlay() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    position.value = withTiming(END_POSITION * 3.3, {
+      duration: 300,
+    });
+    await sleep(300);
+    setLongPressed(false);
+  }
+
+  // show the template expenses overlay
   if (longPressed) {
     return (
       <GestureDetector gesture={panGesture}>
@@ -204,18 +233,8 @@ const AddExpenseButton = ({ navigation }) => {
           exiting={SlideOutDown}
         >
           <Pressable
-            onPress={async () => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              position.value = withTiming(END_POSITION, { duration: 300 });
-              await sleep(300);
-              setLongPressed(false);
-            }}
-            onLongPress={async () => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              position.value = withTiming(END_POSITION, { duration: 300 });
-              await sleep(300);
-              setLongPressed(false);
-            }}
+            onPress={hideTempOverlay}
+            onLongPress={hideTempOverlay}
             style={({ pressed }) => [
               styles.addButton,
               GlobalStyles.shadowGlowPrimary,
@@ -224,40 +243,14 @@ const AddExpenseButton = ({ navigation }) => {
               pressed && GlobalStyles.pressedWithShadowNoScale,
             ]}
           >
-            <View
-              style={{
-                flexDirection: "column",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 8,
-                borderRadius: 5,
-              }}
-            >
-              <Text
-                style={[
-                  {
-                    fontWeight: "300",
-                    fontSize: 24,
-                    color: GlobalStyles.colors.gray300,
-                  },
-                ]}
-              >
+            <View style={styles.templateContainer}>
+              <Text style={[styles.templateContainerTitle]}>
                 Template Expenses
               </Text>
-              <Text
-                style={[
-                  {
-                    fontWeight: "300",
-                    fontSize: 24,
-                    color: GlobalStyles.colors.gray300,
-                  },
-                ]}
-              >
-                ▼
-              </Text>
+              <Text style={styles.arrowDownSymbolText}>▼</Text>
             </View>
             <FlatList
-              data={slicedExpenses}
+              data={bestTemplateCandidates}
               renderItem={renderExpenseTemplates}
             />
           </Pressable>
@@ -266,35 +259,35 @@ const AddExpenseButton = ({ navigation }) => {
     );
   }
 
-  if (!valid.current) {
-    return (
-      <Animated.View
-        style={[styles.margin]}
-        entering={SlideInDown.duration(600)}
-        exiting={SlideOutDown}
-      >
-        <Pressable
-          onPress={() => {
-            pressHandler();
-          }}
-          style={[
-            styles.addButton,
-            GlobalStyles.shadowGlowPrimary,
-            styles.addButtonInactive,
-          ]}
-        >
-          <LoadingBarOverlay
-            containerStyle={{
-              backgroundColor: "transparent",
-              maxHeight: 44,
-              marginLeft: -4,
-            }}
-            noText
-          ></LoadingBarOverlay>
-        </Pressable>
-      </Animated.View>
-    );
-  }
+  // if (!valid.current) {
+  //   return (
+  //     <Animated.View
+  //       style={[styles.margin]}
+  //       entering={SlideInDown.duration(600)}
+  //       exiting={SlideOutDown}
+  //     >
+  //       <Pressable
+  //         onPress={() => {
+  //           pressHandler();
+  //         }}
+  //         style={[
+  //           styles.addButton,
+  //           GlobalStyles.shadowGlowPrimary,
+  //           styles.addButtonInactive,
+  //         ]}
+  //       >
+  //         <LoadingBarOverlay
+  //           containerStyle={{
+  //             backgroundColor: "transparent",
+  //             maxHeight: 44,
+  //             marginLeft: -4,
+  //           }}
+  //           noText
+  //         ></LoadingBarOverlay>
+  //       </Pressable>
+  //     </Animated.View>
+  //   );
+  // }
   return (
     <Animated.View
       style={styles.margin}
@@ -388,5 +381,22 @@ const styles = StyleSheet.create({
     width: "76%",
     alignSelf: "center",
     justifyContent: "space-between",
+  },
+  templateContainer: {
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+    borderRadius: 5,
+  },
+  templateContainerTitle: {
+    fontWeight: "300",
+    fontSize: 24,
+    color: GlobalStyles.colors.gray300,
+  },
+  arrowDownSymbolText: {
+    fontWeight: "300",
+    fontSize: 24,
+    color: GlobalStyles.colors.gray300,
   },
 });

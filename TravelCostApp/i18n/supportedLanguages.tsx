@@ -407,6 +407,9 @@ const en = {
   bannerText1: "Do you want to keep your budget like a true Nomad? 💎",
   bannerText2:
     "Save even more money with the latest functions of the premium version.\nStart your free trial today!",
+  templateExpenses: "Expense Templates",
+  mostUsedExpenses: "Most used expenses",
+  lastUsedExpenses: "Last used expenses",
 };
 const de = {
   // special expense strings
@@ -838,6 +841,9 @@ const de = {
   bannerText1: "Möchtest du dein Budget wie ein echter Nomade verwalten? 💎",
   bannerText2:
     "Spare noch mehr Geld mit den neuesten Funktionen der Premium-Version.\nStarte noch heute deine kostenlose Testversion!",
+  templateExpenses: "Ausgaben-Vorlagen",
+  mostUsedExpenses: "Am häufigsten verwendete Ausgaben",
+  lastUsedExpenses: "Zuletzt verwendete Ausgaben",
 };
 const fr = {
   // special expense strings
@@ -1264,6 +1270,9 @@ const fr = {
   bannerText1: "Voulez-vous gérer votre budget comme un vrai Nomade ? 💎",
   bannerText2:
     "Économisez encore plus d'argent avec les dernières fonctionnalités de la version premium.\nCommencez votre essai gratuit dès aujourd'hui !",
+  templateExpenses: "Modèles de dépenses",
+  mostUsedExpenses: "Dépenses les plus utilisées",
+  lastUsedExpenses: "Dernières dépenses utilisées",
 };
 const ru = {
   // special expense strings
@@ -1695,5 +1704,8 @@ const ru = {
   bannerText1: "Хотите вести свой бюджет, как настоящий номад? 💎",
   bannerText2:
     "Экономьте еще больше с последними функциями премиум-версии.\nНачните бесплатную пробную версию сегодня!",
+  templateExpenses: "Шаблоны расходов",
+  mostUsedExpenses: "Самые используемые расходы",
+  lastUsedExpenses: "Последние использованные расходы",
 };
 export { en, de, fr, ru };

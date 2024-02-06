@@ -106,10 +106,6 @@ const AddExpenseButton = ({ navigation }) => {
     );
     const formattedDescription = truncateString(data.description, 15);
     const categoryIcon = getCatSymbol(data.category);
-    // is duplicate if data.id is the same as any expense.id of topDuplicates
-    const isDuplicate = topDuplicates.some(
-      (e: ExpenseData) => e.id === data.id
-    );
     return (
       <View
         style={{
@@ -118,12 +114,12 @@ const AddExpenseButton = ({ navigation }) => {
       >
         {isFirst && (
           <Text style={styles.templateContainerSubtitle}>
-            Most used expenses
+            {i18n.t("mostUsedExpenses")}
           </Text>
         )}
         {isThird && (
           <Text style={styles.templateContainerSubtitle}>
-            Last used expenses
+            {i18n.t("lastUsedExpenses")}
           </Text>
         )}
         <Pressable
@@ -275,7 +271,7 @@ const AddExpenseButton = ({ navigation }) => {
           >
             <View style={styles.templateContainer}>
               <Text style={[styles.templateContainerTitle]}>
-                Template Expenses
+                {i18n.t("templateExpenses")}
               </Text>
               <Text style={styles.arrowDownSymbolText}>▼</Text>
             </View>

@@ -296,35 +296,35 @@ const AddExpenseButton = ({ navigation }) => {
     );
   }
 
-  // if (!valid.current) {
-  //   return (
-  //     <Animated.View
-  //       style={[styles.margin]}
-  //       entering={SlideInDown.duration(600)}
-  //       exiting={SlideOutDown}
-  //     >
-  //       <Pressable
-  //         onPress={() => {
-  //           pressHandler();
-  //         }}
-  //         style={[
-  //           styles.addButton,
-  //           GlobalStyles.shadowGlowPrimary,
-  //           styles.addButtonInactive,
-  //         ]}
-  //       >
-  //         <LoadingBarOverlay
-  //           containerStyle={{
-  //             backgroundColor: "transparent",
-  //             maxHeight: 44,
-  //             marginLeft: -4,
-  //           }}
-  //           noText
-  //         ></LoadingBarOverlay>
-  //       </Pressable>
-  //     </Animated.View>
-  //   );
-  // }
+  if (!valid.current) {
+    return (
+      <Animated.View
+        style={[styles.margin]}
+        entering={SlideInDown.duration(600)}
+        exiting={SlideOutDown}
+      >
+        <Pressable
+          onPress={() => {
+            pressHandler();
+          }}
+          style={[
+            styles.addButton,
+            GlobalStyles.shadowGlowPrimary,
+            styles.addButtonInactive,
+          ]}
+        >
+          <LoadingBarOverlay
+            containerStyle={{
+              backgroundColor: "transparent",
+              maxHeight: 44,
+              marginLeft: -4,
+            }}
+            noText
+          ></LoadingBarOverlay>
+        </Pressable>
+      </Animated.View>
+    );
+  }
   return (
     <Animated.View
       style={styles.margin}

@@ -46,29 +46,8 @@ export function getCatSymbol(cat: string) {
       return "happy-outline";
     case "undefined":
       return "help-outline";
-
-    // TODO: change this hotfix for GMR categories to real new categories (dynamically added)
-    case "ANREISE":
-      return "globe-outline";
-    case "INLANDSFLUG":
-      return "airplane-outline";
-    case "FORTBEWEGUNG":
-      return "car-outline";
-    case "TOUREN & AKTIVITÄTEN":
-      return "ios-bus-outline";
-    case "UNTERKUNFT":
-      return "bed-outline";
-    case "ESSEN & TRINKEN":
-      return "fast-food-outline";
-    case "VISUM":
-      return "calendar-outline";
-    case "SIM KARTE":
-      return "call-outline";
-    case "VERGNÜGEN":
-      return "happy-outline";
     default: {
       // if not, return "help-outline"
-      // // console.log(`cat: ${cat} finally not found in categoryList`);
       return "help-outline";
     }
   }

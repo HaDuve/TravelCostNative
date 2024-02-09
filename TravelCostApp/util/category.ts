@@ -56,7 +56,9 @@ export function getCatSymbol(cat: string) {
 export async function getCatSymbolAsync(cat: string) {
   const catList = await asyncStoreGetObject("categoryList");
   if (catList) {
-    const catObj = catList.find((catObj: Category) => catObj.catString === cat);
+    const catObj: Category = catList.find(
+      (catObj: Category) => catObj.catString === cat || catObj.icon === cat
+    );
     if (catObj) {
       return catObj.icon;
     }

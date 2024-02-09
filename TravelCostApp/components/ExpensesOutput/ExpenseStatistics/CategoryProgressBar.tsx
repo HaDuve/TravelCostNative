@@ -2,7 +2,12 @@ import React, { StyleSheet, Text, View, Dimensions } from "react-native";
 import * as Progress from "react-native-progress";
 import { GlobalStyles } from "../../../constants/styles";
 import { Ionicons } from "@expo/vector-icons";
-import { Category, getCatString, getCatSymbol } from "../../../util/category";
+import {
+  Category,
+  getCatString,
+  getCatSymbol,
+  getCatSymbolAsync,
+} from "../../../util/category";
 import { useContext } from "react";
 import { TripContext } from "../../../store/trip-context";
 import { formatExpenseWithCurrency } from "../../../util/string";
@@ -37,9 +42,9 @@ const CategoryProgressBar = ({
           return;
         }
       }
-      const newCatSymbol = getCatSymbol(cat);
+      const newCatSymbol = await getCatSymbolAsync(cat);
       setCatSymbol(newCatSymbol);
-      iconOverride && setCatSymbol(iconOverride);
+      !!iconOverride && setCatSymbol(iconOverride);
     }
     setCatSymbolAsync();
   }, [cat, iconOverride, userCtx.catIconNames]);

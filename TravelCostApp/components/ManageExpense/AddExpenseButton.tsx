@@ -99,13 +99,19 @@ const AddExpenseButton = ({ navigation }) => {
     const isFirst = index === 0;
     const isThird = index === 3;
     // shallow copy item or we will have problems with the expense context
-    const data: ExpenseData = JSON.parse(JSON.stringify(item));
+    let data: ExpenseData;
+    try {
+      data = JSON.parse(JSON.stringify(item));
+    } catch (error) {
+      return <></>;
+    }
     const formattedAmount = formatExpenseWithCurrency(
       data.amount,
       data.currency
     );
     const formattedDescription = truncateString(data.description, 15);
     const categoryIcon = getCatSymbol(data.category);
+    const cat = data.category;
     return (
       <View
         style={{
@@ -145,7 +151,7 @@ const AddExpenseButton = ({ navigation }) => {
             });
           }}
         >
-          <IconButton size={24} icon={categoryIcon}></IconButton>
+          <IconButton size={24} icon={categoryIcon} category={cat}></IconButton>
           <Text style={styles.description}>{formattedDescription}</Text>
           <Text style={{}}>{formattedAmount}</Text>
         </Pressable>

@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
 import { isToday, toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
-import { getCatSymbol, Category } from "../../util/category";
+import { getCatSymbol, Category, getCatSymbolAsync } from "../../util/category";
 import { useContext, useCallback, useState, useMemo, memo } from "react";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseWithCurrency } from "../../util/string";
@@ -94,7 +94,7 @@ function ExpenseItem(props): JSX.Element {
 
   const [catSymbol, setCatSymbol] = useState(iconName ? iconName : "");
   useEffect(() => {
-    function setCatSymbolAsync() {
+    async function setCatSymbolAsync() {
       const listOfCats = catIconNames;
       if (listOfCats) {
         const cat: Category = listOfCats.find(({ cat }) => cat === category);
@@ -103,8 +103,8 @@ function ExpenseItem(props): JSX.Element {
           return;
         }
       }
-      const iconName = getCatSymbol(category);
-      setCatSymbol(iconName);
+      const storedIcon = await getCatSymbolAsync(category);
+      setCatSymbol(storedIcon);
     }
     setCatSymbolAsync();
     // need to disable eslint because of array in deps => rerender every tick problem

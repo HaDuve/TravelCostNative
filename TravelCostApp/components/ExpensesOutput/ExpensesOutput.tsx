@@ -92,7 +92,11 @@ function ExpensesOutput({
   return (
     <View style={{ flex: 1 }}>
       {loadingSpinner}
-      <ScrollView style={styles.container} refreshControl={refreshControl}>
+      <ScrollView
+        style={styles.container}
+        refreshControl={refreshControl}
+        nestedScrollEnabled={true}
+      >
         <View>{memoizedContent}</View>
       </ScrollView>
     </View>

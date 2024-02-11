@@ -852,7 +852,7 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
         {!isFiltered && <LoadingBarOverlay></LoadingBarOverlay>}
       </View>
       <Animated.FlatList
-        scrollEnabled={true}
+        scrollEnabled={false}
         onScroll={(event) => {
           setContentVerticalOffset(event.nativeEvent.contentOffset.y);
         }}

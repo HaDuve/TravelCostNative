@@ -1,44 +1,43 @@
 /* eslint-disable react/prop-types */
-import { StyleSheet, Text, View, Platform, Alert } from "react-native";
-import { GlobalStyles } from "../constants/styles";
+import { useContext, useEffect, useRef, useState } from "react";
+import { Alert, Platform, StyleSheet, Text, View } from "react-native";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
-import { useContext, useState, useEffect, useRef } from "react";
 import IconButton from "../components/UI/IconButton";
+import { GlobalStyles } from "../constants/styles";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
 import React from "react";
-import { saveStoppedTour } from "../util/tourUtil";
-import { TourGuideZone, useTourGuideController } from "rn-tourguide";
-import { sleep } from "../util/appState";
-import { useInterval } from "../components/Hooks/useInterval";
-import { secureStoreGetItem } from "../store/secure-storage";
-import { fetchTripHistory, storeExpoPushTokenInTrip } from "../util/http";
-import { AuthContext } from "../store/auth-context";
 import { BranchEvent } from "react-native-branch";
+import { TourGuideZone, useTourGuideController } from "rn-tourguide";
+import { useInterval } from "../components/Hooks/useInterval";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
+import { AuthContext } from "../store/auth-context";
+import { secureStoreGetItem } from "../store/secure-storage";
+import { sleep } from "../util/appState";
+import { fetchTripHistory, storeExpoPushTokenInTrip } from "../util/http";
+import { saveStoppedTour } from "../util/tourUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "de";
 
-import { ExpoPushToken } from "expo-notifications";
-import * as Notifications from "expo-notifications";
-import * as Device from "expo-device";
+import { useFocusEffect } from "@react-navigation/native";
 import Constants from "expo-constants";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
+import { ExpoPushToken } from "expo-notifications";
+import branch from "react-native-branch";
+import Purchases from "react-native-purchases";
+import { setAttributesAsync } from "../components/Premium/PremiumConstants";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import { NetworkContext } from "../store/network-context";
-import { useFocusEffect } from "@react-navigation/native";
-import { setAttributesAsync } from "../components/Premium/PremiumConstants";
-import Purchases from "react-native-purchases";
-import branch from "react-native-branch";
 import safeLogError from "../util/error";
-import Toast from "react-native-toast-message";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -122,12 +121,6 @@ async function storeToken() {
     });
     await storeExpoPushTokenInTrip(token, "");
   } catch (error) {
-    Toast.show({
-      type: "error",
-      text1: "Store permissions error",
-      text2: "Will try later",
-    });
-    // console.log("storeExpoPushTokenInTrip failed, will try later");
     setMMKVObject("expoPushTokenStatus", { failed: true });
   }
 }
@@ -141,7 +134,6 @@ const ProfileScreen = ({ navigation }) => {
   const isConnected = netCtx.isConnected && netCtx.strongConnection;
 
   const [tourIsRunning, setTourIsRunning] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
   const [tripHistory, setTripHistory] = useState([]);
   const [isFetchingLogout, setIsFetchingLogout] = useState(false);
 

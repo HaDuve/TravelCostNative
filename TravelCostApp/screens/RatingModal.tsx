@@ -1,23 +1,29 @@
-import { Button, StyleSheet, Text, View, Image, Pressable } from "react-native";
-import React, { useState } from "react";
-import Modal from "react-native-modal";
-import { Linking, Platform } from "react-native";
 import * as StoreReview from "expo-store-review";
+import React from "react";
+import {
+  Image,
+  Linking,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import Modal from "react-native-modal";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import PropTypes from "prop-types";
-import { GlobalStyles } from "../constants/styles";
-import GradientButton from "../components/UI/GradientButton";
 import FlatButton from "../components/UI/FlatButton";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import GradientButton from "../components/UI/GradientButton";
+import { GlobalStyles } from "../constants/styles";
 import { secureStoreSetObject } from "../store/secure-storage";
 
 //TODO: set the according URLS when we are live!

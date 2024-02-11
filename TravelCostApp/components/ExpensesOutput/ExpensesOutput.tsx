@@ -1,29 +1,21 @@
 import { Dimensions, StyleSheet, Text, View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
 
 import { GlobalStyles } from "../../constants/styles";
 import ExpensesList from "./ExpensesList";
 import React from "react-native";
 import Animated, { SlideOutLeft } from "react-native-reanimated";
 import LoadingOverlay from "../UI/LoadingOverlay";
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { EXPENSES_LOAD_TIMEOUT } from "../../confAppConstants";
 import { memo } from "react";
-import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { TripContext } from "../../store/trip-context";
 
 function ExpensesOutput({
   expenses,
   fallbackText,
   refreshControl,
+  refreshing,
   showSumForTravellerName,
   isFiltered,
 }) {
@@ -40,26 +32,6 @@ function ExpensesOutput({
     if (tripName && expenses.length > 1) setShowLoading(false);
   }, [tripName, expenses.length]);
 
-  // const toggleLoading = () => setShowLoading((prev) => !prev);
-  const loadingSpinner = useMemo(
-    () => (
-      <View
-        style={{
-          position: "absolute",
-          width: Dimensions.get("window").width,
-          height: 60,
-          alignItems: "center",
-          justifyContent: "center",
-          paddingTop: 4,
-          marginTop: "12%",
-        }}
-      >
-        {/* commented out because we have the same in expenselist */}
-        {/* <LoadingBarOverlay></LoadingBarOverlay> */}
-      </View>
-    ),
-    []
-  );
   const memoizedContent = useMemo(() => {
     // console.log("render content");
     if (expenses?.length > 0) {
@@ -69,6 +41,8 @@ function ExpensesOutput({
           expenses={expenses}
           showSumForTravellerName={showSumForTravellerName}
           isFiltered={isFiltered}
+          refreshControl={refreshControl}
+          refreshing={refreshing}
         />
       );
     }
@@ -85,20 +59,15 @@ function ExpensesOutput({
     fallback,
     fallbackText,
     isFiltered,
+    refreshControl,
+    refreshing,
     showLoading,
     showSumForTravellerName,
   ]);
 
   return (
-    <View style={{ flex: 1 }}>
-      {loadingSpinner}
-      <ScrollView
-        style={styles.container}
-        refreshControl={refreshControl}
-        nestedScrollEnabled={true}
-      >
-        <View>{memoizedContent}</View>
-      </ScrollView>
+    <View style={styles.container}>
+      <View>{memoizedContent}</View>
     </View>
   );
 }
@@ -111,6 +80,7 @@ ExpensesOutput.propTypes = {
   expenses: PropTypes.array,
   fallbackText: PropTypes.string,
   refreshControl: PropTypes.object,
+  refreshing: PropTypes.bool,
   showSumForTravellerName: PropTypes.string,
   isFiltered: PropTypes.bool,
 };

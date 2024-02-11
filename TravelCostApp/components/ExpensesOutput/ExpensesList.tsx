@@ -73,12 +73,19 @@ import {
 import { TripAsObject } from "../../screens/TripSummaryScreen";
 import { Pressable } from "react-native";
 import safeLogError from "../../util/error";
+import { sleep } from "../../util/appState";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 
 // Displays a list of all expenses.
-function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
+function ExpensesList({
+  expenses,
+  showSumForTravellerName,
+  isFiltered,
+  refreshControl,
+  refreshing,
+}) {
   // GLOBALS across all expenseItems
   let tripID = "";
   // let expenseCtx;
@@ -504,15 +511,6 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
     });
   }, [expenses?.length, selected?.length]);
 
-  // function moveExpensesToTrip() {
-  //   if (selected.length === 0) return;
-  //   // TODO: finish this function
-  // }
-  // function editMultipleExpenses() {
-  //   if (selected.length === 0) return;
-  //   // TODO: finish this function
-  // }
-
   const finderWithExpenses = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (selected.length === 0) return;
@@ -838,24 +836,13 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
         height: Dimensions.get("window").height,
       }}
     >
-      <View
-        style={{
-          position: "absolute",
-          width: Dimensions.get("window").width,
-          height: 60,
-          alignItems: "center",
-          justifyContent: "center",
-          paddingTop: 4,
-          marginTop: -50,
-        }}
-      >
-        {!isFiltered && <LoadingBarOverlay></LoadingBarOverlay>}
-      </View>
       <Animated.FlatList
-        scrollEnabled={false}
+        scrollEnabled={true}
         onScroll={(event) => {
           setContentVerticalOffset(event.nativeEvent.contentOffset.y);
         }}
+        refreshControl={refreshControl}
+        refreshing={refreshing}
         data={expenses}
         ref={flatListRef}
         layout={ListLayoutAnimation}
@@ -873,7 +860,6 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
         }
         ListHeaderComponent={listHeaderJSX}
         keyExtractor={(item: Expense) => item.id}
-        // refreshControl={refreshControl}
         getItemLayout={(data, index) => ({
           length: 55,
           offset: 55 * index,
@@ -926,6 +912,7 @@ ExpensesList.propTypes = {
     })
   ).isRequired,
   refreshControl: PropTypes.object,
+  refreshing: PropTypes.bool,
   showSumForTravellerName: PropTypes.string,
   isFiltered: PropTypes.bool,
 };

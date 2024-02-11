@@ -21,6 +21,7 @@ import {
   View,
   RefreshControl,
   useWindowDimensions,
+  Dimensions,
 } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
@@ -202,7 +203,7 @@ function RecentExpenses({ navigation }) {
     }
     await getExpenses(true, true, true);
     setRefreshing(false);
-  }, [getExpenses, refreshing]);
+  }, [getExpenses]);
 
   // strong connection state
   const [offlineString, setOfflineString] = useState("");
@@ -320,20 +321,19 @@ function RecentExpenses({ navigation }) {
   const isScaledUp = fontScale > 1;
   const useMoreSpace = isScaledUp || isLongNumber;
 
-  // // console.log("RecentExpenses ~ apikey:", apikey);
-
   const ExpensesOutputJSX = (
     <MemoizedExpensesOutput
       expenses={recentExpenses}
       fallbackText={i18n.t("fallbackTextExpenses")}
+      refreshing={refreshing}
       refreshControl={
         <RefreshControl
+          progressViewOffset={8}
           refreshing={refreshing || isFetching}
-          tintColor="transparent"
-          colors={["transparent"]}
+          tintColor={GlobalStyles.colors.textColor}
+          colors={[GlobalStyles.colors.textColor]}
           style={{ backgroundColor: "transparent" }}
           onRefresh={async () => {
-            // console.log("onREFRESH");
             await onRefresh();
           }}
         />

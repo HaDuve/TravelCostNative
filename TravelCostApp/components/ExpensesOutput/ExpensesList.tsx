@@ -880,6 +880,7 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
           index,
         })}
         initialScrollIndex={1}
+        windowSize={8}
         onScrollToIndexFailed={(info) => {
           const wait = new Promise((resolve) => setTimeout(resolve, 500));
           wait.then(() => {

@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
 import { Badge } from "react-native-paper";
 import { useEffect, useState } from "react";
-import { getCatSymbolAsync } from "../../util/category";
+import { getCatSymbolMMKV } from "../../util/category";
 
 const IconButton = ({
   icon,
@@ -23,7 +23,7 @@ const IconButton = ({
   const [overrideIcon, setCatSymbol] = useState(null);
   useEffect(() => {
     async function setCatSymbolAsync() {
-      const newCatSymbol = await getCatSymbolAsync(category);
+      const newCatSymbol = getCatSymbolMMKV(category);
       setCatSymbol(newCatSymbol);
     }
     if (category) setCatSymbolAsync();

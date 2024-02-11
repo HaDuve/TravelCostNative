@@ -6,6 +6,7 @@ import { en, de, fr, ru } from "../i18n/supportedLanguages";
 import { asyncStoreGetObject } from "../store/async-storage";
 import { CATEGORY_KEYWORDS } from "./categoryKeywords";
 import { ExpenseData } from "./expense";
+import { getMMKVObject } from "../store/mmkv";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -53,8 +54,8 @@ export function getCatSymbol(cat: string) {
   }
 }
 
-export async function getCatSymbolAsync(cat: string) {
-  const catList = await asyncStoreGetObject("categoryList");
+export function getCatSymbolMMKV(cat: string) {
+  const catList = getMMKVObject("categoryList");
   if (catList) {
     const catObj: Category = catList.find(
       (catObj: Category) => catObj.catString === cat || catObj.icon === cat

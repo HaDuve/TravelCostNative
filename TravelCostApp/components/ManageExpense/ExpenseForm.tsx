@@ -33,7 +33,7 @@ import {
   DEFAULTCATEGORIES,
   getCatString,
   getCatSymbol,
-  getCatSymbolAsync,
+  getCatSymbolMMKV,
   mapDescriptionToCategory,
 } from "../../util/category";
 import { formatExpenseWithCurrency } from "../../util/string";
@@ -190,7 +190,7 @@ const ExpenseForm = ({
   const iconString = iconName ? iconName : getCatSymbol(pickedCat);
   const [icon, setIcon] = useState(iconString);
   const getSetCatIcon = async (catString: string) => {
-    const icon = await getCatSymbolAsync(catString);
+    const icon = getCatSymbolMMKV(catString);
     setIcon(icon);
   };
   useEffect(() => {
@@ -518,9 +518,8 @@ const ExpenseForm = ({
   }
   useEffect(() => {
     // if Icon is changed, asyncGetCatSymbol
-    getCatSymbolAsync(inputs.category.value).then((symbol) => {
-      setIcon(symbol);
-    });
+    const symbol = getCatSymbolMMKV(inputs.category.value);
+    setIcon(symbol);
   }, [inputs.category.value]);
 
   function inputChangedHandler(inputIdentifier: string, enteredValue: string) {

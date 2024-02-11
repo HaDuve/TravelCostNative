@@ -33,6 +33,7 @@ import { RangeString } from "./expenses-context";
 import Purchases from "react-native-purchases";
 import safeLogError from "../util/error";
 import set from "react-native-reanimated";
+import { getMMKVObject } from "./mmkv";
 
 export interface UserData {
   uid?: string;
@@ -185,17 +186,15 @@ function UserContextProvider({ children }) {
     loadIsPremiumFromAsync();
   }, []);
 
-  async function _loadCatListFromAsync() {
+  function _loadCatListFromMMKV() {
     try {
-      const categoryListString = await AsyncStorage.getItem("categoryList");
-      if (categoryListString !== null) {
-        const list = JSON.parse(categoryListString);
-        // // console.log("loadCategoryList ~ list:", list);
-        setCatIconNames(list);
+      const categoryList = getMMKVObject("categoryList");
+      if (categoryList !== null) {
+        setCatIconNames(categoryList);
         return;
       }
     } catch (error) {
-      console.error(error);
+      safeLogError(error);
     }
   }
 
@@ -204,18 +203,18 @@ function UserContextProvider({ children }) {
    * @returns void
    * @description
    * 1. fetches the category list from the server
-   * 2. if tripid == "async", it loads the category list from async storage
+   * 2. if tripid == "async", it loads the category list from MMKV Storage
    **/
   async function fetchOrLoadCatList(tripid: string) {
     if (tripid == "async") {
-      await _loadCatListFromAsync();
-    } else {
-      try {
-        const catList = await fetchCategories(tripid);
-        setCatIconNames(catList);
-      } catch (error) {
-        await _loadCatListFromAsync();
-      }
+      _loadCatListFromMMKV();
+      return;
+    }
+    try {
+      const catList = await fetchCategories(tripid);
+      setCatIconNames(catList);
+    } catch (error) {
+      _loadCatListFromMMKV();
     }
   }
 

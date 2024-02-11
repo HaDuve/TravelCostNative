@@ -12,7 +12,7 @@ import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
 import { isToday, toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
-import { getCatSymbol, Category, getCatSymbolAsync } from "../../util/category";
+import { Category, getCatSymbolMMKV } from "../../util/category";
 import { useContext, useCallback, useState, useMemo, memo } from "react";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseWithCurrency } from "../../util/string";
@@ -108,7 +108,7 @@ function ExpenseItem(props): JSX.Element {
           return;
         }
       }
-      const storedIcon = await getCatSymbolAsync(category);
+      const storedIcon = getCatSymbolMMKV(category);
       setCatSymbol(storedIcon);
     }
     setCatSymbolAsync();

@@ -49,8 +49,9 @@ import InfoButton from "../components/UI/InfoButton";
 import Modal from "react-native-modal";
 import FlatButton from "../components/UI/FlatButton";
 import BlurPremium from "../components/Premium/BlurPremium";
+import { getMMKVObject } from "../store/mmkv";
 
-const ManageCategoryScreen = ({ route, navigation }) => {
+const ManageCategoryScreen = ({ navigation }) => {
   // defaultCategories minus the last element (-new cat element)
   const defaultCategoryList: Category[] = DEFAULTCATEGORIES.slice(
     0,
@@ -101,10 +102,10 @@ const ManageCategoryScreen = ({ route, navigation }) => {
 
   const loadCategoryList = async () => {
     try {
-      const categoryListString = await AsyncStorage.getItem("categoryList");
+      // TODO: REPLACE WITH MMKV STORAGE SO ANDROID DOES NOT DIE
+      const categoryListString = getMMKVObject("categoryList");
       if (categoryListString !== null) {
         const list = JSON.parse(categoryListString);
-        // // console.log("loadCategoryList ~ list:", list);
         setCategoryList(list);
       } else {
         setCategoryList(defaultCategoryList);

@@ -23,20 +23,14 @@ import { TripContext } from "../store/trip-context";
 import { Ionicons } from "@expo/vector-icons";
 import GradientButton from "../components/UI/GradientButton";
 import { useFocusEffect } from "@react-navigation/native";
-import { asyncStoreGetObject } from "../store/async-storage";
 import { Alert } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 
 import PropTypes from "prop-types";
-import { UserContext } from "../store/user-context";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NetworkContext } from "../store/network-context";
-import { DEFAULTCATEGORIES } from "../util/category";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import IconButton from "../components/UI/IconButton";
+import { Category, DEFAULTCATEGORIES } from "../util/category";
 import BackButton from "../components/UI/BackButton";
-import { MMKV } from "react-native-mmkv";
-import { mmkvstorage, setMMKVObject } from "../store/mmkv";
+import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -47,7 +41,6 @@ const CategoryPickScreen = ({ route, navigation }) => {
 
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
-  const userCtx = useContext(UserContext);
 
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
   const tripid = tripCtx.tripid;
@@ -82,11 +75,6 @@ const CategoryPickScreen = ({ route, navigation }) => {
             catString: i18n.t("catNewString"),
           });
           setCategoryList(tempList);
-          await AsyncStorage.setItem(
-            "categoryList",
-            JSON.stringify(categories)
-          );
-          // MMKV save
           setMMKVObject("categoryList", categories);
           setIsFetching(false);
         } else await loadCategoryList();
@@ -94,7 +82,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
 
       // first try to load categories from asyncstore
       const loadCategoryList = async () => {
-        const categories = await asyncStoreGetObject("categoryList");
+        const categories: Category[] = getMMKVObject("categoryList");
         if (categories) {
           categories.push({
             id: 6,

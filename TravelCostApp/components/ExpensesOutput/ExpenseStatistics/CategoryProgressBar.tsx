@@ -5,8 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import {
   Category,
   getCatString,
-  getCatSymbol,
-  getCatSymbolAsync,
+  getCatSymbolMMKV,
 } from "../../../util/category";
 import { useContext } from "react";
 import { TripContext } from "../../../store/trip-context";
@@ -42,7 +41,7 @@ const CategoryProgressBar = ({
           return;
         }
       }
-      const newCatSymbol = await getCatSymbolAsync(cat);
+      const newCatSymbol = getCatSymbolMMKV(cat);
       setCatSymbol(newCatSymbol);
       !!iconOverride && setCatSymbol(iconOverride);
     }

@@ -49,7 +49,8 @@ import InfoButton from "../components/UI/InfoButton";
 import Modal from "react-native-modal";
 import FlatButton from "../components/UI/FlatButton";
 import BlurPremium from "../components/Premium/BlurPremium";
-import { getMMKVObject } from "../store/mmkv";
+import { getMMKVObject, setMMKVObject } from "../store/mmkv";
+import safeLogError from "../util/error";
 
 const ManageCategoryScreen = ({ navigation }) => {
   // defaultCategories minus the last element (-new cat element)
@@ -128,20 +129,14 @@ const ManageCategoryScreen = ({ navigation }) => {
       navigation.pop(2);
     }
     try {
-      await AsyncStorage.setItem(
-        "categoryList",
-        JSON.stringify(newCategoryList)
-      );
-      // console.log(
-      //   `updating trip categories with ${JSON.stringify(newCategoryList)}`
-      // );
+      setMMKVObject("categoryList", categoryList);
       await updateTrip(tripid, {
         categories: JSON.stringify(newCategoryList),
       });
       // todo: update this without another fetch
       await userCtx.loadCatListFromAsyncInCtx(tripid);
     } catch (error) {
-      console.error(error);
+      safeLogError(error);
     }
     setIsUploading(false);
   };

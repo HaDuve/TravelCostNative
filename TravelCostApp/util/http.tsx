@@ -385,7 +385,6 @@ export async function storeTrip(tripData: TripData) {
 }
 
 export async function updateTrip(tripid: string, tripData) {
-  // // console.log("https: ~ updateTrip ~ tripData", tripData);
   try {
     const res = await axios.patch(
       BACKEND_URL + "/trips/" + `${tripid}.json` + getMMKVString("QPAR"),

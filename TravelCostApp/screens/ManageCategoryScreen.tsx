@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -77,7 +77,21 @@ const ManageCategoryScreen = ({ navigation }) => {
   const tripCtx = useContext(TripContext);
   const tripid = tripCtx.tripid;
 
-  const fetchCategoryList = async () => {
+  const loadCategoryList = useCallback(async () => {
+    try {
+      const categoryList = getMMKVObject("categoryList");
+      if (categoryList !== null) {
+        setCategoryList(categoryList);
+      } else {
+        setCategoryList(defaultCategoryList);
+      }
+    } catch (error) {
+      safeLogError(error);
+    }
+    setIsFetching(false);
+  }, [defaultCategoryList]);
+
+  const fetchCategoryList = useCallback(async () => {
     if (!isOnline) {
       await loadCategoryList();
       return;
@@ -91,7 +105,7 @@ const ManageCategoryScreen = ({ navigation }) => {
         setIsFetching(false);
       }
     } catch (error) {
-      console.error(error);
+      safeLogError(error);
     }
     if (categoryList?.length === 0) {
       await loadCategoryList();
@@ -99,23 +113,13 @@ const ManageCategoryScreen = ({ navigation }) => {
     if (categoryList?.length === 0) {
       setCategoryList(defaultCategoryList);
     }
-  };
-
-  const loadCategoryList = async () => {
-    try {
-      // TODO: REPLACE WITH MMKV STORAGE SO ANDROID DOES NOT DIE
-      const categoryListString = getMMKVObject("categoryList");
-      if (categoryListString !== null) {
-        const list = JSON.parse(categoryListString);
-        setCategoryList(list);
-      } else {
-        setCategoryList(defaultCategoryList);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-    setIsFetching(false);
-  };
+  }, [
+    categoryList?.length,
+    defaultCategoryList,
+    isOnline,
+    loadCategoryList,
+    tripid,
+  ]);
 
   const saveCategoryList = async (newCategoryList) => {
     setIsUploading(true);
@@ -133,7 +137,6 @@ const ManageCategoryScreen = ({ navigation }) => {
       await updateTrip(tripid, {
         categories: JSON.stringify(newCategoryList),
       });
-      // todo: update this without another fetch
       await userCtx.loadCatListFromAsyncInCtx(tripid);
     } catch (error) {
       safeLogError(error);
@@ -184,7 +187,7 @@ const ManageCategoryScreen = ({ navigation }) => {
 
   useEffect(() => {
     fetchCategoryList();
-  }, [isOnline]);
+  }, [fetchCategoryList, isOnline]);
 
   const renderCategoryItem = ({ item, index }) => {
     return (

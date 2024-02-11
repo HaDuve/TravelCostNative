@@ -61,6 +61,7 @@ const ManageCategoryScreen = ({ navigation }) => {
 
   const [categoryList, setCategoryList] =
     useState<Category[]>(defaultCategoryList);
+
   const [newCategoryName, setNewCategoryName] = useState("");
   const [selectedIconName, setSelectedIconName] = useState("");
 
@@ -89,7 +90,11 @@ const ManageCategoryScreen = ({ navigation }) => {
       safeLogError(error);
     }
     setIsFetching(false);
-  }, [defaultCategoryList]);
+  }, [defaultCategoryList.length]);
+
+  useEffect(() => {
+    loadCategoryList();
+  }, [loadCategoryList]);
 
   const fetchCategoryList = useCallback(async () => {
     if (!isOnline) {
@@ -115,7 +120,7 @@ const ManageCategoryScreen = ({ navigation }) => {
     }
   }, [
     categoryList?.length,
-    defaultCategoryList,
+    defaultCategoryList.length,
     isOnline,
     loadCategoryList,
     tripid,
@@ -184,10 +189,6 @@ const ManageCategoryScreen = ({ navigation }) => {
     setTouched(true);
     await saveCategoryList(defaultCategoryList);
   };
-
-  useEffect(() => {
-    fetchCategoryList();
-  }, [fetchCategoryList, isOnline]);
 
   const renderCategoryItem = ({ item, index }) => {
     return (
@@ -482,23 +483,14 @@ const ManageCategoryScreen = ({ navigation }) => {
               // elevation: 1,
             }}
           />
-          {!isFetching && (
+          {categoryList && (
             <Animated.FlatList
               data={categoryList}
-              numColumns={2}
               renderItem={renderCategoryItem}
               keyExtractor={(item, index) => `${index}`}
               refreshing={isFetching}
               onRefresh={fetchCategoryList}
             />
-          )}
-          {isFetching && (
-            <View style={{ flex: 1, justifyContent: "center" }}>
-              <ActivityIndicator
-                size="large"
-                color={GlobalStyles.colors.backgroundColor}
-              />
-            </View>
           )}
           <View
             style={{

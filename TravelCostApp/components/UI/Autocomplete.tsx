@@ -17,8 +17,6 @@ const Autocomplete = ({
   placeholder,
   style = {},
   menuStyle = {},
-  right = () => {},
-  left = () => {},
 }) => {
   const [value, setValue] = useState(origValue);
   const [menuVisible, setMenuVisible] = useState(false);
@@ -32,7 +30,7 @@ const Autocomplete = ({
     if (origValue == "") setMenuVisible(false);
   }, [origValue]);
   /**
-   * Filters the data array based on the provided text.
+   * Filters the data array based on the provided text and removes duplicate results.
    * @param {string} text - The text to filter the data array with.
    * @returns {Array} - The filtered data array.
    */
@@ -45,7 +43,7 @@ const Autocomplete = ({
   }
 
   return (
-    <View style={[containerStyle]}>
+    <View style={containerStyle}>
       <TextInput
         onFocus={() => {
           if (value?.length === 0) {
@@ -121,18 +119,16 @@ const Autocomplete = ({
 };
 
 export default Autocomplete;
-
+// react-native/Libraries/Lists/VirtualizedList.js
 Autocomplete.propTypes = {
   value: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   data: PropTypes.array.isRequired,
-  containerStyle: PropTypes.object,
+  containerStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
   onChange: PropTypes.func.isRequired,
   showOnEmpty: PropTypes.bool,
   placeholder: PropTypes.string,
   icon: PropTypes.string,
-  style: PropTypes.object,
-  menuStyle: PropTypes.object,
-  right: PropTypes.func,
-  left: PropTypes.func,
+  style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+  menuStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
 };

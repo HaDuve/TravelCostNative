@@ -93,7 +93,6 @@ const PaywallScreen = ({ navigation }) => {
               margin: "2%",
               marginTop: "-4%",
             },
-            GlobalStyles.shadowPrimary,
             { overflow: "visible" },
           ]}
         /> */}

@@ -14,8 +14,6 @@ import GradientButton from "../components/UI/GradientButton";
 import { TripContext } from "../store/trip-context";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../store/user-context";
-import Image from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import CategoryProgressBar from "../components/ExpensesOutput/ExpenseStatistics/CategoryProgressBar";
 import { GlobalStyles } from "../constants/styles";
 import { ExpensesContext } from "../store/expenses-context";

@@ -479,13 +479,7 @@ function Home() {
 
             tabBarLabel: "Finder", //i18n.t("settingsTab"),
             tabBarIcon: ({ color }) => (
-              // image of a money bag
               <Ionicons name="search-outline" size={24} color={color} />
-              // probably needs a new build for this icon to work
-              // <Image
-              //   source={require("./assets/money-bag.png")}
-              //   style={{ width: 60, height: 60 }}
-              // />
             ),
           }}
         />
@@ -501,13 +495,7 @@ function Home() {
 
             tabBarLabel: "Financial", //i18n.t("settingsTab"),
             tabBarIcon: ({ color }) => (
-              // image of a money bag
               <Ionicons name="cash-outline" size={24} color={color} />
-              // probably needs a new build for this icon to work
-              // <Image
-              //   source={require("./assets/money-bag.png")}
-              //   style={{ width: 60, height: 60 }}
-              // />
             ),
           }}
         />

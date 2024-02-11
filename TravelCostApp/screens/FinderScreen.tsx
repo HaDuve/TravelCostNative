@@ -307,7 +307,7 @@ const FinderScreen = () => {
                   GlobalStyles.shadowGlowPrimary,
                 ]}
                 style={styles.autoCompleteStyle}
-                menuStyle={[styles.autoCompleteMenuStyle]}
+                menuStyle={styles.autoCompleteMenuStyle}
               ></Autocomplete>
               {checkedQuery && (
                 <IconButton

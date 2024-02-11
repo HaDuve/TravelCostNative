@@ -88,7 +88,6 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
   const prevOpenedRow = useRef(null);
   let travellerName = "";
   const navigation = useNavigation();
-  // // console.log("expenses: ", expenses.length);
 
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;
@@ -166,13 +165,8 @@ function ExpensesList({ expenses, showSumForTravellerName, isFiltered }) {
     );
   }, []);
   const onClick = useCallback(({ item, index }, isOnline) => {
-    // // console.log("onClick ~ isOnline", isOnline);
-    // // console.log("onClick ~ index", index);
-    // // console.log("onClick ~ item", item);
     const editedExpenseId = item.id;
     const uid = item.uid;
-    // console.log("onClick ~ uid", uid);
-    // console.log("onClick ~ rangedId", item?.rangeId);
     async function deleteAllExpenses() {
       try {
         navigation?.popToTop();

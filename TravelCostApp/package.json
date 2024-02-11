@@ -7,7 +7,8 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "lint": "eslint --fix ."
   },
   "dependencies": {
     "@config-plugins/react-native-branch": "^6.0.0",
@@ -99,7 +100,7 @@
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
-    "eslint": "^8.31.0",
+    "eslint": "^8.56.0",
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
     "metro": "^0.76.3",

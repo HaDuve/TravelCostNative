@@ -1,8 +1,5 @@
+// eslint-disable-next-line no-undef
 module.exports = {
-  env: {
-    browser: true,
-    es2021: true,
-  },
   extends: [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -18,5 +15,10 @@ module.exports = {
   plugins: ["react", "@typescript-eslint"],
   rules: {
     "no-console": 1,
+  },
+  settings: {
+    react: {
+      version: "detect",
+    },
   },
 };

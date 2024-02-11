@@ -86,7 +86,6 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
                 },
               }),
             },
-            GlobalStyles.shadowPrimary,
             { overflow: "visible" },
           ]}
         />
@@ -99,7 +98,6 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
               height: "10%",
               marginBottom: "20%",
             },
-            GlobalStyles.shadowPrimary,
             { overflow: "visible" },
           ]}
         />

@@ -2,8 +2,6 @@ import React, { Alert, Dimensions, Pressable, StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";
 import Animated, {
-  FadeIn,
-  FadeInDown,
   SlideInDown,
   SlideOutDown,
   runOnJS,
@@ -36,18 +34,14 @@ import { FlatList } from "react-native";
 import { View } from "react-native";
 import { Text } from "react-native";
 import {
-  DuplicateOption,
   ExpenseData,
   findMostDuplicatedDescriptionExpenses,
 } from "../../util/expense";
 import { formatExpenseWithCurrency, truncateString } from "../../util/string";
-import { getCatString, getCatSymbol } from "../../util/category";
+import { getCatSymbol } from "../../util/category";
 import IconButton from "../UI/IconButton";
 import uniqBy from "lodash.uniqby";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { PanGesture } from "react-native-gesture-handler/lib/typescript/handlers/gestures/panGesture";
-import set from "react-native-reanimated";
-import Button from "../UI/Button";
 
 const PageLength = 20;
 

@@ -97,7 +97,6 @@ import { secureStoreGetItem } from "./store/secure-storage";
 import { isConnectionFastEnough } from "./util/connectionSpeed";
 import FinderScreen from "./screens/FinderScreen";
 import CustomerScreen from "./screens/CustomerScreen";
-import CategoryMapTestScreen from "./screens/CategoryMapTestScreen";
 import GPTDealScreen from "./screens/ChatGPTDealScreen";
 import { initBranch } from "./components/Referral/branch";
 import { MemoizedRecentExpenses } from "./screens/RecentExpenses";
@@ -287,14 +286,6 @@ function AuthenticatedStack() {
           <Stack.Screen
             name="Customer"
             component={CustomerScreen}
-            options={{
-              headerShown: false,
-              presentation: "modal",
-            }}
-          />
-          <Stack.Screen
-            name="CategoryMapTest"
-            component={CategoryMapTestScreen}
             options={{
               headerShown: false,
               presentation: "modal",

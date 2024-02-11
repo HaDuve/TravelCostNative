@@ -1,4 +1,11 @@
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import PropTypes from "prop-types";
 
@@ -10,8 +17,6 @@ import { useContext, useCallback, useState, useMemo, memo } from "react";
 import { TripContext } from "../../store/trip-context";
 import { formatExpenseWithCurrency } from "../../util/string";
 import React from "react";
-
-import { FlatList } from "react-native-gesture-handler";
 
 //Localization
 import * as Localization from "expo-localization";

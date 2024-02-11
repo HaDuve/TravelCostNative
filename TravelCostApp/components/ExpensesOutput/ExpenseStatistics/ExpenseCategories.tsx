@@ -1,20 +1,11 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { FlatList } from "react-native";
 import * as Haptics from "expo-haptics";
 
 import React, { useContext } from "react";
 import CategoryProgressBar from "./CategoryProgressBar";
 import { CatColors, GlobalStyles } from "../../../constants/styles";
 import CategoryChart from "../../ExpensesOverview/CategoryChart";
-import { ScrollView } from "react-native-gesture-handler";
-import { G } from "react-native-svg";
-import Animated, {
-  FadeInRight,
-  FadeInUp,
-  FadeOutLeft,
-  Layout,
-  Transition,
-} from "react-native-reanimated";
+import Animated, { Layout } from "react-native-reanimated";
 
 //Localization
 import * as Localization from "expo-localization";

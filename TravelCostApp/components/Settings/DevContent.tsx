@@ -1,12 +1,11 @@
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View, FlatList } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { useInterval } from "../Hooks/useInterval";
 import { getOfflineQueue } from "../../util/offline-queue";
-import { DEBUG_POLLING_INTERVAL, DEVELOPER_MODE } from "../../confAppConstants";
+import { DEBUG_POLLING_INTERVAL } from "../../confAppConstants";
 import { versionCheck, VersionCheckResponse } from "../../util/version";
 import { useFocusEffect } from "@react-navigation/native";
 import { DateTime } from "luxon";
-import { FlatList } from "react-native-gesture-handler";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -18,7 +17,6 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import Button from "../UI/Button";
-import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { importExcelFile } from "../ImportExport/OpenXLSXPicker";
 import { AuthContext } from "../../store/auth-context";
 import { UserContext } from "../../store/user-context";
@@ -35,7 +33,6 @@ import {
 import { storeExpoPushTokenInTrip } from "../../util/http";
 import { ExpoPushToken } from "expo-notifications";
 import safeLogError from "../../util/error";
-import Toast from "react-native-toast-message";
 import BackButton from "../UI/BackButton";
 import { showBanner } from "../UI/ToastComponent";
 

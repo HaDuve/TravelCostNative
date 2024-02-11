@@ -12,7 +12,6 @@ import Purchases from "react-native-purchases";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 import { AuthContext } from "../store/auth-context";
-import { ExpensesContext } from "../store/expenses-context";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -26,9 +25,8 @@ i18n.enableFallback = true;
 import { ScrollView } from "react-native-gesture-handler";
 import { GlobalStyles } from "../constants/styles";
 import LinkingButton from "../components/UI/LinkButton";
-import { DEBUG_POLLING_INTERVAL, DEVELOPER_MODE } from "../confAppConstants";
+import { DEVELOPER_MODE } from "../confAppConstants";
 import { useFocusEffect } from "@react-navigation/native";
-import { DateTime } from "luxon";
 import { resetTour } from "../util/tourUtil";
 import { reloadApp } from "../util/appState";
 import { ENTITLEMENT_ID } from "../components/Premium/PremiumConstants";
@@ -44,8 +42,6 @@ import { BlurView } from "expo-blur";
 import { NetworkContext } from "../store/network-context";
 import safeLogError from "../util/error";
 import { canOpenURL } from "expo-linking";
-import { useInterval } from "../components/Hooks/useInterval";
-import { getOfflineQueue } from "../util/offline-queue";
 import DevContent from "../components/Settings/DevContent";
 
 const SettingsScreen = ({ navigation }) => {
@@ -220,9 +216,6 @@ const SettingsScreen = ({ navigation }) => {
       >
         {premiumButtonString}
       </GradientButton>
-      {/* <TouchableOpacity onPress={() => navigation.navigate("CategoryMapTest")}>
-        <Text style={[styles.textButton]}>CatMapTest</Text>
-      </TouchableOpacity> */}
       <TouchableOpacity
         onPress={async () => {
           // console.log("pressed support button");

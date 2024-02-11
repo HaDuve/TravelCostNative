@@ -1,4 +1,4 @@
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { DateTime } from "luxon";
 import React, {
   useCallback,
   useContext,
@@ -6,42 +6,42 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import DatePickerModal from "../components/UI/DatePickerModal";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import DatePickerContainer from "../components/UI/DatePickerContainer";
+import DatePickerModal from "../components/UI/DatePickerModal";
 import { getFormattedDate } from "../util/date";
-import { DateTime } from "luxon";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import * as Haptics from "expo-haptics";
-import GradientButton from "../components/UI/GradientButton";
-import { ExpensesContext } from "../store/expenses-context";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import * as Haptics from "expo-haptics";
 import { Checkbox } from "react-native-paper";
+import Animated from "react-native-reanimated";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+import Autocomplete from "../components/UI/Autocomplete";
+import GradientButton from "../components/UI/GradientButton";
+import IconButton from "../components/UI/IconButton";
+import { GlobalStyles, ListLayoutAnimation } from "../constants/styles";
 import {
   asyncStoreGetItem,
   asyncStoreGetObject,
   asyncStoreSetItem,
   asyncStoreSetObject,
 } from "../store/async-storage";
-import { GlobalStyles, ListLayoutAnimation } from "../constants/styles";
-import IconButton from "../components/UI/IconButton";
-import { UserContext } from "../store/user-context";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
-import Animated from "react-native-reanimated";
-import { formatExpenseWithCurrency } from "../util/string";
+import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
-import safeLogError from "../util/error";
-import Autocomplete from "../components/UI/Autocomplete";
+import { UserContext } from "../store/user-context";
 import { DEFAULTCATEGORIES } from "../util/category";
+import safeLogError from "../util/error";
 import { ExpenseData } from "../util/expense";
+import { formatExpenseWithCurrency } from "../util/string";
 
 const FinderScreen = () => {
   const navigation = useNavigation();

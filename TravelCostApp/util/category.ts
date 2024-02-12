@@ -89,13 +89,13 @@ export function getCatString(cat: string) {
   }
 }
 
-function getMaxCategoryMap(categoryMap: any) {
+function getMaxCategoryMap(categoryCountMap: CategoryCountMap) {
   // return the category with the most matches
   let maxCategory = "";
   let maxCount = -1;
-  Object.keys(categoryMap).forEach((category) => {
-    if (categoryMap[category] > maxCount) {
-      maxCount = categoryMap[category];
+  Object.keys(categoryCountMap).forEach((category) => {
+    if (categoryCountMap[category] > maxCount) {
+      maxCount = categoryCountMap[category];
       maxCategory = category;
     }
   });
@@ -103,6 +103,10 @@ function getMaxCategoryMap(categoryMap: any) {
     // console.log("mapDescriptionToCategory ~ maxCategory:", maxCategory);
     return maxCategory;
 }
+
+type CategoryCountMap = {
+  [key: string]: number;
+};
 
 export function mapDescriptionToCategory(
   description: string,
@@ -115,7 +119,7 @@ export function mapDescriptionToCategory(
   const descriptionWords = description.trim().toLowerCase().split(" ");
 
   // check if the description contains a keyword of a category
-  const categoryMap = {};
+  const categoryCountMap: CategoryCountMap = {};
   categories.forEach((category) => {
     const keywords = category.keywords ?? [];
     keywords.push(category.cat);
@@ -124,7 +128,8 @@ export function mapDescriptionToCategory(
       keywordsSplit.forEach((word) => {
         if (descriptionWords.includes(word)) {
           // console.log("match found: ", word, "in", descriptionWords);
-          categoryMap[category.cat] = (categoryMap[category.cat] || 0) + 1;
+          categoryCountMap[category.cat] =
+            (categoryCountMap[category.cat] || 0) + 1;
         }
       });
     });
@@ -139,12 +144,12 @@ export function mapDescriptionToCategory(
     splitDescription.forEach((word) => {
       if (descriptionWords.includes(word)) {
         // console.log(description, "found a match with: ", expense.description);
-        categoryMap[expense.category] =
-          (categoryMap[expense.category] || 0) + 1;
+        categoryCountMap[expense.category] =
+          (categoryCountMap[expense.category] || 0) + 1;
       }
     });
   });
-  const maxCategory = getMaxCategoryMap(categoryMap);
+  const maxCategory = getMaxCategoryMap(categoryCountMap);
 
   return maxCategory;
 }

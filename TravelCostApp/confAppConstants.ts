@@ -2,7 +2,7 @@
 export const DEVELOPER_MODE = false;
 
 // OfflineMode, set to true if you want the simulator to be offline
-export const DEBUG_FORCE_OFFLINE = false;
+export const DEBUG_FORCE_OFFLINE = true;
 // asyncStorage, set to true if you want all storage to be reset and user logged out
 export const DEBUG_RESET_STORAGE = false;
 // tweak minimum required internet speed in Mbit/s

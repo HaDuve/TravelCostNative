@@ -106,6 +106,9 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ChangelogScreen from "./screens/ChangelogScreen";
 import { Badge } from "react-native-paper";
 import { ExpenseData } from "./util/expense";
+import BackgroundFetchScreen, {
+  registerBackgroundFetchAsync,
+} from "./taskmanager/backgroundTasks";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -302,6 +305,14 @@ function AuthenticatedStack() {
           <Stack.Screen
             name="Settings"
             component={SettingsScreen}
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
+          <Stack.Screen
+            name="backgroundTasks"
+            component={BackgroundFetchScreen}
             options={{
               headerShown: false,
               presentation: "modal",
@@ -661,6 +672,9 @@ function Root() {
       const storedUid = await secureStoreGetItem("uid");
       const storedTripId = await secureStoreGetItem("currentTripId");
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
+
+      // register backgroundtask
+      await registerBackgroundFetchAsync();
 
       const { REVCAT_G, REVCAT_A }: Keys = await loadKeys();
 

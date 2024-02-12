@@ -88,7 +88,8 @@
     "splitwise-js-map": "^1.0.3",
     "victory": "^36.6.5",
     "victory-native": "^36.6.8",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "expo-background-fetch": "~11.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

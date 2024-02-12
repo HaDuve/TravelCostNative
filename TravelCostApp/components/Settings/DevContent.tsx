@@ -118,6 +118,15 @@ const DevContent = ({ navigation }) => {
       <Button
         style={styles.settingsButton}
         onPress={async () => {
+          navigation.navigate("backgroundTasks");
+        }}
+      >
+        Background Tasks
+      </Button>
+
+      <Button
+        style={styles.settingsButton}
+        onPress={async () => {
           navigation.navigate("RecentExpenses");
           await showBanner(navigation);
         }}

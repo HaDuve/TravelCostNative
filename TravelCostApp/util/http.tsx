@@ -73,7 +73,7 @@ export const dataResponseTime = (func) => {
     const start = Date.now();
     const result = await func(...args);
     const end = Date.now();
-    // console.log(`Time taken by ${func.name} is ${end - start} ms`);
+    console.log(`Time taken by ${func.name} is ${end - start} ms`);
     return result;
   };
 };

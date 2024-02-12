@@ -2,13 +2,16 @@ Changelog Travel Expense App
 
 __Newest Changes:
 
+1.2.802
+- added background synchronization for offline expenses
+- bugfixes and performance improvements
+
+__Other Changes:
+
 1.2.801l
 - improved the Expense Templates (longpress on Add-Expense Button)
 - added most used expenses as templates
 - bugfixes and performance improvements
-
-
-__Other Changes:
 
 1.2.801k
 - added longpress on Add-Expense Button to open up a list of Template Expenses, based on your 20 latest Expenses

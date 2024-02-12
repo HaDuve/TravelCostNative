@@ -51,12 +51,13 @@ import FlatButton from "../components/UI/FlatButton";
 import BlurPremium from "../components/Premium/BlurPremium";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
+import { useMemo } from "react";
 
 const ManageCategoryScreen = ({ navigation }) => {
   // defaultCategories minus the last element (-new cat element)
-  const defaultCategoryList: Category[] = DEFAULTCATEGORIES.slice(
-    0,
-    DEFAULTCATEGORIES?.length - 1
+  const defaultCategoryList: Category[] = useMemo(
+    () => DEFAULTCATEGORIES.slice(0, DEFAULTCATEGORIES?.length - 1),
+    []
   );
 
   const [categoryList, setCategoryList] =
@@ -90,7 +91,7 @@ const ManageCategoryScreen = ({ navigation }) => {
       safeLogError(error);
     }
     setIsFetching(false);
-  }, [defaultCategoryList.length]);
+  }, []);
 
   useEffect(() => {
     loadCategoryList();
@@ -118,13 +119,7 @@ const ManageCategoryScreen = ({ navigation }) => {
     if (categoryList?.length === 0) {
       setCategoryList(defaultCategoryList);
     }
-  }, [
-    categoryList?.length,
-    defaultCategoryList.length,
-    isOnline,
-    loadCategoryList,
-    tripid,
-  ]);
+  }, [isOnline, loadCategoryList, tripid]);
 
   const saveCategoryList = async (newCategoryList) => {
     setIsUploading(true);

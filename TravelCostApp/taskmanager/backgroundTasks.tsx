@@ -7,11 +7,9 @@ import safeLogError from "../util/error";
 
 const BACKGROUND_FETCH_TASK = "background-offline-queue-task";
 
-// 1. Define the task by providing a name and the function that should be executed
-// Note: This needs to be called in the global scope (e.g outside of your React components)
 TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
   try {
-    await sendOfflineQueue(false, null);
+    await sendOfflineQueue(false, null, true);
     // Be sure to return the successful result type!
     return BackgroundFetch.BackgroundFetchResult.NewData;
   } catch (error) {

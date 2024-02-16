@@ -1,9 +1,4 @@
-import {
-  asyncStoreGetItem,
-  asyncStoreGetObject,
-  asyncStoreSetObject,
-} from "../store/async-storage";
-import { Expense, ExpenseData } from "./expense";
+import { Expense } from "./expense";
 import {
   storeExpense,
   updateExpense,
@@ -26,14 +21,9 @@ import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
 
 import NetInfo from "@react-native-community/netinfo";
 import { isConnectionFastEnough } from "./connectionSpeed";
-import {
-  secureStoreGetItem,
-  secureStoreGetObject,
-  secureStoreSetObject,
-} from "../store/secure-storage";
+import { secureStoreGetItem } from "../store/secure-storage";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import safeLogError from "./error";
-import set from "react-native-reanimated";
 
 // interface of offline queue manage expense item
 export interface OfflineQueueManageExpenseItem {
@@ -228,8 +218,9 @@ export const storeExpenseOnlineOffline = async (
  * @returns A Promise that resolves when the offline queue is processed.
  */
 export async function sendOfflineQueue(
-  mutexBool: boolean,
-  setMutexFunction: (mutexBool: boolean) => void
+  mutexBool: boolean = null,
+  setMutexFunction: (mutexBool: boolean) => void = null,
+  runAsBGTask = false
 ) {
   if (mutexBool) {
     return;
@@ -244,21 +235,20 @@ export async function sendOfflineQueue(
     const { isFastEnough } = await isConnectionFastEnough();
 
     if (!isOnline || !isOnline.isConnected || !isFastEnough || forceOffline) {
-      // console.log(
-      // "sendOfflineQueue ~ still offline! Length:",
-      //   offlineQueue?.length
-      // );
       if (setMutexFunction) setMutexFunction(false);
       return;
     }
-    // indicate loading
-    Toast.hide();
-    Toast.show({
-      type: "loading",
-      text1: i18n.t("toastSyncChanges1"),
-      text2: i18n.t("toastSyncChanges2"),
-      autoHide: false,
-    });
+
+    if (!runAsBGTask) {
+      // indicate loading
+      Toast.hide();
+      Toast.show({
+        type: "loading",
+        text1: i18n.t("toastSyncChanges1"),
+        text2: i18n.t("toastSyncChanges2"),
+        autoHide: false,
+      });
+    }
 
     // send items in while loop
     const processedItems = [];
@@ -314,17 +304,12 @@ export async function sendOfflineQueue(
     // Remove the processed items from the queue
     const remainingItems = offlineQueue.slice(i);
     setMMKVObject("offlineQueue", remainingItems);
-    Toast.hide();
+
+    if (setMutexFunction) setMutexFunction(false);
+
+    if (!runAsBGTask) Toast.hide();
     if (processedItems?.length > 0) {
       await touchAllTravelers(tripid, true);
-      Toast.show({
-        type: "success",
-        text1: i18n.t("toastSyncFinished1"),
-        text2: `${i18n.t("toastSyncFinished21")} ${processedItems?.length}/${
-          offlineQueue?.length
-        } ${i18n.t("toastSyncFinished22")}`,
-      });
     }
   }
-  if (setMutexFunction) setMutexFunction(false);
 }

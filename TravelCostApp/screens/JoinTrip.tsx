@@ -42,7 +42,10 @@ import { secureStoreSetItem } from "../store/secure-storage";
 import { setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { isConnectionFastEnough } from "../util/connectionSpeed";
+import {
+  isConnectionFastEnough,
+  isConnectionFastEnoughAsBool,
+} from "../util/connectionSpeed";
 import { sleep } from "../util/appState";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
@@ -71,9 +74,9 @@ const JoinTrip = ({ navigation, route }) => {
   const getTrip = useCallback(
     async (tripID: string) => {
       setIsFetching(true);
-      if (!(await isConnectionFastEnough(true))) {
+      if (!(await isConnectionFastEnoughAsBool())) {
         await sleep(3000);
-        if (!(await isConnectionFastEnough(true))) {
+        if (!(await isConnectionFastEnoughAsBool())) {
           Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
           return;
         }

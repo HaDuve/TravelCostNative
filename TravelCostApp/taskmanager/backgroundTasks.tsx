@@ -4,10 +4,15 @@ import * as BackgroundFetch from "expo-background-fetch";
 import * as TaskManager from "expo-task-manager";
 import { sendOfflineQueue } from "../util/offline-queue";
 import safeLogError from "../util/error";
+import { getMMKVObject } from "../store/mmkv";
 
 const BACKGROUND_FETCH_TASK = "background-offline-queue-task";
 
 TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
+  const offlineQueue = getMMKVObject("offlineQueue") || [];
+  if (!offlineQueue || offlineQueue.length === 0) {
+    return BackgroundFetch.BackgroundFetchResult.NoData;
+  }
   try {
     await sendOfflineQueue(false, null, true);
     // Be sure to return the successful result type!

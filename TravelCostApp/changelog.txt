@@ -4,6 +4,7 @@ __Newest Changes:
 
 1.2.802
 - added background synchronization for offline expenses
+- layout and design improvements
 - bugfixes and performance improvements
 
 __Other Changes:
@@ -40,8 +41,6 @@ __Other Changes:
 - improved SplitSummaryScreen Layout
 - improved Date Picker now using locale format (e.g: MM DD YYYY for americans)
 - fixed Finder not finding categories
-
-
 
 1.2.801g
 - translated push notifications

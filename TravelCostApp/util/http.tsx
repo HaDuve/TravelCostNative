@@ -144,10 +144,11 @@ export async function patchCategories(tripid: string, categories: Category[]) {
  * @param expenseData
  * @returns id
  */
-export async function storeExpense(tripid: string, uid: string, expenseData) {
-  // // console.log("https: ~ storeExpense ~ uid", uid);
-  // // console.log("https: ~ storeExpense ~ tripid", tripid);
-  // TODO: create expenseData interface for TypeScript
+export async function storeExpense(
+  tripid: string,
+  uid: string,
+  expenseData: ExpenseData
+) {
   try {
     const response = await axios.post(
       BACKEND_URL +
@@ -167,12 +168,6 @@ export async function storeExpense(tripid: string, uid: string, expenseData) {
 }
 
 export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
-  // // console.log(
-  // "https: ~ fetchExpensesWithUIDs ~ uidlist",
-  // uidlist,
-  // "tripid",
-  // tripid
-  // );
   if (!tripid || !uidlist || DEBUG_NO_DATA) return [];
   const expenses: ExpenseData[] = [];
   const axios_calls = [];
@@ -278,14 +273,20 @@ export async function fetchExpenses(tripid: string, uid: string) {
   }
 }
 
+/**
+ * Updates an expense for a specific trip and user.
+ * @param tripid - The ID of the trip.
+ * @param uid - The ID of the user.
+ * @param id - The ID of the expense.
+ * @param expenseData - The updated expense data.
+ * @returns A Promise that resolves to the response from the server.
+ */
 export function updateExpense(
   tripid: string,
   uid: string,
   id: string,
-  expenseData
+  expenseData: ExpenseData
 ) {
-  // // console.log("updateExpense ~ expenseData", expenseData);
-  //TODO: create expenseData Interface for TypeScript
   try {
     const response = axios.put(
       BACKEND_URL +
@@ -304,6 +305,13 @@ export function updateExpense(
   }
 }
 
+/**
+ * Deletes an expense from a trip.
+ * @param tripid - The ID of the trip.
+ * @param uid - The ID of the user.
+ * @param id - The ID of the expense.
+ * @returns A Promise that resolves to the response from the server.
+ */
 export function deleteExpense(tripid: string, uid: string, id: string) {
   try {
     const response = axios.delete(

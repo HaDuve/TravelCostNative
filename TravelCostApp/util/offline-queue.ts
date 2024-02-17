@@ -308,7 +308,7 @@ export async function sendOfflineQueue(
     if (setMutexFunction) setMutexFunction(false);
 
     if (!runAsBGTask) Toast.hide();
-    if (processedItems?.length > 0) {
+    if (processedItems.length > 0) {
       await touchAllTravelers(tripid, true);
     }
   }

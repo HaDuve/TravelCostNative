@@ -5,28 +5,19 @@ import * as TaskManager from "expo-task-manager";
 import { sendOfflineQueue } from "../util/offline-queue";
 import safeLogError from "../util/error";
 import { getMMKVObject } from "../store/mmkv";
-import * as Notifications from "expo-notifications";
 
 const BACKGROUND_FETCH_TASK = "background-offline-queue-task";
 
+const sendOfflineQueueAsBGTask = async () =>
+  await sendOfflineQueue(null, null, true);
+
 TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
-  const offlineQueue = getMMKVObject("offlineQueue") || [];
-  const length = offlineQueue.length;
-  if (!offlineQueue || offlineQueue.length === 0) {
+  const offlineQueueBefore = getMMKVObject("offlineQueue") || [];
+  if (!offlineQueueBefore || offlineQueueBefore.length === 0) {
     return BackgroundFetch.BackgroundFetchResult.NoData;
   }
   try {
-    await sendOfflineQueue(false, null, true);
-    // send notification to show successful sync
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "Live Sync",
-        body: `Successfully synced ${
-          length > 1 ? length : ""
-        } offline updates!`,
-      },
-      trigger: null,
-    });
+    await sendOfflineQueueAsBGTask();
     return BackgroundFetch.BackgroundFetchResult.NewData;
   } catch (error) {
     safeLogError(error);

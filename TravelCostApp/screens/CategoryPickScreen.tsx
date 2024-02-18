@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FlatButton from "../components/UI/FlatButton";
 import { GlobalStyles } from "../constants/styles";
 
@@ -52,62 +52,45 @@ const CategoryPickScreen = ({ route, navigation }) => {
   const [isFetching, setIsFetching] = useState(false);
 
   // load categories from server or asyncstore
-  useFocusEffect(
-    React.useCallback(() => {
-      // console.log("CategoryPickScreen ~ isOnline", isOnline);
-      const loadCategories = async () => {
-        setIsFetching(true);
-        if (!isOnline) {
-          await loadCategoryList();
-          // console.log("offline cats");
-          return;
-        }
-        const categories = await fetchCategories(tripid);
-        // // console.log("CategoryPickScreen ~ categories", categories);
-        if (categories) {
-          // console.log("online cats");
-          const tempList = [...categories];
-          tempList.push({
-            id: 6,
-            icon: "add-outline",
-            color: GlobalStyles.colors.textColor,
-            cat: "newCat",
-            catString: i18n.t("catNewString"),
-          });
-          setCategoryList(tempList);
-          setMMKVObject("categoryList", categories);
-          setIsFetching(false);
-        } else await loadCategoryList();
-      };
+  useEffect(() => {
+    const loadCategories = async () => {
+      setStoredCategories();
+      if (!isOnline) {
+        return;
+      }
+      setIsFetching(true);
+      const categories = await fetchCategories(tripid);
+      if (categories) {
+        const tempList = [...categories];
+        tempList.push({
+          id: 6,
+          icon: "add-outline",
+          color: GlobalStyles.colors.textColor,
+          cat: "newCat",
+          catString: i18n.t("catNewString"),
+        });
+        setCategoryList(tempList);
+        setMMKVObject("categoryList", categories);
+      }
+      setIsFetching(false);
+    };
 
-      // first try to load categories from asyncstore
-      const loadCategoryList = async () => {
-        const categories: Category[] = getMMKVObject("categoryList");
-        if (categories) {
-          categories.push({
-            id: 6,
-            icon: "add-outline",
-            color: GlobalStyles.colors.textColor,
-            cat: "newCat",
-            catString: i18n.t("catNewString"),
-          });
-          setCategoryList(categories);
-        }
-        setIsFetching(false);
-      };
-
-      // const postCategoriesAsync = async () => {
-      //   setIsFetching(true);
-      //   await deleteCategories(tripid);
-      //   await updateTrip(tripid, { categories: CATLIST });
-      //   //log
-      //   // console.log("CategoryPickScreen ~ finished posting categories");
-      // };
-
-      // postCategoriesAsync();
-      loadCategories();
-    }, [isOnline, tripid])
-  );
+    // first try to load categories from asyncstore
+    const setStoredCategories = () => {
+      const categories = getMMKVObject("categoryList");
+      if (categories) {
+        categories.push({
+          id: 6,
+          icon: "add-outline",
+          color: GlobalStyles.colors.textColor,
+          cat: "newCat",
+          catString: i18n.t("catNewString"),
+        });
+        setCategoryList(categories);
+      }
+    };
+    loadCategories();
+  }, [isOnline, tripid]);
 
   async function newCatPressHandler(item) {
     if (!isOnline) {
@@ -207,7 +190,29 @@ const CategoryPickScreen = ({ route, navigation }) => {
         numColumns={2}
         data={categoryList}
         renderItem={renderCatItem}
-        ListHeaderComponent={<BackButton />}
+        ListHeaderComponent={
+          <>
+            <BackButton />
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {isFetching && (
+                <ActivityIndicator
+                  size="large"
+                  color={GlobalStyles.colors.gray500}
+                />
+              )}
+            </View>
+          </>
+        }
         ListFooterComponent={
           <View>
             <View style={styles.buttonContainer}>
@@ -229,14 +234,6 @@ const CategoryPickScreen = ({ route, navigation }) => {
                 >
                   {i18n.t("continue")}
                 </GradientButton>
-              )}
-            </View>
-            <View style={{ marginTop: 20, minHeight: 40 }}>
-              {isFetching && (
-                <ActivityIndicator
-                  size="large"
-                  color={GlobalStyles.colors.textColor}
-                />
               )}
             </View>
           </View>

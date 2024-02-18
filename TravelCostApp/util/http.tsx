@@ -392,7 +392,7 @@ export async function storeTrip(tripData: TripData) {
   }
 }
 
-export async function updateTrip(tripid: string, tripData) {
+export async function updateTrip(tripid: string, tripData: TripData) {
   try {
     const res = await axios.patch(
       BACKEND_URL + "/trips/" + `${tripid}.json` + getMMKVString("QPAR"),

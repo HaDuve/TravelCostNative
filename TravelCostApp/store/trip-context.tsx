@@ -14,6 +14,7 @@ import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { useInterval } from "../components/Hooks/useInterval";
 import { setMMKVObject, getMMKVObject } from "./mmkv";
 import set from "react-native-reanimated";
+import { Category } from "../util/category";
 
 export interface TripData {
   tripName?: string;
@@ -30,6 +31,9 @@ export interface TripData {
   isPaidDate?: string;
   isPaid?: isPaidString;
   isDynamicDailyBudget?: boolean;
+  // online categories are stored as a JSON.stringified strings
+  // local categories are stored as Category arrays.
+  categories?: Category[] | string;
 }
 
 export const TripContext = createContext({

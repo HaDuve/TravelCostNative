@@ -1,5 +1,4 @@
 import {
-  Animated,
   FlatList,
   Platform,
   Pressable,
@@ -9,7 +8,7 @@ import {
 } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import FlatButton from "../components/UI/FlatButton";
 import { GlobalStyles } from "../constants/styles";
 
@@ -31,6 +30,8 @@ import { NetworkContext } from "../store/network-context";
 import { Category, DEFAULTCATEGORIES } from "../util/category";
 import BackButton from "../components/UI/BackButton";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
+import { useCallback } from "react";
+import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -51,61 +52,67 @@ const CategoryPickScreen = ({ route, navigation }) => {
   // isfetching state
   const [isFetching, setIsFetching] = useState(false);
 
+  // state to check if we just came from manageCategoryScreen
+
   // load categories from server or asyncstore
-  useEffect(() => {
-    const loadCategories = async () => {
-      setStoredCategories();
-      if (!isOnline) {
+  useFocusEffect(
+    useCallback(() => {
+      const loadCategories = async () => {
+        setStoredCategories();
+        if (!isOnline) return;
+        setIsFetching(true);
+        const categories = await fetchCategories(tripid);
+        if (categories) {
+          const tempList = [...categories];
+          tempList.push({
+            id: 6,
+            icon: "add-outline",
+            color: GlobalStyles.colors.textColor,
+            cat: "newCat",
+            catString: i18n.t("catNewString"),
+          });
+          setCategoryList(tempList);
+          setMMKVObject("categoryList", categories);
+        }
+        setIsFetching(false);
+      };
+
+      // first try to load categories from asyncstore
+      const setStoredCategories = () => {
+        const categories = getMMKVObject("categoryList");
+        if (categories) {
+          categories.push({
+            id: 6,
+            icon: "add-outline",
+            color: GlobalStyles.colors.textColor,
+            cat: "newCat",
+            catString: i18n.t("catNewString"),
+          });
+          setCategoryList(categories);
+        }
+      };
+      loadCategories();
+    }, [tripid, isOnline])
+  );
+
+  async function newCatPressHandler() {
+    if (!isOnline) {
+      if (await isConnectionFastEnoughAsBool()) {
+        // try again
+        navigation.navigate("ManageCategory");
         return;
       }
-      setIsFetching(true);
-      const categories = await fetchCategories(tripid);
-      if (categories) {
-        const tempList = [...categories];
-        tempList.push({
-          id: 6,
-          icon: "add-outline",
-          color: GlobalStyles.colors.textColor,
-          cat: "newCat",
-          catString: i18n.t("catNewString"),
-        });
-        setCategoryList(tempList);
-        setMMKVObject("categoryList", categories);
-      }
-      setIsFetching(false);
-    };
-
-    // first try to load categories from asyncstore
-    const setStoredCategories = () => {
-      const categories = getMMKVObject("categoryList");
-      if (categories) {
-        categories.push({
-          id: 6,
-          icon: "add-outline",
-          color: GlobalStyles.colors.textColor,
-          cat: "newCat",
-          catString: i18n.t("catNewString"),
-        });
-        setCategoryList(categories);
-      }
-    };
-    loadCategories();
-  }, [isOnline, tripid]);
-
-  async function newCatPressHandler(item) {
-    if (!isOnline) {
       Alert.alert("Offline", "You need to be online to add a new category");
       return;
     }
     navigation.navigate("ManageCategory");
   }
 
-  async function catPressHandler(item) {
+  async function catPressHandler(item: Category) {
     setIsFetching(true);
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    // setIsShaking(false);
     if (item.cat === "newCat") {
-      newCatPressHandler(item);
+      await newCatPressHandler();
     } else {
       navigation.navigate("ManageExpense", {
         pickedCat: item.cat ?? item.name,
@@ -118,39 +125,9 @@ const CategoryPickScreen = ({ route, navigation }) => {
     setIsFetching(false);
   }
 
-  // function startShake(item) {
-  //   Animated.sequence([
-  //     Animated.timing(item.shakeAnimation, {
-  //       toValue: 5,
-  //       duration: 100,
-  //       useNativeDriver: true,
-  //     }),
-  //     Animated.timing(item.shakeAnimation, {
-  //       toValue: -5,
-  //       duration: 100,
-  //       useNativeDriver: true,
-  //     }),
-  //     Animated.timing(item.shakeAnimation, {
-  //       toValue: 5,
-  //       duration: 100,
-  //       useNativeDriver: true,
-  //     }),
-  //     Animated.timing(item.shakeAnimation, {
-  //       toValue: 0,
-  //       duration: 100,
-  //       useNativeDriver: true,
-  //     }),
-  //   ]).start();
-  //   setTimeout(() => {
-  //     if (isShaking) startShake(item);
-  //   }, 800);
-  // }
-
   function renderCatItem(itemData) {
     const item = itemData.item;
     if (!item.catString) item.catString = item.name;
-    item.shakeAnimation = new Animated.Value(0);
-    // if (isShaking) startShake(item);
 
     return (
       <Pressable
@@ -162,24 +139,13 @@ const CategoryPickScreen = ({ route, navigation }) => {
           pressed && GlobalStyles.pressedWithShadow,
         ]}
         onPress={catPressHandler.bind(this, item)}
-        // onLongPress={catLongPressHandler.bind(this, item)}
       >
-        <Animated.View
-          style={[
-            styles.widthConstraint,
-            { transform: [{ translateX: item.shakeAnimation }] },
-          ]}
-        >
-          <Animated.View
-            style={[
-              styles.centerStyle,
-              { transform: [{ translateX: item.shakeAnimation }] },
-            ]}
-          >
+        <View style={styles.widthConstraint}>
+          <View style={styles.centerStyle}>
             <Ionicons name={item.icon} size={42} color={item.color} />
             <Text style={styles.itemText}>{item.catString}</Text>
-          </Animated.View>
-        </Animated.View>
+          </View>
+        </View>
       </Pressable>
     );
   }

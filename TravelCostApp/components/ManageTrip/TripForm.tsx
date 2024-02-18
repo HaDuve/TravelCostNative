@@ -57,7 +57,7 @@ import { secureStoreSetItem } from "../../store/secure-storage";
 import BackButton from "../UI/BackButton";
 import { onShare } from "../ProfileOutput/ShareTrip";
 import { NetworkContext } from "../../store/network-context";
-import { setMMKVObject } from "../../store/mmkv";
+import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
 import { useTourGuideController } from "rn-tourguide";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { useWindowDimensions } from "react-native";
@@ -309,7 +309,14 @@ const TripForm = ({ navigation, route }) => {
 
   async function createTripData(tripData: TripData) {
     setLoadingProgress(1);
+    const currentCategories = getMMKVObject("categoryList");
+    // auto convert current categories into  new trips data
+    // stored online as a stringified array
+    if (currentCategories)
+      tripData.categories = JSON.stringify(currentCategories);
+
     const tripid = await storeTrip(tripData);
+
     setLoadingProgress(2);
     await putTravelerInTrip(tripid, { userName: userName, uid: uid });
     setLoadingProgress(4);

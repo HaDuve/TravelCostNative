@@ -186,7 +186,11 @@ const ExpenseForm = ({
     },
   });
   const [tempAmount, setTempAmount] = useState("");
-  const amountValue = inputs.amount.value || tempAmount;
+  const bothTempAndInputAmount = !!(inputs.amount.value && tempAmount);
+  const bothTempAndInputAmountValue = +inputs.amount.value + +tempAmount;
+  const amountValue = bothTempAndInputAmount
+    ? bothTempAndInputAmountValue
+    : inputs.amount.value || tempAmount;
   const iconString = iconName ? iconName : getCatSymbol(pickedCat);
   const [icon, setIcon] = useState(iconString);
   const getSetCatIcon = async (catString: string) => {
@@ -1067,7 +1071,7 @@ const ExpenseForm = ({
                   }}
                 />
               )}
-              {!inputs.amount.value && tempAmount && isAndroid && (
+              {!inputs.amount.value && tempAmount && (
                 <IconButton
                   buttonStyle={[
                     styles.quickSumButton,
@@ -1605,6 +1609,7 @@ const ExpenseForm = ({
         </Animated.View>
       </Animated.View>
       {Platform.OS == "ios" && (
+        // QuickSum Button on ios
         <InputAccessoryView nativeID="amountID">
           <View
             style={{

@@ -59,7 +59,7 @@ const Input = ({
 export default Input;
 
 Input.propTypes = {
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   style: PropTypes.object,
   textInputConfig: PropTypes.object.isRequired,
   invalid: PropTypes.bool,

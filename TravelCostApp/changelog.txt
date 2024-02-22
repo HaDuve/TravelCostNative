@@ -2,12 +2,16 @@ Changelog Travel Expense App
 
 __Newest Changes:
 
+1.2.802b
+- Quick Sum Button improved (Expense Form)
+- Fixed a crash in Expense Form
+
+__Other Changes:
+
 1.2.802
 - added background synchronization for offline expenses
 - layout and design improvements
 - bugfixes and performance improvements
-
-__Other Changes:
 
 1.2.801l
 - improved the Expense Templates (longpress on Add-Expense Button)

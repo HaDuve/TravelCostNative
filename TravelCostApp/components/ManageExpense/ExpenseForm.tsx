@@ -974,10 +974,6 @@ const ExpenseForm = ({
     (item) => item.amount !== 0
   );
   const hidePickers = true;
-  // console log all 3 dates
-  // // console.log("startDate", startDate);
-  // // console.log("endDate", endDate);
-  // // console.log("date", inputs.date.value);
   let dateIsRanged =
     startDate?.toString().slice(0, 10) !== endDate?.toString().slice(0, 10);
   // if no startDate or no endDate, then date is not ranged
@@ -1020,15 +1016,10 @@ const ExpenseForm = ({
           <View
             style={[
               {
-                // horizontal
                 flexDirection: "row",
-                // space between
                 justifyContent: "space-between",
-                // align items in the center
                 alignItems: "center",
-                // padding
                 paddingHorizontal: "2%",
-                // margin
                 marginBottom: "-2%",
               },
               Platform.OS == "android" && {
@@ -1039,7 +1030,6 @@ const ExpenseForm = ({
             ]}
           >
             {backButtonJsx}
-            {/* put gpt button here */}
             {chatGPTemojiButton}
             {Platform.OS == "ios" && confirmButtonJSX}
           </View>
@@ -1062,7 +1052,7 @@ const ExpenseForm = ({
               {inputs.amount.value && isAndroid && (
                 <IconButton
                   buttonStyle={[
-                    styles.quickAddButton,
+                    styles.quickSumButton,
                     GlobalStyles.strongShadow,
                   ]}
                   icon={"add-outline"}
@@ -1072,7 +1062,6 @@ const ExpenseForm = ({
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     const _tempAmount = +tempAmount;
                     const newAmount = _tempAmount + Number(inputs.amount.value);
-                    // console.log("_tempAmount:", _tempAmount);
                     setTempAmount(newAmount.toFixed(2));
                     inputChangedHandler("amount", "");
                   }}
@@ -1081,7 +1070,7 @@ const ExpenseForm = ({
               {!inputs.amount.value && tempAmount && isAndroid && (
                 <IconButton
                   buttonStyle={[
-                    styles.quickAddButton,
+                    styles.quickSumButton,
                     GlobalStyles.strongShadow,
                   ]}
                   icon={"return-down-back-outline"}
@@ -1210,7 +1199,7 @@ const ExpenseForm = ({
                   hideBottomBorder,
                 })}
 
-                <Pressable
+                <View
                   style={
                     duplOrSplit !== 0 && {
                       paddingBottom: 5,
@@ -1219,37 +1208,15 @@ const ExpenseForm = ({
                       borderBottomWidth: 1,
                     }
                   }
-                  onPress={() => {
-                    // toggleDuplOrSplit();
-                  }}
                 >
                   {duplOrSplit !== 0 && (
                     <View style={styles.duplOrSplitContainer}>
                       <Text style={styles.dateLabelDuplSplitText}>
                         {duplOrSplitString(duplOrSplit)}
                       </Text>
-                      {/* <Switch
-                        style={[
-                          // { marginLeft: "10%" },
-                          GlobalStyles.shadowPrimary,
-                        ]}
-                        trackColor={{
-                          false: GlobalStyles.colors.gray500,
-                          true: GlobalStyles.colors.primary500,
-                        }}
-                        thumbColor={
-                          duplOrSplit == 2
-                            ? GlobalStyles.colors.backgroundColor
-                            : GlobalStyles.colors.gray500Accent
-                        }
-                        value={duplOrSplit == 2}
-                        onChange={() => {
-                          toggleDuplOrSplit();
-                        }}
-                      ></Switch> */}
                     </View>
                   )}
-                </Pressable>
+                </View>
 
                 <View style={styles.inputsRowSecond}>
                   {/* !IsSoloTraveller && */}
@@ -1504,7 +1471,9 @@ const ExpenseForm = ({
                       horizontal={true}
                       contentContainerStyle={{
                         flex: 1,
-                        minWidth: splitList?.length * 100 + 200,
+                        minWidth: splitList?.length
+                          ? splitList?.length * 100 + 200
+                          : 0,
                         marginLeft: 8,
                         marginRight: 8,
                         justifyContent: "flex-start",
@@ -1796,7 +1765,7 @@ const styles = StyleSheet.create({
     padding: 8,
     marginTop: 8,
   },
-  quickAddButton: {
+  quickSumButton: {
     borderWidth: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderColor: GlobalStyles.colors.gray700,

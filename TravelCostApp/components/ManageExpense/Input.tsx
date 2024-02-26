@@ -20,8 +20,13 @@ const Input = ({
   placeholder = "",
   editable = true,
   selectTextOnFocus = true,
+  hasCurrency = false,
 }) => {
-  const inputStyles = [styles.input, inputStyle];
+  const inputStyles = [
+    styles.input,
+    hasCurrency && styles.hasCurrencyStyle,
+    inputStyle,
+  ];
   if (textInputConfig && textInputConfig.multiline) {
     inputStyles.push(styles.inputMultiline);
   }
@@ -69,6 +74,7 @@ Input.propTypes = {
   placeholder: PropTypes.string,
   editable: PropTypes.bool,
   selectTextOnFocus: PropTypes.bool,
+  hasCurrency: PropTypes.bool,
 };
 
 const styles = StyleSheet.create({
@@ -90,6 +96,10 @@ const styles = StyleSheet.create({
     borderBottomColor: GlobalStyles.colors.gray700,
     borderBottomWidth: 1,
     textAlign: "center",
+  },
+  hasCurrencyStyle: {
+    paddingRight: 16,
+    marginRight: -10,
   },
   inputMultiline: {
     minHeight: 100,

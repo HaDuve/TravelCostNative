@@ -2,11 +2,16 @@ Changelog Travel Expense App
 
 __Newest Changes:
 
+1.2.802c
+- New Overview-Overlay on Budget-Number press (Top Right)
+- New "Remove Traveller from Splitlist"-Button in the Splitlist of shared expenses
+- Bugfixes and performance improvements
+
+__Other Changes:
+
 1.2.802b
 - Quick Sum Button improved (Expense Form)
 - Fixed a crash in Expense Form
-
-__Other Changes:
 
 1.2.802
 - added background synchronization for offline expenses

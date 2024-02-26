@@ -4,7 +4,7 @@ import Toast, {
   ToastConfig,
 } from "react-native-toast-message";
 import React from "react";
-import { Dimensions, StyleSheet, View } from "react-native";
+import { Dimensions, StyleSheet, View, FlatList } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import LoadingBarOverlay from "./LoadingBarOverlay";
 import { Text } from "react-native";
@@ -24,6 +24,9 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { getMMKVString, setMMKVString } from "../../store/mmkv";
 import { DEVELOPER_MODE } from "../../confAppConstants";
 import { isPremiumMember } from "../Premium/PremiumConstants";
+import { ProgressBar } from "react-native-paper";
+import { formatExpenseWithCurrency } from "../../util/string";
+import { Pressable } from "react-native";
 
 const CONTENTCONTAINERSTYLE = { paddingLeft: 10 };
 const MINHEIGHT = 60;
@@ -186,7 +189,6 @@ const toastConfig: ToastConfig = {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              // console.log("Pressed X in config");
               Toast.hide();
             }}
           >
@@ -200,12 +202,87 @@ const toastConfig: ToastConfig = {
       </BackgroundGradient>
     </TouchableOpacity>
   ),
-  // call loading like this:
-  // Toast.show({
-  //   type: 'loading',
-  //   // And I can pass any custom props I want
-  //   props: { uuid: 'bba1a7d0-6ab2-4a0a-a76e-ebbe05ae6d70' }
-  // });
+  budgetOverview: (props) => {
+    const text3 = props.props.text3;
+    const travellerList = props.props.travellerList;
+    const travellerBudgets = props.props.travellerBudgets;
+    const travellerSplitExpenseSums = props.props.travellerSplitExpenseSums;
+    const currency = props.props.currency;
+    const noTotalBudget = props.props.noTotalBudget;
+    const periodName = props.props.periodName;
+    const periodLabel = props.props.periodLabel;
+    const budgetNumber = props.props.budgetNumber;
+    const periodBudgetString = props.props.periodBudgetString;
+
+    const hasMultipleTravellers = travellerList && travellerList.length > 1;
+
+    return (
+      <View
+        style={[styles.budgetOverviewContainer, GlobalStyles.wideStrongShadow]}
+      >
+        <View style={styles.budgetOverviewHeader}>
+          <Text style={styles.overviewTextTitle}>{i18n.t("overview")}</Text>
+          <Pressable onPress={() => Toast.hide()}>
+            <Text>X</Text>
+          </Pressable>
+        </View>
+        <Text style={styles.overviewTextInfo}>{text3}</Text>
+        <Text style={styles.overviewTextInfo}>{props.text1}</Text>
+        <Text style={styles.overviewTextInfo}>{periodBudgetString}</Text>
+        <Text style={styles.overviewTextInfo}>{props.text2}</Text>
+        {hasMultipleTravellers && (
+          <FlatList
+            data={travellerList}
+            ListHeaderComponent={() => {
+              return (
+                <Text style={styles.overviewTextTitle}>
+                  Per Traveller Budget:{" "}
+                  {formatExpenseWithCurrency(travellerBudgets, currency)} /{" "}
+                  {i18n.t(periodName)}
+                </Text>
+              );
+            }}
+            renderItem={({ item, index }) => {
+              const sum = formatExpenseWithCurrency(
+                +travellerSplitExpenseSums[index].toFixed(2),
+                currency
+              );
+              const budgetProgress =
+                travellerSplitExpenseSums[index] / travellerBudgets;
+              const budgetColor = noTotalBudget
+                ? GlobalStyles.colors.primary500
+                : budgetProgress <= 1
+                ? GlobalStyles.colors.primary500
+                : GlobalStyles.colors.error300;
+              const unfilledColor: string = noTotalBudget
+                ? GlobalStyles.colors.primary500
+                : budgetProgress <= 1
+                ? GlobalStyles.colors.gray500
+                : GlobalStyles.colors.errorGrayed;
+              return (
+                <View style={styles.travellerItemContainer}>
+                  <Text style={styles.overviewTextSmall}>
+                    {item}: {sum}
+                  </Text>
+                  <View style={[{ padding: 2 }, GlobalStyles.shadow]}>
+                    <Progress.Bar
+                      color={budgetColor}
+                      unfilledColor={unfilledColor}
+                      borderWidth={0}
+                      progress={budgetProgress}
+                      width={150}
+                      height={12}
+                      borderRadius={8}
+                    ></Progress.Bar>
+                  </View>
+                </View>
+              );
+            }}
+          ></FlatList>
+        )}
+      </View>
+    );
+  },
 };
 
 function isCalledToday() {
@@ -231,14 +308,12 @@ export async function showBanner(navigation, props = {}) {
   if (isPremium || isCalledToday()) return;
   Toast.show({
     type: "banner",
-    // TODO: translate
     text1: i18n.t("bannerText1"),
     text2: i18n.t("bannerText2"),
     autoHide: false,
     position: "top",
     topOffset: 10,
     onPress: () => {
-      // console.log("pressed Onpress");
       navigation.navigate("Paywall");
     },
     ...props,
@@ -259,6 +334,47 @@ const ToastComponent = () => {
 export default ToastComponent;
 
 const styles = StyleSheet.create({
+  budgetOverviewContainer: {
+    flex: 1,
+    borderColor: GlobalStyles.colors.primaryGrayed,
+    borderWidth: 1,
+    borderRadius: 36,
+    paddingHorizontal: 30,
+    paddingVertical: 12,
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
+  },
+  budgetOverviewHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  travellerItemContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    minHeight: 40,
+  },
+  overviewTextInfo: {
+    fontSize: 18,
+    fontWeight: "200",
+    color: GlobalStyles.colors.textColor,
+    textAlign: "left",
+    paddingVertical: 8,
+  },
+  overviewTextSmall: {
+    fontSize: 16,
+    fontWeight: "200",
+    color: GlobalStyles.colors.textColor,
+    textAlign: "left",
+    paddingVertical: 4,
+  },
+  overviewTextTitle: {
+    fontSize: 18,
+    fontWeight: "400",
+    color: GlobalStyles.colors.textColor,
+    textAlign: "left",
+    paddingVertical: 8,
+  },
   bannerContainerContainer: {
     // flex: 1,
     borderColor: "black",

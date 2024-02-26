@@ -18,7 +18,11 @@ i18n.enableFallback = true;
 
 import { getCatString } from "../../../util/category";
 import PropTypes from "prop-types";
-import { ExpenseData, getExpensesSum } from "../../../util/expense";
+import {
+  ExpenseData,
+  getExpensesSum,
+  getTravellerSum,
+} from "../../../util/expense";
 import { useContext } from "react";
 import { TripContext } from "../../../store/trip-context";
 import BlurPremium from "../../Premium/BlurPremium";
@@ -70,41 +74,6 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
     return travellerExpenses;
   }
 
-  function getSumExpenses(expenses: ExpenseData[], traveller: string) {
-    // return the sum of expenses for a given traveller
-    const expensesSum = expenses.reduce((sum: number, expense: ExpenseData) => {
-      const hasSplits = expense.splitList && expense.splitList?.length > 0;
-      if (!hasSplits) {
-        const correct = traveller == expense.whoPaid;
-        if (!correct) return sum;
-        if (!expense.calcAmount) return sum + Number(expense.amount);
-        return sum + Number(expense.calcAmount);
-      } else {
-        const split = expense.splitList.find(
-          (split) => split.userName === traveller
-        );
-        const correct = split;
-        if (!correct || !split) return sum;
-
-        // check if the expense has a calcAmount by comparing it to the amount
-        // if it is the same, the expense has no calcAmount
-        if (!expense.calcAmount || !expense.amount)
-          return sum + Number(split.amount);
-        const hasConversionRate = expense.calcAmount !== expense.amount;
-        if (!hasConversionRate) {
-          return sum + Number(split.amount);
-        } else {
-          // calculate the rate of the split
-          const rate = expense.calcAmount / expense.amount;
-          // calculate the amount of the split
-          const splitAmount = split.amount * rate;
-          return sum + Number(splitAmount);
-        }
-      }
-    }, 0);
-    return expensesSum;
-  }
-
   const totalSum = getExpensesSum(expenses);
 
   const catSumCat = [];
@@ -115,7 +84,7 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
       travellerList[travellerIndex]
     );
     const sumCat = Number(
-      getSumExpenses(catExpenses, travellerList[travellerIndex])
+      getTravellerSum(catExpenses, travellerList[travellerIndex])
     );
     catSumCat.push({
       cat: travellerList[travellerIndex],

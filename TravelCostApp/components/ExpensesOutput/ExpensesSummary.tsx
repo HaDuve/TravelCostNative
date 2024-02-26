@@ -23,7 +23,12 @@ import { UserContext } from "../../store/user-context";
 import { NetworkContext } from "../../store/network-context";
 import { getRate } from "../../util/currencyExchange";
 import { SettingsContext } from "../../store/settings-context";
-import { ExpenseData, getExpensesSum } from "../../util/expense";
+import {
+  ExpenseData,
+  getExpensesSum,
+  getTravellerSum,
+} from "../../util/expense";
+import { ExpensesContext, RangeString } from "../../store/expenses-context";
 
 const ExpensesSummary = ({
   expenses,
@@ -34,6 +39,7 @@ const ExpensesSummary = ({
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   const netCtx = useContext(NetworkContext);
+  const expCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
   const hideSpecial = settings.hideSpecialExpenses;
   const [lastRate, setLastRate] = useState(1);
@@ -61,10 +67,10 @@ const ExpensesSummary = ({
     return <></>;
   }
 
-  const userCurrency = tripCtx.tripCurrency;
+  const tripCurrency = tripCtx.tripCurrency;
   const expensesSumString = formatExpenseWithCurrency(
     truncateNumber(expensesSum, 1000, true),
-    userCurrency
+    tripCurrency
   );
 
   const calcExpensesSumString =
@@ -77,32 +83,47 @@ const ExpensesSummary = ({
 
   let budgetNumber = Number(tripCtx.dailyBudget);
   let infinityString = "";
+  let periodExpenses: ExpenseData[] = [];
+  let periodLabel = "";
   const expenseSumNum = Number(expensesSum);
   const totalBudget = Number(tripCtx.totalBudget);
-  //TODO: change the dailybudget system to make calculating this unified
+
   let budgetMult = 1;
   switch (periodName) {
     case "day":
+      periodExpenses = expCtx.getRecentExpenses(RangeString.day);
+      periodLabel = i18n.t("todayLabel");
       break;
     case "week":
       budgetMult = 7;
       budgetNumber = budgetNumber * budgetMult;
+      periodExpenses = expCtx.getRecentExpenses(RangeString.week);
+      periodLabel = i18n.t("weekLabel");
       break;
     case "month":
       budgetMult = 30;
       budgetNumber = budgetNumber * budgetMult;
-
+      periodExpenses = expCtx.getRecentExpenses(RangeString.month);
+      periodLabel = i18n.t("monthLabel");
       break;
     case "year":
       budgetMult = 365;
       budgetNumber = budgetNumber * budgetMult;
+      periodExpenses = expCtx.getRecentExpenses(RangeString.year);
+      periodLabel = i18n.t("yearLabel");
       break;
     case "total":
       budgetNumber = totalBudget ?? MAX_JS_NUMBER;
+      periodExpenses = expCtx.expenses;
+      periodLabel = i18n.t("totalLabel");
       break;
     default:
       break;
   }
+  const travellers = tripCtx.travellers;
+  const travellerSplitExpenseSums = travellers.map((traveller) => {
+    return getTravellerSum(periodExpenses, traveller);
+  });
 
   if (!budgetNumber || budgetNumber == MAX_JS_NUMBER) infinityString = "∞";
   if (budgetNumber > totalBudget ?? MAX_JS_NUMBER) budgetNumber = totalBudget;
@@ -140,10 +161,10 @@ const ExpensesSummary = ({
     : "";
   const leftToSpendString = `${i18n.t(
     "youHaveXLeftToSpend1"
-  )}${formatExpenseWithCurrency(
+  )}:\n${formatExpenseWithCurrency(
     truncateNumber(budgetNumber - expenseSumNum, 1000, true),
-    userCurrency
-  )}${lastRateUnequal1 ? " | " : ""}${calcLeftToSpend}${i18n.t(
+    tripCurrency
+  )}${lastRateUnequal1 ? " = " : ""}${calcLeftToSpend}${i18n.t(
     "youHaveXLeftToSpend2"
   )}`;
 
@@ -156,10 +177,20 @@ const ExpensesSummary = ({
 
   const overBudgetString = `${i18n.t(
     "exceededBudgetByX1"
-  )}${formatExpenseWithCurrency(
+  )}:\n${formatExpenseWithCurrency(
     truncateNumber(expenseSumNum - budgetNumber, 1000, true),
-    userCurrency
-  )}${lastRateUnequal1 ? " | " : ""}${calcOverBudget} !`;
+    tripCurrency
+  )}${lastRateUnequal1 ? " = " : ""}${calcOverBudget} !`;
+
+  const periodBudgetString = `${periodLabel} ${i18n.t(
+    "budget"
+  )} :\n${formatExpenseWithCurrency(
+    budgetNumber,
+    tripCtx.tripCurrency
+  )} = ${formatExpenseWithCurrency(
+    budgetNumber * lastRate,
+    userCtx.lastCurrency
+  )}`;
 
   const pressBudgetHandler = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -172,19 +203,39 @@ const ExpensesSummary = ({
       return;
     }
     // show Toast containing budget info
+    const tripCurrency = tripCtx.tripCurrency;
+    const lastCurrency = userCtx.lastCurrency;
+    // const lastRate = lastRate
+
     Toast.show({
-      type: budgetNumber > expenseSumNum ? "success" : "error",
+      // type: budgetNumber > expenseSumNum ? "success" : "error",
+      type: "budgetOverview",
       position: "bottom",
-      text1: `${i18n.t(periodName)} ${i18n.t(
-        "expenses"
-      )}: ${expensesSumString} ${
-        lastRateUnequal1 ? "|" : ""
+      text1: `${periodLabel} ${i18n.t("expenses")} :\n${expensesSumString} ${
+        lastRateUnequal1 ? "=" : ""
       } ${calcExpensesSumString}`,
       text2:
         budgetNumber > expenseSumNum
           ? `${leftToSpendString}`
           : `${overBudgetString}`,
-      visibilityTime: 5000,
+      autoHide: false,
+      bottomOffset: 100,
+      props: {
+        text3: `${formatExpenseWithCurrency(
+          1,
+          tripCurrency
+        )} = ${formatExpenseWithCurrency(lastRate, lastCurrency)}`,
+        travellerList: tripCtx.travellers,
+        // travellerBudgets: tripCtx.travellerBudgets
+        travellerBudgets: budgetNumber / tripCtx.travellers.length,
+        budgetNumber: budgetNumber,
+        travellerSplitExpenseSums: travellerSplitExpenseSums,
+        currency: tripCurrency,
+        noTotalBudget: noTotalBudget,
+        periodName: periodName,
+        periodLabel: periodLabel,
+        periodBudgetString: periodBudgetString,
+      },
     });
   };
 

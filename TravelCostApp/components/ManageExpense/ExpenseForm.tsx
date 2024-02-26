@@ -593,7 +593,7 @@ const ExpenseForm = ({
   }
 
   async function removeUserFromSplitHandler(userName: string) {
-    if (!splitList) return;
+    if (!splitList || splitList.length < 1) return;
     const splitListTemp = [...splitList];
     const index = splitListTemp.findIndex(
       (split) => split.userName === userName
@@ -608,7 +608,7 @@ const ExpenseForm = ({
     // List of length 1 here and remove the paidForSelf bool from the condition
     // In case the Button for "ADD LOCAL TRAVELLER" is on the right side of splitlist
     const paidForSelf =
-      splitListTemp.length == 1 && splitListTemp[0].userName == whoPaid;
+      splitListTemp.length == 1 && splitListTemp[0]?.userName == whoPaid;
     if (splitListTemp.length === 0 || paidForSelf) {
       setSplitType("SELF");
       setSplitList([]);

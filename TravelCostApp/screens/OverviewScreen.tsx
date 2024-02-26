@@ -162,6 +162,7 @@ const OverviewScreen = ({ navigation }) => {
           setOpen={() => {
             requestAnimationFrame(() => {
               setOpen(!open);
+              Toast.hide();
             });
           }}
           onOpen={() => {

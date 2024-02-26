@@ -390,6 +390,7 @@ function RecentExpenses({ navigation }) {
           setOpen={() => {
             requestAnimationFrame(() => {
               setOpen(!open);
+              Toast.hide();
             });
           }}
           placeholder={""}

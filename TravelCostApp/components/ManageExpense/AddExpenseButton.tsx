@@ -58,11 +58,11 @@ const AddExpenseButton = ({ navigation }) => {
     "description"
   );
 
-  const topDuplicates = findMostDuplicatedDescriptionExpenses(lastExpenses);
+  const topDuplicates = findMostDuplicatedDescriptionExpenses(expCtx.expenses);
 
   const [lastExpensesNumber, setLastExpensesNumber] = useState(PageLength);
 
-  const bestTemplateCandidates = [
+  const topTemplateExpenses = [
     ...topDuplicates,
     ...lastExpenses.slice(0, lastExpensesNumber).filter((exp) => {
       // filter out duplicates
@@ -118,12 +118,16 @@ const AddExpenseButton = ({ navigation }) => {
             {i18n.t("mostUsedExpenses")}
           </Text>
         )}
-        {(isThird && hasTop3) ||
-          (isFirst && !hasTop3 && (
-            <Text style={styles.templateContainerSubtitle}>
-              {i18n.t("lastUsedExpenses")}
-            </Text>
-          ))}
+        {isThird && hasTop3 && (
+          <Text style={styles.templateContainerSubtitle}>
+            {i18n.t("lastUsedExpenses")}
+          </Text>
+        )}
+        {isFirst && !hasTop3 && (
+          <Text style={styles.templateContainerSubtitle}>
+            {i18n.t("lastUsedExpenses")}
+          </Text>
+        )}
         <Pressable
           style={({ pressed }) => [
             styles.expenseTemplateContainer,
@@ -147,7 +151,12 @@ const AddExpenseButton = ({ navigation }) => {
             });
           }}
         >
-          <IconButton size={24} icon={categoryIcon} category={cat}></IconButton>
+          <IconButton
+            size={24}
+            icon={categoryIcon}
+            category={cat}
+            color={GlobalStyles.colors.textColor}
+          ></IconButton>
           <Text style={styles.description}>{formattedDescription}</Text>
           <Text style={{}}>{formattedAmount}</Text>
         </Pressable>
@@ -279,7 +288,7 @@ const AddExpenseButton = ({ navigation }) => {
             </View>
             <FlatList
               directionalLockEnabled={true}
-              data={bestTemplateCandidates}
+              data={topTemplateExpenses}
               renderItem={renderExpenseTemplates}
               onEndReachedThreshold={0.5}
               onEndReached={() => {

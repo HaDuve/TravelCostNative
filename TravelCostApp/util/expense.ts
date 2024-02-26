@@ -166,35 +166,46 @@ export function getTravellerSum(expenses: ExpenseData[], traveller: string) {
 }
 
 /**
- * Find the top 3 most duplicated objects in an array.
- * @param {Array<ExpenseData>} objectsArray - The array of objects to search.
+ * Find the top N most duplicated objects in an array.
+ * @param {Array<ExpenseData>} expenseArray - The array of objects to search.
  * @returns {Array<ExpenseData>} - An array containing the top 3 most duplicated objects.
  */
-export function findMostDuplicatedDescriptionExpenses(objectsArray) {
-  const duplicatesMap = {};
+export function findMostDuplicatedDescriptionExpenses(
+  expenseArray: ExpenseData[],
+  numberOfTop = 3
+) {
+  try {
+    const duplicatesMap = {};
 
-  // Step 1: Create a map with count as value to track duplicates
-  for (const obj of objectsArray) {
-    if (Object.prototype.hasOwnProperty.call(duplicatesMap, obj.description)) {
-      duplicatesMap[obj.description]++;
-    } else {
-      duplicatesMap[obj.description] = 1;
+    // Step 1: Create a map with count as value to track duplicates
+    expenseArray.forEach((exp) => {
+      const description = exp.description;
+      if (duplicatesMap[description]) {
+        duplicatesMap[description]++;
+      } else {
+        if (!exp.rangeId || exp.rangeId.length == 0) {
+          duplicatesMap[description] = 1;
+        }
+      }
+    });
+    const topExpenses: ExpenseData[] = [];
+    // Step 2: Find the top 3 most duplicated objects
+    for (let index = 0; index < numberOfTop; index++) {
+      const topExpenseInMap = Object.keys(duplicatesMap).reduce(
+        (a, b) => (duplicatesMap[a] > duplicatesMap[b] ? a : b),
+        0
+      );
+      const topExpense = expenseArray.find(
+        (exp) => exp.description === topExpenseInMap
+      );
+      if (topExpense) {
+        topExpenses.push(topExpense);
+        // remove from map
+        delete duplicatesMap[topExpenseInMap];
+      }
     }
+    return topExpenses;
+  } catch (error) {
+    return [];
   }
-
-  // Step 2: Sort the map by count
-  const sortedDuplicates = Object.entries(duplicatesMap).sort(
-    (a, b) => Number(b[1]) - Number(a[1])
-  );
-
-  // Step 3: Get the top 3 duplicates as ExpenseData objects
-  const top3Duplicates = sortedDuplicates.slice(0, 3).map(([description]) => {
-    // Find the original ExpenseData object with this description
-    const originalObject = objectsArray.find(
-      (obj) => obj.description === description
-    );
-    return originalObject;
-  });
-
-  return top3Duplicates;
 }

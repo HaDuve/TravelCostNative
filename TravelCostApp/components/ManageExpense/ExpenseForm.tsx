@@ -92,8 +92,7 @@ import SettingsSwitch from "../UI/SettingsSwitch";
 import CountryPicker from "../Currency/CountryPicker";
 import { getMMKVObject } from "../../store/mmkv";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
-import { Keyboard, Platform } from "react-native";
-import ToastComponent from "../UI/ToastComponent";
+import { Platform } from "react-native";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { MAX_EXPENSES_PERTRIP_NONPREMIUM } from "../../confAppConstants";
 
@@ -259,19 +258,14 @@ const ExpenseForm = ({
   const [isSpecialExpense, setIsSpecialExpense] = useState(
     editingValues?.isSpecialExpense ?? false
   );
-  // // console.log("rerender: special:", isSpecialExpense);
 
   useEffect(() => {
-    // console.log("useEffect ~ tripCtx.isPaidDate", tripCtx?.isPaidDate);
-    // console.log("useEffect ~ startDate", startDate);
-    // console.log("useEffect ~ editingValues.date", editingValues?.date);
     if (
       tripCtx.isPaidDate &&
       (startDate || editingValues?.date) &&
       (new Date(tripCtx.isPaidDate) > new Date(startDate) ||
         new Date(tripCtx.isPaidDate) > editingValues?.date)
     ) {
-      // console.log("paid by tripctx");
       setIsPaid(isPaidString.paid);
     }
   }, [tripCtx.isPaidDate, startDate, editingValues?.date]);
@@ -595,6 +589,49 @@ const ExpenseForm = ({
     if (listSplits) {
       setSplitList(listSplits);
       setSplitListValid(validateSplitList(listSplits, splitType, +amountValue));
+    }
+  }
+
+  async function removeUserFromSplitHandler(userName: string) {
+    if (!splitList) return;
+    const splitListTemp = [...splitList];
+    const index = splitListTemp.findIndex(
+      (split) => split.userName === userName
+    );
+    if (index === -1) {
+      return;
+    }
+    splitListTemp.splice(index, 1);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    // if splitList is empty now, set splitType to "SELF"
+    // if we ever implement the "ADD LOCAL TRAVELLER" function, we could keep a
+    // List of length 1 here and remove the paidForSelf bool from the condition
+    // In case the Button for "ADD LOCAL TRAVELLER" is on the right side of splitlist
+    const paidForSelf =
+      splitListTemp.length == 1 && splitListTemp[0].userName == whoPaid;
+    if (splitListTemp.length === 0 || paidForSelf) {
+      setSplitType("SELF");
+      setSplitList([]);
+      setSplitListValid(true);
+      return;
+    }
+    setSplitList(splitListTemp);
+    if (splitType === "EQUAL") {
+      const splitTravellersTemp = tripCtx.travellers.filter(
+        (traveller) => traveller !== userName
+      );
+      const listSplits = calcSplitList(
+        "EQUAL",
+        +amountValue,
+        whoPaid,
+        splitTravellersTemp
+      );
+      setSplitList(listSplits);
+      setSplitListValid(validateSplitList(listSplits, splitType, +amountValue));
+    } else {
+      setSplitListValid(
+        validateSplitList(splitListTemp, splitType, +amountValue)
+      );
     }
   }
 
@@ -1492,9 +1529,7 @@ const ExpenseForm = ({
                             style={[
                               GlobalStyles.strongShadow,
                               {
-                                // flex: 1,
                                 minWidth: 100,
-                                // maxWidth: 100,
                                 marginTop: 14,
                                 marginBottom: 8,
                                 borderWidth: 1,
@@ -1511,19 +1546,49 @@ const ExpenseForm = ({
                               },
                             ]}
                           >
-                            <Text
+                            <View
                               style={{
-                                color: splitListValid
-                                  ? GlobalStyles.colors.textColor
-                                  : GlobalStyles.colors.error500,
-                                textAlign: "left",
-                                marginLeft: 8,
-                                paddingTop: 2,
-                                marginBottom: -16,
+                                flexDirection: "row",
+                                paddingHorizontal: 4,
+                                // space out
+                                justifyContent: "space-between",
+                                flex: 1,
                               }}
                             >
-                              {truncateString(itemData.item.userName, 10)}
-                            </Text>
+                              <Text
+                                style={{
+                                  color: splitListValid
+                                    ? GlobalStyles.colors.textColor
+                                    : GlobalStyles.colors.error500,
+                                  textAlign: "left",
+                                  marginLeft: 4,
+                                  paddingTop: 2,
+                                }}
+                              >
+                                {truncateString(itemData.item.userName, 10)}
+                              </Text>
+                              <Pressable
+                                style={{
+                                  paddingLeft: 16,
+                                  paddingBottom: 16,
+                                }}
+                                onPress={() => {
+                                  removeUserFromSplitHandler(
+                                    itemData.item.userName
+                                  );
+                                }}
+                              >
+                                <Text
+                                  style={{
+                                    color: GlobalStyles.colors.accent500,
+                                    textAlign: "left",
+                                    fontWeight: "600",
+                                  }}
+                                >
+                                  x
+                                </Text>
+                              </Pressable>
+                            </View>
                             {/* Horizontal container  */}
                             <View
                               style={{
@@ -1537,11 +1602,12 @@ const ExpenseForm = ({
                               }}
                             >
                               <Input
+                                hasCurrency={!!inputs.currency}
                                 inputStyle={[
                                   splitTypeEqual && {
                                     color: GlobalStyles.colors.textColor,
                                   },
-                                  { paddingBottom: 4 },
+                                  { paddingBottom: 4, marginTop: -26 },
                                   {
                                     backgroundColor:
                                       GlobalStyles.colors.backgroundColor,
@@ -1549,8 +1615,9 @@ const ExpenseForm = ({
                                 ]}
                                 textInputConfig={{
                                   onFocus: () => {
-                                    if (splitType === "EQUAL")
-                                      Keyboard.dismiss();
+                                    if (splitType === "EQUAL") {
+                                      setSplitType("EXACT");
+                                    }
                                   },
                                   keyboardType: "decimal-pad",
                                   onChangeText: inputSplitListHandler.bind(

@@ -92,6 +92,7 @@ const AddExpenseButton = ({ navigation }) => {
   const renderExpenseTemplates = ({ item, index }) => {
     const isFirst = index === 0;
     const isThird = index === 3;
+    const hasTop3 = topDuplicates && topDuplicates.length > 0;
     // shallow copy item or we will have problems with the expense context
     let data: ExpenseData;
     try {
@@ -112,16 +113,17 @@ const AddExpenseButton = ({ navigation }) => {
           alignSelf: "center",
         }}
       >
-        {isFirst && (
+        {isFirst && hasTop3 && (
           <Text style={styles.templateContainerSubtitle}>
             {i18n.t("mostUsedExpenses")}
           </Text>
         )}
-        {isThird && (
-          <Text style={styles.templateContainerSubtitle}>
-            {i18n.t("lastUsedExpenses")}
-          </Text>
-        )}
+        {(isThird && hasTop3) ||
+          (isFirst && !hasTop3 && (
+            <Text style={styles.templateContainerSubtitle}>
+              {i18n.t("lastUsedExpenses")}
+            </Text>
+          ))}
         <Pressable
           style={({ pressed }) => [
             styles.expenseTemplateContainer,

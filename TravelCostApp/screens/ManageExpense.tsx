@@ -34,6 +34,7 @@ import { formatExpenseWithCurrency } from "../util/string";
 import { isSameDay } from "../util/dateTime";
 import ToastComponent from "../components/UI/ToastComponent";
 import safeLogError from "../util/error";
+import LoadingOverlay from "../components/UI/LoadingOverlay";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -57,9 +58,27 @@ const ManageExpense = ({ route, navigation }) => {
   const editedExpenseId = route.params?.expenseId;
   const isEditing = !!editedExpenseId;
 
-  const selectedExpense: ExpenseData = expenseCtx.expenses.find(
-    (expense) => expense.id === editedExpenseId
-  );
+  let selectedExpense: ExpenseData;
+  let expenseError = false;
+
+  try {
+    selectedExpense = expenseCtx.expenses.find(
+      (expense) => expense.id === editedExpenseId
+    );
+  } catch (error) {
+    expenseError = true;
+  }
+
+  if (expenseError || (isEditing && !selectedExpense)) {
+    navigation.popToTop();
+    Toast.show({
+      type: "error",
+      text1: i18n.t("exceptionError"),
+      text2: i18n.t("toastErrorUpdateExp"),
+    });
+    return <LoadingOverlay></LoadingOverlay>;
+  }
+
   const selectedExpenseAuthorUid = selectedExpense?.uid;
 
   async function deleteExpenseHandler() {

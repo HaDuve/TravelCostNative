@@ -313,6 +313,7 @@ const FinderScreen = () => {
                 <IconButton
                   icon="close-outline"
                   size={26}
+                  color={GlobalStyles.colors.textColor}
                   buttonStyle={{ marginTop: "7%" }}
                   onPressStyle={{
                     backgroundColor: GlobalStyles.colors.gray500,

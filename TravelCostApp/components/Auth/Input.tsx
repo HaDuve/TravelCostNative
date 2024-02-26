@@ -2,7 +2,6 @@ import React, { View, Text, TextInput, StyleSheet } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
-import IconButton from "../UI/IconButton";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 function Input({

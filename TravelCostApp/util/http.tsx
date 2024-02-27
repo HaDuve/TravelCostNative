@@ -33,7 +33,6 @@ const BACKEND_URL =
 /** ACCESS TOKEN */
 /** Sets the ACCESS TOKEN for all future http requests */
 export function setAxiosAccessToken(token: string) {
-  // console.log("setAxiosAccessToken ~ setQPAR", truncateString(token, 5));
   if (!token || token?.length < 2) {
     console.error("https: ~ setAxiosAccessToken ~ wrong token QPAR error");
     setMMKVString("QPAR", "");
@@ -361,15 +360,14 @@ export async function updateUser(uid: string, userData: UserData) {
 }
 
 export async function fetchUser(uid: string) {
-  // // console.log("https: ~ fetchUser ~ uid", uid);
+  console.log("fetchUser ~ uid:", uid);
   if (!uid) {
     safeLogError("fetchUser: uid is undefined", "http.tsx", 356);
     return null;
   }
   try {
-    const response = await axios.get(
-      BACKEND_URL + "/users/" + `${uid}.json` + getMMKVString("QPAR")
-    );
+    const response = await axios.get(BACKEND_URL + "/users/" + `${uid}.json`);
+    console.log("fetchUser ~ response:", response);
     const userData: UserData = response.data;
     return userData;
   } catch (error) {

@@ -1,13 +1,11 @@
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
-LogBox.ignoreAllLogs(); //Ignore all log notifications
 import {
   SafeAreaView,
   View,
   Keyboard,
   Platform,
   AppState,
-  LogBox,
   StatusBar as StatusBarRN,
 } from "react-native";
 import Purchases from "react-native-purchases";
@@ -397,7 +395,7 @@ function Home() {
       backBehavior={"history"}
       tabBarPosition={"bottom"}
       // tabBar={(props) => <TabBar {...props} />}
-      screenOptions={({ navigation }) => ({
+      screenOptions={() => ({
         headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
         headerTintColor: GlobalStyles.colors.backgroundColor,
         tabBarStyle: {
@@ -526,17 +524,17 @@ function Home() {
 }
 
 function Root() {
-  // NOTE: batchedBridge debugging global
-  if (global.__fbBatchedBridge) {
-    const origMessageQueue = global.__fbBatchedBridge;
-    const modules = origMessageQueue._remoteModuleTable;
-    const methods = origMessageQueue._remoteMethodTable;
-    global.findModuleByModuleAndMethodIds = (moduleId, methodId) => {
-      // console.log(
-      //   `The problematic line code is in: ${modules[moduleId]}.${methods[moduleId][methodId]}`
-      // );
-    };
-  }
+  // NOTE: batchedBridge debugging global (keep this code in case batchedBridge bugs)
+  // if (global.__fbBatchedBridge) {
+  //   const origMessageQueue = global.__fbBatchedBridge;
+  //   const modules = origMessageQueue._remoteModuleTable;
+  //   const methods = origMessageQueue._remoteMethodTable;
+  //   global.findModuleByModuleAndMethodIds = (moduleId, methodId) => {
+  //     console.log(
+  //       `The problematic line code is in: ${modules[moduleId]}.${methods[moduleId][methodId]}`
+  //     );
+  //   };
+  // }
 
   const [appIsReady, setAppIsReady] = useState(false);
   const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
@@ -651,24 +649,12 @@ function Root() {
 
   useEffect(() => {
     async function onRootMount() {
-      // first start
       await handleFirstStart();
-
-      // end wrap
-      // console.log("onRootMount ~ onRootMount");
-
       if (DEBUG_RESET_STORAGE) await asyncStoreSafeClear();
-
       // offline check and set context
-      const { isFastEnough, speed } = await isConnectionFastEnough();
-      // console.log("onRootMount ~ speed:", speed);
-      // console.log("onRootMount ~ isFastEnough:", isFastEnough);
+      const { isFastEnough } = await isConnectionFastEnough();
       const online = isFastEnough;
-
-      // console.log("onRootMount ~ online:", online, speed?.toFixed(2), " mbps");
-      if (online) {
-        await versionCheck();
-      }
+      if (isFastEnough) await versionCheck();
       // fetch token and trip
       const storedToken = await secureStoreGetItem("token");
       const storedUid = await secureStoreGetItem("uid");

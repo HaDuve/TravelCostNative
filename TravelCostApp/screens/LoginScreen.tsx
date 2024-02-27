@@ -60,25 +60,21 @@ function LoginScreen() {
     let { token = "", uid = "" } = { token: "", uid: "" };
     let checkUser: UserData = {};
     try {
-      // NECESSARY TRYCATCH
       ({ token, uid } = await login(email, password));
-      // console.log("loginHandler ~ uid:", uid);
-      //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
+      if (!uid) throw new Error("No uid found!");
+      if (!token) throw new Error("No token found!");
       checkUser = await fetchUser(uid);
-      // adding locale to database
+      if (!checkUser) throw new Error("No user found!");
       checkUser.locale = i18n.locale;
       await updateUser(uid, checkUser);
       await userCtx.addUserName(checkUser);
       await authCtx.setUserID(uid);
     } catch (error) {
-      console.error(error);
+      safeLogError(error);
       setIsAuthenticating(false);
       authCtx.logout();
     }
     const userData = checkUser;
-    tripCtx.setTripid(checkUser.currentTrip);
-
-    // console.log("loginHandler ~ checkUser", checkUser);
     // Check if the user logged in but there is no userName, we deleted the account
     if (!checkUser.userName) {
       Toast.show({
@@ -92,6 +88,7 @@ function LoginScreen() {
       authCtx.logout();
       return;
     }
+    tripCtx.setTripid(checkUser.currentTrip);
     let freshlyCreated = checkUser.freshlyCreated;
     if (!checkUser.currentTrip) {
       // we infer freshly created if no current trip exists but we assigned a name already

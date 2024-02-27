@@ -12,17 +12,8 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import Input from "./Input";
-import * as AppleAuthentication from "expo-apple-authentication";
-import Toast from "react-native-toast-message";
 import PropTypes from "prop-types";
-import {
-  asyncStoreGetItem,
-  asyncStoreSetItem,
-} from "../../store/async-storage";
 import GradientButton from "../UI/GradientButton";
-import { TextInput } from "react-native-paper";
-import LoadingBarOverlay from "../UI/LoadingBarOverlay";
-import { getMMKVString } from "../../store/mmkv";
 import {
   secureStoreGetItem,
   secureStoreSetItem,
@@ -74,83 +65,84 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
     });
   }
 
-  async function appleAuth(
-    credentials: AppleAuthentication.AppleAuthenticationCredential
-  ) {
-    let appleEmail = "";
-    if (credentials.email !== null) {
-      await asyncStoreSetItem(
-        "@userEmail" + credentials.user,
-        credentials.email
-      );
-      appleEmail = credentials.email;
-    } else {
-      const storedMail = await asyncStoreGetItem(
-        "@userEmail" + credentials.user
-      );
-      if (storedMail !== null) {
-        appleEmail = storedMail;
-      } else {
-        Toast.show({
-          type: "error",
-          text1: i18n.t("toastEmailError1"),
-          text2: i18n.t("toastEmailError2"),
-        });
-        return;
-      }
-    }
-    const name =
-      credentials.fullName.givenName + " " + credentials.fullName.familyName;
-    const password = credentials.user.slice(0, 20) + "@apple.com.p4sW0r-_d";
-    const newCredentials = {
-      name: name,
-      email: appleEmail,
-      password: password,
-    };
-    await onSubmit(newCredentials);
-  }
+  // async function appleAuth(
+  //   credentials: AppleAuthentication.AppleAuthenticationCredential
+  // ) {
+  //   let appleEmail = "";
+  //   if (credentials.email !== null) {
+  //     await asyncStoreSetItem(
+  //       "@userEmail" + credentials.user,
+  //       credentials.email
+  //     );
+  //     appleEmail = credentials.email;
+  //   } else {
+  //     const storedMail = await asyncStoreGetItem(
+  //       "@userEmail" + credentials.user
+  //     );
+  //     if (storedMail !== null) {
+  //       appleEmail = storedMail;
+  //     } else {
+  //       Toast.show({
+  //         type: "error",
+  //         text1: i18n.t("toastEmailError1"),
+  //         text2: i18n.t("toastEmailError2"),
+  //       });
+  //       return;
+  //     }
+  //   }
+  //   const name =
+  //     credentials.fullName.givenName + " " + credentials.fullName.familyName;
+  //   const password = credentials.user.slice(0, 20) + "@apple.com.p4sW0r-_d";
+  //   const newCredentials = {
+  //     name: name,
+  //     email: appleEmail,
+  //     password: password,
+  //   };
+  //   await onSubmit(newCredentials);
+  // }
 
-  const AppleAuthenticationJSX = (
-    <AppleAuthentication.AppleAuthenticationButton
-      buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-      buttonStyle={
-        AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE
-      }
-      cornerRadius={5}
-      style={{ width: 200, height: 44 }}
-      onPress={async () => {
-        let credentials: AppleAuthentication.AppleAuthenticationCredential;
-        try {
-          credentials = await AppleAuthentication.signInAsync({
-            requestedScopes: [
-              AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-              AppleAuthentication.AppleAuthenticationScope.EMAIL,
-            ],
-          });
-          // signed in
-        } catch (e) {
-          if (e.code === "ERR_REQUEST_CANCELED") {
-            // handle that the user canceled the sign-in flow
-            // console.log("onPress={ ~ e:", e);
-            Toast.show({
-              type: "error",
-              text1: i18n.t("toastAppleError1"),
-              text2: i18n.t("toastAppleError2"),
-            });
-          } else {
-            // handle other errors
-            // console.log("onPress={ ~ e:", e);
-            Toast.show({
-              type: "error",
-              text1: i18n.t("toastAppleError1"),
-              text2: e.message,
-            });
-          }
-        }
-        await appleAuth(credentials);
-      }}
-    />
-  );
+  // NOTE: Keep this code in case Apple Auth is reimplemented
+  // const AppleAuthenticationJSX = (
+  //   <AppleAuthentication.AppleAuthenticationButton
+  //     buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+  //     buttonStyle={
+  //       AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE
+  //     }
+  //     cornerRadius={5}
+  //     style={{ width: 200, height: 44 }}
+  //     onPress={async () => {
+  //       let credentials: AppleAuthentication.AppleAuthenticationCredential;
+  //       try {
+  //         credentials = await AppleAuthentication.signInAsync({
+  //           requestedScopes: [
+  //             AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+  //             AppleAuthentication.AppleAuthenticationScope.EMAIL,
+  //           ],
+  //         });
+  //         // signed in
+  //       } catch (e) {
+  //         if (e.code === "ERR_REQUEST_CANCELED") {
+  //           // handle that the user canceled the sign-in flow
+  //           // console.log("onPress={ ~ e:", e);
+  //           Toast.show({
+  //             type: "error",
+  //             text1: i18n.t("toastAppleError1"),
+  //             text2: i18n.t("toastAppleError2"),
+  //           });
+  //         } else {
+  //           // handle other errors
+  //           // console.log("onPress={ ~ e:", e);
+  //           Toast.show({
+  //             type: "error",
+  //             text1: i18n.t("toastAppleError1"),
+  //             text2: e.message,
+  //           });
+  //         }
+  //       }
+  //       await appleAuth(credentials);
+  //     }}
+  //   />
+  // );
 
   return (
     <View style={styles.form}>

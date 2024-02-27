@@ -218,8 +218,8 @@ const ExpensesSummary = ({
         budgetNumber > expenseSumNum
           ? `${leftToSpendString}`
           : `${overBudgetString}`,
-      autoHide: false,
-      bottomOffset: 100,
+      bottomOffset: 40,
+      visibilityTime: 20000,
       props: {
         text3: `${formatExpenseWithCurrency(
           1,
@@ -235,6 +235,7 @@ const ExpensesSummary = ({
         periodName: periodName,
         periodLabel: periodLabel,
         periodBudgetString: periodBudgetString,
+        lastRateUnequal1: lastRateUnequal1,
       },
     });
   };

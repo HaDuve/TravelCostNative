@@ -213,6 +213,7 @@ const toastConfig: ToastConfig = {
     const periodLabel = props.props.periodLabel;
     const budgetNumber = props.props.budgetNumber;
     const periodBudgetString = props.props.periodBudgetString;
+    const lastRateUnequal1 = props.props.lastRateUnequal1;
 
     const hasMultipleTravellers = travellerList && travellerList.length > 1;
 
@@ -226,17 +227,14 @@ const toastConfig: ToastConfig = {
             <Text>X</Text>
           </Pressable>
         </View>
-        <Text style={styles.overviewTextInfo}>{text3}</Text>
-        <Text style={styles.overviewTextInfo}>{props.text1}</Text>
-        <Text style={styles.overviewTextInfo}>{periodBudgetString}</Text>
-        <Text style={styles.overviewTextInfo}>{props.text2}</Text>
+
         {hasMultipleTravellers && (
           <FlatList
             data={travellerList}
             ListHeaderComponent={() => {
               return (
                 <Text style={styles.overviewTextTitle}>
-                  Per Traveller Budget:{" "}
+                  {i18n.t("budgetPerTraveller")}:{" "}
                   {formatExpenseWithCurrency(travellerBudgets, currency)} /{" "}
                   {i18n.t(periodName)}
                 </Text>
@@ -257,21 +255,34 @@ const toastConfig: ToastConfig = {
               const unfilledColor: string = noTotalBudget
                 ? GlobalStyles.colors.primary500
                 : budgetProgress <= 1
-                ? GlobalStyles.colors.gray500
+                ? GlobalStyles.colors.gray600
                 : GlobalStyles.colors.errorGrayed;
               return (
                 <View style={styles.travellerItemContainer}>
-                  <Text style={styles.overviewTextSmall}>
-                    {item}: {sum}
-                  </Text>
-                  <View style={[{ padding: 2 }, GlobalStyles.shadow]}>
+                  <View style={{ flexDirection: "row" }}>
+                    <Text style={styles.overviewTextSmall}>{item}:</Text>
+                    <Text
+                      style={[
+                        styles.overViewTextTravellerSum,
+                        styles.sumTextMoveRight,
+                      ]}
+                    >
+                      {sum}
+                    </Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.travellerItemProgressBarContainer,
+                      GlobalStyles.shadow,
+                    ]}
+                  >
                     <Progress.Bar
                       color={budgetColor}
                       unfilledColor={unfilledColor}
                       borderWidth={0}
                       progress={budgetProgress}
-                      width={150}
-                      height={12}
+                      width={180}
+                      height={16}
                       borderRadius={8}
                     ></Progress.Bar>
                   </View>
@@ -280,6 +291,17 @@ const toastConfig: ToastConfig = {
             }}
           ></FlatList>
         )}
+        {lastRateUnequal1 && (
+          <View>
+            <Text style={styles.overviewTextTitle}>
+              {i18n.t("currencyLabel")}
+            </Text>
+            <Text style={styles.overviewTextInfo}>{text3}</Text>
+            <Text style={styles.overviewTextInfo}>{props.text1}</Text>
+            <Text style={styles.overviewTextInfo}>{periodBudgetString}</Text>
+          </View>
+        )}
+        <Text style={styles.overviewTextInfo}>{props.text2}</Text>
       </View>
     );
   },
@@ -353,6 +375,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     minHeight: 40,
+    overflow: "visible",
+  },
+  travellerItemProgressBarContainer: {
+    padding: 2,
+    overflow: "visible",
+    zIndex: -1,
+  },
+  sumTextMoveRight: {
+    left: 180,
+    position: "absolute",
+    zIndex: 999,
   },
   overviewTextInfo: {
     fontSize: 18,
@@ -367,6 +400,13 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
     textAlign: "left",
     paddingVertical: 4,
+  },
+  overViewTextTravellerSum: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: GlobalStyles.colors.gray300,
+    textAlign: "left",
+    paddingTop: 5,
   },
   overviewTextTitle: {
     fontSize: 18,

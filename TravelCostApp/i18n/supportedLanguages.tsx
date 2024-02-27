@@ -410,6 +410,7 @@ const en = {
   templateExpenses: "Expense Templates",
   mostUsedExpenses: "Most used expenses",
   lastUsedExpenses: "Last used expenses",
+  budgetPerTraveller: "Budget per traveller",
 };
 const de = {
   // special expense strings
@@ -687,8 +688,8 @@ const de = {
   total: "Gesamt",
   budget: "Budget",
   noTotalBudget: "Kein Gesamtbudget!",
-  infinityLeftToSpend: "Du hast ∞ übrig zum Ausgeben!",
-  youHaveXLeftToSpend1: "Du hast noch ",
+  infinityLeftToSpend: "Es ist noch ∞ übrig zum Ausgeben!",
+  youHaveXLeftToSpend1: "Es ist noch ",
   youHaveXLeftToSpend2: " übrig zum Ausgeben!",
   underBudget: "Unter dem Budget um",
   overBudget: "Über dem Budget um",
@@ -844,6 +845,7 @@ const de = {
   templateExpenses: "Ausgaben-Vorlagen",
   mostUsedExpenses: "Am häufigsten verwendete Ausgaben",
   lastUsedExpenses: "Zuletzt verwendete Ausgaben",
+  budgetPerTraveller: "Budget pro Reisendem",
 };
 const fr = {
   // special expense strings
@@ -1273,6 +1275,7 @@ const fr = {
   templateExpenses: "Modèles de dépenses",
   mostUsedExpenses: "Dépenses les plus utilisées",
   lastUsedExpenses: "Dernières dépenses utilisées",
+  budgetPerTraveller: "Budget par voyageur",
 };
 const ru = {
   // special expense strings
@@ -1707,5 +1710,6 @@ const ru = {
   templateExpenses: "Шаблоны расходов",
   mostUsedExpenses: "Самые используемые расходы",
   lastUsedExpenses: "Последние использованные расходы",
+  budgetPerTraveller: "Бюджет на одного путешественника",
 };
 export { en, de, fr, ru };

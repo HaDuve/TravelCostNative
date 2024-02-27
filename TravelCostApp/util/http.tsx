@@ -4,7 +4,6 @@ import { Category } from "./category";
 import { TripData } from "../store/trip-context";
 import { ExpenseData, ExpenseDataOnline } from "./expense";
 import { UserData } from "../store/user-context";
-import { truncateString } from "./string";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -48,7 +47,7 @@ axios.interceptors.request.use(
   (config) => {
     // set header
     // config.headers.common["Authorization"] = `Bearer ${getMMKVString("QPAR")}`;
-    // // console.log(
+    // console.log(
     //   `\n--- AXIOS LOG ~~~ \n`,
     //   `${config.method.toUpperCase()} request sent to ${truncateString(
     //     config.url,
@@ -68,10 +67,10 @@ axios.interceptors.request.use(
  */
 export const dataResponseTime = (func) => {
   return async (...args) => {
-    // console.log(`Timing ${func.name} now!`);
     const start = Date.now();
     const result = await func(...args);
     const end = Date.now();
+    // eslint-disable-next-line no-console
     console.log(`Time taken by ${func.name} is ${end - start} ms`);
     return result;
   };
@@ -348,7 +347,6 @@ export async function storeUser(uid: string, userData: object) {
  * Updates User via axios.patch given uid and userdata to patch
  */
 export async function updateUser(uid: string, userData: UserData) {
-  // // console.log("updateUser ~ userData", userData);
   try {
     await axios.patch(
       BACKEND_URL + "/users/" + `${uid}.json` + getMMKVString("QPAR"),
@@ -360,14 +358,12 @@ export async function updateUser(uid: string, userData: UserData) {
 }
 
 export async function fetchUser(uid: string) {
-  console.log("fetchUser ~ uid:", uid);
   if (!uid) {
     safeLogError("fetchUser: uid is undefined", "http.tsx", 356);
     return null;
   }
   try {
     const response = await axios.get(BACKEND_URL + "/users/" + `${uid}.json`);
-    console.log("fetchUser ~ response:", response);
     const userData: UserData = response.data;
     return userData;
   } catch (error) {
@@ -376,8 +372,6 @@ export async function fetchUser(uid: string) {
 }
 
 export async function storeTrip(tripData: TripData) {
-  // // console.log("https: ~ storeTrip ~ tripData", tripData);
-  //TODO: create tripData Interface for TypeScript
   try {
     const response = await axios.post(
       BACKEND_URL + "/trips.json" + getMMKVString("QPAR"),
@@ -501,8 +495,6 @@ export async function getUIDs(tripid: string) {
 }
 
 export async function getAllExpenses(tripid: string, uid?: string) {
-  // // console.log("~~ https: ~ getAllExpenses ~ tripid", tripid);
-  // // console.log("~~ https: ~ getAllExpenses ~ uid", uid);
   const uids = await getUIDs(tripid);
   if (uids?.length < 1) uids.push(uid);
   const expenses = await fetchExpensesWithUIDs(tripid, uids);
@@ -510,9 +502,7 @@ export async function getAllExpenses(tripid: string, uid?: string) {
 }
 
 export async function updateTripHistory(userId: string, newTripid: string) {
-  // // console.log("updateTripHistory ~ newTripid", newTripid);
   const tripHistory = await fetchTripHistory(userId);
-  // if triphistory empty, just await storeTripHistory(uid, [tripid]);
   if (!tripHistory) return storeTripHistory(userId, [newTripid]);
   // look for newTripid inside of oldTripHistory
   if (tripHistory.indexOf(newTripid) > -1) return;
@@ -524,7 +514,6 @@ export async function updateTripHistory(userId: string, newTripid: string) {
 }
 
 export async function storeTripHistory(userId: string, tripHistory: string[]) {
-  // // console.log("storeTripHistory ~ tripHistory", tripHistory);
   try {
     const response = await axios.put(
       BACKEND_URL + `/users/${userId}/tripHistory.json` + getMMKVString("QPAR"),
@@ -537,7 +526,6 @@ export async function storeTripHistory(userId: string, tripHistory: string[]) {
 }
 
 export async function fetchTripHistory(userId: string) {
-  // // console.log("fetchTripHistory ~ userId", userId);
   try {
     const response = await axios.get(
       BACKEND_URL + `/users/${userId}/tripHistory.json` + getMMKVString("QPAR")
@@ -549,14 +537,10 @@ export async function fetchTripHistory(userId: string) {
 }
 
 export async function fetchCurrentTrip(userId: string) {
-  // // console.log("https: ~ fetchCurrentTrip ~ userId", userId);
   try {
     const response = await axios.get(
       BACKEND_URL + `/users/${userId}.json` + getMMKVString("QPAR")
     );
-    // // console.log("https: ~ fetchCurrentTrip ~ response", response.data);
-    // if (!response?.data?.currentTrip)
-    // console.log("https: ~ could not find current trip of this user!");
     return response.data.currentTrip;
   } catch (error) {
     throw new Error("error while fetching current trip");
@@ -568,7 +552,6 @@ export async function fetchUserName(userId: string): Promise<string> {
     const response = await axios.get(
       BACKEND_URL + `/users/${userId}.json` + getMMKVString("QPAR")
     );
-    // // console.log("https: ~ fetchUserName ~ response", response.data);
     return response.data.userName;
   } catch (error) {
     throw new Error("error while fetching user name");
@@ -591,7 +574,6 @@ export async function touchTraveler(
   firebaseId: string,
   isTouched: boolean
 ) {
-  // // console.log("touching with QPAR", getMMKVString("QPAR"));
   try {
     const response = await axios.patch(
       BACKEND_URL +
@@ -615,7 +597,7 @@ export async function touchAllTravelers(tripid: string, flag: boolean) {
   try {
     await Promise.all(axios_calls);
   } catch (error) {
-    // console.log("touching:", error);
+    safeLogError(error);
   }
 }
 
@@ -629,7 +611,7 @@ export async function unTouchTraveler(tripid: string, uid: string) {
   try {
     await Promise.all(axios_calls);
   } catch (error) {
-    // console.log("touching:", error);
+    safeLogError(error);
   }
 }
 
@@ -643,7 +625,7 @@ export async function touchMyTraveler(tripid: string, uid: string) {
   try {
     await Promise.all(axios_calls);
   } catch (error) {
-    // console.log("touching:", error);
+    safeLogError(error);
   }
 }
 
@@ -656,10 +638,9 @@ export async function fetchTravelerIsTouched(tripid: string, uid: string) {
       if (DatabaseUid !== uid) continue;
       returnIsTouched = allTravelersRes[key].touched;
     }
-    // return true if uid is not found in allTravelersRes
     return returnIsTouched ?? true;
   } catch (error) {
-    // console.log("fetchTravelerIsTouched:", error);
+    safeLogError(error);
     return false;
   }
 }
@@ -681,39 +662,23 @@ export async function storeExpoPushTokenInTrip(
   const localeToken: localeExpoPushToken = token;
   localeToken.tripid = usedTripID;
   localeToken.locale = i18n.locale;
-  // console.log(
-  //   "storeExpoPushTokenInTrip ~ localeToken.locale:",
-  //   localeToken.locale
-  // );
-  // console.log("storeExpoPushTokenInTrip ~ usedTripID", usedTripID);
-  // store token string under tripid/tokens adding to current tokens if any
   const response = await axios.get(
     BACKEND_URL + `/trips/${usedTripID}/tokens.json` + getMMKVString("QPAR")
   );
   const res = response?.data;
-  // // console.log("res:", res);
   const keysToDelete = [];
   if (res) {
     for (const key in res) {
       const compareToken = res[key].token ?? res[key].localeToken;
       if (!compareToken) continue;
-      // // console.log("compareToken:", compareToken);
-      // console.log("compareToken.data:", compareToken?.data);
       if (localeToken.data == compareToken.data) {
         // delete all redundant tokens that have the same data as localeToken from database
-        // console.log("found a match");
         keysToDelete.push(key);
       }
     }
   }
-  // if (keysToDelete || keysToDelete.length < 1)
-  // console.log("found no match");
   const axiosCalls = [];
   for (const key of keysToDelete) {
-    // console.log(
-    //   "url/key to delete:",
-    //   `/trips/${usedTripID}/tokens/${key}.json`
-    // );
     axiosCalls.push(
       axios.delete(
         BACKEND_URL +
@@ -729,17 +694,12 @@ export async function storeExpoPushTokenInTrip(
       BACKEND_URL + `/trips/${usedTripID}/tokens.json` + getMMKVString("QPAR"),
       { token: localeToken }
     );
-    // console.log(" ~ successfully stored token in trip", response?.data);
     finalResponse = response;
   } catch (error) {
     safeLogError(error, "http.tsx", 735);
   }
   try {
-    // delete all redundant tokens
     await Promise.all(axiosCalls);
-    // // console.log(
-    //   `Successfully executed ${axiosCalls.length} axios.delete calls!`
-    // );
   } catch (error) {
     safeLogError(error);
   }
@@ -748,7 +708,6 @@ export async function storeExpoPushTokenInTrip(
 
 export async function fetchChangelog() {
   try {
-    // console.log("fetching changelog");
     const response = await axios.get(
       "https://raw.githubusercontent.com/HaDuve/TravelCostNative/main/TravelCostApp/changelog.txt"
     );

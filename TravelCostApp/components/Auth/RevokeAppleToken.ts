@@ -1,9 +1,9 @@
 import axios from "axios";
 import qs from "qs";
+import safeLogError from "../../util/error";
 
 export async function revokeAppleToken(refreshToken) {
   //   const client_secret = makeJWT(); // Assuming you have the makeJWT function in your project
-
   const data = {
     token: refreshToken,
     client_id: "YOUR CLIENT ID",
@@ -21,8 +21,8 @@ export async function revokeAppleToken(refreshToken) {
         },
       }
     );
-    // console.log(response?.data);
+    return response?.data;
   } catch (error) {
-    console.error(error);
+    safeLogError(error);
   }
 }

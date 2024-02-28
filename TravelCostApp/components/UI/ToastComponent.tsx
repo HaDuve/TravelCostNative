@@ -24,17 +24,12 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { getMMKVString, setMMKVString } from "../../store/mmkv";
 import { DEVELOPER_MODE } from "../../confAppConstants";
 import { isPremiumMember } from "../Premium/PremiumConstants";
-import { ProgressBar } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { Pressable } from "react-native";
 
 const CONTENTCONTAINERSTYLE = { paddingLeft: 10 };
 const MINHEIGHT = 60;
 const toastConfig: ToastConfig = {
-  /*
-      Overwrite 'success' type,
-      by modifying the existing `BaseToast` component
-    */
   success: (props) => (
     <BaseToast
       {...props}
@@ -217,6 +212,21 @@ const toastConfig: ToastConfig = {
 
     const hasMultipleTravellers = travellerList && travellerList.length > 1;
 
+    const currencyJSX = (
+      <>
+        {lastRateUnequal1 && (
+          <View>
+            <Text style={styles.overviewTextTitle}>
+              {i18n.t("currencyLabel")}
+            </Text>
+            <Text style={styles.overviewTextInfo}>{text3}</Text>
+            <Text style={styles.overviewTextInfo}>{props.text1}</Text>
+            <Text style={styles.overviewTextInfo}>{periodBudgetString}</Text>
+          </View>
+        )}
+        <Text style={styles.overviewTextInfo}>{props.text2}</Text>
+      </>
+    );
     return (
       <View
         style={[styles.budgetOverviewContainer, GlobalStyles.wideStrongShadow]}
@@ -291,17 +301,6 @@ const toastConfig: ToastConfig = {
             }}
           ></FlatList>
         )}
-        {lastRateUnequal1 && (
-          <View>
-            <Text style={styles.overviewTextTitle}>
-              {i18n.t("currencyLabel")}
-            </Text>
-            <Text style={styles.overviewTextInfo}>{text3}</Text>
-            <Text style={styles.overviewTextInfo}>{props.text1}</Text>
-            <Text style={styles.overviewTextInfo}>{periodBudgetString}</Text>
-          </View>
-        )}
-        <Text style={styles.overviewTextInfo}>{props.text2}</Text>
       </View>
     );
   },

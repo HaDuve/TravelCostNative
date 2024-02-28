@@ -43,13 +43,14 @@ import { NetworkContext } from "../store/network-context";
 import safeLogError from "../util/error";
 import { canOpenURL } from "expo-linking";
 import DevContent from "../components/Settings/DevContent";
+import CurrencyExchangeInfo from "../components/UI/CurrencyExchangeInfo";
 
 const SettingsScreen = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
-  const isConnected = netCtx.isConnected && netCtx.strongConnection;
+  const isConnected = netCtx.isConnected;
   const [isRestoringPurchases, setIsRestoringPurchases] = useState(false);
   const multiTraveller =
     (tripCtx.travellers && tripCtx.travellers?.length > 1) ?? false;
@@ -74,7 +75,6 @@ const SettingsScreen = ({ navigation }) => {
     React.useCallback(() => {
       async function setPremiumNow() {
         const isPremium = await userCtx.checkPremium();
-        // // console.log("setPremiumNow ~ isPremium:", isPremium);
         setPremiumStatus(isPremium);
       }
       setPremiumNow();
@@ -178,7 +178,9 @@ const SettingsScreen = ({ navigation }) => {
         </View>
       </BlurView>
       {DEVELOPER_MODE && <DevContent navigation={navigation} />}
+
       <SettingsSection multiTraveller={multiTraveller}></SettingsSection>
+
       <GradientButton
         style={styles.settingsButton}
         onPress={async () => {
@@ -216,11 +218,11 @@ const SettingsScreen = ({ navigation }) => {
       >
         {premiumButtonString}
       </GradientButton>
+      <CurrencyExchangeInfo />
       <TouchableOpacity
         onPress={async () => {
-          // console.log("pressed support button");
           const subject = encodeURIComponent("Budget For Nomads Support");
-          const message = encodeURIComponent("Hi, I have a question about ...");
+          const message = encodeURIComponent("Hi, I have feedback about ...");
           const url = `mailto:budgetfornomads@outlook.com?subject=${subject}&body=${message}`;
           navigation.pop();
           try {

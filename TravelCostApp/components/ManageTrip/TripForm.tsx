@@ -46,10 +46,8 @@ import InfoButton from "../UI/InfoButton";
 import Modal from "react-native-modal";
 import { MAX_JS_NUMBER, MAX_TRIPS_NONPREMIUM } from "../../confAppConstants";
 import Animated, {
-  FadeIn,
   FadeInDown,
   FadeOut,
-  SlideInDown,
   ZoomIn,
   ZoomOut,
 } from "react-native-reanimated";
@@ -61,7 +59,7 @@ import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
 import { useTourGuideController } from "rn-tourguide";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { useWindowDimensions } from "react-native";
-import { Checkbox, Switch } from "react-native-paper";
+import { Switch } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import Toast from "react-native-toast-message";
@@ -240,33 +238,33 @@ const TripForm = ({ navigation, route }) => {
     navigation.pop();
   }
 
-  async function deleteAcceptHandler() {
-    const trips = route.params.trips;
-    // if triplist?.length == 1 await userCtx.setFreshlyCreatedTo(true);
-    // await deleteTrip(editedTripId);
-  }
-  function deleteHandler() {
-    Alert.alert(
-      i18n.t("deleteTrip"),
-      i18n.t("deleteTripSure"),
-      [
-        {
-          text: i18n.t("cancel"),
-          style: "cancel",
-        },
-        {
-          // text: i18n.t("delete"),
-          text: i18n.t("delete"),
-          style: "destructive",
-          onPress: async () => {
-            deleteAcceptHandler();
-            navigation.pop();
-          },
-        },
-      ],
-      { cancelable: false }
-    );
-  }
+  // async function deleteAcceptHandler() {
+  // const trips = route.params.trips;
+  // if triplist?.length == 1 await userCtx.setFreshlyCreatedTo(true);
+  // await deleteTrip(editedTripId);
+  // }
+  // function deleteHandler() {
+  //   Alert.alert(
+  //     i18n.t("deleteTrip"),
+  //     i18n.t("deleteTripSure"),
+  //     [
+  //       {
+  //         text: i18n.t("cancel"),
+  //         style: "cancel",
+  //       },
+  //       {
+  //         // text: i18n.t("delete"),
+  //         text: i18n.t("delete"),
+  //         style: "destructive",
+  //         onPress: async () => {
+  //           deleteAcceptHandler();
+  //           navigation.pop();
+  //         },
+  //       },
+  //     ],
+  //     { cancelable: false }
+  //   );
+  // }
 
   async function editingTripData(tripData: TripData, setActive = false) {
     try {
@@ -289,10 +287,6 @@ const TripForm = ({ navigation, route }) => {
         const expenses = await getAllExpenses(editedTripId, uid);
         setLoadingProgress(9);
         expenseCtx.setExpenses([...expenses]);
-        // expenseCtx.setExpenses([]);
-        // expenses.forEach((element) => {
-        //   expenseCtx.addExpense(element);
-        // });
         setMMKVObject("expenses", expenses);
         tripCtx.setdailyBudget(tripData.dailyBudget);
         return;
@@ -371,14 +365,6 @@ const TripForm = ({ navigation, route }) => {
       start();
     }
     navigation.navigate("RecentExpenses");
-
-    // restart app with Updates
-    // const r = await reloadApp();
-    // if (r == -1)
-    // navigation.popToTop();
-
-    // tripCtx.refresh();
-    // navigation.navigate("Profile");
   }
 
   const isLimitedByPremium = async () => {

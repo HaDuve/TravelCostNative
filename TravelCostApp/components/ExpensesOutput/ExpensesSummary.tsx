@@ -20,7 +20,6 @@ import Toast from "react-native-toast-message";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
 import * as Haptics from "expo-haptics";
 import { UserContext } from "../../store/user-context";
-import { NetworkContext } from "../../store/network-context";
 import { getRate } from "../../util/currencyExchange";
 import { SettingsContext } from "../../store/settings-context";
 import {
@@ -38,7 +37,6 @@ const ExpensesSummary = ({
 }) => {
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
-  const netCtx = useContext(NetworkContext);
   const expCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
   const hideSpecial = settings.hideSpecialExpenses;

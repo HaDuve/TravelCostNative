@@ -58,7 +58,6 @@ import { NetworkContext } from "../../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { Text } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { addShadowItemsToExpenses } from "./ExpenseListUtil";
@@ -73,7 +72,6 @@ import {
 import { TripAsObject } from "../../screens/TripSummaryScreen";
 import { Pressable } from "react-native";
 import safeLogError from "../../util/error";
-import { sleep } from "../../util/appState";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;

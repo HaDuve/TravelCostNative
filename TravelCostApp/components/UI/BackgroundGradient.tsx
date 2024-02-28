@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import PropTypes from "prop-types";
@@ -22,4 +22,4 @@ BackgroundGradient.propTypes = {
   style: PropTypes.object,
 };
 
-const styles = StyleSheet.create({});
+// const styles = StyleSheet.create({});

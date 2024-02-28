@@ -26,11 +26,7 @@ import {
   fetchTripName,
   getAllExpenses,
   getTravellers,
-  putTravelerInTrip,
-  updateTripHistory,
-  updateUser,
 } from "../../util/http";
-import LoadingOverlay from "../UI/LoadingOverlay";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -42,17 +38,12 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import { ExpensesContext } from "../../store/expenses-context";
-import { UserContext } from "../../store/user-context";
-import { AuthContext } from "../../store/auth-context";
 import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
-import { getCurrencySymbol } from "../../util/currencySymbol";
 import { ExpenseData } from "../../util/expense";
-import { isForeground } from "../../util/appState";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { daysBetween } from "../../util/date";
-import set from "react-native-reanimated";
 import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
 import safeLogError from "../../util/error";
 

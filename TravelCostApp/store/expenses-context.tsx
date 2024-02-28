@@ -1,18 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { createContext, useEffect, useReducer } from "react";
 import {
   getDateMinusDays,
   getDatePlusDays,
-  getFormattedDate,
   getPreviousMondayDate,
-  toShortFormat,
 } from "../util/date";
-import { truncateString } from "../util/string";
-import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 import PropTypes from "prop-types";
-import { Expense, ExpenseData } from "../util/expense";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ExpenseData } from "../util/expense";
 import uniqBy from "lodash.uniqby";
 import { getMMKVObject, setMMKVObject } from "./mmkv";
 export enum RangeString {
@@ -22,6 +17,65 @@ export enum RangeString {
   year = "year",
   total = "total",
 }
+
+export type ExpenseContextType = {
+  expenses: Array<ExpenseData>;
+  addExpense: (
+    {
+      uid,
+      description,
+      amount,
+      date,
+      startDate,
+      endDate,
+      category,
+      country,
+      currency,
+      whoPaid,
+      calcAmount,
+      iconName,
+    }: ExpenseData,
+    id?: string
+  ) => void;
+  setExpenses: (expenses: Array<ExpenseData>) => void;
+  deleteExpense: (id: string) => void;
+  updateExpense: (
+    id: string,
+    {
+      description,
+      amount,
+      date,
+      category,
+      country,
+      currency,
+      whoPaid,
+      calcAmount,
+      iconName,
+    }: ExpenseData
+  ) => void;
+  getRecentExpenses: (rangestring: RangeString) => Array<ExpenseData>;
+  getYearlyExpenses: (yearsBack: number) => {
+    firstDay: Date;
+    lastDay: Date;
+    yearlyExpenses: Array<ExpenseData>;
+  };
+  getMonthlyExpenses: (monthsBack: number) => {
+    firstDay: Date;
+    lastDay: Date;
+    monthlyExpenses: Array<ExpenseData>;
+  };
+  getWeeklyExpenses: (weeksBack: number) => {
+    firstDay: Date;
+    lastDay: Date;
+    weeklyExpenses: Array<ExpenseData>;
+  };
+  getDailyExpenses: (daysBack: number) => Array<ExpenseData>;
+  getSpecificDayExpenses: (date: Date) => Array<ExpenseData>;
+  getSpecificWeekExpenses: (date: Date) => Array<ExpenseData>;
+  getSpecificMonthExpenses: (date: Date) => Array<ExpenseData>;
+  getSpecificYearExpenses: (date: Date) => Array<ExpenseData>;
+  loadExpensesFromStorage: (forceLoad?: boolean) => Promise<boolean>;
+};
 
 export const ExpensesContext = createContext({
   expenses: [],

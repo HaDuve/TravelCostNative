@@ -1,12 +1,10 @@
-import React, { memo } from "react";
-import { StyleSheet, Vibration, View } from "react-native";
+import React from "react";
+import { StyleSheet, View } from "react-native";
 import * as Haptics from "expo-haptics";
 import {
   VictoryAxis,
   VictoryBar,
   VictoryChart,
-  VictoryContainer,
-  VictoryLabel,
   VictoryLine,
   VictoryTooltip,
   VictoryVoronoiContainer,
@@ -22,13 +20,8 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import { GlobalStyles } from "../../constants/styles";
-import {
-  getDateMinusDays,
-  getDatePlusDays,
-  toDayMonthString,
-} from "../../util/date";
+import { getDateMinusDays } from "../../util/date";
 import PropTypes from "prop-types";
-import { getCurrencySymbol } from "../../util/currencySymbol";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { isSameDay } from "../../util/dateTime";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
@@ -38,14 +31,11 @@ const ExpenseChart = ({
   xAxis,
   yAxis,
   budget,
-  daysRange,
   currency,
   navigation,
   expenses,
 }) => {
-  // // console.log("rerender ExpenseChart - 3");
   const data = inputData;
-  // console last day
   const firstItem = inputData[0];
   const [lastItem] = inputData.slice(-1);
   const lastItemDate = new Date(firstItem.day ?? firstItem.firstDay);
@@ -54,8 +44,6 @@ const ExpenseChart = ({
     new Date(lastItem.day ?? lastItem.lastDay),
     1
   );
-  // // console.log("firstItemDate:", firstItemDate);
-  // // console.log("lastItemDate:", lastItemDate);
   const xAxisString = xAxis;
   const yAxisString = yAxis;
   const budgetCompare =

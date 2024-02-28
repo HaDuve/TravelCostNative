@@ -36,6 +36,41 @@ export interface TripData {
   categories?: Category[] | string;
 }
 
+export type TripContextType = {
+  tripid: string;
+  tripName: string;
+  totalBudget: string;
+  dailyBudget: string;
+  setdailyBudget: (dailyBudget: string) => void;
+  tripCurrency: string;
+  totalSum: number;
+  tripProgress: number;
+  startDate: string;
+  endDate: string;
+  refreshState: boolean;
+  refresh: () => void;
+  setTripProgress: (percent: number) => void;
+  travellers: Traveller[];
+  fetchAndSetTravellers: (tripid: string) => Promise<boolean>;
+  setTotalSum: (amount: number) => void;
+  setTripid: (tripid: string) => void;
+  addTrip: ({ tripName, tripTotalBudget }) => void;
+  deleteTrip: (tripid: string) => void;
+  getcurrentTrip: () => TripData;
+  setCurrentTrip: (tripid: string, trip: TripData) => Promise<void>;
+  fetchAndSetCurrentTrip: (tripid: string) => Promise<TripData>;
+  saveTripDataInStorage: (tripData: TripData) => Promise<void>;
+  loadTripDataFromStorage: () => Promise<TripData>;
+  saveTravellersInStorage: (travellers) => Promise<void>;
+  loadTravellersFromStorage: () => Promise<void>;
+  fetchAndSettleCurrentTrip: (unSettle?: boolean) => Promise<void>;
+  isPaid: isPaidString;
+  isPaidDate: string;
+  isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
+  isDynamicDailyBudget: boolean;
+};
+
 export const TripContext = createContext({
   tripid: "",
   tripName: "",

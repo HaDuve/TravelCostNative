@@ -30,7 +30,6 @@ import PropTypes from "prop-types";
 import IconButton from "../UI/IconButton";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
-import BackButton from "../UI/BackButton";
 
 const PaywallScreen = ({ navigation }) => {
   // - State for all available package

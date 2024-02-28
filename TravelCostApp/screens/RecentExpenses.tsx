@@ -9,8 +9,12 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { MemoizedExpensesOutput } from "../components/ExpensesOutput/ExpensesOutput";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import { AuthContext } from "../store/auth-context";
-import { ExpensesContext, RangeString } from "../store/expenses-context";
-import { TripContext } from "../store/trip-context";
+import {
+  ExpenseContextType,
+  ExpensesContext,
+  RangeString,
+} from "../store/expenses-context";
+import { TripContext, TripContextType } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 import { getOfflineQueue } from "../util/offline-queue";
 import { fetchTravelerIsTouched } from "../util/http";
@@ -76,10 +80,10 @@ function RecentExpenses({ navigation }) {
       showAnyIndicator: boolean,
       setIsFetching: (isFetching: boolean) => void,
       setRefreshing: (isRefreshing: boolean) => void,
-      expensesCtx: any,
+      expensesCtx: ExpenseContextType,
       tripid: string,
       uid: string,
-      tripCtx: any
+      tripCtx: TripContextType
     ) => {
       await fetchAndSetExpenses(
         showRefIndicator,

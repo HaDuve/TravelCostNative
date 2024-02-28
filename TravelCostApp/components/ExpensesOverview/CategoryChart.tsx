@@ -1,23 +1,13 @@
 import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 import { VictoryPie, VictoryTooltip } from "victory-native";
-import { GlobalStyles } from "../../constants/styles";
-import Animated, {
-  FadeInRight,
-  FadeOut,
-  FadeOutLeft,
-  ZoomIn,
-  ZoomInEasyUp,
-  ZoomInRight,
-  ZoomOut,
-  ZoomOutEasyUp,
-  ZoomOutLeft,
-} from "react-native-reanimated";
+import Animated, { FadeOut, ZoomIn } from "react-native-reanimated";
 import { getCatString } from "../../util/category";
 import PropTypes from "prop-types";
 import { useContext } from "react";
 import { TripContext } from "../../store/trip-context";
 import { getCurrencySymbol } from "../../util/currencySymbol";
+import { GlobalStyles } from "../../constants/styles";
 
 const CategoryChart = ({ inputData }) => {
   const tripCtx = useContext(TripContext);
@@ -51,7 +41,8 @@ const CategoryChart = ({ inputData }) => {
         labelPlacement="vertical"
         style={{
           data: {
-            fill: (d) => d.slice.data.color,
+            fill: (d) =>
+              d?.slice?.data?.color || GlobalStyles.colors.primary400,
           },
         }}
         labelComponent={
@@ -66,7 +57,6 @@ const CategoryChart = ({ inputData }) => {
           return `${getCatString(datum.x)} ${Number(datum.y).toFixed(
             2
           )} ${getCurrencySymbol(tripCurrency)}`;
-          // return `${datum.x[0].toUpperCase()}${datum.x.slice(1)}`;
         }}
       />
     </Animated.View>
@@ -88,6 +78,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginHorizontal: "25%",
     borderRadius: 9999,
-    // backgroundColor: GlobalStyles.colors,
   },
 });

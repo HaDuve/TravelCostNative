@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { StyleSheet, Modal, TextInput, View, Text } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import React from "react";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -11,7 +11,6 @@ import { GlobalStyles } from "../../constants/styles";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
-import LoadingOverlay from "../UI/LoadingOverlay";
 import * as Haptics from "expo-haptics";
 import PropTypes from "prop-types";
 import { getCurrencySymbol } from "../../util/currencySymbol";

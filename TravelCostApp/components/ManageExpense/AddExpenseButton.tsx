@@ -235,7 +235,7 @@ const AddExpenseButton = ({ navigation }) => {
         position.value = 0;
       }
     })
-    .onEnd((e) => {
+    .onEnd(() => {
       if (position.value > END_POSITION) {
         position.value = withTiming(END_POSITION * 5, { duration: 300 }, () => {
           runOnJS(setLongPressed)(false);

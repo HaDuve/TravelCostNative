@@ -31,13 +31,7 @@ import { MAX_PERIOD_RANGE, MIN_PERIOD_RANGE } from "../../confAppConstants";
 import { BlurView } from "expo-blur";
 import { TripContext } from "../../store/trip-context";
 
-const ExpensesOverview = ({
-  navigation,
-  expenses,
-  periodName,
-  dateTimeString,
-}) => {
-  // // console.log("rerender ExpensesOverview - 1");
+const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const tripCtx = useContext(TripContext);
   // const periodRangeNumber = useRef(7);
   // periodRangeNumber useState is used to rerender the component when the periodRangeNumber changes
@@ -279,7 +273,6 @@ ExpensesOverview.propTypes = {
   expenses: PropTypes.array.isRequired,
   periodName: PropTypes.string.isRequired,
   navigation: PropTypes.object.isRequired,
-  dateTimeString: PropTypes.string.isRequired,
 };
 
 const styles = StyleSheet.create({

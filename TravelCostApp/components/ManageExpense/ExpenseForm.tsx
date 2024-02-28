@@ -416,8 +416,9 @@ const ExpenseForm = ({
   }, [tripCtx.travellers, netCtx.strongConnection]);
 
   const IsSoloTraveller = currentTravellers?.length === 1;
-  const [currentTravellersAsItems, setCurrentTravellersAsItems] = useState(
-    travellerToDropdown(currentTravellers)
+  const currentTravellersAsItems = useCallback(
+    () => travellerToDropdown(currentTravellers),
+    [currentTravellers]
   );
 
   const [items, setItems] = useState(currentTravellersAsItems);

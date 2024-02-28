@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, Pressable, Alert, StyleSheet } from "react-native";
 import Purchases, { PurchasesPackage } from "react-native-purchases";
 import { ENTITLEMENT_ID } from "../Premium/PremiumConstants";
-import branch, { BranchEvent } from "react-native-branch";
+import { BranchEvent } from "react-native-branch";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -24,19 +24,14 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
   } = purchasePackage;
   const purchasePack: PurchasesPackage = purchasePackage;
   const discount = purchasePack?.product?.introPrice;
-  // // console.log("PackageItem ~ discount:", discount);
   const hasAFreeTrial = discount?.price === 0;
-  // console.log("PackageItem ~ hasAFreeTrial:", hasAFreeTrial);
   const freeNumberOfUnits = discount?.periodNumberOfUnits;
-  // // console.log("PackageItem ~ freeNumberOfUnits:", freeNumberOfUnits);
   const freeUnit = discount?.periodUnit;
-  // // console.log("PackageItem ~ freeUnit:", freeUnit);
   const freePeriodString =
     hasAFreeTrial &&
     `${freeNumberOfUnits} ${i18n.t(freeUnit?.toLowerCase())} ${i18n.t(
       "freeTrial"
     )}`;
-  // console.log("PackageItem ~ freePeriodString:", freePeriodString);
 
   const isMonthly = subscriptionPeriod === "P1M";
   const isYearly = subscriptionPeriod === "P1Y";
@@ -52,11 +47,8 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
   const onSelection = async () => {
     setIsPurchasing(true);
     try {
-      const { customerInfo, productIdentifier } =
-        await Purchases.purchasePackage(purchasePackage);
+      const { customerInfo } = await Purchases.purchasePackage(purchasePackage);
 
-      // console.log("onSelection ~ customerInfo:", customerInfo);
-      // console.log("onSelection ~ productIdentifier:", productIdentifier);
       if (
         typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined"
       ) {
@@ -83,10 +75,6 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
       setIsPurchasing(false);
     }
   };
-
-  const discountJSX = isYearly && (
-    <Discount discountPercentage={40} style={styles.discountStyle}></Discount>
-  );
 
   const isPopularLabel = isPopular && (
     <View

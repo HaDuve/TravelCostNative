@@ -64,7 +64,6 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
   // new changes button
   const hasNewChanges = userCtx.hasNewChanges;
   useEffect(() => {
-    // // console.log("rerender profileform");
     async function checkNewChanges() {
       if (!isConnected) return;
       const newestChangelog = await fetchChangelog();
@@ -133,67 +132,9 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
     });
   }, [userCtx.userName]);
 
-  function inputChangedHandler(inputIdentifier, enteredValue) {
-    setInputs((curInputs) => {
-      return {
-        ...curInputs,
-        [inputIdentifier]: { value: enteredValue, isValid: true },
-      };
-    });
-  }
-
-  async function submitHandler() {
-    const userData: UserData = { userName: "", locale: i18n.locale };
-    userData.userName = inputs.userName.value;
-
-    const invalid =
-      userData.userName?.length == 0 || userData.userName?.length > 20;
-
-    if (invalid) {
-      return;
-    }
-    await userCtx.addUserName(userData);
-    try {
-      await updateUser(authCtx.uid, userData);
-      if (!userCtx.freshlyCreated) {
-        return;
-      }
-    } catch (error) {
-      Alert.alert(i18n.t("profileError"));
-    }
-  }
-
-  function cancelHandler() {
-    setInputs((curInputs) => {
-      return {
-        ...curInputs,
-        ["userName"]: { value: userCtx.userName, isValid: true },
-      };
-    });
-    Keyboard.dismiss();
-  }
-
   function avatarHandler() {
     return;
   }
-
-  const changedName = inputs.userName.value !== userCtx.userName;
-  const changedNameButtons = (
-    <View style={styles.buttonContainer}>
-      <IconButton
-        icon={"close-outline"}
-        size={36}
-        color={GlobalStyles.colors.accent500}
-        onPress={cancelHandler}
-      />
-      <IconButton
-        icon={"checkmark"}
-        size={36}
-        color={GlobalStyles.colors.primary500}
-        onPress={submitHandler}
-      />
-    </View>
-  );
 
   function joinInviteHandler() {
     navigation.navigate("Join");

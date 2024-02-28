@@ -1,6 +1,7 @@
 import branch, { BranchEvent, BranchParams } from "react-native-branch";
 import { secureStoreGetItem } from "../../store/secure-storage";
 import Purchases from "react-native-purchases";
+import safeLogError from "../../util/error";
 
 export async function initBranch(navigation = null) {
   const storedUid = await secureStoreGetItem("uid");
@@ -20,18 +21,10 @@ export async function initBranch(navigation = null) {
       //   "will open " + uri + " cachedInitialEvent is " + cachedInitialEvent
       // );
     },
-    onOpenComplete: ({ error, params, uri }) => {
+    onOpenComplete: ({ error, params }) => {
+      // error, params, uri }) => {
       if (error) {
-        console.error(
-          "subscribe onOpenComplete, Error from opening uri: " +
-            uri +
-            " error: " +
-            error
-        );
-        // console.log(
-        //   "onOpenComplete",
-        //   "Error from opening uri: " + uri + " error: " + error
-        // );
+        safeLogError("Branch error", error);
         return;
       } else if (params) {
         if (!params["+clicked_branch_link"]) {
@@ -43,7 +36,7 @@ export async function initBranch(navigation = null) {
         } else {
           // Handle params
           const deepLinkPath = params.$deeplink_path as string;
-          const canonicalUrl = params.$canonical_url as string;
+          // const canonicalUrl = params.$canonical_url as string;
           // console.log("deepLinkPath", deepLinkPath);
           // console.log("canonicalUrl", canonicalUrl);
           // Route based on Branch link data
@@ -58,8 +51,7 @@ export async function initBranch(navigation = null) {
 
 export async function showBranchParams() {
   const latestParams: BranchParams = await branch.getLatestReferringParams(); // Params from last open
-  const installParams = await branch.getFirstReferringParams(); // Params from original install
-  // // console.log("showParams", latestParams, installParams);
+  // const installParams = await branch.getFirstReferringParams(); // Params from original install
   const campaign = latestParams["~campaign"];
   const channel = latestParams["~channel"];
   const feature = latestParams["~feature"];
@@ -111,11 +103,11 @@ export async function trackPurchaseEvent() {
       Custom_Event_Property_Key2: "Custom_Event_Property_val2",
     },
   };
-  const referrer = await branch.getLatestReferringParams();
-  let referrerString = "";
-  if (referrer) {
-    referrerString = referrer["~channel"];
-  }
+  // const referrer = await branch.getLatestReferringParams();
+  // let referrerString = "";
+  // if (referrer) {
+  //   referrerString = referrer["~channel"];
+  // }
   const event = new BranchEvent(BranchEvent.Purchase, [buo], params);
   event.logEvent();
   // console.log("event logged, refferrer:", referrerString);

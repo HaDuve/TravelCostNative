@@ -19,7 +19,6 @@ import { Card } from "react-native-paper";
 import { sleep } from "../../util/appState";
 import { NetworkContext } from "../../store/network-context";
 import { UserContext } from "../../store/user-context";
-import BackButton from "../UI/BackButton";
 import FlatButton from "../UI/FlatButton";
 import PropTypes from "prop-types";
 

@@ -3,7 +3,6 @@ import { countryToAlpha2 } from "country-to-iso";
 import CountryFlag from "react-native-country-flag";
 import PropTypes from "prop-types";
 import { View, StyleSheet } from "react-native";
-import { GlobalStyles } from "../../constants/styles";
 
 const ExpenseCountryFlag = ({ countryName, style, containerStyle }) => {
   if (!countryName) return <></>;

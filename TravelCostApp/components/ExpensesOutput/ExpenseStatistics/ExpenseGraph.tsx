@@ -10,7 +10,6 @@ import {
   toDayMonthString2,
   toMonthString,
 } from "../../../util/date";
-import { TripContext } from "../../../store/trip-context";
 import { formatExpenseWithCurrency } from "../../../util/string";
 import { GlobalStyles } from "../../../constants/styles";
 import ExpenseChart from "../../ExpensesOverview/ExpenseChart";

@@ -13,7 +13,7 @@ import * as Haptics from "expo-haptics";
 
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { TripContext } from "../../store/trip-context";
 import {
   formatExpenseWithCurrency,
@@ -21,6 +21,7 @@ import {
   truncateNumber,
 } from "../../util/string";
 import {
+  TravellerNames,
   fetchTrip,
   fetchTripName,
   getAllExpenses,
@@ -52,15 +53,32 @@ import { isForeground } from "../../util/appState";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { daysBetween } from "../../util/date";
 import set from "react-native-reanimated";
+import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
+import safeLogError from "../../util/error";
 
-function TripHistoryItem({ tripid, setRefreshing, trips }) {
+export type TripHistoryItem = {
+  tripid: string;
+  tripName: string;
+  totalBudget: string;
+  dailyBudget: string;
+  tripCurrency: string;
+  isDynamicDailyBudget: boolean;
+  startDate: string;
+  endDate: string;
+  travellers: TravellerNames[];
+  sumOfExpenses: number;
+  progress: number;
+  days: number;
+};
+
+function TripHistoryItem({ tripid, trips }) {
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const expenseCtx = useContext(ExpensesContext);
   const contextTrip = tripCtx.tripid == tripid;
   const netCtx = useContext(NetworkContext);
   // list of objects containing the userName key
-  const [travellers, setTravellers] = useState([]);
+  const [travellers, setTravellers] = useState<TravellerNames[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [tripName, setTripName] = useState("");
   const [totalBudget, setTotalBudget] = useState("");
@@ -71,6 +89,62 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const [allLoaded, setAllLoaded] = useState(false);
   const [isDynamicDailyBudget, setIsDynamicDailyBudget] = useState(false);
   const [days, setDays] = useState(0);
+
+  const storeTripHistoryItem = useCallback(
+    (tripid: string) => {
+      if (!tripid) return;
+      const trip: TripHistoryItem = {
+        tripid: tripid,
+        tripName: tripName,
+        totalBudget: totalBudget,
+        dailyBudget: dailyBudget,
+        tripCurrency: tripCurrency,
+        isDynamicDailyBudget: isDynamicDailyBudget,
+        startDate: tripCtx.startDate,
+        endDate: tripCtx.endDate,
+        travellers: travellers,
+        sumOfExpenses: sumOfExpenses,
+        progress: progress,
+        days: days,
+      };
+      setMMKVObject("tripHistoryItem" + `_${tripid}`, trip);
+    },
+    [
+      dailyBudget,
+      days,
+      isDynamicDailyBudget,
+      progress,
+      sumOfExpenses,
+      totalBudget,
+      travellers.length,
+      tripCtx.endDate,
+      tripCtx.startDate,
+      tripCurrency,
+      tripName,
+    ]
+  );
+
+  function loadTripHistoryItem(tripid: string) {
+    const trip: TripHistoryItem = getMMKVObject(
+      "tripHistoryItem" + `_${tripid}`
+    );
+    if (trip) {
+      setTripName(trip.tripName);
+      setTotalBudget(trip.totalBudget);
+      setDailyBudget(trip.dailyBudget);
+      setTripCurrency(trip.tripCurrency);
+      setIsDynamicDailyBudget(trip.isDynamicDailyBudget);
+      setSumOfExpenses(trip.sumOfExpenses);
+      setProgress(trip.progress);
+      setDays(trip.days);
+      const travellers = [];
+      trip.travellers?.forEach((traveller) => {
+        travellers.push(traveller);
+      });
+      if (travellers.length > 0) setTravellers(travellers);
+      setIsFetching(false);
+    }
+  }
 
   useEffect(() => {
     if (!days || !isDynamicDailyBudget) return;
@@ -91,7 +165,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
 
   useEffect(() => {
     if (tripid != tripCtx.tripid) return;
-    //calc expenses sum
+    // calc expenses sum
     const _expenses = expenseCtx.expenses;
     const _expensesSum = _expenses.reduce(
       (sum: number, expense: ExpenseData) => {
@@ -111,13 +185,15 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
 
   useEffect(() => {
     if (!tripid) {
-      // console.log("no tripid in tripITEM");
+      safeLogError("no tripid");
       return;
     }
+
+    // FUNCTION DEFINITIONS
+
     async function getTrip() {
       try {
         const trip = await fetchTrip(tripid);
-        // // console.log("getTrip ~ trip", trip);
         const _dailyBudget = trip.dailyBudget;
         const _totalBudget = trip.totalBudget ?? MAX_JS_NUMBER.toString();
         const _tripCurrency = trip.tripCurrency;
@@ -151,8 +227,7 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
     }
     async function getTripTravellers() {
       try {
-        const listTravellers = await getTravellers(tripid);
-        // console.log("getTripTravellers ~ listTravellers:", listTravellers);
+        const listTravellers: TravellerNames = await getTravellers(tripid);
         const objTravellers = [];
         listTravellers.forEach((traveller) => {
           objTravellers.push({ userName: traveller });
@@ -171,7 +246,13 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       }
     }
 
-    if (contextTrip) {
+    async function fetchAndSetTripData() {
+      await getTripName();
+      await getTrip();
+      await getTripTravellers();
+    }
+
+    function handleContextTrip() {
       const isDynamic = tripCtx.isDynamicDailyBudget;
       setIsDynamicDailyBudget(isDynamic);
       setTripName(tripCtx.tripName);
@@ -209,22 +290,19 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       if (objTravellers.length > 0) setTravellers(objTravellers);
 
       setIsFetching(false);
-      // console.log("useEffect context success! for:", tripName);
     }
 
-    async function fetchAndSetTripData() {
-      await getTripName();
-      await getTrip();
-      await getTripTravellers();
-    }
+    // START OF EFFECT
+
+    loadTripHistoryItem(tripid);
+    if (contextTrip) handleContextTrip();
     if (allLoaded || contextTrip) return;
     if (netCtx.isConnected && netCtx.strongConnection) {
       try {
         fetchAndSetTripData();
         setAllLoaded(true);
-        // console.log("useEffect fetch success! for:", tripName);
       } catch (error) {
-        // console.log("error while fetching TripData", error);
+        safeLogError(error);
       }
       setIsFetching(false);
     }
@@ -246,6 +324,10 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
     contextTrip,
     netCtx.strongConnection,
   ]);
+
+  useEffect(() => {
+    if (allLoaded) storeTripHistoryItem(tripid);
+  }, [allLoaded, storeTripHistoryItem, tripid]);
 
   const noTotalBudget =
     !totalBudget ||
@@ -272,7 +354,6 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
   const megaLongText =
     dailyBudgetString?.length + sumOfExpensesString?.length > 22;
   const isScaledUp = fontScale > 1 || megaLongText;
-  // // console.log("TripHistoryItem ~ isScaledUp:", isScaledUp);
 
   function tripPressHandler() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -280,8 +361,6 @@ function TripHistoryItem({ tripid, setRefreshing, trips }) {
       Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
       return;
     }
-    // NOTE: Android can only handle alert with 2 actions, so this needs to be changed or actions will go missing
-    // console.log("pressed: ", tripid);
     navigation.navigate("ManageTrip", { tripId: tripid, trips: trips });
   }
 

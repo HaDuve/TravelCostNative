@@ -33,7 +33,8 @@ import { RangeString } from "./expenses-context";
 import Purchases from "react-native-purchases";
 import safeLogError from "../util/error";
 import set from "react-native-reanimated";
-import { getMMKVObject } from "./mmkv";
+import { getMMKVObject, setMMKVObject } from "./mmkv";
+import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
 
 export interface UserData {
   uid?: string;
@@ -131,19 +132,25 @@ function UserContextProvider({ children }) {
   async function updateTripHistory() {
     const uid = await secureStoreGetItem("uid");
     // console.log("fetch ~ uid:", uid);
-    if (!uid) return;
+    if (!uid || DEBUG_FORCE_OFFLINE) return;
     try {
       const tripHistoryResponse = await fetchTripHistory(uid);
-      // console.log("fetch ~ tripHistoryResponse:", tripHistoryResponse);
       setTripHistory(tripHistoryResponse);
+      setMMKVObject("tripHistory", tripHistoryResponse);
     } catch (error) {
       safeLogError(error);
     }
   }
   useEffect(() => {
-    // Trip History fetch
-
-    updateTripHistory();
+    const storedHistory = getMMKVObject("tripHistory");
+    if (storedHistory !== null) {
+      setTripHistory(storedHistory);
+    }
+    // Trip History fetch async
+    async function asyncUpTripHistory() {
+      await updateTripHistory();
+    }
+    asyncUpTripHistory();
   }, []);
 
   async function checkPremium() {

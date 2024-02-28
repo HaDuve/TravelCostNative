@@ -236,24 +236,12 @@ const ProfileScreen = ({ navigation }) => {
   useEffect(() => {
     setTripHistory(userCtx.tripHistory);
     async function fetchHistory() {
-      // console.log("fetchHistory ~ fetchHistory:", fetchHistory);
       if (!userCtx.tripHistory || userCtx.tripHistory?.length < 1) {
-        const uid = await secureStoreGetItem("uid");
-        // console.log("fetch ~ uid:", uid);
-        if (!uid) return;
-        try {
-          // TODO: if failed fetch later
-          const tripHistoryResponse = await fetchTripHistory(uid);
-          // console.log("fetch ~ tripHistoryResponse:", tripHistoryResponse);
-          userCtx.setTripHistory(tripHistoryResponse);
-        } catch (error) {
-          safeLogError(error);
-        }
+        await userCtx.updateTripHistory();
       }
     }
-    // // console.log("useEffect ~ userCtx.tripHistory:", userCtx.tripHistory);
     fetchHistory();
-  }, [userCtx.tripHistory?.length, uid, tripCtx.tripid]);
+  }, [userCtx]);
 
   useInterval(
     () => {

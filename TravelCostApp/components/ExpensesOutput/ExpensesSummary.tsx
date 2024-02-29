@@ -40,6 +40,8 @@ const ExpensesSummary = ({
   const expCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
   const hideSpecial = settings.hideSpecialExpenses;
+  const [isToastShowing, setIsToastShowing] = useState(false);
+
   const [lastRate, setLastRate] = useState(1);
   const lastRateUnequal1 = lastRate !== 1;
   const getRateCallback = useCallback(async () => {
@@ -190,13 +192,24 @@ const ExpensesSummary = ({
     userCtx.lastCurrency
   )}`;
 
+  const valid =
+    tripCtx.tripid && tripCtx.travellers && tripCtx.travellers?.length > 0;
   const pressBudgetHandler = () => {
+    if (isToastShowing) {
+      setIsToastShowing(false);
+      Toast.hide();
+      return;
+    }
+    setIsToastShowing(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (infinityString) {
       Toast.show({
         type: "error",
         text1: i18n.t("noTotalBudget"),
         text2: i18n.t("infinityLeftToSpend"),
+        onHide() {
+          setIsToastShowing(false);
+        },
       });
       return;
     }
@@ -204,7 +217,11 @@ const ExpensesSummary = ({
     const tripCurrency = tripCtx.tripCurrency;
     const lastCurrency = userCtx.lastCurrency;
     // const lastRate = lastRate
-
+    if (!valid) {
+      Toast.hide();
+      setIsToastShowing(false);
+      return;
+    }
     Toast.show({
       // type: budgetNumber > expenseSumNum ? "success" : "error",
       type: "budgetOverview",
@@ -218,6 +235,9 @@ const ExpensesSummary = ({
           : `${overBudgetString}`,
       bottomOffset: 40,
       visibilityTime: 20000,
+      onHide: () => {
+        setIsToastShowing(false);
+      },
       props: {
         text3: `${formatExpenseWithCurrency(
           1,

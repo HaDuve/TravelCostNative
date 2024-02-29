@@ -7,7 +7,7 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { Dimensions, Platform, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Platform, View } from "react-native";
 import React from "react";
 import DatePicker from "react-native-neat-date-picker";
 import { GlobalStyles } from "../../constants/styles";
@@ -18,7 +18,7 @@ const DatePickerModal = ({
   onCancelRange,
   onConfirmRange,
 }) => {
-  const dateStringFormatLocale: DateStringOptions = getLocaleDateFormat();
+  const dateStringFormatLocale = getLocaleDateFormat();
   const android = Platform.OS === "android";
   const datepickerJSX = android ? (
     <View
@@ -85,5 +85,3 @@ const DatePickerModal = ({
 };
 
 export default DatePickerModal;
-
-const styles = StyleSheet.create({});

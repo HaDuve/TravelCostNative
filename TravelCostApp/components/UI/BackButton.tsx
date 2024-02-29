@@ -1,4 +1,4 @@
-import { Platform, StyleSheet } from "react-native";
+import { Platform } from "react-native";
 import React from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { GlobalStyles } from "../../constants/styles";
@@ -34,5 +34,3 @@ export default BackButton;
 BackButton.propTypes = {
   style: PropTypes.object,
 };
-
-const styles = StyleSheet.create({});

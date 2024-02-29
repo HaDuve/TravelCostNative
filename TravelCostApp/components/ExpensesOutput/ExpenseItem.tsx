@@ -243,11 +243,7 @@ function ExpenseItem(props): JSX.Element {
 
   if (!id) return <></>;
   return (
-    <View
-      // entering={FadeInRight}
-      // exiting={FadeOutLeft}
-      style={[{ height: 55 }, hideSpecial && { opacity: 0.75 }]}
-    >
+    <View style={[{ height: 55 }, hideSpecial && { opacity: 0.75 }]}>
       <Pressable
         onPress={navigateToExpense}
         onLongPress={() => {

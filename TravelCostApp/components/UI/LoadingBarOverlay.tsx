@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { GlobalStyles } from "../../constants/styles";
 
 //localization
@@ -9,7 +9,6 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 import PropTypes from "prop-types";
-import Animated, { Easing, EasingNode } from "react-native-reanimated";
 import * as Progress from "react-native-progress";
 import LoadingOverlay from "./LoadingOverlay";
 const i18n = new I18n({ en, de, fr, ru });

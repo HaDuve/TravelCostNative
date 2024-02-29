@@ -27,7 +27,7 @@ export const MAX_JS_NUMBER = 3435973836;
 // tweak loading splash screen overlay delay
 export const SPLASH_SCREEN_DELAY = 1500;
 // tweak loading recent expenses overlay timeout
-export const EXPENSES_LOAD_TIMEOUT = 2000;
+export const EXPENSES_LOAD_TIMEOUT = 1000;
 // cache: only call the exchange getRate request again after X numbers of hours
 // TODO: Make it so that Premium Users request more often
 export const CACHE_NUM_HOURS = 48;

@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 
 //Localization

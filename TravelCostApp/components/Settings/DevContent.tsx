@@ -17,14 +17,10 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import Button from "../UI/Button";
-import { importExcelFile } from "../ImportExport/OpenXLSXPicker";
 import { AuthContext } from "../../store/auth-context";
-import { UserContext } from "../../store/user-context";
 import { TripContext } from "../../store/trip-context";
 import { NetworkContext } from "../../store/network-context";
 import { GlobalStyles } from "../../constants/styles";
-import { exportAllExpensesToXLSX } from "../ImportExport/ExportToGoogleXlsx";
-import { ExpensesContext } from "../../store/expenses-context";
 import {
   initBranch,
   showBranchParams,
@@ -38,10 +34,8 @@ import { showBanner } from "../UI/ToastComponent";
 
 const DevContent = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
-  const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
-  const expensesCtx = useContext(ExpensesContext);
   const isConnected = netCtx.isConnected && netCtx.strongConnection;
   const [latestVersion, setLatestVersion] = useState("");
   const [currentVersion, setCurrentVersion] = useState("");
@@ -56,10 +50,6 @@ const DevContent = ({ navigation }) => {
     () => {
       async function asyncGetOfflineQueue() {
         const queue = await getOfflineQueue();
-        // console.log("getOfflineQueue ~ queue:", queue?.length);
-        queue.forEach((Item) => {
-          // console.log(Item.type, Item.expense.expenseData?.description);
-        });
         setOfflineQueue(queue ?? []);
       }
       asyncGetOfflineQueue();
@@ -226,39 +216,6 @@ const DevContent = ({ navigation }) => {
         style={styles.settingsButton}
       >
         UnsettleAllSplits
-      </Button>
-      <Button
-        onPress={importExcelFile.bind(
-          this,
-          authCtx.uid,
-          tripCtx.tripid,
-          userCtx.userName,
-          expensesCtx.addExpense
-        )}
-        style={styles.settingsButton}
-      >
-        {/* aus der Excel .xlsm */}
-        Import GehMalReisen
-      </Button>
-      <Button
-        onPress={navigation.navigate.bind(this, "ImportGS", {
-          uid: authCtx.uid,
-          tripid: tripCtx.tripid,
-          userName: userCtx.userName,
-          addExpense: expensesCtx.addExpense,
-        })}
-        style={styles.settingsButton}
-      >
-        {/* aus der heruntergeladenen GoogleSheets als Xlsx */}
-        Import FoodForNomads
-      </Button>
-      <Button
-        onPress={exportAllExpensesToXLSX.bind(this, expensesCtx.expenses)}
-        style={styles.settingsButton}
-      >
-        {/* in die heruntergeladene GoogleSheets als Xlsx */}
-        {/* danach muss zurueck konvertiert werden  */}
-        Export FoodForNomads
       </Button>
     </View>
   );

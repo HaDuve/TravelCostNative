@@ -1,14 +1,21 @@
 import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import React from "react";
 import PropTypes from "prop-types";
-import { LinearGradient } from "expo-linear-gradient";
 import { GlobalStyles } from "../../constants/styles";
 
 const SettingsSwitch = ({ style, toggleState, state, label }) => {
   return (
     <Pressable onPress={() => toggleState()} style={[styles.container, style]}>
       <View style={{ flex: 1 }}>
-        <Text style={GlobalStyles.secondaryText}>{label}</Text>
+        <Text
+          style={{
+            fontSize: 14,
+            color: "#626262",
+            fontWeight: "300",
+          }}
+        >
+          {label}
+        </Text>
       </View>
       <Switch
         trackColor={{

@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View, Pressable, Alert } from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 import React from "react";
 import { GlobalStyles } from "../../constants/styles";
-import { toShortFormat, getFormattedDate } from "../../util/date";
+import { toShortFormat } from "../../util/date";
 import IconButton from "./IconButton";
 import PropTypes from "prop-types";
 

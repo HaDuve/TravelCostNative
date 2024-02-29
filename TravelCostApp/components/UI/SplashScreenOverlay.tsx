@@ -1,32 +1,10 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  ImageBackground,
-  Image,
-  StatusBar,
-  ActivityIndicator,
-} from "react-native";
+import { ImageBackground, ActivityIndicator } from "react-native";
 import { reloadApp } from "../../util/appState";
-// TODO: find out why other activity indicators dont animate?
-// import { ActivityIndicator } from "react-native-paper";
-// import * as Progress from "react-native-progress";
-
 import React from "react";
 import { GlobalStyles } from "../../constants/styles";
 import Animated, {
-  FadeIn,
   FadeOutDown,
-  FadeOutLeft,
-  SlideInDown,
-  SlideInRight,
-  SlideInUp,
-  SlideOutDown,
-  SlideOutLeft,
-  ZoomIn,
   ZoomInDown,
-  ZoomInUp,
-  ZoomOut,
   ZoomOutDown,
 } from "react-native-reanimated";
 import { SPLASH_SCREEN_DELAY } from "../../confAppConstants";
@@ -36,14 +14,10 @@ import IconButton from "./IconButton";
 
 const loadingColor = GlobalStyles.colors.backgroundColor;
 const delay = SPLASH_SCREEN_DELAY;
-const SplashScreenOverlay = (containerStyle) => {
+const SplashScreenOverlay = () => {
   return (
     <>
-      {/* <StatusBar hidden /> */}
       <Animated.View
-        // entering={ZoomIn.duration(400)}
-        // exiting={SlideOutLeft.duration(800).delay(3500)}
-        // exiting={SlideOutDown.duration(1600).delay(3500)}
         exiting={FadeOutDown.duration(800).delay(delay + 500)}
         style={{
           flex: 1,
@@ -66,7 +40,6 @@ const SplashScreenOverlay = (containerStyle) => {
             }}
           >
             <ActivityIndicator size={"large"} color={loadingColor} />
-            {/* <Progress.CircleSnail color={["red", "green", "blue"]} /> */}
           </Animated.View>
           <Animated.View
             entering={ZoomInDown.duration(1200).delay(3500)}
@@ -98,5 +71,3 @@ const SplashScreenOverlay = (containerStyle) => {
 };
 
 export default SplashScreenOverlay;
-
-const styles = StyleSheet.create({});

@@ -9,7 +9,8 @@ export async function initBranch(navigation = null) {
   await showBranchParams();
   // Listener
   branch.subscribe({
-    onOpenStart: ({ uri, cachedInitialEvent }) => {
+    onOpenStart: () => {
+      //{ uri, cachedInitialEvent }) => {
       // console.log(
       //   "subscribe onOpenStart, will open " +
       //     uri +

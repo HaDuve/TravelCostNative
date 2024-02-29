@@ -2,7 +2,6 @@ import { StyleSheet, Text, View, Pressable, Platform } from "react-native";
 import React from "react";
 import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";
-import BackgroundGradient from "./BackgroundGradient";
 import { LinearGradient } from "expo-linear-gradient";
 import PropTypes from "prop-types";
 

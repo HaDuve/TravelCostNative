@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react";
 import { View, StyleSheet } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //Localization
 import * as Localization from "expo-localization";

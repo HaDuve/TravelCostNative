@@ -1,12 +1,12 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/react-in-jsx-scope */
 import { useState, useContext, useEffect } from "react";
-import { View, Text, Alert, Keyboard, Pressable } from "react-native";
+import { View, Text, Alert, Pressable } from "react-native";
 import React, { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
-import { UserContext, UserData } from "../../store/user-context";
-import { fetchChangelog, updateUser } from "../../util/http";
+import { UserContext } from "../../store/user-context";
+import { fetchChangelog } from "../../util/http";
 
 import IconButton from "../UI/IconButton";
 import { TripContext } from "../../store/trip-context";

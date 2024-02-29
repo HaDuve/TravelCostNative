@@ -54,7 +54,6 @@ import {
   asyncStoreSafeClear,
 } from "./store/async-storage";
 import LoadingOverlay from "./components/UI/LoadingOverlay";
-import ImportGSScreen from "./screens/ImportGSScreen";
 import FilteredExpenses from "./screens/FilteredExpenses";
 import { sendOfflineQueue } from "./util/offline-queue";
 import { BranchEvent } from "react-native-branch";
@@ -107,6 +106,7 @@ import { ExpenseData } from "./util/expense";
 import BackgroundFetchScreen, {
   registerBackgroundFetchAsync,
 } from "./taskmanager/backgroundTasks";
+import safeLogError from "./util/error";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -247,14 +247,6 @@ function AuthenticatedStack() {
           <Stack.Screen
             name="TripSummary"
             component={TripSummaryScreen}
-            options={{
-              headerShown: false,
-              presentation: "modal",
-            }}
-          />
-          <Stack.Screen
-            name="ImportGS"
-            component={ImportGSScreen}
             options={{
               headerShown: false,
               presentation: "modal",
@@ -680,21 +672,16 @@ function Root() {
             apiKey: REVCAT_A,
             appUserID: storedUid,
           });
-          // console.log("onRootMount ~ storedUid:", storedUid);
         }
         await Purchases.collectDeviceIdentifiers();
         const event = new BranchEvent(BranchEvent.Login);
         await event.logEvent();
         const needsTour = await loadTourConfig();
-        // console.log("onRootMount ~ needsTour:", needsTour);
         userCtx.setNeedsTour(needsTour);
 
-        //// START OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
         // check if user is online
         if (!online) {
-          // console.log("OFFLINE SETUP STARTED");
           await setupOfflineMount(true, storedToken);
-          // console.log("OFFLINE SETUP FINISHED");
           setAppIsReady(true);
           return;
         }
@@ -702,7 +689,6 @@ function Root() {
         // set tripId in context
         let tripData;
         if (storedTripId) {
-          // // console.log("onRootMount ~ storedTripId", storedTripId);
           tripData = await tripCtx.fetchAndSetCurrentTrip(storedTripId);
           await tripCtx.fetchAndSetTravellers(storedTripId);
           tripCtx.setTripid(storedTripId);
@@ -719,14 +705,11 @@ function Root() {
           return;
         }
 
-        // check if user was only freshly created
         if (freshlyCreated) {
           await userCtx.setFreshlyCreatedTo(freshlyCreated);
         }
         // check if user was deleted
         const checkUser = await fetchUser(storedUid);
-        // console.log("onRootMount ~ checkUser:", checkUser);
-        // Check if the user logged in but there is no userName, we deleted the account
         if (!checkUser.userName) {
           Toast.show({
             type: "error",
@@ -741,14 +724,10 @@ function Root() {
         if (checkUser.userName && !checkUser.currentTrip) {
           await userCtx.setFreshlyCreatedTo(true);
         }
-        // TODO: fix status when user disconnedcted while freshlyCreated=true
-        //// END OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
-
         // setup context
         await authCtx.setUserID(storedUid);
         await onlineSetup(tripData, checkUser, storedTripId, storedUid);
         await authCtx.authenticate(storedToken);
-        // console.log("Root end reached");
         setAppIsReady(true);
       } else {
         tripCtx.setIsLoading(false);
@@ -759,13 +738,13 @@ function Root() {
       setAppIsReady(true);
     }
     const test_onRootMount = dataResponseTime(onRootMount);
-    // const test_onRootMount = onRootMount;
 
     try {
       test_onRootMount();
     } catch (error) {
-      console.error("onRootMount ~ error", error);
+      safeLogError(error);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

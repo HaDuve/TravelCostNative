@@ -198,35 +198,15 @@ const toastConfig: ToastConfig = {
     </TouchableOpacity>
   ),
   budgetOverview: (props) => {
-    const text3 = props.props.text3;
     const travellerList = props.props.travellerList;
     const travellerBudgets = props.props.travellerBudgets;
     const travellerSplitExpenseSums = props.props.travellerSplitExpenseSums;
     const currency = props.props.currency;
     const noTotalBudget = props.props.noTotalBudget;
     const periodName = props.props.periodName;
-    const periodLabel = props.props.periodLabel;
-    const budgetNumber = props.props.budgetNumber;
-    const periodBudgetString = props.props.periodBudgetString;
-    const lastRateUnequal1 = props.props.lastRateUnequal1;
 
     const hasMultipleTravellers = travellerList && travellerList.length > 1;
 
-    const currencyJSX = (
-      <>
-        {lastRateUnequal1 && (
-          <View>
-            <Text style={styles.overviewTextTitle}>
-              {i18n.t("currencyLabel")}
-            </Text>
-            <Text style={styles.overviewTextInfo}>{text3}</Text>
-            <Text style={styles.overviewTextInfo}>{props.text1}</Text>
-            <Text style={styles.overviewTextInfo}>{periodBudgetString}</Text>
-          </View>
-        )}
-        <Text style={styles.overviewTextInfo}>{props.text2}</Text>
-      </>
-    );
     return (
       <View
         style={[styles.budgetOverviewContainer, GlobalStyles.wideStrongShadow]}
@@ -292,7 +272,7 @@ const toastConfig: ToastConfig = {
                       borderWidth={0}
                       progress={budgetProgress}
                       width={180}
-                      height={16}
+                      height={20}
                       borderRadius={8}
                     ></Progress.Bar>
                   </View>
@@ -401,7 +381,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   overViewTextTravellerSum: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "500",
     color: GlobalStyles.colors.gray300,
     textAlign: "left",

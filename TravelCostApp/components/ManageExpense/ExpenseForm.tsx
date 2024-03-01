@@ -215,11 +215,13 @@ const ExpenseForm = ({
       setLoadingTravellers(false);
     }
     asyncSetTravellers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     // setlistequal with tripcontext.travellers
     if (tripCtx.travellers) setListEQUAL(tripCtx.travellers);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripCtx.travellers?.length]);
 
   // datepicker states
@@ -442,6 +444,7 @@ const ExpenseForm = ({
   );
   useEffect(() => {
     setSplitItemsEQUAL(currentTravellersAsItems);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTravellersAsItems?.length]);
   const [openEQUAL, setOpenEQUAL] = useState(false);
   const [splitTravellersList, setListEQUAL] = useState(
@@ -483,6 +486,7 @@ const ExpenseForm = ({
         (expense) =>
           expense.date > DateTime.now().minus({ days: 500 }).toJSDate()
       ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [expCtx.expenses?.length]
   );
   // extract suggestions from all the descriptions of expense state into an array of strings
@@ -552,9 +556,10 @@ const ExpenseForm = ({
     setOpenEQUAL(true);
   }
 
-  function inputSplitListHandler(index, props, value) {
+  function inputSplitListHandler(index, props: { userName: string }, value) {
     if (splitType === "EQUAL") return;
     const tempList = [...splitList];
+    // eslint-disable-next-line react/prop-types
     const tempValue = { amount: value, userName: props.userName };
     tempList[index] = tempValue;
     setSplitList(tempList);

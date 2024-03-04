@@ -137,6 +137,57 @@ function TripHistoryItem({ tripid, trips }) {
     }
   }
 
+  const handleContextTrip = useCallback(() => {
+    const isDynamic = tripCtx.isDynamicDailyBudget;
+    setIsDynamicDailyBudget(isDynamic);
+    setTripName(tripCtx.tripName);
+    setTotalBudget(tripCtx.totalBudget);
+
+    setTripCurrency(tripCtx.tripCurrency);
+    const _expenses = expenseCtx.expenses;
+    const sumOfExpenses = _expenses.reduce((acc, expense: ExpenseData) => {
+      if (isNaN(Number(expense.calcAmount))) return acc;
+      return acc + Number(expense.calcAmount);
+    }, 0);
+    const newProgress = sumOfExpenses / Number(tripCtx.totalBudget);
+    if (isNaN(newProgress) || newProgress > 1) {
+      setProgress(1);
+    } else {
+      setProgress(newProgress);
+    }
+    const days = daysBetween(
+      new Date(tripCtx.endDate),
+      new Date(tripCtx.startDate)
+    );
+    setDays(days);
+    setSumOfExpenses(sumOfExpenses);
+    const dynamicDailyBudget = (
+      (+tripCtx.totalBudget - sumOfExpenses) /
+      days
+    ).toFixed(2);
+    // dont allow negative daily budget
+    if (isDynamic && Number(dynamicDailyBudget) < 0) setDailyBudget("0.01");
+    else setDailyBudget(isDynamic ? dynamicDailyBudget : tripCtx.dailyBudget);
+    const objTravellers = [];
+    tripCtx.travellers.forEach((traveller) => {
+      objTravellers.push({ userName: traveller });
+    });
+    if (objTravellers.length > 0) setTravellers(objTravellers);
+
+    setIsFetching(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    expenseCtx.expenses.length,
+    tripCtx.dailyBudget,
+    tripCtx.endDate,
+    tripCtx.isDynamicDailyBudget,
+    tripCtx.startDate,
+    tripCtx.totalBudget,
+    tripCtx.travellers,
+    tripCtx.tripCurrency,
+    tripCtx.tripName,
+  ]);
+
   useEffect(() => {
     if (!days || !isDynamicDailyBudget) return;
     let calcDynamicBudget = (Number(totalBudget) - sumOfExpenses) / days;
@@ -144,6 +195,7 @@ function TripHistoryItem({ tripid, trips }) {
       calcDynamicBudget = 0.01;
     setDailyBudget(calcDynamicBudget.toFixed(2));
     if (contextTrip) tripCtx.setdailyBudget(calcDynamicBudget.toFixed(2));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     sumOfExpenses,
     totalBudget,
@@ -172,6 +224,7 @@ function TripHistoryItem({ tripid, trips }) {
       setProgress(newProgress);
     }
     setSumOfExpenses(_expensesSum);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expenseCtx.expenses.length, tripCtx.tripid, tripCtx.totalBudget, tripid]);
 
   useEffect(() => {
@@ -241,45 +294,7 @@ function TripHistoryItem({ tripid, trips }) {
       await getTripName();
       await getTrip();
       await getTripTravellers();
-    }
-
-    function handleContextTrip() {
-      const isDynamic = tripCtx.isDynamicDailyBudget;
-      setIsDynamicDailyBudget(isDynamic);
-      setTripName(tripCtx.tripName);
-      setTotalBudget(tripCtx.totalBudget);
-
-      setTripCurrency(tripCtx.tripCurrency);
-      const _expenses = expenseCtx.expenses;
-      const sumOfExpenses = _expenses.reduce((acc, expense: ExpenseData) => {
-        if (isNaN(Number(expense.calcAmount))) return acc;
-        return acc + Number(expense.calcAmount);
-      }, 0);
-      const newProgress = sumOfExpenses / Number(tripCtx.totalBudget);
-      if (isNaN(newProgress) || newProgress > 1) {
-        setProgress(1);
-      } else {
-        setProgress(newProgress);
-      }
-      const days = daysBetween(
-        new Date(tripCtx.endDate),
-        new Date(tripCtx.startDate)
-      );
-      setDays(days);
-      setSumOfExpenses(sumOfExpenses);
-      const dynamicDailyBudget = (
-        (+tripCtx.totalBudget - sumOfExpenses) /
-        days
-      ).toFixed(2);
-      // dont allow negative daily budget
-      if (isDynamic && Number(dynamicDailyBudget) < 0) setDailyBudget("0.01");
-      else setDailyBudget(isDynamic ? dynamicDailyBudget : tripCtx.dailyBudget);
-      const objTravellers = [];
-      tripCtx.travellers.forEach((traveller) => {
-        objTravellers.push({ userName: traveller });
-      });
-      if (objTravellers.length > 0) setTravellers(objTravellers);
-
+      setAllLoaded(true);
       setIsFetching(false);
     }
 
@@ -287,34 +302,18 @@ function TripHistoryItem({ tripid, trips }) {
 
     loadTripHistoryItem(tripid);
     if (contextTrip) handleContextTrip();
-    if (allLoaded || contextTrip) return;
-    if (netCtx.isConnected && netCtx.strongConnection) {
+    if (allLoaded || contextTrip) {
+      setIsFetching(false);
+      return;
+    }
+    if (netCtx.isConnected) {
       try {
         fetchAndSetTripData();
-        setAllLoaded(true);
       } catch (error) {
         safeLogError(error);
       }
-      setIsFetching(false);
     }
-  }, [
-    tripid,
-    tripName,
-    expenseCtx.expenses.length,
-    netCtx.isConnected,
-    tripCtx.tripid,
-    tripCtx.travellers.length,
-    tripCtx.tripName,
-    tripCtx.totalBudget,
-    tripCtx.dailyBudget,
-    tripCtx.tripCurrency,
-    tripCtx.isDynamicDailyBudget,
-    tripCtx.startDate,
-    tripCtx.endDate,
-    allLoaded,
-    contextTrip,
-    netCtx.strongConnection,
-  ]);
+  }, [allLoaded, contextTrip, handleContextTrip, netCtx.isConnected, tripid]);
 
   useEffect(() => {
     if (allLoaded) storeTripHistoryItem(tripid);

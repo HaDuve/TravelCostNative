@@ -43,8 +43,13 @@ import { NetworkContext } from "../../store/network-context";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
 import { ExpenseData } from "../../util/expense";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
-import { daysBetween } from "../../util/date";
-import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
+import { daysBetween, isToday } from "../../util/date";
+import {
+  getMMKVObject,
+  getMMKVString,
+  setMMKVObject,
+  setMMKVString,
+} from "../../store/mmkv";
 import safeLogError from "../../util/error";
 
 export type TripHistoryItem = {
@@ -241,7 +246,29 @@ function TripHistoryItem({ tripid, trips }) {
         const _dailyBudget = trip.dailyBudget;
         const _totalBudget = trip.totalBudget ?? MAX_JS_NUMBER.toString();
         const _tripCurrency = trip.tripCurrency;
-        const _expenses = await getAllExpenses(tripid);
+        const lastCacheUpdate = getMMKVString(
+          "lastUpdateISO_allExpenses_tripid" + trip.tripid
+        );
+        const lastUpdateWasToday =
+          lastCacheUpdate && isToday(new Date(lastCacheUpdate));
+        const cachedExpenses = getMMKVObject(
+          "lastUpdate_allExpenses_tripid_" + trip.tripid
+        );
+        const _expenses =
+          lastUpdateWasToday && cachedExpenses
+            ? cachedExpenses
+            : await getAllExpenses(trip.tripid);
+        if (!lastUpdateWasToday) {
+          // update cache
+          setMMKVString(
+            "lastUpdateISO_allExpenses_tripid" + trip.tripid,
+            new Date().toISOString()
+          );
+          setMMKVObject(
+            "lastUpdate_allExpenses_tripid_" + trip.tripid,
+            _expenses
+          );
+        }
         const sumOfExpenses = _expenses.reduce((acc, expense: ExpenseData) => {
           if (isNaN(Number(expense.calcAmount))) return acc;
           return acc + Number(expense.calcAmount);

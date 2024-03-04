@@ -9,8 +9,14 @@ import {
 } from "../store/async-storage";
 import { secureStoreGetItem } from "../store/secure-storage";
 import safeLogError from "./error";
+import {
+  getMMKVObject,
+  getMMKVString,
+  setMMKVObject,
+  setMMKVString,
+} from "../store/mmkv";
 
-export async function getRate(base: string, target: string) {
+export async function getRate(base: string, target: string): Promise<number> {
   const response = await getRateAPI1(base, target);
   // console.log("getRate ~ initialresponse:", response);
   if (typeof response === "number" && response === -1) {
@@ -54,11 +60,13 @@ export async function getRateAPI2(base: string, target: string) {
   try {
     const response = await axios.get(requestURL);
     const rate = response?.data?.data?.[target]?.value;
+    console.log("getRateAPI2 ~ rate:", rate);
     if (!rate) throw new Error("No rate found");
     // console.log("getRateAPI2 ~ rate:", rate);
     const timeStamp = DateTime.now().toISO();
     await asyncStoreSetItem("currencyExchangeAPI2_update", timeStamp);
     await asyncStoreSetItem("currencyExchangeAPI2_" + base + target, rate);
+    console.log("got a new rate of " + rate + " for " + base + " " + target);
     return rate;
   } catch (error) {
     safeLogError(error);
@@ -70,7 +78,7 @@ export async function getRateAPI1(base: string, target: string) {
   if (base === target) {
     return 1;
   }
-  const lastUpdate = await asyncStoreGetObject("currencyExchange_lastUpdate");
+  const lastUpdate = getMMKVString("currencyExchange_lastUpdate");
   if (lastUpdate) {
     const lastUpdateDateTime = DateTime.fromISO(lastUpdate);
     const now = DateTime.now();
@@ -92,13 +100,14 @@ export async function getRateAPI1(base: string, target: string) {
   try {
     const response = await axios.get(requestURL);
     const rates = response.data.rates;
+    console.log("getRateAPI1 ~ rates:", rates);
     if (response) {
       if (DEBUG_FORCE_OFFLINE) {
         return getOfflineRate(base, target);
       }
-      await asyncStoreSetObject("currencyExchange_base_" + base, rates);
+      setMMKVObject("currencyExchange_base_" + base, rates);
       const timeStamp = DateTime.now().toISO();
-      await asyncStoreSetObject("currencyExchange_lastUpdate", timeStamp);
+      setMMKVString("currencyExchange_lastUpdate", timeStamp);
     } else {
       return getOfflineRate(base, target);
     }
@@ -108,11 +117,9 @@ export async function getRateAPI1(base: string, target: string) {
   }
 }
 
-export async function getOfflineRate(base: string, target: string) {
+export function getOfflineRate(base: string, target: string) {
   // offline get from asyncstore
-  const currencyExchange = await asyncStoreGetObject(
-    "currencyExchange_base_" + base
-  );
+  const currencyExchange = getMMKVObject("currencyExchange_base_" + base);
   if (currencyExchange) {
     return currencyExchange[target];
   } else {

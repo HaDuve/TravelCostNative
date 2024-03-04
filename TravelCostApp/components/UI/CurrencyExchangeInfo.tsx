@@ -15,9 +15,9 @@ import { getRate } from "../../util/currencyExchange";
 import { TripContext } from "../../store/trip-context";
 import { UserContext } from "../../store/user-context";
 import { NetworkContext } from "../../store/network-context";
-import { asyncStoreGetObject } from "../../store/async-storage";
 import { GlobalStyles } from "../../constants/styles";
 import { formatExpenseWithCurrency } from "../../util/string";
+import { getMMKVString } from "../../store/mmkv";
 
 const CurrencyExchangeInfo = () => {
   const [currentRate, setCurrentRate] = useState(1);
@@ -35,7 +35,7 @@ const CurrencyExchangeInfo = () => {
     getCurrentRate();
   }, [isConnected, tripCtx.tripCurrency, userCtx.lastCurrency]);
   async function getLastUpdateTime() {
-    const lastUpdate = await asyncStoreGetObject("currencyExchange_lastUpdate");
+    const lastUpdate = getMMKVString("currencyExchange_lastUpdate");
     // return as a formatted date with hour time
     if (lastUpdate) {
       const date = new Date(lastUpdate);

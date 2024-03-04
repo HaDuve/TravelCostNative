@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
   StyleSheet,
   Text,
@@ -12,15 +13,22 @@ import { fetchTripName, fetchTrip, getAllExpenses } from "../util/http";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { Checkbox } from "react-native-paper";
 import GradientButton from "../components/UI/GradientButton";
-import { daysBetween } from "../util/date";
-import { set } from "react-native-reanimated";
+import { daysBetween, isToday } from "../util/date";
 import { GlobalStyles } from "../constants/styles";
-import BackButton from "../components/UI/BackButton";
 import FlatButton from "../components/UI/FlatButton";
-import { ExpenseData, Split } from "../util/expense";
+import { ExpenseData, Split, getExpensesSum } from "../util/expense";
 import { formatExpenseWithCurrency } from "../util/string";
-import { Traveller } from "../util/traveler";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
+import PropTypes from "prop-types";
+import { TripContext } from "../store/trip-context";
+import { ExpensesContext } from "../store/expenses-context";
+import { getRate } from "../util/currencyExchange";
+import safeLogError from "../util/error";
+import {
+  getMMKVObject,
+  getMMKVString,
+  setMMKVObject,
+  setMMKVString,
+} from "../store/mmkv";
 
 export type TripAsObject = {
   tripid: string;
@@ -42,8 +50,8 @@ export type TripsSummary = {
 
 const TripSummaryScreen = ({ navigation }) => {
   const userCtx = useContext(UserContext);
-  // console.log("TripSummaryScreen");
-  // console.log("userCtx.tripHistory:", userCtx.tripHistory);
+  const tripCtx = useContext(TripContext);
+  const expCtx = useContext(ExpensesContext);
   const [isFetching, setIsFetching] = useState(false);
   const [allTrips, setAllTrips] = useState<TripAsObject[]>([]);
   const [tripSummary, setTripSummary] = useState<TripsSummary>(null);
@@ -51,11 +59,20 @@ const TripSummaryScreen = ({ navigation }) => {
     tripSummary?.numberOfTrips && tripSummary.numberOfTrips > 1
       ? "Trips"
       : "Trip";
-
+  const numberOfDaysIsANumber =
+    tripSummary?.numberOfDays && !isNaN(tripSummary.numberOfDays);
   useEffect(() => {
     async function asyncSetAllTrips() {
       if (!userCtx.tripHistory) return;
       const allTripsAsObjects: TripAsObject[] = [];
+      const lastUpdate = getMMKVString("allTripsAsObject_CacheISODate");
+      // check if lastUpdate is a iso string today
+      const lastUpdateWasToday = lastUpdate && isToday(new Date(lastUpdate));
+      if (lastUpdateWasToday) {
+        const allTrips = getMMKVObject("allTripsAsObject");
+        setAllTrips(allTrips);
+        return;
+      }
 
       setIsFetching(true);
       for (let i = 0; i < userCtx.tripHistory.length; i++) {
@@ -68,16 +85,20 @@ const TripSummaryScreen = ({ navigation }) => {
         });
       }
       setAllTrips(allTripsAsObjects);
+      setMMKVObject("allTripsAsObject", allTripsAsObjects);
+      const allTripsISODate = new Date().toISOString();
+      setMMKVString("allTripsAsObject_CacheISODate", allTripsISODate);
       setIsFetching(false);
     }
     asyncSetAllTrips();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userCtx.tripHistory?.length]);
 
   const summarizeHandler = async () => {
     setIsFetching(true);
+
     // get a summary of all selected trips
     const selectedTrips = allTrips.filter((trip) => trip.selected);
-    // console.log("selectedTrips:", selectedTrips);
     // gather all the data for tripssummary
     const numberOfTrips = selectedTrips?.length;
     let totalCost = 0;
@@ -88,8 +109,11 @@ const TripSummaryScreen = ({ navigation }) => {
     let travelDays = 0;
     for (let i = 0; i < selectedTrips?.length; i++) {
       const trip = selectedTrips[i];
+      const isContextTrip = trip.tripid === tripCtx.tripid;
 
-      const tripData = await fetchTrip(trip.tripid);
+      const tripData = isContextTrip
+        ? tripCtx.getcurrentTrip()
+        : await fetchTrip(trip.tripid);
       if (!tripData) continue;
       if (currency !== "" && currency !== tripData.tripCurrency) {
         // we are having diffenrent currencies that we cannot compare yet
@@ -100,49 +124,78 @@ const TripSummaryScreen = ({ navigation }) => {
       }
       currency = tripData.tripCurrency;
 
-      // console log all keys from tripdata
-      for (const key in tripData) {
-        // console.log("summarizeHandler ~ key:", key);
+      const lastUpdate = getMMKVString(
+        "lastUpdateISO_allExpenses_tripid" + trip.tripid
+      );
+      const lastUpdateWasToday = lastUpdate && isToday(new Date(lastUpdate));
+      const cachedExpenses = getMMKVObject("allExpenses_tripid_" + trip.tripid);
+
+      const expenses = isContextTrip
+        ? expCtx.expenses
+        : lastUpdateWasToday && cachedExpenses
+        ? cachedExpenses
+        : await getAllExpenses(trip.tripid);
+
+      if (!lastUpdateWasToday) {
+        // update cache
+        setMMKVString(
+          "lastUpdateISO_allExpenses_tripid" + trip.tripid,
+          new Date().toISOString()
+        );
+        setMMKVObject("allExpenses_tripid_" + trip.tripid, expenses);
       }
 
-      const expenses = await getAllExpenses(trip.tripid);
-      const sumOfExpenses = expenses.reduce((acc, expense: ExpenseData) => {
-        if (isNaN(Number(expense.calcAmount))) return acc;
-        return acc + Number(expense.calcAmount);
-      }, 0);
-      totalCost += sumOfExpenses;
+      if (!expenses) {
+        safeLogError(
+          new Error(
+            "expenses is null in " + trip.tripid + " in TripSummaryScreen.tsx"
+          )
+        );
+        continue;
+      }
+
+      const sumOfExpenses = getExpensesSum(expenses);
+      if (!isNaN(sumOfExpenses)) totalCost += sumOfExpenses;
 
       for (let i = 0; i < expenses?.length; i++) {
-        const expense = expenses[i];
+        const expense: ExpenseData = expenses[i];
         // map countries if not already in array
-        if (!countries.includes(expense.country)) {
-          countries.push(expense.country);
+        const countryFormatted = expense.country?.toLowerCase().trim();
+        if (countryFormatted && !countries.includes(countryFormatted)) {
+          countries.push(countryFormatted);
         }
         if (expense.splitList && expense.splitList.length > 0) {
+          const shallowCopySplitList = JSON.parse(
+            JSON.stringify(expense.splitList)
+          );
           // add travellers and their costs
-          for (let i = 0; i < expense.splitList.length; i++) {
-            const split: Split = expense.splitList[i];
+          for (let i = 0; i < shallowCopySplitList.length; i++) {
+            const split: Split = shallowCopySplitList[i];
             const traveller = split.userName;
+            const travellerFormatted = traveller?.toLowerCase().trim();
             const cost = Number(split.amount);
-            const rate = split.rate ?? 1;
-            if (!travellers.includes(traveller)) {
-              travellers.push(traveller);
+            const calcRate = expense.calcAmount / expense.amount;
+            const rate = calcRate || split.rate || 1;
+            if (!travellers.includes(travellerFormatted)) {
+              travellers.push(travellerFormatted);
               // add traveller and their costs
-              travellersAndTheirCosts.push({
-                traveller: traveller,
-                cost: cost / rate,
-              });
+              if (!isNaN(cost * rate))
+                travellersAndTheirCosts.push({
+                  traveller: traveller,
+                  cost: cost * rate,
+                });
             } else {
               // traveller already exists, add costs
               const travellerAndCost = travellersAndTheirCosts.find(
                 (t) => t.traveller === traveller
               );
-              travellerAndCost.cost += cost / rate;
+              if (!isNaN(cost * rate)) travellerAndCost.cost += cost * rate;
             }
           }
         } else {
-          if (!travellers.includes(expense.whoPaid)) {
-            travellers.push(expense.whoPaid);
+          const whoPaidFormatted = expense.whoPaid?.toLowerCase().trim();
+          if (!travellers.includes(whoPaidFormatted)) {
+            travellers.push(whoPaidFormatted);
             // add traveller and their costs
             travellersAndTheirCosts.push({
               traveller: expense.whoPaid,
@@ -153,19 +206,20 @@ const TripSummaryScreen = ({ navigation }) => {
             const travellerAndCost = travellersAndTheirCosts.find(
               (t) => t.traveller === expense.whoPaid
             );
-            travellerAndCost.cost += Number(expense.calcAmount);
+            if (!isNaN(Number(expense.calcAmount)))
+              travellerAndCost.cost += Number(expense.calcAmount);
           }
         }
       }
       // add number of days from daysBetween in trip
-      travelDays += daysBetween(
-        new Date(tripData.endDate),
-        new Date(tripData.startDate)
+      const endDateIsFuture = new Date() < new Date(tripData.endDate);
+      const startDateIsFuture = new Date() < new Date(tripData.startDate);
+      const countDays = daysBetween(
+        endDateIsFuture ? new Date() : new Date(tripData.endDate),
+        startDateIsFuture ? new Date() : new Date(tripData.startDate)
       );
+      travelDays += countDays;
     }
-    // set state
-    // console.log("summarizeHandler ~ totalCost:", totalCost);
-    // sum up all travellers costs
 
     setTripSummary({
       numberOfTrips: numberOfTrips,
@@ -240,9 +294,11 @@ const TripSummaryScreen = ({ navigation }) => {
           <Text style={styles.summaryText}>
             Number of Countries: {tripSummary.numberOfCountries}
           </Text>
-          <Text style={styles.summaryText}>
-            Number of Days: {tripSummary.numberOfDays}
-          </Text>
+          {!!numberOfDaysIsANumber && !!tripSummary.numberOfDays && (
+            <Text style={styles.summaryText}>
+              Number of Days: {tripSummary.numberOfDays}
+            </Text>
+          )}
           {/* travellers and their costs */}
           {/* <Text style={styles.summaryText}>Travellers And Their Costs</Text> */}
           <FlatList
@@ -285,6 +341,10 @@ const TripSummaryScreen = ({ navigation }) => {
 };
 
 export default TripSummaryScreen;
+
+TripSummaryScreen.propTypes = {
+  navigation: PropTypes.object,
+};
 
 const styles = StyleSheet.create({
   titleText: {

@@ -15,6 +15,7 @@ import { useInterval } from "../components/Hooks/useInterval";
 import { setMMKVObject, getMMKVObject } from "./mmkv";
 import set from "react-native-reanimated";
 import { Category } from "../util/category";
+import safeLogError from "../util/error";
 
 export interface TripData {
   tripName?: string;
@@ -207,7 +208,6 @@ function TripContextProvider({ children }) {
   }
   //
   function refresh() {
-    // console.log("refresh ~ refresh", refresh);
     setRefreshState(!refreshState);
   }
 
@@ -223,15 +223,13 @@ function TripContextProvider({ children }) {
     }
     // updates the current Travellers in context
     try {
-      // console.log("fetching travellers");
       const travellers = await getTravellers(tripid);
-      // console.log("fetchAndSetTravellers ~ travellers:", travellers);
       if (travellers?.length < 1) throw new Error("no travellers found");
       saveTravellersInStorage(travellers);
       setTravellers(travellers);
       return true;
     } catch (error) {
-      // // console.log("setCurrentTravellers ~ error", error);
+      safeLogError(error);
       throw new Error("no travellers found");
     }
   }
@@ -239,7 +237,6 @@ function TripContextProvider({ children }) {
   async function setCurrentTrip(tripid: string, trip: TripData) {
     if (!trip) return;
     if (tripid === "reset") {
-      // console.log("resetting Trip to empty!");
       _setTripid("");
       setTripName("");
       setTotalBudget("");
@@ -303,11 +300,7 @@ function TripContextProvider({ children }) {
       await saveTripDataInStorage(trip);
       return trip;
     } catch (error) {
-      // console.log(
-      // "error while fetchCurrent Trip in trip-context searching for ",
-      //   tripid,
-      //   error.message
-      // );
+      safeLogError(error);
     }
   }
 
@@ -325,10 +318,7 @@ function TripContextProvider({ children }) {
       await saveTripDataInStorage(trip);
       await updateTrip(tripid, trip);
     } catch (error) {
-      // console.log(
-      //   "error while fetchCurrent Trip in trip-context searching for ",
-      //   tripid
-      // );
+      safeLogError(error);
     }
   }
 
@@ -352,7 +342,6 @@ function TripContextProvider({ children }) {
   }
 
   function _setTripid(tripid: string) {
-    // // console.log("_setTripid ~ tripid", tripid);
     setTripid(tripid);
   }
 

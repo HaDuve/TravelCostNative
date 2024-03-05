@@ -20,13 +20,7 @@ import {
   truncateString,
   truncateNumber,
 } from "../../util/string";
-import {
-  TravellerNames,
-  fetchTrip,
-  fetchTripName,
-  getAllExpenses,
-  getTravellers,
-} from "../../util/http";
+import { TravellerNames, fetchTripName, getTravellers } from "../../util/http";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -41,16 +35,16 @@ import { ExpensesContext } from "../../store/expenses-context";
 import PropTypes from "prop-types";
 import { NetworkContext } from "../../store/network-context";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
-import { ExpenseData } from "../../util/expense";
-import LoadingBarOverlay from "../UI/LoadingBarOverlay";
-import { daysBetween, isToday } from "../../util/date";
 import {
-  getMMKVObject,
-  getMMKVString,
-  setMMKVObject,
-  setMMKVString,
-} from "../../store/mmkv";
+  ExpenseData,
+  getAllExpensesData,
+  getExpensesSum,
+} from "../../util/expense";
+import LoadingBarOverlay from "../UI/LoadingBarOverlay";
+import { daysBetween } from "../../util/date";
+import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
 import safeLogError from "../../util/error";
+import { getTripData } from "../../util/trip";
 
 export type TripHistoryItem = {
   tripid: string;
@@ -105,6 +99,7 @@ function TripHistoryItem({ tripid, trips }) {
       };
       setMMKVObject("tripHistoryItem" + `_${tripid}`, trip);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       dailyBudget,
       days,
@@ -242,37 +237,14 @@ function TripHistoryItem({ tripid, trips }) {
 
     async function getTrip() {
       try {
-        const trip = await fetchTrip(tripid);
+        const trip = await getTripData(tripid);
+
         const _dailyBudget = trip.dailyBudget;
         const _totalBudget = trip.totalBudget ?? MAX_JS_NUMBER.toString();
         const _tripCurrency = trip.tripCurrency;
-        const lastCacheUpdate = getMMKVString(
-          "lastUpdateISO_allExpenses_tripid" + trip.tripid
-        );
-        const lastUpdateWasToday =
-          lastCacheUpdate && isToday(new Date(lastCacheUpdate));
-        const cachedExpenses = getMMKVObject(
-          "lastUpdate_allExpenses_tripid_" + trip.tripid
-        );
-        const _expenses =
-          lastUpdateWasToday && cachedExpenses
-            ? cachedExpenses
-            : await getAllExpenses(trip.tripid);
-        if (!lastUpdateWasToday) {
-          // update cache
-          setMMKVString(
-            "lastUpdateISO_allExpenses_tripid" + trip.tripid,
-            new Date().toISOString()
-          );
-          setMMKVObject(
-            "lastUpdate_allExpenses_tripid_" + trip.tripid,
-            _expenses
-          );
-        }
-        const sumOfExpenses = _expenses.reduce((acc, expense: ExpenseData) => {
-          if (isNaN(Number(expense.calcAmount))) return acc;
-          return acc + Number(expense.calcAmount);
-        }, 0);
+        const _expenses = await getAllExpensesData(tripid);
+        const sumOfExpenses = getExpensesSum(_expenses);
+
         const isDynamic = trip.isDynamicDailyBudget;
         setIsDynamicDailyBudget(isDynamic);
         const startDate = trip.startDate;

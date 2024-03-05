@@ -1,4 +1,10 @@
-import { DateOrDateTime } from "./date";
+import {
+  getMMKVObject,
+  getMMKVString,
+  setMMKVObject,
+  setMMKVString,
+} from "../store/mmkv";
+import { DateOrDateTime, isToday } from "./date";
 import { getAllExpenses } from "./http";
 import {
   deleteExpenseOnlineOffline,
@@ -208,4 +214,30 @@ export function findMostDuplicatedDescriptionExpenses(
   } catch (error) {
     return [];
   }
+}
+
+export async function getAllExpensesData(tripid: string) {
+  const lastCacheUpdateExpenses = getMMKVString(
+    "lastUpdateISO_allExpenses_tripid" + tripid
+  );
+  const cachedExpenses = getMMKVObject(
+    "lastUpdate_allExpenses_tripid_" + tripid
+  );
+  const lastUpdateWasToday =
+    lastCacheUpdateExpenses &&
+    cachedExpenses &&
+    isToday(new Date(lastCacheUpdateExpenses));
+
+  const _expenses: ExpenseData[] = lastUpdateWasToday
+    ? cachedExpenses
+    : await getAllExpenses(tripid);
+  if (!lastUpdateWasToday) {
+    // update cache
+    setMMKVString(
+      "lastUpdateISO_allExpenses_tripid" + tripid,
+      new Date().toISOString()
+    );
+    setMMKVObject("lastUpdate_allExpenses_tripid_" + tripid, _expenses);
+  }
+  return _expenses;
 }

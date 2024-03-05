@@ -501,6 +501,8 @@ export async function getAllExpenses(tripid: string, uid?: string) {
   return expenses;
 }
 
+
+
 export async function updateTripHistory(userId: string, newTripid: string) {
   const tripHistory = await fetchTripHistory(userId);
   if (!tripHistory) return storeTripHistory(userId, [newTripid]);

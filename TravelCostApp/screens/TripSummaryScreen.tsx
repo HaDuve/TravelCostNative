@@ -151,10 +151,8 @@ const TripSummaryScreen = ({ navigation }) => {
         : await getTripData(trip.tripid);
       if (!tripData) continue;
       if (currency !== "" && currency !== tripData.tripCurrency) {
-        // we are having diffenrent currencies that we cannot compare yet
-        // cant use toast because its a modal
+        // TODO: allow different currencies by calculating for the home currency from tripCtx
         Alert.alert("Please select trips with the same currency");
-        // remove this trip from selected trips
         setAllTrips((prevState) => {
           const updatedTrips = prevState.map((trip) => {
             if (trip.tripid === tripData.tripid) {

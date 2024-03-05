@@ -154,7 +154,16 @@ const TripSummaryScreen = ({ navigation }) => {
         // we are having diffenrent currencies that we cannot compare yet
         // cant use toast because its a modal
         Alert.alert("Please select trips with the same currency");
-
+        // remove this trip from selected trips
+        setAllTrips((prevState) => {
+          const updatedTrips = prevState.map((trip) => {
+            if (trip.tripid === tripData.tripid) {
+              trip.selected = false;
+            }
+            return trip;
+          });
+          return updatedTrips;
+        });
         continue;
       }
       currency = tripData.tripCurrency;

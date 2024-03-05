@@ -79,6 +79,7 @@ const TripSummaryScreen = ({ navigation }) => {
   useEffect(() => {
     async function asyncSetAllTrips() {
       if (!userCtx.tripHistory) return;
+      setIsFetching(true);
       const allTripsAsObjects: TripAsObject[] = [];
       const lastUpdate = getMMKVString("allTripsAsObject_CacheISODate");
       // check if lastUpdate is a iso string today
@@ -89,7 +90,6 @@ const TripSummaryScreen = ({ navigation }) => {
         return;
       }
 
-      setIsFetching(true);
       for (let i = 0; i < userCtx.tripHistory.length; i++) {
         const tripid = userCtx.tripHistory[i];
         const tripName = await fetchTripName(tripid);

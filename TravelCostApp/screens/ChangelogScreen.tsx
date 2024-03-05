@@ -1,24 +1,19 @@
 import { StyleSheet, Text, View, ScrollView } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import BackButton from "../components/UI/BackButton";
 import { GlobalStyles } from "../constants/styles";
-import axios from "axios";
-import safeLogError from "../util/error";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
-import DrawerCollapsedItem from "react-native-paper/lib/typescript/src/components/Drawer/DrawerCollapsedItem";
-import Constants from "expo-constants";
 import { getMMKVString, setMMKVString } from "../store/mmkv";
 import { fetchChangelog } from "../util/http";
 import { VersionCheckResponse, versionCheck } from "../util/version";
 import InfoButton from "../components/UI/InfoButton";
-import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import { parseChangelog } from "../util/parseChangelog";
-import { TouchableRipple } from "react-native-paper";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { Pressable } from "react-native";
 import * as Haptics from "expo-haptics";
 import { NetworkContext } from "../store/network-context";
-import { LinkingContext } from "@react-navigation/native";
+import PropTypes from "prop-types";
+import safeLogError from "../util/error";
 
 function renderChangelogItem(item) {
   return (
@@ -52,9 +47,6 @@ const ChangelogScreen = ({ navigation }) => {
       canBeFormattedIndex + 2,
       endOfNewIndex
     );
-    // const index1 = formattedTextNew.indexOf("\n");
-    // const index2 = formattedTextNew.indexOf("\n", formatStringStart.length + 1);
-    // const newestVersion = formattedTextNew.slice(index1, index2).trim();
     formattedTextOld = changelogText.slice(endOfNewIndex + 2);
   } else {
     formattedTextOld = changelogText;
@@ -62,29 +54,41 @@ const ChangelogScreen = ({ navigation }) => {
   const parsedNewChanges = parseChangelog(formattedTextNew);
   const parsedOldChanges = parseChangelog(formattedTextOld);
 
+  const setStoredChangelog = useCallback(() => {
+    const fallBackChangelog = getMMKVString("changelog.txt");
+    if (fallBackChangelog) {
+      setChangelogText(fallBackChangelog); //.replaceAll("- ", "\n • "));
+    }
+    const fallBackVersion = getMMKVString("currentVersion");
+    if (fallBackVersion) {
+      setCurrentVersion(fallBackVersion);
+    }
+    setIsFetching(false);
+  }, []);
+
   useEffect(() => {
-    async function setLog() {
+    async function setNewChangelog() {
       try {
         const newChangelogText = await fetchChangelog();
         setMMKVString("changelog.txt", newChangelogText);
         setChangelogText(newChangelogText); //.replaceAll("- ", "\n • "));
         const versionCheckResponse: VersionCheckResponse = await versionCheck();
-        if (versionCheckResponse)
+        if (versionCheckResponse) {
           setCurrentVersion(versionCheckResponse.currentVersion);
+          setMMKVString("currentVersion", versionCheckResponse.currentVersion);
+        }
         setIsFetching(false);
       } catch (error) {
-        const fallBackChangelog = getMMKVString("changelog.txt");
-        if (fallBackChangelog) {
-          setChangelogText(fallBackChangelog); //.replaceAll("- ", "\n • "));
-          setIsFetching(false);
-        } else {
-          navigation.pop();
-        }
+        safeLogError(error);
+        setStoredChangelog();
       }
     }
-    if (strongConnection && (!changelogText || changelogText.length < 1))
-      setLog();
-  }, [changelogText, strongConnection, navigation]);
+    if (strongConnection && (!changelogText || changelogText.length < 1)) {
+      setNewChangelog();
+      return;
+    }
+    setStoredChangelog();
+  }, [changelogText, strongConnection, navigation, setStoredChangelog]);
 
   if (isFetching) {
     return (
@@ -188,6 +192,10 @@ const ChangelogScreen = ({ navigation }) => {
 };
 
 export default ChangelogScreen;
+
+ChangelogScreen.propTypes = {
+  navigation: PropTypes.object,
+};
 
 const styles = StyleSheet.create({
   container: {

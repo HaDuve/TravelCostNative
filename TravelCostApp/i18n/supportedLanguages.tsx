@@ -411,6 +411,7 @@ const en = {
   mostUsedExpenses: "Most used expenses",
   lastUsedExpenses: "Last used expenses",
   budgetPerTraveller: "Budget per traveller",
+  charts: "Charts",
 };
 const de = {
   // special expense strings
@@ -846,6 +847,7 @@ const de = {
   mostUsedExpenses: "Am häufigsten verwendete Ausgaben",
   lastUsedExpenses: "Zuletzt verwendete Ausgaben",
   budgetPerTraveller: "Budget pro Reisendem",
+  charts: "Diagramme",
 };
 const fr = {
   // special expense strings
@@ -1276,6 +1278,7 @@ const fr = {
   mostUsedExpenses: "Dépenses les plus utilisées",
   lastUsedExpenses: "Dernières dépenses utilisées",
   budgetPerTraveller: "Budget par voyageur",
+  charts: "Diagrammes",
 };
 const ru = {
   // special expense strings
@@ -1711,5 +1714,6 @@ const ru = {
   mostUsedExpenses: "Самые используемые расходы",
   lastUsedExpenses: "Последние использованные расходы",
   budgetPerTraveller: "Бюджет на одного путешественника",
+  charts: "Схемы",
 };
 export { en, de, fr, ru };

@@ -15,6 +15,16 @@ import { Checkbox } from "react-native-paper";
 import { daysBetween, isToday } from "../util/date";
 import { GlobalStyles } from "../constants/styles";
 import FlatButton from "../components/UI/FlatButton";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import {
   ExpenseData,
   Split,
@@ -36,6 +46,7 @@ import { getTripData } from "../util/trip";
 import * as Progress from "react-native-progress";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import ExpenseCountryFlag from "../components/ExpensesOutput/ExpenseCountryFlag";
+import GradientButton from "../components/UI/GradientButton";
 
 export type TripAsObject = {
   tripid: string;
@@ -64,6 +75,7 @@ const TripSummaryScreen = ({ navigation }) => {
   const [isFetching, setIsFetching] = useState(false);
   const [allTrips, setAllTrips] = useState<TripAsObject[]>([]);
   const [tripSummary, setTripSummary] = useState<TripsSummary>(null);
+  const [allExpensesList, setAllExpensesList] = useState<ExpenseData[]>([]);
   const progress = tripSummary?.totalCost / tripSummary?.totalBudget || 0;
   const isInBudget = progress <= 1;
   const progressBarColor = isInBudget
@@ -74,11 +86,17 @@ const TripSummaryScreen = ({ navigation }) => {
     tripSummary?.numberOfTrips && tripSummary.numberOfTrips > 1
       ? "Trips"
       : "Trip";
+  const titleText = `Summary (${
+    tripSummary?.numberOfTrips + " " + titleTextTrips
+  })`;
   const numberOfDaysIsANumber =
     tripSummary?.numberOfDays && !isNaN(tripSummary.numberOfDays);
   useEffect(() => {
     async function asyncSetAllTrips() {
-      if (!userCtx.tripHistory) return;
+      if (!userCtx.tripHistory) {
+        setIsFetching(false);
+        return;
+      }
       setIsFetching(true);
       const allTripsAsObjects: TripAsObject[] = [];
       const lastUpdate = getMMKVString("allTripsAsObject_CacheISODate");
@@ -123,6 +141,7 @@ const TripSummaryScreen = ({ navigation }) => {
     const travellersAndTheirCosts: TravellerAndCost[] = [];
     const countries: string[] = [];
     let travelDays = 0;
+    const allExpenses: ExpenseData[] = [];
     for (let i = 0; i < selectedTrips?.length; i++) {
       const trip = selectedTrips[i];
       const isContextTrip = trip.tripid === tripCtx.tripid;
@@ -153,6 +172,7 @@ const TripSummaryScreen = ({ navigation }) => {
         );
         continue;
       }
+      allExpenses.push(...expenses);
 
       const sumOfExpenses = getExpensesSum(expenses);
       if (!isNaN(sumOfExpenses)) totalCost += sumOfExpenses;
@@ -231,6 +251,7 @@ const TripSummaryScreen = ({ navigation }) => {
       totalBudget: +totalBudget.toFixed(2),
       countries: countries,
     });
+    setAllExpensesList(allExpenses);
     setIsFetching(false);
   };
 
@@ -288,10 +309,7 @@ const TripSummaryScreen = ({ navigation }) => {
       ></FlatList>
       {tripSummary && (
         <View style={[styles.summaryContainer, GlobalStyles.shadow]}>
-          <Text style={styles.titleText}>
-            Summary ({tripSummary.numberOfTrips + " " + titleTextTrips})
-          </Text>
-
+          <Text style={styles.titleText}>{titleText}</Text>
           <Text style={styles.summaryText}>
             Total Costs:{" "}
             {formatExpenseWithCurrency(
@@ -323,9 +341,6 @@ const TripSummaryScreen = ({ navigation }) => {
               maxHeight: 60,
             }}
           >
-            <Text style={styles.summaryText}>
-              Number of Countries: {tripSummary.numberOfCountries}
-            </Text>
             {tripSummary.countries && tripSummary.countries.length > 0 && (
               <FlatList
                 horizontal={true}
@@ -335,7 +350,7 @@ const TripSummaryScreen = ({ navigation }) => {
                     <ExpenseCountryFlag
                       countryName={item.item}
                       style={GlobalStyles.countryFlagStyle}
-                      containerStyle={[GlobalStyles.shadow]}
+                      containerStyle={[{ padding: 4 }, GlobalStyles.shadow]}
                     ></ExpenseCountryFlag>
                   );
                   return (
@@ -344,11 +359,19 @@ const TripSummaryScreen = ({ navigation }) => {
                 }}
               ></FlatList>
             )}
+            <Text style={styles.summaryText}>
+              Countries: {tripSummary.numberOfCountries}
+            </Text>
           </View>
 
           {!!numberOfDaysIsANumber && !!tripSummary.numberOfDays && (
             <Text style={styles.summaryText}>
-              Number of Days: {tripSummary.numberOfDays}
+              Days: {tripSummary.numberOfDays}
+            </Text>
+          )}
+          {!!allExpensesList && allExpensesList.length > 0 && (
+            <Text style={styles.summaryText}>
+              Expenses: {allExpensesList.length}
             </Text>
           )}
           {/* travellers and their costs */}
@@ -371,6 +394,18 @@ const TripSummaryScreen = ({ navigation }) => {
       )}
       <View style={styles.buttonContainer}>
         <FlatButton onPress={() => navigation.pop()}>Back</FlatButton>
+        <GradientButton
+          onPress={() => {
+            navigation.navigate("FilteredPieCharts", {
+              expenses: allExpensesList,
+              dayString: `${titleText}\n${allExpensesList?.length} ${i18n.t(
+                "expensesTab"
+              )}`,
+            });
+          }}
+        >
+          Charts
+        </GradientButton>
         {/* {tripSummary && (
           <GradientButton
             style={styles.gradientButtonStyle}
@@ -419,6 +454,7 @@ const styles = StyleSheet.create({
   progressBarContainer: {
     paddingHorizontal: 12,
     paddingVertical: 4,
+    marginBottom: 4,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,

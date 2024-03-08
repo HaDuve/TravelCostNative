@@ -1,5 +1,5 @@
-import { Alert, StyleSheet, Text } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import { Alert, AlertButton, StyleSheet, Text } from "react-native";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -18,6 +18,8 @@ import { NetworkContext } from "../../store/network-context";
 import { GlobalStyles } from "../../constants/styles";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { getMMKVString } from "../../store/mmkv";
+import { isPremiumMember } from "../Premium/PremiumConstants";
+import { useNavigation } from "@react-navigation/native";
 
 const CurrencyExchangeInfo = () => {
   const [currentRate, setCurrentRate] = useState(1);
@@ -26,14 +28,24 @@ const CurrencyExchangeInfo = () => {
   const userCtx = useContext(UserContext);
   const netCtx = useContext(NetworkContext);
   const isConnected = netCtx.isConnected;
-  useEffect(() => {
-    async function getCurrentRate() {
-      const rate = await getRate(tripCtx.tripCurrency, userCtx.lastCurrency);
+  const navigation = useNavigation();
+
+  const getCurrentRate = useCallback(
+    async (forceRefresh = false) => {
+      const rate = await getRate(
+        tripCtx.tripCurrency,
+        userCtx.lastCurrency,
+        forceRefresh
+      );
       setCurrentRate(rate);
-    }
+    },
+    [tripCtx.tripCurrency, userCtx.lastCurrency]
+  );
+
+  useEffect(() => {
     if (!isConnected) return;
-    getCurrentRate();
-  }, [isConnected, tripCtx.tripCurrency, userCtx.lastCurrency]);
+    getCurrentRate(false);
+  }, [getCurrentRate, isConnected, tripCtx.tripCurrency, userCtx.lastCurrency]);
   async function getLastUpdateTime() {
     const lastUpdate = getMMKVString("currencyExchange_lastUpdate");
     // return as a formatted date with hour time
@@ -43,26 +55,42 @@ const CurrencyExchangeInfo = () => {
     }
     return lastUpdate;
   }
-  const rateUneqal1 = currentRate != 1;
+  const PressHandler = async () => {
+    if (isFetching) return;
+    setIsFetching(true);
+    const lastUpdate = await getLastUpdateTime();
+    if (!lastUpdate) {
+      setIsFetching(false);
+      return;
+    }
+    Alert.alert(
+      "Last Update",
+      `We got the latest currency exchange rate from ${lastUpdate}`,
+      [
+        {
+          text: i18n.t("confirm"),
+          onPress: () => setIsFetching(false),
+          style: "cancel",
+        } as AlertButton,
+        {
+          text: "Refresh",
+          onPress: async () => {
+            if (!(await isPremiumMember())) {
+              navigation.navigate("Paywall");
+              return;
+            }
+            setIsFetching(false);
+            await getCurrentRate(true);
+            navigation.pop();
+          },
+        } as AlertButton,
+      ]
+    );
+  };
+  const rateUneqal1 = currentRate && currentRate != 1;
   if (!rateUneqal1) return <></>;
   return (
-    <TouchableOpacity
-      disabled={isFetching}
-      onPress={async () => {
-        if (isFetching) return;
-        setIsFetching(true);
-        const lastUpdate = await getLastUpdateTime();
-        if (!lastUpdate) {
-          setIsFetching(false);
-          return;
-        }
-        Alert.alert(
-          "Last Update",
-          `We got the latest currency exchange rate from ${lastUpdate}`,
-          [{ text: i18n.t("confirm"), onPress: () => setIsFetching(false) }]
-        );
-      }}
-    >
+    <TouchableOpacity disabled={isFetching} onPress={PressHandler}>
       <Text style={[styles.textButton]}>
         {i18n.t("currencyLabel")}:{" "}
         {formatExpenseWithCurrency(1, tripCtx.tripCurrency)} ={" "}

@@ -1,14 +1,10 @@
 import axios from "axios";
 import { DateTime } from "luxon";
 import { CACHE_NUM_HOURS, DEBUG_FORCE_OFFLINE } from "../confAppConstants";
-import {
-  asyncStoreGetItem,
-  asyncStoreGetObject,
-  asyncStoreSetItem,
-  asyncStoreSetObject,
-} from "../store/async-storage";
+import { asyncStoreGetItem, asyncStoreSetItem } from "../store/async-storage";
 import { secureStoreGetItem } from "../store/secure-storage";
 import safeLogError from "./error";
+import NetInfo from "@react-native-community/netinfo";
 import {
   getMMKVObject,
   getMMKVString,
@@ -16,12 +12,19 @@ import {
   setMMKVString,
 } from "../store/mmkv";
 
-export async function getRate(base: string, target: string): Promise<number> {
-  const response = await getRateAPI1(base, target);
-  // console.log("getRate ~ initialresponse:", response);
+export async function getRate(
+  base: string,
+  target: string,
+  forceNewRate = false
+): Promise<number> {
+  const connectionInfo = await NetInfo.fetch();
+  if (!connectionInfo || !connectionInfo.isInternetReachable) {
+    return getOfflineRate(base, target);
+  }
+  const response = await getRateAPI1(base, target, forceNewRate);
   if (typeof response === "number" && response === -1) {
     try {
-      return await getRateAPI2(base, target);
+      return await getRateAPI2(base, target, forceNewRate);
     } catch (error) {
       safeLogError(error);
       return -1;
@@ -30,15 +33,20 @@ export async function getRate(base: string, target: string): Promise<number> {
   return response;
 }
 
-export async function getRateAPI2(base: string, target: string) {
-  const lastUpdate = await asyncStoreGetItem("currencyExchangeAPI2_update");
+export async function getRateAPI2(
+  base: string,
+  target: string,
+  forceNewRate = false
+) {
+  const lastUpdate = forceNewRate
+    ? false
+    : await asyncStoreGetItem("currencyExchangeAPI2_update");
   if (lastUpdate) {
     const lastUpdateDateTime = DateTime.fromISO(lastUpdate);
     const now = DateTime.now();
     const diff = now.diff(lastUpdateDateTime, "hours").hours;
-    // console.log("getRateAPI2 ~ diff:", diff);
-    // this api is more restrictive, so we wait 4 hours
-    if (diff < CACHE_NUM_HOURS * 4) {
+    console.log("diff:", diff, " < ", CACHE_NUM_HOURS);
+    if (diff < CACHE_NUM_HOURS) {
       // get from asyncstore
       const rate = await asyncStoreGetItem(
         "currencyExchangeAPI2_" + base + target
@@ -60,13 +68,11 @@ export async function getRateAPI2(base: string, target: string) {
   try {
     const response = await axios.get(requestURL);
     const rate = response?.data?.data?.[target]?.value;
-    console.log("getRateAPI2 ~ rate:", rate);
     if (!rate) throw new Error("No rate found");
     // console.log("getRateAPI2 ~ rate:", rate);
     const timeStamp = DateTime.now().toISO();
     await asyncStoreSetItem("currencyExchangeAPI2_update", timeStamp);
     await asyncStoreSetItem("currencyExchangeAPI2_" + base + target, rate);
-    console.log("got a new rate of " + rate + " for " + base + " " + target);
     return rate;
   } catch (error) {
     safeLogError(error);
@@ -74,15 +80,23 @@ export async function getRateAPI2(base: string, target: string) {
   }
 }
 
-export async function getRateAPI1(base: string, target: string) {
+export async function getRateAPI1(
+  base: string,
+  target: string,
+  forceNewRate = false
+) {
   if (base === target) {
     return 1;
   }
-  const lastUpdate = getMMKVString("currencyExchange_lastUpdate");
+  const lastUpdate = forceNewRate
+    ? false
+    : getMMKVString("currencyExchange_lastUpdate");
+  console.log("forceNewRate:", forceNewRate, "lastUpdate", lastUpdate);
   if (lastUpdate) {
     const lastUpdateDateTime = DateTime.fromISO(lastUpdate);
     const now = DateTime.now();
     const diff = now.diff(lastUpdateDateTime, "hours").hours;
+    console.log("diff:", diff, " < ", CACHE_NUM_HOURS);
     if (diff < CACHE_NUM_HOURS) {
       // get from asyncstore
       return getOfflineRate(base, target);
@@ -100,18 +114,17 @@ export async function getRateAPI1(base: string, target: string) {
   try {
     const response = await axios.get(requestURL);
     const rates = response.data.rates;
-    console.log("getRateAPI1 ~ rates:", rates);
-    if (response) {
+    if (response && rates && rates[target]) {
       if (DEBUG_FORCE_OFFLINE) {
         return getOfflineRate(base, target);
       }
       setMMKVObject("currencyExchange_base_" + base, rates);
       const timeStamp = DateTime.now().toISO();
       setMMKVString("currencyExchange_lastUpdate", timeStamp);
+      return rates[target];
     } else {
       return getOfflineRate(base, target);
     }
-    return rates[target];
   } catch (error) {
     return getOfflineRate(base, target);
   }

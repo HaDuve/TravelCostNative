@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Pressable, Platform } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React, { useContext, useRef } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { ExpensesContext } from "../../../store/expenses-context";
 import {
   getDateMinusDays,
@@ -26,33 +26,37 @@ i18n.enableFallback = true;
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import PropTypes from "prop-types";
 import { isForeground } from "../../../util/appState";
-import { MAX_JS_NUMBER } from "../../../confAppConstants";
+import { MAX_JS_NUMBER, MAX_PERIOD_RANGE } from "../../../confAppConstants";
 import { SettingsContext } from "../../../store/settings-context";
 import { getExpensesSum } from "../../../util/expense";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import FlatButton from "../../UI/FlatButton";
 
 const ExpenseGraph = ({
   periodName,
   periodRangeNumber,
+  longerPeriodNum,
+  setLongerPeriodNum,
   tripCtx,
   navigation,
 }) => {
-  // // console.log("rerender ExpenseGraph - 2");
   const today = new Date();
   const renderItemRef = useRef(null);
   const expenseCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
   const hideSpecial = settings.hideSpecialExpenses;
+  const [startingPoint, setStartingPoint] = useState(0);
 
   if (!isForeground || !expenseCtx.expenses) {
-    // console.log("ExpenseGraph: not ready, return empty view");
     return <></>;
   }
   const totalBudget = Number(tripCtx.totalBudget) ?? MAX_JS_NUMBER;
   const listExpenseSumBudgets = [];
-  const lastDays = periodRangeNumber ?? 8,
-    lastWeeks = periodRangeNumber ?? 10,
-    lastMonths = periodRangeNumber ?? 10,
-    lastYears = periodName == "total" ? 5 : periodRangeNumber ?? 10;
+  const lastDays = (periodRangeNumber ?? 8) + longerPeriodNum;
+  const lastWeeks = (periodRangeNumber ?? 1) + longerPeriodNum;
+  const lastMonths = (periodRangeNumber ?? 10) + longerPeriodNum;
+  const lastYears =
+    (periodName == "total" ? 5 : periodRangeNumber ?? 10) + longerPeriodNum;
   let xAxis = "";
   let yAxis = "";
   let budgetAxis = "";
@@ -63,7 +67,7 @@ const ExpenseGraph = ({
       xAxis = "day";
       yAxis = "expensesSum";
       budgetAxis = "dailyBudget";
-      for (let i = 0; i < lastDays; i++) {
+      for (let i = startingPoint; i < lastDays; i++) {
         const day = getDateMinusDays(today, i);
         const dayExpenses = expenseCtx.getDailyExpenses(i);
         const expensesSum = getExpensesSum(dayExpenses, hideSpecial);
@@ -444,6 +448,13 @@ const ExpenseGraph = ({
     default:
       break;
   }
+  const showFutureString =
+    startingPoint == 0
+      ? `${i18n.t("showXResults1")} ${i18n.t("future")} ${i18n.t(
+          periodName + "s"
+        )}`
+      : `${i18n.t("showLess")} ${i18n.t("future")} ${i18n.t(periodName + "s")}`;
+  const showMoreString = i18n.t("showMore") + " " + i18n.t(periodName + "s");
 
   return (
     <Animated.View
@@ -474,9 +485,37 @@ const ExpenseGraph = ({
                 navigation={navigation}
                 expenses={expenseCtx.expenses}
               ></ExpenseChart>
+
+              <View style={styles.flatButtonContainer}>
+                <FlatButton
+                  onPress={() => {
+                    startingPoint == 0
+                      ? setStartingPoint(
+                          startingPoint - (periodRangeNumber ?? 10)
+                        )
+                      : setStartingPoint(0);
+                  }}
+                >
+                  {showFutureString}
+                </FlatButton>
+              </View>
             </View>
           }
-          ListFooterComponent={<View style={{ height: 100 }}></View>}
+          ListFooterComponent={
+            <View style={{ height: 200 }}>
+              {longerPeriodNum + periodRangeNumber < MAX_PERIOD_RANGE && (
+                <FlatButton
+                  onPress={() => {
+                    let newNum = longerPeriodNum + 10;
+                    if (newNum > MAX_PERIOD_RANGE) newNum = MAX_PERIOD_RANGE;
+                    setLongerPeriodNum(newNum);
+                  }}
+                >
+                  {showMoreString}
+                </FlatButton>
+              )}
+            </View>
+          }
           removeClippedSubviews={true}
           // maxToRenderPerBatch={7}
           updateCellsBatchingPeriod={300}
@@ -503,6 +542,8 @@ ExpenseGraph.propTypes = {
   periodRangeNumber: PropTypes.number,
   expenseCtx: PropTypes.object,
   tripCtx: PropTypes.object,
+  longerPeriodNum: PropTypes.number,
+  setLongerPeriodNum: PropTypes.func,
 };
 
 const styles = StyleSheet.create({
@@ -517,6 +558,9 @@ const styles = StyleSheet.create({
     marginTop: "2.5%",
     paddingBottom: "5%",
     marginBottom: "5%",
+  },
+  flatButtonContainer: {
+    marginBottom: "-10%",
   },
   listContainer: {
     flex: 1,

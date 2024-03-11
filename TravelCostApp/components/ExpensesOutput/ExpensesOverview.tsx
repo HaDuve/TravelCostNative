@@ -44,6 +44,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   // enum =>  0 = categories, 1 = traveller, 2 = country, 3 = currency
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
   const userCtx = useContext(UserContext);
+  const [longerPeriodNum, setLongerPeriodNum] = useState(0);
 
   async function toggleContent() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -57,30 +58,24 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       titleString = i18n.t("overview");
       break;
     default:
-      // TODO: convert day into days etc. for localization
-      titleString = `${i18n.t("last")} ${periodRangeNumber} ${i18n.t(
-        periodName + "s"
-      )}`;
+      titleString = `${i18n.t("last")} ${
+        periodRangeNumber + longerPeriodNum
+      } ${i18n.t(periodName + "s")}`;
       break;
   }
 
   const [autoIncrement, setAutoIncrement] = useState<NodeJS.Timer>(null);
 
   const startAutoIncrement = async () => {
-    // TODO: add a state variable and a useInterval, if the state is set to true, call rightNavButtonHandler
-    // console.log("startAutoIncrement ~ startAutoIncrement:");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     rightNavButtonHandler();
     const interval = setInterval(() => {
-      // console.log("startAutoIncrement ~ interval tick");
       rightNavButtonHandler();
     }, 600);
     setAutoIncrement(interval);
     return;
   };
   const stopAutoIncrement = () => {
-    // console.log("stopAutoIncrement ~ stopAutoIncrement");
-    // setAutoIncrement(false);
     clearInterval(autoIncrement);
     return;
   };
@@ -122,6 +117,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
             if (isGraphNotPie) {
               realPeriodNumber.current = MIN_PERIOD_RANGE;
               setPeriodRangeNumber(realPeriodNumber.current);
+              setLongerPeriodNum(0);
               stopAutoIncrement();
             } else {
               setToggleGraphEnum(
@@ -176,10 +172,6 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           size={24}
           onPressIn={startAutoIncrement}
           onPressOut={stopAutoIncrement}
-          // onPress={() => {
-          //   // rightNavButtonHandler();
-          //   // stopAutoIncrement();
-          // }}
           color={GlobalStyles.colors.primaryGrayed}
         ></IconButton>
       </Animated.View>
@@ -196,6 +188,8 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           periodName={periodName}
           periodRangeNumber={periodRangeNumber}
           tripCtx={tripCtx}
+          longerPeriodNum={longerPeriodNum}
+          setLongerPeriodNum={setLongerPeriodNum}
         />
       )}
       {!isGraphNotPie && toggleGraphEnum == 0 && (

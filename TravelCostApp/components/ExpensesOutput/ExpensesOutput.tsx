@@ -7,9 +7,23 @@ import Animated, { SlideOutLeft } from "react-native-reanimated";
 import LoadingOverlay from "../UI/LoadingOverlay";
 import { useContext, useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import { EXPENSES_LOAD_TIMEOUT } from "../../confAppConstants";
 import { memo } from "react";
 import { TripContext } from "../../store/trip-context";
+import FlatButton from "../UI/FlatButton";
+import { useNavigation } from "@react-navigation/native";
+import { ExpensesContext, RangeString } from "../../store/expenses-context";
+import { UserContext } from "../../store/user-context";
 
 function ExpensesOutput({
   expenses,
@@ -22,6 +36,18 @@ function ExpensesOutput({
   const { tripName } = useContext(TripContext);
   const [showLoading, setShowLoading] = useState(true);
   const [fallback, setFallback] = useState(true);
+  const navigation = useNavigation();
+  const expCtx = useContext(ExpensesContext);
+  const userCtx = useContext(UserContext);
+  const periodName = userCtx.periodName;
+  const periodNameIsToday = periodName == RangeString.day;
+  const yesterdayExpenses = expCtx.getDailyExpenses(1);
+  const shouldShowExtraButtons = !isFiltered && periodNameIsToday;
+  const showYesterday =
+    yesterdayExpenses && yesterdayExpenses.length > 0 && shouldShowExtraButtons;
+  const tomorrowExpenses = expCtx.getDailyExpenses(-1);
+  const showTomorrow =
+    tomorrowExpenses && tomorrowExpenses.length > 0 && shouldShowExtraButtons;
   useEffect(() => {
     setTimeout(() => {
       if (tripName) setShowLoading(false);
@@ -33,7 +59,6 @@ function ExpensesOutput({
   }, [tripName, expenses.length]);
 
   const memoizedContent = useMemo(() => {
-    // console.log("render content");
     if (expenses?.length > 0) {
       if (fallback) setFallback(false);
       return (
@@ -51,6 +76,30 @@ function ExpensesOutput({
         <View style={styles.fallbackInnerContainer}>
           {showLoading && <LoadingOverlay></LoadingOverlay>}
           {!showLoading && <Text style={styles.infoText}>{fallbackText}</Text>}
+          {showYesterday && (
+            <FlatButton
+              onPress={() => {
+                navigation.navigate("FilteredExpenses", {
+                  expenses: yesterdayExpenses,
+                  dayString: i18n.t("yesterday"),
+                });
+              }}
+            >
+              {"<< " + i18n.t("showXResults1") + " " + i18n.t("yesterday")}
+            </FlatButton>
+          )}
+          {showTomorrow && (
+            <FlatButton
+              onPress={() => {
+                navigation.navigate("FilteredExpenses", {
+                  expenses: tomorrowExpenses,
+                  dayString: i18n.t("tomorrow"),
+                });
+              }}
+            >
+              {i18n.t("showXResults1") + " " + i18n.t("tomorrow") + " >>"}
+            </FlatButton>
+          )}
         </View>
       </Animated.View>
     );
@@ -94,10 +143,8 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
   },
   fallbackContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    // borderWidth: 1,
+    position: "absolute",
+    alignSelf: "center",
     margin: "10%",
   },
   fallbackInnerContainer: {

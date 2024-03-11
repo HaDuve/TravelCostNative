@@ -50,6 +50,7 @@ const en = {
   // today - yesterday etc.
   today: "Today",
   yesterday: "Yesterday",
+  tomorrow: "Tomorrow",
   thisWeek: "This Week",
   lastWeek: "Last Week",
   thisMonth: "This Month",
@@ -77,6 +78,8 @@ const en = {
   priceIn: "Price in ",
   showMoreOptions: "Show more options",
   showLessOptions: "Show less options",
+  showMore: "Show more",
+  showLess: "Show less",
   currencyLabel: "Currency",
   baseCurrency: "Home currency",
   descriptionLabel: "Description",
@@ -412,6 +415,7 @@ const en = {
   lastUsedExpenses: "Last used expenses",
   budgetPerTraveller: "Budget per traveller",
   charts: "Charts",
+  future: "future",
 };
 const de = {
   // special expense strings
@@ -466,6 +470,7 @@ const de = {
   // today - yesterday etc.
   today: "Heute",
   yesterday: "Gestern",
+  tomorrow: "Morgen",
   thisWeek: "Diese Woche",
   lastWeek: "Letzte Woche",
   thisMonth: "Diesen Monat",
@@ -493,6 +498,8 @@ const de = {
   priceIn: "Preis in ",
   showMoreOptions: "Zeige mehr Optionen",
   showLessOptions: "Zeige weniger Optionen",
+  showMore: "Zeige mehr",
+  showLess: "Zeige weniger",
   currencyLabel: "Währung",
   baseCurrency: "Heimatwährung",
   descriptionLabel: "Beschreibung",
@@ -848,6 +855,7 @@ const de = {
   lastUsedExpenses: "Zuletzt verwendete Ausgaben",
   budgetPerTraveller: "Budget pro Reisendem",
   charts: "Diagramme",
+  future: "zukünftige",
 };
 const fr = {
   // special expense strings
@@ -901,6 +909,7 @@ const fr = {
   // today - yesterday etc.
   today: "Aujourd'hui",
   yesterday: "Hier",
+  tomorrow: "Demain",
   thisWeek: "Cette semaine",
   lastWeek: "La semaine dernière",
   thisMonth: "Ce mois-ci",
@@ -928,6 +937,8 @@ const fr = {
   priceIn: "Prix en ",
   showMoreOptions: "Afficher plus d'options",
   showLessOptions: "Afficher moins d'options",
+  showMore: "Afficher plus",
+  showLess: "Afficher moins des",
   currencyLabel: "Devise",
   baseCurrency: "Devise d'origine",
   descriptionLabel: "Description",
@@ -1279,6 +1290,7 @@ const fr = {
   lastUsedExpenses: "Dernières dépenses utilisées",
   budgetPerTraveller: "Budget par voyageur",
   charts: "Diagrammes",
+  future: "futures",
 };
 const ru = {
   // special expense strings
@@ -1332,6 +1344,7 @@ const ru = {
   // today - yesterday etc.
   today: "Сегодня",
   yesterday: "Вчера",
+  tomorrow: "Завтра",
   thisWeek: "На этой неделе",
   lastWeek: "На прошлой неделе",
   thisMonth: "В этом месяце",
@@ -1359,6 +1372,8 @@ const ru = {
   priceIn: "Цена в ",
   showMoreOptions: "Показать больше опций",
   showLessOptions: "Показать меньше опций",
+  showMore: "Показать больше",
+  showLess: "Показать меньше",
   currencyLabel: "Валюта",
   baseCurrency: "Домашняя валюта",
   descriptionLabel: "Описание",
@@ -1715,5 +1730,6 @@ const ru = {
   lastUsedExpenses: "Последние использованные расходы",
   budgetPerTraveller: "Бюджет на одного путешественника",
   charts: "Схемы",
+  future: "Будущее",
 };
 export { en, de, fr, ru };

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Pressable, Platform } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useRef } from "react";
 import { ExpensesContext } from "../../../store/expenses-context";
 import {
   getDateMinusDays,
@@ -52,11 +52,11 @@ const ExpenseGraph = ({
   }
   const totalBudget = Number(tripCtx.totalBudget) ?? MAX_JS_NUMBER;
   const listExpenseSumBudgets = [];
-  const lastDays = (periodRangeNumber ?? 8) + longerPeriodNum;
-  const lastWeeks = (periodRangeNumber ?? 1) + longerPeriodNum;
-  const lastMonths = (periodRangeNumber ?? 10) + longerPeriodNum;
+  const lastDays = (periodRangeNumber ?? 7) + longerPeriodNum;
+  const lastWeeks = (periodRangeNumber ?? 7) + longerPeriodNum;
+  const lastMonths = (periodRangeNumber ?? 7) + longerPeriodNum;
   const lastYears =
-    (periodName == "total" ? 5 : periodRangeNumber ?? 10) + longerPeriodNum;
+    (periodName == "total" ? 5 : periodRangeNumber ?? 7) + longerPeriodNum;
   let xAxis = "";
   let yAxis = "";
   let budgetAxis = "";
@@ -165,7 +165,7 @@ const ExpenseGraph = ({
       yAxis = "expensesSum";
       budgetAxis = "weeklyBudget";
 
-      for (let i = 0; i < lastWeeks; i++) {
+      for (let i = startingPoint; i < lastWeeks; i++) {
         const { firstDay, lastDay, weeklyExpenses } =
           expenseCtx.getWeeklyExpenses(i);
         const expensesSum = getExpensesSum(weeklyExpenses, hideSpecial);
@@ -266,7 +266,7 @@ const ExpenseGraph = ({
       yAxis = "expensesSum";
       budgetAxis = "monthlyBudget";
 
-      for (let i = 0; i < lastMonths; i++) {
+      for (let i = startingPoint; i < lastMonths; i++) {
         const { firstDay, lastDay, monthlyExpenses } =
           expenseCtx.getMonthlyExpenses(i);
         const expensesSum = getExpensesSum(monthlyExpenses, hideSpecial);
@@ -360,7 +360,7 @@ const ExpenseGraph = ({
       yAxis = "expensesSum";
       budgetAxis = "yearlyBudget";
 
-      for (let i = 0; i < lastYears; i++) {
+      for (let i = startingPoint; i < lastYears; i++) {
         const { firstDay, lastDay, yearlyExpenses } =
           expenseCtx.getYearlyExpenses(i);
         const expensesSum = getExpensesSum(yearlyExpenses, hideSpecial);

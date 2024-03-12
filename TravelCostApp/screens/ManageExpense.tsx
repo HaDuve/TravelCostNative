@@ -23,6 +23,11 @@ import {
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale = Localization.locale.slice(0, 2);
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import { getCatString } from "../util/category";
 import PropTypes from "prop-types";
 import { deleteAllExpensesByRangedId, ExpenseData } from "../util/expense";
@@ -35,13 +40,9 @@ import { isSameDay } from "../util/dateTime";
 import ToastComponent from "../components/UI/ToastComponent";
 import safeLogError from "../util/error";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
-const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = Localization.locale.slice(0, 2);
-i18n.enableFallback = true;
-// i18n.locale = "en";
 
 const ManageExpense = ({ route, navigation }) => {
-  const { pickedCat, tempValues, newCat, iconName } = route.params;
+  const { pickedCat, tempValues, newCat, iconName, dateISO } = route.params;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const expenseCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
@@ -238,11 +239,9 @@ const ManageExpense = ({ route, navigation }) => {
   };
 
   const createRangedData = async (expenseData) => {
-    // console.log("ranged Data detected");
     // rangeId to identify all the expenses that belong to the same range
     const rangeId =
       Date.now().toString() + Math.random().toString(36).substring(2, 15);
-    // console.log("creatingRangedData ~ rangeId:", rangeId);
 
     // sanity check if the expenseData.date is unequal to expenseData.startDate and endDate
     // if so, set the date to the startDate
@@ -559,6 +558,7 @@ const ManageExpense = ({ route, navigation }) => {
         defaultValues={tempValues ?? selectedExpense}
         editedExpenseId={editedExpenseId}
         newCat={newCat}
+        dateISO={dateISO}
       />
       {isEditing && (
         <View style={styles.deleteContainer}>

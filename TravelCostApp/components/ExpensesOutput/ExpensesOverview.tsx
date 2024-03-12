@@ -45,6 +45,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
   const userCtx = useContext(UserContext);
   const [longerPeriodNum, setLongerPeriodNum] = useState(0);
+  const [startingPoint, setStartingPoint] = useState(0);
 
   async function toggleContent() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -58,8 +59,8 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       titleString = i18n.t("overview");
       break;
     default:
-      titleString = `${i18n.t("last")} ${
-        periodRangeNumber + longerPeriodNum
+      titleString = `${i18n.t("last")} ${periodRangeNumber + longerPeriodNum}${
+        startingPoint != 0 ? `+${-startingPoint}` : ""
       } ${i18n.t(periodName + "s")}`;
       break;
   }
@@ -115,9 +116,10 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           onPress={async () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             if (isGraphNotPie) {
-              realPeriodNumber.current = MIN_PERIOD_RANGE;
+              realPeriodNumber.current = 7;
               setPeriodRangeNumber(realPeriodNumber.current);
               setLongerPeriodNum(0);
+              setStartingPoint(0);
               stopAutoIncrement();
             } else {
               setToggleGraphEnum(
@@ -190,6 +192,8 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           tripCtx={tripCtx}
           longerPeriodNum={longerPeriodNum}
           setLongerPeriodNum={setLongerPeriodNum}
+          startingPoint={startingPoint}
+          setStartingPoint={setStartingPoint}
         />
       )}
       {!isGraphNotPie && toggleGraphEnum == 0 && (

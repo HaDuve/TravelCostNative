@@ -11,19 +11,13 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
-import FlatButton from "../components/UI/FlatButton";
 import { GlobalStyles } from "../constants/styles";
-import Toast from "react-native-toast-message";
 import PropTypes from "prop-types";
 import BackButton from "../components/UI/BackButton";
 import BlurPremium from "../components/Premium/BlurPremium";
+import FlatButton from "../components/UI/FlatButton";
 
-const FilteredExpenses = ({
-  route,
-  navigation,
-  expensesAsArg,
-  dayStringAsArg,
-}) => {
+const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
   const { expenses, dayString, showSumForTravellerName } = expensesAsArg
     ? {
         expenses: expensesAsArg,
@@ -33,15 +27,15 @@ const FilteredExpenses = ({
     : route.params;
   const withArgs = expensesAsArg ? true : false;
 
-  if (!expenses || expenses?.length < 1) {
-    Toast.show({
-      type: "error",
-      text1: `${i18n.t("noExpensesText")} ${dayString}`,
-      visibilityTime: 1000,
-    });
-    navigation.pop();
-    return <></>;
-  }
+  // if (!expenses || expenses?.length < 1) {
+  //   Toast.show({
+  //     type: "error",
+  //     text1: `${i18n.t("noExpensesText")} ${dayString}`,
+  //     visibilityTime: 1000,
+  //   });
+  //   navigation?.pop();
+  //   return <>{}</>;
+  // }
   return (
     <View style={styles.container}>
       {!withArgs && (

@@ -29,7 +29,6 @@ import { isForeground } from "../../../util/appState";
 import { MAX_JS_NUMBER, MAX_PERIOD_RANGE } from "../../../confAppConstants";
 import { SettingsContext } from "../../../store/settings-context";
 import { getExpensesSum } from "../../../util/expense";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import FlatButton from "../../UI/FlatButton";
 
 const ExpenseGraph = ({
@@ -37,6 +36,8 @@ const ExpenseGraph = ({
   periodRangeNumber,
   longerPeriodNum,
   setLongerPeriodNum,
+  startingPoint,
+  setStartingPoint,
   tripCtx,
   navigation,
 }) => {
@@ -45,7 +46,6 @@ const ExpenseGraph = ({
   const expenseCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
   const hideSpecial = settings.hideSpecialExpenses;
-  const [startingPoint, setStartingPoint] = useState(0);
 
   if (!isForeground || !expenseCtx.expenses) {
     return <></>;
@@ -123,7 +123,7 @@ const ExpenseGraph = ({
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
-              if (!filteredExpenses || filteredExpenses?.length === 0) return;
+              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
                 dayString: dayString,
@@ -138,7 +138,7 @@ const ExpenseGraph = ({
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
-              if (!filteredExpenses || filteredExpenses?.length === 0) return;
+              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
                 dayString: titleStringFilteredPieCharts,
@@ -224,7 +224,7 @@ const ExpenseGraph = ({
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
-              if (!filteredExpenses || filteredExpenses?.length === 0) return;
+              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
                 dayString: weekString,
@@ -239,7 +239,7 @@ const ExpenseGraph = ({
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
-              if (!filteredExpenses || filteredExpenses?.length === 0) return;
+              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
                 dayString: titleStringFilteredPieCharts,
@@ -314,7 +314,7 @@ const ExpenseGraph = ({
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
-              if (!filteredExpenses || filteredExpenses?.length === 0) return;
+              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
                 dayString: month,
@@ -329,7 +329,7 @@ const ExpenseGraph = ({
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
-              if (!filteredExpenses || filteredExpenses?.length === 0) return;
+              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
                 dayString: titleStringFilteredPieCharts,
@@ -408,7 +408,7 @@ const ExpenseGraph = ({
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
-              if (!filteredExpenses || filteredExpenses?.length === 0) return;
+              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
                 dayString: yearString,
@@ -423,7 +423,7 @@ const ExpenseGraph = ({
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
-              if (!filteredExpenses || filteredExpenses?.length === 0) return;
+              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
               navigation.navigate("FilteredPieCharts", {
                 expenses: filteredExpenses,
                 dayString: titleStringFilteredPieCharts,
@@ -448,13 +448,13 @@ const ExpenseGraph = ({
     default:
       break;
   }
-  const showFutureString =
-    startingPoint == 0
-      ? `${i18n.t("showXResults1")} ${i18n.t("future")} ${i18n.t(
-          periodName + "s"
-        )}`
-      : `${i18n.t("showLess")} ${i18n.t("future")} ${i18n.t(periodName + "s")}`;
-  const showMoreString = i18n.t("showMore") + " " + i18n.t(periodName + "s");
+  const showFutureString = `${i18n.t("showMore")} ${i18n.t("future")} ${i18n.t(
+    periodName + "s"
+  )}`;
+
+  const showPastString = `${i18n.t("showMore")} ${i18n.t("past")} ${i18n.t(
+    periodName + "s"
+  )}`;
 
   return (
     <Animated.View
@@ -487,33 +487,35 @@ const ExpenseGraph = ({
               ></ExpenseChart>
 
               <View style={styles.flatButtonContainer}>
-                <FlatButton
-                  onPress={() => {
-                    startingPoint == 0
-                      ? setStartingPoint(
-                          startingPoint - (periodRangeNumber ?? 10)
-                        )
-                      : setStartingPoint(0);
-                  }}
-                >
-                  {showFutureString}
-                </FlatButton>
+                {startingPoint > -MAX_PERIOD_RANGE && (
+                  <FlatButton
+                    onPress={() => {
+                      // reduce starting point to show future expenses
+                      setStartingPoint(
+                        startingPoint - (periodRangeNumber ?? 10)
+                      );
+                    }}
+                  >
+                    {showFutureString}
+                  </FlatButton>
+                )}
               </View>
             </View>
           }
           ListFooterComponent={
             <View style={{ height: 200 }}>
-              {longerPeriodNum + periodRangeNumber < MAX_PERIOD_RANGE && (
-                <FlatButton
-                  onPress={() => {
-                    let newNum = longerPeriodNum + 10;
-                    if (newNum > MAX_PERIOD_RANGE) newNum = MAX_PERIOD_RANGE;
-                    setLongerPeriodNum(newNum);
-                  }}
-                >
-                  {showMoreString}
-                </FlatButton>
-              )}
+              <View style={styles.flatButtonContainer}>
+                {longerPeriodNum < MAX_PERIOD_RANGE && (
+                  <FlatButton
+                    onPress={() => {
+                      // reduce starting point to show future expenses
+                      setLongerPeriodNum(longerPeriodNum + 10);
+                    }}
+                  >
+                    {showPastString}
+                  </FlatButton>
+                )}
+              </View>
             </View>
           }
           removeClippedSubviews={true}
@@ -544,6 +546,8 @@ ExpenseGraph.propTypes = {
   tripCtx: PropTypes.object,
   longerPeriodNum: PropTypes.number,
   setLongerPeriodNum: PropTypes.func,
+  startingPoint: PropTypes.number,
+  setStartingPoint: PropTypes.func,
 };
 
 const styles = StyleSheet.create({

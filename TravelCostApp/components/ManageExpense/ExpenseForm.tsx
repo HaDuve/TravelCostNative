@@ -107,6 +107,7 @@ const ExpenseForm = ({
   editedExpenseId,
   newCat,
   iconName,
+  dateISO,
 }) => {
   // set context
   const authCtx = useContext(AuthContext);
@@ -271,6 +272,19 @@ const ExpenseForm = ({
       setIsPaid(isPaidString.paid);
     }
   }, [tripCtx.isPaidDate, startDate, editingValues?.date]);
+
+  useEffect(() => {
+    if (dateISO) {
+      setStartDate(dateISO);
+      setEndDate(dateISO);
+      setInputs((curInputs) => {
+        return {
+          ...curInputs,
+          ["date"]: { value: dateISO, isValid: true },
+        };
+      });
+    }
+  }, [dateISO]);
 
   // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
   const [duplOrSplit, setDuplOrSplit] = useState<DuplicateOption>(
@@ -1809,6 +1823,7 @@ ExpenseForm.propTypes = {
   editedExpenseId: PropTypes.string,
   newCat: PropTypes.bool,
   iconName: PropTypes.string,
+  dateISO: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

@@ -22,6 +22,7 @@ import BlurPremium from "../../Premium/BlurPremium";
 import { processTitleStringFilteredPiecharts } from "../../../util/string";
 import { TripContext } from "../../../store/trip-context";
 import { getExpensesSum } from "../../../util/expense";
+import AddExpensesHereButton from "../../UI/AddExpensesHereButton";
 
 const ExpenseCategories = ({ expenses, periodName, navigation }) => {
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
@@ -124,7 +125,10 @@ const ExpenseCategories = ({ expenses, periodName, navigation }) => {
         ListFooterComponent={<View style={{ height: 100 }}></View>}
         ListEmptyComponent={
           <View style={styles.fallbackTextContainer}>
-            <Text>{i18n.t("fallbackTextExpenses")}</Text>
+            <Text style={{ marginVertical: 12 }}>
+              {i18n.t("fallbackTextExpenses")}
+            </Text>
+            <AddExpensesHereButton />
           </View>
         }
       />
@@ -151,7 +155,7 @@ const styles = StyleSheet.create({
     padding: "10%",
     marginTop: "-50%",
     alignItems: "center",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
   },
   categoryCard: {
     marginVertical: 4,

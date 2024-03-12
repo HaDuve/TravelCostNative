@@ -346,6 +346,7 @@ const FinderScreen = () => {
               {checkedDate && (
                 <IconButton
                   icon="close-outline"
+                  color={GlobalStyles.colors.textColor}
                   size={26}
                   buttonStyle={{ marginTop: "7%" }}
                   onPressStyle={{

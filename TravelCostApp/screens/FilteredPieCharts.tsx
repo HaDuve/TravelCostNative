@@ -30,6 +30,9 @@ import ExpenseCurrencies from "../components/ExpensesOutput/ExpenseStatistics/Ex
 import FlatButton from "../components/UI/FlatButton";
 import FilteredExpenses from "./FilteredExpenses";
 import BackButton from "../components/UI/BackButton";
+import AddExpensesHereButton from "../components/UI/AddExpensesHereButton";
+import { ExpenseData } from "../util/expense";
+import { getEarliestDate } from "../util/date";
 
 const FilteredPieCharts = ({ navigation, route }) => {
   const { expenses, dayString, noList = false } = route.params;
@@ -95,6 +98,11 @@ const FilteredPieCharts = ({ navigation, route }) => {
     );
   };
 
+  // find the earliest date in the expenses
+  const earliestDate = getEarliestDate(
+    expenses.map((exp: ExpenseData) => exp.date)
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.firstTitleContainer}>
@@ -137,7 +145,21 @@ const FilteredPieCharts = ({ navigation, route }) => {
       </View>
       <View style={styles.shadow}></View>
       {contents[toggleGraphEnum]}
-      <FlatButton onPress={() => navigation.pop()}>{i18n.t("back")}</FlatButton>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingHorizontal: "5%",
+        }}
+      >
+        <FlatButton onPress={() => navigation.pop()}>
+          {i18n.t("back")}
+        </FlatButton>
+        <AddExpensesHereButton
+          dayISO={new Date(earliestDate).toISOString()}
+        ></AddExpensesHereButton>
+      </View>
     </View>
   );
 };

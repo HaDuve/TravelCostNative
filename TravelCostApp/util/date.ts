@@ -137,6 +137,12 @@ export function toMonthString(date: DateOrDateTime) {
   // return monthName;
 }
 
+export function getEarliestDate(dateISOs: string[]) {
+  return dateISOs.reduce(function (pre, cur) {
+    return Date.parse(pre) > Date.parse(cur) ? cur : pre;
+  });
+}
+
 export function getDateMinusDays(date: DateOrDateTime, days: number) {
   if (date instanceof DateTime) return _getDateMinusDays(date, days);
   return new Date(date.getFullYear(), date.getMonth(), date.getDate() - days);

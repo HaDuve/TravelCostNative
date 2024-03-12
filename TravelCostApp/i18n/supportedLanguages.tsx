@@ -416,6 +416,7 @@ const en = {
   budgetPerTraveller: "Budget per traveller",
   charts: "Charts",
   future: "future",
+  past: "past",
 };
 const de = {
   // special expense strings
@@ -856,6 +857,7 @@ const de = {
   budgetPerTraveller: "Budget pro Reisendem",
   charts: "Diagramme",
   future: "zukünftige",
+  past: "vergangene",
 };
 const fr = {
   // special expense strings
@@ -1291,6 +1293,7 @@ const fr = {
   budgetPerTraveller: "Budget par voyageur",
   charts: "Diagrammes",
   future: "futures",
+  past: "passés",
 };
 const ru = {
   // special expense strings
@@ -1731,5 +1734,6 @@ const ru = {
   budgetPerTraveller: "Бюджет на одного путешественника",
   charts: "Схемы",
   future: "Будущее",
+  past: "прошлые",
 };
 export { en, de, fr, ru };

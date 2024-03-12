@@ -2,12 +2,19 @@ Changelog Travel Expense App
 
 __Newest Changes:
 
+1.2.802e
+- Show future Dates in Overview
+- Added "Add Expenses Here"-Button in Filtered Screens, to quickly add expenses to a specific date
+- Added optional manual update of Exchange Rates in settings
+- Bugfixes and performance improvements
+
+__Other Changes:
+
 1.2.802d
 - Improved Trip Summary Screen for multiple trips
 - Added information about the last currency exchange rate update in Settings Screen
 - Bugfixes and performance improvements
 
-__Other Changes:
 
 1.2.802c
 - New Overview-Overlay on Budget-Number press (Top Right)

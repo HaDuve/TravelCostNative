@@ -145,14 +145,7 @@ const FilteredPieCharts = ({ navigation, route }) => {
       </View>
       <View style={styles.shadow}></View>
       {contents[toggleGraphEnum]}
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          paddingHorizontal: "5%",
-        }}
-      >
+      <View style={styles.footerContainer}>
         <FlatButton onPress={() => navigation.pop()}>
           {i18n.t("back")}
         </FlatButton>
@@ -222,5 +215,12 @@ const styles = StyleSheet.create({
   chevronContainer: {
     justifyContent: "center",
     alignItems: "center",
+  },
+  footerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: "5%",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
   },
 });

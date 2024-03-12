@@ -16,6 +16,7 @@ import PropTypes from "prop-types";
 import BackButton from "../components/UI/BackButton";
 import BlurPremium from "../components/Premium/BlurPremium";
 import FlatButton from "../components/UI/FlatButton";
+import { useNavigation } from "@react-navigation/native";
 
 const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
   const { expenses, dayString, showSumForTravellerName } = expensesAsArg
@@ -26,6 +27,7 @@ const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
       }
     : route.params;
   const withArgs = expensesAsArg ? true : false;
+  const navigation = useNavigation();
 
   // if (!expenses || expenses?.length < 1) {
   //   Toast.show({

@@ -91,12 +91,10 @@ export async function getRateAPI1(
   const lastUpdate = forceNewRate
     ? false
     : getMMKVString("currencyExchange_lastUpdate");
-  console.log("forceNewRate:", forceNewRate, "lastUpdate", lastUpdate);
   if (lastUpdate) {
     const lastUpdateDateTime = DateTime.fromISO(lastUpdate);
     const now = DateTime.now();
     const diff = now.diff(lastUpdateDateTime, "hours").hours;
-    console.log("diff:", diff, " < ", CACHE_NUM_HOURS);
     if (diff < CACHE_NUM_HOURS) {
       // get from asyncstore
       return getOfflineRate(base, target);

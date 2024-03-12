@@ -17,6 +17,9 @@ import BackButton from "../components/UI/BackButton";
 import BlurPremium from "../components/Premium/BlurPremium";
 import FlatButton from "../components/UI/FlatButton";
 import { useNavigation } from "@react-navigation/native";
+import AddExpenseHereButton from "../components/UI/AddExpensesHereButton";
+import { getEarliestDate } from "../util/date";
+import { ExpenseData } from "../util/expense";
 
 const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
   const { expenses, dayString, showSumForTravellerName } = expensesAsArg
@@ -28,6 +31,10 @@ const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
     : route.params;
   const withArgs = expensesAsArg ? true : false;
   const navigation = useNavigation();
+  const earliestDate = getEarliestDate(
+    expenses.map((exp: ExpenseData) => exp.date)
+  );
+  // ||new Date(dayString).toISOString();
 
   // if (!expenses || expenses?.length < 1) {
   //   Toast.show({
@@ -59,9 +66,12 @@ const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
       />
       <BlurPremium canBack />
       {!withArgs && (
-        <FlatButton onPress={() => navigation.pop()}>
-          {i18n.t("back")}
-        </FlatButton>
+        <View style={{ flexDirection: "row" }}>
+          <FlatButton onPress={() => navigation.pop()}>
+            {i18n.t("back")}
+          </FlatButton>
+          <AddExpenseHereButton dayISO={earliestDate} />
+        </View>
       )}
     </View>
   );

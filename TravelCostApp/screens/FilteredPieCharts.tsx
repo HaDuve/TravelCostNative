@@ -30,7 +30,7 @@ import ExpenseCurrencies from "../components/ExpensesOutput/ExpenseStatistics/Ex
 import FlatButton from "../components/UI/FlatButton";
 import FilteredExpenses from "./FilteredExpenses";
 import BackButton from "../components/UI/BackButton";
-import AddExpensesHereButton from "../components/UI/AddExpensesHereButton";
+import AddExpenseHereButton from "../components/UI/AddExpensesHereButton";
 import { ExpenseData } from "../util/expense";
 import { getEarliestDate } from "../util/date";
 
@@ -98,7 +98,6 @@ const FilteredPieCharts = ({ navigation, route }) => {
     );
   };
 
-  // find the earliest date in the expenses
   const earliestDate = getEarliestDate(
     expenses.map((exp: ExpenseData) => exp.date)
   );
@@ -149,9 +148,7 @@ const FilteredPieCharts = ({ navigation, route }) => {
         <FlatButton onPress={() => navigation.pop()}>
           {i18n.t("back")}
         </FlatButton>
-        <AddExpensesHereButton
-          dayISO={new Date(earliestDate).toISOString()}
-        ></AddExpensesHereButton>
+        <AddExpenseHereButton dayISO={earliestDate}></AddExpenseHereButton>
       </View>
     </View>
   );

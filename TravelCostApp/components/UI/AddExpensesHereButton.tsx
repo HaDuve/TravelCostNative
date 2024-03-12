@@ -14,13 +14,16 @@ import FlatButton from "./FlatButton";
 import { useNavigation } from "@react-navigation/native";
 import { DateTime } from "luxon";
 import PropTypes from "prop-types";
+import { isIsoDate } from "../../util/date";
 
-const AddExpensesHereButton = ({ dayISO }) => {
+const AddExpenseHereButton = ({ dayISO }) => {
   const navigation = useNavigation();
+  if (!isIsoDate(dayISO)) {
+    return <></>;
+  }
   const formattedDayString = `${i18n.t("addExp")}: ${DateTime.fromISO(
     dayISO
   ).toLocaleString()}`;
-
   return (
     <View>
       <FlatButton
@@ -37,9 +40,9 @@ const AddExpensesHereButton = ({ dayISO }) => {
   );
 };
 
-export default AddExpensesHereButton;
+export default AddExpenseHereButton;
 
-AddExpensesHereButton.propTypes = {
+AddExpenseHereButton.propTypes = {
   dayISO: PropTypes.string,
 };
 

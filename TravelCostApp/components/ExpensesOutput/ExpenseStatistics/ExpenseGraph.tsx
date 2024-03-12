@@ -104,7 +104,6 @@ const ExpenseGraph = ({
         const expenseString = emptyValue
           ? ""
           : formatExpenseWithCurrency(item.expensesSum, tripCtx.tripCurrency);
-
         return (
           <Pressable
             style={({ pressed }) => [
@@ -124,6 +123,7 @@ const ExpenseGraph = ({
                     (item.isSpecialExpense && !hideSpecial)
                 );
               // if (!filteredExpenses || filteredExpenses?.length === 0) return;
+
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
                 dayString: dayString,

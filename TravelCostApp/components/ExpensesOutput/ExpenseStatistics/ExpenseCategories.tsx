@@ -22,7 +22,6 @@ import BlurPremium from "../../Premium/BlurPremium";
 import { processTitleStringFilteredPiecharts } from "../../../util/string";
 import { TripContext } from "../../../store/trip-context";
 import { getExpensesSum } from "../../../util/expense";
-import AddExpensesHereButton from "../../UI/AddExpensesHereButton";
 
 const ExpenseCategories = ({ expenses, periodName, navigation }) => {
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
@@ -128,7 +127,6 @@ const ExpenseCategories = ({ expenses, periodName, navigation }) => {
             <Text style={{ marginVertical: 12 }}>
               {i18n.t("fallbackTextExpenses")}
             </Text>
-            <AddExpensesHereButton />
           </View>
         }
       />

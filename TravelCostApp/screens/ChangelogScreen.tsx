@@ -83,11 +83,11 @@ const ChangelogScreen = ({ navigation }) => {
         setStoredChangelog();
       }
     }
+    setStoredChangelog();
     if (strongConnection && (!changelogText || changelogText.length < 1)) {
       setNewChangelog();
       return;
     }
-    setStoredChangelog();
   }, [changelogText, strongConnection, navigation, setStoredChangelog]);
 
   if (isFetching) {

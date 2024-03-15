@@ -72,7 +72,7 @@ import {
 import { TripAsObject } from "../../screens/TripSummaryScreen";
 import { Pressable } from "react-native";
 import safeLogError from "../../util/error";
-import { scale, verticalScale } from "../../util/scalingUtil";
+import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -924,10 +924,10 @@ const styles = StyleSheet.create({
   scrollToTopButton: {
     flex: 1,
     position: "absolute",
-    top: 10,
+    top: verticalScale(10),
     alignSelf: "center",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: moderateScale(8),
+    paddingVertical: moderateScale(4),
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 50,
     borderColor: GlobalStyles.colors.primaryGrayed,
@@ -935,7 +935,7 @@ const styles = StyleSheet.create({
   },
   scrollToTopText: {
     color: GlobalStyles.colors.primary700,
-    fontSize: 14,
+    fontSize: moderateScale(14),
     fontWeight: "bold",
   },
   fastExpenseContainer: {

@@ -392,6 +392,7 @@ function RecentExpenses({ navigation }) {
           open={open}
           value={PeriodValue}
           items={items}
+          showTickIcon={false}
           setOpen={() => {
             requestAnimationFrame(() => {
               setOpen(!open);
@@ -418,8 +419,9 @@ function RecentExpenses({ navigation }) {
           dropDownContainerStyle={styles.dropdownContainerDropdown}
           itemProps={{
             style: {
-              height: verticalScale(80),
-              width: scale(160),
+              height: moderateScale(50),
+              padding: moderateScale(4),
+              marginLeft: scale(4),
             },
           }}
           style={styles.dropdown}
@@ -500,7 +502,7 @@ const styles = StyleSheet.create({
     }),
   },
   dropdownContainerDropdown: {
-    height: verticalScale(300),
+    maxHeight: verticalScale(600),
   },
   dropdown: {
     borderRadius: 10,

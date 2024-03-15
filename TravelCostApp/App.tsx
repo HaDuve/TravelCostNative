@@ -110,7 +110,12 @@ import BackgroundFetchScreen, {
 } from "./taskmanager/backgroundTasks";
 import safeLogError from "./util/error";
 import { useOrientation } from "./components/Hooks/useOrientation";
-import { isTablet, scale } from "./util/scalingUtil";
+import {
+  isTablet,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "./util/scalingUtil";
 import { CustomTooltip } from "./components/UI/Tourguide_Tooltip";
 
 // Keep the splash screen visible while we fetch resources
@@ -398,24 +403,32 @@ function Home() {
         tabBarStyle: {
           backgroundColor: GlobalStyles.colors.gray500,
           // paddingTop: 4,
-          borderTopWidth: 1,
+          borderTopWidth: moderateScale(1),
           borderTopColor: GlobalStyles.colors.gray600,
+          height: verticalScale(50),
         },
         tabBarItemStyle: {
           // width: "40%",
           borderWidth: 0,
-          padding: "0%",
           // margin: "0%",
-          marginTop: "-2%",
+          marginTop: verticalScale(-2),
           // marginBottom: "1%",
           // paddingBottom: "1%",
+          height: verticalScale(50),
+          padding: scale(4),
         },
         tabBarLabelStyle: {
-          fontSize: 10,
+          fontSize: moderateScale(10),
+        },
+        tabBarIconStyle: {
+          height: moderateScale(25),
+          width: moderateScale(25),
         },
         tabBarActiveTintColor: GlobalStyles.colors.primary500,
         tabBarIndicatorStyle: {
           backgroundColor: GlobalStyles.colors.primary500,
+          borderWidth: moderateScale(1),
+          borderColor: GlobalStyles.colors.primary500,
         },
         tabBarBounces: true,
       })}
@@ -429,7 +442,11 @@ function Home() {
           // title: "Recent Expenses",
           tabBarLabel: i18n.t("expensesTab"),
           tabBarIcon: ({ color }) => (
-            <Ionicons name="home-outline" size={24} color={color} />
+            <Ionicons
+              name="home-outline"
+              size={moderateScale(24)}
+              color={color}
+            />
           ),
         }}
       />
@@ -459,7 +476,7 @@ function Home() {
           tabBarIcon: ({ color }) => (
             <Ionicons
               name={isShowingGraph ? "bar-chart-outline" : "pie-chart-outline"}
-              size={24}
+              size={moderateScale(24)}
               color={color}
             />
           ),
@@ -476,7 +493,11 @@ function Home() {
 
             tabBarLabel: "Finder", //i18n.t("settingsTab"),
             tabBarIcon: ({ color }) => (
-              <Ionicons name="search-outline" size={24} color={color} />
+              <Ionicons
+                name="search-outline"
+                size={moderateScale(24)}
+                color={color}
+              />
             ),
           }}
         />
@@ -492,7 +513,11 @@ function Home() {
 
             tabBarLabel: "Financial", //i18n.t("settingsTab"),
             tabBarIcon: ({ color }) => (
-              <Ionicons name="cash-outline" size={24} color={color} />
+              <Ionicons
+                name="cash-outline"
+                size={moderateScale(24)}
+                color={color}
+              />
             ),
           }}
         />
@@ -509,9 +534,16 @@ function Home() {
           tabBarIcon: ({ color }) => (
             <View>
               {hasNewChanges && (
-                <Badge style={{ position: "absolute" }} size={6} />
+                <Badge
+                  style={{ position: "absolute" }}
+                  size={moderateScale(6)}
+                />
               )}
-              <Ionicons name="globe-outline" size={24} color={color} />
+              <Ionicons
+                name="globe-outline"
+                size={moderateScale(24)}
+                color={color}
+              />
             </View>
           ),
         }}

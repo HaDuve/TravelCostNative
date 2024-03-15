@@ -59,6 +59,7 @@ import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { Platform } from "react-native";
 import { memo } from "react";
 import { getMMKVObject } from "../store/mmkv";
+import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
 
 function RecentExpenses({ navigation }) {
   const expensesCtx = useContext(ExpensesContext);
@@ -355,19 +356,19 @@ function RecentExpenses({ navigation }) {
       <TourGuideZone
         text={i18n.t("walk1")}
         zone={1}
-        maskOffset={-4}
-        tooltipBottomOffset={200}
+        maskOffset={verticalScale(-4)}
+        tooltipBottomOffset={verticalScale(200)}
       ></TourGuideZone>
       <TourGuideZone
         text={i18n.t("walk8")}
         zone={8}
-        maskOffset={-4}
-        tooltipBottomOffset={-200}
+        maskOffset={verticalScale(-4)}
+        tooltipBottomOffset={verticalScale(-200)}
       ></TourGuideZone>
       <TourGuideZone
         text={i18n.t("walk3")}
-        maskOffset={200}
-        tooltipBottomOffset={-200}
+        maskOffset={verticalScale(200)}
+        tooltipBottomOffset={verticalScale(-200)}
         zone={3}
       ></TourGuideZone>
       <View style={styles.dateHeader}>
@@ -414,6 +415,13 @@ function RecentExpenses({ navigation }) {
           }}
           setItems={setItems}
           containerStyle={styles.dropdownContainer}
+          dropDownContainerStyle={styles.dropdownContainerDropdown}
+          itemProps={{
+            style: {
+              height: verticalScale(80),
+              width: scale(160),
+            },
+          }}
           style={styles.dropdown}
           textStyle={[
             styles.dropdownTextStyle,
@@ -457,26 +465,26 @@ const styles = StyleSheet.create({
     }),
   },
   dateHeader: {
-    marginVertical: "4%",
-    marginLeft: "6%",
-    marginBottom: "-6%",
+    marginVertical: verticalScale(16),
+    marginLeft: scale(12),
+    marginBottom: verticalScale(-20),
   },
   dateString: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    marginTop: "6%",
-    marginHorizontal: "4%",
-    marginBottom: "4%",
+    marginTop: verticalScale(24),
+    marginHorizontal: scale(12),
+    marginBottom: verticalScale(12),
     zIndex: 10,
   },
   dropdownContainer: {
-    maxWidth: "50%",
-    marginTop: "2%",
+    maxWidth: scale(160),
+    marginTop: verticalScale(6),
     ...Platform.select({
       ios: {
         shadowColor: GlobalStyles.colors.textColor,
@@ -491,16 +499,19 @@ const styles = StyleSheet.create({
       },
     }),
   },
+  dropdownContainerDropdown: {
+    height: verticalScale(300),
+  },
   dropdown: {
     borderRadius: 10,
     borderWidth: 0,
   },
   dropdownTextStyle: {
-    fontSize: i18n.locale == "fr" ? 20 : 34,
+    fontSize: i18n.locale == "fr" ? moderateScale(20) : moderateScale(34),
     fontWeight: "bold",
   },
   scaledUpTextStyle: {
-    fontSize: 24,
+    fontSize: moderateScale(24),
   },
   zBehind: {
     zIndex: 10,

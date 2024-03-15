@@ -12,6 +12,7 @@ i18n.enableFallback = true;
 import Onboarding from "react-native-onboarding-swiper";
 import { GlobalStyles } from "../constants/styles";
 import PropTypes from "prop-types";
+import { moderateScale, scale } from "../util/scalingUtil";
 
 const OnboardingScreen = ({ navigation }) => {
   return (
@@ -59,9 +60,9 @@ OnboardingScreen.propTypes = {
 
 const styles = StyleSheet.create({
   titleStyle: {
-    paddingHorizontal: "10%",
-    marginTop: "-10%",
-    fontSize: 28,
+    paddingHorizontal: scale(20),
+    marginTop: scale(-20),
+    fontSize: moderateScale(28),
     fontWeight: "bold",
   },
 });

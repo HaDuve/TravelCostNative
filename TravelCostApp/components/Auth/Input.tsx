@@ -3,6 +3,7 @@ import React, { View, Text, TextInput, StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
 
 function Input({
   label,
@@ -75,22 +76,23 @@ Input.propTypes = {
 
 const styles = StyleSheet.create({
   inputContainer: {
-    minHeight: 50,
+    minHeight: moderateScale(50),
     marginVertical: 8,
   },
   label: {
     color: GlobalStyles.colors.gray600,
     marginBottom: 4,
+    fontSize: moderateScale(14),
   },
   labelInvalid: {
     color: GlobalStyles.colors.error500,
   },
   input: {
-    paddingVertical: 8,
-    paddingHorizontal: 6,
+    paddingVertical: verticalScale(8),
+    paddingHorizontal: moderateScale(6),
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 4,
-    fontSize: 16,
+    fontSize: moderateScale(16),
     borderBottomWidth: 1,
   },
   inputInvalid: {

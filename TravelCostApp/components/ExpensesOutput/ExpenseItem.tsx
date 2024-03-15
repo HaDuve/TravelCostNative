@@ -30,6 +30,7 @@ import { useEffect } from "react";
 import * as Haptics from "expo-haptics";
 import { ExpenseData } from "../../util/expense";
 import { useRef } from "react";
+import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -197,7 +198,7 @@ function ExpenseItem(props): JSX.Element {
                   style={[
                     styles.avatar,
                     GlobalStyles.shadow,
-                    { marginBottom: 16 },
+                    { marginBottom: verticalScale(16) },
                     userPaid && styles.avatarPaid,
                   ]}
                 >
@@ -243,7 +244,9 @@ function ExpenseItem(props): JSX.Element {
 
   if (!id) return <></>;
   return (
-    <View style={[{ height: 55 }, hideSpecial && { opacity: 0.75 }]}>
+    <View
+      style={[{ height: verticalScale(55) }, hideSpecial && { opacity: 0.75 }]}
+    >
       <Pressable
         onPress={navigateToExpense}
         onLongPress={() => {
@@ -256,7 +259,7 @@ function ExpenseItem(props): JSX.Element {
           <View style={styles.iconContainer}>
             <Ionicons
               name={catSymbol}
-              size={28}
+              size={moderateScale(28)}
               color={
                 hideSpecial
                   ? GlobalStyles.colors.textHidden
@@ -343,7 +346,7 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
   expenseItem: {
-    height: 55,
+    height: verticalScale(55),
     borderWidth: 0,
     borderColor: "black",
 
@@ -363,8 +366,8 @@ const styles = StyleSheet.create({
     }),
   },
   textBase: {
-    marginTop: 2,
-    marginLeft: 4,
+    marginTop: verticalScale(2),
+    marginLeft: scale(4),
     color: GlobalStyles.colors.textColor,
   },
   description: {
@@ -372,75 +375,79 @@ const styles = StyleSheet.create({
     // width: "110%",
     fontStyle: "italic",
     fontWeight: "300",
-    fontSize: 15,
+    fontSize: moderateScale(15),
     zIndex: 2,
     flexWrap: "wrap",
     flexDirection: "row",
   },
   secondaryText: {
     color: GlobalStyles.colors.gray700,
-    fontSize: 13,
+    fontSize: moderateScale(13),
     zIndex: 1,
   },
   iconContainer: {
-    marginTop: 4,
-    marginRight: 8,
+    marginTop: verticalScale(4),
+    marginRight: scale(8),
     marginLeft: 0,
   },
   leftItem: {
     flex: 1,
+    maxHeight: verticalScale(40),
+    alignContent: "flex-start",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
   },
   amountContainer: {
-    paddingHorizontal: 4,
+    paddingHorizontal: scale(4),
     paddingVertical: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,
-    minWidth: 80,
+    minWidth: scale(80),
   },
   amount: {
-    minWidth: 100,
-    maxWidth: 100,
+    minWidth: scale(100),
+    maxWidth: scale(100),
     textAlign: "center",
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: "300",
     color: GlobalStyles.colors.error300,
   },
 
   originalCurrencyText: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     textAlign: "center",
     fontWeight: "300",
   },
   countryFlagContainer: {
-    marginRight: "1%",
+    marginRight: scale(4),
   },
   countryFlag: {
-    marginTop: "6%",
+    marginTop: verticalScale(3),
     // marginRight: 12,
   },
   avatarContainer: {
-    maxHeight: 50,
-    padding: 4,
-    paddingRight: 10,
+    maxHeight: verticalScale(50),
+    padding: scale(4),
+    paddingRight: scale(10),
     // center items left
     flexDirection: "row",
   },
   avatar: {
-    marginRight: -6,
-    minHeight: 20,
-    minWidth: 20,
+    marginRight: scale(-6),
+    minHeight: moderateScale(22),
+    minWidth: moderateScale(22),
     borderRadius: 60,
-    borderWidth: 1,
+    borderWidth: moderateScale(1),
     borderColor: GlobalStyles.colors.primaryGrayed,
     backgroundColor: GlobalStyles.colors.gray500,
     alignItems: "center",
     justifyContent: "center",
     ...Platform.select({
       android: {
-        minHeight: 22,
-        minWidth: 22,
+        minHeight: verticalScale(22),
+        minWidth: scale(22),
       },
     }),
   },
@@ -449,7 +456,7 @@ const styles = StyleSheet.create({
     borderColor: GlobalStyles.colors.primary700,
   },
   avatarText: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     fontWeight: "bold",
     color: GlobalStyles.colors.primary700,
   },

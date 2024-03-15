@@ -26,6 +26,7 @@ import FlatButton from "../UI/FlatButton";
 import AuthForm from "./AuthForm";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
+import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
 
 function AuthContent({ isLogin, onAuthenticate, isConnected }) {
   const navigation = useNavigation();
@@ -117,13 +118,13 @@ const styles = StyleSheet.create({
     // backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   authContent: {
-    padding: "4%",
-    marginTop: "8%",
-    marginBottom: "10%",
-    marginHorizontal: "6%",
+    padding: scale(16),
+    marginTop: verticalScale(30),
+    marginBottom: verticalScale(20),
+    marginHorizontal: scale(16),
     ...Platform.select({
       android: {
-        marginBottom: "20%",
+        marginBottom: verticalScale(60),
       },
     }),
     borderRadius: 8,
@@ -142,14 +143,14 @@ const styles = StyleSheet.create({
   },
   buttons: {
     flexDirection: i18n.locale !== "en" ? "column" : "row",
-    marginTop: "4%",
+    marginTop: verticalScale(16),
     alignItems: "center",
     justifyContent: "center",
   },
   secondaryText: {
-    fontSize: 14,
-    paddingVertical: "2%",
-    paddingHorizontal: "2%",
+    fontSize: moderateScale(14),
+    paddingVertical: verticalScale(8),
+    paddingHorizontal: scale(6),
     color: GlobalStyles.colors.gray700,
     fontWeight: "300",
   },

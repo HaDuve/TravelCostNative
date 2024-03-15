@@ -30,6 +30,7 @@ import Animated, {
 import { MAX_PERIOD_RANGE, MIN_PERIOD_RANGE } from "../../confAppConstants";
 import { BlurView } from "expo-blur";
 import { TripContext } from "../../store/trip-context";
+import { verticalScale } from "../../util/scalingUtil";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const tripCtx = useContext(TripContext);
@@ -234,7 +235,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       >
         <TourGuideZone
           text={i18n.t("walk4")}
-          tooltipBottomOffset={166}
+          tooltipBottomOffset={verticalScale(166)}
           maskOffset={60}
           zone={4}
           shape={"circle"}

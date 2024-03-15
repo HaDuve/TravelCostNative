@@ -38,6 +38,7 @@ import { setAttributesAsync } from "../components/Premium/PremiumConstants";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import { NetworkContext } from "../store/network-context";
 import safeLogError from "../util/error";
+import { verticalScale } from "../util/scalingUtil";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -357,8 +358,8 @@ const ProfileScreen = ({ navigation }) => {
         </View>
         <TourGuideZone
           text={i18n.t("walk6")}
-          maskOffset={200}
-          tooltipBottomOffset={250}
+          maskOffset={verticalScale(200)}
+          tooltipBottomOffset={verticalScale(250)}
           zone={6}
         >
           <TripList trips={tripHistory}></TripList>
@@ -367,8 +368,8 @@ const ProfileScreen = ({ navigation }) => {
       <View style={styles.horizontalButtonContainer}>
         <TourGuideZone
           text={i18n.t("walk7")}
-          maskOffset={50}
-          tooltipBottomOffset={50}
+          maskOffset={verticalScale(50)}
+          tooltipBottomOffset={verticalScale(50)}
           zone={7}
         >
           <View>

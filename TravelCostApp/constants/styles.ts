@@ -1,5 +1,6 @@
 import { Platform } from "react-native";
 import { Layout } from "react-native-reanimated";
+import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
 
 export const GlobalStyles = {
   colors: {
@@ -65,21 +66,23 @@ export const GlobalStyles = {
   titleText: {
     textAlign: "center",
     color: "#434343",
-    fontSize: 28,
+    fontSize: moderateScale(28),
     fontWeight: "bold",
-    marginBottom: "4%",
+    marginBottom: verticalScale(12),
   },
   buttonTextGradient: {
     color: "#FFFFFF",
     textAlign: "center",
     fontStyle: "italic",
     fontWeight: "300",
+    fontSize: moderateScale(14),
   },
   buttonTextFlat: {
     color: "#008C70",
     textAlign: "center",
     fontStyle: "italic",
     fontWeight: "300",
+    fontSize: moderateScale(14),
   },
   secondaryText: {
     fontSize: 14,
@@ -150,8 +153,8 @@ export const GlobalStyles = {
     opacity: 0.9,
   },
   countryFlagStyle: {
-    width: 30,
-    height: 25,
+    width: moderateScale(30),
+    height: moderateScale(25),
     borderRadius: 1000,
     borderWidth: 1,
     borderColor: "#626262",

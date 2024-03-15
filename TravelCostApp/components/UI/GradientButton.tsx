@@ -4,6 +4,7 @@ import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import PropTypes from "prop-types";
+import { moderateScale, scale } from "../../util/scalingUtil";
 
 const GradientButton = ({
   children,
@@ -58,7 +59,8 @@ GradientButton.propTypes = {
 
 const styles = StyleSheet.create({
   button: {
-    padding: 16,
+    padding: moderateScale(16),
+    marginHorizontal: scale(4),
     backgroundColor: GlobalStyles.colors.primary500,
 
     overflow: "visible",

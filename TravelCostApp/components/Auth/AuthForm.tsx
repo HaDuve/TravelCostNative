@@ -18,6 +18,7 @@ import {
   secureStoreGetItem,
   secureStoreSetItem,
 } from "../../store/secure-storage";
+import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
 
 function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
   const [enteredEmail, setEnteredEmail] = useState("");
@@ -150,7 +151,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
         <View style={styles.iconContainer}>
           <Image
             source={require("../../assets/icon2.png")}
-            style={{ width: 60, height: 60 }}
+            style={{ width: moderateScale(60), height: moderateScale(60) }}
           />
         </View>
         <View style={styles.titleContainer}>
@@ -244,11 +245,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttons: {
-    marginTop: 12,
+    marginTop: scale(12),
   },
   iconContainer: {
-    marginTop: "-12%",
-    marginBottom: "4%",
+    marginTop: verticalScale(-30),
+    marginBottom: scale(10),
     alignItems: "center",
     justifyContent: "center",
     flex: 1,
@@ -260,37 +261,37 @@ const styles = StyleSheet.create({
   titleText: {
     textAlign: "center",
     color: GlobalStyles.colors.textColor,
-    fontSize: 28,
+    fontSize: moderateScale(28),
     fontWeight: "bold",
-    marginBottom: "4%",
+    marginBottom: scale(12),
   },
   subTitleText: {
     textAlign: "center",
     color: GlobalStyles.colors.gray700,
-    fontSize: 14,
-    marginBottom: "4%",
+    fontSize: moderateScale(14),
+    marginBottom: scale(12),
   },
   appleAuthContainer: {
-    marginTop: "8%",
+    marginTop: scale(16),
     justifyContent: "center",
     alignItems: "center",
   },
   orText: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     fontWeight: "bold",
     color: GlobalStyles.colors.gray600,
   },
   google: {
-    marginTop: 12,
-    margin: 4,
-    padding: 8,
-    paddingHorizontal: 32,
+    marginTop: scale(12),
+    margin: scale(4),
+    padding: scale(8),
+    paddingHorizontal: scale(32),
     borderWidth: 1,
     borderColor: GlobalStyles.colors.gray500,
     borderRadius: 8,
   },
   googleText: {
-    fontSize: 18,
+    fontSize: moderateScale(18),
     color: GlobalStyles.colors.textColor,
   },
 });

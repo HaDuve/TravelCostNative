@@ -87,7 +87,7 @@ const CurrencyExchangeInfo = () => {
       ]
     );
   };
-  const rateUneqal1 = currentRate && currentRate != 1;
+  const rateUneqal1 = currentRate && currentRate != 1 && currentRate != -1;
   if (!rateUneqal1) return <></>;
   return (
     <TouchableOpacity disabled={isFetching} onPress={PressHandler}>

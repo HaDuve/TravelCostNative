@@ -6,7 +6,8 @@ import safeLogError from "../../util/error";
 export async function initBranch(navigation = null) {
   const storedUid = await secureStoreGetItem("uid");
   branch.setIdentity(storedUid);
-  await showBranchParams();
+  // const { campaign, channel, feature, tags, stage, url } =
+  //   await showBranchParams();
   // Listener
   branch.subscribe({
     onOpenStart: () => {

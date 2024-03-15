@@ -10,7 +10,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TourGuideZone } from "rn-tourguide";
 
@@ -42,6 +42,8 @@ import { getCatSymbol } from "../../util/category";
 import IconButton from "../UI/IconButton";
 import uniqBy from "lodash.uniqby";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import { OrientationState, useOrientation } from "../Hooks/useOrientation";
 
 const PageLength = 20;
 
@@ -50,6 +52,8 @@ const AddExpenseButton = ({ navigation }) => {
   const tripCtx = useContext(TripContext);
   const authCtx = useContext(AuthContext);
   const expCtx = useContext(ExpensesContext);
+  const orientation: OrientationState = useOrientation();
+  const isPortrait: boolean = orientation === "PORTRAIT";
   // sort last expenses by editedTimestamp timestamp
   const lastExpenses: ExpenseData[] = uniqBy(
     expCtx.expenses.sort((a, b) => {
@@ -152,19 +156,19 @@ const AddExpenseButton = ({ navigation }) => {
           }}
         >
           <IconButton
-            size={24}
+            size={moderateScale(24)}
             icon={categoryIcon}
             category={cat}
             color={GlobalStyles.colors.textColor}
           ></IconButton>
-          <Text style={styles.description}>{formattedDescription}</Text>
-          <Text style={{}}>{formattedAmount}</Text>
+          <Text style={styles.descriptionText}>{formattedDescription}</Text>
+          <Text style={styles.amountText}>{formattedAmount}</Text>
         </Pressable>
       </View>
     );
   };
 
-  const pressHandler = async () => {
+  const pressHandler = useCallback(async () => {
     const retryTimeout = 5000; // Adjust this timeout as needed
     const startTime = Date.now();
 
@@ -223,7 +227,7 @@ const AddExpenseButton = ({ navigation }) => {
       }
     };
     retryFunction();
-  };
+  }, [authCtx, navigation, skipCatScreen, tripCtx.travellers, tripCtx.tripid]);
 
   const END_POSITION = Dimensions.get("window").height * 0.2;
   const position = useSharedValue(0);
@@ -265,7 +269,7 @@ const AddExpenseButton = ({ navigation }) => {
     return (
       <GestureDetector gesture={panGesture}>
         <Animated.View
-          style={[styles.margin, animatedStyle]}
+          style={[styles.marginTemplate, animatedStyle]}
           entering={SlideInDown.duration(600)}
           exiting={SlideOutDown}
         >
@@ -306,36 +310,37 @@ const AddExpenseButton = ({ navigation }) => {
       </GestureDetector>
     );
   }
+  // if (!valid.current) return <Text>INV</Text>;
 
-  if (!valid.current) {
-    return (
-      <Animated.View
-        style={[styles.margin]}
-        entering={SlideInDown.duration(600)}
-        exiting={SlideOutDown}
-      >
-        <Pressable
-          onPress={() => {
-            pressHandler();
-          }}
-          style={[
-            styles.addButton,
-            GlobalStyles.shadowGlowPrimary,
-            styles.addButtonInactive,
-          ]}
-        >
-          <LoadingBarOverlay
-            containerStyle={{
-              backgroundColor: "transparent",
-              maxHeight: 44,
-              marginLeft: -4,
-            }}
-            noText
-          ></LoadingBarOverlay>
-        </Pressable>
-      </Animated.View>
-    );
-  }
+  // if (!valid.current) {
+  //   return (
+  //     <Animated.View
+  //       style={[styles.margin]}
+  //       entering={SlideInDown.duration(600)}
+  //       exiting={SlideOutDown}
+  //     >
+  //       <Pressable
+  //         onPress={() => {
+  //           pressHandler();
+  //         }}
+  //         style={[
+  //           styles.addButton,
+  //           GlobalStyles.shadowGlowPrimary,
+  //           styles.addButtonInactive,
+  //         ]}
+  //       >
+  //         <LoadingBarOverlay
+  //           containerStyle={{
+  //             backgroundColor: "transparent",
+  //             maxHeight: 44,
+  //             marginLeft: -4,
+  //           }}
+  //           noText
+  //         ></LoadingBarOverlay>
+  //       </Pressable>
+  //     </Animated.View>
+  //   );
+  // }
   return (
     <Animated.View
       style={styles.margin}
@@ -347,7 +352,7 @@ const AddExpenseButton = ({ navigation }) => {
         borderRadius={16}
         shape={"circle"}
         maskOffset={40}
-        tooltipBottomOffset={80}
+        tooltipBottomOffset={verticalScale(80)}
         zone={2}
       ></TourGuideZone>
 
@@ -367,7 +372,7 @@ const AddExpenseButton = ({ navigation }) => {
       >
         <Ionicons
           name={"add-outline"}
-          size={42}
+          size={moderateScale(42)}
           color={GlobalStyles.colors.backgroundColor}
         />
       </Pressable>
@@ -382,11 +387,32 @@ AddExpenseButton.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  margin: { marginTop: "-100%", marginHorizontal: "40%" },
+  margin: {
+    maxHeight: moderateScale(88),
+    maxWidth: moderateScale(88),
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    alignContent: "center",
+  },
+  marginTemplate: {
+    marginHorizontal: scale(60),
+  },
+  templateContainer: {
+    backgroundColor: GlobalStyles.colors.primary400,
+    marginBottom: verticalScale(10),
+    paddingVertical: verticalScale(20),
+    paddingHorizontal: scale(20),
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
+    minWidth: scale(330),
+  },
   addButton: {
     backgroundColor: GlobalStyles.colors.primary400,
     borderRadius: 999,
-    marginBottom: "10%",
+    marginBottom: verticalScale(10),
     paddingVertical: "19.8%",
     paddingHorizontal: "20%",
     flexDirection: "row",
@@ -397,13 +423,18 @@ const styles = StyleSheet.create({
   addButtonInactive: {
     backgroundColor: GlobalStyles.colors.primary400,
   },
-  description: {
+  descriptionText: {
     flex: 1,
     // width: "110%",
     fontStyle: "italic",
     fontWeight: "300",
-    fontSize: 15,
+    fontSize: moderateScale(15),
     flexWrap: "wrap",
+  },
+  amountText: {
+    fontWeight: "300",
+    fontSize: moderateScale(18),
+    color: GlobalStyles.colors.textColor,
   },
   longPressedButton: {
     backgroundColor: GlobalStyles.colors.primary400,

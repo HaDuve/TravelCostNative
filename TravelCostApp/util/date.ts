@@ -10,6 +10,7 @@ import {
   _toDayMonthString,
   _getPreviousMondayDate,
 } from "./dateTime";
+import safeLogError from "./error";
 
 // for every function, if typeof date is DateTime, return _functionName(date,...args)
 // this will call the equivalent function in dateTime.ts
@@ -139,13 +140,30 @@ export function toMonthString(date: DateOrDateTime) {
 
 export function getEarliestDate(dateISOs: string[]) {
   if (!dateISOs || dateISOs.length === 0) return null;
+  // in case any date is not a string turn it into a iso
+  dateISOs.forEach((dateISO) => {
+    if (!isIsoDate(dateISO)) {
+      try {
+        dateISO = new Date(dateISO).toISOString();
+      } catch (e) {
+        safeLogError(e);
+      }
+    }
+  });
   return dateISOs.reduce(function (pre, cur) {
     return Date.parse(pre) > Date.parse(cur) ? cur : pre;
   });
 }
 
+export function getLatestDate(dateISOs: string[]) {
+  if (!dateISOs || dateISOs.length === 0) return null;
+  return dateISOs.reduce(function (pre, cur) {
+    return Date.parse(pre) < Date.parse(cur) ? cur : pre;
+  });
+}
+
 export function isIsoDate(str: string) {
-  if (!str) return false;
+  if (!str || typeof str !== "string") return false;
   if (str.includes("T")) {
     // this is datetime
     if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(str)) return false;

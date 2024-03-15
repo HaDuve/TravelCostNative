@@ -30,6 +30,7 @@
     "currency-symbol-map": "^5.1.0",
     "expo": "^49.0.16",
     "expo-apple-authentication": "~6.1.0",
+    "expo-background-fetch": "~11.3.0",
     "expo-blur": "~12.4.1",
     "expo-constants": "^14.4.2",
     "expo-dev-client": "~2.4.11",
@@ -64,7 +65,7 @@
     "react-native-dotenv": "^3.4.9",
     "react-native-dropdown-picker": "^5.4.2",
     "react-native-gesture-handler": "~2.12.0",
-    "react-native-mmkv": "^2.10.1",
+    "react-native-mmkv": "^2.12.2",
     "react-native-modal": "^13.0.1",
     "react-native-neat-date-picker": "^1.4.5",
     "react-native-offline": "^6.0.0",
@@ -88,8 +89,7 @@
     "splitwise-js-map": "^1.0.3",
     "victory": "^36.6.5",
     "victory-native": "^36.6.8",
-    "xlsx": "^0.18.5",
-    "expo-background-fetch": "~11.3.0"
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

@@ -28,6 +28,7 @@ import {
   getTravellerSum,
 } from "../../util/expense";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
+import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
 
 const ExpensesSummary = ({
   expenses,
@@ -280,8 +281,8 @@ const ExpensesSummary = ({
         borderWidth={0}
         borderRadius={8}
         progress={budgetProgress}
-        height={12}
-        width={useMoreSpace ? 180 : 150}
+        height={verticalScale(12)}
+        width={useMoreSpace ? moderateScale(180) : moderateScale(150)}
       />
     </Pressable>
   );
@@ -300,30 +301,28 @@ const styles = StyleSheet.create({
   container: {
     ...Platform.select({
       ios: {
-        paddingTop: "1%",
-        paddingLeft: "2%",
-        marginRight: "-5%",
-        marginBottom: "-2%",
+        paddingTop: verticalScale(4),
+        paddingLeft: scale(20),
+        marginBottom: verticalScale(-4),
       },
       android: {
-        paddingTop: "1%",
-        paddingLeft: "2%",
-        marginRight: "-5%",
-        marginBottom: "-2%",
+        paddingTop: verticalScale(4),
+        paddingLeft: scale(20),
+        marginBottom: verticalScale(-4),
       },
     }),
   },
   useMoreSpaceContainer: {
-    paddingTop: "3%",
-    paddingBottom: "1%",
-    marginLeft: "-2%",
+    paddingTop: verticalScale(8),
+    paddingBottom: verticalScale(4),
+    marginLeft: scale(-4),
     paddingLeft: 0,
   },
   sumTextContainer: {
     alignItems: "center",
   },
   sum: {
-    fontSize: 32,
+    fontSize: moderateScale(32),
     fontWeight: "bold",
     // padding: 4,
     color: GlobalStyles.colors.primary500,

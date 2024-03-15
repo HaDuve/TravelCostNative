@@ -72,6 +72,7 @@ import {
 import { TripAsObject } from "../../screens/TripSummaryScreen";
 import { Pressable } from "react-native";
 import safeLogError from "../../util/error";
+import { scale, verticalScale } from "../../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -150,7 +151,7 @@ function ExpensesList({
           paddingLeft: 10,
           alignContent: "center",
           justifyContent: "center",
-          width: 55,
+          width: scale(55),
           backgroundColor: GlobalStyles.colors.error500,
         }}
       >
@@ -342,7 +343,9 @@ function ExpensesList({
         itemData.item.id[4] === "o" &&
         itemData.item.id[5] === "w"
       )
-        return <View style={{ height: 55, width: "100%" }}></View>;
+        return (
+          <View style={{ height: verticalScale(55), width: "100%" }}></View>
+        );
       const index = itemData.index;
       const navigateToExpense = async () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -410,7 +413,7 @@ function ExpensesList({
         return (
           <View
             style={{
-              height: 55,
+              height: verticalScale(55),
               width: "100%",
               backgroundColor: GlobalStyles.colors.backgroundColor,
             }}
@@ -441,7 +444,7 @@ function ExpensesList({
         );
       //else platform ios
       return (
-        <View style={{ height: 55, width: "100%" }}>
+        <View style={{ height: verticalScale(55), width: "100%" }}>
           <Swipeable
             renderRightActions={(progress, dragX) =>
               renderRightActions(
@@ -861,8 +864,8 @@ function ExpensesList({
         ListHeaderComponent={listHeaderJSX}
         keyExtractor={(item: Expense) => item.id}
         getItemLayout={(data, index) => ({
-          length: 55,
-          offset: 55 * index,
+          length: verticalScale(55),
+          offset: verticalScale(55) * index,
           index,
         })}
         initialScrollIndex={1}
@@ -936,7 +939,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   fastExpenseContainer: {
-    height: 55,
+    height: verticalScale(55),
     width: "100%",
     flexDirection: "row",
     alignContent: "center",

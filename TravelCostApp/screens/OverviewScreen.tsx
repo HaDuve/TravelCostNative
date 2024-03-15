@@ -38,6 +38,7 @@ import { TripContext } from "../store/trip-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { showBanner } from "../components/UI/ToastComponent";
+import { scale } from "../util/scalingUtil";
 
 const OverviewScreen = ({ navigation }) => {
   // // console.log("rerender OverviewScreen - 0");
@@ -237,7 +238,7 @@ const styles = StyleSheet.create({
     marginBottom: "4%",
   },
   dropdownContainer: {
-    maxWidth: "50%",
+    maxWidth: scale(160),
     ...Platform.select({
       ios: {
         shadowColor: GlobalStyles.colors.textColor,
@@ -266,20 +267,7 @@ const styles = StyleSheet.create({
   zBehind: {
     zIndex: 10,
   },
-  addButton: {
-    backgroundColor: GlobalStyles.colors.primary400,
-    flex: 0,
-    borderRadius: 100,
-    minHeight: 55,
-    minWidth: 30,
-    marginHorizontal: 160,
-    marginTop: -40,
-    marginBottom: -15,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 1,
-  },
+
   tempGrayBar1: {
     borderTopWidth: 1,
     borderBottomWidth: 0,

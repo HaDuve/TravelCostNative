@@ -7,6 +7,8 @@ import {
   Platform,
   AppState,
   StatusBar as StatusBarRN,
+  useWindowDimensions,
+  Dimensions,
 } from "react-native";
 import Purchases from "react-native-purchases";
 
@@ -77,7 +79,7 @@ import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
 import Toast from "react-native-toast-message";
 import { useInterval } from "./components/Hooks/useInterval";
 import { isForeground } from "./util/appState";
-import { TourGuideProvider } from "rn-tourguide";
+import { TourGuideProvider, TooltipProps } from "rn-tourguide";
 import { loadTourConfig } from "./util/tourUtil";
 import { loadKeys, Keys } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
@@ -107,6 +109,9 @@ import BackgroundFetchScreen, {
   registerBackgroundFetchAsync,
 } from "./taskmanager/backgroundTasks";
 import safeLogError from "./util/error";
+import { useOrientation } from "./components/Hooks/useOrientation";
+import { isTablet, scale } from "./util/scalingUtil";
+import { CustomTooltip } from "./components/UI/Tourguide_Tooltip";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -608,7 +613,6 @@ function Root() {
     const userData: UserData = checkUser;
     const tripid = userData.currentTrip;
     if (!tripid || tripid?.length < 2) return;
-    // // console.log("onRootMount ~ userData", userData);
     // save user Name in Ctx and async
     await loadKeys();
     try {
@@ -788,12 +792,20 @@ function handleUnhandledTouches() {
 }
 
 export default function App() {
+  const { width, height } = Dimensions.get("screen");
+  console.log(width, height, "isTablet", isTablet());
   return (
     <View
-      style={{ flex: 1 }}
+      style={{
+        flex: 1,
+      }}
       onStartShouldSetResponder={handleUnhandledTouches}
     >
-      <>
+      <View
+        style={{
+          flex: 1,
+        }}
+      >
         <SafeAreaView
           style={{
             flex: 0,
@@ -827,6 +839,24 @@ export default function App() {
                                 skip: i18n.t("tourGuideLabelSkip"),
                                 finish: i18n.t("tourGuideLabelFinish"),
                               },
+                              tooltipComponent: ({
+                                isFirstStep,
+                                isLastStep,
+                                handleNext,
+                                handlePrev,
+                                handleStop,
+                                currentStep,
+                                labels,
+                              }: TooltipProps) =>
+                                CustomTooltip({
+                                  isFirstStep,
+                                  isLastStep,
+                                  handleNext,
+                                  handlePrev,
+                                  handleStop,
+                                  currentStep,
+                                  labels,
+                                }),
                             }}
                           >
                             <Root />
@@ -842,7 +872,7 @@ export default function App() {
             </NetworkContextProvider>
           </AuthContextProvider>
         </SafeAreaView>
-      </>
+      </View>
     </View>
   );
 }

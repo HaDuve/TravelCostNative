@@ -728,11 +728,12 @@ function ExpensesList({
       expenses?.length < MAX_EXPENSES_RENDER && (
         <View
           style={{
-            paddingRight: 20,
-            marginTop: 12,
+            paddingRight: scale(20),
+            marginTop: verticalScale(12),
             alignItems: "center",
             justifyContent: "flex-end",
             flexDirection: "row",
+            height: verticalScale(55),
           }}
         >
           {/* hide until production ready */}
@@ -740,7 +741,7 @@ function ExpensesList({
             <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
               <IconButton
                 icon={"document-outline"}
-                size={24}
+                size={moderateScale(24)}
                 color={
                   selected?.length > 0
                     ? GlobalStyles.colors.gray700
@@ -754,7 +755,7 @@ function ExpensesList({
             <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
               <IconButton
                 icon={"ios-trash-outline"}
-                size={24}
+                size={moderateScale(24)}
                 color={
                   selected?.length > 0
                     ? GlobalStyles.colors.gray700
@@ -768,7 +769,7 @@ function ExpensesList({
             <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
               <IconButton
                 icon={"pie-chart-outline"}
-                size={24}
+                size={moderateScale(24)}
                 color={
                   selected?.length > 0
                     ? GlobalStyles.colors.gray700
@@ -782,7 +783,7 @@ function ExpensesList({
             <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
               <IconButton
                 icon={"md-arrow-undo-outline"}
-                size={24}
+                size={moderateScale(24)}
                 color={
                   selected?.length > 0
                     ? GlobalStyles.colors.gray700
@@ -800,7 +801,7 @@ function ExpensesList({
                     ? "close-outline"
                     : "checkmark-done-outline"
                 }
-                size={24}
+                size={moderateScale(24)}
                 color={GlobalStyles.colors.gray700}
                 onPress={selectAll}
               ></IconButton>
@@ -809,7 +810,7 @@ function ExpensesList({
 
           <IconButton
             icon={"ellipsis-horizontal-circle-outline"}
-            size={24}
+            size={moderateScale(24)}
             color={GlobalStyles.colors.gray700}
             onPress={selectPressHandler}
           ></IconButton>
@@ -857,9 +858,7 @@ function ExpensesList({
           expenses?.length
         )}
         ListFooterComponent={
-          <View
-            style={{ height: Dimensions.get("screen").height / 1.8 }}
-          ></View>
+          <View style={{ height: verticalScale(200) }}></View>
         }
         ListHeaderComponent={listHeaderJSX}
         keyExtractor={(item: Expense) => item.id}
@@ -945,28 +944,28 @@ const styles = StyleSheet.create({
     alignContent: "center",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingLeft: "4%",
-    paddingRight: "2%",
+    paddingLeft: scale(16),
+    paddingRight: scale(12),
   },
   fastExpenseText: {
     color: GlobalStyles.colors.textColor,
-    fontSize: 14,
+    fontSize: moderateScale(14),
     fontWeight: "300",
-    paddingHorizontal: 10,
+    paddingHorizontal: scale(10),
   },
   descriptionText: {
     // flex: 1,
     // width: "110%",
     fontStyle: "italic",
     fontWeight: "300",
-    fontSize: 15,
+    fontSize: moderateScale(15),
     zIndex: 2,
     flexWrap: "wrap",
     flexDirection: "row",
   },
   secondaryText: {
     color: GlobalStyles.colors.gray700,
-    fontSize: 13,
+    fontSize: moderateScale(13),
     zIndex: 1,
   },
 });

@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     borderColor: "black",
 
-    paddingLeft: 16,
+    paddingLeft: scale(16),
     paddingRight: 0,
     marginLeft: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -358,10 +358,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     ...Platform.select({
       ios: {
-        paddingVertical: 8,
+        paddingVertical: verticalScale(8),
       },
       android: {
-        paddingVertical: 6,
+        paddingVertical: verticalScale(6),
       },
     }),
   },

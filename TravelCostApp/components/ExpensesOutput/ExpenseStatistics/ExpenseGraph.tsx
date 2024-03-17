@@ -30,6 +30,7 @@ import { MAX_JS_NUMBER, MAX_PERIOD_RANGE } from "../../../confAppConstants";
 import { SettingsContext } from "../../../store/settings-context";
 import { getExpensesSum } from "../../../util/expense";
 import FlatButton from "../../UI/FlatButton";
+import { moderateScale, scale, verticalScale } from "../../../util/scalingUtil";
 
 const ExpenseGraph = ({
   periodName,
@@ -503,7 +504,7 @@ const ExpenseGraph = ({
             </View>
           }
           ListFooterComponent={
-            <View style={{ height: 200 }}>
+            <View style={{ height: verticalScale(200) }}>
               <View style={styles.flatButtonContainer}>
                 {longerPeriodNum < MAX_PERIOD_RANGE && (
                   <FlatButton
@@ -525,8 +526,8 @@ const ExpenseGraph = ({
           maxToRenderPerBatch={20}
           // windowSize={7}
           getItemLayout={(data, index) => ({
-            length: 50,
-            offset: 50 * index,
+            length: verticalScale(65),
+            offset: verticalScale(50) * index,
             index,
           })}
         ></Animated.FlatList>
@@ -557,19 +558,20 @@ const styles = StyleSheet.create({
     // paddingTop: 60,
   },
   graphContainer: {
-    minHeight: 158,
-    paddingTop: "15%",
-    marginTop: "2.5%",
-    paddingBottom: "5%",
-    marginBottom: "5%",
+    minHeight: verticalScale(158),
+    paddingTop: verticalScale(45),
+    marginTop: verticalScale(8),
+    paddingBottom: verticalScale(15),
+    marginBottom: verticalScale(15),
   },
   flatButtonContainer: {
-    marginBottom: "-10%",
+    marginBottom: verticalScale(-30),
   },
   listContainer: {
     flex: 1,
   },
   categoryCard: {
+    height: verticalScale(65),
     ...Platform.select({
       ios: {
         shadowColor: "#000",
@@ -592,24 +594,24 @@ const styles = StyleSheet.create({
   },
 
   itemContainer: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    marginHorizontal: 20,
-    marginTop: 4,
+    paddingVertical: verticalScale(12),
+    paddingHorizontal: scale(24),
+    marginHorizontal: scale(20),
+    marginTop: verticalScale(4),
     ...Platform.select({
       android: {
         elevation: 5,
         borderRadius: 10,
       },
     }),
-    marginBottom: 8,
-    borderRadius: 10,
+    marginBottom: verticalScale(8),
+    borderRadius: moderateScale(10),
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   text1: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     color: GlobalStyles.colors.textColor,
     fontWeight: "300",
   },

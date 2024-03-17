@@ -7,7 +7,7 @@ import React from "react";
 import { Dimensions, StyleSheet, View, FlatList } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import LoadingBarOverlay from "./LoadingBarOverlay";
-import { Text } from "react-native";
+import { Text, ViewStyle } from "react-native";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -26,9 +26,23 @@ import { DEVELOPER_MODE } from "../../confAppConstants";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { Pressable } from "react-native";
+import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import { DeviceType, deviceType } from "expo-device";
 
-const CONTENTCONTAINERSTYLE = { paddingLeft: 10 };
-const MINHEIGHT = 60;
+const MINHEIGHT = verticalScale(60);
+const MINHEIGHT_LOADINGBAR = verticalScale(88);
+const MAXHEIGHT = verticalScale(100);
+const MINWIDTH = scale(200);
+const MAXWIDTH = scale(300);
+
+const CONTENTCONTAINERSTYLE: ViewStyle = { paddingLeft: scale(10) };
+const SIZESTYLES: ViewStyle = {
+  minHeight: MINHEIGHT,
+  maxHeight: MAXHEIGHT,
+  minWidth: MINWIDTH,
+  maxWidth: MAXWIDTH,
+};
+
 const toastConfig: ToastConfig = {
   success: (props) => (
     <BaseToast
@@ -36,17 +50,17 @@ const toastConfig: ToastConfig = {
       style={[
         {
           borderLeftColor: GlobalStyles.colors.primary500,
-          minHeight: MINHEIGHT,
         },
+        SIZESTYLES,
         GlobalStyles.wideStrongShadow,
       ]}
       contentContainerStyle={CONTENTCONTAINERSTYLE}
       text1Style={{
-        fontSize: 17,
+        fontSize: moderateScale(17),
         fontWeight: "500",
       }}
       text2Style={{
-        fontSize: 15,
+        fontSize: moderateScale(15),
         fontWeight: "400",
       }}
       text1NumberOfLines={2}
@@ -64,14 +78,15 @@ const toastConfig: ToastConfig = {
       style={[
         { borderLeftColor: GlobalStyles.colors.error500, minHeight: MINHEIGHT },
         GlobalStyles.wideStrongShadow,
+        SIZESTYLES,
       ]}
       contentContainerStyle={CONTENTCONTAINERSTYLE}
       text1Style={{
-        fontSize: 17,
+        fontSize: moderateScale(17),
         fontWeight: "500",
       }}
       text2Style={{
-        fontSize: 15,
+        fontSize: moderateScale(15),
         fontWeight: "400",
       }}
       text1NumberOfLines={2}
@@ -88,26 +103,26 @@ const toastConfig: ToastConfig = {
     */
   loading: (props) => {
     const { progress } = props.props;
-    const size = "small";
+    const isTablet = deviceType === DeviceType.TABLET;
+    const size = isTablet ? "large" : "small";
     const progressValid =
       progress && typeof progress == "number" && progress >= 0 && progress <= 1;
-    const MINHEIGHT = 88;
-    const barWidth = Dimensions.get("screen").width * 0.83;
+    const barWidth = moderateScale(260, 0.4);
     const loadingColor = GlobalStyles.colors.cat8;
     const unfilledColor = GlobalStyles.colors.gray600;
     const loadingBarJSX = progressValid ? (
       <View style={GlobalStyles.strongShadow}>
         <Progress.Bar
           style={{
-            marginTop: -22,
-            marginLeft: 14,
+            marginTop: verticalScale(-22),
+            marginLeft: scale(14),
           }}
           progress={progress}
           color={loadingColor}
           unfilledColor={unfilledColor}
           borderWidth={0}
-          borderRadius={8}
-          height={14}
+          borderRadius={moderateScale(8)}
+          height={verticalScale(14)}
           width={barWidth}
         ></Progress.Bar>
       </View>
@@ -124,16 +139,20 @@ const toastConfig: ToastConfig = {
               borderLeftColor: GlobalStyles.colors.cat8,
               backgroundColor: GlobalStyles.colors.backgroundColor,
             },
+            SIZESTYLES,
             GlobalStyles.wideStrongShadow,
-            progressValid && { minHeight: MINHEIGHT, paddingBottom: 16 },
+            progressValid && {
+              minHeight: MINHEIGHT_LOADINGBAR,
+              paddingBottom: verticalScale(16),
+            },
           ]}
           contentContainerStyle={CONTENTCONTAINERSTYLE}
           text1Style={{
-            fontSize: 17,
+            fontSize: moderateScale(17),
             fontWeight: "500",
           }}
           text2Style={{
-            fontSize: 15,
+            fontSize: moderateScale(15),
             fontWeight: "400",
           }}
           text1NumberOfLines={2}
@@ -142,17 +161,19 @@ const toastConfig: ToastConfig = {
             <View
               style={{
                 flex: 1,
-                // maxWidth: 55,
-                // padding: 20,
-                // marginLeft: -40,
-                marginRight: 30,
-                marginTop: progressValid ? 18 : 12,
-                maxHeight: 20,
-                maxWidth: 20,
+                marginRight: scale(30),
+                marginTop: progressValid
+                  ? verticalScale(12)
+                  : verticalScale(18),
+                maxHeight: MAXHEIGHT / 2,
+                maxWidth: scale(20),
               }}
             >
               {/* Below is just the spinner, the loading BAR is in loadingBarJSX */}
-              <LoadingBarOverlay size={size}></LoadingBarOverlay>
+              <LoadingBarOverlay
+                containerStyle={{ maxHeight: MAXHEIGHT / 4 }}
+                size={size}
+              ></LoadingBarOverlay>
             </View>
           )}
           onPress={() => Toast.hide()}
@@ -177,7 +198,7 @@ const toastConfig: ToastConfig = {
               props.onPress();
             }}
           >
-            <View style={{ marginBottom: 8 }}>
+            <View style={{ marginBottom: verticalScale(8) }}>
               <Text style={styles.bannerText1}>{props.text1}</Text>
             </View>
             <Text style={styles.bannerText2}>{props.text2}</Text>
@@ -189,7 +210,14 @@ const toastConfig: ToastConfig = {
           >
             <View style={styles.xCloseContainer}>
               <View style={[styles.xCloseButton, GlobalStyles.strongShadow]}>
-                <Text style={{ color: GlobalStyles.colors.gray700 }}>X</Text>
+                <Text
+                  style={{
+                    color: GlobalStyles.colors.gray700,
+                    fontSize: moderateScale(16),
+                  }}
+                >
+                  X
+                </Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -247,10 +275,18 @@ const toastConfig: ToastConfig = {
                 : budgetProgress <= 1
                 ? GlobalStyles.colors.gray600
                 : GlobalStyles.colors.errorGrayed;
+              const travellerName = item;
               return (
                 <View style={styles.travellerItemContainer}>
-                  <View style={{ flexDirection: "row" }}>
-                    <Text style={styles.overviewTextSmall}>{item}:</Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      paddingHorizontal: scale(4),
+                    }}
+                  >
+                    <Text style={styles.overviewTextSmall}>
+                      {travellerName}
+                    </Text>
                     <Text
                       style={[
                         styles.overViewTextTravellerSum,
@@ -271,9 +307,9 @@ const toastConfig: ToastConfig = {
                       unfilledColor={unfilledColor}
                       borderWidth={0}
                       progress={budgetProgress}
-                      width={180}
-                      height={20}
-                      borderRadius={8}
+                      width={scale(180)}
+                      height={verticalScale(20)}
+                      borderRadius={moderateScale(8)}
                     ></Progress.Bar>
                   </View>
                 </View>
@@ -313,7 +349,7 @@ export async function showBanner(navigation, props = {}) {
     text2: i18n.t("bannerText2"),
     autoHide: false,
     position: "top",
-    topOffset: 10,
+    topOffset: verticalScale(10),
     onPress: () => {
       navigation.navigate("Paywall");
     },
@@ -324,8 +360,8 @@ export async function showBanner(navigation, props = {}) {
 const ToastComponent = () => {
   return (
     <Toast
-      topOffset={10}
-      bottomOffset={40}
+      topOffset={verticalScale(10)}
+      bottomOffset={verticalScale(40)}
       config={toastConfig}
       position={"bottom"}
     />
@@ -340,8 +376,8 @@ const styles = StyleSheet.create({
     borderColor: GlobalStyles.colors.primaryGrayed,
     borderWidth: 1,
     borderRadius: 36,
-    paddingHorizontal: 30,
-    paddingVertical: 12,
+    paddingHorizontal: scale(30),
+    paddingVertical: verticalScale(12),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
   },
   budgetOverviewHeader: {
@@ -353,46 +389,46 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    minHeight: 40,
+    minHeight: verticalScale(40),
     overflow: "visible",
   },
   travellerItemProgressBarContainer: {
-    padding: 2,
+    padding: scale(2),
     overflow: "visible",
     zIndex: -1,
   },
   sumTextMoveRight: {
-    left: 180,
+    left: scale(110),
     position: "absolute",
     zIndex: 999,
   },
   overviewTextInfo: {
-    fontSize: 18,
+    fontSize: moderateScale(18),
     fontWeight: "200",
     color: GlobalStyles.colors.textColor,
     textAlign: "left",
-    paddingVertical: 8,
+    paddingVertical: verticalScale(8),
   },
   overviewTextSmall: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: "200",
     color: GlobalStyles.colors.textColor,
     textAlign: "left",
-    paddingVertical: 4,
+    paddingVertical: verticalScale(4),
   },
   overViewTextTravellerSum: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: "500",
     color: GlobalStyles.colors.gray300,
     textAlign: "left",
-    paddingTop: 5,
+    paddingTop: verticalScale(5),
   },
   overviewTextTitle: {
-    fontSize: 18,
+    fontSize: moderateScale(18),
     fontWeight: "400",
     color: GlobalStyles.colors.textColor,
     textAlign: "left",
-    paddingVertical: 8,
+    paddingVertical: verticalScale(8),
   },
   bannerContainerContainer: {
     // flex: 1,
@@ -401,14 +437,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   xCloseContainer: {
-    marginTop: 18,
-    marginLeft: 4,
+    marginTop: verticalScale(18),
+    marginLeft: scale(4),
   },
   xCloseButton: {
     borderRadius: 24,
     borderWidth: 1,
     borderColor: "white",
-    padding: 4,
+    padding: scale(4),
     // paddingHorizontal: 8,
     backgroundColor: "white",
   },
@@ -417,17 +453,17 @@ const styles = StyleSheet.create({
     maxWidth: "90%",
     borderColor: "black",
     borderRadius: 36,
-    paddingHorizontal: 30,
-    paddingVertical: 12,
+    paddingHorizontal: scale(30),
+    paddingVertical: verticalScale(12),
   },
   bannerText1: {
-    fontSize: 18,
+    fontSize: moderateScale(18),
     fontWeight: "400",
     color: GlobalStyles.colors.textColor,
     textAlign: "center",
   },
   bannerText2: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: "300",
     color: GlobalStyles.colors.textColor,
     textAlign: "center",

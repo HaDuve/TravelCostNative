@@ -30,7 +30,7 @@ import Animated, {
 import { MAX_PERIOD_RANGE, MIN_PERIOD_RANGE } from "../../confAppConstants";
 import { BlurView } from "expo-blur";
 import { TripContext } from "../../store/trip-context";
-import { verticalScale } from "../../util/scalingUtil";
+import { moderateScale, verticalScale } from "../../util/scalingUtil";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const tripCtx = useContext(TripContext);
@@ -113,7 +113,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           icon={
             isGraphNotPie ? "play-skip-back-outline" : "chevron-back-outline"
           }
-          size={24}
+          size={moderateScale(24)}
           onPress={async () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             if (isGraphNotPie) {
@@ -172,7 +172,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           icon={
             isGraphNotPie ? "add-circle-outline" : "chevron-forward-outline"
           }
-          size={24}
+          size={moderateScale(24)}
           onPressIn={startAutoIncrement}
           onPressOut={stopAutoIncrement}
           color={GlobalStyles.colors.primaryGrayed}

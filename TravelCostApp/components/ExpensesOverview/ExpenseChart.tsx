@@ -6,8 +6,8 @@ import {
   VictoryBar,
   VictoryChart,
   VictoryLine,
-  VictoryTooltip,
   VictoryVoronoiContainer,
+  VictoryTooltip,
 } from "victory-native";
 
 //Localization
@@ -25,6 +25,7 @@ import PropTypes from "prop-types";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { isSameDay } from "../../util/dateTime";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
+import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
 
 const ExpenseChart = ({
   inputData,
@@ -81,13 +82,18 @@ const ExpenseChart = ({
     <View style={styles.container}>
       <VictoryChart
         domain={{ x: [firstItemDate, lastItemDate] }}
-        height={160}
+        height={scale(160)}
         animate={{
           duration: 1000,
           onLoad: { duration: 1000 },
         }}
-        padding={{ top: 10, bottom: 30, left: 60, right: 30 }}
-        domainPadding={{ x: [0, 20] }}
+        padding={{
+          top: scale(20),
+          bottom: scale(30),
+          left: verticalScale(60),
+          right: verticalScale(30),
+        }}
+        domainPadding={{ x: [scale(0), scale(20)] }}
         containerComponent={
           // daysRange < 10 ? (
           <VictoryVoronoiContainer voronoiDimension="x" />
@@ -111,7 +117,7 @@ const ExpenseChart = ({
           domain={{ x: [firstItemDate, lastItemDate] }}
           labelComponent={
             <VictoryTooltip
-              center={{ x: 210, y: 26 }}
+              center={{ x: scale(210), y: verticalScale(26) }}
               constrainToVisibleArea
               renderInPortal={false}
             />
@@ -139,7 +145,7 @@ const ExpenseChart = ({
         <VictoryBar
           labelComponent={
             <VictoryTooltip
-              center={{ x: 212, y: 14 }}
+              center={{ x: scale(212), y: verticalScale(28) }}
               renderInPortal={false}
               constrainToVisibleArea
             />

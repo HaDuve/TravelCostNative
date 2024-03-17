@@ -47,6 +47,7 @@ import * as Progress from "react-native-progress";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import ExpenseCountryFlag from "../components/ExpensesOutput/ExpenseCountryFlag";
 import GradientButton from "../components/UI/GradientButton";
+import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
 
 export type TripAsObject = {
   tripid: string;
@@ -334,10 +335,10 @@ const TripSummaryScreen = ({ navigation }) => {
               color={progressBarColor}
               unfilledColor={GlobalStyles.colors.gray600}
               borderWidth={0}
-              borderRadius={8}
+              borderRadius={moderateScale(8)}
               progress={progress}
-              height={12}
-              width={200}
+              height={verticalScale(12)}
+              width={scale(200)}
             ></Progress.Bar>
           </View>
           <View

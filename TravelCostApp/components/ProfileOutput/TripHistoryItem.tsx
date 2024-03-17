@@ -45,6 +45,7 @@ import { daysBetween } from "../../util/date";
 import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
 import safeLogError from "../../util/error";
 import { getTripData } from "../../util/trip";
+import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
 
 export type TripHistoryItem = {
   tripid: string;
@@ -407,10 +408,10 @@ function TripHistoryItem({ tripid, trips }) {
                 color={GlobalStyles.colors.errorGrayed}
                 unfilledColor={GlobalStyles.colors.gray600}
                 borderWidth={0}
-                borderRadius={8}
+                borderRadius={moderateScale(8)}
                 progress={activeProgress}
-                height={12}
-                width={150}
+                height={verticalScale(12)}
+                width={scale(150)}
               />
             </View>
           </View>
@@ -486,10 +487,10 @@ function TripHistoryItem({ tripid, trips }) {
               }
               unfilledColor={GlobalStyles.colors.gray600}
               borderWidth={0}
-              borderRadius={8}
+              borderRadius={moderateScale(8)}
               progress={activeProgress}
-              height={12}
-              width={150}
+              height={verticalScale(12)}
+              width={scale(150)}
             />
           </View>
         </View>

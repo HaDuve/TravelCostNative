@@ -38,7 +38,7 @@ import { TripContext } from "../store/trip-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { showBanner } from "../components/UI/ToastComponent";
-import { scale } from "../util/scalingUtil";
+import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
 
 const OverviewScreen = ({ navigation }) => {
   // // console.log("rerender OverviewScreen - 0");
@@ -138,7 +138,8 @@ const OverviewScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.dateHeader}>
         <Text style={styles.dateString}>
-          {truncateString(tripCtx.tripName, 23)} - {dateTimeString}
+          {truncateString(tripCtx.tripName, moderateScale(23))} -{" "}
+          {dateTimeString}
           {offlineString}
         </Text>
       </View>
@@ -147,7 +148,7 @@ const OverviewScreen = ({ navigation }) => {
           styles.header,
           useMoreSpace && {
             flexDirection: "column",
-            justifyContent: "center",
+            justifyContent: "space-between",
             alignItems: "center",
           },
         ]}
@@ -156,7 +157,8 @@ const OverviewScreen = ({ navigation }) => {
           open={open}
           value={PeriodValue}
           items={items}
-          placeholder={"..."}
+          showTickIcon={false}
+          placeholder={""}
           modalProps={{
             animationType: "slide",
           }}
@@ -182,6 +184,14 @@ const OverviewScreen = ({ navigation }) => {
           }}
           setItems={setItems}
           containerStyle={styles.dropdownContainer}
+          dropDownContainerStyle={styles.dropdownContainerDropdown}
+          itemProps={{
+            style: {
+              height: moderateScale(50),
+              padding: moderateScale(4),
+              marginLeft: scale(4),
+            },
+          }}
           // customItemLabelStyle={styles.dropdownItemLabel}
           style={styles.dropdown}
           textStyle={[
@@ -220,12 +230,12 @@ const styles = StyleSheet.create({
     // justifyContent: "flex-start",
   },
   dateHeader: {
-    marginVertical: "4%",
-    marginLeft: "6%",
-    marginBottom: "-4%",
+    marginTop: verticalScale(12),
+    marginLeft: scale(18),
+    marginBottom: verticalScale(-4),
   },
   dateString: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
   },
@@ -233,12 +243,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
     zIndex: 10,
-    marginTop: "6%",
-    paddingHorizontal: "4%",
-    marginBottom: "4%",
+    marginTop: verticalScale(18),
+    paddingHorizontal: scale(12),
+    marginBottom: verticalScale(12),
   },
   dropdownContainer: {
-    maxWidth: scale(160),
+    maxWidth: moderateScale(160),
     ...Platform.select({
       ios: {
         shadowColor: GlobalStyles.colors.textColor,
@@ -253,16 +263,19 @@ const styles = StyleSheet.create({
       },
     }),
   },
+  dropdownContainerDropdown: {
+    maxHeight: verticalScale(600),
+  },
   dropdown: {
     borderRadius: 10,
     borderWidth: 0,
   },
   dropdownTextStyle: {
-    fontSize: i18n.locale == "fr" ? 20 : 34,
+    fontSize: i18n.locale == "fr" ? moderateScale(20) : moderateScale(34),
     fontWeight: "bold",
   },
   scaledUpTextStyle: {
-    fontSize: 24,
+    fontSize: moderateScale(24),
   },
   zBehind: {
     zIndex: 10,
@@ -283,6 +296,6 @@ const styles = StyleSheet.create({
     zIndex: 0,
   },
   customSummaryStyle: {
-    marginTop: "-2%",
+    marginTop: verticalScale(-12),
   },
 });

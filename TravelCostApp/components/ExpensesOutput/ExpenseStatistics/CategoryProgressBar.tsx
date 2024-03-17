@@ -15,6 +15,7 @@ import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { useState } from "react";
 import { UserContext } from "../../../store/user-context";
+import { moderateScale, verticalScale } from "../../../util/scalingUtil";
 
 const CategoryProgressBar = ({
   cat,
@@ -77,9 +78,9 @@ const CategoryProgressBar = ({
         color={budgetColor}
         unfilledColor={unfilledColor}
         borderWidth={0}
-        borderRadius={8}
+        borderRadius={moderateScale(8)}
         progress={budgetProgress}
-        height={14}
+        height={verticalScale(14)}
         width={windowWidth - 60}
       />
     </Animated.View>

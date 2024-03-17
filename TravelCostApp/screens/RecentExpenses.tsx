@@ -333,11 +333,14 @@ function RecentExpenses({ navigation }) {
       refreshing={refreshing}
       refreshControl={
         <RefreshControl
-          progressViewOffset={8}
+          progressViewOffset={verticalScale(8)}
           refreshing={refreshing || isFetching}
           tintColor={GlobalStyles.colors.textColor}
           colors={[GlobalStyles.colors.textColor]}
-          style={{ backgroundColor: "transparent" }}
+          style={{
+            backgroundColor: "transparent",
+            marginBottom: verticalScale(-12),
+          }}
           onRefresh={async () => {
             await onRefresh();
           }}
@@ -485,7 +488,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   dropdownContainer: {
-    maxWidth: scale(160),
+    maxWidth: moderateScale(160),
     marginTop: verticalScale(6),
     ...Platform.select({
       ios: {

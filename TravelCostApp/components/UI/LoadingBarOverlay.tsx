@@ -11,6 +11,7 @@ import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 import PropTypes from "prop-types";
 import * as Progress from "react-native-progress";
 import LoadingOverlay from "./LoadingOverlay";
+import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
@@ -25,7 +26,7 @@ const LoadingBarOverlay = (props) => {
     progressMax,
     customText,
     noText,
-    barWidth = 100,
+    barWidth = scale(100),
   } = props;
   let { progress, size } = props;
   const renderedText = customText ?? "Uploading your Expenses ... "; //i18n.t("uploadingExpenses");
@@ -63,9 +64,9 @@ const LoadingBarOverlay = (props) => {
         color={loadingColor}
         unfilledColor={unfilledColor}
         borderWidth={0}
-        borderRadius={8}
+        borderRadius={moderateScale(8)}
         progress={progress}
-        height={14}
+        height={verticalScale(14)}
         width={barWidth}
       />
       {validProgress && (
@@ -95,19 +96,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: "6%",
-    paddingTop: "10%",
-    margin: "6%",
+    padding: scale(5),
+    paddingTop: verticalScale(5),
+    margin: scale(5),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   headerContainer: {
     alignItems: "center",
-    marginBottom: "6%",
+    marginBottom: verticalScale(5),
   },
   text: {
     color: loadingColor,
-    fontSize: 18,
+    fontSize: moderateScale(18),
     fontWeight: "300",
-    marginTop: 12,
+    marginTop: verticalScale(12),
   },
 });

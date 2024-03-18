@@ -8,12 +8,15 @@ import { useContext } from "react";
 import { TripContext } from "../../store/trip-context";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { GlobalStyles } from "../../constants/styles";
+import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import { useOrientation } from "../Hooks/useOrientation";
 
 const CategoryChart = ({ inputData }) => {
   const tripCtx = useContext(TripContext);
   const tripCurrency = tripCtx.tripCurrency;
+  const orientation = useOrientation();
+  const isPortrait = orientation === "PORTRAIT";
   const [useDummyData, setUseDummyData] = useState(true);
-
   let chartDataForRender = Array.from(inputData);
   // this little trick is necessary to make the pie animate on load.  For the very first render, pare down
   // the chartData array to just one element, then, for all future renders, use the fully array
@@ -28,16 +31,18 @@ const CategoryChart = ({ inputData }) => {
     <Animated.View exiting={FadeOut} entering={ZoomIn} style={styles.container}>
       <VictoryPie
         data={chartDataForRender}
-        height={200}
+        height={isPortrait ? verticalScale(200) : moderateScale(100)}
         startAngle={-270}
         endAngle={90}
         animate={{
           duration: 500,
           onLoad: { duration: 0 },
         }}
-        innerRadius={70}
+        innerRadius={
+          isPortrait ? moderateScale(70, 0.5) : moderateScale(30, 0.5)
+        }
         padAngle={0}
-        padding={10}
+        padding={isPortrait ? scale(10) : scale(8)}
         labelPlacement="vertical"
         style={{
           data: {
@@ -47,7 +52,7 @@ const CategoryChart = ({ inputData }) => {
         }}
         labelComponent={
           <VictoryTooltip
-            center={{ x: 207, y: 96 }}
+            center={{ x: scale(207), y: verticalScale(96) }}
             constrainToVisibleArea
             renderInPortal={false}
             pointerLength={0}
@@ -72,11 +77,11 @@ CategoryChart.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 4,
-    paddingTop: 60,
+    padding: scale(12),
+    paddingTop: verticalScale(60),
     justifyContent: "center",
     alignItems: "center",
-    marginHorizontal: "25%",
+    marginHorizontal: scale(100),
     borderRadius: 9999,
   },
 });

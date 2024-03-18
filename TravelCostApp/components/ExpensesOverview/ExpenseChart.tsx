@@ -26,6 +26,7 @@ import { formatExpenseWithCurrency } from "../../util/string";
 import { isSameDay } from "../../util/dateTime";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import { useOrientation } from "../Hooks/useOrientation";
 
 const ExpenseChart = ({
   inputData,
@@ -36,6 +37,9 @@ const ExpenseChart = ({
   navigation,
   expenses,
 }) => {
+  const orientation = useOrientation();
+  const isPortrait = orientation === "PORTRAIT";
+  const smallerScale = moderateScale(100, 0.2);
   const data = inputData;
   const firstItem = inputData[0];
   const [lastItem] = inputData.slice(-1);
@@ -45,6 +49,7 @@ const ExpenseChart = ({
     new Date(lastItem.day ?? lastItem.lastDay),
     1
   );
+
   const xAxisString = xAxis;
   const yAxisString = yAxis;
   const budgetCompare =
@@ -82,7 +87,8 @@ const ExpenseChart = ({
     <View style={styles.container}>
       <VictoryChart
         domain={{ x: [firstItemDate, lastItemDate] }}
-        height={scale(160)}
+        height={moderateScale(160)}
+        width={moderateScale(360)}
         animate={{
           duration: 1000,
           onLoad: { duration: 1000 },

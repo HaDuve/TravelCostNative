@@ -31,6 +31,7 @@ import { SettingsContext } from "../../../store/settings-context";
 import { getExpensesSum } from "../../../util/expense";
 import FlatButton from "../../UI/FlatButton";
 import { moderateScale, scale, verticalScale } from "../../../util/scalingUtil";
+import { useOrientation } from "../../Hooks/useOrientation";
 
 const ExpenseGraph = ({
   periodName,
@@ -44,6 +45,8 @@ const ExpenseGraph = ({
 }) => {
   const today = new Date();
   const renderItemRef = useRef(null);
+  const orientation = useOrientation();
+  const isPortrait = orientation === "PORTRAIT";
   const expenseCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
   const hideSpecial = settings.hideSpecialExpenses;
@@ -468,26 +471,53 @@ const ExpenseGraph = ({
         exiting={FadeOutLeft.duration(500)}
         style={styles.listContainer}
       >
+        {!isPortrait && (
+          <View style={styles.graphContainer}>
+            <ExpenseChart
+              inputData={listExpenseSumBudgets}
+              xAxis={xAxis}
+              yAxis={yAxis}
+              budgetAxis={budgetAxis}
+              budget={budget}
+              daysRange={daysRange}
+              currency={tripCtx.tripCurrency}
+              navigation={navigation}
+              expenses={expenseCtx.expenses}
+            ></ExpenseChart>
+          </View>
+        )}
         <Animated.FlatList
           entering={FadeInRight.duration(500)}
           exiting={FadeOutLeft.duration(500)}
           data={listExpenseSumBudgets}
           renderItem={renderItemRef.current}
           ListHeaderComponent={
-            <View style={styles.graphContainer}>
-              <ExpenseChart
-                inputData={listExpenseSumBudgets}
-                xAxis={xAxis}
-                yAxis={yAxis}
-                budgetAxis={budgetAxis}
-                budget={budget}
-                daysRange={daysRange}
-                currency={tripCtx.tripCurrency}
-                navigation={navigation}
-                expenses={expenseCtx.expenses}
-              ></ExpenseChart>
+            <View
+              style={[
+                styles.graphContainer,
+                !isPortrait && styles.landscapeGraphContainer,
+              ]}
+            >
+              {isPortrait && (
+                <ExpenseChart
+                  inputData={listExpenseSumBudgets}
+                  xAxis={xAxis}
+                  yAxis={yAxis}
+                  budgetAxis={budgetAxis}
+                  budget={budget}
+                  daysRange={daysRange}
+                  currency={tripCtx.tripCurrency}
+                  navigation={navigation}
+                  expenses={expenseCtx.expenses}
+                ></ExpenseChart>
+              )}
 
-              <View style={styles.flatButtonContainer}>
+              <View
+                style={[
+                  isPortrait && styles.flatButtonContainer,
+                  !isPortrait && styles.landscapeFlatButton,
+                ]}
+              >
                 {startingPoint > -MAX_PERIOD_RANGE && (
                   <FlatButton
                     onPress={() => {
@@ -564,14 +594,26 @@ const styles = StyleSheet.create({
     paddingBottom: verticalScale(15),
     marginBottom: verticalScale(15),
   },
+  landscapeGraphContainer: {
+    minHeight: 0,
+    paddingTop: 0,
+    marginTop: 0,
+    paddingBottom: 0,
+  },
   flatButtonContainer: {
     marginBottom: verticalScale(-30),
   },
+  landscapeFlatButton: {
+    marginTop: verticalScale(48),
+    // marginBottom: verticalScale(20),
+  },
   listContainer: {
     flex: 1,
+    flexDirection: "row",
   },
   categoryCard: {
     height: verticalScale(65),
+    minWidth: scale(200),
     ...Platform.select({
       ios: {
         shadowColor: "#000",
@@ -591,6 +633,9 @@ const styles = StyleSheet.create({
         // marginVertical: 4,
       },
     }),
+  },
+  landscapeMaxWidth: {
+    maxWidth: scale(100),
   },
 
   itemContainer: {

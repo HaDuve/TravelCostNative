@@ -27,10 +27,10 @@ import Animated, {
   FadeOutDown,
   FadeOutRight,
 } from "react-native-reanimated";
-import { MAX_PERIOD_RANGE, MIN_PERIOD_RANGE } from "../../confAppConstants";
+import { MAX_PERIOD_RANGE } from "../../confAppConstants";
 import { BlurView } from "expo-blur";
 import { TripContext } from "../../store/trip-context";
-import { moderateScale, verticalScale } from "../../util/scalingUtil";
+import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const tripCtx = useContext(TripContext);
@@ -83,7 +83,6 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   };
 
   const rightNavButtonHandler = () => {
-    // console.log("pressed right button");
     if (isGraphNotPie) {
       realPeriodNumber.current =
         realPeriodNumber.current == MAX_PERIOD_RANGE
@@ -236,7 +235,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
         <TourGuideZone
           text={i18n.t("walk4")}
           tooltipBottomOffset={verticalScale(166)}
-          maskOffset={60}
+          maskOffset={verticalScale(60)}
           zone={4}
           shape={"circle"}
         >
@@ -248,7 +247,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
               styles.toggleButton,
             ]}
           >
-            <ToggleButton></ToggleButton>
+            <ToggleButton toggled={isGraphNotPie}></ToggleButton>
           </Pressable>
         </TourGuideZone>
       </View>
@@ -285,8 +284,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "absolute",
     width: "100%",
-    paddingBottom: "2%",
-    // height: "5%",
+    paddingBottom: verticalScale(6),
   },
   titleContainer: {
     flexDirection: "row",
@@ -294,7 +292,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   chevronContainer: {
-    marginTop: "4%",
+    marginTop: verticalScale(12),
     justifyContent: "center",
     alignItems: "center",
   },
@@ -302,22 +300,22 @@ const styles = StyleSheet.create({
     opacity: 0.65,
   },
   titleText: {
-    marginTop: "2%",
-    minWidth: 200,
-    maxWidth: 200,
+    marginTop: verticalScale(6),
+    minWidth: scale(200),
+    maxWidth: scale(200),
     textAlign: "center",
-    fontSize: 22,
+    fontSize: moderateScale(22),
     fontWeight: "bold",
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
-    marginLeft: "2%",
+    marginLeft: scale(6),
   },
   toggleButton: {
     flex: 1,
     // borderRadius: 10,
-    marginHorizontal: 150,
-    marginBottom: "-2%",
-    marginTop: "-20%",
+    // marginHorizontal: scale(120),
+    marginBottom: verticalScale(-6),
+    marginTop: verticalScale(-66),
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

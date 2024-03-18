@@ -27,10 +27,14 @@ import { useContext } from "react";
 import { TripContext } from "../../../store/trip-context";
 import BlurPremium from "../../Premium/BlurPremium";
 import { processTitleStringFilteredPiecharts } from "../../../util/string";
+import { moderateScale, scale, verticalScale } from "../../../util/scalingUtil";
+import { useOrientation } from "../../Hooks/useOrientation";
 
 const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
   const { tripCurrency } = useContext(TripContext);
+  const orientation = useOrientation();
+  const isPortrait = orientation === "PORTRAIT";
   if (!expenses)
     return (
       <View style={styles.container}>
@@ -143,15 +147,22 @@ const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
 
   return (
     <Animated.View style={styles.container}>
+      {!isPortrait && <CategoryChart inputData={dataList}></CategoryChart>}
       <Animated.FlatList
         itemLayoutAnimation={layoutAnim}
         data={catSumCat}
         renderItem={renderItem}
         keyExtractor={(item) => item.cat}
         ListHeaderComponent={
-          <CategoryChart inputData={dataList}></CategoryChart>
+          isPortrait ? (
+            <CategoryChart inputData={dataList}></CategoryChart>
+          ) : (
+            <View style={{ height: verticalScale(100) }}></View>
+          )
         }
-        ListFooterComponent={<View style={{ height: 100 }}></View>}
+        ListFooterComponent={
+          <View style={{ height: verticalScale(100) }}></View>
+        }
         ListEmptyComponent={
           <View style={styles.fallbackTextContainer}>
             <Text>{i18n.t("fallbackTextExpenses")}</Text>
@@ -174,20 +185,19 @@ ExpenseTravellers.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginHorizontal: 4,
+    flexDirection: "row",
   },
   fallbackTextContainer: {
     flex: 1,
-    padding: 24,
-    marginTop: "-50%",
+    padding: scale(24),
+    marginTop: verticalScale(-150),
     alignItems: "center",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
   },
   categoryCard: {
-    marginVertical: 4,
-    marginBottom: 12,
-    marginHorizontal: 8,
-    paddingBottom: 4,
+    marginBottom: verticalScale(20),
+    marginHorizontal: scale(16),
+    paddingBottom: verticalScale(12),
     shadowColor: "#000",
     shadowOffset: {
       width: 1,
@@ -197,6 +207,6 @@ const styles = StyleSheet.create({
     shadowRadius: 2.84,
     elevation: 5,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 10,
+    borderRadius: moderateScale(10),
   },
 });

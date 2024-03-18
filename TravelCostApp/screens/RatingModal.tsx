@@ -25,6 +25,8 @@ import FlatButton from "../components/UI/FlatButton";
 import GradientButton from "../components/UI/GradientButton";
 import { GlobalStyles } from "../constants/styles";
 import { secureStoreSetObject } from "../store/secure-storage";
+import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
+import { useOrientation } from "../components/Hooks/useOrientation";
 
 //TODO: set the according URLS when we are live!
 export const APP_STORE_URL = `https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=${i18n.locale}`;
@@ -36,6 +38,9 @@ export const neverAskAgain = async () => {
 };
 
 const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
+  const orientation = useOrientation();
+  const isPortrait = orientation === "PORTRAIT";
+
   const handleRate = async () => {
     if (StoreReview.isAvailableAsync()) {
       // Request the in-app review
@@ -64,7 +69,7 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
       style={styles.modalStyle}
       animationInTiming={400}
       animationOutTiming={800}
-      isVisible={isModalVisible}
+      isVisible={moderateScale(isModalVisible)}
       onSwipeComplete={handleClose}
       swipeDirection={["up", "left", "right", "down"]}
       onBackdropPress={handleClose}
@@ -80,15 +85,15 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
             {
               ...Platform.select({
                 ios: {
-                  width: 125,
-                  height: 125,
-                  margin: "4%",
+                  width: moderateScale(125, 0.6),
+                  height: moderateScale(125, 0.6),
+                  margin: scale(12),
                   // marginTop: "-4%",
                 },
                 android: {
-                  width: 125,
-                  height: 125,
-                  margin: "4%",
+                  width: moderateScale(125),
+                  height: moderateScale(125),
+                  margin: scale(12),
                 },
               }),
             },
@@ -100,9 +105,9 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
           source={require("../assets/stars.png")}
           style={[
             {
-              width: "80%",
-              height: "10%",
-              marginBottom: "20%",
+              width: scale(180),
+              height: verticalScale(24),
+              marginBottom: verticalScale(12),
             },
             { overflow: "visible" },
           ]}
@@ -135,31 +140,31 @@ RatingModal.propTypes = {
 const styles = StyleSheet.create({
   modalStyle: {
     justifyContent: "flex-end",
-    marginBottom: 40,
+    marginBottom: verticalScale(40),
   },
   imageContainer: {
     overflow: "visible",
 
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    marginBottom: verticalScale(20),
   },
   titleContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    marginBottom: verticalScale(20),
   },
   titleText: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: "bold",
     textAlign: "center",
     color: GlobalStyles.colors.textColor,
   },
   subTitleContainer: {
-    marginBottom: 20,
+    marginBottom: verticalScale(20),
   },
   subTitleText: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     textAlign: "center",
     color: GlobalStyles.colors.textColor,
   },
@@ -172,8 +177,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    padding: "6%",
-    borderRadius: 10,
-    marginHorizontal: "2%",
+    padding: scale(18),
+    borderRadius: moderateScale(10),
+    marginHorizontal: scale(12),
   },
 });

@@ -15,7 +15,8 @@ import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { useState } from "react";
 import { UserContext } from "../../../store/user-context";
-import { moderateScale, verticalScale } from "../../../util/scalingUtil";
+import { moderateScale, scale, verticalScale } from "../../../util/scalingUtil";
+import { useOrientation } from "../../Hooks/useOrientation";
 
 const CategoryProgressBar = ({
   cat,
@@ -28,7 +29,8 @@ const CategoryProgressBar = ({
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   const budgetProgress = (catCost / totalCost) * 1;
-
+  const orientation = useOrientation();
+  const isPortrait = orientation === "PORTRAIT";
   const [catSymbol, setCatSymbol] = useState(null);
   useEffect(() => {
     async function setCatSymbolAsync() {
@@ -54,7 +56,6 @@ const CategoryProgressBar = ({
 
   const userCurrency = tripCtx.tripCurrency;
   const catCostString = formatExpenseWithCurrency(catCost, userCurrency);
-  const windowWidth = Dimensions.get("window").width;
 
   if (Number.isNaN(budgetProgress)) {
     console.error("NaN budgetProgress passed to CategoryProgressBar");
@@ -64,9 +65,11 @@ const CategoryProgressBar = ({
     <Animated.View entering={ZoomIn} style={styles.container}>
       <View style={styles.titleRow}>
         {iconJSXOverride ?? (
-          <Ionicons name={catSymbol} size={30} color={color} />
+          <Ionicons name={catSymbol} size={moderateScale(30)} color={color} />
         )}
-        <Text style={[styles.sum, { color: budgetColor, marginLeft: 8 }]}>
+        <Text
+          style={[styles.sum, { color: budgetColor, marginLeft: scale(8) }]}
+        >
           {getCatString(cat)}
         </Text>
         <View style={{ flex: 1 }}></View>
@@ -81,7 +84,7 @@ const CategoryProgressBar = ({
         borderRadius={moderateScale(8)}
         progress={budgetProgress}
         height={verticalScale(14)}
-        width={windowWidth - 60}
+        width={isPortrait ? moderateScale(292, 0.96) : moderateScale(300, 0.3)}
       />
     </Animated.View>
   );
@@ -101,11 +104,11 @@ CategoryProgressBar.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 8,
-    paddingBottom: 12,
-    marginLeft: 16,
-    marginRight: 20,
-    borderRadius: 6,
+    padding: scale(8),
+    paddingBottom: verticalScale(4),
+    marginLeft: scale(8),
+    marginRight: scale(10),
+    borderRadius: moderateScale(6),
     justifyContent: "space-between",
     alignItems: "flex-start",
   },
@@ -114,13 +117,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-start",
+    marginBottom: verticalScale(4),
   },
   period: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     color: GlobalStyles.colors.primary500,
   },
   sum: {
-    fontSize: 22,
+    fontSize: moderateScale(22),
     fontWeight: "300",
     color: GlobalStyles.colors.primary500,
   },

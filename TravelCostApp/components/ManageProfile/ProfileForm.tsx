@@ -23,6 +23,8 @@ import { ExpensesContext } from "../../store/expenses-context";
 import { asyncStoreSafeClear } from "../../store/async-storage";
 import { getMMKVString } from "../../store/mmkv";
 import { NetworkContext } from "../../store/network-context";
+import { OrientationContext } from "../../store/orientation-context";
+import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -34,6 +36,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
   const tripCtx = useContext(TripContext);
   const expCtx = useContext(ExpensesContext);
   const netCtx = useContext(NetworkContext);
+  const { isPortrait } = useContext(OrientationContext);
   const isConnected = netCtx.strongConnection;
   const freshlyCreated = userCtx.freshlyCreated;
 
@@ -75,12 +78,12 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
     checkNewChanges();
   }, [isConnected]);
   const iconButtonJSX = (
-    <View style={[styles.inputsRow, { marginTop: -12 }]}>
+    <View style={[styles.inputsRow, { marginTop: verticalScale(-12) }]}>
       {/* TODO: add a "new changes" button that parses the changelog, if it has new changes, will show a "!"-badge */}
       {!freshlyCreated && (
         <IconButton
           icon={"newspaper-outline"}
-          size={36}
+          size={moderateScale(36)}
           color={GlobalStyles.colors.textColor}
           // style={styles.button}
           onPress={() => {
@@ -97,7 +100,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
       {!freshlyCreated && (
         <IconButton
           icon={"settings-outline"}
-          size={36}
+          size={moderateScale(36)}
           color={GlobalStyles.colors.textColor}
           // style={styles.button}
           onPress={() => {
@@ -108,7 +111,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
       )}
       <IconButton
         icon={"exit-outline"}
-        size={36}
+        size={moderateScale(36)}
         color={GlobalStyles.colors.textColor}
         // style={styles.button}
         onPress={logoutHandler}
@@ -194,67 +197,67 @@ ProfileForm.propTypes = {
 const styles = StyleSheet.create({
   form: {
     flex: 1,
-    marginTop: "2%",
+    marginTop: verticalScale(8),
   },
   nameRow: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
-    maxWidth: "40%",
+    maxWidth: scale(100),
   },
   welcomeTextBar: {
-    marginTop: "2%",
-    marginHorizontal: "4%",
-    padding: "1%",
-    minHeight: "5%",
+    marginTop: verticalScale(8),
+    marginHorizontal: scale(15),
+    padding: scale(4),
+    minHeight: verticalScale(50),
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
   },
   welcomeText: {
-    fontSize: 36,
+    fontSize: moderateScale(36),
     fontWeight: "bold",
     color: GlobalStyles.colors.primary700,
   },
   avatarBar: {
-    marginTop: "2%",
-    marginHorizontal: "4%",
-    padding: "1%",
-    minHeight: "20%",
+    marginTop: verticalScale(10),
+    marginHorizontal: scale(15),
+    padding: scale(4),
+    minHeight: verticalScale(30),
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
   avatar: {
-    minHeight: 60,
-    minWidth: 60,
-    borderRadius: 60,
+    minHeight: moderateScale(60),
+    minWidth: moderateScale(60),
+    borderRadius: moderateScale(60),
     backgroundColor: GlobalStyles.colors.gray500,
     alignItems: "center",
     justifyContent: "center",
   },
   avatarText: {
-    fontSize: 36,
+    fontSize: moderateScale(36),
     fontWeight: "bold",
     color: GlobalStyles.colors.primary700,
   },
   userText: {
-    fontSize: 24,
+    fontSize: moderateScale(24),
     fontWeight: "bold",
     color: GlobalStyles.colors.primary700,
   },
   logoutContainer: {
-    marginBottom: "-4%",
+    marginBottom: verticalScale(-16),
     alignItems: "flex-end",
     justifyContent: "flex-end",
   },
   title: {
-    fontSize: 24,
+    fontSize: moderateScale(24),
     fontWeight: "bold",
     color: GlobalStyles.colors.backgroundColor,
-    marginTop: 5,
-    marginBottom: 24,
+    marginTop: verticalScale(5),
+    marginBottom: verticalScale(24),
     textAlign: "center",
   },
   categoryRow: {
@@ -274,29 +277,29 @@ const styles = StyleSheet.create({
   errorText: {
     textAlign: "center",
     color: GlobalStyles.colors.error500,
-    margin: 8,
+    margin: scale(8),
   },
   buttonContainer: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
-    margin: 8,
-    minHeight: 100,
+    margin: verticalScale(8),
+    minHeight: verticalScale(100),
   },
   navButtonContainer: {
     flex: 1,
     justifyContent: "flex-end",
     alignContent: "flex-end",
-    padding: 4,
-    marginBottom: 8,
+    padding: verticalScale(4),
+    marginBottom: verticalScale(8),
   },
   navButton: {
-    minWidth: 120,
-    marginVertical: 8,
-    marginTop: 36,
+    minWidth: scale(120),
+    marginVertical: verticalScale(8),
+    marginTop: verticalScale(36),
   },
   button: {
-    minWidth: 120,
-    marginHorizontal: 8,
+    minWidth: scale(120),
+    marginHorizontal: scale(8),
   },
 });

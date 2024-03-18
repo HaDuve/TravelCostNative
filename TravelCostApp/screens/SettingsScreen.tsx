@@ -44,6 +44,7 @@ import safeLogError from "../util/error";
 import { canOpenURL } from "expo-linking";
 import DevContent from "../components/Settings/DevContent";
 import CurrencyExchangeInfo from "../components/UI/CurrencyExchangeInfo";
+import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
 
 const SettingsScreen = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
@@ -140,14 +141,14 @@ const SettingsScreen = ({ navigation }) => {
       stickyHeaderIndices={[0]}
       style={{
         flex: 1,
-        paddingHorizontal: "4%",
+        paddingHorizontal: scale(15),
         backgroundColor: GlobalStyles.colors.backgroundColor,
         ...Platform.select({
           ios: {
             padding: 0,
           },
           android: {
-            paddingTop: "6%",
+            paddingTop: verticalScale(18),
           },
         }),
       }}
@@ -166,7 +167,7 @@ const SettingsScreen = ({ navigation }) => {
         >
           <IconButton
             icon="arrow-back-outline"
-            size={36}
+            size={moderateScale(36)}
             color={GlobalStyles.colors.textColor}
             buttonStyle={styles.backButton}
             onPress={() => navigation.goBack()}
@@ -265,7 +266,7 @@ const SettingsScreen = ({ navigation }) => {
           paddingHorizontal: "4%",
         }}
       ></View>
-      <View style={{ flex: 1, minHeight: 100 }}></View>
+      <View style={{ flex: 1, minHeight: verticalScale(100) }}></View>
     </ScrollView>
   );
 };
@@ -286,7 +287,7 @@ const styles = StyleSheet.create({
   },
   backButton: { marginBottom: "-14%" },
   titleText: {
-    fontSize: 22,
+    fontSize: moderateScale(22),
     fontWeight: "bold",
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
@@ -303,7 +304,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: "8%",
     borderRadius: 16,
     textAlign: "center",
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: "bold",
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,

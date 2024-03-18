@@ -6,6 +6,7 @@ import IconButton from "./IconButton";
 import { useNavigation } from "@react-navigation/native";
 import PropTypes from "prop-types";
 import * as Haptics from "expo-haptics";
+import { moderateScale } from "../../util/scalingUtil";
 
 const BackButton = ({ style }) => {
   const navigation = useNavigation();
@@ -22,7 +23,7 @@ const BackButton = ({ style }) => {
     >
       <IconButton
         icon="arrow-back-outline"
-        size={24}
+        size={moderateScale(24)}
         color={GlobalStyles.colors.textColor}
       ></IconButton>
     </TouchableOpacity>

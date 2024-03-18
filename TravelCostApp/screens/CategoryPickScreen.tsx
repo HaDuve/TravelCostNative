@@ -32,6 +32,7 @@ import BackButton from "../components/UI/BackButton";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import { useCallback } from "react";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
+import { moderateScale } from "../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -142,7 +143,11 @@ const CategoryPickScreen = ({ route, navigation }) => {
       >
         <View style={styles.widthConstraint}>
           <View style={styles.centerStyle}>
-            <Ionicons name={item.icon} size={42} color={item.color} />
+            <Ionicons
+              name={item.icon}
+              size={moderateScale(42)}
+              color={item.color}
+            />
             <Text style={styles.itemText}>{item.catString}</Text>
           </View>
         </View>
@@ -276,7 +281,7 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.primary400,
   },
   itemText: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     marginTop: "2%",
     color: GlobalStyles.colors.textColor,
     fontWeight: "200",

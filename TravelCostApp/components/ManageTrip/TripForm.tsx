@@ -65,6 +65,7 @@ import { isPremiumMember } from "../Premium/PremiumConstants";
 import Toast from "react-native-toast-message";
 import { sleep } from "../../util/appState";
 import safeLogError from "../../util/error";
+import { moderateScale } from "../../util/scalingUtil";
 
 const TripForm = ({ navigation, route }) => {
   const tripCtx = useContext(TripContext);
@@ -501,7 +502,8 @@ const TripForm = ({ navigation, route }) => {
   }
 
   function updateCurrency() {
-    inputChangedHandler("tripCurrency", countryValue.split(" ")[0]);
+    if (!countryValue || countryValue.length < 1) return;
+    inputChangedHandler("tripCurrency", countryValue?.split(" ")[0]);
   }
 
   const [infoTitleText, setInfoTitleText] = useState("");
@@ -574,7 +576,7 @@ const TripForm = ({ navigation, route }) => {
             ? inputs.tripCurrency.value
             : standardCurrency
         }
-        countryValue={countryValue.split(" ")[0]}
+        countryValue={countryValue?.split(" ")[0] || ""}
         setCountryValue={setCountryValue}
         onChangeValue={updateCurrency}
         valid={inputs.tripCurrency.isValid}
@@ -667,11 +669,11 @@ const TripForm = ({ navigation, route }) => {
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
-              marginHorizontal: 8,
-              marginBottom: -8,
+              marginHorizontal: moderateScale(8),
+              marginBottom: moderateScale(-8),
             }}
           >
-            <BackButton style={{ marginTop: -8 }}></BackButton>
+            <BackButton style={{ marginTop: moderateScale(-8) }}></BackButton>
             {!isEditing && (
               <FlatButton
                 onPress={() => {
@@ -739,7 +741,7 @@ const TripForm = ({ navigation, route }) => {
                   <IconButton
                     icon="ios-git-compare-outline"
                     color={GlobalStyles.colors.primary500}
-                    size={36}
+                    size={moderateScale(36)}
                     buttonStyle={[
                       styles.recalcButton,
                       GlobalStyles.strongShadow,
@@ -794,7 +796,7 @@ const TripForm = ({ navigation, route }) => {
                       <IconButton
                         icon="ios-git-compare-outline"
                         color={GlobalStyles.colors.primary500}
-                        size={36}
+                        size={moderateScale(36)}
                         buttonStyle={[
                           styles.recalcButton,
                           GlobalStyles.strongShadow,
@@ -904,7 +906,10 @@ const TripForm = ({ navigation, route }) => {
               buttonStyle={{}}
               style={[
                 styles.button,
-                { marginVertical: 8, marginHorizontal: 24 },
+                {
+                  marginVertical: moderateScale(8),
+                  marginHorizontal: moderateScale(24),
+                },
               ]}
               onPress={submitHandler.bind(this, true /* setActive */)}
             >
@@ -925,7 +930,7 @@ const TripForm = ({ navigation, route }) => {
       </Animated.View>
       <View
         style={{
-          minHeight: 60,
+          minHeight: moderateScale(60),
           zIndex: -10,
           backgroundColor: GlobalStyles.colors.backgroundColor,
         }}
@@ -964,7 +969,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   dynamicDailyLabel: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     color: GlobalStyles.colors.textColor,
   },
   recalcButtonContainer: {
@@ -995,7 +1000,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 10,
   },
   label: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     color: GlobalStyles.colors.textColor,
     marginBottom: 4,
   },
@@ -1005,11 +1010,11 @@ const styles = StyleSheet.create({
     marginBottom: "4%",
   },
   title: {
-    fontSize: 24,
+    fontSize: moderateScale(24),
     fontWeight: "bold",
     color: GlobalStyles.colors.textColor,
-    marginTop: 5,
-    marginBottom: 24,
+    marginTop: moderateScale(5),
+    marginBottom: moderateScale(24),
     textAlign: "center",
   },
   categoryRow: {
@@ -1024,7 +1029,7 @@ const styles = StyleSheet.create({
   errorText: {
     textAlign: "center",
     color: GlobalStyles.colors.error500,
-    margin: 8,
+    margin: moderateScale(8),
   },
   buttonContainer: {
     flexDirection: "row",
@@ -1041,7 +1046,7 @@ const styles = StyleSheet.create({
   },
   modalStyle: {
     justifyContent: "center",
-    marginBottom: 40,
+    marginBottom: moderateScale(40),
   },
   infoModalContainer: {
     flexDirection: "column",
@@ -1053,17 +1058,17 @@ const styles = StyleSheet.create({
     margin: "4%",
   },
   infoTitleText: {
-    fontSize: 24,
+    fontSize: moderateScale(24),
     fontWeight: "bold",
     color: GlobalStyles.colors.textColor,
-    marginTop: 5,
-    marginBottom: 24,
+    marginTop: moderateScale(5),
+    marginBottom: moderateScale(24),
     textAlign: "center",
   },
   infoContentText: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     color: GlobalStyles.colors.textColor,
-    marginBottom: 24,
+    marginBottom: moderateScale(24),
     textAlign: "center",
   },
 });

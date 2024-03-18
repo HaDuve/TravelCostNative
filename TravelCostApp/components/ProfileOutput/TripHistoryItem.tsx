@@ -47,7 +47,7 @@ import safeLogError from "../../util/error";
 import { getTripData } from "../../util/trip";
 import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
 
-export type TripHistoryItem = {
+export type TripHistoryItemType = {
   tripid: string;
   tripName: string;
   totalBudget: string;
@@ -84,7 +84,7 @@ function TripHistoryItem({ tripid, trips }) {
   const storeTripHistoryItem = useCallback(
     (tripid: string) => {
       if (!tripid) return;
-      const trip: TripHistoryItem = {
+      const trip: TripHistoryItemType = {
         tripid: tripid,
         tripName: tripName,
         totalBudget: totalBudget,
@@ -117,7 +117,7 @@ function TripHistoryItem({ tripid, trips }) {
   );
 
   function loadTripHistoryItem(tripid: string) {
-    const trip: TripHistoryItem = getMMKVObject(
+    const trip: TripHistoryItemType = getMMKVObject(
       "tripHistoryItem" + `_${tripid}`
     );
     if (trip) {
@@ -380,7 +380,6 @@ function TripHistoryItem({ tripid, trips }) {
         >
           <View style={[styles.topRow]}>
             <View>
-              {/* <Text style={[styles.textBase, styles.description]}>{"..."}</Text> */}
               <LoadingBarOverlay
                 size="small"
                 customText=" "
@@ -420,7 +419,7 @@ function TripHistoryItem({ tripid, trips }) {
     );
   }
 
-  const dimensionChars = Dimensions.get("window").width / 20;
+  const dimensionChars = moderateScale(25, 0.4);
 
   function renderTravellers(item) {
     if (!item.item?.userName) return <></>;
@@ -432,7 +431,9 @@ function TripHistoryItem({ tripid, trips }) {
             {item.item?.userName?.charAt(0)}
           </Text>
         </View>
-        <Text>{truncateString(item.item.userName, 10)}</Text>
+        <Text style={styles.travellerNameText}>
+          {truncateString(item.item.userName, 10)}
+        </Text>
       </View>
     );
   }
@@ -521,39 +522,41 @@ const styles = StyleSheet.create({
   },
   tripItem: {
     flex: 1,
-    padding: 12,
-    margin: 12,
+    padding: scale(12),
+    margin: scale(12),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
-    borderRadius: 12,
+    borderRadius: moderateScale(12),
   },
   inactive: {
     opacity: 0.7,
   },
   topRow: {
-    marginVertical: 8,
+    marginVertical: verticalScale(8),
     flexDirection: "row",
     justifyContent: "space-between",
   },
   textBase: {
     color: GlobalStyles.colors.textColor,
-    fontSize: 14,
+    fontSize: moderateScale(14),
     fontWeight: "300",
   },
   description: {
-    fontSize: 16,
-    marginBottom: 4,
+    fontSize: moderateScale(16),
+    marginBottom: verticalScale(4),
     fontWeight: "300",
     fontStyle: "italic",
+    width: scale(110),
   },
   amountContainer: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingHorizontal: scale(12),
+    paddingVertical: verticalScale(4),
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 4,
-    minWidth: 80,
+    borderRadius: moderateScale(4),
+    minWidth: scale(80),
   },
   amount: {
+    fontSize: moderateScale(12),
     color: GlobalStyles.colors.primary500,
     fontWeight: "bold",
   },
@@ -561,24 +564,29 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     justifyContent: "flex-start",
-    margin: 4,
-    padding: 8,
-    borderRadius: 16,
+    margin: scale(4),
+    padding: scale(8),
+    borderRadius: moderateScale(16),
     maxWidth: "47%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   avatar: {
-    minHeight: 20,
-    minWidth: 20,
-    borderRadius: 60,
+    minHeight: moderateScale(20),
+    minWidth: moderateScale(20),
+    borderRadius: moderateScale(60),
     backgroundColor: GlobalStyles.colors.gray500,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 14,
+    marginRight: scale(14),
   },
   avatarText: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     fontWeight: "bold",
     color: GlobalStyles.colors.primary700,
+  },
+  travellerNameText: {
+    fontSize: moderateScale(14),
+    fontWeight: "300",
+    color: GlobalStyles.colors.textColor,
   },
 });

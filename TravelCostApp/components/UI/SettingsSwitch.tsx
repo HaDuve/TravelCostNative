@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import React from "react";
 import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
+import { moderateScale, verticalScale } from "../../util/scalingUtil";
 
 const SettingsSwitch = ({ style, toggleState, state, label }) => {
   return (
@@ -9,7 +10,7 @@ const SettingsSwitch = ({ style, toggleState, state, label }) => {
       <View style={{ flex: 1 }}>
         <Text
           style={{
-            fontSize: 14,
+            fontSize: moderateScale(14),
             color: "#626262",
             fontWeight: "300",
           }}
@@ -29,7 +30,7 @@ const SettingsSwitch = ({ style, toggleState, state, label }) => {
         }
         onValueChange={toggleState}
         value={state}
-        style={[{ marginBottom: 8 }, GlobalStyles.shadowPrimary]}
+        style={[{ marginBottom: verticalScale(8) }, GlobalStyles.shadowPrimary]}
       />
       {/* </LinearGradient> */}
     </Pressable>
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
   },
   label: {
     color: GlobalStyles.colors.textColor,
-    fontSize: 16,
-    marginBottom: 16,
+    fontSize: moderateScale(16),
+    marginBottom: verticalScale(16),
   },
 });

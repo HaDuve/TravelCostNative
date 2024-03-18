@@ -38,7 +38,7 @@ import { setAttributesAsync } from "../components/Premium/PremiumConstants";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import { NetworkContext } from "../store/network-context";
 import safeLogError from "../util/error";
-import { verticalScale } from "../util/scalingUtil";
+import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -343,12 +343,12 @@ const ProfileScreen = ({ navigation }) => {
           <TourGuideZone
             text={i18n.t("walk5")}
             shape={"circle"}
-            maskOffset={24}
+            maskOffset={moderateScale(24)}
             zone={5}
           >
             <IconButton
               icon={"ios-earth"}
-              size={36}
+              size={moderateScale(36)}
               buttonStyle={styles.newTripButtonContainer}
               color={GlobalStyles.colors.primary400}
               onPress={navigation.navigate.bind(this, "ManageTrip")}
@@ -378,7 +378,7 @@ const ProfileScreen = ({ navigation }) => {
               // icon="md-document-attach-outline"
               icon="list-outline"
               buttonStyle={[styles.addButton, GlobalStyles.shadowGlowPrimary]}
-              size={42}
+              size={moderateScale(42)}
               color={GlobalStyles.colors.backgroundColor}
               onPress={() => {
                 // onShare(tripCtx.tripid, navigation);
@@ -419,19 +419,19 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     flex: 2,
-    padding: 4,
+    padding: scale(4),
   },
 
   tripContainer: {
     flex: 1,
     minHeight: "68%",
-    margin: 16,
-    marginBottom: -30,
+    margin: scale(16),
+    marginBottom: verticalScale(-30),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   horizontalContainer: {
-    marginTop: "3%",
-    marginRight: "3%",
+    marginTop: verticalScale(15),
+    marginRight: scale(15),
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -461,24 +461,24 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   tripListTitle: {
-    fontSize: 22,
+    fontSize: moderateScale(22),
     fontWeight: "bold",
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
-    marginLeft: "2%",
+    marginLeft: scale(10),
   },
   deleteContainer: {
-    marginTop: 16,
-    paddingTop: 8,
+    marginTop: verticalScale(16),
+    paddingTop: verticalScale(8),
     borderTopWidth: 2,
     borderTopColor: GlobalStyles.colors.primary200,
     alignItems: "center",
   },
   addButton: {
     backgroundColor: GlobalStyles.colors.primary400,
-    padding: 16,
-    paddingHorizontal: 18,
-    marginBottom: 4,
+    padding: moderateScale(16),
+    paddingHorizontal: moderateScale(16),
+    marginBottom: verticalScale(4),
     borderRadius: 99,
   },
   offlineWarningContainer: {
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
     alignContent: "center",
   },
   offlineWarningText: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     paddingVertical: "2%",
     paddingHorizontal: "2%",
     color: GlobalStyles.colors.gray700,

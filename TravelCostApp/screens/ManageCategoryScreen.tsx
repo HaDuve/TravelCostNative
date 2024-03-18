@@ -52,6 +52,7 @@ import BlurPremium from "../components/Premium/BlurPremium";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
 import { useMemo } from "react";
+import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
 
 const ManageCategoryScreen = ({ navigation }) => {
   // defaultCategories minus the last element (-new cat element)
@@ -194,7 +195,7 @@ const ManageCategoryScreen = ({ navigation }) => {
       >
         <Ionicons
           name={item.icon}
-          size={24}
+          size={moderateScale(24, 0.3)}
           color={GlobalStyles.colors.textColor}
         />
         <TextInput
@@ -212,7 +213,11 @@ const ManageCategoryScreen = ({ navigation }) => {
             handleDeleteCategory(index);
           }}
         >
-          <Ionicons name="trash-outline" size={24} color="#434343" />
+          <Ionicons
+            name="trash-outline"
+            size={moderateScale(24, 0.3)}
+            color={GlobalStyles.colors.textColor}
+          />
         </TouchableOpacity>
       </Animated.View>
     );
@@ -309,10 +314,10 @@ const ManageCategoryScreen = ({ navigation }) => {
 
   function renderRowIconPicker({ item }) {
     return (
-      <View style={[{ margin: 5 }]}>
+      <View style={[{ margin: scale(5) }]}>
         <View
           style={{
-            marginBottom: 1,
+            marginBottom: verticalScale(2),
           }}
         >
           <SelectCategoryIcon
@@ -324,7 +329,7 @@ const ManageCategoryScreen = ({ navigation }) => {
         {item?.length > 1 ? (
           <View
             style={{
-              marginBottom: 1,
+              marginBottom: verticalScale(2),
             }}
           >
             <SelectCategoryIcon
@@ -337,7 +342,7 @@ const ManageCategoryScreen = ({ navigation }) => {
         {item?.length > 2 ? (
           <View
             style={{
-              marginBottom: 1,
+              marginBottom: verticalScale(2),
             }}
           >
             <SelectCategoryIcon
@@ -411,7 +416,10 @@ const ManageCategoryScreen = ({ navigation }) => {
           <View
             style={[
               styles.inputContainer,
-              bigDisplay && { minHeight: 284, maxHeight: 284 },
+              bigDisplay && {
+                minHeight: moderateScale(284, 0.3),
+                maxHeight: moderateScale(284, 0.3),
+              },
               GlobalStyles.shadowPrimary,
             ]}
           >
@@ -461,7 +469,7 @@ const ManageCategoryScreen = ({ navigation }) => {
           </View>
           <View
             style={{
-              height: 16,
+              height: verticalScale(16),
               width: "100%",
               zIndex: 10,
               //transparent border color
@@ -562,26 +570,26 @@ ManageCategoryScreen.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: moderateScale(16),
   },
   inputContainer: {
     flex: 1,
     alignItems: "center",
-    minHeight: 220,
-    maxHeight: 220,
+    minHeight: moderateScale(220, 0.3),
+    maxHeight: moderateScale(220, 0.3),
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 8,
-    marginBottom: 8,
-    padding: 4,
+    marginBottom: moderateScale(8),
+    padding: moderateScale(4),
     // paddingHorizontal: 16,
   },
   newCategoryInput: {
     // center
     alignItems: "center",
     flex: 1,
-    height: 40,
-    maxHeight: 40,
-    fontSize: 20,
+    height: moderateScale(40),
+    maxHeight: moderateScale(40),
+    fontSize: moderateScale(20),
     color: GlobalStyles.colors.primary400,
     borderBottomWidth: 1,
     borderBottomColor: GlobalStyles.colors.primary500,
@@ -591,23 +599,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   iconButton: {
-    padding: 8,
-    marginHorizontal: 8,
-    borderRadius: 16,
+    padding: moderateScale(8),
+    marginHorizontal: moderateScale(8),
+    borderRadius: moderateScale(16),
   },
   selectedIconButton: {
     backgroundColor: GlobalStyles.colors.gray500Accent,
   },
   addButton: {
     backgroundColor: "#538076",
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    marginBottom: 12,
-    marginTop: -24,
+    borderRadius: moderateScale(8),
+    paddingVertical: moderateScale(8),
+    paddingHorizontal: moderateScale(16),
+    marginBottom: moderateScale(12),
+    marginTop: moderateScale(-24),
   },
   addButtonText: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     color: GlobalStyles.colors.backgroundColor,
   },
   categoryItem: {
@@ -615,19 +623,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 8,
-    margin: 8,
-    padding: 16,
+    borderRadius: moderateScale(8),
+    margin: moderateScale(8),
+    padding: moderateScale(16),
     zIndex: 1,
   },
   categoryNameInput: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     color: "#434343",
-    marginLeft: 16,
+    marginLeft: moderateScale(16),
     flex: 1,
   },
   deleteButton: {
-    marginLeft: 16,
+    marginLeft: moderateScale(16),
   },
   modalStyle: {
     flex: 1,
@@ -636,20 +644,20 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 8,
-    padding: 16,
+    borderRadius: moderateScale(8),
+    padding: moderateScale(16),
     width: "80%",
     height: "40%",
     justifyContent: "space-evenly",
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: "bold",
     color: GlobalStyles.colors.primary400,
     textAlign: "center",
   },
   modalText: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     color: GlobalStyles.colors.primary400,
     textAlign: "center",
   },
@@ -659,31 +667,31 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     backgroundColor: GlobalStyles.colors.primary400,
-    borderRadius: 8,
-    padding: 8,
+    borderRadius: moderateScale(8),
+    padding: moderateScale(8),
     width: "40%",
   },
   modalButtonText: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     color: GlobalStyles.colors.backgroundColor,
     textAlign: "center",
   },
   infoModalContainer: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 8,
-    padding: 16,
+    borderRadius: moderateScale(8),
+    padding: moderateScale(16),
     width: "80%",
     height: "40%",
     justifyContent: "space-evenly",
   },
   infoTitleText: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: "bold",
     color: GlobalStyles.colors.textColor,
     textAlign: "center",
   },
   infoContentText: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     color: GlobalStyles.colors.textColor,
     textAlign: "center",
   },

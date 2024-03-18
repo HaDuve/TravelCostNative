@@ -56,11 +56,12 @@ export const GlobalStyles = {
     textAlign: "center",
     fontStyle: "italic",
     fontWeight: "300",
+    fontSize: moderateScale(14),
   },
   backButton: {
     flex: 1,
-    padding: 8,
-    marginBottom: -12,
+    padding: moderateScale(8),
+    marginBottom: moderateScale(-12),
   },
   row: { flexDirection: "row" },
   titleText: {
@@ -85,7 +86,7 @@ export const GlobalStyles = {
     fontSize: moderateScale(14),
   },
   secondaryText: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     color: "#626262",
     fontWeight: "300",
   },
@@ -162,8 +163,8 @@ export const GlobalStyles = {
     justifyContent: "center",
   },
   countryFlagStyleBig: {
-    width: 50,
-    height: 35,
+    width: moderateScale(50),
+    height: moderateScale(35),
     borderRadius: 4,
   },
 };

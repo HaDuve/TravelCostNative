@@ -3,6 +3,7 @@ import React from "react";
 import { Pressable } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
+import { moderateScale } from "../../util/scalingUtil";
 
 const InfoButton = ({ containerStyle, onPress }) => {
   return (
@@ -25,14 +26,14 @@ InfoButton.propTypes = {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
-    borderRadius: 50,
-    width: 20,
-    height: 20,
+    borderRadius: moderateScale(50),
+    width: moderateScale(20),
+    height: moderateScale(20),
     alignItems: "center",
     justifyContent: "center",
   },
   text: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     fontWeight: "bold",
   },
 });

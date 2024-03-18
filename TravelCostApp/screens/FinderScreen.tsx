@@ -43,12 +43,14 @@ import safeLogError from "../util/error";
 import { ExpenseData } from "../util/expense";
 import { formatExpenseWithCurrency } from "../util/string";
 import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
+import { OrientationContext } from "../store/orientation-context";
 
 const FinderScreen = () => {
   const navigation = useNavigation();
   const expCtx = useContext(ExpensesContext);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
+  const { isPortrait } = useContext(OrientationContext);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -279,12 +281,15 @@ const FinderScreen = () => {
   return (
     <>
       {datepickerJSX}
-      <Animated.View layout={ListLayoutAnimation} style={styles.container}>
+      <Animated.ScrollView
+        layout={ListLayoutAnimation}
+        style={styles.container}
+      >
         <View style={[styles.cardContainer, GlobalStyles.wideStrongShadow]}>
           <Text style={styles.titleText}>{i18n.t("finderTitle")}</Text>
           <Animated.ScrollView
             layout={ListLayoutAnimation}
-            style={{ flex: 1, minHeight: "50%" }}
+            style={{ flex: 1, minHeight: "50% " }}
           >
             <View style={styles.rowContainer}>
               <View style={styles.checkBoxContainer}>
@@ -387,7 +392,7 @@ const FinderScreen = () => {
               : i18n.t("noResults")}
           </GradientButton>
         </View>
-      </Animated.View>
+      </Animated.ScrollView>
       {/* <BlurPremium /> */}
     </>
   );

@@ -46,6 +46,7 @@ import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { Pressable } from "react-native";
+import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
 
 const SplitSummaryScreen = ({ navigation }) => {
   const {
@@ -320,64 +321,67 @@ const SplitSummaryScreen = ({ navigation }) => {
         <FlatList
           style={{ maxWidth: "100%", paddingHorizontal: "2%" }}
           data={splits}
-          ListFooterComponent={<View style={{ height: 10 }}></View>}
+          ListFooterComponent={
+            <View style={styles.buttonContainer}>
+              {!showSimplify && !noSimpleSplits && (
+                <FlatButton
+                  onPress={async () => {
+                    if (showSimplify) {
+                      navigation.goBack();
+                    } else {
+                      await getOpenSplits();
+                      setShowSimplify(true);
+                      setTitleText(titleTextOriginal);
+                      setSubTitleText(subTitleOriginal);
+                    }
+                  }}
+                >
+                  Back
+                </FlatButton>
+              )}
+              {showSimplify && !noSimpleSplits && (
+                <GradientButton
+                  style={styles.button}
+                  onPress={handleSimpflifySplits}
+                >
+                  Simplify Splits
+                </GradientButton>
+              )}
+              {hasOpenSplits && (
+                <GradientButton
+                  style={styles.button}
+                  colors={GlobalStyles.gradientColors}
+                  darkText
+                  buttonStyle={{
+                    backgroundColor: GlobalStyles.colors.errorGrayed,
+                  }}
+                  onPress={async () => {
+                    // alert ask user if he really wants to settle all Splits
+                    // if yes, call settleSplitsHandler
+                    Alert.alert(
+                      "Settle Splits",
+                      "Are you sure you want to settle all splits? Has everyone gotten their money back? (This will only settle splits from Today or Before, but not open splits from the future!)",
+                      [
+                        {
+                          text: "Cancel",
+                          style: "cancel",
+                        },
+                        {
+                          text: "Settle",
+                          onPress: async () => await settleSplitsHandler(),
+                        },
+                      ]
+                    );
+                  }}
+                >
+                  Settle Splits
+                </GradientButton>
+              )}
+            </View>
+          }
           ListHeaderComponent={<View style={{ height: 40 }}></View>}
           renderItem={renderSplitItem}
         />
-        <View style={styles.buttonContainer}>
-          {!showSimplify && !noSimpleSplits && (
-            <FlatButton
-              onPress={async () => {
-                if (showSimplify) {
-                  navigation.goBack();
-                } else {
-                  await getOpenSplits();
-                  setShowSimplify(true);
-                  setTitleText(titleTextOriginal);
-                  setSubTitleText(subTitleOriginal);
-                }
-              }}
-            >
-              Back
-            </FlatButton>
-          )}
-          {showSimplify && !noSimpleSplits && (
-            <GradientButton
-              style={styles.button}
-              onPress={handleSimpflifySplits}
-            >
-              Simplify Splits
-            </GradientButton>
-          )}
-          {hasOpenSplits && (
-            <GradientButton
-              style={styles.button}
-              colors={GlobalStyles.gradientColors}
-              darkText
-              buttonStyle={{ backgroundColor: GlobalStyles.colors.errorGrayed }}
-              onPress={async () => {
-                // alert ask user if he really wants to settle all Splits
-                // if yes, call settleSplitsHandler
-                Alert.alert(
-                  "Settle Splits",
-                  "Are you sure you want to settle all splits? Has everyone gotten their money back? (This will only settle splits from Today or Before, but not open splits from the future!)",
-                  [
-                    {
-                      text: "Cancel",
-                      style: "cancel",
-                    },
-                    {
-                      text: "Settle",
-                      onPress: async () => await settleSplitsHandler(),
-                    },
-                  ]
-                );
-              }}
-            >
-              Settle Splits
-            </GradientButton>
-          )}
-        </View>
       </Animated.View>
     </View>
   );
@@ -394,34 +398,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    padding: "8%",
+    padding: scale(28),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   cardContainer: {
     alignItems: "center",
     justifyContent: "center",
-    // marginVertical: "6%",
-    marginHorizontal: "0%",
-    padding: "8%",
+    paddingHorizontal: scale(24),
+    paddingTop: verticalScale(24),
+    paddingBottom: verticalScale(2),
     //card
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
-    borderRadius: 20,
+    borderRadius: moderateScale(20),
     // borderWidth: 1,
     borderColor: GlobalStyles.colors.gray500,
-    minWidth: "100%",
+    minWidth: scale(300),
   },
   button: {
-    marginLeft: 24,
-
+    marginLeft: scale(24),
     ...Platform.select({
       ios: {
-        marginTop: "14%",
-        marginLeft: "4%",
+        marginTop: verticalScale(50),
         borderRadius: 12,
         minHeight: 55,
       },
       android: {
-        // marginTop: "38%",
         elevation: 0,
       },
     }),
@@ -429,13 +430,13 @@ const styles = StyleSheet.create({
   splitContainer: {
     flex: 1,
     flexDirection: "row",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginVertical: 8,
+    paddingHorizontal: scale(16),
+    paddingVertical: verticalScale(8),
+    marginVertical: verticalScale(8),
     borderWidth: 1,
     borderColor: GlobalStyles.colors.backgroundColor,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 44,
+    borderRadius: moderateScale(44),
     alignItems: "center",
     justifyContent: "center",
   },
@@ -445,28 +446,29 @@ const styles = StyleSheet.create({
     flexDirection: "row",
 
     flex: 1,
-    // alignItems: "center",
+    alignItems: "center",
+    justifyContent: "center",
 
     // margin: "2%",
     // minHeight: 250,
     ...Platform.select({
       ios: { marginTop: "-0%" },
       android: {
-        height: 55,
+        height: verticalScale(55),
         justifyContent: "space-between",
         alignItems: "center",
       },
     }),
-    position: "absolute",
+    // position: "absolute",
     // render on the bottom of the screen
-    top: Dimensions.get("window").height - 235,
+    // top: Dimensions.get("window").height - 235,
   },
   splitText: {
     maxWidth: "100%",
     textAlign: "center",
   },
   userText: {
-    fontSize: 18,
+    fontSize: moderateScale(18),
     fontWeight: "500",
     //italics
     fontStyle: "italic",
@@ -476,7 +478,7 @@ const styles = StyleSheet.create({
     alignContent: "center",
   },
   normalText: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: "300",
     color: GlobalStyles.colors.textColor, // center
     alignItems: "center",
@@ -484,7 +486,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   amountText: {
-    fontSize: 18,
+    fontSize: moderateScale(18),
     fontWeight: "500",
     fontStyle: "italic",
 
@@ -501,9 +503,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   titleText: {
-    fontSize: 32,
+    fontSize: moderateScale(32),
     fontWeight: "bold",
-    paddingBottom: 12,
+    paddingBottom: verticalScale(12),
     color: GlobalStyles.colors.textColor,
     // center
     alignItems: "center",
@@ -517,7 +519,7 @@ const styles = StyleSheet.create({
     alignContent: "flex-start",
   },
   subTitleText: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: "300",
     fontStyle: "italic",
 

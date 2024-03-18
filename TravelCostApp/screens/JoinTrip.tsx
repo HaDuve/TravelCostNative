@@ -47,6 +47,7 @@ import {
   isConnectionFastEnoughAsBool,
 } from "../util/connectionSpeed";
 import { sleep } from "../util/appState";
+import { moderateScale } from "../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -237,7 +238,10 @@ const JoinTrip = ({ navigation, route }) => {
       </View>
       {!clickedOnLink && (
         <View style={styles.linkInputContainer}>
-          <Text> {i18n.t("joinLink")}</Text>
+          <Text style={{ fontSize: moderateScale(14) }}>
+            {" "}
+            {i18n.t("joinLink")}
+          </Text>
           <Input
             value={joinTripid}
             onUpdateValue={(value) => {
@@ -268,8 +272,8 @@ const JoinTrip = ({ navigation, route }) => {
         <Text
           style={{
             alignSelf: "center",
-            padding: 16,
-            fontSize: 16,
+            padding: moderateScale(16),
+            fontSize: moderateScale(16),
           }}
         >
           {i18n.t("joinTrip")}?
@@ -278,8 +282,8 @@ const JoinTrip = ({ navigation, route }) => {
       <Text
         style={{
           alignSelf: "center",
-          padding: 4,
-          fontSize: 26,
+          padding: moderateScale(4),
+          fontSize: moderateScale(26),
           fontWeight: "bold",
         }}
       >
@@ -316,7 +320,7 @@ const styles = StyleSheet.create({
     margin: "5%",
     padding: "2%",
     backgroundColor: GlobalStyles.colors.gray500,
-    borderRadius: 10,
+    borderRadius: moderateScale(10),
     borderWidth: 1,
     elevation: 3,
     borderColor: GlobalStyles.colors.gray600,
@@ -352,7 +356,7 @@ const styles = StyleSheet.create({
     }),
   },
   titleText: {
-    fontSize: 30,
+    fontSize: moderateScale(30),
     fontWeight: "bold",
   },
   buttonContainer: {
@@ -364,9 +368,9 @@ const styles = StyleSheet.create({
   linkInputContainer: {
     flex: 1,
     minHeight: "50%",
-    padding: 24,
-    margin: 16,
-    marginBottom: 32,
+    padding: moderateScale(24),
+    margin: moderateScale(16),
+    marginBottom: moderateScale(32),
     borderWidth: 1,
     borderColor: GlobalStyles.colors.gray500,
   },

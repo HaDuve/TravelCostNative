@@ -3,6 +3,7 @@ import React from "react";
 import { GlobalStyles } from "../../constants/styles";
 import { Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
+import { moderateScale } from "../../util/scalingUtil";
 
 const SelectCategoryIcon = ({
   selectedIconName,
@@ -19,7 +20,7 @@ const SelectCategoryIcon = ({
     >
       <Ionicons
         name={iconName}
-        size={42}
+        size={moderateScale(42, 0.3)}
         color={GlobalStyles.colors.primary400}
       />
     </TouchableOpacity>

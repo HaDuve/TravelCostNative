@@ -31,7 +31,7 @@ import { SettingsContext } from "../../../store/settings-context";
 import { getExpensesSum } from "../../../util/expense";
 import FlatButton from "../../UI/FlatButton";
 import { moderateScale, scale, verticalScale } from "../../../util/scalingUtil";
-import { useOrientation } from "../../Hooks/useOrientation";
+import { OrientationContext } from "../../../store/orientation-context";
 
 const ExpenseGraph = ({
   periodName,
@@ -45,8 +45,8 @@ const ExpenseGraph = ({
 }) => {
   const today = new Date();
   const renderItemRef = useRef(null);
-  const orientation = useOrientation();
-  const isPortrait = orientation === "PORTRAIT";
+  const { isPortrait } = useContext(OrientationContext);
+
   const expenseCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
   const hideSpecial = settings.hideSpecialExpenses;

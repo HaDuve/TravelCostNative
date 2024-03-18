@@ -7,7 +7,6 @@ import {
   Platform,
   AppState,
   StatusBar as StatusBarRN,
-  useWindowDimensions,
   Dimensions,
 } from "react-native";
 import Purchases from "react-native-purchases";
@@ -109,7 +108,6 @@ import BackgroundFetchScreen, {
   registerBackgroundFetchAsync,
 } from "./taskmanager/backgroundTasks";
 import safeLogError from "./util/error";
-import { useOrientation } from "./components/Hooks/useOrientation";
 import {
   isTablet,
   moderateScale,
@@ -117,6 +115,7 @@ import {
   verticalScale,
 } from "./util/scalingUtil";
 import { CustomTooltip } from "./components/UI/Tourguide_Tooltip";
+import OrientationContextProvider from "./store/orientation-context";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -860,27 +859,19 @@ export default function App() {
                   <SettingsProvider>
                     <NetworkProvider>
                       <ExpensesContextProvider>
-                        <GestureHandlerRootView style={{ flex: 1 }}>
-                          <TourGuideProvider
-                            {...{
-                              borderRadius: 16,
-                              key: "settings",
-                              labels: {
-                                previous: i18n.t("tourGuideLabelPrevious"),
-                                next: i18n.t("tourGuideLabelNext"),
-                                skip: i18n.t("tourGuideLabelSkip"),
-                                finish: i18n.t("tourGuideLabelFinish"),
-                              },
-                              tooltipComponent: ({
-                                isFirstStep,
-                                isLastStep,
-                                handleNext,
-                                handlePrev,
-                                handleStop,
-                                currentStep,
-                                labels,
-                              }: TooltipProps) =>
-                                CustomTooltip({
+                        <OrientationContextProvider>
+                          <GestureHandlerRootView style={{ flex: 1 }}>
+                            <TourGuideProvider
+                              {...{
+                                borderRadius: 16,
+                                key: "settings",
+                                labels: {
+                                  previous: i18n.t("tourGuideLabelPrevious"),
+                                  next: i18n.t("tourGuideLabelNext"),
+                                  skip: i18n.t("tourGuideLabelSkip"),
+                                  finish: i18n.t("tourGuideLabelFinish"),
+                                },
+                                tooltipComponent: ({
                                   isFirstStep,
                                   isLastStep,
                                   handleNext,
@@ -888,14 +879,24 @@ export default function App() {
                                   handleStop,
                                   currentStep,
                                   labels,
-                                }),
-                            }}
-                          >
-                            <Root />
+                                }: TooltipProps) =>
+                                  CustomTooltip({
+                                    isFirstStep,
+                                    isLastStep,
+                                    handleNext,
+                                    handlePrev,
+                                    handleStop,
+                                    currentStep,
+                                    labels,
+                                  }),
+                              }}
+                            >
+                              <Root />
 
-                            <ToastComponent />
-                          </TourGuideProvider>
-                        </GestureHandlerRootView>
+                              <ToastComponent />
+                            </TourGuideProvider>
+                          </GestureHandlerRootView>
+                        </OrientationContextProvider>
                       </ExpensesContextProvider>
                     </NetworkProvider>
                   </SettingsProvider>

@@ -43,7 +43,6 @@ import IconButton from "../UI/IconButton";
 import uniqBy from "lodash.uniqby";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
-import { OrientationState, useOrientation } from "../Hooks/useOrientation";
 
 const PageLength = 20;
 
@@ -52,8 +51,7 @@ const AddExpenseButton = ({ navigation }) => {
   const tripCtx = useContext(TripContext);
   const authCtx = useContext(AuthContext);
   const expCtx = useContext(ExpensesContext);
-  const orientation: OrientationState = useOrientation();
-  const isPortrait: boolean = orientation === "PORTRAIT";
+
   // sort last expenses by editedTimestamp timestamp
   const lastExpenses: ExpenseData[] = uniqBy(
     expCtx.expenses.sort((a, b) => {

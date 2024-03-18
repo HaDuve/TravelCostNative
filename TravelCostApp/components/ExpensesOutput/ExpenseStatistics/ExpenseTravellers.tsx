@@ -28,13 +28,13 @@ import { TripContext } from "../../../store/trip-context";
 import BlurPremium from "../../Premium/BlurPremium";
 import { processTitleStringFilteredPiecharts } from "../../../util/string";
 import { moderateScale, scale, verticalScale } from "../../../util/scalingUtil";
-import { useOrientation } from "../../Hooks/useOrientation";
+import { OrientationContext } from "../../../store/orientation-context";
 
 const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
   const { tripCurrency } = useContext(TripContext);
-  const orientation = useOrientation();
-  const isPortrait = orientation === "PORTRAIT";
+  const { isPortrait } = useContext(OrientationContext);
+
   if (!expenses)
     return (
       <View style={styles.container}>

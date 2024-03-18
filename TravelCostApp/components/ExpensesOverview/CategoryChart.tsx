@@ -9,13 +9,13 @@ import { TripContext } from "../../store/trip-context";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { GlobalStyles } from "../../constants/styles";
 import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
-import { useOrientation } from "../Hooks/useOrientation";
+import { OrientationContext } from "../../store/orientation-context";
 
 const CategoryChart = ({ inputData }) => {
   const tripCtx = useContext(TripContext);
   const tripCurrency = tripCtx.tripCurrency;
-  const orientation = useOrientation();
-  const isPortrait = orientation === "PORTRAIT";
+  const { isPortrait } = useContext(OrientationContext);
+
   const [useDummyData, setUseDummyData] = useState(true);
   let chartDataForRender = Array.from(inputData);
   // this little trick is necessary to make the pie animate on load.  For the very first render, pare down

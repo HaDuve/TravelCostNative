@@ -1,5 +1,5 @@
 import * as StoreReview from "expo-store-review";
-import React from "react";
+import React, { useContext } from "react";
 import {
   Image,
   Linking,
@@ -26,20 +26,18 @@ import GradientButton from "../components/UI/GradientButton";
 import { GlobalStyles } from "../constants/styles";
 import { secureStoreSetObject } from "../store/secure-storage";
 import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
-import { useOrientation } from "../components/Hooks/useOrientation";
+import { OrientationContext } from "../store/orientation-context";
 
 //TODO: set the according URLS when we are live!
 export const APP_STORE_URL = `https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=${i18n.locale}`;
 export const PLAY_STORE_URL =
-  "https://play.google.com/store/apps/details?id=com.example.app";
-
+  "https://play.google.com/store/apps/details?id=com.budgetfornomads.app";
 export const neverAskAgain = async () => {
   await secureStoreSetObject("neverAskAgain", true);
 };
 
 const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
-  const orientation = useOrientation();
-  const isPortrait = orientation === "PORTRAIT";
+  const { isPortrait } = useContext(OrientationContext);
 
   const handleRate = async () => {
     if (StoreReview.isAvailableAsync()) {
@@ -69,7 +67,7 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
       style={styles.modalStyle}
       animationInTiming={400}
       animationOutTiming={800}
-      isVisible={moderateScale(isModalVisible)}
+      isVisible={isModalVisible}
       onSwipeComplete={handleClose}
       swipeDirection={["up", "left", "right", "down"]}
       onBackdropPress={handleClose}

@@ -16,7 +16,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { UserContext } from "../../../store/user-context";
 import { moderateScale, scale, verticalScale } from "../../../util/scalingUtil";
-import { useOrientation } from "../../Hooks/useOrientation";
+import { OrientationContext } from "../../../store/orientation-context";
 
 const CategoryProgressBar = ({
   cat,
@@ -29,8 +29,7 @@ const CategoryProgressBar = ({
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   const budgetProgress = (catCost / totalCost) * 1;
-  const orientation = useOrientation();
-  const isPortrait = orientation === "PORTRAIT";
+  const { isPortrait } = useContext(OrientationContext);
   const [catSymbol, setCatSymbol] = useState(null);
   useEffect(() => {
     async function setCatSymbolAsync() {

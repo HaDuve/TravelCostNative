@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { StyleSheet, View } from "react-native";
 import * as Haptics from "expo-haptics";
 import {
@@ -26,7 +26,6 @@ import { formatExpenseWithCurrency } from "../../util/string";
 import { isSameDay } from "../../util/dateTime";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
-import { useOrientation } from "../Hooks/useOrientation";
 
 const ExpenseChart = ({
   inputData,
@@ -37,9 +36,6 @@ const ExpenseChart = ({
   navigation,
   expenses,
 }) => {
-  const orientation = useOrientation();
-  const isPortrait = orientation === "PORTRAIT";
-  const smallerScale = moderateScale(100, 0.2);
   const data = inputData;
   const firstItem = inputData[0];
   const [lastItem] = inputData.slice(-1);

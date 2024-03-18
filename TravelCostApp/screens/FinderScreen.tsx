@@ -42,6 +42,7 @@ import { DEFAULTCATEGORIES } from "../util/category";
 import safeLogError from "../util/error";
 import { ExpenseData } from "../util/expense";
 import { formatExpenseWithCurrency } from "../util/string";
+import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
 
 const FinderScreen = () => {
   const navigation = useNavigation();
@@ -312,9 +313,9 @@ const FinderScreen = () => {
               {checkedQuery && (
                 <IconButton
                   icon="close-outline"
-                  size={26}
+                  size={moderateScale(26)}
                   color={GlobalStyles.colors.textColor}
-                  buttonStyle={{ marginTop: "7%" }}
+                  buttonStyle={{ marginTop: verticalScale(14) }}
                   onPressStyle={{
                     backgroundColor: GlobalStyles.colors.gray500,
                     borderRadius: 99,
@@ -347,8 +348,8 @@ const FinderScreen = () => {
                 <IconButton
                   icon="close-outline"
                   color={GlobalStyles.colors.textColor}
-                  size={26}
-                  buttonStyle={{ marginTop: "7%" }}
+                  size={moderateScale(26)}
+                  buttonStyle={{ marginTop: verticalScale(14) }}
                   onPressStyle={{
                     backgroundColor: GlobalStyles.colors.gray500,
                     borderRadius: 99,
@@ -398,20 +399,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // margin: "4%",
-    padding: "8%",
+    padding: scale(20),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   cardContainer: {
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
-    borderRadius: 20,
-    padding: "8%",
+    borderRadius: moderateScale(20),
+    padding: scale(20),
     justifyContent: "space-around",
   },
   checkBoxContainer: {
-    borderRadius: 99,
-    marginRight: 8,
-    marginTop: "8%",
+    borderRadius: moderateScale(99),
+    marginRight: scale(8),
+    marginTop: verticalScale(20),
     ...Platform.select({
       ios: { borderWidth: 1 },
     }),
@@ -420,28 +421,28 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-start",
-    minHeight: 90,
+    minHeight: verticalScale(90),
   },
   rowContainer: {
     flex: 1,
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "flex-start",
-    minHeight: 90,
+    minHeight: verticalScale(90),
   },
   titleText: {
-    fontSize: 32,
+    fontSize: moderateScale(32),
     fontWeight: "bold",
-    paddingBottom: 12,
+    paddingBottom: verticalScale(12),
     color: GlobalStyles.colors.textColor,
     // center
     textAlign: "center",
   },
   queryText: {
-    fontSize: 16,
-    marginTop: "20%",
+    fontSize: moderateScale(16),
+    marginTop: verticalScale(65),
 
-    marginBottom: "5%",
+    marginBottom: verticalScale(18),
     //center
     textAlign: "center",
     // thin text
@@ -450,28 +451,29 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   findButton: {
-    marginHorizontal: "20%",
+    marginHorizontal: scale(65),
     borderRadius: 99,
   },
   queryContainer: {
     flex: 1,
-    marginTop: "3%",
+    marginTop: verticalScale(10),
 
-    // marginHorizontal: "3.5%",
-    marginLeft: "5%",
-    maxWidth: "60%",
+    marginLeft: scale(18),
+    maxWidth: scale(180),
   },
   autoCompleteStyle: {
     // flex: 1,
     zIndex: 0,
-
+    fontSize: moderateScale(16, 0.4),
+    paddingVertical: moderateScale(2, 2),
+    paddingHorizontal: scale(2),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
-    borderRadius: 5,
+    borderRadius: moderateScale(5),
     // marginLeft: -8,
   },
   autoCompleteMenuStyle: {
     zIndex: 0,
-    marginLeft: 8,
-    marginBottom: -1,
+    marginLeft: scale(8),
+    marginBottom: verticalScale(-1),
   },
 });

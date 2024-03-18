@@ -4,6 +4,7 @@ import { GlobalStyles } from "../../constants/styles";
 import { toShortFormat } from "../../util/date";
 import IconButton from "./IconButton";
 import PropTypes from "prop-types";
+import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
 
 const DatePickerContainer = ({
   openDatePickerRange,
@@ -20,7 +21,7 @@ const DatePickerContainer = ({
       <View style={styles.dateIconContainer}>
         <IconButton
           icon={"calendar-outline"}
-          size={32}
+          size={moderateScale(32)}
           color={GlobalStyles.colors.primary500}
           onPress={openDatePickerRange}
           buttonStyle={styles.buttonContainer}
@@ -58,15 +59,15 @@ DatePickerContainer.propTypes = {
 
 const styles = StyleSheet.create({
   dateIconContainer: {
-    marginLeft: "2.5%",
+    marginLeft: scale(7.5),
   },
   buttonContainer: {
-    margin: 4,
-    padding: 4,
+    margin: scale(4),
+    padding: scale(4),
     borderWidth: 1,
 
     borderColor: GlobalStyles.colors.gray700,
-    borderRadius: 5,
+    borderRadius: moderateScale(5),
     backgroundColor: GlobalStyles.colors.backgroundColor,
     // shadow
     elevation: 4,
@@ -79,14 +80,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
 
-    marginHorizontal: "5%",
-    marginTop: "4%",
-    paddingBottom: 4,
+    marginHorizontal: scale(15),
+    marginTop: verticalScale(12),
+    paddingBottom: verticalScale(12),
   },
   advancedText: {
-    marginTop: 9,
-    marginLeft: 12,
-    fontSize: 12,
+    marginTop: verticalScale(9),
+    marginLeft: scale(12),
+    fontSize: moderateScale(12),
     fontStyle: "italic",
     fontWeight: "300",
   },

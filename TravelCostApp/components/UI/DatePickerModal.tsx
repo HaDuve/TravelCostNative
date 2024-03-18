@@ -11,7 +11,7 @@ import { Dimensions, Platform, View } from "react-native";
 import React from "react";
 import DatePicker from "react-native-neat-date-picker";
 import { GlobalStyles } from "../../constants/styles";
-import { getLocaleDateFormat } from "../../util/date";
+import { getDatePlusDays, getLocaleDateFormat } from "../../util/date";
 
 const DatePickerModal = ({
   showDatePickerRange,

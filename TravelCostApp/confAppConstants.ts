@@ -29,7 +29,6 @@ export const SPLASH_SCREEN_DELAY = 1500;
 // tweak loading recent expenses overlay timeout
 export const EXPENSES_LOAD_TIMEOUT = 1000;
 // cache: only call the exchange getRate request again after X numbers of hours
-// TODO: Make it so that Premium Users request more often
 export const CACHE_NUM_HOURS = 48;
 // maximum number of expenses before we start to show cheap text-based expenseItems
 export const MAX_EXPENSES_RENDER = 150;

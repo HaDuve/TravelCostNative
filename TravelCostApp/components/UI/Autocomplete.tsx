@@ -52,6 +52,7 @@ const Autocomplete = ({
           }
         }}
         // maybe with a timeout
+        multiline
         onBlur={async () =>
           setTimeout(
             () => setMenuVisible(false),

@@ -1,6 +1,6 @@
 import { Platform } from "react-native";
 import { Layout } from "react-native-reanimated";
-import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
+import { moderateScale, verticalScale } from "../util/scalingUtil";
 
 export const GlobalStyles = {
   colors: {

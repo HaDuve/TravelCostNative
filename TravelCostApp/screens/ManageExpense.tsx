@@ -30,7 +30,11 @@ i18n.enableFallback = true;
 
 import { getCatString } from "../util/category";
 import PropTypes from "prop-types";
-import { deleteAllExpensesByRangedId, ExpenseData } from "../util/expense";
+import {
+  deleteAllExpensesByRangedId,
+  ExpenseData,
+  Split,
+} from "../util/expense";
 import { NetworkContext } from "../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import * as Haptics from "expo-haptics";
@@ -267,6 +271,10 @@ const ManageExpense = ({ route, navigation }) => {
       expenseData.calcAmount = Number(splitCalcAmount.toFixed(2));
       const splitDaysAmount = expenseData.amount / (days + 1);
       expenseData.amount = Number(splitDaysAmount.toFixed(2));
+      // also split the splits by the number of days for split
+      expenseData.splitList.forEach((split: Split) => {
+        split.amount = Number((split.amount / (days + 1)).toFixed(2));
+      });
     }
 
     // iterate over number of days between and change date and endDate to the first date + iterator

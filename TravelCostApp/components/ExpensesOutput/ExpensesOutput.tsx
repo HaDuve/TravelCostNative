@@ -24,6 +24,7 @@ import FlatButton from "../UI/FlatButton";
 import { useNavigation } from "@react-navigation/native";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { UserContext } from "../../store/user-context";
+import { moderateScale } from "../../util/scalingUtil";
 
 function ExpensesOutput({
   expenses,
@@ -78,6 +79,7 @@ function ExpensesOutput({
           {!showLoading && <Text style={styles.infoText}>{fallbackText}</Text>}
           {showYesterday && (
             <FlatButton
+              textStyle={{ marginVertical: moderateScale(4) }}
               onPress={() => {
                 navigation.navigate("FilteredExpenses", {
                   expenses: yesterdayExpenses,
@@ -85,11 +87,12 @@ function ExpensesOutput({
                 });
               }}
             >
-              {"<< " + i18n.t("showXResults1") + " " + i18n.t("yesterday")}
+              {i18n.t("showXResults1") + " " + i18n.t("yesterday")}
             </FlatButton>
           )}
           {showTomorrow && (
             <FlatButton
+              textStyle={{ marginVertical: moderateScale(4) }}
               onPress={() => {
                 navigation.navigate("FilteredExpenses", {
                   expenses: tomorrowExpenses,
@@ -97,7 +100,7 @@ function ExpensesOutput({
                 });
               }}
             >
-              {i18n.t("showXResults1") + " " + i18n.t("tomorrow") + " >>"}
+              {i18n.t("showXResults1") + " " + i18n.t("tomorrow")}
             </FlatButton>
           )}
         </View>
@@ -156,8 +159,8 @@ const styles = StyleSheet.create({
   },
   infoText: {
     color: GlobalStyles.colors.textColor,
-    fontSize: 16,
+    fontSize: moderateScale(16),
     textAlign: "center",
-    marginTop: 32,
+    marginVertical: moderateScale(32),
   },
 });

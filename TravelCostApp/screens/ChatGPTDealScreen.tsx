@@ -9,7 +9,6 @@ import {
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import FlatButton from "../components/UI/FlatButton";
-import axios from "axios";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
@@ -31,6 +30,7 @@ import { Image } from "react-native";
 import InfoButton from "../components/UI/InfoButton";
 import GradientButton from "../components/UI/GradientButton";
 import BlurPremium from "../components/Premium/BlurPremium";
+import { moderateScale, verticalScale } from "../util/scalingUtil";
 
 const GPTDealScreen = ({ route, navigation }) => {
   const { price, currency, country, product } = route.params;
@@ -108,7 +108,7 @@ const GPTDealScreen = ({ route, navigation }) => {
         <View style={[styles.image, GlobalStyles.shadowGlowPrimary]}>
           <Image
             source={require("../assets/chatgpt-logo.jpeg")}
-            style={{ width: 40, height: 40 }}
+            style={{ width: moderateScale(40), height: moderateScale(40) }}
           />
         </View>
         <View style={{ flexDirection: "row" }}>
@@ -173,12 +173,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   image: {
-    width: 60,
-    height: 60,
+    width: moderateScale(60),
+    height: moderateScale(60),
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 4,
-    paddingTop: 8,
+    marginBottom: moderateScale(4),
+    paddingTop: moderateScale(8),
   },
   headerContainer: {
     flex: 1,
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   },
   answerContainer: {
     flex: 4,
-    margin: 20,
+    margin: moderateScale(20),
     // padding: 20,
     backgroundColor: "#fff",
     alignItems: "center",
@@ -197,15 +197,15 @@ const styles = StyleSheet.create({
     borderColor: GlobalStyles.colors.primaryGrayed,
   },
   loadingContainer: {
-    margin: 20,
+    margin: moderateScale(20),
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     alignItems: "center",
     justifyContent: "center",
   },
   titleText: {
-    marginTop: 4,
-    fontSize: 24,
+    marginTop: moderateScale(4),
+    fontSize: moderateScale(24),
     fontWeight: "bold",
     color: GlobalStyles.colors.textColor,
   },
@@ -214,11 +214,11 @@ const styles = StyleSheet.create({
     marginHorizontal: "2%",
   },
   answerText: {
-    padding: 20,
-    fontSize: 16,
+    padding: moderateScale(20),
+    fontSize: moderateScale(16),
     fontWeight: "300",
     fontStyle: "italic",
-    marginHorizontal: 20,
+    marginHorizontal: moderateScale(20),
     color: GlobalStyles.colors.textColor,
   },
   buttonContainer: {

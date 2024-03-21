@@ -291,14 +291,16 @@ function ExpenseItem(props): JSX.Element {
             </Text>
           </View>
           {toggle1 && (
-            <ExpenseCountryFlag
-              countryName={country}
-              style={[GlobalStyles.countryFlagStyle, styles.countryFlag]}
-              containerStyle={[
-                styles.countryFlagContainer,
-                GlobalStyles.shadow,
-              ]}
-            />
+            <View style={styles.countryFlag}>
+              <ExpenseCountryFlag
+                countryName={country}
+                style={GlobalStyles.countryFlagStyle}
+                containerStyle={[
+                  styles.countryFlagContainer,
+                  GlobalStyles.shadow,
+                ]}
+              />
+            </View>
           )}
           {toggle2 && <View>{sharedList()}</View>}
           <View style={styles.amountContainer}>

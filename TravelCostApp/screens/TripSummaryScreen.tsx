@@ -33,7 +33,7 @@ import {
 } from "../util/expense";
 import { formatExpenseWithCurrency } from "../util/string";
 import PropTypes from "prop-types";
-import { TripContext } from "../store/trip-context";
+import { TripContext, TripData } from "../store/trip-context";
 import { ExpensesContext } from "../store/expenses-context";
 import safeLogError from "../util/error";
 import {
@@ -67,6 +67,12 @@ export type TripsSummary = {
   countries: string[];
   numberOfDays: number;
   totalBudget: number;
+  averageCostPerDay?: number;
+  averageCostPerMonth?: number;
+  averageCostPerYear?: number;
+  averageCostPerCountry?: number;
+  averageCostPerTrip?: number;
+  averageCostPerTraveller: number;
 };
 
 const TripSummaryScreen = ({ navigation }) => {
@@ -106,6 +112,7 @@ const TripSummaryScreen = ({ navigation }) => {
       if (lastUpdateWasToday) {
         const allTrips = getMMKVObject("allTripsAsObject");
         setAllTrips(allTrips);
+        setIsFetching(false);
         return;
       }
 
@@ -130,7 +137,6 @@ const TripSummaryScreen = ({ navigation }) => {
 
   const summarizeHandler = async () => {
     setIsFetching(true);
-
     // get a summary of all selected trips
     const selectedTrips = allTrips.filter((trip) => trip.selected);
     // gather all the data for tripssummary
@@ -143,17 +149,18 @@ const TripSummaryScreen = ({ navigation }) => {
     const countries: string[] = [];
     let travelDays = 0;
     const allExpenses: ExpenseData[] = [];
+
     for (let i = 0; i < selectedTrips?.length; i++) {
       const trip = selectedTrips[i];
       const isContextTrip = trip.tripid === tripCtx.tripid;
 
-      const tripData = isContextTrip
+      const tripData: TripData = isContextTrip
         ? tripCtx.getcurrentTrip()
         : await getTripData(trip.tripid);
       if (!tripData) continue;
       if (currency !== "" && currency !== tripData.tripCurrency) {
         // TODO: allow different currencies by calculating for the home currency from tripCtx
-        Alert.alert("Please select trips with the same currency");
+        Alert.alert("Please select trips with the same home currency");
         setAllTrips((prevState) => {
           const updatedTrips = prevState.map((trip) => {
             if (trip.tripid === tripData.tripid) {
@@ -249,6 +256,14 @@ const TripSummaryScreen = ({ navigation }) => {
       travelDays += countDays;
     }
 
+    const avgCostPerDay = totalCost / travelDays;
+    const avgCostPerMonth = avgCostPerDay * 30;
+    const avgCostPerYear = avgCostPerDay * 365;
+
+    const avgCostPerCountry = totalCost / countries.length;
+    const avgCostPerTrip = totalCost / numberOfTrips;
+    const avgCostPerTraveller = totalCost / travellers.length;
+
     setTripSummary({
       numberOfTrips: numberOfTrips,
       totalCost: +totalCost.toFixed(2),
@@ -258,6 +273,12 @@ const TripSummaryScreen = ({ navigation }) => {
       numberOfDays: travelDays,
       totalBudget: +totalBudget.toFixed(2),
       countries: countries,
+      averageCostPerDay: +avgCostPerDay.toFixed(2),
+      averageCostPerMonth: +avgCostPerMonth.toFixed(2),
+      averageCostPerYear: +avgCostPerYear.toFixed(2),
+      averageCostPerCountry: +avgCostPerCountry.toFixed(),
+      averageCostPerTrip: +avgCostPerTrip.toFixed(2),
+      averageCostPerTraveller: +avgCostPerTraveller.toFixed(2),
     });
     setAllExpensesList(allExpenses);
     setIsFetching(false);
@@ -287,34 +308,11 @@ const TripSummaryScreen = ({ navigation }) => {
   }
   if (isFetching) return <LoadingBarOverlay></LoadingBarOverlay>;
   return (
-    <Animated.View
+    <Animated.ScrollView
       entering={FadeIn}
       exiting={FadeOut}
-      style={{ marginTop: 12 }}
+      style={{ marginTop: moderateScale(12) }}
     >
-      <FlatList
-        data={allTrips}
-        renderItem={(item) => {
-          return (
-            <TouchableOpacity
-              onPress={itemCheckBoxHandler.bind(this, item)}
-              style={[
-                styles.tripItemContainer,
-                item.item.selected
-                  ? GlobalStyles.shadowPrimary
-                  : GlobalStyles.shadow,
-              ]}
-            >
-              <Checkbox
-                color={GlobalStyles.colors.primary700}
-                status={item.item.selected ? "checked" : "unchecked"}
-                // onPress={itemCheckBoxHandler.bind(this, item)}
-              ></Checkbox>
-              <Text>{item.item.tripname}</Text>
-            </TouchableOpacity>
-          );
-        }}
-      ></FlatList>
       {tripSummary && (
         <View style={[styles.summaryContainer, GlobalStyles.shadow]}>
           <Text style={styles.titleText}>{titleText}</Text>
@@ -346,19 +344,23 @@ const TripSummaryScreen = ({ navigation }) => {
               // center content
               justifyContent: "center",
               alignItems: "center",
-              maxHeight: 60,
+              // maxHeight: 60,
             }}
           >
             {tripSummary.countries && tripSummary.countries.length > 0 && (
               <FlatList
-                horizontal={true}
+                numColumns={Math.min(tripSummary.countries.length, 7)}
+                scrollEnabled={false}
                 data={tripSummary.countries}
                 renderItem={(item) => {
                   const countryFlag = (
                     <ExpenseCountryFlag
                       countryName={item.item}
                       style={GlobalStyles.countryFlagStyle}
-                      containerStyle={[{ padding: 4 }, GlobalStyles.shadow]}
+                      containerStyle={[
+                        { padding: moderateScale(4) },
+                        GlobalStyles.shadow,
+                      ]}
                     ></ExpenseCountryFlag>
                   );
                   return (
@@ -382,6 +384,61 @@ const TripSummaryScreen = ({ navigation }) => {
               Expenses: {allExpensesList.length}
             </Text>
           )}
+          {!!tripSummary.averageCostPerDay && (
+            <Text style={styles.summaryText}>
+              Average Cost Per Day:{" "}
+              {formatExpenseWithCurrency(
+                tripSummary.averageCostPerDay,
+                tripSummary.currency
+              )}
+            </Text>
+          )}
+          {!!tripSummary.averageCostPerMonth && (
+            <Text style={styles.summaryText}>
+              Average Cost Per Month:{" "}
+              {formatExpenseWithCurrency(
+                tripSummary.averageCostPerMonth,
+                tripSummary.currency
+              )}
+            </Text>
+          )}
+          {!!tripSummary.averageCostPerYear && (
+            <Text style={styles.summaryText}>
+              Average Cost Per Year:{" "}
+              {formatExpenseWithCurrency(
+                tripSummary.averageCostPerYear,
+                tripSummary.currency
+              )}
+            </Text>
+          )}
+          {!!tripSummary.averageCostPerCountry && (
+            <Text style={styles.summaryText}>
+              Average Cost Per Country:{" "}
+              {formatExpenseWithCurrency(
+                tripSummary.averageCostPerCountry,
+                tripSummary.currency
+              )}
+            </Text>
+          )}
+          {!!tripSummary.averageCostPerTrip && (
+            <Text style={styles.summaryText}>
+              Average Cost Per Trip:{" "}
+              {formatExpenseWithCurrency(
+                tripSummary.averageCostPerTrip,
+                tripSummary.currency
+              )}
+            </Text>
+          )}
+          {!!tripSummary.averageCostPerTraveller && (
+            <Text style={styles.summaryText}>
+              Average Cost Per Traveller:{" "}
+              {formatExpenseWithCurrency(
+                tripSummary.averageCostPerTraveller,
+                tripSummary.currency
+              )}
+            </Text>
+          )}
+
           {/* travellers and their costs */}
           {/* <Text style={styles.summaryText}>Travellers And Their Costs</Text> */}
           <FlatList
@@ -389,7 +446,7 @@ const TripSummaryScreen = ({ navigation }) => {
             renderItem={(item) => (
               <View style={styles.travellerCostItem}>
                 <Text style={styles.summaryText}>{item.item.traveller}</Text>
-                <Text>
+                <Text style={styles.summaryText}>
                   {formatExpenseWithCurrency(
                     item.item.cost.toFixed(2),
                     tripSummary.currency
@@ -423,7 +480,34 @@ const TripSummaryScreen = ({ navigation }) => {
           </GradientButton>
         )} */}
       </View>
-    </Animated.View>
+      <FlatList
+        data={allTrips}
+        scrollEnabled={false}
+        ListHeaderComponent={() => (
+          <Text style={styles.titleText}>{i18n.t("myTrips")}</Text>
+        )}
+        renderItem={(item) => {
+          return (
+            <TouchableOpacity
+              onPress={itemCheckBoxHandler.bind(this, item)}
+              style={[
+                styles.tripItemContainer,
+                item.item.selected
+                  ? GlobalStyles.shadowPrimary
+                  : GlobalStyles.shadow,
+              ]}
+            >
+              <Checkbox
+                color={GlobalStyles.colors.primary700}
+                status={item.item.selected ? "checked" : "unchecked"}
+                // onPress={itemCheckBoxHandler.bind(this, item)}
+              ></Checkbox>
+              <Text style={styles.summaryText}>{item.item.tripname}</Text>
+            </TouchableOpacity>
+          );
+        }}
+      ></FlatList>
+    </Animated.ScrollView>
   );
 };
 
@@ -435,57 +519,64 @@ TripSummaryScreen.propTypes = {
 
 const styles = StyleSheet.create({
   titleText: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: "bold",
     textAlign: "center",
-    margin: 16,
+    margin: moderateScale(16),
   },
   tripItemContainer: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 10,
-    margin: 12,
-    marginHorizontal: 16,
+    padding: moderateScale(10),
+    margin: moderateScale(12),
+    marginHorizontal: moderateScale(16),
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 10,
+    borderRadius: moderateScale(10),
     borderWidth: 1,
     borderColor: GlobalStyles.colors.gray600,
   },
   summaryContainer: {
-    padding: 10,
-    margin: 16,
+    padding: moderateScale(10),
+    margin: moderateScale(16),
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 10,
+    borderRadius: moderateScale(10),
     borderWidth: 1,
     borderColor: GlobalStyles.colors.gray600,
   },
   progressBarContainer: {
-    paddingHorizontal: 12,
+    paddingHorizontal: moderateScale(12),
     paddingVertical: 4,
     marginBottom: 4,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,
-    minWidth: 80,
+    minWidth: moderateScale(80),
   },
   gradientButtonStyle: {
-    margin: 16,
+    margin: moderateScale(16),
   },
   buttonContainer: {
     alignItems: "center",
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-evenly",
+    margin: moderateScale(16),
   },
-  summaryText: {
-    fontSize: 16,
+  summaryTextBig: {
+    fontSize: moderateScale(16),
     fontWeight: "bold",
     textAlign: "center",
-    margin: 4,
+    margin: moderateScale(4),
+  },
+  summaryText: {
+    fontSize: moderateScale(14),
+    fontWeight: "300",
+    textAlign: "center",
+    margin: moderateScale(4),
   },
   travellerCostItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    margin: 4,
+    margin: moderateScale(4),
   },
 });

@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View, ScrollView } from "react-native";
 import DatePickerContainer from "../components/UI/DatePickerContainer";
 import DatePickerModal from "../components/UI/DatePickerModal";
 import { getFormattedDate } from "../util/date";
@@ -287,9 +287,9 @@ const FinderScreen = () => {
       >
         <View style={[styles.cardContainer, GlobalStyles.wideStrongShadow]}>
           <Text style={styles.titleText}>{i18n.t("finderTitle")}</Text>
-          <Animated.ScrollView
-            layout={ListLayoutAnimation}
-            style={{ flex: 1, minHeight: "50% " }}
+          <ScrollView
+            scrollEnabled={false}
+            style={{ flex: 1, minHeight: "50%" }}
           >
             <View style={styles.rowContainer}>
               <View style={styles.checkBoxContainer}>
@@ -372,25 +372,27 @@ const FinderScreen = () => {
               {(queryString || dateString) && i18n.t("finding")} :{queryString}{" "}
               {dateString}
             </Text>
-          </Animated.ScrollView>
-          <Text style={styles.queryText}>
-            {foundResults && "Sum of the Results: "}
-            {foundResults &&
-              formatExpenseWithCurrency(
-                sumOfResults,
-                tripCtx.tripCurrency
-              )}{" "}
-          </Text>
-          <GradientButton
-            onPress={() => findPressedHandler()}
-            style={styles.findButton}
-          >
-            {foundResults
-              ? `${i18n.t("showXResults1")} ${numberOfResults} ${i18n.t(
-                  "showXResults2"
-                )}`
-              : i18n.t("noResults")}
-          </GradientButton>
+          </ScrollView>
+          <View style={styles.buttonContainer}>
+            <Text style={styles.queryText}>
+              {foundResults && "Sum of the Results: "}
+              {foundResults &&
+                formatExpenseWithCurrency(
+                  sumOfResults,
+                  tripCtx.tripCurrency
+                )}{" "}
+            </Text>
+            <GradientButton
+              onPress={() => findPressedHandler()}
+              style={styles.findButton}
+            >
+              {foundResults
+                ? `${i18n.t("showXResults1")} ${numberOfResults} ${i18n.t(
+                    "showXResults2"
+                  )}`
+                : i18n.t("noResults")}
+            </GradientButton>
+          </View>
         </View>
       </Animated.ScrollView>
       {/* <BlurPremium /> */}
@@ -475,6 +477,10 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: moderateScale(5),
     // marginLeft: -8,
+  },
+  buttonContainer: {
+    marginTop: verticalScale(20),
+    marginBottom: verticalScale(20),
   },
   autoCompleteMenuStyle: {
     zIndex: 0,

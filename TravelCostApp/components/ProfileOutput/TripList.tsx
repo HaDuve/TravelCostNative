@@ -25,6 +25,7 @@ function TripList({ trips }) {
     >
       <FlatList
         data={uniqTrips}
+        scrollEnabled={false}
         ListFooterComponent={<View style={{ height: 300 }}></View>}
         renderItem={renderTripItem}
         keyExtractor={(item: TripData) => {

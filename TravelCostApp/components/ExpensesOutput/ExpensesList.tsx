@@ -858,7 +858,7 @@ function ExpensesList({
           expenses?.length
         )}
         ListFooterComponent={
-          <View style={{ height: verticalScale(200) }}></View>
+          <View style={{ height: verticalScale(300) }}></View>
         }
         ListHeaderComponent={listHeaderJSX}
         keyExtractor={(item: Expense) => item.id}

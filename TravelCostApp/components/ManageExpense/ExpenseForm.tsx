@@ -869,7 +869,7 @@ const ExpenseForm = ({
             marginBottom: verticalScale(8),
             marginLeft: scale(4),
             borderRadius: moderateScale(20),
-            minHeight: verticalScale(50),
+            minHeight: moderateScale(50),
             minWidth: scale(90),
             marginRight: scale(8),
             backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -1021,6 +1021,7 @@ const ExpenseForm = ({
             : i18n.t("specString4")
         }
         state={isSpecialExpense}
+        labelStyle={styles.isSpecialLabel}
       ></SettingsSwitch>
     </View>
   );
@@ -1164,7 +1165,7 @@ const ExpenseForm = ({
                 buttonStyle={[styles.iconButton, GlobalStyles.strongShadow]}
                 icon={icon}
                 color={GlobalStyles.colors.primary500}
-                size={moderateScale(48)}
+                size={moderateScale(48, 0.4)}
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   navigation.navigate("CategoryPick", {
@@ -1479,7 +1480,7 @@ const ExpenseForm = ({
                       <Text
                         style={{
                           color: GlobalStyles.colors.textColor,
-                          fontSize: moderateScale(24),
+                          fontSize: moderateScale(24, 0.3),
                           fontWeight: "bold",
                           padding: scale(4),
                         }}
@@ -1514,7 +1515,10 @@ const ExpenseForm = ({
                 <View
                   style={[
                     styles.advancedRowSplit,
-                    { marginTop: scale(12), marginLeft: scale(12) },
+                    {
+                      marginTop: moderateScale(12),
+                      marginLeft: moderateScale(12),
+                    },
                   ]}
                 >
                   {!splitTypeSelf &&
@@ -1552,16 +1556,17 @@ const ExpenseForm = ({
                       contentContainerStyle={{
                         flex: 1,
                         minWidth: splitList?.length
-                          ? splitList?.length * scale(100) + scale(200)
+                          ? splitList?.length * moderateScale(100) +
+                            moderateScale(200)
                           : 0,
-                        marginLeft: scale(8),
-                        marginRight: scale(8),
+                        marginLeft: moderateScale(8),
+                        marginRight: moderateScale(8),
                         justifyContent: "flex-start",
                         alignItems: "flex-start",
                       }}
                       ListHeaderComponent={recalcJSX}
                       ListFooterComponent={
-                        <View style={{ width: scale(300) }}></View>
+                        <View style={{ width: moderateScale(300) }}></View>
                       }
                       renderItem={(itemData) => {
                         const splitValue = itemData.item.amount.toString();
@@ -1570,13 +1575,13 @@ const ExpenseForm = ({
                             style={[
                               GlobalStyles.strongShadow,
                               {
-                                minWidth: scale(100),
-                                marginTop: verticalScale(14),
-                                marginBottom: verticalScale(8),
+                                minWidth: moderateScale(100),
+                                marginTop: moderateScale(14),
+                                marginBottom: moderateScale(8),
                                 borderWidth: 1,
                                 borderRadius: 8,
-                                padding: scale(8),
-                                margin: scale(8),
+                                padding: moderateScale(8),
+                                margin: moderateScale(8),
                                 backgroundColor:
                                   GlobalStyles.colors.backgroundColor,
                                 borderColor: GlobalStyles.colors.gray700,
@@ -1590,7 +1595,7 @@ const ExpenseForm = ({
                             <View
                               style={{
                                 flexDirection: "row",
-                                paddingHorizontal: scale(4),
+                                paddingHorizontal: moderateScale(4),
                                 // space out
                                 justifyContent: "space-between",
                                 flex: 1,
@@ -1604,6 +1609,7 @@ const ExpenseForm = ({
                                   textAlign: "left",
                                   marginLeft: scale(4),
                                   paddingTop: verticalScale(2),
+                                  fontSize: moderateScale(14, 0.3),
                                 }}
                               >
                                 {truncateString(itemData.item.userName, 10)}
@@ -1621,7 +1627,7 @@ const ExpenseForm = ({
                               >
                                 <Text
                                   style={{
-                                    fontSize: moderateScale(14),
+                                    fontSize: moderateScale(14, 0.3),
                                     color: GlobalStyles.colors.accent500,
                                     textAlign: "left",
                                     fontWeight: "600",
@@ -1905,24 +1911,21 @@ const styles = StyleSheet.create({
   },
   descriptionContainer: {
     flex: 1,
-    marginTop: "5%",
-
-    marginHorizontal: "3.5%",
-    marginLeft: "5%",
+    marginTop: verticalScale(12),
+    marginHorizontal: moderateScale(8),
+    marginLeft: moderateScale(12),
   },
   autoCompleteStyle: {
     flex: 1,
     backgroundColor: GlobalStyles.colors.gray500,
     borderRadius: 5,
-    fontSize: moderateScale(14),
-    padding: moderateScale(2, 4),
+    fontSize: moderateScale(14, 0.3),
   },
   autoCompleteMenuStyle: {
     marginLeft: scale(8),
     marginBottom: verticalScale(-1),
     borderBottomWidth: 1,
     borderBottomColor: GlobalStyles.colors.primaryGrayed,
-    fontSize: moderateScale(14),
   },
   countryFlagContainer: {
     marginRight: "5%",
@@ -1939,10 +1942,10 @@ const styles = StyleSheet.create({
     marginLeft: scale(-120),
   },
   topCurrencyText: {
-    fontSize: moderateScale(12),
+    fontSize: moderateScale(12, 0.3),
   },
   title: {
-    fontSize: moderateScale(24),
+    fontSize: moderateScale(24, 0.3),
     fontWeight: "bold",
     color: GlobalStyles.colors.backgroundColor,
     marginTop: verticalScale(5),
@@ -1977,7 +1980,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     marginLeft: "30%",
     marginTop: "1.5%",
-    fontSize: moderateScale(12),
+    fontSize: moderateScale(12, 0.3),
     fontWeight: "300",
     color: GlobalStyles.colors.textColor,
   },
@@ -1997,19 +2000,19 @@ const styles = StyleSheet.create({
     marginLeft: "1%",
   },
   currencyLabel: {
-    fontSize: moderateScale(12),
+    fontSize: moderateScale(12, 0.3),
     color: GlobalStyles.colors.textColor,
     marginTop: verticalScale(12),
-    marginLeft: scale(14),
-    marginBottom: verticalScale(-8),
+    marginLeft: moderateScale(14, 0.3),
+    marginBottom: moderateScale(-8, 0.3),
   },
   whoPaidLabel: {
-    fontSize: moderateScale(12),
+    fontSize: moderateScale(12, 0.3),
     color: GlobalStyles.colors.textColor,
     marginBottom: verticalScale(4),
   },
   whoSharedLabel: {
-    fontSize: moderateScale(12),
+    fontSize: moderateScale(12, 0.3),
     color: GlobalStyles.colors.textColor,
     marginTop: verticalScale(8),
     marginBottom: 0,
@@ -2017,7 +2020,7 @@ const styles = StyleSheet.create({
   },
   whoPaidContainer: {
     marginTop: verticalScale(20),
-    marginHorizontal: scale(16),
+    marginHorizontal: moderateScale(16, 0.3),
   },
   button: {
     minWidth: moderateScale(200),
@@ -2027,9 +2030,15 @@ const styles = StyleSheet.create({
   advancedText: {
     marginTop: verticalScale(9),
     marginLeft: scale(12),
-    fontSize: moderateScale(12),
+    fontSize: moderateScale(12, 0.3),
     fontStyle: "italic",
     fontWeight: "300",
+  },
+  isSpecialLabel: {
+    fontSize: moderateScale(12, 0.3),
+    fontWeight: "400",
+    color: GlobalStyles.colors.textColor,
+    marginLeft: scale(-8),
   },
   dateLabel: {
     marginTop: "4%",
@@ -2039,12 +2048,12 @@ const styles = StyleSheet.create({
     // justifyContent: "space-between",
   },
   dateLabelText: {
-    fontSize: moderateScale(12),
+    fontSize: moderateScale(12, 0.3),
     fontWeight: "400",
     color: GlobalStyles.colors.textColor,
   },
   dateLabelDuplSplitText: {
-    fontSize: moderateScale(12),
+    fontSize: moderateScale(12, 0.3),
     fontWeight: "300",
     fontStyle: "italic",
     marginLeft: "2%",
@@ -2078,12 +2087,12 @@ const styles = StyleSheet.create({
     borderBottomColor: GlobalStyles.colors.gray700,
   },
   dropdownTextStyle: {
-    fontSize: moderateScale(18),
+    fontSize: moderateScale(18, 0.3),
     color: GlobalStyles.colors.textColor,
     padding: scale(4),
   },
   dropdownListItemLabelStyle: {
-    fontSize: moderateScale(18),
+    fontSize: moderateScale(18, 0.3),
     color: GlobalStyles.colors.textColor,
     padding: scale(4),
   },

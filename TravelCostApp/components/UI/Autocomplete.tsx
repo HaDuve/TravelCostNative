@@ -46,6 +46,7 @@ const Autocomplete = ({
   return (
     <View style={containerStyle}>
       <TextInput
+        selectTextOnFocus
         onFocus={() => {
           if (value?.length === 0) {
             setMenuVisible(true);
@@ -88,31 +89,41 @@ const Autocomplete = ({
       {menuVisible && filteredData && filteredData.length > 0 && (
         <Animated.View
           entering={FadeIn.duration(500)}
+          style={{ maxWidth: "100%" }}
           // exiting={FadeOutUp}
-          style={{
-            flex: 1,
-            zIndex: 0,
-            backgroundColor: GlobalStyles.colors.backgroundColor,
-            borderWidth: 2,
-            flexDirection: "column",
-            borderColor: GlobalStyles.colors.primaryGrayed,
-          }}
         >
           {
             // only show the newest 3 items
-            filteredData.slice(0, 3).map((autotext, i) => (
-              <Menu.Item
-                key={i}
-                style={[{ width: "100%" }, menuStyle]}
-                //   icon={icon}
-                onPress={() => {
-                  origOnChange(autotext);
-                  setValue(autotext);
-                  setMenuVisible(false);
-                }}
-                title={autotext}
-              />
-            ))
+            filteredData.slice(0, 3).map((autotext, i) => {
+              return (
+                <Menu.Item
+                  key={i}
+                  style={[
+                    {
+                      backgroundColor: GlobalStyles.colors.backgroundColor,
+                      borderWidth: 1,
+                      borderColor: GlobalStyles.colors.primaryGrayed,
+                      maxWidth: "100%",
+                    },
+                  ]}
+                  //   icon={icon}
+                  onPress={() => {
+                    origOnChange(autotext);
+                    setValue(autotext);
+                    setMenuVisible(false);
+                  }}
+                  titleStyle={{
+                    flex: 1,
+                    fontSize: moderateScale(12, 0.3),
+                    paddingTop: moderateScale(4),
+                    paddingBottom: moderateScale(24, 0.25),
+                    // maxWidth: "100%",
+                    width: "100%",
+                  }}
+                  title={autotext}
+                />
+              );
+            })
           }
         </Animated.View>
       )}

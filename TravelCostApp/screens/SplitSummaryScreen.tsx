@@ -45,7 +45,7 @@ import Animated from "react-native-reanimated";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
-import { Pressable } from "react-native";
+import { Pressable, ScrollView } from "react-native";
 import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
 
 const SplitSummaryScreen = ({ navigation }) => {
@@ -298,7 +298,7 @@ const SplitSummaryScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={[styles.container]}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Animated.View
         // entering={FadeIn}
         // exiting={FadeOut}
@@ -383,7 +383,7 @@ const SplitSummaryScreen = ({ navigation }) => {
           renderItem={renderSplitItem}
         />
       </Animated.View>
-    </View>
+    </ScrollView>
   );
 };
 

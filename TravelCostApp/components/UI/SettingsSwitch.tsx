@@ -4,16 +4,19 @@ import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
 import { moderateScale, verticalScale } from "../../util/scalingUtil";
 
-const SettingsSwitch = ({ style, toggleState, state, label }) => {
+const SettingsSwitch = ({ style, toggleState, state, label, labelStyle }) => {
   return (
     <Pressable onPress={() => toggleState()} style={[styles.container, style]}>
       <View style={{ flex: 1 }}>
         <Text
-          style={{
-            fontSize: moderateScale(14),
-            color: "#626262",
-            fontWeight: "300",
-          }}
+          style={[
+            {
+              fontSize: moderateScale(14),
+              color: "#626262",
+              fontWeight: "300",
+            },
+            labelStyle,
+          ]}
         >
           {label}
         </Text>
@@ -43,6 +46,7 @@ SettingsSwitch.propTypes = {
   toggleState: PropTypes.func.isRequired,
   state: PropTypes.bool.isRequired,
   label: PropTypes.string.isRequired,
+  labelStyle: PropTypes.object,
 };
 
 const styles = StyleSheet.create({

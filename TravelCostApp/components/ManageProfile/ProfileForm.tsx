@@ -198,6 +198,7 @@ const styles = StyleSheet.create({
   form: {
     flex: 1,
     marginTop: verticalScale(8),
+    maxHeight: verticalScale(30),
   },
   nameRow: {
     flexDirection: "row",
@@ -288,10 +289,12 @@ const styles = StyleSheet.create({
   },
   navButtonContainer: {
     flex: 1,
+    minHeight: verticalScale(150),
     justifyContent: "flex-end",
     alignContent: "flex-end",
     padding: verticalScale(4),
-    marginBottom: verticalScale(8),
+    marginVertical: verticalScale(8),
+    marginTop: verticalScale(36),
   },
   navButton: {
     minWidth: scale(120),

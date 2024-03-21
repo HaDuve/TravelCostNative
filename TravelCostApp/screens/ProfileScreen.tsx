@@ -1,6 +1,13 @@
 /* eslint-disable react/prop-types */
 import { useContext, useEffect, useRef, useState } from "react";
-import { Alert, Platform, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+} from "react-native";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
 import IconButton from "../components/UI/IconButton";
@@ -335,7 +342,7 @@ const ProfileScreen = ({ navigation }) => {
     <></>
   ) : (
     <>
-      <View style={styles.tripContainer}>
+      <ScrollView style={styles.tripContainer}>
         <View style={styles.horizontalContainer}>
           <Text style={styles.tripListTitle}>{i18n.t("myTrips")}</Text>
           {/* <Pressable onPress={navigation.navigate.bind(this, "ManageTrip")}> */}
@@ -364,7 +371,7 @@ const ProfileScreen = ({ navigation }) => {
         >
           <TripList trips={tripHistory}></TripList>
         </TourGuideZone>
-      </View>
+      </ScrollView>
       <View style={styles.horizontalButtonContainer}>
         <TourGuideZone
           text={i18n.t("walk7")}
@@ -418,19 +425,20 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   innerContainer: {
-    flex: 2,
+    flex: 0,
+    minHeight: verticalScale(100),
     padding: scale(4),
   },
 
   tripContainer: {
     flex: 1,
-    minHeight: "68%",
+    // minHeight: "68%",
     margin: scale(16),
     marginBottom: verticalScale(-30),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   horizontalContainer: {
-    marginTop: verticalScale(15),
+    marginTop: moderateScale(15, 0.3),
     marginRight: scale(15),
     flexDirection: "row",
     justifyContent: "space-between",

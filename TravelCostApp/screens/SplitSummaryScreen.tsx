@@ -302,7 +302,7 @@ const SplitSummaryScreen = ({ navigation }) => {
       <Animated.View
         // entering={FadeIn}
         // exiting={FadeOut}
-        style={[styles.cardContainer, GlobalStyles.wideStrongShadow]}
+        style={[GlobalStyles.wideStrongShadow, styles.cardContainer]}
       >
         <View style={styles.titleContainer}>
           {/* <BackButton></BackButton> */}
@@ -413,11 +413,18 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
     borderColor: GlobalStyles.colors.gray500,
     minWidth: scale(300),
+    // android styles
+    ...Platform.select({
+      android: {
+        margin: scale(8),
+        marginTop: verticalScale(2),
+      },
+    }),
   },
   button: {
-    marginLeft: scale(24),
     ...Platform.select({
       ios: {
+        marginLeft: scale(24),
         marginTop: verticalScale(50),
         borderRadius: 12,
         minHeight: 55,
@@ -439,6 +446,13 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(44),
     alignItems: "center",
     justifyContent: "center",
+    // android styles
+    ...Platform.select({
+      android: {
+        margin: scale(8),
+        minHeight: verticalScale(55),
+      },
+    }),
   },
   buttonContainer: {
     // marginVertical: "10%",
@@ -454,14 +468,12 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: { marginTop: "-0%" },
       android: {
-        height: verticalScale(55),
-        justifyContent: "space-between",
-        alignItems: "center",
+        // height: verticalScale(55),
+        marginVertical: scale(18),
+        // flexDirection: "column",
+        minHeight: verticalScale(100),
       },
     }),
-    // position: "absolute",
-    // render on the bottom of the screen
-    // top: Dimensions.get("window").height - 235,
   },
   splitText: {
     maxWidth: "100%",

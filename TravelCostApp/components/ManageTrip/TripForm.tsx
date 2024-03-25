@@ -58,14 +58,13 @@ import { NetworkContext } from "../../store/network-context";
 import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
 import { useTourGuideController } from "rn-tourguide";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
-import { useWindowDimensions } from "react-native";
 import { Switch } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import Toast from "react-native-toast-message";
 import { sleep } from "../../util/appState";
 import safeLogError from "../../util/error";
-import { moderateScale } from "../../util/scalingUtil";
+import { moderateScale, scale } from "../../util/scalingUtil";
 
 const TripForm = ({ navigation, route }) => {
   const tripCtx = useContext(TripContext);
@@ -86,7 +85,7 @@ const TripForm = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [infoIsVisible, setInfoIsVisible] = useState(false);
-  const windowWidth = useWindowDimensions().width;
+  const windowWidth = scale(350);
   const {
     canStart, // a boolean indicate if you can start tour guide
     start, // a function to start the tourguide

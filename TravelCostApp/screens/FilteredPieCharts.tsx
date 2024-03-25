@@ -1,5 +1,5 @@
 import { Platform, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import { useState } from "react";
 import PropTypes from "prop-types";
 import Animated, {
@@ -33,10 +33,15 @@ import BackButton from "../components/UI/BackButton";
 import AddExpenseHereButton from "../components/UI/AddExpensesHereButton";
 import { ExpenseData } from "../util/expense";
 import { getEarliestDate } from "../util/date";
+import { moderateScale, verticalScale } from "../util/scalingUtil";
+import { useOrientation } from "../components/Hooks/useOrientation";
+import { OrientationContext } from "../store/orientation-context";
 
 const FilteredPieCharts = ({ navigation, route }) => {
   const { expenses, dayString, noList = false } = route.params;
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
+
+  const { isPortrait } = useContext(OrientationContext);
   // contents and titleStrings have to match in legth and correspond!
   const titleStrings = [
     i18n.t("categories"),
@@ -104,43 +109,50 @@ const FilteredPieCharts = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.firstTitleContainer}>
-        <BackButton style={{ marginTop: -16 }}></BackButton>
-        <Text style={styles.firstTitleText}>{dayString}</Text>
-      </View>
+      <View style={[!isPortrait && styles.landscapeTitleContainer]}>
+        <View style={styles.firstTitleContainer}>
+          <BackButton style={{ marginTop: moderateScale(-16) }}></BackButton>
+          <Text style={styles.firstTitleText}>{dayString}</Text>
+        </View>
 
-      <View style={styles.titleContainer}>
-        <Animated.View
-          entering={FadeInLeft}
-          exiting={FadeOutLeft}
-          style={styles.chevronContainer}
-        >
-          {/* "remove-outline" */}
-          <IconButton
-            icon={"chevron-back-outline"}
-            size={24}
-            onPress={previousHandler}
-            color={GlobalStyles.colors.primaryGrayed}
-          ></IconButton>
-        </Animated.View>
-        <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-          <Text style={styles.titleText}>
-            {" "}
-            {titleStrings[toggleGraphEnum]}{" "}
-          </Text>
-        </Animated.View>
-        <Animated.View
-          entering={FadeInRight}
-          exiting={FadeOutRight}
-          style={styles.chevronContainer}
-        >
-          <IconButton
-            icon={"chevron-forward-outline"}
-            size={24}
-            onPress={nextHandler}
-            color={GlobalStyles.colors.primaryGrayed}
-          ></IconButton>
-        </Animated.View>
+        <View style={styles.titleContainer}>
+          <Animated.View
+            entering={FadeInLeft}
+            exiting={FadeOutLeft}
+            style={styles.chevronContainer}
+          >
+            {/* "remove-outline" */}
+            <IconButton
+              icon={"chevron-back-outline"}
+              size={24}
+              onPress={previousHandler}
+              color={GlobalStyles.colors.primaryGrayed}
+            ></IconButton>
+          </Animated.View>
+          <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
+            <Text
+              style={[
+                styles.titleText,
+                !isPortrait && styles.landScapetitleText,
+              ]}
+            >
+              {" "}
+              {titleStrings[toggleGraphEnum]}{" "}
+            </Text>
+          </Animated.View>
+          <Animated.View
+            entering={FadeInRight}
+            exiting={FadeOutRight}
+            style={styles.chevronContainer}
+          >
+            <IconButton
+              icon={"chevron-forward-outline"}
+              size={24}
+              onPress={nextHandler}
+              color={GlobalStyles.colors.primaryGrayed}
+            ></IconButton>
+          </Animated.View>
+        </View>
       </View>
       <View style={styles.shadow}></View>
       {contents[toggleGraphEnum]}
@@ -171,13 +183,19 @@ const styles = StyleSheet.create({
     // center text
     textAlign: "center",
   },
+  landscapeTitleContainer: {
+    flexDirection: "row-reverse",
+    justifyContent: "space-between",
+    paddingHorizontal: moderateScale(80),
+    marginTop: verticalScale(-24),
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
   firstTitleContainer: {
     marginVertical: "4%",
     flexDirection: "row",
     ...Platform.select({
       android: {
-        paddingLeft: "5%",
-        paddingTop: "5%",
+        justifyContent: "center",
       },
     }),
   },
@@ -208,6 +226,9 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
     marginLeft: "2%",
+  },
+  landScapetitleText: {
+    marginTop: verticalScale(30),
   },
   chevronContainer: {
     justifyContent: "center",

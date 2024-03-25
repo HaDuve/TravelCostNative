@@ -306,7 +306,7 @@ const ManageCategoryScreen = ({ navigation }) => {
     "ios-water-outline",
   ];
   // get dimensions
-  const bigDisplay = Dimensions.useWindowDimensions().height > 850;
+  const bigDisplay = verticalScale(680) > 850;
   const arrays = [];
   // 1-3 possible items per row
   const size = bigDisplay ? 3 : 2;

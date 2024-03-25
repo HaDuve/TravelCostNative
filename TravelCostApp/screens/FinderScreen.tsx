@@ -285,7 +285,7 @@ const FinderScreen = () => {
         layout={ListLayoutAnimation}
         style={styles.container}
       >
-        <View style={[styles.cardContainer, GlobalStyles.wideStrongShadow]}>
+        <View style={[GlobalStyles.wideStrongShadow, styles.cardContainer]}>
           <Text style={styles.titleText}>{i18n.t("finderTitle")}</Text>
           <ScrollView
             scrollEnabled={false}
@@ -415,6 +415,17 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(20),
     padding: scale(20),
     justifyContent: "space-around",
+    // android styles
+    ...Platform.select({
+      android: {
+        elevation: 10,
+        shadowColor: "rgba(0, 0, 0, 1)",
+        marginHorizontal: moderateScale(12),
+        marginBottom: moderateScale(20),
+        marginTop: moderateScale(8),
+        overflow: "visible",
+      },
+    }),
   },
   checkBoxContainer: {
     borderRadius: moderateScale(99),

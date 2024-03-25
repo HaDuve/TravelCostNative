@@ -48,6 +48,7 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import ExpenseCountryFlag from "../components/ExpensesOutput/ExpenseCountryFlag";
 import GradientButton from "../components/UI/GradientButton";
 import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
+import { Platform } from "react-native";
 
 export type TripAsObject = {
   tripid: string;
@@ -328,7 +329,7 @@ const TripSummaryScreen = ({ navigation }) => {
               tripSummary.currency
             )}
           </Text>
-          <View style={[styles.progressBarContainer, GlobalStyles.shadow]}>
+          <View style={[GlobalStyles.shadow, styles.progressBarContainer]}>
             <Progress.Bar
               color={progressBarColor}
               unfilledColor={GlobalStyles.colors.gray600}
@@ -551,6 +552,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 4,
     minWidth: moderateScale(80),
+    // android styles
+    ...Platform.select({
+      android: {
+        elevation: 0,
+      },
+    }),
   },
   gradientButtonStyle: {
     margin: moderateScale(16),

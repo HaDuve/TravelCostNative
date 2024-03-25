@@ -2074,7 +2074,7 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     marginTop: verticalScale(-12),
-    maxWidth: Dimensions.get("screen").width / 1.27,
+    maxWidth: "89%",
   },
   whoPaidDropdownContainer: {
     width: "75%",

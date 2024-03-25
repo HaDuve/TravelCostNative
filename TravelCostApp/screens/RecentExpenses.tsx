@@ -60,6 +60,7 @@ import { Platform } from "react-native";
 import { memo } from "react";
 import { getMMKVObject } from "../store/mmkv";
 import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
+import { OrientationContext } from "../store/orientation-context";
 
 function RecentExpenses({ navigation }) {
   const expensesCtx = useContext(ExpensesContext);
@@ -68,6 +69,7 @@ function RecentExpenses({ navigation }) {
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const tripid = tripCtx.tripid;
+  const { isPortrait } = useContext(OrientationContext);
   const netCtx = useContext(NetworkContext);
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
   const { settings } = useContext(SettingsContext);
@@ -374,7 +376,9 @@ function RecentExpenses({ navigation }) {
         tooltipBottomOffset={verticalScale(-200)}
         zone={3}
       ></TourGuideZone>
-      <View style={styles.dateHeader}>
+      <View
+        style={[styles.dateHeader, !isPortrait && styles.landscapeDateHeader]}
+      >
         <Text style={styles.dateString}>
           {truncateString(tripCtx.tripName, 23)} - {dateTimeString}
           {offlineString}
@@ -389,6 +393,7 @@ function RecentExpenses({ navigation }) {
             justifyContent: "center",
             alignItems: "center",
           },
+          !isPortrait && styles.landscapeHeader,
         ]}
       >
         <DropDownPicker
@@ -440,7 +445,9 @@ function RecentExpenses({ navigation }) {
           periodName={PeriodValue}
         />
       </View>
-      <View style={styles.tempGrayBar1}></View>
+      <View
+        style={[styles.tempGrayBar1, !isPortrait && styles.landscapeBar]}
+      ></View>
       {ExpensesOutputJSX}
 
       <AddExpenseButton navigation={navigation} />
@@ -474,6 +481,11 @@ const styles = StyleSheet.create({
     marginLeft: scale(12),
     marginBottom: verticalScale(-20),
   },
+  landscapeDateHeader: {
+    marginTop: verticalScale(4),
+    marginBottom: verticalScale(-24),
+    alignSelf: "center",
+  },
   dateString: {
     fontSize: moderateScale(12),
     fontStyle: "italic",
@@ -486,6 +498,14 @@ const styles = StyleSheet.create({
     marginHorizontal: scale(12),
     marginBottom: verticalScale(12),
     zIndex: 10,
+  },
+  landscapeHeader: {
+    marginTop: verticalScale(4),
+    // marginBottom: verticalScale(-12),
+    zIndex: 10,
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginHorizontal: scale(12),
   },
   dropdownContainer: {
     maxWidth: moderateScale(160),
@@ -534,5 +554,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.9,
     shadowRadius: 4,
     zIndex: 2,
+  },
+  landscapeBar: {
+    // marginTop: verticalScale(24),
+    // marginBottom: verticalScale(-8),
   },
 });

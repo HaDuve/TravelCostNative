@@ -43,6 +43,7 @@ import IconButton from "../UI/IconButton";
 import uniqBy from "lodash.uniqby";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import { OrientationContext } from "../../store/orientation-context";
 
 const PageLength = 20;
 
@@ -227,7 +228,8 @@ const AddExpenseButton = ({ navigation }) => {
     retryFunction();
   }, [authCtx, navigation, skipCatScreen, tripCtx.travellers, tripCtx.tripid]);
 
-  const END_POSITION = Dimensions.get("window").height * 0.2;
+  const { height } = useContext(OrientationContext);
+  const END_POSITION = height * 0.2;
   const position = useSharedValue(0);
 
   const panGesture = Gesture.Pan()

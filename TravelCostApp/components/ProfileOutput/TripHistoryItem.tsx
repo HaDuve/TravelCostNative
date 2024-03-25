@@ -46,6 +46,7 @@ import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
 import safeLogError from "../../util/error";
 import { getTripData } from "../../util/trip";
 import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import { Platform } from "react-native";
 
 export type TripHistoryItemType = {
   tripid: string;
@@ -372,8 +373,8 @@ function TripHistoryItem({ tripid, trips }) {
       >
         <View
           style={[
-            styles.tripItem,
             GlobalStyles.wideStrongShadow,
+            styles.tripItem,
             !contextTrip && styles.inactive,
             activeBorder,
           ]}
@@ -424,7 +425,7 @@ function TripHistoryItem({ tripid, trips }) {
   function renderTravellers(item) {
     if (!item.item?.userName) return <></>;
     return (
-      <View style={[styles.travellerCard, GlobalStyles.strongShadow]}>
+      <View style={[GlobalStyles.strongShadow, styles.travellerCard]}>
         <View style={[styles.avatar, GlobalStyles.shadowPrimary]}>
           <Text style={styles.avatarText}>
             {/* TODO: Profile Picture for now replaced with first char of the name */}
@@ -526,6 +527,12 @@ const styles = StyleSheet.create({
     margin: scale(12),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: moderateScale(12),
+    // android styles
+    ...Platform.select({
+      android: {
+        elevation: 0,
+      },
+    }),
   },
   inactive: {
     opacity: 0.7,
@@ -569,6 +576,13 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(16),
     maxWidth: "47%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
+    // android styles
+    ...Platform.select({
+      android: {
+        elevation: 0,
+        backgroundColor: GlobalStyles.colors.gray300,
+      },
+    }),
   },
   avatar: {
     minHeight: moderateScale(20),

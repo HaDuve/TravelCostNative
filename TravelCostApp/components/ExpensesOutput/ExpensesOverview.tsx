@@ -31,9 +31,11 @@ import { MAX_PERIOD_RANGE } from "../../confAppConstants";
 import { BlurView } from "expo-blur";
 import { TripContext } from "../../store/trip-context";
 import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import { OrientationContext } from "../../store/orientation-context";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const tripCtx = useContext(TripContext);
+  const { isPortrait } = useContext(OrientationContext);
   // const periodRangeNumber = useRef(7);
   // periodRangeNumber useState is used to rerender the component when the periodRangeNumber changes
   const realPeriodNumber = useRef(7);
@@ -226,11 +228,10 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       )}
       {titleContainerJSX}
       <View
-        style={
-          [
-            // styles.toggleButton
-          ]
-        }
+        style={[
+          // styles.toggleButton
+          !isPortrait && styles.landscapeToggleButtonContainer,
+        ]}
       >
         <TourGuideZone
           text={i18n.t("walk4")}
@@ -316,10 +317,16 @@ const styles = StyleSheet.create({
     // marginHorizontal: scale(120),
     marginBottom: verticalScale(-6),
     marginTop: verticalScale(-66),
+    marginHorizontal: "50%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    justifySelf: "center",
     zIndex: 1,
     elevation: 0,
+  },
+  landscapeToggleButtonContainer: {
+    marginLeft: scale(-600),
+    marginBottom: verticalScale(6),
   },
 });

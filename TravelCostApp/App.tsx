@@ -823,8 +823,6 @@ function handleUnhandledTouches() {
 }
 
 export default function App() {
-  const { width, height } = Dimensions.get("screen");
-  console.log(width, height, "isTablet", isTablet());
   return (
     <View
       style={{

@@ -39,6 +39,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { showBanner } from "../components/UI/ToastComponent";
 import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
+import { OrientationContext } from "../store/orientation-context";
 
 const OverviewScreen = ({ navigation }) => {
   // // console.log("rerender OverviewScreen - 0");
@@ -132,11 +133,14 @@ const OverviewScreen = ({ navigation }) => {
   );
   const isLongNumber = expensesSumString?.length > 10;
   const { fontScale } = useWindowDimensions();
+  const { isPortrait } = useContext(OrientationContext);
   const isScaledUp = fontScale > 1;
   const useMoreSpace = isScaledUp || isLongNumber;
   return (
     <View style={styles.container}>
-      <View style={styles.dateHeader}>
+      <View
+        style={[styles.dateHeader, !isPortrait && styles.landscapeDateHeader]}
+      >
         <Text style={styles.dateString}>
           {truncateString(tripCtx.tripName, moderateScale(23))} -{" "}
           {dateTimeString}
@@ -151,6 +155,7 @@ const OverviewScreen = ({ navigation }) => {
             justifyContent: "space-between",
             alignItems: "center",
           },
+          !isPortrait && styles.landscapeHeader,
         ]}
       >
         <DropDownPicker
@@ -206,7 +211,11 @@ const OverviewScreen = ({ navigation }) => {
           style={styles.customSummaryStyle}
         />
       </View>
-      <View style={styles.tempGrayBar1}></View>
+      {
+        <View
+          style={[styles.tempGrayBar1, !isPortrait && styles.landscapeBar]}
+        ></View>
+      }
 
       <MemoizedExpensesOverview
         navigation={navigation}
@@ -227,12 +236,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
+    // overflow: "visible",
     // justifyContent: "flex-start",
   },
   dateHeader: {
     marginTop: verticalScale(12),
     marginLeft: scale(18),
     marginBottom: verticalScale(-4),
+  },
+  landscapeDateHeader: {
+    marginTop: verticalScale(4),
+    marginBottom: verticalScale(-24),
+    alignSelf: "center",
   },
   dateString: {
     fontSize: moderateScale(12),
@@ -242,10 +257,18 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    zIndex: 10,
+    // zIndex: 10,
     marginTop: verticalScale(18),
     paddingHorizontal: scale(12),
     marginBottom: verticalScale(12),
+  },
+  landscapeHeader: {
+    marginTop: verticalScale(12),
+    marginBottom: verticalScale(-12),
+    zIndex: 10,
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginHorizontal: scale(12),
   },
   dropdownContainer: {
     maxWidth: moderateScale(160),
@@ -294,6 +317,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.9,
     shadowRadius: 4,
     zIndex: 0,
+  },
+  landscapeBar: {
+    marginTop: verticalScale(12),
+    marginBottom: verticalScale(-12),
   },
   customSummaryStyle: {
     marginTop: verticalScale(-12),

@@ -8,10 +8,11 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import { Dimensions, Platform, View } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import DatePicker from "react-native-neat-date-picker";
 import { GlobalStyles } from "../../constants/styles";
 import { getDatePlusDays, getLocaleDateFormat } from "../../util/date";
+import { OrientationContext } from "../../store/orientation-context";
 
 const DatePickerModal = ({
   showDatePickerRange,
@@ -20,12 +21,9 @@ const DatePickerModal = ({
 }) => {
   const dateStringFormatLocale = getLocaleDateFormat();
   const android = Platform.OS === "android";
+  const { height } = useContext(OrientationContext);
   const datepickerJSX = android ? (
-    <View
-      style={
-        showDatePickerRange && { minHeight: Dimensions.get("screen").height }
-      }
-    >
+    <View style={showDatePickerRange && { minHeight: height }}>
       <DatePicker
         dateStringFormat={dateStringFormatLocale}
         isVisible={showDatePickerRange}

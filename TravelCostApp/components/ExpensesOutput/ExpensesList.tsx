@@ -835,7 +835,7 @@ function ExpensesList({
       style={{
         paddingLeft: 0,
         backgroundColor: GlobalStyles.colors.backgroundColor,
-        height: Dimensions.get("window").height,
+        height: verticalScale(550),
       }}
     >
       <Animated.FlatList

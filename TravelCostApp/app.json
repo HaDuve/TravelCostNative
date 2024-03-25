@@ -33,7 +33,7 @@
     },
     "android": {
       "package": "com.budgetfornomads.app",
-      "versionCode": 101087,
+      "versionCode": 101088,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon2.png",
         "backgroundColor": "#FFFFFF"

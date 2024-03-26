@@ -286,7 +286,7 @@ const ExpensesSummary = ({
         borderWidth={0}
         borderRadius={dynamicScale(8)}
         progress={budgetProgress}
-        height={verticalScale(12)}
+        height={dynamicScale(12, true)}
         width={useMoreSpace ? dynamicScale(180) : dynamicScale(150)}
       />
     </Pressable>
@@ -306,20 +306,20 @@ const styles = StyleSheet.create({
   container: {
     ...Platform.select({
       ios: {
-        paddingTop: verticalScale(4),
+        paddingTop: dynamicScale(4, true),
         paddingLeft: dynamicScale(20),
-        marginBottom: verticalScale(-4),
+        marginBottom: dynamicScale(-4, true),
       },
       android: {
-        paddingTop: verticalScale(4),
+        paddingTop: dynamicScale(4, true),
         paddingLeft: dynamicScale(20),
-        marginBottom: verticalScale(-4),
+        marginBottom: dynamicScale(-4, true),
       },
     }),
   },
   useMoreSpaceContainer: {
-    paddingTop: verticalScale(8),
-    paddingBottom: verticalScale(4),
+    paddingTop: dynamicScale(8, true),
+    paddingBottom: dynamicScale(4, true),
     marginLeft: dynamicScale(-4),
     paddingLeft: 0,
   },

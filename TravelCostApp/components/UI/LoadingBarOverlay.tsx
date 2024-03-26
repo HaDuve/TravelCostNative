@@ -71,7 +71,7 @@ const LoadingBarOverlay = (props) => {
         borderWidth={0}
         borderRadius={dynamicScale(8, false, 0.5)}
         progress={progress}
-        height={verticalScale(14)}
+        height={dynamicScale(14, true)}
         width={barWidth}
       />
       {validProgress && (
@@ -102,18 +102,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: dynamicScale(5),
-    paddingTop: verticalScale(5),
+    paddingTop: dynamicScale(5, true),
     margin: dynamicScale(5),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   headerContainer: {
     alignItems: "center",
-    marginBottom: verticalScale(5),
+    marginBottom: dynamicScale(5, true),
   },
   text: {
     color: loadingColor,
     fontSize: dynamicScale(18, false, 0.5),
     fontWeight: "300",
-    marginTop: verticalScale(12),
+    marginTop: dynamicScale(12, true),
   },
 });

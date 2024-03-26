@@ -846,8 +846,8 @@ const ExpenseForm = ({
   const recalcJSX = splitType == "EXACT" && !splitListValid && (
     <Animated.View
       style={{
-        marginTop: verticalScale(-8),
-        paddingTop: verticalScale(8),
+        marginTop: dynamicScale(-8, true),
+        paddingTop: dynamicScale(8, true),
         marginLeft: dynamicScale(8),
         // borderWidth: 1,
         // center the content
@@ -871,7 +871,7 @@ const ExpenseForm = ({
             alignContent: "center",
             justifyContent: "center",
             alignItems: "center",
-            marginBottom: verticalScale(8),
+            marginBottom: dynamicScale(8, true),
             marginLeft: dynamicScale(4),
             borderRadius: dynamicScale(20, false, 0.5),
             minHeight: dynamicScale(50, false, 0.5),
@@ -1283,7 +1283,7 @@ const ExpenseForm = ({
                 <View
                   style={
                     duplOrSplit !== 0 && {
-                      paddingBottom: verticalScale(5),
+                      paddingBottom: dynamicScale(5, true),
                       marginHorizontal: "5%",
                       borderBottomColor: GlobalStyles.colors.textColor,
                       borderBottomWidth: 1,
@@ -1334,7 +1334,7 @@ const ExpenseForm = ({
                             size={dynamicScale(28, false, 0.5)}
                             buttonStyle={[
                               {
-                                height: verticalScale(48),
+                                height: dynamicScale(48, true),
                                 backgroundColor:
                                   GlobalStyles.colors.backgroundColor,
                                 borderRadius: dynamicScale(4, false, 0.5),
@@ -1615,7 +1615,7 @@ const ExpenseForm = ({
                                     : GlobalStyles.colors.error500,
                                   textAlign: "left",
                                   marginLeft: dynamicScale(4),
-                                  paddingTop: verticalScale(2),
+                                  paddingTop: dynamicScale(2, true),
                                   fontSize: dynamicScale(14, false, 0.3),
                                 }}
                               >
@@ -1624,7 +1624,7 @@ const ExpenseForm = ({
                               <Pressable
                                 style={{
                                   paddingLeft: dynamicScale(16),
-                                  paddingBottom: verticalScale(16),
+                                  paddingBottom: dynamicScale(16, true),
                                 }}
                                 onPress={() => {
                                   removeUserFromSplitHandler(
@@ -1663,8 +1663,8 @@ const ExpenseForm = ({
                                     color: GlobalStyles.colors.textColor,
                                   },
                                   {
-                                    paddingBottom: verticalScale(4),
-                                    marginTop: verticalScale(-26),
+                                    paddingBottom: dynamicScale(4, true),
+                                    marginTop: dynamicScale(-26, true),
                                   },
                                   {
                                     backgroundColor:
@@ -1688,7 +1688,7 @@ const ExpenseForm = ({
                               ></Input>
                               <Text
                                 style={{
-                                  paddingBottom: verticalScale(11),
+                                  paddingBottom: dynamicScale(11, true),
                                   marginLeft: dynamicScale(-18),
                                   marginRight: dynamicScale(8),
                                 }}
@@ -1893,8 +1893,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: GlobalStyles.colors.gray700,
-    padding: verticalScale(8),
-    marginTop: verticalScale(8),
+    padding: dynamicScale(8, true),
+    marginTop: dynamicScale(8, true),
   },
   quickSumButton: {
     borderWidth: 1,
@@ -1918,7 +1918,7 @@ const styles = StyleSheet.create({
   },
   descriptionContainer: {
     flex: 1,
-    marginTop: verticalScale(12),
+    marginTop: dynamicScale(12, true),
     marginHorizontal: dynamicScale(8, false, 0.5),
     marginLeft: dynamicScale(12, false, 0.5),
   },
@@ -1930,13 +1930,13 @@ const styles = StyleSheet.create({
   },
   autoCompleteMenuStyle: {
     marginLeft: dynamicScale(8),
-    marginBottom: verticalScale(-1),
+    marginBottom: dynamicScale(-1, true),
     borderBottomWidth: 1,
     borderBottomColor: GlobalStyles.colors.primaryGrayed,
   },
   countryFlagContainer: {
     marginRight: "5%",
-    marginTop: verticalScale(20),
+    marginTop: dynamicScale(20, true),
   },
   countryFlag: {
     width: dynamicScale(60, false, 0.5),
@@ -1955,8 +1955,8 @@ const styles = StyleSheet.create({
     fontSize: dynamicScale(24, false, 0.3),
     fontWeight: "bold",
     color: GlobalStyles.colors.backgroundColor,
-    marginTop: verticalScale(5),
-    marginBottom: verticalScale(24),
+    marginTop: dynamicScale(5, true),
+    marginBottom: dynamicScale(24, true),
     textAlign: "center",
   },
   categoryRow: {
@@ -1980,7 +1980,7 @@ const styles = StyleSheet.create({
   errorText: {
     textAlign: "center",
     color: GlobalStyles.colors.error500,
-    margin: verticalScale(8),
+    margin: dynamicScale(8, true),
   },
   tempAmount: {
     // absolute
@@ -2009,33 +2009,33 @@ const styles = StyleSheet.create({
   currencyLabel: {
     fontSize: dynamicScale(12, false, 0.3),
     color: GlobalStyles.colors.textColor,
-    marginTop: verticalScale(12),
+    marginTop: dynamicScale(12),
     marginLeft: dynamicScale(14, false, 0.3),
     marginBottom: dynamicScale(-8, false, 0.3),
   },
   whoPaidLabel: {
     fontSize: dynamicScale(12, false, 0.3),
     color: GlobalStyles.colors.textColor,
-    marginBottom: verticalScale(4),
+    marginBottom: dynamicScale(4, true),
   },
   whoSharedLabel: {
     fontSize: dynamicScale(12, false, 0.3),
     color: GlobalStyles.colors.textColor,
-    marginTop: verticalScale(8),
+    marginTop: dynamicScale(8, true),
     marginBottom: 0,
     marginLeft: dynamicScale(8),
   },
   whoPaidContainer: {
-    marginTop: verticalScale(20),
+    marginTop: dynamicScale(20, true),
     marginHorizontal: dynamicScale(16, false, 0.3),
   },
   button: {
     minWidth: dynamicScale(200, false, 0.5),
     marginHorizontal: 0,
-    marginVertical: verticalScale(4),
+    marginVertical: dynamicScale(4, true),
   },
   advancedText: {
-    marginTop: verticalScale(9),
+    marginTop: dynamicScale(9, true),
     marginLeft: dynamicScale(12),
     fontSize: dynamicScale(12, false, 0.3),
     fontStyle: "italic",
@@ -2077,18 +2077,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     marginHorizontal: "5%",
     marginTop: "4%",
-    paddingBottom: verticalScale(4),
+    paddingBottom: dynamicScale(4, true),
   },
   dropdownContainer: {
-    marginTop: verticalScale(-12),
+    marginTop: dynamicScale(-12, true),
     maxWidth: "89%",
   },
   whoPaidDropdownContainer: {
     width: "75%",
     backgroundColor: GlobalStyles.colors.gray500,
     borderWidth: 0,
-    marginTop: verticalScale(12),
-    marginBottom: verticalScale(10),
+    marginTop: dynamicScale(12, true),
+    marginBottom: dynamicScale(10, true),
     borderBottomWidth: 1,
     borderRadius: 0,
     borderBottomColor: GlobalStyles.colors.gray700,

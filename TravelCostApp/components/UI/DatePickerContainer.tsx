@@ -86,11 +86,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
 
     marginHorizontal: dynamicScale(15),
-    marginTop: verticalScale(12),
-    paddingBottom: verticalScale(12),
+    marginTop: dynamicScale(12, true),
+    paddingBottom: dynamicScale(12, true),
   },
   advancedText: {
-    marginTop: verticalScale(9),
+    marginTop: dynamicScale(9, true),
     marginLeft: dynamicScale(12),
     fontSize: dynamicScale(12, false, 0.5),
     fontStyle: "italic",

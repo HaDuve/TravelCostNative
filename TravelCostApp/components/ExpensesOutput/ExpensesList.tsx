@@ -872,7 +872,7 @@ function ExpensesList({
           expenses?.length
         )}
         ListFooterComponent={
-          <View style={{ height: verticalScale(300) }}></View>
+          <View style={{ height: dynamicScale(300, true) }}></View>
         }
         ListHeaderComponent={listHeaderJSX}
         keyExtractor={(item: Expense) => item.id}
@@ -937,7 +937,7 @@ const styles = StyleSheet.create({
   scrollToTopButton: {
     flex: 1,
     position: "absolute",
-    top: verticalScale(10),
+    top: dynamicScale(10, true),
     alignSelf: "center",
     paddingHorizontal: dynamicScale(8, false, 0.5),
     paddingVertical: dynamicScale(4, false, 0.5),

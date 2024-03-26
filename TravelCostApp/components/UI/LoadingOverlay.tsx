@@ -50,13 +50,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: dynamicScale(12),
-    marginTop: verticalScale(4),
+    marginTop: dynamicScale(4, true),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   text: {
     color: loadingColor,
     fontSize: dynamicScale(18, false, 0.5),
     fontWeight: "300",
-    marginTop: verticalScale(12),
+    marginTop: dynamicScale(12, true),
   },
 });

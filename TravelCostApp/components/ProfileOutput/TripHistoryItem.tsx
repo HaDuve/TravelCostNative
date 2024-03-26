@@ -415,7 +415,7 @@ function TripHistoryItem({ tripid, trips }) {
                 borderWidth={0}
                 borderRadius={dynamicScale(8, false, 0.5)}
                 progress={activeProgress}
-                height={verticalScale(12)}
+                height={dynamicScale(12, true)}
                 width={scale(150)}
               />
             </View>
@@ -496,7 +496,7 @@ function TripHistoryItem({ tripid, trips }) {
               borderWidth={0}
               borderRadius={dynamicScale(8, false, 0.5)}
               progress={activeProgress}
-              height={verticalScale(12)}
+              height={dynamicScale(12, true)}
               width={scale(150)}
             />
           </View>
@@ -543,7 +543,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   topRow: {
-    marginVertical: verticalScale(8),
+    marginVertical: dynamicScale(8, true),
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -554,14 +554,14 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: dynamicScale(16, false, 0.5),
-    marginBottom: verticalScale(4),
+    marginBottom: dynamicScale(4, true),
     fontWeight: "300",
     fontStyle: "italic",
     width: dynamicScale(110),
   },
   amountContainer: {
     paddingHorizontal: dynamicScale(12),
-    paddingVertical: verticalScale(4),
+    paddingVertical: dynamicScale(4, true),
     justifyContent: "center",
     alignItems: "center",
     borderRadius: dynamicScale(4, false, 0.5),

@@ -36,7 +36,9 @@ const CategoryChart = ({ inputData }) => {
     <Animated.View exiting={FadeOut} entering={ZoomIn} style={styles.container}>
       <VictoryPie
         data={chartDataForRender}
-        height={isPortrait ? verticalScale(200) : dynamicScale(100, false, 0.5)}
+        height={
+          isPortrait ? dynamicScale(200, true) : dynamicScale(110, false, 0.5)
+        }
         startAngle={-270}
         endAngle={90}
         animate={{
@@ -59,7 +61,7 @@ const CategoryChart = ({ inputData }) => {
         }}
         labelComponent={
           <VictoryTooltip
-            center={{ x: dynamicScale(207), y: verticalScale(96) }}
+            center={{ x: dynamicScale(207), y: dynamicScale(96, true) }}
             constrainToVisibleArea
             renderInPortal={false}
             pointerLength={0}
@@ -85,7 +87,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: dynamicScale(12),
-    paddingTop: verticalScale(60),
+    paddingTop: dynamicScale(60, true),
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: dynamicScale(100),

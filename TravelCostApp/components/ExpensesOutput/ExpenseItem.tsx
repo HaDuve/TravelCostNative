@@ -208,7 +208,7 @@ function ExpenseItem(props): JSX.Element {
                   style={[
                     styles.avatar,
                     GlobalStyles.shadow,
-                    { marginBottom: verticalScale(16) },
+                    { marginBottom: dynamicScale(16, true) },
                     userPaid && styles.avatarPaid,
                   ]}
                 >
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   textBase: {
-    marginTop: verticalScale(2),
+    marginTop: dynamicScale(2, true),
     marginLeft: dynamicScale(4),
     color: GlobalStyles.colors.textColor,
   },
@@ -406,13 +406,13 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   iconContainer: {
-    marginTop: verticalScale(4),
+    marginTop: dynamicScale(4, true),
     marginRight: dynamicScale(8),
     marginLeft: 0,
   },
   leftItem: {
     flex: 1,
-    maxHeight: verticalScale(40),
+    maxHeight: dynamicScale(40, true),
     alignContent: "flex-start",
     justifyContent: "flex-start",
     alignItems: "flex-start",
@@ -444,11 +444,11 @@ const styles = StyleSheet.create({
     marginRight: dynamicScale(4),
   },
   countryFlag: {
-    marginTop: verticalScale(3),
+    marginTop: dynamicScale(3, true),
     // marginRight: 12,
   },
   avatarContainer: {
-    maxHeight: verticalScale(50),
+    maxHeight: dynamicScale(50, true),
     padding: dynamicScale(4),
     paddingRight: dynamicScale(10),
     // center items left
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     ...Platform.select({
       android: {
-        minHeight: verticalScale(22),
+        minHeight: dynamicScale(22, true),
         minWidth: dynamicScale(22),
       },
     }),

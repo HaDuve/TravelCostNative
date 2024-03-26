@@ -341,7 +341,7 @@ const TripSummaryScreen = ({ navigation }) => {
               borderWidth={0}
               borderRadius={dynamicScale(8, false, 0.5)}
               progress={progress}
-              height={verticalScale(12)}
+              height={dynamicScale(12, true)}
               width={scale(200)}
             ></Progress.Bar>
           </View>

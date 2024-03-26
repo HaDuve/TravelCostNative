@@ -153,7 +153,7 @@ const SettingsScreen = ({ navigation }) => {
             padding: 0,
           },
           android: {
-            paddingTop: verticalScale(18),
+            paddingTop: dynamicScale(18, true),
           },
         }),
       }}
@@ -271,7 +271,7 @@ const SettingsScreen = ({ navigation }) => {
           paddingHorizontal: "4%",
         }}
       ></View>
-      <View style={{ flex: 1, minHeight: verticalScale(100) }}></View>
+      <View style={{ flex: 1, minHeight: dynamicScale(100, true) }}></View>
     </ScrollView>
   );
 };

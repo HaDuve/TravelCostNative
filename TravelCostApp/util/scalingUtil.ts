@@ -28,19 +28,25 @@ export const dynamicScale = (
   vertical = false,
   moderateFactor: number = null
 ) => {
+  let returnSize = 0;
   const { width, height } = Dimensions.get("window");
   const isPortrait = width < height;
   const dynamicBaseWidth = isPortrait ? 350 : 680;
   // const dynamicBaseWidth = 350;
   const dynamicBaseHeight = isPortrait ? 680 : 350;
   // const dynamicBaseHeight = 680;
-  const tHeight = (height / dynamicBaseHeight) * size;
-  const tWidth = (width / dynamicBaseWidth) * size;
-  if (moderateFactor && vertical)
-    return tHeight + (tHeight - size) * moderateFactor;
-  if (moderateFactor && !vertical)
-    return tWidth + (tWidth - size) * moderateFactor;
-  return vertical ? tHeight : tWidth;
+  const hSize = (height / dynamicBaseHeight) * size;
+  const wSize = (width / dynamicBaseWidth) * size;
+  if (moderateFactor != null) {
+    // moderation
+    returnSize = !vertical
+      ? hSize + (hSize - size) * moderateFactor
+      : wSize + (wSize - size) * moderateFactor;
+    return returnSize;
+  }
+  // no moderation
+  returnSize = !vertical ? hSize : wSize;
+  return returnSize;
 };
 
 export const isTablet = () => {

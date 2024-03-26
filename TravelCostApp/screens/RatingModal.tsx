@@ -109,8 +109,8 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
           style={[
             {
               width: dynamicScale(180),
-              height: verticalScale(24),
-              marginBottom: verticalScale(12),
+              height: dynamicScale(24, true),
+              marginBottom: dynamicScale(12, true),
             },
             { overflow: "visible" },
           ]}
@@ -143,19 +143,19 @@ RatingModal.propTypes = {
 const styles = StyleSheet.create({
   modalStyle: {
     justifyContent: "flex-end",
-    marginBottom: verticalScale(40),
+    marginBottom: dynamicScale(40, true),
   },
   imageContainer: {
     overflow: "visible",
 
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: verticalScale(20),
+    marginBottom: dynamicScale(20, true),
   },
   titleContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: verticalScale(20),
+    marginBottom: dynamicScale(20, true),
   },
   titleText: {
     fontSize: dynamicScale(20, false, 0.5),
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
   },
   subTitleContainer: {
-    marginBottom: verticalScale(20),
+    marginBottom: dynamicScale(20, true),
   },
   subTitleText: {
     fontSize: dynamicScale(16, false, 0.5),

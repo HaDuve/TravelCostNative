@@ -34,9 +34,9 @@ import {
 } from "../../util/scalingUtil";
 import { DeviceType, deviceType } from "expo-device";
 
-const MINHEIGHT = verticalScale(60);
-const MINHEIGHT_LOADINGBAR = verticalScale(88);
-const MAXHEIGHT = verticalScale(100);
+const MINHEIGHT = dynamicScale(60, true);
+const MINHEIGHT_LOADINGBAR = dynamicScale(88, true);
+const MAXHEIGHT = dynamicScale(100, true);
 const MINWIDTH = dynamicScale(200);
 const MAXWIDTH = dynamicScale(300);
 
@@ -119,7 +119,7 @@ const toastConfig: ToastConfig = {
       <View style={GlobalStyles.strongShadow}>
         <Progress.Bar
           style={{
-            marginTop: verticalScale(-22),
+            marginTop: dynamicScale(-22, true),
             marginLeft: dynamicScale(14),
           }}
           progress={progress}
@@ -127,7 +127,7 @@ const toastConfig: ToastConfig = {
           unfilledColor={unfilledColor}
           borderWidth={0}
           borderRadius={dynamicScale(8, false, 0.5)}
-          height={verticalScale(14)}
+          height={dynamicScale(14, true)}
           width={barWidth}
         ></Progress.Bar>
       </View>
@@ -148,7 +148,7 @@ const toastConfig: ToastConfig = {
             GlobalStyles.wideStrongShadow,
             progressValid && {
               minHeight: MINHEIGHT_LOADINGBAR,
-              paddingBottom: verticalScale(16),
+              paddingBottom: dynamicScale(16, true),
             },
           ]}
           contentContainerStyle={CONTENTCONTAINERSTYLE}
@@ -168,8 +168,8 @@ const toastConfig: ToastConfig = {
                 flex: 1,
                 marginRight: dynamicScale(30),
                 marginTop: progressValid
-                  ? verticalScale(12)
-                  : verticalScale(18),
+                  ? dynamicScale(12, true)
+                  : dynamicScale(18, true),
                 maxHeight: MAXHEIGHT / 2,
                 maxWidth: dynamicScale(20),
               }}
@@ -203,7 +203,7 @@ const toastConfig: ToastConfig = {
               props.onPress();
             }}
           >
-            <View style={{ marginBottom: verticalScale(8) }}>
+            <View style={{ marginBottom: dynamicScale(8, true) }}>
               <Text style={styles.bannerText1}>{props.text1}</Text>
             </View>
             <Text style={styles.bannerText2}>{props.text2}</Text>
@@ -313,7 +313,7 @@ const toastConfig: ToastConfig = {
                       borderWidth={0}
                       progress={budgetProgress}
                       width={scale(180)}
-                      height={verticalScale(20)}
+                      height={dynamicScale(20, true)}
                       borderRadius={dynamicScale(8, false, 0.5)}
                     ></Progress.Bar>
                   </View>
@@ -354,7 +354,7 @@ export async function showBanner(navigation, props = {}) {
     text2: i18n.t("bannerText2"),
     autoHide: false,
     position: "top",
-    topOffset: verticalScale(10),
+    topOffset: dynamicScale(10, true),
     onPress: () => {
       navigation.navigate("Paywall");
     },
@@ -365,8 +365,8 @@ export async function showBanner(navigation, props = {}) {
 const ToastComponent = () => {
   return (
     <Toast
-      topOffset={verticalScale(10)}
-      bottomOffset={verticalScale(40)}
+      topOffset={dynamicScale(10, true)}
+      bottomOffset={dynamicScale(40, true)}
       config={toastConfig}
       position={"bottom"}
     />
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 36,
     paddingHorizontal: dynamicScale(30),
-    paddingVertical: verticalScale(12),
+    paddingVertical: dynamicScale(12),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
   },
   budgetOverviewHeader: {
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    minHeight: verticalScale(40),
+    minHeight: dynamicScale(40, true),
     overflow: "visible",
   },
   travellerItemProgressBarContainer: {
@@ -412,28 +412,28 @@ const styles = StyleSheet.create({
     fontWeight: "200",
     color: GlobalStyles.colors.textColor,
     textAlign: "left",
-    paddingVertical: verticalScale(8),
+    paddingVertical: dynamicScale(8, true),
   },
   overviewTextSmall: {
     fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "200",
     color: GlobalStyles.colors.textColor,
     textAlign: "left",
-    paddingVertical: verticalScale(4),
+    paddingVertical: dynamicScale(4, true),
   },
   overViewTextTravellerSum: {
     fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "500",
     color: GlobalStyles.colors.gray300,
     textAlign: "left",
-    paddingTop: verticalScale(5),
+    paddingTop: dynamicScale(5, true),
   },
   overviewTextTitle: {
     fontSize: dynamicScale(18, false, 0.5),
     fontWeight: "400",
     color: GlobalStyles.colors.textColor,
     textAlign: "left",
-    paddingVertical: verticalScale(8),
+    paddingVertical: dynamicScale(8, true),
   },
   bannerContainerContainer: {
     // flex: 1,
@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   xCloseContainer: {
-    marginTop: verticalScale(18),
+    marginTop: dynamicScale(18, true),
     marginLeft: dynamicScale(4),
   },
   xCloseButton: {
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
     borderColor: "black",
     borderRadius: 36,
     paddingHorizontal: dynamicScale(30),
-    paddingVertical: verticalScale(12),
+    paddingVertical: dynamicScale(12, true),
   },
   bannerText1: {
     fontSize: dynamicScale(18, false, 0.5),

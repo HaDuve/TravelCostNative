@@ -311,7 +311,7 @@ const ManageCategoryScreen = ({ navigation }) => {
     "ios-water-outline",
   ];
   // get dimensions
-  const bigDisplay = verticalScale(680) > 850;
+  const bigDisplay = dynamicScale(680, true) > 850;
   const arrays = [];
   // 1-3 possible items per row
   const size = bigDisplay ? 3 : 2;
@@ -322,7 +322,7 @@ const ManageCategoryScreen = ({ navigation }) => {
       <View style={[{ margin: dynamicScale(5) }]}>
         <View
           style={{
-            marginBottom: verticalScale(2),
+            marginBottom: dynamicScale(2, true),
           }}
         >
           <SelectCategoryIcon
@@ -334,7 +334,7 @@ const ManageCategoryScreen = ({ navigation }) => {
         {item?.length > 1 ? (
           <View
             style={{
-              marginBottom: verticalScale(2),
+              marginBottom: dynamicScale(2, true),
             }}
           >
             <SelectCategoryIcon
@@ -347,7 +347,7 @@ const ManageCategoryScreen = ({ navigation }) => {
         {item?.length > 2 ? (
           <View
             style={{
-              marginBottom: verticalScale(2),
+              marginBottom: dynamicScale(2, true),
             }}
           >
             <SelectCategoryIcon
@@ -474,7 +474,7 @@ const ManageCategoryScreen = ({ navigation }) => {
           </View>
           <View
             style={{
-              height: verticalScale(16),
+              height: dynamicScale(16, true),
               width: "100%",
               zIndex: 10,
               //transparent border color

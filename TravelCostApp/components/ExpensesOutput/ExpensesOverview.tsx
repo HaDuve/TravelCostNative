@@ -240,8 +240,8 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       >
         <TourGuideZone
           text={i18n.t("walk4")}
-          tooltipBottomOffset={verticalScale(166)}
-          maskOffset={verticalScale(60)}
+          tooltipBottomOffset={dynamicScale(166, true)}
+          maskOffset={dynamicScale(60, true)}
           zone={4}
           shape={"circle"}
         >
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "absolute",
     width: "100%",
-    paddingBottom: verticalScale(6),
+    paddingBottom: dynamicScale(6, true),
   },
   titleContainer: {
     flexDirection: "row",
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   chevronContainer: {
-    marginTop: verticalScale(12),
+    marginTop: dynamicScale(12, true),
     justifyContent: "center",
     alignItems: "center",
   },
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     opacity: 0.65,
   },
   titleText: {
-    marginTop: verticalScale(6),
+    marginTop: dynamicScale(6, true),
     minWidth: dynamicScale(200),
     maxWidth: dynamicScale(200),
     textAlign: "center",
@@ -320,8 +320,8 @@ const styles = StyleSheet.create({
     flex: 1,
     // borderRadius: 10,
     // marginHorizontal:dynamicScale(120),
-    marginBottom: verticalScale(-6),
-    marginTop: verticalScale(-66),
+    marginBottom: dynamicScale(-6, true),
+    marginTop: dynamicScale(-66, true),
     marginHorizontal: "50%",
     flexDirection: "row",
     alignItems: "center",
@@ -332,6 +332,6 @@ const styles = StyleSheet.create({
   },
   landscapeToggleButtonContainer: {
     marginLeft: dynamicScale(-600),
-    marginBottom: verticalScale(6),
+    marginBottom: dynamicScale(6, true),
   },
 });

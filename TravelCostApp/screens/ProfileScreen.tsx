@@ -370,8 +370,8 @@ const ProfileScreen = ({ navigation }) => {
         </View>
         <TourGuideZone
           text={i18n.t("walk6")}
-          maskOffset={verticalScale(200)}
-          tooltipBottomOffset={verticalScale(250)}
+          maskOffset={dynamicScale(200, true)}
+          tooltipBottomOffset={dynamicScale(250, true)}
           zone={6}
         >
           <TripList trips={tripHistory}></TripList>
@@ -380,8 +380,8 @@ const ProfileScreen = ({ navigation }) => {
       <View style={styles.horizontalButtonContainer}>
         <TourGuideZone
           text={i18n.t("walk7")}
-          maskOffset={verticalScale(50)}
-          tooltipBottomOffset={verticalScale(50)}
+          maskOffset={dynamicScale(50, true)}
+          tooltipBottomOffset={dynamicScale(50, true)}
           zone={7}
         >
           <View>
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     flex: 0,
-    minHeight: verticalScale(100),
+    minHeight: dynamicScale(100, true),
     padding: dynamicScale(4),
   },
 
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     flex: 1,
     // minHeight: "68%",
     margin: dynamicScale(16),
-    marginBottom: verticalScale(-30),
+    marginBottom: dynamicScale(-30, true),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   horizontalContainer: {
@@ -481,8 +481,8 @@ const styles = StyleSheet.create({
     marginLeft: dynamicScale(10),
   },
   deleteContainer: {
-    marginTop: verticalScale(16),
-    paddingTop: verticalScale(8),
+    marginTop: dynamicScale(16, true),
+    paddingTop: dynamicScale(8, true),
     borderTopWidth: 2,
     borderTopColor: GlobalStyles.colors.primary200,
     alignItems: "center",
@@ -491,7 +491,7 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.primary400,
     padding: dynamicScale(16, false, 0.5),
     paddingHorizontal: dynamicScale(16, false, 0.5),
-    marginBottom: verticalScale(4),
+    marginBottom: dynamicScale(4, true),
     borderRadius: 99,
   },
   offlineWarningContainer: {

@@ -94,7 +94,7 @@ const CategoryProgressBar = ({
         borderWidth={0}
         borderRadius={dynamicScale(8)}
         progress={budgetProgress}
-        height={verticalScale(14)}
+        height={dynamicScale(14, true)}
         width={
           isPortrait
             ? dynamicScale(292, false, 0.96)
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: dynamicScale(8),
-    paddingBottom: verticalScale(4),
+    paddingBottom: dynamicScale(4, true),
     marginLeft: dynamicScale(8),
     marginRight: dynamicScale(10),
     borderRadius: dynamicScale(6, false, 0.5),
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-start",
-    marginBottom: verticalScale(4),
+    marginBottom: dynamicScale(4, true),
   },
   period: {
     fontSize: dynamicScale(12, false, 0.5),

@@ -363,7 +363,7 @@ const AddExpenseButton = ({ navigation }) => {
         borderRadius={16}
         shape={"circle"}
         maskOffset={40}
-        tooltipBottomOffset={verticalScale(80)}
+        tooltipBottomOffset={dynamicScale(80, true)}
         zone={2}
       ></TourGuideZone>
 
@@ -409,8 +409,8 @@ const styles = StyleSheet.create({
   },
   templateContainer: {
     backgroundColor: GlobalStyles.colors.primary400,
-    marginBottom: verticalScale(10),
-    paddingVertical: verticalScale(20),
+    marginBottom: dynamicScale(10, true),
+    paddingVertical: dynamicScale(20, true),
     paddingHorizontal: dynamicScale(20),
     flexDirection: "row",
     alignItems: "center",
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
   addButton: {
     backgroundColor: GlobalStyles.colors.primary400,
     borderRadius: 999,
-    marginBottom: verticalScale(10),
+    marginBottom: dynamicScale(10, true),
     paddingVertical: "19.8%",
     paddingHorizontal: "20%",
     flexDirection: "row",

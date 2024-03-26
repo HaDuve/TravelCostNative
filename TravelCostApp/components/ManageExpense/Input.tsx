@@ -86,12 +86,12 @@ Input.propTypes = {
 const styles = StyleSheet.create({
   inputContainer: {
     marginHorizontal: dynamicScale(16),
-    marginVertical: verticalScale(4),
+    marginVertical: dynamicScale(4, true),
   },
   label: {
     fontSize: dynamicScale(12, false, 0.5),
     color: GlobalStyles.colors.textColor,
-    marginBottom: verticalScale(4),
+    marginBottom: dynamicScale(4, true),
   },
   input: {
     backgroundColor: GlobalStyles.colors.gray500,
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     marginRight: dynamicScale(-10),
   },
   inputMultiline: {
-    minHeight: verticalScale(100),
+    minHeight: dynamicScale(100, true),
     textAlignVertical: "top",
   },
   invalidLabel: {

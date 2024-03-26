@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.error500,
   },
   input: {
-    paddingVertical: verticalScale(8),
+    paddingVertical: dynamicScale(8, true),
     paddingHorizontal: dynamicScale(6, false, 0.5),
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 4,

@@ -37,7 +37,10 @@ const SettingsSwitch = ({ style, toggleState, state, label, labelStyle }) => {
         }
         onValueChange={toggleState}
         value={state}
-        style={[{ marginBottom: verticalScale(8) }, GlobalStyles.shadowPrimary]}
+        style={[
+          { marginBottom: dynamicScale(8, true) },
+          GlobalStyles.shadowPrimary,
+        ]}
       />
       {/* </LinearGradient> */}
     </Pressable>
@@ -67,6 +70,6 @@ const styles = StyleSheet.create({
   label: {
     color: GlobalStyles.colors.textColor,
     fontSize: dynamicScale(16, false, 0.5),
-    marginBottom: verticalScale(16),
+    marginBottom: dynamicScale(16, true),
   },
 });

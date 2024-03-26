@@ -245,13 +245,13 @@ const styles = StyleSheet.create({
     // justifyContent: "flex-start",
   },
   dateHeader: {
-    marginTop: verticalScale(12),
+    marginTop: dynamicScale(12, true),
     marginLeft: dynamicScale(18),
-    marginBottom: verticalScale(-4),
+    marginBottom: dynamicScale(-4, true),
   },
   landscapeDateHeader: {
-    marginTop: verticalScale(4),
-    marginBottom: verticalScale(-24),
+    marginTop: dynamicScale(4, true),
+    marginBottom: dynamicScale(-24, true),
     alignSelf: "center",
   },
   dateString: {
@@ -263,13 +263,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
     // zIndex: 10,
-    marginTop: verticalScale(18),
+    marginTop: dynamicScale(18, true),
     paddingHorizontal: dynamicScale(12),
-    marginBottom: verticalScale(12),
+    marginBottom: dynamicScale(12, true),
   },
   landscapeHeader: {
-    marginTop: verticalScale(12),
-    marginBottom: verticalScale(-12),
+    marginTop: dynamicScale(12, true),
+    marginBottom: dynamicScale(-12, true),
     zIndex: 10,
     justifyContent: "space-between",
     alignItems: "center",
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
     }),
   },
   dropdownContainerDropdown: {
-    maxHeight: verticalScale(600),
+    maxHeight: dynamicScale(600, true),
   },
   dropdown: {
     borderRadius: 10,
@@ -327,10 +327,10 @@ const styles = StyleSheet.create({
     zIndex: 0,
   },
   landscapeBar: {
-    marginTop: verticalScale(12),
-    marginBottom: verticalScale(-12),
+    marginTop: dynamicScale(12, true),
+    marginBottom: dynamicScale(-12, true),
   },
   customSummaryStyle: {
-    marginTop: verticalScale(-12),
+    marginTop: dynamicScale(-12, true),
   },
 });

@@ -410,8 +410,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: dynamicScale(24),
-    paddingTop: verticalScale(24),
-    paddingBottom: verticalScale(2),
+    paddingTop: dynamicScale(24, true),
+    paddingBottom: dynamicScale(2, true),
     //card
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: dynamicScale(20, false, 0.5),
@@ -422,7 +422,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       android: {
         margin: dynamicScale(8),
-        marginTop: verticalScale(2),
+        marginTop: dynamicScale(2, true),
       },
     }),
   },
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         marginLeft: dynamicScale(24),
-        marginTop: verticalScale(50),
+        marginTop: dynamicScale(50, true),
         borderRadius: 12,
         minHeight: 55,
       },
@@ -443,8 +443,8 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     paddingHorizontal: dynamicScale(16),
-    paddingVertical: verticalScale(8),
-    marginVertical: verticalScale(8),
+    paddingVertical: dynamicScale(8, true),
+    marginVertical: dynamicScale(8, true),
     borderWidth: 1,
     borderColor: GlobalStyles.colors.backgroundColor,
     backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       android: {
         margin: dynamicScale(8),
-        minHeight: verticalScale(55),
+        minHeight: dynamicScale(55, true),
       },
     }),
   },
@@ -473,10 +473,10 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: { marginTop: "-0%" },
       android: {
-        // height: verticalScale(55),
+        // height: dynamicScale(55, true),
         marginVertical: dynamicScale(18),
         // flexDirection: "column",
-        minHeight: verticalScale(100),
+        minHeight: dynamicScale(100, true),
       },
     }),
   },
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: dynamicScale(32, false, 0.5),
     fontWeight: "bold",
-    paddingBottom: verticalScale(12),
+    paddingBottom: dynamicScale(12, true),
     color: GlobalStyles.colors.textColor,
     // center
     alignItems: "center",

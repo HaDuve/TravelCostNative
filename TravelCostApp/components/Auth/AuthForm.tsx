@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     marginTop: dynamicScale(12),
   },
   iconContainer: {
-    marginTop: verticalScale(-30),
+    marginTop: dynamicScale(-30, true),
     marginBottom: dynamicScale(10),
     alignItems: "center",
     justifyContent: "center",

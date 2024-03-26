@@ -539,7 +539,7 @@ const ExpenseGraph = ({
             </View>
           }
           ListFooterComponent={
-            <View style={{ height: verticalScale(200) }}>
+            <View style={{ height: dynamicScale(200, true) }}>
               <View style={styles.flatButtonContainer}>
                 {longerPeriodNum < MAX_PERIOD_RANGE && (
                   <FlatButton
@@ -561,8 +561,8 @@ const ExpenseGraph = ({
           maxToRenderPerBatch={20}
           // windowSize={7}
           getItemLayout={(data, index) => ({
-            length: verticalScale(65),
-            offset: verticalScale(50) * index,
+            length: dynamicScale(65, true),
+            offset: dynamicScale(65, true) * index,
             index,
           })}
         ></Animated.FlatList>
@@ -593,11 +593,11 @@ const styles = StyleSheet.create({
     // paddingTop: 60,
   },
   graphContainer: {
-    minHeight: verticalScale(158),
-    paddingTop: verticalScale(45),
-    marginTop: verticalScale(8),
-    paddingBottom: verticalScale(15),
-    marginBottom: verticalScale(15),
+    minHeight: dynamicScale(158, true),
+    paddingTop: dynamicScale(45, true),
+    marginTop: dynamicScale(8, true),
+    paddingBottom: dynamicScale(15, true),
+    marginBottom: dynamicScale(15, true),
   },
   landscapeGraphContainer: {
     minHeight: 0,
@@ -606,18 +606,18 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
   },
   flatButtonContainer: {
-    marginBottom: verticalScale(-30),
+    marginBottom: dynamicScale(-30, true),
   },
   landscapeFlatButton: {
-    marginTop: verticalScale(48),
-    // marginBottom: verticalScale(20),
+    marginTop: dynamicScale(48, true),
+    // marginBottom: dynamicScale(20, true),
   },
   listContainer: {
     flex: 1,
     flexDirection: "row",
   },
   categoryCard: {
-    height: verticalScale(65),
+    height: dynamicScale(65, true),
     minWidth: dynamicScale(200),
     ...Platform.select({
       ios: {
@@ -644,17 +644,17 @@ const styles = StyleSheet.create({
   },
 
   itemContainer: {
-    paddingVertical: verticalScale(12),
+    paddingVertical: dynamicScale(12, true),
     paddingHorizontal: dynamicScale(24),
     marginHorizontal: dynamicScale(20),
-    marginTop: verticalScale(4),
+    marginTop: dynamicScale(4, true),
     ...Platform.select({
       android: {
         elevation: 5,
         borderRadius: 10,
       },
     }),
-    marginBottom: verticalScale(8),
+    marginBottom: dynamicScale(8, true),
     borderRadius: dynamicScale(10, false, 0.5),
     flexDirection: "row",
     justifyContent: "space-between",

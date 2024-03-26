@@ -144,11 +144,11 @@ const ExpenseCountries = ({ expenses, periodName, navigation }) => {
           isPortrait ? (
             <CategoryChart inputData={dataList}></CategoryChart>
           ) : (
-            <View style={{ height: verticalScale(100) }}></View>
+            <View style={{ height: dynamicScale(100, true) }}></View>
           )
         }
         ListFooterComponent={
-          <View style={{ height: verticalScale(100) }}></View>
+          <View style={{ height: dynamicScale(100, true) }}></View>
         }
         ListEmptyComponent={
           <View style={styles.fallbackTextContainer}>
@@ -177,14 +177,14 @@ const styles = StyleSheet.create({
   fallbackTextContainer: {
     flex: 1,
     padding: dynamicScale(24),
-    marginTop: verticalScale(-150),
+    marginTop: dynamicScale(-150, true),
     alignItems: "center",
     justifyContent: "space-between",
   },
   categoryCard: {
-    marginBottom: verticalScale(20),
+    marginBottom: dynamicScale(20, true),
     marginHorizontal: dynamicScale(16),
-    paddingBottom: verticalScale(12),
+    paddingBottom: dynamicScale(12, true),
     shadowColor: "#000",
     shadowOffset: {
       width: 1,
@@ -197,6 +197,6 @@ const styles = StyleSheet.create({
     borderRadius: dynamicScale(10, false, 0.5),
   },
   countryFlagContainerStyle: {
-    marginBottom: verticalScale(3),
+    marginBottom: dynamicScale(3, true),
   },
 });

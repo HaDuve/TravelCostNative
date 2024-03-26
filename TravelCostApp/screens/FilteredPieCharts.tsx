@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     flexDirection: "row-reverse",
     justifyContent: "space-between",
     paddingHorizontal: dynamicScale(80, false, 0.5),
-    marginTop: verticalScale(-24),
+    marginTop: dynamicScale(-24, true),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   firstTitleContainer: {
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     marginLeft: "2%",
   },
   landScapetitleText: {
-    marginTop: verticalScale(30),
+    marginTop: dynamicScale(30, true),
   },
   chevronContainer: {
     justifyContent: "center",

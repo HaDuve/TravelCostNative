@@ -124,12 +124,12 @@ const styles = StyleSheet.create({
   },
   authContent: {
     padding: dynamicScale(16),
-    marginTop: verticalScale(30),
-    marginBottom: verticalScale(20),
+    marginTop: dynamicScale(30, true),
+    marginBottom: dynamicScale(20, true),
     marginHorizontal: dynamicScale(16),
     ...Platform.select({
       android: {
-        marginBottom: verticalScale(60),
+        marginBottom: dynamicScale(60, true),
       },
     }),
     borderRadius: 8,
@@ -148,13 +148,13 @@ const styles = StyleSheet.create({
   },
   buttons: {
     flexDirection: i18n.locale !== "en" ? "column" : "row",
-    marginTop: verticalScale(16),
+    marginTop: dynamicScale(16, true),
     alignItems: "center",
     justifyContent: "center",
   },
   secondaryText: {
     fontSize: dynamicScale(14, false, 0.5),
-    paddingVertical: verticalScale(8),
+    paddingVertical: dynamicScale(8, true),
     paddingHorizontal: dynamicScale(6),
     color: GlobalStyles.colors.gray700,
     fontWeight: "300",

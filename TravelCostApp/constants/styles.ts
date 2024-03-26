@@ -69,7 +69,7 @@ export const GlobalStyles = {
     color: "#434343",
     fontSize: dynamicScale(28),
     fontWeight: "bold",
-    marginBottom: verticalScale(12),
+    marginBottom: dynamicScale(12, true),
   },
   buttonTextGradient: {
     color: "#FFFFFF",

@@ -325,7 +325,7 @@ const FinderScreen = () => {
                   icon="close-outline"
                   size={dynamicScale(26, false, 0.5)}
                   color={GlobalStyles.colors.textColor}
-                  buttonStyle={{ marginTop: verticalScale(14) }}
+                  buttonStyle={{ marginTop: dynamicScale(14, true) }}
                   onPressStyle={{
                     backgroundColor: GlobalStyles.colors.gray500,
                     borderRadius: 99,
@@ -359,7 +359,7 @@ const FinderScreen = () => {
                   icon="close-outline"
                   color={GlobalStyles.colors.textColor}
                   size={dynamicScale(26, false, 0.5)}
-                  buttonStyle={{ marginTop: verticalScale(14) }}
+                  buttonStyle={{ marginTop: dynamicScale(14, true) }}
                   onPressStyle={{
                     backgroundColor: GlobalStyles.colors.gray500,
                     borderRadius: 99,
@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
   checkBoxContainer: {
     borderRadius: dynamicScale(99, false, 0.5),
     marginRight: dynamicScale(8),
-    marginTop: verticalScale(20),
+    marginTop: dynamicScale(20, true),
     ...Platform.select({
       ios: { borderWidth: 1 },
     }),
@@ -444,28 +444,28 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-start",
-    minHeight: verticalScale(90),
+    minHeight: dynamicScale(90, true),
   },
   rowContainer: {
     flex: 1,
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "flex-start",
-    minHeight: verticalScale(90),
+    minHeight: dynamicScale(90, true),
   },
   titleText: {
     fontSize: dynamicScale(32, false, 0.5),
     fontWeight: "bold",
-    paddingBottom: verticalScale(12),
+    paddingBottom: dynamicScale(12, true),
     color: GlobalStyles.colors.textColor,
     // center
     textAlign: "center",
   },
   queryText: {
     fontSize: dynamicScale(16, false, 0.5),
-    marginTop: verticalScale(65),
+    marginTop: dynamicScale(65, true),
 
-    marginBottom: verticalScale(18),
+    marginBottom: dynamicScale(18, true),
     //center
     textAlign: "center",
     // thin text
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
   },
   queryContainer: {
     flex: 1,
-    marginTop: verticalScale(10),
+    marginTop: dynamicScale(10, true),
 
     marginLeft: dynamicScale(18),
     maxWidth: dynamicScale(180),
@@ -495,12 +495,12 @@ const styles = StyleSheet.create({
     // marginLeft: -8,
   },
   buttonContainer: {
-    marginTop: verticalScale(20),
-    marginBottom: verticalScale(20),
+    marginTop: dynamicScale(20, true),
+    marginBottom: dynamicScale(20, true),
   },
   autoCompleteMenuStyle: {
     zIndex: 0,
     marginLeft: dynamicScale(8),
-    marginBottom: verticalScale(-1),
+    marginBottom: dynamicScale(-1, true),
   },
 });

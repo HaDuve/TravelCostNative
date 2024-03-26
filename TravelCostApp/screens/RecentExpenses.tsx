@@ -340,13 +340,13 @@ function RecentExpenses({ navigation }) {
       refreshing={refreshing}
       refreshControl={
         <RefreshControl
-          progressViewOffset={verticalScale(8)}
+          progressViewOffset={dynamicScale(8, true)}
           refreshing={refreshing || isFetching}
           tintColor={GlobalStyles.colors.textColor}
           colors={[GlobalStyles.colors.textColor]}
           style={{
             backgroundColor: "transparent",
-            marginBottom: verticalScale(-12),
+            marginBottom: dynamicScale(-12, true),
           }}
           onRefresh={async () => {
             await onRefresh();
@@ -366,19 +366,19 @@ function RecentExpenses({ navigation }) {
       <TourGuideZone
         text={i18n.t("walk1")}
         zone={1}
-        maskOffset={verticalScale(-4)}
-        tooltipBottomOffset={verticalScale(200)}
+        maskOffset={dynamicScale(-4, true)}
+        tooltipBottomOffset={dynamicScale(200, true)}
       ></TourGuideZone>
       <TourGuideZone
         text={i18n.t("walk8")}
         zone={8}
-        maskOffset={verticalScale(-4)}
-        tooltipBottomOffset={verticalScale(-200)}
+        maskOffset={dynamicScale(-4, true)}
+        tooltipBottomOffset={dynamicScale(-200, true)}
       ></TourGuideZone>
       <TourGuideZone
         text={i18n.t("walk3")}
-        maskOffset={verticalScale(200)}
-        tooltipBottomOffset={verticalScale(-200)}
+        maskOffset={dynamicScale(200, true)}
+        tooltipBottomOffset={dynamicScale(-200, true)}
         zone={3}
       ></TourGuideZone>
       <View
@@ -482,13 +482,13 @@ const styles = StyleSheet.create({
     }),
   },
   dateHeader: {
-    marginVertical: verticalScale(16),
+    marginVertical: dynamicScale(16, true),
     marginLeft: dynamicScale(12),
-    marginBottom: verticalScale(-20),
+    marginBottom: dynamicScale(-20, true),
   },
   landscapeDateHeader: {
-    marginTop: verticalScale(4),
-    marginBottom: verticalScale(-24),
+    marginTop: dynamicScale(4, true),
+    marginBottom: dynamicScale(-24, true),
     alignSelf: "center",
   },
   dateString: {
@@ -499,14 +499,14 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    marginTop: verticalScale(24),
+    marginTop: dynamicScale(24, true),
     marginHorizontal: dynamicScale(12),
-    marginBottom: verticalScale(12),
+    marginBottom: dynamicScale(12, true),
     zIndex: 10,
   },
   landscapeHeader: {
-    marginTop: verticalScale(4),
-    // marginBottom: verticalScale(-12),
+    marginTop: dynamicScale(4, true),
+    // marginBottom: dynamicScale(-12, true),
     zIndex: 10,
     justifyContent: "space-between",
     alignItems: "center",
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     maxWidth: dynamicScale(160, false, 0.5),
-    marginTop: verticalScale(6),
+    marginTop: dynamicScale(6, true),
     ...Platform.select({
       ios: {
         shadowColor: GlobalStyles.colors.textColor,
@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
     }),
   },
   dropdownContainerDropdown: {
-    maxHeight: verticalScale(600),
+    maxHeight: dynamicScale(600, true),
   },
   dropdown: {
     borderRadius: 10,
@@ -564,7 +564,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   landscapeBar: {
-    // marginTop: verticalScale(24),
-    // marginBottom: verticalScale(-8),
+    // marginTop: dynamicScale(24, true),
+    // marginBottom: dynamicScale(-8, true),
   },
 });

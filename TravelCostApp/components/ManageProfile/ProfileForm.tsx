@@ -83,7 +83,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
     checkNewChanges();
   }, [isConnected]);
   const iconButtonJSX = (
-    <View style={[styles.inputsRow, { marginTop: verticalScale(-12) }]}>
+    <View style={[styles.inputsRow, { marginTop: dynamicScale(-12, true) }]}>
       {/* TODO: add a "new changes" button that parses the changelog, if it has new changes, will show a "!"-badge */}
       {!freshlyCreated && (
         <IconButton
@@ -202,8 +202,8 @@ ProfileForm.propTypes = {
 const styles = StyleSheet.create({
   form: {
     flex: 1,
-    marginTop: verticalScale(8),
-    maxHeight: verticalScale(30),
+    marginTop: dynamicScale(8, true),
+    maxHeight: dynamicScale(30, true),
   },
   nameRow: {
     flexDirection: "row",
@@ -213,10 +213,10 @@ const styles = StyleSheet.create({
     maxWidth: dynamicScale(100),
   },
   welcomeTextBar: {
-    marginTop: verticalScale(8),
+    marginTop: dynamicScale(8, true),
     marginHorizontal: dynamicScale(15),
     padding: dynamicScale(4),
-    minHeight: verticalScale(50),
+    minHeight: dynamicScale(50, true),
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -227,10 +227,10 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.primary700,
   },
   avatarBar: {
-    marginTop: verticalScale(10),
+    marginTop: dynamicScale(10, true),
     marginHorizontal: dynamicScale(15),
     padding: dynamicScale(4),
-    minHeight: verticalScale(30),
+    minHeight: dynamicScale(30, true),
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.primary700,
   },
   logoutContainer: {
-    marginBottom: verticalScale(-16),
+    marginBottom: dynamicScale(-16, true),
     alignItems: "flex-end",
     justifyContent: "flex-end",
   },
@@ -262,8 +262,8 @@ const styles = StyleSheet.create({
     fontSize: dynamicScale(24, false, 0.5),
     fontWeight: "bold",
     color: GlobalStyles.colors.backgroundColor,
-    marginTop: verticalScale(5),
-    marginBottom: verticalScale(24),
+    marginTop: dynamicScale(5, true),
+    marginBottom: dynamicScale(24, true),
     textAlign: "center",
   },
   categoryRow: {
@@ -289,22 +289,22 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
-    margin: verticalScale(8),
-    minHeight: verticalScale(100),
+    margin: dynamicScale(8, true),
+    minHeight: dynamicScale(100, true),
   },
   navButtonContainer: {
     flex: 1,
-    minHeight: verticalScale(150),
+    minHeight: dynamicScale(150, true),
     justifyContent: "flex-end",
     alignContent: "flex-end",
-    padding: verticalScale(4),
-    marginVertical: verticalScale(8),
-    marginTop: verticalScale(36),
+    padding: dynamicScale(4, true),
+    marginVertical: dynamicScale(8, true),
+    marginTop: dynamicScale(36, true),
   },
   navButton: {
     minWidth: dynamicScale(120),
-    marginVertical: verticalScale(8),
-    marginTop: verticalScale(36),
+    marginVertical: dynamicScale(8, true),
+    marginTop: dynamicScale(36, true),
   },
   button: {
     minWidth: dynamicScale(120),

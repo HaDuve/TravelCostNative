@@ -42,7 +42,12 @@ import { DEFAULTCATEGORIES } from "../util/category";
 import safeLogError from "../util/error";
 import { ExpenseData } from "../util/expense";
 import { formatExpenseWithCurrency } from "../util/string";
-import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 
 const FinderScreen = () => {
@@ -406,14 +411,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // margin: "4%",
-    padding: scale(20),
+    padding: dynamicScale(20),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   cardContainer: {
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: moderateScale(20),
-    padding: scale(20),
+    padding: dynamicScale(20),
     justifyContent: "space-around",
     // android styles
     ...Platform.select({
@@ -429,7 +434,7 @@ const styles = StyleSheet.create({
   },
   checkBoxContainer: {
     borderRadius: moderateScale(99),
-    marginRight: scale(8),
+    marginRight: dynamicScale(8),
     marginTop: verticalScale(20),
     ...Platform.select({
       ios: { borderWidth: 1 },
@@ -469,22 +474,22 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   findButton: {
-    marginHorizontal: scale(65),
+    marginHorizontal: dynamicScale(65),
     borderRadius: 99,
   },
   queryContainer: {
     flex: 1,
     marginTop: verticalScale(10),
 
-    marginLeft: scale(18),
-    maxWidth: scale(180),
+    marginLeft: dynamicScale(18),
+    maxWidth: dynamicScale(180),
   },
   autoCompleteStyle: {
     // flex: 1,
     zIndex: 0,
     fontSize: moderateScale(16, 0.4),
     paddingVertical: moderateScale(2, 2),
-    paddingHorizontal: scale(2),
+    paddingHorizontal: dynamicScale(2),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: moderateScale(5),
     // marginLeft: -8,
@@ -495,7 +500,7 @@ const styles = StyleSheet.create({
   },
   autoCompleteMenuStyle: {
     zIndex: 0,
-    marginLeft: scale(8),
+    marginLeft: dynamicScale(8),
     marginBottom: verticalScale(-1),
   },
 });

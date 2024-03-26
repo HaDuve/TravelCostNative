@@ -24,7 +24,12 @@ import { asyncStoreSafeClear } from "../../store/async-storage";
 import { getMMKVString } from "../../store/mmkv";
 import { NetworkContext } from "../../store/network-context";
 import { OrientationContext } from "../../store/orientation-context";
-import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -205,12 +210,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
-    maxWidth: scale(100),
+    maxWidth: dynamicScale(100),
   },
   welcomeTextBar: {
     marginTop: verticalScale(8),
-    marginHorizontal: scale(15),
-    padding: scale(4),
+    marginHorizontal: dynamicScale(15),
+    padding: dynamicScale(4),
     minHeight: verticalScale(50),
     flexDirection: "row",
     justifyContent: "center",
@@ -223,8 +228,8 @@ const styles = StyleSheet.create({
   },
   avatarBar: {
     marginTop: verticalScale(10),
-    marginHorizontal: scale(15),
-    padding: scale(4),
+    marginHorizontal: dynamicScale(15),
+    padding: dynamicScale(4),
     minHeight: verticalScale(30),
     flexDirection: "row",
     justifyContent: "space-between",
@@ -278,7 +283,7 @@ const styles = StyleSheet.create({
   errorText: {
     textAlign: "center",
     color: GlobalStyles.colors.error500,
-    margin: scale(8),
+    margin: dynamicScale(8),
   },
   buttonContainer: {
     flex: 1,
@@ -297,12 +302,12 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(36),
   },
   navButton: {
-    minWidth: scale(120),
+    minWidth: dynamicScale(120),
     marginVertical: verticalScale(8),
     marginTop: verticalScale(36),
   },
   button: {
-    minWidth: scale(120),
-    marginHorizontal: scale(8),
+    minWidth: dynamicScale(120),
+    marginHorizontal: dynamicScale(8),
   },
 });

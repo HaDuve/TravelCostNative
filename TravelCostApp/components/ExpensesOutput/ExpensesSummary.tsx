@@ -28,7 +28,12 @@ import {
   getTravellerSum,
 } from "../../util/expense";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
-import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../util/scalingUtil";
 
 const ExpensesSummary = ({
   expenses,
@@ -302,12 +307,12 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         paddingTop: verticalScale(4),
-        paddingLeft: scale(20),
+        paddingLeft: dynamicScale(20),
         marginBottom: verticalScale(-4),
       },
       android: {
         paddingTop: verticalScale(4),
-        paddingLeft: scale(20),
+        paddingLeft: dynamicScale(20),
         marginBottom: verticalScale(-4),
       },
     }),
@@ -315,7 +320,7 @@ const styles = StyleSheet.create({
   useMoreSpaceContainer: {
     paddingTop: verticalScale(8),
     paddingBottom: verticalScale(4),
-    marginLeft: scale(-4),
+    marginLeft: dynamicScale(-4),
     paddingLeft: 0,
   },
   sumTextContainer: {

@@ -59,7 +59,12 @@ import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { Platform } from "react-native";
 import { memo } from "react";
 import { getMMKVObject } from "../store/mmkv";
-import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 
 function RecentExpenses({ navigation }) {
@@ -429,7 +434,7 @@ function RecentExpenses({ navigation }) {
             style: {
               height: moderateScale(50),
               padding: moderateScale(4),
-              marginLeft: scale(4),
+              marginLeft: dynamicScale(4),
             },
           }}
           style={styles.dropdown}
@@ -478,7 +483,7 @@ const styles = StyleSheet.create({
   },
   dateHeader: {
     marginVertical: verticalScale(16),
-    marginLeft: scale(12),
+    marginLeft: dynamicScale(12),
     marginBottom: verticalScale(-20),
   },
   landscapeDateHeader: {
@@ -495,7 +500,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
     marginTop: verticalScale(24),
-    marginHorizontal: scale(12),
+    marginHorizontal: dynamicScale(12),
     marginBottom: verticalScale(12),
     zIndex: 10,
   },
@@ -505,7 +510,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     justifyContent: "space-between",
     alignItems: "center",
-    marginHorizontal: scale(12),
+    marginHorizontal: dynamicScale(12),
   },
   dropdownContainer: {
     maxWidth: moderateScale(160),

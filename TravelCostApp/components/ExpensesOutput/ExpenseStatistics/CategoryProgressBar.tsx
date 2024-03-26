@@ -15,7 +15,12 @@ import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { useState } from "react";
 import { UserContext } from "../../../store/user-context";
-import { moderateScale, scale, verticalScale } from "../../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
 
 const CategoryProgressBar = ({
@@ -67,7 +72,10 @@ const CategoryProgressBar = ({
           <Ionicons name={catSymbol} size={moderateScale(30)} color={color} />
         )}
         <Text
-          style={[styles.sum, { color: budgetColor, marginLeft: scale(8) }]}
+          style={[
+            styles.sum,
+            { color: budgetColor, marginLeft: dynamicScale(8) },
+          ]}
         >
           {getCatString(cat)}
         </Text>
@@ -103,10 +111,10 @@ CategoryProgressBar.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: scale(8),
+    padding: dynamicScale(8),
     paddingBottom: verticalScale(4),
-    marginLeft: scale(8),
-    marginRight: scale(10),
+    marginLeft: dynamicScale(8),
+    marginRight: dynamicScale(10),
     borderRadius: moderateScale(6),
     justifyContent: "space-between",
     alignItems: "flex-start",

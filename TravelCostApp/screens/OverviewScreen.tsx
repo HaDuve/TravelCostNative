@@ -38,7 +38,12 @@ import { TripContext } from "../store/trip-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { showBanner } from "../components/UI/ToastComponent";
-import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 
 const OverviewScreen = ({ navigation }) => {
@@ -194,7 +199,7 @@ const OverviewScreen = ({ navigation }) => {
             style: {
               height: moderateScale(50),
               padding: moderateScale(4),
-              marginLeft: scale(4),
+              marginLeft: dynamicScale(4),
             },
           }}
           // customItemLabelStyle={styles.dropdownItemLabel}
@@ -241,7 +246,7 @@ const styles = StyleSheet.create({
   },
   dateHeader: {
     marginTop: verticalScale(12),
-    marginLeft: scale(18),
+    marginLeft: dynamicScale(18),
     marginBottom: verticalScale(-4),
   },
   landscapeDateHeader: {
@@ -259,7 +264,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     // zIndex: 10,
     marginTop: verticalScale(18),
-    paddingHorizontal: scale(12),
+    paddingHorizontal: dynamicScale(12),
     marginBottom: verticalScale(12),
   },
   landscapeHeader: {
@@ -268,7 +273,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     justifyContent: "space-between",
     alignItems: "center",
-    marginHorizontal: scale(12),
+    marginHorizontal: dynamicScale(12),
   },
   dropdownContainer: {
     maxWidth: moderateScale(160),

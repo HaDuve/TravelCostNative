@@ -18,7 +18,12 @@ import {
   secureStoreGetItem,
   secureStoreSetItem,
 } from "../../store/secure-storage";
-import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../util/scalingUtil";
 
 function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
   const [enteredEmail, setEnteredEmail] = useState("");
@@ -245,11 +250,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttons: {
-    marginTop: scale(12),
+    marginTop: dynamicScale(12),
   },
   iconContainer: {
     marginTop: verticalScale(-30),
-    marginBottom: scale(10),
+    marginBottom: dynamicScale(10),
     alignItems: "center",
     justifyContent: "center",
     flex: 1,
@@ -263,16 +268,16 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
     fontSize: moderateScale(28),
     fontWeight: "bold",
-    marginBottom: scale(12),
+    marginBottom: dynamicScale(12),
   },
   subTitleText: {
     textAlign: "center",
     color: GlobalStyles.colors.gray700,
     fontSize: moderateScale(14),
-    marginBottom: scale(12),
+    marginBottom: dynamicScale(12),
   },
   appleAuthContainer: {
-    marginTop: scale(16),
+    marginTop: dynamicScale(16),
     justifyContent: "center",
     alignItems: "center",
   },
@@ -282,10 +287,10 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.gray600,
   },
   google: {
-    marginTop: scale(12),
-    margin: scale(4),
-    padding: scale(8),
-    paddingHorizontal: scale(32),
+    marginTop: dynamicScale(12),
+    margin: dynamicScale(4),
+    padding: dynamicScale(8),
+    paddingHorizontal: dynamicScale(32),
     borderWidth: 1,
     borderColor: GlobalStyles.colors.gray500,
     borderRadius: 8,

@@ -405,18 +405,18 @@ const styles = StyleSheet.create({
     alignContent: "center",
   },
   marginTemplate: {
-    marginHorizontal: scale(60),
+    marginHorizontal: dynamicScale(60),
   },
   templateContainer: {
     backgroundColor: GlobalStyles.colors.primary400,
     marginBottom: verticalScale(10),
     paddingVertical: verticalScale(20),
-    paddingHorizontal: scale(20),
+    paddingHorizontal: dynamicScale(20),
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "center",
-    minWidth: scale(330),
+    minWidth: dynamicScale(330),
   },
   addButton: {
     backgroundColor: GlobalStyles.colors.primary400,

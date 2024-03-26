@@ -30,7 +30,7 @@ import { MAX_JS_NUMBER, MAX_PERIOD_RANGE } from "../../../confAppConstants";
 import { SettingsContext } from "../../../store/settings-context";
 import { getExpensesSum } from "../../../util/expense";
 import FlatButton from "../../UI/FlatButton";
-import { moderateScale, scale, verticalScale } from "../../../util/scalingUtil";
+import { dynamicScale, moderateScale, scale, verticalScale } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
 
 const ExpenseGraph = ({
@@ -613,7 +613,7 @@ const styles = StyleSheet.create({
   },
   categoryCard: {
     height: verticalScale(65),
-    minWidth: scale(200),
+    minWidth: dynamicScale(200),
     ...Platform.select({
       ios: {
         shadowColor: "#000",
@@ -635,13 +635,13 @@ const styles = StyleSheet.create({
     }),
   },
   landscapeMaxWidth: {
-    maxWidth: scale(100),
+    maxWidth: dynamicScale(100),
   },
 
   itemContainer: {
     paddingVertical: verticalScale(12),
-    paddingHorizontal: scale(24),
-    marginHorizontal: scale(20),
+    paddingHorizontal: dynamicScale(24),
+    marginHorizontal: dynamicScale(20),
     marginTop: verticalScale(4),
     ...Platform.select({
       android: {

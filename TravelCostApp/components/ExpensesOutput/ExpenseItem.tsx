@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
   },
   textBase: {
     marginTop: verticalScale(2),
-    marginLeft: scale(4),
+    marginLeft: dynamicScale(4),
     color: GlobalStyles.colors.textColor,
   },
   description: {
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     marginTop: verticalScale(4),
-    marginRight: scale(8),
+    marginRight: dynamicScale(8),
     marginLeft: 0,
   },
   leftItem: {
@@ -418,17 +418,17 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   amountContainer: {
-    paddingHorizontal: scale(4),
+    paddingHorizontal: dynamicScale(4),
     paddingVertical: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,
-    minWidth: scale(80),
+    minWidth: dynamicScale(80),
   },
   amount: {
-    minWidth: scale(100),
-    maxWidth: scale(100),
+    minWidth: dynamicScale(100),
+    maxWidth: dynamicScale(100),
     textAlign: "center",
     fontSize: moderateScale(20),
     fontWeight: "300",
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
     fontWeight: "300",
   },
   countryFlagContainer: {
-    marginRight: scale(4),
+    marginRight: dynamicScale(4),
   },
   countryFlag: {
     marginTop: verticalScale(3),
@@ -449,13 +449,13 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     maxHeight: verticalScale(50),
-    padding: scale(4),
-    paddingRight: scale(10),
+    padding: dynamicScale(4),
+    paddingRight: dynamicScale(10),
     // center items left
     flexDirection: "row",
   },
   avatar: {
-    marginRight: scale(-6),
+    marginRight: dynamicScale(-6),
     minHeight: moderateScale(22),
     minWidth: moderateScale(22),
     borderRadius: 60,
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       android: {
         minHeight: verticalScale(22),
-        minWidth: scale(22),
+        minWidth: dynamicScale(22),
       },
     }),
   },

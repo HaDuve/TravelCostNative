@@ -8,7 +8,12 @@ import React, {
 } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
-import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../util/scalingUtil";
 
 const Input = ({
   label,
@@ -80,7 +85,7 @@ Input.propTypes = {
 
 const styles = StyleSheet.create({
   inputContainer: {
-    marginHorizontal: scale(16),
+    marginHorizontal: dynamicScale(16),
     marginVertical: verticalScale(4),
   },
   label: {
@@ -91,7 +96,7 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: GlobalStyles.colors.gray500,
     color: GlobalStyles.colors.primary700,
-    padding: scale(6),
+    padding: dynamicScale(6),
     borderRadius: 0,
     fontSize: moderateScale(18),
     borderBottomColor: GlobalStyles.colors.gray700,
@@ -99,8 +104,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   hasCurrencyStyle: {
-    paddingRight: scale(16),
-    marginRight: scale(-10),
+    paddingRight: dynamicScale(16),
+    marginRight: dynamicScale(-10),
   },
   inputMultiline: {
     minHeight: verticalScale(100),

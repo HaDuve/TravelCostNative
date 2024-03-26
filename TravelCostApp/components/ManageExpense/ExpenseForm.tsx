@@ -97,7 +97,7 @@ import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { Platform } from "react-native";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { MAX_EXPENSES_PERTRIP_NONPREMIUM } from "../../confAppConstants";
-import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import { dynamicScale, moderateScale, scale, verticalScale } from "../../util/scalingUtil";
 
 const ExpenseForm = ({
   onCancel,
@@ -843,7 +843,7 @@ const ExpenseForm = ({
       style={{
         marginTop: verticalScale(-8),
         paddingTop: verticalScale(8),
-        marginLeft: scale(8),
+        marginLeft: dynamicScale(8),
         // borderWidth: 1,
         // center the content
         flex: 1,
@@ -867,11 +867,11 @@ const ExpenseForm = ({
             justifyContent: "center",
             alignItems: "center",
             marginBottom: verticalScale(8),
-            marginLeft: scale(4),
+            marginLeft: dynamicScale(4),
             borderRadius: moderateScale(20),
             minHeight: moderateScale(50),
-            minWidth: scale(90),
-            marginRight: scale(8),
+            minWidth: dynamicScale(90),
+            marginRight: dynamicScale(8),
             backgroundColor: GlobalStyles.colors.backgroundColor,
             borderWidth: 1,
             borderColor: GlobalStyles.colors.gray700,
@@ -958,7 +958,7 @@ const ExpenseForm = ({
     return (
       <Pressable
         onPress={() => props.onPress(props.item.value)}
-        style={{ padding: scale(4) }}
+        style={{ padding: dynamicScale(4) }}
       >
         <Text style={[styles.dropdownTextStyle]}>{props.item.label}</Text>
       </Pressable>
@@ -1316,8 +1316,8 @@ const ExpenseForm = ({
                         <View
                           style={{
                             flexDirection: "row",
-                            marginLeft: scale(16),
-                            marginTop: scale(4),
+                            marginLeft: dynamicScale(16),
+                            marginTop: dynamicScale(4),
                           }}
                         >
                           {/* equal share equal pay button scale waage */}
@@ -1335,7 +1335,7 @@ const ExpenseForm = ({
                                 borderRadius: moderateScale(4),
                                 borderWidth: 1,
                                 borderColor: GlobalStyles.colors.gray700,
-                                marginRight: scale(8),
+                                marginRight: dynamicScale(8),
                               },
                               GlobalStyles.strongShadow,
                             ]}
@@ -1482,7 +1482,7 @@ const ExpenseForm = ({
                           color: GlobalStyles.colors.textColor,
                           fontSize: moderateScale(24, 0.3),
                           fontWeight: "bold",
-                          padding: scale(4),
+                          padding: dynamicScale(4),
                         }}
                       >
                         {i18n.t("confirm2")}
@@ -1490,7 +1490,7 @@ const ExpenseForm = ({
                     )}
                     min={1}
                     max={99}
-                    labelProps={{ style: { padding: scale(4) } }}
+                    labelProps={{ style: { padding: dynamicScale(4) } }}
                     modalProps={{
                       animationType: "slide",
                       presentationStyle: "pageSheet",
@@ -1607,7 +1607,7 @@ const ExpenseForm = ({
                                     ? GlobalStyles.colors.textColor
                                     : GlobalStyles.colors.error500,
                                   textAlign: "left",
-                                  marginLeft: scale(4),
+                                  marginLeft: dynamicScale(4),
                                   paddingTop: verticalScale(2),
                                   fontSize: moderateScale(14, 0.3),
                                 }}
@@ -1616,7 +1616,7 @@ const ExpenseForm = ({
                               </Text>
                               <Pressable
                                 style={{
-                                  paddingLeft: scale(16),
+                                  paddingLeft: dynamicScale(16),
                                   paddingBottom: verticalScale(16),
                                 }}
                                 onPress={() => {
@@ -1645,8 +1645,8 @@ const ExpenseForm = ({
                                 alignItems: "flex-end",
                                 overflow: "visible",
                                 // borderWidth: 1,
-                                marginLeft: scale(-16),
-                                marginRight: scale(-8),
+                                marginLeft: dynamicScale(-16),
+                                marginRight: dynamicScale(-8),
                               }}
                             >
                               <Input
@@ -1682,8 +1682,8 @@ const ExpenseForm = ({
                               <Text
                                 style={{
                                   paddingBottom: verticalScale(11),
-                                  marginLeft: scale(-18),
-                                  marginRight: scale(8),
+                                  marginLeft: dynamicScale(-18),
+                                  marginRight: dynamicScale(8),
                                 }}
                               >
                                 {getCurrencySymbol(inputs.currency.value)}
@@ -1922,7 +1922,7 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(14, 0.3),
   },
   autoCompleteMenuStyle: {
-    marginLeft: scale(8),
+    marginLeft: dynamicScale(8),
     marginBottom: verticalScale(-1),
     borderBottomWidth: 1,
     borderBottomColor: GlobalStyles.colors.primaryGrayed,
@@ -1938,8 +1938,8 @@ const styles = StyleSheet.create({
   },
 
   topCurrencyPressableContainer: {
-    padding: scale(8),
-    marginLeft: scale(-120),
+    padding: dynamicScale(8),
+    marginLeft: dynamicScale(-120),
   },
   topCurrencyText: {
     fontSize: moderateScale(12, 0.3),
@@ -2016,7 +2016,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
     marginTop: verticalScale(8),
     marginBottom: 0,
-    marginLeft: scale(8),
+    marginLeft: dynamicScale(8),
   },
   whoPaidContainer: {
     marginTop: verticalScale(20),
@@ -2029,7 +2029,7 @@ const styles = StyleSheet.create({
   },
   advancedText: {
     marginTop: verticalScale(9),
-    marginLeft: scale(12),
+    marginLeft: dynamicScale(12),
     fontSize: moderateScale(12, 0.3),
     fontStyle: "italic",
     fontWeight: "300",
@@ -2038,7 +2038,7 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(12, 0.3),
     fontWeight: "400",
     color: GlobalStyles.colors.textColor,
-    marginLeft: scale(-8),
+    marginLeft: dynamicScale(-8),
   },
   dateLabel: {
     marginTop: "4%",
@@ -2089,12 +2089,12 @@ const styles = StyleSheet.create({
   dropdownTextStyle: {
     fontSize: moderateScale(18, 0.3),
     color: GlobalStyles.colors.textColor,
-    padding: scale(4),
+    padding: dynamicScale(4),
   },
   dropdownListItemLabelStyle: {
     fontSize: moderateScale(18, 0.3),
     color: GlobalStyles.colors.textColor,
-    padding: scale(4),
+    padding: dynamicScale(4),
   },
   hidePickersStyle: {
     maxHeight: 0,
@@ -2102,7 +2102,7 @@ const styles = StyleSheet.create({
     opacity: 0,
   },
   advancedRowSplit: {
-    marginLeft: scale(36),
+    marginLeft: dynamicScale(36),
     flexDirection: "row",
     justifyContent: "flex-start",
   },
@@ -2133,8 +2133,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "stretch",
-    padding: scale(8),
-    margin: scale(4),
+    padding: dynamicScale(8),
+    margin: dynamicScale(4),
     overflow: "visible",
   },
 });

@@ -30,7 +30,12 @@ import Animated, {
 import { MAX_PERIOD_RANGE } from "../../confAppConstants";
 import { BlurView } from "expo-blur";
 import { TripContext } from "../../store/trip-context";
-import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
@@ -302,19 +307,19 @@ const styles = StyleSheet.create({
   },
   titleText: {
     marginTop: verticalScale(6),
-    minWidth: scale(200),
-    maxWidth: scale(200),
+    minWidth: dynamicScale(200),
+    maxWidth: dynamicScale(200),
     textAlign: "center",
     fontSize: moderateScale(22),
     fontWeight: "bold",
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
-    marginLeft: scale(6),
+    marginLeft: dynamicScale(6),
   },
   toggleButton: {
     flex: 1,
     // borderRadius: 10,
-    // marginHorizontal: scale(120),
+    // marginHorizontal:dynamicScale(120),
     marginBottom: verticalScale(-6),
     marginTop: verticalScale(-66),
     marginHorizontal: "50%",
@@ -326,7 +331,7 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
   landscapeToggleButtonContainer: {
-    marginLeft: scale(-600),
+    marginLeft: dynamicScale(-600),
     marginBottom: verticalScale(6),
   },
 });

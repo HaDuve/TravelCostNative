@@ -25,7 +25,12 @@ import FlatButton from "../components/UI/FlatButton";
 import GradientButton from "../components/UI/GradientButton";
 import { GlobalStyles } from "../constants/styles";
 import { secureStoreSetObject } from "../store/secure-storage";
-import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 
 //TODO: set the according URLS when we are live!
@@ -85,13 +90,13 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
                 ios: {
                   width: moderateScale(125, 0.6),
                   height: moderateScale(125, 0.6),
-                  margin: scale(12),
+                  margin: dynamicScale(12),
                   // marginTop: "-4%",
                 },
                 android: {
                   width: moderateScale(125),
                   height: moderateScale(125),
-                  margin: scale(12),
+                  margin: dynamicScale(12),
                 },
               }),
             },
@@ -103,7 +108,7 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
           source={require("../assets/stars.png")}
           style={[
             {
-              width: scale(180),
+              width: dynamicScale(180),
               height: verticalScale(24),
               marginBottom: verticalScale(12),
             },
@@ -175,8 +180,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    padding: scale(18),
+    padding: dynamicScale(18),
     borderRadius: moderateScale(10),
-    marginHorizontal: scale(12),
+    marginHorizontal: dynamicScale(12),
   },
 });

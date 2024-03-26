@@ -45,7 +45,12 @@ import { setAttributesAsync } from "../components/Premium/PremiumConstants";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import { NetworkContext } from "../store/network-context";
 import safeLogError from "../util/error";
-import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../util/scalingUtil";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -427,19 +432,19 @@ const styles = StyleSheet.create({
   innerContainer: {
     flex: 0,
     minHeight: verticalScale(100),
-    padding: scale(4),
+    padding: dynamicScale(4),
   },
 
   tripContainer: {
     flex: 1,
     // minHeight: "68%",
-    margin: scale(16),
+    margin: dynamicScale(16),
     marginBottom: verticalScale(-30),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   horizontalContainer: {
     marginTop: moderateScale(15, 0.3),
-    marginRight: scale(15),
+    marginRight: dynamicScale(15),
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -473,7 +478,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
-    marginLeft: scale(10),
+    marginLeft: dynamicScale(10),
   },
   deleteContainer: {
     marginTop: verticalScale(16),

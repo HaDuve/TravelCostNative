@@ -27,7 +27,12 @@ import { useContext } from "react";
 import { TripContext } from "../../../store/trip-context";
 import BlurPremium from "../../Premium/BlurPremium";
 import { processTitleStringFilteredPiecharts } from "../../../util/string";
-import { moderateScale, scale, verticalScale } from "../../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
 
 const ExpenseTravellers = ({ expenses, periodName, navigation }) => {
@@ -189,14 +194,14 @@ const styles = StyleSheet.create({
   },
   fallbackTextContainer: {
     flex: 1,
-    padding: scale(24),
+    padding: dynamicScale(24),
     marginTop: verticalScale(-150),
     alignItems: "center",
     justifyContent: "space-between",
   },
   categoryCard: {
     marginBottom: verticalScale(20),
-    marginHorizontal: scale(16),
+    marginHorizontal: dynamicScale(16),
     paddingBottom: verticalScale(12),
     shadowColor: "#000",
     shadowOffset: {

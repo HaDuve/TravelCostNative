@@ -962,7 +962,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
     fontSize: moderateScale(14),
     fontWeight: "300",
-    paddingHorizontal: scale(10),
+    paddingHorizontal: dynamicScale(10),
   },
   descriptionText: {
     // flex: 1,

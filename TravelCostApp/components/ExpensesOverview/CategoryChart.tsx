@@ -8,7 +8,12 @@ import { useContext } from "react";
 import { TripContext } from "../../store/trip-context";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { GlobalStyles } from "../../constants/styles";
-import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
 
 const CategoryChart = ({ inputData }) => {
@@ -42,7 +47,7 @@ const CategoryChart = ({ inputData }) => {
           isPortrait ? moderateScale(70, 0.5) : moderateScale(30, 0.5)
         }
         padAngle={0}
-        padding={isPortrait ? scale(10) : scale(8)}
+        padding={isPortrait ? dynamicScale(10) : dynamicScale(8)}
         labelPlacement="vertical"
         style={{
           data: {
@@ -52,7 +57,7 @@ const CategoryChart = ({ inputData }) => {
         }}
         labelComponent={
           <VictoryTooltip
-            center={{ x: scale(207), y: verticalScale(96) }}
+            center={{ x: dynamicScale(207), y: verticalScale(96) }}
             constrainToVisibleArea
             renderInPortal={false}
             pointerLength={0}
@@ -77,11 +82,11 @@ CategoryChart.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: scale(12),
+    padding: dynamicScale(12),
     paddingTop: verticalScale(60),
     justifyContent: "center",
     alignItems: "center",
-    marginHorizontal: scale(100),
+    marginHorizontal: dynamicScale(100),
     borderRadius: 9999,
   },
 });

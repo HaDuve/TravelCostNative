@@ -44,7 +44,12 @@ import safeLogError from "../util/error";
 import { canOpenURL } from "expo-linking";
 import DevContent from "../components/Settings/DevContent";
 import CurrencyExchangeInfo from "../components/UI/CurrencyExchangeInfo";
-import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../util/scalingUtil";
 
 const SettingsScreen = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
@@ -141,7 +146,7 @@ const SettingsScreen = ({ navigation }) => {
       stickyHeaderIndices={[0]}
       style={{
         flex: 1,
-        paddingHorizontal: scale(15),
+        paddingHorizontal: dynamicScale(15),
         backgroundColor: GlobalStyles.colors.backgroundColor,
         ...Platform.select({
           ios: {

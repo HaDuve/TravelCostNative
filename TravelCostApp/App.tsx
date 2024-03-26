@@ -109,6 +109,7 @@ import BackgroundFetchScreen, {
 } from "./taskmanager/backgroundTasks";
 import safeLogError from "./util/error";
 import {
+  dynamicScale,
   isTablet,
   moderateScale,
   scale,
@@ -414,7 +415,7 @@ function Home() {
           // marginBottom: "1%",
           // paddingBottom: "1%",
           height: verticalScale(50),
-          padding: scale(4),
+          padding: dynamicScale(4),
         },
         tabBarLabelStyle: {
           fontSize: moderateScale(10),

@@ -45,7 +45,12 @@ import { daysBetween } from "../../util/date";
 import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
 import safeLogError from "../../util/error";
 import { getTripData } from "../../util/trip";
-import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../util/scalingUtil";
 import { Platform } from "react-native";
 
 export type TripHistoryItemType = {
@@ -523,8 +528,8 @@ const styles = StyleSheet.create({
   },
   tripItem: {
     flex: 1,
-    padding: scale(12),
-    margin: scale(12),
+    padding: dynamicScale(12),
+    margin: dynamicScale(12),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: moderateScale(12),
     // android styles
@@ -552,15 +557,15 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(4),
     fontWeight: "300",
     fontStyle: "italic",
-    width: scale(110),
+    width: dynamicScale(110),
   },
   amountContainer: {
-    paddingHorizontal: scale(12),
+    paddingHorizontal: dynamicScale(12),
     paddingVertical: verticalScale(4),
     justifyContent: "center",
     alignItems: "center",
     borderRadius: moderateScale(4),
-    minWidth: scale(80),
+    minWidth: dynamicScale(80),
   },
   amount: {
     fontSize: moderateScale(12),
@@ -571,8 +576,8 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     justifyContent: "flex-start",
-    margin: scale(4),
-    padding: scale(8),
+    margin: dynamicScale(4),
+    padding: dynamicScale(8),
     borderRadius: moderateScale(16),
     maxWidth: "47%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -591,7 +596,7 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.gray500,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: scale(14),
+    marginRight: dynamicScale(14),
   },
   avatarText: {
     fontSize: moderateScale(14),

@@ -46,7 +46,12 @@ import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { Pressable, ScrollView } from "react-native";
-import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../util/scalingUtil";
 
 const SplitSummaryScreen = ({ navigation }) => {
   const {
@@ -398,13 +403,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    padding: scale(28),
+    padding: dynamicScale(28),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   cardContainer: {
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: scale(24),
+    paddingHorizontal: dynamicScale(24),
     paddingTop: verticalScale(24),
     paddingBottom: verticalScale(2),
     //card
@@ -412,11 +417,11 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(20),
     // borderWidth: 1,
     borderColor: GlobalStyles.colors.gray500,
-    minWidth: scale(300),
+    minWidth: dynamicScale(300),
     // android styles
     ...Platform.select({
       android: {
-        margin: scale(8),
+        margin: dynamicScale(8),
         marginTop: verticalScale(2),
       },
     }),
@@ -424,7 +429,7 @@ const styles = StyleSheet.create({
   button: {
     ...Platform.select({
       ios: {
-        marginLeft: scale(24),
+        marginLeft: dynamicScale(24),
         marginTop: verticalScale(50),
         borderRadius: 12,
         minHeight: 55,
@@ -437,7 +442,7 @@ const styles = StyleSheet.create({
   splitContainer: {
     flex: 1,
     flexDirection: "row",
-    paddingHorizontal: scale(16),
+    paddingHorizontal: dynamicScale(16),
     paddingVertical: verticalScale(8),
     marginVertical: verticalScale(8),
     borderWidth: 1,
@@ -449,7 +454,7 @@ const styles = StyleSheet.create({
     // android styles
     ...Platform.select({
       android: {
-        margin: scale(8),
+        margin: dynamicScale(8),
         minHeight: verticalScale(55),
       },
     }),
@@ -469,7 +474,7 @@ const styles = StyleSheet.create({
       ios: { marginTop: "-0%" },
       android: {
         // height: verticalScale(55),
-        marginVertical: scale(18),
+        marginVertical: dynamicScale(18),
         // flexDirection: "column",
         minHeight: verticalScale(100),
       },

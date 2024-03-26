@@ -3,7 +3,12 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { IStep, Labels, TooltipProps } from "rn-tourguide";
 import FlatButton from "./FlatButton";
 import { GlobalStyles } from "../../constants/styles";
-import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../util/scalingUtil";
 
 export interface TooltipProp {
   isFirstStep?: boolean;
@@ -73,14 +78,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingBottom: verticalScale(16),
-    width: scale(300),
+    width: dynamicScale(300),
     backgroundColor: "#ffffffef",
   },
   tooltip: {
     position: "absolute",
-    paddingHorizontal: scale(15),
+    paddingHorizontal: dynamicScale(15),
     overflow: "hidden",
-    width: scale(300),
+    width: dynamicScale(300),
     borderRadius: 16,
     paddingTop: verticalScale(24),
     alignItems: "center",
@@ -101,10 +106,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "space-around",
-    width: scale(220),
+    width: dynamicScale(220),
   },
   button: {
-    padding: scale(10),
+    padding: dynamicScale(10),
   },
   buttonText: {
     color: GlobalStyles.colors.primary700,

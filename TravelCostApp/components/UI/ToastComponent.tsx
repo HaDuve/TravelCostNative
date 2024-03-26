@@ -26,16 +26,21 @@ import { DEVELOPER_MODE } from "../../confAppConstants";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { Pressable } from "react-native";
-import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../util/scalingUtil";
 import { DeviceType, deviceType } from "expo-device";
 
 const MINHEIGHT = verticalScale(60);
 const MINHEIGHT_LOADINGBAR = verticalScale(88);
 const MAXHEIGHT = verticalScale(100);
-const MINWIDTH = scale(200);
-const MAXWIDTH = scale(300);
+const MINWIDTH = dynamicScale(200);
+const MAXWIDTH = dynamicScale(300);
 
-const CONTENTCONTAINERSTYLE: ViewStyle = { paddingLeft: scale(10) };
+const CONTENTCONTAINERSTYLE: ViewStyle = { paddingLeft: dynamicScale(10) };
 const SIZESTYLES: ViewStyle = {
   minHeight: MINHEIGHT,
   maxHeight: MAXHEIGHT,
@@ -115,7 +120,7 @@ const toastConfig: ToastConfig = {
         <Progress.Bar
           style={{
             marginTop: verticalScale(-22),
-            marginLeft: scale(14),
+            marginLeft: dynamicScale(14),
           }}
           progress={progress}
           color={loadingColor}
@@ -161,12 +166,12 @@ const toastConfig: ToastConfig = {
             <View
               style={{
                 flex: 1,
-                marginRight: scale(30),
+                marginRight: dynamicScale(30),
                 marginTop: progressValid
                   ? verticalScale(12)
                   : verticalScale(18),
                 maxHeight: MAXHEIGHT / 2,
-                maxWidth: scale(20),
+                maxWidth: dynamicScale(20),
               }}
             >
               {/* Below is just the spinner, the loading BAR is in loadingBarJSX */}
@@ -281,7 +286,7 @@ const toastConfig: ToastConfig = {
                   <View
                     style={{
                       flexDirection: "row",
-                      paddingHorizontal: scale(4),
+                      paddingHorizontal: dynamicScale(4),
                     }}
                   >
                     <Text style={styles.overviewTextSmall}>
@@ -376,7 +381,7 @@ const styles = StyleSheet.create({
     borderColor: GlobalStyles.colors.primaryGrayed,
     borderWidth: 1,
     borderRadius: 36,
-    paddingHorizontal: scale(30),
+    paddingHorizontal: dynamicScale(30),
     paddingVertical: verticalScale(12),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
   },
@@ -393,12 +398,12 @@ const styles = StyleSheet.create({
     overflow: "visible",
   },
   travellerItemProgressBarContainer: {
-    padding: scale(2),
+    padding: dynamicScale(2),
     overflow: "visible",
     zIndex: -1,
   },
   sumTextMoveRight: {
-    left: scale(110),
+    left: dynamicScale(110),
     position: "absolute",
     zIndex: 999,
   },
@@ -438,13 +443,13 @@ const styles = StyleSheet.create({
   },
   xCloseContainer: {
     marginTop: verticalScale(18),
-    marginLeft: scale(4),
+    marginLeft: dynamicScale(4),
   },
   xCloseButton: {
     borderRadius: 24,
     borderWidth: 1,
     borderColor: "white",
-    padding: scale(4),
+    padding: dynamicScale(4),
     // paddingHorizontal: 8,
     backgroundColor: "white",
   },
@@ -453,7 +458,7 @@ const styles = StyleSheet.create({
     maxWidth: "90%",
     borderColor: "black",
     borderRadius: 36,
-    paddingHorizontal: scale(30),
+    paddingHorizontal: dynamicScale(30),
     paddingVertical: verticalScale(12),
   },
   bannerText1: {

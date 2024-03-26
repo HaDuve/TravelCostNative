@@ -26,7 +26,12 @@ import FlatButton from "../UI/FlatButton";
 import AuthForm from "./AuthForm";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
-import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../util/scalingUtil";
 
 function AuthContent({ isLogin, onAuthenticate, isConnected }) {
   const navigation = useNavigation();
@@ -118,10 +123,10 @@ const styles = StyleSheet.create({
     // backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   authContent: {
-    padding: scale(16),
+    padding: dynamicScale(16),
     marginTop: verticalScale(30),
     marginBottom: verticalScale(20),
-    marginHorizontal: scale(16),
+    marginHorizontal: dynamicScale(16),
     ...Platform.select({
       android: {
         marginBottom: verticalScale(60),
@@ -150,7 +155,7 @@ const styles = StyleSheet.create({
   secondaryText: {
     fontSize: moderateScale(14),
     paddingVertical: verticalScale(8),
-    paddingHorizontal: scale(6),
+    paddingHorizontal: dynamicScale(6),
     color: GlobalStyles.colors.gray700,
     fontWeight: "300",
   },

@@ -25,7 +25,12 @@ import PropTypes from "prop-types";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { isSameDay } from "../../util/dateTime";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../util/scalingUtil";
 
 const ExpenseChart = ({
   inputData,
@@ -90,12 +95,12 @@ const ExpenseChart = ({
           onLoad: { duration: 1000 },
         }}
         padding={{
-          top: scale(20),
-          bottom: scale(30),
+          top: dynamicScale(20),
+          bottom: dynamicScale(30),
           left: verticalScale(60),
           right: verticalScale(30),
         }}
-        domainPadding={{ x: [scale(0), scale(20)] }}
+        domainPadding={{ x: [scale(0), dynamicScale(20)] }}
         containerComponent={
           // daysRange < 10 ? (
           <VictoryVoronoiContainer voronoiDimension="x" />
@@ -119,7 +124,7 @@ const ExpenseChart = ({
           domain={{ x: [firstItemDate, lastItemDate] }}
           labelComponent={
             <VictoryTooltip
-              center={{ x: scale(210), y: verticalScale(26) }}
+              center={{ x: dynamicScale(210), y: verticalScale(26) }}
               constrainToVisibleArea
               renderInPortal={false}
             />
@@ -147,7 +152,7 @@ const ExpenseChart = ({
         <VictoryBar
           labelComponent={
             <VictoryTooltip
-              center={{ x: scale(212), y: verticalScale(28) }}
+              center={{ x: dynamicScale(212), y: verticalScale(28) }}
               renderInPortal={false}
               constrainToVisibleArea
             />

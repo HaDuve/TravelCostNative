@@ -52,7 +52,12 @@ import BlurPremium from "../components/Premium/BlurPremium";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
 import { useMemo } from "react";
-import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../util/scalingUtil";
 
 const ManageCategoryScreen = ({ navigation }) => {
   // defaultCategories minus the last element (-new cat element)
@@ -314,7 +319,7 @@ const ManageCategoryScreen = ({ navigation }) => {
 
   function renderRowIconPicker({ item }) {
     return (
-      <View style={[{ margin: scale(5) }]}>
+      <View style={[{ margin: dynamicScale(5) }]}>
         <View
           style={{
             marginBottom: verticalScale(2),

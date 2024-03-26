@@ -47,7 +47,12 @@ import * as Progress from "react-native-progress";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import ExpenseCountryFlag from "../components/ExpensesOutput/ExpenseCountryFlag";
 import GradientButton from "../components/UI/GradientButton";
-import { moderateScale, scale, verticalScale } from "../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../util/scalingUtil";
 import { Platform } from "react-native";
 
 export type TripAsObject = {
@@ -312,7 +317,7 @@ const TripSummaryScreen = ({ navigation }) => {
     <Animated.ScrollView
       entering={FadeIn}
       exiting={FadeOut}
-      style={{ marginTop: moderateScale(12) }}
+      style={{ marginTop: dynamicScale(12, false, 0.5) }}
     >
       {tripSummary && (
         <View style={[styles.summaryContainer, GlobalStyles.shadow]}>
@@ -334,7 +339,7 @@ const TripSummaryScreen = ({ navigation }) => {
               color={progressBarColor}
               unfilledColor={GlobalStyles.colors.gray600}
               borderWidth={0}
-              borderRadius={moderateScale(8)}
+              borderRadius={dynamicScale(8, false, 0.5)}
               progress={progress}
               height={verticalScale(12)}
               width={scale(200)}
@@ -359,7 +364,7 @@ const TripSummaryScreen = ({ navigation }) => {
                       countryName={item.item}
                       style={GlobalStyles.countryFlagStyle}
                       containerStyle={[
-                        { padding: moderateScale(4) },
+                        { padding: dynamicScale(4, false, 0.5) },
                         GlobalStyles.shadow,
                       ]}
                     ></ExpenseCountryFlag>
@@ -520,38 +525,38 @@ TripSummaryScreen.propTypes = {
 
 const styles = StyleSheet.create({
   titleText: {
-    fontSize: moderateScale(20),
+    fontSize: dynamicScale(20, false, 0.5),
     fontWeight: "bold",
     textAlign: "center",
-    margin: moderateScale(16),
+    margin: dynamicScale(16, false, 0.5),
   },
   tripItemContainer: {
     flexDirection: "row",
     alignItems: "center",
-    padding: moderateScale(10),
-    margin: moderateScale(12),
-    marginHorizontal: moderateScale(16),
+    padding: dynamicScale(10, false, 0.5),
+    margin: dynamicScale(12, false, 0.5),
+    marginHorizontal: dynamicScale(16, false, 0.5),
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: moderateScale(10),
+    borderRadius: dynamicScale(10, false, 0.5),
     borderWidth: 1,
     borderColor: GlobalStyles.colors.gray600,
   },
   summaryContainer: {
-    padding: moderateScale(10),
-    margin: moderateScale(16),
+    padding: dynamicScale(10, false, 0.5),
+    margin: dynamicScale(16, false, 0.5),
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: moderateScale(10),
+    borderRadius: dynamicScale(10, false, 0.5),
     borderWidth: 1,
     borderColor: GlobalStyles.colors.gray600,
   },
   progressBarContainer: {
-    paddingHorizontal: moderateScale(12),
+    paddingHorizontal: dynamicScale(12, false, 0.5),
     paddingVertical: 4,
     marginBottom: 4,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,
-    minWidth: moderateScale(80),
+    minWidth: dynamicScale(80, false, 0.5),
     // android styles
     ...Platform.select({
       android: {
@@ -560,30 +565,30 @@ const styles = StyleSheet.create({
     }),
   },
   gradientButtonStyle: {
-    margin: moderateScale(16),
+    margin: dynamicScale(16, false, 0.5),
   },
   buttonContainer: {
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-evenly",
-    margin: moderateScale(16),
+    margin: dynamicScale(16, false, 0.5),
   },
   summaryTextBig: {
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "bold",
     textAlign: "center",
-    margin: moderateScale(4),
+    margin: dynamicScale(4, false, 0.5),
   },
   summaryText: {
-    fontSize: moderateScale(14),
+    fontSize: dynamicScale(14, false, 0.5),
     fontWeight: "300",
     textAlign: "center",
-    margin: moderateScale(4),
+    margin: dynamicScale(4, false, 0.5),
   },
   travellerCostItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    margin: moderateScale(4),
+    margin: dynamicScale(4, false, 0.5),
   },
 });

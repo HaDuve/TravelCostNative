@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: loadingColor,
-    fontSize: moderateScale(18),
+    fontSize: dynamicScale(18, false, 0.5),
     fontWeight: "300",
     marginTop: verticalScale(12),
   },

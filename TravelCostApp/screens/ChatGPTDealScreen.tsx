@@ -30,7 +30,11 @@ import { Image } from "react-native";
 import InfoButton from "../components/UI/InfoButton";
 import GradientButton from "../components/UI/GradientButton";
 import BlurPremium from "../components/Premium/BlurPremium";
-import { moderateScale, verticalScale } from "../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  verticalScale,
+} from "../util/scalingUtil";
 
 const GPTDealScreen = ({ route, navigation }) => {
   const { price, currency, country, product } = route.params;
@@ -108,7 +112,10 @@ const GPTDealScreen = ({ route, navigation }) => {
         <View style={[styles.image, GlobalStyles.shadowGlowPrimary]}>
           <Image
             source={require("../assets/chatgpt-logo.jpeg")}
-            style={{ width: moderateScale(40), height: moderateScale(40) }}
+            style={{
+              width: dynamicScale(40, false, 0.5),
+              height: dynamicScale(40, false, 0.5),
+            }}
           />
         </View>
         <View style={{ flexDirection: "row" }}>
@@ -173,12 +180,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   image: {
-    width: moderateScale(60),
-    height: moderateScale(60),
+    width: dynamicScale(60, false, 0.5),
+    height: dynamicScale(60, false, 0.5),
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: moderateScale(4),
-    paddingTop: moderateScale(8),
+    marginBottom: dynamicScale(4, false, 0.5),
+    paddingTop: dynamicScale(8, false, 0.5),
   },
   headerContainer: {
     flex: 1,
@@ -188,7 +195,7 @@ const styles = StyleSheet.create({
   },
   answerContainer: {
     flex: 4,
-    margin: moderateScale(20),
+    margin: dynamicScale(20, false, 0.5),
     // padding: 20,
     backgroundColor: "#fff",
     alignItems: "center",
@@ -197,15 +204,15 @@ const styles = StyleSheet.create({
     borderColor: GlobalStyles.colors.primaryGrayed,
   },
   loadingContainer: {
-    margin: moderateScale(20),
+    margin: dynamicScale(20, false, 0.5),
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     alignItems: "center",
     justifyContent: "center",
   },
   titleText: {
-    marginTop: moderateScale(4),
-    fontSize: moderateScale(24),
+    marginTop: dynamicScale(4, false, 0.5),
+    fontSize: dynamicScale(24, false, 0.5),
     fontWeight: "bold",
     color: GlobalStyles.colors.textColor,
   },
@@ -214,11 +221,11 @@ const styles = StyleSheet.create({
     marginHorizontal: "2%",
   },
   answerText: {
-    padding: moderateScale(20),
-    fontSize: moderateScale(16),
+    padding: dynamicScale(20, false, 0.5),
+    fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "300",
     fontStyle: "italic",
-    marginHorizontal: moderateScale(20),
+    marginHorizontal: dynamicScale(20, false, 0.5),
     color: GlobalStyles.colors.textColor,
   },
   buttonContainer: {

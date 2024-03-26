@@ -119,7 +119,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           icon={
             isGraphNotPie ? "play-skip-back-outline" : "chevron-back-outline"
           }
-          size={moderateScale(24)}
+          size={dynamicScale(24, false, 0.5)}
           onPress={async () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             if (isGraphNotPie) {
@@ -178,7 +178,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           icon={
             isGraphNotPie ? "add-circle-outline" : "chevron-forward-outline"
           }
-          size={moderateScale(24)}
+          size={dynamicScale(24, false, 0.5)}
           onPressIn={startAutoIncrement}
           onPressOut={stopAutoIncrement}
           color={GlobalStyles.colors.primaryGrayed}

@@ -444,7 +444,7 @@ function Home() {
           tabBarIcon: ({ color }) => (
             <Ionicons
               name="home-outline"
-              size={moderateScale(24)}
+              size={dynamicScale(24, false, 0.5)}
               color={color}
             />
           ),
@@ -476,7 +476,7 @@ function Home() {
           tabBarIcon: ({ color }) => (
             <Ionicons
               name={isShowingGraph ? "bar-chart-outline" : "pie-chart-outline"}
-              size={moderateScale(24)}
+              size={dynamicScale(24, false, 0.5)}
               color={color}
             />
           ),
@@ -495,7 +495,7 @@ function Home() {
             tabBarIcon: ({ color }) => (
               <Ionicons
                 name="search-outline"
-                size={moderateScale(24)}
+                size={dynamicScale(24, false, 0.5)}
                 color={color}
               />
             ),
@@ -515,7 +515,7 @@ function Home() {
             tabBarIcon: ({ color }) => (
               <Ionicons
                 name="cash-outline"
-                size={moderateScale(24)}
+                size={dynamicScale(24, false, 0.5)}
                 color={color}
               />
             ),
@@ -536,12 +536,12 @@ function Home() {
               {hasNewChanges && (
                 <Badge
                   style={{ position: "absolute" }}
-                  size={moderateScale(6)}
+                  size={dynamicScale(6, false, 0.5)}
                 />
               )}
               <Ionicons
                 name="globe-outline"
-                size={moderateScale(24)}
+                size={dynamicScale(24, false, 0.5)}
                 color={color}
               />
             </View>

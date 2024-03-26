@@ -3,7 +3,7 @@ import { countryToAlpha2 } from "country-to-iso";
 import CountryFlag from "react-native-country-flag";
 import PropTypes from "prop-types";
 import { View, StyleSheet } from "react-native";
-import { moderateScale } from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 
 const ExpenseCountryFlag = ({ countryName, style, containerStyle }) => {
   if (!countryName) return <></>;
@@ -13,7 +13,7 @@ const ExpenseCountryFlag = ({ countryName, style, containerStyle }) => {
     <View style={[styles.container, containerStyle]}>
       <CountryFlag
         isoCode={countryCode}
-        size={moderateScale(20)}
+        size={dynamicScale(20, false, 0.5)}
         style={style}
       />
     </View>

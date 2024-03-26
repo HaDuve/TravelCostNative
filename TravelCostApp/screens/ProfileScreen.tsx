@@ -355,12 +355,12 @@ const ProfileScreen = ({ navigation }) => {
           <TourGuideZone
             text={i18n.t("walk5")}
             shape={"circle"}
-            maskOffset={moderateScale(24)}
+            maskOffset={dynamicScale(24, false, 0.5)}
             zone={5}
           >
             <IconButton
               icon={"ios-earth"}
-              size={moderateScale(36)}
+              size={dynamicScale(36, false, 0.5)}
               buttonStyle={styles.newTripButtonContainer}
               color={GlobalStyles.colors.primary400}
               onPress={navigation.navigate.bind(this, "ManageTrip")}
@@ -390,7 +390,7 @@ const ProfileScreen = ({ navigation }) => {
               // icon="md-document-attach-outline"
               icon="list-outline"
               buttonStyle={[styles.addButton, GlobalStyles.shadowGlowPrimary]}
-              size={moderateScale(42)}
+              size={dynamicScale(42, false, 0.5)}
               color={GlobalStyles.colors.backgroundColor}
               onPress={() => {
                 // onShare(tripCtx.tripid, navigation);
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   horizontalContainer: {
-    marginTop: moderateScale(15, 0.3),
+    marginTop: dynamicScale(15, false, 0.3),
     marginRight: dynamicScale(15),
     flexDirection: "row",
     justifyContent: "space-between",
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   tripListTitle: {
-    fontSize: moderateScale(22),
+    fontSize: dynamicScale(22, false, 0.5),
     fontWeight: "bold",
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
@@ -489,8 +489,8 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: GlobalStyles.colors.primary400,
-    padding: moderateScale(16),
-    paddingHorizontal: moderateScale(16),
+    padding: dynamicScale(16, false, 0.5),
+    paddingHorizontal: dynamicScale(16, false, 0.5),
     marginBottom: verticalScale(4),
     borderRadius: 99,
   },
@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
     alignContent: "center",
   },
   offlineWarningText: {
-    fontSize: moderateScale(14),
+    fontSize: dynamicScale(14, false, 0.5),
     paddingVertical: "2%",
     paddingHorizontal: "2%",
     color: GlobalStyles.colors.gray700,

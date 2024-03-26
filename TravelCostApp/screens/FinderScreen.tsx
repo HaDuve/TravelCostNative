@@ -323,7 +323,7 @@ const FinderScreen = () => {
               {checkedQuery && (
                 <IconButton
                   icon="close-outline"
-                  size={moderateScale(26)}
+                  size={dynamicScale(26, false, 0.5)}
                   color={GlobalStyles.colors.textColor}
                   buttonStyle={{ marginTop: verticalScale(14) }}
                   onPressStyle={{
@@ -358,7 +358,7 @@ const FinderScreen = () => {
                 <IconButton
                   icon="close-outline"
                   color={GlobalStyles.colors.textColor}
-                  size={moderateScale(26)}
+                  size={dynamicScale(26, false, 0.5)}
                   buttonStyle={{ marginTop: verticalScale(14) }}
                   onPressStyle={{
                     backgroundColor: GlobalStyles.colors.gray500,
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
   cardContainer: {
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
-    borderRadius: moderateScale(20),
+    borderRadius: dynamicScale(20, false, 0.5),
     padding: dynamicScale(20),
     justifyContent: "space-around",
     // android styles
@@ -425,15 +425,15 @@ const styles = StyleSheet.create({
       android: {
         elevation: 10,
         shadowColor: "rgba(0, 0, 0, 1)",
-        marginHorizontal: moderateScale(12),
-        marginBottom: moderateScale(20),
-        marginTop: moderateScale(8),
+        marginHorizontal: dynamicScale(12, false, 0.5),
+        marginBottom: dynamicScale(20, false, 0.5),
+        marginTop: dynamicScale(8, false, 0.5),
         overflow: "visible",
       },
     }),
   },
   checkBoxContainer: {
-    borderRadius: moderateScale(99),
+    borderRadius: dynamicScale(99, false, 0.5),
     marginRight: dynamicScale(8),
     marginTop: verticalScale(20),
     ...Platform.select({
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     minHeight: verticalScale(90),
   },
   titleText: {
-    fontSize: moderateScale(32),
+    fontSize: dynamicScale(32, false, 0.5),
     fontWeight: "bold",
     paddingBottom: verticalScale(12),
     color: GlobalStyles.colors.textColor,
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   queryText: {
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     marginTop: verticalScale(65),
 
     marginBottom: verticalScale(18),
@@ -487,11 +487,11 @@ const styles = StyleSheet.create({
   autoCompleteStyle: {
     // flex: 1,
     zIndex: 0,
-    fontSize: moderateScale(16, 0.4),
-    paddingVertical: moderateScale(2, 2),
+    fontSize: dynamicScale(16, false, 0.4),
+    paddingVertical: dynamicScale(2, false, 2),
     paddingHorizontal: dynamicScale(2),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
-    borderRadius: moderateScale(5),
+    borderRadius: dynamicScale(5),
     // marginLeft: -8,
   },
   buttonContainer: {

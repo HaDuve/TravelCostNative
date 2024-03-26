@@ -1,6 +1,6 @@
 import { Platform } from "react-native";
 import { Layout } from "react-native-reanimated";
-import { moderateScale, verticalScale } from "../util/scalingUtil";
+import { dynamicScale, verticalScale } from "../util/scalingUtil";
 
 export const GlobalStyles = {
   colors: {
@@ -56,18 +56,18 @@ export const GlobalStyles = {
     textAlign: "center",
     fontStyle: "italic",
     fontWeight: "300",
-    fontSize: moderateScale(14),
+    fontSize: dynamicScale(14, false, 0.5),
   },
   backButton: {
     flex: 1,
-    padding: moderateScale(8),
-    marginBottom: moderateScale(-12),
+    padding: dynamicScale(8, false, 0.5),
+    marginBottom: dynamicScale(-12, false, 0.5),
   },
   row: { flexDirection: "row" },
   titleText: {
     textAlign: "center",
     color: "#434343",
-    fontSize: moderateScale(28),
+    fontSize: dynamicScale(28),
     fontWeight: "bold",
     marginBottom: verticalScale(12),
   },
@@ -76,17 +76,17 @@ export const GlobalStyles = {
     textAlign: "center",
     fontStyle: "italic",
     fontWeight: "300",
-    fontSize: moderateScale(14),
+    fontSize: dynamicScale(14, false, 0.5),
   },
   buttonTextFlat: {
     color: "#008C70",
     textAlign: "center",
     fontStyle: "italic",
     fontWeight: "300",
-    fontSize: moderateScale(14),
+    fontSize: dynamicScale(14, false, 0.5),
   },
   secondaryText: {
-    fontSize: moderateScale(14),
+    fontSize: dynamicScale(14, false, 0.5),
     color: "#626262",
     fontWeight: "300",
   },
@@ -154,8 +154,8 @@ export const GlobalStyles = {
     opacity: 0.9,
   },
   countryFlagStyle: {
-    width: moderateScale(30),
-    height: moderateScale(25),
+    width: dynamicScale(30, false, 0.5),
+    height: dynamicScale(25, false, 0.5),
     borderRadius: 1000,
     borderWidth: 1,
     borderColor: "#626262",
@@ -163,8 +163,8 @@ export const GlobalStyles = {
     justifyContent: "center",
   },
   countryFlagStyleBig: {
-    width: moderateScale(50),
-    height: moderateScale(35),
+    width: dynamicScale(50),
+    height: dynamicScale(35),
     borderRadius: 4,
   },
 };

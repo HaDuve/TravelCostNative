@@ -26,7 +26,7 @@ const DatePickerContainer = ({
       <View style={styles.dateIconContainer}>
         <IconButton
           icon={"calendar-outline"}
-          size={moderateScale(32)}
+          size={dynamicScale(32, false, 0.5)}
           color={GlobalStyles.colors.primary500}
           onPress={openDatePickerRange}
           buttonStyle={styles.buttonContainer}
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
 
     borderColor: GlobalStyles.colors.gray700,
-    borderRadius: moderateScale(5),
+    borderRadius: dynamicScale(5, false, 0.5),
     backgroundColor: GlobalStyles.colors.backgroundColor,
     // shadow
     elevation: 4,
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   advancedText: {
     marginTop: verticalScale(9),
     marginLeft: dynamicScale(12),
-    fontSize: moderateScale(12),
+    fontSize: dynamicScale(12, false, 0.5),
     fontStyle: "italic",
     fontWeight: "300",
   },

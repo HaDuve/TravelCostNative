@@ -36,7 +36,7 @@ const CategoryChart = ({ inputData }) => {
     <Animated.View exiting={FadeOut} entering={ZoomIn} style={styles.container}>
       <VictoryPie
         data={chartDataForRender}
-        height={isPortrait ? verticalScale(200) : moderateScale(100)}
+        height={isPortrait ? verticalScale(200) : dynamicScale(100, false, 0.5)}
         startAngle={-270}
         endAngle={90}
         animate={{
@@ -44,7 +44,9 @@ const CategoryChart = ({ inputData }) => {
           onLoad: { duration: 0 },
         }}
         innerRadius={
-          isPortrait ? moderateScale(70, 0.5) : moderateScale(30, 0.5)
+          isPortrait
+            ? dynamicScale(70, false, 0.5)
+            : dynamicScale(30, false, 0.5)
         }
         padAngle={0}
         padding={isPortrait ? dynamicScale(10) : dynamicScale(8)}

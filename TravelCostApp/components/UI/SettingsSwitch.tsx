@@ -2,7 +2,11 @@ import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import React from "react";
 import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
-import { moderateScale, verticalScale } from "../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  verticalScale,
+} from "../../util/scalingUtil";
 
 const SettingsSwitch = ({ style, toggleState, state, label, labelStyle }) => {
   return (
@@ -11,7 +15,7 @@ const SettingsSwitch = ({ style, toggleState, state, label, labelStyle }) => {
         <Text
           style={[
             {
-              fontSize: moderateScale(14),
+              fontSize: dynamicScale(14, false, 0.5),
               color: "#626262",
               fontWeight: "300",
             },
@@ -62,7 +66,7 @@ const styles = StyleSheet.create({
   },
   label: {
     color: GlobalStyles.colors.textColor,
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     marginBottom: verticalScale(16),
   },
 });

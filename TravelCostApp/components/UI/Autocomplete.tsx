@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { moderateScale } from "../../util/scalingUtil";
+import { dynamicScale, moderateScale } from "../../util/scalingUtil";
 
 const Autocomplete = ({
   value: origValue,
@@ -114,9 +114,9 @@ const Autocomplete = ({
                   }}
                   titleStyle={{
                     flex: 1,
-                    fontSize: moderateScale(12, 0.3),
-                    paddingTop: moderateScale(4),
-                    paddingBottom: moderateScale(24, 0.25),
+                    fontSize: dynamicScale(12, false, 0.3),
+                    paddingTop: dynamicScale(4, false, 0.5),
+                    paddingBottom: dynamicScale(24, false, 0.25),
                     // maxWidth: "100%",
                     width: "100%",
                   }}

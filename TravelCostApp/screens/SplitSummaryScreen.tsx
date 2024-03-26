@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
     paddingBottom: verticalScale(2),
     //card
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
-    borderRadius: moderateScale(20),
+    borderRadius: dynamicScale(20, false, 0.5),
     // borderWidth: 1,
     borderColor: GlobalStyles.colors.gray500,
     minWidth: dynamicScale(300),
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: GlobalStyles.colors.backgroundColor,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: moderateScale(44),
+    borderRadius: dynamicScale(44, false, 0.5),
     alignItems: "center",
     justifyContent: "center",
     // android styles
@@ -485,7 +485,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   userText: {
-    fontSize: moderateScale(18),
+    fontSize: dynamicScale(18, false, 0.5),
     fontWeight: "500",
     //italics
     fontStyle: "italic",
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     alignContent: "center",
   },
   normalText: {
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16),
     fontWeight: "300",
     color: GlobalStyles.colors.textColor, // center
     alignItems: "center",
@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   amountText: {
-    fontSize: moderateScale(18),
+    fontSize: dynamicScale(18, false, 0.5),
     fontWeight: "500",
     fontStyle: "italic",
 
@@ -520,7 +520,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   titleText: {
-    fontSize: moderateScale(32),
+    fontSize: dynamicScale(32, false, 0.5),
     fontWeight: "bold",
     paddingBottom: verticalScale(12),
     color: GlobalStyles.colors.textColor,
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
     alignContent: "flex-start",
   },
   subTitleText: {
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "300",
     fontStyle: "italic",
 

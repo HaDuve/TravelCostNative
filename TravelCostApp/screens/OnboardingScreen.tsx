@@ -60,9 +60,9 @@ OnboardingScreen.propTypes = {
 
 const styles = StyleSheet.create({
   titleStyle: {
-    paddingHorizontal: dynamicScale(20),
-    marginTop: dynamicScale(-20),
-    fontSize: moderateScale(28),
+    paddingHorizontal: dynamicScale(20, false, 0.5),
+    marginTop: dynamicScale(-20, false, 0.5),
+    fontSize: dynamicScale(28, false, 0.5),
     fontWeight: "bold",
   },
 });

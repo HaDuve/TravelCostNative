@@ -413,7 +413,7 @@ function TripHistoryItem({ tripid, trips }) {
                 color={GlobalStyles.colors.errorGrayed}
                 unfilledColor={GlobalStyles.colors.gray600}
                 borderWidth={0}
-                borderRadius={moderateScale(8)}
+                borderRadius={dynamicScale(8, false, 0.5)}
                 progress={activeProgress}
                 height={verticalScale(12)}
                 width={scale(150)}
@@ -425,7 +425,7 @@ function TripHistoryItem({ tripid, trips }) {
     );
   }
 
-  const dimensionChars = moderateScale(25, 0.4);
+  const dimensionChars = dynamicScale(25, false, 0.4);
 
   function renderTravellers(item) {
     if (!item.item?.userName) return <></>;
@@ -494,7 +494,7 @@ function TripHistoryItem({ tripid, trips }) {
               }
               unfilledColor={GlobalStyles.colors.gray600}
               borderWidth={0}
-              borderRadius={moderateScale(8)}
+              borderRadius={dynamicScale(8, false, 0.5)}
               progress={activeProgress}
               height={verticalScale(12)}
               width={scale(150)}
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
     padding: dynamicScale(12),
     margin: dynamicScale(12),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
-    borderRadius: moderateScale(12),
+    borderRadius: dynamicScale(12, false, 0.5),
     // android styles
     ...Platform.select({
       android: {
@@ -549,11 +549,11 @@ const styles = StyleSheet.create({
   },
   textBase: {
     color: GlobalStyles.colors.textColor,
-    fontSize: moderateScale(14),
+    fontSize: dynamicScale(14, false, 0.5),
     fontWeight: "300",
   },
   description: {
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     marginBottom: verticalScale(4),
     fontWeight: "300",
     fontStyle: "italic",
@@ -564,11 +564,11 @@ const styles = StyleSheet.create({
     paddingVertical: verticalScale(4),
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: moderateScale(4),
+    borderRadius: dynamicScale(4, false, 0.5),
     minWidth: dynamicScale(80),
   },
   amount: {
-    fontSize: moderateScale(12),
+    fontSize: dynamicScale(12, false, 0.5),
     color: GlobalStyles.colors.primary500,
     fontWeight: "bold",
   },
@@ -578,7 +578,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     margin: dynamicScale(4),
     padding: dynamicScale(8),
-    borderRadius: moderateScale(16),
+    borderRadius: dynamicScale(16, false, 0.5),
     maxWidth: "47%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
     // android styles
@@ -590,21 +590,21 @@ const styles = StyleSheet.create({
     }),
   },
   avatar: {
-    minHeight: moderateScale(20),
-    minWidth: moderateScale(20),
-    borderRadius: moderateScale(60),
+    minHeight: dynamicScale(20, false, 0.5),
+    minWidth: dynamicScale(20, false, 0.5),
+    borderRadius: dynamicScale(60, false, 0.5),
     backgroundColor: GlobalStyles.colors.gray500,
     alignItems: "center",
     justifyContent: "center",
     marginRight: dynamicScale(14),
   },
   avatarText: {
-    fontSize: moderateScale(14),
+    fontSize: dynamicScale(14, false, 0.5),
     fontWeight: "bold",
     color: GlobalStyles.colors.primary700,
   },
   travellerNameText: {
-    fontSize: moderateScale(14),
+    fontSize: dynamicScale(14, false, 0.5),
     fontWeight: "300",
     color: GlobalStyles.colors.textColor,
   },

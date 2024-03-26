@@ -432,8 +432,8 @@ function RecentExpenses({ navigation }) {
           dropDownContainerStyle={styles.dropdownContainerDropdown}
           itemProps={{
             style: {
-              height: moderateScale(50),
-              padding: moderateScale(4),
+              height: dynamicScale(50, false, 0.5),
+              padding: dynamicScale(4, false, 0.5),
               marginLeft: dynamicScale(4),
             },
           }}
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   dateString: {
-    fontSize: moderateScale(12),
+    fontSize: dynamicScale(12, false, 0.5),
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
   },
@@ -513,7 +513,7 @@ const styles = StyleSheet.create({
     marginHorizontal: dynamicScale(12),
   },
   dropdownContainer: {
-    maxWidth: moderateScale(160),
+    maxWidth: dynamicScale(160, false, 0.5),
     marginTop: verticalScale(6),
     ...Platform.select({
       ios: {
@@ -537,11 +537,14 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   dropdownTextStyle: {
-    fontSize: i18n.locale == "fr" ? moderateScale(20) : moderateScale(34),
+    fontSize:
+      i18n.locale == "fr"
+        ? dynamicScale(20, false, 0.5)
+        : dynamicScale(34, false, 0.5),
     fontWeight: "bold",
   },
   scaledUpTextStyle: {
-    fontSize: moderateScale(24),
+    fontSize: dynamicScale(24, false, 0.5),
   },
   zBehind: {
     zIndex: 10,

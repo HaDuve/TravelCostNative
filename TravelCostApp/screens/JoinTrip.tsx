@@ -47,7 +47,7 @@ import {
   isConnectionFastEnoughAsBool,
 } from "../util/connectionSpeed";
 import { sleep } from "../util/appState";
-import { moderateScale } from "../util/scalingUtil";
+import { dynamicScale, moderateScale } from "../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -238,7 +238,7 @@ const JoinTrip = ({ navigation, route }) => {
       </View>
       {!clickedOnLink && (
         <View style={styles.linkInputContainer}>
-          <Text style={{ fontSize: moderateScale(14) }}>
+          <Text style={{ fontSize: dynamicScale(14, false, 0.5) }}>
             {" "}
             {i18n.t("joinLink")}
           </Text>
@@ -272,8 +272,8 @@ const JoinTrip = ({ navigation, route }) => {
         <Text
           style={{
             alignSelf: "center",
-            padding: moderateScale(16),
-            fontSize: moderateScale(16),
+            padding: dynamicScale(16, false, 0.5),
+            fontSize: dynamicScale(16, false, 0.5),
           }}
         >
           {i18n.t("joinTrip")}?
@@ -282,8 +282,8 @@ const JoinTrip = ({ navigation, route }) => {
       <Text
         style={{
           alignSelf: "center",
-          padding: moderateScale(4),
-          fontSize: moderateScale(26),
+          padding: dynamicScale(4, false, 0.5),
+          fontSize: dynamicScale(26, false, 0.5),
           fontWeight: "bold",
         }}
       >
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
     margin: "5%",
     padding: "2%",
     backgroundColor: GlobalStyles.colors.gray500,
-    borderRadius: moderateScale(10),
+    borderRadius: dynamicScale(10, false, 0.5),
     borderWidth: 1,
     elevation: 3,
     borderColor: GlobalStyles.colors.gray600,
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     }),
   },
   titleText: {
-    fontSize: moderateScale(30),
+    fontSize: dynamicScale(30, false, 0.5),
     fontWeight: "bold",
   },
   buttonContainer: {
@@ -368,9 +368,9 @@ const styles = StyleSheet.create({
   linkInputContainer: {
     flex: 1,
     minHeight: "50%",
-    padding: moderateScale(24),
-    margin: moderateScale(16),
-    marginBottom: moderateScale(32),
+    padding: dynamicScale(24, false, 0.5),
+    margin: dynamicScale(16, false, 0.5),
+    marginBottom: dynamicScale(32, false, 0.5),
     borderWidth: 1,
     borderColor: GlobalStyles.colors.gray500,
   },

@@ -61,11 +61,11 @@ const toastConfig: ToastConfig = {
       ]}
       contentContainerStyle={CONTENTCONTAINERSTYLE}
       text1Style={{
-        fontSize: moderateScale(17),
+        fontSize: dynamicScale(17, false, 0.5),
         fontWeight: "500",
       }}
       text2Style={{
-        fontSize: moderateScale(15),
+        fontSize: dynamicScale(15, false, 0.5),
         fontWeight: "400",
       }}
       text1NumberOfLines={2}
@@ -87,11 +87,11 @@ const toastConfig: ToastConfig = {
       ]}
       contentContainerStyle={CONTENTCONTAINERSTYLE}
       text1Style={{
-        fontSize: moderateScale(17),
+        fontSize: dynamicScale(17, false, 0.5),
         fontWeight: "500",
       }}
       text2Style={{
-        fontSize: moderateScale(15),
+        fontSize: dynamicScale(15, false, 0.5),
         fontWeight: "400",
       }}
       text1NumberOfLines={2}
@@ -112,7 +112,7 @@ const toastConfig: ToastConfig = {
     const size = isTablet ? "large" : "small";
     const progressValid =
       progress && typeof progress == "number" && progress >= 0 && progress <= 1;
-    const barWidth = moderateScale(260, 0.4);
+    const barWidth = dynamicScale(260, false, 0.4);
     const loadingColor = GlobalStyles.colors.cat8;
     const unfilledColor = GlobalStyles.colors.gray600;
     const loadingBarJSX = progressValid ? (
@@ -126,7 +126,7 @@ const toastConfig: ToastConfig = {
           color={loadingColor}
           unfilledColor={unfilledColor}
           borderWidth={0}
-          borderRadius={moderateScale(8)}
+          borderRadius={dynamicScale(8, false, 0.5)}
           height={verticalScale(14)}
           width={barWidth}
         ></Progress.Bar>
@@ -153,11 +153,11 @@ const toastConfig: ToastConfig = {
           ]}
           contentContainerStyle={CONTENTCONTAINERSTYLE}
           text1Style={{
-            fontSize: moderateScale(17),
+            fontSize: dynamicScale(17, false, 0.5),
             fontWeight: "500",
           }}
           text2Style={{
-            fontSize: moderateScale(15),
+            fontSize: dynamicScale(15, false, 0.5),
             fontWeight: "400",
           }}
           text1NumberOfLines={2}
@@ -218,7 +218,7 @@ const toastConfig: ToastConfig = {
                 <Text
                   style={{
                     color: GlobalStyles.colors.gray700,
-                    fontSize: moderateScale(16),
+                    fontSize: dynamicScale(16, false, 0.5),
                   }}
                 >
                   X
@@ -314,7 +314,7 @@ const toastConfig: ToastConfig = {
                       progress={budgetProgress}
                       width={scale(180)}
                       height={verticalScale(20)}
-                      borderRadius={moderateScale(8)}
+                      borderRadius={dynamicScale(8, false, 0.5)}
                     ></Progress.Bar>
                   </View>
                 </View>
@@ -408,28 +408,28 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
   overviewTextInfo: {
-    fontSize: moderateScale(18),
+    fontSize: dynamicScale(18, false, 0.5),
     fontWeight: "200",
     color: GlobalStyles.colors.textColor,
     textAlign: "left",
     paddingVertical: verticalScale(8),
   },
   overviewTextSmall: {
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "200",
     color: GlobalStyles.colors.textColor,
     textAlign: "left",
     paddingVertical: verticalScale(4),
   },
   overViewTextTravellerSum: {
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "500",
     color: GlobalStyles.colors.gray300,
     textAlign: "left",
     paddingTop: verticalScale(5),
   },
   overviewTextTitle: {
-    fontSize: moderateScale(18),
+    fontSize: dynamicScale(18, false, 0.5),
     fontWeight: "400",
     color: GlobalStyles.colors.textColor,
     textAlign: "left",
@@ -462,13 +462,13 @@ const styles = StyleSheet.create({
     paddingVertical: verticalScale(12),
   },
   bannerText1: {
-    fontSize: moderateScale(18),
+    fontSize: dynamicScale(18, false, 0.5),
     fontWeight: "400",
     color: GlobalStyles.colors.textColor,
     textAlign: "center",
   },
   bannerText2: {
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "300",
     color: GlobalStyles.colors.textColor,
     textAlign: "center",

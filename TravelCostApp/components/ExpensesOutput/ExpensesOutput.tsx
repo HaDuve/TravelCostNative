@@ -79,7 +79,7 @@ function ExpensesOutput({
           {!showLoading && <Text style={styles.infoText}>{fallbackText}</Text>}
           {showYesterday && (
             <FlatButton
-              textStyle={{ marginVertical: moderateScale(4) }}
+              textStyle={{ marginVertical: dynamicScale(4, false, 0.5) }}
               onPress={() => {
                 navigation.navigate("FilteredExpenses", {
                   expenses: yesterdayExpenses,
@@ -92,7 +92,7 @@ function ExpensesOutput({
           )}
           {showTomorrow && (
             <FlatButton
-              textStyle={{ marginVertical: moderateScale(4) }}
+              textStyle={{ marginVertical: dynamicScale(4, false, 0.5) }}
               onPress={() => {
                 navigation.navigate("FilteredExpenses", {
                   expenses: tomorrowExpenses,

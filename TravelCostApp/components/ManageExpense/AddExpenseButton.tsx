@@ -160,7 +160,7 @@ const AddExpenseButton = ({ navigation }) => {
           }}
         >
           <IconButton
-            size={moderateScale(24)}
+            size={dynamicScale(24)}
             icon={categoryIcon}
             category={cat}
             color={GlobalStyles.colors.textColor}
@@ -383,7 +383,7 @@ const AddExpenseButton = ({ navigation }) => {
       >
         <Ionicons
           name={"add-outline"}
-          size={moderateScale(42)}
+          size={dynamicScale(42, false, 0.5)}
           color={GlobalStyles.colors.backgroundColor}
         />
       </Pressable>
@@ -437,12 +437,12 @@ const styles = StyleSheet.create({
     // width: "110%",
     fontStyle: "italic",
     fontWeight: "300",
-    fontSize: moderateScale(15),
+    fontSize: dynamicScale(15, false, 0.5),
     flexWrap: "wrap",
   },
   amountText: {
     fontWeight: "300",
-    fontSize: moderateScale(18),
+    fontSize: dynamicScale(18, false, 0.5),
     color: GlobalStyles.colors.textColor,
   },
   longPressedButton: {
@@ -469,26 +469,19 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "space-between",
   },
-  templateContainer: {
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-    borderRadius: 5,
-  },
   templateContainerTitle: {
     fontWeight: "300",
-    fontSize: 24,
+    fontSize: dynamicScale(24, false, 0.5),
     color: GlobalStyles.colors.gray300,
   },
   templateContainerSubtitle: {
     fontWeight: "300",
-    fontSize: 18,
+    fontSize: dynamicScale(18, false, 0.5),
     color: GlobalStyles.colors.gray300,
   },
   arrowDownSymbolText: {
     fontWeight: "300",
-    fontSize: 24,
+    fontSize: dynamicScale(24, false, 0.5),
     color: GlobalStyles.colors.gray300,
   },
 });

@@ -30,7 +30,12 @@ import { MAX_JS_NUMBER, MAX_PERIOD_RANGE } from "../../../confAppConstants";
 import { SettingsContext } from "../../../store/settings-context";
 import { getExpensesSum } from "../../../util/expense";
 import FlatButton from "../../UI/FlatButton";
-import { dynamicScale, moderateScale, scale, verticalScale } from "../../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
 
 const ExpenseGraph = ({
@@ -650,13 +655,13 @@ const styles = StyleSheet.create({
       },
     }),
     marginBottom: verticalScale(8),
-    borderRadius: moderateScale(10),
+    borderRadius: dynamicScale(10, false, 0.5),
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   text1: {
-    fontSize: moderateScale(20),
+    fontSize: dynamicScale(20, false, 0.5),
     color: GlobalStyles.colors.textColor,
     fontWeight: "300",
   },

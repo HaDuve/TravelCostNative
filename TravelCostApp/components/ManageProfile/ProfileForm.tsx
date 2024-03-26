@@ -88,7 +88,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
       {!freshlyCreated && (
         <IconButton
           icon={"newspaper-outline"}
-          size={moderateScale(36)}
+          size={dynamicScale(36, false, 0.5)}
           color={GlobalStyles.colors.textColor}
           // style={styles.button}
           onPress={() => {
@@ -105,7 +105,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
       {!freshlyCreated && (
         <IconButton
           icon={"settings-outline"}
-          size={moderateScale(36)}
+          size={dynamicScale(36, false, 0.5)}
           color={GlobalStyles.colors.textColor}
           // style={styles.button}
           onPress={() => {
@@ -116,7 +116,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
       )}
       <IconButton
         icon={"exit-outline"}
-        size={moderateScale(36)}
+        size={dynamicScale(36, false, 0.5)}
         color={GlobalStyles.colors.textColor}
         // style={styles.button}
         onPress={logoutHandler}
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   welcomeText: {
-    fontSize: moderateScale(36),
+    fontSize: dynamicScale(36, false, 0.5),
     fontWeight: "bold",
     color: GlobalStyles.colors.primary700,
   },
@@ -236,20 +236,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   avatar: {
-    minHeight: moderateScale(60),
-    minWidth: moderateScale(60),
-    borderRadius: moderateScale(60),
+    minHeight: dynamicScale(60, false, 0.5),
+    minWidth: dynamicScale(60, false, 0.5),
+    borderRadius: dynamicScale(60, false, 0.5),
     backgroundColor: GlobalStyles.colors.gray500,
     alignItems: "center",
     justifyContent: "center",
   },
   avatarText: {
-    fontSize: moderateScale(36),
+    fontSize: dynamicScale(36, false, 0.5),
     fontWeight: "bold",
     color: GlobalStyles.colors.primary700,
   },
   userText: {
-    fontSize: moderateScale(24),
+    fontSize: dynamicScale(24, false, 0.5),
     fontWeight: "bold",
     color: GlobalStyles.colors.primary700,
   },
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   title: {
-    fontSize: moderateScale(24),
+    fontSize: dynamicScale(24, false, 0.5),
     fontWeight: "bold",
     color: GlobalStyles.colors.backgroundColor,
     marginTop: verticalScale(5),

@@ -1,6 +1,6 @@
 import * as React from "react";
 import Svg, { G, Path } from "react-native-svg";
-import { moderateScale } from "../../util/scalingUtil";
+import { dynamicScale, moderateScale } from "../../util/scalingUtil";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
 
@@ -15,8 +15,8 @@ function ToggleButton({ toggled = false }) {
   return (
     <Svg
       xmlns="http://www.w3.org/2000/svg"
-      width={moderateScale(98)}
-      height={moderateScale(80)}
+      width={dynamicScale(98, false, 0.5)}
+      height={dynamicScale(80, false, 0.5)}
       fill="none"
       viewBox="0 0 98 50"
     >

@@ -284,10 +284,10 @@ const ExpensesSummary = ({
         color={budgetColor}
         unfilledColor={unfilledColor}
         borderWidth={0}
-        borderRadius={moderateScale(8)}
+        borderRadius={dynamicScale(8)}
         progress={budgetProgress}
         height={verticalScale(12)}
-        width={useMoreSpace ? moderateScale(180) : moderateScale(150)}
+        width={useMoreSpace ? dynamicScale(180) : dynamicScale(150)}
       />
     </Pressable>
   );

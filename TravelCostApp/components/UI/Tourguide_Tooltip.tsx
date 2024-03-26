@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   },
   tooltipText: {
     textAlign: "center",
-    fontSize: moderateScale(14),
+    fontSize: dynamicScale(14, false, 0.5),
     fontWeight: "300",
   },
   tooltipContainer: {

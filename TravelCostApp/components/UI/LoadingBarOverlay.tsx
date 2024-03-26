@@ -69,7 +69,7 @@ const LoadingBarOverlay = (props) => {
         color={loadingColor}
         unfilledColor={unfilledColor}
         borderWidth={0}
-        borderRadius={moderateScale(8)}
+        borderRadius={dynamicScale(8, false, 0.5)}
         progress={progress}
         height={verticalScale(14)}
         width={barWidth}
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: loadingColor,
-    fontSize: moderateScale(18),
+    fontSize: dynamicScale(18, false, 0.5),
     fontWeight: "300",
     marginTop: verticalScale(12),
   },

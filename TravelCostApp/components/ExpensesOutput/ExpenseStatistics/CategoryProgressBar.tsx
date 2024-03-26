@@ -69,7 +69,11 @@ const CategoryProgressBar = ({
     <Animated.View entering={ZoomIn} style={styles.container}>
       <View style={styles.titleRow}>
         {iconJSXOverride ?? (
-          <Ionicons name={catSymbol} size={moderateScale(30)} color={color} />
+          <Ionicons
+            name={catSymbol}
+            size={dynamicScale(30, false, 0.5)}
+            color={color}
+          />
         )}
         <Text
           style={[
@@ -88,10 +92,14 @@ const CategoryProgressBar = ({
         color={budgetColor}
         unfilledColor={unfilledColor}
         borderWidth={0}
-        borderRadius={moderateScale(8)}
+        borderRadius={dynamicScale(8)}
         progress={budgetProgress}
         height={verticalScale(14)}
-        width={isPortrait ? moderateScale(292, 0.96) : moderateScale(300, 0.3)}
+        width={
+          isPortrait
+            ? dynamicScale(292, false, 0.96)
+            : dynamicScale(300, false, 0.3)
+        }
       />
     </Animated.View>
   );

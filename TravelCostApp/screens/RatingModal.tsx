@@ -88,15 +88,15 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
             {
               ...Platform.select({
                 ios: {
-                  width: moderateScale(125, 0.6),
-                  height: moderateScale(125, 0.6),
-                  margin: dynamicScale(12),
+                  width: dynamicScale(125, false, 0.6),
+                  height: dynamicScale(125, false, 0.6),
+                  margin: dynamicScale(12, false, 0.5),
                   // marginTop: "-4%",
                 },
                 android: {
-                  width: moderateScale(125),
-                  height: moderateScale(125),
-                  margin: dynamicScale(12),
+                  width: dynamicScale(125, false, 0.5),
+                  height: dynamicScale(125, false, 0.5),
+                  margin: dynamicScale(12, false, 0.5),
                 },
               }),
             },
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(20),
   },
   titleText: {
-    fontSize: moderateScale(20),
+    fontSize: dynamicScale(20, false, 0.5),
     fontWeight: "bold",
     textAlign: "center",
     color: GlobalStyles.colors.textColor,
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(20),
   },
   subTitleText: {
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     textAlign: "center",
     color: GlobalStyles.colors.textColor,
   },
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,
     padding: dynamicScale(18),
-    borderRadius: moderateScale(10),
+    borderRadius: dynamicScale(10, false, 0.5),
     marginHorizontal: dynamicScale(12),
   },
 });

@@ -88,8 +88,8 @@ const ExpenseChart = ({
     <View style={styles.container}>
       <VictoryChart
         domain={{ x: [firstItemDate, lastItemDate] }}
-        height={moderateScale(160)}
-        width={moderateScale(360)}
+        height={dynamicScale(160, false, 0.5)}
+        width={dynamicScale(360, false, 0.5)}
         animate={{
           duration: 1000,
           onLoad: { duration: 1000 },

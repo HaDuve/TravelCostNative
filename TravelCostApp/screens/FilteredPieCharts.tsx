@@ -33,7 +33,11 @@ import BackButton from "../components/UI/BackButton";
 import AddExpenseHereButton from "../components/UI/AddExpensesHereButton";
 import { ExpenseData } from "../util/expense";
 import { getEarliestDate } from "../util/date";
-import { moderateScale, verticalScale } from "../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  verticalScale,
+} from "../util/scalingUtil";
 import { useOrientation } from "../components/Hooks/useOrientation";
 import { OrientationContext } from "../store/orientation-context";
 
@@ -111,7 +115,9 @@ const FilteredPieCharts = ({ navigation, route }) => {
     <View style={styles.container}>
       <View style={[!isPortrait && styles.landscapeTitleContainer]}>
         <View style={styles.firstTitleContainer}>
-          <BackButton style={{ marginTop: moderateScale(-16) }}></BackButton>
+          <BackButton
+            style={{ marginTop: dynamicScale(-16, false, 0.5) }}
+          ></BackButton>
           <Text style={styles.firstTitleText}>{dayString}</Text>
         </View>
 
@@ -177,7 +183,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   firstTitleText: {
-    fontSize: 20,
+    fontSize: dynamicScale(20, false, 0.5),
     fontWeight: "bold",
     color: GlobalStyles.colors.textColor,
     // center text
@@ -186,7 +192,7 @@ const styles = StyleSheet.create({
   landscapeTitleContainer: {
     flexDirection: "row-reverse",
     justifyContent: "space-between",
-    paddingHorizontal: moderateScale(80),
+    paddingHorizontal: dynamicScale(80, false, 0.5),
     marginTop: verticalScale(-24),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
@@ -221,7 +227,7 @@ const styles = StyleSheet.create({
     minWidth: 200,
     maxWidth: 200,
     textAlign: "center",
-    fontSize: 22,
+    fontSize: dynamicScale(22, false, 0.5),
     fontWeight: "bold",
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,

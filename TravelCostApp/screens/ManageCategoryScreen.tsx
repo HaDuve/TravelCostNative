@@ -200,7 +200,7 @@ const ManageCategoryScreen = ({ navigation }) => {
       >
         <Ionicons
           name={item.icon}
-          size={moderateScale(24, 0.3)}
+          size={dynamicScale(24, false, 0.3)}
           color={GlobalStyles.colors.textColor}
         />
         <TextInput
@@ -220,7 +220,7 @@ const ManageCategoryScreen = ({ navigation }) => {
         >
           <Ionicons
             name="trash-outline"
-            size={moderateScale(24, 0.3)}
+            size={dynamicScale(24, false, 0.3)}
             color={GlobalStyles.colors.textColor}
           />
         </TouchableOpacity>
@@ -422,8 +422,8 @@ const ManageCategoryScreen = ({ navigation }) => {
             style={[
               styles.inputContainer,
               bigDisplay && {
-                minHeight: moderateScale(284, 0.3),
-                maxHeight: moderateScale(284, 0.3),
+                minHeight: dynamicScale(284, false, 0.3),
+                maxHeight: dynamicScale(284, false, 0.3),
               },
               GlobalStyles.shadowPrimary,
             ]}
@@ -575,26 +575,26 @@ ManageCategoryScreen.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: moderateScale(16),
+    padding: dynamicScale(16),
   },
   inputContainer: {
     flex: 1,
     alignItems: "center",
-    minHeight: moderateScale(220, 0.3),
-    maxHeight: moderateScale(220, 0.3),
+    minHeight: dynamicScale(220, false, 0.3),
+    maxHeight: dynamicScale(220, false, 0.3),
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 8,
-    marginBottom: moderateScale(8),
-    padding: moderateScale(4),
+    marginBottom: dynamicScale(8, false, 0.5),
+    padding: dynamicScale(4, false, 0.5),
     // paddingHorizontal: 16,
   },
   newCategoryInput: {
     // center
     alignItems: "center",
     flex: 1,
-    height: moderateScale(40),
-    maxHeight: moderateScale(40),
-    fontSize: moderateScale(20),
+    height: dynamicScale(40, false, 0.5),
+    maxHeight: dynamicScale(40, false, 0.5),
+    fontSize: dynamicScale(20, false, 0.5),
     color: GlobalStyles.colors.primary400,
     borderBottomWidth: 1,
     borderBottomColor: GlobalStyles.colors.primary500,
@@ -604,23 +604,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   iconButton: {
-    padding: moderateScale(8),
-    marginHorizontal: moderateScale(8),
-    borderRadius: moderateScale(16),
+    padding: dynamicScale(8, false, 0.5),
+    marginHorizontal: dynamicScale(8, false, 0.5),
+    borderRadius: dynamicScale(16, false, 0.5),
   },
   selectedIconButton: {
     backgroundColor: GlobalStyles.colors.gray500Accent,
   },
   addButton: {
     backgroundColor: "#538076",
-    borderRadius: moderateScale(8),
-    paddingVertical: moderateScale(8),
-    paddingHorizontal: moderateScale(16),
-    marginBottom: moderateScale(12),
-    marginTop: moderateScale(-24),
+    borderRadius: dynamicScale(8, false, 0.5),
+    paddingVertical: dynamicScale(8, false, 0.5),
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+    marginBottom: dynamicScale(12, false, 0.5),
+    marginTop: dynamicScale(-24, false, 0.5),
   },
   addButtonText: {
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     color: GlobalStyles.colors.backgroundColor,
   },
   categoryItem: {
@@ -628,19 +628,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: moderateScale(8),
-    margin: moderateScale(8),
-    padding: moderateScale(16),
+    borderRadius: dynamicScale(8, false, 0.5),
+    margin: dynamicScale(8, false, 0.5),
+    padding: dynamicScale(16, false, 0.5),
     zIndex: 1,
   },
   categoryNameInput: {
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     color: "#434343",
-    marginLeft: moderateScale(16),
+    marginLeft: dynamicScale(16, false, 0.5),
     flex: 1,
   },
   deleteButton: {
-    marginLeft: moderateScale(16),
+    marginLeft: dynamicScale(16, false, 0.5),
   },
   modalStyle: {
     flex: 1,
@@ -649,20 +649,20 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: moderateScale(8),
-    padding: moderateScale(16),
+    borderRadius: dynamicScale(8, false, 0.5),
+    padding: dynamicScale(16, false, 0.5),
     width: "80%",
     height: "40%",
     justifyContent: "space-evenly",
   },
   modalTitle: {
-    fontSize: moderateScale(20),
+    fontSize: dynamicScale(20, false, 0.5),
     fontWeight: "bold",
     color: GlobalStyles.colors.primary400,
     textAlign: "center",
   },
   modalText: {
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     color: GlobalStyles.colors.primary400,
     textAlign: "center",
   },
@@ -672,31 +672,31 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     backgroundColor: GlobalStyles.colors.primary400,
-    borderRadius: moderateScale(8),
-    padding: moderateScale(8),
+    borderRadius: dynamicScale(8, false, 0.5),
+    padding: dynamicScale(8, false, 0.5),
     width: "40%",
   },
   modalButtonText: {
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     color: GlobalStyles.colors.backgroundColor,
     textAlign: "center",
   },
   infoModalContainer: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: moderateScale(8),
-    padding: moderateScale(16),
+    borderRadius: dynamicScale(8, false, 0.5),
+    padding: dynamicScale(16, false, 0.5),
     width: "80%",
     height: "40%",
     justifyContent: "space-evenly",
   },
   infoTitleText: {
-    fontSize: moderateScale(20),
+    fontSize: dynamicScale(20, false, 0.5),
     fontWeight: "bold",
     color: GlobalStyles.colors.textColor,
     textAlign: "center",
   },
   infoContentText: {
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     color: GlobalStyles.colors.textColor,
     textAlign: "center",
   },

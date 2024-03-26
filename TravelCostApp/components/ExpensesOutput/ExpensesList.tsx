@@ -417,9 +417,9 @@ function ExpensesList({
                 ? GlobalStyles.colors.textColor
                 : GlobalStyles.colors.gray700
             }
-            size={16}
+            size={dynamicScale(16, false, 0.5)}
             onPress={selectItem.bind(this, itemData.item.id)}
-            buttonStyle={{ padding: 48 }}
+            buttonStyle={{ padding: dynamicScale(48, false, 0.5) }}
           ></IconButton>
         </Animated.View>
       );
@@ -755,7 +755,7 @@ function ExpensesList({
             <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
               <IconButton
                 icon={"document-outline"}
-                size={moderateScale(24)}
+                size={dynamicScale(24)}
                 color={
                   selected?.length > 0
                     ? GlobalStyles.colors.gray700
@@ -769,7 +769,7 @@ function ExpensesList({
             <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
               <IconButton
                 icon={"ios-trash-outline"}
-                size={moderateScale(24)}
+                size={dynamicScale(24)}
                 color={
                   selected?.length > 0
                     ? GlobalStyles.colors.gray700
@@ -783,7 +783,7 @@ function ExpensesList({
             <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
               <IconButton
                 icon={"pie-chart-outline"}
-                size={moderateScale(24)}
+                size={dynamicScale(24)}
                 color={
                   selected?.length > 0
                     ? GlobalStyles.colors.gray700
@@ -797,7 +797,7 @@ function ExpensesList({
             <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
               <IconButton
                 icon={"md-arrow-undo-outline"}
-                size={moderateScale(24)}
+                size={dynamicScale(24, false, 0.5)}
                 color={
                   selected?.length > 0
                     ? GlobalStyles.colors.gray700
@@ -815,7 +815,7 @@ function ExpensesList({
                     ? "close-outline"
                     : "checkmark-done-outline"
                 }
-                size={moderateScale(24)}
+                size={dynamicScale(24, false, 0.5)}
                 color={GlobalStyles.colors.gray700}
                 onPress={selectAll}
               ></IconButton>
@@ -824,7 +824,7 @@ function ExpensesList({
 
           <IconButton
             icon={"ellipsis-horizontal-circle-outline"}
-            size={moderateScale(24)}
+            size={dynamicScale(24, false, 0.5)}
             color={GlobalStyles.colors.gray700}
             onPress={selectPressHandler}
           ></IconButton>

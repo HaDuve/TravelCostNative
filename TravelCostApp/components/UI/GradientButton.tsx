@@ -59,7 +59,7 @@ GradientButton.propTypes = {
 
 const styles = StyleSheet.create({
   button: {
-    padding: moderateScale(16),
+    padding: dynamicScale(16, false, 0.5),
     marginHorizontal: dynamicScale(4),
     backgroundColor: GlobalStyles.colors.primary500,
 

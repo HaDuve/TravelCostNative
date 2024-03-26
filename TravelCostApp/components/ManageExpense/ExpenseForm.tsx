@@ -97,7 +97,12 @@ import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { Platform } from "react-native";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { MAX_EXPENSES_PERTRIP_NONPREMIUM } from "../../confAppConstants";
-import { dynamicScale, moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../util/scalingUtil";
 
 const ExpenseForm = ({
   onCancel,
@@ -868,8 +873,8 @@ const ExpenseForm = ({
             alignItems: "center",
             marginBottom: verticalScale(8),
             marginLeft: dynamicScale(4),
-            borderRadius: moderateScale(20),
-            minHeight: moderateScale(50),
+            borderRadius: dynamicScale(20, false, 0.5),
+            minHeight: dynamicScale(50, false, 0.5),
             minWidth: dynamicScale(90),
             marginRight: dynamicScale(8),
             backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -878,7 +883,7 @@ const ExpenseForm = ({
           },
           GlobalStyles.strongShadow,
         ]}
-        size={moderateScale(44)}
+        size={dynamicScale(44, false, 0.5)}
         onPress={() => handleRecalculationSplits()}
         onLongPress={() => resetSplitHandler()}
       />
@@ -949,7 +954,7 @@ const ExpenseForm = ({
       <IconButton
         icon="checkmark-outline"
         color={GlobalStyles.colors.textColor}
-        size={moderateScale(26)}
+        size={dynamicScale(26, false, 0.5)}
       ></IconButton>
     </TouchableOpacity>
   );
@@ -1133,7 +1138,7 @@ const ExpenseForm = ({
                   ]}
                   icon={"add-outline"}
                   color={GlobalStyles.colors.textColor}
-                  size={moderateScale(24)}
+                  size={dynamicScale(24, false, 0.5)}
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     const _tempAmount = +tempAmount;
@@ -1151,7 +1156,7 @@ const ExpenseForm = ({
                   ]}
                   icon={"return-down-back-outline"}
                   color={GlobalStyles.colors.textColor}
-                  size={moderateScale(24)}
+                  size={dynamicScale(24, false, 0.5)}
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     const _tempAmount = +tempAmount;
@@ -1165,7 +1170,7 @@ const ExpenseForm = ({
                 buttonStyle={[styles.iconButton, GlobalStyles.strongShadow]}
                 icon={icon}
                 color={GlobalStyles.colors.primary500}
-                size={moderateScale(48, 0.4)}
+                size={dynamicScale(48, false, 0.4)}
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   navigation.navigate("CategoryPick", {
@@ -1185,7 +1190,7 @@ const ExpenseForm = ({
                         ? "arrow-down-circle-outline"
                         : "arrow-forward-circle-outline"
                     }
-                    size={moderateScale(28)}
+                    size={dynamicScale(28, false, 0.5)}
                     color={GlobalStyles.colors.primary500}
                   />
                   {hideAdvanced && (
@@ -1326,13 +1331,13 @@ const ExpenseForm = ({
                           {/* "expand-outline" */}
                           <IconButton
                             icon="people-circle-outline"
-                            size={moderateScale(28)}
+                            size={dynamicScale(28, false, 0.5)}
                             buttonStyle={[
                               {
                                 height: verticalScale(48),
                                 backgroundColor:
                                   GlobalStyles.colors.backgroundColor,
-                                borderRadius: moderateScale(4),
+                                borderRadius: dynamicScale(4, false, 0.5),
                                 borderWidth: 1,
                                 borderColor: GlobalStyles.colors.gray700,
                                 marginRight: dynamicScale(8),
@@ -1480,7 +1485,7 @@ const ExpenseForm = ({
                       <Text
                         style={{
                           color: GlobalStyles.colors.textColor,
-                          fontSize: moderateScale(24, 0.3),
+                          fontSize: dynamicScale(24, false, 0.3),
                           fontWeight: "bold",
                           padding: dynamicScale(4),
                         }}
@@ -1516,8 +1521,8 @@ const ExpenseForm = ({
                   style={[
                     styles.advancedRowSplit,
                     {
-                      marginTop: moderateScale(12),
-                      marginLeft: moderateScale(12),
+                      marginTop: dynamicScale(12, false, 0.5),
+                      marginLeft: dynamicScale(12, false, 0.5),
                     },
                   ]}
                 >
@@ -1556,17 +1561,19 @@ const ExpenseForm = ({
                       contentContainerStyle={{
                         flex: 1,
                         minWidth: splitList?.length
-                          ? splitList?.length * moderateScale(100) +
-                            moderateScale(200)
+                          ? splitList?.length * dynamicScale(100, false, 0.5) +
+                            dynamicScale(200, false, 0.5)
                           : 0,
-                        marginLeft: moderateScale(8),
-                        marginRight: moderateScale(8),
+                        marginLeft: dynamicScale(8, false, 0.5),
+                        marginRight: dynamicScale(8, false, 0.5),
                         justifyContent: "flex-start",
                         alignItems: "flex-start",
                       }}
                       ListHeaderComponent={recalcJSX}
                       ListFooterComponent={
-                        <View style={{ width: moderateScale(300) }}></View>
+                        <View
+                          style={{ width: dynamicScale(300, false, 0.5) }}
+                        ></View>
                       }
                       renderItem={(itemData) => {
                         const splitValue = itemData.item.amount.toString();
@@ -1575,13 +1582,13 @@ const ExpenseForm = ({
                             style={[
                               GlobalStyles.strongShadow,
                               {
-                                minWidth: moderateScale(100),
-                                marginTop: moderateScale(14),
-                                marginBottom: moderateScale(8),
+                                minWidth: dynamicScale(100, false, 0.5),
+                                marginTop: dynamicScale(14, false, 0.5),
+                                marginBottom: dynamicScale(8, false, 0.5),
                                 borderWidth: 1,
                                 borderRadius: 8,
-                                padding: moderateScale(8),
-                                margin: moderateScale(8),
+                                padding: dynamicScale(8, false, 0.5),
+                                margin: dynamicScale(8, false, 0.5),
                                 backgroundColor:
                                   GlobalStyles.colors.backgroundColor,
                                 borderColor: GlobalStyles.colors.gray700,
@@ -1595,7 +1602,7 @@ const ExpenseForm = ({
                             <View
                               style={{
                                 flexDirection: "row",
-                                paddingHorizontal: moderateScale(4),
+                                paddingHorizontal: dynamicScale(4, false, 0.5),
                                 // space out
                                 justifyContent: "space-between",
                                 flex: 1,
@@ -1609,7 +1616,7 @@ const ExpenseForm = ({
                                   textAlign: "left",
                                   marginLeft: dynamicScale(4),
                                   paddingTop: verticalScale(2),
-                                  fontSize: moderateScale(14, 0.3),
+                                  fontSize: dynamicScale(14, false, 0.3),
                                 }}
                               >
                                 {truncateString(itemData.item.userName, 10)}
@@ -1627,7 +1634,7 @@ const ExpenseForm = ({
                               >
                                 <Text
                                   style={{
-                                    fontSize: moderateScale(14, 0.3),
+                                    fontSize: dynamicScale(14, false, 0.3),
                                     color: GlobalStyles.colors.accent500,
                                     textAlign: "left",
                                     fontWeight: "600",
@@ -1780,7 +1787,7 @@ const ExpenseForm = ({
                   ]}
                   icon={"add-outline"}
                   color={GlobalStyles.colors.textColor}
-                  size={moderateScale(24)}
+                  size={dynamicScale(24, false, 0.5)}
                   onPress={() => {
                     // console.log("add button pressed!");
                   }}
@@ -1794,7 +1801,7 @@ const ExpenseForm = ({
                   ]}
                   icon={"return-down-back-outline"}
                   color={GlobalStyles.colors.textColor}
-                  size={moderateScale(24)}
+                  size={dynamicScale(24, false, 0.5)}
                   onPress={() => {
                     // console.log("sum button pressed");
                   }}
@@ -1881,7 +1888,7 @@ const styles = StyleSheet.create({
     // alignContent: "stretch",
   },
   amountInput: {
-    minWidth: moderateScale(150),
+    minWidth: dynamicScale(150, false, 0.5),
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 5,
     borderWidth: 1,
@@ -1894,9 +1901,9 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderColor: GlobalStyles.colors.gray700,
     borderRadius: 8,
-    padding: moderateScale(2),
-    margin: moderateScale(4),
-    maxHeight: moderateScale(32),
+    padding: dynamicScale(2, false, 0.5),
+    margin: dynamicScale(4, false, 0.5),
+    maxHeight: dynamicScale(32, false, 0.5),
     marginTop: "10.5%",
     marginLeft: "-18%",
   },
@@ -1906,20 +1913,20 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderColor: GlobalStyles.colors.gray700,
     borderRadius: 8,
-    padding: moderateScale(8),
-    margin: moderateScale(8),
+    padding: dynamicScale(8, false, 0.5),
+    margin: dynamicScale(8, false, 0.5),
   },
   descriptionContainer: {
     flex: 1,
     marginTop: verticalScale(12),
-    marginHorizontal: moderateScale(8),
-    marginLeft: moderateScale(12),
+    marginHorizontal: dynamicScale(8, false, 0.5),
+    marginLeft: dynamicScale(12, false, 0.5),
   },
   autoCompleteStyle: {
     flex: 1,
     backgroundColor: GlobalStyles.colors.gray500,
     borderRadius: 5,
-    fontSize: moderateScale(14, 0.3),
+    fontSize: dynamicScale(14, false, 0.3),
   },
   autoCompleteMenuStyle: {
     marginLeft: dynamicScale(8),
@@ -1932,9 +1939,9 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(20),
   },
   countryFlag: {
-    width: moderateScale(60),
-    height: moderateScale(40),
-    borderRadius: moderateScale(4),
+    width: dynamicScale(60, false, 0.5),
+    height: dynamicScale(40, false, 0.5),
+    borderRadius: dynamicScale(4, false, 0.5),
   },
 
   topCurrencyPressableContainer: {
@@ -1942,10 +1949,10 @@ const styles = StyleSheet.create({
     marginLeft: dynamicScale(-120),
   },
   topCurrencyText: {
-    fontSize: moderateScale(12, 0.3),
+    fontSize: dynamicScale(12, false, 0.3),
   },
   title: {
-    fontSize: moderateScale(24, 0.3),
+    fontSize: dynamicScale(24, false, 0.3),
     fontWeight: "bold",
     color: GlobalStyles.colors.backgroundColor,
     marginTop: verticalScale(5),
@@ -1980,7 +1987,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     marginLeft: "30%",
     marginTop: "1.5%",
-    fontSize: moderateScale(12, 0.3),
+    fontSize: dynamicScale(12, false, 0.3),
     fontWeight: "300",
     color: GlobalStyles.colors.textColor,
   },
@@ -2000,19 +2007,19 @@ const styles = StyleSheet.create({
     marginLeft: "1%",
   },
   currencyLabel: {
-    fontSize: moderateScale(12, 0.3),
+    fontSize: dynamicScale(12, false, 0.3),
     color: GlobalStyles.colors.textColor,
     marginTop: verticalScale(12),
-    marginLeft: moderateScale(14, 0.3),
-    marginBottom: moderateScale(-8, 0.3),
+    marginLeft: dynamicScale(14, false, 0.3),
+    marginBottom: dynamicScale(-8, false, 0.3),
   },
   whoPaidLabel: {
-    fontSize: moderateScale(12, 0.3),
+    fontSize: dynamicScale(12, false, 0.3),
     color: GlobalStyles.colors.textColor,
     marginBottom: verticalScale(4),
   },
   whoSharedLabel: {
-    fontSize: moderateScale(12, 0.3),
+    fontSize: dynamicScale(12, false, 0.3),
     color: GlobalStyles.colors.textColor,
     marginTop: verticalScale(8),
     marginBottom: 0,
@@ -2020,22 +2027,22 @@ const styles = StyleSheet.create({
   },
   whoPaidContainer: {
     marginTop: verticalScale(20),
-    marginHorizontal: moderateScale(16, 0.3),
+    marginHorizontal: dynamicScale(16, false, 0.3),
   },
   button: {
-    minWidth: moderateScale(200),
+    minWidth: dynamicScale(200, false, 0.5),
     marginHorizontal: 0,
     marginVertical: verticalScale(4),
   },
   advancedText: {
     marginTop: verticalScale(9),
     marginLeft: dynamicScale(12),
-    fontSize: moderateScale(12, 0.3),
+    fontSize: dynamicScale(12, false, 0.3),
     fontStyle: "italic",
     fontWeight: "300",
   },
   isSpecialLabel: {
-    fontSize: moderateScale(12, 0.3),
+    fontSize: dynamicScale(12, false, 0.3),
     fontWeight: "400",
     color: GlobalStyles.colors.textColor,
     marginLeft: dynamicScale(-8),
@@ -2048,12 +2055,12 @@ const styles = StyleSheet.create({
     // justifyContent: "space-between",
   },
   dateLabelText: {
-    fontSize: moderateScale(12, 0.3),
+    fontSize: dynamicScale(12, false, 0.3),
     fontWeight: "400",
     color: GlobalStyles.colors.textColor,
   },
   dateLabelDuplSplitText: {
-    fontSize: moderateScale(12, 0.3),
+    fontSize: dynamicScale(12, false, 0.3),
     fontWeight: "300",
     fontStyle: "italic",
     marginLeft: "2%",
@@ -2087,12 +2094,12 @@ const styles = StyleSheet.create({
     borderBottomColor: GlobalStyles.colors.gray700,
   },
   dropdownTextStyle: {
-    fontSize: moderateScale(18, 0.3),
+    fontSize: dynamicScale(18, false, 0.3),
     color: GlobalStyles.colors.textColor,
     padding: dynamicScale(4),
   },
   dropdownListItemLabelStyle: {
-    fontSize: moderateScale(18, 0.3),
+    fontSize: dynamicScale(18, false, 0.3),
     color: GlobalStyles.colors.textColor,
     padding: dynamicScale(4),
   },

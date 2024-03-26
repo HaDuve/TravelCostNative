@@ -172,7 +172,7 @@ const SettingsScreen = ({ navigation }) => {
         >
           <IconButton
             icon="arrow-back-outline"
-            size={moderateScale(36)}
+            size={dynamicScale(36, false, 0.5)}
             color={GlobalStyles.colors.textColor}
             buttonStyle={styles.backButton}
             onPress={() => navigation.goBack()}
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   },
   backButton: { marginBottom: "-14%" },
   titleText: {
-    fontSize: moderateScale(22),
+    fontSize: dynamicScale(22, false, 0.5),
     fontWeight: "bold",
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: "8%",
     borderRadius: 16,
     textAlign: "center",
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "bold",
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,

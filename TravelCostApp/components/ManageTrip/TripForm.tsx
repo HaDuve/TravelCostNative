@@ -668,11 +668,11 @@ const TripForm = ({ navigation, route }) => {
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
-              marginHorizontal: moderateScale(8),
-              marginBottom: moderateScale(-8),
+              marginHorizontal: dynamicScale(8, false, 0.5),
+              marginBottom: dynamicScale(-8, false, 0.5),
             }}
           >
-            <BackButton style={{ marginTop: moderateScale(-8) }}></BackButton>
+            <BackButton style={{ marginTop: dynamicScale(-8) }}></BackButton>
             {!isEditing && (
               <FlatButton
                 onPress={() => {
@@ -740,7 +740,7 @@ const TripForm = ({ navigation, route }) => {
                   <IconButton
                     icon="ios-git-compare-outline"
                     color={GlobalStyles.colors.primary500}
-                    size={moderateScale(36)}
+                    size={dynamicScale(36, false, 0.5)}
                     buttonStyle={[
                       styles.recalcButton,
                       GlobalStyles.strongShadow,
@@ -795,7 +795,7 @@ const TripForm = ({ navigation, route }) => {
                       <IconButton
                         icon="ios-git-compare-outline"
                         color={GlobalStyles.colors.primary500}
-                        size={moderateScale(36)}
+                        size={dynamicScale(36, false, 0.5)}
                         buttonStyle={[
                           styles.recalcButton,
                           GlobalStyles.strongShadow,
@@ -906,8 +906,8 @@ const TripForm = ({ navigation, route }) => {
               style={[
                 styles.button,
                 {
-                  marginVertical: moderateScale(8),
-                  marginHorizontal: moderateScale(24),
+                  marginVertical: dynamicScale(8, false, 0.5),
+                  marginHorizontal: dynamicScale(24, false, 0.5),
                 },
               ]}
               onPress={submitHandler.bind(this, true /* setActive */)}
@@ -929,7 +929,7 @@ const TripForm = ({ navigation, route }) => {
       </Animated.View>
       <View
         style={{
-          minHeight: moderateScale(60),
+          minHeight: dynamicScale(60, false, 0.5),
           zIndex: -10,
           backgroundColor: GlobalStyles.colors.backgroundColor,
         }}
@@ -968,7 +968,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   dynamicDailyLabel: {
-    fontSize: moderateScale(12),
+    fontSize: dynamicScale(12, false, 0.5),
     color: GlobalStyles.colors.textColor,
   },
   recalcButtonContainer: {
@@ -999,7 +999,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 10,
   },
   label: {
-    fontSize: moderateScale(12),
+    fontSize: dynamicScale(12, false, 0.5),
     color: GlobalStyles.colors.textColor,
     marginBottom: 4,
   },
@@ -1009,11 +1009,11 @@ const styles = StyleSheet.create({
     marginBottom: "4%",
   },
   title: {
-    fontSize: moderateScale(24),
+    fontSize: dynamicScale(24, false, 0.5),
     fontWeight: "bold",
     color: GlobalStyles.colors.textColor,
-    marginTop: moderateScale(5),
-    marginBottom: moderateScale(24),
+    marginTop: dynamicScale(5, false, 0.5),
+    marginBottom: dynamicScale(24, false, 0.5),
     textAlign: "center",
   },
   categoryRow: {
@@ -1028,7 +1028,7 @@ const styles = StyleSheet.create({
   errorText: {
     textAlign: "center",
     color: GlobalStyles.colors.error500,
-    margin: moderateScale(8),
+    margin: dynamicScale(8, false, 0.5),
   },
   buttonContainer: {
     flexDirection: "row",
@@ -1045,7 +1045,7 @@ const styles = StyleSheet.create({
   },
   modalStyle: {
     justifyContent: "center",
-    marginBottom: moderateScale(40),
+    marginBottom: dynamicScale(40, false, 0.5),
   },
   infoModalContainer: {
     flexDirection: "column",
@@ -1057,17 +1057,17 @@ const styles = StyleSheet.create({
     margin: "4%",
   },
   infoTitleText: {
-    fontSize: moderateScale(24),
+    fontSize: dynamicScale(24, false, 0.5),
     fontWeight: "bold",
     color: GlobalStyles.colors.textColor,
-    marginTop: moderateScale(5),
-    marginBottom: moderateScale(24),
+    marginTop: dynamicScale(5, false, 0.5),
+    marginBottom: dynamicScale(24, false, 0.5),
     textAlign: "center",
   },
   infoContentText: {
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     color: GlobalStyles.colors.textColor,
-    marginBottom: moderateScale(24),
+    marginBottom: dynamicScale(24, false, 0.5),
     textAlign: "center",
   },
 });

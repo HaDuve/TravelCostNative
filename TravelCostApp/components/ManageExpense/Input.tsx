@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     marginVertical: verticalScale(4),
   },
   label: {
-    fontSize: moderateScale(12),
+    fontSize: dynamicScale(12, false, 0.5),
     color: GlobalStyles.colors.textColor,
     marginBottom: verticalScale(4),
   },
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.primary700,
     padding: dynamicScale(6),
     borderRadius: 0,
-    fontSize: moderateScale(18),
+    fontSize: dynamicScale(18, false, 0.5),
     borderBottomColor: GlobalStyles.colors.gray700,
     borderBottomWidth: 1,
     textAlign: "center",

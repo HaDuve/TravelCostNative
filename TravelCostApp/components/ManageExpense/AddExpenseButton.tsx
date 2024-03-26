@@ -42,7 +42,12 @@ import { getCatSymbol } from "../../util/category";
 import IconButton from "../UI/IconButton";
 import uniqBy from "lodash.uniqby";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
 
 const PageLength = 20;
@@ -343,7 +348,13 @@ const AddExpenseButton = ({ navigation }) => {
   // }
   return (
     <Animated.View
-      style={styles.margin}
+      style={[
+        styles.margin,
+        {
+          maxHeight: dynamicScale(88, false, 0.7),
+          maxWidth: dynamicScale(88, false, 0.7),
+        },
+      ]}
       entering={SlideInDown}
       exiting={SlideOutDown}
     >
@@ -388,8 +399,6 @@ AddExpenseButton.propTypes = {
 
 const styles = StyleSheet.create({
   margin: {
-    maxHeight: moderateScale(88),
-    maxWidth: moderateScale(88),
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",

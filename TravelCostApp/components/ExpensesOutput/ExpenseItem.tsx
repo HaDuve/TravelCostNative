@@ -30,7 +30,13 @@ import { useEffect } from "react";
 import * as Haptics from "expo-haptics";
 import { ExpenseData } from "../../util/expense";
 import { useRef } from "react";
-import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../util/scalingUtil";
+import { OrientationContext } from "../../store/orientation-context";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -120,12 +126,16 @@ function ExpenseItem(props): JSX.Element {
   const sameCurrency = tripCurrency === currency;
 
   const { settings } = useContext(SettingsContext);
-  const toggle1 = settings.showFlags;
-  const toggle2 = settings.showWhoPaid;
-  const toggle3 = settings.hideSpecialExpenses;
-  const hideSpecial = toggle3 && isSpecialExpense;
+  const settingShowFlags = settings.showFlags;
+  const settingShowWhoPaid = settings.showWhoPaid;
+  const settingHideSpecialExpenses = settings.hideSpecialExpenses;
+  const hideSpecial = settingHideSpecialExpenses && isSpecialExpense;
 
   const navigateToExpense = useCallback(async () => {
+    if (!id) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      return;
+    }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     navigation.navigate("ManageExpense", {
       expenseId: id,
@@ -242,10 +252,13 @@ function ExpenseItem(props): JSX.Element {
   }, [date, todayString]);
   configureDateString();
 
-  if (!id) return <></>;
+  // if (!id) return <></>;
   return (
     <View
-      style={[{ height: verticalScale(55) }, hideSpecial && { opacity: 0.75 }]}
+      style={[
+        { height: dynamicScale(55, true) },
+        hideSpecial && { opacity: 0.75 },
+      ]}
     >
       <Pressable
         onPress={navigateToExpense}
@@ -255,11 +268,27 @@ function ExpenseItem(props): JSX.Element {
         }}
         style={({ pressed }) => pressed && GlobalStyles.pressed}
       >
-        <View style={styles.expenseItem}>
+        <View
+          style={[
+            styles.expenseItem,
+            {
+              height: dynamicScale(55, true),
+              paddingLeft: dynamicScale(16),
+              ...Platform.select({
+                ios: {
+                  paddingVertical: dynamicScale(8, true),
+                },
+                android: {
+                  paddingVertical: dynamicScale(6, true),
+                },
+              }),
+            },
+          ]}
+        >
           <View style={styles.iconContainer}>
             <Ionicons
               name={catSymbol}
-              size={moderateScale(28)}
+              size={dynamicScale(28, false, 0.5)}
               color={
                 hideSpecial
                   ? GlobalStyles.colors.textHidden
@@ -273,7 +302,7 @@ function ExpenseItem(props): JSX.Element {
               style={[
                 styles.textBase,
                 styles.description,
-                toggle1 && toggle2 && { width: "90%" },
+                settingShowFlags && settingShowWhoPaid && { width: "90%" },
                 hideSpecial && { color: GlobalStyles.colors.textHidden },
               ]}
             >
@@ -290,7 +319,7 @@ function ExpenseItem(props): JSX.Element {
               {dateString.current}
             </Text>
           </View>
-          {toggle1 && (
+          {settingShowFlags && (
             <View style={styles.countryFlag}>
               <ExpenseCountryFlag
                 countryName={country}
@@ -302,7 +331,7 @@ function ExpenseItem(props): JSX.Element {
               />
             </View>
           )}
-          {toggle2 && <View>{sharedList()}</View>}
+          {settingShowWhoPaid && <View>{sharedList()}</View>}
           <View style={styles.amountContainer}>
             <Text
               style={[
@@ -348,24 +377,13 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
   expenseItem: {
-    height: verticalScale(55),
     borderWidth: 0,
     borderColor: "black",
-
-    paddingLeft: scale(16),
     paddingRight: 0,
     marginLeft: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     flexDirection: "row",
     justifyContent: "space-between",
-    ...Platform.select({
-      ios: {
-        paddingVertical: verticalScale(8),
-      },
-      android: {
-        paddingVertical: verticalScale(6),
-      },
-    }),
   },
   textBase: {
     marginTop: verticalScale(2),

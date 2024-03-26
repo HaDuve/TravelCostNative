@@ -72,7 +72,12 @@ import {
 import { TripAsObject } from "../../screens/TripSummaryScreen";
 import { Pressable } from "react-native";
 import safeLogError from "../../util/error";
-import { moderateScale, scale, verticalScale } from "../../util/scalingUtil";
+import {
+  dynamicScale,
+  moderateScale,
+  scale,
+  verticalScale,
+} from "../../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -146,12 +151,12 @@ function ExpensesList({
     return (
       <View
         style={{
-          marginBottom: 2,
-          paddingTop: 14,
-          paddingLeft: 10,
+          marginBottom: dynamicScale(2, true, 0.5),
+          paddingTop: dynamicScale(14, true, 0.5),
+          paddingLeft: dynamicScale(10, true, 0.5),
           alignContent: "center",
           justifyContent: "center",
-          width: scale(55),
+          width: dynamicScale(55),
           backgroundColor: GlobalStyles.colors.error500,
         }}
       >
@@ -159,7 +164,7 @@ function ExpensesList({
         <IconButton
           icon="trash"
           color={GlobalStyles.colors.backgroundColor}
-          size={36}
+          size={dynamicScale(36, false, 0.5)}
           onPress={onClick}
           buttonStyle={{
             marginBottom: "0%",
@@ -344,7 +349,9 @@ function ExpensesList({
         itemData.item.id[5] === "w"
       )
         return (
-          <View style={{ height: verticalScale(55), width: "100%" }}></View>
+          <View
+            style={{ height: dynamicScale(55, true), width: "100%" }}
+          ></View>
         );
       const index = itemData.index;
       const navigateToExpense = async () => {
@@ -358,7 +365,14 @@ function ExpensesList({
         return (
           <View>
             <TouchableOpacity
-              style={styles.fastExpenseContainer}
+              style={[
+                styles.fastExpenseContainer,
+                {
+                  height: dynamicScale(55, true),
+                  paddingLeft: dynamicScale(16),
+                  paddingRight: dynamicScale(12),
+                },
+              ]}
               onPress={() => navigateToExpense()}
             >
               <View>
@@ -413,7 +427,7 @@ function ExpensesList({
         return (
           <View
             style={{
-              height: verticalScale(55),
+              height: dynamicScale(55, true),
               width: "100%",
               backgroundColor: GlobalStyles.colors.backgroundColor,
             }}
@@ -444,7 +458,7 @@ function ExpensesList({
         );
       //else platform ios
       return (
-        <View style={{ height: verticalScale(55), width: "100%" }}>
+        <View style={{ height: dynamicScale(55, true), width: "100%" }}>
           <Swipeable
             renderRightActions={(progress, dragX) =>
               renderRightActions(
@@ -728,12 +742,12 @@ function ExpensesList({
       expenses?.length < MAX_EXPENSES_RENDER && (
         <View
           style={{
-            paddingRight: scale(20),
-            marginTop: verticalScale(12),
+            paddingRight: dynamicScale(20),
+            marginTop: dynamicScale(12, true),
             alignItems: "center",
             justifyContent: "flex-end",
             flexDirection: "row",
-            height: verticalScale(55),
+            height: dynamicScale(55, true),
           }}
         >
           {/* hide until production ready */}
@@ -835,7 +849,7 @@ function ExpensesList({
       style={{
         paddingLeft: 0,
         backgroundColor: GlobalStyles.colors.backgroundColor,
-        height: verticalScale(550),
+        height: dynamicScale(550, true),
       }}
     >
       <Animated.FlatList
@@ -863,8 +877,8 @@ function ExpensesList({
         ListHeaderComponent={listHeaderJSX}
         keyExtractor={(item: Expense) => item.id}
         getItemLayout={(data, index) => ({
-          length: verticalScale(55),
-          offset: verticalScale(55) * index,
+          length: dynamicScale(55, true),
+          offset: dynamicScale(55, true) * index,
           index,
         })}
         initialScrollIndex={1}
@@ -938,14 +952,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   fastExpenseContainer: {
-    height: verticalScale(55),
     width: "100%",
     flexDirection: "row",
     alignContent: "center",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingLeft: scale(16),
-    paddingRight: scale(12),
   },
   fastExpenseText: {
     color: GlobalStyles.colors.textColor,

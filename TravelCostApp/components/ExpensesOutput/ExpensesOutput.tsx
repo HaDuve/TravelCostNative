@@ -24,7 +24,7 @@ import FlatButton from "../UI/FlatButton";
 import { useNavigation } from "@react-navigation/native";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { UserContext } from "../../store/user-context";
-import { moderateScale } from "../../util/scalingUtil";
+import { dynamicScale, moderateScale } from "../../util/scalingUtil";
 
 function ExpensesOutput({
   expenses,
@@ -159,8 +159,8 @@ const styles = StyleSheet.create({
   },
   infoText: {
     color: GlobalStyles.colors.textColor,
-    fontSize: moderateScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     textAlign: "center",
-    marginVertical: moderateScale(32),
+    marginVertical: dynamicScale(32, false, 0.5),
   },
 });

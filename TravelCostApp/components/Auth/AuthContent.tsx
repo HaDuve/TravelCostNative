@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   secondaryText: {
-    fontSize: moderateScale(14),
+    fontSize: dynamicScale(14, false, 0.5),
     paddingVertical: verticalScale(8),
     paddingHorizontal: dynamicScale(6),
     color: GlobalStyles.colors.gray700,

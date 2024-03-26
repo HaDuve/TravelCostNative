@@ -188,6 +188,6 @@ const styles = StyleSheet.create({
     shadowRadius: 2.84,
     elevation: 5,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: moderateScale(10),
+    borderRadius: dynamicScale(10, false, 0.5),
   },
 });

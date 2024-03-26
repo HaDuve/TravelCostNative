@@ -403,7 +403,7 @@ function Home() {
         tabBarStyle: {
           backgroundColor: GlobalStyles.colors.gray500,
           // paddingTop: 4,
-          borderTopWidth: moderateScale(1),
+          borderTopWidth: dynamicScale(1, false, 0.5),
           borderTopColor: GlobalStyles.colors.gray600,
           height: verticalScale(50),
         },
@@ -418,16 +418,16 @@ function Home() {
           padding: dynamicScale(4),
         },
         tabBarLabelStyle: {
-          fontSize: moderateScale(10),
+          fontSize: dynamicScale(10, false, 0.5),
         },
         tabBarIconStyle: {
-          height: moderateScale(25),
-          width: moderateScale(25),
+          height: dynamicScale(25, false, 0.5),
+          width: dynamicScale(25, false, 0.5),
         },
         tabBarActiveTintColor: GlobalStyles.colors.primary500,
         tabBarIndicatorStyle: {
           backgroundColor: GlobalStyles.colors.primary500,
-          borderWidth: moderateScale(1),
+          borderWidth: dynamicScale(1, false, 0.5),
           borderColor: GlobalStyles.colors.primary500,
         },
         tabBarBounces: true,

@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     minWidth: dynamicScale(200),
     maxWidth: dynamicScale(200),
     textAlign: "center",
-    fontSize: moderateScale(22),
+    fontSize: dynamicScale(22, false, 0.5),
     fontWeight: "bold",
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,

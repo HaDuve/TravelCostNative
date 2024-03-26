@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   sum: {
-    fontSize: moderateScale(32),
+    fontSize: dynamicScale(32, false, 0.5),
     fontWeight: "bold",
     // padding: 4,
     color: GlobalStyles.colors.primary500,

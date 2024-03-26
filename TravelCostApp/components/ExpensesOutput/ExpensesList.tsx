@@ -939,8 +939,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: verticalScale(10),
     alignSelf: "center",
-    paddingHorizontal: moderateScale(8),
-    paddingVertical: moderateScale(4),
+    paddingHorizontal: dynamicScale(8, false, 0.5),
+    paddingVertical: dynamicScale(4, false, 0.5),
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 50,
     borderColor: GlobalStyles.colors.primaryGrayed,
@@ -948,7 +948,7 @@ const styles = StyleSheet.create({
   },
   scrollToTopText: {
     color: GlobalStyles.colors.primary700,
-    fontSize: moderateScale(14),
+    fontSize: dynamicScale(14, false, 0.5),
     fontWeight: "bold",
   },
   fastExpenseContainer: {
@@ -960,7 +960,7 @@ const styles = StyleSheet.create({
   },
   fastExpenseText: {
     color: GlobalStyles.colors.textColor,
-    fontSize: moderateScale(14),
+    fontSize: dynamicScale(14, false, 0.5),
     fontWeight: "300",
     paddingHorizontal: dynamicScale(10),
   },
@@ -969,14 +969,14 @@ const styles = StyleSheet.create({
     // width: "110%",
     fontStyle: "italic",
     fontWeight: "300",
-    fontSize: moderateScale(15),
+    fontSize: dynamicScale(15, false, 0.5),
     zIndex: 2,
     flexWrap: "wrap",
     flexDirection: "row",
   },
   secondaryText: {
     color: GlobalStyles.colors.gray700,
-    fontSize: moderateScale(13),
+    fontSize: dynamicScale(13, false, 0.5),
     zIndex: 1,
   },
 });

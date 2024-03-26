@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     paddingBottom: verticalScale(4),
     marginLeft: dynamicScale(8),
     marginRight: dynamicScale(10),
-    borderRadius: moderateScale(6),
+    borderRadius: dynamicScale(6, false, 0.5),
     justifyContent: "space-between",
     alignItems: "flex-start",
   },
@@ -127,11 +127,11 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(4),
   },
   period: {
-    fontSize: moderateScale(12),
+    fontSize: dynamicScale(12, false, 0.5),
     color: GlobalStyles.colors.primary500,
   },
   sum: {
-    fontSize: moderateScale(22),
+    fontSize: dynamicScale(22, false, 0.5),
     fontWeight: "300",
     color: GlobalStyles.colors.primary500,
   },

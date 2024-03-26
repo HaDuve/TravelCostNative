@@ -156,7 +156,10 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
         <View style={styles.iconContainer}>
           <Image
             source={require("../../assets/icon2.png")}
-            style={{ width: moderateScale(60), height: moderateScale(60) }}
+            style={{
+              width: dynamicScale(60, false, 0.5),
+              height: dynamicScale(60, false, 0.5),
+            }}
           />
         </View>
         <View style={styles.titleContainer}>
@@ -266,14 +269,14 @@ const styles = StyleSheet.create({
   titleText: {
     textAlign: "center",
     color: GlobalStyles.colors.textColor,
-    fontSize: moderateScale(28),
+    fontSize: dynamicScale(28, false, 0.5),
     fontWeight: "bold",
     marginBottom: dynamicScale(12),
   },
   subTitleText: {
     textAlign: "center",
     color: GlobalStyles.colors.gray700,
-    fontSize: moderateScale(14),
+    fontSize: dynamicScale(14, false, 0.5),
     marginBottom: dynamicScale(12),
   },
   appleAuthContainer: {
@@ -282,7 +285,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   orText: {
-    fontSize: moderateScale(12),
+    fontSize: dynamicScale(12, false, 0.5),
     fontWeight: "bold",
     color: GlobalStyles.colors.gray600,
   },
@@ -296,7 +299,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   googleText: {
-    fontSize: moderateScale(18),
+    fontSize: dynamicScale(18, false, 0.5),
     color: GlobalStyles.colors.textColor,
   },
 });

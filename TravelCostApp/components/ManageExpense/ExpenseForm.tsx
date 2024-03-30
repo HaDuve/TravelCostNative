@@ -959,17 +959,6 @@ const ExpenseForm = ({
     </TouchableOpacity>
   );
 
-  const renderDropDownList = (props: RenderListItemPropsInterface<string>) => {
-    return (
-      <Pressable
-        onPress={() => props.onPress(props.item.value)}
-        style={{ padding: dynamicScale(4) }}
-      >
-        <Text style={[styles.dropdownTextStyle]}>{props.item.label}</Text>
-      </Pressable>
-    );
-  };
-
   const isPaidJSX = (
     <View style={styles.isPaidContainer}>
       <SegmentedButtons

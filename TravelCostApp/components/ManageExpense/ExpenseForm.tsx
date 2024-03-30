@@ -194,11 +194,11 @@ const ExpenseForm = ({
     },
   });
   const [tempAmount, setTempAmount] = useState("");
-  const bothTempAndInputAmount = !!(inputs.amount.value && tempAmount);
-  const bothTempAndInputAmountValue = +inputs.amount.value + +tempAmount;
-  const amountValue = bothTempAndInputAmount
-    ? bothTempAndInputAmountValue
-    : inputs.amount.value || tempAmount;
+  const hasTempAndInput = !!(inputs.amount.value && tempAmount);
+  const tmpInputSum = +inputs.amount.value + +tempAmount;
+  const amountValue = hasTempAndInput
+    ? tmpInputSum
+    : inputs.amount.value ?? tempAmount;
   const iconString = iconName ? iconName : getCatSymbol(pickedCat);
   const [icon, setIcon] = useState(iconString);
   const getSetCatIcon = async (catString: string) => {

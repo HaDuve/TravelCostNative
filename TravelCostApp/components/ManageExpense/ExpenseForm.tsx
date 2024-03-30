@@ -14,7 +14,6 @@ import {
   View,
   Pressable,
   FlatList,
-  Dimensions,
   KeyboardAvoidingView,
   InputAccessoryView,
 } from "react-native";
@@ -37,9 +36,7 @@ import {
   mapDescriptionToCategory,
 } from "../../util/category";
 import { formatExpenseWithCurrency } from "../../util/string";
-import DropDownPicker, {
-  RenderListItemPropsInterface,
-} from "react-native-dropdown-picker";
+import DropDownPicker from "react-native-dropdown-picker";
 // import CurrencyPicker from "react-native-currency-picker";
 import { TripContext } from "../../store/trip-context";
 import {
@@ -97,12 +94,8 @@ import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { Platform } from "react-native";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { MAX_EXPENSES_PERTRIP_NONPREMIUM } from "../../confAppConstants";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
+import { getRate } from "../../util/currencyExchange";
 
 const ExpenseForm = ({
   onCancel,
@@ -198,7 +191,64 @@ const ExpenseForm = ({
   const tmpInputSum = +inputs.amount.value + +tempAmount;
   const amountValue = hasTempAndInput
     ? tmpInputSum
-    : inputs.amount.value ?? tempAmount;
+    : inputs.amount.value.length > 0
+    ? inputs.amount.value
+    : tempAmount;
+
+  const hasCalcAmount =
+    amountValue &&
+    inputs.currency.value &&
+    inputs.currency.value !== tripCtx.tripCurrency;
+
+  // list of all splits owed
+  const [splitList, setSplitList] = useState(
+    editingValues ? editingValues.splitList : []
+  );
+  const [splitListValid, setSplitListValid] = useState(true);
+
+  // dropdown for whoPaid picker
+  const [currentTravellers, setCurrentTravellers] = useState(
+    tripCtx.travellers
+  );
+
+  const [calcAmount, setCalcAmount] = useState("");
+  const [splitListCalcAmounts, setSplitListCalcAmounts] = useState([""]);
+  useEffect(() => {
+    async function getCalcAmount() {
+      // calc calcAmount from amount, currency and TripCtx.tripCurrency and add it to expenseData
+      const base = tripCtx.tripCurrency;
+      const target = inputs.currency.value;
+      const rate = await getRate(base, target);
+      const calcAmount = +amountValue / rate;
+
+      // if expenseData has a splitlist, add the rate to each split
+      const splitListsCalcAmountsList = [];
+      if (splitList && splitList?.length > 0) {
+        splitList.forEach((split) => {
+          split.rate = rate;
+          splitListsCalcAmountsList.push(
+            (split.amount / split.rate).toFixed(2)
+          );
+        });
+      }
+      if (!hasCalcAmount || rate == -1 || rate == 1) {
+        setCalcAmount("");
+        setSplitListCalcAmounts([""]);
+        return;
+      }
+      setSplitListCalcAmounts(splitListsCalcAmountsList);
+      setCalcAmount(calcAmount.toFixed(2));
+    }
+    getCalcAmount();
+  }, [
+    inputs.amount.value,
+    inputs.currency.value,
+    tripCtx.tripCurrency,
+    splitList,
+    amountValue,
+    hasCalcAmount,
+  ]);
+
   const iconString = iconName ? iconName : getCatSymbol(pickedCat);
   const [icon, setIcon] = useState(iconString);
   const getSetCatIcon = async (catString: string) => {
@@ -422,16 +472,6 @@ const ExpenseForm = ({
     duplOrSplitString,
   ]);
 
-  // list of all splits owed
-  const [splitList, setSplitList] = useState(
-    editingValues ? editingValues.splitList : []
-  );
-  const [splitListValid, setSplitListValid] = useState(true);
-
-  // dropdown for whoPaid picker
-  const [currentTravellers, setCurrentTravellers] = useState(
-    tripCtx.travellers
-  );
   useEffect(() => {
     if (netCtx.strongConnection) {
       // console.log("~~ currentTravellers:", tripCtx.travellers);
@@ -1154,7 +1194,20 @@ const ExpenseForm = ({
                   }}
                 />
               )}
-              {<Text style={styles.tempAmount}>{tempAmount}</Text>}
+              {tempAmount && (
+                <Text style={styles.tempAmount}>
+                  +{" "}
+                  {formatExpenseWithCurrency(tempAmount, inputs.currency.value)}
+                </Text>
+              )}
+              {hasCalcAmount && (
+                <Text
+                  style={[!tempAmount ? styles.tempAmount : styles.calcAmount]}
+                >
+                  ={" "}
+                  {formatExpenseWithCurrency(calcAmount, tripCtx.tripCurrency)}
+                </Text>
+              )}
               <IconButton
                 buttonStyle={[styles.iconButton, GlobalStyles.strongShadow]}
                 icon={icon}
@@ -1577,6 +1630,7 @@ const ExpenseForm = ({
                                 borderWidth: 1,
                                 borderRadius: 8,
                                 padding: dynamicScale(8, false, 0.5),
+                                paddingBottom: dynamicScale(24, true, 0.5),
                                 margin: dynamicScale(8, false, 0.5),
                                 backgroundColor:
                                   GlobalStyles.colors.backgroundColor,
@@ -1685,6 +1739,15 @@ const ExpenseForm = ({
                                 {getCurrencySymbol(inputs.currency.value)}
                               </Text>
                             </View>
+                            {splitListCalcAmounts[itemData.index] && (
+                              <Text style={styles.splitListCalcAmount}>
+                                {"= "}
+                                {formatExpenseWithCurrency(
+                                  splitListCalcAmounts[itemData.index],
+                                  tripCtx.tripCurrency
+                                )}
+                              </Text>
+                            )}
                           </View>
                         );
                       }}
@@ -1894,7 +1957,7 @@ const styles = StyleSheet.create({
     margin: dynamicScale(4, false, 0.5),
     maxHeight: dynamicScale(32, false, 0.5),
     marginTop: "10.5%",
-    marginLeft: "-18%",
+    marginLeft: "-16%",
   },
   taskBarButtons: {},
   iconButton: {
@@ -1972,10 +2035,25 @@ const styles = StyleSheet.create({
     margin: dynamicScale(8, true),
   },
   tempAmount: {
-    // absolute
     position: "absolute",
     marginLeft: "30%",
     marginTop: "1.5%",
+    fontSize: dynamicScale(12, false, 0.3),
+    fontWeight: "300",
+    color: GlobalStyles.colors.textColor,
+  },
+  calcAmount: {
+    position: "absolute",
+    marginLeft: "50%",
+    marginTop: "1.5%",
+    fontSize: dynamicScale(12, false, 0.3),
+    fontWeight: "300",
+    color: GlobalStyles.colors.textColor,
+  },
+  splitListCalcAmount: {
+    position: "absolute",
+    top: "115%",
+    // left: "25%",
     fontSize: dynamicScale(12, false, 0.3),
     fontWeight: "300",
     color: GlobalStyles.colors.textColor,

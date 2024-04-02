@@ -286,14 +286,14 @@ const FinderScreen = () => {
   return (
     <>
       {datepickerJSX}
-      <Animated.ScrollView
-        layout={ListLayoutAnimation}
-        style={styles.container}
-      >
-        <View style={[GlobalStyles.wideStrongShadow, styles.cardContainer]}>
+      <View style={styles.container}>
+        <ScrollView
+          style={[GlobalStyles.wideStrongShadow]}
+          contentContainerStyle={styles.cardContainer}
+        >
           <Text style={styles.titleText}>{i18n.t("finderTitle")}</Text>
-          <ScrollView
-            scrollEnabled={false}
+          <View
+            // scrollEnabled={false}
             style={{ flex: 1, minHeight: "50%" }}
           >
             <View style={styles.rowContainer}>
@@ -377,7 +377,7 @@ const FinderScreen = () => {
               {(queryString || dateString) && i18n.t("finding")} :{queryString}{" "}
               {dateString}
             </Text>
-          </ScrollView>
+          </View>
           <View style={styles.buttonContainer}>
             <Text style={styles.queryText}>
               {foundResults && "Sum of the Results: "}
@@ -398,8 +398,8 @@ const FinderScreen = () => {
                 : i18n.t("noResults")}
             </GradientButton>
           </View>
-        </View>
-      </Animated.ScrollView>
+        </ScrollView>
+      </View>
       {/* <BlurPremium /> */}
     </>
   );
@@ -410,12 +410,11 @@ export default FinderScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // margin: "4%",
-    padding: dynamicScale(20),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   cardContainer: {
     flex: 1,
+    margin: dynamicScale(20),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: dynamicScale(20, false, 0.5),
     padding: dynamicScale(20),
@@ -460,6 +459,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
     // center
     textAlign: "center",
+    margin: dynamicScale(8, false, 2),
   },
   queryText: {
     fontSize: dynamicScale(16, false, 0.5),

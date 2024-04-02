@@ -429,8 +429,7 @@ const styles = StyleSheet.create({
   button: {
     ...Platform.select({
       ios: {
-        marginLeft: dynamicScale(24),
-        marginTop: dynamicScale(50, true),
+        marginTop: dynamicScale(20, true),
         borderRadius: 12,
         minHeight: 55,
       },
@@ -460,18 +459,14 @@ const styles = StyleSheet.create({
     }),
   },
   buttonContainer: {
-    // marginVertical: "10%",
-    // minWidth: 150,
     flexDirection: "row",
-
     flex: 1,
     alignItems: "center",
-    justifyContent: "center",
-
+    justifyContent: "space-between",
     // margin: "2%",
     // minHeight: 250,
     ...Platform.select({
-      ios: { marginTop: "-0%" },
+      ios: { marginTop: 0 },
       android: {
         // height: dynamicScale(55, true),
         marginVertical: dynamicScale(18),

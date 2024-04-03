@@ -6,7 +6,7 @@ import {
   Alert,
   Platform,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import PropTypes from "prop-types";
 import FlatButton from "../components/UI/FlatButton";
 //Localization
@@ -35,6 +35,9 @@ import {
   moderateScale,
   verticalScale,
 } from "../util/scalingUtil";
+import { NetworkContext } from "../store/network-context";
+import Toast from "react-native-toast-message";
+import { err } from "react-native-svg/lib/typescript/xml";
 
 const GPTDealScreen = ({ route, navigation }) => {
   const { price, currency, country, product } = route.params;
@@ -42,6 +45,8 @@ const GPTDealScreen = ({ route, navigation }) => {
   // useState isFetching
   const [isFetching, setIsFetching] = React.useState(true);
   const [answer, setAnswer] = React.useState("- no answer yet -");
+  const { isConnected, strongConnection } = useContext(NetworkContext);
+  const isOnline = isConnected && strongConnection;
 
   useEffect(() => {
     async function getGPT_Response() {
@@ -59,7 +64,12 @@ const GPTDealScreen = ({ route, navigation }) => {
           if (response) setAnswer(response.content);
         } catch (error) {
           console.error(error);
-          setAnswer("Error: " + error);
+          Toast.show({
+            type: "error",
+            text1: "Chat GPT Error",
+            text2: error,
+          });
+          navigation.pop();
         }
         setIsFetching(false);
         return;
@@ -73,18 +83,28 @@ const GPTDealScreen = ({ route, navigation }) => {
           country: country,
         };
         const response = await getChatGPT_Response(goodDeal);
-        if (response) setAnswer(response.content);
+        if (response && response.content) setAnswer(response.content);
       } catch (error) {
         console.error(error);
-        setAnswer("Error: " + error);
+        Toast.show({
+          type: "error",
+          text1: "Chat GPT Error",
+          text2: error,
+        });
+        navigation.pop();
       }
       setIsFetching(false);
     }
+    if (!isOnline) {
+      Toast.show({
+        type: "error",
+        text1: "Chat GPT Error",
+        text2: "No Internet connection. Please try again later",
+      });
+      navigation.pop();
+      return;
+    }
     getGPT_Response();
-    // console.log("GPTDealScreen ~ product:", product);
-    // console.log("GPTDealScreen ~ country:", country);
-    // console.log("GPTDealScreen ~ currency:", currency);
-    // console.log("GPTDealScreen ~ price:", price);
   }, [country, currency, price, product]);
 
   async function handleRegenerate() {
@@ -102,7 +122,12 @@ const GPTDealScreen = ({ route, navigation }) => {
       if (response) setAnswer(response.content);
     } catch (error) {
       console.error(error);
-      setAnswer("Error: " + error);
+      Toast.show({
+        type: "error",
+        text1: "Chat GPT Error",
+        text2: error,
+      });
+      navigation.pop();
     }
     setIsFetching(false);
   }

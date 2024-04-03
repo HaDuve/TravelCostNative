@@ -4,8 +4,8 @@ import { constantScale } from "../../util/scalingUtil";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
 
-const Width = constantScale(98, -0.1);
-const Height = constantScale(80, -0.1);
+const Width = constantScale(98, -1.8);
+const Height = constantScale(80, -1.8);
 
 function ToggleButton({ toggled = false }) {
   const borderColor = GlobalStyles.colors.primary400;

@@ -118,7 +118,7 @@ const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
 const BottomTabs = createMaterialTopTabNavigator();
 
-const IconSize = constantScale(24, -0.1);
+const IconSize = constantScale(24, -0.2);
 
 const prefix = Linking.createURL("/");
 function NotAuthenticatedStack() {
@@ -397,7 +397,6 @@ function Home() {
         headerTintColor: GlobalStyles.colors.backgroundColor,
         tabBarStyle: {
           backgroundColor: GlobalStyles.colors.gray500,
-          // paddingTop: 4,
           borderTopWidth: dynamicScale(1, false, 0.5),
           borderTopColor: GlobalStyles.colors.gray600,
           height: dynamicScale(50, true),
@@ -406,23 +405,23 @@ function Home() {
           // width: "40%",
           borderWidth: 0,
           // margin: "0%",
-          marginTop: dynamicScale(-2, true),
+          // marginTop: dynamicScale(-2, true),
           // marginBottom: "1%",
           // paddingBottom: "1%",
-          height: dynamicScale(50, true),
-          padding: dynamicScale(4),
+          height: IconSize + dynamicScale(6),
+          // padding: dynamicScale(4),
         },
         tabBarLabelStyle: {
           fontSize: dynamicScale(10, false, 0.5),
         },
         tabBarIconStyle: {
-          height: dynamicScale(25, false, 0.5),
-          width: dynamicScale(25, false, 0.5),
+          height: IconSize * 1.5,
+          width: IconSize,
         },
         tabBarActiveTintColor: GlobalStyles.colors.primary500,
         tabBarIndicatorStyle: {
           backgroundColor: GlobalStyles.colors.primary500,
-          borderWidth: dynamicScale(1, false, 0.5),
+          borderWidth: dynamicScale(1, true, 0.5),
           borderColor: GlobalStyles.colors.primary500,
         },
         tabBarBounces: true,

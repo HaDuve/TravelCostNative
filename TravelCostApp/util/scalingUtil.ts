@@ -36,7 +36,7 @@ const dynamicScale = (
   const dynamicBaseHeight = isPortrait ? 680 : 350;
   // const dynamicBaseHeight = 680;
   const isATablet = isTablet();
-  const tabletMult = isATablet ? 0.6 : 1;
+  const tabletMult = isATablet ? 0.6 : 0.7;
 
   const hSize = (height / dynamicBaseHeight) * size;
   const wSize = (width / dynamicBaseWidth) * size;

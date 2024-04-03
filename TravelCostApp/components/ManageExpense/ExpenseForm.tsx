@@ -1376,13 +1376,15 @@ const ExpenseForm = ({
                             size={dynamicScale(28, false, 0.5)}
                             buttonStyle={[
                               {
-                                height: dynamicScale(48, true),
+                                height: dynamicScale(48, false, 0.5),
                                 backgroundColor:
                                   GlobalStyles.colors.backgroundColor,
                                 borderRadius: dynamicScale(4, false, 0.5),
                                 borderWidth: 1,
                                 borderColor: GlobalStyles.colors.gray700,
-                                marginRight: dynamicScale(8),
+                                marginTop: dynamicScale(8, true),
+                                marginRight: dynamicScale(12),
+                                marginLeft: dynamicScale(-8),
                               },
                               GlobalStyles.strongShadow,
                             ]}
@@ -1630,7 +1632,7 @@ const ExpenseForm = ({
                                 borderWidth: 1,
                                 borderRadius: 8,
                                 padding: dynamicScale(8, false, 0.5),
-                                paddingBottom: dynamicScale(24, true, 0.5),
+                                paddingBottom: dynamicScale(32, true, 0.5),
                                 margin: dynamicScale(8, false, 0.5),
                                 backgroundColor:
                                   GlobalStyles.colors.backgroundColor,

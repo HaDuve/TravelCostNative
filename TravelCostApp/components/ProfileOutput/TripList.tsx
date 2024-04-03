@@ -1,13 +1,17 @@
 import { FlatList, View } from "react-native";
 import TripHistoryItem from "./TripHistoryItem";
-import React from "react";
+import React, { useContext } from "react";
 import LoadingOverlay from "../UI/LoadingOverlay";
 import PropTypes from "prop-types";
 import uniqBy from "lodash.uniqby";
 import { TripData } from "../../store/trip-context";
+import { OrientationContext } from "../../store/orientation-context";
+import { constantScale, dynamicScale } from "../../util/scalingUtil";
 
 function TripList({ trips }) {
+  const { isLandscape } = useContext(OrientationContext);
   if (!trips || trips?.length < 1) return <LoadingOverlay></LoadingOverlay>;
+
   const uniqTrips: TripData[] = uniqBy(trips);
   function renderTripItem(itemData) {
     if (!itemData || !itemData.item) return <></>;
@@ -25,8 +29,11 @@ function TripList({ trips }) {
     >
       <FlatList
         data={uniqTrips}
-        scrollEnabled={false}
-        ListFooterComponent={<View style={{ height: 300 }}></View>}
+        scrollEnabled={isLandscape}
+        horizontal={isLandscape}
+        ListFooterComponent={
+          <View style={{ height: constantScale(150), width: "100%" }}></View>
+        }
         renderItem={renderTripItem}
         keyExtractor={(item: TripData) => {
           if (typeof item === "string" || item instanceof String)

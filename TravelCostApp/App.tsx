@@ -399,24 +399,19 @@ function Home() {
           backgroundColor: GlobalStyles.colors.gray500,
           borderTopWidth: dynamicScale(1, false, 0.5),
           borderTopColor: GlobalStyles.colors.gray600,
-          height: dynamicScale(50, true),
+          height: IconSize * 1.8,
         },
         tabBarItemStyle: {
-          // width: "40%",
           borderWidth: 0,
-          // margin: "0%",
-          // marginTop: dynamicScale(-2, true),
-          // marginBottom: "1%",
-          // paddingBottom: "1%",
-          height: IconSize + dynamicScale(6),
-          // padding: dynamicScale(4),
         },
         tabBarLabelStyle: {
           fontSize: dynamicScale(10, false, 0.5),
         },
         tabBarIconStyle: {
           height: IconSize * 1.5,
-          width: IconSize,
+          width: IconSize * 1.2,
+          marginTop: dynamicScale(-6, true, -1),
+          // marginTop: -6,
         },
         tabBarActiveTintColor: GlobalStyles.colors.primary500,
         tabBarIndicatorStyle: {
@@ -516,7 +511,10 @@ function Home() {
           tabBarIcon: ({ color }) => (
             <View>
               {hasNewChanges && (
-                <Badge style={{ position: "absolute" }} size={IconSize} />
+                <Badge
+                  style={{ position: "absolute" }}
+                  size={dynamicScale(6, false, 0.5)}
+                />
               )}
               <Ionicons name="globe-outline" size={IconSize} color={color} />
             </View>

@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     flex: 1,
     // minHeight: "68%",
     margin: dynamicScale(16),
-    marginBottom: dynamicScale(-30, true),
+    marginBottom: dynamicScale(-150, true),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   horizontalContainer: {

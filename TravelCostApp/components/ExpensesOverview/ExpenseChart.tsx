@@ -25,12 +25,8 @@ import PropTypes from "prop-types";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { isSameDay } from "../../util/dateTime";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../../util/scalingUtil";
+import { dynamicScale, scale } from "../../util/scalingUtil";
+import { OrientationContext } from "../../store/orientation-context";
 
 const ExpenseChart = ({
   inputData,
@@ -41,6 +37,7 @@ const ExpenseChart = ({
   navigation,
   expenses,
 }) => {
+  const { isLandscape, isTablet } = useContext(OrientationContext);
   const data = inputData;
   const firstItem = inputData[0];
   const [lastItem] = inputData.slice(-1);
@@ -67,29 +64,21 @@ const ExpenseChart = ({
       }
     }
   });
-  // cap expensesSum at 5*dailyBudget 5*weeklyBudget 5*monthlyBudget 5*yearlyBudget respectively
-  // const CAP = 100;
-  // inputData?.forEach((obj) => {
-  //   if (obj.expensesSum > CAP * obj.yearlyBudget) {
-  //     obj.expensesSum = CAP * obj.yearlyBudget;
-  //   }
-  //   if (obj.expensesSum > CAP * obj.monthlyBudget) {
-  //     obj.expensesSum = CAP * obj.monthlyBudget;
-  //   }
-  //   if (obj.expensesSum > CAP * obj.weeklyBudget) {
-  //     obj.expensesSum = CAP * obj.weeklyBudget;
-  //   }
-  //   if (obj.expensesSum > CAP * obj.dailyBudget) {
-  //     obj.expensesSum = CAP * obj.dailyBudget;
-  //   }
-  // });
+  const hTabletScaling = isLandscape ? 0.7 : 1.9;
+  const hPhoneScaling = isLandscape ? 16 : 1.9;
+  const wTabletScaling = isLandscape ? 0.1 : 1;
+  const wPhoneScaling = isLandscape ? 10 : 0.6;
+  const hScaling = isTablet ? hTabletScaling : hPhoneScaling;
+  const wScaling = isTablet ? wTabletScaling : wPhoneScaling;
+  const height = dynamicScale(200, false, hScaling);
+  const width = dynamicScale(460, false, wScaling);
 
   return (
     <View style={styles.container}>
       <VictoryChart
         domain={{ x: [firstItemDate, lastItemDate] }}
-        height={dynamicScale(160, false, 0.5)}
-        width={dynamicScale(360, false, 0.5)}
+        height={height}
+        width={width}
         animate={{
           duration: 1000,
           onLoad: { duration: 1000 },

@@ -4,7 +4,7 @@ import Toast, {
   ToastConfig,
 } from "react-native-toast-message";
 import React from "react";
-import { Dimensions, StyleSheet, View, FlatList } from "react-native";
+import { StyleSheet, View, FlatList } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import LoadingBarOverlay from "./LoadingBarOverlay";
 import { Text, ViewStyle } from "react-native";
@@ -26,12 +26,7 @@ import { DEVELOPER_MODE } from "../../confAppConstants";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { Pressable } from "react-native";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../../util/scalingUtil";
+import { dynamicScale, scale } from "../../util/scalingUtil";
 import { DeviceType, deviceType } from "expo-device";
 
 const MINHEIGHT = dynamicScale(60, true);

@@ -5,8 +5,10 @@ const { width: Startup_Width, height: Startup_Height } =
   Dimensions.get("window");
 
 //Guideline sizes are based on standard ~5" screen mobile device
-const guidelineBaseWidth = 350;
-const guidelineBaseHeight = 680;
+const guidelineBaseWidth = 375;
+const guidelineBaseHeight = 667;
+const tabletScaleMult = 0.6;
+const phoneScaleMult = 0.9;
 
 const scale = (size: number) => (Startup_Width / guidelineBaseWidth) * size;
 const verticalScale = (size: number) =>
@@ -31,12 +33,18 @@ const dynamicScale = (
   let returnSize = 0;
   const { width, height } = Dimensions.get("window");
   const isPortrait = width < height;
-  const dynamicBaseWidth = isPortrait ? 350 : 680;
-  // const dynamicBaseWidth = 350;
-  const dynamicBaseHeight = isPortrait ? 680 : 350;
-  // const dynamicBaseHeight = 680;
+  const dynamicBaseWidth = isPortrait
+    ? guidelineBaseWidth
+    : guidelineBaseHeight;
+  // const dynamicBaseWidth = guidelineBaseWidth;
+  const dynamicBaseHeight = isPortrait
+    ? guidelineBaseHeight
+    : guidelineBaseWidth;
+  // const dynamicBaseHeight = guidelineBaseHeight;
   const isATablet = isTablet();
-  const tabletMult = isATablet ? 0.6 : 0.7;
+  const scaling =
+    (dynamicBaseHeight / (isPortrait ? height : width)) *
+    (isATablet ? tabletScaleMult : phoneScaleMult);
 
   const hSize = (height / dynamicBaseHeight) * size;
   const wSize = (width / dynamicBaseWidth) * size;
@@ -45,25 +53,26 @@ const dynamicScale = (
     returnSize = !vertical
       ? hSize + (hSize - size) * moderateFactor
       : wSize + (wSize - size) * moderateFactor;
-    return returnSize * tabletMult;
+    return returnSize * scaling;
   }
   // no moderation
   returnSize = !vertical ? hSize : wSize;
-  return returnSize * tabletMult;
+  return returnSize;
 };
 
 const constantScale = (size: number, moderateFactor: number = null) => {
   const { width, height } = Dimensions.get("window");
   const smallerDim = Math.min(width, height);
-  const baseDim = 350;
+  const baseDim = guidelineBaseWidth;
   const isATablet = isTablet();
-  const tabletMult = isATablet ? 0.6 : 1;
+  const scaling =
+    (baseDim / smallerDim) * (isATablet ? tabletScaleMult : phoneScaleMult);
   const dimSize = (smallerDim / baseDim) * size;
   if (moderateFactor != null) {
     const returnSize = dimSize + (dimSize - size) * moderateFactor;
-    return returnSize * tabletMult;
+    return returnSize * scaling;
   }
-  return dimSize * tabletMult;
+  return dimSize;
 };
 
 const isTablet = () => {

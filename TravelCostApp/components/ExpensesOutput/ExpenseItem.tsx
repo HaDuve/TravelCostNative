@@ -30,16 +30,13 @@ import { useEffect } from "react";
 import * as Haptics from "expo-haptics";
 import { ExpenseData } from "../../util/expense";
 import { useRef } from "react";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
+
+const IconSize = dynamicScale(28, false, 0.5);
 
 function ExpenseItem(props): JSX.Element {
   const { showSumForTravellerName, filtered } = props;
@@ -252,6 +249,8 @@ function ExpenseItem(props): JSX.Element {
   }, [date, todayString]);
   configureDateString();
 
+  const { isLandscape } = useContext(OrientationContext);
+
   // if (!id) return <></>;
   return (
     <View
@@ -283,12 +282,15 @@ function ExpenseItem(props): JSX.Element {
                 },
               }),
             },
+            isLandscape && {
+              height: dynamicScale(100, true),
+            },
           ]}
         >
           <View style={styles.iconContainer}>
             <Ionicons
               name={catSymbol}
-              size={dynamicScale(28, false, 0.5)}
+              size={IconSize}
               color={
                 hideSpecial
                   ? GlobalStyles.colors.textHidden
@@ -377,7 +379,6 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
   expenseItem: {
-    borderWidth: 0,
     borderColor: "black",
     paddingRight: 0,
     marginLeft: 0,
@@ -391,7 +392,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
   },
   description: {
-    flex: 1,
+    // flex: 1,
     // width: "110%",
     fontStyle: "italic",
     fontWeight: "300",

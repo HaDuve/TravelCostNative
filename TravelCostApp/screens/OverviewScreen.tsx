@@ -11,9 +11,7 @@ import {
 } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
-import ExpensesOverview, {
-  MemoizedExpensesOverview,
-} from "../components/ExpensesOutput/ExpensesOverview";
+import { MemoizedExpensesOverview } from "../components/ExpensesOutput/ExpensesOverview";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -38,16 +36,10 @@ import { TripContext } from "../store/trip-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { showBanner } from "../components/UI/ToastComponent";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../util/scalingUtil";
+import { dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 
 const OverviewScreen = ({ navigation }) => {
-  // // console.log("rerender OverviewScreen - 0");
   const expensesCtx = useContext(ExpensesContext);
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);

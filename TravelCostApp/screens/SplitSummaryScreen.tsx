@@ -52,6 +52,8 @@ import {
   scale,
   verticalScale,
 } from "../util/scalingUtil";
+import { useOrientation } from "../components/Hooks/useOrientation";
+import { OrientationContext } from "../store/orientation-context";
 
 const SplitSummaryScreen = ({ navigation }) => {
   const {
@@ -81,9 +83,11 @@ const SplitSummaryScreen = ({ navigation }) => {
 
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState();
+  const { isPortrait } = useContext(OrientationContext);
 
   const [tripIsPaid, setTripIsPaid] = useState(isPaid === isPaidString.paid);
 
+  // TODO: this tripIsPaid-useEffect is a anti-pattern, use a context function instead
   useEffect(() => {
     setTripIsPaid(isPaid === isPaidString.paid);
   }, [isPaid]);
@@ -294,6 +298,62 @@ const SplitSummaryScreen = ({ navigation }) => {
     [tripCurrency]
   );
 
+  const ButtonContainerJSX = (
+    <View style={isPortrait && styles.buttonContainer}>
+      {!showSimplify && !noSimpleSplits && (
+        <FlatButton
+          onPress={async () => {
+            if (showSimplify) {
+              navigation.goBack();
+            } else {
+              await getOpenSplits();
+              setShowSimplify(true);
+              setTitleText(titleTextOriginal);
+              setSubTitleText(subTitleOriginal);
+            }
+          }}
+        >
+          Back
+        </FlatButton>
+      )}
+      {showSimplify && !noSimpleSplits && (
+        <GradientButton style={styles.button} onPress={handleSimpflifySplits}>
+          Simplify Splits
+        </GradientButton>
+      )}
+      {hasOpenSplits && (
+        <GradientButton
+          style={styles.button}
+          colors={GlobalStyles.gradientColors}
+          darkText
+          buttonStyle={{
+            backgroundColor: GlobalStyles.colors.errorGrayed,
+          }}
+          onPress={async () => {
+            // alert ask user if he really wants to settle all Splits
+            // if yes, call settleSplitsHandler
+            Alert.alert(
+              "Settle Splits",
+              "Are you sure you want to settle all splits? Has everyone gotten their money back? (This will only settle splits from Today or Before, but not open splits from the future!)",
+              [
+                {
+                  text: "Cancel",
+                  style: "cancel",
+                },
+                {
+                  text: "Settle",
+                  onPress: async () => await settleSplitsHandler(),
+                },
+              ]
+            );
+          }}
+        >
+          Settle Splits
+        </GradientButton>
+      )}
+    </View>
+  );
+
   if (error && !isFetching) {
     return <ErrorOverlay message={error} onConfirm={errorHandler} />;
   }
@@ -303,87 +363,41 @@ const SplitSummaryScreen = ({ navigation }) => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      scrollEnabled={isPortrait}
+      contentContainerStyle={styles.container}
+    >
       <Animated.View
         // entering={FadeIn}
         // exiting={FadeOut}
-        style={[GlobalStyles.wideStrongShadow, styles.cardContainer]}
+        style={[
+          GlobalStyles.wideStrongShadow,
+          styles.cardContainer,
+          !isPortrait && styles.row,
+        ]}
       >
-        <View style={styles.titleContainer}>
-          {/* <BackButton></BackButton> */}
-          <Text style={styles.titleText}> {titleText}</Text>
-        </View>
-        {/* <View style={styles.subTitleContainer}>
+        <View>
+          <View style={styles.titleContainer}>
+            {/* <BackButton></BackButton> */}
+            <Text style={styles.titleText}> {titleText}</Text>
+          </View>
+          {/* <View style={styles.subTitleContainer}>
             <Text style={styles.subTitleText}> {subTitleText}</Text>
           </View> */}
-        <View style={styles.subTitleContainer}>
-          <Text style={styles.subTitleText}> {totalPaidBackText}</Text>
-        </View>
-        <View style={styles.subTitleContainer}>
-          <Text style={styles.subTitleText}> {totalPayBackText}</Text>
+          <View style={styles.subTitleContainer}>
+            <Text style={styles.subTitleText}> {totalPaidBackText}</Text>
+          </View>
+          <View style={styles.subTitleContainer}>
+            <Text style={styles.subTitleText}> {totalPayBackText}</Text>
+          </View>
+          {!isPortrait && ButtonContainerJSX}
         </View>
 
         <FlatList
           style={{ maxWidth: "100%", paddingHorizontal: "2%" }}
           data={splits}
-          ListFooterComponent={
-            <View style={styles.buttonContainer}>
-              {!showSimplify && !noSimpleSplits && (
-                <FlatButton
-                  onPress={async () => {
-                    if (showSimplify) {
-                      navigation.goBack();
-                    } else {
-                      await getOpenSplits();
-                      setShowSimplify(true);
-                      setTitleText(titleTextOriginal);
-                      setSubTitleText(subTitleOriginal);
-                    }
-                  }}
-                >
-                  Back
-                </FlatButton>
-              )}
-              {showSimplify && !noSimpleSplits && (
-                <GradientButton
-                  style={styles.button}
-                  onPress={handleSimpflifySplits}
-                >
-                  Simplify Splits
-                </GradientButton>
-              )}
-              {hasOpenSplits && (
-                <GradientButton
-                  style={styles.button}
-                  colors={GlobalStyles.gradientColors}
-                  darkText
-                  buttonStyle={{
-                    backgroundColor: GlobalStyles.colors.errorGrayed,
-                  }}
-                  onPress={async () => {
-                    // alert ask user if he really wants to settle all Splits
-                    // if yes, call settleSplitsHandler
-                    Alert.alert(
-                      "Settle Splits",
-                      "Are you sure you want to settle all splits? Has everyone gotten their money back? (This will only settle splits from Today or Before, but not open splits from the future!)",
-                      [
-                        {
-                          text: "Cancel",
-                          style: "cancel",
-                        },
-                        {
-                          text: "Settle",
-                          onPress: async () => await settleSplitsHandler(),
-                        },
-                      ]
-                    );
-                  }}
-                >
-                  Settle Splits
-                </GradientButton>
-              )}
-            </View>
-          }
+          scrollEnabled={!isPortrait}
+          ListFooterComponent={isPortrait && ButtonContainerJSX}
           ListHeaderComponent={<View style={{ height: 40 }}></View>}
           renderItem={renderSplitItem}
         />
@@ -402,13 +416,14 @@ SplitSummaryScreen.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    padding: dynamicScale(28),
+    // alignItems: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   cardContainer: {
+    margin: dynamicScale(20),
+    minHeight: "86%",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-around",
     paddingHorizontal: dynamicScale(24),
     paddingTop: dynamicScale(24, true),
     paddingBottom: dynamicScale(2, true),
@@ -464,7 +479,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     // margin: "2%",
-    // minHeight: 250,
     ...Platform.select({
       ios: { marginTop: 0 },
       android: {
@@ -539,5 +553,13 @@ const styles = StyleSheet.create({
     // center
     alignItems: "flex-start",
     alignContent: "flex-start",
+  },
+  row: {
+    flexDirection: "row",
+    // marginTop: 0,
+    // paddingTop: 0,
+    justifyContent: "flex-start",
+    alignContent: "flex-start",
+    alignItems: "flex-start",
   },
 });

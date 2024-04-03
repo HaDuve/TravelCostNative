@@ -7,7 +7,6 @@ import {
   Platform,
   AppState,
   StatusBar as StatusBarRN,
-  Dimensions,
 } from "react-native";
 import Purchases from "react-native-purchases";
 
@@ -108,13 +107,7 @@ import BackgroundFetchScreen, {
   registerBackgroundFetchAsync,
 } from "./taskmanager/backgroundTasks";
 import safeLogError from "./util/error";
-import {
-  dynamicScale,
-  isTablet,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "./util/scalingUtil";
+import { constantScale, dynamicScale } from "./util/scalingUtil";
 import { CustomTooltip } from "./components/UI/Tourguide_Tooltip";
 import OrientationContextProvider from "./store/orientation-context";
 
@@ -124,6 +117,8 @@ SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
 const BottomTabs = createMaterialTopTabNavigator();
+
+const IconSize = constantScale(24, -0.1);
 
 const prefix = Linking.createURL("/");
 function NotAuthenticatedStack() {
@@ -442,11 +437,7 @@ function Home() {
           // title: "Recent Expenses",
           tabBarLabel: i18n.t("expensesTab"),
           tabBarIcon: ({ color }) => (
-            <Ionicons
-              name="home-outline"
-              size={dynamicScale(24, false, 0.5)}
-              color={color}
-            />
+            <Ionicons name="home-outline" size={IconSize} color={color} />
           ),
         }}
       />
@@ -460,7 +451,7 @@ function Home() {
           title: i18n.t("overviewTab"),
           tabBarLabel: "Push",
           tabBarIcon: ({ color }) => (
-            <Ionicons name={"push"} size={24} color={color} />
+            <Ionicons name={"push"} size={IconSize} color={color} />
           ),
         }}
       ></BottomTabs.Screen> */}
@@ -476,7 +467,7 @@ function Home() {
           tabBarIcon: ({ color }) => (
             <Ionicons
               name={isShowingGraph ? "bar-chart-outline" : "pie-chart-outline"}
-              size={dynamicScale(24, false, 0.5)}
+              size={IconSize}
               color={color}
             />
           ),
@@ -493,11 +484,7 @@ function Home() {
 
             tabBarLabel: "Finder", //i18n.t("settingsTab"),
             tabBarIcon: ({ color }) => (
-              <Ionicons
-                name="search-outline"
-                size={dynamicScale(24, false, 0.5)}
-                color={color}
-              />
+              <Ionicons name="search-outline" size={IconSize} color={color} />
             ),
           }}
         />
@@ -513,11 +500,7 @@ function Home() {
 
             tabBarLabel: "Financial", //i18n.t("settingsTab"),
             tabBarIcon: ({ color }) => (
-              <Ionicons
-                name="cash-outline"
-                size={dynamicScale(24, false, 0.5)}
-                color={color}
-              />
+              <Ionicons name="cash-outline" size={IconSize} color={color} />
             ),
           }}
         />
@@ -534,16 +517,9 @@ function Home() {
           tabBarIcon: ({ color }) => (
             <View>
               {hasNewChanges && (
-                <Badge
-                  style={{ position: "absolute" }}
-                  size={dynamicScale(6, false, 0.5)}
-                />
+                <Badge style={{ position: "absolute" }} size={IconSize} />
               )}
-              <Ionicons
-                name="globe-outline"
-                size={dynamicScale(24, false, 0.5)}
-                color={color}
-              />
+              <Ionicons name="globe-outline" size={IconSize} color={color} />
             </View>
           ),
         }}

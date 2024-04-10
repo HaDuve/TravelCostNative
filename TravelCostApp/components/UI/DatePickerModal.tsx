@@ -7,11 +7,11 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { Dimensions, Platform, View } from "react-native";
+import { Platform, View } from "react-native";
 import React, { useContext } from "react";
 import DatePicker from "react-native-neat-date-picker";
 import { GlobalStyles } from "../../constants/styles";
-import { getDatePlusDays, getLocaleDateFormat } from "../../util/date";
+import { getLocaleDateFormat } from "../../util/date";
 import { OrientationContext } from "../../store/orientation-context";
 
 const DatePickerModal = ({

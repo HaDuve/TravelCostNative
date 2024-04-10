@@ -6,6 +6,7 @@ __Newest Changes:
 - Added Tablet support
 - Added MacOS support
 - Added Landscape (Orientation) support
+- Added Exchange Rate Calculations to Expenseform
 - Bugfixes and performance improvements
 
 __Other Changes:

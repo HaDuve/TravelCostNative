@@ -1,4 +1,5 @@
 import * as SecureStore from "expo-secure-store";
+import safeLogError from "../util/error";
 
 /**
  * Saves a key-value pair securely using SecureStore.
@@ -49,11 +50,11 @@ export async function secureStoreSetObject(key: string, value: object) {
  */
 export async function secureStoreGetObject(key: string) {
   const result = await SecureStore.getItemAsync(key);
-  if (result) {
-    // parse the result and return it
-    return JSON.parse(result);
-  } else {
-    // console.log("No values stored under that key.", key);
+  try {
+    return result ? JSON.parse(result) : null;
+  } catch (error) {
+    safeLogError(error);
+    return null;
   }
 }
 

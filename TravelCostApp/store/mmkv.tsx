@@ -1,4 +1,5 @@
 import { MMKV } from "react-native-mmkv";
+import safeLogError from "../util/error";
 
 export const mmkvstorage = new MMKV();
 
@@ -8,7 +9,12 @@ export function setMMKVObject(key: string, value: object) {
 
 export function getMMKVObject(key: string) {
   const value = mmkvstorage.getString(key);
-  return value ? JSON.parse(value) : null;
+  try {
+    return value ? JSON.parse(value) : null;
+  } catch (error) {
+    safeLogError(error);
+    return null;
+  }
 }
 
 export function setMMKVString(key: string, value: string) {

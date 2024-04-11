@@ -47,13 +47,12 @@ const OverviewScreen = ({ navigation }) => {
   const { settings } = useContext(SettingsContext);
 
   const [open, setOpen] = useState(false);
-  const [PeriodValue, setPeriodValue] = useState<RangeString>(
-    userCtx.periodName
-  );
 
   const [dateTimeString, setDateTimeString] = useState("");
   // strong connection state
   const [offlineString, setOfflineString] = useState("");
+  const PeriodValue = userCtx.periodName;
+
   // set in useEffect
   const showInternetSpeed = settings.showInternetSpeed;
   const lastConnectionSpeedInMbps = netCtx.lastConnectionSpeedInMbps ?? 0;
@@ -79,7 +78,6 @@ const OverviewScreen = ({ navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      // console.log("callback called");
       if (!userCtx.freshlyCreated) {
         showBanner(navigation);
       }
@@ -100,6 +98,7 @@ const OverviewScreen = ({ navigation }) => {
     netCtx.strongConnection,
     connectionSpeedString,
   ]);
+
   useInterval(
     React.useCallback(() => {
       setDateTimeString(_toShortFormat(DateTime.now()));
@@ -179,11 +178,7 @@ const OverviewScreen = ({ navigation }) => {
           onSelectItem={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}
-          setValue={(value) => {
-            // requestAnimationFrame(() => {
-            setPeriodValue(value);
-            // });
-          }}
+          setValue={userCtx.setPeriodString}
           setItems={setItems}
           containerStyle={styles.dropdownContainer}
           dropDownContainerStyle={styles.dropdownContainerDropdown}
@@ -254,7 +249,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    // zIndex: 10,
+    zIndex: 10,
     marginTop: dynamicScale(18, true),
     paddingHorizontal: dynamicScale(12),
     marginBottom: dynamicScale(12, true),

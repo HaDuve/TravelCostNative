@@ -66,6 +66,7 @@ import {
   verticalScale,
 } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
+import { useStateWithCallback } from "../components/Hooks/useStateWithCallback";
 
 function RecentExpenses({ navigation }) {
   const expensesCtx = useContext(ExpensesContext);
@@ -183,24 +184,15 @@ function RecentExpenses({ navigation }) {
       }
     }, [userCtx.freshlyCreated, navigation])
   );
+
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState();
 
   const [open, setOpen] = useState(false);
-  const [PeriodValue, setPeriodValue] = useState<RangeString>(RangeString.day);
-  useEffect(() => {
-    userCtx.setPeriodString(PeriodValue);
-  }, [PeriodValue, userCtx]);
+
+  const PeriodValue = userCtx.periodName;
 
   const [dateTimeString, setDateTimeString] = useState("");
-
-  // const test_getExpenses = dataResponseTime(getExpenses);
-  // const test_offlineLoad = dataResponseTime(
-  //   expensesCtx.loadExpensesFromStorage
-  // );
-  // const test_fetchTravelerIsTouched = dataResponseTime(fetchTravelerIsTouched);
-  // const test_fetchAndSetExpenses = dataResponseTime(fetchAndSetExpenses);
-
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(async () => {
@@ -422,11 +414,7 @@ function RecentExpenses({ navigation }) {
           onSelectItem={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}
-          setValue={(value) => {
-            // requestAnimationFrame(() => {
-            setPeriodValue(value);
-            // });
-          }}
+          setValue={userCtx.setPeriodString}
           setItems={setItems}
           containerStyle={styles.dropdownContainer}
           dropDownContainerStyle={styles.dropdownContainerDropdown}

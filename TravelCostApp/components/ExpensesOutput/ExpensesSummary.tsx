@@ -28,12 +28,7 @@ import {
   getTravellerSum,
 } from "../../util/expense";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 
 const ExpensesSummary = ({
   expenses,

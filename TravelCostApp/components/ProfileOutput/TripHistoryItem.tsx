@@ -416,7 +416,7 @@ function TripHistoryItem({ tripid, trips }) {
                 borderRadius={dynamicScale(8, false, 0.5)}
                 progress={activeProgress}
                 height={dynamicScale(12, true)}
-                width={scale(150)}
+                width={dynamicScale(150, true, 1)}
               />
             </View>
           </View>
@@ -497,7 +497,7 @@ function TripHistoryItem({ tripid, trips }) {
               borderRadius={dynamicScale(8, false, 0.5)}
               progress={activeProgress}
               height={dynamicScale(12, true)}
-              width={scale(150)}
+              width={dynamicScale(150, true, 1)}
             />
           </View>
         </View>

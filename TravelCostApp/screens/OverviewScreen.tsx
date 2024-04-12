@@ -263,7 +263,8 @@ const styles = StyleSheet.create({
     marginHorizontal: dynamicScale(12),
   },
   dropdownContainer: {
-    maxWidth: dynamicScale(160, false, 0.5),
+    maxWidth: dynamicScale(170, false, 0.5),
+    marginTop: dynamicScale(2, true),
     ...Platform.select({
       ios: {
         shadowColor: GlobalStyles.colors.textColor,

@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
     marginTop: dynamicScale(24, true),
-    marginHorizontal: dynamicScale(12),
+    marginHorizontal: dynamicScale(8),
     marginBottom: dynamicScale(12, true),
     zIndex: 10,
   },
@@ -501,8 +501,8 @@ const styles = StyleSheet.create({
     marginHorizontal: dynamicScale(12),
   },
   dropdownContainer: {
-    maxWidth: dynamicScale(160, false, 0.5),
-    marginTop: dynamicScale(6, true),
+    maxWidth: dynamicScale(170, false, 0.5),
+    marginTop: dynamicScale(8, true),
     ...Platform.select({
       ios: {
         shadowColor: GlobalStyles.colors.textColor,

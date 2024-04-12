@@ -70,7 +70,7 @@ const ExpenseChart = ({
   const wPhoneScaling = isLandscape ? 10 : 0.1;
   const hScaling = isTablet ? hTabletScaling : hPhoneScaling;
   const wScaling = isTablet ? wTabletScaling : wPhoneScaling;
-  const height = dynamicScale(200, false, hScaling);
+  const height = dynamicScale(240, false, hScaling);
   const width = dynamicScale(460, false, wScaling);
 
   return (

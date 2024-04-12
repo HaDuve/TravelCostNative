@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
   landscapeToggleButtonContainer: {
-    marginLeft: dynamicScale(-600),
+    marginLeft: dynamicScale(-600, false, 2),
     marginBottom: dynamicScale(6, true),
   },
 });

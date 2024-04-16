@@ -315,7 +315,7 @@ function RecentExpenses({ navigation }) {
   const isLongNumber = expensesSumString?.length > 10;
   const { fontScale } = useWindowDimensions();
   const isScaledUp = fontScale > 1;
-  const useMoreSpace = (isScaledUp || isLongNumber) && isPortrait;
+  const useMoreSpace = (isScaledUp || isLongNumber) && !isTablet;
 
   const ExpensesOutputJSX = (
     <MemoizedExpensesOutput

@@ -131,7 +131,7 @@ const OverviewScreen = ({ navigation }) => {
   const { fontScale } = useWindowDimensions();
   const { isPortrait, isTablet } = useContext(OrientationContext);
   const isScaledUp = fontScale > 1;
-  const useMoreSpace = (isScaledUp || isLongNumber) && isPortrait;
+  const useMoreSpace = (isScaledUp || isLongNumber) && !isTablet;
   return (
     <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
       <View

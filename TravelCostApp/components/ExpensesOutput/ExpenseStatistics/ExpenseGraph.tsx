@@ -54,7 +54,8 @@ const ExpenseGraph = ({
   const flatListRef = useRef(null);
   useFocusEffect(
     React.useCallback(() => {
-      flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
+      console.log("scrolling", !!flatListRef.current);
+      flatListRef.current?.scrollToOffset({ animated: true, offset: 55 });
     }, [])
   );
 

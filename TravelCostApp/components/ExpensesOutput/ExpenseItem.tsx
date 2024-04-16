@@ -292,7 +292,9 @@ function ExpenseItem(props): JSX.Element {
             },
           ]}
         >
-          <View style={styles.iconContainer}>
+          <View
+            style={[styles.iconContainer, { height: constantScale(44, 0.5) }]}
+          >
             <Ionicons
               name={catSymbol}
               size={IconSize}
@@ -415,11 +417,10 @@ const styles = StyleSheet.create({
     marginTop: dynamicScale(4, true),
     marginRight: dynamicScale(8),
     marginLeft: 0,
-    height: constantScale(44, 0.5),
   },
   leftItem: {
     flex: 1,
-    height: dynamicScale(40, true),
+    height: constantScale(40, 0.5),
     alignContent: "flex-start",
     justifyContent: "flex-start",
     alignItems: "flex-start",
@@ -448,8 +449,8 @@ const styles = StyleSheet.create({
   },
   countryFlagContainer: {
     marginRight: dynamicScale(4),
-    height: constantScale(40, 0.5),
-    width: constantScale(50, 0.5),
+    height: constantScale(40),
+    width: constantScale(50),
   },
   countryFlag: {
     marginTop: dynamicScale(3, true),
@@ -461,8 +462,8 @@ const styles = StyleSheet.create({
     paddingRight: dynamicScale(10),
     // center items left
     flexDirection: "row",
-    height: constantScale(30, 0.5),
-    width: constantScale(100, 0.5),
+    height: constantScale(22, 1),
+    width: constantScale(30),
   },
   avatar: {
     marginRight: dynamicScale(-6),

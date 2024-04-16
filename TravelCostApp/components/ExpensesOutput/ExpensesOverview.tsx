@@ -32,6 +32,7 @@ import { BlurView } from "expo-blur";
 import { TripContext } from "../../store/trip-context";
 import { dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
+import { useSwipe } from "../Hooks/useSwipe";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const tripCtx = useContext(TripContext);
@@ -42,6 +43,16 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const [periodRangeNumber, setPeriodRangeNumber] = useState(
     realPeriodNumber.current
   );
+
+  const { onTouchStart, onTouchEnd } = useSwipe(onSwipeLeft, onSwipeRight, 6);
+
+  function onSwipeLeft() {
+    console.log("SWIPE_LEFT");
+  }
+
+  function onSwipeRight() {
+    console.log("SWIPE_RIGHT");
+  }
 
   const [isGraphNotPie, setToggleGraph] = useState(true);
   // enum =>  0 = categories, 1 = traveller, 2 = country, 3 = currency
@@ -183,8 +194,11 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   );
 
   return (
-    <View style={styles.container}>
-      {/* {isAndroid && titleContainerJSX} */}
+    <View
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      style={styles.container}
+    >
       {isGraphNotPie && (
         <ExpenseGraph
           navigation={navigation}
@@ -326,7 +340,10 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
   landscapeToggleButtonContainer: {
-    marginLeft: dynamicScale(-600, false, 2),
-    marginBottom: dynamicScale(6, true),
+    // marginLeft: dynamicScale(-1100, false, 2),
+    // marginBottom: dynamicScale(6, true),
+    position: "absolute",
+    left: -280,
+    bottom: 1,
   },
 });

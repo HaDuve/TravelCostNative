@@ -1,4 +1,4 @@
-import React, { StyleSheet, Text, View, Dimensions } from "react-native";
+import React, { StyleSheet, Text, View } from "react-native";
 import * as Progress from "react-native-progress";
 import { GlobalStyles } from "../../../constants/styles";
 import { Ionicons } from "@expo/vector-icons";
@@ -17,9 +17,6 @@ import { useState } from "react";
 import { UserContext } from "../../../store/user-context";
 import {
   dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
 } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
 

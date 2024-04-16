@@ -23,12 +23,11 @@ i18n.enableFallback = true;
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { Checkbox } from "react-native-paper";
-import Animated from "react-native-reanimated";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import Autocomplete from "../components/UI/Autocomplete";
 import GradientButton from "../components/UI/GradientButton";
 import IconButton from "../components/UI/IconButton";
-import { GlobalStyles, ListLayoutAnimation } from "../constants/styles";
+import { GlobalStyles } from "../constants/styles";
 import {
   asyncStoreGetItem,
   asyncStoreGetObject,
@@ -42,12 +41,7 @@ import { DEFAULTCATEGORIES } from "../util/category";
 import safeLogError from "../util/error";
 import { ExpenseData } from "../util/expense";
 import { formatExpenseWithCurrency } from "../util/string";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../util/scalingUtil";
+import { dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 
 const FinderScreen = () => {

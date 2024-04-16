@@ -64,7 +64,7 @@ import { isPremiumMember } from "../Premium/PremiumConstants";
 import Toast from "react-native-toast-message";
 import { sleep } from "../../util/appState";
 import safeLogError from "../../util/error";
-import { dynamicScale, moderateScale, scale } from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 
 const TripForm = ({ navigation, route }) => {
   const tripCtx = useContext(TripContext);

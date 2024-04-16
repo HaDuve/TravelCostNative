@@ -6,7 +6,6 @@ import {
   FlatList,
   Alert,
   useWindowDimensions,
-  Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
@@ -45,12 +44,7 @@ import { daysBetween } from "../../util/date";
 import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
 import safeLogError from "../../util/error";
 import { getTripData } from "../../util/trip";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 import { Platform } from "react-native";
 
 export type TripHistoryItemType = {

@@ -24,7 +24,7 @@ import FlatButton from "../UI/FlatButton";
 import { useNavigation } from "@react-navigation/native";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { UserContext } from "../../store/user-context";
-import { dynamicScale, moderateScale } from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 
 function ExpensesOutput({
   expenses,

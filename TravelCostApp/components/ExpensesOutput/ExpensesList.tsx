@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
   Alert,
-  Dimensions,
   Platform,
   TouchableOpacity,
   StyleSheet,
@@ -74,9 +73,6 @@ import { Pressable } from "react-native";
 import safeLogError from "../../util/error";
 import {
   dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
 } from "../../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);

@@ -2,11 +2,7 @@ import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import React from "react";
 import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
-import {
-  dynamicScale,
-  moderateScale,
-  verticalScale,
-} from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 
 const SettingsSwitch = ({ style, toggleState, state, label, labelStyle }) => {
   return (

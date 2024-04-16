@@ -4,7 +4,7 @@ import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import PropTypes from "prop-types";
-import { dynamicScale, moderateScale, scale } from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 
 const GradientButton = ({
   children,

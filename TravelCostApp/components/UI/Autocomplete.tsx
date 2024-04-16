@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { dynamicScale, moderateScale } from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 
 const Autocomplete = ({
   value: origValue,

@@ -18,7 +18,6 @@ i18n.enableFallback = true;
 
 import {
   Alert,
-  Dimensions,
   FlatList,
   Platform,
   StyleSheet,
@@ -46,13 +45,7 @@ import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { Pressable, ScrollView } from "react-native";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../util/scalingUtil";
-import { useOrientation } from "../components/Hooks/useOrientation";
+import { dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 
 const SplitSummaryScreen = ({ navigation }) => {

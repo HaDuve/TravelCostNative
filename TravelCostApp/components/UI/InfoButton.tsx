@@ -3,7 +3,7 @@ import React from "react";
 import { Pressable } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
-import { dynamicScale, moderateScale } from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 
 const InfoButton = ({ containerStyle, onPress }) => {
   return (

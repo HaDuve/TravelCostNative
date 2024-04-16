@@ -20,9 +20,6 @@ import {
 } from "../../store/secure-storage";
 import {
   dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
 } from "../../util/scalingUtil";
 
 function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {

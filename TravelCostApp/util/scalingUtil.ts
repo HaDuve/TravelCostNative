@@ -7,7 +7,7 @@ const { width: Startup_Width, height: Startup_Height } =
 //Guideline sizes are based on standard ~5" screen mobile device
 const guidelineBaseWidth = 375;
 const guidelineBaseHeight = 667;
-const tabletScaleMult = 0.6;
+const tabletScaleMult = 1.2;
 const phoneScaleMult = 0.9;
 
 const scale = (size: number) => (Startup_Width / guidelineBaseWidth) * size;

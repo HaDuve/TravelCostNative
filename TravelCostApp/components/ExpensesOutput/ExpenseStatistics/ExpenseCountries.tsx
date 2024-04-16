@@ -25,9 +25,6 @@ import { processTitleStringFilteredPiecharts } from "../../../util/string";
 import { TripContext } from "../../../store/trip-context";
 import {
   dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
 } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
 

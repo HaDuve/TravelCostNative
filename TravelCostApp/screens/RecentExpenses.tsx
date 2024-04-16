@@ -25,7 +25,6 @@ import {
   View,
   RefreshControl,
   useWindowDimensions,
-  Dimensions,
 } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
@@ -44,7 +43,6 @@ i18n.enableFallback = true;
 import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpensesUtil";
-import { asyncStoreGetObject } from "../store/async-storage";
 import { _toShortFormat } from "../util/dateTime";
 import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
 import { isForeground } from "../util/appState";
@@ -59,14 +57,8 @@ import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { Platform } from "react-native";
 import { memo } from "react";
 import { getMMKVObject } from "../store/mmkv";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../util/scalingUtil";
+import { dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
-import { useStateWithCallback } from "../components/Hooks/useStateWithCallback";
 
 function RecentExpenses({ navigation }) {
   const expensesCtx = useContext(ExpensesContext);

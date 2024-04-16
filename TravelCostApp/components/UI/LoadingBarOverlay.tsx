@@ -11,12 +11,7 @@ import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 import PropTypes from "prop-types";
 import * as Progress from "react-native-progress";
 import LoadingOverlay from "./LoadingOverlay";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";

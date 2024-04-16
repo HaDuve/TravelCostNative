@@ -32,9 +32,6 @@ import { getExpensesSum } from "../../../util/expense";
 import FlatButton from "../../UI/FlatButton";
 import {
   dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
 } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
 

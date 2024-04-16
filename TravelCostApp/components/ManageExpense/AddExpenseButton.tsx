@@ -1,4 +1,4 @@
-import React, { Alert, Dimensions, Pressable, StyleSheet } from "react-native";
+import React, { Alert, Pressable, StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";
 import Animated, {
@@ -27,7 +27,6 @@ import PropTypes from "prop-types";
 import { SettingsContext } from "../../store/settings-context";
 import { TripContext } from "../../store/trip-context";
 import { AuthContext } from "../../store/auth-context";
-import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { reloadApp, sleep } from "../../util/appState";
 import { ExpensesContext } from "../../store/expenses-context";
 import { FlatList } from "react-native";
@@ -42,12 +41,7 @@ import { getCatSymbol } from "../../util/category";
 import IconButton from "../UI/IconButton";
 import uniqBy from "lodash.uniqby";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
 
 const PageLength = 20;

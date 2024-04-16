@@ -27,7 +27,7 @@ import { de, en, fr, ru } from "../i18n/supportedLanguages";
 import { AuthContext } from "../store/auth-context";
 import { secureStoreGetItem } from "../store/secure-storage";
 import { sleep } from "../util/appState";
-import { fetchTripHistory, storeExpoPushTokenInTrip } from "../util/http";
+import { storeExpoPushTokenInTrip } from "../util/http";
 import { saveStoppedTour } from "../util/tourUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
@@ -44,13 +44,7 @@ import Purchases from "react-native-purchases";
 import { setAttributesAsync } from "../components/Premium/PremiumConstants";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import { NetworkContext } from "../store/network-context";
-import safeLogError from "../util/error";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../util/scalingUtil";
+import { dynamicScale } from "../util/scalingUtil";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({

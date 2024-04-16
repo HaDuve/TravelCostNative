@@ -28,9 +28,6 @@ import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
 import {
   dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
 } from "../../util/scalingUtil";
 
 function AuthContent({ isLogin, onAuthenticate, isConnected }) {

@@ -30,14 +30,9 @@ import { Image } from "react-native";
 import InfoButton from "../components/UI/InfoButton";
 import GradientButton from "../components/UI/GradientButton";
 import BlurPremium from "../components/Premium/BlurPremium";
-import {
-  dynamicScale,
-  moderateScale,
-  verticalScale,
-} from "../util/scalingUtil";
+import { dynamicScale } from "../util/scalingUtil";
 import { NetworkContext } from "../store/network-context";
 import Toast from "react-native-toast-message";
-import { err } from "react-native-svg/lib/typescript/xml";
 
 const GPTDealScreen = ({ route, navigation }) => {
   const { price, currency, country, product } = route.params;

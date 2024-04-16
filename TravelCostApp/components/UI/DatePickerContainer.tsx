@@ -4,12 +4,7 @@ import { GlobalStyles } from "../../constants/styles";
 import { toShortFormat } from "../../util/date";
 import IconButton from "./IconButton";
 import PropTypes from "prop-types";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 
 const DatePickerContainer = ({
   openDatePickerRange,

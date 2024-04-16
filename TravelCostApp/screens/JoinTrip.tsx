@@ -47,7 +47,7 @@ import {
   isConnectionFastEnoughAsBool,
 } from "../util/connectionSpeed";
 import { sleep } from "../util/appState";
-import { dynamicScale, moderateScale } from "../util/scalingUtil";
+import { dynamicScale } from "../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;

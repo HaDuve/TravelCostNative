@@ -5,9 +5,6 @@ import PropTypes from "prop-types";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import {
   dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
 } from "../../util/scalingUtil";
 
 function Input({

@@ -8,12 +8,7 @@ import { useContext } from "react";
 import { TripContext } from "../../store/trip-context";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { GlobalStyles } from "../../constants/styles";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
 
 const CategoryChart = ({ inputData }) => {
@@ -37,7 +32,7 @@ const CategoryChart = ({ inputData }) => {
       <VictoryPie
         data={chartDataForRender}
         height={
-          isPortrait ? dynamicScale(200, true) : dynamicScale(110, false, 0.5)
+          isPortrait ? dynamicScale(200, true) : dynamicScale(400, false, 0.5)
         }
         startAngle={-270}
         endAngle={90}
@@ -47,8 +42,8 @@ const CategoryChart = ({ inputData }) => {
         }}
         innerRadius={
           isPortrait
-            ? dynamicScale(70, false, 0.5)
-            : dynamicScale(30, false, 0.5)
+            ? dynamicScale(80, false, 0.5)
+            : dynamicScale(150, false, 0.5)
         }
         padAngle={0}
         padding={isPortrait ? dynamicScale(10) : dynamicScale(8)}

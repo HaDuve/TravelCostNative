@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
-  Platform,
 } from "react-native";
 // import animated from reanimated
 import Animated, {
@@ -24,9 +23,8 @@ i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
-import { useContext, useLayoutEffect } from "react";
+import { useContext } from "react";
 import { TripContext } from "../store/trip-context";
 import { GlobalStyles } from "../constants/styles";
 import { fetchCategories, updateTrip } from "../util/http";
@@ -41,7 +39,6 @@ import { UserContext } from "../store/user-context";
 import * as Haptics from "expo-haptics";
 import Toast from "react-native-toast-message";
 import { Category, DEFAULTCATEGORIES } from "../util/category";
-import Dimensions from "react-native";
 import { alertYesNo } from "../components/Errors/Alert";
 import IconButton from "../components/UI/IconButton";
 import { NetworkContext } from "../store/network-context";
@@ -52,12 +49,7 @@ import BlurPremium from "../components/Premium/BlurPremium";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
 import { useMemo } from "react";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../util/scalingUtil";
+import { dynamicScale } from "../util/scalingUtil";
 
 const ManageCategoryScreen = ({ navigation }) => {
   // defaultCategories minus the last element (-new cat element)

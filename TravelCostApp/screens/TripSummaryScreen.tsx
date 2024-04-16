@@ -47,12 +47,7 @@ import * as Progress from "react-native-progress";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import ExpenseCountryFlag from "../components/ExpensesOutput/ExpenseCountryFlag";
 import GradientButton from "../components/UI/GradientButton";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../util/scalingUtil";
+import { dynamicScale, scale } from "../util/scalingUtil";
 import { Platform } from "react-native";
 
 export type TripAsObject = {

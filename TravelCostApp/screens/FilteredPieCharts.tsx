@@ -33,12 +33,7 @@ import BackButton from "../components/UI/BackButton";
 import AddExpenseHereButton from "../components/UI/AddExpensesHereButton";
 import { ExpenseData } from "../util/expense";
 import { getEarliestDate } from "../util/date";
-import {
-  dynamicScale,
-  moderateScale,
-  verticalScale,
-} from "../util/scalingUtil";
-import { useOrientation } from "../components/Hooks/useOrientation";
+import { dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 
 const FilteredPieCharts = ({ navigation, route }) => {

@@ -6,7 +6,7 @@ import IconButton from "./IconButton";
 import { useNavigation } from "@react-navigation/native";
 import PropTypes from "prop-types";
 import * as Haptics from "expo-haptics";
-import { dynamicScale, moderateScale } from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 
 const BackButton = ({ style }) => {
   const navigation = useNavigation();

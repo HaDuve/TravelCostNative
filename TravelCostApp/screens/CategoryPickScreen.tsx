@@ -32,7 +32,7 @@ import BackButton from "../components/UI/BackButton";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import { useCallback } from "react";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
-import { dynamicScale, moderateScale } from "../util/scalingUtil";
+import { dynamicScale } from "../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;

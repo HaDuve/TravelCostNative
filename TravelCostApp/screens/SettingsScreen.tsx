@@ -44,12 +44,7 @@ import safeLogError from "../util/error";
 import { canOpenURL } from "expo-linking";
 import DevContent from "../components/Settings/DevContent";
 import CurrencyExchangeInfo from "../components/UI/CurrencyExchangeInfo";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../util/scalingUtil";
+import { dynamicScale } from "../util/scalingUtil";
 
 const SettingsScreen = ({ navigation }) => {
   const authCtx = useContext(AuthContext);

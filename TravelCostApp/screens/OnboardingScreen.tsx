@@ -12,7 +12,7 @@ i18n.enableFallback = true;
 import Onboarding from "react-native-onboarding-swiper";
 import { GlobalStyles } from "../constants/styles";
 import PropTypes from "prop-types";
-import { dynamicScale, moderateScale, scale } from "../util/scalingUtil";
+import { dynamicScale } from "../util/scalingUtil";
 
 const OnboardingScreen = ({ navigation }) => {
   return (

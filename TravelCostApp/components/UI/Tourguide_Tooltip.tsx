@@ -3,12 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { IStep, Labels, TooltipProps } from "rn-tourguide";
 import FlatButton from "./FlatButton";
 import { GlobalStyles } from "../../constants/styles";
-import {
-  dynamicScale,
-  moderateScale,
-  scale,
-  verticalScale,
-} from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 
 export interface TooltipProp {
   isFirstStep?: boolean;

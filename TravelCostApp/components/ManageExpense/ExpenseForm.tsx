@@ -94,8 +94,9 @@ import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { Platform } from "react-native";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { MAX_EXPENSES_PERTRIP_NONPREMIUM } from "../../confAppConstants";
-import { constantScale, dynamicScale } from "../../util/scalingUtil";
+import { constantScale, dynamicScale, isTablet } from "../../util/scalingUtil";
 import { getRate } from "../../util/currencyExchange";
+import { OrientationContext } from "../../store/orientation-context";
 
 const ExpenseForm = ({
   onCancel,
@@ -117,6 +118,7 @@ const ExpenseForm = ({
   const netCtx = useContext(NetworkContext);
   const expCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
+  const { isPortrait, isLandscape, isTablet } = useContext(OrientationContext);
   const hideSpecial = settings.hideSpecialExpenses;
   const alwaysShowAdvancedSetting = settings.alwaysShowAdvanced || isEditing;
   const editingValues: ExpenseData = defaultValues;
@@ -1734,7 +1736,7 @@ const ExpenseForm = ({
                               <Text
                                 style={{
                                   paddingBottom: dynamicScale(11, true),
-                                  marginLeft: dynamicScale(-18),
+                                  marginLeft: dynamicScale(-18, false, 1.3),
                                   marginRight: dynamicScale(8),
                                 }}
                               >
@@ -1779,12 +1781,6 @@ const ExpenseForm = ({
               {submitButtonLabel}
             </GradientButton>
           </View>
-          {/* Commented out ChatGPT Button */}
-
-          {/* {!amountValue && i18n.t("askChatGptPre")} */}
-          {/* {!amountValue && "AskGPT: What would be a good Price?"}
-                  {amountValue && isEditing && i18n.t("askChatGptPost")}
-                  {amountValue && !isEditing && i18n.t("askChatGptPre")} */}
         </Animated.View>
       </Animated.View>
       {Platform.OS == "ios" && (
@@ -1802,6 +1798,7 @@ const ExpenseForm = ({
               backgroundColor: GlobalStyles.colors.backgroundColorLight,
               borderTopWidth: 1,
               borderColor: GlobalStyles.colors.gray700,
+              minWidth: isTablet ? (isPortrait ? "90%" : "135%") : "100%",
             }}
           >
             <TouchableOpacity

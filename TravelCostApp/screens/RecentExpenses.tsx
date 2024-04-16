@@ -57,7 +57,7 @@ import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { Platform } from "react-native";
 import { memo } from "react";
 import { getMMKVObject } from "../store/mmkv";
-import { dynamicScale } from "../util/scalingUtil";
+import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 
 function RecentExpenses({ navigation }) {
@@ -67,7 +67,7 @@ function RecentExpenses({ navigation }) {
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const tripid = tripCtx.tripid;
-  const { isPortrait } = useContext(OrientationContext);
+  const { isPortrait, isTablet } = useContext(OrientationContext);
   const netCtx = useContext(NetworkContext);
   const isOnline = netCtx.isConnected && netCtx.strongConnection;
   const { settings } = useContext(SettingsContext);
@@ -315,7 +315,7 @@ function RecentExpenses({ navigation }) {
   const isLongNumber = expensesSumString?.length > 10;
   const { fontScale } = useWindowDimensions();
   const isScaledUp = fontScale > 1;
-  const useMoreSpace = isScaledUp || isLongNumber;
+  const useMoreSpace = (isScaledUp || isLongNumber) && isPortrait;
 
   const ExpensesOutputJSX = (
     <MemoizedExpensesOutput
@@ -346,7 +346,7 @@ function RecentExpenses({ navigation }) {
   //   return <LoadingOverlay />;
   // }
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
       <TourGuideZone
         text={i18n.t("walk1")}
         zone={1}
@@ -460,6 +460,9 @@ const styles = StyleSheet.create({
         // paddingTop: "3%",
       },
     }),
+  },
+  tabletPaddingTop: {
+    paddingTop: constantScale(16, 0.5),
   },
   dateHeader: {
     marginVertical: dynamicScale(16, true),

@@ -36,7 +36,7 @@ import { TripContext } from "../store/trip-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { showBanner } from "../components/UI/ToastComponent";
-import { dynamicScale } from "../util/scalingUtil";
+import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 
 const OverviewScreen = ({ navigation }) => {
@@ -129,11 +129,11 @@ const OverviewScreen = ({ navigation }) => {
   );
   const isLongNumber = expensesSumString?.length > 10;
   const { fontScale } = useWindowDimensions();
-  const { isPortrait } = useContext(OrientationContext);
+  const { isPortrait, isTablet } = useContext(OrientationContext);
   const isScaledUp = fontScale > 1;
-  const useMoreSpace = isScaledUp || isLongNumber;
+  const useMoreSpace = (isScaledUp || isLongNumber) && isPortrait;
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
       <View
         style={[styles.dateHeader, !isPortrait && styles.landscapeDateHeader]}
       >
@@ -205,7 +205,11 @@ const OverviewScreen = ({ navigation }) => {
       </View>
       {
         <View
-          style={[styles.tempGrayBar1, !isPortrait && styles.landscapeBar]}
+          style={[
+            styles.tempGrayBar1,
+            !isPortrait && styles.landscapeBar,
+            !isPortrait && isTablet && styles.landscapeBarTablet,
+          ]}
         ></View>
       }
 
@@ -228,8 +232,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    // overflow: "visible",
-    // justifyContent: "flex-start",
+  },
+  tabletPaddingTop: {
+    paddingTop: constantScale(12, 0.5),
   },
   dateHeader: {
     marginTop: dynamicScale(12, true),
@@ -317,6 +322,10 @@ const styles = StyleSheet.create({
   landscapeBar: {
     marginTop: dynamicScale(12, true),
     marginBottom: dynamicScale(-12, true),
+  },
+  landscapeBarTablet: {
+    marginTop: dynamicScale(52, true, 1),
+    marginBottom: dynamicScale(4, true),
   },
   customSummaryStyle: {
     marginTop: dynamicScale(-12, true),

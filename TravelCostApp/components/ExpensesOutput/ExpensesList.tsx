@@ -1,10 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {
-  Alert,
-  Platform,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { Alert, Platform, TouchableOpacity, StyleSheet } from "react-native";
 
 import { MemoizedExpenseItem } from "./ExpenseItem";
 import React, {
@@ -71,9 +66,7 @@ import {
 import { TripAsObject } from "../../screens/TripSummaryScreen";
 import { Pressable } from "react-native";
 import safeLogError from "../../util/error";
-import {
-  dynamicScale,
-} from "../../util/scalingUtil";
+import { constantScale, dynamicScale } from "../../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 i18n.enableFallback = true;
@@ -152,7 +145,7 @@ function ExpensesList({
           paddingLeft: dynamicScale(10, true, 0.5),
           alignContent: "center",
           justifyContent: "center",
-          width: dynamicScale(55),
+          width: dynamicScale(56),
           backgroundColor: GlobalStyles.colors.error500,
         }}
       >
@@ -346,7 +339,7 @@ function ExpensesList({
       )
         return (
           <View
-            style={{ height: dynamicScale(55, true), width: "100%" }}
+            style={{ height: dynamicScale(56, true), width: "100%" }}
           ></View>
         );
       const index = itemData.index;
@@ -364,7 +357,7 @@ function ExpensesList({
               style={[
                 styles.fastExpenseContainer,
                 {
-                  height: dynamicScale(55, true),
+                  height: constantScale(55),
                   paddingLeft: dynamicScale(16),
                   paddingRight: dynamicScale(12),
                 },
@@ -423,7 +416,7 @@ function ExpensesList({
         return (
           <View
             style={{
-              height: dynamicScale(55, true),
+              height: constantScale(55),
               width: "100%",
               backgroundColor: GlobalStyles.colors.backgroundColor,
             }}
@@ -454,7 +447,7 @@ function ExpensesList({
         );
       //else platform ios
       return (
-        <View style={{ height: dynamicScale(55, true), width: "100%" }}>
+        <View style={{ height: constantScale(55), width: "100%" }}>
           <Swipeable
             renderRightActions={(progress, dragX) =>
               renderRightActions(

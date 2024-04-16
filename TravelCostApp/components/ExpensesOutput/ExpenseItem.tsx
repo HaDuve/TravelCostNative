@@ -30,7 +30,7 @@ import { useEffect } from "react";
 import * as Haptics from "expo-haptics";
 import { ExpenseData } from "../../util/expense";
 import { useRef } from "react";
-import { dynamicScale } from "../../util/scalingUtil";
+import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
@@ -59,6 +59,16 @@ function ExpenseItem(props): JSX.Element {
   const { tripCurrency } = useContext(TripContext);
   const { periodName, catIconNames } = useContext(UserContext);
   const rate = calcAmount / amount;
+  // const { orientation, width, height } = useContext(OrientationContext);
+  // console.log(
+  //   orientation,
+  //   width,
+  //   height,
+  //   "const100:",
+  //   constantScale(100, 0.5).toFixed(2),
+  //   "dynamic100:",
+  //   dynamicScale(100, true, 0.5).toFixed(2)
+  // );
 
   const calculateSumForTraveller = useCallback(() => {
     if (
@@ -253,12 +263,7 @@ function ExpenseItem(props): JSX.Element {
 
   // if (!id) return <></>;
   return (
-    <View
-      style={[
-        { height: dynamicScale(55, true) },
-        hideSpecial && { opacity: 0.75 },
-      ]}
-    >
+    <View style={hideSpecial && { opacity: 0.75 }}>
       <Pressable
         onPress={navigateToExpense}
         onLongPress={() => {
@@ -271,7 +276,7 @@ function ExpenseItem(props): JSX.Element {
           style={[
             styles.expenseItem,
             {
-              height: dynamicScale(55, true),
+              height: constantScale(55),
               paddingLeft: dynamicScale(16),
               ...Platform.select({
                 ios: {
@@ -337,7 +342,7 @@ function ExpenseItem(props): JSX.Element {
           <View style={styles.amountContainer}>
             <Text
               style={[
-                styles.amount,
+                styles.amountText,
                 hideSpecial && {
                   color: GlobalStyles.colors.errorHidden,
                 },
@@ -410,10 +415,11 @@ const styles = StyleSheet.create({
     marginTop: dynamicScale(4, true),
     marginRight: dynamicScale(8),
     marginLeft: 0,
+    height: constantScale(44, 0.5),
   },
   leftItem: {
     flex: 1,
-    maxHeight: dynamicScale(40, true),
+    height: dynamicScale(40, true),
     alignContent: "flex-start",
     justifyContent: "flex-start",
     alignItems: "flex-start",
@@ -425,11 +431,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,
-    minWidth: dynamicScale(80),
+    width: constantScale(150, 0.5),
+    height: constantScale(40, 0.5),
   },
-  amount: {
-    minWidth: dynamicScale(100),
-    maxWidth: dynamicScale(100),
+  amountText: {
     textAlign: "center",
     fontSize: dynamicScale(20, false, 0.5),
     fontWeight: "300",
@@ -443,6 +448,8 @@ const styles = StyleSheet.create({
   },
   countryFlagContainer: {
     marginRight: dynamicScale(4),
+    height: constantScale(40, 0.5),
+    width: constantScale(50, 0.5),
   },
   countryFlag: {
     marginTop: dynamicScale(3, true),
@@ -454,11 +461,13 @@ const styles = StyleSheet.create({
     paddingRight: dynamicScale(10),
     // center items left
     flexDirection: "row",
+    height: constantScale(30, 0.5),
+    width: constantScale(100, 0.5),
   },
   avatar: {
     marginRight: dynamicScale(-6),
-    minHeight: dynamicScale(22, false, 0.5),
-    minWidth: dynamicScale(22, false, 0.5),
+    minHeight: constantScale(20, 0.5),
+    minWidth: constantScale(20, 0.5),
     borderRadius: 60,
     borderWidth: dynamicScale(1, false, 0.5),
     borderColor: GlobalStyles.colors.primaryGrayed,
@@ -467,8 +476,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     ...Platform.select({
       android: {
-        minHeight: dynamicScale(22, true),
-        minWidth: dynamicScale(22),
+        minHeight: constantScale(20, 0.5),
+        minWidth: constantScale(20, 0.5),
       },
     }),
   },

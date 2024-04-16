@@ -242,7 +242,7 @@ const toastConfig: ToastConfig = {
         <View style={styles.budgetOverviewHeader}>
           <Text style={styles.overviewTextTitle}>{i18n.t("overview")}</Text>
           <Pressable onPress={() => Toast.hide()}>
-            <Text>X</Text>
+            <Text style={styles.overviewTextTitle}>X</Text>
           </Pressable>
         </View>
 
@@ -251,7 +251,7 @@ const toastConfig: ToastConfig = {
             data={travellerList}
             ListHeaderComponent={() => {
               return (
-                <Text style={styles.overviewTextTitle}>
+                <Text style={styles.overviewTextInfo}>
                   {i18n.t("budgetPerTraveller")}:{" "}
                   {formatExpenseWithCurrency(travellerBudgets, currency)} /{" "}
                   {i18n.t(periodName)}
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
   },
   overviewTextInfo: {
     fontSize: dynamicScale(18, false, 0.5),
-    fontWeight: "200",
+    fontWeight: "300",
     color: GlobalStyles.colors.textColor,
     textAlign: "left",
     paddingVertical: dynamicScale(8, true),
@@ -424,8 +424,8 @@ const styles = StyleSheet.create({
     paddingTop: dynamicScale(5, true),
   },
   overviewTextTitle: {
-    fontSize: dynamicScale(18, false, 0.5),
-    fontWeight: "400",
+    fontSize: dynamicScale(20, false, 0.5),
+    fontWeight: "500",
     color: GlobalStyles.colors.textColor,
     textAlign: "left",
     paddingVertical: dynamicScale(8, true),

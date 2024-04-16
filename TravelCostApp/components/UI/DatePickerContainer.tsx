@@ -4,7 +4,7 @@ import { GlobalStyles } from "../../constants/styles";
 import { toShortFormat } from "../../util/date";
 import IconButton from "./IconButton";
 import PropTypes from "prop-types";
-import { dynamicScale } from "../../util/scalingUtil";
+import { constantScale, dynamicScale } from "../../util/scalingUtil";
 
 const DatePickerContainer = ({
   openDatePickerRange,
@@ -59,11 +59,11 @@ DatePickerContainer.propTypes = {
 
 const styles = StyleSheet.create({
   dateIconContainer: {
-    marginLeft: dynamicScale(7.5),
+    marginLeft: constantScale(7.5, 0.5),
   },
   buttonContainer: {
-    margin: dynamicScale(4),
-    padding: dynamicScale(4),
+    margin: constantScale(4, 0.5),
+    padding: constantScale(4, 0.5),
     borderWidth: 1,
 
     borderColor: GlobalStyles.colors.gray700,
@@ -79,10 +79,10 @@ const styles = StyleSheet.create({
   dateContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-
-    marginHorizontal: dynamicScale(15),
-    marginTop: dynamicScale(12, true),
-    paddingBottom: dynamicScale(12, true),
+    marginRight: dynamicScale(30, false, 0.5),
+    marginLeft: dynamicScale(4, false, 0.5),
+    marginTop: dynamicScale(12, true, 0.5),
+    paddingBottom: dynamicScale(12, true, 0.5),
   },
   advancedText: {
     marginTop: dynamicScale(9, true),

@@ -23,7 +23,6 @@ function TripList({ trips }) {
     <View
       style={{
         flex: 1,
-        minHeight: "90%",
         zIndex: -10,
       }}
     >

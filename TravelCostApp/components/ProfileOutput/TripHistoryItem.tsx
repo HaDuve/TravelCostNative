@@ -571,9 +571,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     margin: dynamicScale(4),
-    padding: dynamicScale(8),
+    padding: dynamicScale(8, false, 0.5),
     borderRadius: dynamicScale(16, false, 0.5),
-    maxWidth: "47%",
+    maxWidth: "45%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
     // android styles
     ...Platform.select({
@@ -590,7 +590,7 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.gray500,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: dynamicScale(14),
+    marginRight: dynamicScale(14, false, 0.5),
   },
   avatarText: {
     fontSize: dynamicScale(14, false, 0.5),

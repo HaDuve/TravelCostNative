@@ -94,7 +94,7 @@ import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { Platform } from "react-native";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { MAX_EXPENSES_PERTRIP_NONPREMIUM } from "../../confAppConstants";
-import { dynamicScale } from "../../util/scalingUtil";
+import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { getRate } from "../../util/currencyExchange";
 
 const ExpenseForm = ({
@@ -1373,18 +1373,18 @@ const ExpenseForm = ({
                           {/* "expand-outline" */}
                           <IconButton
                             icon="people-circle-outline"
-                            size={dynamicScale(28, false, 0.5)}
+                            size={constantScale(28, 0.5)}
                             buttonStyle={[
                               {
-                                height: dynamicScale(48, false, 0.5),
+                                height: constantScale(48, 0.5),
                                 backgroundColor:
                                   GlobalStyles.colors.backgroundColor,
                                 borderRadius: dynamicScale(4, false, 0.5),
                                 borderWidth: 1,
                                 borderColor: GlobalStyles.colors.gray700,
-                                marginTop: dynamicScale(8, true),
-                                marginRight: dynamicScale(12),
-                                marginLeft: dynamicScale(-8),
+                                marginRight: constantScale(12),
+                                marginLeft: constantScale(-8),
+                                padding: constantScale(4),
                               },
                               GlobalStyles.strongShadow,
                             ]}
@@ -1626,14 +1626,14 @@ const ExpenseForm = ({
                             style={[
                               GlobalStyles.strongShadow,
                               {
-                                minWidth: dynamicScale(100, false, 0.5),
-                                marginTop: dynamicScale(14, false, 0.5),
-                                marginBottom: dynamicScale(8, false, 0.5),
+                                minWidth: constantScale(100, 0.5),
+                                marginTop: constantScale(14, 0.5),
+                                marginBottom: constantScale(8, 0.5),
                                 borderWidth: 1,
                                 borderRadius: 8,
-                                padding: dynamicScale(8, false, 0.5),
-                                paddingBottom: dynamicScale(32, true, 0.5),
-                                margin: dynamicScale(8, false, 0.5),
+                                padding: constantScale(8, 0.5),
+                                paddingBottom: constantScale(32, 0.5),
+                                margin: constantScale(8, 0.5),
                                 backgroundColor:
                                   GlobalStyles.colors.backgroundColor,
                                 borderColor: GlobalStyles.colors.gray700,
@@ -1947,8 +1947,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: GlobalStyles.colors.gray700,
-    padding: dynamicScale(8, true),
-    marginTop: dynamicScale(8, true),
+    padding: constantScale(8, 0.5),
+    marginTop: constantScale(8, 0.5),
   },
   quickSumButton: {
     borderWidth: 1,
@@ -1990,7 +1990,7 @@ const styles = StyleSheet.create({
   },
   countryFlagContainer: {
     marginRight: "5%",
-    marginTop: dynamicScale(20, true),
+    marginTop: constantScale(20, -1.5),
   },
   countryFlag: {
     width: dynamicScale(60, false, 0.5),

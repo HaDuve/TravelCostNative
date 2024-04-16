@@ -64,9 +64,9 @@ const ExpenseChart = ({
       }
     }
   });
-  const hTabletScaling = isLandscape ? 0.7 : 1.9;
+  const hTabletScaling = isLandscape ? 1.7 : 1.9;
   const hPhoneScaling = isLandscape ? 16 : 1.9;
-  const wTabletScaling = isLandscape ? 0.1 : 1;
+  const wTabletScaling = isLandscape ? 0.8 : 1;
   const wPhoneScaling = isLandscape ? 10 : 0.1;
   const hScaling = isTablet ? hTabletScaling : hPhoneScaling;
   const wScaling = isTablet ? wTabletScaling : wPhoneScaling;

@@ -47,7 +47,7 @@ import * as Progress from "react-native-progress";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import ExpenseCountryFlag from "../components/ExpensesOutput/ExpenseCountryFlag";
 import GradientButton from "../components/UI/GradientButton";
-import { dynamicScale, scale } from "../util/scalingUtil";
+import { constantScale, dynamicScale, scale } from "../util/scalingUtil";
 import { Platform } from "react-native";
 
 export type TripAsObject = {
@@ -336,7 +336,7 @@ const TripSummaryScreen = ({ navigation }) => {
               borderWidth={0}
               borderRadius={dynamicScale(8, false, 0.5)}
               progress={progress}
-              height={dynamicScale(12, true)}
+              height={constantScale(12, 0.5)}
               width={scale(200)}
             ></Progress.Bar>
           </View>

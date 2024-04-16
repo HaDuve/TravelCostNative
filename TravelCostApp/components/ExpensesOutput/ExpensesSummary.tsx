@@ -28,7 +28,7 @@ import {
   getTravellerSum,
 } from "../../util/expense";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
-import { dynamicScale } from "../../util/scalingUtil";
+import { constantScale, dynamicScale } from "../../util/scalingUtil";
 
 const ExpensesSummary = ({
   expenses,
@@ -281,7 +281,7 @@ const ExpensesSummary = ({
         borderWidth={0}
         borderRadius={dynamicScale(8)}
         progress={budgetProgress}
-        height={dynamicScale(12, true)}
+        height={constantScale(12, 0.5)}
         width={useMoreSpace ? dynamicScale(180) : dynamicScale(150)}
       />
     </Pressable>

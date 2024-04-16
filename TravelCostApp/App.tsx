@@ -118,7 +118,7 @@ const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
 const BottomTabs = createMaterialTopTabNavigator();
 
-const IconSize = constantScale(24, -0.2);
+const IconSize = constantScale(24, 0.1);
 
 const prefix = Linking.createURL("/");
 function NotAuthenticatedStack() {

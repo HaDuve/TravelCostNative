@@ -26,7 +26,7 @@ import { DEVELOPER_MODE } from "../../confAppConstants";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { Pressable } from "react-native";
-import { dynamicScale, scale } from "../../util/scalingUtil";
+import { constantScale, dynamicScale, scale } from "../../util/scalingUtil";
 import { DeviceType, deviceType } from "expo-device";
 
 const MINHEIGHT = dynamicScale(60, true);
@@ -122,7 +122,7 @@ const toastConfig: ToastConfig = {
           unfilledColor={unfilledColor}
           borderWidth={0}
           borderRadius={dynamicScale(8, false, 0.5)}
-          height={dynamicScale(14, true)}
+          height={constantScale(14, 0.5)}
           width={barWidth}
         ></Progress.Bar>
       </View>
@@ -308,7 +308,7 @@ const toastConfig: ToastConfig = {
                       borderWidth={0}
                       progress={budgetProgress}
                       width={scale(180)}
-                      height={dynamicScale(20, true)}
+                      height={constantScale(20, 0.5)}
                       borderRadius={dynamicScale(8, false, 0.5)}
                     ></Progress.Bar>
                   </View>

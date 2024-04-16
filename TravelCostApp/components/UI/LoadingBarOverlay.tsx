@@ -11,7 +11,7 @@ import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 import PropTypes from "prop-types";
 import * as Progress from "react-native-progress";
 import LoadingOverlay from "./LoadingOverlay";
-import { dynamicScale } from "../../util/scalingUtil";
+import { constantScale, dynamicScale } from "../../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = Localization.locale.slice(0, 2);
 // i18n.locale = "en";
@@ -66,7 +66,7 @@ const LoadingBarOverlay = (props) => {
         borderWidth={0}
         borderRadius={dynamicScale(8, false, 0.5)}
         progress={progress}
-        height={dynamicScale(14, true)}
+        height={constantScale(14, 0.5)}
         width={barWidth}
       />
       {validProgress && (

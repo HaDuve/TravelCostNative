@@ -15,9 +15,7 @@ import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { useState } from "react";
 import { UserContext } from "../../../store/user-context";
-import {
-  dynamicScale,
-} from "../../../util/scalingUtil";
+import { constantScale, dynamicScale } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
 
 const CategoryProgressBar = ({
@@ -91,7 +89,7 @@ const CategoryProgressBar = ({
         borderWidth={0}
         borderRadius={dynamicScale(8)}
         progress={budgetProgress}
-        height={dynamicScale(14, true)}
+        height={constantScale(14, 0.5)}
         width={
           isPortrait
             ? dynamicScale(292, false, 0.96)

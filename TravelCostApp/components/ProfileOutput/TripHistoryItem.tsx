@@ -44,7 +44,7 @@ import { daysBetween } from "../../util/date";
 import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
 import safeLogError from "../../util/error";
 import { getTripData } from "../../util/trip";
-import { dynamicScale } from "../../util/scalingUtil";
+import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { Platform } from "react-native";
 
 export type TripHistoryItemType = {
@@ -409,7 +409,7 @@ function TripHistoryItem({ tripid, trips }) {
                 borderWidth={0}
                 borderRadius={dynamicScale(8, false, 0.5)}
                 progress={activeProgress}
-                height={dynamicScale(12, true)}
+                height={constantScale(12, 0.5)}
                 width={dynamicScale(150, true, 1)}
               />
             </View>
@@ -490,7 +490,7 @@ function TripHistoryItem({ tripid, trips }) {
               borderWidth={0}
               borderRadius={dynamicScale(8, false, 0.5)}
               progress={activeProgress}
-              height={dynamicScale(12, true)}
+              height={constantScale(12, 0.5)}
               width={dynamicScale(150, true, 1)}
             />
           </View>

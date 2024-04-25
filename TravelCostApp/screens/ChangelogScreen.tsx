@@ -103,8 +103,8 @@ const ChangelogScreen = ({ navigation }) => {
   return (
     <ScrollView style={styles.container}>
       <View style={[styles.headerContainer]}>
-        <BackButton style={{ padding: 12 }} />
-        <Text style={GlobalStyles.titleText}>Budget for Nomads Changelog</Text>
+        <BackButton style={{ padding: constantScale(12, 0.5) }} />
+        <Text style={GlobalStyles.titleText}>App Changes</Text>
       </View>
 
       <Pressable
@@ -208,6 +208,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     flexDirection: "row",
+    justifyContent: "space-between",
+    marginRight: "27.5%",
   },
   changelogContainer: {
     margin: constantScale(12, 0.5),

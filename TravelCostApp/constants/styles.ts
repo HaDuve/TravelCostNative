@@ -1,6 +1,10 @@
 import { Platform } from "react-native";
 import { Layout } from "react-native-reanimated";
-import { dynamicScale, verticalScale } from "../util/scalingUtil";
+import {
+  constantScale,
+  dynamicScale,
+  verticalScale,
+} from "../util/scalingUtil";
 
 export const GlobalStyles = {
   colors: {
@@ -65,11 +69,10 @@ export const GlobalStyles = {
   },
   row: { flexDirection: "row" },
   titleText: {
-    textAlign: "center",
     color: "#434343",
-    fontSize: dynamicScale(28),
+    fontSize: constantScale(28, 0.5),
     fontWeight: "bold",
-    marginBottom: dynamicScale(12, true),
+    marginBottom: dynamicScale(12, true, 0.1),
   },
   buttonTextGradient: {
     color: "#FFFFFF",

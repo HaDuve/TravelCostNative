@@ -17,6 +17,7 @@ import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
 import Toast from "react-native-toast-message";
 import Discount from "./Discount";
+import { constantScale } from "../../util/scalingUtil";
 
 const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
   const {
@@ -83,14 +84,16 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
         borderColor: GlobalStyles.colors.cat2,
         backgroundColor: GlobalStyles.colors.cat2,
         borderRadius: 24,
-        padding: 4,
-        paddingHorizontal: 16,
+        padding: constantScale(4, 0.5),
+        paddingHorizontal: constantScale(16, 0.5),
         alignItems: "center",
         marginTop: "-10.5%",
-        marginBottom: 4,
+        marginBottom: constantScale(4, 0.5),
       }}
     >
-      <Text style={{ color: "white" }}>{i18n.t("popular").toUpperCase()}</Text>
+      <Text style={{ color: "white", fontSize: constantScale(14, 0.5) }}>
+        {i18n.t("popular").toUpperCase()}
+      </Text>
     </View>
   );
 
@@ -142,11 +145,12 @@ const styles = StyleSheet.create({
   },
   title: {
     color: GlobalStyles.colors.textColor,
-    fontSize: 16,
+    fontSize: constantScale(16, 0.5),
     fontWeight: "bold",
   },
   discountStyle: {},
   terms: {
     color: "darkgrey",
+    fontSize: constantScale(14, 0.5),
   },
 });

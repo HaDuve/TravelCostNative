@@ -30,6 +30,7 @@ import PropTypes from "prop-types";
 import IconButton from "../UI/IconButton";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
+import { constantScale } from "../../util/scalingUtil";
 
 const PaywallScreen = ({ navigation }) => {
   // - State for all available package
@@ -116,10 +117,10 @@ const PaywallScreen = ({ navigation }) => {
             "\n" +
             i18n.t("paywallFeature2") +
             "\n" +
-            i18n.t("paywallFeature3") +
-            "\n" +
-            i18n.t("paywallFeature4") +
-            "\n" +
+            // i18n.t("paywallFeature3") +
+            // "\n" +
+            // i18n.t("paywallFeature4") +
+            // "\n" +
             i18n.t("paywallFeature5")}
         </Text>
         {/*  +
@@ -245,15 +246,15 @@ const styles = StyleSheet.create({
     overflow: "visible",
   },
   text: {
-    fontSize: 20,
+    fontSize: constantScale(20, 0.5),
     textAlign: "center",
-    margin: 10,
+    margin: constantScale(10, 0.5),
   },
   headerFooterContainer: {
-    paddingVertical: 20,
+    paddingVertical: constantScale(20, 0.5),
   },
   headerTitleText: {
-    fontSize: 32,
+    fontSize: constantScale(32, 0.5),
     // paddingHorizontal: "4%",
     marginTop: "-5%",
     marginBottom: "6%",
@@ -271,14 +272,14 @@ const styles = StyleSheet.create({
     overflow: "visible",
   },
   headerSubtitleText: {
-    fontSize: 18,
+    fontSize: constantScale(18, 0.5),
     fontWeight: "300",
     textAlign: "center",
     paddingHorizontal: "4%",
     // marginBottom: "6%",
   },
   featureText: {
-    fontSize: 18,
+    fontSize: constantScale(18, 0.5),
     fontWeight: "300",
     textAlign: "center",
     paddingHorizontal: "4%",
@@ -290,11 +291,11 @@ const styles = StyleSheet.create({
     // text color
     color: GlobalStyles.colors.primary700,
     // text size
-    fontSize: 12,
+    fontSize: constantScale(12, 0.5),
   },
   backButtonTextStyle: {
     color: GlobalStyles.colors.accent250,
-    fontSize: 16,
+    fontSize: constantScale(16, 0.5),
     fontWeight: "bold",
     textAlign: "left",
   },

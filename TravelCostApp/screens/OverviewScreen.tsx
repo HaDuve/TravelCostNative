@@ -337,6 +337,6 @@ const styles = StyleSheet.create({
     marginBottom: dynamicScale(4, true),
   },
   customSummaryStyle: {
-    marginTop: dynamicScale(-12, true),
+    marginTop: dynamicScale(-10, true, 0.3),
   },
 });

@@ -506,15 +506,14 @@ function ExpensesList({
   };
   const selectAll = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const filteredExpenses = expenses.filter(
+      (item) => !item.id.includes("shadow")
+    );
     requestAnimationFrame(() => {
-      if (selected?.length === expenses?.length) {
+      if (selected?.length === filteredExpenses?.length) {
         setSelected([]);
       } else {
-        setSelected(
-          expenses
-            .filter((item) => !item.id.includes("shadow"))
-            .map((item) => item.id)
-        );
+        setSelected(filteredExpenses.map((item) => item.id));
       }
     });
   }, [expenses?.length, selected?.length]);
@@ -745,7 +744,11 @@ function ExpensesList({
         >
           {/* hide until production ready */}
           {selectable && DEVELOPER_MODE && (
-            <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
+            <Animated.View
+              style={styles.headerIconContainer}
+              entering={FadeInRight}
+              exiting={FadeOutRight}
+            >
               <IconButton
                 icon={"document-outline"}
                 size={constantScale(24, 0.5)}
@@ -759,7 +762,11 @@ function ExpensesList({
             </Animated.View>
           )}
           {selectable && (
-            <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
+            <Animated.View
+              style={styles.headerIconContainer}
+              entering={FadeInRight}
+              exiting={FadeOutRight}
+            >
               <IconButton
                 icon={"ios-trash-outline"}
                 size={constantScale(24, 0.5)}
@@ -773,7 +780,11 @@ function ExpensesList({
             </Animated.View>
           )}
           {selectable && !isFiltered && (
-            <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
+            <Animated.View
+              style={styles.headerIconContainer}
+              entering={FadeInRight}
+              exiting={FadeOutRight}
+            >
               <IconButton
                 icon={"pie-chart-outline"}
                 size={constantScale(24, 0.5)}
@@ -787,7 +798,11 @@ function ExpensesList({
             </Animated.View>
           )}
           {selectable && multipleTripsInHistory && (
-            <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
+            <Animated.View
+              style={styles.headerIconContainer}
+              entering={FadeInRight}
+              exiting={FadeOutRight}
+            >
               <IconButton
                 icon={"md-arrow-undo-outline"}
                 size={constantScale(24, 0.5)}
@@ -801,10 +816,15 @@ function ExpensesList({
             </Animated.View>
           )}
           {selectable && (
-            <Animated.View entering={FadeInRight} exiting={FadeOutRight}>
+            <Animated.View
+              style={styles.headerIconContainer}
+              entering={FadeInRight}
+              exiting={FadeOutRight}
+            >
               <IconButton
                 icon={
-                  selected?.length > 0
+                  selected?.length ===
+                  expenses.filter((item) => !item.id.includes("shadow")).length
                     ? "close-outline"
                     : "checkmark-done-outline"
                 }
@@ -943,6 +963,9 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.primary700,
     fontSize: dynamicScale(14, false, 0.5),
     fontWeight: "bold",
+  },
+  headerIconContainer: {
+    marginRight: constantScale(24, 0.5),
   },
   fastExpenseContainer: {
     width: "100%",

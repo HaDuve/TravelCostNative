@@ -1,5 +1,9 @@
 import axios, { AxiosResponse } from "axios";
-import { DEBUG_NO_DATA } from "../confAppConstants";
+import {
+  AXIOS_TIMEOUT_DEFAULT,
+  AXIOS_TIMOUT_LONG,
+  DEBUG_NO_DATA,
+} from "../confAppConstants";
 import { Category } from "./category";
 import { TripData } from "../store/trip-context";
 import { ExpenseData, ExpenseDataOnline } from "./expense";
@@ -28,6 +32,7 @@ const BACKEND_URL =
 // const Axios = axios.create({
 //   baseURL: BACKEND_URL,
 // });
+axios.defaults.timeout = AXIOS_TIMEOUT_DEFAULT; // Set default timeout to 5 seconds
 
 /** ACCESS TOKEN */
 /** Sets the ACCESS TOKEN for all future http requests */
@@ -80,7 +85,10 @@ export const dataResponseTime = (func) => {
 export const fetchServerInfo = async () => {
   try {
     const response = await axios.get(
-      `${BACKEND_URL}/server.json${getMMKVString("QPAR")}`
+      `${BACKEND_URL}/server.json${getMMKVString("QPAR")}`,
+      {
+        timeout: AXIOS_TIMOUT_LONG,
+      }
     );
 
     // Process the response data here
@@ -101,7 +109,10 @@ export async function fetchCategories(tripid: string) {
         "/trips/" +
         tripid +
         "/categories.json" +
-        getMMKVString("QPAR")
+        getMMKVString("QPAR"),
+      {
+        timeout: AXIOS_TIMOUT_LONG,
+      }
     );
     if (response) return JSON.parse(response.data);
   } catch (error) {
@@ -178,7 +189,10 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
           "/" +
           uid +
           "/expenses.json" +
-          getMMKVString("QPAR")
+          getMMKVString("QPAR"),
+        {
+          timeout: AXIOS_TIMOUT_LONG,
+        }
       );
       axios_calls.push(new_axios_call);
     } catch (error) {
@@ -233,7 +247,10 @@ export async function fetchExpenses(tripid: string, uid: string) {
         "/" +
         uid +
         "/expenses.json" +
-        getMMKVString("QPAR")
+        getMMKVString("QPAR"),
+      {
+        timeout: AXIOS_TIMOUT_LONG,
+      }
     );
     const expenses = [];
 
@@ -363,7 +380,9 @@ export async function fetchUser(uid: string) {
     return null;
   }
   try {
-    const response = await axios.get(BACKEND_URL + "/users/" + `${uid}.json`);
+    const response = await axios.get(BACKEND_URL + "/users/" + `${uid}.json`, {
+      timeout: AXIOS_TIMOUT_LONG,
+    });
     const userData: UserData = response.data;
     return userData;
   } catch (error) {
@@ -400,7 +419,10 @@ export async function fetchTrip(tripid: string): Promise<TripData> {
   if (!tripid) return null;
   try {
     const response = await axios.get(
-      BACKEND_URL + "/trips/" + `${tripid}.json` + getMMKVString("QPAR")
+      BACKEND_URL + "/trips/" + `${tripid}.json` + getMMKVString("QPAR"),
+      {
+        timeout: AXIOS_TIMOUT_LONG,
+      }
     );
     return response.data;
   } catch (error) {
@@ -444,7 +466,10 @@ export async function putTravelerInTrip(tripid: string, traveller: Traveller) {
 export async function fetchTripsTravellers(tripid: string) {
   try {
     const response = await axios.get(
-      BACKEND_URL + `/trips/${tripid}/travellers.json` + getMMKVString("QPAR")
+      BACKEND_URL + `/trips/${tripid}/travellers.json` + getMMKVString("QPAR"),
+      {
+        timeout: AXIOS_TIMOUT_LONG,
+      }
     );
     return response.data;
   } catch (error) {
@@ -501,8 +526,6 @@ export async function getAllExpenses(tripid: string, uid?: string) {
   return expenses;
 }
 
-
-
 export async function updateTripHistory(userId: string, newTripid: string) {
   const tripHistory = await fetchTripHistory(userId);
   if (!tripHistory) return storeTripHistory(userId, [newTripid]);
@@ -530,7 +553,10 @@ export async function storeTripHistory(userId: string, tripHistory: string[]) {
 export async function fetchTripHistory(userId: string) {
   try {
     const response = await axios.get(
-      BACKEND_URL + `/users/${userId}/tripHistory.json` + getMMKVString("QPAR")
+      BACKEND_URL + `/users/${userId}/tripHistory.json` + getMMKVString("QPAR"),
+      {
+        timeout: AXIOS_TIMOUT_LONG,
+      }
     );
     return response.data;
   } catch (error) {
@@ -541,7 +567,10 @@ export async function fetchTripHistory(userId: string) {
 export async function fetchCurrentTrip(userId: string) {
   try {
     const response = await axios.get(
-      BACKEND_URL + `/users/${userId}.json` + getMMKVString("QPAR")
+      BACKEND_URL + `/users/${userId}.json` + getMMKVString("QPAR"),
+      {
+        timeout: AXIOS_TIMOUT_LONG,
+      }
     );
     return response.data.currentTrip;
   } catch (error) {
@@ -552,7 +581,10 @@ export async function fetchCurrentTrip(userId: string) {
 export async function fetchUserName(userId: string): Promise<string> {
   try {
     const response = await axios.get(
-      BACKEND_URL + `/users/${userId}.json` + getMMKVString("QPAR")
+      BACKEND_URL + `/users/${userId}.json` + getMMKVString("QPAR"),
+      {
+        timeout: AXIOS_TIMOUT_LONG,
+      }
     );
     return response.data.userName;
   } catch (error) {
@@ -563,7 +595,10 @@ export async function fetchUserName(userId: string): Promise<string> {
 export async function fetchTripName(tripId: string): Promise<string> {
   try {
     const response = await axios.get(
-      BACKEND_URL + `/trips/${tripId}.json` + getMMKVString("QPAR")
+      BACKEND_URL + `/trips/${tripId}.json` + getMMKVString("QPAR"),
+      {
+        timeout: AXIOS_TIMOUT_LONG,
+      }
     );
     return response.data.tripName;
   } catch (error) {
@@ -665,7 +700,10 @@ export async function storeExpoPushTokenInTrip(
   localeToken.tripid = usedTripID;
   localeToken.locale = i18n.locale;
   const response = await axios.get(
-    BACKEND_URL + `/trips/${usedTripID}/tokens.json` + getMMKVString("QPAR")
+    BACKEND_URL + `/trips/${usedTripID}/tokens.json` + getMMKVString("QPAR"),
+    {
+      timeout: AXIOS_TIMOUT_LONG,
+    }
   );
   const res = response?.data;
   const keysToDelete = [];
@@ -711,7 +749,10 @@ export async function storeExpoPushTokenInTrip(
 export async function fetchChangelog() {
   try {
     const response = await axios.get(
-      "https://raw.githubusercontent.com/HaDuve/TravelCostNative/main/TravelCostApp/changelog.txt"
+      "https://raw.githubusercontent.com/HaDuve/TravelCostNative/main/TravelCostApp/changelog.txt",
+      {
+        timeout: AXIOS_TIMOUT_LONG,
+      }
     );
     let tempText = "";
     if (response) tempText = response.data;

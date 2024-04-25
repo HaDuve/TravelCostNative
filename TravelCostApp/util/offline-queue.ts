@@ -44,10 +44,9 @@ export interface OfflineQueueManageExpenseItem {
 
 // retrieve offlinequeue and push new item
 export const pushOfflineQueue = async (item: OfflineQueueManageExpenseItem) => {
-  const offlineQueue = await getOfflineQueue();
+  const offlineQueue = getOfflineQueue();
   offlineQueue.push(item);
   const res = setMMKVObject("offlineQueue", offlineQueue);
-  // console.log("pushOfflineQueue ~ offlineQueue:", offlineQueue);
   return res;
 };
 
@@ -69,11 +68,8 @@ export const pushQueueReturnRndID = async (
 };
 
 // retrieve offlinequeue
-export const getOfflineQueue = async () => {
+export const getOfflineQueue = () => {
   const offlineQueue = getMMKVObject("offlineQueue");
-  if (!offlineQueue) {
-    // console.log("retrieved no OfflineQueue!");
-  }
   return offlineQueue || [];
 };
 
@@ -104,11 +100,8 @@ export const deleteExpenseOnlineOffline = async (
   item.expense.tripid = tripid;
 
   // if the internet is not fast enough, store in offline queue
-  // const { isFastEnough, speed } = await isConnectionFastEnough();
-  const netInfo = await NetInfo.fetch();
-  const reachable = netInfo.isConnected && netInfo.isInternetReachable;
-  // console.log("reachable:", reachable);
-  if (online && reachable) {
+  const { isFastEnough } = await isConnectionFastEnough();
+  if (online && isFastEnough) {
     // delete item online
     try {
       await deleteExpense(
@@ -207,15 +200,15 @@ export const storeExpenseOnlineOffline = async (
       );
       return id;
     } catch (error) {
-      safeLogError(error);
+      safeLogError("error1:" + error);
       const id = await pushQueueReturnRndID(item);
       // console.log("debugOQ id:", id);
       return id;
     }
   } else {
     // store item offline
+    safeLogError("error2");
     const id = await pushQueueReturnRndID(item);
-    // console.log("debugOQ id:", id);
     return id;
   }
 };

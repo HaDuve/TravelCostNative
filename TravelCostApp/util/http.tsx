@@ -588,7 +588,7 @@ export async function fetchUserName(userId: string): Promise<string> {
     );
     return response.data.userName;
   } catch (error) {
-    throw new Error("error while fetching user name");
+    safeLogError(error);
   }
 }
 
@@ -602,7 +602,7 @@ export async function fetchTripName(tripId: string): Promise<string> {
     );
     return response.data.tripName;
   } catch (error) {
-    throw new Error("error while fetching trip name");
+    safeLogError(error);
   }
 }
 
@@ -616,11 +616,11 @@ export async function touchTraveler(
       BACKEND_URL +
         `/trips/${tripid}/travellers/${firebaseId}.json` +
         getMMKVString("QPAR"),
-      { touched: isTouched }
+      { touched: isTouched, timout: AXIOS_TIMOUT_LONG }
     );
     return response;
   } catch (error) {
-    throw new Error("error while touching traveler");
+    safeLogError(error);
   }
 }
 

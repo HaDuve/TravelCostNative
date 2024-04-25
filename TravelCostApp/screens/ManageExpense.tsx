@@ -44,6 +44,10 @@ import { isSameDay } from "../util/dateTime";
 import ToastComponent from "../components/UI/ToastComponent";
 import safeLogError from "../util/error";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
+import {
+  isConnectionFastEnough,
+  isConnectionFastEnoughAsBool,
+} from "../util/connectionSpeed";
 
 const ManageExpense = ({ route, navigation }) => {
   const { pickedCat, tempValues, newCat, iconName, dateISO } = route.params;
@@ -513,18 +517,10 @@ const ManageExpense = ({ route, navigation }) => {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       // setIsSubmitting(false);
       navigation.popToTop();
-      if (isOnline) await touchAllTravelers(tripid, true);
+      if (isOnline && (await isConnectionFastEnoughAsBool()))
+        await touchAllTravelers(tripid, true);
     } catch (error) {
-      // setError("Could not save data - please try again later!" + error);
-      console.error(error);
-      Toast.show({
-        text1: i18n.t("toastSavingError1"),
-        text2: i18n.t("error2"),
-        type: "error",
-      });
-      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      // setIsSubmitting(false);
-      navigation.popToTop();
+      safeLogError(error);
     }
     // no matter what happens, add one expense to the expenseCtx and remove it for refresh
     expenseCtx.addExpense({ ...expenseData, id: "temp" });

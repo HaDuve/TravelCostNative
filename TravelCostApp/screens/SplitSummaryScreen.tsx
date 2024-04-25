@@ -293,7 +293,7 @@ const SplitSummaryScreen = ({ navigation }) => {
 
   const ButtonContainerJSX = (
     <View style={isPortrait && styles.buttonContainer}>
-      {!showSimplify && !noSimpleSplits && (
+      {!showSimplify && (
         <FlatButton
           onPress={async () => {
             if (showSimplify) {

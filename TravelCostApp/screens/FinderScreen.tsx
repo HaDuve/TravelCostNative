@@ -42,14 +42,12 @@ import safeLogError from "../util/error";
 import { ExpenseData } from "../util/expense";
 import { formatExpenseWithCurrency } from "../util/string";
 import { dynamicScale } from "../util/scalingUtil";
-import { OrientationContext } from "../store/orientation-context";
 
 const FinderScreen = () => {
   const navigation = useNavigation();
   const expCtx = useContext(ExpensesContext);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
-  const { isPortrait } = useContext(OrientationContext);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -458,13 +456,9 @@ const styles = StyleSheet.create({
   queryText: {
     fontSize: dynamicScale(16, false, 0.6),
     marginTop: dynamicScale(65, true, 0.3),
-
     marginBottom: dynamicScale(18, true),
-    //center
     textAlign: "center",
-    // thin text
     fontWeight: "200",
-    //cursive
     fontStyle: "italic",
   },
   findButton: {
@@ -474,19 +468,16 @@ const styles = StyleSheet.create({
   queryContainer: {
     flex: 1,
     marginTop: dynamicScale(10, true),
-
     marginLeft: dynamicScale(18),
     maxWidth: dynamicScale(180),
   },
   autoCompleteStyle: {
-    // flex: 1,
     zIndex: 0,
     fontSize: dynamicScale(16, false, 0.4),
     paddingVertical: dynamicScale(2, false, 2),
     paddingHorizontal: dynamicScale(2),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: dynamicScale(5),
-    // marginLeft: -8,
   },
   buttonContainer: {
     marginTop: dynamicScale(20, true),

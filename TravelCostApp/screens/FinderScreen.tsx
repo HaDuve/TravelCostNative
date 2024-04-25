@@ -456,8 +456,8 @@ const styles = StyleSheet.create({
     margin: dynamicScale(8, false, 2),
   },
   queryText: {
-    fontSize: dynamicScale(16, false, 0.5),
-    marginTop: dynamicScale(65, true),
+    fontSize: dynamicScale(16, false, 0.6),
+    marginTop: dynamicScale(65, true, 0.3),
 
     marginBottom: dynamicScale(18, true),
     //center

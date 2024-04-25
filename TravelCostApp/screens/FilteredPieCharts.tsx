@@ -33,14 +33,14 @@ import BackButton from "../components/UI/BackButton";
 import AddExpenseHereButton from "../components/UI/AddExpensesHereButton";
 import { ExpenseData } from "../util/expense";
 import { getEarliestDate } from "../util/date";
-import { dynamicScale } from "../util/scalingUtil";
+import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 
 const FilteredPieCharts = ({ navigation, route }) => {
   const { expenses, dayString, noList = false } = route.params;
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
 
-  const { isPortrait } = useContext(OrientationContext);
+  const { isPortrait, isTablet } = useContext(OrientationContext);
   // contents and titleStrings have to match in legth and correspond!
   const titleStrings = [
     i18n.t("categories"),
@@ -55,24 +55,28 @@ const FilteredPieCharts = ({ navigation, route }) => {
       expenses={expenses}
       periodName={dayString}
       navigation={navigation}
+      forcePortraitFormat
     />,
     <ExpenseTravellers
       key={1}
       expenses={expenses}
       periodName={dayString}
       navigation={navigation}
+      forcePortraitFormat
     ></ExpenseTravellers>,
     <ExpenseCountries
       key={2}
       expenses={expenses}
       periodName={dayString}
       navigation={navigation}
+      forcePortraitFormat
     ></ExpenseCountries>,
     <ExpenseCurrencies
       key={3}
       expenses={expenses}
       periodName={dayString}
       navigation={navigation}
+      forcePortraitFormat
     ></ExpenseCurrencies>,
     !noList && (
       <FilteredExpenses
@@ -108,7 +112,12 @@ const FilteredPieCharts = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <View style={[!isPortrait && styles.landscapeTitleContainer]}>
+      <View
+        style={[
+          !isPortrait && styles.landscapeTitleContainer,
+          isTablet && styles.tabletContainer,
+        ]}
+      >
         <View style={styles.firstTitleContainer}>
           <BackButton
             style={{ marginTop: dynamicScale(-16, false, 0.5) }}
@@ -135,6 +144,7 @@ const FilteredPieCharts = ({ navigation, route }) => {
               style={[
                 styles.titleText,
                 !isPortrait && styles.landScapetitleText,
+                isTablet && styles.tabletTitleText,
               ]}
             >
               {" "}
@@ -191,6 +201,11 @@ const styles = StyleSheet.create({
     marginTop: dynamicScale(-24, true),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
+  tabletContainer: {
+    marginTop: 0,
+    padding: constantScale(12, 0.5),
+    paddingHorizontal: constantScale(12, 0.5),
+  },
   firstTitleContainer: {
     marginVertical: "4%",
     flexDirection: "row",
@@ -230,6 +245,9 @@ const styles = StyleSheet.create({
   },
   landScapetitleText: {
     marginTop: dynamicScale(30, true),
+  },
+  tabletTitleText: {
+    marginTop: constantScale(16, 0.5),
   },
   chevronContainer: {
     justifyContent: "center",

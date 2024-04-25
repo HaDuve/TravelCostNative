@@ -22,16 +22,19 @@ import { ExpenseData, getExpensesSum } from "../../../util/expense";
 import BlurPremium from "../../Premium/BlurPremium";
 import { processTitleStringFilteredPiecharts } from "../../../util/string";
 import { TripContext } from "../../../store/trip-context";
-import {
-  dynamicScale,
-} from "../../../util/scalingUtil";
+import { dynamicScale } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
 
-const ExpenseCurrencies = ({ expenses, periodName, navigation }) => {
+const ExpenseCurrencies = ({
+  expenses,
+  periodName,
+  navigation,
+  forcePortraitFormat,
+}) => {
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
   const { tripCurrency } = useContext(TripContext);
   const { isPortrait } = useContext(OrientationContext);
-
+  const useRowFormat = !isPortrait && !forcePortraitFormat;
   if (!expenses)
     return (
       <View style={styles.container}>
@@ -125,14 +128,14 @@ const ExpenseCurrencies = ({ expenses, periodName, navigation }) => {
 
   return (
     <Animated.View style={styles.container}>
-      {!isPortrait && <CategoryChart inputData={dataList}></CategoryChart>}
+      {useRowFormat && <CategoryChart inputData={dataList}></CategoryChart>}
       <Animated.FlatList
         itemLayoutAnimation={layoutAnim}
         data={catSumCat}
         renderItem={renderItem}
         keyExtractor={(item) => item.cat}
         ListHeaderComponent={
-          isPortrait ? (
+          !useRowFormat ? (
             <CategoryChart inputData={dataList}></CategoryChart>
           ) : (
             <View style={{ height: dynamicScale(100, true) }}></View>
@@ -158,6 +161,7 @@ ExpenseCurrencies.propTypes = {
   expenses: PropTypes.array,
   periodName: PropTypes.string,
   navigation: PropTypes.object,
+  forcePortraitFormat: PropTypes.bool,
 };
 
 const styles = StyleSheet.create({

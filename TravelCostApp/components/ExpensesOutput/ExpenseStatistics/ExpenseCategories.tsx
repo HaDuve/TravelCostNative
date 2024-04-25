@@ -133,8 +133,13 @@ const ExpenseCategories = ({ expenses, periodName, navigation }) => {
           <View style={{ height: dynamicScale(100, true) }}></View>
         }
         ListEmptyComponent={
-          <View style={styles.fallbackTextContainer}>
-            <Text style={{ marginVertical: 12 }}>
+          <View style={[isPortrait && styles.fallbackTextContainer]}>
+            <Text
+              style={{
+                marginVertical: 12,
+                fontSize: dynamicScale(14, false, 0.5),
+              }}
+            >
               {i18n.t("fallbackTextExpenses")}
             </Text>
           </View>

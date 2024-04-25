@@ -32,8 +32,8 @@ import { DeviceType, deviceType } from "expo-device";
 const MINHEIGHT = dynamicScale(60, true);
 const MINHEIGHT_LOADINGBAR = dynamicScale(88, true);
 const MAXHEIGHT = dynamicScale(100, true);
-const MINWIDTH = dynamicScale(200);
-const MAXWIDTH = dynamicScale(300);
+const MINWIDTH = dynamicScale(250);
+const MAXWIDTH = dynamicScale(350);
 
 const CONTENTCONTAINERSTYLE: ViewStyle = { paddingLeft: dynamicScale(10) };
 const SIZESTYLES: ViewStyle = {

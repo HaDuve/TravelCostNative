@@ -25,10 +25,8 @@ import FlatButton from "../components/UI/FlatButton";
 import GradientButton from "../components/UI/GradientButton";
 import { GlobalStyles } from "../constants/styles";
 import { secureStoreSetObject } from "../store/secure-storage";
-import { dynamicScale } from "../util/scalingUtil";
-import { OrientationContext } from "../store/orientation-context";
+import { constantScale, dynamicScale } from "../util/scalingUtil";
 
-//TODO: set the according URLS when we are live!
 export const APP_STORE_URL = `https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=${i18n.locale}`;
 export const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=com.budgetfornomads.app";
@@ -37,8 +35,6 @@ export const neverAskAgain = async () => {
 };
 
 const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
-  const { isPortrait } = useContext(OrientationContext);
-
   const handleRate = async () => {
     if (StoreReview.isAvailableAsync()) {
       // Request the in-app review
@@ -83,15 +79,15 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
             {
               ...Platform.select({
                 ios: {
-                  width: dynamicScale(125, false, 0.6),
-                  height: dynamicScale(125, false, 0.6),
-                  margin: dynamicScale(12, false, 0.5),
+                  width: constantScale(125, 0.6),
+                  height: constantScale(125, 0.6),
+                  margin: constantScale(12, 0.5),
                   // marginTop: "-4%",
                 },
                 android: {
-                  width: dynamicScale(125, false, 0.5),
-                  height: dynamicScale(125, false, 0.5),
-                  margin: dynamicScale(12, false, 0.5),
+                  width: constantScale(125, 0.5),
+                  height: constantScale(125, 0.5),
+                  margin: constantScale(12, 0.5),
                 },
               }),
             },
@@ -103,9 +99,9 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
           source={require("../assets/stars.png")}
           style={[
             {
-              width: dynamicScale(180),
-              height: dynamicScale(24, true),
-              marginBottom: dynamicScale(12, true),
+              width: constantScale(180),
+              height: constantScale(24),
+              marginBottom: constantScale(12),
             },
             { overflow: "visible" },
           ]}

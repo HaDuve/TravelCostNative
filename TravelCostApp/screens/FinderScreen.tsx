@@ -41,7 +41,7 @@ import { DEFAULTCATEGORIES } from "../util/category";
 import safeLogError from "../util/error";
 import { ExpenseData } from "../util/expense";
 import { formatExpenseWithCurrency } from "../util/string";
-import { dynamicScale } from "../util/scalingUtil";
+import { constantScale, dynamicScale } from "../util/scalingUtil";
 
 const FinderScreen = () => {
   const navigation = useNavigation();
@@ -317,7 +317,7 @@ const FinderScreen = () => {
                   icon="close-outline"
                   size={dynamicScale(26, false, 0.5)}
                   color={GlobalStyles.colors.textColor}
-                  buttonStyle={{ marginTop: dynamicScale(14, true) }}
+                  buttonStyle={{ marginTop: dynamicScale(14, true, 0.5) }}
                   onPressStyle={{
                     backgroundColor: GlobalStyles.colors.gray500,
                     borderRadius: 99,
@@ -454,8 +454,8 @@ const styles = StyleSheet.create({
     margin: dynamicScale(8, false, 2),
   },
   queryText: {
-    fontSize: dynamicScale(16, false, 0.6),
-    marginTop: dynamicScale(65, true, 0.3),
+    fontSize: constantScale(14, 0.5),
+    marginTop: dynamicScale(32, true, 0.5),
     marginBottom: dynamicScale(18, true),
     textAlign: "center",
     fontWeight: "200",

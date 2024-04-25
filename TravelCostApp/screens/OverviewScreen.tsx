@@ -135,7 +135,11 @@ const OverviewScreen = ({ navigation }) => {
   return (
     <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
       <View
-        style={[styles.dateHeader, !isPortrait && styles.landscapeDateHeader]}
+        style={[
+          styles.dateHeader,
+          !isPortrait && styles.landscapeDateHeader,
+          isTablet && styles.tabletDateHeader,
+        ]}
       >
         <Text style={styles.dateString}>
           {truncateString(tripCtx.tripName, dynamicScale(23, false, 0.5))} -{" "}
@@ -244,6 +248,11 @@ const styles = StyleSheet.create({
   landscapeDateHeader: {
     marginTop: dynamicScale(4, true),
     marginBottom: dynamicScale(-24, true),
+    alignSelf: "center",
+  },
+  tabletDateHeader: {
+    marginTop: dynamicScale(4, true),
+    marginBottom: dynamicScale(-8, true),
     alignSelf: "center",
   },
   dateString: {

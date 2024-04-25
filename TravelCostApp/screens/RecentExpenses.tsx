@@ -366,7 +366,11 @@ function RecentExpenses({ navigation }) {
         zone={3}
       ></TourGuideZone>
       <View
-        style={[styles.dateHeader, !isPortrait && styles.landscapeDateHeader]}
+        style={[
+          styles.dateHeader,
+          !isPortrait && styles.landscapeDateHeader,
+          isTablet && styles.landscapeDateHeader,
+        ]}
       >
         <Text style={styles.dateString}>
           {truncateString(tripCtx.tripName, 23)} - {dateTimeString}

@@ -174,7 +174,7 @@ const ExpenseTravellers = ({
           </View>
         }
       />
-      <BlurPremium />
+      {/* <BlurPremium /> */}
     </Animated.View>
   );
 };

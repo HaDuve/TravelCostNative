@@ -179,7 +179,7 @@ const GPTDealScreen = ({ route, navigation }) => {
             </GradientButton>
           )}
         </View>
-        <BlurPremium canBack></BlurPremium>
+        {/* <BlurPremium canBack /> */}
       </View>
     </View>
   );

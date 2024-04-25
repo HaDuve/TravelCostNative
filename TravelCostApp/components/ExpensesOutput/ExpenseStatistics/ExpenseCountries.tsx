@@ -156,7 +156,7 @@ const ExpenseCountries = ({
           </View>
         }
       />
-      <BlurPremium />
+      {/* <BlurPremium /> */}
     </Animated.View>
   );
 };

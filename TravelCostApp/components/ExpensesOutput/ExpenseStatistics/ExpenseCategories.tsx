@@ -24,7 +24,6 @@ i18n.enableFallback = true;
 
 import { getCatString } from "../../../util/category";
 import PropTypes from "prop-types";
-import BlurPremium from "../../Premium/BlurPremium";
 import { processTitleStringFilteredPiecharts } from "../../../util/string";
 import { TripContext } from "../../../store/trip-context";
 import { getExpensesSum } from "../../../util/expense";
@@ -158,7 +157,6 @@ const ExpenseCategories = ({
           </View>
         }
       />
-      <BlurPremium />
     </Animated.View>
   );
 };

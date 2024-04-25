@@ -64,7 +64,7 @@ const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
         showSumForTravellerName={showSumForTravellerName}
         isFiltered
       />
-      <BlurPremium canBack />
+      {/* <BlurPremium canBack /> */}
       {!withArgs && (
         <View style={{ flexDirection: "row" }}>
           <FlatButton onPress={() => navigation.pop()}>

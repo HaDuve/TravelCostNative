@@ -150,7 +150,7 @@ const ExpenseCurrencies = ({
           </View>
         }
       />
-      <BlurPremium />
+      {/* <BlurPremium /> */}
     </Animated.View>
   );
 };

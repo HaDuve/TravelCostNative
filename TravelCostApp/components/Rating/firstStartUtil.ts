@@ -1,4 +1,4 @@
-import { DAYS_BEFORE_PROMPT } from "../../confAppConstants";
+import { DAYS_BEFORE_PROMPT, DEVELOPER_MODE } from "../../confAppConstants";
 import {
   secureStoreGetObject,
   secureStoreSetObject,
@@ -18,6 +18,9 @@ export const handleFirstStart = async () => {
 };
 
 export const shouldPromptForRating = async () => {
+  if (DEVELOPER_MODE) {
+    return true;
+  }
   try {
     const neverAskAgain = await secureStoreGetObject("neverAskAgain");
     if (neverAskAgain) {

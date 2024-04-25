@@ -44,7 +44,7 @@ import Purchases from "react-native-purchases";
 import { setAttributesAsync } from "../components/Premium/PremiumConstants";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import { NetworkContext } from "../store/network-context";
-import { dynamicScale } from "../util/scalingUtil";
+import { constantScale, dynamicScale } from "../util/scalingUtil";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -349,7 +349,7 @@ const ProfileScreen = ({ navigation }) => {
           <TourGuideZone
             text={i18n.t("walk5")}
             shape={"circle"}
-            maskOffset={dynamicScale(24, false, 0.5)}
+            maskOffset={constantScale(24, 0.5)}
             zone={5}
           >
             <IconButton
@@ -364,8 +364,8 @@ const ProfileScreen = ({ navigation }) => {
         </View>
         <TourGuideZone
           text={i18n.t("walk6")}
-          maskOffset={dynamicScale(200, true)}
-          tooltipBottomOffset={dynamicScale(250, true)}
+          maskOffset={constantScale(200, 0.1)}
+          tooltipBottomOffset={constantScale(150, 0.1)}
           zone={6}
         >
           <TripList trips={tripHistory}></TripList>
@@ -374,8 +374,8 @@ const ProfileScreen = ({ navigation }) => {
       <View style={styles.horizontalButtonContainer}>
         <TourGuideZone
           text={i18n.t("walk7")}
-          maskOffset={dynamicScale(50, true)}
-          tooltipBottomOffset={dynamicScale(50, true)}
+          maskOffset={constantScale(50, 0.5)}
+          tooltipBottomOffset={constantScale(50, 0.5)}
           zone={7}
         >
           <View>

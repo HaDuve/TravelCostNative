@@ -41,7 +41,7 @@ import { getCatSymbol } from "../../util/category";
 import IconButton from "../UI/IconButton";
 import uniqBy from "lodash.uniqby";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { dynamicScale } from "../../util/scalingUtil";
+import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
 
 const PageLength = 20;
@@ -354,10 +354,10 @@ const AddExpenseButton = ({ navigation }) => {
     >
       <TourGuideZone
         text={i18n.t("walk2")}
-        borderRadius={16}
+        borderRadius={constantScale(16, 0.5)}
         shape={"circle"}
-        maskOffset={40}
-        tooltipBottomOffset={dynamicScale(80, true)}
+        maskOffset={constantScale(40, 0.5)}
+        tooltipBottomOffset={constantScale(80, 0.5)}
         zone={2}
       ></TourGuideZone>
 

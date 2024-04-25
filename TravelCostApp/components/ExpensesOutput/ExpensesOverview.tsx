@@ -30,7 +30,7 @@ import Animated, {
 import { MAX_PERIOD_RANGE } from "../../confAppConstants";
 import { BlurView } from "expo-blur";
 import { TripContext } from "../../store/trip-context";
-import { dynamicScale } from "../../util/scalingUtil";
+import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
 import { useSwipe } from "../Hooks/useSwipe";
 
@@ -249,8 +249,8 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       >
         <TourGuideZone
           text={i18n.t("walk4")}
-          tooltipBottomOffset={dynamicScale(166, true)}
-          maskOffset={dynamicScale(60, true)}
+          tooltipBottomOffset={constantScale(166, 0.5)}
+          maskOffset={constantScale(60, 0.5)}
           zone={4}
           shape={"circle"}
         >

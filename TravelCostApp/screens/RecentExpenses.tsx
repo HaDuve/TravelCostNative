@@ -350,19 +350,19 @@ function RecentExpenses({ navigation }) {
       <TourGuideZone
         text={i18n.t("walk1")}
         zone={1}
-        maskOffset={dynamicScale(-4, true)}
-        tooltipBottomOffset={dynamicScale(200, true)}
+        maskOffset={constantScale(-4, 0.5)}
+        tooltipBottomOffset={constantScale(200, 0.5)}
       ></TourGuideZone>
       <TourGuideZone
         text={i18n.t("walk8")}
         zone={8}
-        maskOffset={dynamicScale(-4, true)}
-        tooltipBottomOffset={dynamicScale(-200, true)}
+        maskOffset={constantScale(-4, 0.5)}
+        tooltipBottomOffset={constantScale(-200, 0.5)}
       ></TourGuideZone>
       <TourGuideZone
         text={i18n.t("walk3")}
-        maskOffset={dynamicScale(200, true)}
-        tooltipBottomOffset={dynamicScale(-200, true)}
+        maskOffset={constantScale(200, 0.5)}
+        tooltipBottomOffset={constantScale(-200, 0.5)}
         zone={3}
       ></TourGuideZone>
       <View

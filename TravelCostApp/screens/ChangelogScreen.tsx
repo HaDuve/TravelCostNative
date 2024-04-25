@@ -14,6 +14,7 @@ import * as Haptics from "expo-haptics";
 import { NetworkContext } from "../store/network-context";
 import PropTypes from "prop-types";
 import safeLogError from "../util/error";
+import { constantScale } from "../util/scalingUtil";
 
 function renderChangelogItem(item) {
   return (
@@ -209,23 +210,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   changelogContainer: {
-    margin: 12,
-    padding: 24,
-    paddingTop: 12,
-    paddingBottom: 12,
+    margin: constantScale(12, 0.5),
+    padding: constantScale(24, 0.5),
+    paddingTop: constantScale(12, 0.5),
+    paddingBottom: constantScale(12, 0.5),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: 24,
   },
   changelogText: {
-    fontSize: 18,
-    lineHeight: 24,
+    fontSize: constantScale(18, 0.5),
+    lineHeight: constantScale(24, 0.5),
     fontWeight: "300",
     color: GlobalStyles.colors.textColor,
   },
   subHeaderText: {
     textAlign: "center",
-    fontSize: 18,
-    lineHeight: 24,
+    fontSize: constantScale(18, 0.5),
+    lineHeight: constantScale(24, 0.5),
     fontWeight: "400",
     color: GlobalStyles.colors.textColor,
   },

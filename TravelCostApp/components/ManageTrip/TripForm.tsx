@@ -472,9 +472,22 @@ const TripForm = ({ navigation, route }) => {
       isDynamicDailyBudget: inputs.isDynamicDailyBudget.value,
     };
 
+    if (
+      !tripData.dailyBudget &&
+      tripData.totalBudget &&
+      tripData.startDate &&
+      tripData.endDate &&
+      !tripData.isDynamicDailyBudget
+    ) {
+      const diffDays = daysBetween(new Date(endDate), new Date(startDate)) + 1;
+      const calcDailyBudget = (
+        Number(inputs.totalBudget.value) / diffDays
+      ).toFixed(2);
+      tripData.dailyBudget = calcDailyBudget;
+    }
+
     const formIsValid = checkFormValidity(tripData);
     if (!formIsValid) return;
-    // if isEditing update Trip, else store
     if (!tripData.totalBudget) tripData.totalBudget = "0";
     try {
       if (isEditing) {
@@ -486,11 +499,16 @@ const TripForm = ({ navigation, route }) => {
       safeLogError(error);
       setIsLoading(false);
       Toast.hide();
-      Alert.alert(
-        "Sorry! We got an unexpected Error, please try again!",
-        error.message
-      );
-      if (!isEditing) authCtx.logout();
+      Toast.show({
+        text1: i18n.t("toastSavingError1"),
+        text2: i18n.t("error2"),
+        type: "error",
+      });
+      if (!isEditing && userCtx.freshlyCreated) {
+        authCtx.logout();
+        return;
+      }
+      navigation.navigate("RecentExpenses");
       return;
     }
     setIsLoading(false);
@@ -502,7 +520,23 @@ const TripForm = ({ navigation, route }) => {
 
   function updateCurrency() {
     if (!countryValue || countryValue.length < 1) return;
-    inputChangedHandler("tripCurrency", countryValue?.split(" ")[0]);
+    Alert.alert(
+      "Changing Home Currency",
+      "Are you sure you want to change the currency? It should be set to the currency you are using normally at home.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          style: "destructive",
+          onPress: () => {
+            inputChangedHandler("tripCurrency", countryValue?.split(" ")[0]);
+          },
+        },
+      ]
+    );
   }
 
   const [infoTitleText, setInfoTitleText] = useState("");

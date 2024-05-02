@@ -182,6 +182,12 @@ export function getDateMinusDays(date: DateOrDateTime, days: number) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate() - days);
 }
 
+/**
+ * Calculates the absolute number of days between two dates.
+ * @param date_1 The first date.
+ * @param date_2 The second date.
+ * @returns The non-negative number of days between the two dates.
+ */
 export function daysBetween(date_1: DateOrDateTime, date_2: DateOrDateTime) {
   if (date_1 instanceof DateTime && date_2 instanceof DateTime)
     return _daysBetween(date_1, date_2);

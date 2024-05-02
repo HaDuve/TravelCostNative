@@ -32,7 +32,6 @@ import { getExpensesSum } from "../../../util/expense";
 import FlatButton from "../../UI/FlatButton";
 import { dynamicScale } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
-import { useFocusEffect } from "@react-navigation/native";
 
 const ExpenseGraph = ({
   periodName,
@@ -51,13 +50,6 @@ const ExpenseGraph = ({
   const expenseCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
   const hideSpecial = settings.hideSpecialExpenses;
-  const flatListRef = useRef(null);
-  useFocusEffect(
-    React.useCallback(() => {
-      console.log("scrolling", !!flatListRef.current);
-      flatListRef.current?.scrollToOffset({ animated: true, offset: 55 });
-    }, [])
-  );
 
   if (!isForeground || !expenseCtx.expenses) {
     return <></>;
@@ -496,7 +488,6 @@ const ExpenseGraph = ({
           </View>
         )}
         <Animated.FlatList
-          ref={flatListRef}
           entering={FadeInRight.duration(500)}
           exiting={FadeOutLeft.duration(500)}
           data={listExpenseSumBudgets}

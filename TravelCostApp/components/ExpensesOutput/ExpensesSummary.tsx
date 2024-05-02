@@ -29,7 +29,6 @@ import {
 } from "../../util/expense";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
-import { OrientationContext } from "../../store/orientation-context";
 
 const ExpensesSummary = ({
   expenses,

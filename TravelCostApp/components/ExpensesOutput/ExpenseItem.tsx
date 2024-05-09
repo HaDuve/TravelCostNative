@@ -457,18 +457,17 @@ const styles = StyleSheet.create({
     // marginRight: 12,
   },
   avatarContainer: {
-    maxHeight: dynamicScale(50, true),
     padding: dynamicScale(4),
     paddingRight: dynamicScale(10),
     // center items left
     flexDirection: "row",
-    height: constantScale(22, 1),
-    width: constantScale(30),
+    height: constantScale(30, 1),
+    width: constantScale(55),
   },
   avatar: {
     marginRight: dynamicScale(-6),
-    minHeight: constantScale(20, 0.5),
-    minWidth: constantScale(20, 0.5),
+    height: constantScale(20, 0.5),
+    width: constantScale(20, 0.5),
     borderRadius: 60,
     borderWidth: dynamicScale(1, false, 0.5),
     borderColor: GlobalStyles.colors.primaryGrayed,

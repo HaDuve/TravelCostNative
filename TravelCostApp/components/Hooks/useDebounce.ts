@@ -23,3 +23,15 @@ export const useDebounce = (callback) => {
 useDebounce.propTypes = {
   callback: PropTypes.func.isRequired,
 };
+
+export const callDebounced = (func, delay) => {
+  let timeoutId;
+
+  return (...args) => {
+    clearTimeout(timeoutId);
+
+    timeoutId = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+};

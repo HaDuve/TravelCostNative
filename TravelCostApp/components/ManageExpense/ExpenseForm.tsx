@@ -6,6 +6,7 @@ import React, {
   useLayoutEffect,
   useMemo,
 } from "react";
+
 import * as Haptics from "expo-haptics";
 import {
   Alert,
@@ -94,9 +95,10 @@ import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { Platform } from "react-native";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { MAX_EXPENSES_PERTRIP_NONPREMIUM } from "../../confAppConstants";
-import { constantScale, dynamicScale, isTablet } from "../../util/scalingUtil";
+import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { getRate } from "../../util/currencyExchange";
 import { OrientationContext } from "../../store/orientation-context";
+import { callDebounced } from "../Hooks/useDebounce";
 
 const ExpenseForm = ({
   onCancel,
@@ -941,6 +943,7 @@ const ExpenseForm = ({
       expensesLength + newExpenseDateRange >= MAX_EXPENSES_PERTRIP_NONPREMIUM;
     return tooManyTrips;
   };
+
   const advancedSubmitHandler = async () => {
     // setIsSubmitting(true);
     if (!isEditing) {
@@ -960,6 +963,9 @@ const ExpenseForm = ({
     hideAdvanced ? await fastSubmit() : await submitHandler();
     Toast.hide();
   };
+
+  const debouncedSubmit = callDebounced(advancedSubmitHandler, 1500);
+
   const askChatGPTHandler = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     navigation.navigate("GPTDeal", {
@@ -989,10 +995,7 @@ const ExpenseForm = ({
       </Animated.View>
     );
   const confirmButtonJSX = (
-    <TouchableOpacity
-      style={GlobalStyles.backButton}
-      onPress={advancedSubmitHandler}
-    >
+    <TouchableOpacity style={GlobalStyles.backButton} onPress={debouncedSubmit}>
       <IconButton
         icon="checkmark-outline"
         color={GlobalStyles.colors.textColor}
@@ -1774,10 +1777,7 @@ const ExpenseForm = ({
           ></View>
           <View style={styles.buttonContainer}>
             <FlatButton onPress={onCancel}>{i18n.t("cancel")}</FlatButton>
-            <GradientButton
-              style={styles.button}
-              onPress={async () => await advancedSubmitHandler()}
-            >
+            <GradientButton style={styles.button} onPress={debouncedSubmit}>
               {submitButtonLabel}
             </GradientButton>
           </View>

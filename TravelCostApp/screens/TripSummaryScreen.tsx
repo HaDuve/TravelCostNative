@@ -49,6 +49,7 @@ import ExpenseCountryFlag from "../components/ExpensesOutput/ExpenseCountryFlag"
 import GradientButton from "../components/UI/GradientButton";
 import { constantScale, dynamicScale, scale } from "../util/scalingUtil";
 import { Platform } from "react-native";
+import { safelyParseJSON } from "../util/jsonParse";
 
 export type TripAsObject = {
   tripid: string;
@@ -201,9 +202,14 @@ const TripSummaryScreen = ({ navigation }) => {
           countries.push(countryFormatted);
         }
         if (expense.splitList && expense.splitList.length > 0) {
-          const shallowCopySplitList = JSON.parse(
-            JSON.stringify(expense.splitList)
-          );
+          let shallowCopySplitList: Split[] = [];
+          try {
+            shallowCopySplitList = safelyParseJSON(
+              JSON.stringify(expense.splitList)
+            );
+          } catch (error) {
+            safeLogError(error);
+          }
           // add travellers and their costs
           for (let i = 0; i < shallowCopySplitList.length; i++) {
             const split: Split = shallowCopySplitList[i];

@@ -11,6 +11,7 @@ i18n.enableFallback = true;
 
 import { getAllExpenses } from "./http";
 import safeLogError from "./error";
+import { safelyParseJSON } from "./jsonParse";
 
 export function recalcSplitsLinearly(splitList: Split[], amount: number) {
   if (amount == 0) return splitList;
@@ -286,7 +287,11 @@ export async function calcOpenSplitsTable(
   rates[tripCurrency] = 1;
   if (givenExpenses && givenExpenses?.length > 0) {
     // create a copy
-    expenses = JSON.parse(JSON.stringify(givenExpenses));
+    try {
+      expenses = safelyParseJSON(JSON.stringify(givenExpenses));
+    } catch (error) {
+      safeLogError(error);
+    }
   } else {
     try {
       expenses = await getAllExpenses(tripid);
@@ -314,7 +319,6 @@ export async function calcOpenSplitsTable(
           DateTime.fromISO(isPaidDate).toJSDate()
       )
         continue;
-      // // console.log("rates:", rates);
       for (const split of expense.splitList) {
         if (split.userName !== expense.whoPaid) {
           // check if rate is already in rates
@@ -360,7 +364,12 @@ export async function calcOpenSplitsTable(
 
 export function simplifySplits(openSplits: Split[]) {
   const Splitwise = require("splitwise-js-map");
-  const tempSplits = JSON.parse(JSON.stringify(openSplits));
+  let tempSplits = [];
+  try {
+    tempSplits = safelyParseJSON(JSON.stringify(openSplits));
+  } catch (error) {
+    safeLogError(error);
+  }
   const listOfSplits = [];
   tempSplits.forEach((openSplit) => {
     if (listOfSplits.some((e) => e.paidBy === openSplit.whoPaid)) {
@@ -383,7 +392,6 @@ export function simplifySplits(openSplits: Split[]) {
     }
   });
   const simplifiedItems = [];
-  // // console.log(listOfSplits);
   try {
     const splits = Splitwise(listOfSplits);
     splits.forEach((simpleSplit) => {
@@ -398,7 +406,7 @@ export function simplifySplits(openSplits: Split[]) {
       simplifiedItems.push(item);
     });
   } catch (error) {
-    // // console.log("error in simplifying splits", error);
+    safeLogError(error);
     const item = {
       amount: 0,
       userName: error.message,

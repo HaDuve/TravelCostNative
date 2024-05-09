@@ -4,6 +4,7 @@ import {
   secureStoreSetObject,
 } from "../../store/secure-storage";
 import safeLogError from "../../util/error";
+import { safelyParseJSON } from "../../util/jsonParse";
 
 export const handleFirstStart = async () => {
   try {
@@ -57,7 +58,12 @@ export async function shouldShowOnboarding() {
 }
 
 const isOlderThanOneDay = async (firstDate) => {
-  const firstStartTimestamp = JSON.parse(firstDate);
+  let firstStartTimestamp = Date.now();
+  try {
+    firstStartTimestamp = Number(safelyParseJSON(firstDate));
+  } catch (error) {
+    safeLogError(error);
+  }
   // normal time is 24 Hours
   const daysInMilliseconds = DAYS_BEFORE_PROMPT * 24 * 60 * 60 * 1000;
   // debug shorter time

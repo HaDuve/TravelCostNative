@@ -35,6 +35,7 @@ import safeLogError from "../util/error";
 import set from "react-native-reanimated";
 import { getMMKVObject, setMMKVObject } from "./mmkv";
 import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
+import { safelyParseJSON } from "../util/jsonParse";
 
 export interface UserData {
   uid?: string;
@@ -181,7 +182,7 @@ function UserContextProvider({ children }) {
           uid ?? "" + "isPremium"
         );
         if (isPremiumString !== null) {
-          const isPremiumNow = JSON.parse(isPremiumString);
+          const isPremiumNow = safelyParseJSON(isPremiumString);
           // console.log("loadIsPremiumFromAsync ~ isPremiumNow:", isPremiumNow);
           setIsPremium(isPremiumNow);
           return;

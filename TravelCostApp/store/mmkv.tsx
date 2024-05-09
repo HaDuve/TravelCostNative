@@ -1,5 +1,6 @@
 import { MMKV } from "react-native-mmkv";
 import safeLogError from "../util/error";
+import { safelyParseJSON } from "../util/jsonParse";
 
 export const mmkvstorage = new MMKV();
 
@@ -10,7 +11,7 @@ export function setMMKVObject(key: string, value: object) {
 export function getMMKVObject(key: string) {
   const value = mmkvstorage.getString(key);
   try {
-    return value ? JSON.parse(value) : null;
+    return value ? safelyParseJSON(value) : null;
   } catch (error) {
     safeLogError(error);
     return null;

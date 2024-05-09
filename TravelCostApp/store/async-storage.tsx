@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import { secureStoreRemoveItem } from "./secure-storage";
 import safeLogError from "../util/error";
+import { safelyParseJSON } from "../util/jsonParse";
 
 /**
  * Store item in long-term Memory of the device.
@@ -66,9 +67,9 @@ export async function asyncStoreGetItem(key: string) {
 export async function asyncStoreGetObject(key: string) {
   try {
     const jsonValue = await AsyncStorage.getItem(key);
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
+    return jsonValue != null ? safelyParseJSON(jsonValue) : null;
   } catch (error) {
-    console.error(error);
+    safeLogError(error);
   }
 }
 

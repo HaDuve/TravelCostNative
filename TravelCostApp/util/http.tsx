@@ -24,6 +24,7 @@ import { getMMKVString, setMMKVString } from "../store/mmkv";
 import { secureStoreGetItem } from "../store/secure-storage";
 import { ExpoPushToken } from "expo-notifications";
 import safeLogError from "./error";
+import { safelyParseJSON } from "./jsonParse";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -114,7 +115,7 @@ export async function fetchCategories(tripid: string) {
         timeout: AXIOS_TIMOUT_LONG,
       }
     );
-    if (response) return JSON.parse(response.data);
+    if (response) return safelyParseJSON(response.data);
   } catch (error) {
     safeLogError(error);
   }
@@ -463,7 +464,17 @@ export async function putTravelerInTrip(tripid: string, traveller: Traveller) {
   }
 }
 
-export async function fetchTripsTravellers(tripid: string) {
+export type tripTravellers = {
+  [key: string]: {
+    uid: string;
+    userName: string;
+    touched: boolean;
+  };
+};
+
+export async function fetchTripsTravellers(
+  tripid: string
+): Promise<tripTravellers> {
   try {
     const response = await axios.get(
       BACKEND_URL + `/trips/${tripid}/travellers.json` + getMMKVString("QPAR"),
@@ -624,11 +635,17 @@ export async function touchTraveler(
   }
 }
 
-export async function touchAllTravelers(tripid: string, flag: boolean) {
+export async function touchAllTravelers(
+  tripid: string,
+  flag: boolean,
+  exceptionUid = ""
+) {
   const response = await fetchTripsTravellers(tripid);
   const axios_calls = [];
-  for (const key in response) {
-    const new_axios_call = touchTraveler(tripid, key, flag);
+  for (const firebaseIdKey in response) {
+    if (!!exceptionUid && exceptionUid === response[firebaseIdKey].uid)
+      continue;
+    const new_axios_call = touchTraveler(tripid, firebaseIdKey, flag);
     axios_calls.push(new_axios_call);
   }
   try {
@@ -669,11 +686,11 @@ export async function touchMyTraveler(tripid: string, uid: string) {
 export async function fetchTravelerIsTouched(tripid: string, uid: string) {
   try {
     const allTravelersRes = await fetchTripsTravellers(tripid);
-    let returnIsTouched = null;
+    let returnIsTouched = false;
     for (const key in allTravelersRes) {
-      const DatabaseUid = allTravelersRes[key].uid;
-      if (DatabaseUid !== uid) continue;
-      returnIsTouched = allTravelersRes[key].touched;
+      const compareUid = allTravelersRes[key].uid;
+      if (compareUid !== uid) continue;
+      returnIsTouched = allTravelersRes[key].touched || !!returnIsTouched;
     }
     return returnIsTouched ?? true;
   } catch (error) {

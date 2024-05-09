@@ -4,6 +4,7 @@ import SplashScreenOverlay from "../components/UI/SplashScreenOverlay";
 import PropTypes from "prop-types";
 import { secureStoreGetItem, secureStoreSetItem } from "./secure-storage";
 import safeLogError from "../util/error";
+import { safelyParseJSON } from "../util/jsonParse";
 
 export interface Settings {
   showFlags: boolean;
@@ -27,7 +28,7 @@ export const SettingsProvider = ({ children }) => {
     const loadSettingsAsync = async () => {
       const settingsString = await secureStoreGetItem("settings");
       if (settingsString) {
-        const loadedSettings: Settings = JSON.parse(settingsString);
+        const loadedSettings: Settings = safelyParseJSON(settingsString);
         setSettings(loadedSettings);
       } else
         setSettings({

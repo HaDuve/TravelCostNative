@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
 import safeLogError from "../util/error";
+import { safelyParseJSON } from "../util/jsonParse";
 
 const prefix = "cache";
 const expiryInMinutes = 5;
@@ -27,7 +28,7 @@ const isExpired = (item) => {
 const get = async (key) => {
   try {
     const value = await AsyncStorage.getItem(prefix + key);
-    const item = JSON.parse(value);
+    const item = safelyParseJSON(value);
 
     if (!item) return null;
 

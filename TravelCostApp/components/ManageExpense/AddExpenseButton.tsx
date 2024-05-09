@@ -43,6 +43,7 @@ import uniqBy from "lodash.uniqby";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
+import { safelyParseJSON } from "../../util/jsonParse";
 
 const PageLength = 20;
 
@@ -98,7 +99,7 @@ const AddExpenseButton = ({ navigation }) => {
     // shallow copy item or we will have problems with the expense context
     let data: ExpenseData;
     try {
-      data = JSON.parse(JSON.stringify(item));
+      data = safelyParseJSON(JSON.stringify(item));
     } catch (error) {
       return <></>;
     }

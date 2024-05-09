@@ -1,9 +1,4 @@
-import {
-  asyncStoreGetItem,
-  asyncStoreGetObject,
-  asyncStoreSetObject,
-} from "../store/async-storage";
-import { Expense, ExpenseData } from "./expense";
+import { Expense } from "./expense";
 import {
   storeExpense,
   updateExpense,
@@ -26,14 +21,9 @@ import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
 
 import NetInfo from "@react-native-community/netinfo";
 import { isConnectionFastEnough } from "./connectionSpeed";
-import {
-  secureStoreGetItem,
-  secureStoreGetObject,
-  secureStoreSetObject,
-} from "../store/secure-storage";
+import { secureStoreGetItem } from "../store/secure-storage";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import safeLogError from "./error";
-import set from "react-native-reanimated";
 
 // interface of offline queue manage expense item
 export interface OfflineQueueManageExpenseItem {
@@ -43,11 +33,10 @@ export interface OfflineQueueManageExpenseItem {
 }
 
 // retrieve offlinequeue and push new item
-export const pushOfflineQueue = async (item: OfflineQueueManageExpenseItem) => {
+export const offlineQueuePushItem = (item: OfflineQueueManageExpenseItem) => {
   const offlineQueue = getOfflineQueue();
   offlineQueue.push(item);
-  const res = setMMKVObject("offlineQueue", offlineQueue);
-  return res;
+  setMMKVObject("offlineQueue", offlineQueue);
 };
 
 // retrieve offlinequeue and push new item, return random id
@@ -59,7 +48,7 @@ export const pushQueueReturnRndID = async (
       Math.random().toString(36).substring(2, 15) +
       Math.random().toString(36).substring(2, 15);
     if (item.type == "add") item.expense.id = id;
-    await pushOfflineQueue(item);
+    offlineQueuePushItem(item);
     return id;
   } catch (error) {
     safeLogError(error);
@@ -290,7 +279,7 @@ export async function sendOfflineQueue(
             item.expense.id
           );
         } else {
-          // console.log("unknown offlineQ item type");
+          safeLogError("unknown offlineQ item type", "offline-queue.ts");
         }
         processedItems.push(item);
         i++;

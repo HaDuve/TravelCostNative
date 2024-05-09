@@ -964,7 +964,7 @@ const ExpenseForm = ({
     Toast.hide();
   };
 
-  const debouncedSubmit = callDebounced(advancedSubmitHandler, 1500);
+  const debouncedSubmit = callDebounced(advancedSubmitHandler, 500);
 
   const askChatGPTHandler = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

@@ -45,15 +45,20 @@ export async function isConnectionFastEnough(): Promise<ConnectionSpeedResult> {
   if (DEBUG_FORCE_OFFLINE) {
     return { isFastEnough: false, speed: 0 };
   }
-  const connectionInfo = await NetInfo.fetch();
-  if (!connectionInfo.isConnected || !connectionInfo.isInternetReachable) {
-    return { isFastEnough: false };
+  try {
+    const connectionInfo = await NetInfo.fetch();
+    if (!connectionInfo.isConnected || !connectionInfo.isInternetReachable) {
+      return { isFastEnough: false };
+    }
+    const speed = await getConnectionSpeed();
+    return {
+      isFastEnough: speed >= requiredSpeed,
+      speed: speed,
+    };
+  } catch (error) {
+    safeLogError(error);
+    return { isFastEnough: false, speed: 0 };
   }
-  const speed = await getConnectionSpeed();
-  return {
-    isFastEnough: speed >= requiredSpeed,
-    speed: speed,
-  };
 }
 
 export async function isConnectionFastEnoughAsBool() {

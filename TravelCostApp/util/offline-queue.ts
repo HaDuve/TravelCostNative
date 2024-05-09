@@ -189,14 +189,14 @@ export const storeExpenseOnlineOffline = async (
       );
       return id;
     } catch (error) {
-      safeLogError("error1:" + error);
+      safeLogError("error1: could not store expense " + error);
       const id = await pushQueueReturnRndID(item);
       // console.log("debugOQ id:", id);
       return id;
     }
   } else {
     // store item offline
-    safeLogError("error2");
+    safeLogError("error2 : network is not online && fast enough");
     const id = await pushQueueReturnRndID(item);
     return id;
   }

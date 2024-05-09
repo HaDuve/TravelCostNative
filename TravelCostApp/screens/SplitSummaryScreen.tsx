@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, {
   useCallback,
   useContext,
@@ -39,7 +38,7 @@ import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import GradientButton from "../components/UI/GradientButton";
 import { ExpensesContext } from "../store/expenses-context";
-import { ExpenseData, isPaidString, Split } from "../util/expense";
+import { ExpenseData, Split } from "../util/expense";
 import Animated from "react-native-reanimated";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { useFocusEffect } from "@react-navigation/native";
@@ -47,6 +46,7 @@ import * as Haptics from "expo-haptics";
 import { Pressable, ScrollView } from "react-native";
 import { dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
+import safeLogError from "../util/error";
 
 const SplitSummaryScreen = ({ navigation }) => {
   const {
@@ -54,7 +54,6 @@ const SplitSummaryScreen = ({ navigation }) => {
     tripCurrency,
     tripName,
     fetchAndSettleCurrentTrip,
-    isPaid,
     isPaidDate,
   } = useContext(TripContext);
   const { freshlyCreated, userName } = useContext(UserContext);
@@ -71,19 +70,12 @@ const SplitSummaryScreen = ({ navigation }) => {
         });
         navigation.navigate("Profile");
       }
-    }, [freshlyCreated])
+    }, [freshlyCreated, navigation])
   );
 
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState();
   const { isPortrait } = useContext(OrientationContext);
-
-  const [tripIsPaid, setTripIsPaid] = useState(isPaid === isPaidString.paid);
-
-  // TODO: this tripIsPaid-useEffect is a anti-pattern, use a context function instead
-  useEffect(() => {
-    setTripIsPaid(isPaid === isPaidString.paid);
-  }, [isPaid]);
 
   const [splits, setSplits] = useState<Split[]>([]);
   const hasOpenSplits = splits?.length > 0;
@@ -151,12 +143,11 @@ const SplitSummaryScreen = ({ navigation }) => {
     } catch (error) {
       Toast.show({
         type: "error",
-        text1: "Error",
-        text2: "Could not fetch splits!",
+        text1: i18n.t("error"),
+        text2: i18n.t("fetchError"),
         visibilityTime: 2000,
       });
-      console.error(error);
-      // setError("Could not fetch splits from the web database! " + error);
+      safeLogError("Could not fetch splits from the web database! " + error);
     }
     setIsFetching(false);
   }, [
@@ -165,7 +156,7 @@ const SplitSummaryScreen = ({ navigation }) => {
     isPaidDate,
     tripCurrency,
     tripid,
-    memoExpenses,
+    memoExpenses.length,
     userName,
   ]);
   const simpleSplits = useCallback(

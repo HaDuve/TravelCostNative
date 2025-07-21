@@ -12,6 +12,9 @@ web-build/
 .env*
 settings.json
 
+# claude
+CLAUDE.md
+
 # macOS
 .DS_Store
 

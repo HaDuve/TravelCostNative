@@ -23,17 +23,20 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.budgetfornomads.app",
-      "buildNumber": "1.0.1178",
+      "buildNumber": "1.0.1181",
       "infoPlist": {
         "UIBackgroundModes": [
           "fetch",
+          "remote-notification",
+          "fetch",
           "remote-notification"
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "package": "com.budgetfornomads.app",
-      "versionCode": 101090,
+      "versionCode": 101091,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon2.png",
         "backgroundColor": "#FFFFFF"

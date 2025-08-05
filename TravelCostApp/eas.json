@@ -57,7 +57,7 @@
       },
       "android": {
         "track": "production",
-        "serviceAccountKeyPath": "/Users/hiono/Documents/Keys/travelcostnative-917b3924d444.json",
+        "serviceAccountKeyPath": "/Users/hiono/Documents/Keys/Budget_For_Nomads/EAS/Google_Play_Console/budget-for-nomads-468110-5964d3e3e268.json",
         "releaseStatus": "draft"
       }
     }

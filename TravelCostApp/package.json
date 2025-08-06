@@ -12,7 +12,9 @@
     "lint:check": "eslint .",
     "type-check": "tsc --noEmit",
     "compile-check": "npm run type-check && npm run lint:check",
-    "build:check": "npm run compile-check && echo '✅ All checks passed - ready for build!'"
+    "build:check": "npm run compile-check && echo '✅ All checks passed - ready for build!'",
+    "sim:ios": "open -a Simulator",
+    "sim:android": "emulator -list-avds && echo 'Run: emulator @<avd-name>' || echo 'No Android AVDs found. Create one in Android Studio.'"
   },
   "dependencies": {
     "@config-plugins/react-native-branch": "^10.0.0",
@@ -97,6 +99,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@react-native-community/cli": "^19.1.1",
     "@tsconfig/react-native": "^2.0.3",
     "@types/jest": "^29.4.0",
     "@types/luxon": "^3.3.0",

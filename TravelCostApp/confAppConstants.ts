@@ -12,9 +12,9 @@ export const MINIMUM_REQUIRED_SPEED = 0.1;
 export const DEBUG_NO_DATA = false;
 // polling interval data
 export const DEBUG_POLLING_INTERVAL = 5000;
-// timout (in ms) axios
+// timeout (in ms) axios
 export const AXIOS_TIMEOUT_DEFAULT = 4500;
-export const AXIOS_TIMOUT_LONG = 35000;
+export const AXIOS_TIMEOUT_LONG = 35000;
 // Premium consts
 export const FORCE_PREMIUM = false;
 // Rating/Review consts

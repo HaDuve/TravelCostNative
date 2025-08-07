@@ -35,6 +35,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: false,
     shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -91,8 +93,8 @@ const TEST_PushScreen = () => {
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] =
     useState<Notifications.Notification>(null);
-  const notificationListener = useRef<Notifications.Subscription>();
-  const responseListener = useRef<Notifications.Subscription>();
+  const notificationListener = useRef<Notifications.Subscription>(null);
+  const responseListener = useRef<Notifications.Subscription>(null);
 
   useEffect(() => {
     registerForPushNotificationsAsync()
@@ -101,7 +103,9 @@ const TEST_PushScreen = () => {
         // console.log("token", token);
         setExpoPushToken(token);
       })
-      .catch((e) => // console.log("token error", e));
+      .catch((e) => {
+        // console.log("token error", e);
+      });
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {

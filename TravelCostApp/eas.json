@@ -1,6 +1,5 @@
 {
   "cli": {
-    // "version": "3.7.2",
     "appVersionSource": "local",
     "promptToConfigurePushNotifications": false
   },

@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import {
   AXIOS_TIMEOUT_DEFAULT,
-  AXIOS_TIMOUT_LONG,
+  AXIOS_TIMEOUT_LONG,
   DEBUG_NO_DATA,
 } from "../confAppConstants";
 import { Category } from "./category";
@@ -88,7 +88,7 @@ export const fetchServerInfo = async () => {
     const response = await axios.get(
       `${BACKEND_URL}/server.json${getMMKVString("QPAR")}`,
       {
-        timeout: AXIOS_TIMOUT_LONG,
+        timeout: AXIOS_TIMEOUT_LONG,
       }
     );
 
@@ -112,7 +112,7 @@ export async function fetchCategories(tripid: string) {
         "/categories.json" +
         getMMKVString("QPAR"),
       {
-        timeout: AXIOS_TIMOUT_LONG,
+        timeout: AXIOS_TIMEOUT_LONG,
       }
     );
     if (response) return safelyParseJSON(response.data);
@@ -192,7 +192,7 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
           "/expenses.json" +
           getMMKVString("QPAR"),
         {
-          timeout: AXIOS_TIMOUT_LONG,
+          timeout: AXIOS_TIMEOUT_LONG,
         }
       );
       axios_calls.push(new_axios_call);
@@ -250,7 +250,7 @@ export async function fetchExpenses(tripid: string, uid: string) {
         "/expenses.json" +
         getMMKVString("QPAR"),
       {
-        timeout: AXIOS_TIMOUT_LONG,
+        timeout: AXIOS_TIMEOUT_LONG,
       }
     );
     const expenses = [];
@@ -382,7 +382,7 @@ export async function fetchUser(uid: string) {
   }
   try {
     const response = await axios.get(BACKEND_URL + "/users/" + `${uid}.json`, {
-      timeout: AXIOS_TIMOUT_LONG,
+      timeout: AXIOS_TIMEOUT_LONG,
     });
     const userData: UserData = response.data;
     return userData;
@@ -422,7 +422,7 @@ export async function fetchTrip(tripid: string): Promise<TripData> {
     const response = await axios.get(
       BACKEND_URL + "/trips/" + `${tripid}.json` + getMMKVString("QPAR"),
       {
-        timeout: AXIOS_TIMOUT_LONG,
+        timeout: AXIOS_TIMEOUT_LONG,
       }
     );
     return response.data;
@@ -479,7 +479,7 @@ export async function fetchTripsTravellers(
     const response = await axios.get(
       BACKEND_URL + `/trips/${tripid}/travellers.json` + getMMKVString("QPAR"),
       {
-        timeout: AXIOS_TIMOUT_LONG,
+        timeout: AXIOS_TIMEOUT_LONG,
       }
     );
     return response.data;
@@ -566,7 +566,7 @@ export async function fetchTripHistory(userId: string) {
     const response = await axios.get(
       BACKEND_URL + `/users/${userId}/tripHistory.json` + getMMKVString("QPAR"),
       {
-        timeout: AXIOS_TIMOUT_LONG,
+        timeout: AXIOS_TIMEOUT_LONG,
       }
     );
     return response.data;
@@ -580,7 +580,7 @@ export async function fetchCurrentTrip(userId: string) {
     const response = await axios.get(
       BACKEND_URL + `/users/${userId}.json` + getMMKVString("QPAR"),
       {
-        timeout: AXIOS_TIMOUT_LONG,
+        timeout: AXIOS_TIMEOUT_LONG,
       }
     );
     return response.data.currentTrip;
@@ -594,7 +594,7 @@ export async function fetchUserName(userId: string): Promise<string> {
     const response = await axios.get(
       BACKEND_URL + `/users/${userId}.json` + getMMKVString("QPAR"),
       {
-        timeout: AXIOS_TIMOUT_LONG,
+        timeout: AXIOS_TIMEOUT_LONG,
       }
     );
     return response.data.userName;
@@ -608,7 +608,7 @@ export async function fetchTripName(tripId: string): Promise<string> {
     const response = await axios.get(
       BACKEND_URL + `/trips/${tripId}.json` + getMMKVString("QPAR"),
       {
-        timeout: AXIOS_TIMOUT_LONG,
+        timeout: AXIOS_TIMEOUT_LONG,
       }
     );
     return response.data.tripName;
@@ -627,7 +627,8 @@ export async function touchTraveler(
       BACKEND_URL +
         `/trips/${tripid}/travellers/${firebaseId}.json` +
         getMMKVString("QPAR"),
-      { touched: isTouched, timout: AXIOS_TIMOUT_LONG }
+      { touched: isTouched },
+      {timeout: AXIOS_TIMEOUT_LONG}
     );
     return response;
   } catch (error) {
@@ -719,7 +720,7 @@ export async function storeExpoPushTokenInTrip(
   const response = await axios.get(
     BACKEND_URL + `/trips/${usedTripID}/tokens.json` + getMMKVString("QPAR"),
     {
-      timeout: AXIOS_TIMOUT_LONG,
+      timeout: AXIOS_TIMEOUT_LONG,
     }
   );
   const res = response?.data;
@@ -768,7 +769,7 @@ export async function fetchChangelog() {
     const response = await axios.get(
       "https://raw.githubusercontent.com/HaDuve/TravelCostNative/main/TravelCostApp/changelog.txt",
       {
-        timeout: AXIOS_TIMOUT_LONG,
+        timeout: AXIOS_TIMEOUT_LONG,
       }
     );
     let tempText = "";

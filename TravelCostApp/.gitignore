@@ -15,6 +15,10 @@ settings.json
 # claude
 CLAUDE.md
 
+# credentials
+credentials.json
+database-overview.md
+
 # macOS
 .DS_Store
 

@@ -82,7 +82,7 @@
     "react-native-webview": "^13.15.0",
     "rn-tourguide": "^3.3.0",
     "splitwise-js-map": "^1.0.3",
-    "@expo/cli": "^0.20.11"
+    "@expo/cli": "^0.24.20"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

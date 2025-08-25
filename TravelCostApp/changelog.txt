@@ -2,6 +2,11 @@ Changelog Travel Expense App
 
 __Newest Changes:
 
+1.2.803a
+- Bugfixes and performance improvements
+
+__Other Changes:
+
 1.2.803
 - Advanced Charts, Splitting Expenses and GPT no longer require premium account
 - Added Tablet support
@@ -9,8 +14,6 @@ __Newest Changes:
 - Added Landscape (Orientation) support
 - Added Exchange Rate Calculations to Expense Form
 - Bugfixes and performance improvements
-
-__Other Changes:
 
 1.2.802e
 - Show future Dates in Overview

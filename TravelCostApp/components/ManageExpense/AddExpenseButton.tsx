@@ -142,9 +142,9 @@ const AddExpenseButton = ({ navigation }) => {
             setLongPressed(false);
             setLastExpensesNumber(PageLength);
             // set date to today
-            data.date = new Date();
-            data.startDate = new Date();
-            data.endDate = new Date();
+            data.date = new Date().toISOString();
+            data.startDate = new Date().toISOString();
+            data.endDate = new Date().toISOString();
             delete data.id;
             delete data.rangeId;
             delete data.editedTimestamp;

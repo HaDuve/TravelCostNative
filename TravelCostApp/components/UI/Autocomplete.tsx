@@ -22,6 +22,7 @@ const Autocomplete = ({
   const [value, setValue] = useState(origValue);
   const [menuVisible, setMenuVisible] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
+  const [blurTimeout, setBlurTimeout] = useState(null);
 
   useEffect(() => {
     setValue(origValue);
@@ -30,6 +31,15 @@ const Autocomplete = ({
   useEffect(() => {
     if (origValue == "") setMenuVisible(false);
   }, [origValue]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (blurTimeout) {
+        clearTimeout(blurTimeout);
+      }
+    };
+  }, [blurTimeout]);
   /**
    * Filters the data array based on the provided text and removes duplicate results.
    * @param {string} text - The text to filter the data array with.
@@ -54,12 +64,13 @@ const Autocomplete = ({
           }
         }}
         // maybe with a timeout
-        onBlur={async () =>
-          setTimeout(
+        onBlur={() => {
+          const timeoutId = setTimeout(
             () => setMenuVisible(false),
             Platform.OS == "ios" ? 700 : 1200
-          )
-        }
+          );
+          setBlurTimeout(timeoutId);
+        }}
         label={label}
         // right={right}
         // left={left}
@@ -107,6 +118,11 @@ const Autocomplete = ({
                   ]}
                   //   icon={icon}
                   onPress={() => {
+                    // Clear the blur timeout to prevent delayed menu hiding
+                    if (blurTimeout) {
+                      clearTimeout(blurTimeout);
+                      setBlurTimeout(null);
+                    }
                     origOnChange(autotext);
                     setValue(autotext);
                     setMenuVisible(false);

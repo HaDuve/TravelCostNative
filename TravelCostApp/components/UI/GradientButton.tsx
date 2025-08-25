@@ -53,7 +53,7 @@ GradientButton.propTypes = {
   buttonStyle: PropTypes.object,
   textStyle: PropTypes.object,
   darkText: PropTypes.bool,
-  style: PropTypes.object,
+  style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
   colors: PropTypes.array,
 };
 

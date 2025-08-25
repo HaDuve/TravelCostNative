@@ -1104,9 +1104,9 @@ const ExpenseForm = ({
   const tempValues: ExpenseData = {
     uid: authCtx.uid,
     amount: +amountValue,
-    date: DateTime.fromISO(inputs.date.value).toJSDate(),
-    startDate: DateTime.fromISO(startDate).toJSDate(),
-    endDate: DateTime.fromISO(endDate).toJSDate(),
+    date: inputs.date.value,
+    startDate: startDate,
+    endDate: endDate,
     description: inputs.description.value,
     category: newCat ? pickedCat : inputs.category.value,
     country: inputs.country.value,
@@ -1885,7 +1885,7 @@ ExpenseForm.propTypes = {
   isEditing: PropTypes.bool,
   defaultValues: PropTypes.shape({
     amount: PropTypes.number,
-    date: PropTypes.instanceOf(Date),
+    date: PropTypes.string,
     description: PropTypes.string,
     category: PropTypes.string,
     country: PropTypes.string,
@@ -1893,10 +1893,13 @@ ExpenseForm.propTypes = {
     whoPaid: PropTypes.string,
     splitType: PropTypes.string,
     listEQUAL: PropTypes.arrayOf(
-      PropTypes.shape({
-        userName: PropTypes.string,
-        amount: PropTypes.number,
-      })
+      PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.shape({
+          userName: PropTypes.string,
+          amount: PropTypes.number,
+        })
+      ])
     ),
     splitList: PropTypes.arrayOf(
       PropTypes.shape({

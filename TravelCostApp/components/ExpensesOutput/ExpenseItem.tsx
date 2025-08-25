@@ -308,6 +308,8 @@ function ExpenseItem(props): JSX.Element {
           <View style={styles.leftItem}>
             <Text
               maxFontSizeMultiplier={1.2}
+              numberOfLines={1}
+              ellipsizeMode="tail"
               style={[
                 styles.textBase,
                 styles.description,
@@ -405,8 +407,8 @@ const styles = StyleSheet.create({
     fontWeight: "300",
     fontSize: dynamicScale(15, false, 0.5),
     zIndex: 2,
-    flexWrap: "wrap",
-    flexDirection: "row",
+    numberOfLines: 1,
+    ellipsizeMode: "tail",
   },
   secondaryText: {
     color: GlobalStyles.colors.gray700,

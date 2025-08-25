@@ -3,7 +3,7 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = Localization.locale.slice(0, 2);
+i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -42,12 +42,12 @@ const DatePickerModal = ({
       onCancel={onCancelRange}
       onConfirm={onConfirmRange}
       // @enum 'en' | 'cn' | 'de' | 'es' | 'fr' | 'pt'
-      // if Localization.locale.slice(0, 2) is one of these, it will be used
+      // if ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en') is one of these, it will be used
       // otherwise, the default language is 'en'
       language={
-        Localization.locale.slice(0, 2) === "de" ||
-        Localization.locale.slice(0, 2) === "fr"
-          ? Localization.locale.slice(0, 2)
+        ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en') === "de" ||
+        ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en') === "fr"
+          ? ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en')
           : "en"
       }
     />

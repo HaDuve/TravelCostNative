@@ -68,7 +68,7 @@ import { Pressable } from "react-native";
 import safeLogError from "../../util/error";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = Localization.locale.slice(0, 2);
+i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
 i18n.enableFallback = true;
 
 // Displays a list of all expenses.

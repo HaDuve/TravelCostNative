@@ -18,7 +18,7 @@ import { getCurrencySymbol } from "../../util/currencySymbol";
 import CountryFlag from "react-native-country-flag";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = Localization.locale.slice(0, 2);
+i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
 // i18n.locale = "en";
 i18n.enableFallback = true;
 
@@ -31,7 +31,7 @@ const CountryPicker = ({
 }) => {
   // Users Device CountryCode CC to translate Country names in picker
   // enforce a language we have registered, otherwise, english
-  let CC = Localization.locale.slice(0, 2);
+  let CC = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
   if (CC !== "de" && CC !== "en" && CC !== "fr" && CC !== "ru") CC = "en";
   //   const CC = "en";
 

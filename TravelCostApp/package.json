@@ -21,6 +21,7 @@
     "@react-native-community/netinfo": "11.4.1",
     "@react-native-documents/picker": "^10.1.5",
     "@react-navigation/bottom-tabs": "^6.3.2",
+    "@react-navigation/core": "6.4.10",
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/material-top-tabs": "^6.5.1",
     "@react-navigation/native": "^6.0.11",

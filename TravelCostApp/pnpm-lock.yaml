@@ -11,9 +11,6 @@ importers:
       '@babel/runtime':
         specifier: ^7.28.3
         version: 7.28.3
-      '@config-plugins/react-native-branch':
-        specifier: ^10.0.0
-        version: 10.0.0(expo@53.0.22(@babel/core@7.28.3)(react-native-webview@13.16.0(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))
       '@expo/cli':
         specifier: ^0.24.20
         version: 0.24.20
@@ -173,9 +170,6 @@ importers:
       react-native:
         specifier: 0.79.5
         version: 0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1)
-      react-native-branch:
-        specifier: ^5.4.0
-        version: 5.9.2(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))
       react-native-dotenv:
         specifier: ^3.4.9
         version: 3.4.11(@babel/runtime@7.28.3)
@@ -829,11 +823,6 @@ packages:
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
-
-  '@config-plugins/react-native-branch@10.0.0':
-    resolution: {integrity: sha512-zGt/mAs39hRkOsVLjoF4lNRRozviQNZI1EbbmJcfbVZMWelfw3LH0y52uPO/J+WgV2+IMtgwYI12ovlL2IDayw==}
-    peerDependencies:
-      expo: ^53
 
   '@egjs/hammerjs@2.0.17':
     resolution: {integrity: sha512-XQsZgjm2EcVUiZQf11UBJQfmZeEmOW8DpI1gsFeln6w0ae0ii4dMQEQ0kjl6DspdWX1aGY1/loyXnP0JS06e/A==}
@@ -4393,11 +4382,6 @@ packages:
   react-native-animatable@1.4.0:
     resolution: {integrity: sha512-DZwaDVWm2NBvBxf7I0wXKXLKb/TxDnkV53sWhCvei1pRyTX3MVFpkvdYBknNBqPrxYuAIlPxEp7gJOidIauUkw==}
 
-  react-native-branch@5.9.2:
-    resolution: {integrity: sha512-gOiFtlQNAvnNKBWB0yfZssDSgg6KJ4LyBvTD399+dW4i/iWW6xOiWDwS15huXQ1QLCsjyseiKxy90UBYOKJsPw==}
-    peerDependencies:
-      react-native: '>= 0.60'
-
   react-native-dotenv@3.4.11:
     resolution: {integrity: sha512-6vnIE+WHABSeHCaYP6l3O1BOEhWxKH6nHAdV7n/wKn/sciZ64zPPp2NUdEUf1m7g4uuzlLbjgr+6uDt89q2DOg==}
     peerDependencies:
@@ -6132,10 +6116,6 @@ snapshots:
 
   '@colors/colors@1.5.0':
     optional: true
-
-  '@config-plugins/react-native-branch@10.0.0(expo@53.0.22(@babel/core@7.28.3)(react-native-webview@13.16.0(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))':
-    dependencies:
-      expo: 53.0.22(@babel/core@7.28.3)(react-native-webview@13.16.0(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
 
   '@egjs/hammerjs@2.0.17':
     dependencies:
@@ -10884,10 +10864,6 @@ snapshots:
   react-native-animatable@1.4.0:
     dependencies:
       prop-types: 15.8.1
-
-  react-native-branch@5.9.2(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1)):
-    dependencies:
-      react-native: 0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1)
 
   react-native-dotenv@3.4.11(@babel/runtime@7.28.3):
     dependencies:

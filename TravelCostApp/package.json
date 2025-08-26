@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.28.3",
-    "@config-plugins/react-native-branch": "^10.0.0",
     "@expo/cli": "^0.24.20",
     "@expo/config": "^11.0.13",
     "@expo/config-plugins": "^10.1.2",
@@ -64,7 +63,6 @@
     "prop-types": "^15.8.1",
     "react": "18.3.1",
     "react-native": "0.79.5",
-    "react-native-branch": "^5.4.0",
     "react-native-dotenv": "^3.4.9",
     "react-native-dropdown-picker": "^5.4.2",
     "react-native-edge-to-edge": "1.6.0",

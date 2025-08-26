@@ -54,6 +54,7 @@
     "expo-splash-screen": "~0.30.10",
     "expo-status-bar": "~2.2.3",
     "expo-store-review": "~8.1.5",
+    "expo-system-ui": "~5.0.11",
     "expo-updates": "^0.28.17",
     "firebase": "^10.8.0",
     "i18n-iso-countries": "^7.5.0",

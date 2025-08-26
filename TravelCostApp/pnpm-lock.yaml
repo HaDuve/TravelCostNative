@@ -136,7 +136,9 @@ importers:
         version: 2.2.3(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))(react@18.2.0)
       expo-store-review:
         specifier: ~8.1.5
-        version: 8.1.5(expo@53.0.22(@babel/core@7.28.3)(graphql@15.8.0)(react-native-webview@13.16.0(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))(react@18.2.0))(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))(react@18.2.0))(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))
+        version: 8.1.5(expo@53.0.22(@babel/core@7.28.3)(graphql@15.8.0)(react-native-webview@13.16.0(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))(react@18.2.0))(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))(react@18.2.0))(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))e      expo-system-ui:
+        specifier: ~5.0.11
+        version: 5.0.11(expo@53.0.22(@babel/core@7.28.3)(graphql@15.8.0)(react-native-webview@13.16.0(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))(react@18.2.0))(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))(react@18.2.0))(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))
       expo-updates:
         specifier: ^0.28.17
         version: 0.28.17(expo@53.0.22(@babel/core@7.28.3)(graphql@15.8.0)(react-native-webview@13.16.0(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))(react@18.2.0))(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))(react@18.2.0))(react@18.2.0)
@@ -1707,6 +1709,9 @@ packages:
   '@react-native/normalize-colors@0.79.5':
     resolution: {integrity: sha512-nGXMNMclZgzLUxijQQ38Dm3IAEhgxuySAWQHnljFtfB0JdaMwpe0Ox9H7Tp2OgrEA+EMEv+Od9ElKlHwGKmmvQ==}
 
+  '@react-native/normalize-colors@0.79.6':
+    resolution: {integrity: sha512-0v2/ruY7eeKun4BeKu+GcfO+SHBdl0LJn4ZFzTzjHdWES0Cn+ONqKljYaIv8p9MV2Hx/kcdEvbY4lWI34jC/mQ==}
+
   '@react-native/virtualized-lists@0.73.4':
     resolution: {integrity: sha512-HpmLg1FrEiDtrtAbXiwCgXFYyloK/dOIPIuWW3fsqukwJEWAiTzm1nXGJ7xPU5XTHiWZ4sKup5Ebaj8z7iyWog==}
     engines: {node: '>=18'}
@@ -3084,6 +3089,16 @@ packages:
 
   expo-structured-headers@4.1.0:
     resolution: {integrity: sha512-2X+aUNzC/qaw7/WyUhrVHNDB0uQ5rE12XA2H/rJXaAiYQSuOeU90ladaN0IJYV9I2XlhYrjXLktLXWbO7zgbag==}
+
+  expo-system-ui@5.0.11:
+    resolution: {integrity: sha512-PG5VdaG5cwBe1Rj02mJdnsihKl9Iw/w/a6+qh2mH3f2K/IvQ+Hf7aG2kavSADtkGNCNj7CEIg7Rn4DQz/SE5rQ==}
+    peerDependencies:
+      expo: '*'
+      react-native: '*'
+      react-native-web: '*'
+    peerDependenciesMeta:
+      react-native-web:
+        optional: true
 
   expo-updates-interface@1.1.0:
     resolution: {integrity: sha512-DeB+fRe0hUDPZhpJ4X4bFMAItatFBUPjw/TVSbJsaf3Exeami+2qbbJhWkcTMoYHOB73nOIcaYcWXYJnCJXO0w==}
@@ -8370,6 +8385,8 @@ snapshots:
 
   '@react-native/normalize-colors@0.79.5': {}
 
+  '@react-native/normalize-colors@0.79.6': {}
+
   '@react-native/virtualized-lists@0.73.4(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))':
     dependencies:
       invariant: 2.2.4
@@ -10008,6 +10025,15 @@ snapshots:
       react-native: 0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0)
 
   expo-structured-headers@4.1.0: {}
+
+  expo-system-ui@5.0.11(expo@53.0.22(@babel/core@7.28.3)(graphql@15.8.0)(react-native-webview@13.16.0(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))(react@18.2.0))(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))(react@18.2.0))(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0)):
+    dependencies:
+      '@react-native/normalize-colors': 0.79.6
+      debug: 4.4.1
+      expo: 53.0.22(@babel/core@7.28.3)(graphql@15.8.0)(react-native-webview@13.16.0(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))(react@18.2.0))(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))(react@18.2.0)
+      react-native: 0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0)
+    transitivePeerDependencies:
+      - supports-color
 
   expo-updates-interface@1.1.0(expo@53.0.22(@babel/core@7.28.3)(graphql@15.8.0)(react-native-webview@13.16.0(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))(react@18.2.0))(react-native@0.73.4(@babel/core@7.28.3)(@babel/preset-env@7.28.3(@babel/core@7.28.3))(encoding@0.1.13)(react@18.2.0))(react@18.2.0)):
     dependencies:

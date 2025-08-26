@@ -103,9 +103,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ChangelogScreen from "./screens/ChangelogScreen";
 import { Badge } from "react-native-paper";
 import { ExpenseData } from "./util/expense";
-import BackgroundFetchScreen, {
-  registerBackgroundFetchAsync,
-} from "./taskmanager/backgroundTasks";
+
 import safeLogError from "./util/error";
 import { constantScale, dynamicScale } from "./util/scalingUtil";
 import { CustomTooltip } from "./components/UI/Tourguide_Tooltip";
@@ -305,14 +303,7 @@ function AuthenticatedStack() {
               presentation: "modal",
             }}
           />
-          <Stack.Screen
-            name="backgroundTasks"
-            component={BackgroundFetchScreen}
-            options={{
-              headerShown: false,
-              presentation: "modal",
-            }}
-          />
+
           <Stack.Screen
             name="Changelog"
             component={ChangelogScreen}
@@ -662,8 +653,7 @@ function Root() {
       const storedTripId = await secureStoreGetItem("currentTripId");
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
 
-      // register backgroundtask
-      await registerBackgroundFetchAsync();
+
 
       const { REVCAT_G, REVCAT_A }: Keys = await loadKeys();
 

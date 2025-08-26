@@ -170,6 +170,9 @@ importers:
       react-native:
         specifier: 0.79.5
         version: 0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1)
+      react-native-branch:
+        specifier: ^6.8.0
+        version: 6.8.0(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))
       react-native-dotenv:
         specifier: ^3.4.9
         version: 3.4.11(@babel/runtime@7.28.3)
@@ -4381,6 +4384,11 @@ packages:
 
   react-native-animatable@1.4.0:
     resolution: {integrity: sha512-DZwaDVWm2NBvBxf7I0wXKXLKb/TxDnkV53sWhCvei1pRyTX3MVFpkvdYBknNBqPrxYuAIlPxEp7gJOidIauUkw==}
+
+  react-native-branch@6.8.0:
+    resolution: {integrity: sha512-jkPNv+kj0Aap5DIzBEJ4reD8P5OE9H5fYkHc/ltLlf1m7PlBy1qyRY1On01eA/nLT4YLCx6QZsB7E9WUXhWM0g==}
+    peerDependencies:
+      react-native: '>= 0.60'
 
   react-native-dotenv@3.4.11:
     resolution: {integrity: sha512-6vnIE+WHABSeHCaYP6l3O1BOEhWxKH6nHAdV7n/wKn/sciZ64zPPp2NUdEUf1m7g4uuzlLbjgr+6uDt89q2DOg==}
@@ -10864,6 +10872,10 @@ snapshots:
   react-native-animatable@1.4.0:
     dependencies:
       prop-types: 15.8.1
+
+  react-native-branch@6.8.0(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1)):
+    dependencies:
+      react-native: 0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1)
 
   react-native-dotenv@3.4.11(@babel/runtime@7.28.3):
     dependencies:

@@ -67,6 +67,7 @@
     "react-native-branch": "^5.4.0",
     "react-native-dotenv": "^3.4.9",
     "react-native-dropdown-picker": "^5.4.2",
+    "react-native-edge-to-edge": "1.6.0",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-is-edge-to-edge": "^1.2.1",
     "react-native-mmkv": "^2.12.2",

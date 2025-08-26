@@ -182,6 +182,9 @@ importers:
       react-native-dropdown-picker:
         specifier: ^5.4.2
         version: 5.4.6(react-native@0.79.5(@babel/core@7.28.3)(@react-native-community/cli@11.3.7(@babel/core@7.28.3)(encoding@0.1.13))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
+      react-native-edge-to-edge:
+        specifier: 1.6.0
+        version: 1.6.0(react-native@0.79.5(@babel/core@7.28.3)(@react-native-community/cli@11.3.7(@babel/core@7.28.3)(encoding@0.1.13))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
       react-native-gesture-handler:
         specifier: ~2.24.0
         version: 2.24.0(react-native@0.79.5(@babel/core@7.28.3)(@react-native-community/cli@11.3.7(@babel/core@7.28.3)(encoding@0.1.13))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)

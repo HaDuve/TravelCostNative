@@ -1,6 +1,5 @@
 {
   "cli": {
-    // "version": "3.7.2",
     "appVersionSource": "local",
     "promptToConfigurePushNotifications": false
   },
@@ -10,11 +9,10 @@
       "distribution": "internal",
       "channel": "staging",
       "android": {
-        "gradleCommand": ":app:assembleDebug",
+        "gradleCommand": ":app:assembleDebug -Pkotlin.jvm.target.validation.mode=warning -Pandroid.kotlinVersion=2.0.21",
         "buildType": "apk",
         "env": {
-          "GRADLE_OPTS": "-Dorg.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8",
-          "JAVA_HOME": "/usr/lib/jvm/java-17-openjdk"
+          "GRADLE_OPTS": "-Dorg.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
         }
       }
     },
@@ -26,11 +24,10 @@
         "simulator": true
       },
       "android": {
-        "gradleCommand": ":app:assembleDebug",
+        "gradleCommand": ":app:assembleDebug -Pkotlin.jvm.target.validation.mode=warning -Pandroid.kotlinVersion=2.0.21",
         "buildType": "apk",
         "env": {
-          "GRADLE_OPTS": "-Dorg.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8",
-          "JAVA_HOME": "/usr/lib/jvm/java-17-openjdk"
+          "GRADLE_OPTS": "-Dorg.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
         }
       }
     },

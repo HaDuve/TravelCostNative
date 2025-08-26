@@ -12,8 +12,8 @@ importers:
         specifier: ^7.28.3
         version: 7.28.3
       '@config-plugins/react-native-branch':
-        specifier: ^9.0.0
-        version: 9.0.0(expo@53.0.22(@babel/core@7.28.3)(react-native-webview@13.16.0(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))
+        specifier: ^10.0.0
+        version: 10.0.0(expo@53.0.22(@babel/core@7.28.3)(react-native-webview@13.16.0(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))
       '@expo/cli':
         specifier: ^0.24.20
         version: 0.24.20
@@ -830,10 +830,10 @@ packages:
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
 
-  '@config-plugins/react-native-branch@9.0.0':
-    resolution: {integrity: sha512-MKNc1mH9bbW5pi4iJz/d6iHqvgfoElgX2l1AKHi82k3Ms0/MoM6f3+vhAIg9j5+QVlNprgy2R4sk2hXRWrNjzw==}
+  '@config-plugins/react-native-branch@10.0.0':
+    resolution: {integrity: sha512-zGt/mAs39hRkOsVLjoF4lNRRozviQNZI1EbbmJcfbVZMWelfw3LH0y52uPO/J+WgV2+IMtgwYI12ovlL2IDayw==}
     peerDependencies:
-      expo: ^52
+      expo: ^53
 
   '@egjs/hammerjs@2.0.17':
     resolution: {integrity: sha512-XQsZgjm2EcVUiZQf11UBJQfmZeEmOW8DpI1gsFeln6w0ae0ii4dMQEQ0kjl6DspdWX1aGY1/loyXnP0JS06e/A==}
@@ -6133,7 +6133,7 @@ snapshots:
   '@colors/colors@1.5.0':
     optional: true
 
-  '@config-plugins/react-native-branch@9.0.0(expo@53.0.22(@babel/core@7.28.3)(react-native-webview@13.16.0(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))':
+  '@config-plugins/react-native-branch@10.0.0(expo@53.0.22(@babel/core@7.28.3)(react-native-webview@13.16.0(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))':
     dependencies:
       expo: 53.0.22(@babel/core@7.28.3)(react-native-webview@13.16.0(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))(react-native@0.79.5(@babel/core@7.28.3)(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
 

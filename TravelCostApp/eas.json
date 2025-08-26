@@ -9,11 +9,7 @@
       "distribution": "internal",
       "channel": "staging",
       "android": {
-        "gradleCommand": ":app:assembleDebug -Pkotlin.jvm.target.validation.mode=warning -Pandroid.kotlinVersion=2.0.21",
-        "buildType": "apk",
-        "env": {
-          "GRADLE_OPTS": "-Dorg.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
-        }
+        "buildType": "apk"
       }
     },
     "development-simulator": {
@@ -24,11 +20,7 @@
         "simulator": true
       },
       "android": {
-        "gradleCommand": ":app:assembleDebug -Pkotlin.jvm.target.validation.mode=warning -Pandroid.kotlinVersion=2.0.21",
-        "buildType": "apk",
-        "env": {
-          "GRADLE_OPTS": "-Dorg.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
-        }
+        "buildType": "apk"
       }
     },
     "beta1": {

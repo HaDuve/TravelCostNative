@@ -8,7 +8,15 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "channel": "staging"
+      "channel": "staging",
+      "android": {
+        "gradleCommand": ":app:assembleDebug",
+        "buildType": "apk",
+        "env": {
+          "GRADLE_OPTS": "-Dorg.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8",
+          "JAVA_HOME": "/usr/lib/jvm/java-17-openjdk"
+        }
+      }
     },
     "development-simulator": {
       "developmentClient": true,
@@ -16,6 +24,14 @@
       "distribution": "internal",
       "ios": {
         "simulator": true
+      },
+      "android": {
+        "gradleCommand": ":app:assembleDebug",
+        "buildType": "apk",
+        "env": {
+          "GRADLE_OPTS": "-Dorg.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8",
+          "JAVA_HOME": "/usr/lib/jvm/java-17-openjdk"
+        }
       }
     },
     "beta1": {

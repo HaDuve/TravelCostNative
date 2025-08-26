@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.28.3",
-    "@config-plugins/react-native-branch": "^6.0.0",
+    "@config-plugins/react-native-branch": "^9.0.0",
     "@expo/cli": "^0.24.20",
     "@expo/config": "^11.0.13",
     "@expo/config-plugins": "^10.1.2",

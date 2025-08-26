@@ -4,8 +4,8 @@
   "scripts": {
     "start": "npx expo start --dev-client",
     "lint": "eslint --fix .",
-    "build:dev": "eas build --platform all --profile development-simulator",
-    "build:prod": "eas build --platform all --profile production",
+    "build:dev": "eas build:dev --platform all --profile development-simulator --non-interactive",
+    "build:prod": "eas build --platform all --profile production --non-interactive",
     "update": "eas update --branch production"
   },
   "dependencies": {

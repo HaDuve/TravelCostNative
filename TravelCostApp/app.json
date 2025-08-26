@@ -23,7 +23,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.budgetfornomads.app",
-      "buildNumber": "1.0.1178",
+      "buildNumber": "1.0.1179",
       "infoPlist": {
         "UIBackgroundModes": [
           "fetch",
@@ -36,7 +36,7 @@
     },
     "android": {
       "package": "com.budgetfornomads.app",
-      "versionCode": 101088,
+      "versionCode": 101089,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon2.png",
         "backgroundColor": "#FFFFFF"

@@ -105,14 +105,6 @@ const DevContent = ({ navigation }) => {
         <Text style={styles.titleText}>DEVCONTENT</Text>
       </View>
 
-      <Button
-        style={styles.settingsButton}
-        onPress={async () => {
-          navigation.navigate("backgroundTasks");
-        }}
-      >
-        Background Tasks
-      </Button>
 
       <Button
         style={styles.settingsButton}

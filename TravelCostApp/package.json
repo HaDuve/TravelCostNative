@@ -95,6 +95,7 @@
     "react-native-webview": "^13.13.5",
     "rn-tourguide": "^3.3.0",
     "splitwise-js-map": "^1.0.3",
+    "victory-native": "^41.19.3",
     "warning": "^4.0.3",
     "whatwg-url": "^14.2.0",
     "whatwg-url-without-unicode": "8.0.0-3"

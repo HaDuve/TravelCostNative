@@ -1,0 +1,6 @@
+{
+  "task": "m-migrate-eas-dependencies",
+  "branch": "feature/migrate-eas-dependencies", 
+  "services": ["react-native", "expo", "eas"],
+  "updated": "2025-09-01"
+}

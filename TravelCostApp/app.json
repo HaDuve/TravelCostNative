@@ -16,14 +16,14 @@
     "updates": {
       "url": "https://u.expo.dev/dff7ffc5-6f1e-4ece-bb23-0c50cda19f46"
     },
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.budgetfornomads.app",
-      "buildNumber": "1.0.1188",
+      "buildNumber": "1.0.1190",
       "infoPlist": {
         "UIBackgroundModes": [
           "remote-notification"
@@ -33,7 +33,7 @@
     },
     "android": {
       "package": "com.budgetfornomads.app",
-      "versionCode": 101105,
+      "versionCode": 101106,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon2.png",
         "backgroundColor": "#FFFFFF"

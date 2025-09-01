@@ -26,7 +26,7 @@ import {
 } from "firebase/auth";
 import { Alert } from "react-native";
 import { initializeApp } from "firebase/app";
-import { getReactNativePersistence } from "firebase/auth/react-native";
+import { getReactNativePersistence } from "firebase/auth";
 import {
   secureStoreGetItem,
   secureStoreRemoveItem,

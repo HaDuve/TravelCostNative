@@ -173,6 +173,9 @@ importers:
       react-native-branch:
         specifier: ^6.8.0
         version: 6.8.0(react-native@0.79.5(@babel/core@7.28.3)(@types/react@19.0.14)(react@19.0.0))
+      react-native-country-flag:
+        specifier: ^2.0.2
+        version: 2.0.2
       react-native-dotenv:
         specifier: ^3.4.9
         version: 3.4.11(@babel/runtime@7.28.3)
@@ -4357,6 +4360,9 @@ packages:
     resolution: {integrity: sha512-jkPNv+kj0Aap5DIzBEJ4reD8P5OE9H5fYkHc/ltLlf1m7PlBy1qyRY1On01eA/nLT4YLCx6QZsB7E9WUXhWM0g==}
     peerDependencies:
       react-native: '>= 0.60'
+
+  react-native-country-flag@2.0.2:
+    resolution: {integrity: sha512-5LMWxS79ZQ0Q9ntYgDYzWp794+HcQGXQmzzZNBR1AT7z5HcJHtX7rlk8RHi7RVzfp5gW6plWSZ4dKjRpu/OafQ==}
 
   react-native-dotenv@3.4.11:
     resolution: {integrity: sha512-6vnIE+WHABSeHCaYP6l3O1BOEhWxKH6nHAdV7n/wKn/sciZ64zPPp2NUdEUf1m7g4uuzlLbjgr+6uDt89q2DOg==}
@@ -10807,6 +10813,8 @@ snapshots:
   react-native-branch@6.8.0(react-native@0.79.5(@babel/core@7.28.3)(@types/react@19.0.14)(react@19.0.0)):
     dependencies:
       react-native: 0.79.5(@babel/core@7.28.3)(@types/react@19.0.14)(react@19.0.0)
+
+  react-native-country-flag@2.0.2: {}
 
   react-native-dotenv@3.4.11(@babel/runtime@7.28.3):
     dependencies:

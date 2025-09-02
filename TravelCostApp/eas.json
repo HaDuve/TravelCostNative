@@ -56,7 +56,8 @@
     "production": {
       "environment": "production",
       "autoIncrement": true,
-      "channel": "production"
+      "channel": "production",
+      "pnpm": "10.15.0"
     }
   },
   "submit": {

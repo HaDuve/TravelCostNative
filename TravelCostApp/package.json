@@ -11,6 +11,7 @@
     "lint": "eslint --fix ."
   },
   "dependencies": {
+    "@babel/runtime": "^7.28.3",
     "@config-plugins/react-native-branch": "^6.0.0",
     "@expo/cli": "^0.10.14",
     "@expo/config": "^8.1.2",

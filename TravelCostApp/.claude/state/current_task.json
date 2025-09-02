@@ -1,0 +1,6 @@
+{
+  "task": "m-implement-replace-victory-with-highcharts",
+  "branch": "feature/replace-victory-with-highcharts",
+  "services": ["react-native", "charts", "webview", "components"],
+  "updated": "2025-09-02"
+}

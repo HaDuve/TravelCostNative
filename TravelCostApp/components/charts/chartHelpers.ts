@@ -16,6 +16,7 @@ export interface ChartOptions {
   showLegend?: boolean;
   enableZoom?: boolean;
   dateFormat?: boolean;
+  currency?: string;
 }
 
 export const generateHTMLTemplate = (
@@ -70,7 +71,9 @@ export const generateHTMLTemplate = (
               },
               style: {
                 fontFamily: 'System'
-              }
+              },
+              spacingLeft: 20,
+              spacingRight: 20
             },
             title: {
               text: '${options.title || ''}',
@@ -106,6 +109,11 @@ export const generateHTMLTemplate = (
             yAxis: {
               title: {
                 text: '${options.yAxisTitle || ''}'
+              },
+              labels: {
+                formatter: function() {
+                  return this.value + '${options.currency ? ' ' + options.currency : ''}';
+                }
               }
             },
             plotOptions: {
@@ -125,6 +133,12 @@ export const generateHTMLTemplate = (
                     }
                   }
                 }
+              },
+              column: {
+                pointWidth: 25,
+                borderRadius: 4,
+                groupPadding: 0.1,
+                pointPadding: 0.1
               }
             },
             series: []

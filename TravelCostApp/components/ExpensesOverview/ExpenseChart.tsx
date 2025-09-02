@@ -7,17 +7,20 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { isSameDay } from "../../util/dateTime";
+import { getCurrencySymbol } from "../../util/currencySymbol";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
-import WIPChart from "../WIPChart";
 
 import WebViewChart from "../charts/WebViewChart";
 import { ChartController, ExpenseData } from "../charts/controller";
@@ -32,20 +35,16 @@ const ExpenseChart = ({
   navigation,
   expenses,
 }) => {
-  const { isLandscape, isTablet } = useContext(OrientationContext);
+  const { isLandscape } = useContext(OrientationContext);
 
   const colors = {
     primary: GlobalStyles.colors.primary500,
     error: GlobalStyles.colors.error300,
-    gray: GlobalStyles.colors.gray400,
-    budget: GlobalStyles.colors.gray700
+    gray: GlobalStyles.colors.gray300,
+    budget: GlobalStyles.colors.gray700,
   };
 
-  const { width, height } = ChartController.getChartDimensions(
-    isLandscape,
-    isTablet,
-    dynamicScale
-  );
+  const { width, height } = ChartController.getChartDimensions(isLandscape);
 
   const chartData = useMemo(() => {
     if (!inputData || inputData.length === 0) {
@@ -65,14 +64,18 @@ const ExpenseChart = ({
   }, [chartData, budget, colors]);
 
   const chartOptions = useMemo(() => {
-    return ChartController.createExpenseChartOptions(budget, colors);
-  }, [budget, colors]);
+    return ChartController.createExpenseChartOptions(
+      budget,
+      colors,
+      getCurrencySymbol(currency)
+    );
+  }, [budget, colors, currency]);
 
   const handlePointClick = (data: any) => {
     if (!data.originalData) return;
 
     const datum = data.originalData;
-    const budgetAmount = 
+    const budgetAmount =
       datum.dailyBudget ||
       datum.weeklyBudget ||
       datum.monthlyBudget ||
@@ -107,10 +110,13 @@ const ExpenseChart = ({
     if (!data.originalData) return;
 
     const datum = data.originalData;
-    const filteredExpenses = ChartController.filterExpensesByDate(expenses, datum);
+    const filteredExpenses = ChartController.filterExpensesByDate(
+      expenses,
+      datum
+    );
 
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    
+
     navigation.navigate("FilteredPieCharts", {
       expenses: filteredExpenses,
       dayString: `${datum.label}`,
@@ -150,6 +156,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: dynamicScale(8),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
 });

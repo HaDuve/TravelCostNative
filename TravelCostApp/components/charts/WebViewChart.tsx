@@ -1,11 +1,7 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
-import { WebView } from 'react-native-webview';
-import { 
-  generateHTMLTemplate, 
-  ChartData, 
-  ChartOptions 
-} from './chartHelpers';
+import React, { useRef, useEffect, useState, memo, useMemo } from "react";
+import { View, StyleSheet, Platform } from "react-native";
+import { WebView } from "react-native-webview";
+import { generateHTMLTemplate, ChartData, ChartOptions } from "./chartHelpers";
 
 interface WebViewChartProps {
   data: any[]; // Highcharts series data format
@@ -33,14 +29,16 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
   onChartReady,
   onPointClick,
   onPointLongPress,
-  style
+  style,
 }) => {
   const webViewRef = useRef<WebView>(null);
   const [isChartReady, setIsChartReady] = useState(false);
-  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
-  const chartId = `chart-${Date.now()}`;
-
-  const htmlContent = generateHTMLTemplate(chartId, options);
+  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(
+    null
+  );
+  
+  const chartId = useMemo(() => `chart-${Date.now()}`, []);
+  const htmlContent = useMemo(() => generateHTMLTemplate(chartId, options), [chartId, options]);
 
   useEffect(() => {
     if (isChartReady && data) {
@@ -74,20 +72,20 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
   const handleWebViewMessage = (event: any) => {
     try {
       const message: ChartMessage = JSON.parse(event.nativeEvent.data);
-      
+
       switch (message.type) {
-        case 'chart-ready':
+        case "chart-ready":
           setIsChartReady(true);
           if (onChartReady) {
             onChartReady();
           }
           break;
-          
-        case 'point-click':
+
+        case "point-click":
           if (longPressTimer) {
             clearTimeout(longPressTimer);
             setLongPressTimer(null);
-            
+
             // Handle single tap
             if (onPointClick && message.data) {
               onPointClick(message.data);
@@ -100,20 +98,20 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
               }
               setLongPressTimer(null);
             }, 500); // 500ms for long press
-            
+
             setLongPressTimer(timer);
           }
           break;
-          
-        case 'zoom':
+
+        case "zoom":
           // Handle zoom events if needed
           break;
-          
+
         default:
-          console.log('Unknown chart message:', message);
+          console.log("Unknown chart message:", message);
       }
     } catch (error) {
-      console.error('Error parsing chart message:', error);
+      console.error("Error parsing chart message:", error);
     }
   };
 
@@ -127,10 +125,13 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
   };
 
   const webViewStyle = {
-    width: width || '100%',
+    width: width || "100%",
     height: height || 200,
-    backgroundColor: 'transparent',
-    ...style
+    backgroundColor: "transparent",
+    maxWidth: "100%",
+    overflow: "hidden",
+    marginHorizontal: width ? 0 : 16, // Add padding when using full width
+    ...style,
   };
 
   return (
@@ -143,7 +144,7 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
         onLoad={handleWebViewLoad}
         scrollEnabled={false}
         bounces={false}
-        scalesPageToFit={Platform.OS === 'android'}
+        scalesPageToFit={Platform.OS === "android"}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         javaScriptEnabled={true}
@@ -152,7 +153,7 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
         mixedContentMode="compatibility"
         allowsInlineMediaPlayback={true}
         mediaPlaybackRequiresUserAction={false}
-        originWhitelist={['*']}
+        originWhitelist={["*"]}
       />
     </View>
   );
@@ -160,11 +161,15 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
+    overflow: "hidden",
+    maxWidth: "100%",
   },
   webView: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     flex: 1,
+    overflow: "hidden",
+    maxWidth: "100%",
   },
 });
 

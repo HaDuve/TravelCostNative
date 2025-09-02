@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import CategoryProgressBar from "./CategoryProgressBar";
 import { CatColors, GlobalStyles } from "../../../constants/styles";
 import CategoryChart from "../../ExpensesOverview/CategoryChart";
@@ -64,19 +64,36 @@ const ExpenseCategories = ({
 
   const totalSum = getExpensesSum(expenses);
 
-  const catSumCat = [];
-  const dataList = [];
+  const { catSumCat, dataList } = useMemo(() => {
+    const catSumCat = [];
+    const dataList = [];
 
-  categoryList.forEach((cat) => {
-    const catExpenses = getAllExpensesWithCat(cat);
-    const sumCat = getExpensesSum(catExpenses);
-    catSumCat.push({
-      cat: cat,
-      sumCat: sumCat,
-      color: "",
-      catExpenses: catExpenses,
+    categoryList.forEach((cat) => {
+      const catExpenses = getAllExpensesWithCat(cat);
+      const sumCat = getExpensesSum(catExpenses);
+      catSumCat.push({
+        cat: cat,
+        sumCat: sumCat,
+        color: "",
+        catExpenses: catExpenses,
+      });
     });
-  });
+
+    catSumCat.sort((a, b) => b.sumCat - a.sumCat);
+
+    const colorlist = CatColors;
+    let color_i = 0;
+    catSumCat.forEach((item) => {
+      item.color = colorlist[color_i];
+      color_i++;
+      if (color_i >= colorlist?.length) {
+        color_i = 0;
+      }
+      dataList.push({ x: item.cat, y: item.sumCat, color: item.color });
+    });
+
+    return { catSumCat, dataList };
+  }, [expenses, categoryList]);
 
   function renderItem(itemData) {
     const newPeriodName = processTitleStringFilteredPiecharts(
@@ -111,24 +128,9 @@ const ExpenseCategories = ({
     );
   }
 
-  catSumCat.sort((a, b) => b.sumCat - a.sumCat);
-  dataList.sort((a, b) => b.sumCat - a.sumCat);
-
-  const colorlist = CatColors;
-
-  let color_i = 0;
-  catSumCat.forEach((item) => {
-    item.color = colorlist[color_i];
-    color_i++;
-    if (color_i >= colorlist?.length) {
-      color_i = 0;
-    }
-    dataList.push({ x: item.cat, y: item.sumCat, color: item.color });
-  });
-
   return (
     <Animated.View style={styles.container}>
-      {useRowFormat && <CategoryChart inputData={dataList}></CategoryChart>}
+      {useRowFormat && <CategoryChart inputData={dataList} tripCurrency={tripCurrency}></CategoryChart>}
       <Animated.FlatList
         itemLayoutAnimation={layoutAnim}
         data={catSumCat}
@@ -136,7 +138,7 @@ const ExpenseCategories = ({
         keyExtractor={(item) => item.cat}
         ListHeaderComponent={
           !useRowFormat ? (
-            <CategoryChart inputData={dataList}></CategoryChart>
+            <CategoryChart inputData={dataList} tripCurrency={tripCurrency}></CategoryChart>
           ) : (
             <View style={{ height: dynamicScale(100, true) }}></View>
           )

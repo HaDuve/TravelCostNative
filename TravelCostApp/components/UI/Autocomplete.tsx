@@ -2,7 +2,7 @@
 
 import { View, Platform } from "react-native";
 import { Menu, TextInput } from "react-native-paper";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -22,6 +22,8 @@ const Autocomplete = ({
   const [value, setValue] = useState(origValue);
   const [menuVisible, setMenuVisible] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
+  const [blurTimeout, setBlurTimeout] = useState(null);
+  const isSelectingRef = useRef(false);
 
   useEffect(() => {
     setValue(origValue);
@@ -30,6 +32,15 @@ const Autocomplete = ({
   useEffect(() => {
     if (origValue == "") setMenuVisible(false);
   }, [origValue]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (blurTimeout) {
+        clearTimeout(blurTimeout);
+      }
+    };
+  }, [blurTimeout]);
   /**
    * Filters the data array based on the provided text and removes duplicate results.
    * @param {string} text - The text to filter the data array with.
@@ -53,13 +64,24 @@ const Autocomplete = ({
             if (showOnEmpty) setFilteredData([...new Set(data)]);
           }
         }}
-        // maybe with a timeout
-        onBlur={async () =>
-          setTimeout(
-            () => setMenuVisible(false),
-            Platform.OS == "ios" ? 700 : 1200
-          )
-        }
+        // Handle blur with check for active selection
+        onBlur={() => {
+          // Don't hide menu immediately if user is selecting an item
+          if (isSelectingRef.current) {
+            return;
+          }
+          
+          const timeoutId = setTimeout(
+            () => {
+              // Double-check selection state before hiding
+              if (!isSelectingRef.current) {
+                setMenuVisible(false);
+              }
+            },
+            Platform.OS == "ios" ? 150 : 200
+          );
+          setBlurTimeout(timeoutId);
+        }}
         label={label}
         // right={right}
         // left={left}
@@ -106,10 +128,33 @@ const Autocomplete = ({
                     },
                   ]}
                   //   icon={icon}
-                  onPress={() => {
+                  onTouchStart={() => {
+                    // Handle selection immediately on touch start to bypass keyboard dismiss
+                    isSelectingRef.current = true;
+                    
+                    // Clear any pending blur timeout
+                    if (blurTimeout) {
+                      clearTimeout(blurTimeout);
+                      setBlurTimeout(null);
+                    }
+                    
+                    // Apply the selection immediately
                     origOnChange(autotext);
                     setValue(autotext);
-                    setMenuVisible(false);
+                    
+                    // Hide menu after a brief delay to ensure smooth UX
+                    setTimeout(() => {
+                      setMenuVisible(false);
+                      isSelectingRef.current = false;
+                    }, 50);
+                  }}
+                  onPress={() => {
+                    // Keep onPress as fallback for platforms that don't consume onTouchStart
+                    if (!isSelectingRef.current) {
+                      origOnChange(autotext);
+                      setValue(autotext);
+                      setMenuVisible(false);
+                    }
                   }}
                   titleStyle={{
                     flex: 1,

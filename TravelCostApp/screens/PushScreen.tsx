@@ -101,7 +101,9 @@ const TEST_PushScreen = () => {
         // console.log("token", token);
         setExpoPushToken(token);
       })
-      .catch((e) => // console.log("token error", e));
+      .catch((e) => {
+        // console.log("token error", e)
+      });
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {

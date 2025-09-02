@@ -8,7 +8,7 @@ import { CATEGORY_KEYWORDS } from "./categoryKeywords";
 import { ExpenseData } from "./expense";
 import { getMMKVObject } from "../store/mmkv";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = Localization.locale.slice(0, 2);
+i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
 i18n.enableFallback = true;
 // i18n.locale = "en";
 

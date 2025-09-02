@@ -13,7 +13,7 @@ import * as Progress from "react-native-progress";
 import LoadingOverlay from "./LoadingOverlay";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = Localization.locale.slice(0, 2);
+i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
 // i18n.locale = "en";
 i18n.enableFallback = true;
 

@@ -11,7 +11,7 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = Localization.locale.slice(0, 2);
+i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -26,7 +26,7 @@ import {
 } from "firebase/auth";
 import { Alert } from "react-native";
 import { initializeApp } from "firebase/app";
-import { getReactNativePersistence } from "firebase/auth/react-native";
+import { getReactNativePersistence } from "firebase/auth";
 import {
   secureStoreGetItem,
   secureStoreRemoveItem,

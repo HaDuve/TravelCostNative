@@ -3,7 +3,7 @@
     "name": "Budget",
     "slug": "Travel-Expense",
     "scheme": "budgetfornomads",
-    "version": "1.2.803",
+    "version": "1.2.804",
     "orientation": "default",
     "icon": "./assets/icon2.png",
     "userInterfaceStyle": "light",
@@ -14,19 +14,18 @@
       "tabletImage": "./assets/launch2.png"
     },
     "updates": {
-      "fallbackToCacheTimeout": 20000,
       "url": "https://u.expo.dev/dff7ffc5-6f1e-4ece-bb23-0c50cda19f46"
     },
+    "newArchEnabled": false,
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.budgetfornomads.app",
-      "buildNumber": "1.0.1178",
+      "buildNumber": "1.0.1196",
       "infoPlist": {
         "UIBackgroundModes": [
-          "fetch",
           "remote-notification"
         ],
         "ITSAppUsesNonExemptEncryption": false
@@ -34,7 +33,7 @@
     },
     "android": {
       "package": "com.budgetfornomads.app",
-      "versionCode": 101091,
+      "versionCode": 101114,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon2.png",
         "backgroundColor": "#FFFFFF"
@@ -50,13 +49,7 @@
     },
     "plugins": [
       "expo-localization",
-      [
-        "@config-plugins/react-native-branch",
-        {
-          "apiKey": "key_live_iqcoQ4YydC3EcES8JDDxfekozubmwZiC",
-          "iosAppDomain": "budgetfornomads.app.link"
-        }
-      ]
+      "expo-font"
     ],
     "runtimeVersion": {
       "policy": "appVersion"

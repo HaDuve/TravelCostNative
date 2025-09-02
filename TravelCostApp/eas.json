@@ -6,24 +6,33 @@
   "build": {
     "development": {
       "developmentClient": true,
+      "environment": "development",
       "distribution": "internal",
-      "channel": "staging"
+      "channel": "staging",
+      "android": {
+        "buildType": "apk"
+      }
     },
     "development-simulator": {
       "developmentClient": true,
+      "environment": "development",
       "channel": "staging",
       "distribution": "internal",
       "ios": {
         "simulator": true
+      },
+      "android": {
+        "buildType": "apk"
       }
     },
     "beta1": {
+      "environment": "development",
       "distribution": "internal",
       "channel": "staging"
     },
     "preview": {
+      "environment": "preview",
       "channel": "staging",
-
       "ios": {
         "simulator": true
       },
@@ -33,18 +42,22 @@
       "distribution": "internal"
     },
     "preview2": {
+      "environment": "preview",
       "android": {
         "gradleCommand": ":app:assembleRelease"
       },
       "channel": "staging"
     },
     "preview3": {
+      "environment": "preview",
       "developmentClient": true,
       "channel": "staging"
     },
     "production": {
+      "environment": "production",
       "autoIncrement": true,
-      "channel": "production"
+      "channel": "production",
+      "pnpm": "10.15.0"
     }
   },
   "submit": {

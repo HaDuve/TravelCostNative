@@ -17,6 +17,7 @@ import { isSameDay } from "../../util/dateTime";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
+import WIPChart from "../WIPChart";
 
 import WebViewChart from "../charts/WebViewChart";
 import { ChartController, ExpenseData } from "../charts/controller";

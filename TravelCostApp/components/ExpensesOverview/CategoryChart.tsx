@@ -1,22 +1,17 @@
 import React, { useMemo } from "react";
 import { StyleSheet } from "react-native";
 import Animated, { FadeOut, ZoomIn } from "react-native-reanimated";
-import { getCatString } from "../../util/category";
 import PropTypes from "prop-types";
 import { useContext } from "react";
-import { TripContext } from "../../store/trip-context";
-import { getCurrencySymbol } from "../../util/currencySymbol";
-import { GlobalStyles } from "../../constants/styles";
 import { dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
+import WIPChart from "../WIPChart";
 
 import WebViewChart from "../charts/WebViewChart";
 import { ChartController, CategoryData } from "../charts/controller";
 import { createPieChartData } from "../charts/chartHelpers";
 
 const CategoryChart = ({ inputData }) => {
-  const tripCtx = useContext(TripContext);
-  const tripCurrency = tripCtx.tripCurrency;
   const { isPortrait } = useContext(OrientationContext);
 
   const { width, height } = ChartController.getCategoryDimensions(

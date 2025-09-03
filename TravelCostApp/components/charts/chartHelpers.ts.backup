@@ -11,7 +11,7 @@ export interface ChartOptions {
   subtitle?: string;
   xAxisTitle?: string;
   yAxisTitle?: string;
-  type?: "line" | "bar" | "column" | "pie" | "area";
+  type?: 'line' | 'bar' | 'column' | 'pie' | 'area';
   colors?: string[];
   showLegend?: boolean;
   enableZoom?: boolean;
@@ -60,11 +60,11 @@ export const generateHTMLTemplate = (
         <div id="${chartId}"></div>
         <script>
           let chart;
-
+          
           const defaultOptions = {
             chart: {
               renderTo: '${chartId}',
-              type: '${options.type || "line"}',
+              type: '${options.type || 'line'}',
               backgroundColor: 'transparent',
               animation: {
                 duration: 1000
@@ -76,14 +76,14 @@ export const generateHTMLTemplate = (
               spacingRight: 20
             },
             title: {
-              text: '${options.title || ""}',
+              text: '${options.title || ''}',
               style: {
                 fontSize: '16px',
                 fontWeight: 'bold'
               }
             },
             subtitle: {
-              text: '${options.subtitle || ""}'
+              text: '${options.subtitle || ''}'
             },
             credits: {
               enabled: false
@@ -95,29 +95,24 @@ export const generateHTMLTemplate = (
               enabled: ${options.showLegend || false}
             },
             tooltip: {
-              enabled: false,
+              enabled: true,
               animation: true,
               borderRadius: 8,
               shadow: true
             },
             xAxis: {
               title: {
-                text: '${options.xAxisTitle || ""}'
+                text: '${options.xAxisTitle || ''}'
               },
               type: ${options.dateFormat ? "'datetime'" : "'category'"}
-,
-              minPadding: 0.1,
-              maxPadding: 0.1
             },
             yAxis: {
               title: {
-                text: '${options.yAxisTitle || ""}'
+                text: '${options.yAxisTitle || ''}'
               },
               labels: {
                 formatter: function() {
-                  return this.value + '${
-                    options.currency ? " " + options.currency : ""
-                  }';
+                  return this.value + '${options.currency ? ' ' + options.currency : ''}';
                 }
               }
             },
@@ -126,6 +121,18 @@ export const generateHTMLTemplate = (
                 animation: {
                   duration: 1000
                 },
+                point: {
+                  events: {
+                    click: function() {
+                      if (window.ReactNativeWebView) {
+                        window.ReactNativeWebView.postMessage(JSON.stringify({
+                          type: 'point-click',
+                          data: this.options
+                        }));
+                      }
+                    }
+                  }
+                }
               },
               column: {
                 pointWidth: 25,
@@ -143,13 +150,13 @@ export const generateHTMLTemplate = (
               ...customOptions,
               series: data
             };
-
+            
             if (chart) {
               chart.destroy();
             }
-
+            
             chart = Highcharts.chart(mergedOptions);
-
+            
             // Notify React Native that chart is ready
             if (window.ReactNativeWebView) {
               window.ReactNativeWebView.postMessage(JSON.stringify({
@@ -183,7 +190,7 @@ export const generateHTMLTemplate = (
           window.initChart = initChart;
           window.updateChart = updateChart;
           window.setExtremes = setExtremes;
-
+          
           // Initial chart creation with empty data
           initChart([]);
         </script>
@@ -200,68 +207,86 @@ export const formatDataForHighcharts = (
     return [];
   }
 
-  if (options.type === "pie") {
-    return [
-      {
-        name: "Data",
-        colorByPoint: true,
-        data: data.map((item) => ({
-          name: item.label || item.x,
-          y: item.y,
-          color: item.color,
-        })),
-      },
-    ];
+  if (options.type === 'pie') {
+    return [{
+      name: 'Data',
+      colorByPoint: true,
+      data: data.map(item => ({
+        name: item.label || item.x,
+        y: item.y,
+        color: item.color
+      }))
+    }];
   }
 
-  return [
-    {
-      name: "Series 1",
-      data: data.map((item) => ({
-        x: options.dateFormat ? new Date(item.x).getTime() : item.x,
-        y: item.y,
-        color: item.color,
-        ...item,
-      })),
-      color: options.colors?.[0],
-    },
-  ];
+  return [{
+    name: 'Series 1',
+    data: data.map(item => ({
+      x: options.dateFormat ? new Date(item.x).getTime() : item.x,
+      y: item.y,
+      color: item.color,
+      ...item
+    })),
+    color: options.colors?.[0]
+  }];
 };
 
 export const createBarChartData = (
   data: ChartData[],
+  budgetLine?: number,
   colors?: { primary: string; error: string; budget: string }
 ): any[] => {
   const series = [];
-
+  
   // Bar data
   series.push({
-    name: "Expenses",
-    type: "column",
-    data: data.map((item) => ({
+    name: 'Expenses',
+    type: 'column',
+    data: data.map(item => ({
       x: item.x,
       y: item.y,
       color: item.color || colors?.primary,
-      ...item,
+      ...item
     })),
     animation: {
-      duration: 1000,
-    },
+      duration: 1000
+    }
   });
+
+  // Budget line
+  if (budgetLine && data.length > 0) {
+    const firstDate = data[0].x;
+    const lastDate = data[data.length - 1].x;
+    
+    series.push({
+      name: 'Budget',
+      type: 'line',
+      data: [
+        { x: firstDate, y: budgetLine },
+        { x: lastDate, y: budgetLine }
+      ],
+      color: colors?.budget || '#999999',
+      dashStyle: 'ShortDash',
+      marker: {
+        enabled: false
+      },
+      enableMouseTracking: false
+    });
+  }
 
   return series;
 };
 
-export const createPieChartData = (data: ChartData[]): any[] => {
-  return [
-    {
-      name: "Categories",
-      colorByPoint: true,
-      data: data.map((item) => ({
-        name: item.label || item.x,
-        y: item.y,
-        color: item.color,
-      })),
-    },
-  ];
+export const createPieChartData = (
+  data: ChartData[]
+): any[] => {
+  return [{
+    name: 'Categories',
+    colorByPoint: true,
+    data: data.map(item => ({
+      name: item.label || item.x,
+      y: item.y,
+      color: item.color
+    }))
+  }];
 };

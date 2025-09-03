@@ -482,8 +482,6 @@ const ExpenseGraph = ({
               budget={budget}
               daysRange={daysRange}
               currency={tripCtx.tripCurrency}
-              navigation={navigation}
-              expenses={expenseCtx.expenses}
             ></ExpenseChart>
           </View>
         )}
@@ -508,8 +506,6 @@ const ExpenseGraph = ({
                   budget={budget}
                   daysRange={daysRange}
                   currency={tripCtx.tripCurrency}
-                  navigation={navigation}
-                  expenses={expenseCtx.expenses}
                 ></ExpenseChart>
               )}
 

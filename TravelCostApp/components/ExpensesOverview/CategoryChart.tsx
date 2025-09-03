@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
-import PropTypes from "prop-types";
 import { useContext } from "react";
 import { dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
@@ -66,6 +65,8 @@ const CategoryChart = React.memo(
     );
   }
 );
+
+CategoryChart.displayName = "CategoryChart";
 
 export default CategoryChart;
 

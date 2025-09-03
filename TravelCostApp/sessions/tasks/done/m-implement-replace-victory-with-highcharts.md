@@ -1,7 +1,7 @@
 ---
 task: m-implement-replace-victory-with-highcharts
 branch: feature/replace-victory-with-highcharts
-status: in-progress
+status: completed
 created: 2025-09-02
 started: 2025-09-02
 modules: [react-native, charts, webview, components]

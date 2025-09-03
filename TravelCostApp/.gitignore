@@ -87,5 +87,6 @@ dist/
 .claude/
 cc-session/
 sessions/
+CLAUDE*
 
 # @end expo-cli

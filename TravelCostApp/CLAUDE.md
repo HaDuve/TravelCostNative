@@ -171,3 +171,7 @@ The app uses a WebView-based Highcharts implementation for data visualization, r
 - Global styling system: Color schemes and responsive scaling
 
 See `components/charts/CLAUDE.md` and `components/ExpensesOverview/CLAUDE.md` for detailed documentation.
+
+## Sessions System Behaviors
+
+@CLAUDE.sessions.md

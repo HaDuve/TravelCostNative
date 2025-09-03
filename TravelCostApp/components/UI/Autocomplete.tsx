@@ -78,7 +78,7 @@ const Autocomplete = ({
                 setMenuVisible(false);
               }
             },
-            Platform.OS == "ios" ? 150 : 200
+            5000
           );
           setBlurTimeout(timeoutId);
         }}

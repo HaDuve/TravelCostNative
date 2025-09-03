@@ -83,4 +83,9 @@ android/
 web-build/
 dist/
 
+# claude & cc-session
+.claude/
+cc-session/
+sessions/
+
 # @end expo-cli

@@ -30,7 +30,10 @@ import { sleep } from "../util/appState";
 import { storeExpoPushTokenInTrip } from "../util/http";
 import { saveStoppedTour } from "../util/tourUtil";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "de";
 
@@ -51,6 +54,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: false,
     shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -148,8 +153,8 @@ const ProfileScreen = ({ navigation }) => {
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] =
     useState<Notifications.Notification>(null);
-  const notificationListener = useRef<Notifications.Subscription>();
-  const responseListener = useRef<Notifications.Subscription>();
+  const notificationListener = useRef<Notifications.EventSubscription>(null);
+  const responseListener = useRef<Notifications.EventSubscription>(null);
 
   useEffect(() => {
     registerForPushNotificationsAsync()
@@ -344,8 +349,6 @@ const ProfileScreen = ({ navigation }) => {
       <ScrollView style={styles.tripContainer}>
         <View style={styles.horizontalContainer}>
           <Text style={styles.tripListTitle}>{i18n.t("myTrips")}</Text>
-          {/* <Pressable onPress={navigation.navigate.bind(this, "ManageTrip")}> */}
-          {/* <Text style={{ color: GlobalStyles.colors.primary700 }}>+</Text> */}
           <TourGuideZone
             text={i18n.t("walk5")}
             shape={"circle"}
@@ -353,7 +356,7 @@ const ProfileScreen = ({ navigation }) => {
             zone={5}
           >
             <IconButton
-              icon={"ios-earth"}
+              icon={"globe-outline"}
               size={dynamicScale(36, false, 0.5)}
               buttonStyle={styles.newTripButtonContainer}
               color={GlobalStyles.colors.primary400}
@@ -379,15 +382,12 @@ const ProfileScreen = ({ navigation }) => {
           zone={7}
         >
           <View>
-            {/* FAB */}
             <IconButton
-              // icon="md-document-attach-outline"
               icon="list-outline"
               buttonStyle={[styles.addButton, GlobalStyles.shadowGlowPrimary]}
               size={dynamicScale(42, false, 0.5)}
               color={GlobalStyles.colors.backgroundColor}
               onPress={() => {
-                // onShare(tripCtx.tripid, navigation);
                 onSummaryHandler();
               }}
             />

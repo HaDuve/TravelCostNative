@@ -6,7 +6,7 @@
     "lint": "eslint --fix .",
     "build:dev": "eas build --platform all --profile development-simulator --non-interactive",
     "build:prod": "eas build --platform all --profile production --non-interactive",
-    "build:submit": "npm run build:prod && eas submit --platform ios --non-interactive && eas submit --platform android --non-interactive",
+    "build:submit:ios": "eas build --platform ios --profile production --non-interactive && eas submit --platform ios --latest --non-interactive",
     "update": "eas update --branch production",
     "android": "expo run:android",
     "ios": "expo run:ios"

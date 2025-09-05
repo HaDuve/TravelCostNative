@@ -1,6 +1,3 @@
-// import { REACT_APP_GPT_API_KEY } from "@env";
-const GPT_API_KEY = "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";
-//  "ee892f25f1msh7b58e66c617672dp1d7c37jsn9339224154d5";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -17,7 +14,7 @@ const languageObj = LANGUAGE_LIST.find(
 const languageName = languageObj?.name;
 // console.log("languageName:", languageName);
 
-import { Configuration, OpenAIApi } from "openai";
+import axios from "axios";
 import { Keys, loadKeys } from "../components/Premium/PremiumConstants";
 import safeLogError from "./error";
 
@@ -99,63 +96,45 @@ function getGPT_Content(requestBody: GPT_RequestBody) {
       return chatGPTcontentPrice(
         (requestBody as GPT_getPrice).product,
         (requestBody as GPT_getPrice).country,
-        (requestBody as GPT_getPrice).country
+        (requestBody as GPT_getPrice).currency
       );
   }
 }
 
 export async function getChatGPT_Response(requestBody: GPT_RequestBody) {
   const { OPENAI }: Keys = await loadKeys();
-  const configuration = new Configuration({
-    apiKey: OPENAI,
-  });
-  const openai = new OpenAIApi(configuration);
+  
+  const payload = {
+    model: "gpt-4",
+    messages: [
+      {
+        role: "system", 
+        content: `You are a helpful and experienced traveller. Answer me in ${languageName}. Dont answer the meta-aspects/instructions literally, only give helpful information and advice.`,
+      },
+      {
+        role: "user",
+        content: getGPT_Content(requestBody),
+      },
+    ],
+    temperature: 0.75,
+    max_tokens: 1000,
+    top_p: 0.9,
+    frequency_penalty: 0.25,
+    presence_penalty: 0.15,
+  };
 
   try {
-    const response = await openai.createChatCompletion({
-      model: "gpt-4",
-      messages: [
-        {
-          role: "system",
-          content: `You are a helpful and experienced traveller. Answer me in ${languageName}. Dont answer the meta-aspects/instructions literally, only give helpful information and advice.`,
-        },
-        {
-          role: "user",
-          content: getGPT_Content(requestBody),
-        },
-      ],
-      temperature: 0.75,
-      max_tokens: 1000,
-      top_p: 0.9,
-      frequency_penalty: 0.25,
-      presence_penalty: 0.15,
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', payload, {
+      headers: {
+        'Authorization': `Bearer ${OPENAI}`,
+        'Content-Type': 'application/json'
+      },
+      timeout: 30000
     });
-    const responseText = response.data.choices[0].message;
-    // console.log("response.data: gpt-4:", response.data);
-    // console.log("responseText: gpt-4:", responseText);
-    return responseText;
+    
+    return response.data.choices[0].message;
   } catch (error) {
-    try {
-      const response = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "user",
-            content: getGPT_Content(requestBody),
-          },
-        ],
-        temperature: 0.75,
-        max_tokens: 2780,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0,
-      });
-      const responseText = response.data.choices[0].message;
-      // console.log("response.data: gpt-3.5-turbo:", response.data);
-      // console.log("responseText: gpt-3.5-turbo:", responseText);
-    } catch (error) {
-      safeLogError(error);
-      return "Sorry, I am not sure about that.";
-    }
+    safeLogError(error);
+    return { content: "Sorry, I am not sure about that." };
   }
 }

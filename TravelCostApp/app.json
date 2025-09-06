@@ -23,7 +23,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.budgetfornomads.app",
-      "buildNumber": "1.0.1201",
+      "buildNumber": "1.0.1202",
       "infoPlist": {
         "UIBackgroundModes": [
           "remote-notification"

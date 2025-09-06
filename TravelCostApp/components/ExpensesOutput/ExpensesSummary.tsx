@@ -1,4 +1,4 @@
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Platform, StyleSheet, Text, View } from "react-native";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
@@ -9,7 +9,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -36,6 +39,7 @@ const ExpensesSummary = ({
   useMoreSpace = false,
   style = {},
 }) => {
+  const { width: screenWidth } = Dimensions.get("window");
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   const expCtx = useContext(ExpensesContext);
@@ -282,7 +286,6 @@ const ExpensesSummary = ({
         borderRadius={dynamicScale(8)}
         progress={budgetProgress}
         height={constantScale(12, 0.5)}
-        width={useMoreSpace ? dynamicScale(180) : dynamicScale(150)}
       />
     </Pressable>
   );
@@ -299,24 +302,30 @@ ExpensesSummary.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    maxWidth: "50%",
+    alignItems: "center",
     ...Platform.select({
       ios: {
         paddingTop: dynamicScale(4, true),
-        paddingLeft: dynamicScale(20),
+        paddingLeft: dynamicScale(8),
+        paddingRight: dynamicScale(8),
         marginBottom: dynamicScale(-4, true),
       },
       android: {
         paddingTop: dynamicScale(4, true),
-        paddingLeft: dynamicScale(20),
+        paddingLeft: dynamicScale(8),
+        paddingRight: dynamicScale(8),
         marginBottom: dynamicScale(-4, true),
       },
     }),
   },
   useMoreSpaceContainer: {
+    maxWidth: "90%",
     paddingTop: dynamicScale(8, true),
     paddingBottom: dynamicScale(4, true),
-    marginLeft: dynamicScale(-4),
-    paddingLeft: 0,
+    paddingLeft: dynamicScale(4),
+    paddingRight: dynamicScale(4),
   },
   sumTextContainer: {
     alignItems: "center",

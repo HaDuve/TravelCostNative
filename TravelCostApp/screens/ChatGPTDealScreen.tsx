@@ -189,18 +189,25 @@ const GPTDealScreen = ({ route, navigation }) => {
 
   const startStreaming = (content) => {
     console.log("startStreaming ~ content:", content);
-    const lines = content.split("\n").filter((line) => line.trim() !== "");
+    // Split content into logical sections by double newlines or major headings
+    const sections = content.split(/\n\s*\n/).filter((section) => {
+      const trimmed = section.trim();
+      // Filter out empty sections, sections with only punctuation, or very short content
+      return (
+        trimmed !== "" && trimmed.length > 3 && !/^[.,!?;:\s-]+$/.test(trimmed)
+      );
+    });
     setStreamingBubbles([]);
     setCurrentStreamIndex(0);
     setIsStreaming(true);
 
-    lines.forEach((line, index) => {
+    sections.forEach((section, index) => {
       setTimeout(() => {
-        setStreamingBubbles((prev) => [...prev, line.trim()]);
-        if (index === lines.length - 1) {
+        setStreamingBubbles((prev) => [...prev, section.trim()]);
+        if (index === sections.length - 1) {
           setIsStreaming(false);
         }
-      }, index * 3000); // 3 second delay between bubbles
+      }, index * 2000); // 2 second delay between sections
     });
   };
 
@@ -272,7 +279,12 @@ const GPTDealScreen = ({ route, navigation }) => {
             {streamingBubbles.map((line, index) => (
               <Animated.View
                 key={index}
-                style={styles.aiBubbleContainer}
+                style={[
+                  styles.aiBubbleContainer,
+                  index === streamingBubbles.length - 1 && {
+                    marginBottom: dynamicScale(30, true),
+                  },
+                ]}
                 entering={FadeInUp.delay(200).duration(500)}
               >
                 <Image
@@ -397,6 +409,7 @@ const styles = StyleSheet.create({
   chatContainer: {
     padding: dynamicScale(8, false, 0.5),
     paddingVertical: dynamicScale(4, true),
+    paddingBottom: dynamicScale(80, true), // Add extra padding at bottom for button container
     flexGrow: 1,
   },
   userBubbleContainer: {

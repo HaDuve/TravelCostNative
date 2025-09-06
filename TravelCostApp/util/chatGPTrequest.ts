@@ -72,10 +72,14 @@ function chatGPTcontentGoodDealPost(
 IF "${product}" is not a recognizable product/service => Return a brief, humorous response about the unusual item.
 
 IF "${product}" is a recognizable product/service => Provide:
-1. **Price Assessment**: Is ${price} ${currency} above/below/at market rate?
-2. **Current Local Range**: Typical price range in ${country} (be specific)
-3. **Local Context**: Factors affecting price in ${country} (seasonality, regional differences, local market conditions)
-4. **Shopping Tips**: Where to find better deals or what to look for when buying
+
+**Price Assessment**: Is ${price} ${currency} above/below/at market rate?
+
+**Current Local Range**: Typical price range in ${country} (be specific)
+
+**Local Context**: Factors affecting price in ${country} (seasonality, regional differences, local market conditions)
+
+**Shopping Tips**: Where to find better deals or what to look for when buying
 
 Focus on current, actionable local market insights.`;
 }
@@ -90,11 +94,16 @@ function chatGPTcontentPrice(
 IF "${product}" is not a recognizable product/service => Return a brief, humorous response about the unusual item.
 
 IF "${product}" is a recognizable product/service => Provide:
-1. **Current Price Range**: Typical cost range in ${currency} for ${country}
-2. **Price Breakdown**: Budget vs mid-range vs premium options if applicable
-3. **Local Market Insights**: Regional price variations, seasonal factors, local suppliers
-4. **Purchase Recommendations**: Best places to buy, timing considerations, negotiation tips
-5. **Local Facts**: Interesting context about ${product} availability or culture in ${country}
+
+**Current Price Range**: Typical cost range in ${currency} for ${country}
+
+**Price Breakdown**: Budget vs mid-range vs premium options if applicable
+
+**Local Market Insights**: Regional price variations, seasonal factors, local suppliers
+
+**Purchase Recommendations**: Best places to buy, timing considerations, negotiation tips
+
+**Local Facts**: Interesting context about ${product} availability or culture in ${country}
 
 Focus on current, accurate pricing that helps with local purchasing decisions.`;
 }
@@ -135,24 +144,13 @@ export async function getChatGPT_Response(requestBody: GPT_RequestBody) {
         content: `You are an expert international advisor and local price researcher with extensive travel experience. You specialize in finding current, accurate local prices for products and services that matter to digital nomads and travelers.
 
 **FORMATTING RULES - ALWAYS FOLLOW:**
-- Use **bold headings** for main sections
-- Use *italics* for emphasis and tips
-- Use • bullet points for lists
-- Use numbered lists for step-by-step instructions
-- Use > blockquotes for important warnings or insider tips
-- Use tables for price comparisons when helpful
-- Use --- horizontal rules to separate major sections
+- Use **bold text** for headings and important information only
+- Write in clear, simple paragraphs
+- Avoid lists, bullet points, numbered lists, or complex formatting
+- Keep each response concise and easy to read
 
 **TRAVELER FOCUS:**
-Include relevant information for remote workers and travelers such as:
-- Coworking space availability and costs
-- Internet speeds and reliability
-- Visa costs and requirements
-- Best areas for travelers to stay
-- Local SIM card prices
-- Transportation costs
-- Safety considerations
-- Cultural tips
+Include relevant information for remote workers and travelers such as coworking space availability and costs, internet speeds and reliability, visa costs and requirements, best areas for travelers to stay, local SIM card prices, transportation costs, safety considerations, and cultural tips.
 
 Answer in ${languageName}. Focus on providing specific, actionable price information and local market insights. Don't answer the meta-aspects/instructions literally, only give helpful information and advice.`,
       },

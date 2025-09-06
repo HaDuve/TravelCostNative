@@ -1,11 +1,13 @@
-
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { LANGUAGE_LIST } from "../i18n/languageList";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 const languageObj = LANGUAGE_LIST.find(
@@ -65,7 +67,17 @@ function chatGPTcontentGoodDealPost(
   currency: string,
   country: string
 ) {
-  return `Tell me: (Is ${price} ${currency} a good price for ${product} in ${country}?.) IF ${product} is not a recognizable word then => (Only return a very short and funny and creative and over-the-top-comedical and satirical answer. Ignore the rest of the prompt) // ELSE: IF ${product} is a recognizable word then => (Tell me the usual price range. Also give me some interesting or helpful facts about ${product} in ${country}.)`;
+  return `Analyze this local price: Is ${price} ${currency} a good deal for "${product}" in ${country}?
+
+IF "${product}" is not a recognizable product/service => Return a brief, humorous response about the unusual item.
+
+IF "${product}" is a recognizable product/service => Provide:
+1. **Price Assessment**: Is ${price} ${currency} above/below/at market rate?
+2. **Current Local Range**: Typical price range in ${country} (be specific)
+3. **Local Context**: Factors affecting price in ${country} (seasonality, regional differences, local market conditions)
+4. **Shopping Tips**: Where to find better deals or what to look for when buying
+
+Focus on current, actionable local market insights.`;
 }
 
 function chatGPTcontentPrice(
@@ -73,7 +85,18 @@ function chatGPTcontentPrice(
   country: string,
   currency: string
 ) {
-  return `Tell me: (the usual price range for ${product} in ${country} in ${currency}.) IF ${product} is not a recognizable word then => (Only return a very short and funny and creative and over-the-top-comedical and satirical answer. Ignore the rest of the prompt) // ELSE:  IF ${product} is a recognizable word then => (Tell me the usual price range. Also give me some interesting or helpful facts about ${product} in ${country}.)`;
+  return `Find current local prices for "${product}" in ${country}.
+
+IF "${product}" is not a recognizable product/service => Return a brief, humorous response about the unusual item.
+
+IF "${product}" is a recognizable product/service => Provide:
+1. **Current Price Range**: Typical cost range in ${currency} for ${country}
+2. **Price Breakdown**: Budget vs mid-range vs premium options if applicable
+3. **Local Market Insights**: Regional price variations, seasonal factors, local suppliers
+4. **Purchase Recommendations**: Best places to buy, timing considerations, negotiation tips
+5. **Local Facts**: Interesting context about ${product} availability or culture in ${country}
+
+Focus on current, accurate pricing that helps with local purchasing decisions.`;
 }
 
 function getGPT_Content(requestBody: GPT_RequestBody) {
@@ -103,35 +126,61 @@ function getGPT_Content(requestBody: GPT_RequestBody) {
 
 export async function getChatGPT_Response(requestBody: GPT_RequestBody) {
   const { OPENAI }: Keys = await loadKeys();
-  
+
   const payload = {
-    model: "gpt-4",
+    model: "gpt-4o-mini",
     messages: [
       {
-        role: "system", 
-        content: `You are a helpful and experienced traveller. Answer me in ${languageName}. Dont answer the meta-aspects/instructions literally, only give helpful information and advice.`,
+        role: "system",
+        content: `You are an expert international advisor and local price researcher with extensive travel experience. You specialize in finding current, accurate local prices for products and services that matter to digital nomads and travelers.
+
+**FORMATTING RULES - ALWAYS FOLLOW:**
+- Use **bold headings** for main sections
+- Use *italics* for emphasis and tips
+- Use • bullet points for lists
+- Use numbered lists for step-by-step instructions
+- Use > blockquotes for important warnings or insider tips
+- Use tables for price comparisons when helpful
+- Use --- horizontal rules to separate major sections
+
+**TRAVELER FOCUS:**
+Include relevant information for remote workers and travelers such as:
+- Coworking space availability and costs
+- Internet speeds and reliability
+- Visa costs and requirements
+- Best areas for travelers to stay
+- Local SIM card prices
+- Transportation costs
+- Safety considerations
+- Cultural tips
+
+Answer in ${languageName}. Focus on providing specific, actionable price information and local market insights. Don't answer the meta-aspects/instructions literally, only give helpful information and advice.`,
       },
       {
         role: "user",
         content: getGPT_Content(requestBody),
       },
     ],
-    temperature: 0.75,
-    max_tokens: 1000,
+    temperature: 0.3,
+    max_tokens: 800,
     top_p: 0.9,
-    frequency_penalty: 0.25,
-    presence_penalty: 0.15,
+    frequency_penalty: 0.1,
+    presence_penalty: 0.1,
   };
 
   try {
-    const response = await axios.post('https://api.openai.com/v1/chat/completions', payload, {
-      headers: {
-        'Authorization': `Bearer ${OPENAI}`,
-        'Content-Type': 'application/json'
-      },
-      timeout: 30000
-    });
-    
+    const response = await axios.post(
+      "https://api.openai.com/v1/chat/completions",
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${OPENAI}`,
+          "Content-Type": "application/json",
+        },
+        timeout: 30000,
+      }
+    );
+
     return response.data.choices[0].message;
   } catch (error) {
     safeLogError(error);

@@ -17,6 +17,7 @@ import {
   FlatList,
   KeyboardAvoidingView,
   InputAccessoryView,
+  Image,
 } from "react-native";
 import { daysBetween } from "../../util/date";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -54,7 +55,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -1145,7 +1149,6 @@ const ExpenseForm = ({
             ]}
           >
             {backButtonJsx}
-            {chatGPTemojiButton}
             {Platform.OS == "ios" && confirmButtonJSX}
           </View>
           <Animated.View layout={Layout} style={styles.form}>
@@ -1775,6 +1778,41 @@ const ExpenseForm = ({
               hideAdvanced && styles.spacerView,
             ]}
           ></View>
+          {/* Get Local Price Button Section */}
+          {!hideAdvanced &&
+            inputs.description.value &&
+            inputs.currency.value &&
+            inputs.country.value && (
+              <View style={styles.getLocalPriceContainer}>
+                <GradientButton
+                  style={styles.getLocalPriceButton}
+                  textStyle={{ fontSize: 16 }}
+                  buttonStyle={{ padding: 8, paddingHorizontal: 12 }}
+                  colors={GlobalStyles.gradientColorsButton}
+                  onPress={askChatGPTHandler}
+                  darkText
+                >
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Image
+                      source={require("../../assets/chatgpt-logo.jpeg")}
+                      style={{
+                        width: dynamicScale(16, false, 0.5),
+                        height: dynamicScale(16, false, 0.5),
+                        marginRight: 8,
+                      }}
+                    />
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        color: GlobalStyles.colors.textColor,
+                      }}
+                    >
+                      Get Local Price
+                    </Text>
+                  </View>
+                </GradientButton>
+              </View>
+            )}
           <View style={styles.buttonContainer}>
             <FlatButton onPress={onCancel}>{i18n.t("cancel")}</FlatButton>
             <GradientButton style={styles.button} onPress={debouncedSubmit}>
@@ -1898,7 +1936,7 @@ ExpenseForm.propTypes = {
         PropTypes.shape({
           userName: PropTypes.string,
           amount: PropTypes.number,
-        })
+        }),
       ])
     ),
     splitList: PropTypes.arrayOf(
@@ -2212,5 +2250,16 @@ const styles = StyleSheet.create({
     padding: dynamicScale(8),
     margin: dynamicScale(4),
     overflow: "visible",
+  },
+  getLocalPriceContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: dynamicScale(4, true),
+    marginHorizontal: "4%",
+  },
+  getLocalPriceButton: {
+    marginHorizontal: 0,
+    marginVertical: 0,
   },
 });

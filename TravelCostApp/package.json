@@ -76,6 +76,7 @@
     "react-native-gesture-handler": "2.24.0",
     "react-native-get-random-values": "~1.11.0",
     "react-native-is-edge-to-edge": "^1.2.1",
+    "react-native-markdown-display": "^7.0.2",
     "react-native-mmkv": "^2.12.2",
     "react-native-modal": "14.0.0-rc.1",
     "react-native-neat-date-picker": "^1.4.5",

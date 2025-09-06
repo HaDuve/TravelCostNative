@@ -18,7 +18,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -45,6 +48,7 @@ import { canOpenURL } from "expo-linking";
 import DevContent from "../components/Settings/DevContent";
 import CurrencyExchangeInfo from "../components/UI/CurrencyExchangeInfo";
 import { dynamicScale } from "../util/scalingUtil";
+import GetLocalPriceButton from "../components/Settings/GetLocalPriceButton";
 
 const SettingsScreen = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
@@ -57,6 +61,7 @@ const SettingsScreen = ({ navigation }) => {
     (tripCtx.travellers && tripCtx.travellers?.length > 1) ?? false;
 
   const [emailString, setEmailString] = useState("");
+
   async function getEmail() {
     const email = await secureStoreGetItem("ENCM");
     if (email) {
@@ -166,6 +171,13 @@ const SettingsScreen = ({ navigation }) => {
           }}
         >
           <IconButton
+            badge={null}
+            badgeText={null}
+            badgeStyle={null}
+            onPressIn={null}
+            onPressOut={null}
+            onLongPress={null}
+            category={null}
             icon="arrow-back-outline"
             size={dynamicScale(36, false, 0.5)}
             color={GlobalStyles.colors.textColor}
@@ -181,6 +193,11 @@ const SettingsScreen = ({ navigation }) => {
       {DEVELOPER_MODE && <DevContent navigation={navigation} />}
 
       <SettingsSection multiTraveller={multiTraveller}></SettingsSection>
+
+      <GetLocalPriceButton
+        navigation={navigation}
+        style={styles.settingsButton}
+      />
 
       <GradientButton
         style={styles.settingsButton}

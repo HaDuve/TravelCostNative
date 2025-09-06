@@ -63,7 +63,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "./i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 // i18n.locale = "en";
 i18n.enableFallback = true;
 
@@ -653,8 +656,6 @@ function Root() {
       const storedTripId = await secureStoreGetItem("currentTripId");
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
 
-
-
       const { REVCAT_G, REVCAT_A }: Keys = await loadKeys();
 
       if (storedToken && storedUid && storedTripId) {
@@ -672,6 +673,7 @@ function Root() {
             appUserID: storedUid,
           });
         }
+        Purchases.setLogLevel(Purchases.LOG_LEVEL.ERROR);
         await Purchases.collectDeviceIdentifiers();
         const event = new BranchEvent(BranchEvent.Login);
         await event.logEvent();

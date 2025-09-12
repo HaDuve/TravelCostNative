@@ -88,7 +88,6 @@ import Autocomplete from "../UI/Autocomplete";
 import { ExpensesContext } from "../../store/expenses-context";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { secureStoreSetItem } from "../../store/secure-storage";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { ActivityIndicator } from "react-native-paper";
 import BackButton from "../UI/BackButton";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
@@ -1071,32 +1070,28 @@ const ExpenseForm = ({
     });
   };
 
-  const backButtonJsx = <BackButton />;
-  const chatGPTemojiButton = !hideAdvanced &&
-    inputs.description.value &&
-    inputs.currency.value &&
-    inputs.country.value && (
-      <Animated.View entering={FadeIn} exiting={FadeOut}>
-        <GradientButton
-          style={{ marginTop: 16 }}
-          textStyle={{ fontSize: 24 }}
-          buttonStyle={{ padding: 4, paddingHorizontal: 8 }}
-          colors={GlobalStyles.gradientColorsButton}
-          onPress={askChatGPTHandler}
-          darkText
-        >
-          🤖
-        </GradientButton>
-      </Animated.View>
-    );
+  const backButtonJsx = (
+    <BackButton
+      style={{
+        flex: 0,
+        paddingRight: dynamicScale(100, false, 0.5),
+      }}
+    />
+  );
   const confirmButtonJSX = (
-    <TouchableOpacity style={GlobalStyles.backButton} onPress={debouncedSubmit}>
+    <Pressable
+      style={[
+        GlobalStyles.backButton,
+        { flex: 0, paddingLeft: dynamicScale(100, false, 0.5) },
+      ]}
+      onPress={debouncedSubmit}
+    >
       <IconButton
         icon="checkmark-outline"
         color={GlobalStyles.colors.textColor}
         size={dynamicScale(26, false, 0.5)}
       ></IconButton>
-    </TouchableOpacity>
+    </Pressable>
   );
 
   const isPaidJSX = (
@@ -1226,11 +1221,11 @@ const ExpenseForm = ({
           <View
             style={[
               {
+                flex: 1,
                 flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
                 paddingHorizontal: "2%",
                 marginBottom: "-2%",
+                justifyContent: "space-between",
               },
               Platform.OS == "android" && {
                 alignContent: "center",
@@ -1863,12 +1858,6 @@ const ExpenseForm = ({
               <Text style={styles.errorText}>{i18n.t("invalidInput")} </Text>
             )}
           </Animated.View>
-          <View
-            style={[
-              styles.spacerViewAdvanced,
-              hideAdvanced && styles.spacerView,
-            ]}
-          ></View>
           {/* Get Local Price Button Section */}
           {!hideAdvanced &&
             inputs.description.value &&
@@ -1898,7 +1887,7 @@ const ExpenseForm = ({
                         color: GlobalStyles.colors.textColor,
                       }}
                     >
-                      Get Local Price
+                      {i18n.t("getLocalPriceTitle")}
                     </Text>
                   </View>
                 </GradientButton>
@@ -1930,7 +1919,7 @@ const ExpenseForm = ({
               minWidth: isTablet ? (isPortrait ? "90%" : "135%") : "100%",
             }}
           >
-            <TouchableOpacity
+            <Pressable
               style={{
                 flex: 1,
                 flexDirection: "row",
@@ -1987,14 +1976,14 @@ const ExpenseForm = ({
                   }}
                 />
               )}
-            </TouchableOpacity>
+            </Pressable>
             {!inputs.amount.value ||
               (!tempAmount && (
-                <TouchableOpacity>
+                <Pressable>
                   <Text style={{ color: GlobalStyles.colors.primary700 }}>
                     {i18n.t("confirm2")}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               ))}
           </View>
         </InputAccessoryView>
@@ -2193,6 +2182,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
     alignItems: "baseline",
+    paddingTop: dynamicScale(20, true),
   },
   currencyContainer: {
     maxWidth: "100%",
@@ -2323,7 +2313,7 @@ const styles = StyleSheet.create({
   },
   spacerViewAdvanced: {
     flex: 1,
-    minHeight: "4%",
+    minHeight: "1%",
   },
   isPaidContainer: {
     marginTop: "4%",
@@ -2346,7 +2336,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: dynamicScale(4, true),
+    paddingTop: dynamicScale(12, true),
     marginHorizontal: "4%",
   },
   getLocalPriceButton: {

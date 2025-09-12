@@ -335,7 +335,7 @@ const GPTDealScreen = ({ route, navigation }) => {
           >
             {i18n.t("back")}
           </FlatButton>
-          {!isFetching && (
+          {/* {!isFetching && (
             <GradientButton
               style={[
                 Platform.OS == "ios" && { paddingHorizontal: 20 },
@@ -346,7 +346,7 @@ const GPTDealScreen = ({ route, navigation }) => {
             >
               Regenerate
             </GradientButton>
-          )}
+          )} */}
         </View>
         {/* <BlurPremium canBack /> */}
       </View>
@@ -385,7 +385,6 @@ const styles = StyleSheet.create({
   answerContainer: {
     flex: 4,
     margin: dynamicScale(4, false, 0.5),
-    paddingTop: dynamicScale(4, false, 0.5),
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
@@ -406,7 +405,8 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
   },
   contentContainer: {
-    flex: 6,
+    width: "90%",
+    height: "80%",
   },
   answerText: {
     padding: dynamicScale(20, false, 0.5),
@@ -417,16 +417,16 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
   },
   buttonContainer: {
-    flex: 1,
+    flex: 0.5,
     flexDirection: "row",
     justifyContent: "space-around",
     backgroundColor: GlobalStyles.colors.backgroundColor,
     alignItems: "center",
   },
   chatContainer: {
-    padding: dynamicScale(8, false, 0.5),
-    paddingVertical: dynamicScale(4, true),
-    paddingBottom: dynamicScale(80, true), // Add extra padding at bottom for button container
+    // padding: dynamicScale(4, false, 0.5),
+    paddingVertical: dynamicScale(8, true),
+    paddingBottom: dynamicScale(120, true), // Add extra padding at bottom for button container
     flexGrow: 1,
   },
   userBubbleContainer: {

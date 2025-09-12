@@ -51,6 +51,7 @@ import {
   isConnectionFastEnough,
   isConnectionFastEnoughAsBool,
 } from "../util/connectionSpeed";
+import { dynamicScale } from "../util/scalingUtil";
 
 interface ManageExpenseProps {
   route: {
@@ -542,27 +543,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     expenseCtx.deleteExpense("temp");
   }
 
-  // function errorHandler() {
-  //   setError(null);
-  // }
-
-  // if (error && !isSubmitting) {
-  //   return <ErrorOverlay message={error} onConfirm={errorHandler} />;
-  // }
-
-  // if (isSubmitting && progress >= 0 && progress <= 1) {
-  //   return (
-  //     <LoadingBarOverlay
-  //       progress={progress}
-  //       progressAt={progressAt}
-  //       progressMax={progressMax}
-  //     />
-  //   );
-  // }
-  // if (isSubmitting) {
-  //   return <LoadingOverlay customText="Saving your Expense!" />;
-  // }
-
   return (
     <ScrollView style={styles.container}>
       <ExpenseForm
@@ -602,13 +582,12 @@ ManageExpense.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
+    height: "100%",
   },
   deleteContainer: {
-    paddingTop: "4%",
-    margin: "2%",
-    marginTop: "-12%",
+    padding: dynamicScale(16, true, 0.5),
+    marginTop: dynamicScale(-46, false, 0.5),
     alignItems: "center",
   },
 });

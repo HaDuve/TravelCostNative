@@ -230,7 +230,7 @@ const ManageExpense = ({ route, navigation }) => {
   }
 
   const createSingleData = async (expenseData: ExpenseData) => {
-    // console.log("no ranged Data detected");
+    console.log("💾 createSingleData: Creating single expense with data:", expenseData);
     // hotfix the date clock bug
     expenseData.date = expenseData.startDate;
     expenseData.editedTimestamp = Date.now();
@@ -242,8 +242,13 @@ const ManageExpense = ({ route, navigation }) => {
         expenseData: expenseData,
       },
     };
+    console.log("💾 createSingleData: Offline queue item:", item);
     const id = await storeExpenseOnlineOffline(item, isOnline);
-    expenseCtx.addExpense({ ...expenseData, id: id ?? "" });
+    console.log("💾 createSingleData: Generated ID:", id);
+    const expenseToAdd = { ...expenseData, id: id ?? "" };
+    console.log("💾 createSingleData: Adding expense to context:", expenseToAdd);
+    expenseCtx.addExpense(expenseToAdd);
+    console.log("💾 createSingleData: Current expenses count after add:", expenseCtx.expenses.length);
   };
 
   const createRangedData = async (expenseData) => {
@@ -448,7 +453,9 @@ const ManageExpense = ({ route, navigation }) => {
   };
 
   async function confirmHandler(expenseData: ExpenseData) {
-    // console.log("confirmHandler ~ expenseData:", expenseData);
+    console.log("💾 ManageExpense: confirmHandler called with expenseData:", expenseData);
+    console.log("💾 Is editing:", isEditing);
+    console.log("💾 Is online:", isOnline);
     // setIsSubmitting(true);
     try {
       // set the category to the corresponting catstring
@@ -504,11 +511,11 @@ const ManageExpense = ({ route, navigation }) => {
           expenseData.endDate.toString().slice(0, 10)
         ) {
           // adding a new ranged expense (no-editing)
-          // console.log("deciding to create ranged data");
+          console.log("💾 Deciding to create ranged data");
           await createRangedData(expenseData);
         } else {
           // adding a new normal expense (no-editing, no-ranged)
-          // console.log("deciding to create normal data");
+          console.log("💾 Deciding to create normal data");
           await createSingleData(expenseData);
         }
       }

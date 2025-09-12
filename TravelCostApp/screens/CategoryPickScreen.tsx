@@ -34,7 +34,10 @@ import { useCallback } from "react";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 import { dynamicScale } from "../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -110,18 +113,22 @@ const CategoryPickScreen = ({ route, navigation }) => {
   }
 
   async function catPressHandler(item: Category) {
+    console.log("🏷️ CategoryPick: Category selected:", item);
+    console.log("🏷️ CategoryPick: Current tempValues:", tempValues);
     setIsFetching(true);
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (item.cat === "newCat") {
       await newCatPressHandler();
     } else {
-      navigation.navigate("ManageExpense", {
+      const navigationParams = {
         pickedCat: item.cat ?? item.name,
         newCat: true,
         iconName: item.icon,
         expenseId: editedExpenseId,
         tempValues: tempValues,
-      });
+      };
+      console.log("🏷️ CategoryPick: Navigating to ManageExpense with params:", navigationParams);
+      navigation.navigate("ManageExpense", navigationParams);
     }
     setIsFetching(false);
   }

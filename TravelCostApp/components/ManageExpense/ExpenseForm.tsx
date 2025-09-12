@@ -355,6 +355,7 @@ const ExpenseForm = ({
   // Restore form state when returning from CategoryPick with tempValues
   useEffect(() => {
     if (tempValues && !isEditing) {
+      console.log("🔄 ExpenseForm: Restoring state from tempValues:", tempValues);
       // Restore form inputs from tempValues
       setInputs({
         amount: {
@@ -362,7 +363,9 @@ const ExpenseForm = ({
           isValid: true,
         },
         date: {
-          value: tempValues.date ? getFormattedDate(tempValues.date) : getFormattedDate(DateTime.now().toJSDate()),
+          value: tempValues.date
+            ? getFormattedDate(tempValues.date)
+            : getFormattedDate(DateTime.now().toJSDate()),
           isValid: true,
         },
         description: {
@@ -415,7 +418,7 @@ const ExpenseForm = ({
       if (tempValues.isSpecialExpense !== undefined) {
         setIsSpecialExpense(tempValues.isSpecialExpense);
       }
-      
+
       // Update picker values to reflect restored state
       if (tempValues.currency) {
         setCurrencyPickerValue(tempValues.currency);
@@ -786,6 +789,11 @@ const ExpenseForm = ({
   }
 
   async function submitHandler() {
+    console.log("📝 ExpenseForm: submitHandler called");
+    console.log("📝 Form inputs state:", inputs);
+    console.log("📝 Additional state - whoPaid:", whoPaid, "splitType:", splitType, "splitList:", splitList);
+    console.log("📝 Picked category:", pickedCat, "newCat:", newCat);
+    
     const expenseData = {
       uid: authCtx.uid,
       amount: +amountValue,
@@ -806,6 +814,8 @@ const ExpenseForm = ({
       isSpecialExpense: isSpecialExpense,
       alreadyDividedAmountByDays: alreadyDividedAmountByDays,
     };
+    
+    console.log("📝 Constructed expenseData:", expenseData);
 
     // SoloTravellers always pay for themselves
     if (IsSoloTraveller || expenseData.whoPaid === null)
@@ -851,6 +861,17 @@ const ExpenseForm = ({
       !whoPaidIsValid ||
       !splitListValid
     ) {
+      console.log("❌ ExpenseForm: Form validation failed!");
+      console.log("❌ Validation results:", {
+        amountIsValid,
+        dateIsValid,
+        descriptionIsValid,
+        categoryIsValid,
+        countryIsValid,
+        currencyIsValid,
+        whoPaidIsValid,
+        splitListValid
+      });
       setInputs((curInputs) => {
         return {
           amount: {
@@ -1296,11 +1317,15 @@ const ExpenseForm = ({
                 color={GlobalStyles.colors.primary500}
                 size={dynamicScale(48, false, 0.4)}
                 onPress={() => {
+                  console.log("🏷️ ExpenseForm: Category icon pressed, current tempValues:", tempValues);
+                  console.log("🏷️ ExpenseForm: Current form state:", inputs);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  navigation.navigate("CategoryPick", {
+                  const navParams = {
                     editedExpenseId: editedExpenseId,
                     tempValues: tempValues,
-                  });
+                  };
+                  console.log("🏷️ ExpenseForm: Navigating to CategoryPick with params:", navParams);
+                  navigation.navigate("CategoryPick", navParams);
                 }}
               />
             </View>

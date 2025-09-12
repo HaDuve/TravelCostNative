@@ -133,7 +133,7 @@ async function performComprehensiveWebSearch(
 
   // Create parallel search queries
   const seasonalQuery = `current season tourism peak off-season shoulder season ${country} ${currentMonth} ${currentYear}`;
-  const pricingQuery = `current price cost ${product} ${country} ${currency} ${currentMonth} ${currentYear} local market`;
+  const pricingQuery = `current price cost local ${product} ${country} ${currency} ${currentMonth} ${currentYear}`;
 
   console.log("Performing parallel web searches...");
   console.log("Seasonal query:", seasonalQuery);
@@ -265,17 +265,14 @@ async function chatGPTcontentPrice(
 
 **Current Market Pricing Data:** ${pricingInfo}
 
-IF "${product}" is not a recognizable product/service => Return a brief, humorous response about the unusual item.
+IF "${product}" is not recognized as a typical product or service:
+-  Provide a brief, witty response commenting humorously on the unusual item.
 
-IF "${product}" is a recognizable product/service => Provide:
+IF "${product}" is recognized:
+**Seasonal Impact:** Explain how the current season in ${country} affects pricing for this type of product and whether this influences the price.
+**Actionable Advice:** Recommend next steps or purchasing tips based on the comprehensive analysis (e.g., good deal, worth waiting for discounts, overpriced). Consider both current market prices and seasonal timing in your recommendations.
 
-**Comprehensive Price Analysis**: Based on the current market data above, provide detailed pricing information for "${product}" in ${country} (in ${currency}).
-
-**Seasonal Impact on Pricing**: Explain how the current season in ${country} affects pricing for this type of product and what this means for buyers.
-
-**Market Comparison**: Compare current local prices between different vendors, regions within ${country}, and online platforms based on the real-time data.
-
-Focus on current, accurate pricing information that helps with local purchasing decisions.`;
+Focus on providing short, concise, up-to-date, and practical insights that assist with decisions. Omit any meta-aspects/instructions literally, only give helpful information and advice.`;
 }
 
 async function getGPT_Content(
@@ -332,13 +329,6 @@ export async function getChatGPT_Response(
       {
         role: "system",
         content: `You are an expert international advisor and local price researcher with extensive travel experience. You specialize in finding current, accurate local prices for products and services that matter to digital nomads and travelers.
-
-**CRITICAL FORMATTING REQUIREMENT:**
-For "good deal" analysis requests, ALWAYS start with:
-**GOOD DEAL?** [emoji] [YES/NO/QUESTIONABLE]
-- Use ✅ for YES (good deal)
-- Use ❌ for NO (not a good deal)
-- Use ❓ for QUESTIONABLE (unclear or depends on factors)
 
 **FORMATTING RULES - ALWAYS FOLLOW:**
 - Use **bold text** for headings and important information only

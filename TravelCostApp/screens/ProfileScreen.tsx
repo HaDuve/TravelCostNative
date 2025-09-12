@@ -48,6 +48,11 @@ import { setAttributesAsync } from "../components/Premium/PremiumConstants";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import { NetworkContext } from "../store/network-context";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
+import GetLocalPriceButton from "../components/Settings/GetLocalPriceButton";
+import GradientButton from "../components/UI/GradientButton";
+import { Linking } from "react-native";
+import { canOpenURL } from "expo-linking";
+import safeLogError from "../util/error";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -346,6 +351,34 @@ const ProfileScreen = ({ navigation }) => {
     <></>
   ) : (
     <>
+      <View style={styles.headerButtonsContainer}>
+        <GetLocalPriceButton
+          navigation={navigation}
+          style={styles.headerButton}
+        />
+        <GradientButton
+          style={styles.headerButton}
+          buttonStyle={{}}
+          onPress={async () => {
+            const subject = encodeURIComponent("Budget For Nomads Support");
+            const message = encodeURIComponent("Hi, I have feedback about ...");
+            const url = `mailto:budgetfornomads@outlook.com?subject=${subject}&body=${message}`;
+            try {
+              const canOpen = await canOpenURL(url);
+              if (!canOpen) return;
+              await Linking.openURL(url);
+            } catch (error) {
+              safeLogError(error);
+              Alert.alert(
+                "No email client found",
+                "Please install an email client and try again."
+              );
+            }
+          }}
+        >
+          {i18n.t("supportFeedbackLabel")}
+        </GradientButton>
+      </View>
       <ScrollView style={styles.tripContainer}>
         <View style={styles.horizontalContainer}>
           <Text style={styles.tripListTitle}>{i18n.t("myTrips")}</Text>
@@ -360,6 +393,13 @@ const ProfileScreen = ({ navigation }) => {
               size={dynamicScale(36, false, 0.5)}
               buttonStyle={styles.newTripButtonContainer}
               color={GlobalStyles.colors.primary400}
+              badge={null}
+              badgeText={null}
+              badgeStyle={null}
+              onPressIn={null}
+              onPressOut={null}
+              onLongPress={null}
+              category={null}
               onPress={navigation.navigate.bind(this, "ManageTrip")}
             />
           </TourGuideZone>
@@ -387,6 +427,13 @@ const ProfileScreen = ({ navigation }) => {
               buttonStyle={[styles.addButton, GlobalStyles.shadowGlowPrimary]}
               size={dynamicScale(42, false, 0.5)}
               color={GlobalStyles.colors.backgroundColor}
+              badge={null}
+              badgeText={null}
+              badgeStyle={null}
+              onPressIn={null}
+              onPressOut={null}
+              onLongPress={null}
+              category={null}
               onPress={() => {
                 onSummaryHandler();
               }}
@@ -427,6 +474,19 @@ const styles = StyleSheet.create({
     flex: 0,
     minHeight: dynamicScale(100, true),
     padding: dynamicScale(4),
+  },
+  headerButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+    paddingVertical: dynamicScale(8, true),
+    marginBottom: dynamicScale(8, true),
+  },
+  headerButton: {
+    flex: 1,
+    marginHorizontal: dynamicScale(4, false, 0.5),
+    borderRadius: 16,
   },
 
   tripContainer: {

@@ -141,6 +141,16 @@ const en = {
   simplifySplitsLabel: "Open Splits Summary",
   resetAppIntroductionLabel: "Reset App Introduction",
   visitFoodForNomadsLabel: "Visit Food For Nomads",
+  supportFeedbackLabel: "Feedback?",
+
+  // Get Local Price Modal
+  getLocalPriceModalTitle: "Get Local Price",
+  getLocalPriceModalSubtitle:
+    "What product or service would you like to check the price of?",
+  getLocalPricePlaceholder:
+    "e.g., Coffee, Coworking space, Apartment rental...",
+  getLocalPriceError: "Please enter a product or service name",
+  getPriceButton: "Get Price",
 
   // Trip Form Labels
   tripFormTitleNew: "New Trip Budget",
@@ -569,6 +579,15 @@ const de = {
   simplifySplitsLabel: "Offene Schulden Übersicht",
   resetAppIntroductionLabel: "App Einführung wiederholen",
   visitFoodForNomadsLabel: "Food For Nomads besuchen",
+  supportFeedbackLabel: "Feedback?",
+
+  // Get Local Price Modal
+  getLocalPriceModalTitle: "Lokale Preise Anzeigen",
+  getLocalPriceModalSubtitle:
+    "Für welches Produkt oder welche Dienstleistung möchtest du den Preis prüfen?",
+  getLocalPricePlaceholder: "z.B. Kaffee, Coworking Space, Wohnungsmiete...",
+  getLocalPriceError: "Bitte gib einen Produkt- oder Dienstleistungsnamen ein",
+  getPriceButton: "Preis Abrufen",
 
   // Trip Form Labels
   tripFormTitleNew: "Neue Reise erstellen",
@@ -1013,6 +1032,16 @@ const fr = {
   simplifySplitsLabel: "Résumé des dettes",
   resetAppIntroductionLabel: "Réinitialiser l'introduction de l'application",
   visitFoodForNomadsLabel: "Visitez Food For Nomads",
+  supportFeedbackLabel: "Commentaires?",
+
+  // Get Local Price Modal
+  getLocalPriceModalTitle: "Obtenir le Prix Local",
+  getLocalPriceModalSubtitle:
+    "Pour quel produit ou service aimerais-tu vérifier le prix ?",
+  getLocalPricePlaceholder:
+    "ex. Café, Espace de coworking, Location d'appartement...",
+  getLocalPriceError: "Veuillez entrer un nom de produit ou de service",
+  getPriceButton: "Obtenir le Prix",
 
   // Trip Form Labels
   tripFormTitleNew: "Nouveau budget de voyage",
@@ -1454,6 +1483,15 @@ const ru = {
   simplifySplitsLabel: "Открыть сводку распределения",
   resetAppIntroductionLabel: "Сбросить введение в приложение",
   visitFoodForNomadsLabel: "Посетить Food For Nomads",
+  supportFeedbackLabel: "Отзыв?",
+
+  // Get Local Price Modal
+  getLocalPriceModalTitle: "Получить Местную Цену",
+  getLocalPriceModalSubtitle:
+    "Для какого продукта или услуги вы хотите проверить цену?",
+  getLocalPricePlaceholder: "напр. Кофе, Коворкинг, Аренда квартиры...",
+  getLocalPriceError: "Пожалуйста, введите название продукта или услуги",
+  getPriceButton: "Получить Цену",
 
   // Trip Form Labels
   tripFormTitleNew: "Бюджет новой поездки",

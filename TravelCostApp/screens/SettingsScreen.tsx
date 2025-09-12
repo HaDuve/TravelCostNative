@@ -48,7 +48,6 @@ import { canOpenURL } from "expo-linking";
 import DevContent from "../components/Settings/DevContent";
 import CurrencyExchangeInfo from "../components/UI/CurrencyExchangeInfo";
 import { dynamicScale } from "../util/scalingUtil";
-import GetLocalPriceButton from "../components/Settings/GetLocalPriceButton";
 
 const SettingsScreen = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
@@ -194,13 +193,9 @@ const SettingsScreen = ({ navigation }) => {
 
       <SettingsSection multiTraveller={multiTraveller}></SettingsSection>
 
-      <GetLocalPriceButton
-        navigation={navigation}
-        style={styles.settingsButton}
-      />
-
       <GradientButton
         style={styles.settingsButton}
+        buttonStyle={{}}
         onPress={async () => {
           await resetTour();
           await reloadApp();
@@ -216,6 +211,7 @@ const SettingsScreen = ({ navigation }) => {
       </LinkingButton>
       <GradientButton
         style={styles.settingsButton}
+        buttonStyle={{}}
         darkText
         colors={GlobalStyles.gradientColorsButton}
         onPress={() => {
@@ -237,27 +233,6 @@ const SettingsScreen = ({ navigation }) => {
         {premiumButtonString}
       </GradientButton>
       <CurrencyExchangeInfo />
-      <TouchableOpacity
-        onPress={async () => {
-          const subject = encodeURIComponent("Budget For Nomads Support");
-          const message = encodeURIComponent("Hi, I have feedback about ...");
-          const url = `mailto:budgetfornomads@outlook.com?subject=${subject}&body=${message}`;
-          navigation.pop();
-          try {
-            const canOpen = await canOpenURL(url);
-            if (!canOpen) return;
-            await Linking.openURL(url);
-          } catch (error) {
-            safeLogError(error);
-            Alert.alert(
-              "No email client found",
-              "Please install an email client and try again."
-            );
-          }
-        }}
-      >
-        <Text style={[styles.textButton]}>Support</Text>
-      </TouchableOpacity>
       {!isRestoringPurchases && (
         <TouchableOpacity onPress={() => restorePurchases()}>
           <Text style={[styles.textButton]}>{i18n.t("restorePurchases")}</Text>

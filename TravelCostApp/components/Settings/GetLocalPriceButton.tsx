@@ -8,6 +8,7 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  KeyboardAvoidingView,
 } from "react-native";
 import { UserContext } from "../../store/user-context";
 import { TripContext } from "../../store/trip-context";
@@ -48,7 +49,7 @@ const GetLocalPriceButton = ({ navigation, style }) => {
 
   const handleLocalPriceSubmit = () => {
     if (!productInput.trim()) {
-      Alert.alert("Error", "Please enter a product or service name");
+      Alert.alert("Error", i18n.t("getLocalPriceError"));
       return;
     }
 
@@ -71,7 +72,7 @@ const GetLocalPriceButton = ({ navigation, style }) => {
     <>
       <GradientButton
         style={[styles.settingsButton, style]}
-        buttonStyle={{ padding: 8, paddingHorizontal: 12 }}
+        buttonStyle={{}}
         colors={GlobalStyles.gradientColorsButton}
         onPress={handleGetLocalPrice}
         darkText
@@ -81,7 +82,7 @@ const GetLocalPriceButton = ({ navigation, style }) => {
             source={require("../../assets/chatgpt-logo.jpeg")}
             style={styles.buttonIcon}
           />
-          <Text style={styles.buttonText}>Get Local Price</Text>
+          <Text style={styles.buttonText}>{i18n.t("getLocalPriceTitle")}</Text>
         </View>
       </GradientButton>
 
@@ -91,25 +92,27 @@ const GetLocalPriceButton = ({ navigation, style }) => {
         transparent={true}
         onRequestClose={handleModalClose}
       >
-        <View style={styles.modalOverlay}>
+        <KeyboardAvoidingView style={styles.modalOverlay} behavior="padding">
           <View style={[styles.modalContainer, GlobalStyles.strongShadow]}>
             <View style={styles.modalHeader}>
               <Image
                 source={require("../../assets/chatgpt-logo.jpeg")}
                 style={styles.modalIcon}
               />
-              <Text style={styles.modalTitle}>Get Local Price</Text>
+              <Text style={styles.modalTitle}>
+                {i18n.t("getLocalPriceModalTitle")}
+              </Text>
             </View>
 
             <Text style={styles.modalSubtitle}>
-              What product or service would you like to check the price of?
+              {i18n.t("getLocalPriceModalSubtitle")}
             </Text>
 
             <TextInput
               style={[styles.textInput, GlobalStyles.strongShadow]}
               value={productInput}
               onChangeText={setProductInput}
-              placeholder="e.g., Coffee, Coworking space, Apartment rental..."
+              placeholder={i18n.t("getLocalPricePlaceholder")}
               placeholderTextColor={GlobalStyles.colors.gray700}
               autoFocus={true}
               multiline={false}
@@ -131,11 +134,11 @@ const GetLocalPriceButton = ({ navigation, style }) => {
                 darkText
                 buttonStyle={{ padding: 8, paddingHorizontal: 12 }}
               >
-                Get Price
+                {i18n.t("getPriceButton")}
               </GradientButton>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </>
   );
@@ -148,9 +151,13 @@ GetLocalPriceButton.propTypes = {
 
 const styles = StyleSheet.create({
   settingsButton: {
-    marginVertical: dynamicScale(8, true),
-    marginHorizontal: dynamicScale(32, false, 0.5),
+    marginVertical: "2%",
+    marginHorizontal: "8%",
     borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    alignSelf: "center",
   },
   buttonContent: {
     flexDirection: "row",
@@ -158,12 +165,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   buttonIcon: {
-    width: dynamicScale(16, false, 0.5),
-    height: dynamicScale(16, false, 0.5),
-    marginRight: 8,
+    width: dynamicScale(18, false, 0.5),
+    height: dynamicScale(18, false, 0.5),
+    marginRight: dynamicScale(6, false, 0.5),
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: dynamicScale(16, false, 0.5),
+    fontWeight: "300",
+    fontStyle: "italic",
     color: GlobalStyles.colors.textColor,
   },
   modalOverlay: {

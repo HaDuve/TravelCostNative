@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
   chatContainer: {
     // padding: dynamicScale(4, false, 0.5),
     paddingVertical: dynamicScale(8, true),
-    paddingBottom: dynamicScale(120, true), // Add extra padding at bottom for button container
+    paddingBottom: dynamicScale(200, true), // Add extra padding at bottom for button container
     flexGrow: 1,
   },
   userBubbleContainer: {

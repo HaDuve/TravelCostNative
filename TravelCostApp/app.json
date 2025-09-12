@@ -17,23 +17,19 @@
       "url": "https://u.expo.dev/dff7ffc5-6f1e-4ece-bb23-0c50cda19f46"
     },
     "newArchEnabled": false,
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.budgetfornomads.app",
       "buildNumber": "1.0.1200",
       "infoPlist": {
-        "UIBackgroundModes": [
-          "remote-notification"
-        ],
+        "UIBackgroundModes": ["remote-notification"],
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.budgetfornomads.app",
-      "versionCode": 101114,
+      "package": "com.budgetfornomad.app",
+      "versionCode": 101117,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon2.png",
         "backgroundColor": "#FFFFFF"
@@ -47,10 +43,7 @@
         "projectId": "dff7ffc5-6f1e-4ece-bb23-0c50cda19f46"
       }
     },
-    "plugins": [
-      "expo-localization",
-      "expo-font"
-    ],
+    "plugins": ["expo-localization", "expo-font"],
     "runtimeVersion": {
       "policy": "appVersion"
     }

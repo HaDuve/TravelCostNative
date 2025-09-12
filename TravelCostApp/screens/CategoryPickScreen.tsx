@@ -41,8 +41,18 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-const CategoryPickScreen = ({ route, navigation }) => {
-  const { editedExpenseId, tempValues } = route.params ? route.params : "";
+interface CategoryPickScreenProps {
+  route: {
+    params?: {
+      editedExpenseId?: string;
+      tempValues?: any; // ExpenseData type
+    };
+  };
+  navigation: any;
+}
+
+const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
+  const { editedExpenseId, tempValues } = route.params || {};
 
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
@@ -113,25 +123,18 @@ const CategoryPickScreen = ({ route, navigation }) => {
   }
 
   async function catPressHandler(item: Category) {
-    console.log("🏷️ CategoryPick: Category selected:", item);
-    console.log("🏷️ CategoryPick: Current tempValues:", tempValues);
     setIsFetching(true);
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (item.cat === "newCat") {
       await newCatPressHandler();
     } else {
-      const navigationParams = {
+      navigation.navigate("ManageExpense", {
         pickedCat: item.cat ?? item.name,
         newCat: true,
         iconName: item.icon,
         expenseId: editedExpenseId,
         tempValues: tempValues,
-      };
-      console.log(
-        "🏷️ CategoryPick: Navigating to ManageExpense with params:",
-        navigationParams
-      );
-      navigation.navigate("ManageExpense", navigationParams);
+      });
     }
     setIsFetching(false);
   }

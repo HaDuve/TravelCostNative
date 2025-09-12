@@ -352,88 +352,83 @@ const ExpenseForm = ({
     }
   }, [dateISO]);
 
+  // Helper function to safely format dates
+  const getSafeFormattedDate = (dateValue: string | undefined): string => {
+    if (dateValue && dateValue !== "") {
+      return getFormattedDate(dateValue);
+    }
+    return getFormattedDate(DateTime.now().toJSDate());
+  };
+
   // Restore form state when returning from CategoryPick with tempValues
   useEffect(() => {
-    if (tempValues && !isEditing) {
-      console.log(
-        "🔄 ExpenseForm: Restoring state from tempValues:",
-        tempValues
-      );
-      // Restore form inputs from tempValues
-      setInputs({
-        amount: {
-          value: tempValues.amount?.toString() || "",
-          isValid: true,
-        },
-        date: {
-          value:
-            tempValues.date && tempValues.date !== ""
-              ? getFormattedDate(tempValues.date)
-              : getFormattedDate(DateTime.now().toJSDate()),
-          isValid: true,
-        },
-        description: {
-          value: tempValues.description || "",
-          isValid: true,
-        },
-        category: {
-          value: tempValues.category || "",
-          isValid: true,
-        },
-        country: {
-          value: tempValues.country || "",
-          isValid: true,
-        },
-        currency: {
-          value: tempValues.currency || tripCtx.tripCurrency,
-          isValid: true,
-        },
-        whoPaid: {
-          value: tempValues.whoPaid || "",
-          isValid: true,
-        },
-      });
+    if (!tempValues || isEditing) return;
 
-      // Restore other form state
-      if (tempValues.startDate && tempValues.startDate !== "") {
-        setStartDate(getFormattedDate(tempValues.startDate));
-      } else {
-        setStartDate(getFormattedDate(DateTime.now().toJSDate()));
-      }
-      if (tempValues.endDate && tempValues.endDate !== "") {
-        setEndDate(getFormattedDate(tempValues.endDate));
-      } else {
-        setEndDate(getFormattedDate(DateTime.now().toJSDate()));
-      }
-      if (tempValues.splitList) {
-        setSplitList(tempValues.splitList);
-      }
-      if (tempValues.splitType) {
-        setSplitType(tempValues.splitType);
-      }
-      if (tempValues.listEQUAL) {
-        setListEQUAL(tempValues.listEQUAL);
-      }
-      if (tempValues.duplOrSplit !== undefined) {
-        setDuplOrSplit(tempValues.duplOrSplit);
-      }
-      if (tempValues.whoPaid) {
-        setWhoPaid(tempValues.whoPaid);
-      }
-      if (tempValues.isPaid !== undefined) {
-        setIsPaid(tempValues.isPaid);
-      }
-      if (tempValues.isSpecialExpense !== undefined) {
-        setIsSpecialExpense(tempValues.isSpecialExpense);
-      }
+    // Restore form inputs from tempValues
+    setInputs({
+      amount: {
+        value: tempValues.amount?.toString() || "",
+        isValid: true,
+      },
+      date: {
+        value: getSafeFormattedDate(tempValues.date),
+        isValid: true,
+      },
+      description: {
+        value: tempValues.description || "",
+        isValid: true,
+      },
+      category: {
+        value: tempValues.category || "",
+        isValid: true,
+      },
+      country: {
+        value: tempValues.country || "",
+        isValid: true,
+      },
+      currency: {
+        value: tempValues.currency || tripCtx.tripCurrency,
+        isValid: true,
+      },
+      whoPaid: {
+        value: tempValues.whoPaid || "",
+        isValid: true,
+      },
+    });
 
-      // Update picker values to reflect restored state
-      if (tempValues.currency) {
-        setCurrencyPickerValue(tempValues.currency);
-      }
-      if (tempValues.country) {
-        setCountryPickerValue(tempValues.country);
-      }
+    // Restore date state
+    setStartDate(getSafeFormattedDate(tempValues.startDate));
+    setEndDate(getSafeFormattedDate(tempValues.endDate));
+
+    // Restore split and sharing state
+    if (tempValues.splitList) {
+      setSplitList(tempValues.splitList);
+    }
+    if (tempValues.splitType) {
+      setSplitType(tempValues.splitType);
+    }
+    if (tempValues.listEQUAL) {
+      setListEQUAL(tempValues.listEQUAL);
+    }
+    if (tempValues.duplOrSplit !== undefined) {
+      setDuplOrSplit(tempValues.duplOrSplit);
+    }
+    if (tempValues.whoPaid) {
+      setWhoPaid(tempValues.whoPaid);
+    }
+    if (tempValues.isPaid !== undefined) {
+      setIsPaid(tempValues.isPaid);
+    }
+    if (tempValues.isSpecialExpense !== undefined) {
+      setIsSpecialExpense(tempValues.isSpecialExpense);
+    }
+    
+    // Update picker values to reflect restored state
+    if (tempValues.currency) {
+      setCurrencyPickerValue(tempValues.currency);
+    }
+    if (tempValues.country) {
+      setCountryPickerValue(tempValues.country);
     }
   }, [tempValues, isEditing, tripCtx.tripCurrency]);
 
@@ -796,25 +791,22 @@ const ExpenseForm = ({
     }
   }
 
-  async function submitHandler() {
-    console.log("📝 ExpenseForm: submitHandler called");
-    console.log("📝 Form inputs state:", inputs);
-    console.log(
-      "📝 Additional state - whoPaid:",
-      whoPaid,
-      "splitType:",
-      splitType,
-      "splitList:",
-      splitList
-    );
-    console.log("📝 Picked category:", pickedCat, "newCat:", newCat);
+  // Helper function to safely create Date objects
+  const createSafeDate = (dateValue: string): Date => {
+    if (dateValue && dateValue !== "") {
+      const parsedDate = DateTime.fromISO(dateValue);
+      return parsedDate.isValid ? parsedDate.toJSDate() : DateTime.now().toJSDate();
+    }
+    return DateTime.now().toJSDate();
+  };
 
+  async function submitHandler() {
     const expenseData = {
       uid: authCtx.uid,
       amount: +amountValue,
-      date: DateTime.fromISO(inputs.date.value).toJSDate(),
-      startDate: startDate && startDate !== "" ? DateTime.fromISO(startDate).toJSDate() : DateTime.now().toJSDate(),
-      endDate: endDate && endDate !== "" ? DateTime.fromISO(endDate).toJSDate() : DateTime.now().toJSDate(),
+      date: createSafeDate(inputs.date.value),
+      startDate: createSafeDate(startDate),
+      endDate: createSafeDate(endDate),
       description: inputs.description.value,
       category: newCat ? pickedCat : inputs.category.value,
       country: inputs.country.value,
@@ -830,9 +822,7 @@ const ExpenseForm = ({
       alreadyDividedAmountByDays: alreadyDividedAmountByDays,
     };
 
-    console.log("📝 Constructed expenseData:", expenseData);
-
-    // SoloTravellers always pay for themselves
+      // SoloTravellers always pay for themselves
     if (IsSoloTraveller || expenseData.whoPaid === null)
       expenseData.whoPaid = userCtx.userName;
     // If left completely empty, set to  placeholder
@@ -876,17 +866,6 @@ const ExpenseForm = ({
       !whoPaidIsValid ||
       !splitListValid
     ) {
-      console.log("❌ ExpenseForm: Form validation failed!");
-      console.log("❌ Validation results:", {
-        amountIsValid,
-        dateIsValid,
-        descriptionIsValid,
-        categoryIsValid,
-        countryIsValid,
-        currencyIsValid,
-        whoPaidIsValid,
-        splitListValid,
-      });
       setInputs((curInputs) => {
         return {
           amount: {
@@ -1218,7 +1197,7 @@ const ExpenseForm = ({
   const tempValues: ExpenseData = {
     uid: authCtx.uid,
     amount: +amountValue,
-    date: inputs.date.value,
+    date: inputs.date.value || new Date().toISOString(),
     startDate: startDate || new Date().toISOString(),
     endDate: endDate || new Date().toISOString(),
     description: inputs.description.value,
@@ -1332,21 +1311,11 @@ const ExpenseForm = ({
                 color={GlobalStyles.colors.primary500}
                 size={dynamicScale(48, false, 0.4)}
                 onPress={() => {
-                  console.log(
-                    "🏷️ ExpenseForm: Category icon pressed, current tempValues:",
-                    tempValues
-                  );
-                  console.log("🏷️ ExpenseForm: Current form state:", inputs);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  const navParams = {
+                  navigation.navigate("CategoryPick", {
                     editedExpenseId: editedExpenseId,
                     tempValues: tempValues,
-                  };
-                  console.log(
-                    "🏷️ ExpenseForm: Navigating to CategoryPick with params:",
-                    navParams
-                  );
-                  navigation.navigate("CategoryPick", navParams);
+                  });
                 }}
               />
             </View>

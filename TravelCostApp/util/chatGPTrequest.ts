@@ -226,13 +226,20 @@ async function chatGPTcontentGoodDealPost(
 
 **Current Market Pricing Data:** ${pricingInfo}
 
+**IMPORTANT FORMATTING REQUIREMENT:**
+Start your response with exactly this format (omit if unclear):
+**GOOD DEAL?** [emoji] [one-word answer: YES/NO/(omit if unclear)]
+
+Use these emojis (omit if unclear):
+- ✅ for YES (good deal)
+- ❌ for NO (not a good deal)
+
 IF "${product}" is not recognized as a typical product or service:
-- Return a brief, witty response commenting humorously on the unusual item.
+-  Provide a brief, witty response commenting humorously on the unusual item.
 
 IF "${product}" is recognized:
 **Price Analysis:** Based on the current market data above, compare ${price} ${currency} to current local market prices for "${product}" in ${country}.
 **Seasonal Impact:** Explain how the current season in ${country} affects pricing for this type of product and whether this influences the value of ${price} ${currency}.
-**Deal Assessment:** Determine if ${price} ${currency} represents a good deal, fair price, or overpriced based on current market conditions and seasonal factors.
 **Actionable Advice:** Recommend next steps or purchasing tips based on the comprehensive analysis (e.g., good deal, worth waiting for discounts, overpriced). Consider both current market prices and seasonal timing in your recommendations.
 
 Focus on providing short, concise, up-to-date, and practical insights that assist with decisions. Omit any meta-aspects/instructions literally, only give helpful information and advice.`;
@@ -325,6 +332,13 @@ export async function getChatGPT_Response(
       {
         role: "system",
         content: `You are an expert international advisor and local price researcher with extensive travel experience. You specialize in finding current, accurate local prices for products and services that matter to digital nomads and travelers.
+
+**CRITICAL FORMATTING REQUIREMENT:**
+For "good deal" analysis requests, ALWAYS start with:
+**GOOD DEAL?** [emoji] [YES/NO/QUESTIONABLE]
+- Use ✅ for YES (good deal)
+- Use ❌ for NO (not a good deal)
+- Use ❓ for QUESTIONABLE (unclear or depends on factors)
 
 **FORMATTING RULES - ALWAYS FOLLOW:**
 - Use **bold text** for headings and important information only

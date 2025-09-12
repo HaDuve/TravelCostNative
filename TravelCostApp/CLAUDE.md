@@ -42,6 +42,22 @@ git branch --show-current             # Current branch/task
 - ❌ Including path like `"tasks/m-task.md"`
 - ❌ Including `.md` file extension
 
+## Service Documentation
+
+### Recently Modified Services (2025-09-12)
+
+**Expense Management Service:**
+- **Files Modified:** `components/ManageExpense/ExpenseForm.tsx`, `screens/ManageExpense.tsx`
+- **Changes:** Enhanced state restoration logic, improved date handling, added TypeScript interfaces
+- **Impact:** Fixed expense category flow and template long press functionality
+- **Status:** Production ready
+
+**Navigation Service:**
+- **Files Modified:** `screens/CategoryPickScreen.tsx`
+- **Changes:** Improved parameter handling, enhanced TypeScript typing
+- **Impact:** Better state persistence during navigation transitions
+- **Status:** Production ready
+
 ## Using Specialized Agents
 
 You have specialized subagents for heavy lifting. Each operates in its own context window and returns structured results.

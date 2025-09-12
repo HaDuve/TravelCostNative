@@ -48,6 +48,10 @@ const GPTDealScreen = ({ route, navigation }) => {
       fontWeight: "300",
       lineHeight: dynamicScale(20, true),
     },
+    paragraph: {
+      marginBottom: dynamicScale(4, true),
+      color: GlobalStyles.colors.textColor,
+    },
     heading1: {
       fontSize: dynamicScale(18, false, 0.3),
       fontWeight: "bold",
@@ -196,7 +200,7 @@ const GPTDealScreen = ({ route, navigation }) => {
 
   const startStreaming = (content) => {
     console.log("startStreaming ~ content:", content);
-    // Split content into logical sections by double newlines or major headings
+    // Split content into chapters/sections by double newlines
     const sections = content.split(/\n\s*\n/).filter((section) => {
       const trimmed = section.trim();
       // Filter out empty sections, sections with only punctuation, or very short content
@@ -210,11 +214,13 @@ const GPTDealScreen = ({ route, navigation }) => {
 
     sections.forEach((section, index) => {
       setTimeout(() => {
-        setStreamingBubbles((prev) => [...prev, section.trim()]);
+        // Clean each section and preserve single line breaks within chapters
+        const cleanSection = section.trim();
+        setStreamingBubbles((prev) => [...prev, cleanSection]);
         if (index === sections.length - 1) {
           setIsStreaming(false);
         }
-      }, index * 2000); // 2 second delay between sections
+      }, index * 2000); // 2 second delay between chapters
     });
   };
 

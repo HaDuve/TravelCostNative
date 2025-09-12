@@ -235,11 +235,16 @@ Use these emojis (omit if unclear):
 - ❌ for NO (not a good deal)
 
 IF "${product}" is not recognized as a typical product or service:
--  Provide a brief, witty response commenting humorously on the unusual item.
+- Provide a brief, witty response commenting humorously on the unusual item.
 
 IF "${product}" is recognized:
 **Price Analysis:** Based on the current market data above, compare ${price} ${currency} to current local market prices for "${product}" in ${country}.
-**Seasonal Impact:** Explain how the current season in ${country} affects pricing for this type of product and whether this influences the value of ${price} ${currency}.
+\n\n
+
+**Seasonal Impact:** Explain how the current season in ${country} affects pricing for this type of product.
+\n Explain whether this influences the value of ${price} ${currency}.
+\n\n
+
 **Actionable Advice:** Recommend next steps or purchasing tips based on the comprehensive analysis (e.g., good deal, worth waiting for discounts, overpriced). Consider both current market prices and seasonal timing in your recommendations.
 
 Focus on providing short, concise, up-to-date, and practical insights that assist with decisions. Omit any meta-aspects/instructions literally, only give helpful information and advice.`;
@@ -265,11 +270,24 @@ async function chatGPTcontentPrice(
 
 **Current Market Pricing Data:** ${pricingInfo}
 
+**IMPORTANT FORMATTING REQUIREMENT:**
+Structure your response in exactly 2 chat bubbles:
+
+BUBBLE 1: Include **Current Pricing** and **Seasonal Impact** in the same bubble using single line breaks (\n) between sections.
+
+BUBBLE 2: Include **Actionable Advice** with recommendations and tips.
+
 IF "${product}" is not recognized as a typical product or service:
--  Provide a brief, witty response commenting humorously on the unusual item.
+- Provide a brief, witty response commenting humorously on the unusual item.
 
 IF "${product}" is recognized:
-**Seasonal Impact:** Explain how the current season in ${country} affects pricing for this type of product and whether this influences the price.
+**Current Pricing:** Based on the current market data above, provide specific price ranges and typical costs for "${product}" in ${country}.
+\n\n
+
+**Seasonal Impact:** Explain how the current season in ${country} affects pricing for this type of product.
+\n Explain whether this influences the price.
+\n\n
+
 **Actionable Advice:** Recommend next steps or purchasing tips based on the comprehensive analysis (e.g., good deal, worth waiting for discounts, overpriced). Consider both current market prices and seasonal timing in your recommendations.
 
 Focus on providing short, concise, up-to-date, and practical insights that assist with decisions. Omit any meta-aspects/instructions literally, only give helpful information and advice.`;
@@ -331,13 +349,19 @@ export async function getChatGPT_Response(
         content: `You are an expert international advisor and local price researcher with extensive travel experience. You specialize in finding current, accurate local prices for products and services that matter to digital nomads and travelers.
 
 **FORMATTING RULES - ALWAYS FOLLOW:**
-- Use **bold text** for headings and important information only
-- Write in clear, simple paragraphs
+- Use **bold text** for headings and important information and the first few words of each paragraph ONLY
+- Structure your response in 2-3 clear chapters/sections maximum
+- Use single line breaks (\n) for paragraphs within the same chapter/section
+- Use double line breaks (\n\n) to separate different chapters/sections
+- Each chapter should be a complete, substantial thought that works well as a separate chat bubble
 - Avoid lists, bullet points, numbered lists, or complex formatting
 - Keep each response concise and easy to read
+- Use Currency Symbol for the currency
+- Round prices where it makes sense to do so
+- Format content to work well with chat bubble streaming
 
 **TRAVELER FOCUS:**
-Include relevant information for remote workers and travelers such as coworking space availability and costs, internet speeds and reliability, visa costs and requirements, best areas for travelers to stay, local SIM card prices, transportation costs, safety considerations, and cultural tips.
+Assume the user is a traveller. Include relevant information for remote workers and travelers such as coworking space availability and costs, internet speeds and reliability, visa costs and requirements, best areas for travelers to stay, local SIM card prices, transportation costs, safety considerations, and cultural tips.
 
 **SEASONAL ANALYSIS:**
 Always consider seasonal factors when analyzing prices. Think about whether the current time of year represents peak season, off-season, or shoulder season for the location, and how this typically affects pricing for different types of products and services.

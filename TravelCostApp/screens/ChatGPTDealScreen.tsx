@@ -124,6 +124,9 @@ const GPTDealScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     async function getGPT_Response() {
+      if (answer !== "- no answer yet -") {
+        return;
+      }
       setIsFetching(true);
       if (!price || price === "" || isNaN(Number(price))) {
         // console.log("GPTDealScreen ~no price:", price);
@@ -185,7 +188,7 @@ const GPTDealScreen = ({ route, navigation }) => {
       return;
     }
     getGPT_Response();
-  }, [country, currency, price, product]);
+  }, [country, currency, price, product, answer]);
 
   const startStreaming = (content) => {
     console.log("startStreaming ~ content:", content);
@@ -214,6 +217,9 @@ const GPTDealScreen = ({ route, navigation }) => {
   async function handleRegenerate() {
     // regenerate getGoodDeal and set new answer
     setIsFetching(true);
+    setAnswer("- no answer yet -");
+    setStreamingBubbles([]);
+    setIsStreaming(true);
     try {
       const goodDeal: GPT_getGoodDeal = {
         requestType: GPT_RequestType.getGoodDeal,

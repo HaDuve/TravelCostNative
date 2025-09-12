@@ -20,6 +20,144 @@ import axios from "axios";
 import { Keys, loadKeys } from "../components/Premium/PremiumConstants";
 import safeLogError from "./error";
 
+// Function to get current date in a readable format
+function getCurrentDateString(): string {
+  const now = new Date();
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+  };
+  return now.toLocaleDateString("en-US", options);
+}
+
+// Function to perform web search with current date using responses API
+async function performWebSearch(query: string): Promise<string> {
+  try {
+    const { OPENAI }: Keys = await loadKeys();
+    const currentDate = getCurrentDateString();
+    const searchQuery = `${query} as of ${currentDate}`;
+
+    const response = await axios.post(
+      "https://api.openai.com/v1/responses",
+      {
+        model: "gpt-4.1",
+        input: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "input_text",
+                text: `Search for current information: ${searchQuery}`,
+              },
+            ],
+          },
+        ],
+        tools: [
+          {
+            type: "web_search",
+          },
+        ],
+        include: ["web_search_call.action.sources"],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${OPENAI}`,
+          "Content-Type": "application/json",
+        },
+        timeout: 30000,
+      }
+    );
+    console.log("Web search response:", JSON.stringify(response.data, null, 2));
+
+    // Parse the response structure - look for the message content
+    if (response.data.output && response.data.output.length > 0) {
+      console.log(
+        "Found output array with length:",
+        response.data.output.length
+      );
+
+      const messageOutput = response.data.output.find(
+        (item: any) => item.type === "message"
+      );
+      if (messageOutput) {
+        console.log("Found message output:", messageOutput);
+
+        if (messageOutput.content && messageOutput.content.length > 0) {
+          console.log(
+            "Found content array with length:",
+            messageOutput.content.length
+          );
+
+          const textContent = messageOutput.content.find(
+            (content: any) => content.type === "output_text"
+          );
+          if (textContent) {
+            console.log("Found output_text content:", textContent.text);
+            return textContent.text || "Web search completed but no text found";
+          } else {
+            console.log("No output_text content found in message content");
+            console.log(
+              "Available content types:",
+              messageOutput.content.map((c: any) => c.type)
+            );
+          }
+        } else {
+          console.log("No content found in message output");
+        }
+      } else {
+        console.log("No message output found in response");
+      }
+    } else {
+      console.log("No output array found in response");
+    }
+
+    return "Web search unavailable - check logs for details";
+  } catch (error) {
+    safeLogError(error);
+    return "Web search failed";
+  }
+}
+
+// Function to perform parallel web searches for comprehensive data
+async function performComprehensiveWebSearch(
+  product: string,
+  country: string,
+  currency: string
+): Promise<{ seasonalInfo: string; pricingInfo: string }> {
+  const currentDate = getCurrentDateString();
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().toLocaleDateString("en-US", {
+    month: "long",
+  });
+
+  // Create parallel search queries
+  const seasonalQuery = `current season tourism peak off-season shoulder season ${country} ${currentMonth} ${currentYear}`;
+  const pricingQuery = `current price cost ${product} ${country} ${currency} ${currentMonth} ${currentYear} local market`;
+
+  console.log("Performing parallel web searches...");
+  console.log("Seasonal query:", seasonalQuery);
+  console.log("Pricing query:", pricingQuery);
+
+  try {
+    // Execute both searches in parallel
+    const [seasonalInfo, pricingInfo] = await Promise.all([
+      performWebSearch(seasonalQuery),
+      performWebSearch(pricingQuery),
+    ]);
+
+    return {
+      seasonalInfo: seasonalInfo || "Seasonal information unavailable",
+      pricingInfo: pricingInfo || "Pricing information unavailable",
+    };
+  } catch (error) {
+    safeLogError(error);
+    return {
+      seasonalInfo: "Seasonal search failed",
+      pricingInfo: "Pricing search failed",
+    };
+  }
+}
+
 export enum GPT_RequestType {
   "getGoodDeal",
   "getKeywords",
@@ -61,59 +199,73 @@ function chatGPTcontentKeywords(customCategory: string) {
   );
 }
 
-function chatGPTcontentGoodDealPost(
+async function chatGPTcontentGoodDealPost(
   product: string,
   price: string,
   currency: string,
   country: string
-) {
-  return `Analyze this local price as of today: Is ${price} ${currency} a good deal for the product "${product}" in ${country}?
+): Promise<string> {
+  const currentDate = getCurrentDateString();
+  const { seasonalInfo, pricingInfo } = await performComprehensiveWebSearch(
+    product,
+    country,
+    currency
+  );
+
+  return `Analyze this local price: Is ${price} ${currency} a good deal for the product "${product}" in ${country}?
+
+**Current Seasonal Context:** ${seasonalInfo}
+
+**Current Market Pricing Data:** ${pricingInfo}
 
 IF "${product}" is not recognized as a typical product or service:
 - Return a brief, witty response commenting humorously on the unusual item.
 
 IF "${product}" is recognized:
-**Current Local Pricing:** Provide the average price range for "${product}" in ${country} (in ${currency}).
-**Price Comparison:** Compare ${price} ${currency} to prices from local vendors, popular online stores, and other regional markets.
-**Price Assessment:** Evaluate whether ${price} ${currency} is reasonable within the current local market context.
-**Budget Range:** Suggest a budget guide including typical spending from economical to premium options locally.
-**Price Influencing Factors:** Describe main factors affecting local price variations, including seasonality, regional differences, and market conditions.
-**Actionable Advice:** Recommend next steps or purchasing tips based on the price assessment (e.g., good deal, worth waiting for discounts, overpriced).
+**Price Analysis:** Based on the current market data above, compare ${price} ${currency} to current local market prices for "${product}" in ${country}.
+**Seasonal Impact:** Explain how the current season in ${country} affects pricing for this type of product and whether this influences the value of ${price} ${currency}.
+**Deal Assessment:** Determine if ${price} ${currency} represents a good deal, fair price, or overpriced based on current market conditions and seasonal factors.
+**Actionable Advice:** Recommend next steps or purchasing tips based on the comprehensive analysis (e.g., good deal, worth waiting for discounts, overpriced). Consider both current market prices and seasonal timing in your recommendations.
 
-Focus on providing concise, up-to-date, and practical insights that assist with informed purchasing decisions.`;
+Focus on providing short, concise, up-to-date, and practical insights that assist with decisions. Omit any meta-aspects/instructions literally, only give helpful information and advice.`;
 }
 
-function chatGPTcontentPrice(
+async function chatGPTcontentPrice(
   product: string,
   country: string,
   currency: string
-) {
-  return `Provide current local pricing information for "${product}" in ${country}.
+): Promise<string> {
+  const currentDate = getCurrentDateString();
+  const { seasonalInfo, pricingInfo } = await performComprehensiveWebSearch(
+    product,
+    country,
+    currency
+  );
+
+  return `Provide current local pricing information for "${product}" in ${country} as of ${currentDate}.
+
+**Current Seasonal Context:** ${seasonalInfo}
+
+**Current Market Pricing Data:** ${pricingInfo}
 
 IF "${product}" is not a recognizable product/service => Return a brief, humorous response about the unusual item.
 
 IF "${product}" is a recognizable product/service => Provide:
 
-**Current Local Pricing**: Average price range for "${product}" in ${country} (in ${currency})
+**Comprehensive Price Analysis**: Based on the current market data above, provide detailed pricing information for "${product}" in ${country} (in ${currency}).
 
-**Price Comparisons**: How local prices compare between different vendors, regions within ${country}, and online prices
+**Seasonal Impact on Pricing**: Explain how the current season in ${country} affects pricing for this type of product and what this means for buyers.
 
-**Recent Deals & Discounts**: Current promotions, seasonal sales, or special offers available locally
-
-**Price Assessment**: Whether current prices are reasonable within the local market context
-
-**Budget Range**: Expected spending range for this item locally (budget to premium options)
-
-**Price Influencing Factors**: What affects local price variations (seasonality, regional differences, local market conditions)
+**Market Comparison**: Compare current local prices between different vendors, regions within ${country}, and online platforms based on the real-time data.
 
 Focus on current, accurate pricing information that helps with local purchasing decisions.`;
 }
 
-function getGPT_Content(requestBody: GPT_RequestBody) {
+async function getGPT_Content(requestBody: GPT_RequestBody): Promise<string> {
   switch (requestBody.requestType) {
     case GPT_RequestType.getGoodDeal:
       // console.log("requestType:", GPT_RequestType.getGoodDeal);
-      return chatGPTcontentGoodDealPost(
+      return await chatGPTcontentGoodDealPost(
         (requestBody as GPT_getGoodDeal).product,
         (requestBody as GPT_getGoodDeal).price,
         (requestBody as GPT_getGoodDeal).currency,
@@ -126,7 +278,7 @@ function getGPT_Content(requestBody: GPT_RequestBody) {
       );
     case GPT_RequestType.getPrice:
       // console.log("requestType:", GPT_RequestType.getPrice);
-      return chatGPTcontentPrice(
+      return await chatGPTcontentPrice(
         (requestBody as GPT_getPrice).product,
         (requestBody as GPT_getPrice).country,
         (requestBody as GPT_getPrice).currency
@@ -136,6 +288,8 @@ function getGPT_Content(requestBody: GPT_RequestBody) {
 
 export async function getChatGPT_Response(requestBody: GPT_RequestBody) {
   const { OPENAI }: Keys = await loadKeys();
+
+  const userContent = await getGPT_Content(requestBody);
 
   const payload = {
     model: "gpt-4o-mini",
@@ -153,11 +307,14 @@ export async function getChatGPT_Response(requestBody: GPT_RequestBody) {
 **TRAVELER FOCUS:**
 Include relevant information for remote workers and travelers such as coworking space availability and costs, internet speeds and reliability, visa costs and requirements, best areas for travelers to stay, local SIM card prices, transportation costs, safety considerations, and cultural tips.
 
+**SEASONAL ANALYSIS:**
+Always consider seasonal factors when analyzing prices. Think about whether the current time of year represents peak season, off-season, or shoulder season for the location, and how this typically affects pricing for different types of products and services.
+
 Answer in ${languageName}. Focus on providing specific, actionable price information and local market insights. Don't answer the meta-aspects/instructions literally, only give helpful information and advice.`,
       },
       {
         role: "user",
-        content: getGPT_Content(requestBody),
+        content: userContent,
       },
     ],
     temperature: 0.3,

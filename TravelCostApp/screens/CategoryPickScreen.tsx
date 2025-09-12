@@ -127,7 +127,10 @@ const CategoryPickScreen = ({ route, navigation }) => {
         expenseId: editedExpenseId,
         tempValues: tempValues,
       };
-      console.log("🏷️ CategoryPick: Navigating to ManageExpense with params:", navigationParams);
+      console.log(
+        "🏷️ CategoryPick: Navigating to ManageExpense with params:",
+        navigationParams
+      );
       navigation.navigate("ManageExpense", navigationParams);
     }
     setIsFetching(false);

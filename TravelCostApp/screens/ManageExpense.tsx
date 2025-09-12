@@ -24,7 +24,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -230,7 +233,10 @@ const ManageExpense = ({ route, navigation }) => {
   }
 
   const createSingleData = async (expenseData: ExpenseData) => {
-    console.log("💾 createSingleData: Creating single expense with data:", expenseData);
+    console.log(
+      "💾 createSingleData: Creating single expense with data:",
+      expenseData
+    );
     // hotfix the date clock bug
     expenseData.date = expenseData.startDate;
     expenseData.editedTimestamp = Date.now();
@@ -246,9 +252,15 @@ const ManageExpense = ({ route, navigation }) => {
     const id = await storeExpenseOnlineOffline(item, isOnline);
     console.log("💾 createSingleData: Generated ID:", id);
     const expenseToAdd = { ...expenseData, id: id ?? "" };
-    console.log("💾 createSingleData: Adding expense to context:", expenseToAdd);
+    console.log(
+      "💾 createSingleData: Adding expense to context:",
+      expenseToAdd
+    );
     expenseCtx.addExpense(expenseToAdd);
-    console.log("💾 createSingleData: Current expenses count after add:", expenseCtx.expenses.length);
+    console.log(
+      "💾 createSingleData: Current expenses count after add:",
+      expenseCtx.expenses.length
+    );
   };
 
   const createRangedData = async (expenseData) => {
@@ -453,7 +465,10 @@ const ManageExpense = ({ route, navigation }) => {
   };
 
   async function confirmHandler(expenseData: ExpenseData) {
-    console.log("💾 ManageExpense: confirmHandler called with expenseData:", expenseData);
+    console.log(
+      "💾 ManageExpense: confirmHandler called with expenseData:",
+      expenseData
+    );
     console.log("💾 Is editing:", isEditing);
     console.log("💾 Is online:", isOnline);
     // setIsSubmitting(true);

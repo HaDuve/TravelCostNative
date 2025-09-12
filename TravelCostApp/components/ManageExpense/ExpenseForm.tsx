@@ -355,7 +355,10 @@ const ExpenseForm = ({
   // Restore form state when returning from CategoryPick with tempValues
   useEffect(() => {
     if (tempValues && !isEditing) {
-      console.log("🔄 ExpenseForm: Restoring state from tempValues:", tempValues);
+      console.log(
+        "🔄 ExpenseForm: Restoring state from tempValues:",
+        tempValues
+      );
       // Restore form inputs from tempValues
       setInputs({
         amount: {
@@ -363,7 +366,7 @@ const ExpenseForm = ({
           isValid: true,
         },
         date: {
-          value: tempValues.date
+          value: tempValues.date && tempValues.date !== ""
             ? getFormattedDate(tempValues.date)
             : getFormattedDate(DateTime.now().toJSDate()),
           isValid: true,
@@ -391,10 +394,10 @@ const ExpenseForm = ({
       });
 
       // Restore other form state
-      if (tempValues.startDate) {
+      if (tempValues.startDate && tempValues.startDate !== "") {
         setStartDate(getFormattedDate(tempValues.startDate));
       }
-      if (tempValues.endDate) {
+      if (tempValues.endDate && tempValues.endDate !== "") {
         setEndDate(getFormattedDate(tempValues.endDate));
       }
       if (tempValues.splitList) {
@@ -791,9 +794,16 @@ const ExpenseForm = ({
   async function submitHandler() {
     console.log("📝 ExpenseForm: submitHandler called");
     console.log("📝 Form inputs state:", inputs);
-    console.log("📝 Additional state - whoPaid:", whoPaid, "splitType:", splitType, "splitList:", splitList);
+    console.log(
+      "📝 Additional state - whoPaid:",
+      whoPaid,
+      "splitType:",
+      splitType,
+      "splitList:",
+      splitList
+    );
     console.log("📝 Picked category:", pickedCat, "newCat:", newCat);
-    
+
     const expenseData = {
       uid: authCtx.uid,
       amount: +amountValue,
@@ -814,7 +824,7 @@ const ExpenseForm = ({
       isSpecialExpense: isSpecialExpense,
       alreadyDividedAmountByDays: alreadyDividedAmountByDays,
     };
-    
+
     console.log("📝 Constructed expenseData:", expenseData);
 
     // SoloTravellers always pay for themselves
@@ -870,7 +880,7 @@ const ExpenseForm = ({
         countryIsValid,
         currencyIsValid,
         whoPaidIsValid,
-        splitListValid
+        splitListValid,
       });
       setInputs((curInputs) => {
         return {
@@ -1204,8 +1214,8 @@ const ExpenseForm = ({
     uid: authCtx.uid,
     amount: +amountValue,
     date: inputs.date.value,
-    startDate: startDate,
-    endDate: endDate,
+    startDate: startDate || new Date().toISOString(),
+    endDate: endDate || new Date().toISOString(),
     description: inputs.description.value,
     category: newCat ? pickedCat : inputs.category.value,
     country: inputs.country.value,
@@ -1317,14 +1327,20 @@ const ExpenseForm = ({
                 color={GlobalStyles.colors.primary500}
                 size={dynamicScale(48, false, 0.4)}
                 onPress={() => {
-                  console.log("🏷️ ExpenseForm: Category icon pressed, current tempValues:", tempValues);
+                  console.log(
+                    "🏷️ ExpenseForm: Category icon pressed, current tempValues:",
+                    tempValues
+                  );
                   console.log("🏷️ ExpenseForm: Current form state:", inputs);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   const navParams = {
                     editedExpenseId: editedExpenseId,
                     tempValues: tempValues,
                   };
-                  console.log("🏷️ ExpenseForm: Navigating to CategoryPick with params:", navParams);
+                  console.log(
+                    "🏷️ ExpenseForm: Navigating to CategoryPick with params:",
+                    navParams
+                  );
                   navigation.navigate("CategoryPick", navParams);
                 }}
               />

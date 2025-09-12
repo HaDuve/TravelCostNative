@@ -366,9 +366,10 @@ const ExpenseForm = ({
           isValid: true,
         },
         date: {
-          value: tempValues.date && tempValues.date !== ""
-            ? getFormattedDate(tempValues.date)
-            : getFormattedDate(DateTime.now().toJSDate()),
+          value:
+            tempValues.date && tempValues.date !== ""
+              ? getFormattedDate(tempValues.date)
+              : getFormattedDate(DateTime.now().toJSDate()),
           isValid: true,
         },
         description: {
@@ -396,9 +397,13 @@ const ExpenseForm = ({
       // Restore other form state
       if (tempValues.startDate && tempValues.startDate !== "") {
         setStartDate(getFormattedDate(tempValues.startDate));
+      } else {
+        setStartDate(getFormattedDate(DateTime.now().toJSDate()));
       }
       if (tempValues.endDate && tempValues.endDate !== "") {
         setEndDate(getFormattedDate(tempValues.endDate));
+      } else {
+        setEndDate(getFormattedDate(DateTime.now().toJSDate()));
       }
       if (tempValues.splitList) {
         setSplitList(tempValues.splitList);
@@ -808,8 +813,8 @@ const ExpenseForm = ({
       uid: authCtx.uid,
       amount: +amountValue,
       date: DateTime.fromISO(inputs.date.value).toJSDate(),
-      startDate: DateTime.fromISO(startDate).toJSDate(),
-      endDate: DateTime.fromISO(endDate).toJSDate(),
+      startDate: startDate && startDate !== "" ? DateTime.fromISO(startDate).toJSDate() : DateTime.now().toJSDate(),
+      endDate: endDate && endDate !== "" ? DateTime.fromISO(endDate).toJSDate() : DateTime.now().toJSDate(),
       description: inputs.description.value,
       category: newCat ? pickedCat : inputs.category.value,
       country: inputs.country.value,

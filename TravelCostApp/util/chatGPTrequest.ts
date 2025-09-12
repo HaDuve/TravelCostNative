@@ -122,7 +122,8 @@ async function performWebSearch(query: string): Promise<string> {
 async function performComprehensiveWebSearch(
   product: string,
   country: string,
-  currency: string
+  currency: string,
+  onLoadingPhaseChange?: (phase: string) => void
 ): Promise<{ seasonalInfo: string; pricingInfo: string }> {
   const currentDate = getCurrentDateString();
   const currentYear = new Date().getFullYear();
@@ -144,6 +145,11 @@ async function performComprehensiveWebSearch(
       performWebSearch(seasonalQuery),
       performWebSearch(pricingQuery),
     ]);
+
+    // Web search is complete, notify that we're now analyzing
+    if (onLoadingPhaseChange) {
+      onLoadingPhaseChange("analyzing");
+    }
 
     return {
       seasonalInfo: seasonalInfo || "Seasonal information unavailable",
@@ -203,13 +209,15 @@ async function chatGPTcontentGoodDealPost(
   product: string,
   price: string,
   currency: string,
-  country: string
+  country: string,
+  onLoadingPhaseChange?: (phase: string) => void
 ): Promise<string> {
   const currentDate = getCurrentDateString();
   const { seasonalInfo, pricingInfo } = await performComprehensiveWebSearch(
     product,
     country,
-    currency
+    currency,
+    onLoadingPhaseChange
   );
 
   return `Analyze this local price: Is ${price} ${currency} a good deal for the product "${product}" in ${country}?
@@ -233,13 +241,15 @@ Focus on providing short, concise, up-to-date, and practical insights that assis
 async function chatGPTcontentPrice(
   product: string,
   country: string,
-  currency: string
+  currency: string,
+  onLoadingPhaseChange?: (phase: string) => void
 ): Promise<string> {
   const currentDate = getCurrentDateString();
   const { seasonalInfo, pricingInfo } = await performComprehensiveWebSearch(
     product,
     country,
-    currency
+    currency,
+    onLoadingPhaseChange
   );
 
   return `Provide current local pricing information for "${product}" in ${country} as of ${currentDate}.
@@ -261,7 +271,10 @@ IF "${product}" is a recognizable product/service => Provide:
 Focus on current, accurate pricing information that helps with local purchasing decisions.`;
 }
 
-async function getGPT_Content(requestBody: GPT_RequestBody): Promise<string> {
+async function getGPT_Content(
+  requestBody: GPT_RequestBody,
+  onLoadingPhaseChange?: (phase: string) => void
+): Promise<string> {
   switch (requestBody.requestType) {
     case GPT_RequestType.getGoodDeal:
       // console.log("requestType:", GPT_RequestType.getGoodDeal);
@@ -269,7 +282,8 @@ async function getGPT_Content(requestBody: GPT_RequestBody): Promise<string> {
         (requestBody as GPT_getGoodDeal).product,
         (requestBody as GPT_getGoodDeal).price,
         (requestBody as GPT_getGoodDeal).currency,
-        (requestBody as GPT_getGoodDeal).country
+        (requestBody as GPT_getGoodDeal).country,
+        onLoadingPhaseChange
       );
     case GPT_RequestType.getKeywords:
       // console.log("requestType:", GPT_RequestType.getKeywords);
@@ -281,15 +295,29 @@ async function getGPT_Content(requestBody: GPT_RequestBody): Promise<string> {
       return await chatGPTcontentPrice(
         (requestBody as GPT_getPrice).product,
         (requestBody as GPT_getPrice).country,
-        (requestBody as GPT_getPrice).currency
+        (requestBody as GPT_getPrice).currency,
+        onLoadingPhaseChange
       );
   }
 }
 
-export async function getChatGPT_Response(requestBody: GPT_RequestBody) {
+export async function getChatGPT_Response(
+  requestBody: GPT_RequestBody,
+  onLoadingPhaseChange?: (phase: string) => void
+) {
   const { OPENAI }: Keys = await loadKeys();
 
-  const userContent = await getGPT_Content(requestBody);
+  // Set loading phase to searching when web search starts
+  if (onLoadingPhaseChange) {
+    onLoadingPhaseChange("searching");
+  }
+
+  const userContent = await getGPT_Content(requestBody, onLoadingPhaseChange);
+
+  // Set loading phase to analyzing when web search is done and GPT analysis starts
+  if (onLoadingPhaseChange) {
+    onLoadingPhaseChange("analyzing");
+  }
 
   const payload = {
     model: "gpt-4o-mini",

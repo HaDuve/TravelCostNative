@@ -119,6 +119,7 @@ const GPTDealScreen = ({ route, navigation }) => {
   const [streamingBubbles, setStreamingBubbles] = React.useState([]);
   const [currentStreamIndex, setCurrentStreamIndex] = React.useState(0);
   const [isStreaming, setIsStreaming] = React.useState(false);
+  const [loadingPhase, setLoadingPhase] = React.useState("searching");
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;
 
@@ -128,6 +129,7 @@ const GPTDealScreen = ({ route, navigation }) => {
         return;
       }
       setIsFetching(true);
+
       if (!price || price === "" || isNaN(Number(price))) {
         // console.log("GPTDealScreen ~no price:", price);
         try {
@@ -137,7 +139,8 @@ const GPTDealScreen = ({ route, navigation }) => {
             currency: currency,
             country: country,
           };
-          const response = await getChatGPT_Response(getPrice);
+
+          const response = await getChatGPT_Response(getPrice, setLoadingPhase);
           if (response) {
             setAnswer(response.content);
             startStreaming(response.content);
@@ -162,7 +165,8 @@ const GPTDealScreen = ({ route, navigation }) => {
           currency: currency,
           country: country,
         };
-        const response = await getChatGPT_Response(goodDeal);
+
+        const response = await getChatGPT_Response(goodDeal, setLoadingPhase);
         if (response && response.content) {
           setAnswer(response.content);
           startStreaming(response.content);
@@ -228,7 +232,8 @@ const GPTDealScreen = ({ route, navigation }) => {
         currency: currency,
         country: country,
       };
-      const response = await getChatGPT_Response(goodDeal);
+
+      const response = await getChatGPT_Response(goodDeal, setLoadingPhase);
       if (response) {
         setAnswer(response.content);
         startStreaming(response.content);
@@ -311,7 +316,13 @@ const GPTDealScreen = ({ route, navigation }) => {
                   style={styles.aiAvatar}
                 />
                 <View style={[styles.typingBubble, GlobalStyles.strongShadow]}>
-                  <Text style={styles.typingText}>●●●</Text>
+                  <Text style={styles.typingText}>
+                    {loadingPhase === "searching"
+                      ? "Searching through current local prices in the web..."
+                      : loadingPhase === "analyzing"
+                      ? "Analyzing the current price data..."
+                      : "●●●"}
+                  </Text>
                 </View>
               </View>
             )}

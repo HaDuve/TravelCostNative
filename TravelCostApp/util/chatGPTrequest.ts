@@ -67,21 +67,20 @@ function chatGPTcontentGoodDealPost(
   currency: string,
   country: string
 ) {
-  return `Analyze this local price: Is ${price} ${currency} a good deal for "${product}" in ${country}?
+  return `Analyze this local price as of today: Is ${price} ${currency} a good deal for the product "${product}" in ${country}?
 
-IF "${product}" is not a recognizable product/service => Return a brief, humorous response about the unusual item.
+IF "${product}" is not recognized as a typical product or service:
+- Return a brief, witty response commenting humorously on the unusual item.
 
-IF "${product}" is a recognizable product/service => Provide:
+IF "${product}" is recognized:
+**Current Local Pricing:** Provide the average price range for "${product}" in ${country} (in ${currency}).
+**Price Comparison:** Compare ${price} ${currency} to prices from local vendors, popular online stores, and other regional markets.
+**Price Assessment:** Evaluate whether ${price} ${currency} is reasonable within the current local market context.
+**Budget Range:** Suggest a budget guide including typical spending from economical to premium options locally.
+**Price Influencing Factors:** Describe main factors affecting local price variations, including seasonality, regional differences, and market conditions.
+**Actionable Advice:** Recommend next steps or purchasing tips based on the price assessment (e.g., good deal, worth waiting for discounts, overpriced).
 
-**Price Assessment**: Is ${price} ${currency} above/below/at market rate?
-
-**Current Local Range**: Typical price range in ${country} (be specific)
-
-**Local Context**: Factors affecting price in ${country} (seasonality, regional differences, local market conditions)
-
-**Shopping Tips**: Where to find better deals or what to look for when buying
-
-Focus on current, actionable local market insights.`;
+Focus on providing concise, up-to-date, and practical insights that assist with informed purchasing decisions.`;
 }
 
 function chatGPTcontentPrice(
@@ -89,23 +88,25 @@ function chatGPTcontentPrice(
   country: string,
   currency: string
 ) {
-  return `Find current local prices for "${product}" in ${country}.
+  return `Provide current local pricing information for "${product}" in ${country}.
 
 IF "${product}" is not a recognizable product/service => Return a brief, humorous response about the unusual item.
 
 IF "${product}" is a recognizable product/service => Provide:
 
-**Current Price Range**: Typical cost range in ${currency} for ${country}
+**Current Local Pricing**: Average price range for "${product}" in ${country} (in ${currency})
 
-**Price Breakdown**: Budget vs mid-range vs premium options if applicable
+**Price Comparisons**: How local prices compare between different vendors, regions within ${country}, and online prices
 
-**Local Market Insights**: Regional price variations, seasonal factors, local suppliers
+**Recent Deals & Discounts**: Current promotions, seasonal sales, or special offers available locally
 
-**Purchase Recommendations**: Best places to buy, timing considerations, negotiation tips
+**Price Assessment**: Whether current prices are reasonable within the local market context
 
-**Local Facts**: Interesting context about ${product} availability or culture in ${country}
+**Budget Range**: Expected spending range for this item locally (budget to premium options)
 
-Focus on current, accurate pricing that helps with local purchasing decisions.`;
+**Price Influencing Factors**: What affects local price variations (seasonality, regional differences, local market conditions)
+
+Focus on current, accurate pricing information that helps with local purchasing decisions.`;
 }
 
 function getGPT_Content(requestBody: GPT_RequestBody) {

@@ -422,7 +422,7 @@ const ExpenseForm = ({
     if (tempValues.isSpecialExpense !== undefined) {
       setIsSpecialExpense(tempValues.isSpecialExpense);
     }
-    
+
     // Update picker values to reflect restored state
     if (tempValues.currency) {
       setCurrencyPickerValue(tempValues.currency);
@@ -795,7 +795,9 @@ const ExpenseForm = ({
   const createSafeDate = (dateValue: string): Date => {
     if (dateValue && dateValue !== "") {
       const parsedDate = DateTime.fromISO(dateValue);
-      return parsedDate.isValid ? parsedDate.toJSDate() : DateTime.now().toJSDate();
+      return parsedDate.isValid
+        ? parsedDate.toJSDate()
+        : DateTime.now().toJSDate();
     }
     return DateTime.now().toJSDate();
   };
@@ -822,7 +824,7 @@ const ExpenseForm = ({
       alreadyDividedAmountByDays: alreadyDividedAmountByDays,
     };
 
-      // SoloTravellers always pay for themselves
+    // SoloTravellers always pay for themselves
     if (IsSoloTraveller || expenseData.whoPaid === null)
       expenseData.whoPaid = userCtx.userName;
     // If left completely empty, set to  placeholder

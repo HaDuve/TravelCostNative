@@ -67,7 +67,8 @@ interface ManageExpenseProps {
 }
 
 const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
-  const { pickedCat, tempValues, newCat, iconName, dateISO } = route.params || {};
+  const { pickedCat, tempValues, newCat, iconName, dateISO } =
+    route.params || {};
   const [isSubmitting, setIsSubmitting] = useState(false);
   const expenseCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);

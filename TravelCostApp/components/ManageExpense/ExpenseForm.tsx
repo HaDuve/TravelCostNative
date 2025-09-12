@@ -352,6 +352,80 @@ const ExpenseForm = ({
     }
   }, [dateISO]);
 
+  // Restore form state when returning from CategoryPick with tempValues
+  useEffect(() => {
+    if (tempValues && !isEditing) {
+      // Restore form inputs from tempValues
+      setInputs({
+        amount: {
+          value: tempValues.amount?.toString() || "",
+          isValid: true,
+        },
+        date: {
+          value: tempValues.date ? getFormattedDate(tempValues.date) : getFormattedDate(DateTime.now().toJSDate()),
+          isValid: true,
+        },
+        description: {
+          value: tempValues.description || "",
+          isValid: true,
+        },
+        category: {
+          value: tempValues.category || "",
+          isValid: true,
+        },
+        country: {
+          value: tempValues.country || "",
+          isValid: true,
+        },
+        currency: {
+          value: tempValues.currency || tripCtx.tripCurrency,
+          isValid: true,
+        },
+        whoPaid: {
+          value: tempValues.whoPaid || "",
+          isValid: true,
+        },
+      });
+
+      // Restore other form state
+      if (tempValues.startDate) {
+        setStartDate(getFormattedDate(tempValues.startDate));
+      }
+      if (tempValues.endDate) {
+        setEndDate(getFormattedDate(tempValues.endDate));
+      }
+      if (tempValues.splitList) {
+        setSplitList(tempValues.splitList);
+      }
+      if (tempValues.splitType) {
+        setSplitType(tempValues.splitType);
+      }
+      if (tempValues.listEQUAL) {
+        setListEQUAL(tempValues.listEQUAL);
+      }
+      if (tempValues.duplOrSplit !== undefined) {
+        setDuplOrSplit(tempValues.duplOrSplit);
+      }
+      if (tempValues.whoPaid) {
+        setWhoPaid(tempValues.whoPaid);
+      }
+      if (tempValues.isPaid !== undefined) {
+        setIsPaid(tempValues.isPaid);
+      }
+      if (tempValues.isSpecialExpense !== undefined) {
+        setIsSpecialExpense(tempValues.isSpecialExpense);
+      }
+      
+      // Update picker values to reflect restored state
+      if (tempValues.currency) {
+        setCurrencyPickerValue(tempValues.currency);
+      }
+      if (tempValues.country) {
+        setCountryPickerValue(tempValues.country);
+      }
+    }
+  }, [tempValues, isEditing, tripCtx.tripCurrency]);
+
   // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
   const [duplOrSplit, setDuplOrSplit] = useState<DuplicateOption>(
     editingValues ? Number(editingValues.duplOrSplit) : DuplicateOption.null

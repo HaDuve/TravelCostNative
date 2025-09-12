@@ -200,6 +200,7 @@ const CategoryPickScreen = ({ route, navigation }) => {
                   onPress={() => {
                     navigation.navigate("ManageExpense", {
                       pickedCat: "undefined",
+                      tempValues: tempValues,
                     });
                   }}
                 >

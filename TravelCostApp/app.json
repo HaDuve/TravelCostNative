@@ -21,14 +21,14 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.budgetfornomads.app",
-      "buildNumber": "1.0.1200",
+      "buildNumber": "1.0.1203",
       "infoPlist": {
         "UIBackgroundModes": ["remote-notification"],
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.budgetfornomad.app",
+      "package": "com.budgetfornomads.app",
       "versionCode": 101117,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon2.png",

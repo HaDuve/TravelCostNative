@@ -5,7 +5,10 @@ import {
   ScrollView,
   Alert,
   Platform,
+  ViewStyle,
 } from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
+import Markdown, { MarkdownProps } from "react-native-markdown-display";
 import React, { useContext, useEffect } from "react";
 import PropTypes from "prop-types";
 import FlatButton from "../components/UI/FlatButton";
@@ -14,7 +17,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -24,12 +30,10 @@ import {
   GPT_getGoodDeal,
   GPT_getPrice,
 } from "../util/chatGPTrequest";
-import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { GlobalStyles } from "../constants/styles";
 import { Image } from "react-native";
 import InfoButton from "../components/UI/InfoButton";
 import GradientButton from "../components/UI/GradientButton";
-import BlurPremium from "../components/Premium/BlurPremium";
 import { dynamicScale } from "../util/scalingUtil";
 import { NetworkContext } from "../store/network-context";
 import Toast from "react-native-toast-message";
@@ -37,9 +41,84 @@ import Toast from "react-native-toast-message";
 const GPTDealScreen = ({ route, navigation }) => {
   const { price, currency, country, product } = route.params;
 
+  const markdownStyles: MarkdownProps["style"] = {
+    body: {
+      color: GlobalStyles.colors.textColor,
+      fontSize: dynamicScale(14, false, 0.3),
+      fontWeight: "300",
+      lineHeight: dynamicScale(20, true),
+    },
+    heading1: {
+      fontSize: dynamicScale(18, false, 0.3),
+      fontWeight: "bold",
+      marginBottom: dynamicScale(4, true),
+      color: GlobalStyles.colors.textColor,
+    },
+    heading2: {
+      fontSize: dynamicScale(16, false, 0.3),
+      fontWeight: "bold",
+      marginBottom: dynamicScale(4, true),
+      color: GlobalStyles.colors.textColor,
+    },
+    strong: {
+      fontWeight: "bold",
+      color: GlobalStyles.colors.textColor,
+    },
+    em: {
+      fontStyle: "italic",
+      color: GlobalStyles.colors.textColor,
+    },
+    s: {
+      textDecorationLine: "line-through",
+      color: GlobalStyles.colors.gray700,
+    },
+    list_item: {
+      marginBottom: dynamicScale(2, true),
+    },
+    bullet_list: {
+      marginBottom: dynamicScale(4, true),
+    },
+    ordered_list: {
+      marginBottom: dynamicScale(4, true),
+    },
+    blockquote: {
+      backgroundColor: GlobalStyles.colors.gray500,
+      borderLeftWidth: 3,
+      borderLeftColor: GlobalStyles.colors.primary500,
+      paddingLeft: dynamicScale(8, false, 0.5),
+      marginLeft: dynamicScale(4, false, 0.5),
+      fontStyle: "italic",
+    },
+    table: {
+      borderWidth: 1,
+      borderColor: GlobalStyles.colors.primaryGrayed,
+      marginVertical: dynamicScale(4, true),
+    },
+    th: {
+      backgroundColor: GlobalStyles.colors.gray500,
+      fontWeight: "bold",
+      padding: dynamicScale(4, false, 0.5),
+    },
+    td: {
+      padding: dynamicScale(4, false, 0.5),
+    },
+    hr: {
+      backgroundColor: GlobalStyles.colors.primaryGrayed,
+      height: 1,
+      marginVertical: dynamicScale(8, true),
+    },
+    link: {
+      color: GlobalStyles.colors.primary500,
+      textDecorationLine: "underline",
+    },
+  };
+
   // useState isFetching
   const [isFetching, setIsFetching] = React.useState(true);
   const [answer, setAnswer] = React.useState("- no answer yet -");
+  const [streamingBubbles, setStreamingBubbles] = React.useState([]);
+  const [currentStreamIndex, setCurrentStreamIndex] = React.useState(0);
+  const [isStreaming, setIsStreaming] = React.useState(false);
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;
 
@@ -56,7 +135,10 @@ const GPTDealScreen = ({ route, navigation }) => {
             country: country,
           };
           const response = await getChatGPT_Response(getPrice);
-          if (response) setAnswer(response.content);
+          if (response) {
+            setAnswer(response.content);
+            startStreaming(response.content);
+          }
         } catch (error) {
           console.error(error);
           Toast.show({
@@ -78,7 +160,10 @@ const GPTDealScreen = ({ route, navigation }) => {
           country: country,
         };
         const response = await getChatGPT_Response(goodDeal);
-        if (response && response.content) setAnswer(response.content);
+        if (response && response.content) {
+          setAnswer(response.content);
+          startStreaming(response.content);
+        }
       } catch (error) {
         console.error(error);
         Toast.show({
@@ -102,6 +187,30 @@ const GPTDealScreen = ({ route, navigation }) => {
     getGPT_Response();
   }, [country, currency, price, product]);
 
+  const startStreaming = (content) => {
+    console.log("startStreaming ~ content:", content);
+    // Split content into logical sections by double newlines or major headings
+    const sections = content.split(/\n\s*\n/).filter((section) => {
+      const trimmed = section.trim();
+      // Filter out empty sections, sections with only punctuation, or very short content
+      return (
+        trimmed !== "" && trimmed.length > 3 && !/^[.,!?;:\s-]+$/.test(trimmed)
+      );
+    });
+    setStreamingBubbles([]);
+    setCurrentStreamIndex(0);
+    setIsStreaming(true);
+
+    sections.forEach((section, index) => {
+      setTimeout(() => {
+        setStreamingBubbles((prev) => [...prev, section.trim()]);
+        if (index === sections.length - 1) {
+          setIsStreaming(false);
+        }
+      }, index * 2000); // 2 second delay between sections
+    });
+  };
+
   async function handleRegenerate() {
     // regenerate getGoodDeal and set new answer
     setIsFetching(true);
@@ -114,7 +223,10 @@ const GPTDealScreen = ({ route, navigation }) => {
         country: country,
       };
       const response = await getChatGPT_Response(goodDeal);
-      if (response) setAnswer(response.content);
+      if (response) {
+        setAnswer(response.content);
+        startStreaming(response.content);
+      }
     } catch (error) {
       console.error(error);
       Toast.show({
@@ -139,8 +251,9 @@ const GPTDealScreen = ({ route, navigation }) => {
           />
         </View>
         <View style={{ flexDirection: "row" }}>
-          <Text style={styles.titleText}>{i18n.t("askChatGptTitle")}</Text>
+          <Text style={styles.titleText}>{i18n.t("getLocalPriceTitle")}</Text>
           <InfoButton
+            containerStyle={{ marginLeft: dynamicScale(4, false, 0.5) }}
             onPress={() =>
               Alert.alert(i18n.t("gptInfoTitle"), i18n.t("gptInfoText"))
             }
@@ -150,21 +263,59 @@ const GPTDealScreen = ({ route, navigation }) => {
 
       <View style={styles.contentContainer}>
         <View style={[styles.answerContainer, GlobalStyles.strongShadow]}>
-          <ScrollView>
-            {isFetching && (
-              <View
-                style={[styles.loadingContainer, GlobalStyles.strongShadow]}
+          <ScrollView contentContainerStyle={styles.chatContainer}>
+            {/* User Query Bubble - Always Show */}
+            <View style={styles.userBubbleContainer}>
+              <View style={[styles.userBubble, GlobalStyles.shadowGlowPrimary]}>
+                <Text style={styles.userBubbleText}>
+                  {price && price !== "" && !isNaN(Number(price))
+                    ? `Is ${price} ${currency} a good deal for "${product.trim()}" in ${country}?`
+                    : `Get local price for "${product.trim()}" in ${country}`}
+                </Text>
+              </View>
+            </View>
+
+            {/* Streaming AI Response Bubbles */}
+            {streamingBubbles.map((line, index) => (
+              <Animated.View
+                key={index}
+                style={[
+                  styles.aiBubbleContainer,
+                  index === streamingBubbles.length - 1 && {
+                    marginBottom: dynamicScale(30, true),
+                  },
+                ]}
+                entering={FadeInUp.delay(200).duration(500)}
               >
-                <LoadingBarOverlay
-                  customText={i18n.t("askingChatGpt")}
-                ></LoadingBarOverlay>
+                <Image
+                  source={require("../assets/chatgpt-logo.jpeg")}
+                  style={styles.aiAvatar}
+                />
+                <View style={[styles.aiBubble, GlobalStyles.strongShadow]}>
+                  <Markdown style={markdownStyles}>{line}</Markdown>
+                </View>
+              </Animated.View>
+            ))}
+
+            {/* Typing Indicator */}
+            {isFetching && (
+              <View style={styles.aiBubbleContainer}>
+                <Image
+                  source={require("../assets/chatgpt-logo.jpeg")}
+                  style={styles.aiAvatar}
+                />
+                <View style={[styles.typingBubble, GlobalStyles.strongShadow]}>
+                  <Text style={styles.typingText}>●●●</Text>
+                </View>
               </View>
             )}
-            {!isFetching && <Text style={[styles.answerText]}>{answer}</Text>}
           </ScrollView>
         </View>
         <View style={styles.buttonContainer}>
-          <FlatButton onPress={() => navigation.pop()}>
+          <FlatButton
+            onPress={() => navigation.pop()}
+            textStyle={{ fontSize: 16 }}
+          >
             {i18n.t("back")}
           </FlatButton>
           {!isFetching && (
@@ -174,6 +325,7 @@ const GPTDealScreen = ({ route, navigation }) => {
                 { elevation: 0 },
               ]}
               onPress={handleRegenerate}
+              buttonStyle={{ padding: 8, paddingHorizontal: 12 }}
             >
               Regenerate
             </GradientButton>
@@ -215,8 +367,8 @@ const styles = StyleSheet.create({
   },
   answerContainer: {
     flex: 4,
-    margin: dynamicScale(20, false, 0.5),
-    // padding: 20,
+    margin: dynamicScale(4, false, 0.5),
+    paddingTop: dynamicScale(4, false, 0.5),
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
@@ -237,8 +389,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
   },
   contentContainer: {
-    flex: 4,
-    marginHorizontal: "2%",
+    flex: 6,
   },
   answerText: {
     padding: dynamicScale(20, false, 0.5),
@@ -254,5 +405,73 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     backgroundColor: GlobalStyles.colors.backgroundColor,
     alignItems: "center",
+  },
+  chatContainer: {
+    padding: dynamicScale(8, false, 0.5),
+    paddingVertical: dynamicScale(4, true),
+    paddingBottom: dynamicScale(80, true), // Add extra padding at bottom for button container
+    flexGrow: 1,
+  },
+  userBubbleContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginBottom: dynamicScale(12, true),
+  },
+  userBubble: {
+    backgroundColor: GlobalStyles.colors.primary500,
+    borderRadius: dynamicScale(20, false, 0.5),
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+    paddingVertical: dynamicScale(12, true),
+    maxWidth: "80%",
+    borderBottomRightRadius: dynamicScale(4, false, 0.5),
+  },
+  userBubbleText: {
+    color: GlobalStyles.colors.backgroundColor,
+    fontSize: dynamicScale(14, false, 0.3),
+    fontWeight: "400",
+  },
+  aiBubbleContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: dynamicScale(12, true),
+  },
+  aiAvatar: {
+    width: dynamicScale(24, false, 0.5),
+    height: dynamicScale(24, false, 0.5),
+    borderRadius: dynamicScale(12, false, 0.5),
+    marginRight: dynamicScale(8, false, 0.5),
+    marginTop: dynamicScale(4, true),
+  },
+  aiBubble: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: dynamicScale(20, false, 0.5),
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+    paddingVertical: dynamicScale(12, true),
+    maxWidth: "80%",
+    borderBottomLeftRadius: dynamicScale(4, false, 0.5),
+    borderWidth: 1,
+    borderColor: GlobalStyles.colors.primaryGrayed,
+  },
+  aiBubbleText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(14, false, 0.3),
+    fontWeight: "300",
+    lineHeight: dynamicScale(20, true),
+  },
+  typingBubble: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: dynamicScale(20, false, 0.5),
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+    paddingVertical: dynamicScale(12, true),
+    maxWidth: "80%",
+    borderBottomLeftRadius: dynamicScale(4, false, 0.5),
+    borderWidth: 1,
+    borderColor: GlobalStyles.colors.primaryGrayed,
+  },
+  typingText: {
+    color: GlobalStyles.colors.gray700,
+    fontSize: dynamicScale(16, false, 0.3),
+    fontWeight: "300",
+    textAlign: "center",
   },
 });

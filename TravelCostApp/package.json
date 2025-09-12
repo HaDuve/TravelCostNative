@@ -6,7 +6,7 @@
     "lint": "eslint --fix .",
     "build:dev": "eas build --platform all --profile development-simulator --non-interactive",
     "build:prod": "eas build --platform all --profile production --non-interactive",
-    "build:submit:ios": "eas build --platform ios --profile production --non-interactive && eas submit --platform ios --latest --non-interactive",
+    "testflight": "eas build --platform ios --profile production --non-interactive && eas submit --platform ios --latest --non-interactive",
     "update": "eas update --branch production",
     "android": "expo run:android",
     "ios": "expo run:ios"
@@ -76,6 +76,7 @@
     "react-native-gesture-handler": "2.24.0",
     "react-native-get-random-values": "~1.11.0",
     "react-native-is-edge-to-edge": "^1.2.1",
+    "react-native-markdown-display": "^7.0.2",
     "react-native-mmkv": "^2.12.2",
     "react-native-modal": "14.0.0-rc.1",
     "react-native-neat-date-picker": "^1.4.5",

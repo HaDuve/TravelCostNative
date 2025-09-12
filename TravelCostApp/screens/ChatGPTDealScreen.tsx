@@ -318,10 +318,10 @@ const GPTDealScreen = ({ route, navigation }) => {
                 <View style={[styles.typingBubble, GlobalStyles.strongShadow]}>
                   <Text style={styles.typingText}>
                     {loadingPhase === "searching"
-                      ? "Searching through current local prices in the web..."
+                      ? i18n.t("gptSearchingWeb")
                       : loadingPhase === "analyzing"
-                      ? "Analyzing the current price data..."
-                      : "●●●"}
+                      ? i18n.t("gptAnalyzingData")
+                      : i18n.t("askingChatGpt")}
                   </Text>
                 </View>
               </View>

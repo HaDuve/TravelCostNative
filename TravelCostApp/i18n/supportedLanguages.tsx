@@ -257,6 +257,8 @@ const en = {
   askChatGptPre: "Ask GPT-4: Would this be a good deal?",
   askChatGptTitle: "Ask GPT-4",
   askingChatGpt: "Asking GPT-4 for a good deal...",
+  gptSearchingWeb: "🔍 Searching current local prices and seasonal data...",
+  gptAnalyzingData: "🧠 Analyzing market trends and pricing insights...",
   getLocalPriceTitle: "Get Local Price",
   gettingLocalPrice: "Getting local price information...",
   day: "Day",
@@ -692,6 +694,9 @@ const de = {
   askChatGptPre: "Frage GPT-4: Ist das ein gutes Angebot?",
   askChatGptTitle: "Frage GPT-4",
   askingChatGpt: "Frage GPT-4 nach einem guten Angebot...",
+  gptSearchingWeb:
+    "🔍 Aktuelle lokale Preise und saisonale Daten werden gesucht...",
+  gptAnalyzingData: "🧠 Markttrends und Preisanalysen werden ausgewertet...",
   getLocalPriceTitle: "Lokale Preise Anzeigen",
   gettingLocalPrice: "Lokale Preisinformationen werden abgerufen...",
   day: "Tag",
@@ -1131,6 +1136,10 @@ const fr = {
   askChatGptPre: "Demander à GPT-4 : Est-ce que ce serait une bonne affaire ?",
   askChatGptTitle: "Demander à GPT-4",
   askingChatGpt: "Demander à GPT-4 pour une bonne affaire...",
+  gptSearchingWeb:
+    "🔍 Recherche des prix locaux actuels et données saisonnières...",
+  gptAnalyzingData:
+    "🧠 Analyse des tendances du marché et des insights de prix...",
   getLocalPriceTitle: "Obtenir le Prix Local",
   gettingLocalPrice: "Obtention des informations sur les prix locaux...",
   day: "Jour",
@@ -1562,6 +1571,8 @@ const ru = {
   askChatGptPre: "Спросить у GPT-4: Будет ли это хорошая сделка?",
   askChatGptTitle: "Спросить у GPT-4",
   askingChatGpt: "Запрашиваю мнение GPT-4 о хорошей сделке...",
+  gptSearchingWeb: "🔍 Поиск актуальных местных цен и сезонных данных...",
+  gptAnalyzingData: "🧠 Анализ рыночных трендов и ценовых инсайтов...",
   getLocalPriceTitle: "Получить Местную Цену",
   gettingLocalPrice: "Получение информации о местных ценах...",
   day: "День",

@@ -241,7 +241,7 @@ export function splitTypesDropdown() {
   ];
 }
 
-export function travellerToDropdown(travellers) {
+export function travellerToDropdown(travellers, includeAddTraveller = true) {
   if (!travellers || travellers?.length < 1) {
     // console.log("travellertodropdown failed");
     return [];
@@ -270,6 +270,15 @@ export function travellerToDropdown(travellers) {
       });
     });
   }
+  
+  // Add "+ add traveller" item at the end only if requested
+  if (includeAddTraveller) {
+    listOfLabelValues.push({
+      label: `+ ${i18n.t("inviteTraveller")}`,
+      value: "__ADD_TRAVELLER__"
+    });
+  }
+  
   return [...listOfLabelValues];
 }
 

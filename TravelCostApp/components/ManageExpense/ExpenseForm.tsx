@@ -414,7 +414,8 @@ const ExpenseForm = ({
       setDuplOrSplit(tempValues.duplOrSplit);
     }
     if (tempValues.whoPaid) {
-      setWhoPaid(tempValues.whoPaid);
+      console.log("🔍 Setting whoPaid from tempValues:", tempValues.whoPaid);
+      setWhoPaidWithLogging(tempValues.whoPaid);
     }
     if (tempValues.isPaid !== undefined) {
       setIsPaid(tempValues.isPaid);
@@ -569,33 +570,126 @@ const ExpenseForm = ({
 
   const IsSoloTraveller = currentTravellers?.length === 1;
   const currentTravellersAsItems = useCallback(
-    () => travellerToDropdown(currentTravellers),
+    () => travellerToDropdown(currentTravellers, true),
     [currentTravellers]
   );
 
+  // Modal state machine for cascading flows
+  const modalStates = {
+    NONE: "none",
+    WHO_PAID: "whoPaid",
+    HOW_SHARED: "howShared",
+    EXACT_SHARING: "exactSharing",
+  };
+
+  const [modalFlow, setModalFlow] = useState(modalStates.NONE);
+
+  const nextModal = (selectedValue, currentSplitType) => {
+    console.log("🔍 nextModal called:", modalFlow, "->", selectedValue);
+
+    switch (modalFlow) {
+      case modalStates.WHO_PAID:
+        if (selectedValue === "__ADD_TRAVELLER__") {
+          setModalFlow(modalStates.NONE); // Go to share screen, no more modals
+        } else {
+          // Close current modal and open next one after a brief delay
+          setModalFlow(modalStates.NONE);
+          setTimeout(() => {
+            setModalFlow(modalStates.HOW_SHARED);
+          }, 100);
+        }
+        break;
+
+      case modalStates.HOW_SHARED:
+        if (selectedValue === "EXACT") {
+          console.log("🔍 Transitioning from HOW_SHARED to EXACT_SHARING");
+          setModalFlow(modalStates.NONE);
+          setTimeout(() => {
+            console.log("🔍 Opening EXACT_SHARING modal");
+            setModalFlow(modalStates.EXACT_SHARING);
+          }, 100);
+        } else {
+          console.log("🔍 HOW_SHARED flow complete, closing all modals");
+          setModalFlow(modalStates.NONE); // EQUAL/SELF, flow complete
+        }
+        break;
+
+      case modalStates.EXACT_SHARING:
+        console.log(
+          "🔍 EXACT_SHARING case triggered, opening traveller picker"
+        );
+        setModalFlow(modalStates.NONE);
+        setTimeout(() => {
+          console.log("🔍 Opening traveller multi-picker");
+          openTravellerMultiPicker(); // Open the traveller picker
+        }, 100);
+        break;
+
+      default:
+        setModalFlow(modalStates.NONE);
+    }
+  };
+
   const [items, setItems] = useState(currentTravellersAsItems);
-  const [open, setOpen] = useState(false);
   const [whoPaid, setWhoPaid] = useState(
     editingValues ? editingValues.whoPaid : null
   );
+
+  // Wrap setWhoPaid with logging
+  const setWhoPaidWithLogging = (value) => {
+    console.log(
+      "🔍 setWhoPaid called with:",
+      value,
+      "from:",
+      new Error().stack.split("\n")[2]
+    );
+    setWhoPaid(value);
+  };
+
+  // Custom setValue handler to handle both normal selections and special __ADD_TRAVELLER__ case
+  const handleWhoPaidChange = (value) => {
+    console.log("🔍 handleWhoPaidChange called with:", value, typeof value);
+
+    // Ignore function objects (weird DropDownPicker behavior for special case)
+    if (typeof value === "function") {
+      console.log("🔍 handleWhoPaidChange ignoring function value");
+      return;
+    }
+
+    // Handle normal string values
+    if (value === "__ADD_TRAVELLER__") {
+      console.log(
+        "🔍 handleWhoPaidChange intercepted __ADD_TRAVELLER__, setting to:",
+        userCtx.userName
+      );
+      setWhoPaidWithLogging(userCtx.userName);
+    } else {
+      console.log("🔍 handleWhoPaidChange setting normal value:", value);
+      setWhoPaidWithLogging(value);
+    }
+  };
   const isAndroid = Platform.OS == "android";
 
   // dropdown for split/owe picker
   const splitTypesItems = splitTypesDropdown();
   const [splitItems, setSplitTypeItems] = useState(splitTypesItems);
-  const [openSplitTypes, setOpenSplitTypes] = useState(false);
+  // Removed: const [openSplitTypes, setOpenSplitTypes] = useState(false); - using modalFlow state machine
   const [splitType, setSplitType] = useState<splitType>(
     editingValues ? editingValues.splitType : "SELF"
   );
 
-  // dropdown for EQUAL share picker
+  // dropdown for EQUAL share picker (without add traveller option)
+  const currentTravellersForEqualSplit = useCallback(
+    () => travellerToDropdown(currentTravellers, false),
+    [currentTravellers]
+  );
   const [splitItemsEQUAL, setSplitItemsEQUAL] = useState(
-    currentTravellersAsItems
+    currentTravellersForEqualSplit
   );
   useEffect(() => {
-    setSplitItemsEQUAL(currentTravellersAsItems);
+    setSplitItemsEQUAL(currentTravellersForEqualSplit);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentTravellersAsItems?.length]);
+  }, [currentTravellers?.length]);
   const [openEQUAL, setOpenEQUAL] = useState(false);
   const [splitTravellersList, setListEQUAL] = useState(
     editingValues ? editingValues.listEQUAL : currentTravellers
@@ -698,12 +792,13 @@ const ExpenseForm = ({
   }
 
   function openTravellerMultiPicker() {
+    console.log("🔍 openTravellerMultiPicker called");
     // console.log("splitType", splitType);
     // add whole traveling group who paid automatically to shared list
     if (!editingValues) {
       setListEQUAL([...currentTravellers]);
     }
-    setOpenEQUAL(true);
+    setModalFlow(modalStates.EXACT_SHARING);
   }
 
   function inputSplitListHandler(index, props: { userName: string }, value) {
@@ -951,7 +1046,8 @@ const ExpenseForm = ({
       inputChangedHandler("currency", userCtx.lastCurrency);
     }
     if (!inputs.whoPaid.isValid) {
-      setWhoPaid(userCtx.userName);
+      console.log("🔍 Setting whoPaid due to invalid input:", userCtx.userName);
+      setWhoPaidWithLogging(userCtx.userName);
     }
   }
 
@@ -1457,7 +1553,7 @@ const ExpenseForm = ({
 
                 <View style={styles.inputsRowSecond}>
                   {/* !IsSoloTraveller && */}
-                  {showWhoPaid && !IsSoloTraveller && (
+                  {showWhoPaid && (
                     <View style={styles.whoPaidContainer}>
                       <Text
                         style={[
@@ -1485,70 +1581,99 @@ const ExpenseForm = ({
                           {/* share-social-outline */}
                           {/* checkmark-done-outline */}
                           {/* "expand-outline" */}
-                          <IconButton
-                            icon="people-circle-outline"
-                            size={constantScale(28, 0.5)}
-                            buttonStyle={[
-                              {
-                                height: constantScale(48, 0.5),
-                                backgroundColor:
-                                  GlobalStyles.colors.backgroundColor,
-                                borderRadius: dynamicScale(4, false, 0.5),
-                                borderWidth: 1,
-                                borderColor: GlobalStyles.colors.gray700,
-                                marginRight: constantScale(12),
-                                marginLeft: constantScale(-8),
-                                padding: constantScale(4),
-                              },
-                              GlobalStyles.strongShadow,
-                            ]}
-                            color={GlobalStyles.colors.primary500}
-                            onPress={() => {
-                              Haptics.impactAsync(
-                                Haptics.ImpactFeedbackStyle.Light
-                              );
-                              const tempSplitType: splitType = "EXACT";
-                              const listSplits = calcSplitList(
-                                tempSplitType,
-                                +amountValue,
-                                userCtx.userName,
-                                currentTravellers
-                              );
-                              // console.log("listSplits:", listSplits);
-                              if (listSplits) {
-                                setSplitType(tempSplitType);
-                                setSplitList(listSplits);
-                                setSplitListValid(
-                                  validateSplitList(
-                                    listSplits,
-                                    tempSplitType,
-                                    +amountValue
-                                  )
+                          {!IsSoloTraveller && (
+                            <IconButton
+                              icon="people-circle-outline"
+                              size={constantScale(28, 0.5)}
+                              buttonStyle={[
+                                {
+                                  height: constantScale(48, 0.5),
+                                  backgroundColor:
+                                    GlobalStyles.colors.backgroundColor,
+                                  borderRadius: dynamicScale(4, false, 0.5),
+                                  borderWidth: 1,
+                                  borderColor: GlobalStyles.colors.gray700,
+                                  marginRight: constantScale(12),
+                                  marginLeft: constantScale(-8),
+                                  padding: constantScale(4),
+                                },
+                                GlobalStyles.strongShadow,
+                              ]}
+                              color={GlobalStyles.colors.primary500}
+                              onPress={() => {
+                                Haptics.impactAsync(
+                                  Haptics.ImpactFeedbackStyle.Light
                                 );
-                              }
-                            }}
-                          ></IconButton>
+                                const tempSplitType: splitType = "EXACT";
+                                const listSplits = calcSplitList(
+                                  tempSplitType,
+                                  +amountValue,
+                                  userCtx.userName,
+                                  currentTravellers
+                                );
+                                // console.log("listSplits:", listSplits);
+                                if (listSplits) {
+                                  setSplitType(tempSplitType);
+                                  setSplitList(listSplits);
+                                  setSplitListValid(
+                                    validateSplitList(
+                                      listSplits,
+                                      tempSplitType,
+                                      +amountValue
+                                    )
+                                  );
+                                }
+                              }}
+                            ></IconButton>
+                          )}
                           <DropDownPicker
                             // renderListItem={(props) =>
                             //   renderDropDownList(props)
                             // }
                             containerStyle={styles.dropdownContainer}
-                            open={open}
+                            open={modalFlow === modalStates.WHO_PAID}
                             value={whoPaid}
                             items={items}
-                            setOpen={setOpen}
-                            setValue={setWhoPaid}
+                            setOpen={(open) => {
+                              setModalFlow(
+                                open ? modalStates.WHO_PAID : modalStates.NONE
+                              );
+                            }}
+                            setValue={handleWhoPaidChange}
                             setItems={setItems}
-                            onClose={setOpenSplitTypes}
+                            onClose={(items) => {
+                              console.log("🔍 whoPaid dropdown onClose called");
+                              // Only reset modal flow if we're not transitioning to another modal
+                              if (modalFlow === modalStates.WHO_PAID) {
+                                setModalFlow(modalStates.NONE);
+                              }
+                            }}
                             onOpen={() => {
+                              setModalFlow(modalStates.WHO_PAID);
                               Haptics.impactAsync(
                                 Haptics.ImpactFeedbackStyle.Light
                               );
                             }}
-                            onSelectItem={() => {
+                            onSelectItem={(item) => {
+                              console.log("🔍 onSelectItem called with:", item);
                               Haptics.impactAsync(
                                 Haptics.ImpactFeedbackStyle.Light
                               );
+
+                              // Set whoPaid value first
+                              if (item.value === "__ADD_TRAVELLER__") {
+                                setWhoPaidWithLogging(userCtx.userName);
+                                setSplitType("SELF");
+                                // Navigate to Share screen
+                                navigation.navigate("Share", {
+                                  tripId: tripCtx.tripid,
+                                });
+                              } else {
+                                setWhoPaidWithLogging(item.value);
+                              }
+
+                              // Use state machine to handle modal flow
+                              nextModal(item.value, splitType);
                             }}
                             listMode="MODAL"
                             modalProps={{
@@ -1582,20 +1707,36 @@ const ExpenseForm = ({
                       )}
                     </View>
                   )}
-                  {whoPaidValid && (
+                  {whoPaidValid && !IsSoloTraveller && (
                     <DropDownPicker
                       // renderListItem={(props) => renderDropDownList(props)}
-                      open={openSplitTypes}
+                      open={modalFlow === modalStates.HOW_SHARED}
                       value={splitType}
                       items={splitItems}
-                      setOpen={setOpenSplitTypes}
+                      setOpen={(open) => {
+                        setModalFlow(
+                          open ? modalStates.HOW_SHARED : modalStates.NONE
+                        );
+                      }}
                       setValue={setSplitType}
                       setItems={setSplitTypeItems}
-                      onClose={openTravellerMultiPicker}
-                      onOpen={() => {
+                      onSelectItem={(item) => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        setSplitType(item.value);
+                        nextModal(item.value, item.value);
                       }}
-                      onSelectItem={() => {
+                      onClose={() => {
+                        console.log(
+                          "🔍 Split types dropdown onClose called, modalFlow:",
+                          modalFlow
+                        );
+                        // Only reset modal flow if we're not transitioning to another modal
+                        // Don't reset if we're about to go to EXACT_SHARING
+                        if (modalFlow === modalStates.HOW_SHARED) {
+                          setModalFlow(modalStates.NONE);
+                        }
+                      }}
+                      onOpen={() => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       }}
                       listMode="MODAL"
@@ -1621,13 +1762,20 @@ const ExpenseForm = ({
                     />
                   )}
                 </View>
-                {!loadingTravellers && !splitTypeSelf && (
+                {!loadingTravellers && !splitTypeSelf && !IsSoloTraveller && (
                   <DropDownPicker
                     // renderListItem={(props) => renderDropDownList(props)}
-                    open={openEQUAL}
+                    open={modalFlow === modalStates.EXACT_SHARING || openEQUAL}
                     value={splitTravellersList}
                     items={splitItemsEQUAL}
-                    setOpen={setOpenEQUAL}
+                    setOpen={(open) => {
+                      if (open) {
+                        setModalFlow(modalStates.EXACT_SHARING);
+                      } else {
+                        setModalFlow(modalStates.NONE);
+                        setOpenEQUAL(false);
+                      }
+                    }}
                     onOpen={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }}
@@ -1636,7 +1784,11 @@ const ExpenseForm = ({
                     }}
                     setValue={setListEQUAL}
                     setItems={setSplitItemsEQUAL}
-                    onClose={splitHandler}
+                    onClose={() => {
+                      console.log("🔍 Traveller multi-picker onClose called");
+                      setModalFlow(modalStates.NONE);
+                      splitHandler();
+                    }}
                     listMode="MODAL"
                     multiple={true}
                     CloseIconComponent={() => (

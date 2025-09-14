@@ -18,7 +18,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -38,6 +41,7 @@ import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { showBanner } from "../components/UI/ToastComponent";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
+import { OnboardingFlags } from "../types/onboarding";
 
 const OverviewScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
@@ -79,9 +83,13 @@ const OverviewScreen = ({ navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       if (!userCtx.freshlyCreated) {
-        showBanner(navigation);
+        const onboardingFlags: OnboardingFlags = {
+          freshlyCreated: userCtx.freshlyCreated,
+          needsTour: userCtx.needsTour,
+        };
+        showBanner(navigation, onboardingFlags);
       }
-    }, [navigation, userCtx.freshlyCreated])
+    }, [navigation, userCtx.freshlyCreated, userCtx.needsTour])
   );
 
   useEffect(() => {

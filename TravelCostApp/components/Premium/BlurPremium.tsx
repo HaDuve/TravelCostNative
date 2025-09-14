@@ -10,7 +10,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -21,23 +24,35 @@ import { NetworkContext } from "../../store/network-context";
 import { UserContext } from "../../store/user-context";
 import FlatButton from "../UI/FlatButton";
 import PropTypes from "prop-types";
+import { shouldShowOnboarding } from "../Rating/firstStartUtil";
 
 const BlurPremium = ({ canBack = false }) => {
   const netCtx = useContext(NetworkContext);
   const userCtx = useContext(UserContext);
   const [isPremium, setIsPremium] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [isOnboarding, setIsOnboarding] = useState(false);
   const startIntensity = 5;
   const [blurIntensity, setBlurIntensity] = useState(startIntensity);
   const navigation = useNavigation();
   const isAndroid = Platform.OS === "android";
   useEffect(() => {
+    async function checkOnboardingState() {
+      // Check if user is in onboarding state
+      const shouldShowOnboardingFlow = await shouldShowOnboarding();
+      const isFreshlyCreated = userCtx.freshlyCreated;
+      const needsTour = userCtx.needsTour;
+
+      // Suppress popup if user is in any onboarding state
+      return shouldShowOnboardingFlow || isFreshlyCreated || needsTour;
+    }
     async function checkPremium() {
       const checkPremi = await userCtx.checkPremium();
-      setIsPremium(checkPremi);
+      const isOnboarding = await checkOnboardingState();
+      setIsPremium(checkPremi && !isOnboarding);
     }
     checkPremium();
-  }, [userCtx.isPremium]);
+  }, [userCtx.isPremium, userCtx.freshlyCreated, userCtx.needsTour]);
 
   const isConnected = netCtx.isConnected && netCtx.strongConnection;
 
@@ -67,7 +82,7 @@ const BlurPremium = ({ canBack = false }) => {
     }, [])
   );
 
-  const showCardJSX = (
+  const showBlurredCardJSX = (
     <BlurView
       intensity={isAndroid ? blurIntensity * 22 : blurIntensity}
       style={styles.titleContainerBlur}
@@ -114,7 +129,7 @@ const BlurPremium = ({ canBack = false }) => {
     </BlurView>
   );
 
-  return <>{!isPremium && showCardJSX}</>;
+  return <>{!isPremium && showBlurredCardJSX}</>;
 };
 
 export default BlurPremium;

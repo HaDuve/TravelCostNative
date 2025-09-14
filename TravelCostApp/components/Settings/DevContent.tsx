@@ -12,7 +12,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -20,6 +23,7 @@ import Button from "../UI/Button";
 import { AuthContext } from "../../store/auth-context";
 import { TripContext } from "../../store/trip-context";
 import { NetworkContext } from "../../store/network-context";
+import { UserContext } from "../../store/user-context";
 import { GlobalStyles } from "../../constants/styles";
 import {
   initBranch,
@@ -31,11 +35,13 @@ import { ExpoPushToken } from "expo-notifications";
 import safeLogError from "../../util/error";
 import BackButton from "../UI/BackButton";
 import { showBanner } from "../UI/ToastComponent";
+import { OnboardingFlags } from "../../types/onboarding";
 
 const DevContent = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
+  const userCtx = useContext(UserContext);
   const isConnected = netCtx.isConnected && netCtx.strongConnection;
   const [latestVersion, setLatestVersion] = useState("");
   const [currentVersion, setCurrentVersion] = useState("");
@@ -105,12 +111,15 @@ const DevContent = ({ navigation }) => {
         <Text style={styles.titleText}>DEVCONTENT</Text>
       </View>
 
-
       <Button
         style={styles.settingsButton}
         onPress={async () => {
           navigation.navigate("RecentExpenses");
-          await showBanner(navigation);
+          const onboardingFlags: OnboardingFlags = {
+            freshlyCreated: userCtx.freshlyCreated,
+            needsTour: userCtx.needsTour,
+          };
+          await showBanner(navigation, onboardingFlags);
         }}
       >
         showAdBanner

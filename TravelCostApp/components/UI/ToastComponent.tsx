@@ -14,7 +14,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -25,9 +28,11 @@ import { getMMKVString, setMMKVString } from "../../store/mmkv";
 import { DEVELOPER_MODE } from "../../confAppConstants";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { formatExpenseWithCurrency } from "../../util/string";
+import { shouldShowOnboarding } from "../Rating/firstStartUtil";
 import { Pressable } from "react-native";
 import { constantScale, dynamicScale, scale } from "../../util/scalingUtil";
 import { DeviceType, deviceType } from "expo-device";
+import { OnboardingFlags } from "../../types/onboarding";
 
 const MINHEIGHT = dynamicScale(60, true);
 const MINHEIGHT_LOADINGBAR = dynamicScale(88, true);
@@ -340,9 +345,25 @@ function isCalledToday() {
 }
 
 // default banner call
-export async function showBanner(navigation, props = {}) {
+export async function showBanner(
+  navigation: any,
+  onboardingFlags?: OnboardingFlags,
+  props: any = {}
+) {
   const isPremium = !DEVELOPER_MODE && (await isPremiumMember());
   if (isPremium || isCalledToday()) return;
+
+  // Check if user is in onboarding state
+  if (onboardingFlags) {
+    const shouldShowOnboardingFlow = await shouldShowOnboarding();
+    const { freshlyCreated, needsTour } = onboardingFlags;
+
+    // Suppress banner if user is in any onboarding state
+    if (shouldShowOnboardingFlow || freshlyCreated || needsTour) {
+      return;
+    }
+  }
+
   Toast.show({
     type: "banner",
     text1: i18n.t("bannerText1"),

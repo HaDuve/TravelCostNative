@@ -1083,10 +1083,9 @@ const ExpenseForm = ({
     <Pressable
       style={[
         {
-          flex: 0,
           paddingLeft: dynamicScale(100, false, 0.5),
-          marginBottom: dynamicScale(1, false, 0.5),
-          paddingTop: dynamicScale(4, false, 0.5),
+          paddingBottom: dynamicScale(8, false, 0.5),
+          paddingTop: dynamicScale(6, false, 0.5),
         },
       ]}
       onPress={debouncedSubmit}
@@ -1095,6 +1094,7 @@ const ExpenseForm = ({
         icon="checkmark-outline"
         color={GlobalStyles.colors.textColor}
         size={dynamicScale(26, false, 0.5)}
+        onPress={debouncedSubmit}
       ></IconButton>
     </Pressable>
   );
@@ -1111,7 +1111,6 @@ const ExpenseForm = ({
           {
             label: i18n.t("notPaidLabel"),
             value: isPaidString.notPaid,
-            // checkedColor: GlobalStyles.colors.accent500,
             showSelectedCheck: true,
             style: [
               {
@@ -1218,6 +1217,23 @@ const ExpenseForm = ({
 
   const headerHeight = useHeaderHeight();
   const hideBottomBorder = duplOrSplit == 1 || duplOrSplit == 2;
+
+  const onPressHandlerQuickSum = () => {
+    // console.log("taskbar pressed");
+    if (inputs.amount.value) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      const _tempAmount = +tempAmount;
+      const newAmount = _tempAmount + Number(inputs.amount.value);
+      // console.log("_tempAmount:", _tempAmount);
+      setTempAmount(newAmount.toFixed(2));
+      inputChangedHandler("amount", "");
+    } else if (tempAmount) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      const _tempAmount = +tempAmount;
+      inputChangedHandler("amount", _tempAmount.toFixed(2));
+      setTempAmount("");
+    }
+  };
   return (
     <>
       {datepickerJSX}
@@ -1253,7 +1269,7 @@ const ExpenseForm = ({
                   onChangeText: inputChangedHandler.bind(this, "amount"),
                   value: inputs.amount.value,
                 }}
-                inputAccessoryViewID="amountID"
+                // inputAccessoryViewID="amountID"
                 invalid={!inputs.amount.isValid}
                 autoFocus={!isEditing ?? false}
               />
@@ -1905,7 +1921,7 @@ const ExpenseForm = ({
           </View>
         </Animated.View>
       </Animated.View>
-      {Platform.OS == "ios" && (
+      {false && ( //Platform.OS == "ios" && ( // comment this out for now, it's not working (not pressable)
         // QuickSum Button on ios
         <InputAccessoryView nativeID="amountID">
           <View
@@ -1934,22 +1950,7 @@ const ExpenseForm = ({
                 // borderWidth: 1,
                 // borderColor: "black",
               }}
-              onPress={() => {
-                // console.log("taskbar pressed");
-                if (inputs.amount.value) {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  const _tempAmount = +tempAmount;
-                  const newAmount = _tempAmount + Number(inputs.amount.value);
-                  // console.log("_tempAmount:", _tempAmount);
-                  setTempAmount(newAmount.toFixed(2));
-                  inputChangedHandler("amount", "");
-                } else if (tempAmount) {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  const _tempAmount = +tempAmount;
-                  inputChangedHandler("amount", _tempAmount.toFixed(2));
-                  setTempAmount("");
-                }
-              }}
+              onPress={onPressHandlerQuickSum}
             >
               {/* <Text style={{ borderWidth: 1, borderColor: "blue" }}>Test</Text> */}
               {inputs.amount.value && (
@@ -1961,9 +1962,7 @@ const ExpenseForm = ({
                   icon={"add-outline"}
                   color={GlobalStyles.colors.textColor}
                   size={dynamicScale(24, false, 0.5)}
-                  onPress={() => {
-                    // console.log("add button pressed!");
-                  }}
+                  onPress={onPressHandlerQuickSum}
                 />
               )}
               {!inputs.amount.value && tempAmount && (
@@ -1992,8 +1991,6 @@ const ExpenseForm = ({
           </View>
         </InputAccessoryView>
       )}
-      {/* We could actually show our Toast Component in this Modal here, but the loading modal would block important screen parts */}
-      {/* <ToastComponent /> */}
     </>
   );
 };

@@ -19,7 +19,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -110,6 +113,22 @@ const AddExpenseButton = ({ navigation }) => {
     const formattedDescription = truncateString(data.description, 15);
     const categoryIcon = getCatSymbol(data.category);
     const cat = data.category;
+    const onPressHandler = () => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setLongPressed(false);
+      setLastExpensesNumber(PageLength);
+      // set date to today
+      data.date = new Date().toISOString();
+      data.startDate = new Date().toISOString();
+      data.endDate = new Date().toISOString();
+      delete data.id;
+      delete data.rangeId;
+      delete data.editedTimestamp;
+      navigation.navigate("ManageExpense", {
+        pickedCat: data.category,
+        tempValues: { ...data },
+      });
+    };
     return (
       <View
         style={{
@@ -137,28 +156,14 @@ const AddExpenseButton = ({ navigation }) => {
             GlobalStyles.strongShadow,
             pressed && GlobalStyles.pressedWithShadow,
           ]}
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setLongPressed(false);
-            setLastExpensesNumber(PageLength);
-            // set date to today
-            data.date = new Date().toISOString();
-            data.startDate = new Date().toISOString();
-            data.endDate = new Date().toISOString();
-            delete data.id;
-            delete data.rangeId;
-            delete data.editedTimestamp;
-            navigation.navigate("ManageExpense", {
-              pickedCat: data.category,
-              tempValues: { ...data },
-            });
-          }}
+          onPress={onPressHandler}
         >
           <IconButton
             size={dynamicScale(24)}
             icon={categoryIcon}
             category={cat}
             color={GlobalStyles.colors.textColor}
+            onPress={onPressHandler}
           ></IconButton>
           <Text style={styles.descriptionText}>{formattedDescription}</Text>
           <Text style={styles.amountText}>{formattedAmount}</Text>

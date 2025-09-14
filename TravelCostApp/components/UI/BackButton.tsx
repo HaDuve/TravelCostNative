@@ -12,18 +12,20 @@ const BackButton = ({ style }) => {
   if (Platform.OS === "android") {
     return <></>;
   }
+  const onPressHandler = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    navigation.goBack();
+  };
   return (
     <Pressable
       style={[GlobalStyles.backButton, style]}
-      onPress={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        navigation.goBack();
-      }}
+      onPress={onPressHandler}
     >
       <IconButton
         icon="arrow-back-outline"
         size={dynamicScale(24, false, 0.5)}
         color={GlobalStyles.colors.textColor}
+        onPress={onPressHandler}
       ></IconButton>
     </Pressable>
   );

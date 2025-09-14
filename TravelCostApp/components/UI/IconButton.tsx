@@ -1,9 +1,24 @@
-import React, { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import PropTypes from "prop-types";
 import { Badge } from "react-native-paper";
 import { useEffect, useState } from "react";
 import { getCatSymbolMMKV } from "../../util/category";
+
+export type IconButtonProps = {
+  icon: string;
+  size?: number;
+  color?: string;
+  badge?: boolean;
+  badgeText?: string;
+  badgeStyle?: ViewStyle;
+  onPress: () => void;
+  onPressIn?: () => void;
+  onPressOut?: () => void;
+  onLongPress?: () => void;
+  buttonStyle?: any;
+  onPressStyle?: ViewStyle;
+  category?: string;
+};
 
 const IconButton = ({
   icon,
@@ -19,7 +34,7 @@ const IconButton = ({
   buttonStyle = {},
   onPressStyle = {},
   category,
-}) => {
+}: IconButtonProps) => {
   const [overrideIcon, setCatSymbol] = useState(null);
   useEffect(() => {
     async function setCatSymbolAsync() {
@@ -61,24 +76,6 @@ const IconButton = ({
 };
 
 export default IconButton;
-
-IconButton.propTypes = {
-  icon: PropTypes.string.isRequired,
-  size: PropTypes.number.isRequired,
-  color: PropTypes.string.isRequired,
-  badge: PropTypes.bool,
-  badgeText: PropTypes.string,
-  badgeStyle: PropTypes.object,
-  onPress: PropTypes.func,
-  onPressIn: PropTypes.func,
-  onPressOut: PropTypes.func,
-  onLongPress: PropTypes.func,
-  buttonStyle: PropTypes.any,
-  rotate: PropTypes.number,
-  onPressStyle: PropTypes.object,
-  imageNumber: PropTypes.number,
-  category: PropTypes.string,
-};
 
 const styles = StyleSheet.create({
   buttonContainer: {

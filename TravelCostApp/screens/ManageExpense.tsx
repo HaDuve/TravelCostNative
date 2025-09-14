@@ -168,6 +168,9 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         safeLogError(error);
       }
     }
+
+    // start of function deleteExpenseHandler
+
     Alert.alert(i18n.t("sure"), i18n.t("sureExt"), [
       // The "No" button
       // Does nothing but dismiss the dialog when tapped

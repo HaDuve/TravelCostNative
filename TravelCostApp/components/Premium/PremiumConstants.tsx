@@ -14,7 +14,10 @@ import { fetchServerInfo } from "../../util/http";
 import { isConnectionFastEnough } from "../../util/connectionSpeed";
 import safeLogError from "../../util/error";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -60,6 +63,7 @@ export interface Keys {
   EXCHANGE: string;
   FREEEXCHANGE: string;
   BRAN: string;
+  VEXO: string;
 }
 
 export async function loadKeys(): Promise<Keys> {
@@ -71,8 +75,9 @@ export async function loadKeys(): Promise<Keys> {
   let EXCHANGE = await secureStoreGetItem("EXCHANGE");
   let FREEEXCHANGE = await secureStoreGetItem("FREEEXCHANGE");
   let BRAN = await secureStoreGetItem("BRAN");
+  let VEXO = await secureStoreGetItem("VEXO");
   if (!isFastEnough)
-    return { REVCAT_G, REVCAT_A, OPENAI, EXCHANGE, FREEEXCHANGE, BRAN };
+    return { REVCAT_G, REVCAT_A, OPENAI, EXCHANGE, FREEEXCHANGE, BRAN, VEXO };
   const data = await fetchServerInfo();
   await secureStoreSetItem("REVCAT_G", data.REVCAT_G);
   await secureStoreSetItem("REVCAT_A", data.REVCAT_A);
@@ -80,11 +85,13 @@ export async function loadKeys(): Promise<Keys> {
   await secureStoreSetItem("EXCHANGE", data.EXCHANGE);
   await secureStoreSetItem("FREEEXCHANGE", data.FREEEXCHANGE);
   await secureStoreSetItem("BRAN", data.BRAN);
+  await secureStoreSetItem("VEXO", data.VEXO);
   REVCAT_G = data.REVCAT_G;
   REVCAT_A = data.REVCAT_A;
   OPENAI = data.OPENAI;
   EXCHANGE = data.EXCHANGE;
   FREEEXCHANGE = data.FREEEXCHANGE;
   BRAN = data.BRAN;
-  return { REVCAT_G, REVCAT_A, OPENAI, EXCHANGE, FREEEXCHANGE, BRAN };
+  VEXO = data.VEXO;
+  return { REVCAT_G, REVCAT_A, OPENAI, EXCHANGE, FREEEXCHANGE, BRAN, VEXO };
 }

@@ -101,6 +101,7 @@ const BlurPremium = ({ canBack = false }) => {
           >
             <GradientButton
               darkText
+              buttonStyle={{}}
               colors={GlobalStyles.gradientColorsButton}
               onPress={() => {
                 if (!isConnected) {

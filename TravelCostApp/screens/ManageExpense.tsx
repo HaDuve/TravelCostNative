@@ -1,6 +1,5 @@
 import { useContext, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
-import React from "react";
 import { ScrollView } from "react-native";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 
@@ -44,13 +43,10 @@ import * as Haptics from "expo-haptics";
 import { setMMKVObject } from "../store/mmkv";
 import { formatExpenseWithCurrency } from "../util/string";
 import { isSameDay } from "../util/dateTime";
-import ToastComponent from "../components/UI/ToastComponent";
 import safeLogError from "../util/error";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
-import {
-  isConnectionFastEnough,
-  isConnectionFastEnoughAsBool,
-} from "../util/connectionSpeed";
+import { trackEvent, VexoEvents } from "../util/vexo-tracking";
+import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 import { dynamicScale } from "../util/scalingUtil";
 
 interface ManageExpenseProps {
@@ -158,6 +154,14 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         expenseCtx.deleteExpense(editedExpenseId);
         await deleteExpenseOnlineOffline(item, isOnline);
         await touchAllTravelers(tripid, true);
+
+        // Track expense deleted
+        trackEvent(VexoEvents.EXPENSE_DELETED, {
+          expenseId: editedExpenseId,
+          tripId: tripid,
+          isRanged: selectedExpense?.rangeId ? true : false,
+        });
+
         Toast.hide();
       } catch (error) {
         Toast.show({
@@ -517,6 +521,15 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           // console.log("deciding to edit normal data");
           await editSingleData(expenseData);
         }
+
+        // Track expense edited
+        trackEvent(VexoEvents.EXPENSE_EDITED, {
+          expenseId: editedExpenseId,
+          amount: expenseData.amount,
+          currency: expenseData.currency,
+          category: expenseData.categoryString,
+          tripId: tripid,
+        });
       } else {
         // adding a new expense (no-editing)
         // Check for ranged Expense
@@ -530,6 +543,17 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           // adding a new normal expense (no-editing, no-ranged)
           await createSingleData(expenseData);
         }
+
+        // Track expense created
+        trackEvent(VexoEvents.EXPENSE_CREATED, {
+          amount: expenseData.amount,
+          currency: expenseData.currency,
+          category: expenseData.categoryString,
+          isRanged:
+            expenseData.startDate.toString().slice(0, 10) !==
+            expenseData.endDate.toString().slice(0, 10),
+          tripId: tripid,
+        });
       }
       // await asyncStoreSetObject("expenses", expenseCtx.expenses);
       setMMKVObject("expenses", expenseCtx.expenses);

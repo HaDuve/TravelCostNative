@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import {
   Alert,
   View,
@@ -7,7 +7,6 @@ import {
   TextInput,
   Image,
   StyleSheet,
-  TouchableOpacity,
   KeyboardAvoidingView,
 } from "react-native";
 import { UserContext } from "../../store/user-context";

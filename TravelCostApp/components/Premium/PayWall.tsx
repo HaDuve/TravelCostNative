@@ -31,6 +31,7 @@ import IconButton from "../UI/IconButton";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { constantScale } from "../../util/scalingUtil";
+import { trackEvent, VexoEvents } from "../../util/vexo-tracking";
 
 const PaywallScreen = ({ navigation }) => {
   // - State for all available package
@@ -43,6 +44,9 @@ const PaywallScreen = ({ navigation }) => {
   const [showEULA, setShowEULA] = useState(false);
 
   useEffect(() => {
+    // Track paywall viewed
+    trackEvent(VexoEvents.PAYWALL_VIEWED);
+    
     // Get current available packages
     const getPackages = async () => {
       try {

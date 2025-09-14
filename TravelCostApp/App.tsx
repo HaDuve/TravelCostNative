@@ -111,6 +111,11 @@ import safeLogError from "./util/error";
 import { constantScale, dynamicScale } from "./util/scalingUtil";
 import { CustomTooltip } from "./components/UI/Tourguide_Tooltip";
 import OrientationContextProvider from "./store/orientation-context";
+import {
+  initializeVexo,
+  identifyUser,
+  VexoUserContext,
+} from "./util/vexo-tracking";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -656,7 +661,7 @@ function Root() {
       const storedTripId = await secureStoreGetItem("currentTripId");
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
 
-      const { REVCAT_G, REVCAT_A }: Keys = await loadKeys();
+      const { REVCAT_G, REVCAT_A, VEXO }: Keys = await loadKeys();
 
       if (storedToken && storedUid && storedTripId) {
         // setup purchases
@@ -677,6 +682,17 @@ function Root() {
         await Purchases.collectDeviceIdentifiers();
         const event = new BranchEvent(BranchEvent.Login);
         await event.logEvent();
+
+        // Initialize Vexo for error and session tracking
+        try {
+          const vexoInitialized = await initializeVexo(VEXO);
+          if (vexoInitialized) {
+            await identifyUser(storedUid);
+          }
+        } catch (vexoError) {
+          safeLogError(vexoError, "App.tsx", 692);
+        }
+
         const needsTour = await loadTourConfig();
         userCtx.setNeedsTour(needsTour);
 

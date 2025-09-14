@@ -4,7 +4,7 @@
   "scripts": {
     "start": "npx expo start --dev-client",
     "lint": "eslint --fix .",
-    "build:dev": "eas build --platform all --profile development-simulator --non-interactive",
+    "build:dev": "eas build --platform all --profile development-simulator",
     "build:prod": "eas build --platform all --profile production --non-interactive",
     "testflight": "eas build --platform ios --profile production --non-interactive && eas submit --platform ios --latest --non-interactive",
     "update": "eas update --branch production",
@@ -99,6 +99,7 @@
     "react-native-webview": "^13.13.5",
     "rn-tourguide": "^3.3.0",
     "splitwise-js-map": "^1.0.3",
+    "vexo-analytics": "^1.5.2",
     "warning": "^4.0.3",
     "whatwg-url": "^14.2.0",
     "whatwg-url-without-unicode": "8.0.0-3"

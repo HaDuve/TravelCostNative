@@ -37,6 +37,7 @@ import GradientButton from "../components/UI/GradientButton";
 import { dynamicScale } from "../util/scalingUtil";
 import { NetworkContext } from "../store/network-context";
 import Toast from "react-native-toast-message";
+import { trackEvent, VexoEvents } from "../util/vexo-tracking";
 
 const GPTDealScreen = ({ route, navigation }) => {
   const { price, currency, country, product } = route.params;
@@ -148,6 +149,14 @@ const GPTDealScreen = ({ route, navigation }) => {
           if (response) {
             setAnswer(response.content);
             startStreaming(response.content);
+            
+            // Track GPT price lookup usage
+            trackEvent(VexoEvents.GPT_RECOMMENDATION_USED, {
+              requestType: 'getPrice',
+              product: product,
+              currency: currency,
+              country: country
+            });
           }
         } catch (error) {
           console.error(error);
@@ -174,6 +183,15 @@ const GPTDealScreen = ({ route, navigation }) => {
         if (response && response.content) {
           setAnswer(response.content);
           startStreaming(response.content);
+          
+          // Track GPT deal recommendation usage
+          trackEvent(VexoEvents.GPT_RECOMMENDATION_USED, {
+            requestType: 'getGoodDeal',
+            product: product,
+            price: price,
+            currency: currency,
+            country: country
+          });
         }
       } catch (error) {
         console.error(error);

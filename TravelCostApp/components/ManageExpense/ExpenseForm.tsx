@@ -74,6 +74,7 @@ import Animated, {
   FadeOutUp,
   FadeIn,
   FadeOut,
+  LinearTransition,
 } from "react-native-reanimated";
 import { DateTime } from "luxon";
 import DatePickerModal from "../UI/DatePickerModal";
@@ -1081,8 +1082,12 @@ const ExpenseForm = ({
   const confirmButtonJSX = (
     <Pressable
       style={[
-        GlobalStyles.backButton,
-        { flex: 0, paddingLeft: dynamicScale(100, false, 0.5) },
+        {
+          flex: 0,
+          paddingLeft: dynamicScale(100, false, 0.5),
+          marginBottom: dynamicScale(1, false, 0.5),
+          paddingTop: dynamicScale(4, false, 0.5),
+        },
       ]}
       onPress={debouncedSubmit}
     >
@@ -1216,15 +1221,14 @@ const ExpenseForm = ({
   return (
     <>
       {datepickerJSX}
-      <Animated.View layout={Layout}>
-        <Animated.View layout={Layout} style={styles.container}>
+      <Animated.View layout={LinearTransition}>
+        <Animated.View layout={LinearTransition} style={styles.container}>
           <View
             style={[
               {
                 flex: 1,
                 flexDirection: "row",
                 paddingHorizontal: "2%",
-                marginBottom: "-2%",
                 justifyContent: "space-between",
               },
               Platform.OS == "android" && {
@@ -1237,7 +1241,7 @@ const ExpenseForm = ({
             {backButtonJsx}
             {Platform.OS == "ios" && confirmButtonJSX}
           </View>
-          <Animated.View layout={Layout} style={styles.form}>
+          <Animated.View layout={LinearTransition} style={styles.form}>
             <View style={styles.inputsRow}>
               <Input
                 inputStyle={[styles.amountInput, GlobalStyles.strongShadow]}
@@ -2045,9 +2049,9 @@ const styles = StyleSheet.create({
   form: {
     flex: 1,
     margin: "4.5%",
+    marginTop: 0,
     padding: "2%",
     paddingBottom: "5%",
-    marginTop: "5%",
     backgroundColor: GlobalStyles.colors.gray500,
     borderRadius: 5,
     borderWidth: 1,

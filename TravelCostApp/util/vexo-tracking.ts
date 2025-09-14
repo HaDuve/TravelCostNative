@@ -21,7 +21,8 @@ export interface VexoUserContext {
 
 const isProduction = !__DEV__;
 
-const shouldEnableVexo = isProduction && Device.isDevice && !DEVELOPER_MODE;
+export const shouldEnableVexo =
+  isProduction && Device.isDevice && !DEVELOPER_MODE;
 
 export async function initializeVexo(apiKey: string): Promise<boolean> {
   try {

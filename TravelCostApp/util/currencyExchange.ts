@@ -134,7 +134,11 @@ export function getOfflineRate(base: string, target: string) {
   if (currencyExchange) {
     return currencyExchange[target];
   } else {
-    safeLogError("Unable to get offline rate for " + base + " " + target);
+    safeLogError(
+      "Unable to get offline rate for " + base + " " + target,
+      "currencyExchange.ts",
+      137
+    );
     return -1;
   }
 }

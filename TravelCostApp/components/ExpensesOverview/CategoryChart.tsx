@@ -53,14 +53,16 @@ const CategoryChart = React.memo(
 
     return (
       <View style={styles.container}>
-        <WebViewChart
-          data={highchartsData}
-          options={chartOptions}
-          width={width}
-          height={height}
-          onChartReady={handleChartReady}
-          style={styles.chart}
-        />
+        {inputData && inputData.length > 0 && (
+          <WebViewChart
+            data={highchartsData}
+            options={chartOptions}
+            width={width}
+            height={height}
+            onChartReady={handleChartReady}
+            style={styles.chart}
+          />
+        )}
       </View>
     );
   }
@@ -77,6 +79,7 @@ const styles = StyleSheet.create({
     paddingTop: dynamicScale(60, true),
     justifyContent: "center",
     alignItems: "center",
+    height: dynamicScale(240, true),
   },
   chart: {
     backgroundColor: "transparent",

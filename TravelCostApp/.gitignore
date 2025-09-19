@@ -84,9 +84,8 @@ web-build/
 dist/
 
 # claude & cc-session
-.claude/
-cc-session/
-sessions/
-CLAUDE*
+# .claude/
+# cc-session/
+# CLAUDE*
 
 # @end expo-cli

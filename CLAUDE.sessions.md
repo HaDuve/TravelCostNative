@@ -14,19 +14,20 @@ This file provides collaborative guidance and philosophy when using the Claude C
 ## Task Management
 
 ### Best Practices
-- One task at a time (check .claude/state/current_task.json)
+- Go into the subdirectory for the correct Folder TravelCostApp/
+- One task at a time (check TravelCostApp/.claude/state/current_task.json)
 - Update work logs as you progress  
 - Mark todos as completed immediately after finishing
 
 ### Quick State Checks
 ```bash
-cat .claude/state/current_task.json  # Shows current task
+cat TravelCostApp/.claude/state/current_task.json  # Shows current task
 git branch --show-current             # Current branch/task
 ```
 
 ### current_task.json Format
 
-**ALWAYS use this exact format for .claude/state/current_task.json:**
+**ALWAYS use this exact format for TravelCostApp/.claude/state/current_task.json:**
 ```json
 {
   "task": "task-name",        // Just the task name, NO path, NO .md extension
@@ -41,6 +42,7 @@ git branch --show-current             # Current branch/task
 - ❌ Using `"branch_name"` instead of `"branch"`  
 - ❌ Including path like `"tasks/m-task.md"`
 - ❌ Including `.md` file extension
+- ❌ forget to check TravelCostApp/
 
 ## Using Specialized Agents
 
@@ -115,19 +117,19 @@ Specifically, avoid long prompts when invoking the logging or context-refinement
 
 These protocols guide specific workflows:
 
-1. **sessions/protocols/task-creation.md** - Creating new tasks
+1. **TravelCostApp/sessions/protocols/task-creation.md** - Creating new tasks
    - EXPLICIT: "create a new task", "let's make a task for X"
    - VAGUE: "we should track this", "might need a task for that"
 
-2. **sessions/protocols/task-startup.md** - Beginning work on existing tasks  
+2. **TravelCostApp/sessions/protocols/task-startup.md** - Beginning work on existing tasks  
    - EXPLICIT: "switch to task X", "let's work on task Y"
    - VAGUE: "maybe we should look at the other thing"
 
-3. **sessions/protocols/task-completion.md** - Completing and closing tasks
+3. **TravelCostApp/sessions/protocols/task-completion.md** - Completing and closing tasks
    - EXPLICIT: "complete the task", "finish this task", "mark it done"
    - VAGUE: "I think we're done", "this might be finished"
 
-4. **sessions/protocols/context-compaction.md** - Managing context window limits
+4. **TravelCostApp/sessions/protocols/context-compaction.md** - Managing context window limits
    - EXPLICIT: "let's compact", "run context compaction", "compact and restart"
    - VAGUE: "context is getting full", "we're using a lot of tokens"
 

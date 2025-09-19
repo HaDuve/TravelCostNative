@@ -16,14 +16,15 @@ This file provides collaborative guidance and philosophy when using the Claude C
 
 ### Best Practices
 
-- One task at a time (check .claude/state/current_task.json)
+- One task at a time (check TravelCostApp/.claude/state/current_task.json)
 - Update work logs as you progress
 - Mark todos as completed immediately after finishing
+- Go into the subdirectory for the correct Folder TravelCostApp/
 
 ### Quick State Checks
 
 ```bash
-cat .claude/state/current_task.json  # Shows current task
+cat TravelCostApp/.claude/state/current_task.json  # Shows current task
 git branch --show-current             # Current branch/task
 ```
 
@@ -131,22 +132,22 @@ Specifically, avoid long prompts when invoking the logging or context-refinement
 
 These protocols guide specific workflows:
 
-1. **sessions/protocols/task-creation.md** - Creating new tasks
+1. **TravelCostApp/sessions/protocols/task-creation.md** - Creating new tasks
 
    - EXPLICIT: "create a new task", "let's make a task for X"
    - VAGUE: "we should track this", "might need a task for that"
 
-2. **sessions/protocols/task-startup.md** - Beginning work on existing tasks
+2. **TravelCostApp/sessions/protocols/task-startup.md** - Beginning work on existing tasks
 
    - EXPLICIT: "switch to task X", "let's work on task Y"
    - VAGUE: "maybe we should look at the other thing"
 
-3. **sessions/protocols/task-completion.md** - Completing and closing tasks
+3. **TravelCostApp/sessions/protocols/task-completion.md** - Completing and closing tasks
 
    - EXPLICIT: "complete the task", "finish this task", "mark it done"
    - VAGUE: "I think we're done", "this might be finished"
 
-4. **sessions/protocols/context-compaction.md** - Managing context window limits
+4. **TravelCostApp/sessions/protocols/context-compaction.md** - Managing context window limits
    - EXPLICIT: "let's compact", "run context compaction", "compact and restart"
    - VAGUE: "context is getting full", "we're using a lot of tokens"
 
@@ -164,37 +165,6 @@ These protocols guide specific workflows:
 - User: "Yes"
 - You: [NOW read task-completion.md] → "I'll complete the task now..."
 
-## Project Architecture
-
-### Chart System (Highcharts WebView Implementation)
-
-The app uses a WebView-based Highcharts implementation for data visualization, replacing the previous Victory charts system.
-
-#### Key Components
-
-- `components/charts/` - Core chart infrastructure
-  - `WebViewChart.tsx:24-160` - Main chart component with WebView integration
-  - `controller.tsx:22-185` - Data processing and chart configuration
-  - `chartHelpers.ts:22-292` - HTML template generation and data formatting
-- `components/ExpensesOverview/` - Chart usage implementations
-  - `ExpenseChart.tsx:29-138` - Column charts for expense visualization
-  - `CategoryChart.tsx:15-68` - Pie charts for category breakdown
-
-#### Architecture Patterns
-
-- **WebView Communication**: Bidirectional messaging between React Native and Highcharts
-- **Data Processing**: Static controller methods for data transformation
-- **Responsive Design**: Orientation-aware chart sizing
-- **Touch Interactions**: Haptic feedback with chart event handling
-
-#### Integration Points
-
-- Highcharts CDN: Chart rendering library
-- react-native-webview: WebView platform
-- expo-haptics: Touch feedback
-- Global styling system: Color schemes and responsive scaling
-
-See `components/charts/CLAUDE.md` and `components/ExpensesOverview/CLAUDE.md` for detailed documentation.
 
 ## Sessions System Behaviors
 

@@ -11,7 +11,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -26,7 +29,7 @@ import {
 } from "firebase/auth";
 import { Alert } from "react-native";
 import { initializeApp } from "firebase/app";
-import { getReactNativePersistence } from "firebase/auth";
+// import { getReactNativePersistence } from "firebase/auth";
 import {
   secureStoreGetItem,
   secureStoreRemoveItem,
@@ -34,7 +37,6 @@ import {
 } from "./secure-storage";
 import { reloadApp } from "../util/appState";
 import safeLogError from "../util/error";
-import branch from "react-native-branch";
 
 export const AuthContext = createContext({
   uid: "",
@@ -65,7 +67,6 @@ function AuthContextProvider({ children }) {
   }
 
   function logout() {
-    branch.logout();
     setAuthToken(null);
   }
 
@@ -86,9 +87,7 @@ function AuthContextProvider({ children }) {
     };
     // assuming initialize App and Auth has never been called before!
     const app = initializeApp(firebaseConfig);
-    const auth = initializeAuth(app, {
-      persistence: getReactNativePersistence(AsyncStorage),
-    });
+    const auth = initializeAuth(app);
     // load email and password from async storage
     const email = await secureStoreGetItem("ENCM");
     // console.log("deleteAccount ~ email:", email);

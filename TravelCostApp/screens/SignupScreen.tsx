@@ -7,7 +7,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -27,7 +30,6 @@ import {
   setAttributesAsync,
 } from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
-import { BranchEvent } from "react-native-branch";
 
 function SignupScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -109,10 +111,7 @@ function SignupScreen() {
       }
       await Purchases.collectDeviceIdentifiers();
       await setAttributesAsync(email, userData.userName);
-      const event = new BranchEvent(BranchEvent.CompleteRegistration);
-      await event.logEvent();
-      const event2 = new BranchEvent(BranchEvent.Login);
-      await event2.logEvent();
+      // Branch.io removed - no event logging
     } catch (error) {
       await authCtx.authenticate(token);
       // console.log("error", error);

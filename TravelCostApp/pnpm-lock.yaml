@@ -74,6 +74,9 @@ importers:
       deprecated-react-native-prop-types:
         specifier: ^5.0.0
         version: 5.0.0
+      dotenv:
+        specifier: ^17.2.2
+        version: 17.2.2
       expo:
         specifier: ^53.0.20
         version: 53.0.22(@babel/core@7.28.4)(react-native-webview@13.16.0(react-native@0.79.5(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0))(react-native@0.79.5(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
@@ -176,9 +179,6 @@ importers:
       react-native:
         specifier: 0.79.5
         version: 0.79.5(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.0.0)
-      react-native-branch:
-        specifier: ^6.8.0
-        version: 6.8.0(react-native@0.79.5(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.0.0))
       react-native-country-flag:
         specifier: ^2.0.2
         version: 2.0.2
@@ -2505,6 +2505,10 @@ packages:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
     engines: {node: '>=12'}
 
+  dotenv@17.2.2:
+    resolution: {integrity: sha512-Sf2LSQP+bOlhKWWyhFsn0UsfdK/kCWRv1iuA2gXAwt3dyNabr6QSj00I2V10pidqz69soatm9ZwZvpQMTIOd5Q==}
+    engines: {node: '>=12'}
+
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
@@ -4412,11 +4416,6 @@ packages:
 
   react-native-animatable@1.4.0:
     resolution: {integrity: sha512-DZwaDVWm2NBvBxf7I0wXKXLKb/TxDnkV53sWhCvei1pRyTX3MVFpkvdYBknNBqPrxYuAIlPxEp7gJOidIauUkw==}
-
-  react-native-branch@6.8.0:
-    resolution: {integrity: sha512-jkPNv+kj0Aap5DIzBEJ4reD8P5OE9H5fYkHc/ltLlf1m7PlBy1qyRY1On01eA/nLT4YLCx6QZsB7E9WUXhWM0g==}
-    peerDependencies:
-      react-native: '>= 0.60'
 
   react-native-country-flag@2.0.2:
     resolution: {integrity: sha512-5LMWxS79ZQ0Q9ntYgDYzWp794+HcQGXQmzzZNBR1AT7z5HcJHtX7rlk8RHi7RVzfp5gW6plWSZ4dKjRpu/OafQ==}
@@ -8624,11 +8623,13 @@ snapshots:
 
   dotenv-expand@11.0.7:
     dependencies:
-      dotenv: 16.4.7
+      dotenv: 16.6.1
 
   dotenv@16.4.7: {}
 
   dotenv@16.6.1: {}
+
+  dotenv@17.2.2: {}
 
   dunder-proto@1.0.1:
     dependencies:
@@ -10944,10 +10945,6 @@ snapshots:
   react-native-animatable@1.4.0:
     dependencies:
       prop-types: 15.8.1
-
-  react-native-branch@6.8.0(react-native@0.79.5(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.0.0)):
-    dependencies:
-      react-native: 0.79.5(@babel/core@7.28.4)(@types/react@19.0.14)(react@19.0.0)
 
   react-native-country-flag@2.0.2: {}
 

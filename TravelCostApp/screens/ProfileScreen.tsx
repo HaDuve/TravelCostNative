@@ -19,7 +19,6 @@ import { UserContext } from "../store/user-context";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import React from "react";
-import { BranchEvent } from "react-native-branch";
 import { TourGuideZone, useTourGuideController } from "rn-tourguide";
 import { useInterval } from "../components/Hooks/useInterval";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
@@ -42,7 +41,7 @@ import Constants from "expo-constants";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { ExpoPushToken } from "expo-notifications";
-import branch from "react-native-branch";
+// Branch.io removed
 import Purchases from "react-native-purchases";
 import { setAttributesAsync } from "../components/Premium/PremiumConstants";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
@@ -231,11 +230,7 @@ const ProfileScreen = ({ navigation }) => {
         if (userCtx.userName)
           await Purchases.setAttributes({ name: userCtx.userName });
         if (!isConnected) return;
-        const params = await branch.getLatestReferringParams();
-        if (params) {
-          if (params["~channel"])
-            await Purchases.setAttributes({ channel: params["~channel"] });
-        }
+        // Branch.io removed - no campaign tracking
       } catch (error) {
         // console.log(
         //   "setAttributesAsync - Settings - ForRevCat ~ error:",
@@ -300,8 +295,7 @@ const ProfileScreen = ({ navigation }) => {
     saveStoppedTour();
     userCtx.setNeedsTour(false);
     setTourIsRunning(false);
-    const event = new BranchEvent(BranchEvent.CompleteTutorial);
-    event.logEvent();
+    // Branch.io removed - no event logging
     // console.log("stop");
   };
   const handleOnStepChange = async (step) => {

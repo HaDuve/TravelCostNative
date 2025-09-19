@@ -2,14 +2,16 @@ import React from "react";
 import { View, Text, Pressable, Alert, StyleSheet } from "react-native";
 import Purchases, { PurchasesPackage } from "react-native-purchases";
 import { ENTITLEMENT_ID } from "../Premium/PremiumConstants";
-import { BranchEvent } from "react-native-branch";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -59,11 +61,7 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
           text1: i18n.t("toastPurchaseSuccess1"),
           text2: i18n.t("toastPurchaseSuccess2"),
         });
-        const branchEvent = isLifetime
-          ? BranchEvent.Purchase
-          : BranchEvent.StartTrial;
-        const event = new BranchEvent(branchEvent);
-        await event.logEvent();
+        // Branch.io removed - no event logging
       }
     } catch (e) {
       if (!e.userCancelled) {

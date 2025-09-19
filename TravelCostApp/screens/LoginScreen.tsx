@@ -9,7 +9,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -28,7 +31,6 @@ import { NetworkContext } from "../store/network-context";
 import { secureStoreSetItem } from "../store/secure-storage";
 import { ExpensesContext } from "../store/expenses-context";
 import { setMMKVObject } from "../store/mmkv";
-import { BranchEvent } from "react-native-branch";
 import safeLogError from "../util/error";
 
 function LoginScreen() {
@@ -119,8 +121,7 @@ function LoginScreen() {
       await Purchases.collectDeviceIdentifiers();
       await setAttributesAsync(email, userData.userName);
 
-      const event = new BranchEvent(BranchEvent.Login);
-      await event.logEvent();
+      // Branch.io removed - no event logging
       // console.log("loginHandler ~ userData", userData);
     } catch (error) {
       safeLogError(error);

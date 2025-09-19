@@ -1,11 +1,21 @@
-import React, { Share, View, Alert, StyleSheet, Text, ScrollView } from "react-native";
+import React, {
+  Share,
+  View,
+  Alert,
+  StyleSheet,
+  Text,
+  ScrollView,
+} from "react-native";
 import axios from "axios";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -19,40 +29,11 @@ import IconButton from "../UI/IconButton";
 import { dynamicScale } from "../../util/scalingUtil";
 
 export async function onShare(shareId, navigation) {
-  const keys = await loadKeys();
-  const branchKey = keys.BRAN;
+  // Branch.io removed - using simple fallback sharing
   let shareURL = i18n.t("inviteLink");
-  const getShareLinkData = {
-    branch_key: branchKey,
-    channel: "appinvite",
-    campaign: "appinvite",
-    tags: ["appinvite", shareId],
-    $deeplink_path: `join/${shareId}`,
-    data: {
-      $deeplink_path: `join/${shareId}`,
-    },
-  };
 
-  try {
-    const response = await axios.post(
-      "https://api2.branch.io/v1/url",
-      getShareLinkData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    // Handle response data as needed
-    const url = response.data.url;
-    if (url) shareURL = url;
-  } catch (error) {
-    // Handle errors
-    safeLogError(error);
-    Alert.alert(i18n.t("errorShareTripText"), i18n.t("errorShareTripText"));
-    return;
-  }
+  // Simple fallback URL with trip ID
+  shareURL = `${shareURL}?trip=${shareId}`;
 
   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   // const link = Linking.createURL("join/" + shareId);
@@ -103,7 +84,8 @@ const ShareTripButton = ({ route, navigation }) => {
           </Text>
 
           <Text style={[GlobalStyles.secondaryText, styles.description]}>
-            Share this trip with other travelers. They'll receive an invitation link to join your trip and track expenses together.
+            Share this trip with other travelers. They'll receive an invitation
+            link to join your trip and track expenses together.
           </Text>
 
           <View style={styles.buttonContainer}>
@@ -144,24 +126,24 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: dynamicScale(20, false),
     paddingTop: dynamicScale(20, true),
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   title: {
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: dynamicScale(20, true),
   },
   description: {
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: dynamicScale(40, true),
     lineHeight: dynamicScale(20, true),
     paddingHorizontal: dynamicScale(20, false),
   },
   buttonContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: dynamicScale(40, true),
   },
   shareButton: {
-    width: '80%',
+    width: "80%",
     minWidth: dynamicScale(200, false),
   },
 });

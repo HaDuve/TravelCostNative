@@ -5,7 +5,7 @@ import { FORCE_PREMIUM } from "../../confAppConstants";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
-import branch from "react-native-branch";
+// Branch.io removed
 import {
   secureStoreGetItem,
   secureStoreSetItem,
@@ -52,8 +52,11 @@ export async function setAttributesAsync(emailString = "", userName = "") {
     await Purchases.setEmail(emailString);
   if (userName && typeof userName == "string")
     await Purchases.setDisplayName(userName);
-  const referrer = await branch.getLatestReferringParams();
-  if (referrer) await Purchases.setCampaign(referrer["~channel"]);
+  try {
+    // Branch.io removed - no campaign tracking
+  } catch (error) {
+    safeLogError(error, "PremiumConstants.tsx", 74);
+  }
 }
 
 export interface Keys {

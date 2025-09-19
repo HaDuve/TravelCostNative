@@ -25,11 +25,6 @@ import { TripContext } from "../../store/trip-context";
 import { NetworkContext } from "../../store/network-context";
 import { UserContext } from "../../store/user-context";
 import { GlobalStyles } from "../../constants/styles";
-import {
-  initBranch,
-  showBranchParams,
-  trackPurchaseEvent,
-} from "../Referral/branch";
 import { storeExpoPushTokenInTrip } from "../../util/http";
 import { ExpoPushToken } from "expo-notifications";
 import safeLogError from "../../util/error";
@@ -184,28 +179,8 @@ const DevContent = ({ navigation }) => {
 
       <Button
         style={styles.settingsButton}
-        onPress={async () => await initBranch()}
-      >
-        initBranch
-      </Button>
-
-      <Button
-        style={styles.settingsButton}
-        onPress={async () => {
-          const { campaign, channel, feature, tags, stage, url } =
-            await showBranchParams();
-          Alert.alert(
-            "showBranchParams",
-            JSON.stringify({ campaign, channel, feature, tags, stage, url })
-          );
-        }}
-      >
-        showBranchParams
-      </Button>
-
-      <Button
-        style={styles.settingsButton}
-        onPress={async () => await trackPurchaseEvent()}
+        // onPress={async () => await trackPurchaseEvent()}
+        onPress={async () => {}}
       >
         trackPurchaseEvent
       </Button>

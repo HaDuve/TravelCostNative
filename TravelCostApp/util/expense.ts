@@ -124,11 +124,15 @@ export async function deleteAllExpensesByRangedId(
   }
 }
 
-export function getExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
-  // Deduplicate range expenses to avoid double-counting
-  // For range expenses, we only want to count each range once, not once per day
+/**
+ * Deduplicates range expenses to avoid double-counting.
+ * For range expenses, we only want to count each range once, not once per day.
+ * @param expenses Array of expenses to deduplicate
+ * @returns Array of expenses with range expenses deduplicated
+ */
+export function deduplicateRangeExpenses(expenses: ExpenseData[]): ExpenseData[] {
   const processedRangeIds = new Set<string>();
-  const deduplicatedExpenses = expenses.filter((expense: ExpenseData) => {
+  return expenses.filter((expense: ExpenseData) => {
     if (expense.rangeId) {
       if (processedRangeIds.has(expense.rangeId)) {
         return false; // Skip this expense as we've already processed this range
@@ -137,6 +141,10 @@ export function getExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
     }
     return true;
   });
+}
+
+export function getExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
+  const deduplicatedExpenses = deduplicateRangeExpenses(expenses);
 
   const sum = deduplicatedExpenses.reduce((sum: number, expense: ExpenseData) => {
     if (
@@ -150,18 +158,7 @@ export function getExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
 }
 
 export function getTravellerSum(expenses: ExpenseData[], traveller: string) {
-  // Deduplicate range expenses to avoid double-counting
-  // For range expenses, we only want to count each range once, not once per day
-  const processedRangeIds = new Set<string>();
-  const deduplicatedExpenses = expenses.filter((expense: ExpenseData) => {
-    if (expense.rangeId) {
-      if (processedRangeIds.has(expense.rangeId)) {
-        return false; // Skip this expense as we've already processed this range
-      }
-      processedRangeIds.add(expense.rangeId);
-    }
-    return true;
-  });
+  const deduplicatedExpenses = deduplicateRangeExpenses(expenses);
 
   // return the sum of expenses for a given traveller
   const expensesSum = deduplicatedExpenses.reduce((sum: number, expense: ExpenseData) => {

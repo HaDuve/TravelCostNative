@@ -55,28 +55,8 @@ export const generateHTMLTemplate = (
             display: none !important;
           }
           /* Make all Highcharts text elements non-selectable */
-          .highcharts-container text,
-          .highcharts-label text,
-          .highcharts-axis-labels text,
-          .highcharts-legend-item text,
-          .highcharts-title text,
-          .highcharts-subtitle text,
-          .highcharts-data-label text,
-          .highcharts-container svg text {
-            -webkit-touch-callout: none; /* iOS Safari */
-            -webkit-user-select: none;   /* Safari */
-            -khtml-user-select: none;    /* Konqueror HTML */
-            -moz-user-select: none;      /* Firefox */
-            -ms-user-select: none;       /* Internet Explorer/Edge */
-            user-select: none;           /* Standard syntax */
-          }
-          /* Additional rule for any remaining text elements */
-          #${chartId} * {
-            -webkit-touch-callout: none;
+          .highcharts-container * {
             -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
             user-select: none;
           }
         </style>

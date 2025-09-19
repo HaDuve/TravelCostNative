@@ -390,7 +390,6 @@ function Home() {
       initialRouteName={FirstScreen}
       backBehavior={"history"}
       tabBarPosition={"bottom"}
-      // tabBar={(props) => <TabBar {...props} />}
       screenOptions={() => ({
         headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
         headerTintColor: GlobalStyles.colors.backgroundColor,
@@ -398,20 +397,6 @@ function Home() {
           backgroundColor: GlobalStyles.colors.gray500,
           borderTopWidth: dynamicScale(1, false, 0.5),
           borderTopColor: GlobalStyles.colors.gray600,
-          height: IconSize * 1.8,
-        },
-        tabBarItemStyle: {
-          borderWidth: 0,
-        },
-        tabBarLabelStyle: {
-          fontSize: dynamicScale(10, false, 0.5),
-        },
-        tabBarIconStyle: {
-          height: IconSize * 1.5,
-          width: IconSize * 1.2,
-          marginTop: dynamicScale(-12, true, -1),
-          marginBottom: dynamicScale(6, true, -1),
-          // marginTop: -6,  // old value - was not pulling icons up enough
         },
         tabBarActiveTintColor: GlobalStyles.colors.primary500,
         tabBarIndicatorStyle: {
@@ -427,8 +412,6 @@ function Home() {
         component={MemoizedRecentExpenses}
         options={{
           tabBarShowLabel: false,
-          // headerShown: false,
-          // title: "Recent Expenses",
           tabBarLabel: i18n.t("expensesTab"),
           tabBarIcon: ({ color }) => (
             <Ionicons name="home-outline" size={IconSize} color={color} />
@@ -454,7 +437,6 @@ function Home() {
         name="Overview"
         component={OverviewScreen}
         options={{
-          // headerShown: false,
           tabBarShowLabel: false,
           title: i18n.t("overviewTab"),
           tabBarLabel: i18n.t("overviewTab"),
@@ -472,7 +454,6 @@ function Home() {
           name="Finder"
           component={FinderScreen}
           options={{
-            // headerShown: false,
             title: i18n.t("settingsTab"),
             tabBarShowLabel: false,
 
@@ -488,7 +469,6 @@ function Home() {
           name="Financial"
           component={SplitSummaryScreen}
           options={{
-            // headerShown: false,
             title: i18n.t("settingsTab"),
             tabBarShowLabel: false,
 
@@ -503,7 +483,6 @@ function Home() {
         name="Profile"
         component={ProfileScreen}
         options={{
-          // headerShown: false,
           title: i18n.t("profileTab"),
           tabBarShowLabel: false,
 

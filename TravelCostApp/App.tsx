@@ -475,7 +475,7 @@ function Home() {
             title: i18n.t("settingsTab"),
             tabBarShowLabel: false,
 
-            tabBarLabel: "Finder", //i18n.t("settingsTab"),
+            tabBarLabel: i18n.t("finderTab"),
             tabBarIcon: ({ color }) => (
               <Ionicons name="search-outline" size={IconSize} color={color} />
             ),
@@ -491,7 +491,7 @@ function Home() {
             title: i18n.t("settingsTab"),
             tabBarShowLabel: false,
 
-            tabBarLabel: "Financial", //i18n.t("settingsTab"),
+            tabBarLabel: i18n.t("financialTab"),
             tabBarIcon: ({ color }) => (
               <Ionicons name="cash-outline" size={IconSize} color={color} />
             ),

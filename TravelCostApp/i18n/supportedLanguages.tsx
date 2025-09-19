@@ -143,6 +143,10 @@ const en = {
   visitFoodForNomadsLabel: "Visit Food For Nomads",
   supportFeedbackLabel: "Feedback?",
 
+  // Navigation Tab Labels
+  finderTab: "Finder",
+  financialTab: "Financial",
+
   // Get Local Price Modal
   getLocalPriceModalTitle: "Get Local Price",
   getLocalPriceModalSubtitle:
@@ -580,6 +584,10 @@ const de = {
   resetAppIntroductionLabel: "App Einführung wiederholen",
   visitFoodForNomadsLabel: "Food For Nomads besuchen",
   supportFeedbackLabel: "Feedback?",
+
+  // Navigation Tab Labels
+  finderTab: "Finden",
+  financialTab: "Finanzen",
 
   // Get Local Price Modal
   getLocalPriceModalTitle: "Lokale Preise Anzeigen",
@@ -1034,6 +1042,10 @@ const fr = {
   visitFoodForNomadsLabel: "Visitez Food For Nomads",
   supportFeedbackLabel: "Commentaires?",
 
+  // Navigation Tab Labels
+  finderTab: "Chercheur",
+  financialTab: "Financier",
+
   // Get Local Price Modal
   getLocalPriceModalTitle: "Obtenir le Prix Local",
   getLocalPriceModalSubtitle:
@@ -1484,6 +1496,10 @@ const ru = {
   resetAppIntroductionLabel: "Сбросить введение в приложение",
   visitFoodForNomadsLabel: "Посетить Food For Nomads",
   supportFeedbackLabel: "Отзыв?",
+
+  // Navigation Tab Labels
+  finderTab: "Поиск",
+  financialTab: "Финансы",
 
   // Get Local Price Modal
   getLocalPriceModalTitle: "Получить Местную Цену",

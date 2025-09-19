@@ -130,7 +130,9 @@ export async function deleteAllExpensesByRangedId(
  * @param expenses Array of expenses to deduplicate
  * @returns Array of expenses with range expenses deduplicated
  */
-export function deduplicateRangeExpenses(expenses: ExpenseData[]): ExpenseData[] {
+export function deduplicateRangeExpenses(
+  expenses: ExpenseData[]
+): ExpenseData[] {
   const processedRangeIds = new Set<string>();
   return expenses.filter((expense: ExpenseData) => {
     if (expense.rangeId) {
@@ -146,14 +148,17 @@ export function deduplicateRangeExpenses(expenses: ExpenseData[]): ExpenseData[]
 export function getExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
   const deduplicatedExpenses = deduplicateRangeExpenses(expenses);
 
-  const sum = deduplicatedExpenses.reduce((sum: number, expense: ExpenseData) => {
-    if (
-      isNaN(Number(expense.calcAmount)) ||
-      (hideSpecial && expense.isSpecialExpense)
-    )
-      return sum;
-    return sum + Number(expense.calcAmount);
-  }, 0);
+  const sum = deduplicatedExpenses.reduce(
+    (sum: number, expense: ExpenseData) => {
+      if (
+        isNaN(Number(expense.calcAmount)) ||
+        (hideSpecial && expense.isSpecialExpense)
+      )
+        return sum;
+      return sum + Number(expense.calcAmount);
+    },
+    0
+  );
   return sum;
 }
 
@@ -161,36 +166,39 @@ export function getTravellerSum(expenses: ExpenseData[], traveller: string) {
   const deduplicatedExpenses = deduplicateRangeExpenses(expenses);
 
   // return the sum of expenses for a given traveller
-  const expensesSum = deduplicatedExpenses.reduce((sum: number, expense: ExpenseData) => {
-    const hasSplits = expense.splitList && expense.splitList?.length > 0;
-    if (!hasSplits) {
-      const correct = traveller == expense.whoPaid;
-      if (!correct) return sum;
-      if (!expense.calcAmount) return sum + Number(expense.amount);
-      return sum + Number(expense.calcAmount);
-    } else {
-      const split = expense.splitList.find(
-        (split) => split.userName === traveller
-      );
-      const correct = split;
-      if (!correct || !split) return sum;
-
-      // check if the expense has a calcAmount by comparing it to the amount
-      // if it is the same, the expense has no calcAmount
-      if (!expense.calcAmount || !expense.amount)
-        return sum + Number(split.amount);
-      const hasConversionRate = expense.calcAmount !== expense.amount;
-      if (!hasConversionRate) {
-        return sum + Number(split.amount);
+  const expensesSum = deduplicatedExpenses.reduce(
+    (sum: number, expense: ExpenseData) => {
+      const hasSplits = expense.splitList && expense.splitList?.length > 0;
+      if (!hasSplits) {
+        const correct = traveller == expense.whoPaid;
+        if (!correct) return sum;
+        if (!expense.calcAmount) return sum + Number(expense.amount);
+        return sum + Number(expense.calcAmount);
       } else {
-        // calculate the rate of the split
-        const rate = expense.calcAmount / expense.amount;
-        // calculate the amount of the split
-        const splitAmount = split.amount * rate;
-        return sum + Number(splitAmount);
+        const split = expense.splitList.find(
+          (split) => split.userName === traveller
+        );
+        const correct = split;
+        if (!correct || !split) return sum;
+
+        // check if the expense has a calcAmount by comparing it to the amount
+        // if it is the same, the expense has no calcAmount
+        if (!expense.calcAmount || !expense.amount)
+          return sum + Number(split.amount);
+        const hasConversionRate = expense.calcAmount !== expense.amount;
+        if (!hasConversionRate) {
+          return sum + Number(split.amount);
+        } else {
+          // calculate the rate of the split
+          const rate = expense.calcAmount / expense.amount;
+          // calculate the amount of the split
+          const splitAmount = split.amount * rate;
+          return sum + Number(splitAmount);
+        }
       }
-    }
-  }, 0);
+    },
+    0
+  );
   return expensesSum;
 }
 

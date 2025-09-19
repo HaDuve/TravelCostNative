@@ -56,7 +56,6 @@ import {
 import LoadingOverlay from "./components/UI/LoadingOverlay";
 import FilteredExpenses from "./screens/FilteredExpenses";
 import { sendOfflineQueue } from "./util/offline-queue";
-import { BranchEvent } from "react-native-branch";
 
 //localization
 import * as Localization from "expo-localization";
@@ -98,7 +97,6 @@ import { isConnectionFastEnough } from "./util/connectionSpeed";
 import FinderScreen from "./screens/FinderScreen";
 import CustomerScreen from "./screens/CustomerScreen";
 import GPTDealScreen from "./screens/ChatGPTDealScreen";
-import { initBranch } from "./components/Referral/branch";
 import { MemoizedRecentExpenses } from "./screens/RecentExpenses";
 import TripSummaryScreen from "./screens/TripSummaryScreen";
 import { versionCheck } from "./util/version";
@@ -170,13 +168,6 @@ function NotAuthenticatedStack() {
 
 function AuthenticatedStack() {
   const navigation = useNavigation();
-  useEffect(() => {
-    async function startInit() {
-      // setup branch
-      await initBranch(navigation);
-    }
-    startInit();
-  });
   return (
     <ExpensesContextProvider>
       <>
@@ -660,8 +651,6 @@ function Root() {
         }
         Purchases.setLogLevel(Purchases.LOG_LEVEL.ERROR);
         await Purchases.collectDeviceIdentifiers();
-        const event = new BranchEvent(BranchEvent.Login);
-        await event.logEvent();
 
         // Initialize Vexo for error and session tracking
         try {

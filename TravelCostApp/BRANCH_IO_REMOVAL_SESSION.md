@@ -26,8 +26,31 @@ Attempt to invoke virtual method 'void io.branch.referral.Branch.logout()' on a 
 
 - ❌ Removed: `import { BranchEvent } from "react-native-branch"`
 - ❌ Removed: `import { initBranch } from "./components/Referral/branch"`
-- ❌ Removed: Branch.io initialization in `startInit()` function
-- ❌ Removed: `BranchEvent.Login` event logging
+- ❌ Removed: Branch.io initialization in `AuthenticatedStack` component
+- ❌ Removed: `useEffect` hook that called `initBranch(navigation)`
+- ❌ Removed: `BranchEvent.Login` event logging in `onRootMount()` function
+- ❌ Removed: `const event = new BranchEvent(BranchEvent.Login); await event.logEvent();`
+
+**Specific Code Removed from App.tsx:**
+
+```typescript
+// REMOVED - Import statements
+import { BranchEvent } from "react-native-branch";
+import { initBranch } from "./components/Referral/branch";
+
+// REMOVED - Branch initialization in AuthenticatedStack
+useEffect(() => {
+  async function startInit() {
+    // setup branch
+    await initBranch(navigation);
+  }
+  startInit();
+});
+
+// REMOVED - Branch event logging in onRootMount()
+const event = new BranchEvent(BranchEvent.Login);
+await event.logEvent();
+```
 
 #### **store/auth-context.tsx**
 

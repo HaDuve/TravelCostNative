@@ -44,6 +44,10 @@ import { TripContext } from "../../store/trip-context";
 import {
   calcSplitList,
   recalcSplitsLinearly,
+  recalcSplitsLinearlyWithPriority,
+  updateSplitPriority,
+  resetSplitPriorities,
+  recalcSplitsWithPriority,
   splitType,
   splitTypesDropdown,
   travellerToDropdown,
@@ -706,7 +710,7 @@ const ExpenseForm = ({
     ) {
       // split into equal parts if we are splitting over a ranged date and are editing
       if (duplOrSplit === 2 && isEditing) {
-        const newSplitList = recalcSplitsLinearly(
+        const newSplitList = recalcSplitsLinearlyWithPriority(
           splitList,
           +amountValue / daysBeween
         );
@@ -718,7 +722,7 @@ const ExpenseForm = ({
         );
         setSplitListValid(isValidSplit);
       }
-      const newSplitList = recalcSplitsLinearly(splitList, +value);
+      const newSplitList = recalcSplitsLinearlyWithPriority(splitList, +value);
       setSplitList(newSplitList);
       const isValidSplit = validateSplitList(newSplitList, splitType, +value);
       setSplitListValid(isValidSplit);
@@ -807,8 +811,11 @@ const ExpenseForm = ({
     // eslint-disable-next-line react/prop-types
     const tempValue = { amount: value, userName: props.userName };
     tempList[index] = tempValue;
-    setSplitList(tempList);
-    setSplitListValid(validateSplitList(tempList, splitType, +amountValue));
+
+    // Update priority for this edited split
+    const updatedListWithPriority = updateSplitPriority(tempList, index);
+    setSplitList(updatedListWithPriority);
+    setSplitListValid(validateSplitList(updatedListWithPriority, splitType, +amountValue));
   }
 
   function splitHandler() {

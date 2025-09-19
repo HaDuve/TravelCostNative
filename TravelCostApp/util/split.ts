@@ -13,6 +13,23 @@ import { getAllExpenses } from "./http";
 import safeLogError from "./error";
 import { safelyParseJSON } from "./jsonParse";
 
+export function recalcSplitsLinearlyWithPriority(splitList: Split[], amount: number): Split[] {
+  if (amount === 0) return splitList;
+
+  const updatedList = [...splitList];
+  const editedSplits = updatedList.filter(split => split.isUserEdited)
+    .sort((a, b) => (a.editPriority || 0) - (b.editPriority || 0));
+  const uneditedSplits = updatedList.filter(split => !split.isUserEdited);
+
+  // If there are unedited splits, use priority-aware distribution
+  if (editedSplits.length > 0) {
+    return recalcSplitsWithPriority(updatedList, amount);
+  }
+
+  // Otherwise, fall back to the original linear behavior
+  return recalcSplitsLinearly(updatedList, amount);
+}
+
 export function recalcSplitsLinearly(splitList: Split[], amount: number) {
   if (amount == 0) return splitList;
   // Calculate the total amount and the total split amount
@@ -66,6 +83,77 @@ export function recalcSplitsLinearly(splitList: Split[], amount: number) {
   }
 
   return splitList;
+}
+
+export function updateSplitPriority(splitList: Split[], editedIndex: number): Split[] {
+  const updatedList = [...splitList];
+
+  // Set the edited split to highest priority (0)
+  updatedList[editedIndex] = {
+    ...updatedList[editedIndex],
+    editPriority: 0,
+    isUserEdited: true
+  };
+
+  // Increment priority for all other splits that have been edited
+  updatedList.forEach((split, index) => {
+    if (index !== editedIndex && split.isUserEdited) {
+      split.editPriority = (split.editPriority || 0) + 1;
+    }
+  });
+
+  return updatedList;
+}
+
+export function resetSplitPriorities(splitList: Split[]): Split[] {
+  return splitList.map(split => ({
+    ...split,
+    editPriority: undefined,
+    isUserEdited: false
+  }));
+}
+
+export function recalcSplitsWithPriority(splitList: Split[], amount: number): Split[] {
+  if (amount === 0) return splitList;
+
+  const updatedList = [...splitList];
+  const totalCurrentAmount = updatedList.reduce((sum, split) => sum + Number(split.amount), 0);
+  const remainder = amount - totalCurrentAmount;
+
+  if (Math.abs(remainder) < 0.01) {
+    return updatedList;
+  }
+
+  // Separate splits by edit status and priority
+  const editedSplits = updatedList.filter(split => split.isUserEdited)
+    .sort((a, b) => (a.editPriority || 0) - (b.editPriority || 0));
+  const uneditedSplits = updatedList.filter(split => !split.isUserEdited);
+
+  // Priority 1: Distribute to unedited splits first
+  if (uneditedSplits.length > 0) {
+    const amountPerUnedited = remainder / uneditedSplits.length;
+    uneditedSplits.forEach(split => {
+      split.amount = Number((Number(split.amount) + amountPerUnedited).toFixed(2));
+    });
+  }
+  // Priority 2: If no unedited splits, distribute to lowest priority edited splits
+  else if (editedSplits.length > 1) {
+    // Skip the highest priority (most recent edit) at index 0
+    const adjustableSplits = editedSplits.slice(1);
+    const amountPerSplit = remainder / adjustableSplits.length;
+    adjustableSplits.forEach(split => {
+      split.amount = Number((Number(split.amount) + amountPerSplit).toFixed(2));
+    });
+  }
+  // Priority 3: If only one edited split, distribute equally among all
+  else {
+    const amountPerSplit = remainder / updatedList.length;
+    updatedList.forEach(split => {
+      split.amount = Number((Number(split.amount) + amountPerSplit).toFixed(2));
+    });
+  }
+
+  return updatedList;
 }
 
 export function recalcSplitsForExact(splitList: Split[], amount: number) {

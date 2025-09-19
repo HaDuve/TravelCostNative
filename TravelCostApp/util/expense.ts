@@ -85,6 +85,8 @@ export interface Split {
   amount: number;
   whoPaid?: string;
   rate?: number;
+  editPriority?: number; // 0 = most recent edit, higher = older edits
+  isUserEdited?: boolean; // true if user explicitly set this value
 }
 
 export async function deleteAllExpensesByRangedId(

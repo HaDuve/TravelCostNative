@@ -1,6 +1,6 @@
 {
-  "task": null,
-  "branch": null,
-  "services": [],
+  "task": "h5-implement-split-calculation-priority",
+  "branch": "feature/split-calculation-priority",
+  "services": ["expense-splitting", "manage-expense", "split-algorithm"],
   "updated": "2025-09-19"
 }

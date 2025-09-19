@@ -125,7 +125,20 @@ export async function deleteAllExpensesByRangedId(
 }
 
 export function getExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
-  const sum = expenses.reduce((sum: number, expense: ExpenseData) => {
+  // Deduplicate range expenses to avoid double-counting
+  // For range expenses, we only want to count each range once, not once per day
+  const processedRangeIds = new Set<string>();
+  const deduplicatedExpenses = expenses.filter((expense: ExpenseData) => {
+    if (expense.rangeId) {
+      if (processedRangeIds.has(expense.rangeId)) {
+        return false; // Skip this expense as we've already processed this range
+      }
+      processedRangeIds.add(expense.rangeId);
+    }
+    return true;
+  });
+
+  const sum = deduplicatedExpenses.reduce((sum: number, expense: ExpenseData) => {
     if (
       isNaN(Number(expense.calcAmount)) ||
       (hideSpecial && expense.isSpecialExpense)
@@ -137,8 +150,21 @@ export function getExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
 }
 
 export function getTravellerSum(expenses: ExpenseData[], traveller: string) {
+  // Deduplicate range expenses to avoid double-counting
+  // For range expenses, we only want to count each range once, not once per day
+  const processedRangeIds = new Set<string>();
+  const deduplicatedExpenses = expenses.filter((expense: ExpenseData) => {
+    if (expense.rangeId) {
+      if (processedRangeIds.has(expense.rangeId)) {
+        return false; // Skip this expense as we've already processed this range
+      }
+      processedRangeIds.add(expense.rangeId);
+    }
+    return true;
+  });
+
   // return the sum of expenses for a given traveller
-  const expensesSum = expenses.reduce((sum: number, expense: ExpenseData) => {
+  const expensesSum = deduplicatedExpenses.reduce((sum: number, expense: ExpenseData) => {
     const hasSplits = expense.splitList && expense.splitList?.length > 0;
     if (!hasSplits) {
       const correct = traveller == expense.whoPaid;

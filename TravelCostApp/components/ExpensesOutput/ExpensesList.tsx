@@ -439,6 +439,7 @@ function ExpensesList({
                   showSumForTravellerName={travellerName}
                   filtered={filtered}
                   setSelectable={setSelectable}
+                  selectItem={selectItem}
                   {...itemData.item}
                 />
               </Swipeable>
@@ -466,6 +467,8 @@ function ExpensesList({
             <MemoizedExpenseItem
               showSumForTravellerName={travellerName}
               filtered={filtered}
+              setSelectable={setSelectable}
+              selectItem={selectItem}
               {...itemData.item}
             />
           </Swipeable>

@@ -40,7 +40,7 @@ const IconSize = dynamicScale(28, false, 0.5);
 
 function ExpenseItem(props): JSX.Element {
   const { showSumForTravellerName, filtered } = props;
-  const { setSelectable } = props;
+  const { setSelectable, selectItem } = props;
   const {
     id,
     description,
@@ -269,6 +269,9 @@ function ExpenseItem(props): JSX.Element {
         onLongPress={() => {
           if (setSelectable === undefined) return;
           setSelectable(true);
+          if (selectItem) {
+            selectItem(id);
+          }
         }}
         style={({ pressed }) => pressed && GlobalStyles.pressed}
       >

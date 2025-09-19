@@ -409,8 +409,9 @@ function Home() {
         tabBarIconStyle: {
           height: IconSize * 1.5,
           width: IconSize * 1.2,
-          marginTop: dynamicScale(-6, true, -1),
-          // marginTop: -6,
+          marginTop: dynamicScale(-12, true, -1),
+          marginBottom: dynamicScale(6, true, -1),
+          // marginTop: -6,  // old value - was not pulling icons up enough
         },
         tabBarActiveTintColor: GlobalStyles.colors.primary500,
         tabBarIndicatorStyle: {

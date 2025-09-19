@@ -9,6 +9,14 @@ import { safelyParseJSON } from "../util/jsonParse";
  */
 export async function secureStoreSetItem(key: string, value: string) {
   // console.log("attempting secure save in Memory > ", key + ": " + value);
+  if (!key || key.trim() === "") {
+    safeLogError(
+      "Invalid key provided to SecureStore",
+      "secure-storage.tsx",
+      12
+    );
+    return;
+  }
   if (!value) return;
   await SecureStore.setItemAsync(key, value);
 }
@@ -19,6 +27,14 @@ export async function secureStoreSetItem(key: string, value: string) {
  * @returns The value associated with the given key, or an empty string if no value is found.
  */
 export async function secureStoreGetItem(key: string) {
+  if (!key || key.trim() === "") {
+    safeLogError(
+      "Invalid key provided to SecureStore",
+      "secure-storage.tsx",
+      25
+    );
+    return "";
+  }
   const result = await SecureStore.getItemAsync(key);
   if (result) {
     // show the result if it is not longer than 10 characters
@@ -38,6 +54,14 @@ export async function secureStoreGetItem(key: string) {
  * @param value The object to set in the secure store.
  */
 export async function secureStoreSetObject(key: string, value: object) {
+  if (!key || key.trim() === "") {
+    safeLogError(
+      "Invalid key provided to SecureStore",
+      "secure-storage.tsx",
+      45
+    );
+    return;
+  }
   const jsonValue = JSON.stringify(value);
   // console.log("secureStoreSetObject ~ key, jsonValue:", key, jsonValue);
   if (!jsonValue) return;
@@ -50,6 +74,14 @@ export async function secureStoreSetObject(key: string, value: object) {
  * @returns The retrieved object, or null if no object is stored under the given key.
  */
 export async function secureStoreGetObject(key: string) {
+  if (!key || key.trim() === "") {
+    safeLogError(
+      "Invalid key provided to SecureStore",
+      "secure-storage.tsx",
+      60
+    );
+    return null;
+  }
   const result = await SecureStore.getItemAsync(key);
   try {
     return result ? safelyParseJSON(result) : null;
@@ -65,6 +97,14 @@ export async function secureStoreGetObject(key: string) {
  * @returns A Promise that resolves to true if the item was successfully removed, or false otherwise.
  */
 export async function secureStoreRemoveItem(key: string) {
+  if (!key || key.trim() === "") {
+    safeLogError(
+      "Invalid key provided to SecureStore",
+      "secure-storage.tsx",
+      80
+    );
+    return false;
+  }
   const res = await SecureStore.deleteItemAsync(key);
   return res;
 }

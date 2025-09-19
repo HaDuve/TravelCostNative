@@ -179,7 +179,7 @@ function UserContextProvider({ children }) {
       try {
         const uid = await secureStoreGetItem("uid");
         const isPremiumString = await secureStoreGetObject(
-          uid ?? "" + "isPremium"
+          (uid ?? "") + "isPremium"
         );
         if (isPremiumString !== null) {
           const isPremiumNow = safelyParseJSON(isPremiumString);

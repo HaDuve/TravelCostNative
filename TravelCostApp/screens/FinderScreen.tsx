@@ -304,7 +304,7 @@ const FinderScreen = () => {
                 data={suggestions}
                 showOnEmpty
                 // placeholder="Search for descriptions, categories, traveller names..."
-                label="Search"
+                label={i18n.t("searchLabel")}
                 containerStyle={[
                   styles.queryContainer,
                   GlobalStyles.shadowGlowPrimary,

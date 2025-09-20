@@ -6,6 +6,17 @@ import { DateTime } from "luxon";
 import BackButton from "../components/UI/BackButton";
 import { Card } from "react-native-paper";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
+i18n.enableFallback = true;
+
 const CustomerScreen = () => {
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>(null);
   useEffect(() => {
@@ -56,7 +67,7 @@ const CustomerScreen = () => {
           <Text style={styles.info}>{originalAppUserID}</Text>
         </View> */}
         <View style={styles.section}>
-          <Text style={styles.label}>Active Subscription:</Text>
+          <Text style={styles.label}>{i18n.t("activeSubscription")}</Text>
           <Text style={styles.info}>{activeSubscriptions}</Text>
         </View>
         {/*
@@ -66,12 +77,12 @@ const CustomerScreen = () => {
         </View> */}
 
         <View style={styles.section}>
-          <Text style={styles.label}>Expiration Date:</Text>
+          <Text style={styles.label}>{i18n.t("expirationDate")}</Text>
           <Text style={styles.info}>{expirationDate}</Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Latest Purchase Date:</Text>
+          <Text style={styles.label}>{i18n.t("latestPurchaseDate")}</Text>
           <Text style={styles.info}>{latestPurchaseDate}</Text>
         </View>
 
@@ -81,22 +92,22 @@ const CustomerScreen = () => {
         </View> */}
 
         <View style={styles.section}>
-          <Text style={styles.label}>Period Type:</Text>
+          <Text style={styles.label}>{i18n.t("periodType")}</Text>
           <Text style={styles.info}>{periodType}</Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Will Renew:</Text>
-          <Text style={styles.info}>{willRenew ? "Yes" : "No"}</Text>
+          <Text style={styles.label}>{i18n.t("willRenew")}</Text>
+          <Text style={styles.info}>{willRenew ? i18n.t("yesValue") : i18n.t("noValue")}</Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Store:</Text>
+          <Text style={styles.label}>{i18n.t("store")}</Text>
           <Text style={styles.info}>{store}</Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Request Date:</Text>
+          <Text style={styles.label}>{i18n.t("requestDate")}</Text>
           <Text style={styles.info}>{reqDate}</Text>
         </View>
         <BackButton></BackButton>

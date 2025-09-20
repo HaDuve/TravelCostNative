@@ -415,7 +415,7 @@ const TripForm = ({ navigation, route }) => {
 
     if (!dynamicIsValid) {
       inputs.totalBudget.isValid = dynamicIsValid;
-      Alert.alert(i18n.t("error"), "Please enter a total Budget number!"); //(i18n.t("enterBudgetAlert"));
+      Alert.alert(i18n.t("error"), i18n.t("enterTotalBudgetNumber"));
       setIsLoading(false);
       Toast.hide();
       return false;

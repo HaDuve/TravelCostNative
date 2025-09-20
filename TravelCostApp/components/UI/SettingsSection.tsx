@@ -84,7 +84,7 @@ const SettingsSection = ({ multiTraveller }) => {
         <Text style={GlobalStyles.secondaryText}>Show Flags icons</Text>
         <Switch onValueChange={toggleShowFlags} value={showFlags} /> */}
       <SettingsSwitch
-        label={"Hide special expenses"}
+        label={i18n.t("hideSpecialExpenses")}
         style={styles.switchContainer}
         state={hideSpecialExpenses}
         toggleState={toggleHideSpecialExpenses}

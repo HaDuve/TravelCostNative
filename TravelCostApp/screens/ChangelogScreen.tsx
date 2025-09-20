@@ -149,7 +149,7 @@ const ChangelogScreen = ({ navigation }) => {
           pressed && GlobalStyles.pressedWithShadow,
         ]}
       >
-        <Text style={styles.subHeaderText}>Other Changes</Text>
+        <Text style={styles.subHeaderText}>{i18n.t("otherChanges")}</Text>
       </Pressable>
       {showOldChanges && (
         <Animated.FlatList

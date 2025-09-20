@@ -51,7 +51,7 @@ const FinancialScreen = () => {
   // console.log("FinancialScreen ~ restCash:", restCash);
   return (
     <View style={styles.container}>
-      <Text>Financial Overview</Text>
+      <Text>{i18n.t("financialOverview")}</Text>
       <View style={styles.progressBar}>
         <CategoryProgressBar
           cat="Gönner Geld"

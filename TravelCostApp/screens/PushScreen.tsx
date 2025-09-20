@@ -80,7 +80,7 @@ async function registerForPushNotificationsAsync() {
     // alert("Must use physical device for Push Notifications");
     Toast.show({
       type: "error",
-      text1: "Must use physical device for Push Notifications",
+      text1: i18n.t("mustUsePhysicalDevice"),
       visibilityTime: 1000,
       autoHide: true,
     });
@@ -150,7 +150,7 @@ const TEST_PushScreen = () => {
         </Text>
       </View>
       <Button
-        title="Press to Send Notification"
+        title={i18n.t("pressToSendNotification")}
         onPress={async () => {
           await sendPushNotification(expoPushToken);
         }}

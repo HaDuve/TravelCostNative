@@ -180,7 +180,7 @@ const SplitSummaryScreen = ({ navigation }) => {
         // Alert.alert("No Splits to Simplify");
         Toast.show({
           type: "error",
-          text1: "No Splits to Simplify",
+          text1: i18n.t("noSplitsToSimplify"),
           visibilityTime: 2000,
         });
         navigation.pop();
@@ -191,7 +191,7 @@ const SplitSummaryScreen = ({ navigation }) => {
         setShowSimplify(false);
         Toast.show({
           type: "error",
-          text1: "Could not simplify splits",
+          text1: i18n.t("couldNotSimplifySplits"),
           text2: "Something must have gone wrong, sorry!",
           visibilityTime: 2000,
         });

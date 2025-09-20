@@ -162,7 +162,7 @@ const GPTDealScreen = ({ route, navigation }) => {
           console.error(error);
           Toast.show({
             type: "error",
-            text1: "Chat GPT Error",
+            text1: i18n.t("chatGPTError"),
             text2: error,
           });
           navigation.pop();

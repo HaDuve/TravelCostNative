@@ -78,12 +78,12 @@ async function registerForPushNotificationsAsync() {
       // alert("Failed to get push token for push notification!");
       // console.log("Failed to get push token for push notification!");
       Alert.alert(
-        "Notifications",
-        "Please enable notifications in settings!",
+        i18n.t("notifications"),
+        i18n.t("enableNotificationsSettings"),
         // neveraskagain button
         [
           {
-            text: "Never ask again",
+            text: i18n.t("neverAskAgain"),
             onPress: () => {
               // console.log("Never ask again");
               setMMKVObject("expoPushAsk", { never: true });

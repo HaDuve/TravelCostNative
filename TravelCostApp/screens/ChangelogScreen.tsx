@@ -16,6 +16,17 @@ import PropTypes from "prop-types";
 import safeLogError from "../util/error";
 import { constantScale } from "../util/scalingUtil";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
+i18n.enableFallback = true;
+
 function renderChangelogItem(item) {
   return (
     <View style={[styles.changelogContainer, GlobalStyles.strongShadow]}>
@@ -95,7 +106,7 @@ const ChangelogScreen = ({ navigation }) => {
     return (
       <ScrollView style={styles.container}>
         <BackButton style={{ marginTop: -20, marginBottom: 0, padding: 4 }} />
-        <LoadingBarOverlay customText="Loading Changelog"></LoadingBarOverlay>
+        <LoadingBarOverlay customText={i18n.t("loadingChangelog")}></LoadingBarOverlay>
       </ScrollView>
     );
   }
@@ -104,7 +115,7 @@ const ChangelogScreen = ({ navigation }) => {
     <ScrollView style={styles.container}>
       <View style={[styles.headerContainer]}>
         <BackButton style={{ padding: constantScale(12, 0.5) }} />
-        <Text style={GlobalStyles.titleText}>App Changes</Text>
+        <Text style={GlobalStyles.titleText}>{i18n.t("appChanges")}</Text>
       </View>
 
       <Pressable
@@ -118,7 +129,7 @@ const ChangelogScreen = ({ navigation }) => {
           pressed && GlobalStyles.pressedWithShadow,
         ]}
       >
-        <Text style={styles.subHeaderText}>Whats new?</Text>
+        <Text style={styles.subHeaderText}>{i18n.t("whatsNew")}</Text>
       </Pressable>
       {showNewChanges && (
         <Animated.FlatList

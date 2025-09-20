@@ -48,7 +48,7 @@ const GetLocalPriceButton = ({ navigation, style }) => {
 
   const handleLocalPriceSubmit = () => {
     if (!productInput.trim()) {
-      Alert.alert("Error", i18n.t("getLocalPriceError"));
+      Alert.alert(i18n.t("alertError"), i18n.t("getLocalPriceError"));
       return;
     }
 

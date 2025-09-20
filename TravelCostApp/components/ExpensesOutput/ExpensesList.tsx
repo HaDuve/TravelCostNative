@@ -211,8 +211,8 @@ function ExpensesList({
       if (item.rangeId) {
         // do you want to delete one or all expenses with this rangeId?
         Alert.alert(
-          `Delete grouped range expenses?`,
-          `This will delete all entries that belong to ${
+          i18n.t("alertDeleteGroupedRangeExpenses"),
+          `${i18n.t("alertDeleteAllEntriesFor")} ${
             item.description
           } for ${formatExpenseWithCurrency(
             Number(item.calcAmount),

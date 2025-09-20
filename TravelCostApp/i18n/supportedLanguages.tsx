@@ -431,6 +431,28 @@ const en = {
   charts: "Charts",
   future: "future",
   past: "past",
+
+  // Missing translation keys
+  finderTab: "Finder",
+  financialTab: "Financial",
+  alertError: "Error",
+  alertException: "Exception",
+  alertTryAgainLater: "Please try again later.",
+  alertOffline: "Offline",
+  alertNeedOnlineCategory: "You need to be online to add a new category",
+  alertSameCurrencyTrips: "Please select trips with the same home currency",
+  alertDeleteContextNotImplemented: "delete context not implemented",
+  alertDeleteGroupedRangeExpenses: "Delete grouped range expenses?",
+  alertDeleteAllEntriesFor: "This will delete all entries that belong to",
+  shareTripDescription: "Share this trip with other travelers. They'll receive an invitation link to join your trip and track expenses together.",
+  placeholderSharedExpense: "Shared expense?",
+  placeholderSharedBetween: "Shared between ... ?",
+  devOfflineQueue: "Offline Queue",
+  loadingChangelog: "Loading Changelog",
+  appChanges: "App Changes",
+  whatsNew: "Whats new?",
+  yourExpoPushToken: "Your expo push token:",
+  bodyLabel: "Body:",
 };
 const de = {
   // special expense strings
@@ -886,6 +908,28 @@ const de = {
   charts: "Diagramme",
   future: "zukünftige",
   past: "vergangene",
+
+  // Missing translation keys
+  finderTab: "Finder",
+  financialTab: "Finanziell",
+  alertError: "Fehler",
+  alertException: "Ausnahme",
+  alertTryAgainLater: "Bitte versuchen Sie es später erneut.",
+  alertOffline: "Offline",
+  alertNeedOnlineCategory: "Sie müssen online sein, um eine neue Kategorie hinzuzufügen",
+  alertSameCurrencyTrips: "Bitte wählen Sie Reisen mit derselben Heimatwährung aus",
+  alertDeleteContextNotImplemented: "Kontext löschen nicht implementiert",
+  alertDeleteGroupedRangeExpenses: "Gruppierte Bereichsausgaben löschen?",
+  alertDeleteAllEntriesFor: "Dies wird alle Einträge löschen, die gehören zu",
+  shareTripDescription: "Teilen Sie diese Reise mit anderen Reisenden. Sie erhalten einen Einladungslink, um Ihrer Reise beizutreten und gemeinsam Ausgaben zu verfolgen.",
+  placeholderSharedExpense: "Geteilte Ausgabe?",
+  placeholderSharedBetween: "Geteilt zwischen ... ?",
+  devOfflineQueue: "Offline-Warteschlange",
+  loadingChangelog: "Änderungsprotokoll wird geladen",
+  appChanges: "App-Änderungen",
+  whatsNew: "Was ist neu?",
+  yourExpoPushToken: "Ihr Expo-Push-Token:",
+  bodyLabel: "Körper:",
 };
 const fr = {
   // special expense strings
@@ -1338,6 +1382,28 @@ const fr = {
   charts: "Diagrammes",
   future: "futures",
   past: "passés",
+
+  // Missing translation keys
+  finderTab: "Explorateur",
+  financialTab: "Financier",
+  alertError: "Erreur",
+  alertException: "Exception",
+  alertTryAgainLater: "Veuillez réessayer plus tard.",
+  alertOffline: "Hors ligne",
+  alertNeedOnlineCategory: "Vous devez être en ligne pour ajouter une nouvelle catégorie",
+  alertSameCurrencyTrips: "Veuillez sélectionner des voyages avec la même devise de base",
+  alertDeleteContextNotImplemented: "suppression du contexte non implémentée",
+  alertDeleteGroupedRangeExpenses: "Supprimer les dépenses de groupe?",
+  alertDeleteAllEntriesFor: "Cela supprimera toutes les entrées qui appartiennent à",
+  shareTripDescription: "Partagez ce voyage avec d'autres voyageurs. Ils recevront un lien d'invitation pour rejoindre votre voyage et suivre les dépenses ensemble.",
+  placeholderSharedExpense: "Dépense partagée?",
+  placeholderSharedBetween: "Partagé entre ... ?",
+  devOfflineQueue: "File d'attente hors ligne",
+  loadingChangelog: "Chargement du journal des modifications",
+  appChanges: "Modifications de l'application",
+  whatsNew: "Quoi de neuf?",
+  yourExpoPushToken: "Votre token de push Expo:",
+  bodyLabel: "Corps:",
 };
 const ru = {
   // special expense strings
@@ -1792,5 +1858,27 @@ const ru = {
   charts: "Схемы",
   future: "Будущее",
   past: "прошлые",
+
+  // Missing translation keys
+  finderTab: "Поиск",
+  financialTab: "Финансы",
+  alertError: "Ошибка",
+  alertException: "Исключение",
+  alertTryAgainLater: "Пожалуйста, попробуйте позже.",
+  alertOffline: "Оффлайн",
+  alertNeedOnlineCategory: "Вам нужно быть онлайн, чтобы добавить новую категорию",
+  alertSameCurrencyTrips: "Пожалуйста, выберите поездки с одинаковой базовой валютой",
+  alertDeleteContextNotImplemented: "удаление контекста не реализовано",
+  alertDeleteGroupedRangeExpenses: "Удалить сгруппированные расходы диапазона?",
+  alertDeleteAllEntriesFor: "Это удалит все записи, которые принадлежат к",
+  shareTripDescription: "Поделитесь этой поездкой с другими путешественниками. Они получат ссылку-приглашение для присоединения к вашей поездке и совместного отслеживания расходов.",
+  placeholderSharedExpense: "Совместный расход?",
+  placeholderSharedBetween: "Разделить между ... ?",
+  devOfflineQueue: "Очередь офлайн",
+  loadingChangelog: "Загрузка журнала изменений",
+  appChanges: "Изменения приложения",
+  whatsNew: "Что нового?",
+  yourExpoPushToken: "Ваш токен push Expo:",
+  bodyLabel: "Тело:",
 };
 export { en, de, fr, ru };

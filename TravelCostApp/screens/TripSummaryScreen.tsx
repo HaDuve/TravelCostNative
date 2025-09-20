@@ -162,7 +162,7 @@ const TripSummaryScreen = ({ navigation }) => {
       if (!tripData) continue;
       if (currency !== "" && currency !== tripData.tripCurrency) {
         // TODO: allow different currencies by calculating for the home currency from tripCtx
-        Alert.alert("Please select trips with the same home currency");
+        Alert.alert(i18n.t("alertSameCurrencyTrips"));
         setAllTrips((prevState) => {
           const updatedTrips = prevState.map((trip) => {
             if (trip.tripid === tripData.tripid) {

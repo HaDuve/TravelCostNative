@@ -1749,7 +1749,7 @@ const ExpenseForm = ({
                       modalContentContainerStyle={{
                         backgroundColor: GlobalStyles.colors.backgroundColor,
                       }}
-                      placeholder="Shared expense?"
+                      placeholder={i18n.t("placeholderSharedExpense")}
                       containerStyle={[
                         styles.dropdownContainer,
                         hidePickers && styles.hidePickersStyle,
@@ -1815,7 +1815,7 @@ const ExpenseForm = ({
                     modalContentContainerStyle={{
                       backgroundColor: GlobalStyles.colors.backgroundColor,
                     }}
-                    placeholder="Shared between ... ?"
+                    placeholder={i18n.t("placeholderSharedBetween")}
                     containerStyle={[
                       styles.dropdownContainer,
                       hidePickers && styles.hidePickersStyle,

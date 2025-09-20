@@ -8,6 +8,18 @@ import React, {
   useState,
 } from "react";
 import { Alert } from "react-native";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
+i18n.enableFallback = true;
+
 import {
   asyncStoreGetItem,
   asyncStoreGetObject,
@@ -248,7 +260,7 @@ function UserContextProvider({ children }) {
 
   function deleteUser(id: string) {
     // // console.log("deleteUser ~ id", id);
-    Alert.alert("delete context not implemented");
+    Alert.alert(i18n.t("alertDeleteContextNotImplemented"));
   }
   async function setUserName(name: string) {
     // // console.log("setUserName ~ name", name);

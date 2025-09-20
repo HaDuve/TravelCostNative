@@ -84,8 +84,7 @@ const ShareTripButton = ({ route, navigation }) => {
           </Text>
 
           <Text style={[GlobalStyles.secondaryText, styles.description]}>
-            Share this trip with other travelers. They'll receive an invitation
-            link to join your trip and track expenses together.
+            {i18n.t("shareTripDescription")}
           </Text>
 
           <View style={styles.buttonContainer}>

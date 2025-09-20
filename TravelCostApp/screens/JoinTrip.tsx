@@ -188,7 +188,7 @@ const JoinTrip = ({ navigation, route }) => {
       // if (r == -1)
       navigation.popToTop();
     } catch (error) {
-      Alert.alert("Exception", "Please try again later.\n" + error.message);
+      Alert.alert(i18n.t("alertException"), i18n.t("alertTryAgainLater") + "\n" + error.message);
       safeLogError(error);
       navigation.popToTop();
     }

@@ -9,6 +9,17 @@ import { ExpoPushToken } from "expo-notifications";
 import { storeExpoPushTokenInTrip } from "../util/http";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
+i18n.enableFallback = true;
+
 // Can use this function below or use Expo's Push Notification Tool from: https://expo.dev/notifications
 async function sendPushNotification(expoPushToken) {
   const message = {
@@ -127,12 +138,12 @@ const TEST_PushScreen = () => {
     <View
       style={{ flex: 1, alignItems: "center", justifyContent: "space-around" }}
     >
-      <Text>Your expo push token: {expoPushToken}</Text>
+      <Text>{i18n.t("yourExpoPushToken")} {expoPushToken}</Text>
       <View style={{ alignItems: "center", justifyContent: "center" }}>
         <Text>
           Title: {notification && notification.request.content.title}{" "}
         </Text>
-        <Text>Body: {notification && notification.request.content.body}</Text>
+        <Text>{i18n.t("bodyLabel")} {notification && notification.request.content.body}</Text>
         <Text>
           Data:{" "}
           {notification && JSON.stringify(notification.request.content.data)}

@@ -116,7 +116,7 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
         navigation.navigate("ManageCategory");
         return;
       }
-      Alert.alert("Offline", "You need to be online to add a new category");
+      Alert.alert(i18n.t("alertOffline"), i18n.t("alertNeedOnlineCategory"));
       return;
     }
     navigation.navigate("ManageCategory");

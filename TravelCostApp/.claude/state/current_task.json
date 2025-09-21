@@ -1,6 +1,6 @@
 {
-  "task": "l11-refactor-download-sizes",
-  "branch": "feature/refactor-download-sizes",
-  "services": ["database", "sync", "api"],
+  "task": null,
+  "branch": null,
+  "services": [],
   "updated": "2025-01-27"
 }

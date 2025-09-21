@@ -180,12 +180,28 @@ export async function storeExpense(
   }
 }
 
-export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
+export async function fetchExpensesWithUIDs(
+  tripid: string,
+  uidlist: string[],
+  useDelta: boolean = true
+) {
   if (!tripid || !uidlist || DEBUG_NO_DATA) return [];
   const expenses: ExpenseData[] = [];
   const axios_calls = [];
+
+  // Import sync timestamp functions
+  const {
+    getLastSyncTimestamp,
+    setLastSyncTimestamp,
+  } = require("./sync-timestamp");
+
   uidlist.forEach((uid) => {
     try {
+      let since = 0;
+      if (useDelta) {
+        since = getLastSyncTimestamp(tripid, uid);
+      }
+
       const new_axios_call = axios.get(
         BACKEND_URL +
           "/trips/" +
@@ -195,6 +211,12 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
           "/expenses.json" +
           getMMKVString("QPAR"),
         {
+          params: useDelta
+            ? {
+                orderBy: '"editedTimestamp"',
+                startAt: since,
+              }
+            : {},
           timeout: AXIOS_TIMOUT_LONG,
         }
       );
@@ -205,7 +227,10 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
   });
   try {
     const responseArray = await Promise.all(axios_calls);
-    responseArray.forEach((response) => {
+    responseArray.forEach((response, index) => {
+      const uid = uidlist[index];
+      const userExpenses: ExpenseData[] = [];
+
       for (const key in response.data) {
         const r: ExpenseDataOnline = response.data[key];
         const expenseObj: ExpenseData = {
@@ -230,7 +255,17 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
           isSpecialExpense: r.isSpecialExpense,
           editedTimestamp: +r.editedTimestamp,
         };
-        expenses.push(expenseObj);
+        userExpenses.push(expenseObj);
+      }
+
+      expenses.push(...userExpenses);
+
+      // Update sync timestamp for this user
+      if (useDelta && userExpenses.length > 0) {
+        const latestTimestamp = Math.max(
+          ...userExpenses.map((e) => e.editedTimestamp || 0)
+        );
+        setLastSyncTimestamp(tripid, uid, latestTimestamp);
       }
     });
   } catch (error) {
@@ -240,10 +275,24 @@ export async function fetchExpensesWithUIDs(tripid: string, uidlist: string[]) {
   return expenses;
 }
 
-export async function fetchExpenses(tripid: string, uid: string) {
+export async function fetchExpenses(
+  tripid: string,
+  uid: string,
+  useDelta: boolean = true
+) {
   if (!tripid || DEBUG_NO_DATA) return [];
 
   try {
+    let since = 0;
+    if (useDelta) {
+      // Import sync timestamp functions
+      const {
+        getLastSyncTimestamp,
+        setLastSyncTimestamp,
+      } = require("./sync-timestamp");
+      since = getLastSyncTimestamp(tripid, uid);
+    }
+
     const response = await axios.get(
       BACKEND_URL +
         "/trips/" +
@@ -253,6 +302,12 @@ export async function fetchExpenses(tripid: string, uid: string) {
         "/expenses.json" +
         getMMKVString("QPAR"),
       {
+        params: useDelta
+          ? {
+              orderBy: '"editedTimestamp"',
+              startAt: since,
+            }
+          : {},
         timeout: AXIOS_TIMOUT_LONG,
       }
     );
@@ -284,6 +339,15 @@ export async function fetchExpenses(tripid: string, uid: string) {
         editedTimestamp: +data.editedTimestamp,
       };
       expenses.push(expenseObj);
+    }
+
+    // Update sync timestamp on successful fetch
+    if (useDelta && expenses.length > 0) {
+      const { setLastSyncTimestamp } = require("./sync-timestamp");
+      const latestTimestamp = Math.max(
+        ...expenses.map((e) => e.editedTimestamp || 0)
+      );
+      setLastSyncTimestamp(tripid, uid, latestTimestamp);
     }
 
     return expenses;
@@ -533,10 +597,14 @@ export async function getUIDs(tripid: string) {
   }
 }
 
-export async function getAllExpenses(tripid: string, uid?: string) {
+export async function getAllExpenses(
+  tripid: string,
+  uid?: string,
+  useDelta: boolean = true
+) {
   const uids = await getUIDs(tripid);
   if (uids?.length < 1) uids.push(uid);
-  const expenses = await fetchExpensesWithUIDs(tripid, uids);
+  const expenses = await fetchExpensesWithUIDs(tripid, uids, useDelta);
   return expenses;
 }
 

@@ -128,6 +128,31 @@ const ExpenseForm = ({
   const hideSpecial = settings.hideSpecialExpenses;
   const alwaysShowAdvancedSetting = settings.alwaysShowAdvanced || isEditing;
   const editingValues: ExpenseData = defaultValues;
+
+  // Helper function to get most recent valid expense from current trip for defaults
+  const getMostRecentTripExpense = useCallback(() => {
+    if (!expCtx.expenses || expCtx.expenses.length === 0) {
+      return null;
+    }
+
+    // Find the most recent expense with valid currency and country data
+    for (const expense of expCtx.expenses) {
+      if (
+        expense.currency &&
+        expense.currency.trim() !== "" &&
+        expense.country &&
+        expense.country.trim() !== ""
+      ) {
+        return expense;
+      }
+    }
+
+    // If no expense has both currency and country, return the most recent one
+    return expCtx.expenses[0] || null;
+  }, [expCtx.expenses]);
+
+  const mostRecentExpense = getMostRecentTripExpense();
+
   const lastCurrency = userCtx.lastCurrency
     ? userCtx.lastCurrency
     : tripCtx.tripCurrency;
@@ -179,6 +204,8 @@ const ExpenseForm = ({
     country: {
       value: editingValues
         ? editingValues.country
+        : mostRecentExpense?.country
+        ? mostRecentExpense.country
         : userCtx.lastCountry
         ? userCtx.lastCountry
         : "",
@@ -187,6 +214,8 @@ const ExpenseForm = ({
     currency: {
       value: editingValues
         ? editingValues.currency
+        : mostRecentExpense?.currency
+        ? mostRecentExpense.currency
         : userCtx.lastCurrency
         ? userCtx.lastCurrency
         : tripCtx.tripCurrency,
@@ -1043,10 +1072,15 @@ const ExpenseForm = ({
       inputChangedHandler("category", arg);
     }
     if (!inputs.country.isValid) {
-      inputChangedHandler("country", userCtx.lastCountry);
+      // Use trip-specific default first, then fall back to user context
+      const defaultCountry = mostRecentExpense?.country || userCtx.lastCountry;
+      inputChangedHandler("country", defaultCountry);
     }
     if (!inputs.currency.isValid) {
-      inputChangedHandler("currency", userCtx.lastCurrency);
+      // Use trip-specific default first, then fall back to user context
+      const defaultCurrency =
+        mostRecentExpense?.currency || userCtx.lastCurrency;
+      inputChangedHandler("currency", defaultCurrency);
     }
     if (!inputs.whoPaid.isValid) {
       console.log("🔍 Setting whoPaid due to invalid input:", userCtx.userName);

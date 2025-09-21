@@ -143,6 +143,22 @@ const en = {
   visitFoodForNomadsLabel: "Visit Food For Nomads",
   supportFeedbackLabel: "Feedback?",
 
+  // Feedback Modal
+  feedbackTitle: "Send Feedback",
+  feedbackSubtitle:
+    "Help us improve Budget for Nomads by sharing your thoughts and suggestions.",
+  feedbackPlaceholder: "Tell us what you think...",
+  feedbackEmptyTitle: "Empty Feedback",
+  feedbackEmptyMessage: "Please enter your feedback before submitting.",
+  feedbackTooLongTitle: "Feedback Too Long",
+  feedbackTooLongMessage: "Please keep your feedback under 1000 characters.",
+  feedbackSuccessTitle: "Thank You!",
+  feedbackSuccessMessage: "Your feedback has been submitted successfully.",
+  feedbackErrorTitle: "Submission Failed",
+  feedbackErrorMessage: "Unable to submit feedback. Please try again later.",
+  submitting: "Submitting...",
+  submit: "Submit",
+
   // Get Local Price Modal
   getLocalPriceModalTitle: "Get Local Price",
   getLocalPriceModalSubtitle:
@@ -444,7 +460,8 @@ const en = {
   alertDeleteContextNotImplemented: "delete context not implemented",
   alertDeleteGroupedRangeExpenses: "Delete grouped range expenses?",
   alertDeleteAllEntriesFor: "This will delete all entries that belong to",
-  shareTripDescription: "Share this trip with other travelers. They'll receive an invitation link to join your trip and track expenses together.",
+  shareTripDescription:
+    "Share this trip with other travelers. They'll receive an invitation link to join your trip and track expenses together.",
   placeholderSharedExpense: "Shared expense?",
   placeholderSharedBetween: "Shared between ... ?",
   devOfflineQueue: "Offline Queue",
@@ -629,6 +646,23 @@ const de = {
   resetAppIntroductionLabel: "App Einführung wiederholen",
   visitFoodForNomadsLabel: "Food For Nomads besuchen",
   supportFeedbackLabel: "Feedback?",
+
+  // Feedback Modal
+  feedbackTitle: "Feedback Senden",
+  feedbackSubtitle:
+    "Hilf uns Budget for Nomads zu verbessern, indem du deine Gedanken und Vorschläge teilst.",
+  feedbackPlaceholder: "Teile uns deine Meinung mit...",
+  feedbackEmptyTitle: "Leeres Feedback",
+  feedbackEmptyMessage: "Bitte gib dein Feedback ein, bevor du es abschickst.",
+  feedbackTooLongTitle: "Feedback Zu Lang",
+  feedbackTooLongMessage: "Bitte halte dein Feedback unter 1000 Zeichen.",
+  feedbackSuccessTitle: "Vielen Dank!",
+  feedbackSuccessMessage: "Dein Feedback wurde erfolgreich übermittelt.",
+  feedbackErrorTitle: "Übermittlung Fehlgeschlagen",
+  feedbackErrorMessage:
+    "Feedback konnte nicht übermittelt werden. Bitte versuche es später erneut.",
+  submitting: "Wird übermittelt...",
+  submit: "Abschicken",
 
   // Get Local Price Modal
   getLocalPriceModalTitle: "Lokale Preise Anzeigen",
@@ -943,12 +977,15 @@ const de = {
   alertException: "Ausnahme",
   alertTryAgainLater: "Bitte versuchen Sie es später erneut.",
   alertOffline: "Offline",
-  alertNeedOnlineCategory: "Sie müssen online sein, um eine neue Kategorie hinzuzufügen",
-  alertSameCurrencyTrips: "Bitte wählen Sie Reisen mit derselben Heimatwährung aus",
+  alertNeedOnlineCategory:
+    "Sie müssen online sein, um eine neue Kategorie hinzuzufügen",
+  alertSameCurrencyTrips:
+    "Bitte wählen Sie Reisen mit derselben Heimatwährung aus",
   alertDeleteContextNotImplemented: "Kontext löschen nicht implementiert",
   alertDeleteGroupedRangeExpenses: "Gruppierte Bereichsausgaben löschen?",
   alertDeleteAllEntriesFor: "Dies wird alle Einträge löschen, die gehören zu",
-  shareTripDescription: "Teilen Sie diese Reise mit anderen Reisenden. Sie erhalten einen Einladungslink, um Ihrer Reise beizutreten und gemeinsam Ausgaben zu verfolgen.",
+  shareTripDescription:
+    "Teilen Sie diese Reise mit anderen Reisenden. Sie erhalten einen Einladungslink, um Ihrer Reise beizutreten und gemeinsam Ausgaben zu verfolgen.",
   placeholderSharedExpense: "Geteilte Ausgabe?",
   placeholderSharedBetween: "Geteilt zwischen ... ?",
   devOfflineQueue: "Offline-Warteschlange",
@@ -975,13 +1012,15 @@ const de = {
   okay: "Okay",
   noInternetConnection: "Keine Internetverbindung",
   notifications: "Benachrichtigungen",
-  enableNotificationsSettings: "Bitte aktivieren Sie Benachrichtigungen in den Einstellungen!",
+  enableNotificationsSettings:
+    "Bitte aktivieren Sie Benachrichtigungen in den Einstellungen!",
   neverAskAgain: "Nie wieder fragen",
   enterTotalBudgetNumber: "Bitte geben Sie eine Gesamtbudgetzahl ein!",
   chatGPTError: "Chat GPT Fehler",
   noSplitsToSimplify: "Keine Aufteilungen zu vereinfachen",
   couldNotSimplifySplits: "Aufteilungen konnten nicht vereinfacht werden",
-  mustUsePhysicalDevice: "Muss physisches Gerät für Push-Benachrichtigungen verwenden",
+  mustUsePhysicalDevice:
+    "Muss physisches Gerät für Push-Benachrichtigungen verwenden",
   pressToSendNotification: "Drücken Sie, um Benachrichtigung zu senden",
   hideSpecialExpenses: "Besondere Ausgaben ausblenden",
 };
@@ -1131,6 +1170,24 @@ const fr = {
   resetAppIntroductionLabel: "Réinitialiser l'introduction de l'application",
   visitFoodForNomadsLabel: "Visitez Food For Nomads",
   supportFeedbackLabel: "Commentaires?",
+
+  // Feedback Modal
+  feedbackTitle: "Envoyer des Commentaires",
+  feedbackSubtitle:
+    "Aidez-nous à améliorer Budget for Nomads en partageant vos pensées et suggestions.",
+  feedbackPlaceholder: "Dites-nous ce que vous pensez...",
+  feedbackEmptyTitle: "Commentaires Vides",
+  feedbackEmptyMessage: "Veuillez saisir vos commentaires avant de soumettre.",
+  feedbackTooLongTitle: "Commentaires Trop Longs",
+  feedbackTooLongMessage:
+    "Veuillez garder vos commentaires sous 1000 caractères.",
+  feedbackSuccessTitle: "Merci !",
+  feedbackSuccessMessage: "Vos commentaires ont été soumis avec succès.",
+  feedbackErrorTitle: "Échec de la Soumission",
+  feedbackErrorMessage:
+    "Impossible de soumettre les commentaires. Veuillez réessayer plus tard.",
+  submitting: "Envoi en cours...",
+  submit: "Soumettre",
 
   // Get Local Price Modal
   getLocalPriceModalTitle: "Obtenir le Prix Local",
@@ -1444,12 +1501,16 @@ const fr = {
   alertException: "Exception",
   alertTryAgainLater: "Veuillez réessayer plus tard.",
   alertOffline: "Hors ligne",
-  alertNeedOnlineCategory: "Vous devez être en ligne pour ajouter une nouvelle catégorie",
-  alertSameCurrencyTrips: "Veuillez sélectionner des voyages avec la même devise de base",
+  alertNeedOnlineCategory:
+    "Vous devez être en ligne pour ajouter une nouvelle catégorie",
+  alertSameCurrencyTrips:
+    "Veuillez sélectionner des voyages avec la même devise de base",
   alertDeleteContextNotImplemented: "suppression du contexte non implémentée",
   alertDeleteGroupedRangeExpenses: "Supprimer les dépenses de groupe?",
-  alertDeleteAllEntriesFor: "Cela supprimera toutes les entrées qui appartiennent à",
-  shareTripDescription: "Partagez ce voyage avec d'autres voyageurs. Ils recevront un lien d'invitation pour rejoindre votre voyage et suivre les dépenses ensemble.",
+  alertDeleteAllEntriesFor:
+    "Cela supprimera toutes les entrées qui appartiennent à",
+  shareTripDescription:
+    "Partagez ce voyage avec d'autres voyageurs. Ils recevront un lien d'invitation pour rejoindre votre voyage et suivre les dépenses ensemble.",
   placeholderSharedExpense: "Dépense partagée?",
   placeholderSharedBetween: "Partagé entre ... ?",
   devOfflineQueue: "File d'attente hors ligne",
@@ -1476,13 +1537,15 @@ const fr = {
   okay: "D'accord",
   noInternetConnection: "Aucune connexion Internet",
   notifications: "Notifications",
-  enableNotificationsSettings: "Veuillez activer les notifications dans les paramètres!",
+  enableNotificationsSettings:
+    "Veuillez activer les notifications dans les paramètres!",
   neverAskAgain: "Ne plus jamais demander",
   enterTotalBudgetNumber: "Veuillez entrer un nombre de budget total!",
   chatGPTError: "Erreur Chat GPT",
   noSplitsToSimplify: "Aucun partage à simplifier",
   couldNotSimplifySplits: "Impossible de simplifier les partages",
-  mustUsePhysicalDevice: "Doit utiliser un appareil physique pour les notifications push",
+  mustUsePhysicalDevice:
+    "Doit utiliser un appareil physique pour les notifications push",
   pressToSendNotification: "Appuyez pour envoyer une notification",
   hideSpecialExpenses: "Masquer les dépenses spéciales",
 };
@@ -1631,6 +1694,23 @@ const ru = {
   resetAppIntroductionLabel: "Сбросить введение в приложение",
   visitFoodForNomadsLabel: "Посетить Food For Nomads",
   supportFeedbackLabel: "Отзыв?",
+
+  // Feedback Modal
+  feedbackTitle: "Отправить Отзыв",
+  feedbackSubtitle:
+    "Помогите нам улучшить Budget for Nomads, поделившись своими мыслями и предложениями.",
+  feedbackPlaceholder: "Расскажите, что вы думаете...",
+  feedbackEmptyTitle: "Пустой Отзыв",
+  feedbackEmptyMessage: "Пожалуйста, введите ваш отзыв перед отправкой.",
+  feedbackTooLongTitle: "Отзыв Слишком Длинный",
+  feedbackTooLongMessage: "Пожалуйста, оставьте ваш отзыв менее 1000 символов.",
+  feedbackSuccessTitle: "Спасибо!",
+  feedbackSuccessMessage: "Ваш отзыв был успешно отправлен.",
+  feedbackErrorTitle: "Ошибка Отправки",
+  feedbackErrorMessage:
+    "Не удалось отправить отзыв. Пожалуйста, попробуйте позже.",
+  submitting: "Отправка...",
+  submit: "Отправить",
 
   // Get Local Price Modal
   getLocalPriceModalTitle: "Получить Местную Цену",
@@ -1947,12 +2027,15 @@ const ru = {
   alertException: "Исключение",
   alertTryAgainLater: "Пожалуйста, попробуйте позже.",
   alertOffline: "Оффлайн",
-  alertNeedOnlineCategory: "Вам нужно быть онлайн, чтобы добавить новую категорию",
-  alertSameCurrencyTrips: "Пожалуйста, выберите поездки с одинаковой базовой валютой",
+  alertNeedOnlineCategory:
+    "Вам нужно быть онлайн, чтобы добавить новую категорию",
+  alertSameCurrencyTrips:
+    "Пожалуйста, выберите поездки с одинаковой базовой валютой",
   alertDeleteContextNotImplemented: "удаление контекста не реализовано",
   alertDeleteGroupedRangeExpenses: "Удалить сгруппированные расходы диапазона?",
   alertDeleteAllEntriesFor: "Это удалит все записи, которые принадлежат к",
-  shareTripDescription: "Поделитесь этой поездкой с другими путешественниками. Они получат ссылку-приглашение для присоединения к вашей поездке и совместного отслеживания расходов.",
+  shareTripDescription:
+    "Поделитесь этой поездкой с другими путешественниками. Они получат ссылку-приглашение для присоединения к вашей поездке и совместного отслеживания расходов.",
   placeholderSharedExpense: "Совместный расход?",
   placeholderSharedBetween: "Разделить между ... ?",
   devOfflineQueue: "Очередь офлайн",
@@ -1985,7 +2068,8 @@ const ru = {
   chatGPTError: "Ошибка Chat GPT",
   noSplitsToSimplify: "Нет разделений для упрощения",
   couldNotSimplifySplits: "Не удалось упростить разделения",
-  mustUsePhysicalDevice: "Необходимо использовать физическое устройство для push-уведомлений",
+  mustUsePhysicalDevice:
+    "Необходимо использовать физическое устройство для push-уведомлений",
   pressToSendNotification: "Нажмите, чтобы отправить уведомление",
   hideSpecialExpenses: "Скрыть специальные расходы",
 };

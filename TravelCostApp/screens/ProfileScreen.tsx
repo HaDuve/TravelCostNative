@@ -11,6 +11,7 @@ import {
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
 import IconButton from "../components/UI/IconButton";
+import FeedbackForm from "../components/FeedbackForm/FeedbackForm";
 import { GlobalStyles } from "../constants/styles";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
@@ -49,8 +50,6 @@ import { NetworkContext } from "../store/network-context";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import GetLocalPriceButton from "../components/Settings/GetLocalPriceButton";
 import GradientButton from "../components/UI/GradientButton";
-import { Linking } from "react-native";
-import { canOpenURL } from "expo-linking";
 import safeLogError from "../util/error";
 
 Notifications.setNotificationHandler({
@@ -152,6 +151,7 @@ const ProfileScreen = ({ navigation }) => {
   const [tourIsRunning, setTourIsRunning] = useState(false);
   const [tripHistory, setTripHistory] = useState([]);
   const [isFetchingLogout, setIsFetchingLogout] = useState(false);
+  const [isFeedbackModalVisible, setIsFeedbackModalVisible] = useState(false);
 
   // possible future use of notification display
   const [expoPushToken, setExpoPushToken] = useState("");
@@ -353,22 +353,7 @@ const ProfileScreen = ({ navigation }) => {
         <GradientButton
           style={styles.headerButton}
           buttonStyle={{}}
-          onPress={async () => {
-            const subject = encodeURIComponent("Budget For Nomads Support");
-            const message = encodeURIComponent("Hi, I have feedback about ...");
-            const url = `mailto:budgetfornomads@outlook.com?subject=${subject}&body=${message}`;
-            try {
-              const canOpen = await canOpenURL(url);
-              if (!canOpen) return;
-              await Linking.openURL(url);
-            } catch (error) {
-              safeLogError(error);
-              Alert.alert(
-                "No email client found",
-                "Please install an email client and try again."
-              );
-            }
-          }}
+          onPress={() => setIsFeedbackModalVisible(true)}
         >
           {i18n.t("supportFeedbackLabel")}
         </GradientButton>
@@ -452,6 +437,11 @@ const ProfileScreen = ({ navigation }) => {
         ></ProfileForm>
       </View>
       {visibleContent}
+
+      <FeedbackForm
+        isVisible={isFeedbackModalVisible}
+        onClose={() => setIsFeedbackModalVisible(false)}
+      />
     </View>
   );
 };

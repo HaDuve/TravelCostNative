@@ -14,7 +14,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -776,5 +779,35 @@ export async function fetchChangelog() {
     return tempText;
   } catch (error) {
     safeLogError(error);
+  }
+}
+
+// Feedback data interface
+export interface FeedbackData {
+  uid: string; // From UserContext
+  feedbackString: string; // User input
+  date: string; // ISO timestamp
+  timestamp: number; // Unix timestamp for sorting
+  userAgent?: string; // Device/app info
+  version?: string; // App version
+}
+
+/**
+ * Store feedback in the database
+ * @param feedbackData - The feedback data to store
+ * @returns Promise<string> - The Firebase-generated ID
+ */
+export async function storeFeedback(
+  feedbackData: FeedbackData
+): Promise<string> {
+  try {
+    const response = await axios.post(
+      BACKEND_URL + "/server/feedback.json" + getMMKVString("QPAR"),
+      feedbackData
+    );
+    return response.data.name; // Firebase-generated ID
+  } catch (error) {
+    safeLogError(error);
+    throw new Error("error while storing feedback");
   }
 }

@@ -152,7 +152,10 @@ const ExpenseForm = ({
   const [helperStateForDividing, setHelperStateForDividing] = useState(false);
   const [inputs, setInputs] = useState({
     amount: {
-      value: editingValues ? editingValues.amount?.toString() : "",
+      value:
+        editingValues && editingValues.amount > 0
+          ? editingValues.amount.toString()
+          : "",
       isValid: true,
     },
     date: {

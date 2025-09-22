@@ -4,12 +4,13 @@
   "scripts": {
     "start": "npx expo start --dev-client",
     "lint": "eslint --fix .",
-    "build:dev": "eas build --platform all --profile development-simulator",
-    "build:prod": "eas build --platform all --profile production --non-interactive",
-    "testflight": "eas build --platform ios --profile production --non-interactive && eas submit --platform ios --latest --non-interactive",
-    "update": "eas update --branch production",
+    "build:dev": "node scripts/build-dev.js",
+    "build:prod": "node scripts/build-prod.js",
+    "submit:prod": "node scripts/submit-prod.js",
     "android": "expo run:android",
-    "ios": "expo run:ios"
+    "ios": "expo run:ios",
+    "update": "eas update --branch production",
+    "testflight": "eas build --platform ios --profile production --non-interactive && eas submit --platform ios --latest --non-interactive"
   },
   "dependencies": {
     "@babel/runtime": "^7.22.5",

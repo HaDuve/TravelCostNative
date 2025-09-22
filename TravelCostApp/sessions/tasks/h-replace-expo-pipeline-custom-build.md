@@ -1,8 +1,9 @@
 ---
 task: h-replace-expo-pipeline-custom-build
 branch: feature/replace-expo-pipeline
-status: pending
+status: in-progress
 created: 2025-01-27
+started: 2025-01-27
 modules: [build-system, deployment, android, ios, eas-config, package-scripts]
 ---
 
@@ -34,7 +35,14 @@ Replace the current Expo EAS (Expo Application Services) pipeline with custom bu
 
 ## Context Files
 
-<!-- Added by context-gathering agent or manually -->
+- @eas.json:1-50 # Current EAS build and submit configuration
+- @package.json:4-13 # Existing build scripts using EAS
+- @app.json:1-58 # Expo app configuration with iOS/Android settings
+- @android/app/build.gradle:1-189 # Android build configuration
+- @ios/Podfile:1-65 # iOS CocoaPods configuration
+- @android/gradle.properties:1-59 # Android Gradle properties
+- @metro.config.js:1-11 # Metro bundler configuration
+- @babel.config.js:1-11 # Babel transpilation configuration
 
 ## User Notes
 
@@ -45,3 +53,16 @@ Replace expo pipeline with our own build and submit scripts. Ideally we want to 
 <!-- Updated as work progresses -->
 
 - [2025-01-27] Created task for replacing Expo pipeline with custom build scripts
+- [2025-01-27] **COMPLETED**: Analyzed current EAS configuration and platform requirements
+- [2025-01-27] **COMPLETED**: Implemented custom build scripts:
+  - `scripts/build-dev.js` - Development builds (APK for Android, simulator for iOS)
+  - `scripts/build-prod.js` - Production builds (AAB for Android, IPA for iOS)
+  - `scripts/submit-prod.js` - App store submissions using Fastlane
+- [2025-01-27] **COMPLETED**: Updated package.json with new build commands
+- [2025-01-27] **COMPLETED**: Created comprehensive `pipeline.md` documentation with:
+  - Complete setup guide for new developers
+  - All script commands and usage instructions
+  - Prerequisites and environment setup
+  - Platform-specific requirements (iOS/Android)
+  - Troubleshooting guide
+  - Migration guide from EAS

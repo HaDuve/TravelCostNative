@@ -1,6 +1,6 @@
 {
-  "task": null,
-  "branch": null,
-  "services": [],
+  "task": "h-replace-expo-pipeline-custom-build",
+  "branch": "feature/replace-expo-pipeline",
+  "services": ["build-system", "deployment", "android", "ios", "eas-config", "package-scripts"],
   "updated": "2025-01-27"
 }

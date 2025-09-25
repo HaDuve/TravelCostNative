@@ -28,6 +28,7 @@ import { secureStoreGetItem } from "../store/secure-storage";
 import { ExpoPushToken } from "expo-notifications";
 import safeLogError from "./error";
 import { safelyParseJSON } from "./jsonParse";
+import { getValidIdToken } from "./firebase-auth";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -42,13 +43,17 @@ axios.defaults.timeout = AXIOS_TIMEOUT_DEFAULT; // Set default timeout to 5 seco
 /** Sets the ACCESS TOKEN for all future http requests */
 export function setAxiosAccessToken(token: string) {
   if (!token || token?.length < 2) {
-    console.error("https: ~ setAxiosAccessToken ~ wrong token QPAR error");
+    console.error("https: ~ setAxiosAccessToken ~ wrong token error");
     setMMKVString("QPAR", "");
     return;
   }
-  setMMKVString("QPAR", `?auth=${token}`);
-  // automatically set the token as authorization token for all axios requests
-  // axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+  // Firebase Realtime Database REST API requires query parameter auth, NOT Authorization header
+  const qpar = `?auth=${token}`;
+  setMMKVString("QPAR", qpar);
+
+  // Clear any Authorization header (Firebase RTDB doesn't use it)
+  delete axios.defaults.headers.common["Authorization"];
 }
 
 /** Axios Logger */
@@ -88,12 +93,23 @@ export const dataResponseTime = (func) => {
 // fetch server info
 export const fetchServerInfo = async () => {
   try {
-    const response = await axios.get(
-      `${BACKEND_URL}/server.json${getMMKVString("QPAR")}`,
-      {
-        timeout: AXIOS_TIMOUT_LONG,
-      }
+    const qpar = getMMKVString("QPAR");
+    console.log(
+      "[HTTP] Using QPAR token:",
+      qpar ? qpar.substring(0, 20) + "..." : "NO TOKEN"
     );
+
+    // If no authentication token, return null instead of making API calls
+    if (!qpar || qpar === "") {
+      console.warn(
+        "[HTTP] No authentication token available for fetchServerInfo"
+      );
+      return null;
+    }
+
+    const response = await axios.get(`${BACKEND_URL}/server.json${qpar}`, {
+      timeout: AXIOS_TIMOUT_LONG,
+    });
 
     // Process the response data here
     if (!response) throw new Error("No response from server");
@@ -195,6 +211,46 @@ export async function fetchExpensesWithUIDs(
     setLastSyncTimestamp,
   } = require("./sync-timestamp");
 
+  // Get valid Firebase ID token (with automatic refresh)
+  const authToken = await getValidIdToken();
+  if (!authToken) {
+    console.warn(
+      "[HTTP] No valid authentication token available, returning empty expenses"
+    );
+    return [];
+  }
+
+  console.log(
+    "[HTTP] fetchExpensesWithUIDs - Auth token:",
+    authToken.substring(0, 20) + "..."
+  );
+  console.log(
+    "[HTTP] fetchExpensesWithUIDs - tripid:",
+    tripid,
+    "uidlist:",
+    uidlist
+  );
+
+  // Test authentication with a simple server info call first
+  try {
+    const testResponse = await axios.get(
+      `${BACKEND_URL}/server.json?auth=${authToken}`,
+      {
+        timeout: 5000,
+      }
+    );
+  } catch (authError) {
+    console.error("[HTTP] Authentication test failed:", {
+      message: authError.message,
+      status: authError.response?.status,
+      statusText: authError.response?.statusText,
+    });
+    console.warn(
+      "[HTTP] Returning empty expenses due to authentication failure"
+    );
+    return [];
+  }
+
   uidlist.forEach((uid) => {
     try {
       let since = 0;
@@ -202,37 +258,34 @@ export async function fetchExpensesWithUIDs(
         since = getLastSyncTimestamp(tripid, uid);
       }
 
-      const new_axios_call = axios.get(
-        BACKEND_URL +
-          "/trips/" +
-          tripid +
-          "/" +
-          uid +
-          "/expenses.json" +
-          getMMKVString("QPAR"),
-        {
-          params: useDelta
-            ? {
-                orderBy: '"editedTimestamp"',
-                startAt: since,
-              }
-            : {},
-          timeout: AXIOS_TIMOUT_LONG,
-        }
-      );
+      // Build URL with proper Firebase REST API query parameters for server-side filtering
+      let url = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`;
+
+      if (useDelta && since > 0) {
+        // Build new URL with server-side filtering parameters
+        url = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="editedTimestamp"&startAt=${since}&auth=${authToken}`;
+      }
+
+      const new_axios_call = axios.get(url, {
+        timeout: AXIOS_TIMOUT_LONG,
+      });
       axios_calls.push(new_axios_call);
     } catch (error) {
       safeLogError(error);
     }
   });
+
   try {
     const responseArray = await Promise.all(axios_calls);
     responseArray.forEach((response, index) => {
       const uid = uidlist[index];
       const userExpenses: ExpenseData[] = [];
 
+      // Process response data directly (server-side filtering already applied)
       for (const key in response.data) {
         const r: ExpenseDataOnline = response.data[key];
+        const editedTimestamp = +r.editedTimestamp || 0;
+
         const expenseObj: ExpenseData = {
           id: key,
           amount: r.amount,
@@ -253,7 +306,7 @@ export async function fetchExpensesWithUIDs(
           rangeId: r.rangeId,
           isPaid: r.isPaid,
           isSpecialExpense: r.isSpecialExpense,
-          editedTimestamp: +r.editedTimestamp,
+          editedTimestamp: editedTimestamp,
         };
         userExpenses.push(expenseObj);
       }
@@ -268,7 +321,18 @@ export async function fetchExpensesWithUIDs(
         setLastSyncTimestamp(tripid, uid, latestTimestamp);
       }
     });
+
+    console.log(
+      `[HTTP] fetchExpensesWithUIDs completed: ${expenses.length} total expenses from ${uidlist.length} users with server-side filtering`
+    );
   } catch (error) {
+    console.error("[HTTP] fetchExpensesWithUIDs error details:", {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      url: error.config?.url,
+    });
     safeLogError(error);
   }
 
@@ -293,29 +357,34 @@ export async function fetchExpenses(
       since = getLastSyncTimestamp(tripid, uid);
     }
 
-    const response = await axios.get(
-      BACKEND_URL +
-        "/trips/" +
-        tripid +
-        "/" +
-        uid +
-        "/expenses.json" +
-        getMMKVString("QPAR"),
-      {
-        params: useDelta
-          ? {
-              orderBy: '"editedTimestamp"',
-              startAt: since,
-            }
-          : {},
-        timeout: AXIOS_TIMOUT_LONG,
-      }
-    );
+    // Get valid Firebase ID token (with automatic refresh)
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn(
+        "[HTTP] No valid authentication token available for fetchExpenses"
+      );
+      return [];
+    }
+
+    // Build URL with proper Firebase REST API query parameters for server-side filtering
+    let url = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`;
+
+    if (useDelta && since > 0) {
+      // Build new URL with server-side filtering parameters
+      url = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="editedTimestamp"&startAt=${since}&auth=${authToken}`;
+    }
+
+    const response = await axios.get(url, {
+      timeout: AXIOS_TIMOUT_LONG,
+    });
+
     const expenses = [];
 
-    // ExpenseData
+    // Process response data directly (server-side filtering already applied)
     for (const key in response.data) {
       const data: ExpenseDataOnline = response.data[key];
+      const editedTimestamp = +data.editedTimestamp || 0;
+
       const expenseObj: ExpenseData = {
         id: key,
         amount: data.amount,
@@ -336,7 +405,7 @@ export async function fetchExpenses(
         rangeId: data.rangeId,
         isPaid: data.isPaid,
         isSpecialExpense: data.isSpecialExpense,
-        editedTimestamp: +data.editedTimestamp,
+        editedTimestamp: editedTimestamp,
       };
       expenses.push(expenseObj);
     }
@@ -350,9 +419,14 @@ export async function fetchExpenses(
       setLastSyncTimestamp(tripid, uid, latestTimestamp);
     }
 
+    console.log(
+      `[HTTP] fetchExpenses completed: ${expenses.length} expenses with server-side filtering`
+    );
     return expenses;
   } catch (error) {
+    console.error("[HTTP] fetchExpenses error:", error);
     safeLogError(error);
+    return [];
   }
 }
 

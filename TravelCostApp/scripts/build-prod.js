@@ -54,6 +54,11 @@ function execCommand(command, options = {}) {
     const result = execSync(command, {
       stdio: "inherit",
       cwd: process.cwd(),
+      env: {
+        ...process.env,
+        LANG: "en_US.UTF-8",
+        LC_ALL: "en_US.UTF-8",
+      },
       ...options,
     });
     return result;
@@ -146,22 +151,73 @@ function buildAndroid() {
   }
 }
 
-function buildiOS() {
-  log("Building iOS production app...", "yellow");
+function checkiOSPrerequisites() {
+  log("Checking iOS build prerequisites...", "yellow");
 
-  // Install pods
-  execCommand("cd ios && pod install");
+  // Check if Xcode is installed
+  try {
+    const xcodeVersion = execSync("xcodebuild -version", {
+      stdio: "pipe",
+      encoding: "utf8",
+    });
+    log(`Xcode version: ${xcodeVersion.split("\n")[0]}`, "blue");
+  } catch (error) {
+    log(
+      "Error: Xcode not found. Please install Xcode from the App Store.",
+      "red"
+    );
+    process.exit(1);
+  }
 
-  // Create archive
-  const archiveCommand = `cd ios && xcodebuild -workspace Budget.xcworkspace -scheme ${CONFIG.ios.scheme} -configuration ${CONFIG.ios.configuration} -destination generic/platform=iOS -archivePath "${CONFIG.ios.archivePath}" archive`;
+  // Check if we're on macOS
+  if (process.platform !== "darwin") {
+    log("Error: iOS builds can only be performed on macOS", "red");
+    process.exit(1);
+  }
 
-  execCommand(archiveCommand);
+  // Check if workspace exists
+  if (!fs.existsSync("./ios/Budget.xcworkspace")) {
+    log(
+      "Error: iOS workspace not found. Please run 'npx expo prebuild' first.",
+      "red"
+    );
+    process.exit(1);
+  }
 
-  // Export IPA
-  const exportCommand = `cd ios && xcodebuild -exportArchive -archivePath "${CONFIG.ios.archivePath}" -exportPath "${CONFIG.ios.exportPath}" -exportOptionsPlist ExportOptions.plist`;
+  // Check for code signing configuration
+  log("Checking code signing configuration...", "yellow");
+  try {
+    const result = execSync(
+      `cd ios && xcodebuild -workspace Budget.xcworkspace -scheme ${CONFIG.ios.scheme} -configuration ${CONFIG.ios.configuration} -showBuildSettings | grep -E "(DEVELOPMENT_TEAM|CODE_SIGN_IDENTITY)"`,
+      { stdio: "pipe", encoding: "utf8" }
+    );
 
-  // Check if ExportOptions.plist exists, create if not
+    if (
+      result.includes("DEVELOPMENT_TEAM") &&
+      result.includes("CODE_SIGN_IDENTITY")
+    ) {
+      log("✓ Code signing configuration found", "green");
+    } else {
+      log("⚠️  Code signing may not be properly configured", "yellow");
+      log(
+        "   You may need to configure signing in Xcode before building",
+        "yellow"
+      );
+    }
+  } catch (error) {
+    log("⚠️  Could not verify code signing configuration", "yellow");
+    log(
+      "   This is normal if you haven't opened the project in Xcode yet",
+      "yellow"
+    );
+  }
+
+  log("iOS prerequisites check passed!", "green");
+}
+
+function createExportOptionsPlist() {
   const exportOptionsPath = "./ios/ExportOptions.plist";
+
   if (!fs.existsSync(exportOptionsPath)) {
     log("Creating ExportOptions.plist...", "yellow");
     const exportOptions = `<?xml version="1.0" encoding="UTF-8"?>
@@ -178,12 +234,87 @@ function buildiOS() {
     <true/>
     <key>compileBitcode</key>
     <false/>
+    <key>destination</key>
+    <string>export</string>
+    <key>signingStyle</key>
+    <string>automatic</string>
+    <key>stripSwiftSymbols</key>
+    <true/>
 </dict>
 </plist>`;
     fs.writeFileSync(exportOptionsPath, exportOptions);
+    log("ExportOptions.plist created successfully", "green");
+  } else {
+    log("ExportOptions.plist already exists", "blue");
+  }
+}
+
+function buildiOS() {
+  log("Building iOS production app...", "yellow");
+
+  checkiOSPrerequisites();
+
+  // Clean previous builds
+  if (fs.existsSync("./ios/build")) {
+    log("Cleaning previous iOS builds...", "yellow");
+    execCommand("cd ios && rm -rf build");
   }
 
-  execCommand(exportCommand);
+  // Install pods with repo update
+  log("Installing iOS dependencies...", "yellow");
+  execCommand(
+    "cd ios && LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 pod install --repo-update"
+  );
+
+  // Create export options plist
+  createExportOptionsPlist();
+
+  // Create archive
+  log("Creating iOS archive...", "yellow");
+  const archiveCommand = `cd ios && xcodebuild -workspace Budget.xcworkspace -scheme ${CONFIG.ios.scheme} -configuration ${CONFIG.ios.configuration} -destination generic/platform=iOS -archivePath "${CONFIG.ios.archivePath}" archive`;
+
+  try {
+    execCommand(archiveCommand);
+    log("Archive created successfully", "green");
+  } catch (error) {
+    log(
+      "Archive creation failed. This is expected if code signing is not configured.",
+      "red"
+    );
+    log("", "reset");
+    log("🔧 To fix code signing issues:", "yellow");
+    log("1. Open ios/Budget.xcworkspace in Xcode", "blue");
+    log("2. Select the 'Budget' project in the navigator", "blue");
+    log("3. Go to 'Signing & Capabilities' tab", "blue");
+    log("4. Select your Apple Developer team", "blue");
+    log("5. Ensure 'Automatically manage signing' is checked", "blue");
+    log("", "reset");
+    log("📝 Alternative: Use EAS Build for production:", "yellow");
+    log(
+      "   eas build --platform ios --profile production --non-interactive",
+      "blue"
+    );
+    log("", "reset");
+    log(
+      "⚠️  Note: Production builds require valid Apple Developer account and code signing",
+      "yellow"
+    );
+    process.exit(1);
+  }
+
+  // Export IPA
+  log("Exporting IPA...", "yellow");
+  const exportCommand = `cd ios && xcodebuild -exportArchive -archivePath "${CONFIG.ios.archivePath}" -exportPath "${CONFIG.ios.exportPath}" -exportOptionsPlist ExportOptions.plist`;
+
+  try {
+    execCommand(exportCommand);
+  } catch (error) {
+    log("IPA export failed. Common solutions:", "red");
+    log("1. Check ExportOptions.plist configuration", "yellow");
+    log("2. Verify Apple Developer account settings", "yellow");
+    log("3. Check provisioning profiles", "yellow");
+    process.exit(1);
+  }
 
   // Check if IPA was created
   const ipaPath = path.join(CONFIG.ios.exportPath, "Budget.ipa");
@@ -195,6 +326,7 @@ function buildiOS() {
     );
   } else {
     log("Error: IPA not found after build", "red");
+    log("Check the export logs above for details", "yellow");
     process.exit(1);
   }
 }

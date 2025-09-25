@@ -52,6 +52,11 @@ function execCommand(command, options = {}) {
     const result = execSync(command, {
       stdio: "inherit",
       cwd: process.cwd(),
+      env: {
+        ...process.env,
+        LANG: "en_US.UTF-8",
+        LC_ALL: "en_US.UTF-8",
+      },
       ...options,
     });
     return result;
@@ -117,22 +122,92 @@ function buildAndroid() {
   }
 }
 
+function getAvailableSimulators() {
+  try {
+    const result = execSync("xcrun simctl list devices --json", {
+      stdio: "pipe",
+      encoding: "utf8",
+    });
+    const data = JSON.parse(result);
+    const availableSims = [];
+
+    Object.keys(data.devices).forEach((runtime) => {
+      if (runtime.includes("iOS")) {
+        data.devices[runtime].forEach((device) => {
+          if (device.state === "Shutdown" || device.state === "Booted") {
+            availableSims.push({
+              name: device.name,
+              udid: device.udid,
+              runtime: runtime,
+            });
+          }
+        });
+      }
+    });
+
+    return availableSims;
+  } catch (error) {
+    log("Warning: Could not get simulator list, using default", "yellow");
+    return [{ name: "iPhone 15", udid: "default", runtime: "iOS 17.0" }];
+  }
+}
+
 function buildiOS() {
   log("Building iOS app...", "yellow");
 
-  // Install pods if needed
-  if (!fs.existsSync("./ios/Pods")) {
-    log("Installing iOS dependencies...", "yellow");
-    execCommand("cd ios && pod install");
+  // Check if Xcode is installed
+  try {
+    execSync("xcodebuild -version", { stdio: "pipe" });
+  } catch (error) {
+    log(
+      "Error: Xcode not found. Please install Xcode from the App Store.",
+      "red"
+    );
+    process.exit(1);
   }
 
+  // Clean previous builds
+  if (fs.existsSync("./ios/build")) {
+    log("Cleaning previous iOS builds...", "yellow");
+    execCommand("cd ios && rm -rf build");
+  }
+
+  // Install pods
+  log("Installing iOS dependencies...", "yellow");
+  execCommand(
+    "cd ios && LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 pod install --repo-update"
+  );
+
+  // Get available simulators
+  const simulators = getAvailableSimulators();
+  const targetSim = simulators[0] || {
+    name: "iPhone 15",
+    udid: "default",
+    runtime: "iOS 17.0",
+  };
+
+  log(`Using simulator: ${targetSim.name} (${targetSim.runtime})`, "blue");
+
   // Build for simulator
-  const buildCommand = `cd ios && xcodebuild -workspace Budget.xcworkspace -scheme ${CONFIG.ios.scheme} -configuration ${CONFIG.ios.configuration} -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.6' build`;
+  const buildCommand = `cd ios && xcodebuild -workspace Budget.xcworkspace -scheme ${CONFIG.ios.scheme} -configuration ${CONFIG.ios.configuration} -destination 'platform=iOS Simulator,name=${targetSim.name}' build`;
 
-  execCommand(buildCommand);
-
-  log("iOS build completed successfully!", "green");
-  log("To run on simulator: npx expo run:ios", "blue");
+  try {
+    execCommand(buildCommand);
+    log("iOS build completed successfully!", "green");
+    log("To run on simulator: npx expo run:ios", "blue");
+  } catch (error) {
+    log("iOS build failed. Common solutions:", "red");
+    log(
+      "1. Clean build folder: cd ios && rm -rf build && xcodebuild clean",
+      "yellow"
+    );
+    log(
+      "2. Reset pods: cd ios && rm -rf Pods Podfile.lock && pod install",
+      "yellow"
+    );
+    log("3. Check Xcode version compatibility", "yellow");
+    process.exit(1);
+  }
 }
 
 function installOnDevice(platform) {

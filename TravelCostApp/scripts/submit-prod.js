@@ -54,6 +54,11 @@ function execCommand(command, options = {}) {
     const result = execSync(command, {
       stdio: "inherit",
       cwd: process.cwd(),
+      env: {
+        ...process.env,
+        LANG: "en_US.UTF-8",
+        LC_ALL: "en_US.UTF-8",
+      },
       ...options,
     });
     return result;
@@ -134,8 +139,14 @@ end`;
   log("Android app submitted successfully!", "green");
 }
 
-function submitiOS() {
-  log("Submitting iOS app to App Store Connect...", "yellow");
+function checkiOSSubmissionPrerequisites() {
+  log("Checking iOS submission prerequisites...", "yellow");
+
+  // Check if we're on macOS
+  if (process.platform !== "darwin") {
+    log("Error: iOS submission can only be performed on macOS", "red");
+    process.exit(1);
+  }
 
   // Check if IPA exists
   if (!fs.existsSync(CONFIG.ios.ipaPath)) {
@@ -143,6 +154,25 @@ function submitiOS() {
     log('Please run "npm run build:prod ios" first', "yellow");
     process.exit(1);
   }
+
+  // Check IPA size
+  const ipaSize = fs.statSync(CONFIG.ios.ipaPath).size / 1024 / 1024;
+  log(`IPA size: ${ipaSize.toFixed(2)} MB`, "blue");
+
+  if (ipaSize > 100) {
+    log(
+      "Warning: IPA size is large (>100MB). This may cause upload issues.",
+      "yellow"
+    );
+  }
+
+  log("iOS submission prerequisites check passed!", "green");
+}
+
+function submitiOS() {
+  log("Submitting iOS app to App Store Connect...", "yellow");
+
+  checkiOSSubmissionPrerequisites();
 
   // Create Fastfile for iOS submission
   const fastfilePath = "./fastlane/iOS/Fastfile";
@@ -157,6 +187,13 @@ function submitiOS() {
 platform :ios do
   desc "Deploy a new version to the App Store"
   lane :deploy do
+    # Validate the IPA first
+    validate_app(
+      ipa: '${CONFIG.ios.ipaPath}',
+      apple_id: '${CONFIG.ios.appleId}'
+    )
+
+    # Upload to App Store
     upload_to_app_store(
       ipa: '${CONFIG.ios.ipaPath}',
       apple_id: '${CONFIG.ios.appleId}',
@@ -164,17 +201,28 @@ platform :ios do
       skip_binary_upload: false,
       skip_screenshots: true,
       skip_metadata: true,
-      force: true
+      force: true,
+      submit_for_review: false
     )
   end
 end`;
 
   fs.writeFileSync(fastfilePath, fastfileContent);
+  log("Fastfile created for iOS submission", "green");
 
-  // Run Fastlane
-  execCommand(`cd fastlane && fastlane ios deploy`);
-
-  log("iOS app submitted successfully!", "green");
+  try {
+    // Run Fastlane
+    execCommand(`cd fastlane && fastlane ios deploy`);
+    log("iOS app submitted successfully!", "green");
+    log("Check App Store Connect for submission status", "blue");
+  } catch (error) {
+    log("iOS submission failed. Common solutions:", "red");
+    log("1. Check Apple ID credentials", "yellow");
+    log("2. Verify app identifier matches App Store Connect", "yellow");
+    log("3. Check if app version is already uploaded", "yellow");
+    log("4. Ensure valid provisioning profiles", "yellow");
+    process.exit(1);
+  }
 }
 
 function createFastlaneConfig() {

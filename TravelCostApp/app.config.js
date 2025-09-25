@@ -30,7 +30,7 @@ export default {
       },
     },
     android: {
-      package: "com.budgetfornomads.app",
+      package: "com.budgetfornomad.app",
       versionCode: 101118,
       adaptiveIcon: {
         foregroundImage: "./assets/icon2.png",

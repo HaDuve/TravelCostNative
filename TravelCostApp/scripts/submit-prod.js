@@ -22,7 +22,7 @@ const CONFIG = {
     serviceAccountKey:
       process.env.GOOGLE_PLAY_SERVICE_ACCOUNT_KEY ||
       "/Users/hiono/Documents/Keys/Budget_For_Nomads/EAS/Google_Play_Console/budget-for-nomads-468110-5964d3e3e268.json",
-    packageName: "com.budgetfornomads.app",
+    packageName: "com.budgetfornomad.app",
     track: "production",
   },
   ios: {
@@ -197,7 +197,7 @@ platform :ios do
     upload_to_app_store(
       ipa: '${CONFIG.ios.ipaPath}',
       apple_id: '${CONFIG.ios.appleId}',
-      app_identifier: 'com.budgetfornomads.app',
+      app_identifier: 'com.budgetfornomad.app',
       skip_binary_upload: false,
       skip_screenshots: true,
       skip_metadata: true,

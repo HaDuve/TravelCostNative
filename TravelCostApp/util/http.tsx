@@ -196,6 +196,10 @@ export async function storeExpense(
   }
 }
 
+/**
+ * Enhanced fetchExpensesWithUIDs with robust edge case handling
+ * Fixes issues with incomplete data downloads and device switching
+ */
 export async function fetchExpensesWithUIDs(
   tripid: string,
   uidlist: string[],
@@ -203,7 +207,6 @@ export async function fetchExpensesWithUIDs(
 ) {
   if (!tripid || !uidlist || DEBUG_NO_DATA) return [];
   const expenses: ExpenseData[] = [];
-  const axios_calls = [];
 
   // Import sync timestamp functions
   const {
@@ -221,69 +224,231 @@ export async function fetchExpensesWithUIDs(
   }
 
   console.log(
-    "[HTTP] fetchExpensesWithUIDs - Auth token:",
-    authToken.substring(0, 20) + "..."
-  );
-  console.log(
     "[HTTP] fetchExpensesWithUIDs - tripid:",
     tripid,
     "uidlist:",
-    uidlist
+    uidlist,
+    "useDelta:",
+    useDelta
   );
 
-  // Test authentication with a simple server info call first
-  try {
-    const testResponse = await axios.get(
-      `${BACKEND_URL}/server.json?auth=${authToken}`,
-      {
-        timeout: 5000,
-      }
-    );
-  } catch (authError) {
-    console.error("[HTTP] Authentication test failed:", {
-      message: authError.message,
-      status: authError.response?.status,
-      statusText: authError.response?.statusText,
-    });
-    console.warn(
-      "[HTTP] Returning empty expenses due to authentication failure"
-    );
-    return [];
-  }
+  // Helper function to check if this is a fresh login (no sync timestamp)
+  const isFreshLogin = (tripid: string, uid: string): boolean => {
+    const lastSync = getLastSyncTimestamp(tripid, uid);
+    return lastSync === 0;
+  };
 
-  uidlist.forEach((uid) => {
+  // Helper function to validate timestamp to prevent edge cases
+  const validateTimestamp = (timestamp: number): boolean => {
+    const now = Date.now();
+    const oneYearAgo = now - 365 * 24 * 60 * 60 * 1000;
+    const oneHourFromNow = now + 60 * 60 * 1000;
+    return timestamp >= oneYearAgo && timestamp <= oneHourFromNow;
+  };
+
+  // Helper function to process expense response data
+  const processExpenseResponse = (data: any): ExpenseData[] => {
+    const expenses: ExpenseData[] = [];
+    if (!data) return expenses;
+
+    for (const key in data) {
+      const r: ExpenseDataOnline = data[key];
+      const editedTimestamp = +r.editedTimestamp || 0;
+
+      const expenseObj: ExpenseData = {
+        id: key,
+        amount: r.amount,
+        date: new Date(r.date),
+        startDate: new Date(r.startDate),
+        endDate: new Date(r.endDate),
+        description: r.description,
+        category: r.category,
+        country: r.country,
+        currency: r.currency,
+        whoPaid: r.whoPaid,
+        uid: r.uid,
+        calcAmount: r.calcAmount,
+        splitType: r.splitType,
+        splitList: r.splitList,
+        categoryString: r.categoryString,
+        duplOrSplit: r.duplOrSplit,
+        rangeId: r.rangeId,
+        isPaid: r.isPaid,
+        isSpecialExpense: r.isSpecialExpense,
+        editedTimestamp: editedTimestamp,
+      };
+      expenses.push(expenseObj);
+    }
+    return expenses;
+  };
+
+  // Process each user individually with enhanced error handling
+  for (const uid of uidlist) {
     try {
       let since = 0;
-      if (useDelta) {
+      const isFresh = isFreshLogin(tripid, uid);
+
+      if (useDelta && !isFresh) {
         since = getLastSyncTimestamp(tripid, uid);
+
+        // Validate timestamp to prevent edge cases
+        if (!validateTimestamp(since)) {
+          console.warn(
+            `[HTTP] Invalid timestamp for user ${uid}, treating as fresh login`
+          );
+          since = 0;
+        }
       }
 
-      // Build URL with proper Firebase REST API query parameters for server-side filtering
       let url = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`;
+      let useServerSideFiltering = false;
 
+      // Determine the best approach based on the scenario
       if (useDelta && since > 0) {
-        // Build new URL with server-side filtering parameters
+        // Normal delta sync - use server-side filtering
         url = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="editedTimestamp"&startAt=${since}&auth=${authToken}`;
+        useServerSideFiltering = true;
+      } else if (isFresh) {
+        // Fresh login - download all data without filtering
+        console.log(`[HTTP] Fresh login detected for user ${uid}, downloading all data`);
+      } else {
+        // Fallback - download all data
+        console.log(`[HTTP] Fallback mode for user ${uid}, downloading all data`);
       }
 
-      const new_axios_call = axios.get(url, {
+      const response = await axios.get(url, {
         timeout: AXIOS_TIMOUT_LONG,
       });
-      axios_calls.push(new_axios_call);
+
+      let userExpenses = processExpenseResponse(response.data);
+
+      // If we used server-side filtering but got no results, fallback to client-side
+      if (useServerSideFiltering && userExpenses.length === 0 && since > 0) {
+        console.warn(
+          `[HTTP] Server-side filtering returned no results for user ${uid}, trying client-side fallback`
+        );
+
+        try {
+          const fallbackResponse = await axios.get(
+            `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`,
+            { timeout: AXIOS_TIMOUT_LONG }
+          );
+
+          const allExpenses = processExpenseResponse(fallbackResponse.data);
+          userExpenses = allExpenses.filter(
+            (expense) => expense.editedTimestamp > since
+          );
+
+          console.log(
+            `[HTTP] Client-side fallback returned ${userExpenses.length} expenses for user ${uid}`
+          );
+        } catch (fallbackError) {
+          console.error(
+            `[HTTP] Client-side fallback failed for user ${uid}:`,
+            fallbackError
+          );
+        }
+      }
+
+      // Check for potential incomplete data download
+      if (userExpenses.length === 0 && !isFresh) {
+        console.warn(
+          `[HTTP] No expenses returned for user ${uid}, checking for incomplete data`
+        );
+        
+        // Try downloading all data to see if there are expenses without editedTimestamp
+        try {
+          const fullResponse = await axios.get(
+            `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`,
+            { timeout: AXIOS_TIMOUT_LONG }
+          );
+          
+          const allExpenses = processExpenseResponse(fullResponse.data);
+          if (allExpenses.length > 0) {
+            console.warn(
+              `[HTTP] Found ${allExpenses.length} expenses without proper editedTimestamp for user ${uid}. This indicates incomplete data.`
+            );
+            // Use all expenses and reset sync timestamp
+            userExpenses = allExpenses;
+            setLastSyncTimestamp(tripid, uid, 0); // Reset to force fresh sync next time
+          }
+        } catch (error) {
+          console.error(`[HTTP] Failed to check for incomplete data for user ${uid}:`, error);
+        }
+      }
+
+      expenses.push(...userExpenses);
+
+      // Update sync timestamp on successful fetch
+      if (useDelta && userExpenses.length > 0) {
+        const latestTimestamp = Math.max(
+          ...userExpenses.map((e) => e.editedTimestamp || 0)
+        );
+
+        // Only update timestamp if we got a valid one
+        if (latestTimestamp > 0) {
+          setLastSyncTimestamp(tripid, uid, latestTimestamp);
+          console.log(
+            `[HTTP] Updated sync timestamp for user ${uid} to: ${new Date(
+              latestTimestamp
+            ).toISOString()}`
+          );
+        }
+      }
+
     } catch (error) {
+      console.error(`[HTTP] Error fetching expenses for user ${uid}:`, error);
       safeLogError(error);
+      // Continue with other users even if one fails
     }
-  });
+  }
+
+  console.log(
+    `[HTTP] fetchExpensesWithUIDs completed: ${expenses.length} total expenses from ${uidlist.length} users`
+  );
+
+  return expenses;
+}
+
+/**
+ * Enhanced fetchExpenses with robust edge case handling
+ * Fixes issues with incomplete data downloads and device switching
+ */
+export async function fetchExpenses(
+  tripid: string,
+  uid: string,
+  useDelta: boolean = true
+) {
+  if (!tripid || DEBUG_NO_DATA) return [];
 
   try {
-    const responseArray = await Promise.all(axios_calls);
-    responseArray.forEach((response, index) => {
-      const uid = uidlist[index];
-      const userExpenses: ExpenseData[] = [];
+    // Import sync timestamp functions
+    const {
+      getLastSyncTimestamp,
+      setLastSyncTimestamp,
+    } = require("./sync-timestamp");
 
-      // Process response data directly (server-side filtering already applied)
-      for (const key in response.data) {
-        const r: ExpenseDataOnline = response.data[key];
+    // Helper function to check if this is a fresh login (no sync timestamp)
+    const isFreshLogin = (tripid: string, uid: string): boolean => {
+      const lastSync = getLastSyncTimestamp(tripid, uid);
+      return lastSync === 0;
+    };
+
+    // Helper function to validate timestamp to prevent edge cases
+    const validateTimestamp = (timestamp: number): boolean => {
+      const now = Date.now();
+      const oneYearAgo = now - 365 * 24 * 60 * 60 * 1000;
+      const oneHourFromNow = now + 60 * 60 * 1000;
+      return timestamp >= oneYearAgo && timestamp <= oneHourFromNow;
+    };
+
+    // Helper function to process expense response data
+    const processExpenseResponse = (data: any): ExpenseData[] => {
+      const expenses: ExpenseData[] = [];
+      if (!data) return expenses;
+
+      for (const key in data) {
+        const r: ExpenseDataOnline = data[key];
         const editedTimestamp = +r.editedTimestamp || 0;
 
         const expenseObj: ExpenseData = {
@@ -308,53 +473,24 @@ export async function fetchExpensesWithUIDs(
           isSpecialExpense: r.isSpecialExpense,
           editedTimestamp: editedTimestamp,
         };
-        userExpenses.push(expenseObj);
+        expenses.push(expenseObj);
       }
+      return expenses;
+    };
 
-      expenses.push(...userExpenses);
-
-      // Update sync timestamp for this user
-      if (useDelta && userExpenses.length > 0) {
-        const latestTimestamp = Math.max(
-          ...userExpenses.map((e) => e.editedTimestamp || 0)
-        );
-        setLastSyncTimestamp(tripid, uid, latestTimestamp);
-      }
-    });
-
-    console.log(
-      `[HTTP] fetchExpensesWithUIDs completed: ${expenses.length} total expenses from ${uidlist.length} users with server-side filtering`
-    );
-  } catch (error) {
-    console.error("[HTTP] fetchExpensesWithUIDs error details:", {
-      message: error.message,
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      data: error.response?.data,
-      url: error.config?.url,
-    });
-    safeLogError(error);
-  }
-
-  return expenses;
-}
-
-export async function fetchExpenses(
-  tripid: string,
-  uid: string,
-  useDelta: boolean = true
-) {
-  if (!tripid || DEBUG_NO_DATA) return [];
-
-  try {
     let since = 0;
-    if (useDelta) {
-      // Import sync timestamp functions
-      const {
-        getLastSyncTimestamp,
-        setLastSyncTimestamp,
-      } = require("./sync-timestamp");
+    const isFresh = isFreshLogin(tripid, uid);
+
+    if (useDelta && !isFresh) {
       since = getLastSyncTimestamp(tripid, uid);
+
+      // Validate timestamp to prevent edge cases
+      if (!validateTimestamp(since)) {
+        console.warn(
+          `[HTTP] Invalid timestamp for user ${uid}, treating as fresh login`
+        );
+        since = 0;
+      }
     }
 
     // Get valid Firebase ID token (with automatic refresh)
@@ -366,61 +502,102 @@ export async function fetchExpenses(
       return [];
     }
 
-    // Build URL with proper Firebase REST API query parameters for server-side filtering
     let url = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`;
+    let useServerSideFiltering = false;
 
+    // Determine the best approach based on the scenario
     if (useDelta && since > 0) {
-      // Build new URL with server-side filtering parameters
+      // Normal delta sync - use server-side filtering
       url = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="editedTimestamp"&startAt=${since}&auth=${authToken}`;
+      useServerSideFiltering = true;
+    } else if (isFresh) {
+      // Fresh login - download all data without filtering
+      console.log(`[HTTP] Fresh login detected for user ${uid}, downloading all data`);
+    } else {
+      // Fallback - download all data
+      console.log(`[HTTP] Fallback mode for user ${uid}, downloading all data`);
     }
 
     const response = await axios.get(url, {
       timeout: AXIOS_TIMOUT_LONG,
     });
 
-    const expenses = [];
+    let expenses = processExpenseResponse(response.data);
 
-    // Process response data directly (server-side filtering already applied)
-    for (const key in response.data) {
-      const data: ExpenseDataOnline = response.data[key];
-      const editedTimestamp = +data.editedTimestamp || 0;
+    // If we used server-side filtering but got no results, fallback to client-side
+    if (useServerSideFiltering && expenses.length === 0 && since > 0) {
+      console.warn(
+        `[HTTP] Server-side filtering returned no results for user ${uid}, trying client-side fallback`
+      );
 
-      const expenseObj: ExpenseData = {
-        id: key,
-        amount: data.amount,
-        date: new Date(data.date),
-        startDate: new Date(data.startDate),
-        endDate: new Date(data.endDate),
-        description: data.description,
-        category: data.category,
-        country: data.country,
-        currency: data.currency,
-        whoPaid: data.whoPaid,
-        uid: data.uid,
-        calcAmount: data.calcAmount,
-        splitType: data.splitType,
-        splitList: data.splitList,
-        categoryString: data.categoryString,
-        duplOrSplit: data.duplOrSplit,
-        rangeId: data.rangeId,
-        isPaid: data.isPaid,
-        isSpecialExpense: data.isSpecialExpense,
-        editedTimestamp: editedTimestamp,
-      };
-      expenses.push(expenseObj);
+      try {
+        const fallbackResponse = await axios.get(
+          `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`,
+          { timeout: AXIOS_TIMOUT_LONG }
+        );
+
+        const allExpenses = processExpenseResponse(fallbackResponse.data);
+        expenses = allExpenses.filter(
+          (expense) => expense.editedTimestamp > since
+        );
+
+        console.log(
+          `[HTTP] Client-side fallback returned ${expenses.length} expenses for user ${uid}`
+        );
+      } catch (fallbackError) {
+        console.error(
+          `[HTTP] Client-side fallback failed for user ${uid}:`,
+          fallbackError
+        );
+      }
+    }
+
+    // Check for potential incomplete data download
+    if (expenses.length === 0 && !isFresh) {
+      console.warn(
+        `[HTTP] No expenses returned for user ${uid}, checking for incomplete data`
+      );
+      
+      // Try downloading all data to see if there are expenses without editedTimestamp
+      try {
+        const fullResponse = await axios.get(
+          `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`,
+          { timeout: AXIOS_TIMOUT_LONG }
+        );
+        
+        const allExpenses = processExpenseResponse(fullResponse.data);
+        if (allExpenses.length > 0) {
+          console.warn(
+            `[HTTP] Found ${allExpenses.length} expenses without proper editedTimestamp for user ${uid}. This indicates incomplete data.`
+          );
+          // Use all expenses and reset sync timestamp
+          expenses = allExpenses;
+          setLastSyncTimestamp(tripid, uid, 0); // Reset to force fresh sync next time
+        }
+      } catch (error) {
+        console.error(`[HTTP] Failed to check for incomplete data for user ${uid}:`, error);
+      }
     }
 
     // Update sync timestamp on successful fetch
     if (useDelta && expenses.length > 0) {
-      const { setLastSyncTimestamp } = require("./sync-timestamp");
       const latestTimestamp = Math.max(
         ...expenses.map((e) => e.editedTimestamp || 0)
       );
-      setLastSyncTimestamp(tripid, uid, latestTimestamp);
+
+      // Only update timestamp if we got a valid one
+      if (latestTimestamp > 0) {
+        setLastSyncTimestamp(tripid, uid, latestTimestamp);
+        console.log(
+          `[HTTP] Updated sync timestamp for user ${uid} to: ${new Date(
+            latestTimestamp
+          ).toISOString()}`
+        );
+      }
     }
 
     console.log(
-      `[HTTP] fetchExpenses completed: ${expenses.length} expenses with server-side filtering`
+      `[HTTP] fetchExpenses completed: ${expenses.length} expenses`
     );
     return expenses;
   } catch (error) {

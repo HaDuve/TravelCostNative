@@ -38,6 +38,7 @@ export type ExpenseContextType = {
     id?: string
   ) => void;
   setExpenses: (expenses: Array<ExpenseData>) => void;
+  mergeExpenses: (newExpenses: Array<ExpenseData>) => void;
   deleteExpense: (id: string) => void;
   updateExpense: (
     id: string,
@@ -97,6 +98,7 @@ export const ExpensesContext = createContext({
     id?: string
   ) => {},
   setExpenses: (expenses) => {},
+  mergeExpenses: (newExpenses) => {},
   deleteExpense: (id) => {},
   updateExpense: (
     id,
@@ -171,6 +173,54 @@ function expensesReducer(state: ExpenseData[], action) {
       const sorted = uniqBy(getSortedState(action.payload), "id");
       return sorted;
     }
+    case "MERGE": {
+      const newExpenses = action.payload;
+      if (!newExpenses || newExpenses.length === 0) {
+        return state;
+      }
+
+      // Create a map of existing expenses by ID for quick lookup
+      const existingExpensesMap = new Map();
+      state.forEach((expense) => {
+        existingExpensesMap.set(expense.id, expense);
+      });
+
+      // Merge new expenses with existing ones
+      const mergedExpenses = [...state];
+
+      newExpenses.forEach((newExpense) => {
+        const existingExpense = existingExpensesMap.get(newExpense.id);
+
+        if (existingExpense) {
+          // If expense exists, check if new one is more recent based on editedTimestamp
+          const existingTimestamp = existingExpense.editedTimestamp || 0;
+          const newTimestamp = newExpense.editedTimestamp || 0;
+
+          if (newTimestamp > existingTimestamp) {
+            // Update existing expense with newer data
+            const index = mergedExpenses.findIndex(
+              (exp) => exp.id === newExpense.id
+            );
+            if (index !== -1) {
+              mergedExpenses[index] = newExpense;
+            }
+          }
+          // If existing is newer or equal, keep existing (do nothing)
+        } else {
+          // New expense, add it
+          mergedExpenses.push(newExpense);
+        }
+      });
+
+      // Sort by date (newest first) and remove duplicates
+      const getSortedState = (data: ExpenseData[]) =>
+        data.sort((a: ExpenseData, b: ExpenseData) => {
+          return Number(new Date(b.date)) - Number(new Date(a.date));
+        });
+
+      const sorted = uniqBy(getSortedState(mergedExpenses), "id");
+      return sorted;
+    }
     case "UPDATE": {
       const updatableExpenseIndex = state.findIndex(
         (expense) => expense.id === action.payload.id
@@ -218,6 +268,10 @@ function ExpensesContextProvider({ children }) {
 
   function setExpenses(expenses: ExpenseData[]) {
     dispatch({ type: "SET", payload: expenses });
+  }
+
+  function mergeExpenses(newExpenses: ExpenseData[]) {
+    dispatch({ type: "MERGE", payload: newExpenses });
   }
 
   function deleteExpense(id: string) {
@@ -389,6 +443,7 @@ function ExpensesContextProvider({ children }) {
     expenses: expensesState,
     addExpense: addExpense,
     setExpenses: setExpenses,
+    mergeExpenses: mergeExpenses,
     deleteExpense: deleteExpense,
     updateExpense: updateExpense,
     getRecentExpenses: getRecentExpenses,

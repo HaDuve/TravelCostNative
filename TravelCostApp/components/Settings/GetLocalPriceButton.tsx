@@ -133,7 +133,7 @@ const GetLocalPriceButton = ({ navigation, style }) => {
                 darkText
                 buttonStyle={{ padding: 8, paddingHorizontal: 12 }}
               >
-                {i18n.t("getPriceButton")}
+                {i18n.t("getLocalPriceTitle")}
               </GradientButton>
             </View>
           </View>

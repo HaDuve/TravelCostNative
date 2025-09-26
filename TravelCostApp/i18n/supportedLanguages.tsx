@@ -160,13 +160,12 @@ const en = {
   submit: "Submit",
 
   // Get Local Price Modal
-  getLocalPriceModalTitle: "Local Price",
+  getLocalPriceModalTitle: "Get Local Price",
   getLocalPriceModalSubtitle:
     "What product or service would you like to check the price of?",
   getLocalPricePlaceholder:
     "e.g., Coffee, Coworking space, Apartment rental...",
   getLocalPriceError: "Please enter a product or service name",
-  getPriceButton: "Get Price",
 
   // Trip Form Labels
   tripFormTitleNew: "New Trip Budget",
@@ -285,7 +284,7 @@ const en = {
   askingChatGpt: "Asking GPT-4 for a good deal...",
   gptSearchingWeb: "🔍 Searching current local prices and seasonal data...",
   gptAnalyzingData: "🧠 Analyzing market trends and pricing insights...",
-  getLocalPriceTitle: "Get Local Price",
+  getLocalPriceTitle: "Local Price",
   gettingLocalPrice: "Getting local price information...",
   day: "Day",
   week: "Week",
@@ -665,12 +664,11 @@ const de = {
   submit: "Abschicken",
 
   // Get Local Price Modal
-  getLocalPriceModalTitle: "Lokale Preise",
+  getLocalPriceModalTitle: "Lokale Preise Anzeigen",
   getLocalPriceModalSubtitle:
     "Für welches Produkt oder welche Dienstleistung möchtest du den Preis prüfen?",
   getLocalPricePlaceholder: "z.B. Kaffee, Coworking Space, Wohnungsmiete...",
   getLocalPriceError: "Bitte gib einen Produkt- oder Dienstleistungsnamen ein",
-  getPriceButton: "Preis Abrufen",
 
   // Trip Form Labels
   tripFormTitleNew: "Neue Reise erstellen",
@@ -799,7 +797,7 @@ const de = {
   gptSearchingWeb:
     "🔍 Aktuelle lokale Preise und saisonale Daten werden gesucht...",
   gptAnalyzingData: "🧠 Markttrends und Preisanalysen werden ausgewertet...",
-  getLocalPriceTitle: "Lokale Preise Anzeigen",
+  getLocalPriceTitle: "Lokaler Preis",
   gettingLocalPrice: "Lokale Preisinformationen werden abgerufen...",
   day: "Tag",
   week: "Woche",
@@ -1190,13 +1188,12 @@ const fr = {
   submit: "Soumettre",
 
   // Get Local Price Modal
-  getLocalPriceModalTitle: "Prix Local",
+  getLocalPriceModalTitle: "Obtenir le Prix Local",
   getLocalPriceModalSubtitle:
     "Pour quel produit ou service aimerais-tu vérifier le prix ?",
   getLocalPricePlaceholder:
     "ex. Café, Espace de coworking, Location d'appartement...",
   getLocalPriceError: "Veuillez entrer un nom de produit ou de service",
-  getPriceButton: "Obtenir le Prix",
 
   // Trip Form Labels
   tripFormTitleNew: "Nouveau budget de voyage",
@@ -1324,7 +1321,7 @@ const fr = {
     "🔍 Recherche des prix locaux actuels et données saisonnières...",
   gptAnalyzingData:
     "🧠 Analyse des tendances du marché et des insights de prix...",
-  getLocalPriceTitle: "Obtenir le Prix Local",
+  getLocalPriceTitle: "Prix Local",
   gettingLocalPrice: "Obtention des informations sur les prix locaux...",
   day: "Jour",
   week: "Semaine",
@@ -1713,12 +1710,11 @@ const ru = {
   submit: "Отправить",
 
   // Get Local Price Modal
-  getLocalPriceModalTitle: "Местная Цена",
+  getLocalPriceModalTitle: "Получить Местную Цену",
   getLocalPriceModalSubtitle:
     "Для какого продукта или услуги вы хотите проверить цену?",
   getLocalPricePlaceholder: "напр. Кофе, Коворкинг, Аренда квартиры...",
   getLocalPriceError: "Пожалуйста, введите название продукта или услуги",
-  getPriceButton: "Получить Цену",
 
   // Trip Form Labels
   tripFormTitleNew: "Бюджет новой поездки",
@@ -1838,7 +1834,7 @@ const ru = {
   askingChatGpt: "Запрашиваю мнение GPT-4 о хорошей сделке...",
   gptSearchingWeb: "🔍 Поиск актуальных местных цен и сезонных данных...",
   gptAnalyzingData: "🧠 Анализ рыночных трендов и ценовых инсайтов...",
-  getLocalPriceTitle: "Получить Местную Цену",
+  getLocalPriceTitle: "Местная Цена",
   gettingLocalPrice: "Получение информации о местных ценах...",
   day: "День",
   week: "Неделя",

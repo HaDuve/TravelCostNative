@@ -399,7 +399,10 @@ const ExpenseForm = ({
     // Restore form inputs from tempValues
     setInputs({
       amount: {
-        value: tempValues.amount?.toString() || "",
+        value:
+          tempValues.amount && tempValues.amount > 0
+            ? tempValues.amount.toString()
+            : "",
         isValid: true,
       },
       date: {

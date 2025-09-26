@@ -12,7 +12,8 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "update": "eas update --branch production",
-    "testflight": "eas build --platform ios --profile production --non-interactive && eas submit --platform ios --latest --non-interactive"
+    "testflight": "eas build --platform ios --profile production --non-interactive && eas submit --platform ios --latest --non-interactive",
+    "migrate:timestamps": "node scripts/migrate-server-timestamps.js"
   },
   "dependencies": {
     "@babel/runtime": "^7.22.5",

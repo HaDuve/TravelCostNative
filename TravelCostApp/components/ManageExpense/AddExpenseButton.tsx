@@ -213,7 +213,7 @@ const AddExpenseButton = ({ navigation }) => {
               {
                 text: "Login",
                 onPress: () => {
-                  authCtx.logout();
+                  authCtx.logout(tripCtx.tripid);
                   reloadApp();
                 },
               },

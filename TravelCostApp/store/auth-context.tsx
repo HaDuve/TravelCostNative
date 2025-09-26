@@ -6,6 +6,7 @@ import { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setAxiosAccessToken } from "../util/http";
 import { getValidIdToken, testFirebaseAuth } from "../util/firebase-auth";
+import { clearLastFetchTimestamp } from "../util/last-fetch-timestamp";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -44,7 +45,7 @@ export const AuthContext = createContext({
   token: "",
   isAuthenticated: false,
   authenticate: async (token) => {},
-  logout: () => {},
+  logout: (tripid?: string) => {},
   setUserID: async (uid) => {},
   deleteAccount: async () => {},
 });
@@ -70,7 +71,8 @@ function AuthContextProvider({ children }) {
           setAuthToken(validToken);
           setAxiosAccessToken(validToken);
           console.log(
-            "[AUTH-CONTEXT] Authentication initialized with valid token"
+            "[AUTH-CONTEXT] Authentication initialized with valid token",
+            validToken
           );
         } else {
           console.log(
@@ -106,8 +108,11 @@ function AuthContextProvider({ children }) {
     }
   }
 
-  function logout() {
+  function logout(tripid?: string) {
     setAuthToken(null);
+    if (tripid) {
+      clearLastFetchTimestamp(tripid);
+    }
   }
 
   async function setUserID(uid) {

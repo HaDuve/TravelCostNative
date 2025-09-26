@@ -1,6 +1,12 @@
 {
-  "task": "h-replace-expo-pipeline-custom-build",
+  "task": "h-fix-delta-sync-download-issues",
   "branch": "feature/replace-expo-pipeline",
-  "services": ["build-system", "deployment", "android", "ios", "eas-config", "package-scripts"],
-  "updated": "2025-01-27"
+  "services": [
+    "delta-sync",
+    "sync-timestamp",
+    "expenses-context",
+    "network-context",
+    "async-storage"
+  ],
+  "updated": "2024-12-19"
 }

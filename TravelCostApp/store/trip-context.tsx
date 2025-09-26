@@ -135,6 +135,7 @@ function TripContextProvider({ children }) {
     const stored_uid = await secureStoreGetItem("uid");
     if (!(stored_tripid || stored_uid)) return;
     setTripid(stored_tripid ?? "");
+    console.log("loadTripidFetchTrip ~ stored_tripid:", stored_tripid);
     const { isFastEnough } = await isConnectionFastEnough();
     if (isFastEnough) {
       try {

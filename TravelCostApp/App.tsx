@@ -686,7 +686,7 @@ function Root() {
             visibilityTime: 5000,
           });
           await asyncStoreSafeClear();
-          authCtx.logout();
+          authCtx.logout(tripCtx.tripid);
           setAppIsReady(true);
           return;
         }

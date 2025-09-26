@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getMMKVString, setMMKVString } from "../store/mmkv";
+import { setMMKVString } from "../store/mmkv";
 import {
   secureStoreGetItem,
   secureStoreSetItem,

@@ -160,7 +160,7 @@ const en = {
   submit: "Submit",
 
   // Get Local Price Modal
-  getLocalPriceModalTitle: "Get Local Price",
+  getLocalPriceModalTitle: "Local Price",
   getLocalPriceModalSubtitle:
     "What product or service would you like to check the price of?",
   getLocalPricePlaceholder:
@@ -665,7 +665,7 @@ const de = {
   submit: "Abschicken",
 
   // Get Local Price Modal
-  getLocalPriceModalTitle: "Lokale Preise Anzeigen",
+  getLocalPriceModalTitle: "Lokale Preise",
   getLocalPriceModalSubtitle:
     "Für welches Produkt oder welche Dienstleistung möchtest du den Preis prüfen?",
   getLocalPricePlaceholder: "z.B. Kaffee, Coworking Space, Wohnungsmiete...",
@@ -1190,7 +1190,7 @@ const fr = {
   submit: "Soumettre",
 
   // Get Local Price Modal
-  getLocalPriceModalTitle: "Obtenir le Prix Local",
+  getLocalPriceModalTitle: "Prix Local",
   getLocalPriceModalSubtitle:
     "Pour quel produit ou service aimerais-tu vérifier le prix ?",
   getLocalPricePlaceholder:
@@ -1713,7 +1713,7 @@ const ru = {
   submit: "Отправить",
 
   // Get Local Price Modal
-  getLocalPriceModalTitle: "Получить Местную Цену",
+  getLocalPriceModalTitle: "Местная Цена",
   getLocalPriceModalSubtitle:
     "Для какого продукта или услуги вы хотите проверить цену?",
   getLocalPricePlaceholder: "напр. Кофе, Коворкинг, Аренда квартиры...",

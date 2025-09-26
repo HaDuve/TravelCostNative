@@ -245,7 +245,7 @@ export async function fetchExpensesWithUIDs(
   for (const uid of uidlist) {
     try {
       let userExpenses: ExpenseData[] = [];
-      const serverFilteredUrl = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="editedTimestamp"&startAt=${lastFetch}&auth=${authToken}`;
+      const serverFilteredUrl = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="serverTimestamp"&startAt=${lastFetch}&auth=${authToken}`;
       const allDataUrl = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`;
       const shouldFilter = useDelta && !isFirstFetch;
       const url = shouldFilter ? serverFilteredUrl : allDataUrl;
@@ -274,9 +274,11 @@ export async function fetchExpensesWithUIDs(
     }
   }
   console.log(
-    `SET: fetchExpensesWithUIDs  setLastFetchTimestamp: tripid is ${tripid} to ${latestTimestamp}`
+    `SET: fetchExpensesWithUIDs  setLastFetchTimestamp: tripid is ${tripid} to ${latestTimestamp}, fetched ${expenses.length} expenses`
   );
-  setLastFetchTimestamp(tripid, latestTimestamp);
+  if (latestTimestamp > 0) {
+    setLastFetchTimestamp(tripid, latestTimestamp);
+  }
   return expenses;
 }
 
@@ -337,7 +339,7 @@ export async function fetchExpenses(
     let expenses: ExpenseData[] = [];
 
     if (useDelta && !isFirstFetch) {
-      const url = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="editedTimestamp"&startAt=${lastFetch}&auth=${authToken}`;
+      const url = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="serverTimestamp"&startAt=${lastFetch}&auth=${authToken}`;
       const response = await axios.get(url, {
         timeout: AXIOS_TIMOUT_LONG,
       });

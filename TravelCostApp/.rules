@@ -7,7 +7,7 @@
         "$userId": {
           "expenses": {
             ".indexOn": [
-              "editedTimestamp"
+              "serverTimestamp"
             ]
           }
         }

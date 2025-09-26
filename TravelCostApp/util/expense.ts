@@ -11,7 +11,7 @@ import {
   OfflineQueueManageExpenseItem,
 } from "./offline-queue";
 import { splitType } from "./split";
-import uniqBy from "lodash.uniqby";
+
 // expense interface
 export interface Expense {
   tripid: string;

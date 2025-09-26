@@ -1,6 +1,17 @@
 {
   "rules": {
-    ".read": "auth.uid !== null",
-    ".write": "auth.uid !== null"
+    ".read": "true",
+    ".write": "true",
+    "trips": {
+      "$tripId": {
+        "$userId": {
+          "expenses": {
+            ".indexOn": [
+              "editedTimestamp"
+            ]
+          }
+        }
+      }
+    }
   }
 }

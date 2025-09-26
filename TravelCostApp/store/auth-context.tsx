@@ -5,6 +5,8 @@ import React from "react";
 import { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setAxiosAccessToken } from "../util/http";
+import { getValidIdToken, testFirebaseAuth } from "../util/firebase-auth";
+import { clearLastFetchTimestamp } from "../util/last-fetch-timestamp";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -43,7 +45,7 @@ export const AuthContext = createContext({
   token: "",
   isAuthenticated: false,
   authenticate: async (token) => {},
-  logout: () => {},
+  logout: (tripid?: string) => {},
   setUserID: async (uid) => {},
   deleteAccount: async () => {},
 });
@@ -60,14 +62,57 @@ function AuthContextProvider({ children }) {
     loadUID();
   }, []);
 
+  // Initialize authentication on app startup
+  useEffect(() => {
+    async function initializeAuth() {
+      try {
+        const validToken = await getValidIdToken();
+        if (validToken) {
+          setAuthToken(validToken);
+          setAxiosAccessToken(validToken);
+          console.log(
+            "[AUTH-CONTEXT] Authentication initialized with valid token",
+            validToken
+          );
+        } else {
+          console.log(
+            "[AUTH-CONTEXT] No valid token found, user needs to login"
+          );
+        }
+      } catch (error) {
+        console.error("[AUTH-CONTEXT] Auth initialization error:", error);
+      }
+    }
+    initializeAuth();
+  }, []);
+
   async function authenticate(token) {
-    await secureStoreSetItem("token", token);
+    // The token is already stored by the login function via storeAuthData
+    // Just set the local state and test the authentication
     setAuthToken(token);
     setAxiosAccessToken(token);
+
+    // Test the authentication to ensure it's working
+    try {
+      const authTest = await testFirebaseAuth();
+      if (authTest.success) {
+        console.log("[AUTH-CONTEXT] Authentication verified successfully");
+      } else {
+        console.warn(
+          "[AUTH-CONTEXT] Authentication test failed:",
+          authTest.error
+        );
+      }
+    } catch (error) {
+      console.error("[AUTH-CONTEXT] Authentication test error:", error);
+    }
   }
 
-  function logout() {
+  function logout(tripid?: string) {
     setAuthToken(null);
+    if (tripid) {
+      clearLastFetchTimestamp(tripid);
+    }
   }
 
   async function setUserID(uid) {

@@ -28,6 +28,11 @@ import { secureStoreGetItem } from "../store/secure-storage";
 import { ExpoPushToken } from "expo-notifications";
 import safeLogError from "./error";
 import { safelyParseJSON } from "./jsonParse";
+import { getValidIdToken } from "./firebase-auth";
+import {
+  getLastFetchTimestamp,
+  setLastFetchTimestamp,
+} from "./last-fetch-timestamp";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -42,13 +47,16 @@ axios.defaults.timeout = AXIOS_TIMEOUT_DEFAULT; // Set default timeout to 5 seco
 /** Sets the ACCESS TOKEN for all future http requests */
 export function setAxiosAccessToken(token: string) {
   if (!token || token?.length < 2) {
-    console.error("https: ~ setAxiosAccessToken ~ wrong token QPAR error");
     setMMKVString("QPAR", "");
     return;
   }
-  setMMKVString("QPAR", `?auth=${token}`);
-  // automatically set the token as authorization token for all axios requests
-  // axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+  // Firebase Realtime Database REST API requires query parameter auth, NOT Authorization header
+  const qpar = `?auth=${token}`;
+  setMMKVString("QPAR", qpar);
+
+  // Clear any Authorization header (Firebase RTDB doesn't use it)
+  delete axios.defaults.headers.common["Authorization"];
 }
 
 /** Axios Logger */
@@ -56,14 +64,6 @@ axios.interceptors.request.use(
   (config) => {
     // set header
     // config.headers.common["Authorization"] = `Bearer ${getMMKVString("QPAR")}`;
-    // console.log(
-    //   `\n--- AXIOS LOG ~~~ \n`,
-    //   `${config.method.toUpperCase()} request sent to ${truncateString(
-    //     config.url,
-    //     160
-    //   )}`,
-    //   `\n~~~ AXIOS LOG --- \n`
-    // );
     return config;
   },
   (error) => {
@@ -88,12 +88,16 @@ export const dataResponseTime = (func) => {
 // fetch server info
 export const fetchServerInfo = async () => {
   try {
-    const response = await axios.get(
-      `${BACKEND_URL}/server.json${getMMKVString("QPAR")}`,
-      {
-        timeout: AXIOS_TIMOUT_LONG,
-      }
-    );
+    const qpar = getMMKVString("QPAR");
+
+    // If no authentication token, return null instead of making API calls
+    if (!qpar || qpar === "") {
+      return null;
+    }
+
+    const response = await axios.get(`${BACKEND_URL}/server.json${qpar}`, {
+      timeout: AXIOS_TIMOUT_LONG,
+    });
 
     // Process the response data here
     if (!response) throw new Error("No response from server");
@@ -180,6 +184,43 @@ export async function storeExpense(
   }
 }
 
+const processExpenseResponse = (data: any): ExpenseData[] => {
+  const expenses: ExpenseData[] = [];
+  if (!data) return expenses;
+
+  for (const key in data) {
+    const r: ExpenseDataOnline = data[key];
+    const editedTimestamp = r.editedTimestamp
+      ? parseInt(r.editedTimestamp, 10)
+      : 0;
+
+    const expenseObj: ExpenseData = {
+      id: key,
+      amount: r.amount,
+      date: new Date(r.date),
+      startDate: new Date(r.startDate),
+      endDate: new Date(r.endDate),
+      description: r.description,
+      category: r.category,
+      country: r.country,
+      currency: r.currency,
+      whoPaid: r.whoPaid,
+      uid: r.uid,
+      calcAmount: r.calcAmount,
+      splitType: r.splitType,
+      splitList: r.splitList,
+      categoryString: r.categoryString,
+      duplOrSplit: r.duplOrSplit,
+      rangeId: r.rangeId,
+      isPaid: r.isPaid,
+      isSpecialExpense: r.isSpecialExpense,
+      editedTimestamp: editedTimestamp,
+    };
+    expenses.push(expenseObj);
+  }
+  return expenses;
+};
+
 export async function fetchExpensesWithUIDs(
   tripid: string,
   uidlist: string[],
@@ -187,52 +228,76 @@ export async function fetchExpensesWithUIDs(
 ) {
   if (!tripid || !uidlist || DEBUG_NO_DATA) return [];
   const expenses: ExpenseData[] = [];
-  const axios_calls = [];
+  let latestTimestamp: number = 0;
 
-  // Import sync timestamp functions
-  const {
-    getLastSyncTimestamp,
-    setLastSyncTimestamp,
-  } = require("./sync-timestamp");
+  const authToken = await getValidIdToken();
+  if (!authToken) {
+    return [];
+  }
 
-  uidlist.forEach((uid) => {
+  // check devices sync status (only fetch new data)
+  console.log(
+    `fetchExpensesWithUIDs getLastFetchTimestamp: tripid is ${tripid}`
+  );
+  const lastFetch = getLastFetchTimestamp(tripid);
+  const isFirstFetch = lastFetch === 0;
+
+  for (const uid of uidlist) {
     try {
-      let since = 0;
-      if (useDelta) {
-        since = getLastSyncTimestamp(tripid, uid);
+      let userExpenses: ExpenseData[] = [];
+      const serverFilteredUrl = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="editedTimestamp"&startAt=${lastFetch}&auth=${authToken}`;
+      const allDataUrl = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`;
+      const shouldFilter = useDelta && !isFirstFetch;
+      const url = shouldFilter ? serverFilteredUrl : allDataUrl;
+
+      const response = await axios.get(url, {
+        timeout: AXIOS_TIMOUT_LONG,
+      });
+      userExpenses = processExpenseResponse(response.data);
+
+      if (userExpenses.length > 0) {
+        const validTimestamps = userExpenses
+          .map((e) => e.editedTimestamp || 0)
+          .filter((ts) => ts > 0);
+
+        if (validTimestamps.length > 0) {
+          const userLatestTimestamp = Math.max(...validTimestamps);
+          if (latestTimestamp < userLatestTimestamp) {
+            latestTimestamp = userLatestTimestamp;
+          }
+        }
       }
 
-      const new_axios_call = axios.get(
-        BACKEND_URL +
-          "/trips/" +
-          tripid +
-          "/" +
-          uid +
-          "/expenses.json" +
-          getMMKVString("QPAR"),
-        {
-          params: useDelta
-            ? {
-                orderBy: '"editedTimestamp"',
-                startAt: since,
-              }
-            : {},
-          timeout: AXIOS_TIMOUT_LONG,
-        }
-      );
-      axios_calls.push(new_axios_call);
+      expenses.push(...userExpenses);
     } catch (error) {
       safeLogError(error);
     }
-  });
-  try {
-    const responseArray = await Promise.all(axios_calls);
-    responseArray.forEach((response, index) => {
-      const uid = uidlist[index];
-      const userExpenses: ExpenseData[] = [];
+  }
+  console.log(
+    `SET: fetchExpensesWithUIDs  setLastFetchTimestamp: tripid is ${tripid} to ${latestTimestamp}`
+  );
+  setLastFetchTimestamp(tripid, latestTimestamp);
+  return expenses;
+}
 
-      for (const key in response.data) {
-        const r: ExpenseDataOnline = response.data[key];
+export async function fetchExpenses(
+  tripid: string,
+  uid: string,
+  useDelta: boolean = true
+) {
+  if (!tripid || DEBUG_NO_DATA) return [];
+
+  try {
+    const processExpenseResponse = (data: any): ExpenseData[] => {
+      const expenses: ExpenseData[] = [];
+      if (!data) return expenses;
+
+      for (const key in data) {
+        const r: ExpenseDataOnline = data[key];
+        const editedTimestamp = r.editedTimestamp
+          ? parseInt(r.editedTimestamp, 10)
+          : 0;
+
         const expenseObj: ExpenseData = {
           id: key,
           amount: r.amount,
@@ -253,106 +318,56 @@ export async function fetchExpensesWithUIDs(
           rangeId: r.rangeId,
           isPaid: r.isPaid,
           isSpecialExpense: r.isSpecialExpense,
-          editedTimestamp: +r.editedTimestamp,
+          editedTimestamp: editedTimestamp,
         };
-        userExpenses.push(expenseObj);
+        expenses.push(expenseObj);
       }
+      return expenses;
+    };
 
-      expenses.push(...userExpenses);
+    const lastFetch = getLastFetchTimestamp(tripid);
+    console.log(`fetchExpenses getLastFetchTimestamp: tripid is ${tripid}`);
+    const isFirstFetch = lastFetch === 0;
 
-      // Update sync timestamp for this user
-      if (useDelta && userExpenses.length > 0) {
-        const latestTimestamp = Math.max(
-          ...userExpenses.map((e) => e.editedTimestamp || 0)
-        );
-        setLastSyncTimestamp(tripid, uid, latestTimestamp);
-      }
-    });
-  } catch (error) {
-    safeLogError(error);
-  }
-
-  return expenses;
-}
-
-export async function fetchExpenses(
-  tripid: string,
-  uid: string,
-  useDelta: boolean = true
-) {
-  if (!tripid || DEBUG_NO_DATA) return [];
-
-  try {
-    let since = 0;
-    if (useDelta) {
-      // Import sync timestamp functions
-      const {
-        getLastSyncTimestamp,
-        setLastSyncTimestamp,
-      } = require("./sync-timestamp");
-      since = getLastSyncTimestamp(tripid, uid);
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      return [];
     }
 
-    const response = await axios.get(
-      BACKEND_URL +
-        "/trips/" +
-        tripid +
-        "/" +
-        uid +
-        "/expenses.json" +
-        getMMKVString("QPAR"),
-      {
-        params: useDelta
-          ? {
-              orderBy: '"editedTimestamp"',
-              startAt: since,
-            }
-          : {},
+    let expenses: ExpenseData[] = [];
+
+    if (useDelta && !isFirstFetch) {
+      const url = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="editedTimestamp"&startAt=${lastFetch}&auth=${authToken}`;
+      const response = await axios.get(url, {
         timeout: AXIOS_TIMOUT_LONG,
-      }
-    );
-    const expenses = [];
-
-    // ExpenseData
-    for (const key in response.data) {
-      const data: ExpenseDataOnline = response.data[key];
-      const expenseObj: ExpenseData = {
-        id: key,
-        amount: data.amount,
-        date: new Date(data.date),
-        startDate: new Date(data.startDate),
-        endDate: new Date(data.endDate),
-        description: data.description,
-        category: data.category,
-        country: data.country,
-        currency: data.currency,
-        whoPaid: data.whoPaid,
-        uid: data.uid,
-        calcAmount: data.calcAmount,
-        splitType: data.splitType,
-        splitList: data.splitList,
-        categoryString: data.categoryString,
-        duplOrSplit: data.duplOrSplit,
-        rangeId: data.rangeId,
-        isPaid: data.isPaid,
-        isSpecialExpense: data.isSpecialExpense,
-        editedTimestamp: +data.editedTimestamp,
-      };
-      expenses.push(expenseObj);
+      });
+      expenses = processExpenseResponse(response.data);
+    } else {
+      const url = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`;
+      const response = await axios.get(url, {
+        timeout: AXIOS_TIMOUT_LONG,
+      });
+      expenses = processExpenseResponse(response.data);
     }
 
-    // Update sync timestamp on successful fetch
-    if (useDelta && expenses.length > 0) {
-      const { setLastSyncTimestamp } = require("./sync-timestamp");
-      const latestTimestamp = Math.max(
-        ...expenses.map((e) => e.editedTimestamp || 0)
-      );
-      setLastSyncTimestamp(tripid, uid, latestTimestamp);
+    if (expenses.length > 0) {
+      const validTimestamps = expenses
+        .map((e) => e.editedTimestamp || 0)
+        .filter((ts) => ts > 0);
+
+      if (validTimestamps.length > 0) {
+        const latestTimestamp = Math.max(...validTimestamps);
+        console.log(
+          `SET: fetchExpenses setLastFetchTimestamp: tripid is ${tripid} to ${latestTimestamp}`
+        );
+        setLastFetchTimestamp(tripid, latestTimestamp);
+      }
     }
 
     return expenses;
   } catch (error) {
     safeLogError(error);
+    return [];
   }
 }
 

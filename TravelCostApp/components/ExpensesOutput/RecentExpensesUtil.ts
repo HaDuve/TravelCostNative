@@ -17,6 +17,7 @@ import { getExpensesSum } from "../../util/expense";
 import { ExpenseContextType } from "../../store/expenses-context";
 import { TripContextType } from "../../store/trip-context";
 import safeLogError from "../../util/error";
+import uniqBy from "lodash.uniqby";
 
 export async function fetchAndSetExpenses(
   showRefIndicator: boolean,
@@ -38,12 +39,19 @@ export async function fetchAndSetExpenses(
     expenses = expenses.filter((expense) => !isNaN(Number(expense.calcAmount)));
 
     if (expenses && expenses?.length !== 0) {
-      expensesCtx.setExpenses(expenses);
-      const expensesSum = getExpensesSum(expenses);
+      // Use mergeExpenses instead of setExpenses to properly merge new expenses with existing ones
+      expensesCtx.mergeExpenses(expenses);
+
+      // Calculate the total sum from all current expenses plus new ones
+      // This gives us the correct total for immediate display
+      const currentExpenses = expensesCtx.expenses;
+      const allExpenses = [...currentExpenses, ...expenses];
+      const uniqueExpenses = uniqBy(allExpenses, "id");
+      const expensesSum = getExpensesSum(uniqueExpenses);
       tripCtx.setTotalSum(expensesSum);
 
-      // await asyncStoreSetObject("expenses", expenses);
-      setMMKVObject("expenses", expenses);
+      // Note: The merged expenses will be automatically saved to storage
+      // via the useEffect in expenses-context.tsx that watches expensesState changes
     }
   } catch (error) {
     safeLogError(error);

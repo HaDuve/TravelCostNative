@@ -23,16 +23,21 @@ export default function safeLogError(
 
   console.error(logMessage);
 
-  if (shouldEnableVexo)
-    customEvent(VexoEvents.ERROR_OCCURRED, {
-      error:
-        typeof error === "string"
-          ? error
-          : (error as Error)?.message || "Unknown error",
-      fileName,
-      lineNumber,
-      stack: error instanceof Error ? error.stack : undefined,
-    });
+  if (shouldEnableVexo) {
+    try {
+      customEvent(VexoEvents.ERROR_OCCURRED, {
+        error:
+          typeof error === "string"
+            ? error
+            : (error as Error)?.message || "Unknown error",
+        fileName,
+        lineNumber,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+    } catch (vexoError) {
+      console.log("[Error] Failed to report to Vexo:", vexoError);
+    }
+  }
 
   return message;
 }

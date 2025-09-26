@@ -74,7 +74,7 @@ function LoginScreen() {
     } catch (error) {
       safeLogError(error);
       setIsAuthenticating(false);
-      authCtx.logout();
+      authCtx.logout(tripCtx.tripid);
     }
     const userData = checkUser;
     // Check if the user logged in but there is no userName, we deleted the account
@@ -87,7 +87,7 @@ function LoginScreen() {
         visibilityTime: 4000,
       });
       // console.log("loginHandler exception error");
-      authCtx.logout();
+      authCtx.logout(tripCtx.tripid);
       return;
     }
     tripCtx.setTripid(checkUser.currentTrip);

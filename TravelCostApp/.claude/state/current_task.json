@@ -1,6 +1,12 @@
 {
-  "task": null,
-  "branch": null,
-  "services": [],
-  "updated": "2025-01-27"
+  "task": "h-fix-delta-sync-download-issues",
+  "branch": "feature/replace-expo-pipeline",
+  "services": [
+    "delta-sync",
+    "sync-timestamp",
+    "expenses-context",
+    "network-context",
+    "async-storage"
+  ],
+  "updated": "2024-12-19"
 }

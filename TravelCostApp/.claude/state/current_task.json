@@ -1,12 +1,6 @@
 {
-  "task": "m-implement-sync-loading-indicator",
-  "branch": "feature/implement-sync-loading-indicator",
-  "services": [
-    "components/UI",
-    "screens",
-    "util/http",
-    "store/expenses-context",
-    "components/ExpensesOutput"
-  ],
+  "task": null,
+  "branch": null,
+  "services": [],
   "updated": "2024-12-19"
 }

@@ -12,8 +12,11 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "update": "eas update --branch production",
-    "testflight": "eas build --platform ios --profile production --non-interactive && eas submit --platform ios --latest --non-interactive",
-    "migrate:timestamps": "node scripts/migrate-server-timestamps.js"
+    "testflight": "npm run version:increment && eas build --platform ios --profile production --non-interactive && eas submit --platform ios --latest --non-interactive",
+    "migrate:timestamps": "node scripts/migrate-server-timestamps.js",
+    "version:increment": "node scripts/version-manager.js increment",
+    "version:sync-eas": "node scripts/version-manager.js sync-eas",
+    "version:set": "node scripts/version-manager.js set"
   },
   "dependencies": {
     "@babel/runtime": "^7.22.5",

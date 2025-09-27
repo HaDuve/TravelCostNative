@@ -114,18 +114,34 @@ function checkEnvironment() {
 function updateVersionNumbers() {
   log("Updating version numbers...", "yellow");
 
-  // Read current package.json
-  const packageJson = JSON.parse(fs.readFileSync("./package.json", "utf8"));
+  // Read current app.json
   const appJson = JSON.parse(fs.readFileSync("./app.json", "utf8"));
 
-  // Get version from app.json (source of truth)
-  const version = appJson.expo.version;
-  const buildNumber = appJson.expo.ios.buildNumber;
-  const versionCode = appJson.expo.android.versionCode;
+  // Increment build numbers
+  const currentBuildNumber = appJson.expo.ios.buildNumber;
+  const currentVersionCode = appJson.expo.android.versionCode;
 
-  log(`Version: ${version}`, "blue");
-  log(`iOS Build Number: ${buildNumber}`, "blue");
-  log(`Android Version Code: ${versionCode}`, "blue");
+  // Parse and increment iOS build number (format: 1.0.1216)
+  const buildNumberParts = currentBuildNumber.split(".");
+  const lastPart = parseInt(buildNumberParts[2]) + 1;
+  const newBuildNumber = `${buildNumberParts[0]}.${buildNumberParts[1]}.${lastPart}`;
+
+  // Increment Android version code
+  const newVersionCode = currentVersionCode + 1;
+
+  // Update app.json
+  appJson.expo.ios.buildNumber = newBuildNumber;
+  appJson.expo.android.versionCode = newVersionCode;
+
+  // Write updated app.json
+  fs.writeFileSync("./app.json", JSON.stringify(appJson, null, 2));
+
+  log(`Version: ${appJson.expo.version}`, "blue");
+  log(`iOS Build Number: ${currentBuildNumber} → ${newBuildNumber}`, "blue");
+  log(
+    `Android Version Code: ${currentVersionCode} → ${newVersionCode}`,
+    "blue"
+  );
 }
 
 function buildAndroid() {

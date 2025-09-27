@@ -17,17 +17,12 @@
       "url": "https://u.expo.dev/dff7ffc5-6f1e-4ece-bb23-0c50cda19f46"
     },
     "newArchEnabled": false,
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.budgetfornomads.app",
-      "buildNumber": "1.0.1215",
       "infoPlist": {
-        "UIBackgroundModes": [
-          "remote-notification"
-        ],
+        "UIBackgroundModes": ["remote-notification"],
         "ITSAppUsesNonExemptEncryption": false
       }
     },
@@ -47,10 +42,7 @@
         "projectId": "dff7ffc5-6f1e-4ece-bb23-0c50cda19f46"
       }
     },
-    "plugins": [
-      "expo-localization",
-      "expo-font"
-    ],
+    "plugins": ["expo-localization", "expo-font"],
     "runtimeVersion": {
       "policy": "appVersion"
     }

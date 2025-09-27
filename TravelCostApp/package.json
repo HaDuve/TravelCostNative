@@ -27,7 +27,8 @@
     "submit:production:android": "eas submit --platform android --profile production --latest --non-interactive",
     "submit:alpha:ios": "eas submit --platform ios --profile alpha --latest --non-interactive",
     "submit:alpha:android": "eas submit --platform android --profile alpha --latest --non-interactive",
-    "migrate:timestamps": "node scripts/migrate-server-timestamps.js"
+    "migrate:timestamps": "node scripts/migrate-server-timestamps.js",
+    "migrate:timestamps:now": "node scripts/migrate-server-timestamps.js --now-timestamp"
   },
   "dependencies": {
     "@babel/runtime": "^7.22.5",

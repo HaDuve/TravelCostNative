@@ -22,6 +22,7 @@ class ServerTimestampMigration {
       dryRun: false,
       batchSize: 10,
       delayMs: 100,
+      nowTimestamp: false,
       ...options,
     };
   }
@@ -32,6 +33,12 @@ class ServerTimestampMigration {
 
     if (this.options.dryRun) {
       console.log("🔍 DRY RUN MODE - No changes will be made");
+    }
+
+    if (this.options.nowTimestamp) {
+      console.log("⏰ NOW TIMESTAMP MODE - Setting timestamps to current time");
+    } else {
+      console.log("🔢 ZERO TIMESTAMP MODE - Setting timestamps to 0");
     }
 
     if (this.options.tripId) {
@@ -176,9 +183,10 @@ class ServerTimestampMigration {
   async updateExpense(tripId, uid, expenseId, expense) {
     try {
       // Update only the serverTimestamp field
+      const timestamp = this.options.nowTimestamp ? Date.now() : 0;
       await axios.patch(
         `${BACKEND_URL}/trips/${tripId}/${uid}/expenses/${expenseId}.json?auth=${AUTH_TOKEN}`,
-        { serverTimestamp: 0 },
+        { serverTimestamp: timestamp },
         { timeout: 10000 }
       );
     } catch (error) {
@@ -251,6 +259,10 @@ function parseArgs() {
         options.delayMs = parseInt(args[i + 1], 10);
         i++; // Skip next argument as it's the value
         break;
+      case "--now-timestamp":
+      case "-n":
+        options.nowTimestamp = true;
+        break;
       case "--help":
       case "-h":
         printHelp();
@@ -274,17 +286,21 @@ OPTIONS:
   -d, --dry-run          Preview changes without making them
   -b, --batch-size <n>   Number of expenses to process in parallel (default: 10)
   --delay <ms>           Delay between batches in milliseconds (default: 100)
+  -n, --now-timestamp    Set timestamps to current time instead of 0
   -h, --help             Show this help message
 
 EXAMPLES:
-  # Run on all trips
+  # Run on all trips (sets timestamps to 0)
   node scripts/migrate-server-timestamps.js
+
+  # Run on all trips (sets timestamps to current time)
+  node scripts/migrate-server-timestamps.js --now-timestamp
 
   # Run on specific trip
   node scripts/migrate-server-timestamps.js --trip-id "trip123"
 
-  # Dry run on specific trip
-  node scripts/migrate-server-timestamps.js --trip-id "trip123" --dry-run
+  # Dry run on specific trip with current timestamp
+  node scripts/migrate-server-timestamps.js --trip-id "trip123" --dry-run --now-timestamp
 
   # Run with custom batch size and delay
   node scripts/migrate-server-timestamps.js --batch-size 5 --delay 200

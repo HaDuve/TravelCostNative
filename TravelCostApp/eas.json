@@ -27,7 +27,7 @@
     },
     "production": {
       "environment": "production",
-      "autoIncrement": false,
+      "autoIncrement": true,
       "channel": "production",
       "pnpm": "10.15.0"
     }

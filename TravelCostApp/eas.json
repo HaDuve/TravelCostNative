@@ -25,17 +25,25 @@
         "buildType": "apk"
       }
     },
+    "staging": {
+      "environment": "production",
+      "autoIncrement": true,
+      "channel": "staging",
+      "distribution": "internal",
+      "pnpm": "10.15.0"
+    },
     "alpha": {
       "environment": "production",
       "autoIncrement": true,
       "channel": "alpha",
-      "distribution": "internal",
+      "distribution": "store",
       "pnpm": "10.15.0"
     },
     "production": {
       "environment": "production",
       "autoIncrement": true,
       "channel": "production",
+      "distribution": "store",
       "pnpm": "10.15.0"
     }
   },

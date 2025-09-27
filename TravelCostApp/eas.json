@@ -40,6 +40,18 @@
     }
   },
   "submit": {
+    "alpha": {
+      "ios": {
+        "appleId": "hionoe@hotmail.de",
+        "ascAppId": "6446042796",
+        "appleTeamId": "AK62F8767Z"
+      },
+      "android": {
+        "track": "production",
+        "serviceAccountKeyPath": "/Users/hiono/Documents/Keys/Budget_For_Nomads/EAS/Google_Play_Console/budget-for-nomads-468110-5964d3e3e268.json",
+        "releaseStatus": "draft"
+      }
+    },
     "production": {
       "ios": {
         "appleId": "hionoe@hotmail.de",

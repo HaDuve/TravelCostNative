@@ -3,7 +3,7 @@
     "name": "Budget",
     "slug": "Travel-Expense",
     "scheme": "budgetfornomads",
-    "version": "1.3.0",
+    "version": "1.3.001",
     "orientation": "default",
     "icon": "./assets/icon2.png",
     "userInterfaceStyle": "light",
@@ -28,7 +28,6 @@
     },
     "android": {
       "package": "com.budgetfornomads.app",
-      "versionCode": 101122,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon2.png",
         "backgroundColor": "#FFFFFF"

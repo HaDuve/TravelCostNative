@@ -5,7 +5,7 @@ export default {
     name: "Budget",
     slug: "Travel-Expense",
     scheme: "budgetfornomads",
-    version: "1.3.0",
+    version: "1.3.001",
     orientation: "default",
     icon: "./assets/icon2.png",
     userInterfaceStyle: "light",
@@ -23,7 +23,6 @@ export default {
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.budgetfornomads.app",
-      buildNumber: "1.0.1214",
       infoPlist: {
         UIBackgroundModes: ["remote-notification"],
         ITSAppUsesNonExemptEncryption: false,
@@ -31,7 +30,6 @@ export default {
     },
     android: {
       package: "com.budgetfornomad.app",
-      versionCode: 101118,
       adaptiveIcon: {
         foregroundImage: "./assets/icon2.png",
         backgroundColor: "#FFFFFF",

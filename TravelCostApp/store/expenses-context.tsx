@@ -20,6 +20,8 @@ export enum RangeString {
 
 export type ExpenseContextType = {
   expenses: Array<ExpenseData>;
+  // Sync loading state
+  isSyncing: boolean;
   addExpense: (
     {
       uid,
@@ -76,10 +78,14 @@ export type ExpenseContextType = {
   getSpecificMonthExpenses: (date: Date) => Array<ExpenseData>;
   getSpecificYearExpenses: (date: Date) => Array<ExpenseData>;
   loadExpensesFromStorage: (forceLoad?: boolean) => Promise<boolean>;
+  // Sync state management
+  setIsSyncing: (syncing: boolean) => void;
 };
 
 export const ExpensesContext = createContext({
   expenses: [],
+  // Sync loading state defaults
+  isSyncing: false,
   addExpense: (
     {
       uid,
@@ -158,6 +164,8 @@ export const ExpensesContext = createContext({
   },
 
   loadExpensesFromStorage: async () => {},
+  // Sync state management defaults
+  setIsSyncing: (syncing: boolean) => {},
 });
 
 function expensesReducer(state: ExpenseData[], action) {
@@ -240,6 +248,7 @@ function expensesReducer(state: ExpenseData[], action) {
 
 function ExpensesContextProvider({ children }) {
   const [expensesState, dispatch] = useReducer(expensesReducer, []);
+  const [isSyncing, setIsSyncing] = React.useState(false);
 
   useEffect(() => {
     async function asyncLoadExpenses() {
@@ -441,6 +450,8 @@ function ExpensesContextProvider({ children }) {
 
   const value = {
     expenses: expensesState,
+    // Sync loading state
+    isSyncing,
     addExpense: addExpense,
     setExpenses: setExpenses,
     mergeExpenses: mergeExpenses,
@@ -456,6 +467,8 @@ function ExpensesContextProvider({ children }) {
     getSpecificMonthExpenses: getSpecificMonthExpenses,
     getSpecificYearExpenses: getSpecificYearExpenses,
     loadExpensesFromStorage: loadExpensesFromStorage,
+    // Sync state management
+    setIsSyncing,
   };
 
   return (

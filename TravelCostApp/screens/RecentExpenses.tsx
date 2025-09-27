@@ -8,6 +8,7 @@ import React, {
 import DropDownPicker from "react-native-dropdown-picker";
 import { MemoizedExpensesOutput } from "../components/ExpensesOutput/ExpensesOutput";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
+import MiniSyncIndicator from "../components/UI/MiniSyncIndicator";
 import { AuthContext } from "../store/auth-context";
 import {
   ExpenseContextType,
@@ -36,7 +37,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -372,10 +376,16 @@ function RecentExpenses({ navigation }) {
           isTablet && styles.landscapeDateHeader,
         ]}
       >
-        <Text style={styles.dateString}>
-          {truncateString(tripCtx.tripName, 23)} - {dateTimeString}
-          {offlineString}
-        </Text>
+        <View style={styles.dateHeaderContent}>
+          <Text style={styles.dateString}>
+            {truncateString(tripCtx.tripName, 23)} - {dateTimeString}
+            {offlineString}
+          </Text>
+          <MiniSyncIndicator
+            isVisible={expensesCtx.isSyncing}
+            size={dynamicScale(16, false, 0.5)}
+          />
+        </View>
       </View>
 
       <View
@@ -472,6 +482,11 @@ const styles = StyleSheet.create({
     marginVertical: dynamicScale(16, true),
     marginLeft: dynamicScale(12),
     marginBottom: dynamicScale(-20, true),
+  },
+  dateHeaderContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   landscapeDateHeader: {
     marginTop: dynamicScale(4, true),

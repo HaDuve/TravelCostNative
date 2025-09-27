@@ -4,6 +4,7 @@ import {
   AXIOS_TIMOUT_LONG,
   DEBUG_NO_DATA,
 } from "../confAppConstants";
+
 import { Category } from "./category";
 import { TripData } from "../store/trip-context";
 import { ExpenseData, ExpenseDataOnline } from "./expense";
@@ -230,17 +231,28 @@ const processExpenseResponse = (data: any): ExpenseData[] => {
   return expenses;
 };
 
+// Clean callback interface for sync loading
+export interface SyncLoadingCallback {
+  onStart?: () => void;
+  onComplete?: () => void;
+}
+
 export async function fetchExpensesWithUIDs(
   tripid: string,
   uidlist: string[],
-  useDelta: boolean = true
+  useDelta: boolean = true,
+  loadingCallback?: SyncLoadingCallback
 ) {
   if (!tripid || !uidlist || DEBUG_NO_DATA) return [];
   const expenses: ExpenseData[] = [];
   let latestTimestamp: number = 0;
 
+  // Notify sync start
+  loadingCallback?.onStart?.();
+
   const authToken = await getValidIdToken();
   if (!authToken) {
+    loadingCallback?.onComplete?.();
     return [];
   }
 
@@ -251,7 +263,8 @@ export async function fetchExpensesWithUIDs(
   const lastFetch = getLastFetchTimestamp(tripid);
   const isFirstFetch = lastFetch === 0;
 
-  for (const uid of uidlist) {
+  for (let i = 0; i < uidlist.length; i++) {
+    const uid = uidlist[i];
     try {
       let userExpenses: ExpenseData[] = [];
       const serverFilteredUrl = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="${SERVER_TIMESTAMP_FIELD}"&startAt=${lastFetch}&auth=${authToken}`;
@@ -288,15 +301,22 @@ export async function fetchExpensesWithUIDs(
   if (latestTimestamp > 0) {
     setLastFetchTimestamp(tripid, latestTimestamp);
   }
+
+  // Notify sync completion
+  loadingCallback?.onComplete?.();
   return expenses;
 }
 
 export async function fetchExpenses(
   tripid: string,
   uid: string,
-  useDelta: boolean = true
+  useDelta: boolean = true,
+  loadingCallback?: SyncLoadingCallback
 ) {
   if (!tripid || DEBUG_NO_DATA) return [];
+
+  // Notify sync start
+  loadingCallback?.onStart?.();
 
   try {
     const processExpenseResponse = (data: any): ExpenseData[] => {
@@ -375,9 +395,12 @@ export async function fetchExpenses(
       }
     }
 
+    // Notify sync completion
+    loadingCallback?.onComplete?.();
     return expenses;
   } catch (error) {
     safeLogError(error);
+    loadingCallback?.onComplete?.();
     return [];
   }
 }
@@ -632,11 +655,17 @@ export async function getUIDs(tripid: string) {
 export async function getAllExpenses(
   tripid: string,
   uid?: string,
-  useDelta: boolean = true
+  useDelta: boolean = true,
+  loadingCallback?: SyncLoadingCallback
 ) {
   const uids = await getUIDs(tripid);
   if (uids?.length < 1) uids.push(uid);
-  const expenses = await fetchExpensesWithUIDs(tripid, uids, useDelta);
+  const expenses = await fetchExpensesWithUIDs(
+    tripid,
+    uids,
+    useDelta,
+    loadingCallback
+  );
   return expenses;
 }
 

@@ -1,4 +1,8 @@
-import { getAllExpenses, unTouchTraveler } from "../../util/http";
+import {
+  getAllExpenses,
+  unTouchTraveler,
+  SyncLoadingCallback,
+} from "../../util/http";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -35,7 +39,17 @@ export async function fetchAndSetExpenses(
     await unTouchTraveler(tripid, uid);
 
     // Use delta sync by default (true = useDelta)
-    let expenses = await getAllExpenses(tripid, uid, true);
+    // Create sync loading callback
+    const syncLoadingCallback = {
+      onStart: () => {
+        expensesCtx.setIsSyncing(true);
+      },
+      onComplete: () => {
+        expensesCtx.setIsSyncing(false);
+      },
+    };
+
+    let expenses = await getAllExpenses(tripid, uid, true, syncLoadingCallback);
     expenses = expenses.filter((expense) => !isNaN(Number(expense.calcAmount)));
 
     if (expenses && expenses?.length !== 0) {
@@ -55,6 +69,8 @@ export async function fetchAndSetExpenses(
     }
   } catch (error) {
     safeLogError(error);
+    // Ensure sync state is reset on error
+    expensesCtx.setIsSyncing(false);
   }
   if (!showRefIndicator && !showAnyIndicator) setIsFetching(false);
   if (!showAnyIndicator) setRefreshing(false);

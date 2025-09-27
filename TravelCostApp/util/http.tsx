@@ -37,6 +37,9 @@ import {
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
 
+// Field name for server timestamp in expense data
+export const SERVER_TIMESTAMP_FIELD = "serverTimestamp";
+
 /** AXIOS Instance */
 // const Axios = axios.create({
 //   baseURL: BACKEND_URL,
@@ -167,6 +170,12 @@ export async function storeExpense(
   expenseData: ExpenseData
 ) {
   try {
+    // Add serverTimestamp to expense data
+    const expenseDataWithTimestamp = {
+      ...expenseData,
+      [SERVER_TIMESTAMP_FIELD]: Date.now(),
+    };
+
     const response = await axios.post(
       BACKEND_URL +
         "/trips/" +
@@ -175,7 +184,7 @@ export async function storeExpense(
         uid +
         "/expenses.json" +
         getMMKVString("QPAR"),
-      expenseData
+      expenseDataWithTimestamp
     );
     const id: string = response.data.name;
     return id;
@@ -245,7 +254,7 @@ export async function fetchExpensesWithUIDs(
   for (const uid of uidlist) {
     try {
       let userExpenses: ExpenseData[] = [];
-      const serverFilteredUrl = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="serverTimestamp"&startAt=${lastFetch}&auth=${authToken}`;
+      const serverFilteredUrl = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="${SERVER_TIMESTAMP_FIELD}"&startAt=${lastFetch}&auth=${authToken}`;
       const allDataUrl = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`;
       const shouldFilter = useDelta && !isFirstFetch;
       const url = shouldFilter ? serverFilteredUrl : allDataUrl;
@@ -339,7 +348,7 @@ export async function fetchExpenses(
     let expenses: ExpenseData[] = [];
 
     if (useDelta && !isFirstFetch) {
-      const url = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="serverTimestamp"&startAt=${lastFetch}&auth=${authToken}`;
+      const url = `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?orderBy="${SERVER_TIMESTAMP_FIELD}"&startAt=${lastFetch}&auth=${authToken}`;
       const response = await axios.get(url, {
         timeout: AXIOS_TIMOUT_LONG,
       });
@@ -388,6 +397,12 @@ export function updateExpense(
   expenseData: ExpenseData
 ) {
   try {
+    // Add serverTimestamp to expense data
+    const expenseDataWithTimestamp = {
+      ...expenseData,
+      [SERVER_TIMESTAMP_FIELD]: Date.now(),
+    };
+
     const response = axios.put(
       BACKEND_URL +
         "/trips/" +
@@ -397,7 +412,7 @@ export function updateExpense(
         "/expenses/" +
         `${id}.json` +
         getMMKVString("QPAR"),
-      expenseData
+      expenseDataWithTimestamp
     );
     return response;
   } catch (error) {

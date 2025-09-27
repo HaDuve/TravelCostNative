@@ -3,6 +3,9 @@ const axios = require("axios");
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
 
+// Field name for server timestamp in expense data (must match http.tsx)
+const SERVER_TIMESTAMP_FIELD = "serverTimestamp";
+
 // You'll need to get a valid auth token - replace this with your actual token
 // YOUR_FIREBASE_AUTH_TOKEN_HERE
 const AUTH_TOKEN = "YOUR_FIREBASE_AUTH_TOKEN_HERE";
@@ -153,8 +156,8 @@ class ServerTimestampMigration {
 
         // Check if serverTimestamp is missing or null/undefined
         if (
-          expense.serverTimestamp === undefined ||
-          expense.serverTimestamp === null
+          expense[SERVER_TIMESTAMP_FIELD] === undefined ||
+          expense[SERVER_TIMESTAMP_FIELD] === null
         ) {
           if (this.options.dryRun) {
             console.log(`    🔍 [DRY RUN] Would update expense ${expenseId}`);
@@ -167,7 +170,7 @@ class ServerTimestampMigration {
         } else {
           this.stats.skippedExpenses++;
           console.log(
-            `    ⏭️  Skipped expense ${expenseId} (already has serverTimestamp: ${expense.serverTimestamp})`
+            `    ⏭️  Skipped expense ${expenseId} (already has ${SERVER_TIMESTAMP_FIELD}: ${expense[SERVER_TIMESTAMP_FIELD]})`
           );
         }
       } catch (error) {
@@ -184,9 +187,12 @@ class ServerTimestampMigration {
     try {
       // Update only the serverTimestamp field
       const timestamp = this.options.nowTimestamp ? Date.now() : 0;
+      const updateData = {};
+      updateData[SERVER_TIMESTAMP_FIELD] = timestamp;
+
       await axios.patch(
         `${BACKEND_URL}/trips/${tripId}/${uid}/expenses/${expenseId}.json?auth=${AUTH_TOKEN}`,
-        { serverTimestamp: timestamp },
+        updateData,
         { timeout: 10000 }
       );
     } catch (error) {

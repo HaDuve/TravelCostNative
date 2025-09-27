@@ -8,7 +8,7 @@
       "developmentClient": true,
       "environment": "development",
       "distribution": "internal",
-      "channel": "staging",
+      "channel": "dev",
       "android": {
         "buildType": "apk"
       }
@@ -16,7 +16,7 @@
     "development-simulator": {
       "developmentClient": true,
       "environment": "development",
-      "channel": "staging",
+      "channel": "dev",
       "distribution": "internal",
       "ios": {
         "simulator": true
@@ -24,6 +24,13 @@
       "android": {
         "buildType": "apk"
       }
+    },
+    "alpha": {
+      "environment": "production",
+      "autoIncrement": true,
+      "channel": "alpha",
+      "distribution": "internal",
+      "pnpm": "10.15.0"
     },
     "production": {
       "environment": "production",

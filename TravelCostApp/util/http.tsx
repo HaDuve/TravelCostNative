@@ -286,9 +286,11 @@ export async function fetchExpensesWithUIDs(
       userExpenses = processExpenseResponse(response.data);
 
       if (userExpenses.length > 0) {
-        // Check both editedTimestamp and serverTimestamp for latest changes
+        // Hybrid approach: Use serverTimestamp (preferred) with editedTimestamp fallback for backward compatibility
+        // TODO: After 100% migration to serverTimestamp and running migration script, simplify to:
+        // .map((e) => e.serverTimestamp || 0)
         const validTimestamps = userExpenses
-          .map((e) => Math.max(e.editedTimestamp || 0, e.serverTimestamp || 0))
+          .map((e) => e.serverTimestamp || e.editedTimestamp || 0)
           .filter((ts) => ts > 0);
 
         if (validTimestamps.length > 0) {
@@ -399,9 +401,11 @@ export async function fetchExpenses(
     }
 
     if (expenses.length > 0) {
-      // Check both editedTimestamp and serverTimestamp for latest changes
+      // Hybrid approach: Use serverTimestamp (preferred) with editedTimestamp fallback for backward compatibility
+      // TODO: After 100% migration to serverTimestamp and running migration script, simplify to:
+      // .map((e) => e.serverTimestamp || 0)
       const validTimestamps = expenses
-        .map((e) => Math.max(e.editedTimestamp || 0, e.serverTimestamp || 0))
+        .map((e) => e.serverTimestamp || e.editedTimestamp || 0)
         .filter((ts) => ts > 0);
 
       if (validTimestamps.length > 0) {

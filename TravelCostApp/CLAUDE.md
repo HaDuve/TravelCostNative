@@ -196,6 +196,17 @@ The app uses a WebView-based Highcharts implementation for data visualization, r
 
 See `components/charts/CLAUDE.md` and `components/ExpensesOverview/CLAUDE.md` for detailed documentation.
 
+## Recent Changes
+
+### 2024-12-19: Soft Delete Implementation
+- **Task**: h-implement-soft-delete-expenses
+- **Services Modified**: expenses-context, http, expense
+- **Changes**: 
+  - Added `isDeleted` field to expense interfaces for soft delete functionality
+  - Modified delete operations to use PATCH instead of DELETE to maintain sync compatibility
+  - Updated sync processing to filter out deleted expenses
+  - Ensures deleted expenses don't reappear on other devices during delta sync
+
 ## Sessions System Behaviors
 
 @CLAUDE.sessions.md

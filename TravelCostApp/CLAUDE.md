@@ -199,9 +199,10 @@ See `components/charts/CLAUDE.md` and `components/ExpensesOverview/CLAUDE.md` fo
 ## Recent Changes
 
 ### 2024-12-19: Soft Delete Implementation
+
 - **Task**: h-implement-soft-delete-expenses
 - **Services Modified**: expenses-context, http, expense
-- **Changes**: 
+- **Changes**:
   - Added `isDeleted` field to expense interfaces for soft delete functionality
   - Modified delete operations to use PATCH instead of DELETE to maintain sync compatibility
   - Updated sync processing to filter out deleted expenses

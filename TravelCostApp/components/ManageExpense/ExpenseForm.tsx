@@ -1392,7 +1392,9 @@ const ExpenseForm = ({
           >
             {backButtonJsx}
             <View style={{ borderWidth: 1, borderColor: "red" }}>
-              <Text>{editingValues.isDeleted ? "deleted" : "not deleted"}</Text>
+              <Text>
+                {editingValues?.isDeleted ? "deleted" : "not deleted"}
+              </Text>
             </View>
             {Platform.OS == "ios" && confirmButtonJSX}
           </View>

@@ -38,7 +38,7 @@ import {
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
 
-// Field name for server timestamp in expense data
+// Field name for server timestamp in expense data -- needs to be updated in .rules firebase backend
 export const SERVER_TIMESTAMP_FIELD = "serverTimestamp";
 
 /** AXIOS Instance */
@@ -200,6 +200,12 @@ const processExpenseResponse = (data: any): ExpenseData[] => {
 
   for (const key in data) {
     const r: ExpenseDataOnline = data[key];
+
+    // Skip deleted expenses during sync
+    if (r.isDeleted) {
+      continue;
+    }
+
     const editedTimestamp = r.editedTimestamp
       ? parseInt(r.editedTimestamp, 10)
       : 0;
@@ -225,6 +231,7 @@ const processExpenseResponse = (data: any): ExpenseData[] => {
       isPaid: r.isPaid,
       isSpecialExpense: r.isSpecialExpense,
       editedTimestamp: editedTimestamp,
+      isDeleted: r.isDeleted || false,
     };
     expenses.push(expenseObj);
   }
@@ -325,6 +332,12 @@ export async function fetchExpenses(
 
       for (const key in data) {
         const r: ExpenseDataOnline = data[key];
+
+        // Skip deleted expenses during sync
+        if (r.isDeleted) {
+          continue;
+        }
+
         const editedTimestamp = r.editedTimestamp
           ? parseInt(r.editedTimestamp, 10)
           : 0;
@@ -350,6 +363,7 @@ export async function fetchExpenses(
           isPaid: r.isPaid,
           isSpecialExpense: r.isSpecialExpense,
           editedTimestamp: editedTimestamp,
+          isDeleted: r.isDeleted || false,
         };
         expenses.push(expenseObj);
       }
@@ -452,7 +466,13 @@ export function updateExpense(
  */
 export function deleteExpense(tripid: string, uid: string, id: string) {
   try {
-    const response = axios.delete(
+    // Soft delete: mark as deleted instead of removing
+    const deletionData = {
+      isDeleted: true,
+      [SERVER_TIMESTAMP_FIELD]: Date.now(),
+    };
+
+    const response = axios.patch(
       BACKEND_URL +
         "/trips/" +
         tripid +
@@ -460,7 +480,8 @@ export function deleteExpense(tripid: string, uid: string, id: string) {
         uid +
         "/expenses/" +
         `${id}.json` +
-        getMMKVString("QPAR")
+        getMMKVString("QPAR"),
+      deletionData
     );
     return response;
   } catch (error) {

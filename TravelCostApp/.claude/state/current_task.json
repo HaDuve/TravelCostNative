@@ -1,6 +1,12 @@
 {
-  "task": null,
-  "branch": null,
-  "services": [],
+  "task": "h-implement-soft-delete-expenses",
+  "branch": "fix/soft-delete-expenses",
+  "services": [
+    "expenses-context",
+    "http",
+    "expense",
+    "ManageExpense",
+    "offline-queue"
+  ],
   "updated": "2024-12-19"
 }

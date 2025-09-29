@@ -43,6 +43,7 @@ export interface ExpenseData {
   isPaid?: string;
   isSpecialExpense?: boolean;
   editedTimestamp?: number;
+  isDeleted?: boolean;
 }
 
 export enum DuplicateOption {
@@ -78,6 +79,7 @@ export interface ExpenseDataOnline {
   rangeId?: string;
   isSpecialExpense?: boolean;
   editedTimestamp?: string;
+  isDeleted?: boolean;
 }
 
 export interface Split {

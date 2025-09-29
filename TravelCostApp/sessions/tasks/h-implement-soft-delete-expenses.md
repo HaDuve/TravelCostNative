@@ -1,8 +1,9 @@
 ---
 task: h-implement-soft-delete-expenses
 branch: fix/soft-delete-expenses
-status: pending
+status: completed
 created: 2024-12-19
+started: 2024-12-19
 modules: [expenses-context, http, expense, ManageExpense, offline-queue]
 ---
 
@@ -46,3 +47,9 @@ Currently, when expenses are deleted, they are permanently removed from Firebase
 <!-- Updated as work progresses -->
 
 - [2024-12-19] Created task for implementing soft delete with minimal changes
+- [2024-12-19] **IMPLEMENTATION COMPLETE**: Successfully implemented soft delete system:
+  - Added `isDeleted?: boolean` field to both `ExpenseData` and `ExpenseDataOnline` interfaces
+  - Modified `deleteExpense` function to use PATCH with `isDeleted: true` instead of DELETE
+  - Updated both `processExpenseResponse` functions to filter out expenses where `isDeleted: true`
+  - Confirmed expenses context DELETE action already filters locally (no changes needed)
+  - All changes are minimal and maintain backward compatibility

@@ -232,6 +232,7 @@ const processExpenseResponse = (data: any): ExpenseData[] => {
       isSpecialExpense: r.isSpecialExpense,
       editedTimestamp: editedTimestamp,
       isDeleted: r.isDeleted || false,
+      serverTimestamp: r.serverTimestamp,
     };
     expenses.push(expenseObj);
   }
@@ -285,8 +286,9 @@ export async function fetchExpensesWithUIDs(
       userExpenses = processExpenseResponse(response.data);
 
       if (userExpenses.length > 0) {
+        // Check both editedTimestamp and serverTimestamp for latest changes
         const validTimestamps = userExpenses
-          .map((e) => e.editedTimestamp || 0)
+          .map((e) => Math.max(e.editedTimestamp || 0, e.serverTimestamp || 0))
           .filter((ts) => ts > 0);
 
         if (validTimestamps.length > 0) {
@@ -364,6 +366,7 @@ export async function fetchExpenses(
           isSpecialExpense: r.isSpecialExpense,
           editedTimestamp: editedTimestamp,
           isDeleted: r.isDeleted || false,
+          serverTimestamp: r.serverTimestamp,
         };
         expenses.push(expenseObj);
       }
@@ -396,8 +399,9 @@ export async function fetchExpenses(
     }
 
     if (expenses.length > 0) {
+      // Check both editedTimestamp and serverTimestamp for latest changes
       const validTimestamps = expenses
-        .map((e) => e.editedTimestamp || 0)
+        .map((e) => Math.max(e.editedTimestamp || 0, e.serverTimestamp || 0))
         .filter((ts) => ts > 0);
 
       if (validTimestamps.length > 0) {

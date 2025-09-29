@@ -201,11 +201,6 @@ const processExpenseResponse = (data: any): ExpenseData[] => {
   for (const key in data) {
     const r: ExpenseDataOnline = data[key];
 
-    // Skip deleted expenses during sync
-    if (r.isDeleted) {
-      continue;
-    }
-
     const editedTimestamp = r.editedTimestamp
       ? parseInt(r.editedTimestamp, 10)
       : 0;
@@ -234,6 +229,8 @@ const processExpenseResponse = (data: any): ExpenseData[] => {
       isDeleted: r.isDeleted || false,
       serverTimestamp: r.serverTimestamp,
     };
+    
+    // Include ALL expenses (including deleted ones) - filtering happens in MERGE
     expenses.push(expenseObj);
   }
   return expenses;
@@ -337,11 +334,6 @@ export async function fetchExpenses(
       for (const key in data) {
         const r: ExpenseDataOnline = data[key];
 
-        // Skip deleted expenses during sync
-        if (r.isDeleted) {
-          continue;
-        }
-
         const editedTimestamp = r.editedTimestamp
           ? parseInt(r.editedTimestamp, 10)
           : 0;
@@ -370,6 +362,8 @@ export async function fetchExpenses(
           isDeleted: r.isDeleted || false,
           serverTimestamp: r.serverTimestamp,
         };
+        
+        // Include ALL expenses (including deleted ones) - filtering happens in MERGE
         expenses.push(expenseObj);
       }
       return expenses;

@@ -187,6 +187,11 @@ function expensesReducer(state: ExpenseData[], action) {
         return state;
       }
 
+      // Create array of deleted expense IDs from sync results
+      const deletedIds = newExpenses
+        .filter((expense) => expense.isDeleted === true)
+        .map((expense) => expense.id);
+
       // Create a map of existing expenses by ID for quick lookup
       const existingExpensesMap = new Map();
       state.forEach((expense) => {
@@ -200,9 +205,13 @@ function expensesReducer(state: ExpenseData[], action) {
         const existingExpense = existingExpensesMap.get(newExpense.id);
 
         if (existingExpense) {
-          // If expense exists, check if new one is more recent based on editedTimestamp
-          const existingTimestamp = existingExpense.editedTimestamp || 0;
-          const newTimestamp = newExpense.editedTimestamp || 0;
+          // If expense exists, check if new one is more recent based on serverTimestamp
+          const existingTimestamp =
+            existingExpense.serverTimestamp ||
+            existingExpense.editedTimestamp ||
+            0;
+          const newTimestamp =
+            newExpense.serverTimestamp || newExpense.editedTimestamp || 0;
 
           if (newTimestamp > existingTimestamp) {
             // Update existing expense with newer data
@@ -220,13 +229,18 @@ function expensesReducer(state: ExpenseData[], action) {
         }
       });
 
+      // Filter out deleted expenses from the final set
+      const filteredExpenses = mergedExpenses.filter(
+        (expense) => !deletedIds.includes(expense.id)
+      );
+
       // Sort by date (newest first) and remove duplicates
       const getSortedState = (data: ExpenseData[]) =>
         data.sort((a: ExpenseData, b: ExpenseData) => {
           return Number(new Date(b.date)) - Number(new Date(a.date));
         });
 
-      const sorted = uniqBy(getSortedState(mergedExpenses), "id");
+      const sorted = uniqBy(getSortedState(filteredExpenses), "id");
       return sorted;
     }
     case "UPDATE": {

@@ -8,7 +8,7 @@ import {
   Alert,
   Pressable,
 } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../store/user-context";
 import { fetchTripName } from "../util/http";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
@@ -102,9 +102,8 @@ const TripSummaryScreen = ({ navigation }) => {
     tripSummary?.numberOfTrips && tripSummary.numberOfTrips > 1
       ? i18n.t("trips")
       : i18n.t("trip");
-  const titleText = `${i18n.t("summary")}\n(${
-    tripSummary?.numberOfTrips + " " + titleTextTrips
-  })`;
+  const titleText = i18n.t("summary");
+  const subtitleText = `(${tripSummary?.numberOfTrips + " " + titleTextTrips})`;
   const numberOfDaysIsANumber =
     tripSummary?.numberOfDays && !isNaN(tripSummary.numberOfDays);
   useEffect(() => {
@@ -298,16 +297,6 @@ const TripSummaryScreen = ({ navigation }) => {
     setIsFetching(false);
   };
 
-  useEffect(() => {
-    if (!tripSummary && allTrips && allTrips.length > 0) {
-      summarizeHandler();
-    }
-  });
-
-  // function exportHandler() {
-  // TODO: export to pdf or excel
-  // }
-
   function itemCheckBoxHandler(item) {
     setTripSummary(null);
     setAllTrips((prevState) => {
@@ -343,7 +332,8 @@ const TripSummaryScreen = ({ navigation }) => {
               pressed && GlobalStyles.pressedWithShadow,
             ]}
           >
-            <Text style={styles.expandableHeaderText}>{titleText}</Text>
+            <Text style={styles.expandableHeaderTitle}>{titleText}</Text>
+            <Text style={styles.expandableHeaderSubtitle}>{subtitleText}</Text>
           </Pressable>
           {showSummary && (
             <Animated.View entering={FadeInUp}>
@@ -558,85 +548,97 @@ const TripSummaryScreen = ({ navigation }) => {
           setShowTripList(!showTripList);
         }}
         style={({ pressed }) => [
-          styles.expandableContainer,
+          styles.tripListContainer,
           GlobalStyles.shadowGlowPrimary,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
       >
-        <Text style={styles.expandableHeaderText}>{i18n.t("myTrips")}</Text>
+        <Text style={styles.expandableHeaderTitle}>{i18n.t("myTrips")}</Text>
+        {showTripList && (
+          <Animated.View entering={FadeInUp}>
+            <FlatList
+              data={allTrips}
+              scrollEnabled={false}
+              renderItem={(item) => {
+                return (
+                  <TouchableOpacity
+                    onPress={itemCheckBoxHandler.bind(this, item)}
+                    style={[
+                      styles.tripItemContainer,
+                      item.item.selected
+                        ? GlobalStyles.shadowPrimary
+                        : GlobalStyles.shadow,
+                    ]}
+                  >
+                    <Checkbox
+                      color={GlobalStyles.colors.primary700}
+                      status={item.item.selected ? "checked" : "unchecked"}
+                      // onPress={itemCheckBoxHandler.bind(this, item)}
+                    ></Checkbox>
+                    <Text
+                      style={[
+                        styles.tripItemText,
+                        {
+                          fontWeight: "500",
+                          color: GlobalStyles.colors.gray700,
+                          flex: 1,
+                          marginLeft: dynamicScale(6, false, 0.5),
+                        },
+                      ]}
+                    >
+                      {item.item.tripname}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
+            ></FlatList>
+          </Animated.View>
+        )}
       </Pressable>
-      {showTripList && (
-        <Animated.FlatList
-          entering={FadeInUp}
-          data={allTrips}
-          scrollEnabled={false}
-          renderItem={(item) => {
-            return (
-              <TouchableOpacity
-                onPress={itemCheckBoxHandler.bind(this, item)}
-                style={[
-                  styles.tripItemContainer,
-                  item.item.selected
-                    ? GlobalStyles.shadowPrimary
-                    : GlobalStyles.shadow,
-                ]}
-              >
-                <Checkbox
-                  color={GlobalStyles.colors.primary700}
-                  status={item.item.selected ? "checked" : "unchecked"}
-                  // onPress={itemCheckBoxHandler.bind(this, item)}
-                ></Checkbox>
-                <Text
-                  style={[
-                    styles.summaryText,
-                    {
-                      fontWeight: "500",
-                      color: GlobalStyles.colors.gray700,
-                      flex: 1,
-                      marginLeft: dynamicScale(8, false, 0.5),
-                    },
-                  ]}
-                >
-                  {item.item.tripname}
-                </Text>
-              </TouchableOpacity>
-            );
-          }}
-        ></Animated.FlatList>
-      )}
       <View style={styles.buttonContainer}>
-        <FlatButton
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            navigation.pop();
-          }}
-          textStyle={{}}
-        >
-          {i18n.t("back")}
-        </FlatButton>
-        <GradientButton
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            navigation.navigate("FilteredPieCharts", {
-              expenses: allExpensesList,
-              dayString: `${titleText}\n${allExpensesList?.length} ${i18n.t(
-                "expensesTab"
-              )}`,
-            });
-          }}
-          buttonStyle={{}}
-        >
-          {i18n.t("charts")}
-        </GradientButton>
         <GradientButton
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setShowSummary(!showSummary);
+            if (!showSummary) {
+              summarizeHandler();
+            }
           }}
-          buttonStyle={{}}
+          buttonStyle={styles.fullWidthButtonStyle}
+          colors={GlobalStyles.gradientColorsButton}
+          darkText
         >
           {i18n.t("summary")}
         </GradientButton>
+        <View style={styles.halfWidthButtonContainer}>
+          <View style={styles.halfWidthButton}>
+            <FlatButton
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                navigation.pop();
+              }}
+              textStyle={{}}
+            >
+              {i18n.t("back")}
+            </FlatButton>
+          </View>
+          <View style={styles.halfWidthButton}>
+            <FlatButton
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                navigation.navigate("FilteredPieCharts", {
+                  expenses: allExpensesList,
+                  dayString: `${titleText}\n${allExpensesList?.length} ${i18n.t(
+                    "expensesTab"
+                  )}`,
+                });
+              }}
+              textStyle={{}}
+            >
+              {i18n.t("charts")}
+            </FlatButton>
+          </View>
+        </View>
         {/* {tripSummary && (
           <GradientButton
             style={styles.gradientButtonStyle}
@@ -666,24 +668,36 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.gray700,
     letterSpacing: 0.5,
   },
+  tripListContainer: {
+    margin: constantScale(12, 0.5),
+    padding: constantScale(16, 0.5),
+    gap: constantScale(8, 0.5),
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
+    borderRadius: 24,
+    alignItems: "stretch",
+    justifyContent: "flex-start",
+    minHeight: constantScale(80, 0.5),
+  },
   tripItemContainer: {
     flexDirection: "row",
     alignItems: "center",
-    padding: dynamicScale(16, false, 0.5),
-    marginVertical: dynamicScale(8, false, 0.5),
-    marginHorizontal: dynamicScale(16, false, 0.5),
+    gap: dynamicScale(8, false, 0.5),
+    padding: dynamicScale(12, false, 0.5),
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+    marginVertical: dynamicScale(4, false, 0.5),
+    marginHorizontal: dynamicScale(8, false, 0.5),
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: dynamicScale(12, false, 0.5),
+    borderRadius: dynamicScale(8, false, 0.5),
     borderWidth: 1,
     borderColor: GlobalStyles.colors.gray300,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 1,
     },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   summaryContainer: {
     padding: dynamicScale(20, false, 0.5),
@@ -717,15 +731,24 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  gradientButtonStyle: {
-    margin: dynamicScale(16, false, 0.5),
-  },
   buttonContainer: {
     alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-evenly",
+    flexDirection: "column",
     margin: dynamicScale(20, false, 0.5),
     paddingHorizontal: dynamicScale(16, false, 0.5),
+  },
+  fullWidthButtonStyle: {
+    width: "100%",
+    marginBottom: dynamicScale(24, false, 0.5),
+  },
+  halfWidthButtonContainer: {
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-between",
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+  },
+  halfWidthButton: {
+    flex: 1,
   },
   summaryTextBig: {
     fontSize: dynamicScale(16, false, 0.5),
@@ -761,12 +784,52 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
+    minHeight: constantScale(80, 0.5),
   },
-  expandableHeaderText: {
+  expandableHeaderTitle: {
     textAlign: "center",
-    fontSize: constantScale(18, 0.5),
-    lineHeight: constantScale(24, 0.5),
+    fontSize: constantScale(24, 0.5),
+    lineHeight: constantScale(30, 0.5),
+    fontWeight: "900",
+    fontStyle: "italic",
+    color: GlobalStyles.colors.textColor,
+    marginBottom: dynamicScale(4, false, 0.5),
+  },
+  expandableHeaderSubtitle: {
+    textAlign: "center",
+    fontSize: constantScale(16, 0.5),
+    lineHeight: constantScale(20, 0.5),
     fontWeight: "400",
     color: GlobalStyles.colors.textColor,
+    opacity: 0.8,
+  },
+  gradientButtonStyle: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 0, // Override GradientButton's default margin
+  },
+  buttonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: dynamicScale(2, true),
+    marginBottom: dynamicScale(-2, true),
+  },
+  buttonIcon: {
+    width: dynamicScale(18, false, 0.5),
+    height: dynamicScale(18, false, 0.5),
+    marginRight: dynamicScale(6, false, 0.5),
+  },
+  buttonText: {
+    fontSize: dynamicScale(16, false, 0.5),
+    fontWeight: "300",
+    fontStyle: "italic",
+    color: GlobalStyles.colors.textColor,
+  },
+  tripItemText: {
+    fontSize: dynamicScale(14, false, 0.5),
+    fontWeight: "400",
+    color: GlobalStyles.colors.gray700,
+    lineHeight: dynamicScale(18, false, 0.5),
   },
 });

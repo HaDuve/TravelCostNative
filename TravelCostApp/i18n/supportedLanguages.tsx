@@ -496,6 +496,18 @@ const en = {
   mustUsePhysicalDevice: "Must use physical device for Push Notifications",
   pressToSendNotification: "Press to Send Notification",
   hideSpecialExpenses: "Hide special expenses",
+
+  // Trip Summary Screen
+  trips: "Trips",
+  trip: "Trip",
+  summary: "Summary",
+  totalCosts: "Total Costs",
+  averageCostPerDay: "Average Cost Per Day",
+  averageCostPerMonth: "Average Cost Per Month",
+  averageCostPerYear: "Average Cost Per Year",
+  averageCostPerCountry: "Average Cost Per Country",
+  averageCostPerTrip: "Average Cost Per Trip",
+  averageCostPerTraveller: "Average Cost Per Traveller",
 };
 const de = {
   // special expense strings
@@ -1021,6 +1033,18 @@ const de = {
     "Muss physisches Gerät für Push-Benachrichtigungen verwenden",
   pressToSendNotification: "Drücken Sie, um Benachrichtigung zu senden",
   hideSpecialExpenses: "Besondere Ausgaben ausblenden",
+
+  // Trip Summary Screen
+  trips: "Reisen",
+  trip: "Reise",
+  summary: "Zusammenfassung",
+  totalCosts: "Gesamtkosten",
+  averageCostPerDay: "Durchschnittskosten pro Tag",
+  averageCostPerMonth: "Durchschnittskosten pro Monat",
+  averageCostPerYear: "Durchschnittskosten pro Jahr",
+  averageCostPerCountry: "Durchschnittskosten pro Land",
+  averageCostPerTrip: "Durchschnittskosten pro Reise",
+  averageCostPerTraveller: "Durchschnittskosten pro Reisenden",
 };
 const fr = {
   // special expense strings
@@ -1545,6 +1569,18 @@ const fr = {
     "Doit utiliser un appareil physique pour les notifications push",
   pressToSendNotification: "Appuyez pour envoyer une notification",
   hideSpecialExpenses: "Masquer les dépenses spéciales",
+
+  // Trip Summary Screen
+  trips: "Voyages",
+  trip: "Voyage",
+  summary: "Résumé",
+  totalCosts: "Coûts totaux",
+  averageCostPerDay: "Coût moyen par jour",
+  averageCostPerMonth: "Coût moyen par mois",
+  averageCostPerYear: "Coût moyen par an",
+  averageCostPerCountry: "Coût moyen par pays",
+  averageCostPerTrip: "Coût moyen par voyage",
+  averageCostPerTraveller: "Coût moyen par voyageur",
 };
 const ru = {
   // special expense strings
@@ -2068,5 +2104,17 @@ const ru = {
     "Необходимо использовать физическое устройство для push-уведомлений",
   pressToSendNotification: "Нажмите, чтобы отправить уведомление",
   hideSpecialExpenses: "Скрыть специальные расходы",
+
+  // Trip Summary Screen
+  trips: "Поездки",
+  trip: "Поездка",
+  summary: "Сводка",
+  totalCosts: "Общие расходы",
+  averageCostPerDay: "Средние расходы в день",
+  averageCostPerMonth: "Средние расходы в месяц",
+  averageCostPerYear: "Средние расходы в год",
+  averageCostPerCountry: "Средние расходы на страну",
+  averageCostPerTrip: "Средние расходы на поездку",
+  averageCostPerTraveller: "Средние расходы на путешественника",
 };
 export { en, de, fr, ru };

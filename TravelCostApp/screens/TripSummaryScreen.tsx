@@ -21,7 +21,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { de, en, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -93,9 +96,9 @@ const TripSummaryScreen = ({ navigation }) => {
 
   const titleTextTrips =
     tripSummary?.numberOfTrips && tripSummary.numberOfTrips > 1
-      ? "Trips"
-      : "Trip";
-  const titleText = `Summary (${
+      ? i18n.t("trips")
+      : i18n.t("trip");
+  const titleText = `${i18n.t("summary")} (${
     tripSummary?.numberOfTrips + " " + titleTextTrips
   })`;
   const numberOfDaysIsANumber =
@@ -318,13 +321,16 @@ const TripSummaryScreen = ({ navigation }) => {
     <Animated.ScrollView
       entering={FadeIn}
       exiting={FadeOut}
-      style={{ marginTop: dynamicScale(12, false, 0.5) }}
+      style={{
+        marginTop: dynamicScale(12, false, 0.5),
+        paddingBottom: dynamicScale(48, false, 0.5),
+      }}
     >
       {tripSummary && (
         <View style={[styles.summaryContainer, GlobalStyles.shadow]}>
           <Text style={styles.titleText}>{titleText}</Text>
           <Text style={styles.summaryText}>
-            Total Costs:{" "}
+            {i18n.t("totalCosts")}:{" "}
             {formatExpenseWithCurrency(
               tripSummary.totalCost,
               tripSummary.currency
@@ -377,23 +383,23 @@ const TripSummaryScreen = ({ navigation }) => {
               ></FlatList>
             )}
             <Text style={styles.summaryText}>
-              Countries: {tripSummary.numberOfCountries}
+              {i18n.t("countries")}: {tripSummary.numberOfCountries}
             </Text>
           </View>
 
           {!!numberOfDaysIsANumber && !!tripSummary.numberOfDays && (
             <Text style={styles.summaryText}>
-              Days: {tripSummary.numberOfDays}
+              {i18n.t("days")}: {tripSummary.numberOfDays}
             </Text>
           )}
           {!!allExpensesList && allExpensesList.length > 0 && (
             <Text style={styles.summaryText}>
-              Expenses: {allExpensesList.length}
+              {i18n.t("expenses")}: {allExpensesList.length}
             </Text>
           )}
           {!!tripSummary.averageCostPerDay && (
             <Text style={styles.summaryText}>
-              Average Cost Per Day:{" "}
+              {i18n.t("averageCostPerDay")}:{" "}
               {formatExpenseWithCurrency(
                 tripSummary.averageCostPerDay,
                 tripSummary.currency
@@ -402,7 +408,7 @@ const TripSummaryScreen = ({ navigation }) => {
           )}
           {!!tripSummary.averageCostPerMonth && (
             <Text style={styles.summaryText}>
-              Average Cost Per Month:{" "}
+              {i18n.t("averageCostPerMonth")}:{" "}
               {formatExpenseWithCurrency(
                 tripSummary.averageCostPerMonth,
                 tripSummary.currency
@@ -411,7 +417,7 @@ const TripSummaryScreen = ({ navigation }) => {
           )}
           {!!tripSummary.averageCostPerYear && (
             <Text style={styles.summaryText}>
-              Average Cost Per Year:{" "}
+              {i18n.t("averageCostPerYear")}:{" "}
               {formatExpenseWithCurrency(
                 tripSummary.averageCostPerYear,
                 tripSummary.currency
@@ -420,7 +426,7 @@ const TripSummaryScreen = ({ navigation }) => {
           )}
           {!!tripSummary.averageCostPerCountry && (
             <Text style={styles.summaryText}>
-              Average Cost Per Country:{" "}
+              {i18n.t("averageCostPerCountry")}:{" "}
               {formatExpenseWithCurrency(
                 tripSummary.averageCostPerCountry,
                 tripSummary.currency
@@ -429,7 +435,7 @@ const TripSummaryScreen = ({ navigation }) => {
           )}
           {!!tripSummary.averageCostPerTrip && (
             <Text style={styles.summaryText}>
-              Average Cost Per Trip:{" "}
+              {i18n.t("averageCostPerTrip")}:{" "}
               {formatExpenseWithCurrency(
                 tripSummary.averageCostPerTrip,
                 tripSummary.currency
@@ -438,7 +444,7 @@ const TripSummaryScreen = ({ navigation }) => {
           )}
           {!!tripSummary.averageCostPerTraveller && (
             <Text style={styles.summaryText}>
-              Average Cost Per Traveller:{" "}
+              {i18n.t("averageCostPerTraveller")}:{" "}
               {formatExpenseWithCurrency(
                 tripSummary.averageCostPerTraveller,
                 tripSummary.currency
@@ -465,7 +471,9 @@ const TripSummaryScreen = ({ navigation }) => {
         </View>
       )}
       <View style={styles.buttonContainer}>
-        <FlatButton onPress={() => navigation.pop()}>Back</FlatButton>
+        <FlatButton onPress={() => navigation.pop()} textStyle={{}}>
+          {i18n.t("back")}
+        </FlatButton>
         <GradientButton
           onPress={() => {
             navigation.navigate("FilteredPieCharts", {
@@ -475,8 +483,9 @@ const TripSummaryScreen = ({ navigation }) => {
               )}`,
             });
           }}
+          buttonStyle={{}}
         >
-          Charts
+          {i18n.t("charts")}
         </GradientButton>
         {/* {tripSummary && (
           <GradientButton

@@ -33,7 +33,10 @@ import { useRef } from "react";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 
 const IconSize = dynamicScale(28, false, 0.5);
@@ -324,6 +327,8 @@ function ExpenseItem(props): JSX.Element {
             </Text>
             <Text
               maxFontSizeMultiplier={1}
+              numberOfLines={1}
+              ellipsizeMode="tail"
               style={[
                 styles.textBase,
                 styles.secondaryText,
@@ -404,14 +409,10 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
   },
   description: {
-    // flex: 1,
-    // width: "110%",
     fontStyle: "italic",
     fontWeight: "300",
     fontSize: dynamicScale(15, false, 0.5),
     zIndex: 2,
-    numberOfLines: 1,
-    ellipsizeMode: "tail",
   },
   secondaryText: {
     color: GlobalStyles.colors.gray700,

@@ -27,7 +27,7 @@ import { getRate } from "../../util/currencyExchange";
 import { SettingsContext } from "../../store/settings-context";
 import {
   ExpenseData,
-  getExpensesSum,
+  getExpensesSumPeriod,
   getTravellerSum,
 } from "../../util/expense";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
@@ -65,10 +65,9 @@ const ExpensesSummary = ({
 
   if (!expenses || !periodName || userCtx.freshlyCreated) return <></>;
 
-  const expensesSum = getExpensesSum(expenses, hideSpecial);
-  // // console.log("expensesSum ~ expensesSum", expensesSum);
+  const expensesSum = getExpensesSumPeriod(expenses, hideSpecial);
+
   if (isNaN(Number(expensesSum))) {
-    // console.log("expensesSum is NaN");
     return <></>;
   }
 
@@ -127,11 +126,11 @@ const ExpensesSummary = ({
   }
   const travellers = tripCtx.travellers;
   const travellerSplitExpenseSums = travellers.map((traveller) => {
-    return getTravellerSum(periodExpenses, traveller);
+    return getTravellerSum(periodExpenses, traveller, periodName === "total");
   });
 
   if (!budgetNumber || budgetNumber == MAX_JS_NUMBER) infinityString = "∞";
-  if (budgetNumber > totalBudget ?? MAX_JS_NUMBER) budgetNumber = totalBudget;
+  if (budgetNumber > (totalBudget ?? MAX_JS_NUMBER)) budgetNumber = totalBudget;
   const noTotalBudget =
     !tripCtx.totalBudget ||
     tripCtx.totalBudget == "0" ||

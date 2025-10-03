@@ -149,25 +149,58 @@ export function deduplicateRangeExpenses(
   });
 }
 
-export function getExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
+/**
+ * Calculate total expenses sum with deduplication for range expenses.
+ * Use this for total/overall calculations where each range should be counted once.
+ */
+export function getExpensesSumTotal(
+  expenses: ExpenseData[],
+  hideSpecial = false
+) {
   const deduplicatedExpenses = deduplicateRangeExpenses(expenses);
+  return calculateExpensesSum(deduplicatedExpenses, hideSpecial);
+}
 
-  const sum = deduplicatedExpenses.reduce(
-    (sum: number, expense: ExpenseData) => {
-      if (
-        isNaN(Number(expense.calcAmount)) ||
-        (hideSpecial && expense.isSpecialExpense)
-      )
-        return sum;
-      return sum + Number(expense.calcAmount);
-    },
-    0
-  );
+/**
+ * Calculate expenses sum for a specific time period, counting all days of range expenses.
+ * Use this for daily/weekly/monthly/yearly calculations where each day should be counted.
+ */
+export function getExpensesSumPeriod(
+  expenses: ExpenseData[],
+  hideSpecial = false
+) {
+  return calculateExpensesSum(expenses, hideSpecial);
+}
+
+/**
+ * Internal helper to calculate expenses sum
+ */
+function calculateExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
+  const sum = expenses.reduce((sum: number, expense: ExpenseData) => {
+    if (
+      isNaN(Number(expense.calcAmount)) ||
+      (hideSpecial && expense.isSpecialExpense)
+    )
+      return sum;
+    return sum + Number(expense.calcAmount);
+  }, 0);
   return sum;
 }
 
-export function getTravellerSum(expenses: ExpenseData[], traveller: string) {
-  const deduplicatedExpenses = deduplicateRangeExpenses(expenses);
+// Deprecated: Use getExpensesSumTotal or getExpensesSumPeriod instead
+export function getExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
+  return getExpensesSumPeriod(expenses, hideSpecial);
+}
+
+export function getTravellerSum(
+  expenses: ExpenseData[],
+  traveller: string,
+  isTotal: boolean = false
+) {
+  // Only deduplicate range expenses for total view
+  const deduplicatedExpenses = isTotal
+    ? deduplicateRangeExpenses(expenses)
+    : expenses;
 
   // return the sum of expenses for a given traveller
   const expensesSum = deduplicatedExpenses.reduce(
@@ -185,20 +218,42 @@ export function getTravellerSum(expenses: ExpenseData[], traveller: string) {
         const correct = split;
         if (!correct || !split) return sum;
 
+        // Safely parse the split amount, handling both string and number types
+        const splitAmount =
+          typeof split.amount === "string"
+            ? Number(String(split.amount).replace(/^0+/, "")) // Remove leading zeros
+            : Number(split.amount);
+
+        if (isNaN(splitAmount) || !isFinite(splitAmount)) {
+          return sum; // Skip invalid split amounts
+        }
+
         // check if the expense has a calcAmount by comparing it to the amount
-        // if it is the same, the expense has no calcAmount
-        if (!expense.calcAmount || !expense.amount)
-          return sum + Number(split.amount);
+        if (!expense.calcAmount || !expense.amount) {
+          return sum + splitAmount;
+        }
+
         const hasConversionRate = expense.calcAmount !== expense.amount;
         if (!hasConversionRate) {
-          return sum + Number(split.amount);
-        } else {
-          // calculate the rate of the split
-          const rate = expense.calcAmount / expense.amount;
-          // calculate the amount of the split
-          const splitAmount = split.amount * rate;
-          return sum + Number(splitAmount);
+          return sum + splitAmount;
         }
+
+        // Check if we need to convert the split amount
+        if (expense.calcAmount === expense.amount) {
+          // No conversion needed - amounts are in the same currency
+          return sum + splitAmount;
+        }
+
+        // Calculate the split's portion of the total expense
+        const splitRatio = splitAmount / expense.amount;
+        const convertedAmount = expense.calcAmount * splitRatio;
+
+        // Validate the result
+        if (isNaN(convertedAmount) || !isFinite(convertedAmount)) {
+          return sum + splitAmount; // Fallback to original amount
+        }
+
+        return sum + convertedAmount;
       }
     },
     0

@@ -19,7 +19,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -28,7 +31,7 @@ import PropTypes from "prop-types";
 import { isForeground } from "../../../util/appState";
 import { MAX_JS_NUMBER, MAX_PERIOD_RANGE } from "../../../confAppConstants";
 import { SettingsContext } from "../../../store/settings-context";
-import { getExpensesSum } from "../../../util/expense";
+import { getExpensesSumPeriod } from "../../../util/expense";
 import FlatButton from "../../UI/FlatButton";
 import { dynamicScale } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
@@ -75,7 +78,7 @@ const ExpenseGraph = ({
       for (let i = startingPoint; i < lastDays; i++) {
         const day = getDateMinusDays(today, i);
         const dayExpenses = expenseCtx.getDailyExpenses(i);
-        const expensesSum = getExpensesSum(dayExpenses, hideSpecial);
+        const expensesSum = getExpensesSumPeriod(dayExpenses, hideSpecial);
         const dailyBudget = tripCtx.dailyBudget;
         const formattedDay = toDayMonthString(day);
         const formattedSum = formatExpenseWithCurrency(
@@ -91,10 +94,22 @@ const ExpenseGraph = ({
       renderItemRef.current = function renderItem({ item }) {
         let dayString = "";
         if (
-          item.day.toDateString() === getDateMinusDays(today, 1).toDateString()
+          (item.day instanceof Date
+            ? item.day.toDateString()
+            : item.day.toString()) ===
+          (() => {
+            const date = getDateMinusDays(today, 1);
+            return date instanceof Date
+              ? date.toDateString()
+              : date.toJSDate().toDateString();
+          })()
         ) {
           dayString = i18n.t("yesterday");
-        } else if (item.day.toDateString() === new Date().toDateString()) {
+        } else if (
+          (item.day instanceof Date
+            ? item.day.toDateString()
+            : item.day.toString()) === new Date().toDateString()
+        ) {
           dayString = i18n.t("today");
         } else {
           dayString = toDayMonthString(item.day);
@@ -173,7 +188,7 @@ const ExpenseGraph = ({
       for (let i = startingPoint; i < lastWeeks; i++) {
         const { firstDay, lastDay, weeklyExpenses } =
           expenseCtx.getWeeklyExpenses(i);
-        const expensesSum = getExpensesSum(weeklyExpenses, hideSpecial);
+        const expensesSum = getExpensesSumPeriod(weeklyExpenses, hideSpecial);
         let weeklyBudget = Number(tripCtx.dailyBudget) * 7;
         if (weeklyBudget > totalBudget) weeklyBudget = totalBudget;
         const formattedDay = toDayMonthString(firstDay);
@@ -190,13 +205,27 @@ const ExpenseGraph = ({
       renderItemRef.current = function renderItem({ item }) {
         let weekString = "";
         if (
-          item.firstDay.toDateString() ===
-          getPreviousMondayDate(getDateMinusDays(today, 7)).toDateString()
+          (item.firstDay instanceof Date
+            ? item.firstDay.toDateString()
+            : item.firstDay.toString()) ===
+          (() => {
+            const date = getPreviousMondayDate(getDateMinusDays(today, 7));
+            return date instanceof Date
+              ? date.toDateString()
+              : date.toJSDate().toDateString();
+          })()
         ) {
           weekString = i18n.t("lastWeek");
         } else if (
-          item.firstDay.toDateString() ===
-          getPreviousMondayDate(new Date()).toDateString()
+          (item.firstDay instanceof Date
+            ? item.firstDay.toDateString()
+            : item.firstDay.toString()) ===
+          (() => {
+            const date = getPreviousMondayDate(new Date());
+            return date instanceof Date
+              ? date.toDateString()
+              : date.toJSDate().toDateString();
+          })()
         ) {
           weekString = i18n.t("thisWeek");
         } else {
@@ -274,7 +303,7 @@ const ExpenseGraph = ({
       for (let i = startingPoint; i < lastMonths; i++) {
         const { firstDay, lastDay, monthlyExpenses } =
           expenseCtx.getMonthlyExpenses(i);
-        const expensesSum = getExpensesSum(monthlyExpenses, hideSpecial);
+        const expensesSum = getExpensesSumPeriod(monthlyExpenses, hideSpecial);
         let monthlyBudget = Number(tripCtx.dailyBudget) * 30;
         if (monthlyBudget > totalBudget) monthlyBudget = totalBudget;
         const formattedDay = toDayMonthString(firstDay);
@@ -368,7 +397,7 @@ const ExpenseGraph = ({
       for (let i = startingPoint; i < lastYears; i++) {
         const { firstDay, lastDay, yearlyExpenses } =
           expenseCtx.getYearlyExpenses(i);
-        const expensesSum = getExpensesSum(yearlyExpenses, hideSpecial);
+        const expensesSum = getExpensesSumPeriod(yearlyExpenses, hideSpecial);
         let yearlyBudget = Number(tripCtx.dailyBudget) * 365;
         if (yearlyBudget > totalBudget) yearlyBudget = totalBudget;
         const formattedDay = toDayMonthString(firstDay);
@@ -478,9 +507,7 @@ const ExpenseGraph = ({
               inputData={listExpenseSumBudgets}
               xAxis={xAxis}
               yAxis={yAxis}
-              budgetAxis={budgetAxis}
               budget={budget}
-              daysRange={daysRange}
               currency={tripCtx.tripCurrency}
             ></ExpenseChart>
           </View>
@@ -502,9 +529,7 @@ const ExpenseGraph = ({
                   inputData={listExpenseSumBudgets}
                   xAxis={xAxis}
                   yAxis={yAxis}
-                  budgetAxis={budgetAxis}
                   budget={budget}
-                  daysRange={daysRange}
                   currency={tripCtx.tripCurrency}
                 ></ExpenseChart>
               )}
@@ -523,6 +548,7 @@ const ExpenseGraph = ({
                         startingPoint - (periodRangeNumber ?? 10)
                       );
                     }}
+                    textStyle={styles.text1}
                   >
                     {showFutureString}
                   </FlatButton>
@@ -539,6 +565,7 @@ const ExpenseGraph = ({
                       // reduce starting point to show future expenses
                       setLongerPeriodNum(longerPeriodNum + 10);
                     }}
+                    textStyle={styles.text1}
                   >
                     {showPastString}
                   </FlatButton>

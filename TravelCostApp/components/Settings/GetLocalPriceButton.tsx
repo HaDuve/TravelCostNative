@@ -67,11 +67,14 @@ const GetLocalPriceButton = ({ navigation, style }) => {
     setProductInput("");
   };
 
+  // Use different styles based on whether we're in header mode or standalone
+  const buttonStyle = style ? style : styles.settingsButton;
+
   return (
     <>
       <GradientButton
-        style={[styles.settingsButton, style]}
-        buttonStyle={{}}
+        style={buttonStyle}
+        buttonStyle={styles.gradientButtonStyle}
         colors={GlobalStyles.gradientColorsButton}
         onPress={handleGetLocalPrice}
         darkText
@@ -158,10 +161,17 @@ const styles = StyleSheet.create({
     width: "100%",
     alignSelf: "center",
   },
+  gradientButtonStyle: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 0, // Override GradientButton's default margin
+  },
   buttonContent: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    paddingTop: dynamicScale(2, true),
+    marginBottom: dynamicScale(-2, true),
   },
   buttonIcon: {
     width: dynamicScale(18, false, 0.5),

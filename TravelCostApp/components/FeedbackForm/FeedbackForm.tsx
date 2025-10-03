@@ -7,8 +7,8 @@ import {
   Alert,
   Platform,
   KeyboardAvoidingView,
+  Modal,
 } from "react-native";
-import Modal from "react-native-modal";
 import * as Haptics from "expo-haptics";
 
 //Localization
@@ -106,29 +106,24 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isVisible, onClose }) => {
 
   return (
     <Modal
-      isVisible={isVisible}
-      onBackdropPress={handleClose}
-      onBackButtonPress={handleClose}
-      style={styles.modal}
-      animationIn="slideInUp"
-      animationOut="slideOutDown"
-      backdropOpacity={0.5}
+      visible={isVisible}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={handleClose}
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.keyboardAvoidingView}
-      >
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.title}>{i18n.t("feedbackTitle")}</Text>
-            <Text style={styles.subtitle}>{i18n.t("feedbackSubtitle")}</Text>
+      <KeyboardAvoidingView style={styles.modalOverlay} behavior="padding">
+        <View style={[styles.modalContainer, GlobalStyles.strongShadow]}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>{i18n.t("feedbackTitle")}</Text>
           </View>
+
+          <Text style={styles.modalSubtitle}>{i18n.t("feedbackSubtitle")}</Text>
 
           <View style={styles.inputContainer}>
             <TextInput
-              style={styles.textInput}
+              style={[styles.textInput, GlobalStyles.strongShadow]}
               placeholder={i18n.t("feedbackPlaceholder")}
-              placeholderTextColor={GlobalStyles.colors.gray600}
+              placeholderTextColor={GlobalStyles.colors.gray700}
               value={feedbackText}
               onChangeText={setFeedbackText}
               multiline
@@ -142,21 +137,17 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isVisible, onClose }) => {
             </Text>
           </View>
 
-          <View style={styles.buttonContainer}>
-            <View style={styles.cancelButton}>
-              <FlatButton
-                onPress={handleClose}
-                textStyle={styles.cancelButtonText}
-              >
-                {i18n.t("cancel")}
-              </FlatButton>
-            </View>
-
+          <View style={styles.modalButtons}>
+            <FlatButton onPress={handleClose} textStyle={{ fontSize: 16 }}>
+              {i18n.t("cancel")}
+            </FlatButton>
             <GradientButton
-              onPress={handleSubmit}
               style={styles.submitButton}
+              colors={GlobalStyles.gradientColorsButton}
+              onPress={handleSubmit}
+              darkText
               buttonStyle={[
-                styles.submitButtonStyle,
+                { padding: 8, paddingHorizontal: 12 },
                 (isSubmitting || !feedbackText.trim()) && styles.disabledButton,
               ]}
             >
@@ -175,70 +166,64 @@ FeedbackForm.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  modal: {
-    justifyContent: "flex-end",
-    margin: 0,
-  },
-  keyboardAvoidingView: {
+  modalOverlay: {
     flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  container: {
+  modalContainer: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderTopLeftRadius: constantScale(20),
-    borderTopRightRadius: constantScale(20),
-    padding: constantScale(20),
-    maxHeight: "80%",
+    borderRadius: dynamicScale(20, false, 0.5),
+    padding: dynamicScale(24, false, 0.5),
+    marginHorizontal: dynamicScale(20, false, 0.5),
+    maxWidth: dynamicScale(400, false, 0.5),
+    width: "90%",
   },
-  header: {
-    marginBottom: constantScale(20),
+  modalHeader: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: dynamicScale(16, true),
   },
-  title: {
-    fontSize: dynamicScale(24, false, 0.5),
+  modalTitle: {
+    fontSize: dynamicScale(20, false, 0.3),
     fontWeight: "bold",
     color: GlobalStyles.colors.textColor,
-    marginBottom: constantScale(8),
   },
-  subtitle: {
-    fontSize: dynamicScale(16, false, 0.5),
-    color: GlobalStyles.colors.gray600,
-    lineHeight: dynamicScale(22, false, 0.5),
+  modalSubtitle: {
+    fontSize: dynamicScale(16, false, 0.3),
+    color: GlobalStyles.colors.textColor,
+    textAlign: "center",
+    marginBottom: dynamicScale(20, true),
+    lineHeight: dynamicScale(22, true),
   },
   inputContainer: {
-    marginBottom: constantScale(20),
+    marginBottom: dynamicScale(24, true),
   },
   textInput: {
-    backgroundColor: GlobalStyles.colors.gray300,
-    borderRadius: constantScale(12),
-    padding: constantScale(16),
-    fontSize: dynamicScale(16, false, 0.5),
-    color: GlobalStyles.colors.textColor,
-    minHeight: dynamicScale(120, false, 0.5),
     borderWidth: 1,
-    borderColor: GlobalStyles.colors.gray300,
+    borderColor: GlobalStyles.colors.primaryGrayed,
+    borderRadius: dynamicScale(12, false, 0.5),
+    padding: dynamicScale(16, false, 0.5),
+    fontSize: dynamicScale(16, false, 0.3),
+    color: GlobalStyles.colors.textColor,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    minHeight: dynamicScale(120, false, 0.5),
   },
   characterCount: {
     fontSize: dynamicScale(12, false, 0.5),
     color: GlobalStyles.colors.gray500,
     textAlign: "right",
-    marginTop: constantScale(4),
+    marginTop: dynamicScale(4),
   },
-  buttonContainer: {
+  modalButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: constantScale(12),
-  },
-  cancelButton: {
-    flex: 1,
-    paddingVertical: constantScale(12),
-  },
-  cancelButtonText: {
-    textAlign: "center",
+    alignItems: "center",
   },
   submitButton: {
+    marginLeft: dynamicScale(16, false, 0.5),
     flex: 1,
-  },
-  submitButtonStyle: {
-    paddingVertical: constantScale(12),
   },
   disabledButton: {
     opacity: 0.5,

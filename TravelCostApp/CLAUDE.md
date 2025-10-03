@@ -2,6 +2,22 @@
 
 This file provides collaborative guidance and philosophy when using the Claude Code Sessions system.
 
+## Recent Service Updates
+
+### Range Expenses Calculation Fix (2025-01-27)
+
+**Services Modified**: `util/expense.ts`, `components/ExpensesOutput/ExpensesSummary.tsx`, `components/ExpensesOutput/ExpenseStatistics/ExpenseGraph.tsx`
+
+**Changes**:
+
+- Implemented context-aware deduplication for range expenses
+- Added separate functions for total vs period calculations (`getExpensesSumTotal`, `getExpensesSumPeriod`)
+- Enhanced split amount validation to prevent NaN values
+- Improved currency conversion logic with proper error handling
+- Updated all expense calculation components to use appropriate context-aware functions
+
+**Impact**: Fixed NaN values in split calculations and corrected range expense counting in time period views.
+
 ## Collaboration Philosophy
 
 **Core Principles**:

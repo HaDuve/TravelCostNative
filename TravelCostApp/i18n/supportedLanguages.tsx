@@ -830,6 +830,7 @@ const de = {
   notPaidLabel: "Noch nicht bezahlt",
   paidLabel: "Zurückgezahlt",
   travellers: "Reisende",
+  costs: "Kosten",
   countries: "Länder",
   currencies: "Währungen",
   expenses: "Ausgaben",

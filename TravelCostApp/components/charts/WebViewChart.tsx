@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, memo, useMemo } from "react";
-import { View, StyleSheet, Platform } from "react-native";
+import { View, StyleSheet, Platform, TouchableOpacity } from "react-native";
 import { WebView } from "react-native-webview";
+import * as Haptics from "expo-haptics";
 import { generateHTMLTemplate, ChartData, ChartOptions } from "./chartHelpers";
 
 interface WebViewChartProps {
@@ -36,9 +37,13 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(
     null
   );
-  
+  const [showLabels, setShowLabels] = useState(false);
+
   const chartId = useMemo(() => `chart-${Date.now()}`, []);
-  const htmlContent = useMemo(() => generateHTMLTemplate(chartId, options), [chartId, options]);
+  const htmlContent = useMemo(
+    () => generateHTMLTemplate(chartId, options),
+    [chartId, options]
+  );
 
   useEffect(() => {
     if (isChartReady && data) {
@@ -56,6 +61,23 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
     `;
 
     webViewRef.current.injectJavaScript(updateScript);
+  };
+
+  const toggleLabels = () => {
+    if (!webViewRef.current || !isChartReady) return;
+
+    // Trigger haptic feedback
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    const newShowLabels = !showLabels;
+    setShowLabels(newShowLabels);
+
+    const toggleScript = `
+      window.toggleLabels(${newShowLabels});
+      true;
+    `;
+
+    webViewRef.current.injectJavaScript(toggleScript);
   };
 
   const setChartExtremes = (min: number, max: number) => {
@@ -124,9 +146,12 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
     }
   };
 
+  // Increase height for pie charts to give more space
+  const defaultHeight = options.type === "pie" ? 300 : 200;
+
   const webViewStyle = {
     width: width || "100%",
-    height: height || 200,
+    height: height || defaultHeight,
     backgroundColor: "transparent",
     maxWidth: "100%",
     overflow: "hidden",
@@ -135,7 +160,11 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
   };
 
   return (
-    <View style={[styles.container, webViewStyle]}>
+    <TouchableOpacity
+      style={[styles.container, webViewStyle]}
+      onPress={toggleLabels}
+      activeOpacity={0.9}
+    >
       <WebView
         ref={webViewRef}
         source={{ html: htmlContent }}
@@ -154,8 +183,9 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
         allowsInlineMediaPlayback={true}
         mediaPlaybackRequiresUserAction={false}
         originWhitelist={["*"]}
+        pointerEvents="none"
       />
-    </View>
+    </TouchableOpacity>
   );
 };
 

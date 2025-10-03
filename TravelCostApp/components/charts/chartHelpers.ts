@@ -75,10 +75,12 @@ export const generateHTMLTemplate = (
                 duration: 1000
               },
               style: {
-                fontFamily: 'System'
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
               },
-              spacingLeft: 20,
-              spacingRight: 20
+              spacingLeft: ${options.type === "pie" ? 30 : 20},
+              spacingRight: ${options.type === "pie" ? 30 : 20},
+              spacingTop: ${options.type === "pie" ? 30 : 20},
+              spacingBottom: ${options.type === "pie" ? 30 : 20}
             },
             title: {
               text: '${options.title || ""}',
@@ -132,11 +134,33 @@ export const generateHTMLTemplate = (
                   duration: 1000
                 },
               },
+              pie: {
+                size: '90%',
+                center: ['50%', '50%'],
+                dataLabels: {
+                  enabled: false,
+                  useHTML: true
+                }
+              },
               column: {
                 pointWidth: 25,
                 borderRadius: 4,
                 groupPadding: 0.1,
-                pointPadding: 0.1
+                pointPadding: 0.1,
+                dataLabels: {
+                  enabled: false,
+                  style: {
+                    fontSize: '12px',
+                    fontWeight: 'normal',
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                    textOutline: '1px contrast'
+                  },
+                  formatter: function() {
+                    return this.y.toFixed(2) + '${
+                      options.currency ? " " + options.currency : "€"
+                    }';
+                  }
+                }
               }
             },
             series: []
@@ -184,10 +208,56 @@ export const generateHTMLTemplate = (
             }
           }
 
+          function toggleLabels(show) {
+            if (chart && chart.series) {
+              chart.series.forEach((series, index) => {
+                if (series.type === 'pie') {
+                  // Pie chart labels
+                  series.update({
+                    dataLabels: {
+                      enabled: show,
+                      useHTML: true,
+                      style: {
+                        fontSize: '12px',
+                        fontWeight: 'normal',
+                        whiteSpace: 'normal',
+                        textOverflow: 'none',
+                        textAlign: 'center'
+                      },
+                      distance: 10,
+                      allowOverlap: true,
+                      crop: false
+                    }
+                  }, false);
+                } else if (series.type === 'column') {
+                  // Bar chart labels
+                  series.update({
+                    dataLabels: {
+                      enabled: show,
+                      style: {
+                        fontSize: '12px',
+                        fontWeight: 'normal',
+                        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                        textOutline: '1px contrast'
+                      },
+                      formatter: function() {
+                        return this.y.toFixed(2) + '${
+                          options.currency ? " " + options.currency : "€"
+                        }';
+                      }
+                    }
+                  }, false);
+                }
+              });
+              chart.redraw();
+            }
+          }
+
           // Make functions available globally
           window.initChart = initChart;
           window.updateChart = updateChart;
           window.setExtremes = setExtremes;
+          window.toggleLabels = toggleLabels;
 
           // Initial chart creation with empty data
           initChart([]);
@@ -262,11 +332,19 @@ export const createPieChartData = (data: ChartData[]): any[] => {
     {
       name: "Categories",
       colorByPoint: true,
-      data: data.map((item) => ({
-        name: item.label || item.x,
-        y: item.y,
-        color: item.color,
-      })),
+      data: data.map((item) => {
+        const label = item.label || item.x;
+        // Split label into category name and currency value
+        const parts = label.split(" ");
+        const categoryName = parts[0];
+        const currencyValue = parts.slice(1).join(" ");
+
+        return {
+          name: `${categoryName}<br/><span style="white-space: nowrap;">${currencyValue}</span>`,
+          y: item.y,
+          color: item.color,
+        };
+      }),
     },
   ];
 };

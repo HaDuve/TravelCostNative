@@ -15,7 +15,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -122,7 +125,11 @@ const FilteredPieCharts = ({ navigation, route }) => {
           <BackButton
             style={{ marginTop: dynamicScale(-16, false, 0.5) }}
           ></BackButton>
-          <Text style={styles.firstTitleText}>{dayString}</Text>
+          <View style={styles.firstTitleTextContainer}>
+            <Text numberOfLines={1} style={styles.firstTitleText}>
+              {dayString}
+            </Text>
+          </View>
         </View>
 
         <View style={styles.titleContainer}>
@@ -187,11 +194,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  firstTitleTextContainer: {
+    flex: 5,
+    paddingRight: dynamicScale(12, false, 0.5),
+    justifyContent: "center",
+    alignItems: "center",
+  },
   firstTitleText: {
     fontSize: dynamicScale(20, false, 0.5),
     fontWeight: "bold",
     color: GlobalStyles.colors.textColor,
-    // center text
     textAlign: "center",
   },
   landscapeTitleContainer: {

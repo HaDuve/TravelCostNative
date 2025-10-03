@@ -174,7 +174,7 @@ export class ChartController {
     width: number;
     height: number;
   } {
-    const height = isLandscape ? 200 : 240;
+    const height = isLandscape ? 280 : 320;
 
     // Use most of available width with padding
     return {

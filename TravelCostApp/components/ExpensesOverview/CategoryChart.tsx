@@ -74,12 +74,11 @@ export default CategoryChart;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: dynamicScale(12),
-    paddingTop: dynamicScale(60, true),
+    padding: dynamicScale(8),
+    paddingTop: dynamicScale(40, true),
     justifyContent: "center",
     alignItems: "center",
-    height: dynamicScale(240, true),
+    height: dynamicScale(320, true),
   },
   chart: {
     backgroundColor: "transparent",

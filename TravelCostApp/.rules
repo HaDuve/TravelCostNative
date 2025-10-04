@@ -1,7 +1,7 @@
 {
   "rules": {
-    ".read": "true",
-    ".write": "true",
+    ".read": "auth != null",
+    ".write": "auth != null",
     "trips": {
       "$tripId": {
         "$userId": {

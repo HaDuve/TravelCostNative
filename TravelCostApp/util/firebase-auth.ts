@@ -5,6 +5,7 @@ import {
   secureStoreSetItem,
 } from "../store/secure-storage";
 import safeLogError from "./error";
+import { setAxiosAccessToken } from "./axios-config";
 
 const API_KEY = "AIzaSyAPXaokb5pgZ286Ih-ty8ZERoc8nubf1TE";
 const BACKEND_URL =
@@ -42,7 +43,7 @@ async function refreshIdToken(refreshToken: string): Promise<string | null> {
       (Date.now() + parseInt(expires_in) * 1000).toString()
     );
 
-    // Update QPAR for immediate use
+    // Update authentication token for immediate use
     setAxiosAccessToken(access_token);
 
     console.log("[FIREBASE-AUTH] Token refreshed successfully");
@@ -134,7 +135,7 @@ async function reAuthenticate(): Promise<string | null> {
     );
     await secureStoreSetItem("uid", localId);
 
-    // Update QPAR for immediate use
+    // Update authentication token for immediate use
     setAxiosAccessToken(idToken);
 
     console.log("[FIREBASE-AUTH] Re-authentication successful");
@@ -161,7 +162,7 @@ export async function testFirebaseAuth(): Promise<{
       return { success: false, error: "No valid token available" };
     }
 
-    // Test with server info endpoint
+    // Test with server info endpoint (now requires auth)
     const response = await axios.get(
       `${BACKEND_URL}/server.json?auth=${token}`,
       {
@@ -229,23 +230,8 @@ export async function storeAuthData(authData: {
   );
   await secureStoreSetItem("uid", localId);
 
-  // Update QPAR for immediate use
+  // Update authentication token for immediate use
   setAxiosAccessToken(idToken);
 
   console.log("[FIREBASE-AUTH] Auth data stored successfully");
-}
-
-// Import setAxiosAccessToken from http.tsx
-function setAxiosAccessToken(token: string) {
-  if (!token || token?.length < 2) {
-    console.error("[FIREBASE-AUTH] Invalid token provided");
-    setMMKVString("QPAR", "");
-    return;
-  }
-  const qpar = `?auth=${token}`;
-  console.log(
-    "[FIREBASE-AUTH] Setting authentication token:",
-    qpar.substring(0, 20) + "..."
-  );
-  setMMKVString("QPAR", qpar);
 }

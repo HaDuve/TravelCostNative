@@ -47,27 +47,11 @@ export const SERVER_TIMESTAMP_FIELD = "serverTimestamp";
 // });
 axios.defaults.timeout = AXIOS_TIMEOUT_DEFAULT; // Set default timeout to 5 seconds
 
-/** ACCESS TOKEN */
-/** Sets the ACCESS TOKEN for all future http requests */
-export function setAxiosAccessToken(token: string) {
-  if (!token || token?.length < 2) {
-    setMMKVString("QPAR", "");
-    return;
-  }
-
-  // Firebase Realtime Database REST API requires query parameter auth, NOT Authorization header
-  const qpar = `?auth=${token}`;
-  setMMKVString("QPAR", qpar);
-
-  // Clear any Authorization header (Firebase RTDB doesn't use it)
-  delete axios.defaults.headers.common["Authorization"];
-}
+// setAxiosAccessToken moved to util/axios-config.ts to avoid circular dependency
 
 /** Axios Logger */
 axios.interceptors.request.use(
   (config) => {
-    // set header
-    // config.headers.common["Authorization"] = `Bearer ${getMMKVString("QPAR")}`;
     return config;
   },
   (error) => {
@@ -92,16 +76,18 @@ export const dataResponseTime = (func) => {
 // fetch server info
 export const fetchServerInfo = async () => {
   try {
-    const qpar = getMMKVString("QPAR");
-
-    // If no authentication token, return null instead of making API calls
-    if (!qpar || qpar === "") {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token available for fetchServerInfo");
       return null;
     }
 
-    const response = await axios.get(`${BACKEND_URL}/server.json${qpar}`, {
-      timeout: AXIOS_TIMOUT_LONG,
-    });
+    const response = await axios.get(
+      `${BACKEND_URL}/server.json?auth=${authToken}`,
+      {
+        timeout: AXIOS_TIMOUT_LONG,
+      }
+    );
 
     // Process the response data here
     if (!response) throw new Error("No response from server");
@@ -116,12 +102,14 @@ export const fetchServerInfo = async () => {
 // fetch categories function from /trips/tripid/categories
 export async function fetchCategories(tripid: string) {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for fetchCategories");
+      return null;
+    }
+
     const response = await axios.get(
-      BACKEND_URL +
-        "/trips/" +
-        tripid +
-        "/categories.json" +
-        getMMKVString("QPAR"),
+      `${BACKEND_URL}/trips/${tripid}/categories.json?auth=${authToken}`,
       {
         timeout: AXIOS_TIMOUT_LONG,
       }
@@ -134,8 +122,14 @@ export async function fetchCategories(tripid: string) {
 
 export async function deleteCategories(tripid: string) {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for deleteCategories");
+      return null;
+    }
+
     const response = await axios.delete(
-      BACKEND_URL + `/trips/${tripid}/categories.json` + getMMKVString("QPAR")
+      `${BACKEND_URL}/trips/${tripid}/categories.json?auth=${authToken}`
     );
     return response?.data;
   } catch (error) {
@@ -144,10 +138,16 @@ export async function deleteCategories(tripid: string) {
 }
 
 export async function patchCategories(tripid: string, categories: Category[]) {
-  const json = JSON.stringify(categories);
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for patchCategories");
+      return null;
+    }
+
+    const json = JSON.stringify(categories);
     const response = await axios.post(
-      BACKEND_URL + `/trips/${tripid}/categories.json` + getMMKVString("QPAR"),
+      `${BACKEND_URL}/trips/${tripid}/categories.json?auth=${authToken}`,
       json
     );
     return response;
@@ -171,6 +171,12 @@ export async function storeExpense(
   expenseData: ExpenseData
 ) {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for storeExpense");
+      return null;
+    }
+
     // Add serverTimestamp to expense data
     const expenseDataWithTimestamp = {
       ...expenseData,
@@ -178,13 +184,7 @@ export async function storeExpense(
     };
 
     const response = await axios.post(
-      BACKEND_URL +
-        "/trips/" +
-        tripid +
-        "/" +
-        uid +
-        "/expenses.json" +
-        getMMKVString("QPAR"),
+      `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json?auth=${authToken}`,
       expenseDataWithTimestamp
     );
     const id: string = response.data.name;
@@ -229,7 +229,7 @@ const processExpenseResponse = (data: any): ExpenseData[] => {
       isDeleted: r.isDeleted || false,
       serverTimestamp: r.serverTimestamp,
     };
-    
+
     // Include ALL expenses (including deleted ones) - filtering happens in MERGE
     expenses.push(expenseObj);
   }
@@ -362,7 +362,7 @@ export async function fetchExpenses(
           isDeleted: r.isDeleted || false,
           serverTimestamp: r.serverTimestamp,
         };
-        
+
         // Include ALL expenses (including deleted ones) - filtering happens in MERGE
         expenses.push(expenseObj);
       }
@@ -429,28 +429,27 @@ export async function fetchExpenses(
  * @param expenseData - The updated expense data.
  * @returns A Promise that resolves to the response from the server.
  */
-export function updateExpense(
+export async function updateExpense(
   tripid: string,
   uid: string,
   id: string,
   expenseData: ExpenseData
 ) {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for updateExpense");
+      return null;
+    }
+
     // Add serverTimestamp to expense data
     const expenseDataWithTimestamp = {
       ...expenseData,
       [SERVER_TIMESTAMP_FIELD]: Date.now(),
     };
 
-    const response = axios.put(
-      BACKEND_URL +
-        "/trips/" +
-        tripid +
-        "/" +
-        uid +
-        "/expenses/" +
-        `${id}.json` +
-        getMMKVString("QPAR"),
+    const response = await axios.put(
+      `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
       expenseDataWithTimestamp
     );
     return response;
@@ -466,23 +465,22 @@ export function updateExpense(
  * @param id - The ID of the expense.
  * @returns A Promise that resolves to the response from the server.
  */
-export function deleteExpense(tripid: string, uid: string, id: string) {
+export async function deleteExpense(tripid: string, uid: string, id: string) {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for deleteExpense");
+      return null;
+    }
+
     // Soft delete: mark as deleted instead of removing
     const deletionData = {
       isDeleted: true,
       [SERVER_TIMESTAMP_FIELD]: Date.now(),
     };
 
-    const response = axios.patch(
-      BACKEND_URL +
-        "/trips/" +
-        tripid +
-        "/" +
-        uid +
-        "/expenses/" +
-        `${id}.json` +
-        getMMKVString("QPAR"),
+    const response = await axios.patch(
+      `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
       deletionData
     );
     return response;
@@ -498,8 +496,14 @@ export function deleteExpense(tripid: string, uid: string, id: string) {
  * @returns uid
  */
 export async function storeUser(uid: string, userData: object) {
+  const authToken = await getValidIdToken();
+  if (!authToken) {
+    console.warn("[HTTP] No valid auth token for storeUser");
+    return null;
+  }
+
   const response = await axios.put(
-    BACKEND_URL + "/users/" + `${uid}.json` + getMMKVString("QPAR"),
+    `${BACKEND_URL}/users/${uid}.json?auth=${authToken}`,
     userData
   );
   const id = response.data.name;
@@ -511,8 +515,14 @@ export async function storeUser(uid: string, userData: object) {
  */
 export async function updateUser(uid: string, userData: UserData) {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for updateUser");
+      throw new Error("No valid auth token");
+    }
+
     await axios.patch(
-      BACKEND_URL + "/users/" + `${uid}.json` + getMMKVString("QPAR"),
+      `${BACKEND_URL}/users/${uid}.json?auth=${authToken}`,
       userData
     );
   } catch (error) {
@@ -526,9 +536,18 @@ export async function fetchUser(uid: string) {
     return null;
   }
   try {
-    const response = await axios.get(BACKEND_URL + "/users/" + `${uid}.json`, {
-      timeout: AXIOS_TIMOUT_LONG,
-    });
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for fetchUser");
+      return null;
+    }
+
+    const response = await axios.get(
+      `${BACKEND_URL}/users/${uid}.json?auth=${authToken}`,
+      {
+        timeout: AXIOS_TIMOUT_LONG,
+      }
+    );
     const userData: UserData = response.data;
     return userData;
   } catch (error) {
@@ -538,8 +557,14 @@ export async function fetchUser(uid: string) {
 
 export async function storeTrip(tripData: TripData) {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for storeTrip");
+      throw new Error("No valid auth token");
+    }
+
     const response = await axios.post(
-      BACKEND_URL + "/trips.json" + getMMKVString("QPAR"),
+      `${BACKEND_URL}/trips.json?auth=${authToken}`,
       tripData
     );
     const id = response.data.name;
@@ -551,8 +576,14 @@ export async function storeTrip(tripData: TripData) {
 
 export async function updateTrip(tripid: string, tripData: TripData) {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for updateTrip");
+      throw new Error("No valid auth token");
+    }
+
     const res = await axios.patch(
-      BACKEND_URL + "/trips/" + `${tripid}.json` + getMMKVString("QPAR"),
+      `${BACKEND_URL}/trips/${tripid}.json?auth=${authToken}`,
       tripData
     );
     return res;
@@ -564,8 +595,14 @@ export async function updateTrip(tripid: string, tripData: TripData) {
 export async function fetchTrip(tripid: string): Promise<TripData> {
   if (!tripid) return null;
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for fetchTrip");
+      return null;
+    }
+
     const response = await axios.get(
-      BACKEND_URL + "/trips/" + `${tripid}.json` + getMMKVString("QPAR"),
+      `${BACKEND_URL}/trips/${tripid}.json?auth=${authToken}`,
       {
         timeout: AXIOS_TIMOUT_LONG,
       }
@@ -578,8 +615,14 @@ export async function fetchTrip(tripid: string): Promise<TripData> {
 
 export async function deleteTrip(tripid: string) {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for deleteTrip");
+      return null;
+    }
+
     const response = await axios.delete(
-      BACKEND_URL + "/trips/" + `${tripid}.json` + getMMKVString("QPAR")
+      `${BACKEND_URL}/trips/${tripid}.json?auth=${authToken}`
     );
     return response;
   } catch (error) {
@@ -597,10 +640,15 @@ export async function putTravelerInTrip(tripid: string, traveller: Traveller) {
     ) {
       throw new Error("traveller.uid is undefined");
     }
+
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for putTravelerInTrip");
+      return null;
+    }
+
     const response = await axios.put(
-      BACKEND_URL +
-        `/trips/${tripid}/travellers/${traveller.uid}.json` +
-        getMMKVString("QPAR"),
+      `${BACKEND_URL}/trips/${tripid}/travellers/${traveller.uid}.json?auth=${authToken}`,
       { uid: traveller.uid, userName: traveller.userName }
     );
     return response.data;
@@ -621,8 +669,14 @@ export async function fetchTripsTravellers(
   tripid: string
 ): Promise<tripTravellers> {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for fetchTripsTravellers");
+      return null;
+    }
+
     const response = await axios.get(
-      BACKEND_URL + `/trips/${tripid}/travellers.json` + getMMKVString("QPAR"),
+      `${BACKEND_URL}/trips/${tripid}/travellers.json?auth=${authToken}`,
       {
         timeout: AXIOS_TIMOUT_LONG,
       }
@@ -698,16 +752,29 @@ export async function updateTripHistory(userId: string, newTripid: string) {
   // look for newTripid inside of oldTripHistory
   if (tripHistory.indexOf(newTripid) > -1) return;
   tripHistory.push(newTripid);
+
+  const authToken = await getValidIdToken();
+  if (!authToken) {
+    console.warn("[HTTP] No valid auth token for updateTripHistory");
+    return null;
+  }
+
   return axios.put(
-    BACKEND_URL + `/users/${userId}/tripHistory.json` + getMMKVString("QPAR"),
+    `${BACKEND_URL}/users/${userId}/tripHistory.json?auth=${authToken}`,
     tripHistory
   );
 }
 
 export async function storeTripHistory(userId: string, tripHistory: string[]) {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for storeTripHistory");
+      throw new Error("No valid auth token");
+    }
+
     const response = await axios.put(
-      BACKEND_URL + `/users/${userId}/tripHistory.json` + getMMKVString("QPAR"),
+      `${BACKEND_URL}/users/${userId}/tripHistory.json?auth=${authToken}`,
       tripHistory
     );
     return response.data;
@@ -718,8 +785,14 @@ export async function storeTripHistory(userId: string, tripHistory: string[]) {
 
 export async function fetchTripHistory(userId: string) {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for fetchTripHistory");
+      return null;
+    }
+
     const response = await axios.get(
-      BACKEND_URL + `/users/${userId}/tripHistory.json` + getMMKVString("QPAR"),
+      `${BACKEND_URL}/users/${userId}/tripHistory.json?auth=${authToken}`,
       {
         timeout: AXIOS_TIMOUT_LONG,
       }
@@ -732,8 +805,14 @@ export async function fetchTripHistory(userId: string) {
 
 export async function fetchCurrentTrip(userId: string) {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for fetchCurrentTrip");
+      return null;
+    }
+
     const response = await axios.get(
-      BACKEND_URL + `/users/${userId}.json` + getMMKVString("QPAR"),
+      `${BACKEND_URL}/users/${userId}.json?auth=${authToken}`,
       {
         timeout: AXIOS_TIMOUT_LONG,
       }
@@ -746,8 +825,14 @@ export async function fetchCurrentTrip(userId: string) {
 
 export async function fetchUserName(userId: string): Promise<string> {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for fetchUserName");
+      return null;
+    }
+
     const response = await axios.get(
-      BACKEND_URL + `/users/${userId}.json` + getMMKVString("QPAR"),
+      `${BACKEND_URL}/users/${userId}.json?auth=${authToken}`,
       {
         timeout: AXIOS_TIMOUT_LONG,
       }
@@ -760,8 +845,14 @@ export async function fetchUserName(userId: string): Promise<string> {
 
 export async function fetchTripName(tripId: string): Promise<string> {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for fetchTripName");
+      return null;
+    }
+
     const response = await axios.get(
-      BACKEND_URL + `/trips/${tripId}.json` + getMMKVString("QPAR"),
+      `${BACKEND_URL}/trips/${tripId}.json?auth=${authToken}`,
       {
         timeout: AXIOS_TIMOUT_LONG,
       }
@@ -778,10 +869,14 @@ export async function touchTraveler(
   isTouched: boolean
 ) {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for touchTraveler");
+      return null;
+    }
+
     const response = await axios.patch(
-      BACKEND_URL +
-        `/trips/${tripid}/travellers/${firebaseId}.json` +
-        getMMKVString("QPAR"),
+      `${BACKEND_URL}/trips/${tripid}/travellers/${firebaseId}.json?auth=${authToken}`,
       { touched: isTouched, timout: AXIOS_TIMOUT_LONG }
     );
     return response;
@@ -868,11 +963,18 @@ export async function storeExpoPushTokenInTrip(
   if (!tripid || tripid.length < 1)
     usedTripID = await secureStoreGetItem("currentTripId");
   if (!usedTripID) return;
+
+  const authToken = await getValidIdToken();
+  if (!authToken) {
+    console.warn("[HTTP] No valid auth token for storeExpoPushTokenInTrip");
+    return null;
+  }
+
   const localeToken: localeExpoPushToken = token;
   localeToken.tripid = usedTripID;
   localeToken.locale = i18n.locale;
   const response = await axios.get(
-    BACKEND_URL + `/trips/${usedTripID}/tokens.json` + getMMKVString("QPAR"),
+    `${BACKEND_URL}/trips/${usedTripID}/tokens.json?auth=${authToken}`,
     {
       timeout: AXIOS_TIMOUT_LONG,
     }
@@ -893,9 +995,7 @@ export async function storeExpoPushTokenInTrip(
   for (const key of keysToDelete) {
     axiosCalls.push(
       axios.delete(
-        BACKEND_URL +
-          `/trips/${usedTripID}/tokens/${key}.json` +
-          getMMKVString("QPAR")
+        `${BACKEND_URL}/trips/${usedTripID}/tokens/${key}.json?auth=${authToken}`
       )
     );
   }
@@ -903,7 +1003,7 @@ export async function storeExpoPushTokenInTrip(
   let finalResponse: AxiosResponse = null;
   try {
     const response = await axios.post(
-      BACKEND_URL + `/trips/${usedTripID}/tokens.json` + getMMKVString("QPAR"),
+      `${BACKEND_URL}/trips/${usedTripID}/tokens.json?auth=${authToken}`,
       { token: localeToken }
     );
     finalResponse = response;
@@ -953,8 +1053,14 @@ export async function storeFeedback(
   feedbackData: FeedbackData
 ): Promise<string> {
   try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for storeFeedback");
+      throw new Error("No valid auth token");
+    }
+
     const response = await axios.post(
-      BACKEND_URL + "/server/feedback.json" + getMMKVString("QPAR"),
+      `${BACKEND_URL}/server/feedback.json?auth=${authToken}`,
       feedbackData
     );
     return response.data.name; // Firebase-generated ID

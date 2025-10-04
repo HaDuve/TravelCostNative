@@ -4,7 +4,7 @@
 import React from "react";
 import { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { setAxiosAccessToken } from "../util/http";
+import { setAxiosAccessToken } from "../util/axios-config";
 import { getValidIdToken, testFirebaseAuth } from "../util/firebase-auth";
 import { clearLastFetchTimestamp } from "../util/last-fetch-timestamp";
 

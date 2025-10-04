@@ -4,6 +4,21 @@ This file provides collaborative guidance and philosophy when using the Claude C
 
 ## Recent Service Updates
 
+### Currency Exchange Error Fix (2025-01-27)
+
+**Services Modified**: `util/currencyExchange.ts`
+
+**Changes**:
+
+- Fixed error spam issue where "Unable to get offline rate" was logged even when online
+- Separated `getOfflineRate()` (offline only) from `getCachedRate()` (online scenarios)
+- Added `getFallbackRate()` function for calculating rates using USD as intermediate currency
+- Improved error handling to only log errors when truly offline
+- Enhanced main `getRate()` logic with better online/offline state handling
+- Added fallback to cached data when both APIs fail
+
+**Impact**: Eliminated error spam in logs when online, improved currency pair coverage with fallback calculation, and maintained API efficiency while providing better user experience.
+
 ### Range Expenses Calculation Fix (2025-01-27)
 
 **Services Modified**: `util/expense.ts`, `components/ExpensesOutput/ExpensesSummary.tsx`, `components/ExpensesOutput/ExpenseStatistics/ExpenseGraph.tsx`

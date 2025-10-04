@@ -19,12 +19,12 @@ export async function getRate(
 ): Promise<number> {
   const connectionInfo = await NetInfo.fetch();
   const isOnline = connectionInfo && connectionInfo.isInternetReachable;
-  
+
   if (!isOnline) {
     // Truly offline - use offline rate with error logging
     return getOfflineRate(base, target);
   }
-  
+
   // Online - try API1 first
   const response = await getRateAPI1(base, target, forceNewRate);
   if (typeof response === "number" && response === -1) {
@@ -37,18 +37,18 @@ export async function getRate(
     } catch (error) {
       safeLogError(error);
     }
-    
+
     // Both APIs failed, try cached data as last resort
     const cachedRate = getCachedRate(base, target);
     if (cachedRate !== -1) {
       console.log(`Using cached rate for ${base} -> ${target}: ${cachedRate}`);
       return cachedRate;
     }
-    
+
     // No cached data available
     return -1;
   }
-  
+
   return response;
 }
 
@@ -163,17 +163,19 @@ export function getFallbackRate(base: string, target: string, rates: any) {
   if (!rates || !rates.USD) {
     return -1;
   }
-  
+
   const usdRate = rates.USD;
   const targetFromUsd = rates[target];
-  
+
   if (targetFromUsd) {
     // Calculate: base -> USD -> target
     const calculatedRate = targetFromUsd / usdRate;
-    console.log(`Fallback calculation: ${base} -> USD (${usdRate}) -> ${target} (${targetFromUsd}) = ${calculatedRate}`);
+    console.log(
+      `Fallback calculation: ${base} -> USD (${usdRate}) -> ${target} (${targetFromUsd}) = ${calculatedRate}`
+    );
     return calculatedRate;
   }
-  
+
   return -1;
 }
 

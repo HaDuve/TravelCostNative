@@ -1,0 +1,28 @@
+{
+  "developer_name": "Hannes",
+  "trigger_phrases": ["make it so", "run that", "go ahead", "yert", "gogo"],
+  "blocked_tools": ["Edit", "Write", "MultiEdit", "NotebookEdit"],
+  "task_detection": {
+    "enabled": true
+  },
+  "branch_enforcement": {
+    "enabled": true
+  },
+  "priority_prefixes": {
+    "h-": "High priority",
+    "m-": "Medium priority",
+    "l-": "Low priority",
+    "?-": "Investigate"
+  },
+  "task_types": {
+    "implement-": "feature/",
+    "fix-": "fix/",
+    "refactor-": "feature/",
+    "research-": "none",
+    "experiment-": "experiment/",
+    "migrate-": "feature/",
+    "test-": "feature/",
+    "docs-": "feature/"
+  },
+  "api_mode": false
+}

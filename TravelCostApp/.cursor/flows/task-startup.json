@@ -1,0 +1,47 @@
+{
+  "name": "Task Startup Flow",
+  "description": "Starts work on existing tasks with git setup and context loading",
+  "triggers": [
+    {
+      "type": "command",
+      "command": "start-task"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Validate Task File",
+      "action": "validate_task_file",
+      "description": "Check if task file exists and is valid"
+    },
+    {
+      "name": "Git Setup",
+      "action": "setup_git_branches",
+      "description": "Checkout/create appropriate branches for task and submodules"
+    },
+    {
+      "name": "Update Task State",
+      "action": "update_task_state",
+      "description": "Update .cursor/state/current_task.json with task info"
+    },
+    {
+      "name": "Load Context Manifest",
+      "action": "load_context_manifest",
+      "description": "Load and verify context manifest from task file"
+    },
+    {
+      "name": "Verify Branch State",
+      "action": "verify_branch_state",
+      "description": "Ensure all modules are on correct branches"
+    },
+    {
+      "name": "Update Task Status",
+      "action": "update_task_status",
+      "description": "Mark task as in-progress and add start date"
+    }
+  ],
+  "config": {
+    "super_repo_check": true,
+    "branch_verification": true,
+    "context_validation": true
+  }
+}

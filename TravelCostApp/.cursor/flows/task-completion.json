@@ -1,0 +1,58 @@
+{
+  "name": "Task Completion Flow",
+  "description": "Completes tasks with agent delegation, git operations, and archival",
+  "triggers": [
+    {
+      "type": "command",
+      "command": "complete-task"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Pre-completion Checks",
+      "action": "verify_success_criteria",
+      "description": "Verify all success criteria are met"
+    },
+    {
+      "name": "Code Review",
+      "action": "invoke_code_review_agent",
+      "description": "Run code-review subagent for quality and security review"
+    },
+    {
+      "name": "Service Documentation",
+      "action": "invoke_service_docs_agent",
+      "description": "Update CLAUDE.md files with service changes"
+    },
+    {
+      "name": "Task Documentation",
+      "action": "invoke_logging_agent",
+      "description": "Finalize task documentation and work log"
+    },
+    {
+      "name": "Archive Task",
+      "action": "archive_task",
+      "description": "Move completed task to done/ directory"
+    },
+    {
+      "name": "Clear Task State",
+      "action": "clear_task_state",
+      "description": "Clear current task from state file"
+    },
+    {
+      "name": "Git Operations",
+      "action": "commit_and_merge",
+      "description": "Commit changes and merge branches based on task type"
+    },
+    {
+      "name": "Select Next Task",
+      "action": "list_remaining_tasks",
+      "description": "Present remaining tasks for selection"
+    }
+  ],
+  "config": {
+    "agent_delegation": true,
+    "git_operations": true,
+    "task_archival": true,
+    "next_task_selection": true
+  }
+}

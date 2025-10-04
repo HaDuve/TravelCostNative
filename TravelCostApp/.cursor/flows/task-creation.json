@@ -1,0 +1,55 @@
+{
+  "name": "Task Creation Flow",
+  "description": "Creates new tasks with priority prefixes, branch mapping, and context gathering",
+  "triggers": [
+    {
+      "type": "command",
+      "command": "create-task"
+    }
+  ],
+  "steps": [
+    {
+      "name": "Parse Task Input",
+      "action": "parse_task_input",
+      "description": "Parse task name, priority, and type from user input"
+    },
+    {
+      "name": "Create Task File",
+      "action": "create_task_file",
+      "description": "Create task file with proper naming convention and template"
+    },
+    {
+      "name": "Setup Git Branch",
+      "action": "setup_git_branch",
+      "description": "Create appropriate git branch based on task type"
+    },
+    {
+      "name": "Gather Context",
+      "action": "invoke_context_agent",
+      "description": "Run context-gathering subagent to create comprehensive manifest"
+    },
+    {
+      "name": "Update Task State",
+      "action": "update_task_state",
+      "description": "Update .cursor/state/current_task.json with new task info"
+    }
+  ],
+  "config": {
+    "priority_prefixes": {
+      "h-": "High priority",
+      "m-": "Medium priority",
+      "l-": "Low priority",
+      "?-": "Investigate"
+    },
+    "task_types": {
+      "implement-": "feature/",
+      "fix-": "fix/",
+      "refactor-": "feature/",
+      "research-": "none",
+      "experiment-": "experiment/",
+      "migrate-": "feature/",
+      "test-": "feature/",
+      "docs-": "feature/"
+    }
+  }
+}

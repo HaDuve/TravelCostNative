@@ -1,7 +1,8 @@
 /* eslint-disable no-console */
 // Note: Error handling utilities
 import { customEvent } from "vexo-analytics";
-import { shouldEnableVexo, VexoEvents } from "./vexo-tracking";
+import { shouldEnableVexo } from "./vexo-tracking";
+import { VexoEvents } from "./vexo-constants";
 /**
  * Logs an error message to the console, including the file name and line number where the error occurred.
  * Also reports the error to Vexo for production tracking.

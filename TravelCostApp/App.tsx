@@ -114,6 +114,7 @@ import {
   identifyUser,
   VexoUserContext,
 } from "./util/vexo-tracking";
+import { VexoEvents } from "./util/vexo-constants";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -585,18 +586,29 @@ function Root() {
     storedTripId: string,
     storedUid: string
   ) {
+    console.log("🔧 [App.tsx] onlineSetup started");
     const userData: UserData = checkUser;
     const tripid = userData.currentTrip;
-    if (!tripid || tripid?.length < 2) return;
+    if (!tripid || tripid?.length < 2) {
+      console.log("❌ [App.tsx] onlineSetup: Invalid tripid:", tripid);
+      return;
+    }
+    console.log("🔧 [App.tsx] onlineSetup: Loading keys and setting up user");
     // save user Name in Ctx and async
     await loadKeys();
     try {
+      console.log("🔧 [App.tsx] onlineSetup: Adding user name to context");
       await userCtx.addUserName(userData);
+      console.log("🔧 [App.tsx] onlineSetup: Setting current trip");
       await tripCtx.setCurrentTrip(tripid, tripData);
       // console.log("onlineSetup ~ tripid before setItem:", tripid);
+      console.log("🔧 [App.tsx] onlineSetup: Loading category list");
       await userCtx.loadCatListFromAsyncInCtx(tripid);
+      console.log("🔧 [App.tsx] onlineSetup: Touching traveler");
       await touchMyTraveler(storedTripId, storedUid);
+      console.log("✅ [App.tsx] onlineSetup completed successfully");
     } catch (error) {
+      console.log("❌ [App.tsx] onlineSetup failed:", error);
       // console.log("onlineSetup ~ error", error);
       await tripCtx.loadTripDataFromStorage();
     }
@@ -607,42 +619,110 @@ function Root() {
     storedToken: string
   ) {
     if (!isOfflineMode) {
-      // console.log("Online mode");
+      console.log("🌐 [App.tsx] setupOfflineMount: Online mode, skipping");
       return null;
     }
-    // console.log("Offline mode");
-    await userCtx.loadUserNameFromStorage();
-    await tripCtx.loadTripDataFromStorage();
-    await tripCtx.loadTravellersFromStorage();
-    await userCtx.loadCatListFromAsyncInCtx("async");
-    await authCtx.authenticate(storedToken);
+    console.log("📱 [App.tsx] setupOfflineMount: Setting up offline mode");
+    try {
+      console.log(
+        "📱 [App.tsx] setupOfflineMount: Loading user name from storage"
+      );
+      await userCtx.loadUserNameFromStorage();
+      console.log(
+        "📱 [App.tsx] setupOfflineMount: Loading trip data from storage"
+      );
+      await tripCtx.loadTripDataFromStorage();
+      console.log(
+        "📱 [App.tsx] setupOfflineMount: Loading travellers from storage"
+      );
+      await tripCtx.loadTravellersFromStorage();
+      console.log(
+        "📱 [App.tsx] setupOfflineMount: Loading category list from storage"
+      );
+      await userCtx.loadCatListFromAsyncInCtx("async");
+      console.log(
+        "📱 [App.tsx] setupOfflineMount: Authenticating with stored token"
+      );
+      await authCtx.authenticate(storedToken);
+      console.log("✅ [App.tsx] setupOfflineMount completed successfully");
+    } catch (error) {
+      console.log("❌ [App.tsx] setupOfflineMount failed:", error);
+    }
   }
 
   useEffect(() => {
     async function onRootMount() {
+      console.log("🚀 [App.tsx] onRootMount started");
       await handleFirstStart();
       if (DEBUG_RESET_STORAGE) await asyncStoreSafeClear();
       // offline check and set context
       const { isFastEnough } = await isConnectionFastEnough();
       const online = isFastEnough;
+      console.log(
+        "🌐 [App.tsx] Connection check - isFastEnough:",
+        isFastEnough,
+        "online:",
+        online
+      );
       if (isFastEnough) await versionCheck();
       // fetch token and trip
       const storedToken = await secureStoreGetItem("token");
       const storedUid = await secureStoreGetItem("uid");
       const storedTripId = await secureStoreGetItem("currentTripId");
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
+      console.log(
+        "🔑 [App.tsx] Stored credentials - token:",
+        !!storedToken,
+        "uid:",
+        !!storedUid,
+        "tripId:",
+        !!storedTripId,
+        "freshlyCreated:",
+        freshlyCreated
+      );
 
-      const { REVCAT_G, REVCAT_A, VEXO }: Keys = await loadKeys();
+      console.log("🔑 [App.tsx] About to load keys...");
+      let REVCAT_G, REVCAT_A, VEXO;
+      try {
+        // Add timeout to prevent hanging
+        const keysPromise = loadKeys();
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(
+            () => reject(new Error("loadKeys timeout after 5 seconds")),
+            5000
+          )
+        );
+
+        const keys = (await Promise.race([
+          keysPromise,
+          timeoutPromise,
+        ])) as Keys;
+        REVCAT_G = keys.REVCAT_G;
+        REVCAT_A = keys.REVCAT_A;
+        VEXO = keys.VEXO;
+        console.log("🔑 [App.tsx] Keys loaded successfully");
+      } catch (error) {
+        console.log("❌ [App.tsx] Failed to load keys:", error);
+        // Set default values or handle the error
+        REVCAT_G = "";
+        REVCAT_A = "";
+        VEXO = "";
+      }
 
       if (storedToken && storedUid && storedTripId) {
+        console.log(
+          "✅ [App.tsx] All credentials present, proceeding with setup"
+        );
         // setup purchases
         if (Platform.OS === "android") {
+          console.log("🤖 [App.tsx] Configuring Android purchases");
           // Purchases
           Purchases.configure({
             apiKey: REVCAT_G,
             appUserID: storedUid,
           });
         } else if (Platform.OS === "ios" || Platform.OS === "macos") {
+          console.log("🍎 [App.tsx] Configuring iOS/macOS purchases");
           // Purchases
           Purchases.configure({
             apiKey: REVCAT_A,
@@ -651,34 +731,54 @@ function Root() {
         }
         Purchases.setLogLevel(Purchases.LOG_LEVEL.ERROR);
         await Purchases.collectDeviceIdentifiers();
+        console.log("💳 [App.tsx] Purchases configured successfully");
 
         // Initialize Vexo for error and session tracking
         try {
+          console.log("📊 [App.tsx] Initializing Vexo tracking");
           const vexoInitialized = await initializeVexo(VEXO);
           if (vexoInitialized) {
             await identifyUser(storedUid);
+            console.log(
+              "📊 [App.tsx] Vexo tracking initialized and user identified"
+            );
           }
         } catch (vexoError) {
+          console.log("❌ [App.tsx] Vexo initialization failed:", vexoError);
           safeLogError(vexoError, "App.tsx", 692);
         }
 
         const needsTour = await loadTourConfig();
         userCtx.setNeedsTour(needsTour);
+        console.log("🎯 [App.tsx] Tour config loaded, needsTour:", needsTour);
 
         // check if user is online
         if (!online) {
+          console.log(
+            "📱 [App.tsx] Offline mode detected, setting up offline mount"
+          );
           await setupOfflineMount(true, storedToken);
+          console.log("✅ [App.tsx] OFFLINE: setAppIsReady(true) called");
           setAppIsReady(true);
           return;
         }
 
         // set tripId in context
+        console.log("🌍 [App.tsx] Online mode - fetching trip data");
         let tripData;
         if (storedTripId) {
+          console.log(
+            "📋 [App.tsx] Fetching trip data for tripId:",
+            storedTripId
+          );
           tripData = await tripCtx.fetchAndSetCurrentTrip(storedTripId);
           await tripCtx.fetchAndSetTravellers(storedTripId);
           tripCtx.setTripid(storedTripId);
+          console.log("📋 [App.tsx] Trip data fetched successfully");
         } else {
+          console.log(
+            "❌ [App.tsx] No storedTripId found, showing error and logging out"
+          );
           Toast.show({
             type: "error",
             text1: i18n.t("toastLoginError1"),
@@ -687,16 +787,22 @@ function Root() {
           });
           await asyncStoreSafeClear();
           authCtx.logout(tripCtx.tripid);
+          console.log("✅ [App.tsx] NO_TRIP_ID: setAppIsReady(true) called");
           setAppIsReady(true);
           return;
         }
 
         if (freshlyCreated) {
+          console.log("🆕 [App.tsx] Setting freshlyCreated flag");
           await userCtx.setFreshlyCreatedTo(freshlyCreated);
         }
         // check if user was deleted
+        console.log("👤 [App.tsx] Checking user status");
         const checkUser = await fetchUser(storedUid);
         if (!checkUser.userName) {
+          console.log(
+            "❌ [App.tsx] User account deleted or invalid, showing error"
+          );
           Toast.show({
             type: "error",
             text1: i18n.t("toastAccountError1"),
@@ -704,32 +810,67 @@ function Root() {
             visibilityTime: 5000,
           });
           await asyncStoreSafeClear();
+          console.log("✅ [App.tsx] USER_DELETED: setAppIsReady(true) called");
           setAppIsReady(true);
           return;
         }
         if (checkUser.userName && !checkUser.currentTrip) {
+          console.log(
+            "🆕 [App.tsx] User has no current trip, setting freshlyCreated"
+          );
           await userCtx.setFreshlyCreatedTo(true);
         }
         // setup context
+        console.log("⚙️ [App.tsx] Setting up user context and authentication");
         await authCtx.setUserID(storedUid);
         await onlineSetup(tripData, checkUser, storedTripId, storedUid);
         await authCtx.authenticate(storedToken);
+        console.log("✅ [App.tsx] ONLINE_SUCCESS: setAppIsReady(true) called");
         setAppIsReady(true);
       } else {
+        console.log(
+          "❌ [App.tsx] Missing credentials, clearing storage and logging out"
+        );
+        console.log(
+          "❌ [App.tsx] Credential check - token:",
+          !!storedToken,
+          "uid:",
+          !!storedUid,
+          "tripId:",
+          !!storedTripId
+        );
         tripCtx.setIsLoading(false);
         await asyncStoreSafeClear();
         authCtx.logout();
+        console.log("✅ [App.tsx] NO_CREDENTIALS: setAppIsReady(true) called");
         setAppIsReady(true);
       }
+      console.log(
+        "⚠️ [App.tsx] FALLBACK: setAppIsReady(true) called (this should not happen)"
+      );
       setAppIsReady(true);
     }
     const test_onRootMount = dataResponseTime(onRootMount);
 
     try {
+      console.log("🚀 [App.tsx] Starting onRootMount execution");
       test_onRootMount();
     } catch (error) {
+      console.log("❌ [App.tsx] onRootMount execution failed:", error);
       safeLogError(error);
+      console.log("✅ [App.tsx] ERROR_CATCH: setAppIsReady(true) called");
+      setAppIsReady(true);
     }
+
+    // Safety timeout - ensure app is ready after 10 seconds regardless
+    setTimeout(() => {
+      if (!appIsReady) {
+        console.log(
+          "⚠️ [App.tsx] SAFETY_TIMEOUT: setAppIsReady(true) called after 10 seconds"
+        );
+        setAppIsReady(true);
+      }
+    }, 10000);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -744,6 +885,11 @@ function Root() {
       handler.remove();
     };
   }, []);
+
+  // Track appIsReady state changes
+  useEffect(() => {
+    console.log("📱 [App.tsx] appIsReady state changed to:", appIsReady);
+  }, [appIsReady]);
 
   useLayoutEffect(() => {
     async function hideSplashScreen() {
@@ -811,16 +957,24 @@ export default function App() {
                         <OrientationContextProvider>
                           <GestureHandlerRootView style={{ flex: 1 }}>
                             <TourGuideProvider
-                              {...{
-                                borderRadius: 16,
-                                key: "settings",
-                                labels: {
-                                  previous: i18n.t("tourGuideLabelPrevious"),
-                                  next: i18n.t("tourGuideLabelNext"),
-                                  skip: i18n.t("tourGuideLabelSkip"),
-                                  finish: i18n.t("tourGuideLabelFinish"),
-                                },
-                                tooltipComponent: ({
+                              key="settings"
+                              borderRadius={16}
+                              labels={{
+                                previous: i18n.t("tourGuideLabelPrevious"),
+                                next: i18n.t("tourGuideLabelNext"),
+                                skip: i18n.t("tourGuideLabelSkip"),
+                                finish: i18n.t("tourGuideLabelFinish"),
+                              }}
+                              tooltipComponent={({
+                                isFirstStep,
+                                isLastStep,
+                                handleNext,
+                                handlePrev,
+                                handleStop,
+                                currentStep,
+                                labels,
+                              }: TooltipProps) =>
+                                CustomTooltip({
                                   isFirstStep,
                                   isLastStep,
                                   handleNext,
@@ -828,17 +982,8 @@ export default function App() {
                                   handleStop,
                                   currentStep,
                                   labels,
-                                }: TooltipProps) =>
-                                  CustomTooltip({
-                                    isFirstStep,
-                                    isLastStep,
-                                    handleNext,
-                                    handlePrev,
-                                    handleStop,
-                                    currentStep,
-                                    labels,
-                                  }),
-                              }}
+                                })
+                              }
                             >
                               <Root />
 

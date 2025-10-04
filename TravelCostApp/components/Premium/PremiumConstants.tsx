@@ -81,7 +81,15 @@ export async function loadKeys(): Promise<Keys> {
   let VEXO = await secureStoreGetItem("VEXO");
   if (!isFastEnough)
     return { REVCAT_G, REVCAT_A, OPENAI, EXCHANGE, FREEEXCHANGE, BRAN, VEXO };
+
   const data = await fetchServerInfo();
+  if (!data) {
+    console.log(
+      "🔑 [PremiumConstants] fetchServerInfo returned null, using stored keys"
+    );
+    return { REVCAT_G, REVCAT_A, OPENAI, EXCHANGE, FREEEXCHANGE, BRAN, VEXO };
+  }
+
   await secureStoreSetItem("REVCAT_G", data.REVCAT_G);
   await secureStoreSetItem("REVCAT_A", data.REVCAT_A);
   await secureStoreSetItem("OPENAI", data.OPENAI);

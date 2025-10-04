@@ -76,12 +76,14 @@ export const dataResponseTime = (func) => {
 // fetch server info
 export const fetchServerInfo = async () => {
   try {
+    console.log("🌐 [HTTP] fetchServerInfo: Getting auth token");
     const authToken = await getValidIdToken();
     if (!authToken) {
       console.warn("[HTTP] No valid auth token available for fetchServerInfo");
       return null;
     }
 
+    console.log("🌐 [HTTP] fetchServerInfo: Making request to server");
     const response = await axios.get(
       `${BACKEND_URL}/server.json?auth=${authToken}`,
       {
@@ -93,9 +95,12 @@ export const fetchServerInfo = async () => {
     if (!response) throw new Error("No response from server");
     const data = response?.data;
     if (!data) throw new Error("No data on the server");
+    console.log("🌐 [HTTP] fetchServerInfo: Successfully fetched server data");
     return data;
   } catch (error) {
+    console.log("❌ [HTTP] fetchServerInfo failed:", error.message);
     safeLogError(error);
+    return null;
   }
 };
 

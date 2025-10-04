@@ -5,7 +5,7 @@ export default {
     name: "Budget",
     slug: "Travel-Expense",
     scheme: "budgetfornomads",
-    version: "1.3.001",
+    version: "1.3.002",
     orientation: "default",
     icon: "./assets/icon2.png",
     userInterfaceStyle: "light",

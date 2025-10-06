@@ -508,6 +508,13 @@ const en = {
   averageCostPerCountry: "Average Cost Per Country",
   averageCostPerTrip: "Average Cost Per Trip",
   averageCostPerTraveller: "Average Cost Per Traveller",
+
+  // Split Summary Screen
+  overviewOfOwedAmounts: "Overview of owed amounts in the trip:",
+  simplifiedSummaryOfOptimalTransactions:
+    "Simplified Summary of Optimal Transactions in the trip:",
+  settleSplitsConfirmationMessage:
+    "Are you sure you want to settle all splits? Has everyone gotten their money back? (This will only settle splits from Today or Before, but not open splits from the future!)",
 };
 const de = {
   // special expense strings
@@ -1046,6 +1053,13 @@ const de = {
   averageCostPerCountry: "Durchschnittskosten pro Land",
   averageCostPerTrip: "Durchschnittskosten pro Reise",
   averageCostPerTraveller: "Durchschnittskosten pro Reisenden",
+
+  // Split Summary Screen
+  overviewOfOwedAmounts: "Übersicht der geschuldeten Beträge in der Reise:",
+  simplifiedSummaryOfOptimalTransactions:
+    "Vereinfachte Zusammenfassung der optimalen Transaktionen in der Reise:",
+  settleSplitsConfirmationMessage:
+    "Sind Sie sicher, dass Sie alle Schulden begleichen möchten? Hat jeder sein Geld zurückbekommen? (Dies wird nur Schulden von heute oder früher begleichen, aber keine offenen Schulden aus der Zukunft!)",
 };
 const fr = {
   // special expense strings
@@ -1582,6 +1596,13 @@ const fr = {
   averageCostPerCountry: "Coût moyen par pays",
   averageCostPerTrip: "Coût moyen par voyage",
   averageCostPerTraveller: "Coût moyen par voyageur",
+
+  // Split Summary Screen
+  overviewOfOwedAmounts: "Aperçu des montants dus dans le voyage:",
+  simplifiedSummaryOfOptimalTransactions:
+    "Résumé simplifié des transactions optimales dans le voyage:",
+  settleSplitsConfirmationMessage:
+    "Êtes-vous sûr de vouloir régler toutes les dépenses ? Tout le monde a-t-il récupéré son argent ? (Cela ne réglera que les dépenses d'aujourd'hui ou d'avant, mais pas les dépenses ouvertes du futur !)",
 };
 const ru = {
   // special expense strings
@@ -2117,5 +2138,12 @@ const ru = {
   averageCostPerCountry: "Средние расходы на страну",
   averageCostPerTrip: "Средние расходы на поездку",
   averageCostPerTraveller: "Средние расходы на путешественника",
+
+  // Split Summary Screen
+  overviewOfOwedAmounts: "Обзор причитающихся сумм в поездке:",
+  simplifiedSummaryOfOptimalTransactions:
+    "Упрощенная сводка оптимальных транзакций в поездке:",
+  settleSplitsConfirmationMessage:
+    "Вы уверены, что хотите рассчитать все разделы? Все ли получили свои деньги? (Это рассчитает только разделы с сегодняшнего дня или ранее, но не открытые разделы из будущего!)",
 };
-export { en, de, fr, ru };
+export { de, en, fr, ru };

@@ -10,7 +10,7 @@ import { de, en, fr, ru } from "../i18n/supportedLanguages";
 import { reloadApp } from "../util/appState";
 import { setAxiosAccessToken } from "../util/axios-config";
 import safeLogError from "../util/error";
-import { getValidIdToken, testFirebaseAuth } from "../util/firebase-auth";
+import { getValidIdToken } from "../util/firebase-auth";
 import { clearLastFetchTimestamp } from "../util/last-fetch-timestamp";
 
 //Localization
@@ -63,17 +63,9 @@ function AuthContextProvider({ children }) {
         if (validToken) {
           setAuthToken(validToken);
           setAxiosAccessToken(validToken);
-          console.log(
-            "[AUTH-CONTEXT] Authentication initialized with valid token",
-            validToken
-          );
-        } else {
-          console.log(
-            "[AUTH-CONTEXT] No valid token found, user needs to login"
-          );
         }
       } catch (error) {
-        console.error("[AUTH-CONTEXT] Auth initialization error:", error);
+        safeLogError(error);
       }
     }
     initializeAuth();
@@ -84,21 +76,6 @@ function AuthContextProvider({ children }) {
     // Just set the local state and test the authentication
     setAuthToken(token);
     setAxiosAccessToken(token);
-
-    // Test the authentication to ensure it's working
-    try {
-      const authTest = await testFirebaseAuth();
-      if (authTest.success) {
-        console.log("[AUTH-CONTEXT] Authentication verified successfully");
-      } else {
-        console.warn(
-          "[AUTH-CONTEXT] Authentication test failed:",
-          authTest.error
-        );
-      }
-    } catch (error) {
-      console.error("[AUTH-CONTEXT] Authentication test error:", error);
-    }
   }
 
   function logout(tripid?: string) {

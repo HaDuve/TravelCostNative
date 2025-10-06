@@ -35,7 +35,9 @@ export default function safeLogError(
         lineNumber,
         stack: error instanceof Error ? error.stack : undefined,
       });
-    } catch (vexoError) {}
+    } catch (vexoError) {
+      return;
+    }
   }
 
   return message;

@@ -46,11 +46,8 @@ async function refreshIdToken(refreshToken: string): Promise<string | null> {
 
     // Update authentication token for immediate use
     setAxiosAccessToken(access_token);
-
-    console.log("[FIREBASE-AUTH] Token refreshed successfully");
     return access_token;
   } catch (error) {
-    console.error("[FIREBASE-AUTH] Failed to refresh token:", error);
     safeLogError(error);
     return null;
   }
@@ -66,7 +63,6 @@ export async function getValidIdToken(): Promise<string | null> {
     const refreshToken = await secureStoreGetItem("refreshToken");
 
     if (!currentToken) {
-      console.warn("[FIREBASE-AUTH] No token found");
       return null;
     }
 
@@ -76,10 +72,6 @@ export async function getValidIdToken(): Promise<string | null> {
     const bufferTime = 5 * 60 * 1000; // 5 minutes
 
     if (now >= expiryTime - bufferTime) {
-      console.log(
-        "[FIREBASE-AUTH] Token expired or expiring soon, refreshing..."
-      );
-
       if (refreshToken) {
         const newToken = await refreshIdToken(refreshToken);
         if (newToken) {
@@ -88,15 +80,11 @@ export async function getValidIdToken(): Promise<string | null> {
       }
 
       // If refresh failed, try to re-authenticate
-      console.log(
-        "[FIREBASE-AUTH] Refresh failed, attempting re-authentication..."
-      );
       return await reAuthenticate();
     }
 
     return currentToken;
   } catch (error) {
-    console.error("[FIREBASE-AUTH] Error getting valid token:", error);
     safeLogError(error);
     return null;
   }
@@ -111,9 +99,6 @@ async function reAuthenticate(): Promise<string | null> {
     const password = await secureStoreGetItem("ENCP");
 
     if (!email || !password) {
-      console.error(
-        "[FIREBASE-AUTH] No stored credentials for re-authentication"
-      );
       return null;
     }
 
@@ -139,10 +124,8 @@ async function reAuthenticate(): Promise<string | null> {
     // Update authentication token for immediate use
     setAxiosAccessToken(idToken);
 
-    console.log("[FIREBASE-AUTH] Re-authentication successful");
     return idToken;
   } catch (error) {
-    console.error("[FIREBASE-AUTH] Re-authentication failed:", error);
     safeLogError(error);
     return null;
   }
@@ -162,24 +145,13 @@ export async function testFirebaseAuth(): Promise<{
     if (!token) {
       return { success: false, error: "No valid token available" };
     }
-
-    // Test with server info endpoint (now requires auth)
-    const response = await axios.get(
-      `${BACKEND_URL}/server.json?auth=${token}`,
-      {
-        timeout: 10000,
-      }
-    );
-
     const uid = await secureStoreGetItem("uid");
-
     return {
       success: true,
       token: `${token.substring(0, 20)}...`,
       uid: uid || "unknown",
     };
   } catch (error) {
-    console.error("[FIREBASE-AUTH] Auth test failed:", error);
     return {
       success: false,
       error: error.response?.data?.error?.message || error.message,
@@ -233,6 +205,4 @@ export async function storeAuthData(authData: {
 
   // Update authentication token for immediate use
   setAxiosAccessToken(idToken);
-
-  console.log("[FIREBASE-AUTH] Auth data stored successfully");
 }

@@ -2,8 +2,7 @@
 // Note: Error handling utilities
 import { customEvent } from "vexo-analytics";
 
-import { VexoEvents } from "./vexo-constants";
-import { shouldEnableVexo } from "./vexo-tracking";
+import { VexoEvents, shouldEnableVexo } from "./vexo-constants";
 /**
  * Logs an error message to the console, including the file name and line number where the error occurred.
  * Also reports the error to Vexo for production tracking.
@@ -36,9 +35,7 @@ export default function safeLogError(
         lineNumber,
         stack: error instanceof Error ? error.stack : undefined,
       });
-    } catch (vexoError) {
-      console.log("[Error] Failed to report to Vexo:", vexoError);
-    }
+    } catch (vexoError) {}
   }
 
   return message;

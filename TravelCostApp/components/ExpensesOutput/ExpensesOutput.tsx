@@ -16,7 +16,6 @@ i18n.enableFallback = true;
 import { useNavigation } from "@react-navigation/native";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import { memo, useContext, useEffect, useMemo, useState } from "react";
 import Animated, { SlideOutLeft } from "react-native-reanimated";
 import { EXPENSES_LOAD_TIMEOUT } from "../../confAppConstants";
@@ -130,15 +129,6 @@ function ExpensesOutput({
 export default ExpensesOutput;
 
 export const MemoizedExpensesOutput = memo(ExpensesOutput);
-
-ExpensesOutput.propTypes = {
-  expenses: PropTypes.array,
-  fallbackText: PropTypes.string,
-  refreshControl: PropTypes.object,
-  refreshing: PropTypes.bool,
-  showSumForTravellerName: PropTypes.string,
-  isFiltered: PropTypes.bool,
-};
 
 const styles = StyleSheet.create({
   container: {

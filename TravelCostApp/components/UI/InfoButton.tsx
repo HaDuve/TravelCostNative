@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import { Pressable, StyleSheet, Text } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
@@ -16,11 +15,6 @@ const InfoButton = ({ containerStyle, onPress }) => {
 };
 
 export default InfoButton;
-
-InfoButton.propTypes = {
-  containerStyle: PropTypes.object,
-  onPress: PropTypes.func.isRequired,
-};
 
 const styles = StyleSheet.create({
   container: {

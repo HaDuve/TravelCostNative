@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
@@ -62,17 +61,6 @@ function Input({
 }
 
 export default Input;
-
-Input.propTypes = {
-  label: PropTypes.string,
-  keyboardType: PropTypes.string,
-  secure: PropTypes.bool,
-  onUpdateValue: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
-  isInvalid: PropTypes.bool,
-  isInvalidInfoText: PropTypes.string,
-  textContentType: PropTypes.string,
-};
 
 const styles = StyleSheet.create({
   clearInputContainer: { padding: 8 },

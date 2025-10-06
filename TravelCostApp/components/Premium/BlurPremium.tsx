@@ -18,7 +18,6 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import PropTypes from "prop-types";
 import { Card } from "react-native-paper";
 import Animated, { SlideInDown } from "react-native-reanimated";
 
@@ -139,10 +138,6 @@ const BlurPremium = ({ canBack = false }) => {
 };
 
 export default BlurPremium;
-
-BlurPremium.propTypes = {
-  canBack: PropTypes.bool,
-};
 
 const styles = StyleSheet.create({
   titleContainerBlur: {

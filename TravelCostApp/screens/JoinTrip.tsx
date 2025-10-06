@@ -4,15 +4,12 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 
-import { ExpensesContext } from "../store/expenses-context";
-import FlatButton from "../components/UI/FlatButton";
-import PropTypes from "prop-types";
 import { ActivityIndicator } from "react-native-paper";
+import FlatButton from "../components/UI/FlatButton";
+import { ExpensesContext } from "../store/expenses-context";
 
-import BackButton from "../components/UI/BackButton";
-import { NetworkContext } from "../store/network-context";
 import uniqBy from "lodash.uniqby";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -21,13 +18,14 @@ import {
   Text,
   View,
 } from "react-native";
+import BackButton from "../components/UI/BackButton";
+import { NetworkContext } from "../store/network-context";
 
-import safeLogError from "../util/error";
 import Animated, { FadeIn } from "react-native-reanimated";
 import Input from "../components/Auth/Input";
 import Button from "../components/UI/Button";
 import { GlobalStyles } from "../constants/styles";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 import { AuthContext } from "../store/auth-context";
 import { setMMKVObject } from "../store/mmkv";
 import { secureStoreSetItem } from "../store/secure-storage";
@@ -38,15 +36,16 @@ import {
   isConnectionFastEnough,
   isConnectionFastEnoughAsBool,
 } from "../util/connectionSpeed";
+import safeLogError from "../util/error";
 import {
   fetchTrip,
   getAllExpenses,
-  storeTripHistory,
-  updateUser,
-  updateTripHistory,
-  putTravelerInTrip,
   getTravellers,
+  putTravelerInTrip,
+  storeTripHistory,
   TravellerNames,
+  updateTripHistory,
+  updateUser,
 } from "../util/http";
 import { dynamicScale } from "../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
@@ -313,10 +312,7 @@ const JoinTrip = ({ navigation, route }) => {
 };
 
 export default JoinTrip;
-JoinTrip.propTypes = {
-  navigation: PropTypes.object,
-  route: PropTypes.object,
-};
+
 const styles = StyleSheet.create({
   buttonContainer: {
     flex: 1,

@@ -1,7 +1,6 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { DateTime } from "luxon";
-import PropTypes from "prop-types";
 import React, {
   memo,
   useCallback,
@@ -468,9 +467,6 @@ function RecentExpenses({ navigation }) {
 
 export default RecentExpenses;
 export const MemoizedRecentExpenses = memo(RecentExpenses);
-RecentExpenses.propTypes = {
-  navigation: PropTypes.object,
-};
 
 const styles = StyleSheet.create({
   container: {

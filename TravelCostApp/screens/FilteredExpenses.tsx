@@ -1,6 +1,5 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import { StyleSheet, Text, View } from "react-native";
 
 //Localization
@@ -85,14 +84,6 @@ const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
 };
 
 export default FilteredExpenses;
-
-FilteredExpenses.propTypes = {
-  route: PropTypes.object,
-  navigation: PropTypes.object,
-  showSumForTravellerName: PropTypes.string,
-  expensesAsArg: PropTypes.array,
-  dayStringAsArg: PropTypes.string,
-};
 
 const styles = StyleSheet.create({
   container: {

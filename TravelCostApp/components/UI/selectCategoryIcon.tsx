@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import PropTypes from "prop-types";
 import { StyleSheet, TouchableOpacity } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
@@ -28,12 +27,6 @@ const SelectCategoryIcon = ({
 };
 
 export default SelectCategoryIcon;
-
-SelectCategoryIcon.propTypes = {
-  selectedIconName: PropTypes.string.isRequired,
-  iconName: PropTypes.string.isRequired,
-  setSelectedIconName: PropTypes.func.isRequired,
-};
 
 const styles = StyleSheet.create({
   iconButton: {

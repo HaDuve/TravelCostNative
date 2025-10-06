@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
@@ -43,14 +42,6 @@ const SettingsSwitch = ({ style, toggleState, state, label, labelStyle }) => {
   );
 };
 export default SettingsSwitch;
-
-SettingsSwitch.propTypes = {
-  style: PropTypes.object,
-  toggleState: PropTypes.func.isRequired,
-  state: PropTypes.bool.isRequired,
-  label: PropTypes.string.isRequired,
-  labelStyle: PropTypes.object,
-};
 
 const styles = StyleSheet.create({
   container: {

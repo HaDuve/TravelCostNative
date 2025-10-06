@@ -1,5 +1,4 @@
-import PropTypes from "prop-types";
-import React, { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 import SplashScreenOverlay from "../components/UI/SplashScreenOverlay";
 import safeLogError from "../util/error";
@@ -69,5 +68,3 @@ export const SettingsProvider = ({ children }) => {
     </SettingsContext.Provider>
   );
 };
-
-SettingsProvider.propTypes = { children: PropTypes.node.isRequired };

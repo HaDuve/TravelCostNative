@@ -13,7 +13,6 @@ i18n.enableFallback = true;
 
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import Purchases from "react-native-purchases";
 
 import {
@@ -130,16 +129,8 @@ function UserContextProvider({ children }) {
       try {
         const storedFreshlyCreated =
           await asyncStoreGetObject("freshlyCreated");
-        console.log(
-          "UserContext: loaded freshlyCreated from storage:",
-          storedFreshlyCreated
-        );
         if (storedFreshlyCreated !== null) {
           setFreshlyCreated(storedFreshlyCreated);
-          console.log(
-            "UserContext: set freshlyCreated to:",
-            storedFreshlyCreated
-          );
         }
       } catch (error) {
         console.error("Error loading freshlyCreated from storage:", error);
@@ -265,10 +256,8 @@ function UserContextProvider({ children }) {
   }
 
   async function setFreshlyCreatedTo(bool: boolean) {
-    console.log("setFreshlyCreatedTo ~ bool", bool);
     setFreshlyCreated(bool);
     await asyncStoreSetObject("freshlyCreated", bool);
-    console.log("setFreshlyCreatedTo ~ set to storage:", bool);
   }
 
   function deleteUser(id: string) {
@@ -344,7 +333,3 @@ function UserContextProvider({ children }) {
 }
 
 export default UserContextProvider;
-
-UserContextProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-};

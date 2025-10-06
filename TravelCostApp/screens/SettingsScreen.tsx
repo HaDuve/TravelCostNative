@@ -1,12 +1,12 @@
+import React, { useContext, useEffect, useState } from "react";
 import {
   Alert,
+  Platform,
   StyleSheet,
-  View,
   Text,
   TouchableOpacity,
-  Platform,
+  View,
 } from "react-native";
-import React, { useContext, useState, useEffect } from "react";
 import Purchases from "react-native-purchases";
 
 import { TripContext } from "../store/trip-context";
@@ -21,30 +21,29 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import { useFocusEffect } from "@react-navigation/native";
-import { resetTour } from "../util/tourUtil";
-import { reloadApp } from "../util/appState";
-import { ENTITLEMENT_ID } from "../components/Premium/PremiumConstants";
-import PropTypes from "prop-types";
-import GradientButton from "../components/UI/GradientButton";
-import SettingsSection from "../components/UI/SettingsSection";
-import Toast from "react-native-toast-message";
-import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
-import IconButton from "../components/UI/IconButton";
 import { BlurView } from "expo-blur";
-import { NetworkContext } from "../store/network-context";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { ScrollView } from "react-native-gesture-handler";
+import Toast from "react-native-toast-message";
+import { ENTITLEMENT_ID } from "../components/Premium/PremiumConstants";
 import DevContent from "../components/Settings/DevContent";
 import CurrencyExchangeInfo from "../components/UI/CurrencyExchangeInfo";
+import GradientButton from "../components/UI/GradientButton";
+import IconButton from "../components/UI/IconButton";
 import LinkingButton from "../components/UI/LinkButton";
+import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
+import SettingsSection from "../components/UI/SettingsSection";
 import { DEVELOPER_MODE } from "../confAppConstants";
 import { GlobalStyles } from "../constants/styles";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 import { AuthContext } from "../store/auth-context";
+import { NetworkContext } from "../store/network-context";
 import { secureStoreGetItem } from "../store/secure-storage";
 import { UserContext } from "../store/user-context";
+import { reloadApp } from "../util/appState";
 import { dynamicScale } from "../util/scalingUtil";
+import { resetTour } from "../util/tourUtil";
 
 const SettingsScreen = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
@@ -262,10 +261,6 @@ const SettingsScreen = ({ navigation }) => {
 };
 
 export default SettingsScreen;
-
-SettingsScreen.propTypes = {
-  navigation: PropTypes.object.isRequired,
-};
 
 const styles = StyleSheet.create({
   backButton: { marginBottom: "-14%" },

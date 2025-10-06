@@ -1,6 +1,5 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import { StyleSheet, Text, View } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
@@ -29,10 +28,6 @@ const ErrorOverlay = ({ message, onConfirm }) => {
 };
 
 export default ErrorOverlay;
-ErrorOverlay.propTypes = {
-  message: PropTypes.string,
-  onConfirm: PropTypes.func,
-};
 
 const styles = StyleSheet.create({
   container: {

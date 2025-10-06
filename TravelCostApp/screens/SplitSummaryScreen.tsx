@@ -1,6 +1,5 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import React, {
   useCallback,
   useContext,
@@ -15,11 +14,11 @@ import {
   Alert,
   FlatList,
   Platform,
+  Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
-  Pressable,
-  ScrollView,
 } from "react-native";
 import Animated from "react-native-reanimated";
 import Toast from "react-native-toast-message";
@@ -28,7 +27,7 @@ import ErrorOverlay from "../components/UI/ErrorOverlay";
 import FlatButton from "../components/UI/FlatButton";
 import GradientButton from "../components/UI/GradientButton";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -402,11 +401,6 @@ const SplitSummaryScreen = ({ navigation }) => {
 };
 
 export default SplitSummaryScreen;
-
-SplitSummaryScreen.propTypes = {
-  route: PropTypes.object.isRequired,
-  navigation: PropTypes.object.isRequired,
-};
 
 const styles = StyleSheet.create({
   amountText: {

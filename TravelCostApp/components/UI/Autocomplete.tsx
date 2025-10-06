@@ -1,6 +1,5 @@
 // Autocomplete/index.js
 
-import PropTypes from "prop-types";
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { Menu, TextInput } from "react-native-paper";
@@ -155,15 +154,3 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
 
 export default Autocomplete;
 // react-native/Libraries/Lists/VirtualizedList.js
-Autocomplete.propTypes = {
-  value: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  data: PropTypes.array.isRequired,
-  containerStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
-  onChange: PropTypes.func.isRequired,
-  showOnEmpty: PropTypes.bool,
-  placeholder: PropTypes.string,
-  icon: PropTypes.string,
-  style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
-  menuStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
-};

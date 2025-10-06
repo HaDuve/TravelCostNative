@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import { useContext, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -60,16 +59,6 @@ const ExpenseChart = ({ inputData, xAxis, yAxis, budget, currency }) => {
 };
 
 export default ExpenseChart;
-
-ExpenseChart.propTypes = {
-  inputData: PropTypes.array,
-  xAxis: PropTypes.string,
-  yAxis: PropTypes.string,
-  budgetAxis: PropTypes.string,
-  budget: PropTypes.number,
-  daysRange: PropTypes.number,
-  currency: PropTypes.string,
-};
 
 const styles = StyleSheet.create({
   container: {

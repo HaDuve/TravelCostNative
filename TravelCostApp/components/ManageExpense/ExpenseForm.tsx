@@ -63,7 +63,6 @@ import Animated, {
 import { truncateString } from "../../util/string";
 import CurrencyPicker from "../Currency/CurrencyPicker";
 
-import PropTypes from "prop-types";
 import { ActivityIndicator, SegmentedButtons } from "react-native-paper";
 import { ExpensesContext } from "../../store/expenses-context";
 import { NetworkContext } from "../../store/network-context";
@@ -96,6 +95,10 @@ import { getRate } from "../../util/currencyExchange";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { recalcSplitsForExact } from "../../util/split";
 import { formatExpenseWithCurrency } from "../../util/string";
+import {
+  travellersToObjectArray,
+  travellersToStringArray,
+} from "../../util/traveller-utils";
 import CountryPicker from "../Currency/CountryPicker";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { callDebounced } from "../Hooks/useDebounce";
@@ -116,7 +119,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   newCat,
   iconName,
   dateISO,
-  setIsSubmitting,
 }) => {
   // set context
   const authCtx = useContext(AuthContext);
@@ -125,7 +127,11 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   const netCtx = useContext(NetworkContext);
   const expCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
-  const { isPortrait, isLandscape, isTablet } = useContext(OrientationContext);
+  const {
+    isPortrait,
+    isLandscape: _isLandscape,
+    isTablet,
+  } = useContext(OrientationContext);
   const hideSpecial = settings.hideSpecialExpenses;
   const alwaysShowAdvancedSetting = settings.alwaysShowAdvanced || isEditing;
   const editingValues: ExpenseData = defaultValues;
@@ -171,7 +177,8 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     isEditing ? editingValues.country : userCtx.lastCountry
   );
   const [loadingTravellers, setLoadingTravellers] = useState(
-    !tripCtx.travellers && tripCtx.travellers?.length < 1
+    !tripCtx.travellers ||
+      travellersToObjectArray(tripCtx.travellers).length < 1
   );
 
   const [confirmedRange, setConfirmedRange] = useState(false);
@@ -249,7 +256,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   // dropdown for whoPaid picker
   const [currentTravellers, setCurrentTravellers] = useState(
-    tripCtx.travellers
+    travellersToObjectArray(tripCtx.travellers)
   );
 
   const [calcAmount, setCalcAmount] = useState("");
@@ -308,7 +315,8 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   }, [isEditing, alwaysShowAdvancedSetting, iconName]);
 
   useEffect(() => {
-    if (!tripCtx.travellers || tripCtx.travellers?.length < 1)
+    const normalizedTravellers = travellersToObjectArray(tripCtx.travellers);
+    if (!tripCtx.travellers || normalizedTravellers.length < 1)
       setLoadingTravellers(true);
     async function asyncSetTravellers() {
       await tripCtx.fetchAndSetTravellers(tripCtx.tripid);
@@ -320,9 +328,12 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   useEffect(() => {
     // setlistequal with tripcontext.travellers
-    if (tripCtx.travellers) setListEQUAL(tripCtx.travellers);
+    if (tripCtx.travellers) {
+      const normalizedTravellers = travellersToObjectArray(tripCtx.travellers);
+      setListEQUAL(normalizedTravellers);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tripCtx.travellers?.length]);
+  }, [tripCtx.travellers]);
 
   // datepicker states
   const [showDatePickerRange, setShowDatePickerRange] = useState(false);
@@ -386,7 +397,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   }, [dateISO]);
 
   // Helper function to safely format dates
-  const getSafeFormattedDate = (dateValue: string | undefined): string => {
+  const _getSafeFormattedDate = (dateValue: string | undefined): string => {
     if (dateValue && dateValue !== "") {
       return getFormattedDate(new Date(dateValue));
     }
@@ -462,10 +473,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       setDuplOrSplit(defaultValues.duplOrSplit);
     }
     if (defaultValues.whoPaid) {
-      console.log(
-        "🔍 Setting whoPaid from defaultValues:",
-        defaultValues.whoPaid
-      );
       setWhoPaidWithLogging(defaultValues.whoPaid);
     }
     if (defaultValues.isPaid !== undefined) {
@@ -615,7 +622,8 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   useEffect(() => {
     if (netCtx.strongConnection) {
       // console.log("~~ currentTravellers:", tripCtx.travellers);
-      setCurrentTravellers(tripCtx.travellers);
+      const normalizedTravellers = travellersToObjectArray(tripCtx.travellers);
+      setCurrentTravellers(normalizedTravellers);
     }
   }, [tripCtx.travellers, netCtx.strongConnection]);
 
@@ -635,9 +643,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   const [modalFlow, setModalFlow] = useState(modalStates.NONE);
 
-  const nextModal = (selectedValue, currentSplitType) => {
-    console.log("🔍 nextModal called:", modalFlow, "->", selectedValue);
-
+  const nextModal = (selectedValue, _currentSplitType) => {
     switch (modalFlow) {
       case modalStates.WHO_PAID:
         if (selectedValue === "__ADD_TRAVELLER__") {
@@ -653,25 +659,18 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
       case modalStates.HOW_SHARED:
         if (selectedValue === "EXACT") {
-          console.log("🔍 Transitioning from HOW_SHARED to EXACT_SHARING");
           setModalFlow(modalStates.NONE);
           setTimeout(() => {
-            console.log("🔍 Opening EXACT_SHARING modal");
             setModalFlow(modalStates.EXACT_SHARING);
           }, 100);
         } else {
-          console.log("🔍 HOW_SHARED flow complete, closing all modals");
           setModalFlow(modalStates.NONE); // EQUAL/SELF, flow complete
         }
         break;
 
       case modalStates.EXACT_SHARING:
-        console.log(
-          "🔍 EXACT_SHARING case triggered, opening traveller picker"
-        );
         setModalFlow(modalStates.NONE);
         setTimeout(() => {
-          console.log("🔍 Opening traveller multi-picker");
           openTravellerMultiPicker(); // Open the traveller picker
         }, 100);
         break;
@@ -688,34 +687,20 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   // Wrap setWhoPaid with logging
   const setWhoPaidWithLogging = value => {
-    console.log(
-      "🔍 setWhoPaid called with:",
-      value,
-      "from:",
-      new Error().stack.split("\n")[2]
-    );
     setWhoPaid(value);
   };
 
   // Custom setValue handler to handle both normal selections and special __ADD_TRAVELLER__ case
   const handleWhoPaidChange = value => {
-    console.log("🔍 handleWhoPaidChange called with:", value, typeof value);
-
     // Ignore function objects (weird DropDownPicker behavior for special case)
     if (typeof value === "function") {
-      console.log("🔍 handleWhoPaidChange ignoring function value");
       return;
     }
 
     // Handle normal string values
     if (value === "__ADD_TRAVELLER__") {
-      console.log(
-        "🔍 handleWhoPaidChange intercepted __ADD_TRAVELLER__, setting to:",
-        userCtx.userName
-      );
       setWhoPaidWithLogging(userCtx.userName);
     } else {
-      console.log("🔍 handleWhoPaidChange setting normal value:", value);
       setWhoPaidWithLogging(value);
     }
   };
@@ -842,7 +827,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   }
 
   function openTravellerMultiPicker() {
-    console.log("🔍 openTravellerMultiPicker called");
     // console.log("splitType", splitType);
     // add whole traveling group who paid automatically to shared list
     if (!editingValues) {
@@ -863,7 +847,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   function splitHandler() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const splitTravellers = splitTravellersList;
+    const splitTravellers = travellersToStringArray(splitTravellersList);
     // calculate splits
     const listSplits = calcSplitList(
       splitType,
@@ -878,7 +862,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   async function resetSplitHandler() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const splitTravellers = splitTravellersList;
+    const splitTravellers = travellersToStringArray(splitTravellersList);
     // console.log("resetSplitHandler ~ splitTravellers:", splitTravellers);
     // calculate splits
     const listSplits = calcSplitList(
@@ -916,14 +900,15 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     }
     setSplitList(splitListTemp);
     if (splitType === "EQUAL") {
-      const splitTravellersTemp = tripCtx.travellers.filter(
-        traveller => traveller !== userName
+      const normalizedTravellers = travellersToObjectArray(tripCtx.travellers);
+      const splitTravellersTemp = normalizedTravellers.filter(
+        traveller => traveller.userName !== userName
       );
       const listSplits = calcSplitList(
         "EQUAL",
         +amountValue,
         whoPaid,
-        splitTravellersTemp
+        travellersToStringArray(splitTravellersTemp)
       );
       setSplitList(listSplits);
       setSplitListValid(validateSplitList(listSplits, splitType, +amountValue));
@@ -1099,7 +1084,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       inputChangedHandler("currency", defaultCurrency);
     }
     if (!inputs.whoPaid.isValid) {
-      console.log("🔍 Setting whoPaid due to invalid input:", userCtx.userName);
       setWhoPaidWithLogging(userCtx.userName);
     }
   }
@@ -1340,38 +1324,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     onCancelRange,
     onConfirmRange,
   });
-
-  const tempValues: ExpenseData = {
-    uid: authCtx.uid,
-    amount: +amountValue,
-    date: inputs.date.value
-      ? typeof inputs.date.value === "string"
-        ? new Date(inputs.date.value)
-        : inputs.date.value
-      : new Date(),
-    startDate: startDate
-      ? typeof startDate === "string"
-        ? new Date(startDate)
-        : startDate
-      : new Date(),
-    endDate: endDate
-      ? typeof endDate === "string"
-        ? new Date(endDate)
-        : endDate
-      : new Date(),
-    description: inputs.description.value,
-    category: newCat ? pickedCat : inputs.category.value,
-    country: inputs.country.value,
-    currency: inputs.currency.value,
-    whoPaid,
-    splitType,
-    listEQUAL: splitTravellersList,
-    splitList,
-    duplOrSplit,
-    iconName,
-    categoryString: "",
-    calcAmount: 0,
-  };
 
   const headerHeight = useHeaderHeight();
   const hideBottomBorder = duplOrSplit == 1 || duplOrSplit == 2;
@@ -1672,7 +1624,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                                   tempSplitType,
                                   +amountValue,
                                   userCtx.userName,
-                                  currentTravellers
+                                  travellersToStringArray(currentTravellers)
                                 );
                                 // console.log("listSplits:", listSplits);
                                 if (listSplits) {
@@ -1705,7 +1657,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                             setValue={handleWhoPaidChange}
                             setItems={setItems}
                             onClose={() => {
-                              console.log("🔍 whoPaid dropdown onClose called");
                               // Only reset modal flow if we're not transitioning to another modal
                               if (modalFlow === modalStates.WHO_PAID) {
                                 setModalFlow(modalStates.NONE);
@@ -1718,7 +1669,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                               );
                             }}
                             onSelectItem={item => {
-                              console.log("🔍 onSelectItem called with:", item);
                               Haptics.impactAsync(
                                 Haptics.ImpactFeedbackStyle.Light
                               );
@@ -1789,10 +1739,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                         nextModal(item.value, item.value);
                       }}
                       onClose={() => {
-                        console.log(
-                          "🔍 Split types dropdown onClose called, modalFlow:",
-                          modalFlow
-                        );
                         // Only reset modal flow if we're not transitioning to another modal
                         // Don't reset if we're about to go to EXACT_SHARING
                         if (modalFlow === modalStates.HOW_SHARED) {
@@ -1829,7 +1775,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                   <DropDownPicker
                     // renderListItem={(props) => renderDropDownList(props)}
                     open={modalFlow === modalStates.EXACT_SHARING || openEQUAL}
-                    value={splitTravellersList}
+                    value={travellersToStringArray(splitTravellersList)}
                     items={splitItemsEQUAL}
                     setOpen={open => {
                       if (open) {
@@ -1848,7 +1794,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                     setValue={setListEQUAL}
                     setItems={setSplitItemsEQUAL}
                     onClose={() => {
-                      console.log("🔍 Traveller multi-picker onClose called");
                       setModalFlow(modalStates.NONE);
                       splitHandler();
                     }}
@@ -2220,46 +2165,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 };
 
 export default ExpenseForm;
-
-ExpenseForm.propTypes = {
-  onCancel: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
-  setIsSubmitting: PropTypes.func.isRequired,
-  isEditing: PropTypes.bool,
-  defaultValues: PropTypes.shape({
-    amount: PropTypes.number,
-    date: PropTypes.string,
-    description: PropTypes.string,
-    category: PropTypes.string,
-    country: PropTypes.string,
-    currency: PropTypes.string,
-    whoPaid: PropTypes.string,
-    splitType: PropTypes.string,
-    listEQUAL: PropTypes.arrayOf(
-      PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.shape({
-          userName: PropTypes.string,
-          amount: PropTypes.number,
-        }),
-      ])
-    ),
-    splitList: PropTypes.arrayOf(
-      PropTypes.shape({
-        userName: PropTypes.string,
-        amount: PropTypes.number,
-      })
-    ),
-    duplOrSplit: PropTypes.number,
-  }),
-  pickedCat: PropTypes.string,
-  submitButtonLabel: PropTypes.string,
-  navigation: PropTypes.object,
-  editedExpenseId: PropTypes.string,
-  newCat: PropTypes.bool,
-  iconName: PropTypes.string,
-  dateISO: PropTypes.string,
-};
 
 const styles = StyleSheet.create({
   advancedRow: {

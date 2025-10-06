@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import Svg, { G, Path } from "react-native-svg";
 
 import { GlobalStyles } from "../../constants/styles";
@@ -49,7 +48,3 @@ function ToggleButton({ toggled = false }) {
 }
 
 export default ToggleButton;
-
-ToggleButton.propTypes = {
-  toggled: PropTypes.bool,
-};

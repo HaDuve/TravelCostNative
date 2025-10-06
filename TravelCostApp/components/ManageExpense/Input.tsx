@@ -1,5 +1,4 @@
 /* eslint-disable react/react-in-jsx-scope */
-import PropTypes from "prop-types";
 import { Keyboard, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
@@ -58,20 +57,6 @@ const Input = ({
 };
 
 export default Input;
-
-Input.propTypes = {
-  label: PropTypes.string,
-  style: PropTypes.object,
-  textInputConfig: PropTypes.object.isRequired,
-  invalid: PropTypes.bool,
-  inputAccessoryViewID: PropTypes.string,
-  autoFocus: PropTypes.bool,
-  inputStyle: PropTypes.any,
-  placeholder: PropTypes.string,
-  editable: PropTypes.bool,
-  selectTextOnFocus: PropTypes.bool,
-  hasCurrency: PropTypes.bool,
-};
 
 const styles = StyleSheet.create({
   hasCurrencyStyle: {

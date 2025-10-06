@@ -1,7 +1,6 @@
 import * as Haptics from "expo-haptics";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import React, { useContext, useRef, useState } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
@@ -291,12 +290,6 @@ const areEqual = (prevProps, nextProps) => {
 };
 
 export const MemoizedExpensesOverview = React.memo(ExpensesOverview, areEqual);
-
-ExpensesOverview.propTypes = {
-  expenses: PropTypes.array.isRequired,
-  periodName: PropTypes.string.isRequired,
-  navigation: PropTypes.object.isRequired,
-};
 
 const styles = StyleSheet.create({
   chevronContainer: {

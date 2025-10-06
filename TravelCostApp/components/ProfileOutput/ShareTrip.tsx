@@ -14,8 +14,6 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import * as Haptics from "expo-haptics";
-import PropTypes from "prop-types";
-
 import safeLogError from "../../util/error";
 import { dynamicScale } from "../../util/scalingUtil";
 import GradientButton from "../UI/GradientButton";
@@ -95,11 +93,6 @@ const ShareTripButton = ({ route, navigation }) => {
 };
 
 export default ShareTripButton;
-
-ShareTripButton.propTypes = {
-  route: PropTypes.object.isRequired,
-  navigation: PropTypes.object.isRequired,
-};
 
 const styles = StyleSheet.create({
   buttonContainer: {

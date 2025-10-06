@@ -3,7 +3,6 @@
 import * as Haptics from "expo-haptics";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import { useContext, useEffect, useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -191,10 +190,6 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
 };
 
 export default ProfileForm;
-
-ProfileForm.propTypes = {
-  navigation: PropTypes.object,
-};
 
 const styles = StyleSheet.create({
   avatar: {

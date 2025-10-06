@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import uniqBy from "lodash.uniqby";
-import PropTypes from "prop-types";
 import React, { createContext, useEffect, useReducer } from "react";
 
 import { toDate, toDateString } from "../types/date";
@@ -527,6 +526,3 @@ function ExpensesContextProvider({ children }) {
 }
 
 export default ExpensesContextProvider;
-ExpensesContextProvider.propTypes = {
-  children: PropTypes.node,
-};

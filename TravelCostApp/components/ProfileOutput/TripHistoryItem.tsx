@@ -23,7 +23,6 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import PropTypes from "prop-types";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import * as Progress from "react-native-progress";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
@@ -70,7 +69,13 @@ export type TripHistoryItemType = {
   days: number;
 };
 
-function TripHistoryItem({ tripid, trips }) {
+interface TripHistoryItemProps {
+  tripid?: string;
+  setRefreshing?: (value: boolean) => void;
+  trips?: TripHistoryItemType[];
+}
+
+function TripHistoryItem({ tripid, trips }: TripHistoryItemProps) {
   const navigation = useNavigation<RootNavigationProp>();
   const tripCtx = useContext(TripContext);
   const expenseCtx = useContext(ExpensesContext);
@@ -124,31 +129,32 @@ function TripHistoryItem({ tripid, trips }) {
     ]
   );
 
-  function loadTripHistoryItem(tripid: string) {
-    const trip: TripHistoryItemType = getMMKVObject(
-      "tripHistoryItem" + `_${tripid}`
-    );
-    if (trip) {
-      setTripName(trip.tripName);
-      setTotalBudget(trip.totalBudget);
-      setDailyBudget(trip.dailyBudget);
-      setTripCurrency(trip.tripCurrency);
-      setIsDynamicDailyBudget(trip.isDynamicDailyBudget);
-      setSumOfExpenses(trip.sumOfExpenses);
-      setProgress(trip.progress);
-      setDays(trip.days);
-
-      // Use standardized traveller conversion
-      const normalizedTravellers = travellersToObjectArray(trip.travellers);
-      console.log("loadTripHistoryItem: trip.travellers:", trip.travellers);
-      console.log(
-        "loadTripHistoryItem: normalized travellers:",
-        normalizedTravellers
+  const loadTripHistoryItem = useCallback(
+    (tripid: string) => {
+      const trip: TripHistoryItemType = getMMKVObject(
+        "tripHistoryItem" + `_${tripid}`
       );
-      setTravellers(normalizedTravellers);
-      setIsFetching(false);
-    }
-  }
+      if (trip) {
+        setTripName(trip.tripName);
+        setTotalBudget(trip.totalBudget);
+        setDailyBudget(trip.dailyBudget);
+        setTripCurrency(trip.tripCurrency);
+        setIsDynamicDailyBudget(trip.isDynamicDailyBudget);
+        setSumOfExpenses(trip.sumOfExpenses);
+        setProgress(trip.progress);
+        setDays(trip.days);
+
+        // Use current trip context travellers as source of truth instead of stored trip data
+        // This ensures consistency across all components
+        const normalizedTravellers = travellersToObjectArray(
+          tripCtx.travellers
+        );
+        setTravellers(normalizedTravellers);
+        setIsFetching(false);
+      }
+    },
+    [tripCtx.travellers]
+  );
 
   // Memoize traveller processing to prevent unnecessary re-computations
   const processedTravellers = useMemo(() => {
@@ -189,8 +195,6 @@ function TripHistoryItem({ tripid, trips }) {
     else setDailyBudget(isDynamic ? dynamicDailyBudget : tripCtx.dailyBudget);
 
     // Always update travellers from context for current trip - this ensures consistency
-    console.log("handleContextTrip: tripCtx.travellers:", tripCtx.travellers);
-    console.log("handleContextTrip: processedTravellers:", processedTravellers);
     setTravellers(processedTravellers);
 
     setIsFetching(false);
@@ -290,21 +294,15 @@ function TripHistoryItem({ tripid, trips }) {
     async function getTripTravellers() {
       try {
         const listTravellers: TravellerNames = await getTravellers(tripid);
-        console.log("getTripTravellers: listTravellers:", listTravellers);
 
         // Use standardized traveller conversion
         const normalizedTravellers = travellersToObjectArray(listTravellers);
-        console.log(
-          "getTripTravellers: normalized travellers:",
-          normalizedTravellers
-        );
         // Only update travellers if this is not the current context trip
         // to avoid overriding context data
         if (!contextTrip) {
           setTravellers(normalizedTravellers);
         }
       } catch (error) {
-        console.error("getTripTravellers: error:", error);
         return;
       }
     }
@@ -349,7 +347,15 @@ function TripHistoryItem({ tripid, trips }) {
         safeLogError(error);
       }
     }
-  }, [allLoaded, contextTrip, handleContextTrip, netCtx.isConnected, tripid]);
+  }, [
+    allLoaded,
+    contextTrip,
+    handleContextTrip,
+    loadTripHistoryItem,
+    netCtx.isConnected,
+    tripid,
+    tripCtx.travellers,
+  ]);
 
   useEffect(() => {
     if (allLoaded) storeTripHistoryItem(tripid);
@@ -460,7 +466,6 @@ function TripHistoryItem({ tripid, trips }) {
   function renderTravellers(item: { item: TravellerObject }) {
     // Add debugging and better null checks
     if (!item || !item.item || !item.item.userName) {
-      console.log("renderTravellers: Invalid item structure:", item);
       return <></>;
     }
     return (
@@ -542,13 +547,6 @@ function TripHistoryItem({ tripid, trips }) {
           keyExtractor={(item: TravellerObject) => {
             return item.userName + tripid;
           }}
-          onLayout={() => {
-            console.log("FlatList travellers data:", travellers);
-            console.log(
-              "FlatList filtered data:",
-              travellers.filter(t => t && t.userName)
-            );
-          }}
         ></FlatList>
       </View>
     </Pressable>
@@ -556,12 +554,6 @@ function TripHistoryItem({ tripid, trips }) {
 }
 
 export default TripHistoryItem;
-
-TripHistoryItem.propTypes = {
-  tripid: PropTypes.string,
-  setRefreshing: PropTypes.func,
-  trips: PropTypes.array,
-};
 
 const styles = StyleSheet.create({
   amount: {

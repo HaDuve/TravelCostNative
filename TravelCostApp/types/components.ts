@@ -303,7 +303,6 @@ export interface ExpenseFormProps {
   newCat?: string;
   iconName?: string;
   dateISO: string;
-  setIsSubmitting?: (value: boolean) => void;
 }
 
 // Overview Screen Props

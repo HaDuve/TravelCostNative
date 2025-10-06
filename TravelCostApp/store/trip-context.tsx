@@ -135,7 +135,6 @@ function TripContextProvider({ children }) {
     const stored_uid = await secureStoreGetItem("uid");
     if (!(stored_tripid || stored_uid)) return;
     setTripid(stored_tripid ?? "");
-    console.log("loadTripidFetchTrip ~ stored_tripid:", stored_tripid);
     const { isFastEnough } = await isConnectionFastEnough();
     if (isFastEnough) {
       try {
@@ -217,38 +216,21 @@ function TripContextProvider({ children }) {
   }
 
   async function fetchAndSetTravellers(tripid: string) {
-    console.log(
-      "🔄 [TripContext] fetchAndSetTravellers called with tripid:",
-      tripid
-    );
     const { isFastEnough } = await isConnectionFastEnough();
     if (!isFastEnough) {
-      console.log(
-        "🔄 [TripContext] Offline mode, loading travellers from storage"
-      );
       await loadTravellersFromStorage();
       return;
     }
     if (!tripid || tripid === "") {
-      console.log(
-        "🔄 [TripContext] No tripid provided, skipping traveller fetch"
-      );
       return;
     }
     // updates the current Travellers in context
     try {
-      console.log(
-        "🔄 [TripContext] Fetching travellers from server for tripid:",
-        tripid
-      );
       const travellers = await getTravellers(tripid);
-      console.log("🔄 [TripContext] Fetched travellers:", travellers);
       if (travellers?.length < 1) throw new Error("no travellers found");
       saveTravellersInStorage(travellers);
       setTravellers(travellers);
-      console.log("🔄 [TripContext] Travellers set in context:", travellers);
     } catch (error) {
-      console.log("🔄 [TripContext] Error fetching travellers:", error);
       safeLogError(error);
       throw new Error("no travellers found");
     }
@@ -257,7 +239,6 @@ function TripContextProvider({ children }) {
   async function setCurrentTrip(tripid: string, trip: TripData) {
     if (!trip) return;
     if (tripid === "reset") {
-      console.log("🔄 [TripContext] Resetting trip data");
       _setTripid("");
       setTripName("");
       setTotalBudget("");
@@ -292,10 +273,6 @@ function TripContextProvider({ children }) {
     setIsLoading(false);
     setIsDynamicDailyBudget(trip.isDynamicDailyBudget);
     // Store travellers in their original format for consistent handling
-    console.log(
-      "🔄 [TripContext] setCurrentTrip - trip.travellers:",
-      trip.travellers
-    );
     setTravellers(trip.travellers);
   }
 

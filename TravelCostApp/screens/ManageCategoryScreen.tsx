@@ -1,21 +1,14 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useContext,
-  useMemo,
-} from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
-  View,
+  FlatList,
+  KeyboardAvoidingView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  FlatList,
-  StyleSheet,
-  KeyboardAvoidingView,
+  View,
 } from "react-native";
 // import animated from reanimated
 import Modal from "react-native-modal";
@@ -33,7 +26,7 @@ import BackgroundGradient from "../components/UI/BackgroundGradient";
 import GradientButton from "../components/UI/GradientButton";
 import SelectCategoryIcon from "../components/UI/selectCategoryIcon";
 import { GlobalStyles } from "../constants/styles";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -44,19 +37,19 @@ i18n.enableFallback = true;
 
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { TripContext } from "../store/trip-context";
-import { fetchCategories, updateTrip } from "../util/http";
 import { UserContext } from "../store/user-context";
+import { fetchCategories, updateTrip } from "../util/http";
 
 import * as Haptics from "expo-haptics";
 
-import { Category, DEFAULTCATEGORIES } from "../util/category";
 import { alertYesNo } from "../components/Errors/Alert";
-import IconButton from "../components/UI/IconButton";
-import { NetworkContext } from "../store/network-context";
-import InfoButton from "../components/UI/InfoButton";
-import FlatButton from "../components/UI/FlatButton";
 import BlurPremium from "../components/Premium/BlurPremium";
+import FlatButton from "../components/UI/FlatButton";
+import IconButton from "../components/UI/IconButton";
+import InfoButton from "../components/UI/InfoButton";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
+import { NetworkContext } from "../store/network-context";
+import { Category, DEFAULTCATEGORIES } from "../util/category";
 import safeLogError from "../util/error";
 import { dynamicScale } from "../util/scalingUtil";
 
@@ -569,11 +562,6 @@ const ManageCategoryScreen = ({ navigation }) => {
 };
 
 export default ManageCategoryScreen;
-
-ManageCategoryScreen.propTypes = {
-  route: PropTypes.object.isRequired,
-  navigation: PropTypes.object.isRequired,
-};
 
 const styles = StyleSheet.create({
   addButton: {

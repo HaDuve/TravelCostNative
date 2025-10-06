@@ -1,6 +1,5 @@
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
-import PropTypes from "prop-types";
 import React from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -49,15 +48,6 @@ const GradientButton: React.FC<GradientButtonProps> = ({
 };
 
 export default GradientButton;
-GradientButton.propTypes = {
-  children: PropTypes.node.isRequired,
-  onPress: PropTypes.func.isRequired,
-  buttonStyle: PropTypes.object,
-  textStyle: PropTypes.object,
-  darkText: PropTypes.bool,
-  style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
-  colors: PropTypes.array,
-};
 
 const styles = StyleSheet.create({
   button: {

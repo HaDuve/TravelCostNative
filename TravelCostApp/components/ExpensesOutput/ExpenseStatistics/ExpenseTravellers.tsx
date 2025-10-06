@@ -13,7 +13,6 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import PropTypes from "prop-types";
 import { useContext } from "react";
 import Animated, { Layout } from "react-native-reanimated";
 
@@ -192,13 +191,6 @@ const ExpenseTravellers = ({
 };
 
 export default ExpenseTravellers;
-
-ExpenseTravellers.propTypes = {
-  expenses: PropTypes.array,
-  periodName: PropTypes.string,
-  navigation: PropTypes.object,
-  forcePortraitFormat: PropTypes.bool,
-};
 
 const styles = StyleSheet.create({
   categoryCard: {

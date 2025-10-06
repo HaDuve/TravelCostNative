@@ -14,8 +14,6 @@ i18n.enableFallback = true;
 
 import { useNavigation } from "@react-navigation/native";
 import { DateTime } from "luxon";
-import PropTypes from "prop-types";
-
 import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 import { RootNavigationProp } from "../../types/navigation";
 import { isIsoDate } from "../../util/date";
@@ -47,9 +45,5 @@ const AddExpenseHereButton = ({ dayISO }) => {
 };
 
 export default AddExpenseHereButton;
-
-AddExpenseHereButton.propTypes = {
-  dayISO: PropTypes.string,
-};
 
 const styles = StyleSheet.create({});

@@ -2,7 +2,6 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { DateTime } from "luxon";
-import PropTypes from "prop-types";
 import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
   Alert,
@@ -993,11 +992,6 @@ const TripForm = ({ navigation, route }) => {
 };
 
 export default TripForm;
-
-TripForm.propTypes = {
-  navigation: PropTypes.object,
-  route: PropTypes.object,
-};
 
 const styles = StyleSheet.create({
   button: {

@@ -1,14 +1,14 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { useContext, useState } from "react";
-import { Alert, StyleSheet, View, ScrollView } from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 import IconButton from "../components/UI/IconButton";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { GlobalStyles } from "../constants/styles";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
@@ -35,24 +35,22 @@ i18n.enableFallback = true;
 
 import { getCatString } from "../util/category";
 
-import PropTypes from "prop-types";
-
+import { NetworkContext } from "../store/network-context";
 import {
   deleteAllExpensesByRangedId,
   ExpenseData,
   Split,
 } from "../util/expense";
-import { NetworkContext } from "../store/network-context";
 
 import * as Haptics from "expo-haptics";
 
 import { setMMKVObject } from "../store/mmkv";
-import { dynamicScale } from "../util/scalingUtil";
-import { formatExpenseWithCurrency } from "../util/string";
+import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 import { isSameDay } from "../util/dateTime";
 import safeLogError from "../util/error";
+import { dynamicScale } from "../util/scalingUtil";
+import { formatExpenseWithCurrency } from "../util/string";
 import { trackEvent, VexoEvents } from "../util/vexo-tracking";
-import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 
 interface ManageExpenseProps {
   route: {
@@ -605,11 +603,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
 };
 
 export default ManageExpense;
-
-ManageExpense.propTypes = {
-  navigation: PropTypes.object,
-  route: PropTypes.object,
-};
 
 const styles = StyleSheet.create({
   container: {

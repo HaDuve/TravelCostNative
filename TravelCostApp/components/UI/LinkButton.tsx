@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import { Linking } from "react-native";
 
 import { LinkButtonProps } from "../../types/components";
@@ -33,9 +32,3 @@ const LinkingButton = ({
 };
 
 export default LinkingButton;
-
-LinkingButton.propTypes = {
-  children: PropTypes.node.isRequired,
-  URL: PropTypes.string.isRequired,
-  style: PropTypes.object,
-};

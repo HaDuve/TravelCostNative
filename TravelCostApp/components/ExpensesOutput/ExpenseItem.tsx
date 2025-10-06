@@ -4,7 +4,6 @@ import * as Haptics from "expo-haptics";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { DateTime } from "luxon";
-import PropTypes from "prop-types";
 import {
   memo,
   useCallback,
@@ -381,24 +380,6 @@ function ExpenseItem(props): JSX.Element {
 
 export const MemoizedExpenseItem = memo(ExpenseItem);
 export default ExpenseItem;
-
-ExpenseItem.propTypes = {
-  id: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  amount: PropTypes.number.isRequired,
-  date: PropTypes.object.isRequired,
-  category: PropTypes.string.isRequired,
-  country: PropTypes.string,
-  whoPaid: PropTypes.string.isRequired,
-  currency: PropTypes.string.isRequired,
-  calcAmount: PropTypes.number.isRequired,
-  splitList: PropTypes.array,
-  iconName: PropTypes.string,
-  showSumForTravellerName: PropTypes.string,
-  filtered: PropTypes.bool,
-  isSpecialExpense: PropTypes.bool,
-  setSelectable: PropTypes.func,
-};
 
 const styles = StyleSheet.create({
   amountContainer: {

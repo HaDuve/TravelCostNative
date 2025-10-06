@@ -1,6 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
-import PropTypes from "prop-types";
 import { Platform, Pressable } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
@@ -33,7 +32,3 @@ const BackButton = ({ style }) => {
 };
 
 export default BackButton;
-
-BackButton.propTypes = {
-  style: PropTypes.object,
-};

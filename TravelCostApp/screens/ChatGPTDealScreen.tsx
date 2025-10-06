@@ -1,8 +1,7 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import React, { useContext, useEffect } from "react";
-import { StyleSheet, Text, View, ScrollView, Alert, Image } from "react-native";
+import { Alert, Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import Markdown, { MarkdownProps } from "react-native-markdown-display";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import Toast from "react-native-toast-message";
@@ -13,7 +12,7 @@ import FlatButton from "../components/UI/FlatButton";
 
 import InfoButton from "../components/UI/InfoButton";
 import { GlobalStyles } from "../constants/styles";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -25,9 +24,9 @@ i18n.enableFallback = true;
 import { NetworkContext } from "../store/network-context";
 import {
   getChatGPT_Response,
-  GPT_RequestType,
   GPT_getGoodDeal,
   GPT_getPrice,
+  GPT_RequestType,
 } from "../util/chatGPTrequest";
 import { dynamicScale } from "../util/scalingUtil";
 import { trackEvent, VexoEvents } from "../util/vexo-tracking";
@@ -372,11 +371,6 @@ const GPTDealScreen = ({ route, navigation }) => {
 };
 
 export default GPTDealScreen;
-
-GPTDealScreen.propTypes = {
-  route: PropTypes.object,
-  navigation: PropTypes.object,
-};
 
 const styles = StyleSheet.create({
   aiAvatar: {

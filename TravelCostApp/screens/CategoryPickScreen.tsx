@@ -8,11 +8,9 @@ import { I18n } from "i18n-js";
 
 import GradientButton from "../components/UI/GradientButton";
 
-import { Alert } from "react-native";
-import { ActivityIndicator } from "react-native-paper";
-import PropTypes from "prop-types";
-import React, { useState, useContext, useCallback } from "react";
+import { useCallback, useContext, useState } from "react";
 import {
+  Alert,
   FlatList,
   Platform,
   Pressable,
@@ -20,11 +18,12 @@ import {
   Text,
   View,
 } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
 
 import BackButton from "../components/UI/BackButton";
 import FlatButton from "../components/UI/FlatButton";
 import { GlobalStyles } from "../constants/styles";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import { NetworkContext } from "../store/network-context";
 import { TripContext } from "../store/trip-context";
@@ -229,11 +228,6 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
 };
 
 export default CategoryPickScreen;
-
-CategoryPickScreen.propTypes = {
-  navigation: PropTypes.object,
-  route: PropTypes.object,
-};
 
 const styles = StyleSheet.create({
   buttonContainer: {

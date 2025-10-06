@@ -1,8 +1,6 @@
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
-
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -71,9 +69,3 @@ const DatePickerModal = ({
 };
 
 export default DatePickerModal;
-
-DatePickerModal.propTypes = {
-  showDatePickerRange: PropTypes.bool,
-  onCancelRange: PropTypes.func,
-  onConfirmRange: PropTypes.func,
-};

@@ -1,5 +1,5 @@
+import { useContext, useState } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
-import React, { useContext, useState } from "react";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -14,14 +14,13 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import * as Haptics from "expo-haptics";
-import PropTypes from "prop-types";
 import Animated, {
   FadeInLeft,
+  FadeInRight,
   FadeInUp,
   FadeOutDown,
   FadeOutLeft,
   FadeOutRight,
-  FadeInRight,
 } from "react-native-reanimated";
 
 import ExpenseCategories from "../components/ExpensesOutput/ExpenseStatistics/ExpenseCategories";
@@ -33,7 +32,7 @@ import BackButton from "../components/UI/BackButton";
 import FlatButton from "../components/UI/FlatButton";
 import IconButton from "../components/UI/IconButton";
 import { GlobalStyles } from "../constants/styles";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 import { OrientationContext } from "../store/orientation-context";
 import { getEarliestDate } from "../util/date";
 import { ExpenseData } from "../util/expense";
@@ -188,10 +187,6 @@ const FilteredPieCharts = ({ navigation, route }) => {
 };
 
 export default FilteredPieCharts;
-FilteredPieCharts.propTypes = {
-  navigation: PropTypes.object.isRequired,
-  route: PropTypes.object.isRequired,
-};
 
 const styles = StyleSheet.create({
   chevronContainer: {

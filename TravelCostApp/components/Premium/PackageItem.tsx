@@ -1,6 +1,5 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import Purchases, { PurchasesPackage } from "react-native-purchases";
 
@@ -119,12 +118,6 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
 };
 
 export default PackageItem;
-
-PackageItem.propTypes = {
-  purchasePackage: PropTypes.object.isRequired,
-  setIsPurchasing: PropTypes.func.isRequired,
-  navigation: PropTypes.object.isRequired,
-};
 
 const styles = StyleSheet.create({
   container: {

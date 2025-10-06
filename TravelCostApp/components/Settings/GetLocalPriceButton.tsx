@@ -1,6 +1,5 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import { useContext, useState } from "react";
 import {
   Alert,
@@ -146,11 +145,6 @@ const GetLocalPriceButton = ({ navigation, style }) => {
       </Modal>
     </>
   );
-};
-
-GetLocalPriceButton.propTypes = {
-  navigation: PropTypes.object.isRequired,
-  style: PropTypes.object,
 };
 
 const styles = StyleSheet.create({

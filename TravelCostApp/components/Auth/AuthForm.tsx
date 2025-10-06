@@ -1,6 +1,5 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 
@@ -242,13 +241,6 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
 }
 
 export default AuthForm;
-
-AuthForm.propTypes = {
-  isLogin: PropTypes.bool.isRequired,
-  onSubmit: PropTypes.func.isRequired,
-  credentialsInvalid: PropTypes.object.isRequired,
-  isConnected: PropTypes.bool,
-};
 
 const styles = StyleSheet.create({
   appleAuthContainer: {

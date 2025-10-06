@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
@@ -48,15 +47,6 @@ const DatePickerContainer = ({
 };
 
 export default DatePickerContainer;
-
-DatePickerContainer.propTypes = {
-  openDatePickerRange: PropTypes.func.isRequired,
-  startDate: PropTypes.string,
-  endDate: PropTypes.string,
-  dateIsRanged: PropTypes.bool.isRequired,
-  hideBottomBorder: PropTypes.bool,
-  narrow: PropTypes.bool,
-};
 
 const styles = StyleSheet.create({
   advancedText: {

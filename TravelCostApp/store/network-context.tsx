@@ -1,6 +1,5 @@
 import NetInfo from "@react-native-community/netinfo";
-import PropTypes from "prop-types";
-import React, { useState, useEffect, createContext } from "react";
+import { createContext, useEffect, useState } from "react";
 
 import { useInterval } from "../components/Hooks/useInterval";
 import {
@@ -61,7 +60,3 @@ const NetworkContextProvider = ({ children }) => {
 };
 
 export default NetworkContextProvider;
-
-NetworkContextProvider.propTypes = {
-  children: PropTypes.node,
-};

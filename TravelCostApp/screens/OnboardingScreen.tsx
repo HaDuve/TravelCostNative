@@ -1,10 +1,10 @@
-import React, { StyleSheet, Image } from "react-native";
+import { Image, StyleSheet } from "react-native";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -13,7 +13,6 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import PropTypes from "prop-types";
 import Onboarding from "react-native-onboarding-swiper";
 
 import { GlobalStyles } from "../constants/styles";
@@ -58,10 +57,6 @@ const OnboardingScreen = ({ navigation }) => {
 };
 
 export default OnboardingScreen;
-
-OnboardingScreen.propTypes = {
-  navigation: PropTypes.object.isRequired,
-};
 
 const styles = StyleSheet.create({
   titleStyle: {

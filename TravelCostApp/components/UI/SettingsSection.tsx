@@ -13,8 +13,6 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import PropTypes from "prop-types";
-
 import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 import { secureStoreGetItem } from "../../store/secure-storage";
 import { SettingsContext } from "../../store/settings-context";
@@ -138,10 +136,6 @@ const SettingsSection = ({ multiTraveller }) => {
 };
 
 export default SettingsSection;
-
-SettingsSection.propTypes = {
-  multiTraveller: PropTypes.bool,
-};
 
 export const loadSettings = async () => {
   try {

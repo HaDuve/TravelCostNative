@@ -1,5 +1,4 @@
 import uniqBy from "lodash.uniqby";
-import PropTypes from "prop-types";
 import { useContext } from "react";
 import { FlatList, View } from "react-native";
 
@@ -47,9 +46,3 @@ function TripList({ trips }) {
 }
 
 export default TripList;
-
-TripList.propTypes = {
-  trips: PropTypes.array,
-  refreshControl: PropTypes.object,
-  setRefreshing: PropTypes.func,
-};

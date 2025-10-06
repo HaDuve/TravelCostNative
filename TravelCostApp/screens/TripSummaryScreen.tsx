@@ -1,22 +1,21 @@
 /* eslint-disable react/prop-types */
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import { useContext, useEffect, useState } from "react";
 import {
+  Alert,
+  FlatList,
+  Platform,
+  Pressable,
   StyleSheet,
   Text,
-  View,
-  FlatList,
   TouchableOpacity,
-  Alert,
-  Pressable,
-  Platform,
+  View,
 } from "react-native";
 import { Checkbox } from "react-native-paper";
 import * as Progress from "react-native-progress";
 
-import Animated, { FadeIn, FadeOut, FadeInUp } from "react-native-reanimated";
+import Animated, { FadeIn, FadeInUp, FadeOut } from "react-native-reanimated";
 import FlatButton from "../components/UI/FlatButton";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { UserContext } from "../store/user-context";
@@ -36,6 +35,15 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
+import { ExpensesContext } from "../store/expenses-context";
+import {
+  getMMKVObject,
+  getMMKVString,
+  setMMKVObject,
+  setMMKVString,
+} from "../store/mmkv";
+import { TripContext, TripData } from "../store/trip-context";
+import safeLogError from "../util/error";
 import {
   ExpenseData,
   Split,
@@ -45,15 +53,6 @@ import {
 import { safelyParseJSON } from "../util/jsonParse";
 import { constantScale, dynamicScale, scale } from "../util/scalingUtil";
 import { formatExpenseWithCurrency } from "../util/string";
-import { TripContext, TripData } from "../store/trip-context";
-import { ExpensesContext } from "../store/expenses-context";
-import safeLogError from "../util/error";
-import {
-  getMMKVObject,
-  getMMKVString,
-  setMMKVObject,
-  setMMKVString,
-} from "../store/mmkv";
 import { getTripData } from "../util/trip";
 
 import ExpenseCountryFlag from "../components/ExpensesOutput/ExpenseCountryFlag";
@@ -658,10 +657,6 @@ const TripSummaryScreen = ({ navigation }) => {
 };
 
 export default TripSummaryScreen;
-
-TripSummaryScreen.propTypes = {
-  navigation: PropTypes.object,
-};
 
 const styles = StyleSheet.create({
   buttonContainer: {

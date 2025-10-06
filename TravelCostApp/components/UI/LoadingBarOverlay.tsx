@@ -1,6 +1,5 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import { StyleSheet, Text, View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 import * as Progress from "react-native-progress";
@@ -83,17 +82,6 @@ const LoadingBarOverlay = props => {
 };
 
 export default LoadingBarOverlay;
-
-LoadingBarOverlay.propTypes = {
-  containerStyle: PropTypes.object,
-  progress: PropTypes.number,
-  progressAt: PropTypes.number,
-  progressMax: PropTypes.number,
-  customText: PropTypes.string,
-  noText: PropTypes.bool,
-  size: PropTypes.string,
-  barWidth: PropTypes.number,
-};
 
 const styles = StyleSheet.create({
   container: {

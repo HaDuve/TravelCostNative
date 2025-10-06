@@ -3,11 +3,10 @@
 
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
-import React, { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 import { reloadApp } from "../util/appState";
 import { setAxiosAccessToken } from "../util/axios-config";
 import safeLogError from "../util/error";
@@ -24,12 +23,12 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
+import { initializeApp } from "firebase/app";
 import {
   deleteUser,
-  signInWithEmailAndPassword,
   initializeAuth,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
-import { initializeApp } from "firebase/app";
 
 // import { getReactNativePersistence } from "firebase/auth";
 import { secureStoreGetItem, secureStoreSetItem } from "./secure-storage";
@@ -173,7 +172,3 @@ function AuthContextProvider({ children }) {
 }
 
 export default AuthContextProvider;
-
-AuthContextProvider.propTypes = {
-  children: PropTypes.node,
-};

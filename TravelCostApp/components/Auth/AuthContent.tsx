@@ -1,7 +1,6 @@
 import { useHeaderHeight } from "@react-navigation/elements";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import { useState } from "react";
 import {
   Alert,
@@ -110,12 +109,6 @@ function AuthContent({ isLogin, onAuthenticate, isConnected }) {
 }
 
 export default AuthContent;
-
-AuthContent.propTypes = {
-  onAuthenticate: PropTypes.func.isRequired,
-  isLogin: PropTypes.bool,
-  isConnected: PropTypes.bool,
-};
 
 const styles = StyleSheet.create({
   authContent: {

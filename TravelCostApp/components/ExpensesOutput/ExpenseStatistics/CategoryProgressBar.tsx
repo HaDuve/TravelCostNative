@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import PropTypes from "prop-types";
 import { useContext, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import * as Progress from "react-native-progress";
@@ -100,15 +99,6 @@ const CategoryProgressBar = ({
 };
 
 export default CategoryProgressBar;
-
-CategoryProgressBar.propTypes = {
-  cat: PropTypes.string.isRequired,
-  color: PropTypes.string.isRequired,
-  totalCost: PropTypes.number.isRequired,
-  catCost: PropTypes.number.isRequired,
-  iconOverride: PropTypes.string,
-  iconJSXOverride: PropTypes.element,
-};
 
 const styles = StyleSheet.create({
   container: {

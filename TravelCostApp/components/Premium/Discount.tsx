@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import { StyleSheet, Text, View } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
@@ -14,11 +13,6 @@ const Discount = ({ discountPercentage, style }) => {
 };
 
 export default Discount;
-
-Discount.propTypes = {
-  discountPercentage: PropTypes.number.isRequired,
-  style: PropTypes.object,
-};
 
 const styles = StyleSheet.create({
   container: {

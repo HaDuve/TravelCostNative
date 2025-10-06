@@ -1,7 +1,6 @@
 import * as Haptics from "expo-haptics";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import React, { useContext, useState } from "react";
 import {
   Alert,
@@ -161,11 +160,6 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isVisible, onClose }) => {
       </KeyboardAvoidingView>
     </Modal>
   );
-};
-
-FeedbackForm.propTypes = {
-  isVisible: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
 };
 
 const styles = StyleSheet.create({

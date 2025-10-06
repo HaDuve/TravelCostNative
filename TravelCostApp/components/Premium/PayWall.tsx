@@ -1,6 +1,5 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import {
   Alert,
@@ -238,10 +237,6 @@ const PaywallScreen = ({ navigation }) => {
 };
 
 export default PaywallScreen;
-
-PaywallScreen.propTypes = {
-  navigation: PropTypes.object.isRequired,
-};
 
 const styles = StyleSheet.create({
   backButtonTextStyle: {

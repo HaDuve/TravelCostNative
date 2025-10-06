@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Image,
   Linking,
@@ -22,8 +21,6 @@ i18n.locale =
     : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
-
-import PropTypes from "prop-types";
 
 import FlatButton from "../components/UI/FlatButton";
 import GradientButton from "../components/UI/GradientButton";
@@ -130,11 +127,6 @@ const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
 };
 
 export default RatingModal;
-
-RatingModal.propTypes = {
-  isModalVisible: PropTypes.bool.isRequired,
-  setIsModalVisible: PropTypes.func.isRequired,
-};
 
 const styles = StyleSheet.create({
   buttonContainer: {

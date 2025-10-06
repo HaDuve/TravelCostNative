@@ -17,7 +17,6 @@ import { useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import {
   useCallback,
   useContext,
@@ -944,24 +943,6 @@ function ExpensesList({
 }
 
 export default ExpensesList;
-
-ExpensesList.propTypes = {
-  expenses: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string,
-      description: PropTypes.string,
-      amount: PropTypes.number,
-      date: PropTypes.instanceOf(Date),
-      currency: PropTypes.string,
-      category: PropTypes.string,
-      uid: PropTypes.string,
-    })
-  ).isRequired,
-  refreshControl: PropTypes.object,
-  refreshing: PropTypes.bool,
-  showSumForTravellerName: PropTypes.string,
-  isFiltered: PropTypes.bool,
-};
 
 const styles = StyleSheet.create({
   descriptionText: {

@@ -1,5 +1,4 @@
-import PropTypes from "prop-types";
-import React, { createContext } from "react";
+import { createContext } from "react";
 
 import { useOrientation } from "../components/Hooks/useOrientation";
 import { useWindowSize } from "../components/Hooks/useWindowSize";
@@ -31,7 +30,3 @@ const OrientationContextProvider = ({ children }) => {
 };
 
 export default OrientationContextProvider;
-
-OrientationContextProvider.propTypes = {
-  children: PropTypes.node,
-};

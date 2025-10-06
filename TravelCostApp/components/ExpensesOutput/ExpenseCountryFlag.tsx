@@ -1,5 +1,4 @@
 import { countryToAlpha2 } from "country-to-iso";
-import PropTypes from "prop-types";
 import { StyleSheet, View } from "react-native";
 import CountryFlag from "react-native-country-flag";
 
@@ -21,11 +20,6 @@ const ExpenseCountryFlag = ({ countryName, style, containerStyle }) => {
 };
 
 export default ExpenseCountryFlag;
-ExpenseCountryFlag.propTypes = {
-  countryName: PropTypes.string,
-  style: PropTypes.object,
-  containerStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
-};
 
 const styles = StyleSheet.create({
   container: {

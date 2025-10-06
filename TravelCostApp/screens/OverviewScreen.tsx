@@ -1,7 +1,6 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { DateTime } from "luxon";
-import PropTypes from "prop-types";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
   Platform,
@@ -244,10 +243,6 @@ const OverviewScreen = ({ navigation }) => {
 };
 
 export default OverviewScreen;
-
-OverviewScreen.propTypes = {
-  navigation: PropTypes.object.isRequired,
-};
 
 const styles = StyleSheet.create({
   container: {

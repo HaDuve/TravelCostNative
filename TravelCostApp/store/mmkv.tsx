@@ -46,7 +46,6 @@ function initializeMMKV(): MMKV {
       encryptionKey: "travel-cost-encryption-key",
     });
 
-    console.log("[MMKV] Successfully initialized");
     return mmkvstorage;
   } catch (error) {
     console.error("[MMKV] Failed to initialize:", error);

@@ -1,6 +1,5 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import { StyleSheet, Text, View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 
@@ -34,13 +33,6 @@ const LoadingOverlay = props => {
 };
 
 export default LoadingOverlay;
-
-LoadingOverlay.propTypes = {
-  containerStyle: PropTypes.object,
-  customText: PropTypes.string,
-  noText: PropTypes.bool,
-  size: PropTypes.string,
-};
 
 const styles = StyleSheet.create({
   container: {

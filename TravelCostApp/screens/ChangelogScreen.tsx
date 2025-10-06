@@ -1,23 +1,22 @@
 import * as Haptics from "expo-haptics";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import { StyleSheet, Text, View, ScrollView, Pressable } from "react-native";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 
 import BackButton from "../components/UI/BackButton";
 import InfoButton from "../components/UI/InfoButton";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { GlobalStyles } from "../constants/styles";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 import { getMMKVString, setMMKVString } from "../store/mmkv";
 import { NetworkContext } from "../store/network-context";
 import safeLogError from "../util/error";
 import { fetchChangelog } from "../util/http";
-import { VersionCheckResponse, versionCheck } from "../util/version";
 import { parseChangelog } from "../util/parseChangelog";
 import { constantScale } from "../util/scalingUtil";
+import { VersionCheckResponse, versionCheck } from "../util/version";
 
 //Localization
 
@@ -208,10 +207,6 @@ const ChangelogScreen = ({ navigation }) => {
 };
 
 export default ChangelogScreen;
-
-ChangelogScreen.propTypes = {
-  navigation: PropTypes.object,
-};
 
 const styles = StyleSheet.create({
   changelogContainer: {

@@ -3,7 +3,6 @@ import * as Haptics from "expo-haptics";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import uniqBy from "lodash.uniqby";
-import PropTypes from "prop-types";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
   Alert,
@@ -399,10 +398,6 @@ const AddExpenseButton = ({ navigation }) => {
 };
 
 export default AddExpenseButton;
-
-AddExpenseButton.propTypes = {
-  navigation: PropTypes.object.isRequired,
-};
 
 const styles = StyleSheet.create({
   addButton: {

@@ -6,10 +6,8 @@ import {
   vexo,
 } from "vexo-analytics";
 
-import { DEVELOPER_MODE } from "../confAppConstants";
-
 import safeLogError from "./error";
-import { VexoEventName, VexoEvents } from "./vexo-constants";
+import { VexoEventName, VexoEvents, shouldEnableVexo } from "./vexo-constants";
 
 // Re-export VexoEvents for external use
 export { VexoEvents };
@@ -24,11 +22,6 @@ export interface VexoUserContext {
   buildProfile?: string;
 }
 
-const isProduction = !__DEV__;
-
-export const shouldEnableVexo =
-  isProduction && Device.isDevice && !DEVELOPER_MODE;
-
 export async function initializeVexo(apiKey: string): Promise<boolean> {
   try {
     if (vexoInitialized) {
@@ -36,7 +29,6 @@ export async function initializeVexo(apiKey: string): Promise<boolean> {
     }
 
     if (!shouldEnableVexo) {
-      console.log("[Vexo] Skipping initialization (dev mode or simulator)");
       return false;
     }
 
@@ -51,7 +43,6 @@ export async function initializeVexo(apiKey: string): Promise<boolean> {
     vexoInitialized = true;
     vexoEnabled = true;
 
-    console.log("[Vexo] Successfully initialized");
     return true;
   } catch (error) {
     safeLogError(error, "vexo-tracking.ts", 44);

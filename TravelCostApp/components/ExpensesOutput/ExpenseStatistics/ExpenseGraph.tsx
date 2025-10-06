@@ -1,7 +1,6 @@
 import * as Haptics from "expo-haptics";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import { useContext, useRef } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
@@ -593,19 +592,6 @@ const ExpenseGraph = ({
 };
 
 export default ExpenseGraph;
-
-ExpenseGraph.propTypes = {
-  navigation: PropTypes.object,
-  expenses: PropTypes.array,
-  periodName: PropTypes.string,
-  periodRangeNumber: PropTypes.number,
-  expenseCtx: PropTypes.object,
-  tripCtx: PropTypes.object,
-  longerPeriodNum: PropTypes.number,
-  setLongerPeriodNum: PropTypes.func,
-  startingPoint: PropTypes.number,
-  setStartingPoint: PropTypes.func,
-};
 
 const styles = StyleSheet.create({
   categoryCard: {

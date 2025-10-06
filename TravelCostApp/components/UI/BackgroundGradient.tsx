@@ -1,6 +1,4 @@
 import { LinearGradient } from "expo-linear-gradient";
-import PropTypes from "prop-types";
-
 import { GlobalStyles } from "../../constants/styles";
 
 const BackgroundGradient = ({ colors, children, style }) => {
@@ -14,9 +12,3 @@ const BackgroundGradient = ({ colors, children, style }) => {
 };
 
 export default BackgroundGradient;
-
-BackgroundGradient.propTypes = {
-  colors: PropTypes.array,
-  children: PropTypes.node.isRequired,
-  style: PropTypes.object,
-};

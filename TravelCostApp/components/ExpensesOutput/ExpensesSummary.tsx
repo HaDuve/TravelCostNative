@@ -1,6 +1,5 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import { useCallback, useContext, useEffect, useState } from "react";
 import {
   Dimensions,
@@ -308,13 +307,6 @@ const ExpensesSummary = ({
 };
 
 export default ExpensesSummary;
-
-ExpensesSummary.propTypes = {
-  expenses: PropTypes.array.isRequired,
-  periodName: PropTypes.string.isRequired,
-  useMoreSpace: PropTypes.bool,
-  style: PropTypes.object,
-};
 
 const styles = StyleSheet.create({
   container: {

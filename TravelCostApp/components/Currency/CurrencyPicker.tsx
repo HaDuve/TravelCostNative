@@ -3,7 +3,6 @@ import * as Haptics from "expo-haptics";
 import * as Localization from "expo-localization";
 import * as i18nIsoCountries from "i18n-iso-countries";
 import { I18n } from "i18n-js";
-import PropTypes from "prop-types";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -121,14 +120,6 @@ const CurrencyPicker = ({
 };
 
 export default CurrencyPicker;
-
-CurrencyPicker.propTypes = {
-  countryValue: PropTypes.string.isRequired,
-  setCountryValue: PropTypes.func.isRequired,
-  onChangeValue: PropTypes.func.isRequired,
-  placeholder: PropTypes.string,
-  valid: PropTypes.bool,
-};
 
 const styles = StyleSheet.create({
   container: { flex: 1, margin: 10 },

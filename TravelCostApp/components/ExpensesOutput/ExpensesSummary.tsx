@@ -17,7 +17,10 @@ import { GlobalStyles } from "../../constants/styles";
 import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 import { SettingsContext } from "../../store/settings-context";
 import { TripContext } from "../../store/trip-context";
-import { travellersToObjectArray } from "../../util/traveller-utils";
+import {
+  normalizeTravellers,
+  travellersToObjectArray,
+} from "../../util/traveller-utils";
 
 //Localization
 const i18n = new I18n({ en, de, fr, ru });
@@ -265,7 +268,8 @@ const ExpensesSummary = ({
         )} = ${formatExpenseWithCurrency(lastRate, lastCurrency)}`,
         travellerList: tripCtx.travellers,
         // travellerBudgets: tripCtx.travellerBudgets
-        travellerBudgets: budgetNumber / tripCtx.travellers.length,
+        travellerBudgets:
+          budgetNumber / normalizeTravellers(tripCtx.travellers).length,
         budgetNumber,
         travellerSplitExpenseSums,
         currency: tripCurrency,

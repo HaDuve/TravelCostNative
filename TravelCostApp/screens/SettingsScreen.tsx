@@ -44,6 +44,7 @@ import { UserContext } from "../store/user-context";
 import { reloadApp } from "../util/appState";
 import { dynamicScale } from "../util/scalingUtil";
 import { resetTour } from "../util/tourUtil";
+import { normalizeTravellers } from "../util/traveller-utils";
 
 const SettingsScreen = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
@@ -53,7 +54,9 @@ const SettingsScreen = ({ navigation }) => {
   const isConnected = netCtx.isConnected;
   const [isRestoringPurchases, setIsRestoringPurchases] = useState(false);
   const multiTraveller =
-    (tripCtx.travellers && tripCtx.travellers?.length > 1) ?? false;
+    (tripCtx.travellers &&
+      normalizeTravellers(tripCtx.travellers).length > 1) ??
+    false;
 
   const [emailString, setEmailString] = useState("");
 

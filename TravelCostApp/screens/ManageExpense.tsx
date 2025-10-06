@@ -50,7 +50,8 @@ import { isSameDay } from "../util/dateTime";
 import safeLogError from "../util/error";
 import { dynamicScale } from "../util/scalingUtil";
 import { formatExpenseWithCurrency } from "../util/string";
-import { trackEvent, VexoEvents } from "../util/vexo-tracking";
+import { VexoEventName } from "../util/vexo-constants";
+import { trackEvent } from "../util/vexo-tracking";
 
 interface ManageExpenseProps {
   route: {
@@ -159,7 +160,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         await touchAllTravelers(tripid, true);
 
         // Track expense deleted
-        trackEvent(VexoEvents.EXPENSE_DELETED, {
+        trackEvent(VexoEventName.EXPENSE_DELETED, {
           expenseId: editedExpenseId,
           tripId: tripid,
           isRanged: selectedExpense?.rangeId ? true : false,
@@ -525,7 +526,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         }
 
         // Track expense edited
-        trackEvent(VexoEvents.EXPENSE_EDITED, {
+        trackEvent(VexoEventName.EXPENSE_EDITED, {
           expenseId: editedExpenseId,
           amount: expenseData.amount,
           currency: expenseData.currency,
@@ -547,7 +548,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         }
 
         // Track expense created
-        trackEvent(VexoEvents.EXPENSE_CREATED, {
+        trackEvent(VexoEventName.EXPENSE_CREATED, {
           amount: expenseData.amount,
           currency: expenseData.currency,
           category: expenseData.categoryString,
@@ -577,7 +578,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       <ExpenseForm
         onCancel={cancelHandler}
         onSubmit={confirmHandler}
-        setIsSubmitting={setIsSubmitting}
         pickedCat={pickedCat}
         iconName={iconName}
         navigation={navigation}

@@ -29,7 +29,8 @@ import {
   GPT_RequestType,
 } from "../util/chatGPTrequest";
 import { dynamicScale } from "../util/scalingUtil";
-import { trackEvent, VexoEvents } from "../util/vexo-tracking";
+import { VexoEventName } from "../util/vexo-constants";
+import { trackEvent } from "../util/vexo-tracking";
 
 const GPTDealScreen = ({ route, navigation }) => {
   const { price, currency, country, product } = route.params;
@@ -143,7 +144,7 @@ const GPTDealScreen = ({ route, navigation }) => {
             startStreaming(response.content);
 
             // Track GPT price lookup usage
-            trackEvent(VexoEvents.GPT_RECOMMENDATION_USED, {
+            trackEvent(VexoEventName.GPT_RECOMMENDATION_USED, {
               requestType: "getPrice",
               product,
               currency,
@@ -177,7 +178,7 @@ const GPTDealScreen = ({ route, navigation }) => {
           startStreaming(response.content);
 
           // Track GPT deal recommendation usage
-          trackEvent(VexoEvents.GPT_RECOMMENDATION_USED, {
+          trackEvent(VexoEventName.GPT_RECOMMENDATION_USED, {
             requestType: "getGoodDeal",
             product,
             price,

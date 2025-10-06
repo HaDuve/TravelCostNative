@@ -29,7 +29,8 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import { constantScale } from "../../util/scalingUtil";
-import { trackEvent, VexoEvents } from "../../util/vexo-tracking";
+import { VexoEventName } from "../../util/vexo-constants";
+import { trackEvent } from "../../util/vexo-tracking";
 import PackageItem from "../Premium/PackageItem";
 import BackgroundGradient from "../UI/BackgroundGradient";
 import FlatButton from "../UI/FlatButton";
@@ -48,7 +49,7 @@ const PaywallScreen = ({ navigation }) => {
 
   useEffect(() => {
     // Track paywall viewed
-    trackEvent(VexoEvents.PAYWALL_VIEWED);
+    trackEvent(VexoEventName.PAYWALL_VIEWED);
 
     // Get current available packages
     const getPackages = async () => {
@@ -58,10 +59,6 @@ const PaywallScreen = ({ navigation }) => {
           offerings.current !== null &&
           offerings.current.availablePackages?.length !== 0
         ) {
-          // log available packages duration
-          // console.log(
-          //   offerings.current.availablePackages[0].product.subscriptionPeriod
-          // );
           setPackages(offerings.current.availablePackages);
         }
       } catch (e) {

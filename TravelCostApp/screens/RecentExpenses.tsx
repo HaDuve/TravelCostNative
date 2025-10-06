@@ -69,6 +69,7 @@ import { OrientationContext } from "../store/orientation-context";
 import { SettingsContext } from "../store/settings-context";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
+import { normalizeTravellers } from "../util/traveller-utils";
 
 function RecentExpenses({ navigation }) {
   const expensesCtx = useContext(ExpensesContext);
@@ -262,7 +263,11 @@ function RecentExpenses({ navigation }) {
   useEffect(() => {
     async function setTravellers() {
       if (netCtx.isConnected && netCtx.strongConnection) {
-        if (tripCtx.travellers && tripCtx.travellers?.length > 1) return;
+        if (
+          tripCtx.travellers &&
+          normalizeTravellers(tripCtx.travellers).length > 1
+        )
+          return;
         try {
           await tripCtx.fetchAndSetTravellers(tripCtx.tripid);
         } catch (error) {

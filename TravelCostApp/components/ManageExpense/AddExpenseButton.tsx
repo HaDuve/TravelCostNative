@@ -50,6 +50,7 @@ import {
 import { safelyParseJSON } from "../../util/jsonParse";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { formatExpenseWithCurrency, truncateString } from "../../util/string";
+import { normalizeTravellers } from "../../util/traveller-utils";
 import IconButton from "../UI/IconButton";
 
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -97,8 +98,8 @@ const AddExpenseButton = ({ navigation }) => {
       tripCtx.tripid &&
       authCtx.uid &&
       tripCtx.travellers &&
-      tripCtx.travellers?.length > 0;
-  }, [tripCtx.tripid, authCtx.uid, tripCtx.travellers?.length]);
+      normalizeTravellers(tripCtx.travellers).length > 0;
+  }, [tripCtx.tripid, authCtx.uid, tripCtx.travellers]);
   const skipCatScreen = settings.skipCategoryScreen;
 
   const renderExpenseTemplates = ({ item, index }) => {
@@ -188,7 +189,7 @@ const AddExpenseButton = ({ navigation }) => {
         tripCtx.tripid &&
         authCtx.uid &&
         tripCtx.travellers &&
-        tripCtx.travellers?.length > 0;
+        normalizeTravellers(tripCtx.travellers).length > 0;
 
       if (!valid.current && Date.now() - startTime < retryTimeout) {
         // Retry after a delay if still invalid

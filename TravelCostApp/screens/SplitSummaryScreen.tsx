@@ -88,24 +88,23 @@ const SplitSummaryScreen = ({ navigation }) => {
   const hasOpenSplits = splits?.length > 0;
   const [showSimplify, setShowSimplify] = useState(true);
 
-  // TODO: improve text and translate
-  const titleTextOriginal = "Split Summary";
-  const titleTextSimplified = "Split Summary";
+  const titleTextOriginal = i18n.t("splitSummaryTitle");
+  const titleTextSimplified = i18n.t("splitSummaryTitle");
 
   const tripNameString = truncateString(tripName, 25);
-  const subTitleOriginal = `Overview of owed amounts in the trip:\n  ${tripNameString}`;
-  const subTitleSimplified = `Simplified Summary of Optimal Transactions in the trip:  ${
+  const subTitleOriginal = `${i18n.t("overviewOfOwedAmounts")}\n  ${tripNameString}`;
+  const subTitleSimplified = `${i18n.t("simplifiedSummaryOfOptimalTransactions")}  ${
     tripNameString
   }`;
 
   const [titleText, setTitleText] = useState(titleTextOriginal);
   const [subTitleText, setSubTitleText] = useState(subTitleOriginal);
 
-  const totalPaidBackTextOriginal = `Your money back:  `;
+  const totalPaidBackTextOriginal = `${i18n.t("yourMoneyBack")}  `;
   const [totalPaidBackText, setTotalPaidBackText] = useState(
     totalPaidBackTextOriginal
   );
-  const totalPayBackTextOriginal = `You still owe: `;
+  const totalPayBackTextOriginal = `${i18n.t("youStillOwe")} `;
   const [totalPayBackText, setTotalPayBackText] = useState(
     totalPayBackTextOriginal
   );
@@ -303,7 +302,7 @@ const SplitSummaryScreen = ({ navigation }) => {
             }
           }}
         >
-          Back
+          {i18n.t("back")}
         </FlatButton>
       )}
       {showSimplify && !noSimpleSplits && (
@@ -312,7 +311,7 @@ const SplitSummaryScreen = ({ navigation }) => {
           onPress={handleSimpflifySplits}
           buttonStyle={{}}
         >
-          Simplify Splits
+          {i18n.t("simplifySplits")}
         </GradientButton>
       )}
       {hasOpenSplits && (
@@ -327,22 +326,22 @@ const SplitSummaryScreen = ({ navigation }) => {
             // alert ask user if he really wants to settle all Splits
             // if yes, call settleSplitsHandler
             Alert.alert(
-              "Settle Splits",
-              "Are you sure you want to settle all splits? Has everyone gotten their money back? (This will only settle splits from Today or Before, but not open splits from the future!)",
+              i18n.t("settleSplits"),
+              i18n.t("settleSplitsConfirmationMessage"),
               [
                 {
-                  text: "Cancel",
+                  text: i18n.t("cancel"),
                   style: "cancel",
                 },
                 {
-                  text: "Settle",
+                  text: i18n.t("confirmSettle"),
                   onPress: async () => await settleSplitsHandler(),
                 },
               ]
             );
           }}
         >
-          Settle Splits
+          {i18n.t("settleSplits")}
         </GradientButton>
       )}
     </View>
@@ -360,12 +359,14 @@ const SplitSummaryScreen = ({ navigation }) => {
     <ScrollView
       scrollEnabled={isPortrait}
       contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+      bounces={false}
     >
       <Animated.View
         // entering={FadeIn}
         // exiting={FadeOut}
         style={[
-          GlobalStyles.wideStrongShadow,
+          GlobalStyles.strongShadow,
           styles.cardContainer,
           !isPortrait && styles.row,
         ]}
@@ -388,11 +389,13 @@ const SplitSummaryScreen = ({ navigation }) => {
         </View>
 
         <FlatList
-          style={{ maxWidth: "100%", paddingHorizontal: "2%" }}
+          style={{ width: "100%", paddingHorizontal: dynamicScale(8) }}
           data={splits}
           scrollEnabled={!isPortrait}
           ListFooterComponent={isPortrait && ButtonContainerJSX}
-          ListHeaderComponent={<View style={{ height: 40 }}></View>}
+          ListHeaderComponent={
+            <View style={{ height: dynamicScale(60) }}></View>
+          }
           renderItem={renderSplitItem}
         />
       </Animated.View>
@@ -413,9 +416,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   button: {
+    width: "100%",
     ...Platform.select({
       ios: {
-        marginTop: dynamicScale(20, true),
+        marginTop: 0,
         borderRadius: 12,
         minHeight: 55,
       },
@@ -426,26 +430,26 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     alignItems: "center",
-    flexDirection: "row",
+    flexDirection: "column",
     flex: 1,
-    justifyContent: "space-between",
-    // margin: "2%",
+    justifyContent: "center",
+    gap: dynamicScale(16),
+    paddingHorizontal: dynamicScale(16),
+    paddingTop: dynamicScale(20),
     ...Platform.select({
       ios: { marginTop: 0 },
       android: {
-        // height: dynamicScale(55, true),
         marginVertical: dynamicScale(18),
-        // flexDirection: "column",
         minHeight: dynamicScale(100, true),
       },
     }),
   },
   cardContainer: {
-    margin: dynamicScale(20),
+    marginVertical: dynamicScale(12),
     minHeight: "86%",
     alignItems: "center",
     justifyContent: "space-around",
-    paddingHorizontal: dynamicScale(24),
+    paddingHorizontal: dynamicScale(20),
     paddingTop: dynamicScale(24, true),
     paddingBottom: dynamicScale(2, true),
     //card
@@ -453,19 +457,21 @@ const styles = StyleSheet.create({
     borderRadius: dynamicScale(20, false, 0.5),
     // borderWidth: 1,
     borderColor: GlobalStyles.colors.gray500,
-    minWidth: dynamicScale(300),
+    width: "100%",
+    maxWidth: "100%",
     // android styles
     ...Platform.select({
       android: {
-        margin: dynamicScale(8),
+        marginVertical: dynamicScale(8),
         marginTop: dynamicScale(2, true),
       },
     }),
   },
   container: {
     flex: 1,
-    // alignItems: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,
+    paddingHorizontal: dynamicScale(12),
+    paddingVertical: dynamicScale(8),
   },
   normalText: {
     fontSize: dynamicScale(16),

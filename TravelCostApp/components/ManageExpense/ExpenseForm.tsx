@@ -1,44 +1,31 @@
+import * as Haptics from "expo-haptics";
 import React, {
-  useState,
+  useCallback,
   useContext,
   useEffect,
-  useCallback,
   useLayoutEffect,
   useMemo,
+  useState,
 } from "react";
-
-import * as Haptics from "expo-haptics";
 import {
   Alert,
+  FlatList,
+  Image,
+  InputAccessoryView,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
   StyleSheet,
   Text,
   View,
-  Pressable,
-  FlatList,
-  KeyboardAvoidingView,
-  InputAccessoryView,
-  Image,
 } from "react-native";
-import { daysBetween } from "../../util/date";
-import { useHeaderHeight } from "@react-navigation/elements";
 
-import { SegmentedButtons } from "react-native-paper";
+import { daysBetween, getFormattedDate } from "../../util/date";
+
 import Input from "./Input";
-import { getFormattedDate } from "../../util/date";
-import { GlobalStyles } from "../../constants/styles";
-import { AuthContext } from "../../store/auth-context";
-import IconButton from "../UI/IconButton";
-import { UserContext } from "../../store/user-context";
-import FlatButton from "../UI/FlatButton";
-import {
-  DEFAULTCATEGORIES,
-  getCatString,
-  getCatSymbol,
-  getCatSymbolMMKV,
-  mapDescriptionToCategory,
-} from "../../util/category";
-import { formatExpenseWithCurrency } from "../../util/string";
+
 import DropDownPicker from "react-native-dropdown-picker";
+import IconButton from "../UI/IconButton";
 // import CurrencyPicker from "react-native-currency-picker";
 import { TripContext } from "../../store/trip-context";
 import {
@@ -53,7 +40,7 @@ import {
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -62,49 +49,62 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import CurrencyPicker from "../Currency/CurrencyPicker";
-import { truncateString } from "../../util/string";
 import { Ionicons } from "@expo/vector-icons";
+import { useHeaderHeight } from "@react-navigation/elements";
+import { DateTime } from "luxon";
 import Animated, {
-  ZoomIn,
-  ZoomOut,
-  Layout,
   Easing,
   FadeInUp,
   FadeOutUp,
-  FadeIn,
-  FadeOut,
   LinearTransition,
+  ZoomIn,
+  ZoomOut,
 } from "react-native-reanimated";
-import { DateTime } from "luxon";
-import DatePickerModal from "../UI/DatePickerModal";
-import DatePickerContainer from "../UI/DatePickerContainer";
-import PropTypes from "prop-types";
-import GradientButton from "../UI/GradientButton";
-import { recalcSplitsForExact } from "../../util/split";
-import { DuplicateOption, ExpenseData, isPaidString } from "../../util/expense";
-import { NetworkContext } from "../../store/network-context";
-import { SettingsContext } from "../../store/settings-context";
-import Autocomplete from "../UI/Autocomplete";
-import { ExpensesContext } from "../../store/expenses-context";
-import { getCurrencySymbol } from "../../util/currencySymbol";
-import { secureStoreSetItem } from "../../store/secure-storage";
-import { ActivityIndicator } from "react-native-paper";
-import BackButton from "../UI/BackButton";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
-import SettingsSwitch from "../UI/SettingsSwitch";
-import CountryPicker from "../Currency/CountryPicker";
-import { getMMKVObject } from "../../store/mmkv";
-import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
-import { Platform } from "react-native";
-import { isPremiumMember } from "../Premium/PremiumConstants";
-import { MAX_EXPENSES_PERTRIP_NONPREMIUM } from "../../confAppConstants";
-import { constantScale, dynamicScale } from "../../util/scalingUtil";
-import { getRate } from "../../util/currencyExchange";
-import { OrientationContext } from "../../store/orientation-context";
-import { callDebounced } from "../Hooks/useDebounce";
+import { truncateString } from "../../util/string";
+import CurrencyPicker from "../Currency/CurrencyPicker";
 
-const ExpenseForm = ({
+import PropTypes from "prop-types";
+import { ActivityIndicator, SegmentedButtons } from "react-native-paper";
+import { ExpensesContext } from "../../store/expenses-context";
+import { NetworkContext } from "../../store/network-context";
+import { secureStoreSetItem } from "../../store/secure-storage";
+import { SettingsContext } from "../../store/settings-context";
+import { getCurrencySymbol } from "../../util/currencySymbol";
+import { DuplicateOption, ExpenseData, isPaidString } from "../../util/expense";
+import Autocomplete from "../UI/Autocomplete";
+import BackButton from "../UI/BackButton";
+import DatePickerContainer from "../UI/DatePickerContainer";
+import GradientButton from "../UI/GradientButton";
+
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+
+import { MAX_EXPENSES_PERTRIP_NONPREMIUM } from "../../confAppConstants";
+import { GlobalStyles } from "../../constants/styles";
+import { AuthContext } from "../../store/auth-context";
+import { getMMKVObject } from "../../store/mmkv";
+import { OrientationContext } from "../../store/orientation-context";
+import { UserContext } from "../../store/user-context";
+import { ExpenseFormProps } from "../../types/components";
+import {
+  DEFAULTCATEGORIES,
+  getCatString,
+  getCatSymbol,
+  getCatSymbolMMKV,
+  mapDescriptionToCategory,
+} from "../../util/category";
+import { getRate } from "../../util/currencyExchange";
+import { constantScale, dynamicScale } from "../../util/scalingUtil";
+import { recalcSplitsForExact } from "../../util/split";
+import { formatExpenseWithCurrency } from "../../util/string";
+import CountryPicker from "../Currency/CountryPicker";
+import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
+import { callDebounced } from "../Hooks/useDebounce";
+import { isPremiumMember } from "../Premium/PremiumConstants";
+import DatePickerModal from "../UI/DatePickerModal";
+import FlatButton from "../UI/FlatButton";
+import SettingsSwitch from "../UI/SettingsSwitch";
+
+const ExpenseForm: React.FC<ExpenseFormProps> = ({
   onCancel,
   onSubmit,
   submitButtonLabel,
@@ -116,6 +116,7 @@ const ExpenseForm = ({
   newCat,
   iconName,
   dateISO,
+  setIsSubmitting,
 }) => {
   // set context
   const authCtx = useContext(AuthContext);
@@ -157,11 +158,11 @@ const ExpenseForm = ({
     ? userCtx.lastCurrency
     : tripCtx.tripCurrency;
   const currencyPlaceholder = isEditing
-    ? editingValues.currency + " | " + getCurrencySymbol(editingValues.currency)
-    : lastCurrency + " | " + getCurrencySymbol(lastCurrency);
+    ? `${editingValues.currency} | ${getCurrencySymbol(editingValues.currency)}`
+    : `${lastCurrency} | ${getCurrencySymbol(lastCurrency)}`;
   const countryPlaceholder = isEditing
     ? editingValues.country
-    : userCtx.lastCountry ?? "";
+    : (userCtx.lastCountry ?? "");
   const [hideAdvanced, sethideAdvanced] = useState(true);
   const [currencyPickerValue, setCurrencyPickerValue] = useState(
     isEditing ? editingValues.currency : lastCurrency
@@ -205,20 +206,20 @@ const ExpenseForm = ({
       value: editingValues
         ? editingValues.country
         : mostRecentExpense?.country
-        ? mostRecentExpense.country
-        : userCtx.lastCountry
-        ? userCtx.lastCountry
-        : "",
+          ? mostRecentExpense.country
+          : userCtx.lastCountry
+            ? userCtx.lastCountry
+            : "",
       isValid: true,
     },
     currency: {
       value: editingValues
         ? editingValues.currency
         : mostRecentExpense?.currency
-        ? mostRecentExpense.currency
-        : userCtx.lastCurrency
-        ? userCtx.lastCurrency
-        : tripCtx.tripCurrency,
+          ? mostRecentExpense.currency
+          : userCtx.lastCurrency
+            ? userCtx.lastCurrency
+            : tripCtx.tripCurrency,
       isValid: true,
     },
     whoPaid: {
@@ -232,8 +233,8 @@ const ExpenseForm = ({
   const amountValue = hasTempAndInput
     ? tmpInputSum
     : inputs.amount.value.length > 0
-    ? inputs.amount.value
-    : tempAmount;
+      ? inputs.amount.value
+      : tempAmount;
 
   const hasCalcAmount =
     amountValue &&
@@ -264,7 +265,7 @@ const ExpenseForm = ({
       // if expenseData has a splitlist, add the rate to each split
       const splitListsCalcAmountsList = [];
       if (splitList && splitList?.length > 0) {
-        splitList.forEach((split) => {
+        splitList.forEach(split => {
           split.rate = rate;
           splitListsCalcAmountsList.push(
             (split.amount / split.rate).toFixed(2)
@@ -375,7 +376,7 @@ const ExpenseForm = ({
     if (dateISO) {
       setStartDate(dateISO);
       setEndDate(dateISO);
-      setInputs((curInputs) => {
+      setInputs(curInputs => {
         return {
           ...curInputs,
           ["date"]: { value: dateISO, isValid: true },
@@ -387,86 +388,101 @@ const ExpenseForm = ({
   // Helper function to safely format dates
   const getSafeFormattedDate = (dateValue: string | undefined): string => {
     if (dateValue && dateValue !== "") {
-      return getFormattedDate(dateValue);
+      return getFormattedDate(new Date(dateValue));
     }
     return getFormattedDate(DateTime.now().toJSDate());
   };
 
-  // Restore form state when returning from CategoryPick with tempValues
+  // Restore form state when returning from CategoryPick with defaultValues
   useEffect(() => {
-    if (!tempValues || isEditing) return;
+    if (!defaultValues || isEditing) return;
 
-    // Restore form inputs from tempValues
+    // Restore form inputs from defaultValues
     setInputs({
       amount: {
         value:
-          tempValues.amount && tempValues.amount > 0
-            ? tempValues.amount.toString()
+          defaultValues.amount && defaultValues.amount > 0
+            ? defaultValues.amount.toString()
             : "",
         isValid: true,
       },
       date: {
-        value: getSafeFormattedDate(tempValues.date),
+        value: defaultValues.date
+          ? typeof defaultValues.date === "string"
+            ? defaultValues.date
+            : defaultValues.date.toISOString()
+          : new Date().toISOString(),
         isValid: true,
       },
       description: {
-        value: tempValues.description || "",
+        value: defaultValues.description || "",
         isValid: true,
       },
       category: {
-        value: tempValues.category || "",
+        value: defaultValues.category || "",
         isValid: true,
       },
       country: {
-        value: tempValues.country || "",
+        value: defaultValues.country || "",
         isValid: true,
       },
       currency: {
-        value: tempValues.currency || tripCtx.tripCurrency,
+        value: defaultValues.currency || tripCtx.tripCurrency,
         isValid: true,
       },
       whoPaid: {
-        value: tempValues.whoPaid || "",
+        value: defaultValues.whoPaid || "",
         isValid: true,
       },
     });
 
     // Restore date state
-    setStartDate(getSafeFormattedDate(tempValues.startDate));
-    setEndDate(getSafeFormattedDate(tempValues.endDate));
+    setStartDate(
+      defaultValues.startDate
+        ? getFormattedDate(defaultValues.startDate)
+        : getFormattedDate(new Date())
+    );
+    setEndDate(
+      defaultValues.endDate
+        ? getFormattedDate(defaultValues.endDate)
+        : getFormattedDate(new Date())
+    );
 
     // Restore split and sharing state
-    if (tempValues.splitList) {
-      setSplitList(tempValues.splitList);
+    if (defaultValues.splitList) {
+      setSplitList(defaultValues.splitList);
     }
-    if (tempValues.splitType) {
-      setSplitType(tempValues.splitType);
+    if (defaultValues.splitType) {
+      setSplitType(defaultValues.splitType);
     }
-    if (tempValues.listEQUAL) {
-      setListEQUAL(tempValues.listEQUAL);
+    if (defaultValues.listEQUAL) {
+      setListEQUAL(defaultValues.listEQUAL);
     }
-    if (tempValues.duplOrSplit !== undefined) {
-      setDuplOrSplit(tempValues.duplOrSplit);
+    if (defaultValues.duplOrSplit !== undefined) {
+      setDuplOrSplit(defaultValues.duplOrSplit);
     }
-    if (tempValues.whoPaid) {
-      console.log("🔍 Setting whoPaid from tempValues:", tempValues.whoPaid);
-      setWhoPaidWithLogging(tempValues.whoPaid);
+    if (defaultValues.whoPaid) {
+      console.log(
+        "🔍 Setting whoPaid from defaultValues:",
+        defaultValues.whoPaid
+      );
+      setWhoPaidWithLogging(defaultValues.whoPaid);
     }
-    if (tempValues.isPaid !== undefined) {
-      setIsPaid(tempValues.isPaid);
+    if (defaultValues.isPaid !== undefined) {
+      setIsPaid(defaultValues.isPaid);
     }
-    if (tempValues.isSpecialExpense !== undefined) {
-      setIsSpecialExpense(tempValues.isSpecialExpense);
+    if (defaultValues.isSpecialExpense !== undefined) {
+      setIsSpecialExpense(defaultValues.isSpecialExpense);
     }
 
     // Update picker values to reflect restored state
-    if (tempValues.currency) {
-      setCurrencyPickerValue(tempValues.currency);
+    if (defaultValues.currency) {
+      setCurrencyPickerValue(defaultValues.currency);
     }
-    if (tempValues.country) {
-      setCountryPickerValue(tempValues.country);
+    if (defaultValues.country) {
+      setCountryPickerValue(defaultValues.country);
     }
-  }, [tempValues, isEditing, tripCtx.tripCurrency]);
+  }, [defaultValues, isEditing, tripCtx.tripCurrency]);
 
   // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
   const [duplOrSplit, setDuplOrSplit] = useState<DuplicateOption>(
@@ -514,13 +530,13 @@ const ExpenseForm = ({
       return duplOrSplitNum === 1
         ? duplString
         : duplOrSplitNum === 2
-        ? splitString
-        : "";
+          ? splitString
+          : "";
     },
     [duplString, splitString]
   );
 
-  const onConfirmRange = (expenseOut) => {
+  const onConfirmRange = expenseOut => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(false);
     // hotfixing datebug for asian countries
@@ -671,7 +687,7 @@ const ExpenseForm = ({
   );
 
   // Wrap setWhoPaid with logging
-  const setWhoPaidWithLogging = (value) => {
+  const setWhoPaidWithLogging = value => {
     console.log(
       "🔍 setWhoPaid called with:",
       value,
@@ -682,7 +698,7 @@ const ExpenseForm = ({
   };
 
   // Custom setValue handler to handle both normal selections and special __ADD_TRAVELLER__ case
-  const handleWhoPaidChange = (value) => {
+  const handleWhoPaidChange = value => {
     console.log("🔍 handleWhoPaidChange called with:", value, typeof value);
 
     // Ignore function objects (weird DropDownPicker behavior for special case)
@@ -762,15 +778,14 @@ const ExpenseForm = ({
   const last500Daysexpenses = useMemo(
     () =>
       expCtx.expenses.filter(
-        (expense) =>
-          expense.date > DateTime.now().minus({ days: 500 }).toJSDate()
+        expense => expense.date > DateTime.now().minus({ days: 500 }).toJSDate()
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [expCtx.expenses?.length]
   );
   // extract suggestions from all the descriptions of expense state into an array of strings
   const suggestionData = last500Daysexpenses.map(
-    (expense) => expense.description
+    expense => expense.description
   );
 
   /**
@@ -787,7 +802,7 @@ const ExpenseForm = ({
         last500Daysexpenses
       );
       if (mappedCategory) {
-        setInputs((curInputs) => {
+        setInputs(curInputs => {
           return {
             ...curInputs,
             ["category"]: { value: mappedCategory, isValid: true },
@@ -805,7 +820,7 @@ const ExpenseForm = ({
   }, [inputs.category.value]);
 
   function inputChangedHandler(inputIdentifier: string, enteredValue: string) {
-    setInputs((curInputs) => {
+    setInputs(curInputs => {
       return {
         ...curInputs,
         [inputIdentifier]: { value: enteredValue, isValid: true },
@@ -881,9 +896,7 @@ const ExpenseForm = ({
   async function removeUserFromSplitHandler(userName: string) {
     if (!splitList || splitList.length < 1) return;
     const splitListTemp = [...splitList];
-    const index = splitListTemp.findIndex(
-      (split) => split.userName === userName
-    );
+    const index = splitListTemp.findIndex(split => split.userName === userName);
     if (index === -1) {
       return;
     }
@@ -904,7 +917,7 @@ const ExpenseForm = ({
     setSplitList(splitListTemp);
     if (splitType === "EQUAL") {
       const splitTravellersTemp = tripCtx.travellers.filter(
-        (traveller) => traveller !== userName
+        traveller => traveller !== userName
       );
       const listSplits = calcSplitList(
         "EQUAL",
@@ -943,15 +956,15 @@ const ExpenseForm = ({
       category: newCat ? pickedCat : inputs.category.value,
       country: inputs.country.value,
       currency: inputs.currency.value,
-      whoPaid: whoPaid, // TODO: convert this to uid
-      splitType: splitType,
+      whoPaid, // TODO: convert this to uid
+      splitType,
       listEQUAL: splitTravellersList,
-      splitList: splitList,
-      duplOrSplit: duplOrSplit,
-      iconName: iconName,
-      isPaid: isPaid,
-      isSpecialExpense: isSpecialExpense,
-      alreadyDividedAmountByDays: alreadyDividedAmountByDays,
+      splitList,
+      duplOrSplit,
+      iconName,
+      isPaid,
+      isSpecialExpense,
+      alreadyDividedAmountByDays,
     };
 
     // SoloTravellers always pay for themselves
@@ -998,7 +1011,7 @@ const ExpenseForm = ({
       !whoPaidIsValid ||
       !splitListValid
     ) {
-      setInputs((curInputs) => {
+      setInputs(curInputs => {
         return {
           amount: {
             value: curInputs.amount.value,
@@ -1056,13 +1069,13 @@ const ExpenseForm = ({
       country: userCtx.lastCountry ? userCtx.lastCountry : "",
       currency: lastCurrency,
       whoPaid: userCtx.userName,
-      splitType: splitType,
+      splitType,
       listEQUAL: currentTravellers,
-      splitList: splitList,
-      iconName: iconName,
-      isPaid: isPaid,
-      isSpecialExpense: isSpecialExpense,
-      duplOrSplit: duplOrSplit,
+      splitList,
+      iconName,
+      isPaid,
+      isSpecialExpense,
+      duplOrSplit,
     };
     await onSubmit(expenseData);
   }
@@ -1217,13 +1230,11 @@ const ExpenseForm = ({
   );
   const confirmButtonJSX = (
     <Pressable
-      style={[
-        {
-          paddingLeft: dynamicScale(100, false, 0.5),
-          paddingBottom: dynamicScale(8, false, 0.5),
-          paddingTop: dynamicScale(6, false, 0.5),
-        },
-      ]}
+      style={{
+        paddingLeft: dynamicScale(100, false, 0.5),
+        paddingBottom: dynamicScale(8, false, 0.5),
+        paddingTop: dynamicScale(6, false, 0.5),
+      }}
       onPress={debouncedSubmit}
     >
       <IconButton
@@ -1279,10 +1290,11 @@ const ExpenseForm = ({
   );
   const hideSpecialTooltip = hideSpecial
     ? i18n.t("specString1")
-    : "\n" + i18n.t("specString2");
+    : `\n${i18n.t("specString2")}`;
   const isSpecialExpenseJSX = hideSpecial && (
     <View style={styles.isSpecialContainer}>
       <SettingsSwitch
+        style={{}}
         toggleState={() => setIsSpecialExpense(!isSpecialExpense)}
         label={
           isSpecialExpense
@@ -1315,9 +1327,7 @@ const ExpenseForm = ({
   const whoPaidValid = whoPaid !== null;
   const splitTypeEqual = splitType === "EQUAL";
   const splitTypeSelf = splitType === "SELF";
-  const splitListHasNonZeroEntries = splitList?.some(
-    (item) => item.amount !== 0
-  );
+  const splitListHasNonZeroEntries = splitList?.some(item => item.amount !== 0);
   const hidePickers = true;
   let dateIsRanged =
     startDate?.toString().slice(0, 10) !== endDate?.toString().slice(0, 10);
@@ -1334,19 +1344,31 @@ const ExpenseForm = ({
   const tempValues: ExpenseData = {
     uid: authCtx.uid,
     amount: +amountValue,
-    date: inputs.date.value || new Date().toISOString(),
-    startDate: startDate || new Date().toISOString(),
-    endDate: endDate || new Date().toISOString(),
+    date: inputs.date.value
+      ? typeof inputs.date.value === "string"
+        ? new Date(inputs.date.value)
+        : inputs.date.value
+      : new Date(),
+    startDate: startDate
+      ? typeof startDate === "string"
+        ? new Date(startDate)
+        : startDate
+      : new Date(),
+    endDate: endDate
+      ? typeof endDate === "string"
+        ? new Date(endDate)
+        : endDate
+      : new Date(),
     description: inputs.description.value,
     category: newCat ? pickedCat : inputs.category.value,
     country: inputs.country.value,
     currency: inputs.currency.value,
-    whoPaid: whoPaid,
-    splitType: splitType,
+    whoPaid,
+    splitType,
     listEQUAL: splitTravellersList,
-    splitList: splitList,
-    duplOrSplit: duplOrSplit,
-    iconName: iconName,
+    splitList,
+    duplOrSplit,
+    iconName,
     categoryString: "",
     calcAmount: 0,
   };
@@ -1396,6 +1418,7 @@ const ExpenseForm = ({
           <Animated.View layout={LinearTransition} style={styles.form}>
             <View style={styles.inputsRow}>
               <Input
+                style={{}}
                 inputStyle={[styles.amountInput, GlobalStyles.strongShadow]}
                 label={
                   i18n.t("priceIn") + getCurrencySymbol(inputs.currency.value)
@@ -1405,9 +1428,9 @@ const ExpenseForm = ({
                   onChangeText: inputChangedHandler.bind(this, "amount"),
                   value: inputs.amount.value,
                 }}
-                // inputAccessoryViewID="amountID"
+                inputAccessoryViewID="amountID"
                 invalid={!inputs.amount.isValid}
-                autoFocus={!isEditing ?? false}
+                autoFocus={!isEditing}
               />
               {inputs.amount.value && isAndroid && (
                 <IconButton
@@ -1452,7 +1475,7 @@ const ExpenseForm = ({
               )}
               {hasCalcAmount && (
                 <Text
-                  style={[!tempAmount ? styles.tempAmount : styles.calcAmount]}
+                  style={!tempAmount ? styles.tempAmount : styles.calcAmount}
                 >
                   ={" "}
                   {formatExpenseWithCurrency(calcAmount, tripCtx.tripCurrency)}
@@ -1466,8 +1489,8 @@ const ExpenseForm = ({
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   navigation.navigate("CategoryPick", {
-                    editedExpenseId: editedExpenseId,
-                    tempValues: tempValues,
+                    editedExpenseId,
+                    defaultValues,
                   });
                 }}
               />
@@ -1514,6 +1537,8 @@ const ExpenseForm = ({
                   data={suggestionData}
                   style={styles.autoCompleteStyle}
                   menuStyle={styles.autoCompleteMenuStyle}
+                  showOnEmpty={true}
+                  placeholder=""
                 ></Autocomplete>
 
                 <View style={styles.currencyContainer}>
@@ -1527,19 +1552,17 @@ const ExpenseForm = ({
                     placeholder={currencyPlaceholder}
                   ></CurrencyPicker>
                 </View>
-                <View style={[styles.inputsRowSecond]}>
+                <View style={styles.inputsRowSecond}>
                   <View style={styles.countryContainer}>
                     <Text style={styles.currencyLabel}>
                       {i18n.t("countryLabel")}
                     </Text>
                     <View style={{ flexDirection: "row" }}>
                       <View
-                        style={[
-                          {
-                            minWidth: "77%",
-                            maxWidth: "77%",
-                          },
-                        ]}
+                        style={{
+                          minWidth: "77%",
+                          maxWidth: "77%",
+                        }}
                       >
                         <CountryPicker
                           countryValue={countryPickerValue}
@@ -1674,14 +1697,14 @@ const ExpenseForm = ({
                             open={modalFlow === modalStates.WHO_PAID}
                             value={whoPaid}
                             items={items}
-                            setOpen={(open) => {
+                            setOpen={open => {
                               setModalFlow(
                                 open ? modalStates.WHO_PAID : modalStates.NONE
                               );
                             }}
                             setValue={handleWhoPaidChange}
                             setItems={setItems}
-                            onClose={(items) => {
+                            onClose={() => {
                               console.log("🔍 whoPaid dropdown onClose called");
                               // Only reset modal flow if we're not transitioning to another modal
                               if (modalFlow === modalStates.WHO_PAID) {
@@ -1694,7 +1717,7 @@ const ExpenseForm = ({
                                 Haptics.ImpactFeedbackStyle.Light
                               );
                             }}
-                            onSelectItem={(item) => {
+                            onSelectItem={item => {
                               console.log("🔍 onSelectItem called with:", item);
                               Haptics.impactAsync(
                                 Haptics.ImpactFeedbackStyle.Light
@@ -1753,14 +1776,14 @@ const ExpenseForm = ({
                       open={modalFlow === modalStates.HOW_SHARED}
                       value={splitType}
                       items={splitItems}
-                      setOpen={(open) => {
+                      setOpen={open => {
                         setModalFlow(
                           open ? modalStates.HOW_SHARED : modalStates.NONE
                         );
                       }}
                       setValue={setSplitType}
                       setItems={setSplitTypeItems}
-                      onSelectItem={(item) => {
+                      onSelectItem={item => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                         setSplitType(item.value);
                         nextModal(item.value, item.value);
@@ -1808,7 +1831,7 @@ const ExpenseForm = ({
                     open={modalFlow === modalStates.EXACT_SHARING || openEQUAL}
                     value={splitTravellersList}
                     items={splitItemsEQUAL}
-                    setOpen={(open) => {
+                    setOpen={open => {
                       if (open) {
                         setModalFlow(modalStates.EXACT_SHARING);
                       } else {
@@ -1880,7 +1903,7 @@ const ExpenseForm = ({
                     whoPaidValid &&
                     !IsSoloTraveller &&
                     splitListHasNonZeroEntries && (
-                      <Text style={[styles.whoSharedLabel]}>
+                      <Text style={styles.whoSharedLabel}>
                         {i18n.t("whoShared")}
                       </Text>
                     )}
@@ -1925,7 +1948,7 @@ const ExpenseForm = ({
                           style={{ width: dynamicScale(300, false, 0.5) }}
                         ></View>
                       }
-                      renderItem={(itemData) => {
+                      renderItem={itemData => {
                         const splitValue = itemData.item.amount.toString();
                         return (
                           <View
@@ -2008,6 +2031,8 @@ const ExpenseForm = ({
                               }}
                             >
                               <Input
+                                style={{}}
+                                label=""
                                 hasCurrency={!!inputs.currency}
                                 inputStyle={[
                                   splitTypeEqual && {
@@ -2036,6 +2061,9 @@ const ExpenseForm = ({
                                   ),
                                   value: splitValue ? splitValue : "",
                                 }}
+                                invalid={false}
+                                autoFocus={false}
+                                inputAccessoryViewID=""
                               ></Input>
                               <Text
                                 style={{
@@ -2107,7 +2135,11 @@ const ExpenseForm = ({
             )}
           <View style={styles.buttonContainer}>
             <FlatButton onPress={onCancel}>{i18n.t("cancel")}</FlatButton>
-            <GradientButton style={styles.button} onPress={debouncedSubmit}>
+            <GradientButton
+              buttonStyle={{}}
+              style={styles.button}
+              onPress={debouncedSubmit}
+            >
               {submitButtonLabel}
             </GradientButton>
           </View>
@@ -2230,103 +2262,205 @@ ExpenseForm.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  advancedRow: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    marginLeft: "2%",
+    marginTop: "6%",
+  },
+  advancedRowSplit: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    marginLeft: dynamicScale(36),
+  },
+  advancedText: {
+    fontSize: dynamicScale(12, false, 0.3),
+    fontStyle: "italic",
+    fontWeight: "300",
+    marginLeft: dynamicScale(12),
+    marginTop: dynamicScale(9, true),
+  },
+  amountInput: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderColor: GlobalStyles.colors.gray700,
+    borderRadius: 5,
+    borderWidth: 1,
+    marginTop: constantScale(8, 0.5),
+    minWidth: dynamicScale(150, false, 0.5),
+    padding: constantScale(8, 0.5),
+  },
+  autoCompleteMenuStyle: {
+    borderBottomColor: GlobalStyles.colors.primaryGrayed,
+    borderBottomWidth: 1,
+    marginBottom: dynamicScale(-1, true),
+    marginLeft: dynamicScale(8),
+  },
+  autoCompleteStyle: {
+    backgroundColor: GlobalStyles.colors.gray500,
+    borderRadius: 5,
+    flex: 1,
+    fontSize: dynamicScale(14, false, 0.3),
+  },
+  button: {
+    marginHorizontal: 0,
+    marginVertical: dynamicScale(4, true),
+    minWidth: dynamicScale(200, false, 0.5),
+  },
+  buttonContainer: {
+    alignItems: "baseline",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    paddingTop: dynamicScale(20, true),
+  },
+  calcAmount: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(12, false, 0.3),
+    fontWeight: "300",
+    marginLeft: "50%",
+    marginTop: "1.5%",
+    position: "absolute",
+  },
+  categoryRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+  },
   container: {
     flex: 1,
     marginBottom: "20%",
     overflow: "visible",
   },
+
+  countryContainer: {
+    marginLeft: "1%",
+    maxWidth: "100%",
+  },
+  countryFlag: {
+    borderRadius: dynamicScale(4, false, 0.5),
+    height: dynamicScale(40, false, 0.5),
+    width: dynamicScale(60, false, 0.5),
+  },
+  countryFlagContainer: {
+    marginRight: "5%",
+    marginTop: constantScale(20, -1.5),
+  },
+  currencyContainer: {
+    marginBottom: "2%",
+    maxWidth: "100%",
+    // borderBottomWidth: 1,
+    // borderBottomColor: GlobalStyles.colors.gray700,
+  },
+  currencyLabel: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(12, false, 0.3),
+    marginBottom: dynamicScale(-8, false, 0.3),
+    marginLeft: dynamicScale(14, false, 0.3),
+    marginTop: dynamicScale(12),
+  },
+  dateContainer: {
+    borderBottomColor: GlobalStyles.colors.gray700,
+    borderBottomWidth: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginHorizontal: "5%",
+    marginTop: "4%",
+    paddingBottom: dynamicScale(4, true),
+  },
+  dateIconContainer: {
+    marginLeft: "2.5%",
+  },
+  dateLabel: {
+    marginTop: "4%",
+    marginHorizontal: "5.5%",
+    // row
+    flexDirection: "row",
+    // justifyContent: "space-between",
+  },
+  dateLabelDuplSplitText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(12, false, 0.3),
+    fontStyle: "italic",
+    fontWeight: "300",
+    marginLeft: "2%",
+  },
+  dateLabelText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(12, false, 0.3),
+    fontWeight: "400",
+  },
+  descriptionContainer: {
+    flex: 1,
+    marginHorizontal: dynamicScale(8, false, 0.5),
+    marginLeft: dynamicScale(12, false, 0.5),
+    marginTop: dynamicScale(12, true),
+  },
+  dropdownContainer: {
+    marginTop: dynamicScale(-12, true),
+    maxWidth: "89%",
+  },
+  dropdownListItemLabelStyle: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(18, false, 0.3),
+    padding: dynamicScale(4),
+  },
+  dropdownTextStyle: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(18, false, 0.3),
+    padding: dynamicScale(4),
+  },
+  duplOrSplitContainer: {
+    alignItems: "stretch",
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    margin: dynamicScale(4),
+    overflow: "visible",
+    padding: dynamicScale(8),
+  },
+  errorText: {
+    color: GlobalStyles.colors.error500,
+    margin: dynamicScale(8, true),
+    textAlign: "center",
+  },
   form: {
+    backgroundColor: GlobalStyles.colors.gray500,
+    borderColor: GlobalStyles.colors.gray600,
+    borderRadius: 5,
+    borderWidth: 1,
+    elevation: 3,
     flex: 1,
     margin: "4.5%",
     marginTop: 0,
     padding: "2%",
     paddingBottom: "5%",
-    backgroundColor: GlobalStyles.colors.gray500,
-    borderRadius: 5,
-    borderWidth: 1,
-    elevation: 3,
-    borderColor: GlobalStyles.colors.gray600,
     shadowColor: GlobalStyles.colors.gray600,
     shadowOffset: { width: 4, height: 4 },
     shadowOpacity: 0.75,
     // justifyContent: "space-around",
     // alignContent: "stretch",
   },
-  amountInput: {
-    minWidth: dynamicScale(150, false, 0.5),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: GlobalStyles.colors.gray700,
-    padding: constantScale(8, 0.5),
-    marginTop: constantScale(8, 0.5),
+  getLocalPriceButton: {
+    marginHorizontal: 0,
+    marginVertical: 0,
   },
-  quickSumButton: {
-    borderWidth: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderColor: GlobalStyles.colors.gray700,
-    borderRadius: 8,
-    padding: dynamicScale(2, false, 0.5),
-    margin: dynamicScale(4, false, 0.5),
-    maxHeight: dynamicScale(32, false, 0.5),
-    marginTop: "10.5%",
-    marginLeft: "-16%",
-  },
-  taskBarButtons: {},
-  iconButton: {
-    borderWidth: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderColor: GlobalStyles.colors.gray700,
-    borderRadius: 8,
-    padding: dynamicScale(8, false, 0.5),
-    margin: dynamicScale(8, false, 0.5),
-  },
-  descriptionContainer: {
-    flex: 1,
-    marginTop: dynamicScale(12, true),
-    marginHorizontal: dynamicScale(8, false, 0.5),
-    marginLeft: dynamicScale(12, false, 0.5),
-  },
-  autoCompleteStyle: {
-    flex: 1,
-    backgroundColor: GlobalStyles.colors.gray500,
-    borderRadius: 5,
-    fontSize: dynamicScale(14, false, 0.3),
-  },
-  autoCompleteMenuStyle: {
-    marginLeft: dynamicScale(8),
-    marginBottom: dynamicScale(-1, true),
-    borderBottomWidth: 1,
-    borderBottomColor: GlobalStyles.colors.primaryGrayed,
-  },
-  countryFlagContainer: {
-    marginRight: "5%",
-    marginTop: constantScale(20, -1.5),
-  },
-  countryFlag: {
-    width: dynamicScale(60, false, 0.5),
-    height: dynamicScale(40, false, 0.5),
-    borderRadius: dynamicScale(4, false, 0.5),
-  },
-
-  topCurrencyPressableContainer: {
-    padding: dynamicScale(8),
-    marginLeft: dynamicScale(-120),
-  },
-  topCurrencyText: {
-    fontSize: dynamicScale(12, false, 0.3),
-  },
-  title: {
-    fontSize: dynamicScale(24, false, 0.3),
-    fontWeight: "bold",
-    color: GlobalStyles.colors.backgroundColor,
-    marginTop: dynamicScale(5, true),
-    marginBottom: dynamicScale(24, true),
-    textAlign: "center",
-  },
-  categoryRow: {
+  getLocalPriceContainer: {
+    alignItems: "center",
     flexDirection: "row",
     justifyContent: "center",
+    marginHorizontal: "4%",
+    paddingTop: dynamicScale(12, true),
+  },
+  hidePickersStyle: {
+    maxHeight: 0,
+    maxWidth: 0,
+    opacity: 0,
+  },
+  iconButton: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderColor: GlobalStyles.colors.gray700,
+    borderRadius: 8,
+    borderWidth: 1,
+    margin: dynamicScale(8, false, 0.5),
+    padding: dynamicScale(8, false, 0.5),
   },
   inputsRow: {
     flexDirection: "row",
@@ -2336,169 +2470,37 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  advancedRow: {
-    marginTop: "6%",
-    marginLeft: "2%",
-    flexDirection: "row",
-    justifyContent: "flex-start",
-  },
-  errorText: {
-    textAlign: "center",
-    color: GlobalStyles.colors.error500,
-    margin: dynamicScale(8, true),
-  },
-  tempAmount: {
-    position: "absolute",
-    marginLeft: "30%",
-    marginTop: "1.5%",
-    fontSize: dynamicScale(12, false, 0.3),
-    fontWeight: "300",
-    color: GlobalStyles.colors.textColor,
-  },
-  calcAmount: {
-    position: "absolute",
-    marginLeft: "50%",
-    marginTop: "1.5%",
-    fontSize: dynamicScale(12, false, 0.3),
-    fontWeight: "300",
-    color: GlobalStyles.colors.textColor,
-  },
-  splitListCalcAmount: {
-    position: "absolute",
-    top: "115%",
-    // left: "25%",
-    fontSize: dynamicScale(12, false, 0.3),
-    fontWeight: "300",
-    color: GlobalStyles.colors.textColor,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "baseline",
-    paddingTop: dynamicScale(20, true),
-  },
-  currencyContainer: {
-    maxWidth: "100%",
-    marginBottom: "2%",
-    // borderBottomWidth: 1,
-    // borderBottomColor: GlobalStyles.colors.gray700,
-  },
-  countryContainer: {
-    maxWidth: "100%",
-    marginLeft: "1%",
-  },
-  currencyLabel: {
-    fontSize: dynamicScale(12, false, 0.3),
-    color: GlobalStyles.colors.textColor,
-    marginTop: dynamicScale(12),
-    marginLeft: dynamicScale(14, false, 0.3),
-    marginBottom: dynamicScale(-8, false, 0.3),
-  },
-  whoPaidLabel: {
-    fontSize: dynamicScale(12, false, 0.3),
-    color: GlobalStyles.colors.textColor,
-    marginBottom: dynamicScale(4, true),
-  },
-  whoSharedLabel: {
-    fontSize: dynamicScale(12, false, 0.3),
-    color: GlobalStyles.colors.textColor,
-    marginTop: dynamicScale(8, true),
-    marginBottom: 0,
-    marginLeft: dynamicScale(8),
-  },
-  whoPaidContainer: {
-    marginTop: dynamicScale(20, true),
-    marginHorizontal: dynamicScale(16, false, 0.3),
-  },
-  button: {
-    minWidth: dynamicScale(200, false, 0.5),
-    marginHorizontal: 0,
-    marginVertical: dynamicScale(4, true),
-  },
-  advancedText: {
-    marginTop: dynamicScale(9, true),
-    marginLeft: dynamicScale(12),
-    fontSize: dynamicScale(12, false, 0.3),
-    fontStyle: "italic",
-    fontWeight: "300",
-  },
-  isSpecialLabel: {
-    fontSize: dynamicScale(12, false, 0.3),
-    fontWeight: "400",
-    color: GlobalStyles.colors.textColor,
-    marginLeft: dynamicScale(-8),
-  },
-  dateLabel: {
-    marginTop: "4%",
-    marginHorizontal: "5.5%",
-    // row
-    flexDirection: "row",
-    // justifyContent: "space-between",
-  },
-  dateLabelText: {
-    fontSize: dynamicScale(12, false, 0.3),
-    fontWeight: "400",
-    color: GlobalStyles.colors.textColor,
-  },
-  dateLabelDuplSplitText: {
-    fontSize: dynamicScale(12, false, 0.3),
-    fontWeight: "300",
-    fontStyle: "italic",
-    marginLeft: "2%",
-    color: GlobalStyles.colors.textColor,
+  invalidInput: {
+    backgroundColor: GlobalStyles.colors.error50,
   },
 
-  dateIconContainer: {
-    marginLeft: "2.5%",
-  },
-  dateContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderBottomColor: GlobalStyles.colors.gray700,
-    borderBottomWidth: 1,
-    marginHorizontal: "5%",
-    marginTop: "4%",
-    paddingBottom: dynamicScale(4, true),
-  },
-  dropdownContainer: {
-    marginTop: dynamicScale(-12, true),
-    maxWidth: "89%",
-  },
-  whoPaidDropdownContainer: {
-    width: "75%",
-    backgroundColor: GlobalStyles.colors.gray500,
-    borderWidth: 0,
-    marginTop: dynamicScale(12, true),
-    marginBottom: dynamicScale(10, true),
-    borderBottomWidth: 1,
-    borderRadius: 0,
-    borderBottomColor: GlobalStyles.colors.gray700,
-  },
-  dropdownTextStyle: {
-    fontSize: dynamicScale(18, false, 0.3),
-    color: GlobalStyles.colors.textColor,
-    padding: dynamicScale(4),
-  },
-  dropdownListItemLabelStyle: {
-    fontSize: dynamicScale(18, false, 0.3),
-    color: GlobalStyles.colors.textColor,
-    padding: dynamicScale(4),
-  },
-  hidePickersStyle: {
-    maxHeight: 0,
-    maxWidth: 0,
-    opacity: 0,
-  },
-  advancedRowSplit: {
-    marginLeft: dynamicScale(36),
-    flexDirection: "row",
-    justifyContent: "flex-start",
-  },
   invalidLabel: {
     color: GlobalStyles.colors.error500,
   },
-  invalidInput: {
-    backgroundColor: GlobalStyles.colors.error50,
+  isPaidContainer: {
+    marginHorizontal: "3%",
+    marginTop: "4%",
+  },
+  isSpecialContainer: {
+    marginHorizontal: "6%",
+    marginTop: "8%",
+  },
+  isSpecialLabel: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(12, false, 0.3),
+    fontWeight: "400",
+    marginLeft: dynamicScale(-8),
+  },
+  quickSumButton: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderColor: GlobalStyles.colors.gray700,
+    borderRadius: 8,
+    borderWidth: 1,
+    margin: dynamicScale(4, false, 0.5),
+    marginLeft: "-16%",
+    marginTop: "10.5%",
+    maxHeight: dynamicScale(32, false, 0.5),
+    padding: dynamicScale(2, false, 0.5),
   },
   spacerView: {
     flex: 1,
@@ -2508,32 +2510,62 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: "1%",
   },
-  isPaidContainer: {
-    marginTop: "4%",
-    marginHorizontal: "3%",
+  splitListCalcAmount: {
+    position: "absolute",
+    top: "115%",
+    // left: "25%",
+    fontSize: dynamicScale(12, false, 0.3),
+    fontWeight: "300",
+    color: GlobalStyles.colors.textColor,
   },
-  isSpecialContainer: {
-    marginTop: "8%",
-    marginHorizontal: "6%",
+  taskBarButtons: {},
+  tempAmount: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(12, false, 0.3),
+    fontWeight: "300",
+    marginLeft: "30%",
+    marginTop: "1.5%",
+    position: "absolute",
   },
-  duplOrSplitContainer: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "stretch",
+  title: {
+    color: GlobalStyles.colors.backgroundColor,
+    fontSize: dynamicScale(24, false, 0.3),
+    fontWeight: "bold",
+    marginBottom: dynamicScale(24, true),
+    marginTop: dynamicScale(5, true),
+    textAlign: "center",
+  },
+  topCurrencyPressableContainer: {
+    marginLeft: dynamicScale(-120),
     padding: dynamicScale(8),
-    margin: dynamicScale(4),
-    overflow: "visible",
   },
-  getLocalPriceContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingTop: dynamicScale(12, true),
-    marginHorizontal: "4%",
+  topCurrencyText: {
+    fontSize: dynamicScale(12, false, 0.3),
   },
-  getLocalPriceButton: {
-    marginHorizontal: 0,
-    marginVertical: 0,
+  whoPaidContainer: {
+    marginHorizontal: dynamicScale(16, false, 0.3),
+    marginTop: dynamicScale(20, true),
+  },
+  whoPaidDropdownContainer: {
+    backgroundColor: GlobalStyles.colors.gray500,
+    borderBottomColor: GlobalStyles.colors.gray700,
+    borderBottomWidth: 1,
+    borderRadius: 0,
+    borderWidth: 0,
+    marginBottom: dynamicScale(10, true),
+    marginTop: dynamicScale(12, true),
+    width: "75%",
+  },
+  whoPaidLabel: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(12, false, 0.3),
+    marginBottom: dynamicScale(4, true),
+  },
+  whoSharedLabel: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(12, false, 0.3),
+    marginBottom: 0,
+    marginLeft: dynamicScale(8),
+    marginTop: dynamicScale(8, true),
   },
 });

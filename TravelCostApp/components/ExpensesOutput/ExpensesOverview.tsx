@@ -1,37 +1,47 @@
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useContext, useRef, useState } from "react";
-import ExpenseCategories from "./ExpenseStatistics/ExpenseCategories";
-import ExpenseGraph from "./ExpenseStatistics/ExpenseGraph";
-import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";
-//Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
-const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
-i18n.enableFallback = true;
-// i18n.locale = "en";
-
-import ToggleButton from "../../assets/SVG/toggleButton";
-import { TourGuideZone } from "rn-tourguide";
-import { UserContext } from "../../store/user-context";
 import PropTypes from "prop-types";
-import ExpenseCountries from "./ExpenseStatistics/ExpenseCountries";
-import ExpenseTravellers from "./ExpenseStatistics/ExpenseTravellers";
-import IconButton from "../UI/IconButton";
-import { FadeInRight } from "react-native-reanimated";
-import ExpenseCurrencies from "./ExpenseStatistics/ExpenseCurrencies";
+import React, { useContext, useRef, useState } from "react";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
+  FadeInRight,
   FadeInUp,
   FadeOutDown,
   FadeOutRight,
 } from "react-native-reanimated";
+import { TourGuideZone } from "rn-tourguide";
+
+import ToggleButton from "../../assets/SVG/toggleButton";
 import { MAX_PERIOD_RANGE } from "../../confAppConstants";
+import { GlobalStyles } from "../../constants/styles";
+import ExpenseCategories from "./ExpenseStatistics/ExpenseCategories";
+import ExpenseCountries from "./ExpenseStatistics/ExpenseCountries";
+import ExpenseGraph from "./ExpenseStatistics/ExpenseGraph";
+//Localization
+
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
+import { UserContext } from "../../store/user-context";
+
+import ExpenseTravellers from "./ExpenseStatistics/ExpenseTravellers";
+
+import IconButton from "../UI/IconButton";
+
+import ExpenseCurrencies from "./ExpenseStatistics/ExpenseCurrencies";
+
 import { BlurView } from "expo-blur";
+
+import { OrientationContext } from "../../store/orientation-context";
 import { TripContext } from "../../store/trip-context";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
-import { OrientationContext } from "../../store/orientation-context";
 import { useSwipe } from "../Hooks/useSwipe";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
@@ -75,11 +85,11 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
     default:
       titleString = `${i18n.t("last")} ${periodRangeNumber + longerPeriodNum}${
         startingPoint != 0 ? `+${-startingPoint}` : ""
-      } ${i18n.t(periodName + "s")}`;
+      } ${i18n.t(`${periodName}s`)}`;
       break;
   }
 
-  const [autoIncrement, setAutoIncrement] = useState<NodeJS.Timer>(null);
+  const [autoIncrement, setAutoIncrement] = useState<number | null>(null);
 
   const startAutoIncrement = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -87,7 +97,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
     const interval = setInterval(() => {
       rightNavButtonHandler();
     }, 600);
-    setAutoIncrement(interval);
+    setAutoIncrement(interval as any);
     return;
   };
   const stopAutoIncrement = () => {
@@ -185,6 +195,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
             isGraphNotPie ? "add-circle-outline" : "chevron-forward-outline"
           }
           size={dynamicScale(24, false, 0.5)}
+          onPress={rightNavButtonHandler}
           onPressIn={startAutoIncrement}
           onPressOut={stopAutoIncrement}
           color={GlobalStyles.colors.primaryGrayed}
@@ -217,6 +228,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           expenses={expenses}
           periodName={periodName}
           navigation={navigation}
+          forcePortraitFormat={false}
         />
       )}
       {!isGraphNotPie && toggleGraphEnum == 1 && (
@@ -224,6 +236,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           expenses={expenses}
           periodName={periodName}
           navigation={navigation}
+          forcePortraitFormat={false}
         ></ExpenseTravellers>
       )}
       {!isGraphNotPie && toggleGraphEnum == 2 && (
@@ -231,6 +244,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           expenses={expenses}
           periodName={periodName}
           navigation={navigation}
+          forcePortraitFormat={false}
         ></ExpenseCountries>
       )}
       {!isGraphNotPie && toggleGraphEnum == 3 && (
@@ -238,15 +252,11 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           expenses={expenses}
           periodName={periodName}
           navigation={navigation}
+          forcePortraitFormat={false}
         ></ExpenseCurrencies>
       )}
       {titleContainerJSX}
-      <View
-        style={[
-          // styles.toggleButton
-          !isPortrait && styles.landscapeToggleButtonContainer,
-        ]}
-      >
+      <View style={!isPortrait && styles.landscapeToggleButtonContainer}>
         <TourGuideZone
           text={i18n.t("walk4")}
           tooltipBottomOffset={constantScale(166, 0.5)}
@@ -289,41 +299,48 @@ ExpensesOverview.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  chevronContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: dynamicScale(12, true),
+  },
   container: {
     flex: 1,
     overflow: "visible",
   },
-  titleContainerBlur: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+  landscapeToggleButtonContainer: {
+    // marginLeft: dynamicScale(-1100, false, 2),
+    // marginBottom: dynamicScale(6, true),
     position: "absolute",
-    width: "100%",
-    paddingBottom: dynamicScale(6, true),
-  },
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  chevronContainer: {
-    marginTop: dynamicScale(12, true),
-    justifyContent: "center",
-    alignItems: "center",
+    left: -280,
+    bottom: 1,
   },
   pressed: {
     opacity: 0.65,
   },
+  titleContainer: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  titleContainerBlur: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    paddingBottom: dynamicScale(6, true),
+    position: "absolute",
+    width: "100%",
+  },
   titleText: {
-    marginTop: dynamicScale(6, true),
-    minWidth: dynamicScale(200),
-    maxWidth: dynamicScale(200),
-    textAlign: "center",
-    fontSize: dynamicScale(22, false, 0.5),
-    fontWeight: "bold",
-    fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
+    fontSize: dynamicScale(22, false, 0.5),
+    fontStyle: "italic",
+    fontWeight: "bold",
     marginLeft: dynamicScale(6),
+    marginTop: dynamicScale(6, true),
+    maxWidth: dynamicScale(200),
+    minWidth: dynamicScale(200),
+    textAlign: "center",
   },
   toggleButton: {
     flex: 1,
@@ -335,15 +352,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    justifySelf: "center",
     zIndex: 1,
     elevation: 0,
-  },
-  landscapeToggleButtonContainer: {
-    // marginLeft: dynamicScale(-1100, false, 2),
-    // marginBottom: dynamicScale(6, true),
-    position: "absolute",
-    left: -280,
-    bottom: 1,
   },
 });

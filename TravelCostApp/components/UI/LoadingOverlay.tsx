@@ -1,22 +1,25 @@
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import PropTypes from "prop-types";
 import { StyleSheet, Text, View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 
-import React from "react";
 import { GlobalStyles } from "../../constants/styles";
 
 //localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
-import PropTypes from "prop-types";
+
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 import { dynamicScale } from "../../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 // i18n.locale = "en";
 i18n.enableFallback = true;
 
 const loadingColor = GlobalStyles.colors.primaryGrayed;
-const LoadingOverlay = (props) => {
+const LoadingOverlay = props => {
   const { containerStyle, customText, noText, size = "large" } = props;
   const string =
     customText && customText?.length > 0
@@ -41,12 +44,12 @@ LoadingOverlay.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: "center",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
-    padding: dynamicScale(12),
     marginTop: dynamicScale(4, true),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
+    padding: dynamicScale(12),
   },
   text: {
     color: loadingColor,

@@ -1,11 +1,12 @@
-import { Platform, Pressable } from "react-native";
-import React from "react";
-import { GlobalStyles } from "../../constants/styles";
-import IconButton from "./IconButton";
 import { useNavigation } from "@react-navigation/native";
-import PropTypes from "prop-types";
 import * as Haptics from "expo-haptics";
+import PropTypes from "prop-types";
+import { Platform, Pressable } from "react-native";
+
+import { GlobalStyles } from "../../constants/styles";
 import { dynamicScale } from "../../util/scalingUtil";
+
+import IconButton from "./IconButton";
 
 const BackButton = ({ style }) => {
   const navigation = useNavigation();

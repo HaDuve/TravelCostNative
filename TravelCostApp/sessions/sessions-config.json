@@ -1,18 +1,7 @@
 {
   "developer_name": "Hannes",
-  "trigger_phrases": [
-    "make it so",
-    "run that",
-    "go ahead",
-    "yert",
-    "gogo"
-  ],
-  "blocked_tools": [
-    "Edit",
-    "Write",
-    "MultiEdit",
-    "NotebookEdit"
-  ],
+  "trigger_phrases": ["make it so", "run that", "go ahead", "yert", "gogo"],
+  "blocked_tools": ["Edit", "Write", "MultiEdit", "NotebookEdit"],
   "task_detection": {
     "enabled": true
   },

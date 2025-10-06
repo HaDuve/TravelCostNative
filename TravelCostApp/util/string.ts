@@ -1,14 +1,17 @@
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import { getCurrencySymbol } from "./currencySymbol";
-import safeLogError from "./error";
 
 export function formatExpenseWithCurrency(
   amount: number | string,
@@ -25,11 +28,14 @@ export function formatExpenseWithCurrency(
     // // console.log("calling formatExpenseWithCurrency without a currency");
     return amount.toFixed(2);
   }
-  const locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageTag)?Localization.getLocales()[0].languageTag:'en-US');
+  const locale =
+    Localization.getLocales()[0] && Localization.getLocales()[0].languageTag
+      ? Localization.getLocales()[0].languageTag
+      : "en-US";
 
   const fractionOptions: Intl.NumberFormatOptions = {
     style: "currency",
-    currency: currency,
+    currency,
     currencyDisplay: "narrowSymbol",
     maximumFractionDigits: 0,
     minimumFractionDigits: 0,
@@ -37,7 +43,7 @@ export function formatExpenseWithCurrency(
   };
   const formatOptions: Intl.NumberFormatOptions = {
     style: "currency",
-    currency: currency,
+    currency,
     currencyDisplay: "narrowSymbol",
     // maximumFractionDigits: 0,
     minimumFractionDigits: 2,
@@ -50,7 +56,7 @@ export function formatExpenseWithCurrency(
         .format(amount)
         .replace(currency, getCurrencySymbol(currency));
     } catch (error) {
-      return amount.toFixed(2) + " " + getCurrencySymbol(currency);
+      return `${amount.toFixed(2)} ${getCurrencySymbol(currency)}`;
     }
   } else {
     try {
@@ -58,7 +64,7 @@ export function formatExpenseWithCurrency(
         .format(amount)
         .replace(currency, getCurrencySymbol(currency));
     } catch (error) {
-      return amount.toFixed(0) + " " + getCurrencySymbol(currency);
+      return `${amount.toFixed(0)} ${getCurrencySymbol(currency)}`;
     }
   }
 }
@@ -81,7 +87,7 @@ export function processTitleStringFilteredPiecharts(
     year: "thisYear",
     all: "totalLabel",
   };
-  nonTranslatedPeriodNames.forEach((nonTranslatedString) => {
+  nonTranslatedPeriodNames.forEach(nonTranslatedString => {
     if (periodName.includes(nonTranslatedString)) {
       periodName = periodName.replace(
         nonTranslatedString,
@@ -94,8 +100,8 @@ export function processTitleStringFilteredPiecharts(
   const lastDashIndex = periodName.lastIndexOf("-");
   const noIndexFound = lastDashIndex === -1;
   const periodNameProcessed = noIndexFound
-    ? periodName + " - "
-    : periodName.slice(0, lastDashIndex + 1) + " ";
+    ? `${periodName} - `
+    : `${periodName.slice(0, lastDashIndex + 1)} `;
   const newPeriodName =
     periodNameProcessed +
     formatExpenseWithCurrency(itemData.item.sumCat, tripCurrency);
@@ -104,7 +110,7 @@ export function processTitleStringFilteredPiecharts(
 
 export function truncateString(str: string, n: number) {
   if (!str || str?.length < 1 || n < 1) return "";
-  return str?.length > n ? str.slice(0, n - 1) + "..." : str;
+  return str?.length > n ? `${str.slice(0, n - 1)}...` : str;
 }
 
 /**

@@ -1,7 +1,12 @@
-import { useRef, useEffect } from "react";
+import { useEffect, useRef } from "react";
 
-export const useInterval = (callback, interval: number, immediate: boolean) => {
-  const ref = useRef();
+export const useInterval = (
+  callback: (isCancelled: () => boolean) => void,
+  interval: number,
+  immediate: boolean
+) => {
+  const ref =
+    useRef<(isCancelled: () => boolean) => void | undefined>(undefined);
 
   // keep reference to callback without restarting the interval
   useEffect(() => {
@@ -14,7 +19,7 @@ export const useInterval = (callback, interval: number, immediate: boolean) => {
 
     // wrap callback to pass isCancelled getter as an argument
     const fn = () => {
-      ref.current(() => cancelled);
+      ref.current?.(() => cancelled);
     };
 
     // set interval and run immediately if requested

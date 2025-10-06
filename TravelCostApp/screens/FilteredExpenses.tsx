@@ -1,23 +1,27 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
-
-//Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import PropTypes from "prop-types";
+import { StyleSheet, Text, View } from "react-native";
+
+//Localization
+
+import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
+import AddExpenseHereButton from "../components/UI/AddExpensesHereButton";
+import BackButton from "../components/UI/BackButton";
+import FlatButton from "../components/UI/FlatButton";
+import { GlobalStyles } from "../constants/styles";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
-import { GlobalStyles } from "../constants/styles";
-import PropTypes from "prop-types";
-import BackButton from "../components/UI/BackButton";
-import BlurPremium from "../components/Premium/BlurPremium";
-import FlatButton from "../components/UI/FlatButton";
 import { useNavigation } from "@react-navigation/native";
-import AddExpenseHereButton from "../components/UI/AddExpensesHereButton";
+
+import { RootNavigationProp } from "../types/navigation";
 import { getEarliestDate } from "../util/date";
 import { ExpenseData } from "../util/expense";
 
@@ -30,7 +34,7 @@ const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
       }
     : route.params;
   const withArgs = expensesAsArg ? true : false;
-  const navigation = useNavigation();
+  const navigation = useNavigation<RootNavigationProp>();
   const earliestDate = getEarliestDate(
     expenses.map((exp: ExpenseData) => exp.date)
   );
@@ -63,6 +67,9 @@ const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
         expenses={expenses}
         showSumForTravellerName={showSumForTravellerName}
         isFiltered
+        fallbackText=""
+        refreshControl={<></>}
+        refreshing={false}
       />
       {/* <BlurPremium canBack /> */}
       {!withArgs && (
@@ -94,6 +101,24 @@ const styles = StyleSheet.create({
     // center the content
     justifyContent: "center",
   },
+  shadow: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderBottomColor: GlobalStyles.colors.gray600,
+    borderBottomWidth: 0,
+    borderTopColor: GlobalStyles.colors.gray600,
+    borderTopWidth: 1,
+    elevation: 2,
+    minHeight: 1,
+    shadowColor: GlobalStyles.colors.textColor,
+    shadowOffset: { width: 1, height: 2.5 },
+    shadowOpacity: 0.9,
+    shadowRadius: 4,
+    zIndex: 2,
+  },
+  titleContainer: {
+    flexDirection: "row",
+    marginVertical: "4%",
+  },
   titleText: {
     fontSize: 20,
     fontWeight: "bold",
@@ -101,23 +126,5 @@ const styles = StyleSheet.create({
     // center text
     textAlign: "center",
     width: "80%",
-  },
-  titleContainer: {
-    marginVertical: "4%",
-    flexDirection: "row",
-  },
-  shadow: {
-    borderTopWidth: 1,
-    borderBottomWidth: 0,
-    borderTopColor: GlobalStyles.colors.gray600,
-    borderBottomColor: GlobalStyles.colors.gray600,
-    minHeight: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    elevation: 2,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 1, height: 2.5 },
-    shadowOpacity: 0.9,
-    shadowRadius: 4,
-    zIndex: 2,
   },
 });

@@ -9,9 +9,11 @@ modules: [components/charts, components/ExpensesOverview]
 # Improve UX in Graphs (Bar Chart and Pie Chart)
 
 ## Problem/Goal
+
 Need to improve UX in graphs (bar chart and pie chart). Manual test, add feedback and prevent bad UX coming from webview (like selecting text elements), add press or long press behaviour if it makes sense. Check how it was before the latest library changes to highcharts.
 
 ## Success Criteria
+
 - [ ] Manual test current graph UX issues
 - [ ] Prevent text selection and other webview bad UX
 - [ ] Add appropriate press/longpress interactions where beneficial
@@ -57,6 +59,7 @@ The color system from `GlobalStyles.colors` provides consistent theming with spe
 ### Technical Reference Details
 
 #### Missing Interaction Handlers
+
 ```typescript
 // Need to restore these in ExpenseChart.tsx
 onPointClick?: (data: any) => void;
@@ -68,6 +71,7 @@ Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); // For long
 ```
 
 #### CSS Fixes for Text Selection (chartHelpers.ts:34-57)
+
 ```css
 * {
   user-select: none;
@@ -78,11 +82,13 @@ Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); // For long
 ```
 
 #### WebView Message Types (WebViewChart.tsx:17-22)
+
 - chart-ready: WebView initialization complete
 - point-click: User tapped chart element
 - zoom: Chart zoom/pan events (currently unused)
 
 #### Budget Calculation Interface
+
 ```typescript
 ChartController.calculateBudgetStatus(
   expensesSum: number,
@@ -92,20 +98,23 @@ ChartController.calculateBudgetStatus(
 ```
 
 #### Navigation Pattern
+
 ```typescript
 navigation.navigate("FilteredPieCharts", {
   expenses: filteredExpenses,
-  dayString: datum.label
+  dayString: datum.label,
 });
 ```
 
 #### Component Integration Points
+
 - ExpenseChart: Column charts for expense timeline (needs interaction restoration)
 - CategoryChart: Pie charts for category breakdown (read-only, no interactions needed)
 - WebViewChart: Core chart component (needs CSS and touch improvements)
 - ChartController: Data processing utilities (budget calculations exist but unused)
 
 #### File Locations
+
 - Main implementation: `/components/charts/WebViewChart.tsx`
 - HTML template fixes: `/components/charts/chartHelpers.ts`
 - Interaction restoration: `/components/ExpensesOverview/ExpenseChart.tsx`
@@ -113,10 +122,13 @@ navigation.navigate("FilteredPieCharts", {
 - Previous implementation reference: `/components/ExpensesOverview/ExpenseChart.tsx.backup`
 
 ## Context Files
+
 <!-- Added by context-gathering agent or manually -->
 
 ## User Notes
+
 Improve UX in graphs (bar chart and pie chart), manual test, add feedback and prevent bad UX coming from webview (like selecting text elements), add press or long press behaviour if it makes sense (check how it was before the latest library changes to highcharts).
 
 ## Work Log
+
 - [2025-09-18] Created task

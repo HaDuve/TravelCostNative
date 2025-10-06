@@ -25,8 +25,8 @@ const MiniSyncIndicator: React.FC<MiniSyncIndicatorProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
     marginRight: dynamicScale(12, false, 0.5),
   },
 });

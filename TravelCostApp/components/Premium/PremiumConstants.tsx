@@ -1,18 +1,18 @@
-import Purchases from "react-native-purchases";
-import { FORCE_PREMIUM } from "../../confAppConstants";
-
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+import Purchases from "react-native-purchases";
+
+import { FORCE_PREMIUM } from "../../confAppConstants";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 // Branch.io removed
 import {
   secureStoreGetItem,
   secureStoreSetItem,
 } from "../../store/secure-storage";
-import { fetchServerInfo } from "../../util/http";
 import { isConnectionFastEnough } from "../../util/connectionSpeed";
 import safeLogError from "../../util/error";
+import { fetchServerInfo } from "../../util/http";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode

@@ -12,7 +12,7 @@ export function parseChangelog(changelogString: string): ChangelogItem[] {
 
   const versions = changelogString.split(/\n\n/g);
 
-  versions.forEach((version) => {
+  versions.forEach(version => {
     const lines = version.split("\n");
     if (lines.length > 1) {
       const versionInfo = lines[0];
@@ -20,7 +20,7 @@ export function parseChangelog(changelogString: string): ChangelogItem[] {
 
       // Replace "-" with "•" and add a new line before each occurrence
       changes = changes.map(
-        (change) =>
+        change =>
           `\n\n• ${capitalizeFirstLetter(change.replace(/^\s*-\s*/, ""))}`
       );
 

@@ -1,1 +1,656 @@
-{"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/constants/styles.ts":{"language":"TypeScript","code":108,"comment":4,"blank":2},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/user-context.tsx":{"language":"TypeScript JSX","code":242,"comment":14,"blank":36},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/settings-context.tsx":{"language":"TypeScript JSX","code":55,"comment":2,"blank":9},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/trip-context.tsx":{"language":"TypeScript JSX","code":186,"comment":12,"blank":22},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/expenses-context.tsx":{"language":"TypeScript JSX","code":260,"comment":21,"blank":30},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/async-storage.tsx":{"language":"TypeScript JSX","code":61,"comment":29,"blank":9},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/cache.tsx":{"language":"TypeScript JSX","code":35,"comment":0,"blank":10},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/auth-context.tsx":{"language":"TypeScript JSX","code":50,"comment":2,"blank":11},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/assets/SVG/toggleButton.js":{"language":"JavaScript","code":38,"comment":0,"blank":3},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/tsconfig.json":{"language":"JSON with Comments","code":7,"comment":0,"blank":1},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/assets/toggleGraph.svg":{"language":"XML","code":9,"comment":0,"blank":1},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/i18n/supportedLanguages.tsx":{"language":"TypeScript JSX","code":507,"comment":56,"blank":55},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/.eslintrc.js":{"language":"JavaScript","code":20,"comment":0,"blank":1},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/package.json":{"language":"JSON","code":89,"comment":0,"blank":1},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/babel.config.js":{"language":"JavaScript","code":7,"comment":0,"blank":1},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/metro.config.js":{"language":"JavaScript","code":2,"comment":1,"blank":2},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/firebase/testAuth.js":{"language":"JavaScript","code":21,"comment":0,"blank":3},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ProfileScreen.tsx":{"language":"TypeScript JSX","code":376,"comment":23,"blank":21},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ManageCategoryScreen.tsx":{"language":"TypeScript JSX","code":532,"comment":17,"blank":22},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/firebase/initializeFirebaseApp.js":{"language":"JavaScript","code":14,"comment":7,"blank":3},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/firebase/getFirebaseDatabase.js":{"language":"JavaScript","code":5,"comment":1,"blank":2},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/SettingsScreen.tsx":{"language":"TypeScript JSX","code":225,"comment":16,"blank":19},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/LoginScreen.tsx":{"language":"TypeScript JSX","code":98,"comment":10,"blank":9},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/JoinTrip.tsx":{"language":"TypeScript JSX","code":219,"comment":10,"blank":12},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Premium/PremiumConstants.tsx":{"language":"TypeScript JSX","code":27,"comment":10,"blank":3},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/FilteredExpenses.tsx":{"language":"TypeScript JSX","code":74,"comment":5,"blank":7},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ImportGSScreen.js":{"language":"JavaScript","code":128,"comment":1,"blank":8},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/WelcomeScreen.js":{"language":"JavaScript","code":40,"comment":0,"blank":7},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Currency/CurrencyPicker.tsx":{"language":"TypeScript JSX","code":89,"comment":4,"blank":10},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Premium/PackageItem.tsx":{"language":"TypeScript JSX","code":79,"comment":0,"blank":10},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ManageExpense.tsx":{"language":"TypeScript JSX","code":267,"comment":38,"blank":27},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Premium/PayWall.tsx":{"language":"TypeScript JSX","code":164,"comment":10,"blank":11},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/CategoryPickScreen.tsx":{"language":"TypeScript JSX","code":294,"comment":45,"blank":19},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/OverviewScreen.tsx":{"language":"TypeScript JSX","code":146,"comment":3,"blank":13},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/SignupScreen.tsx":{"language":"TypeScript JSX","code":83,"comment":10,"blank":9},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Hooks/useInterval.ts":{"language":"TypeScript","code":19,"comment":7,"blank":7},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseCountryFlag.tsx":{"language":"TypeScript JSX","code":21,"comment":1,"blank":4},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpensesOutput.tsx":{"language":"TypeScript JSX","code":74,"comment":0,"blank":8},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/OnboardingScreen.js":{"language":"JavaScript","code":60,"comment":2,"blank":6},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseItem.tsx":{"language":"TypeScript JSX","code":317,"comment":4,"blank":16},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageProfile/ProfileForm.tsx":{"language":"TypeScript JSX","code":245,"comment":12,"blank":17},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/RecentExpensesUtil.ts":{"language":"TypeScript","code":41,"comment":0,"blank":4},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpensesList.tsx":{"language":"TypeScript JSX","code":182,"comment":37,"blank":15},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Errors/Alert.tsx":{"language":"TypeScript JSX","code":24,"comment":4,"blank":3},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpensesSummary.tsx":{"language":"TypeScript JSX","code":115,"comment":14,"blank":12},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpensesOverview.tsx":{"language":"TypeScript JSX","code":228,"comment":9,"blank":13},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseCountries.tsx":{"language":"TypeScript JSX","code":154,"comment":2,"blank":19},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ImportExport/ImportFromGoogleXlsx.ts":{"language":"TypeScript","code":248,"comment":38,"blank":17},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ImportExport/ExportToGoogleXlsx.ts":{"language":"TypeScript","code":31,"comment":3,"blank":4},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseCurrencies.tsx":{"language":"TypeScript JSX","code":150,"comment":2,"blank":19},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ImportExport/OpenXLSXPicker.ts":{"language":"TypeScript","code":142,"comment":20,"blank":16},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ImportExport/ImportExpense.ts":{"language":"TypeScript","code":51,"comment":29,"blank":7},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseTravellers.tsx":{"language":"TypeScript JSX","code":208,"comment":10,"blank":21},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/package-lock.json":{"language":"JSON","code":36921,"comment":0,"blank":1},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/CategoryProgressBar.tsx":{"language":"TypeScript JSX","code":108,"comment":0,"blank":9},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseGraph.tsx":{"language":"TypeScript JSX","code":407,"comment":21,"blank":19},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/SplitSummaryScreen.tsx":{"language":"TypeScript JSX","code":178,"comment":13,"blank":14},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseCategories.tsx":{"language":"TypeScript JSX","code":158,"comment":2,"blank":19},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ProfileOutput/TripHistoryItem.tsx":{"language":"TypeScript JSX","code":261,"comment":7,"blank":17},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ProfileOutput/ShareTrip.js":{"language":"JavaScript","code":40,"comment":6,"blank":7},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/RecentExpenses.tsx":{"language":"TypeScript JSX","code":265,"comment":10,"blank":28},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ProfileOutput/TripItem.tsx":{"language":"TypeScript JSX","code":219,"comment":4,"blank":17},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageTrip/TripForm.tsx":{"language":"TypeScript JSX","code":482,"comment":26,"blank":35},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ProfileOutput/TripList.tsx":{"language":"TypeScript JSX","code":48,"comment":0,"blank":5},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOverview/ExpenseChart.tsx":{"language":"TypeScript JSX","code":157,"comment":4,"blank":6},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOverview/CategoryChart.tsx":{"language":"TypeScript JSX","code":83,"comment":3,"blank":7},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Auth/Input.tsx":{"language":"TypeScript JSX","code":60,"comment":0,"blank":6},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Auth/AuthForm.tsx":{"language":"TypeScript JSX","code":236,"comment":14,"blank":16},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageExpense/ExpenseForm.tsx":{"language":"TypeScript JSX","code":1017,"comment":39,"blank":48},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Auth/AuthContent.tsx":{"language":"TypeScript JSX","code":101,"comment":2,"blank":16},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageExpense/ExpensePicker.js":{"language":"JavaScript","code":55,"comment":0,"blank":4},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageExpense/Input.tsx":{"language":"TypeScript JSX","code":87,"comment":2,"blank":6},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/%23%23%20Configuration.md":{"language":"Markdown","code":30,"comment":0,"blank":10},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageExpense/AddExpenseButton.tsx":{"language":"TypeScript JSX","code":76,"comment":3,"blank":9},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/LoadingOverlay.tsx":{"language":"TypeScript JSX","code":34,"comment":2,"blank":5},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/Button.tsx":{"language":"TypeScript JSX","code":67,"comment":2,"blank":4},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/selectCategoryIcon.tsx":{"language":"TypeScript JSX","code":42,"comment":0,"blank":5},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/DatePickerModal.tsx":{"language":"TypeScript JSX","code":65,"comment":2,"blank":5},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/ToastComponent.tsx":{"language":"TypeScript JSX","code":40,"comment":27,"blank":4},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/ErrorOverlay.js":{"language":"JavaScript","code":32,"comment":0,"blank":4},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/IconButton.js":{"language":"JavaScript","code":48,"comment":0,"blank":4},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/SettingsSwitch.tsx":{"language":"TypeScript JSX","code":49,"comment":6,"blank":4},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/FlatButton.tsx":{"language":"TypeScript JSX","code":34,"comment":0,"blank":6},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/BottomTabBar.tsx":{"language":"TypeScript JSX","code":129,"comment":2,"blank":12},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/BackgroundGradient.tsx":{"language":"TypeScript JSX","code":12,"comment":0,"blank":4},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/DatePickerContainer.tsx":{"language":"TypeScript JSX","code":68,"comment":0,"blank":5},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/SettingsSection.tsx":{"language":"TypeScript JSX","code":61,"comment":3,"blank":9},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/GradientButton.tsx":{"language":"TypeScript JSX","code":79,"comment":2,"blank":4},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/app.json":{"language":"JSON","code":18,"comment":24,"blank":0},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/SplashScreenOverlay.tsx":{"language":"TypeScript JSX","code":61,"comment":4,"blank":4},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/eas.json":{"language":"JSON","code":49,"comment":0,"blank":1},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/index.js":{"language":"JavaScript","code":3,"comment":3,"blank":3},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/auth.ts":{"language":"TypeScript","code":21,"comment":0,"blank":6},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/expense.ts":{"language":"TypeScript","code":54,"comment":1,"blank":4},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/tourUtil.ts":{"language":"TypeScript","code":21,"comment":0,"blank":5},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/http.tsx":{"language":"TypeScript JSX","code":440,"comment":82,"blank":42},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/LinkButton.tsx":{"language":"TypeScript JSX","code":53,"comment":2,"blank":4},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/offline-queue.ts":{"language":"TypeScript","code":213,"comment":49,"blank":9},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/appState.ts":{"language":"TypeScript","code":14,"comment":0,"blank":5},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/currencyExchange.ts":{"language":"TypeScript","code":10,"comment":2,"blank":2},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/split.ts":{"language":"TypeScript","code":244,"comment":20,"blank":17},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/dateTime.ts":{"language":"TypeScript","code":37,"comment":18,"blank":1},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/category.ts":{"language":"TypeScript","code":74,"comment":6,"blank":5},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/.expo-shared/assets.json":{"language":"JSON","code":4,"comment":0,"blank":1},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/confAppConstants.ts":{"language":"TypeScript","code":9,"comment":9,"blank":2},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/date.ts":{"language":"TypeScript","code":127,"comment":40,"blank":27},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/string.ts":{"language":"TypeScript","code":18,"comment":0,"blank":2},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/App.tsx":{"language":"TypeScript JSX","code":547,"comment":61,"blank":36},"file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/jsconfig.json":{"language":"JSON with Comments","code":10,"comment":2,"blank":0}}
+{
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/constants/styles.ts": {
+    "language": "TypeScript",
+    "code": 108,
+    "comment": 4,
+    "blank": 2
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/user-context.tsx": {
+    "language": "TypeScript JSX",
+    "code": 242,
+    "comment": 14,
+    "blank": 36
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/settings-context.tsx": {
+    "language": "TypeScript JSX",
+    "code": 55,
+    "comment": 2,
+    "blank": 9
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/trip-context.tsx": {
+    "language": "TypeScript JSX",
+    "code": 186,
+    "comment": 12,
+    "blank": 22
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/expenses-context.tsx": {
+    "language": "TypeScript JSX",
+    "code": 260,
+    "comment": 21,
+    "blank": 30
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/async-storage.tsx": {
+    "language": "TypeScript JSX",
+    "code": 61,
+    "comment": 29,
+    "blank": 9
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/cache.tsx": {
+    "language": "TypeScript JSX",
+    "code": 35,
+    "comment": 0,
+    "blank": 10
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/store/auth-context.tsx": {
+    "language": "TypeScript JSX",
+    "code": 50,
+    "comment": 2,
+    "blank": 11
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/assets/SVG/toggleButton.js": {
+    "language": "JavaScript",
+    "code": 38,
+    "comment": 0,
+    "blank": 3
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/tsconfig.json": {
+    "language": "JSON with Comments",
+    "code": 7,
+    "comment": 0,
+    "blank": 1
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/assets/toggleGraph.svg": {
+    "language": "XML",
+    "code": 9,
+    "comment": 0,
+    "blank": 1
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/i18n/supportedLanguages.tsx": {
+    "language": "TypeScript JSX",
+    "code": 507,
+    "comment": 56,
+    "blank": 55
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/.eslintrc.js": {
+    "language": "JavaScript",
+    "code": 20,
+    "comment": 0,
+    "blank": 1
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/package.json": {
+    "language": "JSON",
+    "code": 89,
+    "comment": 0,
+    "blank": 1
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/babel.config.js": {
+    "language": "JavaScript",
+    "code": 7,
+    "comment": 0,
+    "blank": 1
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/metro.config.js": {
+    "language": "JavaScript",
+    "code": 2,
+    "comment": 1,
+    "blank": 2
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/firebase/testAuth.js": {
+    "language": "JavaScript",
+    "code": 21,
+    "comment": 0,
+    "blank": 3
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ProfileScreen.tsx": {
+    "language": "TypeScript JSX",
+    "code": 376,
+    "comment": 23,
+    "blank": 21
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ManageCategoryScreen.tsx": {
+    "language": "TypeScript JSX",
+    "code": 532,
+    "comment": 17,
+    "blank": 22
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/firebase/initializeFirebaseApp.js": {
+    "language": "JavaScript",
+    "code": 14,
+    "comment": 7,
+    "blank": 3
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/firebase/getFirebaseDatabase.js": {
+    "language": "JavaScript",
+    "code": 5,
+    "comment": 1,
+    "blank": 2
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/SettingsScreen.tsx": {
+    "language": "TypeScript JSX",
+    "code": 225,
+    "comment": 16,
+    "blank": 19
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/LoginScreen.tsx": {
+    "language": "TypeScript JSX",
+    "code": 98,
+    "comment": 10,
+    "blank": 9
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/JoinTrip.tsx": {
+    "language": "TypeScript JSX",
+    "code": 219,
+    "comment": 10,
+    "blank": 12
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Premium/PremiumConstants.tsx": {
+    "language": "TypeScript JSX",
+    "code": 27,
+    "comment": 10,
+    "blank": 3
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/FilteredExpenses.tsx": {
+    "language": "TypeScript JSX",
+    "code": 74,
+    "comment": 5,
+    "blank": 7
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ImportGSScreen.js": {
+    "language": "JavaScript",
+    "code": 128,
+    "comment": 1,
+    "blank": 8
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/WelcomeScreen.js": {
+    "language": "JavaScript",
+    "code": 40,
+    "comment": 0,
+    "blank": 7
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Currency/CurrencyPicker.tsx": {
+    "language": "TypeScript JSX",
+    "code": 89,
+    "comment": 4,
+    "blank": 10
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Premium/PackageItem.tsx": {
+    "language": "TypeScript JSX",
+    "code": 79,
+    "comment": 0,
+    "blank": 10
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/ManageExpense.tsx": {
+    "language": "TypeScript JSX",
+    "code": 267,
+    "comment": 38,
+    "blank": 27
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Premium/PayWall.tsx": {
+    "language": "TypeScript JSX",
+    "code": 164,
+    "comment": 10,
+    "blank": 11
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/CategoryPickScreen.tsx": {
+    "language": "TypeScript JSX",
+    "code": 294,
+    "comment": 45,
+    "blank": 19
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/OverviewScreen.tsx": {
+    "language": "TypeScript JSX",
+    "code": 146,
+    "comment": 3,
+    "blank": 13
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/SignupScreen.tsx": {
+    "language": "TypeScript JSX",
+    "code": 83,
+    "comment": 10,
+    "blank": 9
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Hooks/useInterval.ts": {
+    "language": "TypeScript",
+    "code": 19,
+    "comment": 7,
+    "blank": 7
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseCountryFlag.tsx": {
+    "language": "TypeScript JSX",
+    "code": 21,
+    "comment": 1,
+    "blank": 4
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpensesOutput.tsx": {
+    "language": "TypeScript JSX",
+    "code": 74,
+    "comment": 0,
+    "blank": 8
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/OnboardingScreen.js": {
+    "language": "JavaScript",
+    "code": 60,
+    "comment": 2,
+    "blank": 6
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseItem.tsx": {
+    "language": "TypeScript JSX",
+    "code": 317,
+    "comment": 4,
+    "blank": 16
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageProfile/ProfileForm.tsx": {
+    "language": "TypeScript JSX",
+    "code": 245,
+    "comment": 12,
+    "blank": 17
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/RecentExpensesUtil.ts": {
+    "language": "TypeScript",
+    "code": 41,
+    "comment": 0,
+    "blank": 4
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpensesList.tsx": {
+    "language": "TypeScript JSX",
+    "code": 182,
+    "comment": 37,
+    "blank": 15
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Errors/Alert.tsx": {
+    "language": "TypeScript JSX",
+    "code": 24,
+    "comment": 4,
+    "blank": 3
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpensesSummary.tsx": {
+    "language": "TypeScript JSX",
+    "code": 115,
+    "comment": 14,
+    "blank": 12
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpensesOverview.tsx": {
+    "language": "TypeScript JSX",
+    "code": 228,
+    "comment": 9,
+    "blank": 13
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseCountries.tsx": {
+    "language": "TypeScript JSX",
+    "code": 154,
+    "comment": 2,
+    "blank": 19
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ImportExport/ImportFromGoogleXlsx.ts": {
+    "language": "TypeScript",
+    "code": 248,
+    "comment": 38,
+    "blank": 17
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ImportExport/ExportToGoogleXlsx.ts": {
+    "language": "TypeScript",
+    "code": 31,
+    "comment": 3,
+    "blank": 4
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseCurrencies.tsx": {
+    "language": "TypeScript JSX",
+    "code": 150,
+    "comment": 2,
+    "blank": 19
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ImportExport/OpenXLSXPicker.ts": {
+    "language": "TypeScript",
+    "code": 142,
+    "comment": 20,
+    "blank": 16
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ImportExport/ImportExpense.ts": {
+    "language": "TypeScript",
+    "code": 51,
+    "comment": 29,
+    "blank": 7
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseTravellers.tsx": {
+    "language": "TypeScript JSX",
+    "code": 208,
+    "comment": 10,
+    "blank": 21
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/package-lock.json": {
+    "language": "JSON",
+    "code": 36921,
+    "comment": 0,
+    "blank": 1
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/CategoryProgressBar.tsx": {
+    "language": "TypeScript JSX",
+    "code": 108,
+    "comment": 0,
+    "blank": 9
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseGraph.tsx": {
+    "language": "TypeScript JSX",
+    "code": 407,
+    "comment": 21,
+    "blank": 19
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/SplitSummaryScreen.tsx": {
+    "language": "TypeScript JSX",
+    "code": 178,
+    "comment": 13,
+    "blank": 14
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOutput/ExpenseStatistics/ExpenseCategories.tsx": {
+    "language": "TypeScript JSX",
+    "code": 158,
+    "comment": 2,
+    "blank": 19
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ProfileOutput/TripHistoryItem.tsx": {
+    "language": "TypeScript JSX",
+    "code": 261,
+    "comment": 7,
+    "blank": 17
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ProfileOutput/ShareTrip.js": {
+    "language": "JavaScript",
+    "code": 40,
+    "comment": 6,
+    "blank": 7
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/screens/RecentExpenses.tsx": {
+    "language": "TypeScript JSX",
+    "code": 265,
+    "comment": 10,
+    "blank": 28
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ProfileOutput/TripItem.tsx": {
+    "language": "TypeScript JSX",
+    "code": 219,
+    "comment": 4,
+    "blank": 17
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageTrip/TripForm.tsx": {
+    "language": "TypeScript JSX",
+    "code": 482,
+    "comment": 26,
+    "blank": 35
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ProfileOutput/TripList.tsx": {
+    "language": "TypeScript JSX",
+    "code": 48,
+    "comment": 0,
+    "blank": 5
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOverview/ExpenseChart.tsx": {
+    "language": "TypeScript JSX",
+    "code": 157,
+    "comment": 4,
+    "blank": 6
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ExpensesOverview/CategoryChart.tsx": {
+    "language": "TypeScript JSX",
+    "code": 83,
+    "comment": 3,
+    "blank": 7
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Auth/Input.tsx": {
+    "language": "TypeScript JSX",
+    "code": 60,
+    "comment": 0,
+    "blank": 6
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Auth/AuthForm.tsx": {
+    "language": "TypeScript JSX",
+    "code": 236,
+    "comment": 14,
+    "blank": 16
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageExpense/ExpenseForm.tsx": {
+    "language": "TypeScript JSX",
+    "code": 1017,
+    "comment": 39,
+    "blank": 48
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/Auth/AuthContent.tsx": {
+    "language": "TypeScript JSX",
+    "code": 101,
+    "comment": 2,
+    "blank": 16
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageExpense/ExpensePicker.js": {
+    "language": "JavaScript",
+    "code": 55,
+    "comment": 0,
+    "blank": 4
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageExpense/Input.tsx": {
+    "language": "TypeScript JSX",
+    "code": 87,
+    "comment": 2,
+    "blank": 6
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/%23%23%20Configuration.md": {
+    "language": "Markdown",
+    "code": 30,
+    "comment": 0,
+    "blank": 10
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageExpense/AddExpenseButton.tsx": {
+    "language": "TypeScript JSX",
+    "code": 76,
+    "comment": 3,
+    "blank": 9
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/LoadingOverlay.tsx": {
+    "language": "TypeScript JSX",
+    "code": 34,
+    "comment": 2,
+    "blank": 5
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/Button.tsx": {
+    "language": "TypeScript JSX",
+    "code": 67,
+    "comment": 2,
+    "blank": 4
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/selectCategoryIcon.tsx": {
+    "language": "TypeScript JSX",
+    "code": 42,
+    "comment": 0,
+    "blank": 5
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/DatePickerModal.tsx": {
+    "language": "TypeScript JSX",
+    "code": 65,
+    "comment": 2,
+    "blank": 5
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/ToastComponent.tsx": {
+    "language": "TypeScript JSX",
+    "code": 40,
+    "comment": 27,
+    "blank": 4
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/ErrorOverlay.js": {
+    "language": "JavaScript",
+    "code": 32,
+    "comment": 0,
+    "blank": 4
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/IconButton.js": {
+    "language": "JavaScript",
+    "code": 48,
+    "comment": 0,
+    "blank": 4
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/SettingsSwitch.tsx": {
+    "language": "TypeScript JSX",
+    "code": 49,
+    "comment": 6,
+    "blank": 4
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/FlatButton.tsx": {
+    "language": "TypeScript JSX",
+    "code": 34,
+    "comment": 0,
+    "blank": 6
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/BottomTabBar.tsx": {
+    "language": "TypeScript JSX",
+    "code": 129,
+    "comment": 2,
+    "blank": 12
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/BackgroundGradient.tsx": {
+    "language": "TypeScript JSX",
+    "code": 12,
+    "comment": 0,
+    "blank": 4
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/DatePickerContainer.tsx": {
+    "language": "TypeScript JSX",
+    "code": 68,
+    "comment": 0,
+    "blank": 5
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/SettingsSection.tsx": {
+    "language": "TypeScript JSX",
+    "code": 61,
+    "comment": 3,
+    "blank": 9
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/GradientButton.tsx": {
+    "language": "TypeScript JSX",
+    "code": 79,
+    "comment": 2,
+    "blank": 4
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/app.json": {
+    "language": "JSON",
+    "code": 18,
+    "comment": 24,
+    "blank": 0
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/SplashScreenOverlay.tsx": {
+    "language": "TypeScript JSX",
+    "code": 61,
+    "comment": 4,
+    "blank": 4
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/eas.json": {
+    "language": "JSON",
+    "code": 49,
+    "comment": 0,
+    "blank": 1
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/index.js": {
+    "language": "JavaScript",
+    "code": 3,
+    "comment": 3,
+    "blank": 3
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/auth.ts": {
+    "language": "TypeScript",
+    "code": 21,
+    "comment": 0,
+    "blank": 6
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/expense.ts": {
+    "language": "TypeScript",
+    "code": 54,
+    "comment": 1,
+    "blank": 4
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/tourUtil.ts": {
+    "language": "TypeScript",
+    "code": 21,
+    "comment": 0,
+    "blank": 5
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/http.tsx": {
+    "language": "TypeScript JSX",
+    "code": 440,
+    "comment": 82,
+    "blank": 42
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/UI/LinkButton.tsx": {
+    "language": "TypeScript JSX",
+    "code": 53,
+    "comment": 2,
+    "blank": 4
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/offline-queue.ts": {
+    "language": "TypeScript",
+    "code": 213,
+    "comment": 49,
+    "blank": 9
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/appState.ts": {
+    "language": "TypeScript",
+    "code": 14,
+    "comment": 0,
+    "blank": 5
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/currencyExchange.ts": {
+    "language": "TypeScript",
+    "code": 10,
+    "comment": 2,
+    "blank": 2
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/split.ts": {
+    "language": "TypeScript",
+    "code": 244,
+    "comment": 20,
+    "blank": 17
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/dateTime.ts": {
+    "language": "TypeScript",
+    "code": 37,
+    "comment": 18,
+    "blank": 1
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/category.ts": {
+    "language": "TypeScript",
+    "code": 74,
+    "comment": 6,
+    "blank": 5
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/.expo-shared/assets.json": {
+    "language": "JSON",
+    "code": 4,
+    "comment": 0,
+    "blank": 1
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/confAppConstants.ts": {
+    "language": "TypeScript",
+    "code": 9,
+    "comment": 9,
+    "blank": 2
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/date.ts": {
+    "language": "TypeScript",
+    "code": 127,
+    "comment": 40,
+    "blank": 27
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/util/string.ts": {
+    "language": "TypeScript",
+    "code": 18,
+    "comment": 0,
+    "blank": 2
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/App.tsx": {
+    "language": "TypeScript JSX",
+    "code": 547,
+    "comment": 61,
+    "blank": 36
+  },
+  "file:///Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/jsconfig.json": {
+    "language": "JSON with Comments",
+    "code": 10,
+    "comment": 2,
+    "blank": 0
+  }
+}

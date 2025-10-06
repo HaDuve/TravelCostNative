@@ -9,9 +9,11 @@ modules: [components/TripForm, utils/currency]
 # Alert and Auto-fill for Trip Home Currency
 
 ## Problem/Goal
+
 Need to alert users if they put anything different than their home currency into trip home currency field AND auto-fill this field with home currency by default.
 
 ## Success Criteria
+
 - [ ] Alert appears when user enters different currency than home currency
 - [ ] Trip home currency field auto-fills with user's home currency
 - [ ] Clear messaging about currency mismatch implications
@@ -67,19 +69,21 @@ Since we're implementing a home currency alert and auto-fill system, we need to 
 #### Component Interfaces & Signatures
 
 **TripForm Currency State**:
+
 ```typescript
 const [inputs, setInputs] = useState({
   tripCurrency: {
-    value: standardCurrency,  // Auto-filled from locale
+    value: standardCurrency, // Auto-filled from locale
     isValid: true,
-  }
+  },
 });
 
-function inputChangedHandler(inputIdentifier: string, enteredValue: any)
-function updateCurrency() // Existing confirmation dialog
+function inputChangedHandler(inputIdentifier: string, enteredValue: any);
+function updateCurrency(); // Existing confirmation dialog
 ```
 
 **UserContext Interface**:
+
 ```typescript
 interface UserData {
   lastCurrency?: string;  // Last used currency
@@ -93,6 +97,7 @@ loadLastCurrencyCountryFromStorage: () => Promise<void>
 ```
 
 **CurrencyPicker Interface**:
+
 ```typescript
 interface CurrencyPickerProps {
   countryValue: string;
@@ -106,30 +111,35 @@ interface CurrencyPickerProps {
 #### Data Structures
 
 **Trip Currency Storage**:
+
 - `TripData.tripCurrency: string` - Stored per trip
 - Validated in `checkFormValidity()` for existence
 - Used throughout app for expense calculations and display
 
 **User Preference Storage**:
+
 - Secure storage keys: `"lastCurrency"`, `"lastCountry"`
 - Need to add: `"homeCurrency"` key for persistent preference
 - Storage pattern: `secureStoreSetItem(key, value)` / `secureStoreGetItem(key)`
 
 **Locale Detection**:
+
 ```typescript
 const locales = Localization.getLocales();
-const currencyList = locales.map((locale) => locale.currencyCode);
+const currencyList = locales.map(locale => locale.currencyCode);
 const standardCurrency = currencyList[0]; // Device locale currency
 ```
 
 #### Configuration Requirements
 
 **Internationalization**:
+
 - Alert messages need i18n keys in `supportedLanguages.tsx`
 - Existing patterns: `infoHomeCurrencyTitle`, `infoHomeCurrencyText`
 - Need new keys for mismatch alerts and confirmation dialogs
 
 **User Experience**:
+
 - Alert should be informative, not intrusive
 - Auto-fill should be obvious but overrideable
 - Settings should allow users to modify home currency preference
@@ -144,10 +154,13 @@ const standardCurrency = currencyList[0]; // Device locale currency
 - **Alert utilities**: `components/Errors/Alert.tsx` (reusable alert functions)
 
 ## Context Files
+
 <!-- Added by context-gathering agent or manually -->
 
 ## User Notes
+
 Alert if a user puts anything different than his home currency into trip home currency AND auto-fill this field with home currency.
 
 ## Work Log
+
 - [2025-09-18] Created task

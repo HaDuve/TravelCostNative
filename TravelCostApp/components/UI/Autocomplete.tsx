@@ -1,14 +1,16 @@
 // Autocomplete/index.js
 
-import { View, Platform } from "react-native";
-import { Menu, TextInput } from "react-native-paper";
-import React, { useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
-import { GlobalStyles } from "../../constants/styles";
+import React, { useEffect, useRef, useState } from "react";
+import { View } from "react-native";
+import { Menu, TextInput } from "react-native-paper";
 import Animated, { FadeIn } from "react-native-reanimated";
+
+import { GlobalStyles } from "../../constants/styles";
+import { AutocompleteProps } from "../../types/components";
 import { dynamicScale } from "../../util/scalingUtil";
 
-const Autocomplete = ({
+const Autocomplete: React.FC<AutocompleteProps> = ({
   value: origValue,
   label,
   data,
@@ -18,6 +20,7 @@ const Autocomplete = ({
   placeholder,
   style = {},
   menuStyle = {},
+  onTouchStart,
 }) => {
   const [value, setValue] = useState(origValue);
   const [menuVisible, setMenuVisible] = useState(false);
@@ -48,7 +51,7 @@ const Autocomplete = ({
    */
   function filterData(text: string) {
     const filteredData = data.filter(
-      (val) => val?.toLowerCase()?.indexOf(text?.toLowerCase()) > -1
+      val => val?.toLowerCase()?.indexOf(text?.toLowerCase()) > -1
     );
     // remove copies
     return [...new Set(filteredData)];
@@ -70,16 +73,13 @@ const Autocomplete = ({
           if (isSelectingRef.current) {
             return;
           }
-          
-          const timeoutId = setTimeout(
-            () => {
-              // Double-check selection state before hiding
-              if (!isSelectingRef.current) {
-                setMenuVisible(false);
-              }
-            },
-            5000
-          );
+
+          const timeoutId = setTimeout(() => {
+            // Double-check selection state before hiding
+            if (!isSelectingRef.current) {
+              setMenuVisible(false);
+            }
+          }, 5000);
           setBlurTimeout(timeoutId);
         }}
         label={label}
@@ -95,7 +95,7 @@ const Autocomplete = ({
         activeOutlineColor={GlobalStyles.colors.primary700}
         underlineColor={GlobalStyles.colors.accent250}
         selectionColor={GlobalStyles.colors.primary700}
-        onChangeText={(text) => {
+        onChangeText={text => {
           origOnChange(text);
           if (text && text?.length > 0) {
             setFilteredData(filterData(text));
@@ -119,35 +119,13 @@ const Autocomplete = ({
               return (
                 <Menu.Item
                   key={i}
-                  style={[
-                    {
-                      backgroundColor: GlobalStyles.colors.backgroundColor,
-                      borderWidth: 1,
-                      borderColor: GlobalStyles.colors.primaryGrayed,
-                      maxWidth: "100%",
-                    },
-                  ]}
-                  //   icon={icon}
-                  onTouchStart={() => {
-                    // Handle selection immediately on touch start to bypass keyboard dismiss
-                    isSelectingRef.current = true;
-                    
-                    // Clear any pending blur timeout
-                    if (blurTimeout) {
-                      clearTimeout(blurTimeout);
-                      setBlurTimeout(null);
-                    }
-                    
-                    // Apply the selection immediately
-                    origOnChange(autotext);
-                    setValue(autotext);
-                    
-                    // Hide menu after a brief delay to ensure smooth UX
-                    setTimeout(() => {
-                      setMenuVisible(false);
-                      isSelectingRef.current = false;
-                    }, 50);
+                  style={{
+                    backgroundColor: GlobalStyles.colors.backgroundColor,
+                    borderWidth: 1,
+                    borderColor: GlobalStyles.colors.primaryGrayed,
+                    maxWidth: "100%",
                   }}
+                  //   icon={icon}
                   onPress={() => {
                     // Keep onPress as fallback for platforms that don't consume onTouchStart
                     if (!isSelectingRef.current) {

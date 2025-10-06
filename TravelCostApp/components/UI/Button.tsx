@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View, Pressable } from "react-native";
-import React from "react";
-import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+
+import { GlobalStyles } from "../../constants/styles";
 
 const Button = ({
   children,
@@ -25,7 +25,7 @@ const Button = ({
           pressed && GlobalStyles.pressedWithShadow,
         ]}
       >
-        <View style={[mode === "flat" && styles.flat]}>
+        <View style={mode === "flat" && styles.flat}>
           <Text
             style={[
               GlobalStyles.buttonTextPrimary,
@@ -44,15 +44,15 @@ export default Button;
 
 const styles = StyleSheet.create({
   button: {
-    padding: 16,
     backgroundColor: GlobalStyles.colors.primary500,
     borderRadius: 16,
     elevation: 3,
+    overflow: "visible",
+    padding: 16,
     shadowColor: GlobalStyles.colors.textColor,
-    shadowRadius: 3,
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.4,
-    overflow: "visible",
+    shadowRadius: 3,
   },
   flat: {
     // TODO: find another way android
@@ -62,11 +62,11 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.primary200,
   },
   pressed: {
-    transform: [{ scale: 0.9 }],
-    opacity: 0.75,
     backgroundColor: GlobalStyles.colors.primary100,
     borderRadius: 16,
+    opacity: 0.75,
     shadowColor: GlobalStyles.colors.backgroundColor,
     shadowRadius: 0,
+    transform: [{ scale: 0.9 }],
   },
 });

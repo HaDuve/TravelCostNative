@@ -1,7 +1,14 @@
-import { StyleSheet, Text, View, Pressable, Platform } from "react-native";
 import * as Haptics from "expo-haptics";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import PropTypes from "prop-types";
+import { useContext, useRef } from "react";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 
-import React, { useContext, useRef } from "react";
+import { MAX_JS_NUMBER, MAX_PERIOD_RANGE } from "../../../confAppConstants";
+import { GlobalStyles } from "../../../constants/styles";
+import { de, en, fr, ru } from "../../../i18n/supportedLanguages";
 import { ExpensesContext } from "../../../store/expenses-context";
 import {
   getDateMinusDays,
@@ -11,13 +18,10 @@ import {
   toMonthString,
 } from "../../../util/date";
 import { formatExpenseWithCurrency } from "../../../util/string";
-import { GlobalStyles } from "../../../constants/styles";
 import ExpenseChart from "../../ExpensesOverview/ExpenseChart";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../../i18n/supportedLanguages";
+
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -26,15 +30,12 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
-import PropTypes from "prop-types";
-import { isForeground } from "../../../util/appState";
-import { MAX_JS_NUMBER, MAX_PERIOD_RANGE } from "../../../confAppConstants";
-import { SettingsContext } from "../../../store/settings-context";
-import { getExpensesSumPeriod } from "../../../util/expense";
-import FlatButton from "../../UI/FlatButton";
-import { dynamicScale } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
+import { SettingsContext } from "../../../store/settings-context";
+import { isForeground } from "../../../util/appState";
+import { getExpensesSumPeriod } from "../../../util/expense";
+import { dynamicScale } from "../../../util/scalingUtil";
+import FlatButton from "../../UI/FlatButton";
 
 const ExpenseGraph = ({
   periodName,
@@ -45,6 +46,7 @@ const ExpenseGraph = ({
   setStartingPoint,
   tripCtx,
   navigation,
+  expenses,
 }) => {
   const today = new Date();
   const renderItemRef = useRef(null);
@@ -64,7 +66,7 @@ const ExpenseGraph = ({
   const lastWeeks = (periodRangeNumber ?? 7) + longerPeriodNum;
   const lastMonths = (periodRangeNumber ?? 7) + longerPeriodNum;
   const lastYears =
-    (periodName == "total" ? 5 : periodRangeNumber ?? 7) + longerPeriodNum;
+    (periodName == "total" ? 5 : (periodRangeNumber ?? 7)) + longerPeriodNum;
   let xAxis = "";
   let yAxis = "";
   let budgetAxis = "";
@@ -138,7 +140,7 @@ const ExpenseGraph = ({
               const filteredExpenses = expenseCtx
                 .getSpecificDayExpenses(new Date(item.day))
                 .filter(
-                  (item) =>
+                  item =>
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
@@ -146,7 +148,7 @@ const ExpenseGraph = ({
 
               navigation.navigate("FilteredExpenses", {
                 expenses: filteredExpenses,
-                dayString: dayString,
+                dayString,
               });
             }}
             onPress={() => {
@@ -154,7 +156,7 @@ const ExpenseGraph = ({
               const filteredExpenses = expenseCtx
                 .getSpecificDayExpenses(new Date(item.day))
                 .filter(
-                  (item) =>
+                  item =>
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
@@ -254,7 +256,7 @@ const ExpenseGraph = ({
               const filteredExpenses = expenseCtx
                 .getSpecificWeekExpenses(new Date(item.firstDay))
                 .filter(
-                  (item) =>
+                  item =>
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
@@ -269,7 +271,7 @@ const ExpenseGraph = ({
               const filteredExpenses = expenseCtx
                 .getSpecificWeekExpenses(new Date(item.firstDay))
                 .filter(
-                  (item) =>
+                  item =>
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
@@ -344,7 +346,7 @@ const ExpenseGraph = ({
               const filteredExpenses = expenseCtx
                 .getSpecificMonthExpenses(new Date(item.firstDay))
                 .filter(
-                  (item) =>
+                  item =>
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
@@ -359,7 +361,7 @@ const ExpenseGraph = ({
               const filteredExpenses = expenseCtx
                 .getSpecificMonthExpenses(new Date(item.firstDay))
                 .filter(
-                  (item) =>
+                  item =>
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
@@ -438,7 +440,7 @@ const ExpenseGraph = ({
               const filteredExpenses = expenseCtx
                 .getSpecificYearExpenses(new Date(item.firstDay))
                 .filter(
-                  (item) =>
+                  item =>
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
@@ -453,7 +455,7 @@ const ExpenseGraph = ({
               const filteredExpenses = expenseCtx
                 .getSpecificYearExpenses(new Date(item.firstDay))
                 .filter(
-                  (item) =>
+                  item =>
                     !item.isSpecialExpense ||
                     (item.isSpecialExpense && !hideSpecial)
                 );
@@ -483,11 +485,11 @@ const ExpenseGraph = ({
       break;
   }
   const showFutureString = `${i18n.t("showMore")} ${i18n.t("future")} ${i18n.t(
-    periodName + "s"
+    `${periodName}s`
   )}`;
 
   const showPastString = `${i18n.t("showMore")} ${i18n.t("past")} ${i18n.t(
-    periodName + "s"
+    `${periodName}s`
   )}`;
 
   return (
@@ -606,35 +608,6 @@ ExpenseGraph.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    // marginTop: 60,
-    // paddingTop: 60,
-  },
-  graphContainer: {
-    minHeight: dynamicScale(158, true),
-    paddingTop: dynamicScale(45, true),
-    marginTop: dynamicScale(8, true),
-    paddingBottom: dynamicScale(15, true),
-    marginBottom: dynamicScale(15, true),
-  },
-  landscapeGraphContainer: {
-    minHeight: 0,
-    paddingTop: 0,
-    marginTop: 0,
-    paddingBottom: 0,
-  },
-  flatButtonContainer: {
-    marginBottom: dynamicScale(-30, true),
-  },
-  landscapeFlatButton: {
-    marginTop: dynamicScale(48, true),
-    // marginBottom: dynamicScale(20, true),
-  },
-  listContainer: {
-    flex: 1,
-    flexDirection: "row",
-  },
   categoryCard: {
     height: dynamicScale(65, true),
     minWidth: dynamicScale(200),
@@ -658,47 +631,76 @@ const styles = StyleSheet.create({
       },
     }),
   },
-
+  container: {
+    flex: 1,
+    // marginTop: 60,
+    // paddingTop: 60,
+  },
+  flatButtonContainer: {
+    marginBottom: dynamicScale(-30, true),
+  },
+  graphContainer: {
+    marginBottom: dynamicScale(15, true),
+    marginTop: dynamicScale(8, true),
+    minHeight: dynamicScale(158, true),
+    paddingBottom: dynamicScale(15, true),
+    paddingTop: dynamicScale(45, true),
+  },
+  green: {
+    color: GlobalStyles.colors.primary500,
+  },
   itemContainer: {
-    paddingVertical: dynamicScale(12, true),
-    paddingHorizontal: dynamicScale(24),
     marginHorizontal: dynamicScale(20),
     marginTop: dynamicScale(4, true),
+    paddingHorizontal: dynamicScale(24),
+    paddingVertical: dynamicScale(12, true),
     ...Platform.select({
       android: {
         elevation: 5,
         borderRadius: 10,
       },
     }),
-    marginBottom: dynamicScale(8, true),
+    backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: dynamicScale(10, false, 0.5),
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: GlobalStyles.colors.backgroundColor,
+    marginBottom: dynamicScale(8, true),
   },
-  text1: {
-    fontSize: dynamicScale(20, false, 0.5),
-    color: GlobalStyles.colors.textColor,
-    fontWeight: "300",
+  landscapeFlatButton: {
+    marginTop: dynamicScale(48, true),
+    // marginBottom: dynamicScale(20, true),
   },
-  green: {
-    color: GlobalStyles.colors.primary500,
+
+  landscapeGraphContainer: {
+    marginTop: 0,
+    minHeight: 0,
+    paddingBottom: 0,
+    paddingTop: 0,
+  },
+  listContainer: {
+    flex: 1,
+    flexDirection: "row",
   },
   red: {
     color: GlobalStyles.colors.error300,
   },
   shadow: {
-    borderTopWidth: 1,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderBottomColor: GlobalStyles.colors.gray600,
     borderBottomWidth: 0,
     borderTopColor: GlobalStyles.colors.gray600,
-    borderBottomColor: GlobalStyles.colors.gray600,
-    minHeight: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderTopWidth: 1,
     elevation: 2,
+    minHeight: 1,
     shadowColor: GlobalStyles.colors.textColor,
     shadowOffset: { width: 1, height: 2.5 },
     shadowOpacity: 0.9,
     shadowRadius: 4,
     zIndex: 2,
+  },
+  text1: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(20, false, 0.5),
+    fontWeight: "300",
   },
 });

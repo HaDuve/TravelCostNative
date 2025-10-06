@@ -9,9 +9,11 @@ modules: [android-platform, app-initialization, dependencies]
 # Fix Android Startup Crash
 
 ## Problem/Goal
+
 Android app crashes on startup after recent library updates. Need to identify and fix compatibility issues or dependency conflicts causing the crash.
 
 ## Success Criteria
+
 - [ ] Android app launches successfully without crashing
 - [ ] Identify root cause of the startup crash
 - [ ] Update or fix problematic libraries/dependencies
@@ -77,12 +79,14 @@ Android has specific requirements for activity lifecycle management, splash scre
 #### Critical Initialization Sequence
 
 **MainActivity.kt Initialization:**
+
 - `SplashScreenManager.registerOnActivity(this)` - Line 21
-- `super.onCreate(null)` - Line 23  
+- `super.onCreate(null)` - Line 23
 - Component name: "main" - Line 30
 - New Architecture delegate with `BuildConfig.IS_NEW_ARCHITECTURE_ENABLED` - Line 39
 
 **MainApplication.kt Configuration:**
+
 - `SoLoader.init(this, OpenSourceMergedSoMapping)` - Line 45
 - New Architecture loading if enabled - Lines 46-48
 - `ApplicationLifecycleDispatcher.onApplicationCreate(this)` - Line 50
@@ -90,6 +94,7 @@ Android has specific requirements for activity lifecycle management, splash scre
 #### Dependency Versions and Compatibility Matrix
 
 **Critical Versions:**
+
 - React: 19.0.0 (experimental with React Native)
 - React Native: 0.79.5
 - react-native-reanimated: 3.19.1
@@ -100,6 +105,7 @@ Android has specific requirements for activity lifecycle management, splash scre
 #### Android Build Configuration
 
 **Build Variables:**
+
 - compileSdk: `rootProject.ext.compileSdkVersion`
 - minSdkVersion: `rootProject.ext.minSdkVersion`
 - targetSdkVersion: `rootProject.ext.targetSdkVersion`
@@ -107,6 +113,7 @@ Android has specific requirements for activity lifecycle management, splash scre
 - versionName: "1.2.803"
 
 **Critical Build Settings:**
+
 - `newArchEnabled=true` in gradle.properties
 - `hermesEnabled=true`
 - `org.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m`
@@ -114,6 +121,7 @@ Android has specific requirements for activity lifecycle management, splash scre
 #### File Locations for Implementation
 
 **Primary Investigation Files:**
+
 - Android configuration: `/android/app/build.gradle`
 - Native entry points: `/android/app/src/main/java/com/budgetfornomads/app/MainActivity.kt`
 - Native application: `/android/app/src/main/java/com/budgetfornomads/app/MainApplication.kt`
@@ -121,6 +129,7 @@ Android has specific requirements for activity lifecycle management, splash scre
 - Error logging: `/util/error.ts`
 
 **Dependency Configuration:**
+
 - Package versions: `/package.json`
 - Gradle properties: `/android/gradle.properties`
 - Expo configuration: `/app.json`
@@ -141,10 +150,13 @@ Resolve the New Architecture configuration mismatch between gradle.properties an
 Test on multiple Android devices and API levels to identify device-specific or API-level-specific crashes. Pay special attention to Android 14+ devices where there may be new permission or lifecycle requirements.
 
 ## Context Files
+
 <!-- Added by context-gathering agent or manually -->
 
 ## User Notes
+
 FIX: fix android crash on startup (check libraries after last update)
 
 ## Work Log
+
 <!-- Updated as work progresses -->

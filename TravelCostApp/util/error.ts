@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
 // Note: Error handling utilities
 import { customEvent } from "vexo-analytics";
-import { shouldEnableVexo } from "./vexo-tracking";
+
 import { VexoEvents } from "./vexo-constants";
+import { shouldEnableVexo } from "./vexo-tracking";
 /**
  * Logs an error message to the console, including the file name and line number where the error occurred.
  * Also reports the error to Vexo for production tracking.
@@ -19,8 +20,8 @@ export default function safeLogError(
   if (!error) return;
   const message = getErrorMessage(error);
   const logMessage = `${fileName ? "in:" : ""} ${
-    fileName ? "fn: " + fileName + " " : ""
-  }${lineNumber ? "ln: " + lineNumber : ""}\n${message || "Unknown error"}`;
+    fileName ? `fn: ${fileName} ` : ""
+  }${lineNumber ? `ln: ${lineNumber}` : ""}\n${message || "Unknown error"}`;
 
   console.error(logMessage);
 

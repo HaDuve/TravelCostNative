@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+
 import {
   _toMonthString,
   _getDateMinusDays,
@@ -141,7 +142,7 @@ export function toMonthString(date: DateOrDateTime) {
 export function getEarliestDate(dateISOs: string[]) {
   if (!dateISOs || dateISOs.length === 0) return null;
   // in case any date is not a string turn it into a iso
-  dateISOs.forEach((dateISO) => {
+  dateISOs.forEach(dateISO => {
     if (!isIsoDate(dateISO)) {
       try {
         dateISO = new Date(dateISO).toISOString();

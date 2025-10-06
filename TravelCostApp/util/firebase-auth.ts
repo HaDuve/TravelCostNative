@@ -1,11 +1,12 @@
 import axios from "axios";
-import { setMMKVString } from "../store/mmkv";
+
 import {
   secureStoreGetItem,
   secureStoreSetItem,
 } from "../store/secure-storage";
-import safeLogError from "./error";
+
 import { setAxiosAccessToken } from "./axios-config";
+import safeLogError from "./error";
 
 const API_KEY = "AIzaSyAPXaokb5pgZ286Ih-ty8ZERoc8nubf1TE";
 const BACKEND_URL =
@@ -118,8 +119,8 @@ async function reAuthenticate(): Promise<string | null> {
 
     const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`;
     const response = await axios.post(url, {
-      email: email,
-      password: password,
+      email,
+      password,
       returnSecureToken: true,
     });
 
@@ -174,7 +175,7 @@ export async function testFirebaseAuth(): Promise<{
 
     return {
       success: true,
-      token: token.substring(0, 20) + "...",
+      token: `${token.substring(0, 20)}...`,
       uid: uid || "unknown",
     };
   } catch (error) {

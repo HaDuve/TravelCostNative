@@ -1,22 +1,21 @@
-import React, { StyleSheet, Text, View } from "react-native";
-import * as Progress from "react-native-progress";
-import { GlobalStyles } from "../../../constants/styles";
 import { Ionicons } from "@expo/vector-icons";
+import PropTypes from "prop-types";
+import { useContext, useEffect, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import * as Progress from "react-native-progress";
+import Animated, { ZoomIn } from "react-native-reanimated";
+
+import { GlobalStyles } from "../../../constants/styles";
+import { OrientationContext } from "../../../store/orientation-context";
+import { TripContext } from "../../../store/trip-context";
+import { UserContext } from "../../../store/user-context";
 import {
   Category,
   getCatString,
   getCatSymbolMMKV,
 } from "../../../util/category";
-import { useContext } from "react";
-import { TripContext } from "../../../store/trip-context";
-import { formatExpenseWithCurrency } from "../../../util/string";
-import Animated, { ZoomIn } from "react-native-reanimated";
-import PropTypes from "prop-types";
-import { useEffect } from "react";
-import { useState } from "react";
-import { UserContext } from "../../../store/user-context";
 import { constantScale, dynamicScale } from "../../../util/scalingUtil";
-import { OrientationContext } from "../../../store/orientation-context";
+import { formatExpenseWithCurrency } from "../../../util/string";
 
 const CategoryProgressBar = ({
   cat,
@@ -113,29 +112,29 @@ CategoryProgressBar.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: "flex-start",
+    borderRadius: dynamicScale(6, false, 0.5),
     flex: 1,
-    padding: dynamicScale(8),
-    paddingBottom: dynamicScale(4, true),
+    justifyContent: "space-between",
     marginLeft: dynamicScale(8),
     marginRight: dynamicScale(10),
-    borderRadius: dynamicScale(6, false, 0.5),
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  titleRow: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    marginBottom: dynamicScale(4, true),
+    padding: dynamicScale(8),
+    paddingBottom: dynamicScale(4, true),
   },
   period: {
-    fontSize: dynamicScale(12, false, 0.5),
     color: GlobalStyles.colors.primary500,
+    fontSize: dynamicScale(12, false, 0.5),
   },
   sum: {
+    color: GlobalStyles.colors.primary500,
     fontSize: dynamicScale(22, false, 0.5),
     fontWeight: "300",
-    color: GlobalStyles.colors.primary500,
+  },
+  titleRow: {
+    alignItems: "center",
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    marginBottom: dynamicScale(4, true),
   },
 });

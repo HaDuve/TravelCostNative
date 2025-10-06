@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import React, { createContext, useEffect, useState } from "react";
-import { Alert } from "react-native";
-import { fetchTrip, fetchUser, getTravellers, updateTrip } from "../util/http";
-import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
-import Toast from "react-native-toast-message";
-import { MAX_JS_NUMBER } from "../confAppConstants";
-import { secureStoreGetItem } from "./secure-storage";
-import { ExpenseData, isPaidString } from "../util/expense";
-import { err } from "react-native-svg/lib/typescript/xml";
-import { Traveller } from "../util/traveler";
-import { isConnectionFastEnough } from "../util/connectionSpeed";
+
 import { useInterval } from "../components/Hooks/useInterval";
-import { setMMKVObject, getMMKVObject } from "./mmkv";
-import set from "react-native-reanimated";
+import { MAX_JS_NUMBER } from "../confAppConstants";
 import { Category } from "../util/category";
+import { isConnectionFastEnough } from "../util/connectionSpeed";
 import safeLogError from "../util/error";
+import { ExpenseData, isPaidString } from "../util/expense";
+import { fetchTrip, fetchUser, getTravellers, updateTrip } from "../util/http";
+import { Traveller } from "../util/traveler";
+
+import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
+import { setMMKVObject, getMMKVObject } from "./mmkv";
+import { secureStoreGetItem } from "./secure-storage";
+
+// SVG error handling - removed problematic import
 
 export interface TripData {
   tripName?: string;
@@ -52,7 +52,7 @@ export type TripContextType = {
   refresh: () => void;
   setTripProgress: (percent: number) => void;
   travellers: Traveller[];
-  fetchAndSetTravellers: (tripid: string) => Promise<boolean>;
+  fetchAndSetTravellers: (tripid: string) => Promise<void>;
   setTotalSum: (amount: number) => void;
   setTripid: (tripid: string) => void;
   addTrip: ({ tripName, tripTotalBudget }) => void;
@@ -102,8 +102,8 @@ export const TripContext = createContext({
     return {};
   },
   saveTripDataInStorage: async (tripData: TripData) => {},
-  loadTripDataFromStorage: async () => {},
-  saveTravellersInStorage: async (travellers) => {},
+  loadTripDataFromStorage: async (): Promise<TripData> => ({}) as TripData,
+  saveTravellersInStorage: async travellers => {},
   loadTravellersFromStorage: async () => {},
   fetchAndSettleCurrentTrip: async (unSettle = false) => {},
   isPaid: isPaidString.notPaid,
@@ -223,7 +223,7 @@ function TripContextProvider({ children }) {
     }
     if (!tripid || tripid === "") {
       // setTravellers([]);
-      return false;
+      return;
     }
     // updates the current Travellers in context
     try {
@@ -231,7 +231,6 @@ function TripContextProvider({ children }) {
       if (travellers?.length < 1) throw new Error("no travellers found");
       saveTravellersInStorage(travellers);
       setTravellers(travellers);
-      return true;
     } catch (error) {
       safeLogError(error);
       throw new Error("no travellers found");
@@ -278,7 +277,7 @@ function TripContextProvider({ children }) {
       setTravellers(trip.travellers);
     } else {
       const extractedTravellers = [];
-      Object.keys(trip.travellers).forEach((key) => {
+      Object.keys(trip.travellers).forEach(key => {
         //skip undefined keys
         if (key && travellers[key]) {
           extractedTravellers.push(travellers[key]["userName"]);
@@ -328,19 +327,19 @@ function TripContextProvider({ children }) {
 
   function getcurrentTrip() {
     const curTripData: TripData = {
-      tripid: tripid,
-      tripName: tripName,
-      totalBudget: totalBudget,
-      dailyBudget: dailyBudget,
-      tripCurrency: tripCurrency,
-      totalSum: totalSum,
-      isPaid: isPaid,
-      isPaidDate: isPaidDate,
+      tripid,
+      tripName,
+      totalBudget,
+      dailyBudget,
+      tripCurrency,
+      totalSum,
+      isPaid,
+      isPaidDate,
       tripProgress: progress,
-      startDate: startDate,
-      endDate: endDate,
-      travellers: travellers,
-      isDynamicDailyBudget: isDynamicDailyBudget,
+      startDate,
+      endDate,
+      travellers,
+      isDynamicDailyBudget,
     };
     return curTripData;
   }
@@ -400,38 +399,38 @@ function TripContextProvider({ children }) {
   }
 
   const value = {
-    tripid: tripid,
-    tripName: tripName,
-    totalBudget: totalBudget,
-    dailyBudget: dailyBudget,
-    setdailyBudget: setdailyBudget,
-    tripCurrency: tripCurrency,
-    totalSum: totalSum,
+    tripid,
+    tripName,
+    totalBudget,
+    dailyBudget,
+    setdailyBudget,
+    tripCurrency,
+    totalSum,
     tripProgress: progress,
-    startDate: startDate,
-    endDate: endDate,
-    refresh: refresh,
-    refreshState: refreshState,
-    setTripProgress: setTripProgress,
-    travellers: travellers,
-    fetchAndSetTravellers: fetchAndSetTravellers,
-    setTotalSum: setTotalSum,
+    startDate,
+    endDate,
+    refresh,
+    refreshState,
+    setTripProgress,
+    travellers,
+    fetchAndSetTravellers,
+    setTotalSum,
     setTripid: _setTripid,
-    addTrip: addTrip,
-    deleteTrip: deleteTrip,
-    getcurrentTrip: getcurrentTrip,
-    setCurrentTrip: setCurrentTrip,
-    fetchAndSetCurrentTrip: fetchAndSetCurrentTrip,
-    saveTripDataInStorage: saveTripDataInStorage,
-    loadTripDataFromStorage: loadTripDataFromStorage,
-    saveTravellersInStorage: saveTravellersInStorage,
-    loadTravellersFromStorage: loadTravellersFromStorage,
-    fetchAndSettleCurrentTrip: fetchAndSettleCurrentTrip,
-    isPaid: isPaid,
-    isPaidDate: isPaidDate,
-    isLoading: isLoading,
-    setIsLoading: setIsLoading,
-    isDynamicDailyBudget: isDynamicDailyBudget,
+    addTrip,
+    deleteTrip,
+    getcurrentTrip,
+    setCurrentTrip,
+    fetchAndSetCurrentTrip,
+    saveTripDataInStorage,
+    loadTripDataFromStorage,
+    saveTravellersInStorage,
+    loadTravellersFromStorage,
+    fetchAndSettleCurrentTrip,
+    isPaid,
+    isPaidDate,
+    isLoading,
+    setIsLoading,
+    isDynamicDailyBudget,
   };
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>;

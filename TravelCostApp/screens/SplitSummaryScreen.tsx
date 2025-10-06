@@ -1,3 +1,6 @@
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import PropTypes from "prop-types";
 import React, {
   useCallback,
   useContext,
@@ -7,13 +10,6 @@ import React, {
 } from "react";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
-const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
-i18n.enableFallback = true;
-// i18n.locale = "en";
 
 import {
   Alert,
@@ -22,31 +18,43 @@ import {
   StyleSheet,
   Text,
   View,
+  Pressable,
+  ScrollView,
 } from "react-native";
+import Animated from "react-native-reanimated";
 import Toast from "react-native-toast-message";
+
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import FlatButton from "../components/UI/FlatButton";
+import GradientButton from "../components/UI/GradientButton";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
+i18n.enableFallback = true;
+// i18n.locale = "en";
+
 import { GlobalStyles } from "../constants/styles";
+import { ExpensesContext } from "../store/expenses-context";
+import { OrientationContext } from "../store/orientation-context";
 import { TripContext } from "../store/trip-context";
+import { UserContext } from "../store/user-context";
+import safeLogError from "../util/error";
+import { ExpenseData, Split } from "../util/expense";
+import { dynamicScale } from "../util/scalingUtil";
 import {
   areSplitListsEqual,
   calcOpenSplitsTable,
   simplifySplits,
 } from "../util/split";
-import PropTypes from "prop-types";
-import { UserContext } from "../store/user-context";
-import GradientButton from "../components/UI/GradientButton";
-import { ExpensesContext } from "../store/expenses-context";
-import { ExpenseData, Split } from "../util/expense";
-import Animated from "react-native-reanimated";
+
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
+
 import { useFocusEffect } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
-import { Pressable, ScrollView } from "react-native";
-import { dynamicScale } from "../util/scalingUtil";
-import { OrientationContext } from "../store/orientation-context";
-import safeLogError from "../util/error";
 
 const SplitSummaryScreen = ({ navigation }) => {
   const {
@@ -86,11 +94,10 @@ const SplitSummaryScreen = ({ navigation }) => {
   const titleTextSimplified = "Split Summary";
 
   const tripNameString = truncateString(tripName, 25);
-  const subTitleOriginal =
-    "Overview of owed amounts in the trip:\n  " + tripNameString;
-  const subTitleSimplified =
-    "Simplified Summary of Optimal Transactions in the trip:  " +
-    tripNameString;
+  const subTitleOriginal = `Overview of owed amounts in the trip:\n  ${tripNameString}`;
+  const subTitleSimplified = `Simplified Summary of Optimal Transactions in the trip:  ${
+    tripNameString
+  }`;
 
   const [titleText, setTitleText] = useState(titleTextOriginal);
   const [subTitleText, setSubTitleText] = useState(subTitleOriginal);
@@ -147,7 +154,7 @@ const SplitSummaryScreen = ({ navigation }) => {
         text2: i18n.t("fetchError"),
         visibilityTime: 2000,
       });
-      safeLogError("Could not fetch splits from the web database! " + error);
+      safeLogError(`Could not fetch splits from the web database! ${error}`);
     }
     setIsFetching(false);
   }, [
@@ -185,7 +192,7 @@ const SplitSummaryScreen = ({ navigation }) => {
         });
         navigation.pop();
       }
-      if (simpleSplits.some((split) => split.whoPaid === "Error")) {
+      if (simpleSplits.some(split => split.whoPaid === "Error")) {
         setTitleText(titleTextSimplified);
         setSubTitleText(subTitleSimplified);
         setShowSimplify(false);
@@ -229,7 +236,7 @@ const SplitSummaryScreen = ({ navigation }) => {
   }, []);
 
   const renderSplitItem = useCallback(
-    (itemData) => {
+    itemData => {
       // get a list of all expenses where the item.userName and item.whoPaid is included in the expense.splitList as either whoPaid or userName
       const expensesList = expenses.filter((expense: ExpenseData) => {
         const splitList = expense?.splitList;
@@ -301,7 +308,11 @@ const SplitSummaryScreen = ({ navigation }) => {
         </FlatButton>
       )}
       {showSimplify && !noSimpleSplits && (
-        <GradientButton style={styles.button} onPress={handleSimpflifySplits}>
+        <GradientButton
+          style={styles.button}
+          onPress={handleSimpflifySplits}
+          buttonStyle={{}}
+        >
           Simplify Splits
         </GradientButton>
       )}
@@ -398,10 +409,42 @@ SplitSummaryScreen.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  amountText: {
+    fontSize: dynamicScale(18, false, 0.5),
+    fontWeight: "500",
+    fontStyle: "italic",
+
+    color: GlobalStyles.colors.errorGrayed,
+    // center
+    alignItems: "center",
+  },
+  button: {
+    ...Platform.select({
+      ios: {
+        marginTop: dynamicScale(20, true),
+        borderRadius: 12,
+        minHeight: 55,
+      },
+      android: {
+        elevation: 0,
+      },
+    }),
+  },
+  buttonContainer: {
+    alignItems: "center",
+    flexDirection: "row",
     flex: 1,
-    // alignItems: "center",
-    backgroundColor: GlobalStyles.colors.backgroundColor,
+    justifyContent: "space-between",
+    // margin: "2%",
+    ...Platform.select({
+      ios: { marginTop: 0 },
+      android: {
+        // height: dynamicScale(55, true),
+        marginVertical: dynamicScale(18),
+        // flexDirection: "column",
+        minHeight: dynamicScale(100, true),
+      },
+    }),
   },
   cardContainer: {
     margin: dynamicScale(20),
@@ -425,67 +468,10 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  button: {
-    ...Platform.select({
-      ios: {
-        marginTop: dynamicScale(20, true),
-        borderRadius: 12,
-        minHeight: 55,
-      },
-      android: {
-        elevation: 0,
-      },
-    }),
-  },
-  splitContainer: {
+  container: {
     flex: 1,
-    flexDirection: "row",
-    paddingHorizontal: dynamicScale(16),
-    paddingVertical: dynamicScale(8, true),
-    marginVertical: dynamicScale(8, true),
-    borderWidth: 1,
-    borderColor: GlobalStyles.colors.backgroundColor,
+    // alignItems: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: dynamicScale(44, false, 0.5),
-    alignItems: "center",
-    justifyContent: "center",
-    // android styles
-    ...Platform.select({
-      android: {
-        margin: dynamicScale(8),
-        minHeight: dynamicScale(55, true),
-      },
-    }),
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "space-between",
-    // margin: "2%",
-    ...Platform.select({
-      ios: { marginTop: 0 },
-      android: {
-        // height: dynamicScale(55, true),
-        marginVertical: dynamicScale(18),
-        // flexDirection: "column",
-        minHeight: dynamicScale(100, true),
-      },
-    }),
-  },
-  splitText: {
-    maxWidth: "100%",
-    textAlign: "center",
-  },
-  userText: {
-    fontSize: dynamicScale(18, false, 0.5),
-    fontWeight: "500",
-    //italics
-    fontStyle: "italic",
-    color: GlobalStyles.colors.textColor,
-    // center
-    alignItems: "center",
-    alignContent: "center",
   },
   normalText: {
     fontSize: dynamicScale(16),
@@ -495,32 +481,39 @@ const styles = StyleSheet.create({
     alignContent: "center",
     fontStyle: "italic",
   },
-  amountText: {
-    fontSize: dynamicScale(18, false, 0.5),
-    fontWeight: "500",
-    fontStyle: "italic",
-
-    color: GlobalStyles.colors.errorGrayed,
-    // center
-    alignItems: "center",
-  },
-
-  titleContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: "-8%",
-    // row
+  row: {
     flexDirection: "row",
+    // marginTop: 0,
+    // paddingTop: 0,
+    justifyContent: "flex-start",
+    alignContent: "flex-start",
+    alignItems: "flex-start",
   },
-  titleText: {
-    fontSize: dynamicScale(32, false, 0.5),
-    fontWeight: "bold",
-    paddingBottom: dynamicScale(12, true),
-    color: GlobalStyles.colors.textColor,
-    // center
+  splitContainer: {
     alignItems: "center",
-    alignContent: "center",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: dynamicScale(44, false, 0.5),
+    borderWidth: 1,
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    marginVertical: dynamicScale(8, true),
+    paddingHorizontal: dynamicScale(16),
+    paddingVertical: dynamicScale(8, true),
+    // android styles
+    ...Platform.select({
+      android: {
+        margin: dynamicScale(8),
+        minHeight: dynamicScale(55, true),
+      },
+    }),
   },
+  splitText: {
+    maxWidth: "100%",
+    textAlign: "center",
+  },
+
   subTitleContainer: {
     alignItems: "flex-start",
     justifyContent: "flex-start",
@@ -538,12 +531,30 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     alignContent: "flex-start",
   },
-  row: {
+  titleContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: "-8%",
+    // row
     flexDirection: "row",
-    // marginTop: 0,
-    // paddingTop: 0,
-    justifyContent: "flex-start",
-    alignContent: "flex-start",
-    alignItems: "flex-start",
+  },
+  titleText: {
+    fontSize: dynamicScale(32, false, 0.5),
+    fontWeight: "bold",
+    paddingBottom: dynamicScale(12, true),
+    color: GlobalStyles.colors.textColor,
+    // center
+    alignItems: "center",
+    alignContent: "center",
+  },
+  userText: {
+    fontSize: dynamicScale(18, false, 0.5),
+    fontWeight: "500",
+    //italics
+    fontStyle: "italic",
+    color: GlobalStyles.colors.textColor,
+    // center
+    alignItems: "center",
+    alignContent: "center",
   },
 });

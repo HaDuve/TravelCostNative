@@ -1,10 +1,7 @@
 import { Platform } from "react-native";
 import { Layout } from "react-native-reanimated";
-import {
-  constantScale,
-  dynamicScale,
-  verticalScale,
-} from "../util/scalingUtil";
+
+import { constantScale, dynamicScale } from "../util/scalingUtil";
 
 export const GlobalStyles = {
   colors: {
@@ -48,18 +45,18 @@ export const GlobalStyles = {
     cat8: "#0097e5",
     cat9: "#e10a8e",
   },
-  gradientColors: ["#FEEF60", "#FBF0A8", "#A1D8C1"],
-  gradientPrimaryButton: ["#A1D8C1", "#A1D8C1", "#538076", "#005645"],
-  gradientColorsButton: ["#FEEF60", "#FBF0A8", "#A1D8C1"],
-  gradientErrorButton: ["#fcc4e4", "#fcc4e4", "#cf6157", "#B42113"],
-  gradientAccentButton: ["#FEEF60", "#FBF0A8", "#A1D8C1"],
+  gradientColors: ["#FEEF60", "#FBF0A8", "#A1D8C1"] as const,
+  gradientPrimaryButton: ["#A1D8C1", "#A1D8C1", "#538076", "#005645"] as const,
+  gradientColorsButton: ["#FEEF60", "#FBF0A8", "#A1D8C1"] as const,
+  gradientErrorButton: ["#fcc4e4", "#fcc4e4", "#cf6157", "#B42113"] as const,
+  gradientAccentButton: ["#FEEF60", "#FBF0A8", "#A1D8C1"] as const,
 
   tabBarColors: ["#FFFFFF", "#FBF0A8", "#A1D8C1", "#538076", "#DCDCDC"],
   buttonTextPrimary: {
     color: "#FFFFFF",
     textAlign: "center",
     fontStyle: "italic",
-    fontWeight: "300",
+    fontWeight: "300" as const,
     fontSize: dynamicScale(14, false, 0.5),
   },
   backButton: {
@@ -71,27 +68,27 @@ export const GlobalStyles = {
   titleText: {
     color: "#434343",
     fontSize: constantScale(28, 0.5),
-    fontWeight: "bold",
+    fontWeight: "bold" as const,
     marginBottom: dynamicScale(12, true, 0.1),
   },
   buttonTextGradient: {
     color: "#FFFFFF",
-    textAlign: "center",
-    fontStyle: "italic",
-    fontWeight: "300",
+    textAlign: "center" as const,
+    fontStyle: "italic" as const,
+    fontWeight: "300" as const,
     fontSize: dynamicScale(14, false, 0.5),
   },
   buttonTextFlat: {
     color: "#008C70",
-    textAlign: "center",
-    fontStyle: "italic",
-    fontWeight: "300",
+    textAlign: "center" as const,
+    fontStyle: "italic" as const,
+    fontWeight: "300" as const,
     fontSize: dynamicScale(14, false, 0.5),
   },
   secondaryText: {
     fontSize: dynamicScale(14, false, 0.5),
     color: "#626262",
-    fontWeight: "300",
+    fontWeight: "300" as const,
   },
   shadow: {
     elevation: 4,

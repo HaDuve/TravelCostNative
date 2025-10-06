@@ -9,9 +9,11 @@ modules: [components/ExpenseItem, components/layouts]
 # Fix Small Phone Layout Issue with Expense Item List
 
 ## Problem/Goal
+
 Small phones (eg: iPhone SE) have layout issues with 2 lines of text in expense item list. Text should not wrap into multiple lines, causing poor UX on small screens.
 
 ## Success Criteria
+
 - [ ] Text in expense item list displays on single line on iPhone SE
 - [ ] Implement responsive text sizing or truncation
 - [ ] Test on various small screen sizes
@@ -50,18 +52,29 @@ The existing maxFontSizeMultiplier properties (1.2 for description, 1 for date) 
 #### Component Interfaces & Signatures
 
 **ExpenseItem Component (ExpenseItem.tsx:41-56)**
+
 ```typescript
 function ExpenseItem(props): JSX.Element {
   const { showSumForTravellerName, filtered, setSelectable } = props;
   const {
-    id, description, amount, category, country, whoPaid, currency,
-    calcAmount, splitList, iconName, isSpecialExpense
+    id,
+    description,
+    amount,
+    category,
+    country,
+    whoPaid,
+    currency,
+    calcAmount,
+    splitList,
+    iconName,
+    isSpecialExpense,
   }: ExpenseData = props;
   let { date } = props;
 }
 ```
 
 **OrientationContext Interface (orientation-context.tsx:8-15)**
+
 ```typescript
 {
   orientation: "PORTRAIT" | "LANDSCAPE",
@@ -74,15 +87,21 @@ function ExpenseItem(props): JSX.Element {
 ```
 
 **Scaling Functions (scalingUtil.ts:28-76)**
+
 ```typescript
-const dynamicScale = (size: number, vertical = false, moderateFactor: number = null) => number
-const constantScale = (size: number, moderateFactor: number = null) => number
-const isTablet = () => boolean
+const dynamicScale = (
+  size: number,
+  vertical = false,
+  moderateFactor: number = null
+) => number;
+const constantScale = (size: number, moderateFactor: number = null) => number;
+const isTablet = () => boolean;
 ```
 
 #### Data Structures
 
 **Current Layout Measurements**
+
 - Base guideline width: 375px (iPhone SE reference)
 - ExpenseItem height: constantScale(55) portrait / dynamicScale(100, true) landscape
 - Icon container: height constantScale(44, 0.5), margin/padding dynamicScale values
@@ -92,6 +111,7 @@ const isTablet = () => boolean
 - Avatar container: width constantScale(55), height constantScale(30, 1)
 
 **Current Font Sizing**
+
 - Description: fontSize dynamicScale(15, false, 0.5), maxFontSizeMultiplier 1.2
 - Date: fontSize dynamicScale(13, false, 0.5), maxFontSizeMultiplier 1
 - Amount: fontSize dynamicScale(20, false, 0.5)
@@ -99,6 +119,7 @@ const isTablet = () => boolean
 #### Configuration Requirements
 
 **Small Phone Detection Logic**
+
 ```typescript
 // Potential threshold for small phone detection
 const isSmallPhone = width <= 375; // iPhone SE baseline
@@ -106,6 +127,7 @@ const isVerySmallPhone = width <= 320; // Older devices
 ```
 
 **Scaling Configuration (scalingUtil.ts:10-11)**
+
 ```typescript
 const tabletScaleMult = 1.2;
 const phoneScaleMult = 0.9;
@@ -122,8 +144,11 @@ const phoneScaleMult = 0.9;
 ## Context Files
 
 ## User Notes
+
 <!-- Any specific notes or requirements from the developer -->
 
 ## Work Log
+
 <!-- Updated as work progresses -->
+
 - [YYYY-MM-DD] Started task, initial research

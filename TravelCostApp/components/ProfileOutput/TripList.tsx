@@ -1,12 +1,14 @@
-import { FlatList, View } from "react-native";
-import TripHistoryItem from "./TripHistoryItem";
-import React, { useContext } from "react";
-import LoadingOverlay from "../UI/LoadingOverlay";
-import PropTypes from "prop-types";
 import uniqBy from "lodash.uniqby";
-import { TripData } from "../../store/trip-context";
+import PropTypes from "prop-types";
+import { useContext } from "react";
+import { FlatList, View } from "react-native";
+
 import { OrientationContext } from "../../store/orientation-context";
-import { constantScale, dynamicScale } from "../../util/scalingUtil";
+import { TripData } from "../../store/trip-context";
+import { constantScale } from "../../util/scalingUtil";
+import LoadingOverlay from "../UI/LoadingOverlay";
+
+import TripHistoryItem from "./TripHistoryItem";
 
 function TripList({ trips }) {
   const { isLandscape } = useContext(OrientationContext);
@@ -16,7 +18,7 @@ function TripList({ trips }) {
   function renderTripItem(itemData) {
     if (!itemData || !itemData.item) return <></>;
     if (typeof itemData.item === "string" || itemData.item instanceof String) {
-      return <TripHistoryItem {...{ tripid: itemData.item, trips: trips }} />;
+      return <TripHistoryItem {...{ tripid: itemData.item, trips }} />;
     } else return <></>;
   }
   return (

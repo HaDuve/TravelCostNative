@@ -1,34 +1,37 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
 import * as Haptics from "expo-haptics";
-
-import React from "react";
-import CategoryProgressBar from "./CategoryProgressBar";
-import { CatColors, GlobalStyles } from "../../../constants/styles";
-import CategoryChart from "../../ExpensesOverview/CategoryChart";
-import Animated, { Layout } from "react-native-reanimated";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../../i18n/supportedLanguages";
+
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { getCatString } from "../../../util/category";
 import PropTypes from "prop-types";
+import { useContext } from "react";
+import Animated, { Layout } from "react-native-reanimated";
+
+import { CatColors, GlobalStyles } from "../../../constants/styles";
+import { de, en, fr, ru } from "../../../i18n/supportedLanguages";
+import { OrientationContext } from "../../../store/orientation-context";
+import { TripContext } from "../../../store/trip-context";
+import { getCatString } from "../../../util/category";
 import {
   ExpenseData,
   getExpensesSum,
   getTravellerSum,
 } from "../../../util/expense";
-import { useContext } from "react";
-import { TripContext } from "../../../store/trip-context";
-import BlurPremium from "../../Premium/BlurPremium";
-import { processTitleStringFilteredPiecharts } from "../../../util/string";
 import { dynamicScale } from "../../../util/scalingUtil";
-import { OrientationContext } from "../../../store/orientation-context";
+import { processTitleStringFilteredPiecharts } from "../../../util/string";
+import CategoryChart from "../../ExpensesOverview/CategoryChart";
+
+import CategoryProgressBar from "./CategoryProgressBar";
 
 const ExpenseTravellers = ({
   expenses,
@@ -51,7 +54,7 @@ const ExpenseTravellers = ({
   expenses.forEach((expense: ExpenseData) => {
     const hasSplits = expense.splitList && expense.splitList?.length !== 0;
     if (hasSplits) {
-      expense.splitList.forEach((split) => {
+      expense.splitList.forEach(split => {
         const travellerName = split.userName;
         if (!travellerList.includes(travellerName)) {
           travellerList.push(travellerName);
@@ -74,7 +77,7 @@ const ExpenseTravellers = ({
           return expense.whoPaid === traveller;
         } else {
           // return true if the splitlist contains the traveller
-          return expense.splitList.some((split) => {
+          return expense.splitList.some(split => {
             return split.userName === traveller;
           });
         }
@@ -97,9 +100,9 @@ const ExpenseTravellers = ({
     );
     catSumCat.push({
       cat: travellerList[travellerIndex],
-      sumCat: sumCat,
+      sumCat,
       color: "",
-      catExpenses: catExpenses,
+      catExpenses,
     });
   }
 
@@ -119,7 +122,7 @@ const ExpenseTravellers = ({
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigation.navigate("FilteredExpenses", {
             expenses: itemData.item.catExpenses,
-            dayString: getCatString(itemData.item.cat) + " " + newPeriodName,
+            dayString: `${getCatString(itemData.item.cat)} ${newPeriodName}`,
             showSumForTravellerName: itemData.item.cat,
           });
         }}
@@ -130,6 +133,7 @@ const ExpenseTravellers = ({
           totalCost={totalSum}
           catCost={itemData.item.sumCat}
           iconOverride={"happy-outline"}
+          iconJSXOverride={null}
         />
       </Pressable>
     );
@@ -141,7 +145,7 @@ const ExpenseTravellers = ({
   const colorlist = CatColors;
 
   let color_i = 0;
-  catSumCat.forEach((item) => {
+  catSumCat.forEach(item => {
     item.color = colorlist[color_i];
     color_i++;
     if (color_i >= colorlist?.length) {
@@ -152,15 +156,23 @@ const ExpenseTravellers = ({
 
   return (
     <Animated.View style={styles.container}>
-      {useRowFormat && <CategoryChart inputData={dataList}></CategoryChart>}
+      {useRowFormat && (
+        <CategoryChart
+          inputData={dataList}
+          tripCurrency={tripCurrency}
+        ></CategoryChart>
+      )}
       <Animated.FlatList
         itemLayoutAnimation={layoutAnim}
         data={catSumCat}
         renderItem={renderItem}
-        keyExtractor={(item) => item.cat}
+        keyExtractor={item => item.cat}
         ListHeaderComponent={
           !useRowFormat ? (
-            <CategoryChart inputData={dataList}></CategoryChart>
+            <CategoryChart
+              inputData={dataList}
+              tripCurrency={tripCurrency}
+            ></CategoryChart>
           ) : (
             <View style={{ height: dynamicScale(100, true) }}></View>
           )
@@ -189,18 +201,10 @@ ExpenseTravellers.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: "row",
-  },
-  fallbackTextContainer: {
-    flex: 1,
-    padding: dynamicScale(24),
-    marginTop: dynamicScale(-150, true),
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
   categoryCard: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: dynamicScale(10, false, 0.5),
+    elevation: 5,
     marginBottom: dynamicScale(20, true),
     marginHorizontal: dynamicScale(16),
     paddingBottom: dynamicScale(12, true),
@@ -211,8 +215,16 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 2.84,
-    elevation: 5,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: dynamicScale(10, false, 0.5),
+  },
+  container: {
+    flex: 1,
+    flexDirection: "row",
+  },
+  fallbackTextContainer: {
+    alignItems: "center",
+    flex: 1,
+    justifyContent: "space-between",
+    marginTop: dynamicScale(-150, true),
+    padding: dynamicScale(24),
   },
 });

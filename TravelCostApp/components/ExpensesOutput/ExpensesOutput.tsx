@@ -1,30 +1,33 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
+
 import ExpensesList from "./ExpensesList";
-import React from "react-native";
-import Animated, { SlideOutLeft } from "react-native-reanimated";
-import LoadingOverlay from "../UI/LoadingOverlay";
-import { useContext, useEffect, useMemo, useState } from "react";
-import PropTypes from "prop-types";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { EXPENSES_LOAD_TIMEOUT } from "../../confAppConstants";
-import { memo } from "react";
-import { TripContext } from "../../store/trip-context";
-import FlatButton from "../UI/FlatButton";
 import { useNavigation } from "@react-navigation/native";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import PropTypes from "prop-types";
+import { memo, useContext, useEffect, useMemo, useState } from "react";
+import Animated, { SlideOutLeft } from "react-native-reanimated";
+import { EXPENSES_LOAD_TIMEOUT } from "../../confAppConstants";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
+import { TripContext } from "../../store/trip-context";
 import { UserContext } from "../../store/user-context";
+import { RootNavigationProp } from "../../types/navigation";
 import { dynamicScale } from "../../util/scalingUtil";
+import FlatButton from "../UI/FlatButton";
+import LoadingOverlay from "../UI/LoadingOverlay";
 
 function ExpensesOutput({
   expenses,
@@ -37,7 +40,7 @@ function ExpensesOutput({
   const { tripName } = useContext(TripContext);
   const [showLoading, setShowLoading] = useState(true);
   const [fallback, setFallback] = useState(true);
-  const navigation = useNavigation();
+  const navigation = useNavigation<RootNavigationProp>();
   const expCtx = useContext(ExpensesContext);
   const userCtx = useContext(UserContext);
   const periodName = userCtx.periodName;
@@ -87,7 +90,7 @@ function ExpensesOutput({
                 });
               }}
             >
-              {i18n.t("showXResults1") + " " + i18n.t("yesterday")}
+              {`${i18n.t("showXResults1")} ${i18n.t("yesterday")}`}
             </FlatButton>
           )}
           {showTomorrow && (
@@ -100,7 +103,7 @@ function ExpensesOutput({
                 });
               }}
             >
-              {i18n.t("showXResults1") + " " + i18n.t("tomorrow")}
+              {`${i18n.t("showXResults1")} ${i18n.t("tomorrow")}`}
             </FlatButton>
           )}
         </View>
@@ -140,15 +143,15 @@ ExpensesOutput.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 0,
     paddingBottom: 0,
+    paddingHorizontal: 0,
     // backgroundColor: GlobalStyles.colors.backgroundColor,
     // borderWidth: 1,
   },
   fallbackContainer: {
-    position: "absolute",
     alignSelf: "center",
     margin: "10%",
+    position: "absolute",
   },
   fallbackInnerContainer: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -160,7 +163,7 @@ const styles = StyleSheet.create({
   infoText: {
     color: GlobalStyles.colors.textColor,
     fontSize: dynamicScale(16, false, 0.5),
-    textAlign: "center",
     marginVertical: dynamicScale(32, false, 0.5),
+    textAlign: "center",
   },
 });

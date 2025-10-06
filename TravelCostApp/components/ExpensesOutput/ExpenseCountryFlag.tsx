@@ -1,8 +1,8 @@
-import React from "react";
 import { countryToAlpha2 } from "country-to-iso";
-import CountryFlag from "react-native-country-flag";
 import PropTypes from "prop-types";
-import { View, StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
+import CountryFlag from "react-native-country-flag";
+
 import { dynamicScale } from "../../util/scalingUtil";
 
 const ExpenseCountryFlag = ({ countryName, style, containerStyle }) => {

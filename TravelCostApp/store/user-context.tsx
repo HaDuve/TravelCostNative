@@ -1,18 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import React, {
-  createContext,
-  useCallback,
-  useEffect,
-  useReducer,
-  useState,
-} from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import { Alert } from "react-native";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -20,34 +11,29 @@ i18n.locale =
     : "en";
 i18n.enableFallback = true;
 
-import {
-  asyncStoreGetItem,
-  asyncStoreGetObject,
-  asyncStoreSetItem,
-  asyncStoreSetObject,
-} from "./async-storage";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import PropTypes from "prop-types";
+import Purchases from "react-native-purchases";
+
 import {
   ENTITLEMENT_ID,
   isPremiumMember,
 } from "../components/Premium/PremiumConstants";
+import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import safeLogError from "../util/error";
 import { fetchCategories, fetchTripHistory } from "../util/http";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import PropTypes from "prop-types";
-import NetInfo from "@react-native-community/netinfo";
+import { safelyParseJSON } from "../util/jsonParse";
+
+import { asyncStoreSetObject } from "./async-storage";
+import { RangeString } from "./expenses-context";
+import { getMMKVObject, setMMKVObject } from "./mmkv";
 import {
   secureStoreGetItem,
   secureStoreGetObject,
   secureStoreSetItem,
-  secureStoreSetObject,
 } from "./secure-storage";
-import { isConnectionFastEnough } from "../util/connectionSpeed";
-import { RangeString } from "./expenses-context";
-import Purchases from "react-native-purchases";
-import safeLogError from "../util/error";
-import set from "react-native-reanimated";
-import { getMMKVObject, setMMKVObject } from "./mmkv";
-import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
-import { safelyParseJSON } from "../util/jsonParse";
 
 export interface UserData {
   uid?: string;
@@ -66,7 +52,7 @@ export const UserContext = createContext({
   userName: "",
   setUserName: async (name: string) => {},
   periodName: RangeString.day,
-  setPeriodString: (string: string) => {},
+  setPeriodString: (periodName: RangeString) => {},
 
   lastCurrency: "",
   setLastCurrency: (string: string) => {},
@@ -92,7 +78,7 @@ export const UserContext = createContext({
   checkPremium: async (): Promise<boolean> => {
     return false;
   },
-  loadCatListFromAsyncInCtx: async (tripid) => {},
+  loadCatListFromAsyncInCtx: async tripid => {},
   catIconNames: [],
   loadLastCurrencyCountryFromAsync: async () => {},
   setIsShowingGraph: (bool: boolean) => {},
@@ -107,7 +93,7 @@ function UserContextProvider({ children }) {
   const [userName, setName] = useState("");
   const [freshlyCreated, setFreshlyCreated] = useState(false);
   const [needsTour, setNeedsTour] = useState(false);
-  const [periodName, setPeriodName] = useState("day");
+  const [periodName, setPeriodName] = useState<RangeString>(RangeString.day);
   const [isOnline, setIsOnline] = useState(false);
   const [lastCurrency, setLastCurrency] = useState("");
   const [lastCountry, setLastCountry] = useState("");
@@ -173,7 +159,7 @@ function UserContextProvider({ children }) {
     return isPremiumNow;
   }
   useEffect(() => {
-    Purchases.addCustomerInfoUpdateListener((info) => {
+    Purchases.addCustomerInfoUpdateListener(info => {
       // handle any changes to purchaserInfo
       if (typeof info.entitlements.active[ENTITLEMENT_ID] !== "undefined") {
         // Grant user "premium" access
@@ -191,7 +177,7 @@ function UserContextProvider({ children }) {
       try {
         const uid = await secureStoreGetItem("uid");
         const isPremiumString = await secureStoreGetObject(
-          (uid ?? "") + "isPremium"
+          `${uid ?? ""}isPremium`
         );
         if (isPremiumString !== null) {
           const isPremiumNow = safelyParseJSON(isPremiumString);
@@ -238,7 +224,7 @@ function UserContextProvider({ children }) {
     }
   }
 
-  function setPeriodString(periodName: string) {
+  function setPeriodString(periodName: RangeString) {
     setPeriodName(periodName);
   }
 
@@ -284,47 +270,47 @@ function UserContextProvider({ children }) {
   }
 
   const value = {
-    userName: userName,
-    setUserName: setUserName,
-    periodName: periodName,
-    setPeriodString: setPeriodString,
+    userName,
+    setUserName,
+    periodName,
+    setPeriodString,
 
-    freshlyCreated: freshlyCreated,
-    setFreshlyCreatedTo: setFreshlyCreatedTo,
+    freshlyCreated,
+    setFreshlyCreatedTo,
 
-    needsTour: needsTour,
-    setNeedsTour: setNeedsTour,
+    needsTour,
+    setNeedsTour,
 
-    tripHistory: tripHistory,
-    setTripHistory: setTripHistory,
+    tripHistory,
+    setTripHistory,
 
-    lastCurrency: lastCurrency,
-    setLastCurrency: setLastCurrency,
-    lastCountry: lastCountry,
-    setLastCountry: setLastCountry,
+    lastCurrency,
+    setLastCurrency,
+    lastCountry,
+    setLastCountry,
 
-    addUserName: addUserName,
-    deleteUser: deleteUser,
-    isOnline: isOnline,
-    setIsOnline: setIsOnline,
-    saveUserNameInStorage: saveUserNameInStorage,
-    loadUserNameFromStorage: loadUserNameFromStorage,
+    addUserName,
+    deleteUser,
+    isOnline,
+    setIsOnline,
+    saveUserNameInStorage,
+    loadUserNameFromStorage,
     // checkConnectionUpdateUser: checkConnectionUpdateUser,
 
-    isPremium: isPremium,
-    checkPremium: checkPremium,
+    isPremium,
+    checkPremium,
     loadCatListFromAsyncInCtx: fetchOrLoadCatList,
-    catIconNames: catIconNames,
+    catIconNames,
 
-    loadLastCurrencyCountryFromAsync: loadLastCurrencyCountryFromAsync,
+    loadLastCurrencyCountryFromAsync,
 
-    setIsShowingGraph: setIsShowingGraph,
-    isShowingGraph: isShowingGraph,
-    updateTripHistory: updateTripHistory,
-    isSendingOfflineQueueMutex: isSendingOfflineQueueMutex,
-    setIsSendingOfflineQueueMutex: setIsSendingOfflineQueueMutex,
-    hasNewChanges: hasNewChanges,
-    setHasNewChanges: setHasNewChanges,
+    setIsShowingGraph,
+    isShowingGraph,
+    updateTripHistory,
+    isSendingOfflineQueueMutex,
+    setIsSendingOfflineQueueMutex,
+    hasNewChanges,
+    setHasNewChanges,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

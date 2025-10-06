@@ -1,18 +1,17 @@
-import { StyleSheet } from "react-native";
-import React from "react";
-import { useState, useEffect, useRef } from "react";
-import { Text, View, Button, Platform } from "react-native";
-import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
-import { ExpoPushToken } from "expo-notifications";
-import { storeExpoPushTokenInTrip } from "../util/http";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
+import * as Device from "expo-device";
 
 //Localization
 import * as Localization from "expo-localization";
+import { ExpoPushToken } from "expo-notifications";
+import * as Notifications from "expo-notifications";
 import { I18n } from "i18n-js";
+import React, { useState, useEffect, useRef } from "react";
+import { Text, View, Button, Platform, StyleSheet } from "react-native";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { storeExpoPushTokenInTrip } from "../util/http";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -46,6 +45,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: false,
     shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -101,9 +102,9 @@ async function registerForPushNotificationsAsync() {
 const TEST_PushScreen = () => {
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] =
-    useState<Notifications.Notification>(null);
-  const notificationListener = useRef<Notifications.Subscription>();
-  const responseListener = useRef<Notifications.Subscription>();
+    useState<Notifications.Notification | null>(null);
+  const notificationListener = useRef<Notifications.Subscription | null>(null);
+  const responseListener = useRef<Notifications.Subscription | null>(null);
 
   useEffect(() => {
     registerForPushNotificationsAsync()
@@ -112,17 +113,17 @@ const TEST_PushScreen = () => {
         // console.log("token", token);
         setExpoPushToken(token);
       })
-      .catch((e) => {
+      .catch(e => {
         // console.log("token error", e)
       });
 
     notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
+      Notifications.addNotificationReceivedListener(notification => {
         setNotification(notification);
       });
 
     responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
+      Notifications.addNotificationResponseReceivedListener(response => {
         // console.log(response);
       });
 
@@ -138,12 +139,17 @@ const TEST_PushScreen = () => {
     <View
       style={{ flex: 1, alignItems: "center", justifyContent: "space-around" }}
     >
-      <Text>{i18n.t("yourExpoPushToken")} {expoPushToken}</Text>
+      <Text>
+        {i18n.t("yourExpoPushToken")} {expoPushToken}
+      </Text>
       <View style={{ alignItems: "center", justifyContent: "center" }}>
         <Text>
           Title: {notification && notification.request.content.title}{" "}
         </Text>
-        <Text>{i18n.t("bodyLabel")} {notification && notification.request.content.body}</Text>
+        <Text>
+          {i18n.t("bodyLabel")}{" "}
+          {notification && notification.request.content.body}
+        </Text>
         <Text>
           Data:{" "}
           {notification && JSON.stringify(notification.request.content.data)}

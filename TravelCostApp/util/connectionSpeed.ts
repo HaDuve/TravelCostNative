@@ -1,9 +1,11 @@
 import NetInfo from "@react-native-community/netinfo";
 import axios from "axios";
+
 import {
   DEBUG_FORCE_OFFLINE,
   MINIMUM_REQUIRED_SPEED,
 } from "../confAppConstants";
+
 import safeLogError from "./error";
 
 const requiredSpeed = MINIMUM_REQUIRED_SPEED; // in Mbps
@@ -53,7 +55,7 @@ export async function isConnectionFastEnough(): Promise<ConnectionSpeedResult> {
     const speed = await getConnectionSpeed();
     return {
       isFastEnough: speed >= requiredSpeed,
-      speed: speed,
+      speed,
     };
   } catch (error) {
     safeLogError(error);

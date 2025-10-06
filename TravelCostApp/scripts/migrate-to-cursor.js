@@ -16,7 +16,7 @@ const TASKS_DIR = "tasks";
 console.log("🚀 Starting migration from cc-sessions to Cursor workflow...\n");
 
 // Ensure target directories exist
-const ensureDir = (dir) => {
+const ensureDir = dir => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
     console.log(`✅ Created directory: ${dir}`);
@@ -40,7 +40,7 @@ console.log("\n📋 Migrating existing tasks...");
 if (fs.existsSync(`${SOURCE_DIR}/tasks`)) {
   const tasks = fs.readdirSync(`${SOURCE_DIR}/tasks`);
 
-  tasks.forEach((task) => {
+  tasks.forEach(task => {
     if (task === "TEMPLATE.md" || task === "done") return;
 
     const sourcePath = `${SOURCE_DIR}/tasks/${task}`;
@@ -59,7 +59,7 @@ if (fs.existsSync(`${SOURCE_DIR}/tasks`)) {
   // Migrate completed tasks
   if (fs.existsSync(`${SOURCE_DIR}/tasks/done`)) {
     const doneTasks = fs.readdirSync(`${SOURCE_DIR}/tasks/done`);
-    doneTasks.forEach((task) => {
+    doneTasks.forEach(task => {
       const sourcePath = `${SOURCE_DIR}/tasks/done/${task}`;
       const targetPath = `${TASKS_DIR}/done/${task}`;
       fs.copyFileSync(sourcePath, targetPath);

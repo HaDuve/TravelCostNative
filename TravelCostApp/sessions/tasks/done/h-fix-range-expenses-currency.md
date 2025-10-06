@@ -3,15 +3,18 @@ task: h-fix-range-expenses-currency
 branch: fix/range-expenses-currency
 status: completed
 created: 2025-09-18
-modules: [components/ExpenseDetails, components/RangeCalculations, utils/currency]
+modules:
+  [components/ExpenseDetails, components/RangeCalculations, utils/currency]
 ---
 
 # Fix Range Expenses Currency Conversion Issues in Shared Calculations
 
 ## Problem/Goal
+
 Range expenses with currency conversion have issues in shared calculations. Problems occur in expense details split costs and in pressable sum top right header split daily range.
 
 ## Success Criteria
+
 - [x] Manual test range expenses with currency conversion (completed in commit 2871407)
 - [x] Fix split costs calculation in expense details (FIXED - added deduplication to getTravellerSum)
 - [x] Fix pressable sum header split daily range calculation (FIXED - added deduplication to getExpensesSum)
@@ -32,6 +35,7 @@ Before creating range expenses, the system calculates `calcAmount` from the orig
 
 **Split Calculations with Currency (util/expense.ts:139-172):**
 The `getTravellerSum()` function is where the core issue likely resides. When calculating expenses for a specific traveller, it handles two scenarios:
+
 1. **Non-split expenses**: Uses either `calcAmount` or `amount` depending on whether currency conversion exists
 2. **Split expenses**: This is where the complexity increases - it checks if conversion rate exists by comparing `expense.calcAmount !== expense.amount`, calculates the rate (`rate = expense.calcAmount / expense.amount`), then multiplies each split amount by this rate (`splitAmount = split.amount * rate`)
 
@@ -66,32 +70,42 @@ During range expense creation (`createRangedData()`), the split amounts and rate
 
 ```typescript
 // Core calculation functions
-export function getTravellerSum(expenses: ExpenseData[], traveller: string): number
-export function getExpensesSum(expenses: ExpenseData[], hideSpecial = false): number
-export async function getRate(base: string, target: string, forceNewRate = false): Promise<number>
+export function getTravellerSum(
+  expenses: ExpenseData[],
+  traveller: string
+): number;
+export function getExpensesSum(
+  expenses: ExpenseData[],
+  hideSpecial = false
+): number;
+export async function getRate(
+  base: string,
+  target: string,
+  forceNewRate = false
+): Promise<number>;
 
 // Range expense creation
-const createRangedData = async (expenseData: ExpenseData) => Promise<void>
-const editRangedData = async (expenseData: ExpenseData) => Promise<void>
+const createRangedData = async (expenseData: ExpenseData) => Promise<void>;
+const editRangedData = async (expenseData: ExpenseData) => Promise<void>;
 ```
 
 #### Data Structures
 
 ```typescript
 interface ExpenseData {
-  amount: number;           // Original amount in expense currency
-  calcAmount: number;       // Converted amount in trip currency
-  currency: string;         // Expense currency
-  splitList?: Split[];      // Array of split amounts
-  rangeId?: string;         // Identifier for range expenses
+  amount: number; // Original amount in expense currency
+  calcAmount: number; // Converted amount in trip currency
+  currency: string; // Expense currency
+  splitList?: Split[]; // Array of split amounts
+  rangeId?: string; // Identifier for range expenses
   // ... other fields
 }
 
 interface Split {
   userName: string;
-  amount: number;    // Split amount (currency context unclear)
+  amount: number; // Split amount (currency context unclear)
   whoPaid?: string;
-  rate?: number;     // Exchange rate applied to split
+  rate?: number; // Exchange rate applied to split
 }
 ```
 
@@ -112,12 +126,15 @@ interface Split {
 - Database/storage operations: `util/http.tsx` and MMKV storage
 
 ## Context Files
+
 <!-- Added by context-gathering agent or manually -->
 
 ## User Notes
+
 Manual test, analyze and fix issues in shared calculations for range expenses with currency conversion.
 
 ## Work Log
+
 - [2025-09-18] Created task
 - [2025-09-19] Fixed range expenses currency conversion issues (commit 2871407)
 - [2025-01-27] Task completion documented - all success criteria met
@@ -127,6 +144,7 @@ Manual test, analyze and fix issues in shared calculations for range expenses wi
 **Summary**: Successfully resolved range expenses currency conversion issues in shared calculations. The fix prevents double-counting of range expenses by implementing deduplication logic that ensures each range is counted only once instead of once per day.
 
 **Technical Details**:
+
 - Added `deduplicateRangeExpenses()` function with Set-based deduplication using `rangeId`
 - Modified `getExpensesSum()` and `getTravellerSum()` to use deduplication
 - Fixed incorrect totals in pressable sum header and expense details

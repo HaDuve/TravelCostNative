@@ -1,8 +1,8 @@
-import * as React from "react";
-import Svg, { G, Path } from "react-native-svg";
-import { constantScale } from "../../util/scalingUtil";
-import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
+import Svg, { G, Path } from "react-native-svg";
+
+import { GlobalStyles } from "../../constants/styles";
+import { constantScale } from "../../util/scalingUtil";
 
 const Width = constantScale(98, 0.08);
 const Height = constantScale(80, 0.08);
@@ -16,13 +16,7 @@ function ToggleButton({ toggled = false }) {
     ? GlobalStyles.colors.primary400
     : GlobalStyles.colors.backgroundColorLight;
   return (
-    <Svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={Width}
-      height={Height}
-      fill="none"
-      viewBox="0 0 98 50"
-    >
+    <Svg width={Width} height={Height} fill="none" viewBox="0 0 98 50">
       <G>
         <Path
           fill={color1toggle}

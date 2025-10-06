@@ -7,22 +7,26 @@ import {
 } from "./http";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import Toast from "react-native-toast-message";
-import * as Device from "expo-device";
-import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
-
 import NetInfo from "@react-native-community/netinfo";
-import { isConnectionFastEnough } from "./connectionSpeed";
-import { secureStoreGetItem } from "../store/secure-storage";
+import * as Device from "expo-device";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import Toast from "react-native-toast-message";
+
+import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
+import { secureStoreGetItem } from "../store/secure-storage";
+
+import { isConnectionFastEnough } from "./connectionSpeed";
 import safeLogError from "./error";
 
 // interface of offline queue manage expense item
@@ -189,7 +193,7 @@ export const storeExpenseOnlineOffline = async (
       );
       return id;
     } catch (error) {
-      safeLogError("error1: could not store expense " + error);
+      safeLogError(`error1: could not store expense ${error}`);
       const id = await pushQueueReturnRndID(item);
       // console.log("debugOQ id:", id);
       return id;

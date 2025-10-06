@@ -1,30 +1,31 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/react-in-jsx-scope */
-import { useState, useContext, useEffect } from "react";
-import { View, Text, Alert, Pressable } from "react-native";
-import React, { StyleSheet } from "react-native";
-import { GlobalStyles } from "../../constants/styles";
-import { AuthContext } from "../../store/auth-context";
-import { UserContext } from "../../store/user-context";
-import { fetchChangelog } from "../../util/http";
-
-import IconButton from "../UI/IconButton";
-import { TripContext } from "../../store/trip-context";
-import FlatButton from "../UI/FlatButton";
-
-//Localization
+import * as Haptics from "expo-haptics";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
-import GradientButton from "../UI/GradientButton";
-import * as Haptics from "expo-haptics";
 import PropTypes from "prop-types";
-import { ExpensesContext } from "../../store/expenses-context";
+import { useContext, useEffect, useState } from "react";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+
+import { GlobalStyles } from "../../constants/styles";
+
+//Localization
+
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
+import GradientButton from "../UI/GradientButton";
+
 import { asyncStoreSafeClear } from "../../store/async-storage";
+import { AuthContext } from "../../store/auth-context";
+import { ExpensesContext } from "../../store/expenses-context";
 import { getMMKVString } from "../../store/mmkv";
 import { NetworkContext } from "../../store/network-context";
 import { OrientationContext } from "../../store/orientation-context";
+import { TripContext } from "../../store/trip-context";
+import { UserContext } from "../../store/user-context";
+import { fetchChangelog } from "../../util/http";
 import { dynamicScale } from "../../util/scalingUtil";
+import FlatButton from "../UI/FlatButton";
+import IconButton from "../UI/IconButton";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -130,7 +131,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
   });
 
   useEffect(() => {
-    setInputs((curInputs) => {
+    setInputs(curInputs => {
       return {
         ...curInputs,
         ["userName"]: { value: userCtx.userName, isValid: true },
@@ -148,13 +149,11 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
 
   const freshlyNavigationButtons = freshlyCreated && (
     <View style={styles.navButtonContainer}>
-      <FlatButton
-        // style={styles.navButton}
-        onPress={joinInviteHandler}
-      >
+      <FlatButton onPress={joinInviteHandler}>
         {i18n.t("invitationText")}
       </FlatButton>
       <GradientButton
+        buttonStyle={{}}
         style={styles.navButton}
         onPress={() => navigation.navigate("ManageTrip")}
       >
@@ -198,90 +197,31 @@ ProfileForm.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  form: {
-    flex: 1,
-    marginTop: dynamicScale(8, true),
-    maxHeight: dynamicScale(30, true),
-  },
-  nameRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1,
-    maxWidth: dynamicScale(100),
-  },
-  welcomeTextBar: {
-    marginTop: dynamicScale(8, true),
-    marginHorizontal: dynamicScale(15),
-    padding: dynamicScale(4),
-    minHeight: dynamicScale(50, true),
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  welcomeText: {
-    fontSize: dynamicScale(36, false, 0.5),
-    fontWeight: "bold",
-    color: GlobalStyles.colors.primary700,
-  },
-  avatarBar: {
-    marginTop: dynamicScale(10, true),
-    marginHorizontal: dynamicScale(15),
-    padding: dynamicScale(4),
-    minHeight: dynamicScale(30, true),
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   avatar: {
+    alignItems: "center",
+    backgroundColor: GlobalStyles.colors.gray500,
+    borderRadius: dynamicScale(60, false, 0.5),
+    justifyContent: "center",
     minHeight: dynamicScale(60, false, 0.5),
     minWidth: dynamicScale(60, false, 0.5),
-    borderRadius: dynamicScale(60, false, 0.5),
-    backgroundColor: GlobalStyles.colors.gray500,
+  },
+  avatarBar: {
     alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarText: {
-    fontSize: dynamicScale(36, false, 0.5),
-    fontWeight: "bold",
-    color: GlobalStyles.colors.primary700,
-  },
-  userText: {
-    fontSize: dynamicScale(24, false, 0.5),
-    fontWeight: "bold",
-    color: GlobalStyles.colors.primary700,
-  },
-  logoutContainer: {
-    marginBottom: dynamicScale(-16, true),
-    alignItems: "flex-end",
-    justifyContent: "flex-end",
-  },
-  title: {
-    fontSize: dynamicScale(24, false, 0.5),
-    fontWeight: "bold",
-    color: GlobalStyles.colors.backgroundColor,
-    marginTop: dynamicScale(5, true),
-    marginBottom: dynamicScale(24, true),
-    textAlign: "center",
-  },
-  categoryRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-  },
-  inputsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginHorizontal: dynamicScale(15),
+    marginTop: dynamicScale(10, true),
+    minHeight: dynamicScale(30, true),
+    padding: dynamicScale(4),
   },
-  rowInput: {
-    flex: 1,
+  avatarText: {
+    color: GlobalStyles.colors.primary700,
+    fontSize: dynamicScale(36, false, 0.5),
+    fontWeight: "bold",
   },
-  inputStyle: {
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-  },
-  errorText: {
-    textAlign: "center",
-    color: GlobalStyles.colors.error500,
-    margin: dynamicScale(8),
+  button: {
+    marginHorizontal: dynamicScale(8),
+    minWidth: dynamicScale(120),
   },
   buttonContainer: {
     flex: 1,
@@ -290,22 +230,81 @@ const styles = StyleSheet.create({
     margin: dynamicScale(8, true),
     minHeight: dynamicScale(100, true),
   },
-  navButtonContainer: {
+  categoryRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  errorText: {
+    color: GlobalStyles.colors.error500,
+    margin: dynamicScale(8),
+    textAlign: "center",
+  },
+  form: {
     flex: 1,
-    minHeight: dynamicScale(150, true),
+    marginTop: dynamicScale(8, true),
+    maxHeight: dynamicScale(30, true),
+  },
+  inputStyle: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  inputsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  logoutContainer: {
+    alignItems: "flex-end",
     justifyContent: "flex-end",
-    alignContent: "flex-end",
-    padding: dynamicScale(4, true),
-    marginVertical: dynamicScale(8, true),
-    marginTop: dynamicScale(36, true),
+    marginBottom: dynamicScale(-16, true),
+  },
+  nameRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    flex: 1,
+    justifyContent: "center",
+    maxWidth: dynamicScale(100),
   },
   navButton: {
-    minWidth: dynamicScale(120),
-    marginVertical: dynamicScale(8, true),
     marginTop: dynamicScale(36, true),
-  },
-  button: {
+    marginVertical: dynamicScale(8, true),
     minWidth: dynamicScale(120),
-    marginHorizontal: dynamicScale(8),
+  },
+  navButtonContainer: {
+    alignContent: "flex-end",
+    flex: 1,
+    justifyContent: "flex-end",
+    marginTop: dynamicScale(36, true),
+    marginVertical: dynamicScale(8, true),
+    minHeight: dynamicScale(150, true),
+    padding: dynamicScale(4, true),
+  },
+  rowInput: {
+    flex: 1,
+  },
+  title: {
+    color: GlobalStyles.colors.backgroundColor,
+    fontSize: dynamicScale(24, false, 0.5),
+    fontWeight: "bold",
+    marginBottom: dynamicScale(24, true),
+    marginTop: dynamicScale(5, true),
+    textAlign: "center",
+  },
+  userText: {
+    color: GlobalStyles.colors.primary700,
+    fontSize: dynamicScale(24, false, 0.5),
+    fontWeight: "bold",
+  },
+  welcomeText: {
+    color: GlobalStyles.colors.primary700,
+    fontSize: dynamicScale(36, false, 0.5),
+    fontWeight: "bold",
+  },
+  welcomeTextBar: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    marginHorizontal: dynamicScale(15),
+    marginTop: dynamicScale(8, true),
+    minHeight: dynamicScale(50, true),
+    padding: dynamicScale(4),
   },
 });

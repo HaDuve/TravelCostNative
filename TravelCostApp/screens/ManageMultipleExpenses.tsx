@@ -1,6 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import ExpenseForm from "../components/ManageExpense/ExpenseForm";
+import { StyleSheet, View } from "react-native";
 
 const ManageMultipleExpenses = () => {
   // TODO: adapt functions to update multiple expenses from ManageExpense.tsx and call ExpenseForm with a multipleExpenses Flag

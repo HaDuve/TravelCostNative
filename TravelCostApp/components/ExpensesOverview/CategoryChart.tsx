@@ -1,15 +1,14 @@
-import React, { useMemo } from "react";
+import React, { useContext, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
-import { useContext } from "react";
-import { dynamicScale } from "../../util/scalingUtil";
-import { OrientationContext } from "../../store/orientation-context";
+
 import { GlobalStyles } from "../../constants/styles";
+import { OrientationContext } from "../../store/orientation-context";
 import { getCatString } from "../../util/category";
 import { getCurrencySymbol } from "../../util/currencySymbol";
-
-import WebViewChart from "../charts/WebViewChart";
-import { ChartController, CategoryData } from "../charts/controller";
+import { dynamicScale } from "../../util/scalingUtil";
 import { createPieChartData } from "../charts/chartHelpers";
+import { CategoryData, ChartController } from "../charts/controller";
+import WebViewChart from "../charts/WebViewChart";
 
 const CategoryChart = React.memo(
   ({
@@ -73,14 +72,14 @@ CategoryChart.displayName = "CategoryChart";
 export default CategoryChart;
 
 const styles = StyleSheet.create({
-  container: {
-    padding: dynamicScale(8),
-    paddingTop: dynamicScale(40, true),
-    justifyContent: "center",
-    alignItems: "center",
-    height: dynamicScale(320, true),
-  },
   chart: {
     backgroundColor: "transparent",
+  },
+  container: {
+    alignItems: "center",
+    height: dynamicScale(320, true),
+    justifyContent: "center",
+    padding: dynamicScale(8),
+    paddingTop: dynamicScale(40, true),
   },
 });

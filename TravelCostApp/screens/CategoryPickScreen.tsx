@@ -1,3 +1,17 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
+import * as Haptics from "expo-haptics";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+
+import GradientButton from "../components/UI/GradientButton";
+
+import { Alert } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
+import PropTypes from "prop-types";
+import React, { useState, useContext, useCallback } from "react";
 import {
   FlatList,
   Platform,
@@ -6,32 +20,17 @@ import {
   Text,
   View,
 } from "react-native";
-import * as Haptics from "expo-haptics";
 
-import React, { useState } from "react";
+import BackButton from "../components/UI/BackButton";
 import FlatButton from "../components/UI/FlatButton";
 import { GlobalStyles } from "../constants/styles";
-
-//Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
-import { fetchCategories } from "../util/http";
-import { useContext } from "react";
-import { TripContext } from "../store/trip-context";
-import { Ionicons } from "@expo/vector-icons";
-import GradientButton from "../components/UI/GradientButton";
-import { useFocusEffect } from "@react-navigation/native";
-import { Alert } from "react-native";
-import { ActivityIndicator } from "react-native-paper";
-
-import PropTypes from "prop-types";
-import { NetworkContext } from "../store/network-context";
-import { Category, DEFAULTCATEGORIES } from "../util/category";
-import BackButton from "../components/UI/BackButton";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
-import { useCallback } from "react";
+import { NetworkContext } from "../store/network-context";
+import { TripContext } from "../store/trip-context";
+import { Category, DEFAULTCATEGORIES } from "../util/category";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
+import { fetchCategories } from "../util/http";
 import { dynamicScale } from "../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
@@ -133,7 +132,7 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
         newCat: true,
         iconName: item.icon,
         expenseId: editedExpenseId,
-        tempValues: tempValues,
+        tempValues,
       });
     }
     setIsFetching(false);
@@ -176,7 +175,7 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
         renderItem={renderCatItem}
         ListHeaderComponent={
           <>
-            <BackButton />
+            <BackButton style={{}} />
             <View
               style={{
                 position: "absolute",
@@ -213,7 +212,7 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
                   onPress={() => {
                     navigation.navigate("ManageExpense", {
                       pickedCat: "undefined",
-                      tempValues: tempValues,
+                      tempValues,
                     });
                   }}
                 >
@@ -237,11 +236,24 @@ CategoryPickScreen.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  pressed: {
-    opacity: 0.4,
+  buttonContainer: {
+    alignItems: "center",
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: "4%",
   },
-  listStyle: {
-    paddingTop: "2%",
+  buttonStyle: {
+    backgroundColor: GlobalStyles.colors.gray500,
+    borderRadius: 12,
+    paddingHorizontal: "1%",
+    paddingVertical: "4%",
+  },
+  centerStyle: {
+    alignItems: "center",
+
+    flex: 1,
+    justifyContent: "center",
   },
   container: {
     flex: 1,
@@ -259,50 +271,37 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  widthConstraint: {
-    minWidth: "30%",
-    maxWidth: "100%",
-  },
-  rowContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-  },
-  centerStyle: {
-    flex: 1,
-
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  buttonContainer: {
-    flex: 1,
-    paddingVertical: "4%",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-  },
-  buttonStyle: {
-    backgroundColor: GlobalStyles.colors.gray500,
-    paddingVertical: "4%",
-    paddingHorizontal: "1%",
-    borderRadius: 12,
+  continueButtonStyle: {
+    paddingHorizontal: "12%",
+    paddingVertical: "12%",
   },
   itemContainer: {
     flex: 1,
     margin: "3%",
   },
+  itemText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(16, false, 0.5),
+    fontStyle: "italic",
+    fontWeight: "200",
+    marginTop: "2%",
+  },
+  listStyle: {
+    paddingTop: "2%",
+  },
   onPressStyleItem: {
     backgroundColor: GlobalStyles.colors.primary400,
   },
-  itemText: {
-    fontSize: dynamicScale(16, false, 0.5),
-    marginTop: "2%",
-    color: GlobalStyles.colors.textColor,
-    fontWeight: "200",
-    fontStyle: "italic",
+  pressed: {
+    opacity: 0.4,
   },
-  continueButtonStyle: {
-    paddingVertical: "12%",
-    paddingHorizontal: "12%",
+  rowContainer: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  widthConstraint: {
+    maxWidth: "100%",
+    minWidth: "30%",
   },
 });

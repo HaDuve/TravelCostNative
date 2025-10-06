@@ -9,9 +9,11 @@ modules: [ai-features, ui-styling, button-components]
 # Fix AI Button Styling
 
 ## Problem/Goal
+
 Improve UI for new AI buttons by creating or using consistent default styling for all text inside all buttons. The current AI button styling is inconsistent or poorly formatted.
 
 ## Success Criteria
+
 - [ ] Audit current AI button implementations and styling
 - [ ] Create consistent styling for AI button text
 - [ ] Apply default button styling across all AI buttons
@@ -37,6 +39,7 @@ The Travel Cost App has three primary AI-powered features that use buttons with 
 **Current Styling Architecture:**
 
 The app uses a sophisticated button component hierarchy:
+
 - **GradientButton** (`/components/UI/GradientButton.tsx`): Primary button component using LinearGradient with haptic feedback, supports `darkText` prop, `textStyle` overrides, and uses `GlobalStyles.buttonTextGradient` as base text styling
 - **FlatButton** (`/components/UI/FlatButton.tsx`): Secondary button using `GlobalStyles.buttonTextFlat` for consistent text styling
 - **Button** (`/components/UI/Button.tsx`): Base button using `GlobalStyles.buttonTextPrimary`
@@ -44,6 +47,7 @@ The app uses a sophisticated button component hierarchy:
 **Text Styling System:**
 
 All button text should use the global text styles from `/constants/styles.ts`:
+
 - `GlobalStyles.buttonTextGradient`: White italic text, weight 300, fontSize uses `dynamicScale(14, false, 0.5)`
 - `GlobalStyles.buttonTextFlat`: Primary color italic text, same sizing
 - `GlobalStyles.buttonTextPrimary`: White italic text, same sizing
@@ -100,8 +104,8 @@ interface GradientButtonProps {
   colors={GlobalStyles.gradientColorsButton}
   onPress={handleAIAction}
   darkText={true}
-  textStyle={{ 
-    fontSize: dynamicScale(16, false, 0.3)
+  textStyle={{
+    fontSize: dynamicScale(16, false, 0.3),
   }}
 >
   <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -126,7 +130,7 @@ GlobalStyles.gradientColorsButton: ["#FEEF60", "#FBF0A8", "#A1D8C1"]
 GlobalStyles.colors.textColor: "#434343"
 GlobalStyles.buttonTextGradient: {
   color: "#FFFFFF",
-  textAlign: "center", 
+  textAlign: "center",
   fontStyle: "italic",
   fontWeight: "300",
   fontSize: dynamicScale(14, false, 0.5)
@@ -140,7 +144,9 @@ GlobalStyles.buttonTextGradient: {
 - Reference implementation: `/screens/ChatGPTDealScreen.tsx` Regenerate button (lines 322-332)
 
 ## User Notes
+
 FIX: improve UI for new AI Buttons (create or use default styling for all text inside all buttons)
 
 ## Work Log
+
 <!-- Updated as work progresses -->

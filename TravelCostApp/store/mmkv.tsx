@@ -1,6 +1,7 @@
-import { MMKV } from "react-native-mmkv";
-import { Platform } from "react-native";
 import * as Device from "expo-device";
+import { Platform } from "react-native";
+import { MMKV } from "react-native-mmkv";
+
 import safeLogError from "../util/error";
 import { safelyParseJSON } from "../util/jsonParse";
 

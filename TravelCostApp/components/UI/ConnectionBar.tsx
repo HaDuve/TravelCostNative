@@ -1,13 +1,13 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
-import { NetworkContext } from "../../store/network-context";
-import Animated, { ZoomInDown, ZoomOutDown } from "react-native-reanimated";
-import { GlobalStyles } from "../../constants/styles";
-
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+import { useContext, useEffect, useState } from "react";
+import { StyleSheet, Text } from "react-native";
+import Animated, { ZoomInDown, ZoomOutDown } from "react-native-reanimated";
+
+import { GlobalStyles } from "../../constants/styles";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
+import { NetworkContext } from "../../store/network-context";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -51,15 +51,15 @@ export default ConnectionBar;
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "center",
     alignItems: "center",
     backgroundColor: GlobalStyles.colors.gray500,
-    padding: 2,
     borderTopColor: GlobalStyles.colors.gray300,
+    justifyContent: "center",
+    padding: 2,
   },
   offlineText: {
     color: GlobalStyles.colors.gray700,
-    fontWeight: "300",
     fontSize: 12,
+    fontWeight: "300",
   },
 });

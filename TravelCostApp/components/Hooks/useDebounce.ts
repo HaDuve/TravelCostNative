@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useRef } from "react";
 import { debounce } from "lodash";
-import PropTypes from "prop-types";
+import { useEffect, useMemo, useRef } from "react";
 
-export const useDebounce = (callback) => {
-  const ref = useRef();
+export const useDebounce = (callback: () => void) => {
+  const ref = useRef<() => void | undefined>(undefined);
 
   useEffect(() => {
     ref.current = callback;
@@ -20,14 +19,10 @@ export const useDebounce = (callback) => {
   return debouncedCallback;
 };
 
-useDebounce.propTypes = {
-  callback: PropTypes.func.isRequired,
-};
+export const callDebounced = (func: (...args: any[]) => void, delay = 1000) => {
+  let timeoutId: NodeJS.Timeout;
 
-export const callDebounced = (func, delay) => {
-  let timeoutId;
-
-  return (...args) => {
+  return (...args: any[]) => {
     clearTimeout(timeoutId);
 
     timeoutId = setTimeout(() => {

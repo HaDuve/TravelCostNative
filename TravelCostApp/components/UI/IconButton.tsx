@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Badge } from "react-native-paper";
 import { useEffect, useState } from "react";
+import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
+import { Badge } from "react-native-paper";
+
 import { getCatSymbolMMKV } from "../../util/category";
 
 export type IconButtonProps = {

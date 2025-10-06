@@ -1,6 +1,6 @@
-import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
-import React from "react";
 import PropTypes from "prop-types";
+import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
+
 import { GlobalStyles } from "../../constants/styles";
 import { dynamicScale } from "../../util/scalingUtil";
 
@@ -54,14 +54,14 @@ SettingsSwitch.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: "center",
+    borderBottomColor: GlobalStyles.colors.gray500,
+    borderBottomWidth: 1,
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: "4%",
-    borderBottomWidth: 1,
-    borderBottomColor: GlobalStyles.colors.gray500,
     marginBottom: "2%",
+    paddingHorizontal: "4%",
   },
   label: {
     color: GlobalStyles.colors.textColor,

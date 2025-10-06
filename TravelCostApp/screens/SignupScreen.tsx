@@ -1,10 +1,21 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { useContext, useEffect, useState } from "react";
-import React, { Alert } from "react-native";
-
-//Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
+import { useContext, useEffect, useState } from "react";
+import React, { Platform } from "react-native";
+
+//Localization
+
+import Purchases from "react-native-purchases";
+import Toast from "react-native-toast-message";
+
+import AuthContent from "../components/Auth/AuthContent";
+import {
+  loadKeys,
+  Keys,
+  setAttributesAsync,
+} from "../components/Premium/PremiumConstants";
+import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
@@ -14,22 +25,13 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import AuthContent from "../components/Auth/AuthContent";
-import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { asyncStoreSafeClear } from "../store/async-storage";
+import { AuthContext } from "../store/auth-context";
+import { NetworkContext } from "../store/network-context";
 import { UserContext, UserData } from "../store/user-context";
 import { createUser } from "../util/auth";
-import { setAxiosAccessToken, storeUser, updateUser } from "../util/http";
-import { AuthContext } from "../store/auth-context";
-import Toast from "react-native-toast-message";
-import { Platform } from "react-native";
-import Purchases from "react-native-purchases";
-import {
-  loadKeys,
-  Keys,
-  setAttributesAsync,
-} from "../components/Premium/PremiumConstants";
-import { NetworkContext } from "../store/network-context";
+import { setAxiosAccessToken } from "../util/axios-config";
+import { storeUser, updateUser } from "../util/http";
 
 function SignupScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);

@@ -1,19 +1,24 @@
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+import PropTypes from "prop-types";
+
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
+import { useContext } from "react";
 import { Platform, View } from "react-native";
-import React, { useContext } from "react";
 import DatePicker from "react-native-neat-date-picker";
+
 import { GlobalStyles } from "../../constants/styles";
-import { getLocaleDateFormat } from "../../util/date";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 import { OrientationContext } from "../../store/orientation-context";
-import PropTypes from "prop-types";
+import { getLocaleDateFormat } from "../../util/date";
 
 const DatePickerModal = ({
   showDatePickerRange,
@@ -45,10 +50,14 @@ const DatePickerModal = ({
       // if ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en') is one of these, it will be used
       // otherwise, the default language is 'en'
       language={
-        ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en') === "de" ||
-        ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en') === "fr"
-          ? ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en')
-          : "en"
+        (() => {
+          const lang =
+            Localization.getLocales()[0] &&
+            Localization.getLocales()[0].languageCode
+              ? Localization.getLocales()[0].languageCode.slice(0, 2)
+              : "en";
+          return lang === "de" || lang === "fr" ? lang : "en";
+        })() as "en" | "cn" | "de" | "es" | "fr" | "pt"
       }
     />
   );

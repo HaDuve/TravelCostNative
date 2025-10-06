@@ -9,9 +9,11 @@ modules: [onboarding, premium-features, popup-management]
 # Fix Onboarding Premium Popup
 
 ## Problem/Goal
+
 Prevent the premium add popup from showing during the onboarding guide. The popup interrupts the user experience and should not appear while users are being guided through the app setup process.
 
 ## Success Criteria
+
 - [ ] Identify where premium popup is triggered during onboarding
 - [ ] Implement logic to suppress popup during onboarding flow
 - [ ] Ensure popup appears normally after onboarding is complete
@@ -38,6 +40,7 @@ The premium popup system operates through the `BlurPremium` component located at
 The BlurPremium component uses a focus effect hook that triggers an animated blur intensity increase when the screen gains focus. After a 600ms delay, it shows an animated card with a "Get Premium" button that navigates to the paywall screen.
 
 Currently, BlurPremium is placed on several key screens including:
+
 - `ManageCategoryScreen.tsx` (line 558) - when users try to manage custom categories
 - Several expense statistics components (ExpenseCountries, ExpenseCurrencies, ExpenseTravellers) - though these are commented out
 - FilteredExpenses, FinderScreen, and ChatGPTDealScreen - also commented out
@@ -45,6 +48,7 @@ Currently, BlurPremium is placed on several key screens including:
 The problem occurs because BlurPremium doesn't check for onboarding state. A freshly created user navigating through the app (especially to the ProfileScreen and related flows) can encounter this premium popup before they've completed their basic setup, disrupting the guided experience.
 
 The app's state management for onboarding involves multiple flags:
+
 - `shouldShowOnboarding()` - time-based check for displaying initial tutorial
 - `freshlyCreated` - UserContext flag indicating new user status
 - `needsTour` - UserContext flag for guided tour within the app
@@ -122,10 +126,13 @@ const STORAGE_KEYS = {
 - Navigation flow: `/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/App.tsx`
 
 ## Context Files
+
 <!-- Added by context-gathering agent or manually -->
 
 ## User Notes
+
 FIX: premium add popup should not show during the onboarding guide
 
 ## Work Log
+
 <!-- Updated as work progresses -->

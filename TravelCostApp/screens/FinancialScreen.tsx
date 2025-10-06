@@ -1,25 +1,32 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { useContext } from "react";
-
-//Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
+import React, { useContext } from "react";
+import { StyleSheet, Text, View } from "react-native";
+
+//Localization
+
+import CategoryProgressBar from "../components/ExpensesOutput/ExpenseStatistics/CategoryProgressBar";
+import GradientButton from "../components/UI/GradientButton";
+import { GlobalStyles } from "../constants/styles";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import GradientButton from "../components/UI/GradientButton";
-import { TripContext } from "../store/trip-context";
-import { useNavigation } from "@react-navigation/native";
-import { UserContext } from "../store/user-context";
-import CategoryProgressBar from "../components/ExpensesOutput/ExpenseStatistics/CategoryProgressBar";
-import { GlobalStyles } from "../constants/styles";
 import { ExpensesContext } from "../store/expenses-context";
+import { TripContext } from "../store/trip-context";
+
+import { useNavigation } from "@react-navigation/native";
+
+import { UserContext } from "../store/user-context";
+import { RootNavigationProp } from "../types/navigation";
 
 const FinancialScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<RootNavigationProp>();
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   const expCtx = useContext(ExpensesContext);
@@ -59,6 +66,7 @@ const FinancialScreen = () => {
           totalCost={totalBudgetNum}
           catCost={restCash}
           iconOverride="fast-food-outline"
+          iconJSXOverride={null}
         />
       </View>
 
@@ -71,6 +79,7 @@ const FinancialScreen = () => {
           navigation.navigate("SplitSummary", { tripid: tripCtx.tripid });
         }}
         style={styles.button}
+        buttonStyle={{}}
       >
         {i18n.t("simplifySplitsLabel")}
       </GradientButton>
@@ -81,18 +90,18 @@ const FinancialScreen = () => {
 export default FinancialScreen;
 
 const styles = StyleSheet.create({
+  button: {
+    margin: 20,
+  },
   container: {
     flex: 1,
     marginTop: 20,
     // justifyContent: "center",
     alignItems: "center",
   },
-  button: {
-    margin: 20,
-  },
   progressBar: {
-    width: "100%",
     height: 100,
     marginVertical: 20,
+    width: "100%",
   },
 });

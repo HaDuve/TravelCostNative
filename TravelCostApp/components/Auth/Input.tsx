@@ -1,11 +1,9 @@
-import React, { View, Text, TextInput, StyleSheet } from "react-native";
+import PropTypes from "prop-types";
+import { StyleSheet, Text, TextInput, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 import { GlobalStyles } from "../../constants/styles";
-import PropTypes from "prop-types";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import {
-  dynamicScale,
-} from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 
 function Input({
   label,
@@ -77,36 +75,36 @@ Input.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  inputContainer: {
-    minHeight: dynamicScale(50, false, 0.5),
-    marginVertical: 8,
-  },
-  label: {
-    color: GlobalStyles.colors.gray600,
-    marginBottom: 4,
-    fontSize: dynamicScale(14, false, 0.5),
-  },
-  labelInvalid: {
+  clearInputContainer: { padding: 8 },
+  clearInputText: { color: GlobalStyles.colors.textColor },
+  errorText: {
     color: GlobalStyles.colors.error500,
+    fontSize: 12,
+    fontWeight: "300",
+    marginLeft: "2%",
   },
   input: {
-    paddingVertical: dynamicScale(8, true),
-    paddingHorizontal: dynamicScale(6, false, 0.5),
     backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderBottomWidth: 1,
     borderRadius: 4,
     fontSize: dynamicScale(16, false, 0.5),
-    borderBottomWidth: 1,
+    paddingHorizontal: dynamicScale(6, false, 0.5),
+    paddingVertical: dynamicScale(8, true),
+  },
+  inputContainer: {
+    marginVertical: 8,
+    minHeight: dynamicScale(50, false, 0.5),
   },
   inputInvalid: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderBottomColor: GlobalStyles.colors.error300,
   },
-  errorText: {
-    fontSize: 12,
-    color: GlobalStyles.colors.error500,
-    fontWeight: "300",
-    marginLeft: "2%",
+  label: {
+    color: GlobalStyles.colors.gray600,
+    fontSize: dynamicScale(14, false, 0.5),
+    marginBottom: 4,
   },
-  clearInputContainer: { padding: 8 },
-  clearInputText: { color: GlobalStyles.colors.textColor },
+  labelInvalid: {
+    color: GlobalStyles.colors.error500,
+  },
 });

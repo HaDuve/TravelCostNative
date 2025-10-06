@@ -1,13 +1,9 @@
-import {
-  getAllExpenses,
-  unTouchTraveler,
-  SyncLoadingCallback,
-} from "../../util/http";
+import { getAllExpenses, unTouchTraveler } from "../../util/http";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -16,12 +12,13 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { setMMKVObject } from "../../store/mmkv";
-import { getExpensesSum } from "../../util/expense";
+import uniqBy from "lodash.uniqby";
+
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 import { ExpenseContextType } from "../../store/expenses-context";
 import { TripContextType } from "../../store/trip-context";
 import safeLogError from "../../util/error";
-import uniqBy from "lodash.uniqby";
+import { getExpensesSum } from "../../util/expense";
 
 export async function fetchAndSetExpenses(
   showRefIndicator: boolean,
@@ -50,7 +47,7 @@ export async function fetchAndSetExpenses(
     };
 
     let expenses = await getAllExpenses(tripid, uid, true, syncLoadingCallback);
-    expenses = expenses.filter((expense) => !isNaN(Number(expense.calcAmount)));
+    expenses = expenses.filter(expense => !isNaN(Number(expense.calcAmount)));
 
     if (expenses && expenses?.length !== 0) {
       // Use mergeExpenses instead of setExpenses to properly merge new expenses with existing ones
@@ -77,7 +74,7 @@ export async function fetchAndSetExpenses(
 }
 
 export function getDateRangeExpenses(startDate, endDate, expenses) {
-  const rangeExpenses = expenses.filter((expense) => {
+  const rangeExpenses = expenses.filter(expense => {
     return expense.date >= startDate && expense.date <= endDate;
   });
   return rangeExpenses;

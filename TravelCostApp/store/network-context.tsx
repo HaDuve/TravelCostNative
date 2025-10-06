@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
 import NetInfo from "@react-native-community/netinfo";
-import { createContext } from "react";
 import PropTypes from "prop-types";
+import React, { useState, useEffect, createContext } from "react";
+
+import { useInterval } from "../components/Hooks/useInterval";
 import {
   DEBUG_FORCE_OFFLINE,
   DEBUG_POLLING_INTERVAL,
 } from "../confAppConstants";
-import { useInterval } from "../components/Hooks/useInterval";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
 
 export const NetworkContext = createContext({
@@ -21,7 +21,7 @@ const NetworkContextProvider = ({ children }) => {
   const [lastConnectionSpeedInMbps, setLastConnectionSpeedInMbps] = useState(0);
 
   useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener((state) => {
+    const unsubscribe = NetInfo.addEventListener(state => {
       if (DEBUG_FORCE_OFFLINE) {
         setIsConnected(false);
         return;

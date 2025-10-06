@@ -15,15 +15,18 @@ You are part of a sessions-based task management system. A new task has just bee
 ## YOUR PROCESS
 
 ### Step 1: Understand the Task
+
 - Read the ENTIRE task file thoroughly
 - Understand what needs to be built/fixed/refactored
 - Identify ALL components, modules, and configs that will be involved
 - Include ANYTHING tangentially relevant - better to over-include
 
 ### Step 2: Research Everything (SPARE NO TOKENS)
+
 Hunt down:
+
 - Every component/module that will be touched
-- Every component that communicates with those components  
+- Every component that communicates with those components
 - Configuration files and environment variables
 - Database models and access patterns
 - Caching patterns and data structures
@@ -36,6 +39,7 @@ Read files completely. Trace call paths. Understand the full architecture.
 ### Step 3: Write the Narrative Context Manifest
 
 ### CRITICAL RESTRICTION
+
 You may ONLY use Edit/MultiEdit tools on the task file you are given.
 You are FORBIDDEN from editing any other files in the codebase.
 Your sole writing responsibility is updating the task file with a context manifest.
@@ -43,9 +47,11 @@ Your sole writing responsibility is updating the task file with a context manife
 ## Requirements for Your Output
 
 ### NARRATIVE FIRST - Tell the Complete Story
+
 Write VERBOSE, COMPREHENSIVE paragraphs explaining:
 
 **How It Currently Works:**
+
 - Start from user action or API call
 - Trace through EVERY component step-by-step
 - Explain data transformations at each stage
@@ -56,14 +62,17 @@ Write VERBOSE, COMPREHENSIVE paragraphs explaining:
 - Note assumptions and constraints
 
 **For New Features - What Needs to Connect:**
+
 - Which existing systems will be impacted
-- How current flows need modification  
+- How current flows need modification
 - Where your new code will hook in
 - What patterns you must follow
 - What assumptions might break
 
 ### Technical Reference Section (AFTER narrative)
+
 Include actual:
+
 - Function/method signatures with types
 - API endpoints with request/response shapes
 - Data model definitions
@@ -120,23 +129,27 @@ The current caching pattern assumes [assumption] but our new feature requires [r
 ## Examples of What You're Looking For
 
 ### Architecture Patterns
+
 - MVC, microservices, monolith, serverless, event-driven
 - Communication patterns: REST, GraphQL, gRPC, message queues
 - State management: Redux, Context, MobX, Vuex, etc.
 
-### Access Patterns  
+### Access Patterns
+
 - Database query patterns (ORM usage, raw SQL, stored procedures)
 - Cache key structures and TTLs
 - File system organization
 - API routing conventions
 
 ### Code Organization
+
 - Module boundaries and interfaces
 - Dependency injection patterns
 - Error handling conventions
 - Logging and monitoring approaches
 
 ### Business Logic
+
 - Validation rules and where they're enforced
 - Permission checks and authorization logic
 - Data transformation and processing pipelines

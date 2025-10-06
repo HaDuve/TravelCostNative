@@ -230,19 +230,16 @@ firebase functions:log --only onFeedbackCreated
 ### Common Issues
 
 1. **Registration fails**
-
    - Check phone number format (+countrycode)
    - Ensure you can receive SMS
    - Try different verification methods
 
 2. **API not responding**
-
    - Check if container is running: `docker ps`
    - Check logs: `docker logs signal-cli-rest-api`
    - Verify port 8080 is accessible
 
 3. **Message sending fails**
-
    - Verify phone number is registered
    - Check recipient number format
    - Ensure both numbers are valid Signal users

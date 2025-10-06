@@ -1,14 +1,18 @@
-import {
-  vexo,
-  customEvent,
-  identifyDevice,
-  enableTracking,
-} from "vexo-analytics";
-import Constants from "expo-constants";
 import * as Device from "expo-device";
+import {
+  customEvent,
+  enableTracking,
+  identifyDevice,
+  vexo,
+} from "vexo-analytics";
+
 import { DEVELOPER_MODE } from "../confAppConstants";
+
 import safeLogError from "./error";
-import { VexoEvents, VexoEventName } from "./vexo-constants";
+import { VexoEventName, VexoEvents } from "./vexo-constants";
+
+// Re-export VexoEvents for external use
+export { VexoEvents };
 
 let vexoInitialized = false;
 let vexoEnabled = false;

@@ -9,13 +9,16 @@ modules: [components/UI, screens/myTrips, screens/manageTrips, assets]
 # Fix Missing Icons in MyTrips and ManageTrips
 
 ## Problem/Goal
+
 Several icons are missing and showing as default "?" symbols since the last update. Need to identify missing icons and find suitable alternatives:
+
 - myTrips screen icons
 - manageTrips screen icons
 - newTrip button (previously had globe symbol)
 - reCalc button (previously had merge symbol)
 
 ## Success Criteria
+
 - [x] Identify all missing icons showing as "?" in myTrips and manageTrips screens
 - [x] Find suitable replacement icons for newTrip button (globe alternative)
 - [x] Find suitable replacement icons for reCalc button (merge alternative)
@@ -24,10 +27,13 @@ Several icons are missing and showing as default "?" symbols since the last upda
 - [x] Test icon functionality and touch targets
 
 ## Context Files
+
 <!-- Added by context-gathering agent or manually -->
 
 ## User Notes
+
 Icons were working before the last update, so this might be related to:
+
 - Icon library changes
 - Asset path changes
 - Icon name changes in dependencies
@@ -37,6 +43,7 @@ Icons were working before the last update, so this might be related to:
 ### 2025-09-03
 
 #### Completed
+
 - Identified root cause: Ionicons v6+ removed `ios-` prefixed icon names
 - Updated ManageCategoryScreen.tsx icon import from `{ Ionicons }` to direct import
 - Replaced all 86 icon names in ioniconsList array (removed `ios-` prefixes)
@@ -47,11 +54,13 @@ Icons were working before the last update, so this might be related to:
 - User tested and confirmed all icons display correctly
 
 #### Decisions
+
 - Used modern Ionicons import syntax for updated files
 - Maintained existing `list-outline` icon for summary/reCalc button
 - Applied consistent `*-outline` naming convention throughout
 
 #### Discovered
+
 - Issue was caused by Ionicons library update breaking iOS-specific icon names
 - Some files in codebase use mixed import patterns for Ionicons
 - Code review identified potential remaining `ios-git-compare-outline` icons in other files

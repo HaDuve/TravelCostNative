@@ -18,11 +18,11 @@ You've been called at the end of a work session to check if any new context was 
 
 1. **Read Transcript Files**
    Follow these steps to find and read the transcript files:
-   
+
    a. **Determine the parent directory** of the sessions/ directory in which the task file is stored
    b. **List all files** in `[parent directory]/.claude/state/context-refinement/`
    c. **Read every file** in that directory
-   
+
    The transcript files contain the full conversation history that led to this point.
 
 2. **Analyze for Drift or Discoveries**
@@ -42,18 +42,20 @@ You've been called at the end of a work session to check if any new context was 
 
 4. **Update Format** (ONLY if needed)
    Append to the existing Context Manifest:
-   
+
    ```markdown
    ### Discovered During Implementation
+
    [Date: YYYY-MM-DD / Session marker]
-   
+
    [NARRATIVE explanation of what was discovered]
-   
+
    During implementation, we discovered that [what was found]. This wasn't documented in the original context because [reason]. The actual behavior is [explanation], which means future implementations need to [guidance].
-   
+
    [Additional discoveries in narrative form...]
-   
+
    #### Updated Technical Details
+
    - [Any new signatures, endpoints, or patterns discovered]
    - [Updated understanding of data flows]
    - [Corrected assumptions]
@@ -62,6 +64,7 @@ You've been called at the end of a work session to check if any new context was 
 ## What Qualifies as Worth Updating
 
 **YES - Update for these:**
+
 - Undocumented component interactions discovered
 - Incorrect assumptions about how something works
 - Missing configuration requirements
@@ -73,6 +76,7 @@ You've been called at the end of a work session to check if any new context was 
 - Undocumented business rules
 
 **NO - Don't update for these:**
+
 - Minor typos or clarifications
 - Things that were implied but not explicit
 - Standard debugging discoveries
@@ -83,6 +87,7 @@ You've been called at the end of a work session to check if any new context was 
 ## Self-Check Before Finalizing
 
 Ask yourself:
+
 - Would the NEXT person implementing similar work benefit from this discovery?
 - Was this a genuine surprise that caused issues?
 - Does this change the understanding of how the system works?

@@ -1,6 +1,8 @@
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
+
+import { Keys, loadKeys } from "../components/Premium/PremiumConstants";
 import { LANGUAGE_LIST } from "../i18n/languageList";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
@@ -11,13 +13,13 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 const languageObj = LANGUAGE_LIST.find(
-  (language) => language.code === i18n.locale
+  language => language.code === i18n.locale
 );
 const languageName = languageObj?.name;
 // console.log("languageName:", languageName);
 
 import axios from "axios";
-import { Keys, loadKeys } from "../components/Premium/PremiumConstants";
+
 import safeLogError from "./error";
 
 // Function to get current date in a readable format
@@ -194,15 +196,13 @@ export interface GPT_getKeywords extends GPT_RequestBody {
 }
 
 function chatGPTcontentKeywords(customCategory: string) {
-  return (
-    "Give me a list of 50 strings containing single words that are semantically similar to " +
-    customCategory +
-    ". Choose the strings so any word that is vaguely related to " +
-    customCategory +
-    "can be mapped to this category in the context of a expense tracker. Be very careful to only add words to the list that contain activities or subjects in relation to" +
-    customCategory +
-    ', especially ones that you have to pay for. The format of your answer must be  ["string","string", ... ], not containing any flavour text or decoration at all, only the list.'
-  );
+  return `Give me a list of 50 strings containing single words that are semantically similar to ${
+    customCategory
+  }. Choose the strings so any word that is vaguely related to ${
+    customCategory
+  }can be mapped to this category in the context of a expense tracker. Be very careful to only add words to the list that contain activities or subjects in relation to${
+    customCategory
+  }, especially ones that you have to pay for. The format of your answer must be  ["string","string", ... ], not containing any flavour text or decoration at all, only the list.`;
 }
 
 async function chatGPTcontentGoodDealPost(

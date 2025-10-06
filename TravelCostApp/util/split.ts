@@ -2,15 +2,21 @@
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { DateTime } from "luxon";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
-import { Expense, Split, ExpenseData, isPaidString } from "./expense";
+
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
+import { DateOrDateTime, toDateString } from "../types/date";
+
+import safeLogError from "./error";
+import { ExpenseData, isPaidString, Split } from "./expense";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import { getAllExpenses } from "./http";
-import safeLogError from "./error";
 import { safelyParseJSON } from "./jsonParse";
 
 export function recalcSplitsLinearly(splitList: Split[], amount: number) {
@@ -37,19 +43,19 @@ export function recalcSplitsLinearly(splitList: Split[], amount: number) {
   // Apply the adjustment factor to each split
   for (let i = 0; i < splitList?.length; i++) {
     const split = splitList[i];
-    split.amount = Number(Number(split.amount) * adjustmentFactor).toFixed(2);
+    split.amount = Number(
+      (Number(split.amount) * adjustmentFactor).toFixed(2)
+    ) as any;
   }
 
   // If the adjustment resulted in any negative amounts, distribute the difference among all splits
-  const negativeSplits = splitList.filter((split) => Number(split.amount) < 0);
+  const negativeSplits = splitList.filter(split => Number(split.amount) < 0);
   if (negativeSplits?.length > 0) {
     const negativeAmount = negativeSplits.reduce(
       (sum, split) => sum + Number(split.amount),
       0
     );
-    const positiveSplits = splitList.filter(
-      (split) => Number(split.amount) > 0
-    );
+    const positiveSplits = splitList.filter(split => Number(split.amount) > 0);
     const positiveAmount = positiveSplits.reduce(
       (sum, split) => sum + Number(split.amount),
       0
@@ -60,7 +66,7 @@ export function recalcSplitsLinearly(splitList: Split[], amount: number) {
       if (Number(split.amount) > 0) {
         split.amount = Number(Number(split.amount) * adjustmentFactor).toFixed(
           2
-        );
+        ) as any;
       }
     }
   }
@@ -79,44 +85,49 @@ export function recalcSplitsForExact(splitList: Split[], amount: number) {
   // console.log("recalcSplitsForExact ~ splitRest:", splitRest);
 
   // Count the number of travellers without a split amount
-  const travellersWithoutSplit = splitList.filter((split) => !split.amount);
+  const travellersWithoutSplit = splitList.filter(split => !split.amount);
   const numberOfTravellersWithoutSplit = travellersWithoutSplit?.length;
 
   if (numberOfTravellersWithoutSplit === 0) {
     // Find all splits with amount equal to splitAmountNorm
-    const splitsWithNormAmount = splitList.filter((split) =>
+    const splitsWithNormAmount = splitList.filter(split =>
       sameNumber(Number(split.amount), Number(splitAmountNorm))
     );
 
     // Split the rest equally among all splits with norm amount
     if (splitsWithNormAmount?.length > 0) {
       const splitAmount = splitRest / splitsWithNormAmount?.length;
-      splitsWithNormAmount.forEach((split) => {
-        split.amount = (Number(split.amount) + splitAmount).toFixed(2);
+      splitsWithNormAmount.forEach(split => {
+        split.amount = Number(
+          (Number(split.amount) + splitAmount).toFixed(2)
+        ) as any;
       });
     } else {
-      const splitsWithDecimalAmount = splitList.filter((split) =>
-        /\.\d{2}$/.test(split.amount)
+      const splitsWithDecimalAmount = splitList.filter(split =>
+        /\.\d{2}$/.test(String(split.amount))
       );
       if (splitsWithDecimalAmount?.length > 0) {
-        splitsWithDecimalAmount.forEach((split) => {
+        splitsWithDecimalAmount.forEach(split => {
           split.amount = Number(
-            Number(split.amount) + splitRest / splitsWithDecimalAmount?.length
-          ).toFixed(2);
+            (
+              Number(split.amount) +
+              splitRest / splitsWithDecimalAmount?.length
+            ).toFixed(2)
+          ) as any;
         });
       } else {
-        splitList.forEach((split) => {
+        splitList.forEach(split => {
           split.amount = Number(
-            Number(split.amount) + splitRest / splitList?.length
-          ).toFixed(2);
+            (Number(split.amount) + splitRest / splitList?.length).toFixed(2)
+          ) as any;
         });
       }
     }
   } else {
     // Split the rest equally among all travellers without a split amount
     const splitAmount = splitRest / numberOfTravellersWithoutSplit;
-    travellersWithoutSplit.forEach((split) => {
-      split.amount = splitAmount.toFixed(2);
+    travellersWithoutSplit.forEach(split => {
+      split.amount = Number(splitAmount.toFixed(2)) as any;
     });
   }
 
@@ -152,10 +163,10 @@ export function calcSplitList(
       return splitList;
     case "EQUAL": {
       const splitAmount = amount / splitTravellers?.length;
-      splitTravellers.forEach((traveller) => {
+      splitTravellers.forEach(traveller => {
         splitList.push({
           userName: traveller,
-          amount: splitAmount.toFixed(2),
+          amount: Number(splitAmount.toFixed(2)),
         });
       });
       return splitList;
@@ -163,10 +174,10 @@ export function calcSplitList(
     case "EXACT":
       if (!splitList || splitList?.length < 1) {
         const splitAmount = amount / splitTravellers?.length;
-        splitTravellers.forEach((traveller) => {
+        splitTravellers.forEach(traveller => {
           splitList.push({
             userName: traveller,
-            amount: splitAmount.toFixed(2),
+            amount: Number(splitAmount.toFixed(2)),
           });
         });
         return splitList;
@@ -177,10 +188,10 @@ export function calcSplitList(
       {
         if (!splitList || splitList?.length < 1) {
           const splitAmount = 100 / splitTravellers?.length;
-          splitTravellers.forEach((traveller) => {
+          splitTravellers.forEach(traveller => {
             splitList.push({
               userName: traveller,
-              amount: splitAmount.toFixed(2),
+              amount: Number(splitAmount.toFixed(2)),
             });
           });
           return splitList;
@@ -249,7 +260,7 @@ export function travellerToDropdown(travellers, includeAddTraveller = true) {
   const listOfLabelValues = [];
   // sometimes this is not an array but an object
   try {
-    travellers.forEach((traveller) => {
+    travellers.forEach(traveller => {
       // // console.log("travellers.forEach ~ traveller:", traveller);
       // TODO: make value uid based and not name based
       listOfLabelValues.push({ label: traveller, value: traveller });
@@ -257,7 +268,7 @@ export function travellerToDropdown(travellers, includeAddTraveller = true) {
   } catch (error) {
     // console.log("travellers is an object", travellers);
     // get travellers.user.username
-    Object.keys(travellers).forEach((key) => {
+    Object.keys(travellers).forEach(key => {
       // console.log("Object.keys ~ key:", key);
       // console.log("Object.keys ~ travellers[key]:", travellers[key]);
       // console.log(
@@ -270,15 +281,15 @@ export function travellerToDropdown(travellers, includeAddTraveller = true) {
       });
     });
   }
-  
+
   // Add "+ add traveller" item at the end only if requested
   if (includeAddTraveller) {
     listOfLabelValues.push({
       label: `+ ${i18n.t("inviteTraveller")}`,
-      value: "__ADD_TRAVELLER__"
+      value: "__ADD_TRAVELLER__",
     });
   }
-  
+
   return [...listOfLabelValues];
 }
 
@@ -320,12 +331,24 @@ export async function calcOpenSplitsTable(
         expense.splitType === "SELF" ||
         !expense.splitList ||
         expense.isPaid == isPaidString.paid ||
-        DateTime.fromISO(expense.startDate) <
-          DateTime.fromISO(isPaidDate).toJSDate() ||
-        DateTime.fromISO(expense.date) <
-          DateTime.fromISO(isPaidDate).toJSDate() ||
-        DateTime.fromISO(expense.endDate) <
-          DateTime.fromISO(isPaidDate).toJSDate()
+        DateTime.fromISO(
+          toDateString(expense.startDate as unknown as DateOrDateTime)
+        ) <
+          DateTime.fromISO(
+            toDateString(isPaidDate as unknown as DateOrDateTime)
+          ) ||
+        DateTime.fromISO(
+          toDateString(expense.date as unknown as DateOrDateTime)
+        ) <
+          DateTime.fromISO(
+            toDateString(isPaidDate as unknown as DateOrDateTime)
+          ) ||
+        DateTime.fromISO(
+          toDateString(expense.endDate as unknown as DateOrDateTime)
+        ) <
+          DateTime.fromISO(
+            toDateString(isPaidDate as unknown as DateOrDateTime)
+          )
       )
         continue;
       for (const split of expense.splitList) {
@@ -372,6 +395,7 @@ export async function calcOpenSplitsTable(
 }
 
 export function simplifySplits(openSplits: Split[]) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const Splitwise = require("splitwise-js-map");
   let tempSplits = [];
   try {
@@ -380,10 +404,10 @@ export function simplifySplits(openSplits: Split[]) {
     safeLogError(error);
   }
   const listOfSplits = [];
-  tempSplits.forEach((openSplit) => {
-    if (listOfSplits.some((e) => e.paidBy === openSplit.whoPaid)) {
+  tempSplits.forEach(openSplit => {
+    if (listOfSplits.some(e => e.paidBy === openSplit.whoPaid)) {
       /* list contains the element we're looking for */
-      const index = listOfSplits.findIndex((e) => {
+      const index = listOfSplits.findIndex(e => {
         return e.paidBy === openSplit.whoPaid;
       });
       if (index !== -1) {
@@ -403,12 +427,12 @@ export function simplifySplits(openSplits: Split[]) {
   const simplifiedItems = [];
   try {
     const splits = Splitwise(listOfSplits);
-    splits.forEach((simpleSplit) => {
+    splits.forEach(simpleSplit => {
       const from = simpleSplit[0];
       const to = simpleSplit[1];
       const value = simpleSplit[2];
       const item = {
-        amount: Number(value).toFixed(2),
+        amount: Number(Number(value).toFixed(2)),
         userName: from,
         whoPaid: to,
       };
@@ -432,14 +456,14 @@ function sumUpSamePairs(openSplits) {
 
   if (!openSplits || openSplits?.length < 1) return;
   const listOfSums = [];
-  openSplits.forEach((split) => {
+  openSplits.forEach(split => {
     if (
       listOfSums.some(
-        (e) => e.userName === split.userName && e.whoPaid === split.whoPaid
+        e => e.userName === split.userName && e.whoPaid === split.whoPaid
       )
     ) {
       /* list contains the element we're looking for */
-      const index = listOfSums.findIndex((e) => {
+      const index = listOfSums.findIndex(e => {
         return e.userName === split.userName && e.whoPaid === split.whoPaid;
       });
       if (index !== -1) {
@@ -459,9 +483,9 @@ function sumUpSamePairs(openSplits) {
 
 function cancelDifferences(openSplits) {
   let listOfSums = [...openSplits];
-  listOfSums.forEach((split) => {
+  listOfSums.forEach(split => {
     /* list contains the element we're looking for */
-    const index = listOfSums.findIndex((e) => {
+    const index = listOfSums.findIndex(e => {
       return e.userName === split.whoPaid && e.whoPaid === split.userName;
     });
     if (index !== -1) {
@@ -473,11 +497,11 @@ function cancelDifferences(openSplits) {
       // difference
       if (split.amount > listOfSums[index].amount) {
         split.amount -= listOfSums[index].amount;
-        split.amount = split.amount.toFixed(2);
+        split.amount = Number(split.amount.toFixed(2)) as any;
         listOfSums.splice(index, 1);
       }
     }
-    listOfSums = listOfSums.filter((item) => item.amount !== 0);
+    listOfSums = listOfSums.filter(item => item.amount !== 0);
   });
 
   return listOfSums;

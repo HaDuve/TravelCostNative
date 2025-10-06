@@ -9,9 +9,11 @@ modules: [components/ManageExpense, components/TravellerDropdown]
 # Fix Individual Share Button in Expense Edit Modal
 
 ## Problem/Goal
+
 Individual share button next to travellerDropdown in expense edit modal (manageExpense) does not work. Need to investigate and fix the button functionality.
 
 ## Success Criteria
+
 - [ ] Investigate why individual share button is not working
 - [ ] Fix button click handling and functionality
 - [ ] Test individual share button in expense edit modal
@@ -36,7 +38,7 @@ The individual share button in question is the `people-circle-outline` IconButto
 
 The button's onPress handler (lines 1603-1626) calls `calcSplitList()` with `tempSplitType: "EXACT"`, passes the current amount, user, and travellers list. If splits are successfully calculated, it updates `splitType`, `splitList`, and `splitListValid` state using the respective setters.
 
-The traveller data comes from `TripContext.travellers` and is transformed using `travellerToDropdown(currentTravellers, true)` which includes an "+ add traveller" option. The dropdown integrates with the modal state machine - when "__ADD_TRAVELLER__" is selected, it navigates to the Share screen for inviting new travellers.
+The traveller data comes from `TripContext.travellers` and is transformed using `travellerToDropdown(currentTravellers, true)` which includes an "+ add traveller" option. The dropdown integrates with the modal state machine - when "**ADD_TRAVELLER**" is selected, it navigates to the Share screen for inviting new travellers.
 
 After the individual share button sets up exact splitting, users see a horizontal FlatList (lines 1867-2023) displaying individual input fields for each traveller's share amount. Each item in this list shows the traveller's name, an editable amount field, the currency symbol, and a remove button ("x"). The split amounts automatically recalculate when the total expense amount changes, maintaining proportional distribution.
 
@@ -59,21 +61,26 @@ The fix will likely involve debugging the button's onPress handler to identify w
 ### Technical Reference Details
 
 #### Component Location & Integration
+
 - File: `/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/components/ManageExpense/ExpenseForm.tsx`
 - Button implementation: Lines 1585-1627
 - Modal state machine: Lines 578-631
 - Split list rendering: Lines 1867-2023
 
 #### Key State Variables
+
 ```typescript
 const [splitType, setSplitType] = useState<splitType>("SELF");
-const [splitList, setSplitList] = useState(editingValues ? editingValues.splitList : []);
+const [splitList, setSplitList] = useState(
+  editingValues ? editingValues.splitList : []
+);
 const [splitListValid, setSplitListValid] = useState(true);
 const [currentTravellers, setCurrentTravellers] = useState(tripCtx.travellers);
 const [modalFlow, setModalFlow] = useState(modalStates.NONE);
 ```
 
 #### Critical Functions
+
 ```typescript
 // From util/split.ts
 calcSplitList(splitType: splitType, amount: number, whoPaid: string, splitTravellers: string[])
@@ -86,6 +93,7 @@ const listSplits = calcSplitList(tempSplitType, +amountValue, userCtx.userName, 
 ```
 
 #### Data Flow Dependencies
+
 - TripContext.travellers → currentTravellers state
 - currentTravellers → calcSplitList() → splitList state
 - splitList + splitType → validateSplitList() → splitListValid state
@@ -93,6 +101,7 @@ const listSplits = calcSplitList(tempSplitType, +amountValue, userCtx.userName, 
 - userCtx.userName must be available as the payer
 
 #### Modal State Machine
+
 ```typescript
 const modalStates = {
   NONE: "none",
@@ -103,17 +112,21 @@ const modalStates = {
 ```
 
 #### Button Rendering Conditions
+
 - Only shows when `!IsSoloTraveller` (i.e., `currentTravellers?.length > 1`)
 - Only shows when `showWhoPaid` is true (i.e., `amountValue !== ""`)
 - Located within whoPaidContainer but should work independently of dropdown
 
 #### Recent Changes Context
+
 - Commit 64f10ec: Added share trip to traveller dropdown functionality
 - Commit f3a84f7: Implemented modal state machine for cascading flows
 - These changes may have introduced timing or state conflicts affecting the button
 
 ## User Notes
+
 Individual share button next to traverllerDropdown in expense edit modal (manageExpense) does not work.
 
 ## Work Log
+
 - [2025-09-18] Created task

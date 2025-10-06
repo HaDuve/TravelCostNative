@@ -6,28 +6,33 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { Platform, StyleSheet, Text, View, ScrollView } from "react-native";
-import DatePickerContainer from "../components/UI/DatePickerContainer";
-import DatePickerModal from "../components/UI/DatePickerModal";
+
 import { getFormattedDate } from "../util/date";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { de, en, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Checkbox } from "react-native-paper";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
+
 import Autocomplete from "../components/UI/Autocomplete";
+import DatePickerContainer from "../components/UI/DatePickerContainer";
+import DatePickerModal from "../components/UI/DatePickerModal";
 import GradientButton from "../components/UI/GradientButton";
 import IconButton from "../components/UI/IconButton";
 import { GlobalStyles } from "../constants/styles";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 import {
   asyncStoreGetItem,
   asyncStoreGetObject,
@@ -37,14 +42,16 @@ import {
 import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
+import { DateOrDateTime, toDate, toDateString } from "../types/date";
+import { RootNavigationProp } from "../types/navigation";
 import { DEFAULTCATEGORIES } from "../util/category";
 import safeLogError from "../util/error";
 import { ExpenseData } from "../util/expense";
-import { formatExpenseWithCurrency } from "../util/string";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
+import { formatExpenseWithCurrency } from "../util/string";
 
 const FinderScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<RootNavigationProp>();
   const expCtx = useContext(ExpensesContext);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
@@ -76,7 +83,7 @@ const FinderScreen = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(false);
   }, []);
-  const onConfirmRange = useCallback((output) => {
+  const onConfirmRange = useCallback(output => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(false);
     // hotfixing datebug for asian countries
@@ -97,7 +104,7 @@ const FinderScreen = () => {
     startDate?.toString().slice(0, 10) !== endDate?.toString().slice(0, 10);
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  const onChangeSearch = (query) => {
+  const onChangeSearch = query => {
     setSearchQuery(query);
     setCheckedQuery(true);
     if (query === "") {
@@ -115,13 +122,20 @@ const FinderScreen = () => {
             !checkedDate ||
             expenseDate?.toString().slice(0, 10) ===
               startDate?.toString().slice(0, 10) ||
-            DateTime.fromJSDate(expense.date).toString()?.slice(0, 10) ===
-              startDate?.toString().slice(0, 10);
+            DateTime.fromJSDate(toDate(expense.date))
+              .toString()
+              ?.slice(0, 10) ===
+              toDateString(new Date(startDate) as DateOrDateTime)?.slice(0, 10);
           const expenseDateIsInRange =
             expenseDateIsSameDay ||
-            (expenseDate >= startDate && expenseDate <= endDate) ||
-            (DateTime.fromJSDate(expense.date).toString() >= startDate &&
-              DateTime.fromJSDate(expense.date).toString() <= endDate);
+            (toDate(expenseDate) >=
+              toDate(new Date(startDate) as DateOrDateTime) &&
+              toDate(expenseDate) <=
+                toDate(new Date(endDate) as DateOrDateTime)) ||
+            (DateTime.fromJSDate(toDate(expense.date)).toString() >=
+              toDateString(new Date(startDate) as DateOrDateTime) &&
+              DateTime.fromJSDate(toDate(expense.date)).toString() <=
+                toDateString(new Date(endDate) as DateOrDateTime));
           const expenseDescriptionIsInSearchQuery = expense.description
             ?.toLowerCase()
             .includes(_searchQuery?.toLowerCase());
@@ -139,7 +153,7 @@ const FinderScreen = () => {
             .includes(_searchQuery?.toLowerCase());
           const expenseTravellerIsInSearchQuery =
             // return true if _searchQuery?.toLowerCase() is in expense.splitList
-            expense.splitList?.some((split) => {
+            expense.splitList?.some(split => {
               const travellerName = split.userName;
               return travellerName
                 ?.toLowerCase()
@@ -182,9 +196,9 @@ const FinderScreen = () => {
 
   const queryString = checkedQuery ? searchQuery : "";
   const dateString = checkedDate
-    ? DateTime.fromISO(startDate).toLocaleString() +
-      " - " +
-      DateTime.fromISO(endDate).toLocaleString()
+    ? `${DateTime.fromISO(startDate).toLocaleString()} - ${DateTime.fromISO(
+        endDate
+      ).toLocaleString()}`
     : "";
   const allEpensesQueryString =
     queryString === "" && dateString === "" ? "All Expenses" : "";
@@ -194,7 +208,7 @@ const FinderScreen = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     navigation.navigate("FilteredPieCharts", {
       expenses: filteredExpenses,
-      dayString: allEpensesQueryString + queryString + " " + dateString,
+      dayString: `${allEpensesQueryString + queryString} ${dateString}`,
     });
   }, [
     navigation,
@@ -253,16 +267,15 @@ const FinderScreen = () => {
   const last500Daysexpenses = useMemo(
     () =>
       expCtx.expenses.filter(
-        (expense) =>
-          expense.date > DateTime.now().minus({ days: 500 }).toJSDate()
+        expense => expense.date > DateTime.now().minus({ days: 500 }).toJSDate()
       ),
     [expCtx.expenses?.length]
   );
   // extract suggestions from all the descriptions of expense state into an array of strings
   const suggestionData: string[] = last500Daysexpenses.map(
-    (expense) => expense.description
+    expense => expense.description
   );
-  const cats = DEFAULTCATEGORIES.map((cat) => {
+  const cats = DEFAULTCATEGORIES.map(cat => {
     if (cat.cat !== "newCat") return cat.catString;
   });
   const travellers = tripCtx.travellers;
@@ -280,7 +293,7 @@ const FinderScreen = () => {
       {datepickerJSX}
       <View style={styles.container}>
         <ScrollView
-          style={[GlobalStyles.wideStrongShadow]}
+          style={GlobalStyles.wideStrongShadow}
           contentContainerStyle={styles.cardContainer}
         >
           <Text style={styles.titleText}>{i18n.t("finderTitle")}</Text>
@@ -303,7 +316,7 @@ const FinderScreen = () => {
                 onChange={onChangeSearch}
                 data={suggestions}
                 showOnEmpty
-                // placeholder="Search for descriptions, categories, traveller names..."
+                placeholder="Search for descriptions, categories, traveller names..."
                 label={i18n.t("searchLabel")}
                 containerStyle={[
                   styles.queryContainer,
@@ -382,6 +395,7 @@ const FinderScreen = () => {
             <GradientButton
               onPress={() => findPressedHandler()}
               style={styles.findButton}
+              buttonStyle={{}}
             >
               {foundResults
                 ? `${i18n.t("showXResults1")} ${numberOfResults} ${i18n.t(
@@ -400,17 +414,30 @@ const FinderScreen = () => {
 export default FinderScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
+  autoCompleteMenuStyle: {
+    marginBottom: dynamicScale(-1, true),
+    marginLeft: dynamicScale(8),
+    zIndex: 0,
+  },
+  autoCompleteStyle: {
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
+    borderRadius: dynamicScale(5),
+    fontSize: dynamicScale(16, false, 0.4),
+    paddingHorizontal: dynamicScale(2),
+    paddingVertical: dynamicScale(2, false, 2),
+    zIndex: 0,
+  },
+  buttonContainer: {
+    marginBottom: dynamicScale(20, true),
+    marginTop: dynamicScale(20, true),
   },
   cardContainer: {
-    flex: 1,
-    margin: dynamicScale(20),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: dynamicScale(20, false, 0.5),
-    padding: dynamicScale(20),
+    flex: 1,
     justifyContent: "space-around",
+    margin: dynamicScale(20),
+    padding: dynamicScale(20),
     // android styles
     ...Platform.select({
       android: {
@@ -431,16 +458,38 @@ const styles = StyleSheet.create({
       ios: { borderWidth: 1 },
     }),
   },
+  container: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    flex: 1,
+  },
+  findButton: {
+    borderRadius: 99,
+    marginHorizontal: dynamicScale(65),
+  },
   headerContainer: {
-    flexDirection: "row",
     alignItems: "center",
+    flexDirection: "row",
     justifyContent: "flex-start",
     minHeight: dynamicScale(90, true),
   },
+  queryContainer: {
+    flex: 1,
+    marginLeft: dynamicScale(18),
+    marginTop: dynamicScale(10, true),
+    maxWidth: dynamicScale(180),
+  },
+  queryText: {
+    fontSize: constantScale(14, 0.5),
+    fontStyle: "italic",
+    fontWeight: "200",
+    marginBottom: dynamicScale(18, true),
+    marginTop: dynamicScale(32, true, 0.5),
+    textAlign: "center",
+  },
   rowContainer: {
+    alignItems: "flex-start",
     flex: 1,
     flexDirection: "row",
-    alignItems: "flex-start",
     justifyContent: "flex-start",
     minHeight: dynamicScale(90, true),
   },
@@ -452,40 +501,5 @@ const styles = StyleSheet.create({
     // center
     textAlign: "center",
     margin: dynamicScale(8, false, 2),
-  },
-  queryText: {
-    fontSize: constantScale(14, 0.5),
-    marginTop: dynamicScale(32, true, 0.5),
-    marginBottom: dynamicScale(18, true),
-    textAlign: "center",
-    fontWeight: "200",
-    fontStyle: "italic",
-  },
-  findButton: {
-    marginHorizontal: dynamicScale(65),
-    borderRadius: 99,
-  },
-  queryContainer: {
-    flex: 1,
-    marginTop: dynamicScale(10, true),
-    marginLeft: dynamicScale(18),
-    maxWidth: dynamicScale(180),
-  },
-  autoCompleteStyle: {
-    zIndex: 0,
-    fontSize: dynamicScale(16, false, 0.4),
-    paddingVertical: dynamicScale(2, false, 2),
-    paddingHorizontal: dynamicScale(2),
-    backgroundColor: GlobalStyles.colors.backgroundColorLight,
-    borderRadius: dynamicScale(5),
-  },
-  buttonContainer: {
-    marginTop: dynamicScale(20, true),
-    marginBottom: dynamicScale(20, true),
-  },
-  autoCompleteMenuStyle: {
-    zIndex: 0,
-    marginLeft: dynamicScale(8),
-    marginBottom: dynamicScale(-1, true),
   },
 });

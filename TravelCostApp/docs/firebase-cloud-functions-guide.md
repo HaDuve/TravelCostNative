@@ -214,7 +214,7 @@ async function retryOperation(
       return await operation();
     } catch (error) {
       if (i === maxRetries - 1) throw error;
-      await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
+      await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
     }
   }
 }
@@ -386,19 +386,16 @@ function checkRateLimit(identifier: string, limit: number = 10): boolean {
 ### Common Issues
 
 1. **Function not triggering**
-
    - Check database security rules
    - Verify trigger path matches exactly
    - Check function deployment status
 
 2. **Timeout errors**
-
    - Increase function timeout in firebase.json
    - Optimize external API calls
    - Consider breaking into smaller functions
 
 3. **Memory errors**
-
    - Reduce function memory usage
    - Use streaming for large data
    - Check for memory leaks

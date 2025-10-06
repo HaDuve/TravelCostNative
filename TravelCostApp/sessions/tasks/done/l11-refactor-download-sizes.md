@@ -115,13 +115,11 @@ Currently downloading entire trip expense database multiple times per day, achie
 **Target: 80-95% reduction in data transfer**
 
 1. **Add Sync Timestamp Tracking**
-
    - Store `lastSyncTimestamp` in MMKV for each trip
    - Track per-user sync timestamps
    - Add server-side timestamp filtering
 
 2. **Implement Delta Sync API**
-
    - Modify `fetchExpenses()` to accept `since` parameter
    - Add Firebase query: `orderByChild('editedTimestamp').startAt(timestamp)`
    - Update all expense fetch functions
@@ -323,7 +321,7 @@ export async function fetchExpenses(
     // Update sync timestamp on successful fetch
     if (useDelta && expenses.length > 0) {
       const latestTimestamp = Math.max(
-        ...expenses.map((e) => e.editedTimestamp || 0)
+        ...expenses.map(e => e.editedTimestamp || 0)
       );
       setLastSyncTimestamp(tripid, uid, latestTimestamp);
     }
@@ -348,7 +346,7 @@ export async function fetchExpensesWithUIDsDelta(
   const expenses: ExpenseData[] = [];
   const axios_calls = [];
 
-  uidlist.forEach((uid) => {
+  uidlist.forEach(uid => {
     const since = getLastSyncTimestamp(tripid, uid);
     const call = axios.get(
       `${BACKEND_URL}/trips/${tripid}/${uid}/expenses.json`,
@@ -373,7 +371,7 @@ export async function fetchExpensesWithUIDsDelta(
       // Update sync timestamp
       if (userExpenses.length > 0) {
         const latestTimestamp = Math.max(
-          ...userExpenses.map((e) => e.editedTimestamp || 0)
+          ...userExpenses.map(e => e.editedTimestamp || 0)
         );
         setLastSyncTimestamp(tripid, uid, latestTimestamp);
       }
@@ -401,7 +399,7 @@ export async function fetchAndSetExpenses() {
 
     // Use delta sync by default
     let expenses = await getAllExpenses(tripid, uid, true); // true = useDelta
-    expenses = expenses.filter((expense) => !isNaN(Number(expense.calcAmount)));
+    expenses = expenses.filter(expense => !isNaN(Number(expense.calcAmount)));
 
     if (expenses && expenses?.length !== 0) {
       expensesCtx.setExpenses(expenses);
@@ -461,13 +459,11 @@ const delayedOnlineSetup = async () => {
 **Target: Additional 60-80% reduction**
 
 1. **Enable HTTP Compression**
-
    - Configure axios to accept gzip responses
    - Add compression headers to requests
    - Test compression effectiveness
 
 2. **Improve Caching Strategy**
-
    - Extend cache duration to 24-48 hours
    - Implement cache versioning
    - Add cache invalidation on data changes
@@ -482,13 +478,11 @@ const delayedOnlineSetup = async () => {
 **Target: Additional 30-50% reduction**
 
 1. **Pagination Implementation**
-
    - Add pagination for large expense datasets
    - Implement lazy loading for historical data
    - Add data prefetching strategies
 
 2. **Background Sync Optimization**
-
    - Reduce sync frequency when app is backgrounded
    - Implement smart sync triggers
    - Add sync scheduling based on usage patterns
@@ -503,13 +497,11 @@ const delayedOnlineSetup = async () => {
 **Target: Verify and maintain optimizations**
 
 1. **Download Size Tracking**
-
    - Add network usage monitoring
    - Track sync frequency and data volumes
    - Implement usage analytics
 
 2. **Performance Metrics**
-
    - Measure sync duration improvements
    - Track cache hit rates
    - Monitor error rates and retry patterns

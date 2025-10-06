@@ -1,14 +1,16 @@
-import { StyleSheet, Text, View, Platform } from "react-native";
-import React, { useEffect, useState } from "react";
-import Purchases, { CustomerInfo } from "react-native-purchases";
-import { ScrollView } from "react-native-gesture-handler";
-import { DateTime } from "luxon";
-import BackButton from "../components/UI/BackButton";
-import { Card } from "react-native-paper";
-
-//Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
+import { DateTime } from "luxon";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View, Platform } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
+import { Card } from "react-native-paper";
+import Purchases, { CustomerInfo } from "react-native-purchases";
+
+import BackButton from "../components/UI/BackButton";
+
+//Localization
+
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
@@ -98,7 +100,9 @@ const CustomerScreen = () => {
 
         <View style={styles.section}>
           <Text style={styles.label}>{i18n.t("willRenew")}</Text>
-          <Text style={styles.info}>{willRenew ? i18n.t("yesValue") : i18n.t("noValue")}</Text>
+          <Text style={styles.info}>
+            {willRenew ? i18n.t("yesValue") : i18n.t("noValue")}
+          </Text>
         </View>
 
         <View style={styles.section}>
@@ -110,7 +114,7 @@ const CustomerScreen = () => {
           <Text style={styles.label}>{i18n.t("requestDate")}</Text>
           <Text style={styles.info}>{reqDate}</Text>
         </View>
-        <BackButton></BackButton>
+        <BackButton style={{}}></BackButton>
       </ScrollView>
     </Card>
   );
@@ -122,19 +126,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 24,
+    marginTop: Platform.OS === "ios" ? 24 : 40,
     padding: 16,
     paddingTop: Platform.OS === "ios" ? 16 : 24,
-    marginTop: Platform.OS === "ios" ? 24 : 40,
   },
-  section: {
-    marginBottom: 16,
+  info: {
+    fontSize: 14,
   },
   label: {
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 8,
   },
-  info: {
-    fontSize: 14,
+  section: {
+    marginBottom: 16,
   },
 });

@@ -1,20 +1,25 @@
-import React, { useState, useContext } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Alert,
-  Platform,
-  KeyboardAvoidingView,
-  Modal,
-} from "react-native";
 import * as Haptics from "expo-haptics";
-
-//Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+import PropTypes from "prop-types";
+import React, { useContext, useState } from "react";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+
+//Localization
+
+import Toast from "react-native-toast-message";
+
+import { GlobalStyles } from "../../constants/styles";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -22,15 +27,13 @@ i18n.locale =
     : "en";
 i18n.enableFallback = true;
 
-import PropTypes from "prop-types";
-import GradientButton from "../UI/GradientButton";
-import FlatButton from "../UI/FlatButton";
-import { GlobalStyles } from "../../constants/styles";
 import { UserContext } from "../../store/user-context";
-import { storeFeedback, FeedbackData } from "../../util/http";
-import { dynamicScale, constantScale } from "../../util/scalingUtil";
 import safeLogError from "../../util/error";
-import Toast from "react-native-toast-message";
+import { FeedbackData, storeFeedback } from "../../util/http";
+import { dynamicScale } from "../../util/scalingUtil";
+import FlatButton from "../UI/FlatButton";
+import GradientButton from "../UI/GradientButton";
+
 import Constants from "expo-constants";
 
 interface FeedbackFormProps {
@@ -166,18 +169,29 @@ FeedbackForm.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
+  characterCount: {
+    color: GlobalStyles.colors.gray500,
+    fontSize: dynamicScale(12, false, 0.5),
+    marginTop: dynamicScale(4),
+    textAlign: "right",
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  inputContainer: {
+    marginBottom: dynamicScale(24, true),
+  },
+  modalButtons: {
     alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   modalContainer: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: dynamicScale(20, false, 0.5),
-    padding: dynamicScale(24, false, 0.5),
     marginHorizontal: dynamicScale(20, false, 0.5),
     maxWidth: dynamicScale(400, false, 0.5),
+    padding: dynamicScale(24, false, 0.5),
     width: "90%",
   },
   modalHeader: {
@@ -185,48 +199,37 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: dynamicScale(16, true),
   },
-  modalTitle: {
-    fontSize: dynamicScale(20, false, 0.3),
-    fontWeight: "bold",
-    color: GlobalStyles.colors.textColor,
+  modalOverlay: {
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    flex: 1,
+    justifyContent: "center",
   },
   modalSubtitle: {
-    fontSize: dynamicScale(16, false, 0.3),
     color: GlobalStyles.colors.textColor,
-    textAlign: "center",
-    marginBottom: dynamicScale(20, true),
+    fontSize: dynamicScale(16, false, 0.3),
     lineHeight: dynamicScale(22, true),
+    marginBottom: dynamicScale(20, true),
+    textAlign: "center",
   },
-  inputContainer: {
-    marginBottom: dynamicScale(24, true),
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: GlobalStyles.colors.primaryGrayed,
-    borderRadius: dynamicScale(12, false, 0.5),
-    padding: dynamicScale(16, false, 0.5),
-    fontSize: dynamicScale(16, false, 0.3),
+  modalTitle: {
     color: GlobalStyles.colors.textColor,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    minHeight: dynamicScale(120, false, 0.5),
-  },
-  characterCount: {
-    fontSize: dynamicScale(12, false, 0.5),
-    color: GlobalStyles.colors.gray500,
-    textAlign: "right",
-    marginTop: dynamicScale(4),
-  },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    fontSize: dynamicScale(20, false, 0.3),
+    fontWeight: "bold",
   },
   submitButton: {
-    marginLeft: dynamicScale(16, false, 0.5),
     flex: 1,
+    marginLeft: dynamicScale(16, false, 0.5),
   },
-  disabledButton: {
-    opacity: 0.5,
+  textInput: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderColor: GlobalStyles.colors.primaryGrayed,
+    borderRadius: dynamicScale(12, false, 0.5),
+    borderWidth: 1,
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(16, false, 0.3),
+    minHeight: dynamicScale(120, false, 0.5),
+    padding: dynamicScale(16, false, 0.5),
   },
 });
 

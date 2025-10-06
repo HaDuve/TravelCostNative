@@ -1,22 +1,10 @@
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  useWindowDimensions,
-} from "react-native";
 import * as Haptics from "expo-haptics";
-
-import React, { useContext, useMemo } from "react";
-import CategoryProgressBar from "./CategoryProgressBar";
-import { CatColors, GlobalStyles } from "../../../constants/styles";
-import CategoryChart from "../../ExpensesOverview/CategoryChart";
-import Animated, { Layout } from "react-native-reanimated";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../../i18n/supportedLanguages";
+
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -25,13 +13,21 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { getCatString } from "../../../util/category";
 import PropTypes from "prop-types";
-import { processTitleStringFilteredPiecharts } from "../../../util/string";
+import { useContext, useMemo } from "react";
+import Animated, { Layout } from "react-native-reanimated";
+
+import { CatColors, GlobalStyles } from "../../../constants/styles";
+import { de, en, fr, ru } from "../../../i18n/supportedLanguages";
+import { OrientationContext } from "../../../store/orientation-context";
 import { TripContext } from "../../../store/trip-context";
+import { getCatString } from "../../../util/category";
 import { getExpensesSum } from "../../../util/expense";
 import { dynamicScale } from "../../../util/scalingUtil";
-import { OrientationContext } from "../../../store/orientation-context";
+import { processTitleStringFilteredPiecharts } from "../../../util/string";
+import CategoryChart from "../../ExpensesOverview/CategoryChart";
+
+import CategoryProgressBar from "./CategoryProgressBar";
 
 const ExpenseCategories = ({
   expenses,
@@ -52,7 +48,7 @@ const ExpenseCategories = ({
     );
 
   const categoryList = [];
-  expenses.forEach((expense) => {
+  expenses.forEach(expense => {
     const cat = expense.category;
     if (!categoryList.includes(cat)) {
       categoryList.push(cat);
@@ -60,7 +56,7 @@ const ExpenseCategories = ({
   });
 
   function getAllExpensesWithCat(category) {
-    return expenses.filter((expense) => {
+    return expenses.filter(expense => {
       return expense.category === category;
     });
   }
@@ -71,14 +67,14 @@ const ExpenseCategories = ({
     const catSumCat = [];
     const dataList = [];
 
-    categoryList.forEach((cat) => {
+    categoryList.forEach(cat => {
       const catExpenses = getAllExpensesWithCat(cat);
       const sumCat = getExpensesSum(catExpenses);
       catSumCat.push({
-        cat: cat,
-        sumCat: sumCat,
+        cat,
+        sumCat,
         color: "",
-        catExpenses: catExpenses,
+        catExpenses,
       });
     });
 
@@ -86,7 +82,7 @@ const ExpenseCategories = ({
 
     const colorlist = CatColors;
     let color_i = 0;
-    catSumCat.forEach((item) => {
+    catSumCat.forEach(item => {
       item.color = colorlist[color_i];
       color_i++;
       if (color_i >= colorlist?.length) {
@@ -117,7 +113,7 @@ const ExpenseCategories = ({
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigation.navigate("FilteredExpenses", {
             expenses: itemData.item.catExpenses,
-            dayString: getCatString(itemData.item.cat) + " " + newPeriodName,
+            dayString: `${getCatString(itemData.item.cat)} ${newPeriodName}`,
           });
         }}
       >
@@ -126,6 +122,8 @@ const ExpenseCategories = ({
           cat={itemData.item.cat}
           totalCost={totalSum}
           catCost={itemData.item.sumCat}
+          iconOverride={null}
+          iconJSXOverride={null}
         />
       </Pressable>
     );
@@ -143,7 +141,7 @@ const ExpenseCategories = ({
         itemLayoutAnimation={layoutAnim}
         data={catSumCat}
         renderItem={renderItem}
-        keyExtractor={(item) => item.cat}
+        keyExtractor={item => item.cat}
         ListHeaderComponent={
           !useRowFormat ? (
             <CategoryChart
@@ -158,7 +156,7 @@ const ExpenseCategories = ({
           <View style={{ height: dynamicScale(100, true) }}></View>
         }
         ListEmptyComponent={
-          <View style={[isPortrait && styles.fallbackTextContainer]}>
+          <View style={isPortrait && styles.fallbackTextContainer}>
             <Text
               style={{
                 marginVertical: 12,
@@ -184,18 +182,10 @@ ExpenseCategories.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: "row",
-  },
-  fallbackTextContainer: {
-    flex: 1,
-    padding: dynamicScale(24),
-    marginTop: dynamicScale(-150, true),
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
   categoryCard: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: dynamicScale(10, false, 0.5),
+    elevation: 5,
     marginBottom: dynamicScale(20, true),
     marginHorizontal: dynamicScale(16),
     paddingBottom: dynamicScale(12, true),
@@ -206,8 +196,16 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 2.84,
-    elevation: 5,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: dynamicScale(10, false, 0.5),
+  },
+  container: {
+    flex: 1,
+    flexDirection: "row",
+  },
+  fallbackTextContainer: {
+    alignItems: "center",
+    flex: 1,
+    justifyContent: "space-between",
+    marginTop: dynamicScale(-150, true),
+    padding: dynamicScale(24),
   },
 });

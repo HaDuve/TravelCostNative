@@ -1,18 +1,29 @@
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+} from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import * as Progress from "react-native-progress";
 import Toast, {
   BaseToast,
   ErrorToast,
   ToastConfig,
 } from "react-native-toast-message";
-import React from "react";
-import { StyleSheet, View, FlatList } from "react-native";
+
+import { DEVELOPER_MODE } from "../../confAppConstants";
 import { GlobalStyles } from "../../constants/styles";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
+
 import LoadingBarOverlay from "./LoadingBarOverlay";
-import { Text, ViewStyle } from "react-native";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -21,17 +32,16 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import * as Progress from "react-native-progress";
 import BackgroundGradient from "./BackgroundGradient";
-import { TouchableOpacity } from "react-native-gesture-handler";
+
 import { getMMKVString, setMMKVString } from "../../store/mmkv";
-import { DEVELOPER_MODE } from "../../confAppConstants";
-import { isPremiumMember } from "../Premium/PremiumConstants";
-import { formatExpenseWithCurrency } from "../../util/string";
-import { shouldShowOnboarding } from "../Rating/firstStartUtil";
-import { Pressable } from "react-native";
 import { constantScale, dynamicScale, scale } from "../../util/scalingUtil";
+import { formatExpenseWithCurrency } from "../../util/string";
+import { isPremiumMember } from "../Premium/PremiumConstants";
+import { shouldShowOnboarding } from "../Rating/firstStartUtil";
+
 import { DeviceType, deviceType } from "expo-device";
+
 import { OnboardingFlags } from "../../types/onboarding";
 
 const MINHEIGHT = dynamicScale(60, true);
@@ -49,7 +59,7 @@ const SIZESTYLES: ViewStyle = {
 };
 
 const toastConfig: ToastConfig = {
-  success: (props) => (
+  success: props => (
     <BaseToast
       {...props}
       style={[
@@ -77,7 +87,7 @@ const toastConfig: ToastConfig = {
       Overwrite 'error' type,
       by modifying the existing `ErrorToast` component
     */
-  error: (props) => (
+  error: props => (
     <ErrorToast
       {...props}
       style={[
@@ -106,7 +116,7 @@ const toastConfig: ToastConfig = {
       I can consume any custom `props` I want.
       They will be passed when calling the `show` method (see below)
     */
-  loading: (props) => {
+  loading: props => {
     const { progress } = props.props;
     const isTablet = deviceType === DeviceType.TABLET;
     const size = isTablet ? "large" : "small";
@@ -187,7 +197,7 @@ const toastConfig: ToastConfig = {
       </View>
     );
   },
-  banner: (props) => (
+  banner: props => (
     <TouchableOpacity
       onPress={() => {
         // console.log("Pressed Touchable in Config");
@@ -195,7 +205,7 @@ const toastConfig: ToastConfig = {
       }}
       style={[styles.bannerContainerContainer, GlobalStyles.wideStrongShadow]}
     >
-      <BackgroundGradient style={[styles.bannerContainer]}>
+      <BackgroundGradient style={styles.bannerContainer} colors={[]}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <TouchableOpacity
             onPress={() => {
@@ -230,7 +240,7 @@ const toastConfig: ToastConfig = {
       </BackgroundGradient>
     </TouchableOpacity>
   ),
-  budgetOverview: (props) => {
+  budgetOverview: props => {
     const travellerList = props.props.travellerList;
     const travellerBudgets = props.props.travellerBudgets;
     const travellerSplitExpenseSums = props.props.travellerSplitExpenseSums;
@@ -273,13 +283,13 @@ const toastConfig: ToastConfig = {
               const budgetColor = noTotalBudget
                 ? GlobalStyles.colors.primary500
                 : budgetProgress <= 1
-                ? GlobalStyles.colors.primary500
-                : GlobalStyles.colors.error300;
+                  ? GlobalStyles.colors.primary500
+                  : GlobalStyles.colors.error300;
               const unfilledColor: string = noTotalBudget
                 ? GlobalStyles.colors.primary500
                 : budgetProgress <= 1
-                ? GlobalStyles.colors.gray600
-                : GlobalStyles.colors.errorGrayed;
+                  ? GlobalStyles.colors.gray600
+                  : GlobalStyles.colors.errorGrayed;
               const travellerName = item;
               return (
                 <View style={styles.travellerItemContainer}>
@@ -392,64 +402,13 @@ const ToastComponent = () => {
 export default ToastComponent;
 
 const styles = StyleSheet.create({
-  budgetOverviewContainer: {
-    flex: 1,
-    borderColor: GlobalStyles.colors.primaryGrayed,
-    borderWidth: 1,
+  bannerContainer: {
+    // flex: 1,
+    maxWidth: "90%",
+    borderColor: "black",
     borderRadius: 36,
     paddingHorizontal: dynamicScale(30),
-    paddingVertical: dynamicScale(12),
-    backgroundColor: GlobalStyles.colors.backgroundColorLight,
-  },
-  budgetOverviewHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  travellerItemContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    minHeight: dynamicScale(40, true),
-    overflow: "visible",
-  },
-  travellerItemProgressBarContainer: {
-    padding: dynamicScale(2),
-    overflow: "visible",
-    zIndex: -1,
-  },
-  sumTextMoveRight: {
-    left: dynamicScale(110),
-    position: "absolute",
-    zIndex: 999,
-  },
-  overviewTextInfo: {
-    fontSize: dynamicScale(18, false, 0.5),
-    fontWeight: "300",
-    color: GlobalStyles.colors.textColor,
-    textAlign: "left",
-    paddingVertical: dynamicScale(8, true),
-  },
-  overviewTextSmall: {
-    fontSize: dynamicScale(16, false, 0.5),
-    fontWeight: "200",
-    color: GlobalStyles.colors.textColor,
-    textAlign: "left",
-    paddingVertical: dynamicScale(4, true),
-  },
-  overViewTextTravellerSum: {
-    fontSize: dynamicScale(16, false, 0.5),
-    fontWeight: "500",
-    color: GlobalStyles.colors.gray300,
-    textAlign: "left",
-    paddingTop: dynamicScale(5, true),
-  },
-  overviewTextTitle: {
-    fontSize: dynamicScale(20, false, 0.5),
-    fontWeight: "500",
-    color: GlobalStyles.colors.textColor,
-    textAlign: "left",
-    paddingVertical: dynamicScale(8, true),
+    paddingVertical: dynamicScale(12, true),
   },
   bannerContainerContainer: {
     // flex: 1,
@@ -457,9 +416,76 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     alignItems: "center",
   },
-  xCloseContainer: {
-    marginTop: dynamicScale(18, true),
-    marginLeft: dynamicScale(4),
+  bannerText1: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(18, false, 0.5),
+    fontWeight: "400",
+    textAlign: "center",
+  },
+  bannerText2: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(16, false, 0.5),
+    fontWeight: "300",
+    textAlign: "center",
+  },
+  budgetOverviewContainer: {
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
+    borderColor: GlobalStyles.colors.primaryGrayed,
+    borderRadius: 36,
+    borderWidth: 1,
+    flex: 1,
+    paddingHorizontal: dynamicScale(30),
+    paddingVertical: dynamicScale(12),
+  },
+  budgetOverviewHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  overViewTextTravellerSum: {
+    color: GlobalStyles.colors.gray300,
+    fontSize: dynamicScale(16, false, 0.5),
+    fontWeight: "500",
+    paddingTop: dynamicScale(5, true),
+    textAlign: "left",
+  },
+  overviewTextInfo: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(18, false, 0.5),
+    fontWeight: "300",
+    paddingVertical: dynamicScale(8, true),
+    textAlign: "left",
+  },
+  overviewTextSmall: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(16, false, 0.5),
+    fontWeight: "200",
+    paddingVertical: dynamicScale(4, true),
+    textAlign: "left",
+  },
+  overviewTextTitle: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(20, false, 0.5),
+    fontWeight: "500",
+    paddingVertical: dynamicScale(8, true),
+    textAlign: "left",
+  },
+  sumTextMoveRight: {
+    left: dynamicScale(110),
+    position: "absolute",
+    zIndex: 999,
+  },
+  travellerItemContainer: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    minHeight: dynamicScale(40, true),
+    overflow: "visible",
+  },
+  travellerItemProgressBarContainer: {
+    overflow: "visible",
+    padding: dynamicScale(2),
+    zIndex: -1,
   },
   xCloseButton: {
     borderRadius: 24,
@@ -469,24 +495,8 @@ const styles = StyleSheet.create({
     // paddingHorizontal: 8,
     backgroundColor: "white",
   },
-  bannerContainer: {
-    // flex: 1,
-    maxWidth: "90%",
-    borderColor: "black",
-    borderRadius: 36,
-    paddingHorizontal: dynamicScale(30),
-    paddingVertical: dynamicScale(12, true),
-  },
-  bannerText1: {
-    fontSize: dynamicScale(18, false, 0.5),
-    fontWeight: "400",
-    color: GlobalStyles.colors.textColor,
-    textAlign: "center",
-  },
-  bannerText2: {
-    fontSize: dynamicScale(16, false, 0.5),
-    fontWeight: "300",
-    color: GlobalStyles.colors.textColor,
-    textAlign: "center",
+  xCloseContainer: {
+    marginLeft: dynamicScale(4),
+    marginTop: dynamicScale(18, true),
   },
 });

@@ -150,7 +150,7 @@ class ServerTimestampMigration {
   }
 
   async processBatch(tripId, uid, expenseIds, allExpenses) {
-    const promises = expenseIds.map(async (expenseId) => {
+    const promises = expenseIds.map(async expenseId => {
       try {
         const expense = allExpenses[expenseId];
 
@@ -209,11 +209,11 @@ class ServerTimestampMigration {
   }
 
   async delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   printStats() {
-    console.log("\n" + "=".repeat(50));
+    console.log(`\n${"=".repeat(50)}`);
     console.log("📊 MIGRATION COMPLETE - FINAL STATISTICS");
     console.log("=".repeat(50));
     console.log(`🏷️  Total Trips Processed: ${this.stats.totalTrips}`);

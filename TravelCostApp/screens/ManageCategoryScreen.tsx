@@ -1,4 +1,13 @@
-import React, { useState, useEffect, useCallback } from "react";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import PropTypes from "prop-types";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  useMemo,
+} from "react";
 import {
   View,
   Text,
@@ -6,8 +15,11 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  KeyboardAvoidingView,
 } from "react-native";
 // import animated from reanimated
+import Modal from "react-native-modal";
+import { ActivityIndicator } from "react-native-paper";
 import Animated, {
   ZoomIn,
   ZoomInLeft,
@@ -15,8 +27,12 @@ import Animated, {
   ZoomOutRight,
 } from "react-native-reanimated";
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
+
+import Toast from "react-native-toast-message";
+import BackgroundGradient from "../components/UI/BackgroundGradient";
+import GradientButton from "../components/UI/GradientButton";
+import SelectCategoryIcon from "../components/UI/selectCategoryIcon";
+import { GlobalStyles } from "../constants/styles";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
@@ -27,31 +43,21 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useContext } from "react";
 import { TripContext } from "../store/trip-context";
-import { GlobalStyles } from "../constants/styles";
 import { fetchCategories, updateTrip } from "../util/http";
-import SelectCategoryIcon from "../components/UI/selectCategoryIcon";
-import GradientButton from "../components/UI/GradientButton";
-import BackgroundGradient from "../components/UI/BackgroundGradient";
-import { KeyboardAvoidingView } from "react-native";
-import { ActivityIndicator } from "react-native-paper";
-
-import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
+
 import * as Haptics from "expo-haptics";
-import Toast from "react-native-toast-message";
+
 import { Category, DEFAULTCATEGORIES } from "../util/category";
 import { alertYesNo } from "../components/Errors/Alert";
 import IconButton from "../components/UI/IconButton";
 import { NetworkContext } from "../store/network-context";
 import InfoButton from "../components/UI/InfoButton";
-import Modal from "react-native-modal";
 import FlatButton from "../components/UI/FlatButton";
 import BlurPremium from "../components/Premium/BlurPremium";
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
-import { useMemo } from "react";
 import { dynamicScale } from "../util/scalingUtil";
 
 const ManageCategoryScreen = ({ navigation }) => {
@@ -122,7 +128,7 @@ const ManageCategoryScreen = ({ navigation }) => {
     }
   }, [isOnline, loadCategoryList, tripid]);
 
-  const saveCategoryList = async (newCategoryList) => {
+  const saveCategoryList = async newCategoryList => {
     setIsUploading(true);
     // if not isOnline, alert user
     if (!isOnline) {
@@ -171,7 +177,7 @@ const ManageCategoryScreen = ({ navigation }) => {
     await saveCategoryList(newCategoryList);
   };
 
-  const handleDeleteCategory = async (index) => {
+  const handleDeleteCategory = async index => {
     const newCategoryList = [...categoryList];
     newCategoryList.splice(index, 1);
     setCategoryList(newCategoryList);
@@ -204,7 +210,7 @@ const ManageCategoryScreen = ({ navigation }) => {
           autoCapitalize="sentences"
           autoComplete="off"
           autoCorrect={false}
-          onChangeText={(newName) => handleEditCategory(index, newName)}
+          onChangeText={newName => handleEditCategory(index, newName)}
         />
         <TouchableOpacity
           style={styles.deleteButton}
@@ -314,7 +320,7 @@ const ManageCategoryScreen = ({ navigation }) => {
 
   function renderRowIconPicker({ item }) {
     return (
-      <View style={[{ margin: dynamicScale(5) }]}>
+      <View style={{ margin: dynamicScale(5) }}>
         <View
           style={{
             marginBottom: dynamicScale(2, true),
@@ -433,11 +439,11 @@ const ManageCategoryScreen = ({ navigation }) => {
             >
               <TextInput
                 autoFocus={true}
-                style={[styles.newCategoryInput]}
+                style={styles.newCategoryInput}
                 placeholder={i18n.t("newCatNamePlaceholder")}
                 value={newCategoryName}
                 textAlign="center"
-                onChangeText={(text) => setNewCategoryName(text)}
+                onChangeText={text => setNewCategoryName(text)}
               />
               <InfoButton
                 onPress={showInfoHandler.bind(this, infoEnum.titleInfo)}
@@ -537,6 +543,7 @@ const ManageCategoryScreen = ({ navigation }) => {
                   handleResetCategoryList
                 );
               }}
+              buttonStyle={{}}
             >
               {i18n.t("reset")}
             </GradientButton>
@@ -548,6 +555,7 @@ const ManageCategoryScreen = ({ navigation }) => {
                   setTouched(false);
                   navigation.pop();
                 }}
+                buttonStyle={{}}
               >
                 {i18n.t("confirm")}
               </GradientButton>
@@ -568,20 +576,118 @@ ManageCategoryScreen.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  addButton: {
+    backgroundColor: "#538076",
+    borderRadius: dynamicScale(8, false, 0.5),
+    marginBottom: dynamicScale(12, false, 0.5),
+    marginTop: dynamicScale(-24, false, 0.5),
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+    paddingVertical: dynamicScale(8, false, 0.5),
+  },
+  addButtonText: {
+    color: GlobalStyles.colors.backgroundColor,
+    fontSize: dynamicScale(16, false, 0.5),
+  },
+  categoryItem: {
+    alignItems: "center",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: dynamicScale(8, false, 0.5),
+    flex: 1,
+    flexDirection: "row",
+    margin: dynamicScale(8, false, 0.5),
+    padding: dynamicScale(16, false, 0.5),
+    zIndex: 1,
+  },
+  categoryNameInput: {
+    color: "#434343",
+    flex: 1,
+    fontSize: dynamicScale(16, false, 0.5),
+    marginLeft: dynamicScale(16, false, 0.5),
+  },
   container: {
     flex: 1,
     padding: dynamicScale(16),
   },
-  inputContainer: {
-    flex: 1,
+  deleteButton: {
+    marginLeft: dynamicScale(16, false, 0.5),
+  },
+  iconButton: {
+    borderRadius: dynamicScale(16, false, 0.5),
+    marginHorizontal: dynamicScale(8, false, 0.5),
+    padding: dynamicScale(8, false, 0.5),
+  },
+  iconPicker: {
     alignItems: "center",
-    minHeight: dynamicScale(220, false, 0.3),
-    maxHeight: dynamicScale(220, false, 0.3),
+    flexDirection: "row",
+  },
+  infoContentText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(16, false, 0.5),
+    textAlign: "center",
+  },
+  infoModalContainer: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: dynamicScale(8, false, 0.5),
+    height: "40%",
+    justifyContent: "space-evenly",
+    padding: dynamicScale(16, false, 0.5),
+    width: "80%",
+  },
+  infoTitleText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(20, false, 0.5),
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  inputContainer: {
+    alignItems: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 8,
+    flex: 1,
     marginBottom: dynamicScale(8, false, 0.5),
+    maxHeight: dynamicScale(220, false, 0.3),
+    minHeight: dynamicScale(220, false, 0.3),
     padding: dynamicScale(4, false, 0.5),
     // paddingHorizontal: 16,
+  },
+  modalButton: {
+    backgroundColor: GlobalStyles.colors.primary400,
+    borderRadius: dynamicScale(8, false, 0.5),
+    padding: dynamicScale(8, false, 0.5),
+    width: "40%",
+  },
+  modalButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+  },
+  modalButtonText: {
+    color: GlobalStyles.colors.backgroundColor,
+    fontSize: dynamicScale(16, false, 0.5),
+    textAlign: "center",
+  },
+  modalContainer: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: dynamicScale(8, false, 0.5),
+    height: "40%",
+    justifyContent: "space-evenly",
+    padding: dynamicScale(16, false, 0.5),
+    width: "80%",
+  },
+  modalStyle: {
+    alignItems: "center",
+    flex: 1,
+    justifyContent: "center",
+  },
+  modalText: {
+    color: GlobalStyles.colors.primary400,
+    fontSize: dynamicScale(16, false, 0.5),
+    textAlign: "center",
+  },
+  modalTitle: {
+    color: GlobalStyles.colors.primary400,
+    fontSize: dynamicScale(20, false, 0.5),
+    fontWeight: "bold",
+    textAlign: "center",
   },
   newCategoryInput: {
     // center
@@ -594,105 +700,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: GlobalStyles.colors.primary500,
   },
-  iconPicker: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  iconButton: {
-    padding: dynamicScale(8, false, 0.5),
-    marginHorizontal: dynamicScale(8, false, 0.5),
-    borderRadius: dynamicScale(16, false, 0.5),
-  },
   selectedIconButton: {
     backgroundColor: GlobalStyles.colors.gray500Accent,
-  },
-  addButton: {
-    backgroundColor: "#538076",
-    borderRadius: dynamicScale(8, false, 0.5),
-    paddingVertical: dynamicScale(8, false, 0.5),
-    paddingHorizontal: dynamicScale(16, false, 0.5),
-    marginBottom: dynamicScale(12, false, 0.5),
-    marginTop: dynamicScale(-24, false, 0.5),
-  },
-  addButtonText: {
-    fontSize: dynamicScale(16, false, 0.5),
-    color: GlobalStyles.colors.backgroundColor,
-  },
-  categoryItem: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: dynamicScale(8, false, 0.5),
-    margin: dynamicScale(8, false, 0.5),
-    padding: dynamicScale(16, false, 0.5),
-    zIndex: 1,
-  },
-  categoryNameInput: {
-    fontSize: dynamicScale(16, false, 0.5),
-    color: "#434343",
-    marginLeft: dynamicScale(16, false, 0.5),
-    flex: 1,
-  },
-  deleteButton: {
-    marginLeft: dynamicScale(16, false, 0.5),
-  },
-  modalStyle: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  modalContainer: {
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: dynamicScale(8, false, 0.5),
-    padding: dynamicScale(16, false, 0.5),
-    width: "80%",
-    height: "40%",
-    justifyContent: "space-evenly",
-  },
-  modalTitle: {
-    fontSize: dynamicScale(20, false, 0.5),
-    fontWeight: "bold",
-    color: GlobalStyles.colors.primary400,
-    textAlign: "center",
-  },
-  modalText: {
-    fontSize: dynamicScale(16, false, 0.5),
-    color: GlobalStyles.colors.primary400,
-    textAlign: "center",
-  },
-  modalButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-  },
-  modalButton: {
-    backgroundColor: GlobalStyles.colors.primary400,
-    borderRadius: dynamicScale(8, false, 0.5),
-    padding: dynamicScale(8, false, 0.5),
-    width: "40%",
-  },
-  modalButtonText: {
-    fontSize: dynamicScale(16, false, 0.5),
-    color: GlobalStyles.colors.backgroundColor,
-    textAlign: "center",
-  },
-  infoModalContainer: {
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: dynamicScale(8, false, 0.5),
-    padding: dynamicScale(16, false, 0.5),
-    width: "80%",
-    height: "40%",
-    justifyContent: "space-evenly",
-  },
-  infoTitleText: {
-    fontSize: dynamicScale(20, false, 0.5),
-    fontWeight: "bold",
-    color: GlobalStyles.colors.textColor,
-    textAlign: "center",
-  },
-  infoContentText: {
-    fontSize: dynamicScale(16, false, 0.5),
-    color: GlobalStyles.colors.textColor,
-    textAlign: "center",
   },
 });

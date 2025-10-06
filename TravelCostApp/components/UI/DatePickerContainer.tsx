@@ -1,10 +1,11 @@
-import { StyleSheet, Text, View, Pressable } from "react-native";
-import React from "react";
+import PropTypes from "prop-types";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+
 import { GlobalStyles } from "../../constants/styles";
 import { toShortFormat } from "../../util/date";
-import IconButton from "./IconButton";
-import PropTypes from "prop-types";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
+
+import IconButton from "./IconButton";
 
 const DatePickerContainer = ({
   openDatePickerRange,
@@ -58,8 +59,16 @@ DatePickerContainer.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  dateIconContainer: {
-    marginLeft: constantScale(7.5, 0.5),
+  advancedText: {
+    fontSize: dynamicScale(12, false, 0.5),
+    fontStyle: "italic",
+    fontWeight: "300",
+    marginLeft: dynamicScale(12),
+    marginTop: dynamicScale(9, true),
+  },
+  bottomBorder: {
+    borderBottomColor: GlobalStyles.colors.gray700,
+    borderBottomWidth: 1,
   },
   buttonContainer: {
     margin: constantScale(4, 0.5),
@@ -79,20 +88,12 @@ const styles = StyleSheet.create({
   dateContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginRight: dynamicScale(30, false, 0.5),
     marginLeft: dynamicScale(4, false, 0.5),
+    marginRight: dynamicScale(30, false, 0.5),
     marginTop: dynamicScale(12, true, 0.5),
     paddingBottom: dynamicScale(12, true, 0.5),
   },
-  advancedText: {
-    marginTop: dynamicScale(9, true),
-    marginLeft: dynamicScale(12),
-    fontSize: dynamicScale(12, false, 0.5),
-    fontStyle: "italic",
-    fontWeight: "300",
-  },
-  bottomBorder: {
-    borderBottomColor: GlobalStyles.colors.gray700,
-    borderBottomWidth: 1,
+  dateIconContainer: {
+    marginLeft: constantScale(7.5, 0.5),
   },
 });

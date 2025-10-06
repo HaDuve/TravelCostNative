@@ -48,10 +48,7 @@
         "privacyPolicyUrl": "https://foodfornomads.com/datenschutzerklaerung/"
       }
     },
-    "categories": [
-      "TRAVEL",
-      "FINANCE"
-    ],
+    "categories": ["TRAVEL", "FINANCE"],
     "advisory": {
       "alcoholTobaccoOrDrugUseOrReferences": "NONE",
       "contests": "NONE",

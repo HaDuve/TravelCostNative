@@ -1,26 +1,30 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, Image } from "react-native";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { Image, StyleSheet, Text, View } from "react-native";
+
 import { GlobalStyles } from "../../constants/styles";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import Input from "./Input";
-import PropTypes from "prop-types";
-import GradientButton from "../UI/GradientButton";
 import {
   secureStoreGetItem,
   secureStoreSetItem,
 } from "../../store/secure-storage";
-import {
-  dynamicScale,
-} from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
+import GradientButton from "../UI/GradientButton";
+
+import Input from "./Input";
 
 function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
   const [enteredEmail, setEnteredEmail] = useState("");
@@ -215,6 +219,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
                   ]
             }
             onPress={submitHandler}
+            buttonStyle={{}}
           >
             {isLogin ? i18n.t("loginText") : i18n.t("createAccountText")}
           </GradientButton>
@@ -246,57 +251,57 @@ AuthForm.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  form: {
-    flex: 1,
+  appleAuthContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: dynamicScale(16),
   },
   buttons: {
     marginTop: dynamicScale(12),
   },
-  iconContainer: {
-    marginTop: dynamicScale(-30, true),
-    marginBottom: dynamicScale(10),
-    alignItems: "center",
-    justifyContent: "center",
+  form: {
     flex: 1,
+  },
+  google: {
+    borderColor: GlobalStyles.colors.gray500,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginTop: dynamicScale(12),
+    margin: dynamicScale(4),
+    padding: dynamicScale(8),
+    paddingHorizontal: dynamicScale(32),
+  },
+  googleText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(18, false, 0.5),
+  },
+  iconContainer: {
+    alignItems: "center",
+    flex: 1,
+    justifyContent: "center",
+    marginBottom: dynamicScale(10),
+    marginTop: dynamicScale(-30, true),
+  },
+  orText: {
+    color: GlobalStyles.colors.gray600,
+    fontSize: dynamicScale(12, false, 0.5),
+    fontWeight: "bold",
+  },
+  subTitleText: {
+    color: GlobalStyles.colors.gray700,
+    fontSize: dynamicScale(14, false, 0.5),
+    marginBottom: dynamicScale(12),
+    textAlign: "center",
   },
   titleContainer: {
     alignItems: "center",
     justifyContent: "space-around",
   },
   titleText: {
-    textAlign: "center",
     color: GlobalStyles.colors.textColor,
     fontSize: dynamicScale(28, false, 0.5),
     fontWeight: "bold",
     marginBottom: dynamicScale(12),
-  },
-  subTitleText: {
     textAlign: "center",
-    color: GlobalStyles.colors.gray700,
-    fontSize: dynamicScale(14, false, 0.5),
-    marginBottom: dynamicScale(12),
-  },
-  appleAuthContainer: {
-    marginTop: dynamicScale(16),
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  orText: {
-    fontSize: dynamicScale(12, false, 0.5),
-    fontWeight: "bold",
-    color: GlobalStyles.colors.gray600,
-  },
-  google: {
-    marginTop: dynamicScale(12),
-    margin: dynamicScale(4),
-    padding: dynamicScale(8),
-    paddingHorizontal: dynamicScale(32),
-    borderWidth: 1,
-    borderColor: GlobalStyles.colors.gray500,
-    borderRadius: 8,
-  },
-  googleText: {
-    fontSize: dynamicScale(18, false, 0.5),
-    color: GlobalStyles.colors.textColor,
   },
 });

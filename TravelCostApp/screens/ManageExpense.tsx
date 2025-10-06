@@ -1,16 +1,21 @@
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
 import { useContext, useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
-import { ScrollView } from "react-native";
-import ExpenseForm from "../components/ManageExpense/ExpenseForm";
+import { Alert, StyleSheet, View, ScrollView } from "react-native";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 
+import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 import IconButton from "../components/UI/IconButton";
+import LoadingOverlay from "../components/UI/LoadingOverlay";
+import { GlobalStyles } from "../constants/styles";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
 import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
-import { touchAllTravelers } from "../util/http";
-import { GlobalStyles } from "../constants/styles";
+import { toDate } from "../types/date";
 import { getRate } from "../util/currencyExchange";
 import { daysBetween, getDatePlusDays } from "../util/date";
+import { touchAllTravelers } from "../util/http";
 import {
   deleteExpenseOnlineOffline,
   OfflineQueueManageExpenseItem,
@@ -19,9 +24,7 @@ import {
 } from "../util/offline-queue";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -31,23 +34,25 @@ i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import { getCatString } from "../util/category";
+
 import PropTypes from "prop-types";
+
 import {
   deleteAllExpensesByRangedId,
   ExpenseData,
   Split,
 } from "../util/expense";
 import { NetworkContext } from "../store/network-context";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
+
 import * as Haptics from "expo-haptics";
+
 import { setMMKVObject } from "../store/mmkv";
+import { dynamicScale } from "../util/scalingUtil";
 import { formatExpenseWithCurrency } from "../util/string";
 import { isSameDay } from "../util/dateTime";
 import safeLogError from "../util/error";
-import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { trackEvent, VexoEvents } from "../util/vexo-tracking";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
-import { dynamicScale } from "../util/scalingUtil";
 
 interface ManageExpenseProps {
   route: {
@@ -87,7 +92,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
 
   try {
     selectedExpense = expenseCtx.expenses.find(
-      (expense) => expense.id === editedExpenseId
+      expense => expense.id === editedExpenseId
     );
   } catch (error) {
     expenseError = true;
@@ -146,7 +151,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         const item: OfflineQueueManageExpenseItem = {
           type: "delete",
           expense: {
-            tripid: tripid,
+            tripid,
             uid: selectedExpenseAuthorUid,
             id: editedExpenseId,
           },
@@ -213,8 +218,8 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
                       const item: OfflineQueueManageExpenseItem = {
                         type: "delete",
                         expense: {
-                          tripid: tripid,
-                          uid: uid,
+                          tripid,
+                          uid,
                           id: editedExpenseId,
                         },
                       };
@@ -262,9 +267,9 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     const item: OfflineQueueManageExpenseItem = {
       type: "add",
       expense: {
-        tripid: tripid,
-        uid: uid,
-        expenseData: expenseData,
+        tripid,
+        uid,
+        expenseData,
       },
     };
     const id = await storeExpenseOnlineOffline(item, isOnline);
@@ -272,7 +277,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     expenseCtx.addExpense(expenseToAdd);
   };
 
-  const createRangedData = async (expenseData) => {
+  const createRangedData = async expenseData => {
     // rangeId to identify all the expenses that belong to the same range
     const rangeId =
       Date.now().toString() + Math.random().toString(36).substring(2, 15);
@@ -327,7 +332,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       });
       // console.log("progress", i / days);
       const newDate = getDatePlusDays(day1, i);
-      newDate.setHours(new Date().getHours(), new Date().getMinutes());
+      toDate(newDate).setHours(new Date().getHours(), new Date().getMinutes());
       // expenseData.startDate =
       // expenseData.endDate =
       expenseData.date = newDate;
@@ -351,13 +356,13 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       const item: OfflineQueueManageExpenseItem = {
         type: "add",
         expense: {
-          tripid: tripid,
-          uid: uid,
-          expenseData: expenseData,
+          tripid,
+          uid,
+          expenseData,
         },
       };
       const id = await storeExpenseOnlineOffline(item, isOnline);
-      expenseCtx.addExpense({ ...expenseData, id: id });
+      expenseCtx.addExpense({ ...expenseData, id });
     }
   };
 
@@ -366,9 +371,9 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     const item: OfflineQueueManageExpenseItem = {
       type: "update",
       expense: {
-        tripid: tripid,
+        tripid,
         uid: selectedExpenseAuthorUid,
-        expenseData: expenseData,
+        expenseData,
         id: editedExpenseId,
       },
     };
@@ -376,13 +381,12 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     await updateExpenseOnlineOffline(item, isOnline);
   };
 
-  const editRangedData = async (expenseData) => {
+  const editRangedData = async expenseData => {
     // console.log("ranged Data detected");
 
     // find all the expenses that have the same identifying rangeId
     const expensesInRange = expenseCtx.expenses.filter(
-      (expense) =>
-        expense.rangeId && expense.rangeId === selectedExpense?.rangeId
+      expense => expense.rangeId && expense.rangeId === selectedExpense?.rangeId
     );
     // if we dont find any expenses, it must have been a non-ranged expense, so update it to a ranged expense
     if (expensesInRange?.length === 0) {
@@ -392,7 +396,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       const item: OfflineQueueManageExpenseItem = {
         type: "delete",
         expense: {
-          tripid: tripid,
+          tripid,
           uid: selectedExpenseAuthorUid,
           id: editedExpenseId,
         },
@@ -453,7 +457,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       const expense = expensesInRange[i];
       // set the correct new date
       const newDate = getDatePlusDays(expenseData.startDate, i);
-      newDate.setHours(new Date().getHours(), new Date().getMinutes());
+      toDate(newDate).setHours(new Date().getHours(), new Date().getMinutes());
       expenseData.date = newDate;
       expenseData.editedTimestamp = Date.now();
       // sanity fix
@@ -461,9 +465,9 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       const item: OfflineQueueManageExpenseItem = {
         type: "update",
         expense: {
-          tripid: tripid,
+          tripid,
           uid: selectedExpenseAuthorUid,
-          expenseData: expenseData,
+          expenseData,
           id: expense.id,
         },
       };
@@ -496,7 +500,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
 
       // if expenseData has a splitlist, add the rate to each split
       if (expenseData.splitList && expenseData.splitList?.length > 0) {
-        expenseData.splitList.forEach((split) => {
+        expenseData.splitList.forEach(split => {
           split.rate = rate;
         });
       }
@@ -583,7 +587,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         submitButtonLabel={isEditing ? i18n.t("update") : i18n.t("add")}
         defaultValues={tempValues ?? selectedExpense}
         editedExpenseId={editedExpenseId}
-        newCat={newCat}
+        newCat={typeof newCat === "string" ? newCat : ""}
         dateISO={dateISO}
       />
       {isEditing && (
@@ -613,8 +617,8 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   deleteContainer: {
-    padding: dynamicScale(16, true, 0.5),
-    marginTop: dynamicScale(-46, false, 0.5),
     alignItems: "center",
+    marginTop: dynamicScale(-46, false, 0.5),
+    padding: dynamicScale(16, true, 0.5),
   },
 });

@@ -1,15 +1,16 @@
-import { ImageBackground, ActivityIndicator } from "react-native";
-import { reloadApp } from "../../util/appState";
-import React from "react";
-import { GlobalStyles } from "../../constants/styles";
+import { ActivityIndicator, ImageBackground } from "react-native";
 import Animated, {
   FadeOutDown,
   ZoomInDown,
   ZoomOutDown,
 } from "react-native-reanimated";
+
 import { SPLASH_SCREEN_DELAY } from "../../confAppConstants";
-import FlatButton from "./FlatButton";
+import { GlobalStyles } from "../../constants/styles";
 import { asyncStoreSafeClear } from "../../store/async-storage";
+import { reloadApp } from "../../util/appState";
+
+import FlatButton from "./FlatButton";
 import IconButton from "./IconButton";
 
 const loadingColor = GlobalStyles.colors.backgroundColor;

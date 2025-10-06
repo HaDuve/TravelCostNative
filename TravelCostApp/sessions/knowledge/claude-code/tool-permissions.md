@@ -16,10 +16,10 @@ Claude Code uses a tiered permission system to balance power and safety:
 
 You can view & manage Claude Code's tool permissions with `/permissions`. This UI lists all permission rules and the settings.json file they are sourced from.
 
-* **Allow** rules will allow Claude Code to use the specified tool without further manual approval.
-* **Deny** rules will prevent Claude Code from using the specified tool. Deny rules take precedence over allow rules.
-* **Additional directories** extend Claude's file access to directories beyond the initial working directory.
-* **Default mode** controls Claude's permission behavior when encountering new requests.
+- **Allow** rules will allow Claude Code to use the specified tool without further manual approval.
+- **Deny** rules will prevent Claude Code from using the specified tool. Deny rules take precedence over allow rules.
+- **Additional directories** extend Claude's file access to directories beyond the initial working directory.
+- **Default mode** controls Claude's permission behavior when encountering new requests.
 
 Permission rules use the format: `Tool` or `Tool(optional-specifier)`
 
@@ -40,9 +40,9 @@ Claude Code supports several permission modes that can be set as the `defaultMod
 
 By default, Claude has access to files in the directory where it was launched. You can extend this access:
 
-* **During startup**: Use `--add-dir <path>` CLI argument
-* **During session**: Use `/add-dir` slash command
-* **Persistent configuration**: Add to `additionalDirectories` in [settings files](/en/docs/claude-code/settings#settings-files)
+- **During startup**: Use `--add-dir <path>` CLI argument
+- **During session**: Use `/add-dir` slash command
+- **Persistent configuration**: Add to `additionalDirectories` in [settings files](/en/docs/claude-code/settings#settings-files)
 
 Files in additional directories follow the same permission rules as the original working directory - they become readable without prompts, and file editing permissions follow the current permission mode.
 
@@ -52,8 +52,8 @@ Some tools support more fine-grained permission controls:
 
 **Bash**
 
-* `Bash(npm run build)` Matches the exact Bash command `npm run build`
-* `Bash(npm run test:*)` Matches Bash commands starting with `npm run test`.
+- `Bash(npm run build)` Matches the exact Bash command `npm run build`
+- `Bash(npm run test:*)` Matches Bash commands starting with `npm run test`.
 
 <Tip>
   Claude Code is aware of shell operators (like `&&`) so a prefix match rule like `Bash(safe-cmd:*)` won't give it permission to run the command `safe-cmd && other-cmd`
@@ -65,18 +65,18 @@ Some tools support more fine-grained permission controls:
 
 Read & Edit rules both follow the [gitignore](https://git-scm.com/docs/gitignore) specification. Patterns are resolved relative to the directory containing `.claude/settings.json`. To reference an absolute path, use `//`. For a path relative to your home directory, use `~/`.
 
-* `Edit(docs/**)` Matches edits to files in the `docs` directory of your project
-* `Read(~/.zshrc)` Matches reads to your `~/.zshrc` file
-* `Edit(//tmp/scratch.txt)` Matches edits to `/tmp/scratch.txt`
+- `Edit(docs/**)` Matches edits to files in the `docs` directory of your project
+- `Read(~/.zshrc)` Matches reads to your `~/.zshrc` file
+- `Edit(//tmp/scratch.txt)` Matches edits to `/tmp/scratch.txt`
 
 **WebFetch**
 
-* `WebFetch(domain:example.com)` Matches fetch requests to example.com
+- `WebFetch(domain:example.com)` Matches fetch requests to example.com
 
 **MCP**
 
-* `mcp__puppeteer` Matches any tool provided by the `puppeteer` server (name configured in Claude Code)
-* `mcp__puppeteer__puppeteer_navigate` Matches the `puppeteer_navigate` tool provided by the `puppeteer` server
+- `mcp__puppeteer` Matches any tool provided by the `puppeteer` server (name configured in Claude Code)
+- `mcp__puppeteer__puppeteer_navigate` Matches the `puppeteer_navigate` tool provided by the `puppeteer` server
 
 ## Additional permission control with hooks
 
@@ -93,4 +93,3 @@ When multiple settings sources exist, they are applied in the following order (h
 5. User settings (`~/.claude/settings.json`)
 
 This hierarchy ensures that organizational policies are always enforced while still allowing flexibility at the project and user levels where appropriate.
-

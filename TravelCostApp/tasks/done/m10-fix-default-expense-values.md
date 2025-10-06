@@ -81,7 +81,6 @@ The system already has patterns for finding recent expenses:
 1. **ExpenseForm Initialization (lines 152-195)**: We need to modify the initial state setup to check for recent expenses BEFORE falling back to user context defaults.
 
 2. **Default Value Resolution (lines 939-955)**: The `addDefaultValues()` function should be enhanced to:
-
    - First check for the most recent expense in the current trip
    - Use those values for currency, country, category patterns
    - Fall back to existing user context logic only if no trip expenses exist

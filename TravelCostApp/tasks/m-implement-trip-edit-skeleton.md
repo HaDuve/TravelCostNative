@@ -9,9 +9,11 @@ modules: [components/ManageTrip, components/ui]
 # Improve ManageTrip Edit Modal Loading Times with Skeleton Component
 
 ## Problem/Goal
+
 ManageTrip edit modal has bad loading times. Need to add reusable skeleton component and use it to load rest of UI faster, improving perceived performance.
 
 ## Success Criteria
+
 - [ ] Create reusable skeleton component
 - [ ] Implement skeleton loading state in ManageTrip edit modal
 - [ ] Improve perceived loading performance
@@ -88,6 +90,7 @@ For styling consistency, the skeleton should use the same global styles system (
 #### Component Integration Points
 
 **TripForm.tsx Key Methods & Data Flow:**
+
 ```typescript
 // Current loading state management
 const [isLoading, setIsLoading] = useState(false);
@@ -119,6 +122,7 @@ if (isLoading) {
 ```
 
 **Input Component Interface (`components/ManageExpense/Input.tsx`):**
+
 ```typescript
 interface InputProps {
   label: string;
@@ -139,23 +143,27 @@ interface InputProps {
 #### Form Layout Structure
 
 **Main Form Container:**
+
 - Card wrapper: `styles.card` with gray500 background, 10px border radius, 4% margin/padding
 - Min height: 80% for editing, 70% for new trips
 - Shadow: elevation 3, shadow offset (4,4), gray600 shadow color
 
 **Title Section:**
+
 - Font size: `dynamicScale(24)` with bold weight
 - Color: `GlobalStyles.colors.textColor` (#434343)
 - Margins: top `dynamicScale(5)`, bottom `dynamicScale(24)`
 - Text alignment: center
 
 **Input Layout Pattern:**
+
 - Container: `styles.inputContainer` with `dynamicScale(16)` horizontal margin
 - Label: 12pt font size with `GlobalStyles.colors.textColor`
 - Input: gray500 background, 6pt padding, primary700 text color
 - Invalid state: error50 background with error500 label color
 
 **Button Areas:**
+
 - Button container: flex row, space-around alignment, 4% top margin
 - Individual buttons: minimum 35% width
 - Special gradient buttons for primary actions
@@ -163,6 +171,7 @@ interface InputProps {
 #### Animation System Integration
 
 **Current Animations (react-native-reanimated):**
+
 ```typescript
 import Animated, { FadeInDown, FadeOut, ZoomIn, ZoomOut } from "react-native-reanimated";
 
@@ -183,6 +192,7 @@ import Animated, { FadeInDown, FadeOut, ZoomIn, ZoomOut } from "react-native-rea
 #### Styling System Details
 
 **Global Colors Available:**
+
 - Background: `#F8F8F8` (backgroundColor)
 - Card background: `#DCDCDC` (gray500)
 - Text: `#434343` (textColor)
@@ -191,6 +201,7 @@ import Animated, { FadeInDown, FadeOut, ZoomIn, ZoomOut } from "react-native-rea
 - Error states: `#B42113` (error500), `#fcc4e4` (error50)
 
 **Scaling Utilities:**
+
 - `dynamicScale(value, isHeight, factor)` - responsive sizing
 - `constantScale(value, factor)` - fixed scaling
 - All measurements should use these for consistency
@@ -198,12 +209,14 @@ import Animated, { FadeInDown, FadeOut, ZoomIn, ZoomOut } from "react-native-rea
 #### Data Dependencies
 
 **Context Requirements:**
+
 - `TripContext`: Current trip data, tripid matching
 - `AuthContext`: User authentication state (uid)
 - `UserContext`: Username and trip history
 - `NetworkContext`: Connection state for offline handling
 
 **API Integration:**
+
 - `fetchTrip(tripId)` returns TripData object with all form fields
 - `updateTrip(tripId, tripData)` for saving changes
 - Network state checking via `netCtx.isConnected && netCtx.strongConnection`
@@ -211,21 +224,26 @@ import Animated, { FadeInDown, FadeOut, ZoomIn, ZoomOut } from "react-native-rea
 #### File Locations
 
 **Implementation locations:**
+
 - New skeleton component: `components/UI/TripFormSkeleton.tsx`
 - Modified TripForm: `components/ManageTrip/TripForm.tsx` (lines 661-672 replacement)
 - Style definitions: Add to existing `constants/styles.ts` or component-local styles
 - Types/interfaces: If needed, add to existing component or create `types/skeleton.ts`
 
 **Testing locations:**
+
 - Component tests: `__tests__/components/UI/TripFormSkeleton.test.tsx`
 - Integration tests: Modify existing `__tests__/components/ManageTrip/TripForm.test.tsx`
 - Visual regression: Include in screenshot testing suite
 
 ## Context Files
+
 <!-- Added by context-gathering agent or manually -->
 
 ## User Notes
+
 Add reusable skeleton component and use it to load rest UI faster for ManageTrip edit modal.
 
 ## Work Log
+
 - [2025-09-18] Created task

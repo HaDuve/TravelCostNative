@@ -9,9 +9,11 @@ modules: [internationalization, translations, localization]
 # Fix Missing Translations
 
 ## Problem/Goal
+
 Update and complete all missing translations throughout the application. Ensure all user-facing text is properly translated for supported languages.
 
 ## Success Criteria
+
 - [ ] Audit app for missing or incomplete translations
 - [ ] Identify untranslated text strings
 - [ ] Add missing translation keys to translation files
@@ -32,7 +34,10 @@ The translation architecture follows a distributed pattern where each component 
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 ```
 
@@ -49,21 +54,25 @@ The locale detection uses Expo's Localization API to determine the device's lang
 Several areas have been identified where translations are incomplete or missing entirely:
 
 **AI/GPT Features:** The GetLocalPriceButton component contains hardcoded English strings that bypass the translation system:
+
 - "Get Local Price" (button text and modal title)
-- "What product or service would you like to check the price of?" (modal subtitle)  
+- "What product or service would you like to check the price of?" (modal subtitle)
 - "e.g., Coffee, Coworking space, Apartment rental..." (placeholder text)
 - "Get Price" (submit button)
 - "Error", "Please enter a product or service name" (validation alerts)
 
 **Share Trip UX:** The ShareTrip component uses some translated strings but mixes in hardcoded error handling:
+
 - Alert.alert calls with duplicate text parameters that should use translation keys
 - Error messages that fall back to English-only strings
 
 **Tab Navigation:** In App.tsx, two tab labels are hardcoded instead of using i18n.t():
+
 - "Finder" (commented out i18n.t("settingsTab"))
 - "Financial" (commented out i18n.t("settingsTab"))
 
 **Form Validation:** Several components contain hardcoded alert messages and validation text that should be translated, particularly in:
+
 - Trip creation forms with English-only error messages
 - Expense form validation that mixes translated and hardcoded strings
 - Connection error dialogs that inconsistently use translation keys
@@ -77,6 +86,7 @@ Since we're fixing missing translations rather than redesigning the system, we n
 **Adding Translation Keys:** New keys must be added to all four language objects (en, de, fr, ru) in `i18n/supportedLanguages.tsx`. The file structure shows English starts at line 1, German at line 423, French at line 866, and Russian at line 1304.
 
 **Component Updates:** Each component using hardcoded strings needs modification to:
+
 1. Replace hardcoded strings with i18n.t("keyName") calls
 2. Ensure the component already has the distributed i18n setup (most do)
 3. Verify fallback behavior works correctly
@@ -88,13 +98,16 @@ Since we're fixing missing translations rather than redesigning the system, we n
 ### Technical Reference Details
 
 #### Current Language Support
+
 - English (en) - Master language with all keys
 - German (de) - Complete translation set
-- French (fr) - Complete translation set  
+- French (fr) - Complete translation set
 - Russian (ru) - Complete translation set
 
 #### Translation File Structure
+
 Located in `/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/i18n/supportedLanguages.tsx`
+
 - File exports: `{ en, de, fr, ru }`
 - Structure: Flat key-value objects
 - Size: ~1,747 lines total
@@ -114,15 +127,19 @@ Located in `/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/i18n/supp
    - Search pattern: `Alert\.alert\([^)]+\)` reveals inconsistent translation usage
 
 #### Implementation Locations
+
 - Add new translation keys: `/Users/hiono/Freelance/2022/TravelCostNative/TravelCostApp/i18n/supportedLanguages.tsx`
 - Component updates: Various files identified through grep patterns
 - Testing: Language switching in SettingsScreen.tsx
 
 ## Context Files
+
 <!-- Added by context-gathering agent or manually -->
 
 ## User Notes
+
 FIX: update all missing translations
 
 ## Work Log
+
 <!-- Updated as work progresses -->

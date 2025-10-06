@@ -1,13 +1,25 @@
-import { Dimensions, Platform, StyleSheet, Text, View } from "react-native";
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import { GlobalStyles } from "../../constants/styles";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import PropTypes from "prop-types";
+import { useCallback, useContext, useEffect, useState } from "react";
+import {
+  Dimensions,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import * as Progress from "react-native-progress";
+import Toast from "react-native-toast-message";
+
+import { MAX_JS_NUMBER } from "../../confAppConstants";
+import { GlobalStyles } from "../../constants/styles";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
+import { SettingsContext } from "../../store/settings-context";
 import { TripContext } from "../../store/trip-context";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -16,22 +28,19 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { formatExpenseWithCurrency, truncateNumber } from "../../util/string";
-import PropTypes from "prop-types";
-import { Pressable } from "react-native";
-import Toast from "react-native-toast-message";
-import { MAX_JS_NUMBER } from "../../confAppConstants";
-import * as Haptics from "expo-haptics";
 import { UserContext } from "../../store/user-context";
 import { getRate } from "../../util/currencyExchange";
-import { SettingsContext } from "../../store/settings-context";
 import {
   ExpenseData,
   getExpensesSumPeriod,
   getTravellerSum,
 } from "../../util/expense";
-import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
+import { formatExpenseWithCurrency, truncateNumber } from "../../util/string";
+
+import * as Haptics from "expo-haptics";
+
+import { ExpensesContext, RangeString } from "../../store/expenses-context";
 
 const ExpensesSummary = ({
   expenses,
@@ -125,7 +134,7 @@ const ExpensesSummary = ({
       break;
   }
   const travellers = tripCtx.travellers;
-  const travellerSplitExpenseSums = travellers.map((traveller) => {
+  const travellerSplitExpenseSums = travellers.map(traveller => {
     return getTravellerSum(periodExpenses, traveller, periodName === "total");
   });
 
@@ -141,13 +150,13 @@ const ExpensesSummary = ({
   const budgetColor = noTotalBudget
     ? GlobalStyles.colors.primary500
     : budgetProgress <= 1
-    ? GlobalStyles.colors.primary500
-    : GlobalStyles.colors.error300;
+      ? GlobalStyles.colors.primary500
+      : GlobalStyles.colors.error300;
   const unfilledColor = noTotalBudget
     ? GlobalStyles.colors.primary500
     : budgetProgress <= 1
-    ? GlobalStyles.colors.gray600
-    : GlobalStyles.colors.errorGrayed;
+      ? GlobalStyles.colors.gray600
+      : GlobalStyles.colors.errorGrayed;
 
   if (budgetProgress > 1) budgetProgress -= 1;
   if (noTotalBudget) {
@@ -250,14 +259,14 @@ const ExpensesSummary = ({
         travellerList: tripCtx.travellers,
         // travellerBudgets: tripCtx.travellerBudgets
         travellerBudgets: budgetNumber / tripCtx.travellers.length,
-        budgetNumber: budgetNumber,
-        travellerSplitExpenseSums: travellerSplitExpenseSums,
+        budgetNumber,
+        travellerSplitExpenseSums,
         currency: tripCurrency,
-        noTotalBudget: noTotalBudget,
-        periodName: periodName,
-        periodLabel: periodLabel,
-        periodBudgetString: periodBudgetString,
-        lastRateUnequal1: lastRateUnequal1,
+        noTotalBudget,
+        periodName,
+        periodLabel,
+        periodBudgetString,
+        lastRateUnequal1,
       },
     });
   };
@@ -301,9 +310,9 @@ ExpensesSummary.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: "center",
     flex: 1,
     maxWidth: "50%",
-    alignItems: "center",
     ...Platform.select({
       ios: {
         paddingTop: dynamicScale(4, true),
@@ -319,16 +328,6 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  useMoreSpaceContainer: {
-    maxWidth: "90%",
-    paddingTop: dynamicScale(8, true),
-    paddingBottom: dynamicScale(4, true),
-    paddingLeft: dynamicScale(4),
-    paddingRight: dynamicScale(4),
-  },
-  sumTextContainer: {
-    alignItems: "center",
-  },
   sum: {
     fontSize: dynamicScale(32, false, 0.5),
     fontWeight: "bold",
@@ -341,5 +340,15 @@ const styles = StyleSheet.create({
         textShadowRadius: 8,
       },
     }),
+  },
+  sumTextContainer: {
+    alignItems: "center",
+  },
+  useMoreSpaceContainer: {
+    maxWidth: "90%",
+    paddingBottom: dynamicScale(4, true),
+    paddingLeft: dynamicScale(4),
+    paddingRight: dynamicScale(4),
+    paddingTop: dynamicScale(8, true),
   },
 });

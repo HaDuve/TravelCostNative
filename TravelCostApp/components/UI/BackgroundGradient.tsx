@@ -1,6 +1,6 @@
-import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import PropTypes from "prop-types";
+
 import { GlobalStyles } from "../../constants/styles";
 
 const BackgroundGradient = ({ colors, children, style }) => {

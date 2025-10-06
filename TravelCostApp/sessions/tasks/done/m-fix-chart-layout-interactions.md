@@ -10,26 +10,33 @@ modules: [components/charts, components/ExpensesOverview]
 # Fix Chart Layout and Interaction Issues
 
 ## Problem/Goal
+
 Fix multiple issues with the Highcharts WebView implementation:
-- Outer bars of bar chart are clipping with the edges of the x-axis 
+
+- Outer bars of bar chart are clipping with the edges of the x-axis
 - Need to add native padding inside Highcharts config to the x-axis/scale
 - Remove onPress behavior from both charts
 - Fix tooltips, press, and longpress interactions
 
 ## Success Criteria
+
 - [ ] Add padding to Highcharts x-axis configuration to prevent bar clipping
 - [ ] Remove onPress behavior from both ExpenseChart and CategoryChart
 - [ ] Verify tooltips work correctly without interfering interactions
 - [ ] Test that press and longpress behaviors are properly handled or disabled as needed
 
 ## Context Files
+
 <!-- Added by context-gathering agent or manually -->
 
 ## User Notes
+
 <!-- Any specific notes or requirements from the developer -->
 
 ## Work Log
+
 <!-- Updated as work progresses -->
+
 - [2025-09-03] Created task for chart layout and interaction fixes
 - [2025-09-03] Started work on chart fixes
 - [2025-09-03] Increased chart spacing from 20 to 40 pixels on both sides in chartHelpers.ts

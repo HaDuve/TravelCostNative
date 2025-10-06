@@ -5,6 +5,7 @@ When a task meets its success criteria:
 ## 1. Pre-Completion Checks
 
 Verify before proceeding:
+
 - [ ] All success criteria checked off in task file
 - [ ] No unaddressed work remaining
 
@@ -13,13 +14,14 @@ Verify before proceeding:
 ## 2. Run Completion Agents
 
 Delegate to specialized agents in this order:
+
 ```
 1. code-review agent - Review all implemented code for security/quality
    Include: Changed files, task context, implementation approach
-   
-2. service-documentation agent - Update CLAUDE.md files 
+
+2. service-documentation agent - Update CLAUDE.md files
    Include: List of services modified during task
-   
+
 3. logging agent - Finalize task documentation
    Include: Task completion summary, final status
 ```
@@ -27,6 +29,7 @@ Delegate to specialized agents in this order:
 ## 3. Task Archival
 
 After agents complete:
+
 ```bash
 # Update task file status to 'completed'
 # Move to done/ directory
@@ -90,7 +93,9 @@ fi
 **IF SUPER-REPO**: Process from deepest submodules to super-repo
 
 #### A. Deepest Submodules First (Depth 2+)
+
 For any submodules within submodules:
+
 1. Navigate to each modified deep submodule
 2. Stage changes based on user preference from Step 1
 3. Commit all changes with descriptive message
@@ -100,7 +105,9 @@ For any submodules within submodules:
 5. Push the merged branch
 
 #### B. Direct Submodules (Depth 1)
+
 For all modified direct submodules:
+
 1. Navigate to each modified submodule
 2. Stage changes based on user preference
 3. Commit all changes with descriptive message
@@ -110,7 +117,9 @@ For all modified direct submodules:
 5. Push the merged branch
 
 #### C. Super-repo (Root)
+
 After ALL submodules are committed and merged:
+
 1. Return to super-repo root
 2. Stage changes based on user preference
 3. Commit all changes with descriptive message
@@ -120,6 +129,7 @@ After ALL submodules are committed and merged:
 5. Push the merged branch
 
 **IF STANDARD REPO**: Simple commit and merge
+
 1. Stage changes based on user preference
 2. Commit with descriptive message
 3. Merge based on branch type (subtask → parent, regular → main)
@@ -128,17 +138,20 @@ After ALL submodules are committed and merged:
 ### Special Cases
 
 **Experiment branches:**
+
 - Ask user whether to keep the experimental branch for reference
 - If keeping: Just push branches without merging
 - If not: Document findings first, then delete branches
 
 **Research tasks (no branch):**
+
 - No merging needed
 - Just ensure findings are documented in task file
 
 ## 6. Select Next Task
 
 Immediately after archival:
+
 ```bash
 # List all tasks (simple and reliable)
 ls -la sessions/tasks/
@@ -149,11 +162,13 @@ echo "Task complete! Here are the remaining tasks:"
 ```
 
 User selects next task:
+
 - Switch to task branch: `git checkout [branch-name]`
 - Update task state: Edit `.claude/state/current_task.json` with new task, branch, and services
 - Follow task-startup.md protocol
 
 If no tasks remain:
+
 - Celebrate completion!
 - Ask user what they want to tackle next
 - Create new task following task-creation.md

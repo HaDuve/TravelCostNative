@@ -9,9 +9,11 @@ modules: [components/ShareTrip, utils/sharing]
 # Fix Trip Sharing Issues
 
 ## Problem/Goal
+
 Manual testing reveals that sharing trip sometimes does not work. Need to investigate and fix the underlying issues causing sharing failures.
 
 ## Success Criteria
+
 - [ ] Manual test trip sharing functionality thoroughly
 - [ ] Identify root causes of sharing failures
 - [ ] Fix sharing mechanism issues
@@ -87,30 +89,38 @@ Sharing depends on accurate trip IDs from TripContext and proper authentication 
 #### Component Interfaces & Signatures
 
 **ShareTrip Functions:**
+
 ```typescript
-export async function onShare(shareId: string, navigation: any): Promise<void>
+export async function onShare(shareId: string, navigation: any): Promise<void>;
 ```
 
 **API Integration:**
+
 ```typescript
-export async function loadKeys(): Promise<Keys> // Keys.BRAN for Branch.io
+export async function loadKeys(): Promise<Keys>; // Keys.BRAN for Branch.io
 ```
 
 **Branch Integration:**
+
 ```typescript
-export async function initBranch(navigation: any): Promise<void>
+export async function initBranch(navigation: any): Promise<void>;
 // Subscriber handles: { error, params } with $deeplink_path processing
 ```
 
 **Dropdown Enhancement:**
+
 ```typescript
-export function travellerToDropdown(travellers: any[], includeAddTraveller: boolean = true): {label: string, value: string}[]
+export function travellerToDropdown(
+  travellers: any[],
+  includeAddTraveller: boolean = true
+): { label: string; value: string }[];
 // Special value: "__ADD_TRAVELLER__" triggers navigation
 ```
 
 #### Data Structures
 
 **Branch.io Deep Link Payload:**
+
 ```javascript
 {
   branch_key: string, // From BRAN key
@@ -123,13 +133,15 @@ export function travellerToDropdown(travellers: any[], includeAddTraveller: bool
 ```
 
 **API Response Structure:**
+
 ```javascript
 {
-  url: string // Generated Branch.io short link
+  url: string; // Generated Branch.io short link
 }
 ```
 
 **Share API Payload:**
+
 ```javascript
 {
   message: string, // i18n.t("inviteMessage")
@@ -140,14 +152,17 @@ export function travellerToDropdown(travellers: any[], includeAddTraveller: bool
 #### Configuration Requirements
 
 **Environment Variables/Keys:**
+
 - `BRAN`: Branch.io API key (loaded via PremiumConstants)
 - Stored in secure storage, refreshed based on network speed
 
 **API Endpoints:**
+
 - Branch.io: `https://api2.branch.io/v1/url` (POST)
 - Firebase: `https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app`
 
 **Network Dependencies:**
+
 - Connection speed check for key loading
 - Internet connectivity for Branch.io API
 - Network stability for deep link processing
@@ -155,23 +170,27 @@ export function travellerToDropdown(travellers: any[], includeAddTraveller: bool
 #### File Locations
 
 **Core Implementation:**
+
 - Share functionality: `/components/ProfileOutput/ShareTrip.tsx`
 - Individual share button: `/components/ManageExpense/ExpenseForm.tsx` (lines 1585-1627)
 - Join functionality: `/screens/JoinTrip.tsx`
 - Trip management entry: `/components/ManageTrip/TripForm.tsx` (lines 720-727)
 
 **Integration Points:**
+
 - Branch deep linking: `/components/Referral/branch.ts`
 - API key management: `/components/Premium/PremiumConstants.tsx`
 - Dropdown enhancement: `/util/split.ts` (lines 244-283)
 - Network monitoring: `/store/network-context.tsx`
 
 **Context Management:**
+
 - Trip context: `/store/trip-context.tsx`
 - Auth context: `/store/auth-context.tsx`
 - User context: `/store/user-context.tsx`
 
 **Testing Focus Areas:**
+
 - Branch.io API key validation and refresh
 - Network connectivity edge cases during sharing
 - Deep link processing timing and navigation
@@ -180,7 +199,9 @@ export function travellerToDropdown(travellers: any[], includeAddTraveller: bool
 - Cross-platform Share API behavior differences
 
 ## User Notes
+
 Manual test and fix: sharing trip sometimes does not work.
 
 ## Work Log
+
 - [2025-09-18] Created task

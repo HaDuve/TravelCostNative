@@ -1,27 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Alert, Platform, TouchableOpacity, StyleSheet } from "react-native";
 
-import { MemoizedExpenseItem } from "./ExpenseItem";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
-import { View } from "react-native";
-
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { GlobalStyles, ListLayoutAnimation } from "../../constants/styles";
-import {
-  fetchTripName,
-  getAllExpenses,
-  touchAllTravelers,
-} from "../../util/http";
-import { TripContext } from "../../store/trip-context";
-import { ExpensesContext } from "../../store/expenses-context";
-import IconButton from "../UI/IconButton";
 import Animated, {
   Easing,
   FadeIn,
@@ -32,43 +10,75 @@ import Animated, {
   FadeOutRight,
   FadeOutUp,
 } from "react-native-reanimated";
+import IconButton from "../UI/IconButton";
 
 //Localization
+import { useNavigation } from "@react-navigation/native";
+import * as Haptics from "expo-haptics";
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+import PropTypes from "prop-types";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  Alert,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Text } from "react-native-paper";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
+import { NetworkContext } from "../../store/network-context";
+import { UserContext } from "../../store/user-context";
+import { RootNavigationProp } from "../../types/navigation";
+import {
+  deleteAllExpensesByRangedId,
+  Expense,
+  ExpenseData,
+} from "../../util/expense";
 import {
   deleteExpenseOnlineOffline,
   OfflineQueueManageExpenseItem,
   storeExpenseOnlineOffline,
 } from "../../util/offline-queue";
-import {
-  ExpenseData,
-  Expense,
-  deleteAllExpensesByRangedId,
-} from "../../util/expense";
-import PropTypes from "prop-types";
-import { NetworkContext } from "../../store/network-context";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { useNavigation } from "@react-navigation/native";
-import { useState } from "react";
-import { Text } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { addShadowItemsToExpenses } from "./ExpenseListUtil";
-import { UserContext } from "../../store/user-context";
-import * as Haptics from "expo-haptics";
-import { toShortFormat } from "../../util/date";
+
+import { Pressable } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Swipeable from "react-native-gesture-handler/Swipeable";
 import {
   DEVELOPER_MODE,
   EXPENSES_LOAD_TIMEOUT,
   MAX_EXPENSES_RENDER,
 } from "../../confAppConstants";
+import { GlobalStyles, ListLayoutAnimation } from "../../constants/styles";
 import { TripAsObject } from "../../screens/TripSummaryScreen";
-import { Pressable } from "react-native";
+import { ExpensesContext } from "../../store/expenses-context";
+import { TripContext } from "../../store/trip-context";
+import { toShortFormat } from "../../util/date";
 import safeLogError from "../../util/error";
+import {
+  fetchTripName,
+  getAllExpenses,
+  touchAllTravelers,
+} from "../../util/http";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
+
+import { MemoizedExpenseItem } from "./ExpenseItem";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 
 // Displays a list of all expenses.
@@ -87,7 +97,7 @@ function ExpensesList({
   const row = useMemo(() => [], []);
   const prevOpenedRow = useRef(null);
   let travellerName = "";
-  const navigation = useNavigation();
+  const navigation = useNavigation<RootNavigationProp>();
 
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;
@@ -113,7 +123,7 @@ function ExpensesList({
   if (expenses?.length < 6) addShadowItemsToExpenses(expenses);
 
   const forceCloseRow = useCallback(
-    (index) => {
+    index => {
       try {
         row[index].close();
       } catch (error) {
@@ -123,7 +133,7 @@ function ExpensesList({
     [row]
   );
   const closeRow = useCallback(
-    (index) => {
+    index => {
       if (prevOpenedRow.current && prevOpenedRow.current !== row[index]) {
         prevOpenedRow.current.close();
       }
@@ -237,7 +247,7 @@ function ExpensesList({
                     type: "delete",
                     expense: {
                       tripid: tripID,
-                      uid: uid,
+                      uid,
                       id: editedExpenseId,
                     },
                   };
@@ -279,7 +289,7 @@ function ExpensesList({
             type: "delete",
             expense: {
               tripid: tripID,
-              uid: uid,
+              uid,
               id: editedExpenseId,
             },
           };
@@ -431,7 +441,9 @@ function ExpensesList({
                   )
                 }
                 onSwipeableOpen={closeRow.bind(this, index)}
-                ref={(ref) => (row[index] = ref)}
+                ref={ref => {
+                  row[index] = ref;
+                }}
                 overshootFriction={8}
               >
                 {selectable && selectableJSX}
@@ -458,9 +470,11 @@ function ExpensesList({
               )
             }
             onSwipeableOpen={closeRow.bind(this, index)}
-            ref={(ref) => (row[index] = ref)}
-            rightOpenValue={-100}
-            disableLeftSwipe={true}
+            ref={ref => {
+              row[index] = ref;
+            }}
+            rightThreshold={-100}
+            leftThreshold={0}
             overshootFriction={8}
           >
             {selectable && selectableJSX}
@@ -483,8 +497,8 @@ function ExpensesList({
       if (!flatListRef.current || index > expenses?.length + 1) return;
       if (flatListRef.current) {
         flatListRef.current.scrollToIndex({
-          index: index,
-          animated: animated,
+          index,
+          animated,
         });
       }
     },
@@ -498,10 +512,10 @@ function ExpensesList({
     scrollTo(1);
   }, [scrollTo, periodName]);
 
-  const selectItem = (item) => {
+  const selectItem = item => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (selected.includes(item)) {
-      setSelected(selected.filter((newItem) => newItem !== item));
+      setSelected(selected.filter(newItem => newItem !== item));
     } else {
       setSelected([...selected, item]);
     }
@@ -510,13 +524,13 @@ function ExpensesList({
   const selectAll = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const filteredExpenses = expenses.filter(
-      (item) => !item.id.includes("shadow")
+      item => !item.id.includes("shadow")
     );
     requestAnimationFrame(() => {
       if (selected?.length === filteredExpenses?.length) {
         setSelected([]);
       } else {
-        setSelected(filteredExpenses.map((item) => item.id));
+        setSelected(filteredExpenses.map(item => item.id));
       }
     });
   }, [expenses?.length, selected?.length]);
@@ -525,7 +539,7 @@ function ExpensesList({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (selected.length === 0) return;
     const finderExpenses = expenses.filter(
-      (item) => selected.includes(item.id) && !item.id.includes("shadow")
+      item => selected.includes(item.id) && !item.id.includes("shadow")
     );
     navigation.navigate("FilteredPieCharts", {
       expenses: finderExpenses,
@@ -544,7 +558,7 @@ function ExpensesList({
         const tripid = userCtx.tripHistory[i];
         const tripName = await fetchTripName(tripid);
         allTripsAsObjects.push({
-          tripid: tripid,
+          tripid,
           tripname: tripName,
           selected: true,
         });
@@ -577,7 +591,7 @@ function ExpensesList({
       navigation?.popToTop();
 
       for (let i = 0; i < selected?.length; i++) {
-        const expenseData = expenses.find((item) => item.id === selected[i]);
+        const expenseData = expenses.find(item => item.id === selected[i]);
         try {
           const expenseUid = expenseData.uid;
           const expenseId = expenseData.id;
@@ -587,7 +601,7 @@ function ExpensesList({
             expense: {
               tripid: _tripid,
               uid: expenseUid,
-              expenseData: expenseData,
+              expenseData,
             },
           };
           const itemToDelete: OfflineQueueManageExpenseItem = {
@@ -622,14 +636,14 @@ function ExpensesList({
   const moveSelectedToTrip = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (selected?.length === 0) return;
-    const buttonTripList = allTrips.map((trip) => {
+    const buttonTripList = allTrips.map(trip => {
       if (trip.tripid === tripID)
         return {
           text: i18n.t("cancel"),
           onPress: () => {
             return;
           },
-          style: "cancel",
+          style: "cancel" as const,
         };
       return {
         text: trip.tripname,
@@ -680,7 +694,7 @@ function ExpensesList({
               });
               for (let i = 0; i < selected?.length; i++) {
                 const expenseItem = expenses.find(
-                  (item) => item.id === selected[i]
+                  item => item.id === selected[i]
                 );
                 if (expenseItem.rangeId) {
                   await deleteAllExpensesByRangedId(
@@ -827,7 +841,7 @@ function ExpensesList({
               <IconButton
                 icon={
                   selected?.length ===
-                  expenses.filter((item) => !item.id.includes("shadow")).length
+                  expenses.filter(item => !item.id.includes("shadow")).length
                     ? "close-outline"
                     : "checkmark-done-outline"
                 }
@@ -870,7 +884,7 @@ function ExpensesList({
     >
       <Animated.FlatList
         scrollEnabled={true}
-        onScroll={(event) => {
+        onScroll={event => {
           setContentVerticalOffset(event.nativeEvent.contentOffset.y);
         }}
         refreshControl={refreshControl}
@@ -899,8 +913,8 @@ function ExpensesList({
         })}
         initialScrollIndex={1}
         windowSize={8}
-        onScrollToIndexFailed={(info) => {
-          const wait = new Promise((resolve) => setTimeout(resolve, 500));
+        onScrollToIndexFailed={info => {
+          const wait = new Promise(resolve => setTimeout(resolve, 500));
           wait.then(() => {
             flatListRef.current?.scrollToIndex({
               index: info.index,
@@ -950,39 +964,6 @@ ExpensesList.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  scrollToTopButton: {
-    flex: 1,
-    position: "absolute",
-    top: dynamicScale(10, true),
-    alignSelf: "center",
-    paddingHorizontal: dynamicScale(8, false, 0.5),
-    paddingVertical: dynamicScale(4, false, 0.5),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 50,
-    borderColor: GlobalStyles.colors.primaryGrayed,
-    borderWidth: 1,
-  },
-  scrollToTopText: {
-    color: GlobalStyles.colors.primary700,
-    fontSize: dynamicScale(14, false, 0.5),
-    fontWeight: "bold",
-  },
-  headerIconContainer: {
-    marginRight: constantScale(24, 0.5),
-  },
-  fastExpenseContainer: {
-    width: "100%",
-    flexDirection: "row",
-    alignContent: "center",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  fastExpenseText: {
-    color: GlobalStyles.colors.textColor,
-    fontSize: dynamicScale(14, false, 0.5),
-    fontWeight: "300",
-    paddingHorizontal: dynamicScale(10),
-  },
   descriptionText: {
     // flex: 1,
     // width: "110%",
@@ -992,6 +973,39 @@ const styles = StyleSheet.create({
     zIndex: 2,
     flexWrap: "wrap",
     flexDirection: "row",
+  },
+  fastExpenseContainer: {
+    alignContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  fastExpenseText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(14, false, 0.5),
+    fontWeight: "300",
+    paddingHorizontal: dynamicScale(10),
+  },
+  headerIconContainer: {
+    marginRight: constantScale(24, 0.5),
+  },
+  scrollToTopButton: {
+    alignSelf: "center",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderColor: GlobalStyles.colors.primaryGrayed,
+    borderRadius: 50,
+    borderWidth: 1,
+    flex: 1,
+    paddingHorizontal: dynamicScale(8, false, 0.5),
+    paddingVertical: dynamicScale(4, false, 0.5),
+    position: "absolute",
+    top: dynamicScale(10, true),
+  },
+  scrollToTopText: {
+    color: GlobalStyles.colors.primary700,
+    fontSize: dynamicScale(14, false, 0.5),
+    fontWeight: "bold",
   },
   secondaryText: {
     color: GlobalStyles.colors.gray700,

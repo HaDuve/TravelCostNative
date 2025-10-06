@@ -1,66 +1,69 @@
-import React from "react";
-import { useContext, useEffect, useState, useLayoutEffect } from "react";
-import {
-  SafeAreaView,
-  View,
-  Keyboard,
-  Platform,
-  AppState,
-  StatusBar as StatusBarRN,
-} from "react-native";
-import Purchases from "react-native-purchases";
-
-import { StatusBar } from "expo-status-bar";
+import { Ionicons } from "@expo/vector-icons";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import * as SplashScreen from "expo-splash-screen";
-import { shouldShowOnboarding } from "./components/Rating/firstStartUtil";
-
-import { NetworkProvider } from "react-native-offline";
-import { Ionicons } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
-import SignupScreen from "./screens/SignupScreen";
-import LoginScreen from "./screens/LoginScreen";
-
-import ManageExpense from "./screens/ManageExpense";
-import { GlobalStyles } from "./constants/styles";
-import AuthContextProvider, { AuthContext } from "./store/auth-context";
-import ExpensesContextProvider, {
-  ExpensesContext,
-} from "./store/expenses-context";
-import ProfileScreen from "./screens/ProfileScreen";
-import UserContextProvider, { UserContext } from "./store/user-context";
+import * as Localization from "expo-localization";
+import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
+import { I18n } from "i18n-js";
+import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
-  fetchUser,
-  touchMyTraveler,
-  dataResponseTime,
-  updateUser,
-} from "./util/http";
-import TripContextProvider, {
-  TripContext,
-  TripData,
-} from "./store/trip-context";
+  AppState,
+  Keyboard,
+  Platform,
+  SafeAreaView,
+  StatusBar as StatusBarRN,
+  View,
+} from "react-native";
+import { NetworkProvider } from "react-native-offline";
+import Purchases from "react-native-purchases";
+
 import TripForm from "./components/ManageTrip/TripForm";
-import OnboardingScreen from "./screens/OnboardingScreen";
-import JoinTrip from "./screens/JoinTrip";
+import { shouldShowOnboarding } from "./components/Rating/firstStartUtil";
+import { RootNavigationProp } from "./types/navigation";
+
 import ShareTripButton from "./components/ProfileOutput/ShareTrip";
-import OverviewScreen from "./screens/OverviewScreen";
+import LoadingOverlay from "./components/UI/LoadingOverlay";
+import { GlobalStyles } from "./constants/styles";
 import CategoryPickScreen from "./screens/CategoryPickScreen";
-import SplitSummaryScreen from "./screens/SplitSummaryScreen";
+import FilteredExpenses from "./screens/FilteredExpenses";
+import JoinTrip from "./screens/JoinTrip";
+import LoginScreen from "./screens/LoginScreen";
+import ManageExpense from "./screens/ManageExpense";
+import OnboardingScreen from "./screens/OnboardingScreen";
+import OverviewScreen from "./screens/OverviewScreen";
+import ProfileScreen from "./screens/ProfileScreen";
 import SettingsScreen from "./screens/SettingsScreen";
+import SignupScreen from "./screens/SignupScreen";
+import SplitSummaryScreen from "./screens/SplitSummaryScreen";
 import {
   asyncStoreGetObject,
   asyncStoreSafeClear,
 } from "./store/async-storage";
-import LoadingOverlay from "./components/UI/LoadingOverlay";
-import FilteredExpenses from "./screens/FilteredExpenses";
+import AuthContextProvider, { AuthContext } from "./store/auth-context";
+import ExpensesContextProvider, {
+  ExpensesContext,
+} from "./store/expenses-context";
+import TripContextProvider, {
+  TripContext,
+  TripData,
+} from "./store/trip-context";
+import UserContextProvider, {
+  UserContext,
+  UserData,
+} from "./store/user-context";
+import {
+  dataResponseTime,
+  fetchUser,
+  touchMyTraveler,
+  updateUser,
+} from "./util/http";
 import { sendOfflineQueue } from "./util/offline-queue";
 
 //localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "./i18n/supportedLanguages";
+
+import { de, en, fr, ru } from "./i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -69,52 +72,53 @@ i18n.locale =
 // i18n.locale = "en";
 i18n.enableFallback = true;
 
-import ManageCategoryScreen from "./screens/ManageCategoryScreen";
+import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
 import ToastComponent from "./components/UI/ToastComponent";
 import {
-  DEBUG_RESET_STORAGE,
   DEBUG_POLLING_INTERVAL,
+  DEBUG_RESET_STORAGE,
 } from "./confAppConstants";
-import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
+import ManageCategoryScreen from "./screens/ManageCategoryScreen";
+
 import Toast from "react-native-toast-message";
+
 import { useInterval } from "./components/Hooks/useInterval";
 import { isForeground } from "./util/appState";
-import { TourGuideProvider, TooltipProps } from "rn-tourguide";
-import { loadTourConfig } from "./util/tourUtil";
-import { loadKeys, Keys } from "./components/Premium/PremiumConstants";
+
+import { TooltipProps, TourGuideProvider } from "rn-tourguide";
+
 import PaywallScreen from "./components/Premium/PayWall";
-import { SettingsProvider } from "./store/settings-context";
-import { UserData } from "./store/user-context";
-import FilteredPieCharts from "./screens/FilteredPieCharts";
+import { Keys, loadKeys } from "./components/Premium/PremiumConstants";
 import {
   handleFirstStart,
   shouldPromptForRating,
 } from "./components/Rating/firstStartUtil";
-import RatingModal from "./screens/RatingModal";
-import NetworkContextProvider from "./store/network-context";
-import { secureStoreGetItem } from "./store/secure-storage";
-import { isConnectionFastEnough } from "./util/connectionSpeed";
-import FinderScreen from "./screens/FinderScreen";
-import CustomerScreen from "./screens/CustomerScreen";
 import GPTDealScreen from "./screens/ChatGPTDealScreen";
+import CustomerScreen from "./screens/CustomerScreen";
+import FilteredPieCharts from "./screens/FilteredPieCharts";
+import FinderScreen from "./screens/FinderScreen";
+import RatingModal from "./screens/RatingModal";
 import { MemoizedRecentExpenses } from "./screens/RecentExpenses";
 import TripSummaryScreen from "./screens/TripSummaryScreen";
-import { versionCheck } from "./util/version";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import ChangelogScreen from "./screens/ChangelogScreen";
-import { Badge } from "react-native-paper";
-import { ExpenseData } from "./util/expense";
-
-import safeLogError from "./util/error";
+import NetworkContextProvider from "./store/network-context";
+import { secureStoreGetItem } from "./store/secure-storage";
+import { SettingsProvider } from "./store/settings-context";
+import { isConnectionFastEnough } from "./util/connectionSpeed";
 import { constantScale, dynamicScale } from "./util/scalingUtil";
+import { loadTourConfig } from "./util/tourUtil";
+import { versionCheck } from "./util/version";
+
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
+import ChangelogScreen from "./screens/ChangelogScreen";
+
+import { Badge } from "react-native-paper";
+
 import { CustomTooltip } from "./components/UI/Tourguide_Tooltip";
 import OrientationContextProvider from "./store/orientation-context";
-import {
-  initializeVexo,
-  identifyUser,
-  VexoUserContext,
-} from "./util/vexo-tracking";
-import { VexoEvents } from "./util/vexo-constants";
+import safeLogError from "./util/error";
+import { ExpenseData } from "./util/expense";
+import { identifyUser, initializeVexo } from "./util/vexo-tracking";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -128,7 +132,7 @@ const IconSize = constantScale(24, 0.1);
 const prefix = Linking.createURL("/");
 function NotAuthenticatedStack() {
   const [needOnboarding, setNeedOnboarding] = useState(false);
-  const navigation = useNavigation();
+  const navigation = useNavigation<RootNavigationProp>();
   useEffect(() => {
     async function checkOnboarding() {
       const need = await shouldShowOnboarding();
@@ -140,6 +144,7 @@ function NotAuthenticatedStack() {
   }, []);
   return (
     <AuthStack.Navigator
+      id={undefined}
       screenOptions={{
         headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
         headerTintColor: GlobalStyles.colors.textColor,
@@ -168,11 +173,12 @@ function NotAuthenticatedStack() {
 }
 
 function AuthenticatedStack() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<RootNavigationProp>();
   return (
     <ExpensesContextProvider>
       <>
         <Stack.Navigator
+          id={undefined}
           screenOptions={{
             headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
             headerTintColor: GlobalStyles.colors.backgroundColor,
@@ -338,7 +344,7 @@ function Navigation() {
           screens: {
             RecentExpenses: "recent",
           },
-        },
+        } as any,
       },
     },
   };
@@ -379,6 +385,7 @@ function Home() {
   const validSplitSummary = hasExp && hasExpensesWithSplit;
   return (
     <BottomTabs.Navigator
+      id={undefined}
       initialRouteName={FirstScreen}
       backBehavior={"history"}
       tabBarPosition={"bottom"}
@@ -550,9 +557,8 @@ function Root() {
                 // );
                 await updateUser(storedUid, checkUser);
               }
-              const tripData: TripData = await tripCtx.fetchAndSetCurrentTrip(
-                tripid
-              );
+              const tripData: TripData =
+                await tripCtx.fetchAndSetCurrentTrip(tripid);
               if (!tripData) return;
               try {
                 setOnlineSetupDone(true);
@@ -876,7 +882,7 @@ function Root() {
 
   useEffect(() => {
     // only ask for review if the app goes from background to active
-    const handler = AppState.addEventListener("change", (nextAppState) => {
+    const handler = AppState.addEventListener("change", nextAppState => {
       if (nextAppState === "active") {
         showModalIfNeeded();
       }

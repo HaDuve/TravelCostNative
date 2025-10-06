@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
 import PropTypes from "prop-types";
+import { StyleSheet, Text, View } from "react-native";
+
 import { GlobalStyles } from "../../constants/styles";
 
 const Discount = ({ discountPercentage, style }) => {
@@ -34,8 +34,8 @@ const styles = StyleSheet.create({
     left: "41%",
   },
   discountText: {
+    color: GlobalStyles.colors.cat1,
     fontSize: 20,
     fontWeight: "bold",
-    color: GlobalStyles.colors.cat1,
   },
 });

@@ -1,19 +1,14 @@
 import axios, { AxiosResponse } from "axios";
+
 import {
   AXIOS_TIMEOUT_DEFAULT,
   AXIOS_TIMOUT_LONG,
   DEBUG_NO_DATA,
 } from "../confAppConstants";
 
-import { Category } from "./category";
-import { TripData } from "../store/trip-context";
-import { ExpenseData, ExpenseDataOnline } from "./expense";
-import { UserData } from "../store/user-context";
-
 //Localization
 import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -22,18 +17,24 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { Traveller } from "./traveler";
-import uniqBy from "lodash.uniqby";
-import { getMMKVString, setMMKVString } from "../store/mmkv";
-import { secureStoreGetItem } from "../store/secure-storage";
 import { ExpoPushToken } from "expo-notifications";
+import { I18n } from "i18n-js";
+import uniqBy from "lodash.uniqby";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { secureStoreGetItem } from "../store/secure-storage";
+import { TripData } from "../store/trip-context";
+import { UserData } from "../store/user-context";
+
+import { Category } from "./category";
 import safeLogError from "./error";
-import { safelyParseJSON } from "./jsonParse";
+import { ExpenseData, ExpenseDataOnline } from "./expense";
 import { getValidIdToken } from "./firebase-auth";
+import { safelyParseJSON } from "./jsonParse";
 import {
   getLastFetchTimestamp,
   setLastFetchTimestamp,
 } from "./last-fetch-timestamp";
+import { Traveller } from "./traveler";
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -51,10 +52,10 @@ axios.defaults.timeout = AXIOS_TIMEOUT_DEFAULT; // Set default timeout to 5 seco
 
 /** Axios Logger */
 axios.interceptors.request.use(
-  (config) => {
+  config => {
     return config;
   },
-  (error) => {
+  error => {
     return Promise.reject(error);
   }
 );
@@ -62,7 +63,7 @@ axios.interceptors.request.use(
 /*
  * development decorator to time the execution of an async function
  */
-export const dataResponseTime = (func) => {
+export const dataResponseTime = func => {
   return async (...args) => {
     const start = Date.now();
     const result = await func(...args);
@@ -230,7 +231,7 @@ const processExpenseResponse = (data: any): ExpenseData[] => {
       rangeId: r.rangeId,
       isPaid: r.isPaid,
       isSpecialExpense: r.isSpecialExpense,
-      editedTimestamp: editedTimestamp,
+      editedTimestamp,
       isDeleted: r.isDeleted || false,
       serverTimestamp: r.serverTimestamp,
     };
@@ -250,12 +251,12 @@ export interface SyncLoadingCallback {
 export async function fetchExpensesWithUIDs(
   tripid: string,
   uidlist: string[],
-  useDelta: boolean = true,
+  useDelta = true,
   loadingCallback?: SyncLoadingCallback
 ) {
   if (!tripid || !uidlist || DEBUG_NO_DATA) return [];
   const expenses: ExpenseData[] = [];
-  let latestTimestamp: number = 0;
+  let latestTimestamp = 0;
 
   // Notify sync start
   loadingCallback?.onStart?.();
@@ -292,8 +293,8 @@ export async function fetchExpensesWithUIDs(
         // TODO: After 100% migration to serverTimestamp and running migration script, simplify to:
         // .map((e) => e.serverTimestamp || 0)
         const validTimestamps = userExpenses
-          .map((e) => e.serverTimestamp || e.editedTimestamp || 0)
-          .filter((ts) => ts > 0);
+          .map(e => e.serverTimestamp || e.editedTimestamp || 0)
+          .filter(ts => ts > 0);
 
         if (validTimestamps.length > 0) {
           const userLatestTimestamp = Math.max(...validTimestamps);
@@ -323,7 +324,7 @@ export async function fetchExpensesWithUIDs(
 export async function fetchExpenses(
   tripid: string,
   uid: string,
-  useDelta: boolean = true,
+  useDelta = true,
   loadingCallback?: SyncLoadingCallback
 ) {
   if (!tripid || DEBUG_NO_DATA) return [];
@@ -363,7 +364,7 @@ export async function fetchExpenses(
           rangeId: r.rangeId,
           isPaid: r.isPaid,
           isSpecialExpense: r.isSpecialExpense,
-          editedTimestamp: editedTimestamp,
+          editedTimestamp,
           isDeleted: r.isDeleted || false,
           serverTimestamp: r.serverTimestamp,
         };
@@ -404,8 +405,8 @@ export async function fetchExpenses(
       // TODO: After 100% migration to serverTimestamp and running migration script, simplify to:
       // .map((e) => e.serverTimestamp || 0)
       const validTimestamps = expenses
-        .map((e) => e.serverTimestamp || e.editedTimestamp || 0)
-        .filter((ts) => ts > 0);
+        .map(e => e.serverTimestamp || e.editedTimestamp || 0)
+        .filter(ts => ts > 0);
 
       if (validTimestamps.length > 0) {
         const latestTimestamp = Math.max(...validTimestamps);
@@ -737,7 +738,7 @@ export async function getUIDs(tripid: string) {
 export async function getAllExpenses(
   tripid: string,
   uid?: string,
-  useDelta: boolean = true,
+  useDelta = true,
   loadingCallback?: SyncLoadingCallback
 ) {
   const uids = await getUIDs(tripid);

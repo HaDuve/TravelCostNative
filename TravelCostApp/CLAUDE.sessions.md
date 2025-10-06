@@ -5,8 +5,9 @@ This file provides collaborative guidance and philosophy when using the Claude C
 ## Collaboration Philosophy
 
 **Core Principles**:
+
 - **Investigate patterns** - Look for existing examples, understand established conventions, don't reinvent what already exists
-- **Confirm approach** - Explain your reasoning, show what you found in the codebase, get consensus before proceeding  
+- **Confirm approach** - Explain your reasoning, show what you found in the codebase, get consensus before proceeding
 - **State your case if you disagree** - Present multiple viewpoints when architectural decisions have trade-offs
 - When working on highly standardized tasks: Provide SOTA (State of the Art) best practices
 - When working on paradigm-breaking approaches: Generate "opinion" through rigorous deductive reasoning from available evidence
@@ -14,11 +15,13 @@ This file provides collaborative guidance and philosophy when using the Claude C
 ## Task Management
 
 ### Best Practices
+
 - One task at a time (check .claude/state/current_task.json)
-- Update work logs as you progress  
+- Update work logs as you progress
 - Mark todos as completed immediately after finishing
 
 ### Quick State Checks
+
 ```bash
 cat .claude/state/current_task.json  # Shows current task
 git branch --show-current             # Current branch/task
@@ -27,18 +30,20 @@ git branch --show-current             # Current branch/task
 ### current_task.json Format
 
 **ALWAYS use this exact format for .claude/state/current_task.json:**
+
 ```json
 {
-  "task": "task-name",        // Just the task name, NO path, NO .md extension
+  "task": "task-name", // Just the task name, NO path, NO .md extension
   "branch": "feature/branch", // Git branch (NOT "branch_name")
-  "services": ["service1"],   // Array of affected services/modules
-  "updated": "2025-08-27"     // Current date in YYYY-MM-DD format
+  "services": ["service1"], // Array of affected services/modules
+  "updated": "2025-08-27" // Current date in YYYY-MM-DD format
 }
 ```
 
 **Common mistakes to avoid:**
+
 - ❌ Using `"task_file"` instead of `"task"`
-- ❌ Using `"branch_name"` instead of `"branch"`  
+- ❌ Using `"branch_name"` instead of `"branch"`
 - ❌ Including path like `"tasks/m-task.md"`
 - ❌ Including `.md` file extension
 
@@ -47,7 +52,8 @@ git branch --show-current             # Current branch/task
 You have specialized subagents for heavy lifting. Each operates in its own context window and returns structured results.
 
 ### Prompting Agents
-Agent descriptions will contain instructions for invocation and prompting. In general, it is safer to issue lightweight prompts. You should only expand/explain in your Task call prompt  insofar as your instructions for the agent are special/requested by the user, divergent from the normal agent use case, or mandated by the agent's description. Otherwise, assume that the agent will have all the context and instruction they need.
+
+Agent descriptions will contain instructions for invocation and prompting. In general, it is safer to issue lightweight prompts. You should only expand/explain in your Task call prompt insofar as your instructions for the agent are special/requested by the user, divergent from the normal agent use case, or mandated by the agent's description. Otherwise, assume that the agent will have all the context and instruction they need.
 
 Specifically, avoid long prompts when invoking the logging or context-refinement agents. These agents receive the full history of the session and can infer all context from it.
 
@@ -71,6 +77,7 @@ Specifically, avoid long prompts when invoking the logging or context-refinement
    - Use when: After service changes
 
 ### Agent Principles
+
 - **Delegate heavy work** - Let agents handle file-heavy operations
 - **Be specific** - Give agents clear context and goals
 - **One agent, one job** - Don't combine responsibilities
@@ -78,19 +85,23 @@ Specifically, avoid long prompts when invoking the logging or context-refinement
 ## Code Philosophy
 
 ### Locality of Behavior
+
 - Keep related code close together rather than over-abstracting
 - Code that relates to a process should be near that process
 - Functions that serve as interfaces to data structures should live with those structures
 
 ### Solve Today's Problems
+
 - Deal with local problems that exist today
 - Avoid excessive abstraction for hypothetical future problems
 
 ### Minimal Abstraction
+
 - Prefer simple function calls over complex inheritance hierarchies
 - Just calling a function is cleaner than complex inheritance scenarios
 
 ### Readability > Cleverness
+
 - Code should be obvious and easy to follow
 - Same structure in every file reduces cognitive load
 
@@ -119,7 +130,7 @@ These protocols guide specific workflows:
    - EXPLICIT: "create a new task", "let's make a task for X"
    - VAGUE: "we should track this", "might need a task for that"
 
-2. **sessions/protocols/task-startup.md** - Beginning work on existing tasks  
+2. **sessions/protocols/task-startup.md** - Beginning work on existing tasks
    - EXPLICIT: "switch to task X", "let's work on task Y"
    - VAGUE: "maybe we should look at the other thing"
 
@@ -134,10 +145,12 @@ These protocols guide specific workflows:
 ### Behavioral Examples
 
 **Explicit → Read and execute:**
+
 - User: "Let's complete this task"
 - You: [Read task-completion.md first] → "I'll complete the task now. Running the logging agent..."
 
 **Vague → Confirm before reading:**
+
 - User: "I think we might be done here"
 - You: "Would you like me to run the task completion protocol?"
 - User: "Yes"

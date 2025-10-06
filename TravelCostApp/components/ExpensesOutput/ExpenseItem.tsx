@@ -1,37 +1,48 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import * as Haptics from "expo-haptics";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { DateTime } from "luxon";
+import PropTypes from "prop-types";
 import {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  FlatList,
   Platform,
   Pressable,
   StyleSheet,
   Text,
   View,
-  FlatList,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import PropTypes from "prop-types";
 
 import { GlobalStyles } from "../../constants/styles";
-import { isToday, toShortFormat } from "../../util/date";
-import { Ionicons } from "@expo/vector-icons";
-import { Category, getCatSymbolMMKV } from "../../util/category";
-import { useContext, useCallback, useState, useMemo, memo } from "react";
 import { TripContext } from "../../store/trip-context";
+import { RootNavigationProp } from "../../types/navigation";
+
+import { Category, getCatSymbolMMKV } from "../../util/category";
+import { isToday, toShortFormat } from "../../util/date";
+
+import { ExpenseData } from "../../util/expense";
+import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { formatExpenseWithCurrency } from "../../util/string";
-import React from "react";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
-import { DateTime } from "luxon";
+
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 import { UserContext } from "../../store/user-context";
+
 import ExpenseCountryFlag from "./ExpenseCountryFlag";
-import { SettingsContext } from "../../store/settings-context";
-import { useEffect } from "react";
-import * as Haptics from "expo-haptics";
-import { ExpenseData } from "../../util/expense";
-import { useRef } from "react";
-import { constantScale, dynamicScale } from "../../util/scalingUtil";
+
 import { OrientationContext } from "../../store/orientation-context";
+import { SettingsContext } from "../../store/settings-context";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -58,7 +69,7 @@ function ExpenseItem(props): JSX.Element {
     isSpecialExpense,
   }: ExpenseData = props;
   let { date } = props;
-  const navigation = useNavigation();
+  const navigation = useNavigation<RootNavigationProp>();
   const { tripCurrency } = useContext(TripContext);
   const { periodName, catIconNames } = useContext(UserContext);
   const rate = calcAmount / amount;
@@ -87,7 +98,7 @@ function ExpenseItem(props): JSX.Element {
     let tempCalcSum = 0;
     let tempSum = 0;
 
-    splitList.forEach((split) => {
+    splitList.forEach(split => {
       if (split.userName === showSumForTravellerName) {
         tempCalcSum += Number(split.amount) * rate;
         tempSum += Number(split.amount);
@@ -172,9 +183,7 @@ function ExpenseItem(props): JSX.Element {
     [sameCurrency, amountString, hideSpecial]
   );
 
-  const splitListHasNonZeroEntries = splitList?.some(
-    (item) => item.amount !== 0
-  );
+  const splitListHasNonZeroEntries = splitList?.some(item => item.amount !== 0);
   const islongListOrNull =
     splitList && splitList?.length > 3 && splitListHasNonZeroEntries
       ? splitList.slice(0, 2)
@@ -229,7 +238,7 @@ function ExpenseItem(props): JSX.Element {
               );
             }}
             contentContainerStyle={styles.avatarContainer}
-            keyExtractor={(item) => {
+            keyExtractor={item => {
               return item.userName;
             }}
           ></FlatList>
@@ -302,7 +311,7 @@ function ExpenseItem(props): JSX.Element {
             style={[styles.iconContainer, { height: constantScale(44, 0.5) }]}
           >
             <Ionicons
-              name={catSymbol}
+              name={catSymbol as any}
               size={IconSize}
               color={
                 hideSpecial
@@ -392,75 +401,38 @@ ExpenseItem.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  pressed: {
-    opacity: 0.75,
-  },
-  expenseItem: {
-    borderColor: "black",
-    paddingRight: 0,
-    marginLeft: 0,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  textBase: {
-    marginTop: dynamicScale(2, true),
-    marginLeft: dynamicScale(4),
-    color: GlobalStyles.colors.textColor,
-  },
-  description: {
-    fontStyle: "italic",
-    fontWeight: "300",
-    fontSize: dynamicScale(15, false, 0.5),
-    zIndex: 2,
-  },
-  secondaryText: {
-    color: GlobalStyles.colors.gray700,
-    fontSize: dynamicScale(13, false, 0.5),
-    zIndex: 1,
-  },
-  iconContainer: {
-    marginTop: dynamicScale(4, true),
-    marginRight: dynamicScale(8),
-    marginLeft: 0,
-  },
-  leftItem: {
-    flex: 1,
-    height: constantScale(40, 0.5),
-    alignContent: "flex-start",
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
-  },
   amountContainer: {
+    alignItems: "center",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: 4,
+    height: constantScale(40, 0.5),
+    justifyContent: "center",
     paddingHorizontal: dynamicScale(4),
     paddingVertical: 0,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 4,
     width: constantScale(150, 0.5),
-    height: constantScale(40, 0.5),
   },
   amountText: {
-    textAlign: "center",
+    color: GlobalStyles.colors.error300,
     fontSize: dynamicScale(20, false, 0.5),
     fontWeight: "300",
-    color: GlobalStyles.colors.error300,
-  },
-
-  originalCurrencyText: {
-    fontSize: dynamicScale(12, false, 0.5),
     textAlign: "center",
-    fontWeight: "300",
   },
-  countryFlagContainer: {
-    marginRight: dynamicScale(4),
-    height: constantScale(40),
-    width: constantScale(50),
-  },
-  countryFlag: {
-    marginTop: dynamicScale(3, true),
-    // marginRight: 12,
+  avatar: {
+    alignItems: "center",
+    backgroundColor: GlobalStyles.colors.gray500,
+    borderColor: GlobalStyles.colors.primaryGrayed,
+    borderRadius: 60,
+    borderWidth: dynamicScale(1, false, 0.5),
+    height: constantScale(20, 0.5),
+    justifyContent: "center",
+    marginRight: dynamicScale(-6),
+    width: constantScale(20, 0.5),
+    ...Platform.select({
+      android: {
+        minHeight: constantScale(20, 0.5),
+        minWidth: constantScale(20, 0.5),
+      },
+    }),
   },
   avatarContainer: {
     padding: dynamicScale(4),
@@ -470,30 +442,67 @@ const styles = StyleSheet.create({
     height: constantScale(30, 1),
     width: constantScale(55),
   },
-  avatar: {
-    marginRight: dynamicScale(-6),
-    height: constantScale(20, 0.5),
-    width: constantScale(20, 0.5),
-    borderRadius: 60,
-    borderWidth: dynamicScale(1, false, 0.5),
-    borderColor: GlobalStyles.colors.primaryGrayed,
-    backgroundColor: GlobalStyles.colors.gray500,
-    alignItems: "center",
-    justifyContent: "center",
-    ...Platform.select({
-      android: {
-        minHeight: constantScale(20, 0.5),
-        minWidth: constantScale(20, 0.5),
-      },
-    }),
-  },
   avatarPaid: {
     // borderWidth: 2,
     borderColor: GlobalStyles.colors.primary700,
   },
   avatarText: {
+    color: GlobalStyles.colors.primary700,
     fontSize: dynamicScale(14, false, 0.5),
     fontWeight: "bold",
-    color: GlobalStyles.colors.primary700,
+  },
+  countryFlag: {
+    marginTop: dynamicScale(3, true),
+    // marginRight: 12,
+  },
+  countryFlagContainer: {
+    height: constantScale(40),
+    marginRight: dynamicScale(4),
+    width: constantScale(50),
+  },
+  description: {
+    fontSize: dynamicScale(15, false, 0.5),
+    fontStyle: "italic",
+    fontWeight: "300",
+    zIndex: 2,
+  },
+
+  expenseItem: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderColor: "black",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginLeft: 0,
+    paddingRight: 0,
+  },
+  iconContainer: {
+    marginLeft: 0,
+    marginRight: dynamicScale(8),
+    marginTop: dynamicScale(4, true),
+  },
+  leftItem: {
+    alignContent: "flex-start",
+    alignItems: "flex-start",
+    flex: 1,
+    height: constantScale(40, 0.5),
+    justifyContent: "flex-start",
+  },
+  originalCurrencyText: {
+    fontSize: dynamicScale(12, false, 0.5),
+    fontWeight: "300",
+    textAlign: "center",
+  },
+  pressed: {
+    opacity: 0.75,
+  },
+  secondaryText: {
+    color: GlobalStyles.colors.gray700,
+    fontSize: dynamicScale(13, false, 0.5),
+    zIndex: 1,
+  },
+  textBase: {
+    color: GlobalStyles.colors.textColor,
+    marginLeft: dynamicScale(4),
+    marginTop: dynamicScale(2, true),
   },
 });

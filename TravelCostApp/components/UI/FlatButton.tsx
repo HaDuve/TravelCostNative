@@ -1,12 +1,22 @@
-import React, { Pressable, StyleSheet, Text, View } from "react-native";
+import PropTypes from "prop-types";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
-import PropTypes from "prop-types";
+import { ButtonProps } from "../../types/components";
 
-function FlatButton({ children, onPress, textStyle }) {
+function FlatButton({
+  children,
+  onPress,
+  textStyle = {},
+  buttonStyle = {},
+}: ButtonProps) {
   return (
     <Pressable
-      style={({ pressed }) => [styles.button, pressed && GlobalStyles.pressed]}
+      style={({ pressed }) => [
+        styles.button,
+        buttonStyle,
+        pressed && GlobalStyles.pressed,
+      ]}
       onPress={onPress}
     >
       <View>

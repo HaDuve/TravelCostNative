@@ -1,20 +1,18 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  Alert,
-  Platform,
-  ViewStyle,
-} from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
-import Markdown, { MarkdownProps } from "react-native-markdown-display";
-import React, { useContext, useEffect } from "react";
-import PropTypes from "prop-types";
-import FlatButton from "../components/UI/FlatButton";
-//Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
+import PropTypes from "prop-types";
+import React, { useContext, useEffect } from "react";
+import { StyleSheet, Text, View, ScrollView, Alert, Image } from "react-native";
+import Markdown, { MarkdownProps } from "react-native-markdown-display";
+import Animated, { FadeInUp } from "react-native-reanimated";
+import Toast from "react-native-toast-message";
+
+import FlatButton from "../components/UI/FlatButton";
+
+//Localization
+
+import InfoButton from "../components/UI/InfoButton";
+import { GlobalStyles } from "../constants/styles";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
@@ -24,19 +22,14 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
+import { NetworkContext } from "../store/network-context";
 import {
   getChatGPT_Response,
   GPT_RequestType,
   GPT_getGoodDeal,
   GPT_getPrice,
 } from "../util/chatGPTrequest";
-import { GlobalStyles } from "../constants/styles";
-import { Image } from "react-native";
-import InfoButton from "../components/UI/InfoButton";
-import GradientButton from "../components/UI/GradientButton";
 import { dynamicScale } from "../util/scalingUtil";
-import { NetworkContext } from "../store/network-context";
-import Toast from "react-native-toast-message";
 import { trackEvent, VexoEvents } from "../util/vexo-tracking";
 
 const GPTDealScreen = ({ route, navigation }) => {
@@ -140,22 +133,22 @@ const GPTDealScreen = ({ route, navigation }) => {
         try {
           const getPrice: GPT_getPrice = {
             requestType: GPT_RequestType.getPrice,
-            product: product,
-            currency: currency,
-            country: country,
+            product,
+            currency,
+            country,
           };
 
           const response = await getChatGPT_Response(getPrice, setLoadingPhase);
           if (response) {
             setAnswer(response.content);
             startStreaming(response.content);
-            
+
             // Track GPT price lookup usage
             trackEvent(VexoEvents.GPT_RECOMMENDATION_USED, {
-              requestType: 'getPrice',
-              product: product,
-              currency: currency,
-              country: country
+              requestType: "getPrice",
+              product,
+              currency,
+              country,
             });
           }
         } catch (error) {
@@ -173,24 +166,24 @@ const GPTDealScreen = ({ route, navigation }) => {
       try {
         const goodDeal: GPT_getGoodDeal = {
           requestType: GPT_RequestType.getGoodDeal,
-          product: product,
-          price: price,
-          currency: currency,
-          country: country,
+          product,
+          price,
+          currency,
+          country,
         };
 
         const response = await getChatGPT_Response(goodDeal, setLoadingPhase);
         if (response && response.content) {
           setAnswer(response.content);
           startStreaming(response.content);
-          
+
           // Track GPT deal recommendation usage
           trackEvent(VexoEvents.GPT_RECOMMENDATION_USED, {
-            requestType: 'getGoodDeal',
-            product: product,
-            price: price,
-            currency: currency,
-            country: country
+            requestType: "getGoodDeal",
+            product,
+            price,
+            currency,
+            country,
           });
         }
       } catch (error) {
@@ -216,10 +209,10 @@ const GPTDealScreen = ({ route, navigation }) => {
     getGPT_Response();
   }, [country, currency, price, product, answer]);
 
-  const startStreaming = (content) => {
+  const startStreaming = content => {
     console.log("startStreaming ~ content:", content);
     // Split content into chapters/sections by double newlines
-    const sections = content.split(/\n\s*\n/).filter((section) => {
+    const sections = content.split(/\n\s*\n/).filter(section => {
       const trimmed = section.trim();
       // Filter out empty sections, sections with only punctuation, or very short content
       return (
@@ -234,7 +227,7 @@ const GPTDealScreen = ({ route, navigation }) => {
       setTimeout(() => {
         // Clean each section and preserve single line breaks within chapters
         const cleanSection = section.trim();
-        setStreamingBubbles((prev) => [...prev, cleanSection]);
+        setStreamingBubbles(prev => [...prev, cleanSection]);
         if (index === sections.length - 1) {
           setIsStreaming(false);
         }
@@ -251,10 +244,10 @@ const GPTDealScreen = ({ route, navigation }) => {
     try {
       const goodDeal: GPT_getGoodDeal = {
         requestType: GPT_RequestType.getGoodDeal,
-        product: product,
-        price: price,
-        currency: currency,
-        country: country,
+        product,
+        price,
+        currency,
+        country,
       };
 
       const response = await getChatGPT_Response(goodDeal, setLoadingPhase);
@@ -344,8 +337,8 @@ const GPTDealScreen = ({ route, navigation }) => {
                     {loadingPhase === "searching"
                       ? i18n.t("gptSearchingWeb")
                       : loadingPhase === "analyzing"
-                      ? i18n.t("gptAnalyzingData")
-                      : i18n.t("askingChatGpt")}
+                        ? i18n.t("gptAnalyzingData")
+                        : i18n.t("askingChatGpt")}
                   </Text>
                 </View>
               </View>
@@ -386,112 +379,26 @@ GPTDealScreen.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  image: {
-    width: dynamicScale(60, false, 0.5),
-    height: dynamicScale(60, false, 0.5),
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: dynamicScale(4, false, 0.5),
-    paddingTop: dynamicScale(8, false, 0.5),
-  },
-  headerContainer: {
-    flex: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  answerContainer: {
-    flex: 4,
-    margin: dynamicScale(4, false, 0.5),
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: GlobalStyles.colors.primaryGrayed,
-  },
-  loadingContainer: {
-    margin: dynamicScale(20, false, 0.5),
-    flex: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  titleText: {
-    marginTop: dynamicScale(4, false, 0.5),
-    fontSize: dynamicScale(24, false, 0.5),
-    fontWeight: "bold",
-    color: GlobalStyles.colors.textColor,
-  },
-  contentContainer: {
-    width: "90%",
-    height: "80%",
-  },
-  answerText: {
-    padding: dynamicScale(20, false, 0.5),
-    fontSize: dynamicScale(16, false, 0.5),
-    fontWeight: "300",
-    fontStyle: "italic",
-    marginHorizontal: dynamicScale(20, false, 0.5),
-    color: GlobalStyles.colors.textColor,
-  },
-  buttonContainer: {
-    flex: 0.5,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    alignItems: "center",
-  },
-  chatContainer: {
-    // padding: dynamicScale(4, false, 0.5),
-    paddingVertical: dynamicScale(8, true),
-    paddingBottom: dynamicScale(200, true), // Add extra padding at bottom for button container
-    flexGrow: 1,
-  },
-  userBubbleContainer: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginBottom: dynamicScale(12, true),
-  },
-  userBubble: {
-    backgroundColor: GlobalStyles.colors.primary500,
-    borderRadius: dynamicScale(20, false, 0.5),
-    paddingHorizontal: dynamicScale(16, false, 0.5),
-    paddingVertical: dynamicScale(8, true),
-    maxWidth: "80%",
-    borderBottomRightRadius: 2,
-  },
-  userBubbleText: {
-    color: GlobalStyles.colors.backgroundColor,
-    fontSize: dynamicScale(16, false, 0.3),
-    fontWeight: "300",
-    lineHeight: dynamicScale(20, true),
-  },
-  aiBubbleContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: dynamicScale(12, true),
-  },
   aiAvatar: {
-    width: dynamicScale(24, false, 0.5),
-    height: dynamicScale(24, false, 0.5),
     borderRadius: dynamicScale(12, false, 0.5),
+    height: dynamicScale(24, false, 0.5),
     marginRight: dynamicScale(8, false, 0.5),
     marginTop: dynamicScale(4, true),
+    width: dynamicScale(24, false, 0.5),
   },
   aiBubble: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: dynamicScale(20, false, 0.5),
-    paddingHorizontal: dynamicScale(16, false, 0.5),
-    maxWidth: "80%",
     borderBottomLeftRadius: 2,
-    borderWidth: 1,
     borderColor: GlobalStyles.colors.primaryGrayed,
+    borderRadius: dynamicScale(20, false, 0.5),
+    borderWidth: 1,
+    maxWidth: "80%",
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+  },
+  aiBubbleContainer: {
+    alignItems: "flex-start",
+    flexDirection: "row",
+    marginBottom: dynamicScale(12, true),
   },
   aiBubbleText: {
     color: GlobalStyles.colors.textColor,
@@ -499,20 +406,106 @@ const styles = StyleSheet.create({
     fontWeight: "300",
     lineHeight: dynamicScale(20, true),
   },
+  answerContainer: {
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderColor: GlobalStyles.colors.primaryGrayed,
+    borderWidth: 1,
+    flex: 4,
+    justifyContent: "center",
+    margin: dynamicScale(4, false, 0.5),
+  },
+  answerText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(16, false, 0.5),
+    fontStyle: "italic",
+    fontWeight: "300",
+    marginHorizontal: dynamicScale(20, false, 0.5),
+    padding: dynamicScale(20, false, 0.5),
+  },
+  buttonContainer: {
+    alignItems: "center",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    flex: 0.5,
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  chatContainer: {
+    // padding: dynamicScale(4, false, 0.5),
+    paddingVertical: dynamicScale(8, true),
+    paddingBottom: dynamicScale(200, true), // Add extra padding at bottom for button container
+    flexGrow: 1,
+  },
+  container: {
+    alignItems: "center",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    flex: 1,
+    justifyContent: "center",
+  },
+  contentContainer: {
+    height: "80%",
+    width: "90%",
+  },
+  headerContainer: {
+    alignItems: "center",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    flex: 1,
+    justifyContent: "center",
+  },
+  image: {
+    alignItems: "center",
+    height: dynamicScale(60, false, 0.5),
+    justifyContent: "center",
+    marginBottom: dynamicScale(4, false, 0.5),
+    paddingTop: dynamicScale(8, false, 0.5),
+    width: dynamicScale(60, false, 0.5),
+  },
+  loadingContainer: {
+    alignItems: "center",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    flex: 1,
+    justifyContent: "center",
+    margin: dynamicScale(20, false, 0.5),
+  },
+  titleText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(24, false, 0.5),
+    fontWeight: "bold",
+    marginTop: dynamicScale(4, false, 0.5),
+  },
   typingBubble: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderBottomLeftRadius: 2,
+    borderColor: GlobalStyles.colors.primaryGrayed,
     borderRadius: dynamicScale(20, false, 0.5),
+    borderWidth: 1,
+    maxWidth: "80%",
     paddingHorizontal: dynamicScale(16, false, 0.5),
     paddingVertical: dynamicScale(12, true),
-    maxWidth: "80%",
-    borderBottomLeftRadius: 2,
-    borderWidth: 1,
-    borderColor: GlobalStyles.colors.primaryGrayed,
   },
   typingText: {
     color: GlobalStyles.colors.gray700,
     fontSize: dynamicScale(16, false, 0.3),
     fontWeight: "300",
     textAlign: "center",
+  },
+  userBubble: {
+    backgroundColor: GlobalStyles.colors.primary500,
+    borderBottomRightRadius: 2,
+    borderRadius: dynamicScale(20, false, 0.5),
+    maxWidth: "80%",
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+    paddingVertical: dynamicScale(8, true),
+  },
+  userBubbleContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginBottom: dynamicScale(12, true),
+  },
+  userBubbleText: {
+    color: GlobalStyles.colors.backgroundColor,
+    fontSize: dynamicScale(16, false, 0.3),
+    fontWeight: "300",
+    lineHeight: dynamicScale(20, true),
   },
 });

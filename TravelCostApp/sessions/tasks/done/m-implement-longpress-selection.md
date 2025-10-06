@@ -9,9 +9,11 @@ modules: [components/ExpenseList, components/ExpenseItem]
 # Add Longpress Multiple Selection for Expense Items
 
 ## Problem/Goal
+
 Need to add longpress functionality that marks expense items for multiple select in the expense list, enabling batch operations on expenses.
 
 ## Success Criteria
+
 - [ ] Implement longpress gesture detection on expense items
 - [ ] Add visual indication for selected expense items
 - [ ] Enable multiple selection mode when longpress is triggered
@@ -32,6 +34,7 @@ When a user long presses on any expense item in the list, the gesture triggers t
 Once selection mode is activated, the `ExpensesList` component undergoes several visual and functional transformations:
 
 **Selection Mode State Management (ExpensesList.tsx:104-105):**
+
 - `selectable` boolean state controls whether the list is in selection mode
 - `selected` string array tracks the IDs of currently selected expense items
 - These states are managed through `useState` hooks and passed down to child components
@@ -142,7 +145,7 @@ interface ExpenseData {
 type SelectionState = {
   selectable: boolean;
   selected: string[]; // Array of expense IDs
-}
+};
 ```
 
 #### Gesture Configuration
@@ -175,7 +178,9 @@ const selectableJSX = (
     }}
   >
     <IconButton
-      icon={selected.includes(itemId) ? "ios-checkmark-circle" : "ellipse-outline"}
+      icon={
+        selected.includes(itemId) ? "ios-checkmark-circle" : "ellipse-outline"
+      }
       color={selected.includes(itemId) ? textColor : gray700}
     />
   </Animated.View>
@@ -193,7 +198,9 @@ const selectableJSX = (
 - **Batch operations**: ExpensesList.tsx lines 507-715
 
 ## User Notes
+
 Add longpress marks expense item für multiple select (in expenseList).
 
 ## Work Log
+
 - [2025-09-18] Created task

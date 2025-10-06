@@ -9,9 +9,11 @@ modules: [expense-templates, gesture-handling, expense-management]
 # Fix Expense Template Long Press
 
 ## Problem/Goal
+
 Users cannot add expenses via template using long press functionality. The template-based expense creation feature has stopped working.
 
 ## Success Criteria
+
 - [x] Long press on expense templates successfully creates new expenses
 - [x] Template data properly populates the expense form
 - [x] Gesture recognition works consistently across devices
@@ -30,7 +32,7 @@ When a user long presses the circular "+" Add Expense Button (`AddExpenseButton.
 Once `longPressed` is true AND there are available `lastExpenses` (line 268 condition), the component renders a templated expense overlay instead of the normal button. This overlay uses:
 
 - **Gesture Detection**: A `GestureDetector` with `panGesture` allows users to swipe down to dismiss the overlay
-- **Animation**: `SlideInDown.duration(600)` for entrance and `SlideOutDown` for exit animations  
+- **Animation**: `SlideInDown.duration(600)` for entrance and `SlideOutDown` for exit animations
 - **Template Data Sources**: Two primary sources feed the template system:
   1. `topDuplicates` from `findMostDuplicatedDescriptionExpenses()` - finds the 3 most frequently used expense descriptions
   2. `lastExpenses` - recent expenses sorted by `editedTimestamp` and filtered for uniqueness by description
@@ -40,7 +42,8 @@ The template data is combined into `topTemplateExpenses` array (lines 68-74), wh
 **Template Expense Rendering:**
 
 Each template expense is rendered via `renderExpenseTemplates` function (lines 95-168) which:
-- Shows category sections ("Most Used Expenses" vs "Last Used Expenses")  
+
+- Shows category sections ("Most Used Expenses" vs "Last Used Expenses")
 - Creates pressable template items with category icon, truncated description, and formatted amount
 - When pressed, manipulates the expense data by:
   - Setting date to current date (`new Date().toISOString()`)
@@ -50,6 +53,7 @@ Each template expense is rendered via `renderExpenseTemplates` function (lines 9
 **Navigation Flow:**
 
 The template selection navigates to `ManageExpense` screen with:
+
 ```javascript
 navigation.navigate("ManageExpense", {
   pickedCat: data.category,
@@ -62,14 +66,16 @@ The `ManageExpense` screen (line 53) extracts `tempValues` from route params and
 **Critical Dependencies:**
 
 The template system requires several conditions to function:
+
 1. `valid.current` must be true (requires `tripCtx.tripid`, `authCtx.uid`, and `tripCtx.travellers?.length > 0`)
-2. `lastExpenses` must exist and have length > 0  
+2. `lastExpenses` must exist and have length > 0
 3. The expense context must contain historical expense data for template generation
 4. Navigation stack must properly handle the ManageExpense route with tempValues
 
 **State Management:**
 
 The component manages several interconnected states:
+
 - `longPressed`: Controls overlay visibility
 - `lastExpensesNumber`: Controls pagination (starts at 20, increases by 20 on scroll end)
 - `valid`: Validation state for required contexts
@@ -80,6 +86,7 @@ The component manages several interconnected states:
 Since users cannot add expenses via template using long press, the issue likely stems from one of these integration points:
 
 **Potential Failure Points:**
+
 1. **Validation Issues**: The `valid.current` check might be failing due to missing or delayed context data (tripCtx.tripid, authCtx.uid, or travellers)
 2. **Navigation Parameters**: The `tempValues` might not be properly passed or processed between AddExpenseButton → ManageExpense → ExpenseForm
 3. **Data Transformation**: The template expense data manipulation (clearing IDs, setting dates) might be corrupting the data structure
@@ -96,17 +103,20 @@ The validation logic has retry mechanisms (lines 170-229) that attempt to valida
 
 ```typescript
 // Template rendering function
-const renderExpenseTemplates = ({ item, index }) => JSX.Element
+const renderExpenseTemplates = ({ item, index }) => JSX.Element;
 
 // Template data processing
-const topDuplicates = findMostDuplicatedDescriptionExpenses(expCtx.expenses)
-const lastExpenses: ExpenseData[] = uniqBy(expenses.sort((a, b) => b.editedTimestamp - a.editedTimestamp), "description")
+const topDuplicates = findMostDuplicatedDescriptionExpenses(expCtx.expenses);
+const lastExpenses: ExpenseData[] = uniqBy(
+  expenses.sort((a, b) => b.editedTimestamp - a.editedTimestamp),
+  "description"
+);
 
 // Navigation call
 navigation.navigate("ManageExpense", {
   pickedCat: string,
   tempValues: ExpenseData,
-})
+});
 ```
 
 #### Data Structures
@@ -129,16 +139,17 @@ interface ExpenseData {
 #### Validation Requirements
 
 ```javascript
-valid.current = tripCtx.tripid && 
-                authCtx.uid && 
-                tripCtx.travellers && 
-                tripCtx.travellers?.length > 0;
+valid.current =
+  tripCtx.tripid &&
+  authCtx.uid &&
+  tripCtx.travellers &&
+  tripCtx.travellers?.length > 0;
 ```
 
 #### File Locations
 
 - Main template implementation: `/components/ManageExpense/AddExpenseButton.tsx`
-- Navigation target: `/screens/ManageExpense.tsx`  
+- Navigation target: `/screens/ManageExpense.tsx`
 - Form implementation: `/components/ManageExpense/ExpenseForm.tsx`
 - Expense utilities: `/util/expense.ts`
 - Template data processing: Lines 57-74 in AddExpenseButton.tsx
@@ -146,6 +157,7 @@ valid.current = tripCtx.tripid &&
 - Template overlay render: Lines 268-311 in AddExpenseButton.tsx
 
 ## User Notes
+
 FIX: check why we cant add expenses via template (longpress) anymore
 
 ## Work Log
@@ -166,6 +178,7 @@ The fix implemented for the category flow also resolved the template long press 
 3. **Navigation Flow**: The improved navigation parameter handling works for both flows
 
 **Files Modified:**
+
 - `/components/ManageExpense/ExpenseForm.tsx` - Added state restoration logic that works for both category and template flows
 - `/screens/ManageExpense.tsx` - Improved parameter handling
 - `/screens/CategoryPickScreen.tsx` - Fixed navigation parameters

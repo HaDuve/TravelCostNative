@@ -105,7 +105,7 @@ echo 'Fix issue #$ARGUMENTS following our coding standards' > .claude/commands/f
 
 #### Bash command execution
 
-Execute bash commands before the slash command runs using the `!` prefix. The output is included in the command context. You *must* include `allowed-tools` with the `Bash` tool, but you can choose the specific bash commands to allow.
+Execute bash commands before the slash command runs using the `!` prefix. The output is included in the command context. You _must_ include `allowed-tools` with the `Bash` tool, but you can choose the specific bash commands to allow.
 
 For example:
 
@@ -151,12 +151,12 @@ Slash commands can trigger extended thinking by including [extended thinking key
 
 Command files support frontmatter, useful for specifying metadata about the command:
 
-\| Frontmatter     | Purpose                                                                            | Default                             |
+\| Frontmatter | Purpose | Default |
 \| :-------------- | :--------------------------------------------------------------------------------- | :---------------------------------- | ----------------------------------------------------------------------------- | ---- |
-\| `allowed-tools` | List of tools the command can use                                                  | Inherits from the conversation      |
+\| `allowed-tools` | List of tools the command can use | Inherits from the conversation |
 \| `argument-hint` | The arguments expected for the slash command. Example: `argument-hint: add [tagId] | remove [tagId]                      | list`. This hint is shown to the user when auto-completing the slash command. | None |
-\| `description`   | Brief description of the command                                                   | Uses the first line from the prompt |
-\| `model`         | `opus`, `sonnet`, `haiku`, or a specific model string                              | Inherits from the conversation      |
+\| `description` | Brief description of the command | Uses the first line from the prompt |
+\| `model` | `opus`, `sonnet`, `haiku`, or a specific model string | Inherits from the conversation |
 
 For example:
 
@@ -189,9 +189,9 @@ MCP commands follow the pattern:
 
 MCP commands are automatically available when:
 
-* An MCP server is connected and active
-* The server exposes prompts through the MCP protocol
-* The prompts are successfully retrieved during connection
+- An MCP server is connected and active
+- The server exposes prompts through the MCP protocol
+- The prompts are successfully retrieved during connection
 
 #### Arguments
 
@@ -208,24 +208,23 @@ MCP prompts can accept arguments defined by the server:
 
 #### Naming conventions
 
-* Server and prompt names are normalized
-* Spaces and special characters become underscores
-* Names are lowercased for consistency
+- Server and prompt names are normalized
+- Spaces and special characters become underscores
+- Names are lowercased for consistency
 
 ### Managing MCP connections
 
 Use the `/mcp` command to:
 
-* View all configured MCP servers
-* Check connection status
-* Authenticate with OAuth-enabled servers
-* Clear authentication tokens
-* View available tools and prompts from each server
+- View all configured MCP servers
+- Check connection status
+- Authenticate with OAuth-enabled servers
+- Clear authentication tokens
+- View available tools and prompts from each server
 
 ## See also
 
-* [Interactive mode](/en/docs/claude-code/interactive-mode) - Shortcuts, input modes, and interactive features
-* [CLI reference](/en/docs/claude-code/cli-reference) - Command-line flags and options
-* [Settings](/en/docs/claude-code/settings) - Configuration options
-* [Memory management](/en/docs/claude-code/memory) - Managing Claude's memory across sessions
-
+- [Interactive mode](/en/docs/claude-code/interactive-mode) - Shortcuts, input modes, and interactive features
+- [CLI reference](/en/docs/claude-code/cli-reference) - Command-line flags and options
+- [Settings](/en/docs/claude-code/settings) - Configuration options
+- [Memory management](/en/docs/claude-code/memory) - Managing Claude's memory across sessions

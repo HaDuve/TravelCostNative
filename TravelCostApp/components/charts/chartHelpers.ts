@@ -123,7 +123,7 @@ export const generateHTMLTemplate = (
               labels: {
                 formatter: function() {
                   return this.value + '${
-                    options.currency ? " " + options.currency : ""
+                    options.currency ? ` ${options.currency}` : ""
                   }';
                 }
               }
@@ -157,7 +157,7 @@ export const generateHTMLTemplate = (
                   },
                   formatter: function() {
                     return this.y.toFixed(2) + '${
-                      options.currency ? " " + options.currency : "€"
+                      options.currency ? ` ${options.currency}` : "€"
                     }';
                   }
                 }
@@ -242,7 +242,7 @@ export const generateHTMLTemplate = (
                       },
                       formatter: function() {
                         return this.y.toFixed(2) + '${
-                          options.currency ? " " + options.currency : "€"
+                          options.currency ? ` ${options.currency}` : "€"
                         }';
                       }
                     }
@@ -280,7 +280,7 @@ export const formatDataForHighcharts = (
       {
         name: "Data",
         colorByPoint: true,
-        data: data.map((item) => ({
+        data: data.map(item => ({
           name: item.label || item.x,
           y: item.y,
           color: item.color,
@@ -292,7 +292,7 @@ export const formatDataForHighcharts = (
   return [
     {
       name: "Series 1",
-      data: data.map((item) => ({
+      data: data.map(item => ({
         x: options.dateFormat ? new Date(item.x).getTime() : item.x,
         y: item.y,
         color: item.color,
@@ -313,7 +313,7 @@ export const createBarChartData = (
   series.push({
     name: "Expenses",
     type: "column",
-    data: data.map((item) => ({
+    data: data.map(item => ({
       x: item.x,
       y: item.y,
       color: item.color || colors?.primary,
@@ -332,10 +332,10 @@ export const createPieChartData = (data: ChartData[]): any[] => {
     {
       name: "Categories",
       colorByPoint: true,
-      data: data.map((item) => {
+      data: data.map(item => {
         const label = item.label || item.x;
         // Split label into category name and currency value
-        const parts = label.split(" ");
+        const parts = String(label).split(" ");
         const categoryName = parts[0];
         const currencyValue = parts.slice(1).join(" ");
 

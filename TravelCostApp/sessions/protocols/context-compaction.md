@@ -11,7 +11,7 @@ Before compacting, delegate to agents:
    - Logs work progress and updates task status
 
 2. **context-refinement agent** - Check for discoveries/drift
-   - Reads transcript files automatically  
+   - Reads transcript files automatically
    - Will update context ONLY if changes found
    - Skip if task is complete
 
@@ -26,6 +26,7 @@ Ensure that .claude/state/current_task.json contains the correct current task, b
 ## 3. Create Checkpoint
 
 Document the current state:
+
 - What was accomplished
 - What remains to be done
 - Any blockers or considerations

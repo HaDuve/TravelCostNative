@@ -9,9 +9,11 @@ modules: [database, store/trips-context, screens/manageTrips, backend/API]
 # Add Delete Trip Option
 
 ## Problem/Goal
+
 Users need the ability to delete trips. This requires careful database analysis and implementation to handle all data relationships and edge cases.
 
 ## Success Criteria
+
 - [ ] Analyze database schema to identify all trip-related data connections (expenses, categories, users, etc.)
 - [ ] Design deletion strategy (hard delete vs soft delete with deleted flag)
 - [ ] Implement database calls for trip deletion
@@ -24,14 +26,19 @@ Users need the ability to delete trips. This requires careful database analysis 
 - [ ] Test real-time updates for other users when trip is deleted
 
 ## Context Files
+
 <!-- Added by context-gathering agent or manually -->
 
 ## User Notes
+
 Important considerations:
+
 - If a trip had multiple users, everyone should automatically get updated on the trip deletion
 - Consider keeping tripId with deleted flag vs complete removal
 - After deleting last trip, user should see same UX as a fresh user (able to create new trip)
 
 ## Work Log
+
 <!-- Updated as work progresses -->
+
 - [2025-09-03] Created task for delete trip option implementation

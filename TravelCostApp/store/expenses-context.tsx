@@ -1,14 +1,17 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import uniqBy from "lodash.uniqby";
+import PropTypes from "prop-types";
 import React, { createContext, useEffect, useReducer } from "react";
+
+import { toDate, toDateString } from "../types/date";
 import {
   getDateMinusDays,
   getDatePlusDays,
   getPreviousMondayDate,
 } from "../util/date";
-import PropTypes from "prop-types";
 import { ExpenseData } from "../util/expense";
-import uniqBy from "lodash.uniqby";
+
 import { getMMKVObject, setMMKVObject } from "./mmkv";
 export enum RangeString {
   day = "day",
@@ -77,7 +80,7 @@ export type ExpenseContextType = {
   getSpecificWeekExpenses: (date: Date) => Array<ExpenseData>;
   getSpecificMonthExpenses: (date: Date) => Array<ExpenseData>;
   getSpecificYearExpenses: (date: Date) => Array<ExpenseData>;
-  loadExpensesFromStorage: (forceLoad?: boolean) => Promise<boolean>;
+  loadExpensesFromStorage: (forceLoad?: boolean) => Promise<void>;
   // Sync state management
   setIsSyncing: (syncing: boolean) => void;
 };
@@ -103,9 +106,9 @@ export const ExpensesContext = createContext({
     }: ExpenseData,
     id?: string
   ) => {},
-  setExpenses: (expenses) => {},
-  mergeExpenses: (newExpenses) => {},
-  deleteExpense: (id) => {},
+  setExpenses: expenses => {},
+  mergeExpenses: newExpenses => {},
+  deleteExpense: id => {},
   updateExpense: (
     id,
     {
@@ -123,7 +126,7 @@ export const ExpensesContext = createContext({
   getRecentExpenses: (rangestring: RangeString): Array<ExpenseData> => {
     return [];
   },
-  getYearlyExpenses: (yearsBack) => {
+  getYearlyExpenses: yearsBack => {
     // firstDay, lastDay, yearlyExpenses;
     return {
       firstDay: new Date(),
@@ -131,7 +134,7 @@ export const ExpensesContext = createContext({
       yearlyExpenses: [],
     };
   },
-  getMonthlyExpenses: (monthsBack) => {
+  getMonthlyExpenses: monthsBack => {
     // firstDay, lastDay, monthlyExpenses;
     return {
       firstDay: new Date(),
@@ -139,7 +142,7 @@ export const ExpensesContext = createContext({
       monthlyExpenses: [],
     };
   },
-  getWeeklyExpenses: (weeksBack) => {
+  getWeeklyExpenses: weeksBack => {
     // firstDay, lastDay, weeklyExpenses;
     return {
       firstDay: new Date(),
@@ -175,7 +178,7 @@ function expensesReducer(state: ExpenseData[], action) {
     case "SET": {
       const getSortedState = (data: ExpenseData[]) =>
         data.sort((a: ExpenseData, b: ExpenseData) => {
-          return Number(new Date(b.date)) - Number(new Date(a.date));
+          return Number(toDate(b.date)) - Number(toDate(a.date));
         });
 
       const sorted = uniqBy(getSortedState(action.payload), "id");
@@ -189,19 +192,19 @@ function expensesReducer(state: ExpenseData[], action) {
 
       // Create array of deleted expense IDs from sync results
       const deletedIds = newExpenses
-        .filter((expense) => expense.isDeleted === true)
-        .map((expense) => expense.id);
+        .filter(expense => expense.isDeleted === true)
+        .map(expense => expense.id);
 
       // Create a map of existing expenses by ID for quick lookup
       const existingExpensesMap = new Map();
-      state.forEach((expense) => {
+      state.forEach(expense => {
         existingExpensesMap.set(expense.id, expense);
       });
 
       // Merge new expenses with existing ones
       const mergedExpenses = [...state];
 
-      newExpenses.forEach((newExpense) => {
+      newExpenses.forEach(newExpense => {
         const existingExpense = existingExpensesMap.get(newExpense.id);
 
         if (existingExpense) {
@@ -216,7 +219,7 @@ function expensesReducer(state: ExpenseData[], action) {
           if (newTimestamp > existingTimestamp) {
             // Update existing expense with newer data
             const index = mergedExpenses.findIndex(
-              (exp) => exp.id === newExpense.id
+              exp => exp.id === newExpense.id
             );
             if (index !== -1) {
               mergedExpenses[index] = newExpense;
@@ -231,13 +234,13 @@ function expensesReducer(state: ExpenseData[], action) {
 
       // Filter out deleted expenses from the final set
       const filteredExpenses = mergedExpenses.filter(
-        (expense) => !deletedIds.includes(expense.id)
+        expense => !deletedIds.includes(expense.id)
       );
 
       // Sort by date (newest first) and remove duplicates
       const getSortedState = (data: ExpenseData[]) =>
         data.sort((a: ExpenseData, b: ExpenseData) => {
-          return Number(new Date(b.date)) - Number(new Date(a.date));
+          return Number(toDate(b.date)) - Number(toDate(a.date));
         });
 
       const sorted = uniqBy(getSortedState(filteredExpenses), "id");
@@ -245,7 +248,7 @@ function expensesReducer(state: ExpenseData[], action) {
     }
     case "UPDATE": {
       const updatableExpenseIndex = state.findIndex(
-        (expense) => expense.id === action.payload.id
+        expense => expense.id === action.payload.id
       );
       const updatableExpense = state[updatableExpenseIndex];
       const updatedItem = { ...updatableExpense, ...action.payload.data };
@@ -254,7 +257,7 @@ function expensesReducer(state: ExpenseData[], action) {
       return updatedExpenses;
     }
     case "DELETE":
-      return state.filter((expense) => expense.id !== action.payload);
+      return state.filter(expense => expense.id !== action.payload);
     default:
       return state;
   }
@@ -302,7 +305,7 @@ function ExpensesContextProvider({ children }) {
   }
 
   function updateExpense(id: string, expenseData: ExpenseData) {
-    dispatch({ type: "UPDATE", payload: { id: id, data: expenseData } });
+    dispatch({ type: "UPDATE", payload: { id, data: expenseData } });
   }
 
   function getRecentExpenses(rangestring: RangeString) {
@@ -337,14 +340,19 @@ function ExpensesContextProvider({ children }) {
 
     const dayBack = getDateMinusDays(today, daysBefore);
 
-    const firstDay = new Date(dayBack.getFullYear(), dayBack.getMonth() - 1, 1);
+    const dayBackDate = toDate(dayBack);
+    const firstDay = new Date(
+      dayBackDate.getFullYear(),
+      dayBackDate.getMonth() - 1,
+      1
+    );
 
     const lastDay = new Date(
-      dayBack.getFullYear() + 1,
-      dayBack.getMonth() - 1,
+      dayBackDate.getFullYear() + 1,
+      dayBackDate.getMonth() - 1,
       0
     );
-    const yearlyExpenses = expensesState.filter((expense) => {
+    const yearlyExpenses = expensesState.filter(expense => {
       return expense.date >= firstDay && expense.date <= lastDay;
     });
     return { firstDay, lastDay, yearlyExpenses };
@@ -360,11 +368,20 @@ function ExpensesContextProvider({ children }) {
 
     const dayBack = getDateMinusDays(today, daysBefore);
 
-    const firstDay = new Date(dayBack.getFullYear(), dayBack.getMonth(), 1);
+    const dayBackDate = toDate(dayBack);
+    const firstDay = new Date(
+      dayBackDate.getFullYear(),
+      dayBackDate.getMonth(),
+      1
+    );
 
-    const lastDay = new Date(dayBack.getFullYear(), dayBack.getMonth() + 1, 0);
+    const lastDay = new Date(
+      dayBackDate.getFullYear(),
+      dayBackDate.getMonth() + 1,
+      0
+    );
 
-    const monthlyExpenses = expensesState.filter((expense) => {
+    const monthlyExpenses = expensesState.filter(expense => {
       return expense.date >= firstDay && expense.date <= lastDay;
     });
     return { firstDay, lastDay, monthlyExpenses };
@@ -380,9 +397,9 @@ function ExpensesContextProvider({ children }) {
 
     const dayBack = getDateMinusDays(today, daysBefore);
     const prevMonday = getPreviousMondayDate(dayBack);
-    const firstDay = prevMonday;
-    const lastDay = getDatePlusDays(prevMonday, 6);
-    const weeklyExpenses = expensesState.filter((expense) => {
+    const firstDay = toDate(prevMonday);
+    const lastDay = toDate(getDatePlusDays(prevMonday, 6));
+    const weeklyExpenses = expensesState.filter(expense => {
       return expense.date >= firstDay && expense.date <= lastDay;
     });
     return { firstDay, lastDay, weeklyExpenses };
@@ -390,15 +407,15 @@ function ExpensesContextProvider({ children }) {
   function getDailyExpenses(daysBack: number) {
     const today = new Date();
     const dayBack = getDateMinusDays(today, daysBack);
-    const dayExpenses = expensesState.filter((expense) => {
-      return expense.date.toDateString() === dayBack.toDateString();
+    const dayExpenses = expensesState.filter(expense => {
+      return toDateString(expense.date) === toDateString(dayBack);
     });
     return dayExpenses;
   }
 
   function getSpecificDayExpenses(date) {
-    const dayExpenses = expensesState.filter((expense) => {
-      return expense.date.toDateString() === date.toDateString();
+    const dayExpenses = expensesState.filter(expense => {
+      return toDateString(expense.date) === toDateString(date);
     });
     return dayExpenses;
   }
@@ -407,29 +424,31 @@ function ExpensesContextProvider({ children }) {
     const prevMonday = getPreviousMondayDate(date);
     const firstDay = prevMonday;
     const lastDay = getDatePlusDays(prevMonday, 6);
-    const weeklyExpenses = expensesState.filter((expense) => {
+    const weeklyExpenses = expensesState.filter(expense => {
       return expense.date >= firstDay && expense.date <= lastDay;
     });
     return weeklyExpenses;
   }
 
   function getSpecificMonthExpenses(date) {
-    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+    const dateObj = toDate(date);
+    const firstDay = new Date(dateObj.getFullYear(), dateObj.getMonth(), 1);
 
-    const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    const lastDay = new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 0);
 
-    const monthlyExpenses = expensesState.filter((expense) => {
+    const monthlyExpenses = expensesState.filter(expense => {
       return expense.date >= firstDay && expense.date <= lastDay;
     });
     return monthlyExpenses;
   }
 
   function getSpecificYearExpenses(date) {
-    const firstDay = new Date(date.getFullYear(), 0, 1);
+    const dateObj = toDate(date);
+    const firstDay = new Date(dateObj.getFullYear(), 0, 1);
 
-    const lastDay = new Date(date.getFullYear(), 11, 31);
+    const lastDay = new Date(dateObj.getFullYear(), 11, 31);
 
-    const yearlyExpenses = expensesState.filter((expense) => {
+    const yearlyExpenses = expensesState.filter(expense => {
       return expense.date >= firstDay && expense.date <= lastDay;
     });
     return yearlyExpenses;
@@ -438,7 +457,7 @@ function ExpensesContextProvider({ children }) {
   async function loadExpensesFromStorage(forceLoad = false) {
     if (!forceLoad && expensesState?.length !== 0) {
       // // console.log("expenses not empty, will not load again");
-      return false;
+      return;
     }
     // const loadedExpenses = await asyncStoreGetObject("expenses");
     const loadedExpenses = getMMKVObject("expenses");
@@ -448,10 +467,10 @@ function ExpensesContextProvider({ children }) {
     // );
     const expArray = [];
     if (loadedExpenses) {
-      loadedExpenses.forEach((expense) => {
-        expense.date = new Date(expense.date);
-        expense.startDate = new Date(expense.startDate);
-        expense.endDate = new Date(expense.endDate);
+      loadedExpenses.forEach(expense => {
+        expense.date = toDate(expense.date);
+        expense.startDate = toDate(expense.startDate);
+        expense.endDate = toDate(expense.endDate);
         expArray.push(expense);
       });
       setExpenses(expArray);
@@ -459,28 +478,27 @@ function ExpensesContextProvider({ children }) {
     } else {
       // // console.log("no Expenses loaded from Storage!");
     }
-    return true;
   }
 
   const value = {
     expenses: expensesState,
     // Sync loading state
     isSyncing,
-    addExpense: addExpense,
-    setExpenses: setExpenses,
-    mergeExpenses: mergeExpenses,
-    deleteExpense: deleteExpense,
-    updateExpense: updateExpense,
-    getRecentExpenses: getRecentExpenses,
-    getYearlyExpenses: getYearlyExpenses,
-    getMonthlyExpenses: getMonthlyExpenses,
-    getWeeklyExpenses: getWeeklyExpenses,
-    getDailyExpenses: getDailyExpenses,
-    getSpecificDayExpenses: getSpecificDayExpenses,
-    getSpecificWeekExpenses: getSpecificWeekExpenses,
-    getSpecificMonthExpenses: getSpecificMonthExpenses,
-    getSpecificYearExpenses: getSpecificYearExpenses,
-    loadExpensesFromStorage: loadExpensesFromStorage,
+    addExpense,
+    setExpenses,
+    mergeExpenses,
+    deleteExpense,
+    updateExpense,
+    getRecentExpenses,
+    getYearlyExpenses,
+    getMonthlyExpenses,
+    getWeeklyExpenses,
+    getDailyExpenses,
+    getSpecificDayExpenses,
+    getSpecificWeekExpenses,
+    getSpecificMonthExpenses,
+    getSpecificYearExpenses,
+    loadExpensesFromStorage,
     // Sync state management
     setIsSyncing,
   };

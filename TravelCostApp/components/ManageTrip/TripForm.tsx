@@ -1,34 +1,51 @@
-import React from "react";
-import { useState, useContext, useEffect, useLayoutEffect } from "react";
-import { View, Text, Alert, ScrollView, Platform } from "react-native";
-import { StyleSheet } from "react-native";
+import { useHeaderHeight } from "@react-navigation/elements";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { DateTime } from "luxon";
+import PropTypes from "prop-types";
+import { useContext, useEffect, useLayoutEffect, useState } from "react";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import Modal from "react-native-modal";
+import Animated, {
+  FadeInDown,
+  FadeOut,
+  ZoomIn,
+  ZoomOut,
+} from "react-native-reanimated";
+
+import { useTourGuideController } from "rn-tourguide";
+import { MAX_JS_NUMBER, MAX_TRIPS_NONPREMIUM } from "../../confAppConstants";
 import { GlobalStyles } from "../../constants/styles";
 import { AuthContext } from "../../store/auth-context";
 import {
-  storeTrip,
-  storeTripHistory,
-  updateUser,
   fetchTrip,
-  updateTripHistory,
-  updateTrip,
   getAllExpenses,
   putTravelerInTrip,
+  storeTrip,
+  storeTripHistory,
+  updateTrip,
+  updateTripHistory,
+  updateUser,
 } from "../../util/http";
 
-import { KeyboardAvoidingView } from "react-native";
-
-import Input from "../ManageExpense/Input";
+import { ExpensesContext } from "../../store/expenses-context";
 import { TripContext, TripData } from "../../store/trip-context";
 import { UserContext } from "../../store/user-context";
-import FlatButton from "../UI/FlatButton";
-import { ExpensesContext } from "../../store/expenses-context";
 import CurrencyPicker from "../Currency/CurrencyPicker";
-import { useHeaderHeight } from "@react-navigation/elements";
+import Input from "../ManageExpense/Input";
+import FlatButton from "../UI/FlatButton";
 
 //localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -38,33 +55,30 @@ i18n.locale =
 i18n.enableFallback = true;
 
 import { daysBetween, getFormattedDate } from "../../util/date";
-import { DateTime } from "luxon";
+
 import * as Haptics from "expo-haptics";
-import DatePickerModal from "../UI/DatePickerModal";
-import IconButton from "../UI/IconButton";
+
 import DatePickerContainer from "../UI/DatePickerContainer";
+import DatePickerModal from "../UI/DatePickerModal";
 import GradientButton from "../UI/GradientButton";
-import PropTypes from "prop-types";
+import IconButton from "../UI/IconButton";
 import InfoButton from "../UI/InfoButton";
-import Modal from "react-native-modal";
-import { MAX_JS_NUMBER, MAX_TRIPS_NONPREMIUM } from "../../confAppConstants";
-import Animated, {
-  FadeInDown,
-  FadeOut,
-  ZoomIn,
-  ZoomOut,
-} from "react-native-reanimated";
-import { secureStoreSetItem } from "../../store/secure-storage";
-import BackButton from "../UI/BackButton";
-import { onShare } from "../ProfileOutput/ShareTrip";
-import { NetworkContext } from "../../store/network-context";
+
 import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
-import { useTourGuideController } from "rn-tourguide";
+import { NetworkContext } from "../../store/network-context";
+import { secureStoreSetItem } from "../../store/secure-storage";
+import { onShare } from "../ProfileOutput/ShareTrip";
+import BackButton from "../UI/BackButton";
+
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
+
 import { Switch } from "react-native-paper";
+
 import { formatExpenseWithCurrency } from "../../util/string";
 import { isPremiumMember } from "../Premium/PremiumConstants";
+
 import Toast from "react-native-toast-message";
+
 import { sleep } from "../../util/appState";
 import safeLogError from "../../util/error";
 import { dynamicScale } from "../../util/scalingUtil";
@@ -73,7 +87,7 @@ const TripForm = ({ navigation, route }) => {
   const tripCtx = useContext(TripContext);
   const locales = Localization.getLocales();
   // get the most fitting currency from the list of locales
-  const currencyList = locales.map((locale) => locale.currencyCode);
+  const currencyList = locales.map(locale => locale.currencyCode);
   const standardCurrency = currencyList[0];
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
@@ -144,7 +158,7 @@ const TripForm = ({ navigation, route }) => {
     setShowDatePickerRange(false);
   };
 
-  const onConfirmRange = (output) => {
+  const onConfirmRange = output => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(false);
     // hotfixing datebug for asian countries
@@ -230,7 +244,7 @@ const TripForm = ({ navigation, route }) => {
   // let currencyPickerRef = undefined;
 
   function inputChangedHandler(inputIdentifier, enteredValue) {
-    setInputs((curInputs) => {
+    setInputs(curInputs => {
       return {
         ...curInputs,
         [inputIdentifier]: { value: enteredValue, isValid: true },
@@ -315,7 +329,7 @@ const TripForm = ({ navigation, route }) => {
     const tripid = await storeTrip(tripData);
 
     setLoadingProgress(2);
-    await putTravelerInTrip(tripid, { userName: userName, uid: uid });
+    await putTravelerInTrip(tripid, { userName, uid });
     setLoadingProgress(4);
 
     await secureStoreSetItem("currentTripId", tripid);
@@ -355,7 +369,7 @@ const TripForm = ({ navigation, route }) => {
     }
     setLoadingProgress(7);
     await updateUser(uid, {
-      userName: userName,
+      userName,
       currentTrip: tripid,
     });
     setLoadingProgress(9);
@@ -468,10 +482,10 @@ const TripForm = ({ navigation, route }) => {
       totalBudget: inputs.totalBudget.value,
       tripCurrency: inputs.tripCurrency.value,
       dailyBudget: inputs.dailyBudget.value,
-      startDate: startDate,
-      endDate: endDate,
+      startDate,
+      endDate,
       tripid: editedTripId,
-      travellers: travellers,
+      travellers,
       isDynamicDailyBudget: inputs.isDynamicDailyBudget.value,
     };
 
@@ -748,6 +762,7 @@ const TripForm = ({ navigation, route }) => {
               }}
               invalid={!inputs.tripName.isValid}
               autoFocus={false}
+              inputAccessoryViewID=""
             />
 
             {currencyView}
@@ -767,6 +782,7 @@ const TripForm = ({ navigation, route }) => {
                   value: inputs.totalBudget.value,
                 }}
                 invalid={!inputs.totalBudget.isValid}
+                inputAccessoryViewID=""
               />
               {validDailyBudgetEntry && !inputs.isDynamicDailyBudget.value && (
                 <Animated.View
@@ -822,6 +838,7 @@ const TripForm = ({ navigation, route }) => {
                       value: inputs.dailyBudget.value,
                     }}
                     invalid={!inputs.dailyBudget.isValid}
+                    inputAccessoryViewID=""
                   />
                   {validTotalBudgetEntry && (
                     <Animated.View
@@ -873,7 +890,7 @@ const TripForm = ({ navigation, route }) => {
                 value={inputs.isDynamicDailyBudget.value}
                 style={{ marginRight: "5%" }}
                 color={GlobalStyles.colors.primary500}
-                onValueChange={(value) => {
+                onValueChange={value => {
                   const calcNewDaily =
                     +inputs.totalBudget.value /
                     daysBetween(new Date(endDate), new Date(startDate));
@@ -983,6 +1000,58 @@ TripForm.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  button: {
+    marginHorizontal: 0,
+    minWidth: "35%",
+  },
+  buttonContainer: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-around",
+
+    marginBottom: "2%",
+    marginHorizontal: "4%",
+    marginTop: "4%",
+  },
+  card: {
+    backgroundColor: GlobalStyles.colors.gray500,
+    borderColor: GlobalStyles.colors.gray600,
+    borderRadius: 10,
+    borderWidth: 1,
+    elevation: 3,
+    flex: 1,
+    margin: "4%",
+    padding: "4%",
+    shadowColor: GlobalStyles.colors.gray600,
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 10,
+  },
+  categoryRow: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+  },
+  currencyPickerContainer: {
+    flex: 1,
+    flexDirection: "row",
+    marginBottom: "4%",
+  },
+  dynamicDailyContainer: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginLeft: "5%",
+    marginTop: "2%",
+  },
+  dynamicDailyLabel: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(12, false, 0.5),
+  },
+  errorText: {
+    color: GlobalStyles.colors.error500,
+    margin: dynamicScale(8, false, 0.5),
+    textAlign: "center",
+  },
   form: {
     // flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -997,20 +1066,41 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  dynamicDailyContainer: {
-    flexDirection: "row",
+  infoContentText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(16, false, 0.5),
+    marginBottom: dynamicScale(24, false, 0.5),
+    textAlign: "center",
+  },
+  infoModalContainer: {
     alignItems: "center",
-    marginLeft: "5%",
-    marginTop: "2%",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: 10,
+    flexDirection: "column",
+    justifyContent: "space-between",
+    margin: "4%",
+    padding: "4%",
+  },
+  infoTitleText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(24, false, 0.5),
+    fontWeight: "bold",
+    marginBottom: dynamicScale(24, false, 0.5),
+    marginTop: dynamicScale(5, false, 0.5),
+    textAlign: "center",
+  },
+  inputsRow: {
+    flexDirection: "row",
     justifyContent: "space-between",
   },
-  dynamicDailyLabel: {
-    fontSize: dynamicScale(12, false, 0.5),
+  label: {
     color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(12, false, 0.5),
+    marginBottom: 4,
   },
-  recalcButtonContainer: {
-    marginRight: "2%",
-    marginTop: "-2%",
+  modalStyle: {
+    justifyContent: "center",
+    marginBottom: dynamicScale(40, false, 0.5),
   },
   recalcButton: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -1022,89 +1112,16 @@ const styles = StyleSheet.create({
     // paddingTop: "1%",
     // paddingLeft: "3%",
   },
-  card: {
-    flex: 1,
-    margin: "4%",
-    padding: "4%",
-    backgroundColor: GlobalStyles.colors.gray500,
-    borderRadius: 10,
-    borderWidth: 1,
-    elevation: 3,
-    borderColor: GlobalStyles.colors.gray600,
-    shadowColor: GlobalStyles.colors.gray600,
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 10,
-  },
-  label: {
-    fontSize: dynamicScale(12, false, 0.5),
-    color: GlobalStyles.colors.textColor,
-    marginBottom: 4,
-  },
-  currencyPickerContainer: {
-    flex: 1,
-    flexDirection: "row",
-    marginBottom: "4%",
+  recalcButtonContainer: {
+    marginRight: "2%",
+    marginTop: "-2%",
   },
   title: {
+    color: GlobalStyles.colors.textColor,
     fontSize: dynamicScale(24, false, 0.5),
     fontWeight: "bold",
-    color: GlobalStyles.colors.textColor,
+    marginBottom: dynamicScale(24, false, 0.5),
     marginTop: dynamicScale(5, false, 0.5),
-    marginBottom: dynamicScale(24, false, 0.5),
-    textAlign: "center",
-  },
-  categoryRow: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "flex-start",
-  },
-  inputsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  errorText: {
-    textAlign: "center",
-    color: GlobalStyles.colors.error500,
-    margin: dynamicScale(8, false, 0.5),
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-
-    marginTop: "4%",
-    marginBottom: "2%",
-    marginHorizontal: "4%",
-  },
-  button: {
-    minWidth: "35%",
-    marginHorizontal: 0,
-  },
-  modalStyle: {
-    justifyContent: "center",
-    marginBottom: dynamicScale(40, false, 0.5),
-  },
-  infoModalContainer: {
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 10,
-    padding: "4%",
-    margin: "4%",
-  },
-  infoTitleText: {
-    fontSize: dynamicScale(24, false, 0.5),
-    fontWeight: "bold",
-    color: GlobalStyles.colors.textColor,
-    marginTop: dynamicScale(5, false, 0.5),
-    marginBottom: dynamicScale(24, false, 0.5),
-    textAlign: "center",
-  },
-  infoContentText: {
-    fontSize: dynamicScale(16, false, 0.5),
-    color: GlobalStyles.colors.textColor,
-    marginBottom: dynamicScale(24, false, 0.5),
     textAlign: "center",
   },
 });

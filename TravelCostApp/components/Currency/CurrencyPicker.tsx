@@ -1,21 +1,24 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { StyleSheet, View } from "react-native";
-
-import React from "react";
-import DropDownPicker from "react-native-dropdown-picker";
+import * as Haptics from "expo-haptics";
+import * as Localization from "expo-localization";
 import * as i18nIsoCountries from "i18n-iso-countries";
+import { I18n } from "i18n-js";
+import PropTypes from "prop-types";
 import { useState } from "react";
+import { StyleSheet, View } from "react-native";
+import DropDownPicker from "react-native-dropdown-picker";
 
 import { GlobalStyles } from "../../constants/styles";
+
 //localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
-import * as Haptics from "expo-haptics";
-import PropTypes from "prop-types";
+
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 // i18n.locale = "en";
 i18n.enableFallback = true;
 
@@ -28,7 +31,10 @@ const CurrencyPicker = ({
 }) => {
   // Users Device CountryCode CC to translate Country names in picker
   // enforce a language we have registered, otherwise, english
-  let CC = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+  let CC =
+    Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+      ? Localization.getLocales()[0].languageCode.slice(0, 2)
+      : "en";
   if (CC !== "de" && CC !== "en" && CC !== "fr" && CC !== "ru") CC = "en";
   // const CC = "en";
 
@@ -46,20 +52,18 @@ const CurrencyPicker = ({
   // i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/ja.json"));
 
   const nonEnglish = CC !== "en";
-  const nonEnglishCountryString = (code) => {
+  const nonEnglishCountryString = code => {
     if (!nonEnglish) return "";
     return ` - ${nonEnglish && countries.getName(code, CC)}`;
   };
 
-  const countryOptions = Object.keys(countries.getNames("en")).map((code) => ({
-    label:
-      `${countryToCurrency[code]} | ${getCurrencySymbol(
-        countryToCurrency[code]
-      )} - ${countries.getName(code, "en")}` + nonEnglishCountryString(code),
-    value:
-      `${countryToCurrency[code]} | ${getCurrencySymbol(
-        countryToCurrency[code]
-      )} - ${countries.getName(code, "en")}` + nonEnglishCountryString(code),
+  const countryOptions = Object.keys(countries.getNames("en")).map(code => ({
+    label: `${countryToCurrency[code]} | ${getCurrencySymbol(
+      countryToCurrency[code]
+    )} - ${countries.getName(code, "en")}${nonEnglishCountryString(code)}`,
+    value: `${countryToCurrency[code]} | ${getCurrencySymbol(
+      countryToCurrency[code]
+    )} - ${countries.getName(code, "en")}${nonEnglishCountryString(code)}`,
   }));
 
   const [open, setOpen] = useState(false);
@@ -128,7 +132,7 @@ CurrencyPicker.propTypes = {
 
 const styles = StyleSheet.create({
   container: { flex: 1, margin: 10 },
-  dropDownPickerContainer: {},
   dropDownPicker: {},
+  dropDownPickerContainer: {},
   dropDownPickerText: {},
 });

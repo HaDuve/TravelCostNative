@@ -1,8 +1,9 @@
-import React, { useRef, useEffect, useState, memo, useMemo } from "react";
-import { View, StyleSheet, Platform, TouchableOpacity } from "react-native";
-import { WebView } from "react-native-webview";
 import * as Haptics from "expo-haptics";
-import { generateHTMLTemplate, ChartData, ChartOptions } from "./chartHelpers";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Platform, StyleSheet, TouchableOpacity } from "react-native";
+import { WebView } from "react-native-webview";
+
+import { ChartData, ChartOptions, generateHTMLTemplate } from "./chartHelpers";
 
 interface WebViewChartProps {
   data: any[]; // Highcharts series data format
@@ -192,14 +193,14 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "transparent",
-    overflow: "hidden",
     maxWidth: "100%",
+    overflow: "hidden",
   },
   webView: {
     backgroundColor: "transparent",
     flex: 1,
-    overflow: "hidden",
     maxWidth: "100%",
+    overflow: "hidden",
   },
 });
 

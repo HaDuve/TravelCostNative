@@ -1,37 +1,41 @@
-import React, { useEffect, useState } from "react";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  FlatList,
   Alert,
-  StyleSheet,
-  TouchableOpacity,
+  FlatList,
   Linking,
   Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+
+import { ActivityIndicator } from "react-native-paper";
+import Purchases from "react-native-purchases";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+
+import { GlobalStyles } from "../../constants/styles";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { ActivityIndicator } from "react-native-paper";
-
-import Purchases from "react-native-purchases";
-import { GlobalStyles } from "../../constants/styles";
+import { constantScale } from "../../util/scalingUtil";
+import { trackEvent, VexoEvents } from "../../util/vexo-tracking";
 import PackageItem from "../Premium/PackageItem";
 import BackgroundGradient from "../UI/BackgroundGradient";
 import FlatButton from "../UI/FlatButton";
-import PropTypes from "prop-types";
 import IconButton from "../UI/IconButton";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
-import { constantScale } from "../../util/scalingUtil";
-import { trackEvent, VexoEvents } from "../../util/vexo-tracking";
 
 const PaywallScreen = ({ navigation }) => {
   // - State for all available package
@@ -46,7 +50,7 @@ const PaywallScreen = ({ navigation }) => {
   useEffect(() => {
     // Track paywall viewed
     trackEvent(VexoEvents.PAYWALL_VIEWED);
-    
+
     // Get current available packages
     const getPackages = async () => {
       try {
@@ -111,21 +115,19 @@ const PaywallScreen = ({ navigation }) => {
         {i18n.t("paywallTitle")}
       </Text>
       <Text style={styles.headerSubtitleText}>
-        {i18n.t("paywallSubtitle") + "\n\n"}
+        {`${i18n.t("paywallSubtitle")}\n\n`}
       </Text>
-      <View style={[styles.featureContainer]}>
+      <View style={styles.featureContainer}>
         <Text style={styles.featureText}>
-          {i18n.t("paywallFeature0") +
-            "\n" +
-            i18n.t("paywallFeature1") +
-            "\n" +
-            i18n.t("paywallFeature2") +
-            "\n" +
+          {`${i18n.t("paywallFeature0")}\n${i18n.t(
+            "paywallFeature1"
+          )}\n${i18n.t("paywallFeature2")}\n${
             // i18n.t("paywallFeature3") +
             // "\n" +
             // i18n.t("paywallFeature4") +
             // "\n" +
-            i18n.t("paywallFeature5")}
+            i18n.t("paywallFeature5")
+          }`}
         </Text>
         {/*  +
           "\n\n" +
@@ -222,7 +224,7 @@ const PaywallScreen = ({ navigation }) => {
               navigation={navigation}
             />
           )}
-          keyExtractor={(item) => item.identifier}
+          keyExtractor={item => item.identifier}
           ListHeaderComponent={header}
           ListHeaderComponentStyle={styles.headerFooterContainer}
           ListFooterComponent={footer}
@@ -242,29 +244,18 @@ PaywallScreen.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  backButtonTextStyle: {
+    color: GlobalStyles.colors.accent250,
+    fontSize: constantScale(16, 0.5),
+    fontWeight: "bold",
+    textAlign: "left",
+  },
   container: {
-    flex: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
     alignItems: "center",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    flex: 1,
     justifyContent: "center",
     overflow: "visible",
-  },
-  text: {
-    fontSize: constantScale(20, 0.5),
-    textAlign: "center",
-    margin: constantScale(10, 0.5),
-  },
-  headerFooterContainer: {
-    paddingVertical: constantScale(20, 0.5),
-  },
-  headerTitleText: {
-    fontSize: constantScale(32, 0.5),
-    // paddingHorizontal: "4%",
-    marginTop: "-5%",
-    marginBottom: "6%",
-    fontWeight: "bold",
-    textAlign: "center",
-    color: GlobalStyles.colors.primary700,
   },
   featureContainer: {
     // paddingHorizontal: "4%",
@@ -275,18 +266,11 @@ const styles = StyleSheet.create({
     // backgroundColor: GlobalStyles.colors.backgroundColor,
     overflow: "visible",
   },
-  headerSubtitleText: {
-    fontSize: constantScale(18, 0.5),
-    fontWeight: "300",
-    textAlign: "center",
-    paddingHorizontal: "4%",
-    // marginBottom: "6%",
-  },
   featureText: {
     fontSize: constantScale(18, 0.5),
     fontWeight: "300",
-    textAlign: "center",
     paddingHorizontal: "4%",
+    textAlign: "center",
     // marginBottom: "6%",
   },
   footerText: {
@@ -297,14 +281,32 @@ const styles = StyleSheet.create({
     // text size
     fontSize: constantScale(12, 0.5),
   },
-  backButtonTextStyle: {
-    color: GlobalStyles.colors.accent250,
-    fontSize: constantScale(16, 0.5),
+  headerFooterContainer: {
+    paddingVertical: constantScale(20, 0.5),
+  },
+  headerSubtitleText: {
+    fontSize: constantScale(18, 0.5),
+    fontWeight: "300",
+    paddingHorizontal: "4%",
+    textAlign: "center",
+    // marginBottom: "6%",
+  },
+  headerTitleText: {
+    fontSize: constantScale(32, 0.5),
+    // paddingHorizontal: "4%",
+    marginTop: "-5%",
+    marginBottom: "6%",
     fontWeight: "bold",
-    textAlign: "left",
+    textAlign: "center",
+    color: GlobalStyles.colors.primary700,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0,0,0,0.3)",
+  },
+  text: {
+    fontSize: constantScale(20, 0.5),
+    margin: constantScale(10, 0.5),
+    textAlign: "center",
   },
 });

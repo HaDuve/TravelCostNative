@@ -1,16 +1,10 @@
-import React, {
-  Share,
-  View,
-  Alert,
-  StyleSheet,
-  Text,
-  ScrollView,
-} from "react-native";
-import axios from "axios";
-//Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+import { Alert, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+//Localization
+
+import { GlobalStyles } from "../../constants/styles";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -21,12 +15,11 @@ i18n.enableFallback = true;
 
 import * as Haptics from "expo-haptics";
 import PropTypes from "prop-types";
+
 import safeLogError from "../../util/error";
-import { loadKeys } from "../Premium/PremiumConstants";
-import { GlobalStyles } from "../../constants/styles";
+import { dynamicScale } from "../../util/scalingUtil";
 import GradientButton from "../UI/GradientButton";
 import IconButton from "../UI/IconButton";
-import { dynamicScale } from "../../util/scalingUtil";
 
 export async function onShare(shareId, navigation) {
   // Branch.io removed - using simple fallback sharing
@@ -73,7 +66,6 @@ const ShareTripButton = ({ route, navigation }) => {
             size={24}
             color={GlobalStyles.colors.primary500}
             onPress={() => navigation.goBack()}
-            style={GlobalStyles.backButton}
           />
         </View>
 
@@ -91,6 +83,7 @@ const ShareTripButton = ({ route, navigation }) => {
             <GradientButton
               onPress={() => onShare(shareId, navigation)}
               style={styles.shareButton}
+              buttonStyle={{}}
             >
               {i18n.t("inviteTraveller")}
             </GradientButton>
@@ -109,40 +102,40 @@ ShareTripButton.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-  },
-  header: {
-    paddingTop: dynamicScale(20, true),
-    paddingHorizontal: dynamicScale(20, false),
-    paddingBottom: dynamicScale(10, true),
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: dynamicScale(20, false),
-    paddingTop: dynamicScale(20, true),
-    justifyContent: "center",
-  },
-  title: {
-    textAlign: "center",
-    marginBottom: dynamicScale(20, true),
-  },
-  description: {
-    textAlign: "center",
-    marginBottom: dynamicScale(40, true),
-    lineHeight: dynamicScale(20, true),
-    paddingHorizontal: dynamicScale(20, false),
-  },
   buttonContainer: {
     alignItems: "center",
     marginBottom: dynamicScale(40, true),
   },
+  container: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: dynamicScale(20, false),
+    paddingTop: dynamicScale(20, true),
+  },
+  description: {
+    lineHeight: dynamicScale(20, true),
+    marginBottom: dynamicScale(40, true),
+    paddingHorizontal: dynamicScale(20, false),
+    textAlign: "center",
+  },
+  header: {
+    paddingBottom: dynamicScale(10, true),
+    paddingHorizontal: dynamicScale(20, false),
+    paddingTop: dynamicScale(20, true),
+  },
+  scrollContainer: {
+    flexGrow: 1,
+  },
   shareButton: {
-    width: "80%",
     minWidth: dynamicScale(200, false),
+    width: "80%",
+  },
+  title: {
+    marginBottom: dynamicScale(20, true),
+    textAlign: "center",
   },
 });

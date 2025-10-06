@@ -486,7 +486,6 @@ DEBUG=1 pnpm run build:dev ios
    ```
 
 3. **Set Up Environment**
-
    - Create `.env` file with required variables
    - Generate Android keystore
    - Configure iOS code signing

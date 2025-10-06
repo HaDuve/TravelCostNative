@@ -4,6 +4,7 @@ import {
   setMMKVObject,
   setMMKVString,
 } from "../store/mmkv";
+
 import { DateOrDateTime, isToday } from "./date";
 import { getAllExpenses } from "./http";
 import {
@@ -116,7 +117,7 @@ export async function deleteAllExpensesByRangedId(
       const queueItem: OfflineQueueManageExpenseItem = {
         type: "delete",
         expense: {
-          tripid: tripid,
+          tripid,
           uid: expense.uid,
           id: expense.id,
         },
@@ -195,7 +196,7 @@ export function getExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
 export function getTravellerSum(
   expenses: ExpenseData[],
   traveller: string,
-  isTotal: boolean = false
+  isTotal = false
 ) {
   // Only deduplicate range expenses for total view
   const deduplicatedExpenses = isTotal
@@ -213,7 +214,7 @@ export function getTravellerSum(
         return sum + Number(expense.calcAmount);
       } else {
         const split = expense.splitList.find(
-          (split) => split.userName === traveller
+          split => split.userName === traveller
         );
         const correct = split;
         if (!correct || !split) return sum;
@@ -274,7 +275,7 @@ export function findMostDuplicatedDescriptionExpenses(
     const duplicatesMap = {};
 
     // Step 1: Create a map with count as value to track duplicates
-    expenseArray.forEach((exp) => {
+    expenseArray.forEach(exp => {
       const description = exp.description;
       if (duplicatesMap[description]) {
         duplicatesMap[description]++;
@@ -292,7 +293,7 @@ export function findMostDuplicatedDescriptionExpenses(
         0
       );
       const topExpense = expenseArray.find(
-        (exp) => exp.description === topExpenseInMap
+        exp => exp.description === topExpenseInMap
       );
       if (topExpense) {
         topExpenses.push(topExpense);
@@ -308,10 +309,10 @@ export function findMostDuplicatedDescriptionExpenses(
 
 export async function getAllExpensesData(tripid: string) {
   const lastCacheUpdateExpenses = getMMKVString(
-    "lastUpdateISO_allExpenses_tripid" + tripid
+    `lastUpdateISO_allExpenses_tripid${tripid}`
   );
   const cachedExpenses = getMMKVObject(
-    "lastUpdate_allExpenses_tripid_" + tripid
+    `lastUpdate_allExpenses_tripid_${tripid}`
   );
   const lastUpdateWasToday =
     lastCacheUpdateExpenses &&
@@ -324,10 +325,10 @@ export async function getAllExpensesData(tripid: string) {
   if (!lastUpdateWasToday) {
     // update cache
     setMMKVString(
-      "lastUpdateISO_allExpenses_tripid" + tripid,
+      `lastUpdateISO_allExpenses_tripid${tripid}`,
       new Date().toISOString()
     );
-    setMMKVObject("lastUpdate_allExpenses_tripid_" + tripid, _expenses);
+    setMMKVObject(`lastUpdate_allExpenses_tripid_${tripid}`, _expenses);
   }
   return _expenses;
 }

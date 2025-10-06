@@ -1,50 +1,34 @@
-import * as React from "react";
 import Svg, { Circle, Path } from "react-native-svg";
-const scaleImage = (props) => (
-  <Svg
-    xmlns="http://www.w3.org/2000/svg"
-    xmlSpace="preserve"
-    height="10"
-    width="10"
-    {...props}
-  >
+const scaleImage = props => (
+  <Svg xmlSpace="preserve" height="10" width="10" {...props}>
     <Circle
       cx={400}
       cy={400}
       r={320}
       strokeMiterlimit={10}
-      style={{
-        fill: "none",
-        stroke: "#000",
-        strokeWidth: 24,
-        strokeMiterlimit: 10,
-      }}
+      fill="none"
+      stroke="#000"
+      strokeWidth={24}
       transform="translate(-68 -68)"
     />
     <Path
       strokeMiterlimit={10}
       d="M331 257V69"
-      style={{
-        fill: "none",
-        stroke: "#000",
-        strokeWidth: 28,
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-        strokeMiterlimit: 10,
-      }}
+      fill="none"
+      stroke="#000"
+      strokeWidth={28}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <Circle
       cx={399}
       cy={325}
       r={36}
       strokeMiterlimit={10}
-      style={{
-        stroke: "#000",
-        strokeWidth: 4,
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-        strokeMiterlimit: 10,
-      }}
+      stroke="#000"
+      strokeWidth={4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
       transform="translate(-68 -68)"
     />
     <Path d="M331.018 245c2.109.212 4.339.367 6.493.549 2.171.195 4.342.346 6.514.504l13.042 1.024c4.353.325 8.701.808 13.064 1.181 4.362.396 8.728.861 13.09 1.415 4.357.59 8.732 1.101 13.087 1.753 4.355.644 8.694 1.381 12.989 2.183 8.608 1.548 17.006 3.247 25.2 4.518 4.099.666 8.171 1.18 12.241 1.586 4.067.413 8.135.727 12.224.867 8.169.318 16.404.288 24.679-.424l3.104-.259 1.552-.167c.261-.064 1.113-.136 1.378-.214l1.191-.242 1.244-.274c.822-.21 1.627-.454 2.417-.709a29.32 29.32 0 0 0 4.519-1.846c1.435-.687 2.762-1.55 4.012-2.434 2.47-1.845 4.602-3.942 6.188-6.473.406-.617.788-1.244 1.153-1.878.365-.635.659-1.343.964-2.026.632-1.387 1.048-2.788 1.668-4.605 3.164-9.27 13.243-14.219 22.513-11.055 9.27 3.164 14.219 13.243 11.055 22.513a17.668 17.668 0 0 1-3.661 6.208l-5.864 6.376a77.015 77.015 0 0 1-5.193 5.161 66.097 66.097 0 0 1-5.926 4.747c-4.144 2.981-8.759 5.35-13.535 7.208-4.789 1.832-9.771 3.149-14.781 3.806-2.53.342-4.948.546-7.562.638l-1.786.046-1.644.02-3.289.021c-4.391.01-8.798-.049-13.222-.196a280.417 280.417 0 0 1-13.304-.824c-8.883-.751-17.817-2.004-26.487-3.602-8.684-1.593-17.01-3.394-25.148-4.905-8.141-1.546-16.208-2.771-24.389-3.658-16.351-1.73-32.999-2.457-49.823-2.533l-1.225-.005c-6.643-.03-12.003-5.439-11.974-12.082.03-6.643 5.439-12.003 12.082-11.973.38.001.777.023 1.15.06z" />
@@ -54,72 +38,54 @@ const scaleImage = (props) => (
       cy={166.5}
       r={24}
       strokeMiterlimit={10}
-      style={{
-        stroke: "#000",
-        strokeWidth: 4,
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-        strokeMiterlimit: 10,
-      }}
+      stroke="#000"
+      strokeWidth={4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
       transform="translate(-68 -68)"
     />
     <Path
       strokeMiterlimit={10}
       d="M488 273v172"
-      style={{
-        fill: "none",
-        stroke: "#000",
-        strokeWidth: 10,
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-        strokeMiterlimit: 10,
-      }}
+      fill="none"
+      stroke="#000"
+      strokeWidth={10}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <Path
       strokeMiterlimit={10}
       d="M488 504.727c44.183 0 80-26.74 80-59.727H408c0 32.986 35.817 59.727 80 59.727z"
-      style={{
-        stroke: "#000",
-        strokeWidth: 4,
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-        strokeMiterlimit: 10,
-      }}
+      stroke="#000"
+      strokeWidth={4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <Path
       strokeMiterlimit={10}
       d="m476 269-47 180M547 449l-47-180M173.734 273v172"
-      style={{
-        fill: "none",
-        stroke: "#000",
-        strokeWidth: 10,
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-        strokeMiterlimit: 10,
-      }}
+      fill="none"
+      stroke="#000"
+      strokeWidth={10}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <Path
       strokeMiterlimit={10}
       d="M173.734 504.727c44.183 0 80-26.74 80-59.727h-160c0 32.986 35.818 59.727 80 59.727z"
-      style={{
-        stroke: "#000",
-        strokeWidth: 4,
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-        strokeMiterlimit: 10,
-      }}
+      stroke="#000"
+      strokeWidth={4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <Path
       strokeMiterlimit={10}
       d="m161.734 269-47 180M232.734 449l-47-180"
-      style={{
-        fill: "none",
-        stroke: "#000",
-        strokeWidth: 10,
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-        strokeMiterlimit: 10,
-      }}
+      fill="none"
+      stroke="#000"
+      strokeWidth={10}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </Svg>
 );

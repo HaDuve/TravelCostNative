@@ -20,11 +20,13 @@ fi
 ### Branch Creation/Checkout
 
 **For main tasks** (no letter suffix):
+
 1. Start from main branch (safe to pull since we don't commit to main)
 2. Pull latest changes from origin/main
 3. Create the new task branch
 
-**For subtasks** (branch contains letter suffix like tt1a-*):
+**For subtasks** (branch contains letter suffix like tt1a-\*):
+
 1. First check current status to ensure no uncommitted changes
    - Run `git status` and address EVERY file shown
    - If super-repo: Check inside each submodule for uncommitted changes
@@ -39,6 +41,7 @@ fi
 ### Super-repo Submodule Management (IF .gitmodules exists)
 
 **CRITICAL: Create matching branches in ALL affected submodules**
+
 - Check the task frontmatter for the modules list
 - For each module listed:
   - Navigate to that module directory
@@ -50,12 +53,14 @@ fi
 Example: If working on tt1-login-ux-flow affecting io_web and io_user_model, create tt1-login-ux-flow branches in both submodules.
 
 **Branch Discipline Rules:**
+
 - Task frontmatter must list ALL modules that might be edited
 - All listed modules MUST have matching task branches
 - Before editing any file, verify the submodule is on the correct branch
 - If a module needs to be added mid-task, create its branch immediately
 
 > Note: If resuming work on an existing branch:
+>
 > - Check git status first for uncommitted work in super-repo AND all submodules
 >   - Address EVERY file shown in `git status`, not just expected files
 >   - Common missed files: CLAUDE.md, .claude/state files, test outputs
@@ -69,16 +74,18 @@ Example: If working on tt1-login-ux-flow affecting io_web and io_user_model, cre
 After creating/checking out branches, update the .claude/state/current_task.json file.
 
 **CORRECT FORMAT (use these exact field names):**
+
 ```json
 {
-  "task": "task-name",        // Just the task name, NO path, NO .md extension
+  "task": "task-name", // Just the task name, NO path, NO .md extension
   "branch": "feature/branch", // The Git branch name (NOT "branch_name")
-  "services": ["service1"],   // Array of affected services/modules
-  "updated": "2025-08-27"     // Current date in YYYY-MM-DD format
+  "services": ["service1"], // Array of affected services/modules
+  "updated": "2025-08-27" // Current date in YYYY-MM-DD format
 }
 ```
 
 **COMMON MISTAKES TO AVOID:**
+
 - ❌ Using `"task_file"` instead of `"task"`
 - ❌ Using `"branch_name"` instead of `"branch"`
 - ❌ Including path like `"tasks/m-task.md"` instead of just `"m-task"`
@@ -89,12 +96,14 @@ After creating/checking out branches, update the .claude/state/current_task.json
 Read the Context Manifest section from the task file.
 
 If the Context Manifest is missing:
+
 - For new tasks: Run context-gathering agent (should have been done during creation)
 - For old tasks: Consider running context-gathering agent to create one
 
 ## 3. Load Context & Verify Branch State
 
 Based on the manifest:
+
 - Read the narrative explanation to understand how everything works
 - Note technical reference details for implementation
 - Check environmental requirements
@@ -104,6 +113,7 @@ Based on the manifest:
 
 **IF SUPER-REPO: Verify All Module Branches**
 Before starting work, confirm all modules are on correct branches:
+
 ```bash
 # For each submodule in the task
 for module in $(cat .claude/state/current_task.json | jq -r '.services[]'); do
@@ -118,6 +128,7 @@ If any module that will be edited is not on the task branch, STOP and fix it fir
 ## 4. Verify Understanding
 
 Before diving in:
+
 - Understand the success criteria
 - Review the work log for previous progress
 - Check for blockers or gotchas
@@ -126,6 +137,7 @@ Before diving in:
 ## 5. Work Mode
 
 Remember:
+
 - Follow DAIC protocol (Discussion before Implementation)
 - Use code-review agent after significant changes
 - Update work log as you go

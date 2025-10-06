@@ -1,19 +1,10 @@
 import { Platform, StyleSheet, Text, View } from "react-native";
-import React, { useContext } from "react";
-import { useState } from "react";
-import PropTypes from "prop-types";
-import Animated, {
-  FadeInLeft,
-  FadeInUp,
-  FadeOutDown,
-  FadeOutLeft,
-  FadeOutRight,
-} from "react-native-reanimated";
+import React, { useContext, useState } from "react";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -22,22 +13,33 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import IconButton from "../components/UI/IconButton";
 import * as Haptics from "expo-haptics";
-import { GlobalStyles } from "../constants/styles";
-import { FadeInRight } from "react-native-reanimated";
+import PropTypes from "prop-types";
+import Animated, {
+  FadeInLeft,
+  FadeInUp,
+  FadeOutDown,
+  FadeOutLeft,
+  FadeOutRight,
+  FadeInRight,
+} from "react-native-reanimated";
+
 import ExpenseCategories from "../components/ExpensesOutput/ExpenseStatistics/ExpenseCategories";
-import ExpenseTravellers from "../components/ExpensesOutput/ExpenseStatistics/ExpenseTravellers";
 import ExpenseCountries from "../components/ExpensesOutput/ExpenseStatistics/ExpenseCountries";
 import ExpenseCurrencies from "../components/ExpensesOutput/ExpenseStatistics/ExpenseCurrencies";
-import FlatButton from "../components/UI/FlatButton";
-import FilteredExpenses from "./FilteredExpenses";
-import BackButton from "../components/UI/BackButton";
+import ExpenseTravellers from "../components/ExpensesOutput/ExpenseStatistics/ExpenseTravellers";
 import AddExpenseHereButton from "../components/UI/AddExpensesHereButton";
-import { ExpenseData } from "../util/expense";
-import { getEarliestDate } from "../util/date";
-import { constantScale, dynamicScale } from "../util/scalingUtil";
+import BackButton from "../components/UI/BackButton";
+import FlatButton from "../components/UI/FlatButton";
+import IconButton from "../components/UI/IconButton";
+import { GlobalStyles } from "../constants/styles";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
 import { OrientationContext } from "../store/orientation-context";
+import { getEarliestDate } from "../util/date";
+import { ExpenseData } from "../util/expense";
+import { constantScale, dynamicScale } from "../util/scalingUtil";
+
+import FilteredExpenses from "./FilteredExpenses";
 
 const FilteredPieCharts = ({ navigation, route }) => {
   const { expenses, dayString, noList = false } = route.params;
@@ -84,6 +86,7 @@ const FilteredPieCharts = ({ navigation, route }) => {
     !noList && (
       <FilteredExpenses
         key={4}
+        route={route}
         expensesAsArg={expenses}
         dayStringAsArg={dayString}
       ></FilteredExpenses>
@@ -191,85 +194,85 @@ FilteredPieCharts.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  chevronContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
   container: {
     flex: 1,
   },
-  firstTitleTextContainer: {
-    flex: 5,
-    paddingRight: dynamicScale(12, false, 0.5),
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  firstTitleText: {
-    fontSize: dynamicScale(20, false, 0.5),
-    fontWeight: "bold",
-    color: GlobalStyles.colors.textColor,
-    textAlign: "center",
-  },
-  landscapeTitleContainer: {
-    flexDirection: "row-reverse",
-    justifyContent: "space-between",
-    paddingHorizontal: dynamicScale(80, false, 0.5),
-    marginTop: dynamicScale(-24, true),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-  },
-  tabletContainer: {
-    marginTop: 0,
-    padding: constantScale(12, 0.5),
-    paddingHorizontal: constantScale(12, 0.5),
-  },
   firstTitleContainer: {
-    marginVertical: "4%",
     flexDirection: "row",
+    marginVertical: "4%",
     ...Platform.select({
       android: {
         justifyContent: "center",
       },
     }),
   },
+  firstTitleText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(20, false, 0.5),
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  firstTitleTextContainer: {
+    alignItems: "center",
+    flex: 5,
+    justifyContent: "center",
+    paddingRight: dynamicScale(12, false, 0.5),
+  },
+  footerContainer: {
+    alignItems: "center",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: "5%",
+  },
+  landScapetitleText: {
+    marginTop: dynamicScale(30, true),
+  },
+  landscapeTitleContainer: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    flexDirection: "row-reverse",
+    justifyContent: "space-between",
+    marginTop: dynamicScale(-24, true),
+    paddingHorizontal: dynamicScale(80, false, 0.5),
+  },
   shadow: {
-    borderTopWidth: 1,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderBottomColor: GlobalStyles.colors.gray600,
     borderBottomWidth: 0,
     borderTopColor: GlobalStyles.colors.gray600,
-    borderBottomColor: GlobalStyles.colors.gray600,
-    minHeight: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderTopWidth: 1,
     elevation: 2,
+    minHeight: 1,
     shadowColor: GlobalStyles.colors.textColor,
     shadowOffset: { width: 1, height: 2.5 },
     shadowOpacity: 0.9,
     shadowRadius: 4,
     zIndex: 2,
   },
+  tabletContainer: {
+    marginTop: 0,
+    padding: constantScale(12, 0.5),
+    paddingHorizontal: constantScale(12, 0.5),
+  },
+  tabletTitleText: {
+    marginTop: constantScale(16, 0.5),
+  },
   titleContainer: {
     flexDirection: "row",
     justifyContent: "center",
   },
   titleText: {
-    minWidth: 200,
-    maxWidth: 200,
-    textAlign: "center",
-    fontSize: dynamicScale(22, false, 0.5),
-    fontWeight: "bold",
-    fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
+    fontSize: dynamicScale(22, false, 0.5),
+    fontStyle: "italic",
+    fontWeight: "bold",
     marginLeft: "2%",
-  },
-  landScapetitleText: {
-    marginTop: dynamicScale(30, true),
-  },
-  tabletTitleText: {
-    marginTop: constantScale(16, 0.5),
-  },
-  chevronContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  footerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: "5%",
-    backgroundColor: GlobalStyles.colors.backgroundColor,
+    maxWidth: 200,
+    minWidth: 200,
+    textAlign: "center",
   },
 });

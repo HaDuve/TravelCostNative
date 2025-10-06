@@ -1,5 +1,7 @@
 import axios from "axios";
+
 import { secureStoreSetItem } from "../store/secure-storage";
+
 import { storeAuthData } from "./firebase-auth";
 
 const API_KEY = "AIzaSyAPXaokb5pgZ286Ih-ty8ZERoc8nubf1TE";
@@ -16,8 +18,8 @@ interface FirebaseAuthResponse {
 async function authenticate(mode: string, email: string, password: string) {
   const url = `https://identitytoolkit.googleapis.com/v1/accounts:${mode}?key=${API_KEY}`;
   const response = await axios.post(url, {
-    email: email,
-    password: password,
+    email,
+    password,
     returnSecureToken: true,
   });
 

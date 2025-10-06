@@ -9,9 +9,11 @@ modules: [network-connectivity, offline-handling, ui-components]
 # Implement Reconnect Button
 
 ## Problem/Goal
+
 Add a reconnect button to the custom "no internet" modal to allow users to manually retry network connections when they regain connectivity.
 
 ## Success Criteria
+
 - [ ] Add reconnect button to existing "no internet" modal
 - [ ] Implement button functionality to retry network requests
 - [ ] Test button behavior when network is restored
@@ -51,16 +53,18 @@ The modal should follow the app's existing design patterns found in other modal 
 ### Technical Reference Details
 
 #### Network Context Interface
+
 ```typescript
 // From store/network-context.tsx
 export const NetworkContext = createContext({
   isConnected: boolean,
-  strongConnection: boolean, 
+  strongConnection: boolean,
   lastConnectionSpeedInMbps: number,
 });
 ```
 
 #### Connection Testing Function
+
 ```typescript
 // From util/connectionSpeed.ts
 export async function isConnectionFastEnough(): Promise<ConnectionSpeedResult> {
@@ -69,6 +73,7 @@ export async function isConnectionFastEnough(): Promise<ConnectionSpeedResult> {
 ```
 
 #### Current Error Pattern (to be replaced)
+
 ```typescript
 // Pattern used throughout app
 import { Alert } from "react-native";
@@ -79,20 +84,24 @@ if (!isConnected) {
 ```
 
 #### Button Components Available
+
 - `GradientButton`: Primary actions with haptic feedback and gradients
-- `FlatButton`: Secondary actions with simple styling  
+- `FlatButton`: Secondary actions with simple styling
 - `Button`: Standard button with press animations
 
 #### Localization Keys for Reconnect Feature
+
 Need to add new keys to `i18n/supportedLanguages.tsx`:
+
 - Existing: `noConnection`, `checkConnectionError`
 - New needed: `reconnect`, `reconnecting`, `retryConnection`, etc.
 
 #### Modal Implementation Pattern
+
 ```typescript
 // Following pattern from App.tsx navigation
 <Stack.Screen
-  name="ReconnectModal" 
+  name="ReconnectModal"
   component={ReconnectModal}
   options={{
     headerShown: false,
@@ -102,6 +111,7 @@ Need to add new keys to `i18n/supportedLanguages.tsx`:
 ```
 
 #### File Locations
+
 - Custom modal component: `/components/UI/ReconnectModal.tsx`
 - Update translations: `/i18n/supportedLanguages.tsx`
 - Integration points: All screens/components currently using `Alert.alert(i18n.t("noConnection")...)`
@@ -109,7 +119,9 @@ Need to add new keys to `i18n/supportedLanguages.tsx`:
 - Alternative overlay approach: Could be added to existing screens directly
 
 #### Integration Strategy
+
 Replace existing `Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"))` calls with:
+
 1. Navigation to custom modal screen, OR
 2. State-managed overlay component that shows/hides based on network errors
 3. Reconnect button triggers `isConnectionFastEnough()` and provides user feedback
@@ -117,7 +129,9 @@ Replace existing `Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionErr
 5. Failure shows retry state or additional error information
 
 ## User Notes
+
 FEATURE: reconnect button in custom „no internet" modal
 
 ## Work Log
+
 <!-- Updated as work progresses -->

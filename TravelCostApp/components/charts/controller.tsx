@@ -30,7 +30,7 @@ export class ChartController {
       return [];
     }
 
-    return inputData.map((item) => {
+    return inputData.map(item => {
       const budgetCompare =
         item.dailyBudget ||
         item.weeklyBudget ||
@@ -60,7 +60,7 @@ export class ChartController {
       return [];
     }
 
-    return inputData.map((item) => ({
+    return inputData.map(item => ({
       x: item.x,
       y: item.y,
       label: item.x,
@@ -82,7 +82,7 @@ export class ChartController {
       enableZoom: true,
       showLegend: false,
       dateFormat: true,
-      currency: currency,
+      currency,
       colors: colors ? [colors.primary] : undefined,
     };
   }
@@ -147,11 +147,11 @@ export class ChartController {
 
     if (datum.firstDay && datum.lastDay) {
       filteredExpenses = expenses.filter(
-        (expense) =>
+        expense =>
           expense.date >= datum.firstDay && expense.date <= datum.lastDay
       );
     } else if (datum.day) {
-      filteredExpenses = expenses.filter((expense) =>
+      filteredExpenses = expenses.filter(expense =>
         this.isSameDay(expense.date, datum.day!)
       );
     }

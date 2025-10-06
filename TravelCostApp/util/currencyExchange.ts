@@ -1,16 +1,18 @@
+import NetInfo from "@react-native-community/netinfo";
 import axios from "axios";
 import { DateTime } from "luxon";
+
 import { CACHE_NUM_HOURS, DEBUG_FORCE_OFFLINE } from "../confAppConstants";
 import { asyncStoreGetItem, asyncStoreSetItem } from "../store/async-storage";
-import { secureStoreGetItem } from "../store/secure-storage";
-import safeLogError from "./error";
-import NetInfo from "@react-native-community/netinfo";
 import {
   getMMKVObject,
   getMMKVString,
   setMMKVObject,
   setMMKVString,
 } from "../store/mmkv";
+import { secureStoreGetItem } from "../store/secure-storage";
+
+import safeLogError from "./error";
 
 export async function getRate(
   base: string,
@@ -68,7 +70,7 @@ export async function getRateAPI2(
     if (diff < CACHE_NUM_HOURS) {
       // get from asyncstore
       const rate = await asyncStoreGetItem(
-        "currencyExchangeAPI2_" + base + target
+        `currencyExchangeAPI2_${base}${target}`
       );
       if (rate) {
         return rate;
@@ -76,13 +78,9 @@ export async function getRateAPI2(
     }
   }
   const apiKey = await secureStoreGetItem("FREEEXCHANGE");
-  const requestURL =
-    "https://api.currencyapi.com/v3/latest?apikey=" +
-    apiKey +
-    "&currencies=" +
-    target +
-    "&base_currency=" +
-    base;
+  const requestURL = `https://api.currencyapi.com/v3/latest?apikey=${
+    apiKey
+  }&currencies=${target}&base_currency=${base}`;
   // console.log("getRateAPI2 ~ requestURL:", requestURL);
   try {
     const response = await axios.get(requestURL);
@@ -91,7 +89,7 @@ export async function getRateAPI2(
     // console.log("getRateAPI2 ~ rate:", rate);
     const timeStamp = DateTime.now().toISO();
     await asyncStoreSetItem("currencyExchangeAPI2_update", timeStamp);
-    await asyncStoreSetItem("currencyExchangeAPI2_" + base + target, rate);
+    await asyncStoreSetItem(`currencyExchangeAPI2_${base}${target}`, rate);
     return rate;
   } catch (error) {
     safeLogError(error);
@@ -124,9 +122,9 @@ export async function getRateAPI1(
     safeLogError("No apiKey found for currencyExchange");
     return -1;
   }
-  const requestURL =
-    `http://api.exchangeratesapi.io/v1/latest?access_key=${apiKey}&base=` +
-    base;
+  const requestURL = `http://api.exchangeratesapi.io/v1/latest?access_key=${apiKey}&base=${
+    base
+  }`;
 
   try {
     const response = await axios.get(requestURL);
@@ -135,7 +133,7 @@ export async function getRateAPI1(
       if (DEBUG_FORCE_OFFLINE) {
         return getCachedRate(base, target);
       }
-      setMMKVObject("currencyExchange_base_" + base, rates);
+      setMMKVObject(`currencyExchange_base_${base}`, rates);
       const timeStamp = DateTime.now().toISO();
       setMMKVString("currencyExchange_lastUpdate", timeStamp);
       return rates[target];
@@ -151,7 +149,7 @@ export async function getRateAPI1(
 
 export function getCachedRate(base: string, target: string) {
   // Get cached rate without logging errors (used when online)
-  const currencyExchange = getMMKVObject("currencyExchange_base_" + base);
+  const currencyExchange = getMMKVObject(`currencyExchange_base_${base}`);
   if (currencyExchange && currencyExchange[target]) {
     return currencyExchange[target];
   }
@@ -181,13 +179,13 @@ export function getFallbackRate(base: string, target: string, rates: any) {
 
 export function getOfflineRate(base: string, target: string) {
   // offline get from asyncstore - only used when truly offline
-  const currencyExchange = getMMKVObject("currencyExchange_base_" + base);
+  const currencyExchange = getMMKVObject(`currencyExchange_base_${base}`);
   if (currencyExchange) {
     return currencyExchange[target];
   } else {
     // Only log error when truly offline - this prevents error spam when online
     safeLogError(
-      "Unable to get offline rate for " + base + " " + target,
+      `Unable to get offline rate for ${base} ${target}`,
       "currencyExchange.ts",
       137
     );

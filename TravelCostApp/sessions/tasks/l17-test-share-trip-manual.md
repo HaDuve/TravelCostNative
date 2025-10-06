@@ -9,9 +9,11 @@ modules: [share-trip, api-integration, manual-testing]
 # Test Share Trip Manual
 
 ## Problem/Goal
+
 Conduct manual end-to-end testing of the share trip functionality to verify API integration and business logic work correctly. This is a comprehensive UX test to ensure the feature functions as expected.
 
 ## Success Criteria
+
 - [ ] Manual test of complete share trip flow from start to finish
 - [ ] Verify API calls work correctly for sharing trips
 - [ ] Test trip sharing permissions and access control
@@ -33,6 +35,7 @@ The function first loads the Branch.io API key using `loadKeys()` from PremiumCo
 
 **Step 2: Deep Link Generation**
 A Branch.io deep link is created by making a POST request to `https://api2.branch.io/v1/url` with specific parameters:
+
 - `$deeplink_path`: Set to `join/{shareId}` format
 - Tags include "appinvite" and the specific trip ID
 - Channel and campaign are both set to "appinvite"
@@ -41,6 +44,7 @@ The Branch API responds with a shortened URL that contains all the necessary rou
 
 **Step 3: Native Share Interface**
 Once the URL is generated, the system uses React Native's built-in Share API to present the native sharing interface. The share payload includes:
+
 - A localized invite message (i18n.t("inviteMessage"))
 - The generated Branch deep link URL
 
@@ -56,10 +60,12 @@ When the app launches via a shared link, the Branch subscriber (lines 12-51) pro
 
 **Trip Joining Process (JoinTrip.tsx)**
 The join flow supports two entry methods:
+
 1. Direct deep link navigation (automatic trip ID extraction)
 2. Manual trip ID/link input by the user
 
 The core joining logic (lines 136-196):
+
 1. **Connection Validation**: Checks network connectivity using NetworkContext
 2. **Trip Data Fetching**: Calls `fetchTrip(tripid)` to retrieve trip details
 3. **User Trip History Update**: Updates user's trip history either by storing new history (`storeTripHistory`) or updating existing (`updateTripHistory`)
@@ -72,11 +78,13 @@ The core joining logic (lines 136-196):
 The backend integration uses Firebase Realtime Database with the base URL `https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app`. Key API functions:
 
 **Trip Operations (http.tsx)**:
+
 - `storeTrip(tripData)`: POST to `/trips.json` - Creates new trips
 - `fetchTrip(tripid)`: GET `/trips/{tripid}.json` - Retrieves trip data
 - `updateTrip(tripid, tripData)`: PUT `/trips/{tripid}.json` - Updates existing trips
 
 **Traveller Management**:
+
 - `putTravelerInTrip(tripid, traveller)`: PUT to `/trips/{tripid}/travellers.json` - Adds users to trips
 - `getTravellers(tripid)`: GET `/trips/{tripid}/travellers.json` - Retrieves trip participants
 - `fetchTripsTravellers(tripid)`: Internal function for detailed traveller data
@@ -88,11 +96,13 @@ All API calls include an authentication token via `getMMKVString("QPAR")` which 
 
 **Trip Context Management**:
 The TripContext provides centralized trip state management with key functions:
+
 - `setCurrentTrip(tripid, tripData)`: Sets active trip and updates contexts
 - `fetchAndSetTravellers(tripid)`: Syncs traveller list
 - `saveTripDataInStorage(tripData)`: Persists to local storage
 
 **Storage Architecture**:
+
 - **Secure Storage**: Used for sensitive data like `currentTripId` and authentication tokens
 - **MMKV Storage**: High-performance storage for frequently accessed data like expenses and trip data
 - **AsyncStorage**: Backup storage for non-critical data
@@ -103,16 +113,19 @@ The NetworkContext monitors connection quality and speed. Share/join operations 
 ### Error Handling & Edge Cases
 
 **Connection Failures**:
+
 - Share operations check network connectivity before API calls
 - Join operations validate connection speed using `isConnectionFastEnoughAsBool()`
 - Failed shares show alert with localized error messages (`i18n.t("errorShareTripText")`)
 
 **Invalid Trip IDs**:
+
 - Join flow validates trip existence through `fetchTrip()` call
 - Missing trips show alerts with trip ID for debugging
 - Retry mechanisms allow users to attempt joining again
 
 **Branch.io Failures**:
+
 - Share falls back to App Store links if Branch API fails
 - Deep link processing gracefully handles malformed URLs
 - Non-branch links are detected and handled separately
@@ -120,11 +133,13 @@ The NetworkContext monitors connection quality and speed. Share/join operations 
 ### For Manual Testing Implementation: Integration Points
 
 **Test Entry Points**:
+
 - TripForm edit mode → Share button (line 719-727)
 - Direct navigation to Join screen with test trip IDs
 - Deep link simulation through Branch testing tools
 
 **Key Validation Points**:
+
 1. **API Integration**: Branch.io URL generation and deep link parsing
 2. **Data Persistence**: Trip joining should update all relevant contexts and storage layers
 3. **Network Resilience**: Share/join operations under various network conditions
@@ -139,26 +154,33 @@ The share trip functionality is deeply integrated with the app's authentication,
 #### Component Interfaces & Signatures
 
 **ShareTrip Functions**:
+
 ```typescript
-export async function onShare(shareId: string, navigation: any): Promise<void>
+export async function onShare(shareId: string, navigation: any): Promise<void>;
 ```
 
 **HTTP API Functions**:
+
 ```typescript
-export async function storeTrip(tripData: TripData): Promise<string>
-export async function fetchTrip(tripid: string): Promise<TripData>
-export async function putTravelerInTrip(tripid: string, traveller: Traveller): Promise<void>
-export async function getTravellers(tripid: string): Promise<TravellerNames>
+export async function storeTrip(tripData: TripData): Promise<string>;
+export async function fetchTrip(tripid: string): Promise<TripData>;
+export async function putTravelerInTrip(
+  tripid: string,
+  traveller: Traveller
+): Promise<void>;
+export async function getTravellers(tripid: string): Promise<TravellerNames>;
 ```
 
 **Branch Integration**:
+
 ```typescript
-export async function initBranch(navigation: any): Promise<void>
+export async function initBranch(navigation: any): Promise<void>;
 ```
 
 #### Data Structures
 
 **Trip Data Model**:
+
 ```typescript
 interface TripData {
   tripName?: string;
@@ -176,6 +198,7 @@ interface TripData {
 ```
 
 **Traveller Model**:
+
 ```typescript
 interface Traveller {
   userName: string;
@@ -184,11 +207,12 @@ interface Traveller {
 ```
 
 **Branch Deep Link Payload**:
+
 ```typescript
 {
   branch_key: string,
   channel: "appinvite",
-  campaign: "appinvite", 
+  campaign: "appinvite",
   tags: ["appinvite", tripId],
   $deeplink_path: `join/${tripId}`,
   data: { $deeplink_path: `join/${tripId}` }
@@ -198,13 +222,16 @@ interface Traveller {
 #### Configuration Requirements
 
 **Environment Variables/Keys** (loaded via PremiumConstants):
+
 - `BRAN`: Branch.io API key for deep link generation
 
 **Firebase Configuration**:
+
 - Base URL: `https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app`
 - Authentication via Firebase Auth tokens
 
 **Storage Keys**:
+
 - `currentTripId`: Secure storage for active trip
 - `QPAR`: MMKV storage for authentication parameters
 - `expenses`: MMKV storage for trip expenses
@@ -213,30 +240,37 @@ interface Traveller {
 #### File Locations
 
 **Core Implementation**:
+
 - Share functionality: `/components/ProfileOutput/ShareTrip.tsx`
 - Join functionality: `/screens/JoinTrip.tsx`
 - Trip management: `/components/ManageTrip/TripForm.tsx`
 
 **API Integration**:
+
 - HTTP utilities: `/util/http.tsx`
 - Branch integration: `/components/Referral/branch.ts`
 
 **Context Management**:
+
 - Trip context: `/store/trip-context.tsx`
 - Auth context: `/store/auth-context.tsx`
 - Network context: `/store/network-context.tsx`
 
 **Localization**:
+
 - Strings: `/i18n/supportedLanguages.tsx`
 
 **Testing Focus Areas**:
+
 - Navigation deep linking via App.tsx (lines 45-46, 169-174)
 - State synchronization across contexts
 - Network connectivity edge cases
 - Cross-platform share interface behavior
 
 ## User Notes
+
 UX test: share trip (manual end to end api&logic test)
 
 ## Work Log
+
 <!-- Updated as work progresses -->

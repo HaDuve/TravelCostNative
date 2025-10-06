@@ -1,13 +1,13 @@
 import AuthContent from "../components/Auth/AuthContent";
-import React, { useContext, useEffect, useState } from "react";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { login } from "../util/auth";
-import { Platform } from "react-native";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import React, { useContext, useEffect, useState } from "react";
+import { Platform } from "react-native";
+
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -16,22 +16,24 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { AuthContext } from "../store/auth-context";
-import { UserContext, UserData } from "../store/user-context";
-import { fetchUser, touchMyTraveler, updateUser } from "../util/http";
-import { TripContext } from "../store/trip-context";
-import Toast from "react-native-toast-message";
 import Purchases from "react-native-purchases";
+import Toast from "react-native-toast-message";
+
 import {
   loadKeys,
   Keys,
   setAttributesAsync,
 } from "../components/Premium/PremiumConstants";
-import { NetworkContext } from "../store/network-context";
-import { secureStoreSetItem } from "../store/secure-storage";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { AuthContext } from "../store/auth-context";
 import { ExpensesContext } from "../store/expenses-context";
 import { setMMKVObject } from "../store/mmkv";
+import { NetworkContext } from "../store/network-context";
+import { secureStoreSetItem } from "../store/secure-storage";
+import { TripContext } from "../store/trip-context";
+import { UserContext, UserData } from "../store/user-context";
 import safeLogError from "../util/error";
+import { fetchUser, touchMyTraveler, updateUser } from "../util/http";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);

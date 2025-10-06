@@ -1,21 +1,27 @@
-import React, { useContext, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { useContext, useState } from "react";
+import { StyleSheet, View } from "react-native";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { SettingsContext } from "../../store/settings-context";
-import SettingsSwitch from "./SettingsSwitch";
 import PropTypes from "prop-types";
+
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 import { secureStoreGetItem } from "../../store/secure-storage";
+import { SettingsContext } from "../../store/settings-context";
 import safeLogError from "../../util/error";
 import { safelyParseJSON } from "../../util/jsonParse";
+
+import SettingsSwitch from "./SettingsSwitch";
 
 const SettingsSection = ({ multiTraveller }) => {
   const { settings, saveSettings } = useContext(SettingsContext);
@@ -86,30 +92,35 @@ const SettingsSection = ({ multiTraveller }) => {
       <SettingsSwitch
         label={i18n.t("hideSpecialExpenses")}
         style={styles.switchContainer}
+        labelStyle={{}}
         state={hideSpecialExpenses}
         toggleState={toggleHideSpecialExpenses}
       />
       <SettingsSwitch
         label={i18n.t("settingsSkipCat")}
         style={styles.switchContainer}
+        labelStyle={{}}
         state={skipCategoryPickScreen}
         toggleState={toggleSkipCategoryPickScreen}
       />
       <SettingsSwitch
         label={i18n.t("settingsShowAdvanced")}
         style={styles.switchContainer}
+        labelStyle={{}}
         state={alwaysShowAdvanced}
         toggleState={toggleAlwaysShowAdvanced}
       />
       <SettingsSwitch
         label={i18n.t("settingsShowFlags")}
         style={styles.switchContainer}
+        labelStyle={{}}
         state={showFlags}
         toggleState={toggleShowFlags}
       />
       <SettingsSwitch
         label={i18n.t("settingsShowInternetSpeed")}
         style={styles.switchContainer}
+        labelStyle={{}}
         state={showInternetSpeed}
         toggleState={toggleShowInternetSpeed}
       />
@@ -117,6 +128,7 @@ const SettingsSection = ({ multiTraveller }) => {
         <SettingsSwitch
           label={i18n.t("settingsShowTravellerIcon")}
           style={styles.switchContainer}
+          labelStyle={{}}
           state={showWhoPaid}
           toggleState={toggleShowWhoPaid}
         />
@@ -143,9 +155,9 @@ export const loadSettings = async () => {
 
 const styles = StyleSheet.create({
   switchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginHorizontal: "10%",
     marginVertical: "4%",
-    justifyContent: "space-between",
-    flexDirection: "row",
   },
 });

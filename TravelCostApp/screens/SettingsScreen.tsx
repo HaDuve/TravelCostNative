@@ -3,20 +3,15 @@ import {
   StyleSheet,
   View,
   Text,
-  Linking,
   TouchableOpacity,
   Platform,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import Purchases from "react-native-purchases";
+
 import { TripContext } from "../store/trip-context";
-import { UserContext } from "../store/user-context";
-import { AuthContext } from "../store/auth-context";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -25,10 +20,6 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { ScrollView } from "react-native-gesture-handler";
-import { GlobalStyles } from "../constants/styles";
-import LinkingButton from "../components/UI/LinkButton";
-import { DEVELOPER_MODE } from "../confAppConstants";
 import { useFocusEffect } from "@react-navigation/native";
 import { resetTour } from "../util/tourUtil";
 import { reloadApp } from "../util/appState";
@@ -37,16 +28,22 @@ import PropTypes from "prop-types";
 import GradientButton from "../components/UI/GradientButton";
 import SettingsSection from "../components/UI/SettingsSection";
 import Toast from "react-native-toast-message";
-import { useEffect } from "react";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
-import { secureStoreGetItem } from "../store/secure-storage";
 import IconButton from "../components/UI/IconButton";
 import { BlurView } from "expo-blur";
 import { NetworkContext } from "../store/network-context";
-import safeLogError from "../util/error";
-import { canOpenURL } from "expo-linking";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { ScrollView } from "react-native-gesture-handler";
 import DevContent from "../components/Settings/DevContent";
 import CurrencyExchangeInfo from "../components/UI/CurrencyExchangeInfo";
+import LinkingButton from "../components/UI/LinkButton";
+import { DEVELOPER_MODE } from "../confAppConstants";
+import { GlobalStyles } from "../constants/styles";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { AuthContext } from "../store/auth-context";
+import { secureStoreGetItem } from "../store/secure-storage";
+import { UserContext } from "../store/user-context";
 import { dynamicScale } from "../util/scalingUtil";
 
 const SettingsScreen = ({ navigation }) => {
@@ -206,6 +203,7 @@ const SettingsScreen = ({ navigation }) => {
       <LinkingButton
         style={styles.settingsButton}
         URL="https://foodfornomads.com/"
+        onPress={() => {}}
       >
         {i18n.t("visitFoodForNomadsLabel")}
       </LinkingButton>
@@ -235,17 +233,17 @@ const SettingsScreen = ({ navigation }) => {
       <CurrencyExchangeInfo />
       {!isRestoringPurchases && (
         <TouchableOpacity onPress={() => restorePurchases()}>
-          <Text style={[styles.textButton]}>{i18n.t("restorePurchases")}</Text>
+          <Text style={styles.textButton}>{i18n.t("restorePurchases")}</Text>
         </TouchableOpacity>
       )}
       {isRestoringPurchases && (
         <LoadingBarOverlay
-          customText={i18n.t("restorePurchases") + "..."}
+          customText={`${i18n.t("restorePurchases")}...`}
         ></LoadingBarOverlay>
       )}
       {emailString && (
         <TouchableOpacity onPress={() => deleteAccountHandler()}>
-          <Text style={[styles.textButton]}>
+          <Text style={styles.textButton}>
             {i18n.t("deleteAccount")} {emailString}
           </Text>
         </TouchableOpacity>
@@ -270,36 +268,36 @@ SettingsScreen.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  backButton: { marginBottom: "-14%" },
+  settingsButton: {
+    borderRadius: 16,
+    marginHorizontal: "8%",
+    marginVertical: "2%",
+  },
+  textButton: {
+    borderRadius: 16,
+    color: GlobalStyles.colors.gray700,
+    fontSize: dynamicScale(16, false, 0.5),
+    fontStyle: "italic",
+    fontWeight: "bold",
+    marginLeft: "2%",
+    marginTop: "8%",
+    paddingHorizontal: "8%",
+    paddingVertical: "2%",
+    textAlign: "center",
+  },
   titleContainer: {
+    alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
     marginLeft: "30%",
     paddingVertical: "3%",
   },
-  backButton: { marginBottom: "-14%" },
   titleText: {
+    color: GlobalStyles.colors.gray700,
     fontSize: dynamicScale(22, false, 0.5),
-    fontWeight: "bold",
     fontStyle: "italic",
-    color: GlobalStyles.colors.gray700,
-    marginLeft: "2%",
-  },
-  settingsButton: {
-    marginVertical: "2%",
-    marginHorizontal: "8%",
-    borderRadius: 16,
-  },
-  textButton: {
-    marginTop: "8%",
-    paddingVertical: "2%",
-    paddingHorizontal: "8%",
-    borderRadius: 16,
-    textAlign: "center",
-    fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "bold",
-    fontStyle: "italic",
-    color: GlobalStyles.colors.gray700,
     marginLeft: "2%",
   },
 });

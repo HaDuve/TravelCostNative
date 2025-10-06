@@ -1,5 +1,7 @@
 /* eslint-disable react/prop-types */
-import { useContext, useEffect, useRef, useState } from "react";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Alert,
   Platform,
@@ -8,23 +10,24 @@ import {
   View,
   ScrollView,
 } from "react-native";
+import Purchases from "react-native-purchases";
+import { TourGuideZone, useTourGuideController } from "rn-tourguide";
+
+import FeedbackForm from "../components/FeedbackForm/FeedbackForm";
+import { useInterval } from "../components/Hooks/useInterval";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
+import { setAttributesAsync } from "../components/Premium/PremiumConstants";
 import TripList from "../components/ProfileOutput/TripList";
 import IconButton from "../components/UI/IconButton";
-import FeedbackForm from "../components/FeedbackForm/FeedbackForm";
+import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { GlobalStyles } from "../constants/styles";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
+import { AuthContext } from "../store/auth-context";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import React from "react";
-import { TourGuideZone, useTourGuideController } from "rn-tourguide";
-import { useInterval } from "../components/Hooks/useInterval";
-import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
-import { de, en, fr, ru } from "../i18n/supportedLanguages";
-import { AuthContext } from "../store/auth-context";
+
 import { secureStoreGetItem } from "../store/secure-storage";
 import { sleep } from "../util/appState";
 import { storeExpoPushTokenInTrip } from "../util/http";
@@ -43,14 +46,12 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { ExpoPushToken } from "expo-notifications";
 // Branch.io removed
-import Purchases from "react-native-purchases";
-import { setAttributesAsync } from "../components/Premium/PremiumConstants";
+
 import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import { NetworkContext } from "../store/network-context";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import GetLocalPriceButton from "../components/Settings/GetLocalPriceButton";
 import GradientButton from "../components/UI/GradientButton";
-import safeLogError from "../util/error";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -168,15 +169,15 @@ const ProfileScreen = ({ navigation }) => {
         // console.log("token", token);
         setExpoPushToken(token);
       })
-      .catch((e) => Alert.alert(e, e.message));
+      .catch(e => Alert.alert(e, e.message));
 
     notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
+      Notifications.addNotificationReceivedListener(notification => {
         setNotification(notification);
       });
 
     responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
+      Notifications.addNotificationResponseReceivedListener(response => {
         // console.log(response);
       });
 
@@ -298,7 +299,7 @@ const ProfileScreen = ({ navigation }) => {
     // Branch.io removed - no event logging
     // console.log("stop");
   };
-  const handleOnStepChange = async (step) => {
+  const handleOnStepChange = async step => {
     // console.log(`stepChange, name: ${step?.name} order: ${step?.order}`);
     switch (step?.order) {
       case 1:
@@ -449,51 +450,58 @@ const ProfileScreen = ({ navigation }) => {
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
+  addButton: {
+    backgroundColor: GlobalStyles.colors.primary400,
+    borderRadius: 99,
+    marginBottom: dynamicScale(4, true),
+    padding: dynamicScale(16, false, 0.5),
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+  },
   container: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
     flex: 1,
     padding: 0,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
   },
+  deleteContainer: {
+    alignItems: "center",
+    borderTopColor: GlobalStyles.colors.primary200,
+    borderTopWidth: 2,
+    marginTop: dynamicScale(16, true),
+    paddingTop: dynamicScale(8, true),
+  },
+  headerButton: {
+    borderRadius: 16,
+    flex: 1,
+    marginHorizontal: dynamicScale(4, false, 0.5),
+  },
+
+  headerButtonsContainer: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: dynamicScale(8, true),
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+    paddingVertical: dynamicScale(8, true),
+  },
+  horizontalButtonContainer: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    // make it appear behind the triplist
+    // zIndex: -1,
+  },
+  horizontalContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginRight: dynamicScale(15),
+    marginTop: dynamicScale(15, false, 0.3),
+  },
+
   innerContainer: {
     flex: 0,
     minHeight: dynamicScale(100, true),
     padding: dynamicScale(4),
   },
-  headerButtonsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: dynamicScale(16, false, 0.5),
-    paddingVertical: dynamicScale(8, true),
-    marginBottom: dynamicScale(8, true),
-  },
-  headerButton: {
-    flex: 1,
-    marginHorizontal: dynamicScale(4, false, 0.5),
-    borderRadius: 16,
-  },
-
-  tripContainer: {
-    flex: 1,
-    // minHeight: "68%",
-    margin: dynamicScale(16),
-    marginBottom: dynamicScale(-150, true),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-  },
-  horizontalContainer: {
-    marginTop: dynamicScale(15, false, 0.3),
-    marginRight: dynamicScale(15),
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  horizontalButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    // make it appear behind the triplist
-    // zIndex: -1,
-  },
-
   newTripButtonContainer: {
     flexDirection: "row",
     padding: "10%",
@@ -511,27 +519,6 @@ const styles = StyleSheet.create({
     //center
     alignSelf: "center",
   },
-  tripListTitle: {
-    fontSize: dynamicScale(22, false, 0.5),
-    fontWeight: "bold",
-    fontStyle: "italic",
-    color: GlobalStyles.colors.gray700,
-    marginLeft: dynamicScale(10),
-  },
-  deleteContainer: {
-    marginTop: dynamicScale(16, true),
-    paddingTop: dynamicScale(8, true),
-    borderTopWidth: 2,
-    borderTopColor: GlobalStyles.colors.primary200,
-    alignItems: "center",
-  },
-  addButton: {
-    backgroundColor: GlobalStyles.colors.primary400,
-    padding: dynamicScale(16, false, 0.5),
-    paddingHorizontal: dynamicScale(16, false, 0.5),
-    marginBottom: dynamicScale(4, true),
-    borderRadius: 99,
-  },
   offlineWarningContainer: {
     // center content
     flex: 1,
@@ -540,10 +527,24 @@ const styles = StyleSheet.create({
     alignContent: "center",
   },
   offlineWarningText: {
-    fontSize: dynamicScale(14, false, 0.5),
-    paddingVertical: "2%",
-    paddingHorizontal: "2%",
     color: GlobalStyles.colors.gray700,
+    fontSize: dynamicScale(14, false, 0.5),
     fontWeight: "300",
+    paddingHorizontal: "2%",
+    paddingVertical: "2%",
+  },
+  tripContainer: {
+    flex: 1,
+    // minHeight: "68%",
+    margin: dynamicScale(16),
+    marginBottom: dynamicScale(-150, true),
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  tripListTitle: {
+    color: GlobalStyles.colors.gray700,
+    fontSize: dynamicScale(22, false, 0.5),
+    fontStyle: "italic",
+    fontWeight: "bold",
+    marginLeft: dynamicScale(10),
   },
 });

@@ -3,15 +3,20 @@ import React, { StyleSheet, Image } from "react-native";
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
+
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import Onboarding from "react-native-onboarding-swiper";
-import { GlobalStyles } from "../constants/styles";
 import PropTypes from "prop-types";
+import Onboarding from "react-native-onboarding-swiper";
+
+import { GlobalStyles } from "../constants/styles";
 import { dynamicScale } from "../util/scalingUtil";
 
 const OnboardingScreen = ({ navigation }) => {
@@ -60,9 +65,9 @@ OnboardingScreen.propTypes = {
 
 const styles = StyleSheet.create({
   titleStyle: {
-    paddingHorizontal: dynamicScale(20, false, 0.5),
-    marginTop: dynamicScale(-20, false, 0.5),
     fontSize: dynamicScale(28, false, 0.5),
     fontWeight: "bold",
+    marginTop: dynamicScale(-20, false, 0.5),
+    paddingHorizontal: dynamicScale(20, false, 0.5),
   },
 });

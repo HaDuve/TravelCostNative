@@ -1,10 +1,11 @@
-import React, { createContext, useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import SplashScreenOverlay from "../components/UI/SplashScreenOverlay";
 import PropTypes from "prop-types";
-import { secureStoreGetItem, secureStoreSetItem } from "./secure-storage";
+import React, { createContext, useEffect, useState } from "react";
+
+import SplashScreenOverlay from "../components/UI/SplashScreenOverlay";
 import safeLogError from "../util/error";
 import { safelyParseJSON } from "../util/jsonParse";
+
+import { secureStoreGetItem, secureStoreSetItem } from "./secure-storage";
 
 export interface Settings {
   showFlags: boolean;
@@ -43,7 +44,7 @@ export const SettingsProvider = ({ children }) => {
     loadSettingsAsync();
   }, []);
 
-  const saveSettings = async (newSettings) => {
+  const saveSettings = async newSettings => {
     try {
       const settingsString = JSON.stringify(newSettings);
       await secureStoreSetItem("settings", settingsString);
@@ -54,8 +55,8 @@ export const SettingsProvider = ({ children }) => {
   };
 
   const value = {
-    settings: settings,
-    saveSettings: saveSettings,
+    settings,
+    saveSettings,
   };
   if (settings === null) {
     // show loading indicator or placeholder content while settings are being loaded

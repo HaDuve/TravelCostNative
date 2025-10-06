@@ -1,15 +1,14 @@
-import React, { useContext, useMemo } from "react";
+import PropTypes from "prop-types";
+import { useContext, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
-import PropTypes from "prop-types";
+import { OrientationContext } from "../../store/orientation-context";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { dynamicScale } from "../../util/scalingUtil";
-import { OrientationContext } from "../../store/orientation-context";
-
-import WebViewChart from "../charts/WebViewChart";
-import { ChartController, ExpenseData } from "../charts/controller";
 import { createBarChartData } from "../charts/chartHelpers";
+import { ChartController, ExpenseData } from "../charts/controller";
+import WebViewChart from "../charts/WebViewChart";
 
 const ExpenseChart = ({ inputData, xAxis, yAxis, budget, currency }) => {
   const { isLandscape } = useContext(OrientationContext);
@@ -74,10 +73,10 @@ ExpenseChart.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: "center",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
     paddingHorizontal: dynamicScale(8),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
   },
 });

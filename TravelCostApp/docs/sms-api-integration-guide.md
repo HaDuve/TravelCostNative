@@ -9,24 +9,28 @@ Instead of running Signal CLI, we now use direct SMS API services that integrate
 ## Supported SMS Services
 
 ### 1. Twilio (Recommended)
+
 - **Reliability**: 99.95% uptime SLA
 - **Global Coverage**: 200+ countries
 - **Pricing**: $0.0075 per SMS (US), free tier available
 - **Features**: Delivery reports, webhooks, advanced routing
 
 ### 2. Vonage (Nexmo)
+
 - **Reliability**: Enterprise-grade
 - **Global Coverage**: 200+ countries
 - **Pricing**: $0.0055 per SMS (US)
 - **Features**: Advanced analytics, A2P 10DLC support
 
 ### 3. TextBelt
+
 - **Reliability**: Good for development
 - **Global Coverage**: Limited
 - **Pricing**: Free tier (1 SMS/day), $0.10 per SMS
 - **Features**: Simple API, good for testing
 
 ### 4. Custom API
+
 - **Flexibility**: Use any SMS provider
 - **Integration**: Custom headers and authentication
 - **Pricing**: Varies by provider
@@ -36,17 +40,20 @@ Instead of running Signal CLI, we now use direct SMS API services that integrate
 ### Option 1: Twilio (Recommended)
 
 #### Step 1: Create Twilio Account
+
 1. Go to [twilio.com](https://www.twilio.com)
 2. Sign up for a free account
 3. Verify your phone number
 4. Get your Account SID and Auth Token from the console
 
 #### Step 2: Get a Phone Number
+
 1. In Twilio Console, go to Phone Numbers → Manage → Buy a number
 2. Choose a number with SMS capabilities
 3. Note the phone number (format: +1234567890)
 
 #### Step 3: Configure Firebase Functions
+
 ```bash
 # Set SMS API type
 firebase functions:config:set sms.api_type="twilio"
@@ -61,6 +68,7 @@ firebase functions:config:set sms.recipient="+YOUR_PHONE_NUMBER"
 ```
 
 #### Step 4: Deploy and Test
+
 ```bash
 # Deploy functions
 firebase deploy --only functions
@@ -73,6 +81,7 @@ firebase functions:log --only onFeedbackCreated
 ### Option 2: TextBelt (Free Testing)
 
 #### Step 1: Configure Firebase Functions
+
 ```bash
 # Set SMS API type
 firebase functions:config:set sms.api_type="textbelt"
@@ -85,6 +94,7 @@ firebase functions:config:set sms.api_key="YOUR_TEXTBELT_KEY"
 ```
 
 #### Step 2: Deploy and Test
+
 ```bash
 # Deploy functions
 firebase deploy --only functions
@@ -95,11 +105,13 @@ firebase deploy --only functions
 ### Option 3: Vonage (Nexmo)
 
 #### Step 1: Create Vonage Account
+
 1. Go to [developer.vonage.com](https://developer.vonage.com)
 2. Sign up for a free account
 3. Get your API Key and API Secret
 
 #### Step 2: Configure Firebase Functions
+
 ```bash
 # Set SMS API type
 firebase functions:config:set sms.api_type="vonage"
@@ -161,12 +173,13 @@ export TWILIO_PHONE_NUMBER="+1234567890"
 Create a test script `test-sms.js`:
 
 ```javascript
-const admin = require('firebase-admin');
+const admin = require("firebase-admin");
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
   credential: admin.credential.applicationDefault(),
-  databaseURL: "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app"
+  databaseURL:
+    "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app",
 });
 
 const db = admin.database();
@@ -178,28 +191,27 @@ const testFeedback = {
   date: new Date().toISOString(),
   timestamp: Date.now(),
   userAgent: "Test Script",
-  version: "1.0.0"
+  version: "1.0.0",
 };
 
 async function testSMS() {
   try {
     console.log("Creating test feedback...");
-    
+
     // Create a test feedback entry
-    const feedbackRef = db.ref('/server/feedback').push();
+    const feedbackRef = db.ref("/server/feedback").push();
     await feedbackRef.set(testFeedback);
-    
+
     console.log("✅ Test feedback created successfully!");
     console.log("Feedback ID:", feedbackRef.key);
     console.log("Check your phone for SMS notification!");
-    
+
     // Clean up after 10 seconds
     setTimeout(async () => {
       await feedbackRef.remove();
       console.log("🧹 Test feedback cleaned up");
       process.exit(0);
     }, 10000);
-    
   } catch (error) {
     console.error("❌ Error:", error);
     process.exit(1);
@@ -210,6 +222,7 @@ testSMS();
 ```
 
 Run the test:
+
 ```bash
 node test-sms.js
 ```
@@ -230,21 +243,25 @@ firebase functions:log --only onFeedbackCreated --limit 50
 ## Cost Comparison
 
 ### Twilio
+
 - **Free Tier**: $15 credit (≈ 2000 SMS)
 - **Paid**: $0.0075 per SMS (US)
 - **Monthly Cost**: $0-15 for typical usage
 
 ### Vonage
+
 - **Free Tier**: $2 credit (≈ 400 SMS)
 - **Paid**: $0.0055 per SMS (US)
 - **Monthly Cost**: $0-10 for typical usage
 
 ### TextBelt
+
 - **Free Tier**: 1 SMS per day
 - **Paid**: $0.10 per SMS
 - **Monthly Cost**: $0-3 for typical usage
 
 ### Estimated Monthly Costs
+
 - **Low usage** (< 100 feedback/month): $0-5
 - **Medium usage** (100-1000 feedback/month): $5-15
 - **High usage** (> 1000 feedback/month): $15-50

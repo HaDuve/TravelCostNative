@@ -1,6 +1,7 @@
 # Task Creation Protocol
 
 ## Configuration
+
 Task naming conventions can be customized in `sessions/sessions-config.json`.
 If no config exists, the defaults below are used.
 
@@ -8,12 +9,14 @@ If no config exists, the defaults below are used.
 
 Check `sessions/sessions-config.json` for configured prefixes.
 Default prefixes:
+
 - `h-` → High priority
-- `m-` → Medium priority  
+- `m-` → Medium priority
 - `l-` → Low priority
 - `?-` → Investigate (task may be obsolete, speculative priority)
 
 Examples:
+
 - `h-fix-auth-redirect.md`
 - `m-implement-oauth.md`
 - `l-docs-api-reference.md`
@@ -25,7 +28,7 @@ Task type comes after priority prefix. Check `sessions/sessions-config.json` for
 Default mappings:
 
 - `implement-` → Creates feature/ branch
-- `fix-` → Creates fix/ branch  
+- `fix-` → Creates fix/ branch
 - `refactor-` → Creates feature/ branch
 - `research-` → No branch needed
 - `experiment-` → Creates experiment/ branch
@@ -36,6 +39,7 @@ Default mappings:
 ## File vs Directory Decision
 
 **Use a FILE when**:
+
 - Single focused goal
 - Estimated < 3 days work
 - No obvious subtasks at creation time
@@ -45,6 +49,7 @@ Default mappings:
   - `l-refactor-redis-client.md`
 
 **Use a DIRECTORY when**:
+
 - Multiple distinct phases
 - Needs clear subtasks from the start
 - Estimated > 3 days work
@@ -56,10 +61,13 @@ Default mappings:
 ## Creating a Task
 
 1. **Copy template**:
+
    ```bash
    cp sessions/tasks/TEMPLATE.md sessions/tasks/[priority]-[task-name].md
    ```
+
    Or for directory:
+
    ```bash
    mkdir sessions/tasks/[priority]-[task-name]
    cp sessions/tasks/TEMPLATE.md sessions/tasks/[priority]-[task-name]/README.md
@@ -78,10 +86,12 @@ Default mappings:
    - Checkboxes for tracking
 
 4. **Context Gathering** (STRONGLY RECOMMENDED):
+
    ```bash
    # Highly recommended to run immediately after task creation:
    # Use context-gathering agent on sessions/tasks/[priority]-[task-name].md
    ```
+
    - Agent creates comprehensive context manifest
    - Includes narrative explanation of how systems work
    - Can be deferred to task-startup if preferred
@@ -90,13 +100,14 @@ Default mappings:
 ## Branch Creation
 
 **DO NOT** create branch until starting work:
+
 ```bash
 # When ready to start:
 git checkout -b feature/implement-cool-thing
 
 # Update task state with CORRECT format
 # IMPORTANT: Use exactly these field names:
-#   - "task" (NOT "task_file") - just the task name without path or .md extension  
+#   - "task" (NOT "task_file") - just the task name without path or .md extension
 #   - "branch" (NOT "branch_name") - the Git branch name
 #   - "services" - array of affected services/modules
 #   - "updated" - current date in YYYY-MM-DD format
@@ -113,6 +124,7 @@ EOF
 ## Task Evolution
 
 If a file task needs subtasks during work:
+
 1. Create directory with same name
 2. Move original file to directory as README.md
 3. Add subtask files
@@ -121,6 +133,7 @@ If a file task needs subtasks during work:
 ## For Agents Creating Tasks
 
 When programmatically creating tasks:
+
 1. Read `sessions/sessions-config.json` for:
    - Priority prefixes from `config.task_prefixes.priority`
    - Type-to-branch mappings from `config.task_prefixes.types`

@@ -1,25 +1,29 @@
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import PropTypes from "prop-types";
 import { StyleSheet, Text, View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
+import * as Progress from "react-native-progress";
 
-import React from "react";
 import { GlobalStyles } from "../../constants/styles";
 
 //localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
-import PropTypes from "prop-types";
-import * as Progress from "react-native-progress";
-import LoadingOverlay from "./LoadingOverlay";
+
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
+
+import LoadingOverlay from "./LoadingOverlay";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 // i18n.locale = "en";
 i18n.enableFallback = true;
 
 const loadingColor = GlobalStyles.colors.primary500;
 const unfilledColor = GlobalStyles.colors.gray600;
-const LoadingBarOverlay = (props) => {
+const LoadingBarOverlay = props => {
   const {
     containerStyle,
     progressAt,
@@ -93,13 +97,13 @@ LoadingBarOverlay.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: "center",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
+    margin: dynamicScale(5),
     padding: dynamicScale(5),
     paddingTop: dynamicScale(5, true),
-    margin: dynamicScale(5),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   headerContainer: {
     alignItems: "center",

@@ -1,14 +1,15 @@
-import { Alert, Platform, StyleSheet } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import { BlurView } from "expo-blur";
+import { Alert, Platform, StyleSheet } from "react-native";
+
 import GradientButton from "../UI/GradientButton";
+
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { GlobalStyles } from "../../constants/styles";
+import { BlurView } from "expo-blur";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -17,14 +18,18 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import Animated, { SlideInDown } from "react-native-reanimated";
+import PropTypes from "prop-types";
 import { Card } from "react-native-paper";
-import { sleep } from "../../util/appState";
+import Animated, { SlideInDown } from "react-native-reanimated";
+
+import { GlobalStyles } from "../../constants/styles";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 import { NetworkContext } from "../../store/network-context";
 import { UserContext } from "../../store/user-context";
-import FlatButton from "../UI/FlatButton";
-import PropTypes from "prop-types";
+import { RootNavigationProp } from "../../types/navigation";
+import { sleep } from "../../util/appState";
 import { shouldShowOnboarding } from "../Rating/firstStartUtil";
+import FlatButton from "../UI/FlatButton";
 
 const BlurPremium = ({ canBack = false }) => {
   const netCtx = useContext(NetworkContext);
@@ -34,7 +39,7 @@ const BlurPremium = ({ canBack = false }) => {
   const [isOnboarding, setIsOnboarding] = useState(false);
   const startIntensity = 5;
   const [blurIntensity, setBlurIntensity] = useState(startIntensity);
-  const navigation = useNavigation();
+  const navigation = useNavigation<RootNavigationProp>();
   const isAndroid = Platform.OS === "android";
   useEffect(() => {
     async function checkOnboardingState() {
@@ -141,8 +146,8 @@ BlurPremium.propTypes = {
 
 const styles = StyleSheet.create({
   titleContainerBlur: {
-    flexDirection: "row",
     alignItems: "center",
+    flexDirection: "row",
     justifyContent: "center",
     position: "absolute",
 

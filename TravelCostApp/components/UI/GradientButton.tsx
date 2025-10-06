@@ -1,12 +1,14 @@
-import { StyleSheet, Text, View, Pressable, Platform } from "react-native";
-import React from "react";
-import { GlobalStyles } from "../../constants/styles";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import PropTypes from "prop-types";
+import React from "react";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+
+import { GlobalStyles } from "../../constants/styles";
+import { GradientButtonProps } from "../../types/components";
 import { dynamicScale } from "../../util/scalingUtil";
 
-const GradientButton = ({
+const GradientButton: React.FC<GradientButtonProps> = ({
   children,
   onPress,
   buttonStyle,
@@ -28,7 +30,7 @@ const GradientButton = ({
       >
         <LinearGradient
           start={{ x: 0.51, y: -1.3 }}
-          colors={colors}
+          colors={colors as any}
           style={[styles.button, buttonStyle, { overflow: "hidden" }]}
         >
           <Text
@@ -59,11 +61,11 @@ GradientButton.propTypes = {
 
 const styles = StyleSheet.create({
   button: {
-    padding: dynamicScale(16, false, 0.5),
-    marginHorizontal: dynamicScale(4),
     backgroundColor: GlobalStyles.colors.primary500,
-
+    marginHorizontal: dynamicScale(4),
     overflow: "visible",
+
+    padding: dynamicScale(16, false, 0.5),
 
     ...Platform.select({
       ios: {
@@ -86,12 +88,12 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.primary200,
   },
   pressed: {
-    elevation: 0,
-    transform: [{ scale: 0.9 }],
-    opacity: 0.75,
     backgroundColor: GlobalStyles.colors.primary100,
     borderRadius: 16,
+    elevation: 0,
+    opacity: 0.75,
     shadowColor: GlobalStyles.colors.backgroundColor,
     shadowRadius: 0,
+    transform: [{ scale: 0.9 }],
   },
 });

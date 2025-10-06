@@ -9,9 +9,11 @@ modules: [share-trip, ui-ux, traveller-management, manage-expense]
 # Implement Share Trip UX Improvements
 
 ## Problem/Goal
+
 Improve share trip UX based on user feedback that they cannot find the share trip functionality. Add a "+ add traveller" item in the traveller dropdown that leads to the shareTrip screen, and potentially add share trip button to manage expense screen.
 
 ## Success Criteria
+
 - [x] Add "+ add traveller" item (translated) to traveller dropdown
 - [x] Implement navigation from dropdown to shareTrip screen
 - [ ] Consider adding share trip button to manage expense screen (deferred)
@@ -49,12 +51,14 @@ The traveller dropdown system is sophisticated and handles multiple data formats
 - Currently used extensively in ExpenseForm for "Who paid?" and shared expense selections
 
 The traveller data flows through the TripContext, which manages:
+
 - fetchAndSetTravellers: Async method to load travellers from backend
 - saveTravellersInStorage/loadTravellersFromStorage: Offline persistence
 - Real-time updates when travellers join/leave trips
 
 **ExpenseForm Dropdown Pattern:**
 The ManageExpense/ExpenseForm.tsx component (lines 425-1475) demonstrates the established dropdown pattern:
+
 - Uses react-native-dropdown-picker for consistent UI
 - Implements modal presentation with "listMode" for better UX
 - Supports search functionality where needed
@@ -68,11 +72,12 @@ Since we're implementing a "+ add traveller" item in the traveller dropdown, it 
 
 **Integration Point 1: Dropdown Data Structure**
 The travellerToDropdown function in util/split.ts (line 244-273) will need modification to append a special "add traveller" item. This item should:
-- Have a recognizable identifier (like value: "__ADD_TRAVELLER__")
+
+- Have a recognizable identifier (like value: "**ADD_TRAVELLER**")
 - Use the translated label from i18n (inviteTraveller key exists: "Invite other Traveller")
 - Be visually distinct (potentially with an icon or special styling)
 
-**Integration Point 2: ExpenseForm Navigation Logic** 
+**Integration Point 2: ExpenseForm Navigation Logic**
 The ExpenseForm component's dropdown handlers (around lines 1425-1475 in ExpenseForm.tsx) will need enhancement to detect when the special "add traveller" item is selected and trigger navigation to the ShareTrip screen instead of setting a traveller value.
 
 **Integration Point 3: Navigation Parameter Passing**
@@ -90,18 +95,22 @@ The task mentions potentially adding a share trip button to the ManageExpense sc
 
 ```typescript
 // util/split.ts
-export function travellerToDropdown(travellers): {label: string, value: string}[]
+export function travellerToDropdown(
+  travellers
+): { label: string; value: string }[];
 
 // ExpenseForm dropdown pattern
 const [open, setOpen] = useState(false);
-const [whoPaid, setWhoPaid] = useState(editingValues ? editingValues.whoPaid : null);
+const [whoPaid, setWhoPaid] = useState(
+  editingValues ? editingValues.whoPaid : null
+);
 const [items, setItems] = useState(currentTravellersAsItems);
 
 // ShareTrip navigation
-navigation.navigate("Share", { tripId: string })
+navigation.navigate("Share", { tripId: string });
 
 // Translation keys available
-i18n.t("inviteTraveller") // "Invite other Traveller"
+i18n.t("inviteTraveller"); // "Invite other Traveller"
 ```
 
 #### Data Structures
@@ -116,7 +125,7 @@ interface DropdownItem {
 // Special add traveller item
 const ADD_TRAVELLER_ITEM = {
   label: i18n.t("inviteTraveller"),
-  value: "__ADD_TRAVELLER__"
+  value: "__ADD_TRAVELLER__",
 };
 
 // ShareTrip route parameters
@@ -141,9 +150,11 @@ interface ShareTripParams {
 - TripContext integration for data refresh
 
 ## Context Files
+
 <!-- Added by context-gathering agent or manually -->
 
 ## User Notes
+
 SPIKE: improve share trip UX (user reported not finding the share trip, add share trip button to manage expense)
 
 Share trip UX: Add "+ add traveller" item (translated) in traveller dropdown that leads to shareTrip screen
@@ -153,6 +164,7 @@ Share trip UX: Add "+ add traveller" item (translated) in traveller dropdown tha
 ### 2025-09-14
 
 #### Completed
+
 - Enhanced `travellerToDropdown()` function with conditional "+ add traveller" option
 - Implemented modal state machine pattern for cascading dropdown flows in ExpenseForm
 - Added navigation from "+ add traveller" dropdown item to ShareTrip screen
@@ -161,23 +173,27 @@ Share trip UX: Add "+ add traveller" item (translated) in traveller dropdown tha
 - Created comprehensive CLAUDE.md documentation for affected components
 
 #### Decisions
+
 - Used state machine pattern instead of individual boolean states for modal management
 - Implemented conditional dropdown inclusion to prevent UX confusion
 - Chose to defer ManageExpense screen button as dropdown solution provides sufficient discoverability
 - Used existing translation keys rather than creating new ones for consistency
 
 #### Discovered
+
 - Solo traveller edge case where "+ add traveller" might be confusing (noted for future iteration)
 - Complex state transitions require careful timeout management (100ms delays)
 - DropDownPicker components need special handling for custom navigation values
 
 #### Technical Implementation
+
 - **util/split.ts**: Added `includeAddTraveller` parameter and `__ADD_TRAVELLER__` special value
 - **ExpenseForm.tsx**: Implemented modal state machine with WHO_PAID → HOW_SHARED → EXACT_SHARING flow
 - **ShareTrip.tsx**: Complete redesign with ScrollView, proper header, and responsive styling
 - **Navigation**: Seamless integration with existing navigation stack using `navigation.navigate("Share", { tripId })`
 
 #### Code Review Results
+
 - No critical security issues found
 - Implementation follows existing architectural patterns
 - Minor warnings about debug logging and state complexity noted for future cleanup

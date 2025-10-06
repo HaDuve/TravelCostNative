@@ -1,8 +1,8 @@
-import { StyleSheet, TouchableOpacity } from "react-native";
-import React from "react";
-import { GlobalStyles } from "../../constants/styles";
 import { Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
+import { StyleSheet, TouchableOpacity } from "react-native";
+
+import { GlobalStyles } from "../../constants/styles";
 import { dynamicScale } from "../../util/scalingUtil";
 
 const SelectCategoryIcon = ({
@@ -37,9 +37,9 @@ SelectCategoryIcon.propTypes = {
 
 const styles = StyleSheet.create({
   iconButton: {
-    padding: 4,
-    marginHorizontal: 4,
     borderRadius: 16,
+    marginHorizontal: 4,
+    padding: 4,
   },
   selectedIconButton: {
     backgroundColor: GlobalStyles.colors.primary50,

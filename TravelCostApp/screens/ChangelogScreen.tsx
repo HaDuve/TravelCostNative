@@ -1,25 +1,26 @@
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import * as Haptics from "expo-haptics";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import PropTypes from "prop-types";
 import React, { useCallback, useContext, useEffect, useState } from "react";
+import { StyleSheet, Text, View, ScrollView, Pressable } from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
+
 import BackButton from "../components/UI/BackButton";
-import { GlobalStyles } from "../constants/styles";
+import InfoButton from "../components/UI/InfoButton";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
+import { GlobalStyles } from "../constants/styles";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
 import { getMMKVString, setMMKVString } from "../store/mmkv";
+import { NetworkContext } from "../store/network-context";
+import safeLogError from "../util/error";
 import { fetchChangelog } from "../util/http";
 import { VersionCheckResponse, versionCheck } from "../util/version";
-import InfoButton from "../components/UI/InfoButton";
 import { parseChangelog } from "../util/parseChangelog";
-import Animated, { FadeInUp } from "react-native-reanimated";
-import { Pressable } from "react-native";
-import * as Haptics from "expo-haptics";
-import { NetworkContext } from "../store/network-context";
-import PropTypes from "prop-types";
-import safeLogError from "../util/error";
 import { constantScale } from "../util/scalingUtil";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -106,14 +107,16 @@ const ChangelogScreen = ({ navigation }) => {
     return (
       <ScrollView style={styles.container}>
         <BackButton style={{ marginTop: -20, marginBottom: 0, padding: 4 }} />
-        <LoadingBarOverlay customText={i18n.t("loadingChangelog")}></LoadingBarOverlay>
+        <LoadingBarOverlay
+          customText={i18n.t("loadingChangelog")}
+        ></LoadingBarOverlay>
       </ScrollView>
     );
   }
 
   return (
     <ScrollView style={styles.container}>
-      <View style={[styles.headerContainer]}>
+      <View style={styles.headerContainer}>
         <BackButton style={{ padding: constantScale(12, 0.5) }} />
         <Text style={GlobalStyles.titleText}>{i18n.t("appChanges")}</Text>
       </View>
@@ -185,6 +188,7 @@ const ChangelogScreen = ({ navigation }) => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   setShowInfo(!showInfo);
                 }}
+                containerStyle={{}}
               ></InfoButton>
             </View>
           </View>
@@ -210,37 +214,37 @@ ChangelogScreen.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  changelogContainer: {
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
+    borderRadius: 24,
+    margin: constantScale(12, 0.5),
+    padding: constantScale(24, 0.5),
+    paddingBottom: constantScale(12, 0.5),
+    paddingTop: constantScale(12, 0.5),
+  },
+  changelogText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: constantScale(18, 0.5),
+    fontWeight: "300" as const,
+    lineHeight: constantScale(24, 0.5),
+  },
   container: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
     flex: 1,
     padding: "4%",
-    backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   headerContainer: {
-    flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
+    flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     marginRight: "27.5%",
   },
-  changelogContainer: {
-    margin: constantScale(12, 0.5),
-    padding: constantScale(24, 0.5),
-    paddingTop: constantScale(12, 0.5),
-    paddingBottom: constantScale(12, 0.5),
-    backgroundColor: GlobalStyles.colors.backgroundColorLight,
-    borderRadius: 24,
-  },
-  changelogText: {
-    fontSize: constantScale(18, 0.5),
-    lineHeight: constantScale(24, 0.5),
-    fontWeight: "300",
-    color: GlobalStyles.colors.textColor,
-  },
   subHeaderText: {
-    textAlign: "center",
-    fontSize: constantScale(18, 0.5),
-    lineHeight: constantScale(24, 0.5),
-    fontWeight: "400",
     color: GlobalStyles.colors.textColor,
+    fontSize: constantScale(18, 0.5),
+    fontWeight: "400" as const,
+    lineHeight: constantScale(24, 0.5),
+    textAlign: "center",
   },
 });

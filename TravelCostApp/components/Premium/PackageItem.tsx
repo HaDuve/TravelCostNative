@@ -1,12 +1,15 @@
-import React from "react";
-import { View, Text, Pressable, Alert, StyleSheet } from "react-native";
-import Purchases, { PurchasesPackage } from "react-native-purchases";
-import { ENTITLEMENT_ID } from "../Premium/PremiumConstants";
-
-//Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+import PropTypes from "prop-types";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import Purchases, { PurchasesPackage } from "react-native-purchases";
+
+//Localization
+
+import Toast from "react-native-toast-message";
+
+import { GlobalStyles } from "../../constants/styles";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -15,11 +18,8 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { GlobalStyles } from "../../constants/styles";
-import PropTypes from "prop-types";
-import Toast from "react-native-toast-message";
-import Discount from "./Discount";
 import { constantScale } from "../../util/scalingUtil";
+import { ENTITLEMENT_ID } from "../Premium/PremiumConstants";
 
 const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
   const {
@@ -44,8 +44,8 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
   const subscriptionPeriodString = isMonthly
     ? ` ${i18n.t("perMonth")}`
     : isYearly
-    ? ` ${i18n.t("perYear")}`
-    : "";
+      ? ` ${i18n.t("perYear")}`
+      : "";
   const subscriptionCalcPriceString = priceString;
   const onSelection = async () => {
     setIsPurchasing(true);
@@ -128,27 +128,27 @@ PackageItem.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "space-between",
     alignItems: "center",
-    padding: "4%",
-    paddingHorizontal: "4%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 10,
+    justifyContent: "space-between",
     margin: "2%",
     marginHorizontal: "4%",
+    padding: "4%",
+    paddingHorizontal: "4%",
   },
+  discountStyle: {},
   isPopularContainer: {
-    borderWidth: 4,
     borderColor: GlobalStyles.colors.cat2,
+    borderWidth: 4,
+  },
+  terms: {
+    color: "darkgrey",
+    fontSize: constantScale(14, 0.5),
   },
   title: {
     color: GlobalStyles.colors.textColor,
     fontSize: constantScale(16, 0.5),
     fontWeight: "bold",
-  },
-  discountStyle: {},
-  terms: {
-    color: "darkgrey",
-    fontSize: constantScale(14, 0.5),
   },
 });

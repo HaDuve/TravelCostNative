@@ -88,10 +88,10 @@ const isTablet = () => {
 };
 
 export {
+  constantScale,
+  dynamicScale,
+  isTablet,
+  moderateScale,
   scale,
   verticalScale,
-  moderateScale,
-  dynamicScale,
-  constantScale,
-  isTablet,
 };

@@ -1,6 +1,7 @@
-import VersionCheck from "react-native-version-check-expo";
 import { Linking } from "react-native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
+import VersionCheck from "react-native-version-check-expo";
+
 import { getMMKVString, setMMKVString } from "../store/mmkv";
 
 export type VersionCheckResponse = {

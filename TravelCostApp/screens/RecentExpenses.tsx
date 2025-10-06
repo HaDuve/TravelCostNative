@@ -1,12 +1,29 @@
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { DateTime } from "luxon";
+import PropTypes from "prop-types";
 import React, {
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
+  memo,
 } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  RefreshControl,
+  useWindowDimensions,
+  Platform,
+} from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
+import Toast from "react-native-toast-message";
+import { TourGuideZone } from "rn-tourguide";
+
 import { MemoizedExpensesOutput } from "../components/ExpensesOutput/ExpensesOutput";
+import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import MiniSyncIndicator from "../components/UI/MiniSyncIndicator";
 import { AuthContext } from "../store/auth-context";
@@ -20,21 +37,11 @@ import { UserContext } from "../store/user-context";
 import { getOfflineQueue } from "../util/offline-queue";
 import { fetchTravelerIsTouched } from "../util/http";
 
-import {
-  StyleSheet,
-  Text,
-  View,
-  RefreshControl,
-  useWindowDimensions,
-} from "react-native";
-import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
-import { DateTime } from "luxon";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
+
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
@@ -48,20 +55,20 @@ import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpensesUtil";
 import { _toShortFormat } from "../util/dateTime";
+
 import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
+
 import { isForeground } from "../util/appState";
-import { TourGuideZone } from "rn-tourguide";
-import PropTypes from "prop-types";
-import Toast from "react-native-toast-message";
+
 import { NetworkContext } from "../store/network-context";
 import { sendOfflineQueue } from "../util/offline-queue";
+
 import * as Haptics from "expo-haptics";
+
 import { SettingsContext } from "../store/settings-context";
-import { formatExpenseWithCurrency, truncateString } from "../util/string";
-import { Platform } from "react-native";
-import { memo } from "react";
-import { getMMKVObject } from "../store/mmkv";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
+import { formatExpenseWithCurrency, truncateString } from "../util/string";
+import { getMMKVObject } from "../store/mmkv";
 import { OrientationContext } from "../store/orientation-context";
 
 function RecentExpenses({ navigation }) {
@@ -210,9 +217,9 @@ function RecentExpenses({ navigation }) {
   const lastConnectionSpeedInMbps = netCtx.lastConnectionSpeedInMbps ?? 0;
   const showInternetSpeed = settings.showInternetSpeed;
   const connectionSpeedString = showInternetSpeed
-    ? " - " +
-      lastConnectionSpeedInMbps?.toFixed(2) +
-      ` ${i18n.t("megaBytePerSecond")}`
+    ? ` - ${lastConnectionSpeedInMbps?.toFixed(
+        2
+      )} ${i18n.t("megaBytePerSecond")}`
     : "";
   // set in useEffect
   useEffect(() => {
@@ -220,7 +227,7 @@ function RecentExpenses({ navigation }) {
       setOfflineString(connectionSpeedString);
     } else {
       if (netCtx.isConnected && !netCtx.strongConnection) {
-        setOfflineString(`` + connectionSpeedString);
+        setOfflineString(`${connectionSpeedString}`);
       } else setOfflineString(` - ${i18n.t("offlineMode")}`);
     }
   }, [
@@ -341,6 +348,8 @@ function RecentExpenses({ navigation }) {
           }}
         />
       }
+      showSumForTravellerName={false}
+      isFiltered={false}
     />
   );
   if (error && !isFetching) {
@@ -420,7 +429,9 @@ function RecentExpenses({ navigation }) {
           onSelectItem={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}
-          setValue={userCtx.setPeriodString}
+          setValue={(value: any) =>
+            userCtx.setPeriodString(value as RangeString)
+          }
           setItems={setItems}
           containerStyle={styles.dropdownContainer}
           dropDownContainerStyle={styles.dropdownContainerDropdown}
@@ -462,10 +473,10 @@ RecentExpenses.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 0,
     backgroundColor: GlobalStyles.colors.backgroundColor,
+    flex: 1,
     justifyContent: "flex-start",
+    padding: 0,
     ...Platform.select({
       ios: {
         padding: 0,
@@ -475,48 +486,28 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  tabletPaddingTop: {
-    paddingTop: constantScale(16, 0.5),
-  },
   dateHeader: {
-    marginVertical: dynamicScale(16, true),
-    marginLeft: dynamicScale(12),
     marginBottom: dynamicScale(-20, true),
+    marginLeft: dynamicScale(12),
+    marginVertical: dynamicScale(16, true),
   },
   dateHeaderContent: {
-    flexDirection: "row",
     alignItems: "center",
+    flexDirection: "row",
     justifyContent: "space-between",
-  },
-  landscapeDateHeader: {
-    marginTop: dynamicScale(4, true),
-    marginBottom: dynamicScale(-24, true),
-    alignSelf: "center",
   },
   dateString: {
+    color: GlobalStyles.colors.gray700,
     fontSize: dynamicScale(12, false, 0.5),
     fontStyle: "italic",
-    color: GlobalStyles.colors.gray700,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    marginTop: dynamicScale(24, true),
-    marginHorizontal: dynamicScale(8),
-    marginBottom: dynamicScale(12, true),
-    zIndex: 10,
-  },
-  landscapeHeader: {
-    marginTop: dynamicScale(4, true),
-    // marginBottom: dynamicScale(-12, true),
-    zIndex: 10,
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginHorizontal: dynamicScale(12),
+  dropdown: {
+    borderRadius: 10,
+    borderWidth: 0,
   },
   dropdownContainer: {
-    maxWidth: dynamicScale(170, false, 0.5),
     marginTop: dynamicScale(8, true),
+    maxWidth: dynamicScale(170, false, 0.5),
     ...Platform.select({
       ios: {
         shadowColor: GlobalStyles.colors.textColor,
@@ -534,10 +525,6 @@ const styles = StyleSheet.create({
   dropdownContainerDropdown: {
     maxHeight: dynamicScale(600, true),
   },
-  dropdown: {
-    borderRadius: 10,
-    borderWidth: 0,
-  },
   dropdownTextStyle: {
     fontSize:
       i18n.locale == "fr"
@@ -545,28 +532,52 @@ const styles = StyleSheet.create({
         : dynamicScale(34, false, 0.5),
     fontWeight: "bold",
   },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    marginBottom: dynamicScale(12, true),
+    marginHorizontal: dynamicScale(8),
+    marginTop: dynamicScale(24, true),
+    zIndex: 10,
+  },
+  landscapeBar: {
+    // marginTop: dynamicScale(24, true),
+    // marginBottom: dynamicScale(-8, true),
+  },
+  landscapeDateHeader: {
+    alignSelf: "center",
+    marginBottom: dynamicScale(-24, true),
+    marginTop: dynamicScale(4, true),
+  },
+  landscapeHeader: {
+    marginTop: dynamicScale(4, true),
+    // marginBottom: dynamicScale(-12, true),
+    zIndex: 10,
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginHorizontal: dynamicScale(12),
+  },
   scaledUpTextStyle: {
     fontSize: dynamicScale(24, false, 0.5),
   },
-  zBehind: {
-    zIndex: 10,
+  tabletPaddingTop: {
+    paddingTop: constantScale(16, 0.5),
   },
   tempGrayBar1: {
-    borderTopWidth: 1,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderBottomColor: GlobalStyles.colors.gray600,
     borderBottomWidth: 0,
     borderTopColor: GlobalStyles.colors.gray600,
-    borderBottomColor: GlobalStyles.colors.gray600,
-    minHeight: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderTopWidth: 1,
     elevation: 2,
+    minHeight: 1,
     shadowColor: GlobalStyles.colors.textColor,
     shadowOffset: { width: 1, height: 2.5 },
     shadowOpacity: 0.9,
     shadowRadius: 4,
     zIndex: 2,
   },
-  landscapeBar: {
-    // marginTop: dynamicScale(24, true),
-    // marginBottom: dynamicScale(-8, true),
+  zBehind: {
+    zIndex: 10,
   },
 });

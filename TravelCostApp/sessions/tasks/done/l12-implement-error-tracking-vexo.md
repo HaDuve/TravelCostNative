@@ -9,9 +9,11 @@ modules: [error-tracking, analytics, vexo-integration]
 # Implement Error Tracking with Vexo
 
 ## Problem/Goal
+
 Add Vexo for session and error tracking in production to improve debugging and monitoring capabilities. Integrate the Vexo tracking library to capture errors and session data.
 
 ## Success Criteria
+
 - [x] Install and configure Vexo tracking library
 - [x] Implement session tracking for user interactions
 - [ ] Set up error tracking for crash reporting
@@ -60,6 +62,7 @@ User context that should be included in Vexo reports includes the authenticated 
 #### Integration Points & Signatures
 
 **Primary Integration Point:**
+
 ```typescript
 // /util/error.ts - Enhanced function
 export default function safeLogError(
@@ -67,10 +70,11 @@ export default function safeLogError(
   fileName = "",
   lineNumber = 0,
   additionalContext?: Record<string, any>
-): string | undefined
+): string | undefined;
 ```
 
 **App Initialization:**
+
 ```typescript
 // App.tsx - Root component useEffect hook
 // Add Vexo initialization after line 659 (after loadKeys())
@@ -78,12 +82,13 @@ export default function safeLogError(
 ```
 
 **Environment Detection:**
+
 ```typescript
 // Pattern to follow
-import Constants from 'expo-constants';
-import * as Device from 'expo-device';
+import Constants from "expo-constants";
+import * as Device from "expo-device";
 
-const isProduction = Constants.manifest?.releaseChannel === 'production';
+const isProduction = Constants.manifest?.releaseChannel === "production";
 const isDevice = Device.isDevice;
 const shouldEnableVexo = isProduction && isDevice && !DEVELOPER_MODE;
 ```
@@ -91,21 +96,23 @@ const shouldEnableVexo = isProduction && isDevice && !DEVELOPER_MODE;
 #### Data Structures for Context
 
 **User Context to Include:**
+
 ```typescript
 interface VexoUserContext {
-  userId?: string;        // From AuthContext.userId
-  tripId?: string;        // From TripContext.currentTrip  
-  locale?: string;        // From i18n.locale
-  deviceId?: string;      // From Device info
-  buildProfile?: string;  // From Constants
+  userId?: string; // From AuthContext.userId
+  tripId?: string; // From TripContext.currentTrip
+  locale?: string; // From i18n.locale
+  deviceId?: string; // From Device info
+  buildProfile?: string; // From Constants
 }
 ```
 
 **Existing Error Structure:**
+
 ```typescript
 // Current error handling preserves:
 // - Error message and stack trace
-// - File name and line number extraction  
+// - File name and line number extraction
 // - Type-safe error object parsing
 // - Console logging (keep in development)
 ```
@@ -113,36 +120,44 @@ interface VexoUserContext {
 #### Configuration Requirements
 
 **Environment Variables:**
+
 - Vexo API key/configuration (add to existing env.d.tsx)
 - Environment detection flags
 - Optional: Vexo endpoint configuration
 
 **Build Configuration:**
+
 - Production builds only (respect existing EAS build profiles)
 - Integrate with existing Babel configuration for console removal
 
 #### File Locations
 
 **Primary Implementation:**
+
 - `/util/error.ts` - Enhance existing error handler
 - `/util/vexo-tracking.ts` - New: Vexo initialization and configuration
 - `/types/env.d.tsx` - Add Vexo environment variables
 
 **Integration Points:**
+
 - `/App.tsx` - Vexo initialization in Root component
 - `/confAppConstants.ts` - Add Vexo-related constants
 
 **Testing Locations:**
+
 - Error tracking can be tested using existing error scenarios
 - Manual error triggers through the existing error handling patterns
 
 ## Context Files
+
 <!-- Added by context-gathering agent or manually -->
 
 ## User Notes
+
 FEATURE: add „vexo" for session and error tracking in production
 
 Vexo: Use https://docs.vexo.co/features library for tracking
 
 ## Work Log
+
 <!-- Updated as work progresses -->

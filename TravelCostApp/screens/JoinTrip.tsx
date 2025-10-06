@@ -1,3 +1,18 @@
+import { useHeaderHeight } from "@react-navigation/elements";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+
+import { ExpensesContext } from "../store/expenses-context";
+import FlatButton from "../components/UI/FlatButton";
+import PropTypes from "prop-types";
+import { ActivityIndicator } from "react-native-paper";
+
+import BackButton from "../components/UI/BackButton";
+import { NetworkContext } from "../store/network-context";
+import uniqBy from "lodash.uniqby";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -6,9 +21,23 @@ import {
   Text,
   View,
 } from "react-native";
-import { useHeaderHeight } from "@react-navigation/elements";
 
-import { useCallback, useContext, useEffect, useState } from "react";
+import safeLogError from "../util/error";
+import Animated, { FadeIn } from "react-native-reanimated";
+import Input from "../components/Auth/Input";
+import Button from "../components/UI/Button";
+import { GlobalStyles } from "../constants/styles";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { AuthContext } from "../store/auth-context";
+import { setMMKVObject } from "../store/mmkv";
+import { secureStoreSetItem } from "../store/secure-storage";
+import { TripContext, TripData } from "../store/trip-context";
+import { UserContext } from "../store/user-context";
+import { sleep } from "../util/appState";
+import {
+  isConnectionFastEnough,
+  isConnectionFastEnoughAsBool,
+} from "../util/connectionSpeed";
 import {
   fetchTrip,
   getAllExpenses,
@@ -19,37 +48,12 @@ import {
   getTravellers,
   TravellerNames,
 } from "../util/http";
-import { UserContext } from "../store/user-context";
-import { AuthContext } from "../store/auth-context";
-import { TripContext, TripData } from "../store/trip-context";
-import { GlobalStyles } from "../constants/styles";
-import Input from "../components/Auth/Input";
-//Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
-import { ExpensesContext } from "../store/expenses-context";
-import React from "react";
-import FlatButton from "../components/UI/FlatButton";
-import Button from "../components/UI/Button";
-import PropTypes from "prop-types";
-import { ActivityIndicator } from "react-native-paper";
-
-import BackButton from "../components/UI/BackButton";
-import { NetworkContext } from "../store/network-context";
-import uniqBy from "lodash.uniqby";
-import { secureStoreSetItem } from "../store/secure-storage";
-import { setMMKVObject } from "../store/mmkv";
-import safeLogError from "../util/error";
-import Animated, { FadeIn } from "react-native-reanimated";
-import {
-  isConnectionFastEnough,
-  isConnectionFastEnoughAsBool,
-} from "../util/connectionSpeed";
-import { sleep } from "../util/appState";
 import { dynamicScale } from "../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -94,13 +98,7 @@ const JoinTrip = ({ navigation, route }) => {
       } catch (e) {
         Alert.alert(
           i18n.t("noTrip"),
-          i18n.t("tryAgain") +
-            "\nid: " +
-            tripID +
-            "\nname:" +
-            tripName +
-            "\n" +
-            e,
+          `${i18n.t("tryAgain")}\nid: ${tripID}\nname:${tripName}\n${e}`,
           [
             {
               style: "cancel",
@@ -180,7 +178,7 @@ const JoinTrip = ({ navigation, route }) => {
       // only put traveller in trip if not already in trip
       if (!travellers[userCtx.userName])
         await putTravelerInTrip(tripid, {
-          uid: uid,
+          uid,
           userName: userCtx.userName,
         });
       // // Immediately reload the React Native Bundle
@@ -188,7 +186,10 @@ const JoinTrip = ({ navigation, route }) => {
       // if (r == -1)
       navigation.popToTop();
     } catch (error) {
-      Alert.alert(i18n.t("alertException"), i18n.t("alertTryAgainLater") + "\n" + error.message);
+      Alert.alert(
+        i18n.t("alertException"),
+        `${i18n.t("alertTryAgainLater")}\n${error.message}`
+      );
       safeLogError(error);
       navigation.popToTop();
     }
@@ -224,7 +225,7 @@ const JoinTrip = ({ navigation, route }) => {
       style={styles.card}
     >
       <View style={styles.titleContainer}>
-        <BackButton></BackButton>
+        <BackButton style={{}}></BackButton>
         <Text style={styles.titleText}>{i18n.t("joinTripLabel")}</Text>
 
         <View style={{ marginLeft: "5%" }}>
@@ -244,7 +245,7 @@ const JoinTrip = ({ navigation, route }) => {
           </Text>
           <Input
             value={joinTripid}
-            onUpdateValue={(value) => {
+            onUpdateValue={value => {
               setJoinTripid(value);
               setFreshLink(true);
             }}
@@ -252,6 +253,8 @@ const JoinTrip = ({ navigation, route }) => {
             secure={false}
             keyboardType={"default"}
             isInvalid={false}
+            isInvalidInfoText=""
+            textContentType="none"
           ></Input>
           {!isFetching && (
             <Button
@@ -315,21 +318,27 @@ JoinTrip.propTypes = {
   route: PropTypes.object,
 };
 const styles = StyleSheet.create({
-  card: {
+  buttonContainer: {
     flex: 1,
-    margin: "5%",
-    padding: "2%",
+    flexDirection: "row",
+    marginTop: "5%",
+    padding: "5%",
+  },
+  card: {
+    alignContent: "center",
+    alignItems: "center",
     backgroundColor: GlobalStyles.colors.gray500,
+    borderColor: GlobalStyles.colors.gray600,
     borderRadius: dynamicScale(10, false, 0.5),
     borderWidth: 1,
     elevation: 3,
-    borderColor: GlobalStyles.colors.gray600,
+    flex: 1,
+    margin: "5%",
+    padding: "2%",
     shadowColor: GlobalStyles.colors.gray600,
+
     shadowOffset: { width: 4, height: 4 },
     shadowOpacity: 10,
-
-    alignContent: "center",
-    alignItems: "center",
     ...Platform.select({
       ios: {},
       android: {
@@ -338,14 +347,23 @@ const styles = StyleSheet.create({
       },
     }),
   },
+  linkInputContainer: {
+    borderColor: GlobalStyles.colors.gray500,
+    borderWidth: 1,
+    flex: 1,
+    margin: dynamicScale(16, false, 0.5),
+    marginBottom: dynamicScale(32, false, 0.5),
+    minHeight: "50%",
+    padding: dynamicScale(24, false, 0.5),
+  },
   titleContainer: {
-    minHeight: "12%",
-    flexDirection: "row",
-    padding: "2%",
-    marginBottom: "2%",
     alignItems: "center",
-    justifyContent: "space-between",
     alignSelf: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: "2%",
+    minHeight: "12%",
+    padding: "2%",
     ...Platform.select({
       ios: {
         marginLeft: "-7.5%",
@@ -358,20 +376,5 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: dynamicScale(30, false, 0.5),
     fontWeight: "bold",
-  },
-  buttonContainer: {
-    flex: 1,
-    padding: "5%",
-    marginTop: "5%",
-    flexDirection: "row",
-  },
-  linkInputContainer: {
-    flex: 1,
-    minHeight: "50%",
-    padding: dynamicScale(24, false, 0.5),
-    margin: dynamicScale(16, false, 0.5),
-    marginBottom: dynamicScale(32, false, 0.5),
-    borderWidth: 1,
-    borderColor: GlobalStyles.colors.gray500,
   },
 });

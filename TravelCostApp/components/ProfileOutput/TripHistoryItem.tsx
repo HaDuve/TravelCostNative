@@ -1,51 +1,55 @@
+import { useNavigation } from "@react-navigation/native";
+import * as Haptics from "expo-haptics";
 import {
+  Alert,
+  FlatList,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
   View,
-  FlatList,
-  Alert,
   useWindowDimensions,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import * as Haptics from "expo-haptics";
-
-import { GlobalStyles } from "../../constants/styles";
-import * as Progress from "react-native-progress";
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import { TripContext } from "../../store/trip-context";
-import {
-  formatExpenseWithCurrency,
-  truncateString,
-  truncateNumber,
-} from "../../util/string";
-import { TravellerNames, fetchTripName, getTravellers } from "../../util/http";
 
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { ExpensesContext } from "../../store/expenses-context";
 import PropTypes from "prop-types";
-import { NetworkContext } from "../../store/network-context";
+import { useCallback, useContext, useEffect, useState } from "react";
+import * as Progress from "react-native-progress";
 import { MAX_JS_NUMBER } from "../../confAppConstants";
+import { GlobalStyles } from "../../constants/styles";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
+import { ExpensesContext } from "../../store/expenses-context";
+import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
+import { NetworkContext } from "../../store/network-context";
+import { TripContext } from "../../store/trip-context";
+import { RootNavigationProp } from "../../types/navigation";
+import { daysBetween } from "../../util/date";
+import safeLogError from "../../util/error";
 import {
   ExpenseData,
   getAllExpensesData,
   getExpensesSum,
 } from "../../util/expense";
-import LoadingBarOverlay from "../UI/LoadingBarOverlay";
-import { daysBetween } from "../../util/date";
-import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
-import safeLogError from "../../util/error";
-import { getTripData } from "../../util/trip";
+import { TravellerNames, fetchTripName, getTravellers } from "../../util/http";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
-import { Platform } from "react-native";
+import {
+  formatExpenseWithCurrency,
+  truncateNumber,
+  truncateString,
+} from "../../util/string";
+import { getTripData } from "../../util/trip";
+import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 
 export type TripHistoryItemType = {
   tripid: string;
@@ -56,20 +60,20 @@ export type TripHistoryItemType = {
   isDynamicDailyBudget: boolean;
   startDate: string;
   endDate: string;
-  travellers: TravellerNames[];
+  travellers: string[];
   sumOfExpenses: number;
   progress: number;
   days: number;
 };
 
 function TripHistoryItem({ tripid, trips }) {
-  const navigation = useNavigation();
+  const navigation = useNavigation<RootNavigationProp>();
   const tripCtx = useContext(TripContext);
   const expenseCtx = useContext(ExpensesContext);
   const contextTrip = tripCtx.tripid == tripid;
   const netCtx = useContext(NetworkContext);
   // list of objects containing the userName key
-  const [travellers, setTravellers] = useState<TravellerNames[]>([]);
+  const [travellers, setTravellers] = useState<{ userName: string }[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [tripName, setTripName] = useState("");
   const [totalBudget, setTotalBudget] = useState("");
@@ -85,18 +89,18 @@ function TripHistoryItem({ tripid, trips }) {
     (tripid: string) => {
       if (!tripid) return;
       const trip: TripHistoryItemType = {
-        tripid: tripid,
-        tripName: tripName,
-        totalBudget: totalBudget,
-        dailyBudget: dailyBudget,
-        tripCurrency: tripCurrency,
-        isDynamicDailyBudget: isDynamicDailyBudget,
+        tripid,
+        tripName,
+        totalBudget,
+        dailyBudget,
+        tripCurrency,
+        isDynamicDailyBudget,
         startDate: tripCtx.startDate,
         endDate: tripCtx.endDate,
-        travellers: travellers,
-        sumOfExpenses: sumOfExpenses,
-        progress: progress,
-        days: days,
+        travellers: travellers.map(t => t.userName),
+        sumOfExpenses,
+        progress,
+        days,
       };
       setMMKVObject("tripHistoryItem" + `_${tripid}`, trip);
     },
@@ -130,8 +134,8 @@ function TripHistoryItem({ tripid, trips }) {
       setProgress(trip.progress);
       setDays(trip.days);
       const travellers = [];
-      trip.travellers?.forEach((traveller) => {
-        travellers.push(traveller);
+      trip.travellers?.forEach(traveller => {
+        travellers.push({ userName: traveller });
       });
       if (travellers.length > 0) setTravellers(travellers);
       setIsFetching(false);
@@ -170,7 +174,7 @@ function TripHistoryItem({ tripid, trips }) {
     if (isDynamic && Number(dynamicDailyBudget) < 0) setDailyBudget("0.01");
     else setDailyBudget(isDynamic ? dynamicDailyBudget : tripCtx.dailyBudget);
     const objTravellers = [];
-    tripCtx.travellers.forEach((traveller) => {
+    tripCtx.travellers.forEach(traveller => {
       objTravellers.push({ userName: traveller });
     });
     if (objTravellers.length > 0) setTravellers(objTravellers);
@@ -273,7 +277,7 @@ function TripHistoryItem({ tripid, trips }) {
       try {
         const listTravellers: TravellerNames = await getTravellers(tripid);
         const objTravellers = [];
-        listTravellers.forEach((traveller) => {
+        listTravellers.forEach(traveller => {
           objTravellers.push({ userName: traveller });
         });
         if (objTravellers.length > 0) setTravellers(objTravellers);
@@ -351,7 +355,7 @@ function TripHistoryItem({ tripid, trips }) {
       Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
       return;
     }
-    navigation.navigate("ManageTrip", { tripId: tripid, trips: trips });
+    navigation.navigate("ManageTrip", { tripId: tripid, trips });
   }
 
   const activeBorder = contextTrip
@@ -378,7 +382,7 @@ function TripHistoryItem({ tripid, trips }) {
             activeBorder,
           ]}
         >
-          <View style={[styles.topRow]}>
+          <View style={styles.topRow}>
             <View>
               <LoadingBarOverlay
                 size="small"
@@ -468,7 +472,7 @@ function TripHistoryItem({ tripid, trips }) {
               style={[styles.textBase, isScaledUp && { textAlign: "center" }]}
             >
               {i18n.t("daily") + (isDynamicDailyBudget ? "*" : "")}
-              {": " + dailyBudgetString}
+              {`: ${dailyBudgetString}`}
             </Text>
           </View>
           <View style={styles.amountContainer}>
@@ -499,7 +503,7 @@ function TripHistoryItem({ tripid, trips }) {
           data={travellers}
           renderItem={renderTravellers}
           numColumns={2}
-          keyExtractor={(item) => {
+          keyExtractor={(item: { userName: string }) => {
             return item.userName + tripid;
           }}
         ></FlatList>
@@ -517,64 +521,65 @@ TripHistoryItem.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  pressed: {
-    opacity: 0.75,
+  amount: {
+    color: GlobalStyles.colors.primary500,
+    fontSize: dynamicScale(12, false, 0.5),
+    fontWeight: "bold",
   },
-  tripItem: {
-    flex: 1,
-    padding: dynamicScale(12),
-    margin: dynamicScale(12),
-    backgroundColor: GlobalStyles.colors.backgroundColorLight,
-    borderRadius: dynamicScale(12, false, 0.5),
-    // android styles
-    ...Platform.select({
-      android: {
-        elevation: 0,
-      },
-    }),
+  amountContainer: {
+    alignItems: "center",
+    borderRadius: dynamicScale(4, false, 0.5),
+    justifyContent: "center",
+    minWidth: dynamicScale(80),
+    paddingHorizontal: dynamicScale(12),
+    paddingVertical: dynamicScale(4, true),
+  },
+  avatar: {
+    alignItems: "center",
+    backgroundColor: GlobalStyles.colors.gray500,
+    borderRadius: dynamicScale(60, false, 0.5),
+    justifyContent: "center",
+    marginRight: dynamicScale(14, false, 0.5),
+    minHeight: dynamicScale(20, false, 0.5),
+    minWidth: dynamicScale(20, false, 0.5),
+  },
+  avatarText: {
+    color: GlobalStyles.colors.primary700,
+    fontSize: dynamicScale(14, false, 0.5),
+    fontWeight: "bold",
+  },
+  description: {
+    fontSize: dynamicScale(16, false, 0.5),
+    fontStyle: "italic",
+    fontWeight: "300",
+    marginBottom: dynamicScale(4, true),
+    width: dynamicScale(110),
   },
   inactive: {
     opacity: 0.7,
   },
-  topRow: {
-    marginVertical: dynamicScale(8, true),
-    flexDirection: "row",
-    justifyContent: "space-between",
+  pressed: {
+    opacity: 0.75,
   },
   textBase: {
     color: GlobalStyles.colors.textColor,
     fontSize: dynamicScale(14, false, 0.5),
     fontWeight: "300",
   },
-  description: {
-    fontSize: dynamicScale(16, false, 0.5),
-    marginBottom: dynamicScale(4, true),
-    fontWeight: "300",
-    fontStyle: "italic",
-    width: dynamicScale(110),
-  },
-  amountContainer: {
-    paddingHorizontal: dynamicScale(12),
-    paddingVertical: dynamicScale(4, true),
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: dynamicScale(4, false, 0.5),
-    minWidth: dynamicScale(80),
-  },
-  amount: {
-    fontSize: dynamicScale(12, false, 0.5),
-    color: GlobalStyles.colors.primary500,
-    fontWeight: "bold",
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: dynamicScale(8, true),
   },
   travellerCard: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: dynamicScale(16, false, 0.5),
     flex: 1,
     flexDirection: "row",
     justifyContent: "flex-start",
     margin: dynamicScale(4),
-    padding: dynamicScale(8, false, 0.5),
-    borderRadius: dynamicScale(16, false, 0.5),
     maxWidth: "45%",
-    backgroundColor: GlobalStyles.colors.backgroundColor,
+    padding: dynamicScale(8, false, 0.5),
     // android styles
     ...Platform.select({
       android: {
@@ -583,23 +588,22 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  avatar: {
-    minHeight: dynamicScale(20, false, 0.5),
-    minWidth: dynamicScale(20, false, 0.5),
-    borderRadius: dynamicScale(60, false, 0.5),
-    backgroundColor: GlobalStyles.colors.gray500,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: dynamicScale(14, false, 0.5),
-  },
-  avatarText: {
-    fontSize: dynamicScale(14, false, 0.5),
-    fontWeight: "bold",
-    color: GlobalStyles.colors.primary700,
-  },
   travellerNameText: {
+    color: GlobalStyles.colors.textColor,
     fontSize: dynamicScale(14, false, 0.5),
     fontWeight: "300",
-    color: GlobalStyles.colors.textColor,
+  },
+  tripItem: {
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
+    borderRadius: dynamicScale(12, false, 0.5),
+    flex: 1,
+    margin: dynamicScale(12),
+    padding: dynamicScale(12),
+    // android styles
+    ...Platform.select({
+      android: {
+        elevation: 0,
+      },
+    }),
   },
 });

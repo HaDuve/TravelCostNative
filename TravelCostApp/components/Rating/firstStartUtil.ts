@@ -11,7 +11,7 @@ export const handleFirstStart = async () => {
     const firstStart = await secureStoreGetObject("firstStart");
     if (!firstStart) {
       // Set the current timestamp as the first start
-      await secureStoreSetObject("firstStart", Date.now());
+      await secureStoreSetObject("firstStart", { value: Date.now() });
     }
   } catch (error) {
     console.error("Error handling first start:", error);
@@ -24,7 +24,7 @@ export const shouldPromptForRating = async () => {
   }
   try {
     const neverAskAgain = await secureStoreGetObject("neverAskAgain");
-    if (neverAskAgain) {
+    if (neverAskAgain?.value) {
       return false;
     }
   } catch (error) {
@@ -35,8 +35,8 @@ export const shouldPromptForRating = async () => {
     if (firstStart) {
       const remindLater = await secureStoreGetObject("remindLater");
       return remindLater
-        ? isOlderThanOneDay(remindLater)
-        : isOlderThanOneDay(firstStart);
+        ? isOlderThanOneDay(remindLater?.value)
+        : isOlderThanOneDay(firstStart?.value);
     }
   } catch (error) {
     console.error("Error checking for rating prompt:", error);
@@ -48,7 +48,7 @@ export async function shouldShowOnboarding() {
   try {
     const firstStart = await secureStoreGetObject("firstStart");
     if (firstStart) {
-      return !(await isOlderThanOneDay(firstStart));
+      return !(await isOlderThanOneDay(firstStart?.value));
     }
     return true;
   } catch (error) {
@@ -57,7 +57,7 @@ export async function shouldShowOnboarding() {
   }
 }
 
-const isOlderThanOneDay = async (firstDate) => {
+const isOlderThanOneDay = async firstDate => {
   let firstStartTimestamp = Date.now();
   try {
     firstStartTimestamp = Number(safelyParseJSON(firstDate));

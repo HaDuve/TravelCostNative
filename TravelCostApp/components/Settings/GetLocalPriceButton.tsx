@@ -1,27 +1,29 @@
-import { useState, useContext } from "react";
-import {
-  Alert,
-  View,
-  Text,
-  Modal,
-  TextInput,
-  Image,
-  StyleSheet,
-  KeyboardAvoidingView,
-} from "react-native";
-import { UserContext } from "../../store/user-context";
-import { TripContext } from "../../store/trip-context";
-import { NetworkContext } from "../../store/network-context";
-import { GlobalStyles } from "../../constants/styles";
-import { dynamicScale } from "../../util/scalingUtil";
-import GradientButton from "../UI/GradientButton";
-import FlatButton from "../UI/FlatButton";
-import PropTypes from "prop-types";
-
-//Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+import PropTypes from "prop-types";
+import { useContext, useState } from "react";
+import {
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+
+import { GlobalStyles } from "../../constants/styles";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
+import { NetworkContext } from "../../store/network-context";
+import { TripContext } from "../../store/trip-context";
+import { UserContext } from "../../store/user-context";
+import { dynamicScale } from "../../util/scalingUtil";
+import FlatButton from "../UI/FlatButton";
+import GradientButton from "../UI/GradientButton";
+
+//Localization
+
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -152,94 +154,94 @@ GetLocalPriceButton.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  settingsButton: {
-    marginVertical: "2%",
-    marginHorizontal: "8%",
-    borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    alignSelf: "center",
-  },
-  gradientButtonStyle: {
-    justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 0, // Override GradientButton's default margin
-  },
   buttonContent: {
-    flexDirection: "row",
     alignItems: "center",
+    flexDirection: "row",
     justifyContent: "center",
-    paddingTop: dynamicScale(2, true),
     marginBottom: dynamicScale(-2, true),
+    paddingTop: dynamicScale(2, true),
   },
   buttonIcon: {
-    width: dynamicScale(18, false, 0.5),
     height: dynamicScale(18, false, 0.5),
     marginRight: dynamicScale(6, false, 0.5),
+    width: dynamicScale(18, false, 0.5),
   },
   buttonText: {
-    fontSize: dynamicScale(16, false, 0.5),
-    fontWeight: "300",
-    fontStyle: "italic",
     color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(16, false, 0.5),
+    fontStyle: "italic",
+    fontWeight: "300",
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
+  gradientButtonStyle: {
     alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 0, // Override GradientButton's default margin
+  },
+  modalButtons: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   modalContainer: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: dynamicScale(20, false, 0.5),
-    padding: dynamicScale(24, false, 0.5),
     marginHorizontal: dynamicScale(20, false, 0.5),
     maxWidth: dynamicScale(400, false, 0.5),
+    padding: dynamicScale(24, false, 0.5),
     width: "90%",
   },
   modalHeader: {
-    flexDirection: "row",
     alignItems: "center",
+    flexDirection: "row",
     justifyContent: "center",
     marginBottom: dynamicScale(16, true),
   },
   modalIcon: {
-    width: dynamicScale(24, false, 0.5),
     height: dynamicScale(24, false, 0.5),
     marginRight: 8,
+    width: dynamicScale(24, false, 0.5),
   },
-  modalTitle: {
-    fontSize: dynamicScale(20, false, 0.3),
-    fontWeight: "bold",
-    color: GlobalStyles.colors.textColor,
+  modalOverlay: {
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    flex: 1,
+    justifyContent: "center",
   },
   modalSubtitle: {
-    fontSize: dynamicScale(16, false, 0.3),
     color: GlobalStyles.colors.textColor,
-    textAlign: "center",
-    marginBottom: dynamicScale(20, true),
+    fontSize: dynamicScale(16, false, 0.3),
     lineHeight: dynamicScale(22, true),
+    marginBottom: dynamicScale(20, true),
+    textAlign: "center",
   },
-  textInput: {
-    borderWidth: 1,
-    borderColor: GlobalStyles.colors.primaryGrayed,
-    borderRadius: dynamicScale(12, false, 0.5),
-    padding: dynamicScale(16, false, 0.5),
-    fontSize: dynamicScale(16, false, 0.3),
+  modalTitle: {
     color: GlobalStyles.colors.textColor,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    marginBottom: dynamicScale(24, true),
-    minHeight: dynamicScale(50, true),
+    fontSize: dynamicScale(20, false, 0.3),
+    fontWeight: "bold",
   },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  settingsButton: {
     alignItems: "center",
+    alignSelf: "center",
+    borderRadius: 16,
+    justifyContent: "center",
+    marginHorizontal: "8%",
+    marginVertical: "2%",
+    width: "100%",
   },
   submitButton: {
-    marginLeft: dynamicScale(16, false, 0.5),
     flex: 1,
+    marginLeft: dynamicScale(16, false, 0.5),
+  },
+  textInput: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderColor: GlobalStyles.colors.primaryGrayed,
+    borderRadius: dynamicScale(12, false, 0.5),
+    borderWidth: 1,
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(16, false, 0.3),
+    marginBottom: dynamicScale(24, true),
+    minHeight: dynamicScale(50, true),
+    padding: dynamicScale(16, false, 0.5),
   },
 });
 

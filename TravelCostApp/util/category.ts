@@ -1,14 +1,19 @@
 //Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
+
 import { GlobalStyles } from "../constants/styles";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
-import { asyncStoreGetObject } from "../store/async-storage";
+import { getMMKVObject } from "../store/mmkv";
+
 import { CATEGORY_KEYWORDS } from "./categoryKeywords";
 import { ExpenseData } from "./expense";
-import { getMMKVObject } from "../store/mmkv";
+
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -93,7 +98,7 @@ function getMaxCategoryMap(categoryCountMap: CategoryCountMap) {
   // return the category with the most matches
   let maxCategory = "";
   let maxCount = -1;
-  Object.keys(categoryCountMap).forEach((category) => {
+  Object.keys(categoryCountMap).forEach(category => {
     if (categoryCountMap[category] > maxCount) {
       maxCount = categoryCountMap[category];
       maxCategory = category;
@@ -120,12 +125,12 @@ export function mapDescriptionToCategory(
 
   // check if the description contains a keyword of a category
   const categoryCountMap: CategoryCountMap = {};
-  categories.forEach((category) => {
+  categories.forEach(category => {
     const keywords = category.keywords ?? [];
     keywords.push(category.cat);
-    keywords.forEach((keyword) => {
+    keywords.forEach(keyword => {
       const keywordsSplit = keyword.trim().toLowerCase().split(" ");
-      keywordsSplit.forEach((word) => {
+      keywordsSplit.forEach(word => {
         if (descriptionWords.includes(word)) {
           // console.log("match found: ", word, "in", descriptionWords);
           categoryCountMap[category.cat] =
@@ -136,12 +141,12 @@ export function mapDescriptionToCategory(
   });
 
   // check if the description matches the description of an expense
-  expenses?.forEach((expense) => {
+  expenses?.forEach(expense => {
     const splitDescription = expense.description
       .trim()
       .toLowerCase()
       .split(" ");
-    splitDescription.forEach((word) => {
+    splitDescription.forEach(word => {
       if (descriptionWords.includes(word)) {
         // console.log(description, "found a match with: ", expense.description);
         categoryCountMap[expense.category] =
@@ -162,7 +167,7 @@ export const DEFAULTCATEGORIES: Category[] = [
     cat: "food",
     catString: i18n.t("catFoodString"),
     keywords: CATEGORY_KEYWORDS.find(
-      (CATEGORY_KEYWORD) => CATEGORY_KEYWORD.cat === "food"
+      CATEGORY_KEYWORD => CATEGORY_KEYWORD.cat === "food"
     ).keywords,
   },
   {
@@ -172,7 +177,7 @@ export const DEFAULTCATEGORIES: Category[] = [
     cat: "international-travel",
     catString: i18n.t("catIntTravString"),
     keywords: CATEGORY_KEYWORDS.find(
-      (CATEGORY_KEYWORD) => CATEGORY_KEYWORD.cat === "international-travel"
+      CATEGORY_KEYWORD => CATEGORY_KEYWORD.cat === "international-travel"
     ).keywords,
   },
   {
@@ -182,7 +187,7 @@ export const DEFAULTCATEGORIES: Category[] = [
     cat: "accomodation",
     catString: i18n.t("catAccoString"),
     keywords: CATEGORY_KEYWORDS.find(
-      (CATEGORY_KEYWORD) => CATEGORY_KEYWORD.cat === "accomodation"
+      CATEGORY_KEYWORD => CATEGORY_KEYWORD.cat === "accomodation"
     ).keywords,
   },
   {
@@ -192,7 +197,7 @@ export const DEFAULTCATEGORIES: Category[] = [
     cat: "national-travel",
     catString: i18n.t("catNatTravString"),
     keywords: CATEGORY_KEYWORDS.find(
-      (CATEGORY_KEYWORD) => CATEGORY_KEYWORD.cat === "national-travel"
+      CATEGORY_KEYWORD => CATEGORY_KEYWORD.cat === "national-travel"
     ).keywords,
   },
   {
@@ -202,7 +207,7 @@ export const DEFAULTCATEGORIES: Category[] = [
     cat: "other",
     catString: i18n.t("catOtherString"),
     keywords: CATEGORY_KEYWORDS.find(
-      (CATEGORY_KEYWORD) => CATEGORY_KEYWORD.cat === "other"
+      CATEGORY_KEYWORD => CATEGORY_KEYWORD.cat === "other"
     ).keywords,
   },
   {

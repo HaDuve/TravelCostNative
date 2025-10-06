@@ -9,9 +9,11 @@ modules: [build/android, deployment, app.json, eas.json]
 # Push to Android Store
 
 ## Problem/Goal
+
 Need to prepare and deploy the app to Google Play Store (Android). Research current requirements and deployment process.
 
 ## Success Criteria
+
 - [ ] Review current Google Play Store requirements and policies
 - [ ] Check app bundle/APK build configuration
 - [ ] Verify app signing and certificates are up to date
@@ -23,11 +25,15 @@ Need to prepare and deploy the app to Google Play Store (Android). Research curr
 - [ ] Verify successful deployment and availability
 
 ## Context Files
+
 <!-- Added by context-gathering agent or manually -->
 
 ## User Notes
+
 Check what has changed since last Android store deployment and ensure all requirements are met.
 
 ## Work Log
+
 <!-- Updated as work progresses -->
+
 - [2025-09-03] Created task for Android store deployment

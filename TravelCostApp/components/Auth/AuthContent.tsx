@@ -1,37 +1,40 @@
-import { useState } from "react";
-import React, {
-  Alert,
-  StyleSheet,
-  View,
-  Text,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
-
 import { useHeaderHeight } from "@react-navigation/elements";
-
-//Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+import PropTypes from "prop-types";
+import { useState } from "react";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
+//Localization
+
+import { GlobalStyles } from "../../constants/styles";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
 import { useNavigation } from "@react-navigation/native";
 
+import { RootNavigationProp } from "../../types/navigation";
+import { dynamicScale } from "../../util/scalingUtil";
 import FlatButton from "../UI/FlatButton";
+
 import AuthForm from "./AuthForm";
-import { GlobalStyles } from "../../constants/styles";
-import PropTypes from "prop-types";
-import {
-  dynamicScale,
-} from "../../util/scalingUtil";
 
 function AuthContent({ isLogin, onAuthenticate, isConnected }) {
-  const navigation = useNavigation();
+  const navigation = useNavigation<RootNavigationProp>();
 
   const [credentialsInvalid, setCredentialsInvalid] = useState({
     name: false,
@@ -115,22 +118,18 @@ AuthContent.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    // flex: 1,
-    // backgroundColor: GlobalStyles.colors.backgroundColor,
-  },
   authContent: {
-    padding: dynamicScale(16),
-    marginTop: dynamicScale(30, true),
     marginBottom: dynamicScale(20, true),
     marginHorizontal: dynamicScale(16),
+    marginTop: dynamicScale(30, true),
+    padding: dynamicScale(16),
     ...Platform.select({
       android: {
         marginBottom: dynamicScale(60, true),
       },
     }),
-    borderRadius: 8,
     backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: 8,
     ...Platform.select({
       ios: {
         shadowColor: GlobalStyles.colors.textColor,
@@ -144,16 +143,20 @@ const styles = StyleSheet.create({
     }),
   },
   buttons: {
-    flexDirection: i18n.locale !== "en" ? "column" : "row",
-    marginTop: dynamicScale(16, true),
     alignItems: "center",
+    flexDirection: i18n.locale !== "en" ? "column" : "row",
     justifyContent: "center",
+    marginTop: dynamicScale(16, true),
+  },
+  container: {
+    // flex: 1,
+    // backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   secondaryText: {
-    fontSize: dynamicScale(14, false, 0.5),
-    paddingVertical: dynamicScale(8, true),
-    paddingHorizontal: dynamicScale(6),
     color: GlobalStyles.colors.gray700,
+    fontSize: dynamicScale(14, false, 0.5),
     fontWeight: "300",
+    paddingHorizontal: dynamicScale(6),
+    paddingVertical: dynamicScale(8, true),
   },
 });

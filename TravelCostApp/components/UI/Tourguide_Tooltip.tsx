@@ -1,9 +1,10 @@
-import * as React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { IStep, Labels, TooltipProps } from "rn-tourguide";
-import FlatButton from "./FlatButton";
+
 import { GlobalStyles } from "../../constants/styles";
 import { dynamicScale } from "../../util/scalingUtil";
+
+import FlatButton from "./FlatButton";
 
 export interface TooltipProp {
   isFirstStep?: boolean;
@@ -30,7 +31,7 @@ export const CustomTooltip = ({
         {currentStep && currentStep.text}
       </Text>
     </View>
-    <View style={[styles.bottomBar]}>
+    <View style={styles.bottomBar}>
       {!isLastStep ? (
         <TouchableOpacity onPress={handleStop}>
           <FlatButton onPress={handleStop}>{labels?.skip || "Skip"}</FlatButton>
@@ -59,49 +60,10 @@ export const CustomTooltip = ({
 );
 
 const styles = StyleSheet.create({
-  container: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 1,
-  },
-  containerView: {
-    borderRadius: 16,
-    paddingTop: dynamicScale(24, true),
-    alignItems: "center",
-    justifyContent: "center",
-    paddingBottom: dynamicScale(16, true),
-    width: dynamicScale(300),
-    backgroundColor: "#ffffffef",
-  },
-  tooltip: {
-    position: "absolute",
-    paddingHorizontal: dynamicScale(15),
-    overflow: "hidden",
-    width: dynamicScale(300),
-    borderRadius: 16,
-    paddingTop: dynamicScale(24, true),
-    alignItems: "center",
-    justifyContent: "center",
-    paddingBottom: dynamicScale(16, true),
-    zIndex: 1 - 1,
-  },
-  nonInteractionPlaceholder: {
-    backgroundColor: "transparent",
-    zIndex: 1 - 2,
-  },
-  tooltipText: {
-    textAlign: "center",
-    fontSize: dynamicScale(14, false, 0.5),
-    fontWeight: "300",
-  },
-  tooltipContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "space-around",
-    width: dynamicScale(220),
+  bottomBar: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: dynamicScale(10, true),
   },
   button: {
     padding: dynamicScale(10),
@@ -109,16 +71,55 @@ const styles = StyleSheet.create({
   buttonText: {
     color: GlobalStyles.colors.primary700,
   },
-  bottomBar: {
-    marginTop: dynamicScale(10, true),
-    flexDirection: "row",
-    justifyContent: "flex-end",
+  container: {
+    bottom: 0,
+    left: 0,
+    position: "absolute",
+    right: 0,
+    top: 0,
+    zIndex: 1,
+  },
+  containerView: {
+    alignItems: "center",
+    backgroundColor: "#ffffffef",
+    borderRadius: 16,
+    justifyContent: "center",
+    paddingBottom: dynamicScale(16, true),
+    paddingTop: dynamicScale(24, true),
+    width: dynamicScale(300),
+  },
+  nonInteractionPlaceholder: {
+    backgroundColor: "transparent",
+    zIndex: 1 - 2,
   },
   overlayContainer: {
-    position: "absolute",
-    left: 0,
-    top: 0,
     bottom: 0,
+    left: 0,
+    position: "absolute",
     right: 0,
+    top: 0,
+  },
+  tooltip: {
+    alignItems: "center",
+    borderRadius: 16,
+    justifyContent: "center",
+    overflow: "hidden",
+    paddingBottom: dynamicScale(16, true),
+    paddingHorizontal: dynamicScale(15),
+    paddingTop: dynamicScale(24, true),
+    position: "absolute",
+    width: dynamicScale(300),
+    zIndex: 1 - 1,
+  },
+  tooltipContainer: {
+    alignItems: "center",
+    flex: 1,
+    justifyContent: "space-around",
+    width: dynamicScale(220),
+  },
+  tooltipText: {
+    fontSize: dynamicScale(14, false, 0.5),
+    fontWeight: "300",
+    textAlign: "center",
   },
 });

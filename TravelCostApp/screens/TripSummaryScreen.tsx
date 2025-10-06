@@ -1,4 +1,8 @@
 /* eslint-disable react/prop-types */
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import PropTypes from "prop-types";
+import { useContext, useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,19 +11,22 @@ import {
   TouchableOpacity,
   Alert,
   Pressable,
+  Platform,
 } from "react-native";
-import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../store/user-context";
-import { fetchTripName } from "../util/http";
-import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { Checkbox } from "react-native-paper";
-import { daysBetween, isToday } from "../util/date";
-import { GlobalStyles } from "../constants/styles";
+import * as Progress from "react-native-progress";
+
+import Animated, { FadeIn, FadeOut, FadeInUp } from "react-native-reanimated";
 import FlatButton from "../components/UI/FlatButton";
+import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
+import { UserContext } from "../store/user-context";
+import { daysBetween, isToday } from "../util/date";
+import { fetchTripName } from "../util/http";
+
+import { GlobalStyles } from "../constants/styles";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
+
 import { de, en, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
@@ -35,8 +42,9 @@ import {
   getAllExpensesData,
   getExpensesSum,
 } from "../util/expense";
+import { safelyParseJSON } from "../util/jsonParse";
+import { constantScale, dynamicScale, scale } from "../util/scalingUtil";
 import { formatExpenseWithCurrency } from "../util/string";
-import PropTypes from "prop-types";
 import { TripContext, TripData } from "../store/trip-context";
 import { ExpensesContext } from "../store/expenses-context";
 import safeLogError from "../util/error";
@@ -47,13 +55,10 @@ import {
   setMMKVString,
 } from "../store/mmkv";
 import { getTripData } from "../util/trip";
-import * as Progress from "react-native-progress";
-import Animated, { FadeIn, FadeOut, FadeInUp } from "react-native-reanimated";
+
 import ExpenseCountryFlag from "../components/ExpensesOutput/ExpenseCountryFlag";
 import GradientButton from "../components/UI/GradientButton";
-import { constantScale, dynamicScale, scale } from "../util/scalingUtil";
-import { Platform } from "react-native";
-import { safelyParseJSON } from "../util/jsonParse";
+
 import * as Haptics from "expo-haptics";
 
 export type TripAsObject = {
@@ -103,7 +108,7 @@ const TripSummaryScreen = ({ navigation }) => {
       ? i18n.t("trips")
       : i18n.t("trip");
   const titleText = i18n.t("summary");
-  const subtitleText = `(${tripSummary?.numberOfTrips + " " + titleTextTrips})`;
+  const subtitleText = `(${`${tripSummary?.numberOfTrips} ${titleTextTrips}`})`;
   const numberOfDaysIsANumber =
     tripSummary?.numberOfDays && !isNaN(tripSummary.numberOfDays);
   useEffect(() => {
@@ -128,7 +133,7 @@ const TripSummaryScreen = ({ navigation }) => {
         const tripid = userCtx.tripHistory[i];
         const tripName = await fetchTripName(tripid);
         allTripsAsObjects.push({
-          tripid: tripid,
+          tripid,
           tripname: tripName,
           selected: true,
         });
@@ -146,7 +151,7 @@ const TripSummaryScreen = ({ navigation }) => {
   const summarizeHandler = async () => {
     setIsFetching(true);
     // get a summary of all selected trips
-    const selectedTrips = allTrips.filter((trip) => trip.selected);
+    const selectedTrips = allTrips.filter(trip => trip.selected);
     // gather all the data for tripssummary
     const numberOfTrips = selectedTrips?.length;
     let totalCost = 0;
@@ -169,8 +174,8 @@ const TripSummaryScreen = ({ navigation }) => {
       if (currency !== "" && currency !== tripData.tripCurrency) {
         // TODO: allow different currencies by calculating for the home currency from tripCtx
         Alert.alert(i18n.t("alertSameCurrencyTrips"));
-        setAllTrips((prevState) => {
-          const updatedTrips = prevState.map((trip) => {
+        setAllTrips(prevState => {
+          const updatedTrips = prevState.map(trip => {
             if (trip.tripid === tripData.tripid) {
               trip.selected = false;
             }
@@ -190,7 +195,7 @@ const TripSummaryScreen = ({ navigation }) => {
       if (!expenses) {
         safeLogError(
           new Error(
-            "expenses is null in " + trip.tripid + " in TripSummaryScreen.tsx"
+            `expenses is null in ${trip.tripid} in TripSummaryScreen.tsx`
           )
         );
         continue;
@@ -229,13 +234,13 @@ const TripSummaryScreen = ({ navigation }) => {
               // add traveller and their costs
               if (!isNaN(cost * rate))
                 travellersAndTheirCosts.push({
-                  traveller: traveller,
+                  traveller,
                   cost: cost * rate,
                 });
             } else {
               // traveller already exists, add costs
               const travellerAndCost = travellersAndTheirCosts.find(
-                (t) => t.traveller === traveller
+                t => t.traveller === traveller
               );
               if (!isNaN(cost * rate)) travellerAndCost.cost += cost * rate;
             }
@@ -252,7 +257,7 @@ const TripSummaryScreen = ({ navigation }) => {
           } else {
             // traveller already exists, add costs
             const travellerAndCost = travellersAndTheirCosts.find(
-              (t) => t.traveller === expense.whoPaid
+              t => t.traveller === expense.whoPaid
             );
             if (!isNaN(Number(expense.calcAmount)))
               travellerAndCost.cost += Number(expense.calcAmount);
@@ -278,14 +283,14 @@ const TripSummaryScreen = ({ navigation }) => {
     const avgCostPerTraveller = totalCost / travellers.length;
 
     setTripSummary({
-      numberOfTrips: numberOfTrips,
+      numberOfTrips,
       totalCost: +totalCost.toFixed(2),
-      currency: currency,
-      travellersAndTheirCosts: travellersAndTheirCosts,
+      currency,
+      travellersAndTheirCosts,
       numberOfCountries: countries?.length,
       numberOfDays: travelDays,
       totalBudget: +totalBudget.toFixed(2),
-      countries: countries,
+      countries,
       averageCostPerDay: +avgCostPerDay.toFixed(2),
       averageCostPerMonth: +avgCostPerMonth.toFixed(2),
       averageCostPerYear: +avgCostPerYear.toFixed(2),
@@ -299,8 +304,8 @@ const TripSummaryScreen = ({ navigation }) => {
 
   function itemCheckBoxHandler(item) {
     setTripSummary(null);
-    setAllTrips((prevState) => {
-      const updatedTrips = prevState.map((trip) => {
+    setAllTrips(prevState => {
+      const updatedTrips = prevState.map(trip => {
         if (trip.tripid === item.item.tripid) {
           trip.selected = !trip.selected;
         }
@@ -393,7 +398,7 @@ const TripSummaryScreen = ({ navigation }) => {
                         numColumns={Math.min(tripSummary.countries.length, 7)}
                         scrollEnabled={false}
                         data={tripSummary.countries}
-                        renderItem={(item) => {
+                        renderItem={item => {
                           const countryFlag = (
                             <ExpenseCountryFlag
                               countryName={item.item}
@@ -508,7 +513,7 @@ const TripSummaryScreen = ({ navigation }) => {
                       </Text>
                       <FlatList
                         data={tripSummary.travellersAndTheirCosts}
-                        renderItem={(item) => (
+                        renderItem={item => (
                           <View style={styles.travellerCostItem}>
                             <Text
                               style={[
@@ -559,7 +564,7 @@ const TripSummaryScreen = ({ navigation }) => {
             <FlatList
               data={allTrips}
               scrollEnabled={false}
-              renderItem={(item) => {
+              renderItem={item => {
                 return (
                   <TouchableOpacity
                     onPress={itemCheckBoxHandler.bind(this, item)}
@@ -659,71 +664,85 @@ TripSummaryScreen.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  titleText: {
-    fontSize: dynamicScale(22, false, 0.5),
-    fontWeight: "700",
-    textAlign: "center",
-    marginVertical: dynamicScale(20, false, 0.5),
-    marginHorizontal: dynamicScale(16, false, 0.5),
-    color: GlobalStyles.colors.gray700,
-    letterSpacing: 0.5,
+  buttonContainer: {
+    alignItems: "center",
+    flexDirection: "column",
+    margin: dynamicScale(20, false, 0.5),
+    paddingHorizontal: dynamicScale(16, false, 0.5),
   },
-  tripListContainer: {
-    margin: constantScale(12, 0.5),
-    padding: constantScale(16, 0.5),
-    gap: constantScale(8, 0.5),
+  buttonContent: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: dynamicScale(-2, true),
+    paddingTop: dynamicScale(2, true),
+  },
+  buttonIcon: {
+    height: dynamicScale(18, false, 0.5),
+    marginRight: dynamicScale(6, false, 0.5),
+    width: dynamicScale(18, false, 0.5),
+  },
+  buttonText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(16, false, 0.5),
+    fontStyle: "italic",
+    fontWeight: "300",
+  },
+  expandableContainer: {
+    alignItems: "center",
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: 24,
-    alignItems: "stretch",
-    justifyContent: "flex-start",
+    justifyContent: "center",
+    margin: constantScale(12, 0.5),
     minHeight: constantScale(80, 0.5),
+    padding: constantScale(24, 0.5),
+    paddingBottom: constantScale(12, 0.5),
+    paddingTop: constantScale(12, 0.5),
   },
-  tripItemContainer: {
-    flexDirection: "row",
+  expandableHeaderSubtitle: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: constantScale(16, 0.5),
+    fontWeight: "400",
+    lineHeight: constantScale(20, 0.5),
+    opacity: 0.8,
+    textAlign: "center",
+  },
+  expandableHeaderTitle: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: constantScale(24, 0.5),
+    fontStyle: "italic",
+    fontWeight: "900",
+    lineHeight: constantScale(30, 0.5),
+    marginBottom: dynamicScale(4, false, 0.5),
+    textAlign: "center",
+  },
+  fullWidthButtonStyle: {
+    marginBottom: dynamicScale(24, false, 0.5),
+    width: "100%",
+  },
+  gradientButtonStyle: {
     alignItems: "center",
-    gap: dynamicScale(8, false, 0.5),
-    padding: dynamicScale(12, false, 0.5),
-    paddingHorizontal: dynamicScale(16, false, 0.5),
-    marginVertical: dynamicScale(4, false, 0.5),
-    marginHorizontal: dynamicScale(8, false, 0.5),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: dynamicScale(8, false, 0.5),
-    borderWidth: 1,
-    borderColor: GlobalStyles.colors.gray300,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    justifyContent: "center",
+    marginHorizontal: 0, // Override GradientButton's default margin
   },
-  summaryContainer: {
-    padding: dynamicScale(20, false, 0.5),
-    margin: dynamicScale(16, false, 0.5),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: dynamicScale(16, false, 0.5),
-    borderWidth: 1,
-    borderColor: GlobalStyles.colors.gray300,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    elevation: 4,
+  halfWidthButton: {
+    flex: 1,
+  },
+  halfWidthButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+    width: "100%",
   },
   progressBarContainer: {
+    alignItems: "center",
+    backgroundColor: GlobalStyles.colors.gray300,
+    borderRadius: dynamicScale(8, false, 0.5),
+    justifyContent: "center",
+    marginVertical: dynamicScale(12, false, 0.5),
+    minWidth: dynamicScale(100, false, 0.5),
     paddingHorizontal: dynamicScale(16, false, 0.5),
     paddingVertical: dynamicScale(8, false, 0.5),
-    marginVertical: dynamicScale(12, false, 0.5),
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: dynamicScale(8, false, 0.5),
-    minWidth: dynamicScale(100, false, 0.5),
-    backgroundColor: GlobalStyles.colors.gray300,
     // android styles
     ...Platform.select({
       android: {
@@ -731,105 +750,91 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  buttonContainer: {
-    alignItems: "center",
-    flexDirection: "column",
-    margin: dynamicScale(20, false, 0.5),
-    paddingHorizontal: dynamicScale(16, false, 0.5),
-  },
-  fullWidthButtonStyle: {
-    width: "100%",
-    marginBottom: dynamicScale(24, false, 0.5),
-  },
-  halfWidthButtonContainer: {
-    flexDirection: "row",
-    width: "100%",
-    justifyContent: "space-between",
-    paddingHorizontal: dynamicScale(16, false, 0.5),
-  },
-  halfWidthButton: {
-    flex: 1,
-  },
-  summaryTextBig: {
-    fontSize: dynamicScale(16, false, 0.5),
-    fontWeight: "600",
-    textAlign: "center",
-    marginVertical: dynamicScale(6, false, 0.5),
-    color: GlobalStyles.colors.gray700,
+  summaryContainer: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderColor: GlobalStyles.colors.gray300,
+    borderRadius: dynamicScale(16, false, 0.5),
+    borderWidth: 1,
+    elevation: 4,
+    margin: dynamicScale(16, false, 0.5),
+    padding: dynamicScale(20, false, 0.5),
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
   },
   summaryText: {
+    color: GlobalStyles.colors.gray700,
     fontSize: dynamicScale(14, false, 0.5),
     fontWeight: "400",
-    textAlign: "left",
-    marginVertical: dynamicScale(6, false, 0.5),
-    color: GlobalStyles.colors.gray700,
     lineHeight: dynamicScale(20, false, 0.5),
+    marginVertical: dynamicScale(6, false, 0.5),
+    textAlign: "left",
+  },
+  summaryTextBig: {
+    color: GlobalStyles.colors.gray700,
+    fontSize: dynamicScale(16, false, 0.5),
+    fontWeight: "600",
+    marginVertical: dynamicScale(6, false, 0.5),
+    textAlign: "center",
+  },
+  titleText: {
+    color: GlobalStyles.colors.gray700,
+    fontSize: dynamicScale(22, false, 0.5),
+    fontWeight: "700",
+    letterSpacing: 0.5,
+    marginHorizontal: dynamicScale(16, false, 0.5),
+    marginVertical: dynamicScale(20, false, 0.5),
+    textAlign: "center",
   },
   travellerCostItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: dynamicScale(8, false, 0.5),
-    paddingVertical: dynamicScale(4, false, 0.5),
-    paddingHorizontal: dynamicScale(8, false, 0.5),
     backgroundColor: GlobalStyles.colors.gray300,
     borderRadius: dynamicScale(8, false, 0.5),
-  },
-  expandableContainer: {
-    margin: constantScale(12, 0.5),
-    padding: constantScale(24, 0.5),
-    paddingTop: constantScale(12, 0.5),
-    paddingBottom: constantScale(12, 0.5),
-    backgroundColor: GlobalStyles.colors.backgroundColorLight,
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: constantScale(80, 0.5),
-  },
-  expandableHeaderTitle: {
-    textAlign: "center",
-    fontSize: constantScale(24, 0.5),
-    lineHeight: constantScale(30, 0.5),
-    fontWeight: "900",
-    fontStyle: "italic",
-    color: GlobalStyles.colors.textColor,
-    marginBottom: dynamicScale(4, false, 0.5),
-  },
-  expandableHeaderSubtitle: {
-    textAlign: "center",
-    fontSize: constantScale(16, 0.5),
-    lineHeight: constantScale(20, 0.5),
-    fontWeight: "400",
-    color: GlobalStyles.colors.textColor,
-    opacity: 0.8,
-  },
-  gradientButtonStyle: {
-    justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 0, // Override GradientButton's default margin
-  },
-  buttonContent: {
     flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: dynamicScale(8, false, 0.5),
+    paddingHorizontal: dynamicScale(8, false, 0.5),
+    paddingVertical: dynamicScale(4, false, 0.5),
+  },
+  tripItemContainer: {
     alignItems: "center",
-    justifyContent: "center",
-    paddingTop: dynamicScale(2, true),
-    marginBottom: dynamicScale(-2, true),
-  },
-  buttonIcon: {
-    width: dynamicScale(18, false, 0.5),
-    height: dynamicScale(18, false, 0.5),
-    marginRight: dynamicScale(6, false, 0.5),
-  },
-  buttonText: {
-    fontSize: dynamicScale(16, false, 0.5),
-    fontWeight: "300",
-    fontStyle: "italic",
-    color: GlobalStyles.colors.textColor,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderColor: GlobalStyles.colors.gray300,
+    borderRadius: dynamicScale(8, false, 0.5),
+    borderWidth: 1,
+    elevation: 1,
+    flexDirection: "row",
+    gap: dynamicScale(8, false, 0.5),
+    marginHorizontal: dynamicScale(8, false, 0.5),
+    marginVertical: dynamicScale(4, false, 0.5),
+    padding: dynamicScale(12, false, 0.5),
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
   tripItemText: {
+    color: GlobalStyles.colors.gray700,
     fontSize: dynamicScale(14, false, 0.5),
     fontWeight: "400",
-    color: GlobalStyles.colors.gray700,
     lineHeight: dynamicScale(18, false, 0.5),
+  },
+  tripListContainer: {
+    alignItems: "stretch",
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
+    borderRadius: 24,
+    gap: constantScale(8, 0.5),
+    justifyContent: "flex-start",
+    margin: constantScale(12, 0.5),
+    minHeight: constantScale(80, 0.5),
+    padding: constantScale(16, 0.5),
   },
 });

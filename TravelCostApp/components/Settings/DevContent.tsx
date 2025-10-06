@@ -1,16 +1,20 @@
-import { Alert, StyleSheet, Text, View, FlatList } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
-import { useInterval } from "../Hooks/useInterval";
-import { getOfflineQueue } from "../../util/offline-queue";
-import { DEBUG_POLLING_INTERVAL } from "../../confAppConstants";
-import { versionCheck, VersionCheckResponse } from "../../util/version";
 import { useFocusEffect } from "@react-navigation/native";
-import { DateTime } from "luxon";
-
-//Localization
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+import { DateTime } from "luxon";
+import React, { useContext, useEffect, useState } from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
+
+import { DEBUG_POLLING_INTERVAL } from "../../confAppConstants";
+import { GlobalStyles } from "../../constants/styles";
+import { de, en, fr, ru } from "../../i18n/supportedLanguages";
+import { AuthContext } from "../../store/auth-context";
+import { getOfflineQueue } from "../../util/offline-queue";
+import { versionCheck, VersionCheckResponse } from "../../util/version";
+import { useInterval } from "../Hooks/useInterval";
+
+//Localization
+
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -19,18 +23,18 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import Button from "../UI/Button";
-import { AuthContext } from "../../store/auth-context";
-import { TripContext } from "../../store/trip-context";
 import { NetworkContext } from "../../store/network-context";
+import { TripContext } from "../../store/trip-context";
 import { UserContext } from "../../store/user-context";
-import { GlobalStyles } from "../../constants/styles";
 import { storeExpoPushTokenInTrip } from "../../util/http";
-import { ExpoPushToken } from "expo-notifications";
-import safeLogError from "../../util/error";
 import BackButton from "../UI/BackButton";
-import { showBanner } from "../UI/ToastComponent";
+import Button from "../UI/Button";
+
+import { ExpoPushToken } from "expo-notifications";
+
 import { OnboardingFlags } from "../../types/onboarding";
+import safeLogError from "../../util/error";
+import { showBanner } from "../UI/ToastComponent";
 
 const DevContent = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
@@ -83,18 +87,13 @@ const DevContent = ({ navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       // checking timezone in DEV MODE
-      const timeZone =
-        DateTime.now().setLocale(i18n.locale).toLocaleString({
-          weekday: "short",
-          month: "short",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-        }) +
-        " " +
-        DateTime.now().zoneName +
-        " " +
-        DateTime.now().toFormat("ZZZZ");
+      const timeZone = `${DateTime.now().setLocale(i18n.locale).toLocaleString({
+        weekday: "short",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      })} ${DateTime.now().zoneName} ${DateTime.now().toFormat("ZZZZ")}`;
       setTimeZoneString(timeZone);
     }, [])
   );
@@ -102,7 +101,7 @@ const DevContent = ({ navigation }) => {
   return (
     <View>
       <View style={styles.titleContainer}>
-        <BackButton />
+        <BackButton style={{}} />
         <Text style={styles.titleText}>DEVCONTENT</Text>
       </View>
 
@@ -130,12 +129,12 @@ const DevContent = ({ navigation }) => {
       {/* render offline queue */}
       {/* offqitem - > expense -> expenseData */}
       <Text>
-{i18n.t("devOfflineQueue")}
+        {i18n.t("devOfflineQueue")}
         {(!offlineQueue || offlineQueue.length < 1) && " empty"}
       </Text>
       <FlatList
         data={offlineQueue}
-        renderItem={(item) => {
+        renderItem={item => {
           if (!item.item.expense) return null;
           const index = item.index;
           return (
@@ -200,36 +199,36 @@ const DevContent = ({ navigation }) => {
 export default DevContent;
 
 const styles = StyleSheet.create({
+  backButton: { marginBottom: "-14%" },
+  settingsButton: {
+    borderRadius: 16,
+    marginHorizontal: "8%",
+    marginVertical: "2%",
+  },
+  textButton: {
+    borderRadius: 16,
+    color: GlobalStyles.colors.gray700,
+    fontSize: 16,
+    fontStyle: "italic",
+    fontWeight: "bold",
+    marginLeft: "2%",
+    marginTop: "8%",
+    paddingHorizontal: "8%",
+    paddingVertical: "2%",
+    textAlign: "center",
+  },
   titleContainer: {
+    alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
     marginLeft: "30%",
     paddingVertical: "3%",
   },
-  backButton: { marginBottom: "-14%" },
   titleText: {
+    color: GlobalStyles.colors.gray700,
     fontSize: 22,
-    fontWeight: "bold",
     fontStyle: "italic",
-    color: GlobalStyles.colors.gray700,
-    marginLeft: "2%",
-  },
-  settingsButton: {
-    marginVertical: "2%",
-    marginHorizontal: "8%",
-    borderRadius: 16,
-  },
-  textButton: {
-    marginTop: "8%",
-    paddingVertical: "2%",
-    paddingHorizontal: "8%",
-    borderRadius: 16,
-    textAlign: "center",
-    fontSize: 16,
     fontWeight: "bold",
-    fontStyle: "italic",
-    color: GlobalStyles.colors.gray700,
     marginLeft: "2%",
   },
 });

@@ -1,6 +1,6 @@
-import * as functions from "firebase-functions";
-import * as admin from "firebase-admin";
 import axios from "axios";
+import * as admin from "firebase-admin";
+import * as functions from "firebase-functions";
 
 // Initialize Firebase Admin SDK
 admin.initializeApp();
@@ -103,7 +103,7 @@ function formatDiscordMessage(feedback: FeedbackData): any {
             name: "💬 Feedback",
             value:
               feedback.feedbackString.length > 1000
-                ? feedback.feedbackString.substring(0, 1000) + "..."
+                ? `${feedback.feedbackString.substring(0, 1000)}...`
                 : feedback.feedbackString,
             inline: false,
           },

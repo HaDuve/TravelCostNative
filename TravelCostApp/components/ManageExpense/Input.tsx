@@ -1,13 +1,8 @@
 /* eslint-disable react/react-in-jsx-scope */
-import React, {
-  Keyboard,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
+import { Keyboard, StyleSheet, Text, TextInput, View } from "react-native";
+
+import { GlobalStyles } from "../../constants/styles";
 import { dynamicScale } from "../../util/scalingUtil";
 
 const Input = ({
@@ -49,7 +44,7 @@ const Input = ({
         autoCorrect={false}
         inputAccessoryViewID={inputAccessoryViewID}
         placeholder={placeholder}
-        onChangeText={(entryValue) => {
+        onChangeText={entryValue => {
           // replacing , with . for decimal-pad
           if (textInputConfig.keyboardType === "decimal-pad") {
             textInputConfig.onChangeText(entryValue.replace(",", "."));
@@ -79,37 +74,37 @@ Input.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  inputContainer: {
-    marginHorizontal: dynamicScale(16),
-    marginVertical: dynamicScale(4, true),
-  },
-  label: {
-    fontSize: dynamicScale(12, false, 0.5),
-    color: GlobalStyles.colors.textColor,
-    marginBottom: dynamicScale(4, true),
+  hasCurrencyStyle: {
+    marginRight: dynamicScale(-10),
+    paddingRight: dynamicScale(16),
   },
   input: {
     backgroundColor: GlobalStyles.colors.gray500,
-    color: GlobalStyles.colors.primary700,
-    padding: dynamicScale(6),
-    borderRadius: 0,
-    fontSize: dynamicScale(18, false, 0.5),
     borderBottomColor: GlobalStyles.colors.gray700,
     borderBottomWidth: 1,
+    borderRadius: 0,
+    color: GlobalStyles.colors.primary700,
+    fontSize: dynamicScale(18, false, 0.5),
+    padding: dynamicScale(6),
     textAlign: "center",
   },
-  hasCurrencyStyle: {
-    paddingRight: dynamicScale(16),
-    marginRight: dynamicScale(-10),
+  inputContainer: {
+    marginHorizontal: dynamicScale(16),
+    marginVertical: dynamicScale(4, true),
   },
   inputMultiline: {
     minHeight: dynamicScale(100, true),
     textAlignVertical: "top",
   },
+  invalidInput: {
+    backgroundColor: GlobalStyles.colors.error50,
+  },
   invalidLabel: {
     color: GlobalStyles.colors.error500,
   },
-  invalidInput: {
-    backgroundColor: GlobalStyles.colors.error50,
+  label: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(12, false, 0.5),
+    marginBottom: dynamicScale(4, true),
   },
 });

@@ -1,17 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
 
-import React from "react";
-import { createContext, useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import PropTypes from "prop-types";
+import React, { createContext, useEffect, useState } from "react";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { reloadApp } from "../util/appState";
 import { setAxiosAccessToken } from "../util/axios-config";
+import safeLogError from "../util/error";
 import { getValidIdToken, testFirebaseAuth } from "../util/firebase-auth";
 import { clearLastFetchTimestamp } from "../util/last-fetch-timestamp";
 
 //Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -20,33 +24,23 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import PropTypes from "prop-types";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
 import {
-  getAuth,
   deleteUser,
-  signInWithCustomToken,
   signInWithEmailAndPassword,
   initializeAuth,
 } from "firebase/auth";
-import { Alert } from "react-native";
 import { initializeApp } from "firebase/app";
+
 // import { getReactNativePersistence } from "firebase/auth";
-import {
-  secureStoreGetItem,
-  secureStoreRemoveItem,
-  secureStoreSetItem,
-} from "./secure-storage";
-import { reloadApp } from "../util/appState";
-import safeLogError from "../util/error";
+import { secureStoreGetItem, secureStoreSetItem } from "./secure-storage";
 
 export const AuthContext = createContext({
   uid: "",
   token: "",
   isAuthenticated: false,
-  authenticate: async (token) => {},
+  authenticate: async token => {},
   logout: (tripid?: string) => {},
-  setUserID: async (uid) => {},
+  setUserID: async uid => {},
   deleteAccount: async () => {},
 });
 
@@ -137,7 +131,7 @@ function AuthContextProvider({ children }) {
     const email = await secureStoreGetItem("ENCM");
     // console.log("deleteAccount ~ email:", email);
     const password = await secureStoreGetItem("ENCP");
-    signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
+    signInWithEmailAndPassword(auth, email, password).then(userCredential => {
       // Signed in
       const user = userCredential.user;
       deleteUser(user)
@@ -156,7 +150,7 @@ function AuthContextProvider({ children }) {
             },
           });
         })
-        .catch((error) => {
+        .catch(error => {
           // An error ocurred
           // ...
           safeLogError(error);
@@ -169,10 +163,10 @@ function AuthContextProvider({ children }) {
     uid: uidString,
     token: authToken,
     isAuthenticated: !!authToken,
-    authenticate: authenticate,
-    logout: logout,
-    setUserID: setUserID,
-    deleteAccount: deleteAccount,
+    authenticate,
+    logout,
+    setUserID,
+    deleteAccount,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

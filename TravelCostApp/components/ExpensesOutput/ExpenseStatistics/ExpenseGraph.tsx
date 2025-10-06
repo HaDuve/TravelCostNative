@@ -97,20 +97,20 @@ const ExpenseGraph = ({
         let dayString = "";
         if (
           (item.day instanceof Date
-            ? item.day.toDateString()
-            : item.day.toString()) ===
+            ? item.day?.toDateString?.() || ""
+            : item.day?.toString?.() || "") ===
           (() => {
             const date = getDateMinusDays(today, 1);
             return date instanceof Date
-              ? date.toDateString()
-              : date.toJSDate().toDateString();
+              ? date?.toDateString?.() || ""
+              : date?.toJSDate?.()?.toDateString?.() || "";
           })()
         ) {
           dayString = i18n.t("yesterday");
         } else if (
           (item.day instanceof Date
-            ? item.day.toDateString()
-            : item.day.toString()) === new Date().toDateString()
+            ? item.day?.toDateString?.() || ""
+            : item.day?.toString?.() || "") === new Date().toDateString()
         ) {
           dayString = i18n.t("today");
         } else {
@@ -208,25 +208,25 @@ const ExpenseGraph = ({
         let weekString = "";
         if (
           (item.firstDay instanceof Date
-            ? item.firstDay.toDateString()
-            : item.firstDay.toString()) ===
+            ? item.firstDay?.toDateString?.() || ""
+            : item.firstDay?.toString?.() || "") ===
           (() => {
             const date = getPreviousMondayDate(getDateMinusDays(today, 7));
             return date instanceof Date
-              ? date.toDateString()
-              : date.toJSDate().toDateString();
+              ? date?.toDateString?.() || ""
+              : date?.toJSDate?.()?.toDateString?.() || "";
           })()
         ) {
           weekString = i18n.t("lastWeek");
         } else if (
           (item.firstDay instanceof Date
-            ? item.firstDay.toDateString()
-            : item.firstDay.toString()) ===
+            ? item.firstDay?.toDateString?.() || ""
+            : item.firstDay?.toString?.() || "") ===
           (() => {
             const date = getPreviousMondayDate(new Date());
             return date instanceof Date
-              ? date.toDateString()
-              : date.toJSDate().toDateString();
+              ? date?.toDateString?.() || ""
+              : date?.toJSDate?.()?.toDateString?.() || "";
           })()
         ) {
           weekString = i18n.t("thisWeek");

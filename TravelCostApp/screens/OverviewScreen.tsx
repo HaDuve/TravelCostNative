@@ -16,7 +16,7 @@ import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { MemoizedExpensesOverview } from "../components/ExpensesOutput/ExpensesOverview";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 import { ExpensesContext, RangeString } from "../store/expenses-context";
 import { UserContext } from "../store/user-context";
 
@@ -30,19 +30,19 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { OnboardingFlags } from "../types/onboarding";
-import { _toShortFormat } from "../util/dateTime";
-import { NetworkContext } from "../store/network-context";
 import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
+import { NetworkContext } from "../store/network-context";
+import { OnboardingFlags } from "../types/onboarding";
+import { _toShortFormat } from "../util/dateTime";
 import { ExpenseData } from "../util/expense";
 
 import * as Haptics from "expo-haptics";
 
 import { SettingsContext } from "../store/settings-context";
+import { TripContext } from "../store/trip-context";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
-import { TripContext } from "../store/trip-context";
 
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -115,7 +115,8 @@ const OverviewScreen = ({ navigation }) => {
 
   useInterval(
     React.useCallback(() => {
-      setDateTimeString(_toShortFormat(DateTime.now()));
+      const now = DateTime.now();
+      setDateTimeString(_toShortFormat(now));
     }, []),
     DEBUG_POLLING_INTERVAL * 13,
     true

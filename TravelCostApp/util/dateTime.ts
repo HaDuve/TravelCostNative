@@ -19,6 +19,9 @@ export function _isToday(dateTime: DateTime): boolean {
   return dateTime.hasSame(DateTime.now(), "day");
 }
 export function _toShortFormat(dateTime: DateTime): string {
+  if (!dateTime) {
+    return new Date().toLocaleDateString();
+  }
   return dateTime.toLocaleString({
     // weekday: "short",
     month: "short",

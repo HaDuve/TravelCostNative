@@ -134,10 +134,20 @@ function TripHistoryItem({ tripid, trips }) {
       setProgress(trip.progress);
       setDays(trip.days);
       const travellers = [];
+      console.log("loadTripHistoryItem: trip.travellers:", trip.travellers);
       trip.travellers?.forEach(traveller => {
-        travellers.push({ userName: traveller });
+        console.log("loadTripHistoryItem: processing traveller:", traveller);
+        if (traveller && typeof traveller === "string") {
+          travellers.push({ userName: traveller });
+        } else {
+          console.warn(
+            "loadTripHistoryItem: invalid traveller data:",
+            traveller
+          );
+        }
       });
-      if (travellers.length > 0) setTravellers(travellers);
+      console.log("loadTripHistoryItem: final travellers array:", travellers);
+      setTravellers(travellers); // Always set, even if empty
       setIsFetching(false);
     }
   }
@@ -174,10 +184,17 @@ function TripHistoryItem({ tripid, trips }) {
     if (isDynamic && Number(dynamicDailyBudget) < 0) setDailyBudget("0.01");
     else setDailyBudget(isDynamic ? dynamicDailyBudget : tripCtx.dailyBudget);
     const objTravellers = [];
+    console.log("handleContextTrip: tripCtx.travellers:", tripCtx.travellers);
     tripCtx.travellers.forEach(traveller => {
-      objTravellers.push({ userName: traveller });
+      console.log("handleContextTrip: processing traveller:", traveller);
+      if (traveller && typeof traveller === "string") {
+        objTravellers.push({ userName: traveller });
+      } else {
+        console.warn("handleContextTrip: invalid traveller data:", traveller);
+      }
     });
-    if (objTravellers.length > 0) setTravellers(objTravellers);
+    console.log("handleContextTrip: final objTravellers array:", objTravellers);
+    setTravellers(objTravellers); // Always set, even if empty
 
     setIsFetching(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -276,12 +293,26 @@ function TripHistoryItem({ tripid, trips }) {
     async function getTripTravellers() {
       try {
         const listTravellers: TravellerNames = await getTravellers(tripid);
+        console.log("getTripTravellers: listTravellers:", listTravellers);
         const objTravellers = [];
         listTravellers.forEach(traveller => {
-          objTravellers.push({ userName: traveller });
+          console.log("getTripTravellers: processing traveller:", traveller);
+          if (traveller && typeof traveller === "string") {
+            objTravellers.push({ userName: traveller });
+          } else {
+            console.warn(
+              "getTripTravellers: invalid traveller data:",
+              traveller
+            );
+          }
         });
-        if (objTravellers.length > 0) setTravellers(objTravellers);
+        console.log(
+          "getTripTravellers: final objTravellers array:",
+          objTravellers
+        );
+        setTravellers(objTravellers); // Always set, even if empty
       } catch (error) {
+        console.error("getTripTravellers: error:", error);
         return;
       }
     }
@@ -426,13 +457,17 @@ function TripHistoryItem({ tripid, trips }) {
   const dimensionChars = dynamicScale(25, false, 0.4);
 
   function renderTravellers(item) {
-    if (!item.item?.userName) return <></>;
+    // Add debugging and better null checks
+    if (!item || !item.item || !item.item.userName) {
+      console.log("renderTravellers: Invalid item structure:", item);
+      return <></>;
+    }
     return (
       <View style={[GlobalStyles.strongShadow, styles.travellerCard]}>
         <View style={[styles.avatar, GlobalStyles.shadowPrimary]}>
           <Text style={styles.avatarText}>
             {/* TODO: Profile Picture for now replaced with first char of the name */}
-            {item.item?.userName?.charAt(0)}
+            {item.item.userName.charAt(0)}
           </Text>
         </View>
         <Text style={styles.travellerNameText}>
@@ -500,11 +535,18 @@ function TripHistoryItem({ tripid, trips }) {
           </View>
         </View>
         <FlatList
-          data={travellers}
+          data={travellers.filter(t => t && t.userName)}
           renderItem={renderTravellers}
           numColumns={2}
           keyExtractor={(item: { userName: string }) => {
             return item.userName + tripid;
+          }}
+          onLayout={() => {
+            console.log("FlatList travellers data:", travellers);
+            console.log(
+              "FlatList filtered data:",
+              travellers.filter(t => t && t.userName)
+            );
           }}
         ></FlatList>
       </View>

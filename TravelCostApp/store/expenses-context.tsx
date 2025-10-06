@@ -353,6 +353,7 @@ function ExpensesContextProvider({ children }) {
       0
     );
     const yearlyExpenses = expensesState.filter(expense => {
+      if (!expense.date) return false;
       return expense.date >= firstDay && expense.date <= lastDay;
     });
     return { firstDay, lastDay, yearlyExpenses };
@@ -382,6 +383,7 @@ function ExpensesContextProvider({ children }) {
     );
 
     const monthlyExpenses = expensesState.filter(expense => {
+      if (!expense.date) return false;
       return expense.date >= firstDay && expense.date <= lastDay;
     });
     return { firstDay, lastDay, monthlyExpenses };
@@ -400,6 +402,7 @@ function ExpensesContextProvider({ children }) {
     const firstDay = toDate(prevMonday);
     const lastDay = toDate(getDatePlusDays(prevMonday, 6));
     const weeklyExpenses = expensesState.filter(expense => {
+      if (!expense.date) return false;
       return expense.date >= firstDay && expense.date <= lastDay;
     });
     return { firstDay, lastDay, weeklyExpenses };
@@ -408,6 +411,7 @@ function ExpensesContextProvider({ children }) {
     const today = new Date();
     const dayBack = getDateMinusDays(today, daysBack);
     const dayExpenses = expensesState.filter(expense => {
+      if (!expense.date) return false;
       return toDateString(expense.date) === toDateString(dayBack);
     });
     return dayExpenses;
@@ -415,40 +419,48 @@ function ExpensesContextProvider({ children }) {
 
   function getSpecificDayExpenses(date) {
     const dayExpenses = expensesState.filter(expense => {
+      if (!expense.date) return false;
+      if (!date) return false;
       return toDateString(expense.date) === toDateString(date);
     });
     return dayExpenses;
   }
 
   function getSpecificWeekExpenses(date) {
+    if (!date) return [];
     const prevMonday = getPreviousMondayDate(date);
     const firstDay = prevMonday;
     const lastDay = getDatePlusDays(prevMonday, 6);
     const weeklyExpenses = expensesState.filter(expense => {
+      if (!expense.date) return false;
       return expense.date >= firstDay && expense.date <= lastDay;
     });
     return weeklyExpenses;
   }
 
   function getSpecificMonthExpenses(date) {
+    if (!date) return [];
     const dateObj = toDate(date);
     const firstDay = new Date(dateObj.getFullYear(), dateObj.getMonth(), 1);
 
     const lastDay = new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 0);
 
     const monthlyExpenses = expensesState.filter(expense => {
+      if (!expense.date) return false;
       return expense.date >= firstDay && expense.date <= lastDay;
     });
     return monthlyExpenses;
   }
 
   function getSpecificYearExpenses(date) {
+    if (!date) return [];
     const dateObj = toDate(date);
     const firstDay = new Date(dateObj.getFullYear(), 0, 1);
 
     const lastDay = new Date(dateObj.getFullYear(), 11, 31);
 
     const yearlyExpenses = expensesState.filter(expense => {
+      if (!expense.date) return false;
       return expense.date >= firstDay && expense.date <= lastDay;
     });
     return yearlyExpenses;
@@ -468,9 +480,13 @@ function ExpensesContextProvider({ children }) {
     const expArray = [];
     if (loadedExpenses) {
       loadedExpenses.forEach(expense => {
-        expense.date = toDate(expense.date);
-        expense.startDate = toDate(expense.startDate);
-        expense.endDate = toDate(expense.endDate);
+        expense.date = expense.date ? toDate(expense.date) : new Date();
+        expense.startDate = expense.startDate
+          ? toDate(expense.startDate)
+          : new Date();
+        expense.endDate = expense.endDate
+          ? toDate(expense.endDate)
+          : new Date();
         expArray.push(expense);
       });
       setExpenses(expArray);

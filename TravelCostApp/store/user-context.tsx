@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import React, { createContext, useCallback, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 import { Alert } from "react-native";
 
 //Localization
@@ -21,12 +21,12 @@ import {
   isPremiumMember,
 } from "../components/Premium/PremiumConstants";
 import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 import safeLogError from "../util/error";
 import { fetchCategories, fetchTripHistory } from "../util/http";
 import { safelyParseJSON } from "../util/jsonParse";
 
-import { asyncStoreSetObject } from "./async-storage";
+import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 import { RangeString } from "./expenses-context";
 import { getMMKVObject, setMMKVObject } from "./mmkv";
 import {
@@ -127,6 +127,30 @@ function UserContextProvider({ children }) {
   useEffect(() => {
     loadLastCurrencyCountryFromAsync();
   }, [loadLastCurrencyCountryFromAsync]);
+
+  // Load freshlyCreated from storage on mount
+  useEffect(() => {
+    async function loadFreshlyCreatedFromStorage() {
+      try {
+        const storedFreshlyCreated =
+          await asyncStoreGetObject("freshlyCreated");
+        console.log(
+          "UserContext: loaded freshlyCreated from storage:",
+          storedFreshlyCreated
+        );
+        if (storedFreshlyCreated !== null) {
+          setFreshlyCreated(storedFreshlyCreated);
+          console.log(
+            "UserContext: set freshlyCreated to:",
+            storedFreshlyCreated
+          );
+        }
+      } catch (error) {
+        console.error("Error loading freshlyCreated from storage:", error);
+      }
+    }
+    loadFreshlyCreatedFromStorage();
+  }, []);
 
   async function updateTripHistory() {
     const uid = await secureStoreGetItem("uid");
@@ -239,9 +263,10 @@ function UserContextProvider({ children }) {
   }
 
   async function setFreshlyCreatedTo(bool: boolean) {
-    // // console.log("setFreshlyCreatedTo ~ bool", bool);
+    console.log("setFreshlyCreatedTo ~ bool", bool);
     setFreshlyCreated(bool);
     await asyncStoreSetObject("freshlyCreated", bool);
+    console.log("setFreshlyCreatedTo ~ set to storage:", bool);
   }
 
   function deleteUser(id: string) {

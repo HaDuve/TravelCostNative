@@ -798,10 +798,12 @@ function Root() {
           return;
         }
 
-        if (freshlyCreated) {
-          console.log("🆕 [App.tsx] Setting freshlyCreated flag");
-          await userCtx.setFreshlyCreatedTo(freshlyCreated);
-        }
+        // Always set freshlyCreated value from storage
+        console.log(
+          "🆕 [App.tsx] Setting freshlyCreated flag:",
+          freshlyCreated
+        );
+        await userCtx.setFreshlyCreatedTo(freshlyCreated || false);
         // check if user was deleted
         console.log("👤 [App.tsx] Checking user status");
         const checkUser = await fetchUser(storedUid);

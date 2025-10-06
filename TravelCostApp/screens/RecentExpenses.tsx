@@ -3,20 +3,20 @@ import { I18n } from "i18n-js";
 import { DateTime } from "luxon";
 import PropTypes from "prop-types";
 import React, {
+  memo,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
-  memo,
 } from "react";
 import {
+  Platform,
+  RefreshControl,
   StyleSheet,
   Text,
-  View,
-  RefreshControl,
   useWindowDimensions,
-  Platform,
+  View,
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import Toast from "react-native-toast-message";
@@ -34,15 +34,15 @@ import {
 } from "../store/expenses-context";
 import { TripContext, TripContextType } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
-import { getOfflineQueue } from "../util/offline-queue";
 import { fetchTravelerIsTouched } from "../util/http";
+import { getOfflineQueue } from "../util/offline-queue";
 
-import { GlobalStyles } from "../constants/styles";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
+import { GlobalStyles } from "../constants/styles";
 
 //Localization
 
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { de, en, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -51,9 +51,9 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
+import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpensesUtil";
 import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
-import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpensesUtil";
 import { _toShortFormat } from "../util/dateTime";
 
 import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
@@ -65,11 +65,11 @@ import { sendOfflineQueue } from "../util/offline-queue";
 
 import * as Haptics from "expo-haptics";
 
+import { getMMKVObject } from "../store/mmkv";
+import { OrientationContext } from "../store/orientation-context";
 import { SettingsContext } from "../store/settings-context";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
-import { getMMKVObject } from "../store/mmkv";
-import { OrientationContext } from "../store/orientation-context";
 
 function RecentExpenses({ navigation }) {
   const expensesCtx = useContext(ExpensesContext);
@@ -279,7 +279,8 @@ function RecentExpenses({ navigation }) {
   useInterval(
     () => {
       if (userCtx.freshlyCreated) return;
-      setDateTimeString(_toShortFormat(DateTime.now()));
+      const now = DateTime.now();
+      setDateTimeString(_toShortFormat(now));
       if (isForeground()) {
         const asyncPolling = async () => {
           await getExpenses(true, true);

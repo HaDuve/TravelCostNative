@@ -18,26 +18,55 @@ export function isDate(value: DateOrDateTime): value is Date {
 
 // Utility function to convert DateOrDateTime to Date
 export function toDate(value: DateOrDateTime): Date {
+  if (!value) {
+    return new Date();
+  }
   if (isDateTime(value)) {
     return value.toJSDate();
   }
-  return value;
+  if (value instanceof Date) {
+    return value;
+  }
+  // Fallback for any other type - try to convert to Date
+  try {
+    return new Date(value);
+  } catch {
+    return new Date();
+  }
 }
 
 // Utility function to convert DateOrDateTime to DateTime
 export function toDateTime(value: DateOrDateTime): DateTime {
+  if (!value) {
+    return DateTime.now();
+  }
   if (isDateTime(value)) {
     return value;
   }
-  return DateTime.fromJSDate(value);
+  if (value instanceof Date) {
+    return DateTime.fromJSDate(value);
+  }
+  // Fallback for any other type - try to convert to DateTime
+  try {
+    return DateTime.fromJSDate(new Date(value));
+  } catch {
+    return DateTime.now();
+  }
 }
 
 // Utility function to get date string from DateOrDateTime
 export function toDateString(value: DateOrDateTime): string {
+  if (!value) {
+    return new Date().toDateString();
+  }
   if (isDateTime(value)) {
     return value.toISODate() || value.toString();
   }
-  return value.toDateString();
+  if (value instanceof Date) {
+    return value.toDateString();
+  }
+  // Fallback for any other type
+  return new Date().toDateString();
 }
 
 // Utility function to get ISO string from DateOrDateTime

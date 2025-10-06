@@ -1,15 +1,15 @@
 import { DateTime } from "luxon";
 
 import {
-  _toMonthString,
-  _getDateMinusDays,
   _daysBetween,
+  _getDateMinusDays,
   _getDatePlusDays,
   _getFormattedDate,
-  _isToday,
-  _toShortFormat,
-  _toDayMonthString,
   _getPreviousMondayDate,
+  _isToday,
+  _toDayMonthString,
+  _toMonthString,
+  _toShortFormat,
 } from "./dateTime";
 import safeLogError from "./error";
 
@@ -41,6 +41,9 @@ export const isToday = (someDate: DateOrDateTime) => {
 };
 
 export function toShortFormat(date: DateOrDateTime) {
+  if (!date) {
+    return new Date().toLocaleDateString();
+  }
   if (date instanceof DateTime) {
     return _toShortFormat(date);
   }
@@ -48,6 +51,9 @@ export function toShortFormat(date: DateOrDateTime) {
 }
 
 export function toDayMonthString(date: DateOrDateTime) {
+  if (!date) {
+    return new Date().toLocaleDateString();
+  }
   if (date instanceof DateTime) {
     return _toDayMonthString(date);
   } else {
@@ -115,6 +121,9 @@ export function toDayMonthString2(
 }
 
 export function toMonthString(date: DateOrDateTime) {
+  if (!date) {
+    return new Date().toLocaleDateString();
+  }
   if (date instanceof DateTime) return _toMonthString(date);
   else {
     return _toMonthString(DateTime.fromJSDate(date));

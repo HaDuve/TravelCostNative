@@ -185,7 +185,6 @@ function displayIssueLinks(title, locations, maxDisplay = 10) {
     console.log(
       `  ${index + 1}. ${colors.blue}${links.ansiLink}${colors.reset}`
     );
-    console.log(`     ${colors.dim}${links.plainLink}${colors.reset}`);
     if (message || type) {
       console.log(`     ${colors.dim}${message}${type}${colors.reset}`);
     }

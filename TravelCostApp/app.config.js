@@ -19,6 +19,7 @@ export default {
       url: "https://u.expo.dev/dff7ffc5-6f1e-4ece-bb23-0c50cda19f46",
     },
     newArchEnabled: false,
+    jsEngine: "hermes",
     assetBundlePatterns: ["**/*"],
     ios: {
       supportsTablet: true,

@@ -778,8 +778,10 @@ function Root() {
             storedTripId
           );
           tripData = await tripCtx.fetchAndSetCurrentTrip(storedTripId);
-          await tripCtx.fetchAndSetTravellers(storedTripId);
+          // Set tripid first to ensure context is ready
           tripCtx.setTripid(storedTripId);
+          // Then fetch travellers
+          await tripCtx.fetchAndSetTravellers(storedTripId);
           console.log("📋 [App.tsx] Trip data fetched successfully");
         } else {
           console.log(

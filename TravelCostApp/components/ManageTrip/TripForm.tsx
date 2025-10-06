@@ -147,7 +147,7 @@ const TripForm = ({ navigation, route }) => {
     //   :
     getFormattedDate(DateTime.now().plus({ days: 7 }))
   );
-  const [travellers, setTravellers] = useState([]);
+  const [travellers, setTravellers] = useState<any>([]);
 
   const openDatePickerRange = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

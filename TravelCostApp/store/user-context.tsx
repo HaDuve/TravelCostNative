@@ -124,10 +124,6 @@ function UserContextProvider({ children }) {
     }
   }, []);
 
-  useEffect(() => {
-    loadLastCurrencyCountryFromAsync();
-  }, [loadLastCurrencyCountryFromAsync]);
-
   // Load freshlyCreated from storage on mount
   useEffect(() => {
     async function loadFreshlyCreatedFromStorage() {
@@ -164,6 +160,7 @@ function UserContextProvider({ children }) {
       safeLogError(error);
     }
   }
+
   useEffect(() => {
     const storedHistory = getMMKVObject("tripHistory");
     if (storedHistory !== null) {
@@ -182,6 +179,7 @@ function UserContextProvider({ children }) {
     setIsPremium(isPremiumNow);
     return isPremiumNow;
   }
+
   useEffect(() => {
     Purchases.addCustomerInfoUpdateListener(info => {
       // handle any changes to purchaserInfo
@@ -215,6 +213,10 @@ function UserContextProvider({ children }) {
     }
     loadIsPremiumFromAsync();
   }, []);
+
+  useEffect(() => {
+    loadLastCurrencyCountryFromAsync();
+  }, [loadLastCurrencyCountryFromAsync]);
 
   function _loadCatListFromMMKV() {
     try {

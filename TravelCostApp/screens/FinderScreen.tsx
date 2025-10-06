@@ -49,6 +49,7 @@ import safeLogError from "../util/error";
 import { ExpenseData } from "../util/expense";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { formatExpenseWithCurrency } from "../util/string";
+import { normalizeTravellers } from "../util/traveller-utils";
 
 const FinderScreen = () => {
   const navigation = useNavigation<RootNavigationProp>();
@@ -278,12 +279,13 @@ const FinderScreen = () => {
   const cats = DEFAULTCATEGORIES.map(cat => {
     if (cat.cat !== "newCat") return cat.catString;
   });
-  const travellers = tripCtx.travellers;
+  const normalizedTravellers = normalizeTravellers(tripCtx.travellers);
+  const travellerNames = normalizedTravellers.map(t => t.userName);
 
   const suggestions = searchQuery
-    ? [...travellers, ...cats, ...suggestionData]
+    ? [...travellerNames, ...cats, ...suggestionData]
     : [
-        ...travellers.slice(0, 1),
+        ...travellerNames.slice(0, 1),
         ...cats.slice(0, 1),
         ...suggestionData.slice(0, 1),
       ];

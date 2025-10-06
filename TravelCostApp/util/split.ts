@@ -18,6 +18,7 @@ i18n.enableFallback = true;
 
 import { getAllExpenses } from "./http";
 import { safelyParseJSON } from "./jsonParse";
+import { TravellerData, travellersToStringArray } from "./traveller-utils";
 
 export function recalcSplitsLinearly(splitList: Split[], amount: number) {
   if (amount == 0) return splitList;
@@ -252,35 +253,25 @@ export function splitTypesDropdown() {
   ];
 }
 
-export function travellerToDropdown(travellers, includeAddTraveller = true) {
-  if (!travellers || travellers?.length < 1) {
-    // console.log("travellertodropdown failed");
+export function travellerToDropdown(
+  travellers: TravellerData,
+  includeAddTraveller = true
+) {
+  if (!travellers) {
     return [];
   }
-  const listOfLabelValues = [];
-  // sometimes this is not an array but an object
-  try {
-    travellers.forEach(traveller => {
-      // // console.log("travellers.forEach ~ traveller:", traveller);
-      // TODO: make value uid based and not name based
-      listOfLabelValues.push({ label: traveller, value: traveller });
-    });
-  } catch (error) {
-    // console.log("travellers is an object", travellers);
-    // get travellers.user.username
-    Object.keys(travellers).forEach(key => {
-      // console.log("Object.keys ~ key:", key);
-      // console.log("Object.keys ~ travellers[key]:", travellers[key]);
-      // console.log(
-      //   "Object.keys ~ travellers[key][userName]:",
-      //   travellers[key]["userName"]
-      // );
-      listOfLabelValues.push({
-        label: travellers[key]["userName"],
-        value: travellers[key]["userName"],
-      });
-    });
+
+  // Use standardized traveller conversion
+  const normalizedTravellers = travellersToStringArray(travellers);
+
+  if (normalizedTravellers.length < 1) {
+    return [];
   }
+
+  const listOfLabelValues = normalizedTravellers.map(traveller => ({
+    label: traveller,
+    value: traveller,
+  }));
 
   // Add "+ add traveller" item at the end only if requested
   if (includeAddTraveller) {
@@ -290,7 +281,7 @@ export function travellerToDropdown(travellers, includeAddTraveller = true) {
     });
   }
 
-  return [...listOfLabelValues];
+  return listOfLabelValues;
 }
 
 export async function calcOpenSplitsTable(

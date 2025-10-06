@@ -18,6 +18,7 @@ import { GlobalStyles } from "../../constants/styles";
 import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 import { SettingsContext } from "../../store/settings-context";
 import { TripContext } from "../../store/trip-context";
+import { travellersToObjectArray } from "../../util/traveller-utils";
 
 //Localization
 const i18n = new I18n({ en, de, fr, ru });
@@ -134,8 +135,16 @@ const ExpensesSummary = ({
       break;
   }
   const travellers = tripCtx.travellers;
-  const travellerSplitExpenseSums = travellers.map(traveller => {
-    return getTravellerSum(periodExpenses, traveller, periodName === "total");
+  // Safely handle different traveller data formats
+  const normalizedTravellers = travellers
+    ? travellersToObjectArray(travellers)
+    : [];
+  const travellerSplitExpenseSums = normalizedTravellers.map(traveller => {
+    return getTravellerSum(
+      periodExpenses,
+      traveller.userName,
+      periodName === "total"
+    );
   });
 
   if (!budgetNumber || budgetNumber == MAX_JS_NUMBER) infinityString = "∞";
@@ -205,8 +214,7 @@ const ExpensesSummary = ({
     userCtx.lastCurrency
   )}`;
 
-  const valid =
-    tripCtx.tripid && tripCtx.travellers && tripCtx.travellers?.length > 0;
+  const valid = tripCtx.tripid && travellers && normalizedTravellers.length > 0;
   const pressBudgetHandler = () => {
     if (isToastShowing) {
       setIsToastShowing(false);

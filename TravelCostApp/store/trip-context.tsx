@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import React, { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 import { useInterval } from "../components/Hooks/useInterval";
 import { MAX_JS_NUMBER } from "../confAppConstants";
@@ -9,10 +9,10 @@ import { isConnectionFastEnough } from "../util/connectionSpeed";
 import safeLogError from "../util/error";
 import { ExpenseData, isPaidString } from "../util/expense";
 import { fetchTrip, fetchUser, getTravellers, updateTrip } from "../util/http";
-import { Traveller } from "../util/traveler";
+import { TravellerData } from "../util/traveller-utils";
 
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
-import { setMMKVObject, getMMKVObject } from "./mmkv";
+import { getMMKVObject, setMMKVObject } from "./mmkv";
 import { secureStoreGetItem } from "./secure-storage";
 
 // SVG error handling - removed problematic import
@@ -23,7 +23,7 @@ export interface TripData {
   totalBudget?: string;
   dailyBudget?: string;
   tripCurrency?: string;
-  travellers?: Traveller[];
+  travellers?: TravellerData;
   tripid?: string;
   totalSum?: number;
   tripProgress?: number;
@@ -51,7 +51,7 @@ export type TripContextType = {
   refreshState: boolean;
   refresh: () => void;
   setTripProgress: (percent: number) => void;
-  travellers: Traveller[];
+  travellers: TravellerData;
   fetchAndSetTravellers: (tripid: string) => Promise<void>;
   setTotalSum: (amount: number) => void;
   setTripid: (tripid: string) => void;
@@ -86,7 +86,7 @@ export const TripContext = createContext({
   refreshState: false,
   refresh: () => {},
   setTripProgress: (percent: number) => {},
-  travellers: [],
+  travellers: [] as TravellerData,
   fetchAndSetTravellers: async (tripid: string) => {},
   setTotalSum: (amount: number) => {},
   setTripid: (tripid: string) => {},
@@ -114,7 +114,7 @@ export const TripContext = createContext({
 });
 
 function TripContextProvider({ children }) {
-  const [travellers, setTravellers] = useState([]);
+  const [travellers, setTravellers] = useState<TravellerData>([]);
   const [tripid, setTripid] = useState("");
   const [tripName, setTripName] = useState("");
   const [totalBudget, setTotalBudget] = useState("");
@@ -201,10 +201,11 @@ function TripContextProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    if (!travellers || (travellers?.length === 0 && tripid)) {
+    // Only fetch travellers if we have a tripid and no travellers yet
+    if (tripid && (!travellers || travellers.length === 0)) {
       fetchAndSetTravellers(tripid);
     }
-  }, [travellers, tripid]);
+  }, [tripid]); // Remove travellers from dependencies to prevent infinite loops
 
   function setTripProgress(percent: number) {
     if (percent < 0 || percent > 1) percent = 1;
@@ -216,22 +217,38 @@ function TripContextProvider({ children }) {
   }
 
   async function fetchAndSetTravellers(tripid: string) {
+    console.log(
+      "🔄 [TripContext] fetchAndSetTravellers called with tripid:",
+      tripid
+    );
     const { isFastEnough } = await isConnectionFastEnough();
     if (!isFastEnough) {
+      console.log(
+        "🔄 [TripContext] Offline mode, loading travellers from storage"
+      );
       await loadTravellersFromStorage();
       return;
     }
     if (!tripid || tripid === "") {
-      // setTravellers([]);
+      console.log(
+        "🔄 [TripContext] No tripid provided, skipping traveller fetch"
+      );
       return;
     }
     // updates the current Travellers in context
     try {
+      console.log(
+        "🔄 [TripContext] Fetching travellers from server for tripid:",
+        tripid
+      );
       const travellers = await getTravellers(tripid);
+      console.log("🔄 [TripContext] Fetched travellers:", travellers);
       if (travellers?.length < 1) throw new Error("no travellers found");
       saveTravellersInStorage(travellers);
       setTravellers(travellers);
+      console.log("🔄 [TripContext] Travellers set in context:", travellers);
     } catch (error) {
+      console.log("🔄 [TripContext] Error fetching travellers:", error);
       safeLogError(error);
       throw new Error("no travellers found");
     }
@@ -240,6 +257,7 @@ function TripContextProvider({ children }) {
   async function setCurrentTrip(tripid: string, trip: TripData) {
     if (!trip) return;
     if (tripid === "reset") {
+      console.log("🔄 [TripContext] Resetting trip data");
       _setTripid("");
       setTripName("");
       setTotalBudget("");
@@ -273,18 +291,12 @@ function TripContextProvider({ children }) {
     setTotalSumTrip(trip.totalSum);
     setIsLoading(false);
     setIsDynamicDailyBudget(trip.isDynamicDailyBudget);
-    if (typeof trip.travellers[1] === "string") {
-      setTravellers(trip.travellers);
-    } else {
-      const extractedTravellers = [];
-      Object.keys(trip.travellers).forEach(key => {
-        //skip undefined keys
-        if (key && travellers[key]) {
-          extractedTravellers.push(travellers[key]["userName"]);
-        }
-      });
-      setTravellers(extractedTravellers);
-    }
+    // Store travellers in their original format for consistent handling
+    console.log(
+      "🔄 [TripContext] setCurrentTrip - trip.travellers:",
+      trip.travellers
+    );
+    setTravellers(trip.travellers);
   }
 
   function setTotalSum(amount: number) {

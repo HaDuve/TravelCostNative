@@ -25,6 +25,7 @@ function runCommand(command, description) {
     const output = execSync(command, {
       encoding: "utf8",
       stdio: "pipe",
+      maxBuffer: 1024 * 1024 * 50, // increase buffer for large tool outputs
       cwd: process.cwd(),
     });
     return { success: true, output, error: null, exitCode: 0 };
@@ -66,15 +67,24 @@ function parseESLintOutput(output) {
   }
 
   // Parse individual error and warning lines
-  // ESLint compact format: "file:line:col, Error - rule (message)"
+  // ESLint compact format: "file: line X, col Y, Error/Warning - message (rule)"
   lines.forEach(line => {
-    const errorMatch = line.match(/^([^:]+):(\d+):(\d+), Error - (.+)/);
-    const warningMatch = line.match(/^([^:]+):(\d+):(\d+), Warning - (.+)/);
+    const errorMatch = line.match(
+      /^([^:]+): line (\d+), col (\d+), Error - (.+)/
+    );
+    const warningMatch = line.match(
+      /^([^:]+): line (\d+), col (\d+), Warning - (.+)/
+    );
 
     if (errorMatch) {
       const [, file, lineNum, col, message] = errorMatch;
+      // Convert relative path to absolute path
+      const absoluteFile = file.trim().startsWith("/")
+        ? file.trim()
+        : `${process.cwd()}/${file.trim()}`;
+
       errorLocations.push({
-        file: file.trim(),
+        file: absoluteFile,
         line: parseInt(lineNum, 10),
         column: parseInt(col, 10),
         message: message.trim(),
@@ -82,8 +92,13 @@ function parseESLintOutput(output) {
       });
     } else if (warningMatch) {
       const [, file, lineNum, col, message] = warningMatch;
+      // Convert relative path to absolute path
+      const absoluteFile = file.trim().startsWith("/")
+        ? file.trim()
+        : `${process.cwd()}/${file.trim()}`;
+
       warningLocations.push({
-        file: file.trim(),
+        file: absoluteFile,
         line: parseInt(lineNum, 10),
         column: parseInt(col, 10),
         message: message.trim(),
@@ -124,9 +139,16 @@ function parsePrettierOutput(output) {
       // Extract file path from lines like "src/file.ts would be reformatted"
       const match = line.match(/^(.+?)\s+would be reformatted/);
       if (match) {
+        const filePath = match[1].trim();
+        const absoluteFile = filePath.startsWith("/")
+          ? filePath
+          : `${process.cwd()}/${filePath}`;
         unformattedFiles.push({
-          file: match[1].trim(),
+          file: absoluteFile,
+          line: 1,
+          column: 1,
           message: "Needs formatting",
+          type: "prettier",
         });
       }
     } else if (line.includes("Code style issues found")) {
@@ -140,8 +162,10 @@ function parsePrettierOutput(output) {
 // Generate hyperlinks for file locations
 function generateHyperlink(file, line, column = 1) {
   const relativePath = file.replace(`${process.cwd()}/`, "");
-  // Use ANSI escape sequences to create clickable hyperlinks for Cursor
-  return `\x1b]8;;cursor://file${file}:${line}:${column}\x1b\\${relativePath}:${line}:${column}\x1b]8;;\x1b\\`;
+  const label = `${relativePath}:${line}:${column}`;
+  const ansiLink = `\x1b]8;;cursor://file${file}:${line}:${column}\x1b\\${label}\x1b]8;;\x1b\\`;
+  const plainLink = `file://${file}:${line}:${column}`;
+  return { ansiLink, plainLink, label };
 }
 
 // Display hyperlinks for issues
@@ -154,11 +178,14 @@ function displayIssueLinks(title, locations, maxDisplay = 10) {
   displayLocations.forEach((location, index) => {
     const line = location.line || 1;
     const column = location.column || 1;
-    const hyperlink = generateHyperlink(location.file, line, column);
+    const links = generateHyperlink(location.file, line, column);
     const message = location.message ? ` - ${location.message}` : "";
     const type = location.type ? ` [${location.type.toUpperCase()}]` : "";
 
-    console.log(`  ${index + 1}. ${colors.blue}${hyperlink}${colors.reset}`);
+    console.log(
+      `  ${index + 1}. ${colors.blue}${links.ansiLink}${colors.reset}`
+    );
+    console.log(`     ${colors.dim}${links.plainLink}${colors.reset}`);
     if (message || type) {
       console.log(`     ${colors.dim}${message}${type}${colors.reset}`);
     }
@@ -304,53 +331,38 @@ async function checkAll() {
     "ESLint code quality check"
   );
 
-  if (eslintResult.success) {
-    results.eslint = {
-      success: true,
-      errors: 0,
-      warnings: 0,
-      total: 0,
-      errorLocations: [],
-      warningLocations: [],
-    };
+  // Always parse ESLint output, even when exit code is 0 (warnings only)
+  const eslintOutputText = eslintResult.success
+    ? eslintResult.output
+    : eslintResult.error;
+  const eslintParsed = parseESLintOutput(eslintOutputText || "");
+  const errors = eslintParsed.errors;
+  const warnings = eslintParsed.warnings;
+  const total = eslintParsed.total;
+  const errorLocations = eslintParsed.errorLocations;
+  const warningLocations = eslintParsed.warningLocations;
+
+  results.eslint = {
+    success: total === 0,
+    errors,
+    warnings,
+    total,
+    errorLocations,
+    warningLocations,
+  };
+  totalIssues += total;
+  if (errors > 0) hasErrors = true;
+
+  if (total === 0) {
     console.log(
       `${colors.green}✅ ESLint: No linting issues found${colors.reset}\n`
     );
   } else {
-    let errors, warnings, total, errorLocations, warningLocations;
-    try {
-      const result = parseESLintOutput(eslintResult.error);
-      errors = result.errors;
-      warnings = result.warnings;
-      total = result.total;
-      errorLocations = result.errorLocations;
-      warningLocations = result.warningLocations;
-
-      results.eslint = {
-        success: errors === 0,
-        errors,
-        warnings,
-        total,
-        errorLocations,
-        warningLocations,
-      };
-      totalIssues += total;
-      if (errors > 0) hasErrors = true;
-    } catch (error) {
-      throw error;
-    }
-
-    if (total === 0) {
-      console.log(
-        `${colors.green}✅ ESLint: No linting issues found${colors.reset}\n`
-      );
-    } else {
-      const status = errors > 0 ? "❌" : "⚠️";
-      const color = errors > 0 ? colors.red : colors.yellow;
-      console.log(
-        `${color}${status} ESLint: ${errors} errors, ${warnings} warnings (${total} total issues)${colors.reset}\n`
-      );
-    }
+    const status = errors > 0 ? "❌" : "⚠️";
+    const color = errors > 0 ? colors.red : colors.yellow;
+    console.log(
+      `${color}${status} ESLint: ${errors} errors, ${warnings} warnings (${total} total issues)${colors.reset}\n`
+    );
   }
 
   // 3. Prettier Check
@@ -422,7 +434,10 @@ async function checkAll() {
 
   console.log(`${colors.blue}${"=".repeat(50)}${colors.reset}`);
 
-  // Display TypeScript errors only
+  // Determine how many links to show (fixed)
+  const maxLinks = 5;
+
+  // Display TypeScript errors
   if (results.typescript.locations.length > 0) {
     console.log(
       `${colors.bright}${colors.cyan}🔗 TYPESCRIPT ERRORS${colors.reset}`
@@ -432,7 +447,58 @@ async function checkAll() {
       `${colors.dim}💡 Click the blue links below to jump to files${colors.reset}\n`
     );
 
-    displayIssueLinks("TypeScript Errors", results.typescript.locations, 5);
+    displayIssueLinks(
+      "TypeScript Errors",
+      results.typescript.locations,
+      maxLinks
+    );
+    console.log(`${colors.cyan}${"=".repeat(50)}${colors.reset}\n`);
+  }
+
+  // Display ESLint errors and warnings
+  if (
+    results.eslint.errorLocations.length > 0 ||
+    results.eslint.warningLocations.length > 0
+  ) {
+    console.log(
+      `${colors.bright}${colors.cyan}🔗 ESLINT ISSUES${colors.reset}`
+    );
+    console.log(`${colors.cyan}${"=".repeat(50)}${colors.reset}`);
+    console.log(
+      `${colors.dim}💡 Click the blue links below to jump to files${colors.reset}\n`
+    );
+
+    if (results.eslint.errorLocations.length > 0) {
+      displayIssueLinks(
+        "ESLint Errors",
+        results.eslint.errorLocations,
+        maxLinks
+      );
+    }
+    if (results.eslint.warningLocations.length > 0) {
+      displayIssueLinks(
+        "ESLint Warnings",
+        results.eslint.warningLocations,
+        maxLinks
+      );
+    }
+    console.log(`${colors.cyan}${"=".repeat(50)}${colors.reset}\n`);
+  }
+
+  // Display Prettier issues as links
+  if (results.prettier.files.length > 0) {
+    console.log(
+      `${colors.bright}${colors.cyan}🔗 PRETTIER ISSUES${colors.reset}`
+    );
+    console.log(`${colors.cyan}${"=".repeat(50)}${colors.reset}`);
+    console.log(
+      `${colors.dim}💡 Click the blue links below to jump to files${colors.reset}\n`
+    );
+    displayIssueLinks(
+      "Prettier Formatting Needed",
+      results.prettier.files,
+      maxLinks
+    );
     console.log(`${colors.cyan}${"=".repeat(50)}${colors.reset}\n`);
   }
 

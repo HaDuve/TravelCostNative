@@ -22,7 +22,12 @@ export function alertYesNo(
     // The "No" button
     {
       text: i18n.t("no"),
-      onPress: () => (onPressNo ? onPressNo() : () => {}),
+      onPress: () =>
+        onPressNo
+          ? onPressNo()
+          : () => {
+              return;
+            },
     },
     // The "Yes" button
     {

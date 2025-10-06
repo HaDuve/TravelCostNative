@@ -179,7 +179,10 @@ const DevContent = ({ navigation }) => {
       <Button
         style={styles.settingsButton}
         // onPress={async () => await trackPurchaseEvent()}
-        onPress={async () => {}}
+        onPress={async () => {
+          // TODO: Implement trackPurchaseEvent functionality
+          return;
+        }}
       >
         trackPurchaseEvent
       </Button>

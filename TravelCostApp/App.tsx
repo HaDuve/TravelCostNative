@@ -624,7 +624,9 @@ function Root() {
       await tripCtx.loadTravellersFromStorage();
       await userCtx.loadCatListFromAsyncInCtx("async");
       await authCtx.authenticate(storedToken);
-    } catch (error) {}
+    } catch (error) {
+      safeLogError(error, "App.tsx", 628);
+    }
   }
 
   useEffect(() => {
@@ -785,9 +787,6 @@ function Root() {
       handler.remove();
     };
   }, []);
-
-  // Track appIsReady state changes
-  useEffect(() => {}, [appIsReady]);
 
   useLayoutEffect(() => {
     async function hideSplashScreen() {

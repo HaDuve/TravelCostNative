@@ -205,7 +205,9 @@ const SettingsScreen = ({ navigation }) => {
       <LinkingButton
         style={styles.settingsButton}
         URL="https://foodfornomads.com/"
-        onPress={() => {}}
+        onPress={() => {
+          // LinkingButton handles the URL opening automatically
+        }}
       >
         {i18n.t("visitFoodForNomadsLabel")}
       </LinkingButton>

@@ -39,28 +39,30 @@ const ExpenseCategories = ({
   const { isPortrait } = useContext(OrientationContext);
 
   const useRowFormat = !isPortrait && !forcePortraitFormat;
-  if (!expenses)
-    return (
-      <View style={styles.container}>
-        <Text>{i18n.t("fallbackTextExpenses")}</Text>
-      </View>
-    );
 
-  const categoryList = [];
-  expenses.forEach(expense => {
-    const cat = expense.category;
-    if (!categoryList.includes(cat)) {
-      categoryList.push(cat);
-    }
-  });
+  const categoryList = useMemo(() => {
+    if (!expenses) return [];
+    const list = [];
+    expenses.forEach(expense => {
+      const cat = expense.category;
+      if (!list.includes(cat)) {
+        list.push(cat);
+      }
+    });
+    return list;
+  }, [expenses]);
 
   function getAllExpensesWithCat(category) {
+    if (!expenses) return [];
     return expenses.filter(expense => {
       return expense.category === category;
     });
   }
 
-  const totalSum = getExpensesSum(expenses);
+  const totalSum = useMemo(() => {
+    if (!expenses) return 0;
+    return getExpensesSum(expenses);
+  }, [expenses]);
 
   const { catSumCat, dataList } = useMemo(() => {
     const catSumCat = [];
@@ -92,6 +94,13 @@ const ExpenseCategories = ({
 
     return { catSumCat, dataList };
   }, [expenses, categoryList]);
+
+  if (!expenses)
+    return (
+      <View style={styles.container}>
+        <Text>{i18n.t("fallbackTextExpenses")}</Text>
+      </View>
+    );
 
   function renderItem(itemData) {
     const newPeriodName = processTitleStringFilteredPiecharts(

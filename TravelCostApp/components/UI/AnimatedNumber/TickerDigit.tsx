@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, StyleProp, TextStyle } from "react-native";
 import React, { useEffect } from "react";
 import Animated, {
   useSharedValue,
@@ -12,6 +12,7 @@ interface TickerDigitProps {
   value: number;
   index: number;
   fontSize: number;
+  textStyle?: StyleProp<TextStyle>;
 }
 
 const NUMBERS = Array.from({ length: 10 }, (_, i) => i);
@@ -23,6 +24,7 @@ const TickerDigit: React.FC<TickerDigitProps> = ({
   value,
   index,
   fontSize,
+  textStyle,
 }) => {
   const offset = useSharedValue(0);
 
@@ -45,7 +47,11 @@ const TickerDigit: React.FC<TickerDigitProps> = ({
     <View style={[styles.container, { height: fontSize * 1.1 }]}>
       <Animated.View style={animatedStyle}>
         {NUMBERS.map((number) => (
-          <Tick key={number} fontSize={fontSize} style={styles.digit}>
+          <Tick
+            key={number}
+            fontSize={fontSize}
+            style={[styles.digit, textStyle]}
+          >
             {number}
           </Tick>
         ))}
@@ -59,7 +65,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   digit: {
-    textAlign: "center",
+    alignSelf: "center",
   },
 });
 

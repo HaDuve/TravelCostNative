@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, StyleProp, ViewStyle } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  StyleProp,
+  ViewStyle,
+  TextStyle,
+} from "react-native";
 import React, { useState } from "react";
 import TickerDigit from "./TickerDigit";
 import Tick from "./Tick";
@@ -7,12 +14,18 @@ interface TickerProps {
   value: number;
   fontSize?: number;
   style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
 }
 
 /**
  * Ticker component that displays an animated number with auto-sizing capabilities
  */
-const Ticker: React.FC<TickerProps> = ({ value, fontSize = 50, style }) => {
+const Ticker: React.FC<TickerProps> = ({
+  value,
+  fontSize = 50,
+  style,
+  textStyle,
+}) => {
   const [calculatedFontSize, setCalculatedFontSize] = useState(fontSize);
 
   // Convert number to string and split into digits
@@ -51,7 +64,7 @@ const Ticker: React.FC<TickerProps> = ({ value, fontSize = 50, style }) => {
             <Tick
               key={index}
               fontSize={calculatedFontSize}
-              style={styles.nonDigit}
+              style={[styles.nonDigit, textStyle]}
             >
               {char}
             </Tick>
@@ -62,6 +75,7 @@ const Ticker: React.FC<TickerProps> = ({ value, fontSize = 50, style }) => {
               value={digit}
               index={index}
               fontSize={calculatedFontSize}
+              textStyle={textStyle}
             />
           );
         })}

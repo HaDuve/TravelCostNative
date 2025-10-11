@@ -6,7 +6,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -32,6 +35,9 @@ const SettingsSection = ({ multiTraveller }) => {
   );
   const [hideSpecialExpenses, setHideSpecialExpenses] = useState(
     settings.hideSpecialExpenses
+  );
+  const [disableNumberAnimations, setDisableNumberAnimations] = useState(
+    settings.disableNumberAnimations
   );
 
   const toggleShowFlags = () => {
@@ -78,6 +84,14 @@ const SettingsSection = ({ multiTraveller }) => {
     setHideSpecialExpenses(!hideSpecialExpenses);
     saveSettings(newSettings);
   };
+  const toggleDisableNumberAnimations = () => {
+    const newSettings = {
+      ...settings,
+      disableNumberAnimations: !disableNumberAnimations,
+    };
+    setDisableNumberAnimations(!disableNumberAnimations);
+    saveSettings(newSettings);
+  };
   return (
     <View>
       {/* <View style={styles.switchContainer}>
@@ -88,30 +102,42 @@ const SettingsSection = ({ multiTraveller }) => {
         style={styles.switchContainer}
         state={hideSpecialExpenses}
         toggleState={toggleHideSpecialExpenses}
+        labelStyle={{}}
+      />
+      <SettingsSwitch
+        label={i18n.t("settingsDisableNumberAnimations")}
+        style={styles.switchContainer}
+        state={disableNumberAnimations}
+        toggleState={toggleDisableNumberAnimations}
+        labelStyle={{}}
       />
       <SettingsSwitch
         label={i18n.t("settingsSkipCat")}
         style={styles.switchContainer}
         state={skipCategoryPickScreen}
         toggleState={toggleSkipCategoryPickScreen}
+        labelStyle={{}}
       />
       <SettingsSwitch
         label={i18n.t("settingsShowAdvanced")}
         style={styles.switchContainer}
         state={alwaysShowAdvanced}
         toggleState={toggleAlwaysShowAdvanced}
+        labelStyle={{}}
       />
       <SettingsSwitch
         label={i18n.t("settingsShowFlags")}
         style={styles.switchContainer}
         state={showFlags}
         toggleState={toggleShowFlags}
+        labelStyle={{}}
       />
       <SettingsSwitch
         label={i18n.t("settingsShowInternetSpeed")}
         style={styles.switchContainer}
         state={showInternetSpeed}
         toggleState={toggleShowInternetSpeed}
+        labelStyle={{}}
       />
       {multiTraveller && (
         <SettingsSwitch
@@ -119,6 +145,7 @@ const SettingsSection = ({ multiTraveller }) => {
           style={styles.switchContainer}
           state={showWhoPaid}
           toggleState={toggleShowWhoPaid}
+          labelStyle={{}}
         />
       )}
     </View>

@@ -344,6 +344,7 @@ const en = {
   settingsShowAdvanced: "Always Show More Options",
   settingsShowFlags: "Show Flag Icons",
   settingsShowInternetSpeed: "Show Internet Speed",
+  settingsDisableNumberAnimations: "Disable Number Animations",
   settingsShowTravellerIcon: "Show Traveller Icons",
   // new Stuff part 2
   newCatNamePlaceholder: "New category name ...",
@@ -872,6 +873,7 @@ const de = {
   settingsShowAdvanced: "Immer Optionen anzeigen",
   settingsShowFlags: "Länderflaggen anzeigen",
   settingsShowInternetSpeed: "Internetgeschwindigkeit anzeigen",
+  settingsDisableNumberAnimations: "Zahlenanimationen deaktivieren",
   settingsShowTravellerIcon: "Reisende-Symbole anzeigen",
   // new Stuff part 2
   newCatNamePlaceholder: "Neuer Kategoriename ...",
@@ -1407,6 +1409,7 @@ const fr = {
   settingsShowAdvanced: "Toujours afficher plus d'options",
   settingsShowFlags: "Afficher les icônes de drapeau",
   settingsShowInternetSpeed: "Afficher la vitesse d'Internet",
+  settingsDisableNumberAnimations: "Désactiver les animations de nombres",
   settingsShowTravellerIcon: "Afficher les icônes de voyageur",
   newCatNamePlaceholder: "Nouveau nom de catégorie ...",
   reset: "Réinitialiser",
@@ -1932,6 +1935,7 @@ const ru = {
   settingsShowAdvanced: "Всегда показывать дополнительные опции",
   settingsShowFlags: "Показывать значки флагов",
   settingsShowInternetSpeed: "Показывать скорость интернета",
+  settingsDisableNumberAnimations: "Отключить анимацию чисел",
   settingsShowTravellerIcon: "Показывать значки путешественников",
   // new Stuff part 2
   newCatNamePlaceholder: "Новое название категории ...",

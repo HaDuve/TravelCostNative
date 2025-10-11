@@ -1,4 +1,11 @@
-import { StyleSheet, View, StyleProp, TextStyle } from "react-native";
+import {
+  StyleSheet,
+  View,
+  StyleProp,
+  TextStyle,
+  Text,
+  Platform,
+} from "react-native";
 import React, { useMemo } from "react";
 import { Ticker, Tick } from "./index";
 import {
@@ -13,6 +20,7 @@ interface CurrencyTickerProps {
   style?: StyleProp<TextStyle>;
   truncate?: boolean;
   truncateLimit?: number;
+  disableAnimation?: boolean;
 }
 
 /**
@@ -25,6 +33,7 @@ const CurrencyTicker: React.FC<CurrencyTickerProps> = ({
   style,
   truncate = true,
   truncateLimit = 1000,
+  disableAnimation = false,
 }) => {
   // Format the number with currency
   const formattedValue = useMemo(() => {
@@ -55,30 +64,71 @@ const CurrencyTicker: React.FC<CurrencyTickerProps> = ({
     };
   }, [formattedValue, value]);
 
+  // If animation is disabled, render simple Text with original styling
+  if (disableAnimation) {
+    return (
+      <Text
+        style={[
+          {
+            fontSize,
+            fontWeight: "bold",
+            ...Platform.select({
+              android: {
+                textShadowColor: "rgba(0, 0, 0, 0.15)",
+                textShadowOffset: { width: 2, height: 2 },
+                textShadowRadius: 8,
+              },
+            }),
+          },
+          style,
+        ]}
+      >
+        {formattedValue}
+      </Text>
+    );
+  }
+
   return (
     <View style={[styles.container, style]}>
       <View style={styles.row}>
         {parts.prefix && (
-          <Tick fontSize={fontSize * 0.8} style={styles.symbol}>
+          <Tick
+            fontSize={fontSize * 0.8}
+            style={[styles.symbol, { color: (style as any)?.color }]}
+          >
             {parts.prefix}
           </Tick>
         )}
         {parts.formattedNumber.map((part, index) => {
           if (part === "," || part === ".") {
             return (
-              <Tick key={index} fontSize={fontSize} style={styles.symbol}>
+              <Tick
+                key={index}
+                fontSize={fontSize}
+                style={[styles.symbol, { color: (style as any)?.color }]}
+              >
                 {part}
               </Tick>
             );
           }
           const num = parseFloat(part);
           if (!isNaN(num)) {
-            return <Ticker key={index} value={num} fontSize={fontSize} />;
+            return (
+              <Ticker
+                key={index}
+                value={num}
+                fontSize={fontSize}
+                textStyle={{ color: (style as any)?.color }}
+              />
+            );
           }
           return null;
         })}
         {parts.suffix && (
-          <Tick fontSize={fontSize * 0.8} style={styles.symbol}>
+          <Tick
+            fontSize={fontSize * 0.8}
+            style={[styles.symbol, { color: (style as any)?.color }]}
+          >
             {parts.suffix}
           </Tick>
         )}

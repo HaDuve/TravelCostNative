@@ -281,6 +281,7 @@ const ExpensesSummary = ({
           style={{ color: budgetColor }}
           truncate={true}
           truncateLimit={1000}
+          disableAnimation={settings.disableNumberAnimations}
         />
       </View>
       <Progress.Bar

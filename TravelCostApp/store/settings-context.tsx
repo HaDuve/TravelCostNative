@@ -13,6 +13,7 @@ export interface Settings {
   skipCategoryScreen: boolean;
   showInternetSpeed: boolean;
   hideSpecialExpenses: boolean;
+  disableNumberAnimations: boolean;
 }
 
 export const SettingsContext = createContext({
@@ -38,6 +39,7 @@ export const SettingsProvider = ({ children }) => {
           skipCategoryScreen: true,
           showInternetSpeed: true,
           hideSpecialExpenses: true,
+          disableNumberAnimations: false,
         });
     };
     loadSettingsAsync();

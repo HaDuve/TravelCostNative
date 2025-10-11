@@ -16,9 +16,24 @@ const Tick: React.FC<TickProps> = ({ fontSize, style, children, ...rest }) => {
         styles.text,
         {
           fontSize,
-          lineHeight: fontSize * 1.1,
+          lineHeight: fontSize,
+          height: fontSize,
+          textAlign: "center",
         },
         style,
+        Platform.select({
+          ios: {
+            fontVariant: ["tabular-nums"],
+            fontFamily: "SF Mono",
+          },
+          android: {
+            fontFamily: "monospace",
+            fontVariant: ["tabular-nums"],
+          },
+          default: {
+            fontVariant: ["tabular-nums"],
+          },
+        }),
       ]}
       {...rest}
     >

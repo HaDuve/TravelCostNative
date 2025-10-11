@@ -29,10 +29,9 @@ const TickerDigit: React.FC<TickerDigitProps> = ({
   const offset = useSharedValue(0);
 
   useEffect(() => {
-    // Animate to the new value position
     offset.value = withDelay(
-      index * 50, // Stagger effect
-      withSpring(-value * fontSize * 1.1, {
+      index * 50,
+      withSpring(-value * fontSize, {
         damping: 20,
         stiffness: 200,
       })
@@ -44,7 +43,7 @@ const TickerDigit: React.FC<TickerDigitProps> = ({
   }));
 
   return (
-    <View style={[styles.container, { height: fontSize * 1.1 }]}>
+    <View style={[styles.container, { height: fontSize }]}>
       <Animated.View style={animatedStyle}>
         {NUMBERS.map((number) => (
           <Tick

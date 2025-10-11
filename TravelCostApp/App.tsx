@@ -550,9 +550,8 @@ function Root() {
                 // );
                 await updateUser(storedUid, checkUser);
               }
-              const tripData: TripData = await tripCtx.fetchAndSetCurrentTrip(
-                tripid
-              );
+              const tripData: TripData =
+                await tripCtx.fetchAndSetCurrentTrip(tripid);
               if (!tripData) return;
               try {
                 setOnlineSetupDone(true);

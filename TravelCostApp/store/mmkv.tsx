@@ -97,3 +97,27 @@ export function getMMKVString(key: string) {
     return "";
   }
 }
+
+// Delete an MMKV object by key
+export function deleteMMKVObject(key: string) {
+  try {
+    const storage = initializeMMKV();
+    storage.delete(key);
+  } catch (error) {
+    console.error("[MMKV] Failed to delete object:", error);
+    safeLogError(error);
+  }
+}
+
+// Temporary expense storage functions
+export const setTempExpense = (expenseId: string, data: any) => {
+  setMMKVObject(`tempExpense_${expenseId}`, data);
+};
+
+export const getTempExpense = (expenseId: string) => {
+  return getMMKVObject(`tempExpense_${expenseId}`);
+};
+
+export const clearTempExpense = (expenseId: string) => {
+  deleteMMKVObject(`tempExpense_${expenseId}`);
+};

@@ -29,7 +29,12 @@ import PropTypes from "prop-types";
 import { NetworkContext } from "../store/network-context";
 import { Category, DEFAULTCATEGORIES } from "../util/category";
 import BackButton from "../components/UI/BackButton";
-import { getMMKVObject, setMMKVObject } from "../store/mmkv";
+import {
+  getMMKVObject,
+  setMMKVObject,
+  getTempExpense,
+  setTempExpense,
+} from "../store/mmkv";
 import { useCallback } from "react";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 import { dynamicScale } from "../util/scalingUtil";
@@ -44,15 +49,15 @@ i18n.enableFallback = true;
 interface CategoryPickScreenProps {
   route: {
     params?: {
-      editedExpenseId?: string;
-      tempValues?: any; // ExpenseData type
+      expenseId?: string;
+      isUpdating?: boolean; // Flag to indicate if we're updating an existing expense
     };
   };
   navigation: any;
 }
 
 const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
-  const { editedExpenseId, tempValues } = route.params || {};
+  const { expenseId, isUpdating } = route.params || {};
 
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
@@ -122,19 +127,37 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
     navigation.navigate("ManageCategory");
   }
 
+  // Helper function to update category in temp storage
+  const updateTempCategory = useCallback(
+    (categoryValue: string) => {
+      const tempData = getTempExpense(expenseId);
+      if (tempData) {
+        setTempExpense(expenseId, {
+          ...tempData,
+          category: categoryValue,
+        });
+      }
+    },
+    [expenseId]
+  );
+
   async function catPressHandler(item: Category) {
     setIsFetching(true);
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (item.cat === "newCat") {
       await newCatPressHandler();
     } else {
-      navigation.navigate("ManageExpense", {
-        pickedCat: item.cat ?? item.name,
-        newCat: true,
-        iconName: item.icon,
-        expenseId: editedExpenseId,
-        tempValues: tempValues,
-      });
+      if (isUpdating) {
+        updateTempCategory(item.cat ?? item.name);
+        navigation.goBack();
+      } else {
+        // New expense flow remains unchanged
+        navigation.navigate("ManageExpense", {
+          pickedCat: item.cat ?? item.name,
+          newCat: true,
+          iconName: item.icon,
+        });
+      }
     }
     setIsFetching(false);
   }
@@ -211,10 +234,16 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
                 <GradientButton
                   buttonStyle={styles.continueButtonStyle}
                   onPress={() => {
-                    navigation.navigate("ManageExpense", {
-                      pickedCat: "undefined",
-                      tempValues: tempValues,
-                    });
+                    if (isUpdating) {
+                      updateTempCategory("undefined");
+                      navigation.goBack();
+                    } else {
+                      // New expense flow remains unchanged
+                      navigation.navigate("ManageExpense", {
+                        pickedCat: "undefined",
+                        newCat: true,
+                      });
+                    }
                   }}
                 >
                   {i18n.t("continue")}

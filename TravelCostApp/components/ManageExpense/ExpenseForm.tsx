@@ -21,6 +21,7 @@ import {
 } from "react-native";
 import { daysBetween } from "../../util/date";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { useFocusEffect } from "@react-navigation/native";
 
 import { SegmentedButtons } from "react-native-paper";
 import Input from "./Input";
@@ -94,7 +95,12 @@ import BackButton from "../UI/BackButton";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import SettingsSwitch from "../UI/SettingsSwitch";
 import CountryPicker from "../Currency/CountryPicker";
-import { getMMKVObject } from "../../store/mmkv";
+import {
+  getMMKVObject,
+  setTempExpense,
+  getTempExpense,
+  clearTempExpense,
+} from "../../store/mmkv";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { Platform } from "react-native";
 import { isPremiumMember } from "../Premium/PremiumConstants";
@@ -161,7 +167,7 @@ const ExpenseForm = ({
     : lastCurrency + " | " + getCurrencySymbol(lastCurrency);
   const countryPlaceholder = isEditing
     ? editingValues.country
-    : userCtx.lastCountry ?? "";
+    : (userCtx.lastCountry ?? "");
   const [hideAdvanced, sethideAdvanced] = useState(true);
   const [currencyPickerValue, setCurrencyPickerValue] = useState(
     isEditing ? editingValues.currency : lastCurrency
@@ -205,20 +211,20 @@ const ExpenseForm = ({
       value: editingValues
         ? editingValues.country
         : mostRecentExpense?.country
-        ? mostRecentExpense.country
-        : userCtx.lastCountry
-        ? userCtx.lastCountry
-        : "",
+          ? mostRecentExpense.country
+          : userCtx.lastCountry
+            ? userCtx.lastCountry
+            : "",
       isValid: true,
     },
     currency: {
       value: editingValues
         ? editingValues.currency
         : mostRecentExpense?.currency
-        ? mostRecentExpense.currency
-        : userCtx.lastCurrency
-        ? userCtx.lastCurrency
-        : tripCtx.tripCurrency,
+          ? mostRecentExpense.currency
+          : userCtx.lastCurrency
+            ? userCtx.lastCurrency
+            : tripCtx.tripCurrency,
       isValid: true,
     },
     whoPaid: {
@@ -232,8 +238,8 @@ const ExpenseForm = ({
   const amountValue = hasTempAndInput
     ? tmpInputSum
     : inputs.amount.value.length > 0
-    ? inputs.amount.value
-    : tempAmount;
+      ? inputs.amount.value
+      : tempAmount;
 
   const hasCalcAmount =
     amountValue &&
@@ -514,8 +520,8 @@ const ExpenseForm = ({
       return duplOrSplitNum === 1
         ? duplString
         : duplOrSplitNum === 2
-        ? splitString
-        : "";
+          ? splitString
+          : "";
     },
     [duplString, splitString]
   );
@@ -773,33 +779,53 @@ const ExpenseForm = ({
     (expense) => expense.description
   );
 
+  // Helper function to update category and icon
+  const updateCategoryAndIcon = useCallback((categoryValue: string) => {
+    const symbol = getCatSymbolMMKV(categoryValue);
+    setIcon(symbol);
+    setInputs((prevInputs) => ({
+      ...prevInputs,
+      category: { value: categoryValue, isValid: true },
+    }));
+  }, []);
+
   /**
    * Automatically determines the category based on the entered value of a specific input.
    * @param inputIdentifier - The identifier of the input. Should be "description"
    * @param enteredValue - The entered value of the input.
    */
-  function autoCategory(inputIdentifier: string, enteredValue: string) {
-    // calc category from description
-    if (inputIdentifier === "description" && pickedCat === "undefined") {
-      const mappedCategory = mapDescriptionToCategory(
-        enteredValue,
-        getMMKVObject("categoryList") ?? DEFAULTCATEGORIES,
-        last500Daysexpenses
-      );
-      if (mappedCategory) {
-        setInputs((curInputs) => {
-          return {
-            ...curInputs,
-            ["category"]: { value: mappedCategory, isValid: true },
-          };
-        });
-        const symbol = getCatSymbol(mappedCategory);
-        setIcon(symbol);
+  const autoCategory = useCallback(
+    (inputIdentifier: string, enteredValue: string) => {
+      // calc category from description
+      if (inputIdentifier === "description" && pickedCat === "undefined") {
+        const mappedCategory = mapDescriptionToCategory(
+          enteredValue,
+          getMMKVObject("categoryList") ?? DEFAULTCATEGORIES,
+          last500Daysexpenses
+        );
+        if (mappedCategory) {
+          updateCategoryAndIcon(mappedCategory);
+        }
       }
-    }
-  }
+    },
+    [pickedCat, updateCategoryAndIcon, last500Daysexpenses]
+  );
+
+  // Load new category when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      if (isEditing && editedExpenseId) {
+        const tempData = getTempExpense(editedExpenseId);
+        if (tempData?.category) {
+          updateCategoryAndIcon(tempData.category);
+          clearTempExpense(editedExpenseId);
+        }
+      }
+    }, [isEditing, editedExpenseId, updateCategoryAndIcon])
+  );
+
+  // Update icon when category changes
   useEffect(() => {
-    // if Icon is changed, asyncGetCatSymbol
     const symbol = getCatSymbolMMKV(inputs.category.value);
     setIcon(symbol);
   }, [inputs.category.value]);
@@ -1465,9 +1491,22 @@ const ExpenseForm = ({
                 size={dynamicScale(48, false, 0.4)}
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  // Store current form state in MMKV before navigation
+                  setTempExpense(editedExpenseId, {
+                    ...inputs,
+                    category: inputs.category.value,
+                    whoPaid,
+                    splitType,
+                    listEQUAL: splitTravellersList,
+                    splitList,
+                    duplOrSplit,
+                    isPaid,
+                    isSpecialExpense,
+                  });
+                  // Navigate with minimal params
                   navigation.navigate("CategoryPick", {
-                    editedExpenseId: editedExpenseId,
-                    tempValues: tempValues,
+                    expenseId: editedExpenseId,
+                    isUpdating: isEditing,
                   });
                 }}
               />

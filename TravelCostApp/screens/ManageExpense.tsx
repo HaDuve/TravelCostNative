@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import { ScrollView } from "react-native";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
@@ -45,9 +45,10 @@ import { formatExpenseWithCurrency } from "../util/string";
 import { isSameDay } from "../util/dateTime";
 import safeLogError from "../util/error";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
-import { trackEvent, VexoEvents } from "../util/vexo-tracking";
+import { trackEvent } from "../util/vexo-tracking";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 import { dynamicScale } from "../util/scalingUtil";
+import { VexoEvents } from "../util/vexo-constants";
 
 interface ManageExpenseProps {
   route: {

@@ -12,10 +12,11 @@ allowed-tools: Read, Write, Edit, Bash, MultiEdit
 - Git status: !`git status --porcelain`
 - Current branch: !`git branch --show-current`
 - Available tasks: !`ls -la tasks/ 2>/dev/null || echo "No tasks directory found"`
+- DAIC mode: !`cat .cursor/state/daic-mode.json 2>/dev/null || echo "discussion"`
 
 ## Task Creation Process
 
-I'll help you create a new task following the cc-sessions conventions:
+I'll help you create a new task following the Cursor task management conventions:
 
 ### Priority Prefixes
 
@@ -51,5 +52,8 @@ I'll then:
 2. Set up the appropriate git branch
 3. Run the context-gathering agent to create a comprehensive manifest
 4. Update the task state
+5. Ensure DAIC workflow is properly initialized
+
+**Note**: This command works in both Discussion and Implementation modes. In Discussion mode, I'll create the task structure and gather context. In Implementation mode, I'll proceed with immediate setup.
 
 Let's get started!

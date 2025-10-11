@@ -1136,7 +1136,7 @@ const ExpenseForm = ({
     >
       <Text style={styles.dateLabelDuplSplitText}>{"(Re)-Calculate"}</Text>
       <IconButton
-        icon="ios-git-compare-outline"
+        icon="git-compare-outline"
         color={GlobalStyles.colors.primary500}
         onPressStyle={{ transform: [{ scale: 0.9 }] }}
         buttonStyle={[

@@ -68,7 +68,10 @@ import { Pressable } from "react-native";
 import safeLogError from "../../util/error";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 
 // Displays a list of all expenses.
@@ -398,7 +401,7 @@ function ExpensesList({
           <IconButton
             icon={
               selected.includes(itemData.item.id)
-                ? "ios-checkmark-circle"
+                ? "checkmark-circle"
                 : "ellipse-outline"
             }
             color={
@@ -771,7 +774,7 @@ function ExpensesList({
               exiting={FadeOutRight}
             >
               <IconButton
-                icon={"ios-trash-outline"}
+                icon={"trash-outline"}
                 size={constantScale(24, 0.5)}
                 color={
                   selected?.length > 0
@@ -807,7 +810,7 @@ function ExpensesList({
               exiting={FadeOutRight}
             >
               <IconButton
-                icon={"md-arrow-undo-outline"}
+                icon={"arrow-undo-outline"}
                 size={constantScale(24, 0.5)}
                 color={
                   selected?.length > 0

@@ -775,7 +775,7 @@ const TripForm = ({ navigation, route }) => {
                   style={styles.recalcButtonContainer}
                 >
                   <IconButton
-                    icon="ios-git-compare-outline"
+                    icon="git-compare-outline"
                     color={GlobalStyles.colors.primary500}
                     size={dynamicScale(36, false, 0.5)}
                     buttonStyle={[
@@ -830,7 +830,7 @@ const TripForm = ({ navigation, route }) => {
                       style={styles.recalcButtonContainer}
                     >
                       <IconButton
-                        icon="ios-git-compare-outline"
+                        icon="git-compare-outline"
                         color={GlobalStyles.colors.primary500}
                         size={dynamicScale(36, false, 0.5)}
                         buttonStyle={[

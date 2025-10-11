@@ -11,6 +11,7 @@ const ICON_NAME_MAPPING = {
   "ios-git-compare-outline": "git-compare-outline",
   "ios-earth": "globe-outline",
   "ios-arrow-undo-outline": "arrow-undo-outline",
+  "ios-pricetag-outline": "pricetag-outline",
   "ios-add": "add",
   "ios-add-circle": "add-circle",
   "ios-add-circle-outline": "add-circle-outline",
@@ -630,6 +631,7 @@ const ICON_NAME_MAPPING = {
 };
 
 // You'll need to get a valid auth token - replace this with your actual token
+// const AUTH_TOKEN = null;
 const AUTH_TOKEN =
   "eyJhbGciOiJSUzI1NiIsImtpZCI6ImE1YTAwNWU5N2NiMWU0MjczMDBlNTJjZGQ1MGYwYjM2Y2Q4MDYyOWIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdHJhdmVsY29zdG5hdGl2ZSIsImF1ZCI6InRyYXZlbGNvc3RuYXRpdmUiLCJhdXRoX3RpbWUiOjE3NjAxNjgyODQsInVzZXJfaWQiOiJRb29GV0pURUdqVlBYTE1pMjdKZ3hLQ2R6VWoyIiwic3ViIjoiUW9vRldKVEVHalZQWExNaTI3Smd4S0NkelVqMiIsImlhdCI6MTc2MDE2ODI4NCwiZXhwIjoxNzYwMTcxODg0LCJlbWFpbCI6ImhhQGhhLmRlIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImhhQGhhLmRlIl19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifX0.cEWCDANZTiN-qFnHAlVPJjd_cpkJ2HYtMLQGgozWozB0EUwgWmaHR6KZzSw6QyJvLWS-XoVtem2U_679TcqFWRrO1FHHCWf1o3cwcWZzkcWQT2pa4FhXx3vjT65YSqCA8Vp5ZmqHatbiJtYuKI4zhXN9cppgQA0lgapq9OcfY-q9O8tqsw_QP-seG8SLFsRHU5NK5MlQyApYgnaiIbLWJEIjuO5ZIWEG_du524VqY3Z4XhEz2KGgXTsy5eGsoiQpxByhz4hKHpbWbzqgBRNxIIBuoFlGJ_hLuJeEWfUaODAlGMSaAum6_n0xJSv_unDR6pGY2fpJ650Z6YXJjctc9Q";
 
@@ -743,19 +745,30 @@ class IconNameDBMigration {
 
   async processTripCategories(tripId, categories) {
     console.log(`  📁 Processing trip categories`);
+    console.log(
+      `    📄 Raw categories data:`,
+      JSON.stringify(categories, null, 2)
+    );
     let categoryList;
 
     try {
       // Categories might be stored as a stringified array
       categoryList =
         typeof categories === "string" ? JSON.parse(categories) : categories;
+      console.log(
+        `    📋 Parsed categories:`,
+        JSON.stringify(categoryList, null, 2)
+      );
     } catch (error) {
-      console.log(`    ⚠️  Invalid category data format`);
+      console.log(`    ⚠️  Invalid category data format:`, error.message);
       return;
     }
 
     if (!Array.isArray(categoryList)) {
-      console.log(`    ⚠️  Categories is not an array`);
+      console.log(
+        `    ⚠️  Categories is not an array, got type:`,
+        typeof categoryList
+      );
       return;
     }
 
@@ -764,6 +777,7 @@ class IconNameDBMigration {
 
     // Process each category
     for (const category of categoryList) {
+      console.log(`    🔍 Checking category:`, category);
       if (category.icon && ICON_NAME_MAPPING.hasOwnProperty(category.icon)) {
         const oldIcon = category.icon;
         const newIcon = ICON_NAME_MAPPING[oldIcon];
@@ -801,19 +815,30 @@ class IconNameDBMigration {
 
   async processUserCategories(tripId, uid, categories) {
     console.log(`  👤 Processing user categories for: ${uid}`);
+    console.log(
+      `    📄 Raw user categories data:`,
+      JSON.stringify(categories, null, 2)
+    );
     this.stats.totalUsers++;
 
     let categoryList;
     try {
       categoryList =
         typeof categories === "string" ? JSON.parse(categories) : categories;
+      console.log(
+        `    📋 Parsed user categories:`,
+        JSON.stringify(categoryList, null, 2)
+      );
     } catch (error) {
-      console.log(`    ⚠️  Invalid category data format`);
+      console.log(`    ⚠️  Invalid category data format:`, error.message);
       return;
     }
 
     if (!Array.isArray(categoryList)) {
-      console.log(`    ⚠️  Categories is not an array`);
+      console.log(
+        `    ⚠️  Categories is not an array, got type:`,
+        typeof categoryList
+      );
       return;
     }
 

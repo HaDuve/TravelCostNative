@@ -1,4 +1,4 @@
-import { Dimensions, Platform, StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
@@ -32,6 +32,7 @@ import {
 } from "../../util/expense";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
+import { CurrencyTicker } from "../UI/AnimatedNumber";
 
 const ExpensesSummary = ({
   expenses,
@@ -39,7 +40,6 @@ const ExpensesSummary = ({
   useMoreSpace = false,
   style = {},
 }) => {
-  const { width: screenWidth } = Dimensions.get("window");
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   const expCtx = useContext(ExpensesContext);
@@ -141,13 +141,13 @@ const ExpensesSummary = ({
   const budgetColor = noTotalBudget
     ? GlobalStyles.colors.primary500
     : budgetProgress <= 1
-    ? GlobalStyles.colors.primary500
-    : GlobalStyles.colors.error300;
+      ? GlobalStyles.colors.primary500
+      : GlobalStyles.colors.error300;
   const unfilledColor = noTotalBudget
     ? GlobalStyles.colors.primary500
     : budgetProgress <= 1
-    ? GlobalStyles.colors.gray600
-    : GlobalStyles.colors.errorGrayed;
+      ? GlobalStyles.colors.gray600
+      : GlobalStyles.colors.errorGrayed;
 
   if (budgetProgress > 1) budgetProgress -= 1;
   if (noTotalBudget) {
@@ -274,9 +274,14 @@ const ExpensesSummary = ({
       ]}
     >
       <View style={styles.sumTextContainer}>
-        <Text style={[styles.sum, { color: budgetColor }]}>
-          {expensesSumString}
-        </Text>
+        <CurrencyTicker
+          value={expenseSumNum}
+          currency={tripCurrency}
+          fontSize={dynamicScale(32, false, 0.5)}
+          style={{ color: budgetColor }}
+          truncate={true}
+          truncateLimit={1000}
+        />
       </View>
       <Progress.Bar
         color={budgetColor}

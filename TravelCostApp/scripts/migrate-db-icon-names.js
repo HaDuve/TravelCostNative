@@ -626,11 +626,12 @@ const ICON_NAME_MAPPING = {
   "pie-chart-outline": "pie-chart-outline",
   "close-outline": "close-outline",
   "checkmark-done-outline": "checkmark-done-outline",
-  "ellipsis-horizontal-circle-outline": "ellipsis-horizontal-circle-outline"
+  "ellipsis-horizontal-circle-outline": "ellipsis-horizontal-circle-outline",
 };
 
 // You'll need to get a valid auth token - replace this with your actual token
-const AUTH_TOKEN = "YOUR_FIREBASE_AUTH_TOKEN_HERE";
+const AUTH_TOKEN =
+  "eyJhbGciOiJSUzI1NiIsImtpZCI6ImE1YTAwNWU5N2NiMWU0MjczMDBlNTJjZGQ1MGYwYjM2Y2Q4MDYyOWIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdHJhdmVsY29zdG5hdGl2ZSIsImF1ZCI6InRyYXZlbGNvc3RuYXRpdmUiLCJhdXRoX3RpbWUiOjE3NjAxNjgyODQsInVzZXJfaWQiOiJRb29GV0pURUdqVlBYTE1pMjdKZ3hLQ2R6VWoyIiwic3ViIjoiUW9vRldKVEVHalZQWExNaTI3Smd4S0NkelVqMiIsImlhdCI6MTc2MDE2ODI4NCwiZXhwIjoxNzYwMTcxODg0LCJlbWFpbCI6ImhhQGhhLmRlIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImhhQGhhLmRlIl19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifX0.cEWCDANZTiN-qFnHAlVPJjd_cpkJ2HYtMLQGgozWozB0EUwgWmaHR6KZzSw6QyJvLWS-XoVtem2U_679TcqFWRrO1FHHCWf1o3cwcWZzkcWQT2pa4FhXx3vjT65YSqCA8Vp5ZmqHatbiJtYuKI4zhXN9cppgQA0lgapq9OcfY-q9O8tqsw_QP-seG8SLFsRHU5NK5MlQyApYgnaiIbLWJEIjuO5ZIWEG_du524VqY3Z4XhEz2KGgXTsy5eGsoiQpxByhz4hKHpbWbzqgBRNxIIBuoFlGJ_hLuJeEWfUaODAlGMSaAum6_n0xJSv_unDR6pGY2fpJ650Z6YXJjctc9Q";
 
 class IconNameDBMigration {
   constructor(options = {}) {
@@ -664,7 +665,7 @@ class IconNameDBMigration {
     }
 
     try {
-      if (!AUTH_TOKEN || AUTH_TOKEN === "YOUR_FIREBASE_AUTH_TOKEN_HERE") {
+      if (!AUTH_TOKEN) {
         throw new Error("Please set a valid AUTH_TOKEN in the script");
       }
 

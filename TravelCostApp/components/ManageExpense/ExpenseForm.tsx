@@ -110,6 +110,26 @@ import { getRate } from "../../util/currencyExchange";
 import { OrientationContext } from "../../store/orientation-context";
 import { callDebounced } from "../Hooks/useDebounce";
 
+// Modal state machine for cascading flows
+const modalStates = {
+  NONE: "none",
+  WHO_PAID: "whoPaid",
+  HOW_SHARED: "howShared",
+  EXACT_SHARING: "exactSharing",
+};
+
+const splitTypes: { [key: string]: splitType } & {
+  EQUAL: splitType;
+  EXACT: splitType;
+  PERCENT: splitType;
+  SELF: splitType;
+} = {
+  EQUAL: "EQUAL",
+  EXACT: "EXACT",
+  PERCENT: "PERCENT",
+  SELF: "SELF",
+} as const;
+
 const ExpenseForm = ({
   onCancel,
   onSubmit,
@@ -130,7 +150,7 @@ const ExpenseForm = ({
   const netCtx = useContext(NetworkContext);
   const expCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
-  const { isPortrait, isLandscape, isTablet } = useContext(OrientationContext);
+  const { isPortrait, isTablet } = useContext(OrientationContext);
   const hideSpecial = settings.hideSpecialExpenses;
   const alwaysShowAdvancedSetting = settings.alwaysShowAdvanced || isEditing;
   const editingValues: ExpenseData = defaultValues;
@@ -615,14 +635,6 @@ const ExpenseForm = ({
     [currentTravellers]
   );
 
-  // Modal state machine for cascading flows
-  const modalStates = {
-    NONE: "none",
-    WHO_PAID: "whoPaid",
-    HOW_SHARED: "howShared",
-    EXACT_SHARING: "exactSharing",
-  };
-
   const [modalFlow, setModalFlow] = useState(modalStates.NONE);
 
   const nextModal = (selectedValue, currentSplitType) => {
@@ -642,7 +654,7 @@ const ExpenseForm = ({
         break;
 
       case modalStates.HOW_SHARED:
-        if (selectedValue === "EXACT") {
+        if (selectedValue === splitTypes.EXACT) {
           console.log("🔍 Transitioning from HOW_SHARED to EXACT_SHARING");
           setModalFlow(modalStates.NONE);
           setTimeout(() => {
@@ -650,7 +662,11 @@ const ExpenseForm = ({
             setModalFlow(modalStates.EXACT_SHARING);
           }, 100);
         } else {
-          console.log("🔍 HOW_SHARED flow complete, closing all modals");
+          console.log(
+            "🔍 HOW_SHARED flow complete, closing all modals as EQUAL"
+          );
+          setSplitType(splitTypes.EQUAL);
+          splitHandler();
           setModalFlow(modalStates.NONE); // EQUAL/SELF, flow complete
         }
         break;
@@ -716,7 +732,7 @@ const ExpenseForm = ({
   const [splitItems, setSplitTypeItems] = useState(splitTypesItems);
   // Removed: const [openSplitTypes, setOpenSplitTypes] = useState(false); - using modalFlow state machine
   const [splitType, setSplitType] = useState<splitType>(
-    editingValues ? editingValues.splitType : "SELF"
+    editingValues ? editingValues.splitType : splitTypes.SELF
   );
 
   // dropdown for EQUAL share picker (without add traveller option)
@@ -743,7 +759,7 @@ const ExpenseForm = ({
     // calc splitList from amount
     if (
       inputIdentifier === "amount" &&
-      (splitType === "EXACT" || splitType === "EQUAL")
+      (splitType === splitTypes.EXACT || splitType === splitTypes.EQUAL)
     ) {
       // split into equal parts if we are splitting over a ranged date and are editing
       if (duplOrSplit === 2 && isEditing) {
@@ -841,13 +857,13 @@ const ExpenseForm = ({
     autoExpenseLinearSplitAdjust(inputIdentifier, enteredValue);
   }
 
-  if (splitType === "SELF" || IsSoloTraveller) {
+  if (splitType === splitTypes.SELF || IsSoloTraveller) {
     if (openEQUAL) {
       setOpenEQUAL(false);
     }
   }
 
-  if (splitType === "EQUAL" && openEQUAL) {
+  if (splitType === splitTypes.EQUAL && openEQUAL) {
     splitHandler();
     setOpenEQUAL(false);
   }
@@ -863,7 +879,7 @@ const ExpenseForm = ({
   }
 
   function inputSplitListHandler(index, props: { userName: string }, value) {
-    if (splitType === "EQUAL") return;
+    if (splitType === splitTypes.EQUAL) return;
     const tempList = [...splitList];
     // eslint-disable-next-line react/prop-types
     const tempValue = { amount: value, userName: props.userName };
@@ -893,7 +909,7 @@ const ExpenseForm = ({
     // console.log("resetSplitHandler ~ splitTravellers:", splitTravellers);
     // calculate splits
     const listSplits = calcSplitList(
-      "EQUAL",
+      splitTypes.EQUAL,
       +amountValue,
       whoPaid,
       splitTravellers
@@ -922,18 +938,18 @@ const ExpenseForm = ({
     const paidForSelf =
       splitListTemp.length == 1 && splitListTemp[0]?.userName == whoPaid;
     if (splitListTemp.length === 0 || paidForSelf) {
-      setSplitType("SELF");
+      setSplitType(splitTypes.SELF);
       setSplitList([]);
       setSplitListValid(true);
       return;
     }
     setSplitList(splitListTemp);
-    if (splitType === "EQUAL") {
+    if (splitType === splitTypes.EQUAL) {
       const splitTravellersTemp = tripCtx.travellers.filter(
         (traveller) => traveller !== userName
       );
       const listSplits = calcSplitList(
-        "EQUAL",
+        splitTypes.EQUAL,
         +amountValue,
         whoPaid,
         splitTravellersTemp
@@ -1144,7 +1160,7 @@ const ExpenseForm = ({
     }
   }
 
-  const recalcJSX = splitType == "EXACT" && !splitListValid && (
+  const recalcJSX = splitType == splitTypes.EXACT && !splitListValid && (
     <Animated.View
       style={{
         marginTop: dynamicScale(-8, true),
@@ -1339,8 +1355,8 @@ const ExpenseForm = ({
     !inputs.currency.isValid;
   const showWhoPaid = amountValue !== "";
   const whoPaidValid = whoPaid !== null;
-  const splitTypeEqual = splitType === "EQUAL";
-  const splitTypeSelf = splitType === "SELF";
+  const splitTypeEqual = splitType === splitTypes.EQUAL;
+  const splitTypeSelf = splitType === splitTypes.SELF;
   const splitListHasNonZeroEntries = splitList?.some(
     (item) => item.amount !== 0
   );
@@ -1683,7 +1699,8 @@ const ExpenseForm = ({
                                 Haptics.impactAsync(
                                   Haptics.ImpactFeedbackStyle.Light
                                 );
-                                const tempSplitType: splitType = "EXACT";
+                                const tempSplitType: splitType =
+                                  splitTypes.EXACT;
                                 const listSplits = calcSplitList(
                                   tempSplitType,
                                   +amountValue,
@@ -1742,7 +1759,7 @@ const ExpenseForm = ({
                               // Set whoPaid value first
                               if (item.value === "__ADD_TRAVELLER__") {
                                 setWhoPaidWithLogging(userCtx.userName);
-                                setSplitType("SELF");
+                                setSplitType(splitTypes.SELF);
                                 // Navigate to Share screen
                                 navigation.navigate("Share", {
                                   tripId: tripCtx.tripid,
@@ -2063,8 +2080,8 @@ const ExpenseForm = ({
                                 ]}
                                 textInputConfig={{
                                   onFocus: () => {
-                                    if (splitType === "EQUAL") {
-                                      setSplitType("EXACT");
+                                    if (splitType === splitTypes.EQUAL) {
+                                      setSplitType(splitTypes.EXACT);
                                     }
                                   },
                                   keyboardType: "decimal-pad",

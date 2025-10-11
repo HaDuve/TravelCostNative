@@ -5,7 +5,10 @@ import { DateTime } from "luxon";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 import { Expense, Split, ExpenseData, isPaidString } from "./expense";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -270,15 +273,15 @@ export function travellerToDropdown(travellers, includeAddTraveller = true) {
       });
     });
   }
-  
+
   // Add "+ add traveller" item at the end only if requested
   if (includeAddTraveller) {
     listOfLabelValues.push({
       label: `+ ${i18n.t("inviteTraveller")}`,
-      value: "__ADD_TRAVELLER__"
+      value: "__ADD_TRAVELLER__",
     });
   }
-  
+
   return [...listOfLabelValues];
 }
 

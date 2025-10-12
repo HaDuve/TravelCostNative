@@ -1,5 +1,11 @@
 import React from "react";
-import { View, StyleSheet, Animated, Dimensions } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  Animated as RNAnimated,
+} from "react-native";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { GlobalStyles } from "../../constants/styles";
 import { dynamicScale } from "../../util/scalingUtil";
 import {
@@ -24,17 +30,17 @@ const ChartSkeleton: React.FC<ChartSkeletonProps> = ({
   height,
   style,
 }) => {
-  const shimmerAnimation = React.useRef(new Animated.Value(0)).current;
+  const shimmerAnimation = React.useRef(new RNAnimated.Value(0)).current;
 
   React.useEffect(() => {
-    const shimmer = Animated.loop(
-      Animated.sequence([
-        Animated.timing(shimmerAnimation, {
+    const shimmer = RNAnimated.loop(
+      RNAnimated.sequence([
+        RNAnimated.timing(shimmerAnimation, {
           toValue: 1,
           duration: CHART_STYLING.ANIMATION.SHIMMER_DURATION,
           useNativeDriver: true,
         }),
-        Animated.timing(shimmerAnimation, {
+        RNAnimated.timing(shimmerAnimation, {
           toValue: 0,
           duration: CHART_STYLING.ANIMATION.SHIMMER_DURATION,
           useNativeDriver: true,
@@ -70,7 +76,8 @@ const ChartSkeleton: React.FC<ChartSkeletonProps> = ({
       >
         <View style={styles.pieContainer}>
           {/* Pie chart skeleton - single solid circle */}
-          <View
+          <Animated.View
+            entering={FadeIn.duration(600)}
             style={[
               styles.pieChart,
               {
@@ -81,7 +88,7 @@ const ChartSkeleton: React.FC<ChartSkeletonProps> = ({
             ]}
           />
         </View>
-        <Animated.View
+        <RNAnimated.View
           style={[styles.shimmerOverlay, { opacity: shimmerOpacity }]}
         />
       </View>
@@ -113,7 +120,8 @@ const ChartSkeleton: React.FC<ChartSkeletonProps> = ({
   );
 
   return (
-    <View
+    <Animated.View
+      entering={FadeIn.duration(600)}
       style={[
         styles.container,
         { width: chartWidth, height: chartHeight },
@@ -191,10 +199,10 @@ const ChartSkeleton: React.FC<ChartSkeletonProps> = ({
       </View>
 
       {/* Shimmer overlay */}
-      <Animated.View
+      <RNAnimated.View
         style={[styles.shimmerOverlay, { opacity: shimmerOpacity }]}
       />
-    </View>
+    </Animated.View>
   );
 };
 

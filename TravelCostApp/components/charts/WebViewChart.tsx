@@ -45,7 +45,6 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
 }) => {
   const webViewRef = useRef<WebView>(null);
   const [isChartReady, setIsChartReady] = useState(false);
-  const [isWebViewLoaded, setIsWebViewLoaded] = useState(false);
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(
     null
   );
@@ -59,8 +58,7 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
   );
 
   // Determine loading states
-  const isLoading =
-    !isWebViewLoaded || !isChartReady || !data || data.length === 0;
+  const isLoading = !isChartReady || !data || data.length === 0;
   const skeletonType: ChartType = options.type === "pie" ? "pie" : "bar";
 
   const updateChartData = useCallback(() => {
@@ -159,16 +157,13 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
   };
 
   const handleWebViewLoad = () => {
-    setIsWebViewLoaded(true);
-    // Initial data load after WebView is ready
     if (data) {
       setTimeout(() => {
         updateChartData();
-      }, 100);
+      }, 5);
     }
   };
 
-  // Increase height for pie charts to give more space
   const defaultHeight =
     options.type === "pie"
       ? CHART_DIMENSIONS.DEFAULT_HEIGHT.PIE
@@ -190,7 +185,6 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
       activeOpacity={0.9}
     >
       {/* Show skeleton while loading */}
-      {/* {true && ( */}
       {isLoading && showSkeleton && (
         <ChartSkeleton
           type={skeletonType}

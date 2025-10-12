@@ -1,9 +1,11 @@
+import { CHART_SPACING } from "./chartConstants";
+
 export interface ChartData {
   x: string | number;
   y: number;
   color?: string;
   label?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface ChartOptions {
@@ -77,10 +79,10 @@ export const generateHTMLTemplate = (
               style: {
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
               },
-              spacingLeft: ${options.type === "pie" ? 30 : 20},
-              spacingRight: ${options.type === "pie" ? 30 : 20},
-              spacingTop: ${options.type === "pie" ? 30 : 20},
-              spacingBottom: ${options.type === "pie" ? 30 : 20}
+              spacingLeft: ${options.type === "pie" ? CHART_SPACING.PIE.LEFT : CHART_SPACING.BAR.LEFT},
+              spacingRight: ${options.type === "pie" ? CHART_SPACING.PIE.RIGHT : CHART_SPACING.BAR.RIGHT},
+              spacingTop: ${options.type === "pie" ? CHART_SPACING.PIE.TOP : CHART_SPACING.BAR.TOP},
+              spacingBottom: ${options.type === "pie" ? CHART_SPACING.PIE.BOTTOM : CHART_SPACING.BAR.BOTTOM}
             },
             title: {
               text: '${options.title || ""}',
@@ -270,7 +272,7 @@ export const generateHTMLTemplate = (
 export const formatDataForHighcharts = (
   data: ChartData[],
   options: ChartOptions = {}
-): any[] => {
+): unknown[] => {
   if (!data || data.length === 0) {
     return [];
   }
@@ -306,7 +308,7 @@ export const formatDataForHighcharts = (
 export const createBarChartData = (
   data: ChartData[],
   colors?: { primary: string; error: string; budget: string }
-): any[] => {
+): unknown[] => {
   const series = [];
 
   // Bar data
@@ -327,13 +329,13 @@ export const createBarChartData = (
   return series;
 };
 
-export const createPieChartData = (data: ChartData[]): any[] => {
+export const createPieChartData = (data: ChartData[]): unknown[] => {
   return [
     {
       name: "Categories",
       colorByPoint: true,
       data: data.map((item) => {
-        const label = item.label || item.x;
+        const label = item.label || String(item.x);
         // Split label into category name and currency value
         const parts = label.split(" ");
         const categoryName = parts[0];

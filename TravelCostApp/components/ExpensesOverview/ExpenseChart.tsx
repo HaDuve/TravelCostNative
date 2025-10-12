@@ -14,12 +14,15 @@ import { createBarChartData } from "../charts/chartHelpers";
 const ExpenseChart = ({ inputData, xAxis, yAxis, budget, currency }) => {
   const { isLandscape } = useContext(OrientationContext);
 
-  const colors = {
-    primary: GlobalStyles.colors.primary500,
-    error: GlobalStyles.colors.error300,
-    gray: GlobalStyles.colors.gray300,
-    budget: GlobalStyles.colors.gray700,
-  };
+  const colors = useMemo(
+    () => ({
+      primary: GlobalStyles.colors.primary500,
+      error: GlobalStyles.colors.error300,
+      gray: GlobalStyles.colors.gray300,
+      budget: GlobalStyles.colors.gray700,
+    }),
+    []
+  );
 
   const { width, height } = ChartController.getChartDimensions(isLandscape);
 
@@ -38,7 +41,7 @@ const ExpenseChart = ({ inputData, xAxis, yAxis, budget, currency }) => {
 
   const highchartsData = useMemo(() => {
     return createBarChartData(chartData, colors);
-  }, [chartData, budget, colors]);
+  }, [chartData, colors]);
 
   const chartOptions = useMemo(() => {
     return ChartController.createExpenseChartOptions(
@@ -55,6 +58,7 @@ const ExpenseChart = ({ inputData, xAxis, yAxis, budget, currency }) => {
         options={chartOptions}
         width={width}
         height={height}
+        showSkeleton={true}
       />
     </View>
   );

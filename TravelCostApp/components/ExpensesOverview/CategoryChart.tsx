@@ -28,7 +28,7 @@ const CategoryChart = React.memo(
         return [];
       }
 
-      return inputData.map((item: any) => ({
+      return inputData.map((item: CategoryData) => ({
         x: getCatString(item.x),
         y: item.y,
         label: `${getCatString(item.x)} ${Number(item.y).toFixed(
@@ -53,16 +53,15 @@ const CategoryChart = React.memo(
 
     return (
       <View style={styles.container}>
-        {inputData && inputData.length > 0 && (
-          <WebViewChart
-            data={highchartsData}
-            options={chartOptions}
-            width={width}
-            height={height}
-            onChartReady={handleChartReady}
-            style={styles.chart}
-          />
-        )}
+        <WebViewChart
+          data={highchartsData}
+          options={chartOptions}
+          width={width}
+          height={height}
+          onChartReady={handleChartReady}
+          style={styles.chart}
+          showSkeleton={true}
+        />
       </View>
     );
   }

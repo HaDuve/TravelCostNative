@@ -4,6 +4,21 @@ This file provides collaborative guidance and philosophy when using the Claude C
 
 ## Recent Service Updates
 
+### SafeAreaView Wrapper Implementation (2024-12-19)
+
+**Services Modified**: `App.tsx`
+
+**Changes**:
+
+- Migrated from basic `SafeAreaView` to `react-native-safe-area-context` library
+- Implemented `SafeAreaProvider` and `useSafeAreaInsets` for proper safe area handling
+- Created custom `SafeAreaWrapper` component with comprehensive inset management
+- Fixed Android bottom navigation bar padding issue that was obscuring content
+- Replaced multiple nested `SafeAreaView` components with single wrapper
+- Added `BottomInset` component for proper bottom safe area coloring
+
+**Impact**: Consistent safe area handling across all screens, proper Android navigation bar support, cleaner component structure, and improved user experience on Android devices.
+
 ### Currency Exchange Error Fix (2025-01-27)
 
 **Services Modified**: `util/currencyExchange.ts`

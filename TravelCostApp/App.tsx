@@ -124,6 +124,13 @@ const IconSize = constantScale(24, 0.1);
 
 const prefix = Linking.createURL("/");
 
+// Paints the bottom safe-area only (to match the tab bar background)
+function BottomInset({ color }: { color: string }) {
+  const insets = useSafeAreaInsets();
+  if (!insets.bottom) return null;
+  return <View style={{ height: insets.bottom, backgroundColor: color }} />;
+}
+
 // SafeAreaWrapper component that handles safe area insets properly
 function SafeAreaWrapper({ children }: { children: React.ReactNode }) {
   const insets = useSafeAreaInsets();
@@ -133,13 +140,15 @@ function SafeAreaWrapper({ children }: { children: React.ReactNode }) {
       style={{
         flex: 1,
         paddingTop: insets.top,
-        paddingBottom: insets.bottom,
+        // Do not set paddingBottom here so we can paint it with a custom color
         paddingLeft: insets.left,
         paddingRight: insets.right,
         backgroundColor: GlobalStyles.colors.backgroundColor,
       }}
     >
       {children}
+      {/* Color only the bottom inset to match the BottomTabBar */}
+      <BottomInset color={GlobalStyles.colors.gray500} />
     </View>
   );
 }

@@ -100,6 +100,9 @@ import {
   setTempExpense,
   getTempExpense,
   clearTempExpense,
+  setTempExpenseDraft,
+  getTempExpenseDraft,
+  clearTempExpenseDraft,
 } from "../../store/mmkv";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { Platform } from "react-native";
@@ -418,86 +421,11 @@ const ExpenseForm = ({
     return getFormattedDate(DateTime.now().toJSDate());
   };
 
-  // Restore form state when returning from CategoryPick with tempValues
-  useEffect(() => {
-    if (!tempValues || isEditing) return;
-
-    // Restore form inputs from tempValues
-    setInputs({
-      amount: {
-        value:
-          tempValues.amount && tempValues.amount > 0
-            ? tempValues.amount.toString()
-            : "",
-        isValid: true,
-      },
-      date: {
-        value: getSafeFormattedDate(tempValues.date),
-        isValid: true,
-      },
-      description: {
-        value: tempValues.description || "",
-        isValid: true,
-      },
-      category: {
-        value: tempValues.category || "",
-        isValid: true,
-      },
-      country: {
-        value: tempValues.country || "",
-        isValid: true,
-      },
-      currency: {
-        value: tempValues.currency || tripCtx.tripCurrency,
-        isValid: true,
-      },
-      whoPaid: {
-        value: tempValues.whoPaid || "",
-        isValid: true,
-      },
-    });
-
-    // Restore date state
-    setStartDate(getSafeFormattedDate(tempValues.startDate));
-    setEndDate(getSafeFormattedDate(tempValues.endDate));
-
-    // Restore split and sharing state
-    if (tempValues.splitList) {
-      setSplitList(tempValues.splitList);
-    }
-    if (tempValues.splitType) {
-      setSplitType(tempValues.splitType);
-    }
-    if (tempValues.listEQUAL) {
-      setListEQUAL(tempValues.listEQUAL);
-    }
-    if (tempValues.duplOrSplit !== undefined) {
-      setDuplOrSplit(tempValues.duplOrSplit);
-    }
-    if (tempValues.whoPaid) {
-      console.log("🔍 Setting whoPaid from tempValues:", tempValues.whoPaid);
-      setWhoPaidWithLogging(tempValues.whoPaid);
-    }
-    if (tempValues.isPaid !== undefined) {
-      setIsPaid(tempValues.isPaid);
-    }
-    if (tempValues.isSpecialExpense !== undefined) {
-      setIsSpecialExpense(tempValues.isSpecialExpense);
-    }
-
-    // Update picker values to reflect restored state
-    if (tempValues.currency) {
-      setCurrencyPickerValue(tempValues.currency);
-    }
-    if (tempValues.country) {
-      setCountryPickerValue(tempValues.country);
-    }
-  }, [tempValues, isEditing, tripCtx.tripCurrency]);
-
   // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
   const [duplOrSplit, setDuplOrSplit] = useState<DuplicateOption>(
     editingValues ? Number(editingValues.duplOrSplit) : DuplicateOption.null
   );
+
   const expenseString = `${formatExpenseWithCurrency(
     Number(amountValue),
     inputs.currency.value
@@ -597,6 +525,7 @@ const ExpenseForm = ({
           text: i18n.t("duplicateExpenses"), //i18n.t("duplicate"),
           onPress: () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setHasUserInteracted(true); // Mark that user has interacted with the form
             setDuplOrSplit(DuplicateOption.duplicate);
           },
         },
@@ -605,6 +534,7 @@ const ExpenseForm = ({
           onPress: () => {
             if (duplOrSplit !== 2) setHelperStateForDividing(true);
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setHasUserInteracted(true); // Mark that user has interacted with the form
             setDuplOrSplit(DuplicateOption.split);
           },
         },
@@ -700,7 +630,8 @@ const ExpenseForm = ({
       "from:",
       new Error().stack.split("\n")[2]
     );
-    setWhoPaid(value);
+    setHasUserInteracted(true); // Mark that user has interacted with the form
+    setWhoPaidWithAutoSave(value);
   };
 
   // Custom setValue handler to handle both normal selections and special __ADD_TRAVELLER__ case
@@ -734,6 +665,85 @@ const ExpenseForm = ({
   const [splitType, setSplitType] = useState<splitType>(
     editingValues ? editingValues.splitType : splitTypes.SELF
   );
+
+  // Track if user has made any changes to the form
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
+
+  // Check for unsaved changes - only consider it a change if user has interacted
+  const hasUnsavedChanges = useMemo(() => {
+    if (!hasUserInteracted) {
+      return false; // No changes if user hasn't interacted with form
+    }
+
+    // For editing mode, compare against original values
+    if (isEditing && editingValues) {
+      const currentState = {
+        inputs,
+        whoPaid,
+        splitType,
+        splitList,
+        duplOrSplit,
+        isPaid,
+        isSpecialExpense,
+      };
+
+      const originalState = {
+        inputs: {
+          amount: {
+            value:
+              editingValues.amount > 0 ? editingValues.amount.toString() : "",
+            isValid: true,
+          },
+          date: { value: getFormattedDate(editingValues.date), isValid: true },
+          description: {
+            value: editingValues.description || "",
+            isValid: true,
+          },
+          category: { value: editingValues.category || "", isValid: true },
+          country: { value: editingValues.country || "", isValid: true },
+          currency: { value: editingValues.currency || "", isValid: true },
+          whoPaid: { value: editingValues.whoPaid || "", isValid: true },
+        },
+        whoPaid: editingValues.whoPaid,
+        splitType: editingValues.splitType,
+        splitList: editingValues.splitList || [],
+        duplOrSplit: Number(editingValues.duplOrSplit),
+        isPaid: editingValues.isPaid ?? isPaidString.notPaid,
+        isSpecialExpense: editingValues.isSpecialExpense ?? false,
+      };
+
+      return JSON.stringify(currentState) !== JSON.stringify(originalState);
+    }
+
+    // For new expenses, check if any field has meaningful content
+    return (
+      inputs.amount.value.trim() !== "" ||
+      inputs.description.value.trim() !== "" ||
+      (inputs.category.value !== "" && inputs.category.value !== pickedCat) ||
+      inputs.country.value.trim() !== "" ||
+      (inputs.currency.value !== "" &&
+        inputs.currency.value !== tripCtx.tripCurrency) ||
+      whoPaid !== null ||
+      splitType !== splitTypes.SELF ||
+      (splitList && splitList.length > 0) ||
+      duplOrSplit !== DuplicateOption.null ||
+      isPaid !== isPaidString.notPaid ||
+      isSpecialExpense !== false
+    );
+  }, [
+    hasUserInteracted,
+    isEditing,
+    editingValues,
+    inputs,
+    whoPaid,
+    splitType,
+    splitList,
+    duplOrSplit,
+    isPaid,
+    isSpecialExpense,
+    pickedCat,
+    tripCtx.tripCurrency,
+  ]);
 
   // dropdown for EQUAL share picker (without add traveller option)
   const currentTravellersForEqualSplit = useCallback(
@@ -830,15 +840,161 @@ const ExpenseForm = ({
   // Load new category when screen comes into focus
   useFocusEffect(
     useCallback(() => {
-      if (isEditing && editedExpenseId) {
+      if (editedExpenseId) {
         const tempData = getTempExpense(editedExpenseId);
+        const draftData = getTempExpenseDraft(editedExpenseId);
+
         if (tempData?.category) {
-          updateCategoryAndIcon(tempData.category);
-          clearTempExpense(editedExpenseId);
+          // Only load category if there's draft data (user hasn't discarded)
+          // or if we're editing an existing expense
+          if (draftData || isEditing) {
+            updateCategoryAndIcon(tempData.category);
+            // Clear temp data after loading
+            if (isEditing) {
+              clearTempExpense(editedExpenseId);
+            }
+          } else {
+            // No draft data and not editing - clear temp data to reset category
+            clearTempExpense(editedExpenseId);
+            // Reset category to undefined for new expenses
+            if (!isEditing) {
+              updateCategoryAndIcon("undefined");
+            }
+          }
         }
       }
     }, [isEditing, editedExpenseId, updateCategoryAndIcon])
   );
+
+  // Check for draft data on mount and show restore prompt for both new and existing expenses
+  useEffect(() => {
+    if (editedExpenseId) {
+      const draftData = getTempExpenseDraft(editedExpenseId);
+      if (draftData) {
+        // Create a user-friendly list of changed items
+        const changedItems = [];
+
+        if (draftData.amount?.value && draftData.amount.value !== "") {
+          changedItems.push(`• ${i18n.t("amount")}: ${draftData.amount.value}`);
+        }
+        if (
+          draftData.description?.value &&
+          draftData.description.value !== ""
+        ) {
+          changedItems.push(
+            `• ${i18n.t("description")}: ${draftData.description.value}`
+          );
+        }
+        if (draftData.category && draftData.category !== "undefined") {
+          const categoryName = getCatString(draftData.category);
+          changedItems.push(`• ${i18n.t("category")}: ${categoryName}`);
+        }
+        if (draftData.country?.value && draftData.country.value !== "") {
+          changedItems.push(
+            `• ${i18n.t("country")}: ${draftData.country.value}`
+          );
+        }
+        if (draftData.currency?.value && draftData.currency.value !== "") {
+          changedItems.push(
+            `• ${i18n.t("currency")}: ${draftData.currency.value}`
+          );
+        }
+        if (draftData.whoPaid && draftData.whoPaid !== "") {
+          changedItems.push(`• ${i18n.t("whoPaid")}: ${draftData.whoPaid}`);
+        }
+        if (draftData.splitType && draftData.splitType !== "SELF") {
+          const splitTypeText =
+            draftData.splitType === "EQUAL"
+              ? i18n.t("equal")
+              : draftData.splitType === "EXACT"
+                ? i18n.t("exact")
+                : draftData.splitType;
+          changedItems.push(`• ${i18n.t("splitType")}: ${splitTypeText}`);
+        }
+        if (draftData.isPaid && draftData.isPaid !== "not paid") {
+          const paidText =
+            draftData.isPaid === "paid"
+              ? i18n.t("paid")
+              : i18n.t("notPaidLabel");
+          changedItems.push(`• ${i18n.t("paymentStatus")}: ${paidText}`);
+        }
+        if (draftData.isSpecialExpense) {
+          changedItems.push(`• ${i18n.t("specialExpense")}: ${i18n.t("yes")}`);
+        }
+
+        const changedItemsText =
+          changedItems.length > 0
+            ? `\n\n${i18n.t("unsavedItems")}:\n${changedItems.join("\n")}`
+            : "";
+
+        Alert.alert(
+          i18n.t("unsavedChanges"),
+          `${i18n.t("unsavedChangesMessage")}${changedItemsText}`,
+          [
+            {
+              text: i18n.t("discard"),
+              style: "destructive",
+              onPress: () => {
+                clearTempExpenseDraft(editedExpenseId);
+                clearTempExpense(editedExpenseId); // Also clear category temp data
+                // Reset category to undefined for new expenses
+                if (!isEditing) {
+                  updateCategoryAndIcon("undefined");
+                }
+              },
+            },
+            {
+              text: i18n.t("restore"),
+              onPress: () => {
+                // Restore form state from draft data
+                // Extract inputs from the spread data structure
+                const inputsToRestore = {
+                  amount: draftData.amount || { value: "", isValid: true },
+                  description: draftData.description || {
+                    value: "",
+                    isValid: true,
+                  },
+                  date: draftData.date || { value: "", isValid: true },
+                  category: draftData.category
+                    ? { value: draftData.category, isValid: true }
+                    : { value: "", isValid: true },
+                  country: draftData.country || { value: "", isValid: true },
+                  currency: draftData.currency || { value: "", isValid: true },
+                  whoPaid: draftData.whoPaid
+                    ? { value: draftData.whoPaid, isValid: true }
+                    : { value: "", isValid: true },
+                };
+                setInputs(inputsToRestore);
+                // whoPaid is now handled in inputs above
+                if (draftData.splitType) {
+                  setSplitType(draftData.splitType);
+                }
+                if (draftData.listEQUAL) {
+                  setListEQUAL(draftData.listEQUAL);
+                }
+                if (draftData.splitList) {
+                  setSplitList(draftData.splitList);
+                }
+                if (draftData.duplOrSplit !== undefined) {
+                  setDuplOrSplit(draftData.duplOrSplit);
+                }
+                if (draftData.isPaid) {
+                  setIsPaid(draftData.isPaid);
+                }
+                if (draftData.isSpecialExpense !== undefined) {
+                  setIsSpecialExpense(draftData.isSpecialExpense);
+                }
+                // Update category and icon (category is already restored in inputs above)
+                if (draftData.category) {
+                  updateCategoryAndIcon(draftData.category);
+                }
+              },
+            },
+          ]
+        );
+      }
+    }
+  }, [editedExpenseId, updateCategoryAndIcon]);
 
   // Update icon when category changes
   useEffect(() => {
@@ -846,12 +1002,92 @@ const ExpenseForm = ({
     setIcon(symbol);
   }, [inputs.category.value]);
 
+  // Helper function to save current form state to draft storage
+  const saveDraftData = useCallback(() => {
+    if (editedExpenseId) {
+      setTempExpenseDraft(editedExpenseId, {
+        ...inputs,
+        category: inputs.category.value,
+        whoPaid,
+        splitType,
+        listEQUAL: splitTravellersList,
+        splitList,
+        duplOrSplit,
+        isPaid,
+        isSpecialExpense,
+      });
+    }
+  }, [
+    editedExpenseId,
+    inputs,
+    whoPaid,
+    splitType,
+    splitTravellersList,
+    splitList,
+    duplOrSplit,
+    isPaid,
+    isSpecialExpense,
+  ]);
+
+  // Wrapper functions that include auto-save
+  const setWhoPaidWithAutoSave = useCallback(
+    (value) => {
+      setWhoPaid(value);
+      setTimeout(saveDraftData, 0);
+    },
+    [saveDraftData]
+  );
+
+  const setSplitTypeWithAutoSave = useCallback(
+    (value) => {
+      setSplitType(value);
+      setTimeout(saveDraftData, 0);
+    },
+    [saveDraftData]
+  );
+
+  const setIsPaidWithAutoSave = useCallback(
+    (value) => {
+      setIsPaid(value);
+      setTimeout(saveDraftData, 0);
+    },
+    [saveDraftData]
+  );
+
+  const setIsSpecialExpenseWithAutoSave = useCallback(
+    (value) => {
+      setIsSpecialExpense(value);
+      setTimeout(saveDraftData, 0);
+    },
+    [saveDraftData]
+  );
+
   function inputChangedHandler(inputIdentifier: string, enteredValue: string) {
+    setHasUserInteracted(true); // Mark that user has interacted with the form
     setInputs((curInputs) => {
-      return {
+      const newInputs = {
         ...curInputs,
         [inputIdentifier]: { value: enteredValue, isValid: true },
       };
+
+      // Auto-save draft data after state update
+      setTimeout(() => {
+        if (editedExpenseId) {
+          setTempExpenseDraft(editedExpenseId, {
+            ...newInputs,
+            category: newInputs.category.value,
+            whoPaid,
+            splitType,
+            listEQUAL: splitTravellersList,
+            splitList,
+            duplOrSplit,
+            isPaid,
+            isSpecialExpense,
+          });
+        }
+      }, 0);
+
+      return newInputs;
     });
     autoCategory(inputIdentifier, enteredValue);
     autoExpenseLinearSplitAdjust(inputIdentifier, enteredValue);
@@ -1283,7 +1519,8 @@ const ExpenseForm = ({
         value={isPaid}
         onValueChange={(value: string) => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          setIsPaid(value);
+          setHasUserInteracted(true); // Mark that user has interacted with the form
+          setIsPaidWithAutoSave(value);
         }}
         buttons={[
           {
@@ -1325,7 +1562,10 @@ const ExpenseForm = ({
   const isSpecialExpenseJSX = hideSpecial && (
     <View style={styles.isSpecialContainer}>
       <SettingsSwitch
-        toggleState={() => setIsSpecialExpense(!isSpecialExpense)}
+        toggleState={() => {
+          setHasUserInteracted(true); // Mark that user has interacted with the form
+          setIsSpecialExpenseWithAutoSave(!isSpecialExpense);
+        }}
         label={
           isSpecialExpense
             ? i18n.t("specString3") + hideSpecialTooltip
@@ -1509,6 +1749,18 @@ const ExpenseForm = ({
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   // Store current form state in MMKV before navigation
                   setTempExpense(editedExpenseId, {
+                    ...inputs,
+                    category: inputs.category.value,
+                    whoPaid,
+                    splitType,
+                    listEQUAL: splitTravellersList,
+                    splitList,
+                    duplOrSplit,
+                    isPaid,
+                    isSpecialExpense,
+                  });
+                  // Also save to draft storage
+                  setTempExpenseDraft(editedExpenseId, {
                     ...inputs,
                     category: inputs.category.value,
                     whoPaid,
@@ -1818,7 +2070,8 @@ const ExpenseForm = ({
                       setItems={setSplitTypeItems}
                       onSelectItem={(item) => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        setSplitType(item.value);
+                        setHasUserInteracted(true); // Mark that user has interacted with the form
+                        setSplitTypeWithAutoSave(item.value);
                         nextModal(item.value, item.value);
                       }}
                       onClose={() => {

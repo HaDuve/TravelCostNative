@@ -121,3 +121,16 @@ export const getTempExpense = (expenseId: string) => {
 export const clearTempExpense = (expenseId: string) => {
   deleteMMKVObject(`tempExpense_${expenseId}`);
 };
+
+// Draft expense storage functions for auto-save functionality
+export const setTempExpenseDraft = (expenseId: string, data: any) => {
+  setMMKVObject(`tempExpenseDraft_${expenseId}`, data);
+};
+
+export const getTempExpenseDraft = (expenseId: string) => {
+  return getMMKVObject(`tempExpenseDraft_${expenseId}`);
+};
+
+export const clearTempExpenseDraft = (expenseId: string) => {
+  deleteMMKVObject(`tempExpenseDraft_${expenseId}`);
+};

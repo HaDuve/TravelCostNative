@@ -215,6 +215,7 @@ function AuthenticatedStack() {
             options={{
               headerShown: false,
               presentation: "modal",
+              headerBackButtonMenuEnabled: false,
             }}
           />
           <Stack.Screen

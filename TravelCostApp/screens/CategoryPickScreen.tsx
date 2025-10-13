@@ -147,17 +147,10 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
     if (item.cat === "newCat") {
       await newCatPressHandler();
     } else {
-      if (isUpdating) {
-        updateTempCategory(item.cat ?? item.name);
-        navigation.goBack();
-      } else {
-        // New expense flow remains unchanged
-        navigation.navigate("ManageExpense", {
-          pickedCat: item.cat ?? item.name,
-          newCat: true,
-          iconName: item.icon,
-        });
-      }
+      // Store category selection in MMKV for both new and existing expenses
+      updateTempCategory(item.cat ?? item.name);
+      // Use consistent navigation for both flows
+      navigation.goBack();
     }
     setIsFetching(false);
   }
@@ -234,16 +227,10 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
                 <GradientButton
                   buttonStyle={styles.continueButtonStyle}
                   onPress={() => {
-                    if (isUpdating) {
-                      updateTempCategory("undefined");
-                      navigation.goBack();
-                    } else {
-                      // New expense flow remains unchanged
-                      navigation.navigate("ManageExpense", {
-                        pickedCat: "undefined",
-                        newCat: true,
-                      });
-                    }
+                    // Store undefined category in MMKV for both new and existing expenses
+                    updateTempCategory("undefined");
+                    // Use consistent navigation for both flows
+                    navigation.goBack();
                   }}
                 >
                   {i18n.t("continue")}

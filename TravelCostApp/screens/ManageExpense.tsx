@@ -40,7 +40,11 @@ import {
 import { NetworkContext } from "../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import * as Haptics from "expo-haptics";
-import { setMMKVObject } from "../store/mmkv";
+import {
+  setMMKVObject,
+  clearTempExpenseDraft,
+  setTempExpense,
+} from "../store/mmkv";
 import { formatExpenseWithCurrency } from "../util/string";
 import { isSameDay } from "../util/dateTime";
 import safeLogError from "../util/error";
@@ -80,8 +84,8 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
 
-  const editedExpenseId = route.params?.expenseId;
-  const isEditing = !!editedExpenseId;
+  const isEditing = !!route.params?.expenseId;
+  const editedExpenseId = route.params?.expenseId || "temp_new_expense";
 
   let selectedExpense: ExpenseData;
   let expenseError = false;
@@ -475,7 +479,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   };
 
   async function confirmHandler(expenseData: ExpenseData) {
-    // setIsSubmitting(true);
     try {
       // set the category to the corresponting catstring
       expenseData.categoryString = getCatString(expenseData.category);
@@ -559,12 +562,17 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       // await asyncStoreSetObject("expenses", expenseCtx.expenses);
       setMMKVObject("expenses", expenseCtx.expenses);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      // setIsSubmitting(false);
+      // Clear draft data after successful submission
+      clearTempExpenseDraft(editedExpenseId);
+      // Reset states to prevent alert during navigation
+      setIsSubmitting(true);
       navigation.popToTop();
       if (isOnline && (await isConnectionFastEnoughAsBool()))
         await touchAllTravelers(tripid, true);
     } catch (error) {
       safeLogError(error);
+    } finally {
+      setIsSubmitting(false);
     }
     // no matter what happens, add one expense to the expenseCtx and remove it for refresh
     expenseCtx.addExpense({ ...expenseData, id: "temp" });
@@ -576,7 +584,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       <ExpenseForm
         onCancel={cancelHandler}
         onSubmit={confirmHandler}
-        setIsSubmitting={setIsSubmitting}
         pickedCat={pickedCat}
         iconName={iconName}
         navigation={navigation}

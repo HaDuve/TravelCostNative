@@ -1,6 +1,10 @@
 {
-  "task": null,
-  "branch": null,
-  "services": [],
-  "updated": "2025-01-27"
+  "task_name": "m-implement-safareaview-wrapper",
+  "status": "completed",
+  "started_at": "2024-12-19T10:30:00Z",
+  "completed_at": "2024-12-19T11:00:00Z",
+  "branch": "feature/safareaview-wrapper",
+  "description": "Implement SafeAreaView as a wrapper around the whole app",
+  "priority": "Medium",
+  "type": "Implementation"
 }

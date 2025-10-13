@@ -1,13 +1,10 @@
 import React from "react";
 import { useContext, useEffect, useState, useLayoutEffect } from "react";
+import { View, Keyboard, Platform, AppState } from "react-native";
 import {
-  SafeAreaView,
-  View,
-  Keyboard,
-  Platform,
-  AppState,
-  StatusBar as StatusBarRN,
-} from "react-native";
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import Purchases from "react-native-purchases";
 
 import { StatusBar } from "expo-status-bar";
@@ -126,6 +123,26 @@ const BottomTabs = createMaterialTopTabNavigator();
 const IconSize = constantScale(24, 0.1);
 
 const prefix = Linking.createURL("/");
+
+// SafeAreaWrapper component that handles safe area insets properly
+function SafeAreaWrapper({ children }: { children: React.ReactNode }) {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
+        backgroundColor: GlobalStyles.colors.backgroundColor,
+      }}
+    >
+      {children}
+    </View>
+  );
+}
 function NotAuthenticatedStack() {
   const [needOnboarding, setNeedOnboarding] = useState(false);
   const navigation = useNavigation();
@@ -920,31 +937,14 @@ function handleUnhandledTouches() {
 
 export default function App() {
   return (
-    <View
-      style={{
-        flex: 1,
-      }}
-      onStartShouldSetResponder={handleUnhandledTouches}
-    >
+    <SafeAreaProvider>
       <View
         style={{
           flex: 1,
         }}
+        onStartShouldSetResponder={handleUnhandledTouches}
       >
-        <SafeAreaView
-          style={{
-            flex: 0,
-            backgroundColor: GlobalStyles.colors.backgroundColor,
-            paddingTop:
-              Platform.OS === "android" ? StatusBarRN.currentHeight : 0,
-          }}
-        />
-        <SafeAreaView
-          style={{
-            flex: 1,
-            backgroundColor: GlobalStyles.colors.gray500,
-          }}
-        >
+        <SafeAreaWrapper>
           <StatusBar style="auto" />
           <AuthContextProvider>
             <NetworkContextProvider>
@@ -997,8 +997,8 @@ export default function App() {
               </TripContextProvider>
             </NetworkContextProvider>
           </AuthContextProvider>
-        </SafeAreaView>
+        </SafeAreaWrapper>
       </View>
-    </View>
+    </SafeAreaProvider>
   );
 }

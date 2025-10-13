@@ -106,21 +106,17 @@ Specifically, avoid long prompts when invoking the logging or context-refinement
 ### Available Agents
 
 1. **context-gathering** - Creates comprehensive context manifests for tasks
-
    - Use when: Creating new task OR task lacks context manifest
    - ALWAYS provide the task file path so the agent can update it directly
 
 2. **code-review** - Reviews code for quality and security
-
    - Use when: After writing significant code, before commits
    - Provide files and line ranges where code was implemented
 
 3. **context-refinement** - Updates context with discoveries from work session
-
    - Use when: End of context window (if task continuing)
 
 4. **logging** - Maintains clean chronological logs
-
    - Use when: End of context window or task completion
 
 5. **service-documentation** - Updates service CLAUDE.md files
@@ -162,7 +158,6 @@ Specifically, avoid long prompts when invoking the logging or context-refinement
 **When the user mentions protocols:**
 
 1. **EXPLICIT requests → Read protocol first, then execute**
-
    - Clear commands like "let's compact", "complete the task", "create a new task"
    - Read the relevant protocol file immediately and proceed
 
@@ -178,17 +173,14 @@ Specifically, avoid long prompts when invoking the logging or context-refinement
 These protocols guide specific workflows:
 
 1. **sessions/protocols/task-creation.md** - Creating new tasks
-
    - EXPLICIT: "create a new task", "let's make a task for X"
    - VAGUE: "we should track this", "might need a task for that"
 
 2. **sessions/protocols/task-startup.md** - Beginning work on existing tasks
-
    - EXPLICIT: "switch to task X", "let's work on task Y"
    - VAGUE: "maybe we should look at the other thing"
 
 3. **sessions/protocols/task-completion.md** - Completing and closing tasks
-
    - EXPLICIT: "complete the task", "finish this task", "mark it done"
    - VAGUE: "I think we're done", "this might be finished"
 

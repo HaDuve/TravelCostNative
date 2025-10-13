@@ -202,6 +202,9 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
           style={styles.webView}
           onMessage={handleWebViewMessage}
           onLoad={handleWebViewLoad}
+          onContentProcessDidTerminate={() => {
+            webViewRef.current?.reload();
+          }}
           scrollEnabled={false}
           bounces={false}
           scalesPageToFit={Platform.OS === "android"}

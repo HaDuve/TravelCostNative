@@ -34,11 +34,7 @@ import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { CurrencyTicker } from "../UI/AnimatedNumber";
 
-const ExpensesSummary = ({
-  expenses,
-  periodName,
-  style = {},
-}) => {
+const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   const expCtx = useContext(ExpensesContext);

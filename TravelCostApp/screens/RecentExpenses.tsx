@@ -20,12 +20,7 @@ import { UserContext } from "../store/user-context";
 import { getOfflineQueue } from "../util/offline-queue";
 import { fetchTravelerIsTouched } from "../util/http";
 
-import {
-  StyleSheet,
-  Text,
-  View,
-  RefreshControl,
-} from "react-native";
+import { StyleSheet, Text, View, RefreshControl } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
@@ -383,12 +378,7 @@ function RecentExpenses({ navigation }) {
         </View>
       </View>
 
-      <View
-        style={[
-          styles.header,
-          !isPortrait && styles.landscapeHeader,
-        ]}
-      >
+      <View style={[styles.header, !isPortrait && styles.landscapeHeader]}>
         <DropDownPicker
           open={open}
           value={PeriodValue}
@@ -425,10 +415,7 @@ function RecentExpenses({ navigation }) {
           textStyle={styles.dropdownTextStyle}
         />
 
-        <ExpensesSummary
-          expenses={recentExpenses}
-          periodName={PeriodValue}
-        />
+        <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
       </View>
       <View
         style={[styles.tempGrayBar1, !isPortrait && styles.landscapeBar]}

@@ -2,12 +2,7 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 import { ExpensesContext, RangeString } from "../store/expenses-context";
 import { UserContext } from "../store/user-context";
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
 import { MemoizedExpensesOverview } from "../components/ExpensesOutput/ExpensesOverview";
@@ -150,12 +145,7 @@ const OverviewScreen = ({ navigation }) => {
           {offlineString}
         </Text>
       </View>
-      <View
-        style={[
-          styles.header,
-          !isPortrait && styles.landscapeHeader,
-        ]}
-      >
+      <View style={[styles.header, !isPortrait && styles.landscapeHeader]}>
         <DropDownPicker
           open={open}
           value={PeriodValue}

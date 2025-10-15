@@ -1646,7 +1646,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                 }}
               />
             </View>
-            
+
             {/* Description field - moved from advanced options for better UX */}
             <Autocomplete
               value={inputs.description.value}
@@ -1659,7 +1659,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               showOnEmpty={false}
               placeholder=""
             />
-            
+
             {/* always show more options when editing */}
             {!alwaysShowAdvancedSetting && (
               <Pressable onPress={toggleAdvancedHandler}>

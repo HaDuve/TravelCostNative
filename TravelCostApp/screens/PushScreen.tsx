@@ -128,12 +128,17 @@ const TEST_PushScreen = () => {
     <View
       style={{ flex: 1, alignItems: "center", justifyContent: "space-around" }}
     >
-      <Text>{i18n.t("yourExpoPushToken")} {expoPushToken}</Text>
+      <Text>
+        {i18n.t("yourExpoPushToken")} {expoPushToken}
+      </Text>
       <View style={{ alignItems: "center", justifyContent: "center" }}>
         <Text>
           Title: {notification && notification.request.content.title}{" "}
         </Text>
-        <Text>{i18n.t("bodyLabel")} {notification && notification.request.content.body}</Text>
+        <Text>
+          {i18n.t("bodyLabel")}{" "}
+          {notification && notification.request.content.body}
+        </Text>
         <Text>
           Data:{" "}
           {notification && JSON.stringify(notification.request.content.data)}

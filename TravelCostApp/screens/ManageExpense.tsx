@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import { ScrollView } from "react-native";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
@@ -74,6 +74,9 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   const tripCtx = useContext(TripContext);
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;
+  const [progress, setProgress] = useState(-1);
+  const [progressAt, setProgressAt] = useState(0);
+  const [progressMax, setProgressMax] = useState(0);
 
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;

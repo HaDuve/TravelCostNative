@@ -380,9 +380,10 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       : // DateTime.fromJSDate(editingValues.endDate).toJSDate())
         getFormattedDate(DateTime.now())
   );
-  const daysBeween = startDate && endDate 
-    ? daysBetween(new Date(endDate), new Date(startDate)) + 1
-    : 1;
+  const daysBeween =
+    startDate && endDate
+      ? daysBetween(new Date(endDate), new Date(startDate)) + 1
+      : 1;
 
   const openDatePickerRange = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -1880,7 +1881,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                               }
 
                               // Use state machine to handle modal flow
-                              nextModal(item.value, splitType);
+                              nextModal(item.value);
                             }}
                             listMode="MODAL"
                             modalProps={{
@@ -1930,7 +1931,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                       onSelectItem={(item) => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                         setSplitTypeWithAutoSave(item.value);
-                        nextModal(item.value, item.value);
+                        nextModal(item.value);
                       }}
                       onClose={() => {
                         // Only reset modal flow if we're not transitioning to another modal

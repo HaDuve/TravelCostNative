@@ -425,7 +425,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     }
   }, [dateISO]);
 
-
   // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
   const [duplOrSplit, setDuplOrSplit] = useState<DuplicateOption>(
     editingValues ? Number(editingValues.duplOrSplit) : DuplicateOption.null
@@ -571,7 +570,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   const [modalFlow, setModalFlow] = useState(modalStates.NONE);
 
   const nextModal = (selectedValue) => {
-
     switch (modalFlow) {
       case modalStates.WHO_PAID:
         if (selectedValue === "__ADD_TRAVELLER__") {
@@ -622,7 +620,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   // Custom setValue handler to handle both normal selections and special __ADD_TRAVELLER__ case
   const handleWhoPaidChange = (value) => {
-
     // Ignore function objects (weird DropDownPicker behavior for special case)
     if (typeof value === "function") {
       return;

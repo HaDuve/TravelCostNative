@@ -98,7 +98,6 @@ export async function deleteAllExpensesByRangedId(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   expenseCtx: any
 ) {
-
   // Use local expenses context instead of server data for ranged deletion
   // Server data might be incomplete or not synced yet
   const allExpenses = expenseCtx?.expenses || [];
@@ -108,7 +107,6 @@ export async function deleteAllExpensesByRangedId(
     (expense) =>
       expense?.rangeId === selectedExpense?.rangeId && !expense.isDeleted
   );
-
 
   // Delete all expenses from server first
   for (let i = 0; i < expensesToDelete.length; i++) {
@@ -131,7 +129,6 @@ export async function deleteAllExpensesByRangedId(
     const expense: ExpenseData = expensesToDelete[i];
     expenseCtx?.deleteExpense(expense.id);
   }
-
 }
 
 /**

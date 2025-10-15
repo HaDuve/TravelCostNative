@@ -14,10 +14,7 @@ import { View } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { GlobalStyles, ListLayoutAnimation } from "../../constants/styles";
-import {
-  fetchTripName,
-  touchAllTravelers,
-} from "../../util/http";
+import { fetchTripName, touchAllTravelers } from "../../util/http";
 import { TripContext } from "../../store/trip-context";
 import { ExpensesContext } from "../../store/expenses-context";
 import IconButton from "../UI/IconButton";
@@ -171,7 +168,6 @@ function ExpensesList({
     const uid = item.uid;
     async function deleteAllExpenses() {
       try {
-
         navigation?.popToTop();
         Toast.show({
           type: "loading",
@@ -183,13 +179,10 @@ function ExpensesList({
         // Server data might be incomplete or not synced yet
         const allExpenses = expenseCtx?.expenses;
 
-
-
         // Collect all expenses to delete first
         const expensesToDelete = allExpenses.filter(
           (expense) => expense?.rangeId === item?.rangeId && !expense.isDeleted
         );
-
 
         // Delete all expenses from server first
         for (let i = 0; i < expensesToDelete.length; i++) {

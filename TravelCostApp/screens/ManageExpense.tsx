@@ -107,7 +107,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   async function deleteExpenseHandler() {
     async function deleteAllExpenses() {
       try {
-
         navigation?.popToTop();
         Toast.show({
           type: "loading",

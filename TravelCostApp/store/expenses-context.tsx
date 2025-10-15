@@ -410,8 +410,6 @@ function ExpensesContextProvider({ children }) {
       );
     });
 
-
-
     return dayExpenses;
   }
 

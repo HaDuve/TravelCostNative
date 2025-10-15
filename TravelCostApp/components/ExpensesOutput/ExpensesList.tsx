@@ -198,10 +198,6 @@ function ExpensesList({
           };
           // Soft delete: call server first
           await deleteExpenseOnlineOffline(queueItem, isOnline);
-          console.log(
-            `✅ [EXPENSES LIST] Server deletion completed for expense:`,
-            expense.id
-          );
         }
 
         // Only remove from local state after all server deletions are complete

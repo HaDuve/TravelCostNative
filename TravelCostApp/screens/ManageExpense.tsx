@@ -49,6 +49,7 @@ import { trackEvent } from "../util/vexo-tracking";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 import { dynamicScale } from "../util/scalingUtil";
 import { VexoEvents } from "../util/vexo-constants";
+import { DateTime } from "luxon";
 
 interface ManageExpenseProps {
   route: {
@@ -74,9 +75,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   const tripCtx = useContext(TripContext);
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;
-  const [progress, setProgress] = useState(-1);
-  const [progressAt, setProgressAt] = useState(0);
-  const [progressMax, setProgressMax] = useState(0);
 
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
@@ -127,7 +125,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         await touchAllTravelers(tripid, true);
         Toast.hide();
       } catch (error) {
-        console.error("❌ [MANAGE EXPENSE] Delete All Error:", error);
         Toast.show({
           text1: i18n.t("error"),
           text2: i18n.t("error2"),
@@ -137,7 +134,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     }
 
     async function deleteExp() {
-      // setIsSubmitting(true);
       try {
         Toast.show({
           type: "loading",
@@ -176,7 +172,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     }
 
     // start of function deleteExpenseHandler
-
     Alert.alert(i18n.t("sure"), i18n.t("sureExt"), [
       // The "No" button
       // Does nothing but dismiss the dialog when tapped
@@ -310,11 +305,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     }
 
     // iterate over number of days between and change date and endDate to the first date + iterator
-    setProgressMax(days);
     for (let i = 0; i <= days; i++) {
-      // console.log("day nr: ", i);
-      setProgressAt(i);
-      setProgress(i / days);
       Toast.show({
         type: "loading",
         text1: i18n.t("toastSaving1"),
@@ -327,28 +318,17 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           size: "small",
         },
       });
-      // console.log("progress", i / days);
       const newDate = getDatePlusDays(day1, i);
-      newDate.setHours(new Date().getHours(), new Date().getMinutes());
-      // expenseData.startDate =
-      // expenseData.endDate =
+      if (newDate instanceof Date) {
+        newDate.setHours(new Date().getHours(), new Date().getMinutes());
+      } else if (newDate instanceof DateTime) {
+        newDate.set({
+          hour: new Date().getHours(),
+          minute: new Date().getMinutes(),
+        });
+      }
       expenseData.date = newDate;
       expenseData.editedTimestamp = Date.now();
-      // console.log(
-      //   "expenseData.date: ",
-      //   expenseData.date,
-      //   typeof expenseData.date
-      // );
-      // console.log(
-      //   "expenseData.startDate: ",
-      //   expenseData.startDate,
-      //   typeof expenseData.startDate
-      // );
-      // console.log(
-      //   "expenseData.endDate: ",
-      //   expenseData.endDate,
-      //   typeof expenseData.endDate
-      // );
 
       const item: OfflineQueueManageExpenseItem = {
         type: "add",
@@ -430,11 +410,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       return;
     }
     //else update the expenses one by one
-    setProgressMax(expensesInRange?.length);
     for (let i = 0; i < expensesInRange?.length; i++) {
-      setProgressAt(i);
-      setProgress(i / expensesInRange?.length);
-      // console.log("progress", i / expensesInRange?.length);
       Toast.show({
         type: "loading",
         text1: i18n.t("toastSaving1"),
@@ -450,7 +426,14 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       const expense = expensesInRange[i];
       // set the correct new date
       const newDate = getDatePlusDays(expenseData.startDate, i);
-      newDate.setHours(new Date().getHours(), new Date().getMinutes());
+      if (newDate instanceof Date) {
+        newDate.setHours(new Date().getHours(), new Date().getMinutes());
+      } else if (newDate instanceof DateTime) {
+        newDate.set({
+          hour: new Date().getHours(),
+          minute: new Date().getMinutes(),
+        });
+      }
       expenseData.date = newDate;
       expenseData.editedTimestamp = Date.now();
       // sanity fix
@@ -470,7 +453,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     }
   };
 
-  async function confirmHandler(expenseData: ExpenseData) {
+  async function confirmHandler(expenseData: ExpenseData): Promise<void> {
     try {
       // set the category to the corresponting catstring
       expenseData.categoryString = getCatString(expenseData.category);
@@ -556,19 +539,17 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       // Clear draft data after successful submission
       clearExpenseDraft(editedExpenseId);
-      // Reset states to prevent alert during navigation
-      setIsSubmitting(true);
       navigation.popToTop();
       if (isOnline && (await isConnectionFastEnoughAsBool()))
         await touchAllTravelers(tripid, true);
     } catch (error) {
       safeLogError(error);
-    } finally {
-      setIsSubmitting(false);
+      return Promise.reject(error);
     }
     // no matter what happens, add one expense to the expenseCtx and remove it for refresh
     expenseCtx.addExpense({ ...expenseData, id: "temp" });
     expenseCtx.deleteExpense("temp");
+    return Promise.resolve();
   }
 
   return (
@@ -601,11 +582,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
 };
 
 export default ManageExpense;
-
-ManageExpense.propTypes = {
-  navigation: PropTypes.object,
-  route: PropTypes.object,
-};
 
 const styles = StyleSheet.create({
   container: {

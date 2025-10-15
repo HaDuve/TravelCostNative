@@ -3,6 +3,7 @@ import { Platform } from "react-native";
 import * as Device from "expo-device";
 import safeLogError from "../util/error";
 import { safelyParseJSON } from "../util/jsonParse";
+import { ExpenseData } from "../util/expense";
 
 // Initialize MMKV with proper error handling
 let mmkvstorage: MMKV | null = null;
@@ -32,10 +33,9 @@ function initializeMMKV(): MMKV {
     // Check if we're in a simulator and JSI is not ready
     if (Platform.OS === "ios" && !Device.isDevice) {
       if (!isJSIReady()) {
-        console.warn(
+        safeLogError(
           "[MMKV] Running in iOS Simulator without JSI - MMKV may not work properly"
         );
-        // Still attempt initialization as some simulators might work
       }
     }
 
@@ -45,10 +45,8 @@ function initializeMMKV(): MMKV {
       encryptionKey: "travel-cost-encryption-key",
     });
 
-    console.log("[MMKV] Successfully initialized");
     return mmkvstorage;
   } catch (error) {
-    console.error("[MMKV] Failed to initialize:", error);
     // Reset the flag so we can retry
     initializationAttempted = false;
     throw error;
@@ -60,7 +58,6 @@ export function setMMKVObject(key: string, value: object) {
     const storage = initializeMMKV();
     storage.set(key, JSON.stringify(value));
   } catch (error) {
-    console.error("[MMKV] Failed to set object:", error);
     safeLogError(error);
   }
 }
@@ -71,7 +68,6 @@ export function getMMKVObject(key: string) {
     const value = storage.getString(key);
     return value ? safelyParseJSON(value) : null;
   } catch (error) {
-    console.error("[MMKV] Failed to get object:", error);
     safeLogError(error);
     return null;
   }
@@ -82,7 +78,6 @@ export function setMMKVString(key: string, value: string) {
     const storage = initializeMMKV();
     storage.set(key, value);
   } catch (error) {
-    console.error("[MMKV] Failed to set string:", error);
     safeLogError(error);
   }
 }
@@ -92,7 +87,6 @@ export function getMMKVString(key: string) {
     const storage = initializeMMKV();
     return storage.getString(key) ?? "";
   } catch (error) {
-    console.error("[MMKV] Failed to get string:", error);
     safeLogError(error);
     return "";
   }
@@ -104,33 +98,39 @@ export function deleteMMKVObject(key: string) {
     const storage = initializeMMKV();
     storage.delete(key);
   } catch (error) {
-    console.error("[MMKV] Failed to delete object:", error);
     safeLogError(error);
   }
 }
 
-// Temporary expense storage functions
-export const setTempExpense = (expenseId: string, data: any) => {
-  setMMKVObject(`tempExpense_${expenseId}`, data);
+export type IDCat = {
+  expenseId: string;
+  category: string;
 };
 
-export const getTempExpense = (expenseId: string) => {
-  return getMMKVObject(`tempExpense_${expenseId}`);
+// SECTION : UTILITY FUNCTIONS
+
+// Change cat via CategoryPickScreen
+export const setExpenseCat = (expenseId: string, data: IDCat) => {
+  setMMKVObject(`expenseCat_${expenseId}`, data);
 };
 
-export const clearTempExpense = (expenseId: string) => {
-  deleteMMKVObject(`tempExpense_${expenseId}`);
+export const getExpenseCat = (expenseId: string) => {
+  return getMMKVObject(`expenseCat_${expenseId}`);
 };
 
-// Draft expense storage functions for auto-save functionality
-export const setTempExpenseDraft = (expenseId: string, data: any) => {
-  setMMKVObject(`tempExpenseDraft_${expenseId}`, data);
+export const clearExpenseCat = (expenseId: string) => {
+  deleteMMKVObject(`expenseCat_${expenseId}`);
 };
 
-export const getTempExpenseDraft = (expenseId: string) => {
-  return getMMKVObject(`tempExpenseDraft_${expenseId}`);
+// Restore changes via draft storage
+export const setExpenseDraft = (expenseId: string, data: ExpenseData) => {
+  setMMKVObject(`expenseDraft_${expenseId}`, data);
 };
 
-export const clearTempExpenseDraft = (expenseId: string) => {
-  deleteMMKVObject(`tempExpenseDraft_${expenseId}`);
+export const getExpenseDraft = (expenseId: string) => {
+  return getMMKVObject(`expenseDraft_${expenseId}`);
+};
+
+export const clearExpenseDraft = (expenseId: string) => {
+  deleteMMKVObject(`expenseDraft_${expenseId}`);
 };

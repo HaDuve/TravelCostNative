@@ -32,8 +32,8 @@ import BackButton from "../components/UI/BackButton";
 import {
   getMMKVObject,
   setMMKVObject,
-  getTempExpense,
-  setTempExpense,
+  getExpenseCat,
+  setExpenseCat,
 } from "../store/mmkv";
 import { useCallback } from "react";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
@@ -130,10 +130,9 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
   // Helper function to update category in temp storage
   const updateTempCategory = useCallback(
     (categoryValue: string) => {
-      const tempData = getTempExpense(expenseId);
-      if (tempData) {
-        setTempExpense(expenseId, {
-          ...tempData,
+      if (expenseId) {
+        setExpenseCat(expenseId, {
+          expenseId: expenseId,
           category: categoryValue,
         });
       }

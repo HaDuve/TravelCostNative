@@ -69,18 +69,14 @@ import { Ionicons } from "@expo/vector-icons";
 import Animated, {
   ZoomIn,
   ZoomOut,
-  Layout,
   Easing,
   FadeInUp,
   FadeOutUp,
-  FadeIn,
-  FadeOut,
   LinearTransition,
 } from "react-native-reanimated";
 import { DateTime } from "luxon";
 import DatePickerModal from "../UI/DatePickerModal";
 import DatePickerContainer from "../UI/DatePickerContainer";
-import PropTypes from "prop-types";
 import GradientButton from "../UI/GradientButton";
 import { recalcSplitsForExact } from "../../util/split";
 import { DuplicateOption, ExpenseData, isPaidString } from "../../util/expense";
@@ -97,12 +93,13 @@ import SettingsSwitch from "../UI/SettingsSwitch";
 import CountryPicker from "../Currency/CountryPicker";
 import {
   getMMKVObject,
-  setTempExpense,
-  getTempExpense,
-  clearTempExpense,
-  setTempExpenseDraft,
-  getTempExpenseDraft,
-  clearTempExpenseDraft,
+  setExpenseCat,
+  getExpenseCat,
+  setExpenseDraft,
+  getExpenseDraft,
+  clearExpenseDraft,
+  IDCat,
+  clearExpenseCat,
 } from "../../store/mmkv";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { Platform } from "react-native";
@@ -112,6 +109,8 @@ import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { getRate } from "../../util/currencyExchange";
 import { OrientationContext } from "../../store/orientation-context";
 import { callDebounced } from "../Hooks/useDebounce";
+import { NavigationProp } from "@react-navigation/native";
+import safeLogError from "../../util/error";
 
 // Modal state machine for cascading flows
 const modalStates = {
@@ -133,7 +132,21 @@ const splitTypes: { [key: string]: splitType } & {
   SELF: "SELF",
 } as const;
 
-const ExpenseForm = ({
+export type ExpenseFormProps = {
+  onCancel: () => void;
+  onSubmit: (expenseData: ExpenseData) => Promise<void>;
+  submitButtonLabel: string;
+  isEditing: boolean;
+  defaultValues: ExpenseData;
+  pickedCat: string;
+  navigation: NavigationProp<any>;
+  editedExpenseId: string;
+  newCat: boolean;
+  iconName: string;
+  dateISO: string;
+};
+
+const ExpenseForm: React.FC<ExpenseFormProps> = ({
   onCancel,
   onSubmit,
   submitButtonLabel,
@@ -666,85 +679,6 @@ const ExpenseForm = ({
     editingValues ? editingValues.splitType : splitTypes.SELF
   );
 
-  // Track if user has made any changes to the form
-  const [hasUserInteracted, setHasUserInteracted] = useState(false);
-
-  // Check for unsaved changes - only consider it a change if user has interacted
-  const hasUnsavedChanges = useMemo(() => {
-    if (!hasUserInteracted) {
-      return false; // No changes if user hasn't interacted with form
-    }
-
-    // For editing mode, compare against original values
-    if (isEditing && editingValues) {
-      const currentState = {
-        inputs,
-        whoPaid,
-        splitType,
-        splitList,
-        duplOrSplit,
-        isPaid,
-        isSpecialExpense,
-      };
-
-      const originalState = {
-        inputs: {
-          amount: {
-            value:
-              editingValues.amount > 0 ? editingValues.amount.toString() : "",
-            isValid: true,
-          },
-          date: { value: getFormattedDate(editingValues.date), isValid: true },
-          description: {
-            value: editingValues.description || "",
-            isValid: true,
-          },
-          category: { value: editingValues.category || "", isValid: true },
-          country: { value: editingValues.country || "", isValid: true },
-          currency: { value: editingValues.currency || "", isValid: true },
-          whoPaid: { value: editingValues.whoPaid || "", isValid: true },
-        },
-        whoPaid: editingValues.whoPaid,
-        splitType: editingValues.splitType,
-        splitList: editingValues.splitList || [],
-        duplOrSplit: Number(editingValues.duplOrSplit),
-        isPaid: editingValues.isPaid ?? isPaidString.notPaid,
-        isSpecialExpense: editingValues.isSpecialExpense ?? false,
-      };
-
-      return JSON.stringify(currentState) !== JSON.stringify(originalState);
-    }
-
-    // For new expenses, check if any field has meaningful content
-    return (
-      inputs.amount.value.trim() !== "" ||
-      inputs.description.value.trim() !== "" ||
-      (inputs.category.value !== "" && inputs.category.value !== pickedCat) ||
-      inputs.country.value.trim() !== "" ||
-      (inputs.currency.value !== "" &&
-        inputs.currency.value !== tripCtx.tripCurrency) ||
-      whoPaid !== null ||
-      splitType !== splitTypes.SELF ||
-      (splitList && splitList.length > 0) ||
-      duplOrSplit !== DuplicateOption.null ||
-      isPaid !== isPaidString.notPaid ||
-      isSpecialExpense !== false
-    );
-  }, [
-    hasUserInteracted,
-    isEditing,
-    editingValues,
-    inputs,
-    whoPaid,
-    splitType,
-    splitList,
-    duplOrSplit,
-    isPaid,
-    isSpecialExpense,
-    pickedCat,
-    tripCtx.tripCurrency,
-  ]);
-
   // dropdown for EQUAL share picker (without add traveller option)
   const currentTravellersForEqualSplit = useCallback(
     () => travellerToDropdown(currentTravellers, false),
@@ -837,197 +771,199 @@ const ExpenseForm = ({
     [pickedCat, updateCategoryAndIcon, last500Daysexpenses]
   );
 
+  // Helper function to save current form state to draft storage
+  const saveDraftData = useCallback(
+    (newValues: Partial<ExpenseData>) => {
+      setExpenseDraft(editedExpenseId, {
+        category: inputs.category.value,
+        description: inputs.description.value,
+        amount: +inputs.amount.value,
+        date: createSafeDate(inputs.date.value),
+        startDate: createSafeDate(startDate),
+        endDate: createSafeDate(endDate),
+        country: inputs.country.value,
+        currency: inputs.currency.value,
+        whoPaid: whoPaid,
+        splitType: splitType,
+        listEQUAL: splitTravellersList,
+        splitList,
+        duplOrSplit,
+        calcAmount: +amountValue,
+        isPaid,
+        isSpecialExpense,
+        categoryString: inputs.category.value,
+        ...newValues,
+      });
+    },
+    [
+      editedExpenseId,
+      inputs.category.value,
+      inputs.description.value,
+      inputs.amount.value,
+      inputs.date.value,
+      inputs.country.value,
+      inputs.currency.value,
+      startDate,
+      endDate,
+      whoPaid,
+      splitType,
+      splitTravellersList,
+      splitList,
+      duplOrSplit,
+      amountValue,
+      isPaid,
+      isSpecialExpense,
+    ]
+  );
+
   // Load new category when screen comes into focus
   useFocusEffect(
     useCallback(() => {
-      if (editedExpenseId) {
-        const tempData = getTempExpense(editedExpenseId);
-        const draftData = getTempExpenseDraft(editedExpenseId);
+      const tempCat = getExpenseCat(editedExpenseId);
 
-        if (tempData?.category) {
-          // Only load category if there's draft data (user hasn't discarded)
-          // or if we're editing an existing expense
-          if (draftData || isEditing) {
-            updateCategoryAndIcon(tempData.category);
-            // Clear temp data after loading
-            if (isEditing) {
-              clearTempExpense(editedExpenseId);
-            }
-          } else {
-            // No draft data and not editing - clear temp data to reset category
-            clearTempExpense(editedExpenseId);
-            // Reset category to undefined for new expenses
-            if (!isEditing) {
-              updateCategoryAndIcon("undefined");
-            }
-          }
-        }
+      if (tempCat?.category) {
+        console.log("🚀 ~ ExpenseForm ~ tempCat?.category:", tempCat?.category);
+        updateCategoryAndIcon(tempCat.category);
+        saveDraftData({ category: tempCat.category });
+        clearExpenseCat(editedExpenseId);
       }
-    }, [isEditing, editedExpenseId, updateCategoryAndIcon])
+    }, [editedExpenseId, updateCategoryAndIcon, saveDraftData])
   );
 
   // Check for draft data on mount and show restore prompt for both new and existing expenses
   useEffect(() => {
-    if (editedExpenseId) {
-      const draftData = getTempExpenseDraft(editedExpenseId);
-      if (draftData) {
-        // Create a user-friendly list of changed items
-        const changedItems = [];
+    const draftData: ExpenseData = getExpenseDraft(editedExpenseId);
+    console.log("🚀 ~ ExpenseForm ~ draftData:", draftData);
+    if (draftData) {
+      // Create a user-friendly list of changed items
+      const changedItems = [];
 
-        if (draftData.amount?.value && draftData.amount.value !== "") {
-          changedItems.push(`• ${i18n.t("amount")}: ${draftData.amount.value}`);
-        }
-        if (
-          draftData.description?.value &&
-          draftData.description.value !== ""
-        ) {
-          changedItems.push(
-            `• ${i18n.t("description")}: ${draftData.description.value}`
-          );
-        }
-        if (draftData.category && draftData.category !== "undefined") {
-          const categoryName = getCatString(draftData.category);
-          changedItems.push(`• ${i18n.t("category")}: ${categoryName}`);
-        }
-        if (draftData.country?.value && draftData.country.value !== "") {
-          changedItems.push(
-            `• ${i18n.t("country")}: ${draftData.country.value}`
-          );
-        }
-        if (draftData.currency?.value && draftData.currency.value !== "") {
-          changedItems.push(
-            `• ${i18n.t("currency")}: ${draftData.currency.value}`
-          );
-        }
-        if (draftData.whoPaid && draftData.whoPaid !== "") {
-          changedItems.push(`• ${i18n.t("whoPaid")}: ${draftData.whoPaid}`);
-        }
-        if (draftData.splitType && draftData.splitType !== "SELF") {
-          const splitTypeText =
-            draftData.splitType === "EQUAL"
-              ? i18n.t("equal")
-              : draftData.splitType === "EXACT"
-                ? i18n.t("exact")
-                : draftData.splitType;
-          changedItems.push(`• ${i18n.t("splitType")}: ${splitTypeText}`);
-        }
-        if (draftData.isPaid && draftData.isPaid !== "not paid") {
-          const paidText =
-            draftData.isPaid === "paid"
-              ? i18n.t("paid")
-              : i18n.t("notPaidLabel");
-          changedItems.push(`• ${i18n.t("paymentStatus")}: ${paidText}`);
-        }
-        if (draftData.isSpecialExpense) {
-          changedItems.push(`• ${i18n.t("specialExpense")}: ${i18n.t("yes")}`);
-        }
-
-        const changedItemsText =
-          changedItems.length > 0
-            ? `\n\n${i18n.t("unsavedItems")}:\n${changedItems.join("\n")}`
-            : "";
-
-        Alert.alert(
-          i18n.t("unsavedChanges"),
-          `${i18n.t("unsavedChangesMessage")}${changedItemsText}`,
-          [
-            {
-              text: i18n.t("discard"),
-              style: "destructive",
-              onPress: () => {
-                clearTempExpenseDraft(editedExpenseId);
-                clearTempExpense(editedExpenseId); // Also clear category temp data
-                // Reset category to undefined for new expenses
-                if (!isEditing) {
-                  updateCategoryAndIcon("undefined");
-                }
-              },
-            },
-            {
-              text: i18n.t("restore"),
-              onPress: () => {
-                // Restore form state from draft data
-                // Extract inputs from the spread data structure
-                const inputsToRestore = {
-                  amount: draftData.amount || { value: "", isValid: true },
-                  description: draftData.description || {
-                    value: "",
-                    isValid: true,
-                  },
-                  date: draftData.date || { value: "", isValid: true },
-                  category: draftData.category
-                    ? { value: draftData.category, isValid: true }
-                    : { value: "", isValid: true },
-                  country: draftData.country || { value: "", isValid: true },
-                  currency: draftData.currency || { value: "", isValid: true },
-                  whoPaid: draftData.whoPaid
-                    ? { value: draftData.whoPaid, isValid: true }
-                    : { value: "", isValid: true },
-                };
-                setInputs(inputsToRestore);
-                // whoPaid is now handled in inputs above
-                if (draftData.splitType) {
-                  setSplitType(draftData.splitType);
-                }
-                if (draftData.listEQUAL) {
-                  setListEQUAL(draftData.listEQUAL);
-                }
-                if (draftData.splitList) {
-                  setSplitList(draftData.splitList);
-                }
-                if (draftData.duplOrSplit !== undefined) {
-                  setDuplOrSplit(draftData.duplOrSplit);
-                }
-                if (draftData.isPaid) {
-                  setIsPaid(draftData.isPaid);
-                }
-                if (draftData.isSpecialExpense !== undefined) {
-                  setIsSpecialExpense(draftData.isSpecialExpense);
-                }
-                // Update category and icon (category is already restored in inputs above)
-                if (draftData.category) {
-                  updateCategoryAndIcon(draftData.category);
-                }
-              },
-            },
-          ]
+      if (draftData.amount && draftData.amount !== 0) {
+        changedItems.push(`• ${i18n.t("amount")}: ${draftData.amount}`);
+      }
+      if (draftData.description && draftData.description !== "") {
+        changedItems.push(
+          `• ${i18n.t("description")}: ${draftData.description}`
         );
       }
+      if (draftData.category && draftData.category !== "undefined") {
+        const categoryName = getCatString(draftData.category);
+        changedItems.push(`• ${i18n.t("category")}: ${categoryName}`);
+      }
+      if (draftData.currency && draftData.currency !== userCtx.lastCurrency) {
+        changedItems.push(`• ${i18n.t("currency")}: ${draftData.currency}`);
+      }
+      if (draftData.country && draftData.country !== userCtx.lastCountry) {
+        changedItems.push(`• ${i18n.t("country")}: ${draftData.country}`);
+      }
+      if (draftData.whoPaid && draftData.whoPaid !== "") {
+        changedItems.push(`• ${i18n.t("whoPaid")}: ${draftData.whoPaid}`);
+      }
+      if (draftData.splitType && draftData.splitType !== "SELF") {
+        const splitTypeText =
+          draftData.splitType === "EQUAL"
+            ? i18n.t("equal")
+            : draftData.splitType === "EXACT"
+              ? i18n.t("exact")
+              : draftData.splitType;
+        changedItems.push(`• ${i18n.t("splitType")}: ${splitTypeText}`);
+      }
+      if (draftData.isPaid && draftData.isPaid !== "not paid") {
+        const paidText =
+          draftData.isPaid === "paid" ? i18n.t("paid") : i18n.t("notPaidLabel");
+        changedItems.push(`• ${i18n.t("paymentStatus")}: ${paidText}`);
+      }
+      if (draftData.isSpecialExpense) {
+        changedItems.push(`• ${i18n.t("specialExpense")}: ${i18n.t("yes")}`);
+      }
+
+      const changedItemsText =
+        changedItems.length > 0
+          ? `\n\n${i18n.t("unsavedItems")}:\n${changedItems.join("\n")}`
+          : "";
+
+      Alert.alert(
+        i18n.t("unsavedChanges"),
+        `${i18n.t("unsavedChangesMessage")}${changedItemsText}`,
+        [
+          {
+            text: i18n.t("discard"),
+            style: "destructive",
+            onPress: () => {
+              clearExpenseDraft(editedExpenseId);
+            },
+          },
+          {
+            text: i18n.t("restore"),
+            onPress: () => {
+              // Restore form state from draft data
+              // Extract inputs from the spread data structure
+              const inputsToRestore = {
+                amount: {
+                  value: draftData.amount?.toString() || "",
+                  isValid: true,
+                },
+                description: {
+                  value: draftData.description || "",
+                  isValid: true,
+                },
+                date: {
+                  value: draftData.date
+                    ? convertToISOString(draftData.date)
+                    : "",
+                  isValid: true,
+                },
+                category: { value: draftData.category || "", isValid: true },
+                country: { value: draftData.country || "", isValid: true },
+                currency: { value: draftData.currency || "", isValid: true },
+                whoPaid: { value: draftData.whoPaid || "", isValid: true },
+              };
+              setInputs(inputsToRestore);
+              if (draftData.splitType) {
+                setSplitType(draftData.splitType);
+              }
+              if (draftData.listEQUAL) {
+                setListEQUAL(draftData.listEQUAL);
+              }
+              if (draftData.splitList) {
+                setSplitList(draftData.splitList);
+              }
+              if (draftData.duplOrSplit !== undefined) {
+                setDuplOrSplit(draftData.duplOrSplit);
+              }
+              if (draftData.isPaid) {
+                setIsPaid(draftData.isPaid);
+              }
+              if (draftData.isSpecialExpense !== undefined) {
+                setIsSpecialExpense(draftData.isSpecialExpense);
+              }
+              if (draftData.startDate) {
+                setStartDate(convertToISOString(draftData.startDate));
+              }
+              if (draftData.endDate) {
+                setEndDate(convertToISOString(draftData.endDate));
+              }
+              if (draftData.calcAmount) {
+                setCalcAmount(draftData.calcAmount.toString());
+              }
+            },
+          },
+        ]
+      );
     }
-  }, [editedExpenseId, updateCategoryAndIcon]);
+  }, [
+    editedExpenseId,
+    tripCtx.tripCurrency,
+    updateCategoryAndIcon,
+    userCtx.lastCountry,
+    userCtx.lastCurrency,
+  ]);
 
   // Update icon when category changes
   useEffect(() => {
     const symbol = getCatSymbolMMKV(inputs.category.value);
     setIcon(symbol);
   }, [inputs.category.value]);
-
-  // Helper function to save current form state to draft storage
-  const saveDraftData = useCallback(() => {
-    if (editedExpenseId) {
-      setTempExpenseDraft(editedExpenseId, {
-        ...inputs,
-        category: inputs.category.value,
-        whoPaid,
-        splitType,
-        listEQUAL: splitTravellersList,
-        splitList,
-        duplOrSplit,
-        isPaid,
-        isSpecialExpense,
-      });
-    }
-  }, [
-    editedExpenseId,
-    inputs,
-    whoPaid,
-    splitType,
-    splitTravellersList,
-    splitList,
-    duplOrSplit,
-    isPaid,
-    isSpecialExpense,
-  ]);
 
   // Wrapper functions that include auto-save
   const setWhoPaidWithAutoSave = useCallback(
@@ -1073,17 +1009,7 @@ const ExpenseForm = ({
       // Auto-save draft data after state update
       setTimeout(() => {
         if (editedExpenseId) {
-          setTempExpenseDraft(editedExpenseId, {
-            ...newInputs,
-            category: newInputs.category.value,
-            whoPaid,
-            splitType,
-            listEQUAL: splitTravellersList,
-            splitList,
-            duplOrSplit,
-            isPaid,
-            isSpecialExpense,
-          });
+          saveDraftData();
         }
       }, 0);
 
@@ -1210,6 +1136,21 @@ const ExpenseForm = ({
     return DateTime.now().toJSDate();
   };
 
+  // Helper function to convert DateOrDateTime to ISO string
+  const convertToISOString = (dateValue: any): string => {
+    if (typeof dateValue === "string") {
+      return dateValue;
+    }
+    if (dateValue instanceof Date) {
+      return dateValue.toISOString();
+    }
+    if (dateValue && typeof dateValue.toJSDate === "function") {
+      // DateTime object
+      return dateValue.toJSDate().toISOString();
+    }
+    return new Date(dateValue).toISOString();
+  };
+
   async function submitHandler() {
     const expenseData = {
       uid: authCtx.uid,
@@ -1219,6 +1160,8 @@ const ExpenseForm = ({
       endDate: createSafeDate(endDate),
       description: inputs.description.value,
       category: newCat ? pickedCat : inputs.category.value,
+      categoryString: inputs.category.value,
+      calcAmount: +amountValue,
       country: inputs.country.value,
       currency: inputs.currency.value,
       whoPaid: whoPaid, // TODO: convert this to uid
@@ -1315,7 +1258,6 @@ const ExpenseForm = ({
       await secureStoreSetItem("lastCountry", inputs.country.value);
     }
     if (inputs.currency.value && inputs.currency.value !== "") {
-      // console.log("submitHandler ~ secureStoreSetItem:", "last Currency");
       userCtx.setLastCurrency(inputs.currency.value);
       await secureStoreSetItem("lastCurrency", inputs.currency.value);
     }
@@ -1448,9 +1390,9 @@ const ExpenseForm = ({
     const expenses = expCtx.expenses;
     const expensesLength = expenses.length || 0;
     const newExpenseDateRange = daysBeween || 1;
-    const tooManyTrips =
+    const tooManyExpenses =
       expensesLength + newExpenseDateRange >= MAX_EXPENSES_PERTRIP_NONPREMIUM;
-    return tooManyTrips;
+    return tooManyExpenses;
   };
 
   const advancedSubmitHandler = async () => {
@@ -1613,26 +1555,6 @@ const ExpenseForm = ({
     onConfirmRange,
   });
 
-  const tempValues: ExpenseData = {
-    uid: authCtx.uid,
-    amount: +amountValue,
-    date: inputs.date.value || new Date().toISOString(),
-    startDate: startDate || new Date().toISOString(),
-    endDate: endDate || new Date().toISOString(),
-    description: inputs.description.value,
-    category: newCat ? pickedCat : inputs.category.value,
-    country: inputs.country.value,
-    currency: inputs.currency.value,
-    whoPaid: whoPaid,
-    splitType: splitType,
-    listEQUAL: splitTravellersList,
-    splitList: splitList,
-    duplOrSplit: duplOrSplit,
-    iconName: iconName,
-    categoryString: "",
-    calcAmount: 0,
-  };
-
   const headerHeight = useHeaderHeight();
   const hideBottomBorder = duplOrSplit == 1 || duplOrSplit == 2;
 
@@ -1748,29 +1670,13 @@ const ExpenseForm = ({
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   // Store current form state in MMKV before navigation
-                  setTempExpense(editedExpenseId, {
-                    ...inputs,
+                  const idCatData: IDCat = {
+                    expenseId: editedExpenseId,
                     category: inputs.category.value,
-                    whoPaid,
-                    splitType,
-                    listEQUAL: splitTravellersList,
-                    splitList,
-                    duplOrSplit,
-                    isPaid,
-                    isSpecialExpense,
-                  });
+                  };
+                  setExpenseCat(editedExpenseId, idCatData);
                   // Also save to draft storage
-                  setTempExpenseDraft(editedExpenseId, {
-                    ...inputs,
-                    category: inputs.category.value,
-                    whoPaid,
-                    splitType,
-                    listEQUAL: splitTravellersList,
-                    splitList,
-                    duplOrSplit,
-                    isPaid,
-                    isSpecialExpense,
-                  });
+                  saveDraftData();
                   // Navigate with minimal params
                   navigation.navigate("CategoryPick", {
                     expenseId: editedExpenseId,
@@ -2497,46 +2403,6 @@ const ExpenseForm = ({
 };
 
 export default ExpenseForm;
-
-ExpenseForm.propTypes = {
-  onCancel: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
-  setIsSubmitting: PropTypes.func.isRequired,
-  isEditing: PropTypes.bool,
-  defaultValues: PropTypes.shape({
-    amount: PropTypes.number,
-    date: PropTypes.string,
-    description: PropTypes.string,
-    category: PropTypes.string,
-    country: PropTypes.string,
-    currency: PropTypes.string,
-    whoPaid: PropTypes.string,
-    splitType: PropTypes.string,
-    listEQUAL: PropTypes.arrayOf(
-      PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.shape({
-          userName: PropTypes.string,
-          amount: PropTypes.number,
-        }),
-      ])
-    ),
-    splitList: PropTypes.arrayOf(
-      PropTypes.shape({
-        userName: PropTypes.string,
-        amount: PropTypes.number,
-      })
-    ),
-    duplOrSplit: PropTypes.number,
-  }),
-  pickedCat: PropTypes.string,
-  submitButtonLabel: PropTypes.string,
-  navigation: PropTypes.object,
-  editedExpenseId: PropTypes.string,
-  newCat: PropTypes.bool,
-  iconName: PropTypes.string,
-  dateISO: PropTypes.string,
-};
 
 const styles = StyleSheet.create({
   container: {

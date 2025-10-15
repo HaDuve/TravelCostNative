@@ -1646,6 +1646,20 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                 }}
               />
             </View>
+            
+            {/* Description field - moved from advanced options for better UX */}
+            <Autocomplete
+              value={inputs.description.value}
+              containerStyle={styles.descriptionContainer}
+              onChange={inputChangedHandler.bind(this, "description")}
+              label={i18n.t("descriptionLabel")}
+              data={suggestionData}
+              style={styles.autoCompleteStyle}
+              menuStyle={styles.autoCompleteMenuStyle}
+              showOnEmpty={false}
+              placeholder=""
+            />
+            
             {/* always show more options when editing */}
             {!alwaysShowAdvancedSetting && (
               <Pressable onPress={toggleAdvancedHandler}>
@@ -1680,16 +1694,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                   .delay(100)}
                 exiting={FadeOutUp.duration(50)}
               >
-                <Autocomplete
-                  value={inputs.description.value}
-                  containerStyle={styles.descriptionContainer}
-                  onChange={inputChangedHandler.bind(this, "description")}
-                  label={i18n.t("descriptionLabel")}
-                  data={suggestionData}
-                  style={styles.autoCompleteStyle}
-                  menuStyle={styles.autoCompleteMenuStyle}
-                ></Autocomplete>
-
                 <View style={styles.currencyContainer}>
                   <Text style={styles.currencyLabel}>
                     {i18n.t("currencyLabel")}

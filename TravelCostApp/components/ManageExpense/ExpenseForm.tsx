@@ -1250,6 +1250,11 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     if (!inputs.description.isValid) {
       inputChangedHandler("description", arg);
     }
+    // Auto-fill description with translated category name if description is empty
+    if (inputs.description.value === "" && arg) {
+      const translatedCategoryName = getCatString(arg);
+      inputChangedHandler("description", translatedCategoryName);
+    }
     if (!inputs.category.isValid) {
       inputChangedHandler("category", arg);
     }

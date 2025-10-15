@@ -25,7 +25,6 @@ import {
   Text,
   View,
   RefreshControl,
-  useWindowDimensions,
 } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
@@ -316,10 +315,6 @@ function RecentExpenses({ navigation }) {
     expensesSum,
     tripCtx.tripCurrency
   );
-  const isLongNumber = expensesSumString?.length > 10;
-  const { fontScale } = useWindowDimensions();
-  const isScaledUp = fontScale > 1;
-  const useMoreSpace = (isScaledUp || isLongNumber) && !isTablet;
 
   const ExpensesOutputJSX = (
     <MemoizedExpensesOutput
@@ -391,11 +386,6 @@ function RecentExpenses({ navigation }) {
       <View
         style={[
           styles.header,
-          useMoreSpace && {
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-          },
           !isPortrait && styles.landscapeHeader,
         ]}
       >
@@ -432,14 +422,10 @@ function RecentExpenses({ navigation }) {
             },
           }}
           style={styles.dropdown}
-          textStyle={[
-            styles.dropdownTextStyle,
-            isScaledUp && styles.scaledUpTextStyle,
-          ]}
+          textStyle={styles.dropdownTextStyle}
         />
 
         <ExpensesSummary
-          useMoreSpace={useMoreSpace}
           expenses={recentExpenses}
           periodName={PeriodValue}
         />

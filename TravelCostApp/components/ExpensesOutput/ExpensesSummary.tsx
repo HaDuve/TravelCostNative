@@ -37,7 +37,6 @@ import { CurrencyTicker } from "../UI/AnimatedNumber";
 const ExpensesSummary = ({
   expenses,
   periodName,
-  useMoreSpace = false,
   style = {},
 }) => {
   const tripCtx = useContext(TripContext);
@@ -268,7 +267,6 @@ const ExpensesSummary = ({
       style={({ pressed }) => [
         styles.container,
         style,
-        useMoreSpace && styles.useMoreSpaceContainer,
         GlobalStyles.shadow,
         pressed && GlobalStyles.pressedWithShadow,
       ]}
@@ -301,7 +299,6 @@ export default ExpensesSummary;
 ExpensesSummary.propTypes = {
   expenses: PropTypes.array.isRequired,
   periodName: PropTypes.string.isRequired,
-  useMoreSpace: PropTypes.bool,
   style: PropTypes.object,
 };
 
@@ -324,13 +321,6 @@ const styles = StyleSheet.create({
         marginBottom: dynamicScale(-4, true),
       },
     }),
-  },
-  useMoreSpaceContainer: {
-    maxWidth: "90%",
-    paddingTop: dynamicScale(8, true),
-    paddingBottom: dynamicScale(4, true),
-    paddingLeft: dynamicScale(4),
-    paddingRight: dynamicScale(4),
   },
   sumTextContainer: {
     alignItems: "center",

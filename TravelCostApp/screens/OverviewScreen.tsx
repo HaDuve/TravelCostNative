@@ -6,7 +6,6 @@ import {
   Platform,
   StyleSheet,
   Text,
-  useWindowDimensions,
   View,
 } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
@@ -135,11 +134,7 @@ const OverviewScreen = ({ navigation }) => {
     expensesSum,
     tripCtx.tripCurrency
   );
-  const isLongNumber = expensesSumString?.length > 10;
-  const { fontScale } = useWindowDimensions();
   const { isPortrait, isTablet } = useContext(OrientationContext);
-  const isScaledUp = fontScale > 1;
-  const useMoreSpace = (isScaledUp || isLongNumber) && !isTablet;
   return (
     <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
       <View
@@ -158,11 +153,6 @@ const OverviewScreen = ({ navigation }) => {
       <View
         style={[
           styles.header,
-          useMoreSpace && {
-            flexDirection: "column",
-            justifyContent: "space-between",
-            alignItems: "center",
-          },
           !isPortrait && styles.landscapeHeader,
         ]}
       >
@@ -203,13 +193,9 @@ const OverviewScreen = ({ navigation }) => {
           }}
           // customItemLabelStyle={styles.dropdownItemLabel}
           style={styles.dropdown}
-          textStyle={[
-            styles.dropdownTextStyle,
-            isScaledUp && styles.scaledUpTextStyle,
-          ]}
+          textStyle={styles.dropdownTextStyle}
         />
         <ExpensesSummary
-          useMoreSpace={useMoreSpace}
           expenses={recentExpenses}
           periodName={PeriodValue}
           style={styles.customSummaryStyle}

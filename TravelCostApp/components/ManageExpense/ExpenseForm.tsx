@@ -110,7 +110,6 @@ import { getRate } from "../../util/currencyExchange";
 import { OrientationContext } from "../../store/orientation-context";
 import { callDebounced } from "../Hooks/useDebounce";
 import { NavigationProp } from "@react-navigation/native";
-import safeLogError from "../../util/error";
 
 // Modal state machine for cascading flows
 const modalStates = {
@@ -426,13 +425,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     }
   }, [dateISO]);
 
-  // Helper function to safely format dates
-  const getSafeFormattedDate = (dateValue: string | undefined): string => {
-    if (dateValue && dateValue !== "") {
-      return getFormattedDate(dateValue);
-    }
-    return getFormattedDate(DateTime.now().toJSDate());
-  };
 
   // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
   const [duplOrSplit, setDuplOrSplit] = useState<DuplicateOption>(
@@ -578,8 +570,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   const [modalFlow, setModalFlow] = useState(modalStates.NONE);
 
-  const nextModal = (selectedValue, currentSplitType) => {
-    console.log("🔍 nextModal called:", modalFlow, "->", selectedValue);
+  const nextModal = (selectedValue) => {
 
     switch (modalFlow) {
       case modalStates.WHO_PAID:
@@ -596,16 +587,11 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
       case modalStates.HOW_SHARED:
         if (selectedValue === splitTypes.EXACT) {
-          console.log("🔍 Transitioning from HOW_SHARED to EXACT_SHARING");
           setModalFlow(modalStates.NONE);
           setTimeout(() => {
-            console.log("🔍 Opening EXACT_SHARING modal");
             setModalFlow(modalStates.EXACT_SHARING);
           }, 100);
         } else {
-          console.log(
-            "🔍 HOW_SHARED flow complete, closing all modals as EQUAL"
-          );
           setSplitType(splitTypes.EQUAL);
           splitHandler();
           setModalFlow(modalStates.NONE); // EQUAL/SELF, flow complete
@@ -613,12 +599,8 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         break;
 
       case modalStates.EXACT_SHARING:
-        console.log(
-          "🔍 EXACT_SHARING case triggered, opening traveller picker"
-        );
         setModalFlow(modalStates.NONE);
         setTimeout(() => {
-          console.log("🔍 Opening traveller multi-picker");
           openTravellerMultiPicker(); // Open the traveller picker
         }, 100);
         break;
@@ -635,34 +617,21 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   // Wrap setWhoPaid with logging
   const setWhoPaidWithLogging = (value) => {
-    console.log(
-      "🔍 setWhoPaid called with:",
-      value,
-      "from:",
-      new Error().stack.split("\n")[2]
-    );
     setWhoPaidWithAutoSave(value);
   };
 
   // Custom setValue handler to handle both normal selections and special __ADD_TRAVELLER__ case
   const handleWhoPaidChange = (value) => {
-    console.log("🔍 handleWhoPaidChange called with:", value, typeof value);
 
     // Ignore function objects (weird DropDownPicker behavior for special case)
     if (typeof value === "function") {
-      console.log("🔍 handleWhoPaidChange ignoring function value");
       return;
     }
 
     // Handle normal string values
     if (value === "__ADD_TRAVELLER__") {
-      console.log(
-        "🔍 handleWhoPaidChange intercepted __ADD_TRAVELLER__, setting to:",
-        userCtx.userName
-      );
       setWhoPaidWithLogging(userCtx.userName);
     } else {
-      console.log("🔍 handleWhoPaidChange setting normal value:", value);
       setWhoPaidWithLogging(value);
     }
   };
@@ -819,7 +788,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       const tempCat = getExpenseCat(editedExpenseId);
 
       if (tempCat?.category) {
-        console.log("🚀 ~ ExpenseForm ~ tempCat?.category:", tempCat?.category);
         updateCategoryAndIcon(tempCat.category);
         saveDraftData({ category: tempCat.category });
         clearExpenseCat(editedExpenseId);
@@ -830,7 +798,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   // Check for draft data on mount and show restore prompt for both new and existing expenses
   useEffect(() => {
     const draftData: ExpenseData = getExpenseDraft(editedExpenseId);
-    console.log("🚀 ~ ExpenseForm ~ draftData:", draftData);
     if (draftData) {
       // Create a user-friendly list of changed items
       const changedItems = [];
@@ -1027,7 +994,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   }
 
   function openTravellerMultiPicker() {
-    console.log("🔍 openTravellerMultiPicker called");
     // console.log("splitType", splitType);
     // add whole traveling group who paid automatically to shared list
     if (!editingValues) {
@@ -1302,7 +1268,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       inputChangedHandler("currency", defaultCurrency);
     }
     if (!inputs.whoPaid.isValid) {
-      console.log("🔍 Setting whoPaid due to invalid input:", userCtx.userName);
       setWhoPaidWithLogging(userCtx.userName);
     }
   }
@@ -1889,8 +1854,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                             }}
                             setValue={handleWhoPaidChange}
                             setItems={setItems}
-                            onClose={(items) => {
-                              console.log("🔍 whoPaid dropdown onClose called");
+                            onClose={() => {
                               // Only reset modal flow if we're not transitioning to another modal
                               if (modalFlow === modalStates.WHO_PAID) {
                                 setModalFlow(modalStates.NONE);
@@ -1903,7 +1867,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                               );
                             }}
                             onSelectItem={(item) => {
-                              console.log("🔍 onSelectItem called with:", item);
                               Haptics.impactAsync(
                                 Haptics.ImpactFeedbackStyle.Light
                               );
@@ -1974,10 +1937,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                         nextModal(item.value, item.value);
                       }}
                       onClose={() => {
-                        console.log(
-                          "🔍 Split types dropdown onClose called, modalFlow:",
-                          modalFlow
-                        );
                         // Only reset modal flow if we're not transitioning to another modal
                         // Don't reset if we're about to go to EXACT_SHARING
                         if (modalFlow === modalStates.HOW_SHARED) {
@@ -2033,7 +1992,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                     setValue={setListEQUAL}
                     setItems={setSplitItemsEQUAL}
                     onClose={() => {
-                      console.log("🔍 Traveller multi-picker onClose called");
                       setModalFlow(modalStates.NONE);
                       splitHandler();
                     }}

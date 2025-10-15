@@ -98,21 +98,10 @@ export async function deleteAllExpensesByRangedId(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   expenseCtx: any
 ) {
-  console.log(
-    "🗑️ [RANGED DELETE] Starting deletion for rangeId:",
-    selectedExpense?.rangeId
-  );
-  console.log("🗑️ [RANGED DELETE] Selected expense:", {
-    id: selectedExpense?.id,
-    description: selectedExpense?.description,
-    rangeId: selectedExpense?.rangeId,
-    isDeleted: selectedExpense?.isDeleted,
-  });
 
   // Use local expenses context instead of server data for ranged deletion
   // Server data might be incomplete or not synced yet
   const allExpenses = expenseCtx?.expenses || [];
-  console.log("🗑️ [RANGED DELETE] Total expenses fetched:", allExpenses.length);
 
   // Collect all expenses to delete first
   const expensesToDelete = allExpenses.filter(
@@ -120,27 +109,10 @@ export async function deleteAllExpensesByRangedId(
       expense?.rangeId === selectedExpense?.rangeId && !expense.isDeleted
   );
 
-  console.log(
-    "🗑️ [RANGED DELETE] Found expenses to delete:",
-    expensesToDelete.length
-  );
-  console.log(
-    "🗑️ [RANGED DELETE] Expenses to delete:",
-    expensesToDelete.map((e) => ({
-      id: e.id,
-      description: e.description,
-      date: e.date,
-      isDeleted: e.isDeleted,
-    }))
-  );
 
   // Delete all expenses from server first
   for (let i = 0; i < expensesToDelete.length; i++) {
     const expense: ExpenseData = expensesToDelete[i];
-    console.log(
-      `🗑️ [RANGED DELETE] Deleting expense ${i + 1}/${expensesToDelete.length}:`,
-      expense.id
-    );
 
     const queueItem: OfflineQueueManageExpenseItem = {
       type: "delete",
@@ -152,20 +124,14 @@ export async function deleteAllExpensesByRangedId(
     };
     // Soft delete: call server first
     await deleteExpenseOnlineOffline(queueItem, isOnline);
-    console.log(
-      `✅ [RANGED DELETE] Server deletion completed for expense:`,
-      expense.id
-    );
   }
 
   // Only remove from local state after all server deletions are complete
   for (let i = 0; i < expensesToDelete.length; i++) {
     const expense: ExpenseData = expensesToDelete[i];
-    console.log(`🗑️ [RANGED DELETE] Removing from local state:`, expense.id);
     expenseCtx?.deleteExpense(expense.id);
   }
 
-  console.log("✅ [RANGED DELETE] All ranged expenses deleted successfully");
 }
 
 /**

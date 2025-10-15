@@ -16,7 +16,6 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { GlobalStyles, ListLayoutAnimation } from "../../constants/styles";
 import {
   fetchTripName,
-  getAllExpenses,
   touchAllTravelers,
 } from "../../util/http";
 import { TripContext } from "../../store/trip-context";
@@ -172,16 +171,6 @@ function ExpensesList({
     const uid = item.uid;
     async function deleteAllExpenses() {
       try {
-        console.log(
-          "🗑️ [EXPENSES LIST] Starting deleteAllExpenses for rangeId:",
-          item?.rangeId
-        );
-        console.log("🗑️ [EXPENSES LIST] Item details:", {
-          id: item?.id,
-          description: item?.description,
-          rangeId: item?.rangeId,
-          isDeleted: item?.isDeleted,
-        });
 
         navigation?.popToTop();
         Toast.show({
@@ -194,49 +183,17 @@ function ExpensesList({
         // Server data might be incomplete or not synced yet
         const allExpenses = expenseCtx?.expenses;
 
-        console.log(
-          "🗑️ [EXPENSES LIST] Total expenses available:",
-          allExpenses.length
-        );
-        console.log("🗑️ [EXPENSES LIST] Looking for rangeId:", item?.rangeId);
-        console.log("🗑️ [EXPENSES LIST] RangeId type:", typeof item?.rangeId);
 
-        // Debug: Show all rangeIds in the expenses
-        const rangeIds = allExpenses
-          .filter((expense) => expense?.rangeId)
-          .map((expense) => ({
-            id: expense.id,
-            rangeId: expense.rangeId,
-            type: typeof expense.rangeId,
-          }));
-        console.log("🗑️ [EXPENSES LIST] All rangeIds in expenses:", rangeIds);
 
         // Collect all expenses to delete first
         const expensesToDelete = allExpenses.filter(
           (expense) => expense?.rangeId === item?.rangeId && !expense.isDeleted
         );
 
-        console.log(
-          "🗑️ [EXPENSES LIST] Found expenses to delete:",
-          expensesToDelete.length
-        );
-        console.log(
-          "🗑️ [EXPENSES LIST] Expenses to delete:",
-          expensesToDelete.map((e) => ({
-            id: e.id,
-            description: e.description,
-            date: e.date,
-            isDeleted: e.isDeleted,
-          }))
-        );
 
         // Delete all expenses from server first
         for (let i = 0; i < expensesToDelete.length; i++) {
           const expense = expensesToDelete[i];
-          console.log(
-            `🗑️ [EXPENSES LIST] Deleting expense ${i + 1}/${expensesToDelete.length}:`,
-            expense.id
-          );
 
           const queueItem: OfflineQueueManageExpenseItem = {
             type: "delete",
@@ -257,14 +214,9 @@ function ExpensesList({
         // Only remove from local state after all server deletions are complete
         for (let i = 0; i < expensesToDelete.length; i++) {
           const expense = expensesToDelete[i];
-          console.log(
-            `🗑️ [EXPENSES LIST] Removing from local state:`,
-            expense.id
-          );
           expenseCtx?.deleteExpense(expense.id);
         }
 
-        console.log("✅ [EXPENSES LIST] All expenses deleted successfully");
         await touchAllTravelers(tripID, true);
         Toast.hide();
       } catch (error) {

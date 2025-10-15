@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import { ScrollView } from "react-native";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
@@ -69,15 +69,11 @@ export const TEMP_EXPENSE_ID = "TEMP_EXPENSE_ID";
 const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   const { pickedCat, tempValues, newCat, iconName, dateISO } =
     route.params || {};
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const expenseCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const tripCtx = useContext(TripContext);
   const { isConnected, strongConnection } = useContext(NetworkContext);
   const isOnline = isConnected && strongConnection;
-  const [progress, setProgress] = useState(-1);
-  const [progressAt, setProgressAt] = useState(0);
-  const [progressMax, setProgressMax] = useState(0);
 
   const tripid = tripCtx.tripid;
   const uid = authCtx.uid;
@@ -111,16 +107,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   async function deleteExpenseHandler() {
     async function deleteAllExpenses() {
       try {
-        console.log(
-          "🗑️ [MANAGE EXPENSE] Starting deleteAllExpenses for rangeId:",
-          selectedExpense?.rangeId
-        );
-        console.log("🗑️ [MANAGE EXPENSE] Selected expense:", {
-          id: selectedExpense?.id,
-          description: selectedExpense?.description,
-          rangeId: selectedExpense?.rangeId,
-          isDeleted: selectedExpense?.isDeleted,
-        });
 
         navigation?.popToTop();
         Toast.show({
@@ -134,9 +120,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           selectedExpense,
           isOnline,
           expenseCtx
-        );
-        console.log(
-          "✅ [MANAGE EXPENSE] deleteAllExpensesByRangedId completed"
         );
         Toast.hide();
         await touchAllTravelers(tripid, true);
@@ -430,12 +413,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     // get days from expenseData
     const newStart = new Date(expenseData.startDate);
     const newEnd = new Date(expenseData.endDate);
-    const validDates =
-      expensesInRange[0].date &&
-      expensesInRange[expensesInRange?.length - 1].date &&
-      expenseData.startDate &&
-      expenseData.endDate;
-    // console.log("editingRangedData ~ validDates:", validDates);
     const differentDates =
       !isSameDay(oldStart, newStart) || !isSameDay(oldEnd, newEnd);
     if (differentDates) {

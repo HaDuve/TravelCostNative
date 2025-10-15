@@ -74,29 +74,8 @@ async function registerForPushNotificationsAsync() {
       finalStatus = status;
     }
     if (finalStatus !== "granted") {
-      // alert("Failed to get push token for push notification!");
-      // console.log("Failed to get push token for push notification!");
-      Alert.alert(
-        i18n.t("notifications"),
-        i18n.t("enableNotificationsSettings"),
-        // neveraskagain button
-        [
-          {
-            text: i18n.t("neverAskAgain"),
-            onPress: () => {
-              // console.log("Never ask again");
-              setMMKVObject("expoPushAsk", { never: true });
-            },
-          },
-          {
-            text: "OK",
-            onPress: () => {
-              // console.log("OK");
-            },
-          },
-        ],
-        { cancelable: false }
-      );
+      // Notification permissions not granted - silently return without showing alert
+      // console.log("Notification permissions not granted, continuing without notifications");
       return;
     }
     // todo implement a later get if device is offline

@@ -7,7 +7,6 @@ import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { ExpoPushToken } from "expo-notifications";
 import { storeExpoPushTokenInTrip } from "../util/http";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -60,13 +59,8 @@ async function registerForPushNotificationsAsync() {
       finalStatus = status;
     }
     if (finalStatus !== "granted") {
-      // alert("Failed to get push token for push notification!");
-      Toast.show({
-        type: "error",
-        text1: "Failed to get permissions for push notification!",
-        visibilityTime: 1000,
-        autoHide: true,
-      });
+      // Notification permissions not granted - silently return without showing toast
+      // console.log("Notification permissions not granted, continuing without notifications");
       return;
     }
     // todo implement a later get if device is offline
@@ -77,13 +71,9 @@ async function registerForPushNotificationsAsync() {
     await storeExpoPushTokenInTrip(token, "");
     // console.log(token);
   } else {
-    // alert("Must use physical device for Push Notifications");
-    Toast.show({
-      type: "error",
-      text1: i18n.t("mustUsePhysicalDevice"),
-      visibilityTime: 1000,
-      autoHide: true,
-    });
+    // Not a physical device - silently return without showing toast
+    // console.log("Must use physical device for Push Notifications");
+    return;
   }
 
   if (Platform.OS === "android") {

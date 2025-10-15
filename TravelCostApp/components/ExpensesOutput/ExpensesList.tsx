@@ -172,6 +172,17 @@ function ExpensesList({
     const uid = item.uid;
     async function deleteAllExpenses() {
       try {
+        console.log(
+          "🗑️ [EXPENSES LIST] Starting deleteAllExpenses for rangeId:",
+          item?.rangeId
+        );
+        console.log("🗑️ [EXPENSES LIST] Item details:", {
+          id: item?.id,
+          description: item?.description,
+          rangeId: item?.rangeId,
+          isDeleted: item?.isDeleted,
+        });
+
         navigation?.popToTop();
         Toast.show({
           type: "loading",
@@ -179,29 +190,85 @@ function ExpensesList({
           text2: i18n.t("toastDeleting2"),
           autoHide: false,
         });
-        const allExpenses = isOnline
-          ? await getAllExpenses(tripID)
-          : expenseCtx?.expenses;
-        for (let i = 0; i < allExpenses?.length; i++) {
-          const expense = allExpenses[i];
-          if (expense?.rangeId == item?.rangeId) {
-            // console.log("found a ranged id match", expense?.rangeId);
-            const queueItem: OfflineQueueManageExpenseItem = {
-              type: "delete",
-              expense: {
-                tripid: tripID,
-                uid: expense.uid,
-                id: expense.id,
-              },
-            };
-            expenseCtx?.deleteExpense(expense.id);
-            await deleteExpenseOnlineOffline(queueItem, isOnline);
-          }
+        // Always use local expenses context for ranged deletion to ensure we have all expenses
+        // Server data might be incomplete or not synced yet
+        const allExpenses = expenseCtx?.expenses;
+
+        console.log(
+          "🗑️ [EXPENSES LIST] Total expenses available:",
+          allExpenses.length
+        );
+        console.log("🗑️ [EXPENSES LIST] Looking for rangeId:", item?.rangeId);
+        console.log("🗑️ [EXPENSES LIST] RangeId type:", typeof item?.rangeId);
+
+        // Debug: Show all rangeIds in the expenses
+        const rangeIds = allExpenses
+          .filter((expense) => expense?.rangeId)
+          .map((expense) => ({
+            id: expense.id,
+            rangeId: expense.rangeId,
+            type: typeof expense.rangeId,
+          }));
+        console.log("🗑️ [EXPENSES LIST] All rangeIds in expenses:", rangeIds);
+
+        // Collect all expenses to delete first
+        const expensesToDelete = allExpenses.filter(
+          (expense) => expense?.rangeId === item?.rangeId && !expense.isDeleted
+        );
+
+        console.log(
+          "🗑️ [EXPENSES LIST] Found expenses to delete:",
+          expensesToDelete.length
+        );
+        console.log(
+          "🗑️ [EXPENSES LIST] Expenses to delete:",
+          expensesToDelete.map((e) => ({
+            id: e.id,
+            description: e.description,
+            date: e.date,
+            isDeleted: e.isDeleted,
+          }))
+        );
+
+        // Delete all expenses from server first
+        for (let i = 0; i < expensesToDelete.length; i++) {
+          const expense = expensesToDelete[i];
+          console.log(
+            `🗑️ [EXPENSES LIST] Deleting expense ${i + 1}/${expensesToDelete.length}:`,
+            expense.id
+          );
+
+          const queueItem: OfflineQueueManageExpenseItem = {
+            type: "delete",
+            expense: {
+              tripid: tripID,
+              uid: expense.uid,
+              id: expense.id,
+            },
+          };
+          // Soft delete: call server first
+          await deleteExpenseOnlineOffline(queueItem, isOnline);
+          console.log(
+            `✅ [EXPENSES LIST] Server deletion completed for expense:`,
+            expense.id
+          );
         }
+
+        // Only remove from local state after all server deletions are complete
+        for (let i = 0; i < expensesToDelete.length; i++) {
+          const expense = expensesToDelete[i];
+          console.log(
+            `🗑️ [EXPENSES LIST] Removing from local state:`,
+            expense.id
+          );
+          expenseCtx?.deleteExpense(expense.id);
+        }
+
+        console.log("✅ [EXPENSES LIST] All expenses deleted successfully");
         await touchAllTravelers(tripID, true);
         Toast.hide();
       } catch (error) {
-        // console.log("delete All Error:", error);
+        console.error("❌ [EXPENSES LIST] Delete All Error:", error);
         Toast.show({
           text1: i18n.t("error"),
           text2: i18n.t("error2"),
@@ -681,10 +748,17 @@ function ExpensesList({
                 text2: i18n.t("toastDeleting2"),
                 autoHide: false,
               });
-              for (let i = 0; i < selected?.length; i++) {
-                const expenseItem = expenses.find(
-                  (item) => item.id === selected[i]
-                );
+              // Collect all expenses to delete first
+              // Use local expenses context to ensure we have all data
+              const expensesToDelete = selected
+                .map((expenseId) =>
+                  expenseCtx?.expenses.find((item) => item.id === expenseId)
+                )
+                .filter((expense) => expense && !expense.isDeleted);
+
+              // Delete all expenses from server first
+              for (let i = 0; i < expensesToDelete.length; i++) {
+                const expenseItem = expensesToDelete[i];
                 if (expenseItem.rangeId) {
                   await deleteAllExpensesByRangedId(
                     tripID,
@@ -692,17 +766,26 @@ function ExpensesList({
                     isOnline,
                     expenseCtx
                   );
+                } else {
+                  const item: OfflineQueueManageExpenseItem = {
+                    type: "delete",
+                    expense: {
+                      tripid: tripID,
+                      uid: expenseItem.uid,
+                      id: expenseItem.id,
+                    },
+                  };
+                  await deleteExpenseOnlineOffline(item, isOnline);
                 }
-                const item: OfflineQueueManageExpenseItem = {
-                  type: "delete",
-                  expense: {
-                    tripid: tripID,
-                    uid: expenseItem.uid,
-                    id: expenseItem.id,
-                  },
-                };
-                expenseCtx?.deleteExpense(expenseItem.id);
-                await deleteExpenseOnlineOffline(item, isOnline);
+              }
+
+              // Only remove from local state after all server deletions are complete
+              for (let i = 0; i < expensesToDelete.length; i++) {
+                const expenseItem = expensesToDelete[i];
+                if (!expenseItem.rangeId) {
+                  expenseCtx?.deleteExpense(expenseItem.id);
+                }
+                // Note: ranged expenses are already deleted from local state by deleteAllExpensesByRangedId
               }
               await touchAllTravelers(tripID, true);
               Toast.hide();

@@ -538,7 +538,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
           text: i18n.t("duplicateExpenses"), //i18n.t("duplicate"),
           onPress: () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setHasUserInteracted(true); // Mark that user has interacted with the form
             setDuplOrSplit(DuplicateOption.duplicate);
           },
         },
@@ -547,7 +546,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
           onPress: () => {
             if (duplOrSplit !== 2) setHelperStateForDividing(true);
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setHasUserInteracted(true); // Mark that user has interacted with the form
             setDuplOrSplit(DuplicateOption.split);
           },
         },
@@ -643,7 +641,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       "from:",
       new Error().stack.split("\n")[2]
     );
-    setHasUserInteracted(true); // Mark that user has interacted with the form
     setWhoPaidWithAutoSave(value);
   };
 
@@ -999,7 +996,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   );
 
   function inputChangedHandler(inputIdentifier: string, enteredValue: string) {
-    setHasUserInteracted(true); // Mark that user has interacted with the form
     setInputs((curInputs) => {
       const newInputs = {
         ...curInputs,
@@ -1461,7 +1457,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         value={isPaid}
         onValueChange={(value: string) => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          setHasUserInteracted(true); // Mark that user has interacted with the form
           setIsPaidWithAutoSave(value);
         }}
         buttons={[
@@ -1505,7 +1500,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     <View style={styles.isSpecialContainer}>
       <SettingsSwitch
         toggleState={() => {
-          setHasUserInteracted(true); // Mark that user has interacted with the form
           setIsSpecialExpenseWithAutoSave(!isSpecialExpense);
         }}
         label={
@@ -1976,7 +1970,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                       setItems={setSplitTypeItems}
                       onSelectItem={(item) => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        setHasUserInteracted(true); // Mark that user has interacted with the form
                         setSplitTypeWithAutoSave(item.value);
                         nextModal(item.value, item.value);
                       }}

@@ -298,7 +298,18 @@ function ExpensesContextProvider({ children }) {
   }
 
   function deleteExpense(id: string) {
+    console.log(`🗑️ [EXPENSES CONTEXT] Deleting expense from local state:`, id);
+    const expenseToDelete = expensesState.find((expense) => expense.id === id);
+    if (expenseToDelete) {
+      console.log(`🗑️ [EXPENSES CONTEXT] Expense details:`, {
+        id: expenseToDelete.id,
+        description: expenseToDelete.description,
+        rangeId: expenseToDelete.rangeId,
+        isDeleted: expenseToDelete.isDeleted,
+      });
+    }
     dispatch({ type: "DELETE", payload: id });
+    console.log(`✅ [EXPENSES CONTEXT] Expense removed from local state:`, id);
   }
 
   function updateExpense(id: string, expenseData: ExpenseData) {
@@ -345,7 +356,11 @@ function ExpensesContextProvider({ children }) {
       0
     );
     const yearlyExpenses = expensesState.filter((expense) => {
-      return expense.date >= firstDay && expense.date <= lastDay;
+      return (
+        !expense.isDeleted &&
+        expense.date >= firstDay &&
+        expense.date <= lastDay
+      );
     });
     return { firstDay, lastDay, yearlyExpenses };
   }
@@ -365,7 +380,11 @@ function ExpensesContextProvider({ children }) {
     const lastDay = new Date(dayBack.getFullYear(), dayBack.getMonth() + 1, 0);
 
     const monthlyExpenses = expensesState.filter((expense) => {
-      return expense.date >= firstDay && expense.date <= lastDay;
+      return (
+        !expense.isDeleted &&
+        expense.date >= firstDay &&
+        expense.date <= lastDay
+      );
     });
     return { firstDay, lastDay, monthlyExpenses };
   }
@@ -383,7 +402,11 @@ function ExpensesContextProvider({ children }) {
     const firstDay = prevMonday;
     const lastDay = getDatePlusDays(prevMonday, 6);
     const weeklyExpenses = expensesState.filter((expense) => {
-      return expense.date >= firstDay && expense.date <= lastDay;
+      return (
+        !expense.isDeleted &&
+        expense.date >= firstDay &&
+        expense.date <= lastDay
+      );
     });
     return { firstDay, lastDay, weeklyExpenses };
   }
@@ -391,14 +414,44 @@ function ExpensesContextProvider({ children }) {
     const today = new Date();
     const dayBack = getDateMinusDays(today, daysBack);
     const dayExpenses = expensesState.filter((expense) => {
-      return expense.date.toDateString() === dayBack.toDateString();
+      return (
+        !expense.isDeleted &&
+        expense.date.toDateString() === dayBack.toDateString()
+      );
     });
+
+    console.log(
+      `📅 [DAILY EXPENSES] Getting expenses for ${daysBack} days back (${dayBack.toDateString()})`
+    );
+    console.log(
+      `📅 [DAILY EXPENSES] Total expenses in state: ${expensesState.length}`
+    );
+    console.log(
+      `📅 [DAILY EXPENSES] Found ${dayExpenses.length} expenses for this day`
+    );
+
+    if (dayExpenses.length > 0) {
+      console.log(
+        `📅 [DAILY EXPENSES] Daily expenses:`,
+        dayExpenses.map((e) => ({
+          id: e.id,
+          description: e.description,
+          date: e.date,
+          rangeId: e.rangeId,
+          isDeleted: e.isDeleted,
+        }))
+      );
+    }
+
     return dayExpenses;
   }
 
   function getSpecificDayExpenses(date) {
     const dayExpenses = expensesState.filter((expense) => {
-      return expense.date.toDateString() === date.toDateString();
+      return (
+        !expense.isDeleted &&
+        expense.date.toDateString() === date.toDateString()
+      );
     });
     return dayExpenses;
   }
@@ -408,7 +461,11 @@ function ExpensesContextProvider({ children }) {
     const firstDay = prevMonday;
     const lastDay = getDatePlusDays(prevMonday, 6);
     const weeklyExpenses = expensesState.filter((expense) => {
-      return expense.date >= firstDay && expense.date <= lastDay;
+      return (
+        !expense.isDeleted &&
+        expense.date >= firstDay &&
+        expense.date <= lastDay
+      );
     });
     return weeklyExpenses;
   }
@@ -419,7 +476,11 @@ function ExpensesContextProvider({ children }) {
     const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
     const monthlyExpenses = expensesState.filter((expense) => {
-      return expense.date >= firstDay && expense.date <= lastDay;
+      return (
+        !expense.isDeleted &&
+        expense.date >= firstDay &&
+        expense.date <= lastDay
+      );
     });
     return monthlyExpenses;
   }
@@ -430,7 +491,11 @@ function ExpensesContextProvider({ children }) {
     const lastDay = new Date(date.getFullYear(), 11, 31);
 
     const yearlyExpenses = expensesState.filter((expense) => {
-      return expense.date >= firstDay && expense.date <= lastDay;
+      return (
+        !expense.isDeleted &&
+        expense.date >= firstDay &&
+        expense.date <= lastDay
+      );
     });
     return yearlyExpenses;
   }
@@ -462,8 +527,40 @@ function ExpensesContextProvider({ children }) {
     return true;
   }
 
+  // Filter out soft-deleted expenses for display
+  const filteredExpenses = expensesState.filter(
+    (expense) => !expense.isDeleted
+  );
+
+  // Log filtering results for debugging
+  if (expensesState.length !== filteredExpenses.length) {
+    const deletedCount = expensesState.length - filteredExpenses.length;
+    console.log(
+      `🔍 [EXPENSES CONTEXT] Filtered out ${deletedCount} soft-deleted expenses`
+    );
+    console.log(
+      `🔍 [EXPENSES CONTEXT] Total expenses: ${expensesState.length}, Visible: ${filteredExpenses.length}`
+    );
+
+    // Log details of deleted expenses
+    const deletedExpenses = expensesState.filter(
+      (expense) => expense.isDeleted
+    );
+    if (deletedExpenses.length > 0) {
+      console.log(
+        "🔍 [EXPENSES CONTEXT] Deleted expenses:",
+        deletedExpenses.map((e) => ({
+          id: e.id,
+          description: e.description,
+          rangeId: e.rangeId,
+          isDeleted: e.isDeleted,
+        }))
+      );
+    }
+  }
+
   const value = {
-    expenses: expensesState,
+    expenses: filteredExpenses,
     // Sync loading state
     isSyncing,
     addExpense: addExpense,

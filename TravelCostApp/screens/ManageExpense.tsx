@@ -111,6 +111,17 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   async function deleteExpenseHandler() {
     async function deleteAllExpenses() {
       try {
+        console.log(
+          "🗑️ [MANAGE EXPENSE] Starting deleteAllExpenses for rangeId:",
+          selectedExpense?.rangeId
+        );
+        console.log("🗑️ [MANAGE EXPENSE] Selected expense:", {
+          id: selectedExpense?.id,
+          description: selectedExpense?.description,
+          rangeId: selectedExpense?.rangeId,
+          isDeleted: selectedExpense?.isDeleted,
+        });
+
         navigation?.popToTop();
         Toast.show({
           type: "loading",
@@ -124,11 +135,14 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           isOnline,
           expenseCtx
         );
+        console.log(
+          "✅ [MANAGE EXPENSE] deleteAllExpensesByRangedId completed"
+        );
         Toast.hide();
         await touchAllTravelers(tripid, true);
         Toast.hide();
       } catch (error) {
-        // console.log("delete All Error:", error);
+        console.error("❌ [MANAGE EXPENSE] Delete All Error:", error);
         Toast.show({
           text1: i18n.t("error"),
           text2: i18n.t("error2"),
@@ -425,14 +439,15 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     const differentDates =
       !isSameDay(oldStart, newStart) || !isSameDay(oldEnd, newEnd);
     if (differentDates) {
-      await createRangedData(expenseData);
-      // redo all and delete old ones
+      // Delete old expenses FIRST
       await deleteAllExpensesByRangedId(
         tripid,
         selectedExpense,
         isOnline,
         expenseCtx
       );
+      // Then create new expenses
+      await createRangedData(expenseData);
       return;
     }
     //else update the expenses one by one

@@ -1,0 +1,6 @@
+{
+  "task": "h-fix-ranged-expenses-soft-delete-issues",
+  "branch": "fix/ranged-expenses-soft-delete-issues",
+  "status": "in_progress",
+  "started": "2024-12-19"
+}

@@ -98,34 +98,74 @@ export async function deleteAllExpensesByRangedId(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   expenseCtx: any
 ) {
-  const allExpenses = await getAllExpenses(tripid);
+  console.log(
+    "🗑️ [RANGED DELETE] Starting deletion for rangeId:",
+    selectedExpense?.rangeId
+  );
+  console.log("🗑️ [RANGED DELETE] Selected expense:", {
+    id: selectedExpense?.id,
+    description: selectedExpense?.description,
+    rangeId: selectedExpense?.rangeId,
+    isDeleted: selectedExpense?.isDeleted,
+  });
 
-  // const rangedExpenses = allExpenses.filter(
-  //   (expense) => expense?.rangeId == selectedExpense?.rangeId
-  // );
-  // const countRangedExpensesMax = rangedExpenses?.length;
-  // console.log(
-  //   "deleteAllExpenses ~ countRangedExpensesMax:",
-  //   countRangedExpensesMax
-  // );
-  // let expCounter = 0;
-  for (let i = 0; i < allExpenses?.length; i++) {
-    const expense: ExpenseData = allExpenses[i];
-    if (expense?.rangeId == selectedExpense?.rangeId) {
-      // expCounter++;
-      const queueItem: OfflineQueueManageExpenseItem = {
-        type: "delete",
-        expense: {
-          tripid: tripid,
-          uid: expense.uid,
-          id: expense.id,
-        },
-      };
-      expenseCtx?.deleteExpense(expense.id);
-      await deleteExpenseOnlineOffline(queueItem, isOnline);
-      // console.log("deleted expense nr: " + expCounter, expense.id);
-    }
+  // Use local expenses context instead of server data for ranged deletion
+  // Server data might be incomplete or not synced yet
+  const allExpenses = expenseCtx?.expenses || [];
+  console.log("🗑️ [RANGED DELETE] Total expenses fetched:", allExpenses.length);
+
+  // Collect all expenses to delete first
+  const expensesToDelete = allExpenses.filter(
+    (expense) =>
+      expense?.rangeId === selectedExpense?.rangeId && !expense.isDeleted
+  );
+
+  console.log(
+    "🗑️ [RANGED DELETE] Found expenses to delete:",
+    expensesToDelete.length
+  );
+  console.log(
+    "🗑️ [RANGED DELETE] Expenses to delete:",
+    expensesToDelete.map((e) => ({
+      id: e.id,
+      description: e.description,
+      date: e.date,
+      isDeleted: e.isDeleted,
+    }))
+  );
+
+  // Delete all expenses from server first
+  for (let i = 0; i < expensesToDelete.length; i++) {
+    const expense: ExpenseData = expensesToDelete[i];
+    console.log(
+      `🗑️ [RANGED DELETE] Deleting expense ${i + 1}/${expensesToDelete.length}:`,
+      expense.id
+    );
+
+    const queueItem: OfflineQueueManageExpenseItem = {
+      type: "delete",
+      expense: {
+        tripid: tripid,
+        uid: expense.uid,
+        id: expense.id,
+      },
+    };
+    // Soft delete: call server first
+    await deleteExpenseOnlineOffline(queueItem, isOnline);
+    console.log(
+      `✅ [RANGED DELETE] Server deletion completed for expense:`,
+      expense.id
+    );
   }
+
+  // Only remove from local state after all server deletions are complete
+  for (let i = 0; i < expensesToDelete.length; i++) {
+    const expense: ExpenseData = expensesToDelete[i];
+    console.log(`🗑️ [RANGED DELETE] Removing from local state:`, expense.id);
+    expenseCtx?.deleteExpense(expense.id);
+  }
+
+  console.log("✅ [RANGED DELETE] All ranged expenses deleted successfully");
 }
 
 /**
@@ -195,7 +235,7 @@ export function getExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
 export function getTravellerSum(
   expenses: ExpenseData[],
   traveller: string,
-  isTotal: boolean = false
+  isTotal = false
 ) {
   // Only deduplicate range expenses for total view
   const deduplicatedExpenses = isTotal

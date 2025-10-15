@@ -380,10 +380,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       : // DateTime.fromJSDate(editingValues.endDate).toJSDate())
         getFormattedDate(DateTime.now())
   );
-  const daysBeween =
-    startDate &&
-    endDate &&
-    daysBetween(new Date(endDate), new Date(startDate)) + 1;
+  const daysBeween = startDate && endDate 
+    ? daysBetween(new Date(endDate), new Date(startDate)) + 1
+    : 1;
 
   const openDatePickerRange = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

@@ -4,7 +4,7 @@ import { useContext } from "react";
 import { dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
 import { GlobalStyles } from "../../constants/styles";
-import { getCatString } from "../../util/category";
+import { getCatLocalized } from "../../util/category";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 
 import WebViewChart from "../charts/WebViewChart";
@@ -29,9 +29,9 @@ const CategoryChart = React.memo(
       }
 
       return inputData.map((item: CategoryData) => ({
-        x: getCatString(item.x),
+        x: getCatLocalized(item.x),
         y: item.y,
-        label: `${getCatString(item.x)} ${Number(item.y).toFixed(
+        label: `${getCatLocalized(item.x)} ${Number(item.y).toFixed(
           2
         )} ${getCurrencySymbol(tripCurrency)}`,
         color: item?.color || GlobalStyles.colors.primary400,

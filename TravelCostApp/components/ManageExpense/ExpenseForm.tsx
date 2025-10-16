@@ -33,7 +33,7 @@ import { UserContext } from "../../store/user-context";
 import FlatButton from "../UI/FlatButton";
 import {
   DEFAULTCATEGORIES,
-  getCatString,
+  getCatLocalized,
   getCatSymbol,
   getCatSymbolMMKV,
   mapDescriptionToCategory,
@@ -710,6 +710,15 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       ...prevInputs,
       category: { value: categoryValue, isValid: true },
     }));
+    // Auto-fill description with translated category name if description is empty
+    if (inputs.description.value === "" && categoryValue !== "undefined") {
+      const categoryString = getCatLocalized(categoryValue);
+      setInputs((prevInputs) => ({
+        ...prevInputs,
+        description: { value: categoryString, isValid: true },
+      }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
@@ -808,7 +817,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         );
       }
       if (draftData.category && draftData.category !== "undefined") {
-        const categoryName = getCatString(draftData.category);
+        const categoryName = getCatLocalized(draftData.category);
         changedItems.push(`• ${i18n.t("category")}: ${categoryName}`);
       }
       if (draftData.currency && draftData.currency !== userCtx.lastCurrency) {
@@ -1139,7 +1148,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       expenseData.whoPaid = userCtx.userName;
     // If left completely empty, set to  placeholder
     if (expenseData.description === "")
-      expenseData.description = getCatString(expenseData.category);
+      expenseData.description = getCatLocalized(expenseData.category);
 
     // validate the expenseData
     const amountIsValid =
@@ -1230,7 +1239,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       date: DateTime.fromISO(startDate).toJSDate(),
       startDate: DateTime.fromISO(startDate).toJSDate(),
       endDate: DateTime.fromISO(endDate).toJSDate(),
-      description: getCatString(pickedCat),
+      description: getCatLocalized(pickedCat),
       category: pickedCat,
       country: userCtx.lastCountry ? userCtx.lastCountry : "",
       currency: lastCurrency,
@@ -1249,11 +1258,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   function addDefaultValues(arg) {
     if (!inputs.description.isValid) {
       inputChangedHandler("description", arg);
-    }
-    // Auto-fill description with translated category name if description is empty
-    if (inputs.description.value === "" && arg) {
-      const translatedCategoryName = getCatString(arg);
-      inputChangedHandler("description", translatedCategoryName);
     }
     if (!inputs.category.isValid) {
       inputChangedHandler("category", arg);

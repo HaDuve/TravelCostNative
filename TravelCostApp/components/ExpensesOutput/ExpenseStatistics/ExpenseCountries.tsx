@@ -12,11 +12,14 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { getCatString } from "../../../util/category";
+import { getCatLocalized } from "../../../util/category";
 import PropTypes from "prop-types";
 import { ExpenseData, getExpensesSum } from "../../../util/expense";
 import ExpenseCountryFlag from "../ExpenseCountryFlag";
@@ -101,7 +104,7 @@ const ExpenseCountries = ({
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigation.navigate("FilteredExpenses", {
             expenses: itemData.item.catExpenses,
-            dayString: getCatString(itemData.item.cat) + " " + newPeriodName,
+            dayString: getCatLocalized(itemData.item.cat) + " " + newPeriodName,
           });
         }}
       >

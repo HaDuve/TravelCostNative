@@ -30,7 +30,7 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { getCatString } from "../util/category";
+import { getCatLocalized } from "../util/category";
 import PropTypes from "prop-types";
 import {
   deleteAllExpensesByRangedId,
@@ -456,7 +456,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   async function confirmHandler(expenseData: ExpenseData): Promise<void> {
     try {
       // set the category to the corresponting catstring
-      expenseData.categoryString = getCatString(expenseData.category);
+      expenseData.categoryString = getCatLocalized(expenseData.category);
 
       // calc calcAmount from amount, currency and TripCtx.tripCurrency and add it to expenseData
       const base = tripCtx.tripCurrency;

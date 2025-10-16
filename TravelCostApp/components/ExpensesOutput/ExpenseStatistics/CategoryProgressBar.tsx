@@ -4,7 +4,7 @@ import { GlobalStyles } from "../../../constants/styles";
 import { Ionicons } from "@expo/vector-icons";
 import {
   Category,
-  getCatString,
+  getCatLocalized,
   getCatSymbolMMKV,
 } from "../../../util/category";
 import { useContext } from "react";
@@ -76,7 +76,7 @@ const CategoryProgressBar = ({
             { color: budgetColor, marginLeft: dynamicScale(8) },
           ]}
         >
-          {getCatString(cat)}
+          {getCatLocalized(cat)}
         </Text>
         <View style={{ flex: 1 }}></View>
         <Text style={[styles.sum, { color: GlobalStyles.colors.error300 }]}>

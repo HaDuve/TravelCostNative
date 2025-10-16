@@ -25,7 +25,7 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { getCatString } from "../../../util/category";
+import { getCatLocalized } from "../../../util/category";
 import PropTypes from "prop-types";
 import { processTitleStringFilteredPiecharts } from "../../../util/string";
 import { TripContext } from "../../../store/trip-context";
@@ -117,7 +117,7 @@ const ExpenseCategories = ({
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigation.navigate("FilteredExpenses", {
             expenses: itemData.item.catExpenses,
-            dayString: getCatString(itemData.item.cat) + " " + newPeriodName,
+            dayString: getCatLocalized(itemData.item.cat) + " " + newPeriodName,
           });
         }}
       >

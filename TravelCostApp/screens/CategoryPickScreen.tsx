@@ -29,12 +29,7 @@ import PropTypes from "prop-types";
 import { NetworkContext } from "../store/network-context";
 import { Category, DEFAULTCATEGORIES } from "../util/category";
 import BackButton from "../components/UI/BackButton";
-import {
-  getMMKVObject,
-  setMMKVObject,
-  getExpenseCat,
-  setExpenseCat,
-} from "../store/mmkv";
+import { getMMKVObject, setMMKVObject, setExpenseCat } from "../store/mmkv";
 import { useCallback } from "react";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 import { dynamicScale } from "../util/scalingUtil";
@@ -50,14 +45,13 @@ interface CategoryPickScreenProps {
   route: {
     params?: {
       expenseId?: string;
-      isUpdating?: boolean; // Flag to indicate if we're updating an existing expense
     };
   };
   navigation: any;
 }
 
 const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
-  const { expenseId, isUpdating } = route.params || {};
+  const { expenseId } = route.params || {};
 
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
@@ -146,10 +140,19 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
     if (item.cat === "newCat") {
       await newCatPressHandler();
     } else {
-      // Store category selection in MMKV for both new and existing expenses
-      updateTempCategory(item.cat ?? item.name);
-      // Use consistent navigation for both flows
-      navigation.goBack();
+      const selectedCategory = item.cat ?? item.name;
+
+      if (expenseId) {
+        // Coming from ManageExpense - store and go back
+        updateTempCategory(selectedCategory);
+        navigation.goBack();
+      } else {
+        // Coming from AddExpenseButton - navigate to ManageExpense
+        navigation.navigate("ManageExpense", {
+          pickedCat: selectedCategory,
+          iconName: item.icon,
+        });
+      }
     }
     setIsFetching(false);
   }
@@ -191,7 +194,7 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
         renderItem={renderCatItem}
         ListHeaderComponent={
           <>
-            <BackButton />
+            <BackButton style={{}} />
             <View
               style={{
                 position: "absolute",
@@ -217,8 +220,14 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
             <View style={styles.buttonContainer}>
               <FlatButton
                 onPress={() => {
-                  navigation.goBack();
+                  if (expenseId) {
+                    navigation.goBack();
+                  } else {
+                    // Coming from AddExpenseButton - return to home
+                    navigation.navigate("Home");
+                  }
                 }}
+                textStyle={{}}
               >
                 {i18n.t("cancel")}
               </FlatButton>
@@ -226,10 +235,14 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
                 <GradientButton
                   buttonStyle={styles.continueButtonStyle}
                   onPress={() => {
-                    // Store undefined category in MMKV for both new and existing expenses
-                    updateTempCategory("undefined");
-                    // Use consistent navigation for both flows
-                    navigation.goBack();
+                    if (expenseId) {
+                      updateTempCategory("undefined");
+                      navigation.goBack();
+                    } else {
+                      navigation.navigate("ManageExpense", {
+                        pickedCat: "undefined",
+                      });
+                    }
                   }}
                 >
                   {i18n.t("continue")}

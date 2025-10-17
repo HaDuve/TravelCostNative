@@ -194,7 +194,7 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
         renderItem={renderCatItem}
         ListHeaderComponent={
           <>
-            <BackButton style={{}} />
+            <BackButton style={{ zIndex: 1000 }} />
             <View
               style={{
                 position: "absolute",
@@ -220,12 +220,7 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
             <View style={styles.buttonContainer}>
               <FlatButton
                 onPress={() => {
-                  if (expenseId) {
-                    navigation.goBack();
-                  } else {
-                    // Coming from AddExpenseButton - return to home
-                    navigation.navigate("Home");
-                  }
+                  navigation.goBack();
                 }}
                 textStyle={{}}
               >

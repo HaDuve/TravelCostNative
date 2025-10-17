@@ -20,6 +20,7 @@ const BackButton = ({ style }) => {
     <Pressable
       style={[GlobalStyles.backButton, style]}
       onPress={onPressHandler}
+      hitSlop={10}
     >
       <IconButton
         icon="arrow-back-outline"

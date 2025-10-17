@@ -702,23 +702,25 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     (expense) => expense.description
   );
 
+
   // Helper function to update category and icon
   const updateCategoryAndIcon = useCallback((categoryValue: string) => {
     const symbol = getCatSymbolMMKV(categoryValue);
     setIcon(symbol);
-    setInputs((prevInputs) => ({
-      ...prevInputs,
-      category: { value: categoryValue, isValid: true },
-    }));
-    // Auto-fill description with translated category name if description is empty
-    if (inputs.description.value === "" && categoryValue !== "undefined") {
-      const categoryString = getCatLocalized(categoryValue);
-      setInputs((prevInputs) => ({
+    setInputs((prevInputs) => {
+      const canSetNewDescription =
+        categoryValue !== "undefined" &&
+        prevInputs.description.value === "" &&
+        prevInputs.category.value !== categoryValue;
+      const newDescription = canSetNewDescription
+        ? getCatLocalized(categoryValue)
+        : prevInputs.description.value || "";
+      return {
         ...prevInputs,
-        description: { value: categoryString, isValid: true },
-      }));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        category: { value: categoryValue, isValid: true },
+        description: { value: newDescription, isValid: true },
+      };
+    });
   }, []);
 
   /**

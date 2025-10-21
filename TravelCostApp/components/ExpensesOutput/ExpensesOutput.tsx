@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, ScrollView, Dimensions } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
 import ExpensesList from "./ExpensesList";
@@ -13,7 +13,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -74,36 +77,45 @@ function ExpensesOutput({
     }
     return (
       <Animated.View exiting={SlideOutLeft} style={styles.fallbackContainer}>
-        <View style={styles.fallbackInnerContainer}>
-          {showLoading && <LoadingOverlay></LoadingOverlay>}
-          {!showLoading && <Text style={styles.infoText}>{fallbackText}</Text>}
-          {showYesterday && (
-            <FlatButton
-              textStyle={{ marginVertical: dynamicScale(4, false, 0.5) }}
-              onPress={() => {
-                navigation.navigate("FilteredExpenses", {
-                  expenses: yesterdayExpenses,
-                  dayString: i18n.t("yesterday"),
-                });
-              }}
-            >
-              {i18n.t("showXResults1") + " " + i18n.t("yesterday")}
-            </FlatButton>
-          )}
-          {showTomorrow && (
-            <FlatButton
-              textStyle={{ marginVertical: dynamicScale(4, false, 0.5) }}
-              onPress={() => {
-                navigation.navigate("FilteredExpenses", {
-                  expenses: tomorrowExpenses,
-                  dayString: i18n.t("tomorrow"),
-                });
-              }}
-            >
-              {i18n.t("showXResults1") + " " + i18n.t("tomorrow")}
-            </FlatButton>
-          )}
-        </View>
+        <ScrollView
+          style={styles.fallbackScrollView}
+          contentContainerStyle={styles.fallbackScrollContent}
+          refreshControl={refreshControl}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.fallbackInnerContainer}>
+            {showLoading && <LoadingOverlay></LoadingOverlay>}
+            {!showLoading && (
+              <Text style={styles.infoText}>{fallbackText}</Text>
+            )}
+            {showYesterday && (
+              <FlatButton
+                textStyle={{ marginVertical: dynamicScale(4, false, 0.5) }}
+                onPress={() => {
+                  (navigation as any).navigate("FilteredExpenses", {
+                    expenses: yesterdayExpenses,
+                    dayString: i18n.t("yesterday"),
+                  });
+                }}
+              >
+                {i18n.t("showXResults1") + " " + i18n.t("yesterday")}
+              </FlatButton>
+            )}
+            {showTomorrow && (
+              <FlatButton
+                textStyle={{ marginVertical: dynamicScale(4, false, 0.5) }}
+                onPress={() => {
+                  (navigation as any).navigate("FilteredExpenses", {
+                    expenses: tomorrowExpenses,
+                    dayString: i18n.t("tomorrow"),
+                  });
+                }}
+              >
+                {i18n.t("showXResults1") + " " + i18n.t("tomorrow")}
+              </FlatButton>
+            )}
+          </View>
+        </ScrollView>
       </Animated.View>
     );
   }, [
@@ -147,11 +159,19 @@ const styles = StyleSheet.create({
   },
   fallbackContainer: {
     position: "absolute",
-    alignSelf: "center",
-    margin: "10%",
+    marginHorizontal: "10%",
+    height: Dimensions.get("window").height,
+  },
+  fallbackScrollView: {
+    flex: 1,
+  },
+  fallbackScrollContent: {
+    flexGrow: 1,
+    justifyContent: "flex-start",
   },
   fallbackInnerContainer: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
+    paddingTop: dynamicScale(64, true, 0.5),
   },
   header: {
     flexDirection: "row",

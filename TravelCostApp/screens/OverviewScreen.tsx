@@ -1,8 +1,21 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+} from "react";
 import DropDownPicker from "react-native-dropdown-picker";
-import { ExpensesContext, RangeString } from "../store/expenses-context";
+import { ExpensesContext } from "../store/expenses-context";
 import { UserContext } from "../store/user-context";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
 import { MemoizedExpensesOverview } from "../components/ExpensesOutput/ExpensesOverview";
@@ -28,7 +41,7 @@ import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { ExpenseData } from "../util/expense";
 import * as Haptics from "expo-haptics";
 import { SettingsContext } from "../store/settings-context";
-import { formatExpenseWithCurrency, truncateString } from "../util/string";
+import { truncateString } from "../util/string";
 import { TripContext } from "../store/trip-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
@@ -36,6 +49,9 @@ import { showBanner } from "../components/UI/ToastComponent";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 import { OnboardingFlags } from "../types/onboarding";
+import { refreshWithToast } from "../util/refreshWithToast";
+import { getOfflineQueue } from "../util/offline-queue";
+import { AuthContext } from "../store/auth-context";
 
 const OverviewScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
@@ -43,8 +59,13 @@ const OverviewScreen = ({ navigation }) => {
   const userCtx = useContext(UserContext);
   const netCtx = useContext(NetworkContext);
   const { settings } = useContext(SettingsContext);
+  const authCtx = useContext(AuthContext);
+  const uid = authCtx.uid;
+  const tripid = tripCtx.tripid;
 
   const [open, setOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   const [dateTimeString, setDateTimeString] = useState("");
   // strong connection state
@@ -117,18 +138,43 @@ const OverviewScreen = ({ navigation }) => {
     { label: i18n.t("totalLabel"), value: "total" },
   ]);
 
+  const onRefresh = useCallback(async () => {
+    // check if we have a offline queue
+    const offlineQueue = await getOfflineQueue();
+    // if we have a offline queue return
+    if (offlineQueue && offlineQueue?.length > 0) {
+      return;
+    }
+
+    try {
+      await refreshWithToast({
+        showRefIndicator: true,
+        showAnyIndicator: true,
+        setIsFetching,
+        setRefreshing,
+        expensesCtx,
+        tripid,
+        uid,
+        tripCtx,
+      });
+    } catch (error) {
+      // Error handling is done in refreshWithToast
+      // console.log("Refresh error:", error);
+    }
+  }, [expensesCtx, tripid, uid, tripCtx, setIsFetching, setRefreshing]);
+
   const recentExpenses: Array<ExpenseData> = useMemo(
     () => expensesCtx.getRecentExpenses(PeriodValue),
     [PeriodValue, expensesCtx.expenses, dateTimeString]
   );
-  const expensesSum = recentExpenses.reduce((sum, expense) => {
-    if (isNaN(Number(expense.calcAmount))) return sum;
-    return sum + Number(expense.calcAmount);
-  }, 0);
-  const expensesSumString = formatExpenseWithCurrency(
-    expensesSum,
-    tripCtx.tripCurrency
-  );
+  // const expensesSum = recentExpenses.reduce((sum, expense) => {
+  //   if (isNaN(Number(expense.calcAmount))) return sum;
+  //   return sum + Number(expense.calcAmount);
+  // }, 0);
+  // const expensesSumString = formatExpenseWithCurrency(
+  //   expensesSum,
+  //   tripCtx.tripCurrency
+  // );
   const { isPortrait, isTablet } = useContext(OrientationContext);
   return (
     <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
@@ -201,11 +247,26 @@ const OverviewScreen = ({ navigation }) => {
         ></View>
       }
 
-      <MemoizedExpensesOverview
-        navigation={navigation}
-        expenses={recentExpenses}
-        periodName={PeriodValue}
-      />
+      <ScrollView
+        style={{ flex: 1 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing || isFetching}
+            onRefresh={onRefresh}
+            tintColor={GlobalStyles.colors.textColor}
+            colors={[GlobalStyles.colors.textColor]}
+            style={{
+              backgroundColor: "transparent",
+            }}
+          />
+        }
+      >
+        <MemoizedExpensesOverview
+          navigation={navigation}
+          expenses={recentExpenses}
+          periodName={PeriodValue}
+        />
+      </ScrollView>
     </View>
   );
 };

@@ -51,12 +51,13 @@ import { NetworkContext } from "../store/network-context";
 import { sendOfflineQueue } from "../util/offline-queue";
 import * as Haptics from "expo-haptics";
 import { SettingsContext } from "../store/settings-context";
-import { formatExpenseWithCurrency, truncateString } from "../util/string";
+import { truncateString } from "../util/string";
 import { Platform } from "react-native";
 import { memo } from "react";
 import { getMMKVObject } from "../store/mmkv";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
+import { refreshWithToast } from "../util/refreshWithToast";
 
 function RecentExpenses({ navigation }) {
   const expensesCtx = useContext(ExpensesContext);
@@ -187,17 +188,29 @@ function RecentExpenses({ navigation }) {
 
   const onRefresh = useCallback(async () => {
     // console.log("refreshing: ", refreshing);
-    setRefreshing(true);
     // check if we have a offline queue
     const offlineQueue = await getOfflineQueue();
     // if we have a offline queue return
     if (offlineQueue && offlineQueue?.length > 0) {
-      setRefreshing(false);
       return;
     }
-    await getExpenses(true, true, true);
-    setRefreshing(false);
-  }, [getExpenses]);
+
+    try {
+      await refreshWithToast({
+        showRefIndicator: true,
+        showAnyIndicator: true,
+        setIsFetching,
+        setRefreshing,
+        expensesCtx,
+        tripid,
+        uid,
+        tripCtx,
+      });
+    } catch (error) {
+      // Error handling is done in refreshWithToast
+      // console.log("Refresh error:", error);
+    }
+  }, [expensesCtx, tripid, uid, tripCtx, setIsFetching, setRefreshing]);
 
   // strong connection state
   const [offlineString, setOfflineString] = useState("");
@@ -305,11 +318,11 @@ function RecentExpenses({ navigation }) {
       }, 0),
     [recentExpenses?.length]
   );
-  const expensesSum = useMemo(getExpensesSum, [getExpensesSum]);
-  const expensesSumString = formatExpenseWithCurrency(
-    expensesSum,
-    tripCtx.tripCurrency
-  );
+  // const expensesSum = useMemo(getExpensesSum, [getExpensesSum]);
+  // const expensesSumString = formatExpenseWithCurrency(
+  //   expensesSum,
+  //   tripCtx.tripCurrency
+  // );
 
   const ExpensesOutputJSX = (
     <MemoizedExpensesOutput

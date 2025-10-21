@@ -418,6 +418,12 @@ const en = {
   toastSyncFinished1: "Online again!",
   toastSyncFinished21: "Synchronized",
   toastSyncFinished22: "offline Changes!",
+  toastSyncSuccessUpToDate: "Your Trip is up to date!",
+  toastSyncSuccessWithCount: "Successfully synced",
+  toastSyncSuccessExpenses: "expenses",
+  toastSyncFailed: "Failed to sync, please try again later",
+  toastSyncSuccessTitle: "Sync Successful",
+  toastSyncFailedTitle: "Sync Failed",
 
   // rate modal
   rateModalTitle: "Enjoying Budget for Nomads?",
@@ -971,6 +977,13 @@ const de = {
   toastSyncFinished1: "Wieder online!",
   toastSyncFinished21: "Synchronisiert",
   toastSyncFinished22: "Offline-Änderungen!",
+  toastSyncSuccessUpToDate: "Deine Reise ist auf dem neuesten Stand!",
+  toastSyncSuccessWithCount: "Erfolgreich synchronisiert",
+  toastSyncSuccessExpenses: "Ausgaben",
+  toastSyncFailed:
+    "Synchronisation fehlgeschlagen, bitte versuche es später erneut",
+  toastSyncSuccessTitle: "Synchronisation erfolgreich",
+  toastSyncFailedTitle: "Synchronisation fehlgeschlagen",
   // rate modal
   rateModalTitle: "Gefällt dir Budget for Nomads?",
   rateModalSubTitle:
@@ -1523,6 +1536,12 @@ const fr = {
   toastSyncFinished1: "En ligne à nouveau !",
   toastSyncFinished21: "Synchronisé",
   toastSyncFinished22: "modifications hors ligne !",
+  toastSyncSuccessUpToDate: "Votre voyage est à jour !",
+  toastSyncSuccessWithCount: "Synchronisé avec succès",
+  toastSyncSuccessExpenses: "dépenses",
+  toastSyncFailed: "Échec de la synchronisation, veuillez réessayer plus tard",
+  toastSyncSuccessTitle: "Synchronisation réussie",
+  toastSyncFailedTitle: "Échec de la synchronisation",
   // rate modal
   rateModalTitle: "Vous appréciez Budget for Nomads ?",
   rateModalSubTitle:
@@ -2078,6 +2097,12 @@ const ru = {
   toastSyncFinished1: "Снова онлайн!",
   toastSyncFinished21: "Синхронизированы",
   toastSyncFinished22: "офлайн изменения!",
+  toastSyncSuccessUpToDate: "Ваша поездка актуальна!",
+  toastSyncSuccessWithCount: "Успешно синхронизировано",
+  toastSyncSuccessExpenses: "расходов",
+  toastSyncFailed: "Не удалось синхронизировать, попробуйте позже",
+  toastSyncSuccessTitle: "Синхронизация успешна",
+  toastSyncFailedTitle: "Ошибка синхронизации",
   // rate modal
   rateModalTitle: "Нравится Budget for Nomads?",
   rateModalSubTitle:

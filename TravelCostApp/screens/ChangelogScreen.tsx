@@ -42,10 +42,10 @@ const ChangelogScreen = ({ navigation }) => {
   const { strongConnection } = useContext(NetworkContext);
   const [isFetching, setIsFetching] = useState(true);
   const [changelogText, setChangelogText] = useState("");
-  const [currentVersion, setCurrentVersion] = useState("");
-  const [showInfo, setShowInfo] = useState(false);
+  // const [currentVersion, setCurrentVersion] = useState("");
+  // const [showInfo, setShowInfo] = useState(false);
   const [showNewChanges, setShowNewChanges] = useState(true);
-  const [showOldChanges, setShowOldChanges] = useState(false);
+  const [showOldChanges, setShowOldChanges] = useState(true);
 
   const formatStringStart = "__Newest Changes:";
   const formatStringEnd = "__Other Changes:";
@@ -86,7 +86,7 @@ const ChangelogScreen = ({ navigation }) => {
         setChangelogText(newChangelogText); //.replaceAll("- ", "\n • "));
         const versionCheckResponse: VersionCheckResponse = await versionCheck();
         if (versionCheckResponse) {
-          setCurrentVersion(versionCheckResponse.currentVersion);
+          // setCurrentVersion(versionCheckResponse.currentVersion);
           setMMKVString("currentVersion", versionCheckResponse.currentVersion);
         }
         setIsFetching(false);
@@ -106,7 +106,9 @@ const ChangelogScreen = ({ navigation }) => {
     return (
       <ScrollView style={styles.container}>
         <BackButton style={{ marginTop: -20, marginBottom: 0, padding: 4 }} />
-        <LoadingBarOverlay customText={i18n.t("loadingChangelog")}></LoadingBarOverlay>
+        <LoadingBarOverlay
+          customText={i18n.t("loadingChangelog")}
+        ></LoadingBarOverlay>
       </ScrollView>
     );
   }
@@ -158,7 +160,7 @@ const ChangelogScreen = ({ navigation }) => {
           renderItem={renderChangelogItem}
         ></Animated.FlatList>
       )}
-      <Pressable
+      {/* <Pressable
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           setShowInfo(!showInfo);
@@ -197,7 +199,7 @@ const ChangelogScreen = ({ navigation }) => {
             </Text>
           </Animated.View>
         )}
-      </Pressable>
+      </Pressable> */}
       <View style={{ minHeight: 24 }}></View>
     </ScrollView>
   );

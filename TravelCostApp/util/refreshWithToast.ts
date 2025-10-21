@@ -42,9 +42,10 @@ export async function refreshWithToast({
   const expensesCountBefore = expensesCtx.expenses.length;
 
   try {
+    // Call fetchAndSetExpenses but don't let it control the loading states
     await fetchAndSetExpenses(
-      showRefIndicator,
-      showAnyIndicator,
+      true, // showRefIndicator = true (don't control isFetching)
+      true, // showAnyIndicator = true (don't control refreshing)
       setIsFetching,
       setRefreshing,
       expensesCtx,
@@ -84,5 +85,9 @@ export async function refreshWithToast({
 
     // Re-throw the error so the calling component can handle it
     throw error;
+  } finally {
+    // Turn off loading indicators AFTER toast is shown
+    if (!showRefIndicator && !showAnyIndicator) setIsFetching(false);
+    if (!showAnyIndicator) setRefreshing(false);
   }
 }

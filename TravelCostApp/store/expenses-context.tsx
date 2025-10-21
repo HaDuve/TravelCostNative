@@ -82,7 +82,7 @@ export type ExpenseContextType = {
   setIsSyncing: (syncing: boolean) => void;
 };
 
-export const ExpensesContext = createContext({
+export const ExpensesContext = createContext<ExpenseContextType>({
   expenses: [],
   // Sync loading state defaults
   isSyncing: false,

@@ -1,5 +1,4 @@
 import React, { createContext, useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import SplashScreenOverlay from "../components/UI/SplashScreenOverlay";
 import PropTypes from "prop-types";
 import { secureStoreGetItem, secureStoreSetItem } from "./secure-storage";
@@ -16,31 +15,42 @@ export interface Settings {
   disableNumberAnimations: boolean;
 }
 
-export const SettingsContext = createContext({
-  settings: {} as Settings,
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  saveSettings: async (settings: Settings): Promise<void> => {},
+export type SettingsContextType = {
+  settings: Settings;
+  saveSettings: (settings: Settings) => Promise<void>;
+};
+
+const defaultSettings: Settings = {
+  showFlags: true,
+  showWhoPaid: true,
+  alwaysShowAdvanced: false,
+  skipCategoryScreen: false,
+  showInternetSpeed: false,
+  hideSpecialExpenses: false,
+  disableNumberAnimations: false,
+};
+
+export const SettingsContext = createContext<SettingsContextType>({
+  settings: defaultSettings,
+  saveSettings: async (_settings: Settings): Promise<void> => {
+    return Promise.resolve();
+  },
 });
 
-export const SettingsProvider = ({ children }) => {
-  const [settings, setSettings] = useState<Settings>(null);
+export const SettingsProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  const [settings, setSettings] = useState<Settings>(defaultSettings);
 
   useEffect(() => {
     const loadSettingsAsync = async () => {
       const settingsString = await secureStoreGetItem("settings");
       if (settingsString) {
         const loadedSettings: Settings = safelyParseJSON(settingsString);
-        setSettings(loadedSettings);
-      } else
-        setSettings({
-          showFlags: true,
-          showWhoPaid: true,
-          alwaysShowAdvanced: true,
-          skipCategoryScreen: true,
-          showInternetSpeed: true,
-          hideSpecialExpenses: true,
-          disableNumberAnimations: false,
-        });
+        loadedSettings && setSettings(loadedSettings);
+      } else setSettings(defaultSettings);
     };
     loadSettingsAsync();
   }, []);

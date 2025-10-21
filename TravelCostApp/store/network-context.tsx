@@ -9,13 +9,23 @@ import {
 import { useInterval } from "../components/Hooks/useInterval";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
 
-export const NetworkContext = createContext({
-  isConnected: true,
-  strongConnection: true,
+export type NetworkContextType = {
+  isConnected: boolean;
+  strongConnection: boolean;
+  lastConnectionSpeedInMbps: number;
+};
+
+export const NetworkContext = createContext<NetworkContextType>({
+  isConnected: false,
+  strongConnection: false,
   lastConnectionSpeedInMbps: 0,
 });
 
-const NetworkContextProvider = ({ children }) => {
+const NetworkContextProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [isConnected, setIsConnected] = useState(!DEBUG_FORCE_OFFLINE);
   const [strongConnection, setStrongConnection] = useState(false);
   const [lastConnectionSpeedInMbps, setLastConnectionSpeedInMbps] = useState(0);

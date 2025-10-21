@@ -72,7 +72,7 @@ export type TripContextType = {
   isDynamicDailyBudget: boolean;
 };
 
-export const TripContext = createContext({
+export const TripContext = createContext<TripContextType>({
   tripid: "",
   tripName: "",
   totalBudget: "",

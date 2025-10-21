@@ -62,7 +62,46 @@ export interface UserData {
   locale?: string;
 }
 
-export const UserContext = createContext({
+export type UserContextType = {
+  userName: string;
+  setUserName: (name: string) => void;
+  periodName: RangeString;
+  setPeriodString: (string: string) => void;
+
+  lastCurrency: string;
+  setLastCurrency: (string: string) => void;
+  lastCountry: string;
+  setLastCountry: (string: string) => void;
+
+  addUserName: (userData: UserData) => void;
+  deleteUser: (uid: string) => void;
+
+  freshlyCreated: boolean;
+  setFreshlyCreatedTo: (bool: boolean) => void;
+  needsTour: boolean;
+  setNeedsTour: (bool: boolean) => void;
+
+  tripHistory: string[];
+  setTripHistory: (tripHistory: string[]) => void;
+  updateTripHistory: () => void;
+  isOnline: boolean;
+  setIsOnline: (bool: boolean) => void;
+  saveUserNameInStorage: (name: string) => void;
+  loadUserNameFromStorage: () => void;
+  isPremium: boolean;
+  checkPremium: () => Promise<boolean>;
+  loadCatListFromAsyncInCtx: (tripid: string) => void;
+  catIconNames: string[];
+  loadLastCurrencyCountryFromAsync: () => void;
+  setIsShowingGraph: (bool: boolean) => void;
+  isShowingGraph: boolean;
+  isSendingOfflineQueueMutex: boolean;
+  setIsSendingOfflineQueueMutex: (bool: boolean) => void;
+  hasNewChanges: boolean;
+  setHasNewChanges: (bool: boolean) => void;
+};
+
+export const UserContext = createContext<UserContextType>({
   userName: "",
   setUserName: async (name: string) => {},
   periodName: RangeString.day,

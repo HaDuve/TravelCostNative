@@ -113,7 +113,7 @@ import { NavigationProp } from "@react-navigation/native";
 
 // Modal state machine for cascading flows
 const modalStates = {
-  NONE: "none",
+  CLOSED: "closed",
   WHO_PAID: "whoPaid",
   HOW_SHARED: "howShared",
   EXACT_SHARING: "exactSharing",
@@ -567,16 +567,16 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     [currentTravellers]
   );
 
-  const [modalFlow, setModalFlow] = useState(modalStates.NONE);
+  const [modalFlow, setModalFlow] = useState(modalStates.CLOSED);
 
   const nextModal = (selectedValue) => {
     switch (modalFlow) {
       case modalStates.WHO_PAID:
         if (selectedValue === "__ADD_TRAVELLER__") {
-          setModalFlow(modalStates.NONE); // Go to share screen, no more modals
+          // Going to share screen
+          setModalFlow(modalStates.CLOSED);
         } else {
-          // Close current modal and open next one after a brief delay
-          setModalFlow(modalStates.NONE);
+          setModalFlow(modalStates.CLOSED);
           setTimeout(() => {
             setModalFlow(modalStates.HOW_SHARED);
           }, 100);
@@ -585,26 +585,27 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
       case modalStates.HOW_SHARED:
         if (selectedValue === splitTypes.EXACT) {
-          setModalFlow(modalStates.NONE);
+          setModalFlow(modalStates.CLOSED);
           setTimeout(() => {
             setModalFlow(modalStates.EXACT_SHARING);
           }, 100);
         } else {
-          setSplitType(splitTypes.EQUAL);
-          splitHandler();
-          setModalFlow(modalStates.NONE); // EQUAL/SELF, flow complete
+          // EQUAL/SELF
+          setSplitType(selectedValue);
+          splitHandler(selectedValue);
+          setModalFlow(modalStates.CLOSED);
         }
         break;
 
       case modalStates.EXACT_SHARING:
-        setModalFlow(modalStates.NONE);
+        setModalFlow(modalStates.CLOSED);
         setTimeout(() => {
           openTravellerMultiPicker(); // Open the traveller picker
         }, 100);
         break;
 
       default:
-        setModalFlow(modalStates.NONE);
+        setModalFlow(modalStates.CLOSED);
     }
   };
 
@@ -701,7 +702,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   const suggestionData = last500Daysexpenses.map(
     (expense) => expense.description
   );
-
 
   // Helper function to update category and icon
   const updateCategoryAndIcon = useCallback((categoryValue: string) => {
@@ -997,7 +997,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   }
 
   if (splitType === splitTypes.EQUAL && openEQUAL) {
-    splitHandler();
+    splitHandler(splitTypes.EQUAL);
     setOpenEQUAL(false);
   }
 
@@ -1020,12 +1020,12 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     setSplitListValid(validateSplitList(tempList, splitType, +amountValue));
   }
 
-  function splitHandler() {
+  function splitHandler(selectedSplitType: splitType) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const splitTravellers = splitTravellersList;
     // calculate splits
     const listSplits = calcSplitList(
-      splitType,
+      selectedSplitType ?? splitType,
       +amountValue,
       whoPaid,
       splitTravellers
@@ -1861,7 +1861,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                             items={items}
                             setOpen={(open) => {
                               setModalFlow(
-                                open ? modalStates.WHO_PAID : modalStates.NONE
+                                open ? modalStates.WHO_PAID : modalStates.CLOSED
                               );
                             }}
                             setValue={handleWhoPaidChange}
@@ -1869,7 +1869,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                             onClose={() => {
                               // Only reset modal flow if we're not transitioning to another modal
                               if (modalFlow === modalStates.WHO_PAID) {
-                                setModalFlow(modalStates.NONE);
+                                setModalFlow(modalStates.CLOSED);
                               }
                             }}
                             onOpen={() => {
@@ -1938,7 +1938,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                       items={splitItems}
                       setOpen={(open) => {
                         setModalFlow(
-                          open ? modalStates.HOW_SHARED : modalStates.NONE
+                          open ? modalStates.HOW_SHARED : modalStates.CLOSED
                         );
                       }}
                       setValue={setSplitType}
@@ -1952,7 +1952,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                         // Only reset modal flow if we're not transitioning to another modal
                         // Don't reset if we're about to go to EXACT_SHARING
                         if (modalFlow === modalStates.HOW_SHARED) {
-                          setModalFlow(modalStates.NONE);
+                          setModalFlow(modalStates.CLOSED);
                         }
                       }}
                       onOpen={() => {
@@ -1991,7 +1991,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                       if (open) {
                         setModalFlow(modalStates.EXACT_SHARING);
                       } else {
-                        setModalFlow(modalStates.NONE);
+                        setModalFlow(modalStates.CLOSED);
                         setOpenEQUAL(false);
                       }
                     }}
@@ -2004,7 +2004,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                     setValue={setListEQUAL}
                     setItems={setSplitItemsEQUAL}
                     onClose={() => {
-                      setModalFlow(modalStates.NONE);
+                      setModalFlow(modalStates.CLOSED);
                       splitHandler();
                     }}
                     listMode="MODAL"

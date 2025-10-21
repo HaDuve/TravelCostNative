@@ -2,10 +2,16 @@ Changelog Travel Expense App
 
 __Newest Changes:
 
-1.2.803a
+1.3.002
+- Added animated Numbers to Expense Summary
+- Improved local price research (AI + web search)
+- Improved Charts
 - Bugfixes and performance improvements
 
 __Other Changes:
+
+1.2.803a
+- Bugfixes and performance improvements
 
 1.2.803
 - Advanced Charts, Splitting Expenses and GPT no longer require premium account

@@ -1,8 +1,4 @@
-import {
-  getAllExpenses,
-  unTouchTraveler,
-  SyncLoadingCallback,
-} from "../../util/http";
+import { getAllExpenses, unTouchTraveler } from "../../util/http";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -16,7 +12,6 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import { setMMKVObject } from "../../store/mmkv";
 import { getExpensesSum } from "../../util/expense";
 import { ExpenseContextType } from "../../store/expenses-context";
 import { TripContextType } from "../../store/trip-context";
@@ -33,8 +28,8 @@ export async function fetchAndSetExpenses(
   uid: string,
   tripCtx: TripContextType
 ) {
-  if (!showRefIndicator && !showAnyIndicator) setIsFetching(true);
-  if (!showAnyIndicator) setRefreshing(true);
+  if (showRefIndicator && showAnyIndicator) setIsFetching(true);
+  if (showAnyIndicator) setRefreshing(true);
   try {
     await unTouchTraveler(tripid, uid);
 
@@ -72,8 +67,8 @@ export async function fetchAndSetExpenses(
     // Ensure sync state is reset on error
     expensesCtx.setIsSyncing(false);
   }
-  if (!showRefIndicator && !showAnyIndicator) setIsFetching(false);
-  if (!showAnyIndicator) setRefreshing(false);
+  if (showRefIndicator && showAnyIndicator) setIsFetching(false);
+  if (showAnyIndicator) setRefreshing(false);
 }
 
 export function getDateRangeExpenses(startDate, endDate, expenses) {

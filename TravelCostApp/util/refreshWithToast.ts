@@ -5,6 +5,8 @@ import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpenses
 import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { ExpenseContextType } from "../store/expenses-context";
+import { TripContextType } from "../store/trip-context";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -17,15 +19,10 @@ export interface RefreshWithToastParams {
   showAnyIndicator: boolean;
   setIsFetching: (isFetching: boolean) => void;
   setRefreshing: (isRefreshing: boolean) => void;
-  expensesCtx: {
-    expenses: any[];
-    mergeExpenses: (expenses: any[]) => void;
-  };
+  expensesCtx: ExpenseContextType;
   tripid: string;
   uid: string;
-  tripCtx: {
-    setTotalSum: (sum: number) => void;
-  };
+  tripCtx: TripContextType;
 }
 
 export async function refreshWithToast({
@@ -44,14 +41,14 @@ export async function refreshWithToast({
   try {
     // Call fetchAndSetExpenses but don't let it control the loading states
     await fetchAndSetExpenses(
-      true, // showRefIndicator = true (don't control isFetching)
-      true, // showAnyIndicator = true (don't control refreshing)
+      showRefIndicator,
+      showAnyIndicator,
       setIsFetching,
       setRefreshing,
-      expensesCtx,
+      expensesCtx as ExpenseContextType,
       tripid,
       uid,
-      tripCtx
+      tripCtx as TripContextType
     );
 
     // Calculate how many new expenses were synced
@@ -85,9 +82,5 @@ export async function refreshWithToast({
 
     // Re-throw the error so the calling component can handle it
     throw error;
-  } finally {
-    // Turn off loading indicators AFTER toast is shown
-    if (!showRefIndicator && !showAnyIndicator) setIsFetching(false);
-    if (!showAnyIndicator) setRefreshing(false);
   }
 }

@@ -242,18 +242,14 @@ function RecentExpenses({ navigation }) {
   useEffect(() => {
     const asyncLoading = async () => {
       // if expenses not empty, return
-      if (
-        !loadedOnce &&
-        expensesCtx.expenses &&
-        expensesCtx.expenses?.length > 0
-      ) {
+      if (!loadedOnce && !expensesCtx.expenses?.length) {
         await getExpenses(true, true, true);
         setLoadedOnce(true);
       }
     };
     asyncLoading();
   }, [
-    expensesCtx.expenses,
+    expensesCtx.expenses?.length,
     getExpenses,
     loadedOnce,
     netCtx.isConnected,
@@ -282,7 +278,7 @@ function RecentExpenses({ navigation }) {
       setDateTimeString(_toShortFormat(DateTime.now()));
       if (isForeground()) {
         const asyncPolling = async () => {
-          await getExpenses(true, true);
+          await getExpenses(false, true);
         };
         asyncPolling();
       }

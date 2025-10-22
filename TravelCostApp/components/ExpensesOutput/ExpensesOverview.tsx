@@ -201,7 +201,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       {titleContainerJSX}
       <View
         style={[
-          // styles.toggleButton
+          styles.toggleButton,
           !isPortrait && styles.landscapeToggleButtonContainer,
         ]}
       >
@@ -284,24 +284,25 @@ const styles = StyleSheet.create({
     marginLeft: dynamicScale(6),
   },
   toggleButton: {
-    flex: 1,
-    // borderRadius: 10,
-    // marginHorizontal:dynamicScale(120),
-    marginBottom: dynamicScale(-6, true),
-    marginTop: dynamicScale(-66, true),
-    marginHorizontal: "50%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    justifySelf: "center",
-    zIndex: 1,
-    elevation: 0,
+    position: "absolute",
+    bottom: dynamicScale(20, true),
+    right: dynamicScale(20),
+    zIndex: 1000,
+    elevation: 10,
+    borderRadius: dynamicScale(25, false, 0.5),
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    padding: dynamicScale(8),
+    ...GlobalStyles.shadowGlowPrimary,
   },
   landscapeToggleButtonContainer: {
-    // marginLeft: dynamicScale(-1100, false, 2),
-    // marginBottom: dynamicScale(6, true),
     position: "absolute",
-    left: -280,
-    bottom: 1,
+    bottom: dynamicScale(20, true),
+    right: dynamicScale(20),
+    zIndex: 1000,
+    elevation: 10,
+    borderRadius: dynamicScale(25, false, 0.5),
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    padding: dynamicScale(8),
+    ...GlobalStyles.shadowGlowPrimary,
   },
 });

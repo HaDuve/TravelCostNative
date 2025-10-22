@@ -174,6 +174,20 @@ export const generateHTMLTemplate = (
               series: data
             };
 
+            // Calculate dynamic bar width if we have column series
+            if (data && data.length > 0) {
+              const columnSeries = data.find(series => series.type === 'column');
+              if (columnSeries && columnSeries.pointWidth) {
+                mergedOptions.plotOptions = {
+                  ...mergedOptions.plotOptions,
+                  column: {
+                    ...mergedOptions.plotOptions?.column,
+                    pointWidth: columnSeries.pointWidth
+                  }
+                };
+              }
+            }
+
             if (chart) {
               chart.destroy();
             }
@@ -335,13 +349,24 @@ export const createBarChartData = (
 
   // Add budget line if budget is provided
   if (budget && budget > 0) {
+    // Create budget line that spans the full chart width
+    const budgetLineData = [];
+    
+    // Add points at the beginning and end of the chart area
+    if (data.length > 0) {
+      // Get the first and last x values
+      const firstX = data[0].x;
+      const lastX = data[data.length - 1].x;
+      
+      // Add budget line points at the start and end
+      budgetLineData.push({ x: firstX, y: budget });
+      budgetLineData.push({ x: lastX, y: budget });
+    }
+
     series.push({
       name: "Budget",
       type: "line",
-      data: data.map((item) => ({
-        x: item.x,
-        y: budget,
-      })),
+      data: budgetLineData,
       color: colors?.budget || "#6B7280",
       lineWidth: 2,
       marker: {
@@ -351,6 +376,7 @@ export const createBarChartData = (
       animation: {
         duration: 1000,
       },
+      zIndex: 1, // Ensure budget line is behind bars
     });
   }
 

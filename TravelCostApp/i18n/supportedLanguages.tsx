@@ -451,6 +451,7 @@ const en = {
   lastUsedExpenses: "Last used expenses",
   budgetPerTraveller: "Budget per traveller",
   charts: "Charts",
+  chartSettings: "Chart Settings",
   future: "future",
   past: "past",
 
@@ -1010,6 +1011,7 @@ const de = {
   lastUsedExpenses: "Zuletzt verwendete Ausgaben",
   budgetPerTraveller: "Budget pro Reisendem",
   charts: "Diagramme",
+  chartSettings: "Diagramm-Einstellungen",
   future: "zukünftige",
   past: "vergangene",
 
@@ -1569,6 +1571,7 @@ const fr = {
   lastUsedExpenses: "Dernières dépenses utilisées",
   budgetPerTraveller: "Budget par voyageur",
   charts: "Diagrammes",
+  chartSettings: "Paramètres du diagramme",
   future: "futures",
   past: "passés",
 
@@ -2130,6 +2133,7 @@ const ru = {
   lastUsedExpenses: "Последние использованные расходы",
   budgetPerTraveller: "Бюджет на одного путешественника",
   charts: "Схемы",
+  chartSettings: "Настройки схемы",
   future: "Будущее",
   past: "прошлые",
 

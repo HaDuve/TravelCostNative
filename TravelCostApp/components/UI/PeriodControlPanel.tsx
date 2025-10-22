@@ -37,10 +37,14 @@ const PeriodControlPanel = ({
           onPress={onLess}
           disabled={!canShowLess}
         >
-          <Ionicons 
-            name="remove" 
-            size={dynamicScale(20, false, 0.5)} 
-            color={canShowLess ? GlobalStyles.colors.primary500 : GlobalStyles.colors.gray600} 
+          <Ionicons
+            name="remove"
+            size={dynamicScale(20, false, 0.5)}
+            color={
+              canShowLess
+                ? GlobalStyles.colors.primary500
+                : GlobalStyles.colors.gray600
+            }
           />
         </Pressable>
 
@@ -61,10 +65,14 @@ const PeriodControlPanel = ({
           onPress={onMore}
           disabled={!canShowMore}
         >
-          <Ionicons 
-            name="add" 
-            size={dynamicScale(20, false, 0.5)} 
-            color={canShowMore ? GlobalStyles.colors.primary500 : GlobalStyles.colors.gray600} 
+          <Ionicons
+            name="add"
+            size={dynamicScale(20, false, 0.5)}
+            color={
+              canShowMore
+                ? GlobalStyles.colors.primary500
+                : GlobalStyles.colors.gray600
+            }
           />
         </Pressable>
 
@@ -77,10 +85,10 @@ const PeriodControlPanel = ({
             ]}
             onPress={onReset}
           >
-            <Ionicons 
-              name="refresh" 
-              size={dynamicScale(18, false, 0.5)} 
-              color={GlobalStyles.colors.gray500} 
+            <Ionicons
+              name="refresh"
+              size={dynamicScale(18, false, 0.5)}
+              color={GlobalStyles.colors.gray700}
             />
           </Pressable>
         )}
@@ -147,5 +155,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderColor: GlobalStyles.colors.gray500,
+    marginRight: dynamicScale(8),
   },
 });

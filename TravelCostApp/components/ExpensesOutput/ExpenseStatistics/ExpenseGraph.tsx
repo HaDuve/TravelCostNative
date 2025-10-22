@@ -65,7 +65,7 @@ const ExpenseGraph = ({
   const lastWeeks = (periodRangeNumber ?? 7) + longerPeriodNum;
   const lastMonths = (periodRangeNumber ?? 7) + longerPeriodNum;
   const lastYears =
-    (periodName == "total" ? 5 : periodRangeNumber ?? 7) + longerPeriodNum;
+    (periodName == "total" ? 5 : (periodRangeNumber ?? 7)) + longerPeriodNum;
   let xAxis = "";
   let yAxis = "";
   let budget = 0;
@@ -454,7 +454,7 @@ const ExpenseGraph = ({
                   !isPortrait && styles.landscapeFlatButton,
                 ]}
               >
-                <Accordion 
+                <Accordion
                   title={i18n.t("chartSettings")}
                   icon="settings-outline"
                   defaultExpanded={false}
@@ -486,8 +486,14 @@ const ExpenseGraph = ({
           ListFooterComponent={
             <View style={{ height: dynamicScale(200, true) }}>
               <View style={styles.flatButtonContainer}>
-                <Accordion 
-                  title={i18n.t("showMore") + " " + i18n.t("past") + " " + i18n.t(periodName + "s")}
+                <Accordion
+                  title={
+                    i18n.t("showMore") +
+                    " " +
+                    i18n.t("past") +
+                    " " +
+                    i18n.t(periodName + "s")
+                  }
                   icon="time-outline"
                   defaultExpanded={false}
                 >

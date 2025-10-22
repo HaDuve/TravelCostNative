@@ -12,11 +12,11 @@ interface AccordionProps {
   defaultExpanded?: boolean;
 }
 
-const Accordion = ({ 
-  title, 
-  children, 
-  icon = "settings-outline", 
-  defaultExpanded = false 
+const Accordion = ({
+  title,
+  children,
+  icon = "settings-outline",
+  defaultExpanded = false,
 }: AccordionProps) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
@@ -34,25 +34,21 @@ const Accordion = ({
         onPress={toggleExpanded}
       >
         <View style={styles.headerContent}>
-          <Ionicons 
-            name={icon} 
-            size={dynamicScale(20, false, 0.5)} 
-            color={GlobalStyles.colors.primary500} 
+          <Ionicons
+            name={icon}
+            size={dynamicScale(20, false, 0.5)}
+            color={GlobalStyles.colors.primary500}
           />
           <Text style={styles.title}>{title}</Text>
         </View>
-        <Ionicons 
-          name={isExpanded ? "chevron-up" : "chevron-down"} 
-          size={dynamicScale(16, false, 0.5)} 
-          color={GlobalStyles.colors.gray500} 
-        />
+         <Ionicons
+           name={isExpanded ? "chevron-up" : "chevron-down"}
+           size={dynamicScale(16, false, 0.5)}
+           color={GlobalStyles.colors.gray700}
+         />
       </Pressable>
-      
-      {isExpanded && (
-        <View style={styles.content}>
-          {children}
-        </View>
-      )}
+
+      {isExpanded && <View style={styles.content}>{children}</View>}
     </View>
   );
 };
@@ -71,6 +67,7 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: dynamicScale(8, false, 0.5),
     marginVertical: dynamicScale(4, true),
+    marginHorizontal: dynamicScale(16),
     ...GlobalStyles.shadowPrimary,
   },
   header: {

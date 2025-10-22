@@ -505,18 +505,13 @@ ExpenseGraph.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  accordionContainer: {
-    // borderWidth: 1,
-  },
+  accordionContainer: {},
   container: {
     flex: 1,
-    // marginTop: 60,
-    // paddingTop: 60,
   },
   graphContainer: {
     minHeight: dynamicScale(158, true),
-    paddingTop: dynamicScale(45, true),
-    marginTop: dynamicScale(8, true),
+    // paddingTop: dynamicScale(10, true),
     paddingBottom: dynamicScale(15, true),
     marginBottom: dynamicScale(15, true),
   },

@@ -66,26 +66,11 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       break;
   }
 
-  const rightNavButtonHandler = () => {
-    if (isGraphNotPie) {
-      realPeriodNumber.current =
-        realPeriodNumber.current == MAX_PERIOD_RANGE
-          ? MAX_PERIOD_RANGE
-          : realPeriodNumber.current + 1;
-      setPeriodRangeNumber(realPeriodNumber.current);
-    } else {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      setToggleGraphEnum(toggleGraphEnum == 3 ? 0 : toggleGraphEnum + 1);
-    }
-  };
-
   const isAndroid = Platform.OS === "android";
 
+  // intensity={isAndroid ? 1 : 1} style={styles.titleContainerBlur}>
   const titleContainerJSX = (
-    <BlurView
-      intensity={isAndroid ? 100 : 90}
-      style={styles.titleContainerBlur}
-    >
+    <View style={styles.titleContainerBlur}>
       {isGraphNotPie && (
         <Animated.View
           style={styles.titleContainer}
@@ -116,7 +101,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           <Text style={styles.titleText}> {i18n.t("currencies")} </Text>
         </Animated.View>
       )}
-    </BlurView>
+    </View>
   );
 
   return (
@@ -198,25 +183,19 @@ const styles = StyleSheet.create({
     overflow: "visible",
   },
   titleContainerBlur: {
+    alignSelf: "center",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     position: "absolute",
-    width: "100%",
-    paddingBottom: dynamicScale(6, true),
+    width: "60%",
+    paddingVertical: dynamicScale(4, true, 0.5),
+    marginTop: dynamicScale(8, true, 0.5),
   },
   titleContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-  },
-  chevronContainer: {
-    marginTop: dynamicScale(12, true),
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  pressed: {
-    opacity: 0.65,
   },
   titleText: {
     marginTop: dynamicScale(6, true),

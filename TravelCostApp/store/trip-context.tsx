@@ -2,13 +2,21 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import React, { createContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
-import { fetchTrip, fetchUser, getTravellers, updateTrip } from "../util/http";
+import {
+  fetchTrip,
+  fetchUser,
+  getTravellers,
+  updateTrip,
+  removeTravelerFromTrip,
+  softDeleteTrip as softDeleteTripAPI,
+  fetchAllUserTrips,
+} from "../util/http";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 import Toast from "react-native-toast-message";
 import { MAX_JS_NUMBER } from "../confAppConstants";
-import { secureStoreGetItem } from "./secure-storage";
+import { secureStoreGetItem, secureStoreSetItem } from "./secure-storage";
 import { ExpenseData, isPaidString } from "../util/expense";
-import { err } from "react-native-svg/lib/typescript/xml";
+// import { err } from "react-native-svg/lib/typescript/xml";
 import { Traveller } from "../util/traveler";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { useInterval } from "../components/Hooks/useInterval";
@@ -16,6 +24,8 @@ import { setMMKVObject, getMMKVObject } from "./mmkv";
 import set from "react-native-reanimated";
 import { Category } from "../util/category";
 import safeLogError from "../util/error";
+import { UserContext } from "./user-context";
+import PropTypes from "prop-types";
 
 export interface TripData {
   tripName?: string;
@@ -35,6 +45,9 @@ export interface TripData {
   // online categories are stored as a JSON.stringified strings
   // local categories are stored as Category arrays.
   categories?: Category[] | string;
+  // Soft delete flags
+  deleted?: boolean;
+  deletedTimestamp?: number;
 }
 
 export type TripContextType = {
@@ -57,6 +70,9 @@ export type TripContextType = {
   setTripid: (tripid: string) => void;
   addTrip: ({ tripName, tripTotalBudget }) => void;
   deleteTrip: (tripid: string) => void;
+  leaveTrip: (tripid: string) => Promise<void>;
+  softDeleteTrip: (tripid: string) => Promise<void>;
+  leaveOrDeleteTrip: (tripid: string) => Promise<void>;
   getcurrentTrip: () => TripData;
   setCurrentTrip: (tripid: string, trip: TripData) => Promise<void>;
   fetchAndSetCurrentTrip: (tripid: string) => Promise<TripData>;
@@ -87,12 +103,17 @@ export const TripContext = createContext<TripContextType>({
   refresh: () => {},
   setTripProgress: (percent: number) => {},
   travellers: [],
-  fetchAndSetTravellers: async (tripid: string) => {},
+  fetchAndSetTravellers: async (tripid: string) => {
+    return false;
+  },
   setTotalSum: (amount: number) => {},
   setTripid: (tripid: string) => {},
 
   addTrip: ({ tripName, tripTotalBudget }) => {},
   deleteTrip: (tripid: string) => {},
+  leaveTrip: async (tripid: string) => {},
+  softDeleteTrip: async (tripid: string) => {},
+  leaveOrDeleteTrip: async (tripid: string) => {},
   getcurrentTrip: () => {
     const tripData = {} as TripData;
     return tripData;
@@ -102,7 +123,9 @@ export const TripContext = createContext<TripContextType>({
     return {};
   },
   saveTripDataInStorage: async (tripData: TripData) => {},
-  loadTripDataFromStorage: async () => {},
+  loadTripDataFromStorage: async () => {
+    return {} as TripData;
+  },
   saveTravellersInStorage: async (travellers) => {},
   loadTravellersFromStorage: async () => {},
   fetchAndSettleCurrentTrip: async (unSettle = false) => {},
@@ -114,6 +137,7 @@ export const TripContext = createContext<TripContextType>({
 });
 
 function TripContextProvider({ children }) {
+  const userCtx = React.useContext(UserContext);
   const [travellers, setTravellers] = useState([]);
   const [tripid, setTripid] = useState("");
   const [tripName, setTripName] = useState("");
@@ -352,8 +376,163 @@ function TripContextProvider({ children }) {
   function addTrip() {
     // console.log("add Trip NOT IMPLEMENTED");
   }
-  function deleteTrip() {
-    // console.log("delete Trip NOT IMPLEMENTED");
+  function deleteTrip(tripid: string) {
+    // Use the new leaveOrDeleteTrip function
+    leaveOrDeleteTrip(tripid);
+  }
+
+  async function leaveTrip(tripidToLeave: string) {
+    try {
+      const uid = await secureStoreGetItem("uid");
+      if (!uid) {
+        throw new Error("User not authenticated");
+      }
+
+      // Remove user from trip travellers
+      await removeTravelerFromTrip(tripidToLeave, uid);
+
+      // If this was the current active trip, handle active trip reassignment
+      if (tripidToLeave === tripid) {
+        await handleActiveTripChange(uid);
+      }
+
+      // Update trip history to remove this trip
+      const updatedTripHistory = userCtx.tripHistory.filter(
+        (id) => id !== tripidToLeave
+      );
+      userCtx.setTripHistory(updatedTripHistory);
+
+      // Only refresh from server if not becoming freshly created
+      if (updatedTripHistory.length > 0) {
+        await userCtx.updateTripHistory();
+      }
+
+      Toast.show({
+        type: "success",
+        text1: "Left Trip",
+        text2: "You have successfully left the trip",
+      });
+    } catch (error) {
+      safeLogError(error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to leave trip",
+      });
+    }
+  }
+
+  async function softDeleteTrip(tripidToDelete: string) {
+    try {
+      const uid = await secureStoreGetItem("uid");
+      if (!uid) {
+        throw new Error("User not authenticated");
+      }
+
+      // Soft delete the trip
+      await softDeleteTripAPI(tripidToDelete);
+
+      // If this was the current active trip, handle active trip reassignment
+      if (tripidToDelete === tripid) {
+        await handleActiveTripChange(uid);
+      }
+
+      // Update trip history to remove this trip
+      const updatedTripHistory = userCtx.tripHistory.filter(
+        (id) => id !== tripidToDelete
+      );
+      userCtx.setTripHistory(updatedTripHistory);
+
+      // Only refresh from server if not becoming freshly created
+      if (updatedTripHistory.length > 0) {
+        await userCtx.updateTripHistory();
+      }
+
+      Toast.show({
+        type: "success",
+        text1: "Trip Deleted",
+        text2: "Trip has been successfully deleted",
+      });
+    } catch (error) {
+      safeLogError(error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to delete trip",
+      });
+    }
+  }
+
+  async function leaveOrDeleteTrip(tripidToProcess: string) {
+    try {
+      const uid = await secureStoreGetItem("uid");
+      if (!uid) {
+        throw new Error("User not authenticated");
+      }
+
+      // Get current trip data to check travellers
+      const tripData = await fetchTrip(tripidToProcess);
+      if (!tripData) {
+        throw new Error("Trip not found");
+      }
+
+      // Get all travellers for this trip
+      const travellers = await getTravellers(tripidToProcess);
+
+      // If only one traveller (the current user), soft delete the trip
+      if (travellers.length <= 1) {
+        await softDeleteTrip(tripidToProcess);
+      } else {
+        // Multiple travellers, just leave the trip
+        await leaveTrip(tripidToProcess);
+      }
+    } catch (error) {
+      safeLogError(error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to process trip",
+      });
+    }
+  }
+
+  async function handleActiveTripChange(uid: string) {
+    try {
+      // Get all user trips (excluding deleted ones)
+      const allTrips = await fetchAllUserTrips(uid);
+
+      if (allTrips.length === 0) {
+        // No other trips - reset to fresh user state
+        await setCurrentTrip("reset", null);
+        await secureStoreSetItem("currentTripId", "");
+        userCtx.setFreshlyCreatedTo(true);
+        return;
+      }
+
+      // If user has other trips, ask which one to set as active
+      // For now, we'll automatically select the first available trip
+      // In a real implementation, you might want to show a selection dialog
+      const newActiveTrip = allTrips[0];
+
+      // Set the new active trip
+      await setCurrentTrip(newActiveTrip.tripid, newActiveTrip);
+      await secureStoreSetItem("currentTripId", newActiveTrip.tripid);
+
+      // Update user's current trip
+      const { updateUser } = await import("../util/http");
+      await updateUser(uid, {
+        currentTrip: newActiveTrip.tripid,
+      });
+
+      // Refresh travellers for the new active trip
+      await fetchAndSetTravellers(newActiveTrip.tripid);
+    } catch (error) {
+      safeLogError(error);
+      // If all else fails, reset to fresh user state
+      await setCurrentTrip("reset", null);
+      await secureStoreSetItem("currentTripId", "");
+      userCtx.setFreshlyCreatedTo(true);
+    }
   }
 
   async function saveTripDataInStorage(tripData: TripData) {
@@ -419,6 +598,9 @@ function TripContextProvider({ children }) {
     setTripid: _setTripid,
     addTrip: addTrip,
     deleteTrip: deleteTrip,
+    leaveTrip: leaveTrip,
+    softDeleteTrip: softDeleteTrip,
+    leaveOrDeleteTrip: leaveOrDeleteTrip,
     getcurrentTrip: getcurrentTrip,
     setCurrentTrip: setCurrentTrip,
     fetchAndSetCurrentTrip: fetchAndSetCurrentTrip,
@@ -438,3 +620,7 @@ function TripContextProvider({ children }) {
 }
 
 export default TripContextProvider;
+
+TripContextProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};

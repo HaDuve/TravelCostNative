@@ -68,6 +68,7 @@ import Toast from "react-native-toast-message";
 import { sleep } from "../../util/appState";
 import safeLogError from "../../util/error";
 import { dynamicScale } from "../../util/scalingUtil";
+import LeaveDeleteTripButton from "./LeaveDeleteTripButton";
 
 const TripForm = ({ navigation, route }) => {
   const tripCtx = useContext(TripContext);
@@ -952,16 +953,17 @@ const TripForm = ({ navigation, route }) => {
               {i18n.t("setActive")}
             </GradientButton>
           )}
-          {/* {isEditing && (
-            <GradientButton
-              buttonStyle={{ backgroundColor: GlobalStyles.colors.error300 }}
-              style={[styles.button, { marginBottom: 8, marginHorizontal: 24 }]}
-              onPress={deleteHandler}
-              colors={GlobalStyles.gradientErrorButton}
-            >
-              {i18n.t("deleteTrip")}
-            </GradientButton>
-          )} */}
+          {isEditing && (
+            <LeaveDeleteTripButton
+              tripid={editedTripId}
+              tripName={inputs.tripName.value || "this trip"}
+              style={{
+                ...styles.deleteButton,
+                marginVertical: dynamicScale(8, false, 0.5),
+                marginHorizontal: dynamicScale(24, false, 0.5),
+              }}
+            />
+          )}
         </KeyboardAvoidingView>
       </Animated.View>
       <View
@@ -1079,6 +1081,12 @@ const styles = StyleSheet.create({
   button: {
     minWidth: "35%",
     marginHorizontal: 0,
+  },
+  deleteButton: {
+    backgroundColor: GlobalStyles.colors.error500,
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
   },
   modalStyle: {
     justifyContent: "center",

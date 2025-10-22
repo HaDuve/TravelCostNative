@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState, useCallback } from "react";
 import {
   Alert,
   Platform,
@@ -27,7 +27,7 @@ import { de, en, fr, ru } from "../i18n/supportedLanguages";
 import { AuthContext } from "../store/auth-context";
 import { secureStoreGetItem } from "../store/secure-storage";
 import { sleep } from "../util/appState";
-import { storeExpoPushTokenInTrip } from "../util/http";
+import { fetchTripHistory, storeExpoPushTokenInTrip } from "../util/http";
 import { saveStoppedTour } from "../util/tourUtil";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
@@ -45,12 +45,13 @@ import { ExpoPushToken } from "expo-notifications";
 // Branch.io removed
 import Purchases from "react-native-purchases";
 import { setAttributesAsync } from "../components/Premium/PremiumConstants";
-import { getMMKVObject, setMMKVObject } from "../store/mmkv";
+import { getMMKVObject, getTripHistory, setMMKVObject } from "../store/mmkv";
 import { NetworkContext } from "../store/network-context";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import GetLocalPriceButton from "../components/Settings/GetLocalPriceButton";
 import GradientButton from "../components/UI/GradientButton";
 import safeLogError from "../util/error";
+import { filterDeletedTrips } from "../util/tripHistory";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -128,44 +129,44 @@ const ProfileScreen = ({ navigation }) => {
   const isConnected = netCtx.isConnected && netCtx.strongConnection;
 
   const [tourIsRunning, setTourIsRunning] = useState(false);
-  const [tripHistory, setTripHistory] = useState([]);
+  const [tripHistory, setTripHistory] = useState<string[]>([]);
   const [isFetchingLogout, setIsFetchingLogout] = useState(false);
   const [isFeedbackModalVisible, setIsFeedbackModalVisible] = useState(false);
 
   // possible future use of notification display
-  const [expoPushToken, setExpoPushToken] = useState("");
-  const [notification, setNotification] =
-    useState<Notifications.Notification>(null);
-  const notificationListener = useRef<Notifications.EventSubscription>(null);
-  const responseListener = useRef<Notifications.EventSubscription>(null);
+  // const [expoPushToken, setExpoPushToken] = useState("");
+  // const [notification, setNotification] =
+  //   useState<Notifications.Notification>(null);
+  // const notificationListener = useRef<Notifications.EventSubscription>(null);
+  // const responseListener = useRef<Notifications.EventSubscription>(null);
 
-  useEffect(() => {
-    registerForPushNotificationsAsync()
-      .then((pushToken: ExpoPushToken) => {
-        if (!pushToken) return;
-        const token = pushToken.data;
-        // console.log("token", token);
-        setExpoPushToken(token);
-      })
-      .catch((e) => Alert.alert(e, e.message));
+  // useEffect(() => {
+  //   registerForPushNotificationsAsync()
+  //     .then((pushToken: ExpoPushToken) => {
+  //       if (!pushToken) return;
+  //       const token = pushToken.data;
+  //       // console.log("token", token);
+  //       setExpoPushToken(token);
+  //     })
+  //     .catch((e) => Alert.alert(e, e.message));
 
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification);
-      });
+  //   notificationListener.current =
+  //     Notifications.addNotificationReceivedListener((notification) => {
+  //       setNotification(notification);
+  //     });
 
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        // console.log(response);
-      });
+  //   responseListener.current =
+  //     Notifications.addNotificationResponseReceivedListener((response) => {
+  //       // console.log(response);
+  //     });
 
-    return () => {
-      Notifications.removeNotificationSubscription(
-        notificationListener.current
-      );
-      Notifications.removeNotificationSubscription(responseListener.current);
-    };
-  }, []);
+  //   return () => {
+  //     Notifications.removeNotificationSubscription(
+  //       notificationListener.current
+  //     );
+  //     Notifications.removeNotificationSubscription(responseListener.current);
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (!isConnected) return;
@@ -177,62 +178,79 @@ const ProfileScreen = ({ navigation }) => {
   }, [isConnected]);
 
   const [emailString, setEmailString] = useState("");
-  async function getEmail() {
+  const getEmail = useCallback(async () => {
     const email = await secureStoreGetItem("ENCM");
     if (email) {
       setEmailString(email);
     }
-  }
+  }, []);
 
   useEffect(() => {
     userCtx.loadUserNameFromStorage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  useFocusEffect(() => {
-    userCtx.loadUserNameFromStorage();
-  });
-  useFocusEffect(() => {
-    getEmail();
-  });
-  useFocusEffect(() => {
-    setAttributesAsync(emailString, userCtx.userName);
-  });
+  useFocusEffect(
+    useCallback(() => {
+      userCtx.loadUserNameFromStorage();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+  );
+  useFocusEffect(
+    useCallback(() => {
+      getEmail();
+    }, [getEmail])
+  );
+  useFocusEffect(
+    useCallback(() => {
+      setAttributesAsync(emailString, userCtx.userName);
+    }, [emailString, userCtx.userName])
+  );
+
+  const updateTripHistory = useCallback(async () => {
+    const tripHistoryResponse = await fetchTripHistory(uid);
+    console.log(
+      "🚀 ~ ProfileScreen ~ tripHistoryResponse:",
+      tripHistoryResponse
+    );
+    setTripHistory(tripHistoryResponse);
+    setMMKVObject("tripHistory", tripHistoryResponse);
+  }, [uid]);
+
+  useFocusEffect(
+    useCallback(() => {
+      // Refresh trip history when screen comes into focus
+      updateTripHistory();
+    }, [updateTripHistory])
+  );
+
+  const setAttributesAsyncCallback = useCallback(async () => {
+    try {
+      if (emailString) await Purchases.setAttributes({ email: emailString });
+      if (userCtx.userName)
+        await Purchases.setAttributes({ name: userCtx.userName });
+      if (!isConnected) return;
+      // Branch.io removed - no campaign tracking
+    } catch (error) {
+      // console.log(
+      //   "setAttributesAsync - Settings - ForRevCat ~ error:",
+      //   error
+      // );
+    }
+  }, [emailString, userCtx.userName, isConnected]);
+
   useEffect(() => {
     setAttributesAsync(emailString, userCtx.userName);
   }, [emailString, userCtx.userName]);
   useEffect(() => {
     getEmail();
-  }, []);
+  }, [getEmail]);
   useEffect(() => {
-    async function setAttributesAsync() {
-      try {
-        if (emailString) await Purchases.setAttributes({ email: emailString });
-        if (userCtx.userName)
-          await Purchases.setAttributes({ name: userCtx.userName });
-        if (!isConnected) return;
-        // Branch.io removed - no campaign tracking
-      } catch (error) {
-        // console.log(
-        //   "setAttributesAsync - Settings - ForRevCat ~ error:",
-        //   error
-        // );
-      }
-    }
-    setAttributesAsync();
-  }, [emailString, userCtx.userName, isConnected]);
+    setAttributesAsyncCallback();
+  }, [setAttributesAsyncCallback]);
 
   function onSummaryHandler() {
     navigation.navigate("TripSummary");
   }
-
-  useEffect(() => {
-    setTripHistory(userCtx.tripHistory);
-    async function fetchHistory() {
-      if (!userCtx.tripHistory || userCtx.tripHistory?.length < 1) {
-        await userCtx.updateTripHistory();
-      }
-    }
-    fetchHistory();
-  }, [userCtx]);
 
   useInterval(
     () => {
@@ -253,60 +271,66 @@ const ProfileScreen = ({ navigation }) => {
   } = useTourGuideController();
   // Can start at mount 🎉
   // you need to wait until everything is registered 😁
-  async function sleepyStartTour() {
+  const sleepyStartTour = useCallback(async () => {
     // console.log("sleepyStartTour ~ sleepyStartTour:", sleepyStartTour);
     setTourIsRunning(true);
     await sleep(1000);
     start();
-  }
+  }, [start]);
   useEffect(() => {
     if (canStart && userCtx.needsTour) {
       // 👈 test if you can start otherwise nothing will happen
       sleepyStartTour();
     }
-  }, [canStart, userCtx.needsTour]); // 👈 don't miss it!
+  }, [canStart, userCtx.needsTour, sleepyStartTour]); // 👈 don't miss it!
 
-  const handleOnStart = () => {
+  const handleOnStart = useCallback(() => {
     navigation.navigate("RecentExpenses");
     // console.log("start");
-  };
-  const handleOnStop = () => {
+  }, [navigation]);
+
+  const handleOnStop = useCallback(() => {
     saveStoppedTour();
     userCtx.setNeedsTour(false);
     setTourIsRunning(false);
     // Branch.io removed - no event logging
     // console.log("stop");
-  };
-  const handleOnStepChange = async (step) => {
-    // console.log(`stepChange, name: ${step?.name} order: ${step?.order}`);
-    switch (step?.order) {
-      case 1:
-        await navigation.navigate("RecentExpenses");
-        break;
-      case 2:
-        await navigation.navigate("RecentExpenses");
-        break;
-      case 3:
-        await navigation.navigate("RecentExpenses");
-        break;
-      case 4:
-        await navigation.navigate("Overview");
-        break;
-      case 5:
-        await navigation.navigate("Profile");
-        break;
-      case 6:
-        await navigation.navigate("Profile");
-        break;
-      case 7:
-        await navigation.navigate("Profile");
-        break;
-      case 8:
-      default:
-        navigation.navigate("RecentExpenses");
-        break;
-    }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleOnStepChange = useCallback(
+    async (step) => {
+      // console.log(`stepChange, name: ${step?.name} order: ${step?.order}`);
+      switch (step?.order) {
+        case 1:
+          await navigation.navigate("RecentExpenses");
+          break;
+        case 2:
+          await navigation.navigate("RecentExpenses");
+          break;
+        case 3:
+          await navigation.navigate("RecentExpenses");
+          break;
+        case 4:
+          await navigation.navigate("Overview");
+          break;
+        case 5:
+          await navigation.navigate("Profile");
+          break;
+        case 6:
+          await navigation.navigate("Profile");
+          break;
+        case 7:
+          await navigation.navigate("Profile");
+          break;
+        case 8:
+        default:
+          navigation.navigate("RecentExpenses");
+          break;
+      }
+    },
+    [navigation]
+  );
 
   React.useEffect(() => {
     eventEmitter.on("start", handleOnStart);
@@ -318,7 +342,14 @@ const ProfileScreen = ({ navigation }) => {
       eventEmitter.off("stop", handleOnStop);
       eventEmitter.off("stepChange", handleOnStepChange);
     };
-  }, []);
+  }, [eventEmitter, handleOnStart, handleOnStop, handleOnStepChange]);
+
+  // Navigate to trip creation when user is freshly created
+  useEffect(() => {
+    if (userCtx.freshlyCreated) {
+      navigation.navigate("ManageTrip");
+    }
+  }, [userCtx.freshlyCreated, navigation]);
 
   const visibleContent = userCtx.freshlyCreated ? (
     <></>

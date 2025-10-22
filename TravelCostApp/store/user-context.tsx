@@ -30,7 +30,7 @@ import {
   ENTITLEMENT_ID,
   isPremiumMember,
 } from "../components/Premium/PremiumConstants";
-import { fetchCategories, fetchTripHistory } from "../util/http";
+import { fetchCategories, fetchTrip, fetchTripHistory } from "../util/http";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PropTypes from "prop-types";
 import NetInfo from "@react-native-community/netinfo";
@@ -48,6 +48,7 @@ import set from "react-native-reanimated";
 import { getMMKVObject, setMMKVObject } from "./mmkv";
 import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
 import { safelyParseJSON } from "../util/jsonParse";
+import { filterDeletedTrips } from "../util/tripHistory";
 
 export interface UserData {
   uid?: string;
@@ -83,7 +84,7 @@ export type UserContextType = {
 
   tripHistory: string[];
   setTripHistory: (tripHistory: string[]) => void;
-  updateTripHistory: () => void;
+  updateTripHistory: () => Promise<string[] | null>;
   isOnline: boolean;
   setIsOnline: (bool: boolean) => void;
   saveUserNameInStorage: (name: string) => void;
@@ -146,7 +147,7 @@ function UserContextProvider({ children }) {
   const [userName, setName] = useState("");
   const [freshlyCreated, setFreshlyCreated] = useState(false);
   const [needsTour, setNeedsTour] = useState(false);
-  const [periodName, setPeriodName] = useState("day");
+  const [periodName, setPeriodName] = useState(RangeString.day);
   const [isOnline, setIsOnline] = useState(false);
   const [lastCurrency, setLastCurrency] = useState("");
   const [lastCountry, setLastCountry] = useState("");
@@ -183,16 +184,18 @@ function UserContextProvider({ children }) {
 
   async function updateTripHistory() {
     const uid = await secureStoreGetItem("uid");
-    // console.log("fetch ~ uid:", uid);
-    if (!uid || DEBUG_FORCE_OFFLINE) return;
+    if (!uid || DEBUG_FORCE_OFFLINE || freshlyCreated) return;
     try {
       const tripHistoryResponse = await fetchTripHistory(uid);
       setTripHistory(tripHistoryResponse);
       setMMKVObject("tripHistory", tripHistoryResponse);
+      return tripHistoryResponse;
     } catch (error) {
       safeLogError(error);
+      return null;
     }
   }
+
   useEffect(() => {
     const storedHistory = getMMKVObject("tripHistory");
     if (storedHistory !== null) {

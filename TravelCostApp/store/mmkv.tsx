@@ -4,6 +4,7 @@ import * as Device from "expo-device";
 import safeLogError from "../util/error";
 import { safelyParseJSON } from "../util/jsonParse";
 import { ExpenseData } from "../util/expense";
+import { fetchTrip } from "../util/http";
 
 // Initialize MMKV with proper error handling
 let mmkvstorage: MMKV | null = null;
@@ -133,4 +134,16 @@ export const getExpenseDraft = (expenseId: string) => {
 
 export const clearExpenseDraft = (expenseId: string) => {
   deleteMMKVObject(`expenseDraft_${expenseId}`);
+};
+
+export const getTripHistory = async () => {
+  const tripHistory = getMMKVObject("tripHistory");
+  const filteredTripHistory = (tripHistory: string[]) => {
+    if (!tripHistory || tripHistory.length === 0) return [];
+    return tripHistory.filter(async (tripid) => {
+      const trip = await fetchTrip(tripid);
+      return trip?.deleted !== true;
+    });
+  };
+  return filteredTripHistory(tripHistory);
 };

@@ -612,7 +612,14 @@ export async function fetchTrip(tripid: string): Promise<TripData> {
         timeout: AXIOS_TIMOUT_LONG,
       }
     );
-    return response.data;
+    const tripData = response.data;
+
+    // Filter out deleted trips
+    if (tripData && tripData.deleted) {
+      return null;
+    }
+
+    return tripData;
   } catch (error) {
     throw new Error("error while fetching trip");
   }
@@ -628,6 +635,29 @@ export async function deleteTrip(tripid: string) {
 
     const response = await axios.delete(
       `${BACKEND_URL}/trips/${tripid}.json?auth=${authToken}`
+    );
+    return response;
+  } catch (error) {
+    safeLogError(error);
+  }
+}
+
+export async function softDeleteTrip(tripid: string) {
+  try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for softDeleteTrip");
+      return null;
+    }
+
+    const deletionData = {
+      deleted: true,
+      deletedTimestamp: Date.now(),
+    };
+
+    const response = await axios.patch(
+      `${BACKEND_URL}/trips/${tripid}.json?auth=${authToken}`,
+      deletionData
     );
     return response;
   } catch (error) {
@@ -655,6 +685,27 @@ export async function putTravelerInTrip(tripid: string, traveller: Traveller) {
     const response = await axios.put(
       `${BACKEND_URL}/trips/${tripid}/travellers/${traveller.uid}.json?auth=${authToken}`,
       { uid: traveller.uid, userName: traveller.userName }
+    );
+    return response.data;
+  } catch (error) {
+    safeLogError(error);
+  }
+}
+
+export async function removeTravelerFromTrip(tripid: string, uid: string) {
+  try {
+    if (!uid || uid === undefined) {
+      throw new Error("uid is undefined");
+    }
+
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for removeTravelerFromTrip");
+      return null;
+    }
+
+    const response = await axios.delete(
+      `${BACKEND_URL}/trips/${tripid}/travellers/${uid}.json?auth=${authToken}`
     );
     return response.data;
   } catch (error) {
@@ -788,7 +839,7 @@ export async function storeTripHistory(userId: string, tripHistory: string[]) {
   }
 }
 
-export async function fetchTripHistory(userId: string) {
+export async function fetchTripHistory(userId: string, filtered = true) {
   try {
     const authToken = await getValidIdToken();
     if (!authToken) {
@@ -802,9 +853,59 @@ export async function fetchTripHistory(userId: string) {
         timeout: AXIOS_TIMOUT_LONG,
       }
     );
+    if (filtered) {
+      const filteredTripHistory: string[] = [];
+      for (const tripid of response.data) {
+        const trip = await fetchTrip(tripid);
+        if (trip?.deleted !== true) {
+          filteredTripHistory.push(tripid);
+        }
+      }
+      return filteredTripHistory;
+    }
     return response.data;
   } catch (error) {
     throw new Error("error while fetching trip history");
+  }
+}
+
+export async function fetchAllUserTrips(userId: string): Promise<TripData[]> {
+  try {
+    const tripHistory = await fetchTripHistory(userId);
+    if (!tripHistory || tripHistory.length === 0) {
+      return [];
+    }
+
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for fetchAllUserTrips");
+      return [];
+    }
+
+    const tripPromises = tripHistory.map(async (tripid: string) => {
+      try {
+        const response = await axios.get(
+          `${BACKEND_URL}/trips/${tripid}.json?auth=${authToken}`,
+          {
+            timeout: AXIOS_TIMOUT_LONG,
+          }
+        );
+        const tripData = response.data;
+        // Add tripid to the data
+        tripData.tripid = tripid;
+        return tripData;
+      } catch (error) {
+        // If trip doesn't exist or is inaccessible, return null
+        return null;
+      }
+    });
+
+    const trips = await Promise.all(tripPromises);
+    // Filter out null values and deleted trips
+    return trips.filter((trip) => trip && !trip.deleted);
+  } catch (error) {
+    safeLogError(error);
+    return [];
   }
 }
 

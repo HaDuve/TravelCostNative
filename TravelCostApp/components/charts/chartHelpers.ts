@@ -195,13 +195,6 @@ export const generateHTMLTemplate = (
                   color: data.budgetColor || '#6B7280',
                   width: 3,
                   zIndex: 1,
-                  label: {
-                    text: 'Budget',
-                    style: {
-                      color: data.budgetColor || '#6B7280',
-                      fontWeight: 'bold'
-                    }
-                  }
                 }]
               };
             }
@@ -259,13 +252,6 @@ export const generateHTMLTemplate = (
                         color: newData.budgetColor || '#6B7280',
                         width: 3,
                         zIndex: 1,
-                        label: {
-                          text: 'Budget',
-                          style: {
-                            color: newData.budgetColor || '#6B7280',
-                            fontWeight: 'bold'
-                          }
-                        }
                       });
                     }
                   }

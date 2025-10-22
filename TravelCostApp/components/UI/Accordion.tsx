@@ -41,11 +41,11 @@ const Accordion = ({
           />
           <Text style={styles.title}>{title}</Text>
         </View>
-         <Ionicons
-           name={isExpanded ? "chevron-up" : "chevron-down"}
-           size={dynamicScale(16, false, 0.5)}
-           color={GlobalStyles.colors.gray700}
-         />
+        <Ionicons
+          name={isExpanded ? "chevron-up" : "chevron-down"}
+          size={dynamicScale(16, false, 0.5)}
+          color={GlobalStyles.colors.gray700}
+        />
       </Pressable>
 
       {isExpanded && <View style={styles.content}>{children}</View>}

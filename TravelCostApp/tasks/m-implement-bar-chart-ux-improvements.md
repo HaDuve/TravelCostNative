@@ -4,15 +4,18 @@ branch: feature/bar-chart-ux-improvements
 status: in-progress
 created: 2025-01-27
 started: 2025-01-27
-modules: [components/charts, components/ExpensesOutput, components/ExpensesOverview]
+modules:
+  [components/charts, components/ExpensesOutput, components/ExpensesOverview]
 ---
 
 # UX: Improve Bar Chart Handling
 
 ## Problem/Goal
+
 Improve the user experience of bar chart interactions by consolidating modifying buttons, redesigning add/remove controls, removing longpress functionality, adding budget lines, and implementing dynamic bar widths.
 
 ## Success Criteria
+
 - [ ] Put all modifying buttons into one accordion view with a settings cog icon
 - [ ] Change all "add/remove days" buttons into a nice panel with layout: "More/Less-Text: (-|+|resetIcon)"
 - [ ] Remove the longpress functions of the "add-days/weeks/months/years-button" and cleanup respective code
@@ -20,7 +23,9 @@ Improve the user experience of bar chart interactions by consolidating modifying
 - [ ] Set the width of the bars dynamic respective on the number of bars and the width of the chart (so there is always a small margin between the bars)
 
 ## Context Files
+
 <!-- Added by context-gathering agent or manually -->
+
 - components/ExpensesOutput/ExpenseStatistics/ExpenseGraph.tsx - Main component with modifying buttons and longpress handlers
 - components/ExpensesOverview/ExpenseChart.tsx - Chart component wrapper
 - components/charts/chartHelpers.ts - Chart configuration and data processing
@@ -28,14 +33,18 @@ Improve the user experience of bar chart interactions by consolidating modifying
 - components/charts/WebViewChart.tsx - WebView chart implementation
 
 ## User Notes
+
 <!-- Any specific notes or requirements from the developer -->
+
 - User prefers single components instead of using forwardRefs and prefers hooks and functions over classes
 - Need to maintain existing functionality while improving UX
 - Budget line should be visible and properly styled
 - Dynamic bar width should ensure proper spacing
 
 ## Work Log
+
 <!-- Updated as work progresses -->
+
 - [2025-01-27] Created task for bar chart UX improvements
 - [2025-01-27] Started work on analyzing current implementation
 - [2025-01-27] Identified ExpenseGraph.tsx as main component with modifying buttons
@@ -50,3 +59,9 @@ Improve the user experience of bar chart interactions by consolidating modifying
 - [2025-01-27] Cleaned up unused variables and imports
 - [2025-01-27] Fixed all linting errors
 - [2025-01-27] All bar chart UX improvements completed successfully
+- [2025-01-27] Fixed budget line to span full chart width instead of just data points
+- [2025-01-27] Implemented proper dynamic bar width calculation in chart template
+- [2025-01-27] Added horizontal margin to accordion component for better spacing
+- [2025-01-27] Added chartSettings translation in all supported languages (EN, DE, FR, RU)
+- [2025-01-27] Swapped reset and plus button positions with marginRight on reset button
+- [2025-01-27] Made reset button and accordion arrow darker gray (gray700) for better visibility

@@ -55,6 +55,23 @@ const PeriodControlPanel = ({
           </Text>
         </View>
 
+        {/* Reset Button */}
+        {canReset && (
+          <Pressable
+            style={({ pressed }) => [
+              styles.resetButton,
+              pressed && GlobalStyles.pressed,
+            ]}
+            onPress={onReset}
+          >
+            <Ionicons
+              name="refresh"
+              size={dynamicScale(18, false, 0.5)}
+              color={GlobalStyles.colors.gray700}
+            />
+          </Pressable>
+        )}
+
         {/* More Button */}
         <Pressable
           style={({ pressed }) => [
@@ -75,23 +92,6 @@ const PeriodControlPanel = ({
             }
           />
         </Pressable>
-
-        {/* Reset Button */}
-        {canReset && (
-          <Pressable
-            style={({ pressed }) => [
-              styles.resetButton,
-              pressed && GlobalStyles.pressed,
-            ]}
-            onPress={onReset}
-          >
-            <Ionicons
-              name="refresh"
-              size={dynamicScale(18, false, 0.5)}
-              color={GlobalStyles.colors.gray700}
-            />
-          </Pressable>
-        )}
       </View>
     </View>
   );

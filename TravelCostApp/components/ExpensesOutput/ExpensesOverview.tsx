@@ -9,7 +9,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -115,35 +118,6 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       intensity={isAndroid ? 100 : 90}
       style={styles.titleContainerBlur}
     >
-      <Animated.View
-        // entering={FadeInLeft}
-        // exiting={FadeOutLeft}
-        style={styles.chevronContainer}
-      >
-        {/* "remove-outline" */}
-        <IconButton
-          icon={
-            isGraphNotPie ? "play-skip-back-outline" : "chevron-back-outline"
-          }
-          size={dynamicScale(24, false, 0.5)}
-          onPress={async () => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            if (isGraphNotPie) {
-              realPeriodNumber.current = 7;
-              setPeriodRangeNumber(realPeriodNumber.current);
-              setLongerPeriodNum(0);
-              setStartingPoint(0);
-              stopAutoIncrement();
-            } else {
-              setToggleGraphEnum(
-                toggleGraphEnum == 0 ? 3 : toggleGraphEnum - 1
-              );
-            }
-          }}
-          color={GlobalStyles.colors.primaryGrayed}
-        ></IconButton>
-      </Animated.View>
-
       {isGraphNotPie && (
         <Animated.View
           style={styles.titleContainer}
@@ -174,22 +148,6 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           <Text style={styles.titleText}> {i18n.t("currencies")} </Text>
         </Animated.View>
       )}
-
-      <Animated.View
-        entering={FadeInRight}
-        exiting={FadeOutRight}
-        style={styles.chevronContainer}
-      >
-        <IconButton
-          icon={
-            isGraphNotPie ? "add-circle-outline" : "chevron-forward-outline"
-          }
-          size={dynamicScale(24, false, 0.5)}
-          onPressIn={startAutoIncrement}
-          onPressOut={stopAutoIncrement}
-          color={GlobalStyles.colors.primaryGrayed}
-        ></IconButton>
-      </Animated.View>
     </BlurView>
   );
 

@@ -329,7 +329,10 @@ export const createBarChartData = (
   // Calculate dynamic bar width based on number of bars and chart width
   const barCount = data.length;
   const availableWidth = chartWidth || 300; // Default width if not provided
-  const maxBarWidth = Math.max(15, Math.min(40, (availableWidth - 80) / barCount)); // Min 15px, max 40px
+  const maxBarWidth = Math.max(
+    15,
+    Math.min(40, (availableWidth - 80) / barCount)
+  ); // Min 15px, max 40px
 
   // Bar data
   series.push({
@@ -351,13 +354,13 @@ export const createBarChartData = (
   if (budget && budget > 0) {
     // Create budget line that spans the full chart width
     const budgetLineData = [];
-    
+
     // Add points at the beginning and end of the chart area
     if (data.length > 0) {
       // Get the first and last x values
       const firstX = data[0].x;
       const lastX = data[data.length - 1].x;
-      
+
       // Add budget line points at the start and end
       budgetLineData.push({ x: firstX, y: budget });
       budgetLineData.push({ x: lastX, y: budget });

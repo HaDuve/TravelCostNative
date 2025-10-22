@@ -438,6 +438,28 @@ const ExpenseGraph = ({
                 !isPortrait && styles.landscapeGraphContainer,
               ]}
             >
+              <Accordion
+                title={i18n.t("chartSettings")}
+                icon="settings-outline"
+                defaultExpanded={false}
+              >
+                <PeriodControlPanel
+                  periodName={periodName}
+                  onMore={() => {
+                    setStartingPoint(startingPoint - (periodRangeNumber ?? 10));
+                  }}
+                  onLess={() => {
+                    setStartingPoint(startingPoint + (periodRangeNumber ?? 10));
+                  }}
+                  onReset={() => {
+                    setStartingPoint(0);
+                    setLongerPeriodNum(0);
+                  }}
+                  canShowMore={startingPoint > -MAX_PERIOD_RANGE}
+                  canShowLess={startingPoint < 0}
+                  canReset={startingPoint !== 0 || longerPeriodNum !== 0}
+                />
+              </Accordion>
               {isPortrait && (
                 <ExpenseChart
                   inputData={listExpenseSumBudgets}
@@ -447,73 +469,6 @@ const ExpenseGraph = ({
                   currency={tripCtx.tripCurrency}
                 ></ExpenseChart>
               )}
-
-              <View
-                style={[
-                  isPortrait && styles.flatButtonContainer,
-                  !isPortrait && styles.landscapeFlatButton,
-                ]}
-              >
-                <Accordion
-                  title={i18n.t("chartSettings")}
-                  icon="settings-outline"
-                  defaultExpanded={false}
-                >
-                  <PeriodControlPanel
-                    periodName={periodName}
-                    onMore={() => {
-                      setStartingPoint(
-                        startingPoint - (periodRangeNumber ?? 10)
-                      );
-                    }}
-                    onLess={() => {
-                      setStartingPoint(
-                        startingPoint + (periodRangeNumber ?? 10)
-                      );
-                    }}
-                    onReset={() => {
-                      setStartingPoint(0);
-                      setLongerPeriodNum(0);
-                    }}
-                    canShowMore={startingPoint > -MAX_PERIOD_RANGE}
-                    canShowLess={startingPoint < 0}
-                    canReset={startingPoint !== 0 || longerPeriodNum !== 0}
-                  />
-                </Accordion>
-              </View>
-            </View>
-          }
-          ListFooterComponent={
-            <View style={{ height: dynamicScale(200, true) }}>
-              <View style={styles.flatButtonContainer}>
-                <Accordion
-                  title={
-                    i18n.t("showMore") +
-                    " " +
-                    i18n.t("past") +
-                    " " +
-                    i18n.t(periodName + "s")
-                  }
-                  icon="time-outline"
-                  defaultExpanded={false}
-                >
-                  <PeriodControlPanel
-                    periodName={periodName}
-                    onMore={() => {
-                      setLongerPeriodNum(longerPeriodNum + 10);
-                    }}
-                    onLess={() => {
-                      setLongerPeriodNum(Math.max(0, longerPeriodNum - 10));
-                    }}
-                    onReset={() => {
-                      setLongerPeriodNum(0);
-                    }}
-                    canShowMore={longerPeriodNum < MAX_PERIOD_RANGE}
-                    canShowLess={longerPeriodNum > 0}
-                    canReset={longerPeriodNum !== 0}
-                  />
-                </Accordion>
-              </View>
             </View>
           }
           removeClippedSubviews={true}

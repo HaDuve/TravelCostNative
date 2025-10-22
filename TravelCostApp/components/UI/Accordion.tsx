@@ -11,6 +11,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { GlobalStyles } from "../../constants/styles";
 import { dynamicScale } from "../../util/scalingUtil";
 import PropTypes from "prop-types";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  interpolate,
+  Extrapolate,
+  runOnJS,
+} from "react-native-reanimated";
 
 interface AccordionProps {
   title: string;
@@ -28,13 +37,68 @@ const Accordion = ({
   containerStyle,
 }: AccordionProps) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [measuredHeight, setMeasuredHeight] = useState(0);
+
+  // Animation values
+  const height = useSharedValue(defaultExpanded ? 1 : 0);
+  const rotation = useSharedValue(defaultExpanded ? 180 : 0);
+  const opacity = useSharedValue(defaultExpanded ? 1 : 0);
 
   const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
+    if (isAnimating) return; // Prevent multiple animations
+
+    const newExpanded = !isExpanded;
+    setIsExpanded(newExpanded);
+    setIsAnimating(true);
+
+    // Animate chevron rotation
+    rotation.value = withSpring(newExpanded ? 180 : 0, {
+      damping: 15,
+      stiffness: 150,
+    });
+
+    // Animate content height and opacity
+    if (newExpanded) {
+      opacity.value = withTiming(1, { duration: 200 });
+      height.value = withSpring(
+        1,
+        {
+          damping: 20,
+          stiffness: 100,
+        },
+        () => {
+          runOnJS(setIsAnimating)(false);
+        }
+      );
+    } else {
+      opacity.value = withTiming(0, { duration: 150 });
+      height.value = withTiming(0, { duration: 200 }, () => {
+        runOnJS(setIsAnimating)(false);
+      });
+    }
   };
 
+  // Animated styles
+  const chevronStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
+
+  const contentStyle = useAnimatedStyle(() => {
+    return {
+      height: interpolate(
+        height.value,
+        [0, 1],
+        [0, measuredHeight || 400], // Use measured height or fallback
+        Extrapolate.CLAMP
+      ),
+      opacity: opacity.value,
+      overflow: "hidden",
+    };
+  });
+
   return (
-    <View style={[styles.container, containerStyle]}>
+    <Animated.View style={[styles.container, containerStyle]}>
       <Pressable
         style={({ pressed }) => [
           styles.header,
@@ -50,15 +114,33 @@ const Accordion = ({
           />
           <Text style={styles.title}>{title}</Text>
         </View>
-        <Ionicons
-          name={isExpanded ? "chevron-up" : "chevron-down"}
-          size={dynamicScale(16, false, 0.5)}
-          color={GlobalStyles.colors.gray700}
-        />
+        <Animated.View style={chevronStyle}>
+          <Ionicons
+            name="chevron-down"
+            size={dynamicScale(16, false, 0.5)}
+            color={GlobalStyles.colors.gray700}
+          />
+        </Animated.View>
       </Pressable>
 
-      {isExpanded && <View style={styles.content}>{children}</View>}
-    </View>
+      {/* Hidden content for measuring height */}
+      <View
+        style={styles.hiddenContent}
+        pointerEvents="none"
+        onLayout={(event) => {
+          const { height } = event.nativeEvent.layout;
+          if (height > 0 && measuredHeight === 0) {
+            setMeasuredHeight(height);
+          }
+        }}
+      >
+        <View style={styles.contentInner}>{children}</View>
+      </View>
+
+      <Animated.View style={[styles.content, contentStyle]}>
+        <View style={styles.contentInner}>{children}</View>
+      </Animated.View>
+    </Animated.View>
   );
 };
 
@@ -99,7 +181,19 @@ const styles = StyleSheet.create({
     marginLeft: dynamicScale(8),
   },
   content: {
+    // Height and opacity are handled by animation
+  },
+  contentInner: {
     paddingHorizontal: dynamicScale(16),
     paddingVertical: dynamicScale(8, true),
+  },
+  hiddenContent: {
+    position: "absolute",
+    top: -10000, // Move off-screen
+    left: 0,
+    right: 0,
+    opacity: 0,
+    zIndex: -1, // Ensure it's behind everything
+    pointerEvents: "none", // Prevent any interaction
   },
 });

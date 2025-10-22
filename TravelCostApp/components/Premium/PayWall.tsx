@@ -15,7 +15,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -31,7 +34,8 @@ import IconButton from "../UI/IconButton";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { constantScale } from "../../util/scalingUtil";
-import { trackEvent, VexoEvents } from "../../util/vexo-tracking";
+import { trackEvent } from "../../util/vexo-tracking";
+import { VexoEvents } from "../../util/vexo-constants";
 
 const PaywallScreen = ({ navigation }) => {
   // - State for all available package
@@ -46,7 +50,7 @@ const PaywallScreen = ({ navigation }) => {
   useEffect(() => {
     // Track paywall viewed
     trackEvent(VexoEvents.PAYWALL_VIEWED);
-    
+
     // Get current available packages
     const getPackages = async () => {
       try {

@@ -3,6 +3,7 @@
 import { customEvent } from "vexo-analytics";
 import { shouldEnableVexo } from "./vexo-tracking";
 import { VexoEvents } from "./vexo-constants";
+import Constants from "expo-constants";
 /**
  * Logs an error message to the console, including the file name and line number where the error occurred.
  * Also reports the error to Vexo for production tracking.
@@ -24,21 +25,21 @@ export default function safeLogError(
 
   console.error(logMessage);
 
-  if (shouldEnableVexo) {
-    try {
-      customEvent(VexoEvents.ERROR_OCCURRED, {
-        error:
-          typeof error === "string"
-            ? error
-            : (error as Error)?.message || "Unknown error",
-        fileName,
-        lineNumber,
-        stack: error instanceof Error ? error.stack : undefined,
-      });
-    } catch (vexoError) {
-      console.log("[Error] Failed to report to Vexo:", vexoError);
-    }
-  }
+  // if (shouldEnableVexo) {
+  //   try {
+  //     customEvent(VexoEvents.ERROR_OCCURRED, {
+  //       error:
+  //         typeof error === "string"
+  //           ? error
+  //           : (error as Error)?.message || "Unknown error",
+  //       fileName,
+  //       lineNumber,
+  //       stack: error instanceof Error ? error.stack : undefined,
+  //     });
+  //   } catch (vexoError) {
+  //     console.log("[Error] Failed to report to Vexo:", vexoError);
+  //   }
+  // }
 
   return message;
 }

@@ -4,11 +4,10 @@ import {
   identifyDevice,
   enableTracking,
 } from "vexo-analytics";
-import Constants from "expo-constants";
 import * as Device from "expo-device";
 import { DEVELOPER_MODE } from "../confAppConstants";
 import safeLogError from "./error";
-import { VexoEvents, VexoEventName } from "./vexo-constants";
+import { VexoEventName } from "./vexo-constants";
 
 let vexoInitialized = false;
 let vexoEnabled = false;

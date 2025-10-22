@@ -8,13 +8,20 @@ import React, {
 import { StyleSheet, Platform, TouchableOpacity, Animated } from "react-native";
 import { WebView } from "react-native-webview";
 import * as Haptics from "expo-haptics";
-import { generateHTMLTemplate, ChartData, ChartOptions } from "./chartHelpers";
+import { generateHTMLTemplate, ChartOptions } from "./chartHelpers";
 import ChartSkeleton from "../UI/ChartSkeleton";
 import { CHART_DIMENSIONS, CHART_STYLING, ChartType } from "./chartConstants";
 import { dynamicScale } from "../../util/scalingUtil";
 
+interface ChartData {
+  series: unknown[];
+  barWidth?: number;
+  budgetValue?: number;
+  budgetColor?: string;
+}
+
 interface WebViewChartProps {
-  data: unknown[]; // Highcharts series data format
+  data: unknown[] | ChartData; // Highcharts series data format or new chart data structure
   options?: ChartOptions;
   width?: number;
   height?: number;
@@ -58,7 +65,10 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
   );
 
   // Determine loading states
-  const isLoading = !isChartReady || !data || data.length === 0;
+  const isLoading =
+    !isChartReady ||
+    !data ||
+    (Array.isArray(data) ? data.length === 0 : !data.series);
   const skeletonType: ChartType = options.type === "pie" ? "pie" : "bar";
 
   const updateChartData = useCallback(() => {

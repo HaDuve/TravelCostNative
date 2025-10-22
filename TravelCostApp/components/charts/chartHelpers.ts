@@ -1,3 +1,4 @@
+import { Dimensions } from "react-native";
 import { CHART_SPACING } from "./chartConstants";
 
 export interface ChartData {
@@ -171,21 +172,38 @@ export const generateHTMLTemplate = (
             const mergedOptions = {
               ...defaultOptions,
               ...customOptions,
-              series: data
+              series: data.series || data
             };
 
-            // Calculate dynamic bar width if we have column series
-            if (data && data.length > 0) {
-              const columnSeries = data.find(series => series.type === 'column');
-              if (columnSeries && columnSeries.pointWidth) {
-                mergedOptions.plotOptions = {
-                  ...mergedOptions.plotOptions,
-                  column: {
-                    ...mergedOptions.plotOptions?.column,
-                    pointWidth: columnSeries.pointWidth
+            // Apply dynamic bar width if provided
+            if (data.barWidth) {
+              mergedOptions.plotOptions = {
+                ...mergedOptions.plotOptions,
+                column: {
+                  ...mergedOptions.plotOptions?.column,
+                  pointWidth: data.barWidth
+                }
+              };
+            }
+
+            // Add budget line as plotLine if provided
+            if (data.budgetValue && data.budgetValue > 0) {
+              mergedOptions.yAxis = {
+                ...mergedOptions.yAxis,
+                plotLines: [{
+                  value: data.budgetValue,
+                  color: data.budgetColor || '#6B7280',
+                  width: 3,
+                  zIndex: 1,
+                  label: {
+                    text: 'Budget',
+                    style: {
+                      color: data.budgetColor || '#6B7280',
+                      fontWeight: 'bold'
+                    }
                   }
-                };
-              }
+                }]
+              };
             }
 
             if (chart) {
@@ -204,7 +222,58 @@ export const generateHTMLTemplate = (
 
           function updateChart(newData) {
             if (chart && newData) {
-              if (Array.isArray(newData)) {
+              // Handle new data structure with series, barWidth, and budgetValue
+              if (newData.series) {
+                // Update series data
+                newData.series.forEach((seriesData, index) => {
+                  if (chart.series[index]) {
+                    chart.series[index].setData(seriesData.data, false);
+                  } else {
+                    chart.addSeries(seriesData, false);
+                  }
+                });
+
+                // Update bar width if changed
+                if (newData.barWidth) {
+                  chart.update({
+                    plotOptions: {
+                      column: {
+                        pointWidth: newData.barWidth
+                      }
+                    }
+                  }, false);
+                }
+
+                // Update budget line if changed
+                if (newData.budgetValue !== undefined) {
+                  const yAxis = chart.yAxis[0];
+                  if (yAxis) {
+                    // Remove existing plot lines
+                    yAxis.removePlotLine('budget-line');
+
+                    // Add new budget line if value > 0
+                    if (newData.budgetValue > 0) {
+                      yAxis.addPlotLine({
+                        id: 'budget-line',
+                        value: newData.budgetValue,
+                        color: newData.budgetColor || '#6B7280',
+                        width: 3,
+                        zIndex: 1,
+                        label: {
+                          text: 'Budget',
+                          style: {
+                            color: newData.budgetColor || '#6B7280',
+                            fontWeight: 'bold'
+                          }
+                        }
+                      });
+                    }
+                  }
+                }
+
+                chart.redraw();
+              } else if (Array.isArray(newData)) {
+                // Fallback for old data format
                 newData.forEach((seriesData, index) => {
                   if (chart.series[index]) {
                     chart.series[index].setData(seriesData.data, false);
@@ -318,21 +387,29 @@ export const formatDataForHighcharts = (
   ];
 };
 
+const BAR_MIN_WIDTH = 4;
+const BAR_MAX_WIDTH = 28;
+const BAR_SPACING = 1.35;
+const CONTAINER_MARGIN = 80;
+
 export const createBarChartData = (
   data: ChartData[],
   colors?: { primary: string; error: string; budget: string },
   budget?: number,
   chartWidth?: number
-): unknown[] => {
+): { series: unknown[]; barWidth: number; budgetValue?: number } => {
   const series = [];
 
   // Calculate dynamic bar width based on number of bars and chart width
   const barCount = data.length;
-  const availableWidth = chartWidth || 300; // Default width if not provided
+  const availableWidth = chartWidth || 300;
   const maxBarWidth = Math.max(
-    15,
-    Math.min(40, (availableWidth - 80) / barCount)
-  ); // Min 15px, max 40px
+    BAR_MIN_WIDTH,
+    Math.min(
+      BAR_MAX_WIDTH,
+      (availableWidth - CONTAINER_MARGIN) / (BAR_SPACING * barCount)
+    )
+  );
 
   // Bar data
   series.push({
@@ -347,43 +424,13 @@ export const createBarChartData = (
     animation: {
       duration: 1000,
     },
-    pointWidth: maxBarWidth,
   });
 
-  // Add budget line if budget is provided
-  if (budget && budget > 0) {
-    // Create budget line that spans the full chart width
-    const budgetLineData = [];
-
-    // Add points at the beginning and end of the chart area
-    if (data.length > 0) {
-      // Get the first and last x values
-      const firstX = data[0].x;
-      const lastX = data[data.length - 1].x;
-
-      // Add budget line points at the start and end
-      budgetLineData.push({ x: firstX, y: budget });
-      budgetLineData.push({ x: lastX, y: budget });
-    }
-
-    series.push({
-      name: "Budget",
-      type: "line",
-      data: budgetLineData,
-      color: colors?.budget || "#6B7280",
-      lineWidth: 2,
-      marker: {
-        enabled: false,
-      },
-      enableMouseTracking: false,
-      animation: {
-        duration: 1000,
-      },
-      zIndex: 1, // Ensure budget line is behind bars
-    });
-  }
-
-  return series;
+  return {
+    series,
+    barWidth: maxBarWidth,
+    budgetValue: budget,
+  };
 };
 
 export const createPieChartData = (data: ChartData[]): unknown[] => {

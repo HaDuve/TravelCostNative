@@ -26,7 +26,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -56,10 +59,11 @@ export type TripHistoryItemType = {
   isDynamicDailyBudget: boolean;
   startDate: string;
   endDate: string;
-  travellers: TravellerNames[];
+  travellers: { userName: string }[];
   sumOfExpenses: number;
   progress: number;
   days: number;
+  deleted: boolean;
 };
 
 function TripHistoryItem({ tripid, trips }) {
@@ -69,7 +73,7 @@ function TripHistoryItem({ tripid, trips }) {
   const contextTrip = tripCtx.tripid == tripid;
   const netCtx = useContext(NetworkContext);
   // list of objects containing the userName key
-  const [travellers, setTravellers] = useState<TravellerNames[]>([]);
+  const [travellers, setTravellers] = useState<{ userName: string }[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [tripName, setTripName] = useState("");
   const [totalBudget, setTotalBudget] = useState("");
@@ -77,6 +81,7 @@ function TripHistoryItem({ tripid, trips }) {
   const [tripCurrency, setTripCurrency] = useState("");
   const [sumOfExpenses, setSumOfExpenses] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [deleted, setDeleted] = useState(false);
   const [allLoaded, setAllLoaded] = useState(false);
   const [isDynamicDailyBudget, setIsDynamicDailyBudget] = useState(false);
   const [days, setDays] = useState(0);
@@ -97,6 +102,7 @@ function TripHistoryItem({ tripid, trips }) {
         sumOfExpenses: sumOfExpenses,
         progress: progress,
         days: days,
+        deleted: deleted,
       };
       setMMKVObject("tripHistoryItem" + `_${tripid}`, trip);
     },
@@ -121,19 +127,22 @@ function TripHistoryItem({ tripid, trips }) {
       "tripHistoryItem" + `_${tripid}`
     );
     if (trip) {
-      setTripName(trip.tripName);
-      setTotalBudget(trip.totalBudget);
-      setDailyBudget(trip.dailyBudget);
-      setTripCurrency(trip.tripCurrency);
-      setIsDynamicDailyBudget(trip.isDynamicDailyBudget);
-      setSumOfExpenses(trip.sumOfExpenses);
-      setProgress(trip.progress);
-      setDays(trip.days);
-      const travellers = [];
-      trip.travellers?.forEach((traveller) => {
-        travellers.push(traveller);
-      });
-      if (travellers.length > 0) setTravellers(travellers);
+      setDeleted(trip.deleted);
+      if (!trip.deleted) {
+        setTripName(trip.tripName);
+        setTotalBudget(trip.totalBudget);
+        setDailyBudget(trip.dailyBudget);
+        setTripCurrency(trip.tripCurrency);
+        setIsDynamicDailyBudget(trip.isDynamicDailyBudget);
+        setSumOfExpenses(trip.sumOfExpenses);
+        setProgress(trip.progress);
+        setDays(trip.days);
+        const travellers = [];
+        trip.travellers?.forEach((traveller) => {
+          travellers.push(traveller);
+        });
+        if (travellers.length > 0) setTravellers(travellers);
+      }
       setIsFetching(false);
     }
   }
@@ -239,6 +248,17 @@ function TripHistoryItem({ tripid, trips }) {
     async function getTrip() {
       try {
         const trip = await getTripData(tripid);
+        if (!trip) {
+          // Trip was deleted or doesn't exist
+          setDeleted(true);
+          setIsFetching(false);
+          return;
+        }
+        setDeleted(trip.deleted);
+        if (trip.deleted) {
+          setIsFetching(false);
+          return;
+        }
 
         const _dailyBudget = trip.dailyBudget;
         const _totalBudget = trip.totalBudget ?? MAX_JS_NUMBER.toString();
@@ -351,7 +371,10 @@ function TripHistoryItem({ tripid, trips }) {
       Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
       return;
     }
-    navigation.navigate("ManageTrip", { tripId: tripid, trips: trips });
+    (navigation as any).navigate("ManageTrip", {
+      tripId: tripid,
+      trips: trips,
+    });
   }
 
   const activeBorder = contextTrip
@@ -363,6 +386,7 @@ function TripHistoryItem({ tripid, trips }) {
     ? false
     : Number(sumOfExpenses) > Number(totalBudget);
 
+  if (deleted) return <Text>deleted</Text>;
   if (!tripid) return <Text>no id</Text>;
   if (isFetching || (tripid && !totalBudget)) {
     return (

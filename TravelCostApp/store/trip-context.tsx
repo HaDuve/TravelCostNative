@@ -20,7 +20,7 @@ import { ExpenseData, isPaidString } from "../util/expense";
 import { Traveller } from "../util/traveler";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { useInterval } from "../components/Hooks/useInterval";
-import { setMMKVObject, getMMKVObject } from "./mmkv";
+import { setMMKVObject, getMMKVObject, deleteMMKVObject } from "./mmkv";
 import set from "react-native-reanimated";
 import { Category } from "../util/category";
 import safeLogError from "../util/error";
@@ -431,6 +431,12 @@ function TripContextProvider({ children }) {
 
       // Soft delete the trip
       await softDeleteTripAPI(tripidToDelete);
+
+      // Clear cached trip data to prevent stale data from showing
+      const { deleteMMKVObject } = await import("./mmkv");
+      deleteMMKVObject("trip_" + tripidToDelete);
+      deleteMMKVObject("lastUpdateISO_trip_" + tripidToDelete);
+      deleteMMKVObject("tripHistoryItem_" + tripidToDelete);
 
       // If this was the current active trip, handle active trip reassignment
       if (tripidToDelete === tripid) {

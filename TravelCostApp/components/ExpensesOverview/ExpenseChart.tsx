@@ -12,7 +12,15 @@ import WebViewChart from "../charts/WebViewChart";
 import { ChartController, ExpenseData } from "../charts/controller";
 import { createBarChartData } from "../charts/chartHelpers";
 
-const ExpenseChart = ({ inputData, xAxis, yAxis, budget, currency }) => {
+const ExpenseChart = ({
+  inputData,
+  xAxis,
+  yAxis,
+  budget,
+  currency,
+  onZoomIn,
+  onZoomOut,
+}) => {
   const { isLandscape } = useContext(OrientationContext);
   const { settings } = useContext(SettingsContext);
 
@@ -30,15 +38,26 @@ const ExpenseChart = ({ inputData, xAxis, yAxis, budget, currency }) => {
 
   const chartData = useMemo(() => {
     if (!inputData || inputData.length === 0) {
+      console.log("📊 CHART DATA: No data available");
       return [];
     }
 
-    return ChartController.processExpenseData(
+    const processedData = ChartController.processExpenseData(
       inputData as ExpenseData[],
       xAxis,
       yAxis,
       colors
     );
+
+    console.log("📊 CHART DATA PROCESSED:", {
+      inputDataLength: inputData.length,
+      processedDataLength: processedData.length,
+      xAxis,
+      yAxis,
+      timestamp: new Date().toISOString(),
+    });
+
+    return processedData;
   }, [inputData, xAxis, yAxis, colors]);
 
   const highchartsData = useMemo(() => {
@@ -49,6 +68,16 @@ const ExpenseChart = ({ inputData, xAxis, yAxis, budget, currency }) => {
       effectiveBudget,
       width
     );
+
+    console.log("📊 HIGHCHARTS DATA CREATED:", {
+      chartDataLength: chartData.length,
+      barWidth: result.barWidth,
+      budgetValue: result.budgetValue,
+      effectiveBudget,
+      width,
+      timestamp: new Date().toISOString(),
+    });
+
     return {
       ...result,
       budgetColor: colors.budget,
@@ -72,6 +101,8 @@ const ExpenseChart = ({ inputData, xAxis, yAxis, budget, currency }) => {
         height={height}
         labelsEnabled={!!settings?.showBarLabels}
         showSkeleton={true}
+        onZoomIn={onZoomIn}
+        onZoomOut={onZoomOut}
       />
     </View>
   );
@@ -87,6 +118,8 @@ ExpenseChart.propTypes = {
   budget: PropTypes.number,
   daysRange: PropTypes.number,
   currency: PropTypes.string,
+  onZoomIn: PropTypes.func,
+  onZoomOut: PropTypes.func,
 };
 
 const styles = StyleSheet.create({

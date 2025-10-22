@@ -28,6 +28,8 @@ interface WebViewChartProps {
   onChartReady?: () => void;
   onPointClick?: (data: unknown) => void;
   onPointLongPress?: (data: unknown) => void;
+  onZoomIn?: () => void;
+  onZoomOut?: () => void;
   style?: object;
   showSkeleton?: boolean;
   labelsEnabled?: boolean;
@@ -48,6 +50,8 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
   onChartReady,
   onPointClick,
   onPointLongPress,
+  onZoomIn,
+  onZoomOut,
   style,
   showSkeleton = true,
   labelsEnabled = false,
@@ -167,8 +171,26 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
           }
           break;
 
-        case "zoom":
-          // Handle zoom events if needed
+        case "zoom-in":
+          console.log("🔍 CHART ZOOM IN EVENT:", {
+            type: "chart-interaction",
+            action: "zoom-in",
+            timestamp: new Date().toISOString(),
+          });
+          if (onZoomIn) {
+            onZoomIn();
+          }
+          break;
+
+        case "zoom-out":
+          console.log("🔍 CHART ZOOM OUT EVENT:", {
+            type: "chart-interaction",
+            action: "zoom-out",
+            timestamp: new Date().toISOString(),
+          });
+          if (onZoomOut) {
+            onZoomOut();
+          }
           break;
 
         default:

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Pressable, Platform } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React, { useContext, useRef } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { ExpensesContext } from "../../../store/expenses-context";
 import {
   getDateMinusDays,
@@ -47,9 +47,38 @@ const ExpenseGraph = ({
   tripCtx,
   navigation,
 }) => {
+  // State for zoom level (number of bars to show)
+  const [zoomLevel, setZoomLevel] = useState(1); // 1 = normal, 0.5 = zoomed in (fewer bars), 2 = zoomed out (more bars)
   const today = new Date();
   const renderItemRef = useRef(null);
   const { isPortrait } = useContext(OrientationContext);
+
+  // Zoom functions
+  const handleZoomIn = () => {
+    setZoomLevel((prev) => {
+      const newZoom = Math.max(0.25, prev * 0.8);
+      console.log("🔍 ZOOM IN:", {
+        previousZoom: prev,
+        newZoom: newZoom,
+        effectivePeriodRange: Math.round((periodRangeNumber ?? 7) * newZoom),
+        timestamp: new Date().toISOString(),
+      });
+      return newZoom;
+    });
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel((prev) => {
+      const newZoom = Math.min(4, prev * 1.25);
+      console.log("🔍 ZOOM OUT:", {
+        previousZoom: prev,
+        newZoom: newZoom,
+        effectivePeriodRange: Math.round((periodRangeNumber ?? 7) * newZoom),
+        timestamp: new Date().toISOString(),
+      });
+      return newZoom;
+    });
+  };
 
   const expenseCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
@@ -61,11 +90,31 @@ const ExpenseGraph = ({
 
   const totalBudget = Number(tripCtx.totalBudget) ?? MAX_JS_NUMBER;
   const listExpenseSumBudgets = [];
-  const lastDays = (periodRangeNumber ?? 7) + longerPeriodNum;
-  const lastWeeks = (periodRangeNumber ?? 7) + longerPeriodNum;
-  const lastMonths = (periodRangeNumber ?? 7) + longerPeriodNum;
+
+  // Calculate effective period range based on zoom level
+  const basePeriodRange = periodRangeNumber ?? 7;
+  const effectivePeriodRange = Math.round(basePeriodRange * zoomLevel);
+
+  const lastDays = effectivePeriodRange + longerPeriodNum;
+  const lastWeeks = effectivePeriodRange + longerPeriodNum;
+  const lastMonths = effectivePeriodRange + longerPeriodNum;
   const lastYears =
-    (periodName == "total" ? 5 : (periodRangeNumber ?? 7)) + longerPeriodNum;
+    (periodName == "total" ? 5 : effectivePeriodRange) + longerPeriodNum;
+
+  // Log period range calculations
+  console.log("📊 PERIOD RANGE CALCULATION:", {
+    periodName,
+    basePeriodRange,
+    zoomLevel,
+    effectivePeriodRange,
+    longerPeriodNum,
+    startingPoint,
+    lastDays,
+    lastWeeks,
+    lastMonths,
+    lastYears,
+    timestamp: new Date().toISOString(),
+  });
   let xAxis = "";
   let yAxis = "";
   let budget = 0;
@@ -404,6 +453,17 @@ const ExpenseGraph = ({
       break;
   }
 
+  // Log final state before rendering
+  console.log("🎯 EXPENSE GRAPH RENDER STATE:", {
+    periodName,
+    startingPoint,
+    longerPeriodNum,
+    zoomLevel,
+    effectivePeriodRange,
+    dataPointsCount: listExpenseSumBudgets.length,
+    timestamp: new Date().toISOString(),
+  });
+
   return (
     <Animated.View
       entering={FadeInRight}
@@ -423,6 +483,8 @@ const ExpenseGraph = ({
               yAxis={yAxis}
               budget={budget}
               currency={tripCtx.tripCurrency}
+              onZoomIn={handleZoomIn}
+              onZoomOut={handleZoomOut}
             ></ExpenseChart>
           </View>
         )}
@@ -446,19 +508,44 @@ const ExpenseGraph = ({
               >
                 <PeriodControlPanel
                   periodName={periodName}
-                  onMore={() => {
-                    setStartingPoint(startingPoint - (periodRangeNumber ?? 10));
-                  }}
-                  onLess={() => {
-                    setStartingPoint(startingPoint + (periodRangeNumber ?? 10));
-                  }}
                   onReset={() => {
+                    console.log("🔄 RESET:", {
+                      previousStartingPoint: startingPoint,
+                      previousLongerPeriodNum: longerPeriodNum,
+                      previousZoomLevel: zoomLevel,
+                      timestamp: new Date().toISOString(),
+                    });
                     setStartingPoint(0);
                     setLongerPeriodNum(0);
+                    setZoomLevel(1); // Reset zoom level
                   }}
-                  canShowMore={startingPoint > -MAX_PERIOD_RANGE}
-                  canShowLess={startingPoint < 0}
-                  canReset={startingPoint !== 0 || longerPeriodNum !== 0}
+                  canReset={
+                    startingPoint !== 0 ||
+                    longerPeriodNum !== 0 ||
+                    zoomLevel !== 1
+                  }
+                  onSlideLeft={() => {
+                    const newStartingPoint = startingPoint + 1;
+                    console.log("⬅️ SLIDE LEFT:", {
+                      previousStartingPoint: startingPoint,
+                      newStartingPoint: newStartingPoint,
+                      periodName,
+                      timestamp: new Date().toISOString(),
+                    });
+                    setStartingPoint(newStartingPoint);
+                  }}
+                  onSlideRight={() => {
+                    const newStartingPoint = startingPoint - 1;
+                    console.log("➡️ SLIDE RIGHT:", {
+                      previousStartingPoint: startingPoint,
+                      newStartingPoint: newStartingPoint,
+                      periodName,
+                      timestamp: new Date().toISOString(),
+                    });
+                    setStartingPoint(newStartingPoint);
+                  }}
+                  canSlideLeft={startingPoint < 0}
+                  canSlideRight={startingPoint > -MAX_PERIOD_RANGE}
                 />
               </Accordion>
               {isPortrait && (
@@ -468,6 +555,8 @@ const ExpenseGraph = ({
                   yAxis={yAxis}
                   budget={budget}
                   currency={tripCtx.tripCurrency}
+                  onZoomIn={handleZoomIn}
+                  onZoomOut={handleZoomOut}
                 ></ExpenseChart>
               )}
             </View>

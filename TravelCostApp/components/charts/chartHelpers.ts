@@ -205,6 +205,51 @@ export const generateHTMLTemplate = (
 
             chart = Highcharts.chart(mergedOptions);
 
+            // Add zoom event listeners
+            chart.xAxis[0].setExtremes = function(min, max, redraw, animation) {
+              // Call the original setExtremes method
+              Highcharts.Axis.prototype.setExtremes.call(this, min, max, redraw, animation);
+
+              // Check if this is a zoom operation (not initial load)
+              if (min !== undefined && max !== undefined && this.dataMin !== undefined && this.dataMax !== undefined) {
+                const totalDataRange = this.dataMax - this.dataMin;
+                const zoomedRange = max - min;
+                const zoomRatio = totalDataRange / zoomedRange;
+
+                console.log('📈 CHART ZOOM DETECTION:', {
+                  min: min,
+                  max: max,
+                  dataMin: this.dataMin,
+                  dataMax: this.dataMax,
+                  totalDataRange: totalDataRange,
+                  zoomedRange: zoomedRange,
+                  zoomRatio: zoomRatio,
+                  timestamp: new Date().toISOString()
+                });
+
+                // Determine zoom level based on ratio
+                if (zoomRatio > 1.5) {
+                  // Zoom in - show fewer bars
+                  console.log('🔍 TRIGGERING ZOOM IN:', { zoomRatio });
+                  if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'zoom-in'
+                    }));
+                  }
+                } else if (zoomRatio < 0.7) {
+                  // Zoom out - show more bars
+                  console.log('🔍 TRIGGERING ZOOM OUT:', { zoomRatio });
+                  if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'zoom-out'
+                    }));
+                  }
+                } else {
+                  console.log('📊 ZOOM RATIO WITHIN NORMAL RANGE:', { zoomRatio });
+                }
+              }
+            };
+
             // Notify React Native that chart is ready
             if (window.ReactNativeWebView) {
               window.ReactNativeWebView.postMessage(JSON.stringify({

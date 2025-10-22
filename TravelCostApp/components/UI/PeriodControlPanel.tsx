@@ -7,41 +7,43 @@ import PropTypes from "prop-types";
 
 interface PeriodControlPanelProps {
   periodName: string;
-  onMore: () => void;
-  onLess: () => void;
   onReset: () => void;
-  canShowMore: boolean;
-  canShowLess: boolean;
   canReset: boolean;
+  // New sliding window controls
+  onSlideLeft?: () => void;
+  onSlideRight?: () => void;
+  canSlideLeft?: boolean;
+  canSlideRight?: boolean;
 }
 
 const PeriodControlPanel = ({
   periodName,
-  onMore,
-  onLess,
   onReset,
-  canShowMore,
-  canShowLess,
   canReset,
+  onSlideLeft,
+  onSlideRight,
+  canSlideLeft = true,
+  canSlideRight = true,
 }: PeriodControlPanelProps) => {
   return (
     <View style={styles.container}>
+      {/* Sliding Window Controls */}
       <View style={styles.controlsRow}>
-        {/* Less Button */}
+        {/* Slide Left Button */}
         <Pressable
           style={({ pressed }) => [
             styles.controlButton,
-            !canShowLess && styles.disabledButton,
+            !canSlideLeft && styles.disabledButton,
             pressed && GlobalStyles.pressed,
           ]}
-          onPress={onLess}
-          disabled={!canShowLess}
+          onPress={onSlideLeft}
+          disabled={!canSlideLeft}
         >
           <Ionicons
-            name="remove"
+            name="chevron-back"
             size={dynamicScale(20, false, 0.5)}
             color={
-              canShowLess
+              canSlideLeft
                 ? GlobalStyles.colors.primary500
                 : GlobalStyles.colors.gray600
             }
@@ -72,21 +74,21 @@ const PeriodControlPanel = ({
           </Pressable>
         )}
 
-        {/* More Button */}
+        {/* Slide Right Button */}
         <Pressable
           style={({ pressed }) => [
             styles.controlButton,
-            !canShowMore && styles.disabledButton,
+            !canSlideRight && styles.disabledButton,
             pressed && GlobalStyles.pressed,
           ]}
-          onPress={onMore}
-          disabled={!canShowMore}
+          onPress={onSlideRight}
+          disabled={!canSlideRight}
         >
           <Ionicons
-            name="add"
+            name="chevron-forward"
             size={dynamicScale(20, false, 0.5)}
             color={
-              canShowMore
+              canSlideRight
                 ? GlobalStyles.colors.primary500
                 : GlobalStyles.colors.gray600
             }
@@ -101,12 +103,12 @@ export default PeriodControlPanel;
 
 PeriodControlPanel.propTypes = {
   periodName: PropTypes.string.isRequired,
-  onMore: PropTypes.func.isRequired,
-  onLess: PropTypes.func.isRequired,
   onReset: PropTypes.func.isRequired,
-  canShowMore: PropTypes.bool.isRequired,
-  canShowLess: PropTypes.bool.isRequired,
   canReset: PropTypes.bool.isRequired,
+  onSlideLeft: PropTypes.func,
+  onSlideRight: PropTypes.func,
+  canSlideLeft: PropTypes.bool,
+  canSlideRight: PropTypes.bool,
 };
 
 const styles = StyleSheet.create({

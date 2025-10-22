@@ -15,7 +15,6 @@ import { GlobalStyles } from "../../../constants/styles";
 import ExpenseChart from "../../ExpensesOverview/ExpenseChart";
 import Accordion from "../../UI/Accordion";
 import PeriodControlPanel from "../../UI/PeriodControlPanel";
-import SettingsSwitch from "../../UI/SettingsSwitch";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -53,7 +52,7 @@ const ExpenseGraph = ({
   const { isPortrait } = useContext(OrientationContext);
 
   const expenseCtx = useContext(ExpensesContext);
-  const { settings, saveSettings } = useContext(SettingsContext);
+  const { settings } = useContext(SettingsContext);
   const hideSpecial = settings.hideSpecialExpenses;
 
   if (!isForeground || !expenseCtx.expenses) {
@@ -61,19 +60,6 @@ const ExpenseGraph = ({
   }
 
   const totalBudget = Number(tripCtx.totalBudget) ?? MAX_JS_NUMBER;
-
-  const toggleShowBarBudgetLine = () => {
-    const newSettings = {
-      ...settings,
-      showBarBudgetLine: !settings.showBarBudgetLine,
-    };
-    saveSettings(newSettings);
-  };
-  const toggleShowBarLabels = () => {
-    const newSettings = { ...settings, showBarLabels: !settings.showBarLabels };
-    saveSettings(newSettings);
-  };
-
   const listExpenseSumBudgets = [];
   const lastDays = (periodRangeNumber ?? 7) + longerPeriodNum;
   const lastWeeks = (periodRangeNumber ?? 7) + longerPeriodNum;
@@ -458,42 +444,22 @@ const ExpenseGraph = ({
                 defaultExpanded={false}
                 containerStyle={styles.accordionContainer}
               >
-                <View style={styles.settingsContainer}>
-                  <SettingsSwitch
-                    label={i18n.t("showBudgetLine")}
-                    state={settings.showBarBudgetLine}
-                    toggleState={toggleShowBarBudgetLine}
-                    style={{}}
-                    labelStyle={{}}
-                  />
-                  <SettingsSwitch
-                    label={i18n.t("showBarLabels")}
-                    state={settings.showBarLabels}
-                    toggleState={toggleShowBarLabels}
-                    style={{ height: 40 }}
-                    labelStyle={{}}
-                  />
-                  <PeriodControlPanel
-                    periodName={periodName}
-                    onMore={() => {
-                      setStartingPoint(
-                        startingPoint - (periodRangeNumber ?? 10)
-                      );
-                    }}
-                    onLess={() => {
-                      setStartingPoint(
-                        startingPoint + (periodRangeNumber ?? 10)
-                      );
-                    }}
-                    onReset={() => {
-                      setStartingPoint(0);
-                      setLongerPeriodNum(0);
-                    }}
-                    canShowMore={startingPoint > -MAX_PERIOD_RANGE}
-                    canShowLess={startingPoint < 0}
-                    canReset={startingPoint !== 0 || longerPeriodNum !== 0}
-                  />
-                </View>
+                <PeriodControlPanel
+                  periodName={periodName}
+                  onMore={() => {
+                    setStartingPoint(startingPoint - (periodRangeNumber ?? 10));
+                  }}
+                  onLess={() => {
+                    setStartingPoint(startingPoint + (periodRangeNumber ?? 10));
+                  }}
+                  onReset={() => {
+                    setStartingPoint(0);
+                    setLongerPeriodNum(0);
+                  }}
+                  canShowMore={startingPoint > -MAX_PERIOD_RANGE}
+                  canShowLess={startingPoint < 0}
+                  canReset={startingPoint !== 0 || longerPeriodNum !== 0}
+                />
               </Accordion>
               {isPortrait && (
                 <ExpenseChart
@@ -539,11 +505,8 @@ ExpenseGraph.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  accordionContainer: {},
-  settingsContainer: {
-    minHeight: dynamicScale(200, true),
-    paddingHorizontal: dynamicScale(16, true),
-    paddingVertical: dynamicScale(16, true),
+  accordionContainer: {
+    // borderWidth: 1,
   },
   container: {
     flex: 1,

@@ -33,11 +33,11 @@ import {
 import { GlobalStyles } from "../constants/styles";
 import { Image } from "react-native";
 import InfoButton from "../components/UI/InfoButton";
-import GradientButton from "../components/UI/GradientButton";
 import { dynamicScale } from "../util/scalingUtil";
 import { NetworkContext } from "../store/network-context";
 import Toast from "react-native-toast-message";
-import { trackEvent, VexoEvents } from "../util/vexo-tracking";
+import { trackEvent } from "../util/vexo-tracking";
+import { VexoEvents } from "../util/vexo-constants";
 
 const GPTDealScreen = ({ route, navigation }) => {
   const { price, currency, country, product } = route.params;
@@ -149,13 +149,13 @@ const GPTDealScreen = ({ route, navigation }) => {
           if (response) {
             setAnswer(response.content);
             startStreaming(response.content);
-            
+
             // Track GPT price lookup usage
             trackEvent(VexoEvents.GPT_RECOMMENDATION_USED, {
-              requestType: 'getPrice',
+              requestType: "getPrice",
               product: product,
               currency: currency,
-              country: country
+              country: country,
             });
           }
         } catch (error) {
@@ -183,14 +183,14 @@ const GPTDealScreen = ({ route, navigation }) => {
         if (response && response.content) {
           setAnswer(response.content);
           startStreaming(response.content);
-          
+
           // Track GPT deal recommendation usage
           trackEvent(VexoEvents.GPT_RECOMMENDATION_USED, {
-            requestType: 'getGoodDeal',
+            requestType: "getGoodDeal",
             product: product,
             price: price,
             currency: currency,
-            country: country
+            country: country,
           });
         }
       } catch (error) {
@@ -344,8 +344,8 @@ const GPTDealScreen = ({ route, navigation }) => {
                     {loadingPhase === "searching"
                       ? i18n.t("gptSearchingWeb")
                       : loadingPhase === "analyzing"
-                      ? i18n.t("gptAnalyzingData")
-                      : i18n.t("askingChatGpt")}
+                        ? i18n.t("gptAnalyzingData")
+                        : i18n.t("askingChatGpt")}
                   </Text>
                 </View>
               </View>

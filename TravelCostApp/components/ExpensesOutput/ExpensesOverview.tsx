@@ -1,4 +1,4 @@
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import React, { useContext, useRef, useState } from "react";
 import ExpenseCategories from "./ExpenseStatistics/ExpenseCategories";
 import ExpenseGraph from "./ExpenseStatistics/ExpenseGraph";
@@ -21,20 +21,15 @@ import PropTypes from "prop-types";
 import ExpenseCountries from "./ExpenseStatistics/ExpenseCountries";
 import ExpenseTravellers from "./ExpenseStatistics/ExpenseTravellers";
 import ExpenseCurrencies from "./ExpenseStatistics/ExpenseCurrencies";
-import Animated, {
-  FadeInUp,
-  FadeOutDown,
-} from "react-native-reanimated";
+import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { MAX_PERIOD_RANGE } from "../../confAppConstants";
 import { BlurView } from "expo-blur";
 import { TripContext } from "../../store/trip-context";
-import { constantScale, dynamicScale } from "../../util/scalingUtil";
-import { OrientationContext } from "../../store/orientation-context";
+import { dynamicScale } from "../../util/scalingUtil";
 import { useSwipe } from "../Hooks/useSwipe";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const tripCtx = useContext(TripContext);
-  const { isPortrait } = useContext(OrientationContext);
   // const periodRangeNumber = useRef(7);
   // periodRangeNumber useState is used to rerender the component when the periodRangeNumber changes
   const realPeriodNumber = useRef(7);
@@ -45,17 +40,17 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const { onTouchStart, onTouchEnd } = useSwipe(onSwipeLeft, onSwipeRight, 6);
 
   function onSwipeLeft() {
-    console.log("SWIPE_LEFT");
+    // Handle swipe left
   }
 
   function onSwipeRight() {
-    console.log("SWIPE_RIGHT");
+    // Handle swipe right
   }
 
-  const [isGraphNotPie, setToggleGraph] = useState(true);
+  const userCtx = useContext(UserContext);
+  const isGraphNotPie = userCtx.isShowingGraph;
   // enum =>  0 = categories, 1 = traveller, 2 = country, 3 = currency
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
-  const userCtx = useContext(UserContext);
   const [longerPeriodNum, setLongerPeriodNum] = useState(0);
   const [startingPoint, setStartingPoint] = useState(0);
 
@@ -70,22 +65,6 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       } ${i18n.t(periodName + "s")}`;
       break;
   }
-
-  const [autoIncrement, setAutoIncrement] = useState<NodeJS.Timer>(null);
-
-  const startAutoIncrement = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    rightNavButtonHandler();
-    const interval = setInterval(() => {
-      rightNavButtonHandler();
-    }, 600);
-    setAutoIncrement(interval);
-    return;
-  };
-  const stopAutoIncrement = () => {
-    clearInterval(autoIncrement);
-    return;
-  };
 
   const rightNavButtonHandler = () => {
     if (isGraphNotPie) {
@@ -149,7 +128,6 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       {isGraphNotPie && (
         <ExpenseGraph
           navigation={navigation}
-          expenses={expenses}
           periodName={periodName}
           periodRangeNumber={periodRangeNumber}
           tripCtx={tripCtx}
@@ -164,6 +142,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           expenses={expenses}
           periodName={periodName}
           navigation={navigation}
+          forcePortraitFormat={false}
         />
       )}
       {!isGraphNotPie && toggleGraphEnum == 1 && (
@@ -171,6 +150,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           expenses={expenses}
           periodName={periodName}
           navigation={navigation}
+          forcePortraitFormat={false}
         ></ExpenseTravellers>
       )}
       {!isGraphNotPie && toggleGraphEnum == 2 && (
@@ -178,6 +158,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           expenses={expenses}
           periodName={periodName}
           navigation={navigation}
+          forcePortraitFormat={false}
         ></ExpenseCountries>
       )}
       {!isGraphNotPie && toggleGraphEnum == 3 && (
@@ -185,6 +166,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           expenses={expenses}
           periodName={periodName}
           navigation={navigation}
+          forcePortraitFormat={false}
         ></ExpenseCurrencies>
       )}
       {titleContainerJSX}

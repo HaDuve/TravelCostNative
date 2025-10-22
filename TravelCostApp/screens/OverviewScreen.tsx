@@ -275,7 +275,7 @@ const OverviewScreen = ({ navigation }) => {
           periodName={PeriodValue}
         />
       </ScrollView>
-      
+
       {/* FAB Toggle Button */}
       <TourGuideZone
         text={i18n.t("walk4")}
@@ -414,12 +414,10 @@ const styles = StyleSheet.create({
   fabToggleButton: {
     position: "absolute",
     bottom: dynamicScale(20, true),
-    right: dynamicScale(20),
+    left: "50%",
+    marginLeft: constantScale(-49, 0.08), // Half of the svg width to center it
     zIndex: 1000,
     elevation: 10,
-    borderRadius: dynamicScale(25, false, 0.5),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    padding: dynamicScale(8),
     ...GlobalStyles.shadowGlowPrimary,
   },
 });

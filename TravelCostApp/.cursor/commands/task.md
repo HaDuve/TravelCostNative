@@ -45,7 +45,7 @@ I'll help you create a new task following the Cursor task management conventions
 #### Creation Process
 
 1. Create the task file with proper naming convention
-2. Set up the appropriate git branch
+2. **REQUIRED: Set up the appropriate git branch** - Branch creation is mandatory for all task types except research
 3. Run the context-gathering agent to create a comprehensive manifest
 4. Update the task state
 5. Ensure DAIC workflow is properly initialized
@@ -59,19 +59,19 @@ I'll help you start work on the created task:
 #### What I'll do:
 
 1. **Validate Task File** - Check if task exists and is properly formatted
-2. **Git Setup** - Create/checkout appropriate branches for task and submodules
+2. **REQUIRED: Git Setup** - Create/checkout appropriate branches for task and submodules
 3. **Update Task State** - Set this as the current active task
 4. **Load Context Manifest** - Load comprehensive context from task file
-5. **Verify Branch State** - Ensure all modules are on correct branches
+5. **REQUIRED: Verify Branch State** - Ensure all modules are on correct branches
 6. **Update Task Status** - Mark as in-progress with start date
 7. **DAIC Mode Check** - Ensure proper workflow mode is set
 
-#### Branch Management
+#### REQUIRED: Branch Management
 
-- For super-repos: Creates matching branches in ALL affected submodules
-- For regular repos: Simple branch creation/checkout
-- Handles both new and existing branches
-- Enforces branch naming conventions based on task type
+- **MANDATORY**: For super-repos: Creates matching branches in ALL affected submodules
+- **MANDATORY**: For regular repos: Simple branch creation/checkout
+- **REQUIRED**: Handles both new and existing branches
+- **REQUIRED**: Enforces branch naming conventions based on task type
 
 #### Context Loading
 
@@ -101,13 +101,13 @@ I'll help you complete the current task:
 2. **Service Documentation Agent** - Updates CLAUDE.md files with service changes
 3. **Logging Agent** - Finalizes task documentation and work log
 
-#### Git Operations
+#### REQUIRED: Git Operations
 
 - Review unstaged changes and commit preferences
-- Handle super-repo vs standard repo differently
-- Commit changes with descriptive messages
-- Merge branches based on task type (subtask → parent, regular → main)
-- Push merged branches
+- **MANDATORY**: Handle super-repo vs standard repo differently
+- **REQUIRED**: Commit changes with descriptive messages
+- **MANDATORY**: Merge branches based on task type (subtask → parent, regular → main)
+- **REQUIRED**: Push merged branches
 
 #### Task Archival
 
@@ -119,6 +119,21 @@ I'll help you complete the current task:
 
 - **Experiment branches**: Ask whether to keep for reference
 - **Research tasks**: No merging needed, just document findings
+
+## CRITICAL: Branch Requirements Summary
+
+**MANDATORY Branch Operations Throughout Workflow:**
+
+1. **Stage 1 (Creation)**: Create appropriate branch based on task type
+2. **Stage 2 (Startup)**: Verify and setup branches in all affected modules
+3. **Stage 3 (Completion)**: Merge branches according to task type and push changes
+
+**Branch Naming Conventions:**
+
+- `feature/` for implement-, refactor-, migrate-, test-, docs- tasks
+- `fix/` for fix- tasks
+- `experiment/` for experiment- tasks
+- No branch for research- tasks
 
 ## Workflow Integration
 

@@ -145,7 +145,6 @@ export const generateHTMLTemplate = (
                 }
               },
               column: {
-                pointWidth: 25,
                 borderRadius: 4,
                 groupPadding: 0.1,
                 pointPadding: 0.1,
@@ -307,9 +306,16 @@ export const formatDataForHighcharts = (
 
 export const createBarChartData = (
   data: ChartData[],
-  colors?: { primary: string; error: string; budget: string }
+  colors?: { primary: string; error: string; budget: string },
+  budget?: number,
+  chartWidth?: number
 ): unknown[] => {
   const series = [];
+
+  // Calculate dynamic bar width based on number of bars and chart width
+  const barCount = data.length;
+  const availableWidth = chartWidth || 300; // Default width if not provided
+  const maxBarWidth = Math.max(15, Math.min(40, (availableWidth - 80) / barCount)); // Min 15px, max 40px
 
   // Bar data
   series.push({
@@ -324,7 +330,29 @@ export const createBarChartData = (
     animation: {
       duration: 1000,
     },
+    pointWidth: maxBarWidth,
   });
+
+  // Add budget line if budget is provided
+  if (budget && budget > 0) {
+    series.push({
+      name: "Budget",
+      type: "line",
+      data: data.map((item) => ({
+        x: item.x,
+        y: budget,
+      })),
+      color: colors?.budget || "#6B7280",
+      lineWidth: 2,
+      marker: {
+        enabled: false,
+      },
+      enableMouseTracking: false,
+      animation: {
+        duration: 1000,
+      },
+    });
+  }
 
   return series;
 };

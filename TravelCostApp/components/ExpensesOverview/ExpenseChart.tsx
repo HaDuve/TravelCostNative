@@ -40,8 +40,8 @@ const ExpenseChart = ({ inputData, xAxis, yAxis, budget, currency }) => {
   }, [inputData, xAxis, yAxis, colors]);
 
   const highchartsData = useMemo(() => {
-    return createBarChartData(chartData, colors);
-  }, [chartData, colors]);
+    return createBarChartData(chartData, colors, budget, width);
+  }, [chartData, colors, budget, width]);
 
   const chartOptions = useMemo(() => {
     return ChartController.createExpenseChartOptions(

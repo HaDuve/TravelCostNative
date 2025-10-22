@@ -13,6 +13,8 @@ import {
 import { formatExpenseWithCurrency } from "../../../util/string";
 import { GlobalStyles } from "../../../constants/styles";
 import ExpenseChart from "../../ExpensesOverview/ExpenseChart";
+import Accordion from "../../UI/Accordion";
+import PeriodControlPanel from "../../UI/PeriodControlPanel";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -32,7 +34,6 @@ import { isForeground } from "../../../util/appState";
 import { MAX_JS_NUMBER, MAX_PERIOD_RANGE } from "../../../confAppConstants";
 import { SettingsContext } from "../../../store/settings-context";
 import { getExpensesSumPeriod } from "../../../util/expense";
-import FlatButton from "../../UI/FlatButton";
 import { dynamicScale } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
 
@@ -67,14 +68,11 @@ const ExpenseGraph = ({
     (periodName == "total" ? 5 : periodRangeNumber ?? 7) + longerPeriodNum;
   let xAxis = "";
   let yAxis = "";
-  let budgetAxis = "";
   let budget = 0;
-  let daysRange = 0;
   switch (periodName) {
     case "day":
       xAxis = "day";
       yAxis = "expensesSum";
-      budgetAxis = "dailyBudget";
       for (let i = startingPoint; i < lastDays; i++) {
         const day = getDateMinusDays(today, i);
         const dayExpenses = expenseCtx.getDailyExpenses(i);
@@ -87,7 +85,6 @@ const ExpenseGraph = ({
         );
         const label = `${formattedDay} - ${formattedSum}`;
         budget = Number(dailyBudget);
-        daysRange = lastDays;
         const obj = { day, expensesSum, dailyBudget, label };
         listExpenseSumBudgets.push(obj);
       }
@@ -130,25 +127,6 @@ const ExpenseGraph = ({
               styles.categoryCard,
               pressed && GlobalStyles.pressedWithShadow,
             ]}
-            onLongPress={() => {
-              // console.log("longPress");
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success
-              );
-              const filteredExpenses = expenseCtx
-                .getSpecificDayExpenses(new Date(item.day))
-                .filter(
-                  (item) =>
-                    !item.isSpecialExpense ||
-                    (item.isSpecialExpense && !hideSpecial)
-                );
-              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
-
-              navigation.navigate("FilteredExpenses", {
-                expenses: filteredExpenses,
-                dayString: dayString,
-              });
-            }}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const filteredExpenses = expenseCtx
@@ -183,7 +161,6 @@ const ExpenseGraph = ({
     case "week":
       xAxis = "firstDay";
       yAxis = "expensesSum";
-      budgetAxis = "weeklyBudget";
 
       for (let i = startingPoint; i < lastWeeks; i++) {
         const { firstDay, lastDay, weeklyExpenses } =
@@ -198,7 +175,6 @@ const ExpenseGraph = ({
         );
         const label = `${formattedDay} - ${formattedSum}`;
         budget = weeklyBudget;
-        daysRange = lastWeeks * 7;
         const obj = { firstDay, lastDay, expensesSum, weeklyBudget, label };
         listExpenseSumBudgets.push(obj);
       }
@@ -247,23 +223,6 @@ const ExpenseGraph = ({
               styles.categoryCard,
               pressed && GlobalStyles.pressedWithShadow,
             ]}
-            onLongPress={() => {
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success
-              );
-              const filteredExpenses = expenseCtx
-                .getSpecificWeekExpenses(new Date(item.firstDay))
-                .filter(
-                  (item) =>
-                    !item.isSpecialExpense ||
-                    (item.isSpecialExpense && !hideSpecial)
-                );
-              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
-              navigation.navigate("FilteredExpenses", {
-                expenses: filteredExpenses,
-                dayString: weekString,
-              });
-            }}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const filteredExpenses = expenseCtx
@@ -298,7 +257,6 @@ const ExpenseGraph = ({
     case "month":
       xAxis = "firstDay";
       yAxis = "expensesSum";
-      budgetAxis = "monthlyBudget";
 
       for (let i = startingPoint; i < lastMonths; i++) {
         const { firstDay, lastDay, monthlyExpenses } =
@@ -313,7 +271,6 @@ const ExpenseGraph = ({
         );
         const label = `${formattedDay} - ${formattedSum}`;
         budget = monthlyBudget;
-        daysRange = lastMonths * 30;
         const obj = { firstDay, lastDay, expensesSum, monthlyBudget, label };
         listExpenseSumBudgets.push(obj);
       }
@@ -337,23 +294,6 @@ const ExpenseGraph = ({
               styles.categoryCard,
               pressed && GlobalStyles.pressedWithShadow,
             ]}
-            onLongPress={() => {
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success
-              );
-              const filteredExpenses = expenseCtx
-                .getSpecificMonthExpenses(new Date(item.firstDay))
-                .filter(
-                  (item) =>
-                    !item.isSpecialExpense ||
-                    (item.isSpecialExpense && !hideSpecial)
-                );
-              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
-              navigation.navigate("FilteredExpenses", {
-                expenses: filteredExpenses,
-                dayString: month,
-              });
-            }}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const filteredExpenses = expenseCtx
@@ -392,7 +332,6 @@ const ExpenseGraph = ({
     case "year":
       xAxis = "firstDay";
       yAxis = "expensesSum";
-      budgetAxis = "yearlyBudget";
 
       for (let i = startingPoint; i < lastYears; i++) {
         const { firstDay, lastDay, yearlyExpenses } =
@@ -407,7 +346,6 @@ const ExpenseGraph = ({
         );
         const label = `${formattedDay} - ${formattedSum}`;
         budget = yearlyBudget;
-        daysRange = lastYears * 365;
         const obj = { firstDay, lastDay, expensesSum, yearlyBudget, label };
         listExpenseSumBudgets.push(obj);
       }
@@ -431,23 +369,6 @@ const ExpenseGraph = ({
               styles.categoryCard,
               pressed && GlobalStyles.pressedWithShadow,
             ]}
-            onLongPress={() => {
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success
-              );
-              const filteredExpenses = expenseCtx
-                .getSpecificYearExpenses(new Date(item.firstDay))
-                .filter(
-                  (item) =>
-                    !item.isSpecialExpense ||
-                    (item.isSpecialExpense && !hideSpecial)
-                );
-              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
-              navigation.navigate("FilteredExpenses", {
-                expenses: filteredExpenses,
-                dayString: yearString,
-              });
-            }}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const filteredExpenses = expenseCtx
@@ -482,13 +403,6 @@ const ExpenseGraph = ({
     default:
       break;
   }
-  const showFutureString = `${i18n.t("showMore")} ${i18n.t("future")} ${i18n.t(
-    periodName + "s"
-  )}`;
-
-  const showPastString = `${i18n.t("showMore")} ${i18n.t("past")} ${i18n.t(
-    periodName + "s"
-  )}`;
 
   return (
     <Animated.View
@@ -540,36 +454,59 @@ const ExpenseGraph = ({
                   !isPortrait && styles.landscapeFlatButton,
                 ]}
               >
-                {startingPoint > -MAX_PERIOD_RANGE && (
-                  <FlatButton
-                    onPress={() => {
-                      // reduce starting point to show future expenses
+                <Accordion 
+                  title={i18n.t("chartSettings")}
+                  icon="settings-outline"
+                  defaultExpanded={false}
+                >
+                  <PeriodControlPanel
+                    periodName={periodName}
+                    onMore={() => {
                       setStartingPoint(
                         startingPoint - (periodRangeNumber ?? 10)
                       );
                     }}
-                    textStyle={styles.text1}
-                  >
-                    {showFutureString}
-                  </FlatButton>
-                )}
+                    onLess={() => {
+                      setStartingPoint(
+                        startingPoint + (periodRangeNumber ?? 10)
+                      );
+                    }}
+                    onReset={() => {
+                      setStartingPoint(0);
+                      setLongerPeriodNum(0);
+                    }}
+                    canShowMore={startingPoint > -MAX_PERIOD_RANGE}
+                    canShowLess={startingPoint < 0}
+                    canReset={startingPoint !== 0 || longerPeriodNum !== 0}
+                  />
+                </Accordion>
               </View>
             </View>
           }
           ListFooterComponent={
             <View style={{ height: dynamicScale(200, true) }}>
               <View style={styles.flatButtonContainer}>
-                {longerPeriodNum < MAX_PERIOD_RANGE && (
-                  <FlatButton
-                    onPress={() => {
-                      // reduce starting point to show future expenses
+                <Accordion 
+                  title={i18n.t("showMore") + " " + i18n.t("past") + " " + i18n.t(periodName + "s")}
+                  icon="time-outline"
+                  defaultExpanded={false}
+                >
+                  <PeriodControlPanel
+                    periodName={periodName}
+                    onMore={() => {
                       setLongerPeriodNum(longerPeriodNum + 10);
                     }}
-                    textStyle={styles.text1}
-                  >
-                    {showPastString}
-                  </FlatButton>
-                )}
+                    onLess={() => {
+                      setLongerPeriodNum(Math.max(0, longerPeriodNum - 10));
+                    }}
+                    onReset={() => {
+                      setLongerPeriodNum(0);
+                    }}
+                    canShowMore={longerPeriodNum < MAX_PERIOD_RANGE}
+                    canShowLess={longerPeriodNum > 0}
+                    canReset={longerPeriodNum !== 0}
+                  />
+                </Accordion>
               </View>
             </View>
           }

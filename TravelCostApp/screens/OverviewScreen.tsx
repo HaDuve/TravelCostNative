@@ -15,10 +15,13 @@ import {
   View,
   ScrollView,
   RefreshControl,
+  Pressable,
 } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
 import { MemoizedExpensesOverview } from "../components/ExpensesOutput/ExpensesOverview";
+import ToggleButton from "../assets/SVG/toggleButton";
+import { TourGuideZone } from "rn-tourguide";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -69,6 +72,11 @@ const OverviewScreen = ({ navigation }) => {
 
   const [dateTimeString, setDateTimeString] = useState("");
   // strong connection state
+
+  async function toggleContent() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    userCtx.setIsShowingGraph(!userCtx.isShowingGraph);
+  }
   const [offlineString, setOfflineString] = useState("");
   const PeriodValue = userCtx.periodName;
 
@@ -267,6 +275,25 @@ const OverviewScreen = ({ navigation }) => {
           periodName={PeriodValue}
         />
       </ScrollView>
+      
+      {/* FAB Toggle Button */}
+      <TourGuideZone
+        text={i18n.t("walk4")}
+        tooltipBottomOffset={constantScale(166, 0.5)}
+        maskOffset={constantScale(60, 0.5)}
+        zone={4}
+        shape={"circle"}
+      >
+        <Pressable
+          onPress={toggleContent}
+          style={({ pressed }) => [
+            styles.fabToggleButton,
+            pressed && GlobalStyles.pressedWithShadow,
+          ]}
+        >
+          <ToggleButton toggled={userCtx.isShowingGraph} />
+        </Pressable>
+      </TourGuideZone>
     </View>
   );
 };
@@ -383,5 +410,16 @@ const styles = StyleSheet.create({
   },
   customSummaryStyle: {
     marginTop: dynamicScale(-10, true, 0.3),
+  },
+  fabToggleButton: {
+    position: "absolute",
+    bottom: dynamicScale(20, true),
+    right: dynamicScale(20),
+    zIndex: 1000,
+    elevation: 10,
+    borderRadius: dynamicScale(25, false, 0.5),
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    padding: dynamicScale(8),
+    ...GlobalStyles.shadowGlowPrimary,
   },
 });

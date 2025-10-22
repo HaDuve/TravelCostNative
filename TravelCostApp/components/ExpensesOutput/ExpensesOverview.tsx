@@ -16,19 +16,14 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import ToggleButton from "../../assets/SVG/toggleButton";
-import { TourGuideZone } from "rn-tourguide";
 import { UserContext } from "../../store/user-context";
 import PropTypes from "prop-types";
 import ExpenseCountries from "./ExpenseStatistics/ExpenseCountries";
 import ExpenseTravellers from "./ExpenseStatistics/ExpenseTravellers";
-import IconButton from "../UI/IconButton";
-import { FadeInRight } from "react-native-reanimated";
 import ExpenseCurrencies from "./ExpenseStatistics/ExpenseCurrencies";
 import Animated, {
   FadeInUp,
   FadeOutDown,
-  FadeOutRight,
 } from "react-native-reanimated";
 import { MAX_PERIOD_RANGE } from "../../confAppConstants";
 import { BlurView } from "expo-blur";
@@ -63,12 +58,6 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const userCtx = useContext(UserContext);
   const [longerPeriodNum, setLongerPeriodNum] = useState(0);
   const [startingPoint, setStartingPoint] = useState(0);
-
-  async function toggleContent() {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    userCtx.setIsShowingGraph(!isGraphNotPie);
-    setToggleGraph(!isGraphNotPie);
-  }
 
   let titleString = "";
   switch (periodName) {
@@ -199,31 +188,6 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
         ></ExpenseCurrencies>
       )}
       {titleContainerJSX}
-      <View
-        style={[
-          styles.toggleButton,
-          !isPortrait && styles.landscapeToggleButtonContainer,
-        ]}
-      >
-        <TourGuideZone
-          text={i18n.t("walk4")}
-          tooltipBottomOffset={constantScale(166, 0.5)}
-          maskOffset={constantScale(60, 0.5)}
-          zone={4}
-          shape={"circle"}
-        >
-          <Pressable
-            onPress={toggleContent}
-            style={({ pressed }) => [
-              GlobalStyles.shadowGlowPrimary,
-              pressed && GlobalStyles.pressedWithShadow,
-              styles.toggleButton,
-            ]}
-          >
-            <ToggleButton toggled={isGraphNotPie}></ToggleButton>
-          </Pressable>
-        </TourGuideZone>
-      </View>
     </View>
   );
 };
@@ -282,27 +246,5 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
     marginLeft: dynamicScale(6),
-  },
-  toggleButton: {
-    position: "absolute",
-    bottom: dynamicScale(20, true),
-    right: dynamicScale(20),
-    zIndex: 1000,
-    elevation: 10,
-    borderRadius: dynamicScale(25, false, 0.5),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    padding: dynamicScale(8),
-    ...GlobalStyles.shadowGlowPrimary,
-  },
-  landscapeToggleButtonContainer: {
-    position: "absolute",
-    bottom: dynamicScale(20, true),
-    right: dynamicScale(20),
-    zIndex: 1000,
-    elevation: 10,
-    borderRadius: dynamicScale(25, false, 0.5),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    padding: dynamicScale(8),
-    ...GlobalStyles.shadowGlowPrimary,
   },
 });

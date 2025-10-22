@@ -30,6 +30,7 @@ interface WebViewChartProps {
   onPointLongPress?: (data: unknown) => void;
   style?: object;
   showSkeleton?: boolean;
+  labelsEnabled?: boolean;
 }
 
 interface ChartMessage {
@@ -49,13 +50,14 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
   onPointLongPress,
   style,
   showSkeleton = true,
+  labelsEnabled = false,
 }) => {
   const webViewRef = useRef<WebView>(null);
   const [isChartReady, setIsChartReady] = useState(false);
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(
     null
   );
-  const [showLabels, setShowLabels] = useState(false);
+  const [showLabels, setShowLabels] = useState(labelsEnabled);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const chartId = useMemo(() => `chart-${Date.now()}`, []);
@@ -82,6 +84,18 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
 
     webViewRef.current.injectJavaScript(updateScript);
   }, [data, isChartReady]);
+
+  useEffect(() => {
+    // keep internal state in sync with prop
+    setShowLabels(labelsEnabled);
+    if (isChartReady && webViewRef.current) {
+      const toggleScript = `
+        window.toggleLabels(${labelsEnabled});
+        true;
+      `;
+      webViewRef.current.injectJavaScript(toggleScript);
+    }
+  }, [labelsEnabled, isChartReady]);
 
   useEffect(() => {
     if (isChartReady && data) {

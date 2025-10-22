@@ -6,6 +6,7 @@ import PropTypes from "prop-types";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
+import { SettingsContext } from "../../store/settings-context";
 
 import WebViewChart from "../charts/WebViewChart";
 import { ChartController, ExpenseData } from "../charts/controller";
@@ -13,6 +14,7 @@ import { createBarChartData } from "../charts/chartHelpers";
 
 const ExpenseChart = ({ inputData, xAxis, yAxis, budget, currency }) => {
   const { isLandscape } = useContext(OrientationContext);
+  const { settings } = useContext(SettingsContext);
 
   const colors = useMemo(
     () => ({
@@ -40,12 +42,18 @@ const ExpenseChart = ({ inputData, xAxis, yAxis, budget, currency }) => {
   }, [inputData, xAxis, yAxis, colors]);
 
   const highchartsData = useMemo(() => {
-    const result = createBarChartData(chartData, colors, budget, width);
+    const effectiveBudget = settings?.showBarBudgetLine ? budget : 0;
+    const result = createBarChartData(
+      chartData,
+      colors,
+      effectiveBudget,
+      width
+    );
     return {
       ...result,
       budgetColor: colors.budget,
     };
-  }, [chartData, colors, budget, width]);
+  }, [chartData, colors, budget, width, settings?.showBarBudgetLine]);
 
   const chartOptions = useMemo(() => {
     return ChartController.createExpenseChartOptions(
@@ -62,6 +70,7 @@ const ExpenseChart = ({ inputData, xAxis, yAxis, budget, currency }) => {
         options={chartOptions}
         width={width}
         height={height}
+        labelsEnabled={!!settings?.showBarLabels}
         showSkeleton={true}
       />
     </View>

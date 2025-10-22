@@ -13,6 +13,8 @@ export interface Settings {
   showInternetSpeed: boolean;
   hideSpecialExpenses: boolean;
   disableNumberAnimations: boolean;
+  showBarBudgetLine: boolean;
+  showBarLabels: boolean;
 }
 
 export type SettingsContextType = {
@@ -28,6 +30,8 @@ const defaultSettings: Settings = {
   showInternetSpeed: false,
   hideSpecialExpenses: false,
   disableNumberAnimations: false,
+  showBarBudgetLine: true,
+  showBarLabels: false,
 };
 
 export const SettingsContext = createContext<SettingsContextType>({
@@ -49,7 +53,9 @@ export const SettingsProvider = ({
       const settingsString = await secureStoreGetItem("settings");
       if (settingsString) {
         const loadedSettings: Settings = safelyParseJSON(settingsString);
-        loadedSettings && setSettings(loadedSettings);
+        // Merge with defaults to ensure new keys are present
+        loadedSettings &&
+          setSettings({ ...defaultSettings, ...loadedSettings });
       } else setSettings(defaultSettings);
     };
     loadSettingsAsync();

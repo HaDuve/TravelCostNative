@@ -439,9 +439,10 @@ const ExpenseGraph = ({
               ]}
             >
               <Accordion
-                title={i18n.t("chartSettings")}
+                title=""
                 icon="settings-outline"
                 defaultExpanded={false}
+                containerStyle={styles.accordionContainer}
               >
                 <PeriodControlPanel
                   periodName={periodName}
@@ -504,6 +505,9 @@ ExpenseGraph.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  accordionContainer: {
+    // borderWidth: 1,
+  },
   container: {
     flex: 1,
     // marginTop: 60,

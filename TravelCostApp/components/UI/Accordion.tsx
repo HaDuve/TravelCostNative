@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, Pressable } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Pressable,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { GlobalStyles } from "../../constants/styles";
 import { dynamicScale } from "../../util/scalingUtil";
@@ -10,6 +17,7 @@ interface AccordionProps {
   children: React.ReactNode;
   icon?: keyof typeof Ionicons.glyphMap;
   defaultExpanded?: boolean;
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
 const Accordion = ({
@@ -17,6 +25,7 @@ const Accordion = ({
   children,
   icon = "settings-outline",
   defaultExpanded = false,
+  containerStyle,
 }: AccordionProps) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
@@ -25,7 +34,7 @@ const Accordion = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyle]}>
       <Pressable
         style={({ pressed }) => [
           styles.header,
@@ -68,7 +77,6 @@ const styles = StyleSheet.create({
     borderRadius: dynamicScale(8, false, 0.5),
     marginVertical: dynamicScale(4, true),
     marginHorizontal: dynamicScale(16),
-    ...GlobalStyles.shadowPrimary,
   },
   header: {
     flexDirection: "row",

@@ -106,11 +106,12 @@ const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(
         const message: ChartMessage = JSON.parse(event.nativeEvent.data);
 
         switch (message.type) {
-          case "chart-ready":
+          case "chartReady":
             setIsChartReady(true);
             if (onChartReady) {
               onChartReady();
             }
+            console.log("📊 Chart ready");
             break;
 
           case "point-click":
@@ -135,28 +136,27 @@ const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(
             }
             break;
 
-          case "zoom-in":
-          case "zoom-out":
+          case "zoom":
             if (message.data && onZoomLevelChange) {
-              const { min, max } = message.data;
+              const { min, max, daysInRange } = message.data;
+              console.log("📊 Zoom event:", { daysInRange, min, max });
+              
+              if (daysInRange >= 27) {
+                console.log("📊 Max zoom out reached");
+              } else if (daysInRange <= 4) {
+                console.log("📊 Max zoom in reached");
+              }
+
               onZoomLevelChange(
-                message.type === "zoom-in" ? "in" : "out",
+                daysInRange >= 27 ? "max" : daysInRange <= 4 ? "min" : "normal",
                 min || 0,
                 max || 0
               );
             }
             break;
 
-          case "log":
-            console.log(message.data.message, message.data);
-            break;
-
-          case "max-zoom-out":
-            console.log("📊 WebViewChart: Max zoom out reached", message.data);
-            break;
-
           default:
-            // Unknown chart message - could be logged in development
+            console.log("📊 Chart message:", message.type, message.data);
             break;
         }
       } catch (error) {

@@ -72,14 +72,22 @@ export const generateHTMLTemplate = (
         <script>
           let chart;
 
-          // Function to safely send messages to React Native
-          function postToRN(type, data) {
-            if (window.__REACT_WEB_VIEW_BRIDGE) {
-              window.__REACT_WEB_VIEW_BRIDGE.postMessage(JSON.stringify({ type, data }));
-            }
-          }
-
           const defaultOptions = {
+            chart: {
+              renderTo: '${chartId}',
+              type: '${options.type || "line"}',
+              backgroundColor: 'transparent',
+              animation: {
+                duration: 1000
+              },
+              style: {
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+              },
+              spacingLeft: ${options.type === "pie" ? CHART_SPACING.PIE.LEFT : CHART_SPACING.BAR.LEFT},
+              spacingRight: ${options.type === "pie" ? CHART_SPACING.PIE.RIGHT : CHART_SPACING.BAR.RIGHT},
+              spacingTop: ${options.type === "pie" ? CHART_SPACING.PIE.TOP : CHART_SPACING.BAR.TOP},
+              spacingBottom: ${options.type === "pie" ? CHART_SPACING.PIE.BOTTOM : CHART_SPACING.BAR.BOTTOM}
+            },
             title: {
               text: '${options.title || ""}',
               style: {
@@ -150,7 +158,11 @@ export const generateHTMLTemplate = (
               },
               events: {
                 load: function() {
-                  postToRN('chart-ready');
+                  if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'chartReady'
+                    }));
+                  }
                 },
                 selection: function(event) {
                   if (!event.xAxis) {
@@ -172,21 +184,22 @@ export const generateHTMLTemplate = (
                   }
 
                   // Log and notify when max zoom out is reached
-                  if (daysInRange >= 27) {
-                    postToRN('log', {
-                      message: "📈 MAX ZOOM OUT REACHED (selection)",
-                      daysInRange,
-                      min: xAxis.min,
-                      max: xAxis.max,
-                      timestamp: new Date().toISOString()
-                    });
-                    return false;
+                  // Send zoom event
+                  if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'zoom',
+                      data: {
+                        min: xAxis.min,
+                        max: xAxis.max,
+                        daysInRange,
+                        zoomRatio
+                      }
+                    }));
                   }
 
-                  if (zoomRatio > 1.5) {
-                    postToRN('zoom-in', { zoomRatio, min: xAxis.min, max: xAxis.max });
-                  } else if (zoomRatio < 0.7) {
-                    postToRN('zoom-out', { zoomRatio, min: xAxis.min, max: xAxis.max });
+                  // Prevent zooming beyond limits
+                  if (daysInRange >= 27 || daysInRange < 4) {
+                    return false;
                   }
 
                   // Let Highcharts handle the zoom
@@ -198,16 +211,17 @@ export const generateHTMLTemplate = (
                   const daysInRange = (e.max - e.min) / (24 * 3600 * 1000);
 
                   // Log and notify when max zoom out is reached
-                  if (daysInRange >= 27) {
-                    postToRN('log', {
-                      message: "📈 MAX ZOOM OUT REACHED (extremes)",
-                      daysInRange,
-                      min: e.min,
-                      max: e.max,
-                      timestamp: new Date().toISOString()
-                    });
-
-                    postToRN('max-zoom-out', { daysInRange, min: e.min, max: e.max });
+                  // Send zoom event
+                  if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'zoom',
+                      data: {
+                        min: e.min,
+                        max: e.max,
+                        daysInRange
+                      }
+                    }));
+                  }
                   }
                 }
               }
@@ -276,20 +290,20 @@ export const generateHTMLTemplate = (
             const mergedOptions = {
               ...defaultOptions,
               ...customOptions,
-              series: Array.isArray(data) ? data : []
+              series: data
             };
 
-            try {
-              if (chart) {
-                chart.destroy();
-              }
+            if (chart) {
+              chart.destroy();
+            }
 
-              chart = Highcharts.chart('${chartId}', mergedOptions);
+            chart = Highcharts.chart(mergedOptions);
 
-              // Notify React Native that chart is ready
-              postToRN('chart-ready');
-            } catch (error) {
-              postToRN('error', { message: error.message, stack: error.stack });
+            // Notify React Native that chart is ready
+            if (window.ReactNativeWebView) {
+              window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'chart-ready'
+              }));
             }
           }
 
@@ -365,26 +379,17 @@ export const generateHTMLTemplate = (
           window.setExtremes = setExtremes;
           window.toggleLabels = toggleLabels;
 
-          // Initial chart creation with empty data
-          try {
-            initChart([]);
+          // Initial chart creation with empty data and zoom
+          initChart([]);
 
-            // Set initial zoom level after a short delay to ensure chart is ready
-            setTimeout(() => {
-              try {
-                if (chart && chart.xAxis && chart.xAxis[0]) {
-                  const now = new Date().getTime();
-                  const sevenDaysAgo = now - (7 * 24 * 3600 * 1000);
-                  chart.xAxis[0].setExtremes(sevenDaysAgo, now);
-                  postToRN('log', { message: '📊 Initial zoom set', min: sevenDaysAgo, max: now });
-                }
-              } catch (error) {
-                postToRN('error', { message: 'Error setting initial zoom', error: error.message });
-              }
-            }, 100);
-          } catch (error) {
-            postToRN('error', { message: 'Error initializing chart', error: error.message });
-          }
+          // Set initial zoom level after a short delay to ensure chart is ready
+          setTimeout(() => {
+            if (chart && chart.xAxis && chart.xAxis[0]) {
+              const now = new Date().getTime();
+              const sevenDaysAgo = now - (7 * 24 * 3600 * 1000);
+              chart.xAxis[0].setExtremes(sevenDaysAgo, now);
+            }
+          }, 100);
         </script>
       </body>
     </html>

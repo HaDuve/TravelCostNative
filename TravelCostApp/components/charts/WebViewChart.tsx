@@ -132,13 +132,17 @@ const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(
             }
             break;
 
-        case "zoom-in":
-        case "zoom-out":
-          if (message.data && onZoomLevelChange) {
-            const { min, max } = message.data;
-            onZoomLevelChange(message.type === "zoom-in" ? "in" : "out", min || 0, max || 0);
-          }
-          break;
+          case "zoom-in":
+          case "zoom-out":
+            if (message.data && onZoomLevelChange) {
+              const { min, max } = message.data;
+              onZoomLevelChange(
+                message.type === "zoom-in" ? "in" : "out",
+                min || 0,
+                max || 0
+              );
+            }
+            break;
 
           default:
             // Unknown chart message - could be logged in development

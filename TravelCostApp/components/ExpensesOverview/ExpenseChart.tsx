@@ -63,9 +63,12 @@ const ExpenseChart = React.forwardRef<WebView, ExpenseChartProps>(
       );
     }, [budget, colors, currency]);
 
-  const handleZoomLevelChange = useCallback((zoomType: string, min: number, max: number) => {
-    setShowResetButton(true);
-  }, []);
+    const handleZoomLevelChange = useCallback(
+      (zoomType: string, min: number, max: number) => {
+        setShowResetButton(true);
+      },
+      []
+    );
 
     const handleReset = useCallback(() => {
       if (!ref) return;

@@ -64,7 +64,7 @@ const ExpenseGraph = ({
   const lastWeeks = (periodRangeNumber ?? 7) + longerPeriodNum;
   const lastMonths = (periodRangeNumber ?? 7) + longerPeriodNum;
   const lastYears =
-    (periodName == "total" ? 5 : periodRangeNumber ?? 7) + longerPeriodNum;
+    (periodName == "total" ? 5 : (periodRangeNumber ?? 7)) + longerPeriodNum;
   let xAxis = "";
   let yAxis = "";
   let budgetAxis = "";
@@ -533,45 +533,10 @@ const ExpenseGraph = ({
                   currency={tripCtx.tripCurrency}
                 ></ExpenseChart>
               )}
-
-              <View
-                style={[
-                  isPortrait && styles.flatButtonContainer,
-                  !isPortrait && styles.landscapeFlatButton,
-                ]}
-              >
-                {startingPoint > -MAX_PERIOD_RANGE && (
-                  <FlatButton
-                    onPress={() => {
-                      // reduce starting point to show future expenses
-                      setStartingPoint(
-                        startingPoint - (periodRangeNumber ?? 10)
-                      );
-                    }}
-                    textStyle={styles.text1}
-                  >
-                    {showFutureString}
-                  </FlatButton>
-                )}
-              </View>
             </View>
           }
           ListFooterComponent={
-            <View style={{ height: dynamicScale(200, true) }}>
-              <View style={styles.flatButtonContainer}>
-                {longerPeriodNum < MAX_PERIOD_RANGE && (
-                  <FlatButton
-                    onPress={() => {
-                      // reduce starting point to show future expenses
-                      setLongerPeriodNum(longerPeriodNum + 10);
-                    }}
-                    textStyle={styles.text1}
-                  >
-                    {showPastString}
-                  </FlatButton>
-                )}
-              </View>
-            </View>
+            <View style={{ height: dynamicScale(200, true) }}></View>
           }
           removeClippedSubviews={true}
           // maxToRenderPerBatch={7}

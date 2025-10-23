@@ -129,8 +129,13 @@ export const generateHTMLTemplate = (
               spacingBottom: ${options.type === "pie" ? CHART_SPACING.PIE.BOTTOM : CHART_SPACING.BAR.BOTTOM},
               zoomType: 'x',
               pinchType: 'x',
-              panning: true,
-              panKey: 'shift',
+              panning: {
+                enabled: true,
+                type: 'x'
+              },
+              panKey: undefined,
+              followTouchMove: true,
+              followPointer: true,
               resetZoomButton: {
                 position: {
                   align: 'right',
@@ -242,12 +247,15 @@ export const generateHTMLTemplate = (
                 }
               }
             },
-            plotOptions: {
-              series: {
-                animation: {
-                  duration: 1000
+              plotOptions: {
+                series: {
+                  animation: {
+                    duration: 1000
+                  },
+                  stickyTracking: true,
+                  allowPointSelect: false,
+                  enableMouseTracking: true,
                 },
-              },
               pie: {
                 size: '90%',
                 center: ['50%', '50%'],

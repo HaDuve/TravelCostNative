@@ -140,7 +140,7 @@ const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(
             if (message.data && onZoomLevelChange) {
               const { min, max, daysInRange } = message.data;
               console.log("📊 Zoom event:", { daysInRange, min, max });
-              
+
               if (daysInRange >= 27) {
                 console.log("📊 Max zoom out reached");
               } else if (daysInRange <= 4) {

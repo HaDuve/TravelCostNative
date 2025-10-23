@@ -116,6 +116,19 @@ export const generateHTMLTemplate = (
               pinchType: 'x',
               panning: true,
               panKey: 'shift',
+              animation: {
+                duration: 150
+              },
+              events: {
+                load: function() {
+                  this.container.style.touchAction = 'none';
+                  if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'chartReady'
+                    }));
+                  }
+                }
+              },
               resetZoomButton: {
                 position: {
                   align: 'right',
@@ -150,6 +163,14 @@ export const generateHTMLTemplate = (
                   }
                 },
                 selection: function(event) {
+                  // Debug log to check if selection event is triggered
+                  if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'log',
+                      data: { message: '📊 Selection event triggered', event }
+                    }));
+                  }
+
                   if (!event.xAxis) {
                     return false;
                   }
@@ -191,6 +212,14 @@ export const generateHTMLTemplate = (
                   return true;
                 },
                 afterSetExtremes: function(e) {
+                  // Debug log to check if afterSetExtremes event is triggered
+                  if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'log',
+                      data: { message: '📊 afterSetExtremes event triggered', event: e }
+                    }));
+                  }
+
                   if (!e.min || !e.max) return;
 
                   const daysInRange = (e.max - e.min) / (24 * 3600 * 1000);
@@ -237,6 +266,25 @@ export const generateHTMLTemplate = (
                 animation: {
                   duration: 1000
                 },
+                allowPointSelect: true,
+                stickyTracking: false,
+                states: {
+                  hover: {
+                    enabled: true
+                  }
+                },
+                point: {
+                  events: {
+                    click: function() {
+                      if (window.ReactNativeWebView) {
+                        window.ReactNativeWebView.postMessage(JSON.stringify({
+                          type: 'log',
+                          data: { message: '📊 Point clicked', point: this }
+                        }));
+                      }
+                    }
+                  }
+                }
               },
               pie: {
                 size: '90%',

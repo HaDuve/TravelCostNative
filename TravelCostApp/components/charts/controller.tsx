@@ -72,7 +72,8 @@ export class ChartController {
   static createExpenseChartOptions(
     budget?: number,
     colors?: { primary: string; error: string; gray: string; budget: string },
-    currency?: string
+    currency?: string,
+    periodType?: "day" | "week" | "month" | "year"
   ): ChartOptions {
     return {
       type: "column",
@@ -88,6 +89,7 @@ export class ChartController {
       pinchType: "x",
       panning: true,
       panKey: "shift",
+      periodType: periodType,
     };
   }
 

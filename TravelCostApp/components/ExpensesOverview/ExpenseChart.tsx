@@ -18,10 +18,14 @@ interface ExpenseChartProps {
   yAxis: string;
   budget: number;
   currency: string;
+  periodType?: "day" | "week" | "month" | "year";
 }
 
 const ExpenseChart = React.forwardRef<WebView, ExpenseChartProps>(
-  function ExpenseChart({ inputData, xAxis, yAxis, budget, currency }, ref) {
+  function ExpenseChart(
+    { inputData, xAxis, yAxis, budget, currency, periodType },
+    ref
+  ) {
     const { isLandscape } = useContext(OrientationContext);
     const [showResetButton, setShowResetButton] = useState(false);
     const defaultViewRange = 7; // 7 days default view
@@ -59,12 +63,13 @@ const ExpenseChart = React.forwardRef<WebView, ExpenseChartProps>(
       return ChartController.createExpenseChartOptions(
         budget,
         colors,
-        getCurrencySymbol(currency)
+        getCurrencySymbol(currency),
+        periodType
       );
-    }, [budget, colors, currency]);
+    }, [budget, colors, currency, periodType]);
 
     const handleZoomLevelChange = useCallback(
-      (zoomType: string, min: number, max: number) => {
+      (_zoomType: string, _min: number, _max: number) => {
         setShowResetButton(true);
       },
       []
@@ -115,6 +120,7 @@ ExpenseChart.propTypes = {
   yAxis: PropTypes.string.isRequired,
   budget: PropTypes.number.isRequired,
   currency: PropTypes.string.isRequired,
+  periodType: PropTypes.oneOf(["day", "week", "month", "year"]),
 };
 
 const styles = StyleSheet.create({

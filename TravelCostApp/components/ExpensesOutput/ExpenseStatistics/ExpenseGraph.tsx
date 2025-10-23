@@ -61,10 +61,9 @@ const ExpenseGraph = ({
   const totalBudget = Number(tripCtx.totalBudget) ?? MAX_JS_NUMBER;
   const listExpenseSumBudgets = [];
   const lastDays = 28 + longerPeriodNum;
-  const lastWeeks = (periodRangeNumber ?? 7) + longerPeriodNum;
-  const lastMonths = (periodRangeNumber ?? 7) + longerPeriodNum;
-  const lastYears =
-    (periodName == "total" ? 5 : (periodRangeNumber ?? 7)) + longerPeriodNum;
+  const lastWeeks = 28 + longerPeriodNum;
+  const lastMonths = 28 + longerPeriodNum;
+  const lastYears = 28 + longerPeriodNum;
   let xAxis = "";
   let yAxis = "";
   let budgetAxis = "";
@@ -509,6 +508,7 @@ const ExpenseGraph = ({
               yAxis={yAxis}
               budget={budget}
               currency={tripCtx.tripCurrency}
+              periodType={periodName}
             ></ExpenseChart>
           </View>
         )}
@@ -531,6 +531,7 @@ const ExpenseGraph = ({
                   yAxis={yAxis}
                   budget={budget}
                   currency={tripCtx.tripCurrency}
+                  periodType={periodName}
                 ></ExpenseChart>
               )}
             </View>

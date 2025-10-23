@@ -9,7 +9,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -79,71 +82,8 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       break;
   }
 
-  const [autoIncrement, setAutoIncrement] = useState<NodeJS.Timer>(null);
-
-  const startAutoIncrement = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    rightNavButtonHandler();
-    const interval = setInterval(() => {
-      rightNavButtonHandler();
-    }, 600);
-    setAutoIncrement(interval);
-    return;
-  };
-  const stopAutoIncrement = () => {
-    clearInterval(autoIncrement);
-    return;
-  };
-
-  const rightNavButtonHandler = () => {
-    if (isGraphNotPie) {
-      realPeriodNumber.current =
-        realPeriodNumber.current == MAX_PERIOD_RANGE
-          ? MAX_PERIOD_RANGE
-          : realPeriodNumber.current + 1;
-      setPeriodRangeNumber(realPeriodNumber.current);
-    } else {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      setToggleGraphEnum(toggleGraphEnum == 3 ? 0 : toggleGraphEnum + 1);
-    }
-  };
-
-  const isAndroid = Platform.OS === "android";
-
   const titleContainerJSX = (
-    <BlurView
-      intensity={isAndroid ? 100 : 90}
-      style={styles.titleContainerBlur}
-    >
-      <Animated.View
-        // entering={FadeInLeft}
-        // exiting={FadeOutLeft}
-        style={styles.chevronContainer}
-      >
-        {/* "remove-outline" */}
-        <IconButton
-          icon={
-            isGraphNotPie ? "play-skip-back-outline" : "chevron-back-outline"
-          }
-          size={dynamicScale(24, false, 0.5)}
-          onPress={async () => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            if (isGraphNotPie) {
-              realPeriodNumber.current = 7;
-              setPeriodRangeNumber(realPeriodNumber.current);
-              setLongerPeriodNum(0);
-              setStartingPoint(0);
-              stopAutoIncrement();
-            } else {
-              setToggleGraphEnum(
-                toggleGraphEnum == 0 ? 3 : toggleGraphEnum - 1
-              );
-            }
-          }}
-          color={GlobalStyles.colors.primaryGrayed}
-        ></IconButton>
-      </Animated.View>
-
+    <View style={styles.titleContainerBlur}>
       {isGraphNotPie && (
         <Animated.View
           style={styles.titleContainer}
@@ -174,23 +114,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           <Text style={styles.titleText}> {i18n.t("currencies")} </Text>
         </Animated.View>
       )}
-
-      <Animated.View
-        entering={FadeInRight}
-        exiting={FadeOutRight}
-        style={styles.chevronContainer}
-      >
-        <IconButton
-          icon={
-            isGraphNotPie ? "add-circle-outline" : "chevron-forward-outline"
-          }
-          size={dynamicScale(24, false, 0.5)}
-          onPressIn={startAutoIncrement}
-          onPressOut={stopAutoIncrement}
-          color={GlobalStyles.colors.primaryGrayed}
-        ></IconButton>
-      </Animated.View>
-    </BlurView>
+    </View>
   );
 
   return (
@@ -202,14 +126,10 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       {isGraphNotPie && (
         <ExpenseGraph
           navigation={navigation}
-          expenses={expenses}
           periodName={periodName}
-          periodRangeNumber={periodRangeNumber}
           tripCtx={tripCtx}
           longerPeriodNum={longerPeriodNum}
-          setLongerPeriodNum={setLongerPeriodNum}
           startingPoint={startingPoint}
-          setStartingPoint={setStartingPoint}
         />
       )}
       {!isGraphNotPie && toggleGraphEnum == 0 && (
@@ -294,25 +214,15 @@ const styles = StyleSheet.create({
     overflow: "visible",
   },
   titleContainerBlur: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    marginTop: dynamicScale(8, true, 0.5),
+    alignSelf: "center",
     position: "absolute",
-    width: "100%",
-    paddingBottom: dynamicScale(6, true),
+    width: "50%",
   },
   titleContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-  },
-  chevronContainer: {
-    marginTop: dynamicScale(12, true),
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  pressed: {
-    opacity: 0.65,
   },
   titleText: {
     marginTop: dynamicScale(6, true),
@@ -327,21 +237,16 @@ const styles = StyleSheet.create({
   },
   toggleButton: {
     flex: 1,
-    // borderRadius: 10,
-    // marginHorizontal:dynamicScale(120),
     marginBottom: dynamicScale(-6, true),
     marginTop: dynamicScale(-66, true),
     marginHorizontal: "50%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    justifySelf: "center",
     zIndex: 1,
     elevation: 0,
   },
   landscapeToggleButtonContainer: {
-    // marginLeft: dynamicScale(-1100, false, 2),
-    // marginBottom: dynamicScale(6, true),
     position: "absolute",
     left: -280,
     bottom: 1,

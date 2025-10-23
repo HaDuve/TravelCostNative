@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   header: {
-    width: "100%",
+    width: "50%",
     flexDirection: "row",
     justifyContent: "flex-end",
     paddingHorizontal: dynamicScale(16),

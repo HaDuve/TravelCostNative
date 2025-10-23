@@ -153,9 +153,14 @@ export const generateHTMLTemplate = (
               spacingTop: ${options.type === "pie" ? CHART_SPACING.PIE.TOP : CHART_SPACING.BAR.TOP},
               spacingBottom: ${options.type === "pie" ? CHART_SPACING.PIE.BOTTOM : CHART_SPACING.BAR.BOTTOM},
               zoomType: 'x',
+              zooming: {
+                type: 'x'
+              },
+              panning: {
+                enabled: true,
+                type: 'x'
+              },
               pinchType: 'x',
-              panning: true,
-              panKey: 'shift',
               resetZoomButton: {
                 position: {
                   align: 'right',
@@ -182,111 +187,6 @@ export const generateHTMLTemplate = (
                 }
               },
               events: {
-                load: function() {
-                  if (window.ReactNativeWebView) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'chartReady'
-                    }));
-                  }
-                },
-                selection: function(event) {
-                  if (!event.xAxis) {
-                    return false;
-                  }
-
-                  const xAxis = event.xAxis[0];
-                  const currentAxis = this.xAxis[0];
-                  const totalRange = currentAxis.dataMax - currentAxis.dataMin;
-                  const selectedRange = xAxis.max - xAxis.min;
-                  const zoomRatio = totalRange / selectedRange;
-
-                  // Calculate periods in range based on period type
-                  const periodType = '${options.periodType || "day"}';
-                  const periodMs = {
-                    day: 24 * 3600 * 1000,
-                    week: 7 * 24 * 3600 * 1000,
-                    month: 28 * 24 * 3600 * 1000,
-                    year: 336 * 24 * 3600 * 1000
-                  }[periodType];
-                  const periodsInRange = selectedRange / periodMs;
-
-                  // Prevent zooming if it would show fewer than 4 periods
-                  if (periodsInRange < 4) {
-                    return false;
-                  }
-
-                  // Calculate dynamic bar width
-                  const chartWidth = this.plotWidth;
-                  const visibleBars = Math.ceil(periodsInRange);
-                  const barWidth = Math.max(4, Math.min(40, (chartWidth / visibleBars) * 0.6));
-
-                  // Update bar width for all series
-                  this.series.forEach(series => {
-                    if (series.type === 'column') {
-                      series.update({ pointWidth: barWidth }, false);
-                    }
-                  });
-
-                  // Send zoom event
-                  if (window.ReactNativeWebView) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'zoom',
-                      data: {
-                        min: xAxis.min,
-                        max: xAxis.max,
-                        periodsInRange,
-                        zoomRatio,
-                        barWidth
-                      }
-                    }));
-                  }
-
-                  // Prevent zooming beyond limits
-                  if (periodsInRange >= 27 || periodsInRange < 4) {
-                    return false;
-                  }
-
-                  // Let Highcharts handle the zoom
-                  return true;
-                },
-                afterSetExtremes: function(e) {
-                  if (!e.min || !e.max) return;
-
-                  // Calculate periods in range based on period type
-                  const periodType = '${options.periodType || "day"}';
-                  const periodMs = {
-                    day: 24 * 3600 * 1000,
-                    week: 7 * 24 * 3600 * 1000,
-                    month: 28 * 24 * 3600 * 1000,
-                    year: 336 * 24 * 3600 * 1000
-                  }[periodType];
-                  const periodsInRange = (e.max - e.min) / periodMs;
-
-                  // Calculate dynamic bar width
-                  const chartWidth = this.plotWidth;
-                  const visibleBars = Math.ceil(periodsInRange);
-                  const barWidth = Math.max(4, Math.min(40, (chartWidth / visibleBars) * 0.6));
-
-                  // Update bar width for all series
-                  this.series.forEach(series => {
-                    if (series.type === 'column') {
-                      series.update({ pointWidth: barWidth }, false);
-                    }
-                  });
-
-                  // Send zoom event
-                  if (window.ReactNativeWebView) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'zoom',
-                      data: {
-                        min: e.min,
-                        max: e.max,
-                        periodsInRange,
-                        barWidth
-                      }
-                    }));
-                  }
-                }
               }
             },
             xAxis: {
@@ -297,7 +197,7 @@ export const generateHTMLTemplate = (
               minPadding: 0.1,
               maxPadding: 0.1,
               minRange: ${getPeriodZoomLimits(options.periodType).minRange}, // Dynamic min range based on period type
-              maxRange: ${getPeriodZoomLimits(options.periodType).maxRange} // Dynamic max range based on period type
+              maxRange: ${getPeriodZoomLimits(options.periodType).maxRange}, // Dynamic max range based on period type
             },
             yAxis: {
               title: {
@@ -327,8 +227,10 @@ export const generateHTMLTemplate = (
               },
               column: {
                 borderRadius: 4,
-                groupPadding: 0.1,
-                pointPadding: 0.1,
+                groupPadding: 0.3,
+                pointPadding: 0.4,
+                boostThreshold: 300,
+                boostBlending: 'add',
                 dataLabels: {
                   enabled: false,
                   style: {
@@ -364,7 +266,7 @@ export const generateHTMLTemplate = (
             // Notify React Native that chart is ready
             if (window.ReactNativeWebView) {
               window.ReactNativeWebView.postMessage(JSON.stringify({
-                type: 'chart-ready'
+                type: 'chartReady'
               }));
             }
           }
@@ -384,74 +286,7 @@ export const generateHTMLTemplate = (
             }
           }
 
-          function setExtremes(min, max) {
-            if (chart && chart.xAxis && chart.xAxis[0]) {
-              chart.xAxis[0].setExtremes(min, max);
-            }
-          }
 
-          function toggleLabels(show) {
-            if (chart && chart.series) {
-              chart.series.forEach((series, index) => {
-                if (series.type === 'pie') {
-                  // Pie chart labels
-                  series.update({
-                    dataLabels: {
-                      enabled: show,
-                      useHTML: true,
-                      style: {
-                        fontSize: '12px',
-                        fontWeight: 'normal',
-                        whiteSpace: 'normal',
-                        textOverflow: 'none',
-                        textAlign: 'center'
-                      },
-                      distance: 10,
-                      allowOverlap: true,
-                      crop: false
-                    }
-                  }, false);
-                } else if (series.type === 'column') {
-                  // Bar chart labels
-                  series.update({
-                    dataLabels: {
-                      enabled: show,
-                      style: {
-                        fontSize: '12px',
-                        fontWeight: 'normal',
-                        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                        textOutline: '1px contrast'
-                      },
-                      formatter: function() {
-                        return this.y.toFixed(2) + '${
-                          options.currency ? " " + options.currency : "€"
-                        }';
-                      }
-                    }
-                  }, false);
-                }
-              });
-              chart.redraw();
-            }
-          }
-
-          function updateBarWidth(width) {
-            if (chart && chart.series) {
-              chart.series.forEach(series => {
-                if (series.type === 'column') {
-                  series.update({ pointWidth: width }, false);
-                }
-              });
-              chart.redraw();
-            }
-          }
-
-          // Make functions available globally
-          window.initChart = initChart;
-          window.updateChart = updateChart;
-          window.setExtremes = setExtremes;
-          window.toggleLabels = toggleLabels;
-          window.updateBarWidth = updateBarWidth;
 
           // Initial chart creation with empty data and zoom
           initChart([]);
@@ -463,7 +298,7 @@ export const generateHTMLTemplate = (
               const sevenDaysAgo = now - (7 * 24 * 3600 * 1000);
               chart.xAxis[0].setExtremes(sevenDaysAgo, now);
             }
-          }, 100);
+          }, 0);
         </script>
       </body>
     </html>

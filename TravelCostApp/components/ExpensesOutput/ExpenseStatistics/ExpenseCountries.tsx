@@ -33,7 +33,7 @@ const ExpenseCountries = ({
   expenses,
   periodName,
   navigation,
-  forcePortraitFormat,
+  forcePortraitFormat = false,
 }) => {
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
   const { tripCurrency } = useContext(TripContext);

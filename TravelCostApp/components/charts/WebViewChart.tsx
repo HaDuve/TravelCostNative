@@ -40,7 +40,7 @@ interface ChartMessage {
 }
 
 const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(
-  function WebViewChart(props, ref) {
+  function WebViewChart(props) {
     const {
       data,
       options = {},
@@ -104,6 +104,7 @@ const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(
     const handleWebViewMessage = (event: { nativeEvent: { data: string } }) => {
       try {
         const message: ChartMessage = JSON.parse(event.nativeEvent.data);
+        console.log("🚀 ~ handleWebViewMessage ~ message:", message);
 
         switch (message.type) {
           case "chartReady":
@@ -114,30 +115,15 @@ const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(
             console.log("📊 Chart ready");
             break;
 
-          case "point-click":
-            if (longPressTimer) {
-              clearTimeout(longPressTimer);
-              setLongPressTimer(null);
-
-              // Handle single tap
-              if (onPointClick && message.data) {
-                onPointClick(message.data);
-              }
-            } else {
-              // Start long press timer
-              const timer = setTimeout(() => {
-                if (onPointLongPress && message.data) {
-                  onPointLongPress(message.data);
-                }
-                setLongPressTimer(null);
-              }, 500); // 500ms for long press
-
-              setLongPressTimer(timer);
+          case "setExtremes":
+            if (message.data) {
+              const { min, max } = message.data;
+              console.log("📊 Set extremes:", { min, max });
             }
             break;
 
           case "zoom":
-            if (message.data && onZoomLevelChange) {
+            if (message.data) {
               const { min, max, daysInRange } = message.data;
               console.log("📊 Zoom event:", { daysInRange, min, max });
 
@@ -147,11 +133,16 @@ const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(
                 console.log("📊 Max zoom in reached");
               }
 
-              onZoomLevelChange(
-                daysInRange >= 27 ? "max" : daysInRange <= 4 ? "min" : "normal",
-                min || 0,
-                max || 0
-              );
+              onZoomLevelChange &&
+                onZoomLevelChange(
+                  daysInRange >= 27
+                    ? "max"
+                    : daysInRange <= 4
+                      ? "min"
+                      : "normal",
+                  min || 0,
+                  max || 0
+                );
             }
             break;
 
@@ -201,7 +192,7 @@ const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(
         {/* WebView with fade animation */}
         <Animated.View style={[styles.webViewContainer, { opacity: fadeAnim }]}>
           <WebView
-            ref={ref || webViewRef}
+            ref={webViewRef}
             source={{ html: htmlContent }}
             style={styles.webView}
             onMessage={handleWebViewMessage}

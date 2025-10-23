@@ -29,20 +29,16 @@ i18n.enableFallback = true;
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import PropTypes from "prop-types";
 import { isForeground } from "../../../util/appState";
-import { MAX_JS_NUMBER, MAX_PERIOD_RANGE } from "../../../confAppConstants";
+import { MAX_JS_NUMBER } from "../../../confAppConstants";
 import { SettingsContext } from "../../../store/settings-context";
 import { getExpensesSumPeriod } from "../../../util/expense";
-import FlatButton from "../../UI/FlatButton";
 import { dynamicScale } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
 
 const ExpenseGraph = ({
   periodName,
-  periodRangeNumber,
   longerPeriodNum,
-  setLongerPeriodNum,
   startingPoint,
-  setStartingPoint,
   tripCtx,
   navigation,
 }) => {
@@ -481,13 +477,6 @@ const ExpenseGraph = ({
     default:
       break;
   }
-  const showFutureString = `${i18n.t("showMore")} ${i18n.t("future")} ${i18n.t(
-    periodName + "s"
-  )}`;
-
-  const showPastString = `${i18n.t("showMore")} ${i18n.t("past")} ${i18n.t(
-    periodName + "s"
-  )}`;
 
   return (
     <Animated.View

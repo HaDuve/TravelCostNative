@@ -30,13 +30,28 @@ export const calculateVisiblePeriods = (
 };
 
 export const calculateBarWidth = (
-  chartWidth: number,
-  visibleBars: number,
+  visiblePeriods: number,
   minWidth = 4,
   maxWidth = 40
 ) => {
-  const calculatedWidth = (chartWidth / visibleBars) * 0.6;
-  return Math.max(minWidth, Math.min(maxWidth, calculatedWidth));
+  // Linear interpolation: 4 periods = 40px, 28 periods = 4px
+  const minPeriods = 4;
+  const maxPeriods = 28;
+
+  // Clamp visible periods to valid range
+  const clampedPeriods = Math.max(
+    minPeriods,
+    Math.min(maxPeriods, visiblePeriods)
+  );
+
+  // Linear interpolation formula: y = y1 + (x - x1) * (y2 - y1) / (x2 - x1)
+  // As periods increase from 4 to 28, width decreases from 40 to 4
+  const barWidth =
+    maxWidth -
+    ((clampedPeriods - minPeriods) * (maxWidth - minWidth)) /
+      (maxPeriods - minPeriods);
+
+  return Math.round(barWidth);
 };
 
 export interface ChartData {
@@ -229,6 +244,11 @@ export const generateHTMLTemplate = (
                       }
                     }));
                   }
+
+                  // Update bar width based on visible range
+                  if (event.min != null && event.max != null) {
+                    updateBarWidth(event.min, event.max);
+                  }
                 }
               }
             },
@@ -262,6 +282,7 @@ export const generateHTMLTemplate = (
                 borderRadius: 4,
                 groupPadding: 0.3,
                 pointPadding: 0.4,
+                // pointWidth will be set dynamically via updateBarWidth
                 boostThreshold: 300,
                 boostBlending: 'add',
                 dataLabels: {
@@ -319,6 +340,34 @@ export const generateHTMLTemplate = (
             }
           }
 
+          function updateBarWidth(min, max) {
+            if (!chart || !chart.series || chart.series.length === 0) return;
+
+            const periodMs = ${PERIOD_MS[options.periodType || "day"]};
+            const rangeMs = max - min;
+            const visiblePeriods = rangeMs / periodMs;
+
+            // Linear interpolation: 4 periods = 40px, 28 periods = 4px
+            const minPeriods = 4;
+            const maxPeriods = 28;
+            const minWidth = 4;
+            const maxWidth = 40;
+
+            const clampedPeriods = Math.max(minPeriods, Math.min(maxPeriods, visiblePeriods));
+            const barWidth = maxWidth - ((clampedPeriods - minPeriods) * (maxWidth - minWidth)) / (maxPeriods - minPeriods);
+
+            // Update all column series
+            chart.series.forEach(function(series) {
+              if (series.type === 'column') {
+                series.update({
+                  pointWidth: Math.round(barWidth)
+                }, false);
+              }
+            });
+
+            chart.redraw();
+          }
+
 
 
           // Initial chart creation with empty data and zoom
@@ -330,6 +379,7 @@ export const generateHTMLTemplate = (
               const now = new Date().getTime();
               const sevenDaysAgo = now - (7 * 24 * 3600 * 1000);
               chart.xAxis[0].setExtremes(sevenDaysAgo, now);
+              // Initial bar width will be set by setExtremes event
             }
           }, 0);
         </script>

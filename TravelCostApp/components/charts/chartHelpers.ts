@@ -73,21 +73,6 @@ export const generateHTMLTemplate = (
           let chart;
 
           const defaultOptions = {
-            chart: {
-              renderTo: '${chartId}',
-              type: '${options.type || "line"}',
-              backgroundColor: 'transparent',
-              animation: {
-                duration: 1000
-              },
-              style: {
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-              },
-              spacingLeft: ${options.type === "pie" ? CHART_SPACING.PIE.LEFT : CHART_SPACING.BAR.LEFT},
-              spacingRight: ${options.type === "pie" ? CHART_SPACING.PIE.RIGHT : CHART_SPACING.BAR.RIGHT},
-              spacingTop: ${options.type === "pie" ? CHART_SPACING.PIE.TOP : CHART_SPACING.BAR.TOP},
-              spacingBottom: ${options.type === "pie" ? CHART_SPACING.PIE.BOTTOM : CHART_SPACING.BAR.BOTTOM}
-            },
             title: {
               text: '${options.title || ""}',
               style: {
@@ -221,7 +206,6 @@ export const generateHTMLTemplate = (
                         daysInRange
                       }
                     }));
-                  }
                   }
                 }
               }

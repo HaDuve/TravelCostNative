@@ -16,7 +16,10 @@ import { OrientationContext } from "../../store/orientation-context";
 import WebViewChart from "../charts/WebViewChart";
 import { WebView } from "react-native-webview";
 import { ChartController, ExpenseData } from "../charts/controller";
-import { createBarChartData } from "../charts/chartHelpers";
+import {
+  createBarChartData,
+  getInitialZoomRange,
+} from "../charts/chartHelpers";
 import IconButton from "../UI/IconButton";
 
 interface ExpenseChartProps {
@@ -40,7 +43,6 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
 }) => {
   const { isLandscape } = useContext(OrientationContext);
   const [showResetButton, setShowResetButton] = useState(false);
-  const defaultViewRange = 7; // 7 days default view
   const webViewRef = useRef<WebView>(null);
 
   const colors = useMemo(
@@ -94,16 +96,16 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
 
     console.log("🔄 WebView ref:", webViewRef.current);
 
-    const now = new Date().getTime();
-    const sevenDaysAgo = now - defaultViewRange * 24 * 3600 * 1000;
+    // Use centralized zoom configuration
+    const zoomRange = getInitialZoomRange(periodType);
 
     webViewRef.current.injectJavaScript(`
-        window.setExtremes(${sevenDaysAgo}, ${now});
+        window.setExtremes(${zoomRange.min}, ${zoomRange.max});
         true;
       `);
 
     setShowResetButton(false);
-  }, [defaultViewRange]);
+  }, [periodType]);
 
   return (
     <View style={styles.container}>

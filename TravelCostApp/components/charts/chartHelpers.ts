@@ -16,6 +16,17 @@ export const BAR_WIDTH_CONFIG = {
   maxWidth: 30,
 } as const;
 
+// Initial zoom configuration - single source of truth
+export const INITIAL_ZOOM_CONFIG = {
+  futureExtensionRatio: 0.01,
+  defaultPeriods: {
+    day: 7,
+    week: 7,
+    month: 7,
+    year: 7,
+  },
+} as const;
+
 // Helper functions for period-specific calculations
 export const getPeriodZoomLimits = (
   periodType: "day" | "week" | "month" | "year" = "day"
@@ -54,6 +65,29 @@ export const calculateBarWidth = (
       (maxPeriods - minPeriods);
 
   return Math.round(barWidth);
+};
+
+// Helper function to calculate initial zoom range with future extension
+export const getInitialZoomRange = (
+  periodType: "day" | "week" | "month" | "year" = "day",
+  config = INITIAL_ZOOM_CONFIG
+) => {
+  const periodMs = PERIOD_MS[periodType];
+  const now = new Date().getTime();
+
+  const periodsToShow = config.defaultPeriods[periodType];
+  const rangeMs = periodsToShow * periodMs;
+
+  // Calculate the start time (past) and end time (future)
+  const startTime = now - rangeMs;
+  const futureExtension = rangeMs * config.futureExtensionRatio;
+  const endTime = now + futureExtension;
+
+  return {
+    min: startTime,
+    max: endTime,
+    rangeMs: rangeMs + futureExtension,
+  };
 };
 
 export interface ChartData {
@@ -259,7 +293,7 @@ export const generateHTMLTemplate = (
                 borderRadius: 4,
                 groupPadding: 0.4,
                 pointPadding: 0.4,
-                pointWidth: ${calculateBarWidth(7)}, // Default width for 7 days (matches initial zoom)
+                pointWidth: ${calculateBarWidth(7)}, // Default width - will be updated by setExtremes event
                 boostThreshold: 300,
                 boostBlending: 'add',
                 dataLabels: {
@@ -358,9 +392,22 @@ export const generateHTMLTemplate = (
           // Set initial zoom level after a short delay to ensure chart is ready
           setTimeout(() => {
             if (chart && chart.xAxis && chart.xAxis[0]) {
+              // Calculate initial zoom range with future extension using centralized config
+              const periodType = '${options.periodType || "day"}';
+              const zoomConfig = ${JSON.stringify(INITIAL_ZOOM_CONFIG)};
+
+              const periodMs = ${JSON.stringify(PERIOD_MS)};
               const now = new Date().getTime();
-              const sevenDaysAgo = now - (7 * 24 * 3600 * 1000);
-              chart.xAxis[0].setExtremes(sevenDaysAgo, now);
+
+              const periodsToShow = zoomConfig.defaultPeriods[periodType];
+              const rangeMs = periodsToShow * periodMs[periodType];
+
+              // Calculate the start time (past) and end time (future)
+              const startTime = now - rangeMs;
+              const futureExtension = rangeMs * zoomConfig.futureExtensionRatio;
+              const endTime = now + futureExtension;
+
+              chart.xAxis[0].setExtremes(startTime, endTime);
               // Initial bar width will be set by setExtremes event
             }
           }, 0);

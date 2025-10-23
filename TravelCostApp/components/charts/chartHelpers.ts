@@ -373,8 +373,17 @@ export const generateHTMLTemplate = (
           window.setExtremes = setExtremes;
           window.toggleLabels = toggleLabels;
 
-          // Initial chart creation with empty data
+          // Initial chart creation with empty data and zoom
           initChart([]);
+
+          // Set initial zoom level after a short delay to ensure chart is ready
+          setTimeout(() => {
+            if (chart && chart.xAxis && chart.xAxis[0]) {
+              const now = new Date().getTime();
+              const sevenDaysAgo = now - (7 * 24 * 3600 * 1000);
+              chart.xAxis[0].setExtremes(sevenDaysAgo, now);
+            }
+          }, 100);
         </script>
       </body>
     </html>

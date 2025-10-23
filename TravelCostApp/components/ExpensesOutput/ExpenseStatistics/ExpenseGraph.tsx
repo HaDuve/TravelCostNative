@@ -60,7 +60,7 @@ const ExpenseGraph = ({
 
   const totalBudget = Number(tripCtx.totalBudget) ?? MAX_JS_NUMBER;
   const listExpenseSumBudgets = [];
-  const lastDays = (periodRangeNumber ?? 7) + longerPeriodNum;
+  const lastDays = (periodRangeNumber ?? 28) + longerPeriodNum;
   const lastWeeks = (periodRangeNumber ?? 7) + longerPeriodNum;
   const lastMonths = (periodRangeNumber ?? 7) + longerPeriodNum;
   const lastYears =

@@ -114,8 +114,13 @@ export const generateHTMLTemplate = (
               spacingBottom: ${options.type === "pie" ? CHART_SPACING.PIE.BOTTOM : CHART_SPACING.BAR.BOTTOM},
               zoomType: 'x',
               pinchType: 'x',
-              panning: true,
-              panKey: 'shift',
+              panning: {
+                enabled: true,
+                type: 'x'
+              },
+              panKey: undefined,
+              followTouchMove: true,
+              followPointer: true,
               animation: {
                 duration: 150
               },
@@ -127,6 +132,9 @@ export const generateHTMLTemplate = (
                       type: 'log',
                       data: { message: '📊 Chart load event' }
                     }));
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'chartReady'
+                    }));
                   }
                 },
                 click: function(e) {
@@ -137,39 +145,6 @@ export const generateHTMLTemplate = (
                     }));
                   }
                 },
-                selection: function(event) {
-                  if (window.ReactNativeWebView) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'log',
-                      data: { message: '📊 Chart selection event', event }
-                    }));
-                  }
-
-                  if (!event.xAxis) {
-                    return false;
-                  }
-
-                  const xAxis = event.xAxis[0];
-                  const currentAxis = this.xAxis[0];
-                  const totalRange = currentAxis.dataMax - currentAxis.dataMin;
-                  const selectedRange = xAxis.max - xAxis.min;
-                  const zoomRatio = totalRange / selectedRange;
-                  const daysInRange = selectedRange / (24 * 3600 * 1000);
-
-                  if (window.ReactNativeWebView) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'zoom',
-                      data: { daysInRange, min: xAxis.min, max: xAxis.max, zoomRatio }
-                    }));
-                  }
-
-                  if (daysInRange < 4 || daysInRange > 27) {
-                    return false;
-                  }
-
-                  return true;
-                }
-              },
               resetZoomButton: {
                 position: {
                   align: 'right',
@@ -196,22 +171,7 @@ export const generateHTMLTemplate = (
                 }
               },
               events: {
-                load: function() {
-                  if (window.ReactNativeWebView) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'chartReady'
-                    }));
-                  }
-                },
                 selection: function(event) {
-                  // Debug log to check if selection event is triggered
-                  if (window.ReactNativeWebView) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'log',
-                      data: { message: '📊 Selection event triggered', event }
-                    }));
-                  }
-
                   if (!event.xAxis) {
                     return false;
                   }
@@ -221,18 +181,20 @@ export const generateHTMLTemplate = (
                   const totalRange = currentAxis.dataMax - currentAxis.dataMin;
                   const selectedRange = xAxis.max - xAxis.min;
                   const zoomRatio = totalRange / selectedRange;
-
-                  // Calculate days in range
                   const daysInRange = selectedRange / (24 * 3600 * 1000);
 
-                  // Prevent zooming if it would show fewer than 4 days
-                  if (daysInRange < 4) {
-                    return false;
-                  }
-
-                  // Log and notify when max zoom out is reached
-                  // Send zoom event
                   if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'log',
+                      data: { 
+                        message: '📊 Selection event',
+                        daysInRange,
+                        min: xAxis.min,
+                        max: xAxis.max,
+                        zoomRatio
+                      }
+                    }));
+
                     window.ReactNativeWebView.postMessage(JSON.stringify({
                       type: 'zoom',
                       data: {
@@ -249,31 +211,34 @@ export const generateHTMLTemplate = (
                     return false;
                   }
 
-                  // Let Highcharts handle the zoom
                   return true;
                 },
                 afterSetExtremes: function(e) {
-                  // Debug log to check if afterSetExtremes event is triggered
-                  if (window.ReactNativeWebView) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'log',
-                      data: { message: '📊 afterSetExtremes event triggered', event: e }
-                    }));
-                  }
-
                   if (!e.min || !e.max) return;
 
                   const daysInRange = (e.max - e.min) / (24 * 3600 * 1000);
+                  const totalRange = this.xAxis[0].dataMax - this.xAxis[0].dataMin;
+                  const zoomRatio = totalRange / (e.max - e.min);
 
-                  // Log and notify when max zoom out is reached
-                  // Send zoom event
                   if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'log',
+                      data: { 
+                        message: '📊 afterSetExtremes event',
+                        daysInRange,
+                        min: e.min,
+                        max: e.max,
+                        zoomRatio
+                      }
+                    }));
+
                     window.ReactNativeWebView.postMessage(JSON.stringify({
                       type: 'zoom',
                       data: {
                         min: e.min,
                         max: e.max,
-                        daysInRange
+                        daysInRange,
+                        zoomRatio
                       }
                     }));
                   }
@@ -327,7 +292,7 @@ export const generateHTMLTemplate = (
                       if (window.ReactNativeWebView) {
                         window.ReactNativeWebView.postMessage(JSON.stringify({
                           type: 'log',
-                          data: { 
+                          data: {
                             message: '📊 Point clicked',
                             x: this.x,
                             y: this.y,

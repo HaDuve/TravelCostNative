@@ -184,6 +184,25 @@ export const generateHTMLTemplate = (
                     return false;
                   }
 
+                  // Prevent zooming if it would show more than 27 points
+                  if (pointsInRange > 27) {
+                    // Log and notify when max zoom out is reached
+                    console.log("📈 MAX ZOOM OUT REACHED:", {
+                      pointsInRange,
+                      selectedRange,
+                      totalRange,
+                      timestamp: new Date().toISOString()
+                    });
+
+                    if (window.ReactNativeWebView) {
+                      window.ReactNativeWebView.postMessage(JSON.stringify({
+                        type: 'max-zoom-out',
+                        data: { pointsInRange, min: xAxis.min, max: xAxis.max }
+                      }));
+                    }
+                    return false;
+                  }
+
                   if (zoomRatio > 1.5) {
                     window.ReactNativeWebView.postMessage(JSON.stringify({
                       type: 'zoom-in',
@@ -208,7 +227,8 @@ export const generateHTMLTemplate = (
               type: ${options.dateFormat ? "'datetime'" : "'category'"},
               minPadding: 0.1,
               maxPadding: 0.1,
-              minRange: 4 * 24 * 3600 * 1000 // Minimum range is 4 days
+              minRange: 4 * 24 * 3600 * 1000, // Minimum range is 4 days
+              maxRange: 27 * 24 * 3600 * 1000 // Maximum range is 27 days
             },
             yAxis: {
               title: {

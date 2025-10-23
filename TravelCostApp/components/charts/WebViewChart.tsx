@@ -144,6 +144,10 @@ const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(
             }
             break;
 
+          case "max-zoom-out":
+            console.log("📊 WebViewChart: Max zoom out reached", message.data);
+            break;
+
           default:
             // Unknown chart message - could be logged in development
             break;

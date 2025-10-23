@@ -187,6 +187,20 @@ export const generateHTMLTemplate = (
                 }
               },
               events: {
+                selection: function(event) {
+                  if (event.xAxis) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'selection',
+                      data: {
+                        min: event.xAxis[0].min,
+                        max: event.xAxis[0].max,
+                        timestamp: new Date().toISOString()
+                      }
+                    }));
+                  }
+                  // Allow default zoom behavior
+                  return true;
+                }
               }
             },
             xAxis: {
@@ -198,6 +212,19 @@ export const generateHTMLTemplate = (
               maxPadding: 0.1,
               minRange: ${getPeriodZoomLimits(options.periodType).minRange}, // Dynamic min range based on period type
               maxRange: ${getPeriodZoomLimits(options.periodType).maxRange}, // Dynamic max range based on period type
+              events: {
+                setExtremes: function(event) {
+                  window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'setExtremes',
+                    data: {
+                      min: event.min,
+                      max: event.max,
+                      trigger: event.trigger, // 'zoom', 'navigator', etc.
+                      timestamp: new Date().toISOString()
+                    }
+                  }));
+                }
+              }
             },
             yAxis: {
               title: {

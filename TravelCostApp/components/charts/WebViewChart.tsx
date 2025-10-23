@@ -34,6 +34,7 @@ interface ChartMessage {
     max?: number;
     daysInRange?: number;
     timestamp?: string;
+    trigger?: string;
   };
   min?: number;
   max?: number;
@@ -115,10 +116,26 @@ const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(
             console.log("📊 Chart ready");
             break;
 
+          case "selection":
+            if (message.data) {
+              const { min, max, timestamp } = message.data;
+              console.log("📊 Selection event (pinch zoom):", {
+                min,
+                max,
+                timestamp,
+              });
+            }
+            break;
+
           case "setExtremes":
             if (message.data) {
-              const { min, max } = message.data;
-              console.log("📊 Set extremes:", { min, max });
+              const { min, max, trigger, timestamp } = message.data;
+              console.log("📊 Set extremes event:", {
+                min,
+                max,
+                trigger,
+                timestamp,
+              });
             }
             break;
 

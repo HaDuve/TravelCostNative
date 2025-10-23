@@ -41,7 +41,7 @@ interface ChartMessage {
 }
 
 const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(
-  function WebViewChart(props) {
+  function WebViewChart(props, ref) {
     const {
       data,
       options = {},
@@ -119,7 +119,7 @@ const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(
           case "selection":
             if (message.data) {
               const { min, max, timestamp } = message.data;
-              console.log("📊 Selection event (pinch zoom):", {
+              console.log("📊 Selection event (drag selection):", {
                 min,
                 max,
                 timestamp,
@@ -130,7 +130,7 @@ const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(
           case "setExtremes":
             if (message.data) {
               const { min, max, trigger, timestamp } = message.data;
-              console.log("📊 Set extremes event:", {
+              console.log("📊 Set extremes event (pinch/pan/zoom):", {
                 min,
                 max,
                 trigger,
@@ -209,7 +209,7 @@ const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(
         {/* WebView with fade animation */}
         <Animated.View style={[styles.webViewContainer, { opacity: fadeAnim }]}>
           <WebView
-            ref={webViewRef}
+            ref={ref || webViewRef}
             source={{ html: htmlContent }}
             style={styles.webView}
             onMessage={handleWebViewMessage}

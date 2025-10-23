@@ -111,6 +111,8 @@ export const generateHTMLTemplate = (
         <div id="${chartId}"></div>
         <script>
           let chart;
+          let lastSetExtremesTime = 0;
+          const SET_EXTREMES_THROTTLE_MS = 100; // Throttle to max 10 events per second
 
           const defaultOptions = {
             title: {
@@ -214,15 +216,19 @@ export const generateHTMLTemplate = (
               maxRange: ${getPeriodZoomLimits(options.periodType).maxRange}, // Dynamic max range based on period type
               events: {
                 setExtremes: function(event) {
-                  window.ReactNativeWebView.postMessage(JSON.stringify({
-                    type: 'setExtremes',
-                    data: {
-                      min: event.min,
-                      max: event.max,
-                      trigger: event.trigger, // 'zoom', 'navigator', etc.
-                      timestamp: new Date().toISOString()
-                    }
-                  }));
+                  const now = Date.now();
+                  if (now - lastSetExtremesTime > SET_EXTREMES_THROTTLE_MS) {
+                    lastSetExtremesTime = now;
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'setExtremes',
+                      data: {
+                        min: event.min,
+                        max: event.max,
+                        trigger: event.trigger, // 'zoom', 'navigator', etc.
+                        timestamp: new Date().toISOString()
+                      }
+                    }));
+                  }
                 }
               }
             },

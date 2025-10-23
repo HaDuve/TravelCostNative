@@ -113,10 +113,41 @@ export const generateHTMLTemplate = (
               title: {
                 text: '${options.xAxisTitle || ""}'
               },
-              type: ${options.dateFormat ? "'datetime'" : "'category'"}
-,
+              type: ${options.dateFormat ? "'datetime'" : "'category'"},
               minPadding: 0.1,
-              maxPadding: 0.1
+              maxPadding: 0.1,
+              zoomType: 'x',
+              pinchType: 'x',
+              panning: true,
+              panKey: 'shift',
+              events: {
+                afterSetExtremes: function(e) {
+                  const range = e.max - e.min;
+                  const days = range / (24 * 3600 * 1000);
+                  let zoomLevel = '';
+                  
+                  if (days <= 27) {
+                    zoomLevel = 'days';
+                  } else if (days <= 111) {
+                    zoomLevel = 'weeks';
+                  } else if (days <= 1343) {
+                    zoomLevel = 'months';
+                  } else {
+                    zoomLevel = 'years';
+                  }
+
+                  if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'zoom-level-change',
+                      data: {
+                        zoomLevel: zoomLevel,
+                        min: e.min,
+                        max: e.max
+                      }
+                    }));
+                  }
+                }
+              }
             },
             yAxis: {
               title: {

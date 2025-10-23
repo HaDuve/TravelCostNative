@@ -5,9 +5,8 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { StyleSheet, Platform, TouchableOpacity, Animated } from "react-native";
+import { StyleSheet, Platform, View, Animated } from "react-native";
 import { WebView } from "react-native-webview";
-import * as Haptics from "expo-haptics";
 import { generateHTMLTemplate, ChartData, ChartOptions } from "./chartHelpers";
 import ChartSkeleton from "../UI/ChartSkeleton";
 import { CHART_DIMENSIONS, CHART_STYLING, ChartType } from "./chartConstants";
@@ -21,34 +20,40 @@ interface WebViewChartProps {
   onChartReady?: () => void;
   onPointClick?: (data: unknown) => void;
   onPointLongPress?: (data: unknown) => void;
+  onZoomLevelChange?: (zoomLevel: string, min: number, max: number) => void;
   style?: object;
   showSkeleton?: boolean;
 }
 
 interface ChartMessage {
   type: string;
-  data?: unknown;
+  data?: {
+    zoomLevel?: string;
+    min?: number;
+    max?: number;
+  };
   min?: number;
   max?: number;
 }
 
-const WebViewChart: React.FC<WebViewChartProps> = ({
-  data,
-  options = {},
-  width,
-  height,
-  onChartReady,
-  onPointClick,
-  onPointLongPress,
-  style,
-  showSkeleton = true,
-}) => {
+const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(function WebViewChart(props, ref) {
+  const {
+    data,
+    options = {},
+    width,
+    height,
+    onChartReady,
+    onPointClick,
+    onPointLongPress,
+    onZoomLevelChange,
+    style,
+    showSkeleton = true,
+  } = props;
   const webViewRef = useRef<WebView>(null);
   const [isChartReady, setIsChartReady] = useState(false);
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(
     null
   );
-  const [showLabels, setShowLabels] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const chartId = useMemo(() => `chart-${Date.now()}`, []);
@@ -92,22 +97,6 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
     }
   }, [isLoading, fadeAnim]);
 
-  const toggleLabels = () => {
-    if (!webViewRef.current || !isChartReady) return;
-
-    // Trigger haptic feedback
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
-    const newShowLabels = !showLabels;
-    setShowLabels(newShowLabels);
-
-    const toggleScript = `
-      window.toggleLabels(${newShowLabels});
-      true;
-    `;
-
-    webViewRef.current.injectJavaScript(toggleScript);
-  };
 
   const handleWebViewMessage = (event: { nativeEvent: { data: string } }) => {
     try {
@@ -143,8 +132,11 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
           }
           break;
 
-        case "zoom":
-          // Handle zoom events if needed
+        case "zoom-level-change":
+          if (message.data?.zoomLevel && onZoomLevelChange) {
+            const { zoomLevel, min, max } = message.data;
+            onZoomLevelChange(zoomLevel, min || 0, max || 0);
+          }
           break;
 
         default:
@@ -179,11 +171,7 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
   };
 
   return (
-    <TouchableOpacity
-      style={[styles.container, webViewStyle, style]}
-      onPress={toggleLabels}
-      activeOpacity={0.9}
-    >
+    <View style={[styles.container, webViewStyle, style]}>
       {/* Show skeleton while loading */}
       {isLoading && showSkeleton && (
         <ChartSkeleton
@@ -197,7 +185,7 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
       {/* WebView with fade animation */}
       <Animated.View style={[styles.webViewContainer, { opacity: fadeAnim }]}>
         <WebView
-          ref={webViewRef}
+          ref={ref || webViewRef}
           source={{ html: htmlContent }}
           style={styles.webView}
           onMessage={handleWebViewMessage}
@@ -217,12 +205,11 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
           allowsInlineMediaPlayback={true}
           mediaPlaybackRequiresUserAction={false}
           originWhitelist={["*"]}
-          pointerEvents="none"
         />
       </Animated.View>
-    </TouchableOpacity>
+    </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

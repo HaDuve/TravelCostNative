@@ -1,5 +1,5 @@
-import React, { useContext, useMemo } from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useCallback, useContext, useMemo, useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
@@ -8,11 +8,22 @@ import { dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
 
 import WebViewChart from "../charts/WebViewChart";
+import { WebView } from "react-native-webview";
 import { ChartController, ExpenseData } from "../charts/controller";
 import { createBarChartData } from "../charts/chartHelpers";
 
-const ExpenseChart = ({ inputData, xAxis, yAxis, budget, currency }) => {
+interface ExpenseChartProps {
+  inputData: unknown[];
+  xAxis: string;
+  yAxis: string;
+  budget: number;
+  currency: string;
+}
+
+const ExpenseChart = React.forwardRef<WebView, ExpenseChartProps>(function ExpenseChart({ inputData, xAxis, yAxis, budget, currency }, ref) {
   const { isLandscape } = useContext(OrientationContext);
+  const [showResetButton, setShowResetButton] = useState(false);
+  const defaultViewRange = 7; // 7 days default view
 
   const colors = useMemo(
     () => ({
@@ -51,29 +62,54 @@ const ExpenseChart = ({ inputData, xAxis, yAxis, budget, currency }) => {
     );
   }, [budget, colors, currency]);
 
+  const handleZoomLevelChange = useCallback(() => {
+    setShowResetButton(true);
+  }, []);
+
+  const handleReset = useCallback(() => {
+    if (!ref) return;
+
+    const now = new Date().getTime();
+    const sevenDaysAgo = now - (defaultViewRange * 24 * 3600 * 1000);
+    
+    (ref as React.RefObject<WebView>).current?.injectJavaScript(`
+      window.setExtremes(${sevenDaysAgo}, ${now});
+      true;
+    `);
+
+    setShowResetButton(false);
+  }, [defaultViewRange, ref]);
+
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        {showResetButton && (
+          <TouchableOpacity onPress={handleReset} style={styles.resetButton}>
+            <Text style={styles.resetButtonText}>Reset View</Text>
+          </TouchableOpacity>
+        )}
+      </View>
       <WebViewChart
+        ref={ref}
         data={highchartsData}
         options={chartOptions}
         width={width}
         height={height}
         showSkeleton={true}
+        onZoomLevelChange={handleZoomLevelChange}
       />
     </View>
   );
-};
+});
 
 export default ExpenseChart;
 
 ExpenseChart.propTypes = {
-  inputData: PropTypes.array,
-  xAxis: PropTypes.string,
-  yAxis: PropTypes.string,
-  budgetAxis: PropTypes.string,
-  budget: PropTypes.number,
-  daysRange: PropTypes.number,
-  currency: PropTypes.string,
+  inputData: PropTypes.array.isRequired,
+  xAxis: PropTypes.string.isRequired,
+  yAxis: PropTypes.string.isRequired,
+  budget: PropTypes.number.isRequired,
+  currency: PropTypes.string.isRequired,
 };
 
 const styles = StyleSheet.create({
@@ -83,5 +119,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: dynamicScale(8),
     backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  header: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingHorizontal: dynamicScale(16),
+    paddingVertical: dynamicScale(8),
+  },
+  resetButton: {
+    backgroundColor: GlobalStyles.colors.primary500,
+    paddingHorizontal: dynamicScale(12),
+    paddingVertical: dynamicScale(6),
+    borderRadius: dynamicScale(4),
+  },
+  resetButtonText: {
+    color: GlobalStyles.colors.backgroundColor,
+    fontSize: dynamicScale(14),
+    fontWeight: '500',
   },
 });

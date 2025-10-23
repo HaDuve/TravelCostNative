@@ -124,9 +124,50 @@ export const generateHTMLTemplate = (
                   this.container.style.touchAction = 'none';
                   if (window.ReactNativeWebView) {
                     window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'chartReady'
+                      type: 'log',
+                      data: { message: '📊 Chart load event' }
                     }));
                   }
+                },
+                click: function(e) {
+                  if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'log',
+                      data: { message: '📊 Chart click event', x: e.xAxis[0].value, y: e.yAxis[0].value }
+                    }));
+                  }
+                },
+                selection: function(event) {
+                  if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'log',
+                      data: { message: '📊 Chart selection event', event }
+                    }));
+                  }
+
+                  if (!event.xAxis) {
+                    return false;
+                  }
+
+                  const xAxis = event.xAxis[0];
+                  const currentAxis = this.xAxis[0];
+                  const totalRange = currentAxis.dataMax - currentAxis.dataMin;
+                  const selectedRange = xAxis.max - xAxis.min;
+                  const zoomRatio = totalRange / selectedRange;
+                  const daysInRange = selectedRange / (24 * 3600 * 1000);
+
+                  if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'zoom',
+                      data: { daysInRange, min: xAxis.min, max: xAxis.max, zoomRatio }
+                    }));
+                  }
+
+                  if (daysInRange < 4 || daysInRange > 27) {
+                    return false;
+                  }
+
+                  return true;
                 }
               },
               resetZoomButton: {
@@ -264,13 +305,20 @@ export const generateHTMLTemplate = (
             plotOptions: {
               series: {
                 animation: {
-                  duration: 1000
+                  duration: 150
                 },
                 allowPointSelect: true,
                 stickyTracking: false,
+                enableMouseTracking: true,
                 states: {
                   hover: {
-                    enabled: true
+                    enabled: true,
+                    brightness: 0.1
+                  },
+                  select: {
+                    enabled: true,
+                    color: null,
+                    borderColor: 'black'
                   }
                 },
                 point: {
@@ -279,7 +327,20 @@ export const generateHTMLTemplate = (
                       if (window.ReactNativeWebView) {
                         window.ReactNativeWebView.postMessage(JSON.stringify({
                           type: 'log',
-                          data: { message: '📊 Point clicked', point: this }
+                          data: { 
+                            message: '📊 Point clicked',
+                            x: this.x,
+                            y: this.y,
+                            category: this.category
+                          }
+                        }));
+                      }
+                    },
+                    mouseOver: function() {
+                      if (window.ReactNativeWebView) {
+                        window.ReactNativeWebView.postMessage(JSON.stringify({
+                          type: 'log',
+                          data: { message: '📊 Point hover' }
                         }));
                       }
                     }

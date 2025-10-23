@@ -1,3 +1,4 @@
+import { BAR_WIDTH, INITIAL_ZOOM, ZOOM_LIMITS } from "../../confAppConstants";
 import { CHART_SPACING } from "./chartConstants";
 
 // Period type constants in milliseconds
@@ -10,22 +11,14 @@ const PERIOD_MS = {
 
 // Bar width configuration - single source of truth
 export const BAR_WIDTH_CONFIG = {
-  minPeriods: 4,
-  maxPeriods: 28,
-  minWidth: 8,
-  maxWidth: 30,
+  minPeriods: ZOOM_LIMITS.min,
+  maxPeriods: ZOOM_LIMITS.max,
+  minWidth: BAR_WIDTH.minWidth,
+  maxWidth: BAR_WIDTH.maxWidth,
 } as const;
 
 // Initial zoom configuration - single source of truth
-export const INITIAL_ZOOM_CONFIG = {
-  futureExtensionRatio: 0.01,
-  defaultPeriods: {
-    day: 7,
-    week: 7,
-    month: 7,
-    year: 7,
-  },
-} as const;
+export const INITIAL_ZOOM_CONFIG = INITIAL_ZOOM;
 
 // Helper functions for period-specific calculations
 export const getPeriodZoomLimits = (
@@ -33,8 +26,8 @@ export const getPeriodZoomLimits = (
 ) => {
   const periodMs = PERIOD_MS[periodType];
   return {
-    minRange: 4 * periodMs, // 4 periods minimum
-    maxRange: 27 * periodMs, // 27 periods maximum
+    minRange: ZOOM_LIMITS.min * periodMs,
+    maxRange: ZOOM_LIMITS.max * periodMs,
   };
 };
 
@@ -294,8 +287,6 @@ export const generateHTMLTemplate = (
                 groupPadding: 0.4,
                 pointPadding: 0.4,
                 pointWidth: ${calculateBarWidth(7)}, // Default width - will be updated by setExtremes event
-                boostThreshold: 300,
-                boostBlending: 'add',
                 dataLabels: {
                   enabled: false,
                   style: {

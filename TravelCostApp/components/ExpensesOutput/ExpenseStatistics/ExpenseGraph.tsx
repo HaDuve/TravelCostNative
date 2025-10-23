@@ -29,7 +29,10 @@ i18n.enableFallback = true;
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import PropTypes from "prop-types";
 import { isForeground } from "../../../util/appState";
-import { MAX_JS_NUMBER } from "../../../confAppConstants";
+import {
+  MAX_JS_NUMBER,
+  PRELOADED_DATA_POINTS,
+} from "../../../confAppConstants";
 import { SettingsContext } from "../../../store/settings-context";
 import { getExpensesSumPeriod } from "../../../util/expense";
 import { dynamicScale } from "../../../util/scalingUtil";
@@ -56,10 +59,10 @@ const ExpenseGraph = ({
 
   const totalBudget = Number(tripCtx.totalBudget) ?? MAX_JS_NUMBER;
   const listExpenseSumBudgets = [];
-  const lastDays = 28 + longerPeriodNum;
-  const lastWeeks = 28 + longerPeriodNum;
-  const lastMonths = 28 + longerPeriodNum;
-  const lastYears = 28 + longerPeriodNum;
+  const lastDays = PRELOADED_DATA_POINTS + longerPeriodNum;
+  const lastWeeks = PRELOADED_DATA_POINTS + longerPeriodNum;
+  const lastMonths = PRELOADED_DATA_POINTS + longerPeriodNum;
+  const lastYears = PRELOADED_DATA_POINTS + longerPeriodNum;
   let xAxis = "";
   let yAxis = "";
   let budgetAxis = "";

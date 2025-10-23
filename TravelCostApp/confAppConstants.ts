@@ -39,3 +39,23 @@ export const MAX_EXPENSES_RENDER = 150;
 // NON-PREMIUM LIMITATIONS
 export const MAX_TRIPS_NONPREMIUM = 2;
 export const MAX_EXPENSES_PERTRIP_NONPREMIUM = 500;
+
+// CHART CONSTANTS
+export const PRELOADED_DATA_POINTS = 30;
+export const ZOOM_LIMITS = {
+  min: 3,
+  max: PRELOADED_DATA_POINTS - 1,
+};
+export const BAR_WIDTH = {
+  minWidth: 6,
+  maxWidth: 30,
+};
+export const INITIAL_ZOOM = {
+  futureExtensionRatio: 0.01,
+  defaultPeriods: {
+    day: 7,
+    week: 7,
+    month: 7,
+    year: 7,
+  },
+};

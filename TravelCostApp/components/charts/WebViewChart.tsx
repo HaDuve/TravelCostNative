@@ -7,7 +7,12 @@ import React, {
 } from "react";
 import { StyleSheet, Platform, View, Animated } from "react-native";
 import { WebView } from "react-native-webview";
-import { generateHTMLTemplate, ChartData, ChartOptions } from "./chartHelpers";
+import {
+  generateHTMLTemplate,
+  ChartData,
+  ChartOptions,
+  calculateVisiblePeriods,
+} from "./chartHelpers";
 import ChartSkeleton from "../UI/ChartSkeleton";
 import { CHART_DIMENSIONS, CHART_STYLING, ChartType } from "./chartConstants";
 import { dynamicScale } from "../../util/scalingUtil";
@@ -21,6 +26,12 @@ interface WebViewChartProps {
   onPointClick?: (data: unknown) => void;
   onPointLongPress?: (data: unknown) => void;
   onZoomLevelChange?: (zoomLevel: string, min: number, max: number) => void;
+  onZoomStateChange?: (zoomState: {
+    isLatestVisible: boolean;
+    visiblePeriods: number;
+    minDate: Date | null;
+    maxDate: Date | null;
+  }) => void;
   onWebViewRef?: (ref: WebView | null) => void;
   style?: object;
   showSkeleton?: boolean;
@@ -50,6 +61,7 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
   onPointClick,
   onPointLongPress,
   onZoomLevelChange,
+  onZoomStateChange,
   onWebViewRef,
   style,
   showSkeleton = true,
@@ -65,6 +77,66 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
   const htmlContent = useMemo(
     () => generateHTMLTemplate(chartId, options),
     [chartId, options]
+  );
+
+  // Helper function to calculate zoom state
+  const calculateZoomState = useCallback(
+    (min: number, max: number) => {
+      if (!data || data.length === 0 || !options.periodType) {
+        return {
+          isLatestVisible: true,
+          visiblePeriods: 7,
+          minDate: null,
+          maxDate: null,
+        };
+      }
+
+      const now = new Date().getTime();
+      const isLatestVisible = now >= min && now <= max;
+
+      const visiblePeriods = Math.round(
+        calculateVisiblePeriods(min, max, options.periodType)
+      );
+
+      // Find first and last dates with data within the visible range
+      let minDate: Date | null = null;
+      let maxDate: Date | null = null;
+
+      // Extract data points from the series data
+      const seriesData =
+        Array.isArray(data) && data[0] && "data" in data[0]
+          ? (data[0] as any).data
+          : [];
+
+      if (Array.isArray(seriesData)) {
+        const visibleDataPoints = seriesData.filter((point: any) => {
+          const pointTime =
+            typeof point.x === "number" ? point.x : new Date(point.x).getTime();
+          return pointTime >= min && pointTime <= max;
+        });
+
+        if (visibleDataPoints.length > 0) {
+          const sortedPoints = visibleDataPoints.sort((a: any, b: any) => {
+            const timeA =
+              typeof a.x === "number" ? a.x : new Date(a.x).getTime();
+            const timeB =
+              typeof b.x === "number" ? b.x : new Date(b.x).getTime();
+            return timeA - timeB;
+          });
+
+          minDate = new Date(sortedPoints[0].x);
+          maxDate = new Date(sortedPoints[sortedPoints.length - 1].x);
+        }
+      }
+
+      return {
+        isLatestVisible,
+        visiblePeriods,
+        minDate,
+        maxDate,
+      };
+    },
+    [data, options.periodType]
   );
 
   // Determine loading states
@@ -147,6 +219,13 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
               });
               onZoomLevelChange &&
                 onZoomLevelChange("normal", min || 0, max || 0);
+            }
+
+            // Calculate and emit zoom state
+            if (min != null && max != null) {
+              const zoomState = calculateZoomState(min, max);
+              console.log("📊 Zoom state calculated:", zoomState);
+              onZoomStateChange && onZoomStateChange(zoomState);
             }
           }
           break;

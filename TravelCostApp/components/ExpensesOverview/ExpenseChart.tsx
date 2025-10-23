@@ -30,6 +30,12 @@ interface ExpenseChartProps {
   currency: string;
   periodType?: "day" | "week" | "month" | "year";
   onWebViewRef?: (ref: WebView | null) => void;
+  onZoomStateChange?: (zoomState: {
+    isLatestVisible: boolean;
+    visiblePeriods: number;
+    minDate: Date | null;
+    maxDate: Date | null;
+  }) => void;
 }
 
 const ExpenseChart: React.FC<ExpenseChartProps> = ({
@@ -40,6 +46,7 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
   currency,
   periodType,
   onWebViewRef,
+  onZoomStateChange,
 }) => {
   const { isLandscape } = useContext(OrientationContext);
   const [showResetButton, setShowResetButton] = useState(false);
@@ -90,6 +97,18 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
     []
   );
 
+  const handleZoomStateChange = useCallback(
+    (zoomState: {
+      isLatestVisible: boolean;
+      visiblePeriods: number;
+      minDate: Date | null;
+      maxDate: Date | null;
+    }) => {
+      onZoomStateChange?.(zoomState);
+    },
+    [onZoomStateChange]
+  );
+
   const handleReset = useCallback(() => {
     console.log("🔄 Reset button pressed");
     if (!webViewRef.current) return;
@@ -127,6 +146,7 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
         height={height}
         showSkeleton={true}
         onZoomLevelChange={handleZoomLevelChange}
+        onZoomStateChange={handleZoomStateChange}
         onWebViewRef={(ref) => {
           webViewRef.current = ref;
           onWebViewRef?.(ref);
@@ -146,6 +166,7 @@ ExpenseChart.propTypes = {
   currency: PropTypes.string.isRequired,
   periodType: PropTypes.oneOf(["day", "week", "month", "year"]),
   onWebViewRef: PropTypes.func,
+  onZoomStateChange: PropTypes.func,
 };
 
 const styles = StyleSheet.create({

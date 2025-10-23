@@ -60,6 +60,7 @@ const en = {
 
   // last periodname
   last: "Last",
+  latest: "Latest",
   days: "days",
   weeks: "weeks",
   months: "months",
@@ -596,6 +597,7 @@ const de = {
 
   // last periodname
   last: "Letzte",
+  latest: "Letzte",
   days: "Tage",
   weeks: "Wochen",
   months: "Monate",
@@ -1158,6 +1160,7 @@ const fr = {
 
   // last periodname
   last: "Dernier",
+  latest: "Dernières",
   days: "jours",
   weeks: "semaines",
   months: "mois",
@@ -1718,6 +1721,7 @@ const ru = {
 
   // last periodname
   last: "Последние",
+  latest: "Последние",
   days: "дни",
   weeks: "недели",
   months: "месяцы",

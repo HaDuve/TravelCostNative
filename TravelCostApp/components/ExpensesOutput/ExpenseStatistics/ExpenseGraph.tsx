@@ -80,6 +80,16 @@ const ExpenseGraph = ({
     });
   };
 
+  const handleZoomReset = () => {
+    console.log("🔍 ZOOM RESET:", {
+      previousZoom: zoomLevel,
+      newZoom: 1,
+      effectivePeriodRange: periodRangeNumber ?? 7,
+      timestamp: new Date().toISOString(),
+    });
+    setZoomLevel(1);
+  };
+
   const expenseCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
   const hideSpecial = settings.hideSpecialExpenses;
@@ -485,6 +495,7 @@ const ExpenseGraph = ({
               currency={tripCtx.tripCurrency}
               onZoomIn={handleZoomIn}
               onZoomOut={handleZoomOut}
+              onZoomReset={handleZoomReset}
             ></ExpenseChart>
           </View>
         )}
@@ -557,6 +568,7 @@ const ExpenseGraph = ({
                   currency={tripCtx.tripCurrency}
                   onZoomIn={handleZoomIn}
                   onZoomOut={handleZoomOut}
+                  onZoomReset={handleZoomReset}
                 ></ExpenseChart>
               )}
             </View>

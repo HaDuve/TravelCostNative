@@ -20,6 +20,7 @@ const ExpenseChart = ({
   currency,
   onZoomIn,
   onZoomOut,
+  onZoomReset,
 }) => {
   const { isLandscape } = useContext(OrientationContext);
   const { settings } = useContext(SettingsContext);
@@ -103,6 +104,7 @@ const ExpenseChart = ({
         showSkeleton={true}
         onZoomIn={onZoomIn}
         onZoomOut={onZoomOut}
+        onZoomReset={onZoomReset}
       />
     </View>
   );
@@ -120,6 +122,7 @@ ExpenseChart.propTypes = {
   currency: PropTypes.string,
   onZoomIn: PropTypes.func,
   onZoomOut: PropTypes.func,
+  onZoomReset: PropTypes.func,
 };
 
 const styles = StyleSheet.create({

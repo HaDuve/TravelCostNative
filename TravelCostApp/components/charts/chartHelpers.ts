@@ -1,4 +1,3 @@
-import { Dimensions } from "react-native";
 import { CHART_SPACING } from "./chartConstants";
 
 export interface ChartData {
@@ -83,7 +82,84 @@ export const generateHTMLTemplate = (
               spacingLeft: ${options.type === "pie" ? CHART_SPACING.PIE.LEFT : CHART_SPACING.BAR.LEFT},
               spacingRight: ${options.type === "pie" ? CHART_SPACING.PIE.RIGHT : CHART_SPACING.BAR.RIGHT},
               spacingTop: ${options.type === "pie" ? CHART_SPACING.PIE.TOP : CHART_SPACING.BAR.TOP},
-              spacingBottom: ${options.type === "pie" ? CHART_SPACING.PIE.BOTTOM : CHART_SPACING.BAR.BOTTOM}
+              spacingBottom: ${options.type === "pie" ? CHART_SPACING.PIE.BOTTOM : CHART_SPACING.BAR.BOTTOM},
+              zoomType: 'x',
+              pinchType: 'x',
+              panning: true,
+              panKey: 'shift',
+              resetZoomButton: {
+                position: {
+                  align: 'right',
+                  verticalAlign: 'top',
+                  x: -10,
+                  y: 10
+                },
+                theme: {
+                  fill: 'white',
+                  stroke: '#6B7280',
+                  r: 4,
+                  states: {
+                    hover: {
+                      fill: '#F3F4F6',
+                      stroke: '#4B5563',
+                      style: {
+                        color: '#4B5563'
+                      }
+                    }
+                  },
+                  style: {
+                    color: '#6B7280'
+                  }
+                }
+              },
+              events: {
+                load: function() {
+                  if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'chart-ready'
+                    }));
+                  }
+                },
+                selection: function(event) {
+                  if (!event.xAxis) {
+                    return false;
+                  }
+
+                  const xAxis = event.xAxis[0];
+                  const currentAxis = this.xAxis[0];
+                  const totalRange = currentAxis.dataMax - currentAxis.dataMin;
+                  const selectedRange = xAxis.max - xAxis.min;
+                  const zoomRatio = totalRange / selectedRange;
+
+                  console.log("📈 CHART SELECTION:", {
+                    min: xAxis.min,
+                    max: xAxis.max,
+                    dataMin: currentAxis.dataMin,
+                    dataMax: currentAxis.dataMax,
+                    totalRange,
+                    selectedRange,
+                    zoomRatio,
+                    timestamp: new Date().toISOString(),
+                  });
+
+                  if (zoomRatio > 1.5) {
+                    console.log("🔍 TRIGGERING ZOOM IN:", { zoomRatio });
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'zoom-in',
+                      data: { zoomRatio, min: xAxis.min, max: xAxis.max }
+                    }));
+                  } else if (zoomRatio < 0.7) {
+                    console.log("🔍 TRIGGERING ZOOM OUT:", { zoomRatio });
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'zoom-out',
+                      data: { zoomRatio, min: xAxis.min, max: xAxis.max }
+                    }));
+                  }
+
+                  // Let Highcharts handle the zoom
+                  return true;
+                }
+              }
             },
             title: {
               text: '${options.title || ""}',
@@ -204,51 +280,6 @@ export const generateHTMLTemplate = (
             }
 
             chart = Highcharts.chart(mergedOptions);
-
-            // Add zoom event listeners
-            chart.xAxis[0].setExtremes = function(min, max, redraw, animation) {
-              // Call the original setExtremes method
-              Highcharts.Axis.prototype.setExtremes.call(this, min, max, redraw, animation);
-
-              // Check if this is a zoom operation (not initial load)
-              if (min !== undefined && max !== undefined && this.dataMin !== undefined && this.dataMax !== undefined) {
-                const totalDataRange = this.dataMax - this.dataMin;
-                const zoomedRange = max - min;
-                const zoomRatio = totalDataRange / zoomedRange;
-
-                console.log('📈 CHART ZOOM DETECTION:', {
-                  min: min,
-                  max: max,
-                  dataMin: this.dataMin,
-                  dataMax: this.dataMax,
-                  totalDataRange: totalDataRange,
-                  zoomedRange: zoomedRange,
-                  zoomRatio: zoomRatio,
-                  timestamp: new Date().toISOString()
-                });
-
-                // Determine zoom level based on ratio
-                if (zoomRatio > 1.5) {
-                  // Zoom in - show fewer bars
-                  console.log('🔍 TRIGGERING ZOOM IN:', { zoomRatio });
-                  if (window.ReactNativeWebView) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'zoom-in'
-                    }));
-                  }
-                } else if (zoomRatio < 0.7) {
-                  // Zoom out - show more bars
-                  console.log('🔍 TRIGGERING ZOOM OUT:', { zoomRatio });
-                  if (window.ReactNativeWebView) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'zoom-out'
-                    }));
-                  }
-                } else {
-                  console.log('📊 ZOOM RATIO WITHIN NORMAL RANGE:', { zoomRatio });
-                }
-              }
-            };
 
             // Notify React Native that chart is ready
             if (window.ReactNativeWebView) {

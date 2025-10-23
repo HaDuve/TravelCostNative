@@ -5,7 +5,13 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { StyleSheet, Platform, TouchableOpacity, Animated } from "react-native";
+import {
+  StyleSheet,
+  Platform,
+  View,
+  TouchableOpacity,
+  Animated,
+} from "react-native";
 import { WebView } from "react-native-webview";
 import * as Haptics from "expo-haptics";
 import { generateHTMLTemplate, ChartOptions } from "./chartHelpers";
@@ -30,6 +36,7 @@ interface WebViewChartProps {
   onPointLongPress?: (data: unknown) => void;
   onZoomIn?: () => void;
   onZoomOut?: () => void;
+  onZoomReset?: () => void;
   style?: object;
   showSkeleton?: boolean;
   labelsEnabled?: boolean;
@@ -52,6 +59,7 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
   onPointLongPress,
   onZoomIn,
   onZoomOut,
+  onZoomReset,
   style,
   showSkeleton = true,
   labelsEnabled = false,
@@ -193,6 +201,17 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
           }
           break;
 
+        case "zoom-reset":
+          console.log("🔍 CHART ZOOM RESET EVENT:", {
+            type: "chart-interaction",
+            action: "zoom-reset",
+            timestamp: new Date().toISOString(),
+          });
+          if (onZoomReset) {
+            onZoomReset();
+          }
+          break;
+
         default:
           // Unknown chart message - could be logged in development
           break;
@@ -225,11 +244,7 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
   };
 
   return (
-    <TouchableOpacity
-      style={[styles.container, webViewStyle, style]}
-      onPress={toggleLabels}
-      activeOpacity={0.9}
-    >
+    <View style={[styles.container, webViewStyle, style]}>
       {/* Show skeleton while loading */}
       {isLoading && showSkeleton && (
         <ChartSkeleton
@@ -263,10 +278,9 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
           allowsInlineMediaPlayback={true}
           mediaPlaybackRequiresUserAction={false}
           originWhitelist={["*"]}
-          pointerEvents="none"
         />
       </Animated.View>
-    </TouchableOpacity>
+    </View>
   );
 };
 

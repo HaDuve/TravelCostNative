@@ -72,47 +72,14 @@ export const generateHTMLTemplate = (
         <script>
           let chart;
 
+          // Function to safely send messages to React Native
+          function postToRN(type, data) {
+            if (window.__REACT_WEB_VIEW_BRIDGE) {
+              window.__REACT_WEB_VIEW_BRIDGE.postMessage(JSON.stringify({ type, data }));
+            }
+          }
+
           const defaultOptions = {
-            chart: {
-              renderTo: '${chartId}',
-              type: '${options.type || "line"}',
-              backgroundColor: 'transparent',
-              animation: {
-                duration: 1000
-              },
-              style: {
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-              },
-              spacingLeft: ${options.type === "pie" ? CHART_SPACING.PIE.LEFT : CHART_SPACING.BAR.LEFT},
-              spacingRight: ${options.type === "pie" ? CHART_SPACING.PIE.RIGHT : CHART_SPACING.BAR.RIGHT},
-              spacingTop: ${options.type === "pie" ? CHART_SPACING.PIE.TOP : CHART_SPACING.BAR.TOP},
-              spacingBottom: ${options.type === "pie" ? CHART_SPACING.PIE.BOTTOM : CHART_SPACING.BAR.BOTTOM}
-            },
-            title: {
-              text: '${options.title || ""}',
-              style: {
-                fontSize: '16px',
-                fontWeight: 'bold'
-              }
-            },
-            subtitle: {
-              text: '${options.subtitle || ""}'
-            },
-            credits: {
-              enabled: false
-            },
-            exporting: {
-              enabled: false
-            },
-            legend: {
-              enabled: ${options.showLegend || false}
-            },
-            tooltip: {
-              enabled: false,
-              animation: true,
-              borderRadius: 8,
-              shadow: true
-            },
             chart: {
               renderTo: '${chartId}',
               type: '${options.type || "line"}',
@@ -158,11 +125,7 @@ export const generateHTMLTemplate = (
               },
               events: {
                 load: function() {
-                  if (window.ReactNativeWebView) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'chart-ready'
-                    }));
-                  }
+                  postToRN('chart-ready');
                 },
                 selection: function(event) {
                   if (!event.xAxis) {
@@ -185,31 +148,20 @@ export const generateHTMLTemplate = (
 
                   // Log and notify when max zoom out is reached
                   if (daysInRange >= 27) {
-                    if (window.ReactNativeWebView) {
-                      window.ReactNativeWebView.postMessage(JSON.stringify({
-                        type: 'log',
-                        data: {
-                          message: "📈 MAX ZOOM OUT REACHED (selection)",
-                          daysInRange,
-                          min: xAxis.min,
-                          max: xAxis.max,
-                          timestamp: new Date().toISOString()
-                        }
-                      }));
-                    }
+                    postToRN('log', {
+                      message: "📈 MAX ZOOM OUT REACHED (selection)",
+                      daysInRange,
+                      min: xAxis.min,
+                      max: xAxis.max,
+                      timestamp: new Date().toISOString()
+                    });
                     return false;
                   }
 
                   if (zoomRatio > 1.5) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'zoom-in',
-                      data: { zoomRatio, min: xAxis.min, max: xAxis.max }
-                    }));
+                    postToRN('zoom-in', { zoomRatio, min: xAxis.min, max: xAxis.max });
                   } else if (zoomRatio < 0.7) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'zoom-out',
-                      data: { zoomRatio, min: xAxis.min, max: xAxis.max }
-                    }));
+                    postToRN('zoom-out', { zoomRatio, min: xAxis.min, max: xAxis.max });
                   }
 
                   // Let Highcharts handle the zoom
@@ -222,25 +174,15 @@ export const generateHTMLTemplate = (
 
                   // Log and notify when max zoom out is reached
                   if (daysInRange >= 27) {
-                    if (window.ReactNativeWebView) {
-                      window.ReactNativeWebView.postMessage(JSON.stringify({
-                        type: 'log',
-                        data: {
-                          message: "📈 MAX ZOOM OUT REACHED (extremes)",
-                          daysInRange,
-                          min: e.min,
-                          max: e.max,
-                          timestamp: new Date().toISOString()
-                        }
-                      }));
-                    }
+                    postToRN('log', {
+                      message: "📈 MAX ZOOM OUT REACHED (extremes)",
+                      daysInRange,
+                      min: e.min,
+                      max: e.max,
+                      timestamp: new Date().toISOString()
+                    });
 
-                    if (window.ReactNativeWebView) {
-                      window.ReactNativeWebView.postMessage(JSON.stringify({
-                        type: 'max-zoom-out',
-                        data: { daysInRange, min: e.min, max: e.max }
-                      }));
-                    }
+                    postToRN('max-zoom-out', { daysInRange, min: e.min, max: e.max });
                   }
                 }
               }
@@ -319,11 +261,7 @@ export const generateHTMLTemplate = (
             chart = Highcharts.chart(mergedOptions);
 
             // Notify React Native that chart is ready
-            if (window.ReactNativeWebView) {
-              window.ReactNativeWebView.postMessage(JSON.stringify({
-                type: 'chart-ready'
-              }));
-            }
+            postToRN('chart-ready');
           }
 
           function updateChart(newData) {

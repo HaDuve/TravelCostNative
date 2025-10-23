@@ -80,6 +80,31 @@ export const generateHTMLTemplate = (
           }
 
           const defaultOptions = {
+            title: {
+              text: '${options.title || ""}',
+              style: {
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }
+            },
+            subtitle: {
+              text: '${options.subtitle || ""}'
+            },
+            credits: {
+              enabled: false
+            },
+            exporting: {
+              enabled: false
+            },
+            legend: {
+              enabled: ${options.showLegend || false}
+            },
+            tooltip: {
+              enabled: false,
+              animation: true,
+              borderRadius: 8,
+              shadow: true
+            },
             chart: {
               renderTo: '${chartId}',
               type: '${options.type || "line"}',
@@ -251,17 +276,21 @@ export const generateHTMLTemplate = (
             const mergedOptions = {
               ...defaultOptions,
               ...customOptions,
-              series: data
+              series: Array.isArray(data) ? data : []
             };
 
-            if (chart) {
-              chart.destroy();
+            try {
+              if (chart) {
+                chart.destroy();
+              }
+
+              chart = Highcharts.chart('${chartId}', mergedOptions);
+
+              // Notify React Native that chart is ready
+              postToRN('chart-ready');
+            } catch (error) {
+              postToRN('error', { message: error.message, stack: error.stack });
             }
-
-            chart = Highcharts.chart(mergedOptions);
-
-            // Notify React Native that chart is ready
-            postToRN('chart-ready');
           }
 
           function updateChart(newData) {
@@ -336,17 +365,26 @@ export const generateHTMLTemplate = (
           window.setExtremes = setExtremes;
           window.toggleLabels = toggleLabels;
 
-          // Initial chart creation with empty data and zoom
-          initChart([]);
+          // Initial chart creation with empty data
+          try {
+            initChart([]);
 
-          // Set initial zoom level after a short delay to ensure chart is ready
-          setTimeout(() => {
-            if (chart && chart.xAxis && chart.xAxis[0]) {
-              const now = new Date().getTime();
-              const sevenDaysAgo = now - (7 * 24 * 3600 * 1000);
-              chart.xAxis[0].setExtremes(sevenDaysAgo, now);
-            }
-          }, 100);
+            // Set initial zoom level after a short delay to ensure chart is ready
+            setTimeout(() => {
+              try {
+                if (chart && chart.xAxis && chart.xAxis[0]) {
+                  const now = new Date().getTime();
+                  const sevenDaysAgo = now - (7 * 24 * 3600 * 1000);
+                  chart.xAxis[0].setExtremes(sevenDaysAgo, now);
+                  postToRN('log', { message: '📊 Initial zoom set', min: sevenDaysAgo, max: now });
+                }
+              } catch (error) {
+                postToRN('error', { message: 'Error setting initial zoom', error: error.message });
+              }
+            }, 100);
+          } catch (error) {
+            postToRN('error', { message: 'Error initializing chart', error: error.message });
+          }
         </script>
       </body>
     </html>

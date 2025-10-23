@@ -343,7 +343,14 @@ export const generateHTMLTemplate = (
             chart.redraw();
           }
 
+          function setExtremes(min, max) {
+            if (chart && chart.xAxis && chart.xAxis[0]) {
+              chart.xAxis[0].setExtremes(min, max);
+            }
+          }
 
+          // Make functions available globally
+          window.setExtremes = setExtremes;
 
           // Initial chart creation with empty data and zoom
           initChart([]);

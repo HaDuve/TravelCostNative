@@ -1,5 +1,11 @@
-import React, { useCallback, useContext, useMemo, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, {
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  useRef,
+} from "react";
+import { StyleSheet, View } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
@@ -11,6 +17,7 @@ import WebViewChart from "../charts/WebViewChart";
 import { WebView } from "react-native-webview";
 import { ChartController, ExpenseData } from "../charts/controller";
 import { createBarChartData } from "../charts/chartHelpers";
+import IconButton from "../UI/IconButton";
 
 interface ExpenseChartProps {
   inputData: unknown[];
@@ -19,98 +26,113 @@ interface ExpenseChartProps {
   budget: number;
   currency: string;
   periodType?: "day" | "week" | "month" | "year";
+  onWebViewRef?: (ref: WebView | null) => void;
 }
 
-const ExpenseChart = React.forwardRef<WebView, ExpenseChartProps>(
-  function ExpenseChart(
-    { inputData, xAxis, yAxis, budget, currency, periodType },
-    ref
-  ) {
-    const { isLandscape } = useContext(OrientationContext);
-    const [showResetButton, setShowResetButton] = useState(false);
-    const defaultViewRange = 7; // 7 days default view
+const ExpenseChart: React.FC<ExpenseChartProps> = ({
+  inputData,
+  xAxis,
+  yAxis,
+  budget,
+  currency,
+  periodType,
+  onWebViewRef,
+}) => {
+  const { isLandscape } = useContext(OrientationContext);
+  const [showResetButton, setShowResetButton] = useState(false);
+  const defaultViewRange = 7; // 7 days default view
+  const webViewRef = useRef<WebView>(null);
 
-    const colors = useMemo(
-      () => ({
-        primary: GlobalStyles.colors.primary500,
-        error: GlobalStyles.colors.error300,
-        gray: GlobalStyles.colors.gray300,
-        budget: GlobalStyles.colors.gray700,
-      }),
-      []
+  const colors = useMemo(
+    () => ({
+      primary: GlobalStyles.colors.primary500,
+      error: GlobalStyles.colors.error300,
+      gray: GlobalStyles.colors.gray300,
+      budget: GlobalStyles.colors.gray700,
+    }),
+    []
+  );
+
+  const { width, height } = ChartController.getChartDimensions(isLandscape);
+
+  const chartData = useMemo(() => {
+    if (!inputData || inputData.length === 0) {
+      return [];
+    }
+
+    return ChartController.processExpenseData(
+      inputData as ExpenseData[],
+      xAxis,
+      yAxis,
+      colors
     );
+  }, [inputData, xAxis, yAxis, colors]);
 
-    const { width, height } = ChartController.getChartDimensions(isLandscape);
+  const highchartsData = useMemo(() => {
+    return createBarChartData(chartData, colors);
+  }, [chartData, colors]);
 
-    const chartData = useMemo(() => {
-      if (!inputData || inputData.length === 0) {
-        return [];
-      }
-
-      return ChartController.processExpenseData(
-        inputData as ExpenseData[],
-        xAxis,
-        yAxis,
-        colors
-      );
-    }, [inputData, xAxis, yAxis, colors]);
-
-    const highchartsData = useMemo(() => {
-      return createBarChartData(chartData, colors);
-    }, [chartData, colors]);
-
-    const chartOptions = useMemo(() => {
-      return ChartController.createExpenseChartOptions(
-        budget,
-        colors,
-        getCurrencySymbol(currency),
-        periodType
-      );
-    }, [budget, colors, currency, periodType]);
-
-    const handleZoomLevelChange = useCallback(
-      (_zoomType: string, _min: number, _max: number) => {
-        setShowResetButton(true);
-      },
-      []
+  const chartOptions = useMemo(() => {
+    return ChartController.createExpenseChartOptions(
+      budget,
+      colors,
+      getCurrencySymbol(currency),
+      periodType
     );
+  }, [budget, colors, currency, periodType]);
 
-    const handleReset = useCallback(() => {
-      if (!ref) return;
+  const handleZoomLevelChange = useCallback(
+    (_zoomType: string, _min: number, _max: number) => {
+      setShowResetButton(true);
+    },
+    []
+  );
 
-      const now = new Date().getTime();
-      const sevenDaysAgo = now - defaultViewRange * 24 * 3600 * 1000;
+  const handleReset = useCallback(() => {
+    console.log("🔄 Reset button pressed");
+    if (!webViewRef.current) return;
 
-      (ref as React.RefObject<WebView>).current?.injectJavaScript(`
-      window.setExtremes(${sevenDaysAgo}, ${now});
-      true;
-    `);
+    console.log("🔄 WebView ref:", webViewRef.current);
 
-      setShowResetButton(false);
-    }, [defaultViewRange, ref]);
+    const now = new Date().getTime();
+    const sevenDaysAgo = now - defaultViewRange * 24 * 3600 * 1000;
 
-    return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-          {showResetButton && (
-            <TouchableOpacity onPress={handleReset} style={styles.resetButton}>
-              <Text style={styles.resetButtonText}>Reset View</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-        <WebViewChart
-          ref={ref}
-          data={highchartsData}
-          options={chartOptions}
-          width={width}
-          height={height}
-          showSkeleton={true}
-          onZoomLevelChange={handleZoomLevelChange}
-        />
+    webViewRef.current.injectJavaScript(`
+        window.setExtremes(${sevenDaysAgo}, ${now});
+        true;
+      `);
+
+    setShowResetButton(false);
+  }, [defaultViewRange]);
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        {showResetButton && (
+          <IconButton
+            icon="refresh"
+            size={dynamicScale(20)}
+            color={GlobalStyles.colors.primary500}
+            onPress={handleReset}
+            buttonStyle={styles.resetButton}
+          />
+        )}
       </View>
-    );
-  }
-);
+      <WebViewChart
+        data={highchartsData}
+        options={chartOptions}
+        width={width}
+        height={height}
+        showSkeleton={true}
+        onZoomLevelChange={handleZoomLevelChange}
+        onWebViewRef={(ref) => {
+          webViewRef.current = ref;
+          onWebViewRef?.(ref);
+        }}
+      />
+    </View>
+  );
+};
 
 export default ExpenseChart;
 
@@ -121,6 +143,7 @@ ExpenseChart.propTypes = {
   budget: PropTypes.number.isRequired,
   currency: PropTypes.string.isRequired,
   periodType: PropTypes.oneOf(["day", "week", "month", "year"]),
+  onWebViewRef: PropTypes.func,
 };
 
 const styles = StyleSheet.create({
@@ -132,21 +155,28 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   header: {
-    width: "50%",
+    width: "100%",
     flexDirection: "row",
     justifyContent: "flex-end",
     paddingHorizontal: dynamicScale(16),
     paddingVertical: dynamicScale(8),
+    position: "absolute",
+    top: 0,
+    right: 0,
+    zIndex: 10,
   },
   resetButton: {
-    backgroundColor: GlobalStyles.colors.primary500,
-    paddingHorizontal: dynamicScale(12),
-    paddingVertical: dynamicScale(6),
-    borderRadius: dynamicScale(4),
-  },
-  resetButtonText: {
-    color: GlobalStyles.colors.backgroundColor,
-    fontSize: dynamicScale(14),
-    fontWeight: "500",
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: dynamicScale(20),
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: GlobalStyles.colors.primary500,
   },
 });

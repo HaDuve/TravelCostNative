@@ -175,6 +175,15 @@ export const generateHTMLTemplate = (
                   const selectedRange = xAxis.max - xAxis.min;
                   const zoomRatio = totalRange / selectedRange;
 
+                  // Calculate number of data points in selected range
+                  const pointInterval = this.series[0]?.pointInterval || (24 * 3600 * 1000); // 1 day in milliseconds
+                  const pointsInRange = selectedRange / pointInterval;
+
+                  // Prevent zooming if it would show fewer than 4 points
+                  if (pointsInRange < 4) {
+                    return false;
+                  }
+
                   if (zoomRatio > 1.5) {
                     window.ReactNativeWebView.postMessage(JSON.stringify({
                       type: 'zoom-in',
@@ -198,7 +207,8 @@ export const generateHTMLTemplate = (
               },
               type: ${options.dateFormat ? "'datetime'" : "'category'"},
               minPadding: 0.1,
-              maxPadding: 0.1
+              maxPadding: 0.1,
+              minRange: 4 * 24 * 3600 * 1000 // Minimum range is 4 days
             },
             yAxis: {
               title: {

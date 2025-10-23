@@ -186,7 +186,7 @@ export const generateHTMLTemplate = (
                   if (window.ReactNativeWebView) {
                     window.ReactNativeWebView.postMessage(JSON.stringify({
                       type: 'log',
-                      data: { 
+                      data: {
                         message: '📊 Selection event',
                         daysInRange,
                         min: xAxis.min,
@@ -223,7 +223,7 @@ export const generateHTMLTemplate = (
                   if (window.ReactNativeWebView) {
                     window.ReactNativeWebView.postMessage(JSON.stringify({
                       type: 'log',
-                      data: { 
+                      data: {
                         message: '📊 afterSetExtremes event',
                         daysInRange,
                         min: e.min,
@@ -431,13 +431,99 @@ export const generateHTMLTemplate = (
             }
           }
 
+          // Define functions first
+          function initChart(data, customOptions = {}) {
+            const mergedOptions = {
+              ...defaultOptions,
+              ...customOptions,
+              series: data
+            };
+
+            if (chart) {
+              chart.destroy();
+            }
+
+            chart = Highcharts.chart(mergedOptions);
+
+            // Notify React Native that chart is ready
+            if (window.ReactNativeWebView) {
+              window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'chart-ready'
+              }));
+            }
+          }
+
+          function updateChart(newData) {
+            if (chart && newData) {
+              if (Array.isArray(newData)) {
+                newData.forEach((seriesData, index) => {
+                  if (chart.series[index]) {
+                    chart.series[index].setData(seriesData.data, false);
+                  } else {
+                    chart.addSeries(seriesData, false);
+                  }
+                });
+                chart.redraw();
+              }
+            }
+          }
+
+          function setExtremes(min, max) {
+            if (chart && chart.xAxis && chart.xAxis[0]) {
+              chart.xAxis[0].setExtremes(min, max);
+            }
+          }
+
+          function toggleLabels(show) {
+            if (chart && chart.series) {
+              chart.series.forEach((series) => {
+                if (series.type === 'pie') {
+                  series.update({
+                    dataLabels: {
+                      enabled: show,
+                      useHTML: true,
+                      style: {
+                        fontSize: '12px',
+                        fontWeight: 'normal',
+                        whiteSpace: 'normal',
+                        textOverflow: 'none',
+                        textAlign: 'center'
+                      },
+                      distance: 10,
+                      allowOverlap: true,
+                      crop: false
+                    }
+                  }, false);
+                } else if (series.type === 'column') {
+                  series.update({
+                    dataLabels: {
+                      enabled: show,
+                      style: {
+                        fontSize: '12px',
+                        fontWeight: 'normal',
+                        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                        textOutline: '1px contrast'
+                      },
+                      formatter: function() {
+                        return this.y.toFixed(2) + '${
+                          options.currency ? " " + options.currency : "€"
+                        }';
+                      }
+                    }
+                  }, false);
+                }
+              });
+              chart.redraw();
+            }
+          }
+
           // Make functions available globally
           window.initChart = initChart;
           window.updateChart = updateChart;
           window.setExtremes = setExtremes;
           window.toggleLabels = toggleLabels;
 
-          // Initial chart creation with empty data and zoom
+          // Initial chart creation with empty data
           initChart([]);
 
           // Set initial zoom level after a short delay to ensure chart is ready

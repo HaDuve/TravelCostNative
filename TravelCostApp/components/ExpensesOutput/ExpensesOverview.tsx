@@ -1,4 +1,4 @@
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import React, { useContext, useRef, useState } from "react";
 import ExpenseCategories from "./ExpenseStatistics/ExpenseCategories";
 import ExpenseGraph from "./ExpenseStatistics/ExpenseGraph";
@@ -16,20 +16,12 @@ i18n.locale =
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
-import ToggleButton from "../../assets/SVG/toggleButton";
-import { TourGuideZone } from "rn-tourguide";
 import { UserContext } from "../../store/user-context";
 import PropTypes from "prop-types";
 import ExpenseCountries from "./ExpenseStatistics/ExpenseCountries";
 import ExpenseTravellers from "./ExpenseStatistics/ExpenseTravellers";
-import IconButton from "../UI/IconButton";
-import { FadeInRight } from "react-native-reanimated";
 import ExpenseCurrencies from "./ExpenseStatistics/ExpenseCurrencies";
-import Animated, {
-  FadeInUp,
-  FadeOutDown,
-  FadeOutRight,
-} from "react-native-reanimated";
+import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { MAX_PERIOD_RANGE } from "../../confAppConstants";
 import { BlurView } from "expo-blur";
 import { TripContext } from "../../store/trip-context";
@@ -57,18 +49,12 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
     console.log("SWIPE_RIGHT");
   }
 
-  const [isGraphNotPie, setToggleGraph] = useState(true);
+  const userCtx = useContext(UserContext);
+  const isGraphNotPie = userCtx.isShowingGraph;
   // enum =>  0 = categories, 1 = traveller, 2 = country, 3 = currency
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
-  const userCtx = useContext(UserContext);
   const [longerPeriodNum, setLongerPeriodNum] = useState(0);
   const [startingPoint, setStartingPoint] = useState(0);
-
-  async function toggleContent() {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    userCtx.setIsShowingGraph(!isGraphNotPie);
-    setToggleGraph(!isGraphNotPie);
-  }
 
   let titleString = "";
   switch (periodName) {
@@ -161,31 +147,6 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
         ></ExpenseCurrencies>
       )}
       {titleContainerJSX}
-      <View
-        style={[
-          // styles.toggleButton
-          !isPortrait && styles.landscapeToggleButtonContainer,
-        ]}
-      >
-        <TourGuideZone
-          text={i18n.t("walk4")}
-          tooltipBottomOffset={constantScale(166, 0.5)}
-          maskOffset={constantScale(60, 0.5)}
-          zone={4}
-          shape={"circle"}
-        >
-          <Pressable
-            onPress={toggleContent}
-            style={({ pressed }) => [
-              GlobalStyles.shadowGlowPrimary,
-              pressed && GlobalStyles.pressedWithShadow,
-              styles.toggleButton,
-            ]}
-          >
-            <ToggleButton toggled={isGraphNotPie}></ToggleButton>
-          </Pressable>
-        </TourGuideZone>
-      </View>
     </View>
   );
 };
@@ -234,21 +195,5 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
     marginLeft: dynamicScale(6),
-  },
-  toggleButton: {
-    flex: 1,
-    marginBottom: dynamicScale(-6, true),
-    marginTop: dynamicScale(-66, true),
-    marginHorizontal: "50%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 1,
-    elevation: 0,
-  },
-  landscapeToggleButtonContainer: {
-    position: "absolute",
-    left: -280,
-    bottom: 1,
   },
 });

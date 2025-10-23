@@ -129,13 +129,8 @@ export const generateHTMLTemplate = (
               spacingBottom: ${options.type === "pie" ? CHART_SPACING.PIE.BOTTOM : CHART_SPACING.BAR.BOTTOM},
               zoomType: 'x',
               pinchType: 'x',
-              panning: {
-                enabled: true,
-                type: 'x'
-              },
-              panKey: undefined,
-              followTouchMove: true,
-              followPointer: true,
+              panning: true,
+              panKey: 'shift',
               resetZoomButton: {
                 position: {
                   align: 'right',
@@ -180,29 +175,26 @@ export const generateHTMLTemplate = (
                   const selectedRange = xAxis.max - xAxis.min;
                   const zoomRatio = totalRange / selectedRange;
 
-                  // Calculate number of data points in selected range
-                  const pointInterval = this.series[0]?.pointInterval || (24 * 3600 * 1000); // 1 day in milliseconds
-                  const pointsInRange = selectedRange / pointInterval;
+                  // Calculate days in range
+                  const daysInRange = selectedRange / (24 * 3600 * 1000);
 
-                  // Prevent zooming if it would show fewer than 4 points
-                  if (pointsInRange < 4) {
+                  // Prevent zooming if it would show fewer than 4 days
+                  if (daysInRange < 4) {
                     return false;
                   }
 
-                  // Prevent zooming if it would show more than 27 points
-                  if (pointsInRange > 27) {
-                    // Log and notify when max zoom out is reached
-                    console.log("📈 MAX ZOOM OUT REACHED:", {
-                      pointsInRange,
-                      selectedRange,
-                      totalRange,
-                      timestamp: new Date().toISOString()
-                    });
-
+                  // Log and notify when max zoom out is reached
+                  if (daysInRange >= 27) {
                     if (window.ReactNativeWebView) {
                       window.ReactNativeWebView.postMessage(JSON.stringify({
-                        type: 'max-zoom-out',
-                        data: { pointsInRange, min: xAxis.min, max: xAxis.max }
+                        type: 'log',
+                        data: {
+                          message: "📈 MAX ZOOM OUT REACHED (selection)",
+                          daysInRange,
+                          min: xAxis.min,
+                          max: xAxis.max,
+                          timestamp: new Date().toISOString()
+                        }
                       }));
                     }
                     return false;
@@ -222,6 +214,34 @@ export const generateHTMLTemplate = (
 
                   // Let Highcharts handle the zoom
                   return true;
+                },
+                afterSetExtremes: function(e) {
+                  if (!e.min || !e.max) return;
+
+                  const daysInRange = (e.max - e.min) / (24 * 3600 * 1000);
+
+                  // Log and notify when max zoom out is reached
+                  if (daysInRange >= 27) {
+                    if (window.ReactNativeWebView) {
+                      window.ReactNativeWebView.postMessage(JSON.stringify({
+                        type: 'log',
+                        data: {
+                          message: "📈 MAX ZOOM OUT REACHED (extremes)",
+                          daysInRange,
+                          min: e.min,
+                          max: e.max,
+                          timestamp: new Date().toISOString()
+                        }
+                      }));
+                    }
+
+                    if (window.ReactNativeWebView) {
+                      window.ReactNativeWebView.postMessage(JSON.stringify({
+                        type: 'max-zoom-out',
+                        data: { daysInRange, min: e.min, max: e.max }
+                      }));
+                    }
+                  }
                 }
               }
             },
@@ -247,15 +267,12 @@ export const generateHTMLTemplate = (
                 }
               }
             },
-              plotOptions: {
-                series: {
-                  animation: {
-                    duration: 1000
-                  },
-                  stickyTracking: true,
-                  allowPointSelect: false,
-                  enableMouseTracking: true,
+            plotOptions: {
+              series: {
+                animation: {
+                  duration: 1000
                 },
+              },
               pie: {
                 size: '90%',
                 center: ['50%', '50%'],

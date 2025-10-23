@@ -28,9 +28,12 @@ interface WebViewChartProps {
 interface ChartMessage {
   type: string;
   data?: {
+    message?: string;
     zoomRatio?: number;
     min?: number;
     max?: number;
+    daysInRange?: number;
+    timestamp?: string;
   };
   min?: number;
   max?: number;
@@ -142,6 +145,10 @@ const WebViewChart = React.forwardRef<WebView, WebViewChartProps>(
                 max || 0
               );
             }
+            break;
+
+          case "log":
+            console.log(message.data.message, message.data);
             break;
 
           case "max-zoom-out":

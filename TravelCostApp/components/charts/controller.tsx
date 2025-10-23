@@ -84,6 +84,10 @@ export class ChartController {
       dateFormat: true,
       currency: currency,
       colors: colors ? [colors.primary] : undefined,
+      zoomType: "x",
+      pinchType: "x",
+      panning: true,
+      panKey: "shift",
     };
   }
 

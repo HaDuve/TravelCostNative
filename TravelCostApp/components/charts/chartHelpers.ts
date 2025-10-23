@@ -19,6 +19,10 @@ export interface ChartOptions {
   enableZoom?: boolean;
   dateFormat?: boolean;
   currency?: string;
+  zoomType?: string;
+  pinchType?: string;
+  panning?: boolean;
+  panKey?: string;
 }
 
 export const generateHTMLTemplate = (
@@ -125,7 +129,7 @@ export const generateHTMLTemplate = (
                   const range = e.max - e.min;
                   const days = range / (24 * 3600 * 1000);
                   let zoomLevel = '';
-                  
+
                   if (days <= 27) {
                     zoomLevel = 'days';
                   } else if (days <= 111) {

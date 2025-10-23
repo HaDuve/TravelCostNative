@@ -20,87 +20,89 @@ interface ExpenseChartProps {
   currency: string;
 }
 
-const ExpenseChart = React.forwardRef<WebView, ExpenseChartProps>(function ExpenseChart({ inputData, xAxis, yAxis, budget, currency }, ref) {
-  const { isLandscape } = useContext(OrientationContext);
-  const [showResetButton, setShowResetButton] = useState(false);
-  const defaultViewRange = 7; // 7 days default view
+const ExpenseChart = React.forwardRef<WebView, ExpenseChartProps>(
+  function ExpenseChart({ inputData, xAxis, yAxis, budget, currency }, ref) {
+    const { isLandscape } = useContext(OrientationContext);
+    const [showResetButton, setShowResetButton] = useState(false);
+    const defaultViewRange = 7; // 7 days default view
 
-  const colors = useMemo(
-    () => ({
-      primary: GlobalStyles.colors.primary500,
-      error: GlobalStyles.colors.error300,
-      gray: GlobalStyles.colors.gray300,
-      budget: GlobalStyles.colors.gray700,
-    }),
-    []
-  );
-
-  const { width, height } = ChartController.getChartDimensions(isLandscape);
-
-  const chartData = useMemo(() => {
-    if (!inputData || inputData.length === 0) {
-      return [];
-    }
-
-    return ChartController.processExpenseData(
-      inputData as ExpenseData[],
-      xAxis,
-      yAxis,
-      colors
+    const colors = useMemo(
+      () => ({
+        primary: GlobalStyles.colors.primary500,
+        error: GlobalStyles.colors.error300,
+        gray: GlobalStyles.colors.gray300,
+        budget: GlobalStyles.colors.gray700,
+      }),
+      []
     );
-  }, [inputData, xAxis, yAxis, colors]);
 
-  const highchartsData = useMemo(() => {
-    return createBarChartData(chartData, colors);
-  }, [chartData, colors]);
+    const { width, height } = ChartController.getChartDimensions(isLandscape);
 
-  const chartOptions = useMemo(() => {
-    return ChartController.createExpenseChartOptions(
-      budget,
-      colors,
-      getCurrencySymbol(currency)
-    );
-  }, [budget, colors, currency]);
+    const chartData = useMemo(() => {
+      if (!inputData || inputData.length === 0) {
+        return [];
+      }
 
-  const handleZoomLevelChange = useCallback(() => {
+      return ChartController.processExpenseData(
+        inputData as ExpenseData[],
+        xAxis,
+        yAxis,
+        colors
+      );
+    }, [inputData, xAxis, yAxis, colors]);
+
+    const highchartsData = useMemo(() => {
+      return createBarChartData(chartData, colors);
+    }, [chartData, colors]);
+
+    const chartOptions = useMemo(() => {
+      return ChartController.createExpenseChartOptions(
+        budget,
+        colors,
+        getCurrencySymbol(currency)
+      );
+    }, [budget, colors, currency]);
+
+  const handleZoomLevelChange = useCallback((zoomType: string, min: number, max: number) => {
     setShowResetButton(true);
   }, []);
 
-  const handleReset = useCallback(() => {
-    if (!ref) return;
+    const handleReset = useCallback(() => {
+      if (!ref) return;
 
-    const now = new Date().getTime();
-    const sevenDaysAgo = now - (defaultViewRange * 24 * 3600 * 1000);
-    
-    (ref as React.RefObject<WebView>).current?.injectJavaScript(`
+      const now = new Date().getTime();
+      const sevenDaysAgo = now - defaultViewRange * 24 * 3600 * 1000;
+
+      (ref as React.RefObject<WebView>).current?.injectJavaScript(`
       window.setExtremes(${sevenDaysAgo}, ${now});
       true;
     `);
 
-    setShowResetButton(false);
-  }, [defaultViewRange, ref]);
+      setShowResetButton(false);
+    }, [defaultViewRange, ref]);
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        {showResetButton && (
-          <TouchableOpacity onPress={handleReset} style={styles.resetButton}>
-            <Text style={styles.resetButtonText}>Reset View</Text>
-          </TouchableOpacity>
-        )}
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          {showResetButton && (
+            <TouchableOpacity onPress={handleReset} style={styles.resetButton}>
+              <Text style={styles.resetButtonText}>Reset View</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+        <WebViewChart
+          ref={ref}
+          data={highchartsData}
+          options={chartOptions}
+          width={width}
+          height={height}
+          showSkeleton={true}
+          onZoomLevelChange={handleZoomLevelChange}
+        />
       </View>
-      <WebViewChart
-        ref={ref}
-        data={highchartsData}
-        options={chartOptions}
-        width={width}
-        height={height}
-        showSkeleton={true}
-        onZoomLevelChange={handleZoomLevelChange}
-      />
-    </View>
-  );
-});
+    );
+  }
+);
 
 export default ExpenseChart;
 
@@ -121,9 +123,9 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   header: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "flex-end",
     paddingHorizontal: dynamicScale(16),
     paddingVertical: dynamicScale(8),
   },
@@ -136,6 +138,6 @@ const styles = StyleSheet.create({
   resetButtonText: {
     color: GlobalStyles.colors.backgroundColor,
     fontSize: dynamicScale(14),
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });

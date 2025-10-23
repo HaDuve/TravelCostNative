@@ -113,45 +113,92 @@ export const generateHTMLTemplate = (
               borderRadius: 8,
               shadow: true
             },
+            chart: {
+              renderTo: '${chartId}',
+              type: '${options.type || "line"}',
+              backgroundColor: 'transparent',
+              animation: {
+                duration: 1000
+              },
+              style: {
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+              },
+              spacingLeft: ${options.type === "pie" ? CHART_SPACING.PIE.LEFT : CHART_SPACING.BAR.LEFT},
+              spacingRight: ${options.type === "pie" ? CHART_SPACING.PIE.RIGHT : CHART_SPACING.BAR.RIGHT},
+              spacingTop: ${options.type === "pie" ? CHART_SPACING.PIE.TOP : CHART_SPACING.BAR.TOP},
+              spacingBottom: ${options.type === "pie" ? CHART_SPACING.PIE.BOTTOM : CHART_SPACING.BAR.BOTTOM},
+              zoomType: 'x',
+              pinchType: 'x',
+              panning: true,
+              panKey: 'shift',
+              resetZoomButton: {
+                position: {
+                  align: 'right',
+                  verticalAlign: 'top',
+                  x: -10,
+                  y: 10
+                },
+                theme: {
+                  fill: 'white',
+                  stroke: '#6B7280',
+                  r: 4,
+                  states: {
+                    hover: {
+                      fill: '#F3F4F6',
+                      stroke: '#4B5563',
+                      style: {
+                        color: '#4B5563'
+                      }
+                    }
+                  },
+                  style: {
+                    color: '#6B7280'
+                  }
+                }
+              },
+              events: {
+                load: function() {
+                  if (window.ReactNativeWebView) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'chart-ready'
+                    }));
+                  }
+                },
+                selection: function(event) {
+                  if (!event.xAxis) {
+                    return false;
+                  }
+
+                  const xAxis = event.xAxis[0];
+                  const currentAxis = this.xAxis[0];
+                  const totalRange = currentAxis.dataMax - currentAxis.dataMin;
+                  const selectedRange = xAxis.max - xAxis.min;
+                  const zoomRatio = totalRange / selectedRange;
+
+                  if (zoomRatio > 1.5) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'zoom-in',
+                      data: { zoomRatio, min: xAxis.min, max: xAxis.max }
+                    }));
+                  } else if (zoomRatio < 0.7) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'zoom-out',
+                      data: { zoomRatio, min: xAxis.min, max: xAxis.max }
+                    }));
+                  }
+
+                  // Let Highcharts handle the zoom
+                  return true;
+                }
+              }
+            },
             xAxis: {
               title: {
                 text: '${options.xAxisTitle || ""}'
               },
               type: ${options.dateFormat ? "'datetime'" : "'category'"},
               minPadding: 0.1,
-              maxPadding: 0.1,
-              zoomType: 'x',
-              pinchType: 'x',
-              panning: true,
-              panKey: 'shift',
-              events: {
-                afterSetExtremes: function(e) {
-                  const range = e.max - e.min;
-                  const days = range / (24 * 3600 * 1000);
-                  let zoomLevel = '';
-
-                  if (days <= 27) {
-                    zoomLevel = 'days';
-                  } else if (days <= 111) {
-                    zoomLevel = 'weeks';
-                  } else if (days <= 1343) {
-                    zoomLevel = 'months';
-                  } else {
-                    zoomLevel = 'years';
-                  }
-
-                  if (window.ReactNativeWebView) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'zoom-level-change',
-                      data: {
-                        zoomLevel: zoomLevel,
-                        min: e.min,
-                        max: e.max
-                      }
-                    }));
-                  }
-                }
-              }
+              maxPadding: 0.1
             },
             yAxis: {
               title: {

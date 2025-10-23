@@ -8,6 +8,14 @@ const PERIOD_MS = {
   year: 336 * 24 * 3600 * 1000, // 336 days (12 * 28)
 } as const;
 
+// Bar width configuration - single source of truth
+export const BAR_WIDTH_CONFIG = {
+  minPeriods: 4,
+  maxPeriods: 28,
+  minWidth: 8,
+  maxWidth: 30,
+} as const;
+
 // Helper functions for period-specific calculations
 export const getPeriodZoomLimits = (
   periodType: "day" | "week" | "month" | "year" = "day"
@@ -31,21 +39,15 @@ export const calculateVisiblePeriods = (
 
 export const calculateBarWidth = (
   visiblePeriods: number,
-  minWidth = 4,
-  maxWidth = 40
+  config = BAR_WIDTH_CONFIG
 ) => {
-  // Linear interpolation: 4 periods = 40px, 28 periods = 4px
-  const minPeriods = 4;
-  const maxPeriods = 28;
+  const { minPeriods, maxPeriods, minWidth, maxWidth } = config;
 
-  // Clamp visible periods to valid range
   const clampedPeriods = Math.max(
     minPeriods,
     Math.min(maxPeriods, visiblePeriods)
   );
 
-  // Linear interpolation formula: y = y1 + (x - x1) * (y2 - y1) / (x2 - x1)
-  // As periods increase from 4 to 28, width decreases from 40 to 4
   const barWidth =
     maxWidth -
     ((clampedPeriods - minPeriods) * (maxWidth - minWidth)) /
@@ -178,31 +180,6 @@ export const generateHTMLTemplate = (
                 type: 'x'
               },
               pinchType: 'x',
-              resetZoomButton: {
-                position: {
-                  align: 'right',
-                  verticalAlign: 'top',
-                  x: -10,
-                  y: 10
-                },
-                theme: {
-                  fill: 'white',
-                  stroke: '#6B7280',
-                  r: 4,
-                  states: {
-                    hover: {
-                      fill: '#F3F4F6',
-                      stroke: '#4B5563',
-                      style: {
-                        color: '#4B5563'
-                      }
-                    }
-                  },
-                  style: {
-                    color: '#6B7280'
-                  }
-                }
-              },
               events: {
                 selection: function(event) {
                   if (event.xAxis) {
@@ -280,9 +257,9 @@ export const generateHTMLTemplate = (
               },
               column: {
                 borderRadius: 4,
-                groupPadding: 0.3,
+                groupPadding: 0.4,
                 pointPadding: 0.4,
-                // pointWidth will be set dynamically via updateBarWidth
+                pointWidth: ${calculateBarWidth(7)}, // Default width for 7 days (matches initial zoom)
                 boostThreshold: 300,
                 boostBlending: 'add',
                 dataLabels: {
@@ -347,11 +324,9 @@ export const generateHTMLTemplate = (
             const rangeMs = max - min;
             const visiblePeriods = rangeMs / periodMs;
 
-            // Linear interpolation: 4 periods = 40px, 28 periods = 4px
-            const minPeriods = 4;
-            const maxPeriods = 28;
-            const minWidth = 4;
-            const maxWidth = 40;
+            // Use same config as TypeScript helper function
+            const barWidthConfig = ${JSON.stringify(BAR_WIDTH_CONFIG)};
+            const { minPeriods, maxPeriods, minWidth, maxWidth } = barWidthConfig;
 
             const clampedPeriods = Math.max(minPeriods, Math.min(maxPeriods, visiblePeriods));
             const barWidth = maxWidth - ((clampedPeriods - minPeriods) * (maxWidth - minWidth)) / (maxPeriods - minPeriods);

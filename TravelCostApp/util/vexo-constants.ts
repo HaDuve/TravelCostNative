@@ -33,6 +33,9 @@ export const VexoEvents = {
   DEEP_LINK_OPENED: "deep_link_opened",
   REFERRAL_COMPLETED: "referral_completed",
 
+  // Finder
+  FINDER_PRESSED: "finder_pressed",
+
   // Error Tracking
   ERROR_OCCURRED: "error_occurred",
 } as const;

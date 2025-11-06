@@ -16,7 +16,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { de, en, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -42,6 +45,8 @@ import safeLogError from "../util/error";
 import { ExpenseData } from "../util/expense";
 import { formatExpenseWithCurrency } from "../util/string";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
+import { trackEvent } from "../util/vexo-tracking";
+import { VexoEvents } from "../util/vexo-constants";
 
 const FinderScreen = () => {
   const navigation = useNavigation();
@@ -192,6 +197,7 @@ const FinderScreen = () => {
   const findPressedHandler = useCallback(() => {
     // console.log("find pressed");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    trackEvent(VexoEvents.FINDER_PRESSED);
     navigation.navigate("FilteredPieCharts", {
       expenses: filteredExpenses,
       dayString: allEpensesQueryString + queryString + " " + dateString,

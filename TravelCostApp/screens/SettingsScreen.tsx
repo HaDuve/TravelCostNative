@@ -48,6 +48,8 @@ import { canOpenURL } from "expo-linking";
 import DevContent from "../components/Settings/DevContent";
 import CurrencyExchangeInfo from "../components/UI/CurrencyExchangeInfo";
 import { dynamicScale } from "../util/scalingUtil";
+import { trackEvent } from "../util/vexo-tracking";
+import { VexoEvents } from "../util/vexo-constants";
 
 const SettingsScreen = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
@@ -111,6 +113,9 @@ const SettingsScreen = ({ navigation }) => {
   }
 
   async function restorePurchases() {
+    // Track restore purchases button press
+    trackEvent(VexoEvents.RESTORE_PURCHASES_PRESSED);
+
     setIsRestoringPurchases(true);
     try {
       const restore = await Purchases.restorePurchases();

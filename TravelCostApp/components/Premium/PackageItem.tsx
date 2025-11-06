@@ -20,6 +20,8 @@ import PropTypes from "prop-types";
 import Toast from "react-native-toast-message";
 import Discount from "./Discount";
 import { constantScale } from "../../util/scalingUtil";
+import { trackEvent } from "../../util/vexo-tracking";
+import { VexoEvents } from "../../util/vexo-constants";
 
 const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
   const {
@@ -55,13 +57,37 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
       if (
         typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined"
       ) {
+        // Track package purchase
+        const packageType = isMonthly
+          ? VexoEvents.PACKAGE_MONTHLY_PURCHASED
+          : isYearly
+          ? VexoEvents.PACKAGE_YEARLY_PURCHASED
+          : isLifetime
+          ? VexoEvents.PACKAGE_LIFETIME_PURCHASED
+          : VexoEvents.PACKAGE_PURCHASED;
+
+        trackEvent(VexoEvents.PACKAGE_PURCHASED, {
+          packageType: packageType,
+          subscriptionPeriod: subscriptionPeriod,
+          priceString: subscriptionCalcPriceString,
+          hasFreeTrial: hasAFreeTrial,
+        });
+
+        // Also track specific package type
+        if (packageType !== VexoEvents.PACKAGE_PURCHASED) {
+          trackEvent(packageType, {
+            subscriptionPeriod: subscriptionPeriod,
+            priceString: subscriptionCalcPriceString,
+            hasFreeTrial: hasAFreeTrial,
+          });
+        }
+
         navigation.pop();
         Toast.show({
           type: "success",
           text1: i18n.t("toastPurchaseSuccess1"),
           text2: i18n.t("toastPurchaseSuccess2"),
         });
-        // Branch.io removed - no event logging
       }
     } catch (e) {
       if (!e.userCancelled) {

@@ -30,6 +30,8 @@ import {
   setAttributesAsync,
 } from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
+import { trackEvent } from "../util/vexo-tracking";
+import { VexoEvents } from "../util/vexo-constants";
 
 function SignupScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -111,7 +113,13 @@ function SignupScreen() {
       }
       await Purchases.collectDeviceIdentifiers();
       await setAttributesAsync(email, userData.userName);
-      // Branch.io removed - no event logging
+
+      // Track account creation
+      trackEvent(VexoEvents.ACCOUNT_CREATED, {
+        email: email,
+        userName: name,
+        locale: userData.locale,
+      });
     } catch (error) {
       await authCtx.authenticate(token);
       // console.log("error", error);

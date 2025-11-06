@@ -8,6 +8,18 @@ import * as Device from "expo-device";
 import { DEVELOPER_MODE } from "../confAppConstants";
 import safeLogError from "./error";
 import { VexoEventName } from "./vexo-constants";
+import { secureStoreGetItem } from "../store/secure-storage";
+
+//Localization
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import { en, de, fr, ru } from "../i18n/supportedLanguages";
+const i18n = new I18n({ en, de, fr, ru });
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
+i18n.enableFallback = true;
 
 let vexoInitialized = false;
 let vexoEnabled = false;
@@ -69,13 +81,34 @@ export async function identifyUser(
   }
 }
 
-export function trackEvent(
+export async function trackEvent(
   eventName: VexoEventName,
   properties?: Record<string, any>
 ) {
   if (!vexoEnabled) return;
+
   try {
-    customEvent(eventName, properties || {});
+    // Fetch user data asynchronously
+    const [userId, userName] = await Promise.all([
+      secureStoreGetItem("uid").catch(() => ""),
+      secureStoreGetItem("userName").catch(() => ""),
+    ]);
+
+    // Get user language from i18n.locale
+    const userLanguage = i18n.locale || "en";
+
+    // Merge userData into event properties
+    const enrichedProperties = {
+      ...(properties || {}),
+      userData: {
+        userId: userId || undefined,
+        userName: userName || undefined,
+        userLanguage: userLanguage,
+      },
+    };
+
+    // Fire and forget - don't await to avoid blocking
+    customEvent(eventName, enrichedProperties);
   } catch (error) {
     safeLogError(error, "vexo-tracking.ts", 76);
   }

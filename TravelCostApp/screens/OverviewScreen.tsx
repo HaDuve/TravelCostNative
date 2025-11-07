@@ -223,8 +223,8 @@ const OverviewScreen = ({ navigation }) => {
           onSelectItem={(item) => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             trackEvent(VexoEvents.PERIOD_SELECTOR_CHANGED, {
-          period: item.value,
-        });
+              period: item.value,
+            });
           }}
           setValue={(callback) => {
             userCtx.setPeriodString(callback(PeriodValue));

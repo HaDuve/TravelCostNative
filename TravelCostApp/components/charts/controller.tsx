@@ -24,11 +24,15 @@ export class ChartController {
     inputData: ExpenseData[],
     xAxis: string,
     yAxis: string,
-    colors: { primary: string; error: string; gray: string }
+    colors: { primary: string; error: string; gray: string },
+    overBudgetColor?: string
   ): ChartData[] {
     if (!inputData || inputData.length === 0) {
       return [];
     }
+
+    // Use provided overBudgetColor or fall back to colors.error
+    const errorColor = overBudgetColor || colors.error;
 
     return inputData.map((item) => {
       const budgetCompare =
@@ -40,9 +44,7 @@ export class ChartController {
       let color = colors.gray;
       if (item.expensesSum > 0) {
         color =
-          item.expensesSum > (budgetCompare || 0)
-            ? colors.error
-            : colors.primary;
+          item.expensesSum > (budgetCompare || 0) ? errorColor : colors.primary;
       }
 
       return {

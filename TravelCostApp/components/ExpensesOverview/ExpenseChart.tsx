@@ -12,6 +12,9 @@ import PropTypes from "prop-types";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
+import { TripContext } from "../../store/trip-context";
+import { ExpensesContext } from "../../store/expenses-context";
+import { SettingsContext } from "../../store/settings-context";
 
 import WebViewChart from "../charts/WebViewChart";
 import { WebView } from "react-native-webview";
@@ -21,6 +24,7 @@ import {
   getInitialZoomRange,
 } from "../charts/chartHelpers";
 import IconButton from "../UI/IconButton";
+import { calculateDailyAverage } from "../../util/budgetColorHelper";
 
 interface ExpenseChartProps {
   inputData: unknown[];
@@ -49,6 +53,9 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
   onZoomStateChange,
 }) => {
   const { isLandscape } = useContext(OrientationContext);
+  const tripCtx = useContext(TripContext);
+  const expensesCtx = useContext(ExpensesContext);
+  const { settings } = useContext(SettingsContext);
   const [showResetButton, setShowResetButton] = useState(false);
   const webViewRef = useRef<WebView>(null);
 
@@ -62,6 +69,35 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
     []
   );
 
+  // Calculate current period average and determine overBudgetColor
+  const overBudgetColor = useMemo(() => {
+    if (!periodType || !settings.trafficLightBudgetColors) {
+      return GlobalStyles.colors.error300;
+    }
+
+    const today = new Date();
+    const averageDailySpending = calculateDailyAverage(
+      periodType as "day" | "week" | "month" | "year" | "total",
+      today,
+      expensesCtx,
+      tripCtx,
+      settings.hideSpecialExpenses
+    );
+
+    const dailyBudget = Number(tripCtx.dailyBudget) || 0;
+
+    // If average is below daily budget, use orange; otherwise use red
+    return averageDailySpending <= dailyBudget
+      ? GlobalStyles.colors.accent500
+      : GlobalStyles.colors.error300;
+  }, [
+    periodType,
+    settings.trafficLightBudgetColors,
+    settings.hideSpecialExpenses,
+    expensesCtx,
+    tripCtx,
+  ]);
+
   const { width, height } = ChartController.getChartDimensions(isLandscape);
 
   const chartData = useMemo(() => {
@@ -73,13 +109,14 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
       inputData as ExpenseData[],
       xAxis,
       yAxis,
-      colors
+      colors,
+      overBudgetColor
     );
-  }, [inputData, xAxis, yAxis, colors]);
+  }, [inputData, xAxis, yAxis, colors, overBudgetColor]);
 
   const highchartsData = useMemo(() => {
-    return createBarChartData(chartData, colors, true, budget); // dateFormat: true for date-based charts
-  }, [chartData, colors, budget]);
+    return createBarChartData(chartData, colors);
+  }, [chartData, colors]);
 
   const chartOptions = useMemo(() => {
     return ChartController.createExpenseChartOptions(

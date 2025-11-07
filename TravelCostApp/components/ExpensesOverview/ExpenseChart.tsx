@@ -78,8 +78,8 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
   }, [inputData, xAxis, yAxis, colors]);
 
   const highchartsData = useMemo(() => {
-    return createBarChartData(chartData, colors);
-  }, [chartData, colors]);
+    return createBarChartData(chartData, colors, true, budget); // dateFormat: true for date-based charts
+  }, [chartData, colors, budget]);
 
   const chartOptions = useMemo(() => {
     return ChartController.createExpenseChartOptions(

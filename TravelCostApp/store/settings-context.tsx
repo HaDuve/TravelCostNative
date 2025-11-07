@@ -13,6 +13,7 @@ export interface Settings {
   showInternetSpeed: boolean;
   hideSpecialExpenses: boolean;
   disableNumberAnimations: boolean;
+  trafficLightBudgetColors: boolean;
 }
 
 export type SettingsContextType = {
@@ -28,6 +29,7 @@ const defaultSettings: Settings = {
   showInternetSpeed: false,
   hideSpecialExpenses: false,
   disableNumberAnimations: false,
+  trafficLightBudgetColors: true,
 };
 
 export const SettingsContext = createContext<SettingsContextType>({

@@ -11,6 +11,8 @@ import safeLogError from "../../util/error";
 import { safelyParseJSON } from "../../util/jsonParse";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
+import InfoButton from "./InfoButton";
+import TrafficLightInfoModal from "./TrafficLightInfoModal";
 
 const SettingsSection = ({ multiTraveller }) => {
   const { settings, saveSettings } = useContext(SettingsContext);
@@ -31,6 +33,10 @@ const SettingsSection = ({ multiTraveller }) => {
   const [disableNumberAnimations, setDisableNumberAnimations] = useState(
     settings.disableNumberAnimations
   );
+  const [trafficLightBudgetColors, setTrafficLightBudgetColors] = useState(
+    settings.trafficLightBudgetColors
+  );
+  const [showTrafficLightInfo, setShowTrafficLightInfo] = useState(false);
 
   const toggleShowFlags = () => {
     const newValue = !showFlags;
@@ -56,7 +62,9 @@ const SettingsSection = ({ multiTraveller }) => {
     };
     setAlwaysShowAdvanced(newValue);
     saveSettings(newSettings);
-    trackEvent(VexoEvents.ALWAYS_SHOW_ADVANCED_TOGGLE_CHANGED, { enabled: newValue });
+    trackEvent(VexoEvents.ALWAYS_SHOW_ADVANCED_TOGGLE_CHANGED, {
+      enabled: newValue,
+    });
   };
   const toggleSkipCategoryPickScreen = () => {
     const newValue = !skipCategoryPickScreen;
@@ -66,7 +74,9 @@ const SettingsSection = ({ multiTraveller }) => {
     };
     setSkipCategoryPickScreen(newValue);
     saveSettings(newSettings);
-    trackEvent(VexoEvents.SKIP_CATEGORY_SCREEN_TOGGLE_CHANGED, { enabled: newValue });
+    trackEvent(VexoEvents.SKIP_CATEGORY_SCREEN_TOGGLE_CHANGED, {
+      enabled: newValue,
+    });
   };
   const toggleShowInternetSpeed = () => {
     const newValue = !showInternetSpeed;
@@ -76,7 +86,9 @@ const SettingsSection = ({ multiTraveller }) => {
     };
     setShowInternetSpeed(newValue);
     saveSettings(newSettings);
-    trackEvent(VexoEvents.SHOW_INTERNET_SPEED_TOGGLE_CHANGED, { enabled: newValue });
+    trackEvent(VexoEvents.SHOW_INTERNET_SPEED_TOGGLE_CHANGED, {
+      enabled: newValue,
+    });
   };
   const toggleHideSpecialExpenses = () => {
     const newValue = !hideSpecialExpenses;
@@ -86,7 +98,9 @@ const SettingsSection = ({ multiTraveller }) => {
     };
     setHideSpecialExpenses(newValue);
     saveSettings(newSettings);
-    trackEvent(VexoEvents.HIDE_SPECIAL_EXPENSES_TOGGLE_CHANGED, { enabled: newValue });
+    trackEvent(VexoEvents.HIDE_SPECIAL_EXPENSES_TOGGLE_CHANGED, {
+      enabled: newValue,
+    });
   };
   const toggleDisableNumberAnimations = () => {
     const newValue = !disableNumberAnimations;
@@ -96,13 +110,44 @@ const SettingsSection = ({ multiTraveller }) => {
     };
     setDisableNumberAnimations(newValue);
     saveSettings(newSettings);
-    trackEvent(VexoEvents.DISABLE_NUMBER_ANIMATIONS_TOGGLE_CHANGED, { enabled: newValue });
+    trackEvent(VexoEvents.DISABLE_NUMBER_ANIMATIONS_TOGGLE_CHANGED, {
+      enabled: newValue,
+    });
+  };
+  const toggleTrafficLightBudgetColors = () => {
+    const newValue = !trafficLightBudgetColors;
+    const newSettings = {
+      ...settings,
+      trafficLightBudgetColors: newValue,
+    };
+    setTrafficLightBudgetColors(newValue);
+    saveSettings(newSettings);
+    trackEvent(VexoEvents.TRAFFIC_LIGHT_BUDGET_COLORS_TOGGLE_CHANGED, {
+      enabled: newValue,
+    });
   };
   return (
     <View>
       {/* <View style={styles.switchContainer}>
         <Text style={GlobalStyles.secondaryText}>Show Flags icons</Text>
         <Switch onValueChange={toggleShowFlags} value={showFlags} /> */}
+      <View style={styles.switchWithInfoContainer}>
+        <SettingsSwitch
+          label={i18n.t("settingsTrafficLightBudgetColors")}
+          style={styles.switchContainer}
+          state={trafficLightBudgetColors}
+          toggleState={toggleTrafficLightBudgetColors}
+          labelStyle={{}}
+        />
+        <InfoButton
+          containerStyle={styles.infoButton}
+          onPress={() => setShowTrafficLightInfo(true)}
+        />
+      </View>
+      <TrafficLightInfoModal
+        isVisible={showTrafficLightInfo}
+        onClose={() => setShowTrafficLightInfo(false)}
+      />
       <SettingsSwitch
         label={i18n.t("hideSpecialExpenses")}
         style={styles.switchContainer}
@@ -180,5 +225,14 @@ const styles = StyleSheet.create({
     marginVertical: "4%",
     justifyContent: "space-between",
     flexDirection: "row",
+  },
+  switchWithInfoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: "10%",
+    marginVertical: "4%",
+  },
+  infoButton: {
+    marginLeft: 8,
   },
 });

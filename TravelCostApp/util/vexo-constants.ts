@@ -75,7 +75,10 @@ export const VexoEvents = {
   SKIP_CATEGORY_SCREEN_TOGGLE_CHANGED: "skip_category_screen_toggle_changed",
   SHOW_INTERNET_SPEED_TOGGLE_CHANGED: "show_internet_speed_toggle_changed",
   HIDE_SPECIAL_EXPENSES_TOGGLE_CHANGED: "hide_special_expenses_toggle_changed",
-  DISABLE_NUMBER_ANIMATIONS_TOGGLE_CHANGED: "disable_number_animations_toggle_changed",
+  DISABLE_NUMBER_ANIMATIONS_TOGGLE_CHANGED:
+    "disable_number_animations_toggle_changed",
+  TRAFFIC_LIGHT_BUDGET_COLORS_TOGGLE_CHANGED:
+    "traffic_light_budget_colors_toggle_changed",
   RESET_APP_INTRODUCTION_PRESSED: "reset_app_introduction_pressed",
   VISIT_FOOD_FOR_NOMADS_PRESSED: "visit_food_for_nomads_pressed",
   FEEDBACK_BUTTON_PRESSED: "feedback_button_pressed",
@@ -121,7 +124,8 @@ export const VexoEvents = {
   DESELECT_ALL_EXPENSES_PRESSED: "deselect_all_expenses_pressed",
   DELETE_MULTIPLE_EXPENSES_PRESSED: "delete_multiple_expenses_pressed",
   MOVE_MULTIPLE_EXPENSES_PRESSED: "move_multiple_expenses_pressed",
-  FILTERED_PIE_CHARTS_WITH_SELECTED_PRESSED: "filtered_pie_charts_with_selected_pressed",
+  FILTERED_PIE_CHARTS_WITH_SELECTED_PRESSED:
+    "filtered_pie_charts_with_selected_pressed",
   EDIT_MULTIPLE_EXPENSES_PRESSED: "edit_multiple_expenses_pressed",
 
   // Social/Sharing

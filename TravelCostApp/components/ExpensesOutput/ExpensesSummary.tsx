@@ -23,6 +23,10 @@ import {
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { CurrencyTicker } from "../UI/AnimatedNumber";
+import {
+  calculateDailyAverage,
+  getBudgetColor,
+} from "../../util/budgetColorHelper";
 
 const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
   const tripCtx = useContext(TripContext);
@@ -123,16 +127,44 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
     isNaN(Number(tripCtx.totalBudget)) ||
     tripCtx.totalBudget >= MAX_JS_NUMBER.toString();
   let budgetProgress = (expenseSumNum / budgetNumber) * 1;
+
+  // Calculate daily average for traffic light system
+  const today = new Date();
+  const averageDailySpending = settings.trafficLightBudgetColors
+    ? calculateDailyAverage(
+        periodName as "day" | "week" | "month" | "year" | "total",
+        today,
+        expCtx,
+        tripCtx,
+        hideSpecial
+      )
+    : 0;
+
+  const dailyBudget = Number(tripCtx.dailyBudget) || 0;
   const budgetColor = noTotalBudget
     ? GlobalStyles.colors.primary500
-    : budgetProgress <= 1
-      ? GlobalStyles.colors.primary500
-      : GlobalStyles.colors.error300;
-  const unfilledColor = noTotalBudget
-    ? GlobalStyles.colors.primary500
-    : budgetProgress <= 1
-      ? GlobalStyles.colors.gray600
-      : GlobalStyles.colors.errorGrayed;
+    : getBudgetColor(
+        expenseSumNum,
+        budgetNumber,
+        averageDailySpending,
+        dailyBudget,
+        settings.trafficLightBudgetColors
+      );
+
+  // Determine unfilled color based on budget color
+  let unfilledColor = GlobalStyles.colors.gray600;
+  if (!noTotalBudget) {
+    if (budgetColor === GlobalStyles.colors.error300) {
+      unfilledColor = GlobalStyles.colors.errorGrayed;
+    } else if (budgetColor === GlobalStyles.colors.accent500) {
+      // Orange - use a lighter orange/gray for unfilled
+      unfilledColor = GlobalStyles.colors.gray600;
+    } else {
+      unfilledColor = GlobalStyles.colors.gray600;
+    }
+  } else {
+    unfilledColor = GlobalStyles.colors.primary500;
+  }
 
   if (budgetProgress > 1) budgetProgress -= 1;
   if (noTotalBudget) {

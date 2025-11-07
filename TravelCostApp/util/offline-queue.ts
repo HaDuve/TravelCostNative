@@ -11,7 +11,10 @@ import * as Localization from "expo-localization";
 import { I18n } from "i18n-js";
 import { en, de, fr, ru } from "../i18n/supportedLanguages";
 const i18n = new I18n({ en, de, fr, ru });
-i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+i18n.locale =
+  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+    ? Localization.getLocales()[0].languageCode.slice(0, 2)
+    : "en";
 i18n.enableFallback = true;
 // i18n.locale = "en";
 
@@ -47,7 +50,12 @@ export const pushQueueReturnRndID = async (
     const id =
       Math.random().toString(36).substring(2, 15) +
       Math.random().toString(36).substring(2, 15);
-    if (item.type == "add") item.expense.id = id;
+    if (item.type == "add") {
+      item.expense.id = id;
+      if (item.expense.expenseData) {
+        item.expense.expenseData.id = id;
+      }
+    }
     offlineQueuePushItem(item);
     return id;
   } catch (error) {
@@ -207,11 +215,13 @@ export const storeExpenseOnlineOffline = async (
  *
  * @param mutexBool - A boolean indicating whether the mutex is active.
  * @param setMutexFunction - A function to set the value of the mutex.
+ * @param expensesContext - Optional expenses context to update local expense IDs after sync.
  * @returns A Promise that resolves when the offline queue is processed.
  */
 export async function sendOfflineQueue(
   mutexBool: boolean,
-  setMutexFunction: (mutexBool: boolean) => void
+  setMutexFunction: (mutexBool: boolean) => void,
+  expensesContext?: { updateExpenseId: (oldId: string, newId: string) => void }
 ) {
   if (mutexBool) {
     return;
@@ -251,12 +261,28 @@ export async function sendOfflineQueue(
       try {
         if (item.type === "add") {
           const oldId = item.expense.id || item.expense.expenseData.id || null;
+          if (!oldId) {
+            i++;
+            continue;
+          }
+
           const id = await storeExpense(
             item.expense.tripid,
             item.expense.uid,
             item.expense.expenseData
           );
+
           item.expense.id = id;
+
+          // Update local expense ID if expenses context is provided
+          if (oldId && id && expensesContext?.updateExpenseId) {
+            try {
+              expensesContext.updateExpenseId(oldId, id);
+            } catch (error) {
+              safeLogError("Failed to update expense ID in context: " + error);
+            }
+          }
+
           // change item.expense.id for every other item.type == "update" or "delete" in the queue
           for (let j = i + 1; j < offlineQueue?.length - i; j++) {
             const item2 = offlineQueue[j];

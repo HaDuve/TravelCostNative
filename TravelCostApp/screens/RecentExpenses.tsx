@@ -117,7 +117,8 @@ function RecentExpenses({ navigation }) {
           // console.log("RecentExpenses ~ sending offline queue");
           await sendOfflineQueue(
             userCtx.isSendingOfflineQueueMutex,
-            userCtx.setIsSendingOfflineQueueMutex
+            userCtx.setIsSendingOfflineQueueMutex,
+            { updateExpenseId: expensesCtx.updateExpenseId }
           );
           return;
         }

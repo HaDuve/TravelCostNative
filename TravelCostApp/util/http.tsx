@@ -196,6 +196,7 @@ export async function storeExpense(
     return id;
   } catch (error) {
     safeLogError(error);
+    throw error;
   }
 }
 

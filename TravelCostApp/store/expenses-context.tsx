@@ -56,6 +56,7 @@ export type ExpenseContextType = {
       iconName,
     }: ExpenseData
   ) => void;
+  updateExpenseId: (oldId: string, newId: string) => void;
   getRecentExpenses: (rangestring: RangeString) => Array<ExpenseData>;
   getYearlyExpenses: (yearsBack: number) => {
     firstDay: Date;
@@ -120,6 +121,7 @@ export const ExpensesContext = createContext<ExpenseContextType>({
       iconName,
     }: ExpenseData
   ) => {},
+  updateExpenseId: (oldId: string, newId: string) => {},
   getRecentExpenses: (rangestring: RangeString): Array<ExpenseData> => {
     return [];
   },
@@ -255,6 +257,19 @@ function expensesReducer(state: ExpenseData[], action) {
     }
     case "DELETE":
       return state.filter((expense) => expense.id !== action.payload);
+    case "UPDATE_ID": {
+      const { oldId, newId } = action.payload;
+      const expenseIndex = state.findIndex((expense) => expense.id === oldId);
+      if (expenseIndex === -1) {
+        return state;
+      }
+      const updatedExpenses = [...state];
+      updatedExpenses[expenseIndex] = {
+        ...updatedExpenses[expenseIndex],
+        id: newId,
+      };
+      return updatedExpenses;
+    }
     default:
       return state;
   }
@@ -304,6 +319,10 @@ function ExpensesContextProvider({ children }) {
 
   function updateExpense(id: string, expenseData: ExpenseData) {
     dispatch({ type: "UPDATE", payload: { id: id, data: expenseData } });
+  }
+
+  function updateExpenseId(oldId: string, newId: string) {
+    dispatch({ type: "UPDATE_ID", payload: { oldId, newId } });
   }
 
   function getRecentExpenses(rangestring: RangeString) {
@@ -518,6 +537,7 @@ function ExpensesContextProvider({ children }) {
     mergeExpenses: mergeExpenses,
     deleteExpense: deleteExpense,
     updateExpense: updateExpense,
+    updateExpenseId: updateExpenseId,
     getRecentExpenses: getRecentExpenses,
     getYearlyExpenses: getYearlyExpenses,
     getMonthlyExpenses: getMonthlyExpenses,

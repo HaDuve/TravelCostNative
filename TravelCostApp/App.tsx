@@ -543,6 +543,7 @@ function Root() {
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
+  const expensesCtx = useContext(ExpensesContext);
 
   // check regularly
   useInterval(
@@ -551,7 +552,8 @@ function Root() {
         const asyncQueue = async () => {
           await sendOfflineQueue(
             userCtx.isSendingOfflineQueueMutex,
-            userCtx.setIsSendingOfflineQueueMutex
+            userCtx.setIsSendingOfflineQueueMutex,
+            { updateExpenseId: expensesCtx.updateExpenseId }
           );
         };
         asyncQueue();

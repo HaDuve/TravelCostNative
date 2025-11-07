@@ -11,16 +11,7 @@ import {
 } from "react-native";
 import * as Haptics from "expo-haptics";
 
-//Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
-const i18n = new I18n({ en, de, fr, ru });
-i18n.locale =
-  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
-    ? Localization.getLocales()[0].languageCode.slice(0, 2)
-    : "en";
-i18n.enableFallback = true;
+import { i18n } from "../../i18n/i18n";
 
 import PropTypes from "prop-types";
 import GradientButton from "../UI/GradientButton";

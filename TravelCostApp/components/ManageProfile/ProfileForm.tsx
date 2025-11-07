@@ -12,10 +12,7 @@ import IconButton from "../UI/IconButton";
 import { TripContext } from "../../store/trip-context";
 import FlatButton from "../UI/FlatButton";
 
-//Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+import { i18n } from "../../i18n/i18n";
 import GradientButton from "../UI/GradientButton";
 import * as Haptics from "expo-haptics";
 import PropTypes from "prop-types";
@@ -25,13 +22,6 @@ import { getMMKVString } from "../../store/mmkv";
 import { NetworkContext } from "../../store/network-context";
 import { OrientationContext } from "../../store/orientation-context";
 import { dynamicScale } from "../../util/scalingUtil";
-const i18n = new I18n({ en, de, fr, ru });
-i18n.locale =
-  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
-    ? Localization.getLocales()[0].languageCode.slice(0, 2)
-    : "en";
-i18n.enableFallback = true;
-// i18n.locale = "en";
 
 const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
   const authCtx = useContext(AuthContext);

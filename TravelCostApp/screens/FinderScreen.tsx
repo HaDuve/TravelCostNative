@@ -11,17 +11,7 @@ import DatePickerContainer from "../components/UI/DatePickerContainer";
 import DatePickerModal from "../components/UI/DatePickerModal";
 import { getFormattedDate } from "../util/date";
 
-//Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { de, en, fr, ru } from "../i18n/supportedLanguages";
-const i18n = new I18n({ en, de, fr, ru });
-i18n.locale =
-  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
-    ? Localization.getLocales()[0].languageCode.slice(0, 2)
-    : "en";
-i18n.enableFallback = true;
-// i18n.locale = "en";
+import { i18n } from "../i18n/i18n";
 
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";

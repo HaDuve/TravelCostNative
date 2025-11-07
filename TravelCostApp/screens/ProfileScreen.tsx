@@ -16,26 +16,16 @@ import { GlobalStyles } from "../constants/styles";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 
-//Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
+import { i18n } from "../i18n/i18n";
 import React from "react";
 import { TourGuideZone, useTourGuideController } from "rn-tourguide";
 import { useInterval } from "../components/Hooks/useInterval";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
-import { de, en, fr, ru } from "../i18n/supportedLanguages";
 import { AuthContext } from "../store/auth-context";
 import { secureStoreGetItem } from "../store/secure-storage";
 import { sleep } from "../util/appState";
 import { storeExpoPushTokenInTrip } from "../util/http";
 import { saveStoppedTour } from "../util/tourUtil";
-const i18n = new I18n({ en, de, fr, ru });
-i18n.locale =
-  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
-    ? Localization.getLocales()[0].languageCode.slice(0, 2)
-    : "en";
-i18n.enableFallback = true;
-// i18n.locale = "de";
 
 import { useFocusEffect } from "@react-navigation/native";
 import Constants from "expo-constants";

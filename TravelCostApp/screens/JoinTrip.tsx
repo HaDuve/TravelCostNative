@@ -24,10 +24,7 @@ import { AuthContext } from "../store/auth-context";
 import { TripContext, TripData } from "../store/trip-context";
 import { GlobalStyles } from "../constants/styles";
 import Input from "../components/Auth/Input";
-//Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
+import { i18n } from "../i18n/i18n";
 import { ExpensesContext } from "../store/expenses-context";
 import React from "react";
 import FlatButton from "../components/UI/FlatButton";
@@ -50,13 +47,6 @@ import { sleep } from "../util/appState";
 import { dynamicScale } from "../util/scalingUtil";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
-const i18n = new I18n({ en, de, fr, ru });
-i18n.locale =
-  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
-    ? Localization.getLocales()[0].languageCode.slice(0, 2)
-    : "en";
-i18n.enableFallback = true;
-// i18n.locale = "en";
 
 const JoinTrip = ({ navigation, route }) => {
   // join Trips via route params (route.params.id -> tripid)

@@ -13,17 +13,7 @@ import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 import { AuthContext } from "../store/auth-context";
 
-//Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
-const i18n = new I18n({ en, de, fr, ru });
-i18n.locale =
-  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
-    ? Localization.getLocales()[0].languageCode.slice(0, 2)
-    : "en";
-i18n.enableFallback = true;
-// i18n.locale = "en";
+import { i18n } from "../i18n/i18n";
 
 import { ScrollView } from "react-native-gesture-handler";
 import { GlobalStyles } from "../constants/styles";

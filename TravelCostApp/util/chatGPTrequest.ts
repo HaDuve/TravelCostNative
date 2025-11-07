@@ -1,15 +1,5 @@
-//Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
+import { i18n } from "../i18n/i18n";
 import { LANGUAGE_LIST } from "../i18n/languageList";
-import { en, de, fr, ru } from "../i18n/supportedLanguages";
-const i18n = new I18n({ en, de, fr, ru });
-i18n.locale =
-  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
-    ? Localization.getLocales()[0].languageCode.slice(0, 2)
-    : "en";
-i18n.enableFallback = true;
-// i18n.locale = "en";
 const languageObj = LANGUAGE_LIST.find(
   (language) => language.code === i18n.locale
 );

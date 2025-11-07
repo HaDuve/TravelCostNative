@@ -1,10 +1,7 @@
 import Purchases from "react-native-purchases";
 import { FORCE_PREMIUM } from "../../confAppConstants";
 
-//Localization
-import * as Localization from "expo-localization";
-import { I18n } from "i18n-js";
-import { en, de, fr, ru } from "../../i18n/supportedLanguages";
+import { i18n } from "../../i18n/i18n";
 // Branch.io removed
 import {
   secureStoreGetItem,
@@ -13,13 +10,6 @@ import {
 import { fetchServerInfo } from "../../util/http";
 import { isConnectionFastEnough } from "../../util/connectionSpeed";
 import safeLogError from "../../util/error";
-const i18n = new I18n({ en, de, fr, ru });
-i18n.locale =
-  Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
-    ? Localization.getLocales()[0].languageCode.slice(0, 2)
-    : "en";
-i18n.enableFallback = true;
-// i18n.locale = "en";
 
 /*
   The entitlement ID from the RevenueCat dashboard that is activated upon successful in-app purchase for the duration of the purchase.

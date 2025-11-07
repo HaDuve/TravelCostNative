@@ -275,6 +275,10 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
         periodLabel: periodLabel,
         periodBudgetString: periodBudgetString,
         lastRateUnequal1: lastRateUnequal1,
+        trafficLightActive: settings.trafficLightBudgetColors,
+        currentBudgetColor: budgetColor,
+        averageDailySpending: averageDailySpending,
+        dailyBudget: dailyBudget,
       },
     });
   };

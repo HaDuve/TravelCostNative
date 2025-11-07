@@ -227,8 +227,15 @@ const toastConfig: ToastConfig = {
     const currency = props.props.currency;
     const noTotalBudget = props.props.noTotalBudget;
     const periodName = props.props.periodName;
+    const trafficLightActive = props.props.trafficLightActive || false;
+    const currentBudgetColor = props.props.currentBudgetColor;
+    const averageDailySpending = props.props.averageDailySpending || 0;
+    const dailyBudget = props.props.dailyBudget || 0;
 
     const hasMultipleTravellers = travellerList && travellerList.length > 1;
+    const isYellowStatus =
+      trafficLightActive &&
+      currentBudgetColor === GlobalStyles.colors.accent500;
 
     return (
       <View
@@ -263,13 +270,15 @@ const toastConfig: ToastConfig = {
               const budgetColor = noTotalBudget
                 ? GlobalStyles.colors.primary500
                 : budgetProgress <= 1
-                ? GlobalStyles.colors.primary500
-                : GlobalStyles.colors.error300;
+                  ? GlobalStyles.colors.primary500
+                  : isYellowStatus
+                    ? GlobalStyles.colors.accent500
+                    : GlobalStyles.colors.error300;
               const unfilledColor: string = noTotalBudget
                 ? GlobalStyles.colors.primary500
                 : budgetProgress <= 1
-                ? GlobalStyles.colors.gray600
-                : GlobalStyles.colors.errorGrayed;
+                  ? GlobalStyles.colors.gray600
+                  : GlobalStyles.colors.gray600;
               const travellerName = item;
               return (
                 <View style={styles.travellerItemContainer}>
@@ -311,6 +320,12 @@ const toastConfig: ToastConfig = {
               );
             }}
           ></FlatList>
+        )}
+        {isYellowStatus && averageDailySpending > 0 && dailyBudget > 0 && (
+          <Text style={styles.overviewTextInfo}>
+            {`🟠 ${i18n.t("overBudgetButAverage")}: ${formatExpenseWithCurrency(averageDailySpending / travellerList.length, currency)}\n${i18n.t("underDailyBudget")}: ${formatExpenseWithCurrency(dailyBudget / travellerList.length, currency)}`}
+          </Text>
+          
         )}
       </View>
     );
@@ -414,7 +429,7 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
   overviewTextInfo: {
-    fontSize: dynamicScale(18, false, 0.5),
+    fontSize: dynamicScale(12, false, 0.5),
     fontWeight: "300",
     color: GlobalStyles.colors.textColor,
     textAlign: "left",

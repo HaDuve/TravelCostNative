@@ -1,19 +1,15 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { StyleSheet, Modal, TextInput, View, Text } from "react-native";
+import React, { StyleSheet, View } from "react-native";
 
-import React from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 import * as i18nIsoCountries from "i18n-iso-countries";
 import { useState } from "react";
 
 import { GlobalStyles } from "../../constants/styles";
 import { i18n } from "../../i18n/i18n";
-import LoadingOverlay from "../UI/LoadingOverlay";
+import * as Localization from "expo-localization";
 import * as Haptics from "expo-haptics";
 import PropTypes from "prop-types";
-import { getCurrencySymbol } from "../../util/currencySymbol";
-import CountryFlag from "react-native-country-flag";
-import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 
@@ -26,7 +22,10 @@ const CountryPicker = ({
 }) => {
   // Users Device CountryCode CC to translate Country names in picker
   // enforce a language we have registered, otherwise, english
-  let CC = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
+  let CC =
+    Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
+      ? Localization.getLocales()[0].languageCode.slice(0, 2)
+      : "en";
   if (CC !== "de" && CC !== "en" && CC !== "fr" && CC !== "ru") CC = "en";
   //   const CC = "en";
 

@@ -1,7 +1,7 @@
 import { i18n } from "../i18n/i18n";
+import * as Localization from "expo-localization";
 
 import { getCurrencySymbol } from "./currencySymbol";
-import safeLogError from "./error";
 
 export function formatExpenseWithCurrency(
   amount: number | string,
@@ -18,7 +18,10 @@ export function formatExpenseWithCurrency(
     // // console.log("calling formatExpenseWithCurrency without a currency");
     return amount.toFixed(2);
   }
-  const locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageTag)?Localization.getLocales()[0].languageTag:'en-US');
+  const locale =
+    Localization.getLocales()[0] && Localization.getLocales()[0].languageTag
+      ? Localization.getLocales()[0].languageTag
+      : "en-US";
 
   const fractionOptions: Intl.NumberFormatOptions = {
     style: "currency",

@@ -26,6 +26,7 @@ import CurrencyPicker from "../Currency/CurrencyPicker";
 import { useHeaderHeight } from "@react-navigation/elements";
 
 import { i18n } from "../../i18n/i18n";
+import * as Localization from "expo-localization";
 
 import { daysBetween, getFormattedDate } from "../../util/date";
 import { DateTime } from "luxon";
@@ -946,24 +947,24 @@ const TripForm = ({ navigation, route }) => {
           </View>
           {/* Horizontal container */}
           {isEditing && (
-              <GradientButton
-                buttonStyle={{}}
-                style={[
-                  styles.button,
-                  {
-                    marginVertical: dynamicScale(8, false, 0.5),
-                    marginHorizontal: dynamicScale(24, false, 0.5),
-                  },
-                ]}
-                onPress={() => {
-                  trackEvent(VexoEvents.SET_ACTIVE_TRIP_PRESSED, {
-                    tripId: editedTripId,
-                  });
-                  submitHandler(true /* setActive */);
-                }}
-              >
-                {i18n.t("setActive")}
-              </GradientButton>
+            <GradientButton
+              buttonStyle={{}}
+              style={[
+                styles.button,
+                {
+                  marginVertical: dynamicScale(8, false, 0.5),
+                  marginHorizontal: dynamicScale(24, false, 0.5),
+                },
+              ]}
+              onPress={() => {
+                trackEvent(VexoEvents.SET_ACTIVE_TRIP_PRESSED, {
+                  tripId: editedTripId,
+                });
+                submitHandler(true /* setActive */);
+              }}
+            >
+              {i18n.t("setActive")}
+            </GradientButton>
           )}
           {/* {isEditing && (
             <GradientButton

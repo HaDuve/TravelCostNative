@@ -1,7 +1,5 @@
 import Purchases from "react-native-purchases";
 import { FORCE_PREMIUM } from "../../confAppConstants";
-
-import { i18n } from "../../i18n/i18n";
 // Branch.io removed
 import {
   secureStoreGetItem,

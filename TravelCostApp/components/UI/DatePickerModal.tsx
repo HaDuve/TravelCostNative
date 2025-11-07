@@ -1,4 +1,4 @@
-import { i18n } from "../../i18n/i18n";
+import * as Localization from "expo-localization";
 
 import { Platform, View } from "react-native";
 import React, { useContext } from "react";
@@ -38,9 +38,18 @@ const DatePickerModal = ({
       // if ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en') is one of these, it will be used
       // otherwise, the default language is 'en'
       language={
-        ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en') === "de" ||
-        ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en') === "fr"
-          ? ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en')
+        (Localization.getLocales()[0] &&
+        Localization.getLocales()[0].languageCode
+          ? Localization.getLocales()[0].languageCode.slice(0, 2)
+          : "en") === "de" ||
+        (Localization.getLocales()[0] &&
+        Localization.getLocales()[0].languageCode
+          ? Localization.getLocales()[0].languageCode.slice(0, 2)
+          : "en") === "fr"
+          ? Localization.getLocales()[0] &&
+            Localization.getLocales()[0].languageCode
+            ? Localization.getLocales()[0].languageCode.slice(0, 2)
+            : "en"
           : "en"
       }
     />

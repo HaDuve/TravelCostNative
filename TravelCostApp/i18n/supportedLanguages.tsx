@@ -353,6 +353,10 @@ const en = {
     "Budget colors now use a traffic light system:\n\n🟢 Green: Under budget\n🟠 Orange: Over budget, but average spending is under budget\n🔴 Red: Over budget AND average spending is over budget\n\nThe average is calculated from the current period plus the previous period (e.g., this week + last week for daily view).",
   overBudgetButAverage: "Over budget, but your average daily spending is",
   underDailyBudget: "under your daily budget of",
+  trafficLightUnderBudget: "Under budget",
+  trafficLightOverBudgetAndAverage: "Over budget",
+  averageDailySpending: "Avg daily spending",
+  dailyBudget: "Daily budget",
   // new Stuff part 2
   newCatNamePlaceholder: "New category name ...",
   reset: "Reset",
@@ -913,6 +917,10 @@ const de = {
   overBudgetButAverage:
     "Über Budget, aber Ihre durchschnittlichen Tagesausgaben sind",
   underDailyBudget: "unter Ihrem Tagesbudget von",
+  trafficLightUnderBudget: "Unter Budget",
+  trafficLightOverBudgetAndAverage: "Über Budget",
+  averageDailySpending: "Durchschn. Tagesausgaben",
+  dailyBudget: "Tagesbudget",
   // new Stuff part 2
   newCatNamePlaceholder: "Neuer Kategoriename ...",
 
@@ -1481,6 +1489,10 @@ const fr = {
   overBudgetButAverage:
     "Au-dessus du budget, mais vos dépenses quotidiennes moyennes sont",
   underDailyBudget: "sous votre budget quotidien de",
+  trafficLightUnderBudget: "Sous le budget",
+  trafficLightOverBudgetAndAverage: "Au-dessus du budget",
+  averageDailySpending: "Dépenses moyennes/jour",
+  dailyBudget: "Budget quotidien",
   newCatNamePlaceholder: "Nouveau nom de catégorie ...",
   reset: "Réinitialiser",
   sureResetCategories:
@@ -2038,6 +2050,10 @@ const ru = {
   overBudgetButAverage:
     "Превышен бюджет, но ваши средние дневные расходы составляют",
   underDailyBudget: "ниже вашего дневного бюджета",
+  trafficLightUnderBudget: "В пределах бюджета",
+  trafficLightOverBudgetAndAverage: "Превышен бюджет",
+  averageDailySpending: "Средние дневные расходы",
+  dailyBudget: "Дневной бюджет",
   // new Stuff part 2
   newCatNamePlaceholder: "Новое название категории ...",
   reset: "Сбросить",

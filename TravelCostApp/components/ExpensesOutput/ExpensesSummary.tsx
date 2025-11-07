@@ -128,7 +128,6 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
     tripCtx.totalBudget >= MAX_JS_NUMBER.toString();
   let budgetProgress = (expenseSumNum / budgetNumber) * 1;
 
-  // Calculate daily average for traffic light system
   const today = new Date();
   const averageDailySpending = settings.trafficLightBudgetColors
     ? calculateDailyAverage(
@@ -151,13 +150,11 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
         settings.trafficLightBudgetColors
       );
 
-  // Determine unfilled color based on budget color
   let unfilledColor = GlobalStyles.colors.gray600;
   if (!noTotalBudget) {
     if (budgetColor === GlobalStyles.colors.error300) {
       unfilledColor = GlobalStyles.colors.errorGrayed;
     } else if (budgetColor === GlobalStyles.colors.accent500) {
-      // Orange - use a lighter orange/gray for unfilled
       unfilledColor = GlobalStyles.colors.gray600;
     } else {
       unfilledColor = GlobalStyles.colors.gray600;
@@ -171,7 +168,6 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
     budgetProgress = 0;
   }
   if (Number.isNaN(budgetProgress)) {
-    // console.log("NaN budgetProgress");
     return <></>;
   }
   const calcLeftToSpend = lastRateUnequal1
@@ -234,17 +230,14 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
       });
       return;
     }
-    // show Toast containing budget info
     const tripCurrency = tripCtx.tripCurrency;
     const lastCurrency = userCtx.lastCurrency;
-    // const lastRate = lastRate
     if (!valid) {
       Toast.hide();
       setIsToastShowing(false);
       return;
     }
     Toast.show({
-      // type: budgetNumber > expenseSumNum ? "success" : "error",
       type: "budgetOverview",
       position: "bottom",
       text1: `${periodLabel} ${i18n.t("expenses")} :\n${expensesSumString} ${
@@ -265,7 +258,6 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
           tripCurrency
         )} = ${formatExpenseWithCurrency(lastRate, lastCurrency)}`,
         travellerList: tripCtx.travellers,
-        // travellerBudgets: tripCtx.travellerBudgets
         travellerBudgets: budgetNumber / tripCtx.travellers.length,
         budgetNumber: budgetNumber,
         travellerSplitExpenseSums: travellerSplitExpenseSums,
@@ -279,6 +271,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
         currentBudgetColor: budgetColor,
         averageDailySpending: averageDailySpending,
         dailyBudget: dailyBudget,
+        expenseSumNum: expenseSumNum,
       },
     });
   };
@@ -350,7 +343,6 @@ const styles = StyleSheet.create({
   sum: {
     fontSize: dynamicScale(32, false, 0.5),
     fontWeight: "bold",
-    // padding: 4,
     color: GlobalStyles.colors.primary500,
     ...Platform.select({
       android: {

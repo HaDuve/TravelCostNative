@@ -24,6 +24,27 @@ import { constantScale, dynamicScale, scale } from "../../util/scalingUtil";
 import { DeviceType, deviceType } from "expo-device";
 import { OnboardingFlags } from "../../types/onboarding";
 
+interface BudgetOverviewToastProps {
+  travellerList: string[];
+  travellerBudgets: number;
+  travellerSplitExpenseSums: number[];
+  currency: string;
+  noTotalBudget: boolean;
+  periodName: string;
+  periodLabel: string;
+  periodBudgetString: string;
+  lastRateUnequal1: boolean;
+  trafficLightActive: boolean;
+  currentBudgetColor: string;
+  averageDailySpending: number;
+  dailyBudget: number;
+  expenseSumNum: number;
+  budgetNumber: number;
+  text3?: string;
+}
+
+type TrafficLightStatus = "green" | "yellow" | "red" | null;
+
 const MINHEIGHT = dynamicScale(60, true);
 const MINHEIGHT_LOADINGBAR = dynamicScale(88, true);
 const MAXHEIGHT = dynamicScale(100, true);
@@ -63,10 +84,6 @@ const toastConfig: ToastConfig = {
       onPress={() => Toast.hide()}
     />
   ),
-  /*
-      Overwrite 'error' type,
-      by modifying the existing `ErrorToast` component
-    */
   error: (props) => (
     <ErrorToast
       {...props}
@@ -89,13 +106,6 @@ const toastConfig: ToastConfig = {
       onPress={() => Toast.hide()}
     />
   ),
-  /*
-      Or create a completely new type - `tomatoToast`,
-      building the layout from scratch.
-
-      I can consume any custom `props` I want.
-      They will be passed when calling the `show` method (see below)
-    */
   loading: (props) => {
     const { progress } = props.props;
     const isTablet = deviceType === DeviceType.TABLET;
@@ -125,8 +135,7 @@ const toastConfig: ToastConfig = {
       <></>
     );
     return (
-      // props.progress - is a number from 0 to 1 or -1 (indeterminate)
-      <View style={[{ flex: 1 }, GlobalStyles.strongShadow]}>
+      <View style={[{ flex: 1 }, GlobalStyles.wideStrongShadow]}>
         <BaseToast
           {...props}
           style={[
@@ -164,7 +173,6 @@ const toastConfig: ToastConfig = {
                 maxWidth: dynamicScale(20),
               }}
             >
-              {/* Below is just the spinner, the loading BAR is in loadingBarJSX */}
               <LoadingBarOverlay
                 containerStyle={{ maxHeight: MAXHEIGHT / 4 }}
                 size={size}
@@ -178,18 +186,19 @@ const toastConfig: ToastConfig = {
     );
   },
   banner: (props) => (
-    <TouchableOpacity
+    <Pressable
       onPress={() => {
-        // console.log("Pressed Touchable in Config");
         props.onPress();
       }}
       style={[styles.bannerContainerContainer, GlobalStyles.wideStrongShadow]}
     >
-      <BackgroundGradient style={[styles.bannerContainer]}>
+      <BackgroundGradient
+        colors={GlobalStyles.gradientColors}
+        style={[styles.bannerContainer]}
+      >
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <TouchableOpacity
+          <Pressable
             onPress={() => {
-              // console.log("Pressed Touchable in Config");
               props.onPress();
             }}
           >
@@ -197,8 +206,8 @@ const toastConfig: ToastConfig = {
               <Text style={styles.bannerText1}>{props.text1}</Text>
             </View>
             <Text style={styles.bannerText2}>{props.text2}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </Pressable>
+          <Pressable
             onPress={() => {
               Toast.hide();
             }}
@@ -215,27 +224,56 @@ const toastConfig: ToastConfig = {
                 </Text>
               </View>
             </View>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </BackgroundGradient>
-    </TouchableOpacity>
+    </Pressable>
   ),
   budgetOverview: (props) => {
-    const travellerList = props.props.travellerList;
-    const travellerBudgets = props.props.travellerBudgets;
-    const travellerSplitExpenseSums = props.props.travellerSplitExpenseSums;
-    const currency = props.props.currency;
-    const noTotalBudget = props.props.noTotalBudget;
-    const periodName = props.props.periodName;
-    const trafficLightActive = props.props.trafficLightActive || false;
-    const currentBudgetColor = props.props.currentBudgetColor;
-    const averageDailySpending = props.props.averageDailySpending || 0;
-    const dailyBudget = props.props.dailyBudget || 0;
+    const toastProps = props.props as BudgetOverviewToastProps;
+    const {
+      travellerList,
+      travellerBudgets,
+      travellerSplitExpenseSums,
+      currency,
+      noTotalBudget,
+      periodName,
+      trafficLightActive,
+      currentBudgetColor,
+      averageDailySpending,
+      dailyBudget,
+      expenseSumNum,
+      budgetNumber,
+    } = toastProps;
 
     const hasMultipleTravellers = travellerList && travellerList.length > 1;
+    const travellerCount = travellerList?.length || 1;
     const isYellowStatus =
       trafficLightActive &&
       currentBudgetColor === GlobalStyles.colors.accent500;
+
+    const getTrafficLightStatus = (): TrafficLightStatus => {
+      if (
+        !trafficLightActive ||
+        noTotalBudget ||
+        averageDailySpending <= 0 ||
+        dailyBudget <= 0
+      ) {
+        return null;
+      }
+
+      if (expenseSumNum <= budgetNumber) {
+        return "green";
+      }
+
+      if (averageDailySpending <= dailyBudget) {
+        return "yellow";
+      }
+
+      return "red";
+    };
+
+    const trafficLightStatus = getTrafficLightStatus();
 
     return (
       <View
@@ -321,9 +359,29 @@ const toastConfig: ToastConfig = {
             }}
           ></FlatList>
         )}
-        {isYellowStatus && averageDailySpending > 0 && dailyBudget > 0 && (
+        {trafficLightStatus && (
           <Text style={styles.overviewTextInfo}>
-            {`🟠 ${i18n.t("overBudgetButAverage")}: ${formatExpenseWithCurrency(averageDailySpending / travellerList.length, currency)}\n${i18n.t("underDailyBudget")}: ${formatExpenseWithCurrency(dailyBudget / travellerList.length, currency)}`}
+            {trafficLightStatus === "green" &&
+              `🟢 - ${i18n.t("averageDailySpending")}: ${formatExpenseWithCurrency(
+                averageDailySpending / travellerCount,
+                currency
+              )}`}
+            {trafficLightStatus === "yellow" &&
+              `🟡 - ${i18n.t("overBudgetButAverage")}: ${formatExpenseWithCurrency(
+                averageDailySpending / travellerCount,
+                currency
+              )}\n${i18n.t("underDailyBudget")}: ${formatExpenseWithCurrency(
+                dailyBudget / travellerCount,
+                currency
+              )}`}
+            {trafficLightStatus === "red" &&
+              `🔴 - ${i18n.t("trafficLightOverBudgetAndAverage")}\n${i18n.t("averageDailySpending")}: ${formatExpenseWithCurrency(
+                averageDailySpending / travellerCount,
+                currency
+              )}\n${i18n.t("dailyBudget")}: ${formatExpenseWithCurrency(
+                dailyBudget / travellerCount,
+                currency
+              )}`}
           </Text>
         )}
       </View>
@@ -333,7 +391,6 @@ const toastConfig: ToastConfig = {
 
 function isCalledToday() {
   const bannerTime = getMMKVString("BannerTime");
-  // console.log("isCalledToday ~ bannerTime:", bannerTime);
   const today = new Date();
   const bannerDate = new Date(bannerTime);
   setMMKVString("BannerTime", today.toISOString());
@@ -348,21 +405,22 @@ function isCalledToday() {
   return false;
 }
 
-// default banner call
+interface NavigationProp {
+  navigate: (screen: string) => void;
+}
+
 export async function showBanner(
-  navigation: any,
+  navigation: NavigationProp,
   onboardingFlags?: OnboardingFlags,
-  props: any = {}
+  props: Record<string, unknown> = {}
 ) {
   const isPremium = !DEVELOPER_MODE && (await isPremiumMember());
   if (isPremium || isCalledToday()) return;
 
-  // Check if user is in onboarding state
   if (onboardingFlags) {
     const shouldShowOnboardingFlow = await shouldShowOnboarding();
     const { freshlyCreated, needsTour } = onboardingFlags;
 
-    // Suppress banner if user is in any onboarding state
     if (shouldShowOnboardingFlow || freshlyCreated || needsTour) {
       return;
     }
@@ -456,7 +514,6 @@ const styles = StyleSheet.create({
     paddingVertical: dynamicScale(8, true),
   },
   bannerContainerContainer: {
-    // flex: 1,
     borderColor: "black",
     borderRadius: 999,
     alignItems: "center",
@@ -470,11 +527,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "white",
     padding: dynamicScale(4),
-    // paddingHorizontal: 8,
     backgroundColor: "white",
   },
   bannerContainer: {
-    // flex: 1,
     maxWidth: "90%",
     borderColor: "black",
     borderRadius: 36,

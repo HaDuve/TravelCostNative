@@ -131,19 +131,19 @@ const SettingsSection = ({ multiTraveller }) => {
       {/* <View style={styles.switchContainer}>
         <Text style={GlobalStyles.secondaryText}>Show Flags icons</Text>
         <Switch onValueChange={toggleShowFlags} value={showFlags} /> */}
-      <View style={styles.switchWithInfoContainer}>
-        <SettingsSwitch
-          label={i18n.t("settingsTrafficLightBudgetColors")}
-          style={styles.switchContainer}
-          state={trafficLightBudgetColors}
-          toggleState={toggleTrafficLightBudgetColors}
-          labelStyle={{}}
-        />
-        <InfoButton
-          containerStyle={styles.infoButton}
-          onPress={() => setShowTrafficLightInfo(true)}
-        />
-      </View>
+      <SettingsSwitch
+        label={i18n.t("settingsTrafficLightBudgetColors")}
+        style={styles.switchContainer}
+        state={trafficLightBudgetColors}
+        toggleState={toggleTrafficLightBudgetColors}
+        labelStyle={{}}
+        infoButton={
+          <InfoButton
+            containerStyle={styles.infoButton}
+            onPress={() => setShowTrafficLightInfo(true)}
+          />
+        }
+      />
       <TrafficLightInfoModal
         isVisible={showTrafficLightInfo}
         onClose={() => setShowTrafficLightInfo(false)}
@@ -234,5 +234,7 @@ const styles = StyleSheet.create({
   },
   infoButton: {
     marginLeft: 8,
+    marginBottom: 6,
+    marginRight: 12,
   },
 });

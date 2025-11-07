@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
 import { dynamicScale } from "../../util/scalingUtil";
 
-const SettingsSwitch = ({ style, toggleState, state, label, labelStyle }) => {
+const SettingsSwitch = ({ style, toggleState, state, label, labelStyle, infoButton }) => {
   return (
     <Pressable onPress={() => toggleState()} style={[styles.container, style]}>
       <View style={{ flex: 1 }}>
@@ -21,6 +21,7 @@ const SettingsSwitch = ({ style, toggleState, state, label, labelStyle }) => {
           {label}
         </Text>
       </View>
+      {infoButton}
       <Switch
         trackColor={{
           false: GlobalStyles.colors.gray500,
@@ -50,11 +51,16 @@ SettingsSwitch.propTypes = {
   state: PropTypes.bool.isRequired,
   label: PropTypes.string.isRequired,
   labelStyle: PropTypes.object,
+  infoButton: PropTypes.element,
+};
+
+SettingsSwitch.defaultProps = {
+  infoButton: null,
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    width: "90%",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

@@ -325,7 +325,6 @@ const toastConfig: ToastConfig = {
           <Text style={styles.overviewTextInfo}>
             {`🟠 ${i18n.t("overBudgetButAverage")}: ${formatExpenseWithCurrency(averageDailySpending / travellerList.length, currency)}\n${i18n.t("underDailyBudget")}: ${formatExpenseWithCurrency(dailyBudget / travellerList.length, currency)}`}
           </Text>
-          
         )}
       </View>
     );

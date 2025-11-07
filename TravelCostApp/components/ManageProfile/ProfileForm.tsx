@@ -54,6 +54,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
       {
         text: i18n.t("yes"),
         onPress: async () => {
+          trackEvent(VexoEvents.LOGOUT_PRESSED);
           setIsFetchingLogout(true);
           await tripCtx.setCurrentTrip("reset", null);
           expCtx.setExpenses([]);
@@ -143,6 +144,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
   }
 
   function joinInviteHandler() {
+    trackEvent(VexoEvents.TRIP_JOINED);
     navigation.navigate("Join");
   }
 

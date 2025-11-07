@@ -29,6 +29,8 @@ import PropTypes from "prop-types";
 import {
   dynamicScale,
 } from "../../util/scalingUtil";
+import { trackEvent } from "../../util/vexo-tracking";
+import { VexoEvents } from "../../util/vexo-constants";
 
 function AuthContent({ isLogin, onAuthenticate, isConnected }) {
   const navigation = useNavigation();
@@ -40,6 +42,10 @@ function AuthContent({ isLogin, onAuthenticate, isConnected }) {
   });
 
   function switchAuthModeHandler() {
+    trackEvent(VexoEvents.AUTH_MODE_SWITCHED, {
+      fromMode: isLogin ? "login" : "signup",
+      toMode: isLogin ? "signup" : "login",
+    });
     if (isLogin) {
       navigation.replace("Signup");
     } else {
@@ -71,6 +77,13 @@ function AuthContent({ isLogin, onAuthenticate, isConnected }) {
       });
       return;
     }
+
+    // Track auth form submission
+    trackEvent(VexoEvents.AUTH_FORM_SUBMITTED, {
+      isLogin: isLogin,
+      email: email,
+    });
+
     await onAuthenticate({ name, email, password });
   }
 

@@ -48,6 +48,8 @@ import {
 } from "../util/connectionSpeed";
 import { sleep } from "../util/appState";
 import { dynamicScale } from "../util/scalingUtil";
+import { trackEvent } from "../util/vexo-tracking";
+import { VexoEvents } from "../util/vexo-constants";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -146,6 +148,13 @@ const JoinTrip = ({ navigation, route }) => {
       navigation.pop();
       return;
     }
+
+    // Track trip join
+    trackEvent(VexoEvents.TRIP_JOINED, {
+      tripId: joinTripid || tripid,
+      tripName: tripName,
+    });
+
     setIsFetching(true);
     try {
       tripid = joinTripid;

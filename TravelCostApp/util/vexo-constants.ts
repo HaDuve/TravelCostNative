@@ -5,6 +5,8 @@ export const VexoEvents = {
   EXPENSE_DELETED: "expense_deleted",
   BULK_EXPENSE_ACTION: "bulk_expense_action",
   ADD_EXPENSE_BUTTON_PRESSED: "add_expense_button_pressed",
+  ADD_EXPENSE_BUTTON_LONGPRESS: "add_expense_button_longpress",
+  TEMPLATE_EXPENSE_SELECTED: "template_expense_selected",
   EXPENSE_CANCEL_PRESSED: "expense_cancel_pressed",
   GET_LOCAL_PRICE_PRESSED: "get_local_price_pressed",
   EXPENSE_PAID_TOGGLE_CHANGED: "expense_paid_toggle_changed",
@@ -113,6 +115,14 @@ export const VexoEvents = {
 
   // Bulk Actions
   MULTI_SELECT_MODE_TOGGLED: "multi_select_mode_toggled",
+  EXPENSE_SELECTED: "expense_selected",
+  EXPENSE_DESELECTED: "expense_deselected",
+  SELECT_ALL_EXPENSES_PRESSED: "select_all_expenses_pressed",
+  DESELECT_ALL_EXPENSES_PRESSED: "deselect_all_expenses_pressed",
+  DELETE_MULTIPLE_EXPENSES_PRESSED: "delete_multiple_expenses_pressed",
+  MOVE_MULTIPLE_EXPENSES_PRESSED: "move_multiple_expenses_pressed",
+  FILTERED_PIE_CHARTS_WITH_SELECTED_PRESSED: "filtered_pie_charts_with_selected_pressed",
+  EDIT_MULTIPLE_EXPENSES_PRESSED: "edit_multiple_expenses_pressed",
 
   // Social/Sharing
   TRIP_INVITE_SENT: "trip_invite_sent",

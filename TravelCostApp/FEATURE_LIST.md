@@ -2,39 +2,41 @@
 
 This document contains a comprehensive list of all user-facing buttons, switches, toggles, and interactive elements in the app (excluding navigation). This list is intended for analytics tracking implementation.
 
-## Expense Management (20 features)
+## Expense Management (22 features)
 
 ### Expense Creation & Editing
 
 1. **Add Expense Button** - Floating action button to create new expense (`components/ManageExpense/AddExpenseButton.tsx`)
-2. **Confirm Expense Button** - Save/confirm expense creation or edit (`components/ManageExpense/ExpenseForm.tsx`)
-3. **Cancel Expense Button** - Cancel expense creation/edit (`components/ManageExpense/ExpenseForm.tsx`)
-4. **Delete Expense Button** - Delete an expense (trash icon) (`screens/ManageExpense.tsx`)
-5. **Get Local Price Button** - ChatGPT integration to get local price recommendations (`components/ManageExpense/ExpenseForm.tsx`)
+2. **Add Expense Button (Long Press)** - Long press to show template expenses (`components/ManageExpense/AddExpenseButton.tsx`)
+3. **Confirm Expense Button** - Save/confirm expense creation or edit (`components/ManageExpense/ExpenseForm.tsx`)
+4. **Cancel Expense Button** - Cancel expense creation/edit (`components/ManageExpense/ExpenseForm.tsx`)
+5. **Delete Expense Button** - Delete an expense (trash icon) (`screens/ManageExpense.tsx`)
+6. **Get Local Price Button** - ChatGPT integration to get local price recommendations (`components/ManageExpense/ExpenseForm.tsx`)
 
 ### Expense Form Controls
 
-6. **Amount Input Field** - Enter expense amount (`components/ManageExpense/ExpenseForm.tsx`)
-7. **Description Input Field** - Enter expense description (`components/ManageExpense/ExpenseForm.tsx`)
-8. **Category Picker** - Select expense category (`screens/CategoryPickScreen.tsx`)
-9. **Currency Picker** - Select currency for expense (`components/Currency/CurrencyPicker.tsx`)
-10. **Country Picker** - Select country for expense (`components/Currency/CountryPicker.tsx`)
-11. **Date Picker** - Select expense date (`components/UI/DatePickerModal.tsx`)
-12. **Date Range Picker** - Select date range for ranged expenses (`components/UI/DatePickerModal.tsx`)
+7. **Amount Input Field** - Enter expense amount (`components/ManageExpense/ExpenseForm.tsx`)
+8. **Description Input Field** - Enter expense description (`components/ManageExpense/ExpenseForm.tsx`)
+9. **Category Picker** - Select expense category (`screens/CategoryPickScreen.tsx`)
+10. **Currency Picker** - Select currency for expense (`components/Currency/CurrencyPicker.tsx`)
+11. **Country Picker** - Select country for expense (`components/Currency/CountryPicker.tsx`)
+12. **Date Picker** - Select expense date (`components/UI/DatePickerModal.tsx`)
+13. **Date Range Picker** - Select date range for ranged expenses (`components/UI/DatePickerModal.tsx`)
 
 ### Expense Status & Splitting
 
-13. **Is Paid Toggle** - Segmented button to mark expense as paid/not paid (`components/ManageExpense/ExpenseForm.tsx`)
-14. **Is Special Expense Toggle** - Switch to mark expense as special/hidden (`components/ManageExpense/ExpenseForm.tsx`)
-15. **Who Paid Selector** - Select who paid for the expense (`components/ManageExpense/ExpenseForm.tsx`)
-16. **Split Type Selector** - Choose split type (Equal, Exact, Percent, Self) (`components/ManageExpense/ExpenseForm.tsx`)
-17. **Split List Editor** - Edit individual split amounts (`components/ManageExpense/ExpenseForm.tsx`)
-18. **Recalculate Splits Button** - Recalculate split amounts (`components/ManageExpense/ExpenseForm.tsx`)
+14. **Is Paid Toggle** - Segmented button to mark expense as paid/not paid (`components/ManageExpense/ExpenseForm.tsx`)
+15. **Is Special Expense Toggle** - Switch to mark expense as special/hidden (`components/ManageExpense/ExpenseForm.tsx`)
+16. **Who Paid Selector** - Select who paid for the expense (`components/ManageExpense/ExpenseForm.tsx`)
+17. **Split Type Selector** - Choose split type (Equal, Exact, Percent, Self) (`components/ManageExpense/ExpenseForm.tsx`)
+18. **Split List Editor** - Edit individual split amounts (`components/ManageExpense/ExpenseForm.tsx`)
+19. **Recalculate Splits Button** - Recalculate split amounts (`components/ManageExpense/ExpenseForm.tsx`)
 
 ### Expense Actions
 
-19. **Quick Sum Button** - Add current amount to running total (`components/ManageExpense/ExpenseForm.tsx`)
-20. **Show/Hide Advanced Options** - Toggle advanced expense options visibility (`components/ManageExpense/ExpenseForm.tsx`)
+20. **Quick Sum Button** - Add current amount to running total (`components/ManageExpense/ExpenseForm.tsx`)
+21. **Show/Hide Advanced Options** - Toggle advanced expense options visibility (`components/ManageExpense/ExpenseForm.tsx`)
+22. **Template Expense Selection** - Select a template expense from the long press menu (`components/ManageExpense/AddExpenseButton.tsx`)
 
 ## Trip Management (12 features)
 
@@ -153,19 +155,26 @@ This document contains a comprehensive list of all user-facing buttons, switches
 85. **Edit Category Button** - Edit existing category (`screens/ManageCategoryScreen.tsx`)
 86. **Delete Category Button** - Delete custom category (`screens/ManageCategoryScreen.tsx`)
 
-## Bulk Actions (2 features)
+## Bulk Actions (8 features)
 
-87. **Bulk Expense Action** - Perform action on multiple expenses (if implemented)
-88. **Select Multiple Expenses** - Multi-select mode for expenses (if implemented)
+87. **Multi-Select Mode Toggle** - Enable/disable multi-select mode for expenses (`components/ExpensesOutput/ExpensesList.tsx`)
+88. **Select Expense** - Select individual expense in multi-select mode (`components/ExpensesOutput/ExpensesList.tsx`)
+89. **Deselect Expense** - Deselect individual expense in multi-select mode (`components/ExpensesOutput/ExpensesList.tsx`)
+90. **Select All Expenses** - Select all expenses at once (`components/ExpensesOutput/ExpensesList.tsx`)
+91. **Deselect All Expenses** - Deselect all expenses at once (`components/ExpensesOutput/ExpensesList.tsx`)
+92. **Delete Multiple Expenses** - Delete selected expenses (`components/ExpensesOutput/ExpensesList.tsx`)
+93. **Move Multiple Expenses** - Move selected expenses to another trip (`components/ExpensesOutput/ExpensesList.tsx`)
+94. **Filtered Pie Charts with Selected** - Show pie charts for selected expenses (`components/ExpensesOutput/ExpensesList.tsx`)
+95. **Edit Multiple Expenses** - Edit multiple selected expenses (`components/ExpensesOutput/ExpensesList.tsx`)
 
 ## Other Features (2 features)
 
-89. **Onboarding Tour Start** - Start app introduction tour (`screens/ProfileScreen.tsx`)
-90. **Onboarding Tour Skip** - Skip or stop onboarding tour (`screens/ProfileScreen.tsx`)
+96. **Onboarding Tour Start** - Start app introduction tour (`screens/ProfileScreen.tsx`)
+97. **Onboarding Tour Skip** - Skip or stop onboarding tour (`screens/ProfileScreen.tsx`)
 
 ---
 
-**Total Features: 90**
+**Total Features: 99**
 
 ## Notes
 

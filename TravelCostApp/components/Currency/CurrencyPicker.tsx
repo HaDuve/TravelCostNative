@@ -14,6 +14,8 @@ import { en, de, fr, ru } from "../../i18n/supportedLanguages";
 import * as Haptics from "expo-haptics";
 import PropTypes from "prop-types";
 import { getCurrencySymbol } from "../../util/currencySymbol";
+import { trackEvent } from "../../util/vexo-tracking";
+import { VexoEvents } from "../../util/vexo-constants";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
 // i18n.locale = "en";
@@ -81,8 +83,15 @@ const CurrencyPicker = ({
         onClose={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }}
-        onSelectItem={() => {
+        onSelectItem={(item) => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          // Extract currency from the value string
+          const currency = item.value?.split(" | ")[0]?.trim();
+          if (currency) {
+            trackEvent(VexoEvents.CURRENCY_PICKED, {
+              currency: currency,
+            });
+          }
         }}
         onChangeValue={onChangeValue}
         modalContentContainerStyle={{

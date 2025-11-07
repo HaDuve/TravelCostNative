@@ -110,6 +110,8 @@ import { getRate } from "../../util/currencyExchange";
 import { OrientationContext } from "../../store/orientation-context";
 import { callDebounced } from "../Hooks/useDebounce";
 import { NavigationProp } from "@react-navigation/native";
+import { trackEvent } from "../../util/vexo-tracking";
+import { VexoEvents } from "../../util/vexo-constants";
 
 // Modal state machine for cascading flows
 const modalStates = {
@@ -488,6 +490,16 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     const endDateFormat = getFormattedDate(endDate);
     setStartDate(startDateFormat);
     setEndDate(endDateFormat);
+
+    const isRange = startDateFormat !== endDateFormat;
+    trackEvent(
+      isRange ? VexoEvents.DATE_RANGE_PICKED : VexoEvents.DATE_PICKED,
+      {
+        startDate: startDateFormat,
+        endDate: endDateFormat,
+        isRange: isRange,
+      }
+    );
     // no range
     if (startDateFormat === endDateFormat) {
       inputChangedHandler("date", startDateFormat);
@@ -629,8 +641,16 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     // Handle normal string values
     if (value === "__ADD_TRAVELLER__") {
       setWhoPaidWithLogging(userCtx.userName);
+      trackEvent(VexoEvents.WHO_PAID_SELECTED, {
+        whoPaid: userCtx.userName,
+        isNewTraveller: true,
+      });
     } else {
       setWhoPaidWithLogging(value);
+      trackEvent(VexoEvents.WHO_PAID_SELECTED, {
+        whoPaid: value,
+        isNewTraveller: false,
+      });
     }
   };
   const isAndroid = Platform.OS == "android";
@@ -949,6 +969,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   const setSplitTypeWithAutoSave = useCallback(
     (value) => {
       setSplitType(value);
+      trackEvent(VexoEvents.SPLIT_TYPE_SELECTED, {
+        splitType: value,
+      });
       setTimeout(saveDraftData, 0);
     },
     [saveDraftData]
@@ -957,6 +980,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   const setIsPaidWithAutoSave = useCallback(
     (value) => {
       setIsPaid(value);
+      trackEvent(VexoEvents.EXPENSE_PAID_TOGGLE_CHANGED, {
+        isPaid: value === isPaidString.paid,
+      });
       setTimeout(saveDraftData, 0);
     },
     [saveDraftData]
@@ -965,6 +991,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   const setIsSpecialExpenseWithAutoSave = useCallback(
     (value) => {
       setIsSpecialExpense(value);
+      trackEvent(VexoEvents.EXPENSE_SPECIAL_TOGGLE_CHANGED, {
+        isSpecial: value,
+      });
       setTimeout(saveDraftData, 0);
     },
     [saveDraftData]
@@ -1282,11 +1311,11 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   function toggleAdvancedHandler() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (hideAdvanced) {
-      sethideAdvanced(false);
-    } else {
-      sethideAdvanced(true);
-    }
+    const newState = !hideAdvanced;
+    sethideAdvanced(newState);
+    trackEvent(VexoEvents.ADVANCED_OPTIONS_TOGGLED, {
+      showAdvanced: newState,
+    });
   }
 
   function handleRecalculationSplits() {
@@ -1301,6 +1330,11 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         +amountValue
       );
       setSplitListValid(isValidSplit);
+      trackEvent(VexoEvents.SPLITS_RECALCULATED, {
+        splitType: splitType,
+        amount: +amountValue,
+        isValid: isValidSplit,
+      });
       if (!isValidSplit) {
         Alert.alert(i18n.t("sorry"), i18n.t("sorrySplitList"));
       }
@@ -1388,6 +1422,12 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   const askChatGPTHandler = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    trackEvent(VexoEvents.GET_LOCAL_PRICE_PRESSED, {
+      price: amountValue,
+      currency: inputs.currency.value,
+      country: inputs.country.value,
+      product: inputs.description.value,
+    });
     navigation.navigate("GPTDeal", {
       price: amountValue,
       currency: inputs.currency.value,
@@ -1534,11 +1574,20 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       // console.log("_tempAmount:", _tempAmount);
       setTempAmount(newAmount.toFixed(2));
       inputChangedHandler("amount", "");
+      trackEvent(VexoEvents.QUICK_SUM_PRESSED, {
+        action: "add",
+        amount: inputs.amount.value,
+        total: newAmount.toFixed(2),
+      });
     } else if (tempAmount) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       const _tempAmount = +tempAmount;
       inputChangedHandler("amount", _tempAmount.toFixed(2));
       setTempAmount("");
+      trackEvent(VexoEvents.QUICK_SUM_PRESSED, {
+        action: "restore",
+        amount: _tempAmount.toFixed(2),
+      });
     }
   };
   return (

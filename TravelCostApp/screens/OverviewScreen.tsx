@@ -55,6 +55,8 @@ import { OnboardingFlags } from "../types/onboarding";
 import { refreshWithToast } from "../util/refreshWithToast";
 import { getOfflineQueue } from "../util/offline-queue";
 import { AuthContext } from "../store/auth-context";
+import { trackEvent } from "../util/vexo-tracking";
+import { VexoEvents } from "../util/vexo-constants";
 
 const OverviewScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
@@ -75,7 +77,11 @@ const OverviewScreen = ({ navigation }) => {
 
   async function toggleContent() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    userCtx.setIsShowingGraph(!userCtx.isShowingGraph);
+    const newState = !userCtx.isShowingGraph;
+    userCtx.setIsShowingGraph(newState);
+    trackEvent(VexoEvents.GRAPH_CHART_VIEW_TOGGLED, {
+      showGraph: newState,
+    });
   }
   const [offlineString, setOfflineString] = useState("");
   const PeriodValue = userCtx.periodName;
@@ -147,6 +153,9 @@ const OverviewScreen = ({ navigation }) => {
   ]);
 
   const onRefresh = useCallback(async () => {
+    // Track refresh
+    trackEvent(VexoEvents.EXPENSES_REFRESHED);
+
     // check if we have a offline queue
     const offlineQueue = await getOfflineQueue();
     // if we have a offline queue return
@@ -221,10 +230,15 @@ const OverviewScreen = ({ navigation }) => {
           onClose={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}
-          onSelectItem={() => {
+          onSelectItem={(item) => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            trackEvent(VexoEvents.PERIOD_SELECTOR_CHANGED, {
+          period: item.value,
+        });
           }}
-          setValue={userCtx.setPeriodString}
+          setValue={(callback) => {
+            userCtx.setPeriodString(callback(PeriodValue));
+          }}
           setItems={setItems}
           containerStyle={styles.dropdownContainer}
           dropDownContainerStyle={styles.dropdownContainerDropdown}

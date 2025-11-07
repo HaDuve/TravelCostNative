@@ -47,6 +47,8 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
 import { safelyParseJSON } from "../../util/jsonParse";
+import { trackEvent } from "../../util/vexo-tracking";
+import { VexoEvents } from "../../util/vexo-constants";
 
 const PageLength = 20;
 
@@ -117,6 +119,14 @@ const AddExpenseButton = ({ navigation }) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setLongPressed(false);
       setLastExpensesNumber(PageLength);
+
+      // Track template expense selection
+      trackEvent(VexoEvents.TEMPLATE_EXPENSE_SELECTED, {
+        templateDescription: data.description,
+        templateCategory: data.category,
+        templateCurrency: data.currency,
+      });
+
       // set date to today
       data.date = new Date().toISOString();
       data.startDate = new Date().toISOString();
@@ -222,6 +232,12 @@ const AddExpenseButton = ({ navigation }) => {
         } else {
           // If valid, proceed
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+          // Track add expense button press
+          trackEvent(VexoEvents.ADD_EXPENSE_BUTTON_PRESSED, {
+            skipCategoryScreen: skipCatScreen,
+          });
+
           skipCatScreen &&
             navigation.navigate("ManageExpense", {
               pickedCat: "undefined",
@@ -379,6 +395,12 @@ const AddExpenseButton = ({ navigation }) => {
           position.value = withSpring(0, { duration: 300 });
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           setLongPressed(true);
+
+          // Track long press to show template expenses
+          trackEvent(VexoEvents.ADD_EXPENSE_BUTTON_LONGPRESS, {
+            hasTemplates: lastExpenses && lastExpenses.length > 0,
+            templatesCount: lastExpenses?.length || 0,
+          });
         }}
       >
         <Ionicons

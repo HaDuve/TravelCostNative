@@ -63,6 +63,8 @@ import { TripAsObject } from "../../screens/TripSummaryScreen";
 import { Pressable } from "react-native";
 import safeLogError from "../../util/error";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
+import { trackEvent } from "../../util/vexo-tracking";
+import { VexoEvents } from "../../util/vexo-constants";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -513,8 +515,16 @@ function ExpensesList({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (selected.includes(item)) {
       setSelected(selected.filter((newItem) => newItem !== item));
+      trackEvent(VexoEvents.EXPENSE_DESELECTED, {
+        expenseId: item,
+        totalSelected: selected.length - 1,
+      });
     } else {
       setSelected([...selected, item]);
+      trackEvent(VexoEvents.EXPENSE_SELECTED, {
+        expenseId: item,
+        totalSelected: selected.length + 1,
+      });
     }
     // console.log("selected", selected);
   };
@@ -526,8 +536,14 @@ function ExpensesList({
     requestAnimationFrame(() => {
       if (selected?.length === filteredExpenses?.length) {
         setSelected([]);
+        trackEvent(VexoEvents.DESELECT_ALL_EXPENSES_PRESSED, {
+          totalExpenses: filteredExpenses.length,
+        });
       } else {
         setSelected(filteredExpenses.map((item) => item.id));
+        trackEvent(VexoEvents.SELECT_ALL_EXPENSES_PRESSED, {
+          totalExpenses: filteredExpenses.length,
+        });
       }
     });
   }, [expenses?.length, selected?.length]);
@@ -538,6 +554,13 @@ function ExpensesList({
     const finderExpenses = expenses.filter(
       (item) => selected.includes(item.id) && !item.id.includes("shadow")
     );
+
+    // Track filtered pie charts with selected expenses
+    trackEvent(VexoEvents.FILTERED_PIE_CHARTS_WITH_SELECTED_PRESSED, {
+      selectedCount: finderExpenses.length,
+      periodName: periodName,
+    });
+
     navigation.navigate("FilteredPieCharts", {
       expenses: finderExpenses,
       dayString: `${finderExpenses?.length} selected Expenses from ${periodName}`,
@@ -567,6 +590,12 @@ function ExpensesList({
 
   const handleEditMultipleExpenses = useCallback(async () => {
     if (!selected || selected.length === 0) return;
+
+    // Track edit multiple expenses
+    trackEvent(VexoEvents.EDIT_MULTIPLE_EXPENSES_PRESSED, {
+      selectedCount: selected.length,
+    });
+
     if (selected.length === 1) {
       navigation.navigate("ManageExpense", { expenseId: selected[0] });
     }
@@ -633,6 +662,13 @@ function ExpensesList({
   const moveSelectedToTrip = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (selected?.length === 0) return;
+
+    // Track move multiple expenses
+    trackEvent(VexoEvents.MOVE_MULTIPLE_EXPENSES_PRESSED, {
+      selectedCount: selected.length,
+      availableTrips: allTrips.length,
+    });
+
     const buttonTripList = allTrips.map((trip) => {
       if (trip.tripid === tripID)
         return {
@@ -679,6 +715,10 @@ function ExpensesList({
           text: i18n.t("delete"),
           style: "destructive",
           onPress: async () => {
+            // Track delete multiple expenses
+            trackEvent(VexoEvents.DELETE_MULTIPLE_EXPENSES_PRESSED, {
+              selectedCount: selected.length,
+            });
             try {
               navigation?.popToTop();
               setSelected([]);
@@ -752,9 +792,15 @@ function ExpensesList({
         setSelectable(false);
         setSelected([]);
         scrollTo(1);
+        trackEvent(VexoEvents.MULTI_SELECT_MODE_TOGGLED, {
+          enabled: false,
+        });
       } else {
         setSelectable(true);
         scrollTo(0);
+        trackEvent(VexoEvents.MULTI_SELECT_MODE_TOGGLED, {
+          enabled: true,
+        });
       }
     });
   }, [scrollTo, selectable]);

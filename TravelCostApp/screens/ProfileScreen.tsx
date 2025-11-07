@@ -51,6 +51,8 @@ import { constantScale, dynamicScale } from "../util/scalingUtil";
 import GetLocalPriceButton from "../components/Settings/GetLocalPriceButton";
 import GradientButton from "../components/UI/GradientButton";
 import safeLogError from "../util/error";
+import { trackEvent } from "../util/vexo-tracking";
+import { VexoEvents } from "../util/vexo-constants";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -221,6 +223,7 @@ const ProfileScreen = ({ navigation }) => {
   }, [emailString, userCtx.userName, isConnected]);
 
   function onSummaryHandler() {
+    trackEvent(VexoEvents.VIEW_TRIP_SUMMARY_PRESSED);
     navigation.navigate("TripSummary");
   }
 
@@ -267,10 +270,12 @@ const ProfileScreen = ({ navigation }) => {
   }, [canStart, userCtx.needsTour]); // 👈 don't miss it!
 
   const handleOnStart = () => {
+    trackEvent(VexoEvents.ONBOARDING_TOUR_STARTED);
     navigation.navigate("RecentExpenses");
     // console.log("start");
   };
   const handleOnStop = () => {
+    trackEvent(VexoEvents.ONBOARDING_TOUR_SKIPPED);
     saveStoppedTour();
     userCtx.setNeedsTour(false);
     setTourIsRunning(false);
@@ -332,7 +337,10 @@ const ProfileScreen = ({ navigation }) => {
         <GradientButton
           style={styles.headerButton}
           buttonStyle={{}}
-          onPress={() => setIsFeedbackModalVisible(true)}
+          onPress={() => {
+            trackEvent(VexoEvents.FEEDBACK_BUTTON_PRESSED);
+            setIsFeedbackModalVisible(true);
+          }}
         >
           {i18n.t("supportFeedbackLabel")}
         </GradientButton>
@@ -358,7 +366,10 @@ const ProfileScreen = ({ navigation }) => {
               onPressOut={null}
               onLongPress={null}
               category={null}
-              onPress={navigation.navigate.bind(this, "ManageTrip")}
+              onPress={() => {
+                trackEvent(VexoEvents.CREATE_TRIP_FROM_PROFILE_PRESSED);
+                navigation.navigate("ManageTrip");
+              }}
             />
           </TourGuideZone>
           {/* </Pressable> */}

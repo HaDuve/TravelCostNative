@@ -33,6 +33,8 @@ import { getMMKVObject, setMMKVObject, setExpenseCat } from "../store/mmkv";
 import { useCallback } from "react";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 import { dynamicScale } from "../util/scalingUtil";
+import { trackEvent } from "../util/vexo-tracking";
+import { VexoEvents } from "../util/vexo-constants";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -141,6 +143,13 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
       await newCatPressHandler();
     } else {
       const selectedCategory = item.cat ?? item.name;
+
+      // Track category selection
+      trackEvent(VexoEvents.CATEGORY_PICKED, {
+        category: selectedCategory,
+        icon: item.icon,
+        hasExpenseId: !!expenseId,
+      });
 
       if (expenseId) {
         // Coming from ManageExpense - store and go back

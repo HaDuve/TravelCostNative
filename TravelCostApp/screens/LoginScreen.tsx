@@ -28,6 +28,8 @@ import {
   setAttributesAsync,
 } from "../components/Premium/PremiumConstants";
 import { NetworkContext } from "../store/network-context";
+import { trackEvent } from "../util/vexo-tracking";
+import { VexoEvents } from "../util/vexo-constants";
 import { secureStoreSetItem } from "../store/secure-storage";
 import { ExpensesContext } from "../store/expenses-context";
 import { setMMKVObject } from "../store/mmkv";
@@ -49,6 +51,11 @@ function LoginScreen() {
   }, [netCtx.isConnected, netCtx.strongConnection]);
 
   async function loginHandler({ email, password }) {
+    // Track login button press
+    trackEvent(VexoEvents.LOGIN_PRESSED, {
+      email: email,
+    });
+
     setIsAuthenticating(true);
     if (!isConnected) {
       Toast.show({

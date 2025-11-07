@@ -68,6 +68,8 @@ import Toast from "react-native-toast-message";
 import { sleep } from "../../util/appState";
 import safeLogError from "../../util/error";
 import { dynamicScale } from "../../util/scalingUtil";
+import { trackEvent } from "../../util/vexo-tracking";
+import { VexoEvents } from "../../util/vexo-constants";
 
 const TripForm = ({ navigation, route }) => {
   const tripCtx = useContext(TripContext);
@@ -272,6 +274,13 @@ const TripForm = ({ navigation, route }) => {
   async function editingTripData(tripData: TripData, setActive = false) {
     try {
       await updateTrip(editedTripId, tripData);
+
+      // Track trip edit
+      trackEvent(VexoEvents.TRIP_EDITED, {
+        tripId: editedTripId,
+        setActive: setActive,
+      });
+
       setLoadingProgress(1);
       if (editedTripId === tripCtx.tripid || setActive) {
         await secureStoreSetItem("currentTripId", editedTripId);
@@ -313,6 +322,15 @@ const TripForm = ({ navigation, route }) => {
       tripData.categories = JSON.stringify(currentCategories);
 
     const tripid = await storeTrip(tripData);
+
+    // Track trip creation
+    trackEvent(VexoEvents.TRIP_CREATED, {
+      tripName: tripData.tripName,
+      tripCurrency: tripData.tripCurrency,
+      hasTotalBudget: !!tripData.totalBudget,
+      hasDailyBudget: !!tripData.dailyBudget,
+      isDynamicDailyBudget: tripData.isDynamicDailyBudget,
+    });
 
     setLoadingProgress(2);
     await putTravelerInTrip(tripid, { userName: userName, uid: uid });
@@ -938,19 +956,24 @@ const TripForm = ({ navigation, route }) => {
           </View>
           {/* Horizontal container */}
           {isEditing && (
-            <GradientButton
-              buttonStyle={{}}
-              style={[
-                styles.button,
-                {
-                  marginVertical: dynamicScale(8, false, 0.5),
-                  marginHorizontal: dynamicScale(24, false, 0.5),
-                },
-              ]}
-              onPress={submitHandler.bind(this, true /* setActive */)}
-            >
-              {i18n.t("setActive")}
-            </GradientButton>
+              <GradientButton
+                buttonStyle={{}}
+                style={[
+                  styles.button,
+                  {
+                    marginVertical: dynamicScale(8, false, 0.5),
+                    marginHorizontal: dynamicScale(24, false, 0.5),
+                  },
+                ]}
+                onPress={() => {
+                  trackEvent(VexoEvents.SET_ACTIVE_TRIP_PRESSED, {
+                    tripId: editedTripId,
+                  });
+                  submitHandler(true /* setActive */);
+                }}
+              >
+                {i18n.t("setActive")}
+              </GradientButton>
           )}
           {/* {isEditing && (
             <GradientButton

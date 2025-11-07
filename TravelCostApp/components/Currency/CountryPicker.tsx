@@ -17,6 +17,8 @@ import PropTypes from "prop-types";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import CountryFlag from "react-native-country-flag";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
+import { trackEvent } from "../../util/vexo-tracking";
+import { VexoEvents } from "../../util/vexo-constants";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale = ((Localization.getLocales()[0]&&Localization.getLocales()[0].languageCode)?Localization.getLocales()[0].languageCode.slice(0,2):'en');
 // i18n.locale = "en";
@@ -87,8 +89,14 @@ const CountryPicker = ({
         onClose={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }}
-        onSelectItem={() => {
+        onSelectItem={(item) => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          // Track country selection
+          if (item.value) {
+            trackEvent(VexoEvents.COUNTRY_PICKED, {
+              country: item.value,
+            });
+          }
         }}
         onChangeValue={onChangeValue}
         modalContentContainerStyle={{

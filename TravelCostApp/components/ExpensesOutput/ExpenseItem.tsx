@@ -32,6 +32,8 @@ import { ExpenseData } from "../../util/expense";
 import { useRef } from "react";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
+import { trackEvent } from "../../util/vexo-tracking";
+import { VexoEvents } from "../../util/vexo-constants";
 const i18n = new I18n({ en, de, fr, ru });
 i18n.locale =
   Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
@@ -147,6 +149,15 @@ function ExpenseItem(props): JSX.Element {
       return;
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    // Track expense item press
+    trackEvent(VexoEvents.EXPENSE_ITEM_PRESSED, {
+      expenseId: id,
+      category: category,
+      currency: currency,
+      country: country,
+    });
+
     navigation.navigate("ManageExpense", {
       expenseId: id,
     });

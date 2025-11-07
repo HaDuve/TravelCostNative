@@ -92,6 +92,13 @@ const FinderScreen = () => {
     setStartDate(startDateFormat);
     setEndDate(endDateFormat);
     setCheckedDate(true);
+
+    const isRange = startDateFormat !== endDateFormat;
+    trackEvent(VexoEvents.DATE_RANGE_SELECTOR_CHANGED, {
+      startDate: startDateFormat,
+      endDate: endDateFormat,
+      isRange: isRange,
+    });
   }, []);
   const datepickerJSX = DatePickerModal({
     showDatePickerRange,
@@ -107,6 +114,11 @@ const FinderScreen = () => {
     setCheckedQuery(true);
     if (query === "") {
       setCheckedQuery(false);
+    } else {
+      // Track search input changes (debounced in real usage)
+      trackEvent(VexoEvents.SEARCH_EXPENSES_INPUT_CHANGED, {
+        queryLength: query.length,
+      });
     }
   };
 
@@ -300,7 +312,11 @@ const FinderScreen = () => {
                   status={checkedQuery ? "checked" : "unchecked"}
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setCheckedQuery(!checkedQuery);
+                    const newValue = !checkedQuery;
+                    setCheckedQuery(newValue);
+                    trackEvent(VexoEvents.SEARCH_QUERY_CHECKBOX_TOGGLED, {
+                      enabled: newValue,
+                    });
                   }}
                 />
               </View>
@@ -341,7 +357,11 @@ const FinderScreen = () => {
                   status={checkedDate ? "checked" : "unchecked"}
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setCheckedDate(!checkedDate);
+                    const newValue = !checkedDate;
+                    setCheckedDate(newValue);
+                    trackEvent(VexoEvents.DATE_FILTER_TOGGLED, {
+                      enabled: newValue,
+                    });
                   }}
                 />
               </View>

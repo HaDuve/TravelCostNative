@@ -47,6 +47,8 @@ import { Pressable, ScrollView } from "react-native";
 import { dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 import safeLogError from "../util/error";
+import { trackEvent } from "../util/vexo-tracking";
+import { VexoEvents } from "../util/vexo-constants";
 
 const SplitSummaryScreen = ({ navigation }) => {
   const {
@@ -176,6 +178,11 @@ const SplitSummaryScreen = ({ navigation }) => {
 
   const handleSimpflifySplits = useCallback(async () => {
     try {
+      // Track simplify splits
+      trackEvent(VexoEvents.SIMPLIFY_SPLITS_PRESSED, {
+        splitsCount: splits?.length || 0,
+      });
+
       if (noSimpleSplits) {
         // Alert.alert("No Splits to Simplify");
         Toast.show({
@@ -288,6 +295,7 @@ const SplitSummaryScreen = ({ navigation }) => {
         <FlatButton
           onPress={async () => {
             if (showSimplify) {
+              trackEvent(VexoEvents.SPLIT_SUMMARY_BACK_PRESSED);
               navigation.goBack();
             } else {
               await getOpenSplits();
@@ -326,7 +334,12 @@ const SplitSummaryScreen = ({ navigation }) => {
                 },
                 {
                   text: "Settle",
-                  onPress: async () => await settleSplitsHandler(),
+                  onPress: async () => {
+                    trackEvent(VexoEvents.SETTLE_ALL_PRESSED, {
+                      splitsCount: splits?.length || 0,
+                    });
+                    await settleSplitsHandler();
+                  },
                 },
               ]
             );

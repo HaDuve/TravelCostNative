@@ -4,6 +4,8 @@ import Purchases, { CustomerInfo } from "react-native-purchases";
 import { ScrollView } from "react-native-gesture-handler";
 import { DateTime } from "luxon";
 import BackButton from "../components/UI/BackButton";
+import { trackEvent } from "../util/vexo-tracking";
+import { VexoEvents } from "../util/vexo-constants";
 import { Card } from "react-native-paper";
 
 //Localization
@@ -24,6 +26,8 @@ const CustomerScreen = () => {
       try {
         const customerInfo = await Purchases.getCustomerInfo();
         setCustomerInfo(customerInfo);
+        // Track customer screen view
+        trackEvent(VexoEvents.CUSTOMER_SCREEN_PRESSED);
         // access latest customerInfo
       } catch (e) {
         // Error fetching customer info

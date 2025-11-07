@@ -46,6 +46,8 @@ import safeLogError from "../../util/error";
 import { getTripData } from "../../util/trip";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { Platform } from "react-native";
+import { trackEvent } from "../../util/vexo-tracking";
+import { VexoEvents } from "../../util/vexo-constants";
 
 export type TripHistoryItemType = {
   tripid: string;
@@ -351,6 +353,10 @@ function TripHistoryItem({ tripid, trips }) {
       Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
       return;
     }
+    trackEvent(VexoEvents.TRIP_LIST_ITEM_PRESSED, {
+      tripId: tripid,
+      isActiveTrip: contextTrip,
+    });
     navigation.navigate("ManageTrip", { tripId: tripid, trips: trips });
   }
 

@@ -78,7 +78,10 @@ const PaywallScreen = ({ navigation }) => {
       {/* <BackButton></BackButton> */}
       <FlatButton
         textStyle={styles.backButtonTextStyle}
-        onPress={() => navigation.pop()}
+        onPress={() => {
+          trackEvent(VexoEvents.PAYWALL_BACK_PRESSED);
+          navigation.pop();
+        }}
       >
         {i18n.t("back")}
       </FlatButton>

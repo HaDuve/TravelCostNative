@@ -17,6 +17,8 @@ import { UserContext } from "../store/user-context";
 import CategoryProgressBar from "../components/ExpensesOutput/ExpenseStatistics/CategoryProgressBar";
 import { GlobalStyles } from "../constants/styles";
 import { ExpensesContext } from "../store/expenses-context";
+import { trackEvent } from "../util/vexo-tracking";
+import { VexoEvents } from "../util/vexo-constants";
 
 const FinancialScreen = () => {
   const navigation = useNavigation();
@@ -68,6 +70,9 @@ const FinancialScreen = () => {
         colors={GlobalStyles.gradientAccentButton}
         darkText
         onPress={async () => {
+          trackEvent(VexoEvents.OPEN_SPLITS_SUMMARY_PRESSED, {
+            tripId: tripCtx.tripid,
+          });
           navigation.navigate("SplitSummary", { tripid: tripCtx.tripid });
         }}
         style={styles.button}

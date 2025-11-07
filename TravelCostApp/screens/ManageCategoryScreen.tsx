@@ -53,6 +53,8 @@ import { getMMKVObject, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
 import { useMemo } from "react";
 import { dynamicScale } from "../util/scalingUtil";
+import { trackEvent } from "../util/vexo-tracking";
+import { VexoEvents } from "../util/vexo-constants";
 
 const ManageCategoryScreen = ({ navigation }) => {
   // defaultCategories minus the last element (-new cat element)
@@ -152,6 +154,13 @@ const ManageCategoryScreen = ({ navigation }) => {
       icon: selectedIconName,
       cat: newCategoryName,
     };
+
+    // Track category creation
+    trackEvent(VexoEvents.CATEGORY_CREATED, {
+      categoryName: newCategoryName,
+      icon: selectedIconName,
+    });
+
     const newCategoryList = [...categoryList, newCategory];
     setCategoryList(newCategoryList);
     setTouched(true);
@@ -163,15 +172,34 @@ const ManageCategoryScreen = ({ navigation }) => {
   };
 
   const handleEditCategory = async (index, newName) => {
+    const oldName = categoryList[index]?.catString;
     const newCategoryList = [...categoryList];
     newCategoryList[index].catString = newName;
     newCategoryList[index].cat = newName;
+
+    // Track category edit (only when name actually changes)
+    if (oldName !== newName) {
+      trackEvent(VexoEvents.CATEGORY_EDITED, {
+        oldName: oldName,
+        newName: newName,
+        icon: categoryList[index]?.icon,
+      });
+    }
+
     setCategoryList(newCategoryList);
     setTouched(true);
     await saveCategoryList(newCategoryList);
   };
 
   const handleDeleteCategory = async (index) => {
+    const deletedCategory = categoryList[index];
+
+    // Track category deletion
+    trackEvent(VexoEvents.CATEGORY_DELETED, {
+      categoryName: deletedCategory?.catString,
+      icon: deletedCategory?.icon,
+    });
+
     const newCategoryList = [...categoryList];
     newCategoryList.splice(index, 1);
     setCategoryList(newCategoryList);

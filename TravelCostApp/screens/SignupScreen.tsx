@@ -47,6 +47,11 @@ function SignupScreen() {
   }, [netCtx.isConnected, netCtx.strongConnection]);
 
   async function signupHandler({ name, email, password }) {
+    // Track signup button press
+    trackEvent(VexoEvents.SIGNUP_PRESSED, {
+      email: email,
+    });
+
     setIsAuthenticating(true);
     const userData: UserData = { userName: name, locale: i18n.locale };
     let { token = "", uid = "" } = {

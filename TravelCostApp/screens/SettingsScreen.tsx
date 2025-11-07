@@ -105,7 +105,7 @@ const SettingsScreen = ({ navigation }) => {
             Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
             return;
           }
-          // console.log("deleteAccountHandler ~ deleteAccountHandler");
+          trackEvent(VexoEvents.DELETE_ACCOUNT_PRESSED);
           authCtx.deleteAccount();
         },
       },
@@ -202,6 +202,7 @@ const SettingsScreen = ({ navigation }) => {
         style={styles.settingsButton}
         buttonStyle={{}}
         onPress={async () => {
+          trackEvent(VexoEvents.RESET_APP_INTRODUCTION_PRESSED);
           await resetTour();
           await reloadApp();
         }}
@@ -226,13 +227,12 @@ const SettingsScreen = ({ navigation }) => {
           }
           // console.log("pressed premium button");
           if (premiumStatus) {
-            // Toast.show({
-            //   type: "success",
-            //   text1: "Premium Nomad", //i18n.t("premiumToastTitle"),
-            //   text2: "You are a premium Nomad already!", //i18n.t("premiumToastText"),
-            // });
+            trackEvent(VexoEvents.CUSTOMER_SCREEN_PRESSED);
             navigation.navigate("Customer");
-          } else navigation.navigate("Paywall");
+          } else {
+            trackEvent(VexoEvents.VIEW_PAYWALL_PRESSED);
+            navigation.navigate("Paywall");
+          }
         }}
       >
         {premiumButtonString}

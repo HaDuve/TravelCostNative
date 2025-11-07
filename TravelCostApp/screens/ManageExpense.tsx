@@ -249,6 +249,9 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   }
 
   function cancelHandler() {
+    trackEvent(VexoEvents.EXPENSE_CANCEL_PRESSED, {
+      isEditing: isEditing,
+    });
     navigation.goBack();
   }
 

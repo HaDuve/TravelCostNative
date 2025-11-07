@@ -19,6 +19,8 @@ import PropTypes from "prop-types";
 import { secureStoreGetItem } from "../../store/secure-storage";
 import safeLogError from "../../util/error";
 import { safelyParseJSON } from "../../util/jsonParse";
+import { trackEvent } from "../../util/vexo-tracking";
+import { VexoEvents } from "../../util/vexo-constants";
 
 const SettingsSection = ({ multiTraveller }) => {
   const { settings, saveSettings } = useContext(SettingsContext);
@@ -41,56 +43,70 @@ const SettingsSection = ({ multiTraveller }) => {
   );
 
   const toggleShowFlags = () => {
-    const newSettings = { ...settings, showFlags: !showFlags };
-    setShowFlags(!showFlags);
+    const newValue = !showFlags;
+    const newSettings = { ...settings, showFlags: newValue };
+    setShowFlags(newValue);
     saveSettings(newSettings);
+    trackEvent(VexoEvents.SHOW_FLAGS_TOGGLE_CHANGED, { enabled: newValue });
   };
 
   const toggleShowWhoPaid = () => {
-    const newSettings = { ...settings, showWhoPaid: !showWhoPaid };
-    setShowWhoPaid(!showWhoPaid);
+    const newValue = !showWhoPaid;
+    const newSettings = { ...settings, showWhoPaid: newValue };
+    setShowWhoPaid(newValue);
     saveSettings(newSettings);
+    trackEvent(VexoEvents.SHOW_WHO_PAID_TOGGLE_CHANGED, { enabled: newValue });
   };
 
   const toggleAlwaysShowAdvanced = () => {
+    const newValue = !alwaysShowAdvanced;
     const newSettings = {
       ...settings,
-      alwaysShowAdvanced: !alwaysShowAdvanced,
+      alwaysShowAdvanced: newValue,
     };
-    setAlwaysShowAdvanced(!alwaysShowAdvanced);
+    setAlwaysShowAdvanced(newValue);
     saveSettings(newSettings);
+    trackEvent(VexoEvents.ALWAYS_SHOW_ADVANCED_TOGGLE_CHANGED, { enabled: newValue });
   };
   const toggleSkipCategoryPickScreen = () => {
+    const newValue = !skipCategoryPickScreen;
     const newSettings = {
       ...settings,
-      skipCategoryScreen: !skipCategoryPickScreen,
+      skipCategoryScreen: newValue,
     };
-    setSkipCategoryPickScreen(!skipCategoryPickScreen);
+    setSkipCategoryPickScreen(newValue);
     saveSettings(newSettings);
+    trackEvent(VexoEvents.SKIP_CATEGORY_SCREEN_TOGGLE_CHANGED, { enabled: newValue });
   };
   const toggleShowInternetSpeed = () => {
+    const newValue = !showInternetSpeed;
     const newSettings = {
       ...settings,
-      showInternetSpeed: !showInternetSpeed,
+      showInternetSpeed: newValue,
     };
-    setShowInternetSpeed(!showInternetSpeed);
+    setShowInternetSpeed(newValue);
     saveSettings(newSettings);
+    trackEvent(VexoEvents.SHOW_INTERNET_SPEED_TOGGLE_CHANGED, { enabled: newValue });
   };
   const toggleHideSpecialExpenses = () => {
+    const newValue = !hideSpecialExpenses;
     const newSettings = {
       ...settings,
-      hideSpecialExpenses: !hideSpecialExpenses,
+      hideSpecialExpenses: newValue,
     };
-    setHideSpecialExpenses(!hideSpecialExpenses);
+    setHideSpecialExpenses(newValue);
     saveSettings(newSettings);
+    trackEvent(VexoEvents.HIDE_SPECIAL_EXPENSES_TOGGLE_CHANGED, { enabled: newValue });
   };
   const toggleDisableNumberAnimations = () => {
+    const newValue = !disableNumberAnimations;
     const newSettings = {
       ...settings,
-      disableNumberAnimations: !disableNumberAnimations,
+      disableNumberAnimations: newValue,
     };
-    setDisableNumberAnimations(!disableNumberAnimations);
+    setDisableNumberAnimations(newValue);
     saveSettings(newSettings);
+    trackEvent(VexoEvents.DISABLE_NUMBER_ANIMATIONS_TOGGLE_CHANGED, { enabled: newValue });
   };
   return (
     <View>

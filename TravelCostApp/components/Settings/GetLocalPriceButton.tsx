@@ -17,6 +17,8 @@ import { dynamicScale } from "../../util/scalingUtil";
 import GradientButton from "../UI/GradientButton";
 import FlatButton from "../UI/FlatButton";
 import PropTypes from "prop-types";
+import { trackEvent } from "../../util/vexo-tracking";
+import { VexoEvents } from "../../util/vexo-constants";
 
 //Localization
 import * as Localization from "expo-localization";
@@ -51,6 +53,13 @@ const GetLocalPriceButton = ({ navigation, style }) => {
       Alert.alert(i18n.t("alertError"), i18n.t("getLocalPriceError"));
       return;
     }
+
+    // Track get local price from profile
+    trackEvent(VexoEvents.GET_LOCAL_PRICE_PROFILE_PRESSED, {
+      product: productInput.trim(),
+      currency: userCtx.lastCurrency || tripCtx.tripCurrency || "EUR",
+      country: userCtx.lastCountry || "Germany",
+    });
 
     setShowLocalPriceModal(false);
     navigation.navigate("GPTDeal", {

@@ -25,6 +25,8 @@ import { UserContext } from "../../store/user-context";
 import FlatButton from "../UI/FlatButton";
 import PropTypes from "prop-types";
 import { shouldShowOnboarding } from "../Rating/firstStartUtil";
+import { trackEvent } from "../../util/vexo-tracking";
+import { VexoEvents } from "../../util/vexo-constants";
 
 const BlurPremium = ({ canBack = false }) => {
   const netCtx = useContext(NetworkContext);
@@ -111,6 +113,7 @@ const BlurPremium = ({ canBack = false }) => {
                   );
                   return;
                 }
+                trackEvent(VexoEvents.PREMIUM_BLUR_CARD_PRESSED);
                 navigation.navigate("Paywall");
               }}
             >

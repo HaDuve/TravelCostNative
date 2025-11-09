@@ -17,6 +17,7 @@ import { i18n } from "../i18n/i18n";
 
 import { ScrollView } from "react-native-gesture-handler";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import LinkingButton from "../components/UI/LinkButton";
 import { DEVELOPER_MODE } from "../confAppConstants";
 import { useFocusEffect } from "@react-navigation/native";
@@ -47,6 +48,7 @@ const SettingsScreen = ({ navigation }) => {
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
   const isConnected = netCtx.isConnected;
+  const GlobalStyles = useGlobalStyles();
   const [isRestoringPurchases, setIsRestoringPurchases] = useState(false);
   const multiTraveller =
     (tripCtx.travellers && tripCtx.travellers?.length > 1) ?? false;

@@ -71,6 +71,7 @@ import { loadTourConfig } from "./util/tourUtil";
 import { loadKeys, Keys } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
 import { SettingsProvider } from "./store/settings-context";
+import { ThemeProvider, useTheme } from "./store/theme-context";
 import { UserData } from "./store/user-context";
 import FilteredPieCharts from "./screens/FilteredPieCharts";
 import {
@@ -124,6 +125,7 @@ function BottomInset({ color }: { color: string }) {
 // SafeAreaWrapper component that handles safe area insets properly
 function SafeAreaWrapper({ children }: { children: React.ReactNode }) {
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
 
   return (
     <View
@@ -133,18 +135,42 @@ function SafeAreaWrapper({ children }: { children: React.ReactNode }) {
         // Do not set paddingBottom here so we can paint it with a custom color
         paddingLeft: insets.left,
         paddingRight: insets.right,
-        backgroundColor: GlobalStyles.colors.backgroundColor,
+        backgroundColor: theme.colors.backgroundColor,
       }}
     >
       {children}
       {/* Color only the bottom inset to match the BottomTabBar */}
-      <BottomInset color={GlobalStyles.colors.gray500} />
+      <BottomInset color={theme.colors.gray500} />
+    </View>
+  );
+}
+
+// StatusBarWrapper component that respects theme
+function StatusBarWrapper() {
+  const { isDark } = useTheme();
+  return <StatusBar style={isDark ? "light" : "dark"} />;
+}
+
+// ThemeFallback component for NavigationContainer fallback
+function ThemeFallback() {
+  const { theme } = useTheme();
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: theme.colors.backgroundColor,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <LoadingOverlay></LoadingOverlay>
     </View>
   );
 }
 function NotAuthenticatedStack() {
   const [needOnboarding, setNeedOnboarding] = useState(false);
   const navigation = useNavigation();
+  const { theme } = useTheme();
   useEffect(() => {
     async function checkOnboarding() {
       const need = await shouldShowOnboarding();
@@ -157,9 +183,9 @@ function NotAuthenticatedStack() {
   return (
     <AuthStack.Navigator
       screenOptions={{
-        headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
-        headerTintColor: GlobalStyles.colors.textColor,
-        contentStyle: { backgroundColor: GlobalStyles.colors.backgroundColor },
+        headerStyle: { backgroundColor: theme.colors.primary500 },
+        headerTintColor: theme.colors.textColor,
+        contentStyle: { backgroundColor: theme.colors.backgroundColor },
       }}
     >
       {needOnboarding && (
@@ -185,13 +211,14 @@ function NotAuthenticatedStack() {
 
 function AuthenticatedStack() {
   const navigation = useNavigation();
+  const { theme } = useTheme();
   return (
     <ExpensesContextProvider>
       <>
         <Stack.Navigator
           screenOptions={{
-            headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
-            headerTintColor: GlobalStyles.colors.backgroundColor,
+            headerStyle: { backgroundColor: theme.colors.primary500 },
+            headerTintColor: theme.colors.backgroundColor,
           }}
         >
           <Stack.Screen
@@ -364,16 +391,7 @@ function Navigation() {
     <NavigationContainer
       linking={linking}
       fallback={
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: GlobalStyles.colors.backgroundColor,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <LoadingOverlay></LoadingOverlay>
-        </View>
+        <ThemeFallback />
       }
     >
       {!authCtx.isAuthenticated && <NotAuthenticatedStack />}
@@ -399,22 +417,25 @@ function Home() {
       initialRouteName={FirstScreen}
       backBehavior={"history"}
       tabBarPosition={"bottom"}
-      screenOptions={() => ({
-        headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
-        headerTintColor: GlobalStyles.colors.backgroundColor,
-        tabBarStyle: {
-          backgroundColor: GlobalStyles.colors.gray500,
-          borderTopWidth: dynamicScale(1, false, 0.5),
-          borderTopColor: GlobalStyles.colors.gray600,
-        },
-        tabBarActiveTintColor: GlobalStyles.colors.primary500,
-        tabBarIndicatorStyle: {
-          backgroundColor: GlobalStyles.colors.primary500,
-          borderWidth: dynamicScale(1, true, 0.5),
-          borderColor: GlobalStyles.colors.primary500,
-        },
-        tabBarBounces: true,
-      })}
+      screenOptions={() => {
+        const { theme } = useTheme();
+        return {
+          headerStyle: { backgroundColor: theme.colors.primary500 },
+          headerTintColor: theme.colors.backgroundColor,
+          tabBarStyle: {
+            backgroundColor: theme.colors.gray500,
+            borderTopWidth: dynamicScale(1, false, 0.5),
+            borderTopColor: theme.colors.gray600,
+          },
+          tabBarActiveTintColor: theme.colors.primary500,
+          tabBarIndicatorStyle: {
+            backgroundColor: theme.colors.primary500,
+            borderWidth: dynamicScale(1, true, 0.5),
+            borderColor: theme.colors.primary500,
+          },
+          tabBarBounces: true,
+        };
+      }}
     >
       <BottomTabs.Screen
         name="RecentExpenses"
@@ -946,9 +967,10 @@ export default function App() {
         }}
         onStartShouldSetResponder={handleUnhandledTouches}
       >
-        <SafeAreaWrapper>
-          <StatusBar style="auto" />
-          <AuthContextProvider>
+        <ThemeProvider>
+          <SafeAreaWrapper>
+            <StatusBarWrapper />
+            <AuthContextProvider>
             <NetworkContextProvider>
               <TripContextProvider>
                 <UserContextProvider>
@@ -999,7 +1021,8 @@ export default function App() {
               </TripContextProvider>
             </NetworkContextProvider>
           </AuthContextProvider>
-        </SafeAreaWrapper>
+          </SafeAreaWrapper>
+        </ThemeProvider>
       </View>
     </SafeAreaProvider>
   );

@@ -1,9 +1,10 @@
 import React, { useContext, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Alert, Text } from "react-native";
 
 import { i18n } from "../../i18n/i18n";
 
 import { SettingsContext } from "../../store/settings-context";
+import { useTheme } from "../../store/theme-context";
 import SettingsSwitch from "./SettingsSwitch";
 import PropTypes from "prop-types";
 import { secureStoreGetItem } from "../../store/secure-storage";
@@ -13,9 +14,12 @@ import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 import InfoButton from "./InfoButton";
 import TrafficLightInfoModal from "./TrafficLightInfoModal";
+import { GlobalStyles } from "../../constants/styles";
+import { dynamicScale } from "../../util/scalingUtil";
 
 const SettingsSection = ({ multiTraveller }) => {
   const { settings, saveSettings } = useContext(SettingsContext);
+  const { themeMode, isDark, setThemeMode } = useTheme();
   const [showFlags, setShowFlags] = useState(settings.showFlags);
   const [showWhoPaid, setShowWhoPaid] = useState(settings.showWhoPaid);
   const [alwaysShowAdvanced, setAlwaysShowAdvanced] = useState(
@@ -126,8 +130,56 @@ const SettingsSection = ({ multiTraveller }) => {
       enabled: newValue,
     });
   };
+
+  const toggleColorScheme = () => {
+    // If currently in auto mode, switch to manual (opposite of current effective theme)
+    if (themeMode === "auto") {
+      const newMode = isDark ? "light" : "dark";
+      setThemeMode(newMode);
+      return;
+    }
+
+    // If in manual mode, toggle between light and dark
+    const newMode = isDark ? "light" : "dark";
+    setThemeMode(newMode);
+
+    // Show alert asking if user wants to enable auto mode
+    Alert.alert(
+      i18n.t("colorSchemeAutoPromptTitle"),
+      i18n.t("colorSchemeAutoPromptMessage"),
+      [
+        {
+          text: i18n.t("colorSchemeAutoPromptCancel"),
+          style: "cancel",
+        },
+        {
+          text: i18n.t("colorSchemeAutoPromptEnable"),
+          onPress: () => {
+            setThemeMode("auto");
+          },
+        },
+      ]
+    );
+  };
+
+  const getColorSchemeLabel = () => {
+    if (themeMode === "auto") {
+      return i18n.t("settingsColorSchemeAuto");
+    }
+    return isDark
+      ? i18n.t("settingsColorSchemeDark")
+      : i18n.t("settingsColorSchemeLight");
+  };
+
   return (
     <View>
+      <SettingsSwitch
+        label={getColorSchemeLabel()}
+        style={styles.switchContainer}
+        state={isDark}
+        toggleState={toggleColorScheme}
+        labelStyle={{}}
+      />
       {/* <View style={styles.switchContainer}>
         <Text style={GlobalStyles.secondaryText}>Show Flags icons</Text>
         <Switch onValueChange={toggleShowFlags} value={showFlags} /> */}

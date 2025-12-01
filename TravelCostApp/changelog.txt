@@ -6,6 +6,7 @@ __Newest Changes:
 - Added animated Numbers to Expense Summary
 - Improved local price research (AI + web search)
 - Improved Charts
+- Improved Splitting Expenses
 - Bugfixes and performance improvements
 
 __Other Changes:

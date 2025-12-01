@@ -23,6 +23,7 @@ import { UserContext } from "../store/user-context";
 import { AuthContext } from "../store/auth-context";
 import { TripContext, TripData } from "../store/trip-context";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import Input from "../components/Auth/Input";
 import { i18n } from "../i18n/i18n";
 import { ExpensesContext } from "../store/expenses-context";
@@ -49,6 +50,8 @@ import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 
 const JoinTrip = ({ navigation, route }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   // join Trips via route params (route.params.id -> tripid)
   // or with an invitation link (Input -> joinTripid)
 
@@ -319,7 +322,8 @@ JoinTrip.propTypes = {
   navigation: PropTypes.object,
   route: PropTypes.object,
 };
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   card: {
     flex: 1,
     margin: "5%",

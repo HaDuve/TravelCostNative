@@ -19,8 +19,11 @@ import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
 import { useSwipe } from "../Hooks/useSwipe";
 import { toDayMonthString } from "../../util/date";
+import { useGlobalStyles } from "../../store/theme-context";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const tripCtx = useContext(TripContext);
   const { isPortrait } = useContext(OrientationContext);
   // const periodRangeNumber = useRef(7);
@@ -190,7 +193,8 @@ ExpensesOverview.propTypes = {
   navigation: PropTypes.object.isRequired,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     overflow: "visible",

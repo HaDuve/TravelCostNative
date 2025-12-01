@@ -403,6 +403,7 @@ function Navigation() {
 function Home() {
   const { isShowingGraph, freshlyCreated, hasNewChanges } =
     useContext(UserContext);
+  const { theme } = useTheme();
 
   const FirstScreen = freshlyCreated ? "Profile" : "RecentExpenses";
   const expCtx = useContext(ExpensesContext);
@@ -417,24 +418,21 @@ function Home() {
       initialRouteName={FirstScreen}
       backBehavior={"history"}
       tabBarPosition={"bottom"}
-      screenOptions={() => {
-        const { theme } = useTheme();
-        return {
-          headerStyle: { backgroundColor: theme.colors.primary500 },
-          headerTintColor: theme.colors.backgroundColor,
-          tabBarStyle: {
-            backgroundColor: theme.colors.gray500,
-            borderTopWidth: dynamicScale(1, false, 0.5),
-            borderTopColor: theme.colors.gray600,
-          },
-          tabBarActiveTintColor: theme.colors.primary500,
-          tabBarIndicatorStyle: {
-            backgroundColor: theme.colors.primary500,
-            borderWidth: dynamicScale(1, true, 0.5),
-            borderColor: theme.colors.primary500,
-          },
-          tabBarBounces: true,
-        };
+      screenOptions={{
+        headerStyle: { backgroundColor: theme.colors.primary500 },
+        headerTintColor: theme.colors.backgroundColor,
+        tabBarStyle: {
+          backgroundColor: theme.colors.gray500,
+          borderTopWidth: dynamicScale(1, false, 0.5),
+          borderTopColor: theme.colors.gray600,
+        },
+        tabBarActiveTintColor: theme.colors.primary500,
+        tabBarIndicatorStyle: {
+          backgroundColor: theme.colors.primary500,
+          borderWidth: dynamicScale(1, true, 0.5),
+          borderColor: theme.colors.primary500,
+        },
+        tabBarBounces: true,
       }}
     >
       <BottomTabs.Screen

@@ -6,6 +6,7 @@ import { ENTITLEMENT_ID } from "../Premium/PremiumConstants";
 import { i18n } from "../../i18n/i18n";
 
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import PropTypes from "prop-types";
 import Toast from "react-native-toast-message";
 import Discount from "./Discount";
@@ -14,6 +15,8 @@ import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 
 const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const {
     product: { title, description, priceString, subscriptionPeriod },
   } = purchasePackage;
@@ -142,7 +145,8 @@ PackageItem.propTypes = {
   navigation: PropTypes.object.isRequired,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     justifyContent: "space-between",
     alignItems: "center",

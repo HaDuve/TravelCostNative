@@ -4,6 +4,7 @@ import { useContext } from "react";
 import { dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import { getCatLocalized } from "../../util/category";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 
@@ -19,6 +20,7 @@ const CategoryChart = React.memo(
     inputData: CategoryData[];
     tripCurrency: string;
   }) => {
+    const GlobalStyles = useGlobalStyles();
     const { isPortrait } = useContext(OrientationContext);
 
     const { width, height } = ChartController.getChartDimensions(isPortrait);

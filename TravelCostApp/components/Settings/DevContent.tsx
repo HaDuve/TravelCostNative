@@ -15,6 +15,7 @@ import { TripContext } from "../../store/trip-context";
 import { NetworkContext } from "../../store/network-context";
 import { UserContext } from "../../store/user-context";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import { storeExpoPushTokenInTrip } from "../../util/http";
 import { ExpoPushToken } from "expo-notifications";
 import safeLogError from "../../util/error";
@@ -23,6 +24,8 @@ import { showBanner } from "../UI/ToastComponent";
 import { OnboardingFlags } from "../../types/onboarding";
 
 const DevContent = ({ navigation }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const authCtx = useContext(AuthContext);
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
@@ -189,7 +192,8 @@ const DevContent = ({ navigation }) => {
 
 export default DevContent;
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   titleContainer: {
     flexDirection: "row",
     justifyContent: "space-between",

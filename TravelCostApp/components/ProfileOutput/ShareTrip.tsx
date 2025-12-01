@@ -14,6 +14,7 @@ import PropTypes from "prop-types";
 import safeLogError from "../../util/error";
 import { loadKeys } from "../Premium/PremiumConstants";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import GradientButton from "../UI/GradientButton";
 import IconButton from "../UI/IconButton";
 import { dynamicScale } from "../../util/scalingUtil";
@@ -51,6 +52,8 @@ export async function onShare(shareId, navigation) {
 }
 
 const ShareTripButton = ({ route, navigation }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const shareId = route.params?.tripId;
 
   return (
@@ -98,7 +101,8 @@ ShareTripButton.propTypes = {
   navigation: PropTypes.object.isRequired,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,

@@ -2,15 +2,17 @@ import { StyleSheet, Text, View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 
 import React from "react";
-import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 
 import { i18n } from "../../i18n/i18n";
 import PropTypes from "prop-types";
 import { dynamicScale } from "../../util/scalingUtil";
 
-const loadingColor = GlobalStyles.colors.primaryGrayed;
 const LoadingOverlay = (props) => {
   const { containerStyle, customText, noText, size = "large" } = props;
+  const GlobalStyles = useGlobalStyles();
+  const loadingColor = GlobalStyles.colors.primaryGrayed;
+  const styles = getStyles(GlobalStyles, loadingColor);
   const string =
     customText && customText?.length > 0
       ? customText
@@ -32,19 +34,20 @@ LoadingOverlay.propTypes = {
   size: PropTypes.string,
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: dynamicScale(12),
-    marginTop: dynamicScale(4, true),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-  },
-  text: {
-    color: loadingColor,
-    fontSize: dynamicScale(18, false, 0.5),
-    fontWeight: "300",
-    marginTop: dynamicScale(12, true),
-  },
-});
+const getStyles = (GlobalStyles, loadingColor) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: dynamicScale(12),
+      marginTop: dynamicScale(4, true),
+      backgroundColor: GlobalStyles.colors.backgroundColor,
+    },
+    text: {
+      color: loadingColor,
+      fontSize: dynamicScale(18, false, 0.5),
+      fontWeight: "300",
+      marginTop: dynamicScale(12, true),
+    },
+  });

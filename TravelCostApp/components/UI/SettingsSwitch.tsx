@@ -1,10 +1,19 @@
 import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import React from "react";
 import PropTypes from "prop-types";
-import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import { dynamicScale } from "../../util/scalingUtil";
 
-const SettingsSwitch = ({ style, toggleState, state, label, labelStyle, infoButton }) => {
+const SettingsSwitch = ({
+  style,
+  toggleState,
+  state,
+  label,
+  labelStyle,
+  infoButton,
+}) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   return (
     <Pressable onPress={() => toggleState()} style={[styles.container, style]}>
       <View style={{ flex: 1 }}>
@@ -12,7 +21,7 @@ const SettingsSwitch = ({ style, toggleState, state, label, labelStyle, infoButt
           style={[
             {
               fontSize: dynamicScale(14, false, 0.5),
-              color: "#626262",
+              color: GlobalStyles.colors.gray700,
               fontWeight: "300",
             },
             labelStyle,
@@ -58,20 +67,21 @@ SettingsSwitch.defaultProps = {
   infoButton: null,
 };
 
-const styles = StyleSheet.create({
-  container: {
-    width: "90%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: "4%",
-    borderBottomWidth: 1,
-    borderBottomColor: GlobalStyles.colors.gray500,
-    marginBottom: "2%",
-  },
-  label: {
-    color: GlobalStyles.colors.textColor,
-    fontSize: dynamicScale(16, false, 0.5),
-    marginBottom: dynamicScale(16, true),
-  },
-});
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
+    container: {
+      width: "90%",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: "4%",
+      borderBottomWidth: 1,
+      borderBottomColor: GlobalStyles.colors.gray500,
+      marginBottom: "2%",
+    },
+    label: {
+      color: GlobalStyles.colors.textColor,
+      fontSize: dynamicScale(16, false, 0.5),
+      marginBottom: dynamicScale(16, true),
+    },
+  });

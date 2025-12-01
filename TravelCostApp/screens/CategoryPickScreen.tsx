@@ -11,6 +11,7 @@ import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
 import FlatButton from "../components/UI/FlatButton";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 
 import { i18n } from "../i18n/i18n";
 import { fetchCategories } from "../util/http";
@@ -43,6 +44,8 @@ interface CategoryPickScreenProps {
 }
 
 const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const { expenseId } = route.params || {};
 
   const tripCtx = useContext(TripContext);
@@ -258,7 +261,8 @@ CategoryPickScreen.propTypes = {
   route: PropTypes.object,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   pressed: {
     opacity: 0.4,
   },

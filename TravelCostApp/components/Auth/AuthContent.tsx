@@ -17,16 +17,16 @@ import { useNavigation } from "@react-navigation/native";
 
 import FlatButton from "../UI/FlatButton";
 import AuthForm from "./AuthForm";
-import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import PropTypes from "prop-types";
-import {
-  dynamicScale,
-} from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 
 function AuthContent({ isLogin, onAuthenticate, isConnected }) {
   const navigation = useNavigation();
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
 
   const [credentialsInvalid, setCredentialsInvalid] = useState({
     name: false,
@@ -120,46 +120,47 @@ AuthContent.propTypes = {
   isConnected: PropTypes.bool,
 };
 
-const styles = StyleSheet.create({
-  container: {
-    // flex: 1,
-    // backgroundColor: GlobalStyles.colors.backgroundColor,
-  },
-  authContent: {
-    padding: dynamicScale(16),
-    marginTop: dynamicScale(30, true),
-    marginBottom: dynamicScale(20, true),
-    marginHorizontal: dynamicScale(16),
-    ...Platform.select({
-      android: {
-        marginBottom: dynamicScale(60, true),
-      },
-    }),
-    borderRadius: 8,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    ...Platform.select({
-      ios: {
-        shadowColor: GlobalStyles.colors.textColor,
-        shadowOffset: { width: 1, height: 1 },
-        shadowOpacity: 0.35,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 10,
-      },
-    }),
-  },
-  buttons: {
-    flexDirection: i18n.locale !== "en" ? "column" : "row",
-    marginTop: dynamicScale(16, true),
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  secondaryText: {
-    fontSize: dynamicScale(14, false, 0.5),
-    paddingVertical: dynamicScale(8, true),
-    paddingHorizontal: dynamicScale(6),
-    color: GlobalStyles.colors.gray700,
-    fontWeight: "300",
-  },
-});
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
+    container: {
+      // flex: 1,
+      // backgroundColor: GlobalStyles.colors.backgroundColor,
+    },
+    authContent: {
+      padding: dynamicScale(16),
+      marginTop: dynamicScale(30, true),
+      marginBottom: dynamicScale(20, true),
+      marginHorizontal: dynamicScale(16),
+      ...Platform.select({
+        android: {
+          marginBottom: dynamicScale(60, true),
+        },
+      }),
+      borderRadius: 8,
+      backgroundColor: GlobalStyles.colors.backgroundColor,
+      ...Platform.select({
+        ios: {
+          shadowColor: GlobalStyles.colors.textColor,
+          shadowOffset: { width: 1, height: 1 },
+          shadowOpacity: 0.35,
+          shadowRadius: 4,
+        },
+        android: {
+          elevation: 10,
+        },
+      }),
+    },
+    buttons: {
+      flexDirection: i18n.locale !== "en" ? "column" : "row",
+      marginTop: dynamicScale(16, true),
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    secondaryText: {
+      fontSize: dynamicScale(14, false, 0.5),
+      paddingVertical: dynamicScale(8, true),
+      paddingHorizontal: dynamicScale(6),
+      color: GlobalStyles.colors.gray700,
+      fontWeight: "300",
+    },
+  });

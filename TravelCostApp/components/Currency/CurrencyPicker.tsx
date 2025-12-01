@@ -7,6 +7,7 @@ import * as i18nIsoCountries from "i18n-iso-countries";
 import { useState } from "react";
 
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import { i18n } from "../../i18n/i18n";
 import * as Localization from "expo-localization";
 import * as Haptics from "expo-haptics";
@@ -22,6 +23,8 @@ const CurrencyPicker = ({
   placeholder,
   valid = true,
 }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   // Users Device CountryCode CC to translate Country names in picker
   // enforce a language we have registered, otherwise, english
   let CC =
@@ -132,7 +135,8 @@ CurrencyPicker.propTypes = {
   valid: PropTypes.bool,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: { flex: 1, margin: 10 },
   dropDownPickerContainer: {},
   dropDownPicker: {},

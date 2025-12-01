@@ -1,5 +1,6 @@
 import React, { Alert, Pressable, StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import * as Haptics from "expo-haptics";
 import Animated, {
   SlideInDown,
@@ -47,6 +48,8 @@ const AddExpenseButton = ({ navigation }) => {
   const tripCtx = useContext(TripContext);
   const authCtx = useContext(AuthContext);
   const expCtx = useContext(ExpensesContext);
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
 
   // sort last expenses by editedTimestamp timestamp
   const lastExpenses: ExpenseData[] = uniqBy(
@@ -409,7 +412,7 @@ AddExpenseButton.propTypes = {
   navigation: PropTypes.object.isRequired,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) => StyleSheet.create({
   margin: {
     alignSelf: "center",
     justifyContent: "center",

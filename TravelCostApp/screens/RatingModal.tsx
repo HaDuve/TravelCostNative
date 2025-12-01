@@ -17,6 +17,7 @@ import PropTypes from "prop-types";
 import FlatButton from "../components/UI/FlatButton";
 import GradientButton from "../components/UI/GradientButton";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import { secureStoreSetObject } from "../store/secure-storage";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 
@@ -28,6 +29,8 @@ export const neverAskAgain = async () => {
 };
 
 const RatingModal = ({ isModalVisible, setIsModalVisible }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const handleRate = async () => {
     if (StoreReview.isAvailableAsync()) {
       // Request the in-app review
@@ -124,7 +127,8 @@ RatingModal.propTypes = {
   setIsModalVisible: PropTypes.func.isRequired,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   modalStyle: {
     justifyContent: "flex-end",
     marginBottom: dynamicScale(40, true),

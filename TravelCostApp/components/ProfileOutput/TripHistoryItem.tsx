@@ -11,6 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import * as Progress from "react-native-progress";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { TripContext } from "../../store/trip-context";
@@ -58,6 +59,8 @@ export type TripHistoryItemType = {
 };
 
 function TripHistoryItem({ tripid, trips }) {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const expenseCtx = useContext(ExpensesContext);
@@ -515,7 +518,8 @@ TripHistoryItem.propTypes = {
   trips: PropTypes.array,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   pressed: {
     opacity: 0.75,
   },

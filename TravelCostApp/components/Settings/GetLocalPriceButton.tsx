@@ -13,6 +13,7 @@ import { UserContext } from "../../store/user-context";
 import { TripContext } from "../../store/trip-context";
 import { NetworkContext } from "../../store/network-context";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import { dynamicScale } from "../../util/scalingUtil";
 import GradientButton from "../UI/GradientButton";
 import FlatButton from "../UI/FlatButton";
@@ -23,6 +24,8 @@ import { VexoEvents } from "../../util/vexo-constants";
 import { i18n } from "../../i18n/i18n";
 
 const GetLocalPriceButton = ({ navigation, style }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const netCtx = useContext(NetworkContext);
@@ -151,7 +154,8 @@ GetLocalPriceButton.propTypes = {
   style: PropTypes.object,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   settingsButton: {
     marginVertical: "2%",
     marginHorizontal: "8%",

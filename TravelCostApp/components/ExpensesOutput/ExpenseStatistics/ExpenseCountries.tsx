@@ -4,6 +4,7 @@ import * as Haptics from "expo-haptics";
 import React, { useContext } from "react";
 import CategoryProgressBar from "./CategoryProgressBar";
 import { CatColors, GlobalStyles } from "../../../constants/styles";
+import { useGlobalStyles } from "../../../store/theme-context";
 import CategoryChart from "../../ExpensesOverview/CategoryChart";
 import Animated, { Layout } from "react-native-reanimated";
 
@@ -25,6 +26,8 @@ const ExpenseCountries = ({
   navigation,
   forcePortraitFormat = false,
 }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
   const { tripCurrency } = useContext(TripContext);
   const { isPortrait } = useContext(OrientationContext);
@@ -163,7 +166,8 @@ ExpenseCountries.propTypes = {
   forcePortraitFormat: PropTypes.bool,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "row",

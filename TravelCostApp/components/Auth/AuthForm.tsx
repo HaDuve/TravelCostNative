@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, Image } from "react-native";
-import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 
 import { i18n } from "../../i18n/i18n";
 
@@ -11,11 +11,11 @@ import {
   secureStoreGetItem,
   secureStoreSetItem,
 } from "../../store/secure-storage";
-import {
-  dynamicScale,
-} from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 
 function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const [enteredEmail, setEnteredEmail] = useState("");
   const [enteredName, setenteredName] = useState("");
   const [enteredPassword, setEnteredPassword] = useState("");
@@ -238,58 +238,59 @@ AuthForm.propTypes = {
   isConnected: PropTypes.bool,
 };
 
-const styles = StyleSheet.create({
-  form: {
-    flex: 1,
-  },
-  buttons: {
-    marginTop: dynamicScale(12),
-  },
-  iconContainer: {
-    marginTop: dynamicScale(-30, true),
-    marginBottom: dynamicScale(10),
-    alignItems: "center",
-    justifyContent: "center",
-    flex: 1,
-  },
-  titleContainer: {
-    alignItems: "center",
-    justifyContent: "space-around",
-  },
-  titleText: {
-    textAlign: "center",
-    color: GlobalStyles.colors.textColor,
-    fontSize: dynamicScale(28, false, 0.5),
-    fontWeight: "bold",
-    marginBottom: dynamicScale(12),
-  },
-  subTitleText: {
-    textAlign: "center",
-    color: GlobalStyles.colors.gray700,
-    fontSize: dynamicScale(14, false, 0.5),
-    marginBottom: dynamicScale(12),
-  },
-  appleAuthContainer: {
-    marginTop: dynamicScale(16),
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  orText: {
-    fontSize: dynamicScale(12, false, 0.5),
-    fontWeight: "bold",
-    color: GlobalStyles.colors.gray600,
-  },
-  google: {
-    marginTop: dynamicScale(12),
-    margin: dynamicScale(4),
-    padding: dynamicScale(8),
-    paddingHorizontal: dynamicScale(32),
-    borderWidth: 1,
-    borderColor: GlobalStyles.colors.gray500,
-    borderRadius: 8,
-  },
-  googleText: {
-    fontSize: dynamicScale(18, false, 0.5),
-    color: GlobalStyles.colors.textColor,
-  },
-});
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
+    form: {
+      flex: 1,
+    },
+    buttons: {
+      marginTop: dynamicScale(12),
+    },
+    iconContainer: {
+      marginTop: dynamicScale(-30, true),
+      marginBottom: dynamicScale(10),
+      alignItems: "center",
+      justifyContent: "center",
+      flex: 1,
+    },
+    titleContainer: {
+      alignItems: "center",
+      justifyContent: "space-around",
+    },
+    titleText: {
+      textAlign: "center",
+      color: GlobalStyles.colors.textColor,
+      fontSize: dynamicScale(28, false, 0.5),
+      fontWeight: "bold",
+      marginBottom: dynamicScale(12),
+    },
+    subTitleText: {
+      textAlign: "center",
+      color: GlobalStyles.colors.gray700,
+      fontSize: dynamicScale(14, false, 0.5),
+      marginBottom: dynamicScale(12),
+    },
+    appleAuthContainer: {
+      marginTop: dynamicScale(16),
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    orText: {
+      fontSize: dynamicScale(12, false, 0.5),
+      fontWeight: "bold",
+      color: GlobalStyles.colors.gray600,
+    },
+    google: {
+      marginTop: dynamicScale(12),
+      margin: dynamicScale(4),
+      padding: dynamicScale(8),
+      paddingHorizontal: dynamicScale(32),
+      borderWidth: 1,
+      borderColor: GlobalStyles.colors.gray500,
+      borderRadius: 8,
+    },
+    googleText: {
+      fontSize: dynamicScale(18, false, 0.5),
+      color: GlobalStyles.colors.textColor,
+    },
+  });

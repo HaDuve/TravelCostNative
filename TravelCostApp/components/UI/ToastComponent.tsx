@@ -5,7 +5,7 @@ import Toast, {
 } from "react-native-toast-message";
 import React from "react";
 import { StyleSheet, View, FlatList } from "react-native";
-import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import LoadingBarOverlay from "./LoadingBarOverlay";
 import { Text, ViewStyle } from "react-native";
 
@@ -59,7 +59,7 @@ const SIZESTYLES: ViewStyle = {
   maxWidth: MAXWIDTH,
 };
 
-const toastConfig: ToastConfig = {
+const getToastConfig = (GlobalStyles): ToastConfig => ({
   success: (props) => (
     <BaseToast
       {...props}
@@ -185,50 +185,55 @@ const toastConfig: ToastConfig = {
       </View>
     );
   },
-  banner: (props) => (
-    <Pressable
-      onPress={() => {
-        props.onPress();
-      }}
-      style={[styles.bannerContainerContainer, GlobalStyles.wideStrongShadow]}
-    >
-      <BackgroundGradient
-        colors={GlobalStyles.gradientColors}
-        style={[styles.bannerContainer]}
+  banner: (props) => {
+    const styles = getStyles(GlobalStyles);
+    return (
+      <Pressable
+        onPress={() => {
+          props.onPress();
+        }}
+        style={[styles.bannerContainerContainer, GlobalStyles.wideStrongShadow]}
       >
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Pressable
-            onPress={() => {
-              props.onPress();
-            }}
+        <BackgroundGradient
+          colors={GlobalStyles.gradientColors}
+          style={[styles.bannerContainer]}
+        >
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <View style={{ marginBottom: dynamicScale(8, true) }}>
-              <Text style={styles.bannerText1}>{props.text1}</Text>
-            </View>
-            <Text style={styles.bannerText2}>{props.text2}</Text>
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              Toast.hide();
-            }}
-          >
-            <View style={styles.xCloseContainer}>
-              <View style={[styles.xCloseButton, GlobalStyles.strongShadow]}>
-                <Text
-                  style={{
-                    color: GlobalStyles.colors.gray700,
-                    fontSize: dynamicScale(16, false, 0.5),
-                  }}
-                >
-                  X
-                </Text>
+            <Pressable
+              onPress={() => {
+                props.onPress();
+              }}
+            >
+              <View style={{ marginBottom: dynamicScale(8, true) }}>
+                <Text style={styles.bannerText1}>{props.text1}</Text>
               </View>
-            </View>
-          </Pressable>
-        </View>
-      </BackgroundGradient>
-    </Pressable>
-  ),
+              <Text style={styles.bannerText2}>{props.text2}</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                Toast.hide();
+              }}
+            >
+              <View style={styles.xCloseContainer}>
+                <View style={[styles.xCloseButton, GlobalStyles.strongShadow]}>
+                  <Text
+                    style={{
+                      color: GlobalStyles.colors.gray700,
+                      fontSize: dynamicScale(16, false, 0.5),
+                    }}
+                  >
+                    X
+                  </Text>
+                </View>
+              </View>
+            </Pressable>
+          </View>
+        </BackgroundGradient>
+      </Pressable>
+    );
+  },
   budgetOverview: (props) => {
     const toastProps = props.props as BudgetOverviewToastProps;
     const {
@@ -274,6 +279,7 @@ const toastConfig: ToastConfig = {
     };
 
     const trafficLightStatus = getTrafficLightStatus();
+    const styles = getStyles(GlobalStyles);
 
     return (
       <View
@@ -387,7 +393,7 @@ const toastConfig: ToastConfig = {
       </View>
     );
   },
-};
+});
 
 function isCalledToday() {
   const bannerTime = getMMKVString("BannerTime");
@@ -441,6 +447,8 @@ export async function showBanner(
 }
 
 const ToastComponent = () => {
+  const GlobalStyles = useGlobalStyles();
+  const toastConfig = getToastConfig(GlobalStyles);
   return (
     <Toast
       topOffset={dynamicScale(10, true)}
@@ -453,99 +461,100 @@ const ToastComponent = () => {
 
 export default ToastComponent;
 
-const styles = StyleSheet.create({
-  budgetOverviewContainer: {
-    flex: 1,
-    borderColor: GlobalStyles.colors.primaryGrayed,
-    borderWidth: 1,
-    borderRadius: 36,
-    paddingHorizontal: dynamicScale(30),
-    paddingVertical: dynamicScale(12),
-    backgroundColor: GlobalStyles.colors.backgroundColorLight,
-  },
-  budgetOverviewHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  travellerItemContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    minHeight: dynamicScale(40, true),
-    overflow: "visible",
-  },
-  travellerItemProgressBarContainer: {
-    padding: dynamicScale(2),
-    overflow: "visible",
-    zIndex: -1,
-  },
-  sumTextMoveRight: {
-    left: dynamicScale(110),
-    position: "absolute",
-    zIndex: 999,
-  },
-  overviewTextInfo: {
-    fontSize: dynamicScale(12, false, 0.5),
-    fontWeight: "300",
-    color: GlobalStyles.colors.textColor,
-    textAlign: "left",
-    paddingVertical: dynamicScale(8, true),
-  },
-  overviewTextSmall: {
-    fontSize: dynamicScale(16, false, 0.5),
-    fontWeight: "200",
-    color: GlobalStyles.colors.textColor,
-    textAlign: "left",
-    paddingVertical: dynamicScale(4, true),
-  },
-  overViewTextTravellerSum: {
-    fontSize: dynamicScale(16, false, 0.5),
-    fontWeight: "500",
-    color: GlobalStyles.colors.gray300,
-    textAlign: "left",
-    paddingTop: dynamicScale(5, true),
-  },
-  overviewTextTitle: {
-    fontSize: dynamicScale(20, false, 0.5),
-    fontWeight: "500",
-    color: GlobalStyles.colors.textColor,
-    textAlign: "left",
-    paddingVertical: dynamicScale(8, true),
-  },
-  bannerContainerContainer: {
-    borderColor: "black",
-    borderRadius: 999,
-    alignItems: "center",
-  },
-  xCloseContainer: {
-    marginTop: dynamicScale(18, true),
-    marginLeft: dynamicScale(4),
-  },
-  xCloseButton: {
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: "white",
-    padding: dynamicScale(4),
-    backgroundColor: "white",
-  },
-  bannerContainer: {
-    maxWidth: "90%",
-    borderColor: "black",
-    borderRadius: 36,
-    paddingHorizontal: dynamicScale(30),
-    paddingVertical: dynamicScale(12, true),
-  },
-  bannerText1: {
-    fontSize: dynamicScale(18, false, 0.5),
-    fontWeight: "400",
-    color: GlobalStyles.colors.textColor,
-    textAlign: "center",
-  },
-  bannerText2: {
-    fontSize: dynamicScale(16, false, 0.5),
-    fontWeight: "300",
-    color: GlobalStyles.colors.textColor,
-    textAlign: "center",
-  },
-});
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
+    budgetOverviewContainer: {
+      flex: 1,
+      borderColor: GlobalStyles.colors.primaryGrayed,
+      borderWidth: 1,
+      borderRadius: 36,
+      paddingHorizontal: dynamicScale(30),
+      paddingVertical: dynamicScale(12),
+      backgroundColor: GlobalStyles.colors.backgroundColorLight,
+    },
+    budgetOverviewHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    travellerItemContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      minHeight: dynamicScale(40, true),
+      overflow: "visible",
+    },
+    travellerItemProgressBarContainer: {
+      padding: dynamicScale(2),
+      overflow: "visible",
+      zIndex: -1,
+    },
+    sumTextMoveRight: {
+      left: dynamicScale(110),
+      position: "absolute",
+      zIndex: 999,
+    },
+    overviewTextInfo: {
+      fontSize: dynamicScale(12, false, 0.5),
+      fontWeight: "300",
+      color: GlobalStyles.colors.textColor,
+      textAlign: "left",
+      paddingVertical: dynamicScale(8, true),
+    },
+    overviewTextSmall: {
+      fontSize: dynamicScale(16, false, 0.5),
+      fontWeight: "200",
+      color: GlobalStyles.colors.textColor,
+      textAlign: "left",
+      paddingVertical: dynamicScale(4, true),
+    },
+    overViewTextTravellerSum: {
+      fontSize: dynamicScale(16, false, 0.5),
+      fontWeight: "500",
+      color: GlobalStyles.colors.gray300,
+      textAlign: "left",
+      paddingTop: dynamicScale(5, true),
+    },
+    overviewTextTitle: {
+      fontSize: dynamicScale(20, false, 0.5),
+      fontWeight: "500",
+      color: GlobalStyles.colors.textColor,
+      textAlign: "left",
+      paddingVertical: dynamicScale(8, true),
+    },
+    bannerContainerContainer: {
+      borderColor: "black",
+      borderRadius: 999,
+      alignItems: "center",
+    },
+    xCloseContainer: {
+      marginTop: dynamicScale(18, true),
+      marginLeft: dynamicScale(4),
+    },
+    xCloseButton: {
+      borderRadius: 24,
+      borderWidth: 1,
+      borderColor: "white",
+      padding: dynamicScale(4),
+      backgroundColor: "white",
+    },
+    bannerContainer: {
+      maxWidth: "90%",
+      borderColor: "black",
+      borderRadius: 36,
+      paddingHorizontal: dynamicScale(30),
+      paddingVertical: dynamicScale(12, true),
+    },
+    bannerText1: {
+      fontSize: dynamicScale(18, false, 0.5),
+      fontWeight: "400",
+      color: GlobalStyles.colors.textColor,
+      textAlign: "center",
+    },
+    bannerText2: {
+      fontSize: dynamicScale(16, false, 0.5),
+      fontWeight: "300",
+      color: GlobalStyles.colors.textColor,
+      textAlign: "center",
+    },
+  });

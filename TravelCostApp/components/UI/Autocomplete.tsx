@@ -1,10 +1,10 @@
 // Autocomplete/index.js
 
-import { View, Platform } from "react-native";
+import { View } from "react-native";
 import { Menu, TextInput } from "react-native-paper";
 import React, { useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
-import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { dynamicScale } from "../../util/scalingUtil";
 
@@ -24,6 +24,7 @@ const Autocomplete = ({
   const [filteredData, setFilteredData] = useState([]);
   const [blurTimeout, setBlurTimeout] = useState(null);
   const isSelectingRef = useRef(false);
+  const GlobalStyles = useGlobalStyles();
 
   useEffect(() => {
     setValue(origValue);
@@ -70,16 +71,13 @@ const Autocomplete = ({
           if (isSelectingRef.current) {
             return;
           }
-          
-          const timeoutId = setTimeout(
-            () => {
-              // Double-check selection state before hiding
-              if (!isSelectingRef.current) {
-                setMenuVisible(false);
-              }
-            },
-            5000
-          );
+
+          const timeoutId = setTimeout(() => {
+            // Double-check selection state before hiding
+            if (!isSelectingRef.current) {
+              setMenuVisible(false);
+            }
+          }, 5000);
           setBlurTimeout(timeoutId);
         }}
         label={label}
@@ -131,17 +129,17 @@ const Autocomplete = ({
                   onTouchStart={() => {
                     // Handle selection immediately on touch start to bypass keyboard dismiss
                     isSelectingRef.current = true;
-                    
+
                     // Clear any pending blur timeout
                     if (blurTimeout) {
                       clearTimeout(blurTimeout);
                       setBlurTimeout(null);
                     }
-                    
+
                     // Apply the selection immediately
                     origOnChange(autotext);
                     setValue(autotext);
-                    
+
                     // Hide menu after a brief delay to ensure smooth UX
                     setTimeout(() => {
                       setMenuVisible(false);

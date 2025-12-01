@@ -1,6 +1,7 @@
 import React, { StyleSheet, Text, View } from "react-native";
 import * as Progress from "react-native-progress";
 import { GlobalStyles } from "../../../constants/styles";
+import { useGlobalStyles } from "../../../store/theme-context";
 import { Ionicons } from "@expo/vector-icons";
 import {
   Category,
@@ -26,6 +27,8 @@ const CategoryProgressBar = ({
   iconOverride,
   iconJSXOverride,
 }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   const budgetProgress = (catCost / totalCost) * 1;
@@ -111,7 +114,8 @@ CategoryProgressBar.propTypes = {
   iconJSXOverride: PropTypes.element,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     padding: dynamicScale(8),

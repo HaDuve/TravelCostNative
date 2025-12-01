@@ -2,17 +2,18 @@ import { StyleSheet, Text, View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 
 import React from "react";
-import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 
-import { i18n } from "../../i18n/i18n";
 import PropTypes from "prop-types";
 import * as Progress from "react-native-progress";
 import LoadingOverlay from "./LoadingOverlay";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 
-const loadingColor = GlobalStyles.colors.primary500;
-const unfilledColor = GlobalStyles.colors.gray600;
 const LoadingBarOverlay = (props) => {
+  const GlobalStyles = useGlobalStyles();
+  const loadingColor = GlobalStyles.colors.primary500;
+  const unfilledColor = GlobalStyles.colors.gray600;
+  const styles = getStyles(GlobalStyles, loadingColor);
   const {
     containerStyle,
     progressAt,
@@ -84,24 +85,25 @@ LoadingBarOverlay.propTypes = {
   barWidth: PropTypes.number,
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: dynamicScale(5),
-    paddingTop: dynamicScale(5, true),
-    margin: dynamicScale(5),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-  },
-  headerContainer: {
-    alignItems: "center",
-    marginBottom: dynamicScale(5, true),
-  },
-  text: {
-    color: loadingColor,
-    fontSize: dynamicScale(18, false, 0.5),
-    fontWeight: "300",
-    marginTop: dynamicScale(12, true),
-  },
-});
+const getStyles = (GlobalStyles, loadingColor) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: dynamicScale(5),
+      paddingTop: dynamicScale(5, true),
+      margin: dynamicScale(5),
+      backgroundColor: GlobalStyles.colors.backgroundColor,
+    },
+    headerContainer: {
+      alignItems: "center",
+      marginBottom: dynamicScale(5, true),
+    },
+    text: {
+      color: loadingColor,
+      fontSize: dynamicScale(18, false, 0.5),
+      fontWeight: "300",
+      marginTop: dynamicScale(12, true),
+    },
+  });

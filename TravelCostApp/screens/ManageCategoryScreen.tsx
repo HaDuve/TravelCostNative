@@ -20,6 +20,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useContext } from "react";
 import { TripContext } from "../store/trip-context";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import { fetchCategories, updateTrip } from "../util/http";
 import SelectCategoryIcon from "../components/UI/selectCategoryIcon";
 import GradientButton from "../components/UI/GradientButton";
@@ -47,6 +48,8 @@ import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 
 const ManageCategoryScreen = ({ navigation }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   // defaultCategories minus the last element (-new cat element)
   const defaultCategoryList: Category[] = useMemo(
     () => DEFAULTCATEGORIES.slice(0, DEFAULTCATEGORIES?.length - 1),
@@ -585,7 +588,8 @@ ManageCategoryScreen.propTypes = {
   navigation: PropTypes.object.isRequired,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     padding: dynamicScale(16),

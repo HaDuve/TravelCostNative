@@ -1,15 +1,19 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import Button from "./Button";
 import PropTypes from "prop-types";
 
 import { i18n } from "../../i18n/i18n";
 
 const ErrorOverlay = ({ message, onConfirm }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   return (
     <View style={styles.container}>
-      <Text style={[styles.text, styles.title]}>{i18n.t("anErrorOccurred")}</Text>
+      <Text style={[styles.text, styles.title]}>
+        {i18n.t("anErrorOccurred")}
+      </Text>
       <Text style={styles.text}>{message}</Text>
       <Button onPress={onConfirm}>{i18n.t("okay")}</Button>
     </View>
@@ -22,21 +26,22 @@ ErrorOverlay.propTypes = {
   onConfirm: PropTypes.func,
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-  },
-  text: {
-    color: GlobalStyles.colors.textColor,
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-});
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 24,
+      backgroundColor: GlobalStyles.colors.backgroundColor,
+    },
+    text: {
+      color: GlobalStyles.colors.textColor,
+      textAlign: "center",
+      marginBottom: 8,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: "bold",
+    },
+  });

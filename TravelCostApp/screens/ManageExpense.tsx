@@ -9,6 +9,7 @@ import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
 import { touchAllTravelers } from "../util/http";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import { getRate } from "../util/currencyExchange";
 import { daysBetween, getDatePlusDays } from "../util/date";
 import {
@@ -58,6 +59,8 @@ interface ManageExpenseProps {
 export const TEMP_EXPENSE_ID = "TEMP_EXPENSE_ID";
 
 const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const { pickedCat, tempValues, newCat, iconName, dateISO } =
     route.params || {};
   const expenseCtx = useContext(ExpensesContext);
@@ -576,7 +579,8 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
 
 export default ManageExpense;
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
     height: "100%",

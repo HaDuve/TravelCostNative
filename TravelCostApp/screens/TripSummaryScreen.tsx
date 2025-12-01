@@ -15,6 +15,7 @@ import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { Checkbox } from "react-native-paper";
 import { daysBetween, isToday } from "../util/date";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import FlatButton from "../components/UI/FlatButton";
 
 import { i18n } from "../i18n/i18n";
@@ -73,6 +74,8 @@ export type TripsSummary = {
 };
 
 const TripSummaryScreen = ({ navigation }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const expCtx = useContext(ExpensesContext);
@@ -648,7 +651,8 @@ TripSummaryScreen.propTypes = {
   navigation: PropTypes.object,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   titleText: {
     fontSize: dynamicScale(22, false, 0.5),
     fontWeight: "700",

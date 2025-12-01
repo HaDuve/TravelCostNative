@@ -16,6 +16,7 @@ import { ActivityIndicator } from "react-native-paper";
 
 import Purchases from "react-native-purchases";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import PackageItem from "../Premium/PackageItem";
 import BackgroundGradient from "../UI/BackgroundGradient";
 import FlatButton from "../UI/FlatButton";
@@ -28,6 +29,8 @@ import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 
 const PaywallScreen = ({ navigation }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   // - State for all available package
   const [packages, setPackages] = useState([]);
 
@@ -238,7 +241,8 @@ PaywallScreen.propTypes = {
   navigation: PropTypes.object.isRequired,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,

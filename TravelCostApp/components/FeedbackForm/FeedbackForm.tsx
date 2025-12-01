@@ -17,6 +17,7 @@ import PropTypes from "prop-types";
 import GradientButton from "../UI/GradientButton";
 import FlatButton from "../UI/FlatButton";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import { UserContext } from "../../store/user-context";
 import { storeFeedback, FeedbackData } from "../../util/http";
 import { dynamicScale, constantScale } from "../../util/scalingUtil";
@@ -30,6 +31,8 @@ interface FeedbackFormProps {
 }
 
 const FeedbackForm: React.FC<FeedbackFormProps> = ({ isVisible, onClose }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const [feedbackText, setFeedbackText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const userCtx = useContext(UserContext);
@@ -156,7 +159,7 @@ FeedbackForm.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) => StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",

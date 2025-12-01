@@ -15,6 +15,7 @@ import { i18n } from "../i18n/i18n";
 import IconButton from "../components/UI/IconButton";
 import * as Haptics from "expo-haptics";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import { FadeInRight } from "react-native-reanimated";
 import ExpenseCategories from "../components/ExpensesOutput/ExpenseStatistics/ExpenseCategories";
 import ExpenseTravellers from "../components/ExpensesOutput/ExpenseStatistics/ExpenseTravellers";
@@ -30,6 +31,8 @@ import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 
 const FilteredPieCharts = ({ navigation, route }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const { expenses, dayString, noList = false } = route.params;
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
 
@@ -180,7 +183,8 @@ FilteredPieCharts.propTypes = {
   route: PropTypes.object.isRequired,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
   },

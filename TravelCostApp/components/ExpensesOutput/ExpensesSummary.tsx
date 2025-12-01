@@ -1,6 +1,7 @@
 import { Platform, StyleSheet, View } from "react-native";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import * as Progress from "react-native-progress";
 import { TripContext } from "../../store/trip-context";
 
@@ -29,6 +30,8 @@ import {
 } from "../../util/budgetColorHelper";
 
 const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   const expCtx = useContext(ExpensesContext);
@@ -317,7 +320,8 @@ ExpensesSummary.propTypes = {
   style: PropTypes.object,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     maxWidth: "50%",

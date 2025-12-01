@@ -23,6 +23,7 @@ import { fetchTravelerIsTouched } from "../util/http";
 import { StyleSheet, Text, View, RefreshControl } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
 import { DateTime } from "luxon";
 
@@ -50,6 +51,8 @@ import { OrientationContext } from "../store/orientation-context";
 import { refreshWithToast } from "../util/refreshWithToast";
 
 function RecentExpenses({ navigation }) {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const expensesCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const uid = authCtx.uid;
@@ -433,7 +436,8 @@ RecentExpenses.propTypes = {
   navigation: PropTypes.object,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     padding: 0,

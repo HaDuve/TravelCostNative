@@ -3,7 +3,7 @@ import React, { Pressable, StyleSheet, Text, View } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
 
-function FlatButton({ children, onPress, textStyle }) {
+function FlatButton({ children, onPress, textStyle = {} }) {
   return (
     <Pressable
       style={({ pressed }) => [styles.button, pressed && GlobalStyles.pressed]}

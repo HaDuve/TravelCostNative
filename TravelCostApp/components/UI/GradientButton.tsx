@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Pressable, Platform } from "react-native";
 import React from "react";
-import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import PropTypes from "prop-types";
@@ -13,13 +13,16 @@ const GradientButton = ({
   darkText = false,
   textStyle = {},
   style = {},
-  colors = GlobalStyles.gradientPrimaryButton,
+  colors,
 }) => {
+  const GlobalStyles = useGlobalStyles();
+  const gradientColors = colors || GlobalStyles.gradientPrimaryButton;
   const onPressHandler = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onPress();
     return;
   };
+  const styles = getStyles(GlobalStyles);
   return (
     <View style={[style, GlobalStyles.shadowPrimary]}>
       <Pressable
@@ -28,7 +31,7 @@ const GradientButton = ({
       >
         <LinearGradient
           start={{ x: 0.51, y: -1.3 }}
-          colors={colors}
+          colors={gradientColors}
           style={[styles.button, buttonStyle, { overflow: "hidden" }]}
         >
           <Text
@@ -57,41 +60,42 @@ GradientButton.propTypes = {
   colors: PropTypes.array,
 };
 
-const styles = StyleSheet.create({
-  button: {
-    padding: dynamicScale(16, false, 0.5),
-    marginHorizontal: dynamicScale(4),
-    backgroundColor: GlobalStyles.colors.primary500,
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
+    button: {
+      padding: dynamicScale(16, false, 0.5),
+      marginHorizontal: dynamicScale(4),
+      backgroundColor: GlobalStyles.colors.primary500,
 
-    overflow: "visible",
+      overflow: "visible",
 
-    ...Platform.select({
-      ios: {
-        shadowColor: GlobalStyles.colors.textColor,
-        shadowRadius: 3,
-        shadowOffset: { width: 2, height: 2 },
-        shadowOpacity: 0.4,
-        borderRadius: 16,
-      },
-      android: {
-        elevation: 5,
-      },
-    }),
-  },
-  flat: {
-    // TODO: find another way android
-    // backgroundColor: "transparent",
-  },
-  flatText: {
-    color: GlobalStyles.colors.primary200,
-  },
-  pressed: {
-    elevation: 0,
-    transform: [{ scale: 0.9 }],
-    opacity: 0.75,
-    backgroundColor: GlobalStyles.colors.primary100,
-    borderRadius: 16,
-    shadowColor: GlobalStyles.colors.backgroundColor,
-    shadowRadius: 0,
-  },
-});
+      ...Platform.select({
+        ios: {
+          shadowColor: GlobalStyles.colors.textColor,
+          shadowRadius: 3,
+          shadowOffset: { width: 2, height: 2 },
+          shadowOpacity: 0.4,
+          borderRadius: 16,
+        },
+        android: {
+          elevation: 5,
+        },
+      }),
+    },
+    flat: {
+      // TODO: find another way android
+      // backgroundColor: "transparent",
+    },
+    flatText: {
+      color: GlobalStyles.colors.primary200,
+    },
+    pressed: {
+      elevation: 0,
+      transform: [{ scale: 0.9 }],
+      opacity: 0.75,
+      backgroundColor: GlobalStyles.colors.primary100,
+      borderRadius: 16,
+      shadowColor: GlobalStyles.colors.backgroundColor,
+      shadowRadius: 0,
+    },
+  });

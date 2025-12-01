@@ -27,6 +27,7 @@ import { SegmentedButtons } from "react-native-paper";
 import Input from "./Input";
 import { getFormattedDate } from "../../util/date";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import { AuthContext } from "../../store/auth-context";
 import IconButton from "../UI/IconButton";
 import { UserContext } from "../../store/user-context";
@@ -158,6 +159,8 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   const expCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
   const { isPortrait, isTablet } = useContext(OrientationContext);
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const hideSpecial = settings.hideSpecialExpenses;
   const alwaysShowAdvancedSetting = settings.alwaysShowAdvanced || isEditing;
   const editingValues: ExpenseData = defaultValues;
@@ -2406,7 +2409,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
 export default ExpenseForm;
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) => StyleSheet.create({
   container: {
     flex: 1,
     marginBottom: "20%",

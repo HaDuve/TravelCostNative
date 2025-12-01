@@ -9,12 +9,15 @@ import { TripContext } from "../../store/trip-context";
 import { UserContext } from "../../store/user-context";
 import { NetworkContext } from "../../store/network-context";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { getMMKVString } from "../../store/mmkv";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { useNavigation } from "@react-navigation/native";
 
 const CurrencyExchangeInfo = () => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const [currentRate, setCurrentRate] = useState(1);
   const [isFetching, setIsFetching] = useState(false);
   const tripCtx = useContext(TripContext);
@@ -95,7 +98,8 @@ const CurrencyExchangeInfo = () => {
 
 export default CurrencyExchangeInfo;
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   textButton: {
     marginTop: "8%",
     paddingVertical: "2%",

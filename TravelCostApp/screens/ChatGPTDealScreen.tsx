@@ -21,6 +21,7 @@ import {
   GPT_getPrice,
 } from "../util/chatGPTrequest";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import { Image } from "react-native";
 import InfoButton from "../components/UI/InfoButton";
 import { dynamicScale } from "../util/scalingUtil";
@@ -30,6 +31,8 @@ import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 
 const GPTDealScreen = ({ route, navigation }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const { price, currency, country, product } = route.params;
 
   const markdownStyles: MarkdownProps["style"] = {
@@ -375,7 +378,8 @@ GPTDealScreen.propTypes = {
   navigation: PropTypes.object,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,

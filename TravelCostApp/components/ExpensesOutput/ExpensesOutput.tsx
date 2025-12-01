@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, Dimensions } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import ExpensesList from "./ExpensesList";
 import React from "react-native";
 import Animated, { SlideOutLeft } from "react-native-reanimated";
@@ -27,6 +28,8 @@ function ExpensesOutput({
   showSumForTravellerName,
   isFiltered,
 }) {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const { tripName } = useContext(TripContext);
   const [showLoading, setShowLoading] = useState(true);
   const [fallback, setFallback] = useState(true);
@@ -139,7 +142,7 @@ ExpensesOutput.propTypes = {
   isFiltered: PropTypes.bool,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) => StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 0,

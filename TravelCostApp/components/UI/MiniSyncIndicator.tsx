@@ -3,6 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import { dynamicScale } from "../../util/scalingUtil";
 
 interface MiniSyncIndicatorProps {
@@ -14,6 +15,7 @@ const MiniSyncIndicator: React.FC<MiniSyncIndicatorProps> = ({
   isVisible,
   size = 12,
 }) => {
+  const GlobalStyles = useGlobalStyles();
   return (
     <View style={[styles.container, { width: size, height: size }]}>
       {isVisible && (

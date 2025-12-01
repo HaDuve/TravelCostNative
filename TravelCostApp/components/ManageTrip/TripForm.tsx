@@ -3,6 +3,7 @@ import { useState, useContext, useEffect, useLayoutEffect } from "react";
 import { View, Text, Alert, ScrollView, Platform } from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import { AuthContext } from "../../store/auth-context";
 import {
   storeTrip,
@@ -63,6 +64,8 @@ import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 
 const TripForm = ({ navigation, route }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const tripCtx = useContext(TripContext);
   const locales = Localization.getLocales();
   // get the most fitting currency from the list of locales
@@ -996,7 +999,8 @@ TripForm.propTypes = {
   route: PropTypes.object,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   form: {
     // flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,

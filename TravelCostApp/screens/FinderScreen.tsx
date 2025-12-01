@@ -21,6 +21,7 @@ import Autocomplete from "../components/UI/Autocomplete";
 import GradientButton from "../components/UI/GradientButton";
 import IconButton from "../components/UI/IconButton";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import {
   asyncStoreGetItem,
   asyncStoreGetObject,
@@ -39,6 +40,8 @@ import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 
 const FinderScreen = () => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const navigation = useNavigation();
   const expCtx = useContext(ExpensesContext);
   const userCtx = useContext(UserContext);
@@ -415,7 +418,8 @@ const FinderScreen = () => {
 
 export default FinderScreen;
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,

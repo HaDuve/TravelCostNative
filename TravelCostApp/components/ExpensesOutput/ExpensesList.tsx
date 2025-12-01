@@ -14,6 +14,7 @@ import { View } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { GlobalStyles, ListLayoutAnimation } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import { fetchTripName, touchAllTravelers } from "../../util/http";
 import { TripContext } from "../../store/trip-context";
 import { ExpensesContext } from "../../store/expenses-context";
@@ -71,6 +72,8 @@ function ExpensesList({
   refreshControl,
   refreshing,
 }) {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   // GLOBALS across all expenseItems
   let tripID = "";
   // let expenseCtx;
@@ -1013,7 +1016,7 @@ ExpensesList.propTypes = {
   isFiltered: PropTypes.bool,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) => StyleSheet.create({
   scrollToTopButton: {
     flex: 1,
     position: "absolute",

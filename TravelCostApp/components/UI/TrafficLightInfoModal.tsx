@@ -3,11 +3,14 @@ import { View, Text, StyleSheet } from "react-native";
 import Modal from "react-native-modal";
 import { i18n } from "../../i18n/i18n";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import FlatButton from "./FlatButton";
 import { dynamicScale } from "../../util/scalingUtil";
 import PropTypes from "prop-types";
 
 const TrafficLightInfoModal = ({ isVisible, onClose }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   return (
     <Modal
       isVisible={isVisible}
@@ -38,7 +41,8 @@ TrafficLightInfoModal.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   modalStyle: {
     justifyContent: "center",
     alignItems: "center",

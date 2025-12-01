@@ -2,8 +2,11 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 
 const Discount = ({ discountPercentage, style }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   return (
     <View style={[styles.container, style]}>
       <Text style={styles.discountText}>
@@ -20,7 +23,8 @@ Discount.propTypes = {
   style: PropTypes.object,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     borderWidth: 4,
     borderColor: GlobalStyles.colors.cat1,

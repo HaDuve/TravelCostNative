@@ -12,6 +12,7 @@ import {
 } from "../../../util/date";
 import { formatExpenseWithCurrency } from "../../../util/string";
 import { GlobalStyles } from "../../../constants/styles";
+import { useGlobalStyles } from "../../../store/theme-context";
 import ExpenseChart from "../../ExpensesOverview/ExpenseChart";
 
 import { i18n } from "../../../i18n/i18n";
@@ -36,6 +37,8 @@ const ExpenseGraph = ({
   navigation,
   onZoomStateChange,
 }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const today = new Date();
   const renderItemRef = useRef(null);
   const { isPortrait } = useContext(OrientationContext);
@@ -569,7 +572,8 @@ ExpenseGraph.propTypes = {
   onZoomStateChange: PropTypes.func,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     // marginTop: 60,

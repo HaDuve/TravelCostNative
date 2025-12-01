@@ -8,6 +8,7 @@ import React, {
 import { StyleSheet, View } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import PropTypes from "prop-types";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { dynamicScale } from "../../util/scalingUtil";
@@ -52,6 +53,8 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
   onWebViewRef,
   onZoomStateChange,
 }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const { isLandscape } = useContext(OrientationContext);
   const tripCtx = useContext(TripContext);
   const expensesCtx = useContext(ExpensesContext);
@@ -206,7 +209,8 @@ ExpenseChart.propTypes = {
   onZoomStateChange: PropTypes.func,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",

@@ -10,6 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 import PropTypes from "prop-types";
 
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import { isToday, toShortFormat } from "../../util/date";
 import { Ionicons } from "@expo/vector-icons";
 import { Category, getCatSymbolMMKV } from "../../util/category";
@@ -35,6 +36,8 @@ import { VexoEvents } from "../../util/vexo-constants";
 const IconSize = dynamicScale(28, false, 0.5);
 
 function ExpenseItem(props): JSX.Element {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const { showSumForTravellerName, filtered } = props;
   const { setSelectable, selectItem } = props;
   const {
@@ -393,7 +396,7 @@ ExpenseItem.propTypes = {
   setSelectable: PropTypes.func,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) => StyleSheet.create({
   pressed: {
     opacity: 0.75,
   },

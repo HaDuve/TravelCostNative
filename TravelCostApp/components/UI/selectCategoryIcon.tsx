@@ -1,6 +1,7 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import { Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
 import { dynamicScale } from "../../util/scalingUtil";
@@ -10,6 +11,8 @@ const SelectCategoryIcon = ({
   iconName,
   setSelectedIconName,
 }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   return (
     <TouchableOpacity
       style={[
@@ -35,7 +38,8 @@ SelectCategoryIcon.propTypes = {
   setSelectedIconName: PropTypes.func.isRequired,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   iconButton: {
     padding: 4,
     marginHorizontal: 4,

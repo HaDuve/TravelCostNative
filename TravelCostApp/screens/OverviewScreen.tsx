@@ -19,6 +19,7 @@ import {
 } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import { MemoizedExpensesOverview } from "../components/ExpensesOutput/ExpensesOverview";
 import ToggleButton from "../assets/SVG/toggleButton";
 import { TourGuideZone } from "rn-tourguide";
@@ -49,6 +50,8 @@ import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 
 const OverviewScreen = ({ navigation }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const expensesCtx = useContext(ExpensesContext);
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
@@ -308,7 +311,8 @@ OverviewScreen.propTypes = {
   navigation: PropTypes.object.isRequired,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,

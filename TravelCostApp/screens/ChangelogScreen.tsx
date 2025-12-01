@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, ScrollView } from "react-native";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import BackButton from "../components/UI/BackButton";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { getMMKVString, setMMKVString } from "../store/mmkv";
 import { fetchChangelog } from "../util/http";
@@ -18,7 +19,7 @@ import { constantScale } from "../util/scalingUtil";
 
 import { i18n } from "../i18n/i18n";
 
-function renderChangelogItem(item) {
+function renderChangelogItem(item, GlobalStyles, styles) {
   return (
     <View style={[styles.changelogContainer, GlobalStyles.strongShadow]}>
       <Text style={styles.changelogText}>
@@ -30,6 +31,8 @@ function renderChangelogItem(item) {
 }
 
 const ChangelogScreen = ({ navigation }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const { strongConnection } = useContext(NetworkContext);
   const [isFetching, setIsFetching] = useState(true);
   const [changelogText, setChangelogText] = useState("");
@@ -128,7 +131,7 @@ const ChangelogScreen = ({ navigation }) => {
         <Animated.FlatList
           entering={FadeInUp}
           data={parsedNewChanges}
-          renderItem={renderChangelogItem}
+          renderItem={(item) => renderChangelogItem(item, GlobalStyles, styles)}
         ></Animated.FlatList>
       )}
       <Pressable
@@ -148,7 +151,7 @@ const ChangelogScreen = ({ navigation }) => {
         <Animated.FlatList
           entering={FadeInUp}
           data={parsedOldChanges}
-          renderItem={renderChangelogItem}
+          renderItem={(item) => renderChangelogItem(item, GlobalStyles, styles)}
         ></Animated.FlatList>
       )}
       {/* <Pressable
@@ -202,7 +205,8 @@ ChangelogScreen.propTypes = {
   navigation: PropTypes.object,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     padding: "4%",

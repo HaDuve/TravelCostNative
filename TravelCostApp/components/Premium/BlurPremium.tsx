@@ -4,6 +4,7 @@ import { BlurView } from "expo-blur";
 import GradientButton from "../UI/GradientButton";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 
 import { i18n } from "../../i18n/i18n";
 
@@ -19,6 +20,8 @@ import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 
 const BlurPremium = ({ canBack = false }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const netCtx = useContext(NetworkContext);
   const userCtx = useContext(UserContext);
   const [isPremium, setIsPremium] = useState(false);
@@ -132,7 +135,8 @@ BlurPremium.propTypes = {
   canBack: PropTypes.bool,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   titleContainerBlur: {
     flexDirection: "row",
     alignItems: "center",

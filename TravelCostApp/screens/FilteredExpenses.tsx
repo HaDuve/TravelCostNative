@@ -5,6 +5,7 @@ import { i18n } from "../i18n/i18n";
 
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import PropTypes from "prop-types";
 import BackButton from "../components/UI/BackButton";
 import BlurPremium from "../components/Premium/BlurPremium";
@@ -15,6 +16,8 @@ import { getEarliestDate } from "../util/date";
 import { ExpenseData } from "../util/expense";
 
 const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const { expenses, dayString, showSumForTravellerName } = expensesAsArg
     ? {
         expenses: expensesAsArg,
@@ -80,7 +83,8 @@ FilteredExpenses.propTypes = {
   dayStringAsArg: PropTypes.string,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     padding: "1%",

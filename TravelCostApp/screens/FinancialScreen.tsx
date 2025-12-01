@@ -9,11 +9,14 @@ import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../store/user-context";
 import CategoryProgressBar from "../components/ExpensesOutput/ExpenseStatistics/CategoryProgressBar";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import { ExpensesContext } from "../store/expenses-context";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 
 const FinancialScreen = () => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const navigation = useNavigation();
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
@@ -78,7 +81,8 @@ const FinancialScreen = () => {
 
 export default FinancialScreen;
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     marginTop: 20,

@@ -4,10 +4,13 @@ import { i18n } from "../i18n/i18n";
 
 import Onboarding from "react-native-onboarding-swiper";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import PropTypes from "prop-types";
 import { dynamicScale } from "../util/scalingUtil";
 
 const OnboardingScreen = ({ navigation }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   return (
     <Onboarding
       onDone={() => navigation.replace("Signup")}
@@ -51,7 +54,8 @@ OnboardingScreen.propTypes = {
   navigation: PropTypes.object.isRequired,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   titleStyle: {
     paddingHorizontal: dynamicScale(20, false, 0.5),
     marginTop: dynamicScale(-20, false, 0.5),

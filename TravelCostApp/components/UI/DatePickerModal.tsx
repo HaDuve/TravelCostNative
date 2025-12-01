@@ -3,7 +3,7 @@ import * as Localization from "expo-localization";
 import { Platform, View } from "react-native";
 import React, { useContext } from "react";
 import DatePicker from "react-native-neat-date-picker";
-import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import { getLocaleDateFormat } from "../../util/date";
 import { OrientationContext } from "../../store/orientation-context";
 import PropTypes from "prop-types";
@@ -13,6 +13,7 @@ const DatePickerModal = ({
   onCancelRange,
   onConfirmRange,
 }) => {
+  const GlobalStyles = useGlobalStyles();
   const dateStringFormatLocale = getLocaleDateFormat();
   const android = Platform.OS === "android";
   const { height } = useContext(OrientationContext);
@@ -46,10 +47,10 @@ const DatePickerModal = ({
         Localization.getLocales()[0].languageCode
           ? Localization.getLocales()[0].languageCode.slice(0, 2)
           : "en") === "fr"
-          ? Localization.getLocales()[0] &&
+          ? ((Localization.getLocales()[0] &&
             Localization.getLocales()[0].languageCode
-            ? Localization.getLocales()[0].languageCode.slice(0, 2)
-            : "en"
+              ? Localization.getLocales()[0].languageCode.slice(0, 2)
+              : "en") as "de" | "fr" | "en")
           : "en"
       }
     />

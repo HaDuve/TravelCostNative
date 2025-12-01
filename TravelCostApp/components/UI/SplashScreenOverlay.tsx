@@ -2,6 +2,7 @@ import { ImageBackground, ActivityIndicator } from "react-native";
 import { reloadApp } from "../../util/appState";
 import React from "react";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import Animated, {
   FadeOutDown,
   ZoomInDown,
@@ -12,9 +13,10 @@ import FlatButton from "./FlatButton";
 import { asyncStoreSafeClear } from "../../store/async-storage";
 import IconButton from "./IconButton";
 
-const loadingColor = GlobalStyles.colors.backgroundColor;
 const delay = SPLASH_SCREEN_DELAY;
 const SplashScreenOverlay = () => {
+  const GlobalStyles = useGlobalStyles();
+  const loadingColor = GlobalStyles.colors.backgroundColor;
   return (
     <>
       <Animated.View

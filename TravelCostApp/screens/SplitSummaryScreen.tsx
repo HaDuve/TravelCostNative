@@ -21,6 +21,7 @@ import ErrorOverlay from "../components/UI/ErrorOverlay";
 import FlatButton from "../components/UI/FlatButton";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import { TripContext } from "../store/trip-context";
 import {
   areSplitListsEqual,
@@ -44,6 +45,8 @@ import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 
 const SplitSummaryScreen = ({ navigation }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const {
     tripid,
     tripCurrency,
@@ -403,7 +406,8 @@ SplitSummaryScreen.propTypes = {
   navigation: PropTypes.object.isRequired,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     // alignItems: "center",

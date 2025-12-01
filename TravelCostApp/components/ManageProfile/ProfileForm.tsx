@@ -4,6 +4,7 @@ import { useState, useContext, useEffect } from "react";
 import { View, Text, Alert, Pressable } from "react-native";
 import React, { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import { AuthContext } from "../../store/auth-context";
 import { UserContext } from "../../store/user-context";
 import { fetchChangelog } from "../../util/http";
@@ -24,6 +25,8 @@ import { OrientationContext } from "../../store/orientation-context";
 import { dynamicScale } from "../../util/scalingUtil";
 
 const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
@@ -189,7 +192,8 @@ ProfileForm.propTypes = {
   navigation: PropTypes.object,
 };
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   form: {
     flex: 1,
     marginTop: dynamicScale(8, true),

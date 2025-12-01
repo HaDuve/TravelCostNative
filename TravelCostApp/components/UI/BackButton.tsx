@@ -1,6 +1,6 @@
 import { Platform, Pressable } from "react-native";
 import React from "react";
-import { GlobalStyles } from "../../constants/styles";
+import { useGlobalStyles } from "../../store/theme-context";
 import IconButton from "./IconButton";
 import { useNavigation } from "@react-navigation/native";
 import PropTypes from "prop-types";
@@ -9,6 +9,7 @@ import { dynamicScale } from "../../util/scalingUtil";
 
 const BackButton = ({ style }) => {
   const navigation = useNavigation();
+  const GlobalStyles = useGlobalStyles();
   if (Platform.OS === "android") {
     return <></>;
   }

@@ -5,8 +5,8 @@ import {
   Dimensions,
   Animated as RNAnimated,
 } from "react-native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
-import { GlobalStyles } from "../../constants/styles";
+import Animated, { FadeIn } from "react-native-reanimated";
+import { useGlobalStyles } from "../../store/theme-context";
 import { dynamicScale } from "../../util/scalingUtil";
 import {
   CHART_SPACING,
@@ -30,6 +30,8 @@ const ChartSkeleton: React.FC<ChartSkeletonProps> = ({
   height,
   style,
 }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const shimmerAnimation = React.useRef(new RNAnimated.Value(0)).current;
 
   React.useEffect(() => {
@@ -206,89 +208,90 @@ const ChartSkeleton: React.FC<ChartSkeletonProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    position: "relative",
-    overflow: "hidden",
-  },
-  shimmerOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: GlobalStyles.colors.gray300,
-    opacity: 0.3,
-  },
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: GlobalStyles.colors.backgroundColor,
+      position: "relative",
+      overflow: "hidden",
+    },
+    shimmerOverlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: GlobalStyles.colors.gray300,
+      opacity: 0.3,
+    },
 
-  // Bar chart styles
-  yAxis: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    justifyContent: "space-between",
-  },
-  yAxisTick: {
-    flexDirection: "row",
-    alignItems: "center",
-    height: 1,
-  },
-  yAxisLabel: {
-    width: dynamicScale(15),
-    height: dynamicScale(8),
-    backgroundColor: CHART_STYLING.SKELETON_COLORS.TEXT,
-    borderRadius: CHART_STYLING.BORDER_RADIUS.SMALL,
-  },
-  yAxisLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: CHART_STYLING.SKELETON_COLORS.BACKGROUND,
-    marginLeft: 2,
-  },
-  xAxis: {
-    position: "absolute",
-    bottom: 0,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    paddingHorizontal: 10,
-  },
-  xAxisTick: {
-    alignItems: "center",
-  },
-  xAxisLabel: {
-    width: dynamicScale(25),
-    height: dynamicScale(8),
-    backgroundColor: CHART_STYLING.SKELETON_COLORS.TEXT,
-    borderRadius: CHART_STYLING.BORDER_RADIUS.SMALL,
-    marginBottom: 4,
-  },
-  chartArea: {
-    position: "absolute",
-  },
-  gridLine: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    height: 1,
-    backgroundColor: CHART_STYLING.SKELETON_COLORS.BACKGROUND,
-  },
-  bar: {
-    position: "absolute",
-    backgroundColor: CHART_STYLING.SKELETON_COLORS.ELEMENT,
-    borderRadius: CHART_STYLING.BORDER_RADIUS.SMALL,
-  },
+    // Bar chart styles
+    yAxis: {
+      position: "absolute",
+      left: 0,
+      top: 0,
+      justifyContent: "space-between",
+    },
+    yAxisTick: {
+      flexDirection: "row",
+      alignItems: "center",
+      height: 1,
+    },
+    yAxisLabel: {
+      width: dynamicScale(15),
+      height: dynamicScale(8),
+      backgroundColor: CHART_STYLING.SKELETON_COLORS.TEXT,
+      borderRadius: CHART_STYLING.BORDER_RADIUS.SMALL,
+    },
+    yAxisLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: CHART_STYLING.SKELETON_COLORS.BACKGROUND,
+      marginLeft: 2,
+    },
+    xAxis: {
+      position: "absolute",
+      bottom: 0,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-end",
+      paddingHorizontal: 10,
+    },
+    xAxisTick: {
+      alignItems: "center",
+    },
+    xAxisLabel: {
+      width: dynamicScale(25),
+      height: dynamicScale(8),
+      backgroundColor: CHART_STYLING.SKELETON_COLORS.TEXT,
+      borderRadius: CHART_STYLING.BORDER_RADIUS.SMALL,
+      marginBottom: 4,
+    },
+    chartArea: {
+      position: "absolute",
+    },
+    gridLine: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      height: 1,
+      backgroundColor: CHART_STYLING.SKELETON_COLORS.BACKGROUND,
+    },
+    bar: {
+      position: "absolute",
+      backgroundColor: CHART_STYLING.SKELETON_COLORS.ELEMENT,
+      borderRadius: CHART_STYLING.BORDER_RADIUS.SMALL,
+    },
 
-  // Pie chart styles
-  pieContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  pieChart: {
-    backgroundColor: CHART_STYLING.SKELETON_COLORS.ELEMENT,
-  },
-});
+    // Pie chart styles
+    pieContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    pieChart: {
+      backgroundColor: CHART_STYLING.SKELETON_COLORS.ELEMENT,
+    },
+  });
 
 export default ChartSkeleton;

@@ -13,6 +13,7 @@ import TripList from "../components/ProfileOutput/TripList";
 import IconButton from "../components/UI/IconButton";
 import FeedbackForm from "../components/FeedbackForm/FeedbackForm";
 import { GlobalStyles } from "../constants/styles";
+import { useGlobalStyles } from "../store/theme-context";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 
@@ -112,6 +113,8 @@ async function storeToken() {
 }
 
 const ProfileScreen = ({ navigation }) => {
+  const GlobalStyles = useGlobalStyles();
+  const styles = getStyles(GlobalStyles);
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const authCtx = useContext(AuthContext);
@@ -428,7 +431,8 @@ const ProfileScreen = ({ navigation }) => {
 
 export default ProfileScreen;
 
-const styles = StyleSheet.create({
+const getStyles = (GlobalStyles) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     padding: 0,

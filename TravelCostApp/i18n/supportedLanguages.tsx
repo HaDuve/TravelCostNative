@@ -391,7 +391,7 @@ const en = {
     "Changing the splitting of expenses with a range of dates is not yet possible.",
   sorry: "Sorry!",
   sorrySplitList:
-    "I could not calculate a valid split. Please check your input. \n\n You can also long-press the recalculate button to reset all splits!",
+    "I could not calculate a valid split. Please check your input. \n\n You can also press the recalculate button to reset all splits!",
   errorPurchasePackage: "Error purchasing package",
   errorPurchasePackageText: "Please restart the app or try again later.",
   errorGetOffers: "Error getting offers",
@@ -956,7 +956,7 @@ const de = {
     "Das Ändern der Aufteilung von Ausgaben mit einem Datumsbereich ist noch nicht möglich.",
   sorry: "Entschuldigung!",
   sorrySplitList:
-    "Ich konnte keine gültige Aufteilung berechnen. Bitte überprüfe deine Eingabe.\n\n Du kannst auch lange auf die Neuberechnen-Schaltfläche gedrückt halten, um alle Aufteilungen zurückzusetzen!",
+    "Ich konnte keine gültige Aufteilung berechnen. Bitte überprüfe deine Eingabe.\n\n Du kannst auch auf die Neuberechnen-Schaltfläche drücken, um alle Aufteilungen zurückzusetzen!",
   errorPurchasePackage: "Fehler beim Kauf des Pakets",
   errorPurchasePackageText:
     "Bitte starte die App neu oder versuche es später erneut.",
@@ -1527,7 +1527,7 @@ const fr = {
     "Il n'est pas encore possible de modifier la répartition des dépenses avec une plage de dates.",
   sorry: "Désolé !",
   sorrySplitList:
-    "Je n'ai pas pu calculer une répartition valide. Veuillez vérifier vos données. \n\n Vous pouvez également appuyer longuement sur le bouton de recalcul pour réinitialiser toutes les répartitions !",
+    "Je n'ai pas pu calculer une répartition valide. Veuillez vérifier vos données. \n\n Vous pouvez également appuyer sur le bouton de recalcul pour réinitialiser toutes les répartitions !",
   errorPurchasePackage: "Erreur lors de l'achat du package",
   errorPurchasePackageText:
     "Veuillez redémarrer l'application ou réessayer ultérieurement.",
@@ -2095,7 +2095,7 @@ const ru = {
   sorry: "Извините!",
 
   sorrySplitList:
-    'Не удалось рассчитать допустимое разделение. Пожалуйста, проверьте введенные данные. \n\n Также вы можете долго нажать кнопку "Пересчитать", чтобы сбросить все разделения!',
+    'Не удалось рассчитать допустимое разделение. Пожалуйста, проверьте введенные данные. \n\n Также вы можете нажать кнопку "Пересчитать", чтобы сбросить все разделения!',
 
   errorPurchasePackage: "Ошибка при покупке пакета",
 

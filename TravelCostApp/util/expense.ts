@@ -89,6 +89,7 @@ export interface Split {
   amount: number;
   whoPaid?: string;
   rate?: number;
+  editOrder?: number; // 0 = most recent edit, higher = older edits, undefined = never edited
 }
 
 export async function deleteAllExpensesByRangedId(

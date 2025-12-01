@@ -6,116 +6,6 @@ import { getAllExpenses } from "./http";
 import safeLogError from "./error";
 import { safelyParseJSON } from "./jsonParse";
 
-export function recalcSplitsLinearly(splitList: Split[], amount: number) {
-  if (amount == 0) return splitList;
-  // Calculate the total amount and the total split amount
-  const totalAmount = splitList.reduce(
-    (sum, split) => sum + Number(split.amount),
-    0
-  );
-  const totalSplitAmount =
-    splitList?.length > 0 ? totalAmount / splitList?.length : 0;
-
-  // Calculate the rest that needs to be split up
-  const rest = amount - totalAmount;
-
-  // If the rest is zero, return the original split list
-  if (rest === 0) {
-    return splitList;
-  }
-
-  // Calculate the adjustment factor for each split
-  const adjustmentFactor = (totalAmount + rest) / totalAmount;
-
-  // Apply the adjustment factor to each split
-  for (let i = 0; i < splitList?.length; i++) {
-    const split = splitList[i];
-    split.amount = Number(Number(split.amount) * adjustmentFactor).toFixed(2);
-  }
-
-  // If the adjustment resulted in any negative amounts, distribute the difference among all splits
-  const negativeSplits = splitList.filter((split) => Number(split.amount) < 0);
-  if (negativeSplits?.length > 0) {
-    const negativeAmount = negativeSplits.reduce(
-      (sum, split) => sum + Number(split.amount),
-      0
-    );
-    const positiveSplits = splitList.filter(
-      (split) => Number(split.amount) > 0
-    );
-    const positiveAmount = positiveSplits.reduce(
-      (sum, split) => sum + Number(split.amount),
-      0
-    );
-    const adjustmentFactor = (positiveAmount + negativeAmount) / positiveAmount;
-    for (let i = 0; i < splitList?.length; i++) {
-      const split = splitList[i];
-      if (Number(split.amount) > 0) {
-        split.amount = Number(Number(split.amount) * adjustmentFactor).toFixed(
-          2
-        );
-      }
-    }
-  }
-
-  return splitList;
-}
-
-export function recalcSplitsForExact(splitList: Split[], amount: number) {
-  // // console.log("recalcSplitsForExact ~ splitList:", splitList);
-
-  const numberOfTravellers = splitList?.length;
-  const splitAmountNorm = amount / numberOfTravellers;
-  const splitRest =
-    amount - splitList.reduce((sum, split) => sum + Number(split.amount), 0);
-
-  // console.log("recalcSplitsForExact ~ splitRest:", splitRest);
-
-  // Count the number of travellers without a split amount
-  const travellersWithoutSplit = splitList.filter((split) => !split.amount);
-  const numberOfTravellersWithoutSplit = travellersWithoutSplit?.length;
-
-  if (numberOfTravellersWithoutSplit === 0) {
-    // Find all splits with amount equal to splitAmountNorm
-    const splitsWithNormAmount = splitList.filter((split) =>
-      sameNumber(Number(split.amount), Number(splitAmountNorm))
-    );
-
-    // Split the rest equally among all splits with norm amount
-    if (splitsWithNormAmount?.length > 0) {
-      const splitAmount = splitRest / splitsWithNormAmount?.length;
-      splitsWithNormAmount.forEach((split) => {
-        split.amount = (Number(split.amount) + splitAmount).toFixed(2);
-      });
-    } else {
-      const splitsWithDecimalAmount = splitList.filter((split) =>
-        /\.\d{2}$/.test(split.amount)
-      );
-      if (splitsWithDecimalAmount?.length > 0) {
-        splitsWithDecimalAmount.forEach((split) => {
-          split.amount = Number(
-            Number(split.amount) + splitRest / splitsWithDecimalAmount?.length
-          ).toFixed(2);
-        });
-      } else {
-        splitList.forEach((split) => {
-          split.amount = Number(
-            Number(split.amount) + splitRest / splitList?.length
-          ).toFixed(2);
-        });
-      }
-    }
-  } else {
-    // Split the rest equally among all travellers without a split amount
-    const splitAmount = splitRest / numberOfTravellersWithoutSplit;
-    travellersWithoutSplit.forEach((split) => {
-      split.amount = splitAmount.toFixed(2);
-    });
-  }
-
-  return splitList;
-}
-
 export function calcSplitList(
   splitType: splitType,
   amount: number,
@@ -184,6 +74,174 @@ export function calcSplitList(
       // console.log("[SplitExpense] Wrong splitType :", splitType);
       return [];
   }
+}
+
+/**
+ * Recalculates splits using edit-order-based approach.
+ * Preserves edited splits and distributes remainder intelligently.
+ * @param splitList - Array of splits with optional editOrder
+ * @param amount - Total amount to distribute
+ * @returns Updated split list with recalculated amounts
+ */
+export function recalcSplitsWithEditOrder(
+  splitList: Split[],
+  amount: number
+): Split[] {
+  if (!splitList || splitList.length === 0 || amount === 0) {
+    return splitList;
+  }
+
+  // Create a copy to avoid mutating the original
+  const updatedList = splitList.map((split) => ({ ...split }));
+
+  // Separate edited and unedited splits
+  const editedSplits = updatedList.filter(
+    (split) => split.editOrder !== undefined
+  );
+  const uneditedSplits = updatedList.filter(
+    (split) => split.editOrder === undefined
+  );
+
+  // Calculate sum of edited splits
+  const editedSum = editedSplits.reduce(
+    (sum, split) => sum + Number(split.amount),
+    0
+  );
+
+  // Calculate remainder to distribute
+  const remainder = amount - editedSum;
+
+  // If remainder is zero, no changes needed
+  if (sameNumber(remainder, 0)) {
+    return updatedList;
+  }
+
+  // If remainder is negative, edited splits exceed total - this is an error case
+  // but we'll still try to distribute by adjusting edited splits (except the most recent)
+  if (remainder < 0) {
+    // Sort edited splits by editOrder (highest first, but skip editOrder 0)
+    const editableSplits = editedSplits
+      .filter((split) => split.editOrder !== 0)
+      .sort((a, b) => (b.editOrder || 0) - (a.editOrder || 0));
+
+    // Distribute the negative remainder (reduction) among editable splits
+    const remainingAdjustment = remainder;
+    for (const split of editableSplits) {
+      const currentAmount = Number(split.amount);
+      const adjustment = remainingAdjustment / editableSplits.length;
+      split.amount = Number(
+        Number(Math.max(0, currentAmount + adjustment)).toFixed(2)
+      ) as any;
+    }
+
+    // Recalculate remainder after adjustment
+    const newEditedSum = updatedList
+      .filter((split) => split.editOrder !== undefined)
+      .reduce((sum, split) => sum + Number(split.amount), 0);
+    const newRemainder = amount - newEditedSum;
+
+    // If still negative, we need to adjust unedited splits too
+    if (newRemainder < 0 && uneditedSplits.length > 0) {
+      const uneditedAdjustment = newRemainder / uneditedSplits.length;
+      uneditedSplits.forEach((split) => {
+        const currentAmount = Number(split.amount) || 0;
+        split.amount = Number(
+          Number(Math.max(0, currentAmount + uneditedAdjustment)).toFixed(2)
+        ) as any;
+      });
+    } else if (newRemainder > 0 && uneditedSplits.length > 0) {
+      // Distribute positive remainder to unedited splits (replace, not add)
+      const uneditedAmount = newRemainder / uneditedSplits.length;
+      uneditedSplits.forEach((split) => {
+        split.amount = Number(Number(uneditedAmount).toFixed(2)) as any;
+      });
+    }
+
+    return updatedList;
+  }
+
+  // Positive remainder: distribute to unedited splits first
+  if (uneditedSplits.length > 0) {
+    // Replace unedited split amounts with equal distribution of remainder
+    const uneditedAmount = remainder / uneditedSplits.length;
+    uneditedSplits.forEach((split) => {
+      split.amount = Number(Number(uneditedAmount).toFixed(2)) as any;
+    });
+  } else {
+    // No unedited splits: distribute to edited splits (oldest first, but preserve editOrder 0)
+    const editableSplits = editedSplits
+      .filter((split) => split.editOrder !== 0)
+      .sort((a, b) => (b.editOrder || 0) - (a.editOrder || 0));
+
+    if (editableSplits.length > 0) {
+      const editableAdjustment = remainder / editableSplits.length;
+      editableSplits.forEach((split) => {
+        const currentAmount = Number(split.amount);
+        split.amount = Number(
+          Number(currentAmount + editableAdjustment).toFixed(2)
+        ) as any;
+      });
+    } else if (editedSplits.length === 1 && editedSplits[0].editOrder === 0) {
+      // Only one split and it's the most recent edit - adjust it (edge case)
+      const split = editedSplits[0];
+      split.amount = Number(Number(amount).toFixed(2)) as any;
+    }
+  }
+
+  return updatedList;
+}
+
+/**
+ * Validates if split list can be made valid given edit constraints.
+ * @param splitList - Array of splits with optional editOrder
+ * @param amount - Total amount
+ * @returns true if valid, false otherwise
+ */
+export function validateSplitListWithEditOrder(
+  splitList: Split[],
+  amount: number
+): boolean {
+  if (!splitList || splitList.length === 0 || !amount) {
+    return false;
+  }
+
+  // Check if any split has invalid amount
+  for (const split of splitList) {
+    const splitAmount = Number(split.amount);
+    if (Number.isNaN(splitAmount) || splitAmount < 0) {
+      return false;
+    }
+  }
+
+  // Calculate sum of edited splits (those with editOrder defined)
+  const editedSplits = splitList.filter(
+    (split) => split.editOrder !== undefined
+  );
+  const editedSum = editedSplits.reduce(
+    (sum, split) => sum + Number(split.amount),
+    0
+  );
+
+  // If edited splits alone exceed total, it's invalid
+  if (editedSum > amount + 0.02) {
+    // Allow small floating point differences
+    return false;
+  }
+
+  // If there are unedited splits, they can accommodate the remainder
+  const uneditedSplits = splitList.filter(
+    (split) => split.editOrder === undefined
+  );
+  if (uneditedSplits.length > 0) {
+    return true; // Can always distribute to unedited splits
+  }
+
+  // All splits are edited - check if they sum correctly
+  const totalSum = splitList.reduce(
+    (sum, split) => sum + Number(split.amount),
+    0
+  );
+  return sameNumber(totalSum, amount);
 }
 
 export function validateSplitList(

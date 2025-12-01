@@ -44,7 +44,8 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { TripContext } from "../../store/trip-context";
 import {
   calcSplitList,
-  recalcSplitsLinearly,
+  recalcSplitsWithEditOrder,
+  validateSplitListWithEditOrder,
   splitType,
   splitTypesDropdown,
   travellerToDropdown,
@@ -57,8 +58,6 @@ import CurrencyPicker from "../Currency/CurrencyPicker";
 import { truncateString } from "../../util/string";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, {
-  ZoomIn,
-  ZoomOut,
   Easing,
   FadeInUp,
   FadeOutUp,
@@ -68,8 +67,12 @@ import { DateTime } from "luxon";
 import DatePickerModal from "../UI/DatePickerModal";
 import DatePickerContainer from "../UI/DatePickerContainer";
 import GradientButton from "../UI/GradientButton";
-import { recalcSplitsForExact } from "../../util/split";
-import { DuplicateOption, ExpenseData, isPaidString } from "../../util/expense";
+import {
+  DuplicateOption,
+  ExpenseData,
+  isPaidString,
+  Split,
+} from "../../util/expense";
 import { NetworkContext } from "../../store/network-context";
 import { SettingsContext } from "../../store/settings-context";
 import Autocomplete from "../UI/Autocomplete";
@@ -273,9 +276,18 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     inputs.currency.value &&
     inputs.currency.value !== tripCtx.tripCurrency;
 
+  // Helper function to reset editOrder from splitList
+  const resetEditOrder = (splits: Split[]): Split[] => {
+    if (!splits) return [];
+    return splits.map((split) => {
+      const { editOrder, ...splitWithoutOrder } = split;
+      return splitWithoutOrder;
+    });
+  };
+
   // list of all splits owed
   const [splitList, setSplitList] = useState(
-    editingValues ? editingValues.splitList : []
+    resetEditOrder(editingValues?.splitList ?? [])
   );
   const [splitListValid, setSplitListValid] = useState(true);
 
@@ -681,21 +693,21 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     ) {
       // split into equal parts if we are splitting over a ranged date and are editing
       if (duplOrSplit === 2 && isEditing) {
-        const newSplitList = recalcSplitsLinearly(
+        const newSplitList = recalcSplitsWithEditOrder(
           splitList,
           +amountValue / daysBeween
         );
         setSplitList(newSplitList);
-        const isValidSplit = validateSplitList(
-          newSplitList,
-          splitType,
-          +amountValue
-        );
+        const isValidSplit =
+          validateSplitList(newSplitList, splitType, +amountValue) &&
+          validateSplitListWithEditOrder(newSplitList, +amountValue);
         setSplitListValid(isValidSplit);
       }
-      const newSplitList = recalcSplitsLinearly(splitList, +value);
+      const newSplitList = recalcSplitsWithEditOrder(splitList, +value);
       setSplitList(newSplitList);
-      const isValidSplit = validateSplitList(newSplitList, splitType, +value);
+      const isValidSplit =
+        validateSplitList(newSplitList, splitType, +value) &&
+        validateSplitListWithEditOrder(newSplitList, +value);
       setSplitListValid(isValidSplit);
     }
   }
@@ -908,7 +920,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                 setListEQUAL(draftData.listEQUAL);
               }
               if (draftData.splitList) {
-                setSplitList(draftData.splitList);
+                // Reset edit order when loading draft data
+                const splitsWithoutOrder = resetEditOrder(draftData.splitList);
+                setSplitList(splitsWithoutOrder);
               }
               if (draftData.duplOrSplit !== undefined) {
                 setDuplOrSplit(draftData.duplOrSplit);
@@ -1031,12 +1045,36 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   function inputSplitListHandler(index, props: { userName: string }, value) {
     if (splitType === splitTypes.EQUAL) return;
-    const tempList = [...splitList];
+    const tempList = splitList.map((split) => ({ ...split }));
+
+    // Set editOrder for the edited split to 0 (most recent)
+    // Increment all other splits' editOrder by 1 (if they have one)
+    tempList.forEach((split, i) => {
+      if (i === index) {
+        split.editOrder = 0;
+      } else if (split.editOrder !== undefined) {
+        split.editOrder = (split.editOrder || 0) + 1;
+      }
+    });
+
+    // Update the split amount
     // eslint-disable-next-line react/prop-types
-    const tempValue = { amount: value, userName: props.userName };
-    tempList[index] = tempValue;
-    setSplitList(tempList);
-    setSplitListValid(validateSplitList(tempList, splitType, +amountValue));
+    tempList[index] = {
+      ...tempList[index],
+      amount: Number(value) || 0,
+      userName: props.userName,
+      editOrder: 0,
+    };
+
+    // Recalculate splits using edit-order-based approach
+    const recalculatedList = recalcSplitsWithEditOrder(tempList, +amountValue);
+    setSplitList(recalculatedList);
+
+    // Validate using both old and new validation
+    const isValidSplit =
+      validateSplitList(recalculatedList, splitType, +amountValue) &&
+      validateSplitListWithEditOrder(recalculatedList, +amountValue);
+    setSplitListValid(isValidSplit);
   }
 
   function splitHandler(selectedSplitType: splitType) {
@@ -1050,24 +1088,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       splitTravellers
     );
     if (listSplits) {
-      setSplitList(listSplits);
-    }
-  }
-
-  async function resetSplitHandler() {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const splitTravellers = splitTravellersList;
-    // console.log("resetSplitHandler ~ splitTravellers:", splitTravellers);
-    // calculate splits
-    const listSplits = calcSplitList(
-      splitTypes.EQUAL,
-      +amountValue,
-      whoPaid,
-      splitTravellers
-    );
-    if (listSplits) {
-      setSplitList(listSplits);
-      setSplitListValid(validateSplitList(listSplits, splitType, +amountValue));
+      // Reset edit order when split type changes
+      const splitsWithoutOrder = resetEditOrder(listSplits);
+      setSplitList(splitsWithoutOrder);
     }
   }
 
@@ -1094,7 +1117,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       setSplitListValid(true);
       return;
     }
-    setSplitList(splitListTemp);
+    // Reset edit order when traveller is removed
+    const splitListWithoutOrder = resetEditOrder(splitListTemp);
+    setSplitList(splitListWithoutOrder);
     if (splitType === splitTypes.EQUAL) {
       const splitTravellersTemp = tripCtx.travellers.filter(
         (traveller) => traveller !== userName
@@ -1105,11 +1130,16 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         whoPaid,
         splitTravellersTemp
       );
-      setSplitList(listSplits);
-      setSplitListValid(validateSplitList(listSplits, splitType, +amountValue));
+      if (listSplits) {
+        const splitsWithoutOrder = resetEditOrder(listSplits);
+        setSplitList(splitsWithoutOrder);
+        setSplitListValid(
+          validateSplitList(splitsWithoutOrder, splitType, +amountValue)
+        );
+      }
     } else {
       setSplitListValid(
-        validateSplitList(splitListTemp, splitType, +amountValue)
+        validateSplitList(splitListWithoutOrder, splitType, +amountValue)
       );
     }
   }
@@ -1185,17 +1215,21 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
     // split into equal parts if we are splitting over a ranged date and are editing
     if (duplOrSplit === 2 && !isEditing) {
-      const newSplitList = recalcSplitsLinearly(
+      const newSplitList = recalcSplitsWithEditOrder(
         splitList,
         +amountValue / daysBeween
       );
       setSplitList(newSplitList);
-      const isValidSplit = validateSplitList(
-        newSplitList,
-        splitType,
-        +amountValue
-      );
+      const isValidSplit =
+        validateSplitList(newSplitList, splitType, +amountValue) &&
+        validateSplitListWithEditOrder(newSplitList, +amountValue);
       setSplitListValid(isValidSplit);
+    }
+
+    // Check split list validity first and show alert if invalid
+    if (!splitListValid && splitType !== splitTypes.SELF) {
+      Alert.alert(i18n.t("sorry"), i18n.t("sorrySplitList"));
+      return;
     }
 
     if (
@@ -1254,6 +1288,12 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   }
 
   async function fastSubmit() {
+    // Check split list validity first and show alert if invalid
+    if (!splitListValid && splitType !== splitTypes.SELF) {
+      Alert.alert(i18n.t("sorry"), i18n.t("sorrySplitList"));
+      return;
+    }
+
     const expenseData = {
       uid: authCtx.uid,
       amount: +amountValue,
@@ -1308,75 +1348,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     });
   }
 
-  function handleRecalculationSplits() {
-    {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      const newSplitList = recalcSplitsForExact(splitList, +amountValue);
-
-      setSplitList(newSplitList);
-      const isValidSplit = validateSplitList(
-        newSplitList,
-        splitType,
-        +amountValue
-      );
-      setSplitListValid(isValidSplit);
-      trackEvent(VexoEvents.SPLITS_RECALCULATED, {
-        splitType: splitType,
-        amount: +amountValue,
-        isValid: isValidSplit,
-      });
-      if (!isValidSplit) {
-        Alert.alert(i18n.t("sorry"), i18n.t("sorrySplitList"));
-      }
-    }
-  }
-
-  const recalcJSX = splitType == splitTypes.EXACT && !splitListValid && (
-    <Animated.View
-      style={{
-        marginTop: dynamicScale(-8, true),
-        paddingTop: dynamicScale(8, true),
-        marginLeft: dynamicScale(8),
-        // borderWidth: 1,
-        // center the content
-        flex: 1,
-        alignContent: "center",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-      entering={ZoomIn}
-      exiting={ZoomOut.duration(100)}
-    >
-      <Text style={styles.dateLabelDuplSplitText}>{"(Re)-Calculate"}</Text>
-      <IconButton
-        icon="git-compare-outline"
-        color={GlobalStyles.colors.primary500}
-        onPressStyle={{ transform: [{ scale: 0.9 }] }}
-        buttonStyle={[
-          {
-            flex: 1,
-            flexDirection: "column",
-            alignContent: "center",
-            justifyContent: "center",
-            alignItems: "center",
-            marginBottom: dynamicScale(8, true),
-            marginLeft: dynamicScale(4),
-            borderRadius: dynamicScale(20, false, 0.5),
-            minHeight: dynamicScale(50, false, 0.5),
-            minWidth: dynamicScale(90),
-            marginRight: dynamicScale(8),
-            backgroundColor: GlobalStyles.colors.backgroundColor,
-            borderWidth: 1,
-            borderColor: GlobalStyles.colors.gray700,
-          },
-          GlobalStyles.strongShadow,
-        ]}
-        size={dynamicScale(44, false, 0.5)}
-        onPress={() => handleRecalculationSplits()}
-        onLongPress={() => resetSplitHandler()}
-      />
-    </Animated.View>
-  );
   const isLimitedByPremium = async () => {
     const isPremium = await isPremiumMember();
     if (isPremium) return false;
@@ -1396,6 +1367,13 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         return;
       }
     }
+
+    // Check split list validity BEFORE closing modal/navigating
+    if (!splitListValid && splitType !== splitTypes.SELF) {
+      Alert.alert(i18n.t("sorry"), i18n.t("sorrySplitList"));
+      return;
+    }
+
     Toast.show({
       type: "loading",
       text1: i18n.t("toastSaving1"),
@@ -1512,6 +1490,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         }
         state={isSpecialExpense}
         labelStyle={styles.isSpecialLabel}
+        style={{}}
       ></SettingsSwitch>
     </View>
   );
@@ -1878,10 +1857,13 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                                 // console.log("listSplits:", listSplits);
                                 if (listSplits) {
                                   setSplitType(tempSplitType);
-                                  setSplitList(listSplits);
+                                  // Reset edit order when split type changes
+                                  const splitsWithoutOrder =
+                                    resetEditOrder(listSplits);
+                                  setSplitList(splitsWithoutOrder);
                                   setSplitListValid(
                                     validateSplitList(
-                                      listSplits,
+                                      splitsWithoutOrder,
                                       tempSplitType,
                                       +amountValue
                                     )
@@ -2136,7 +2118,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                         justifyContent: "flex-start",
                         alignItems: "flex-start",
                       }}
-                      ListHeaderComponent={recalcJSX}
+                      ListHeaderComponent={null}
                       ListFooterComponent={
                         <View
                           style={{ width: dynamicScale(300, false, 0.5) }}

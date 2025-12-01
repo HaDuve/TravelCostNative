@@ -11,9 +11,7 @@ import {
   secureStoreGetItem,
   secureStoreSetItem,
 } from "../../store/secure-storage";
-import {
-  dynamicScale,
-} from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 
 function AuthForm({ isLogin, onSubmit, credentialsInvalid, isConnected }) {
   const [enteredEmail, setEnteredEmail] = useState("");

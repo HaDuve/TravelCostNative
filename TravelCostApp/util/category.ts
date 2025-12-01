@@ -92,8 +92,7 @@ function getMaxCategoryMap(categoryCountMap: CategoryCountMap) {
       maxCategory = category;
     }
   });
-  if (maxCategory)
-    return maxCategory;
+  if (maxCategory) return maxCategory;
 }
 
 type CategoryCountMap = {

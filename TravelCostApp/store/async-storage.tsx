@@ -16,8 +16,8 @@ export async function asyncStoreSetItem(
 ) {
   if (!value) {
     await AsyncStorage.removeItem(key);
-      return;
-    }
+    return;
+  }
   if (typeof value !== "string") {
     value = value.toString();
   }

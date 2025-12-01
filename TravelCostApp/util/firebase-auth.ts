@@ -223,5 +223,4 @@ export async function storeAuthData(authData: {
 
   // Update authentication token for immediate use
   setAxiosAccessToken(idToken);
-
 }

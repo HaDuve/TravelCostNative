@@ -346,10 +346,8 @@ function TripContextProvider({ children }) {
     setTripid(tripid);
   }
 
-  function addTrip() {
-  }
-  function deleteTrip() {
-  }
+  function addTrip() {}
+  function deleteTrip() {}
 
   async function saveTripDataInStorage(tripData: TripData) {
     // cut away the trip.expenses array
@@ -371,8 +369,7 @@ function TripContextProvider({ children }) {
       setdailyBudget(tripData.dailyBudget.toString());
       try {
         await loadTravellersFromStorage();
-      } catch (error) {
-      }
+      } catch (error) {}
       setIsLoading(false);
 
       return tripData;

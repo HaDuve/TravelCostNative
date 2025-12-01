@@ -51,6 +51,7 @@ import {
   travellerToDropdown,
   validateSplitList,
 } from "../../util/split";
+import { Traveller } from "../../util/traveler";
 
 import { i18n } from "../../i18n/i18n";
 
@@ -285,6 +286,20 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     });
   };
 
+  // Helper function to convert Traveller[] to string[] (user names)
+  const extractUserNames = (
+    travellers: string[] | Traveller[] | undefined
+  ): string[] => {
+    if (!travellers) return [];
+    if (travellers.length === 0) return [];
+    // Check if first element is a string (already user names)
+    if (typeof travellers[0] === "string") {
+      return travellers as string[];
+    }
+    // Otherwise, it's Traveller[], extract userNames
+    return (travellers as Traveller[]).map((t) => t.userName);
+  };
+
   // list of all splits owed
   const [splitList, setSplitList] = useState(
     resetEditOrder(editingValues?.splitList ?? [])
@@ -364,7 +379,10 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   useEffect(() => {
     // setlistequal with tripcontext.travellers
-    if (tripCtx.travellers) setListEQUAL(tripCtx.travellers);
+    if (tripCtx.travellers) {
+      const userNames = extractUserNames(tripCtx.travellers);
+      setListEQUAL(userNames);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripCtx.travellers?.length]);
 
@@ -676,8 +694,10 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTravellers?.length]);
   const [openEQUAL, setOpenEQUAL] = useState(false);
-  const [splitTravellersList, setListEQUAL] = useState(
-    editingValues ? editingValues.listEQUAL : currentTravellers
+  const [splitTravellersList, setListEQUAL] = useState<string[]>(
+    editingValues
+      ? editingValues.listEQUAL || []
+      : extractUserNames(currentTravellers)
   );
 
   function autoExpenseLinearSplitAdjust(
@@ -1035,7 +1055,8 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   function openTravellerMultiPicker() {
     // add whole traveling group who paid automatically to shared list
     if (!editingValues) {
-      setListEQUAL([...currentTravellers]);
+      const userNames = extractUserNames(currentTravellers);
+      setListEQUAL(userNames);
     }
     setModalFlow(modalStates.EXACT_SHARING);
   }
@@ -1118,8 +1139,8 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     const splitListWithoutOrder = resetEditOrder(splitListTemp);
     setSplitList(splitListWithoutOrder);
     if (splitType === splitTypes.EQUAL) {
-      const splitTravellersTemp = tripCtx.travellers.filter(
-        (traveller) => traveller !== userName
+      const splitTravellersTemp = extractUserNames(tripCtx.travellers).filter(
+        (travellerName) => travellerName !== userName
       );
       const listSplits = calcSplitList(
         splitTypes.EQUAL,
@@ -1303,7 +1324,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       currency: lastCurrency,
       whoPaid: userCtx.userName,
       splitType: splitType,
-      listEQUAL: currentTravellers,
+      listEQUAL: extractUserNames(currentTravellers),
       splitList: splitList,
       iconName: iconName,
       isPaid: isPaid,
@@ -1843,11 +1864,13 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                                 );
                                 const tempSplitType: splitType =
                                   splitTypes.EXACT;
+                                const userNames =
+                                  extractUserNames(currentTravellers);
                                 const listSplits = calcSplitList(
                                   tempSplitType,
                                   +amountValue,
                                   userCtx.userName,
-                                  currentTravellers
+                                  userNames
                                 );
                                 if (listSplits) {
                                   setSplitType(tempSplitType);
@@ -2020,7 +2043,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                     setItems={setSplitItemsEQUAL}
                     onClose={() => {
                       setModalFlow(modalStates.CLOSED);
-                      splitHandler();
+                      splitHandler(splitType);
                     }}
                     listMode="MODAL"
                     multiple={true}
@@ -2359,8 +2382,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                   icon={"return-down-back-outline"}
                   color={GlobalStyles.colors.textColor}
                   size={dynamicScale(24, false, 0.5)}
-                  onPress={() => {
-                  }}
+                  onPress={() => {}}
                 />
               )}
             </Pressable>

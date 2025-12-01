@@ -1,17 +1,21 @@
 import { i18n } from "../i18n/i18n";
 import { DateTime } from "luxon";
-import { Expense, Split, ExpenseData, isPaidString } from "./expense";
+import { Split, ExpenseData, isPaidString } from "./expense";
+import { Traveller } from "./traveler";
+import { DateOrDateTime } from "./date";
 
 import { getAllExpenses } from "./http";
 import safeLogError from "./error";
 import { safelyParseJSON } from "./jsonParse";
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+const Splitwise = require("splitwise-js-map");
 
 export function calcSplitList(
   splitType: splitType,
   amount: number,
   whoPaid: string,
   splitTravellers: string[]
-) {
+): Split[] | undefined {
   if (
     !splitType ||
     !amount ||
@@ -23,7 +27,7 @@ export function calcSplitList(
     return;
   }
 
-  const splitList = [];
+  const splitList: Split[] = [];
   switch (splitType) {
     case "SELF":
       return splitList;
@@ -32,7 +36,7 @@ export function calcSplitList(
       splitTravellers.forEach((traveller) => {
         splitList.push({
           userName: traveller,
-          amount: splitAmount.toFixed(2),
+          amount: Number(splitAmount.toFixed(2)),
         });
       });
       return splitList;
@@ -43,7 +47,7 @@ export function calcSplitList(
         splitTravellers.forEach((traveller) => {
           splitList.push({
             userName: traveller,
-            amount: splitAmount.toFixed(2),
+            amount: Number(splitAmount.toFixed(2)),
           });
         });
         return splitList;
@@ -57,7 +61,7 @@ export function calcSplitList(
           splitTravellers.forEach((traveller) => {
             splitList.push({
               userName: traveller,
-              amount: splitAmount.toFixed(2),
+              amount: Number(splitAmount.toFixed(2)),
             });
           });
           return splitList;
@@ -124,7 +128,7 @@ export function recalcSplitsWithEditOrder(
       const adjustment = remainingAdjustment / editableSplits.length;
       split.amount = Number(
         Number(Math.max(0, currentAmount + adjustment)).toFixed(2)
-      ) as any;
+      );
     }
 
     // Recalculate remainder after adjustment
@@ -140,13 +144,13 @@ export function recalcSplitsWithEditOrder(
         const currentAmount = Number(split.amount) || 0;
         split.amount = Number(
           Number(Math.max(0, currentAmount + uneditedAdjustment)).toFixed(2)
-        ) as any;
+        );
       });
     } else if (newRemainder > 0 && uneditedSplits.length > 0) {
       // Distribute positive remainder to unedited splits (replace, not add)
       const uneditedAmount = newRemainder / uneditedSplits.length;
       uneditedSplits.forEach((split) => {
-        split.amount = Number(Number(uneditedAmount).toFixed(2)) as any;
+        split.amount = Number(Number(uneditedAmount).toFixed(2));
       });
     }
 
@@ -158,7 +162,7 @@ export function recalcSplitsWithEditOrder(
     // Replace unedited split amounts with equal distribution of remainder
     const uneditedAmount = remainder / uneditedSplits.length;
     uneditedSplits.forEach((split) => {
-      split.amount = Number(Number(uneditedAmount).toFixed(2)) as any;
+      split.amount = Number(Number(uneditedAmount).toFixed(2));
     });
   } else {
     // No unedited splits: distribute to edited splits (oldest first, but preserve editOrder 0)
@@ -172,12 +176,12 @@ export function recalcSplitsWithEditOrder(
         const currentAmount = Number(split.amount);
         split.amount = Number(
           Number(currentAmount + editableAdjustment).toFixed(2)
-        ) as any;
+        );
       });
     } else if (editedSplits.length === 1 && editedSplits[0].editOrder === 0) {
       // Only one split and it's the most recent edit - adjust it (edge case)
       const split = editedSplits[0];
-      split.amount = Number(Number(amount).toFixed(2)) as any;
+      split.amount = Number(Number(amount).toFixed(2));
     }
   }
 
@@ -285,25 +289,50 @@ export function splitTypesDropdown() {
   ];
 }
 
-export function travellerToDropdown(travellers, includeAddTraveller = true) {
-  if (!travellers || travellers?.length < 1) {
+export function travellerToDropdown(
+  travellers: string[] | Traveller[] | { [key: string]: { userName: string } },
+  includeAddTraveller = true
+): Array<{ label: string; value: string }> {
+  if (!travellers || (Array.isArray(travellers) && travellers.length < 1)) {
     return [];
   }
-  const listOfLabelValues = [];
+  const listOfLabelValues: Array<{ label: string; value: string }> = [];
   // sometimes this is not an array but an object
   try {
-    travellers.forEach((traveller) => {
-      // TODO: make value uid based and not name based
-      listOfLabelValues.push({ label: traveller, value: traveller });
-    });
-  } catch (error) {
-    // get travellers.user.username
-    Object.keys(travellers).forEach((key) => {
-      listOfLabelValues.push({
-        label: travellers[key]["userName"],
-        value: travellers[key]["userName"],
+    if (Array.isArray(travellers)) {
+      travellers.forEach((traveller) => {
+        // Handle both string[] and Traveller[]
+        const userName =
+          typeof traveller === "string" ? traveller : traveller.userName;
+        // TODO: make value uid based and not name based
+        listOfLabelValues.push({ label: userName, value: userName });
       });
-    });
+    } else {
+      // get travellers.user.username
+      Object.keys(travellers).forEach((key) => {
+        listOfLabelValues.push({
+          label: travellers[key]["userName"],
+          value: travellers[key]["userName"],
+        });
+      });
+    }
+  } catch (error) {
+    // Fallback: try to extract user names from object
+    if (!Array.isArray(travellers)) {
+      Object.keys(travellers).forEach((key) => {
+        const traveller = travellers[key];
+        if (
+          traveller &&
+          typeof traveller === "object" &&
+          "userName" in traveller
+        ) {
+          listOfLabelValues.push({
+            label: traveller.userName,
+            value: traveller.userName,
+          });
+        }
+      });
+    }
   }
 
   // Add "+ add traveller" item at the end only if requested
@@ -349,16 +378,29 @@ export async function calcOpenSplitsTable(
   const asyncSplitList = async () => {
     for (const exp of expenses) {
       const expense: ExpenseData = exp;
+      // Normalize dates for comparison
+      const normalizeDate = (date: DateOrDateTime): Date => {
+        if (date instanceof Date) {
+          return date;
+        }
+        if (date instanceof DateTime) {
+          return date.toJSDate();
+        }
+        // If it's a string, parse it
+        if (typeof date === "string") {
+          return DateTime.fromISO(date).toJSDate();
+        }
+        return new Date(date);
+      };
+
+      const paidDate = DateTime.fromISO(isPaidDate).toJSDate();
       if (
         expense.splitType === "SELF" ||
         !expense.splitList ||
         expense.isPaid == isPaidString.paid ||
-        DateTime.fromISO(expense.startDate) <
-          DateTime.fromISO(isPaidDate).toJSDate() ||
-        DateTime.fromISO(expense.date) <
-          DateTime.fromISO(isPaidDate).toJSDate() ||
-        DateTime.fromISO(expense.endDate) <
-          DateTime.fromISO(isPaidDate).toJSDate()
+        normalizeDate(expense.startDate) < paidDate ||
+        normalizeDate(expense.date) < paidDate ||
+        normalizeDate(expense.endDate) < paidDate
       )
         continue;
       for (const split of expense.splitList) {
@@ -393,7 +435,6 @@ export async function calcOpenSplitsTable(
 }
 
 export function simplifySplits(openSplits: Split[]) {
-  const Splitwise = require("splitwise-js-map");
   let tempSplits = [];
   try {
     tempSplits = safelyParseJSON(JSON.stringify(openSplits));
@@ -493,7 +534,7 @@ function cancelDifferences(openSplits) {
       // difference
       if (split.amount > listOfSums[index].amount) {
         split.amount -= listOfSums[index].amount;
-        split.amount = split.amount.toFixed(2);
+        split.amount = Number(split.amount.toFixed(2));
         listOfSums.splice(index, 1);
       }
     }

@@ -201,7 +201,7 @@ const AddExpenseButton = ({ navigation }) => {
                 text: "Cancel",
                 onPress: () => {
                   return;
-                }, // console.log("Cancel Pressed"),
+                },
                 style: "cancel",
               },
               {
@@ -307,7 +307,6 @@ const AddExpenseButton = ({ navigation }) => {
               renderItem={renderExpenseTemplates}
               onEndReachedThreshold={0.5}
               onEndReached={() => {
-                console.log("Expense Template End Found");
                 const maxNumber = lastExpenses.length;
                 const newNumber = Math.max(
                   maxNumber,

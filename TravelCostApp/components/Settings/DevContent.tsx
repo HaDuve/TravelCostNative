@@ -58,7 +58,6 @@ const DevContent = ({ navigation }) => {
     async function checkVersion() {
       if (isConnected) {
         const data: VersionCheckResponse = await versionCheck();
-        // console.log("checkVersion ~ versionCheckResponse:", data);
         const latestVersion = data?.latestVersion;
         const currentVersion = data?.currentVersion;
         if (!latestVersion || !currentVersion) return;
@@ -155,7 +154,6 @@ const DevContent = ({ navigation }) => {
               // });
               // granted so we want to save the token in the trip
               await storeExpoPushTokenInTrip(token, "");
-              // console.log("storeExpoPushTokenInTrip succeeded");
             } catch (error) {
               const message = safeLogError(error);
               setErrorMessage(message);

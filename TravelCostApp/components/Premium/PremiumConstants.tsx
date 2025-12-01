@@ -23,10 +23,8 @@ export async function isPremiumMember() {
       typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined"
     ) {
       // Grant user "pro" access
-      // console.log("User is premium member");
       return true;
     } //else
-    // console.log("User is not premium member");
     return false;
   } catch (e) {
     // Error fetching customer info
@@ -72,9 +70,6 @@ export async function loadKeys(): Promise<Keys> {
 
   const data = await fetchServerInfo();
   if (!data) {
-    console.log(
-      "🔑 [PremiumConstants] fetchServerInfo returned null, using stored keys"
-    );
     return { REVCAT_G, REVCAT_A, OPENAI, EXCHANGE, FREEEXCHANGE, BRAN, VEXO };
   }
 

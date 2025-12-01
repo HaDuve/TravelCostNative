@@ -5,9 +5,7 @@ import {
 
 export async function loadTourConfig() {
   const hadTour = await secureStoreGetObject("hadTour");
-  // console.log("loadTourConfig ~ hadTour:", hadTour);
   const needsTour = !hadTour;
-  // console.log("loadTourConfig ~ needsTour:", needsTour);
   return needsTour;
 }
 

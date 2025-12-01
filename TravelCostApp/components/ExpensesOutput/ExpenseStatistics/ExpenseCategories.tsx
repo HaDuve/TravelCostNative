@@ -103,7 +103,6 @@ const ExpenseCategories = ({
           pressed && GlobalStyles.pressedWithShadow,
         ]}
         onPress={() => {
-          // console.log("expenses", itemData.item.catExpenses);
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigation.navigate("FilteredExpenses", {
             expenses: itemData.item.catExpenses,

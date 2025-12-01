@@ -28,7 +28,6 @@ export async function onShare(shareId, navigation) {
   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   // const link = Linking.createURL("join/" + shareId);
   // const link = "exp://192.168.100.102:19000/--/join/" + shareId;
-  // console.log("shareURL", shareURL);
   try {
     const result = await Share.share({
       message: i18n.t("inviteMessage"),

@@ -46,7 +46,6 @@ async function refreshIdToken(refreshToken: string): Promise<string | null> {
     // Update authentication token for immediate use
     setAxiosAccessToken(access_token);
 
-    console.log("[FIREBASE-AUTH] Token refreshed successfully");
     return access_token;
   } catch (error) {
     console.error("[FIREBASE-AUTH] Failed to refresh token:", error);
@@ -75,10 +74,6 @@ export async function getValidIdToken(): Promise<string | null> {
     const bufferTime = 5 * 60 * 1000; // 5 minutes
 
     if (now >= expiryTime - bufferTime) {
-      console.log(
-        "[FIREBASE-AUTH] Token expired or expiring soon, refreshing..."
-      );
-
       if (refreshToken) {
         const newToken = await refreshIdToken(refreshToken);
         if (newToken) {
@@ -87,9 +82,6 @@ export async function getValidIdToken(): Promise<string | null> {
       }
 
       // If refresh failed, try to re-authenticate
-      console.log(
-        "[FIREBASE-AUTH] Refresh failed, attempting re-authentication..."
-      );
       return await reAuthenticate();
     }
 
@@ -138,7 +130,6 @@ async function reAuthenticate(): Promise<string | null> {
     // Update authentication token for immediate use
     setAxiosAccessToken(idToken);
 
-    console.log("[FIREBASE-AUTH] Re-authentication successful");
     return idToken;
   } catch (error) {
     console.error("[FIREBASE-AUTH] Re-authentication failed:", error);
@@ -233,5 +224,4 @@ export async function storeAuthData(authData: {
   // Update authentication token for immediate use
   setAxiosAccessToken(idToken);
 
-  console.log("[FIREBASE-AUTH] Auth data stored successfully");
 }

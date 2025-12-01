@@ -20,12 +20,6 @@ export function calcSplitList(
     !splitTravellers ||
     splitTravellers?.length < 1
   ) {
-    // console.log("splitTravellers?.length:", splitTravellers?.length);
-    // console.log("splitTravellers:", splitTravellers);
-    // console.log("whoPaid:", whoPaid);
-    // console.log("splitType:", splitType);
-    // console.log("amount:", amount);
-    // console.log("calcSplitlist failed");
     return;
   }
 
@@ -71,7 +65,6 @@ export function calcSplitList(
       }
       break;
     default:
-      // console.log("[SplitExpense] Wrong splitType :", splitType);
       return [];
   }
 }
@@ -294,27 +287,18 @@ export function splitTypesDropdown() {
 
 export function travellerToDropdown(travellers, includeAddTraveller = true) {
   if (!travellers || travellers?.length < 1) {
-    // console.log("travellertodropdown failed");
     return [];
   }
   const listOfLabelValues = [];
   // sometimes this is not an array but an object
   try {
     travellers.forEach((traveller) => {
-      // // console.log("travellers.forEach ~ traveller:", traveller);
       // TODO: make value uid based and not name based
       listOfLabelValues.push({ label: traveller, value: traveller });
     });
   } catch (error) {
-    // console.log("travellers is an object", travellers);
     // get travellers.user.username
     Object.keys(travellers).forEach((key) => {
-      // console.log("Object.keys ~ key:", key);
-      // console.log("Object.keys ~ travellers[key]:", travellers[key]);
-      // console.log(
-      //   "Object.keys ~ travellers[key][userName]:",
-      //   travellers[key]["userName"]
-      // );
       listOfLabelValues.push({
         label: travellers[key]["userName"],
         value: travellers[key]["userName"],
@@ -339,7 +323,6 @@ export async function calcOpenSplitsTable(
   givenExpenses?: ExpenseData[],
   isPaidDate?: string
 ) {
-  // console.log("calcOpenSplitsTable:", calcOpenSplitsTable);
   // cleanup all expenses where payer === debtor
 
   let expenses = [];
@@ -359,7 +342,6 @@ export async function calcOpenSplitsTable(
       safeLogError(error);
     }
     if (!expenses || expenses?.length < 1) {
-      // console.log("no expenses!");
       return;
     }
   }
@@ -386,24 +368,13 @@ export async function calcOpenSplitsTable(
             // get rate
             try {
               const rate = expense.amount / expense.calcAmount;
-              // // console.log("asyncSplitList ~ rate:", rate);
               rates[expense.currency] = rate;
-              // // console.log(
-              //   "asyncSplitList ~ expense.currency:",
-              //   expense.currency
-              // );
               split.amount = split.amount / rate;
-              // // console.log("asyncSplitList ~ split.amount:", split.amount);
             } catch (error) {
               safeLogError(error);
             }
           } else {
             split.amount = split.amount / rates[expense.currency];
-            // // console.log(
-            //   "asyncSplitList ~ rates[expense.currency]:",
-            //   rates[expense.currency]
-            // );
-            // // console.log("asyncSplitList ~ split.amount:", split.amount);
           }
           split.whoPaid = expense.whoPaid;
           openSplits.push(split);
@@ -412,7 +383,6 @@ export async function calcOpenSplitsTable(
     }
   };
   await asyncSplitList();
-  // console.log(openSplits?.length, "openSplits");
   if (openSplits?.length < 1) {
     return openSplits;
   }
@@ -478,7 +448,6 @@ export function simplifySplits(openSplits: Split[]) {
 }
 
 function sumUpSamePairs(openSplits) {
-  // // console.log("sumUpSamePairs ~ sumUpSamePairs:", sumUpSamePairs);
   // add up all the sums of the same payer and debtor pair
 
   if (!openSplits || openSplits?.length < 1) return;

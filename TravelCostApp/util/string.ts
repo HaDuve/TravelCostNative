@@ -15,7 +15,6 @@ export function formatExpenseWithCurrency(
   }
 
   if (!currency) {
-    // // console.log("calling formatExpenseWithCurrency without a currency");
     return amount.toFixed(2);
   }
   const locale =

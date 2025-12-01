@@ -197,7 +197,6 @@ const FinderScreen = () => {
     queryString === "" && dateString === "" ? "All Expenses" : "";
 
   const findPressedHandler = useCallback(() => {
-    // console.log("find pressed");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     trackEvent(VexoEvents.FINDER_PRESSED);
     navigation.navigate("FilteredPieCharts", {

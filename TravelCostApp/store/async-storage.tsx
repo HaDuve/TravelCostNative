@@ -16,9 +16,8 @@ export async function asyncStoreSetItem(
 ) {
   if (!value) {
     await AsyncStorage.removeItem(key);
-    return;
-  }
-  // // console.log("attempting save in Memory > ", key + ": " + value);
+      return;
+    }
   if (typeof value !== "string") {
     value = value.toString();
   }
@@ -79,8 +78,6 @@ export async function asyncStoreGetObject(key: string) {
  * first calls getAllKeys() and then multiremove(keys)
  */
 export async function asyncStoreSafeClear() {
-  // console.log("attempting to clear all async stored Memory > ");
-
   // add keys(prefixes) which should never be deleted
   const neverDelete = ["@userEmail", "firstStart"];
 

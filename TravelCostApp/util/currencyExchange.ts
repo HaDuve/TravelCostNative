@@ -41,7 +41,6 @@ export async function getRate(
     // Both APIs failed, try cached data as last resort
     const cachedRate = getCachedRate(base, target);
     if (cachedRate !== -1) {
-      console.log(`Using cached rate for ${base} -> ${target}: ${cachedRate}`);
       return cachedRate;
     }
 
@@ -64,7 +63,6 @@ export async function getRateAPI2(
     const lastUpdateDateTime = DateTime.fromISO(lastUpdate);
     const now = DateTime.now();
     const diff = now.diff(lastUpdateDateTime, "hours").hours;
-    console.log("diff:", diff, " < ", CACHE_NUM_HOURS);
     if (diff < CACHE_NUM_HOURS) {
       // get from asyncstore
       const rate = await asyncStoreGetItem(
@@ -83,12 +81,10 @@ export async function getRateAPI2(
     target +
     "&base_currency=" +
     base;
-  // console.log("getRateAPI2 ~ requestURL:", requestURL);
   try {
     const response = await axios.get(requestURL);
     const rate = response?.data?.data?.[target]?.value;
     if (!rate) throw new Error("No rate found");
-    // console.log("getRateAPI2 ~ rate:", rate);
     const timeStamp = DateTime.now().toISO();
     await asyncStoreSetItem("currencyExchangeAPI2_update", timeStamp);
     await asyncStoreSetItem("currencyExchangeAPI2_" + base + target, rate);
@@ -170,9 +166,6 @@ export function getFallbackRate(base: string, target: string, rates: any) {
   if (targetFromUsd) {
     // Calculate: base -> USD -> target
     const calculatedRate = targetFromUsd / usdRate;
-    console.log(
-      `Fallback calculation: ${base} -> USD (${usdRate}) -> ${target} (${targetFromUsd}) = ${calculatedRate}`
-    );
     return calculatedRate;
   }
 

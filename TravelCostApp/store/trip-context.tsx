@@ -135,7 +135,6 @@ function TripContextProvider({ children }) {
     const stored_uid = await secureStoreGetItem("uid");
     if (!(stored_tripid || stored_uid)) return;
     setTripid(stored_tripid ?? "");
-    console.log("loadTripidFetchTrip ~ stored_tripid:", stored_tripid);
     const { isFastEnough } = await isConnectionFastEnough();
     if (isFastEnough) {
       try {
@@ -144,11 +143,9 @@ function TripContextProvider({ children }) {
         await fetchAndSetCurrentTrip(fetched_tripid ?? stored_tripid);
         await fetchAndSetTravellers(fetched_tripid ?? stored_tripid);
       } catch (error) {
-        // console.log("loadTripidFetchTrip ~ error", error);
         setIsLoading(false);
       }
     } else {
-      // console.log("loading from storage in offline mode~");
       await loadTripDataFromStorage();
       setIsLoading(false);
     }
@@ -350,10 +347,8 @@ function TripContextProvider({ children }) {
   }
 
   function addTrip() {
-    // console.log("add Trip NOT IMPLEMENTED");
   }
   function deleteTrip() {
-    // console.log("delete Trip NOT IMPLEMENTED");
   }
 
   async function saveTripDataInStorage(tripData: TripData) {
@@ -377,13 +372,11 @@ function TripContextProvider({ children }) {
       try {
         await loadTravellersFromStorage();
       } catch (error) {
-        // console.log("error loading travellers from storage:", error.message);
       }
       setIsLoading(false);
 
       return tripData;
     } else {
-      // console.log("no tripdata loaded from Storage!");
       setIsLoading(false);
     }
   }

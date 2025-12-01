@@ -56,7 +56,6 @@ function ExpenseItem(props): JSX.Element {
   const { periodName, catIconNames } = useContext(UserContext);
   const rate = calcAmount / amount;
   // const { orientation, width, height } = useContext(OrientationContext);
-  // console.log(
   //   orientation,
   //   width,
   //   height,

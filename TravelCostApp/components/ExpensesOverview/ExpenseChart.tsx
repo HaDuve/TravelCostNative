@@ -147,10 +147,7 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
   );
 
   const handleReset = useCallback(() => {
-    console.log("🔄 Reset button pressed");
     if (!webViewRef.current) return;
-
-    console.log("🔄 WebView ref:", webViewRef.current);
 
     // Use centralized zoom configuration
     const zoomRange = getInitialZoomRange(periodType);

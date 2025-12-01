@@ -528,7 +528,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     if (duplOrSplit == DuplicateOption.null) setConfirmedRange(true);
 
     // TODO: make this structured
-    // console.log(daysBeween);
   };
   useLayoutEffect(() => {
     if (!confirmedRange) return;
@@ -570,7 +569,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   useEffect(() => {
     if (netCtx.strongConnection) {
-      // console.log("~~ currentTravellers:", tripCtx.travellers);
       setCurrentTravellers(tripCtx.travellers);
     }
   }, [tripCtx.travellers, netCtx.strongConnection]);
@@ -1035,7 +1033,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   }
 
   function openTravellerMultiPicker() {
-    // console.log("splitType", splitType);
     // add whole traveling group who paid automatically to shared list
     if (!editingValues) {
       setListEQUAL([...currentTravellers]);
@@ -1535,12 +1532,10 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   const hideBottomBorder = duplOrSplit == 1 || duplOrSplit == 2;
 
   const onPressHandlerQuickSum = () => {
-    // console.log("taskbar pressed");
     if (inputs.amount.value) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       const _tempAmount = +tempAmount;
       const newAmount = _tempAmount + Number(inputs.amount.value);
-      // console.log("_tempAmount:", _tempAmount);
       setTempAmount(newAmount.toFixed(2));
       inputChangedHandler("amount", "");
       trackEvent(VexoEvents.QUICK_SUM_PRESSED, {
@@ -1854,7 +1849,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                                   userCtx.userName,
                                   currentTravellers
                                 );
-                                // console.log("listSplits:", listSplits);
                                 if (listSplits) {
                                   setSplitType(tempSplitType);
                                   // Reset edit order when split type changes
@@ -2366,7 +2360,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                   color={GlobalStyles.colors.textColor}
                   size={dynamicScale(24, false, 0.5)}
                   onPress={() => {
-                    // console.log("sum button pressed");
                   }}
                 />
               )}

@@ -109,7 +109,6 @@ function ExpensesList({
       try {
         row[index].close();
       } catch (error) {
-        // console.log("forceCloseRow ~ error", error);
       }
     },
     [row]
@@ -250,7 +249,6 @@ function ExpensesList({
                   await touchAllTravelers(tripID, true);
                   Toast.hide();
                 } catch (error) {
-                  // console.log(i18n.t("deleteError"), error);
                   Toast.show({
                     text1: i18n.t("error"),
                     text2: i18n.t("error2"),
@@ -292,7 +290,6 @@ function ExpensesList({
           await touchAllTravelers(tripID, true);
           Toast.hide();
         } catch (error) {
-          // console.log(i18n.t("deleteError"), error);
           Toast.show({
             text1: i18n.t("error"),
             text2: i18n.t("error2"),
@@ -517,7 +514,6 @@ function ExpensesList({
         totalSelected: selected.length + 1,
       });
     }
-    // console.log("selected", selected);
   };
   const selectAll = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -597,8 +593,6 @@ function ExpensesList({
 
   const handleMoveToTripPress = useCallback(
     async (_tripid, _tripname) => {
-      // console.log("handleMoveToTripPress ~ tripid", _tripid);
-      // console.log("handleMoveToTripPress ~ tripname", _tripname);
       Toast.show({
         type: "loading",
         text1: `Moving ${selected?.length} expenses`,
@@ -762,7 +756,6 @@ function ExpensesList({
               await touchAllTravelers(tripID, true);
               Toast.hide();
             } catch (error) {
-              // console.log(i18n.t("deleteError"), error);
               Toast.show({
                 text1: i18n.t("error"),
                 text2: i18n.t("error2"),
@@ -778,7 +771,6 @@ function ExpensesList({
   const selectPressHandler = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     requestAnimationFrame(() => {
-      // console.log("selectPressHandler ~ selectable", selectable);
       if (selectable) {
         setSelectable(false);
         setSelected([]);

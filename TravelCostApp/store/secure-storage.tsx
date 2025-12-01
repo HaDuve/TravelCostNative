@@ -8,7 +8,6 @@ import { safelyParseJSON } from "../util/jsonParse";
  * @param value - The value to save.
  */
 export async function secureStoreSetItem(key: string, value: string) {
-  // console.log("attempting secure save in Memory > ", key + ": " + value);
   if (!key || key.trim() === "") {
     safeLogError(
       "Invalid key provided to SecureStore",
@@ -39,11 +38,8 @@ export async function secureStoreGetItem(key: string) {
   if (result) {
     // show the result if it is not longer than 10 characters
 
-    // // console.log("🔐 Here's your value 🔐 \n" + result);
-    // // console.log("🔐 Here's your value 🔐 \n", result.slice(0, 10));
     return result;
   } else {
-    // console.log("No values stored under that key.", key);
     return "";
   }
 }
@@ -63,7 +59,6 @@ export async function secureStoreSetObject(key: string, value: object) {
     return;
   }
   const jsonValue = JSON.stringify(value);
-  // console.log("secureStoreSetObject ~ key, jsonValue:", key, jsonValue);
   if (!jsonValue) return;
   await SecureStore.setItemAsync(key, jsonValue);
 }

@@ -34,7 +34,6 @@ export async function initializeVexo(apiKey: string): Promise<boolean> {
     }
 
     if (!shouldEnableVexo) {
-      console.log("[Vexo] Skipping initialization (dev mode or simulator)");
       return false;
     }
 
@@ -49,7 +48,6 @@ export async function initializeVexo(apiKey: string): Promise<boolean> {
     vexoInitialized = true;
     vexoEnabled = true;
 
-    console.log("[Vexo] Successfully initialized");
     return true;
   } catch (error) {
     safeLogError(error, "vexo-tracking.ts", 44);

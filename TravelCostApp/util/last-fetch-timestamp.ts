@@ -29,9 +29,6 @@ export function getLastFetchTimestamp(tripid: string): number {
 
     // how many minutes ago?
     const minutesAgo = Math.floor((Date.now() - parsed) / 60000);
-    console.log(
-      `getLastFetchTimestamp: lastFetch_${tripid} is ${parsed} and ${minutesAgo} minutes ago`
-    );
     return isNaN(parsed) ? 0 : parsed;
   } catch (error) {
     console.error("Error getting last fetch timestamp:", error);
@@ -51,11 +48,6 @@ export function setLastFetchTimestamp(tripid: string, timestamp: number): void {
       return;
     }
     setMMKVString(`lastFetch_${tripid}`, timestamp.toString());
-    console.log(
-      `setLastFetchTimestamp: lastFetch_${tripid} is ${timestamp} to ${timestamp
-        .toString()
-        .substring(0, 10)}`
-    );
   } catch (error) {
     console.error("Error setting last fetch timestamp:", error);
   }
@@ -68,7 +60,6 @@ export function setLastFetchTimestamp(tripid: string, timestamp: number): void {
 export function clearLastFetchTimestamp(tripid: string): void {
   try {
     setMMKVString(`lastFetch_${tripid}`, "0");
-    console.log(`clearLastFetchTimestamp: lastFetch_${tripid} to 0`);
   } catch (error) {
     console.error("Error clearing last fetch timestamp:", error);
   }

@@ -93,7 +93,6 @@ function getMaxCategoryMap(categoryCountMap: CategoryCountMap) {
     }
   });
   if (maxCategory)
-    // console.log("mapDescriptionToCategory ~ maxCategory:", maxCategory);
     return maxCategory;
 }
 
@@ -120,7 +119,6 @@ export function mapDescriptionToCategory(
       const keywordsSplit = keyword.trim().toLowerCase().split(" ");
       keywordsSplit.forEach((word) => {
         if (descriptionWords.includes(word)) {
-          // console.log("match found: ", word, "in", descriptionWords);
           categoryCountMap[category.cat] =
             (categoryCountMap[category.cat] || 0) + 1;
         }
@@ -136,7 +134,6 @@ export function mapDescriptionToCategory(
       .split(" ");
     splitDescription.forEach((word) => {
       if (descriptionWords.includes(word)) {
-        // console.log(description, "found a match with: ", expense.description);
         categoryCountMap[expense.category] =
           (categoryCountMap[expense.category] || 0) + 1;
       }

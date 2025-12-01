@@ -4,7 +4,6 @@ const languageObj = LANGUAGE_LIST.find(
   (language) => language.code === i18n.locale
 );
 const languageName = languageObj?.name;
-// console.log("languageName:", languageName);
 
 import axios from "axios";
 import { Keys, loadKeys } from "../components/Premium/PremiumConstants";
@@ -57,48 +56,22 @@ async function performWebSearch(query: string): Promise<string> {
         timeout: 30000,
       }
     );
-    console.log("Web search response:", JSON.stringify(response.data, null, 2));
 
     // Parse the response structure - look for the message content
     if (response.data.output && response.data.output.length > 0) {
-      console.log(
-        "Found output array with length:",
-        response.data.output.length
-      );
-
       const messageOutput = response.data.output.find(
         (item: any) => item.type === "message"
       );
       if (messageOutput) {
-        console.log("Found message output:", messageOutput);
-
         if (messageOutput.content && messageOutput.content.length > 0) {
-          console.log(
-            "Found content array with length:",
-            messageOutput.content.length
-          );
-
           const textContent = messageOutput.content.find(
             (content: any) => content.type === "output_text"
           );
           if (textContent) {
-            console.log("Found output_text content:", textContent.text);
             return textContent.text || "Web search completed but no text found";
-          } else {
-            console.log("No output_text content found in message content");
-            console.log(
-              "Available content types:",
-              messageOutput.content.map((c: any) => c.type)
-            );
           }
-        } else {
-          console.log("No content found in message output");
         }
-      } else {
-        console.log("No message output found in response");
       }
-    } else {
-      console.log("No output array found in response");
     }
 
     return "Web search unavailable - check logs for details";
@@ -124,10 +97,6 @@ async function performComprehensiveWebSearch(
   // Create parallel search queries
   const seasonalQuery = `current season tourism peak off-season shoulder season ${country} ${currentMonth} ${currentYear}`;
   const pricingQuery = `current price cost local ${product} ${country} ${currency} ${currentMonth} ${currentYear}`;
-
-  console.log("Performing parallel web searches...");
-  console.log("Seasonal query:", seasonalQuery);
-  console.log("Pricing query:", pricingQuery);
 
   try {
     // Execute both searches in parallel
@@ -289,7 +258,6 @@ async function getGPT_Content(
 ): Promise<string> {
   switch (requestBody.requestType) {
     case GPT_RequestType.getGoodDeal:
-      // console.log("requestType:", GPT_RequestType.getGoodDeal);
       return await chatGPTcontentGoodDealPost(
         (requestBody as GPT_getGoodDeal).product,
         (requestBody as GPT_getGoodDeal).price,
@@ -298,12 +266,10 @@ async function getGPT_Content(
         onLoadingPhaseChange
       );
     case GPT_RequestType.getKeywords:
-      // console.log("requestType:", GPT_RequestType.getKeywords);
       return chatGPTcontentKeywords(
         (requestBody as GPT_getKeywords).customCategory
       );
     case GPT_RequestType.getPrice:
-      // console.log("requestType:", GPT_RequestType.getPrice);
       return await chatGPTcontentPrice(
         (requestBody as GPT_getPrice).product,
         (requestBody as GPT_getPrice).country,

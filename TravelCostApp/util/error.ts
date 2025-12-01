@@ -37,7 +37,6 @@ export default function safeLogError(
   //       stack: error instanceof Error ? error.stack : undefined,
   //     });
   //   } catch (vexoError) {
-  //     console.log("[Error] Failed to report to Vexo:", vexoError);
   //   }
   // }
 

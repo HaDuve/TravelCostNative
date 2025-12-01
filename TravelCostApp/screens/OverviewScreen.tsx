@@ -166,7 +166,6 @@ const OverviewScreen = ({ navigation }) => {
       });
     } catch (error) {
       // Error handling is done in refreshWithToast
-      // console.log("Refresh error:", error);
     }
   }, [expensesCtx, tripid, uid, tripCtx, setIsFetching, setRefreshing]);
 

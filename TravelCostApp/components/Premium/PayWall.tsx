@@ -50,9 +50,6 @@ const PaywallScreen = ({ navigation }) => {
           offerings.current.availablePackages?.length !== 0
         ) {
           // log available packages duration
-          // console.log(
-          //   offerings.current.availablePackages[0].product.subscriptionPeriod
-          // );
           setPackages(offerings.current.availablePackages);
         }
       } catch (e) {
@@ -137,9 +134,6 @@ const PaywallScreen = ({ navigation }) => {
   );
 
   const footer = () => {
-    // // console.log(
-    //   "Modify this value to reflect your app's Privacy Policy and Terms & Conditions agreements. Required to make it through App Review."
-    // );
     return (
       <View>
         <View

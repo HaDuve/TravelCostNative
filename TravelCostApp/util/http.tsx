@@ -57,8 +57,6 @@ export const dataResponseTime = (func) => {
     const start = Date.now();
     const result = await func(...args);
     const end = Date.now();
-    // eslint-disable-next-line no-console
-    console.log(`Time taken by ${func.name} is ${end - start} ms`);
     return result;
   };
 };
@@ -66,14 +64,12 @@ export const dataResponseTime = (func) => {
 // fetch server info
 export const fetchServerInfo = async () => {
   try {
-    console.log("🌐 [HTTP] fetchServerInfo: Getting auth token");
     const authToken = await getValidIdToken();
     if (!authToken) {
       console.warn("[HTTP] No valid auth token available for fetchServerInfo");
       return null;
     }
 
-    console.log("🌐 [HTTP] fetchServerInfo: Making request to server");
     const response = await axios.get(
       `${BACKEND_URL}/server.json?auth=${authToken}`,
       {
@@ -85,10 +81,8 @@ export const fetchServerInfo = async () => {
     if (!response) throw new Error("No response from server");
     const data = response?.data;
     if (!data) throw new Error("No data on the server");
-    console.log("🌐 [HTTP] fetchServerInfo: Successfully fetched server data");
     return data;
   } catch (error) {
-    console.log("❌ [HTTP] fetchServerInfo failed:", error.message);
     safeLogError(error);
     return null;
   }
@@ -258,9 +252,6 @@ export async function fetchExpensesWithUIDs(
   }
 
   // check devices sync status (only fetch new data)
-  console.log(
-    `fetchExpensesWithUIDs getLastFetchTimestamp: tripid is ${tripid}`
-  );
   const lastFetch = getLastFetchTimestamp(tripid);
   const isFirstFetch = lastFetch === 0;
 
@@ -299,9 +290,6 @@ export async function fetchExpensesWithUIDs(
       safeLogError(error);
     }
   }
-  console.log(
-    `SET: fetchExpensesWithUIDs  setLastFetchTimestamp: tripid is ${tripid} to ${latestTimestamp}, fetched ${expenses.length} expenses`
-  );
   if (latestTimestamp > 0) {
     setLastFetchTimestamp(tripid, latestTimestamp);
   }
@@ -366,7 +354,6 @@ export async function fetchExpenses(
     };
 
     const lastFetch = getLastFetchTimestamp(tripid);
-    console.log(`fetchExpenses getLastFetchTimestamp: tripid is ${tripid}`);
     const isFirstFetch = lastFetch === 0;
 
     const authToken = await getValidIdToken();
@@ -400,9 +387,6 @@ export async function fetchExpenses(
 
       if (validTimestamps.length > 0) {
         const latestTimestamp = Math.max(...validTimestamps);
-        console.log(
-          `SET: fetchExpenses setLastFetchTimestamp: tripid is ${tripid} to ${latestTimestamp}`
-        );
         setLastFetchTimestamp(tripid, latestTimestamp);
       }
     }

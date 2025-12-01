@@ -96,7 +96,6 @@ function RecentExpenses({ navigation }) {
     ) => {
       if (userCtx.freshlyCreated) return;
       // if (ignoreTouched)
-      // console.log("getExpenses ~ ignoreTouched:", ignoreTouched);
       // check offlinemode
       const online = netCtx.isConnected && netCtx.strongConnection;
       const offlineQueue = getMMKVObject("offlineQueue");
@@ -104,7 +103,6 @@ function RecentExpenses({ navigation }) {
       if (!online || queueBlocked || userCtx.isSendingOfflineQueueMutex) {
         // if online, send offline queue
         if (online) {
-          // console.log("RecentExpenses ~ sending offline queue");
           await sendOfflineQueue(
             userCtx.isSendingOfflineQueueMutex,
             userCtx.setIsSendingOfflineQueueMutex,
@@ -127,7 +125,6 @@ function RecentExpenses({ navigation }) {
         setIsFetching(false);
         return;
       }
-      // console.log("we are touched and fetching expenses", tripid);
       // fetch and set expenses
 
       await fetchExpenses(
@@ -178,7 +175,6 @@ function RecentExpenses({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(async () => {
-    // console.log("refreshing: ", refreshing);
     // check if we have a offline queue
     const offlineQueue = await getOfflineQueue();
     // if we have a offline queue return
@@ -199,7 +195,6 @@ function RecentExpenses({ navigation }) {
       });
     } catch (error) {
       // Error handling is done in refreshWithToast
-      // console.log("Refresh error:", error);
     }
   }, [expensesCtx, tripid, uid, tripCtx, setIsFetching, setRefreshing]);
 
@@ -254,7 +249,6 @@ function RecentExpenses({ navigation }) {
         try {
           await tripCtx.fetchAndSetTravellers(tripCtx.tripid);
         } catch (error) {
-          // console.log("error loading travellers in expenseForm");
         }
       } else {
         await tripCtx.loadTravellersFromStorage();

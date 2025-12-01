@@ -35,7 +35,6 @@ const FinancialScreen = () => {
   ).toFixed(0);
 
   // calculate total budget // number of days in the trip * number of days from the beginning to today
-  // console.log("expensesSum ~ expensesSum:", expensesSum);
 
   const restCash =
     Number(daysFromStartToToday) * Number(tripCtx.dailyBudget) - expensesSum;
@@ -43,7 +42,6 @@ const FinancialScreen = () => {
   const multiTraveller =
     tripCtx.travellers && tripCtx.travellers.length > 1 ? true : false;
   // if (restCash < 0) restCash = 0;
-  // console.log("FinancialScreen ~ restCash:", restCash);
   return (
     <View style={styles.container}>
       <Text>{i18n.t("financialOverview")}</Text>

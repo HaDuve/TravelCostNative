@@ -177,7 +177,6 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
   const handleWebViewMessage = (event: { nativeEvent: { data: string } }) => {
     try {
       const message: ChartMessage = JSON.parse(event.nativeEvent.data);
-      console.log("🚀 ~ handleWebViewMessage ~ message:", message);
 
       switch (message.type) {
         case "chartReady":
@@ -185,38 +184,20 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
           if (onChartReady) {
             onChartReady();
           }
-          console.log("📊 Chart ready");
           break;
 
         case "selection":
           if (message.data) {
             const { min, max, timestamp } = message.data;
-            console.log("📊 Selection event (drag selection):", {
-              min,
-              max,
-              timestamp,
-            });
           }
           break;
 
         case "setExtremes":
           if (message.data) {
             const { min, max, trigger, timestamp } = message.data;
-            console.log("📊 Set extremes event (pinch/pan/zoom):", {
-              min,
-              max,
-              trigger,
-              timestamp,
-            });
 
             // Trigger zoom level change callback for pan/zoom events
             if (trigger && trigger !== "navigator") {
-              console.log("🔄 Zoom level change callback triggered:", {
-                min,
-                max,
-                trigger,
-                timestamp,
-              });
               onZoomLevelChange &&
                 onZoomLevelChange("normal", min || 0, max || 0);
             }
@@ -224,14 +205,12 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
             // Calculate and emit zoom state
             if (min != null && max != null) {
               const zoomState = calculateZoomState(min, max);
-              console.log("📊 Zoom state calculated:", zoomState);
               onZoomStateChange && onZoomStateChange(zoomState);
             }
           }
           break;
 
         default:
-          console.log("📊 Chart message:", message.type, message.data);
           break;
       }
     } catch (error) {

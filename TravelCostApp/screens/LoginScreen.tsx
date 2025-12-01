@@ -83,7 +83,6 @@ function LoginScreen() {
         text2: i18n.t("tryAgain"),
         visibilityTime: 4000,
       });
-      // console.log("loginHandler exception error");
       authCtx.logout(tripCtx.tripid);
       return;
     }
@@ -91,7 +90,6 @@ function LoginScreen() {
     let freshlyCreated = checkUser.freshlyCreated;
     if (!checkUser.currentTrip) {
       // we infer freshly created if no current trip exists but we assigned a name already
-      // console.log(
       //   "loginHandler ~ we set to freshly because username but no current trip!"
       // );
       await userCtx.setFreshlyCreatedTo(true);
@@ -113,13 +111,11 @@ function LoginScreen() {
         // Purchases
         Purchases.configure({ apiKey: REVCAT_A, appUserID: uid });
         await userCtx.checkPremium();
-        // console.log("LoginScreen ~ uid:", uid);
       }
       await Purchases.collectDeviceIdentifiers();
       await setAttributesAsync(email, userData.userName);
 
       // Branch.io removed - no event logging
-      // console.log("loginHandler ~ userData", userData);
     } catch (error) {
       safeLogError(error);
     }

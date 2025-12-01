@@ -189,7 +189,6 @@ export const storeExpenseOnlineOffline = async (
     } catch (error) {
       safeLogError("error1: could not store expense " + error);
       const id = await pushQueueReturnRndID(item);
-      // console.log("debugOQ id:", id);
       return id;
     }
   } else {

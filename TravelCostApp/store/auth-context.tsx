@@ -60,14 +60,6 @@ function AuthContextProvider({ children }) {
         if (validToken) {
           setAuthToken(validToken);
           setAxiosAccessToken(validToken);
-          console.log(
-            "[AUTH-CONTEXT] Authentication initialized with valid token",
-            validToken
-          );
-        } else {
-          console.log(
-            "[AUTH-CONTEXT] No valid token found, user needs to login"
-          );
         }
       } catch (error) {
         console.error("[AUTH-CONTEXT] Auth initialization error:", error);
@@ -86,7 +78,6 @@ function AuthContextProvider({ children }) {
     try {
       const authTest = await testFirebaseAuth();
       if (authTest.success) {
-        console.log("[AUTH-CONTEXT] Authentication verified successfully");
       } else {
         console.warn(
           "[AUTH-CONTEXT] Authentication test failed:",
@@ -125,7 +116,6 @@ function AuthContextProvider({ children }) {
     const auth = initializeAuth(app);
     // load email and password from async storage
     const email = await secureStoreGetItem("ENCM");
-    // console.log("deleteAccount ~ email:", email);
     const password = await secureStoreGetItem("ENCP");
     signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
       // Signed in
@@ -133,7 +123,6 @@ function AuthContextProvider({ children }) {
       deleteUser(user)
         .then(() => {
           // User deleted.
-          // console.log("User deleted.");
           Toast.show({
             type: "success",
             text1: i18n.t("toastAccDeleted1"),

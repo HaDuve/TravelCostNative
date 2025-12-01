@@ -19,12 +19,10 @@ export async function versionCheck() {
   try {
     const versionCheckTimeStamp = getMMKVString("versionCheckTimeStamp");
 
-    // console.log("versionCheck ~ versionCheckTimeStamp:", versionCheckTimeStamp);
     if (versionCheckTimeStamp) {
       const timeDiff =
         (new Date().getTime() - new Date(versionCheckTimeStamp).getTime()) /
         1000;
-      // console.log("versionCheck ~ timeDiff:", timeDiff);
       if (timeDiff < 60 * 60 * 24 * 1) {
         // 1 day no annoying reminder
         return;
@@ -37,8 +35,6 @@ export async function versionCheck() {
     // storeUrl : string
     // currentVersion : string
     // latestVersion : string
-    // console.log("versionCheck ~ current version", updateResponse?.currentVersion);
-    // console.log("versionCheck ~ latest version", updateResponse?.latestVersion);
     if (updateResponse?.isNeeded && updateResponse?.storeUrl) {
       Toast.show({
         type: "success",
@@ -59,7 +55,6 @@ export async function versionCheck() {
     return updateResponse;
   } catch (error) {
     // Silently handle version check errors to prevent app crashes
-    console.log("Version check failed:", error.message);
     return null;
   }
 }

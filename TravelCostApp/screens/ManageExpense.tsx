@@ -210,7 +210,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
                       await touchAllTravelers(tripid, true);
                       Toast.hide();
                     } catch (error) {
-                      // console.log(i18n.t("deleteError"), error);
                       Toast.show({
                         text1: i18n.t("error"),
                         text2: i18n.t("error2"),
@@ -352,7 +351,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   };
 
   const editRangedData = async (expenseData) => {
-    // console.log("ranged Data detected");
 
     // find all the expenses that have the same identifying rangeId
     const expensesInRange = expenseCtx.expenses.filter(
@@ -361,7 +359,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     );
     // if we dont find any expenses, it must have been a non-ranged expense, so update it to a ranged expense
     if (expensesInRange?.length === 0) {
-      // console.log("no expenses in range found");
       // delete the original expense
       expenseCtx.deleteExpense(editedExpenseId);
       const item: OfflineQueueManageExpenseItem = {
@@ -442,7 +439,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       };
       expenseCtx.updateExpense(expense.id, expenseData);
       await updateExpenseOnlineOffline(item, isOnline);
-      // console.log("updated expense nr: " + (i + 1), expense.rangeId);
     }
   };
 
@@ -455,7 +451,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       const base = tripCtx.tripCurrency;
       const target = expenseData.currency;
       const rate = await getRate(base, target);
-      // console.log("confirmHandler ~ rate:", rate);
       if (rate === -1) {
         Alert.alert(
           "Error",
@@ -486,11 +481,9 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           selectedExpense.rangeId
         ) {
           // editing ranged Data
-          // console.log("deciding to edit ranged data");
           await editRangedData(expenseData);
         } else {
           // editing normal expense (no-ranged)
-          // console.log("deciding to edit normal data");
           await editSingleData(expenseData);
         }
 

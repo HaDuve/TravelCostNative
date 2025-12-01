@@ -132,7 +132,6 @@ const ExpenseGraph = ({
               pressed && GlobalStyles.pressedWithShadow,
             ]}
             onLongPress={() => {
-              // console.log("longPress");
               Haptics.notificationAsync(
                 Haptics.NotificationFeedbackType.Success
               );

@@ -126,7 +126,6 @@ const GPTDealScreen = ({ route, navigation }) => {
       setIsFetching(true);
 
       if (!price || price === "" || isNaN(Number(price))) {
-        // console.log("GPTDealScreen ~no price:", price);
         try {
           const getPrice: GPT_getPrice = {
             requestType: GPT_RequestType.getPrice,
@@ -207,7 +206,6 @@ const GPTDealScreen = ({ route, navigation }) => {
   }, [country, currency, price, product, answer]);
 
   const startStreaming = (content) => {
-    console.log("startStreaming ~ content:", content);
     // Split content into chapters/sections by double newlines
     const sections = content.split(/\n\s*\n/).filter((section) => {
       const trimmed = section.trim();

@@ -67,7 +67,6 @@ async function registerForPushNotificationsAsync() {
     }
     if (finalStatus !== "granted") {
       // Notification permissions not granted - silently return without showing alert
-      // console.log("Notification permissions not granted, continuing without notifications");
       return;
     }
     // todo implement a later get if device is offline
@@ -78,14 +77,10 @@ async function registerForPushNotificationsAsync() {
       });
       // granted so we want to save the token in the trip
       await storeExpoPushTokenInTrip(token, "");
-      // console.log("storeExpoPushTokenInTrip succeeded");
     } catch {
-      // console.log("storeExpoPushTokenInTrip failed, will try later");
       setMMKVObject("expoPushTokenStatus", { failed: true });
     }
-    // console.log(token);
   } else {
-    // console.log("Must use physical device for Push Notifications");
   }
 
   if (Platform.OS === "android") {
@@ -136,7 +131,6 @@ const ProfileScreen = ({ navigation }) => {
       .then((pushToken: ExpoPushToken) => {
         if (!pushToken) return;
         const token = pushToken.data;
-        // console.log("token", token);
         setExpoPushToken(token);
       })
       .catch((e) => Alert.alert(e, e.message));
@@ -148,7 +142,6 @@ const ProfileScreen = ({ navigation }) => {
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        // console.log(response);
       });
 
     return () => {
@@ -203,7 +196,6 @@ const ProfileScreen = ({ navigation }) => {
         if (!isConnected) return;
         // Branch.io removed - no campaign tracking
       } catch (error) {
-        // console.log(
         //   "setAttributesAsync - Settings - ForRevCat ~ error:",
         //   error
         // );
@@ -247,7 +239,6 @@ const ProfileScreen = ({ navigation }) => {
   // Can start at mount 🎉
   // you need to wait until everything is registered 😁
   async function sleepyStartTour() {
-    // console.log("sleepyStartTour ~ sleepyStartTour:", sleepyStartTour);
     setTourIsRunning(true);
     await sleep(1000);
     start();
@@ -262,7 +253,6 @@ const ProfileScreen = ({ navigation }) => {
   const handleOnStart = () => {
     trackEvent(VexoEvents.ONBOARDING_TOUR_STARTED);
     navigation.navigate("RecentExpenses");
-    // console.log("start");
   };
   const handleOnStop = () => {
     trackEvent(VexoEvents.ONBOARDING_TOUR_SKIPPED);
@@ -270,10 +260,8 @@ const ProfileScreen = ({ navigation }) => {
     userCtx.setNeedsTour(false);
     setTourIsRunning(false);
     // Branch.io removed - no event logging
-    // console.log("stop");
   };
   const handleOnStepChange = async (step) => {
-    // console.log(`stepChange, name: ${step?.name} order: ${step?.order}`);
     switch (step?.order) {
       case 1:
         await navigation.navigate("RecentExpenses");

@@ -100,7 +100,6 @@ const SplitSummaryScreen = ({ navigation }) => {
   );
 
   const getOpenSplits = useCallback(async () => {
-    // console.log("called getOpenSplits!");
     if (!tripid || expenses?.length === 0) return;
     setIsFetching(true);
     try {
@@ -202,7 +201,6 @@ const SplitSummaryScreen = ({ navigation }) => {
       setTitleText(titleTextSimplified);
       setSubTitleText(subTitleSimplified);
     } catch (error) {
-      // console.log("handleSimpflifySplits ~ error", error);
     }
   }, [splits?.length, subTitleSimplified]);
 
@@ -222,7 +220,6 @@ const SplitSummaryScreen = ({ navigation }) => {
       setTotalPaidBackText("");
       setTotalPayBackText("");
     } catch (error) {
-      // console.log("settleSplitsHandler ~ error", error);
     }
     setIsFetching(false);
     navigation.popToTop();
@@ -253,7 +250,6 @@ const SplitSummaryScreen = ({ navigation }) => {
       return (
         <Pressable
           onPress={() => {
-            // console.log("length of split expenses", length);
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             navigation.navigate("FilteredExpenses", {
               expenses: expensesList,

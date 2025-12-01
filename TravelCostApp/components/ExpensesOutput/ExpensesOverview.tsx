@@ -32,13 +32,9 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
 
   const { onTouchStart, onTouchEnd } = useSwipe(onSwipeLeft, onSwipeRight, 6);
 
-  function onSwipeLeft() {
-    console.log("SWIPE_LEFT");
-  }
+  function onSwipeLeft() {}
 
-  function onSwipeRight() {
-    console.log("SWIPE_RIGHT");
-  }
+  function onSwipeRight() {}
 
   const handleZoomStateChange = useCallback(
     (zoomState: {

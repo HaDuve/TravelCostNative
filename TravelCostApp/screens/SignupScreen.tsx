@@ -117,7 +117,6 @@ function SignupScreen() {
       });
     } catch (error) {
       await authCtx.authenticate(token);
-      // console.log("error", error);
     }
     await authCtx.authenticate(token);
   }

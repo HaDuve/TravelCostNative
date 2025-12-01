@@ -151,10 +151,6 @@ function UserContextProvider({ children }) {
   const [hasNewChanges, setHasNewChanges] = useState(false);
 
   const loadLastCurrencyCountryFromAsync = useCallback(async () => {
-    // console.log(
-    //   "loadLastCurrencyCountryFromAsync ~ loadLastCurrencyCountryFromAsync:",
-    //   loadLastCurrencyCountryFromAsync
-    // );
     try {
       const lastCurrencyString = await secureStoreGetItem("lastCurrency");
       const lastCountryString = await secureStoreGetItem("lastCountry");
@@ -174,7 +170,6 @@ function UserContextProvider({ children }) {
 
   async function updateTripHistory() {
     const uid = await secureStoreGetItem("uid");
-    // console.log("fetch ~ uid:", uid);
     if (!uid || DEBUG_FORCE_OFFLINE) return;
     try {
       const tripHistoryResponse = await fetchTripHistory(uid);
@@ -198,7 +193,6 @@ function UserContextProvider({ children }) {
 
   async function checkPremium() {
     const isPremiumNow = await isPremiumMember();
-    // console.log("checkPremium ~ isPremiumNow:", isPremiumNow);
     setIsPremium(isPremiumNow);
     return isPremiumNow;
   }
@@ -207,10 +201,8 @@ function UserContextProvider({ children }) {
       // handle any changes to purchaserInfo
       if (typeof info.entitlements.active[ENTITLEMENT_ID] !== "undefined") {
         // Grant user "premium" access
-        // console.log("User is premium member");
         setIsPremium(true);
       } else {
-        // console.log("User is not premium member");
         setIsPremium(false);
       }
     });
@@ -225,7 +217,6 @@ function UserContextProvider({ children }) {
         );
         if (isPremiumString !== null) {
           const isPremiumNow = safelyParseJSON(isPremiumString);
-          // console.log("loadIsPremiumFromAsync ~ isPremiumNow:", isPremiumNow);
           setIsPremium(isPremiumNow);
           return;
         }
@@ -273,9 +264,7 @@ function UserContextProvider({ children }) {
   }
 
   async function addUserName(userData: UserData) {
-    // // console.log("addUser ~ UserData", UserData);
     if (!userData || !userData.userName) {
-      // console.log("addUser ~ no UserData to add Username!");
       return;
     }
     setUserName(userData.userName);
@@ -283,24 +272,20 @@ function UserContextProvider({ children }) {
   }
 
   async function setFreshlyCreatedTo(bool: boolean) {
-    // // console.log("setFreshlyCreatedTo ~ bool", bool);
     setFreshlyCreated(bool);
     await asyncStoreSetObject("freshlyCreated", bool);
   }
 
   function deleteUser(id: string) {
-    // // console.log("deleteUser ~ id", id);
     Alert.alert(i18n.t("alertDeleteContextNotImplemented"));
   }
   async function setUserName(name: string) {
-    // // console.log("setUserName ~ name", name);
     if (!name || name?.length < 1) return;
     setName(name);
     await saveUserNameInStorage(name);
   }
 
   async function saveUserNameInStorage(name: string) {
-    // console.log("saveUserNameInStorage ~ userName", name);
     await secureStoreSetItem("userName", name);
   }
 

@@ -110,10 +110,8 @@ const SettingsScreen = ({ navigation }) => {
     try {
       const restore = await Purchases.restorePurchases();
       // ... check restored purchaserInfo to see if entitlement is now active
-      // console.log("restorePurchases ~ restore:", restore);
       if (restore.entitlements.all[ENTITLEMENT_ID].isActive) {
         // ... grant user entitlement
-        // console.log("restorePurchases ~ restore.entitlements.all:", restore);
         await userCtx.checkPremium();
         navigation.pop();
         Toast.show({
@@ -128,7 +126,6 @@ const SettingsScreen = ({ navigation }) => {
         text1: i18n.t("premiumNomad"),
         text2: i18n.t("premiumNomadError"),
       });
-      // console.log("restorePurchases ~ e:", e);
     }
     setIsRestoringPurchases(false);
   }
@@ -215,7 +212,6 @@ const SettingsScreen = ({ navigation }) => {
             Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
             return;
           }
-          // console.log("pressed premium button");
           if (premiumStatus) {
             trackEvent(VexoEvents.CUSTOMER_SCREEN_PRESSED);
             navigation.navigate("Customer");

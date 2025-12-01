@@ -51,7 +51,6 @@ async function registerForPushNotificationsAsync() {
     }
     if (finalStatus !== "granted") {
       // Notification permissions not granted - silently return without showing toast
-      // console.log("Notification permissions not granted, continuing without notifications");
       return;
     }
     // todo implement a later get if device is offline
@@ -60,10 +59,8 @@ async function registerForPushNotificationsAsync() {
     });
     // granted so we want to save the token in the trip
     await storeExpoPushTokenInTrip(token, "");
-    // console.log(token);
   } else {
     // Not a physical device - silently return without showing toast
-    // console.log("Must use physical device for Push Notifications");
     return;
   }
 
@@ -90,11 +87,9 @@ const TEST_PushScreen = () => {
     registerForPushNotificationsAsync()
       .then((pushToken: ExpoPushToken) => {
         const token = pushToken.data;
-        // console.log("token", token);
         setExpoPushToken(token);
       })
       .catch((e) => {
-        // console.log("token error", e)
       });
 
     notificationListener.current =
@@ -104,7 +99,6 @@ const TEST_PushScreen = () => {
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        // console.log(response);
       });
 
     return () => {

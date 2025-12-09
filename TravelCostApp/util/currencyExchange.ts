@@ -12,17 +12,34 @@ import {
   setMMKVString,
 } from "../store/mmkv";
 
+function saveBaseRates(base: string, rates: Record<string, number>) {
+  // Merge new rates into MMKV and refresh timestamp for offline reuse
+  const existingRates = getMMKVObject("currencyExchange_base_" + base) || {};
+  setMMKVObject("currencyExchange_base_" + base, {
+    ...existingRates,
+    ...rates,
+  });
+  setMMKVString("currencyExchange_lastUpdate", DateTime.now().toISO());
+}
+
 export async function getRate(
   base: string,
   target: string,
   forceNewRate = false
 ): Promise<number> {
   const connectionInfo = await NetInfo.fetch();
-  const isOnline = connectionInfo && connectionInfo.isInternetReachable;
+  const isOnline =
+    connectionInfo &&
+    connectionInfo.isInternetReachable &&
+    !DEBUG_FORCE_OFFLINE;
 
   if (!isOnline) {
-    // Truly offline - use offline rate with error logging
-    return getOfflineRate(base, target);
+    // Truly offline - use offline rate with error logging but prefer cached data
+    const offlineRate = await getOfflineRateAny(base, target);
+    if (offlineRate !== -1) {
+      return offlineRate;
+    }
+    return -1;
   }
 
   // Online - try API1 first
@@ -88,6 +105,8 @@ export async function getRateAPI2(
     const timeStamp = DateTime.now().toISO();
     await asyncStoreSetItem("currencyExchangeAPI2_update", timeStamp);
     await asyncStoreSetItem("currencyExchangeAPI2_" + base + target, rate);
+    // Also persist to MMKV so offline mode can re-use last good rate
+    saveBaseRates(base, { [target]: rate });
     return rate;
   } catch (error) {
     safeLogError(error);
@@ -131,9 +150,7 @@ export async function getRateAPI1(
       if (DEBUG_FORCE_OFFLINE) {
         return getCachedRate(base, target);
       }
-      setMMKVObject("currencyExchange_base_" + base, rates);
-      const timeStamp = DateTime.now().toISO();
-      setMMKVString("currencyExchange_lastUpdate", timeStamp);
+      saveBaseRates(base, rates);
       return rates[target];
     } else {
       // API succeeded but target currency not found - try fallback calculation
@@ -149,12 +166,19 @@ export function getCachedRate(base: string, target: string) {
   // Get cached rate without logging errors (used when online)
   const currencyExchange = getMMKVObject("currencyExchange_base_" + base);
   if (currencyExchange && currencyExchange[target]) {
-    return currencyExchange[target];
+    const rate = currencyExchange[target];
+    // Refresh timestamp so offline mode can still rely on this data
+    saveBaseRates(base, { [target]: rate });
+    return rate;
   }
   return -1;
 }
 
-export function getFallbackRate(base: string, target: string, rates: any) {
+export function getFallbackRate(
+  base: string,
+  target: string,
+  rates?: Record<string, number> | null
+) {
   // Try to calculate rate using USD as intermediate currency
   if (!rates || !rates.USD) {
     return -1;
@@ -173,9 +197,12 @@ export function getFallbackRate(base: string, target: string, rates: any) {
 }
 
 export function getOfflineRate(base: string, target: string) {
+  if (base === target) {
+    return 1;
+  }
   // offline get from asyncstore - only used when truly offline
   const currencyExchange = getMMKVObject("currencyExchange_base_" + base);
-  if (currencyExchange) {
+  if (currencyExchange && currencyExchange[target]) {
     return currencyExchange[target];
   } else {
     // Only log error when truly offline - this prevents error spam when online
@@ -184,6 +211,44 @@ export function getOfflineRate(base: string, target: string) {
       "currencyExchange.ts",
       137
     );
-    return -1;
   }
+  return -1;
+}
+
+async function getOfflineRateAny(base: string, target: string) {
+  if (base === target) {
+    return 1;
+  }
+
+  // 1) Try MMKV
+  const mmkvRate = getOfflineRate(base, target);
+  if (mmkvRate !== -1) {
+    return mmkvRate;
+  }
+
+  // 2) Try async storage (API2 cache)
+  try {
+    const api2Rate = await asyncStoreGetItem(
+      "currencyExchangeAPI2_" + base + target
+    );
+    if (api2Rate !== undefined && api2Rate !== null) {
+      const parsedRate =
+        typeof api2Rate === "string" ? Number(api2Rate) : api2Rate;
+      if (typeof parsedRate === "number" && !Number.isNaN(parsedRate)) {
+        // Persist into MMKV for future use
+        saveBaseRates(base, { [target]: parsedRate });
+        return parsedRate;
+      }
+    }
+  } catch (error) {
+    safeLogError(error);
+  }
+
+  // 3) Nothing cached
+  safeLogError(
+    "Unable to get offline rate for " + base + " " + target,
+    "currencyExchange.ts",
+    137
+  );
+  return -1;
 }

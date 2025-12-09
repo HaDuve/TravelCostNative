@@ -212,17 +212,10 @@ function TripContextProvider({ children }) {
     setRefreshState(!refreshState);
   }
 
-  async function fetchAndSetTravellers(tripid: string) {
+  async function fetchAndSetTravellers(tripid: string): Promise<boolean> {
+    await loadTravellersFromStorage();
     const { isFastEnough } = await isConnectionFastEnough();
-    if (!isFastEnough) {
-      await loadTravellersFromStorage();
-      return;
-    }
-    if (!tripid || tripid === "") {
-      // setTravellers([]);
-      return false;
-    }
-    // updates the current Travellers in context
+    if (!isFastEnough || !tripid || tripid === "") return false;
     try {
       const travellers = await getTravellers(tripid);
       if (travellers?.length < 1) throw new Error("no travellers found");
@@ -231,7 +224,7 @@ function TripContextProvider({ children }) {
       return true;
     } catch (error) {
       safeLogError(error);
-      throw new Error("no travellers found");
+      return false;
     }
   }
 
@@ -382,11 +375,12 @@ function TripContextProvider({ children }) {
     await asyncStoreSetObject("currentTravellers", travellers);
   }
 
-  async function loadTravellersFromStorage() {
+  async function loadTravellersFromStorage(): Promise<Traveller[]> {
     const travellers = await asyncStoreGetObject("currentTravellers");
     if (travellers) {
       setTravellers(travellers);
     }
+    return travellers;
   }
 
   const value = {

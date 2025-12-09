@@ -1,4 +1,4 @@
-import { Platform, StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View, Text } from "react-native";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { GlobalStyles } from "../../constants/styles";
 import * as Progress from "react-native-progress";
@@ -52,15 +52,35 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
     call();
   }, [userCtx.lastCurrency, tripCtx.tripCurrency, getRateCallback]);
 
-  if (!expenses || !periodName || userCtx.freshlyCreated) return <></>;
+  const safeExpenses = Array.isArray(expenses) ? expenses : [];
+  const travellers = Array.isArray(tripCtx.travellers)
+    ? tripCtx.travellers
+    : [];
+  const travellerNames = travellers.map((traveller) =>
+    typeof traveller === "string" ? traveller : traveller?.userName
+  );
+  const tripCurrency = tripCtx.tripCurrency || userCtx.lastCurrency || "";
+  const isOfflineMissingTrip =
+    !tripCtx.tripid && travellers.length === 0 && !tripCurrency;
 
-  const expensesSum = getExpensesSumPeriod(expenses, hideSpecial);
+  if (!periodName || userCtx.freshlyCreated) return <></>;
+
+  if (isOfflineMissingTrip) {
+    return (
+      <View style={[styles.container, style]}>
+        <Text style={styles.offlineText}>
+          {i18n.t("offline")}: {i18n.t("noDataAvailable")}
+        </Text>
+      </View>
+    );
+  }
+
+  const expensesSum = getExpensesSumPeriod(safeExpenses, hideSpecial);
 
   if (isNaN(Number(expensesSum))) {
     return <></>;
   }
 
-  const tripCurrency = tripCtx.tripCurrency;
   const expensesSumString = formatExpenseWithCurrency(
     truncateNumber(expensesSum, 1000, true),
     tripCurrency
@@ -74,48 +94,53 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
           userCtx.lastCurrency
         );
 
-  let budgetNumber = Number(tripCtx.dailyBudget);
+  let budgetNumber = Number(tripCtx.dailyBudget ?? 0);
   let infinityString = "";
   let periodExpenses: ExpenseData[] = [];
   let periodLabel = "";
   const expenseSumNum = Number(expensesSum);
-  const totalBudget = Number(tripCtx.totalBudget);
+  let totalBudget = Number(tripCtx.totalBudget ?? 0);
+  if (Number.isNaN(totalBudget)) totalBudget = 0;
+  if (Number.isNaN(budgetNumber)) budgetNumber = 0;
 
   let budgetMult = 1;
   switch (periodName) {
     case "day":
-      periodExpenses = expCtx.getRecentExpenses(RangeString.day);
+      periodExpenses = expCtx.getRecentExpenses(RangeString.day) || [];
       periodLabel = i18n.t("todayLabel");
       break;
     case "week":
       budgetMult = 7;
       budgetNumber = budgetNumber * budgetMult;
-      periodExpenses = expCtx.getRecentExpenses(RangeString.week);
+      periodExpenses = expCtx.getRecentExpenses(RangeString.week) || [];
       periodLabel = i18n.t("weekLabel");
       break;
     case "month":
       budgetMult = 30;
       budgetNumber = budgetNumber * budgetMult;
-      periodExpenses = expCtx.getRecentExpenses(RangeString.month);
+      periodExpenses = expCtx.getRecentExpenses(RangeString.month) || [];
       periodLabel = i18n.t("monthLabel");
       break;
     case "year":
       budgetMult = 365;
       budgetNumber = budgetNumber * budgetMult;
-      periodExpenses = expCtx.getRecentExpenses(RangeString.year);
+      periodExpenses = expCtx.getRecentExpenses(RangeString.year) || [];
       periodLabel = i18n.t("yearLabel");
       break;
     case "total":
       budgetNumber = totalBudget ?? MAX_JS_NUMBER;
-      periodExpenses = expCtx.expenses;
+      periodExpenses = expCtx.expenses || [];
       periodLabel = i18n.t("totalLabel");
       break;
     default:
       break;
   }
-  const travellers = tripCtx.travellers;
-  const travellerSplitExpenseSums = travellers.map((traveller) => {
-    return getTravellerSum(periodExpenses, traveller, periodName === "total");
+  const travellerSplitExpenseSums = travellerNames.map((travellerName) => {
+    return getTravellerSum(
+      periodExpenses,
+      travellerName || "",
+      periodName === "total"
+    );
   });
 
   if (!budgetNumber || budgetNumber == MAX_JS_NUMBER) infinityString = "∞";
@@ -126,7 +151,8 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
     tripCtx.totalBudget == "" ||
     isNaN(Number(tripCtx.totalBudget)) ||
     tripCtx.totalBudget >= MAX_JS_NUMBER.toString();
-  let budgetProgress = (expenseSumNum / budgetNumber) * 1;
+  let budgetProgress =
+    budgetNumber > 0 ? (expenseSumNum / budgetNumber) * 1 : 0;
 
   const today = new Date();
   const averageDailySpending = settings.trafficLightBudgetColors
@@ -209,8 +235,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
     userCtx.lastCurrency
   )}`;
 
-  const valid =
-    tripCtx.tripid && tripCtx.travellers && tripCtx.travellers?.length > 0;
+  const valid = tripCtx.tripid && travellerNames.length > 0;
   const pressBudgetHandler = () => {
     if (isToastShowing) {
       setIsToastShowing(false);
@@ -257,8 +282,9 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
           1,
           tripCurrency
         )} = ${formatExpenseWithCurrency(lastRate, lastCurrency)}`,
-        travellerList: tripCtx.travellers,
-        travellerBudgets: budgetNumber / tripCtx.travellers.length,
+        travellerList: travellerNames,
+        travellerBudgets:
+          travellerNames.length > 0 ? budgetNumber / travellerNames.length : 0,
         budgetNumber: budgetNumber,
         travellerSplitExpenseSums: travellerSplitExpenseSums,
         currency: tripCurrency,
@@ -339,6 +365,10 @@ const styles = StyleSheet.create({
   },
   sumTextContainer: {
     alignItems: "center",
+  },
+  offlineText: {
+    color: GlobalStyles.colors.primary500,
+    textAlign: "center",
   },
   sum: {
     fontSize: dynamicScale(32, false, 0.5),

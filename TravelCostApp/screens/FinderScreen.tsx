@@ -95,8 +95,9 @@ const FinderScreen = () => {
     onCancelRange,
     onConfirmRange,
   });
-  const dateIsRanged =
-    startDate?.toString().slice(0, 10) !== endDate?.toString().slice(0, 10);
+  const startDateStr = (startDate ?? "").toString();
+  const endDateStr = (endDate ?? "").toString();
+  const dateIsRanged = startDateStr.slice(0, 10) !== endDateStr.slice(0, 10);
   const [searchQuery, setSearchQuery] = React.useState("");
 
   const onChangeSearch = (query) => {
@@ -120,10 +121,10 @@ const FinderScreen = () => {
           const expenseDate = expense.startDate;
           const expenseDateIsSameDay =
             !checkedDate ||
-            expenseDate?.toString().slice(0, 10) ===
-              startDate?.toString().slice(0, 10) ||
-            DateTime.fromJSDate(expense.date).toString()?.slice(0, 10) ===
-              startDate?.toString().slice(0, 10);
+            (expenseDate?.toString()?.slice(0, 10) ?? "") ===
+              startDateStr.slice(0, 10) ||
+            (DateTime.fromJSDate(expense.date).toString()?.slice(0, 10) ??
+              "") === startDateStr.slice(0, 10);
           const expenseDateIsInRange =
             expenseDateIsSameDay ||
             (expenseDate >= startDate && expenseDate <= endDate) ||
@@ -272,7 +273,9 @@ const FinderScreen = () => {
   const cats = DEFAULTCATEGORIES.map((cat) => {
     if (cat.cat !== "newCat") return cat.catString;
   });
-  const travellers = tripCtx.travellers;
+  const travellers = Array.isArray(tripCtx.travellers)
+    ? tripCtx.travellers
+    : [];
 
   const suggestions = searchQuery
     ? [...travellers, ...cats, ...suggestionData]

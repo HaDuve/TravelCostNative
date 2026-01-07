@@ -353,7 +353,6 @@ export async function calcOpenSplitsTable(
   isPaidDate?: string
 ) {
   // cleanup all expenses where payer === debtor
-
   let expenses = [];
   const rates = {};
   rates[tripCurrency] = 1;
@@ -376,33 +375,48 @@ export async function calcOpenSplitsTable(
   }
   let openSplits = [];
   const asyncSplitList = async () => {
+    // Normalize dates for comparison
+    const normalizeDate = (date: DateOrDateTime): Date => {
+      if (date instanceof Date) {
+        return date;
+      }
+      if (date instanceof DateTime) {
+        return date.toJSDate();
+      }
+      // If it's a string, parse it
+      if (typeof date === "string") {
+        return DateTime.fromISO(date).toJSDate();
+      }
+      return new Date(date);
+    };
+
+    // Calculate paidDate boundary (end of day) if isPaidDate is set
+    // This ensures expenses on the same day as settlement are included in settlement
+    const paidDateBoundary = isPaidDate
+      ? DateTime.fromISO(isPaidDate).endOf("day").toJSDate()
+      : null;
+
+    const isBeforePaidDate = paidDateBoundary
+      ? (date: DateOrDateTime) => {
+          const normalized = normalizeDate(date);
+          return normalized <= paidDateBoundary;
+        }
+      : () => false; // If no paidDate, don't skip by date
+
     for (const exp of expenses) {
       const expense: ExpenseData = exp;
-      // Normalize dates for comparison
-      const normalizeDate = (date: DateOrDateTime): Date => {
-        if (date instanceof Date) {
-          return date;
-        }
-        if (date instanceof DateTime) {
-          return date.toJSDate();
-        }
-        // If it's a string, parse it
-        if (typeof date === "string") {
-          return DateTime.fromISO(date).toJSDate();
-        }
-        return new Date(date);
-      };
 
-      const paidDate = DateTime.fromISO(isPaidDate).toJSDate();
       if (
         expense.splitType === "SELF" ||
         !expense.splitList ||
         expense.isPaid == isPaidString.paid ||
-        normalizeDate(expense.startDate) < paidDate ||
-        normalizeDate(expense.date) < paidDate ||
-        normalizeDate(expense.endDate) < paidDate
-      )
+        (paidDateBoundary &&
+          (isBeforePaidDate(expense.startDate) ||
+            isBeforePaidDate(expense.date) ||
+            isBeforePaidDate(expense.endDate)))
+      ) {
         continue;
+      }
       for (const split of expense.splitList) {
         if (split.userName !== expense.whoPaid) {
           // check if rate is already in rates

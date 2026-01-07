@@ -201,8 +201,15 @@ const SplitSummaryScreen = ({ navigation }) => {
       setTitleText(titleTextSimplified);
       setSubTitleText(subTitleSimplified);
     } catch (error) {
+      safeLogError(error, "SplitSummaryScreen.tsx", 204);
     }
-  }, [splits?.length, subTitleSimplified]);
+  }, [
+    navigation,
+    noSimpleSplits,
+    simpleSplits,
+    splits?.length,
+    subTitleSimplified,
+  ]);
 
   function errorHandler() {
     setError(null);
@@ -220,10 +227,11 @@ const SplitSummaryScreen = ({ navigation }) => {
       setTotalPaidBackText("");
       setTotalPayBackText("");
     } catch (error) {
+      safeLogError(error, "SplitSummaryScreen.tsx", 224);
     }
     setIsFetching(false);
     navigation.popToTop();
-  }, []);
+  }, [fetchAndSettleCurrentTrip, getOpenSplits, navigation, subTitleOriginal]);
 
   const renderSplitItem = useCallback(
     (itemData) => {
@@ -282,6 +290,7 @@ const SplitSummaryScreen = ({ navigation }) => {
     <View style={isPortrait && styles.buttonContainer}>
       {!showSimplify && (
         <FlatButton
+          textStyle={styles.buttonText}
           onPress={async () => {
             if (showSimplify) {
               trackEvent(VexoEvents.SPLIT_SUMMARY_BACK_PRESSED);
@@ -298,7 +307,11 @@ const SplitSummaryScreen = ({ navigation }) => {
         </FlatButton>
       )}
       {showSimplify && !noSimpleSplits && (
-        <GradientButton style={styles.button} onPress={handleSimpflifySplits}>
+        <GradientButton
+          buttonStyle={styles.button}
+          style={styles.button}
+          onPress={handleSimpflifySplits}
+        >
           Simplify Splits
         </GradientButton>
       )}
@@ -400,13 +413,18 @@ SplitSummaryScreen.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  buttonText: {
+    fontSize: dynamicScale(16, false, 0.5),
+    fontWeight: "500",
+    color: GlobalStyles.colors.textColor,
+  },
   container: {
     flex: 1,
     // alignItems: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   cardContainer: {
-    margin: dynamicScale(20),
+    margin: dynamicScale(20, false, 0.5),
     minHeight: "86%",
     alignItems: "center",
     justifyContent: "space-around",
@@ -418,12 +436,12 @@ const styles = StyleSheet.create({
     borderRadius: dynamicScale(20, false, 0.5),
     // borderWidth: 1,
     borderColor: GlobalStyles.colors.gray500,
-    minWidth: dynamicScale(300),
     // android styles
     ...Platform.select({
       android: {
         margin: dynamicScale(8),
         marginTop: dynamicScale(2, true),
+        minWidth: dynamicScale(300),
       },
     }),
   },
@@ -490,7 +508,7 @@ const styles = StyleSheet.create({
     alignContent: "center",
   },
   normalText: {
-    fontSize: dynamicScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "300",
     color: GlobalStyles.colors.textColor, // center
     alignItems: "center",

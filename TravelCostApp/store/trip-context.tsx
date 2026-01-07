@@ -1,19 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import React, { createContext, useEffect, useState } from "react";
-import { Alert } from "react-native";
 import { fetchTrip, fetchUser, getTravellers, updateTrip } from "../util/http";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
-import Toast from "react-native-toast-message";
 import { MAX_JS_NUMBER } from "../confAppConstants";
 import { secureStoreGetItem } from "./secure-storage";
 import { ExpenseData, isPaidString } from "../util/expense";
-import { err } from "react-native-svg/lib/typescript/xml";
 import { Traveller } from "../util/traveler";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { useInterval } from "../components/Hooks/useInterval";
 import { setMMKVObject, getMMKVObject } from "./mmkv";
-import set from "react-native-reanimated";
 import { Category } from "../util/category";
 import safeLogError from "../util/error";
 
@@ -87,7 +83,7 @@ export const TripContext = createContext<TripContextType>({
   refresh: () => {},
   setTripProgress: (percent: number) => {},
   travellers: [],
-  fetchAndSetTravellers: async (tripid: string) => {},
+  fetchAndSetTravellers: async (tripid: string) => false,
   setTotalSum: (amount: number) => {},
   setTripid: (tripid: string) => {},
 
@@ -360,9 +356,16 @@ function TripContextProvider({ children }) {
 
       setTripCurrency(tripData.tripCurrency);
       setdailyBudget(tripData.dailyBudget.toString());
+      setIsPaid(tripData.isPaid ?? isPaidString.notPaid);
+      setIsPaidDate(tripData.isPaidDate ?? "");
+      setTotalSumTrip(tripData.totalSum ?? 0);
+      setStartDate(tripData.startDate ?? "");
+      setEndDate(tripData.endDate ?? "");
       try {
         await loadTravellersFromStorage();
-      } catch (error) {}
+      } catch (error) {
+        safeLogError(error);
+      }
       setIsLoading(false);
 
       return tripData;

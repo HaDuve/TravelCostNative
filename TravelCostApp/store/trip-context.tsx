@@ -27,6 +27,7 @@ export interface TripData {
   endDate?: string;
   isPaidDate?: string;
   isPaid?: isPaidString;
+  isPaidTimestamp?: number;
   isDynamicDailyBudget?: boolean;
   // online categories are stored as a JSON.stringified strings
   // local categories are stored as Category arrays.
@@ -60,9 +61,11 @@ export type TripContextType = {
   loadTripDataFromStorage: () => Promise<TripData>;
   saveTravellersInStorage: (travellers) => Promise<void>;
   loadTravellersFromStorage: () => Promise<void>;
-  fetchAndSettleCurrentTrip: (unSettle?: boolean) => Promise<void>;
+  fetchAndSettleCurrentTrip: () => Promise<void>;
+  setTripUnsettled: () => Promise<void>;
   isPaid: isPaidString;
   isPaidDate: string;
+  isPaidTimestamp: number | undefined;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
   isDynamicDailyBudget: boolean;
@@ -98,12 +101,16 @@ export const TripContext = createContext<TripContextType>({
     return {};
   },
   saveTripDataInStorage: async (tripData: TripData) => {},
-  loadTripDataFromStorage: async () => {},
+  loadTripDataFromStorage: async (): Promise<TripData> => {
+    return {} as TripData;
+  },
   saveTravellersInStorage: async (travellers) => {},
   loadTravellersFromStorage: async () => {},
-  fetchAndSettleCurrentTrip: async (unSettle = false) => {},
+  fetchAndSettleCurrentTrip: async () => {},
+  setTripUnsettled: async () => {},
   isPaid: isPaidString.notPaid,
   isPaidDate: "",
+  isPaidTimestamp: undefined,
   isLoading: false,
   setIsLoading: (isLoading: boolean) => {},
   isDynamicDailyBudget: false,
@@ -123,6 +130,9 @@ function TripContextProvider({ children }) {
   const [endDate, setEndDate] = useState("");
   const [isPaid, setIsPaid] = useState(isPaidString.notPaid);
   const [isPaidDate, setIsPaidDate] = useState("");
+  const [isPaidTimestamp, setIsPaidTimestamp] = useState<number | undefined>(
+    undefined
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [isDynamicDailyBudget, setIsDynamicDailyBudget] = useState(false);
 
@@ -237,6 +247,7 @@ function TripContextProvider({ children }) {
       setEndDate("");
       setIsPaid(isPaidString.notPaid);
       setIsPaidDate("");
+      setIsPaidTimestamp(undefined);
       setTotalSumTrip(0);
       setIsLoading(false);
       return;
@@ -257,6 +268,7 @@ function TripContextProvider({ children }) {
     setEndDate(trip.endDate);
     setIsPaid(trip.isPaid);
     setIsPaidDate(trip.isPaidDate);
+    setIsPaidTimestamp(trip.isPaidTimestamp);
     setTotalSumTrip(trip.totalSum);
     setIsLoading(false);
     setIsDynamicDailyBudget(trip.isDynamicDailyBudget);
@@ -294,16 +306,28 @@ function TripContextProvider({ children }) {
     }
   }
 
-  async function fetchAndSettleCurrentTrip(unSettle = false) {
+  async function fetchAndSettleCurrentTrip() {
     try {
       const trip = await fetchTrip(tripid);
       trip.isPaid = isPaidString.paid;
+      const now = Date.now();
+      trip.isPaidTimestamp = now;
       const today = new Date();
       trip.isPaidDate = today.toISOString();
-      if (unSettle) {
-        trip.isPaid = isPaidString.notPaid;
-        trip.isPaidDate = "";
-      }
+      await setCurrentTrip(tripid, trip);
+      await saveTripDataInStorage(trip);
+      await updateTrip(tripid, trip);
+    } catch (error) {
+      safeLogError(error);
+    }
+  }
+
+  async function setTripUnsettled() {
+    try {
+      const trip = await fetchTrip(tripid);
+      trip.isPaid = isPaidString.notPaid;
+      // Keep isPaidTimestamp unchanged for reference
+      // isPaidTimestamp remains set even though isPaid is false
       await setCurrentTrip(tripid, trip);
       await saveTripDataInStorage(trip);
       await updateTrip(tripid, trip);
@@ -322,6 +346,7 @@ function TripContextProvider({ children }) {
       totalSum: totalSum,
       isPaid: isPaid,
       isPaidDate: isPaidDate,
+      isPaidTimestamp: isPaidTimestamp,
       tripProgress: progress,
       startDate: startDate,
       endDate: endDate,
@@ -358,6 +383,7 @@ function TripContextProvider({ children }) {
       setdailyBudget(tripData.dailyBudget.toString());
       setIsPaid(tripData.isPaid ?? isPaidString.notPaid);
       setIsPaidDate(tripData.isPaidDate ?? "");
+      setIsPaidTimestamp(tripData.isPaidTimestamp);
       setTotalSumTrip(tripData.totalSum ?? 0);
       setStartDate(tripData.startDate ?? "");
       setEndDate(tripData.endDate ?? "");
@@ -414,8 +440,10 @@ function TripContextProvider({ children }) {
     saveTravellersInStorage: saveTravellersInStorage,
     loadTravellersFromStorage: loadTravellersFromStorage,
     fetchAndSettleCurrentTrip: fetchAndSettleCurrentTrip,
+    setTripUnsettled: setTripUnsettled,
     isPaid: isPaid,
     isPaidDate: isPaidDate,
+    isPaidTimestamp: isPaidTimestamp,
     isLoading: isLoading,
     setIsLoading: setIsLoading,
     isDynamicDailyBudget: isDynamicDailyBudget,

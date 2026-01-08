@@ -172,15 +172,6 @@ const DevContent = ({ navigation }) => {
       >
         trackPurchaseEvent
       </Button>
-      <Button
-        onPress={async () => {
-          await tripCtx.fetchAndSettleCurrentTrip(true);
-          navigation.pop();
-        }}
-        style={styles.settingsButton}
-      >
-        UnsettleAllSplits
-      </Button>
     </View>
   );
 };

@@ -73,6 +73,7 @@ import {
   ExpenseData,
   isPaidString,
   Split,
+  getEffectiveIsPaid,
 } from "../../util/expense";
 import { NetworkContext } from "../../store/network-context";
 import { SettingsContext } from "../../store/settings-context";
@@ -416,15 +417,27 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     setShowDatePickerRange(false);
   };
 
+  // Calculate effective isPaid status (with timestamp override) when editing
+  const effectiveIsPaid = isEditing
+    ? getEffectiveIsPaid(editingValues, tripCtx.isPaidTimestamp)
+    : isPaidString.notPaid;
+
+  // Check if expense isPaid is overridden by timestamp
+  const isOverridden =
+    isEditing &&
+    tripCtx.isPaidTimestamp &&
+    tripCtx.isPaidTimestamp > (editingValues?.editedTimestamp || 0) &&
+    effectiveIsPaid === isPaidString.paid;
+
   const [isPaid, setIsPaid] = useState(
-    editingValues?.isPaid ?? isPaidString.notPaid
+    isEditing ? effectiveIsPaid : isPaidString.notPaid
   );
   const [isSpecialExpense, setIsSpecialExpense] = useState(
     editingValues?.isSpecialExpense ?? false
   );
 
   // Note: New expenses always default to "notPaid" - users must explicitly mark expenses as paid
-  // Trip-level settlement (isPaidDate) affects split calculations, not individual expense payment status
+  // Trip-level settlement (isPaidTimestamp) affects effective isPaid status via timestamp override
 
   useEffect(() => {
     if (dateISO) {
@@ -1444,44 +1457,53 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   const isPaidJSX = (
     <View style={styles.isPaidContainer}>
-      <SegmentedButtons
-        value={isPaid}
-        onValueChange={(value: string) => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          setIsPaidWithAutoSave(value);
-        }}
-        buttons={[
-          {
-            label: i18n.t("notPaidLabel"),
-            value: isPaidString.notPaid,
-            showSelectedCheck: true,
-            style: [
-              {
-                backgroundColor:
-                  isPaid == isPaidString.paid
-                    ? GlobalStyles.colors.gray500
-                    : GlobalStyles.colors.gray300,
-              },
-              isPaid == isPaidString.paid ? GlobalStyles.strongShadow : null,
-            ],
-          },
-          {
-            label: i18n.t("paidLabel"),
-            value: isPaidString.paid,
-            showSelectedCheck: true,
-            style: [
-              {
-                backgroundColor:
-                  isPaid == isPaidString.notPaid
-                    ? GlobalStyles.colors.gray500
-                    : GlobalStyles.colors.gray300,
-              },
-              isPaid == isPaidString.notPaid ? GlobalStyles.strongShadow : null,
-            ],
-            // checkedColor: GlobalStyles.colors.primary500,
-          },
-        ]}
-      ></SegmentedButtons>
+      {isOverridden ? (
+        <View style={{ padding: 8 }}>
+          <Text style={{ fontStyle: "italic", color: GlobalStyles.colors.textColor }}>
+            {i18n.t("expenseMarkedPaidDueToSettlement") ||
+             "This expense is marked as paid due to trip settlement"}
+          </Text>
+        </View>
+      ) : (
+        <SegmentedButtons
+          value={isPaid}
+          onValueChange={(value: string) => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setIsPaidWithAutoSave(value);
+          }}
+          buttons={[
+            {
+              label: i18n.t("notPaidLabel"),
+              value: isPaidString.notPaid,
+              showSelectedCheck: true,
+              style: [
+                {
+                  backgroundColor:
+                    isPaid == isPaidString.paid
+                      ? GlobalStyles.colors.gray500
+                      : GlobalStyles.colors.gray300,
+                },
+                isPaid == isPaidString.paid ? GlobalStyles.strongShadow : null,
+              ],
+            },
+            {
+              label: i18n.t("paidLabel"),
+              value: isPaidString.paid,
+              showSelectedCheck: true,
+              style: [
+                {
+                  backgroundColor:
+                    isPaid == isPaidString.notPaid
+                      ? GlobalStyles.colors.gray500
+                      : GlobalStyles.colors.gray300,
+                },
+                isPaid == isPaidString.notPaid ? GlobalStyles.strongShadow : null,
+              ],
+              // checkedColor: GlobalStyles.colors.primary500,
+            },
+          ]}
+        ></SegmentedButtons>
+      )}
     </View>
   );
   const hideSpecialTooltip = hideSpecial

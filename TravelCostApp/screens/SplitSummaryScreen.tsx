@@ -31,7 +31,7 @@ import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import GradientButton from "../components/UI/GradientButton";
 import { ExpensesContext } from "../store/expenses-context";
-import { ExpenseData, Split } from "../util/expense";
+import { ExpenseData, Split, isPaidString } from "../util/expense";
 import Animated from "react-native-reanimated";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { useFocusEffect } from "@react-navigation/native";
@@ -49,7 +49,8 @@ const SplitSummaryScreen = ({ navigation }) => {
     tripCurrency,
     tripName,
     fetchAndSettleCurrentTrip,
-    isPaidDate,
+    isPaid,
+    isPaidTimestamp,
   } = useContext(TripContext);
   const { freshlyCreated, userName } = useContext(UserContext);
   const { expenses } = useContext(ExpensesContext);
@@ -75,7 +76,7 @@ const SplitSummaryScreen = ({ navigation }) => {
   const [splits, setSplits] = useState<Split[]>([]);
   const hasOpenSplits = splits?.length > 0;
   const [showSimplify, setShowSimplify] = useState(true);
-  const isTripSettled = !!isPaidDate;
+  const isTripSettled = isPaid === isPaidString.paid;
 
   // TODO: improve text and translate
   const titleTextOriginal = "Split Summary";
@@ -108,7 +109,7 @@ const SplitSummaryScreen = ({ navigation }) => {
         tripid,
         tripCurrency,
         expenses,
-        isPaidDate
+        isPaidTimestamp
       );
       const formattedSplits = [];
       let userGetsBack = 0;
@@ -129,7 +130,7 @@ const SplitSummaryScreen = ({ navigation }) => {
       setSplits(formattedSplits);
       // When trip is settled, all expenses are paid, so clear totals
       // Otherwise show calculated totals
-      const isSettled = !!isPaidDate;
+      const isSettled = isPaid === isPaidString.paid;
       if (isSettled) {
         setTotalPaidBackText(
           totalPaidBackTextOriginal + formatExpenseWithCurrency(0, tripCurrency)
@@ -160,7 +161,8 @@ const SplitSummaryScreen = ({ navigation }) => {
   }, [
     totalPaidBackTextOriginal,
     totalPayBackTextOriginal,
-    isPaidDate,
+    isPaid,
+    isPaidTimestamp,
     tripCurrency,
     tripid,
     memoExpenses.length,
@@ -232,7 +234,7 @@ const SplitSummaryScreen = ({ navigation }) => {
   const settleSplitsHandler = useCallback(async () => {
     setIsFetching(true);
     try {
-      await fetchAndSettleCurrentTrip(false);
+      await fetchAndSettleCurrentTrip();
       await getOpenSplits();
       setSplits([]);
       setShowSimplify(false);
@@ -246,20 +248,6 @@ const SplitSummaryScreen = ({ navigation }) => {
     setIsFetching(false);
     navigation.popToTop();
   }, [fetchAndSettleCurrentTrip, getOpenSplits, navigation, subTitleOriginal]);
-
-  const unsettleSplitsHandler = useCallback(async () => {
-    setIsFetching(true);
-    try {
-      await fetchAndSettleCurrentTrip(true);
-      await getOpenSplits();
-      setShowSimplify(true);
-      setTitleText(titleTextOriginal);
-      setSubTitleText(subTitleOriginal);
-    } catch (error) {
-      safeLogError(error, "SplitSummaryScreen.tsx", 235);
-    }
-    setIsFetching(false);
-  }, [fetchAndSettleCurrentTrip, getOpenSplits]);
 
   const renderSplitItem = useCallback(
     (itemData) => {
@@ -376,36 +364,6 @@ const SplitSummaryScreen = ({ navigation }) => {
           }}
         >
           Settle Splits
-        </GradientButton>
-      )}
-      {isTripSettled && (
-        <GradientButton
-          style={styles.button}
-          colors={GlobalStyles.gradientColors}
-          darkText
-          buttonStyle={{
-            backgroundColor: GlobalStyles.colors.primary500,
-          }}
-          onPress={async () => {
-            Alert.alert(
-              "Unsettle Trip",
-              "Are you sure you want to unsettle this trip? This will allow expenses to appear in split calculations again.",
-              [
-                {
-                  text: "Cancel",
-                  style: "cancel",
-                },
-                {
-                  text: "Unsettle",
-                  onPress: async () => {
-                    await unsettleSplitsHandler();
-                  },
-                },
-              ]
-            );
-          }}
-        >
-          Unsettle Trip
         </GradientButton>
       )}
     </View>

@@ -1,6 +1,6 @@
 import { i18n } from "../i18n/i18n";
 import { DateTime } from "luxon";
-import { Split, ExpenseData, isPaidString } from "./expense";
+import { Split, ExpenseData, isPaidString, getEffectiveIsPaid } from "./expense";
 import { Traveller } from "./traveler";
 import { DateOrDateTime } from "./date";
 
@@ -350,7 +350,7 @@ export async function calcOpenSplitsTable(
   tripid: string,
   tripCurrency: string,
   givenExpenses?: ExpenseData[],
-  isPaidDate?: string
+  tripIsPaidTimestamp?: number
 ) {
   // cleanup all expenses where payer === debtor
   let expenses = [];
@@ -375,56 +375,17 @@ export async function calcOpenSplitsTable(
   }
   let openSplits = [];
   const asyncSplitList = async () => {
-    // Normalize dates for comparison
-    const normalizeDate = (date: DateOrDateTime): Date => {
-      if (date instanceof Date) {
-        return date;
-      }
-      if (date instanceof DateTime) {
-        return date.toJSDate();
-      }
-      // If it's a string, parse it
-      if (typeof date === "string") {
-        return DateTime.fromISO(date).toJSDate();
-      }
-      return new Date(date);
-    };
-
-    // If trip is settled (isPaidDate exists), ALL expenses are considered paid
-    // Otherwise, check individual expense flags and date boundaries
-    const isTripSettled = !!isPaidDate;
-
-    // Calculate paidDate boundary (end of day) if isPaidDate is set but trip is not fully settled
-    // This ensures expenses on the same day as settlement are included in settlement
-    const paidDateBoundary = isPaidDate
-      ? DateTime.fromISO(isPaidDate).endOf("day").toJSDate()
-      : null;
-
-    const isBeforePaidDate = paidDateBoundary
-      ? (date: DateOrDateTime) => {
-          const normalized = normalizeDate(date);
-          return normalized <= paidDateBoundary;
-        }
-      : () => false; // If no paidDate, don't skip by date
-
     for (const exp of expenses) {
       const expense: ExpenseData = exp;
 
       // Skip expense if:
-      // 1. Trip is fully settled (all expenses are considered paid)
-      // 2. Expense type is SELF
-      // 3. Expense has no split list
-      // 4. Expense is individually marked as paid
-      // 5. Expense date is on or before paidDateBoundary (for partial settlement scenarios)
+      // 1. Expense type is SELF
+      // 2. Expense has no split list
+      // 3. Expense has effective isPaid status of "paid" (checked via timestamp override logic)
       if (
-        isTripSettled ||
         expense.splitType === "SELF" ||
         !expense.splitList ||
-        expense.isPaid == isPaidString.paid ||
-        (paidDateBoundary &&
-          (isBeforePaidDate(expense.startDate) ||
-            isBeforePaidDate(expense.date) ||
-            isBeforePaidDate(expense.endDate)))
+        getEffectiveIsPaid(expense, tripIsPaidTimestamp) === isPaidString.paid
       ) {
         continue;
       }

@@ -11,6 +11,7 @@ import { touchAllTravelers } from "../util/http";
 import { GlobalStyles } from "../constants/styles";
 import { getRate } from "../util/currencyExchange";
 import { daysBetween, getDatePlusDays } from "../util/date";
+import { isPaidString } from "../util/expense";
 import {
   deleteExpenseOnlineOffline,
   OfflineQueueManageExpenseItem,
@@ -497,6 +498,11 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         });
       } else {
         // adding a new expense (no-editing)
+        // Auto-unsettle trip if currently settled (new expenses break settlement)
+        if (tripCtx.isPaid === isPaidString.paid) {
+          await tripCtx.setTripUnsettled();
+        }
+
         // Check for ranged Expense
         if (
           expenseData.startDate.toString().slice(0, 10) !==

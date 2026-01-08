@@ -31,7 +31,12 @@ import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import GradientButton from "../components/UI/GradientButton";
 import { ExpensesContext } from "../store/expenses-context";
-import { ExpenseData, Split, isPaidString } from "../util/expense";
+import {
+  ExpenseData,
+  Split,
+  isPaidString,
+  getEffectiveIsPaid,
+} from "../util/expense";
 import Animated from "react-native-reanimated";
 import { formatExpenseWithCurrency, truncateString } from "../util/string";
 import { useFocusEffect } from "@react-navigation/native";
@@ -162,7 +167,6 @@ const SplitSummaryScreen = ({ navigation }) => {
     isPaidTimestamp,
     tripCurrency,
     tripid,
-    memoExpenses.length,
     userName,
     expenses,
   ]);
@@ -244,12 +248,26 @@ const SplitSummaryScreen = ({ navigation }) => {
     }
     setIsFetching(false);
     navigation.popToTop();
-  }, [fetchAndSettleCurrentTrip, getOpenSplits, navigation, subTitleOriginal]);
+  }, [
+    fetchAndSettleCurrentTrip,
+    getOpenSplits,
+    navigation,
+    subTitleOriginal,
+    titleTextOriginal,
+  ]);
 
   const renderSplitItem = useCallback(
     (itemData) => {
       // get a list of all expenses where the item.userName and item.whoPaid is included in the expense.splitList as either whoPaid or userName
+      // Only include expenses that are not paid (consistent with calcOpenSplitsTable logic)
       const expensesList = expenses.filter((expense: ExpenseData) => {
+        // Skip paid expenses
+        if (
+          getEffectiveIsPaid(expense, isPaidTimestamp) === isPaidString.paid
+        ) {
+          return false;
+        }
+
         const splitList = expense?.splitList;
         const splitListLength = splitList?.length;
         for (let i = 0; i < splitListLength; i++) {
@@ -296,7 +314,7 @@ const SplitSummaryScreen = ({ navigation }) => {
         </Pressable>
       );
     },
-    [tripCurrency]
+    [tripCurrency, isPaidTimestamp, expenses]
   );
 
   const ButtonContainerJSX = (

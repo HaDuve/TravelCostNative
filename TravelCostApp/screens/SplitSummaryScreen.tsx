@@ -75,6 +75,7 @@ const SplitSummaryScreen = ({ navigation }) => {
   const [splits, setSplits] = useState<Split[]>([]);
   const hasOpenSplits = splits?.length > 0;
   const [showSimplify, setShowSimplify] = useState(true);
+  const isTripSettled = !!isPaidDate;
 
   // TODO: improve text and translate
   const titleTextOriginal = "Split Summary";
@@ -126,14 +127,26 @@ const SplitSummaryScreen = ({ navigation }) => {
           split.userName === userName ? Number(split.amount) : Number(0);
       }
       setSplits(formattedSplits);
-      setTotalPaidBackText(
-        totalPaidBackTextOriginal +
-          formatExpenseWithCurrency(userGetsBack, tripCurrency)
-      );
-      setTotalPayBackText(
-        totalPayBackTextOriginal +
-          formatExpenseWithCurrency(userHasToPay, tripCurrency)
-      );
+      // When trip is settled, all expenses are paid, so clear totals
+      // Otherwise show calculated totals
+      const isSettled = !!isPaidDate;
+      if (isSettled) {
+        setTotalPaidBackText(
+          totalPaidBackTextOriginal + formatExpenseWithCurrency(0, tripCurrency)
+        );
+        setTotalPayBackText(
+          totalPayBackTextOriginal + formatExpenseWithCurrency(0, tripCurrency)
+        );
+      } else {
+        setTotalPaidBackText(
+          totalPaidBackTextOriginal +
+            formatExpenseWithCurrency(userGetsBack, tripCurrency)
+        );
+        setTotalPayBackText(
+          totalPayBackTextOriginal +
+            formatExpenseWithCurrency(userHasToPay, tripCurrency)
+        );
+      }
     } catch (error) {
       Toast.show({
         type: "error",
@@ -152,6 +165,7 @@ const SplitSummaryScreen = ({ navigation }) => {
     tripid,
     memoExpenses.length,
     userName,
+    expenses,
   ]);
   const simpleSplits = useCallback(
     () => simplifySplits(splits),
@@ -232,6 +246,20 @@ const SplitSummaryScreen = ({ navigation }) => {
     setIsFetching(false);
     navigation.popToTop();
   }, [fetchAndSettleCurrentTrip, getOpenSplits, navigation, subTitleOriginal]);
+
+  const unsettleSplitsHandler = useCallback(async () => {
+    setIsFetching(true);
+    try {
+      await fetchAndSettleCurrentTrip(true);
+      await getOpenSplits();
+      setShowSimplify(true);
+      setTitleText(titleTextOriginal);
+      setSubTitleText(subTitleOriginal);
+    } catch (error) {
+      safeLogError(error, "SplitSummaryScreen.tsx", 235);
+    }
+    setIsFetching(false);
+  }, [fetchAndSettleCurrentTrip, getOpenSplits]);
 
   const renderSplitItem = useCallback(
     (itemData) => {
@@ -315,7 +343,7 @@ const SplitSummaryScreen = ({ navigation }) => {
           Simplify Splits
         </GradientButton>
       )}
-      {hasOpenSplits && (
+      {hasOpenSplits && !isTripSettled && (
         <GradientButton
           style={styles.button}
           colors={GlobalStyles.gradientColors}
@@ -328,7 +356,7 @@ const SplitSummaryScreen = ({ navigation }) => {
             // if yes, call settleSplitsHandler
             Alert.alert(
               "Settle Splits",
-              "Are you sure you want to settle all splits? Has everyone gotten their money back? (This will only settle splits from Today or Before, but not open splits from the future!)",
+              "Are you sure you want to settle all splits? Has everyone gotten their money back? This will mark ALL expenses as paid, regardless of their date.",
               [
                 {
                   text: "Cancel",
@@ -348,6 +376,36 @@ const SplitSummaryScreen = ({ navigation }) => {
           }}
         >
           Settle Splits
+        </GradientButton>
+      )}
+      {isTripSettled && (
+        <GradientButton
+          style={styles.button}
+          colors={GlobalStyles.gradientColors}
+          darkText
+          buttonStyle={{
+            backgroundColor: GlobalStyles.colors.primary500,
+          }}
+          onPress={async () => {
+            Alert.alert(
+              "Unsettle Trip",
+              "Are you sure you want to unsettle this trip? This will allow expenses to appear in split calculations again.",
+              [
+                {
+                  text: "Cancel",
+                  style: "cancel",
+                },
+                {
+                  text: "Unsettle",
+                  onPress: async () => {
+                    await unsettleSplitsHandler();
+                  },
+                },
+              ]
+            );
+          }}
+        >
+          Unsettle Trip
         </GradientButton>
       )}
     </View>
@@ -383,12 +441,28 @@ const SplitSummaryScreen = ({ navigation }) => {
           {/* <View style={styles.subTitleContainer}>
             <Text style={styles.subTitleText}> {subTitleText}</Text>
           </View> */}
-          <View style={styles.subTitleContainer}>
-            <Text style={styles.subTitleText}> {totalPaidBackText}</Text>
-          </View>
-          <View style={styles.subTitleContainer}>
-            <Text style={styles.subTitleText}> {totalPayBackText}</Text>
-          </View>
+          {isTripSettled && (
+            <View style={styles.subTitleContainer}>
+              <Text
+                style={[
+                  styles.subTitleText,
+                  { color: GlobalStyles.colors.primary500, fontWeight: "600" },
+                ]}
+              >
+                Trip Settled - All expenses marked as paid
+              </Text>
+            </View>
+          )}
+          {!isTripSettled && (
+            <>
+              <View style={styles.subTitleContainer}>
+                <Text style={styles.subTitleText}> {totalPaidBackText}</Text>
+              </View>
+              <View style={styles.subTitleContainer}>
+                <Text style={styles.subTitleText}> {totalPayBackText}</Text>
+              </View>
+            </>
+          )}
           {!isPortrait && ButtonContainerJSX}
         </View>
 
@@ -398,6 +472,24 @@ const SplitSummaryScreen = ({ navigation }) => {
           scrollEnabled={!isPortrait}
           ListFooterComponent={isPortrait && ButtonContainerJSX}
           ListHeaderComponent={<View style={{ height: 40 }}></View>}
+          ListEmptyComponent={
+            isTripSettled ? (
+              <View style={{ padding: 20, alignItems: "center" }}>
+                <Text
+                  style={[
+                    styles.subTitleText,
+                    { color: GlobalStyles.colors.primary500 },
+                  ]}
+                >
+                  No open splits - All expenses are settled
+                </Text>
+              </View>
+            ) : splits.length === 0 && !isFetching ? (
+              <View style={{ padding: 20, alignItems: "center" }}>
+                <Text style={styles.subTitleText}>No open splits</Text>
+              </View>
+            ) : null
+          }
           renderItem={renderSplitItem}
         />
       </Animated.View>

@@ -390,7 +390,11 @@ export async function calcOpenSplitsTable(
       return new Date(date);
     };
 
-    // Calculate paidDate boundary (end of day) if isPaidDate is set
+    // If trip is settled (isPaidDate exists), ALL expenses are considered paid
+    // Otherwise, check individual expense flags and date boundaries
+    const isTripSettled = !!isPaidDate;
+
+    // Calculate paidDate boundary (end of day) if isPaidDate is set but trip is not fully settled
     // This ensures expenses on the same day as settlement are included in settlement
     const paidDateBoundary = isPaidDate
       ? DateTime.fromISO(isPaidDate).endOf("day").toJSDate()
@@ -406,7 +410,14 @@ export async function calcOpenSplitsTable(
     for (const exp of expenses) {
       const expense: ExpenseData = exp;
 
+      // Skip expense if:
+      // 1. Trip is fully settled (all expenses are considered paid)
+      // 2. Expense type is SELF
+      // 3. Expense has no split list
+      // 4. Expense is individually marked as paid
+      // 5. Expense date is on or before paidDateBoundary (for partial settlement scenarios)
       if (
+        isTripSettled ||
         expense.splitType === "SELF" ||
         !expense.splitList ||
         expense.isPaid == isPaidString.paid ||

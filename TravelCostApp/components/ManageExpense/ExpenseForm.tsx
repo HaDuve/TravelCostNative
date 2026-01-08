@@ -423,16 +423,8 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     editingValues?.isSpecialExpense ?? false
   );
 
-  useEffect(() => {
-    if (
-      tripCtx.isPaidDate &&
-      (startDate || editingValues?.date) &&
-      (new Date(tripCtx.isPaidDate) > new Date(startDate) ||
-        new Date(tripCtx.isPaidDate) > editingValues?.date)
-    ) {
-      setIsPaid(isPaidString.paid);
-    }
-  }, [tripCtx.isPaidDate, startDate, editingValues?.date]);
+  // Note: New expenses always default to "notPaid" - users must explicitly mark expenses as paid
+  // Trip-level settlement (isPaidDate) affects split calculations, not individual expense payment status
 
   useEffect(() => {
     if (dateISO) {

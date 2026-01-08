@@ -1459,9 +1459,13 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     <View style={styles.isPaidContainer}>
       {isOverridden ? (
         <View style={{ padding: 8 }}>
-          <Text style={{ fontStyle: "italic", color: GlobalStyles.colors.textColor }}>
-            {i18n.t("expenseMarkedPaidDueToSettlement") ||
-             "This expense is marked as paid due to trip settlement"}
+          <Text
+            style={{
+              fontStyle: "italic",
+              color: GlobalStyles.colors.textColor,
+            }}
+          >
+            {i18n.t("expenseMarkedPaidDueToSettlement")}
           </Text>
         </View>
       ) : (
@@ -1497,7 +1501,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                       ? GlobalStyles.colors.gray500
                       : GlobalStyles.colors.gray300,
                 },
-                isPaid == isPaidString.notPaid ? GlobalStyles.strongShadow : null,
+                isPaid == isPaidString.notPaid
+                  ? GlobalStyles.strongShadow
+                  : null,
               ],
               // checkedColor: GlobalStyles.colors.primary500,
             },

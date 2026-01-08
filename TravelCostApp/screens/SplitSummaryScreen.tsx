@@ -78,25 +78,22 @@ const SplitSummaryScreen = ({ navigation }) => {
   const [showSimplify, setShowSimplify] = useState(true);
   const isTripSettled = isPaid === isPaidString.paid;
 
-  // TODO: improve text and translate
-  const titleTextOriginal = "Split Summary";
-  const titleTextSimplified = "Split Summary";
+  const titleTextOriginal = i18n.t("splitSummaryTitle");
+  const titleTextSimplified = i18n.t("splitSummaryTitleSimplified");
 
   const tripNameString = truncateString(tripName, 25);
-  const subTitleOriginal =
-    "Overview of owed amounts in the trip:\n  " + tripNameString;
+  const subTitleOriginal = i18n.t("overviewOfOwedAmounts") + tripNameString;
   const subTitleSimplified =
-    "Simplified Summary of Optimal Transactions in the trip:  " +
-    tripNameString;
+    i18n.t("simplifiedSummaryOptimalTransactions") + tripNameString;
 
   const [titleText, setTitleText] = useState(titleTextOriginal);
   const [subTitleText, setSubTitleText] = useState(subTitleOriginal);
 
-  const totalPaidBackTextOriginal = `Your money back:  `;
+  const totalPaidBackTextOriginal = i18n.t("yourMoneyBackWithColon");
   const [totalPaidBackText, setTotalPaidBackText] = useState(
     totalPaidBackTextOriginal
   );
-  const totalPayBackTextOriginal = `You still owe: `;
+  const totalPayBackTextOriginal = i18n.t("youStillOweWithColon");
   const [totalPayBackText, setTotalPayBackText] = useState(
     totalPayBackTextOriginal
   );
@@ -207,7 +204,7 @@ const SplitSummaryScreen = ({ navigation }) => {
         Toast.show({
           type: "error",
           text1: i18n.t("couldNotSimplifySplits"),
-          text2: "Something must have gone wrong, sorry!",
+          text2: i18n.t("somethingWentWrongSorry"),
           visibilityTime: 2000,
         });
         return;
@@ -319,7 +316,7 @@ const SplitSummaryScreen = ({ navigation }) => {
             }
           }}
         >
-          Back
+          {i18n.t("back")}
         </FlatButton>
       )}
       {showSimplify && !noSimpleSplits && (
@@ -328,7 +325,7 @@ const SplitSummaryScreen = ({ navigation }) => {
           style={styles.button}
           onPress={handleSimpflifySplits}
         >
-          Simplify Splits
+          {i18n.t("simplifySplits")}
         </GradientButton>
       )}
       {hasOpenSplits && !isTripSettled && (
@@ -343,15 +340,15 @@ const SplitSummaryScreen = ({ navigation }) => {
             // alert ask user if he really wants to settle all Splits
             // if yes, call settleSplitsHandler
             Alert.alert(
-              "Settle Splits",
-              "Are you sure you want to settle all splits? Has everyone gotten their money back? This will mark ALL expenses as paid, regardless of their date.",
+              i18n.t("settleSplits"),
+              i18n.t("sureSettleSplitsFullMessage"),
               [
                 {
-                  text: "Cancel",
+                  text: i18n.t("cancel"),
                   style: "cancel",
                 },
                 {
-                  text: "Settle",
+                  text: i18n.t("confirmSettle"),
                   onPress: async () => {
                     trackEvent(VexoEvents.SETTLE_ALL_PRESSED, {
                       splitsCount: splits?.length || 0,
@@ -363,7 +360,7 @@ const SplitSummaryScreen = ({ navigation }) => {
             );
           }}
         >
-          Settle Splits
+          {i18n.t("settleSplits")}
         </GradientButton>
       )}
     </View>
@@ -407,7 +404,7 @@ const SplitSummaryScreen = ({ navigation }) => {
                   { color: GlobalStyles.colors.primary500, fontWeight: "600" },
                 ]}
               >
-                Trip Settled - All expenses marked as paid
+                {i18n.t("tripSettledAllExpensesPaid")}
               </Text>
             </View>
           )}
@@ -439,12 +436,14 @@ const SplitSummaryScreen = ({ navigation }) => {
                     { color: GlobalStyles.colors.primary500 },
                   ]}
                 >
-                  No open splits - All expenses are settled
+                  {i18n.t("noOpenSplitsAllSettled")}
                 </Text>
               </View>
             ) : splits.length === 0 && !isFetching ? (
               <View style={{ padding: 20, alignItems: "center" }}>
-                <Text style={styles.subTitleText}>No open splits</Text>
+                <Text style={styles.subTitleText}>
+                  {i18n.t("noOpenSplits")}
+                </Text>
               </View>
             ) : null
           }

@@ -1,6 +1,11 @@
 import { i18n } from "../i18n/i18n";
 import { DateTime } from "luxon";
-import { Split, ExpenseData, isPaidString, getEffectiveIsPaid } from "./expense";
+import {
+  Split,
+  ExpenseData,
+  isPaidString,
+  getEffectiveIsPaid,
+} from "./expense";
 import { Traveller } from "./traveler";
 import { DateOrDateTime } from "./date";
 

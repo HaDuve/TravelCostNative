@@ -40,7 +40,7 @@ export interface ExpenseData {
   listEQUAL?: string[];
   iconName?: string;
   rangeId?: string;
-  isPaid?: string;
+  isPaid?: isPaidString;
   isSpecialExpense?: boolean;
   editedTimestamp?: number;
   isDeleted?: boolean;

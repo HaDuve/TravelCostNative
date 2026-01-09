@@ -5,6 +5,7 @@ import { i18n } from "../../i18n/i18n";
 import * as Progress from "react-native-progress";
 import { formatExpenseWithCurrency } from "../../util/string";
 import { constantScale, dynamicScale, scale } from "../../util/scalingUtil";
+import { getCatLocalized } from "../../util/category";
 
 export interface BudgetOverviewContentProps {
   travellerList: string[];
@@ -90,11 +91,24 @@ export const BudgetOverviewContent: React.FC<BudgetOverviewContentProps> = ({
         <FlatList
           data={travellerList}
           ListHeaderComponent={() => {
+            // Handle category-* format for periodName
+            let periodDisplayName = periodName;
+            if (periodName.startsWith("category-")) {
+              const category = periodName.replace("category-", "");
+              periodDisplayName = getCatLocalized(category);
+            } else {
+              try {
+                periodDisplayName = i18n.t(periodName);
+              } catch {
+                // If translation fails, use the original periodName
+                periodDisplayName = periodName;
+              }
+            }
             return (
               <Text style={styles.overviewTextInfo}>
                 {i18n.t("budgetPerTraveller")}:{" "}
                 {formatExpenseWithCurrency(travellerBudgets, currency)} /{" "}
-                {i18n.t(periodName)}
+                {periodDisplayName}
               </Text>
             );
           }}
@@ -120,22 +134,7 @@ export const BudgetOverviewContent: React.FC<BudgetOverviewContentProps> = ({
             const travellerName = item;
             return (
               <View style={styles.travellerItemContainer}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    paddingHorizontal: dynamicScale(4),
-                  }}
-                >
-                  <Text style={styles.overviewTextSmall}>{travellerName}</Text>
-                  <Text
-                    style={[
-                      styles.overViewTextTravellerSum,
-                      styles.sumTextMoveRight,
-                    ]}
-                  >
-                    {sum}
-                  </Text>
-                </View>
+                <Text style={styles.overviewTextSmall}>{travellerName}</Text>
                 <View
                   style={[
                     styles.travellerItemProgressBarContainer,
@@ -151,6 +150,7 @@ export const BudgetOverviewContent: React.FC<BudgetOverviewContentProps> = ({
                     height={constantScale(20, 0.5)}
                     borderRadius={dynamicScale(8, false, 0.5)}
                   ></Progress.Bar>
+                  <Text style={styles.overViewTextTravellerSum}>{sum}</Text>
                 </View>
               </View>
             );
@@ -202,21 +202,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   travellerItemContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    alignItems: "stretch",
     minHeight: dynamicScale(40, true),
     overflow: "visible",
+    marginVertical: dynamicScale(4, true),
   },
   travellerItemProgressBarContainer: {
     padding: dynamicScale(2),
     overflow: "visible",
-    zIndex: -1,
+    alignSelf: "center",
+    marginTop: dynamicScale(4, true),
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  sumTextMoveRight: {
-    left: dynamicScale(110),
+  overViewTextTravellerSum: {
+    fontSize: dynamicScale(16, false, 0.5),
+    fontWeight: "500",
+    color: "#FFFFFF",
+    textAlign: "center",
     position: "absolute",
-    zIndex: 999,
+    width: scale(180),
+    paddingTop: dynamicScale(2, true),
   },
   overviewTextInfo: {
     fontSize: dynamicScale(12, false, 0.5),
@@ -231,13 +240,6 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
     textAlign: "left",
     paddingVertical: dynamicScale(4, true),
-  },
-  overViewTextTravellerSum: {
-    fontSize: dynamicScale(16, false, 0.5),
-    fontWeight: "500",
-    color: GlobalStyles.colors.gray300,
-    textAlign: "left",
-    paddingTop: dynamicScale(5, true),
   },
   overviewTextTitle: {
     fontSize: dynamicScale(20, false, 0.5),

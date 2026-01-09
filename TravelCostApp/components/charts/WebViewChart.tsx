@@ -47,6 +47,11 @@ interface ChartMessage {
     daysInRange?: number;
     timestamp?: string;
     trigger?: string;
+    x?: string | number;
+    y?: number;
+    name?: string;
+    color?: string;
+    originalData?: unknown;
   };
   min?: number;
   max?: number;
@@ -207,6 +212,12 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
               const zoomState = calculateZoomState(min, max);
               onZoomStateChange && onZoomStateChange(zoomState);
             }
+          }
+          break;
+
+        case "pointClick":
+          if (message.data && onPointClick) {
+            onPointClick(message.data);
           }
           break;
 

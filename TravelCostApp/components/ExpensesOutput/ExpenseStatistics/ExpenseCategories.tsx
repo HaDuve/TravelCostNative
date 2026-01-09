@@ -126,6 +126,9 @@ const ExpenseCategories = ({
         <CategoryChart
           inputData={dataList}
           tripCurrency={tripCurrency}
+          expenses={expenses}
+          periodName={periodName}
+          navigation={navigation}
         ></CategoryChart>
       )}
       <Animated.FlatList
@@ -138,6 +141,9 @@ const ExpenseCategories = ({
             <CategoryChart
               inputData={dataList}
               tripCurrency={tripCurrency}
+              expenses={expenses}
+              periodName={periodName}
+              navigation={navigation}
             ></CategoryChart>
           ) : (
             <View style={{ height: dynamicScale(100, true) }}></View>

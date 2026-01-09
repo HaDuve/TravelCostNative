@@ -18,13 +18,19 @@ import { SettingsContext } from "../../store/settings-context";
 
 import WebViewChart from "../charts/WebViewChart";
 import { WebView } from "react-native-webview";
-import { ChartController, ExpenseData } from "../charts/controller";
+import { ChartController } from "../charts/controller";
+import { ExpenseData } from "../../util/expense";
 import {
   createBarChartData,
   getInitialZoomRange,
 } from "../charts/chartHelpers";
 import IconButton from "../UI/IconButton";
 import { calculateDailyAverage } from "../../util/budgetColorHelper";
+import ExpenseSummaryModal from "../ExpensesOutput/ExpenseSummaryModal";
+import { calculateBudgetOverview } from "../ExpensesOutput/budgetOverviewHelpers";
+import { getRate } from "../../util/currencyExchange";
+import { UserContext } from "../../store/user-context";
+import * as Haptics from "expo-haptics";
 
 interface ExpenseChartProps {
   inputData: unknown[];
@@ -40,6 +46,7 @@ interface ExpenseChartProps {
     minDate: Date | null;
     maxDate: Date | null;
   }) => void;
+  navigation?: any;
 }
 
 const ExpenseChart: React.FC<ExpenseChartProps> = ({
@@ -51,12 +58,16 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
   periodType,
   onWebViewRef,
   onZoomStateChange,
+  navigation,
 }) => {
   const { isLandscape } = useContext(OrientationContext);
   const tripCtx = useContext(TripContext);
   const expensesCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
+  const userCtx = useContext(UserContext);
   const [showResetButton, setShowResetButton] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalProps, setModalProps] = useState<any>(null);
   const webViewRef = useRef<WebView>(null);
 
   const colors = useMemo(
@@ -106,7 +117,7 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
     }
 
     return ChartController.processExpenseData(
-      inputData as ExpenseData[],
+      inputData as any,
       xAxis,
       yAxis,
       colors,
@@ -160,6 +171,148 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
     setShowResetButton(false);
   }, [periodType]);
 
+  const handlePointClick = useCallback(
+    async (pointData: any) => {
+      if (!periodType || !navigation) return;
+
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+      // Get the original data from the point
+      // The originalData is from the chart which has day/firstDay properties
+      const originalData = pointData.originalData as any;
+      if (!originalData) return;
+
+      // Filter expenses based on periodType and clicked point
+      let filteredExpenses: ExpenseData[] = [];
+      let periodLabel = "";
+      let periodNameForCalc = periodType;
+
+      // Get rate for currency conversion
+      let rate = 1;
+      if (userCtx.lastCurrency && tripCtx.tripCurrency) {
+        rate = await getRate(tripCtx.tripCurrency, userCtx.lastCurrency);
+      }
+
+      switch (periodType) {
+        case "day":
+          if (originalData.day) {
+            filteredExpenses = expensesCtx
+              .getSpecificDayExpenses(new Date(originalData.day))
+              .filter(
+                (exp) =>
+                  !exp.isSpecialExpense ||
+                  (exp.isSpecialExpense && !settings.hideSpecialExpenses)
+              );
+            periodLabel = new Date(originalData.day).toLocaleDateString();
+            periodNameForCalc = "day";
+          }
+          break;
+        case "week":
+          if (originalData.firstDay) {
+            filteredExpenses = expensesCtx
+              .getSpecificWeekExpenses(new Date(originalData.firstDay))
+              .filter(
+                (exp) =>
+                  !exp.isSpecialExpense ||
+                  (exp.isSpecialExpense && !settings.hideSpecialExpenses)
+              );
+            periodLabel = new Date(originalData.firstDay).toLocaleDateString();
+            periodNameForCalc = "week";
+          }
+          break;
+        case "month":
+          if (originalData.firstDay) {
+            filteredExpenses = expensesCtx
+              .getSpecificMonthExpenses(new Date(originalData.firstDay))
+              .filter(
+                (exp) =>
+                  !exp.isSpecialExpense ||
+                  (exp.isSpecialExpense && !settings.hideSpecialExpenses)
+              );
+            const monthDate = new Date(originalData.firstDay);
+            periodLabel = monthDate.toLocaleDateString("default", {
+              month: "long",
+              year: "numeric",
+            });
+            periodNameForCalc = "month";
+          }
+          break;
+        case "year":
+          if (originalData.firstDay) {
+            filteredExpenses = expensesCtx
+              .getSpecificYearExpenses(new Date(originalData.firstDay))
+              .filter(
+                (exp) =>
+                  !exp.isSpecialExpense ||
+                  (exp.isSpecialExpense && !settings.hideSpecialExpenses)
+              );
+            const yearDate = new Date(originalData.firstDay);
+            periodLabel = yearDate.getFullYear().toString();
+            periodNameForCalc = "year";
+          }
+          break;
+      }
+
+      if (filteredExpenses.length === 0) return;
+
+      // Calculate budget overview props
+      const calculation = calculateBudgetOverview({
+        expenses: filteredExpenses as ExpenseData[],
+        periodName: periodNameForCalc as "day" | "week" | "month" | "year",
+        expCtx: expensesCtx,
+        tripCtx,
+        settings,
+        hideSpecial: settings.hideSpecialExpenses,
+      });
+
+      // Prepare modal props
+      const travellers = Array.isArray(tripCtx.travellers)
+        ? tripCtx.travellers
+        : [];
+      const travellerNames = travellers.map((traveller) =>
+        typeof traveller === "string" ? traveller : traveller?.userName
+      );
+
+      const props = {
+        travellerList: travellerNames,
+        travellerBudgets:
+          travellerNames.length > 0
+            ? calculation.budgetNumber / travellerNames.length
+            : 0,
+        travellerSplitExpenseSums: calculation.travellerSplitExpenseSums,
+        currency: calculation.tripCurrency,
+        noTotalBudget: calculation.noTotalBudget,
+        periodName: periodNameForCalc,
+        periodLabel: periodLabel,
+        lastRateUnequal1: rate !== 1,
+        trafficLightActive: settings.trafficLightBudgetColors,
+        currentBudgetColor: calculation.budgetColor,
+        averageDailySpending: calculation.averageDailySpending,
+        dailyBudget: Number(tripCtx.dailyBudget) || 0,
+        expenseSumNum: calculation.expenseSumNum,
+        budgetNumber: calculation.budgetNumber,
+        onDetailsPress: () => {
+          navigation.navigate("FilteredPieCharts", {
+            expenses: filteredExpenses,
+            dayString: periodLabel,
+          });
+        },
+      };
+
+      setModalProps(props);
+      setIsModalVisible(true);
+    },
+    [
+      periodType,
+      navigation,
+      expensesCtx,
+      tripCtx,
+      settings,
+      userCtx.lastCurrency,
+      tripCtx.tripCurrency,
+    ]
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -181,11 +334,19 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
         showSkeleton={true}
         onZoomLevelChange={handleZoomLevelChange}
         onZoomStateChange={handleZoomStateChange}
+        onPointClick={handlePointClick}
         onWebViewRef={(ref) => {
           webViewRef.current = ref;
           onWebViewRef?.(ref);
         }}
       />
+      {modalProps && (
+        <ExpenseSummaryModal
+          isVisible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+          {...modalProps}
+        />
+      )}
     </View>
   );
 };

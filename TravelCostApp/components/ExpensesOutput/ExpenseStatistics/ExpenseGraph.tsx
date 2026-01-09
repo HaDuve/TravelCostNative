@@ -504,6 +504,7 @@ const ExpenseGraph = ({
               currency={tripCtx.tripCurrency}
               periodType={periodName}
               onZoomStateChange={handleZoomStateChange}
+              navigation={navigation}
             ></ExpenseChart>
           </View>
         )}
@@ -528,6 +529,7 @@ const ExpenseGraph = ({
                   currency={tripCtx.tripCurrency}
                   periodType={periodName}
                   onZoomStateChange={handleZoomStateChange}
+                  navigation={navigation}
                 ></ExpenseChart>
               )}
             </View>

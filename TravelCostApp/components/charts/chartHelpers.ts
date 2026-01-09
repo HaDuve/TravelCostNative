@@ -273,6 +273,25 @@ export const generateHTMLTemplate = (
                 animation: {
                   duration: 1000
                 },
+                events: {
+                  click: function(event) {
+                    const point = event.point;
+                    if (point && window.ReactNativeWebView) {
+                      // Send point click data to React Native
+                      window.ReactNativeWebView.postMessage(JSON.stringify({
+                        type: 'pointClick',
+                        data: {
+                          x: point.x,
+                          y: point.y,
+                          name: point.name,
+                          color: point.color,
+                          // Include original data if available
+                          originalData: point.options.originalData || null
+                        }
+                      }));
+                    }
+                  }
+                }
               },
               pie: {
                 size: '90%',
@@ -280,6 +299,24 @@ export const generateHTMLTemplate = (
                 dataLabels: {
                   enabled: false,
                   useHTML: true
+                },
+                point: {
+                  events: {
+                    click: function() {
+                      if (window.ReactNativeWebView) {
+                        window.ReactNativeWebView.postMessage(JSON.stringify({
+                          type: 'pointClick',
+                          data: {
+                            x: this.name,
+                            y: this.y,
+                            name: this.name,
+                            color: this.color,
+                            originalData: this.options.originalData || null
+                          }
+                        }));
+                      }
+                    }
+                  }
                 }
               },
               column: {
@@ -299,6 +336,24 @@ export const generateHTMLTemplate = (
                     return this.y.toFixed(2) + '${
                       options.currency ? " " + options.currency : "€"
                     }';
+                  }
+                },
+                point: {
+                  events: {
+                    click: function() {
+                      if (window.ReactNativeWebView) {
+                        window.ReactNativeWebView.postMessage(JSON.stringify({
+                          type: 'pointClick',
+                          data: {
+                            x: this.x,
+                            y: this.y,
+                            name: this.name || this.category || null,
+                            color: this.color,
+                            originalData: this.options.originalData || null
+                          }
+                        }));
+                      }
+                    }
                   }
                 }
               }

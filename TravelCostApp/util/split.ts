@@ -1,6 +1,11 @@
 import { i18n } from "../i18n/i18n";
 import { DateTime } from "luxon";
-import { Split, ExpenseData, isPaidString } from "./expense";
+import {
+  Split,
+  ExpenseData,
+  isPaidString,
+  getEffectiveIsPaid,
+} from "./expense";
 import { Traveller } from "./traveler";
 import { DateOrDateTime } from "./date";
 
@@ -350,20 +355,13 @@ export async function calcOpenSplitsTable(
   tripid: string,
   tripCurrency: string,
   givenExpenses?: ExpenseData[],
-  isPaidDate?: string
+  tripIsPaidTimestamp?: number
 ) {
-  // cleanup all expenses where payer === debtor
-
   let expenses = [];
   const rates = {};
   rates[tripCurrency] = 1;
   if (givenExpenses && givenExpenses?.length > 0) {
-    // create a copy
-    try {
-      expenses = safelyParseJSON(JSON.stringify(givenExpenses));
-    } catch (error) {
-      safeLogError(error);
-    }
+    expenses = [...givenExpenses];
   } else {
     try {
       expenses = await getAllExpenses(tripid);
@@ -371,55 +369,45 @@ export async function calcOpenSplitsTable(
       safeLogError(error);
     }
     if (!expenses || expenses?.length < 1) {
-      return;
+      return [];
     }
   }
   let openSplits = [];
   const asyncSplitList = async () => {
     for (const exp of expenses) {
       const expense: ExpenseData = exp;
-      // Normalize dates for comparison
-      const normalizeDate = (date: DateOrDateTime): Date => {
-        if (date instanceof Date) {
-          return date;
-        }
-        if (date instanceof DateTime) {
-          return date.toJSDate();
-        }
-        // If it's a string, parse it
-        if (typeof date === "string") {
-          return DateTime.fromISO(date).toJSDate();
-        }
-        return new Date(date);
-      };
 
-      const paidDate = DateTime.fromISO(isPaidDate).toJSDate();
+      // Skip expense if:
+      // 1. Expense type is SELF
+      // 2. Expense has no split list
+      // 3. Expense has effective isPaid status of "paid" (checked via timestamp override logic)
       if (
         expense.splitType === "SELF" ||
         !expense.splitList ||
-        expense.isPaid == isPaidString.paid ||
-        normalizeDate(expense.startDate) < paidDate ||
-        normalizeDate(expense.date) < paidDate ||
-        normalizeDate(expense.endDate) < paidDate
-      )
+        getEffectiveIsPaid(expense, tripIsPaidTimestamp) === isPaidString.paid
+      ) {
         continue;
+      }
       for (const split of expense.splitList) {
         if (split.userName !== expense.whoPaid) {
+          // Create a copy of the split object to avoid mutating the original
+          const splitCopy = { ...split };
+
           // check if rate is already in rates
           if (!rates[expense.currency]) {
             // get rate
             try {
               const rate = expense.amount / expense.calcAmount;
               rates[expense.currency] = rate;
-              split.amount = split.amount / rate;
+              splitCopy.amount = splitCopy.amount / rate;
             } catch (error) {
               safeLogError(error);
             }
           } else {
-            split.amount = split.amount / rates[expense.currency];
+            splitCopy.amount = splitCopy.amount / rates[expense.currency];
           }
-          split.whoPaid = expense.whoPaid;
-          openSplits.push(split);
+          splitCopy.whoPaid = expense.whoPaid;
+          openSplits.push(splitCopy);
         }
       }
     }

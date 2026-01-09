@@ -19,7 +19,7 @@ import {
 import Toast from "react-native-toast-message";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import FlatButton from "../components/UI/FlatButton";
-import LoadingOverlay from "../components/UI/LoadingOverlay";
+import MiniSyncIndicator from "../components/UI/MiniSyncIndicator";
 import { GlobalStyles } from "../constants/styles";
 import { TripContext } from "../store/trip-context";
 import {
@@ -31,9 +31,14 @@ import PropTypes from "prop-types";
 import { UserContext } from "../store/user-context";
 import GradientButton from "../components/UI/GradientButton";
 import { ExpensesContext } from "../store/expenses-context";
-import { ExpenseData, Split } from "../util/expense";
+import {
+  ExpenseData,
+  Split,
+  isPaidString,
+  getEffectiveIsPaid,
+} from "../util/expense";
 import Animated from "react-native-reanimated";
-import { formatExpenseWithCurrency, truncateString } from "../util/string";
+import { formatExpenseWithCurrency } from "../util/string";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { Pressable, ScrollView } from "react-native";
@@ -47,14 +52,13 @@ const SplitSummaryScreen = ({ navigation }) => {
   const {
     tripid,
     tripCurrency,
-    tripName,
     fetchAndSettleCurrentTrip,
-    isPaidDate,
+    isPaid,
+    isPaidTimestamp,
   } = useContext(TripContext);
   const { freshlyCreated, userName } = useContext(UserContext);
   const { expenses } = useContext(ExpensesContext);
   // avoid rerenders
-  const memoExpenses = useMemo(() => expenses, [expenses]);
   useFocusEffect(
     React.useCallback(() => {
       if (freshlyCreated) {
@@ -75,26 +79,18 @@ const SplitSummaryScreen = ({ navigation }) => {
   const [splits, setSplits] = useState<Split[]>([]);
   const hasOpenSplits = splits?.length > 0;
   const [showSimplify, setShowSimplify] = useState(true);
+  const isTripSettled = isPaid === isPaidString.paid;
 
-  // TODO: improve text and translate
-  const titleTextOriginal = "Split Summary";
-  const titleTextSimplified = "Split Summary";
-
-  const tripNameString = truncateString(tripName, 25);
-  const subTitleOriginal =
-    "Overview of owed amounts in the trip:\n  " + tripNameString;
-  const subTitleSimplified =
-    "Simplified Summary of Optimal Transactions in the trip:  " +
-    tripNameString;
+  const titleTextOriginal = i18n.t("splitSummaryTitle");
+  const titleTextSimplified = i18n.t("splitSummaryTitleSimplified");
 
   const [titleText, setTitleText] = useState(titleTextOriginal);
-  const [subTitleText, setSubTitleText] = useState(subTitleOriginal);
 
-  const totalPaidBackTextOriginal = `Your money back:  `;
+  const totalPaidBackTextOriginal = i18n.t("yourMoneyBackWithColon");
   const [totalPaidBackText, setTotalPaidBackText] = useState(
     totalPaidBackTextOriginal
   );
-  const totalPayBackTextOriginal = `You still owe: `;
+  const totalPayBackTextOriginal = i18n.t("youStillOweWithColon");
   const [totalPayBackText, setTotalPayBackText] = useState(
     totalPayBackTextOriginal
   );
@@ -107,7 +103,7 @@ const SplitSummaryScreen = ({ navigation }) => {
         tripid,
         tripCurrency,
         expenses,
-        isPaidDate
+        isPaidTimestamp
       );
       const formattedSplits = [];
       let userGetsBack = 0;
@@ -126,14 +122,26 @@ const SplitSummaryScreen = ({ navigation }) => {
           split.userName === userName ? Number(split.amount) : Number(0);
       }
       setSplits(formattedSplits);
-      setTotalPaidBackText(
-        totalPaidBackTextOriginal +
-          formatExpenseWithCurrency(userGetsBack, tripCurrency)
-      );
-      setTotalPayBackText(
-        totalPayBackTextOriginal +
-          formatExpenseWithCurrency(userHasToPay, tripCurrency)
-      );
+      // When trip is settled, all expenses are paid, so clear totals
+      // Otherwise show calculated totals
+      const isSettled = isPaid === isPaidString.paid;
+      if (isSettled) {
+        setTotalPaidBackText(
+          totalPaidBackTextOriginal + formatExpenseWithCurrency(0, tripCurrency)
+        );
+        setTotalPayBackText(
+          totalPayBackTextOriginal + formatExpenseWithCurrency(0, tripCurrency)
+        );
+      } else {
+        setTotalPaidBackText(
+          totalPaidBackTextOriginal +
+            formatExpenseWithCurrency(userGetsBack, tripCurrency)
+        );
+        setTotalPayBackText(
+          totalPayBackTextOriginal +
+            formatExpenseWithCurrency(userHasToPay, tripCurrency)
+        );
+      }
     } catch (error) {
       Toast.show({
         type: "error",
@@ -147,26 +155,69 @@ const SplitSummaryScreen = ({ navigation }) => {
   }, [
     totalPaidBackTextOriginal,
     totalPayBackTextOriginal,
-    isPaidDate,
+    isPaid,
+    isPaidTimestamp,
     tripCurrency,
     tripid,
-    memoExpenses.length,
     userName,
+    expenses,
   ]);
-  const simpleSplits = useCallback(
-    () => simplifySplits(splits),
-    [splits.length]
-  )();
+  const simpleSplits = useCallback(() => simplifySplits(splits), [splits])();
   const sameList = useMemo(
     () => areSplitListsEqual(splits, simpleSplits),
-    [splits.length, simpleSplits.length]
+    [splits, simpleSplits]
   );
   const noSimpleSplits = !simpleSplits || simpleSplits?.length < 1 || sameList;
+
+  // Pre-compute filtered expenses for each split to avoid O(N*M) filtering on every render
+  const splitExpensesMap = useMemo(() => {
+    const map = new Map<string, ExpenseData[]>();
+
+    if (!splits || splits.length === 0) {
+      return map;
+    }
+
+    // Create a key for each split and pre-filter expenses
+    splits.forEach((split) => {
+      const key = `${split.userName}-${split.whoPaid}`;
+
+      // Only compute if not already computed
+      if (!map.has(key)) {
+        const expensesList = expenses.filter((expense: ExpenseData) => {
+          // Skip paid expenses
+          if (
+            getEffectiveIsPaid(expense, isPaidTimestamp) === isPaidString.paid
+          ) {
+            return false;
+          }
+
+          const splitList = expense?.splitList;
+          const splitListLength = splitList?.length;
+          for (let i = 0; i < splitListLength; i++) {
+            const expenseSplit = splitList[i];
+            if (
+              (expenseSplit.userName === split.userName &&
+                expenseSplit.whoPaid === split.whoPaid) ||
+              expenseSplit.userName === split.whoPaid ||
+              expenseSplit.whoPaid === split.userName
+            ) {
+              return true;
+            }
+          }
+          return false;
+        });
+
+        map.set(key, expensesList);
+      }
+    });
+
+    return map;
+  }, [splits, expenses, isPaidTimestamp]);
 
   useEffect(() => {
     if (isFetching || !tripid) return;
     getOpenSplits();
-  }, [getOpenSplits]);
+  }, [getOpenSplits, isFetching, tripid]);
 
   const handleSimpflifySplits = useCallback(async () => {
     try {
@@ -186,12 +237,11 @@ const SplitSummaryScreen = ({ navigation }) => {
       }
       if (simpleSplits.some((split) => split.whoPaid === "Error")) {
         setTitleText(titleTextSimplified);
-        setSubTitleText(subTitleSimplified);
         setShowSimplify(false);
         Toast.show({
           type: "error",
           text1: i18n.t("couldNotSimplifySplits"),
-          text2: "Something must have gone wrong, sorry!",
+          text2: i18n.t("somethingWentWrongSorry"),
           visibilityTime: 2000,
         });
         return;
@@ -199,10 +249,16 @@ const SplitSummaryScreen = ({ navigation }) => {
       setSplits(simpleSplits);
       setShowSimplify(false);
       setTitleText(titleTextSimplified);
-      setSubTitleText(subTitleSimplified);
     } catch (error) {
+      safeLogError(error, "SplitSummaryScreen.tsx", 204);
     }
-  }, [splits?.length, subTitleSimplified]);
+  }, [
+    navigation,
+    noSimpleSplits,
+    simpleSplits,
+    splits?.length,
+    titleTextSimplified,
+  ]);
 
   function errorHandler() {
     setError(null);
@@ -211,41 +267,37 @@ const SplitSummaryScreen = ({ navigation }) => {
   const settleSplitsHandler = useCallback(async () => {
     setIsFetching(true);
     try {
-      await fetchAndSettleCurrentTrip(false);
-      await getOpenSplits();
+      await fetchAndSettleCurrentTrip();
       setSplits([]);
       setShowSimplify(false);
       setTitleText(titleTextOriginal);
-      setSubTitleText(subTitleOriginal);
       setTotalPaidBackText("");
       setTotalPayBackText("");
+      Toast.show({
+        type: "success",
+        text1: i18n.t("toastSettleSuccessTitle"),
+        text2: i18n.t("toastSettleSuccessMessage"),
+        visibilityTime: 2000,
+      });
+      navigation.popToTop();
     } catch (error) {
+      safeLogError(error, "SplitSummaryScreen.tsx", 224);
+      Toast.show({
+        type: "error",
+        text1: i18n.t("toastSettleFailedTitle"),
+        text2: i18n.t("toastSettleFailedMessage"),
+        visibilityTime: 2000,
+      });
     }
     setIsFetching(false);
-    navigation.popToTop();
-  }, []);
+  }, [fetchAndSettleCurrentTrip, navigation, titleTextOriginal]);
 
   const renderSplitItem = useCallback(
     (itemData) => {
-      // get a list of all expenses where the item.userName and item.whoPaid is included in the expense.splitList as either whoPaid or userName
-      const expensesList = expenses.filter((expense: ExpenseData) => {
-        const splitList = expense?.splitList;
-        const splitListLength = splitList?.length;
-        for (let i = 0; i < splitListLength; i++) {
-          const split = splitList[i];
-          if (
-            (split.userName === itemData.item.userName &&
-              split.whoPaid === itemData.item.whoPaid) ||
-            split.userName === itemData.item.whoPaid ||
-            split.whoPaid === itemData.item.userName
-          ) {
-            return true;
-          }
-        }
-        return false;
-      });
+      // Use pre-computed filtered expenses from memoized map instead of filtering on every render
+      const key = `${itemData.item.userName}-${itemData.item.whoPaid}`;
+      const expensesList = splitExpensesMap.get(key) || [];
 
-      const length = expensesList.length;
       const item = itemData.item;
       return (
         <Pressable
@@ -275,13 +327,14 @@ const SplitSummaryScreen = ({ navigation }) => {
         </Pressable>
       );
     },
-    [tripCurrency]
+    [tripCurrency, splitExpensesMap, navigation]
   );
 
   const ButtonContainerJSX = (
     <View style={isPortrait && styles.buttonContainer}>
       {!showSimplify && (
         <FlatButton
+          textStyle={styles.buttonText}
           onPress={async () => {
             if (showSimplify) {
               trackEvent(VexoEvents.SPLIT_SUMMARY_BACK_PRESSED);
@@ -290,19 +343,22 @@ const SplitSummaryScreen = ({ navigation }) => {
               await getOpenSplits();
               setShowSimplify(true);
               setTitleText(titleTextOriginal);
-              setSubTitleText(subTitleOriginal);
             }
           }}
         >
-          Back
+          {i18n.t("back")}
         </FlatButton>
       )}
       {showSimplify && !noSimpleSplits && (
-        <GradientButton style={styles.button} onPress={handleSimpflifySplits}>
-          Simplify Splits
+        <GradientButton
+          buttonStyle={styles.button}
+          style={styles.button}
+          onPress={handleSimpflifySplits}
+        >
+          {i18n.t("simplifySplits")}
         </GradientButton>
       )}
-      {hasOpenSplits && (
+      {hasOpenSplits && !isTripSettled && (
         <GradientButton
           style={styles.button}
           colors={GlobalStyles.gradientColors}
@@ -311,18 +367,16 @@ const SplitSummaryScreen = ({ navigation }) => {
             backgroundColor: GlobalStyles.colors.errorGrayed,
           }}
           onPress={async () => {
-            // alert ask user if he really wants to settle all Splits
-            // if yes, call settleSplitsHandler
             Alert.alert(
-              "Settle Splits",
-              "Are you sure you want to settle all splits? Has everyone gotten their money back? (This will only settle splits from Today or Before, but not open splits from the future!)",
+              i18n.t("settleSplits"),
+              i18n.t("sureSettleSplitsFullMessage"),
               [
                 {
-                  text: "Cancel",
+                  text: i18n.t("cancel"),
                   style: "cancel",
                 },
                 {
-                  text: "Settle",
+                  text: i18n.t("confirmSettle"),
                   onPress: async () => {
                     trackEvent(VexoEvents.SETTLE_ALL_PRESSED, {
                       splitsCount: splits?.length || 0,
@@ -334,7 +388,7 @@ const SplitSummaryScreen = ({ navigation }) => {
             );
           }}
         >
-          Settle Splits
+          {i18n.t("settleSplits")}
         </GradientButton>
       )}
     </View>
@@ -344,49 +398,94 @@ const SplitSummaryScreen = ({ navigation }) => {
     return <ErrorOverlay message={error} onConfirm={errorHandler} />;
   }
 
-  if (isFetching) {
-    return <LoadingOverlay />;
-  }
-
   return (
     <ScrollView
       scrollEnabled={isPortrait}
       contentContainerStyle={styles.container}
     >
       <Animated.View
-        // entering={FadeIn}
-        // exiting={FadeOut}
         style={[
           GlobalStyles.wideStrongShadow,
           styles.cardContainer,
           !isPortrait && styles.row,
         ]}
       >
-        <View>
-          <View style={styles.titleContainer}>
-            {/* <BackButton></BackButton> */}
-            <Text style={styles.titleText}> {titleText}</Text>
+        <View style={styles.cardContent}>
+          <View>
+            <View style={styles.titleContainer}>
+              <Text style={styles.titleText}> {titleText}</Text>
+              <View style={styles.syncIndicatorContainer}>
+                <MiniSyncIndicator
+                  isVisible={isFetching}
+                  size={dynamicScale(16, false, 0.5)}
+                />
+              </View>
+            </View>
+            {isTripSettled && (
+              <View style={styles.subTitleContainer}>
+                <Text
+                  style={[
+                    styles.subTitleText,
+                    {
+                      color: GlobalStyles.colors.primary500,
+                      fontWeight: "600",
+                    },
+                  ]}
+                >
+                  {i18n.t("tripSettledAllExpensesPaid")}
+                </Text>
+              </View>
+            )}
+            {!isTripSettled && (
+              <>
+                <View style={styles.subTitleContainer}>
+                  <Text style={styles.subTitleText}> {totalPaidBackText}</Text>
+                </View>
+                <View style={styles.subTitleContainer}>
+                  <Text style={styles.subTitleText}> {totalPayBackText}</Text>
+                </View>
+              </>
+            )}
+            {!isPortrait && ButtonContainerJSX}
           </View>
-          {/* <View style={styles.subTitleContainer}>
-            <Text style={styles.subTitleText}> {subTitleText}</Text>
-          </View> */}
-          <View style={styles.subTitleContainer}>
-            <Text style={styles.subTitleText}> {totalPaidBackText}</Text>
-          </View>
-          <View style={styles.subTitleContainer}>
-            <Text style={styles.subTitleText}> {totalPayBackText}</Text>
-          </View>
-          {!isPortrait && ButtonContainerJSX}
-        </View>
 
-        <FlatList
-          style={{ maxWidth: "100%", paddingHorizontal: "2%" }}
-          data={splits}
-          scrollEnabled={!isPortrait}
-          ListFooterComponent={isPortrait && ButtonContainerJSX}
-          ListHeaderComponent={<View style={{ height: 40 }}></View>}
-          renderItem={renderSplitItem}
-        />
+          <FlatList
+            style={{
+              paddingHorizontal: dynamicScale(8, false, 0.5),
+              flex: 1,
+            }}
+            contentContainerStyle={{
+              paddingBottom: isPortrait ? 0 : dynamicScale(18, false, 0.5),
+            }}
+            data={splits}
+            scrollEnabled={!isPortrait}
+            ListHeaderComponent={
+              <View style={{ height: dynamicScale(20, false, 0.5) }}></View>
+            }
+            ListEmptyComponent={
+              isTripSettled ? (
+                <View style={{ padding: 20, alignItems: "center" }}>
+                  <Text
+                    style={[
+                      styles.subTitleText,
+                      { color: GlobalStyles.colors.primary500 },
+                    ]}
+                  >
+                    {i18n.t("noOpenSplitsAllSettled")}
+                  </Text>
+                </View>
+              ) : splits.length === 0 && !isFetching ? (
+                <View style={{ padding: 20, alignItems: "center" }}>
+                  <Text style={styles.subTitleText}>
+                    {i18n.t("noOpenSplits")}
+                  </Text>
+                </View>
+              ) : null
+            }
+            renderItem={renderSplitItem}
+          />
+        </View>
+        {isPortrait && ButtonContainerJSX}
       </Animated.View>
     </ScrollView>
   );
@@ -400,39 +499,50 @@ SplitSummaryScreen.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  syncIndicatorContainer: {
+    position: "absolute",
+    right: 0,
+    top: dynamicScale(8, false, 0.5),
+  },
+  buttonText: {
+    fontSize: dynamicScale(16, false, 0.5),
+    fontWeight: "500",
+    color: GlobalStyles.colors.textColor,
+  },
   container: {
     flex: 1,
-    // alignItems: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   cardContainer: {
-    margin: dynamicScale(20),
-    minHeight: "86%",
+    flex: 1,
+    borderWidth: 1,
+    borderColor: GlobalStyles.colors.gray300,
     alignItems: "center",
-    justifyContent: "space-around",
-    paddingHorizontal: dynamicScale(24),
-    paddingTop: dynamicScale(24, true),
-    paddingBottom: dynamicScale(2, true),
-    //card
+    flexDirection: "column",
+    justifyContent: "space-between",
+    margin: dynamicScale(20, false, 0.5),
+    paddingBottom: dynamicScale(18, false, 0.5),
+    paddingHorizontal: dynamicScale(8, false, 0.5),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: dynamicScale(20, false, 0.5),
-    // borderWidth: 1,
-    borderColor: GlobalStyles.colors.gray500,
-    minWidth: dynamicScale(300),
-    // android styles
     ...Platform.select({
       android: {
         margin: dynamicScale(8),
         marginTop: dynamicScale(2, true),
+        minWidth: dynamicScale(300),
       },
     }),
+  },
+  cardContent: {
+    flex: 1,
+    width: "100%",
+    flexDirection: "column",
   },
   button: {
     ...Platform.select({
       ios: {
-        marginTop: dynamicScale(20, true),
         borderRadius: 12,
-        minHeight: 55,
+        minHeight: dynamicScale(48, false, 0.5),
       },
       android: {
         elevation: 0,
@@ -442,11 +552,11 @@ const styles = StyleSheet.create({
   splitContainer: {
     flex: 1,
     flexDirection: "row",
-    paddingHorizontal: dynamicScale(16),
-    paddingVertical: dynamicScale(8, true),
-    marginVertical: dynamicScale(8, true),
-    borderWidth: 1,
-    borderColor: GlobalStyles.colors.backgroundColor,
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+    paddingVertical: dynamicScale(8, false, 0.5),
+    marginVertical: dynamicScale(8, false, 0.5),
+    borderWidth: 2,
+    borderColor: GlobalStyles.colors.gray300,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: dynamicScale(44, false, 0.5),
     alignItems: "center",
@@ -461,16 +571,13 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
-    flex: 1,
+    alignSelf: "center",
     alignItems: "center",
     justifyContent: "space-between",
-    // margin: "2%",
     ...Platform.select({
       ios: { marginTop: 0 },
       android: {
-        // height: dynamicScale(55, true),
         marginVertical: dynamicScale(18),
-        // flexDirection: "column",
         minHeight: dynamicScale(100, true),
       },
     }),
@@ -482,17 +589,15 @@ const styles = StyleSheet.create({
   userText: {
     fontSize: dynamicScale(18, false, 0.5),
     fontWeight: "500",
-    //italics
     fontStyle: "italic",
     color: GlobalStyles.colors.textColor,
-    // center
     alignItems: "center",
     alignContent: "center",
   },
   normalText: {
-    fontSize: dynamicScale(16),
+    fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "300",
-    color: GlobalStyles.colors.textColor, // center
+    color: GlobalStyles.colors.textColor,
     alignItems: "center",
     alignContent: "center",
     fontStyle: "italic",
@@ -501,49 +606,39 @@ const styles = StyleSheet.create({
     fontSize: dynamicScale(18, false, 0.5),
     fontWeight: "500",
     fontStyle: "italic",
-
     color: GlobalStyles.colors.errorGrayed,
-    // center
     alignItems: "center",
   },
 
   titleContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: "-8%",
-    // row
     flexDirection: "row",
+    marginTop: dynamicScale(18, false, 0.5),
   },
   titleText: {
     fontSize: dynamicScale(32, false, 0.5),
     fontWeight: "bold",
     paddingBottom: dynamicScale(12, true),
     color: GlobalStyles.colors.textColor,
-    // center
     alignItems: "center",
     alignContent: "center",
   },
   subTitleContainer: {
-    alignItems: "flex-start",
-    justifyContent: "flex-start",
-    margin: "2%",
-    // center
-    alignContent: "flex-start",
+    marginVertical: dynamicScale(4, false, 0.5),
+    alignItems: "center",
+    alignContent: "center",
   },
   subTitleText: {
     fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "300",
     fontStyle: "italic",
-
     color: GlobalStyles.colors.textColor,
-    // center
     alignItems: "flex-start",
     alignContent: "flex-start",
   },
   row: {
     flexDirection: "row",
-    // marginTop: 0,
-    // paddingTop: 0,
     justifyContent: "flex-start",
     alignContent: "flex-start",
     alignItems: "flex-start",

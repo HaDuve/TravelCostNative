@@ -40,7 +40,7 @@ export interface ExpenseData {
   listEQUAL?: string[];
   iconName?: string;
   rangeId?: string;
-  isPaid?: string;
+  isPaid?: isPaidString;
   isSpecialExpense?: boolean;
   editedTimestamp?: number;
   isDeleted?: boolean;
@@ -56,6 +56,36 @@ export enum DuplicateOption {
 export enum isPaidString {
   paid = "paid",
   notPaid = "not paid",
+}
+
+/**
+ * Computes the effective isPaid status for an expense based on timestamp override logic.
+ * If trip was settled (isPaidTimestamp exists) and expense was created/edited before settlement,
+ * then the expense is effectively "paid" regardless of its stored isPaid value.
+ *
+ * @param expense - The expense data
+ * @param tripIsPaidTimestamp - The timestamp when the trip was settled (in milliseconds)
+ * @returns The effective isPaid status (paid or not paid)
+ */
+export function getEffectiveIsPaid(
+  expense: ExpenseData,
+  tripIsPaidTimestamp?: number
+): isPaidString {
+  // If no trip settlement timestamp, use expense's stored isPaid value
+  if (!tripIsPaidTimestamp || tripIsPaidTimestamp === 0) {
+    return expense.isPaid ?? isPaidString.notPaid;
+  }
+
+  // Get expense editedTimestamp, default to 0 if missing
+  const expenseTimestamp = expense.editedTimestamp || 0;
+
+  // If trip was settled after expense was created/edited, override to "paid"
+  if (tripIsPaidTimestamp > expenseTimestamp) {
+    return isPaidString.paid;
+  }
+
+  // Otherwise, use expense's stored isPaid value
+  return expense.isPaid ?? isPaidString.notPaid;
 }
 
 export interface ExpenseDataOnline {

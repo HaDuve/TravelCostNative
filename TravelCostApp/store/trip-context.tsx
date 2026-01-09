@@ -1,19 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import React, { createContext, useEffect, useState } from "react";
-import { Alert } from "react-native";
 import { fetchTrip, fetchUser, getTravellers, updateTrip } from "../util/http";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
-import Toast from "react-native-toast-message";
 import { MAX_JS_NUMBER } from "../confAppConstants";
 import { secureStoreGetItem } from "./secure-storage";
 import { ExpenseData, isPaidString } from "../util/expense";
-import { err } from "react-native-svg/lib/typescript/xml";
 import { Traveller } from "../util/traveler";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { useInterval } from "../components/Hooks/useInterval";
 import { setMMKVObject, getMMKVObject } from "./mmkv";
-import set from "react-native-reanimated";
 import { Category } from "../util/category";
 import safeLogError from "../util/error";
 
@@ -31,6 +27,7 @@ export interface TripData {
   endDate?: string;
   isPaidDate?: string;
   isPaid?: isPaidString;
+  isPaidTimestamp?: number;
   isDynamicDailyBudget?: boolean;
   // online categories are stored as a JSON.stringified strings
   // local categories are stored as Category arrays.
@@ -64,9 +61,11 @@ export type TripContextType = {
   loadTripDataFromStorage: () => Promise<TripData>;
   saveTravellersInStorage: (travellers) => Promise<void>;
   loadTravellersFromStorage: () => Promise<void>;
-  fetchAndSettleCurrentTrip: (unSettle?: boolean) => Promise<void>;
+  fetchAndSettleCurrentTrip: () => Promise<void>;
+  setTripUnsettled: () => Promise<void>;
   isPaid: isPaidString;
   isPaidDate: string;
+  isPaidTimestamp: number | undefined;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
   isDynamicDailyBudget: boolean;
@@ -87,7 +86,7 @@ export const TripContext = createContext<TripContextType>({
   refresh: () => {},
   setTripProgress: (percent: number) => {},
   travellers: [],
-  fetchAndSetTravellers: async (tripid: string) => {},
+  fetchAndSetTravellers: async (tripid: string) => false,
   setTotalSum: (amount: number) => {},
   setTripid: (tripid: string) => {},
 
@@ -102,12 +101,16 @@ export const TripContext = createContext<TripContextType>({
     return {};
   },
   saveTripDataInStorage: async (tripData: TripData) => {},
-  loadTripDataFromStorage: async () => {},
+  loadTripDataFromStorage: async (): Promise<TripData> => {
+    return {} as TripData;
+  },
   saveTravellersInStorage: async (travellers) => {},
   loadTravellersFromStorage: async () => {},
-  fetchAndSettleCurrentTrip: async (unSettle = false) => {},
+  fetchAndSettleCurrentTrip: async () => {},
+  setTripUnsettled: async () => {},
   isPaid: isPaidString.notPaid,
   isPaidDate: "",
+  isPaidTimestamp: undefined,
   isLoading: false,
   setIsLoading: (isLoading: boolean) => {},
   isDynamicDailyBudget: false,
@@ -127,6 +130,9 @@ function TripContextProvider({ children }) {
   const [endDate, setEndDate] = useState("");
   const [isPaid, setIsPaid] = useState(isPaidString.notPaid);
   const [isPaidDate, setIsPaidDate] = useState("");
+  const [isPaidTimestamp, setIsPaidTimestamp] = useState<number | undefined>(
+    undefined
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [isDynamicDailyBudget, setIsDynamicDailyBudget] = useState(false);
 
@@ -212,6 +218,30 @@ function TripContextProvider({ children }) {
     setRefreshState(!refreshState);
   }
 
+  /**
+   * Migrates trip data from old settlement system (isPaidDate) to new system (isPaidTimestamp).
+   * Old system: "settled until today" - isPaidDate exists but means partial settlement
+   * New system: "settled everything" - isPaidTimestamp means all expenses before that timestamp are paid
+   * Migration: Convert isPaidDate to isPaidTimestamp, set isPaid to false (since old system was different)
+   */
+  function migrateTripSettlementData(trip: TripData): TripData {
+    // If trip has isPaidDate but no isPaidTimestamp, migrate it
+    if (trip.isPaidDate && !trip.isPaidTimestamp) {
+      try {
+        // Convert ISO string date to timestamp
+        const date = new Date(trip.isPaidDate);
+        if (!isNaN(date.getTime())) {
+          trip.isPaidTimestamp = date.getTime();
+          // Set isPaid to false because old system was "settled until today", not "settled everything"
+          trip.isPaid = isPaidString.notPaid;
+        }
+      } catch (error) {
+        safeLogError(error);
+      }
+    }
+    return trip;
+  }
+
   async function fetchAndSetTravellers(tripid: string): Promise<boolean> {
     await loadTravellersFromStorage();
     const { isFastEnough } = await isConnectionFastEnough();
@@ -241,29 +271,37 @@ function TripContextProvider({ children }) {
       setEndDate("");
       setIsPaid(isPaidString.notPaid);
       setIsPaidDate("");
+      setIsPaidTimestamp(undefined);
       setTotalSumTrip(0);
       setIsLoading(false);
       return;
     }
+
+    // Migrate trip data from old settlement system
+    const migratedTrip = migrateTripSettlementData(trip);
+
     _setTripid(tripid);
-    setTripName(trip.tripName);
+    setTripName(migratedTrip.tripName);
     setTotalBudget(
-      trip.totalBudget ? trip.totalBudget.toString() : MAX_JS_NUMBER.toString()
+      migratedTrip.totalBudget
+        ? migratedTrip.totalBudget.toString()
+        : MAX_JS_NUMBER.toString()
     );
-    setTripCurrency(trip.tripCurrency);
+    setTripCurrency(migratedTrip.tripCurrency);
     // negative Numbers are not allowed
-    if (Number(trip.dailyBudget) < 0) {
+    if (Number(migratedTrip.dailyBudget) < 0) {
       setdailyBudget("0.0001");
     } else {
-      setdailyBudget(trip.dailyBudget.toString());
+      setdailyBudget(migratedTrip.dailyBudget.toString());
     }
-    setStartDate(trip.startDate);
-    setEndDate(trip.endDate);
-    setIsPaid(trip.isPaid);
-    setIsPaidDate(trip.isPaidDate);
-    setTotalSumTrip(trip.totalSum);
+    setStartDate(migratedTrip.startDate);
+    setEndDate(migratedTrip.endDate);
+    setIsPaid(migratedTrip.isPaid ?? isPaidString.notPaid);
+    setIsPaidDate(migratedTrip.isPaidDate);
+    setIsPaidTimestamp(migratedTrip.isPaidTimestamp);
+    setTotalSumTrip(migratedTrip.totalSum);
     setIsLoading(false);
-    setIsDynamicDailyBudget(trip.isDynamicDailyBudget);
+    setIsDynamicDailyBudget(migratedTrip.isDynamicDailyBudget);
     if (typeof trip.travellers[1] === "string") {
       setTravellers(trip.travellers);
     } else {
@@ -290,24 +328,52 @@ function TripContextProvider({ children }) {
       const trip: TripData = await fetchTrip(tripid);
       if (!trip) throw new Error("no trip found");
       trip.tripid = tripid;
-      await setCurrentTrip(tripid, trip);
-      await saveTripDataInStorage(trip);
-      return trip;
+
+      // Migrate trip data from old settlement system
+      const migratedTrip = migrateTripSettlementData(trip);
+
+      await setCurrentTrip(tripid, migratedTrip);
+
+      // If migration occurred, save migrated trip back to database and storage
+      if (
+        trip.isPaidDate &&
+        !trip.isPaidTimestamp &&
+        migratedTrip.isPaidTimestamp
+      ) {
+        await saveTripDataInStorage(migratedTrip);
+        await updateTrip(tripid, migratedTrip);
+      } else {
+        await saveTripDataInStorage(migratedTrip);
+      }
+      return migratedTrip;
     } catch (error) {
       safeLogError(error);
     }
   }
 
-  async function fetchAndSettleCurrentTrip(unSettle = false) {
+  async function fetchAndSettleCurrentTrip() {
     try {
       const trip = await fetchTrip(tripid);
       trip.isPaid = isPaidString.paid;
+      const now = Date.now();
+      trip.isPaidTimestamp = now;
       const today = new Date();
       trip.isPaidDate = today.toISOString();
-      if (unSettle) {
-        trip.isPaid = isPaidString.notPaid;
-        trip.isPaidDate = "";
-      }
+      await setCurrentTrip(tripid, trip);
+      await saveTripDataInStorage(trip);
+      await updateTrip(tripid, trip);
+    } catch (error) {
+      safeLogError(error);
+      throw error;
+    }
+  }
+
+  async function setTripUnsettled() {
+    try {
+      const trip = await fetchTrip(tripid);
+      trip.isPaid = isPaidString.notPaid;
+      // Keep isPaidTimestamp unchanged for reference
+      // isPaidTimestamp remains set even though isPaid is false
       await setCurrentTrip(tripid, trip);
       await saveTripDataInStorage(trip);
       await updateTrip(tripid, trip);
@@ -326,6 +392,7 @@ function TripContextProvider({ children }) {
       totalSum: totalSum,
       isPaid: isPaid,
       isPaidDate: isPaidDate,
+      isPaidTimestamp: isPaidTimestamp,
       tripProgress: progress,
       startDate: startDate,
       endDate: endDate,
@@ -351,21 +418,41 @@ function TripContextProvider({ children }) {
   async function loadTripDataFromStorage() {
     const tripData: TripData = getMMKVObject("currentTrip");
     if (tripData) {
-      setTripName(tripData.tripName);
+      // Migrate trip data from old settlement system
+      const migratedTrip = migrateTripSettlementData(tripData);
+
+      setTripName(migratedTrip.tripName);
       setTotalBudget(
-        tripData.totalBudget
-          ? tripData.totalBudget.toString()
+        migratedTrip.totalBudget
+          ? migratedTrip.totalBudget.toString()
           : MAX_JS_NUMBER.toString()
       );
 
-      setTripCurrency(tripData.tripCurrency);
-      setdailyBudget(tripData.dailyBudget.toString());
+      setTripCurrency(migratedTrip.tripCurrency);
+      setdailyBudget(migratedTrip.dailyBudget.toString());
+      setIsPaid(migratedTrip.isPaid ?? isPaidString.notPaid);
+      setIsPaidDate(migratedTrip.isPaidDate ?? "");
+      setIsPaidTimestamp(migratedTrip.isPaidTimestamp);
+      setTotalSumTrip(migratedTrip.totalSum ?? 0);
+      setStartDate(migratedTrip.startDate ?? "");
+      setEndDate(migratedTrip.endDate ?? "");
       try {
         await loadTravellersFromStorage();
-      } catch (error) {}
+      } catch (error) {
+        safeLogError(error);
+      }
       setIsLoading(false);
 
-      return tripData;
+      // If migration occurred, save migrated trip back to storage
+      if (
+        tripData.isPaidDate &&
+        !tripData.isPaidTimestamp &&
+        migratedTrip.isPaidTimestamp
+      ) {
+        await saveTripDataInStorage(migratedTrip);
+      }
+
+      return migratedTrip;
     } else {
       setIsLoading(false);
     }
@@ -411,8 +498,10 @@ function TripContextProvider({ children }) {
     saveTravellersInStorage: saveTravellersInStorage,
     loadTravellersFromStorage: loadTravellersFromStorage,
     fetchAndSettleCurrentTrip: fetchAndSettleCurrentTrip,
+    setTripUnsettled: setTripUnsettled,
     isPaid: isPaid,
     isPaidDate: isPaidDate,
+    isPaidTimestamp: isPaidTimestamp,
     isLoading: isLoading,
     setIsLoading: setIsLoading,
     isDynamicDailyBudget: isDynamicDailyBudget,

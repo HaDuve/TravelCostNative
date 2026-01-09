@@ -435,6 +435,10 @@ const en = {
   toastSyncFailed: "Failed to sync, please try again later",
   toastSyncSuccessTitle: "Sync Successful",
   toastSyncFailedTitle: "Sync Failed",
+  toastSettleSuccessTitle: "All Splits Settled!",
+  toastSettleSuccessMessage: "Yay! All splits are settled!",
+  toastSettleFailedTitle: "Settlement Failed",
+  toastSettleFailedMessage: "Could not settle splits. Please try again.",
 
   // rate modal
   rateModalTitle: "Enjoying Budget for Nomads?",
@@ -543,6 +547,22 @@ const en = {
   averageCostPerCountry: "Average Cost Per Country",
   averageCostPerTrip: "Average Cost Per Trip",
   averageCostPerTraveller: "Average Cost Per Traveller",
+
+  // ExpenseForm and SplitSummaryScreen translations
+  expenseMarkedPaidDueToSettlement:
+    "This expense is marked as paid due to trip settlement",
+  splitSummaryTitleSimplified: "Split Summary",
+  overviewOfOwedAmounts: "Overview of owed amounts in the trip:\n  ",
+  simplifiedSummaryOptimalTransactions:
+    "Simplified Summary of Optimal Transactions in the trip:  ",
+  yourMoneyBackWithColon: "Your money back:  ",
+  youStillOweWithColon: "You still owe: ",
+  somethingWentWrongSorry: "Something must have gone wrong, sorry!",
+  sureSettleSplitsFullMessage:
+    "Are you sure you want to settle all splits? Has everyone gotten their money back? This will mark ALL expenses as paid, regardless of their date.",
+  tripSettledAllExpensesPaid: "Trip Settled - All expenses marked as paid",
+  noOpenSplitsAllSettled: "No open splits - All expenses are settled",
+  noOpenSplits: "No open splits",
 };
 const de = {
   // special expense strings
@@ -1007,6 +1027,11 @@ const de = {
     "Synchronisation fehlgeschlagen, bitte versuche es später erneut",
   toastSyncSuccessTitle: "Synchronisation erfolgreich",
   toastSyncFailedTitle: "Synchronisation fehlgeschlagen",
+  toastSettleSuccessTitle: "Alle Aufteilungen beglichen!",
+  toastSettleSuccessMessage: "Yay! Alle Aufteilungen sind beglichen!",
+  toastSettleFailedTitle: "Begleichung fehlgeschlagen",
+  toastSettleFailedMessage:
+    "Aufteilungen konnten nicht beglichen werden. Bitte versuche es erneut.",
   // rate modal
   rateModalTitle: "Gefällt dir Budget for Nomads?",
   rateModalSubTitle:
@@ -1118,6 +1143,24 @@ const de = {
   averageCostPerCountry: "Durchschnittskosten pro Land",
   averageCostPerTrip: "Durchschnittskosten pro Reise",
   averageCostPerTraveller: "Durchschnittskosten pro Reisenden",
+
+  // ExpenseForm and SplitSummaryScreen translations
+  expenseMarkedPaidDueToSettlement:
+    "Diese Ausgabe ist aufgrund der Reiseabrechnung als bezahlt markiert",
+  splitSummaryTitleSimplified: "Aufteilungen",
+  overviewOfOwedAmounts: "Übersicht der geschuldeten Beträge in der Reise:\n  ",
+  simplifiedSummaryOptimalTransactions:
+    "Vereinfachte Übersicht optimaler Transaktionen in der Reise:  ",
+  yourMoneyBackWithColon: "Dein Geld zurück:  ",
+  youStillOweWithColon: "Du schuldest noch: ",
+  somethingWentWrongSorry: "Etwas muss schief gelaufen sein, entschuldige!",
+  sureSettleSplitsFullMessage:
+    "Sind Sie sicher, dass Sie alle Schulden begleichen möchten? Hat jeder sein Geld zurückbekommen? Dies markiert ALLE Ausgaben als bezahlt, unabhängig von ihrem Datum.",
+  tripSettledAllExpensesPaid:
+    "Reise abgerechnet - Alle Ausgaben als bezahlt markiert",
+  noOpenSplitsAllSettled:
+    "Keine offenen Aufteilungen - Alle Ausgaben abgerechnet",
+  noOpenSplits: "Keine offenen Aufteilungen",
 };
 const fr = {
   // special expense strings
@@ -1577,6 +1620,11 @@ const fr = {
   toastSyncFailed: "Échec de la synchronisation, veuillez réessayer plus tard",
   toastSyncSuccessTitle: "Synchronisation réussie",
   toastSyncFailedTitle: "Échec de la synchronisation",
+  toastSettleSuccessTitle: "Tous les partages réglés !",
+  toastSettleSuccessMessage: "Yay ! Tous les partages sont réglés !",
+  toastSettleFailedTitle: "Échec du règlement",
+  toastSettleFailedMessage:
+    "Impossible de régler les partages. Veuillez réessayer.",
   // rate modal
   rateModalTitle: "Vous appréciez Budget for Nomads ?",
   rateModalSubTitle:
@@ -1690,6 +1738,24 @@ const fr = {
   averageCostPerCountry: "Coût moyen par pays",
   averageCostPerTrip: "Coût moyen par voyage",
   averageCostPerTraveller: "Coût moyen par voyageur",
+
+  // ExpenseForm and SplitSummaryScreen translations
+  expenseMarkedPaidDueToSettlement:
+    "Cette dépense est marquée comme payée en raison du règlement du voyage",
+  splitSummaryTitleSimplified: "Résumé des dépenses",
+  overviewOfOwedAmounts: "Aperçu des montants dus dans le voyage :\n  ",
+  simplifiedSummaryOptimalTransactions:
+    "Résumé simplifié des transactions optimales dans le voyage :  ",
+  yourMoneyBackWithColon: "Votre argent est de retour :  ",
+  youStillOweWithColon: "Vous devez toujours : ",
+  somethingWentWrongSorry: "Quelque chose a dû mal se passer, désolé !",
+  sureSettleSplitsFullMessage:
+    "Êtes-vous sûr de vouloir régler toutes les dépenses ? Tout le monde a-t-il récupéré son argent ? Cela marquera TOUTES les dépenses comme payées, quelle que soit leur date.",
+  tripSettledAllExpensesPaid:
+    "Voyage réglé - Toutes les dépenses marquées comme payées",
+  noOpenSplitsAllSettled:
+    "Aucune dépense ouverte - Toutes les dépenses sont réglées",
+  noOpenSplits: "Aucune dépense ouverte",
 };
 const ru = {
   // special expense strings
@@ -2150,6 +2216,11 @@ const ru = {
   toastSyncFailed: "Не удалось синхронизировать, попробуйте позже",
   toastSyncSuccessTitle: "Синхронизация успешна",
   toastSyncFailedTitle: "Ошибка синхронизации",
+  toastSettleSuccessTitle: "Все разделы урегулированы!",
+  toastSettleSuccessMessage: "Ура! Все разделы урегулированы!",
+  toastSettleFailedTitle: "Ошибка урегулирования",
+  toastSettleFailedMessage:
+    "Не удалось урегулировать разделы. Пожалуйста, попробуйте снова.",
   // rate modal
   rateModalTitle: "Нравится Budget for Nomads?",
   rateModalSubTitle:
@@ -2261,5 +2332,22 @@ const ru = {
   averageCostPerCountry: "Средние расходы на страну",
   averageCostPerTrip: "Средние расходы на поездку",
   averageCostPerTraveller: "Средние расходы на путешественника",
+
+  // ExpenseForm and SplitSummaryScreen translations
+  expenseMarkedPaidDueToSettlement:
+    "Эта статья расходов помечена как оплаченная из-за урегулирования поездки",
+  splitSummaryTitleSimplified: "Разделить сумму",
+  overviewOfOwedAmounts: "Обзор причитающихся сумм в поездке:\n  ",
+  simplifiedSummaryOptimalTransactions:
+    "Упрощенная сводка оптимальных транзакций в поездке:  ",
+  yourMoneyBackWithColon: "Ваши деньги вернутся:  ",
+  youStillOweWithColon: "Вы все еще должны: ",
+  somethingWentWrongSorry: "Что-то пошло не так, извините!",
+  sureSettleSplitsFullMessage:
+    "Вы уверены, что хотите рассчитать все разделы? Все ли получили свои деньги? Это отметит ВСЕ расходы как оплаченные, независимо от их даты.",
+  tripSettledAllExpensesPaid:
+    "Поездка урегулирована - Все расходы помечены как оплаченные",
+  noOpenSplitsAllSettled: "Нет открытых разделов - Все расходы урегулированы",
+  noOpenSplits: "Нет открытых разделов",
 };
 export { en, de, fr, ru };

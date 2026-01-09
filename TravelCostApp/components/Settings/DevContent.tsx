@@ -119,7 +119,7 @@ const DevContent = ({ navigation }) => {
       {/* render offline queue */}
       {/* offqitem - > expense -> expenseData */}
       <Text>
-{i18n.t("devOfflineQueue")}
+        {i18n.t("devOfflineQueue")}
         {(!offlineQueue || offlineQueue.length < 1) && " empty"}
       </Text>
       <FlatList
@@ -171,15 +171,6 @@ const DevContent = ({ navigation }) => {
         onPress={async () => {}}
       >
         trackPurchaseEvent
-      </Button>
-      <Button
-        onPress={async () => {
-          await tripCtx.fetchAndSettleCurrentTrip(true);
-          navigation.pop();
-        }}
-        style={styles.settingsButton}
-      >
-        UnsettleAllSplits
       </Button>
     </View>
   );

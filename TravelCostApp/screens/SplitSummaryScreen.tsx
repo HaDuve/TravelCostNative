@@ -273,11 +273,23 @@ const SplitSummaryScreen = ({ navigation }) => {
       setTitleText(titleTextOriginal);
       setTotalPaidBackText("");
       setTotalPayBackText("");
+      Toast.show({
+        type: "success",
+        text1: i18n.t("toastSettleSuccessTitle"),
+        text2: i18n.t("toastSettleSuccessMessage"),
+        visibilityTime: 2000,
+      });
+      navigation.popToTop();
     } catch (error) {
       safeLogError(error, "SplitSummaryScreen.tsx", 224);
+      Toast.show({
+        type: "error",
+        text1: i18n.t("toastSettleFailedTitle"),
+        text2: i18n.t("toastSettleFailedMessage"),
+        visibilityTime: 2000,
+      });
     }
     setIsFetching(false);
-    navigation.popToTop();
   }, [fetchAndSettleCurrentTrip, navigation, titleTextOriginal]);
 
   const renderSplitItem = useCallback(

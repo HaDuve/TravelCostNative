@@ -364,6 +364,7 @@ function TripContextProvider({ children }) {
       await updateTrip(tripid, trip);
     } catch (error) {
       safeLogError(error);
+      throw error;
     }
   }
 

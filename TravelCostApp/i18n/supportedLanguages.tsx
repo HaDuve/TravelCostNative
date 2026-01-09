@@ -435,6 +435,10 @@ const en = {
   toastSyncFailed: "Failed to sync, please try again later",
   toastSyncSuccessTitle: "Sync Successful",
   toastSyncFailedTitle: "Sync Failed",
+  toastSettleSuccessTitle: "All Splits Settled!",
+  toastSettleSuccessMessage: "Yay! All splits are settled!",
+  toastSettleFailedTitle: "Settlement Failed",
+  toastSettleFailedMessage: "Could not settle splits. Please try again.",
 
   // rate modal
   rateModalTitle: "Enjoying Budget for Nomads?",
@@ -1023,6 +1027,11 @@ const de = {
     "Synchronisation fehlgeschlagen, bitte versuche es später erneut",
   toastSyncSuccessTitle: "Synchronisation erfolgreich",
   toastSyncFailedTitle: "Synchronisation fehlgeschlagen",
+  toastSettleSuccessTitle: "Alle Aufteilungen beglichen!",
+  toastSettleSuccessMessage: "Yay! Alle Aufteilungen sind beglichen!",
+  toastSettleFailedTitle: "Begleichung fehlgeschlagen",
+  toastSettleFailedMessage:
+    "Aufteilungen konnten nicht beglichen werden. Bitte versuche es erneut.",
   // rate modal
   rateModalTitle: "Gefällt dir Budget for Nomads?",
   rateModalSubTitle:
@@ -1611,6 +1620,11 @@ const fr = {
   toastSyncFailed: "Échec de la synchronisation, veuillez réessayer plus tard",
   toastSyncSuccessTitle: "Synchronisation réussie",
   toastSyncFailedTitle: "Échec de la synchronisation",
+  toastSettleSuccessTitle: "Tous les partages réglés !",
+  toastSettleSuccessMessage: "Yay ! Tous les partages sont réglés !",
+  toastSettleFailedTitle: "Échec du règlement",
+  toastSettleFailedMessage:
+    "Impossible de régler les partages. Veuillez réessayer.",
   // rate modal
   rateModalTitle: "Vous appréciez Budget for Nomads ?",
   rateModalSubTitle:
@@ -2202,6 +2216,11 @@ const ru = {
   toastSyncFailed: "Не удалось синхронизировать, попробуйте позже",
   toastSyncSuccessTitle: "Синхронизация успешна",
   toastSyncFailedTitle: "Ошибка синхронизации",
+  toastSettleSuccessTitle: "Все разделы урегулированы!",
+  toastSettleSuccessMessage: "Ура! Все разделы урегулированы!",
+  toastSettleFailedTitle: "Ошибка урегулирования",
+  toastSettleFailedMessage:
+    "Не удалось урегулировать разделы. Пожалуйста, попробуйте снова.",
   // rate modal
   rateModalTitle: "Нравится Budget for Nomads?",
   rateModalSubTitle:

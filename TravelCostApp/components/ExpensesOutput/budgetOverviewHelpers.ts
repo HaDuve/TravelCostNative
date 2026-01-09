@@ -6,7 +6,7 @@ import {
 } from "../../util/expense";
 import { ExpenseContextType, RangeString } from "../../store/expenses-context";
 import { TripContextType } from "../../store/trip-context";
-import { SettingsContextType } from "../../store/settings-context";
+import { Settings } from "../../store/settings-context";
 import {
   calculateDailyAverage,
   getBudgetColor,
@@ -35,7 +35,7 @@ export interface BudgetOverviewCalculationParams {
   periodName: string;
   expCtx: ExpenseContextType;
   tripCtx: TripContextType;
-  settings: SettingsContextType;
+  settings: Settings;
   hideSpecial: boolean;
 }
 
@@ -131,7 +131,7 @@ export function calculateBudgetOverview(
     tripCtx.totalBudget >= MAX_JS_NUMBER.toString();
 
   const today = new Date();
-  const averageDailySpending = settings.settings.trafficLightBudgetColors
+  const averageDailySpending = settings.trafficLightBudgetColors
     ? calculateDailyAverage(
         periodName as "day" | "week" | "month" | "year" | "total",
         today,
@@ -149,7 +149,7 @@ export function calculateBudgetOverview(
         budgetNumber,
         averageDailySpending,
         dailyBudget,
-        settings.settings.trafficLightBudgetColors
+        settings.trafficLightBudgetColors
       ) || GlobalStyles.colors.primary500;
 
   const tripCurrency = tripCtx.tripCurrency || "";

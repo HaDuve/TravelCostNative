@@ -6,14 +6,16 @@ import { GlobalStyles } from "../../constants/styles";
 import FlatButton from "../UI/FlatButton";
 import { dynamicScale } from "../../util/scalingUtil";
 import PropTypes from "prop-types";
-import { BudgetOverviewContent, BudgetOverviewContentProps } from "./BudgetOverviewContent";
+import {
+  BudgetOverviewContent,
+  BudgetOverviewContentProps,
+} from "./BudgetOverviewContent";
 import * as Haptics from "expo-haptics";
 
 interface ExpenseSummaryModalProps extends BudgetOverviewContentProps {
   isVisible: boolean;
   onClose: () => void;
   onDetailsPress?: () => void;
-  periodLabel: string;
 }
 
 const ExpenseSummaryModal: React.FC<ExpenseSummaryModalProps> = ({

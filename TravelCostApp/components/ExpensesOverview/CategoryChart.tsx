@@ -18,6 +18,20 @@ import { calculateBudgetOverview } from "../ExpensesOutput/budgetOverviewHelpers
 import { getRate } from "../../util/currencyExchange";
 import { ExpenseData } from "../../util/expense";
 import * as Haptics from "expo-haptics";
+import { PieChartPointData, NavigationProp } from "../charts/chartTypes";
+import { BudgetOverviewContentProps } from "../ExpensesOutput/BudgetOverviewContent";
+
+interface CategoryChartProps {
+  inputData: CategoryData[];
+  tripCurrency: string;
+  expenses?: ExpenseData[];
+  periodName?: string;
+  navigation?: NavigationProp;
+}
+
+interface ExpenseSummaryModalProps extends BudgetOverviewContentProps {
+  onDetailsPress: () => void;
+}
 
 const CategoryChart = React.memo(
   ({
@@ -26,20 +40,15 @@ const CategoryChart = React.memo(
     expenses,
     periodName,
     navigation,
-  }: {
-    inputData: CategoryData[];
-    tripCurrency: string;
-    expenses?: ExpenseData[];
-    periodName?: string;
-    navigation?: any;
-  }) => {
+  }: CategoryChartProps) => {
     const { isPortrait } = useContext(OrientationContext);
     const tripCtx = useContext(TripContext);
     const expensesCtx = useContext(ExpensesContext);
     const { settings } = useContext(SettingsContext);
     const userCtx = useContext(UserContext);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [modalProps, setModalProps] = useState<any>(null);
+    const [modalProps, setModalProps] =
+      useState<ExpenseSummaryModalProps | null>(null);
 
     const { width, height } = ChartController.getChartDimensions(isPortrait);
 
@@ -72,7 +81,7 @@ const CategoryChart = React.memo(
     };
 
     const handlePointClick = useCallback(
-      async (pointData: any) => {
+      async (pointData: PieChartPointData) => {
         if (!expenses || !navigation) return;
 
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -138,7 +147,7 @@ const CategoryChart = React.memo(
           typeof traveller === "string" ? traveller : traveller?.userName
         );
 
-        const props = {
+        const props: ExpenseSummaryModalProps = {
           travellerList: travellerNames,
           travellerBudgets:
             travellerNames.length > 0

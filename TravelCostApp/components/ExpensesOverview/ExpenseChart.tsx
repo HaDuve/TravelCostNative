@@ -31,6 +31,8 @@ import { calculateBudgetOverview } from "../ExpensesOutput/budgetOverviewHelpers
 import { getRate } from "../../util/currencyExchange";
 import { UserContext } from "../../store/user-context";
 import * as Haptics from "expo-haptics";
+import { BarChartPointData, NavigationProp } from "../charts/chartTypes";
+import { BudgetOverviewContentProps } from "../ExpensesOutput/BudgetOverviewContent";
 
 interface ExpenseChartProps {
   inputData: unknown[];
@@ -46,7 +48,11 @@ interface ExpenseChartProps {
     minDate: Date | null;
     maxDate: Date | null;
   }) => void;
-  navigation?: any;
+  navigation?: NavigationProp;
+}
+
+interface ExpenseSummaryModalProps extends BudgetOverviewContentProps {
+  onDetailsPress: () => void;
 }
 
 const ExpenseChart: React.FC<ExpenseChartProps> = ({
@@ -172,14 +178,14 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
   }, [periodType]);
 
   const handlePointClick = useCallback(
-    async (pointData: any) => {
+    async (pointData: BarChartPointData) => {
       if (!periodType || !navigation) return;
 
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
       // Get the original data from the point
       // The originalData is from the chart which has day/firstDay properties
-      const originalData = pointData.originalData as any;
+      const originalData = pointData.originalData;
       if (!originalData) return;
 
       // Filter expenses based on periodType and clicked point
@@ -273,7 +279,7 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
         typeof traveller === "string" ? traveller : traveller?.userName
       );
 
-      const props = {
+      const props: ExpenseSummaryModalProps = {
         travellerList: travellerNames,
         travellerBudgets:
           travellerNames.length > 0

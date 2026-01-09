@@ -13,6 +13,8 @@ export interface BudgetOverviewContentProps {
   currency: string;
   noTotalBudget: boolean;
   periodName: string;
+  periodLabel: string;
+  lastRateUnequal1?: boolean;
   trafficLightActive: boolean;
   currentBudgetColor: string;
   averageDailySpending: number;
@@ -32,6 +34,8 @@ export const BudgetOverviewContent: React.FC<BudgetOverviewContentProps> = ({
   currency,
   noTotalBudget,
   periodName,
+  periodLabel,
+  lastRateUnequal1,
   trafficLightActive,
   currentBudgetColor,
   averageDailySpending,

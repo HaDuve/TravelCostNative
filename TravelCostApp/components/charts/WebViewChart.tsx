@@ -16,6 +16,7 @@ import {
 import ChartSkeleton from "../UI/ChartSkeleton";
 import { CHART_DIMENSIONS, CHART_STYLING, ChartType } from "./chartConstants";
 import { dynamicScale } from "../../util/scalingUtil";
+import { ChartPointData } from "./chartTypes";
 
 interface WebViewChartProps {
   data: unknown[]; // Highcharts series data format
@@ -23,8 +24,8 @@ interface WebViewChartProps {
   width?: number;
   height?: number;
   onChartReady?: () => void;
-  onPointClick?: (data: unknown) => void;
-  onPointLongPress?: (data: unknown) => void;
+  onPointClick?: (data: ChartPointData) => void;
+  onPointLongPress?: (data: ChartPointData) => void;
   onZoomLevelChange?: (zoomLevel: string, min: number, max: number) => void;
   onZoomStateChange?: (zoomState: {
     isLatestVisible: boolean;
@@ -39,7 +40,7 @@ interface WebViewChartProps {
 
 interface ChartMessage {
   type: string;
-  data?: {
+  data?: ChartPointData & {
     message?: string;
     zoomRatio?: number;
     min?: number;
@@ -47,11 +48,6 @@ interface ChartMessage {
     daysInRange?: number;
     timestamp?: string;
     trigger?: string;
-    x?: string | number;
-    y?: number;
-    name?: string;
-    color?: string;
-    originalData?: unknown;
   };
   min?: number;
   max?: number;
@@ -109,28 +105,48 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
 
       // Extract data points from the series data
       const seriesData =
-        Array.isArray(data) && data[0] && "data" in data[0]
-          ? (data[0] as any).data
+        Array.isArray(data) &&
+        data[0] &&
+        typeof data[0] === "object" &&
+        "data" in data[0]
+          ? (data[0] as { data: unknown[] }).data
           : [];
 
       if (Array.isArray(seriesData)) {
-        const visibleDataPoints = seriesData.filter((point: any) => {
+        const visibleDataPoints = seriesData.filter((point: unknown) => {
+          if (!point || typeof point !== "object") return false;
+          const pointObj = point as { x?: string | number };
+          if (!pointObj.x) return false;
           const pointTime =
-            typeof point.x === "number" ? point.x : new Date(point.x).getTime();
+            typeof pointObj.x === "number"
+              ? pointObj.x
+              : new Date(pointObj.x).getTime();
           return pointTime >= min && pointTime <= max;
         });
 
         if (visibleDataPoints.length > 0) {
-          const sortedPoints = visibleDataPoints.sort((a: any, b: any) => {
-            const timeA =
-              typeof a.x === "number" ? a.x : new Date(a.x).getTime();
-            const timeB =
-              typeof b.x === "number" ? b.x : new Date(b.x).getTime();
-            return timeA - timeB;
-          });
+          const sortedPoints = visibleDataPoints.sort(
+            (a: unknown, b: unknown) => {
+              const aObj = a as { x?: string | number };
+              const bObj = b as { x?: string | number };
+              const timeA =
+                typeof aObj.x === "number"
+                  ? aObj.x
+                  : new Date(aObj.x || 0).getTime();
+              const timeB =
+                typeof bObj.x === "number"
+                  ? bObj.x
+                  : new Date(bObj.x || 0).getTime();
+              return timeA - timeB;
+            }
+          );
 
-          minDate = new Date(sortedPoints[0].x);
-          maxDate = new Date(sortedPoints[sortedPoints.length - 1].x);
+          const firstPoint = sortedPoints[0] as { x?: string | number };
+          const lastPoint = sortedPoints[sortedPoints.length - 1] as {
+            x?: string | number;
+          };
+          if (firstPoint.x) minDate = new Date(firstPoint.x);
+          if (lastPoint.x) maxDate = new Date(lastPoint.x);
         }
       }
 
@@ -217,7 +233,12 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
 
         case "pointClick":
           if (message.data && onPointClick) {
-            onPointClick(message.data);
+            onPointClick(message.data as ChartPointData);
+          }
+          break;
+        case "pointLongPress":
+          if (message.data && onPointLongPress) {
+            onPointLongPress(message.data as ChartPointData);
           }
           break;
 

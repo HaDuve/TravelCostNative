@@ -56,6 +56,7 @@ const ExpenseSummaryModal: React.FC<ExpenseSummaryModalProps> = ({
           showsVerticalScrollIndicator={false}
         >
           <BudgetOverviewContent
+            periodLabel={periodLabel}
             {...budgetOverviewProps}
             showCloseButton={false}
           />
@@ -126,4 +127,3 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
-

@@ -262,9 +262,13 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
       if (filteredExpenses.length === 0) return;
 
       // Calculate budget overview props
+      // Use a unique periodName to force using the provided expenses instead of getRecentExpenses()
+      // The unique periodName will fall into the default case and use the provided expenses
+      const uniquePeriodName = `${periodNameForCalc}-${originalData.day || originalData.firstDay || Date.now()}`;
+
       const calculation = calculateBudgetOverview({
         expenses: filteredExpenses as ExpenseData[],
-        periodName: periodNameForCalc as "day" | "week" | "month" | "year",
+        periodName: uniquePeriodName,
         expCtx: expensesCtx,
         tripCtx,
         settings,
@@ -315,7 +319,6 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
       tripCtx,
       settings,
       userCtx.lastCurrency,
-      tripCtx.tripCurrency,
     ]
   );
 

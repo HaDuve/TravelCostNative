@@ -67,28 +67,59 @@ export function calculateBudgetOverview(
   if (Number.isNaN(budgetNumber)) budgetNumber = 0;
 
   let budgetMult = 1;
-  switch (periodName) {
+
+  // Check if periodName starts with a standard period name (e.g., "day-", "week-")
+  // This handles cases where we pass unique periodNames like "day-2026-01-05" to force using provided expenses
+  const periodBase = periodName.split("-")[0];
+
+  switch (periodBase) {
     case "day":
-      periodExpenses = expCtx.getRecentExpenses(RangeString.day) || [];
-      periodLabel = i18n.t("todayLabel");
+      // Only use getRecentExpenses if periodName is exactly "day", not "day-..."
+      if (periodName === "day") {
+        periodExpenses = expCtx.getRecentExpenses(RangeString.day) || [];
+        periodLabel = i18n.t("todayLabel");
+      } else {
+        // Custom day period - use provided expenses
+        periodExpenses = safeExpenses;
+        periodLabel = periodName;
+        budgetMult = 1;
+      }
       break;
     case "week":
       budgetMult = 7;
       budgetNumber = budgetNumber * budgetMult;
-      periodExpenses = expCtx.getRecentExpenses(RangeString.week) || [];
-      periodLabel = i18n.t("weekLabel");
+      if (periodName === "week") {
+        periodExpenses = expCtx.getRecentExpenses(RangeString.week) || [];
+        periodLabel = i18n.t("weekLabel");
+      } else {
+        // Custom week period - use provided expenses
+        periodExpenses = safeExpenses;
+        periodLabel = periodName;
+      }
       break;
     case "month":
       budgetMult = 30;
       budgetNumber = budgetNumber * budgetMult;
-      periodExpenses = expCtx.getRecentExpenses(RangeString.month) || [];
-      periodLabel = i18n.t("monthLabel");
+      if (periodName === "month") {
+        periodExpenses = expCtx.getRecentExpenses(RangeString.month) || [];
+        periodLabel = i18n.t("monthLabel");
+      } else {
+        // Custom month period - use provided expenses
+        periodExpenses = safeExpenses;
+        periodLabel = periodName;
+      }
       break;
     case "year":
       budgetMult = 365;
       budgetNumber = budgetNumber * budgetMult;
-      periodExpenses = expCtx.getRecentExpenses(RangeString.year) || [];
-      periodLabel = i18n.t("yearLabel");
+      if (periodName === "year") {
+        periodExpenses = expCtx.getRecentExpenses(RangeString.year) || [];
+        periodLabel = i18n.t("yearLabel");
+      } else {
+        // Custom year period - use provided expenses
+        periodExpenses = safeExpenses;
+        periodLabel = periodName;
+      }
       break;
     case "total":
       budgetNumber = totalBudget ?? MAX_JS_NUMBER;
@@ -96,22 +127,23 @@ export function calculateBudgetOverview(
       periodLabel = i18n.t("totalLabel");
       break;
     default:
-      // For custom periods (e.g., filtered by date/category), use provided expenses
+      // For custom periods (e.g., "category-..."), use provided expenses
       periodExpenses = safeExpenses;
       periodLabel = periodName;
+      // Try to infer budget multiplier from periodName prefix
+      if (periodName.startsWith("day-")) {
+        budgetMult = 1;
+      } else if (periodName.startsWith("week-")) {
+        budgetMult = 7;
+        budgetNumber = budgetNumber * budgetMult;
+      } else if (periodName.startsWith("month-")) {
+        budgetMult = 30;
+        budgetNumber = budgetNumber * budgetMult;
+      } else if (periodName.startsWith("year-")) {
+        budgetMult = 365;
+        budgetNumber = budgetNumber * budgetMult;
+      }
       break;
-  }
-
-  // If expenses were provided directly (e.g., from chart click), use those instead
-  if (
-    safeExpenses.length > 0 &&
-    periodName !== "day" &&
-    periodName !== "week" &&
-    periodName !== "month" &&
-    periodName !== "year" &&
-    periodName !== "total"
-  ) {
-    periodExpenses = safeExpenses;
   }
 
   const travellerSplitExpenseSums = travellerNames.map((travellerName) => {

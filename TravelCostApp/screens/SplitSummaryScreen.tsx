@@ -19,7 +19,7 @@ import {
 import Toast from "react-native-toast-message";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 import FlatButton from "../components/UI/FlatButton";
-import LoadingOverlay from "../components/UI/LoadingOverlay";
+import MiniSyncIndicator from "../components/UI/MiniSyncIndicator";
 import { GlobalStyles } from "../constants/styles";
 import { TripContext } from "../store/trip-context";
 import {
@@ -38,7 +38,7 @@ import {
   getEffectiveIsPaid,
 } from "../util/expense";
 import Animated from "react-native-reanimated";
-import { formatExpenseWithCurrency, truncateString } from "../util/string";
+import { formatExpenseWithCurrency } from "../util/string";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { Pressable, ScrollView } from "react-native";
@@ -52,7 +52,6 @@ const SplitSummaryScreen = ({ navigation }) => {
   const {
     tripid,
     tripCurrency,
-    tripName,
     fetchAndSettleCurrentTrip,
     isPaid,
     isPaidTimestamp,
@@ -60,7 +59,6 @@ const SplitSummaryScreen = ({ navigation }) => {
   const { freshlyCreated, userName } = useContext(UserContext);
   const { expenses } = useContext(ExpensesContext);
   // avoid rerenders
-  const memoExpenses = useMemo(() => expenses, [expenses]);
   useFocusEffect(
     React.useCallback(() => {
       if (freshlyCreated) {
@@ -86,13 +84,7 @@ const SplitSummaryScreen = ({ navigation }) => {
   const titleTextOriginal = i18n.t("splitSummaryTitle");
   const titleTextSimplified = i18n.t("splitSummaryTitleSimplified");
 
-  const tripNameString = truncateString(tripName, 25);
-  const subTitleOriginal = i18n.t("overviewOfOwedAmounts") + tripNameString;
-  const subTitleSimplified =
-    i18n.t("simplifiedSummaryOptimalTransactions") + tripNameString;
-
   const [titleText, setTitleText] = useState(titleTextOriginal);
-  const [subTitleText, setSubTitleText] = useState(subTitleOriginal);
 
   const totalPaidBackTextOriginal = i18n.t("yourMoneyBackWithColon");
   const [totalPaidBackText, setTotalPaidBackText] = useState(
@@ -170,13 +162,10 @@ const SplitSummaryScreen = ({ navigation }) => {
     userName,
     expenses,
   ]);
-  const simpleSplits = useCallback(
-    () => simplifySplits(splits),
-    [splits.length]
-  )();
+  const simpleSplits = useCallback(() => simplifySplits(splits), [splits])();
   const sameList = useMemo(
     () => areSplitListsEqual(splits, simpleSplits),
-    [splits.length, simpleSplits.length]
+    [splits, simpleSplits]
   );
   const noSimpleSplits = !simpleSplits || simpleSplits?.length < 1 || sameList;
 
@@ -228,7 +217,7 @@ const SplitSummaryScreen = ({ navigation }) => {
   useEffect(() => {
     if (isFetching || !tripid) return;
     getOpenSplits();
-  }, [getOpenSplits]);
+  }, [getOpenSplits, isFetching, tripid]);
 
   const handleSimpflifySplits = useCallback(async () => {
     try {
@@ -248,7 +237,6 @@ const SplitSummaryScreen = ({ navigation }) => {
       }
       if (simpleSplits.some((split) => split.whoPaid === "Error")) {
         setTitleText(titleTextSimplified);
-        setSubTitleText(subTitleSimplified);
         setShowSimplify(false);
         Toast.show({
           type: "error",
@@ -261,7 +249,6 @@ const SplitSummaryScreen = ({ navigation }) => {
       setSplits(simpleSplits);
       setShowSimplify(false);
       setTitleText(titleTextSimplified);
-      setSubTitleText(subTitleSimplified);
     } catch (error) {
       safeLogError(error, "SplitSummaryScreen.tsx", 204);
     }
@@ -270,7 +257,7 @@ const SplitSummaryScreen = ({ navigation }) => {
     noSimpleSplits,
     simpleSplits,
     splits?.length,
-    subTitleSimplified,
+    titleTextSimplified,
   ]);
 
   function errorHandler() {
@@ -281,12 +268,9 @@ const SplitSummaryScreen = ({ navigation }) => {
     setIsFetching(true);
     try {
       await fetchAndSettleCurrentTrip();
-      // Skip getOpenSplits() call - after settling, all expenses are paid,
-      // so splits will be empty. No need to recalculate.
       setSplits([]);
       setShowSimplify(false);
       setTitleText(titleTextOriginal);
-      setSubTitleText(subTitleOriginal);
       setTotalPaidBackText("");
       setTotalPayBackText("");
     } catch (error) {
@@ -294,12 +278,7 @@ const SplitSummaryScreen = ({ navigation }) => {
     }
     setIsFetching(false);
     navigation.popToTop();
-  }, [
-    fetchAndSettleCurrentTrip,
-    navigation,
-    subTitleOriginal,
-    titleTextOriginal,
-  ]);
+  }, [fetchAndSettleCurrentTrip, navigation, titleTextOriginal]);
 
   const renderSplitItem = useCallback(
     (itemData) => {
@@ -336,7 +315,7 @@ const SplitSummaryScreen = ({ navigation }) => {
         </Pressable>
       );
     },
-    [tripCurrency, splitExpensesMap]
+    [tripCurrency, splitExpensesMap, navigation]
   );
 
   const ButtonContainerJSX = (
@@ -352,7 +331,6 @@ const SplitSummaryScreen = ({ navigation }) => {
               await getOpenSplits();
               setShowSimplify(true);
               setTitleText(titleTextOriginal);
-              setSubTitleText(subTitleOriginal);
             }
           }}
         >
@@ -377,8 +355,6 @@ const SplitSummaryScreen = ({ navigation }) => {
             backgroundColor: GlobalStyles.colors.errorGrayed,
           }}
           onPress={async () => {
-            // alert ask user if he really wants to settle all Splits
-            // if yes, call settleSplitsHandler
             Alert.alert(
               i18n.t("settleSplits"),
               i18n.t("sureSettleSplitsFullMessage"),
@@ -410,85 +386,94 @@ const SplitSummaryScreen = ({ navigation }) => {
     return <ErrorOverlay message={error} onConfirm={errorHandler} />;
   }
 
-  if (isFetching) {
-    return <LoadingOverlay />;
-  }
-
   return (
     <ScrollView
       scrollEnabled={isPortrait}
       contentContainerStyle={styles.container}
     >
       <Animated.View
-        // entering={FadeIn}
-        // exiting={FadeOut}
         style={[
           GlobalStyles.wideStrongShadow,
           styles.cardContainer,
           !isPortrait && styles.row,
         ]}
       >
-        <View>
-          <View style={styles.titleContainer}>
-            {/* <BackButton></BackButton> */}
-            <Text style={styles.titleText}> {titleText}</Text>
-          </View>
-          {/* <View style={styles.subTitleContainer}>
-            <Text style={styles.subTitleText}> {subTitleText}</Text>
-          </View> */}
-          {isTripSettled && (
-            <View style={styles.subTitleContainer}>
-              <Text
-                style={[
-                  styles.subTitleText,
-                  { color: GlobalStyles.colors.primary500, fontWeight: "600" },
-                ]}
-              >
-                {i18n.t("tripSettledAllExpensesPaid")}
-              </Text>
+        <View style={styles.cardContent}>
+          <View>
+            <View style={styles.titleContainer}>
+              <Text style={styles.titleText}> {titleText}</Text>
+              <View style={styles.syncIndicatorContainer}>
+                <MiniSyncIndicator
+                  isVisible={isFetching}
+                  size={dynamicScale(16, false, 0.5)}
+                />
+              </View>
             </View>
-          )}
-          {!isTripSettled && (
-            <>
+            {isTripSettled && (
               <View style={styles.subTitleContainer}>
-                <Text style={styles.subTitleText}> {totalPaidBackText}</Text>
-              </View>
-              <View style={styles.subTitleContainer}>
-                <Text style={styles.subTitleText}> {totalPayBackText}</Text>
-              </View>
-            </>
-          )}
-          {!isPortrait && ButtonContainerJSX}
-        </View>
-
-        <FlatList
-          style={{ maxWidth: "100%", paddingHorizontal: "2%" }}
-          data={splits}
-          scrollEnabled={!isPortrait}
-          ListFooterComponent={isPortrait && ButtonContainerJSX}
-          ListHeaderComponent={<View style={{ height: 40 }}></View>}
-          ListEmptyComponent={
-            isTripSettled ? (
-              <View style={{ padding: 20, alignItems: "center" }}>
                 <Text
                   style={[
                     styles.subTitleText,
-                    { color: GlobalStyles.colors.primary500 },
+                    {
+                      color: GlobalStyles.colors.primary500,
+                      fontWeight: "600",
+                    },
                   ]}
                 >
-                  {i18n.t("noOpenSplitsAllSettled")}
+                  {i18n.t("tripSettledAllExpensesPaid")}
                 </Text>
               </View>
-            ) : splits.length === 0 && !isFetching ? (
-              <View style={{ padding: 20, alignItems: "center" }}>
-                <Text style={styles.subTitleText}>
-                  {i18n.t("noOpenSplits")}
-                </Text>
-              </View>
-            ) : null
-          }
-          renderItem={renderSplitItem}
-        />
+            )}
+            {!isTripSettled && (
+              <>
+                <View style={styles.subTitleContainer}>
+                  <Text style={styles.subTitleText}> {totalPaidBackText}</Text>
+                </View>
+                <View style={styles.subTitleContainer}>
+                  <Text style={styles.subTitleText}> {totalPayBackText}</Text>
+                </View>
+              </>
+            )}
+            {!isPortrait && ButtonContainerJSX}
+          </View>
+
+          <FlatList
+            style={{
+              paddingHorizontal: dynamicScale(8, false, 0.5),
+              flex: 1,
+            }}
+            contentContainerStyle={{
+              paddingBottom: isPortrait ? 0 : dynamicScale(18, false, 0.5),
+            }}
+            data={splits}
+            scrollEnabled={!isPortrait}
+            ListHeaderComponent={
+              <View style={{ height: dynamicScale(20, false, 0.5) }}></View>
+            }
+            ListEmptyComponent={
+              isTripSettled ? (
+                <View style={{ padding: 20, alignItems: "center" }}>
+                  <Text
+                    style={[
+                      styles.subTitleText,
+                      { color: GlobalStyles.colors.primary500 },
+                    ]}
+                  >
+                    {i18n.t("noOpenSplitsAllSettled")}
+                  </Text>
+                </View>
+              ) : splits.length === 0 && !isFetching ? (
+                <View style={{ padding: 20, alignItems: "center" }}>
+                  <Text style={styles.subTitleText}>
+                    {i18n.t("noOpenSplits")}
+                  </Text>
+                </View>
+              ) : null
+            }
+            renderItem={renderSplitItem}
+          />
+        </View>
+        {isPortrait && ButtonContainerJSX}
       </Animated.View>
     </ScrollView>
   );
@@ -502,6 +487,11 @@ SplitSummaryScreen.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  syncIndicatorContainer: {
+    position: "absolute",
+    right: 0,
+    top: dynamicScale(8, false, 0.5),
+  },
   buttonText: {
     fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "500",
@@ -509,23 +499,20 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    // alignItems: "center",
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   cardContainer: {
-    margin: dynamicScale(20, false, 0.5),
-    minHeight: "86%",
+    flex: 1,
+    borderWidth: 1,
+    borderColor: GlobalStyles.colors.gray300,
     alignItems: "center",
-    justifyContent: "space-around",
-    paddingHorizontal: dynamicScale(24),
-    paddingTop: dynamicScale(24, true),
-    paddingBottom: dynamicScale(2, true),
-    //card
+    flexDirection: "column",
+    justifyContent: "space-between",
+    margin: dynamicScale(20, false, 0.5),
+    paddingBottom: dynamicScale(18, false, 0.5),
+    paddingHorizontal: dynamicScale(8, false, 0.5),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: dynamicScale(20, false, 0.5),
-    // borderWidth: 1,
-    borderColor: GlobalStyles.colors.gray500,
-    // android styles
     ...Platform.select({
       android: {
         margin: dynamicScale(8),
@@ -534,12 +521,16 @@ const styles = StyleSheet.create({
       },
     }),
   },
+  cardContent: {
+    flex: 1,
+    width: "100%",
+    flexDirection: "column",
+  },
   button: {
     ...Platform.select({
       ios: {
-        marginTop: dynamicScale(20, true),
         borderRadius: 12,
-        minHeight: 55,
+        minHeight: dynamicScale(48, false, 0.5),
       },
       android: {
         elevation: 0,
@@ -549,11 +540,11 @@ const styles = StyleSheet.create({
   splitContainer: {
     flex: 1,
     flexDirection: "row",
-    paddingHorizontal: dynamicScale(16),
-    paddingVertical: dynamicScale(8, true),
-    marginVertical: dynamicScale(8, true),
-    borderWidth: 1,
-    borderColor: GlobalStyles.colors.backgroundColor,
+    paddingHorizontal: dynamicScale(16, false, 0.5),
+    paddingVertical: dynamicScale(8, false, 0.5),
+    marginVertical: dynamicScale(8, false, 0.5),
+    borderWidth: 2,
+    borderColor: GlobalStyles.colors.gray300,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: dynamicScale(44, false, 0.5),
     alignItems: "center",
@@ -568,16 +559,13 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
-    flex: 1,
+    alignSelf: "center",
     alignItems: "center",
     justifyContent: "space-between",
-    // margin: "2%",
     ...Platform.select({
       ios: { marginTop: 0 },
       android: {
-        // height: dynamicScale(55, true),
         marginVertical: dynamicScale(18),
-        // flexDirection: "column",
         minHeight: dynamicScale(100, true),
       },
     }),
@@ -589,17 +577,15 @@ const styles = StyleSheet.create({
   userText: {
     fontSize: dynamicScale(18, false, 0.5),
     fontWeight: "500",
-    //italics
     fontStyle: "italic",
     color: GlobalStyles.colors.textColor,
-    // center
     alignItems: "center",
     alignContent: "center",
   },
   normalText: {
     fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "300",
-    color: GlobalStyles.colors.textColor, // center
+    color: GlobalStyles.colors.textColor,
     alignItems: "center",
     alignContent: "center",
     fontStyle: "italic",
@@ -608,49 +594,39 @@ const styles = StyleSheet.create({
     fontSize: dynamicScale(18, false, 0.5),
     fontWeight: "500",
     fontStyle: "italic",
-
     color: GlobalStyles.colors.errorGrayed,
-    // center
     alignItems: "center",
   },
 
   titleContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: "-8%",
-    // row
     flexDirection: "row",
+    marginTop: dynamicScale(18, false, 0.5),
   },
   titleText: {
     fontSize: dynamicScale(32, false, 0.5),
     fontWeight: "bold",
     paddingBottom: dynamicScale(12, true),
     color: GlobalStyles.colors.textColor,
-    // center
     alignItems: "center",
     alignContent: "center",
   },
   subTitleContainer: {
-    alignItems: "flex-start",
-    justifyContent: "flex-start",
-    margin: "2%",
-    // center
-    alignContent: "flex-start",
+    marginVertical: dynamicScale(4, false, 0.5),
+    alignItems: "center",
+    alignContent: "center",
   },
   subTitleText: {
     fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "300",
     fontStyle: "italic",
-
     color: GlobalStyles.colors.textColor,
-    // center
     alignItems: "flex-start",
     alignContent: "flex-start",
   },
   row: {
     flexDirection: "row",
-    // marginTop: 0,
-    // paddingTop: 0,
     justifyContent: "flex-start",
     alignContent: "flex-start",
     alignItems: "flex-start",

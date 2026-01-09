@@ -180,6 +180,51 @@ const SplitSummaryScreen = ({ navigation }) => {
   );
   const noSimpleSplits = !simpleSplits || simpleSplits?.length < 1 || sameList;
 
+  // Pre-compute filtered expenses for each split to avoid O(N*M) filtering on every render
+  const splitExpensesMap = useMemo(() => {
+    const map = new Map<string, ExpenseData[]>();
+
+    if (!splits || splits.length === 0) {
+      return map;
+    }
+
+    // Create a key for each split and pre-filter expenses
+    splits.forEach((split) => {
+      const key = `${split.userName}-${split.whoPaid}`;
+
+      // Only compute if not already computed
+      if (!map.has(key)) {
+        const expensesList = expenses.filter((expense: ExpenseData) => {
+          // Skip paid expenses
+          if (
+            getEffectiveIsPaid(expense, isPaidTimestamp) === isPaidString.paid
+          ) {
+            return false;
+          }
+
+          const splitList = expense?.splitList;
+          const splitListLength = splitList?.length;
+          for (let i = 0; i < splitListLength; i++) {
+            const expenseSplit = splitList[i];
+            if (
+              (expenseSplit.userName === split.userName &&
+                expenseSplit.whoPaid === split.whoPaid) ||
+              expenseSplit.userName === split.whoPaid ||
+              expenseSplit.whoPaid === split.userName
+            ) {
+              return true;
+            }
+          }
+          return false;
+        });
+
+        map.set(key, expensesList);
+      }
+    });
+
+    return map;
+  }, [splits, expenses, isPaidTimestamp]);
+
   useEffect(() => {
     if (isFetching || !tripid) return;
     getOpenSplits();
@@ -236,7 +281,8 @@ const SplitSummaryScreen = ({ navigation }) => {
     setIsFetching(true);
     try {
       await fetchAndSettleCurrentTrip();
-      await getOpenSplits();
+      // Skip getOpenSplits() call - after settling, all expenses are paid,
+      // so splits will be empty. No need to recalculate.
       setSplits([]);
       setShowSimplify(false);
       setTitleText(titleTextOriginal);
@@ -250,7 +296,6 @@ const SplitSummaryScreen = ({ navigation }) => {
     navigation.popToTop();
   }, [
     fetchAndSettleCurrentTrip,
-    getOpenSplits,
     navigation,
     subTitleOriginal,
     titleTextOriginal,
@@ -258,33 +303,10 @@ const SplitSummaryScreen = ({ navigation }) => {
 
   const renderSplitItem = useCallback(
     (itemData) => {
-      // get a list of all expenses where the item.userName and item.whoPaid is included in the expense.splitList as either whoPaid or userName
-      // Only include expenses that are not paid (consistent with calcOpenSplitsTable logic)
-      const expensesList = expenses.filter((expense: ExpenseData) => {
-        // Skip paid expenses
-        if (
-          getEffectiveIsPaid(expense, isPaidTimestamp) === isPaidString.paid
-        ) {
-          return false;
-        }
+      // Use pre-computed filtered expenses from memoized map instead of filtering on every render
+      const key = `${itemData.item.userName}-${itemData.item.whoPaid}`;
+      const expensesList = splitExpensesMap.get(key) || [];
 
-        const splitList = expense?.splitList;
-        const splitListLength = splitList?.length;
-        for (let i = 0; i < splitListLength; i++) {
-          const split = splitList[i];
-          if (
-            (split.userName === itemData.item.userName &&
-              split.whoPaid === itemData.item.whoPaid) ||
-            split.userName === itemData.item.whoPaid ||
-            split.whoPaid === itemData.item.userName
-          ) {
-            return true;
-          }
-        }
-        return false;
-      });
-
-      const length = expensesList.length;
       const item = itemData.item;
       return (
         <Pressable
@@ -314,7 +336,7 @@ const SplitSummaryScreen = ({ navigation }) => {
         </Pressable>
       );
     },
-    [tripCurrency, isPaidTimestamp, expenses]
+    [tripCurrency, splitExpensesMap]
   );
 
   const ButtonContainerJSX = (

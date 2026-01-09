@@ -357,17 +357,11 @@ export async function calcOpenSplitsTable(
   givenExpenses?: ExpenseData[],
   tripIsPaidTimestamp?: number
 ) {
-  // cleanup all expenses where payer === debtor
   let expenses = [];
   const rates = {};
   rates[tripCurrency] = 1;
   if (givenExpenses && givenExpenses?.length > 0) {
-    // create a copy
-    try {
-      expenses = safelyParseJSON(JSON.stringify(givenExpenses));
-    } catch (error) {
-      safeLogError(error);
-    }
+    expenses = [...givenExpenses];
   } else {
     try {
       expenses = await getAllExpenses(tripid);
@@ -375,7 +369,7 @@ export async function calcOpenSplitsTable(
       safeLogError(error);
     }
     if (!expenses || expenses?.length < 1) {
-      return;
+      return [];
     }
   }
   let openSplits = [];
@@ -396,21 +390,24 @@ export async function calcOpenSplitsTable(
       }
       for (const split of expense.splitList) {
         if (split.userName !== expense.whoPaid) {
+          // Create a copy of the split object to avoid mutating the original
+          const splitCopy = { ...split };
+
           // check if rate is already in rates
           if (!rates[expense.currency]) {
             // get rate
             try {
               const rate = expense.amount / expense.calcAmount;
               rates[expense.currency] = rate;
-              split.amount = split.amount / rate;
+              splitCopy.amount = splitCopy.amount / rate;
             } catch (error) {
               safeLogError(error);
             }
           } else {
-            split.amount = split.amount / rates[expense.currency];
+            splitCopy.amount = splitCopy.amount / rates[expense.currency];
           }
-          split.whoPaid = expense.whoPaid;
-          openSplits.push(split);
+          splitCopy.whoPaid = expense.whoPaid;
+          openSplits.push(splitCopy);
         }
       }
     }

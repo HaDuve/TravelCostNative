@@ -352,7 +352,6 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   };
 
   const editRangedData = async (expenseData) => {
-
     // find all the expenses that have the same identifying rangeId
     const expensesInRange = expenseCtx.expenses.filter(
       (expense) =>

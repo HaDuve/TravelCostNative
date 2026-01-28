@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React, { useContext } from "react";
+import React, { useCallback, useContext, useMemo } from "react";
 import CategoryProgressBar from "./CategoryProgressBar";
 import { CatColors, GlobalStyles } from "../../../constants/styles";
 import CategoryChart from "../../ExpensesOverview/CategoryChart";
@@ -25,52 +25,58 @@ const ExpenseCountries = ({
   navigation,
   forcePortraitFormat = false,
 }) => {
-  const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
+  const layoutAnim = useMemo(
+    () => Layout.damping(50).stiffness(300).overshootClamping(0.8),
+    []
+  );
   const { tripCurrency } = useContext(TripContext);
   const { isPortrait } = useContext(OrientationContext);
   const useRowFormat = !isPortrait && !forcePortraitFormat;
-  if (!expenses)
-    return (
-      <View style={styles.container}>
-        <Text>{i18n.t("fallbackTextExpenses")}</Text>
-      </View>
+  const fallbackCountry = "Worldwide / Unknown";
+  const totalSum = useMemo(
+    () => (expenses ? getExpensesSum(expenses) : 0),
+    [expenses]
+  );
+
+  const { catSumCat, dataList } = useMemo(() => {
+    if (!expenses || expenses.length === 0) {
+      return { catSumCat: [], dataList: [] };
+    }
+
+    const countryMap = new Map<string, ExpenseData[]>();
+    expenses.forEach((expense: ExpenseData) => {
+      let countryName = expense.country?.trim();
+      if (!countryName || !countryName.trim()) countryName = fallbackCountry;
+      const existing = countryMap.get(countryName);
+      if (existing) {
+        existing.push(expense);
+      } else {
+        countryMap.set(countryName, [expense]);
+      }
+    });
+
+    const catSumCat = Array.from(countryMap.entries()).map(
+      ([country, catExpenses]) => ({
+        cat: country,
+        sumCat: getExpensesSum(catExpenses),
+        color: "",
+        catExpenses,
+      })
     );
 
-  const fallbackCountry = "Worldwide / Unknown";
-  const countryList = [];
-  expenses.forEach((expense: ExpenseData) => {
-    let countryName = expense.country?.trim();
-    if (!countryName || !countryName.trim()) countryName = fallbackCountry;
-    if (!countryList.includes(countryName)) {
-      countryList.push(countryName);
-    }
-  });
+    catSumCat.sort((a, b) => b.sumCat - a.sumCat);
 
-  function getAllExpensesWithCat(country: string) {
-    return expenses.filter((expense: ExpenseData) => {
-      if (country == fallbackCountry)
-        return !expense.country || !expense.country.trim();
-      return expense.country?.trim() === country;
+    const colorlist = CatColors;
+    const dataList = catSumCat.map((item, index) => {
+      const color = colorlist[index % colorlist.length];
+      item.color = color;
+      return { x: item.cat, y: item.sumCat, color };
     });
-  }
 
-  const totalSum = getExpensesSum(expenses);
+    return { catSumCat, dataList };
+  }, [expenses, fallbackCountry]);
 
-  const catSumCat = [];
-  const dataList = [];
-
-  countryList.forEach((cat) => {
-    const catExpenses = getAllExpensesWithCat(cat);
-    const sumCat = getExpensesSum(catExpenses);
-    catSumCat.push({
-      cat: cat,
-      sumCat: sumCat,
-      color: "",
-      catExpenses: catExpenses,
-    });
-  });
-
-  function renderItem(itemData) {
+  const renderItem = useCallback((itemData) => {
     const country = itemData.item.cat;
     const newPeriodName = processTitleStringFilteredPiecharts(
       periodName,
@@ -108,22 +114,14 @@ const ExpenseCountries = ({
         />
       </Pressable>
     );
-  }
+  }, [fallbackCountry, navigation, periodName, totalSum, tripCurrency]);
 
-  catSumCat.sort((a, b) => b.sumCat - a.sumCat);
-  dataList.sort((a, b) => b.sumCat - a.sumCat);
-
-  const colorlist = CatColors;
-
-  let color_i = 0;
-  catSumCat.forEach((item) => {
-    item.color = colorlist[color_i];
-    color_i++;
-    if (color_i >= colorlist?.length) {
-      color_i = 0;
-    }
-    dataList.push({ x: item.cat, y: item.sumCat, color: item.color });
-  });
+  if (!expenses)
+    return (
+      <View style={styles.container}>
+        <Text>{i18n.t("fallbackTextExpenses")}</Text>
+      </View>
+    );
 
   return (
     <Animated.View style={styles.container}>

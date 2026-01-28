@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React from "react";
+import React, { useCallback, useContext, useMemo } from "react";
 import CategoryProgressBar from "./CategoryProgressBar";
 import { CatColors, GlobalStyles } from "../../../constants/styles";
 import CategoryChart from "../../ExpensesOverview/CategoryChart";
@@ -16,7 +16,6 @@ import {
   getExpensesSum,
   getTravellerSum,
 } from "../../../util/expense";
-import { useContext } from "react";
 import { TripContext } from "../../../store/trip-context";
 import BlurPremium from "../../Premium/BlurPremium";
 import { processTitleStringFilteredPiecharts } from "../../../util/string";
@@ -29,74 +28,69 @@ const ExpenseTravellers = ({
   navigation,
   forcePortraitFormat = false,
 }) => {
-  const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
+  const layoutAnim = useMemo(
+    () => Layout.damping(50).stiffness(300).overshootClamping(0.8),
+    []
+  );
   const { tripCurrency } = useContext(TripContext);
   const { isPortrait } = useContext(OrientationContext);
   const useRowFormat = !isPortrait && !forcePortraitFormat;
-  if (!expenses)
-    return (
-      <View style={styles.container}>
-        <Text>{i18n.t("fallbackTextExpenses")}</Text>
-      </View>
-    );
+  const totalSum = useMemo(
+    () => (expenses ? getExpensesSum(expenses) : 0),
+    [expenses]
+  );
 
-  const travellerList = [];
-  expenses.forEach((expense: ExpenseData) => {
-    const hasSplits = expense.splitList && expense.splitList?.length !== 0;
-    if (hasSplits) {
-      expense.splitList.forEach((split) => {
-        const travellerName = split.userName;
-        if (!travellerList.includes(travellerName)) {
-          travellerList.push(travellerName);
-        }
-      });
-    } else {
-      const travellerName = expense.whoPaid;
-      if (!travellerList.includes(travellerName)) {
-        travellerList.push(travellerName);
-      }
+  const { catSumCat, dataList } = useMemo(() => {
+    if (!expenses || expenses.length === 0) {
+      return { catSumCat: [], dataList: [] };
     }
-  });
 
-  function getAllExpensesWithTraveller(traveller: string): ExpenseData[] {
-    const travellerExpenses: ExpenseData[] = expenses.filter(
-      (expense: ExpenseData) => {
-        // check if the expense has a splitlist
-        const hasSplits = expense.splitList && expense.splitList?.length !== 0;
-        if (!hasSplits) {
-          return expense.whoPaid === traveller;
+    const travellerMap = new Map<string, ExpenseData[]>();
+    expenses.forEach((expense: ExpenseData) => {
+      const hasSplits = expense.splitList && expense.splitList.length !== 0;
+      if (hasSplits && expense.splitList) {
+        expense.splitList.forEach((split) => {
+          const travellerName = split.userName;
+          const existing = travellerMap.get(travellerName);
+          if (existing) {
+            existing.push(expense);
+          } else {
+            travellerMap.set(travellerName, [expense]);
+          }
+        });
+      } else {
+        const travellerName = expense.whoPaid;
+        const existing = travellerMap.get(travellerName);
+        if (existing) {
+          existing.push(expense);
         } else {
-          // return true if the splitlist contains the traveller
-          return expense.splitList.some((split) => {
-            return split.userName === traveller;
-          });
+          travellerMap.set(travellerName, [expense]);
         }
       }
-    );
-    return travellerExpenses;
-  }
-
-  const totalSum = getExpensesSum(expenses);
-
-  const catSumCat = [];
-  const dataList = [];
-
-  for (const travellerIndex in travellerList) {
-    const catExpenses = getAllExpensesWithTraveller(
-      travellerList[travellerIndex]
-    );
-    const sumCat = Number(
-      getTravellerSum(catExpenses, travellerList[travellerIndex])
-    );
-    catSumCat.push({
-      cat: travellerList[travellerIndex],
-      sumCat: sumCat,
-      color: "",
-      catExpenses: catExpenses,
     });
-  }
 
-  function renderItem(itemData) {
+    const catSumCat = Array.from(travellerMap.entries()).map(
+      ([traveller, catExpenses]) => ({
+        cat: traveller,
+        sumCat: Number(getTravellerSum(catExpenses, traveller)),
+        color: "",
+        catExpenses,
+      })
+    );
+
+    catSumCat.sort((a, b) => b.sumCat - a.sumCat);
+
+    const colorlist = CatColors;
+    const dataList = catSumCat.map((item, index) => {
+      const color = colorlist[index % colorlist.length];
+      item.color = color;
+      return { x: item.cat, y: item.sumCat, color };
+    });
+
+    return { catSumCat, dataList };
+  }, [expenses]);
+
+  const renderItem = useCallback((itemData) => {
     const newPeriodName = processTitleStringFilteredPiecharts(
       periodName,
       tripCurrency,
@@ -126,22 +120,14 @@ const ExpenseTravellers = ({
         />
       </Pressable>
     );
-  }
+  }, [navigation, periodName, totalSum, tripCurrency]);
 
-  catSumCat.sort((a, b) => b.sumCat - a.sumCat);
-  dataList.sort((a, b) => b.sumCat - a.sumCat);
-
-  const colorlist = CatColors;
-
-  let color_i = 0;
-  catSumCat.forEach((item) => {
-    item.color = colorlist[color_i];
-    color_i++;
-    if (color_i >= colorlist?.length) {
-      color_i = 0;
-    }
-    dataList.push({ x: item.cat, y: item.sumCat, color: item.color });
-  });
+  if (!expenses)
+    return (
+      <View style={styles.container}>
+        <Text>{i18n.t("fallbackTextExpenses")}</Text>
+      </View>
+    );
 
   return (
     <Animated.View style={styles.container}>

@@ -1,13 +1,7 @@
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  useWindowDimensions,
-} from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React, { useContext, useMemo } from "react";
+import React, { useCallback, useContext, useMemo } from "react";
 import CategoryProgressBar from "./CategoryProgressBar";
 import { CatColors, GlobalStyles } from "../../../constants/styles";
 import CategoryChart from "../../ExpensesOverview/CategoryChart";
@@ -19,7 +13,7 @@ import { getCatLocalized } from "../../../util/category";
 import PropTypes from "prop-types";
 import { processTitleStringFilteredPiecharts } from "../../../util/string";
 import { TripContext } from "../../../store/trip-context";
-import { getExpensesSum } from "../../../util/expense";
+import { ExpenseData, getExpensesSum } from "../../../util/expense";
 import { dynamicScale } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
 
@@ -29,66 +23,57 @@ const ExpenseCategories = ({
   navigation,
   forcePortraitFormat = false,
 }) => {
-  const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
+  const layoutAnim = useMemo(
+    () => Layout.damping(50).stiffness(300).overshootClamping(0.8),
+    []
+  );
   const { tripCurrency } = useContext(TripContext);
   const { isPortrait } = useContext(OrientationContext);
 
   const useRowFormat = !isPortrait && !forcePortraitFormat;
-  if (!expenses)
-    return (
-      <View style={styles.container}>
-        <Text>{i18n.t("fallbackTextExpenses")}</Text>
-      </View>
-    );
-
-  const categoryList = [];
-  expenses.forEach((expense) => {
-    const cat = expense.category;
-    if (!categoryList.includes(cat)) {
-      categoryList.push(cat);
-    }
-  });
-
-  function getAllExpensesWithCat(category) {
-    return expenses.filter((expense) => {
-      return expense.category === category;
-    });
-  }
-
-  const totalSum = getExpensesSum(expenses);
+  const totalSum = useMemo(
+    () => (expenses ? getExpensesSum(expenses) : 0),
+    [expenses]
+  );
 
   const { catSumCat, dataList } = useMemo(() => {
-    const catSumCat = [];
-    const dataList = [];
+    if (!expenses || expenses.length === 0) {
+      return { catSumCat: [], dataList: [] };
+    }
 
-    categoryList.forEach((cat) => {
-      const catExpenses = getAllExpensesWithCat(cat);
-      const sumCat = getExpensesSum(catExpenses);
-      catSumCat.push({
-        cat: cat,
-        sumCat: sumCat,
-        color: "",
-        catExpenses: catExpenses,
-      });
+    const categoryMap = new Map<string, ExpenseData[]>();
+    expenses.forEach((expense) => {
+      const cat = expense.category;
+      const existing = categoryMap.get(cat);
+      if (existing) {
+        existing.push(expense);
+      } else {
+        categoryMap.set(cat, [expense]);
+      }
     });
+
+    const catSumCat = Array.from(categoryMap.entries()).map(
+      ([cat, catExpenses]) => ({
+        cat,
+        sumCat: getExpensesSum(catExpenses),
+        color: "",
+        catExpenses,
+      })
+    );
 
     catSumCat.sort((a, b) => b.sumCat - a.sumCat);
 
     const colorlist = CatColors;
-    let color_i = 0;
-    catSumCat.forEach((item) => {
-      item.color = colorlist[color_i];
-      color_i++;
-      if (color_i >= colorlist?.length) {
-        color_i = 0;
-      }
-      dataList.push({ x: item.cat, y: item.sumCat, color: item.color });
+    const dataList = catSumCat.map((item, index) => {
+      const color = colorlist[index % colorlist.length];
+      item.color = color;
+      return { x: item.cat, y: item.sumCat, color };
     });
 
     return { catSumCat, dataList };
-  }, [expenses, categoryList]);
+  }, [expenses]);
 
-  function renderItem(itemData) {
+  const renderItem = useCallback((itemData) => {
     const newPeriodName = processTitleStringFilteredPiecharts(
       periodName,
       tripCurrency,
@@ -118,7 +103,14 @@ const ExpenseCategories = ({
         />
       </Pressable>
     );
-  }
+  }, [navigation, periodName, totalSum, tripCurrency]);
+
+  if (!expenses)
+    return (
+      <View style={styles.container}>
+        <Text>{i18n.t("fallbackTextExpenses")}</Text>
+      </View>
+    );
 
   return (
     <Animated.View style={styles.container}>

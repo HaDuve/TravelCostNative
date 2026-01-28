@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Pressable, Platform } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React, { useContext, useRef, useCallback } from "react";
+import React, { useCallback, useContext, useMemo } from "react";
 import { ExpensesContext } from "../../../store/expenses-context";
 import {
   getDateMinusDays,
@@ -36,13 +36,12 @@ const ExpenseGraph = ({
   navigation,
   onZoomStateChange,
 }) => {
-  const today = new Date();
-  const renderItemRef = useRef(null);
   const { isPortrait } = useContext(OrientationContext);
 
   const expenseCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
   const hideSpecial = settings.hideSpecialExpenses;
+  const { tripCurrency, dailyBudget, totalBudget } = tripCtx;
 
   const handleZoomStateChange = useCallback(
     (zoomState: {
@@ -56,432 +55,456 @@ const ExpenseGraph = ({
     [onZoomStateChange]
   );
 
+  const graphConfig = useMemo(() => {
+    if (!expenseCtx.expenses) {
+      return {
+        listExpenseSumBudgets: [],
+        xAxis: "",
+        yAxis: "",
+        budget: 0,
+        renderItem: () => null,
+      };
+    }
+
+    const today = new Date();
+    const listExpenseSumBudgets = [];
+    const lastDays = PRELOADED_DATA_POINTS + longerPeriodNum;
+    const lastWeeks = PRELOADED_DATA_POINTS + longerPeriodNum;
+    const lastMonths = PRELOADED_DATA_POINTS + longerPeriodNum;
+    const lastYears = PRELOADED_DATA_POINTS + longerPeriodNum;
+    const totalBudgetNumber = Number(totalBudget) ?? MAX_JS_NUMBER;
+
+    let xAxis = "";
+    let yAxis = "";
+    let budget = 0;
+    let renderItem: (itemData: { item: any }) => JSX.Element | null = () =>
+      null;
+
+    switch (periodName) {
+      case "day":
+        xAxis = "day";
+        yAxis = "expensesSum";
+        for (let i = startingPoint; i < lastDays; i++) {
+          const day = getDateMinusDays(today, i);
+          const dayExpenses = expenseCtx.getDailyExpenses(i);
+          const expensesSum = getExpensesSumPeriod(dayExpenses, hideSpecial);
+          const formattedDay = toDayMonthString(day);
+          const formattedSum = formatExpenseWithCurrency(
+            expensesSum,
+            tripCurrency
+          );
+          const label = `${formattedDay} - ${formattedSum}`;
+          budget = Number(dailyBudget);
+          const obj = { day, expensesSum, dailyBudget, label };
+          listExpenseSumBudgets.push(obj);
+        }
+        renderItem = ({ item }) => {
+          let dayString = "";
+          if (
+            (item.day instanceof Date
+              ? item.day.toDateString()
+              : item.day.toString()) ===
+            (() => {
+              const date = getDateMinusDays(today, 1);
+              return date instanceof Date
+                ? date.toDateString()
+                : date.toJSDate().toDateString();
+            })()
+          ) {
+            dayString = i18n.t("yesterday");
+          } else if (
+            (item.day instanceof Date
+              ? item.day.toDateString()
+              : item.day.toString()) === new Date().toDateString()
+          ) {
+            dayString = i18n.t("today");
+          } else {
+            dayString = toDayMonthString(item.day);
+          }
+          const titleStringFilteredPieCharts = `${dayString} - ${formatExpenseWithCurrency(
+            item.expensesSum,
+            tripCurrency
+          )}`;
+          const debt = item.expensesSum > item.dailyBudget;
+          const colorCoding = !debt ? styles.green : styles.red;
+          const emptyValue = item.expensesSum === 0;
+          const expenseString = emptyValue
+            ? ""
+            : formatExpenseWithCurrency(item.expensesSum, tripCurrency);
+          return (
+            <Pressable
+              style={({ pressed }) => [
+                styles.categoryCard,
+                pressed && GlobalStyles.pressedWithShadow,
+              ]}
+              onLongPress={() => {
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Success
+                );
+                const filteredExpenses = expenseCtx
+                  .getSpecificDayExpenses(new Date(item.day))
+                  .filter(
+                    (item) =>
+                      !item.isSpecialExpense ||
+                      (item.isSpecialExpense && !hideSpecial)
+                  );
+                // if (!filteredExpenses || filteredExpenses?.length === 0) return;
+
+                navigation.navigate("FilteredExpenses", {
+                  expenses: filteredExpenses,
+                  dayString: dayString,
+                });
+              }}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                const filteredExpenses = expenseCtx
+                  .getSpecificDayExpenses(new Date(item.day))
+                  .filter(
+                    (item) =>
+                      !item.isSpecialExpense ||
+                      (item.isSpecialExpense && !hideSpecial)
+                  );
+                // if (!filteredExpenses || filteredExpenses?.length === 0) return;
+                navigation.navigate("FilteredPieCharts", {
+                  expenses: filteredExpenses,
+                  dayString: titleStringFilteredPieCharts,
+                });
+              }}
+            >
+              <Animated.View
+                entering={FadeInRight}
+                exiting={FadeOutLeft}
+                style={styles.itemContainer}
+              >
+                <Text style={styles.text1}>{dayString}</Text>
+                <Text style={[styles.text1, colorCoding]}>
+                  {expenseString}
+                  {emptyValue ? "-" : ""}
+                </Text>
+              </Animated.View>
+            </Pressable>
+          );
+        };
+        break;
+      case "week":
+        xAxis = "firstDay";
+        yAxis = "expensesSum";
+
+        for (let i = startingPoint; i < lastWeeks; i++) {
+          const { firstDay, lastDay, weeklyExpenses } =
+            expenseCtx.getWeeklyExpenses(i);
+          const expensesSum = getExpensesSumPeriod(weeklyExpenses, hideSpecial);
+          let weeklyBudget = Number(dailyBudget) * 7;
+          if (weeklyBudget > totalBudgetNumber) weeklyBudget = totalBudgetNumber;
+          const formattedDay = toDayMonthString(firstDay);
+          const formattedSum = formatExpenseWithCurrency(
+            expensesSum,
+            tripCurrency
+          );
+          const label = `${formattedDay} - ${formattedSum}`;
+          budget = weeklyBudget;
+          const obj = { firstDay, lastDay, expensesSum, weeklyBudget, label };
+          listExpenseSumBudgets.push(obj);
+        }
+        renderItem = ({ item }) => {
+          let weekString = "";
+          if (
+            (item.firstDay instanceof Date
+              ? item.firstDay.toDateString()
+              : item.firstDay.toString()) ===
+            (() => {
+              const date = getPreviousMondayDate(getDateMinusDays(today, 7));
+              return date instanceof Date
+                ? date.toDateString()
+                : date.toJSDate().toDateString();
+            })()
+          ) {
+            weekString = i18n.t("lastWeek");
+          } else if (
+            (item.firstDay instanceof Date
+              ? item.firstDay.toDateString()
+              : item.firstDay.toString()) ===
+            (() => {
+              const date = getPreviousMondayDate(new Date());
+              return date instanceof Date
+                ? date.toDateString()
+                : date.toJSDate().toDateString();
+            })()
+          ) {
+            weekString = i18n.t("thisWeek");
+          } else {
+            weekString = toDayMonthString2(item.firstDay, item.lastDay);
+          }
+          const titleStringFilteredPieCharts = `${weekString} - ${formatExpenseWithCurrency(
+            item.expensesSum,
+            tripCurrency
+          )}`;
+          const debt = item.expensesSum > item.weeklyBudget;
+          const colorCoding = !debt ? styles.green : styles.red;
+          const emptyValue = item.expensesSum === 0;
+          const expenseString = emptyValue
+            ? ""
+            : formatExpenseWithCurrency(item.expensesSum, tripCurrency);
+          return (
+            <Pressable
+              style={({ pressed }) => [
+                styles.categoryCard,
+                pressed && GlobalStyles.pressedWithShadow,
+              ]}
+              onLongPress={() => {
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Success
+                );
+                const filteredExpenses = expenseCtx
+                  .getSpecificWeekExpenses(new Date(item.firstDay))
+                  .filter(
+                    (item) =>
+                      !item.isSpecialExpense ||
+                      (item.isSpecialExpense && !hideSpecial)
+                  );
+                // if (!filteredExpenses || filteredExpenses?.length === 0) return;
+                navigation.navigate("FilteredExpenses", {
+                  expenses: filteredExpenses,
+                  dayString: weekString,
+                });
+              }}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                const filteredExpenses = expenseCtx
+                  .getSpecificWeekExpenses(new Date(item.firstDay))
+                  .filter(
+                    (item) =>
+                      !item.isSpecialExpense ||
+                      (item.isSpecialExpense && !hideSpecial)
+                  );
+                // if (!filteredExpenses || filteredExpenses?.length === 0) return;
+                navigation.navigate("FilteredPieCharts", {
+                  expenses: filteredExpenses,
+                  dayString: titleStringFilteredPieCharts,
+                });
+              }}
+            >
+              <Animated.View
+                entering={FadeInRight}
+                exiting={FadeOutLeft}
+                style={styles.itemContainer}
+              >
+                <Text style={styles.text1}>{weekString}</Text>
+                <Text style={[styles.text1, colorCoding]}>
+                  {expenseString}
+                  {emptyValue ? "-" : ""}
+                </Text>
+              </Animated.View>
+            </Pressable>
+          );
+        };
+        break;
+      case "month":
+        xAxis = "firstDay";
+        yAxis = "expensesSum";
+
+        for (let i = startingPoint; i < lastMonths; i++) {
+          const { firstDay, lastDay, monthlyExpenses } =
+            expenseCtx.getMonthlyExpenses(i);
+          const expensesSum = getExpensesSumPeriod(monthlyExpenses, hideSpecial);
+          let monthlyBudget = Number(dailyBudget) * 30;
+          if (monthlyBudget > totalBudgetNumber)
+            monthlyBudget = totalBudgetNumber;
+          const formattedDay = toDayMonthString(firstDay);
+          const formattedSum = formatExpenseWithCurrency(
+            expensesSum,
+            tripCurrency
+          );
+          const label = `${formattedDay} - ${formattedSum}`;
+          budget = monthlyBudget;
+          const obj = { firstDay, lastDay, expensesSum, monthlyBudget, label };
+          listExpenseSumBudgets.push(obj);
+        }
+        renderItem = ({ item }) => {
+          const month = toMonthString(item.firstDay);
+          const titleStringFilteredPieCharts = `${month} - ${formatExpenseWithCurrency(
+            item.expensesSum,
+            tripCurrency
+          )}`;
+          const debt = item.expensesSum > item.monthlyBudget;
+          const colorCoding = !debt ? styles.green : styles.red;
+
+          const emptyValue = item.expensesSum === 0;
+          const expenseString = emptyValue
+            ? ""
+            : formatExpenseWithCurrency(item.expensesSum, tripCurrency);
+
+          return (
+            <Pressable
+              style={({ pressed }) => [
+                styles.categoryCard,
+                pressed && GlobalStyles.pressedWithShadow,
+              ]}
+              onLongPress={() => {
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Success
+                );
+                const filteredExpenses = expenseCtx
+                  .getSpecificMonthExpenses(new Date(item.firstDay))
+                  .filter(
+                    (item) =>
+                      !item.isSpecialExpense ||
+                      (item.isSpecialExpense && !hideSpecial)
+                  );
+                // if (!filteredExpenses || filteredExpenses?.length === 0) return;
+                navigation.navigate("FilteredExpenses", {
+                  expenses: filteredExpenses,
+                  dayString: month,
+                });
+              }}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                const filteredExpenses = expenseCtx
+                  .getSpecificMonthExpenses(new Date(item.firstDay))
+                  .filter(
+                    (item) =>
+                      !item.isSpecialExpense ||
+                      (item.isSpecialExpense && !hideSpecial)
+                  );
+                // if (!filteredExpenses || filteredExpenses?.length === 0) return;
+                navigation.navigate("FilteredPieCharts", {
+                  expenses: filteredExpenses,
+                  dayString: titleStringFilteredPieCharts,
+                });
+              }}
+            >
+              <Animated.View
+                entering={FadeInRight}
+                exiting={FadeOutLeft}
+                style={styles.itemContainer}
+              >
+                <Text style={styles.text1}>
+                  {month} {item.firstDay.getFullYear()}
+                </Text>
+                <Text style={[styles.text1, colorCoding]}>
+                  {expenseString}
+                  {emptyValue ? "-" : ""}
+                </Text>
+              </Animated.View>
+            </Pressable>
+          );
+        };
+        break;
+
+      case "total":
+      case "year":
+        xAxis = "firstDay";
+        yAxis = "expensesSum";
+
+        for (let i = startingPoint; i < lastYears; i++) {
+          const { firstDay, lastDay, yearlyExpenses } =
+            expenseCtx.getYearlyExpenses(i);
+          const expensesSum = getExpensesSumPeriod(yearlyExpenses, hideSpecial);
+          let yearlyBudget = Number(dailyBudget) * 365;
+          if (yearlyBudget > totalBudgetNumber)
+            yearlyBudget = totalBudgetNumber;
+          const formattedDay = toDayMonthString(firstDay);
+          const formattedSum = formatExpenseWithCurrency(
+            expensesSum,
+            tripCurrency
+          );
+          const label = `${formattedDay} - ${formattedSum}`;
+          budget = yearlyBudget;
+          const obj = { firstDay, lastDay, expensesSum, yearlyBudget, label };
+          listExpenseSumBudgets.push(obj);
+        }
+        renderItem = ({ item }) => {
+          const yearString = item.firstDay.getFullYear();
+          const titleStringFilteredPieCharts = `${yearString} - ${formatExpenseWithCurrency(
+            item.expensesSum,
+            tripCurrency
+          )}`;
+          const debt = item.expensesSum > item.yearlyBudget;
+          const colorCoding = !debt ? styles.green : styles.red;
+
+          const emptyValue = item.expensesSum === 0;
+          const expenseString = emptyValue
+            ? ""
+            : formatExpenseWithCurrency(item.expensesSum, tripCurrency);
+
+          return (
+            <Pressable
+              style={({ pressed }) => [
+                styles.categoryCard,
+                pressed && GlobalStyles.pressedWithShadow,
+              ]}
+              onLongPress={() => {
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Success
+                );
+                const filteredExpenses = expenseCtx
+                  .getSpecificYearExpenses(new Date(item.firstDay))
+                  .filter(
+                    (item) =>
+                      !item.isSpecialExpense ||
+                      (item.isSpecialExpense && !hideSpecial)
+                  );
+                // if (!filteredExpenses || filteredExpenses?.length === 0) return;
+                navigation.navigate("FilteredExpenses", {
+                  expenses: filteredExpenses,
+                  dayString: yearString,
+                });
+              }}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                const filteredExpenses = expenseCtx
+                  .getSpecificYearExpenses(new Date(item.firstDay))
+                  .filter(
+                    (item) =>
+                      !item.isSpecialExpense ||
+                      (item.isSpecialExpense && !hideSpecial)
+                  );
+                // if (!filteredExpenses || filteredExpenses?.length === 0) return;
+                navigation.navigate("FilteredPieCharts", {
+                  expenses: filteredExpenses,
+                  dayString: titleStringFilteredPieCharts,
+                });
+              }}
+            >
+              <Animated.View
+                entering={FadeInRight}
+                exiting={FadeOutLeft}
+                style={styles.itemContainer}
+              >
+                <Text style={styles.text1}>{yearString}</Text>
+                <Text style={[styles.text1, colorCoding]}>
+                  {expenseString}
+                  {emptyValue ? "-" : ""}
+                </Text>
+              </Animated.View>
+            </Pressable>
+          );
+        };
+        break;
+      default:
+        break;
+    }
+
+    return { listExpenseSumBudgets, xAxis, yAxis, budget, renderItem };
+  }, [
+    dailyBudget,
+    expenseCtx,
+    expenseCtx.expenses,
+    hideSpecial,
+    longerPeriodNum,
+    navigation,
+    periodName,
+    startingPoint,
+    totalBudget,
+    tripCurrency,
+  ]);
+
   if (!isForeground || !expenseCtx.expenses) {
     return <></>;
   }
 
-  const totalBudget = Number(tripCtx.totalBudget) ?? MAX_JS_NUMBER;
-  const listExpenseSumBudgets = [];
-  const lastDays = PRELOADED_DATA_POINTS + longerPeriodNum;
-  const lastWeeks = PRELOADED_DATA_POINTS + longerPeriodNum;
-  const lastMonths = PRELOADED_DATA_POINTS + longerPeriodNum;
-  const lastYears = PRELOADED_DATA_POINTS + longerPeriodNum;
-  let xAxis = "";
-  let yAxis = "";
-  let budgetAxis = "";
-  let budget = 0;
-  let daysRange = 0;
-  switch (periodName) {
-    case "day":
-      xAxis = "day";
-      yAxis = "expensesSum";
-      budgetAxis = "dailyBudget";
-      for (let i = startingPoint; i < lastDays; i++) {
-        const day = getDateMinusDays(today, i);
-        const dayExpenses = expenseCtx.getDailyExpenses(i);
-        const expensesSum = getExpensesSumPeriod(dayExpenses, hideSpecial);
-        const dailyBudget = tripCtx.dailyBudget;
-        const formattedDay = toDayMonthString(day);
-        const formattedSum = formatExpenseWithCurrency(
-          expensesSum,
-          tripCtx.tripCurrency
-        );
-        const label = `${formattedDay} - ${formattedSum}`;
-        budget = Number(dailyBudget);
-        daysRange = lastDays;
-        const obj = { day, expensesSum, dailyBudget, label };
-        listExpenseSumBudgets.push(obj);
-      }
-      renderItemRef.current = function renderItem({ item }) {
-        let dayString = "";
-        if (
-          (item.day instanceof Date
-            ? item.day.toDateString()
-            : item.day.toString()) ===
-          (() => {
-            const date = getDateMinusDays(today, 1);
-            return date instanceof Date
-              ? date.toDateString()
-              : date.toJSDate().toDateString();
-          })()
-        ) {
-          dayString = i18n.t("yesterday");
-        } else if (
-          (item.day instanceof Date
-            ? item.day.toDateString()
-            : item.day.toString()) === new Date().toDateString()
-        ) {
-          dayString = i18n.t("today");
-        } else {
-          dayString = toDayMonthString(item.day);
-        }
-        const titleStringFilteredPieCharts = `${dayString} - ${formatExpenseWithCurrency(
-          item.expensesSum,
-          tripCtx.tripCurrency
-        )}`;
-        const debt = item.expensesSum > item.dailyBudget;
-        const colorCoding = !debt ? styles.green : styles.red;
-        const emptyValue = item.expensesSum === 0;
-        const expenseString = emptyValue
-          ? ""
-          : formatExpenseWithCurrency(item.expensesSum, tripCtx.tripCurrency);
-        return (
-          <Pressable
-            style={({ pressed }) => [
-              styles.categoryCard,
-              pressed && GlobalStyles.pressedWithShadow,
-            ]}
-            onLongPress={() => {
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success
-              );
-              const filteredExpenses = expenseCtx
-                .getSpecificDayExpenses(new Date(item.day))
-                .filter(
-                  (item) =>
-                    !item.isSpecialExpense ||
-                    (item.isSpecialExpense && !hideSpecial)
-                );
-              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
-
-              navigation.navigate("FilteredExpenses", {
-                expenses: filteredExpenses,
-                dayString: dayString,
-              });
-            }}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              const filteredExpenses = expenseCtx
-                .getSpecificDayExpenses(new Date(item.day))
-                .filter(
-                  (item) =>
-                    !item.isSpecialExpense ||
-                    (item.isSpecialExpense && !hideSpecial)
-                );
-              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
-              navigation.navigate("FilteredPieCharts", {
-                expenses: filteredExpenses,
-                dayString: titleStringFilteredPieCharts,
-              });
-            }}
-          >
-            <Animated.View
-              entering={FadeInRight}
-              exiting={FadeOutLeft}
-              style={styles.itemContainer}
-            >
-              <Text style={styles.text1}>{dayString}</Text>
-              <Text style={[styles.text1, colorCoding]}>
-                {expenseString}
-                {emptyValue ? "-" : ""}
-              </Text>
-            </Animated.View>
-          </Pressable>
-        );
-      };
-      break;
-    case "week":
-      xAxis = "firstDay";
-      yAxis = "expensesSum";
-      budgetAxis = "weeklyBudget";
-
-      for (let i = startingPoint; i < lastWeeks; i++) {
-        const { firstDay, lastDay, weeklyExpenses } =
-          expenseCtx.getWeeklyExpenses(i);
-        const expensesSum = getExpensesSumPeriod(weeklyExpenses, hideSpecial);
-        let weeklyBudget = Number(tripCtx.dailyBudget) * 7;
-        if (weeklyBudget > totalBudget) weeklyBudget = totalBudget;
-        const formattedDay = toDayMonthString(firstDay);
-        const formattedSum = formatExpenseWithCurrency(
-          expensesSum,
-          tripCtx.tripCurrency
-        );
-        const label = `${formattedDay} - ${formattedSum}`;
-        budget = weeklyBudget;
-        daysRange = lastWeeks * 7;
-        const obj = { firstDay, lastDay, expensesSum, weeklyBudget, label };
-        listExpenseSumBudgets.push(obj);
-      }
-      renderItemRef.current = function renderItem({ item }) {
-        let weekString = "";
-        if (
-          (item.firstDay instanceof Date
-            ? item.firstDay.toDateString()
-            : item.firstDay.toString()) ===
-          (() => {
-            const date = getPreviousMondayDate(getDateMinusDays(today, 7));
-            return date instanceof Date
-              ? date.toDateString()
-              : date.toJSDate().toDateString();
-          })()
-        ) {
-          weekString = i18n.t("lastWeek");
-        } else if (
-          (item.firstDay instanceof Date
-            ? item.firstDay.toDateString()
-            : item.firstDay.toString()) ===
-          (() => {
-            const date = getPreviousMondayDate(new Date());
-            return date instanceof Date
-              ? date.toDateString()
-              : date.toJSDate().toDateString();
-          })()
-        ) {
-          weekString = i18n.t("thisWeek");
-        } else {
-          weekString = toDayMonthString2(item.firstDay, item.lastDay);
-        }
-        const titleStringFilteredPieCharts = `${weekString} - ${formatExpenseWithCurrency(
-          item.expensesSum,
-          tripCtx.tripCurrency
-        )}`;
-        const debt = item.expensesSum > item.weeklyBudget;
-        const colorCoding = !debt ? styles.green : styles.red;
-        const emptyValue = item.expensesSum === 0;
-        const expenseString = emptyValue
-          ? ""
-          : formatExpenseWithCurrency(item.expensesSum, tripCtx.tripCurrency);
-        return (
-          <Pressable
-            style={({ pressed }) => [
-              styles.categoryCard,
-              pressed && GlobalStyles.pressedWithShadow,
-            ]}
-            onLongPress={() => {
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success
-              );
-              const filteredExpenses = expenseCtx
-                .getSpecificWeekExpenses(new Date(item.firstDay))
-                .filter(
-                  (item) =>
-                    !item.isSpecialExpense ||
-                    (item.isSpecialExpense && !hideSpecial)
-                );
-              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
-              navigation.navigate("FilteredExpenses", {
-                expenses: filteredExpenses,
-                dayString: weekString,
-              });
-            }}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              const filteredExpenses = expenseCtx
-                .getSpecificWeekExpenses(new Date(item.firstDay))
-                .filter(
-                  (item) =>
-                    !item.isSpecialExpense ||
-                    (item.isSpecialExpense && !hideSpecial)
-                );
-              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
-              navigation.navigate("FilteredPieCharts", {
-                expenses: filteredExpenses,
-                dayString: titleStringFilteredPieCharts,
-              });
-            }}
-          >
-            <Animated.View
-              entering={FadeInRight}
-              exiting={FadeOutLeft}
-              style={styles.itemContainer}
-            >
-              <Text style={styles.text1}>{weekString}</Text>
-              <Text style={[styles.text1, colorCoding]}>
-                {expenseString}
-                {emptyValue ? "-" : ""}
-              </Text>
-            </Animated.View>
-          </Pressable>
-        );
-      };
-      break;
-    case "month":
-      xAxis = "firstDay";
-      yAxis = "expensesSum";
-      budgetAxis = "monthlyBudget";
-
-      for (let i = startingPoint; i < lastMonths; i++) {
-        const { firstDay, lastDay, monthlyExpenses } =
-          expenseCtx.getMonthlyExpenses(i);
-        const expensesSum = getExpensesSumPeriod(monthlyExpenses, hideSpecial);
-        let monthlyBudget = Number(tripCtx.dailyBudget) * 30;
-        if (monthlyBudget > totalBudget) monthlyBudget = totalBudget;
-        const formattedDay = toDayMonthString(firstDay);
-        const formattedSum = formatExpenseWithCurrency(
-          expensesSum,
-          tripCtx.tripCurrency
-        );
-        const label = `${formattedDay} - ${formattedSum}`;
-        budget = monthlyBudget;
-        daysRange = lastMonths * 30;
-        const obj = { firstDay, lastDay, expensesSum, monthlyBudget, label };
-        listExpenseSumBudgets.push(obj);
-      }
-      renderItemRef.current = function renderItem({ item }) {
-        const month = toMonthString(item.firstDay);
-        const titleStringFilteredPieCharts = `${month} - ${formatExpenseWithCurrency(
-          item.expensesSum,
-          tripCtx.tripCurrency
-        )}`;
-        const debt = item.expensesSum > item.monthlyBudget;
-        const colorCoding = !debt ? styles.green : styles.red;
-
-        const emptyValue = item.expensesSum === 0;
-        const expenseString = emptyValue
-          ? ""
-          : formatExpenseWithCurrency(item.expensesSum, tripCtx.tripCurrency);
-
-        return (
-          <Pressable
-            style={({ pressed }) => [
-              styles.categoryCard,
-              pressed && GlobalStyles.pressedWithShadow,
-            ]}
-            onLongPress={() => {
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success
-              );
-              const filteredExpenses = expenseCtx
-                .getSpecificMonthExpenses(new Date(item.firstDay))
-                .filter(
-                  (item) =>
-                    !item.isSpecialExpense ||
-                    (item.isSpecialExpense && !hideSpecial)
-                );
-              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
-              navigation.navigate("FilteredExpenses", {
-                expenses: filteredExpenses,
-                dayString: month,
-              });
-            }}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              const filteredExpenses = expenseCtx
-                .getSpecificMonthExpenses(new Date(item.firstDay))
-                .filter(
-                  (item) =>
-                    !item.isSpecialExpense ||
-                    (item.isSpecialExpense && !hideSpecial)
-                );
-              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
-              navigation.navigate("FilteredPieCharts", {
-                expenses: filteredExpenses,
-                dayString: titleStringFilteredPieCharts,
-              });
-            }}
-          >
-            <Animated.View
-              entering={FadeInRight}
-              exiting={FadeOutLeft}
-              style={styles.itemContainer}
-            >
-              <Text style={styles.text1}>
-                {month} {item.firstDay.getFullYear()}
-              </Text>
-              <Text style={[styles.text1, colorCoding]}>
-                {expenseString}
-                {emptyValue ? "-" : ""}
-              </Text>
-            </Animated.View>
-          </Pressable>
-        );
-      };
-      break;
-
-    case "total":
-    case "year":
-      xAxis = "firstDay";
-      yAxis = "expensesSum";
-      budgetAxis = "yearlyBudget";
-
-      for (let i = startingPoint; i < lastYears; i++) {
-        const { firstDay, lastDay, yearlyExpenses } =
-          expenseCtx.getYearlyExpenses(i);
-        const expensesSum = getExpensesSumPeriod(yearlyExpenses, hideSpecial);
-        let yearlyBudget = Number(tripCtx.dailyBudget) * 365;
-        if (yearlyBudget > totalBudget) yearlyBudget = totalBudget;
-        const formattedDay = toDayMonthString(firstDay);
-        const formattedSum = formatExpenseWithCurrency(
-          expensesSum,
-          tripCtx.tripCurrency
-        );
-        const label = `${formattedDay} - ${formattedSum}`;
-        budget = yearlyBudget;
-        daysRange = lastYears * 365;
-        const obj = { firstDay, lastDay, expensesSum, yearlyBudget, label };
-        listExpenseSumBudgets.push(obj);
-      }
-      renderItemRef.current = function renderItem({ item }) {
-        const yearString = item.firstDay.getFullYear();
-        const titleStringFilteredPieCharts = `${yearString} - ${formatExpenseWithCurrency(
-          item.expensesSum,
-          tripCtx.tripCurrency
-        )}`;
-        const debt = item.expensesSum > item.yearlyBudget;
-        const colorCoding = !debt ? styles.green : styles.red;
-
-        const emptyValue = item.expensesSum === 0;
-        const expenseString = emptyValue
-          ? ""
-          : formatExpenseWithCurrency(item.expensesSum, tripCtx.tripCurrency);
-
-        return (
-          <Pressable
-            style={({ pressed }) => [
-              styles.categoryCard,
-              pressed && GlobalStyles.pressedWithShadow,
-            ]}
-            onLongPress={() => {
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success
-              );
-              const filteredExpenses = expenseCtx
-                .getSpecificYearExpenses(new Date(item.firstDay))
-                .filter(
-                  (item) =>
-                    !item.isSpecialExpense ||
-                    (item.isSpecialExpense && !hideSpecial)
-                );
-              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
-              navigation.navigate("FilteredExpenses", {
-                expenses: filteredExpenses,
-                dayString: yearString,
-              });
-            }}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              const filteredExpenses = expenseCtx
-                .getSpecificYearExpenses(new Date(item.firstDay))
-                .filter(
-                  (item) =>
-                    !item.isSpecialExpense ||
-                    (item.isSpecialExpense && !hideSpecial)
-                );
-              // if (!filteredExpenses || filteredExpenses?.length === 0) return;
-              navigation.navigate("FilteredPieCharts", {
-                expenses: filteredExpenses,
-                dayString: titleStringFilteredPieCharts,
-              });
-            }}
-          >
-            <Animated.View
-              entering={FadeInRight}
-              exiting={FadeOutLeft}
-              style={styles.itemContainer}
-            >
-              <Text style={styles.text1}>{yearString}</Text>
-              <Text style={[styles.text1, colorCoding]}>
-                {expenseString}
-                {emptyValue ? "-" : ""}
-              </Text>
-            </Animated.View>
-          </Pressable>
-        );
-      };
-      break;
-    default:
-      break;
-  }
+  const { listExpenseSumBudgets, xAxis, yAxis, budget, renderItem } =
+    graphConfig;
 
   return (
     <Animated.View
@@ -501,7 +524,7 @@ const ExpenseGraph = ({
               xAxis={xAxis}
               yAxis={yAxis}
               budget={budget}
-              currency={tripCtx.tripCurrency}
+              currency={tripCurrency}
               periodType={periodName}
               onZoomStateChange={handleZoomStateChange}
             ></ExpenseChart>
@@ -511,7 +534,7 @@ const ExpenseGraph = ({
           entering={FadeInRight.duration(500)}
           exiting={FadeOutLeft.duration(500)}
           data={listExpenseSumBudgets}
-          renderItem={renderItemRef.current}
+          renderItem={renderItem}
           ListHeaderComponent={
             <View
               style={[
@@ -525,7 +548,7 @@ const ExpenseGraph = ({
                   xAxis={xAxis}
                   yAxis={yAxis}
                   budget={budget}
-                  currency={tripCtx.tripCurrency}
+                  currency={tripCurrency}
                   periodType={periodName}
                   onZoomStateChange={handleZoomStateChange}
                 ></ExpenseChart>
@@ -552,7 +575,7 @@ const ExpenseGraph = ({
   );
 };
 
-export default ExpenseGraph;
+export default React.memo(ExpenseGraph);
 
 ExpenseGraph.propTypes = {
   navigation: PropTypes.object,

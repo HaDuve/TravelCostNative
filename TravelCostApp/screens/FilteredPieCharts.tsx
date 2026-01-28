@@ -34,16 +34,13 @@ const FilteredPieCharts = ({ navigation, route }) => {
 
   const { isPortrait, isTablet } = useContext(OrientationContext);
   // contents and titleStrings have to match in legth and correspond!
-  const titleStrings = useMemo(
-    () => [
-      i18n.t("categories"),
-      i18n.t("travellers"),
-      i18n.t("countries"),
-      i18n.t("currencies"),
-      !noList && i18n.t("expenses"),
-    ],
-    [noList, i18n.locale]
-  );
+  const titleStrings = [
+    i18n.t("categories"),
+    i18n.t("travellers"),
+    i18n.t("countries"),
+    i18n.t("currencies"),
+    !noList && i18n.t("expenses"),
+  ];
   const contents = useMemo(
     () => [
       <ExpenseCategories

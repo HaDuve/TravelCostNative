@@ -489,7 +489,6 @@ const ExpenseGraph = ({
   }, [
     dailyBudget,
     expenseCtx,
-    expenseCtx.expenses,
     hideSpecial,
     longerPeriodNum,
     navigation,

@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React, { useContext } from "react";
+import React, { useCallback, useContext, useMemo } from "react";
 import CategoryProgressBar from "./CategoryProgressBar";
 import { CatColors, GlobalStyles } from "../../../constants/styles";
 import CategoryChart from "../../ExpensesOverview/CategoryChart";
@@ -24,56 +24,56 @@ const ExpenseCurrencies = ({
   navigation,
   forcePortraitFormat = false,
 }) => {
-  const layoutAnim = Layout.damping(50).stiffness(300).overshootClamping(0.8);
+  const layoutAnim = useMemo(
+    () => Layout.damping(50).stiffness(300).overshootClamping(0.8),
+    []
+  );
   const { tripCurrency } = useContext(TripContext);
   const { isPortrait } = useContext(OrientationContext);
   const useRowFormat = !isPortrait && !forcePortraitFormat;
-  if (!expenses)
-    return (
-      <View style={styles.container}>
-        <Text>{i18n.t("fallbackTextExpenses")}</Text>
-      </View>
+  const totalSum = useMemo(
+    () => (expenses ? getExpensesSum(expenses) : 0),
+    [expenses]
+  );
+
+  const { catSumCat, dataList } = useMemo(() => {
+    if (!expenses || expenses.length === 0) {
+      return { catSumCat: [], dataList: [] };
+    }
+
+    const currencyMap = new Map<string, ExpenseData[]>();
+    expenses.forEach((expense: ExpenseData) => {
+      const currencyName = expense.currency;
+      const existing = currencyMap.get(currencyName);
+      if (existing) {
+        existing.push(expense);
+      } else {
+        currencyMap.set(currencyName, [expense]);
+      }
+    });
+
+    const catSumCat = Array.from(currencyMap.entries()).map(
+      ([currency, catExpenses]) => ({
+        cat: currency,
+        sumCat: getExpensesSum(catExpenses),
+        color: "",
+        catExpenses,
+      })
     );
 
-  const countryList = [];
-  expenses.forEach((expense: ExpenseData) => {
-    const currencyName = expense.currency;
-    if (!countryList.includes(currencyName)) {
-      countryList.push(currencyName);
-    }
-  });
+    catSumCat.sort((a, b) => b.sumCat - a.sumCat);
 
-  function getAllExpensesWithCur(currency: string) {
-    return expenses.filter((expense: ExpenseData) => {
-      return expense.currency === currency;
+    const colorlist = CatColors;
+    const dataList = catSumCat.map((item, index) => {
+      const color = colorlist[index % colorlist.length];
+      item.color = color;
+      return { x: item.cat, y: item.sumCat, color };
     });
-  }
 
-  const totalSum = getExpensesSum(expenses);
+    return { catSumCat, dataList };
+  }, [expenses]);
 
-  const catSumCat = [];
-  const dataList = [];
-
-  countryList.forEach((cat: string) => {
-    const catExpenses: ExpenseData[] = getAllExpensesWithCur(cat);
-    const sumCat = getExpensesSum(catExpenses);
-    catSumCat.push({
-      cat: cat,
-      sumCat: sumCat,
-      color: "",
-      catExpenses: catExpenses,
-    });
-  });
-
-  function renderItem(itemData: {
-    item: {
-      cat: string;
-      sumCat: number;
-      color: string;
-      catExpenses: ExpenseData[];
-    };
-    index: number;
-  }) {
+  const renderItem = useCallback((itemData) => {
     const newPeriodName = processTitleStringFilteredPiecharts(
       periodName,
       tripCurrency,
@@ -102,22 +102,14 @@ const ExpenseCurrencies = ({
         />
       </Pressable>
     );
-  }
+  }, [navigation, periodName, totalSum, tripCurrency]);
 
-  catSumCat.sort((a, b) => b.sumCat - a.sumCat);
-  dataList.sort((a, b) => b.sumCat - a.sumCat);
-
-  const colorlist = CatColors;
-
-  let color_i = 0;
-  catSumCat.forEach((item) => {
-    item.color = colorlist[color_i];
-    color_i++;
-    if (color_i >= colorlist?.length) {
-      color_i = 0;
-    }
-    dataList.push({ x: item.cat, y: item.sumCat, color: item.color });
-  });
+  if (!expenses)
+    return (
+      <View style={styles.container}>
+        <Text>{i18n.t("fallbackTextExpenses")}</Text>
+      </View>
+    );
 
   return (
     <Animated.View style={styles.container}>

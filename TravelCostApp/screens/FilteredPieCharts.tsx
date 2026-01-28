@@ -1,6 +1,5 @@
 import { Platform, StyleSheet, Text, View } from "react-native";
-import React, { useContext } from "react";
-import { useState } from "react";
+import React, { useCallback, useContext, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import Animated, {
   FadeInLeft,
@@ -42,64 +41,70 @@ const FilteredPieCharts = ({ navigation, route }) => {
     i18n.t("currencies"),
     !noList && i18n.t("expenses"),
   ];
-  const contents = [
-    <ExpenseCategories
-      key={0}
-      expenses={expenses}
-      periodName={dayString}
-      navigation={navigation}
-      forcePortraitFormat
-    />,
-    <ExpenseTravellers
-      key={1}
-      expenses={expenses}
-      periodName={dayString}
-      navigation={navigation}
-      forcePortraitFormat
-    ></ExpenseTravellers>,
-    <ExpenseCountries
-      key={2}
-      expenses={expenses}
-      periodName={dayString}
-      navigation={navigation}
-      forcePortraitFormat
-    ></ExpenseCountries>,
-    <ExpenseCurrencies
-      key={3}
-      expenses={expenses}
-      periodName={dayString}
-      navigation={navigation}
-      forcePortraitFormat
-    ></ExpenseCurrencies>,
-    !noList && (
-      <FilteredExpenses
-        key={4}
-        expensesAsArg={expenses}
-        dayStringAsArg={dayString}
-      ></FilteredExpenses>
-    ),
-  ];
+  const contents = useMemo(
+    () => [
+      <ExpenseCategories
+        key={0}
+        expenses={expenses}
+        periodName={dayString}
+        navigation={navigation}
+        forcePortraitFormat
+      />,
+      <ExpenseTravellers
+        key={1}
+        expenses={expenses}
+        periodName={dayString}
+        navigation={navigation}
+        forcePortraitFormat
+      ></ExpenseTravellers>,
+      <ExpenseCountries
+        key={2}
+        expenses={expenses}
+        periodName={dayString}
+        navigation={navigation}
+        forcePortraitFormat
+      ></ExpenseCountries>,
+      <ExpenseCurrencies
+        key={3}
+        expenses={expenses}
+        periodName={dayString}
+        navigation={navigation}
+        forcePortraitFormat
+      ></ExpenseCurrencies>,
+      !noList && (
+        <FilteredExpenses
+          key={4}
+          expensesAsArg={expenses}
+          dayStringAsArg={dayString}
+        ></FilteredExpenses>
+      ),
+    ],
+    [dayString, expenses, navigation, noList]
+  );
   if (contents?.length !== titleStrings?.length)
     console.error("Lengths do not match");
-  let contentsMaxIndex = titleStrings?.length - 1;
-  if (noList) contentsMaxIndex = titleStrings?.length - 2;
+  const contentsMaxIndex = useMemo(() => {
+    if (noList) return titleStrings.length - 2;
+    return titleStrings.length - 1;
+  }, [noList, titleStrings.length]);
 
-  const nextHandler = async () => {
+  const nextHandler = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setToggleGraphEnum(
-      toggleGraphEnum == contentsMaxIndex ? 0 : toggleGraphEnum + 1
+    setToggleGraphEnum((current) =>
+      current == contentsMaxIndex ? 0 : current + 1
     );
-  };
+  }, [contentsMaxIndex]);
 
-  const previousHandler = async () => {
+  const previousHandler = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setToggleGraphEnum(
-      toggleGraphEnum == 0 ? contentsMaxIndex : toggleGraphEnum - 1
+    setToggleGraphEnum((current) =>
+      current == 0 ? contentsMaxIndex : current - 1
     );
-  };
+  }, [contentsMaxIndex]);
 
-  const earliestDate = getEarliestDate(
-    expenses.map((exp: ExpenseData) => exp.date)
+  const earliestDate = useMemo(
+    () => getEarliestDate(expenses.map((exp: ExpenseData) => exp.date)),
+    [expenses]
   );
 
   return (

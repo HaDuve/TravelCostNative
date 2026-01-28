@@ -52,6 +52,13 @@ interface ChartMessage {
   max?: number;
 }
 
+interface ZoomState {
+  isLatestVisible: boolean;
+  visiblePeriods: number;
+  minDate: Date | null;
+  maxDate: Date | null;
+}
+
 const WebViewChart: React.FC<WebViewChartProps> = ({
   data,
   options = {},
@@ -72,6 +79,7 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
     null
   );
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const lastZoomStateRef = useRef<ZoomState | null>(null);
 
   const chartId = useMemo(() => `chart-${Date.now()}`, []);
   const htmlContent = useMemo(
@@ -79,10 +87,21 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
     [chartId, options]
   );
 
+  const seriesData = useMemo(() => {
+    if (!Array.isArray(data) || data.length === 0) {
+      return [];
+    }
+    const firstSeries = data[0] as { data?: unknown };
+    if (firstSeries && Array.isArray(firstSeries.data)) {
+      return firstSeries.data as Array<{ x?: number | string }>;
+    }
+    return [];
+  }, [data]);
+
   // Helper function to calculate zoom state
   const calculateZoomState = useCallback(
     (min: number, max: number) => {
-      if (!data || data.length === 0 || !options.periodType) {
+      if (!seriesData.length || !options.periodType) {
         return {
           isLatestVisible: true,
           visiblePeriods: 7,
@@ -99,35 +118,24 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
       );
 
       // Find first and last dates with data within the visible range
-      let minDate: Date | null = null;
-      let maxDate: Date | null = null;
+      let minTime = Number.POSITIVE_INFINITY;
+      let maxTime = Number.NEGATIVE_INFINITY;
 
-      // Extract data points from the series data
-      const seriesData =
-        Array.isArray(data) && data[0] && "data" in data[0]
-          ? (data[0] as any).data
-          : [];
-
-      if (Array.isArray(seriesData)) {
-        const visibleDataPoints = seriesData.filter((point: any) => {
-          const pointTime =
-            typeof point.x === "number" ? point.x : new Date(point.x).getTime();
-          return pointTime >= min && pointTime <= max;
-        });
-
-        if (visibleDataPoints.length > 0) {
-          const sortedPoints = visibleDataPoints.sort((a: any, b: any) => {
-            const timeA =
-              typeof a.x === "number" ? a.x : new Date(a.x).getTime();
-            const timeB =
-              typeof b.x === "number" ? b.x : new Date(b.x).getTime();
-            return timeA - timeB;
-          });
-
-          minDate = new Date(sortedPoints[0].x);
-          maxDate = new Date(sortedPoints[sortedPoints.length - 1].x);
-        }
+      for (const point of seriesData) {
+        const pointX = point?.x;
+        if (pointX == null) continue;
+        const pointTime =
+          typeof pointX === "number" ? pointX : new Date(pointX).getTime();
+        if (Number.isNaN(pointTime)) continue;
+        if (pointTime < min || pointTime > max) continue;
+        if (pointTime < minTime) minTime = pointTime;
+        if (pointTime > maxTime) maxTime = pointTime;
       }
+
+      const minDate =
+        minTime !== Number.POSITIVE_INFINITY ? new Date(minTime) : null;
+      const maxDate =
+        maxTime !== Number.NEGATIVE_INFINITY ? new Date(maxTime) : null;
 
       return {
         isLatestVisible,
@@ -136,7 +144,25 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
         maxDate,
       };
     },
-    [data, options.periodType]
+    [options.periodType, seriesData]
+  );
+
+  const emitZoomState = useCallback(
+    (zoomState: ZoomState) => {
+      const lastZoomState = lastZoomStateRef.current;
+      const hasChanged =
+        !lastZoomState ||
+        lastZoomState.isLatestVisible !== zoomState.isLatestVisible ||
+        lastZoomState.visiblePeriods !== zoomState.visiblePeriods ||
+        lastZoomState.minDate?.getTime() !== zoomState.minDate?.getTime() ||
+        lastZoomState.maxDate?.getTime() !== zoomState.maxDate?.getTime();
+
+      if (!hasChanged) return;
+
+      lastZoomStateRef.current = zoomState;
+      onZoomStateChange && onZoomStateChange(zoomState);
+    },
+    [onZoomStateChange]
   );
 
   // Determine loading states
@@ -205,7 +231,7 @@ const WebViewChart: React.FC<WebViewChartProps> = ({
             // Calculate and emit zoom state
             if (min != null && max != null) {
               const zoomState = calculateZoomState(min, max);
-              onZoomStateChange && onZoomStateChange(zoomState);
+              emitZoomState(zoomState);
             }
           }
           break;

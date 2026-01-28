@@ -35,7 +35,7 @@ import { ExpoPushToken } from "expo-notifications";
 // Branch.io removed
 import Purchases from "react-native-purchases";
 import { setAttributesAsync } from "../components/Premium/PremiumConstants";
-import { getMMKVObject, setMMKVObject } from "../store/mmkv";
+import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import { NetworkContext } from "../store/network-context";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import GetLocalPriceButton from "../components/Settings/GetLocalPriceButton";
@@ -61,7 +61,7 @@ async function registerForPushNotificationsAsync() {
       await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== "granted") {
-      if (getMMKVObject("expoPushAsk")?.never) return;
+      if (getMMKVObject(MMKV_KEYS.EXPO_PUSH_ASK)?.never) return;
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
@@ -78,7 +78,7 @@ async function registerForPushNotificationsAsync() {
       // granted so we want to save the token in the trip
       await storeExpoPushTokenInTrip(token, "");
     } catch {
-      setMMKVObject("expoPushTokenStatus", { failed: true });
+      setMMKVObject(MMKV_KEYS.EXPO_PUSH_TOKEN_STATUS, { failed: true });
     }
   } else {
   }
@@ -102,7 +102,7 @@ async function storeToken() {
     });
     await storeExpoPushTokenInTrip(token, "");
   } catch (error) {
-    setMMKVObject("expoPushTokenStatus", { failed: true });
+    setMMKVObject(MMKV_KEYS.EXPO_PUSH_TOKEN_STATUS, { failed: true });
   }
 }
 
@@ -154,9 +154,9 @@ const ProfileScreen = ({ navigation }) => {
 
   useEffect(() => {
     if (!isConnected) return;
-    const status = getMMKVObject("expoPushTokenStatus");
+    const status = getMMKVObject(MMKV_KEYS.EXPO_PUSH_TOKEN_STATUS);
     if (status?.failed) {
-      setMMKVObject("expoPushTokenStatus", null);
+      setMMKVObject(MMKV_KEYS.EXPO_PUSH_TOKEN_STATUS, null);
       storeToken();
     }
   }, [isConnected]);

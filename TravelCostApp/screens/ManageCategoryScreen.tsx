@@ -39,7 +39,7 @@ import InfoButton from "../components/UI/InfoButton";
 import Modal from "react-native-modal";
 import FlatButton from "../components/UI/FlatButton";
 import BlurPremium from "../components/Premium/BlurPremium";
-import { getMMKVObject, setMMKVObject } from "../store/mmkv";
+import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
 import { useMemo } from "react";
 import { dynamicScale } from "../util/scalingUtil";
@@ -74,7 +74,7 @@ const ManageCategoryScreen = ({ navigation }) => {
 
   const loadCategoryList = useCallback(async () => {
     try {
-      const categoryList = getMMKVObject("categoryList");
+      const categoryList = getMMKVObject(MMKV_KEYS.CATEGORY_LIST);
       if (categoryList !== null) {
         setCategoryList(categoryList);
       } else {
@@ -126,7 +126,7 @@ const ManageCategoryScreen = ({ navigation }) => {
       navigation.pop(2);
     }
     try {
-      setMMKVObject("categoryList", categoryList);
+      setMMKVObject(MMKV_KEYS.CATEGORY_LIST, categoryList);
       await updateTrip(tripid, {
         categories: JSON.stringify(newCategoryList),
       });

@@ -16,7 +16,7 @@ import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
 import NetInfo from "@react-native-community/netinfo";
 import { isConnectionFastEnough } from "./connectionSpeed";
 import { secureStoreGetItem } from "../store/secure-storage";
-import { getMMKVObject, setMMKVObject } from "../store/mmkv";
+import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import safeLogError from "./error";
 
 // interface of offline queue manage expense item
@@ -50,12 +50,12 @@ const ensureAddItemId = (item: OfflineQueueManageExpenseItem) => {
 export const offlineQueuePushItem = (item: OfflineQueueManageExpenseItem) => {
   const offlineQueue = getOfflineQueue();
   offlineQueue.push(item);
-  setMMKVObject("offlineQueue", offlineQueue);
+  setMMKVObject(MMKV_KEYS.OFFLINE_QUEUE, offlineQueue);
 };
 
 // retrieve offlinequeue and push new item, return random id
 export const pushQueueReturnRndID = async (
-  item: OfflineQueueManageExpenseItem
+  item: OfflineQueueManageExpenseItem,
 ) => {
   try {
     const id = ensureAddItemId(item);
@@ -69,7 +69,7 @@ export const pushQueueReturnRndID = async (
 
 // retrieve offlinequeue
 export const getOfflineQueue = () => {
-  const offlineQueue = getMMKVObject("offlineQueue");
+  const offlineQueue = getMMKVObject(MMKV_KEYS.OFFLINE_QUEUE);
   return offlineQueue || [];
 };
 
@@ -83,7 +83,7 @@ export const getOfflineQueue = () => {
  */
 export const deleteExpenseOnlineOffline = async (
   item: OfflineQueueManageExpenseItem,
-  online: boolean
+  online: boolean,
 ) => {
   // load tripid from asyncstore to fix the tripctx tripid bug
   const tripid = await secureStoreGetItem("currentTripId");
@@ -94,7 +94,7 @@ export const deleteExpenseOnlineOffline = async (
       text2: i18n.t("toastErrorDeleteExp"),
     });
     throw new Error(
-      "No tripid found in asyncStore! (storeExpenseOnlineOffline)"
+      "No tripid found in asyncStore! (storeExpenseOnlineOffline)",
     );
   }
   item.expense.tripid = tripid;
@@ -107,7 +107,7 @@ export const deleteExpenseOnlineOffline = async (
       await deleteExpense(
         item.expense.tripid,
         item.expense.uid,
-        item.expense.id
+        item.expense.id,
       );
     } catch (error) {
       await pushQueueReturnRndID(item);
@@ -128,7 +128,7 @@ export const deleteExpenseOnlineOffline = async (
  */
 export const updateExpenseOnlineOffline = async (
   item: OfflineQueueManageExpenseItem,
-  online = true
+  online = true,
 ) => {
   // load tripid from asyncstore to fix the tripctx tripid bug
   const tripid = await secureStoreGetItem("currentTripId");
@@ -139,7 +139,7 @@ export const updateExpenseOnlineOffline = async (
       text2: i18n.t("toastErrorUpdateExp"),
     });
     throw new Error(
-      "No tripid found in asyncStore! (storeExpenseOnlineOffline)"
+      "No tripid found in asyncStore! (storeExpenseOnlineOffline)",
     );
   }
   item.expense.tripid = tripid;
@@ -152,7 +152,7 @@ export const updateExpenseOnlineOffline = async (
         item.expense.tripid,
         item.expense.uid,
         item.expense.id,
-        item.expense.expenseData
+        item.expense.expenseData,
       );
     } catch (error) {
       await pushQueueReturnRndID(item);
@@ -173,7 +173,7 @@ export const updateExpenseOnlineOffline = async (
 export const storeExpenseOnlineOffline = async (
   item: OfflineQueueManageExpenseItem,
   online: boolean,
-  forceTripid = null
+  forceTripid = null,
 ) => {
   // load tripid from asyncstore to fix the tripctx tripid bug
   const tripid = forceTripid ?? (await secureStoreGetItem("currentTripId"));
@@ -184,7 +184,7 @@ export const storeExpenseOnlineOffline = async (
       text2: i18n.t("toastErrorStoreExp"),
     });
     throw new Error(
-      "No tripid found in asyncStore! (storeExpenseOnlineOffline)"
+      "No tripid found in asyncStore! (storeExpenseOnlineOffline)",
     );
   }
   item.expense.tripid = tripid;
@@ -199,14 +199,14 @@ export const storeExpenseOnlineOffline = async (
           item.expense.tripid,
           item.expense.uid,
           expenseId,
-          item.expense.expenseData
+          item.expense.expenseData,
         );
         return expenseId;
       }
       return await storeExpense(
         item.expense.tripid,
         item.expense.uid,
-        item.expense.expenseData
+        item.expense.expenseData,
       );
     } catch (error) {
       safeLogError("error1: could not store expense " + error);
@@ -232,13 +232,13 @@ export const storeExpenseOnlineOffline = async (
 export async function sendOfflineQueue(
   mutexBool: boolean,
   setMutexFunction: (mutexBool: boolean) => void,
-  expensesContext?: { updateExpenseId: (oldId: string, newId: string) => void }
+  expensesContext?: { updateExpenseId: (oldId: string, newId: string) => void },
 ) {
   if (mutexBool) {
     return;
   }
   if (setMutexFunction) setMutexFunction(true);
-  let offlineQueue = getMMKVObject("offlineQueue") || [];
+  let offlineQueue = getMMKVObject(MMKV_KEYS.OFFLINE_QUEUE) || [];
 
   if (offlineQueue && offlineQueue?.length > 0) {
     const forceOffline = !Device.isDevice && DEBUG_FORCE_OFFLINE;
@@ -265,7 +265,7 @@ export async function sendOfflineQueue(
     let tripid = "";
 
     while (i < offlineQueue?.length) {
-      offlineQueue = getMMKVObject("offlineQueue") || [];
+      offlineQueue = getMMKVObject(MMKV_KEYS.OFFLINE_QUEUE) || [];
       const item = offlineQueue[i];
       tripid = item.expense.tripid;
 
@@ -285,7 +285,7 @@ export async function sendOfflineQueue(
             item.expense.tripid,
             item.expense.uid,
             ensuredId,
-            item.expense.expenseData
+            item.expense.expenseData,
           );
 
           item.expense.id = id;
@@ -307,20 +307,20 @@ export async function sendOfflineQueue(
                 continue;
               offlineQueue[j].expense.id = id;
             }
-            setMMKVObject("offlineQueue", offlineQueue);
+            setMMKVObject(MMKV_KEYS.OFFLINE_QUEUE, offlineQueue);
           }
         } else if (item.type === "update") {
           await updateExpense(
             item.expense.tripid,
             item.expense.uid,
             item.expense.id,
-            item.expense.expenseData
+            item.expense.expenseData,
           );
         } else if (item.type === "delete") {
           await deleteExpense(
             item.expense.tripid,
             item.expense.uid,
-            item.expense.id
+            item.expense.id,
           );
         } else {
           safeLogError("unknown offlineQ item type", "offline-queue.ts");
@@ -335,7 +335,7 @@ export async function sendOfflineQueue(
 
     // Remove the processed items from the queue
     const remainingItems = offlineQueue.slice(i);
-    setMMKVObject("offlineQueue", remainingItems);
+    setMMKVObject(MMKV_KEYS.OFFLINE_QUEUE, remainingItems);
     Toast.hide();
     if (processedItems?.length > 0) {
       await touchAllTravelers(tripid, true);

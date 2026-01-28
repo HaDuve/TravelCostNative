@@ -22,7 +22,7 @@ import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 import { secureStoreSetItem } from "../store/secure-storage";
 import { ExpensesContext } from "../store/expenses-context";
-import { setMMKVObject } from "../store/mmkv";
+import { MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
 
 function LoginScreen() {
@@ -134,7 +134,7 @@ function LoginScreen() {
       await userCtx.updateTripHistory();
       tripCtx.refresh();
       expCtx.setExpenses([]);
-      setMMKVObject("expenses", []);
+      setMMKVObject(MMKV_KEYS.EXPENSES, []);
     } catch (error) {
       safeLogError(error);
     }

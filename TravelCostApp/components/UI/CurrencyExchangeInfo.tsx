@@ -10,7 +10,7 @@ import { UserContext } from "../../store/user-context";
 import { NetworkContext } from "../../store/network-context";
 import { GlobalStyles } from "../../constants/styles";
 import { formatExpenseWithCurrency } from "../../util/string";
-import { getMMKVString } from "../../store/mmkv";
+import { getMMKVString, MMKV_KEYS } from "../../store/mmkv";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { useNavigation } from "@react-navigation/native";
 
@@ -40,7 +40,7 @@ const CurrencyExchangeInfo = () => {
     getCurrentRate(false);
   }, [getCurrentRate, isConnected, tripCtx.tripCurrency, userCtx.lastCurrency]);
   async function getLastUpdateTime() {
-    const lastUpdate = getMMKVString("currencyExchange_lastUpdate");
+    const lastUpdate = getMMKVString(MMKV_KEYS.CURRENCY_EXCHANGE_LAST_UPDATE);
     // return as a formatted date with hour time
     if (lastUpdate) {
       const date = new Date(lastUpdate);

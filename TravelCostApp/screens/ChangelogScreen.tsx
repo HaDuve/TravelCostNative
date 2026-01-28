@@ -3,7 +3,7 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import BackButton from "../components/UI/BackButton";
 import { GlobalStyles } from "../constants/styles";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
-import { getMMKVString, setMMKVString } from "../store/mmkv";
+import { getMMKVString, MMKV_KEYS, setMMKVString } from "../store/mmkv";
 import { fetchChangelog } from "../util/http";
 import { VersionCheckResponse, versionCheck } from "../util/version";
 import InfoButton from "../components/UI/InfoButton";
@@ -58,11 +58,11 @@ const ChangelogScreen = ({ navigation }) => {
   const parsedOldChanges = parseChangelog(formattedTextOld);
 
   const setStoredChangelog = useCallback(() => {
-    const fallBackChangelog = getMMKVString("changelog.txt");
+    const fallBackChangelog = getMMKVString(MMKV_KEYS.CHANGELOG_TXT);
     if (fallBackChangelog) {
       setChangelogText(fallBackChangelog); //.replaceAll("- ", "\n • "));
     }
-    const fallBackVersion = getMMKVString("currentVersion");
+    const fallBackVersion = getMMKVString(MMKV_KEYS.CURRENT_VERSION);
     if (fallBackVersion) {
       setCurrentVersion(fallBackVersion);
     }
@@ -73,12 +73,15 @@ const ChangelogScreen = ({ navigation }) => {
     async function setNewChangelog() {
       try {
         const newChangelogText = await fetchChangelog();
-        setMMKVString("changelog.txt", newChangelogText);
+        setMMKVString(MMKV_KEYS.CHANGELOG_TXT, newChangelogText);
         setChangelogText(newChangelogText); //.replaceAll("- ", "\n • "));
         const versionCheckResponse: VersionCheckResponse = await versionCheck();
         if (versionCheckResponse) {
           // setCurrentVersion(versionCheckResponse.currentVersion);
-          setMMKVString("currentVersion", versionCheckResponse.currentVersion);
+          setMMKVString(
+            MMKV_KEYS.CURRENT_VERSION,
+            versionCheckResponse.currentVersion
+          );
         }
         setIsFetching(false);
       } catch (error) {

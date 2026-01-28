@@ -36,7 +36,7 @@ import BackButton from "../components/UI/BackButton";
 import { NetworkContext } from "../store/network-context";
 import uniqBy from "lodash.uniqby";
 import { secureStoreSetItem } from "../store/secure-storage";
-import { setMMKVObject } from "../store/mmkv";
+import { MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
 import Animated, { FadeIn } from "react-native-reanimated";
 import {
@@ -173,10 +173,10 @@ const JoinTrip = ({ navigation, route }) => {
       const expenses = await getAllExpenses(tripid, uid);
       expenseCtx.setExpenses(expenses);
       tripdata.expenses = [];
-      setMMKVObject("currentTrip", tripdata);
+      setMMKVObject(MMKV_KEYS.CURRENT_TRIP, tripdata);
       await secureStoreSetItem("currentTripId", tripid);
       // await asyncStoreSetObject("expenses", expenses);
-      setMMKVObject("expenses", expenses);
+      setMMKVObject(MMKV_KEYS.EXPENSES, expenses);
 
       const travellers: TravellerNames = await getTravellers(tripid);
       // only put traveller in trip if not already in trip

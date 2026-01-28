@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useLayoutEffect,
   useMemo,
+  useRef,
 } from "react";
 
 import * as Haptics from "expo-haptics";
@@ -744,10 +745,18 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [expCtx.expenses?.length]
   );
-  // extract suggestions from all the descriptions of expense state into an array of strings
-  const suggestionData = last500Daysexpenses.map(
-    (expense) => expense.description
-  );
+  // Extract unique suggestions once to avoid per-keystroke work
+  const suggestionData = useMemo(() => {
+    if (!last500Daysexpenses?.length) return [];
+    const uniqueDescriptions = new Set<string>();
+    for (const expense of last500Daysexpenses) {
+      const description = expense.description?.trim();
+      if (!description) continue;
+      uniqueDescriptions.add(description);
+      if (uniqueDescriptions.size >= 200) break;
+    }
+    return Array.from(uniqueDescriptions);
+  }, [last500Daysexpenses]);
 
   // Helper function to update category and icon
   const updateCategoryAndIcon = useCallback((categoryValue: string) => {
@@ -790,10 +799,22 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     },
     [pickedCat, updateCategoryAndIcon, last500Daysexpenses]
   );
+  // Keep debounced instance stable while always calling latest autoCategory
+  const autoCategoryRef = useRef(autoCategory);
+  useEffect(() => {
+    autoCategoryRef.current = autoCategory;
+  }, [autoCategory]);
+  const debouncedAutoCategory = useMemo(
+    () =>
+      callDebounced((inputIdentifier: string, enteredValue: string) => {
+        autoCategoryRef.current(inputIdentifier, enteredValue);
+      }, 250),
+    []
+  );
 
   // Helper function to save current form state to draft storage
   const saveDraftData = useCallback(
-    (newValues: Partial<ExpenseData>) => {
+    (newValues: Partial<ExpenseData> = {}) => {
       setExpenseDraft(editedExpenseId, {
         category: inputs.category.value,
         description: inputs.description.value,
@@ -834,6 +855,18 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       isPaid,
       isSpecialExpense,
     ]
+  );
+  const saveDraftDataRef = useRef(saveDraftData);
+  useEffect(() => {
+    saveDraftDataRef.current = saveDraftData;
+  }, [saveDraftData]);
+  const scheduleDraftSave = useMemo(
+    () =>
+      callDebounced((newValues?: Partial<ExpenseData>) => {
+        if (!editedExpenseId) return;
+        saveDraftDataRef.current(newValues);
+      }, 300),
+    [editedExpenseId]
   );
 
   // Load new category when screen comes into focus
@@ -989,9 +1022,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   const setWhoPaidWithAutoSave = useCallback(
     (value) => {
       setWhoPaid(value);
-      setTimeout(saveDraftData, 0);
+      scheduleDraftSave();
     },
-    [saveDraftData]
+    [scheduleDraftSave]
   );
 
   const setSplitTypeWithAutoSave = useCallback(
@@ -1000,9 +1033,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       trackEvent(VexoEvents.SPLIT_TYPE_SELECTED, {
         splitType: value,
       });
-      setTimeout(saveDraftData, 0);
+      scheduleDraftSave();
     },
-    [saveDraftData]
+    [scheduleDraftSave]
   );
 
   const setIsPaidWithAutoSave = useCallback(
@@ -1011,9 +1044,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       trackEvent(VexoEvents.EXPENSE_PAID_TOGGLE_CHANGED, {
         isPaid: value === isPaidString.paid,
       });
-      setTimeout(saveDraftData, 0);
+      scheduleDraftSave();
     },
-    [saveDraftData]
+    [scheduleDraftSave]
   );
 
   const setIsSpecialExpenseWithAutoSave = useCallback(
@@ -1022,9 +1055,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       trackEvent(VexoEvents.EXPENSE_SPECIAL_TOGGLE_CHANGED, {
         isSpecial: value,
       });
-      setTimeout(saveDraftData, 0);
+      scheduleDraftSave();
     },
-    [saveDraftData]
+    [scheduleDraftSave]
   );
 
   function inputChangedHandler(inputIdentifier: string, enteredValue: string) {
@@ -1033,17 +1066,10 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         ...curInputs,
         [inputIdentifier]: { value: enteredValue, isValid: true },
       };
-
-      // Auto-save draft data after state update
-      setTimeout(() => {
-        if (editedExpenseId) {
-          saveDraftData();
-        }
-      }, 0);
-
       return newInputs;
     });
-    autoCategory(inputIdentifier, enteredValue);
+    scheduleDraftSave();
+    debouncedAutoCategory(inputIdentifier, enteredValue);
     autoExpenseLinearSplitAdjust(inputIdentifier, enteredValue);
   }
 

@@ -57,7 +57,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
     ? tripCtx.travellers
     : [];
   const travellerNames = travellers.map((traveller) =>
-    typeof traveller === "string" ? traveller : traveller?.userName
+    typeof traveller === "string" ? traveller : traveller?.userName,
   );
   const tripCurrency = tripCtx.tripCurrency || userCtx.lastCurrency || "";
   const isOfflineMissingTrip =
@@ -83,7 +83,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
 
   const expensesSumString = formatExpenseWithCurrency(
     truncateNumber(expensesSum, 1000, true),
-    tripCurrency
+    tripCurrency,
   );
 
   const calcExpensesSumString =
@@ -91,7 +91,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
       ? ""
       : formatExpenseWithCurrency(
           truncateNumber(expensesSum * lastRate, 1000, true),
-          userCtx.lastCurrency
+          userCtx.lastCurrency,
         );
 
   let budgetNumber = Number(tripCtx.dailyBudget ?? 0);
@@ -139,7 +139,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
     return getTravellerSum(
       periodExpenses,
       travellerName || "",
-      periodName === "total"
+      periodName === "total",
     );
   });
 
@@ -161,7 +161,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
         today,
         expCtx,
         tripCtx,
-        hideSpecial
+        hideSpecial,
       )
     : 0;
 
@@ -173,7 +173,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
         budgetNumber,
         averageDailySpending,
         dailyBudget,
-        settings.trafficLightBudgetColors
+        settings.trafficLightBudgetColors,
       );
 
   let unfilledColor = GlobalStyles.colors.gray600;
@@ -199,40 +199,40 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
   const calcLeftToSpend = lastRateUnequal1
     ? formatExpenseWithCurrency(
         truncateNumber((budgetNumber - expenseSumNum) * lastRate, 1000, true),
-        userCtx.lastCurrency
+        userCtx.lastCurrency,
       )
     : "";
   const leftToSpendString = `${i18n.t(
-    "youHaveXLeftToSpend1"
+    "youHaveXLeftToSpend1",
   )}:\n${formatExpenseWithCurrency(
     truncateNumber(budgetNumber - expenseSumNum, 1000, true),
-    tripCurrency
+    tripCurrency,
   )}${lastRateUnequal1 ? " = " : ""}${calcLeftToSpend}${i18n.t(
-    "youHaveXLeftToSpend2"
+    "youHaveXLeftToSpend2",
   )}`;
 
   const calcOverBudget = lastRateUnequal1
     ? formatExpenseWithCurrency(
         truncateNumber((expenseSumNum - budgetNumber) * lastRate, 1000, true),
-        userCtx.lastCurrency
+        userCtx.lastCurrency,
       )
     : "";
 
   const overBudgetString = `${i18n.t(
-    "exceededBudgetByX1"
+    "exceededBudgetByX1",
   )}:\n${formatExpenseWithCurrency(
     truncateNumber(expenseSumNum - budgetNumber, 1000, true),
-    tripCurrency
+    tripCurrency,
   )}${lastRateUnequal1 ? " = " : ""}${calcOverBudget} !`;
 
   const periodBudgetString = `${periodLabel} ${i18n.t(
-    "budget"
+    "budget",
   )} :\n${formatExpenseWithCurrency(
     budgetNumber,
-    tripCtx.tripCurrency
+    tripCtx.tripCurrency,
   )} = ${formatExpenseWithCurrency(
     budgetNumber * lastRate,
-    userCtx.lastCurrency
+    userCtx.lastCurrency,
   )}`;
 
   const valid = tripCtx.tripid && travellerNames.length > 0;
@@ -280,7 +280,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
       props: {
         text3: `${formatExpenseWithCurrency(
           1,
-          tripCurrency
+          tripCurrency,
         )} = ${formatExpenseWithCurrency(lastRate, lastCurrency)}`,
         travellerList: travellerNames,
         travellerBudgets:

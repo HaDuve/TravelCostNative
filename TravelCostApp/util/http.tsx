@@ -193,8 +193,8 @@ export async function storeExpenseWithId(
   try {
     const authToken = await getValidIdToken();
     if (!authToken) {
-      console.warn("[HTTP] No valid auth token for storeExpenseWithId");
-      return null;
+      safeLogError("[HTTP] No valid auth token for storeExpenseWithId");
+      throw new Error("No valid auth token for storeExpenseWithId");
     }
 
     // Add serverTimestamp to expense data

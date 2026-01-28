@@ -434,6 +434,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   const [isPaid, setIsPaid] = useState(
     isEditing ? effectiveIsPaid : isPaidString.notPaid
   );
+  const didUserChangeIsPaidRef = useRef(false);
   const [isSpecialExpense, setIsSpecialExpense] = useState(
     editingValues?.isSpecialExpense ?? false
   );
@@ -1040,6 +1041,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   const setIsPaidWithAutoSave = useCallback(
     (value) => {
+      didUserChangeIsPaidRef.current = true;
       setIsPaid(value);
       trackEvent(VexoEvents.EXPENSE_PAID_TOGGLE_CHANGED, {
         isPaid: value === isPaidString.paid,
@@ -1048,6 +1050,14 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     },
     [scheduleDraftSave]
   );
+
+  // If the edited expense changes (or effectiveIsPaid changes due to settlement timestamp),
+  // only sync local UI state if the user hasn't manually changed it in this session.
+  useEffect(() => {
+    if (!isEditing) return;
+    if (didUserChangeIsPaidRef.current) return;
+    setIsPaid(effectiveIsPaid);
+  }, [effectiveIsPaid, isEditing, editingValues?.id]);
 
   const setIsSpecialExpenseWithAutoSave = useCallback(
     (value) => {
@@ -1071,17 +1081,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     scheduleDraftSave();
     debouncedAutoCategory(inputIdentifier, enteredValue);
     autoExpenseLinearSplitAdjust(inputIdentifier, enteredValue);
-  }
-
-  if (splitType === splitTypes.SELF || IsSoloTraveller) {
-    if (openEQUAL) {
-      setOpenEQUAL(false);
-    }
-  }
-
-  if (splitType === splitTypes.EQUAL && openEQUAL) {
-    splitHandler(splitTypes.EQUAL);
-    setOpenEQUAL(false);
   }
 
   function openTravellerMultiPicker() {
@@ -1143,6 +1142,21 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       setSplitList(splitsWithoutOrder);
     }
   }
+
+  // Never call setState during render: move these guards into effects.
+  useEffect(() => {
+    if ((splitType === splitTypes.SELF || IsSoloTraveller) && openEQUAL) {
+      setOpenEQUAL(false);
+    }
+  }, [IsSoloTraveller, openEQUAL, splitType]);
+
+  useEffect(() => {
+    if (splitType === splitTypes.EQUAL && openEQUAL) {
+      splitHandler(splitTypes.EQUAL);
+      setOpenEQUAL(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openEQUAL, splitType]);
 
   async function removeUserFromSplitHandler(userName: string) {
     if (!splitList || splitList.length < 1) return;

@@ -424,20 +424,26 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           minute: new Date().getMinutes(),
         });
       }
-      expenseData.date = newDate;
-      expenseData.editedTimestamp = Date.now();
-      // sanity fix
-      expenseData.rangeId = expense.rangeId;
+      // IMPORTANT: don't mutate the shared expenseData object inside the loop.
+      // Mutating can cause stale/incorrect state during rerenders (and can lead to loops),
+      // especially when toggling fields like isPaid on ranged expenses.
+      const updatedExpenseData: ExpenseData = {
+        ...expenseData,
+        date: newDate,
+        editedTimestamp: Date.now(),
+        // sanity fix
+        rangeId: expense.rangeId,
+      };
       const item: OfflineQueueManageExpenseItem = {
         type: "update",
         expense: {
           tripid: tripid,
           uid: selectedExpenseAuthorUid,
-          expenseData: expenseData,
+          expenseData: updatedExpenseData,
           id: expense.id,
         },
       };
-      expenseCtx.updateExpense(expense.id, expenseData);
+      expenseCtx.updateExpense(expense.id, updatedExpenseData);
       await updateExpenseOnlineOffline(item, isOnline);
     }
   };

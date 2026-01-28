@@ -1,6 +1,7 @@
 import { Expense } from "./expense";
 import {
   storeExpense,
+  storeExpenseWithId,
   updateExpense,
   deleteExpense,
   touchAllTravelers,
@@ -25,6 +26,26 @@ export interface OfflineQueueManageExpenseItem {
   expense: Expense;
 }
 
+const generateExpenseId = () =>
+  Math.random().toString(36).substring(2, 15) +
+  Math.random().toString(36).substring(2, 15);
+
+const ensureAddItemId = (item: OfflineQueueManageExpenseItem) => {
+  if (item.type !== "add") return item.expense.id;
+  if (item.expense.id) {
+    if (item.expense.expenseData && !item.expense.expenseData.id) {
+      item.expense.expenseData.id = item.expense.id;
+    }
+    return item.expense.id;
+  }
+  const id = generateExpenseId();
+  item.expense.id = id;
+  if (item.expense.expenseData) {
+    item.expense.expenseData.id = id;
+  }
+  return id;
+};
+
 // retrieve offlinequeue and push new item
 export const offlineQueuePushItem = (item: OfflineQueueManageExpenseItem) => {
   const offlineQueue = getOfflineQueue();
@@ -37,15 +58,7 @@ export const pushQueueReturnRndID = async (
   item: OfflineQueueManageExpenseItem
 ) => {
   try {
-    const id =
-      Math.random().toString(36).substring(2, 15) +
-      Math.random().toString(36).substring(2, 15);
-    if (item.type == "add") {
-      item.expense.id = id;
-      if (item.expense.expenseData) {
-        item.expense.expenseData.id = id;
-      }
-    }
+    const id = ensureAddItemId(item);
     offlineQueuePushItem(item);
     return id;
   } catch (error) {
@@ -175,17 +188,26 @@ export const storeExpenseOnlineOffline = async (
     );
   }
   item.expense.tripid = tripid;
+  const expenseId = ensureAddItemId(item);
   // if the internet is not fast enough, store in offline queue
   const { isFastEnough } = await isConnectionFastEnough();
   if (online && isFastEnough) {
     // store item online
     try {
-      const id = await storeExpense(
+      if (expenseId && item.expense.expenseData) {
+        await storeExpenseWithId(
+          item.expense.tripid,
+          item.expense.uid,
+          expenseId,
+          item.expense.expenseData
+        );
+        return expenseId;
+      }
+      return await storeExpense(
         item.expense.tripid,
         item.expense.uid,
         item.expense.expenseData
       );
-      return id;
     } catch (error) {
       safeLogError("error1: could not store expense " + error);
       const id = await pushQueueReturnRndID(item);
@@ -249,22 +271,27 @@ export async function sendOfflineQueue(
 
       try {
         if (item.type === "add") {
-          const oldId = item.expense.id || item.expense.expenseData.id || null;
-          if (!oldId) {
+          const oldId = item.expense.id || item.expense.expenseData?.id || null;
+          if (!item.expense.id && item.expense.expenseData?.id) {
+            item.expense.id = item.expense.expenseData.id;
+          }
+          const ensuredId = ensureAddItemId(item);
+          if (!ensuredId || !item.expense.expenseData) {
             i++;
             continue;
           }
 
-          const id = await storeExpense(
+          const id = await storeExpenseWithId(
             item.expense.tripid,
             item.expense.uid,
+            ensuredId,
             item.expense.expenseData
           );
 
           item.expense.id = id;
 
           // Update local expense ID if expenses context is provided
-          if (oldId && id && expensesContext?.updateExpenseId) {
+          if (oldId && id && oldId !== id && expensesContext?.updateExpenseId) {
             try {
               expensesContext.updateExpenseId(oldId, id);
             } catch (error) {
@@ -272,14 +299,16 @@ export async function sendOfflineQueue(
             }
           }
 
-          // change item.expense.id for every other item.type == "update" or "delete" in the queue
-          for (let j = i + 1; j < offlineQueue?.length - i; j++) {
-            const item2 = offlineQueue[j];
-            if (!item2 || item2.expense.id !== oldId || item2.type === "add")
-              continue;
-            offlineQueue[j].expense.id = id;
+          if (oldId && id && oldId !== id) {
+            // change item.expense.id for every other item.type == "update" or "delete" in the queue
+            for (let j = i + 1; j < offlineQueue?.length - i; j++) {
+              const item2 = offlineQueue[j];
+              if (!item2 || item2.expense.id !== oldId || item2.type === "add")
+                continue;
+              offlineQueue[j].expense.id = id;
+            }
+            setMMKVObject("offlineQueue", offlineQueue);
           }
-          setMMKVObject("offlineQueue", offlineQueue);
         } else if (item.type === "update") {
           await updateExpense(
             item.expense.tripid,

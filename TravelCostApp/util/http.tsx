@@ -184,6 +184,36 @@ export async function storeExpense(
   }
 }
 
+export async function storeExpenseWithId(
+  tripid: string,
+  uid: string,
+  id: string,
+  expenseData: ExpenseData
+) {
+  try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for storeExpenseWithId");
+      return null;
+    }
+
+    // Add serverTimestamp to expense data
+    const expenseDataWithTimestamp = {
+      ...expenseData,
+      [SERVER_TIMESTAMP_FIELD]: Date.now(),
+    };
+
+    await axios.put(
+      `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
+      expenseDataWithTimestamp
+    );
+    return id;
+  } catch (error) {
+    safeLogError(error);
+    throw error;
+  }
+}
+
 const processExpenseResponse = (data: any): ExpenseData[] => {
   const expenses: ExpenseData[] = [];
   if (!data) return expenses;

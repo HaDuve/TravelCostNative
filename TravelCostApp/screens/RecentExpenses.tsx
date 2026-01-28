@@ -44,7 +44,7 @@ import { SettingsContext } from "../store/settings-context";
 import { truncateString } from "../util/string";
 import { Platform } from "react-native";
 import { memo } from "react";
-import { getMMKVObject } from "../store/mmkv";
+import { getMMKVObject, MMKV_KEYS } from "../store/mmkv";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 import { refreshWithToast } from "../util/refreshWithToast";
@@ -98,7 +98,7 @@ function RecentExpenses({ navigation }) {
       // if (ignoreTouched)
       // check offlinemode
       const online = netCtx.isConnected && netCtx.strongConnection;
-      const offlineQueue = getMMKVObject("offlineQueue");
+      const offlineQueue = getMMKVObject(MMKV_KEYS.OFFLINE_QUEUE);
       const queueBlocked = offlineQueue && offlineQueue?.length > 0;
       if (!online || queueBlocked || userCtx.isSendingOfflineQueueMutex) {
         // if online, send offline queue

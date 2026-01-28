@@ -1,7 +1,7 @@
 import VersionCheck from "react-native-version-check-expo";
 import { Linking } from "react-native";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { getMMKVString, setMMKVString } from "../store/mmkv";
+import { getMMKVString, MMKV_KEYS, setMMKVString } from "../store/mmkv";
 
 export type VersionCheckResponse = {
   latestVersion: string;
@@ -17,7 +17,9 @@ export async function versionCheck() {
   // we are trying this feature with expo-updates
 
   try {
-    const versionCheckTimeStamp = getMMKVString("versionCheckTimeStamp");
+    const versionCheckTimeStamp = getMMKVString(
+      MMKV_KEYS.VERSION_CHECK_TIMESTAMP
+    );
 
     if (versionCheckTimeStamp) {
       const timeDiff =
@@ -49,7 +51,10 @@ export async function versionCheck() {
           await Linking.openURL(updateResponse?.storeUrl);
         },
       });
-      setMMKVString("versionCheckTimeStamp", new Date().toISOString());
+      setMMKVString(
+        MMKV_KEYS.VERSION_CHECK_TIMESTAMP,
+        new Date().toISOString()
+      );
     }
     // return {latestVersion, currentVersion, isNeeded, storeUrl}
     return updateResponse;

@@ -15,7 +15,7 @@ import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
 import NetInfo from "@react-native-community/netinfo";
 import { isConnectionFastEnough } from "./connectionSpeed";
 import { secureStoreGetItem } from "../store/secure-storage";
-import { getMMKVObject, setMMKVObject } from "../store/mmkv";
+import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import safeLogError from "./error";
 
 // interface of offline queue manage expense item
@@ -29,7 +29,7 @@ export interface OfflineQueueManageExpenseItem {
 export const offlineQueuePushItem = (item: OfflineQueueManageExpenseItem) => {
   const offlineQueue = getOfflineQueue();
   offlineQueue.push(item);
-  setMMKVObject("offlineQueue", offlineQueue);
+  setMMKVObject(MMKV_KEYS.OFFLINE_QUEUE, offlineQueue);
 };
 
 // retrieve offlinequeue and push new item, return random id
@@ -56,7 +56,7 @@ export const pushQueueReturnRndID = async (
 
 // retrieve offlinequeue
 export const getOfflineQueue = () => {
-  const offlineQueue = getMMKVObject("offlineQueue");
+  const offlineQueue = getMMKVObject(MMKV_KEYS.OFFLINE_QUEUE);
   return offlineQueue || [];
 };
 
@@ -216,7 +216,7 @@ export async function sendOfflineQueue(
     return;
   }
   if (setMutexFunction) setMutexFunction(true);
-  let offlineQueue = getMMKVObject("offlineQueue") || [];
+  let offlineQueue = getMMKVObject(MMKV_KEYS.OFFLINE_QUEUE) || [];
 
   if (offlineQueue && offlineQueue?.length > 0) {
     const forceOffline = !Device.isDevice && DEBUG_FORCE_OFFLINE;
@@ -243,7 +243,7 @@ export async function sendOfflineQueue(
     let tripid = "";
 
     while (i < offlineQueue?.length) {
-      offlineQueue = getMMKVObject("offlineQueue") || [];
+      offlineQueue = getMMKVObject(MMKV_KEYS.OFFLINE_QUEUE) || [];
       const item = offlineQueue[i];
       tripid = item.expense.tripid;
 
@@ -279,7 +279,7 @@ export async function sendOfflineQueue(
               continue;
             offlineQueue[j].expense.id = id;
           }
-          setMMKVObject("offlineQueue", offlineQueue);
+          setMMKVObject(MMKV_KEYS.OFFLINE_QUEUE, offlineQueue);
         } else if (item.type === "update") {
           await updateExpense(
             item.expense.tripid,
@@ -306,7 +306,7 @@ export async function sendOfflineQueue(
 
     // Remove the processed items from the queue
     const remainingItems = offlineQueue.slice(i);
-    setMMKVObject("offlineQueue", remainingItems);
+    setMMKVObject(MMKV_KEYS.OFFLINE_QUEUE, remainingItems);
     Toast.hide();
     if (processedItems?.length > 0) {
       await touchAllTravelers(tripid, true);

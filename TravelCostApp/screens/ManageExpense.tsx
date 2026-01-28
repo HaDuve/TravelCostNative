@@ -31,7 +31,7 @@ import {
 import { NetworkContext } from "../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import * as Haptics from "expo-haptics";
-import { setMMKVObject, clearExpenseDraft } from "../store/mmkv";
+import { clearExpenseDraft, MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import { formatExpenseWithCurrency } from "../util/string";
 import { isSameDay } from "../util/dateTime";
 import safeLogError from "../util/error";
@@ -526,7 +526,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         });
       }
       // await asyncStoreSetObject("expenses", expenseCtx.expenses);
-      setMMKVObject("expenses", expenseCtx.expenses);
+      setMMKVObject(MMKV_KEYS.EXPENSES, expenseCtx.expenses);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       // Clear draft data after successful submission
       clearExpenseDraft(editedExpenseId);

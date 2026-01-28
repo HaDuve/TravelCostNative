@@ -33,6 +33,7 @@ import safeLogError from "../util/error";
 import {
   getMMKVObject,
   getMMKVString,
+  MMKV_KEYS,
   setMMKVObject,
   setMMKVString,
 } from "../store/mmkv";
@@ -104,11 +105,13 @@ const TripSummaryScreen = ({ navigation }) => {
       }
       setIsFetching(true);
       const allTripsAsObjects: TripAsObject[] = [];
-      const lastUpdate = getMMKVString("allTripsAsObject_CacheISODate");
+      const lastUpdate = getMMKVString(
+        MMKV_KEYS.ALL_TRIPS_AS_OBJECT_CACHE_ISO_DATE
+      );
       // check if lastUpdate is a iso string today
       const lastUpdateWasToday = lastUpdate && isToday(new Date(lastUpdate));
       if (lastUpdateWasToday) {
-        const allTrips = getMMKVObject("allTripsAsObject");
+        const allTrips = getMMKVObject(MMKV_KEYS.ALL_TRIPS_AS_OBJECT);
         setAllTrips(allTrips);
         setIsFetching(false);
         return;
@@ -124,9 +127,12 @@ const TripSummaryScreen = ({ navigation }) => {
         });
       }
       setAllTrips(allTripsAsObjects);
-      setMMKVObject("allTripsAsObject", allTripsAsObjects);
+      setMMKVObject(MMKV_KEYS.ALL_TRIPS_AS_OBJECT, allTripsAsObjects);
       const allTripsISODate = new Date().toISOString();
-      setMMKVString("allTripsAsObject_CacheISODate", allTripsISODate);
+      setMMKVString(
+        MMKV_KEYS.ALL_TRIPS_AS_OBJECT_CACHE_ISO_DATE,
+        allTripsISODate
+      );
       setIsFetching(false);
     }
     asyncSetAllTrips();

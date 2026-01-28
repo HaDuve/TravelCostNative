@@ -9,7 +9,7 @@ import {
 import PropTypes from "prop-types";
 import { ExpenseData } from "../util/expense";
 import uniqBy from "lodash.uniqby";
-import { getMMKVObject, setMMKVObject } from "./mmkv";
+import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "./mmkv";
 export enum RangeString {
   day = "day",
   week = "week",
@@ -291,7 +291,7 @@ function ExpensesContextProvider({ children }) {
     async function asyncSaveExpenses() {
       if (expensesState?.length > 0)
         // await asyncStoreSetObject("expenses", expensesState);
-        setMMKVObject("expenses", expensesState);
+        setMMKVObject(MMKV_KEYS.EXPENSES, expensesState);
     }
     asyncSaveExpenses();
   }, [expensesState]);
@@ -489,7 +489,7 @@ function ExpensesContextProvider({ children }) {
       return false;
     }
     // const loadedExpenses = await asyncStoreGetObject("expenses");
-    const loadedExpenses = getMMKVObject("expenses");
+    const loadedExpenses = getMMKVObject(MMKV_KEYS.EXPENSES);
     const expArray = [];
     if (loadedExpenses) {
       loadedExpenses.forEach((expense) => {

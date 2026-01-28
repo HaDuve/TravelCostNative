@@ -26,7 +26,12 @@ import PropTypes from "prop-types";
 import { NetworkContext } from "../store/network-context";
 import { Category, DEFAULTCATEGORIES } from "../util/category";
 import BackButton from "../components/UI/BackButton";
-import { getMMKVObject, setMMKVObject, setExpenseCat } from "../store/mmkv";
+import {
+  getMMKVObject,
+  MMKV_KEYS,
+  setMMKVObject,
+  setExpenseCat,
+} from "../store/mmkv";
 import { useCallback } from "react";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 import { dynamicScale } from "../util/scalingUtil";
@@ -77,14 +82,14 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
             catString: i18n.t("catNewString"),
           });
           setCategoryList(tempList);
-          setMMKVObject("categoryList", categories);
+          setMMKVObject(MMKV_KEYS.CATEGORY_LIST, categories);
         }
         setIsFetching(false);
       };
 
       // first try to load categories from asyncstore
       const setStoredCategories = () => {
-        const categories = getMMKVObject("categoryList");
+        const categories = getMMKVObject(MMKV_KEYS.CATEGORY_LIST);
         if (categories) {
           categories.push({
             id: 6,

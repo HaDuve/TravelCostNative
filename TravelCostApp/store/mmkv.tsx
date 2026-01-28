@@ -53,7 +53,7 @@ function initializeMMKV(): MMKV {
   }
 }
 
-export function setMMKVObject(key: MMKVKey | string, value: object) {
+export function setMMKVObject(key: MMKVKey, value: object) {
   try {
     const storage = initializeMMKV();
     storage.set(key, JSON.stringify(value));
@@ -62,7 +62,7 @@ export function setMMKVObject(key: MMKVKey | string, value: object) {
   }
 }
 
-export function getMMKVObject(key: MMKVKey | string) {
+export function getMMKVObject(key: MMKVKey) {
   try {
     const storage = initializeMMKV();
     const value = storage.getString(key);
@@ -73,7 +73,7 @@ export function getMMKVObject(key: MMKVKey | string) {
   }
 }
 
-export function setMMKVString(key: MMKVKey | string, value: string) {
+export function setMMKVString(key: MMKVKey, value: string) {
   try {
     const storage = initializeMMKV();
     storage.set(key, value);
@@ -82,7 +82,7 @@ export function setMMKVString(key: MMKVKey | string, value: string) {
   }
 }
 
-export function getMMKVString(key: MMKVKey | string) {
+export function getMMKVString(key: MMKVKey) {
   try {
     const storage = initializeMMKV();
     return storage.getString(key) ?? "";
@@ -93,7 +93,7 @@ export function getMMKVString(key: MMKVKey | string) {
 }
 
 // Delete an MMKV object by key
-export function deleteMMKVObject(key: MMKVKey | string) {
+export function deleteMMKVObject(key: MMKVKey) {
   try {
     const storage = initializeMMKV();
     storage.delete(key);

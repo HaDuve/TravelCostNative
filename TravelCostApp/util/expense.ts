@@ -1,6 +1,7 @@
 import {
   getMMKVObject,
   getMMKVString,
+  MMKV_KEY_PATTERNS,
   setMMKVObject,
   setMMKVString,
 } from "../store/mmkv";
@@ -342,10 +343,10 @@ export function findMostDuplicatedDescriptionExpenses(
 
 export async function getAllExpensesData(tripid: string) {
   const lastCacheUpdateExpenses = getMMKVString(
-    "lastUpdateISO_allExpenses_tripid" + tripid
+    MMKV_KEY_PATTERNS.LAST_UPDATE_ISO_ALL_EXPENSES_TRIP(tripid)
   );
   const cachedExpenses = getMMKVObject(
-    "lastUpdate_allExpenses_tripid_" + tripid
+    MMKV_KEY_PATTERNS.LAST_UPDATE_ALL_EXPENSES_TRIP(tripid)
   );
   const lastUpdateWasToday =
     lastCacheUpdateExpenses &&
@@ -358,10 +359,13 @@ export async function getAllExpensesData(tripid: string) {
   if (!lastUpdateWasToday) {
     // update cache
     setMMKVString(
-      "lastUpdateISO_allExpenses_tripid" + tripid,
+      MMKV_KEY_PATTERNS.LAST_UPDATE_ISO_ALL_EXPENSES_TRIP(tripid),
       new Date().toISOString()
     );
-    setMMKVObject("lastUpdate_allExpenses_tripid_" + tripid, _expenses);
+    setMMKVObject(
+      MMKV_KEY_PATTERNS.LAST_UPDATE_ALL_EXPENSES_TRIP(tripid),
+      _expenses
+    );
   }
   return _expenses;
 }

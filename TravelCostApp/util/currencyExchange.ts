@@ -8,18 +8,21 @@ import NetInfo from "@react-native-community/netinfo";
 import {
   getMMKVObject,
   getMMKVString,
+  MMKV_KEYS,
+  MMKV_KEY_PATTERNS,
   setMMKVObject,
   setMMKVString,
 } from "../store/mmkv";
 
 function saveBaseRates(base: string, rates: Record<string, number>) {
   // Merge new rates into MMKV and refresh timestamp for offline reuse
-  const existingRates = getMMKVObject("currencyExchange_base_" + base) || {};
-  setMMKVObject("currencyExchange_base_" + base, {
+  const existingRates =
+    getMMKVObject(MMKV_KEY_PATTERNS.CURRENCY_EXCHANGE_BASE(base)) || {};
+  setMMKVObject(MMKV_KEY_PATTERNS.CURRENCY_EXCHANGE_BASE(base), {
     ...existingRates,
     ...rates,
   });
-  setMMKVString("currencyExchange_lastUpdate", DateTime.now().toISO());
+  setMMKVString(MMKV_KEYS.CURRENCY_EXCHANGE_LAST_UPDATE, DateTime.now().toISO());
 }
 
 export async function getRate(
@@ -124,7 +127,7 @@ export async function getRateAPI1(
   }
   const lastUpdate = forceNewRate
     ? false
-    : getMMKVString("currencyExchange_lastUpdate");
+    : getMMKVString(MMKV_KEYS.CURRENCY_EXCHANGE_LAST_UPDATE);
   if (lastUpdate) {
     const lastUpdateDateTime = DateTime.fromISO(lastUpdate);
     const now = DateTime.now();
@@ -164,7 +167,9 @@ export async function getRateAPI1(
 
 export function getCachedRate(base: string, target: string) {
   // Get cached rate without logging errors (used when online)
-  const currencyExchange = getMMKVObject("currencyExchange_base_" + base);
+  const currencyExchange = getMMKVObject(
+    MMKV_KEY_PATTERNS.CURRENCY_EXCHANGE_BASE(base)
+  );
   if (currencyExchange && currencyExchange[target]) {
     const rate = currencyExchange[target];
     // Refresh timestamp so offline mode can still rely on this data
@@ -201,7 +206,9 @@ export function getOfflineRate(base: string, target: string) {
     return 1;
   }
   // offline get from asyncstore - only used when truly offline
-  const currencyExchange = getMMKVObject("currencyExchange_base_" + base);
+  const currencyExchange = getMMKVObject(
+    MMKV_KEY_PATTERNS.CURRENCY_EXCHANGE_BASE(base)
+  );
   if (currencyExchange && currencyExchange[target]) {
     return currencyExchange[target];
   } else {

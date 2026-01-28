@@ -1,4 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
+import {
+  trackAsyncFunction,
+  logRender,
+} from "../util/performance";
 import NetInfo from "@react-native-community/netinfo";
 import { createContext } from "react";
 import PropTypes from "prop-types";
@@ -30,13 +34,27 @@ const NetworkContextProvider = ({
   const [strongConnection, setStrongConnection] = useState(false);
   const [lastConnectionSpeedInMbps, setLastConnectionSpeedInMbps] = useState(0);
 
+  // Track renders
+  React.useEffect(() => {
+    logRender("NetworkContextProvider", "state changed", [
+      "isConnected",
+      "strongConnection",
+    ]);
+  });
+
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
       if (DEBUG_FORCE_OFFLINE) {
-        setIsConnected(false);
+        setIsConnected((prev) => (prev ? false : prev));
         return;
       }
-      setIsConnected(state.isInternetReachable);
+      // `isInternetReachable` is often null during startup. Treat null as
+      // "unknown" and fall back to `isConnected` rather than forcing offline.
+      const nextIsConnected =
+        state.isInternetReachable === null
+          ? !!state.isConnected
+          : !!state.isInternetReachable;
+      setIsConnected((prev) => (prev === nextIsConnected ? prev : nextIsConnected));
     });
 
     return () => unsubscribe();
@@ -51,9 +69,18 @@ const NetworkContextProvider = ({
         return;
       }
       async function asyncCheckConnectionSpeed() {
-        const { isFastEnough, speed } = await isConnectionFastEnough();
-        setLastConnectionSpeedInMbps(speed);
-        setStrongConnection(isFastEnough);
+        const { isFastEnough, speed } = await trackAsyncFunction(
+          isConnectionFastEnough,
+          "isConnectionFastEnough",
+          "background-polling"
+        )();
+        // Avoid cascading renders from "same value" updates
+        setLastConnectionSpeedInMbps((prev) => {
+          // Reduce churn from tiny measurement jitter
+          const rounded = Number.isFinite(speed) ? Math.round(speed * 100) / 100 : 0;
+          return prev === rounded ? prev : rounded;
+        });
+        setStrongConnection((prev) => (prev === isFastEnough ? prev : isFastEnough));
       }
       asyncCheckConnectionSpeed();
     },
@@ -61,10 +88,13 @@ const NetworkContextProvider = ({
     true
   );
 
+  const value = useMemo(
+    () => ({ isConnected, strongConnection, lastConnectionSpeedInMbps }),
+    [isConnected, strongConnection, lastConnectionSpeedInMbps]
+  );
+
   return (
-    <NetworkContext.Provider
-      value={{ isConnected, strongConnection, lastConnectionSpeedInMbps }}
-    >
+    <NetworkContext.Provider value={value}>
       {children}
     </NetworkContext.Provider>
   );

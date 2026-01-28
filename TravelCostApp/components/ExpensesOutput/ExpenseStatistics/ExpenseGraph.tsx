@@ -28,6 +28,22 @@ import { getExpensesSumPeriod } from "../../../util/expense";
 import { dynamicScale } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
 
+type ExpenseGraphProps = {
+  periodName: string;
+  longerPeriodNum: number;
+  startingPoint: number;
+  tripCtx: any;
+  navigation: any;
+  onZoomStateChange?: (zoomState: {
+    isLatestVisible: boolean;
+    visiblePeriods: number;
+    minDate: Date | null;
+    maxDate: Date | null;
+  }) => void;
+  refreshing?: boolean;
+  onRefresh?: () => void | Promise<void>;
+};
+
 const ExpenseGraph = ({
   periodName,
   longerPeriodNum,
@@ -35,7 +51,9 @@ const ExpenseGraph = ({
   tripCtx,
   navigation,
   onZoomStateChange,
-}) => {
+  refreshing,
+  onRefresh,
+}: ExpenseGraphProps) => {
   const { isPortrait } = useContext(OrientationContext);
 
   const expenseCtx = useContext(ExpensesContext);
@@ -557,6 +575,8 @@ const ExpenseGraph = ({
           ListFooterComponent={
             <View style={{ height: dynamicScale(200, true) }}></View>
           }
+          refreshing={!!refreshing}
+          onRefresh={onRefresh}
           removeClippedSubviews={true}
           // maxToRenderPerBatch={7}
           updateCellsBatchingPeriod={300}
@@ -588,6 +608,8 @@ ExpenseGraph.propTypes = {
   startingPoint: PropTypes.number,
   setStartingPoint: PropTypes.func,
   onZoomStateChange: PropTypes.func,
+  refreshing: PropTypes.bool,
+  onRefresh: PropTypes.func,
 };
 
 const styles = StyleSheet.create({

@@ -1,6 +1,18 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { createContext, useEffect, useReducer } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+} from "react";
+import {
+  trackAsyncFunction,
+  logFunctionTime,
+  logRender,
+} from "../util/performance";
 import {
   getDateMinusDays,
   getDatePlusDays,
@@ -165,19 +177,26 @@ export const ExpensesContext = createContext<ExpenseContextType>({
     return [];
   },
 
-  loadExpensesFromStorage: async () => {},
+  loadExpensesFromStorage: async () => false,
   // Sync state management defaults
   setIsSyncing: (syncing: boolean) => {},
 });
 
 function expensesReducer(state: ExpenseData[], action) {
+  const toTime = (value: any): number => {
+    if (!value) return 0;
+    if (value instanceof Date) return value.getTime();
+    if (typeof value?.toMillis === "function") return value.toMillis();
+    return new Date(value).getTime();
+  };
+
   switch (action.type) {
     case "ADD":
       return [action.payload, ...state];
     case "SET": {
       const getSortedState = (data: ExpenseData[]) =>
         data.sort((a: ExpenseData, b: ExpenseData) => {
-          return Number(new Date(b.date)) - Number(new Date(a.date));
+          return toTime(b.date) - toTime(a.date);
         });
 
       const sorted = uniqBy(getSortedState(action.payload), "id");
@@ -239,7 +258,7 @@ function expensesReducer(state: ExpenseData[], action) {
       // Sort by date (newest first) and remove duplicates
       const getSortedState = (data: ExpenseData[]) =>
         data.sort((a: ExpenseData, b: ExpenseData) => {
-          return Number(new Date(b.date)) - Number(new Date(a.date));
+          return toTime(b.date) - toTime(a.date);
         });
 
       const sorted = uniqBy(getSortedState(filteredExpenses), "id");
@@ -275,238 +294,372 @@ function expensesReducer(state: ExpenseData[], action) {
   }
 }
 
+// Deduplicate storage reads across concurrent callers / remounts.
+// IMPORTANT: only dedupe the *MMKV read + parsing*, not React state setters.
+let loadExpensesArrayFromStorageInFlight: Promise<ExpenseData[]> | null = null;
+let cachedExpensesArrayFromStorage: ExpenseData[] | null = null;
+
+function readExpensesArrayFromMMKV(): ExpenseData[] {
+  const loadedExpenses = getMMKVObject(MMKV_KEYS.EXPENSES);
+  const expArray: ExpenseData[] = [];
+
+  if (loadedExpenses && Array.isArray(loadedExpenses)) {
+    loadedExpenses.forEach((expense) => {
+      expense.date = new Date(expense.date);
+      expense.startDate = new Date(expense.startDate);
+      expense.endDate = new Date(expense.endDate);
+      expArray.push(expense);
+    });
+  }
+
+  return expArray;
+}
+
 function ExpensesContextProvider({ children }) {
   const [expensesState, dispatch] = useReducer(expensesReducer, []);
   const [isSyncing, setIsSyncing] = React.useState(false);
 
-  useEffect(() => {
-    async function asyncLoadExpenses() {
-      await loadExpensesFromStorage(true);
-    }
-    asyncLoadExpenses();
+  const toJSDate = useCallback((value: any): Date => {
+    if (!value) return new Date(0);
+    if (value instanceof Date) return value;
+    if (typeof value?.toJSDate === "function") return value.toJSDate();
+    return new Date(value);
   }, []);
 
+  const toTime = useCallback(
+    (value: any): number => {
+      const d = toJSDate(value);
+      return d.getTime();
+    },
+    [toJSDate]
+  );
+
+  // Track renders
+  React.useEffect(() => {
+    logRender("ExpensesContextProvider", "state changed", [
+      "expensesState",
+    ]);
+  });
+
+  const hasLoadedFromStorageRef = useRef(false);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
-    // save expenseState in async
-    async function asyncSaveExpenses() {
-      if (expensesState?.length > 0)
-        // await asyncStoreSetObject("expenses", expensesState);
-        setMMKVObject(MMKV_KEYS.EXPENSES, expensesState);
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
     }
-    asyncSaveExpenses();
+
+    if (!expensesState?.length) {
+      return;
+    }
+
+    saveTimeoutRef.current = setTimeout(() => {
+      const startTime = Date.now();
+      setMMKVObject(MMKV_KEYS.EXPENSES, expensesState);
+      logFunctionTime(
+        "asyncSaveExpenses",
+        startTime,
+        Date.now(),
+        "context-update",
+        { expenseCount: expensesState.length }
+      );
+    }, 400);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
   }, [expensesState]);
 
-  function addExpense(expenseData: ExpenseData, id?: string) {
+  const addExpense = useCallback((expenseData: ExpenseData, id?: string) => {
     if (!id) id = new Date().getTime().toString();
     if (!expenseData.id) expenseData.id = id;
     dispatch({ type: "ADD", payload: expenseData });
-  }
+  }, []);
 
-  function setExpenses(expenses: ExpenseData[]) {
+  const setExpenses = useCallback((expenses: ExpenseData[]) => {
     dispatch({ type: "SET", payload: expenses });
-  }
+  }, []);
 
-  function mergeExpenses(newExpenses: ExpenseData[]) {
+  const mergeExpenses = useCallback((newExpenses: ExpenseData[]) => {
     dispatch({ type: "MERGE", payload: newExpenses });
-  }
+  }, []);
 
-  function deleteExpense(id: string) {
-    const expenseToDelete = expensesState.find((expense) => expense.id === id);
+  const deleteExpense = useCallback((id: string) => {
     dispatch({ type: "DELETE", payload: id });
-  }
+  }, []);
 
-  function updateExpense(id: string, expenseData: ExpenseData) {
+  const updateExpense = useCallback((id: string, expenseData: ExpenseData) => {
     dispatch({ type: "UPDATE", payload: { id: id, data: expenseData } });
-  }
+  }, []);
 
-  function updateExpenseId(oldId: string, newId: string) {
+  const updateExpenseId = useCallback((oldId: string, newId: string) => {
     dispatch({ type: "UPDATE_ID", payload: { oldId, newId } });
-  }
+  }, []);
 
-  function getRecentExpenses(rangestring: RangeString) {
-    let expenses = [];
-    switch (rangestring) {
-      case "day":
-        return getDailyExpenses(0);
-      case "week":
-        expenses = getWeeklyExpenses(0).weeklyExpenses;
-        return expenses;
-      case "month":
-        expenses = getMonthlyExpenses(0).monthlyExpenses;
-        return expenses;
-      case "year":
-        expenses = getYearlyExpenses(0).yearlyExpenses;
-        return expenses;
-      case "total":
-        return expensesState;
+  const getYearlyExpenses = useCallback(
+    (yearsBack: number) => {
+      /*
+       *  Returns an object containing the first date, last date of a month and
+       *  the expenses in that range.
+       *  returns {firstDay, lastDay, yearlyExpenses}
+       */
+      const daysBefore = yearsBack * 365;
+      const today = new Date();
 
-      default:
-        return expensesState;
-    }
-  }
-  function getYearlyExpenses(yearsBack: number) {
-    /*
-     *  Returns an object containing the first date, last date of a month and
-     *  the expenses in that range.
-     *  returns {firstDay, lastDay, yearlyExpenses}
-     */
-    const daysBefore = yearsBack * 365;
-    const today = new Date();
+      const dayBack = toJSDate(getDateMinusDays(today, daysBefore));
 
-    const dayBack = getDateMinusDays(today, daysBefore);
-
-    const firstDay = new Date(dayBack.getFullYear(), dayBack.getMonth() - 1, 1);
-
-    const lastDay = new Date(
-      dayBack.getFullYear() + 1,
-      dayBack.getMonth() - 1,
-      0
-    );
-    const yearlyExpenses = expensesState.filter((expense) => {
-      return (
-        !expense.isDeleted &&
-        expense.date >= firstDay &&
-        expense.date <= lastDay
+      const firstDay = new Date(
+        dayBack.getFullYear(),
+        dayBack.getMonth() - 1,
+        1
       );
-    });
-    return { firstDay, lastDay, yearlyExpenses };
-  }
-  function getMonthlyExpenses(monthsBack: number) {
-    /*
-     *  Returns an object containing the first date, last date of a month and
-     *  the expenses in that range.
-     *  returns {firstDay, lastDay, monthlyExpenses}
-     */
-    const daysBefore = monthsBack * 30;
-    const today = new Date();
 
-    const dayBack = getDateMinusDays(today, daysBefore);
-
-    const firstDay = new Date(dayBack.getFullYear(), dayBack.getMonth(), 1);
-
-    const lastDay = new Date(dayBack.getFullYear(), dayBack.getMonth() + 1, 0);
-
-    const monthlyExpenses = expensesState.filter((expense) => {
-      return (
-        !expense.isDeleted &&
-        expense.date >= firstDay &&
-        expense.date <= lastDay
+      const lastDay = new Date(
+        dayBack.getFullYear() + 1,
+        dayBack.getMonth() - 1,
+        0
       );
-    });
-    return { firstDay, lastDay, monthlyExpenses };
-  }
-  function getWeeklyExpenses(weeksBack: number) {
-    /*
-     *  Returns an object containing the first date, last date of a month and
-     *  the expenses in that range.
-     *  returns {firstDay, lastDay, weeklyExpenses}
-     */
-    const daysBefore = weeksBack * 7;
-    const today = new Date();
-
-    const dayBack = getDateMinusDays(today, daysBefore);
-    const prevMonday = getPreviousMondayDate(dayBack);
-    const firstDay = prevMonday;
-    const lastDay = getDatePlusDays(prevMonday, 6);
-    const weeklyExpenses = expensesState.filter((expense) => {
-      return (
-        !expense.isDeleted &&
-        expense.date >= firstDay &&
-        expense.date <= lastDay
-      );
-    });
-    return { firstDay, lastDay, weeklyExpenses };
-  }
-  function getDailyExpenses(daysBack: number) {
-    const today = new Date();
-    const dayBack = getDateMinusDays(today, daysBack);
-    const dayExpenses = expensesState.filter((expense) => {
-      return (
-        !expense.isDeleted &&
-        expense.date.toDateString() === dayBack.toDateString()
-      );
-    });
-
-    return dayExpenses;
-  }
-
-  function getSpecificDayExpenses(date) {
-    const dayExpenses = expensesState.filter((expense) => {
-      return (
-        !expense.isDeleted &&
-        expense.date.toDateString() === date.toDateString()
-      );
-    });
-    return dayExpenses;
-  }
-
-  function getSpecificWeekExpenses(date) {
-    const prevMonday = getPreviousMondayDate(date);
-    const firstDay = prevMonday;
-    const lastDay = getDatePlusDays(prevMonday, 6);
-    const weeklyExpenses = expensesState.filter((expense) => {
-      return (
-        !expense.isDeleted &&
-        expense.date >= firstDay &&
-        expense.date <= lastDay
-      );
-    });
-    return weeklyExpenses;
-  }
-
-  function getSpecificMonthExpenses(date) {
-    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-
-    const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-
-    const monthlyExpenses = expensesState.filter((expense) => {
-      return (
-        !expense.isDeleted &&
-        expense.date >= firstDay &&
-        expense.date <= lastDay
-      );
-    });
-    return monthlyExpenses;
-  }
-
-  function getSpecificYearExpenses(date) {
-    const firstDay = new Date(date.getFullYear(), 0, 1);
-
-    const lastDay = new Date(date.getFullYear(), 11, 31);
-
-    const yearlyExpenses = expensesState.filter((expense) => {
-      return (
-        !expense.isDeleted &&
-        expense.date >= firstDay &&
-        expense.date <= lastDay
-      );
-    });
-    return yearlyExpenses;
-  }
-
-  async function loadExpensesFromStorage(forceLoad = false) {
-    if (!forceLoad && expensesState?.length !== 0) {
-      return false;
-    }
-    // const loadedExpenses = await asyncStoreGetObject("expenses");
-    const loadedExpenses = getMMKVObject(MMKV_KEYS.EXPENSES);
-    const expArray = [];
-    if (loadedExpenses) {
-      loadedExpenses.forEach((expense) => {
-        expense.date = new Date(expense.date);
-        expense.startDate = new Date(expense.startDate);
-        expense.endDate = new Date(expense.endDate);
-        expArray.push(expense);
+      const firstMs = firstDay.getTime();
+      const lastMs = lastDay.getTime();
+      const yearlyExpenses = expensesState.filter((expense) => {
+        const ms = toTime(expense.date);
+        return !expense.isDeleted && ms >= firstMs && ms <= lastMs;
       });
-      setExpenses(expArray);
+      return { firstDay, lastDay, yearlyExpenses };
+    },
+    [expensesState, toJSDate, toTime]
+  );
+
+  const getMonthlyExpenses = useCallback(
+    (monthsBack: number) => {
+      /*
+       *  Returns an object containing the first date, last date of a month and
+       *  the expenses in that range.
+       *  returns {firstDay, lastDay, monthlyExpenses}
+       */
+      const daysBefore = monthsBack * 30;
+      const today = new Date();
+
+      const dayBack = toJSDate(getDateMinusDays(today, daysBefore));
+
+      const firstDay = new Date(dayBack.getFullYear(), dayBack.getMonth(), 1);
+
+      const lastDay = new Date(dayBack.getFullYear(), dayBack.getMonth() + 1, 0);
+
+      const firstMs = firstDay.getTime();
+      const lastMs = lastDay.getTime();
+      const monthlyExpenses = expensesState.filter((expense) => {
+        const ms = toTime(expense.date);
+        return !expense.isDeleted && ms >= firstMs && ms <= lastMs;
+      });
+      return { firstDay, lastDay, monthlyExpenses };
+    },
+    [expensesState, toJSDate, toTime]
+  );
+
+  const getWeeklyExpenses = useCallback(
+    (weeksBack: number) => {
+      /*
+       *  Returns an object containing the first date, last date of a month and
+       *  the expenses in that range.
+       *  returns {firstDay, lastDay, weeklyExpenses}
+       */
+      const daysBefore = weeksBack * 7;
+      const today = new Date();
+
+      const dayBack = toJSDate(getDateMinusDays(today, daysBefore));
+      const prevMonday = toJSDate(getPreviousMondayDate(dayBack));
+      const firstDay = prevMonday;
+      const lastDay = toJSDate(getDatePlusDays(prevMonday, 6));
+      const firstMs = firstDay.getTime();
+      const lastMs = lastDay.getTime();
+      const weeklyExpenses = expensesState.filter((expense) => {
+        const ms = toTime(expense.date);
+        return !expense.isDeleted && ms >= firstMs && ms <= lastMs;
+      });
+      return { firstDay, lastDay, weeklyExpenses };
+    },
+    [expensesState, toJSDate, toTime]
+  );
+
+  const getDailyExpenses = useCallback(
+    (daysBack: number) => {
+      const today = new Date();
+      const dayBack = toJSDate(getDateMinusDays(today, daysBack));
+      const dayBackStr = dayBack.toDateString();
+      const dayExpenses = expensesState.filter((expense) => {
+        const d = toJSDate(expense.date);
+        return (
+          !expense.isDeleted &&
+          d.toDateString() === dayBackStr
+        );
+      });
+
+      return dayExpenses;
+    },
+    [expensesState, toJSDate]
+  );
+
+  const getSpecificDayExpenses = useCallback(
+    (date) => {
+      const day = toJSDate(date);
+      const dayStr = day.toDateString();
+      const dayExpenses = expensesState.filter((expense) => {
+        const d = toJSDate(expense.date);
+        return (
+          !expense.isDeleted &&
+          d.toDateString() === dayStr
+        );
+      });
+      return dayExpenses;
+    },
+    [expensesState, toJSDate]
+  );
+
+  const getSpecificWeekExpenses = useCallback(
+    (date) => {
+      const base = toJSDate(date);
+      const prevMonday = toJSDate(getPreviousMondayDate(base));
+      const firstDay = prevMonday;
+      const lastDay = toJSDate(getDatePlusDays(prevMonday, 6));
+      const firstMs = firstDay.getTime();
+      const lastMs = lastDay.getTime();
+      const weeklyExpenses = expensesState.filter((expense) => {
+        const ms = toTime(expense.date);
+        return (
+          !expense.isDeleted && ms >= firstMs && ms <= lastMs
+        );
+      });
+      return weeklyExpenses;
+    },
+    [expensesState, toJSDate, toTime]
+  );
+
+  const getSpecificMonthExpenses = useCallback(
+    (date) => {
+      const d = toJSDate(date);
+      const firstDay = new Date(d.getFullYear(), d.getMonth(), 1);
+      const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+      const firstMs = firstDay.getTime();
+      const lastMs = lastDay.getTime();
+
+      const monthlyExpenses = expensesState.filter((expense) => {
+        const ms = toTime(expense.date);
+        return (
+          !expense.isDeleted && ms >= firstMs && ms <= lastMs
+        );
+      });
+      return monthlyExpenses;
+    },
+    [expensesState, toJSDate, toTime]
+  );
+
+  const getSpecificYearExpenses = useCallback(
+    (date) => {
+      const d = toJSDate(date);
+      const firstDay = new Date(d.getFullYear(), 0, 1);
+      const lastDay = new Date(d.getFullYear(), 11, 31);
+      const firstMs = firstDay.getTime();
+      const lastMs = lastDay.getTime();
+
+      const yearlyExpenses = expensesState.filter((expense) => {
+        const ms = toTime(expense.date);
+        return (
+          !expense.isDeleted && ms >= firstMs && ms <= lastMs
+        );
+      });
+      return yearlyExpenses;
+    },
+    [expensesState, toJSDate, toTime]
+  );
+
+  const getRecentExpenses = useCallback(
+    (rangestring: RangeString) => {
+      let expenses = [];
+      switch (rangestring) {
+        case "day":
+          return getDailyExpenses(0);
+        case "week":
+          expenses = getWeeklyExpenses(0).weeklyExpenses;
+          return expenses;
+        case "month":
+          expenses = getMonthlyExpenses(0).monthlyExpenses;
+          return expenses;
+        case "year":
+          expenses = getYearlyExpenses(0).yearlyExpenses;
+          return expenses;
+        case "total":
+          return expensesState;
+
+        default:
+          return expensesState;
+      }
+    },
+    [
+      expensesState,
+      getDailyExpenses,
+      getMonthlyExpenses,
+      getWeeklyExpenses,
+      getYearlyExpenses,
+    ]
+  );
+
+  const loadExpensesFromStorage = useCallback(
+    async (forceLoad = false) => {
+      if (!forceLoad && expensesState?.length !== 0) {
+        return false;
+      }
+
+      // If we've already read a large list once, reuse it to avoid repeated parsing.
+      if (!forceLoad && cachedExpensesArrayFromStorage) {
+        setExpenses(cachedExpensesArrayFromStorage);
+        return true;
+      }
+
+      if (!loadExpensesArrayFromStorageInFlight) {
+        loadExpensesArrayFromStorageInFlight = (async () => {
+          try {
+            const expArray = readExpensesArrayFromMMKV();
+            cachedExpensesArrayFromStorage = expArray.length ? expArray : null;
+            return expArray;
+          } finally {
+            loadExpensesArrayFromStorageInFlight = null;
+          }
+        })();
+      }
+
+      const expArray = await loadExpensesArrayFromStorageInFlight;
+      if (expArray?.length) {
+        setExpenses(expArray);
+      }
+      return true;
+    },
+    [expensesState?.length, setExpenses]
+  );
+
+  useEffect(() => {
+    async function asyncLoadExpenses() {
+      if (hasLoadedFromStorageRef.current) return;
+      hasLoadedFromStorageRef.current = true;
+
+      await trackAsyncFunction(
+        loadExpensesFromStorage,
+        "loadExpensesFromStorage",
+        "context-init"
+      )(true);
     }
-    return true;
-  }
+    asyncLoadExpenses();
+  }, [loadExpensesFromStorage]);
 
   // Filter out soft-deleted expenses for display
-  const filteredExpenses = expensesState.filter(
-    (expense) => !expense.isDeleted
+  const filteredExpenses = useMemo(
+    () => expensesState.filter((expense) => !expense.isDeleted),
+    [expensesState]
   );
+
+  // (debug logs removed - kept behavior identical)
 
   // Log filtering results for debugging
   if (expensesState.length !== filteredExpenses.length) {
@@ -518,29 +671,52 @@ function ExpensesContextProvider({ children }) {
     );
   }
 
-  const value = {
-    expenses: filteredExpenses,
-    // Sync loading state
-    isSyncing,
-    addExpense: addExpense,
-    setExpenses: setExpenses,
-    mergeExpenses: mergeExpenses,
-    deleteExpense: deleteExpense,
-    updateExpense: updateExpense,
-    updateExpenseId: updateExpenseId,
-    getRecentExpenses: getRecentExpenses,
-    getYearlyExpenses: getYearlyExpenses,
-    getMonthlyExpenses: getMonthlyExpenses,
-    getWeeklyExpenses: getWeeklyExpenses,
-    getDailyExpenses: getDailyExpenses,
-    getSpecificDayExpenses: getSpecificDayExpenses,
-    getSpecificWeekExpenses: getSpecificWeekExpenses,
-    getSpecificMonthExpenses: getSpecificMonthExpenses,
-    getSpecificYearExpenses: getSpecificYearExpenses,
-    loadExpensesFromStorage: loadExpensesFromStorage,
-    // Sync state management
-    setIsSyncing,
-  };
+  const value = useMemo(
+    () => ({
+      expenses: filteredExpenses,
+      // Sync loading state
+      isSyncing,
+      addExpense,
+      setExpenses,
+      mergeExpenses,
+      deleteExpense,
+      updateExpense,
+      updateExpenseId,
+      getRecentExpenses,
+      getYearlyExpenses,
+      getMonthlyExpenses,
+      getWeeklyExpenses,
+      getDailyExpenses,
+      getSpecificDayExpenses,
+      getSpecificWeekExpenses,
+      getSpecificMonthExpenses,
+      getSpecificYearExpenses,
+      loadExpensesFromStorage,
+      // Sync state management
+      setIsSyncing,
+    }),
+    [
+      filteredExpenses,
+      isSyncing,
+      addExpense,
+      setExpenses,
+      mergeExpenses,
+      deleteExpense,
+      updateExpense,
+      updateExpenseId,
+      getRecentExpenses,
+      getYearlyExpenses,
+      getMonthlyExpenses,
+      getWeeklyExpenses,
+      getDailyExpenses,
+      getSpecificDayExpenses,
+      getSpecificWeekExpenses,
+      getSpecificMonthExpenses,
+      getSpecificYearExpenses,
+      loadExpensesFromStorage,
+      setIsSyncing,
+    ]
+  );
 
   return (
     <ExpensesContext.Provider value={value}>

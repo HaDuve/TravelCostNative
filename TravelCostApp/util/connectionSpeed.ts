@@ -1,4 +1,4 @@
-import NetInfo from "@react-native-community/netinfo";
+import NetInfo, { type NetInfoState } from "@react-native-community/netinfo";
 import axios from "axios";
 import {
   DEBUG_FORCE_OFFLINE,
@@ -12,6 +12,45 @@ export type ConnectionSpeedResult = {
   isFastEnough: boolean;
   speed?: number; // download speed in Mbps
 };
+
+type CachedConnectionSpeed = {
+  value: ConnectionSpeedResult;
+  expiresAtMs: number;
+};
+
+const CONNECTION_SPEED_CACHE_TTL_MS = 60_000;
+const CONNECTION_SPEED_HARD_TIMEOUT_MS = 800;
+
+let cachedResult: CachedConnectionSpeed | null = null;
+let inFlightCheck: Promise<ConnectionSpeedResult> | null = null;
+
+function nowMs(): number {
+  return Date.now();
+}
+
+function getFreshCachedResult(): ConnectionSpeedResult | null {
+  if (!cachedResult) return null;
+  if (cachedResult.expiresAtMs <= nowMs()) return null;
+  return cachedResult.value;
+}
+
+async function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+  onTimeout: () => T,
+): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((resolve) => {
+        timeoutId = setTimeout(() => resolve(onTimeout()), timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+}
 
 async function getConnectionSpeed(): Promise<number> {
   const downloadUrl = "https://jsonplaceholder.typicode.com/todos";
@@ -45,30 +84,96 @@ export async function isConnectionFastEnough(): Promise<ConnectionSpeedResult> {
   if (DEBUG_FORCE_OFFLINE) {
     return { isFastEnough: false, speed: 0 };
   }
-  try {
-    const connectionInfo = await NetInfo.fetch();
-    if (!connectionInfo.isConnected || !connectionInfo.isInternetReachable) {
-      return { isFastEnough: false };
+
+  const cached = getFreshCachedResult();
+  if (cached) return cached;
+
+  if (inFlightCheck) return inFlightCheck;
+
+  inFlightCheck = (async () => {
+    try {
+      const connectionInfo = await withTimeout(
+        NetInfo.fetch(),
+        CONNECTION_SPEED_HARD_TIMEOUT_MS,
+        () =>
+          ({
+            isConnected: true,
+            isInternetReachable: null,
+          }) as unknown as NetInfoState,
+      );
+
+      const isConnected = !!connectionInfo?.isConnected;
+      // Reachability is often null on startup. Treat null as "unknown", not offline.
+      const reachable = connectionInfo?.isInternetReachable;
+      if (!isConnected || reachable === false) {
+        const offlineResult = { isFastEnough: false, speed: 0 };
+        cachedResult = {
+          value: offlineResult,
+          expiresAtMs: nowMs() + CONNECTION_SPEED_CACHE_TTL_MS,
+        };
+        return offlineResult;
+      }
+
+      const speed = await withTimeout(
+        getConnectionSpeed(),
+        CONNECTION_SPEED_HARD_TIMEOUT_MS,
+        () => Number.NaN,
+      );
+
+      // If the speed check timed out (or errored) but we are connected, prefer
+      // not forcing "offline-setup" during startup. We still cache briefly to
+      // avoid repeated long checks.
+      const result: ConnectionSpeedResult = Number.isFinite(speed)
+        ? { isFastEnough: speed >= requiredSpeed, speed }
+        : { isFastEnough: true };
+
+      cachedResult = {
+        value: result,
+        expiresAtMs: nowMs() + CONNECTION_SPEED_CACHE_TTL_MS,
+      };
+      return result;
+    } catch (error) {
+      safeLogError(error);
+      const fallback = { isFastEnough: false, speed: 0 };
+      cachedResult = {
+        value: fallback,
+        expiresAtMs: nowMs() + CONNECTION_SPEED_CACHE_TTL_MS,
+      };
+      return fallback;
+    } finally {
+      inFlightCheck = null;
     }
-    const speed = await getConnectionSpeed();
-    return {
-      isFastEnough: speed >= requiredSpeed,
-      speed: speed,
-    };
-  } catch (error) {
-    safeLogError(error);
-    return { isFastEnough: false, speed: 0 };
-  }
+  })();
+
+  return inFlightCheck;
 }
 
 export async function isConnectionFastEnoughAsBool() {
   if (DEBUG_FORCE_OFFLINE) {
     return false;
   }
-  const connectionInfo = await NetInfo.fetch();
-  if (!connectionInfo.isConnected || !connectionInfo.isInternetReachable) {
+  const cached = getFreshCachedResult();
+  if (cached) return cached.isFastEnough;
+
+  const connectionInfo = await withTimeout(
+    NetInfo.fetch(),
+    CONNECTION_SPEED_HARD_TIMEOUT_MS,
+    () =>
+      ({
+        isConnected: true,
+        isInternetReachable: null,
+      }) as unknown as NetInfoState,
+  );
+  const reachable = connectionInfo?.isInternetReachable;
+  if (!connectionInfo.isConnected || reachable === false) {
     return false;
   }
-  const speed = await getConnectionSpeed();
+
+  const speed = await withTimeout(
+    getConnectionSpeed(),
+    CONNECTION_SPEED_HARD_TIMEOUT_MS,
+    () => Number.NaN,
+  );
+  if (!Number.isFinite(speed)) return true;
   return speed >= requiredSpeed;
 }

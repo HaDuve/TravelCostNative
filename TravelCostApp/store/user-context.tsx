@@ -1,41 +1,33 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable no-empty-function */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   createContext,
   useCallback,
   useEffect,
-  useReducer,
+  useMemo,
   useState,
 } from "react";
+import { trackAsyncFunction, logRender } from "../util/performance";
 import { Alert } from "react-native";
 
 import { i18n } from "../i18n/i18n";
 
-import {
-  asyncStoreGetItem,
-  asyncStoreGetObject,
-  asyncStoreSetItem,
-  asyncStoreSetObject,
-} from "./async-storage";
+import { asyncStoreSetObject } from "./async-storage";
 import {
   ENTITLEMENT_ID,
   isPremiumMember,
 } from "../components/Premium/PremiumConstants";
 import { fetchCategories, fetchTripHistory } from "../util/http";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import PropTypes from "prop-types";
-import NetInfo from "@react-native-community/netinfo";
 import {
   secureStoreGetItem,
   secureStoreGetObject,
   secureStoreSetItem,
-  secureStoreSetObject,
 } from "./secure-storage";
-import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { RangeString } from "./expenses-context";
 import Purchases from "react-native-purchases";
 import safeLogError from "../util/error";
-import set from "react-native-reanimated";
 import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "./mmkv";
 import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
 import { safelyParseJSON } from "../util/jsonParse";
@@ -94,7 +86,7 @@ export type UserContextType = {
 
 export const UserContext = createContext<UserContextType>({
   userName: "",
-  setUserName: async (name: string) => {},
+  setUserName: (name: string) => {},
   periodName: RangeString.day,
   setPeriodString: (string: string) => {},
 
@@ -103,28 +95,28 @@ export const UserContext = createContext<UserContextType>({
   lastCountry: "",
   setLastCountry: (string: string) => {},
 
-  addUserName: async ({ userName }: UserData) => {},
+  addUserName: (userData: UserData) => {},
   deleteUser: (uid: string) => {},
 
   freshlyCreated: false,
-  setFreshlyCreatedTo: async (bool: boolean) => {},
+  setFreshlyCreatedTo: (bool: boolean) => {},
   needsTour: false,
   setNeedsTour: (bool: boolean) => {},
 
   tripHistory: [],
   setTripHistory: (tripHistory: string[]) => {},
-  updateTripHistory: async () => {},
+  updateTripHistory: () => {},
   isOnline: false,
   setIsOnline: (bool: boolean) => {},
-  saveUserNameInStorage: async (name: string) => {},
-  loadUserNameFromStorage: async () => {},
+  saveUserNameInStorage: (name: string) => {},
+  loadUserNameFromStorage: () => {},
   isPremium: false,
   checkPremium: async (): Promise<boolean> => {
     return false;
   },
-  loadCatListFromAsyncInCtx: async (tripid) => {},
+  loadCatListFromAsyncInCtx: (tripid: string) => {},
   catIconNames: [],
-  loadLastCurrencyCountryFromAsync: async () => {},
+  loadLastCurrencyCountryFromAsync: () => {},
   setIsShowingGraph: (bool: boolean) => {},
   isShowingGraph: true,
   isSendingOfflineQueueMutex: false,
@@ -137,18 +129,27 @@ function UserContextProvider({ children }) {
   const [userName, setName] = useState("");
   const [freshlyCreated, setFreshlyCreated] = useState(false);
   const [needsTour, setNeedsTour] = useState(false);
-  const [periodName, setPeriodName] = useState("day");
+  const [periodName, setPeriodName] = useState<RangeString>(RangeString.day);
   const [isOnline, setIsOnline] = useState(false);
   const [lastCurrency, setLastCurrency] = useState("");
   const [lastCountry, setLastCountry] = useState("");
   const [isPremium, setIsPremium] = useState(false);
   // useState for cat iconName list
-  const [catIconNames, setCatIconNames] = useState([]);
+  const [catIconNames, setCatIconNames] = useState<string[]>([]);
   const [isShowingGraph, setIsShowingGraph] = useState(true);
-  const [tripHistory, setTripHistory] = useState([]);
+  const [tripHistory, setTripHistory] = useState<string[]>([]);
   const [isSendingOfflineQueueMutex, setIsSendingOfflineQueueMutex] =
     useState(false);
   const [hasNewChanges, setHasNewChanges] = useState(false);
+
+  // Track renders
+  React.useEffect(() => {
+    logRender("UserContextProvider", "state changed", [
+      "userName",
+      "tripHistory",
+      "catIconNames",
+    ]);
+  });
 
   const loadLastCurrencyCountryFromAsync = useCallback(async () => {
     try {
@@ -168,17 +169,25 @@ function UserContextProvider({ children }) {
     loadLastCurrencyCountryFromAsync();
   }, [loadLastCurrencyCountryFromAsync]);
 
-  async function updateTripHistory() {
-    const uid = await secureStoreGetItem("uid");
+  const updateTripHistory = useCallback(async () => {
+    const uid = await trackAsyncFunction(
+      secureStoreGetItem,
+      "secureStoreGetItem_uid",
+      "context-update",
+    )("uid");
     if (!uid || DEBUG_FORCE_OFFLINE) return;
     try {
-      const tripHistoryResponse = await fetchTripHistory(uid);
+      const tripHistoryResponse = await trackAsyncFunction(
+        fetchTripHistory,
+        "fetchTripHistory",
+        "context-update",
+      )(uid);
       setTripHistory(tripHistoryResponse);
       setMMKVObject(MMKV_KEYS.TRIP_HISTORY, tripHistoryResponse);
     } catch (error) {
       safeLogError(error);
     }
-  }
+  }, []);
   useEffect(() => {
     const storedHistory = getMMKVObject(MMKV_KEYS.TRIP_HISTORY);
     if (storedHistory !== null) {
@@ -186,16 +195,20 @@ function UserContextProvider({ children }) {
     }
     // Trip History fetch async
     async function asyncUpTripHistory() {
-      await updateTripHistory();
+      await trackAsyncFunction(
+        updateTripHistory,
+        "updateTripHistory",
+        "context-init",
+      )();
     }
     asyncUpTripHistory();
-  }, []);
+  }, [updateTripHistory]);
 
-  async function checkPremium() {
+  const checkPremium = useCallback(async () => {
     const isPremiumNow = await isPremiumMember();
     setIsPremium(isPremiumNow);
     return isPremiumNow;
-  }
+  }, []);
   useEffect(() => {
     Purchases.addCustomerInfoUpdateListener((info) => {
       // handle any changes to purchaserInfo
@@ -213,7 +226,7 @@ function UserContextProvider({ children }) {
       try {
         const uid = await secureStoreGetItem("uid");
         const isPremiumString = await secureStoreGetObject(
-          (uid ?? "") + "isPremium"
+          (uid ?? "") + "isPremium",
         );
         if (isPremiumString !== null) {
           const isPremiumNow = safelyParseJSON(isPremiumString);
@@ -246,101 +259,137 @@ function UserContextProvider({ children }) {
    * 1. fetches the category list from the server
    * 2. if tripid == "async", it loads the category list from MMKV Storage
    **/
-  async function fetchOrLoadCatList(tripid: string) {
+  const fetchOrLoadCatList = useCallback(async (tripid: string) => {
     if (tripid == "async") {
       _loadCatListFromMMKV();
       return;
     }
     try {
-      const catList = await fetchCategories(tripid);
+      const catList = await trackAsyncFunction(
+        fetchCategories,
+        "fetchCategories",
+        "context-update",
+      )(tripid);
       setCatIconNames(catList);
     } catch (error) {
       _loadCatListFromMMKV();
     }
-  }
+  }, []);
 
-  function setPeriodString(periodName: string) {
-    setPeriodName(periodName);
-  }
+  const setPeriodString = useCallback((periodName: string) => {
+    setPeriodName(periodName as RangeString);
+  }, []);
 
-  async function addUserName(userData: UserData) {
-    if (!userData || !userData.userName) {
-      return;
-    }
-    setUserName(userData.userName);
-    await saveUserNameInStorage(userData.userName);
-  }
+  const saveUserNameInStorage = useCallback(async (name: string) => {
+    await secureStoreSetItem("userName", name);
+  }, []);
 
-  async function setFreshlyCreatedTo(bool: boolean) {
+  const setUserName = useCallback(
+    async (name: string) => {
+      if (!name || name?.length < 1) return;
+      setName(name);
+      await saveUserNameInStorage(name);
+    },
+    [saveUserNameInStorage],
+  );
+
+  const addUserName = useCallback(
+    async (userData: UserData) => {
+      if (!userData || !userData.userName) {
+        return;
+      }
+      setUserName(userData.userName);
+      await saveUserNameInStorage(userData.userName);
+    },
+    [saveUserNameInStorage, setUserName],
+  );
+
+  const setFreshlyCreatedTo = useCallback(async (bool: boolean) => {
     setFreshlyCreated(bool);
     await asyncStoreSetObject("freshlyCreated", bool);
-  }
+  }, []);
 
-  function deleteUser(id: string) {
+  const deleteUser = useCallback((id: string) => {
     Alert.alert(i18n.t("alertDeleteContextNotImplemented"));
-  }
-  async function setUserName(name: string) {
-    if (!name || name?.length < 1) return;
-    setName(name);
-    await saveUserNameInStorage(name);
-  }
-
-  async function saveUserNameInStorage(name: string) {
-    await secureStoreSetItem("userName", name);
-  }
-
-  async function loadUserNameFromStorage() {
+  }, []);
+  const loadUserNameFromStorage = useCallback(async () => {
     const _userName = await secureStoreGetItem("userName");
     if (_userName) {
       const trimmedName = _userName.replaceAll('"', "").trim();
       setName(trimmedName);
       if (trimmedName != _userName) await saveUserNameInStorage(trimmedName);
     }
-  }
+  }, [saveUserNameInStorage]);
 
-  const value = {
-    userName: userName,
-    setUserName: setUserName,
-    periodName: periodName,
-    setPeriodString: setPeriodString,
+  const value = useMemo(
+    () => ({
+      userName: userName,
+      setUserName: setUserName,
+      periodName: periodName,
+      setPeriodString: setPeriodString,
 
-    freshlyCreated: freshlyCreated,
-    setFreshlyCreatedTo: setFreshlyCreatedTo,
+      lastCurrency: lastCurrency,
+      setLastCurrency: setLastCurrency,
+      lastCountry: lastCountry,
+      setLastCountry: setLastCountry,
 
-    needsTour: needsTour,
-    setNeedsTour: setNeedsTour,
+      addUserName: addUserName,
+      deleteUser: deleteUser,
 
-    tripHistory: tripHistory,
-    setTripHistory: setTripHistory,
+      freshlyCreated: freshlyCreated,
+      setFreshlyCreatedTo: setFreshlyCreatedTo,
+      needsTour: needsTour,
+      setNeedsTour: setNeedsTour,
 
-    lastCurrency: lastCurrency,
-    setLastCurrency: setLastCurrency,
-    lastCountry: lastCountry,
-    setLastCountry: setLastCountry,
+      tripHistory: tripHistory,
+      setTripHistory: setTripHistory,
+      updateTripHistory: updateTripHistory,
 
-    addUserName: addUserName,
-    deleteUser: deleteUser,
-    isOnline: isOnline,
-    setIsOnline: setIsOnline,
-    saveUserNameInStorage: saveUserNameInStorage,
-    loadUserNameFromStorage: loadUserNameFromStorage,
-    // checkConnectionUpdateUser: checkConnectionUpdateUser,
+      isOnline: isOnline,
+      setIsOnline: setIsOnline,
+      saveUserNameInStorage: saveUserNameInStorage,
+      loadUserNameFromStorage: loadUserNameFromStorage,
 
-    isPremium: isPremium,
-    checkPremium: checkPremium,
-    loadCatListFromAsyncInCtx: fetchOrLoadCatList,
-    catIconNames: catIconNames,
+      isPremium: isPremium,
+      checkPremium: checkPremium,
+      loadCatListFromAsyncInCtx: fetchOrLoadCatList,
+      catIconNames: catIconNames,
+      loadLastCurrencyCountryFromAsync: loadLastCurrencyCountryFromAsync,
 
-    loadLastCurrencyCountryFromAsync: loadLastCurrencyCountryFromAsync,
-
-    setIsShowingGraph: setIsShowingGraph,
-    isShowingGraph: isShowingGraph,
-    updateTripHistory: updateTripHistory,
-    isSendingOfflineQueueMutex: isSendingOfflineQueueMutex,
-    setIsSendingOfflineQueueMutex: setIsSendingOfflineQueueMutex,
-    hasNewChanges: hasNewChanges,
-    setHasNewChanges: setHasNewChanges,
-  };
+      setIsShowingGraph: setIsShowingGraph,
+      isShowingGraph: isShowingGraph,
+      isSendingOfflineQueueMutex: isSendingOfflineQueueMutex,
+      setIsSendingOfflineQueueMutex: setIsSendingOfflineQueueMutex,
+      hasNewChanges: hasNewChanges,
+      setHasNewChanges: setHasNewChanges,
+    }),
+    [
+      userName,
+      setUserName,
+      periodName,
+      setPeriodString,
+      lastCurrency,
+      lastCountry,
+      addUserName,
+      deleteUser,
+      freshlyCreated,
+      setFreshlyCreatedTo,
+      needsTour,
+      tripHistory,
+      updateTripHistory,
+      isOnline,
+      isPremium,
+      checkPremium,
+      fetchOrLoadCatList,
+      catIconNames,
+      loadLastCurrencyCountryFromAsync,
+      isShowingGraph,
+      isSendingOfflineQueueMutex,
+      hasNewChanges,
+      loadUserNameFromStorage,
+      saveUserNameInStorage,
+    ],
+  );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }

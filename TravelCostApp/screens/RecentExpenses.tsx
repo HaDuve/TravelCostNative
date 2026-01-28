@@ -33,6 +33,8 @@ import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpensesUtil";
 import { _toShortFormat } from "../util/dateTime";
 import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
+import { trackAsyncFunction, setFPSPhase } from "../util/performance";
+import { useContextTracking } from "../util/performance-hooks";
 import { isForeground } from "../util/appState";
 import { TourGuideZone } from "rn-tourguide";
 import PropTypes from "prop-types";
@@ -63,6 +65,20 @@ function RecentExpenses({ navigation }) {
   const listRef = React.useRef(null);
   useScrollToTop(listRef);
 
+  // Track context changes
+  useContextTracking("RecentExpenses", {
+    expensesCtx,
+    netCtx,
+    tripCtx,
+    userCtx,
+  });
+
+  // Set FPS phase when component mounts
+  React.useEffect(() => {
+    setFPSPhase("screen-load");
+    return () => setFPSPhase("idle");
+  }, []);
+
   //wrap fetchAndSetExpenses in a callback
   const fetchExpenses = useCallback(
     async (
@@ -73,7 +89,7 @@ function RecentExpenses({ navigation }) {
       expensesCtx: ExpenseContextType,
       tripid: string,
       uid: string,
-      tripCtx: TripContextType
+      tripCtx: TripContextType,
     ) => {
       await fetchAndSetExpenses(
         showRefIndicator,
@@ -83,16 +99,16 @@ function RecentExpenses({ navigation }) {
         expensesCtx,
         tripid,
         uid,
-        tripCtx
+        tripCtx,
       );
     },
-    []
+    [],
   );
   const getExpenses = useCallback(
     async (
       showRefIndicator = false,
       showAnyIndicator = false,
-      ignoreTouched = false
+      ignoreTouched = false,
     ) => {
       if (userCtx.freshlyCreated) return;
       // if (ignoreTouched)
@@ -103,23 +119,38 @@ function RecentExpenses({ navigation }) {
       if (!online || queueBlocked || userCtx.isSendingOfflineQueueMutex) {
         // if online, send offline queue
         if (online) {
-          await sendOfflineQueue(
+          await trackAsyncFunction(
+            sendOfflineQueue,
+            "sendOfflineQueue",
+            "screen-load",
+          )(
             userCtx.isSendingOfflineQueueMutex,
             userCtx.setIsSendingOfflineQueueMutex,
-            { updateExpenseId: expensesCtx.updateExpenseId }
+            { updateExpenseId: expensesCtx.updateExpenseId },
           );
           return;
         }
         // if offline, load from storage
         // setIsFetching(true);
         // await test_offlineLoad(expensesCtx, setRefreshing, setIsFetching);
-        await expensesCtx.loadExpensesFromStorage();
+        if (!expensesCtx.expenses?.length) {
+          await trackAsyncFunction(
+            expensesCtx.loadExpensesFromStorage,
+            "loadExpensesFromStorage",
+            "screen-load",
+          )();
+        }
         // setIsFetching(false);
         return;
       }
       // checking isTouched or firstLoad
       const isTouched =
-        ignoreTouched || (await fetchTravelerIsTouched(tripid, uid));
+        ignoreTouched ||
+        (await trackAsyncFunction(
+          fetchTravelerIsTouched,
+          "fetchTravelerIsTouched",
+          "screen-load",
+        )(tripid, uid));
       if (!isTouched) {
         setRefreshing(false);
         setIsFetching(false);
@@ -135,7 +166,7 @@ function RecentExpenses({ navigation }) {
         expensesCtx,
         tripid,
         uid,
-        tripCtx
+        tripCtx,
       );
     },
     [
@@ -148,7 +179,7 @@ function RecentExpenses({ navigation }) {
       uid,
       userCtx.freshlyCreated,
       userCtx.isSendingOfflineQueueMutex,
-    ]
+    ],
   );
 
   useFocusEffect(
@@ -161,7 +192,7 @@ function RecentExpenses({ navigation }) {
         });
         navigation.navigate("Profile");
       }
-    }, [userCtx.freshlyCreated, navigation])
+    }, [userCtx.freshlyCreated, navigation]),
   );
 
   const [isFetching, setIsFetching] = useState(false);
@@ -224,13 +255,23 @@ function RecentExpenses({ navigation }) {
   ]);
 
   const [loadedOnce, setLoadedOnce] = useState(false);
+  const initialLoadInFlightRef = React.useRef(false);
 
   useEffect(() => {
     const asyncLoading = async () => {
       // if expenses not empty, return
-      if (!loadedOnce && !expensesCtx.expenses?.length) {
-        await getExpenses(true, true, true);
-        setLoadedOnce(true);
+      if (
+        !loadedOnce &&
+        !initialLoadInFlightRef.current &&
+        !expensesCtx.expenses?.length
+      ) {
+        initialLoadInFlightRef.current = true;
+        try {
+          await getExpenses(true, true, true);
+          setLoadedOnce(true);
+        } finally {
+          initialLoadInFlightRef.current = false;
+        }
       }
     };
     asyncLoading();
@@ -249,6 +290,7 @@ function RecentExpenses({ navigation }) {
         try {
           await tripCtx.fetchAndSetTravellers(tripCtx.tripid);
         } catch (error) {
+          // ignore - falls back to storage
         }
       } else {
         await tripCtx.loadTravellersFromStorage();
@@ -269,7 +311,7 @@ function RecentExpenses({ navigation }) {
       }
     },
     DEBUG_POLLING_INTERVAL,
-    true
+    true,
   );
 
   const [items, setItems] = useState([
@@ -287,7 +329,7 @@ function RecentExpenses({ navigation }) {
 
   const getRecentExpenses = useMemo(
     () => expensesCtx.getRecentExpenses(PeriodValue),
-    [expensesCtx.expenses?.length, PeriodValue, today]
+    [expensesCtx.expenses?.length, PeriodValue, today],
   );
   const recentExpenses = getRecentExpenses;
 
@@ -297,7 +339,7 @@ function RecentExpenses({ navigation }) {
         if (isNaN(Number(expense.calcAmount))) return sum;
         return sum + Number(expense.calcAmount);
       }, 0),
-    [recentExpenses?.length]
+    [recentExpenses?.length],
   );
   // const expensesSum = useMemo(getExpensesSum, [getExpensesSum]);
   // const expensesSumString = formatExpenseWithCurrency(
@@ -310,6 +352,8 @@ function RecentExpenses({ navigation }) {
       expenses={recentExpenses}
       fallbackText={i18n.t("fallbackTextExpenses")}
       refreshing={refreshing}
+      showSumForTravellerName={undefined}
+      isFiltered={false}
       refreshControl={
         <RefreshControl
           progressViewOffset={dynamicScale(8, true)}
@@ -394,7 +438,9 @@ function RecentExpenses({ navigation }) {
           onSelectItem={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}
-          setValue={userCtx.setPeriodString}
+          setValue={(callback) => {
+            userCtx.setPeriodString(callback(PeriodValue));
+          }}
           setItems={setItems}
           containerStyle={styles.dropdownContainer}
           dropDownContainerStyle={styles.dropdownContainerDropdown}
@@ -484,6 +530,7 @@ const styles = StyleSheet.create({
   dropdownContainer: {
     maxWidth: dynamicScale(170, false, 0.5),
     marginTop: dynamicScale(8, true),
+    backgroundColor: GlobalStyles.colors.backgroundColor,
     ...Platform.select({
       ios: {
         shadowColor: GlobalStyles.colors.textColor,

@@ -8,15 +8,7 @@ import React, {
 import DropDownPicker from "react-native-dropdown-picker";
 import { ExpensesContext } from "../store/expenses-context";
 import { UserContext } from "../store/user-context";
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  RefreshControl,
-  Pressable,
-} from "react-native";
+import { Platform, StyleSheet, Text, View, Pressable } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
 import { MemoizedExpensesOverview } from "../components/ExpensesOutput/ExpensesOverview";
@@ -47,6 +39,8 @@ import { getOfflineQueue } from "../util/offline-queue";
 import { AuthContext } from "../store/auth-context";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
+import { trackAsyncFunction, setFPSPhase } from "../util/performance";
+import { useContextTracking } from "../util/performance-hooks";
 
 const OverviewScreen = ({ navigation }) => {
   const expensesCtx = useContext(ExpensesContext);
@@ -61,6 +55,20 @@ const OverviewScreen = ({ navigation }) => {
   const [open, setOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+
+  // Track context changes
+  useContextTracking("OverviewScreen", {
+    expensesCtx,
+    tripCtx,
+    userCtx,
+    netCtx,
+  });
+
+  // Set FPS phase when component mounts
+  React.useEffect(() => {
+    setFPSPhase("screen-load");
+    return () => setFPSPhase("idle");
+  }, []);
 
   const [dateTimeString, setDateTimeString] = useState("");
   // strong connection state
@@ -96,7 +104,7 @@ const OverviewScreen = ({ navigation }) => {
         });
         navigation.navigate("Profile");
       }
-    }, [userCtx.freshlyCreated, navigation])
+    }, [userCtx.freshlyCreated, navigation]),
   );
 
   useFocusEffect(
@@ -108,7 +116,7 @@ const OverviewScreen = ({ navigation }) => {
         };
         showBanner(navigation, onboardingFlags);
       }
-    }, [navigation, userCtx.freshlyCreated, userCtx.needsTour])
+    }, [navigation, userCtx.freshlyCreated, userCtx.needsTour]),
   );
 
   useEffect(() => {
@@ -131,7 +139,7 @@ const OverviewScreen = ({ navigation }) => {
       setDateTimeString(_toShortFormat(DateTime.now()));
     }, []),
     DEBUG_POLLING_INTERVAL * 13,
-    true
+    true,
   );
 
   const [items, setItems] = useState([
@@ -145,6 +153,7 @@ const OverviewScreen = ({ navigation }) => {
   const onRefresh = useCallback(async () => {
     // Track refresh
     trackEvent(VexoEvents.EXPENSES_REFRESHED);
+    setFPSPhase("data-loading");
 
     // check if we have a offline queue
     const offlineQueue = await getOfflineQueue();
@@ -171,7 +180,7 @@ const OverviewScreen = ({ navigation }) => {
 
   const recentExpenses: Array<ExpenseData> = useMemo(
     () => expensesCtx.getRecentExpenses(PeriodValue),
-    [PeriodValue, expensesCtx.expenses, dateTimeString]
+    [PeriodValue, expensesCtx.expenses, dateTimeString],
   );
   // const expensesSum = recentExpenses.reduce((sum, expense) => {
   //   if (isNaN(Number(expense.calcAmount))) return sum;
@@ -258,26 +267,15 @@ const OverviewScreen = ({ navigation }) => {
         ></View>
       }
 
-      <ScrollView
-        style={{ flex: 1 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing || isFetching}
-            onRefresh={onRefresh}
-            tintColor={GlobalStyles.colors.textColor}
-            colors={[GlobalStyles.colors.textColor]}
-            style={{
-              backgroundColor: "transparent",
-            }}
-          />
-        }
-      >
+      <View style={{ flex: 1 }}>
         <MemoizedExpensesOverview
           navigation={navigation}
           expenses={recentExpenses}
           periodName={PeriodValue}
+          refreshing={refreshing || isFetching}
+          onRefresh={onRefresh}
         />
-      </ScrollView>
+      </View>
 
       {/* FAB Toggle Button */}
       <TourGuideZone

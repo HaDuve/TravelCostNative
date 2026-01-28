@@ -34,7 +34,11 @@ export async function fetchAndSetExpenses(
       },
     };
 
-    let expenses = await getAllExpenses(tripid, uid, true, syncLoadingCallback);
+    // If we currently have no local expenses, do a full sync (useDelta=false).
+    // Delta sync can legitimately return only a small set of changes, which
+    // would leave the UI showing 0–1 items after a cold start.
+    const useDelta = (expensesCtx.expenses?.length ?? 0) > 0;
+    let expenses = await getAllExpenses(tripid, uid, useDelta, syncLoadingCallback);
     expenses = expenses.filter((expense) => !isNaN(Number(expense.calcAmount)));
 
     if (expenses && expenses?.length !== 0) {

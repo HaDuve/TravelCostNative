@@ -34,6 +34,13 @@ import {
   dataResponseTime,
   updateUser,
 } from "./util/http";
+import {
+  trackAsyncFunction,
+  startFPSMonitoring,
+  stopFPSMonitoring,
+  setFPSPhase,
+} from "./util/performance";
+import { printPerformanceReport } from "./util/performance-report";
 import TripContextProvider, {
   TripContext,
   TripData,
@@ -391,7 +398,7 @@ function Home() {
   const expenses = expCtx.expenses;
   const hasExp = expenses?.length > 0;
   const hasExpensesWithSplit = expenses?.some(
-    (exp: ExpenseData) => exp.splitList?.length > 0
+    (exp: ExpenseData) => exp.splitList?.length > 0,
   );
   const validSplitSummary = hasExp && hasExpensesWithSplit;
   return (
@@ -399,6 +406,7 @@ function Home() {
       initialRouteName={FirstScreen}
       backBehavior={"history"}
       tabBarPosition={"bottom"}
+      lazy
       screenOptions={() => ({
         headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
         headerTintColor: GlobalStyles.colors.backgroundColor,
@@ -526,6 +534,10 @@ function Root() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
   const [onlineSetupDone, setOnlineSetupDone] = useState(false);
+  const nextOnlineSetupCheckAtRef = React.useRef(0);
+  const onlineSetupBackoffMsRef = React.useRef(
+    Math.round(DEBUG_POLLING_INTERVAL * 1.7),
+  );
 
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
@@ -535,12 +547,18 @@ function Root() {
   // check regularly
   useInterval(
     () => {
+      // Defer background polling until first paint is complete
+      if (!appIsReady) return;
       if (isForeground() && authCtx.isAuthenticated) {
         const asyncQueue = async () => {
-          await sendOfflineQueue(
+          await trackAsyncFunction(
+            sendOfflineQueue,
+            "sendOfflineQueue",
+            "background-polling",
+          )(
             userCtx.isSendingOfflineQueueMutex,
             userCtx.setIsSendingOfflineQueueMutex,
-            { updateExpenseId: expensesCtx.updateExpenseId }
+            { updateExpenseId: expensesCtx.updateExpenseId },
           );
         };
         asyncQueue();
@@ -548,28 +566,65 @@ function Root() {
         const delayedOnlineSetup = async () => {
           if (userCtx.freshlyCreated) return;
           if (!onlineSetupDone) {
-            const { isFastEnough } = await isConnectionFastEnough();
+            const now = Date.now();
+            if (now < nextOnlineSetupCheckAtRef.current) return;
+            const { isFastEnough } = await trackAsyncFunction(
+              isConnectionFastEnough,
+              "isConnectionFastEnough",
+              "background-polling",
+            )();
             if (isFastEnough) {
+              // reset backoff on success
+              onlineSetupBackoffMsRef.current = Math.round(
+                DEBUG_POLLING_INTERVAL * 1.7,
+              );
               //prepare online setup
-              const storedUid = await secureStoreGetItem("uid");
+              const storedUid = await trackAsyncFunction(
+                secureStoreGetItem,
+                "secureStoreGetItem_uid",
+                "background-polling",
+              )("uid");
               if (!storedUid) return;
-              const checkUser = await fetchUser(storedUid);
+              const checkUser = await trackAsyncFunction(
+                fetchUser,
+                "fetchUser",
+                "background-polling",
+              )(storedUid);
               if (!checkUser) return;
               const tripid = checkUser.currentTrip;
               const locale = checkUser.locale;
               if (!locale) {
                 checkUser.locale = i18n.locale;
-                await updateUser(storedUid, checkUser);
+                await trackAsyncFunction(
+                  updateUser,
+                  "updateUser",
+                  "background-polling",
+                )(storedUid, checkUser);
               }
-              const tripData: TripData =
-                await tripCtx.fetchAndSetCurrentTrip(tripid);
+              const tripData: TripData = await trackAsyncFunction(
+                tripCtx.fetchAndSetCurrentTrip,
+                "fetchAndSetCurrentTrip",
+                "background-polling",
+              )(tripid);
               if (!tripData) return;
               try {
                 setOnlineSetupDone(true);
-                await onlineSetup(tripData, checkUser, tripid, storedUid);
+                await trackAsyncFunction(
+                  onlineSetup,
+                  "delayedOnlineSetup",
+                  "background-polling",
+                )(tripData, checkUser, tripid, storedUid);
               } catch (error) {
                 setOnlineSetupDone(false);
               }
+            } else {
+              // Simple backoff so we don't re-check speed constantly when slow/unknown
+              nextOnlineSetupCheckAtRef.current =
+                now + onlineSetupBackoffMsRef.current;
+              onlineSetupBackoffMsRef.current = Math.min(
+                onlineSetupBackoffMsRef.current * 2,
+                5 * 60 * 1000,
+              );
             }
           }
         };
@@ -578,7 +633,7 @@ function Root() {
       }
     },
     DEBUG_POLLING_INTERVAL * 1.7,
-    false
+    false,
   );
 
   const showModalIfNeeded = async () => {
@@ -591,7 +646,7 @@ function Root() {
     tripData: TripData,
     checkUser: UserData,
     storedTripId: string,
-    storedUid: string
+    storedUid: string,
   ) {
     const userData: UserData = checkUser;
     const tripid = userData.currentTrip;
@@ -599,46 +654,130 @@ function Root() {
       return;
     }
     // save user Name in Ctx and async
-    await loadKeys();
+    await trackAsyncFunction(loadKeys, "loadKeys", "startup")();
     try {
-      await userCtx.addUserName(userData);
-      await tripCtx.setCurrentTrip(tripid, tripData);
-      await userCtx.loadCatListFromAsyncInCtx(tripid);
-      await touchMyTraveler(storedTripId, storedUid);
+      await trackAsyncFunction(
+        userCtx.addUserName,
+        "addUserName",
+        "startup",
+      )(userData);
+      await trackAsyncFunction(
+        tripCtx.setCurrentTrip,
+        "setCurrentTrip",
+        "startup",
+      )(tripid, tripData);
+      await trackAsyncFunction(
+        userCtx.loadCatListFromAsyncInCtx,
+        "loadCatListFromAsyncInCtx",
+        "startup",
+      )(tripid);
+      await trackAsyncFunction(
+        touchMyTraveler,
+        "touchMyTraveler",
+        "startup",
+      )(storedTripId, storedUid);
     } catch (error) {
-      await tripCtx.loadTripDataFromStorage();
+      await trackAsyncFunction(
+        tripCtx.loadTripDataFromStorage,
+        "loadTripDataFromStorage",
+        "startup",
+      )();
     }
   }
 
   async function setupOfflineMount(
     isOfflineMode: boolean,
-    storedToken: string
+    storedToken: string,
   ) {
     if (!isOfflineMode) {
       return null;
     }
     try {
-      await userCtx.loadUserNameFromStorage();
-      await tripCtx.loadTripDataFromStorage();
-      await tripCtx.loadTravellersFromStorage();
-      await userCtx.loadCatListFromAsyncInCtx("async");
-      await authCtx.authenticate(storedToken);
+      await trackAsyncFunction(
+        userCtx.loadUserNameFromStorage,
+        "loadUserNameFromStorage",
+        "startup",
+      )();
+      await trackAsyncFunction(
+        tripCtx.loadTripDataFromStorage,
+        "loadTripDataFromStorage",
+        "startup",
+      )();
+      await trackAsyncFunction(
+        tripCtx.loadTravellersFromStorage,
+        "loadTravellersFromStorage",
+        "startup",
+      )();
+      await trackAsyncFunction(
+        userCtx.loadCatListFromAsyncInCtx,
+        "loadCatListFromAsyncInCtx",
+        "startup",
+      )("async");
+      await trackAsyncFunction(
+        authCtx.authenticate,
+        "authenticate",
+        "startup",
+      )(storedToken);
     } catch (error) {}
   }
 
   useEffect(() => {
+    // Start FPS monitoring
+    setFPSPhase("startup");
+    startFPSMonitoring("startup");
+
+    // Stop FPS monitoring and generate report after 5 minutes
+    const reportTimer = setTimeout(
+      () => {
+        stopFPSMonitoring();
+        setFPSPhase("idle");
+        printPerformanceReport();
+      },
+      5 * 60 * 1000,
+    ); // 5 minutes
+
     async function onRootMount() {
-      await handleFirstStart();
-      if (DEBUG_RESET_STORAGE) await asyncStoreSafeClear();
+      await trackAsyncFunction(
+        handleFirstStart,
+        "handleFirstStart",
+        "startup",
+      )();
+      if (DEBUG_RESET_STORAGE)
+        await trackAsyncFunction(
+          asyncStoreSafeClear,
+          "asyncStoreSafeClear",
+          "startup",
+        )();
       // offline check and set context
-      const { isFastEnough } = await isConnectionFastEnough();
+      const { isFastEnough } = await trackAsyncFunction(
+        isConnectionFastEnough,
+        "isConnectionFastEnough",
+        "startup",
+      )();
       const online = isFastEnough;
-      if (isFastEnough) await versionCheck();
+      if (isFastEnough)
+        await trackAsyncFunction(versionCheck, "versionCheck", "startup")();
       // fetch token and trip
-      const storedToken = await secureStoreGetItem("token");
-      const storedUid = await secureStoreGetItem("uid");
-      const storedTripId = await secureStoreGetItem("currentTripId");
-      const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
+      const storedToken = await trackAsyncFunction(
+        secureStoreGetItem,
+        "secureStoreGetItem_token",
+        "startup",
+      )("token");
+      const storedUid = await trackAsyncFunction(
+        secureStoreGetItem,
+        "secureStoreGetItem_uid",
+        "startup",
+      )("uid");
+      const storedTripId = await trackAsyncFunction(
+        secureStoreGetItem,
+        "secureStoreGetItem_tripId",
+        "startup",
+      )("currentTripId");
+      const freshlyCreated = await trackAsyncFunction(
+        asyncStoreGetObject,
+        "asyncStoreGetObject_freshlyCreated",
+        "startup",
+      )("freshlyCreated");
 
       let REVCAT_G, REVCAT_A, VEXO;
       try {
@@ -647,8 +786,8 @@ function Root() {
         const timeoutPromise = new Promise((_, reject) =>
           setTimeout(
             () => reject(new Error("loadKeys timeout after 5 seconds")),
-            5000
-          )
+            5000,
+          ),
         );
 
         const keys = (await Promise.race([
@@ -681,24 +820,46 @@ function Root() {
           });
         }
         Purchases.setLogLevel(Purchases.LOG_LEVEL.ERROR);
-        await Purchases.collectDeviceIdentifiers();
+        await trackAsyncFunction(
+          () => Purchases.collectDeviceIdentifiers(),
+          "Purchases.collectDeviceIdentifiers",
+          "startup",
+        )();
 
         // Initialize Vexo for error and session tracking
         try {
-          const vexoInitialized = await initializeVexo(VEXO);
+          const vexoInitialized = await trackAsyncFunction(
+            initializeVexo,
+            "initializeVexo",
+            "startup",
+          )(VEXO);
           if (vexoInitialized) {
-            await identifyUser(storedUid);
+            await trackAsyncFunction(
+              identifyUser,
+              "identifyUser",
+              "startup",
+            )(storedUid);
           }
         } catch (vexoError) {
           safeLogError(vexoError, "App.tsx", 692);
         }
 
-        const needsTour = await loadTourConfig();
+        const needsTour = await trackAsyncFunction(
+          loadTourConfig,
+          "loadTourConfig",
+          "startup",
+        )();
         userCtx.setNeedsTour(needsTour);
 
         // check if user is online
         if (!online) {
-          await setupOfflineMount(true, storedToken);
+          setFPSPhase("offline-setup");
+          await trackAsyncFunction(
+            setupOfflineMount,
+            "setupOfflineMount",
+            "startup",
+          )(true, storedToken);
+          setFPSPhase("ready");
           setAppIsReady(true);
           return;
         }
@@ -706,8 +867,16 @@ function Root() {
         // set tripId in context
         let tripData;
         if (storedTripId) {
-          tripData = await tripCtx.fetchAndSetCurrentTrip(storedTripId);
-          await tripCtx.fetchAndSetTravellers(storedTripId);
+          tripData = await trackAsyncFunction(
+            tripCtx.fetchAndSetCurrentTrip,
+            "fetchAndSetCurrentTrip",
+            "startup",
+          )(storedTripId);
+          await trackAsyncFunction(
+            tripCtx.fetchAndSetTravellers,
+            "fetchAndSetTravellers",
+            "startup",
+          )(storedTripId);
           tripCtx.setTripid(storedTripId);
         } else {
           Toast.show({
@@ -726,7 +895,11 @@ function Root() {
           await userCtx.setFreshlyCreatedTo(freshlyCreated);
         }
         // check if user was deleted
-        const checkUser = await fetchUser(storedUid);
+        const checkUser = await trackAsyncFunction(
+          fetchUser,
+          "fetchUser",
+          "startup",
+        )(storedUid);
         if (!checkUser.userName) {
           Toast.show({
             type: "error",
@@ -742,9 +915,25 @@ function Root() {
           await userCtx.setFreshlyCreatedTo(true);
         }
         // setup context
-        await authCtx.setUserID(storedUid);
-        await onlineSetup(tripData, checkUser, storedTripId, storedUid);
-        await authCtx.authenticate(storedToken);
+        await trackAsyncFunction(
+          authCtx.setUserID,
+          "setUserID",
+          "startup",
+        )(storedUid);
+        setFPSPhase("online-setup");
+        await trackAsyncFunction(onlineSetup, "onlineSetup", "startup")(
+          tripData,
+          checkUser,
+          storedTripId,
+          storedUid,
+        );
+        setFPSPhase("authentication");
+        await trackAsyncFunction(
+          authCtx.authenticate,
+          "authenticate",
+          "startup",
+        )(storedToken);
+        setFPSPhase("ready");
         setAppIsReady(true);
       } else {
         tripCtx.setIsLoading(false);
@@ -754,10 +943,14 @@ function Root() {
       }
       setAppIsReady(true);
     }
-    const test_onRootMount = dataResponseTime(onRootMount);
+    const trackedOnRootMount = trackAsyncFunction(
+      onRootMount,
+      "onRootMount",
+      "startup",
+    );
 
     try {
-      test_onRootMount();
+      trackedOnRootMount();
     } catch (error) {
       safeLogError(error);
       setAppIsReady(true);
@@ -769,6 +962,11 @@ function Root() {
         setAppIsReady(true);
       }
     }, 10000);
+
+    return () => {
+      clearTimeout(reportTimer);
+      stopFPSMonitoring();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

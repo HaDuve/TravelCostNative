@@ -1,7 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import React, { createContext, useEffect, useState } from "react";
+/* eslint-disable no-empty-function */
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import PropTypes from "prop-types";
 import { fetchTrip, fetchUser, getTravellers, updateTrip } from "../util/http";
+import {
+  trackAsyncFunction,
+  logFunctionTime,
+  logRender,
+} from "../util/performance";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 import { MAX_JS_NUMBER } from "../confAppConstants";
 import { secureStoreGetItem } from "./secure-storage";
@@ -60,7 +73,7 @@ export type TripContextType = {
   saveTripDataInStorage: (tripData: TripData) => Promise<void>;
   loadTripDataFromStorage: () => Promise<TripData>;
   saveTravellersInStorage: (travellers) => Promise<void>;
-  loadTravellersFromStorage: () => Promise<void>;
+  loadTravellersFromStorage: () => Promise<Traveller[]>;
   fetchAndSettleCurrentTrip: () => Promise<void>;
   setTripUnsettled: () => Promise<void>;
   isPaid: isPaidString;
@@ -105,7 +118,7 @@ export const TripContext = createContext<TripContextType>({
     return {} as TripData;
   },
   saveTravellersInStorage: async (travellers) => {},
-  loadTravellersFromStorage: async () => {},
+  loadTravellersFromStorage: async () => [],
   fetchAndSettleCurrentTrip: async () => {},
   setTripUnsettled: async () => {},
   isPaid: isPaidString.notPaid,
@@ -131,20 +144,46 @@ function TripContextProvider({ children }) {
   const [isPaid, setIsPaid] = useState(isPaidString.notPaid);
   const [isPaidDate, setIsPaidDate] = useState("");
   const [isPaidTimestamp, setIsPaidTimestamp] = useState<number | undefined>(
-    undefined
+    undefined,
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isDynamicDailyBudget, setIsDynamicDailyBudget] = useState(false);
 
-  async function loadTripidFetchTrip() {
-    const stored_tripid = await secureStoreGetItem("currentTripId");
-    const stored_uid = await secureStoreGetItem("uid");
+  // Track renders
+  React.useEffect(() => {
+    logRender("TripContextProvider", "state changed", [
+      "tripid",
+      "tripName",
+      "totalBudget",
+      "totalSum",
+    ]);
+  });
+
+  const loadTripidFetchTrip = useCallback(async () => {
+    const stored_tripid = await trackAsyncFunction(
+      secureStoreGetItem,
+      "secureStoreGetItem_tripId",
+      "context-polling",
+    )("currentTripId");
+    const stored_uid = await trackAsyncFunction(
+      secureStoreGetItem,
+      "secureStoreGetItem_uid",
+      "context-polling",
+    )("uid");
     if (!(stored_tripid || stored_uid)) return;
     setTripid(stored_tripid ?? "");
-    const { isFastEnough } = await isConnectionFastEnough();
+    const { isFastEnough } = await trackAsyncFunction(
+      isConnectionFastEnough,
+      "isConnectionFastEnough",
+      "context-polling",
+    )();
     if (isFastEnough) {
       try {
-        const checkUser = await fetchUser(stored_uid);
+        const checkUser = await trackAsyncFunction(
+          fetchUser,
+          "fetchUser",
+          "context-polling",
+        )(stored_uid);
         const fetched_tripid = checkUser.currentTrip;
         await fetchAndSetCurrentTrip(fetched_tripid ?? stored_tripid);
         await fetchAndSetTravellers(fetched_tripid ?? stored_tripid);
@@ -156,14 +195,15 @@ function TripContextProvider({ children }) {
       setIsLoading(false);
     }
     setIsLoading(false);
-  }
+  }, [isLoading, tripid, tripName]);
 
   useEffect(() => {
     function calcDynamicDailyBudget() {
+      const startTime = Date.now();
       if (isDynamicDailyBudget) {
         const daysLeft = Math.floor(
           (new Date(endDate).getTime() - new Date().getTime()) /
-            (1000 * 3600 * 24)
+            (1000 * 3600 * 24),
         );
         const totalBudgetLeft = Number(totalBudget) - Number(totalSum);
         const dailyBudget = totalBudgetLeft / daysLeft;
@@ -175,6 +215,12 @@ function TripContextProvider({ children }) {
           setdailyBudget(dailyBudget.toFixed(2));
         }
       }
+      logFunctionTime(
+        "calcDynamicDailyBudget",
+        startTime,
+        Date.now(),
+        "context-update",
+      );
     }
     calcDynamicDailyBudget();
   }, [isDynamicDailyBudget, totalBudget, totalSum, endDate]);
@@ -190,33 +236,42 @@ function TripContextProvider({ children }) {
       loadTripidFetchTrip();
     },
     2000,
-    true
+    true,
   );
 
   useEffect(() => {
     async function loadAsyncTravellers() {
-      const travellers = await asyncStoreGetObject("currentTravellers");
-      if (travellers) {
-        setTravellers(travellers);
-      }
+      await trackAsyncFunction(
+        asyncStoreGetObject,
+        "loadAsyncTravellers",
+        "context-init",
+      )("currentTravellers").then((travellers) => {
+        if (travellers) {
+          setTravellers(travellers);
+        }
+      });
     }
     loadAsyncTravellers();
   }, []);
 
   useEffect(() => {
     if (!travellers || (travellers?.length === 0 && tripid)) {
-      fetchAndSetTravellers(tripid);
+      trackAsyncFunction(
+        fetchAndSetTravellers,
+        "fetchAndSetTravellers",
+        "context-update",
+      )(tripid);
     }
   }, [travellers, tripid]);
 
-  function setTripProgress(percent: number) {
+  const setTripProgress = useCallback((percent: number) => {
     if (percent < 0 || percent > 1) percent = 1;
     setProgress(percent);
-  }
+  }, []);
   //
-  function refresh() {
-    setRefreshState(!refreshState);
-  }
+  const refresh = useCallback(() => {
+    setRefreshState((prev) => !prev);
+  }, []);
 
   /**
    * Migrates trip data from old settlement system (isPaidDate) to new system (isPaidTimestamp).
@@ -242,116 +297,134 @@ function TripContextProvider({ children }) {
     return trip;
   }
 
-  async function fetchAndSetTravellers(tripid: string): Promise<boolean> {
-    await loadTravellersFromStorage();
-    const { isFastEnough } = await isConnectionFastEnough();
-    if (!isFastEnough || !tripid || tripid === "") return false;
-    try {
-      const travellers = await getTravellers(tripid);
-      if (travellers?.length < 1) throw new Error("no travellers found");
-      saveTravellersInStorage(travellers);
-      setTravellers(travellers);
-      return true;
-    } catch (error) {
-      safeLogError(error);
-      return false;
-    }
-  }
+  const fetchAndSetTravellers = useCallback(
+    async (tripid: string): Promise<boolean> => {
+      await loadTravellersFromStorage();
+      const { isFastEnough } = await isConnectionFastEnough();
+      if (!isFastEnough || !tripid || tripid === "") return false;
+      try {
+        const travellers = await getTravellers(tripid);
+        if (travellers?.length < 1) throw new Error("no travellers found");
+        saveTravellersInStorage(travellers);
+        setTravellers(travellers);
+        return true;
+      } catch (error) {
+        safeLogError(error);
+        return false;
+      }
+    },
+    [],
+  );
 
-  async function setCurrentTrip(tripid: string, trip: TripData) {
-    if (!trip) return;
-    if (tripid === "reset") {
-      _setTripid("");
-      setTripName("");
-      setTotalBudget("");
-      setTripCurrency("");
-      setdailyBudget("");
-      setTravellers([]);
-      setStartDate("");
-      setEndDate("");
-      setIsPaid(isPaidString.notPaid);
-      setIsPaidDate("");
-      setIsPaidTimestamp(undefined);
-      setTotalSumTrip(0);
-      setIsLoading(false);
-      return;
-    }
-
-    // Migrate trip data from old settlement system
-    const migratedTrip = migrateTripSettlementData(trip);
-
-    _setTripid(tripid);
-    setTripName(migratedTrip.tripName);
-    setTotalBudget(
-      migratedTrip.totalBudget
-        ? migratedTrip.totalBudget.toString()
-        : MAX_JS_NUMBER.toString()
-    );
-    setTripCurrency(migratedTrip.tripCurrency);
-    // negative Numbers are not allowed
-    if (Number(migratedTrip.dailyBudget) < 0) {
-      setdailyBudget("0.0001");
-    } else {
-      setdailyBudget(migratedTrip.dailyBudget.toString());
-    }
-    setStartDate(migratedTrip.startDate);
-    setEndDate(migratedTrip.endDate);
-    setIsPaid(migratedTrip.isPaid ?? isPaidString.notPaid);
-    setIsPaidDate(migratedTrip.isPaidDate);
-    setIsPaidTimestamp(migratedTrip.isPaidTimestamp);
-    setTotalSumTrip(migratedTrip.totalSum);
-    setIsLoading(false);
-    setIsDynamicDailyBudget(migratedTrip.isDynamicDailyBudget);
-    if (typeof trip.travellers[1] === "string") {
-      setTravellers(trip.travellers);
-    } else {
-      const extractedTravellers = [];
-      Object.keys(trip.travellers).forEach((key) => {
-        //skip undefined keys
-        if (key && travellers[key]) {
-          extractedTravellers.push(travellers[key]["userName"]);
-        }
-      });
-      setTravellers(extractedTravellers);
-    }
-  }
-
-  function setTotalSum(amount: number) {
-    setTotalSumTrip(amount);
-  }
-
-  async function fetchAndSetCurrentTrip(tripid: string) {
-    if (!tripid) return;
-    const { isFastEnough } = await isConnectionFastEnough();
-    if (!isFastEnough) return;
-    try {
-      const trip: TripData = await fetchTrip(tripid);
-      if (!trip) throw new Error("no trip found");
-      trip.tripid = tripid;
+  const setCurrentTrip = useCallback(
+    async (tripid: string, trip: TripData) => {
+      if (!trip) return;
+      if (tripid === "reset") {
+        _setTripid("");
+        setTripName("");
+        setTotalBudget("");
+        setTripCurrency("");
+        setdailyBudget("");
+        setTravellers([]);
+        setStartDate("");
+        setEndDate("");
+        setIsPaid(isPaidString.notPaid);
+        setIsPaidDate("");
+        setIsPaidTimestamp(undefined);
+        setTotalSumTrip(0);
+        setIsLoading(false);
+        return;
+      }
 
       // Migrate trip data from old settlement system
       const migratedTrip = migrateTripSettlementData(trip);
 
-      await setCurrentTrip(tripid, migratedTrip);
-
-      // If migration occurred, save migrated trip back to database and storage
-      if (
-        trip.isPaidDate &&
-        !trip.isPaidTimestamp &&
-        migratedTrip.isPaidTimestamp
-      ) {
-        await saveTripDataInStorage(migratedTrip);
-        await updateTrip(tripid, migratedTrip);
+      _setTripid(tripid);
+      setTripName(migratedTrip.tripName);
+      setTotalBudget(
+        migratedTrip.totalBudget
+          ? migratedTrip.totalBudget.toString()
+          : MAX_JS_NUMBER.toString(),
+      );
+      setTripCurrency(migratedTrip.tripCurrency);
+      // negative Numbers are not allowed
+      if (Number(migratedTrip.dailyBudget) < 0) {
+        setdailyBudget("0.0001");
       } else {
-        await saveTripDataInStorage(migratedTrip);
+        setdailyBudget(migratedTrip.dailyBudget.toString());
       }
-      return migratedTrip;
-    } catch (error) {
-      safeLogError(error);
-    }
-  }
+      setStartDate(migratedTrip.startDate);
+      setEndDate(migratedTrip.endDate);
+      setIsPaid(migratedTrip.isPaid ?? isPaidString.notPaid);
+      setIsPaidDate(migratedTrip.isPaidDate);
+      setIsPaidTimestamp(migratedTrip.isPaidTimestamp);
+      setTotalSumTrip(migratedTrip.totalSum);
+      setIsLoading(false);
+      setIsDynamicDailyBudget(migratedTrip.isDynamicDailyBudget);
+      if (typeof trip.travellers[1] === "string") {
+        setTravellers(trip.travellers);
+      } else {
+        const extractedTravellers = [];
+        Object.keys(trip.travellers).forEach((key) => {
+          //skip undefined keys
+          if (key && travellers[key]) {
+            extractedTravellers.push(travellers[key]["userName"]);
+          }
+        });
+        setTravellers(extractedTravellers);
+      }
+    },
+    [travellers],
+  );
 
-  async function fetchAndSettleCurrentTrip() {
+  const setTotalSum = useCallback((amount: number) => {
+    setTotalSumTrip(amount);
+  }, []);
+
+  const fetchAndSetCurrentTrip = useCallback(
+    async (tripid: string) => {
+      if (!tripid) return;
+      const { isFastEnough } = await isConnectionFastEnough();
+      if (!isFastEnough) return;
+      try {
+        const trip: TripData = await fetchTrip(tripid);
+        if (!trip) throw new Error("no trip found");
+        trip.tripid = tripid;
+
+        // Migrate trip data from old settlement system
+        const migratedTrip = migrateTripSettlementData(trip);
+
+        // Avoid unnecessary updates if trip hasn't changed
+        if (
+          tripid === getcurrentTrip().tripid &&
+          migratedTrip.totalSum === getcurrentTrip().totalSum &&
+          migratedTrip.tripName === getcurrentTrip().tripName
+        ) {
+          return migratedTrip;
+        }
+
+        await setCurrentTrip(tripid, migratedTrip);
+
+        // If migration occurred, save migrated trip back to database and storage
+        if (
+          trip.isPaidDate &&
+          !trip.isPaidTimestamp &&
+          migratedTrip.isPaidTimestamp
+        ) {
+          await saveTripDataInStorage(migratedTrip);
+          await updateTrip(tripid, migratedTrip);
+        } else {
+          await saveTripDataInStorage(migratedTrip);
+        }
+        return migratedTrip;
+      } catch (error) {
+        safeLogError(error);
+      }
+    },
+    [setCurrentTrip],
+  );
+
+  const fetchAndSettleCurrentTrip = useCallback(async () => {
     try {
       const trip = await fetchTrip(tripid);
       trip.isPaid = isPaidString.paid;
@@ -366,9 +439,9 @@ function TripContextProvider({ children }) {
       safeLogError(error);
       throw error;
     }
-  }
+  }, [tripid, setCurrentTrip]);
 
-  async function setTripUnsettled() {
+  const setTripUnsettled = useCallback(async () => {
     try {
       const trip = await fetchTrip(tripid);
       trip.isPaid = isPaidString.notPaid;
@@ -380,9 +453,9 @@ function TripContextProvider({ children }) {
     } catch (error) {
       safeLogError(error);
     }
-  }
+  }, [tripid, setCurrentTrip]);
 
-  function getcurrentTrip() {
+  const getcurrentTrip = useCallback(() => {
     const curTripData: TripData = {
       tripid: tripid,
       tripName: tripName,
@@ -400,22 +473,37 @@ function TripContextProvider({ children }) {
       isDynamicDailyBudget: isDynamicDailyBudget,
     };
     return curTripData;
-  }
+  }, [
+    tripid,
+    tripName,
+    totalBudget,
+    dailyBudget,
+    tripCurrency,
+    totalSum,
+    isPaid,
+    isPaidDate,
+    isPaidTimestamp,
+    progress,
+    startDate,
+    endDate,
+    travellers,
+    isDynamicDailyBudget,
+  ]);
 
-  function _setTripid(tripid: string) {
+  const _setTripid = useCallback((tripid: string) => {
     setTripid(tripid);
-  }
+  }, []);
 
   function addTrip() {}
   function deleteTrip() {}
 
-  async function saveTripDataInStorage(tripData: TripData) {
+  const saveTripDataInStorage = useCallback(async (tripData: TripData) => {
     // cut away the trip.expenses array
     tripData.expenses = [];
     setMMKVObject(MMKV_KEYS.CURRENT_TRIP, tripData);
-  }
+  }, []);
 
-  async function loadTripDataFromStorage() {
+  const loadTripDataFromStorage = useCallback(async () => {
     const tripData: TripData = getMMKVObject(MMKV_KEYS.CURRENT_TRIP);
     if (tripData) {
       // Migrate trip data from old settlement system
@@ -425,7 +513,7 @@ function TripContextProvider({ children }) {
       setTotalBudget(
         migratedTrip.totalBudget
           ? migratedTrip.totalBudget.toString()
-          : MAX_JS_NUMBER.toString()
+          : MAX_JS_NUMBER.toString(),
       );
 
       setTripCurrency(migratedTrip.tripCurrency);
@@ -456,58 +544,98 @@ function TripContextProvider({ children }) {
     } else {
       setIsLoading(false);
     }
-  }
+  }, []);
 
-  async function saveTravellersInStorage(travellers) {
+  const saveTravellersInStorage = useCallback(async (travellers) => {
     await asyncStoreSetObject("currentTravellers", travellers);
-  }
+  }, []);
 
-  async function loadTravellersFromStorage(): Promise<Traveller[]> {
+  const loadTravellersFromStorage = useCallback(async (): Promise<
+    Traveller[]
+  > => {
     const travellers = await asyncStoreGetObject("currentTravellers");
     if (travellers) {
       setTravellers(travellers);
     }
     return travellers;
-  }
+  }, []);
 
-  const value = {
-    tripid: tripid,
-    tripName: tripName,
-    totalBudget: totalBudget,
-    dailyBudget: dailyBudget,
-    setdailyBudget: setdailyBudget,
-    tripCurrency: tripCurrency,
-    totalSum: totalSum,
-    tripProgress: progress,
-    startDate: startDate,
-    endDate: endDate,
-    refresh: refresh,
-    refreshState: refreshState,
-    setTripProgress: setTripProgress,
-    travellers: travellers,
-    fetchAndSetTravellers: fetchAndSetTravellers,
-    setTotalSum: setTotalSum,
-    setTripid: _setTripid,
-    addTrip: addTrip,
-    deleteTrip: deleteTrip,
-    getcurrentTrip: getcurrentTrip,
-    setCurrentTrip: setCurrentTrip,
-    fetchAndSetCurrentTrip: fetchAndSetCurrentTrip,
-    saveTripDataInStorage: saveTripDataInStorage,
-    loadTripDataFromStorage: loadTripDataFromStorage,
-    saveTravellersInStorage: saveTravellersInStorage,
-    loadTravellersFromStorage: loadTravellersFromStorage,
-    fetchAndSettleCurrentTrip: fetchAndSettleCurrentTrip,
-    setTripUnsettled: setTripUnsettled,
-    isPaid: isPaid,
-    isPaidDate: isPaidDate,
-    isPaidTimestamp: isPaidTimestamp,
-    isLoading: isLoading,
-    setIsLoading: setIsLoading,
-    isDynamicDailyBudget: isDynamicDailyBudget,
-  };
+  const value = useMemo(
+    () => ({
+      tripid: tripid,
+      tripName: tripName,
+      totalBudget: totalBudget,
+      dailyBudget: dailyBudget,
+      setdailyBudget: setdailyBudget,
+      tripCurrency: tripCurrency,
+      totalSum: totalSum,
+      tripProgress: progress,
+      startDate: startDate,
+      endDate: endDate,
+      refresh: refresh,
+      refreshState: refreshState,
+      setTripProgress: setTripProgress,
+      travellers: travellers,
+      fetchAndSetTravellers: fetchAndSetTravellers,
+      setTotalSum: setTotalSum,
+      setTripid: _setTripid,
+      addTrip: addTrip,
+      deleteTrip: deleteTrip,
+      getcurrentTrip: getcurrentTrip,
+      setCurrentTrip: setCurrentTrip,
+      fetchAndSetCurrentTrip: fetchAndSetCurrentTrip,
+      saveTripDataInStorage: saveTripDataInStorage,
+      loadTripDataFromStorage: loadTripDataFromStorage,
+      saveTravellersInStorage: saveTravellersInStorage,
+      loadTravellersFromStorage: loadTravellersFromStorage,
+      fetchAndSettleCurrentTrip: fetchAndSettleCurrentTrip,
+      setTripUnsettled: setTripUnsettled,
+      isPaid: isPaid,
+      isPaidDate: isPaidDate,
+      isPaidTimestamp: isPaidTimestamp,
+      isLoading: isLoading,
+      setIsLoading: setIsLoading,
+      isDynamicDailyBudget: isDynamicDailyBudget,
+    }),
+    [
+      tripid,
+      tripName,
+      totalBudget,
+      dailyBudget,
+      tripCurrency,
+      totalSum,
+      progress,
+      startDate,
+      endDate,
+      refresh,
+      refreshState,
+      setTripProgress,
+      travellers,
+      fetchAndSetTravellers,
+      setTotalSum,
+      _setTripid,
+      getcurrentTrip,
+      setCurrentTrip,
+      fetchAndSetCurrentTrip,
+      saveTripDataInStorage,
+      loadTripDataFromStorage,
+      saveTravellersInStorage,
+      loadTravellersFromStorage,
+      fetchAndSettleCurrentTrip,
+      setTripUnsettled,
+      isPaid,
+      isPaidDate,
+      isPaidTimestamp,
+      isLoading,
+      isDynamicDailyBudget,
+    ],
+  );
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>;
 }
 
 export default TripContextProvider;
+
+TripContextProvider.propTypes = {
+  children: PropTypes.node,
+};

@@ -20,7 +20,21 @@ import { OrientationContext } from "../../store/orientation-context";
 import { useSwipe } from "../Hooks/useSwipe";
 import { toDayMonthString } from "../../util/date";
 
-const ExpensesOverview = ({ navigation, expenses, periodName }) => {
+type ExpensesOverviewProps = {
+  navigation: any;
+  expenses: any[];
+  periodName: string;
+  refreshing?: boolean;
+  onRefresh?: () => void | Promise<void>;
+};
+
+const ExpensesOverview = ({
+  navigation,
+  expenses,
+  periodName,
+  refreshing,
+  onRefresh,
+}: ExpensesOverviewProps) => {
   const tripCtx = useContext(TripContext);
   const { isPortrait } = useContext(OrientationContext);
   // const periodRangeNumber = useRef(7);
@@ -133,6 +147,8 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           longerPeriodNum={longerPeriodNum}
           startingPoint={startingPoint}
           onZoomStateChange={handleZoomStateChange}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
         />
       )}
       {!isGraphNotPie && toggleGraphEnum == 0 && (
@@ -184,6 +200,8 @@ ExpensesOverview.propTypes = {
   expenses: PropTypes.array.isRequired,
   periodName: PropTypes.string.isRequired,
   navigation: PropTypes.object.isRequired,
+  refreshing: PropTypes.bool,
+  onRefresh: PropTypes.func,
 };
 
 const styles = StyleSheet.create({

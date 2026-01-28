@@ -55,7 +55,13 @@ export interface Keys {
   VEXO: string;
 }
 
+let cachedKeys: Keys | null = null;
+
 export async function loadKeys(): Promise<Keys> {
+  if (cachedKeys) {
+    return cachedKeys;
+  }
+
   const { isFastEnough } = await isConnectionFastEnough();
   // fetch revcat api key
   let REVCAT_G = await secureStoreGetItem("REVCAT_G");
@@ -65,12 +71,31 @@ export async function loadKeys(): Promise<Keys> {
   let FREEEXCHANGE = await secureStoreGetItem("FREEEXCHANGE");
   let BRAN = await secureStoreGetItem("BRAN");
   let VEXO = await secureStoreGetItem("VEXO");
-  if (!isFastEnough)
-    return { REVCAT_G, REVCAT_A, OPENAI, EXCHANGE, FREEEXCHANGE, BRAN, VEXO };
+  if (!isFastEnough) {
+    cachedKeys = {
+      REVCAT_G,
+      REVCAT_A,
+      OPENAI,
+      EXCHANGE,
+      FREEEXCHANGE,
+      BRAN,
+      VEXO,
+    };
+    return cachedKeys;
+  }
 
   const data = await fetchServerInfo();
   if (!data) {
-    return { REVCAT_G, REVCAT_A, OPENAI, EXCHANGE, FREEEXCHANGE, BRAN, VEXO };
+    cachedKeys = {
+      REVCAT_G,
+      REVCAT_A,
+      OPENAI,
+      EXCHANGE,
+      FREEEXCHANGE,
+      BRAN,
+      VEXO,
+    };
+    return cachedKeys;
   }
 
   await secureStoreSetItem("REVCAT_G", data.REVCAT_G);
@@ -87,5 +112,16 @@ export async function loadKeys(): Promise<Keys> {
   FREEEXCHANGE = data.FREEEXCHANGE;
   BRAN = data.BRAN;
   VEXO = data.VEXO;
-  return { REVCAT_G, REVCAT_A, OPENAI, EXCHANGE, FREEEXCHANGE, BRAN, VEXO };
+
+  cachedKeys = {
+    REVCAT_G,
+    REVCAT_A,
+    OPENAI,
+    EXCHANGE,
+    FREEEXCHANGE,
+    BRAN,
+    VEXO,
+  };
+
+  return cachedKeys;
 }

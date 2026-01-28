@@ -96,6 +96,7 @@ import {
   clearExpenseDraft,
   IDCat,
   clearExpenseCat,
+  MMKV_KEYS,
 } from "../../store/mmkv";
 import ExpenseCountryFlag from "../ExpensesOutput/ExpenseCountryFlag";
 import { Platform } from "react-native";
@@ -788,7 +789,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       if (inputIdentifier === "description" && pickedCat === "undefined") {
         const mappedCategory = mapDescriptionToCategory(
           enteredValue,
-          getMMKVObject("categoryList") ?? DEFAULTCATEGORIES,
+          getMMKVObject(MMKV_KEYS.CATEGORY_LIST) ?? DEFAULTCATEGORIES,
           last500Daysexpenses
         );
         if (mappedCategory) {

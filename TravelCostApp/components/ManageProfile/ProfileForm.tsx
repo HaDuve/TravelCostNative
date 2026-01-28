@@ -18,7 +18,7 @@ import * as Haptics from "expo-haptics";
 import PropTypes from "prop-types";
 import { ExpensesContext } from "../../store/expenses-context";
 import { asyncStoreSafeClear } from "../../store/async-storage";
-import { getMMKVString } from "../../store/mmkv";
+import { getMMKVString, MMKV_KEYS } from "../../store/mmkv";
 import { NetworkContext } from "../../store/network-context";
 import { OrientationContext } from "../../store/orientation-context";
 import { dynamicScale } from "../../util/scalingUtil";
@@ -66,7 +66,7 @@ const ProfileForm = ({ navigation, setIsFetchingLogout }) => {
       const newestChangelog = await fetchChangelog();
       if (!newestChangelog) return;
       userCtx.setHasNewChanges(true);
-      const oldChangelog = getMMKVString("changelog.txt");
+      const oldChangelog = getMMKVString(MMKV_KEYS.CHANGELOG_TXT);
       if (oldChangelog == newestChangelog) userCtx.setHasNewChanges(false);
     }
     checkNewChanges();

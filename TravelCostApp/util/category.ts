@@ -3,7 +3,7 @@ import { GlobalStyles } from "../constants/styles";
 import { asyncStoreGetObject } from "../store/async-storage";
 import { CATEGORY_KEYWORDS } from "./categoryKeywords";
 import { ExpenseData } from "./expense";
-import { getMMKVObject } from "../store/mmkv";
+import { getMMKVObject, MMKV_KEYS } from "../store/mmkv";
 
 // interface of category objects with id, name, iconName and color
 export interface Category {
@@ -48,7 +48,7 @@ export function getCatSymbol(cat: string) {
 }
 
 export function getCatSymbolMMKV(cat: string) {
-  const catList = getMMKVObject("categoryList");
+  const catList = getMMKVObject(MMKV_KEYS.CATEGORY_LIST);
   if (catList) {
     const catObj: Category = catList.find(
       (catObj: Category) => catObj.catString === cat || catObj.icon === cat

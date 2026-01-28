@@ -14,7 +14,7 @@ import { i18n } from "../../i18n/i18n";
 import * as Progress from "react-native-progress";
 import BackgroundGradient from "./BackgroundGradient";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { getMMKVString, setMMKVString } from "../../store/mmkv";
+import { getMMKVString, MMKV_KEYS, setMMKVString } from "../../store/mmkv";
 import { DEVELOPER_MODE } from "../../confAppConstants";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { formatExpenseWithCurrency } from "../../util/string";
@@ -390,10 +390,10 @@ const toastConfig: ToastConfig = {
 };
 
 function isCalledToday() {
-  const bannerTime = getMMKVString("BannerTime");
+  const bannerTime = getMMKVString(MMKV_KEYS.BANNER_TIME);
   const today = new Date();
   const bannerDate = new Date(bannerTime);
-  setMMKVString("BannerTime", today.toISOString());
+  setMMKVString(MMKV_KEYS.BANNER_TIME, today.toISOString());
   if (DEVELOPER_MODE || !bannerTime) return false;
   if (
     today.getDate() === bannerDate.getDate() &&

@@ -9,7 +9,7 @@ import { ExpenseData, isPaidString } from "../util/expense";
 import { Traveller } from "../util/traveler";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
 import { useInterval } from "../components/Hooks/useInterval";
-import { setMMKVObject, getMMKVObject } from "./mmkv";
+import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "./mmkv";
 import { Category } from "../util/category";
 import safeLogError from "../util/error";
 
@@ -412,11 +412,11 @@ function TripContextProvider({ children }) {
   async function saveTripDataInStorage(tripData: TripData) {
     // cut away the trip.expenses array
     tripData.expenses = [];
-    setMMKVObject("currentTrip", tripData);
+    setMMKVObject(MMKV_KEYS.CURRENT_TRIP, tripData);
   }
 
   async function loadTripDataFromStorage() {
-    const tripData: TripData = getMMKVObject("currentTrip");
+    const tripData: TripData = getMMKVObject(MMKV_KEYS.CURRENT_TRIP);
     if (tripData) {
       // Migrate trip data from old settlement system
       const migratedTrip = migrateTripSettlementData(tripData);

@@ -36,7 +36,7 @@ import { RangeString } from "./expenses-context";
 import Purchases from "react-native-purchases";
 import safeLogError from "../util/error";
 import set from "react-native-reanimated";
-import { getMMKVObject, setMMKVObject } from "./mmkv";
+import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "./mmkv";
 import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
 import { safelyParseJSON } from "../util/jsonParse";
 
@@ -174,13 +174,13 @@ function UserContextProvider({ children }) {
     try {
       const tripHistoryResponse = await fetchTripHistory(uid);
       setTripHistory(tripHistoryResponse);
-      setMMKVObject("tripHistory", tripHistoryResponse);
+      setMMKVObject(MMKV_KEYS.TRIP_HISTORY, tripHistoryResponse);
     } catch (error) {
       safeLogError(error);
     }
   }
   useEffect(() => {
-    const storedHistory = getMMKVObject("tripHistory");
+    const storedHistory = getMMKVObject(MMKV_KEYS.TRIP_HISTORY);
     if (storedHistory !== null) {
       setTripHistory(storedHistory);
     }
@@ -229,7 +229,7 @@ function UserContextProvider({ children }) {
 
   function _loadCatListFromMMKV() {
     try {
-      const categoryList = getMMKVObject("categoryList");
+      const categoryList = getMMKVObject(MMKV_KEYS.CATEGORY_LIST);
       if (categoryList !== null) {
         setCatIconNames(categoryList);
         return;

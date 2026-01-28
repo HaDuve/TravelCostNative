@@ -1,4 +1,4 @@
-import { getMMKVString, setMMKVString } from "../store/mmkv";
+import { getMMKVString, MMKV_KEY_PATTERNS, setMMKVString } from "../store/mmkv";
 
 /**
  * Simple timestamp management for expenses fetch
@@ -21,7 +21,7 @@ function isValidTimestamp(timestamp: any): timestamp is number {
  */
 export function getLastFetchTimestamp(tripid: string): number {
   try {
-    const stored = getMMKVString(`lastFetch_${tripid}`);
+    const stored = getMMKVString(MMKV_KEY_PATTERNS.LAST_FETCH(tripid));
     if (!stored || stored === "") {
       return 0;
     }
@@ -47,7 +47,7 @@ export function setLastFetchTimestamp(tripid: string, timestamp: number): void {
       console.error("Invalid timestamp provided:", timestamp);
       return;
     }
-    setMMKVString(`lastFetch_${tripid}`, timestamp.toString());
+    setMMKVString(MMKV_KEY_PATTERNS.LAST_FETCH(tripid), timestamp.toString());
   } catch (error) {
     console.error("Error setting last fetch timestamp:", error);
   }
@@ -59,7 +59,7 @@ export function setLastFetchTimestamp(tripid: string, timestamp: number): void {
  */
 export function clearLastFetchTimestamp(tripid: string): void {
   try {
-    setMMKVString(`lastFetch_${tripid}`, "0");
+    setMMKVString(MMKV_KEY_PATTERNS.LAST_FETCH(tripid), "0");
   } catch (error) {
     console.error("Error clearing last fetch timestamp:", error);
   }

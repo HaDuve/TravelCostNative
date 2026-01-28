@@ -34,7 +34,11 @@ import {
 } from "../../util/expense";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { daysBetween } from "../../util/date";
-import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
+import {
+  getMMKVObject,
+  MMKV_KEY_PATTERNS,
+  setMMKVObject,
+} from "../../store/mmkv";
 import safeLogError from "../../util/error";
 import { getTripData } from "../../util/trip";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
@@ -93,7 +97,7 @@ function TripHistoryItem({ tripid, trips }) {
         progress: progress,
         days: days,
       };
-      setMMKVObject("tripHistoryItem" + `_${tripid}`, trip);
+      setMMKVObject(MMKV_KEY_PATTERNS.TRIP_HISTORY_ITEM(tripid), trip);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -113,7 +117,7 @@ function TripHistoryItem({ tripid, trips }) {
 
   function loadTripHistoryItem(tripid: string) {
     const trip: TripHistoryItemType = getMMKVObject(
-      "tripHistoryItem" + `_${tripid}`
+      MMKV_KEY_PATTERNS.TRIP_HISTORY_ITEM(tripid)
     );
     if (trip) {
       setTripName(trip.tripName);

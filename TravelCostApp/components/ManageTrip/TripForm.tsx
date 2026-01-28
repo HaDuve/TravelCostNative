@@ -49,7 +49,7 @@ import { secureStoreSetItem } from "../../store/secure-storage";
 import BackButton from "../UI/BackButton";
 import { onShare } from "../ProfileOutput/ShareTrip";
 import { NetworkContext } from "../../store/network-context";
-import { getMMKVObject, setMMKVObject } from "../../store/mmkv";
+import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "../../store/mmkv";
 import { useTourGuideController } from "rn-tourguide";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { Switch } from "react-native-paper";
@@ -290,7 +290,7 @@ const TripForm = ({ navigation, route }) => {
         const expenses = await getAllExpenses(editedTripId, uid);
         setLoadingProgress(9);
         expenseCtx.setExpenses([...expenses]);
-        setMMKVObject("expenses", expenses);
+        setMMKVObject(MMKV_KEYS.EXPENSES, expenses);
         tripCtx.setdailyBudget(tripData.dailyBudget);
         return;
       }
@@ -306,7 +306,7 @@ const TripForm = ({ navigation, route }) => {
 
   async function createTripData(tripData: TripData) {
     setLoadingProgress(1);
-    const currentCategories = getMMKVObject("categoryList");
+    const currentCategories = getMMKVObject(MMKV_KEYS.CATEGORY_LIST);
     // auto convert current categories into  new trips data
     // stored online as a stringified array
     if (currentCategories)
@@ -329,7 +329,7 @@ const TripForm = ({ navigation, route }) => {
 
     await secureStoreSetItem("currentTripId", tripid);
     // await asyncStoreSetObject("expenses", []);
-    setMMKVObject("expenses", []);
+    setMMKVObject(MMKV_KEYS.EXPENSES, []);
 
     // the following context state functions are unnecessary as long as we reload
     try {
@@ -369,7 +369,7 @@ const TripForm = ({ navigation, route }) => {
     });
     setLoadingProgress(9);
     expenseCtx.setExpenses([]);
-    setMMKVObject("expenses", []);
+    setMMKVObject(MMKV_KEYS.EXPENSES, []);
 
     // Tourguide
     await userCtx.setFreshlyCreatedTo(false);

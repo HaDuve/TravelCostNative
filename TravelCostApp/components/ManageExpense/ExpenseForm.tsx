@@ -798,9 +798,17 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     },
     [pickedCat, updateCategoryAndIcon, last500Daysexpenses]
   );
+  // Keep debounced instance stable while always calling latest autoCategory
+  const autoCategoryRef = useRef(autoCategory);
+  useEffect(() => {
+    autoCategoryRef.current = autoCategory;
+  }, [autoCategory]);
   const debouncedAutoCategory = useMemo(
-    () => callDebounced(autoCategory, 250),
-    [autoCategory]
+    () =>
+      callDebounced((inputIdentifier: string, enteredValue: string) => {
+        autoCategoryRef.current(inputIdentifier, enteredValue);
+      }, 250),
+    []
   );
 
   // Helper function to save current form state to draft storage

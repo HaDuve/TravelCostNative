@@ -20,6 +20,7 @@ import { i18n } from "../i18n/i18n";
 import React from "react";
 import { TourGuideZone, useTourGuideController } from "rn-tourguide";
 import { useInterval } from "../components/Hooks/useInterval";
+import { useLazyLoading } from "../components/Hooks/useLazyLoading";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { AuthContext } from "../store/auth-context";
 import { secureStoreGetItem } from "../store/secure-storage";
@@ -107,6 +108,7 @@ async function storeToken() {
 }
 
 const ProfileScreen = ({ navigation }) => {
+  const { shouldRender, LoadingComponent } = useLazyLoading();
   const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
   const authCtx = useContext(AuthContext);
@@ -390,6 +392,10 @@ const ProfileScreen = ({ navigation }) => {
       </View>
     </>
   );
+
+  if (!shouldRender) {
+    return LoadingComponent;
+  }
 
   if (isFetchingLogout)
     return (

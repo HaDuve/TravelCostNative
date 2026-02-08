@@ -29,6 +29,7 @@ import { DateTime } from "luxon";
 import { i18n } from "../i18n/i18n";
 
 import { useInterval } from "../components/Hooks/useInterval";
+import { useLazyLoading } from "../components/Hooks/useLazyLoading";
 import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpensesUtil";
 import { _toShortFormat } from "../util/dateTime";
@@ -50,6 +51,7 @@ import { OrientationContext } from "../store/orientation-context";
 import { refreshWithToast } from "../util/refreshWithToast";
 
 function RecentExpenses({ navigation }) {
+  const { shouldRender, LoadingComponent } = useLazyLoading();
   const expensesCtx = useContext(ExpensesContext);
   const authCtx = useContext(AuthContext);
   const uid = authCtx.uid;
@@ -327,6 +329,10 @@ function RecentExpenses({ navigation }) {
       }
     />
   );
+  if (!shouldRender) {
+    return LoadingComponent;
+  }
+
   if (error && !isFetching) {
     return <ErrorOverlay message={error} onConfirm={errorHandler} />;
   }

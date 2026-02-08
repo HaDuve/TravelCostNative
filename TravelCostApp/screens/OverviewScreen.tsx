@@ -30,6 +30,7 @@ import { _toShortFormat } from "../util/dateTime";
 import PropTypes from "prop-types";
 import { NetworkContext } from "../store/network-context";
 import { useInterval } from "../components/Hooks/useInterval";
+import { useLazyLoading } from "../components/Hooks/useLazyLoading";
 import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { ExpenseData } from "../util/expense";
 import * as Haptics from "expo-haptics";
@@ -49,6 +50,7 @@ import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 
 const OverviewScreen = ({ navigation }) => {
+  const { shouldRender, LoadingComponent } = useLazyLoading();
   const expensesCtx = useContext(ExpensesContext);
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
@@ -182,6 +184,11 @@ const OverviewScreen = ({ navigation }) => {
   //   tripCtx.tripCurrency
   // );
   const { isPortrait, isTablet } = useContext(OrientationContext);
+
+  if (!shouldRender) {
+    return LoadingComponent;
+  }
+
   return (
     <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
       <View

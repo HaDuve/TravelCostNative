@@ -43,12 +43,14 @@ import { useFocusEffect } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { Pressable, ScrollView } from "react-native";
 import { dynamicScale } from "../util/scalingUtil";
+import { useLazyLoading } from "../components/Hooks/useLazyLoading";
 import { OrientationContext } from "../store/orientation-context";
 import safeLogError from "../util/error";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 
 const SplitSummaryScreen = ({ navigation }) => {
+  const { shouldRender, LoadingComponent } = useLazyLoading();
   const {
     tripid,
     tripCurrency,
@@ -393,6 +395,10 @@ const SplitSummaryScreen = ({ navigation }) => {
       )}
     </View>
   );
+
+  if (!shouldRender) {
+    return LoadingComponent;
+  }
 
   if (error && !isFetching) {
     return <ErrorOverlay message={error} onConfirm={errorHandler} />;

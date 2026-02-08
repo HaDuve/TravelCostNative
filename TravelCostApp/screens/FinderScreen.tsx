@@ -17,6 +17,7 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { Checkbox } from "react-native-paper";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
+import { useLazyLoading } from "../components/Hooks/useLazyLoading";
 import Autocomplete from "../components/UI/Autocomplete";
 import GradientButton from "../components/UI/GradientButton";
 import IconButton from "../components/UI/IconButton";
@@ -39,6 +40,7 @@ import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 
 const FinderScreen = () => {
+  const { shouldRender, LoadingComponent } = useLazyLoading();
   const navigation = useNavigation();
   const expCtx = useContext(ExpensesContext);
   const userCtx = useContext(UserContext);
@@ -284,6 +286,10 @@ const FinderScreen = () => {
         ...cats.slice(0, 1),
         ...suggestionData.slice(0, 1),
       ];
+
+  if (!shouldRender) {
+    return LoadingComponent;
+  }
 
   return (
     <>

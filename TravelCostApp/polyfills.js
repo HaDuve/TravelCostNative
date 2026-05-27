@@ -3,5 +3,5 @@ import { polyfillGlobal } from "react-native/Libraries/Utilities/PolyfillFunctio
 
 polyfillGlobal(
   "FormData",
-  () => require("react-native/Libraries/Network/FormData").default
+  () => require("react-native/Libraries/Network/FormData").default,
 );

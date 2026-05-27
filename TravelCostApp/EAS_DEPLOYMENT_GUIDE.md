@@ -157,6 +157,21 @@ eas whoami          # Check login status
 
 ---
 
+## Troubleshooting
+
+### ITMS-90725 (iOS SDK / Xcode too old)
+
+Apple rejects uploads built with an SDK older than the current minimum (e.g. iOS 18 SDK from Xcode 16). **Fix:** `eas.json` pins iOS builds to `macos-sequoia-15.6-xcode-26.2`. Rebuild and submit a new binary:
+
+```bash
+pnpm run build:production:ios
+pnpm run submit:production:ios
+```
+
+Confirm in the EAS build log: **Spin up build environment** shows Xcode 26.x. For local Xcode builds, install Xcode 26+ on macOS Sequoia 15.6+.
+
+---
+
 ## Quick Reference
 
 ### 📋 **Essential Commands**

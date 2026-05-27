@@ -10,6 +10,9 @@
       "distribution": "internal",
       "channel": "dev",
       "pnpm": "10.15.0",
+      "ios": {
+        "image": "macos-sequoia-15.6-xcode-26.2"
+      },
       "android": {
         "buildType": "apk"
       }
@@ -21,7 +24,8 @@
       "distribution": "internal",
       "pnpm": "10.15.0",
       "ios": {
-        "simulator": true
+        "simulator": true,
+        "image": "macos-sequoia-15.6-xcode-26.2"
       },
       "android": {
         "buildType": "apk"
@@ -32,21 +36,30 @@
       "autoIncrement": true,
       "channel": "staging",
       "distribution": "internal",
-      "pnpm": "10.15.0"
+      "pnpm": "10.15.0",
+      "ios": {
+        "image": "macos-sequoia-15.6-xcode-26.2"
+      }
     },
     "alpha": {
       "environment": "production",
       "autoIncrement": true,
       "channel": "alpha",
       "distribution": "store",
-      "pnpm": "10.15.0"
+      "pnpm": "10.15.0",
+      "ios": {
+        "image": "macos-sequoia-15.6-xcode-26.2"
+      }
     },
     "production": {
       "environment": "production",
       "autoIncrement": true,
       "channel": "production",
       "distribution": "store",
-      "pnpm": "10.15.0"
+      "pnpm": "10.15.0",
+      "ios": {
+        "image": "macos-sequoia-15.6-xcode-26.2"
+      }
     }
   },
   "submit": {

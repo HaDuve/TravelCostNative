@@ -320,7 +320,7 @@ xcodebuild -version
 
 - **Bundle ID**: `com.budgetfornomads.app`
 - **Deployment Target**: iOS 15.1+
-- **Xcode Version**: 15.0+
+- **Xcode Version**: 26+ (required for App Store uploads since April 2026; EAS image `macos-sequoia-15.6-xcode-26.2`)
 - **Hermes**: Enabled
 - **New Architecture**: Disabled (compatibility with current setup)
 

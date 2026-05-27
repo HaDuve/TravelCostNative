@@ -1,4 +1,4 @@
-// Must load before `expo` (Expo.fx → winter/runtime.native uses global FormData).
+// Required for Expo runtime (not test-only): load before `expo` so winter/runtime.native has FormData.
 import { polyfillGlobal } from "react-native/Libraries/Utilities/PolyfillFunctions";
 
 polyfillGlobal(

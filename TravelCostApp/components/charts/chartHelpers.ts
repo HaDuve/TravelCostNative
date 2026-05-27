@@ -222,6 +222,29 @@ export const generateHTMLTemplate = (
   `;
 };
 
+const toColumnPoint = (
+  item: ChartData,
+  color?: string
+): { x: string | number; y: number; color?: string; label?: string } => {
+  const point: {
+    x: string | number;
+    y: number;
+    color?: string;
+    label?: string;
+  } = {
+    x: item.x,
+    y: item.y,
+    color: color ?? item.color,
+  };
+
+  if (item.label != null) {
+    point.label = item.label;
+  }
+
+  return point;
+};
+
+/** Generic formatter; not used by production callers today. Overview column charts use createBarChartData. */
 export const formatDataForHighcharts = (
   data: ChartData[],
   options: ChartOptions = {}
@@ -247,17 +270,23 @@ export const formatDataForHighcharts = (
   return [
     {
       name: "Series 1",
-      data: data.map((item) => ({
-        x: options.dateFormat ? new Date(item.x).getTime() : item.x,
-        y: item.y,
-        color: item.color,
-        ...item,
-      })),
+      data: data.map((item) =>
+        toColumnPoint(
+          {
+            x: options.dateFormat ? new Date(item.x).getTime() : item.x,
+            y: item.y,
+            color: item.color,
+            label: item.label,
+          },
+          item.color
+        )
+      ),
       color: options.colors?.[0],
     },
   ];
 };
 
+/** Overview expense column chart path (ExpenseChart). Prefer this over formatDataForHighcharts for column data. */
 export const createBarChartData = (
   data: ChartData[],
   colors?: { primary: string; error: string; budget: string }
@@ -267,12 +296,9 @@ export const createBarChartData = (
   series.push({
     name: "Expenses",
     type: "column",
-    data: data.map((item) => ({
-      x: item.x,
-      y: item.y,
-      color: item.color || colors?.primary,
-      ...item,
-    })),
+    data: data.map((item) =>
+      toColumnPoint(item, item.color || colors?.primary)
+    ),
     animation: {
       duration: 1000,
     },

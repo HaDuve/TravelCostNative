@@ -1,12 +1,9 @@
 import * as React from "react";
-import { Text } from "react-native";
-import { render } from "@testing-library/react-native";
+
 jest.mock("@react-navigation/native", () => {
   const actual = jest.requireActual("@react-navigation/native");
   return { ...actual, useScrollToTop: jest.fn() };
 });
-
-import { NavigationContainer } from "@react-navigation/native";
 
 jest.mock("../../util/vexo-tracking", () => ({
   trackEvent: jest.fn(),
@@ -15,11 +12,14 @@ jest.mock("../../util/vexo-tracking", () => ({
   VexoUserContext: {},
 }));
 
+jest.mock("../../util/currencyExchange", () => ({
+  getRate: jest.fn(async () => 1),
+}));
+
 jest.mock("../../components/ExpensesOutput/ExpensesOutput", () => ({
   MemoizedExpensesOutput: () => null,
 }));
 
-jest.mock("../../components/ExpensesOutput/ExpensesSummary", () => () => null);
 jest.mock("../../components/ManageExpense/AddExpenseButton", () => () => null);
 jest.mock("../../components/UI/MiniSyncIndicator", () => () => null);
 
@@ -49,72 +49,30 @@ jest.mock("../../util/refreshWithToast", () => ({
   refreshWithToast: jest.fn(async () => {}),
 }));
 
-import { AuthContext } from "../../store/auth-context";
-import { ExpensesContext } from "../../store/expenses-context";
-import { NetworkContext } from "../../store/network-context";
-import { OrientationContext } from "../../store/orientation-context";
-import { SettingsContext } from "../../store/settings-context";
-import { TripContext } from "../../store/trip-context";
-import { UserContext } from "../../store/user-context";
-
-function renderRecentExpenses() {
-  const navigation = { navigate: jest.fn() };
-  const RecentExpenses = require("../../screens/RecentExpenses").default;
-
-  return render(
-    <AuthContext.Provider value={{ uid: "u1" } as any}>
-      <TripContext.Provider
-        value={{
-          tripid: "t1",
-          tripName: "Japan 2026",
-          loadTravellersFromStorage: jest.fn(async () => {}),
-        } as any}
-      >
-        <ExpensesContext.Provider
-          value={{
-            // Non-empty so the initial "load once" effect doesn't trigger state updates in tests
-            expenses: [{ id: "e1" }],
-            isSyncing: false,
-            updateExpenseId: undefined,
-            getRecentExpenses: () => [],
-            loadExpensesFromStorage: jest.fn(async () => {}),
-          } as any}
-        >
-          <UserContext.Provider
-            value={{
-              freshlyCreated: false,
-              periodName: "month",
-              setPeriodString: jest.fn(),
-              isSendingOfflineQueueMutex: false,
-              setIsSendingOfflineQueueMutex: jest.fn(),
-            } as any}
-          >
-            <NetworkContext.Provider
-              value={{
-                isConnected: false,
-                strongConnection: false,
-                lastConnectionSpeedInMbps: 0,
-              } as any}
-            >
-              <SettingsContext.Provider value={{ settings: { showInternetSpeed: false } } as any}>
-                <OrientationContext.Provider value={{ isPortrait: true, isTablet: false } as any}>
-                  <NavigationContainer>
-                    <RecentExpenses navigation={navigation as any} />
-                  </NavigationContainer>
-                </OrientationContext.Provider>
-              </SettingsContext.Provider>
-            </NetworkContext.Provider>
-          </UserContext.Provider>
-        </ExpensesContext.Provider>
-      </TripContext.Provider>
-    </AuthContext.Provider>
-  );
-}
+import RecentExpenses from "../../screens/RecentExpenses";
+import { makeExpense } from "../fixtures/expense";
+import { renderWithAppProviders } from "../fixtures/app-providers";
 
 describe("RecentExpenses screen", () => {
-  it("shows the trip name in the header", () => {
-    const screen = renderRecentExpenses();
+  it("shows the trip name and period expense total from ExpensesSummary", () => {
+    const monthExpenses = [makeExpense({ id: "e1", calcAmount: 75, amount: 75 })];
+    const navigation = { navigate: jest.fn() };
+
+    const screen = renderWithAppProviders(
+      <RecentExpenses navigation={navigation as any} />,
+      {
+        expenses: {
+          expenses: monthExpenses,
+          getRecentExpenses: () => monthExpenses,
+        },
+        user: {
+          periodName: "month",
+          needsTour: false,
+        },
+      }
+    );
+
     expect(screen.getByText(/Japan 2026/)).toBeTruthy();
+    expect(screen.getByText(/75/)).toBeTruthy();
   });
 });
-

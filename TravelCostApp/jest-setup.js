@@ -1,8 +1,48 @@
-import "@testing-library/jest-native/extend-expect";
-
 jest.mock("@react-native-async-storage/async-storage", () =>
   require("@react-native-async-storage/async-storage/jest/async-storage-mock")
 );
+
+jest.mock("@react-native-community/netinfo", () => ({
+  addEventListener: jest.fn(() => jest.fn()),
+  fetch: jest.fn(() =>
+    Promise.resolve({
+      isConnected: true,
+      isInternetReachable: true,
+      type: "wifi",
+    })
+  ),
+  useNetInfo: jest.fn(() => ({
+    isConnected: true,
+    isInternetReachable: true,
+    type: "wifi",
+  })),
+}));
+
+jest.mock("expo-font", () => ({
+  loadAsync: jest.fn(() => Promise.resolve()),
+  isLoaded: jest.fn(() => true),
+  isLoading: jest.fn(() => false),
+}));
+
+jest.mock("@expo/vector-icons", () => {
+  const React = require("react");
+  const { Text } = require("react-native");
+  const MockIcon = (props) =>
+    React.createElement(Text, { testID: `icon-${props.name}` }, props.name);
+  const iconExports = {
+    Ionicons: MockIcon,
+    MaterialCommunityIcons: MockIcon,
+    MaterialIcons: MockIcon,
+    FontAwesome: MockIcon,
+    AntDesign: MockIcon,
+    Feather: MockIcon,
+    Entypo: MockIcon,
+  };
+  return {
+    ...iconExports,
+    default: iconExports,
+  };
+});
 
 jest.mock("react-native-purchases", () => {
   const Purchases = {
@@ -37,4 +77,3 @@ jest.mock("firebase/auth", () => ({
   signOut: jest.fn(async () => {}),
   onAuthStateChanged: jest.fn(() => () => {}),
 }));
-

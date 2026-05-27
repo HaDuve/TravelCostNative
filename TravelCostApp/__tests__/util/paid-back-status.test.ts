@@ -1,26 +1,5 @@
-import type { ExpenseData } from "../../util/expense";
 import { getEffectiveIsPaid, isPaidString } from "../../util/expense";
-
-function makeExpense(overrides: Partial<ExpenseData> = {}): ExpenseData {
-  return {
-    id: "e1",
-    uid: "u1",
-    splitType: "EQUAL",
-    startDate: new Date("2026-01-01T00:00:00.000Z"),
-    endDate: new Date("2026-01-01T00:00:00.000Z"),
-    categoryString: "",
-    description: "dinner",
-    amount: 100,
-    date: new Date("2026-01-01T00:00:00.000Z"),
-    category: "",
-    currency: "EUR",
-    whoPaid: "Alice",
-    calcAmount: 100,
-    splitList: [],
-    isSpecialExpense: false,
-    ...overrides,
-  };
-}
+import { makeExpense } from "../fixtures/expense";
 
 describe("Paid back status (getEffectiveIsPaid)", () => {
   it("uses the expense stored isPaid when the trip has no Settlement timestamp", () => {

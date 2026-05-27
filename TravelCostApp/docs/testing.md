@@ -39,14 +39,56 @@ This document defines how we test TravelCostApp with Jest + React Native Testing
 
 ## Fixture guidelines
 
+- Reuse factories in `__tests__/fixtures/` (`makeExpense`, `renderWithAppProviders`).
 - Build small reusable fixture factories (Trip, Expense, Traveller, User context).
 - Keep defaults realistic and override only what matters for behavior.
 - Use deterministic dates/currency values in tests.
 
 ## Determinism cookbook
 
-- Freeze time when date behavior matters.
-- Use fixed exchange-rate inputs in unit tests.
+Freeze time, dates, and exchange rates so money and period logic stay stable across locales and CI.
+
+### Fake timers (Luxon / `Date.now`)
+
+```typescript
+beforeEach(() => {
+  jest.useFakeTimers();
+  jest.setSystemTime(new Date("2026-01-15T12:00:00.000Z"));
+});
+
+afterEach(() => {
+  jest.useRealTimers();
+});
+```
+
+### Fixed `Date` in fixtures
+
+```typescript
+import { makeExpense } from "../fixtures/expense";
+
+const expense = makeExpense({
+  date: new Date("2026-01-15T12:00:00.000Z"),
+  startDate: new Date("2026-01-15T12:00:00.000Z"),
+  endDate: new Date("2026-01-15T12:00:00.000Z"),
+});
+```
+
+### Stubbed exchange rates
+
+```typescript
+jest.mock("../../util/currencyExchange", () => ({
+  getRate: jest.fn(async () => 1),
+}));
+```
+
+Use a fixed numeric rate when conversion behavior matters:
+
+```typescript
+import { getRate } from "../../util/currencyExchange";
+
+(getRate as jest.Mock).mockResolvedValue(1.25);
+```
+
 - Avoid locale-dependent assertions unless the test is explicitly about locale output.
 
 ## TDD workflow
@@ -60,6 +102,22 @@ This document defines how we test TravelCostApp with Jest + React Native Testing
 ## Baseline command and CI gate
 
 - Local baseline: `pnpm test` (from `TravelCostApp/`)
+- Serial runs (debugging order-dependent issues): `pnpm test --runInBand`
+- Do **not** use `pnpm test -- --runInBand` — the extra `--` makes Jest treat `--runInBand` as a path pattern (`No tests found`).
 - CI requirement: pull requests must pass `pnpm test` (see `.github/workflows/test.yml`)
 - Package manager: [package-manager.md](./package-manager.md)
 
+## Tracer-bullet examples
+
+| Layer | Example file |
+| ----- | ------------ |
+| Util / domain | `__tests__/util/expense-range.test.ts` |
+| Util / Split | `__tests__/util/equal-split.test.ts` |
+| Util / Balance | `__tests__/util/balance-simplification.test.ts` |
+| Component | `__tests__/components/expenses-summary.test.tsx` |
+| Screen | `__tests__/screens/recent-expenses-screen.test.tsx` |
+| Providers | `__tests__/fixtures/app-providers.tsx` |
+
+## Target coverage (issue #227)
+
+Bottom-tab screens: RecentExpenses, Overview, Financial, Profile, Finder. Key components: ExpensesSummary, Split Summary. Util: Splits, Balances, Settlement/Paid back, ranged dedup.

@@ -1,8 +1,4 @@
 import * as React from "react";
-import { render } from "@testing-library/react-native";
-import { NavigationContainer } from "@react-navigation/native";
-
-import OverviewScreen from "../../screens/OverviewScreen";
 
 jest.mock("expo-haptics", () => ({
   impactAsync: jest.fn(async () => {}),
@@ -33,57 +29,24 @@ jest.mock("../../components/UI/ToastComponent", () => ({
   showBanner: jest.fn(),
 }));
 
-import { AuthContext } from "../../store/auth-context";
-import { ExpensesContext } from "../../store/expenses-context";
-import { NetworkContext } from "../../store/network-context";
-import { OrientationContext } from "../../store/orientation-context";
-import { SettingsContext } from "../../store/settings-context";
-import { TripContext } from "../../store/trip-context";
-import { UserContext } from "../../store/user-context";
-
-function renderOverview() {
-  const navigation = { navigate: jest.fn() };
-
-  return render(
-    <AuthContext.Provider value={{ uid: "u1" } as any}>
-      <TripContext.Provider value={{ tripid: "t1", tripName: "Japan 2026" } as any}>
-        <ExpensesContext.Provider value={{ expenses: [], getRecentExpenses: () => [] } as any}>
-          <UserContext.Provider
-            value={{
-              freshlyCreated: false,
-              needsTour: false,
-              periodName: "month",
-              isShowingGraph: false,
-              setIsShowingGraph: jest.fn(),
-              setPeriodString: jest.fn(),
-            } as any}
-          >
-            <NetworkContext.Provider
-              value={{
-                isConnected: false,
-                strongConnection: false,
-                lastConnectionSpeedInMbps: 0,
-              } as any}
-            >
-              <SettingsContext.Provider value={{ settings: { showInternetSpeed: false } } as any}>
-                <OrientationContext.Provider value={{ isPortrait: true, isTablet: false } as any}>
-                  <NavigationContainer>
-                    <OverviewScreen navigation={navigation as any} />
-                  </NavigationContainer>
-                </OrientationContext.Provider>
-              </SettingsContext.Provider>
-            </NetworkContext.Provider>
-          </UserContext.Provider>
-        </ExpensesContext.Provider>
-      </TripContext.Provider>
-    </AuthContext.Provider>
-  );
-}
+import OverviewScreen from "../../screens/OverviewScreen";
+import { renderWithAppProviders } from "../fixtures/app-providers";
 
 describe("Overview screen", () => {
   it("shows the trip name in the header", () => {
-    const screen = renderOverview();
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <OverviewScreen navigation={navigation as any} />,
+      {
+        user: {
+          needsTour: false,
+          isShowingGraph: false,
+          setIsShowingGraph: jest.fn(),
+        },
+        expenses: { expenses: [], getRecentExpenses: () => [] },
+      }
+    );
+
     expect(screen.getByText(/Japan 2026/)).toBeTruthy();
   });
 });
-

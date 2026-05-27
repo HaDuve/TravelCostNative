@@ -123,7 +123,7 @@ firebase functions:log --only onFeedbackCreated --limit 10
 User: test-user-123
 Date: 1/27/2025, 11:30:00 PM
 Platform: iOS
-Version: 1.3.001
+Version: {version}
 
 Feedback:
 This is a test feedback message.

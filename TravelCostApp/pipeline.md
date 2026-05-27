@@ -1,6 +1,6 @@
 # Build Pipeline Documentation
 
-This document provides a comprehensive guide for building and deploying the TravelCostApp using our custom build pipeline, replacing the previous Expo EAS (Expo Application Services) setup.
+This document covers local native builds and related tooling. **EAS cloud builds** use the scripts in `package.json` (see [EAS_DEPLOYMENT_GUIDE.md](EAS_DEPLOYMENT_GUIDE.md)). **Package manager:** [pnpm only](docs/package-manager.md) in `TravelCostApp/`.
 
 ## Table of Contents
 
@@ -16,7 +16,7 @@ This document provides a comprehensive guide for building and deploying the Trav
 ### System Requirements
 
 - **Node.js**: Version 18+ (recommended: 20.x)
-- **Package Manager**: pnpm (preferred) or npm
+- **Package Manager**: [pnpm](docs/package-manager.md) **10.15.0** only (not `npm install` in `TravelCostApp/`)
 - **Operating System**: macOS (for iOS builds), macOS/Linux/Windows (for Android builds)
 
 ### Required Tools
@@ -146,56 +146,53 @@ keytool -list -v -keystore @haduve__Travel-Expense.jks -storepass your_password 
 
 ## Build Scripts
 
-### Development Builds
+Scripts are defined in `package.json`. Always run from `TravelCostApp/` with **pnpm**.
 
-Development builds are optimized for testing and debugging:
+### Local development (simulator / device)
 
 ```bash
-# Build for all platforms
-pnpm run build:dev
-
-# Build for specific platform
-pnpm run build:dev android
-pnpm run build:dev ios
-
-# Build and install on connected device
-pnpm run build:dev android --install
+pnpm install
+pnpm run ios       # iOS simulator (expo run:ios)
+pnpm run android   # Android emulator/device (expo run:android)
+pnpm run start     # Metro + dev client
 ```
 
-**Output:**
-
-- **Android**: APK file at `android/app/build/outputs/apk/debug/app-debug.apk`
-- **iOS**: Simulator build (use `npx expo run:ios` to run)
-
-### Production Builds
-
-Production builds are optimized for app store distribution:
+### EAS cloud — development client
 
 ```bash
-# Build for all platforms
-pnpm run build:prod
-
-# Build for specific platform
-pnpm run build:prod android
-pnpm run build:prod ios
+pnpm run build:dev:all          # simulator-friendly (development-simulator profile)
+pnpm run build:dev:ios
+pnpm run build:dev:android
+pnpm run build:dev:device:ios   # physical device (development profile)
+pnpm run build:dev:device:android
 ```
 
-**Output:**
+Alias: `pnpm run build:dev` → same as `build:dev:all`.
 
-- **Android**: AAB file at `android/app/build/outputs/bundle/release/app-release.aab`
-- **iOS**: IPA file at `ios/build/export/Budget.ipa`
-
-### App Store Submissions
-
-Submit production builds to app stores:
+### EAS cloud — staging / alpha / production
 
 ```bash
-# Submit to all stores
-pnpm run submit:prod
+pnpm run build:staging:all
+pnpm run build:alpha:all
+pnpm run build:production:all   # alias: pnpm run build:prod
+pnpm run build:production:ios
+pnpm run build:production:android
+```
 
-# Submit to specific store
-pnpm run submit:prod android
-pnpm run submit:prod ios
+### App Store submissions (EAS Submit)
+
+```bash
+pnpm run submit:prod:ios
+pnpm run submit:prod:android
+pnpm run submit:alpha:ios
+```
+
+### Over-the-air updates (EAS Update)
+
+```bash
+pnpm run update:dev -- "Your message"
+pnpm run update:staging -- "Your message"
+pnpm run update:production -- "Your message"
 ```
 
 ### Manual Testing Commands
@@ -209,9 +206,9 @@ After successful builds, use these commands to test your builds manually:
 export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
 export ANDROID_HOME=$HOME/Library/Android/sdk
 export PATH=$PATH:$ANDROID_HOME/platform-tools
-pnpm run build:dev android
+pnpm run android
 
-# Install APK on connected device
+# Or install a built APK manually
 adb install android/app/build/outputs/apk/debug/app-debug.apk
 
 # Or install via ADB
@@ -228,7 +225,7 @@ export LANG=en_US.UTF-8
 export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
 export ANDROID_HOME=$HOME/Library/Android/sdk
 export PATH=$PATH:$ANDROID_HOME/platform-tools
-pnpm run build:dev ios
+pnpm run ios
 
 # Run on iOS Simulator
 npx expo run:ios --simulator
@@ -244,7 +241,7 @@ export LANG=en_US.UTF-8
 export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
 export ANDROID_HOME=$HOME/Library/Android/sdk
 export PATH=$PATH:$ANDROID_HOME/platform-tools
-pnpm run build:prod android
+pnpm run build:production:android
 ```
 
 **Output Location**: `android/app/build/outputs/bundle/release/app-release.aab`
@@ -259,7 +256,7 @@ export LANG=en_US.UTF-8
 export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
 export ANDROID_HOME=$HOME/Library/Android/sdk
 export PATH=$PATH:$ANDROID_HOME/platform-tools
-pnpm run build:prod ios
+pnpm run build:production:ios
 ```
 
 **Output Location**: `ios/build/export/Budget.ipa`
@@ -367,7 +364,7 @@ ls -la android/app/release.keystore
 ```bash
 # Solution: Clean and rebuild
 cd android && ./gradlew clean && cd ..
-pnpm run build:prod android
+pnpm run build:production:android
 ```
 
 #### iOS Build Failures
@@ -441,10 +438,10 @@ Enable verbose logging for debugging:
 
 ```bash
 # Android
-DEBUG=1 pnpm run build:dev android
+DEBUG=1 pnpm run android
 
 # iOS
-DEBUG=1 pnpm run build:dev ios
+DEBUG=1 pnpm run ios
 ```
 
 ### Performance Optimization
@@ -495,7 +492,7 @@ DEBUG=1 pnpm run build:dev ios
 
    ```bash
    # Test development build
-   pnpm run build:dev
+   pnpm run build:dev:all
 
    # Test production build
    pnpm run build:prod

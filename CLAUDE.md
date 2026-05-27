@@ -20,6 +20,7 @@ This file provides collaborative guidance and philosophy when using the Claude C
 - Update work logs as you progress
 - Mark todos as completed immediately after finishing
 - Go into the subdirectory for the correct Folder TravelCostApp/
+- App deps: **pnpm only** in `TravelCostApp/` — see `TravelCostApp/docs/package-manager.md`
 
 ### Quick State Checks
 

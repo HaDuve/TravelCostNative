@@ -2,6 +2,8 @@
 
 This directory contains the Firebase Cloud Functions for the TravelCost App.
 
+> **npm only here:** The main app uses [pnpm](../docs/package-manager.md). Use `npm install` / `npm run` in this folder only.
+
 ## Functions
 
 ### `onFeedbackCreated`

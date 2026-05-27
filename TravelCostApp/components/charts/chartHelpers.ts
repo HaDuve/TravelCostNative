@@ -212,59 +212,8 @@ export const generateHTMLTemplate = (
             }
           }
 
-          function setExtremes(min, max) {
-            if (chart && chart.xAxis && chart.xAxis[0]) {
-              chart.xAxis[0].setExtremes(min, max);
-            }
-          }
-
-          function toggleLabels(show) {
-            if (chart && chart.series) {
-              chart.series.forEach((series, index) => {
-                if (series.type === 'pie') {
-                  series.update({
-                    dataLabels: {
-                      enabled: show,
-                      useHTML: true,
-                      style: {
-                        fontSize: '12px',
-                        fontWeight: 'normal',
-                        whiteSpace: 'normal',
-                        textOverflow: 'none',
-                        textAlign: 'center'
-                      },
-                      distance: 10,
-                      allowOverlap: true,
-                      crop: false
-                    }
-                  }, false);
-                } else if (series.type === 'column') {
-                  series.update({
-                    dataLabels: {
-                      enabled: show,
-                      style: {
-                        fontSize: '12px',
-                        fontWeight: 'normal',
-                        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                        textOutline: '1px contrast'
-                      },
-                      formatter: function() {
-                        return this.y.toFixed(2) + '${
-                          options.currency ? " " + options.currency : "€"
-                        }';
-                      }
-                    }
-                  }, false);
-                }
-              });
-              chart.redraw();
-            }
-          }
-
           window.initChart = initChart;
           window.updateChart = updateChart;
-          window.setExtremes = setExtremes;
-          window.toggleLabels = toggleLabels;
 
           initChart([]);
         </script>

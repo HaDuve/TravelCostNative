@@ -26,8 +26,6 @@ interface WebViewChartProps {
 interface ChartMessage {
   type: string;
   data?: unknown;
-  min?: number;
-  max?: number;
 }
 
 const WebViewChart: React.FC<WebViewChartProps> = ({

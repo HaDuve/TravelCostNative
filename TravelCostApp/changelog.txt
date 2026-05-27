@@ -2,11 +2,14 @@ Changelog Travel Expense App
 
 __Newest Changes:
 
-1.3.004
-- Fixed sync
+1.3.005
 - Bugfixes and performance improvements
 
 __Other Changes:
+
+1.3.004
+- Fixed sync
+- Bugfixes and performance improvements
 
 1.3.003
 - Bugfixes and performance improvements

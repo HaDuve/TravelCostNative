@@ -1,5 +1,6 @@
 import {
   createBarChartData,
+  createPieChartData,
   formatDataForHighcharts,
 } from "../../components/charts/chartHelpers";
 
@@ -57,5 +58,35 @@ describe("Highcharts column point payload", () => {
     expect(point.color).toBe("#00aa00");
     expect(point).not.toHaveProperty("originalData");
     expect(Object.keys(point).sort()).toEqual(["color", "x", "y"]);
+  });
+});
+
+describe("Highcharts pie point payload", () => {
+  it("createPieChartData omits originalData and only serializes name, y, and color", () => {
+    const chartData = [
+      {
+        x: "Food 42 EUR",
+        y: 42,
+        color: "#ff0000",
+        originalData: {
+          categoryId: "food",
+          expensesSum: 42,
+        },
+      },
+    ];
+
+    const series = createPieChartData(chartData) as Array<{
+      data: Array<Record<string, unknown>>;
+    }>;
+
+    const point = series[0].data[0];
+
+    expect(point).toEqual({
+      name: 'Food<br/><span style="white-space: nowrap;">42 EUR</span>',
+      y: 42,
+      color: "#ff0000",
+    });
+    expect(point).not.toHaveProperty("originalData");
+    expect(Object.keys(point).sort()).toEqual(["color", "name", "y"]);
   });
 });

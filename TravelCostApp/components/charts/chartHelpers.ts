@@ -244,6 +244,7 @@ const toColumnPoint = (
   return point;
 };
 
+/** Generic formatter; not used by production callers today. Overview column charts use createBarChartData. */
 export const formatDataForHighcharts = (
   data: ChartData[],
   options: ChartOptions = {}
@@ -285,6 +286,7 @@ export const formatDataForHighcharts = (
   ];
 };
 
+/** Overview expense column chart path (ExpenseChart). Prefer this over formatDataForHighcharts for column data. */
 export const createBarChartData = (
   data: ChartData[],
   colors?: { primary: string; error: string; budget: string }

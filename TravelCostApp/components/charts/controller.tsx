@@ -74,24 +74,17 @@ export class ChartController {
   static createExpenseChartOptions(
     budget?: number,
     colors?: { primary: string; error: string; gray: string; budget: string },
-    currency?: string,
-    periodType?: "day" | "week" | "month" | "year"
+    currency?: string
   ): ChartOptions {
     return {
       type: "column",
       title: "",
       xAxisTitle: "",
       yAxisTitle: "",
-      enableZoom: true,
       showLegend: false,
       dateFormat: true,
       currency: currency,
       colors: colors ? [colors.primary] : undefined,
-      zoomType: "x",
-      pinchType: "x",
-      panning: true,
-      panKey: "shift",
-      periodType: periodType,
     };
   }
 

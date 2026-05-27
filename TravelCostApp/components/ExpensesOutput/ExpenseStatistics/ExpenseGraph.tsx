@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Pressable, Platform } from "react-native";
 import * as Haptics from "expo-haptics";
 
-import React, { useCallback, useContext, useMemo } from "react";
+import React, { useContext, useMemo } from "react";
 import { ExpensesContext } from "../../../store/expenses-context";
 import {
   getDateMinusDays,
@@ -34,7 +34,6 @@ const ExpenseGraph = ({
   startingPoint,
   tripCtx,
   navigation,
-  onZoomStateChange,
 }) => {
   const { isPortrait } = useContext(OrientationContext);
 
@@ -42,18 +41,6 @@ const ExpenseGraph = ({
   const { settings } = useContext(SettingsContext);
   const hideSpecial = settings.hideSpecialExpenses;
   const { tripCurrency, dailyBudget, totalBudget } = tripCtx;
-
-  const handleZoomStateChange = useCallback(
-    (zoomState: {
-      isLatestVisible: boolean;
-      visiblePeriods: number;
-      minDate: Date | null;
-      maxDate: Date | null;
-    }) => {
-      onZoomStateChange?.(zoomState);
-    },
-    [onZoomStateChange]
-  );
 
   const graphConfig = useMemo(() => {
     if (!expenseCtx.expenses) {
@@ -525,7 +512,6 @@ const ExpenseGraph = ({
               budget={budget}
               currency={tripCurrency}
               periodType={periodName}
-              onZoomStateChange={handleZoomStateChange}
             ></ExpenseChart>
           </View>
         )}
@@ -549,7 +535,6 @@ const ExpenseGraph = ({
                   budget={budget}
                   currency={tripCurrency}
                   periodType={periodName}
-                  onZoomStateChange={handleZoomStateChange}
                 ></ExpenseChart>
               )}
             </View>
@@ -587,7 +572,6 @@ ExpenseGraph.propTypes = {
   setLongerPeriodNum: PropTypes.func,
   startingPoint: PropTypes.number,
   setStartingPoint: PropTypes.func,
-  onZoomStateChange: PropTypes.func,
 };
 
 const styles = StyleSheet.create({

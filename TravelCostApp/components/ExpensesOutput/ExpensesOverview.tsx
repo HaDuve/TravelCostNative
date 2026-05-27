@@ -1,5 +1,5 @@
 import { Platform, StyleSheet, Text, View } from "react-native";
-import React, { useContext, useRef, useState, useCallback } from "react";
+import React, { useContext, useRef, useState } from "react";
 import ExpenseCategories from "./ExpenseStatistics/ExpenseCategories";
 import ExpenseGraph from "./ExpenseStatistics/ExpenseGraph";
 import { GlobalStyles } from "../../constants/styles";
@@ -18,7 +18,6 @@ import { TripContext } from "../../store/trip-context";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { OrientationContext } from "../../store/orientation-context";
 import { useSwipe } from "../Hooks/useSwipe";
-import { toDayMonthString } from "../../util/date";
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const tripCtx = useContext(TripContext);
@@ -36,30 +35,12 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
 
   function onSwipeRight() {}
 
-  const handleZoomStateChange = useCallback(
-    (zoomState: {
-      isLatestVisible: boolean;
-      visiblePeriods: number;
-      minDate: Date | null;
-      maxDate: Date | null;
-    }) => {
-      setZoomState(zoomState);
-    },
-    []
-  );
-
   const userCtx = useContext(UserContext);
   const isGraphNotPie = userCtx.isShowingGraph;
   // enum =>  0 = categories, 1 = traveller, 2 = country, 3 = currency
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
   const [longerPeriodNum, setLongerPeriodNum] = useState(0);
   const [startingPoint, setStartingPoint] = useState(0);
-  const [zoomState, setZoomState] = useState({
-    isLatestVisible: true,
-    visiblePeriods: 7,
-    minDate: null as Date | null,
-    maxDate: null as Date | null,
-  });
 
   let titleString = "";
   switch (periodName) {
@@ -67,20 +48,9 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       titleString = i18n.t("overview");
       break;
     default:
-      if (isGraphNotPie && zoomState.isLatestVisible) {
-        // Show "Latest X Periods" when most recent data is visible
-        titleString = `${i18n.t("latest")} ${zoomState.visiblePeriods} ${i18n.t(periodName + "s")}`;
-      } else if (isGraphNotPie && zoomState.minDate && zoomState.maxDate) {
-        // Show date range when zoomed to historical data
-        const minDateStr = toDayMonthString(zoomState.minDate);
-        const maxDateStr = toDayMonthString(zoomState.maxDate);
-        titleString = `${minDateStr} - ${maxDateStr}`;
-      } else {
-        // Fallback to original logic for pie charts or when zoom state is not available
-        titleString = `${i18n.t("last")} ${periodRangeNumber + longerPeriodNum}${
-          startingPoint != 0 ? `+${-startingPoint}` : ""
-        } ${i18n.t(periodName + "s")}`;
-      }
+      titleString = `${i18n.t("last")} ${periodRangeNumber + longerPeriodNum}${
+        startingPoint != 0 ? `+${-startingPoint}` : ""
+      } ${i18n.t(periodName + "s")}`;
       break;
   }
 
@@ -132,7 +102,6 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
           tripCtx={tripCtx}
           longerPeriodNum={longerPeriodNum}
           startingPoint={startingPoint}
-          onZoomStateChange={handleZoomStateChange}
         />
       )}
       {!isGraphNotPie && toggleGraphEnum == 0 && (

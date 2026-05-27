@@ -122,6 +122,7 @@
     "splitwise-js-map": "^1.0.3",
     "vexo-analytics": "^1.5.2",
     "warning": "^4.0.3",
+    "web-streams-polyfill": "^4.3.0",
     "whatwg-url": "^14.2.0",
     "whatwg-url-without-unicode": "8.0.0-3"
   },

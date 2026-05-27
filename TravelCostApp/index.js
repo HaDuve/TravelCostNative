@@ -1,5 +1,5 @@
+import "./polyfills";
 import { registerRootComponent } from "expo";
-import "react-native-polyfill-globals/auto";
 import "react-native-url-polyfill/auto";
 import App from "./App";
 

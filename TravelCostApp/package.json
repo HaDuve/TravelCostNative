@@ -1,6 +1,7 @@
 {
   "name": "travelcostapp",
   "version": "1.0.0",
+  "packageManager": "pnpm@10.15.0",
   "scripts": {
     "start": "npx expo start --dev-client",
     "lint": "eslint --fix .",
@@ -21,13 +22,19 @@
     "build:alpha:ios": "eas build --platform ios --profile alpha --non-interactive",
     "build:alpha:android": "eas build --platform android --profile alpha --non-interactive",
     "build:alpha:all": "eas build --platform all --profile alpha --non-interactive",
+    "build:dev": "eas build --platform all --profile development-simulator --non-interactive",
     "build:dev:ios": "eas build --platform ios --profile development-simulator --non-interactive",
     "build:dev:android": "eas build --platform android --profile development-simulator --non-interactive",
     "build:dev:all": "eas build --platform all --profile development-simulator --non-interactive",
+    "build:dev:device:ios": "eas build --platform ios --profile development --non-interactive",
+    "build:dev:device:android": "eas build --platform android --profile development --non-interactive",
+    "build:prod": "eas build --platform all --profile production --non-interactive",
     "submit:production:ios": "eas submit --platform ios --profile production --latest --non-interactive",
     "submit:production:android": "eas submit --platform android --profile production --latest --non-interactive",
     "submit:alpha:ios": "eas submit --platform ios --profile alpha --latest --non-interactive",
     "submit:alpha:android": "eas submit --platform android --profile alpha --latest --non-interactive",
+    "submit:prod:ios": "eas submit --platform ios --profile production --latest --non-interactive",
+    "submit:prod:android": "eas submit --platform android --profile production --latest --non-interactive",
     "migrate:timestamps": "node scripts/migrate-server-timestamps.js",
     "migrate:timestamps:now": "node scripts/migrate-server-timestamps.js --now-timestamp"
   },
@@ -105,7 +112,6 @@
     "react-native-onboarding-swiper": "^1.3.0",
     "react-native-pager-view": "6.7.1",
     "react-native-paper": "^5.14.5",
-    "react-native-polyfill-globals": "^3.1.0",
     "react-native-progress": "^5.0.1",
     "react-native-purchases": "^9.2.2",
     "react-native-reanimated": "3.19.1",
@@ -122,7 +128,6 @@
     "splitwise-js-map": "^1.0.3",
     "vexo-analytics": "^1.5.2",
     "warning": "^4.0.3",
-    "web-streams-polyfill": "^4.3.0",
     "whatwg-url": "^14.2.0",
     "whatwg-url-without-unicode": "8.0.0-3"
   },

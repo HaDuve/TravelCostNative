@@ -64,6 +64,12 @@ This file provides collaborative guidance and philosophy when using the Claude C
 - Use `CONTEXT.md` as the single source of truth for domain language in tests.
 - Keep glossary definitions in `CONTEXT.md` only to avoid drift.
 
+## Package manager
+
+- **TravelCostApp/** — **pnpm 10.15.0** only (`pnpm-lock.yaml`). Never `npm install` in the app root.
+- See `docs/package-manager.md`. CI and EAS Build use pnpm.
+- **`functions/`** — separate package; uses npm.
+
 ## Task Management
 
 ### Best Practices

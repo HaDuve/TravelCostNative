@@ -2,6 +2,8 @@
 
 This guide documents how to create and implement Cloud Functions with Firebase Realtime Database for the TravelCost App project.
 
+> **Package manager:** The React Native app uses **pnpm** in `TravelCostApp/`. This `functions/` package uses **npm** — see [package-manager.md](./package-manager.md).
+
 ## Project Structure
 
 ```

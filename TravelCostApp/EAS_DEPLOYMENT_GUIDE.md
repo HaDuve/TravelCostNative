@@ -13,6 +13,8 @@
 
 ## Quick Start
 
+Run all commands below from `TravelCostApp/` with **pnpm** (see [docs/package-manager.md](docs/package-manager.md)). Pass update messages after `--`, e.g. `pnpm run update:dev -- "Fix login"`.
+
 ### What is EAS?
 
 EAS (Expo Application Services) provides cloud-based building and over-the-air updates for React Native apps.
@@ -51,27 +53,27 @@ Code changes → Git commit → Push to EAS branch → Channel receives update �
 
 | Command                            | What it does                        | When to use             |
 | ---------------------------------- | ----------------------------------- | ----------------------- |
-| `npm run build:production:ios`     | Build iOS for production            | Ready for App Store     |
-| `npm run build:production:android` | Build Android for production        | Ready for Play Store    |
-| `npm run build:production:all`     | Build both platforms for production | Full production release |
-| `npm run build:alpha:ios`          | Build iOS for alpha testing         | TestFlight testing      |
-| `npm run build:alpha:android`      | Build Android for alpha testing     | Internal testing        |
-| `npm run build:alpha:all`          | Build both platforms for alpha      | Full alpha testing      |
-| `npm run build:staging:ios`        | Build iOS for staging               | Internal testing        |
-| `npm run build:staging:android`    | Build Android for staging           | Internal testing        |
-| `npm run build:staging:all`        | Build both platforms for staging    | Full staging build      |
-| `npm run build:dev:ios`            | Build iOS for development           | Local testing           |
-| `npm run build:dev:android`        | Build Android for development       | Local testing           |
-| `npm run build:dev:all`            | Build both platforms for dev        | Full development build  |
+| `pnpm run build:production:ios`     | Build iOS for production            | Ready for App Store     |
+| `pnpm run build:production:android` | Build Android for production        | Ready for Play Store    |
+| `pnpm run build:production:all`     | Build both platforms for production | Full production release |
+| `pnpm run build:alpha:ios`          | Build iOS for alpha testing         | TestFlight testing      |
+| `pnpm run build:alpha:android`      | Build Android for alpha testing     | Internal testing        |
+| `pnpm run build:alpha:all`          | Build both platforms for alpha      | Full alpha testing      |
+| `pnpm run build:staging:ios`        | Build iOS for staging               | Internal testing        |
+| `pnpm run build:staging:android`    | Build Android for staging           | Internal testing        |
+| `pnpm run build:staging:all`        | Build both platforms for staging    | Full staging build      |
+| `pnpm run build:dev:ios`            | Build iOS for development           | Local testing           |
+| `pnpm run build:dev:android`        | Build Android for development       | Local testing           |
+| `pnpm run build:dev:all`            | Build both platforms for dev        | Full development build  |
 
 ### 📤 **Submit Commands**
 
 | Command                             | What it does                        | When to use          |
 | ----------------------------------- | ----------------------------------- | -------------------- |
-| `npm run submit:production:ios`     | Submit iOS to App Store             | Ready for App Store  |
-| `npm run submit:production:android` | Submit Android to Play Store        | Ready for Play Store |
-| `npm run submit:alpha:ios`          | Submit iOS to TestFlight            | Alpha testing        |
-| `npm run submit:alpha:android`      | Submit Android for internal testing | Alpha testing        |
+| `pnpm run submit:production:ios`     | Submit iOS to App Store             | Ready for App Store  |
+| `pnpm run submit:production:android` | Submit Android to Play Store        | Ready for Play Store |
+| `pnpm run submit:alpha:ios`          | Submit iOS to TestFlight            | Alpha testing        |
+| `pnpm run submit:alpha:android`      | Submit Android for internal testing | Alpha testing        |
 
 ## Update Commands
 
@@ -79,11 +81,11 @@ Code changes → Git commit → Push to EAS branch → Channel receives update �
 
 | Command                     | What it does                  | When to use            |
 | --------------------------- | ----------------------------- | ---------------------- |
-| `npm run update:production` | Updates production users      | Ready for live release |
-| `npm run update:alpha`      | Updates alpha testers         | Ready for testing      |
-| `npm run update:staging`    | Updates staging testers       | Internal testing       |
-| `npm run update:dev`        | Updates developers            | Testing new features   |
-| `npm run update`            | Auto-update (uses git branch) | Quick updates          |
+| `pnpm run update:production` | Updates production users      | Ready for live release |
+| `pnpm run update:alpha`      | Updates alpha testers         | Ready for testing      |
+| `pnpm run update:staging`    | Updates staging testers       | Internal testing       |
+| `pnpm run update:dev`        | Updates developers            | Testing new features   |
+| `pnpm run update`            | Auto-update (uses git branch) | Quick updates          |
 
 ### 🚀 **Update Process**
 
@@ -99,41 +101,41 @@ Code changes → Git commit → Push to EAS branch → Channel receives update �
 
 ```bash
 # 1. Make changes and test locally
-npm run update:dev "Testing new feature"
+pnpm run update:dev "Testing new feature"
 
 # 2. Test on staging for internal review
-npm run build:staging:all
-npm run update:staging "Ready for internal testing"
+pnpm run build:staging:all
+pnpm run update:staging "Ready for internal testing"
 ```
 
 ### 🧪 **Alpha Testing Workflow**
 
 ```bash
 # 1. Build and submit to TestFlight
-npm run build:alpha:ios
-npm run submit:alpha:ios
+pnpm run build:alpha:ios
+pnpm run submit:alpha:ios
 
 # 2. Push updates to alpha testers
-npm run update:alpha "Feature ready for beta testing"
+pnpm run update:alpha "Feature ready for beta testing"
 ```
 
 ### 🚀 **Production Release Workflow**
 
 ```bash
 # 1. Build and submit to app stores
-npm run build:production:all
-npm run submit:production:ios
-npm run submit:production:android
+pnpm run build:production:all
+pnpm run submit:production:ios
+pnpm run submit:production:android
 
 # 2. Push updates to production users
-npm run update:production "Feature released to production"
+pnpm run update:production "Feature released to production"
 ```
 
 ### 🔄 **Hotfix Workflow**
 
 ```bash
 # Critical bug fix - push immediately to production
-npm run update:production "HOTFIX: Critical bug resolved"
+pnpm run update:production "HOTFIX: Critical bug resolved"
 ```
 
 ## Troubleshooting
@@ -161,20 +163,20 @@ eas whoami          # Check login status
 
 ```bash
 # Updates (no app store review needed)
-npm run update:dev "Message"        # → Development
-npm run update:staging "Message"    # → Internal testing
-npm run update:alpha "Message"      # → Beta testers
-npm run update:production "Message" # → All users
+pnpm run update:dev "Message"        # → Development
+pnpm run update:staging "Message"    # → Internal testing
+pnpm run update:alpha "Message"      # → Beta testers
+pnpm run update:production "Message" # → All users
 
 # Builds (requires app store review)
-npm run build:staging:all           # → Internal testing
-npm run build:alpha:all             # → TestFlight
-npm run build:production:all        # → App Store
+pnpm run build:staging:all           # → Internal testing
+pnpm run build:alpha:all             # → TestFlight
+pnpm run build:production:all        # → App Store
 
 # Submit to stores
-npm run submit:alpha:ios            # → TestFlight
-npm run submit:production:ios       # → App Store
-npm run submit:production:android   # → Play Store
+pnpm run submit:alpha:ios            # → TestFlight
+pnpm run submit:production:ios       # → App Store
+pnpm run submit:production:android   # → Play Store
 ```
 
 ### 🎯 **Update Message Format**

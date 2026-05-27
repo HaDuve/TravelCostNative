@@ -59,6 +59,7 @@ This document defines how we test TravelCostApp with Jest + React Native Testing
 
 ## Baseline command and CI gate
 
-- Local baseline: `npm test`
-- CI requirement: pull requests must pass `npm test`
+- Local baseline: `pnpm test` (from `TravelCostApp/`)
+- CI requirement: pull requests must pass `pnpm test` (see `.github/workflows/test.yml`)
+- Package manager: [package-manager.md](./package-manager.md)
 

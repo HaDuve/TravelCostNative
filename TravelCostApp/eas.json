@@ -9,6 +9,7 @@
       "environment": "development",
       "distribution": "internal",
       "channel": "dev",
+      "pnpm": "10.15.0",
       "android": {
         "buildType": "apk"
       }
@@ -18,6 +19,7 @@
       "environment": "development",
       "channel": "dev",
       "distribution": "internal",
+      "pnpm": "10.15.0",
       "ios": {
         "simulator": true
       },

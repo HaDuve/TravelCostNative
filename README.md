@@ -4,7 +4,18 @@
 
 
 React Native App for iOS and Android to calculate and present travel costs.
- 
+
+## Development
+
+App code is in [`TravelCostApp/`](TravelCostApp/). Use **pnpm** only — see [TravelCostApp/docs/package-manager.md](TravelCostApp/docs/package-manager.md).
+
+```bash
+cd TravelCostApp
+pnpm install
+pnpm test
+pnpm run ios
+```
+
 Build in TypeScript with React-Native, this is my app for travellers to track their travel-expenses and keep their budget. The user can enter expenses at ease, no matter the currency or location, and see informative statistics and graph. The data is saved in firebase, and multiple users can share a trip. The app also calculates the open debts between the users like Splitwise.
 Try the app here: [Budget For Nomads](https://budgetfornomads.app.link/oiieSiMl4Bb)
 

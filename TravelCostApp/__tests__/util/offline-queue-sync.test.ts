@@ -82,4 +82,43 @@ describe("sendOfflineQueue", () => {
     expect(updateExpenseId).not.toHaveBeenCalled();
     expect(mmkvStore[MMKV_KEYS.OFFLINE_QUEUE]).toEqual([]);
   });
+
+  it("remaps the local expense id when the server returns a different id", async () => {
+    const clientId = "local-offline-id";
+    const serverId = "server-generated-id";
+    const expenseData = makeExpense({
+      id: clientId,
+      editedTimestamp: 1_700_000_000_000,
+    });
+
+    mmkvStore[MMKV_KEYS.OFFLINE_QUEUE] = [
+      {
+        type: "add",
+        expense: {
+          tripid: "trip-1",
+          uid: "traveller-1",
+          expenseData,
+        },
+      },
+    ];
+
+    (storeExpenseWithId as jest.Mock).mockResolvedValue(serverId);
+
+    const updateExpenseId = jest.fn();
+    let mutex = false;
+    const setMutex = jest.fn((value: boolean) => {
+      mutex = value;
+    });
+
+    await sendOfflineQueue(mutex, setMutex, { updateExpenseId });
+
+    expect(storeExpenseWithId).toHaveBeenCalledWith(
+      "trip-1",
+      "traveller-1",
+      clientId,
+      expect.objectContaining({ id: clientId })
+    );
+    expect(updateExpenseId).toHaveBeenCalledWith(clientId, serverId);
+    expect(mmkvStore[MMKV_KEYS.OFFLINE_QUEUE]).toEqual([]);
+  });
 });

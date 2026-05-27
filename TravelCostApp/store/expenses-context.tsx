@@ -170,10 +170,44 @@ export const ExpensesContext = createContext<ExpenseContextType>({
   setIsSyncing: (syncing: boolean) => {},
 });
 
-function expensesReducer(state: ExpenseData[], action) {
+// Fingerprint for offline-created rows vs server rows with different ids.
+// Keep uid, editedTimestamp, amount, description, and date in sync when changing matching.
+function findOfflineCreatedDuplicateIndex(
+  expenses: ExpenseData[],
+  incoming: ExpenseData
+): number {
+  if (!incoming.editedTimestamp) {
+    return -1;
+  }
+  const incomingDate = Number(new Date(incoming.date));
+  return expenses.findIndex(
+    (exp) =>
+      !exp.isDeleted &&
+      exp.id !== incoming.id &&
+      exp.uid === incoming.uid &&
+      exp.editedTimestamp === incoming.editedTimestamp &&
+      exp.amount === incoming.amount &&
+      exp.description === incoming.description &&
+      Number(new Date(exp.date)) === incomingDate
+  );
+}
+
+export function mergeExpenseLists(
+  state: ExpenseData[],
+  newExpenses: ExpenseData[]
+): ExpenseData[] {
+  return expensesReducer(state, { type: "MERGE", payload: newExpenses });
+}
+
+export function expensesReducer(state: ExpenseData[], action) {
   switch (action.type) {
-    case "ADD":
+    case "ADD": {
+      const id = action.payload?.id;
+      if (id && state.some((expense) => expense.id === id)) {
+        return state;
+      }
       return [action.payload, ...state];
+    }
     case "SET": {
       const getSortedState = (data: ExpenseData[]) =>
         data.sort((a: ExpenseData, b: ExpenseData) => {
@@ -226,8 +260,15 @@ function expensesReducer(state: ExpenseData[], action) {
           }
           // If existing is newer or equal, keep existing (do nothing)
         } else {
-          // New expense, add it
-          mergedExpenses.push(newExpense);
+          const offlineDuplicateIndex = findOfflineCreatedDuplicateIndex(
+            mergedExpenses,
+            newExpense
+          );
+          if (offlineDuplicateIndex !== -1) {
+            mergedExpenses[offlineDuplicateIndex] = newExpense;
+          } else {
+            mergedExpenses.push(newExpense);
+          }
         }
       });
 

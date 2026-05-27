@@ -3,10 +3,12 @@ import { getAllExpenses, unTouchTraveler } from "../../util/http";
 import { i18n } from "../../i18n/i18n";
 
 import { getExpensesSum } from "../../util/expense";
-import { ExpenseContextType } from "../../store/expenses-context";
+import {
+  ExpenseContextType,
+  mergeExpenseLists,
+} from "../../store/expenses-context";
 import { TripContextType } from "../../store/trip-context";
 import safeLogError from "../../util/error";
-import uniqBy from "lodash.uniqby";
 
 export async function fetchAndSetExpenses(
   showRefIndicator: boolean,
@@ -38,15 +40,9 @@ export async function fetchAndSetExpenses(
     expenses = expenses.filter((expense) => !isNaN(Number(expense.calcAmount)));
 
     if (expenses && expenses?.length !== 0) {
-      // Use mergeExpenses instead of setExpenses to properly merge new expenses with existing ones
+      const mergedForSum = mergeExpenseLists(expensesCtx.expenses, expenses);
       expensesCtx.mergeExpenses(expenses);
-
-      // Calculate the total sum from all current expenses plus new ones
-      // This gives us the correct total for immediate display
-      const currentExpenses = expensesCtx.expenses;
-      const allExpenses = [...currentExpenses, ...expenses];
-      const uniqueExpenses = uniqBy(allExpenses, "id");
-      const expensesSum = getExpensesSum(uniqueExpenses);
+      const expensesSum = getExpensesSum(mergedForSum);
       tripCtx.setTotalSum(expensesSum);
 
       // Note: The merged expenses will be automatically saved to storage

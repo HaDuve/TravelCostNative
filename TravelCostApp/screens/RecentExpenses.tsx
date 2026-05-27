@@ -100,22 +100,26 @@ function RecentExpenses({ navigation }) {
       const online = netCtx.isConnected && netCtx.strongConnection;
       const offlineQueue = getMMKVObject(MMKV_KEYS.OFFLINE_QUEUE);
       const queueBlocked = offlineQueue && offlineQueue?.length > 0;
-      if (!online || queueBlocked || userCtx.isSendingOfflineQueueMutex) {
-        // if online, send offline queue
-        if (online) {
-          await sendOfflineQueue(
-            userCtx.isSendingOfflineQueueMutex,
-            userCtx.setIsSendingOfflineQueueMutex,
-            { updateExpenseId: expensesCtx.updateExpenseId }
-          );
+
+      if (userCtx.isSendingOfflineQueueMutex) {
+        return;
+      }
+
+      if (!online) {
+        await expensesCtx.loadExpensesFromStorage();
+        return;
+      }
+
+      if (queueBlocked) {
+        await sendOfflineQueue(
+          userCtx.isSendingOfflineQueueMutex,
+          userCtx.setIsSendingOfflineQueueMutex,
+          { updateExpenseId: expensesCtx.updateExpenseId }
+        );
+        const queueAfterSync = getMMKVObject(MMKV_KEYS.OFFLINE_QUEUE) || [];
+        if (queueAfterSync.length > 0) {
           return;
         }
-        // if offline, load from storage
-        // setIsFetching(true);
-        // await test_offlineLoad(expensesCtx, setRefreshing, setIsFetching);
-        await expensesCtx.loadExpensesFromStorage();
-        // setIsFetching(false);
-        return;
       }
       // checking isTouched or firstLoad
       const isTouched =

@@ -49,11 +49,61 @@ jest.mock("../../util/refreshWithToast", () => ({
   refreshWithToast: jest.fn(async () => {}),
 }));
 
+const mmkvStore: Record<string, unknown> = {};
+
+jest.mock("../../store/mmkv", () => ({
+  MMKV_KEYS: { OFFLINE_QUEUE: "offlineQueue" },
+  getMMKVObject: jest.fn((key: string) => mmkvStore[key] ?? null),
+  setMMKVObject: jest.fn((key: string, value: unknown) => {
+    mmkvStore[key] = value;
+  }),
+}));
+
+jest.mock("../../util/offline-queue", () => ({
+  getOfflineQueue: jest.fn(async () => mmkvStore.offlineQueue ?? []),
+  sendOfflineQueue: jest.fn(async () => {
+    mmkvStore.offlineQueue = [];
+  }),
+}));
+
+jest.mock("../../components/ExpensesOutput/RecentExpensesUtil", () => ({
+  fetchAndSetExpenses: jest.fn(async () => {}),
+}));
+
+jest.mock("../../util/http", () => ({
+  fetchTravelerIsTouched: jest.fn(async () => true),
+}));
+
+import { waitFor } from "@testing-library/react-native";
 import RecentExpenses from "../../screens/RecentExpenses";
+import { fetchAndSetExpenses } from "../../components/ExpensesOutput/RecentExpensesUtil";
 import { makeExpense } from "../fixtures/expense";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 
 describe("RecentExpenses screen", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    Object.keys(mmkvStore).forEach((key) => delete mmkvStore[key]);
+  });
+
+  it("fetches expenses after the offline queue flushes successfully", async () => {
+    mmkvStore.offlineQueue = [{ type: "add", expense: { tripid: "t1" } }];
+
+    const navigation = { navigate: jest.fn() };
+    renderWithAppProviders(<RecentExpenses navigation={navigation as any} />, {
+      expenses: {
+        expenses: [],
+        getRecentExpenses: () => [],
+        loadExpensesFromStorage: jest.fn(async () => {}),
+      },
+      network: { isConnected: true, strongConnection: true },
+    });
+
+    await waitFor(() => {
+      expect(fetchAndSetExpenses).toHaveBeenCalled();
+    });
+  });
+
   it("shows the trip name and period expense total from ExpensesSummary", () => {
     const monthExpenses = [makeExpense({ id: "e1", calcAmount: 75, amount: 75 })];
     const navigation = { navigate: jest.fn() };

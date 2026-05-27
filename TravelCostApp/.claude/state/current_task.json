@@ -1,6 +1,0 @@
-{
-  "task": "h-fix-expenseform-input-delay",
-  "branch": "cursor/expenseform-input-delay-c7ab",
-  "services": ["components"],
-  "updated": "2026-01-28"
-}

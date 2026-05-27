@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  useRef,
-} from "react";
+import React, { useContext, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
@@ -19,11 +13,7 @@ import { SettingsContext } from "../../store/settings-context";
 import WebViewChart from "../charts/WebViewChart";
 import { WebView } from "react-native-webview";
 import { ChartController, ExpenseData } from "../charts/controller";
-import {
-  createBarChartData,
-  getInitialZoomRange,
-} from "../charts/chartHelpers";
-import IconButton from "../UI/IconButton";
+import { createBarChartData } from "../charts/chartHelpers";
 import { calculateDailyAverage } from "../../util/budgetColorHelper";
 
 interface ExpenseChartProps {
@@ -34,12 +24,6 @@ interface ExpenseChartProps {
   currency: string;
   periodType?: "day" | "week" | "month" | "year";
   onWebViewRef?: (ref: WebView | null) => void;
-  onZoomStateChange?: (zoomState: {
-    isLatestVisible: boolean;
-    visiblePeriods: number;
-    minDate: Date | null;
-    maxDate: Date | null;
-  }) => void;
 }
 
 const ExpenseChart: React.FC<ExpenseChartProps> = ({
@@ -50,15 +34,11 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
   currency,
   periodType,
   onWebViewRef,
-  onZoomStateChange,
 }) => {
   const { isLandscape } = useContext(OrientationContext);
   const tripCtx = useContext(TripContext);
   const expensesCtx = useContext(ExpensesContext);
   const { settings } = useContext(SettingsContext);
-  const [showResetButton, setShowResetButton] = useState(false);
-  const webViewRef = useRef<WebView>(null);
-
   const colors = useMemo(
     () => ({
       primary: GlobalStyles.colors.primary500,
@@ -69,7 +49,6 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
     []
   );
 
-  // Calculate current period average and determine overBudgetColor
   const overBudgetColor = useMemo(() => {
     if (!periodType || !settings.trafficLightBudgetColors) {
       return GlobalStyles.colors.error300;
@@ -86,7 +65,6 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
 
     const dailyBudget = Number(tripCtx.dailyBudget) || 0;
 
-    // If average is below daily budget, use orange; otherwise use red
     return averageDailySpending <= dailyBudget
       ? GlobalStyles.colors.accent500
       : GlobalStyles.colors.error300;
@@ -122,69 +100,19 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
     return ChartController.createExpenseChartOptions(
       budget,
       colors,
-      getCurrencySymbol(currency),
-      periodType
+      getCurrencySymbol(currency)
     );
-  }, [budget, colors, currency, periodType]);
-
-  const handleZoomLevelChange = useCallback(
-    (_zoomType: string, _min: number, _max: number) => {
-      setShowResetButton(true);
-    },
-    []
-  );
-
-  const handleZoomStateChange = useCallback(
-    (zoomState: {
-      isLatestVisible: boolean;
-      visiblePeriods: number;
-      minDate: Date | null;
-      maxDate: Date | null;
-    }) => {
-      onZoomStateChange?.(zoomState);
-    },
-    [onZoomStateChange]
-  );
-
-  const handleReset = useCallback(() => {
-    if (!webViewRef.current) return;
-
-    // Use centralized zoom configuration
-    const zoomRange = getInitialZoomRange(periodType);
-
-    webViewRef.current.injectJavaScript(`
-        window.setExtremes(${zoomRange.min}, ${zoomRange.max});
-        true;
-      `);
-
-    setShowResetButton(false);
-  }, [periodType]);
+  }, [budget, colors, currency]);
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        {showResetButton && (
-          <IconButton
-            icon="refresh"
-            size={dynamicScale(20)}
-            color={GlobalStyles.colors.primary500}
-            onPress={handleReset}
-            buttonStyle={styles.resetButton}
-          />
-        )}
-      </View>
       <WebViewChart
         data={highchartsData}
         options={chartOptions}
         width={width}
         height={height}
         showSkeleton={true}
-        onZoomLevelChange={handleZoomLevelChange}
-        onZoomStateChange={handleZoomStateChange}
-        onWebViewRef={(ref) => {
-          webViewRef.current = ref;
-          onWebViewRef?.(ref);
-        }}
+        onWebViewRef={onWebViewRef}
       />
     </View>
   );
@@ -200,7 +128,6 @@ ExpenseChart.propTypes = {
   currency: PropTypes.string.isRequired,
   periodType: PropTypes.oneOf(["day", "week", "month", "year"]),
   onWebViewRef: PropTypes.func,
-  onZoomStateChange: PropTypes.func,
 };
 
 const styles = StyleSheet.create({
@@ -210,30 +137,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: dynamicScale(8),
     backgroundColor: GlobalStyles.colors.backgroundColor,
-  },
-  header: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    paddingHorizontal: dynamicScale(16),
-    paddingVertical: dynamicScale(8),
-    position: "absolute",
-    top: 0,
-    right: 0,
-    zIndex: 10,
-  },
-  resetButton: {
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: dynamicScale(20),
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: GlobalStyles.colors.primary500,
   },
 });

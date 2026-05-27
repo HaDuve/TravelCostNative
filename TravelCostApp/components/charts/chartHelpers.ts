@@ -1,87 +1,9 @@
-import { BAR_WIDTH, INITIAL_ZOOM, ZOOM_LIMITS } from "../../confAppConstants";
 import { CHART_SPACING } from "./chartConstants";
 
-// Period type constants in milliseconds
-const PERIOD_MS = {
-  day: 24 * 3600 * 1000, // 1 day
-  week: 7 * 24 * 3600 * 1000, // 7 days
-  month: 28 * 24 * 3600 * 1000, // 28 days
-  year: 336 * 24 * 3600 * 1000, // 336 days (12 * 28)
-} as const;
-
-// Bar width configuration - single source of truth
-export const BAR_WIDTH_CONFIG = {
-  minPeriods: ZOOM_LIMITS.min,
-  maxPeriods: ZOOM_LIMITS.max,
-  minWidth: BAR_WIDTH.minWidth,
-  maxWidth: BAR_WIDTH.maxWidth,
-} as const;
-
-// Initial zoom configuration - single source of truth
-export const INITIAL_ZOOM_CONFIG = INITIAL_ZOOM;
-
-// Helper functions for period-specific calculations
-export const getPeriodZoomLimits = (
-  periodType: "day" | "week" | "month" | "year" = "day"
-) => {
-  const periodMs = PERIOD_MS[periodType];
-  return {
-    minRange: ZOOM_LIMITS.min * periodMs,
-    maxRange: ZOOM_LIMITS.max * periodMs,
-  };
-};
-
-export const calculateVisiblePeriods = (
-  min: number,
-  max: number,
-  periodType: "day" | "week" | "month" | "year" = "day"
-) => {
-  const periodMs = PERIOD_MS[periodType];
-  const rangeMs = max - min;
-  return rangeMs / periodMs;
-};
-
-export const calculateBarWidth = (
-  visiblePeriods: number,
-  config = BAR_WIDTH_CONFIG
-) => {
-  const { minPeriods, maxPeriods, minWidth, maxWidth } = config;
-
-  const clampedPeriods = Math.max(
-    minPeriods,
-    Math.min(maxPeriods, visiblePeriods)
-  );
-
-  const barWidth =
-    maxWidth -
-    ((clampedPeriods - minPeriods) * (maxWidth - minWidth)) /
-      (maxPeriods - minPeriods);
-
-  return Math.round(barWidth);
-};
-
-// Helper function to calculate initial zoom range with future extension
-export const getInitialZoomRange = (
-  periodType: "day" | "week" | "month" | "year" = "day",
-  config = INITIAL_ZOOM_CONFIG
-) => {
-  const periodMs = PERIOD_MS[periodType];
-  const now = new Date().getTime();
-
-  const periodsToShow = config.defaultPeriods[periodType];
-  const rangeMs = periodsToShow * periodMs;
-
-  // Calculate the start time (past) and end time (future)
-  const startTime = now - rangeMs;
-  const futureExtension = rangeMs * config.futureExtensionRatio;
-  const endTime = now + futureExtension;
-
-  return {
-    min: startTime,
-    max: endTime,
-    rangeMs: rangeMs + futureExtension,
-  };
-};
+/** Pin Highcharts to avoid CDN drift breaking the WebView template. */
+const HIGHCHARTS_VERSION = "12.5.0";
+/** jsDelivr serves npm packages reliably; code.highcharts.com can return 403 for some clients. */
+const HIGHCHARTS_CDN_BASE = `https://cdn.jsdelivr.net/npm/highcharts@${HIGHCHARTS_VERSION}`;
 
 export interface ChartData {
   x: string | number;
@@ -102,25 +24,21 @@ export interface ChartOptions {
   enableZoom?: boolean;
   dateFormat?: boolean;
   currency?: string;
-  zoomType?: string;
-  pinchType?: string;
-  panning?: boolean;
-  panKey?: string;
-  periodType?: "day" | "week" | "month" | "year";
 }
 
 export const generateHTMLTemplate = (
   chartId: string,
   options: ChartOptions = {}
 ): string => {
+  const xAxisType = options.dateFormat ? "'datetime'" : "'category'";
   return `
     <!DOCTYPE html>
     <html>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <meta charset="utf-8">
-        <script src="https://code.highcharts.com/highcharts.js"></script>
-        <script src="https://code.highcharts.com/modules/exporting.js"></script>
+        <script src="${HIGHCHARTS_CDN_BASE}/highcharts.js"></script>
+        <script src="${HIGHCHARTS_CDN_BASE}/modules/exporting.js"></script>
         <style>
           * {
             margin: 0;
@@ -155,10 +73,23 @@ export const generateHTMLTemplate = (
         <div id="${chartId}"></div>
         <script>
           let chart;
-          let lastSetExtremesTime = 0;
-          const SET_EXTREMES_THROTTLE_MS = 100; // Throttle to max 10 events per second
 
           const defaultOptions = {
+            chart: {
+              renderTo: '${chartId}',
+              type: '${options.type || "line"}',
+              backgroundColor: 'transparent',
+              animation: {
+                duration: 1000
+              },
+              style: {
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+              },
+              spacingLeft: ${options.type === "pie" ? CHART_SPACING.PIE.LEFT : CHART_SPACING.BAR.LEFT},
+              spacingRight: ${options.type === "pie" ? CHART_SPACING.PIE.RIGHT : CHART_SPACING.BAR.RIGHT},
+              spacingTop: ${options.type === "pie" ? CHART_SPACING.PIE.TOP : CHART_SPACING.BAR.TOP},
+              spacingBottom: ${options.type === "pie" ? CHART_SPACING.PIE.BOTTOM : CHART_SPACING.BAR.BOTTOM}
+            },
             title: {
               text: '${options.title || ""}',
               style: {
@@ -184,77 +115,13 @@ export const generateHTMLTemplate = (
               borderRadius: 8,
               shadow: true
             },
-            chart: {
-              renderTo: '${chartId}',
-              type: '${options.type || "line"}',
-              backgroundColor: 'transparent',
-              animation: {
-                duration: 1000
-              },
-              style: {
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-              },
-              spacingLeft: ${options.type === "pie" ? CHART_SPACING.PIE.LEFT : CHART_SPACING.BAR.LEFT},
-              spacingRight: ${options.type === "pie" ? CHART_SPACING.PIE.RIGHT : CHART_SPACING.BAR.RIGHT},
-              spacingTop: ${options.type === "pie" ? CHART_SPACING.PIE.TOP : CHART_SPACING.BAR.TOP},
-              spacingBottom: ${options.type === "pie" ? CHART_SPACING.PIE.BOTTOM : CHART_SPACING.BAR.BOTTOM},
-              zoomType: 'x',
-              zooming: {
-                type: 'x'
-              },
-              panning: {
-                enabled: true,
-                type: 'x'
-              },
-              pinchType: 'x',
-              events: {
-                selection: function(event) {
-                  if (event.xAxis) {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'selection',
-                      data: {
-                        min: event.xAxis[0].min,
-                        max: event.xAxis[0].max,
-                        timestamp: new Date().toISOString()
-                      }
-                    }));
-                  }
-                  // Allow default zoom behavior
-                  return true;
-                }
-              }
-            },
             xAxis: {
               title: {
                 text: '${options.xAxisTitle || ""}'
               },
-              type: ${options.dateFormat ? "'datetime'" : "'category'"},
+              type: ${xAxisType},
               minPadding: 0.1,
-              maxPadding: 0.1,
-              minRange: ${getPeriodZoomLimits(options.periodType).minRange}, // Dynamic min range based on period type
-              maxRange: ${getPeriodZoomLimits(options.periodType).maxRange}, // Dynamic max range based on period type
-              events: {
-                setExtremes: function(event) {
-                  const now = Date.now();
-                  if (now - lastSetExtremesTime > SET_EXTREMES_THROTTLE_MS) {
-                    lastSetExtremesTime = now;
-                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                      type: 'setExtremes',
-                      data: {
-                        min: event.min,
-                        max: event.max,
-                        trigger: event.trigger, // 'zoom', 'navigator', etc.
-                        timestamp: new Date().toISOString()
-                      }
-                    }));
-                  }
-
-                  // Update bar width based on visible range
-                  if (event.min != null && event.max != null) {
-                    updateBarWidth(event.min, event.max);
-                  }
-                }
-              }
+              maxPadding: 0.1
             },
             yAxis: {
               title: {
@@ -283,10 +150,10 @@ export const generateHTMLTemplate = (
                 }
               },
               column: {
+                pointWidth: 25,
                 borderRadius: 4,
-                groupPadding: 0.4,
-                pointPadding: 0.4,
-                pointWidth: ${calculateBarWidth(7)}, // Default width - will be updated by setExtremes event
+                groupPadding: 0.1,
+                pointPadding: 0.1,
                 dataLabels: {
                   enabled: false,
                   style: {
@@ -317,9 +184,12 @@ export const generateHTMLTemplate = (
               chart.destroy();
             }
 
+            if (typeof Highcharts === 'undefined' || !Highcharts.chart) {
+              return;
+            }
+
             chart = Highcharts.chart(mergedOptions);
 
-            // Notify React Native that chart is ready
             if (window.ReactNativeWebView) {
               window.ReactNativeWebView.postMessage(JSON.stringify({
                 type: 'chartReady'
@@ -342,66 +212,10 @@ export const generateHTMLTemplate = (
             }
           }
 
-          function updateBarWidth(min, max) {
-            if (!chart || !chart.series || chart.series.length === 0) return;
+          window.initChart = initChart;
+          window.updateChart = updateChart;
 
-            const periodMs = ${PERIOD_MS[options.periodType || "day"]};
-            const rangeMs = max - min;
-            const visiblePeriods = rangeMs / periodMs;
-
-            // Use same config as TypeScript helper function
-            const barWidthConfig = ${JSON.stringify(BAR_WIDTH_CONFIG)};
-            const { minPeriods, maxPeriods, minWidth, maxWidth } = barWidthConfig;
-
-            const clampedPeriods = Math.max(minPeriods, Math.min(maxPeriods, visiblePeriods));
-            const barWidth = maxWidth - ((clampedPeriods - minPeriods) * (maxWidth - minWidth)) / (maxPeriods - minPeriods);
-
-            // Update all column series
-            chart.series.forEach(function(series) {
-              if (series.type === 'column') {
-                series.update({
-                  pointWidth: Math.round(barWidth)
-                }, false);
-              }
-            });
-
-            chart.redraw();
-          }
-
-          function setExtremes(min, max) {
-            if (chart && chart.xAxis && chart.xAxis[0]) {
-              chart.xAxis[0].setExtremes(min, max);
-            }
-          }
-
-          // Make functions available globally
-          window.setExtremes = setExtremes;
-
-          // Initial chart creation with empty data and zoom
           initChart([]);
-
-          // Set initial zoom level after a short delay to ensure chart is ready
-          setTimeout(() => {
-            if (chart && chart.xAxis && chart.xAxis[0]) {
-              // Calculate initial zoom range with future extension using centralized config
-              const periodType = '${options.periodType || "day"}';
-              const zoomConfig = ${JSON.stringify(INITIAL_ZOOM_CONFIG)};
-
-              const periodMs = ${JSON.stringify(PERIOD_MS)};
-              const now = new Date().getTime();
-
-              const periodsToShow = zoomConfig.defaultPeriods[periodType];
-              const rangeMs = periodsToShow * periodMs[periodType];
-
-              // Calculate the start time (past) and end time (future)
-              const startTime = now - rangeMs;
-              const futureExtension = rangeMs * zoomConfig.futureExtensionRatio;
-              const endTime = now + futureExtension;
-
-              chart.xAxis[0].setExtremes(startTime, endTime);
-              // Initial bar width will be set by setExtremes event
-            }
-          }, 0);
         </script>
       </body>
     </html>
@@ -450,7 +264,6 @@ export const createBarChartData = (
 ): unknown[] => {
   const series = [];
 
-  // Bar data
   series.push({
     name: "Expenses",
     type: "column",
@@ -475,7 +288,6 @@ export const createPieChartData = (data: ChartData[]): unknown[] => {
       colorByPoint: true,
       data: data.map((item) => {
         const label = item.label || String(item.x);
-        // Split label into category name and currency value
         const parts = label.split(" ");
         const categoryName = parts[0];
         const currencyValue = parts.slice(1).join(" ");

@@ -70,7 +70,7 @@ const Autocomplete = ({
           if (isSelectingRef.current) {
             return;
           }
-          
+
           const timeoutId = setTimeout(
             () => {
               // Double-check selection state before hiding
@@ -131,17 +131,17 @@ const Autocomplete = ({
                   onTouchStart={() => {
                     // Handle selection immediately on touch start to bypass keyboard dismiss
                     isSelectingRef.current = true;
-                    
+
                     // Clear any pending blur timeout
                     if (blurTimeout) {
                       clearTimeout(blurTimeout);
                       setBlurTimeout(null);
                     }
-                    
+
                     // Apply the selection immediately
                     origOnChange(autotext);
                     setValue(autotext);
-                    
+
                     // Hide menu after a brief delay to ensure smooth UX
                     setTimeout(() => {
                       setMenuVisible(false);

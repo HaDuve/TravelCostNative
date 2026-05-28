@@ -14,8 +14,8 @@ import PropTypes from "prop-types";
 import {
   ExpenseData,
   getExpensesSum,
-  getTravellerSum,
 } from "../../../util/expense";
+import { sumByTraveller } from "../../../util/expenseTotals";
 import { TripContext } from "../../../store/trip-context";
 import BlurPremium from "../../Premium/BlurPremium";
 import { processTitleStringFilteredPiecharts } from "../../../util/string";
@@ -72,7 +72,7 @@ const ExpenseTravellers = ({
     const catSumCat = Array.from(travellerMap.entries()).map(
       ([traveller, catExpenses]) => ({
         cat: traveller,
-        sumCat: Number(getTravellerSum(catExpenses, traveller)),
+        sumCat: Number(sumByTraveller(catExpenses, traveller)),
         color: "",
         catExpenses,
       })

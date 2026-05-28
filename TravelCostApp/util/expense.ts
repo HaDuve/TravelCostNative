@@ -12,6 +12,7 @@ import {
   OfflineQueueManageExpenseItem,
 } from "./offline-queue";
 import { splitType } from "./split";
+import { asPeriodSlice, sumByPeriod, sumForTrip } from "./expenseTotals";
 
 // expense interface
 export interface Expense {
@@ -187,24 +188,29 @@ export function deduplicateRangeExpenses(
 /**
  * Calculate total expenses sum with deduplication for range expenses.
  * Use this for total/overall calculations where each range should be counted once.
+ *
+ * Delegates to {@link sumForTrip}: excludes deleted expenses and uses
+ * consolidateRangedExpenses (reconstructs full cost for ranged-split expenses).
  */
 export function getExpensesSumTotal(
   expenses: ExpenseData[],
-  hideSpecial = false
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _hideSpecial = false
 ) {
-  const deduplicatedExpenses = deduplicateRangeExpenses(expenses);
-  return calculateExpensesSum(deduplicatedExpenses, hideSpecial);
+  return sumForTrip(expenses);
 }
 
 /**
  * Calculate expenses sum for a specific time period, counting all days of range expenses.
  * Use this for daily/weekly/monthly/yearly calculations where each day should be counted.
+ *
+ * Delegates to {@link sumByPeriod}: excludes deleted expenses.
  */
 export function getExpensesSumPeriod(
   expenses: ExpenseData[],
   hideSpecial = false
 ) {
-  return calculateExpensesSum(expenses, hideSpecial);
+  return sumByPeriod(asPeriodSlice(expenses), hideSpecial);
 }
 
 /**
@@ -227,6 +233,10 @@ export function getExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
   return getExpensesSumPeriod(expenses, hideSpecial);
 }
 
+/**
+ * @deprecated Use {@link sumByTraveller} from `./expenseTotals` instead.
+ * `sumByTraveller` correctly excludes deleted expenses.
+ */
 export function getTravellerSum(
   expenses: ExpenseData[],
   traveller: string,

@@ -1,6 +1,6 @@
 import { GlobalStyles } from "../constants/styles";
 import type { ExpenseData } from "./expense";
-import { getExpensesSumPeriod } from "./expense";
+import { asPeriodSlice, sumByPeriod } from "./expenseTotals";
 import { DateTime } from "luxon";
 import {
   getDateMinusDays,
@@ -117,7 +117,7 @@ export function calculateDailyAverage(
         Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
       );
 
-      const totalSum = getExpensesSumPeriod(eligible, hideSpecial);
+      const totalSum = sumByPeriod(asPeriodSlice(eligible), hideSpecial);
       return totalSum / daysFromStartToToday;
     }
 
@@ -135,7 +135,7 @@ export function calculateDailyAverage(
         const dayExpenses = eligible.filter((exp) =>
           isSameDay(toJsDate(exp.date), day)
         );
-        const daySum = getExpensesSumPeriod(dayExpenses, hideSpecial);
+        const daySum = sumByPeriod(asPeriodSlice(dayExpenses), hideSpecial);
         if (daySum > 0) {
           totalSum += daySum;
           daysWithExpenses++;
@@ -184,7 +184,7 @@ export function calculateDailyAverage(
           if (d < weekStartDay || d > weekEndDay) return false;
           return true;
         });
-        const weekSum = getExpensesSumPeriod(weekExpenses, hideSpecial);
+        const weekSum = sumByPeriod(asPeriodSlice(weekExpenses), hideSpecial);
         if (weekSum > 0) {
           totalSum += weekSum / 7;
           weeksWithExpenses++;
@@ -224,7 +224,7 @@ export function calculateDailyAverage(
           if (d < start || d > end) return false;
           return true;
         });
-        const monthSum = getExpensesSumPeriod(monthExpenses, hideSpecial);
+        const monthSum = sumByPeriod(asPeriodSlice(monthExpenses), hideSpecial);
         if (monthSum > 0) {
           totalSum += monthSum / 30;
           monthsWithExpenses++;
@@ -257,7 +257,7 @@ export function calculateDailyAverage(
           if (d < start || d > end) return false;
           return true;
         });
-        const yearSum = getExpensesSumPeriod(yearExpenses, hideSpecial);
+        const yearSum = sumByPeriod(asPeriodSlice(yearExpenses), hideSpecial);
         if (yearSum > 0) {
           totalSum += yearSum / 365;
           yearsWithExpenses++;
@@ -307,7 +307,7 @@ export function calculateAverageUpToDate(
         const dayExpenses = eligible.filter((exp) =>
           isSameDay(toJsDate(exp.date), day)
         );
-        const daySum = getExpensesSumPeriod(dayExpenses, hideSpecial);
+        const daySum = sumByPeriod(asPeriodSlice(dayExpenses), hideSpecial);
         if (daySum > 0) {
           totalSum += daySum;
           daysWithExpenses++;
@@ -354,7 +354,7 @@ export function calculateAverageUpToDate(
           if (d < weekStartDay || d > weekEndDay) return false;
           return true;
         });
-        const weekSum = getExpensesSumPeriod(weekExpenses, hideSpecial);
+        const weekSum = sumByPeriod(asPeriodSlice(weekExpenses), hideSpecial);
         if (weekSum > 0) {
           totalSum += weekSum / 7;
           weeksWithExpenses++;
@@ -392,7 +392,7 @@ export function calculateAverageUpToDate(
           if (d < start || d > end) return false;
           return true;
         });
-        const monthSum = getExpensesSumPeriod(monthExpenses, hideSpecial);
+        const monthSum = sumByPeriod(asPeriodSlice(monthExpenses), hideSpecial);
         if (monthSum > 0) {
           totalSum += monthSum / 30;
           monthsWithExpenses++;
@@ -425,7 +425,7 @@ export function calculateAverageUpToDate(
           if (d < start || d > end) return false;
           return true;
         });
-        const yearSum = getExpensesSumPeriod(yearExpenses, hideSpecial);
+        const yearSum = sumByPeriod(asPeriodSlice(yearExpenses), hideSpecial);
         if (yearSum > 0) {
           totalSum += yearSum / 365;
           yearsWithExpenses++;

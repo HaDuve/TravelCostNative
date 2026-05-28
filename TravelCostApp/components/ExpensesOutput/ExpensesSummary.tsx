@@ -18,8 +18,8 @@ import { SettingsContext } from "../../store/settings-context";
 import {
   ExpenseData,
   getExpensesSumPeriod,
-  getTravellerSum,
 } from "../../util/expense";
+import { sumByTraveller } from "../../util/expenseTotals";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { CurrencyTicker } from "../UI/AnimatedNumber";
@@ -136,7 +136,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
       break;
   }
   const travellerSplitExpenseSums = travellerNames.map((travellerName) => {
-    return getTravellerSum(
+    return sumByTraveller(
       periodExpenses,
       travellerName || "",
       periodName === "total",

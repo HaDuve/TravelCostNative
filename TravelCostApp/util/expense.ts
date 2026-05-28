@@ -228,7 +228,10 @@ function calculateExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
   return sum;
 }
 
-// Deprecated: Use getExpensesSumTotal or getExpensesSumPeriod instead
+/**
+ * @deprecated Prefer {@link sumForTrip} (total) or {@link sumByPeriod}/{@link asPeriodSlice} (period).
+ * This wrapper is kept for existing UI callers and will be removed in a follow-up cleanup.
+ */
 export function getExpensesSum(expenses: ExpenseData[], hideSpecial = false) {
   return getExpensesSumPeriod(expenses, hideSpecial);
 }

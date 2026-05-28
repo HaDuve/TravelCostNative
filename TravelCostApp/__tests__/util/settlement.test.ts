@@ -62,6 +62,9 @@ describe("Settlement (settleTrip)", () => {
     expect(openBefore.length).toBeGreaterThan(0);
 
     const settledTrip = settleTrip(trip, now);
+    expect(settledTrip.isPaid).toBe(isPaidString.paid);
+    expect(settledTrip.isPaidTimestamp).toBe(now);
+    expect(settledTrip.isPaidDate).toBe(new Date(now).toISOString());
 
     // Per-expense paid-back is derived by getEffectiveIsPaid with trip settlement timestamp.
     for (const exp of trip.expenses) {

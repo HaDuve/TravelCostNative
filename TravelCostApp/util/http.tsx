@@ -7,7 +7,8 @@ import {
 
 import { Category } from "./category";
 import type { TripData } from "../types/trip";
-import { ExpenseData, ExpenseDataOnline, isPaidString } from "./expense";
+import type { ExpenseData, ExpenseDataOnline } from "./expense";
+import { isPaidString } from "./expense";
 import { UserData } from "../store/user-context";
 
 import { i18n } from "../i18n/i18n";

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable react/prop-types */
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { fetchTrip, fetchUser, getTravellers, updateTrip } from "../util/http";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
@@ -105,7 +104,7 @@ export const TripContext = createContext<TripContextType>({
   isDynamicDailyBudget: false,
 });
 
-function TripContextProvider({ children }) {
+function TripContextProvider({ children }: React.PropsWithChildren) {
   const expensesCtx = useContext(ExpensesContext);
   const [travellers, setTravellers] = useState([]);
   const [tripid, setTripid] = useState("");
@@ -458,7 +457,7 @@ function TripContextProvider({ children }) {
     if (travellers) {
       setTravellers(travellers);
     }
-    return travellers;
+    return travellers ?? [];
   }
 
   const value = {

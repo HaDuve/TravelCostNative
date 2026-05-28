@@ -341,10 +341,6 @@ export function findMostDuplicatedDescriptionExpenses(
   }
 }
 
-// Re-export canonical aggregation module so existing callers importing from
-// this file continue to work, and new code can import from expenseTotals directly.
-export { sumForTrip, sumByPeriod, sumByTraveller } from "./expenseTotals";
-
 export async function getAllExpensesData(tripid: string) {
   const lastCacheUpdateExpenses = getMMKVString(
     MMKV_KEY_PATTERNS.LAST_UPDATE_ISO_ALL_EXPENSES_TRIP(tripid)

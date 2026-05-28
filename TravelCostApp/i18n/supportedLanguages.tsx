@@ -178,6 +178,9 @@ const en = {
   enterNameAlert: "Please enter a Name for your new Trip Budget",
   enterBudgetAlert: "Please enter a Total Budget higher than Daily Budget",
   selectCurrencyAlert: "Please select your home currency for this trip",
+  alertChangeHomeCurrencyTitle: "Changing home currency",
+  alertChangeHomeCurrencyMessage:
+    "Are you sure you want to change the currency? Set it to the currency you normally use at home.",
   deleteTrip: "Delete Trip",
   deleteTripSure: "Are you sure you want to delete this Trip?",
   setActive: "Set as active Trip",
@@ -753,6 +756,9 @@ const de = {
   enterNameAlert: "Bitte gib einen Namen für deine Reise ein!",
   enterBudgetAlert: "Bitte gib ein höheres Gesamtbudget als Tagesbudget ein!",
   selectCurrencyAlert: "Bitte wähle deine Heimatwährung aus!",
+  alertChangeHomeCurrencyTitle: "Heimatwährung ändern",
+  alertChangeHomeCurrencyMessage:
+    "Möchtest du die Währung wirklich ändern? Wähle die Währung, die du zu Hause normalerweise verwendest.",
   deleteTrip: "Reise löschen",
   deleteTripSure: "Bist du dir sicher, dass du diese Reise löschen möchtest?",
   setActive: "Als aktive Reise markieren",
@@ -1358,6 +1364,9 @@ const fr = {
     "Veuillez entrer un budget total supérieur au budget quotidien",
   selectCurrencyAlert:
     "Veuillez sélectionner votre devise du domicile pour ce voyage",
+  alertChangeHomeCurrencyTitle: "Changer la devise du domicile",
+  alertChangeHomeCurrencyMessage:
+    "Voulez-vous vraiment changer la devise ? Choisissez la devise que vous utilisez habituellement chez vous.",
   deleteTrip: "Supprimer le voyage",
   deleteTripSure: "Êtes-vous sûr de vouloir supprimer ce voyage?",
   setActive: "Définir comme voyage actif",
@@ -1953,6 +1962,9 @@ const ru = {
   enterNameAlert: "Введите название нового бюджета поездки",
   enterBudgetAlert: "Введите общий бюджет, превышающий дневной бюджет",
   selectCurrencyAlert: "Выберите домашнюю валюту для бюджета поездки",
+  alertChangeHomeCurrencyTitle: "Изменение домашней валюты",
+  alertChangeHomeCurrencyMessage:
+    "Вы уверены, что хотите изменить валюту? Укажите валюту, которую вы обычно используете дома.",
   deleteTrip: "Удалить поездку",
   deleteTripSure: "Вы уверены, что хотите удалить эту поездку?",
   setActive: "Установить активной поездкой",

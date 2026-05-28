@@ -1,8 +1,14 @@
+import { readFileSync } from "fs";
+import { join } from "path";
 import { de, en, fr, ru } from "../../i18n/supportedLanguages";
+
+const appRoot = join(__dirname, "../..");
 
 /** Trip-currency UI copy (issue #221) — traveller home currency, not destination/base. */
 const tripCurrencyCopy = (locale: Record<string, string>) => [
   locale.selectCurrencyAlert,
+  locale.alertChangeHomeCurrencyTitle,
+  locale.alertChangeHomeCurrencyMessage,
   locale.baseCurrencyLabel,
   locale.baseCurrency,
   locale.infoHomeCurrencyTitle,
@@ -53,5 +59,22 @@ describe("trip currency i18n (issue #221)", () => {
       expect(copy).toMatch(/домашн/i);
       expect(copy).not.toMatch(/базов/i);
     });
+  });
+
+  it("change-home-currency alert keys exist in every locale", () => {
+    for (const locale of [en, de, fr, ru]) {
+      expect(locale.alertChangeHomeCurrencyTitle).toBeTruthy();
+      expect(locale.alertChangeHomeCurrencyMessage).toBeTruthy();
+    }
+  });
+
+  it("TripForm updateCurrency uses i18n, not hardcoded English", () => {
+    const tripForm = readFileSync(
+      join(appRoot, "components/ManageTrip/TripForm.tsx"),
+      "utf8"
+    );
+    expect(tripForm).not.toMatch(/"Changing Home Currency"/);
+    expect(tripForm).toMatch(/alertChangeHomeCurrencyTitle/);
+    expect(tripForm).toMatch(/alertChangeHomeCurrencyMessage/);
   });
 });

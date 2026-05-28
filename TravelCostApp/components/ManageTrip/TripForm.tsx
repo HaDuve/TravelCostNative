@@ -533,15 +533,15 @@ const TripForm = ({ navigation, route }) => {
   function updateCurrency() {
     if (!countryValue || countryValue.length < 1) return;
     Alert.alert(
-      "Changing Home Currency",
-      "Are you sure you want to change the currency? It should be set to the currency you are using normally at home.",
+      i18n.t("alertChangeHomeCurrencyTitle"),
+      i18n.t("alertChangeHomeCurrencyMessage"),
       [
         {
-          text: "Cancel",
+          text: i18n.t("cancel"),
           style: "cancel",
         },
         {
-          text: "Yes",
+          text: i18n.t("yes"),
           style: "destructive",
           onPress: () => {
             inputChangedHandler("tripCurrency", countryValue?.split(" ")[0]);

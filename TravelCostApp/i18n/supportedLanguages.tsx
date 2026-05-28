@@ -177,7 +177,10 @@ const en = {
   dailyBudgetLabel: "Daily Budget in",
   enterNameAlert: "Please enter a Name for your new Trip Budget",
   enterBudgetAlert: "Please enter a Total Budget higher than Daily Budget",
-  selectCurrencyAlert: "Please select a Base Currency for your Trip Budget",
+  selectCurrencyAlert: "Please select your home currency for this trip",
+  alertChangeHomeCurrencyTitle: "Changing home currency",
+  alertChangeHomeCurrencyMessage:
+    "Are you sure you want to change the currency? Set it to the currency you normally use at home.",
   deleteTrip: "Delete Trip",
   deleteTripSure: "Are you sure you want to delete this Trip?",
   setActive: "Set as active Trip",
@@ -753,6 +756,9 @@ const de = {
   enterNameAlert: "Bitte gib einen Namen für deine Reise ein!",
   enterBudgetAlert: "Bitte gib ein höheres Gesamtbudget als Tagesbudget ein!",
   selectCurrencyAlert: "Bitte wähle deine Heimatwährung aus!",
+  alertChangeHomeCurrencyTitle: "Heimatwährung ändern",
+  alertChangeHomeCurrencyMessage:
+    "Möchtest du die Währung wirklich ändern? Wähle die Währung, die du zu Hause normalerweise verwendest.",
   deleteTrip: "Reise löschen",
   deleteTripSure: "Bist du dir sicher, dass du diese Reise löschen möchtest?",
   setActive: "Als aktive Reise markieren",
@@ -1256,7 +1262,7 @@ const fr = {
   showMore: "Afficher plus",
   showLess: "Afficher moins des",
   currencyLabel: "Devise",
-  baseCurrency: "Devise d'origine",
+  baseCurrency: "Devise du domicile",
   descriptionLabel: "Description",
   dateLabel: "Date",
 
@@ -1350,14 +1356,17 @@ const fr = {
   tripFormTitleNew: "Nouveau budget de voyage",
   tripFormTitleEdit: "Modifier le budget de voyage",
   tripNameLabel: "Nom du voyage",
-  baseCurrencyLabel: "Devise d'origine",
+  baseCurrencyLabel: "Devise du domicile",
   totalBudgetLabel: "Budget total en",
   dailyBudgetLabel: "Budget quotidien en",
   enterNameAlert: "Veuillez entrer un nom pour votre nouveau budget de voyage",
   enterBudgetAlert:
     "Veuillez entrer un budget total supérieur au budget quotidien",
   selectCurrencyAlert:
-    "Veuillez sélectionner une devise d'origine pour votre budget de voyage",
+    "Veuillez sélectionner votre devise du domicile pour ce voyage",
+  alertChangeHomeCurrencyTitle: "Changer la devise du domicile",
+  alertChangeHomeCurrencyMessage:
+    "Voulez-vous vraiment changer la devise ? Choisissez la devise que vous utilisez habituellement chez vous.",
   deleteTrip: "Supprimer le voyage",
   deleteTripSure: "Êtes-vous sûr de vouloir supprimer ce voyage?",
   setActive: "Définir comme voyage actif",
@@ -1559,11 +1568,11 @@ const fr = {
   infoNewCatText:
     "Entrez un nom pour votre catégorie, puis choisissez un symbole approprié pour votre catégorie." +
     "\n\n Confirmez votre nouvelle catégorie avec le bouton <Ajouter>.",
-  infoHomeCurrencyTitle: "Informations sur la devise locale",
+  infoHomeCurrencyTitle: "Informations sur la devise du domicile",
   infoHomeCurrencyText:
-    "Configurez ici votre devise locale (par exemple, la devise du pays dans lequel vous résidez)." +
-    "\n\n Le pays ne sera pas enregistré et est seulement utile pour trouver votre devise." +
-    "\n\n Cette devise sera affichée dans l'application et toutes les autres devises que vous utiliserez lors de votre voyage seront converties en celle-ci.",
+    "Configurez ici votre devise du domicile (par exemple, la monnaie du pays où vous vivez habituellement)." +
+    "\n\n Le pays ne sera pas enregistré et sert uniquement à retrouver votre devise." +
+    "\n\n Cette devise s'affiche dans l'application ; toutes les autres devises utilisées pendant le voyage y sont converties.",
   infoTotalBudgetTitle: "Informations sur le budget total",
   infoTotalBudgetText:
     "Configurez ici votre budget total (par exemple, le montant d'argent pour l'ensemble du voyage)." +
@@ -1680,7 +1689,7 @@ const fr = {
   alertNeedOnlineCategory:
     "Vous devez être en ligne pour ajouter une nouvelle catégorie",
   alertSameCurrencyTrips:
-    "Veuillez sélectionner des voyages avec la même devise de base",
+    "Veuillez sélectionner des voyages avec la même devise du domicile",
   alertDeleteContextNotImplemented: "suppression du contexte non implémentée",
   alertDeleteGroupedRangeExpenses: "Supprimer les dépenses de groupe?",
   alertDeleteAllEntriesFor:
@@ -1952,7 +1961,10 @@ const ru = {
   dailyBudgetLabel: "Дневной бюджет в",
   enterNameAlert: "Введите название нового бюджета поездки",
   enterBudgetAlert: "Введите общий бюджет, превышающий дневной бюджет",
-  selectCurrencyAlert: "Выберите базовую валюту для бюджета поездки",
+  selectCurrencyAlert: "Выберите домашнюю валюту для бюджета поездки",
+  alertChangeHomeCurrencyTitle: "Изменение домашней валюты",
+  alertChangeHomeCurrencyMessage:
+    "Вы уверены, что хотите изменить валюту? Укажите валюту, которую вы обычно используете дома.",
   deleteTrip: "Удалить поездку",
   deleteTripSure: "Вы уверены, что хотите удалить эту поездку?",
   setActive: "Установить активной поездкой",
@@ -2281,7 +2293,7 @@ const ru = {
   alertNeedOnlineCategory:
     "Вам нужно быть онлайн, чтобы добавить новую категорию",
   alertSameCurrencyTrips:
-    "Пожалуйста, выберите поездки с одинаковой базовой валютой",
+    "Пожалуйста, выберите поездки с одинаковой домашней валютой",
   alertDeleteContextNotImplemented: "удаление контекста не реализовано",
   alertDeleteGroupedRangeExpenses: "Удалить сгруппированные расходы диапазона?",
   alertDeleteAllEntriesFor: "Это удалит все записи, которые принадлежат к",

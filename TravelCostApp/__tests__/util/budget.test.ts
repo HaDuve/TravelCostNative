@@ -103,6 +103,12 @@ describe("util/budget", () => {
     });
   });
 
+  describe("getBudgetColor (non-traffic light)", () => {
+    it("returns red when over budget", () => {
+      expect(getBudgetColor(110, 100, 0, 0, false)).toBe(GlobalStyles.colors.error300);
+    });
+  });
+
   describe("calculateDailyAverage", () => {
     it('computes "total" as trip total spent divided by days since trip start', () => {
       const expenses = [
@@ -292,6 +298,84 @@ describe("util/budget", () => {
           true
         )
       ).toBeCloseTo(50 / 5, 6);
+    });
+
+    it('computes "total" as trip total spent divided by days since trip start (up to target date)', () => {
+      const expenses = [
+        makeExpense({ calcAmount: 100, date: new Date("2026-01-15T12:00:00Z") }),
+        makeExpense({
+          id: "e2",
+          calcAmount: 50,
+          date: new Date("2026-01-14T12:00:00Z"),
+        }),
+      ];
+
+      expect(
+        calculateAverageUpToDate(
+          "total",
+          new Date("2026-01-15T12:00:00.000Z"),
+          expenses,
+          { startDate: "2026-01-10T00:00:00.000Z" },
+          false
+        )
+      ).toBeCloseTo(150 / 5, 6);
+    });
+
+    it('computes "week" as average daily spend per week (up to target date)', () => {
+      const expenses = [
+        makeExpense({
+          calcAmount: 70,
+          date: new Date("2026-01-12T12:00:00Z"), // Mon
+        }),
+      ];
+
+      expect(
+        calculateAverageUpToDate(
+          "week",
+          new Date("2026-01-18T12:00:00.000Z"), // Sun, week is complete
+          expenses,
+          { startDate: "2026-01-10T00:00:00.000Z" },
+          false
+        )
+      ).toBeCloseTo(10, 6); // 70/7
+    });
+
+    it('computes "month" as average daily spend per month (up to target date)', () => {
+      const expenses = [
+        makeExpense({
+          calcAmount: 300,
+          date: new Date("2026-01-02T12:00:00Z"),
+        }),
+      ];
+
+      expect(
+        calculateAverageUpToDate(
+          "month",
+          new Date("2026-01-31T12:00:00.000Z"),
+          expenses,
+          { startDate: "2026-01-01T00:00:00.000Z" },
+          false
+        )
+      ).toBeCloseTo(10, 6); // 300/30
+    });
+
+    it('computes "year" as average daily spend per year (up to target date)', () => {
+      const expenses = [
+        makeExpense({
+          calcAmount: 3650,
+          date: new Date("2025-06-01T12:00:00Z"),
+        }),
+      ];
+
+      expect(
+        calculateAverageUpToDate(
+          "year",
+          new Date("2025-12-31T12:00:00.000Z"),
+          expenses,
+          { startDate: "2025-01-01T00:00:00.000Z" },
+          false
+        )
+      ).toBeCloseTo(10, 6); // 3650/365
     });
   });
 });

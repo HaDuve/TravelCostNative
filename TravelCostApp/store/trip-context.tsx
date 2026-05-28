@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { fetchTrip, fetchUser, getTravellers, updateTrip } from "../util/http";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 import { MAX_JS_NUMBER } from "../confAppConstants";
@@ -12,11 +12,10 @@ import { useInterval } from "../components/Hooks/useInterval";
 import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "./mmkv";
 import { Category } from "../util/category";
 import safeLogError from "../util/error";
-import { ExpensesContext } from "./expenses-context";
-import { sumForTrip } from "../util/expenseTotals";
 import { computeDynamicDailyBudget } from "../util/budget";
 import type { TripData } from "../types/trip";
 import { settleTrip } from "../util/settlement";
+import { useTripTotalSpent } from "../hooks/useTripTotalSpent";
 
 export type { TripData };
 
@@ -105,7 +104,6 @@ export const TripContext = createContext<TripContextType>({
 });
 
 function TripContextProvider({ children }: React.PropsWithChildren) {
-  const expensesCtx = useContext(ExpensesContext);
   const [travellers, setTravellers] = useState([]);
   const [tripid, setTripid] = useState("");
   const [tripName, setTripName] = useState("");
@@ -125,10 +123,7 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
   const [isLoading, setIsLoading] = useState(false);
   const [isDynamicDailyBudget, setIsDynamicDailyBudget] = useState(false);
 
-  const tripTotalSpent = useMemo(() => {
-    const expenses = expensesCtx?.expenses ?? [];
-    return sumForTrip(expenses);
-  }, [expensesCtx?.expenses]);
+  const tripTotalSpent = useTripTotalSpent();
 
   async function loadTripidFetchTrip() {
     const stored_tripid = await secureStoreGetItem("currentTripId");

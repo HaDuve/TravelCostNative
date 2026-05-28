@@ -102,7 +102,7 @@ export function calculateDailyAverage(
   currentDate: Date,
   expenses: ExpenseData[],
   tripMeta: TripBudgetMeta,
-  hideSpecial: boolean = false
+  hideSpecial = false
 ): number {
   const today = currentDate;
   const eligible = (Array.isArray(expenses) ? expenses : []).filter((exp) =>
@@ -277,11 +277,11 @@ export function calculateDailyAverage(
  * This calculates average only up to that point (no future data).
  */
 export function calculateAverageUpToDate(
-  periodName: PeriodName,
+  periodName: PeriodNameWithTotal,
   targetDate: Date,
   expenses: ExpenseData[],
   tripMeta: TripBudgetMeta,
-  hideSpecial: boolean = false
+  hideSpecial = false
 ): number {
   // Some date helpers (e.g. getPreviousMondayDate) mutate the Date passed in.
   // Avoid mutating caller-owned Date instances.
@@ -290,6 +290,19 @@ export function calculateAverageUpToDate(
     isEligibleExpense(exp, { hideSpecial, maxDate: safeTargetDate })
   );
   switch (periodName) {
+    case "total": {
+      const startDate = new Date(tripMeta.startDate);
+      const daysFromStartToTarget = Math.max(
+        1,
+        Math.floor(
+          (safeTargetDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+        )
+      );
+
+      const totalSum = sumByPeriod(asPeriodSlice(eligible), hideSpecial);
+      return totalSum / daysFromStartToTarget;
+    }
+
     case "day": {
       const thisWeekMonday = getPreviousMondayDate(new Date(safeTargetDate)) as Date;
       const lastWeekMonday = getDateMinusDays(thisWeekMonday, 7) as Date;

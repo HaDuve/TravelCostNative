@@ -15,28 +15,10 @@ import safeLogError from "../util/error";
 import { ExpensesContext } from "./expenses-context";
 import { sumForTrip } from "../util/expenseTotals";
 import { computeDynamicDailyBudget } from "../util/budget";
+import type { TripData } from "../types/trip";
+import { settleTrip } from "../util/settlement";
 
-export interface TripData {
-  tripName?: string;
-  expenses?: ExpenseData[];
-  totalBudget?: string;
-  dailyBudget?: string;
-  tripCurrency?: string;
-  travellers?: Traveller[];
-  tripid?: string;
-  /** @deprecated derive trip total spent from expenses instead (see #247) */
-  totalSum?: number;
-  tripProgress?: number;
-  startDate?: string;
-  endDate?: string;
-  isPaidDate?: string;
-  isPaid?: isPaidString;
-  isPaidTimestamp?: number;
-  isDynamicDailyBudget?: boolean;
-  // online categories are stored as a JSON.stringified strings
-  // local categories are stored as Category arrays.
-  categories?: Category[] | string;
-}
+export type { TripData };
 
 export type TripContextType = {
   tripid: string;
@@ -66,7 +48,7 @@ export type TripContextType = {
   saveTripDataInStorage: (tripData: TripData) => Promise<void>;
   loadTripDataFromStorage: () => Promise<TripData>;
   saveTravellersInStorage: (travellers) => Promise<void>;
-  loadTravellersFromStorage: () => Promise<void>;
+  loadTravellersFromStorage: () => Promise<Traveller[]>;
   fetchAndSettleCurrentTrip: () => Promise<void>;
   setTripUnsettled: () => Promise<void>;
   isPaid: isPaidString;
@@ -111,7 +93,7 @@ export const TripContext = createContext<TripContextType>({
     return {} as TripData;
   },
   saveTravellersInStorage: async (travellers) => {},
-  loadTravellersFromStorage: async () => {},
+  loadTravellersFromStorage: async (): Promise<Traveller[]> => [],
   fetchAndSettleCurrentTrip: async () => {},
   setTripUnsettled: async () => {},
   isPaid: isPaidString.notPaid,
@@ -122,7 +104,7 @@ export const TripContext = createContext<TripContextType>({
   isDynamicDailyBudget: false,
 });
 
-function TripContextProvider({ children }) {
+function TripContextProvider({ children }: React.PropsWithChildren) {
   const expensesCtx = useContext(ExpensesContext);
   const [travellers, setTravellers] = useState([]);
   const [tripid, setTripid] = useState("");
@@ -366,14 +348,10 @@ function TripContextProvider({ children }) {
   async function fetchAndSettleCurrentTrip() {
     try {
       const trip = await fetchTrip(tripid);
-      trip.isPaid = isPaidString.paid;
-      const now = Date.now();
-      trip.isPaidTimestamp = now;
-      const today = new Date();
-      trip.isPaidDate = today.toISOString();
-      await setCurrentTrip(tripid, trip);
-      await saveTripDataInStorage(trip);
-      await updateTrip(tripid, trip);
+      const settledTrip = settleTrip(trip);
+      await setCurrentTrip(tripid, settledTrip);
+      await saveTripDataInStorage(settledTrip);
+      await updateTrip(tripid, settledTrip);
     } catch (error) {
       safeLogError(error);
       throw error;
@@ -479,7 +457,7 @@ function TripContextProvider({ children }) {
     if (travellers) {
       setTravellers(travellers);
     }
-    return travellers;
+    return travellers ?? [];
   }
 
   const value = {

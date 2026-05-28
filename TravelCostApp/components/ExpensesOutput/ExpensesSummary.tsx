@@ -26,7 +26,7 @@ import { CurrencyTicker } from "../UI/AnimatedNumber";
 import {
   calculateDailyAverage,
   getBudgetColor,
-} from "../../util/budgetColorHelper";
+} from "../../util/budget";
 
 const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
   const tripCtx = useContext(TripContext);
@@ -159,8 +159,11 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
     ? calculateDailyAverage(
         periodName as "day" | "week" | "month" | "year" | "total",
         today,
-        expCtx,
-        tripCtx,
+        expCtx.expenses || [],
+        {
+          startDate: tripCtx.startDate,
+          dailyBudget: Number(tripCtx.dailyBudget) || 0,
+        },
         hideSpecial,
       )
     : 0;

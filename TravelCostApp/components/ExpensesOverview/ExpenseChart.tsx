@@ -14,7 +14,7 @@ import WebViewChart from "../charts/WebViewChart";
 import { WebView } from "react-native-webview";
 import { ChartController, ExpenseData } from "../charts/controller";
 import { createBarChartData } from "../charts/chartHelpers";
-import { calculateDailyAverage } from "../../util/budgetColorHelper";
+import { calculateDailyAverage } from "../../util/budget";
 
 interface ExpenseChartProps {
   inputData: unknown[];
@@ -58,8 +58,8 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
     const averageDailySpending = calculateDailyAverage(
       periodType as "day" | "week" | "month" | "year" | "total",
       today,
-      expensesCtx,
-      tripCtx,
+      expensesCtx.expenses || [],
+      { startDate: tripCtx.startDate, dailyBudget: Number(tripCtx.dailyBudget) || 0 },
       settings.hideSpecialExpenses
     );
 

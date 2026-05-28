@@ -45,6 +45,7 @@ import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { Platform } from "react-native";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
+import { computeDynamicDailyBudget } from "../../util/budget";
 
 export type TripHistoryItemType = {
   tripid: string;
@@ -161,13 +162,13 @@ function TripHistoryItem({ tripid, trips }) {
     );
     setDays(days);
     setSumOfExpenses(sumOfExpenses);
-    const dynamicDailyBudget = (
-      (+tripCtx.totalBudget - sumOfExpenses) /
-      days
-    ).toFixed(2);
-    // dont allow negative daily budget
-    if (isDynamic && Number(dynamicDailyBudget) < 0) setDailyBudget("0.01");
-    else setDailyBudget(isDynamic ? dynamicDailyBudget : tripCtx.dailyBudget);
+    const dynamicDailyBudget = computeDynamicDailyBudget({
+      totalBudget: Number(tripCtx.totalBudget),
+      tripTotalSpent: sumOfExpenses,
+      endDate: new Date(tripCtx.endDate),
+      now: new Date(),
+    }).toFixed(2);
+    setDailyBudget(isDynamic ? dynamicDailyBudget : tripCtx.dailyBudget);
     const objTravellers = [];
     tripCtx.travellers.forEach((traveller) => {
       objTravellers.push({ userName: traveller });
@@ -190,9 +191,12 @@ function TripHistoryItem({ tripid, trips }) {
 
   useEffect(() => {
     if (!days || !isDynamicDailyBudget) return;
-    let calcDynamicBudget = (Number(totalBudget) - sumOfExpenses) / days;
-    if (isNaN(calcDynamicBudget) || calcDynamicBudget < 0)
-      calcDynamicBudget = 0.01;
+    const calcDynamicBudget = computeDynamicDailyBudget({
+      totalBudget: Number(totalBudget),
+      tripTotalSpent: sumOfExpenses,
+      endDate: new Date(tripCtx.endDate),
+      now: new Date(),
+    });
     setDailyBudget(calcDynamicBudget.toFixed(2));
     if (contextTrip) tripCtx.setdailyBudget(calcDynamicBudget.toFixed(2));
     // eslint-disable-next-line react-hooks/exhaustive-deps

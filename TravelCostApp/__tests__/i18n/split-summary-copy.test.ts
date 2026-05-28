@@ -44,25 +44,45 @@ describe("split summary i18n (issue #222)", () => {
   });
 
   describe("German", () => {
+    it("helper copy clarifies no money moved vs paid back", () => {
+      expect(de.balanceSimplificationHelper).toMatch(/kein Geld bewegt/i);
+      expect(de.settlementHelper).toMatch(/zurückbekommen/i);
+    });
+
     it("balance touchpoints avoid Aufteilung open-split phrasing", () => {
       const copy = splitSummaryTouchpoints(de);
       expect(copy).not.toMatch(/offene Aufteilung/i);
       expect(copy).not.toMatch(/Aufteilungen vereinfachen/i);
+      expect(copy).toMatch(/Salden/i);
     });
   });
 
   describe("French", () => {
+    it("helper copy clarifies no money moved vs paid back", () => {
+      expect(fr.balanceSimplificationHelper).toMatch(
+        /n'a encore bougé|aucun argent/i
+      );
+      expect(fr.settlementHelper).toMatch(/remboursé/i);
+    });
+
     it("balance touchpoints avoid open partage / dépense ouverte phrasing", () => {
       const copy = splitSummaryTouchpoints(fr);
       expect(copy).not.toMatch(/dépense ouverte/i);
       expect(copy).not.toMatch(/partages ouverts/i);
+      expect(copy).toMatch(/soldes/i);
     });
   });
 
   describe("Russian", () => {
+    it("helper copy clarifies no money moved vs paid back", () => {
+      expect(ru.balanceSimplificationHelper).toMatch(/не переводились/i);
+      expect(ru.settlementHelper).toMatch(/вернули деньги/i);
+    });
+
     it("balance touchpoints avoid open раздел phrasing", () => {
       const copy = splitSummaryTouchpoints(ru);
       expect(copy).not.toMatch(/открыт\w* раздел/i);
+      expect(copy).toMatch(/баланс/i);
     });
   });
 

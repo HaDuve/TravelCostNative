@@ -35,6 +35,6 @@ describe("Financial screen", () => {
     });
 
     expect(screen.getByText("Financial Overview")).toBeTruthy();
-    expect(screen.getByText("Open Splits Summary")).toBeTruthy();
+    expect(screen.getByText("Balance summary")).toBeTruthy();
   });
 });

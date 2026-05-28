@@ -113,7 +113,7 @@ Places where English UI copy or code identifiers still diverge from domain langu
 
 | Surface | Current wording / field | Domain term | Notes |
 | ------- | ----------------------- | ----------- | ----- |
-| Trip setup (i18n) | “Base Currency” (`selectCurrencyAlert`, related strings) | **Trip currency** | “Base” suggests destination or accounting base; domain term is the traveller’s home reference currency for the trip. |
+| Trip setup (i18n) | ~~“Base Currency”~~ → home / Heimatwährung / domicile copy (#221) | **Trip currency** | Aligned in #221 for EN/DE/FR/RU trip-currency alerts and info modals. |
 | Expense / trip models | `isPaid`, `isPaidTimestamp` | **Paid back**, **Settlement** (trip-wide) | `isPaid` is per-expense paid-back status; trip `isPaid` + timestamp drive trip-wide **Settlement**. |
 | Split Summary UI (i18n) | “open splits”, “Calculate open splits”, “No open splits” | **Balance** | Rolled-up amounts travellers owe each other, not “splits” as allocation mode. |
 | Split Summary UI (i18n) | “settle splits”, “Could not settle splits” | **Settlement** | Trip-wide clearing of balances, not settling split rows. |

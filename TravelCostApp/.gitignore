@@ -14,9 +14,6 @@ web-build/
 .env*
 settings.json
 
-# claude
-CLAUDE.md
-
 # credentials
 credentials.json
 database-overview.md

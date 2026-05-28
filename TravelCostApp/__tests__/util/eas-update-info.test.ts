@@ -49,10 +49,24 @@ describe("getEasUpdateInfo", () => {
 
     const info = await getEasUpdateInfo({ checkForNewer: true });
 
+    expect(info.updatesEnabled).toBe(true);
     expect(info.newerUpdateAvailable).toBe(true);
     expect(info.newerUpdateId).toBe("11111111-2222-3333-4444-555555555555");
     expect(info.newerUpdateCreatedAt).toBe("2026-05-21T15:30:00.000Z");
     expect(mockCheckForUpdateAsync).toHaveBeenCalled();
+  });
+
+  it("does not claim newer update is available when the newer manifest has no displayable fields", async () => {
+    mockCheckForUpdateAsync.mockResolvedValue({
+      isAvailable: true,
+      manifest: {},
+    });
+
+    const info = await getEasUpdateInfo({ checkForNewer: true });
+
+    expect(info.newerUpdateAvailable).toBe(false);
+    expect(info.newerUpdateId).toBeNull();
+    expect(info.newerUpdateCreatedAt).toBeNull();
   });
 
   it("leaves update fields empty and skips server check when expo-updates is disabled", async () => {
@@ -62,6 +76,7 @@ describe("getEasUpdateInfo", () => {
 
     const info = await getEasUpdateInfo({ checkForNewer: true });
 
+    expect(info.updatesEnabled).toBe(false);
     expect(info.runningUpdateId).toBeNull();
     expect(info.runningUpdateCreatedAt).toBeNull();
     expect(info.newerUpdateAvailable).toBe(false);

@@ -1,6 +1,7 @@
 import * as Updates from "expo-updates";
 
 export type EasUpdateInfo = {
+  updatesEnabled: boolean;
   runningUpdateId: string | null;
   runningUpdateCreatedAt: string | null;
   newerUpdateId: string | null;
@@ -18,6 +19,7 @@ export async function getEasUpdateInfo(
   const { checkForNewer = true } = options;
 
   const info: EasUpdateInfo = {
+    updatesEnabled: Updates.isEnabled,
     runningUpdateId: Updates.isEnabled ? Updates.updateId : null,
     runningUpdateCreatedAt: Updates.isEnabled
       ? (Updates.createdAt?.toISOString() ?? null)
@@ -35,13 +37,19 @@ export async function getEasUpdateInfo(
     const check = await Updates.checkForUpdateAsync();
     if (check.isAvailable && check.manifest) {
       const manifest = check.manifest as { id?: string; createdAt?: string };
-      info.newerUpdateAvailable = true;
       info.newerUpdateId = manifest.id ?? null;
       info.newerUpdateCreatedAt = manifest.createdAt
         ? new Date(manifest.createdAt).toISOString()
         : null;
+      info.newerUpdateAvailable = Boolean(
+        info.newerUpdateId || info.newerUpdateCreatedAt
+      );
     }
-  } catch {
+  } catch (error) {
+    if (__DEV__) {
+      // Low-noise: only in dev so unexpected failures aren't invisible.
+      console.warn("EAS update check failed", error);
+    }
     // Leave newer fields empty; footer still shows running update.
   }
 

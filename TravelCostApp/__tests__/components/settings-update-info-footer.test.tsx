@@ -33,6 +33,7 @@ describe("SettingsUpdateInfoFooter", () => {
 
   it("shows the running OTA update id and publish time", async () => {
     mockGetEasUpdateInfo.mockResolvedValue({
+      updatesEnabled: true,
       runningUpdateId: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
       runningUpdateCreatedAt: "2026-05-20T10:00:00.000Z",
       newerUpdateId: null,
@@ -51,12 +52,14 @@ describe("SettingsUpdateInfoFooter", () => {
     expect(
       await screen.findByText(/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/)
     ).toBeTruthy();
-    expect(screen.getByText(/2026/)).toBeTruthy();
+    expect(screen.getByText(/Version ID/i)).toBeTruthy();
+    expect(screen.getByText(/Version created at/i)).toBeTruthy();
     expect(screen.queryByText(/Newer version ID/i)).toBeNull();
   });
 
   it("shows newer OTA id and publish time when a newer bundle is available", async () => {
     mockGetEasUpdateInfo.mockResolvedValue({
+      updatesEnabled: true,
       runningUpdateId: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
       runningUpdateCreatedAt: "2026-05-20T10:00:00.000Z",
       newerUpdateId: "11111111-2222-3333-4444-555555555555",
@@ -76,5 +79,25 @@ describe("SettingsUpdateInfoFooter", () => {
       await screen.findByText(/11111111-2222-3333-4444-555555555555/)
     ).toBeTruthy();
     expect(screen.getByText(/Newer version ID/i)).toBeTruthy();
+  });
+
+  it("shows an explicit message when expo-updates is disabled on this build", async () => {
+    mockGetEasUpdateInfo.mockResolvedValue({
+      updatesEnabled: false,
+      runningUpdateId: null,
+      runningUpdateCreatedAt: null,
+      newerUpdateId: null,
+      newerUpdateCreatedAt: null,
+      newerUpdateAvailable: false,
+    });
+
+    const screen = renderWithAppProviders(<SettingsUpdateInfoFooter />, {
+      wrapNavigation: false,
+      network: { isConnected: true, strongConnection: true },
+    });
+
+    expect(await screen.findByText(/Updates disabled/i)).toBeTruthy();
+    expect(screen.queryByText(/Version ID/i)).toBeNull();
+    expect(screen.queryByText(/Newer version ID/i)).toBeNull();
   });
 });

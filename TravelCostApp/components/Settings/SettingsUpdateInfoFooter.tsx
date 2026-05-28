@@ -40,8 +40,18 @@ const SettingsUpdateInfoFooter = () => {
     }, [refresh])
   );
 
+  if (info?.updatesEnabled === false) {
+    return (
+      <Text style={styles.textButton}>
+        {i18n.t("settingsUpdatesDisabledLabel")}
+      </Text>
+    );
+  }
+
   const runningId = info?.runningUpdateId ?? null;
-  const runningCreatedAt = formatPublishTime(info?.runningUpdateCreatedAt ?? null);
+  const runningCreatedAt = formatPublishTime(
+    info?.runningUpdateCreatedAt ?? null
+  );
 
   return (
     <>

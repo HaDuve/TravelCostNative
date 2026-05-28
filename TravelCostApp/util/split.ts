@@ -350,21 +350,6 @@ export function travellerToDropdown(
   return [...listOfLabelValues];
 }
 
-/**
- * @deprecated Use `rollupOpenBalances(expenses, tripCurrency, tripIsPaidTimestamp?)`.
- *
- * Kept for backwards compatibility with older callers. This is now synchronous and
- * no longer fetches expenses over HTTP when none are provided.
- */
-export function calcOpenSplitsTable(
-  tripid: string,
-  tripCurrency: string,
-  givenExpenses?: ExpenseData[],
-  tripIsPaidTimestamp?: number
-) {
-  return rollupOpenBalances(givenExpenses ?? [], tripCurrency, tripIsPaidTimestamp);
-}
-
 export function rollupOpenBalances(
   expenses: ExpenseData[],
   tripCurrency: string,

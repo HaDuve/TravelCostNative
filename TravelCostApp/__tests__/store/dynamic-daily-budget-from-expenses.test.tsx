@@ -27,7 +27,6 @@ function BudgetProbe() {
         endDate: new Date("2026-01-11T00:00:00.000Z").toISOString(),
         travellers: [],
         isDynamicDailyBudget: true,
-        totalSum: 0,
       });
     })();
   }, [tripCtx.setCurrentTrip]);

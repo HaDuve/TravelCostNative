@@ -26,8 +26,6 @@ export type TripContextType = {
   dailyBudget: string;
   setdailyBudget: (dailyBudget: string) => void;
   tripCurrency: string;
-  /** @deprecated derive trip total spent from expenses instead (see #247) */
-  totalSum: number;
   tripProgress: number;
   startDate: string;
   endDate: string;
@@ -36,8 +34,6 @@ export type TripContextType = {
   setTripProgress: (percent: number) => void;
   travellers: Traveller[];
   fetchAndSetTravellers: (tripid: string) => Promise<boolean>;
-  /** @deprecated derive trip total spent from expenses instead (see #247) */
-  setTotalSum: (amount: number) => void;
   setTripid: (tripid: string) => void;
   addTrip: ({ tripName, tripTotalBudget }) => void;
   deleteTrip: (tripid: string) => void;
@@ -65,7 +61,6 @@ export const TripContext = createContext<TripContextType>({
   dailyBudget: "",
   setdailyBudget: (dailyBudget: string) => {},
   tripCurrency: "",
-  totalSum: 0,
   tripProgress: 0,
   startDate: "",
   endDate: "",
@@ -74,7 +69,6 @@ export const TripContext = createContext<TripContextType>({
   setTripProgress: (percent: number) => {},
   travellers: [],
   fetchAndSetTravellers: async (tripid: string) => false,
-  setTotalSum: (amount: number) => {},
   setTripid: (tripid: string) => {},
 
   addTrip: ({ tripName, tripTotalBudget }) => {},
@@ -110,7 +104,6 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
   const [totalBudget, setTotalBudget] = useState("");
   const [tripCurrency, setTripCurrency] = useState("");
   const [dailyBudget, setdailyBudget] = useState("");
-  const [totalSum, setTotalSumTrip] = useState(0);
   const [progress, setProgress] = useState(0);
   const [refreshState, setRefreshState] = useState(false);
   const [startDate, setStartDate] = useState("");
@@ -231,6 +224,19 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     return trip;
   }
 
+  function dropDeprecatedTripFields(trip: TripData): TripData {
+    // `totalSum` was a persisted trip-level total-spent number. We now derive totals
+    // from expenses (see #247) and drop this field on load to avoid stale state.
+    //
+    // Important: don't mutate the input object; callers may retain the reference.
+    if (!trip) return trip;
+    if (!("totalSum" in trip)) return trip;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { totalSum: _deprecatedTotalSum, ...rest } = trip as any;
+    return rest as TripData;
+  }
+
   async function fetchAndSetTravellers(tripid: string): Promise<boolean> {
     await loadTravellersFromStorage();
     const { isFastEnough } = await isConnectionFastEnough();
@@ -261,13 +267,12 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
       setIsPaid(isPaidString.notPaid);
       setIsPaidDate("");
       setIsPaidTimestamp(undefined);
-      setTotalSumTrip(0);
       setIsLoading(false);
       return;
     }
 
     // Migrate trip data from old settlement system
-    const migratedTrip = migrateTripSettlementData(trip);
+    const migratedTrip = dropDeprecatedTripFields(migrateTripSettlementData(trip));
 
     _setTripid(tripid);
     setTripName(migratedTrip.tripName);
@@ -288,7 +293,6 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     setIsPaid(migratedTrip.isPaid ?? isPaidString.notPaid);
     setIsPaidDate(migratedTrip.isPaidDate);
     setIsPaidTimestamp(migratedTrip.isPaidTimestamp);
-    setTotalSumTrip(migratedTrip.totalSum);
     setIsLoading(false);
     setIsDynamicDailyBudget(migratedTrip.isDynamicDailyBudget);
     if (typeof trip.travellers[1] === "string") {
@@ -305,10 +309,6 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     }
   }
 
-  function setTotalSum(amount: number) {
-    setTotalSumTrip(amount);
-  }
-
   async function fetchAndSetCurrentTrip(tripid: string) {
     if (!tripid) return;
     const { isFastEnough } = await isConnectionFastEnough();
@@ -319,7 +319,7 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
       trip.tripid = tripid;
 
       // Migrate trip data from old settlement system
-      const migratedTrip = migrateTripSettlementData(trip);
+      const migratedTrip = dropDeprecatedTripFields(migrateTripSettlementData(trip));
 
       await setCurrentTrip(tripid, migratedTrip);
 
@@ -374,7 +374,6 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
       totalBudget: totalBudget,
       dailyBudget: dailyBudget,
       tripCurrency: tripCurrency,
-      totalSum: totalSum,
       isPaid: isPaid,
       isPaidDate: isPaidDate,
       isPaidTimestamp: isPaidTimestamp,
@@ -403,8 +402,14 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
   async function loadTripDataFromStorage() {
     const tripData: TripData = getMMKVObject(MMKV_KEYS.CURRENT_TRIP);
     if (tripData) {
+      // `totalSum` might still exist in persisted data from older app versions.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hadDeprecatedTotalSum = "totalSum" in (tripData as any);
+
       // Migrate trip data from old settlement system
-      const migratedTrip = migrateTripSettlementData(tripData);
+      const migratedTrip = dropDeprecatedTripFields(
+        migrateTripSettlementData(tripData)
+      );
 
       setTripName(migratedTrip.tripName);
       setTotalBudget(
@@ -418,7 +423,6 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
       setIsPaid(migratedTrip.isPaid ?? isPaidString.notPaid);
       setIsPaidDate(migratedTrip.isPaidDate ?? "");
       setIsPaidTimestamp(migratedTrip.isPaidTimestamp);
-      setTotalSumTrip(migratedTrip.totalSum ?? 0);
       setStartDate(migratedTrip.startDate ?? "");
       setEndDate(migratedTrip.endDate ?? "");
       try {
@@ -428,12 +432,13 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
       }
       setIsLoading(false);
 
-      // If migration occurred, save migrated trip back to storage
-      if (
+      // If migration occurred, save migrated trip back to storage.
+      // Also persist the cleanup of deprecated fields (e.g. legacy `totalSum`).
+      const didMigrateSettlementData =
         tripData.isPaidDate &&
         !tripData.isPaidTimestamp &&
-        migratedTrip.isPaidTimestamp
-      ) {
+        migratedTrip.isPaidTimestamp;
+      if (didMigrateSettlementData || hadDeprecatedTotalSum) {
         await saveTripDataInStorage(migratedTrip);
       }
 
@@ -462,7 +467,6 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     dailyBudget: dailyBudget,
     setdailyBudget: setdailyBudget,
     tripCurrency: tripCurrency,
-    totalSum: totalSum,
     tripProgress: progress,
     startDate: startDate,
     endDate: endDate,
@@ -471,7 +475,6 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     setTripProgress: setTripProgress,
     travellers: travellers,
     fetchAndSetTravellers: fetchAndSetTravellers,
-    setTotalSum: setTotalSum,
     setTripid: _setTripid,
     addTrip: addTrip,
     deleteTrip: deleteTrip,

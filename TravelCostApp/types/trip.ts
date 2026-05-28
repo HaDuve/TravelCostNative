@@ -10,8 +10,6 @@ export interface TripData {
   tripCurrency?: string;
   travellers?: Traveller[];
   tripid?: string;
-  /** @deprecated derive trip total spent from expenses instead (see #247) */
-  totalSum?: number;
   tripProgress?: number;
   startDate?: string;
   endDate?: string;

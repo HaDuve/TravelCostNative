@@ -97,6 +97,14 @@ The spending target for a single calendar day. The day is **over daily budget** 
 A mode where the daily budget target is recalculated from remaining total budget and remaining trip days (e.g. after €1,200 spent with €1,800 left over 20 days, the target becomes ~€90/day). When enabled, “over daily budget” uses the current recalculated target, not necessarily the original figure entered at trip setup.
 _Avoid_: Automatic budget (vague)
 
+**Trip total spent**:
+The trip-wide cumulative spend — ranged expenses counted once (deduplicated by rangeId), deleted expenses excluded. Input to dynamic daily budget recalculation. Distinct from **period spend**.
+_Avoid_: totalSum (implementation name), total expenses (ambiguous with count)
+
+**Period spend**:
+The sum of expenses visible in a chosen time window (day / week / month / total) — ranged expenses counted per day they appear in the window. Computed where needed; never stored as trip state. Distinct from **trip total spent**.
+_Avoid_: totalSum, recentSum (non-canonical names)
+
 ### Currency
 
 **Trip currency**:

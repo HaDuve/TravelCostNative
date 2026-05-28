@@ -826,11 +826,11 @@ export default function App() {
           <StatusBar style="auto" />
           <AuthContextProvider>
             <NetworkContextProvider>
-              <TripContextProvider>
-                <UserContextProvider>
-                  <SettingsProvider>
-                    <NetworkProvider>
-                      <ExpensesContextProvider>
+              <ExpensesContextProvider>
+                <TripContextProvider>
+                  <UserContextProvider>
+                    <SettingsProvider>
+                      <NetworkProvider>
                         <OrientationContextProvider>
                           <GestureHandlerRootView style={{ flex: 1 }}>
                             <TourGuideProvider
@@ -868,11 +868,11 @@ export default function App() {
                             </TourGuideProvider>
                           </GestureHandlerRootView>
                         </OrientationContextProvider>
-                      </ExpensesContextProvider>
-                    </NetworkProvider>
-                  </SettingsProvider>
-                </UserContextProvider>
-              </TripContextProvider>
+                      </NetworkProvider>
+                    </SettingsProvider>
+                  </UserContextProvider>
+                </TripContextProvider>
+              </ExpensesContextProvider>
             </NetworkContextProvider>
           </AuthContextProvider>
         </SafeAreaWrapper>

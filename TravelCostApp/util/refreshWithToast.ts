@@ -3,7 +3,6 @@ import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpenses
 
 import { i18n } from "../i18n/i18n";
 import { ExpenseContextType } from "../store/expenses-context";
-import { TripContextType } from "../store/trip-context";
 
 export interface RefreshWithToastParams {
   showRefIndicator: boolean;
@@ -13,7 +12,6 @@ export interface RefreshWithToastParams {
   expensesCtx: ExpenseContextType;
   tripid: string;
   uid: string;
-  tripCtx: TripContextType;
 }
 
 export async function refreshWithToast({
@@ -24,7 +22,6 @@ export async function refreshWithToast({
   expensesCtx,
   tripid,
   uid,
-  tripCtx,
 }: RefreshWithToastParams): Promise<void> {
   // Store the count of expenses before refresh
   const expensesCountBefore = expensesCtx.expenses.length;
@@ -38,8 +35,7 @@ export async function refreshWithToast({
       setRefreshing,
       expensesCtx as ExpenseContextType,
       tripid,
-      uid,
-      tripCtx as TripContextType
+      uid
     );
 
     // Calculate how many new expenses were synced

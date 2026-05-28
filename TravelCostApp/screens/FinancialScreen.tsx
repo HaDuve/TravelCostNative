@@ -14,7 +14,7 @@ import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 
 const FinancialScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   const expCtx = useContext(ExpensesContext);
@@ -38,7 +38,6 @@ const FinancialScreen = () => {
 
   const restCash =
     Number(daysFromStartToToday) * Number(tripCtx.dailyBudget) - expensesSum;
-  tripCtx.setTotalSum(expensesSum);
   const multiTraveller =
     tripCtx.travellers && tripCtx.travellers.length > 1 ? true : false;
   // if (restCash < 0) restCash = 0;
@@ -66,6 +65,7 @@ const FinancialScreen = () => {
           });
           navigation.navigate("SplitSummary", { tripid: tripCtx.tripid });
         }}
+        buttonStyle={styles.button}
         style={styles.button}
       >
         {i18n.t("simplifySplitsLabel")}

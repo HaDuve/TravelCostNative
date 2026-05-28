@@ -72,8 +72,7 @@ function RecentExpenses({ navigation }) {
       setRefreshing: (isRefreshing: boolean) => void,
       expensesCtx: ExpenseContextType,
       tripid: string,
-      uid: string,
-      tripCtx: TripContextType
+      uid: string
     ) => {
       await fetchAndSetExpenses(
         showRefIndicator,
@@ -82,8 +81,7 @@ function RecentExpenses({ navigation }) {
         setRefreshing,
         expensesCtx,
         tripid,
-        uid,
-        tripCtx
+        uid
       );
     },
     []
@@ -138,8 +136,7 @@ function RecentExpenses({ navigation }) {
         setRefreshing,
         expensesCtx,
         tripid,
-        uid,
-        tripCtx
+        uid
       );
     },
     [
@@ -195,12 +192,11 @@ function RecentExpenses({ navigation }) {
         expensesCtx,
         tripid,
         uid,
-        tripCtx,
       });
     } catch (error) {
       // Error handling is done in refreshWithToast
     }
-  }, [expensesCtx, tripid, uid, tripCtx, setIsFetching, setRefreshing]);
+  }, [expensesCtx, tripid, uid, setIsFetching, setRefreshing]);
 
   // strong connection state
   const [offlineString, setOfflineString] = useState("");

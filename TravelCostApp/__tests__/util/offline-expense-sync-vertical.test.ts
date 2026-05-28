@@ -103,7 +103,6 @@ describe("offline expense sync (#230)", () => {
     (getAllExpenses as jest.Mock).mockResolvedValue([serverExpense]);
 
     const mergeExpenses = jest.fn();
-    const tripCtx = { setTotalSum: jest.fn() };
 
     await fetchAndSetExpenses(
       false,
@@ -116,8 +115,7 @@ describe("offline expense sync (#230)", () => {
         setIsSyncing: jest.fn(),
       } as any,
       "trip-1",
-      "u1",
-      tripCtx as any
+      "u1"
     );
 
     expect(mergeExpenses).toHaveBeenCalledWith([serverExpense]);

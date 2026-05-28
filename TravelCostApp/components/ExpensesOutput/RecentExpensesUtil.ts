@@ -1,13 +1,6 @@
 import { getAllExpenses, unTouchTraveler } from "../../util/http";
 
-import { i18n } from "../../i18n/i18n";
-
-import { getExpensesSum } from "../../util/expense";
-import {
-  ExpenseContextType,
-  mergeExpenseLists,
-} from "../../store/expenses-context";
-import { TripContextType } from "../../store/trip-context";
+import { ExpenseContextType } from "../../store/expenses-context";
 import safeLogError from "../../util/error";
 
 export async function fetchAndSetExpenses(
@@ -17,8 +10,7 @@ export async function fetchAndSetExpenses(
   setRefreshing: (isRefreshing: boolean) => void,
   expensesCtx: ExpenseContextType,
   tripid: string,
-  uid: string,
-  tripCtx: TripContextType
+  uid: string
 ) {
   if (showRefIndicator && showAnyIndicator) setIsFetching(true);
   if (showAnyIndicator) setRefreshing(true);
@@ -40,10 +32,7 @@ export async function fetchAndSetExpenses(
     expenses = expenses.filter((expense) => !isNaN(Number(expense.calcAmount)));
 
     if (expenses && expenses?.length !== 0) {
-      const mergedForSum = mergeExpenseLists(expensesCtx.expenses, expenses);
       expensesCtx.mergeExpenses(expenses);
-      const expensesSum = getExpensesSum(mergedForSum);
-      tripCtx.setTotalSum(expensesSum);
 
       // Note: The merged expenses will be automatically saved to storage
       // via the useEffect in expenses-context.tsx that watches expensesState changes

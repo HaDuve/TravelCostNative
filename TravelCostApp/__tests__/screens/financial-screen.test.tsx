@@ -27,7 +27,6 @@ describe("Financial screen", () => {
         startDate: pastDate.toISOString(),
         endDate: new Date("2026-02-01T12:00:00.000Z").toISOString(),
         travellers: ["Alice", "Bob"],
-        setTotalSum: jest.fn(),
       },
       expenses: {
         expenses: [makeExpense({ date: pastDate, calcAmount: 40 })],

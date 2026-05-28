@@ -24,7 +24,7 @@ import { GlobalStyles } from "../constants/styles";
 import { TripContext } from "../store/trip-context";
 import {
   areSplitListsEqual,
-  calcOpenSplitsTable,
+  rollupOpenBalances,
   simplifySplits,
 } from "../util/split";
 import PropTypes from "prop-types";
@@ -99,12 +99,7 @@ const SplitSummaryScreen = ({ navigation }) => {
     if (!tripid || expenses?.length === 0) return;
     setIsFetching(true);
     try {
-      const response = await calcOpenSplitsTable(
-        tripid,
-        tripCurrency,
-        expenses,
-        isPaidTimestamp
-      );
+      const response = rollupOpenBalances(expenses, tripCurrency, isPaidTimestamp);
       const formattedSplits = [];
       let userGetsBack = 0;
       let userHasToPay = 0;

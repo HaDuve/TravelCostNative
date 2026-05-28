@@ -44,7 +44,7 @@ const en = {
   chooseAction: "Please choose action:",
   inviteTravellers: "Invite other travellers",
   setActiveTrip: "Set as active Trip",
-  calcOpenSplits: "Calculate open splits",
+  calcOpenSplits: "Calculate balances",
   daily: "Daily",
 
   // today - yesterday etc.
@@ -139,7 +139,7 @@ const en = {
   // Settings Labels
   logoutLabel: "Logout",
   joinTripLabel: "Join Trip",
-  simplifySplitsLabel: "Open Splits Summary",
+  simplifySplitsLabel: "Balance summary",
   resetAppIntroductionLabel: "Reset App Introduction",
   visitFoodForNomadsLabel: "Visit Food For Nomads",
   supportFeedbackLabel: "Feedback?",
@@ -324,15 +324,19 @@ const en = {
   yourMoneyBack: "Your money back",
   youStillOwe: "You still owe",
   error: "Error",
-  errorSplits: "Could not fetch splits!",
-  alertNoSplits: "No Splits to Simplify",
+  errorSplits: "Could not fetch balances!",
+  alertNoSplits: "Nothing to simplify",
   XowesYtoZ1: "owes",
   XowesYtoZ2: "to",
-  simplifySplits: "Simplify Splits",
-  settleSplits: "Settle Splits",
+  simplifySplits: "Simplify splits",
+  settleSplits: "Settle splits",
+  balanceSimplificationHelper:
+    "See fewer payments between travellers. No money has moved yet.",
+  settlementHelper:
+    "Mark the trip as settled when everyone has been paid back.",
   confirmSettle: "Settle",
   sureSettleSplits:
-    "Are you sure you want to settle all splits? Has everyone gotten their money back?",
+    "Are you sure you want to settle the trip? Has everyone been paid back?",
   sureDeleteAccount:
     "This will unreversibly delete your Budget for Nomads Account!",
   premiumNomad: "Premium Nomad",
@@ -443,10 +447,10 @@ const en = {
   toastSyncFailed: "Failed to sync, please try again later",
   toastSyncSuccessTitle: "Sync Successful",
   toastSyncFailedTitle: "Sync Failed",
-  toastSettleSuccessTitle: "All Splits Settled!",
-  toastSettleSuccessMessage: "Yay! All splits are settled!",
-  toastSettleFailedTitle: "Settlement Failed",
-  toastSettleFailedMessage: "Could not settle splits. Please try again.",
+  toastSettleSuccessTitle: "Trip settled!",
+  toastSettleSuccessMessage: "Everyone is paid back for this trip.",
+  toastSettleFailedTitle: "Settlement failed",
+  toastSettleFailedMessage: "Could not settle the trip. Please try again.",
 
   // rate modal
   rateModalTitle: "Enjoying Budget for Nomads?",
@@ -538,8 +542,8 @@ const en = {
   neverAskAgain: "Never ask again",
   enterTotalBudgetNumber: "Please enter a total Budget number!",
   chatGPTError: "Chat GPT Error",
-  noSplitsToSimplify: "No Splits to Simplify",
-  couldNotSimplifySplits: "Could not simplify splits",
+  noSplitsToSimplify: "Nothing to simplify",
+  couldNotSimplifySplits: "Could not simplify balances",
   mustUsePhysicalDevice: "Must use physical device for Push Notifications",
   pressToSendNotification: "Press to Send Notification",
   hideSpecialExpenses: "Hide special expenses",
@@ -567,10 +571,12 @@ const en = {
   youStillOweWithColon: "You still owe: ",
   somethingWentWrongSorry: "Something must have gone wrong, sorry!",
   sureSettleSplitsFullMessage:
-    "Are you sure you want to settle all splits? Has everyone gotten their money back? This will mark ALL expenses as paid, regardless of their date.",
-  tripSettledAllExpensesPaid: "Trip Settled - All expenses marked as paid",
-  noOpenSplitsAllSettled: "No open splits - All expenses are settled",
-  noOpenSplits: "No open splits",
+    "Are you sure you want to settle the trip? Has everyone been paid back? This will mark ALL expenses as paid back, regardless of their date.",
+  tripSettledAllExpensesPaid:
+    "Trip settled — all expenses marked as paid back",
+  noOpenSplitsAllSettled:
+    "No open balances — all expenses are paid back",
+  noOpenSplits: "No open balances",
 };
 const de = {
   // special expense strings
@@ -619,7 +625,7 @@ const de = {
   chooseAction: "Bitte wähle eine Aktion aus:",
   inviteTravellers: "Andere Reisende einladen",
   setActiveTrip: "Als aktive Reise markieren",
-  calcOpenSplits: "Berechne offene Schulden",
+  calcOpenSplits: "Salden berechnen",
   daily: "Täglich",
 
   // today - yesterday etc.
@@ -717,7 +723,7 @@ const de = {
   // Settings Labels
   logoutLabel: "Ausloggen",
   joinTripLabel: "Reise beitreten",
-  simplifySplitsLabel: "Offene Schulden Übersicht",
+  simplifySplitsLabel: "Saldenübersicht",
   resetAppIntroductionLabel: "App Einführung wiederholen",
   visitFoodForNomadsLabel: "Food For Nomads besuchen",
   supportFeedbackLabel: "Feedback?",
@@ -914,15 +920,19 @@ const de = {
   yourMoneyBack: "Dein Geld zurück",
   youStillOwe: "Du schuldest noch",
   error: "Fehler",
-  errorSplits: "Aufteilungen konnten nicht abgerufen werden!",
-  alertNoSplits: "Keine Aufteilungen zum Vereinfachen",
+  errorSplits: "Salden konnten nicht abgerufen werden!",
+  alertNoSplits: "Nichts zu vereinfachen",
   XowesYtoZ1: "schuldet",
   XowesYtoZ2: "zu",
-  simplifySplits: "Aufteilungen vereinfachen",
-  settleSplits: "Aufteilungen begleichen",
+  simplifySplits: "Salden vereinfachen",
+  settleSplits: "Reise begleichen",
+  balanceSimplificationHelper:
+    "Weniger Zahlungen zwischen Reisenden — es wurde noch kein Geld bewegt.",
+  settlementHelper:
+    "Reise begleichen, wenn alle ihr Geld zurückbekommen haben.",
   confirmSettle: "Begleichen",
   sureSettleSplits:
-    "Sind Sie sicher, dass Sie alle Schulden begleichen möchten? Hat jeder sein Geld zurückbekommen?",
+    "Reise wirklich begleichen? Hat jeder sein Geld zurückbekommen?",
   sureDeleteAccount:
     "Dies löscht deinen Budget for Nomads Account unwiderruflich!",
   premiumNomad: "Premium-Nomade",
@@ -1043,11 +1053,12 @@ const de = {
     "Synchronisation fehlgeschlagen, bitte versuche es später erneut",
   toastSyncSuccessTitle: "Synchronisation erfolgreich",
   toastSyncFailedTitle: "Synchronisation fehlgeschlagen",
-  toastSettleSuccessTitle: "Alle Aufteilungen beglichen!",
-  toastSettleSuccessMessage: "Yay! Alle Aufteilungen sind beglichen!",
+  toastSettleSuccessTitle: "Reise beglichen!",
+  toastSettleSuccessMessage:
+    "Alle Reisenden haben ihr Geld für diese Reise zurück.",
   toastSettleFailedTitle: "Begleichung fehlgeschlagen",
   toastSettleFailedMessage:
-    "Aufteilungen konnten nicht beglichen werden. Bitte versuche es erneut.",
+    "Reise konnte nicht beglichen werden. Bitte versuche es erneut.",
   // rate modal
   rateModalTitle: "Gefällt dir Budget for Nomads?",
   rateModalSubTitle:
@@ -1141,8 +1152,8 @@ const de = {
   neverAskAgain: "Nie wieder fragen",
   enterTotalBudgetNumber: "Bitte geben Sie eine Gesamtbudgetzahl ein!",
   chatGPTError: "Chat GPT Fehler",
-  noSplitsToSimplify: "Keine Aufteilungen zu vereinfachen",
-  couldNotSimplifySplits: "Aufteilungen konnten nicht vereinfacht werden",
+  noSplitsToSimplify: "Nichts zu vereinfachen",
+  couldNotSimplifySplits: "Salden konnten nicht vereinfacht werden",
   mustUsePhysicalDevice:
     "Muss physisches Gerät für Push-Benachrichtigungen verwenden",
   pressToSendNotification: "Drücken Sie, um Benachrichtigung zu senden",
@@ -1171,12 +1182,12 @@ const de = {
   youStillOweWithColon: "Du schuldest noch: ",
   somethingWentWrongSorry: "Etwas muss schief gelaufen sein, entschuldige!",
   sureSettleSplitsFullMessage:
-    "Sind Sie sicher, dass Sie alle Schulden begleichen möchten? Hat jeder sein Geld zurückbekommen? Dies markiert ALLE Ausgaben als bezahlt, unabhängig von ihrem Datum.",
+    "Reise wirklich begleichen? Hat jeder sein Geld zurückbekommen? Alle Ausgaben werden als zurückgezahlt markiert, unabhängig vom Datum.",
   tripSettledAllExpensesPaid:
-    "Reise abgerechnet - Alle Ausgaben als bezahlt markiert",
+    "Reise beglichen — alle Ausgaben als zurückgezahlt markiert",
   noOpenSplitsAllSettled:
-    "Keine offenen Aufteilungen - Alle Ausgaben abgerechnet",
-  noOpenSplits: "Keine offenen Aufteilungen",
+    "Keine offenen Salden — alle Ausgaben sind zurückgezahlt",
+  noOpenSplits: "Keine offenen Salden",
 };
 const fr = {
   // special expense strings
@@ -1224,7 +1235,7 @@ const fr = {
   chooseAction: "Veuillez choisir une action :",
   inviteTravellers: "Inviter d'autres voyageurs",
   setActiveTrip: "Définir comme voyage actif",
-  calcOpenSplits: "Calculer les dépenses partagées ouvertes",
+  calcOpenSplits: "Calculer les soldes",
   daily: "Quotidien",
 
   // today - yesterday etc.
@@ -1321,7 +1332,7 @@ const fr = {
   // Settings Labels
   logoutLabel: "Déconnexion",
   joinTripLabel: "Rejoindre un voyage",
-  simplifySplitsLabel: "Résumé des dettes",
+  simplifySplitsLabel: "Résumé des soldes",
   resetAppIntroductionLabel: "Réinitialiser l'introduction de l'application",
   visitFoodForNomadsLabel: "Visitez Food For Nomads",
   supportFeedbackLabel: "Commentaires?",
@@ -1517,15 +1528,19 @@ const fr = {
   yourMoneyBack: "Votre argent est de retour",
   youStillOwe: "Vous devez toujours",
   error: "Erreur",
-  errorSplits: "Impossible de récupérer les dépenses partagées !",
-  alertNoSplits: "Aucune dépense à simplifier",
+  errorSplits: "Impossible de récupérer les soldes !",
+  alertNoSplits: "Rien à simplifier",
   XowesYtoZ1: "doit",
   XowesYtoZ2: "à",
-  simplifySplits: "Simplifier les dépenses",
-  settleSplits: "Régler les dépenses",
+  simplifySplits: "Simplifier les soldes",
+  settleSplits: "Régler le voyage",
+  balanceSimplificationHelper:
+    "Moins de paiements entre voyageurs. Aucun argent n'a encore bougé.",
+  settlementHelper:
+    "Marquer le voyage comme réglé quand tout le monde a été remboursé.",
   confirmSettle: "Régler",
   sureSettleSplits:
-    "Êtes-vous sûr de vouloir régler toutes les dépenses ? Tout le monde a-t-il récupéré son argent ?",
+    "Régler le voyage ? Tout le monde a-t-il été remboursé ?",
   sureDeleteAccount:
     "Cela supprimera définitivement votre compte Budget for Nomads !",
   premiumNomad: "Nomade Premium",
@@ -1644,11 +1659,12 @@ const fr = {
   toastSyncFailed: "Échec de la synchronisation, veuillez réessayer plus tard",
   toastSyncSuccessTitle: "Synchronisation réussie",
   toastSyncFailedTitle: "Échec de la synchronisation",
-  toastSettleSuccessTitle: "Tous les partages réglés !",
-  toastSettleSuccessMessage: "Yay ! Tous les partages sont réglés !",
+  toastSettleSuccessTitle: "Voyage réglé !",
+  toastSettleSuccessMessage:
+    "Tout le monde a été remboursé pour ce voyage.",
   toastSettleFailedTitle: "Échec du règlement",
   toastSettleFailedMessage:
-    "Impossible de régler les partages. Veuillez réessayer.",
+    "Impossible de régler le voyage. Veuillez réessayer.",
   // rate modal
   rateModalTitle: "Vous appréciez Budget for Nomads ?",
   rateModalSubTitle:
@@ -1744,8 +1760,8 @@ const fr = {
   neverAskAgain: "Ne plus jamais demander",
   enterTotalBudgetNumber: "Veuillez entrer un nombre de budget total!",
   chatGPTError: "Erreur Chat GPT",
-  noSplitsToSimplify: "Aucun partage à simplifier",
-  couldNotSimplifySplits: "Impossible de simplifier les partages",
+  noSplitsToSimplify: "Rien à simplifier",
+  couldNotSimplifySplits: "Impossible de simplifier les soldes",
   mustUsePhysicalDevice:
     "Doit utiliser un appareil physique pour les notifications push",
   pressToSendNotification: "Appuyez pour envoyer une notification",
@@ -1774,12 +1790,12 @@ const fr = {
   youStillOweWithColon: "Vous devez toujours : ",
   somethingWentWrongSorry: "Quelque chose a dû mal se passer, désolé !",
   sureSettleSplitsFullMessage:
-    "Êtes-vous sûr de vouloir régler toutes les dépenses ? Tout le monde a-t-il récupéré son argent ? Cela marquera TOUTES les dépenses comme payées, quelle que soit leur date.",
+    "Régler le voyage ? Tout le monde a-t-il été remboursé ? Toutes les dépenses seront marquées comme remboursées, quelle que soit leur date.",
   tripSettledAllExpensesPaid:
-    "Voyage réglé - Toutes les dépenses marquées comme payées",
+    "Voyage réglé — toutes les dépenses marquées comme remboursées",
   noOpenSplitsAllSettled:
-    "Aucune dépense ouverte - Toutes les dépenses sont réglées",
-  noOpenSplits: "Aucune dépense ouverte",
+    "Aucun solde ouvert — toutes les dépenses sont remboursées",
+  noOpenSplits: "Aucun solde ouvert",
 };
 const ru = {
   // special expense strings
@@ -1827,7 +1843,7 @@ const ru = {
   chooseAction: "Пожалуйста, выберите действие:",
   inviteTravellers: "Пригласить других путешественников",
   setActiveTrip: "Установить активную поездку",
-  calcOpenSplits: "Рассчитать открытые распределения",
+  calcOpenSplits: "Рассчитать балансы",
   daily: "Ежедневно",
 
   // today - yesterday etc.
@@ -1923,7 +1939,7 @@ const ru = {
   // Settings Labels
   logoutLabel: "Выйти",
   joinTripLabel: "Присоединиться к поездке",
-  simplifySplitsLabel: "Открыть сводку распределения",
+  simplifySplitsLabel: "Сводка балансов",
   resetAppIntroductionLabel: "Сбросить введение в приложение",
   visitFoodForNomadsLabel: "Посетить Food For Nomads",
   supportFeedbackLabel: "Отзыв?",
@@ -2110,15 +2126,19 @@ const ru = {
   yourMoneyBack: "Ваши деньги вернутся",
   youStillOwe: "Вы все еще должны",
   error: "Ошибка",
-  errorSplits: "Не удалось получить разделы!",
-  alertNoSplits: "Нет разделов для упрощения",
+  errorSplits: "Не удалось получить балансы!",
+  alertNoSplits: "Нечего упрощать",
   XowesYtoZ1: "должен",
   XowesYtoZ2: "для",
-  simplifySplits: "Упростить разделы",
-  settleSplits: "Расчет разделов",
-  confirmSettle: "Расчет",
+  simplifySplits: "Упростить балансы",
+  settleSplits: "Закрыть поездку",
+  balanceSimplificationHelper:
+    "Меньше платежей между путешественниками. Деньги ещё не переводились.",
+  settlementHelper:
+    "Отметить поездку закрытой, когда всем вернули деньги.",
+  confirmSettle: "Закрыть",
   sureSettleSplits:
-    "Вы уверены, что хотите рассчитать все разделы? Все ли получили свои деньги?",
+    "Закрыть поездку? Всем вернули деньги?",
   sureDeleteAccount: "Это безвозвратно удалит ваш аккаунт в Budget for Nomads!",
   premiumNomad: "Премиум-намбад",
   premiumNomadActiveNow: "Теперь вы являетесь премиум-намбадом!",
@@ -2248,11 +2268,11 @@ const ru = {
   toastSyncFailed: "Не удалось синхронизировать, попробуйте позже",
   toastSyncSuccessTitle: "Синхронизация успешна",
   toastSyncFailedTitle: "Ошибка синхронизации",
-  toastSettleSuccessTitle: "Все разделы урегулированы!",
-  toastSettleSuccessMessage: "Ура! Все разделы урегулированы!",
-  toastSettleFailedTitle: "Ошибка урегулирования",
+  toastSettleSuccessTitle: "Поездка закрыта!",
+  toastSettleSuccessMessage: "Всем вернули деньги по этой поездке.",
+  toastSettleFailedTitle: "Ошибка закрытия",
   toastSettleFailedMessage:
-    "Не удалось урегулировать разделы. Пожалуйста, попробуйте снова.",
+    "Не удалось закрыть поездку. Пожалуйста, попробуйте снова.",
   // rate modal
   rateModalTitle: "Нравится Budget for Nomads?",
   rateModalSubTitle:
@@ -2346,8 +2366,8 @@ const ru = {
   neverAskAgain: "Больше не спрашивать",
   enterTotalBudgetNumber: "Пожалуйста, введите общую сумму бюджета!",
   chatGPTError: "Ошибка Chat GPT",
-  noSplitsToSimplify: "Нет разделений для упрощения",
-  couldNotSimplifySplits: "Не удалось упростить разделения",
+  noSplitsToSimplify: "Нечего упрощать",
+  couldNotSimplifySplits: "Не удалось упростить балансы",
   mustUsePhysicalDevice:
     "Необходимо использовать физическое устройство для push-уведомлений",
   pressToSendNotification: "Нажмите, чтобы отправить уведомление",
@@ -2376,10 +2396,11 @@ const ru = {
   youStillOweWithColon: "Вы все еще должны: ",
   somethingWentWrongSorry: "Что-то пошло не так, извините!",
   sureSettleSplitsFullMessage:
-    "Вы уверены, что хотите рассчитать все разделы? Все ли получили свои деньги? Это отметит ВСЕ расходы как оплаченные, независимо от их даты.",
+    "Закрыть поездку? Всем вернули деньги? Все расходы будут отмечены как возмещённые, независимо от даты.",
   tripSettledAllExpensesPaid:
-    "Поездка урегулирована - Все расходы помечены как оплаченные",
-  noOpenSplitsAllSettled: "Нет открытых разделов - Все расходы урегулированы",
-  noOpenSplits: "Нет открытых разделов",
+    "Поездка закрыта — все расходы отмечены как возмещённые",
+  noOpenSplitsAllSettled:
+    "Нет открытых балансов — все расходы возмещены",
+  noOpenSplits: "Нет открытых балансов",
 };
 export { en, de, fr, ru };

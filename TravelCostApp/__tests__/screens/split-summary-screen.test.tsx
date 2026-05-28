@@ -61,6 +61,10 @@ describe("Split Summary screen", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Split Summary")).toBeTruthy();
+      expect(screen.getByText("Settle splits")).toBeTruthy();
+      expect(
+        screen.getByText(/paid back/i, { exact: false })
+      ).toBeTruthy();
       expect(screen.getByText("Bob")).toBeTruthy();
       expect(screen.getByText("Alice")).toBeTruthy();
     });

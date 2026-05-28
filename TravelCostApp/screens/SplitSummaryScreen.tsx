@@ -353,46 +353,56 @@ const SplitSummaryScreen = ({ navigation }) => {
         </FlatButton>
       )}
       {showSimplify && !noSimpleSplits && (
-        <GradientButton
-          buttonStyle={styles.button}
-          style={styles.button}
-          onPress={handleSimpflifySplits}
-        >
-          {i18n.t("simplifySplits")}
-        </GradientButton>
+        <View style={styles.actionWithHelper}>
+          <GradientButton
+            buttonStyle={styles.button}
+            style={styles.button}
+            onPress={handleSimpflifySplits}
+          >
+            {i18n.t("simplifySplits")}
+          </GradientButton>
+          <Text style={styles.buttonHelperText}>
+            {i18n.t("balanceSimplificationHelper")}
+          </Text>
+        </View>
       )}
       {hasOpenSplits && !isTripSettled && (
-        <GradientButton
-          style={styles.button}
-          colors={GlobalStyles.gradientColors}
-          darkText
-          buttonStyle={{
-            backgroundColor: GlobalStyles.colors.errorGrayed,
-          }}
-          onPress={async () => {
-            Alert.alert(
-              i18n.t("settleSplits"),
-              i18n.t("sureSettleSplitsFullMessage"),
-              [
-                {
-                  text: i18n.t("cancel"),
-                  style: "cancel",
-                },
-                {
-                  text: i18n.t("confirmSettle"),
-                  onPress: async () => {
-                    trackEvent(VexoEvents.SETTLE_ALL_PRESSED, {
-                      splitsCount: splits?.length || 0,
-                    });
-                    await settleSplitsHandler();
+        <View style={styles.actionWithHelper}>
+          <GradientButton
+            style={styles.button}
+            colors={GlobalStyles.gradientColors}
+            darkText
+            buttonStyle={{
+              backgroundColor: GlobalStyles.colors.errorGrayed,
+            }}
+            onPress={async () => {
+              Alert.alert(
+                i18n.t("settleSplits"),
+                i18n.t("sureSettleSplitsFullMessage"),
+                [
+                  {
+                    text: i18n.t("cancel"),
+                    style: "cancel",
                   },
-                },
-              ]
-            );
-          }}
-        >
-          {i18n.t("settleSplits")}
-        </GradientButton>
+                  {
+                    text: i18n.t("confirmSettle"),
+                    onPress: async () => {
+                      trackEvent(VexoEvents.SETTLE_ALL_PRESSED, {
+                        splitsCount: splits?.length || 0,
+                      });
+                      await settleSplitsHandler();
+                    },
+                  },
+                ]
+              );
+            }}
+          >
+            {i18n.t("settleSplits")}
+          </GradientButton>
+          <Text style={styles.buttonHelperText}>
+            {i18n.t("settlementHelper")}
+          </Text>
+        </View>
       )}
     </View>
   );
@@ -572,11 +582,24 @@ const styles = StyleSheet.create({
       },
     }),
   },
+  actionWithHelper: {
+    flex: 1,
+    maxWidth: "48%",
+    paddingHorizontal: dynamicScale(4, false, 0.5),
+  },
+  buttonHelperText: {
+    fontSize: dynamicScale(12, false, 0.5),
+    color: GlobalStyles.colors.gray700,
+    textAlign: "center",
+    marginTop: dynamicScale(6, false, 0.5),
+    paddingHorizontal: dynamicScale(4, false, 0.5),
+  },
   buttonContainer: {
     flexDirection: "row",
     alignSelf: "center",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "space-between",
+    flexWrap: "wrap",
     ...Platform.select({
       ios: { marginTop: 0 },
       android: {

@@ -14,7 +14,7 @@ import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 
 const FinancialScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const tripCtx = useContext(TripContext);
   const userCtx = useContext(UserContext);
   const expCtx = useContext(ExpensesContext);
@@ -51,7 +51,6 @@ const FinancialScreen = () => {
           totalCost={totalBudgetNum}
           catCost={restCash}
           iconOverride="fast-food-outline"
-          iconJSXOverride={undefined}
         />
       </View>
 
@@ -64,7 +63,7 @@ const FinancialScreen = () => {
           trackEvent(VexoEvents.OPEN_SPLITS_SUMMARY_PRESSED, {
             tripId: tripCtx.tripid,
           });
-          (navigation as any).navigate("SplitSummary", { tripid: tripCtx.tripid });
+          navigation.navigate("SplitSummary", { tripid: tripCtx.tripid });
         }}
         buttonStyle={styles.button}
         style={styles.button}

@@ -192,12 +192,11 @@ function RecentExpenses({ navigation }) {
         expensesCtx,
         tripid,
         uid,
-        tripCtx,
       });
     } catch (error) {
       // Error handling is done in refreshWithToast
     }
-  }, [expensesCtx, tripid, uid, tripCtx, setIsFetching, setRefreshing]);
+  }, [expensesCtx, tripid, uid, setIsFetching, setRefreshing]);
 
   // strong connection state
   const [offlineString, setOfflineString] = useState("");

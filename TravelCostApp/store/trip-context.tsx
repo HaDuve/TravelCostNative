@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { fetchTrip, fetchUser, getTravellers, updateTrip } from "../util/http";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 import { MAX_JS_NUMBER } from "../confAppConstants";
@@ -12,6 +12,9 @@ import { useInterval } from "../components/Hooks/useInterval";
 import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "./mmkv";
 import { Category } from "../util/category";
 import safeLogError from "../util/error";
+import { ExpensesContext } from "./expenses-context";
+import { sumForTrip } from "../util/expenseTotals";
+import { computeDynamicDailyBudget } from "../util/budget";
 
 export interface TripData {
   tripName?: string;
@@ -120,6 +123,7 @@ export const TripContext = createContext<TripContextType>({
 });
 
 function TripContextProvider({ children }) {
+  const expensesCtx = useContext(ExpensesContext);
   const [travellers, setTravellers] = useState([]);
   const [tripid, setTripid] = useState("");
   const [tripName, setTripName] = useState("");
@@ -138,6 +142,11 @@ function TripContextProvider({ children }) {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isDynamicDailyBudget, setIsDynamicDailyBudget] = useState(false);
+
+  const tripTotalSpent = useMemo(() => {
+    const expenses = expensesCtx?.expenses ?? [];
+    return sumForTrip(expenses);
+  }, [expensesCtx?.expenses]);
 
   async function loadTripidFetchTrip() {
     const stored_tripid = await secureStoreGetItem("currentTripId");
@@ -164,24 +173,23 @@ function TripContextProvider({ children }) {
   useEffect(() => {
     function calcDynamicDailyBudget() {
       if (isDynamicDailyBudget) {
-        // TODO: stop reading TripContext.totalSum; compute dynamic daily budget from expenses-derived totals.
-        const daysLeft = Math.floor(
-          (new Date(endDate).getTime() - new Date().getTime()) /
-            (1000 * 3600 * 24)
-        );
-        const totalBudgetLeft = Number(totalBudget) - Number(totalSum);
-        const dailyBudget = totalBudgetLeft / daysLeft;
+        const computed = computeDynamicDailyBudget({
+          totalBudget: Number(totalBudget),
+          tripTotalSpent,
+          endDate: new Date(endDate),
+          now: new Date(),
+        });
         // negative numbers are not allowed
-        if (isNaN(dailyBudget)) return;
-        if (dailyBudget < 0) {
+        if (isNaN(computed)) return;
+        if (computed < 0) {
           setdailyBudget("0.0001");
         } else {
-          setdailyBudget(dailyBudget.toFixed(2));
+          setdailyBudget(computed.toFixed(2));
         }
       }
     }
     calcDynamicDailyBudget();
-  }, [isDynamicDailyBudget, totalBudget, totalSum, endDate]);
+  }, [isDynamicDailyBudget, totalBudget, tripTotalSpent, endDate]);
 
   useInterval(
     () => {

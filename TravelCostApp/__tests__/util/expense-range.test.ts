@@ -34,6 +34,8 @@ function makeExpense(params: {
   whoPaid: string;
   amount: number;
   calcAmount: number;
+  isDeleted?: boolean;
+  duplOrSplit?: number;
 }): ExpenseData {
   return {
     id: params.id,
@@ -49,10 +51,11 @@ function makeExpense(params: {
     currency: "EUR",
     whoPaid: params.whoPaid,
     calcAmount: params.calcAmount,
-    duplOrSplit: undefined,
+    duplOrSplit: params.duplOrSplit,
     splitList: [],
     rangeId: params.rangeId,
     isSpecialExpense: false,
+    isDeleted: params.isDeleted,
   } as ExpenseData;
 }
 
@@ -117,6 +120,90 @@ describe("Ranged expense deduplication", () => {
     ];
 
     expect(getExpensesSumPeriod(expenses)).toBe(250);
+  });
+});
+
+describe("getExpensesSumTotal — delegates to sumForTrip", () => {
+  it("excludes deleted expenses from the total", () => {
+    const expenses: ExpenseData[] = [
+      makeExpense({
+        id: "e1",
+        rangeId: "",
+        description: "active",
+        whoPaid: "Alice",
+        amount: 100,
+        calcAmount: 100,
+      }),
+      makeExpense({
+        id: "e2",
+        rangeId: "",
+        description: "deleted",
+        whoPaid: "Bob",
+        amount: 50,
+        calcAmount: 50,
+        isDeleted: true,
+      }),
+    ];
+    expect(getExpensesSumTotal(expenses)).toBe(100);
+  });
+
+  it("reconstructs full cost for ranged-split expenses (duplOrSplit=2)", () => {
+    // €300 total split into 3 daily instances of €100 each
+    const expenses: ExpenseData[] = [
+      makeExpense({
+        id: "e1",
+        rangeId: "r1",
+        description: "day1",
+        whoPaid: "Alice",
+        amount: 100,
+        calcAmount: 100,
+        duplOrSplit: 2,
+      }),
+      makeExpense({
+        id: "e2",
+        rangeId: "r1",
+        description: "day2",
+        whoPaid: "Alice",
+        amount: 100,
+        calcAmount: 100,
+        duplOrSplit: 2,
+      }),
+      makeExpense({
+        id: "e3",
+        rangeId: "r1",
+        description: "day3",
+        whoPaid: "Alice",
+        amount: 100,
+        calcAmount: 100,
+        duplOrSplit: 2,
+      }),
+    ];
+    expect(getExpensesSumTotal(expenses)).toBe(300);
+  });
+});
+
+describe("getExpensesSumPeriod — delegates to sumByPeriod", () => {
+  it("excludes deleted expenses from the period sum", () => {
+    const expenses: ExpenseData[] = [
+      makeExpense({
+        id: "e1",
+        rangeId: "",
+        description: "active",
+        whoPaid: "Alice",
+        amount: 100,
+        calcAmount: 100,
+      }),
+      makeExpense({
+        id: "e2",
+        rangeId: "",
+        description: "deleted",
+        whoPaid: "Bob",
+        amount: 50,
+        calcAmount: 50,
+        isDeleted: true,
+      }),
+    ];
+    expect(getExpensesSumPeriod(expenses)).toBe(100);
   });
 });
 

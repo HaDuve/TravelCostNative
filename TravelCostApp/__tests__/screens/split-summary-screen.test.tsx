@@ -30,7 +30,7 @@ import { makeExpense } from "../fixtures/expense";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 
 describe("Split Summary screen", () => {
-  it("lists an open Balance from fixture expenses via calcOpenSplitsTable", async () => {
+  it("lists an open Balance from fixture expenses via rollupOpenBalances", async () => {
     const navigation = { navigate: jest.fn(), pop: jest.fn() };
     const screen = renderWithAppProviders(
       <SplitSummaryScreen navigation={navigation as any} />,
@@ -77,8 +77,8 @@ describe("Split Summary screen", () => {
       { userName: "Alice", whoPaid: "Bob", amount: 30 },
     ];
     const calcSpy = jest
-      .spyOn(splitUtil, "calcOpenSplitsTable")
-      .mockResolvedValue(openBalances);
+      .spyOn(splitUtil, "rollupOpenBalances")
+      .mockReturnValue(openBalances as any);
 
     const navigation = { navigate: jest.fn(), pop: jest.fn() };
     const screen = renderWithAppProviders(

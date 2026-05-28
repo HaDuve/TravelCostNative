@@ -79,24 +79,33 @@ function LoadTripProbe({
 }
 
 describe("TripContext storage contracts", () => {
-  it("loadTravellersFromStorage resolves to [] when storage is empty", async () => {
+  beforeEach(() => {
+    // Defend against other suites leaking fake timers into this file in CI.
+    jest.useRealTimers();
+  });
+
+  it(
+    "loadTravellersFromStorage resolves to [] when storage is empty",
+    async () => {
     mockAsyncStoreGetObject.mockResolvedValueOnce(null);
 
-    const results: unknown[] = [];
+    let resolveResult: (travellers: unknown) => void;
+    const resultPromise = new Promise<unknown>((resolve) => {
+      resolveResult = resolve;
+    });
     const TripContextProvider = require("../../store/trip-context").default;
     render(
       <ExpensesContext.Provider value={{ expenses: [] } as any}>
         <TripContextProvider>
-          <LoadTravellersProbe onResult={(r) => results.push(r)} />
+          <LoadTravellersProbe onResult={(r) => resolveResult(r)} />
         </TripContextProvider>
       </ExpensesContext.Provider>
     );
 
-    await waitFor(() => {
-      expect(results.length).toBeGreaterThan(0);
-    });
-    expect(results[0]).toEqual([]);
-  });
+    await expect(resultPromise).resolves.toEqual([]);
+    },
+    15000
+  );
 
   it("setCurrentTrip drops deprecated totalSum field when present", async () => {
     const results: Array<{

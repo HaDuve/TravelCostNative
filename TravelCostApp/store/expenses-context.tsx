@@ -61,6 +61,18 @@ export type ExpenseContextType = {
 const noop = () => undefined;
 const noopAsyncBool = async () => false;
 
+function endOfLocalDay(date: Date): Date {
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    23,
+    59,
+    59,
+    999
+  );
+}
+
 export const ExpensesContext = createContext<ExpenseContextType>({
   expenses: [],
   // Sync loading state defaults
@@ -74,7 +86,7 @@ export const ExpensesContext = createContext<ExpenseContextType>({
   getRecentExpenses: (rangestring: RangeString): Array<ExpenseData> => {
     return [];
   },
-  getYearlyExpenses: (yearsBack) => {
+  getYearlyExpenses: (yearsBack: number) => {
     // firstDay, lastDay, yearlyExpenses;
     return {
       firstDay: new Date(),
@@ -82,7 +94,7 @@ export const ExpensesContext = createContext<ExpenseContextType>({
       yearlyExpenses: [],
     };
   },
-  getMonthlyExpenses: (monthsBack) => {
+  getMonthlyExpenses: (monthsBack: number) => {
     // firstDay, lastDay, monthlyExpenses;
     return {
       firstDay: new Date(),
@@ -90,7 +102,7 @@ export const ExpensesContext = createContext<ExpenseContextType>({
       monthlyExpenses: [],
     };
   },
-  getWeeklyExpenses: (weeksBack) => {
+  getWeeklyExpenses: (weeksBack: number) => {
     // firstDay, lastDay, weeklyExpenses;
     return {
       firstDay: new Date(),
@@ -101,16 +113,16 @@ export const ExpensesContext = createContext<ExpenseContextType>({
   getDailyExpenses: (daysBack): Array<ExpenseData> => {
     return [];
   },
-  getSpecificDayExpenses: (date): Array<ExpenseData> => {
+  getSpecificDayExpenses: (date: Date): Array<ExpenseData> => {
     return [];
   },
-  getSpecificWeekExpenses: (date): Array<ExpenseData> => {
+  getSpecificWeekExpenses: (date: Date): Array<ExpenseData> => {
     return [];
   },
-  getSpecificMonthExpenses: (date): Array<ExpenseData> => {
+  getSpecificMonthExpenses: (date: Date): Array<ExpenseData> => {
     return [];
   },
-  getSpecificYearExpenses: (date): Array<ExpenseData> => {
+  getSpecificYearExpenses: (date: Date): Array<ExpenseData> => {
     return [];
   },
 
@@ -341,11 +353,12 @@ function ExpensesContextProvider({ children }) {
 
       const firstDay = new Date(year, 0, 1);
       const lastDay = new Date(year, 11, 31);
+      const lastInstant = endOfLocalDay(lastDay);
       const yearlyExpenses = expensesState.filter((expense) => {
         return (
           !expense.isDeleted &&
           expense.date >= firstDay &&
-          expense.date <= lastDay
+          expense.date <= lastInstant
         );
       });
       return { firstDay, lastDay, yearlyExpenses };
@@ -360,24 +373,31 @@ function ExpensesContextProvider({ children }) {
        *  the expenses in that range.
        *  returns {firstDay, lastDay, monthlyExpenses}
        */
-      const daysBefore = monthsBack * 30;
       const today = new Date();
+      const targetMonthDate = new Date(
+        today.getFullYear(),
+        today.getMonth() - monthsBack,
+        1
+      );
 
-      const dayBack = getDateMinusDays(today, daysBefore);
-
-      const firstDay = new Date(dayBack.getFullYear(), dayBack.getMonth(), 1);
+      const firstDay = new Date(
+        targetMonthDate.getFullYear(),
+        targetMonthDate.getMonth(),
+        1
+      );
 
       const lastDay = new Date(
-        dayBack.getFullYear(),
-        dayBack.getMonth() + 1,
+        targetMonthDate.getFullYear(),
+        targetMonthDate.getMonth() + 1,
         0
       );
+      const lastInstant = endOfLocalDay(lastDay);
 
       const monthlyExpenses = expensesState.filter((expense) => {
         return (
           !expense.isDeleted &&
           expense.date >= firstDay &&
-          expense.date <= lastDay
+          expense.date <= lastInstant
         );
       });
       return { firstDay, lastDay, monthlyExpenses };
@@ -399,11 +419,12 @@ function ExpensesContextProvider({ children }) {
       const prevMonday = getPreviousMondayDate(dayBack);
       const firstDay = prevMonday;
       const lastDay = getDatePlusDays(prevMonday, 6);
+      const lastInstant = endOfLocalDay(lastDay);
       const weeklyExpenses = expensesState.filter((expense) => {
         return (
           !expense.isDeleted &&
           expense.date >= firstDay &&
-          expense.date <= lastDay
+          expense.date <= lastInstant
         );
       });
       return { firstDay, lastDay, weeklyExpenses };
@@ -412,7 +433,7 @@ function ExpensesContextProvider({ children }) {
   );
 
   const getSpecificDayExpenses = useCallback(
-    (date) => {
+    (date: Date) => {
       const dayExpenses = expensesState.filter((expense) => {
         return (
           !expense.isDeleted &&
@@ -425,15 +446,16 @@ function ExpensesContextProvider({ children }) {
   );
 
   const getSpecificWeekExpenses = useCallback(
-    (date) => {
+    (date: Date) => {
       const prevMonday = getPreviousMondayDate(date);
       const firstDay = prevMonday;
       const lastDay = getDatePlusDays(prevMonday, 6);
+      const lastInstant = endOfLocalDay(lastDay);
       const weeklyExpenses = expensesState.filter((expense) => {
         return (
           !expense.isDeleted &&
           expense.date >= firstDay &&
-          expense.date <= lastDay
+          expense.date <= lastInstant
         );
       });
       return weeklyExpenses;
@@ -442,16 +464,17 @@ function ExpensesContextProvider({ children }) {
   );
 
   const getSpecificMonthExpenses = useCallback(
-    (date) => {
+    (date: Date) => {
       const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
 
       const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+      const lastInstant = endOfLocalDay(lastDay);
 
       const monthlyExpenses = expensesState.filter((expense) => {
         return (
           !expense.isDeleted &&
           expense.date >= firstDay &&
-          expense.date <= lastDay
+          expense.date <= lastInstant
         );
       });
       return monthlyExpenses;
@@ -460,16 +483,17 @@ function ExpensesContextProvider({ children }) {
   );
 
   const getSpecificYearExpenses = useCallback(
-    (date) => {
+    (date: Date) => {
       const firstDay = new Date(date.getFullYear(), 0, 1);
 
       const lastDay = new Date(date.getFullYear(), 11, 31);
+      const lastInstant = endOfLocalDay(lastDay);
 
       const yearlyExpenses = expensesState.filter((expense) => {
         return (
           !expense.isDeleted &&
           expense.date >= firstDay &&
-          expense.date <= lastDay
+          expense.date <= lastInstant
         );
       });
       return yearlyExpenses;

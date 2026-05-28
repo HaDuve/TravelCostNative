@@ -8,7 +8,11 @@ import {
 import Purchases from "react-native-purchases";
 
 import { StatusBar } from "expo-status-bar";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  useIsFocused,
+  useNavigation,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import * as SplashScreen from "expo-splash-screen";
@@ -110,6 +114,15 @@ const AuthStack = createNativeStackNavigator();
 const BottomTabs = createBottomTabNavigator();
 
 const IconSize = constantScale(24, 0.1);
+
+/** Tear down tab content when blurred (RN7 replacement for removed unmountOnBlur). */
+function UnmountOnBlur({ children }: { children: React.ReactNode }) {
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return null;
+  }
+  return <>{children}</>;
+}
 
 const prefix = Linking.createURL("/");
 
@@ -405,8 +418,8 @@ function Home() {
       safeAreaInsets={{ bottom: 0 }}
       screenOptions={{
         headerShown: false,
-          lazy: true,
-          tabBarStyle: {
+        lazy: true,
+        tabBarStyle: {
           backgroundColor: GlobalStyles.colors.gray500,
           borderTopWidth: dynamicScale(1, false, 0.5),
           borderTopColor: GlobalStyles.colors.gray600,
@@ -431,6 +444,7 @@ function Home() {
       <BottomTabs.Screen
         name="Overview"
         component={OverviewScreen}
+        layout={({ children }) => <UnmountOnBlur>{children}</UnmountOnBlur>}
         options={{
           tabBarShowLabel: false,
           title: i18n.t("overviewTab"),

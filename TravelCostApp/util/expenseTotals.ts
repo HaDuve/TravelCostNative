@@ -34,6 +34,7 @@ export function sumByPeriod(
   hideSpecial = false
 ): number {
   return expenses.reduce((sum, e) => {
+    if (e.isDeleted) return sum;
     if (isNaN(Number(e.calcAmount)) || (hideSpecial && e.isSpecialExpense))
       return sum;
     return sum + Number(e.calcAmount);
@@ -50,7 +51,8 @@ export function sumByTraveller(
   travellerId: string,
   isTotal = false
 ): number {
-  const working = isTotal ? deduplicateByRangeId(expenses) : expenses;
+  const active = expenses.filter((e) => !e.isDeleted);
+  const working = isTotal ? deduplicateByRangeId(active) : active;
   return working.reduce((sum, expense) => {
     const hasSplits = expense.splitList && expense.splitList.length > 0;
 

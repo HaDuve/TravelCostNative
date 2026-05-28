@@ -55,6 +55,14 @@ describe("sumByPeriod (period spend)", () => {
     expect(sumByPeriod(expenses)).toBe(250);
   });
 
+  it("excludes deleted expenses from period spend", () => {
+    const expenses = [
+      makeExpense({ id: "e1", calcAmount: 100, splitList: [] }),
+      makeExpense({ id: "e2", calcAmount: 50, isDeleted: true, splitList: [] }),
+    ];
+    expect(sumByPeriod(expenses)).toBe(100);
+  });
+
   it("excludes special expenses when hideSpecial is true", () => {
     const expenses = [
       makeExpense({ id: "e1", calcAmount: 100, splitList: [] }),
@@ -83,6 +91,25 @@ describe("sumByTraveller (per-traveller attribution)", () => {
     ];
     expect(sumByTraveller(expenses, "Alice")).toBe(100);
     expect(sumByTraveller(expenses, "Bob")).toBe(50);
+  });
+
+  it("excludes deleted expenses from traveller attribution", () => {
+    const expenses = [
+      makeExpense({
+        id: "e1",
+        amount: 100,
+        calcAmount: 100,
+        splitList: [{ userName: "Alice", amount: 100 }],
+      }),
+      makeExpense({
+        id: "e2",
+        amount: 100,
+        calcAmount: 100,
+        isDeleted: true,
+        splitList: [{ userName: "Alice", amount: 100 }],
+      }),
+    ];
+    expect(sumByTraveller(expenses, "Alice")).toBe(100);
   });
 
   it("uses each traveller's split amount from splitList", () => {

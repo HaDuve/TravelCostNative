@@ -12,12 +12,14 @@ function deduplicateByRangeId(expenses: ExpenseData[]): ExpenseData[] {
 }
 
 /**
- * Trip total spent — counts each ranged expense ONCE (deduped by rangeId).
+ * Trip total spent — deduplicates ranged expenses by rangeId, excludes deleted.
  *
- * Use for: trip-wide cumulative totals, dynamic daily budget recalculation.
- * Pass the full, unfiltered expense list; dedup and deleted exclusion happen here.
- *
- * Do NOT use for period views — sumByPeriod counts every day-instance intentionally.
+ * ⚠ Known limitation: only correct for ranged-duplicate expenses (duplOrSplit=1),
+ * where each day-instance stores the full calcAmount. For ranged-split expenses
+ * (duplOrSplit=2) each instance stores calcAmount/days, so dedup returns just one
+ * day's share — not the full cost. Pre-existing behaviour inherited from
+ * getExpensesSumTotal. Use sumByPeriod over the full unfiltered list as a
+ * workaround for ranged-split trip totals.
  */
 export function sumForTrip(expenses: ExpenseData[]): number {
   const active = expenses.filter((e) => !e.isDeleted);
@@ -30,15 +32,12 @@ export function sumForTrip(expenses: ExpenseData[]): number {
 }
 
 /**
- * Period spend — counts every day-instance of a ranged expense (no dedup).
+ * Period spend — sums every day-instance of a ranged expense (no dedup).
  *
- * Use for: daily / weekly / monthly / yearly period views.
- * The CALLER must pre-filter the list to the window first. Each instance already
- * carries only its proportional calcAmount (ranged split), so summing all of them
- * gives the correct period total. Deduplicating here would silently discard
- * all-but-one day, making the period total up to N× too small.
- *
- * Do NOT use for trip-wide totals — use sumForTrip instead.
+ * The CALLER must pre-filter the list to the window first.
+ * For ranged-split expenses each instance stores calcAmount/days, so summing
+ * only the window's instances gives the correct proportional period cost.
+ * Deduplicating here would discard all-but-one day, making the total N× too small.
  */
 export function sumByPeriod(
   expenses: ExpenseData[],
@@ -54,12 +53,11 @@ export function sumByPeriod(
 }
 
 /**
- * Per-traveller attribution — sums what a traveller spent across the supplied expenses.
+ * Per-traveller attribution — same dedup contract as sumForTrip / sumByPeriod.
  *
- * isTotal=false (default): counts every day-instance — use for period views where
- *   the caller has pre-filtered the list to the window (same contract as sumByPeriod).
- * isTotal=true: deduplicates ranged expenses by rangeId — use for trip total views
- *   (same contract as sumForTrip).
+ * isTotal=false (default): no dedup — caller pre-filters to window (period view).
+ * isTotal=true: deduplicates by rangeId — carries the same ranged-split caveat
+ *   as sumForTrip (returns one day's share, not the full cost, for duplOrSplit=2).
  *
  * Applies expense-currency → trip-currency conversion ratio for split expenses.
  */

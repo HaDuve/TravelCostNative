@@ -30,7 +30,7 @@ describe("Split edit order (recalcSplitsWithEditOrder)", () => {
     ]);
   });
 
-  it("negative remainder: oldest edited splits are reduced, most-recent (editOrder=0) is preserved", () => {
+  it("negative remainder: non-most-recent edited splits are reduced, most-recent (editOrder=0) is preserved", () => {
     const input: Split[] = [
       makeSplit({ userName: "A", amount: 40, editOrder: 0 }),
       makeSplit({ userName: "B", amount: 20, editOrder: 1 }),
@@ -46,7 +46,7 @@ describe("Split edit order (recalcSplitsWithEditOrder)", () => {
     ]);
   });
 
-  it("all splits edited: remainder is distributed among oldest edited splits", () => {
+  it("all splits edited: remainder is distributed among non-most-recent edited splits", () => {
     const input: Split[] = [
       makeSplit({ userName: "A", amount: 60, editOrder: 0 }),
       makeSplit({ userName: "B", amount: 20, editOrder: 1 }),
@@ -60,6 +60,31 @@ describe("Split edit order (recalcSplitsWithEditOrder)", () => {
       makeSplit({ userName: "B", amount: 30, editOrder: 1 }),
       makeSplit({ userName: "C", amount: 10, editOrder: 2 }),
     ]);
+  });
+
+  it("rounding: amounts are 2dp and total stays within a rounding tolerance", () => {
+    const input: Split[] = [
+      makeSplit({ userName: "A", amount: 33.33, editOrder: 0 }),
+      makeSplit({ userName: "B", amount: 16.67, editOrder: 1 }),
+      makeSplit({ userName: "C", amount: 0 }),
+      makeSplit({ userName: "D", amount: 0 }),
+      makeSplit({ userName: "E", amount: 0 }),
+    ];
+
+    const result = recalcSplitsWithEditOrder(input, 100);
+
+    // remainder = 50, unedited splits = 3 -> 16.666..., which rounds to 16.67 each
+    expect(result[2].amount).toBe(16.67);
+    expect(result[3].amount).toBe(16.67);
+    expect(result[4].amount).toBe(16.67);
+
+    const sum = result.reduce((acc, split) => acc + Number(split.amount), 0);
+    expect(Math.abs(sum - 100)).toBeLessThanOrEqual(0.02);
+
+    result.forEach((split) => {
+      expect(Number.isFinite(Number(split.amount))).toBe(true);
+      expect(Number(split.amount)).toBeCloseTo(Number(split.amount), 2);
+    });
   });
 
   it("zero-amount clamp: a split that would go negative is clamped to 0", () => {

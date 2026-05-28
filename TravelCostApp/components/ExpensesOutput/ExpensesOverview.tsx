@@ -1,5 +1,5 @@
-import { Platform, StyleSheet, Text, View } from "react-native";
-import React, { useContext, useRef, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useContext, useRef, useState } from "react";
 import ExpenseCategories from "./ExpenseStatistics/ExpenseCategories";
 import ExpenseGraph from "./ExpenseStatistics/ExpenseGraph";
 import { GlobalStyles } from "../../constants/styles";
@@ -11,36 +11,59 @@ import PropTypes from "prop-types";
 import ExpenseCountries from "./ExpenseStatistics/ExpenseCountries";
 import ExpenseTravellers from "./ExpenseStatistics/ExpenseTravellers";
 import ExpenseCurrencies from "./ExpenseStatistics/ExpenseCurrencies";
-import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
-import { MAX_PERIOD_RANGE } from "../../confAppConstants";
-import { BlurView } from "expo-blur";
+import Animated, {
+  FadeInLeft,
+  FadeInRight,
+  FadeInUp,
+  FadeOutDown,
+  FadeOutLeft,
+  FadeOutRight,
+} from "react-native-reanimated";
 import { TripContext } from "../../store/trip-context";
-import { constantScale, dynamicScale } from "../../util/scalingUtil";
-import { OrientationContext } from "../../store/orientation-context";
+import { dynamicScale } from "../../util/scalingUtil";
 import { useSwipe } from "../Hooks/useSwipe";
+import IconButton from "../UI/IconButton";
+
+const PIE_CHART_TYPE_COUNT = 4;
 
 const ExpensesOverview = ({ navigation, expenses, periodName }) => {
   const tripCtx = useContext(TripContext);
-  const { isPortrait } = useContext(OrientationContext);
-  // const periodRangeNumber = useRef(7);
-  // periodRangeNumber useState is used to rerender the component when the periodRangeNumber changes
+  const pieChartTitles = [
+    i18n.t("categories"),
+    i18n.t("travellers"),
+    i18n.t("countries"),
+    i18n.t("currencies"),
+  ];
   const realPeriodNumber = useRef(7);
-  const [periodRangeNumber, setPeriodRangeNumber] = useState(
-    realPeriodNumber.current
-  );
-
-  const { onTouchStart, onTouchEnd } = useSwipe(onSwipeLeft, onSwipeRight, 6);
-
-  function onSwipeLeft() {}
-
-  function onSwipeRight() {}
+  const [periodRangeNumber] = useState(realPeriodNumber.current);
 
   const userCtx = useContext(UserContext);
   const isGraphNotPie = userCtx.isShowingGraph;
-  // enum =>  0 = categories, 1 = traveller, 2 = country, 3 = currency
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
-  const [longerPeriodNum, setLongerPeriodNum] = useState(0);
-  const [startingPoint, setStartingPoint] = useState(0);
+  const [longerPeriodNum] = useState(0);
+  const [startingPoint] = useState(0);
+
+  const contentsMaxIndex = PIE_CHART_TYPE_COUNT - 1;
+
+  const nextPieChartType = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setToggleGraphEnum((current) =>
+      current === contentsMaxIndex ? 0 : current + 1
+    );
+  }, [contentsMaxIndex]);
+
+  const previousPieChartType = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setToggleGraphEnum((current) =>
+      current === 0 ? contentsMaxIndex : current - 1
+    );
+  }, [contentsMaxIndex]);
+
+  const { onTouchStart, onTouchEnd } = useSwipe(
+    nextPieChartType,
+    previousPieChartType,
+    6
+  );
 
   let titleString = "";
   switch (periodName) {
@@ -54,38 +77,47 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       break;
   }
 
-  const titleContainerJSX = (
-    <View style={styles.titleContainerBlur}>
-      {isGraphNotPie && (
-        <Animated.View
-          style={styles.titleContainer}
-          entering={FadeInUp}
-          exiting={FadeOutDown}
-        >
-          <Text style={styles.titleText}> {titleString} </Text>
-        </Animated.View>
-      )}
-
-      {!isGraphNotPie && toggleGraphEnum == 0 && (
-        <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-          <Text style={styles.titleText}> {i18n.t("categories")} </Text>
-        </Animated.View>
-      )}
-      {!isGraphNotPie && toggleGraphEnum == 1 && (
-        <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-          <Text style={styles.titleText}> {i18n.t("travellers")} </Text>
-        </Animated.View>
-      )}
-      {!isGraphNotPie && toggleGraphEnum == 2 && (
-        <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-          <Text style={styles.titleText}> {i18n.t("countries")} </Text>
-        </Animated.View>
-      )}
-      {!isGraphNotPie && toggleGraphEnum == 3 && (
-        <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
-          <Text style={styles.titleText}> {i18n.t("currencies")} </Text>
-        </Animated.View>
-      )}
+  const chartTitleHeader = isGraphNotPie ? (
+    <View style={styles.chartTitleHeader}>
+      <Animated.View
+        style={styles.titleContainer}
+        entering={FadeInUp}
+        exiting={FadeOutDown}
+      >
+        <Text style={styles.titleText}>{titleString}</Text>
+      </Animated.View>
+    </View>
+  ) : (
+    <View style={styles.chartTitleHeader}>
+      <Animated.View
+        entering={FadeInLeft}
+        exiting={FadeOutLeft}
+        style={styles.chevronContainer}
+      >
+        <IconButton
+          icon={"chevron-back-outline"}
+          size={24}
+          onPress={previousPieChartType}
+          color={GlobalStyles.colors.primaryGrayed}
+        />
+      </Animated.View>
+      <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
+        <Text style={styles.titleText}>
+          {pieChartTitles[toggleGraphEnum]}
+        </Text>
+      </Animated.View>
+      <Animated.View
+        entering={FadeInRight}
+        exiting={FadeOutRight}
+        style={styles.chevronContainer}
+      >
+        <IconButton
+          icon={"chevron-forward-outline"}
+          size={24}
+          onPress={nextPieChartType}
+          color={GlobalStyles.colors.primaryGrayed}
+        />
+      </Animated.View>
     </View>
   );
 
@@ -95,44 +127,46 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
       onTouchEnd={onTouchEnd}
       style={styles.container}
     >
-      {isGraphNotPie && (
-        <ExpenseGraph
-          navigation={navigation}
-          periodName={periodName}
-          tripCtx={tripCtx}
-          longerPeriodNum={longerPeriodNum}
-          startingPoint={startingPoint}
-        />
-      )}
-      {!isGraphNotPie && toggleGraphEnum == 0 && (
-        <ExpenseCategories
-          expenses={expenses}
-          periodName={periodName}
-          navigation={navigation}
-        />
-      )}
-      {!isGraphNotPie && toggleGraphEnum == 1 && (
-        <ExpenseTravellers
-          expenses={expenses}
-          periodName={periodName}
-          navigation={navigation}
-        ></ExpenseTravellers>
-      )}
-      {!isGraphNotPie && toggleGraphEnum == 2 && (
-        <ExpenseCountries
-          expenses={expenses}
-          periodName={periodName}
-          navigation={navigation}
-        ></ExpenseCountries>
-      )}
-      {!isGraphNotPie && toggleGraphEnum == 3 && (
-        <ExpenseCurrencies
-          expenses={expenses}
-          periodName={periodName}
-          navigation={navigation}
-        ></ExpenseCurrencies>
-      )}
-      {titleContainerJSX}
+      {chartTitleHeader}
+      <View style={styles.chartBody}>
+        {isGraphNotPie && (
+          <ExpenseGraph
+            navigation={navigation}
+            periodName={periodName}
+            tripCtx={tripCtx}
+            longerPeriodNum={longerPeriodNum}
+            startingPoint={startingPoint}
+          />
+        )}
+        {!isGraphNotPie && toggleGraphEnum == 0 && (
+          <ExpenseCategories
+            expenses={expenses}
+            periodName={periodName}
+            navigation={navigation}
+          />
+        )}
+        {!isGraphNotPie && toggleGraphEnum == 1 && (
+          <ExpenseTravellers
+            expenses={expenses}
+            periodName={periodName}
+            navigation={navigation}
+          />
+        )}
+        {!isGraphNotPie && toggleGraphEnum == 2 && (
+          <ExpenseCountries
+            expenses={expenses}
+            periodName={periodName}
+            navigation={navigation}
+          />
+        )}
+        {!isGraphNotPie && toggleGraphEnum == 3 && (
+          <ExpenseCurrencies
+            expenses={expenses}
+            periodName={periodName}
+            navigation={navigation}
+          />
+        )}
+      </View>
     </View>
   );
 };
@@ -160,19 +194,29 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: "visible",
   },
-  titleContainerBlur: {
-    marginTop: dynamicScale(8, true, 0.5),
-    alignSelf: "center",
-    position: "absolute",
-    width: "50%",
+  chartTitleHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
+    elevation: 10,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    paddingTop: dynamicScale(4, true),
+    paddingBottom: dynamicScale(4, true),
+  },
+  chartBody: {
+    flex: 1,
   },
   titleContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
   },
+  chevronContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
   titleText: {
-    marginTop: dynamicScale(6, true),
     minWidth: dynamicScale(200),
     maxWidth: dynamicScale(200),
     textAlign: "center",
@@ -180,6 +224,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
-    marginLeft: dynamicScale(6),
+    marginHorizontal: dynamicScale(6),
   },
 });

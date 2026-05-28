@@ -10,7 +10,7 @@ import Purchases from "react-native-purchases";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import * as SplashScreen from "expo-splash-screen";
 import { shouldShowOnboarding } from "./components/Rating/firstStartUtil";
 
@@ -102,13 +102,12 @@ import {
   VexoUserContext,
 } from "./util/vexo-tracking";
 import { VexoEvents } from "./util/vexo-constants";
-
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
-const BottomTabs = createMaterialTopTabNavigator();
+const BottomTabs = createBottomTabNavigator();
 
 const IconSize = constantScale(24, 0.1);
 
@@ -394,27 +393,28 @@ function Home() {
     (exp: ExpenseData) => exp.splitList?.length > 0
   );
   const validSplitSummary = hasExp && hasExpensesWithSplit;
+
+  // SafeAreaWrapper paints bottom inset via BottomInset — don't pad tab bar again.
+  const homeTabBarHeight = dynamicScale(48, false, 0.5);
+
   return (
     <BottomTabs.Navigator
       initialRouteName={FirstScreen}
       backBehavior={"history"}
-      tabBarPosition={"bottom"}
-      screenOptions={() => ({
-        headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
-        headerTintColor: GlobalStyles.colors.backgroundColor,
-        tabBarStyle: {
+      detachInactiveScreens={true}
+      safeAreaInsets={{ bottom: 0 }}
+      screenOptions={{
+        headerShown: false,
+          lazy: true,
+          tabBarStyle: {
           backgroundColor: GlobalStyles.colors.gray500,
           borderTopWidth: dynamicScale(1, false, 0.5),
           borderTopColor: GlobalStyles.colors.gray600,
+          height: homeTabBarHeight,
+          paddingBottom: 0,
         },
         tabBarActiveTintColor: GlobalStyles.colors.primary500,
-        tabBarIndicatorStyle: {
-          backgroundColor: GlobalStyles.colors.primary500,
-          borderWidth: dynamicScale(1, true, 0.5),
-          borderColor: GlobalStyles.colors.primary500,
-        },
-        tabBarBounces: true,
-      })}
+      }}
     >
       <BottomTabs.Screen
         name="RecentExpenses"
@@ -427,20 +427,6 @@ function Home() {
           ),
         }}
       />
-      {/* DEBUG for push notifications */}
-      {/* <BottomTabs.Screen
-        name="Push"
-        component={PushScreen}
-        options={{
-          // headerShown: false,
-          tabBarShowLabel: false,
-          title: i18n.t("overviewTab"),
-          tabBarLabel: "Push",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name={"push"} size={IconSize} color={color} />
-          ),
-        }}
-      ></BottomTabs.Screen> */}
 
       <BottomTabs.Screen
         name="Overview"
@@ -465,7 +451,6 @@ function Home() {
           options={{
             title: i18n.t("settingsTab"),
             tabBarShowLabel: false,
-
             tabBarLabel: i18n.t("finderTab"),
             tabBarIcon: ({ color }) => (
               <Ionicons name="search-outline" size={IconSize} color={color} />
@@ -480,7 +465,6 @@ function Home() {
           options={{
             title: i18n.t("settingsTab"),
             tabBarShowLabel: false,
-
             tabBarLabel: i18n.t("financialTab"),
             tabBarIcon: ({ color }) => (
               <Ionicons name="cash-outline" size={IconSize} color={color} />
@@ -494,7 +478,6 @@ function Home() {
         options={{
           title: i18n.t("profileTab"),
           tabBarShowLabel: false,
-
           tabBarLabel: i18n.t("myTrips"),
           tabBarIcon: ({ color }) => (
             <View>

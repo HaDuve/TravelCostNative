@@ -6,8 +6,8 @@ import {
 } from "../confAppConstants";
 
 import { Category } from "./category";
-import { TripData } from "../store/trip-context";
-import { ExpenseData, ExpenseDataOnline } from "./expense";
+import type { TripData } from "../types/trip";
+import { ExpenseData, ExpenseDataOnline, isPaidString } from "./expense";
 import { UserData } from "../store/user-context";
 
 import { i18n } from "../i18n/i18n";
@@ -27,6 +27,10 @@ import {
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
+
+function normalizeIsPaid(value: unknown): isPaidString {
+  return value === isPaidString.paid ? isPaidString.paid : isPaidString.notPaid;
+}
 
 // Field name for server timestamp in expense data -- needs to be updated in .rules firebase backend
 export const SERVER_TIMESTAMP_FIELD = "serverTimestamp";
@@ -243,7 +247,7 @@ const processExpenseResponse = (data: any): ExpenseData[] => {
       categoryString: r.categoryString,
       duplOrSplit: r.duplOrSplit,
       rangeId: r.rangeId,
-      isPaid: r.isPaid,
+      isPaid: normalizeIsPaid(r.isPaid),
       isSpecialExpense: r.isSpecialExpense,
       editedTimestamp: editedTimestamp,
       isDeleted: r.isDeleted || false,
@@ -370,7 +374,7 @@ export async function fetchExpenses(
           categoryString: r.categoryString,
           duplOrSplit: r.duplOrSplit,
           rangeId: r.rangeId,
-          isPaid: r.isPaid,
+          isPaid: normalizeIsPaid(r.isPaid),
           isSpecialExpense: r.isSpecialExpense,
           editedTimestamp: editedTimestamp,
           isDeleted: r.isDeleted || false,

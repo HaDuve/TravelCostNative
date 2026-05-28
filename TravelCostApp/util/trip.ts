@@ -5,7 +5,7 @@ import {
   setMMKVObject,
   setMMKVString,
 } from "../store/mmkv";
-import { TripData } from "../store/trip-context";
+import type { TripData } from "../types/trip";
 import { isToday } from "./date";
 import { fetchTrip } from "./http";
 

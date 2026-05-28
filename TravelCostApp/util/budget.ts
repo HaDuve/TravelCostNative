@@ -12,7 +12,7 @@ type PeriodName = "day" | "week" | "month" | "year";
 type PeriodNameWithTotal = PeriodName | "total";
 
 export type TripBudgetMeta = {
-  startDate: string;
+  readonly startDate: string;
 };
 
 function toJsDate(date: unknown): Date {

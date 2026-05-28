@@ -1,5 +1,6 @@
 import { makeExpense } from "../fixtures/expense";
 import {
+  asPeriodSlice,
   sumForTrip,
   sumByPeriod,
   sumByTraveller,
@@ -42,6 +43,37 @@ describe("sumForTrip (trip total spent)", () => {
     expect(sumForTrip(expenses)).toBe(150);
   });
 
+  it("reconstructs full cost for ranged-split expenses (duplOrSplit=2)", () => {
+    // €600 rent stored as 3 daily instances of €200 each
+    const expenses = [
+      makeExpense({
+        id: "e1",
+        rangeId: "r1",
+        duplOrSplit: 2,
+        amount: 200,
+        calcAmount: 200,
+        splitList: [],
+      }),
+      makeExpense({
+        id: "e2",
+        rangeId: "r1",
+        duplOrSplit: 2,
+        amount: 200,
+        calcAmount: 200,
+        splitList: [],
+      }),
+      makeExpense({
+        id: "e3",
+        rangeId: "r1",
+        duplOrSplit: 2,
+        amount: 200,
+        calcAmount: 200,
+        splitList: [],
+      }),
+    ];
+    expect(sumForTrip(expenses)).toBe(600);
+  });
+
   it("excludes deleted ranged expense instances before deduplication", () => {
     const expenses = [
       makeExpense({ id: "e1", rangeId: "r1", calcAmount: 100, isDeleted: true, splitList: [] }),
@@ -69,7 +101,7 @@ describe("sumByPeriod (period spend)", () => {
       makeExpense({ id: "e2", rangeId: "r1", calcAmount: 100, splitList: [] }),
       makeExpense({ id: "e3", calcAmount: 50, splitList: [] }),
     ];
-    expect(sumByPeriod(expenses)).toBe(250);
+    expect(sumByPeriod(asPeriodSlice(expenses))).toBe(250);
   });
 
   it("excludes deleted expenses from period spend", () => {
@@ -77,7 +109,7 @@ describe("sumByPeriod (period spend)", () => {
       makeExpense({ id: "e1", calcAmount: 100, splitList: [] }),
       makeExpense({ id: "e2", calcAmount: 50, isDeleted: true, splitList: [] }),
     ];
-    expect(sumByPeriod(expenses)).toBe(100);
+    expect(sumByPeriod(asPeriodSlice(expenses))).toBe(100);
   });
 
   it("ignores non-finite calcAmount values", () => {
@@ -85,7 +117,7 @@ describe("sumByPeriod (period spend)", () => {
       makeExpense({ id: "e1", calcAmount: 10, splitList: [] }),
       makeExpense({ id: "e2", calcAmount: Number.NEGATIVE_INFINITY, splitList: [] }),
     ];
-    expect(sumByPeriod(expenses)).toBe(10);
+    expect(sumByPeriod(asPeriodSlice(expenses))).toBe(10);
   });
 
   it("excludes special expenses when hideSpecial is true", () => {
@@ -93,7 +125,7 @@ describe("sumByPeriod (period spend)", () => {
       makeExpense({ id: "e1", calcAmount: 100, splitList: [] }),
       makeExpense({ id: "e2", calcAmount: 40, isSpecialExpense: true, splitList: [] }),
     ];
-    expect(sumByPeriod(expenses, true)).toBe(100);
+    expect(sumByPeriod(asPeriodSlice(expenses), true)).toBe(100);
   });
 
   it("includes special expenses when hideSpecial is false (default)", () => {
@@ -101,8 +133,8 @@ describe("sumByPeriod (period spend)", () => {
       makeExpense({ id: "e1", calcAmount: 100, splitList: [] }),
       makeExpense({ id: "e2", calcAmount: 40, isSpecialExpense: true, splitList: [] }),
     ];
-    expect(sumByPeriod(expenses)).toBe(140);
-    expect(sumByPeriod(expenses, false)).toBe(140);
+    expect(sumByPeriod(asPeriodSlice(expenses))).toBe(140);
+    expect(sumByPeriod(asPeriodSlice(expenses), false)).toBe(140);
   });
 });
 
@@ -201,6 +233,36 @@ describe("sumByTraveller (per-traveller attribution)", () => {
       makeExpense({ id: "e2", rangeId: "r1", whoPaid: "Alice", calcAmount: 100, splitList: [] }),
     ];
     expect(sumByTraveller(expenses, "Alice", true)).toBe(100);
+  });
+
+  it("reconstructs full cost for ranged-split expenses when isTotal is true", () => {
+    const expenses = [
+      makeExpense({
+        id: "e1",
+        rangeId: "r1",
+        duplOrSplit: 2,
+        amount: 200,
+        calcAmount: 200,
+        splitList: [{ userName: "Alice", amount: 200 }],
+      }),
+      makeExpense({
+        id: "e2",
+        rangeId: "r1",
+        duplOrSplit: 2,
+        amount: 200,
+        calcAmount: 200,
+        splitList: [{ userName: "Alice", amount: 200 }],
+      }),
+      makeExpense({
+        id: "e3",
+        rangeId: "r1",
+        duplOrSplit: 2,
+        amount: 200,
+        calcAmount: 200,
+        splitList: [{ userName: "Alice", amount: 200 }],
+      }),
+    ];
+    expect(sumByTraveller(expenses, "Alice", true)).toBe(600);
   });
 
   it("counts all ranged instances when isTotal is false (default)", () => {

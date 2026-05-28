@@ -1,30 +1,52 @@
-import type { ExpenseData } from "./expense";
+import { DuplicateOption, type ExpenseData } from "./expense";
 
-function deduplicateByRangeId(expenses: ExpenseData[]): ExpenseData[] {
-  const seen = new Set<string>();
-  return expenses.filter((e) => {
-    if (e.rangeId) {
-      if (seen.has(e.rangeId)) return false;
-      seen.add(e.rangeId);
+declare const __periodBrand: unique symbol;
+export type PeriodSlice = ExpenseData[] & { readonly [__periodBrand]: void };
+export function asPeriodSlice(expenses: ExpenseData[]): PeriodSlice {
+  return expenses as PeriodSlice;
+}
+
+function consolidateRangedExpenses(expenses: ExpenseData[]): ExpenseData[] {
+  const byRangeId = new Map<string, ExpenseData[]>();
+  const out: ExpenseData[] = [];
+
+  for (const e of expenses) {
+    if (!e.rangeId) {
+      out.push(e);
+      continue;
     }
-    return true;
-  });
+    const existing = byRangeId.get(e.rangeId);
+    if (existing) {
+      existing.push(e);
+    } else {
+      byRangeId.set(e.rangeId, [e]);
+    }
+  }
+
+  for (const instances of byRangeId.values()) {
+    const first = instances[0];
+    if (first.duplOrSplit === DuplicateOption.split) {
+      const totalCalc = instances.reduce((sum, e) => {
+        const value = Number(e.calcAmount);
+        if (!Number.isFinite(value)) return sum;
+        return sum + value;
+      }, 0);
+      out.push({ ...first, calcAmount: totalCalc });
+    } else {
+      out.push(first);
+    }
+  }
+
+  return out;
 }
 
 /**
  * Trip total spent — deduplicates ranged expenses by rangeId, excludes deleted.
- *
- * ⚠ Known limitation: only correct for ranged-duplicate expenses (duplOrSplit=1),
- * where each day-instance stores the full calcAmount. For ranged-split expenses
- * (duplOrSplit=2) each instance stores calcAmount/days, so dedup returns just one
- * day's share — not the full cost. Pre-existing behaviour inherited from
- * getExpensesSumTotal. Use sumByPeriod over the full unfiltered list as a
- * workaround for ranged-split trip totals.
  */
 export function sumForTrip(expenses: ExpenseData[]): number {
   const active = expenses.filter((e) => !e.isDeleted);
-  const deduped = deduplicateByRangeId(active);
-  return deduped.reduce((sum, e) => {
+  const consolidated = consolidateRangedExpenses(active);
+  return consolidated.reduce((sum, e) => {
     const value = Number(e.calcAmount);
     if (!Number.isFinite(value)) return sum;
     return sum + value;
@@ -40,7 +62,7 @@ export function sumForTrip(expenses: ExpenseData[]): number {
  * Deduplicating here would discard all-but-one day, making the total N× too small.
  */
 export function sumByPeriod(
-  expenses: ExpenseData[],
+  expenses: PeriodSlice,
   hideSpecial = false
 ): number {
   return expenses.reduce((sum, e) => {
@@ -67,7 +89,7 @@ export function sumByTraveller(
   isTotal = false
 ): number {
   const active = expenses.filter((e) => !e.isDeleted);
-  const working = isTotal ? deduplicateByRangeId(active) : active;
+  const working = isTotal ? consolidateRangedExpenses(active) : active;
   return working.reduce((sum, expense) => {
     const hasSplits = expense.splitList && expense.splitList.length > 0;
 
@@ -79,7 +101,7 @@ export function sumByTraveller(
       return sum + value;
     }
 
-    const split = expense.splitList!.find((s) => s.userName === travellerId);
+    const split = expense.splitList?.find((s) => s.userName === travellerId);
     if (!split) return sum;
 
     const splitAmount =

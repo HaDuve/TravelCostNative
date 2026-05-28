@@ -36,6 +36,7 @@ import { NetworkContext } from "../store/network-context";
 import safeLogError from "../util/error";
 import { canOpenURL } from "expo-linking";
 import DevContent from "../components/Settings/DevContent";
+import SettingsUpdateInfoFooter from "../components/Settings/SettingsUpdateInfoFooter";
 import CurrencyExchangeInfo from "../components/UI/CurrencyExchangeInfo";
 import { dynamicScale } from "../util/scalingUtil";
 import { trackEvent } from "../util/vexo-tracking";
@@ -241,6 +242,7 @@ const SettingsScreen = ({ navigation }) => {
           </Text>
         </TouchableOpacity>
       )}
+      <SettingsUpdateInfoFooter />
       <View
         style={{
           flexDirection: "row",

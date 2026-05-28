@@ -13,7 +13,6 @@ type PeriodNameWithTotal = PeriodName | "total";
 
 export type TripBudgetMeta = {
   startDate: string;
-  dailyBudget: number;
 };
 
 function toJsDate(date: unknown): Date {
@@ -35,9 +34,20 @@ function isSameDay(a: Date, b: Date): boolean {
   );
 }
 
-function clampToZero(n: number): number {
-  if (!Number.isFinite(n) || Number.isNaN(n) || n <= 0) return 0;
-  return n;
+function isEligibleExpense(
+  exp: ExpenseData,
+  {
+    hideSpecial,
+    maxDate,
+  }: {
+    hideSpecial: boolean;
+    maxDate?: Date;
+  }
+): boolean {
+  if (exp.isDeleted) return false;
+  if (hideSpecial && exp.isSpecialExpense) return false;
+  if (maxDate && toJsDate(exp.date).getTime() > maxDate.getTime()) return false;
+  return true;
 }
 
 export function computeDynamicDailyBudget({
@@ -95,6 +105,9 @@ export function calculateDailyAverage(
   hideSpecial: boolean = false
 ): number {
   const today = currentDate;
+  const eligible = (Array.isArray(expenses) ? expenses : []).filter((exp) =>
+    isEligibleExpense(exp, { hideSpecial, maxDate: today })
+  );
 
   switch (periodName) {
     case "total": {
@@ -104,14 +117,7 @@ export function calculateDailyAverage(
         Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
       );
 
-      const eligibleExpenses = (Array.isArray(expenses) ? expenses : []).filter(
-        (exp) =>
-          !exp.isDeleted &&
-          (!exp.isSpecialExpense || (exp.isSpecialExpense && !hideSpecial)) &&
-          toJsDate(exp.date).getTime() <= today.getTime()
-      );
-
-      const totalSum = getExpensesSumPeriod(eligibleExpenses, hideSpecial);
+      const totalSum = getExpensesSumPeriod(eligible, hideSpecial);
       return totalSum / daysFromStartToToday;
     }
 
@@ -126,7 +132,7 @@ export function calculateDailyAverage(
       let daysWithExpenses = 0;
 
       allDays.forEach((day) => {
-        const dayExpenses = (expenses || []).filter((exp) =>
+        const dayExpenses = eligible.filter((exp) =>
           isSameDay(toJsDate(exp.date), day)
         );
         const daySum = getExpensesSumPeriod(dayExpenses, hideSpecial);
@@ -173,10 +179,9 @@ export function calculateDailyAverage(
       weeks.forEach((week) => {
         const weekStartDay = startOfDay(week.firstDay).getTime();
         const weekEndDay = startOfDay(week.lastDay).getTime();
-        const weekExpenses = (expenses || []).filter((exp) => {
+        const weekExpenses = eligible.filter((exp) => {
           const d = startOfDay(toJsDate(exp.date)).getTime();
           if (d < weekStartDay || d > weekEndDay) return false;
-          if (hideSpecial && exp.isSpecialExpense) return false;
           return true;
         });
         const weekSum = getExpensesSumPeriod(weekExpenses, hideSpecial);
@@ -214,10 +219,9 @@ export function calculateDailyAverage(
       months.forEach((month) => {
         const start = startOfDay(month.firstDay).getTime();
         const end = startOfDay(month.lastDay).getTime();
-        const monthExpenses = (expenses || []).filter((exp) => {
+        const monthExpenses = eligible.filter((exp) => {
           const d = startOfDay(toJsDate(exp.date)).getTime();
           if (d < start || d > end) return false;
-          if (hideSpecial && exp.isSpecialExpense) return false;
           return true;
         });
         const monthSum = getExpensesSumPeriod(monthExpenses, hideSpecial);
@@ -248,10 +252,9 @@ export function calculateDailyAverage(
       years.forEach((year) => {
         const start = startOfDay(year.firstDay).getTime();
         const end = startOfDay(year.lastDay).getTime();
-        const yearExpenses = (expenses || []).filter((exp) => {
+        const yearExpenses = eligible.filter((exp) => {
           const d = startOfDay(toJsDate(exp.date)).getTime();
           if (d < start || d > end) return false;
-          if (hideSpecial && exp.isSpecialExpense) return false;
           return true;
         });
         const yearSum = getExpensesSumPeriod(yearExpenses, hideSpecial);
@@ -280,22 +283,28 @@ export function calculateAverageUpToDate(
   tripMeta: TripBudgetMeta,
   hideSpecial: boolean = false
 ): number {
+  // Some date helpers (e.g. getPreviousMondayDate) mutate the Date passed in.
+  // Avoid mutating caller-owned Date instances.
+  const safeTargetDate = new Date(targetDate);
+  const eligible = (Array.isArray(expenses) ? expenses : []).filter((exp) =>
+    isEligibleExpense(exp, { hideSpecial, maxDate: safeTargetDate })
+  );
   switch (periodName) {
     case "day": {
-      const thisWeekMonday = getPreviousMondayDate(targetDate) as Date;
+      const thisWeekMonday = getPreviousMondayDate(new Date(safeTargetDate)) as Date;
       const lastWeekMonday = getDateMinusDays(thisWeekMonday, 7) as Date;
 
       const allDays: Date[] = [];
       for (let i = 0; i < 14; i++) {
-        const day = getDateMinusDays(targetDate, i) as Date;
-        if (day >= lastWeekMonday && day <= targetDate) allDays.push(day);
+        const day = getDateMinusDays(safeTargetDate, i) as Date;
+        if (day >= lastWeekMonday && day <= safeTargetDate) allDays.push(day);
       }
 
       let totalSum = 0;
       let daysWithExpenses = 0;
 
       allDays.forEach((day) => {
-        const dayExpenses = (expenses || []).filter((exp) =>
+        const dayExpenses = eligible.filter((exp) =>
           isSameDay(toJsDate(exp.date), day)
         );
         const daySum = getExpensesSumPeriod(dayExpenses, hideSpecial);
@@ -309,8 +318,8 @@ export function calculateAverageUpToDate(
     }
 
     case "week": {
-      const currentMonth = targetDate.getMonth();
-      const currentYear = targetDate.getFullYear();
+      const currentMonth = safeTargetDate.getMonth();
+      const currentYear = safeTargetDate.getFullYear();
       const firstDayCurrentMonth = new Date(currentYear, currentMonth, 1);
       const firstDayLastMonth = new Date(currentYear, currentMonth - 1, 1);
 
@@ -319,7 +328,7 @@ export function calculateAverageUpToDate(
       let weekStart = getPreviousMondayDate(firstDayLastMonth) as Date;
       while (weekStart < firstDayCurrentMonth) {
         const weekEnd = getDatePlusDays(weekStart, 6) as Date;
-        if (weekEnd >= firstDayLastMonth && weekEnd <= targetDate) {
+        if (weekEnd >= firstDayLastMonth && weekEnd <= safeTargetDate) {
           weeks.push({ firstDay: weekStart, lastDay: weekEnd });
         }
         weekStart = getDatePlusDays(weekStart, 7) as Date;
@@ -327,9 +336,10 @@ export function calculateAverageUpToDate(
 
       weekStart = getPreviousMondayDate(firstDayCurrentMonth) as Date;
       const lastDayCurrentMonth = new Date(currentYear, currentMonth + 1, 0);
-      while (weekStart <= lastDayCurrentMonth && weekStart <= targetDate) {
+      while (weekStart <= lastDayCurrentMonth && weekStart <= safeTargetDate) {
         const weekEnd = getDatePlusDays(weekStart, 6) as Date;
-        if (weekEnd <= targetDate) weeks.push({ firstDay: weekStart, lastDay: weekEnd });
+        if (weekEnd <= safeTargetDate)
+          weeks.push({ firstDay: weekStart, lastDay: weekEnd });
         weekStart = getDatePlusDays(weekStart, 7) as Date;
       }
 
@@ -339,11 +349,9 @@ export function calculateAverageUpToDate(
       weeks.forEach((week) => {
         const weekStartDay = startOfDay(week.firstDay).getTime();
         const weekEndDay = startOfDay(week.lastDay).getTime();
-        const weekExpenses = (expenses || []).filter((exp) => {
+        const weekExpenses = eligible.filter((exp) => {
           const d = startOfDay(toJsDate(exp.date)).getTime();
           if (d < weekStartDay || d > weekEndDay) return false;
-          if (toJsDate(exp.date).getTime() > targetDate.getTime()) return false;
-          if (hideSpecial && exp.isSpecialExpense) return false;
           return true;
         });
         const weekSum = getExpensesSumPeriod(weekExpenses, hideSpecial);
@@ -357,20 +365,20 @@ export function calculateAverageUpToDate(
     }
 
     case "month": {
-      const currentYear = targetDate.getFullYear();
+      const currentYear = safeTargetDate.getFullYear();
       const months: Array<{ firstDay: Date; lastDay: Date }> = [];
 
       for (let month = 0; month < 12; month++) {
         const firstDay = new Date(currentYear - 1, month, 1);
         const lastDay = new Date(currentYear - 1, month + 1, 0);
-        if (lastDay <= targetDate) months.push({ firstDay, lastDay });
+        if (lastDay <= safeTargetDate) months.push({ firstDay, lastDay });
       }
 
-      const currentMonth = targetDate.getMonth();
+      const currentMonth = safeTargetDate.getMonth();
       for (let month = 0; month <= currentMonth; month++) {
         const firstDay = new Date(currentYear, month, 1);
         const lastDay = new Date(currentYear, month + 1, 0);
-        if (lastDay <= targetDate) months.push({ firstDay, lastDay });
+        if (lastDay <= safeTargetDate) months.push({ firstDay, lastDay });
       }
 
       let totalSum = 0;
@@ -379,11 +387,9 @@ export function calculateAverageUpToDate(
       months.forEach((month) => {
         const start = startOfDay(month.firstDay).getTime();
         const end = startOfDay(month.lastDay).getTime();
-        const monthExpenses = (expenses || []).filter((exp) => {
+        const monthExpenses = eligible.filter((exp) => {
           const d = startOfDay(toJsDate(exp.date)).getTime();
           if (d < start || d > end) return false;
-          if (toJsDate(exp.date).getTime() > targetDate.getTime()) return false;
-          if (hideSpecial && exp.isSpecialExpense) return false;
           return true;
         });
         const monthSum = getExpensesSumPeriod(monthExpenses, hideSpecial);
@@ -397,7 +403,7 @@ export function calculateAverageUpToDate(
     }
 
     case "year": {
-      const currentYear = targetDate.getFullYear();
+      const currentYear = safeTargetDate.getFullYear();
       const startDate = new Date(tripMeta.startDate);
       const startYear = startDate.getFullYear();
       const years: Array<{ firstDay: Date; lastDay: Date }> = [];
@@ -405,7 +411,7 @@ export function calculateAverageUpToDate(
       for (let year = startYear; year <= currentYear; year++) {
         const firstDay = new Date(year, 0, 1);
         const lastDay = new Date(year, 11, 31);
-        if (lastDay <= targetDate) years.push({ firstDay, lastDay });
+        if (lastDay <= safeTargetDate) years.push({ firstDay, lastDay });
       }
 
       let totalSum = 0;
@@ -414,11 +420,9 @@ export function calculateAverageUpToDate(
       years.forEach((year) => {
         const start = startOfDay(year.firstDay).getTime();
         const end = startOfDay(year.lastDay).getTime();
-        const yearExpenses = (expenses || []).filter((exp) => {
+        const yearExpenses = eligible.filter((exp) => {
           const d = startOfDay(toJsDate(exp.date)).getTime();
           if (d < start || d > end) return false;
-          if (toJsDate(exp.date).getTime() > targetDate.getTime()) return false;
-          if (hideSpecial && exp.isSpecialExpense) return false;
           return true;
         });
         const yearSum = getExpensesSumPeriod(yearExpenses, hideSpecial);

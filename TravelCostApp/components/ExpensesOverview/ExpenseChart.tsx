@@ -59,7 +59,7 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({
       periodType as "day" | "week" | "month" | "year" | "total",
       today,
       expensesCtx.expenses || [],
-      { startDate: tripCtx.startDate, dailyBudget: Number(tripCtx.dailyBudget) || 0 },
+      { startDate: tripCtx.startDate },
       settings.hideSpecialExpenses
     );
 

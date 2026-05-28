@@ -162,7 +162,6 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
         expCtx.expenses || [],
         {
           startDate: tripCtx.startDate,
-          dailyBudget: Number(tripCtx.dailyBudget) || 0,
         },
         hideSpecial,
       )

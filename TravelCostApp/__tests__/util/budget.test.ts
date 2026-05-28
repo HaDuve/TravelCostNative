@@ -1,4 +1,5 @@
 import {
+  calculateAverageUpToDate,
   calculateDailyAverage,
   computeDynamicDailyBudget,
   getBudgetColor,
@@ -98,10 +99,64 @@ describe("util/budget", () => {
           "total",
           new Date("2026-01-15T12:00:00.000Z"),
           expenses,
-          { startDate: "2026-01-10T00:00:00.000Z", dailyBudget: 10 },
+          { startDate: "2026-01-10T00:00:00.000Z" },
           false
         )
       ).toBeCloseTo(150 / 5, 6);
+    });
+
+    it("does not count deleted expenses (day)", () => {
+      const expenses = [
+        makeExpense({
+          id: "e1",
+          calcAmount: 100,
+          isDeleted: true,
+          date: new Date("2026-01-15T12:00:00Z"),
+        }),
+        makeExpense({
+          id: "e2",
+          calcAmount: 50,
+          date: new Date("2026-01-15T12:00:00Z"),
+        }),
+      ];
+
+      expect(
+        calculateDailyAverage(
+          "day",
+          new Date("2026-01-15T12:00:00.000Z"),
+          expenses,
+          { startDate: "2026-01-10T00:00:00.000Z" },
+          false
+        )
+      ).toBe(50);
+    });
+  });
+
+  describe("calculateAverageUpToDate", () => {
+    it("does not count deleted expenses (day)", () => {
+      const expenses = [
+        makeExpense({
+          id: "e1",
+          calcAmount: 100,
+          isDeleted: true,
+          date: new Date("2026-01-15T12:00:00Z"),
+        }),
+        makeExpense({
+          id: "e2",
+          calcAmount: 50,
+          date: new Date("2026-01-15T12:00:00Z"),
+        }),
+      ];
+
+      expect(
+        calculateAverageUpToDate(
+          "day",
+          new Date("2026-01-15T12:00:00.000Z"),
+          expenses,
+          { startDate: "2026-01-10T00:00:00.000Z" },
+          false
+        )
+      ).toBe(50);
     });
   });
 });

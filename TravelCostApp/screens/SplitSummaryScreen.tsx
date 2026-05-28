@@ -162,7 +162,7 @@ const SplitSummaryScreen = ({ navigation }) => {
     userName,
     expenses,
   ]);
-  const simpleSplits = useCallback(() => simplifySplits(splits), [splits])();
+  const simpleSplits = useMemo(() => simplifySplits(splits), [splits]);
   const sameList = useMemo(
     () => areSplitListsEqual(splits, simpleSplits),
     [splits, simpleSplits]
@@ -215,9 +215,12 @@ const SplitSummaryScreen = ({ navigation }) => {
   }, [splits, expenses, isPaidTimestamp]);
 
   useEffect(() => {
+    // isFetching intentionally omitted from deps — it's a re-entrancy guard,
+    // not a trigger. Including it caused a fetch loop (true→false re-fired the effect).
     if (isFetching || !tripid) return;
     getOpenSplits();
-  }, [getOpenSplits, isFetching, tripid]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getOpenSplits, tripid]);
 
   const handleSimpflifySplits = useCallback(async () => {
     try {

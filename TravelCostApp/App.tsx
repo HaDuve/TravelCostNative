@@ -473,10 +473,11 @@ function Home() {
         />
       )}
       {validSplitSummary && (
-        <BottomTabs.Screen
-          name="Financial"
-          component={SplitSummaryScreen}
-          options={{
+      <BottomTabs.Screen
+        name="Financial"
+        component={SplitSummaryScreen}
+        layout={({ children }) => <UnmountOnBlur>{children}</UnmountOnBlur>}
+        options={{
             title: i18n.t("settingsTab"),
             tabBarShowLabel: false,
             tabBarLabel: i18n.t("financialTab"),

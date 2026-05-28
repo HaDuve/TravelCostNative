@@ -25,6 +25,7 @@ jest.mock("react-native-toast-message", () => ({
 }));
 
 import SplitSummaryScreen from "../../screens/SplitSummaryScreen";
+import * as splitUtil from "../../util/split";
 import { makeExpense } from "../fixtures/expense";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 
@@ -61,8 +62,64 @@ describe("Split Summary screen", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Split Summary")).toBeTruthy();
+      expect(screen.getByText("Settle splits")).toBeTruthy();
+      expect(
+        screen.getByText(/paid back/i, { exact: false })
+      ).toBeTruthy();
       expect(screen.getByText("Bob")).toBeTruthy();
       expect(screen.getByText("Alice")).toBeTruthy();
     });
+  });
+
+  it("shows Balance simplification and Settlement helpers when balances can be simplified", async () => {
+    const openBalances = [
+      { userName: "Bob", whoPaid: "Alice", amount: 50 },
+      { userName: "Alice", whoPaid: "Bob", amount: 30 },
+    ];
+    const calcSpy = jest
+      .spyOn(splitUtil, "calcOpenSplitsTable")
+      .mockResolvedValue(openBalances);
+
+    const navigation = { navigate: jest.fn(), pop: jest.fn() };
+    const screen = renderWithAppProviders(
+      <SplitSummaryScreen navigation={navigation as any} />,
+      {
+        trip: {
+          tripid: "t1",
+          tripCurrency: "EUR",
+          isPaid: "notPaid",
+          isPaidTimestamp: 0,
+          fetchAndSettleCurrentTrip: jest.fn(async () => {}),
+        },
+        user: { userName: "Alice", freshlyCreated: false },
+        expenses: {
+          expenses: [
+            makeExpense({
+              whoPaid: "Alice",
+              amount: 100,
+              calcAmount: 100,
+              currency: "EUR",
+              splitList: [
+                { userName: "Alice", amount: 50 },
+                { userName: "Bob", amount: 50 },
+              ],
+            }),
+          ],
+        },
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Simplify splits")).toBeTruthy();
+      expect(
+        screen.getByText(/no money has moved/i, { exact: false })
+      ).toBeTruthy();
+      expect(screen.getByText("Settle splits")).toBeTruthy();
+      expect(
+        screen.getByText(/paid back/i, { exact: false })
+      ).toBeTruthy();
+    });
+
+    calcSpy.mockRestore();
   });
 });

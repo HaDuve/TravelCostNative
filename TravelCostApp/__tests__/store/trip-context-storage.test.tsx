@@ -40,14 +40,19 @@ function LoadTravellersProbe({
   return null;
 }
 
-function LoadTripProbe({ onResult }: { onResult: (trip: unknown) => void }) {
+function LoadTripProbe({
+  onResult,
+}: {
+  onResult: (result: { storedTrip: unknown; inputTripHasTotalSum: boolean }) => void;
+}) {
   const { TripContext } = require("../../store/trip-context");
   const ctx = useContext(TripContext);
   const didInit = useRef(false);
   useEffect(() => {
     if (didInit.current) return;
     didInit.current = true;
-    ctx.setCurrentTrip("trip-1", {
+    // Intentionally include a legacy persisted field to verify migration behavior.
+    const inputTrip = {
       tripid: "trip-1",
       tripName: "Trip",
       totalBudget: "100",
@@ -61,7 +66,14 @@ function LoadTripProbe({ onResult }: { onResult: (trip: unknown) => void }) {
       isDynamicDailyBudget: false,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       totalSum: 123 as any,
-    } as any).then(() => onResult(ctx.getcurrentTrip()));
+    } as any;
+
+    ctx.setCurrentTrip("trip-1", inputTrip).then(() =>
+      onResult({
+        storedTrip: ctx.getcurrentTrip(),
+        inputTripHasTotalSum: "totalSum" in inputTrip,
+      })
+    );
   }, [ctx, onResult]);
   return null;
 }
@@ -87,7 +99,10 @@ describe("TripContext storage contracts", () => {
   });
 
   it("setCurrentTrip drops deprecated totalSum field when present", async () => {
-    const results: unknown[] = [];
+    const results: Array<{
+      storedTrip: unknown;
+      inputTripHasTotalSum: boolean;
+    }> = [];
     const TripContextProvider = require("../../store/trip-context").default;
     render(
       <ExpensesContext.Provider value={{ expenses: [] } as any}>
@@ -102,7 +117,8 @@ describe("TripContext storage contracts", () => {
     });
 
     expect(results[0]).toBeTruthy();
-    expect("totalSum" in (results[0] as any)).toBe(false);
+    expect(results[0].inputTripHasTotalSum).toBe(true);
+    expect("totalSum" in (results[0].storedTrip as any)).toBe(false);
   });
 });
 

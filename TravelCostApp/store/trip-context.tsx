@@ -232,11 +232,14 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
   function dropDeprecatedTripFields(trip: TripData): TripData {
     // `totalSum` was a persisted trip-level total-spent number. We now derive totals
     // from expenses (see #247) and drop this field on load to avoid stale state.
-    if (trip && "totalSum" in trip) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      delete (trip as any).totalSum;
-    }
-    return trip;
+    //
+    // Important: don't mutate the input object; callers may retain the reference.
+    if (!trip) return trip;
+    if (!("totalSum" in trip)) return trip;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { totalSum: _deprecatedTotalSum, ...rest } = trip as any;
+    return rest as TripData;
   }
 
   async function fetchAndSetTravellers(tripid: string): Promise<boolean> {
@@ -404,6 +407,10 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
   async function loadTripDataFromStorage() {
     const tripData: TripData = getMMKVObject(MMKV_KEYS.CURRENT_TRIP);
     if (tripData) {
+      // `totalSum` might still exist in persisted data from older app versions.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hadDeprecatedTotalSum = "totalSum" in (tripData as any);
+
       // Migrate trip data from old settlement system
       const migratedTrip = dropDeprecatedTripFields(
         migrateTripSettlementData(tripData)
@@ -430,12 +437,13 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
       }
       setIsLoading(false);
 
-      // If migration occurred, save migrated trip back to storage
-      if (
+      // If migration occurred, save migrated trip back to storage.
+      // Also persist the cleanup of deprecated fields (e.g. legacy `totalSum`).
+      const didMigrateSettlementData =
         tripData.isPaidDate &&
         !tripData.isPaidTimestamp &&
-        migratedTrip.isPaidTimestamp
-      ) {
+        migratedTrip.isPaidTimestamp;
+      if (didMigrateSettlementData || hadDeprecatedTotalSum) {
         await saveTripDataInStorage(migratedTrip);
       }
 

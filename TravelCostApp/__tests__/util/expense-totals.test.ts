@@ -150,6 +150,19 @@ describe("sumByTraveller (per-traveller attribution)", () => {
     expect(sumByTraveller(expenses, "Bob")).toBe(50);
   });
 
+  it("ignores non-finite fallback amounts when calcAmount is missing (no splits)", () => {
+    const expenses = [
+      makeExpense({
+        id: "e1",
+        whoPaid: "Alice",
+        calcAmount: undefined as unknown as number,
+        amount: Number.POSITIVE_INFINITY,
+        splitList: [],
+      }),
+    ];
+    expect(sumByTraveller(expenses, "Alice")).toBe(0);
+  });
+
   it("excludes deleted expenses from traveller attribution", () => {
     const expenses = [
       makeExpense({

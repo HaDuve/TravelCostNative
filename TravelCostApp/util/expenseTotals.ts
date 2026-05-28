@@ -78,8 +78,8 @@ export function sumByPeriod(
  * Per-traveller attribution — same dedup contract as sumForTrip / sumByPeriod.
  *
  * isTotal=false (default): no dedup — caller pre-filters to window (period view).
- * isTotal=true: deduplicates by rangeId — carries the same ranged-split caveat
- *   as sumForTrip (returns one day's share, not the full cost, for duplOrSplit=2).
+ * isTotal=true: deduplicates by rangeId — for ranged-split (duplOrSplit=2),
+ * consolidation reconstructs full cost by summing instances in the input slice.
  *
  * Applies expense-currency → trip-currency conversion ratio for split expenses.
  */
@@ -95,7 +95,11 @@ export function sumByTraveller(
 
     if (!hasSplits) {
       if (expense.whoPaid !== travellerId) return sum;
-      if (expense.calcAmount == null) return sum + Number(expense.amount);
+      if (expense.calcAmount == null) {
+        const amountValue = Number(expense.amount);
+        if (!Number.isFinite(amountValue)) return sum;
+        return sum + amountValue;
+      }
       const value = Number(expense.calcAmount);
       if (!Number.isFinite(value)) return sum;
       return sum + value;

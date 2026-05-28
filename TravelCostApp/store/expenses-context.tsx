@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   createContext,
   useCallback,
@@ -28,40 +26,11 @@ export type ExpenseContextType = {
   expenses: Array<ExpenseData>;
   // Sync loading state
   isSyncing: boolean;
-  addExpense: (
-    {
-      uid,
-      description,
-      amount,
-      date,
-      startDate,
-      endDate,
-      category,
-      country,
-      currency,
-      whoPaid,
-      calcAmount,
-      iconName,
-    }: ExpenseData,
-    id?: string
-  ) => void;
+  addExpense: (expense: ExpenseData, id?: string) => void;
   setExpenses: (expenses: Array<ExpenseData>) => void;
   mergeExpenses: (newExpenses: Array<ExpenseData>) => void;
   deleteExpense: (id: string) => void;
-  updateExpense: (
-    id: string,
-    {
-      description,
-      amount,
-      date,
-      category,
-      country,
-      currency,
-      whoPaid,
-      calcAmount,
-      iconName,
-    }: ExpenseData
-  ) => void;
+  updateExpense: (id: string, expense: ExpenseData) => void;
   updateExpenseId: (oldId: string, newId: string) => void;
   getRecentExpenses: (rangestring: RangeString) => Array<ExpenseData>;
   getYearlyExpenses: (yearsBack: number) => {
@@ -89,45 +58,19 @@ export type ExpenseContextType = {
   setIsSyncing: (syncing: boolean) => void;
 };
 
+const noop = () => undefined;
+const noopAsyncBool = async () => false;
+
 export const ExpensesContext = createContext<ExpenseContextType>({
   expenses: [],
   // Sync loading state defaults
   isSyncing: false,
-  addExpense: (
-    {
-      uid,
-      description,
-      amount,
-      date,
-      startDate,
-      endDate,
-      category,
-      country,
-      currency,
-      whoPaid,
-      calcAmount,
-      iconName,
-    }: ExpenseData,
-    id?: string
-  ) => {},
-  setExpenses: (expenses) => {},
-  mergeExpenses: (newExpenses) => {},
-  deleteExpense: (id) => {},
-  updateExpense: (
-    id,
-    {
-      description,
-      amount,
-      date,
-      category,
-      country,
-      currency,
-      whoPaid,
-      calcAmount,
-      iconName,
-    }: ExpenseData
-  ) => {},
-  updateExpenseId: (oldId: string, newId: string) => {},
+  addExpense: noop,
+  setExpenses: noop,
+  mergeExpenses: noop,
+  deleteExpense: noop,
+  updateExpense: noop,
+  updateExpenseId: noop,
   getRecentExpenses: (rangestring: RangeString): Array<ExpenseData> => {
     return [];
   },
@@ -171,9 +114,9 @@ export const ExpensesContext = createContext<ExpenseContextType>({
     return [];
   },
 
-  loadExpensesFromStorage: async () => {},
+  loadExpensesFromStorage: noopAsyncBool,
   // Sync state management defaults
-  setIsSyncing: (syncing: boolean) => {},
+  setIsSyncing: noop,
 });
 
 // Fingerprint for offline-created rows vs server rows with different ids.
@@ -389,26 +332,15 @@ function ExpensesContextProvider({ children }) {
   const getYearlyExpenses = useCallback(
     (yearsBack: number) => {
       /*
-       *  Returns an object containing the first date, last date of a month and
+       *  Returns an object containing the first date, last date of a year and
        *  the expenses in that range.
        *  returns {firstDay, lastDay, yearlyExpenses}
        */
-      const daysBefore = yearsBack * 365;
       const today = new Date();
+      const year = today.getFullYear() - yearsBack;
 
-      const dayBack = getDateMinusDays(today, daysBefore);
-
-      const firstDay = new Date(
-        dayBack.getFullYear(),
-        dayBack.getMonth() - 1,
-        1
-      );
-
-      const lastDay = new Date(
-        dayBack.getFullYear() + 1,
-        dayBack.getMonth() - 1,
-        0
-      );
+      const firstDay = new Date(year, 0, 1);
+      const lastDay = new Date(year, 11, 31);
       const yearlyExpenses = expensesState.filter((expense) => {
         return (
           !expense.isDeleted &&

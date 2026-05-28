@@ -325,6 +325,7 @@ export function expensesReducer(state: ExpenseData[], action) {
 function ExpensesContextProvider({ children }) {
   const [expensesState, dispatch] = useReducer(expensesReducer, []);
   const [isSyncing, setIsSyncing] = React.useState(false);
+  const expensesCount = expensesState.length;
 
   useEffect(() => {
     async function asyncLoadExpenses() {
@@ -358,9 +359,8 @@ function ExpensesContextProvider({ children }) {
   }, []);
 
   const deleteExpense = useCallback((id: string) => {
-    const expenseToDelete = expensesState.find((expense) => expense.id === id);
     dispatch({ type: "DELETE", payload: id });
-  }, [expensesState]);
+  }, []);
 
   const updateExpense = useCallback((id: string, expenseData: ExpenseData) => {
     dispatch({ type: "UPDATE", payload: { id: id, data: expenseData } });
@@ -578,7 +578,7 @@ function ExpensesContextProvider({ children }) {
 
   const loadExpensesFromStorage = useCallback(
     async (forceLoad = false) => {
-      if (!forceLoad && expensesState?.length !== 0) {
+      if (!forceLoad && expensesCount !== 0) {
         return false;
       }
       // const loadedExpenses = await asyncStoreGetObject("expenses");
@@ -595,7 +595,7 @@ function ExpensesContextProvider({ children }) {
       }
       return true;
     },
-    [expensesState?.length, setExpenses]
+    [expensesCount, setExpenses]
   );
 
   const filteredExpenses = useMemo(

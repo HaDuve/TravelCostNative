@@ -95,7 +95,7 @@ const SplitSummaryScreen = ({ navigation }) => {
     totalPayBackTextOriginal
   );
 
-  const getOpenSplits = useCallback(async () => {
+  const getOpenSplits = useCallback(() => {
     if (!tripid || expenses?.length === 0) return;
     setIsFetching(true);
     try {
@@ -338,7 +338,7 @@ const SplitSummaryScreen = ({ navigation }) => {
               trackEvent(VexoEvents.SPLIT_SUMMARY_BACK_PRESSED);
               navigation.goBack();
             } else {
-              await getOpenSplits();
+              getOpenSplits();
               setShowSimplify(true);
               setTitleText(titleTextOriginal);
             }

@@ -376,6 +376,7 @@ export function rollupOpenBalances(
   let openSplits: Split[] = [];
   for (const exp of expenses) {
     const expense: ExpenseData = exp;
+    const expenseCurrency = expense.currency || tripCurrency;
 
     // Skip expense if:
     // 1. Expense type is SELF
@@ -398,17 +399,43 @@ export function rollupOpenBalances(
       const splitCopy: Split = { ...split };
 
       // check if rate is already in rates
-      if (!rates[expense.currency]) {
+      if (!rates[expenseCurrency]) {
         try {
-          const rate = expense.amount / expense.calcAmount;
-          rates[expense.currency] = rate;
-          splitCopy.amount = Number((splitCopy.amount / rate).toFixed(2));
+          // When expense currency differs from trip currency, we convert split amounts into trip currency.
+          // The conversion factor comes from the expense's original amount vs its already-converted calcAmount.
+          const calcAmount = Number(expense.calcAmount);
+          const amount = Number(expense.amount);
+          if (
+            expenseCurrency === tripCurrency ||
+            !calcAmount ||
+            Number.isNaN(calcAmount) ||
+            !amount ||
+            Number.isNaN(amount)
+          ) {
+            // Either already trip currency, or conversion inputs are invalid (avoid Infinity/NaN).
+            rates[expenseCurrency] = 1;
+            splitCopy.amount = Number(Number(splitCopy.amount).toFixed(2));
+          } else {
+            const rate = amount / calcAmount;
+            if (!rate || Number.isNaN(rate) || !Number.isFinite(rate)) {
+              safeLogError(
+                new Error(
+                  `Invalid currency conversion rate for ${expenseCurrency}→${tripCurrency}`
+                )
+              );
+              rates[expenseCurrency] = 1;
+              splitCopy.amount = Number(Number(splitCopy.amount).toFixed(2));
+            } else {
+              rates[expenseCurrency] = rate;
+              splitCopy.amount = Number((splitCopy.amount / rate).toFixed(2));
+            }
+          }
         } catch (error) {
           safeLogError(error);
         }
       } else {
         splitCopy.amount = Number(
-          (splitCopy.amount / rates[expense.currency]).toFixed(2)
+          (splitCopy.amount / rates[expenseCurrency]).toFixed(2)
         );
       }
 

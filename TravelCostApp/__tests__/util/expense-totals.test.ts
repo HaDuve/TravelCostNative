@@ -5,6 +5,15 @@ import {
   sumByTraveller,
 } from "../../util/expenseTotals";
 
+beforeAll(() => {
+  jest.useFakeTimers();
+  jest.setSystemTime(new Date("2026-01-15T12:00:00.000Z"));
+});
+
+afterAll(() => {
+  jest.useRealTimers();
+});
+
 // ─── sumForTrip ───────────────────────────────────────────────────────────────
 
 describe("sumForTrip (trip total spent)", () => {
@@ -41,6 +50,14 @@ describe("sumForTrip (trip total spent)", () => {
     // e1 is deleted; e2 is first surviving instance → counts once
     expect(sumForTrip(expenses)).toBe(100);
   });
+
+  it("ignores non-finite calcAmount values", () => {
+    const expenses = [
+      makeExpense({ id: "e1", calcAmount: 10, splitList: [] }),
+      makeExpense({ id: "e2", calcAmount: Number.POSITIVE_INFINITY, splitList: [] }),
+    ];
+    expect(sumForTrip(expenses)).toBe(10);
+  });
 });
 
 // ─── sumByPeriod ──────────────────────────────────────────────────────────────
@@ -61,6 +78,14 @@ describe("sumByPeriod (period spend)", () => {
       makeExpense({ id: "e2", calcAmount: 50, isDeleted: true, splitList: [] }),
     ];
     expect(sumByPeriod(expenses)).toBe(100);
+  });
+
+  it("ignores non-finite calcAmount values", () => {
+    const expenses = [
+      makeExpense({ id: "e1", calcAmount: 10, splitList: [] }),
+      makeExpense({ id: "e2", calcAmount: Number.NEGATIVE_INFINITY, splitList: [] }),
+    ];
+    expect(sumByPeriod(expenses)).toBe(10);
   });
 
   it("excludes special expenses when hideSpecial is true", () => {
@@ -106,6 +131,24 @@ describe("sumByTraveller (per-traveller attribution)", () => {
         amount: 100,
         calcAmount: 100,
         isDeleted: true,
+        splitList: [{ userName: "Alice", amount: 100 }],
+      }),
+    ];
+    expect(sumByTraveller(expenses, "Alice")).toBe(100);
+  });
+
+  it("ignores expenses with non-finite calcAmount values", () => {
+    const expenses = [
+      makeExpense({
+        id: "e1",
+        amount: 100,
+        calcAmount: 100,
+        splitList: [{ userName: "Alice", amount: 100 }],
+      }),
+      makeExpense({
+        id: "e2",
+        amount: 100,
+        calcAmount: Number.POSITIVE_INFINITY,
         splitList: [{ userName: "Alice", amount: 100 }],
       }),
     ];

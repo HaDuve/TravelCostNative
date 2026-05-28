@@ -20,8 +20,9 @@ export function sumForTrip(expenses: ExpenseData[]): number {
   const active = expenses.filter((e) => !e.isDeleted);
   const deduped = deduplicateByRangeId(active);
   return deduped.reduce((sum, e) => {
-    if (isNaN(Number(e.calcAmount))) return sum;
-    return sum + Number(e.calcAmount);
+    const value = Number(e.calcAmount);
+    if (!Number.isFinite(value)) return sum;
+    return sum + value;
   }, 0);
 }
 
@@ -35,9 +36,10 @@ export function sumByPeriod(
 ): number {
   return expenses.reduce((sum, e) => {
     if (e.isDeleted) return sum;
-    if (isNaN(Number(e.calcAmount)) || (hideSpecial && e.isSpecialExpense))
+    const value = Number(e.calcAmount);
+    if (!Number.isFinite(value) || (hideSpecial && e.isSpecialExpense))
       return sum;
-    return sum + Number(e.calcAmount);
+    return sum + value;
   }, 0);
 }
 
@@ -58,8 +60,10 @@ export function sumByTraveller(
 
     if (!hasSplits) {
       if (expense.whoPaid !== travellerId) return sum;
-      if (!expense.calcAmount) return sum + Number(expense.amount);
-      return sum + Number(expense.calcAmount);
+      if (expense.calcAmount == null) return sum + Number(expense.amount);
+      const value = Number(expense.calcAmount);
+      if (!Number.isFinite(value)) return sum;
+      return sum + value;
     }
 
     const split = expense.splitList!.find((s) => s.userName === travellerId);
@@ -70,14 +74,20 @@ export function sumByTraveller(
         ? Number(String(split.amount).replace(/^0+/, ""))
         : Number(split.amount);
 
-    if (isNaN(splitAmount) || !isFinite(splitAmount)) return sum;
+    if (!Number.isFinite(splitAmount)) return sum;
 
-    if (!expense.calcAmount || !expense.amount) return sum + splitAmount;
+    if (expense.calcAmount == null || expense.amount == null)
+      return sum + splitAmount;
 
-    if (expense.calcAmount === expense.amount) return sum + splitAmount;
+    const amountValue = Number(expense.amount);
+    const calcValue = Number(expense.calcAmount);
 
-    const convertedAmount = expense.calcAmount * (splitAmount / expense.amount);
-    if (isNaN(convertedAmount) || !isFinite(convertedAmount))
+    if (!Number.isFinite(amountValue) || !Number.isFinite(calcValue)) return sum;
+    if (amountValue === 0) return sum + splitAmount;
+    if (calcValue === amountValue) return sum + splitAmount;
+
+    const convertedAmount = calcValue * (splitAmount / amountValue);
+    if (!Number.isFinite(convertedAmount))
       return sum + splitAmount;
 
     return sum + convertedAmount;

@@ -4,9 +4,7 @@ Shared travel expense tracking for groups: one trip holds expenses, budgets, tra
 
 ## Language
 
-**Trip**:
-The shared container where a group tracks travel spending together — expenses, travellers, budgets, and splits all belong to one trip.
-_Avoid_: Trip budget (as a noun for the container), journey, group ledger
+### People
 
 **User**:
 A person with a signed-in app account (authentication identity). Users can create trips, join trips, and hold trip history — but merely having an account does not put them on any trip roster.
@@ -16,6 +14,12 @@ _Avoid_: Account (in domain speech), member
 A User who appears on a specific trip’s roster. Every Traveller is a User; joining or creating a trip is what makes someone a Traveller for that trip. A User who has not completed onboarding or has not joined a trip is not a Traveller.
 _Avoid_: Member, participant, user (when you mean someone on the trip roster)
 
+### Trips
+
+**Trip**:
+The shared container where a group tracks travel spending together — expenses, travellers, budgets, and splits all belong to one trip.
+_Avoid_: Trip budget (as a noun for the container), journey, group ledger
+
 **Active trip**:
 The trip a User has selected for day-to-day use — adding expenses, viewing the ledger, and seeing trip-level summaries. A User may belong to many trips but only one is active at a time.
 _Avoid_: Current trip (implementation alias only), open trip
@@ -23,6 +27,8 @@ _Avoid_: Current trip (implementation alias only), open trip
 **Trip history**:
 All trips a User can open (shown as “My Trips”) — not only past trips; includes current and future-dated trips. One is the **Active trip**.
 _Avoid_: History (alone — implies completed trips only)
+
+### Expenses
 
 **Expense**:
 A recorded cost on a trip — amount, when it applies, category, who paid, and how it is shared among travellers.
@@ -35,6 +41,12 @@ _Avoid_: Long-term expense (UI copy only), grouped expenses (implementation grou
 **Deleted expense**:
 An expense removed from the trip — it no longer appears in the ledger, budgets, splits, or summaries. Users treat it as gone; it is not shown again unless restored (if that capability is added later).
 _Avoid_: Removed expense, archived expense
+
+**Special expense**:
+An expense flagged to stay off budget charts and spending summaries when the viewer hides special expenses. It is still a normal **Expense** for **Splits** and **Balances** — included in split calculations and visible on split summaries like any other expense.
+_Avoid_: Private expense, excluded expense
+
+### Money flow
 
 **Split**:
 How an expense’s cost is divided among travellers on that expense (equal, exact amount, percent, or self).
@@ -68,6 +80,8 @@ _Avoid_: Split up (UI copy)
 Repeating a **Ranged expense**’s full amount on each day in its date span (multiply per day), as opposed to **Ranged split**.
 _Avoid_: Duplicate (alone — ambiguous), multiply (UI copy)
 
+### Budget
+
 **Budget**:
 A spending target on a trip. Qualifiers name the shape: **total budget** (whole trip), **daily budget** (per calendar day), and **dynamic daily budget** (recalculated daily target — see below).
 _Avoid_: Spending limit, trip budget (as the trip container)
@@ -83,9 +97,7 @@ The spending target for a single calendar day. The day is **over daily budget** 
 A mode where the daily budget target is recalculated from remaining total budget and remaining trip days (e.g. after €1,200 spent with €1,800 left over 20 days, the target becomes ~€90/day). When enabled, “over daily budget” uses the current recalculated target, not necessarily the original figure entered at trip setup.
 _Avoid_: Automatic budget (vague)
 
-**Special expense**:
-An expense flagged to stay off budget charts and spending summaries when the viewer hides special expenses. It is still a normal **Expense** for **Splits** and **Balances** — included in split calculations and visible on split summaries like any other expense.
-_Avoid_: Private expense, excluded expense
+### Currency
 
 **Trip currency**:
 The currency a traveller lives with at home — where their money comes from — used as the trip’s reference for budgets, totals, and balances. It is **not** the currency of the country being visited; expenses abroad may be logged in other currencies and understood in trip currency for rollups.
@@ -94,6 +106,18 @@ _Avoid_: Base currency (ambiguous), local currency, destination currency
 **Expense currency**:
 The currency in which an expense was entered (e.g. cash spent in Japan). May differ from **Trip currency**; the app converts for trip-level totals.
 _Avoid_: Foreign currency (implies trip currency is always “foreign”)
+
+## Flagged ambiguities
+
+Places where English UI copy or code identifiers still diverge from domain language above. Prefer domain terms in new work; align i18n and labels incrementally.
+
+| Surface | Current wording / field | Domain term | Notes |
+| ------- | ----------------------- | ----------- | ----- |
+| Trip setup (i18n) | “Base Currency” (`selectCurrencyAlert`, related strings) | **Trip currency** | “Base” suggests destination or accounting base; domain term is the traveller’s home reference currency for the trip. |
+| Expense / trip models | `isPaid`, `isPaidTimestamp` | **Paid back**, **Settlement** (trip-wide) | `isPaid` is per-expense paid-back status; trip `isPaid` + timestamp drive trip-wide **Settlement**. |
+| Split Summary UI (i18n) | “open splits”, “Calculate open splits”, “No open splits” | **Balance** | Rolled-up amounts travellers owe each other, not “splits” as allocation mode. |
+| Split Summary UI (i18n) | “settle splits”, “Could not settle splits” | **Settlement** | Trip-wide clearing of balances, not settling split rows. |
+| Split Summary UI (i18n) | “simplify splits”, “Could not simplify splits” | **Balance simplification** | Fewer payment lines with the same net balances; no money has moved. |
 
 ## Example dialogue
 

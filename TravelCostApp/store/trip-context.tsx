@@ -21,6 +21,7 @@ export interface TripData {
   tripCurrency?: string;
   travellers?: Traveller[];
   tripid?: string;
+  /** @deprecated derive trip total spent from expenses instead (see #247) */
   totalSum?: number;
   tripProgress?: number;
   startDate?: string;
@@ -41,6 +42,7 @@ export type TripContextType = {
   dailyBudget: string;
   setdailyBudget: (dailyBudget: string) => void;
   tripCurrency: string;
+  /** @deprecated derive trip total spent from expenses instead (see #247) */
   totalSum: number;
   tripProgress: number;
   startDate: string;
@@ -50,6 +52,7 @@ export type TripContextType = {
   setTripProgress: (percent: number) => void;
   travellers: Traveller[];
   fetchAndSetTravellers: (tripid: string) => Promise<boolean>;
+  /** @deprecated derive trip total spent from expenses instead (see #247) */
   setTotalSum: (amount: number) => void;
   setTripid: (tripid: string) => void;
   addTrip: ({ tripName, tripTotalBudget }) => void;
@@ -161,6 +164,7 @@ function TripContextProvider({ children }) {
   useEffect(() => {
     function calcDynamicDailyBudget() {
       if (isDynamicDailyBudget) {
+        // TODO: stop reading TripContext.totalSum; compute dynamic daily budget from expenses-derived totals.
         const daysLeft = Math.floor(
           (new Date(endDate).getTime() - new Date().getTime()) /
             (1000 * 3600 * 24)

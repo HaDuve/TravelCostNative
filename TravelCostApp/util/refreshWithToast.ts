@@ -38,8 +38,7 @@ export async function refreshWithToast({
       setRefreshing,
       expensesCtx as ExpenseContextType,
       tripid,
-      uid,
-      tripCtx as TripContextType
+      uid
     );
 
     // Calculate how many new expenses were synced

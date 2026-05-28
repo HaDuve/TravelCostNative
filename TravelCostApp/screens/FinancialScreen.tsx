@@ -38,7 +38,6 @@ const FinancialScreen = () => {
 
   const restCash =
     Number(daysFromStartToToday) * Number(tripCtx.dailyBudget) - expensesSum;
-  tripCtx.setTotalSum(expensesSum);
   const multiTraveller =
     tripCtx.travellers && tripCtx.travellers.length > 1 ? true : false;
   // if (restCash < 0) restCash = 0;
@@ -52,6 +51,7 @@ const FinancialScreen = () => {
           totalCost={totalBudgetNum}
           catCost={restCash}
           iconOverride="fast-food-outline"
+          iconJSXOverride={undefined}
         />
       </View>
 
@@ -64,8 +64,9 @@ const FinancialScreen = () => {
           trackEvent(VexoEvents.OPEN_SPLITS_SUMMARY_PRESSED, {
             tripId: tripCtx.tripid,
           });
-          navigation.navigate("SplitSummary", { tripid: tripCtx.tripid });
+          (navigation as any).navigate("SplitSummary", { tripid: tripCtx.tripid });
         }}
+        buttonStyle={styles.button}
         style={styles.button}
       >
         {i18n.t("simplifySplitsLabel")}

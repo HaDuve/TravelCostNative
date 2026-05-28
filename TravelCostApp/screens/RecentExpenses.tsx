@@ -72,8 +72,7 @@ function RecentExpenses({ navigation }) {
       setRefreshing: (isRefreshing: boolean) => void,
       expensesCtx: ExpenseContextType,
       tripid: string,
-      uid: string,
-      tripCtx: TripContextType
+      uid: string
     ) => {
       await fetchAndSetExpenses(
         showRefIndicator,
@@ -82,8 +81,7 @@ function RecentExpenses({ navigation }) {
         setRefreshing,
         expensesCtx,
         tripid,
-        uid,
-        tripCtx
+        uid
       );
     },
     []
@@ -138,8 +136,7 @@ function RecentExpenses({ navigation }) {
         setRefreshing,
         expensesCtx,
         tripid,
-        uid,
-        tripCtx
+        uid
       );
     },
     [

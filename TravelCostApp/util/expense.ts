@@ -186,6 +186,7 @@ export async function deleteAllExpensesByRangedId(
   isOnline: boolean,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   expenseCtx: any,
+  options?: { showUndoToast?: boolean },
 ) {
   const allExpenses = expenseCtx?.expenses || [];
   const expensesToDelete = allExpenses.filter(
@@ -203,6 +204,7 @@ export async function deleteAllExpensesByRangedId(
     targets,
     isOnline,
     expenseCtx,
+    showUndoToast: options?.showUndoToast ?? true,
   });
 }
 

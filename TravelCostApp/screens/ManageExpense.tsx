@@ -371,7 +371,8 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         tripid,
         selectedExpense,
         isOnline,
-        expenseCtx
+        expenseCtx,
+        { showUndoToast: false },
       );
       // Then create new expenses
       await createRangedData(expenseData);

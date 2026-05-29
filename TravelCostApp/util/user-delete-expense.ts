@@ -128,13 +128,20 @@ export async function deleteUserExpenses({
   isOnline,
   expenseCtx,
   afterSync = () => touchAllTravelers(tripid, true),
+  showUndoToast = true,
 }: {
   tripid: string;
   targets: UserDeleteExpenseTarget[];
   isOnline: boolean;
   expenseCtx: Pick<UserDeleteExpenseContext, "deleteExpense">;
   afterSync?: () => Promise<void>;
+  /** False for compound flows (e.g. ranged date edit) that are not a user delete action. */
+  showUndoToast?: boolean;
 }): Promise<void> {
+  if (targets.length === 0) {
+    return;
+  }
+
   clearPendingUndoDelete();
   Toast.hide();
   Toast.show({
@@ -144,24 +151,35 @@ export async function deleteUserExpenses({
     autoHide: false,
   });
 
-  for (const target of targets) {
-    expenseCtx.deleteExpense(target.id);
+  try {
+    for (const target of targets) {
+      expenseCtx.deleteExpense(target.id);
+    }
+
+    for (const target of targets) {
+      const item: OfflineQueueManageExpenseItem = {
+        type: "delete",
+        expense: {
+          tripid: target.tripid,
+          uid: target.uid,
+          id: target.id,
+        },
+      };
+      await deleteExpenseOnlineOffline(item, isOnline);
+    }
+  } finally {
+    Toast.hide();
   }
 
-  for (const target of targets) {
-    const item: OfflineQueueManageExpenseItem = {
-      type: "delete",
-      expense: {
-        tripid: target.tripid,
-        uid: target.uid,
-        id: target.id,
-      },
-    };
-    await deleteExpenseOnlineOffline(item, isOnline);
+  try {
+    await afterSync();
+  } catch {
+    // Deletes already applied; undo toast remains the recovery path.
   }
 
-  await afterSync();
-  Toast.hide();
+  if (!showUndoToast) {
+    return;
+  }
 
   const actionId = registerPendingUndoDelete(tripid, targets);
   showDeletedExpenseToast(actionId, () => {

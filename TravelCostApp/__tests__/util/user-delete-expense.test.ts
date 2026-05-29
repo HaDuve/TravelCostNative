@@ -21,9 +21,11 @@ import {
 import { touchAllTravelers } from "../../util/http";
 import {
   UNDO_DELETE_WINDOW_MS,
+  collectUserDeleteTargets,
   deleteUserExpenses,
   undoUserExpenseDelete,
 } from "../../util/user-delete-expense";
+import type { ExpenseData } from "../../util/expense";
 
 describe("deleteUserExpenses", () => {
   const expenseCtx = {
@@ -67,6 +69,59 @@ describe("deleteUserExpenses", () => {
     expect(deletedToastCall).toBeDefined();
     expect(deletedToastCall[0].visibilityTime).toBe(UNDO_DELETE_WINDOW_MS);
     expect(deletedToastCall[0].props?.onUndo).toEqual(expect.any(Function));
+  });
+
+  it("does not show undo toast when showUndoToast is false", async () => {
+    await deleteUserExpenses({
+      tripid: "trip-1",
+      targets: [{ tripid: "trip-1", uid: "u1", id: "exp-1" }],
+      isOnline: true,
+      expenseCtx,
+      showUndoToast: false,
+    });
+
+    expect(expenseCtx.deleteExpense).toHaveBeenCalledWith("exp-1");
+    const deletedToastCall = (Toast.show as jest.Mock).mock.calls.find(
+      ([args]) => args.type === "deletedExpense",
+    );
+    expect(deletedToastCall).toBeUndefined();
+  });
+
+  it("skips delete and undo toast when there are no targets", async () => {
+    await deleteUserExpenses({
+      tripid: "trip-1",
+      targets: [],
+      isOnline: true,
+      expenseCtx,
+    });
+
+    expect(expenseCtx.deleteExpense).not.toHaveBeenCalled();
+    expect(deleteExpenseOnlineOffline).not.toHaveBeenCalled();
+    const deletedToastCall = (Toast.show as jest.Mock).mock.calls.find(
+      ([args]) => args.type === "deletedExpense",
+    );
+    expect(deletedToastCall).toBeUndefined();
+  });
+
+  it("shows undo toast when afterSync fails after deletes succeed", async () => {
+    (touchAllTravelers as jest.Mock).mockRejectedValueOnce(
+      new Error("touch failed"),
+    );
+
+    await deleteUserExpenses({
+      tripid: "trip-1",
+      targets: [{ tripid: "trip-1", uid: "u1", id: "exp-1" }],
+      isOnline: true,
+      expenseCtx,
+      afterSync: () => touchAllTravelers("trip-1", true),
+    });
+
+    expect(expenseCtx.deleteExpense).toHaveBeenCalledWith("exp-1");
+    expect(Toast.hide).toHaveBeenCalled();
+    const deletedToastCall = (Toast.show as jest.Mock).mock.calls.find(
+      ([args]) => args.type === "deletedExpense",
+    );
+    expect(deletedToastCall).toBeDefined();
   });
 });
 
@@ -175,6 +230,27 @@ describe("dismissing the deleted expense toast", () => {
     });
 
     expect(restoreExpenseOnlineOffline).not.toHaveBeenCalled();
+  });
+});
+
+describe("collectUserDeleteTargets", () => {
+  it("expands a ranged selection to every day in the range for one undo scope", () => {
+    const tripid = "trip-1";
+    const expenses = [
+      { id: "e1", uid: "u1", rangeId: "r1", isDeleted: false },
+      { id: "e2", uid: "u1", rangeId: "r1", isDeleted: false },
+      { id: "e3", uid: "u1", rangeId: "r2", isDeleted: false },
+    ] as ExpenseData[];
+
+    const targets = collectUserDeleteTargets(tripid, expenses, ["e1"]);
+
+    expect(targets).toEqual(
+      expect.arrayContaining([
+        { tripid, uid: "u1", id: "e1" },
+        { tripid, uid: "u1", id: "e2" },
+      ]),
+    );
+    expect(targets).toHaveLength(2);
   });
 });
 

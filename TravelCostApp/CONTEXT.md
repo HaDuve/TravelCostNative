@@ -126,6 +126,7 @@ Places where English UI copy or code identifiers still diverge from domain langu
 | Split Summary UI (i18n) | ~~“open splits”, “Calculate open splits”, “No open splits”~~ → balance copy (#222) | **Balance** | Aligned in #222 for EN/DE/FR/RU: balances wording, button helpers, Settlement vs Balance simplification labels. |
 | Split Summary UI (i18n) | ~~“settle splits”, “Could not settle splits”~~ → Settlement copy (#222) | **Settlement** | Aligned in #222; trip-wide settle actions and toasts use Settlement language. |
 | Split Summary UI (i18n) | ~~“simplify splits”, “Could not simplify splits”~~ → Balance simplification copy (#222) | **Balance simplification** | Aligned in #222; “Simplify splits” + helper clarifies no money has moved. |
+| Trip setup (i18n) | ~~“Trip Budget” as the named entity in alerts; FR/RU titles as budget container~~ → Trip copy (#223) | **Trip** | `enterNameAlert` names the trip in EN/DE/FR/RU; EN keeps “New Trip Budget” / “Edit Trip Budget” as form screen titles only; FR/RU titles use voyage / поездка like DE Reise. |
 
 ## Example dialogue
 

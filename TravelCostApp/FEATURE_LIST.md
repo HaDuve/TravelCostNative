@@ -42,7 +42,7 @@ This document contains a comprehensive list of all user-facing buttons, switches
 
 ### Trip Creation & Editing
 
-21. **Create New Trip Button** - Create a new trip budget (`components/ManageTrip/TripForm.tsx`)
+21. **Create New Trip Button** - Create a new trip (`components/ManageTrip/TripForm.tsx`)
 22. **Edit Trip Button** - Edit existing trip details (`components/ManageTrip/TripForm.tsx`)
 23. **Confirm Trip Button** - Save trip creation/edit (`components/ManageTrip/TripForm.tsx`)
 24. **Cancel Trip Button** - Cancel trip creation/edit (`components/ManageTrip/TripForm.tsx`)
@@ -51,7 +51,7 @@ This document contains a comprehensive list of all user-facing buttons, switches
 ### Trip Form Controls
 
 26. **Trip Name Input** - Enter trip name (`components/ManageTrip/TripForm.tsx`)
-27. **Total Budget Input** - Enter total trip budget (`components/ManageTrip/TripForm.tsx`)
+27. **Total Budget Input** - Enter total budget for the trip (`components/ManageTrip/TripForm.tsx`)
 28. **Daily Budget Input** - Enter daily budget (`components/ManageTrip/TripForm.tsx`)
 29. **Trip Currency Picker** - Select trip currency (`components/ManageTrip/TripForm.tsx`)
 30. **Trip Date Range Picker** - Select trip start and end dates (`components/ManageTrip/TripForm.tsx`)

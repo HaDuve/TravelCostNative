@@ -20,7 +20,6 @@ import {
   InputAccessoryView,
   Image,
 } from "react-native";
-import { daysBetween } from "../../util/date";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -79,6 +78,13 @@ import {
   Split,
   getEffectivePaidBack,
 } from "../../util/expense";
+import {
+  buildRangedDuplOrSplitPromptString,
+  countInclusiveDaysInRange,
+  divideAmountForRangedSplit,
+  resolveAlreadyDividedAmountByDays,
+  resolveAmountWhenCollapsingRangeToSingleDay,
+} from "../../util/expense-form-range";
 import { NetworkContext } from "../../store/network-context";
 import { SettingsContext } from "../../store/settings-context";
 import Autocomplete from "../UI/Autocomplete";
@@ -401,7 +407,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   );
   const daysBeween =
     startDate && endDate
-      ? daysBetween(new Date(endDate), new Date(startDate)) + 1
+      ? countInclusiveDaysInRange(new Date(startDate), new Date(endDate))
       : 1;
 
   const openDatePickerRange = () => {
@@ -454,52 +460,39 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     editingValues ? Number(editingValues.duplOrSplit) : DuplicateOption.null
   );
 
-  const expenseString = `${formatExpenseWithCurrency(
-    Number(amountValue),
-    inputs.currency.value
-  )}`;
-  const expenseTimesDaysString = formatExpenseWithCurrency(
-    Number(amountValue) * daysBeween,
-    inputs.currency.value
+  const alreadyDividedAmountByDays = resolveAlreadyDividedAmountByDays(
+    isEditing,
+    duplOrSplit,
+    helperStateForDividing
   );
-  const expenseDividedByDaysString = formatExpenseWithCurrency(
-    Number(amountValue) / daysBeween,
-    inputs.currency.value
-  );
-  const duplString = `${i18n.t("duplString1")} ${expenseString} ${i18n.t(
-    "duplString2"
-  )} ${daysBeween} ${i18n.t("duplString3")}. \n${i18n.t(
-    "duplString4"
-  )} ${expenseTimesDaysString} ${i18n.t("total")}`;
 
-  const newExpenseSplitString = `${i18n.t(
-    "splitString1"
-  )} ${expenseString}\n${i18n.t("splitString2")} ${daysBeween} ${i18n.t(
-    "splitString3"
-  )} ${expenseDividedByDaysString}`;
-
-  const editedSplitString = `${i18n.t(
-    "splitString1"
-  )} ${expenseTimesDaysString}\n${i18n.t(
-    "splitString2"
-  )} ${daysBeween} ${i18n.t("splitString3")} ${expenseString}`;
-
-  let alreadyDividedAmountByDays = isEditing && duplOrSplit === 2;
-  if (helperStateForDividing) alreadyDividedAmountByDays = false;
-
-  const splitString = alreadyDividedAmountByDays
-    ? editedSplitString
-    : newExpenseSplitString;
+  const rangedPromptInput = {
+    amount: Number(amountValue),
+    inclusiveDayCount: daysBeween,
+    alreadyDividedAmountByDays,
+    formatAmount: (amount: number) =>
+      formatExpenseWithCurrency(amount, inputs.currency.value),
+    labels: {
+      duplString1: i18n.t("duplString1"),
+      duplString2: i18n.t("duplString2"),
+      duplString3: i18n.t("duplString3"),
+      duplString4: i18n.t("duplString4"),
+      splitString1: i18n.t("splitString1"),
+      splitString2: i18n.t("splitString2"),
+      splitString3: i18n.t("splitString3"),
+      total: i18n.t("total"),
+    },
+  };
 
   const duplOrSplitString = useCallback(
-    (duplOrSplitNum: number) => {
-      return duplOrSplitNum === 1
-        ? duplString
-        : duplOrSplitNum === 2
-          ? splitString
-          : "";
-    },
-    [duplString, splitString]
+    (duplOrSplitNum: number) =>
+      buildRangedDuplOrSplitPromptString(duplOrSplitNum, rangedPromptInput),
+    [
+      amountValue,
+      inputs.currency.value,
+      daysBeween,
+      alreadyDividedAmountByDays,
+    ]
   );
 
   const onConfirmRange = (expenseOut) => {
@@ -525,22 +518,14 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     // no range
     if (startDateFormat === endDateFormat) {
       inputChangedHandler("date", startDateFormat);
-      // multiply amount by number of days to get total
-      if (duplOrSplit === DuplicateOption.split) {
-        inputChangedHandler(
-          "amount",
-          (Number(amountValue) * daysBeween).toFixed(2).toString()
-        );
-      }
-      if (
-        duplOrSplit === DuplicateOption.split &&
-        !alreadyDividedAmountByDays
-      ) {
-        // divide amount by number of days
-        inputChangedHandler(
-          "amount",
-          (Number(amountValue) / daysBeween).toFixed(2).toString()
-        );
+      const adjustedAmount = resolveAmountWhenCollapsingRangeToSingleDay({
+        amount: Number(amountValue),
+        inclusiveDayCount: daysBeween,
+        duplOrSplit,
+        alreadyDividedAmountByDays,
+      });
+      if (adjustedAmount !== null) {
+        inputChangedHandler("amount", adjustedAmount);
       }
       setDuplOrSplit(DuplicateOption.null);
       return;
@@ -715,7 +700,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       if (duplOrSplit === 2 && isEditing) {
         const newSplitList = recalcSplitsWithEditOrder(
           splitList,
-          +amountValue / daysBeween
+          divideAmountForRangedSplit(+amountValue, daysBeween)
         );
         setSplitList(newSplitList);
         const isValidSplit =
@@ -1233,7 +1218,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     if (duplOrSplit === 2 && !isEditing) {
       const newSplitList = recalcSplitsWithEditOrder(
         splitList,
-        +amountValue / daysBeween
+        divideAmountForRangedSplit(+amountValue, daysBeween)
       );
       setSplitList(newSplitList);
       const isValidSplit =

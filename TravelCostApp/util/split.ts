@@ -192,6 +192,120 @@ export function recalcSplitsWithEditOrder(
   return updatedList;
 }
 
+/** Strips editOrder from each split (e.g. after traveller removal or split-type change). */
+export function resetEditOrder(splits: Split[]): Split[] {
+  if (!splits) return [];
+  return splits.map((split) => {
+    const { editOrder, ...splitWithoutOrder } = split;
+    return splitWithoutOrder;
+  });
+}
+
+/**
+ * Applies a manual split amount edit: bumps edit order, recalculates, validates.
+ * @param splitType - Expense split mode (required for `validateSplitList`; issue #275 sketch omitted this param).
+ */
+export function applySplitEdit(
+  splitList: Split[],
+  index: number,
+  userName: string,
+  value: string | number,
+  amount: number,
+  splitType: splitType
+): { splitList: Split[]; valid: boolean } {
+  const tempList = splitList.map((split) => ({ ...split }));
+
+  tempList.forEach((split, i) => {
+    if (i === index) {
+      split.editOrder = 0;
+    } else if (split.editOrder !== undefined) {
+      split.editOrder = (split.editOrder || 0) + 1;
+    }
+  });
+
+  tempList[index] = {
+    ...tempList[index],
+    amount: Number(value) || 0,
+    userName,
+    editOrder: 0,
+  };
+
+  const recalculatedList = recalcSplitsWithEditOrder(tempList, amount);
+  const valid = Boolean(
+    validateSplitList(recalculatedList, splitType, amount) &&
+      validateSplitListWithEditOrder(recalculatedList, amount)
+  );
+
+  return { splitList: recalculatedList, valid };
+}
+
+/**
+ * Removes a traveller from the split list; SELF fallback when list empties or only payer remains.
+ * Returns null when userName is not on the list.
+ */
+export type RemoveFromSplitResult = {
+  splitList: Split[];
+  splitType: splitType;
+  /** Omitted when EQUAL recalc fails (matches legacy ExpenseForm: validity left unchanged). */
+  valid?: boolean;
+};
+
+export function removeFromSplit(
+  splitList: Split[],
+  userName: string,
+  whoPaid: string,
+  splitType: splitType,
+  amount: number,
+  travellers: string[]
+): RemoveFromSplitResult | null {
+  const index = splitList.findIndex((split) => split.userName === userName);
+  if (index === -1) {
+    return null;
+  }
+
+  const splitListTemp = [...splitList];
+  splitListTemp.splice(index, 1);
+
+  const paidForSelf =
+    splitListTemp.length === 1 && splitListTemp[0]?.userName === whoPaid;
+  if (splitListTemp.length === 0 || paidForSelf) {
+    return { splitList: [], splitType: "SELF", valid: true };
+  }
+
+  const splitListWithoutOrder = resetEditOrder(splitListTemp);
+
+  if (splitType === "EQUAL") {
+    const splitTravellersTemp = travellers.filter(
+      (travellerName) => travellerName !== userName
+    );
+    const listSplits = calcSplitList(
+      "EQUAL",
+      amount,
+      whoPaid,
+      splitTravellersTemp
+    );
+    if (listSplits) {
+      const splitsWithoutOrder = resetEditOrder(listSplits);
+      return {
+        splitList: splitsWithoutOrder,
+        splitType,
+        valid: Boolean(
+          validateSplitList(splitsWithoutOrder, splitType, amount)
+        ),
+      };
+    }
+    return { splitList: splitListWithoutOrder, splitType };
+  }
+
+  return {
+    splitList: splitListWithoutOrder,
+    splitType,
+    valid: Boolean(
+      validateSplitList(splitListWithoutOrder, splitType, amount)
+    ),
+  };
+}
+
 /**
  * Validates if split list can be made valid given edit constraints.
  * @param splitList - Array of splits with optional editOrder

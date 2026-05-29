@@ -30,6 +30,7 @@ export type ExpenseContextType = {
   setExpenses: (expenses: Array<ExpenseData>) => void;
   mergeExpenses: (newExpenses: Array<ExpenseData>) => void;
   deleteExpense: (id: string) => void;
+  restoreExpense: (id: string) => void;
   updateExpense: (id: string, expense: ExpenseData) => void;
   updateExpenseId: (oldId: string, newId: string) => void;
   getRecentExpenses: (rangestring: RangeString) => Array<ExpenseData>;
@@ -81,6 +82,7 @@ export const ExpensesContext = createContext<ExpenseContextType>({
   setExpenses: noop,
   mergeExpenses: noop,
   deleteExpense: noop,
+  restoreExpense: noop,
   updateExpense: noop,
   updateExpenseId: noop,
   getRecentExpenses: (rangestring: RangeString): Array<ExpenseData> => {
@@ -272,6 +274,23 @@ export function expensesReducer(state: ExpenseData[], action) {
       };
       return updatedExpenses;
     }
+    case "RESTORE": {
+      const restoreIndex = state.findIndex(
+        (expense) => expense.id === action.payload,
+      );
+      if (restoreIndex === -1) {
+        return state;
+      }
+      const restoredAt = Date.now();
+      const updatedExpenses = [...state];
+      updatedExpenses[restoreIndex] = {
+        ...updatedExpenses[restoreIndex],
+        isDeleted: false,
+        editedTimestamp: restoredAt,
+        serverTimestamp: restoredAt,
+      };
+      return updatedExpenses;
+    }
     case "UPDATE_ID": {
       const { oldId, newId } = action.payload;
       const expenseIndex = state.findIndex((expense) => expense.id === oldId);
@@ -328,6 +347,10 @@ function ExpensesContextProvider({ children }) {
 
   const deleteExpense = useCallback((id: string) => {
     dispatch({ type: "DELETE", payload: id });
+  }, []);
+
+  const restoreExpense = useCallback((id: string) => {
+    dispatch({ type: "RESTORE", payload: id });
   }, []);
 
   const updateExpense = useCallback((id: string, expenseData: ExpenseData) => {
@@ -581,6 +604,7 @@ function ExpensesContextProvider({ children }) {
       setExpenses,
       mergeExpenses,
       deleteExpense,
+      restoreExpense,
       updateExpense,
       updateExpenseId,
       getRecentExpenses,
@@ -599,6 +623,7 @@ function ExpensesContextProvider({ children }) {
     [
       addExpense,
       deleteExpense,
+      restoreExpense,
       filteredExpenses,
       getDailyExpenses,
       getMonthlyExpenses,

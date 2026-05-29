@@ -504,6 +504,32 @@ export async function deleteExpense(tripid: string, uid: string, id: string) {
 }
 
 /**
+ * Restores a soft-deleted expense on a trip.
+ */
+export async function restoreExpense(tripid: string, uid: string, id: string) {
+  try {
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for restoreExpense");
+      return null;
+    }
+
+    const restoreData = {
+      isDeleted: false,
+      [SERVER_TIMESTAMP_FIELD]: Date.now(),
+    };
+
+    const response = await axios.patch(
+      `${BACKEND_URL}/trips/${tripid}/${uid}/expenses/${id}.json?auth=${authToken}`,
+      restoreData,
+    );
+    return response;
+  } catch (error) {
+    safeLogError(error);
+  }
+}
+
+/**
  * Stores the initially created User in Firebase,
  * @param uid
  * @param userData

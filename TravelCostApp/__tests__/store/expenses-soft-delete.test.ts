@@ -101,6 +101,25 @@ describe("deleted expense tombstones in expenses state", () => {
     jest.restoreAllMocks();
   });
 
+  it("clears isDeleted when a deleted expense is restored", () => {
+    const deleteTime = 2_000;
+    jest.spyOn(Date, "now").mockReturnValue(deleteTime);
+
+    let state = expensesReducer([], {
+      type: "ADD",
+      payload: makeExpense({ id: "e1" }),
+    });
+    state = expensesReducer(state, { type: "DELETE", payload: "e1" });
+    state = expensesReducer(state, { type: "RESTORE", payload: "e1" });
+
+    expect(state).toHaveLength(1);
+    expect(state[0].isDeleted).toBe(false);
+    expect(state[0].editedTimestamp).toBe(deleteTime);
+    expect(state[0].serverTimestamp).toBe(deleteTime);
+
+    jest.restoreAllMocks();
+  });
+
   it("excludes deleted expenses from the active ledger view", () => {
     const ledger = activeExpenses([
       makeExpense({ id: "active" }),

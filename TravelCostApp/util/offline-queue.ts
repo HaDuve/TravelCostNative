@@ -4,6 +4,7 @@ import {
   storeExpenseWithId,
   updateExpense,
   deleteExpense,
+  restoreExpense,
   touchAllTravelers,
 } from "./http";
 
@@ -22,7 +23,7 @@ import safeLogError from "./error";
 // interface of offline queue manage expense item
 export interface OfflineQueueManageExpenseItem {
   timeStamp?: string;
-  type: "add" | "update" | "delete";
+  type: "add" | "update" | "delete" | "restore";
   expense: Expense;
 }
 
@@ -73,6 +74,22 @@ export const getOfflineQueue = () => {
   return offlineQueue || [];
 };
 
+/** Drops a queued delete for this expense id; returns true if one was removed. */
+export const removePendingDeleteFromOfflineQueue = (
+  expenseId: string,
+): boolean => {
+  const offlineQueue = getOfflineQueue();
+  const filtered = offlineQueue.filter(
+    (item: OfflineQueueManageExpenseItem) =>
+      !(item.type === "delete" && item.expense.id === expenseId),
+  );
+  if (filtered.length === offlineQueue.length) {
+    return false;
+  }
+  setMMKVObject(MMKV_KEYS.OFFLINE_QUEUE, filtered);
+  return true;
+};
+
 /**
  * Deletes an expense either online or offline based on the provided parameters.
  * @async
@@ -114,6 +131,47 @@ export const deleteExpenseOnlineOffline = async (
     }
   } else {
     // delete item offline
+    await pushQueueReturnRndID(item);
+  }
+};
+
+/**
+ * Restores a soft-deleted expense online or offline (mirrors deleteExpenseOnlineOffline).
+ * If a pending queued delete exists for this expense, removes it and skips the network.
+ */
+export const restoreExpenseOnlineOffline = async (
+  item: OfflineQueueManageExpenseItem,
+  online: boolean,
+) => {
+  const tripid = await secureStoreGetItem("currentTripId");
+  if (!tripid) {
+    Toast.show({
+      type: "error",
+      text1: i18n.t("error"),
+      text2: i18n.t("toastErrorDeleteExp"),
+    });
+    throw new Error(
+      "No tripid found in asyncStore! (restoreExpenseOnlineOffline)",
+    );
+  }
+  item.expense.tripid = tripid;
+
+  if (removePendingDeleteFromOfflineQueue(item.expense.id)) {
+    return;
+  }
+
+  const { isFastEnough } = await isConnectionFastEnough();
+  if (online && isFastEnough) {
+    try {
+      await restoreExpense(
+        item.expense.tripid,
+        item.expense.uid,
+        item.expense.id,
+      );
+    } catch (error) {
+      await pushQueueReturnRndID(item);
+    }
+  } else {
     await pushQueueReturnRndID(item);
   }
 };
@@ -318,6 +376,12 @@ export async function sendOfflineQueue(
           );
         } else if (item.type === "delete") {
           await deleteExpense(
+            item.expense.tripid,
+            item.expense.uid,
+            item.expense.id,
+          );
+        } else if (item.type === "restore") {
+          await restoreExpense(
             item.expense.tripid,
             item.expense.uid,
             item.expense.id,

@@ -3,9 +3,54 @@ import { de, en, fr, ru } from "../../i18n/supportedLanguages";
 /** Wording that treats the trip container as a "trip budget" entity (CONTEXT.md avoid). */
 const tripBudgetAsContainerEn = /trip budget/i;
 const tripBudgetAsContainerFr = /budget de voyage/i;
-const tripBudgetAsContainerRu = /бюджет\w* поездк/i;
+/** Cyrillic inflection between бюджет and поездк (\\w does not match Russian suffixes). */
+const tripBudgetAsContainerRu = /бюджет.{0,4}поездк/iu;
+
+const walk5Expectations: Array<{
+  lang: string;
+  locale: Record<string, string>;
+  tripPattern: RegExp;
+  avoidPattern: RegExp;
+}> = [
+  {
+    lang: "en",
+    locale: en,
+    tripPattern: /new trip/i,
+    avoidPattern: tripBudgetAsContainerEn,
+  },
+  {
+    lang: "de",
+    locale: de,
+    tripPattern: /neue Reise/i,
+    avoidPattern: /budget.*reise/i,
+  },
+  {
+    lang: "fr",
+    locale: fr,
+    tripPattern: /nouveau voyage/i,
+    avoidPattern: tripBudgetAsContainerFr,
+  },
+  {
+    lang: "ru",
+    locale: ru,
+    tripPattern: /новое путешествие/i,
+    avoidPattern: tripBudgetAsContainerRu,
+  },
+];
 
 describe("trip form i18n (issue #223)", () => {
+  describe("tripBudgetAsContainerRu guard", () => {
+    it("matches inflected budget+trip phrasing that \\w-based patterns miss", () => {
+      expect("бюджета поездки").toMatch(tripBudgetAsContainerRu);
+      expect("бюджет поездки").toMatch(tripBudgetAsContainerRu);
+    });
+
+    it("does not match acceptable trip-only phrasing", () => {
+      expect("для этой поездки").not.toMatch(tripBudgetAsContainerRu);
+      expect("Новая поездка").not.toMatch(tripBudgetAsContainerRu);
+    });
+  });
+
   describe("English", () => {
     it("enterNameAlert asks for a trip name, not a Trip Budget name", () => {
       expect(en.enterNameAlert).toMatch(/trip/i);
@@ -15,11 +60,6 @@ describe("trip form i18n (issue #223)", () => {
     it("keeps Trip Budget only as form screen title (intentional)", () => {
       expect(en.tripFormTitleNew).toBe("New Trip Budget");
       expect(en.tripFormTitleEdit).toBe("Edit Trip Budget");
-    });
-
-    it("walkthrough onboarding refers to a trip, not a trip budget container", () => {
-      expect(en.walk5).toMatch(/new trip/i);
-      expect(en.walk5).not.toMatch(tripBudgetAsContainerEn);
     });
   });
 
@@ -67,11 +107,22 @@ describe("trip form i18n (issue #223)", () => {
     });
   });
 
+  describe("walkthrough onboarding (walk5)", () => {
+    it.each(walk5Expectations)(
+      "$lang walk5 promotes creating a Trip, not a trip-budget container",
+      ({ locale, tripPattern, avoidPattern }) => {
+        expect(locale.walk5).toMatch(tripPattern);
+        expect(locale.walk5).not.toMatch(avoidPattern);
+      }
+    );
+  });
+
   it("trip form alert keys exist in every locale", () => {
     for (const locale of [en, de, fr, ru]) {
       expect(locale.enterNameAlert).toBeTruthy();
       expect(locale.tripFormTitleNew).toBeTruthy();
       expect(locale.tripFormTitleEdit).toBeTruthy();
+      expect(locale.walk5).toBeTruthy();
     }
   });
 });

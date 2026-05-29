@@ -19,13 +19,14 @@ jest.mock("../../util/http", () => ({
   storeExpenseWithId: jest.fn(),
   updateExpense: jest.fn(),
   deleteExpense: jest.fn(),
+  restoreExpense: jest.fn(),
   touchAllTravelers: jest.fn(async () => {}),
 }));
 
 import { MMKV_KEYS } from "../../store/mmkv";
 import { makeExpense } from "../fixtures/expense";
 import { sendOfflineQueue } from "../../util/offline-queue";
-import { storeExpenseWithId } from "../../util/http";
+import { restoreExpense, storeExpenseWithId } from "../../util/http";
 
 const mmkvStore: Record<string, unknown> = {};
 
@@ -119,6 +120,27 @@ describe("sendOfflineQueue", () => {
       expect.objectContaining({ id: clientId })
     );
     expect(updateExpenseId).toHaveBeenCalledWith(clientId, serverId);
+    expect(mmkvStore[MMKV_KEYS.OFFLINE_QUEUE]).toEqual([]);
+  });
+
+  it("uploads queued restore items and clears the queue", async () => {
+    mmkvStore[MMKV_KEYS.OFFLINE_QUEUE] = [
+      {
+        type: "restore",
+        expense: { tripid: "trip-1", uid: "traveller-1", id: "exp-restored" },
+      },
+    ];
+
+    (restoreExpense as jest.Mock).mockResolvedValue({});
+
+    let mutex = false;
+    await sendOfflineQueue(mutex, jest.fn());
+
+    expect(restoreExpense).toHaveBeenCalledWith(
+      "trip-1",
+      "traveller-1",
+      "exp-restored",
+    );
     expect(mmkvStore[MMKV_KEYS.OFFLINE_QUEUE]).toEqual([]);
   });
 });

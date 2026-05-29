@@ -434,6 +434,7 @@ const en = {
   toastAccDeleted1: "Account Deleted",
   toastAccDeleted2: "Your account has been deleted successfully.",
   toastErrorDeleteExp: "Could not delete Expense, please try again!",
+  toastErrorRestoreExp: "Could not restore Expense, please try again!",
   toastErrorUpdateExp: "Could not update Expense, please try again!",
   toastErrorStoreExp: "Could not store Expense, please try again!",
   toastSyncChanges1: "Synchronizing offline changes",
@@ -1037,6 +1038,8 @@ const de = {
   toastAccDeleted2: "Dein Konto wurde erfolgreich gelöscht.",
   toastErrorDeleteExp:
     "Ausgabe konnte nicht gelöscht werden, bitte versuche es erneut!",
+  toastErrorRestoreExp:
+    "Ausgabe konnte nicht wiederhergestellt werden, bitte versuche es erneut!",
   toastErrorUpdateExp:
     "Ausgabe konnte nicht aktualisiert werden, bitte versuche es erneut!",
   toastErrorStoreExp:
@@ -1644,6 +1647,8 @@ const fr = {
   toastAccDeleted2: "Votre compte a été supprimé avec succès.",
   toastErrorDeleteExp:
     "Impossible de supprimer la dépense, veuillez réessayer !",
+  toastErrorRestoreExp:
+    "Impossible de restaurer la dépense, veuillez réessayer !",
   toastErrorUpdateExp:
     "Impossible de mettre à jour la dépense, veuillez réessayer !",
   toastErrorStoreExp:
@@ -2253,6 +2258,8 @@ const ru = {
   toastAccDeleted2: "Ваш аккаунт успешно удален.",
   toastErrorDeleteExp:
     "Не удалось удалить расход, пожалуйста, попробуйте снова!",
+  toastErrorRestoreExp:
+    "Не удалось восстановить расход, пожалуйста, попробуйте снова!",
   toastErrorUpdateExp:
     "Не удалось обновить расход, пожалуйста, попробуйте снова!",
   toastErrorStoreExp:

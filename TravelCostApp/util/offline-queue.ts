@@ -4,6 +4,7 @@ import {
   storeExpenseWithId,
   updateExpense,
   deleteExpense,
+  restoreExpense,
   touchAllTravelers,
 } from "./http";
 
@@ -22,7 +23,7 @@ import safeLogError from "./error";
 // interface of offline queue manage expense item
 export interface OfflineQueueManageExpenseItem {
   timeStamp?: string;
-  type: "add" | "update" | "delete";
+  type: "add" | "update" | "delete" | "restore";
   expense: Expense;
 }
 
@@ -73,6 +74,22 @@ export const getOfflineQueue = () => {
   return offlineQueue || [];
 };
 
+/** Drops a queued delete for this expense id; returns true if one was removed. */
+export const removePendingDeleteFromOfflineQueue = (
+  expenseId: string,
+): boolean => {
+  const offlineQueue = getOfflineQueue();
+  const filtered = offlineQueue.filter(
+    (item: OfflineQueueManageExpenseItem) =>
+      !(item.type === "delete" && item.expense.id === expenseId),
+  );
+  if (filtered.length === offlineQueue.length) {
+    return false;
+  }
+  setMMKVObject(MMKV_KEYS.OFFLINE_QUEUE, filtered);
+  return true;
+};
+
 /**
  * Deletes an expense either online or offline based on the provided parameters.
  * @async
@@ -114,6 +131,55 @@ export const deleteExpenseOnlineOffline = async (
     }
   } else {
     // delete item offline
+    await pushQueueReturnRndID(item);
+  }
+};
+
+/**
+ * Restores a soft-deleted expense on the server or offline queue (mirrors deleteExpenseOnlineOffline).
+ *
+ * Callers must also clear the local tombstone via `restoreExpense` / `restoreExpenses` on expenses
+ * context and call `touchAllTravelers` after a successful restore — same three-step pattern as delete.
+ *
+ * Queue-first: if a pending queued `delete` exists for this expense id, only that queue entry is
+ * removed (no network). Local `isDeleted` is not cleared here.
+ */
+export const restoreExpenseOnlineOffline = async (
+  item: OfflineQueueManageExpenseItem,
+  online: boolean,
+) => {
+  const tripid = await secureStoreGetItem("currentTripId");
+  if (!tripid) {
+    Toast.show({
+      type: "error",
+      text1: i18n.t("error"),
+      text2: i18n.t("toastErrorRestoreExp"),
+    });
+    throw new Error(
+      "No tripid found in secure store! (restoreExpenseOnlineOffline)",
+    );
+  }
+  item.expense.tripid = tripid;
+
+  if (removePendingDeleteFromOfflineQueue(item.expense.id)) {
+    return;
+  }
+
+  const { isFastEnough } = await isConnectionFastEnough();
+  if (online && isFastEnough) {
+    try {
+      const response = await restoreExpense(
+        item.expense.tripid,
+        item.expense.uid,
+        item.expense.id,
+      );
+      if (!response) {
+        await pushQueueReturnRndID(item);
+      }
+    } catch (error) {
+      await pushQueueReturnRndID(item);
+    }
+  } else {
     await pushQueueReturnRndID(item);
   }
 };
@@ -318,6 +384,12 @@ export async function sendOfflineQueue(
           );
         } else if (item.type === "delete") {
           await deleteExpense(
+            item.expense.tripid,
+            item.expense.uid,
+            item.expense.id,
+          );
+        } else if (item.type === "restore") {
+          await restoreExpense(
             item.expense.tripid,
             item.expense.uid,
             item.expense.id,

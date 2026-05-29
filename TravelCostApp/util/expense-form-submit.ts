@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import { getCatLocalized } from "./category";
+import { createSafeDate } from "./date";
 import {
   DuplicateOption,
   ExpenseData,
@@ -10,6 +11,8 @@ import { splitType } from "./split";
 
 export type ExpenseFormSnapshot = {
   uid: string;
+  /** Raw amount field text; defaults to {@link amountValue} when omitted (draft save path). */
+  amountInput?: string | number;
   amountValue: string | number;
   dateIso: string;
   startDateIso: string;
@@ -48,16 +51,6 @@ export type ExpenseFieldValidity = {
 export type BuiltAdvancedExpenseData = ExpenseData & {
   alreadyDividedAmountByDays: boolean;
 };
-
-function createSafeDate(dateValue: string): Date {
-  if (dateValue && dateValue !== "") {
-    const parsedDate = DateTime.fromISO(dateValue);
-    return parsedDate.isValid
-      ? parsedDate.toJSDate()
-      : DateTime.now().toJSDate();
-  }
-  return DateTime.now().toJSDate();
-}
 
 function sharedExpenseCore(snapshot: ExpenseFormSnapshot) {
   return {

@@ -79,6 +79,11 @@ import {
   getEffectivePaidBack,
 } from "../../util/expense";
 import {
+  applyDraftToForm,
+  summarizeDraftChanges,
+  toExpenseDraft,
+} from "../../util/expense-form-draft";
+import {
   buildRangedDuplOrSplitPromptString,
   countInclusiveDaysInRange,
   divideAmountForRangedSplit,
@@ -804,26 +809,39 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   // Helper function to save current form state to draft storage
   const saveDraftData = useCallback(
     (newValues: Partial<ExpenseData> = {}) => {
-      setExpenseDraft(editedExpenseId, {
-        category: inputs.category.value,
-        description: inputs.description.value,
-        amount: +inputs.amount.value,
-        date: createSafeDate(inputs.date.value),
-        startDate: createSafeDate(startDate),
-        endDate: createSafeDate(endDate),
-        country: inputs.country.value,
-        currency: inputs.currency.value,
-        whoPaid: whoPaid,
-        splitType: splitType,
-        listEQUAL: splitTravellersList,
-        splitList,
-        duplOrSplit,
-        calcAmount: +amountValue,
-        paidBack,
-        isSpecialExpense,
-        categoryString: inputs.category.value,
-        ...newValues,
-      });
+      setExpenseDraft(
+        editedExpenseId,
+        toExpenseDraft(
+          {
+            uid: "",
+            amountInput: inputs.amount.value,
+            amountValue,
+            dateIso: inputs.date.value,
+            startDateIso: startDate,
+            endDateIso: endDate,
+            description: inputs.description.value,
+            categoryInput: inputs.category.value,
+            country: inputs.country.value,
+            currency: inputs.currency.value,
+            whoPaid,
+            splitType,
+            splitList,
+            listEQUAL: splitTravellersList,
+            paidBack,
+            isSpecialExpense,
+            duplOrSplit,
+            iconName,
+            alreadyDividedAmountByDays,
+            newCat,
+            pickedCat,
+            isSoloTraveller: IsSoloTraveller,
+            userName: userCtx.userName,
+            lastCountry: userCtx.lastCountry,
+            lastCurrency: userCtx.lastCurrency,
+          },
+          newValues
+        )
+      );
     },
     [
       editedExpenseId,
@@ -843,6 +861,14 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       amountValue,
       paidBack,
       isSpecialExpense,
+      iconName,
+      alreadyDividedAmountByDays,
+      newCat,
+      pickedCat,
+      IsSoloTraveller,
+      userCtx.userName,
+      userCtx.lastCountry,
+      userCtx.lastCurrency,
     ]
   );
   const saveDraftDataRef = useRef(saveDraftData);
@@ -875,52 +901,10 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   useEffect(() => {
     const draftData: ExpenseData = getExpenseDraft(editedExpenseId);
     if (draftData) {
-      const draftPaidBack =
-        draftData.paidBack ??
-        (draftData as ExpenseData & { isPaid?: isPaidString }).isPaid;
-      // Create a user-friendly list of changed items
-      const changedItems = [];
-
-      if (draftData.amount && draftData.amount !== 0) {
-        changedItems.push(`• ${i18n.t("amount")}: ${draftData.amount}`);
-      }
-      if (draftData.description && draftData.description !== "") {
-        changedItems.push(
-          `• ${i18n.t("description")}: ${draftData.description}`
-        );
-      }
-      if (draftData.category && draftData.category !== "undefined") {
-        const categoryName = getCatLocalized(draftData.category);
-        changedItems.push(`• ${i18n.t("category")}: ${categoryName}`);
-      }
-      if (draftData.currency && draftData.currency !== userCtx.lastCurrency) {
-        changedItems.push(`• ${i18n.t("currency")}: ${draftData.currency}`);
-      }
-      if (draftData.country && draftData.country !== userCtx.lastCountry) {
-        changedItems.push(`• ${i18n.t("country")}: ${draftData.country}`);
-      }
-      if (draftData.whoPaid && draftData.whoPaid !== "") {
-        changedItems.push(`• ${i18n.t("whoPaid")}: ${draftData.whoPaid}`);
-      }
-      if (draftData.splitType && draftData.splitType !== "SELF") {
-        const splitTypeText =
-          draftData.splitType === "EQUAL"
-            ? i18n.t("equal")
-            : draftData.splitType === "EXACT"
-              ? i18n.t("exact")
-              : draftData.splitType;
-        changedItems.push(`• ${i18n.t("splitType")}: ${splitTypeText}`);
-      }
-      if (draftPaidBack && draftPaidBack !== "not paid") {
-        const paidText =
-          draftPaidBack === "paid"
-            ? i18n.t("paid")
-            : i18n.t("notPaidLabel");
-        changedItems.push(`• ${i18n.t("paymentStatus")}: ${paidText}`);
-      }
-      if (draftData.isSpecialExpense) {
-        changedItems.push(`• ${i18n.t("specialExpense")}: ${i18n.t("yes")}`);
-      }
+      const changedItems = summarizeDraftChanges(draftData, {
+        lastCountry: userCtx.lastCountry,
+        lastCurrency: userCtx.lastCurrency,
+      });
 
       const changedItemsText =
         changedItems.length > 0
@@ -941,57 +925,36 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
           {
             text: i18n.t("restore"),
             onPress: () => {
-              // Restore form state from draft data
-              // Extract inputs from the spread data structure
-              const inputsToRestore = {
-                amount: {
-                  value: draftData.amount?.toString() || "",
-                  isValid: true,
-                },
-                description: {
-                  value: draftData.description || "",
-                  isValid: true,
-                },
-                date: {
-                  value: draftData.date
-                    ? convertToISOString(draftData.date)
-                    : "",
-                  isValid: true,
-                },
-                category: { value: draftData.category || "", isValid: true },
-                country: { value: draftData.country || "", isValid: true },
-                currency: { value: draftData.currency || "", isValid: true },
-                whoPaid: { value: draftData.whoPaid || "", isValid: true },
-              };
-              setInputs(inputsToRestore);
-              if (draftData.splitType) {
-                setSplitType(draftData.splitType);
+              const restored = applyDraftToForm(draftData);
+              if (restored.inputs) {
+                setInputs(restored.inputs);
               }
-              if (draftData.listEQUAL) {
-                setListEQUAL(draftData.listEQUAL);
+              if (restored.splitType) {
+                setSplitType(restored.splitType);
               }
-              if (draftData.splitList) {
-                // Reset edit order when loading draft data
-                const splitsWithoutOrder = resetEditOrder(draftData.splitList);
-                setSplitList(splitsWithoutOrder);
+              if (restored.listEQUAL) {
+                setListEQUAL(restored.listEQUAL);
               }
-              if (draftData.duplOrSplit !== undefined) {
-                setDuplOrSplit(draftData.duplOrSplit);
+              if (restored.splitList) {
+                setSplitList(restored.splitList);
               }
-              if (draftPaidBack) {
-                setPaidBack(draftPaidBack);
+              if (restored.duplOrSplit !== undefined) {
+                setDuplOrSplit(restored.duplOrSplit);
               }
-              if (draftData.isSpecialExpense !== undefined) {
-                setIsSpecialExpense(draftData.isSpecialExpense);
+              if (restored.paidBack) {
+                setPaidBack(restored.paidBack);
               }
-              if (draftData.startDate) {
-                setStartDate(convertToISOString(draftData.startDate));
+              if (restored.isSpecialExpense !== undefined) {
+                setIsSpecialExpense(restored.isSpecialExpense);
               }
-              if (draftData.endDate) {
-                setEndDate(convertToISOString(draftData.endDate));
+              if (restored.startDate) {
+                setStartDate(restored.startDate);
               }
-              if (draftData.calcAmount) {
-                setCalcAmount(draftData.calcAmount.toString());
+              if (restored.endDate) {
+                setEndDate(restored.endDate);
+              }
+              if (restored.calcAmount) {
+                setCalcAmount(restored.calcAmount);
               }
             },
           },

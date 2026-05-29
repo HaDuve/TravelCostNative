@@ -1,12 +1,11 @@
-import { DateTime } from "luxon";
 import { i18n } from "../i18n/i18n";
 import { getCatLocalized } from "./category";
+import { createSafeDate, DateOrDateTime } from "./date";
 import type { ExpenseFormSnapshot } from "./expense-form-submit";
 import {
   ExpenseData,
   paidBackStatus,
 } from "./expense";
-import { DateOrDateTime } from "./date";
 import { resetEditOrder, splitType } from "./split";
 
 export type FormFieldState = {
@@ -34,16 +33,6 @@ export type ExpenseFormDraftRestore = {
   endDate?: string;
   calcAmount?: string;
 };
-
-function createSafeDate(dateValue: string): Date {
-  if (dateValue && dateValue !== "") {
-    const parsedDate = DateTime.fromISO(dateValue);
-    return parsedDate.isValid
-      ? parsedDate.toJSDate()
-      : DateTime.now().toJSDate();
-  }
-  return DateTime.now().toJSDate();
-}
 
 export function toExpenseDraft(
   snapshot: ExpenseFormSnapshot,

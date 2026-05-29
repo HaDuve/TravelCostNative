@@ -233,3 +233,14 @@ export const getLocaleDateFormat = (separator = "-") => {
 
   return format.replace(/\W/g, separator);
 };
+
+/** Parse ISO date string for expense forms; falls back to now when empty/invalid. */
+export function createSafeDate(dateValue: string): Date {
+  if (dateValue && dateValue !== "") {
+    const parsedDate = DateTime.fromISO(dateValue);
+    return parsedDate.isValid
+      ? parsedDate.toJSDate()
+      : DateTime.now().toJSDate();
+  }
+  return DateTime.now().toJSDate();
+}

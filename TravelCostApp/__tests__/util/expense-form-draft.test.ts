@@ -4,7 +4,8 @@ jest.mock("expo-localization", () => ({
 
 import { DateTime } from "luxon";
 import { i18n } from "../../i18n/i18n";
-import { paidBackStatus } from "../../util/expense";
+import { getCatLocalized } from "../../util/category";
+import { ExpenseData, paidBackStatus } from "../../util/expense";
 import { makeExpense } from "../fixtures/expense";
 import { makeExpenseFormSnapshot } from "../fixtures/expense-form";
 import {
@@ -117,6 +118,9 @@ describe("draft round-trip", () => {
     expect(restored.endDate).toBe(
       dateFromIso(snapshot.endDateIso).toISOString()
     );
+    expect(restored.inputs?.date?.value).toBe(
+      dateFromIso(snapshot.dateIso).toISOString()
+    );
   });
 });
 
@@ -142,7 +146,7 @@ describe("summarizeDraftChanges", () => {
     expect(lines).toEqual([
       `• ${i18n.t("amount")}: 50`,
       `• ${i18n.t("description")}: coffee`,
-      `• ${i18n.t("category")}: Food`,
+      `• ${i18n.t("category")}: ${getCatLocalized("Food")}`,
       `• ${i18n.t("currency")}: USD`,
       `• ${i18n.t("country")}: US`,
       `• ${i18n.t("whoPaid")}: Bob`,
@@ -169,5 +173,25 @@ describe("summarizeDraftChanges", () => {
     );
 
     expect(lines).toEqual([]);
+  });
+});
+
+describe("legacy draft paidBack field", () => {
+  const baseline = { lastCountry: "DE", lastCurrency: "EUR" };
+
+  it("restore and summary accept isPaid when paidBack is missing", () => {
+    const { paidBack: _paidBack, ...withoutPaidBack } = makeExpense({
+      amount: 50,
+      category: "Food",
+    });
+    const legacyDraft = {
+      ...withoutPaidBack,
+      isPaid: paidBackStatus.paid,
+    } as ExpenseData & { isPaid: paidBackStatus };
+
+    expect(applyDraftToForm(legacyDraft).paidBack).toBe(paidBackStatus.paid);
+    expect(summarizeDraftChanges(legacyDraft, baseline)).toContain(
+      `• ${i18n.t("paymentStatus")}: ${i18n.t("paid")}`
+    );
   });
 });

@@ -262,10 +262,13 @@ export function expensesReducer(state: ExpenseData[], action) {
       if (deleteIndex === -1) {
         return state;
       }
+      const deletedAt = Date.now();
       const updatedExpenses = [...state];
       updatedExpenses[deleteIndex] = {
         ...updatedExpenses[deleteIndex],
         isDeleted: true,
+        editedTimestamp: deletedAt,
+        serverTimestamp: deletedAt,
       };
       return updatedExpenses;
     }

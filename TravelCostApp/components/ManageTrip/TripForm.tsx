@@ -289,8 +289,7 @@ const TripForm = ({ navigation, route }) => {
         setLoadingProgress(8);
         const expenses = await getAllExpenses(editedTripId, uid);
         setLoadingProgress(9);
-        expenseCtx.setExpenses([...expenses]);
-        setMMKVObject(MMKV_KEYS.EXPENSES, expenses);
+        expenseCtx.mergeExpenses([...expenses]);
         tripCtx.setdailyBudget(tripData.dailyBudget);
         return;
       }

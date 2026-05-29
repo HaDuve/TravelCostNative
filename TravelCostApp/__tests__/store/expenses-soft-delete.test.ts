@@ -59,6 +59,48 @@ describe("deleted expense tombstones in expenses state", () => {
     expect(state[0].isDeleted).toBe(true);
   });
 
+  it("preserves local tombstone when server refresh omits the deleted expense", () => {
+    let state = expensesReducer([], {
+      type: "ADD",
+      payload: makeExpense({ id: "e1" }),
+    });
+    state = expensesReducer(state, { type: "DELETE", payload: "e1" });
+    state = mergeExpenseLists(state, [makeExpense({ id: "e2" })]);
+
+    const tombstone = state.find((expense) => expense.id === "e1");
+    expect(tombstone?.isDeleted).toBe(true);
+    expect(state).toHaveLength(2);
+  });
+
+  it("preserves local tombstone when sync merges a stale active server row", () => {
+    const deleteTime = 2_000;
+    jest.spyOn(Date, "now").mockReturnValue(deleteTime);
+
+    let state = expensesReducer([], {
+      type: "ADD",
+      payload: makeExpense({
+        id: "e1",
+        editedTimestamp: 100,
+        serverTimestamp: 100,
+      }),
+    });
+    state = expensesReducer(state, { type: "DELETE", payload: "e1" });
+    state = mergeExpenseLists(state, [
+      makeExpense({
+        id: "e1",
+        isDeleted: false,
+        editedTimestamp: 100,
+        serverTimestamp: 150,
+      }),
+    ]);
+
+    expect(state).toHaveLength(1);
+    expect(state[0].isDeleted).toBe(true);
+    expect(state[0].editedTimestamp).toBe(deleteTime);
+
+    jest.restoreAllMocks();
+  });
+
   it("excludes deleted expenses from the active ledger view", () => {
     const ledger = activeExpenses([
       makeExpense({ id: "active" }),

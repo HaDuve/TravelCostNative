@@ -37,6 +37,36 @@ export type ModalFlowResult = {
   effects: ModalFlowEffect[];
 };
 
+export type ModalFlowEffectHandlers = {
+  setSplitType: (splitType: splitType) => void;
+  runSplitHandler: (splitType: splitType) => void;
+  openTravellerMultiPicker: () => void;
+  navigateShare: () => void;
+};
+
+/** ExpenseForm interpreter: apply immediate effects from {@link modalFlowReducer}. */
+export function applyModalFlowEffects(
+  effects: ModalFlowEffect[],
+  handlers: ModalFlowEffectHandlers
+): void {
+  for (const effect of effects) {
+    switch (effect.type) {
+      case "SET_SPLIT_TYPE":
+        handlers.setSplitType(effect.splitType);
+        break;
+      case "RUN_SPLIT_HANDLER":
+        handlers.runSplitHandler(effect.splitType);
+        break;
+      case "OPEN_TRAVELLER_MULTI_PICKER":
+        handlers.openTravellerMultiPicker();
+        break;
+      case "NAVIGATE_SHARE":
+        handlers.navigateShare();
+        break;
+    }
+  }
+}
+
 const SPLIT_TYPE_EXACT = "EXACT";
 
 export function modalFlowReducer(

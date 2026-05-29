@@ -61,10 +61,11 @@ import {
 } from "../../util/expense-form-submit";
 import type { ExpenseFormInputsState } from "../../util/expense-form-inputs";
 import {
+  applyModalFlowEffects,
+  MODAL_FLOW_ADD_TRAVELLER,
   MODAL_FLOW_DEFER_MS,
   MODAL_FLOW_STATE,
   modalFlowReducer,
-  type ModalFlowEffect,
   type ModalFlowState,
 } from "../../util/modal-flow-reducer";
 import { Traveller } from "../../util/traveler";
@@ -606,24 +607,15 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     MODAL_FLOW_STATE.CLOSED
   );
 
-  const applyModalFlowEffects = useCallback(
-    (effects: ModalFlowEffect[]) => {
-      for (const effect of effects) {
-        switch (effect.type) {
-          case "SET_SPLIT_TYPE":
-            setSplitType(effect.splitType);
-            break;
-          case "RUN_SPLIT_HANDLER":
-            splitHandler(effect.splitType);
-            break;
-          case "OPEN_TRAVELLER_MULTI_PICKER":
-            openTravellerMultiPickerRef.current();
-            break;
-          case "NAVIGATE_SHARE":
-            navigation.navigate("Share", { tripId: tripCtx.tripid });
-            break;
-        }
-      }
+  const runModalFlowEffects = useCallback(
+    (effects: Parameters<typeof applyModalFlowEffects>[0]) => {
+      applyModalFlowEffects(effects, {
+        setSplitType,
+        runSplitHandler: splitHandler,
+        openTravellerMultiPicker: () => openTravellerMultiPickerRef.current(),
+        navigateShare: () =>
+          navigation.navigate("Share", { tripId: tripCtx.tripid }),
+      });
     },
     [navigation, setSplitType, splitHandler, tripCtx.tripid]
   );
@@ -632,7 +624,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     (selectedValue: string) => {
       const result = modalFlowReducer(modalFlow, selectedValue);
       setModalFlow(result.next);
-      applyModalFlowEffects(result.effects);
+      runModalFlowEffects(result.effects);
 
       if (result.deferred?.reopen) {
         setTimeout(() => {
@@ -640,11 +632,11 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         }, MODAL_FLOW_DEFER_MS);
       } else if (result.deferred?.effects) {
         setTimeout(() => {
-          applyModalFlowEffects(result.deferred!.effects!);
+          runModalFlowEffects(result.deferred!.effects!);
         }, MODAL_FLOW_DEFER_MS);
       }
     },
-    [applyModalFlowEffects, modalFlow]
+    [runModalFlowEffects, modalFlow]
   );
 
   const [items, setItems] = useState(currentTravellersAsItems);
@@ -734,7 +726,33 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       scheduleDraftSaveRef.current();
     },
   });
-  const { icon, debouncedAutoCategory, updateCategoryAndIcon } = categoryAutomap;
+  const {
+    icon,
+    setIcon,
+    debouncedAutoCategory,
+    updateCategoryAndIcon,
+    syncIconForCategory,
+  } = categoryAutomap;
+
+  useEffect(() => {
+    if (pickedCat) {
+      syncIconForCategory(pickedCat);
+    } else if (editingValues?.category) {
+      syncIconForCategory(editingValues.category);
+    } else if (editingValues?.iconName) {
+      setIcon(editingValues.iconName);
+    }
+  }, [
+    pickedCat,
+    editingValues?.category,
+    editingValues?.iconName,
+    syncIconForCategory,
+    setIcon,
+  ]);
+
+  useEffect(() => {
+    syncIconForCategory(inputs.category.value);
+  }, [inputs.category.value, syncIconForCategory]);
 
   const makeFormSnapshot = useCallback(
     (overrides: Partial<ExpenseFormSnapshot> = {}): ExpenseFormSnapshot => ({
@@ -814,7 +832,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       }, 300),
     [editedExpenseId]
   );
-  scheduleDraftSaveRef.current = scheduleDraftSave;
+  useEffect(() => {
+    scheduleDraftSaveRef.current = scheduleDraftSave;
+  }, [scheduleDraftSave]);
 
   // Load new category when screen comes into focus
   useFocusEffect(
@@ -1631,13 +1651,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                               );
 
                               // Set whoPaid value first
-                              if (item.value === "__ADD_TRAVELLER__") {
+                              if (item.value === MODAL_FLOW_ADD_TRAVELLER) {
                                 setWhoPaidWithLogging(userCtx.userName);
                                 setSplitType(splitTypes.SELF);
-                                // Navigate to Share screen
-                                navigation.navigate("Share", {
-                                  tripId: tripCtx.tripid,
-                                });
                               } else {
                                 setWhoPaidWithLogging(item.value);
                               }
@@ -1692,7 +1708,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                       setItems={setSplitTypeItems}
                       onSelectItem={(item) => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        setSplitType(item.value);
+                        if (item.value === splitTypes.EXACT) {
+                          setSplitType(item.value);
+                        }
                         nextModal(item.value);
                       }}
                       onClose={() => {

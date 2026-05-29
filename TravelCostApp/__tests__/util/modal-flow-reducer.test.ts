@@ -1,5 +1,6 @@
 import type { splitType } from "../../util/split";
 import {
+  applyModalFlowEffects,
   MODAL_FLOW_ADD_TRAVELLER,
   MODAL_FLOW_DEFER_MS,
   MODAL_FLOW_STATE,
@@ -99,4 +100,25 @@ describe("modalFlowReducer transition table", () => {
       expect(modalFlowReducer(current, selectedValue)).toEqual(expected);
     }
   );
+});
+
+describe("applyModalFlowEffects", () => {
+  it("navigates to Share once for NAVIGATE_SHARE (sole navigation path for add traveller)", () => {
+    const navigateShare = jest.fn();
+    const handlers = {
+      setSplitType: jest.fn(),
+      runSplitHandler: jest.fn(),
+      openTravellerMultiPicker: jest.fn(),
+      navigateShare,
+    };
+
+    const result = modalFlowReducer(
+      MODAL_FLOW_STATE.WHO_PAID,
+      MODAL_FLOW_ADD_TRAVELLER
+    );
+    applyModalFlowEffects(result.effects, handlers);
+
+    expect(navigateShare).toHaveBeenCalledTimes(1);
+    expect(handlers.setSplitType).not.toHaveBeenCalled();
+  });
 });

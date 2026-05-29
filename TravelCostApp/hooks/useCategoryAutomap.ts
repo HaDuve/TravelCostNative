@@ -89,10 +89,18 @@ export function useCategoryAutomap({
     [debounceMs]
   );
 
+  const syncIconForCategory = useCallback(
+    (categoryValue: string) => {
+      setIcon(getIconForCategory(categoryValue));
+    },
+    [getIconForCategory]
+  );
+
   return {
     icon,
     setIcon,
     updateCategoryAndIcon,
     debouncedAutoCategory,
+    syncIconForCategory,
   };
 }

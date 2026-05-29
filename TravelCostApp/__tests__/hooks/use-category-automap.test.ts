@@ -74,4 +74,25 @@ describe("useCategoryAutomap", () => {
     );
     expect(result.current.icon).toBe("transport-icon");
   });
+
+  it("syncIconForCategory updates icon when category changes outside automap", () => {
+    const getIconForCategory = jest.fn(() => "food-icon");
+
+    const { result } = renderHook(() =>
+      useCategoryAutomap({
+        pickedCat: "undefined",
+        categories: [],
+        recentExpenses: [],
+        onApplyCategory: jest.fn(),
+        getIconForCategory,
+      })
+    );
+
+    act(() => {
+      result.current.syncIconForCategory("Food");
+    });
+
+    expect(getIconForCategory).toHaveBeenCalledWith("Food");
+    expect(result.current.icon).toBe("food-icon");
+  });
 });

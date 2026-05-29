@@ -192,12 +192,6 @@ export function recalcSplitsWithEditOrder(
   return updatedList;
 }
 
-/**
- * Validates if split list can be made valid given edit constraints.
- * @param splitList - Array of splits with optional editOrder
- * @param amount - Total amount
- * @returns true if valid, false otherwise
- */
 /** Strips editOrder from each split (e.g. after traveller removal or split-type change). */
 export function resetEditOrder(splits: Split[]): Split[] {
   if (!splits) return [];
@@ -209,6 +203,7 @@ export function resetEditOrder(splits: Split[]): Split[] {
 
 /**
  * Applies a manual split amount edit: bumps edit order, recalculates, validates.
+ * @param splitType - Expense split mode (required for `validateSplitList`; issue #275 sketch omitted this param).
  */
 export function applySplitEdit(
   splitList: Split[],
@@ -311,6 +306,12 @@ export function removeFromSplit(
   };
 }
 
+/**
+ * Validates if split list can be made valid given edit constraints.
+ * @param splitList - Array of splits with optional editOrder
+ * @param amount - Total amount
+ * @returns true if valid, false otherwise
+ */
 export function validateSplitListWithEditOrder(
   splitList: Split[],
   amount: number

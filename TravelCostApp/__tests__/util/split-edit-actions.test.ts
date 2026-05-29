@@ -103,6 +103,28 @@ describe("removeFromSplit", () => {
     });
   });
 
+  it("omits valid when EQUAL recalc cannot run (legacy: splitListValid unchanged)", () => {
+    const splitList: Split[] = [
+      makeSplit({ userName: "A", amount: 50, editOrder: 0 }),
+      makeSplit({ userName: "B", amount: 50, editOrder: 1 }),
+    ];
+
+    const result = removeFromSplit(
+      splitList,
+      "A",
+      "Payer",
+      "EQUAL",
+      0,
+      ["A", "B"]
+    );
+
+    expect(result).toEqual({
+      splitList: [makeSplit({ userName: "B", amount: 50 })],
+      splitType: "EQUAL",
+    });
+    expect(result).not.toHaveProperty("valid");
+  });
+
   it("recalculates EQUAL splits for remaining travellers after removal", () => {
     const splitList: Split[] = [
       makeSplit({ userName: "A", amount: 33.33 }),

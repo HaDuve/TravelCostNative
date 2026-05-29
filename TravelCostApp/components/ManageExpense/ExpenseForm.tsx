@@ -1151,7 +1151,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       return;
     }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    setSplitType(result.splitType);
+    if (result.splitType !== splitType) {
+      setSplitType(result.splitType);
+    }
     setSplitList(result.splitList);
     if (result.valid !== undefined) {
       setSplitListValid(result.valid);

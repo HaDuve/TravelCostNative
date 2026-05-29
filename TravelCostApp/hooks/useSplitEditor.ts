@@ -51,14 +51,15 @@ export function useSplitEditor({
     resetEditOrder(initialSplitList)
   );
   const [splitListValid, setSplitListValid] = useState(true);
-  const [splitType, setSplitTypeState] = useState<splitType>(initialSplitType);
+  const [currentSplitType, setSplitTypeState] =
+    useState<splitType>(initialSplitType);
   const [splitTravellersList, setSplitTravellersList] = useState(
     initialSplitTravellersList
   );
 
   const inputSplitListHandler = useCallback(
     (index: number, props: { userName: string }, value: string) => {
-      if (splitType === SPLIT_TYPES.EQUAL) {
+      if (currentSplitType === SPLIT_TYPES.EQUAL) {
         return;
       }
       const { splitList: nextList, valid } = applySplitEdit(
@@ -67,12 +68,12 @@ export function useSplitEditor({
         props.userName,
         value,
         amount,
-        splitType
+        currentSplitType
       );
       setSplitList(nextList);
       setSplitListValid(valid);
     },
-    [amount, splitList, splitType]
+    [amount, currentSplitType, splitList]
   );
 
   const splitHandler = useCallback(
@@ -109,7 +110,7 @@ export function useSplitEditor({
         splitList,
         userName,
         whoPaid ?? "",
-        splitType,
+        currentSplitType,
         amount,
         tripTravellerNames
       );
@@ -117,7 +118,7 @@ export function useSplitEditor({
         return;
       }
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      if (result.splitType !== splitType) {
+      if (result.splitType !== currentSplitType) {
         setSplitTypeState(result.splitType);
       }
       setSplitList(result.splitList);
@@ -125,14 +126,15 @@ export function useSplitEditor({
         setSplitListValid(result.valid);
       }
     },
-    [amount, splitList, splitType, tripTravellerNames, whoPaid]
+    [amount, currentSplitType, splitList, tripTravellerNames, whoPaid]
   );
 
   const autoExpenseLinearSplitAdjust = useCallback(
     (inputIdentifier: string, value: string) => {
       if (
         inputIdentifier !== "amount" ||
-        (splitType !== SPLIT_TYPES.EXACT && splitType !== SPLIT_TYPES.EQUAL)
+        (currentSplitType !== SPLIT_TYPES.EXACT &&
+          currentSplitType !== SPLIT_TYPES.EQUAL)
       ) {
         return;
       }
@@ -144,7 +146,7 @@ export function useSplitEditor({
         setSplitList(rangedList);
         setSplitListValid(
           Boolean(
-            validateSplitList(rangedList, splitType, amount) &&
+            validateSplitList(rangedList, currentSplitType, amount) &&
               validateSplitListWithEditOrder(rangedList, amount)
           )
         );
@@ -154,26 +156,27 @@ export function useSplitEditor({
       setSplitList(nextList);
       setSplitListValid(
         Boolean(
-          validateSplitList(nextList, splitType, numericValue) &&
+          validateSplitList(nextList, currentSplitType, numericValue) &&
             validateSplitListWithEditOrder(nextList, numericValue)
         )
       );
     },
     [
       amount,
+      currentSplitType,
       duplOrSplit,
       isEditing,
       rangedDayCount,
       splitList,
-      splitType,
     ]
   );
 
   return {
     splitList,
-    splitType,
+    splitType: currentSplitType,
     splitListValid,
     splitTravellersList,
+    setSplitTravellersList,
     inputSplitListHandler,
     removeUserFromSplit,
     splitHandler,

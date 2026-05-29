@@ -3,7 +3,16 @@ import * as Haptics from "expo-haptics";
 
 import { useSplitEditor } from "../../hooks/useSplitEditor";
 import type { Split } from "../../util/expense";
-import { applySplitEdit, resetEditOrder, type splitType } from "../../util/split";
+import {
+  applySplitEdit,
+  calcSplitList,
+  recalcSplitsWithEditOrder,
+  resetEditOrder,
+  validateSplitList,
+  validateSplitListWithEditOrder,
+  type splitType,
+} from "../../util/split";
+import { divideAmountForRangedSplit } from "../../util/expense-form-range";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 
@@ -112,6 +121,102 @@ describe("useSplitEditor", () => {
       splitType: "EQUAL",
     });
     expect(onAutosave).toHaveBeenCalled();
+  });
+
+  it("falls back to SELF on remove without split-type analytics", () => {
+    const { result } = renderSplitEditor({
+      initialSplitList: [makeSplit({ userName: "A", amount: 100 })],
+      initialSplitType: "EXACT",
+      amount: 100,
+      tripTravellerNames: ["A"],
+    });
+
+    act(() => {
+      result.current.removeUserFromSplit("A");
+    });
+
+    expect(result.current.splitType).toBe("SELF");
+    expect(result.current.splitList).toEqual([]);
+    expect(trackEvent).not.toHaveBeenCalled();
+  });
+
+  it("setSplitTravellersList updates travellers used by splitHandler", () => {
+    const { result } = renderSplitEditor({
+      initialSplitList: [],
+      initialSplitType: "SELF",
+      initialSplitTravellersList: ["A"],
+      amount: 100,
+      whoPaid: "Payer",
+    });
+
+    act(() => {
+      result.current.setSplitTravellersList(["A", "B", "C"]);
+    });
+    act(() => {
+      result.current.splitHandler("EQUAL");
+    });
+
+    expect(result.current.splitTravellersList).toEqual(["A", "B", "C"]);
+    const expectedList = resetEditOrder(
+      calcSplitList("EQUAL", 100, "Payer", ["A", "B", "C"])!
+    );
+    expect(result.current.splitList).toEqual(expectedList);
+  });
+
+  it("autoExpenseLinearSplitAdjust recalculates EXACT splits when amount changes", () => {
+    const initialSplitList = resetEditOrder([
+      makeSplit({ userName: "A", amount: 50 }),
+      makeSplit({ userName: "B", amount: 50 }),
+    ]);
+    const { result } = renderSplitEditor({
+      initialSplitList,
+      initialSplitType: "EXACT",
+      amount: 100,
+    });
+
+    act(() => {
+      result.current.autoExpenseLinearSplitAdjust("amount", "80");
+    });
+
+    const expectedList = recalcSplitsWithEditOrder(initialSplitList, 80);
+    expect(result.current.splitList).toEqual(expectedList);
+    expect(result.current.splitListValid).toBe(
+      Boolean(
+        validateSplitList(expectedList, "EXACT", 80) &&
+          validateSplitListWithEditOrder(expectedList, 80)
+      )
+    );
+  });
+
+  it("autoExpenseLinearSplitAdjust applies ranged per-day amount when editing a ranged split", () => {
+    const initialSplitList = resetEditOrder([
+      makeSplit({ userName: "A", amount: 50, editOrder: 0 }),
+      makeSplit({ userName: "B", amount: 50, editOrder: 1 }),
+    ]);
+    const amount = 150;
+    const rangedDayCount = 3;
+    const perDay = divideAmountForRangedSplit(amount, rangedDayCount);
+    const { result } = renderSplitEditor({
+      initialSplitList,
+      initialSplitType: "EXACT",
+      amount,
+      duplOrSplit: 2,
+      isEditing: true,
+      rangedDayCount,
+    });
+
+    act(() => {
+      result.current.autoExpenseLinearSplitAdjust("amount", String(perDay));
+    });
+
+    const expectedList = recalcSplitsWithEditOrder(initialSplitList, perDay);
+    expect(result.current.splitList).toEqual(expectedList);
+    expect(result.current.splitListValid).toBe(
+      Boolean(
+        validateSplitList(expectedList, "EXACT", perDay) &&
+          validateSplitListWithEditOrder(expectedList, perDay)
+      )
+    );
   });
 
   it("splitHandler recalculates splits and fires light impact haptics", () => {

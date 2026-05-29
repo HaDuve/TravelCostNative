@@ -18,6 +18,7 @@ import {
   storeExpenseOnlineOffline,
   updateExpenseOnlineOffline,
 } from "../util/offline-queue";
+import { deleteUserExpenses } from "../util/user-delete-expense";
 
 import { i18n } from "../i18n/i18n";
 
@@ -100,21 +101,12 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     async function deleteAllExpenses() {
       try {
         navigation?.popToTop();
-        Toast.show({
-          type: "loading",
-          text1: i18n.t("toastDeleting1"),
-          text2: i18n.t("toastDeleting2"),
-          autoHide: false,
-        });
         await deleteAllExpensesByRangedId(
           tripid,
           selectedExpense,
           isOnline,
           expenseCtx
         );
-        Toast.hide();
-        await touchAllTravelers(tripid, true);
-        Toast.hide();
       } catch (error) {
         Toast.show({
           text1: i18n.t("error"),
@@ -126,32 +118,24 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
 
     async function deleteExp() {
       try {
-        Toast.show({
-          type: "loading",
-          text1: i18n.t("toastDeleting1"),
-          text2: i18n.t("toastDeleting2"),
-          autoHide: false,
+        await deleteUserExpenses({
+          tripid,
+          targets: [
+            {
+              tripid,
+              uid: selectedExpenseAuthorUid,
+              id: editedExpenseId,
+            },
+          ],
+          isOnline,
+          expenseCtx,
         });
-        const item: OfflineQueueManageExpenseItem = {
-          type: "delete",
-          expense: {
-            tripid: tripid,
-            uid: selectedExpenseAuthorUid,
-            id: editedExpenseId,
-          },
-        };
-        expenseCtx.deleteExpense(editedExpenseId);
-        await deleteExpenseOnlineOffline(item, isOnline);
-        await touchAllTravelers(tripid, true);
 
-        // Track expense deleted
         trackEvent(VexoEvents.EXPENSE_DELETED, {
           expenseId: editedExpenseId,
           tripId: tripid,
           isRanged: selectedExpense?.rangeId ? true : false,
         });
-
-        Toast.hide();
       } catch (error) {
         Toast.show({
           text1: i18n.t("error"),
@@ -192,24 +176,18 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
                   onPress: async () => {
                     try {
                       navigation?.popToTop();
-                      Toast.show({
-                        type: "loading",
-                        text1: i18n.t("toastDeleting1"),
-                        text2: i18n.t("toastDeleting2"),
-                        autoHide: false,
+                      await deleteUserExpenses({
+                        tripid,
+                        targets: [
+                          {
+                            tripid,
+                            uid: uid,
+                            id: editedExpenseId,
+                          },
+                        ],
+                        isOnline,
+                        expenseCtx,
                       });
-                      const item: OfflineQueueManageExpenseItem = {
-                        type: "delete",
-                        expense: {
-                          tripid: tripid,
-                          uid: uid,
-                          id: editedExpenseId,
-                        },
-                      };
-                      expenseCtx?.deleteExpense(editedExpenseId);
-                      await deleteExpenseOnlineOffline(item, isOnline);
-                      await touchAllTravelers(tripid, true);
-                      Toast.hide();
                     } catch (error) {
                       Toast.show({
                         text1: i18n.t("error"),
@@ -393,7 +371,8 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         tripid,
         selectedExpense,
         isOnline,
-        expenseCtx
+        expenseCtx,
+        { showUndoToast: false },
       );
       // Then create new expenses
       await createRangedData(expenseData);

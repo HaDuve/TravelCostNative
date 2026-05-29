@@ -7,10 +7,7 @@ import {
 } from "../store/mmkv";
 import { DateOrDateTime, isToday } from "./date";
 import { getAllExpenses } from "./http";
-import {
-  deleteExpenseOnlineOffline,
-  OfflineQueueManageExpenseItem,
-} from "./offline-queue";
+import { deleteUserExpenses } from "./user-delete-expense";
 import { splitType } from "./split";
 import { asPeriodSlice, sumByPeriod, sumForTrip } from "./expenseTotals";
 
@@ -188,39 +185,27 @@ export async function deleteAllExpensesByRangedId(
   selectedExpense: ExpenseData,
   isOnline: boolean,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  expenseCtx: any
+  expenseCtx: any,
+  options?: { showUndoToast?: boolean },
 ) {
-  // Use local expenses context instead of server data for ranged deletion
-  // Server data might be incomplete or not synced yet
   const allExpenses = expenseCtx?.expenses || [];
-
-  // Collect all expenses to delete first
   const expensesToDelete = allExpenses.filter(
     (expense) =>
-      expense?.rangeId === selectedExpense?.rangeId && !expense.isDeleted
+      expense?.rangeId === selectedExpense?.rangeId && !expense.isDeleted,
   );
+  const targets = expensesToDelete.map((expense: ExpenseData) => ({
+    tripid,
+    uid: expense.uid,
+    id: expense.id,
+  }));
 
-  // Delete all expenses from server first
-  for (let i = 0; i < expensesToDelete.length; i++) {
-    const expense: ExpenseData = expensesToDelete[i];
-
-    const queueItem: OfflineQueueManageExpenseItem = {
-      type: "delete",
-      expense: {
-        tripid: tripid,
-        uid: expense.uid,
-        id: expense.id,
-      },
-    };
-    // Soft delete: call server first
-    await deleteExpenseOnlineOffline(queueItem, isOnline);
-  }
-
-  // Only remove from local state after all server deletions are complete
-  for (let i = 0; i < expensesToDelete.length; i++) {
-    const expense: ExpenseData = expensesToDelete[i];
-    expenseCtx?.deleteExpense(expense.id);
-  }
+  await deleteUserExpenses({
+    tripid,
+    targets,
+    isOnline,
+    expenseCtx,
+    showUndoToast: options?.showUndoToast ?? true,
+  });
 }
 
 /**

@@ -229,6 +229,54 @@ const toastConfig: ToastConfig = {
       </BackgroundGradient>
     </Pressable>
   ),
+  deletedExpense: (props) => {
+    const onUndo = props.props?.onUndo as (() => void | Promise<void>) | undefined;
+    return (
+      <BaseToast
+        {...props}
+        style={[
+          {
+            borderLeftColor: GlobalStyles.colors.primary500,
+          },
+          SIZESTYLES,
+          GlobalStyles.wideStrongShadow,
+        ]}
+        contentContainerStyle={CONTENTCONTAINERSTYLE}
+        text1Style={{
+          fontSize: dynamicScale(17, false, 0.5),
+          fontWeight: "500",
+        }}
+        text2Style={{
+          fontSize: dynamicScale(15, false, 0.5),
+          fontWeight: "400",
+        }}
+        text1NumberOfLines={2}
+        text2NumberOfLines={2}
+        renderTrailingIcon={() => (
+          <TouchableOpacity
+            onPress={() => {
+              void onUndo?.();
+            }}
+            style={{
+              justifyContent: "center",
+              paddingHorizontal: dynamicScale(12),
+            }}
+          >
+            <Text
+              style={{
+                color: GlobalStyles.colors.primary500,
+                fontSize: dynamicScale(16, false, 0.5),
+                fontWeight: "600",
+              }}
+            >
+              {i18n.t("undo")}
+            </Text>
+          </TouchableOpacity>
+        )}
+        onPress={() => Toast.hide()}
+      />
+    );
+  },
   budgetOverview: (props) => {
     const toastProps = props.props as BudgetOverviewToastProps;
     const {

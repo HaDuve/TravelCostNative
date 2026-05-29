@@ -79,30 +79,31 @@ export function buildExpenseData(
     ? snapshot.pickedCat
     : snapshot.categoryInput;
 
-  const expenseData: BuiltAdvancedExpenseData = {
+  const whoPaid =
+    snapshot.isSoloTraveller || snapshot.whoPaid === null
+      ? snapshot.userName
+      : snapshot.whoPaid;
+
+  let description = snapshot.description;
+  if (description === "") {
+    description = getCatLocalized(category);
+  }
+
+  return {
     ...sharedExpenseCore(snapshot),
     date: createSafeDate(snapshot.dateIso),
     startDate: createSafeDate(snapshot.startDateIso),
     endDate: createSafeDate(snapshot.endDateIso),
-    description: snapshot.description,
+    description,
     category,
     categoryString: snapshot.categoryInput,
     calcAmount: +snapshot.amountValue,
     country: snapshot.country,
     currency: snapshot.currency,
-    whoPaid: snapshot.whoPaid,
+    whoPaid,
     listEQUAL: snapshot.listEQUAL,
     alreadyDividedAmountByDays: snapshot.alreadyDividedAmountByDays,
   };
-
-  if (snapshot.isSoloTraveller || expenseData.whoPaid === null) {
-    expenseData.whoPaid = snapshot.userName;
-  }
-  if (expenseData.description === "") {
-    expenseData.description = getCatLocalized(expenseData.category);
-  }
-
-  return expenseData;
 }
 
 export function buildFastExpenseData(

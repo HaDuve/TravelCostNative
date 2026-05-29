@@ -82,6 +82,36 @@ describe("buildExpenseData", () => {
 
     expect(built.description).toBe(getCatLocalized("Food"));
   });
+
+  it("coerces numeric amountValue like the hasTempAndInput sum path", () => {
+    const built = buildExpenseData(
+      makeExpenseFormSnapshot({ amountValue: 100 })
+    );
+
+    expect(built.amount).toBe(100);
+    expect(built.calcAmount).toBe(100);
+  });
+
+  it("falls back to now for empty or invalid date ISO strings", () => {
+    const fixedNow = DateTime.fromISO("2026-06-15T10:00:00.000Z");
+    const nowSpy = jest
+      .spyOn(DateTime, "now")
+      .mockReturnValue(fixedNow as DateTime<true>);
+
+    const built = buildExpenseData(
+      makeExpenseFormSnapshot({
+        dateIso: "",
+        startDateIso: "not-a-date",
+        endDateIso: "",
+      })
+    );
+
+    expect(built.date).toEqual(fixedNow.toJSDate());
+    expect(built.startDate).toEqual(fixedNow.toJSDate());
+    expect(built.endDate).toEqual(fixedNow.toJSDate());
+
+    nowSpy.mockRestore();
+  });
 });
 
 describe("buildFastExpenseData", () => {

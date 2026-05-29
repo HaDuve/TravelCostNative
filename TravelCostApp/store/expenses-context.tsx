@@ -31,6 +31,7 @@ export type ExpenseContextType = {
   mergeExpenses: (newExpenses: Array<ExpenseData>) => void;
   deleteExpense: (id: string) => void;
   restoreExpense: (id: string) => void;
+  restoreExpenses: (ids: string[]) => void;
   updateExpense: (id: string, expense: ExpenseData) => void;
   updateExpenseId: (oldId: string, newId: string) => void;
   getRecentExpenses: (rangestring: RangeString) => Array<ExpenseData>;
@@ -83,6 +84,7 @@ export const ExpensesContext = createContext<ExpenseContextType>({
   mergeExpenses: noop,
   deleteExpense: noop,
   restoreExpense: noop,
+  restoreExpenses: noop,
   updateExpense: noop,
   updateExpenseId: noop,
   getRecentExpenses: (rangestring: RangeString): Array<ExpenseData> => {
@@ -353,6 +355,10 @@ function ExpensesContextProvider({ children }) {
     dispatch({ type: "RESTORE", payload: id });
   }, []);
 
+  const restoreExpenses = useCallback((ids: string[]) => {
+    ids.forEach((id) => dispatch({ type: "RESTORE", payload: id }));
+  }, []);
+
   const updateExpense = useCallback((id: string, expenseData: ExpenseData) => {
     dispatch({ type: "UPDATE", payload: { id: id, data: expenseData } });
   }, []);
@@ -605,6 +611,7 @@ function ExpensesContextProvider({ children }) {
       mergeExpenses,
       deleteExpense,
       restoreExpense,
+      restoreExpenses,
       updateExpense,
       updateExpenseId,
       getRecentExpenses,
@@ -624,6 +631,7 @@ function ExpensesContextProvider({ children }) {
       addExpense,
       deleteExpense,
       restoreExpense,
+      restoreExpenses,
       filteredExpenses,
       getDailyExpenses,
       getMonthlyExpenses,

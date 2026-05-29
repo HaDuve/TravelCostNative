@@ -116,8 +116,29 @@ describe("deleted expense tombstones in expenses state", () => {
     expect(state[0].isDeleted).toBe(false);
     expect(state[0].editedTimestamp).toBe(deleteTime);
     expect(state[0].serverTimestamp).toBe(deleteTime);
+    expect(activeExpenses(state).map((expense) => expense.id)).toEqual(["e1"]);
 
     jest.restoreAllMocks();
+  });
+
+  it("restores multiple deleted expenses", () => {
+    let state = expensesReducer([], {
+      type: "ADD",
+      payload: makeExpense({ id: "e1" }),
+    });
+    state = expensesReducer(state, {
+      type: "ADD",
+      payload: makeExpense({ id: "e2" }),
+    });
+    state = expensesReducer(state, { type: "DELETE", payload: "e1" });
+    state = expensesReducer(state, { type: "DELETE", payload: "e2" });
+    state = expensesReducer(state, { type: "RESTORE", payload: "e1" });
+    state = expensesReducer(state, { type: "RESTORE", payload: "e2" });
+
+    expect(activeExpenses(state).map((expense) => expense.id).sort()).toEqual([
+      "e1",
+      "e2",
+    ]);
   });
 
   it("excludes deleted expenses from the active ledger view", () => {

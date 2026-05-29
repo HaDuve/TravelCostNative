@@ -101,4 +101,23 @@ describe("restoreExpenseOnlineOffline", () => {
       },
     ]);
   });
+
+  it("queues restore when the PATCH returns no response", async () => {
+    (restoreExpense as jest.Mock).mockResolvedValueOnce(null);
+
+    await restoreExpenseOnlineOffline(
+      {
+        type: "restore",
+        expense: { tripid: "trip-1", uid: "u1", id: "exp-failed" },
+      },
+      true,
+    );
+
+    expect(mmkvStore[MMKV_KEYS.OFFLINE_QUEUE]).toEqual([
+      {
+        type: "restore",
+        expense: { tripid: "trip-1", uid: "u1", id: "exp-failed" },
+      },
+    ]);
+  });
 });

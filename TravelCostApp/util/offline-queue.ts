@@ -136,8 +136,13 @@ export const deleteExpenseOnlineOffline = async (
 };
 
 /**
- * Restores a soft-deleted expense online or offline (mirrors deleteExpenseOnlineOffline).
- * If a pending queued delete exists for this expense, removes it and skips the network.
+ * Restores a soft-deleted expense on the server or offline queue (mirrors deleteExpenseOnlineOffline).
+ *
+ * Callers must also clear the local tombstone via `restoreExpense` / `restoreExpenses` on expenses
+ * context and call `touchAllTravelers` after a successful restore — same three-step pattern as delete.
+ *
+ * Queue-first: if a pending queued `delete` exists for this expense id, only that queue entry is
+ * removed (no network). Local `isDeleted` is not cleared here.
  */
 export const restoreExpenseOnlineOffline = async (
   item: OfflineQueueManageExpenseItem,
@@ -148,10 +153,10 @@ export const restoreExpenseOnlineOffline = async (
     Toast.show({
       type: "error",
       text1: i18n.t("error"),
-      text2: i18n.t("toastErrorDeleteExp"),
+      text2: i18n.t("toastErrorRestoreExp"),
     });
     throw new Error(
-      "No tripid found in asyncStore! (restoreExpenseOnlineOffline)",
+      "No tripid found in secure store! (restoreExpenseOnlineOffline)",
     );
   }
   item.expense.tripid = tripid;
@@ -163,11 +168,14 @@ export const restoreExpenseOnlineOffline = async (
   const { isFastEnough } = await isConnectionFastEnough();
   if (online && isFastEnough) {
     try {
-      await restoreExpense(
+      const response = await restoreExpense(
         item.expense.tripid,
         item.expense.uid,
         item.expense.id,
       );
+      if (!response) {
+        await pushQueueReturnRndID(item);
+      }
     } catch (error) {
       await pushQueueReturnRndID(item);
     }

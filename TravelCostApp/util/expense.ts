@@ -42,7 +42,7 @@ export interface ExpenseData {
   listEQUAL?: string[];
   iconName?: string;
   rangeId?: string;
-  paidBack?: isPaidString;
+  paidBack?: paidBackStatus;
   isSpecialExpense?: boolean;
   editedTimestamp?: number;
   isDeleted?: boolean;
@@ -55,10 +55,13 @@ export enum DuplicateOption {
   split = 2,
 }
 
-export enum isPaidString {
+export enum paidBackStatus {
   paid = "paid",
   notPaid = "not paid",
 }
+
+/** @deprecated Use {@link paidBackStatus}. */
+export const isPaidString = paidBackStatus;
 
 /** Legacy expense records (server, MMKV) may still use `isPaid`. */
 type ExpensePaidBackSource = {
@@ -66,14 +69,16 @@ type ExpensePaidBackSource = {
   isPaid?: unknown;
 };
 
-function normalizePaidBackValue(value: unknown): isPaidString {
-  return value === isPaidString.paid ? isPaidString.paid : isPaidString.notPaid;
+function normalizePaidBackValue(value: unknown): paidBackStatus {
+  return value === paidBackStatus.paid
+    ? paidBackStatus.paid
+    : paidBackStatus.notPaid;
 }
 
 /** Read path: accept `paidBack` or legacy `isPaid` from sync payloads. */
 export function readPaidBackFromOnlineRecord(
   record: ExpensePaidBackSource
-): isPaidString {
+): paidBackStatus {
   if (record.paidBack !== undefined && record.paidBack !== null) {
     return normalizePaidBackValue(record.paidBack);
   }
@@ -81,12 +86,27 @@ export function readPaidBackFromOnlineRecord(
 }
 
 /** Stored per-expense paid-back flag (legacy `isPaid` field on old records). */
-export function getStoredPaidBack(expense: ExpenseData): isPaidString | undefined {
+export function getStoredPaidBack(
+  expense: ExpenseData
+): paidBackStatus | undefined {
   if (expense.paidBack !== undefined) {
     return expense.paidBack;
   }
-  const legacy = expense as ExpenseData & { isPaid?: isPaidString };
+  const legacy = expense as ExpenseData & { isPaid?: paidBackStatus };
   return legacy.isPaid;
+}
+
+/**
+ * Normalizes in-memory/cached expenses: `paidBack` from legacy `isPaid`, strips `isPaid`.
+ */
+export function normalizeExpensePaidBack(expense: ExpenseData): ExpenseData {
+  const stored = getStoredPaidBack(expense);
+  if (stored === undefined) {
+    return expense;
+  }
+  const legacy = expense as ExpenseData & { isPaid?: paidBackStatus };
+  const { isPaid: _legacy, ...rest } = legacy;
+  return { ...rest, paidBack: stored };
 }
 
 /**
@@ -97,18 +117,18 @@ export function getStoredPaidBack(expense: ExpenseData): isPaidString | undefine
 export function getEffectivePaidBack(
   expense: ExpenseData,
   tripIsPaidTimestamp?: number
-): isPaidString {
+): paidBackStatus {
   if (!tripIsPaidTimestamp || tripIsPaidTimestamp === 0) {
-    return getStoredPaidBack(expense) ?? isPaidString.notPaid;
+    return getStoredPaidBack(expense) ?? paidBackStatus.notPaid;
   }
 
   const expenseTimestamp = expense.editedTimestamp || 0;
 
   if (tripIsPaidTimestamp > expenseTimestamp) {
-    return isPaidString.paid;
+    return paidBackStatus.paid;
   }
 
-  return getStoredPaidBack(expense) ?? isPaidString.notPaid;
+  return getStoredPaidBack(expense) ?? paidBackStatus.notPaid;
 }
 
 /** @deprecated Use {@link getEffectivePaidBack}. */
@@ -142,13 +162,16 @@ export interface ExpenseDataOnline {
   serverTimestamp?: number;
 }
 
-/** Write path: serialize expense for Firebase using `paidBack` only. */
+/** Write path: serialize expense for Firebase using `paidBack` only when set. */
 export function toExpenseOnline(expense: ExpenseData): ExpenseDataOnline {
   const { paidBack, ...rest } = expense;
-  const legacy = expense as ExpenseData & { isPaid?: isPaidString };
-  const stored = paidBack ?? legacy.isPaid ?? isPaidString.notPaid;
-  const online = { ...rest, paidBack: stored } as ExpenseDataOnline & ExpenseData;
-  delete (online as ExpenseData & { isPaid?: isPaidString }).isPaid;
+  const legacy = expense as ExpenseData & { isPaid?: paidBackStatus };
+  const stored = paidBack ?? legacy.isPaid;
+  const online = { ...rest } as ExpenseDataOnline & ExpenseData;
+  delete (online as ExpenseData & { isPaid?: paidBackStatus }).isPaid;
+  if (stored !== undefined) {
+    online.paidBack = stored;
+  }
   return online;
 }
 
@@ -402,9 +425,10 @@ export async function getAllExpensesData(tripid: string) {
     cachedExpenses &&
     isToday(new Date(lastCacheUpdateExpenses));
 
-  const _expenses: ExpenseData[] = lastUpdateWasToday
+  const rawExpenses: ExpenseData[] = lastUpdateWasToday
     ? cachedExpenses
     : await getAllExpenses(tripid);
+  const expenses = rawExpenses.map(normalizeExpensePaidBack);
   if (!lastUpdateWasToday) {
     // update cache
     setMMKVString(
@@ -413,8 +437,8 @@ export async function getAllExpensesData(tripid: string) {
     );
     setMMKVObject(
       MMKV_KEY_PATTERNS.LAST_UPDATE_ALL_EXPENSES_TRIP(tripid),
-      _expenses
+      expenses
     );
   }
-  return _expenses;
+  return expenses;
 }

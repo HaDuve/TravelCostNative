@@ -58,7 +58,7 @@ _Avoid_: Open split (UI copy), debt (marketing copy)
 
 **Paid back**:
 Per-expense status: the travellers’ shares for that expense have been reimbursed to whoever paid. Expenses not yet paid back still count toward open **Balances**. (Code field: `paidBack`.)
-_Avoid_: Paid (ambiguous with who paid upfront), isPaid (legacy field name)
+_Avoid_: Paid (ambiguous with who paid upfront), isPaid (legacy field name), isPaidString (legacy enum name; use `paidBackStatus`)
 
 **Who paid**:
 The traveller who fronted the money for an expense (before **Splits** allocate shares among travellers). Distinct from **Paid back** (whether shares have been reimbursed).

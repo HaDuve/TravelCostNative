@@ -175,7 +175,7 @@ const en = {
   baseCurrencyLabel: "Home Currency",
   totalBudgetLabel: "Total Budget in",
   dailyBudgetLabel: "Daily Budget in",
-  enterNameAlert: "Please enter a Name for your new Trip Budget",
+  enterNameAlert: "Please enter a name for your new trip.",
   enterBudgetAlert: "Please enter a Total Budget higher than Daily Budget",
   selectCurrencyAlert: "Please select your home currency for this trip",
   alertChangeHomeCurrencyTitle: "Changing home currency",
@@ -1364,13 +1364,13 @@ const fr = {
   getLocalPriceError: "Veuillez entrer un nom de produit ou de service",
 
   // Trip Form Labels
-  tripFormTitleNew: "Nouveau budget de voyage",
-  tripFormTitleEdit: "Modifier le budget de voyage",
+  tripFormTitleNew: "Nouveau voyage",
+  tripFormTitleEdit: "Modifier le voyage",
   tripNameLabel: "Nom du voyage",
   baseCurrencyLabel: "Devise du domicile",
   totalBudgetLabel: "Budget total en",
   dailyBudgetLabel: "Budget quotidien en",
-  enterNameAlert: "Veuillez entrer un nom pour votre nouveau budget de voyage",
+  enterNameAlert: "Veuillez entrer un nom pour votre nouveau voyage.",
   enterBudgetAlert:
     "Veuillez entrer un budget total supérieur au budget quotidien",
   selectCurrencyAlert:
@@ -1969,15 +1969,15 @@ const ru = {
   getLocalPriceError: "Пожалуйста, введите название продукта или услуги",
 
   // Trip Form Labels
-  tripFormTitleNew: "Бюджет новой поездки",
-  tripFormTitleEdit: "Изменить бюджет поездки",
+  tripFormTitleNew: "Новая поездка",
+  tripFormTitleEdit: "Изменить поездку",
   tripNameLabel: "Название поездки",
   baseCurrencyLabel: "Домашняя валюта",
   totalBudgetLabel: "Общий бюджет в",
   dailyBudgetLabel: "Дневной бюджет в",
-  enterNameAlert: "Введите название нового бюджета поездки",
+  enterNameAlert: "Введите название новой поездки.",
   enterBudgetAlert: "Введите общий бюджет, превышающий дневной бюджет",
-  selectCurrencyAlert: "Выберите домашнюю валюту для бюджета поездки",
+  selectCurrencyAlert: "Выберите домашнюю валюту для этой поездки",
   alertChangeHomeCurrencyTitle: "Изменение домашней валюты",
   alertChangeHomeCurrencyMessage:
     "Вы уверены, что хотите изменить валюту? Укажите валюту, которую вы обычно используете дома.",

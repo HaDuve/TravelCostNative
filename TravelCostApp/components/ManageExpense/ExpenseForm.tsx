@@ -44,13 +44,16 @@ import DropDownPicker from "react-native-dropdown-picker";
 // import CurrencyPicker from "react-native-currency-picker";
 import { TripContext } from "../../store/trip-context";
 import {
+  applySplitEdit,
   calcSplitList,
   recalcSplitsWithEditOrder,
-  validateSplitListWithEditOrder,
+  removeFromSplit,
+  resetEditOrder,
   splitType,
   splitTypesDropdown,
   travellerToDropdown,
   validateSplitList,
+  validateSplitListWithEditOrder,
 } from "../../util/split";
 import { Traveller } from "../../util/traveler";
 
@@ -279,15 +282,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     amountValue &&
     inputs.currency.value &&
     inputs.currency.value !== tripCtx.tripCurrency;
-
-  // Helper function to reset editOrder from splitList
-  const resetEditOrder = (splits: Split[]): Split[] => {
-    if (!splits) return [];
-    return splits.map((split) => {
-      const { editOrder, ...splitWithoutOrder } = split;
-      return splitWithoutOrder;
-    });
-  };
 
   // Helper function to convert Traveller[] to string[] (user names)
   const extractUserNames = (
@@ -1099,36 +1093,16 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   function inputSplitListHandler(index, props: { userName: string }, value) {
     if (splitType === splitTypes.EQUAL) return;
-    const tempList = splitList.map((split) => ({ ...split }));
-
-    // Set editOrder for the edited split to 0 (most recent)
-    // Increment all other splits' editOrder by 1 (if they have one)
-    tempList.forEach((split, i) => {
-      if (i === index) {
-        split.editOrder = 0;
-      } else if (split.editOrder !== undefined) {
-        split.editOrder = (split.editOrder || 0) + 1;
-      }
-    });
-
-    // Update the split amount
-    // eslint-disable-next-line react/prop-types
-    tempList[index] = {
-      ...tempList[index],
-      amount: Number(value) || 0,
-      userName: props.userName,
-      editOrder: 0,
-    };
-
-    // Recalculate splits using edit-order-based approach
-    const recalculatedList = recalcSplitsWithEditOrder(tempList, +amountValue);
-    setSplitList(recalculatedList);
-
-    // Validate using both old and new validation
-    const isValidSplit =
-      validateSplitList(recalculatedList, splitType, +amountValue) &&
-      validateSplitListWithEditOrder(recalculatedList, +amountValue);
-    setSplitListValid(isValidSplit);
+    const { splitList: nextList, valid } = applySplitEdit(
+      splitList,
+      index,
+      props.userName,
+      value,
+      +amountValue,
+      splitType
+    );
+    setSplitList(nextList);
+    setSplitListValid(valid);
   }
 
   function splitHandler(selectedSplitType: splitType) {
@@ -1165,51 +1139,22 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   async function removeUserFromSplitHandler(userName: string) {
     if (!splitList || splitList.length < 1) return;
-    const splitListTemp = [...splitList];
-    const index = splitListTemp.findIndex(
-      (split) => split.userName === userName
+    const result = removeFromSplit(
+      splitList,
+      userName,
+      whoPaid,
+      splitType,
+      +amountValue,
+      extractUserNames(tripCtx.travellers)
     );
-    if (index === -1) {
+    if (!result) {
       return;
     }
-    splitListTemp.splice(index, 1);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    // if splitList is empty now, set splitType to "SELF"
-    // if we ever implement the "ADD LOCAL TRAVELLER" function, we could keep a
-    // List of length 1 here and remove the paidForSelf bool from the condition
-    // In case the Button for "ADD LOCAL TRAVELLER" is on the right side of splitlist
-    const paidForSelf =
-      splitListTemp.length == 1 && splitListTemp[0]?.userName == whoPaid;
-    if (splitListTemp.length === 0 || paidForSelf) {
-      setSplitType(splitTypes.SELF);
-      setSplitList([]);
-      setSplitListValid(true);
-      return;
-    }
-    // Reset edit order when traveller is removed
-    const splitListWithoutOrder = resetEditOrder(splitListTemp);
-    setSplitList(splitListWithoutOrder);
-    if (splitType === splitTypes.EQUAL) {
-      const splitTravellersTemp = extractUserNames(tripCtx.travellers).filter(
-        (travellerName) => travellerName !== userName
-      );
-      const listSplits = calcSplitList(
-        splitTypes.EQUAL,
-        +amountValue,
-        whoPaid,
-        splitTravellersTemp
-      );
-      if (listSplits) {
-        const splitsWithoutOrder = resetEditOrder(listSplits);
-        setSplitList(splitsWithoutOrder);
-        setSplitListValid(
-          validateSplitList(splitsWithoutOrder, splitType, +amountValue)
-        );
-      }
-    } else {
-      setSplitListValid(
-        validateSplitList(splitListWithoutOrder, splitType, +amountValue)
-      );
+    setSplitType(result.splitType);
+    setSplitList(result.splitList);
+    if (result.valid !== undefined) {
+      setSplitListValid(result.valid);
     }
   }
 

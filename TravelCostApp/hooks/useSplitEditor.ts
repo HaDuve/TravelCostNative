@@ -173,8 +173,10 @@ export function useSplitEditor({
 
   return {
     splitList,
+    setSplitList,
     splitType: currentSplitType,
     splitListValid,
+    setSplitListValid,
     splitTravellersList,
     setSplitTravellersList,
     inputSplitListHandler,

@@ -33,20 +33,15 @@ import { UserContext } from "../../store/user-context";
 import FlatButton from "../UI/FlatButton";
 import {
   DEFAULTCATEGORIES,
-  getCatLocalized,
   getCatSymbol,
-  getCatSymbolMMKV,
-  mapDescriptionToCategory,
 } from "../../util/category";
 import { formatExpenseWithCurrency } from "../../util/string";
 import DropDownPicker from "react-native-dropdown-picker";
 // import CurrencyPicker from "react-native-currency-picker";
 import { TripContext } from "../../store/trip-context";
 import {
-  applySplitEdit,
   calcSplitList,
   recalcSplitsWithEditOrder,
-  removeFromSplit,
   resetEditOrder,
   splitType,
   splitTypesDropdown,
@@ -54,6 +49,24 @@ import {
   validateSplitList,
   validateSplitListWithEditOrder,
 } from "../../util/split";
+import { useSplitEditor } from "../../hooks/useSplitEditor";
+import { useExpenseFx } from "../../hooks/useExpenseFx";
+import { useExpenseFormInputs } from "../../hooks/useExpenseFormInputs";
+import { useCategoryAutomap } from "../../hooks/useCategoryAutomap";
+import {
+  buildExpenseData,
+  buildFastExpenseData,
+  validateExpenseData,
+  type ExpenseFormSnapshot,
+} from "../../util/expense-form-submit";
+import type { ExpenseFormInputsState } from "../../util/expense-form-inputs";
+import {
+  MODAL_FLOW_DEFER_MS,
+  MODAL_FLOW_STATE,
+  modalFlowReducer,
+  type ModalFlowEffect,
+  type ModalFlowState,
+} from "../../util/modal-flow-reducer";
 import { Traveller } from "../../util/traveler";
 
 import { i18n } from "../../i18n/i18n";
@@ -75,7 +88,6 @@ import {
   DuplicateOption,
   ExpenseData,
   isPaidString,
-  Split,
   getEffectivePaidBack,
 } from "../../util/expense";
 import {
@@ -117,20 +129,11 @@ import { Platform } from "react-native";
 import { isPremiumMember } from "../Premium/PremiumConstants";
 import { MAX_EXPENSES_PERTRIP_NONPREMIUM } from "../../confAppConstants";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
-import { getRate } from "../../util/currencyExchange";
 import { OrientationContext } from "../../store/orientation-context";
 import { callDebounced } from "../Hooks/useDebounce";
 import { NavigationProp } from "@react-navigation/native";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
-
-// Modal state machine for cascading flows
-const modalStates = {
-  CLOSED: "closed",
-  WHO_PAID: "whoPaid",
-  HOW_SHARED: "howShared",
-  EXACT_SHARING: "exactSharing",
-};
 
 const splitTypes: { [key: string]: splitType } & {
   EQUAL: splitType;
@@ -229,145 +232,173 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   const [confirmedRange, setConfirmedRange] = useState(false);
   const [helperStateForDividing, setHelperStateForDividing] = useState(false);
-  const [inputs, setInputs] = useState({
-    amount: {
-      value:
-        editingValues && editingValues.amount > 0
-          ? editingValues.amount.toString()
-          : "",
-      isValid: true,
-    },
-    date: {
-      value: editingValues
-        ? getFormattedDate(editingValues.date)
-        : getFormattedDate(DateTime.now().toJSDate()),
-      isValid: true,
-    },
-    description: {
-      value: editingValues ? editingValues.description : "",
-      isValid: true,
-    },
-    category: {
-      value: editingValues
-        ? newCat
-          ? pickedCat
-          : editingValues.category
-        : pickedCat,
-      isValid: true,
-    },
-    country: {
-      value: editingValues
-        ? editingValues.country
-        : mostRecentExpense?.country
-          ? mostRecentExpense.country
-          : userCtx.lastCountry
-            ? userCtx.lastCountry
-            : "",
-      isValid: true,
-    },
-    currency: {
-      value: editingValues
-        ? editingValues.currency
-        : mostRecentExpense?.currency
-          ? mostRecentExpense.currency
-          : userCtx.lastCurrency
-            ? userCtx.lastCurrency
-            : tripCtx.tripCurrency,
-      isValid: true,
-    },
-    whoPaid: {
-      value: editingValues ? editingValues.whoPaid : "",
-      isValid: true,
-    },
-  });
-  const [tempAmount, setTempAmount] = useState("");
-  const hasTempAndInput = !!(inputs.amount.value && tempAmount);
-  const tmpInputSum = +inputs.amount.value + +tempAmount;
-  const amountValue = hasTempAndInput
-    ? tmpInputSum
-    : inputs.amount.value.length > 0
-      ? inputs.amount.value
-      : tempAmount;
 
-  const hasCalcAmount =
-    amountValue &&
-    inputs.currency.value &&
-    inputs.currency.value !== tripCtx.tripCurrency;
-
-  // Helper function to convert Traveller[] to string[] (user names)
-  const extractUserNames = (
-    travellers: string[] | Traveller[] | undefined
-  ): string[] => {
-    if (!travellers) return [];
-    if (travellers.length === 0) return [];
-    // Check if first element is a string (already user names)
-    if (typeof travellers[0] === "string") {
-      return travellers as string[];
-    }
-    // Otherwise, it's Traveller[], extract userNames
-    return (travellers as Traveller[]).map((t) => t.userName);
-  };
-
-  // list of all splits owed
-  const [splitList, setSplitList] = useState(
-    resetEditOrder(editingValues?.splitList ?? [])
+  const extractUserNames = useCallback(
+    (travellers: string[] | Traveller[] | undefined): string[] => {
+      if (!travellers) return [];
+      if (travellers.length === 0) return [];
+      if (typeof travellers[0] === "string") {
+        return travellers as string[];
+      }
+      return (travellers as Traveller[]).map((t) => t.userName);
+    },
+    []
   );
-  const [splitListValid, setSplitListValid] = useState(true);
 
-  // dropdown for whoPaid picker
   const [currentTravellers, setCurrentTravellers] = useState(
     tripCtx.travellers
   );
+  const [whoPaid, setWhoPaid] = useState<string | null>(
+    editingValues ? editingValues.whoPaid : null
+  );
 
-  const [calcAmount, setCalcAmount] = useState("");
-  const [splitListCalcAmounts, setSplitListCalcAmounts] = useState([""]);
-  useEffect(() => {
-    async function getCalcAmount() {
-      // calc calcAmount from amount, currency and TripCtx.tripCurrency and add it to expenseData
-      const base = tripCtx.tripCurrency;
-      const target = inputs.currency.value;
-      const rate = await getRate(base, target);
-      const calcAmount = +amountValue / rate;
+  const initialInputs = useMemo<ExpenseFormInputsState>(
+    () => ({
+      amount: {
+        value:
+          editingValues && editingValues.amount > 0
+            ? editingValues.amount.toString()
+            : "",
+        isValid: true,
+      },
+      date: {
+        value: editingValues
+          ? getFormattedDate(editingValues.date)
+          : getFormattedDate(DateTime.now().toJSDate()),
+        isValid: true,
+      },
+      description: {
+        value: editingValues ? editingValues.description : "",
+        isValid: true,
+      },
+      category: {
+        value: editingValues
+          ? newCat
+            ? pickedCat
+            : editingValues.category
+          : pickedCat,
+        isValid: true,
+      },
+      country: {
+        value: editingValues
+          ? editingValues.country
+          : mostRecentExpense?.country
+            ? mostRecentExpense.country
+            : userCtx.lastCountry
+              ? userCtx.lastCountry
+              : "",
+        isValid: true,
+      },
+      currency: {
+        value: editingValues
+          ? editingValues.currency
+          : mostRecentExpense?.currency
+            ? mostRecentExpense.currency
+            : userCtx.lastCurrency
+              ? userCtx.lastCurrency
+              : tripCtx.tripCurrency,
+        isValid: true,
+      },
+      whoPaid: {
+        value: editingValues ? editingValues.whoPaid : "",
+        isValid: true,
+      },
+    }),
+    [
+      editingValues,
+      mostRecentExpense?.country,
+      mostRecentExpense?.currency,
+      newCat,
+      pickedCat,
+      tripCtx.tripCurrency,
+      userCtx.lastCountry,
+      userCtx.lastCurrency,
+    ]
+  );
 
-      // if expenseData has a splitlist, add the rate to each split
-      const splitListsCalcAmountsList = [];
-      if (splitList && splitList?.length > 0) {
-        splitList.forEach((split) => {
-          split.rate = rate;
-          splitListsCalcAmountsList.push(
-            (split.amount / split.rate).toFixed(2)
-          );
-        });
-      }
-      if (!hasCalcAmount || rate == -1 || rate == 1) {
-        setCalcAmount("");
-        setSplitListCalcAmounts([""]);
-        return;
-      }
-      setSplitListCalcAmounts(splitListsCalcAmountsList);
-      setCalcAmount(calcAmount.toFixed(2));
-    }
-    getCalcAmount();
-  }, [
-    inputs.amount.value,
-    inputs.currency.value,
-    tripCtx.tripCurrency,
-    splitList,
+  const saveDraftDataRef = useRef<(newValues?: Partial<ExpenseData>) => void>(
+    () => {}
+  );
+  const autoExpenseLinearSplitAdjustRef = useRef(
+    (_inputIdentifier: string, _enteredValue: string) => {}
+  );
+  const openTravellerMultiPickerRef = useRef<() => void>(() => {});
+
+  const {
+    inputs,
+    setInputs,
+    tempAmount,
+    setTempAmount,
     amountValue,
-    hasCalcAmount,
-  ]);
+    inputChangedHandler: baseInputChangedHandler,
+    applyFieldValidity,
+  } = useExpenseFormInputs({
+    initialInputs,
+    onInputChange: (inputIdentifier, enteredValue) => {
+      autoExpenseLinearSplitAdjustRef.current(inputIdentifier, enteredValue);
+    },
+  });
+
+  const [showDatePickerRange, setShowDatePickerRange] = useState(false);
+  const [startDate, setStartDate] = useState(
+    editingValues
+      ? getFormattedDate(editingValues.startDate)
+      : getFormattedDate(DateTime.now())
+  );
+  const [endDate, setEndDate] = useState(
+    editingValues
+      ? getFormattedDate(editingValues.endDate)
+      : getFormattedDate(DateTime.now())
+  );
+  const daysBeween =
+    startDate && endDate
+      ? countInclusiveDaysInRange(new Date(startDate), new Date(endDate))
+      : 1;
+
+  const [duplOrSplit, setDuplOrSplit] = useState<DuplicateOption>(
+    editingValues ? Number(editingValues.duplOrSplit) : DuplicateOption.null
+  );
+
+  const splitEditor = useSplitEditor({
+    initialSplitList: resetEditOrder(editingValues?.splitList ?? []),
+    initialSplitType: editingValues ? editingValues.splitType : "SELF",
+    initialSplitTravellersList: editingValues?.listEQUAL?.length
+      ? editingValues.listEQUAL
+      : extractUserNames(tripCtx.travellers),
+    amount: +amountValue,
+    whoPaid,
+    tripTravellerNames: extractUserNames(tripCtx.travellers),
+    onAutosave: () => saveDraftDataRef.current(),
+    duplOrSplit,
+    isEditing,
+    rangedDayCount: daysBeween,
+  });
+
+  const {
+    splitList,
+    setSplitList,
+    splitType,
+    splitListValid,
+    setSplitListValid,
+    splitTravellersList,
+    setSplitTravellersList,
+    inputSplitListHandler,
+    removeUserFromSplit,
+    splitHandler,
+    setSplitType,
+    autoExpenseLinearSplitAdjust,
+  } = splitEditor;
+
+  autoExpenseLinearSplitAdjustRef.current = autoExpenseLinearSplitAdjust;
+
+  const { calcAmount, splitListCalcAmounts, hasCalcAmount } = useExpenseFx({
+    tripCurrency: tripCtx.tripCurrency,
+    expenseCurrency: inputs.currency.value,
+    amountValue,
+    splitList,
+  });
 
   const iconString = iconName ? iconName : getCatSymbol(pickedCat);
-  const [icon, setIcon] = useState(iconString);
-  const getSetCatIcon = async (catString: string) => {
-    const icon = getCatSymbolMMKV(catString);
-    setIcon(icon);
-  };
-  useEffect(() => {
-    if (pickedCat) getSetCatIcon(pickedCat);
-    else if (editingValues?.category) getSetCatIcon(editingValues?.category);
-    else if (editingValues?.iconName) setIcon(editingValues.iconName);
-  }, [pickedCat, editingValues?.category, editingValues?.iconName]);
 
   useEffect(() => {
     const hideAdvanceByDefault = isEditing || alwaysShowAdvancedSetting;
@@ -386,34 +417,12 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   }, []);
 
   useEffect(() => {
-    // setlistequal with tripcontext.travellers
     if (tripCtx.travellers) {
       const userNames = extractUserNames(tripCtx.travellers);
-      setListEQUAL(userNames);
+      setSplitTravellersList(userNames);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripCtx.travellers?.length]);
-
-  // datepicker states
-  const [showDatePickerRange, setShowDatePickerRange] = useState(false);
-  const [startDate, setStartDate] = useState(
-    editingValues
-      ? getFormattedDate(
-          editingValues.startDate
-          // DateTime.fromJSDate(editingValues.startDate).toJSDate()
-        )
-      : getFormattedDate(DateTime.now())
-  );
-  const [endDate, setEndDate] = useState(
-    editingValues
-      ? getFormattedDate(editingValues.endDate)
-      : // DateTime.fromJSDate(editingValues.endDate).toJSDate())
-        getFormattedDate(DateTime.now())
-  );
-  const daysBeween =
-    startDate && endDate
-      ? countInclusiveDaysInRange(new Date(startDate), new Date(endDate))
-      : 1;
 
   const openDatePickerRange = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -459,11 +468,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       });
     }
   }, [dateISO]);
-
-  // duplOrSplit enum:  1 is dupl, 2 is split, 0 is null
-  const [duplOrSplit, setDuplOrSplit] = useState<DuplicateOption>(
-    editingValues ? Number(editingValues.duplOrSplit) : DuplicateOption.null
-  );
 
   const alreadyDividedAmountByDays = resolveAlreadyDividedAmountByDays(
     isEditing,
@@ -598,52 +602,52 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     [currentTravellers]
   );
 
-  const [modalFlow, setModalFlow] = useState(modalStates.CLOSED);
+  const [modalFlow, setModalFlow] = useState<ModalFlowState>(
+    MODAL_FLOW_STATE.CLOSED
+  );
 
-  const nextModal = (selectedValue) => {
-    switch (modalFlow) {
-      case modalStates.WHO_PAID:
-        if (selectedValue === "__ADD_TRAVELLER__") {
-          // Going to share screen
-          setModalFlow(modalStates.CLOSED);
-        } else {
-          setModalFlow(modalStates.CLOSED);
-          setTimeout(() => {
-            setModalFlow(modalStates.HOW_SHARED);
-          }, 100);
+  const applyModalFlowEffects = useCallback(
+    (effects: ModalFlowEffect[]) => {
+      for (const effect of effects) {
+        switch (effect.type) {
+          case "SET_SPLIT_TYPE":
+            setSplitType(effect.splitType);
+            break;
+          case "RUN_SPLIT_HANDLER":
+            splitHandler(effect.splitType);
+            break;
+          case "OPEN_TRAVELLER_MULTI_PICKER":
+            openTravellerMultiPickerRef.current();
+            break;
+          case "NAVIGATE_SHARE":
+            navigation.navigate("Share", { tripId: tripCtx.tripid });
+            break;
         }
-        break;
+      }
+    },
+    [navigation, setSplitType, splitHandler, tripCtx.tripid]
+  );
 
-      case modalStates.HOW_SHARED:
-        if (selectedValue === splitTypes.EXACT) {
-          setModalFlow(modalStates.CLOSED);
-          setTimeout(() => {
-            setModalFlow(modalStates.EXACT_SHARING);
-          }, 100);
-        } else {
-          // EQUAL/SELF
-          setSplitType(selectedValue);
-          splitHandler(selectedValue);
-          setModalFlow(modalStates.CLOSED);
-        }
-        break;
+  const nextModal = useCallback(
+    (selectedValue: string) => {
+      const result = modalFlowReducer(modalFlow, selectedValue);
+      setModalFlow(result.next);
+      applyModalFlowEffects(result.effects);
 
-      case modalStates.EXACT_SHARING:
-        setModalFlow(modalStates.CLOSED);
+      if (result.deferred?.reopen) {
         setTimeout(() => {
-          openTravellerMultiPicker(); // Open the traveller picker
-        }, 100);
-        break;
-
-      default:
-        setModalFlow(modalStates.CLOSED);
-    }
-  };
+          setModalFlow(result.deferred!.reopen!);
+        }, MODAL_FLOW_DEFER_MS);
+      } else if (result.deferred?.effects) {
+        setTimeout(() => {
+          applyModalFlowEffects(result.deferred!.effects!);
+        }, MODAL_FLOW_DEFER_MS);
+      }
+    },
+    [applyModalFlowEffects, modalFlow]
+  );
 
   const [items, setItems] = useState(currentTravellersAsItems);
-  const [whoPaid, setWhoPaid] = useState(
-    editingValues ? editingValues.whoPaid : null
-  );
 
   // Wrap setWhoPaid with logging
   const setWhoPaidWithLogging = (value) => {
@@ -674,15 +678,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   };
   const isAndroid = Platform.OS == "android";
 
-  // dropdown for split/owe picker
   const splitTypesItems = splitTypesDropdown();
   const [splitItems, setSplitTypeItems] = useState(splitTypesItems);
-  // Removed: const [openSplitTypes, setOpenSplitTypes] = useState(false); - using modalFlow state machine
-  const [splitType, setSplitType] = useState<splitType>(
-    editingValues ? editingValues.splitType : splitTypes.SELF
-  );
 
-  // dropdown for EQUAL share picker (without add traveller option)
   const currentTravellersForEqualSplit = useCallback(
     () => travellerToDropdown(currentTravellers, false),
     [currentTravellers]
@@ -695,41 +693,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTravellers?.length]);
   const [openEQUAL, setOpenEQUAL] = useState(false);
-  const [splitTravellersList, setListEQUAL] = useState<string[]>(
-    editingValues
-      ? editingValues.listEQUAL || []
-      : extractUserNames(currentTravellers)
-  );
 
-  function autoExpenseLinearSplitAdjust(
-    inputIdentifier: string,
-    value: string
-  ) {
-    // calc splitList from amount
-    if (
-      inputIdentifier === "amount" &&
-      (splitType === splitTypes.EXACT || splitType === splitTypes.EQUAL)
-    ) {
-      // split into equal parts if we are splitting over a ranged date and are editing
-      if (duplOrSplit === 2 && isEditing) {
-        const newSplitList = recalcSplitsWithEditOrder(
-          splitList,
-          divideAmountForRangedSplit(+amountValue, daysBeween)
-        );
-        setSplitList(newSplitList);
-        const isValidSplit =
-          validateSplitList(newSplitList, splitType, +amountValue) &&
-          validateSplitListWithEditOrder(newSplitList, +amountValue);
-        setSplitListValid(isValidSplit);
-      }
-      const newSplitList = recalcSplitsWithEditOrder(splitList, +value);
-      setSplitList(newSplitList);
-      const isValidSplit =
-        validateSplitList(newSplitList, splitType, +value) &&
-        validateSplitListWithEditOrder(newSplitList, +value);
-      setSplitListValid(isValidSplit);
-    }
-  }
   const last500Daysexpenses = useMemo(
     () =>
       expCtx.expenses.filter(
@@ -752,126 +716,93 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     return Array.from(uniqueDescriptions);
   }, [last500Daysexpenses]);
 
-  // Helper function to update category and icon
-  const updateCategoryAndIcon = useCallback((categoryValue: string) => {
-    const symbol = getCatSymbolMMKV(categoryValue);
-    setIcon(symbol);
-    setInputs((prevInputs) => {
-      const canSetNewDescription =
-        categoryValue !== "undefined" &&
-        prevInputs.description.value === "" &&
-        prevInputs.category.value !== categoryValue;
-      const newDescription = canSetNewDescription
-        ? getCatLocalized(categoryValue)
-        : prevInputs.description.value || "";
-      return {
+  const scheduleDraftSaveRef = useRef<(newValues?: Partial<ExpenseData>) => void>(
+    () => {}
+  );
+
+  const categoryAutomap = useCategoryAutomap({
+    pickedCat,
+    categories: getMMKVObject(MMKV_KEYS.CATEGORY_LIST) ?? DEFAULTCATEGORIES,
+    recentExpenses: last500Daysexpenses,
+    initialIcon: iconString,
+    onApplyCategory: ({ category, description }) => {
+      setInputs((prevInputs) => ({
         ...prevInputs,
-        category: { value: categoryValue, isValid: true },
-        description: { value: newDescription, isValid: true },
-      };
-    });
-  }, []);
-
-  /**
-   * Automatically determines the category based on the entered value of a specific input.
-   * @param inputIdentifier - The identifier of the input. Should be "description"
-   * @param enteredValue - The entered value of the input.
-   */
-  const autoCategory = useCallback(
-    (inputIdentifier: string, enteredValue: string) => {
-      // calc category from description
-      if (inputIdentifier === "description" && pickedCat === "undefined") {
-        const mappedCategory = mapDescriptionToCategory(
-          enteredValue,
-          getMMKVObject(MMKV_KEYS.CATEGORY_LIST) ?? DEFAULTCATEGORIES,
-          last500Daysexpenses
-        );
-        if (mappedCategory) {
-          updateCategoryAndIcon(mappedCategory);
-        }
-      }
+        category: { value: category, isValid: true },
+        description: { value: description, isValid: true },
+      }));
+      scheduleDraftSaveRef.current();
     },
-    [pickedCat, updateCategoryAndIcon, last500Daysexpenses]
-  );
-  // Keep debounced instance stable while always calling latest autoCategory
-  const autoCategoryRef = useRef(autoCategory);
-  useEffect(() => {
-    autoCategoryRef.current = autoCategory;
-  }, [autoCategory]);
-  const debouncedAutoCategory = useMemo(
-    () =>
-      callDebounced((inputIdentifier: string, enteredValue: string) => {
-        autoCategoryRef.current(inputIdentifier, enteredValue);
-      }, 250),
-    []
-  );
+  });
+  const { icon, debouncedAutoCategory, updateCategoryAndIcon } = categoryAutomap;
 
-  // Helper function to save current form state to draft storage
-  const saveDraftData = useCallback(
-    (newValues: Partial<ExpenseData> = {}) => {
-      setExpenseDraft(
-        editedExpenseId,
-        toExpenseDraft(
-          {
-            uid: "",
-            amountInput: inputs.amount.value,
-            amountValue,
-            dateIso: inputs.date.value,
-            startDateIso: startDate,
-            endDateIso: endDate,
-            description: inputs.description.value,
-            categoryInput: inputs.category.value,
-            country: inputs.country.value,
-            currency: inputs.currency.value,
-            whoPaid,
-            splitType,
-            splitList,
-            listEQUAL: splitTravellersList,
-            paidBack,
-            isSpecialExpense,
-            duplOrSplit,
-            iconName,
-            alreadyDividedAmountByDays,
-            newCat,
-            pickedCat,
-            isSoloTraveller: IsSoloTraveller,
-            userName: userCtx.userName,
-            lastCountry: userCtx.lastCountry,
-            lastCurrency: userCtx.lastCurrency,
-          },
-          newValues
-        )
-      );
-    },
+  const makeFormSnapshot = useCallback(
+    (overrides: Partial<ExpenseFormSnapshot> = {}): ExpenseFormSnapshot => ({
+      uid: authCtx.uid,
+      amountInput: inputs.amount.value,
+      amountValue,
+      dateIso: inputs.date.value,
+      startDateIso: startDate,
+      endDateIso: endDate,
+      description: inputs.description.value,
+      categoryInput: inputs.category.value,
+      country: inputs.country.value,
+      currency: inputs.currency.value,
+      whoPaid,
+      splitType,
+      splitList,
+      listEQUAL: splitTravellersList,
+      paidBack,
+      isSpecialExpense,
+      duplOrSplit,
+      iconName,
+      alreadyDividedAmountByDays,
+      newCat,
+      pickedCat,
+      isSoloTraveller: IsSoloTraveller,
+      userName: userCtx.userName,
+      lastCountry: userCtx.lastCountry,
+      lastCurrency: userCtx.lastCurrency,
+      ...overrides,
+    }),
     [
-      editedExpenseId,
-      inputs.category.value,
-      inputs.description.value,
+      authCtx.uid,
       inputs.amount.value,
-      inputs.date.value,
+      inputs.category.value,
       inputs.country.value,
       inputs.currency.value,
+      inputs.date.value,
+      inputs.description.value,
+      amountValue,
       startDate,
       endDate,
       whoPaid,
       splitType,
-      splitTravellersList,
       splitList,
-      duplOrSplit,
-      amountValue,
+      splitTravellersList,
       paidBack,
       isSpecialExpense,
+      duplOrSplit,
       iconName,
       alreadyDividedAmountByDays,
       newCat,
       pickedCat,
       IsSoloTraveller,
-      userCtx.userName,
       userCtx.lastCountry,
       userCtx.lastCurrency,
+      userCtx.userName,
     ]
   );
-  const saveDraftDataRef = useRef(saveDraftData);
+
+  const saveDraftData = useCallback(
+    (newValues: Partial<ExpenseData> = {}) => {
+      setExpenseDraft(
+        editedExpenseId,
+        toExpenseDraft(makeFormSnapshot(), newValues)
+      );
+    },
+    [editedExpenseId, makeFormSnapshot]
+  );
   useEffect(() => {
     saveDraftDataRef.current = saveDraftData;
   }, [saveDraftData]);
@@ -883,6 +814,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       }, 300),
     [editedExpenseId]
   );
+  scheduleDraftSaveRef.current = scheduleDraftSave;
 
   // Load new category when screen comes into focus
   useFocusEffect(
@@ -890,7 +822,10 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       const tempCat = getExpenseCat(editedExpenseId);
 
       if (tempCat?.category) {
-        updateCategoryAndIcon(tempCat.category);
+        updateCategoryAndIcon(tempCat.category, {
+          description: inputs.description.value,
+          category: inputs.category.value,
+        });
         saveDraftData({ category: tempCat.category });
         clearExpenseCat(editedExpenseId);
       }
@@ -933,7 +868,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                 setSplitType(restored.splitType);
               }
               if (restored.listEQUAL) {
-                setListEQUAL(restored.listEQUAL);
+                setSplitTravellersList(restored.listEQUAL);
               }
               if (restored.splitList) {
                 setSplitList(restored.splitList);
@@ -953,9 +888,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               if (restored.endDate) {
                 setEndDate(restored.endDate);
               }
-              if (restored.calcAmount) {
-                setCalcAmount(restored.calcAmount);
-              }
             },
           },
         ]
@@ -963,33 +895,14 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     }
   }, [
     editedExpenseId,
-    tripCtx.tripCurrency,
-    updateCategoryAndIcon,
     userCtx.lastCountry,
     userCtx.lastCurrency,
   ]);
-
-  // Update icon when category changes
-  useEffect(() => {
-    const symbol = getCatSymbolMMKV(inputs.category.value);
-    setIcon(symbol);
-  }, [inputs.category.value]);
 
   // Wrapper functions that include auto-save
   const setWhoPaidWithAutoSave = useCallback(
     (value) => {
       setWhoPaid(value);
-      scheduleDraftSave();
-    },
-    [scheduleDraftSave]
-  );
-
-  const setSplitTypeWithAutoSave = useCallback(
-    (value) => {
-      setSplitType(value);
-      trackEvent(VexoEvents.SPLIT_TYPE_SELECTED, {
-        splitType: value,
-      });
       scheduleDraftSave();
     },
     [scheduleDraftSave]
@@ -1026,58 +939,23 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     [scheduleDraftSave]
   );
 
-  function inputChangedHandler(inputIdentifier: string, enteredValue: string) {
-    setInputs((curInputs) => {
-      const newInputs = {
-        ...curInputs,
-        [inputIdentifier]: { value: enteredValue, isValid: true },
-      };
-      return newInputs;
-    });
-    scheduleDraftSave();
-    debouncedAutoCategory(inputIdentifier, enteredValue);
-    autoExpenseLinearSplitAdjust(inputIdentifier, enteredValue);
-  }
+  const inputChangedHandler = useCallback(
+    (inputIdentifier: string, enteredValue: string) => {
+      baseInputChangedHandler(inputIdentifier, enteredValue);
+      scheduleDraftSave();
+      debouncedAutoCategory(inputIdentifier, enteredValue);
+    },
+    [baseInputChangedHandler, debouncedAutoCategory, scheduleDraftSave]
+  );
 
-  function openTravellerMultiPicker() {
-    // add whole traveling group who paid automatically to shared list
+  const openTravellerMultiPicker = useCallback(() => {
     if (!editingValues) {
       const userNames = extractUserNames(currentTravellers);
-      setListEQUAL(userNames);
+      setSplitTravellersList(userNames);
     }
-    setModalFlow(modalStates.EXACT_SHARING);
-  }
-
-  function inputSplitListHandler(index, props: { userName: string }, value) {
-    if (splitType === splitTypes.EQUAL) return;
-    const { splitList: nextList, valid } = applySplitEdit(
-      splitList,
-      index,
-      props.userName,
-      value,
-      +amountValue,
-      splitType
-    );
-    setSplitList(nextList);
-    setSplitListValid(valid);
-  }
-
-  function splitHandler(selectedSplitType: splitType) {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const splitTravellers = splitTravellersList;
-    // calculate splits
-    const listSplits = calcSplitList(
-      selectedSplitType ?? splitType,
-      +amountValue,
-      whoPaid,
-      splitTravellers
-    );
-    if (listSplits) {
-      // Reset edit order when split type changes
-      const splitsWithoutOrder = resetEditOrder(listSplits);
-      setSplitList(splitsWithoutOrder);
-    }
-  }
+    setModalFlow(MODAL_FLOW_STATE.EXACT_SHARING);
+  }, [currentTravellers, editingValues, extractUserNames, setSplitTravellersList]);
+  openTravellerMultiPickerRef.current = openTravellerMultiPicker;
 
   // Never call setState during render: move these guards into effects.
   useEffect(() => {
@@ -1094,161 +972,35 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openEQUAL, splitType]);
 
-  async function removeUserFromSplitHandler(userName: string) {
-    if (!splitList || splitList.length < 1) return;
-    const result = removeFromSplit(
-      splitList,
-      userName,
-      whoPaid,
-      splitType,
-      +amountValue,
-      extractUserNames(tripCtx.travellers)
-    );
-    if (!result) {
-      return;
-    }
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    if (result.splitType !== splitType) {
-      setSplitType(result.splitType);
-    }
-    setSplitList(result.splitList);
-    if (result.valid !== undefined) {
-      setSplitListValid(result.valid);
-    }
-  }
-
-  // Helper function to safely create Date objects
-  const createSafeDate = (dateValue: string): Date => {
-    if (dateValue && dateValue !== "") {
-      const parsedDate = DateTime.fromISO(dateValue);
-      return parsedDate.isValid
-        ? parsedDate.toJSDate()
-        : DateTime.now().toJSDate();
-    }
-    return DateTime.now().toJSDate();
-  };
-
-  // Helper function to convert DateOrDateTime to ISO string
-  const convertToISOString = (dateValue: any): string => {
-    if (typeof dateValue === "string") {
-      return dateValue;
-    }
-    if (dateValue instanceof Date) {
-      return dateValue.toISOString();
-    }
-    if (dateValue && typeof dateValue.toJSDate === "function") {
-      // DateTime object
-      return dateValue.toJSDate().toISOString();
-    }
-    return new Date(dateValue).toISOString();
-  };
-
   async function submitHandler() {
-    const expenseData = {
-      uid: authCtx.uid,
-      amount: +amountValue,
-      date: createSafeDate(inputs.date.value),
-      startDate: createSafeDate(startDate),
-      endDate: createSafeDate(endDate),
-      description: inputs.description.value,
-      category: newCat ? pickedCat : inputs.category.value,
-      categoryString: inputs.category.value,
-      calcAmount: +amountValue,
-      country: inputs.country.value,
-      currency: inputs.currency.value,
-      whoPaid: whoPaid, // TODO: convert this to uid
-      splitType: splitType,
-      listEQUAL: splitTravellersList,
-      splitList: splitList,
-      duplOrSplit: duplOrSplit,
-      iconName: iconName,
-      paidBack: paidBack,
-      isSpecialExpense: isSpecialExpense,
-      alreadyDividedAmountByDays: alreadyDividedAmountByDays,
-    };
+    const expenseData = buildExpenseData(makeFormSnapshot());
 
-    // SoloTravellers always pay for themselves
-    if (IsSoloTraveller || expenseData.whoPaid === null)
-      expenseData.whoPaid = userCtx.userName;
-    // If left completely empty, set to  placeholder
-    if (expenseData.description === "")
-      expenseData.description = getCatLocalized(expenseData.category);
-
-    // validate the expenseData
-    const amountIsValid =
-      !isNaN(expenseData.amount) &&
-      expenseData.amount > 0 &&
-      expenseData.amount < 34359738368;
-    const dateIsValid = expenseData.date?.toString() !== "Invalid Date";
-    const descriptionIsValid = expenseData.description.trim()?.length > 0;
-    const whoPaidIsValid = true;
-    const categoryIsValid = true;
-    const countryIsValid = true;
-    const currencyIsValid = true;
-
-    // split into equal parts if we are splitting over a ranged date and are editing
     if (duplOrSplit === 2 && !isEditing) {
       const newSplitList = recalcSplitsWithEditOrder(
         splitList,
         divideAmountForRangedSplit(+amountValue, daysBeween)
       );
       setSplitList(newSplitList);
-      const isValidSplit =
-        validateSplitList(newSplitList, splitType, +amountValue) &&
-        validateSplitListWithEditOrder(newSplitList, +amountValue);
-      setSplitListValid(isValidSplit);
+      setSplitListValid(
+        Boolean(
+          validateSplitList(newSplitList, splitType, +amountValue) &&
+            validateSplitListWithEditOrder(newSplitList, +amountValue)
+        )
+      );
     }
 
-    // Check split list validity first and show alert if invalid
     if (!splitListValid && splitType !== splitTypes.SELF) {
       Alert.alert(i18n.t("sorry"), i18n.t("sorrySplitList"));
       return;
     }
 
-    if (
-      !amountIsValid ||
-      !dateIsValid ||
-      !descriptionIsValid ||
-      !categoryIsValid ||
-      !countryIsValid ||
-      !currencyIsValid ||
-      !whoPaidIsValid ||
-      !splitListValid
-    ) {
-      setInputs((curInputs) => {
-        return {
-          amount: {
-            value: curInputs.amount.value,
-            isValid: amountIsValid,
-          },
-          date: { value: curInputs.date.value, isValid: dateIsValid },
-          description: {
-            value: curInputs.description.value,
-            isValid: descriptionIsValid,
-          },
-          category: {
-            value: curInputs.category.value,
-            isValid: categoryIsValid,
-          },
-          country: {
-            value: curInputs.country.value,
-            isValid: countryIsValid,
-          },
-          currency: {
-            value: curInputs.currency.value,
-            isValid: currencyIsValid,
-          },
-          whoPaid: {
-            value: curInputs.whoPaid.value,
-            isValid: whoPaidIsValid,
-          },
-        };
-      });
+    const { valid, fieldValidity } = validateExpenseData(expenseData);
+    if (!valid || !splitListValid) {
+      applyFieldValidity(fieldValidity);
       addDefaultValues(pickedCat);
       return;
     }
 
-    // update lastcountry and lastcurrency
     if (inputs.country.value && inputs.country.value !== "") {
       userCtx.setLastCountry(inputs.country.value);
       await secureStoreSetItem("lastCountry", inputs.country.value);
@@ -1261,31 +1013,16 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   }
 
   async function fastSubmit() {
-    // Check split list validity first and show alert if invalid
     if (!splitListValid && splitType !== splitTypes.SELF) {
       Alert.alert(i18n.t("sorry"), i18n.t("sorrySplitList"));
       return;
     }
 
-    const expenseData = {
-      uid: authCtx.uid,
-      amount: +amountValue,
-      date: DateTime.fromISO(startDate).toJSDate(),
-      startDate: DateTime.fromISO(startDate).toJSDate(),
-      endDate: DateTime.fromISO(endDate).toJSDate(),
-      description: getCatLocalized(pickedCat),
-      category: pickedCat,
-      country: userCtx.lastCountry ? userCtx.lastCountry : "",
-      currency: lastCurrency,
-      whoPaid: userCtx.userName,
-      splitType: splitType,
-      listEQUAL: extractUserNames(currentTravellers),
-      splitList: splitList,
-      iconName: iconName,
-      paidBack: paidBack,
-      isSpecialExpense: isSpecialExpense,
-      duplOrSplit: duplOrSplit,
-    };
+    const expenseData = buildFastExpenseData(
+      makeFormSnapshot({
+        listEQUAL: extractUserNames(currentTravellers),
+      })
+    );
     await onSubmit(expenseData);
   }
 
@@ -1866,24 +1603,24 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                             //   renderDropDownList(props)
                             // }
                             containerStyle={styles.dropdownContainer}
-                            open={modalFlow === modalStates.WHO_PAID}
+                            open={modalFlow === MODAL_FLOW_STATE.WHO_PAID}
                             value={whoPaid}
                             items={items}
                             setOpen={(open) => {
                               setModalFlow(
-                                open ? modalStates.WHO_PAID : modalStates.CLOSED
+                                open ? MODAL_FLOW_STATE.WHO_PAID : MODAL_FLOW_STATE.CLOSED
                               );
                             }}
                             setValue={handleWhoPaidChange}
                             setItems={setItems}
                             onClose={() => {
                               // Only reset modal flow if we're not transitioning to another modal
-                              if (modalFlow === modalStates.WHO_PAID) {
-                                setModalFlow(modalStates.CLOSED);
+                              if (modalFlow === MODAL_FLOW_STATE.WHO_PAID) {
+                                setModalFlow(MODAL_FLOW_STATE.CLOSED);
                               }
                             }}
                             onOpen={() => {
-                              setModalFlow(modalStates.WHO_PAID);
+                              setModalFlow(MODAL_FLOW_STATE.WHO_PAID);
                               Haptics.impactAsync(
                                 Haptics.ImpactFeedbackStyle.Light
                               );
@@ -1943,26 +1680,26 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                   {whoPaidValid && !IsSoloTraveller && (
                     <DropDownPicker
                       // renderListItem={(props) => renderDropDownList(props)}
-                      open={modalFlow === modalStates.HOW_SHARED}
+                      open={modalFlow === MODAL_FLOW_STATE.HOW_SHARED}
                       value={splitType}
                       items={splitItems}
                       setOpen={(open) => {
                         setModalFlow(
-                          open ? modalStates.HOW_SHARED : modalStates.CLOSED
+                          open ? MODAL_FLOW_STATE.HOW_SHARED : MODAL_FLOW_STATE.CLOSED
                         );
                       }}
                       setValue={setSplitType}
                       setItems={setSplitTypeItems}
                       onSelectItem={(item) => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        setSplitTypeWithAutoSave(item.value);
+                        setSplitType(item.value);
                         nextModal(item.value);
                       }}
                       onClose={() => {
                         // Only reset modal flow if we're not transitioning to another modal
                         // Don't reset if we're about to go to EXACT_SHARING
-                        if (modalFlow === modalStates.HOW_SHARED) {
-                          setModalFlow(modalStates.CLOSED);
+                        if (modalFlow === MODAL_FLOW_STATE.HOW_SHARED) {
+                          setModalFlow(MODAL_FLOW_STATE.CLOSED);
                         }
                       }}
                       onOpen={() => {
@@ -1994,14 +1731,14 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                 {!loadingTravellers && !splitTypeSelf && !IsSoloTraveller && (
                   <DropDownPicker
                     // renderListItem={(props) => renderDropDownList(props)}
-                    open={modalFlow === modalStates.EXACT_SHARING || openEQUAL}
+                    open={modalFlow === MODAL_FLOW_STATE.EXACT_SHARING || openEQUAL}
                     value={splitTravellersList}
                     items={splitItemsEQUAL}
                     setOpen={(open) => {
                       if (open) {
-                        setModalFlow(modalStates.EXACT_SHARING);
+                        setModalFlow(MODAL_FLOW_STATE.EXACT_SHARING);
                       } else {
-                        setModalFlow(modalStates.CLOSED);
+                        setModalFlow(MODAL_FLOW_STATE.CLOSED);
                         setOpenEQUAL(false);
                       }
                     }}
@@ -2011,10 +1748,10 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                     onSelectItem={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }}
-                    setValue={setListEQUAL}
+                    setValue={setSplitTravellersList}
                     setItems={setSplitItemsEQUAL}
                     onClose={() => {
-                      setModalFlow(modalStates.CLOSED);
+                      setModalFlow(MODAL_FLOW_STATE.CLOSED);
                       splitHandler(splitType);
                     }}
                     listMode="MODAL"
@@ -2166,7 +1903,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                                   paddingBottom: dynamicScale(16, true),
                                 }}
                                 onPress={() => {
-                                  removeUserFromSplitHandler(
+                                  removeUserFromSplit(
                                     itemData.item.userName
                                   );
                                 }}

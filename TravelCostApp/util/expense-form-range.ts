@@ -1,6 +1,7 @@
 import { daysBetween } from "./date";
 import { DuplicateOption } from "./expense";
 
+/** Inclusive day count for a date span (matches ExpenseForm `daysBeween`). */
 export function countInclusiveDaysInRange(
   startDate: Date,
   endDate: Date
@@ -9,6 +10,7 @@ export function countInclusiveDaysInRange(
   return daysBetween(endDate, startDate) + 1;
 }
 
+/** Per-day amount × days — **Ranged duplicate** total. */
 export function multiplyAmountForRangedDuplicate(
   amount: number,
   inclusiveDayCount: number
@@ -16,6 +18,7 @@ export function multiplyAmountForRangedDuplicate(
   return amount * inclusiveDayCount;
 }
 
+/** Total amount ÷ days — **Ranged split** per-day share. */
 export function divideAmountForRangedSplit(
   amount: number,
   inclusiveDayCount: number
@@ -23,6 +26,7 @@ export function divideAmountForRangedSplit(
   return amount / inclusiveDayCount;
 }
 
+/** Whether the amount field already holds a per-day share (editing ranged split). */
 export function resolveAlreadyDividedAmountByDays(
   isEditing: boolean,
   duplOrSplit: DuplicateOption | number,
@@ -45,6 +49,7 @@ export type CollapseRangeToSingleDayInput = {
   alreadyDividedAmountByDays: boolean;
 };
 
+/** Amount field value after the user collapses a range back to a single day. */
 export function resolveAmountWhenCollapsingRangeToSingleDay(
   input: CollapseRangeToSingleDayInput
 ): string | null {
@@ -84,6 +89,7 @@ export type RangedSplitPromptInput = RangedPromptInput & {
   alreadyDividedAmountByDays: boolean;
 };
 
+/** Alert copy for **Ranged duplicate** (per-day × days). */
 export function buildRangedDuplicatePromptString(
   input: RangedPromptInput
 ): string {
@@ -95,6 +101,7 @@ export function buildRangedDuplicatePromptString(
   return `${labels.duplString1} ${expenseString} ${labels.duplString2} ${input.inclusiveDayCount} ${labels.duplString3}. \n${labels.duplString4} ${expenseTimesDaysString} ${labels.total}`;
 }
 
+/** Alert copy for **Ranged split** (new vs already-divided editing). */
 export function buildRangedSplitPromptString(
   input: RangedSplitPromptInput
 ): string {
@@ -114,6 +121,7 @@ export function buildRangedSplitPromptString(
   return `${labels.splitString1} ${expenseString}\n${labels.splitString2} ${input.inclusiveDayCount} ${labels.splitString3} ${expenseDividedByDaysString}`;
 }
 
+/** Picker prompt for duplicate (1), split (2), or empty (0). */
 export function buildRangedDuplOrSplitPromptString(
   duplOrSplitNum: number,
   input: RangedSplitPromptInput

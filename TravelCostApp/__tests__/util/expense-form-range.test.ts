@@ -1,4 +1,10 @@
+jest.mock("expo-localization", () => ({
+  getLocales: () => [{ languageTag: "en-US", languageCode: "en" }],
+}));
+
+import { i18n } from "../../i18n/i18n";
 import { DuplicateOption } from "../../util/expense";
+import { formatExpenseWithCurrency } from "../../util/string";
 import {
   buildRangedDuplicatePromptString,
   buildRangedDuplOrSplitPromptString,
@@ -12,12 +18,20 @@ import {
 } from "../../util/expense-form-range";
 
 describe("multiplyAmountForRangedDuplicate", () => {
+  it("leaves amount unchanged for a single-day span", () => {
+    expect(multiplyAmountForRangedDuplicate(50, 1)).toBe(50);
+  });
+
   it("multiplies per-day amount across an inclusive multi-day span", () => {
     expect(multiplyAmountForRangedDuplicate(50, 3)).toBe(150);
   });
 });
 
 describe("divideAmountForRangedSplit", () => {
+  it("leaves amount unchanged for a single-day span", () => {
+    expect(divideAmountForRangedSplit(50, 1)).toBe(50);
+  });
+
   it("spreads total amount evenly per day for a multi-day span", () => {
     expect(divideAmountForRangedSplit(150, 3)).toBe(50);
   });
@@ -159,6 +173,14 @@ describe("buildRangedSplitPromptString", () => {
 
 describe("buildRangedDuplOrSplitPromptString", () => {
   it("returns duplicate or split prompt for the chosen option", () => {
+    const splitInput = {
+      amount: 150,
+      inclusiveDayCount: 3,
+      alreadyDividedAmountByDays: false,
+      formatAmount,
+      labels: promptLabels,
+    };
+
     expect(
       buildRangedDuplOrSplitPromptString(1, {
         amount: 50,
@@ -167,17 +189,13 @@ describe("buildRangedDuplOrSplitPromptString", () => {
         formatAmount,
         labels: promptLabels,
       })
-    ).toContain("Duplicating $50.00");
+    ).toBe(
+      "Duplicating $50.00 over 3 days. \nResulting in a $150.00 Total"
+    );
 
-    expect(
-      buildRangedDuplOrSplitPromptString(2, {
-        amount: 150,
-        inclusiveDayCount: 3,
-        alreadyDividedAmountByDays: false,
-        formatAmount,
-        labels: promptLabels,
-      })
-    ).toContain("days, each $50.00");
+    expect(buildRangedDuplOrSplitPromptString(2, splitInput)).toBe(
+      buildRangedSplitPromptString(splitInput)
+    );
 
     expect(
       buildRangedDuplOrSplitPromptString(0, {
@@ -188,5 +206,61 @@ describe("buildRangedDuplOrSplitPromptString", () => {
         labels: promptLabels,
       })
     ).toBe("");
+  });
+});
+
+function englishRangedPromptLabels() {
+  return {
+    duplString1: i18n.t("duplString1"),
+    duplString2: i18n.t("duplString2"),
+    duplString3: i18n.t("duplString3"),
+    duplString4: i18n.t("duplString4"),
+    splitString1: i18n.t("splitString1"),
+    splitString2: i18n.t("splitString2"),
+    splitString3: i18n.t("splitString3"),
+    total: i18n.t("total"),
+  };
+}
+
+describe("ranged prompts with formatExpenseWithCurrency", () => {
+  beforeAll(() => {
+    i18n.locale = "en";
+  });
+
+  const formatEur = (amount: number) => formatExpenseWithCurrency(amount, "EUR");
+
+  it("matches ExpenseForm duplicate prompt formatting for EUR", () => {
+    expect(
+      buildRangedDuplicatePromptString({
+        amount: 50,
+        inclusiveDayCount: 3,
+        formatAmount: formatEur,
+        labels: englishRangedPromptLabels(),
+      })
+    ).toBe("Duplicating €50 over 3 days. \nResulting in a €150 Total");
+  });
+
+  it("matches ExpenseForm split prompt formatting for EUR (new ranged expense)", () => {
+    expect(
+      buildRangedSplitPromptString({
+        amount: 150,
+        inclusiveDayCount: 3,
+        alreadyDividedAmountByDays: false,
+        formatAmount: formatEur,
+        labels: englishRangedPromptLabels(),
+      })
+    ).toBe("Splitting up the €150\nover 3 days, each €50");
+  });
+
+  it("matches ExpenseForm split prompt formatting for EUR (editing ranged split)", () => {
+    expect(
+      buildRangedSplitPromptString({
+        amount: 50,
+        inclusiveDayCount: 3,
+        alreadyDividedAmountByDays: true,
+        formatAmount: formatEur,
+        labels: englishRangedPromptLabels(),
+      })
+    ).toBe("Splitting up the €150\nover 3 days, each €50");
   });
 });

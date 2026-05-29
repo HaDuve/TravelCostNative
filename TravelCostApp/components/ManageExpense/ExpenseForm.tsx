@@ -466,13 +466,8 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     helperStateForDividing
   );
 
-  const rangedPromptInput = {
-    amount: Number(amountValue),
-    inclusiveDayCount: daysBeween,
-    alreadyDividedAmountByDays,
-    formatAmount: (amount: number) =>
-      formatExpenseWithCurrency(amount, inputs.currency.value),
-    labels: {
+  const rangedPromptLabels = useMemo(
+    () => ({
       duplString1: i18n.t("duplString1"),
       duplString2: i18n.t("duplString2"),
       duplString3: i18n.t("duplString3"),
@@ -481,18 +476,32 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       splitString2: i18n.t("splitString2"),
       splitString3: i18n.t("splitString3"),
       total: i18n.t("total"),
-    },
-  };
+    }),
+    [i18n.locale]
+  );
 
-  const duplOrSplitString = useCallback(
-    (duplOrSplitNum: number) =>
-      buildRangedDuplOrSplitPromptString(duplOrSplitNum, rangedPromptInput),
+  const rangedPromptInput = useMemo(
+    () => ({
+      amount: Number(amountValue),
+      inclusiveDayCount: daysBeween,
+      alreadyDividedAmountByDays,
+      formatAmount: (amount: number) =>
+        formatExpenseWithCurrency(amount, inputs.currency.value),
+      labels: rangedPromptLabels,
+    }),
     [
       amountValue,
       inputs.currency.value,
       daysBeween,
       alreadyDividedAmountByDays,
+      rangedPromptLabels,
     ]
+  );
+
+  const duplOrSplitString = useCallback(
+    (duplOrSplitNum: number) =>
+      buildRangedDuplOrSplitPromptString(duplOrSplitNum, rangedPromptInput),
+    [rangedPromptInput]
   );
 
   const onConfirmRange = (expenseOut) => {

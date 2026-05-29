@@ -39,7 +39,7 @@ An expense whose cost applies across a span of dates (e.g. monthly accommodation
 _Avoid_: Long-term expense (UI copy only), grouped expenses (implementation grouping)
 
 **Deleted expense**:
-An expense removed from the trip — it no longer appears in the ledger, budgets, splits, or summaries. Users treat it as gone; it is not shown again unless restored (if that capability is added later).
+An expense removed from the trip — it no longer appears in the ledger, budgets, splits, or summaries. Users treat it as gone until they tap **Undo** on the post-delete success toast (about eight seconds). Restore uses the same soft-delete tombstone and sync path as delete; there is no separate “trash” screen or server-retention messaging.
 _Avoid_: Removed expense, archived expense
 
 **Special expense**:

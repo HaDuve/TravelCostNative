@@ -15,9 +15,6 @@ Type:
 - `Bug` — something isn't working
 - `Enhancement` — new feature or request
 - `Documentation` — docs improvements
-- `Feedback` — from testers/users we'd like to implement
-- `Sales` — about app sales
-- `Learning` — a skill to learn/sharpen
 - `MetaIssue` — checklist containing other issues
 
 Area:
@@ -32,7 +29,6 @@ Priority:
 - `1 - High Priority` — almost ASAP
 - `2 - Medium Priority` — fast, but not ASAP
 - `3 - Low priority` — can be delayed
-- `Postponed` — last priority until everything else is done
 
 Complexity:
 
@@ -44,8 +40,7 @@ Complexity:
 Workflow / status:
 
 - `ready-for-agent` — fully specified for an AFK agent
+- `ready-for-human` — needs manual intervention
 - `needs-triage` — awaiting maintainer triage
 - `needs-info` — waiting on reporter
 - `Depends` — depends on other issues
-- `no-issue-activity` — stale
-- `good first issue`, `help wanted`, `question`, `Duplicate`, `invalid`, `wontfix`

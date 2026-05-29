@@ -1,7 +1,7 @@
 import { settleTrip } from "../../util/settlement";
 import { makeExpense } from "../fixtures/expense";
 import { rollupOpenBalances } from "../../util/split";
-import { getEffectiveIsPaid, isPaidString } from "../../util/expense";
+import { getEffectivePaidBack, isPaidString } from "../../util/expense";
 
 describe("Settlement (settleTrip)", () => {
   it("sets isPaid, isPaidTimestamp, isPaidDate and preserves all other trip fields", () => {
@@ -66,9 +66,9 @@ describe("Settlement (settleTrip)", () => {
     expect(settledTrip.isPaidTimestamp).toBe(now);
     expect(settledTrip.isPaidDate).toBe(new Date(now).toISOString());
 
-    // Per-expense paid-back is derived by getEffectiveIsPaid with trip settlement timestamp.
+    // Per-expense paid-back is derived by getEffectivePaidBack with trip settlement timestamp.
     for (const exp of trip.expenses) {
-      expect(getEffectiveIsPaid(exp, settledTrip.isPaidTimestamp)).toBe(
+      expect(getEffectivePaidBack(exp, settledTrip.isPaidTimestamp)).toBe(
         isPaidString.paid
       );
     }
@@ -100,7 +100,7 @@ describe("Settlement (settleTrip)", () => {
     const settledTrip = settleTrip(trip, settledAt);
 
     expect(
-      getEffectiveIsPaid(trip.expenses[0], settledTrip.isPaidTimestamp)
+      getEffectivePaidBack(trip.expenses[0], settledTrip.isPaidTimestamp)
     ).toBe(isPaidString.notPaid);
 
     const openBalances = rollupOpenBalances(

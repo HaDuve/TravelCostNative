@@ -74,7 +74,7 @@ import {
   ExpenseData,
   isPaidString,
   Split,
-  getEffectiveIsPaid,
+  getEffectivePaidBack,
 } from "../../util/expense";
 import { NetworkContext } from "../../store/network-context";
 import { SettingsContext } from "../../store/settings-context";
@@ -419,28 +419,28 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     setShowDatePickerRange(false);
   };
 
-  // Calculate effective isPaid status (with timestamp override) when editing
-  const effectiveIsPaid = isEditing
-    ? getEffectiveIsPaid(editingValues, tripCtx.isPaidTimestamp)
+  // Calculate effective paid-back status (with timestamp override) when editing
+  const effectivePaidBack = isEditing
+    ? getEffectivePaidBack(editingValues, tripCtx.isPaidTimestamp)
     : isPaidString.notPaid;
 
-  // Check if expense isPaid is overridden by timestamp
+  // Check if expense paidBack is overridden by timestamp
   const isOverridden =
     isEditing &&
     tripCtx.isPaidTimestamp &&
     tripCtx.isPaidTimestamp > (editingValues?.editedTimestamp || 0) &&
-    effectiveIsPaid === isPaidString.paid;
+    effectivePaidBack === isPaidString.paid;
 
-  const [isPaid, setIsPaid] = useState(
-    isEditing ? effectiveIsPaid : isPaidString.notPaid
+  const [paidBack, setPaidBack] = useState(
+    isEditing ? effectivePaidBack : isPaidString.notPaid
   );
-  const didUserChangeIsPaidRef = useRef(false);
+  const didUserChangePaidBackRef = useRef(false);
   const [isSpecialExpense, setIsSpecialExpense] = useState(
     editingValues?.isSpecialExpense ?? false
   );
 
   // Note: New expenses always default to "notPaid" - users must explicitly mark expenses as paid
-  // Trip-level settlement (isPaidTimestamp) affects effective isPaid status via timestamp override
+  // Trip-level settlement (isPaidTimestamp) affects effective paidBack via timestamp override
 
   useEffect(() => {
     if (dateISO) {
@@ -831,7 +831,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         splitList,
         duplOrSplit,
         calcAmount: +amountValue,
-        isPaid,
+        paidBack,
         isSpecialExpense,
         categoryString: inputs.category.value,
         ...newValues,
@@ -853,7 +853,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       splitList,
       duplOrSplit,
       amountValue,
-      isPaid,
+      paidBack,
       isSpecialExpense,
     ]
   );
@@ -887,6 +887,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   useEffect(() => {
     const draftData: ExpenseData = getExpenseDraft(editedExpenseId);
     if (draftData) {
+      const draftPaidBack =
+        draftData.paidBack ??
+        (draftData as ExpenseData & { isPaid?: isPaidString }).isPaid;
       // Create a user-friendly list of changed items
       const changedItems = [];
 
@@ -920,9 +923,11 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               : draftData.splitType;
         changedItems.push(`• ${i18n.t("splitType")}: ${splitTypeText}`);
       }
-      if (draftData.isPaid && draftData.isPaid !== "not paid") {
+      if (draftPaidBack && draftPaidBack !== "not paid") {
         const paidText =
-          draftData.isPaid === "paid" ? i18n.t("paid") : i18n.t("notPaidLabel");
+          draftPaidBack === "paid"
+            ? i18n.t("paid")
+            : i18n.t("notPaidLabel");
         changedItems.push(`• ${i18n.t("paymentStatus")}: ${paidText}`);
       }
       if (draftData.isSpecialExpense) {
@@ -985,8 +990,8 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               if (draftData.duplOrSplit !== undefined) {
                 setDuplOrSplit(draftData.duplOrSplit);
               }
-              if (draftData.isPaid) {
-                setIsPaid(draftData.isPaid);
+              if (draftPaidBack) {
+                setPaidBack(draftPaidBack);
               }
               if (draftData.isSpecialExpense !== undefined) {
                 setIsSpecialExpense(draftData.isSpecialExpense);
@@ -1039,25 +1044,25 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     [scheduleDraftSave]
   );
 
-  const setIsPaidWithAutoSave = useCallback(
+  const setPaidBackWithAutoSave = useCallback(
     (value) => {
-      didUserChangeIsPaidRef.current = true;
-      setIsPaid(value);
+      didUserChangePaidBackRef.current = true;
+      setPaidBack(value);
       trackEvent(VexoEvents.EXPENSE_PAID_TOGGLE_CHANGED, {
-        isPaid: value === isPaidString.paid,
+        paidBack: value === isPaidString.paid,
       });
       scheduleDraftSave();
     },
     [scheduleDraftSave]
   );
 
-  // If the edited expense changes (or effectiveIsPaid changes due to settlement timestamp),
+  // If the edited expense changes (or effectivePaidBack changes due to settlement timestamp),
   // only sync local UI state if the user hasn't manually changed it in this session.
   useEffect(() => {
     if (!isEditing) return;
-    if (didUserChangeIsPaidRef.current) return;
-    setIsPaid(effectiveIsPaid);
-  }, [effectiveIsPaid, isEditing, editingValues?.id]);
+    if (didUserChangePaidBackRef.current) return;
+    setPaidBack(effectivePaidBack);
+  }, [effectivePaidBack, isEditing, editingValues?.id]);
 
   const setIsSpecialExpenseWithAutoSave = useCallback(
     (value) => {
@@ -1253,7 +1258,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       splitList: splitList,
       duplOrSplit: duplOrSplit,
       iconName: iconName,
-      isPaid: isPaid,
+      paidBack: paidBack,
       isSpecialExpense: isSpecialExpense,
       alreadyDividedAmountByDays: alreadyDividedAmountByDays,
     };
@@ -1373,7 +1378,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       listEQUAL: extractUserNames(currentTravellers),
       splitList: splitList,
       iconName: iconName,
-      isPaid: isPaid,
+      paidBack: paidBack,
       isSpecialExpense: isSpecialExpense,
       duplOrSplit: duplOrSplit,
     };
@@ -1496,7 +1501,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     </Pressable>
   );
 
-  const isPaidJSX = (
+  const paidBackJSX = (
     <View style={styles.isPaidContainer}>
       {isOverridden ? (
         <View style={{ padding: 8 }}>
@@ -1511,10 +1516,10 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         </View>
       ) : (
         <SegmentedButtons
-          value={isPaid}
+          value={paidBack}
           onValueChange={(value: string) => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setIsPaidWithAutoSave(value);
+            setPaidBackWithAutoSave(value);
           }}
           buttons={[
             {
@@ -1524,11 +1529,13 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               style: [
                 {
                   backgroundColor:
-                    isPaid == isPaidString.paid
+                    paidBack == isPaidString.paid
                       ? GlobalStyles.colors.gray500
                       : GlobalStyles.colors.gray300,
                 },
-                isPaid == isPaidString.paid ? GlobalStyles.strongShadow : null,
+                paidBack == isPaidString.paid
+                  ? GlobalStyles.strongShadow
+                  : null,
               ],
             },
             {
@@ -1538,11 +1545,11 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               style: [
                 {
                   backgroundColor:
-                    isPaid == isPaidString.notPaid
+                    paidBack == isPaidString.notPaid
                       ? GlobalStyles.colors.gray500
                       : GlobalStyles.colors.gray300,
                 },
-                isPaid == isPaidString.notPaid
+                paidBack == isPaidString.notPaid
                   ? GlobalStyles.strongShadow
                   : null,
               ],
@@ -2339,7 +2346,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                     ></FlatList>
                   </KeyboardAvoidingView>
                 )}
-                {!splitTypeSelf && splitListHasNonZeroEntries && isPaidJSX}
+                {!splitTypeSelf && splitListHasNonZeroEntries && paidBackJSX}
                 {isSpecialExpenseJSX}
               </Animated.View>
             )}

@@ -57,8 +57,8 @@ The net amount one traveller owes another on a trip, rolled up across expenses. 
 _Avoid_: Open split (UI copy), debt (marketing copy)
 
 **Paid back**:
-Per-expense status: the travellers’ shares for that expense have been reimbursed to whoever paid. Expenses not yet paid back still count toward open **Balances**. (Code field: `isPaid`.)
-_Avoid_: Paid (ambiguous with who paid upfront), isPaid (implementation name)
+Per-expense status: the travellers’ shares for that expense have been reimbursed to whoever paid. Expenses not yet paid back still count toward open **Balances**. (Code field: `paidBack`.)
+_Avoid_: Paid (ambiguous with who paid upfront), isPaid (legacy field name)
 
 **Who paid**:
 The traveller who fronted the money for an expense (before **Splits** allocate shares among travellers). Distinct from **Paid back** (whether shares have been reimbursed).
@@ -122,7 +122,7 @@ Places where English UI copy or code identifiers still diverge from domain langu
 | Surface | Current wording / field | Domain term | Notes |
 | ------- | ----------------------- | ----------- | ----- |
 | Trip setup (i18n) | ~~“Base Currency”~~ → home / Heimatwährung / domicile copy (#221) | **Trip currency** | Aligned in #221 for EN/DE/FR/RU trip-currency alerts, info modals, and TripForm change-currency confirm. |
-| Expense / trip models | `isPaid`, `isPaidTimestamp` | **Paid back**, **Settlement** (trip-wide) | `isPaid` is per-expense paid-back status; trip `isPaid` + timestamp drive trip-wide **Settlement**. |
+| Expense / trip models | ~~`isPaid` (per expense)~~ → `paidBack`; `isPaid` + `isPaidTimestamp` on trip | **Paid back**, **Settlement** (trip-wide) | Per-expense **Paid back** uses `paidBack` (#224). Trip `isPaid` + `isPaidTimestamp` still name trip-wide **Settlement** (follow-up rename optional). |
 | Split Summary UI (i18n) | ~~“open splits”, “Calculate open splits”, “No open splits”~~ → balance copy (#222) | **Balance** | Aligned in #222 for EN/DE/FR/RU: balances wording, button helpers, Settlement vs Balance simplification labels. |
 | Split Summary UI (i18n) | ~~“settle splits”, “Could not settle splits”~~ → Settlement copy (#222) | **Settlement** | Aligned in #222; trip-wide settle actions and toasts use Settlement language. |
 | Split Summary UI (i18n) | ~~“simplify splits”, “Could not simplify splits”~~ → Balance simplification copy (#222) | **Balance simplification** | Aligned in #222; “Simplify splits” + helper clarifies no money has moved. |

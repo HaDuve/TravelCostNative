@@ -35,7 +35,7 @@ import {
   ExpenseData,
   Split,
   isPaidString,
-  getEffectiveIsPaid,
+  getEffectivePaidBack,
 } from "../util/expense";
 import Animated from "react-native-reanimated";
 import { formatExpenseWithCurrency } from "../util/string";
@@ -181,7 +181,7 @@ const SplitSummaryScreen = ({ navigation }) => {
         const expensesList = expenses.filter((expense: ExpenseData) => {
           // Skip paid expenses
           if (
-            getEffectiveIsPaid(expense, isPaidTimestamp) === isPaidString.paid
+            getEffectivePaidBack(expense, isPaidTimestamp) === isPaidString.paid
           ) {
             return false;
           }

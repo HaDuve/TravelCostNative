@@ -42,7 +42,7 @@ export interface ExpenseData {
   listEQUAL?: string[];
   iconName?: string;
   rangeId?: string;
-  isPaid?: isPaidString;
+  paidBack?: isPaidString;
   isSpecialExpense?: boolean;
   editedTimestamp?: number;
   isDeleted?: boolean;
@@ -60,38 +60,64 @@ export enum isPaidString {
   notPaid = "not paid",
 }
 
+/** Legacy expense records (server, MMKV) may still use `isPaid`. */
+type ExpensePaidBackSource = {
+  paidBack?: unknown;
+  isPaid?: unknown;
+};
+
+function normalizePaidBackValue(value: unknown): isPaidString {
+  return value === isPaidString.paid ? isPaidString.paid : isPaidString.notPaid;
+}
+
+/** Read path: accept `paidBack` or legacy `isPaid` from sync payloads. */
+export function readPaidBackFromOnlineRecord(
+  record: ExpensePaidBackSource
+): isPaidString {
+  if (record.paidBack !== undefined && record.paidBack !== null) {
+    return normalizePaidBackValue(record.paidBack);
+  }
+  return normalizePaidBackValue(record.isPaid);
+}
+
+/** Stored per-expense paid-back flag (legacy `isPaid` field on old records). */
+export function getStoredPaidBack(expense: ExpenseData): isPaidString | undefined {
+  if (expense.paidBack !== undefined) {
+    return expense.paidBack;
+  }
+  const legacy = expense as ExpenseData & { isPaid?: isPaidString };
+  return legacy.isPaid;
+}
+
 /**
- * Computes the effective isPaid status for an expense based on timestamp override logic.
+ * Computes the effective paid-back status for an expense based on timestamp override logic.
  * If trip was settled (isPaidTimestamp exists) and expense was created/edited before settlement,
- * then the expense is effectively "paid" regardless of its stored isPaid value.
- *
- * @param expense - The expense data
- * @param tripIsPaidTimestamp - The timestamp when the trip was settled (in milliseconds)
- * @returns The effective isPaid status (paid or not paid)
+ * then the expense is effectively paid back regardless of its stored paidBack value.
  */
-export function getEffectiveIsPaid(
+export function getEffectivePaidBack(
   expense: ExpenseData,
   tripIsPaidTimestamp?: number
 ): isPaidString {
-  // If no trip settlement timestamp, use expense's stored isPaid value
   if (!tripIsPaidTimestamp || tripIsPaidTimestamp === 0) {
-    return expense.isPaid ?? isPaidString.notPaid;
+    return getStoredPaidBack(expense) ?? isPaidString.notPaid;
   }
 
-  // Get expense editedTimestamp, default to 0 if missing
   const expenseTimestamp = expense.editedTimestamp || 0;
 
-  // If trip was settled after expense was created/edited, override to "paid"
   if (tripIsPaidTimestamp > expenseTimestamp) {
     return isPaidString.paid;
   }
 
-  // Otherwise, use expense's stored isPaid value
-  return expense.isPaid ?? isPaidString.notPaid;
+  return getStoredPaidBack(expense) ?? isPaidString.notPaid;
 }
 
+/** @deprecated Use {@link getEffectivePaidBack}. */
+export const getEffectiveIsPaid = getEffectivePaidBack;
+
 export interface ExpenseDataOnline {
-  isPaid: string;
+  /** Write path uses `paidBack`; read path may still see legacy `isPaid`. */
+  paidBack?: string;
+  isPaid?: string;
   id?: string;
   uid?: string;
   splitType: splitType;
@@ -114,6 +140,16 @@ export interface ExpenseDataOnline {
   editedTimestamp?: string;
   isDeleted?: boolean;
   serverTimestamp?: number;
+}
+
+/** Write path: serialize expense for Firebase using `paidBack` only. */
+export function toExpenseOnline(expense: ExpenseData): ExpenseDataOnline {
+  const { paidBack, ...rest } = expense;
+  const legacy = expense as ExpenseData & { isPaid?: isPaidString };
+  const stored = paidBack ?? legacy.isPaid ?? isPaidString.notPaid;
+  const online = { ...rest, paidBack: stored } as ExpenseDataOnline & ExpenseData;
+  delete (online as ExpenseData & { isPaid?: isPaidString }).isPaid;
+  return online;
 }
 
 export interface Split {

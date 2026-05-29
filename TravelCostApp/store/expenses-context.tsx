@@ -153,6 +153,11 @@ function findOfflineCreatedDuplicateIndex(
   );
 }
 
+/** Expenses visible in the ledger (excludes deleted tombstones). */
+export function activeExpenses(expenses: ExpenseData[]): ExpenseData[] {
+  return expenses.filter((expense) => !expense.isDeleted);
+}
+
 export function mergeExpenseLists(
   state: ExpenseData[],
   newExpenses: ExpenseData[]
@@ -183,11 +188,6 @@ export function expensesReducer(state: ExpenseData[], action) {
       if (!newExpenses || newExpenses.length === 0) {
         return state;
       }
-
-      // Create array of deleted expense IDs from sync results
-      const deletedIds = newExpenses
-        .filter((expense) => expense.isDeleted === true)
-        .map((expense) => expense.id);
 
       // Create a map of existing expenses by ID for quick lookup
       const existingExpensesMap = new Map();
@@ -233,18 +233,13 @@ export function expensesReducer(state: ExpenseData[], action) {
         }
       });
 
-      // Filter out deleted expenses from the final set
-      const filteredExpenses = mergedExpenses.filter(
-        (expense) => !deletedIds.includes(expense.id)
-      );
-
       // Sort by date (newest first) and remove duplicates
       const getSortedState = (data: ExpenseData[]) =>
         data.sort((a: ExpenseData, b: ExpenseData) => {
           return Number(new Date(b.date)) - Number(new Date(a.date));
         });
 
-      const sorted = uniqBy(getSortedState(filteredExpenses), "id");
+      const sorted = uniqBy(getSortedState(mergedExpenses), "id");
       return sorted;
     }
     case "UPDATE": {
@@ -257,8 +252,23 @@ export function expensesReducer(state: ExpenseData[], action) {
       updatedExpenses[updatableExpenseIndex] = updatedItem;
       return updatedExpenses;
     }
-    case "DELETE":
-      return state.filter((expense) => expense.id !== action.payload);
+    case "DELETE": {
+      if (action.payload === "temp") {
+        return state.filter((expense) => expense.id !== action.payload);
+      }
+      const deleteIndex = state.findIndex(
+        (expense) => expense.id === action.payload,
+      );
+      if (deleteIndex === -1) {
+        return state;
+      }
+      const updatedExpenses = [...state];
+      updatedExpenses[deleteIndex] = {
+        ...updatedExpenses[deleteIndex],
+        isDeleted: true,
+      };
+      return updatedExpenses;
+    }
     case "UPDATE_ID": {
       const { oldId, newId } = action.payload;
       const expenseIndex = state.findIndex((expense) => expense.id === oldId);
@@ -517,10 +527,10 @@ function ExpensesContextProvider({ children }) {
           expenses = getYearlyExpenses(0).yearlyExpenses;
           return expenses;
         case "total":
-          return expensesState;
+          return activeExpenses(expensesState);
 
         default:
-          return expensesState;
+          return activeExpenses(expensesState);
       }
     },
     [
@@ -555,7 +565,7 @@ function ExpensesContextProvider({ children }) {
   );
 
   const filteredExpenses = useMemo(
-    () => expensesState.filter((expense) => !expense.isDeleted),
+    () => activeExpenses(expensesState),
     [expensesState]
   );
 

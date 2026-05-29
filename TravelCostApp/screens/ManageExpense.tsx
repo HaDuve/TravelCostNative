@@ -426,7 +426,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       }
       // IMPORTANT: don't mutate the shared expenseData object inside the loop.
       // Mutating can cause stale/incorrect state during rerenders (and can lead to loops),
-      // especially when toggling fields like isPaid on ranged expenses.
+      // especially when toggling fields like paidBack on ranged expenses.
       const updatedExpenseData: ExpenseData = {
         ...expenseData,
         date: newDate,

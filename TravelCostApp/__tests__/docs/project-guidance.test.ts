@@ -17,7 +17,7 @@ describe("project guidance (issue #220)", () => {
     expect(context).toMatch(/## Flagged ambiguities/);
     expect(context).toMatch(/Base Currency/i);
     expect(context).toMatch(/\*\*Trip currency\*\*/);
-    expect(context).toMatch(/`isPaid`/);
+    expect(context).toMatch(/`paidBack`/);
     expect(context).toMatch(/\*\*Paid back\*\*/);
     expect(context).toMatch(/open splits/i);
     expect(context).toMatch(/settle splits/i);

@@ -4,7 +4,7 @@ import {
   Split,
   ExpenseData,
   isPaidString,
-  getEffectiveIsPaid,
+  getEffectivePaidBack,
 } from "./expense";
 import { Traveller } from "./traveler";
 import { DateOrDateTime } from "./date";
@@ -366,11 +366,11 @@ export function rollupOpenBalances(
     // Skip expense if:
     // 1. Expense type is SELF
     // 2. Expense has no split list
-    // 3. Expense has effective isPaid status of "paid" (checked via timestamp override logic)
+    // 3. Expense is effectively paid back (checked via settlement timestamp override)
     if (
       expense.splitType === "SELF" ||
       !expense.splitList ||
-      getEffectiveIsPaid(expense, tripIsPaidTimestamp) === isPaidString.paid
+      getEffectivePaidBack(expense, tripIsPaidTimestamp) === isPaidString.paid
     ) {
       continue;
     }

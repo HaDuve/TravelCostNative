@@ -8,7 +8,10 @@ import {
 import { Category } from "./category";
 import type { TripData } from "../types/trip";
 import type { ExpenseData, ExpenseDataOnline } from "./expense";
-import { isPaidString } from "./expense";
+import {
+  readPaidBackFromOnlineRecord,
+  toExpenseOnline,
+} from "./expense";
 import { UserData } from "../store/user-context";
 
 import { i18n } from "../i18n/i18n";
@@ -28,10 +31,6 @@ import {
 
 const BACKEND_URL =
   "https://travelcostnative-default-rtdb.asia-southeast1.firebasedatabase.app";
-
-function normalizeIsPaid(value: unknown): isPaidString {
-  return value === isPaidString.paid ? isPaidString.paid : isPaidString.notPaid;
-}
 
 // Field name for server timestamp in expense data -- needs to be updated in .rules firebase backend
 export const SERVER_TIMESTAMP_FIELD = "serverTimestamp";
@@ -173,7 +172,7 @@ export async function storeExpense(
 
     // Add serverTimestamp to expense data
     const expenseDataWithTimestamp = {
-      ...expenseData,
+      ...toExpenseOnline(expenseData),
       [SERVER_TIMESTAMP_FIELD]: Date.now(),
     };
 
@@ -204,7 +203,7 @@ export async function storeExpenseWithId(
 
     // Add serverTimestamp to expense data
     const expenseDataWithTimestamp = {
-      ...expenseData,
+      ...toExpenseOnline(expenseData),
       [SERVER_TIMESTAMP_FIELD]: Date.now(),
     };
 
@@ -248,7 +247,7 @@ const processExpenseResponse = (data: any): ExpenseData[] => {
       categoryString: r.categoryString,
       duplOrSplit: r.duplOrSplit,
       rangeId: r.rangeId,
-      isPaid: normalizeIsPaid(r.isPaid),
+      paidBack: readPaidBackFromOnlineRecord(r),
       isSpecialExpense: r.isSpecialExpense,
       editedTimestamp: editedTimestamp,
       isDeleted: r.isDeleted || false,
@@ -375,7 +374,7 @@ export async function fetchExpenses(
           categoryString: r.categoryString,
           duplOrSplit: r.duplOrSplit,
           rangeId: r.rangeId,
-          isPaid: normalizeIsPaid(r.isPaid),
+          paidBack: readPaidBackFromOnlineRecord(r),
           isSpecialExpense: r.isSpecialExpense,
           editedTimestamp: editedTimestamp,
           isDeleted: r.isDeleted || false,
@@ -459,7 +458,7 @@ export async function updateExpense(
 
     // Add serverTimestamp to expense data
     const expenseDataWithTimestamp = {
-      ...expenseData,
+      ...toExpenseOnline(expenseData),
       [SERVER_TIMESTAMP_FIELD]: Date.now(),
     };
 

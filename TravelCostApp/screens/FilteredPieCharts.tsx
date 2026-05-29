@@ -1,20 +1,12 @@
 import { Platform, StyleSheet, Text, View } from "react-native";
 import React, { useCallback, useContext, useMemo, useState } from "react";
 import PropTypes from "prop-types";
-import Animated, {
-  FadeInLeft,
-  FadeInUp,
-  FadeOutDown,
-  FadeOutLeft,
-  FadeOutRight,
-} from "react-native-reanimated";
 
 import { i18n } from "../i18n/i18n";
 
 import IconButton from "../components/UI/IconButton";
 import * as Haptics from "expo-haptics";
 import { GlobalStyles } from "../constants/styles";
-import { FadeInRight } from "react-native-reanimated";
 import ExpenseCategories from "../components/ExpensesOutput/ExpenseStatistics/ExpenseCategories";
 import ExpenseTravellers from "../components/ExpensesOutput/ExpenseStatistics/ExpenseTravellers";
 import ExpenseCountries from "../components/ExpensesOutput/ExpenseStatistics/ExpenseCountries";
@@ -127,11 +119,7 @@ const FilteredPieCharts = ({ navigation, route }) => {
         </View>
 
         <View style={styles.titleContainer}>
-          <Animated.View
-            entering={FadeInLeft}
-            exiting={FadeOutLeft}
-            style={styles.chevronContainer}
-          >
+          <View style={styles.chevronContainer}>
             {/* "remove-outline" */}
             <IconButton
               icon={"chevron-back-outline"}
@@ -139,8 +127,8 @@ const FilteredPieCharts = ({ navigation, route }) => {
               onPress={previousHandler}
               color={GlobalStyles.colors.primaryGrayed}
             ></IconButton>
-          </Animated.View>
-          <Animated.View entering={FadeInUp} exiting={FadeOutDown}>
+          </View>
+          <View>
             <Text
               style={[
                 styles.titleText,
@@ -151,19 +139,15 @@ const FilteredPieCharts = ({ navigation, route }) => {
               {" "}
               {titleStrings[toggleGraphEnum]}{" "}
             </Text>
-          </Animated.View>
-          <Animated.View
-            entering={FadeInRight}
-            exiting={FadeOutRight}
-            style={styles.chevronContainer}
-          >
+          </View>
+          <View style={styles.chevronContainer}>
             <IconButton
               icon={"chevron-forward-outline"}
               size={24}
               onPress={nextHandler}
               color={GlobalStyles.colors.primaryGrayed}
             ></IconButton>
-          </Animated.View>
+          </View>
         </View>
       </View>
       <View style={styles.shadow}></View>

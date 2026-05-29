@@ -49,6 +49,9 @@ jest.mock("../../util/currencyExchange", () => ({
   getRate: jest.fn(async () => 1),
 }));
 
+jest.mock("../../components/UI/DatePickerContainer", () => () => null);
+jest.mock("../../components/UI/DatePickerModal", () => () => null);
+
 import ExpenseForm from "../../components/ManageExpense/ExpenseForm";
 import { i18n } from "../../i18n/i18n";
 import { makeExpense } from "../fixtures/expense";

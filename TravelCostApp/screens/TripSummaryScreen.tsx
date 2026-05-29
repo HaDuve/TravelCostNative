@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   Pressable,
+  ScrollView,
 } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../store/user-context";
@@ -39,7 +40,7 @@ import {
 } from "../store/mmkv";
 import { getTripData } from "../util/trip";
 import * as Progress from "react-native-progress";
-import Animated, { FadeIn, FadeOut, FadeInUp } from "react-native-reanimated";
+import Animated, { FadeInUp } from "react-native-reanimated";
 import ExpenseCountryFlag from "../components/ExpensesOutput/ExpenseCountryFlag";
 import GradientButton from "../components/UI/GradientButton";
 import { constantScale, dynamicScale, scale } from "../util/scalingUtil";
@@ -307,9 +308,7 @@ const TripSummaryScreen = ({ navigation }) => {
   }
   if (isFetching) return <LoadingBarOverlay></LoadingBarOverlay>;
   return (
-    <Animated.ScrollView
-      entering={FadeIn}
-      exiting={FadeOut}
+    <ScrollView
       style={{
         marginTop: dynamicScale(12, false, 0.5),
         paddingBottom: dynamicScale(48, false, 0.5),
@@ -644,7 +643,7 @@ const TripSummaryScreen = ({ navigation }) => {
           </GradientButton>
         )} */}
       </View>
-    </Animated.ScrollView>
+    </ScrollView>
   );
 };
 

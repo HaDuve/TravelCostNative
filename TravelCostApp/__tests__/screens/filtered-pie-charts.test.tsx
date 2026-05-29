@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Text } from "react-native";
 import { fireEvent } from "@testing-library/react-native";
 
 jest.mock("expo-haptics", () => ({
@@ -54,10 +53,16 @@ function renderScreen(routeOverrides: Record<string, unknown> = {}) {
   return { screen, navigation };
 }
 
-// The currently shown chart is identified by its title. Matched with a tight
-// regex because the title <Text> is padded with surrounding spaces.
-function expectActiveTitle(screen: ReturnType<typeof renderScreen>["screen"], title: string) {
-  expect(screen.getByText(new RegExp(`^\\s*${title}\\s*$`))).toBeTruthy();
+// The currently shown chart is identified by its title. `exact: false` does a
+// normalized substring match (the title <Text> is padded with surrounding
+// spaces) without treating the localized title as a regex — a translation
+// could otherwise contain regex metacharacters. The five titles have no
+// substring overlap, so the match stays unambiguous.
+function expectActiveTitle(
+  screen: ReturnType<typeof renderScreen>["screen"],
+  title: string
+) {
+  expect(screen.getByText(title, { exact: false })).toBeTruthy();
 }
 
 describe("FilteredPieCharts navigation arrows", () => {

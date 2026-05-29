@@ -1,5 +1,11 @@
 import type { splitType } from "./split";
 
+/** Matches ExpenseForm `setTimeout(…, 100)` between modal close and deferred reopen/effects. */
+export const MODAL_FLOW_DEFER_MS = 100;
+
+/** WHO_PAID picker sentinel; also used in ExpenseForm `onSelectItem`. */
+export const MODAL_FLOW_ADD_TRAVELLER = "__ADD_TRAVELLER__" as const;
+
 export const MODAL_FLOW_STATE = {
   CLOSED: "closed",
   WHO_PAID: "whoPaid",
@@ -10,6 +16,10 @@ export const MODAL_FLOW_STATE = {
 export type ModalFlowState =
   (typeof MODAL_FLOW_STATE)[keyof typeof MODAL_FLOW_STATE];
 
+/**
+ * Work scheduled after `next` is applied. The UI interpreter should wait
+ * {@link MODAL_FLOW_DEFER_MS} before applying `reopen` or `effects`.
+ */
 export type ModalFlowDeferred = {
   reopen?: ModalFlowState;
   effects?: ModalFlowEffect[];
@@ -27,7 +37,6 @@ export type ModalFlowResult = {
   effects: ModalFlowEffect[];
 };
 
-const ADD_TRAVELLER_VALUE = "__ADD_TRAVELLER__";
 const SPLIT_TYPE_EXACT = "EXACT";
 
 export function modalFlowReducer(
@@ -36,7 +45,7 @@ export function modalFlowReducer(
 ): ModalFlowResult {
   switch (current) {
     case MODAL_FLOW_STATE.WHO_PAID:
-      if (selectedValue === ADD_TRAVELLER_VALUE) {
+      if (selectedValue === MODAL_FLOW_ADD_TRAVELLER) {
         return {
           next: MODAL_FLOW_STATE.CLOSED,
           effects: [{ type: "NAVIGATE_SHARE" }],

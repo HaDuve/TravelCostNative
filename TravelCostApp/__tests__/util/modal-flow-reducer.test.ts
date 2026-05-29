@@ -1,11 +1,19 @@
 import type { splitType } from "../../util/split";
 import {
+  MODAL_FLOW_ADD_TRAVELLER,
+  MODAL_FLOW_DEFER_MS,
   MODAL_FLOW_STATE,
   type ModalFlowEffect,
   type ModalFlowResult,
   type ModalFlowState,
   modalFlowReducer,
 } from "../../util/modal-flow-reducer";
+
+describe("modal flow constants", () => {
+  it("documents the close-then-reopen delay used by ExpenseForm", () => {
+    expect(MODAL_FLOW_DEFER_MS).toBe(100);
+  });
+});
 
 type TransitionCase = {
   current: ModalFlowState;
@@ -42,7 +50,7 @@ const transitionTable: TransitionCase[] = [
   },
   {
     current: MODAL_FLOW_STATE.WHO_PAID,
-    selectedValue: "__ADD_TRAVELLER__",
+    selectedValue: MODAL_FLOW_ADD_TRAVELLER,
     expected: {
       next: MODAL_FLOW_STATE.CLOSED,
       effects: [{ type: "NAVIGATE_SHARE" }],

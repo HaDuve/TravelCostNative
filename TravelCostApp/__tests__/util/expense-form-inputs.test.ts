@@ -38,6 +38,10 @@ describe("resolveAmountValue", () => {
   it("uses temp amount when amount input is empty", () => {
     expect(resolveAmountValue("", "7")).toBe("7");
   });
+
+  it("returns empty string when both amount input and temp amount are empty", () => {
+    expect(resolveAmountValue("", "")).toBe("");
+  });
 });
 
 describe("applyFieldValidityToInputs", () => {

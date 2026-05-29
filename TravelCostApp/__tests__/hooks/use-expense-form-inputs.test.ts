@@ -1,7 +1,9 @@
 import { act, renderHook } from "@testing-library/react-native";
 
 import { useExpenseFormInputs } from "../../hooks/useExpenseFormInputs";
+import { validateExpenseData } from "../../util/expense-form-submit";
 import type { ExpenseFormInputsState } from "../../util/expense-form-inputs";
+import { makeExpense } from "../fixtures/expense";
 
 function makeInitialInputs(): ExpenseFormInputsState {
   return {
@@ -49,20 +51,15 @@ describe("useExpenseFormInputs", () => {
   });
 
   it("applies field validity flags from validateExpenseData", () => {
+    const { fieldValidity } = validateExpenseData(
+      makeExpense({ amount: 0, description: "   " })
+    );
     const { result } = renderHook(() =>
       useExpenseFormInputs({ initialInputs: makeInitialInputs() })
     );
 
     act(() => {
-      result.current.applyFieldValidity({
-        amount: false,
-        date: true,
-        description: false,
-        whoPaid: true,
-        category: true,
-        country: true,
-        currency: true,
-      });
+      result.current.applyFieldValidity(fieldValidity);
     });
 
     expect(result.current.inputs.amount.isValid).toBe(false);

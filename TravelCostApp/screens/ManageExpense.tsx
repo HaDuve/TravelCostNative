@@ -29,6 +29,7 @@ import {
   ExpenseData,
   Split,
 } from "../util/expense";
+import type { ExpenseFormSubmitPayload } from "../util/expense-form-submit";
 import { NetworkContext } from "../store/network-context";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import * as Haptics from "expo-haptics";
@@ -427,7 +428,9 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     }
   };
 
-  async function confirmHandler(expenseData: ExpenseData): Promise<void> {
+  async function confirmHandler(payload: ExpenseFormSubmitPayload): Promise<void> {
+    // Fast submit omits categoryString/calcAmount; this handler completes the shape.
+    const expenseData = payload as ExpenseData;
     try {
       // set the category to the corresponting catstring
       expenseData.categoryString = getCatLocalized(expenseData.category);

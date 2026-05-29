@@ -58,6 +58,11 @@ export type BuiltFastExpenseData = Omit<
   "calcAmount" | "categoryString" | "alreadyDividedAmountByDays"
 >;
 
+/** Payload from ExpenseForm before ManageExpense fills FX/category fields. */
+export type ExpenseFormSubmitPayload =
+  | BuiltAdvancedExpenseData
+  | BuiltFastExpenseData;
+
 function sharedExpenseCore(snapshot: ExpenseFormSnapshot) {
   return {
     uid: snapshot.uid,

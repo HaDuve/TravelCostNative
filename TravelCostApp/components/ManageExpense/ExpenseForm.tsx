@@ -58,6 +58,7 @@ import {
   buildFastExpenseData,
   validateExpenseData,
   type ExpenseFormSnapshot,
+  type ExpenseFormSubmitPayload,
 } from "../../util/expense-form-submit";
 import type { ExpenseFormInputsState } from "../../util/expense-form-inputs";
 import {
@@ -150,7 +151,7 @@ const splitTypes: { [key: string]: splitType } & {
 
 export type ExpenseFormProps = {
   onCancel: () => void;
-  onSubmit: (expenseData: ExpenseData) => Promise<void>;
+  onSubmit: (expenseData: ExpenseFormSubmitPayload) => Promise<void>;
   submitButtonLabel: string;
   isEditing: boolean;
   defaultValues: ExpenseData;

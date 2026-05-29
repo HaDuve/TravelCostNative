@@ -9,6 +9,7 @@
  */
 
 const { spawnSync } = require("child_process");
+const { getBuildProfileEnvironment } = require("./eas-profiles");
 
 function usageAndExit(message) {
   if (message) console.error(message);
@@ -68,7 +69,17 @@ function main() {
     "--non-interactive",
   ]);
 
-  run("eas", ["update", "--branch", opts.branch, "--message", opts.message]);
+  const environment = getBuildProfileEnvironment(opts.profile);
+  run("eas", [
+    "update",
+    "--branch",
+    opts.branch,
+    "--environment",
+    environment,
+    "--non-interactive",
+    "--message",
+    opts.message,
+  ]);
 }
 
 main();

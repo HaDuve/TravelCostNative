@@ -8,11 +8,11 @@
     "test": "jest",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "update:production": "eas update --branch production --message",
-    "update:alpha": "eas update --branch alpha --message",
-    "update:staging": "eas update --branch staging --message",
-    "update:dev": "eas update --branch dev --message",
-    "update": "eas update --auto",
+    "update:production": "node scripts/eas-update.js --target production",
+    "update:alpha": "node scripts/eas-update.js --target alpha",
+    "update:staging": "node scripts/eas-update.js --target staging",
+    "update:dev": "node scripts/eas-update.js --target dev",
+    "update": "eas update --auto --non-interactive",
     "build:production:ios": "eas build --platform ios --profile production --non-interactive",
     "build:production:android": "eas build --platform android --profile production --non-interactive",
     "build:production:all": "eas build --platform all --profile production --non-interactive",
@@ -41,7 +41,8 @@
     "submit+update:alpha:android": "node scripts/submit-and-update.js --platform android --profile alpha --branch alpha --message",
     "migrate:timestamps": "node scripts/migrate-server-timestamps.js",
     "migrate:timestamps:now": "node scripts/migrate-server-timestamps.js --now-timestamp",
-    "version:bump": "node scripts/bump-app-version.js"
+    "version:bump": "node scripts/bump-app-version.js",
+    "version:bump:eas": "node scripts/bump-app-version.js --eas"
   },
   "dependencies": {
     "@babel/runtime": "^7.22.5",

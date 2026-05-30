@@ -50,6 +50,7 @@ jest.mock("../../components/UI/DatePickerModal", () => () => null);
 
 import FinderScreen from "../../screens/FinderScreen";
 import {
+  FINDER_FILTER_CLEAR_SLOT_WIDTH,
   FINDER_FILTER_CONTENT_WIDTH,
   finderFilterRowStyles,
 } from "../../styles/finder-filter-row-styles";
@@ -169,6 +170,50 @@ describe("Finder screen", () => {
       "finder-search-filter-clear-slot"
     ).width;
     expect(widthAfter).toBe(widthBefore);
-    expect(widthAfter).toBe(finderFilterRowStyles.clearColumn.width);
+    expect(widthAfter).toBe(FINDER_FILTER_CLEAR_SLOT_WIDTH);
+  });
+
+  it("keeps the date clear column width when the filter becomes active", async () => {
+    const screen = renderWithAppProviders(<FinderScreen />, {
+      wrapNavigation: false,
+      expenses: { expenses: [] },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Finder")).toBeTruthy();
+    });
+
+    const widthBefore = flattenStyle(
+      screen,
+      "finder-date-filter-clear-slot"
+    ).width;
+
+    fireEvent.press(screen.getAllByRole("checkbox")[1]);
+
+    const widthAfter = flattenStyle(screen, "finder-date-filter-clear-slot")
+      .width;
+    expect(widthAfter).toBe(widthBefore);
+    expect(widthAfter).toBe(FINDER_FILTER_CLEAR_SLOT_WIDTH);
+  });
+
+  it("uses the same clear column width on search and date filter rows", async () => {
+    const screen = renderWithAppProviders(<FinderScreen />, {
+      wrapNavigation: false,
+      expenses: { expenses: [] },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Finder")).toBeTruthy();
+    });
+
+    const searchClear = flattenStyle(
+      screen,
+      "finder-search-filter-clear-slot"
+    );
+    const dateClear = flattenStyle(screen, "finder-date-filter-clear-slot");
+
+    expect(searchClear.width).toBe(dateClear.width);
+    expect(searchClear.width).toBe(FINDER_FILTER_CLEAR_SLOT_WIDTH);
+    expect(searchClear.width).toBe(finderFilterRowStyles.clearColumn.width);
   });
 });

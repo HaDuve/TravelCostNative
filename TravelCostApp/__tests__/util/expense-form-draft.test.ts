@@ -122,6 +122,21 @@ describe("draft round-trip", () => {
       dateFromIso(snapshot.dateIso).toISOString()
     );
   });
+
+  it("restores dates after MMKV-style JSON round-trip (ISO strings)", () => {
+    const draft = toExpenseDraft(makeExpenseFormSnapshot());
+    const fromStorage = JSON.parse(
+      JSON.stringify(draft)
+    ) as typeof draft;
+
+    const restored = applyDraftToForm(fromStorage);
+
+    expect(restored.inputs?.date?.value).toBe(
+      dateFromIso("2026-01-15").toISOString()
+    );
+    expect(restored.startDate).toBe(dateFromIso("2026-01-15").toISOString());
+    expect(restored.endDate).toBe(dateFromIso("2026-01-16").toISOString());
+  });
 });
 
 describe("summarizeDraftChanges", () => {

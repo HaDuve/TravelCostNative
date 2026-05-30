@@ -52,6 +52,17 @@ export type BuiltAdvancedExpenseData = ExpenseData & {
   alreadyDividedAmountByDays: boolean;
 };
 
+/** Fast submit deliberately omits these fields (see issue #270). */
+export type BuiltFastExpenseData = Omit<
+  ExpenseData,
+  "calcAmount" | "categoryString" | "alreadyDividedAmountByDays"
+>;
+
+/** Payload from ExpenseForm before ManageExpense fills FX/category fields. */
+export type ExpenseFormSubmitPayload =
+  | BuiltAdvancedExpenseData
+  | BuiltFastExpenseData;
+
 function sharedExpenseCore(snapshot: ExpenseFormSnapshot) {
   return {
     uid: snapshot.uid,
@@ -101,7 +112,7 @@ export function buildExpenseData(
 
 export function buildFastExpenseData(
   snapshot: ExpenseFormSnapshot
-): ExpenseData {
+): BuiltFastExpenseData {
   const rangeDate = DateTime.fromISO(snapshot.startDateIso).toJSDate();
 
   return {

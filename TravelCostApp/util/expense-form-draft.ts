@@ -63,17 +63,17 @@ export function toExpenseDraft(
   };
 }
 
-function convertToISOString(dateValue: DateOrDateTime): string {
+/** MMKV JSON persistence stores dates as ISO strings at runtime. */
+type DraftDateValue = DateOrDateTime | string;
+
+function convertToISOString(dateValue: DraftDateValue): string {
   if (typeof dateValue === "string") {
     return dateValue;
   }
   if (dateValue instanceof Date) {
     return dateValue.toISOString();
   }
-  if (dateValue && typeof (dateValue as { toJSDate?: () => Date }).toJSDate === "function") {
-    return (dateValue as { toJSDate: () => Date }).toJSDate().toISOString();
-  }
-  return new Date(dateValue as string | number).toISOString();
+  return dateValue.toJSDate().toISOString();
 }
 
 function readDraftPaidBack(

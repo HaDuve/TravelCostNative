@@ -38,7 +38,7 @@ export type TripContextType = {
   addTrip: ({ tripName, tripTotalBudget }) => void;
   deleteTrip: (tripid: string) => void;
   getcurrentTrip: () => TripData;
-  setCurrentTrip: (tripid: string, trip: TripData) => Promise<void>;
+  setCurrentTrip: (tripid: string, trip: TripData) => Promise<TripData | void>;
   fetchAndSetCurrentTrip: (tripid: string) => Promise<TripData>;
   saveTripDataInStorage: (tripData: TripData) => Promise<void>;
   loadTripDataFromStorage: () => Promise<TripData>;
@@ -77,7 +77,7 @@ export const TripContext = createContext<TripContextType>({
     const tripData = {} as TripData;
     return tripData;
   },
-  setCurrentTrip: async (tripid: string, trip: TripData) => {},
+  setCurrentTrip: async (tripid: string, trip: TripData) => undefined,
   fetchAndSetCurrentTrip: async (tripid: string): Promise<TripData> => {
     return {};
   },
@@ -216,7 +216,10 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     }
   }
 
-  async function setCurrentTrip(tripid: string, trip: TripData) {
+  async function setCurrentTrip(
+    tripid: string,
+    trip: TripData
+  ): Promise<TripData | void> {
     if (!trip) return;
     if (tripid === "reset") {
       _setTripid("");
@@ -234,7 +237,7 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
       return;
     }
 
-    const hydratedTrip = hydrateTrip({ ...trip, tripid });
+    const hydratedTrip = hydrateTrip({ ...trip, tripid: trip.tripid ?? tripid });
 
     _setTripid(tripid);
     setTripName(hydratedTrip.tripName);
@@ -260,6 +263,8 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
       });
       setTravellers(extractedTravellers);
     }
+
+    return hydratedTrip;
   }
 
   async function fetchAndSetCurrentTrip(tripid: string) {
@@ -271,8 +276,8 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
       if (!trip) throw new Error("no trip found");
       trip.tripid = tripid;
 
-      const migratedTrip = hydrateTrip(trip);
-      await setCurrentTrip(tripid, trip);
+      const migratedTrip = await setCurrentTrip(tripid, trip);
+      if (!migratedTrip) return;
 
       // If migration occurred, save migrated trip back to database and storage
       if (
@@ -355,9 +360,11 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     if (tripData) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const hadDeprecatedTotalSum = "totalSum" in (tripData as any);
-      const migratedTrip = hydrateTrip(tripData);
-
-      await setCurrentTrip(tripData.tripid ?? "", tripData);
+      const migratedTrip = await setCurrentTrip(tripData.tripid ?? "", tripData);
+      if (!migratedTrip) {
+        setIsLoading(false);
+        return;
+      }
 
       try {
         await loadTravellersFromStorage();

@@ -54,6 +54,22 @@ describe("hydrateTrip", () => {
     expect(hydrated.dailyBudget).toBe("0.0001");
   });
 
+  it.each([
+    ["empty isPaidDate", ""],
+    ["invalid isPaidDate", "not-a-date"],
+  ])("does not set isPaidTimestamp for %s", (_label, isPaidDate) => {
+    const raw = minimalTrip({
+      isPaid: isPaidString.paid,
+      isPaidDate,
+      isPaidTimestamp: undefined,
+    });
+
+    const hydrated = hydrateTrip(raw);
+
+    expect(hydrated.isPaidTimestamp).toBeUndefined();
+    expect(hydrated.isPaid).toBe(isPaidString.paid);
+  });
+
   it("preserves isDynamicDailyBudget when set on raw trip", () => {
     const hydrated = hydrateTrip(
       minimalTrip({ isDynamicDailyBudget: true })

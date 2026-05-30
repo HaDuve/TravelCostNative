@@ -5,11 +5,14 @@ import { isPaidString } from "./expense";
 export function hydrateTrip(raw: TripData): TripData {
   if (!raw) return raw;
 
-  const trip: TripData = { ...raw };
-  if ("totalSum" in trip) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    delete (trip as any).totalSum;
-  }
+  const trip: TripData =
+    "totalSum" in raw
+      ? (() => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+          const { totalSum, ...rest } = raw as any;
+          return rest as TripData;
+        })()
+      : { ...raw };
 
   if (trip.isPaidDate && !trip.isPaidTimestamp) {
     const date = new Date(trip.isPaidDate);

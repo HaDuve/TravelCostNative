@@ -19,6 +19,7 @@ import {
   ExpenseData,
   findMostDuplicatedDescriptionExpenses,
 } from "../../util/expense";
+import { expensesForTemplateSelection } from "../../util/template-expense-pool";
 import uniqBy from "lodash.uniqby";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { safelyParseJSON } from "../../util/jsonParse";
@@ -34,14 +35,18 @@ const AddExpenseButton = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
   const expCtx = useContext(ExpensesContext);
 
+  const templateSourceExpenses = expensesForTemplateSelection(expCtx.expenses);
+
   const lastExpenses: ExpenseData[] = uniqBy(
-    [...expCtx.expenses].sort((a, b) => {
+    [...templateSourceExpenses].sort((a, b) => {
       return (b.editedTimestamp ?? 0) - (a.editedTimestamp ?? 0);
     }),
     "description"
   );
 
-  const topDuplicates = findMostDuplicatedDescriptionExpenses(expCtx.expenses);
+  const topDuplicates = findMostDuplicatedDescriptionExpenses(
+    templateSourceExpenses
+  );
 
   const [lastExpensesNumber, setLastExpensesNumber] = useState(PageLength);
   const [templatePickerVisible, setTemplatePickerVisible] = useState(false);

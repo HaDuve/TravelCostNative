@@ -31,8 +31,12 @@ _Avoid_: History (alone — implies completed trips only)
 ### Expenses
 
 **Expense**:
-A recorded cost on a trip — amount, when it applies, category, who paid, and how it is shared among travellers.
+A recorded cost on a trip — amount, when it applies, **Description**, category, who paid, and how it is shared among travellers.
 _Avoid_: Transaction, entry, payment
+
+**Description**:
+The expense label in the ledger (e.g. “Coffee with Ana”). When left empty on save, defaults to the localized category label.
+_Avoid_: Name (ambiguous with trip name), title
 
 **Ranged expense**:
 An expense whose cost applies across a span of dates (e.g. monthly accommodation), as opposed to a single calendar day. A ranged expense is still an **Expense**; “ranged” names the multi-day shape.
@@ -45,6 +49,36 @@ _Avoid_: Removed expense, archived expense, trash
 **Special expense**:
 An expense flagged to stay off budget charts and spending summaries when the viewer hides special expenses. It is still a normal **Expense** for **Splits** and **Balances** — included in split calculations and visible on split summaries like any other expense.
 _Avoid_: Private expense, excluded expense
+
+**Draft restoration**:
+Resume an interrupted expense form from local draft — restore or discard on reopen. New add: **Restored expense**; edit: **Edit resumption**.
+_Avoid_: Autosave (implementation), unsaved changes (UI copy only)
+
+#### Creation paths
+
+How a User starts or resumes a new **Expense** on the **Active trip**. Entry path sets starting state; save shape is **Fast expense** or **Advanced expense** (advanced options collapsed or visible at submit).
+
+**Fast expense**:
+Save shape with advanced options collapsed — usually category-first quick-add (amount, optional **Description**). Country, currency, who paid, and split default from recent use or trip context.
+_Avoid_: Quick expense (vague), category expense (ambiguous with category field)
+
+**Advanced expense**:
+New-expense save with advanced options visible at submit — **User** expanded them or always-show-advanced is on. Country, currency, dates, who paid, splits, etc. are validated.
+_Avoid_: Full expense (vague), manual expense
+
+**Restored expense**:
+New **Expense** via **Draft restoration** after the User left mid-add.
+_Avoid_: Recovered draft, unsaved expense
+
+**Template expense**:
+New **Expense** prefilled from a prior one — long-press +, pick a recent entry (most-used / last-used groupings are UI only). Fields copy over; date → today. New ledger row, not a duplicate.
+_Avoid_: Duplicate expense (conflicts with **Ranged duplicate**), copy expense, expense from history
+
+#### Editing
+
+**Edit resumption**:
+Edit an existing **Expense** via **Draft restoration** — same prompt as **Restored expense**, but the expense is already on the trip.
+_Avoid_: Resume edit, draft edit
 
 ### Money flow
 
@@ -127,6 +161,7 @@ Places where English UI copy or code identifiers still diverge from domain langu
 | Split Summary UI (i18n) | ~~“settle splits”, “Could not settle splits”~~ → Settlement copy (#222) | **Settlement** | Aligned in #222; trip-wide settle actions and toasts use Settlement language. |
 | Split Summary UI (i18n) | ~~“simplify splits”, “Could not simplify splits”~~ → Balance simplification copy (#222) | **Balance simplification** | Aligned in #222; “Simplify splits” + helper clarifies no money has moved. |
 | Trip setup (i18n) | ~~“Trip Budget” as the named entity in alerts; FR/RU titles as budget container~~ → Trip copy (#223) | **Trip** | `enterNameAlert` names the trip in EN/DE/FR/RU; EN keeps “New Trip Budget” / “Edit Trip Budget” as form screen titles only; FR/RU titles use voyage / поездка like DE Reise. |
+| Expense form (i18n) | “unsaved changes”, “restore”, “discard” | **Draft restoration** | UI copy for restore-or-discard on reopen; prefer domain term in new comments and docs. |
 
 ## Example dialogue
 
@@ -144,3 +179,9 @@ Places where English UI copy or code identifiers still diverge from domain langu
 
 **Dev:** Split Summary shows fewer lines after “simplify” — did they pay?  
 **Expert:** No — that’s **Balance simplification**, fewer payments needed. **Settlement** is when money actually moved.
+
+**Dev:** Alice long-presses + and picks “Coffee €4.50” from last week — new expense or edit?  
+**Expert:** **Template expense** — new row today, prefilled from the old one. Not **Edit resumption**.
+
+**Dev:** She saves without opening advanced — **Fast expense** or **Template expense**?  
+**Expert:** Both. **Template expense** = entry path; **Fast expense** = save shape.

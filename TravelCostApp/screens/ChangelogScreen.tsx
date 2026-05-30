@@ -9,6 +9,8 @@ import { VersionCheckResponse, versionCheck } from "../util/version";
 import InfoButton from "../components/UI/InfoButton";
 import { parseChangelog } from "../util/parseChangelog";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import StaticList from "../components/UI/StaticList";
+import { ChangelogItem } from "../util/parseChangelog";
 import { Pressable } from "react-native";
 import * as Haptics from "expo-haptics";
 import { NetworkContext } from "../store/network-context";
@@ -18,12 +20,12 @@ import { constantScale } from "../util/scalingUtil";
 
 import { i18n } from "../i18n/i18n";
 
-function renderChangelogItem(item) {
+function renderChangelogItem({ item }: { item: ChangelogItem }) {
   return (
     <View style={[styles.changelogContainer, GlobalStyles.strongShadow]}>
       <Text style={styles.changelogText}>
-        {item.item.versionString}
-        {item.item.changes} {"\n"}
+        {item.versionString}
+        {item.changes} {"\n"}
       </Text>
     </View>
   );
@@ -64,7 +66,7 @@ const ChangelogScreen = ({ navigation }) => {
     }
     const fallBackVersion = getMMKVString(MMKV_KEYS.CURRENT_VERSION);
     if (fallBackVersion) {
-      setCurrentVersion(fallBackVersion);
+      setMMKVString(MMKV_KEYS.CURRENT_VERSION, fallBackVersion);
     }
     setIsFetching(false);
   }, []);
@@ -128,11 +130,13 @@ const ChangelogScreen = ({ navigation }) => {
         <Text style={styles.subHeaderText}>{i18n.t("whatsNew")}</Text>
       </Pressable>
       {showNewChanges && (
-        <Animated.FlatList
-          entering={FadeInUp}
-          data={parsedNewChanges}
-          renderItem={renderChangelogItem}
-        ></Animated.FlatList>
+        <Animated.View entering={FadeInUp}>
+          <StaticList
+            data={parsedNewChanges}
+            keyExtractor={(item) => item.versionString}
+            renderItem={renderChangelogItem}
+          />
+        </Animated.View>
       )}
       <Pressable
         onPress={() => {
@@ -148,11 +152,13 @@ const ChangelogScreen = ({ navigation }) => {
         <Text style={styles.subHeaderText}>{i18n.t("otherChanges")}</Text>
       </Pressable>
       {showOldChanges && (
-        <Animated.FlatList
-          entering={FadeInUp}
-          data={parsedOldChanges}
-          renderItem={renderChangelogItem}
-        ></Animated.FlatList>
+        <Animated.View entering={FadeInUp}>
+          <StaticList
+            data={parsedOldChanges}
+            keyExtractor={(item) => item.versionString}
+            renderItem={renderChangelogItem}
+          />
+        </Animated.View>
       )}
       {/* <Pressable
         onPress={() => {

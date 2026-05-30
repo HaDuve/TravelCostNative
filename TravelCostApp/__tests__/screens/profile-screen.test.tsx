@@ -35,16 +35,26 @@ jest.mock("../../store/secure-storage", () => ({
 jest.mock("../../util/http", () => ({
   fetchChangelog: jest.fn(async () => null),
   storeExpoPushTokenInTrip: jest.fn(async () => {}),
+  fetchTripName: jest.fn(async () => "Japan 2026"),
+  getTravellers: jest.fn(async () => ({
+    travellers: [{ userName: "Alice" }, { userName: "Bob" }],
+  })),
+  getTripData: jest.fn(async () => ({
+    dailyBudget: "100",
+    totalBudget: "3000",
+    tripCurrency: "EUR",
+  })),
 }));
 
-jest.mock("../../store/mmkv", () => ({
-  getMMKVObject: jest.fn(() => null),
-  setMMKVObject: jest.fn(),
-  MMKV_KEYS: {
-    EXPO_PUSH_ASK: "EXPO_PUSH_ASK",
-    EXPO_PUSH_TOKEN_STATUS: "EXPO_PUSH_TOKEN_STATUS",
-  },
-}));
+jest.mock("../../store/mmkv", () => {
+  const actual = jest.requireActual("../../store/mmkv-keys");
+  return {
+    getMMKVObject: jest.fn(() => null),
+    setMMKVObject: jest.fn(),
+    MMKV_KEYS: actual.MMKV_KEYS,
+    MMKV_KEY_PATTERNS: actual.MMKV_KEY_PATTERNS,
+  };
+});
 
 jest.mock("../../components/Premium/PremiumConstants", () => ({
   setAttributesAsync: jest.fn(async () => {}),
@@ -69,6 +79,8 @@ jest.mock("../../components/FeedbackForm/FeedbackForm", () => () => null);
 
 import ProfileScreen from "../../screens/ProfileScreen";
 import { renderWithAppProviders } from "../fixtures/app-providers";
+import { assertNoNestedVerticalFlatLists } from "../helpers/scroll-composition";
+import { waitFor } from "@testing-library/react-native";
 
 describe("Profile screen", () => {
   it("shows the signed-in User name and My Trips section", () => {
@@ -97,5 +109,36 @@ describe("Profile screen", () => {
 
     expect(screen.getByText("Alice")).toBeTruthy();
     expect(screen.getByText("My Trips")).toBeTruthy();
+  });
+
+  it("does not nest vertical FlatList inside ScrollView when trips are listed", async () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
+        expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
+        user: {
+          userName: "Alice",
+          freshlyCreated: false,
+          tripHistory: ["t1"],
+          loadUserNameFromStorage: jest.fn(),
+          updateTripHistory: jest.fn(async () => {}),
+          needsTour: false,
+          setNeedsTour: jest.fn(),
+          hasNewChanges: false,
+          setHasNewChanges: jest.fn(),
+          setUserName: jest.fn(async () => {}),
+          setTripHistory: jest.fn(),
+        },
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Japan 2026/)).toBeTruthy();
+    });
+
+    assertNoNestedVerticalFlatLists(screen.root);
   });
 });

@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
+import StaticList from "../components/UI/StaticList";
 import {
   StyleSheet,
   Text,
   View,
-  FlatList,
   TouchableOpacity,
   Alert,
   Pressable,
@@ -384,14 +384,17 @@ const TripSummaryScreen = ({ navigation }) => {
                 >
                   {tripSummary.countries &&
                     tripSummary.countries.length > 0 && (
-                      <FlatList
-                        numColumns={Math.min(tripSummary.countries.length, 7)}
-                        scrollEnabled={false}
-                        data={tripSummary.countries}
-                        renderItem={(item) => {
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          flexWrap: "wrap",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {tripSummary.countries.map((country) => {
                           const countryFlag = (
                             <ExpenseCountryFlag
-                              countryName={item.item}
+                              countryName={country}
                               style={GlobalStyles.countryFlagStyle}
                               containerStyle={[
                                 { padding: dynamicScale(4, false, 0.5) },
@@ -400,12 +403,15 @@ const TripSummaryScreen = ({ navigation }) => {
                             ></ExpenseCountryFlag>
                           );
                           return (
-                            <View style={{ flexDirection: "row" }}>
+                            <View
+                              key={country}
+                              style={{ flexDirection: "row" }}
+                            >
                               {countryFlag}
                             </View>
                           );
-                        }}
-                      ></FlatList>
+                        })}
+                      </View>
                     )}
                   <Text
                     style={[
@@ -501,9 +507,10 @@ const TripSummaryScreen = ({ navigation }) => {
                       >
                         {i18n.t("travellers")} & {i18n.t("costs")}
                       </Text>
-                      <FlatList
+                      <StaticList
                         data={tripSummary.travellersAndTheirCosts}
-                        renderItem={(item) => (
+                        keyExtractor={(item) => item.traveller}
+                        renderItem={({ item }) => (
                           <View style={styles.travellerCostItem}>
                             <Text
                               style={[
@@ -511,7 +518,7 @@ const TripSummaryScreen = ({ navigation }) => {
                                 { fontWeight: "500" },
                               ]}
                             >
-                              {item.item.traveller}
+                              {item.traveller}
                             </Text>
                             <Text
                               style={[
@@ -523,13 +530,13 @@ const TripSummaryScreen = ({ navigation }) => {
                               ]}
                             >
                               {formatExpenseWithCurrency(
-                                item.item.cost.toFixed(2),
+                                item.cost.toFixed(2),
                                 tripSummary.currency
                               )}
                             </Text>
                           </View>
                         )}
-                      ></FlatList>
+                      />
                     </View>
                   )}
               </View>
@@ -551,42 +558,39 @@ const TripSummaryScreen = ({ navigation }) => {
         <Text style={styles.expandableHeaderTitle}>{i18n.t("myTrips")}</Text>
         {showTripList && (
           <Animated.View entering={FadeInUp}>
-            <FlatList
+            <StaticList
               data={allTrips}
-              scrollEnabled={false}
-              renderItem={(item) => {
-                return (
-                  <TouchableOpacity
-                    onPress={itemCheckBoxHandler.bind(this, item)}
+              keyExtractor={(item) => item.tripid}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={itemCheckBoxHandler.bind(this, { item })}
+                  style={[
+                    styles.tripItemContainer,
+                    item.selected
+                      ? GlobalStyles.shadowPrimary
+                      : GlobalStyles.shadow,
+                  ]}
+                >
+                  <Checkbox
+                    color={GlobalStyles.colors.primary700}
+                    status={item.selected ? "checked" : "unchecked"}
+                  ></Checkbox>
+                  <Text
                     style={[
-                      styles.tripItemContainer,
-                      item.item.selected
-                        ? GlobalStyles.shadowPrimary
-                        : GlobalStyles.shadow,
+                      styles.tripItemText,
+                      {
+                        fontWeight: "500",
+                        color: GlobalStyles.colors.gray700,
+                        flex: 1,
+                        marginLeft: dynamicScale(6, false, 0.5),
+                      },
                     ]}
                   >
-                    <Checkbox
-                      color={GlobalStyles.colors.primary700}
-                      status={item.item.selected ? "checked" : "unchecked"}
-                      // onPress={itemCheckBoxHandler.bind(this, item)}
-                    ></Checkbox>
-                    <Text
-                      style={[
-                        styles.tripItemText,
-                        {
-                          fontWeight: "500",
-                          color: GlobalStyles.colors.gray700,
-                          flex: 1,
-                          marginLeft: dynamicScale(6, false, 0.5),
-                        },
-                      ]}
-                    >
-                      {item.item.tripname}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              }}
-            ></FlatList>
+                    {item.tripname}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
           </Animated.View>
         )}
       </Pressable>

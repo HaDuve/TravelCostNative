@@ -34,6 +34,7 @@ const ExpenseGraph = ({
   startingPoint,
   tripCtx,
   navigation,
+  refreshControl,
 }) => {
   const { isPortrait } = useContext(OrientationContext);
 
@@ -520,6 +521,7 @@ const ExpenseGraph = ({
           exiting={FadeOutLeft.duration(500)}
           data={listExpenseSumBudgets}
           renderItem={renderItem}
+          refreshControl={refreshControl}
           ListHeaderComponent={
             <View
               style={[
@@ -572,6 +574,7 @@ ExpenseGraph.propTypes = {
   setLongerPeriodNum: PropTypes.func,
   startingPoint: PropTypes.number,
   setStartingPoint: PropTypes.func,
+  refreshControl: PropTypes.element,
 };
 
 const styles = StyleSheet.create({
@@ -607,6 +610,8 @@ const styles = StyleSheet.create({
   categoryCard: {
     height: dynamicScale(65, true),
     minWidth: dynamicScale(200),
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: dynamicScale(10, false, 0.5),
     ...Platform.select({
       ios: {
         shadowColor: "#000",
@@ -618,12 +623,7 @@ const styles = StyleSheet.create({
         shadowRadius: 2.84,
       },
       android: {
-        // elevation: 0,
-        // borderRadius: 1000,
-        // borderWidth: 1,
-        // borderColor: GlobalStyles.colors.gray600,
-        // marginHorizontal: 12,
-        // marginVertical: 4,
+        elevation: 5,
       },
     }),
   },
@@ -671,3 +671,5 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
 });
+
+export const expenseGraphStyles = styles;

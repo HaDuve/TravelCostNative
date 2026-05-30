@@ -13,7 +13,6 @@ import {
   StyleSheet,
   Text,
   View,
-  ScrollView,
   RefreshControl,
   Pressable,
 } from "react-native";
@@ -258,26 +257,24 @@ const OverviewScreen = ({ navigation }) => {
         ></View>
       }
 
-      <ScrollView
-        style={{ flex: 1 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing || isFetching}
-            onRefresh={onRefresh}
-            tintColor={GlobalStyles.colors.textColor}
-            colors={[GlobalStyles.colors.textColor]}
-            style={{
-              backgroundColor: "transparent",
-            }}
-          />
-        }
-      >
+      <View style={{ flex: 1 }}>
         <MemoizedExpensesOverview
           navigation={navigation}
           expenses={recentExpenses}
           periodName={PeriodValue}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing || isFetching}
+              onRefresh={onRefresh}
+              tintColor={GlobalStyles.colors.textColor}
+              colors={[GlobalStyles.colors.textColor]}
+              style={{
+                backgroundColor: "transparent",
+              }}
+            />
+          }
         />
-      </ScrollView>
+      </View>
 
       {/* FAB Toggle Button */}
       <TourGuideZone
@@ -354,6 +351,8 @@ const styles = StyleSheet.create({
   dropdownContainer: {
     maxWidth: dynamicScale(170, false, 0.5),
     marginTop: dynamicScale(2, true),
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: 10,
     ...Platform.select({
       ios: {
         shadowColor: GlobalStyles.colors.textColor,
@@ -362,7 +361,6 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
       },
       android: {
-        // marginTop: "2%",
         elevation: 8,
         borderRadius: 12,
       },
@@ -421,6 +419,10 @@ const styles = StyleSheet.create({
     marginLeft: constantScale(-49, 0.08), // Half of the svg width to center it
     zIndex: 1000,
     elevation: 10,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: 999,
     ...GlobalStyles.shadowGlowPrimary,
   },
 });
+
+export const overviewScreenStyles = styles;

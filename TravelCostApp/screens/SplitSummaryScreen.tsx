@@ -8,13 +8,16 @@ import React, {
 
 import { i18n } from "../i18n/i18n";
 
+import StaticList from "../components/UI/StaticList";
 import {
   Alert,
   FlatList,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   View,
+  ScrollView,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
@@ -41,7 +44,6 @@ import Animated from "react-native-reanimated";
 import { formatExpenseWithCurrency } from "../util/string";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
-import { Pressable, ScrollView } from "react-native";
 import { dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 import safeLogError from "../util/error";
@@ -457,41 +459,79 @@ const SplitSummaryScreen = ({ navigation }) => {
             {!isPortrait && ButtonContainerJSX}
           </View>
 
-          <FlatList
-            style={{
-              paddingHorizontal: dynamicScale(8, false, 0.5),
-              flex: 1,
-            }}
-            contentContainerStyle={{
-              paddingBottom: isPortrait ? 0 : dynamicScale(18, false, 0.5),
-            }}
-            data={splits}
-            scrollEnabled={!isPortrait}
-            ListHeaderComponent={
-              <View style={{ height: dynamicScale(20, false, 0.5) }}></View>
-            }
-            ListEmptyComponent={
-              isTripSettled ? (
-                <View style={{ padding: 20, alignItems: "center" }}>
-                  <Text
-                    style={[
-                      styles.subTitleText,
-                      { color: GlobalStyles.colors.primary500 },
-                    ]}
-                  >
-                    {i18n.t("noOpenSplitsAllSettled")}
-                  </Text>
-                </View>
-              ) : splits.length === 0 && !isFetching ? (
-                <View style={{ padding: 20, alignItems: "center" }}>
-                  <Text style={styles.subTitleText}>
-                    {i18n.t("noOpenSplits")}
-                  </Text>
-                </View>
-              ) : null
-            }
-            renderItem={renderSplitItem}
-          />
+          {isPortrait ? (
+            <StaticList
+              style={{
+                paddingHorizontal: dynamicScale(8, false, 0.5),
+                flex: 1,
+              }}
+              contentContainerStyle={{
+                paddingBottom: 0,
+              }}
+              data={splits}
+              keyExtractor={(item) => `${item.userName}-${item.whoPaid}`}
+              ListHeaderComponent={
+                <View style={{ height: dynamicScale(20, false, 0.5) }}></View>
+              }
+              ListEmptyComponent={
+                isTripSettled ? (
+                  <View style={{ padding: 20, alignItems: "center" }}>
+                    <Text
+                      style={[
+                        styles.subTitleText,
+                        { color: GlobalStyles.colors.primary500 },
+                      ]}
+                    >
+                      {i18n.t("noOpenSplitsAllSettled")}
+                    </Text>
+                  </View>
+                ) : splits.length === 0 && !isFetching ? (
+                  <View style={{ padding: 20, alignItems: "center" }}>
+                    <Text style={styles.subTitleText}>
+                      {i18n.t("noOpenSplits")}
+                    </Text>
+                  </View>
+                ) : null
+              }
+              renderItem={renderSplitItem}
+            />
+          ) : (
+            <FlatList
+              style={{
+                paddingHorizontal: dynamicScale(8, false, 0.5),
+                flex: 1,
+              }}
+              contentContainerStyle={{
+                paddingBottom: dynamicScale(18, false, 0.5),
+              }}
+              data={splits}
+              scrollEnabled={true}
+              ListHeaderComponent={
+                <View style={{ height: dynamicScale(20, false, 0.5) }}></View>
+              }
+              ListEmptyComponent={
+                isTripSettled ? (
+                  <View style={{ padding: 20, alignItems: "center" }}>
+                    <Text
+                      style={[
+                        styles.subTitleText,
+                        { color: GlobalStyles.colors.primary500 },
+                      ]}
+                    >
+                      {i18n.t("noOpenSplitsAllSettled")}
+                    </Text>
+                  </View>
+                ) : splits.length === 0 && !isFetching ? (
+                  <View style={{ padding: 20, alignItems: "center" }}>
+                    <Text style={styles.subTitleText}>
+                      {i18n.t("noOpenSplits")}
+                    </Text>
+                  </View>
+                ) : null
+              }
+              renderItem={renderSplitItem}
+            />
+          )}
         </View>
         {isPortrait && ButtonContainerJSX}
       </Animated.View>

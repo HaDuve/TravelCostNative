@@ -28,7 +28,7 @@ function TripList({ trips }) {
     >
       <FlatList
         data={uniqTrips}
-        scrollEnabled={isLandscape}
+        scrollEnabled={true}
         horizontal={isLandscape}
         ListFooterComponent={
           <View style={{ height: constantScale(150), width: "100%" }}></View>

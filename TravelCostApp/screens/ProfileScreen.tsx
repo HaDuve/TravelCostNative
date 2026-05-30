@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Text,
   View,
-  ScrollView,
 } from "react-native";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
@@ -323,7 +322,7 @@ const ProfileScreen = ({ navigation }) => {
           {i18n.t("supportFeedbackLabel")}
         </GradientButton>
       </View>
-      <ScrollView style={styles.tripContainer}>
+      <View style={styles.tripContainer}>
         <View style={styles.horizontalContainer}>
           <Text style={styles.tripListTitle}>{i18n.t("myTrips")}</Text>
           <TourGuideZone
@@ -360,7 +359,7 @@ const ProfileScreen = ({ navigation }) => {
         >
           <TripList trips={tripHistory}></TripList>
         </TourGuideZone>
-      </ScrollView>
+      </View>
       <View style={styles.horizontalButtonContainer}>
         <TourGuideZone
           text={i18n.t("walk7")}

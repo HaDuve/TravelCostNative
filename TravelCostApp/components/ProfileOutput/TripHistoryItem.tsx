@@ -1,9 +1,9 @@
+import StaticList from "../UI/StaticList";
 import {
   Pressable,
   StyleSheet,
   Text,
   View,
-  FlatList,
   Alert,
   useWindowDimensions,
 } from "react-native";
@@ -428,19 +428,20 @@ function TripHistoryItem({ tripid, trips }) {
 
   const dimensionChars = dynamicScale(25, false, 0.4);
 
-  function renderTravellers(item) {
-    if (!item.item?.userName) return <></>;
+  function renderTravellers({ item }: { item: { userName?: string } }) {
+    if (!item?.userName) return <></>;
     return (
-      <View style={[GlobalStyles.strongShadow, styles.travellerCard]}>
-        <View style={[styles.avatar, GlobalStyles.shadowPrimary]}>
-          <Text style={styles.avatarText}>
-            {/* TODO: Profile Picture for now replaced with first char of the name */}
-            {item.item?.userName?.charAt(0)}
+      <View style={{ width: "50%" }}>
+        <View style={[GlobalStyles.strongShadow, styles.travellerCard]}>
+          <View style={[styles.avatar, GlobalStyles.shadowPrimary]}>
+            <Text style={styles.avatarText}>
+              {item.userName.charAt(0)}
+            </Text>
+          </View>
+          <Text style={styles.travellerNameText}>
+            {truncateString(item.userName, 10)}
           </Text>
         </View>
-        <Text style={styles.travellerNameText}>
-          {truncateString(item.item.userName, 10)}
-        </Text>
       </View>
     );
   }
@@ -502,14 +503,13 @@ function TripHistoryItem({ tripid, trips }) {
             />
           </View>
         </View>
-        <FlatList
-          data={travellers}
-          renderItem={renderTravellers}
-          numColumns={2}
-          keyExtractor={(item) => {
-            return item.userName + tripid;
-          }}
-        ></FlatList>
+        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+          <StaticList
+            data={travellers}
+            renderItem={renderTravellers}
+            keyExtractor={(item) => item.userName + tripid}
+          />
+        </View>
       </View>
     </Pressable>
   );

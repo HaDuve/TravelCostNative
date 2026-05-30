@@ -26,7 +26,12 @@ import IconButton from "../UI/IconButton";
 
 const PIE_CHART_TYPE_COUNT = 4;
 
-const ExpensesOverview = ({ navigation, expenses, periodName }) => {
+const ExpensesOverview = ({
+  navigation,
+  expenses,
+  periodName,
+  refreshControl,
+}) => {
   const tripCtx = useContext(TripContext);
   const pieChartTitles = [
     i18n.t("categories"),
@@ -136,6 +141,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
             tripCtx={tripCtx}
             longerPeriodNum={longerPeriodNum}
             startingPoint={startingPoint}
+            refreshControl={refreshControl}
           />
         )}
         {!isGraphNotPie && toggleGraphEnum == 0 && (
@@ -143,6 +149,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
             expenses={expenses}
             periodName={periodName}
             navigation={navigation}
+            refreshControl={refreshControl}
           />
         )}
         {!isGraphNotPie && toggleGraphEnum == 1 && (
@@ -150,6 +157,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
             expenses={expenses}
             periodName={periodName}
             navigation={navigation}
+            refreshControl={refreshControl}
           />
         )}
         {!isGraphNotPie && toggleGraphEnum == 2 && (
@@ -157,6 +165,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
             expenses={expenses}
             periodName={periodName}
             navigation={navigation}
+            refreshControl={refreshControl}
           />
         )}
         {!isGraphNotPie && toggleGraphEnum == 3 && (
@@ -164,6 +173,7 @@ const ExpensesOverview = ({ navigation, expenses, periodName }) => {
             expenses={expenses}
             periodName={periodName}
             navigation={navigation}
+            refreshControl={refreshControl}
           />
         )}
       </View>
@@ -187,6 +197,7 @@ ExpensesOverview.propTypes = {
   expenses: PropTypes.array.isRequired,
   periodName: PropTypes.string.isRequired,
   navigation: PropTypes.object.isRequired,
+  refreshControl: PropTypes.element,
 };
 
 const styles = StyleSheet.create({

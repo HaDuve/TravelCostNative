@@ -24,6 +24,7 @@ const ExpenseCountries = ({
   periodName,
   navigation,
   forcePortraitFormat = false,
+  refreshControl,
 }) => {
   const layoutAnim = useMemo(
     () => Layout.damping(50).stiffness(300).overshootClamping(0.8),
@@ -131,6 +132,7 @@ const ExpenseCountries = ({
         data={catSumCat}
         renderItem={renderItem}
         keyExtractor={(item) => item.cat}
+        refreshControl={refreshControl}
         ListHeaderComponent={
           !useRowFormat ? (
             <CategoryChart inputData={dataList}></CategoryChart>

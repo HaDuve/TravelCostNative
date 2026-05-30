@@ -31,6 +31,8 @@ jest.mock("../../components/UI/ToastComponent", () => ({
 
 import OverviewScreen from "../../screens/OverviewScreen";
 import { renderWithAppProviders } from "../fixtures/app-providers";
+import { makeExpense } from "../fixtures/expense";
+import { assertNoNestedVerticalFlatLists } from "../helpers/scroll-composition";
 
 describe("Overview screen", () => {
   it("shows the trip name in the header", () => {
@@ -48,5 +50,45 @@ describe("Overview screen", () => {
     );
 
     expect(screen.getByText(/Japan 2026/)).toBeTruthy();
+  });
+
+  it("does not nest vertical FlatList inside ScrollView", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <OverviewScreen navigation={navigation as any} />,
+      {
+        user: {
+          needsTour: false,
+          isShowingGraph: false,
+          setIsShowingGraph: jest.fn(),
+        },
+        expenses: {
+          expenses: [makeExpense()],
+          getRecentExpenses: () => [makeExpense()],
+        },
+      }
+    );
+
+    assertNoNestedVerticalFlatLists(screen.root);
+  });
+
+  it("shows pie chart statistics when graph mode is off", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <OverviewScreen navigation={navigation as any} />,
+      {
+        user: {
+          needsTour: false,
+          isShowingGraph: false,
+          setIsShowingGraph: jest.fn(),
+        },
+        expenses: {
+          expenses: [makeExpense({ category: "Food" })],
+          getRecentExpenses: () => [makeExpense({ category: "Food" })],
+        },
+      }
+    );
+
+    expect(screen.getByText(/categories/i)).toBeTruthy();
   });
 });

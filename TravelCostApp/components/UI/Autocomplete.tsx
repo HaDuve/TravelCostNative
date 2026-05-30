@@ -1,11 +1,10 @@
 // Autocomplete/index.js
 
-import { View, StyleSheet } from "react-native";
-import { Menu, TextInput } from "react-native-paper";
+import { View, StyleSheet, Text, Pressable } from "react-native";
+import { TextInput } from "react-native-paper";
 import React, { useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
-import Animated, { FadeIn } from "react-native-reanimated";
 import { dynamicScale } from "../../util/scalingUtil";
 
 const suggestionMenuStackStyle = {
@@ -80,6 +79,23 @@ const Autocomplete = ({
     borderRadius: fieldRoundness,
   };
 
+  const selectSuggestion = (autotext: string) => {
+    isSelectingRef.current = true;
+
+    if (blurTimeout) {
+      clearTimeout(blurTimeout);
+      setBlurTimeout(null);
+    }
+
+    origOnChange(autotext);
+    setValue(autotext);
+
+    setTimeout(() => {
+      setMenuVisible(false);
+      isSelectingRef.current = false;
+    }, 50);
+  };
+
   return (
     <View
       testID="autocomplete-container"
@@ -88,6 +104,11 @@ const Autocomplete = ({
         { overflow: "visible", zIndex: menuVisible ? 10 : 1 },
       ]}
     >
+      {label ? (
+        <Text testID="autocomplete-label" style={styles.fieldLabel}>
+          {label}
+        </Text>
+      ) : null}
       <TextInput
         testID="autocomplete-field"
         theme={{
@@ -104,34 +125,25 @@ const Autocomplete = ({
             if (showOnEmpty) setFilteredData([...new Set(data)]);
           }
         }}
-        // Handle blur with check for active selection
         onBlur={() => {
-          // Don't hide menu immediately if user is selecting an item
           if (isSelectingRef.current) {
             return;
           }
 
-          const timeoutId = setTimeout(
-            () => {
-              // Double-check selection state before hiding
-              if (!isSelectingRef.current) {
-                setMenuVisible(false);
-              }
-            },
-            5000
-          );
+          const timeoutId = setTimeout(() => {
+            if (!isSelectingRef.current) {
+              setMenuVisible(false);
+            }
+          }, 5000);
           setBlurTimeout(timeoutId);
         }}
-        label={label}
-        // right={right}
-        // left={left}
+        placeholder={placeholder}
         style={fieldStyle}
         inputMode="text"
         mode="outlined"
         outlineColor={GlobalStyles.colors.primary700}
         textColor={GlobalStyles.colors.textColor}
         cursorColor={GlobalStyles.colors.textColor}
-        placeholder={placeholder}
         activeOutlineColor={GlobalStyles.colors.primary700}
         underlineColor={GlobalStyles.colors.accent250}
         selectionColor={GlobalStyles.colors.primary700}
@@ -148,85 +160,68 @@ const Autocomplete = ({
         value={value}
       />
       {menuVisible && filteredData && filteredData.length > 0 && (
-        <Animated.View
+        <View
           testID="autocomplete-suggestions"
-          entering={FadeIn.duration(500)}
           style={[
-            {
-              maxWidth: "100%",
-              width: "100%",
-              paddingHorizontal: dynamicScale(8, false, 0.3),
-            },
+            styles.suggestionsList,
             menuStyle,
             suggestionMenuStackStyle,
           ]}
         >
-          {
-            // only show the newest 3 items
-            filteredData.slice(0, 3).map((autotext, i) => {
-              const suggestionPadding = dynamicScale(10, false, 0.3);
-              return (
-                <Menu.Item
-                  key={i}
-                  testID={`autocomplete-suggestion-${i}`}
-                  style={[
-                    {
-                      backgroundColor: GlobalStyles.colors.backgroundColor,
-                      borderWidth: 1,
-                      borderColor: GlobalStyles.colors.primaryGrayed,
-                      maxWidth: "100%",
-                      paddingVertical: suggestionPadding,
-                      paddingHorizontal: dynamicScale(12, false, 0.3),
-                      justifyContent: "center",
-                    },
-                  ]}
-                  //   icon={icon}
-                  onTouchStart={() => {
-                    // Handle selection immediately on touch start to bypass keyboard dismiss
-                    isSelectingRef.current = true;
-
-                    // Clear any pending blur timeout
-                    if (blurTimeout) {
-                      clearTimeout(blurTimeout);
-                      setBlurTimeout(null);
-                    }
-
-                    // Apply the selection immediately
-                    origOnChange(autotext);
-                    setValue(autotext);
-
-                    // Hide menu after a brief delay to ensure smooth UX
-                    setTimeout(() => {
-                      setMenuVisible(false);
-                      isSelectingRef.current = false;
-                    }, 50);
-                  }}
-                  onPress={() => {
-                    // Keep onPress as fallback for platforms that don't consume onTouchStart
-                    if (!isSelectingRef.current) {
-                      origOnChange(autotext);
-                      setValue(autotext);
-                      setMenuVisible(false);
-                    }
-                  }}
-                  titleStyle={{
-                    flex: 1,
-                    fontSize: dynamicScale(12, false, 0.3),
-                    marginVertical: 0,
-                    paddingVertical: 0,
-                    paddingHorizontal: 0,
-                    width: "100%",
-                  }}
-                  title={autotext}
-                />
-              );
-            })
-          }
-        </Animated.View>
+          {filteredData.slice(0, 3).map((autotext, i) => (
+            <Pressable
+              key={i}
+              testID={`autocomplete-suggestion-${i}`}
+              style={({ pressed }) => [
+                styles.suggestionItem,
+                pressed && styles.suggestionItemPressed,
+              ]}
+              onPress={() => selectSuggestion(autotext)}
+            >
+              <Text
+                testID={`autocomplete-suggestion-${i}-text`}
+                style={styles.suggestionText}
+                numberOfLines={1}
+              >
+                {autotext}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
       )}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  fieldLabel: {
+    fontSize: dynamicScale(12, false, 0.3),
+    color: GlobalStyles.colors.primary700,
+    marginBottom: dynamicScale(4, true, 0.3),
+    marginLeft: dynamicScale(4, false, 0.3),
+  },
+  suggestionsList: {
+    maxWidth: "100%",
+    width: "100%",
+    paddingHorizontal: dynamicScale(8, false, 0.3),
+  },
+  suggestionItem: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderWidth: 1,
+    borderColor: GlobalStyles.colors.primaryGrayed,
+    maxWidth: "100%",
+    paddingVertical: dynamicScale(10, false, 0.3),
+    paddingHorizontal: dynamicScale(12, false, 0.3),
+    justifyContent: "center",
+  },
+  suggestionItemPressed: {
+    backgroundColor: GlobalStyles.colors.gray300,
+  },
+  suggestionText: {
+    color: GlobalStyles.colors.textColor,
+    fontSize: dynamicScale(12, false, 0.3),
+  },
+});
 
 export default Autocomplete;
 // react-native/Libraries/Lists/VirtualizedList.js

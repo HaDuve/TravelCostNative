@@ -2,7 +2,7 @@ import * as React from "react";
 import { StyleSheet } from "react-native";
 import { fireEvent } from "@testing-library/react-native";
 
-import { Menu, TextInput as PaperTextInput } from "react-native-paper";
+import { TextInput as PaperTextInput } from "react-native-paper";
 
 import Autocomplete from "../../components/UI/Autocomplete";
 import { GlobalStyles } from "../../constants/styles";
@@ -80,6 +80,45 @@ describe("Autocomplete", () => {
     expect(outlineRadius).toBe(roundness);
   });
 
+  it("shows readable suggestion titles when the menu opens", () => {
+    const screen = renderWithAppProviders(
+      <Autocomplete
+        value=""
+        label="Suchen"
+        data={suggestions}
+        showOnEmpty
+        onChange={jest.fn()}
+      />,
+      { wrapNavigation: false }
+    );
+
+    fireEvent(screen.getByTestId("autocomplete-field"), "focus");
+
+    const title = screen.getByTestId("autocomplete-suggestion-0-text");
+    expect(title).toHaveTextContent("Tina");
+
+    const titleStyle = flattenStyle(title.props.style);
+    expect(titleStyle.color).toBe(GlobalStyles.colors.textColor);
+    expect(titleStyle.opacity ?? 1).toBe(1);
+  });
+
+  it("renders the label above the outline instead of on the border", () => {
+    const screen = renderWithAppProviders(
+      <Autocomplete
+        value=""
+        label="Suchen"
+        data={suggestions}
+        onChange={jest.fn()}
+      />,
+      { wrapNavigation: false }
+    );
+
+    expect(screen.getByTestId("autocomplete-label")).toHaveTextContent("Suchen");
+
+    const input = screen.UNSAFE_getByType(PaperTextInput);
+    expect(input.props.label).toBeUndefined();
+  });
+
   it("pads the suggestion list horizontally instead of offsetting with margin", () => {
     const screen = renderWithAppProviders(
       <Autocomplete
@@ -116,13 +155,14 @@ describe("Autocomplete", () => {
 
     fireEvent(screen.getByTestId("autocomplete-field"), "focus");
 
-    const item = screen.UNSAFE_getAllByType(Menu.Item)[0];
-    const itemStyle = flattenStyle(item.props.style);
-    const titleStyle = flattenStyle(item.props.titleStyle);
+    const pressable = screen.getByTestId("autocomplete-suggestion-0");
+    const itemStyle = flattenStyle(
+      typeof pressable.props.style === "function"
+        ? pressable.props.style({ pressed: false })
+        : pressable.props.style
+    );
 
     expect(itemStyle.paddingTop).toBe(itemStyle.paddingBottom);
-    expect(titleStyle.paddingTop ?? 0).toBe(0);
-    expect(titleStyle.paddingBottom ?? 0).toBe(0);
   });
 
   it("raises the container stacking while suggestions are visible", () => {

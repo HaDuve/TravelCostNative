@@ -489,6 +489,7 @@ const styles = StyleSheet.create({
     marginLeft: dynamicScale(18),
     maxWidth: dynamicScale(180),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
+    borderRadius: dynamicScale(8, false, 0.3),
     overflow: "visible",
     ...GlobalStyles.shadowGlowPrimary,
   },

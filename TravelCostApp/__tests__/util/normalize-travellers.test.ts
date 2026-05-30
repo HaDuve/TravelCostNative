@@ -11,6 +11,21 @@ describe("normalizeTravellers", () => {
     ]);
   });
 
+  it("dedupes duplicate names in a legacy name list", () => {
+    expect(normalizeTravellers(["Alice", "Alice", "Bob"])).toEqual([
+      { uid: "", userName: "Alice" },
+      { uid: "", userName: "Bob" },
+    ]);
+  });
+
+  it("passes through a canonical roster without duplicate entries", () => {
+    const roster = [
+      { uid: "u1", userName: "Alice" },
+      { uid: "u2", userName: "Bob" },
+    ];
+    expect(normalizeTravellers(roster)).toEqual(roster);
+  });
+
   it("maps a Firebase travellers object to canonical roster entries", () => {
     expect(
       normalizeTravellers({

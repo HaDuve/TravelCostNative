@@ -733,6 +733,7 @@ export async function getTravellers(tripid: string): Promise<Traveller[]> {
     return normalizeTravellers(response);
   } catch (error) {
     safeLogError(error);
+    return [];
   }
 }
 

@@ -14,6 +14,22 @@ function normalizeTravellerEntry(entry: unknown): Traveller | null {
   return { uid: uid ?? "", userName };
 }
 
+function appendUniqueTraveller(
+  roster: Traveller[],
+  traveller: Traveller,
+  seenUids: Set<string>,
+  seenNames: Set<string>
+): void {
+  if (traveller.uid) {
+    if (seenUids.has(traveller.uid)) return;
+    seenUids.add(traveller.uid);
+  } else if (seenNames.has(traveller.userName)) {
+    return;
+  }
+  seenNames.add(traveller.userName);
+  roster.push(traveller);
+}
+
 export function normalizeTravellers(raw: unknown): Traveller[] {
   if (!raw) {
     return [];
@@ -23,9 +39,17 @@ export function normalizeTravellers(raw: unknown): Traveller[] {
     if (raw.length === 0) {
       return [];
     }
-    return raw
-      .map((entry) => normalizeTravellerEntry(entry))
-      .filter((entry): entry is Traveller => entry !== null);
+    const roster: Traveller[] = [];
+    const seenUids = new Set<string>();
+    const seenNames = new Set<string>();
+
+    for (const entry of raw) {
+      const traveller = normalizeTravellerEntry(entry);
+      if (!traveller) continue;
+      appendUniqueTraveller(roster, traveller, seenUids, seenNames);
+    }
+
+    return roster;
   }
 
   if (typeof raw === "object") {
@@ -38,14 +62,7 @@ export function normalizeTravellers(raw: unknown): Traveller[] {
         (raw as Record<string, unknown>)[key]
       );
       if (!traveller) continue;
-      if (traveller.uid) {
-        if (seenUids.has(traveller.uid)) continue;
-        seenUids.add(traveller.uid);
-      } else if (seenNames.has(traveller.userName)) {
-        continue;
-      }
-      seenNames.add(traveller.userName);
-      roster.push(traveller);
+      appendUniqueTraveller(roster, traveller, seenUids, seenNames);
     }
 
     return roster;

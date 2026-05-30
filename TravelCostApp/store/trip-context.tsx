@@ -207,7 +207,7 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     if (!isFastEnough || !tripid || tripid === "") return false;
     try {
       const travellers = await getTravellers(tripid);
-      if (travellers?.length < 1) throw new Error("no travellers found");
+      if (travellers.length < 1) throw new Error("no travellers found");
       saveTravellersInStorage(travellers);
       setTravellers(travellers);
       return true;

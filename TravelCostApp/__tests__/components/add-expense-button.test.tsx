@@ -19,41 +19,63 @@ jest.mock("@react-navigation/native", () => ({
 }));
 
 import { fireEvent } from "@testing-library/react-native";
+import { Modal } from "react-native";
 
 import { i18n } from "../../i18n/i18n";
+import { VexoEvents } from "../../util/vexo-constants";
+import { trackEvent } from "../../util/vexo-tracking";
 import AddExpenseButton from "../../components/ManageExpense/AddExpenseButton";
 import { makeExpense } from "../fixtures/expense";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 import { assertSolidBackgroundForShadow } from "../../util/shadow-styles";
 
-describe("AddExpenseButton", () => {
-  it("opens the template expense modal on long press with a ledger-style row", () => {
-    const navigation = { navigate: jest.fn() };
-    const templateExpense = makeExpense({
-      id: "e-template",
-      description: "Coffee shop",
-      amount: 42,
-      calcAmount: 42,
-      editedTimestamp: 2,
-    });
-
-    const screen = renderWithAppProviders(
-      <AddExpenseButton navigation={navigation} />,
-      {
-        wrapNavigation: false,
-        expenses: {
-          expenses: [templateExpense],
-          getRecentExpenses: () => [templateExpense],
+function renderAddExpenseButtonWithTemplate(
+  templateExpense = makeExpense({
+    id: "e-template",
+    description: "Coffee shop",
+    amount: 42,
+    calcAmount: 42,
+    editedTimestamp: 2,
+  })
+) {
+  const navigation = { navigate: jest.fn() };
+  const screen = renderWithAppProviders(
+    <AddExpenseButton navigation={navigation} />,
+    {
+      wrapNavigation: false,
+      settings: {
+        settings: {
+          showFlags: true,
+          showWhoPaid: true,
         },
-      }
-    );
+      },
+      expenses: {
+        expenses: [templateExpense],
+        getRecentExpenses: () => [templateExpense],
+      },
+    }
+  );
+
+  return { screen, navigation, templateExpense };
+}
+
+describe("AddExpenseButton", () => {
+  beforeEach(() => {
+    (trackEvent as jest.Mock).mockClear();
+  });
+
+  it("opens the template expense modal on long press with a ledger-style row", () => {
+    const { screen, templateExpense } = renderAddExpenseButtonWithTemplate();
 
     fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
 
     expect(screen.getByTestId("expense-template-picker-modal")).toBeTruthy();
-    expect(screen.getByText("Coffee shop")).toBeTruthy();
+    expect(screen.getByText(templateExpense.description)).toBeTruthy();
     expect(screen.getByText(/42/)).toBeTruthy();
     expect(screen.getByText(i18n.t("templateExpenses"))).toBeTruthy();
+    expect(screen.getAllByTestId("expense-item-traveller-avatar").length).toBeGreaterThan(
+      0
+    );
   });
 
   it("dismisses the template picker via backdrop and keeps the fab visible", () => {
@@ -82,6 +104,52 @@ describe("AddExpenseButton", () => {
 
     expect(screen.queryByTestId("expense-template-picker-modal")).toBeNull();
     expect(screen.getByTestId("add-expense-fab")).toBeTruthy();
+  });
+
+  it("dismisses the template picker via Cancel", () => {
+    const { screen } = renderAddExpenseButtonWithTemplate();
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+    fireEvent.press(screen.getByText(i18n.t("cancel")));
+
+    expect(screen.queryByTestId("expense-template-picker-modal")).toBeNull();
+    expect(screen.getByTestId("add-expense-fab")).toBeTruthy();
+  });
+
+  it("dismisses the template picker on Android back", () => {
+    const { screen } = renderAddExpenseButtonWithTemplate();
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+    fireEvent(screen.UNSAFE_getByType(Modal), "requestClose");
+
+    expect(screen.queryByTestId("expense-template-picker-modal")).toBeNull();
+    expect(screen.getByTestId("add-expense-fab")).toBeTruthy();
+  });
+
+  it("tracks long press when there are no template expenses", () => {
+    const navigation = { navigate: jest.fn() };
+
+    const screen = renderWithAppProviders(
+      <AddExpenseButton navigation={navigation} />,
+      {
+        wrapNavigation: false,
+        expenses: {
+          expenses: [],
+          getRecentExpenses: () => [],
+        },
+      }
+    );
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+
+    expect(screen.queryByTestId("expense-template-picker-modal")).toBeNull();
+    expect(trackEvent).toHaveBeenCalledWith(
+      VexoEvents.ADD_EXPENSE_BUTTON_LONGPRESS,
+      {
+        hasTemplates: false,
+        templatesCount: 0,
+      }
+    );
   });
 
   it("prefills Manage expense from a template with today's date", () => {

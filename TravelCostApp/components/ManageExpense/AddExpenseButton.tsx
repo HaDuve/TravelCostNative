@@ -84,7 +84,6 @@ const AddExpenseButton = ({ navigation }) => {
         return;
       }
 
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       closeTemplatePicker();
 
       trackEvent(VexoEvents.TEMPLATE_EXPENSE_SELECTED, {
@@ -169,15 +168,20 @@ const AddExpenseButton = ({ navigation }) => {
   }, [authCtx, navigation, skipCatScreen, tripCtx.travellers, tripCtx.tripid]);
 
   const openTemplatePicker = useCallback(() => {
-    if (!lastExpenses?.length) {
+    const templatesCount = lastExpenses?.length ?? 0;
+    const hasTemplates = templatesCount > 0;
+
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    trackEvent(VexoEvents.ADD_EXPENSE_BUTTON_LONGPRESS, {
+      hasTemplates,
+      templatesCount,
+    });
+
+    if (!hasTemplates) {
       return;
     }
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
     setTemplatePickerVisible(true);
-    trackEvent(VexoEvents.ADD_EXPENSE_BUTTON_LONGPRESS, {
-      hasTemplates: true,
-      templatesCount: lastExpenses.length,
-    });
   }, [lastExpenses]);
 
   const handleLoadMoreTemplates = useCallback(() => {

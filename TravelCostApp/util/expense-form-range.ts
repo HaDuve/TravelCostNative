@@ -52,11 +52,11 @@ export function distributeRangedAmount(
 export function resolveAlreadyDividedAmountByDays(
   isEditing: boolean,
   duplOrSplit: DuplicateOption | number,
-  helperStateForDividing: boolean
+  pendingFreshSplitDivision: boolean
 ): boolean {
   let alreadyDividedAmountByDays =
     isEditing && Number(duplOrSplit) === DuplicateOption.split;
-  if (helperStateForDividing) alreadyDividedAmountByDays = false;
+  if (pendingFreshSplitDivision) alreadyDividedAmountByDays = false;
   return alreadyDividedAmountByDays;
 }
 

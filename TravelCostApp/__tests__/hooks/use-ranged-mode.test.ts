@@ -2,7 +2,10 @@ import { act, renderHook } from "@testing-library/react-native";
 
 import { useRangedMode } from "../../hooks/useRangedMode";
 import { DuplicateOption } from "../../util/expense";
-import { buildRangedDuplOrSplitPromptString } from "../../util/expense-form-range";
+import {
+  buildRangedDuplOrSplitPromptString,
+  distributeRangedAmount,
+} from "../../util/expense-form-range";
 
 function renderRangedMode(
   overrides: Partial<Parameters<typeof useRangedMode>[0]> = {}
@@ -94,6 +97,63 @@ describe("useRangedMode", () => {
     });
 
     expect(result.current.shouldPromptForMode).toBe(true);
+  });
+
+  it.each([
+    ["duplicate", DuplicateOption.duplicate],
+    ["split", DuplicateOption.split],
+  ])(
+    "does not request duplicate/split choice when multi-day range is confirmed with ranged %s mode",
+    (_label, initialDuplOrSplit) => {
+      const { result } = renderRangedMode({
+        isEditing: false,
+        initialDuplOrSplit,
+      });
+
+      act(() => {
+        result.current.onMultiDayRangeConfirmed();
+      });
+
+      expect(result.current.shouldPromptForMode).toBe(false);
+    }
+  );
+
+  it("keeps per-day amount for split recalc when editing an already-divided ranged split", () => {
+    const { result } = renderRangedMode({
+      isEditing: true,
+      initialDuplOrSplit: DuplicateOption.split,
+    });
+    const perDayInField = 50;
+    const dayCount = 3;
+
+    expect(
+      distributeRangedAmount({
+        total: perDayInField,
+        dayCount,
+        mode: result.current.duplOrSplit,
+        alreadyDivided: result.current.alreadyDividedAmountByDays,
+      })
+    ).toBe(50);
+  });
+
+  it("divides total across days after freshly confirming ranged split", () => {
+    const { result } = renderRangedMode({
+      isEditing: true,
+      initialDuplOrSplit: DuplicateOption.null,
+    });
+
+    act(() => {
+      result.current.confirmSplit();
+    });
+
+    expect(
+      distributeRangedAmount({
+        total: 150,
+        dayCount: 3,
+        mode: result.current.duplOrSplit,
+        alreadyDivided: result.current.alreadyDividedAmountByDays,
+      })
+    ).toBe(50);
   });
 
   it("maps ranged modes to existing DuplicateOption values at the persistence seam", () => {

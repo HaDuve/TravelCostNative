@@ -1,6 +1,13 @@
 import { useCallback, useState } from "react";
 
 import { DuplicateOption } from "../util/expense";
+
+/**
+ * Ranged duplicate/split mode for the expense form.
+ * Owns mode transitions, derived alreadyDivided, and collapse amount rules.
+ * The duplicate/split Alert UI lives in ExpenseForm; per-day split recalc uses
+ * distributeRangedAmount in useSplitEditor, fed by this hook's outputs.
+ */
 import {
   resolveAlreadyDividedAmountByDays,
   resolveAmountWhenCollapsingRangeToSingleDay,

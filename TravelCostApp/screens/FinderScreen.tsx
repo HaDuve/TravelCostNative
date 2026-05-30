@@ -15,11 +15,11 @@ import { i18n } from "../i18n/i18n";
 
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
-import { Checkbox } from "react-native-paper";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
+import FinderFilterRow from "../components/Finder/FinderFilterRow";
 import Autocomplete from "../components/UI/Autocomplete";
+import { finderFilterRowStyles } from "../styles/finder-filter-row-styles";
 import GradientButton from "../components/UI/GradientButton";
-import IconButton from "../components/UI/IconButton";
 import { GlobalStyles } from "../constants/styles";
 import {
   asyncStoreGetItem,
@@ -298,87 +298,63 @@ const FinderScreen = () => {
             // scrollEnabled={false}
             style={{ flex: 1, minHeight: "50%" }}
           >
-            <View style={[styles.rowContainer, styles.searchRowContainer]}>
-              <View style={styles.checkBoxContainer}>
-                <Checkbox
-                  status={checkedQuery ? "checked" : "unchecked"}
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    const newValue = !checkedQuery;
-                    setCheckedQuery(newValue);
-                    trackEvent(VexoEvents.SEARCH_QUERY_CHECKBOX_TOGGLED, {
-                      enabled: newValue,
-                    });
-                  }}
-                />
-              </View>
+            <FinderFilterRow
+              testID="finder-search-filter"
+              rowStyle={finderFilterRowStyles.searchRow}
+              checked={checkedQuery}
+              showClear={checkedQuery}
+              onToggleChecked={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                const newValue = !checkedQuery;
+                setCheckedQuery(newValue);
+                trackEvent(VexoEvents.SEARCH_QUERY_CHECKBOX_TOGGLED, {
+                  enabled: newValue,
+                });
+              }}
+              onClear={() => {
+                setSearchQuery("");
+                setCheckedQuery(false);
+              }}
+            >
               <Autocomplete
                 value={searchQuery}
                 onChange={onChangeSearch}
                 data={suggestions}
                 showOnEmpty
-                // placeholder="Search for descriptions, categories, traveller names..."
                 label={i18n.t("searchLabel")}
-                containerStyle={styles.queryContainer}
+                containerStyle={styles.autocompleteInFilterRow}
                 style={styles.autoCompleteStyle}
-              ></Autocomplete>
-              {checkedQuery && (
-                <IconButton
-                  icon="close-outline"
-                  size={dynamicScale(26, false, 0.5)}
-                  color={GlobalStyles.colors.textColor}
-                  buttonStyle={{ marginTop: dynamicScale(14, true, 0.5) }}
-                  onPressStyle={{
-                    backgroundColor: GlobalStyles.colors.gray500,
-                    borderRadius: 99,
-                  }}
-                  onPress={() => {
-                    setSearchQuery("");
-                    setCheckedQuery(false);
-                  }}
-                ></IconButton>
-              )}
-            </View>
-            <View style={[styles.rowContainer, styles.dateRowContainer]}>
-              <View style={styles.checkBoxContainer}>
-                <Checkbox
-                  status={checkedDate ? "checked" : "unchecked"}
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    const newValue = !checkedDate;
-                    setCheckedDate(newValue);
-                    trackEvent(VexoEvents.DATE_FILTER_TOGGLED, {
-                      enabled: newValue,
-                    });
-                  }}
-                />
-              </View>
+              />
+            </FinderFilterRow>
+            <FinderFilterRow
+              testID="finder-date-filter"
+              rowStyle={finderFilterRowStyles.dateRow}
+              checked={checkedDate}
+              showClear={checkedDate}
+              onToggleChecked={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                const newValue = !checkedDate;
+                setCheckedDate(newValue);
+                trackEvent(VexoEvents.DATE_FILTER_TOGGLED, {
+                  enabled: newValue,
+                });
+              }}
+              onClear={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setCheckedDate(false);
+                setStartDate(getFormattedDate(DateTime.now()));
+                setEndDate(getFormattedDate(DateTime.now()));
+              }}
+            >
               {DatePickerContainer({
                 openDatePickerRange,
                 startDate,
                 endDate,
                 dateIsRanged,
                 narrow: true,
+                containerStyle: styles.finderDatePickerContainer,
               })}
-              {checkedDate && (
-                <IconButton
-                  icon="close-outline"
-                  color={GlobalStyles.colors.textColor}
-                  size={dynamicScale(26, false, 0.5)}
-                  buttonStyle={{ marginTop: dynamicScale(14, true) }}
-                  onPressStyle={{
-                    backgroundColor: GlobalStyles.colors.gray500,
-                    borderRadius: 99,
-                  }}
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setCheckedDate(false);
-                    setStartDate(getFormattedDate(DateTime.now()));
-                    setEndDate(getFormattedDate(DateTime.now()));
-                  }}
-                ></IconButton>
-              )}
-            </View>
+            </FinderFilterRow>
             <Text style={styles.queryText}>
               {(queryString || dateString) && i18n.t("finding")} :{queryString}{" "}
               {dateString}
@@ -438,32 +414,17 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  checkBoxContainer: {
-    borderRadius: dynamicScale(99, false, 0.5),
-    marginRight: dynamicScale(8),
-    marginTop: dynamicScale(20, true),
-    ...Platform.select({
-      ios: { borderWidth: 1 },
-    }),
-  },
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-start",
     minHeight: dynamicScale(90, true),
   },
-  rowContainer: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "flex-start",
-    minHeight: dynamicScale(90, true),
-  },
-  searchRowContainer: {
-    zIndex: 10,
-  },
-  dateRowContainer: {
-    zIndex: 1,
+  finderDatePickerContainer: {
+    marginTop: 0,
+    marginRight: 0,
+    marginLeft: 0,
+    paddingBottom: 0,
   },
   titleText: {
     fontSize: dynamicScale(32, false, 0.5),
@@ -486,13 +447,8 @@ const styles = StyleSheet.create({
     marginHorizontal: dynamicScale(65),
     borderRadius: 99,
   },
-  queryContainer: {
-    flex: 1,
-    marginTop: dynamicScale(10, true),
-    marginLeft: dynamicScale(18),
-    maxWidth: dynamicScale(180),
-    backgroundColor: GlobalStyles.colors.backgroundColorLight,
-    borderRadius: dynamicScale(8, false, 0.3),
+  autocompleteInFilterRow: {
+    alignSelf: "stretch",
     overflow: "visible",
   },
   autoCompleteStyle: {

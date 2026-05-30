@@ -13,10 +13,15 @@ const DatePickerContainer = ({
   dateIsRanged,
   hideBottomBorder = false,
   narrow = false,
+  containerStyle,
 }) => {
   return (
     <View
-      style={[styles.dateContainer, !hideBottomBorder && styles.bottomBorder]}
+      style={[
+        styles.dateContainer,
+        !hideBottomBorder && styles.bottomBorder,
+        containerStyle,
+      ]}
     >
       <View style={styles.dateIconContainer}>
         <IconButton
@@ -55,6 +60,7 @@ DatePickerContainer.propTypes = {
   dateIsRanged: PropTypes.bool.isRequired,
   hideBottomBorder: PropTypes.bool,
   narrow: PropTypes.bool,
+  containerStyle: PropTypes.object,
 };
 
 const styles = StyleSheet.create({

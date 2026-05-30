@@ -178,10 +178,13 @@ Confirm in the EAS build log: **Spin up build environment** shows Xcode 26.x. Fo
 
 ```bash
 # Updates (no app store review needed)
-pnpm run update:dev "Message"        # → Development
-pnpm run update:staging "Message"    # → Internal testing
-pnpm run update:alpha "Message"      # → Beta testers
-pnpm run update:production "Message" # → All users
+pnpm run update:dev -- "Message"        # → Development
+pnpm run update:staging -- "Message"    # → Internal testing
+pnpm run update:alpha -- "Message"      # → Beta testers
+pnpm run update:production -- "Message" # → All users (message from changelog if omitted)
+pnpm run update:production:bump         # → Publish OTA + bump EAS changelog suffix (default note)
+pnpm run update:production:bump -- "Fix login"  # → Same, with custom changelog note
+pnpm run update:production:bump -- --dry-run    # → Preview publish + changelog bump only
 
 # Builds (requires app store review)
 pnpm run build:staging:all           # → Internal testing
@@ -195,6 +198,12 @@ pnpm run submit:production:android   # → Play Store
 ```
 
 ### 🎯 **Update Message Format**
+
+`update:production` without a message reads the newest `changelog.txt` block and publishes
+`{version}: {first bullet}` (for example `1.3.005c: Added restore feature`).
+
+`update:production:bump` publishes a plain note (default: `Bugfixes and performance improvements`)
+and then bumps the EAS suffix in `changelog.txt` with the same note.
 
 ```
 TYPE: Brief description

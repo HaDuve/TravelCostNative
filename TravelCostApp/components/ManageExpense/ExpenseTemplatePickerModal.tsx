@@ -50,7 +50,11 @@ const ExpenseTemplatePickerModal = ({
         {isFirst && !hasTopSection && (
           <Text style={styles.sectionSubtitle}>{i18n.t("lastUsedExpenses")}</Text>
         )}
-        <ExpenseListRow {...item} onPress={() => onSelectTemplate(item)} />
+        <ExpenseListRow
+          {...item}
+          layoutVariant="templatePicker"
+          onPress={() => onSelectTemplate(item)}
+        />
       </View>
     );
   };
@@ -96,8 +100,9 @@ export default ExpenseTemplatePickerModal;
 
 const styles = StyleSheet.create({
   modalContent: {
-    width: "92%",
-    maxWidth: dynamicScale(440, false, 0.5),
+    width: "94%",
+    maxWidth: dynamicScale(480, false, 0.5),
+    maxHeight: "85%",
     paddingVertical: dynamicScale(16, false, 0.5),
     paddingHorizontal: dynamicScale(12, false, 0.5),
   },
@@ -125,6 +130,7 @@ const styles = StyleSheet.create({
     marginLeft: dynamicScale(8),
   },
   list: {
-    maxHeight: dynamicScale(420, true),
+    flexGrow: 1,
+    maxHeight: dynamicScale(520, true),
   },
 });

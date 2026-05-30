@@ -78,6 +78,26 @@ describe("AddExpenseButton", () => {
     );
   });
 
+  it("shows the full template description with room for two lines in the modal", () => {
+    const longDescription = "Airport lounge breakfast with the team";
+    const { screen } = renderAddExpenseButtonWithTemplate(
+      makeExpense({
+        id: "e-template",
+        description: longDescription,
+        amount: 42,
+        calcAmount: 42,
+        editedTimestamp: 2,
+      })
+    );
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+
+    const description = screen.getByTestId("expense-item-description");
+    expect(description.props.children).toBe(longDescription);
+    expect(description.props.numberOfLines).toBe(2);
+    expect(description.props.ellipsizeMode).toBeUndefined();
+  });
+
   it("dismisses the template picker via backdrop and keeps the fab visible", () => {
     const navigation = { navigate: jest.fn() };
     const templateExpense = makeExpense({

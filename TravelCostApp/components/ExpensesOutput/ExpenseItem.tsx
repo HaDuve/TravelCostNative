@@ -35,8 +35,14 @@ import { VexoEvents } from "../../util/vexo-constants";
 const IconSize = dynamicScale(28, false, 0.5);
 
 function ExpenseItem(props): JSX.Element {
-  const { showSumForTravellerName, filtered, onPressOverride, disableLongPressSelection } =
-    props;
+  const {
+    showSumForTravellerName,
+    filtered,
+    onPressOverride,
+    disableLongPressSelection,
+    layoutVariant = "ledger",
+  } = props;
+  const isTemplatePickerRow = layoutVariant === "templatePicker";
   const { setSelectable, selectItem } = props;
   const {
     id,
@@ -292,7 +298,12 @@ function ExpenseItem(props): JSX.Element {
           style={[
             styles.expenseItem,
             {
-              height: constantScale(55),
+              minHeight: isTemplatePickerRow
+                ? constantScale(72, 0.5)
+                : constantScale(55, 0.5),
+              height: isTemplatePickerRow
+                ? undefined
+                : constantScale(55, 0.5),
               paddingLeft: dynamicScale(16),
               ...Platform.select({
                 ios: {
@@ -303,9 +314,11 @@ function ExpenseItem(props): JSX.Element {
                 },
               }),
             },
-            isLandscape && {
-              height: dynamicScale(100, true),
-            },
+            isTemplatePickerRow && styles.expenseItemTemplatePicker,
+            isLandscape &&
+              !isTemplatePickerRow && {
+                height: dynamicScale(100, true),
+              },
           ]}
         >
           <View
@@ -321,15 +334,24 @@ function ExpenseItem(props): JSX.Element {
               }
             />
           </View>
-          <View style={styles.leftItem}>
+          <View
+            style={[
+              styles.leftItem,
+              isTemplatePickerRow && styles.leftItemTemplatePicker,
+            ]}
+          >
             <Text
+              testID="expense-item-description"
               maxFontSizeMultiplier={1.2}
-              numberOfLines={1}
-              ellipsizeMode="tail"
+              numberOfLines={isTemplatePickerRow ? 2 : 1}
+              ellipsizeMode={isTemplatePickerRow ? undefined : "tail"}
               style={[
                 styles.textBase,
                 styles.description,
-                settingShowFlags && settingShowWhoPaid && { width: "90%" },
+                !isTemplatePickerRow &&
+                  settingShowFlags &&
+                  settingShowWhoPaid && { width: "90%" },
+                isTemplatePickerRow && styles.descriptionTemplatePicker,
                 hideSpecial && { color: GlobalStyles.colors.textHidden },
               ]}
             >
@@ -357,8 +379,17 @@ function ExpenseItem(props): JSX.Element {
               />
             </View>
           )}
-          {settingShowWhoPaid && <View>{sharedList()}</View>}
-          <View style={styles.amountContainer}>
+          {settingShowWhoPaid && (
+            <View style={isTemplatePickerRow && styles.travellerListTemplatePicker}>
+              {sharedList()}
+            </View>
+          )}
+          <View
+            style={[
+              styles.amountContainer,
+              isTemplatePickerRow && styles.amountContainerTemplatePicker,
+            ]}
+          >
             <Text
               style={[
                 styles.amountText,
@@ -398,6 +429,7 @@ ExpenseItem.propTypes = {
   setSelectable: PropTypes.func,
   onPressOverride: PropTypes.func,
   disableLongPressSelection: PropTypes.bool,
+  layoutVariant: PropTypes.oneOf(["ledger", "templatePicker"]),
 };
 
 const styles = StyleSheet.create({
@@ -411,6 +443,10 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  expenseItemTemplatePicker: {
+    alignItems: "flex-start",
+    paddingVertical: dynamicScale(10, true),
   },
   textBase: {
     marginTop: dynamicScale(2, true),
@@ -440,6 +476,19 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "flex-start",
   },
+  leftItemTemplatePicker: {
+    flexGrow: 2,
+    flexShrink: 1,
+    minWidth: 0,
+    height: undefined,
+    minHeight: constantScale(44, 0.5),
+  },
+  descriptionTemplatePicker: {
+    flexShrink: 1,
+  },
+  travellerListTemplatePicker: {
+    flexShrink: 0,
+  },
   amountContainer: {
     paddingHorizontal: dynamicScale(4),
     paddingVertical: 0,
@@ -449,6 +498,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     width: constantScale(150, 0.5),
     height: constantScale(40, 0.5),
+  },
+  amountContainerTemplatePicker: {
+    flexShrink: 0,
+    width: constantScale(108, 0.5),
+    minHeight: constantScale(40, 0.5),
+    height: undefined,
   },
   amountText: {
     textAlign: "center",

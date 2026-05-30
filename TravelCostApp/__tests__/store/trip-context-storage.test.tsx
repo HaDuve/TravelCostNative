@@ -129,5 +129,60 @@ describe("TripContext storage contracts", () => {
     expect(results[0].inputTripHasTotalSum).toBe(true);
     expect("totalSum" in (results[0].storedTrip as any)).toBe(false);
   });
+
+  it("loadTripDataFromStorage sets tripid and isDynamicDailyBudget from stored trip", async () => {
+    const { getMMKVObject } = require("../../store/mmkv");
+    getMMKVObject.mockReturnValueOnce({
+      tripid: "stored-trip",
+      tripName: "Stored",
+      totalBudget: "200",
+      dailyBudget: "20",
+      tripCurrency: "USD",
+      travellers: [],
+      startDate: new Date("2026-01-01T00:00:00.000Z").toISOString(),
+      endDate: new Date("2026-01-11T00:00:00.000Z").toISOString(),
+      isDynamicDailyBudget: true,
+    });
+
+    const ctxRef: {
+      current: {
+        getcurrentTrip: () => {
+          tripid?: string;
+          isDynamicDailyBudget?: boolean;
+        };
+      } | null;
+    } = { current: null };
+    let loadedTripid: string | undefined;
+
+    function LoadFromStorageProbe() {
+      const { TripContext } = require("../../store/trip-context");
+      const ctx = useContext(TripContext);
+      ctxRef.current = ctx;
+      const didInit = useRef(false);
+      useEffect(() => {
+        if (didInit.current) return;
+        didInit.current = true;
+        ctx.loadTripDataFromStorage().then((loaded) => {
+          loadedTripid = loaded?.tripid;
+        });
+      }, [ctx]);
+      return null;
+    }
+
+    const TripContextProvider = require("../../store/trip-context").default;
+    render(
+      <ExpensesContext.Provider value={{ expenses: [] } as any}>
+        <TripContextProvider>
+          <LoadFromStorageProbe />
+        </TripContextProvider>
+      </ExpensesContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(loadedTripid).toBe("stored-trip");
+      expect(ctxRef.current?.getcurrentTrip().tripid).toBe("stored-trip");
+      expect(ctxRef.current?.getcurrentTrip().isDynamicDailyBudget).toBe(true);
+    });
+  });
 });
 

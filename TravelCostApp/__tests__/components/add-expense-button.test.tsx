@@ -108,6 +108,56 @@ describe("AddExpenseButton", () => {
     useWindowDimensionsSpy.mockRestore();
   });
 
+  it("opens template help from the info button", () => {
+    const { screen } = renderAddExpenseButtonWithTemplate();
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+    fireEvent.press(screen.getByTestId("expense-template-picker-info"));
+
+    expect(screen.getByTestId("expense-template-help-modal")).toBeTruthy();
+    expect(screen.getByText(i18n.t("templateExpensesHelpTitle"))).toBeTruthy();
+    expect(
+      screen.getByText(i18n.t("templateExpensesHelpText"), { exact: false })
+    ).toBeTruthy();
+    expect(screen.getByTestId("expense-template-picker-modal")).toBeTruthy();
+  });
+
+  it("dismisses template help via confirm and keeps the picker open", () => {
+    const { screen, templateExpense } = renderAddExpenseButtonWithTemplate();
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+    fireEvent.press(screen.getByTestId("expense-template-picker-info"));
+    fireEvent.press(screen.getByText(i18n.t("confirm")));
+
+    expect(screen.queryByTestId("expense-template-help-modal")).toBeNull();
+    expect(screen.getByTestId("expense-template-picker-modal")).toBeTruthy();
+    expect(screen.getByText(templateExpense.description)).toBeTruthy();
+  });
+
+  it("dismisses template help via backdrop and keeps the picker open", () => {
+    const { screen, templateExpense } = renderAddExpenseButtonWithTemplate();
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+    fireEvent.press(screen.getByTestId("expense-template-picker-info"));
+    fireEvent.press(screen.getByTestId("expense-template-help-backdrop"));
+
+    expect(screen.queryByTestId("expense-template-help-modal")).toBeNull();
+    expect(screen.getByTestId("expense-template-picker-modal")).toBeTruthy();
+    expect(screen.getByText(templateExpense.description)).toBeTruthy();
+  });
+
+  it("dismisses the template picker after viewing help", () => {
+    const { screen } = renderAddExpenseButtonWithTemplate();
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+    fireEvent.press(screen.getByTestId("expense-template-picker-info"));
+    fireEvent.press(screen.getByText(i18n.t("confirm")));
+    fireEvent.press(screen.getByText(i18n.t("cancel")));
+
+    expect(screen.queryByTestId("expense-template-picker-modal")).toBeNull();
+    expect(screen.getByTestId("add-expense-fab")).toBeTruthy();
+  });
+
   it("dismisses the template picker via backdrop and keeps the fab visible", () => {
     const navigation = { navigate: jest.fn() };
     const templateExpense = makeExpense({

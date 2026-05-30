@@ -5,11 +5,19 @@ import { GlobalStyles } from "../../constants/styles";
 import PropTypes from "prop-types";
 import { dynamicScale } from "../../util/scalingUtil";
 
-const InfoButton = ({ containerStyle, onPress }) => {
+const InfoButton = ({
+  containerStyle,
+  onPress,
+  testID,
+  accessibilityLabel,
+}) => {
   return (
     <Pressable
       style={[styles.container, containerStyle]}
       onPress={onPress}
+      testID={testID}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole="button"
     >
       <Text style={styles.text}>i</Text>
     </Pressable>
@@ -21,6 +29,8 @@ export default InfoButton;
 InfoButton.propTypes = {
   containerStyle: PropTypes.object,
   onPress: PropTypes.func.isRequired,
+  testID: PropTypes.string,
+  accessibilityLabel: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

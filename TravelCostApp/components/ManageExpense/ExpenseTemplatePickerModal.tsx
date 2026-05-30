@@ -1,15 +1,18 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { FlatList, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import PropTypes from "prop-types";
+import * as Haptics from "expo-haptics";
 
 import AppModal from "../UI/AppModal";
 import ExpenseListRow from "../ExpensesOutput/ExpenseListRow";
+import ExpenseTemplateHelpModal from "./ExpenseTemplateHelpModal";
 import { GlobalStyles } from "../../constants/styles";
 import { i18n } from "../../i18n/i18n";
 import type { ExpenseData } from "../../util/expense";
 import { templatePickerModalContentWidth } from "../../util/modal-layout";
 import { dynamicScale } from "../../util/scalingUtil";
 import FlatButton from "../UI/FlatButton";
+import InfoButton from "../UI/InfoButton";
 
 export type ExpenseTemplatePickerModalProps = {
   isVisible: boolean;
@@ -28,9 +31,19 @@ const ExpenseTemplatePickerModal = ({
   onSelectTemplate,
   onLoadMore,
 }: ExpenseTemplatePickerModalProps) => {
+  const [helpVisible, setHelpVisible] = useState(false);
   const { width: screenWidth } = useWindowDimensions();
   const contentWidth = templatePickerModalContentWidth(screenWidth);
   const hasTopSection = topDuplicateCount > 0;
+
+  const openHelp = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setHelpVisible(true);
+  }, []);
+
+  const closeHelp = useCallback(() => {
+    setHelpVisible(false);
+  }, []);
 
   const renderItem = ({
     item,
@@ -80,12 +93,19 @@ const ExpenseTemplatePickerModal = ({
     >
       <View style={styles.modalHeader}>
         <Text style={styles.modalTitle}>{i18n.t("templateExpenses")}</Text>
+        <InfoButton
+          testID="expense-template-picker-info"
+          accessibilityLabel={i18n.t("templateExpensesHelpTitle")}
+          containerStyle={styles.infoButton}
+          onPress={openHelp}
+        />
         <View testID="expense-template-picker-close">
           <FlatButton onPress={onClose} textStyle={styles.closeButtonText}>
             {i18n.t("cancel")}
           </FlatButton>
         </View>
       </View>
+      <ExpenseTemplateHelpModal isVisible={helpVisible} onClose={closeHelp} />
       <FlatList
         testID="expense-template-picker-list"
         data={templates}
@@ -130,6 +150,9 @@ const styles = StyleSheet.create({
     fontWeight: "300",
     fontSize: dynamicScale(22, false, 0.5),
     color: GlobalStyles.colors.textColor,
+  },
+  infoButton: {
+    marginHorizontal: dynamicScale(6, false, 0.5),
   },
   closeButtonText: {
     fontSize: dynamicScale(16, false, 0.5),

@@ -28,6 +28,10 @@ _Avoid_: Current trip (implementation alias only), open trip
 All trips a User can open (shown as “My Trips”) — not only past trips; includes current and future-dated trips. One is the **Active trip**.
 _Avoid_: History (alone — implies completed trips only)
 
+**Leave trip**:
+A User removing themselves from one trip’s roster: they stop being a **Traveller** on it and it disappears from their **Trip history**. The trip and its expenses, splits, and balances keep existing for the remaining travellers. Distinct from destroying the trip for everyone. A User cannot leave their last trip (a User must always have an **Active trip**).
+_Avoid_: Delete trip (that implies destroying it for all travellers), remove trip, archive
+
 ### Expenses
 
 **Expense**:

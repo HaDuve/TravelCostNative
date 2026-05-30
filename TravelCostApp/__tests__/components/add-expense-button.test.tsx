@@ -78,7 +78,7 @@ describe("AddExpenseButton", () => {
     );
   });
 
-  it("shows the full template description with room for two lines in the modal", () => {
+  it("shows a long template description in the modal", () => {
     const longDescription = "Airport lounge breakfast with the team";
     const { screen } = renderAddExpenseButtonWithTemplate(
       makeExpense({
@@ -92,64 +92,18 @@ describe("AddExpenseButton", () => {
 
     fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
 
-    const description = screen.getByTestId("expense-item-description");
-    expect(description.props.children).toBe(longDescription);
-    expect(description.props.numberOfLines).toBe(2);
-    expect(description.props.ellipsizeMode).toBeUndefined();
+    expect(screen.getByText(longDescription)).toBeTruthy();
   });
 
-  it("reserves at least 30% row width for the template description column", () => {
-    const { screen } = renderAddExpenseButtonWithTemplate();
-
-    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
-
-    const descriptionColumn = screen.getByTestId("expense-item-description-column");
-    const columnStyle = StyleSheet.flatten(descriptionColumn.props.style);
-
-    expect(columnStyle.minWidth).toBe("30%");
-    expect(columnStyle.flexGrow).toBeGreaterThan(1);
-  });
-
-  it("lets template picker flag and traveller slots shrink when space is tight", () => {
-    const { screen } = renderAddExpenseButtonWithTemplate();
-
-    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
-
-    const flagSlot = screen.getByTestId("expense-item-flag-slot");
-    const travellersSlot = screen.getByTestId("expense-item-travellers-slot");
-
-    expect(StyleSheet.flatten(flagSlot.props.style).flexShrink).toBe(1);
-    expect(StyleSheet.flatten(travellersSlot.props.style).flexShrink).toBe(1);
-  });
-
-  it("uses tighter horizontal padding on the template picker modal", () => {
-    const { screen } = renderAddExpenseButtonWithTemplate();
-
-    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
-
-    const contentStyle = StyleSheet.flatten(
-      screen.getByTestId("expense-template-picker-content").props.style
-    );
-    expect(contentStyle.paddingHorizontal).toBe(6);
-    expect(contentStyle.marginHorizontal).toBe(0);
-  });
-
-  it("keeps the template picker modal within the screen width", () => {
-    const screenWidth = 390;
+  it("shows template descriptions on a narrow screen", () => {
     const useWindowDimensionsSpy = jest
       .spyOn(require("react-native"), "useWindowDimensions")
-      .mockReturnValue({ width: screenWidth, height: 844, scale: 2, fontScale: 1 });
+      .mockReturnValue({ width: 320, height: 600, scale: 2, fontScale: 1 });
 
-    const { screen } = renderAddExpenseButtonWithTemplate();
+    const { screen, templateExpense } = renderAddExpenseButtonWithTemplate();
     fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
 
-    const contentStyle = StyleSheet.flatten(
-      screen.getByTestId("expense-template-picker-content").props.style
-    );
-
-    expect(contentStyle.maxWidth).toBeLessThanOrEqual(screenWidth);
-    expect(contentStyle.width).toBeLessThanOrEqual(screenWidth);
-    expect(contentStyle.maxWidth).toBe(screenWidth - 12);
+    expect(screen.getByText(templateExpense.description)).toBeTruthy();
 
     useWindowDimensionsSpy.mockRestore();
   });

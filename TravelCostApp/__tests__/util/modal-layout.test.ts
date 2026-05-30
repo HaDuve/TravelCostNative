@@ -8,4 +8,9 @@ describe("templatePickerModalContentWidth", () => {
   it("never returns a negative width", () => {
     expect(templatePickerModalContentWidth(4, 6)).toBe(0);
   });
+
+  it("never exceeds the screen width", () => {
+    const screenWidth = 390;
+    expect(templatePickerModalContentWidth(screenWidth)).toBeLessThanOrEqual(screenWidth);
+  });
 });

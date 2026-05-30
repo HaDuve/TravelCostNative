@@ -87,6 +87,7 @@ const ExpenseTemplatePickerModal = ({
         </View>
       </View>
       <FlatList
+        testID="expense-template-picker-list"
         data={templates}
         keyExtractor={(item, index) => item.id ?? `${item.description}-${index}`}
         renderItem={renderItem}

@@ -491,7 +491,6 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
     borderRadius: dynamicScale(8, false, 0.3),
     overflow: "visible",
-    ...GlobalStyles.shadowGlowPrimary,
   },
   autoCompleteStyle: {
     fontSize: dynamicScale(16, false, 0.4),

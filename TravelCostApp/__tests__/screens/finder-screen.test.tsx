@@ -67,6 +67,6 @@ describe("Finder screen", () => {
     });
 
     const scrollView = screen.UNSAFE_getByType(ScrollView);
-    expect(scrollView.props.keyboardShouldPersistTaps).toBe("always");
+    expect(scrollView.props.keyboardShouldPersistTaps).toBe("handled");
   });
 });

@@ -290,7 +290,7 @@ const FinderScreen = () => {
       {datepickerJSX}
       <View style={styles.container}>
         <ScrollView
-          keyboardShouldPersistTaps="always"
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.cardContainer}
         >
           <Text style={styles.titleText}>{i18n.t("finderTitle")}</Text>

@@ -136,6 +136,7 @@ const Autocomplete = ({
         outlineStyle={{ borderRadius: fieldRoundness }}
         selectTextOnFocus
         onFocus={() => {
+          clearBlurDismiss();
           if (value?.length === 0) {
             setMenuVisible(true);
             if (showOnEmpty) setFilteredData([...new Set(data)]);

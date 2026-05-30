@@ -484,7 +484,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
 
   return (
     <ScrollView
-      keyboardShouldPersistTaps="always"
+      keyboardShouldPersistTaps="handled"
       style={styles.container}
     >
       <ExpenseForm

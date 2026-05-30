@@ -39,7 +39,7 @@ describe("Autocomplete", () => {
     expect(Number(menuStyle.elevation ?? 0)).toBeGreaterThan(0);
   });
 
-  it("gives the outlined label a solid background matching the field surface", () => {
+  it("matches the field surface background on the outlined input", () => {
     const screen = renderWithAppProviders(
       <Autocomplete
         value=""
@@ -267,6 +267,33 @@ describe("Autocomplete", () => {
     fireEvent.press(screen.getByTestId("autocomplete-suggestion-0"));
 
     expect(onChange).toHaveBeenCalledWith("Tina");
+  });
+
+  it("keeps suggestions visible after refocus within the blur dismiss window", () => {
+    jest.useFakeTimers();
+    const screen = renderWithAppProviders(
+      <Autocomplete
+        value=""
+        label="Suchen"
+        data={suggestions}
+        showOnEmpty
+        onChange={jest.fn()}
+      />,
+      { wrapNavigation: false }
+    );
+
+    const field = screen.getByTestId("autocomplete-field");
+    fireEvent(field, "focus");
+    fireEvent(field, "blur");
+    fireEvent(field, "focus");
+
+    act(() => {
+      jest.advanceTimersByTime(AUTOCOMPLETE_BLUR_DISMISS_MS);
+    });
+
+    expect(screen.getByTestId("autocomplete-suggestions")).toBeTruthy();
+
+    jest.useRealTimers();
   });
 
   it("raises the container stacking while suggestions are visible", () => {

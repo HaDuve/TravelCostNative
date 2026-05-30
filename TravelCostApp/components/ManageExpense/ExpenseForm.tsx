@@ -2259,8 +2259,6 @@ const styles = StyleSheet.create({
     fontSize: dynamicScale(14, false, 0.3),
   },
   autoCompleteMenuStyle: {
-    marginLeft: dynamicScale(8),
-    marginBottom: dynamicScale(-1, true),
     borderBottomWidth: 1,
     borderBottomColor: GlobalStyles.colors.primaryGrayed,
   },

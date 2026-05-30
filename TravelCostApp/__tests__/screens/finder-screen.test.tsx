@@ -1,4 +1,5 @@
 import * as React from "react";
+import { ScrollView } from "react-native";
 import { act, waitFor } from "@testing-library/react-native";
 
 jest.mock("@react-navigation/native", () => {
@@ -57,5 +58,15 @@ describe("Finder screen", () => {
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
+  });
+
+  it("delivers taps to controls while the keyboard is open", () => {
+    const screen = renderWithAppProviders(<FinderScreen />, {
+      wrapNavigation: false,
+      expenses: { expenses: [] },
+    });
+
+    const scrollView = screen.UNSAFE_getByType(ScrollView);
+    expect(scrollView.props.keyboardShouldPersistTaps).toBe("handled");
   });
 });

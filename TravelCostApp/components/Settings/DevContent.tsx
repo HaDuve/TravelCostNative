@@ -1,4 +1,5 @@
-import { Alert, StyleSheet, Text, View, FlatList } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
+import StaticList from "../UI/StaticList";
 import React, { useContext, useEffect, useState } from "react";
 import { useInterval } from "../Hooks/useInterval";
 import { getOfflineQueue } from "../../util/offline-queue";
@@ -122,21 +123,21 @@ const DevContent = ({ navigation }) => {
         {i18n.t("devOfflineQueue")}
         {(!offlineQueue || offlineQueue.length < 1) && " empty"}
       </Text>
-      <FlatList
+      <StaticList
         data={offlineQueue}
-        renderItem={(item) => {
-          if (!item.item.expense) return null;
-          const index = item.index;
+        keyExtractor={(item, index) => `${item.type}-${index}`}
+        renderItem={({ item, index }) => {
+          if (!item.expense) return null;
           return (
             <View style={{ flexDirection: "row" }}>
               <Text>
-                {index + 1} {item.item.type}{" "}
+                {index + 1} {item.type}{" "}
               </Text>
-              <Text>{item.item.expense?.expenseData?.description}</Text>
+              <Text>{item.expense?.expenseData?.description}</Text>
             </View>
           );
         }}
-      ></FlatList>
+      />
       <Text>{errorMessage}</Text>
       {!isFetching && (
         <Button

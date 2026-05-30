@@ -103,7 +103,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isVisible, onClose }) => {
       onRequestClose={handleClose}
     >
       <KeyboardAvoidingView style={styles.modalOverlay} behavior="padding">
-        <View style={[styles.modalContainer, GlobalStyles.strongShadow]}>
+        <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{i18n.t("feedbackTitle")}</Text>
           </View>
@@ -112,7 +112,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isVisible, onClose }) => {
 
           <View style={styles.inputContainer}>
             <TextInput
-              style={[styles.textInput, GlobalStyles.strongShadow]}
+              style={styles.textInput}
               placeholder={i18n.t("feedbackPlaceholder")}
               placeholderTextColor={GlobalStyles.colors.gray700}
               value={feedbackText}
@@ -170,6 +170,7 @@ const styles = StyleSheet.create({
     marginHorizontal: dynamicScale(20, false, 0.5),
     maxWidth: dynamicScale(400, false, 0.5),
     width: "90%",
+    ...GlobalStyles.strongShadow,
   },
   modalHeader: {
     alignItems: "center",
@@ -200,6 +201,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
     backgroundColor: GlobalStyles.colors.backgroundColor,
     minHeight: dynamicScale(120, false, 0.5),
+    ...GlobalStyles.strongShadow,
   },
   characterCount: {
     fontSize: dynamicScale(12, false, 0.5),

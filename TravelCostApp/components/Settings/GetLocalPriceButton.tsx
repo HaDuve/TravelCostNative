@@ -95,7 +95,7 @@ const GetLocalPriceButton = ({ navigation, style }) => {
         onRequestClose={handleModalClose}
       >
         <KeyboardAvoidingView style={styles.modalOverlay} behavior="padding">
-          <View style={[styles.modalContainer, GlobalStyles.strongShadow]}>
+          <View style={styles.modalContainer}>
             <View style={styles.modalHeader}>
               <Image
                 source={require("../../assets/chatgpt-logo.jpeg")}
@@ -111,7 +111,7 @@ const GetLocalPriceButton = ({ navigation, style }) => {
             </Text>
 
             <TextInput
-              style={[styles.textInput, GlobalStyles.strongShadow]}
+              style={styles.textInput}
               value={productInput}
               onChangeText={setProductInput}
               placeholder={i18n.t("getLocalPricePlaceholder")}
@@ -197,6 +197,7 @@ const styles = StyleSheet.create({
     marginHorizontal: dynamicScale(20, false, 0.5),
     maxWidth: dynamicScale(400, false, 0.5),
     width: "90%",
+    ...GlobalStyles.strongShadow,
   },
   modalHeader: {
     flexDirection: "row",
@@ -231,6 +232,7 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
     marginBottom: dynamicScale(24, true),
     minHeight: dynamicScale(50, true),
+    ...GlobalStyles.strongShadow,
   },
   modalButtons: {
     flexDirection: "row",

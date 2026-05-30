@@ -6,6 +6,7 @@ import Toast, {
 import React from "react";
 import { StyleSheet, View, FlatList } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
+import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 import LoadingBarOverlay from "./LoadingBarOverlay";
 import { Text, ViewStyle } from "react-native";
 
@@ -66,9 +67,10 @@ const toastConfig: ToastConfig = {
       style={[
         {
           borderLeftColor: GlobalStyles.colors.primary500,
+          backgroundColor: GlobalStyles.colors.backgroundColor,
         },
         SIZESTYLES,
-        GlobalStyles.wideStrongShadow,
+        shadowRegressionStyles.toastSurface,
       ]}
       contentContainerStyle={CONTENTCONTAINERSTYLE}
       text1Style={{
@@ -88,9 +90,13 @@ const toastConfig: ToastConfig = {
     <ErrorToast
       {...props}
       style={[
-        { borderLeftColor: GlobalStyles.colors.error500, minHeight: MINHEIGHT },
-        GlobalStyles.wideStrongShadow,
+        {
+          borderLeftColor: GlobalStyles.colors.error500,
+          backgroundColor: GlobalStyles.colors.backgroundColor,
+          minHeight: MINHEIGHT,
+        },
         SIZESTYLES,
+        shadowRegressionStyles.toastSurface,
       ]}
       contentContainerStyle={CONTENTCONTAINERSTYLE}
       text1Style={{
@@ -116,7 +122,7 @@ const toastConfig: ToastConfig = {
     const loadingColor = GlobalStyles.colors.cat8;
     const unfilledColor = GlobalStyles.colors.gray600;
     const loadingBarJSX = progressValid ? (
-      <View style={GlobalStyles.strongShadow}>
+      <View style={shadowRegressionStyles.toastProgressBarTrack}>
         <Progress.Bar
           style={{
             marginTop: dynamicScale(-22, true),
@@ -135,7 +141,7 @@ const toastConfig: ToastConfig = {
       <></>
     );
     return (
-      <View style={[{ flex: 1 }, GlobalStyles.wideStrongShadow]}>
+      <View style={[styles.toastLoadingOuter, shadowRegressionStyles.toastSurface]}>
         <BaseToast
           {...props}
           style={[
@@ -144,7 +150,7 @@ const toastConfig: ToastConfig = {
               backgroundColor: GlobalStyles.colors.backgroundColor,
             },
             SIZESTYLES,
-            GlobalStyles.wideStrongShadow,
+            shadowRegressionStyles.toastSurface,
             progressValid && {
               minHeight: MINHEIGHT_LOADINGBAR,
               paddingBottom: dynamicScale(16, true),
@@ -190,7 +196,7 @@ const toastConfig: ToastConfig = {
       onPress={() => {
         props.onPress();
       }}
-      style={[styles.bannerContainerContainer, GlobalStyles.wideStrongShadow]}
+      style={[styles.bannerContainerContainer, shadowRegressionStyles.toastBannerShell]}
     >
       <BackgroundGradient
         colors={GlobalStyles.gradientColors}
@@ -213,7 +219,7 @@ const toastConfig: ToastConfig = {
             }}
           >
             <View style={styles.xCloseContainer}>
-              <View style={[styles.xCloseButton, GlobalStyles.strongShadow]}>
+              <View style={styles.xCloseButton}>
                 <Text
                   style={{
                     color: GlobalStyles.colors.gray700,
@@ -243,7 +249,7 @@ const toastConfig: ToastConfig = {
             borderRadius: dynamicScale(6),
           },
           SIZESTYLES,
-          GlobalStyles.wideStrongShadow,
+          shadowRegressionStyles.toastSurface,
         ]}
       >
         <Pressable
@@ -354,7 +360,7 @@ const toastConfig: ToastConfig = {
 
     return (
       <View
-        style={[styles.budgetOverviewContainer, GlobalStyles.wideStrongShadow]}
+        style={[styles.budgetOverviewContainer, shadowRegressionStyles.toastSurface]}
       >
         <View style={styles.budgetOverviewHeader}>
           <Text style={styles.overviewTextTitle}>{i18n.t("overview")}</Text>
@@ -418,7 +424,7 @@ const toastConfig: ToastConfig = {
                   <View
                     style={[
                       styles.travellerItemProgressBarContainer,
-                      GlobalStyles.shadow,
+                      shadowRegressionStyles.toastProgressBarTrack,
                     ]}
                   >
                     <Progress.Bar
@@ -595,6 +601,9 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     alignItems: "center",
   },
+  toastLoadingOuter: {
+    flex: 1,
+  },
   xCloseContainer: {
     marginTop: dynamicScale(18, true),
     marginLeft: dynamicScale(4),
@@ -605,6 +614,7 @@ const styles = StyleSheet.create({
     borderColor: "white",
     padding: dynamicScale(4),
     backgroundColor: "white",
+    ...GlobalStyles.strongShadow,
   },
   bannerContainer: {
     maxWidth: "90%",

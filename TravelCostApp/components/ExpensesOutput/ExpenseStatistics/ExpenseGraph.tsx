@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Pressable, Platform } from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 import * as Haptics from "expo-haptics";
 
 import React, { useContext, useMemo } from "react";
@@ -27,6 +27,7 @@ import { SettingsContext } from "../../../store/settings-context";
 import { getExpensesSumPeriod } from "../../../util/expense";
 import { dynamicScale } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
+import { shadowRegressionStyles } from "../../../styles/shadow-regression-styles";
 
 const ExpenseGraph = ({
   periodName,
@@ -34,6 +35,7 @@ const ExpenseGraph = ({
   startingPoint,
   tripCtx,
   navigation,
+  refreshControl,
 }) => {
   const { isPortrait } = useContext(OrientationContext);
 
@@ -520,6 +522,7 @@ const ExpenseGraph = ({
           exiting={FadeOutLeft.duration(500)}
           data={listExpenseSumBudgets}
           renderItem={renderItem}
+          refreshControl={refreshControl}
           ListHeaderComponent={
             <View
               style={[
@@ -549,8 +552,8 @@ const ExpenseGraph = ({
           maxToRenderPerBatch={20}
           // windowSize={7}
           getItemLayout={(data, index) => ({
-            length: dynamicScale(65, true),
-            offset: dynamicScale(65, true) * index,
+            length: dynamicScale(52, true),
+            offset: dynamicScale(52, true) * index,
             index,
           })}
         ></Animated.FlatList>
@@ -572,6 +575,7 @@ ExpenseGraph.propTypes = {
   setLongerPeriodNum: PropTypes.func,
   startingPoint: PropTypes.number,
   setStartingPoint: PropTypes.func,
+  refreshControl: PropTypes.element,
 };
 
 const styles = StyleSheet.create({
@@ -605,43 +609,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   categoryCard: {
-    height: dynamicScale(65, true),
-    minWidth: dynamicScale(200),
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 1,
-          height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 2.84,
-      },
-      android: {
-        // elevation: 0,
-        // borderRadius: 1000,
-        // borderWidth: 1,
-        // borderColor: GlobalStyles.colors.gray600,
-        // marginHorizontal: 12,
-        // marginVertical: 4,
-      },
-    }),
+    ...shadowRegressionStyles.expenseGraphCategoryCard,
   },
 
   itemContainer: {
-    paddingVertical: dynamicScale(12, true),
+    paddingVertical: dynamicScale(4, true),
     paddingHorizontal: dynamicScale(24),
-    marginHorizontal: dynamicScale(20),
-    marginTop: dynamicScale(4, true),
-    ...Platform.select({
-      android: {
-        elevation: 5,
-        borderRadius: 10,
-      },
-    }),
-    marginBottom: dynamicScale(8, true),
+    marginHorizontal: dynamicScale(4),
     borderRadius: dynamicScale(10, false, 0.5),
     flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
@@ -655,19 +632,5 @@ const styles = StyleSheet.create({
   },
   red: {
     color: GlobalStyles.colors.error300,
-  },
-  shadow: {
-    borderTopWidth: 1,
-    borderBottomWidth: 0,
-    borderTopColor: GlobalStyles.colors.gray600,
-    borderBottomColor: GlobalStyles.colors.gray600,
-    minHeight: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    elevation: 2,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 1, height: 2.5 },
-    shadowOpacity: 0.9,
-    shadowRadius: 4,
-    zIndex: 2,
   },
 });

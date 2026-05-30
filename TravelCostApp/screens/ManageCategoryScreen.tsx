@@ -209,7 +209,7 @@ const ManageCategoryScreen = ({ navigation }) => {
       <Animated.View
         entering={ZoomInLeft}
         exiting={ZoomOutRight}
-        style={[styles.categoryItem, GlobalStyles.strongShadow]}
+        style={[styles.categoryItem]}
       >
         <Ionicons
           name={item.icon}
@@ -438,7 +438,6 @@ const ManageCategoryScreen = ({ navigation }) => {
                 minHeight: dynamicScale(284, false, 0.3),
                 maxHeight: dynamicScale(284, false, 0.3),
               },
-              GlobalStyles.shadowPrimary,
             ]}
           >
             <View
@@ -599,7 +598,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: dynamicScale(8, false, 0.5),
     padding: dynamicScale(4, false, 0.5),
-    // paddingHorizontal: 16,
+    ...GlobalStyles.shadowPrimary,
   },
   newCategoryInput: {
     // center
@@ -645,6 +644,7 @@ const styles = StyleSheet.create({
     margin: dynamicScale(8, false, 0.5),
     padding: dynamicScale(16, false, 0.5),
     zIndex: 1,
+    ...GlobalStyles.strongShadow,
   },
   categoryNameInput: {
     fontSize: dynamicScale(16, false, 0.5),

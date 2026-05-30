@@ -1,6 +1,7 @@
 import { Platform, StyleSheet, View, Text } from "react-native";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { GlobalStyles } from "../../constants/styles";
+import { shadowRegressionStyles, periodHeaderLabelFontSize } from "../../styles/shadow-regression-styles";
 import * as Progress from "react-native-progress";
 import { TripContext } from "../../store/trip-context";
 
@@ -67,7 +68,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
 
   if (isOfflineMissingTrip) {
     return (
-      <View style={[styles.container, style]}>
+      <View style={style}>
         <Text style={styles.offlineText}>
           {i18n.t("offline")}: {i18n.t("noDataAvailable")}
         </Text>
@@ -306,11 +307,11 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
 
   return (
     <Pressable
+      testID="expenses-summary-pressable"
       onPress={() => pressBudgetHandler()}
       style={({ pressed }) => [
-        styles.container,
+        shadowRegressionStyles.expensesSummaryContainer,
         style,
-        GlobalStyles.shadow,
         pressed && GlobalStyles.pressedWithShadow,
       ]}
     >
@@ -318,7 +319,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
         <CurrencyTicker
           value={expenseSumNum}
           currency={tripCurrency}
-          fontSize={dynamicScale(32, false, 0.5)}
+          fontSize={periodHeaderLabelFontSize}
           style={{ color: budgetColor }}
           truncate={true}
           truncateLimit={1000}
@@ -329,9 +330,9 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
         color={budgetColor}
         unfilledColor={unfilledColor}
         borderWidth={0}
-        borderRadius={dynamicScale(8)}
+        borderRadius={dynamicScale(6)}
         progress={budgetProgress}
-        height={constantScale(12, 0.5)}
+        height={constantScale(6, 0.5)}
       />
     </Pressable>
   );
@@ -346,25 +347,6 @@ ExpensesSummary.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    maxWidth: "50%",
-    alignItems: "center",
-    ...Platform.select({
-      ios: {
-        paddingTop: dynamicScale(4, true),
-        paddingLeft: dynamicScale(8),
-        paddingRight: dynamicScale(8),
-        marginBottom: dynamicScale(-4, true),
-      },
-      android: {
-        paddingTop: dynamicScale(4, true),
-        paddingLeft: dynamicScale(8),
-        paddingRight: dynamicScale(8),
-        marginBottom: dynamicScale(-4, true),
-      },
-    }),
-  },
   sumTextContainer: {
     alignItems: "center",
   },

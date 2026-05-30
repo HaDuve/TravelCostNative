@@ -8,10 +8,13 @@ import React, {
 
 import { i18n } from "../i18n/i18n";
 
+import StaticList from "../components/UI/StaticList";
+import { shadowRegressionStyles } from "../styles/shadow-regression-styles";
 import {
   Alert,
   FlatList,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   View,
@@ -41,7 +44,6 @@ import Animated from "react-native-reanimated";
 import { formatExpenseWithCurrency } from "../util/string";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
-import { Pressable, ScrollView } from "react-native";
 import { dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 import safeLogError from "../util/error";
@@ -299,6 +301,7 @@ const SplitSummaryScreen = ({ navigation }) => {
       const item = itemData.item;
       return (
         <Pressable
+          testID={`split-balance-row-${item.userName}-${item.whoPaid}`}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             navigation.navigate("FilteredExpenses", {
@@ -310,7 +313,7 @@ const SplitSummaryScreen = ({ navigation }) => {
           }}
           style={({ pressed }) => [
             styles.splitContainer,
-            GlobalStyles.strongShadow,
+            shadowRegressionStyles.splitBalanceRow,
             pressed && GlobalStyles.pressedWithShadow,
           ]}
         >
@@ -406,67 +409,64 @@ const SplitSummaryScreen = ({ navigation }) => {
     return <ErrorOverlay message={error} onConfirm={errorHandler} />;
   }
 
-  return (
-    <ScrollView
-      scrollEnabled={isPortrait}
-      contentContainerStyle={styles.container}
+  const splitSummaryContent = (
+    <Animated.View
+      style={[
+        shadowRegressionStyles.splitSummaryCard,
+        styles.cardContainer,
+        !isPortrait && styles.row,
+      ]}
     >
-      <Animated.View
-        style={[
-          GlobalStyles.wideStrongShadow,
-          styles.cardContainer,
-          !isPortrait && styles.row,
-        ]}
-      >
-        <View style={styles.cardContent}>
-          <View>
-            <View style={styles.titleContainer}>
-              <Text style={styles.titleText}> {titleText}</Text>
-              <View style={styles.syncIndicatorContainer}>
-                <MiniSyncIndicator
-                  isVisible={isFetching}
-                  size={dynamicScale(16, false, 0.5)}
-                />
-              </View>
+      <View style={styles.cardContent}>
+        <View>
+          <View style={styles.titleContainer}>
+            <Text style={styles.titleText}> {titleText}</Text>
+            <View style={styles.syncIndicatorContainer}>
+              <MiniSyncIndicator
+                isVisible={isFetching}
+                size={dynamicScale(16, false, 0.5)}
+              />
             </View>
-            {isTripSettled && (
-              <View style={styles.subTitleContainer}>
-                <Text
-                  style={[
-                    styles.subTitleText,
-                    {
-                      color: GlobalStyles.colors.primary500,
-                      fontWeight: "600",
-                    },
-                  ]}
-                >
-                  {i18n.t("tripSettledAllExpensesPaid")}
-                </Text>
-              </View>
-            )}
-            {!isTripSettled && (
-              <>
-                <View style={styles.subTitleContainer}>
-                  <Text style={styles.subTitleText}> {totalPaidBackText}</Text>
-                </View>
-                <View style={styles.subTitleContainer}>
-                  <Text style={styles.subTitleText}> {totalPayBackText}</Text>
-                </View>
-              </>
-            )}
-            {!isPortrait && ButtonContainerJSX}
           </View>
+          {isTripSettled && (
+            <View style={styles.subTitleContainer}>
+              <Text
+                style={[
+                  styles.subTitleText,
+                  {
+                    color: GlobalStyles.colors.primary500,
+                    fontWeight: "600",
+                  },
+                ]}
+              >
+                {i18n.t("tripSettledAllExpensesPaid")}
+              </Text>
+            </View>
+          )}
+          {!isTripSettled && (
+            <>
+              <View style={styles.subTitleContainer}>
+                <Text style={styles.subTitleText}> {totalPaidBackText}</Text>
+              </View>
+              <View style={styles.subTitleContainer}>
+                <Text style={styles.subTitleText}> {totalPayBackText}</Text>
+              </View>
+            </>
+          )}
+          {!isPortrait && ButtonContainerJSX}
+        </View>
 
-          <FlatList
+        {isPortrait ? (
+          <StaticList
             style={{
               paddingHorizontal: dynamicScale(8, false, 0.5),
               flex: 1,
             }}
             contentContainerStyle={{
-              paddingBottom: isPortrait ? 0 : dynamicScale(18, false, 0.5),
+              paddingBottom: 0,
             }}
             data={splits}
-            scrollEnabled={!isPortrait}
+            keyExtractor={(item) => `${item.userName}-${item.whoPaid}`}
             ListHeaderComponent={
               <View style={{ height: dynamicScale(20, false, 0.5) }}></View>
             }
@@ -492,11 +492,49 @@ const SplitSummaryScreen = ({ navigation }) => {
             }
             renderItem={renderSplitItem}
           />
-        </View>
-        {isPortrait && ButtonContainerJSX}
-      </Animated.View>
-    </ScrollView>
+        ) : (
+          <FlatList
+            style={{
+              paddingHorizontal: dynamicScale(8, false, 0.5),
+              flex: 1,
+            }}
+            contentContainerStyle={{
+              paddingBottom: dynamicScale(18, false, 0.5),
+            }}
+            data={splits}
+            scrollEnabled={true}
+            ListHeaderComponent={
+              <View style={{ height: dynamicScale(20, false, 0.5) }}></View>
+            }
+            ListEmptyComponent={
+              isTripSettled ? (
+                <View style={{ padding: 20, alignItems: "center" }}>
+                  <Text
+                    style={[
+                      styles.subTitleText,
+                      { color: GlobalStyles.colors.primary500 },
+                    ]}
+                  >
+                    {i18n.t("noOpenSplitsAllSettled")}
+                  </Text>
+                </View>
+              ) : splits.length === 0 && !isFetching ? (
+                <View style={{ padding: 20, alignItems: "center" }}>
+                  <Text style={styles.subTitleText}>
+                    {i18n.t("noOpenSplits")}
+                  </Text>
+                </View>
+              ) : null
+            }
+            renderItem={renderSplitItem}
+          />
+        )}
+      </View>
+      {isPortrait && ButtonContainerJSX}
+    </Animated.View>
   );
+
+  return <View style={styles.container}>{splitSummaryContent}</View>;
 };
 
 export default SplitSummaryScreen;
@@ -558,7 +596,7 @@ const styles = StyleSheet.create({
     }),
   },
   splitContainer: {
-    flex: 1,
+    alignSelf: "stretch",
     flexDirection: "row",
     paddingHorizontal: dynamicScale(16, false, 0.5),
     paddingVertical: dynamicScale(8, false, 0.5),

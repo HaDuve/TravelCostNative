@@ -21,15 +21,17 @@ function TripList({ trips }) {
   }
   return (
     <View
+      testID="trip-list-wrapper"
       style={{
         flex: 1,
-        zIndex: -10,
+        minHeight: dynamicScale(120, true),
       }}
     >
       <FlatList
         data={uniqTrips}
-        scrollEnabled={isLandscape}
+        scrollEnabled={true}
         horizontal={isLandscape}
+        style={{ flex: 1 }}
         ListFooterComponent={
           <View style={{ height: constantScale(150), width: "100%" }}></View>
         }

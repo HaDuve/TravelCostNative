@@ -3,7 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  FlatList,
   Alert,
   useWindowDimensions,
 } from "react-native";
@@ -11,6 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 
 import { GlobalStyles } from "../../constants/styles";
+import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 import * as Progress from "react-native-progress";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { TripContext } from "../../store/trip-context";
@@ -378,8 +378,9 @@ function TripHistoryItem({ tripid, trips }) {
         style={({ pressed }) => pressed && GlobalStyles.pressed}
       >
         <View
+          testID={`trip-history-card-${tripid}`}
           style={[
-            GlobalStyles.wideStrongShadow,
+            shadowRegressionStyles.tripHistoryCard,
             styles.tripItem,
             !contextTrip && styles.inactive,
             activeBorder,
@@ -428,18 +429,23 @@ function TripHistoryItem({ tripid, trips }) {
 
   const dimensionChars = dynamicScale(25, false, 0.4);
 
-  function renderTravellers(item) {
-    if (!item.item?.userName) return <></>;
+  function renderTravellers({ item }: { item: { userName?: string } }) {
+    if (!item?.userName) return <></>;
     return (
-      <View style={[GlobalStyles.strongShadow, styles.travellerCard]}>
-        <View style={[styles.avatar, GlobalStyles.shadowPrimary]}>
+      <View
+        testID={`trip-traveller-${item.userName}`}
+        style={[
+          shadowRegressionStyles.tripTravellerChip,
+          styles.travellerCard,
+        ]}
+      >
+        <View style={shadowRegressionStyles.tripTravellerAvatar}>
           <Text style={styles.avatarText}>
-            {/* TODO: Profile Picture for now replaced with first char of the name */}
-            {item.item?.userName?.charAt(0)}
+            {item.userName.charAt(0)}
           </Text>
         </View>
         <Text style={styles.travellerNameText}>
-          {truncateString(item.item.userName, 10)}
+          {truncateString(item.userName, 10)}
         </Text>
       </View>
     );
@@ -451,10 +457,11 @@ function TripHistoryItem({ tripid, trips }) {
       style={({ pressed }) => pressed && GlobalStyles.pressed}
     >
       <View
+        testID={`trip-history-card-${tripid}`}
         style={[
           styles.tripItem,
           !contextTrip && styles.inactive,
-          GlobalStyles.wideStrongShadow,
+          shadowRegressionStyles.tripHistoryCard,
           activeBorder,
         ]}
       >
@@ -502,14 +509,20 @@ function TripHistoryItem({ tripid, trips }) {
             />
           </View>
         </View>
-        <FlatList
-          data={travellers}
-          renderItem={renderTravellers}
-          numColumns={2}
-          keyExtractor={(item) => {
-            return item.userName + tripid;
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            width: "100%",
           }}
-        ></FlatList>
+          testID="trip-travellers-wrap"
+        >
+          {travellers.map((item) => (
+            <React.Fragment key={item.userName + tripid}>
+              {renderTravellers({ item })}
+            </React.Fragment>
+          ))}
+        </View>
       </View>
     </Pressable>
   );
@@ -528,7 +541,6 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
   tripItem: {
-    flex: 1,
     padding: dynamicScale(12),
     margin: dynamicScale(12),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
@@ -589,15 +601,6 @@ const styles = StyleSheet.create({
         backgroundColor: GlobalStyles.colors.gray300,
       },
     }),
-  },
-  avatar: {
-    minHeight: dynamicScale(20, false, 0.5),
-    minWidth: dynamicScale(20, false, 0.5),
-    borderRadius: dynamicScale(60, false, 0.5),
-    backgroundColor: GlobalStyles.colors.gray500,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: dynamicScale(14, false, 0.5),
   },
   avatarText: {
     fontSize: dynamicScale(14, false, 0.5),

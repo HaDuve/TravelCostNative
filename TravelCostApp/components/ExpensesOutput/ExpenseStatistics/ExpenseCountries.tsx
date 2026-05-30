@@ -13,6 +13,7 @@ import { getCatLocalized } from "../../../util/category";
 import PropTypes from "prop-types";
 import { ExpenseData, getExpensesSum } from "../../../util/expense";
 import ExpenseCountryFlag from "../ExpenseCountryFlag";
+import { shadowRegressionStyles } from "../../../styles/shadow-regression-styles";
 import BlurPremium from "../../Premium/BlurPremium";
 import { processTitleStringFilteredPiecharts } from "../../../util/string";
 import { TripContext } from "../../../store/trip-context";
@@ -24,6 +25,7 @@ const ExpenseCountries = ({
   periodName,
   navigation,
   forcePortraitFormat = false,
+  refreshControl,
 }) => {
   const layoutAnim = useMemo(
     () => Layout.damping(50).stiffness(300).overshootClamping(0.8),
@@ -87,7 +89,7 @@ const ExpenseCountries = ({
       <ExpenseCountryFlag
         countryName={country}
         style={GlobalStyles.countryFlagStyle}
-        containerStyle={[styles.countryFlagContainerStyle, GlobalStyles.shadow]}
+        containerStyle={styles.countryFlagContainerStyle}
       ></ExpenseCountryFlag>
     );
     return (
@@ -131,6 +133,7 @@ const ExpenseCountries = ({
         data={catSumCat}
         renderItem={renderItem}
         keyExtractor={(item) => item.cat}
+        refreshControl={refreshControl}
         ListHeaderComponent={
           !useRowFormat ? (
             <CategoryChart inputData={dataList}></CategoryChart>
@@ -174,19 +177,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   categoryCard: {
-    marginBottom: dynamicScale(20, true),
-    marginHorizontal: dynamicScale(16),
     paddingBottom: dynamicScale(12, true),
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 1,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 2.84,
-    elevation: 5,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: dynamicScale(10, false, 0.5),
+    ...shadowRegressionStyles.statisticsPieCategoryCard,
   },
   countryFlagContainerStyle: {
     marginBottom: dynamicScale(3, true),

@@ -22,23 +22,21 @@ const SettingsSwitch = ({ style, toggleState, state, label, labelStyle, infoButt
         </Text>
       </View>
       {infoButton}
-      <Switch
-        trackColor={{
-          false: GlobalStyles.colors.gray500,
-          true: GlobalStyles.colors.primary500,
-        }}
-        thumbColor={
-          state
-            ? GlobalStyles.colors.backgroundColor
-            : GlobalStyles.colors.gray500Accent
-        }
-        onValueChange={toggleState}
-        value={state}
-        style={[
-          { marginBottom: dynamicScale(8, true) },
-          GlobalStyles.shadowPrimary,
-        ]}
-      />
+      <View style={styles.switchTrackShadow}>
+        <Switch
+          trackColor={{
+            false: GlobalStyles.colors.gray500,
+            true: GlobalStyles.colors.primary500,
+          }}
+          thumbColor={
+            state
+              ? GlobalStyles.colors.backgroundColor
+              : GlobalStyles.colors.gray500Accent
+          }
+          onValueChange={toggleState}
+          value={state}
+        />
+      </View>
       {/* </LinearGradient> */}
     </Pressable>
   );
@@ -73,5 +71,11 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.textColor,
     fontSize: dynamicScale(16, false, 0.5),
     marginBottom: dynamicScale(16, true),
+  },
+  switchTrackShadow: {
+    marginBottom: dynamicScale(8, true),
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: dynamicScale(16, false, 0.5),
+    ...GlobalStyles.shadowPrimary,
   },
 });

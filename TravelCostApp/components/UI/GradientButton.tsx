@@ -1,6 +1,7 @@
-import { StyleSheet, Text, View, Pressable, Platform } from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 import React from "react";
 import { GlobalStyles } from "../../constants/styles";
+import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import PropTypes from "prop-types";
@@ -21,27 +22,38 @@ const GradientButton = ({
     return;
   };
   return (
-    <View style={[style, GlobalStyles.shadowPrimary]}>
-      <Pressable
-        onPress={onPressHandler}
-        style={({ pressed }) => [pressed && GlobalStyles.pressedWithShadow]}
+    <View testID="gradient-button-layout" style={style}>
+      <View
+        testID="gradient-button-shadow"
+        style={[
+          shadowRegressionStyles.gradientButtonShadow,
+          { backgroundColor: colors[colors.length - 1] },
+        ]}
       >
-        <LinearGradient
-          start={{ x: 0.51, y: -1.3 }}
-          colors={colors}
-          style={[styles.button, buttonStyle, { overflow: "hidden" }]}
+        <Pressable
+          onPress={onPressHandler}
+          style={({ pressed }) => [
+            styles.pressable,
+            pressed && GlobalStyles.pressedWithShadow,
+          ]}
         >
-          <Text
-            style={[
-              GlobalStyles.buttonTextGradient,
-              darkText && { color: GlobalStyles.colors.textColor },
-              textStyle,
-            ]}
+          <LinearGradient
+            start={{ x: 0.51, y: -1.3 }}
+            colors={colors}
+            style={[styles.button, styles.gradientFill, buttonStyle]}
           >
-            {children}
-          </Text>
-        </LinearGradient>
-      </Pressable>
+            <Text
+              style={[
+                GlobalStyles.buttonTextGradient,
+                darkText && { color: GlobalStyles.colors.textColor },
+                textStyle,
+              ]}
+            >
+              {children}
+            </Text>
+          </LinearGradient>
+        </Pressable>
+      </View>
     </View>
   );
 };
@@ -58,25 +70,15 @@ GradientButton.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  pressable: {
+    alignSelf: "stretch",
+  },
   button: {
     padding: dynamicScale(16, false, 0.5),
-    marginHorizontal: dynamicScale(4),
-    backgroundColor: GlobalStyles.colors.primary500,
-
-    overflow: "visible",
-
-    ...Platform.select({
-      ios: {
-        shadowColor: GlobalStyles.colors.textColor,
-        shadowRadius: 3,
-        shadowOffset: { width: 2, height: 2 },
-        shadowOpacity: 0.4,
-        borderRadius: 16,
-      },
-      android: {
-        elevation: 5,
-      },
-    }),
+  },
+  gradientFill: {
+    borderRadius: 16,
+    overflow: "hidden",
   },
   flat: {
     // TODO: find another way android

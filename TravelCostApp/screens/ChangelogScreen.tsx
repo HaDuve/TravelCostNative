@@ -9,6 +9,9 @@ import { VersionCheckResponse, versionCheck } from "../util/version";
 import InfoButton from "../components/UI/InfoButton";
 import { parseChangelog } from "../util/parseChangelog";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import StaticList from "../components/UI/StaticList";
+import { shadowRegressionStyles } from "../styles/shadow-regression-styles";
+import { ChangelogItem } from "../util/parseChangelog";
 import { Pressable } from "react-native";
 import * as Haptics from "expo-haptics";
 import { NetworkContext } from "../store/network-context";
@@ -18,12 +21,12 @@ import { constantScale } from "../util/scalingUtil";
 
 import { i18n } from "../i18n/i18n";
 
-function renderChangelogItem(item) {
+function renderChangelogItem({ item }: { item: ChangelogItem }) {
   return (
-    <View style={[styles.changelogContainer, GlobalStyles.strongShadow]}>
+    <View style={[styles.changelogContainer, shadowRegressionStyles.changelogItem]}>
       <Text style={styles.changelogText}>
-        {item.item.versionString}
-        {item.item.changes} {"\n"}
+        {item.versionString}
+        {item.changes} {"\n"}
       </Text>
     </View>
   );
@@ -61,10 +64,6 @@ const ChangelogScreen = ({ navigation }) => {
     const fallBackChangelog = getMMKVString(MMKV_KEYS.CHANGELOG_TXT);
     if (fallBackChangelog) {
       setChangelogText(fallBackChangelog); //.replaceAll("- ", "\n • "));
-    }
-    const fallBackVersion = getMMKVString(MMKV_KEYS.CURRENT_VERSION);
-    if (fallBackVersion) {
-      setCurrentVersion(fallBackVersion);
     }
     setIsFetching(false);
   }, []);
@@ -115,44 +114,48 @@ const ChangelogScreen = ({ navigation }) => {
       </View>
 
       <Pressable
+        testID="changelog-section-whats-new"
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           setShowNewChanges(!showNewChanges);
         }}
         style={({ pressed }) => [
-          styles.changelogContainer,
-          GlobalStyles.shadowGlowPrimary,
+          shadowRegressionStyles.changelogSectionHeader,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
       >
         <Text style={styles.subHeaderText}>{i18n.t("whatsNew")}</Text>
       </Pressable>
       {showNewChanges && (
-        <Animated.FlatList
-          entering={FadeInUp}
-          data={parsedNewChanges}
-          renderItem={renderChangelogItem}
-        ></Animated.FlatList>
+        <Animated.View entering={FadeInUp}>
+          <StaticList
+            data={parsedNewChanges}
+            keyExtractor={(item) => item.versionString}
+            renderItem={renderChangelogItem}
+          />
+        </Animated.View>
       )}
       <Pressable
+        testID="changelog-section-other-changes"
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           setShowOldChanges(!showOldChanges);
         }}
         style={({ pressed }) => [
-          styles.changelogContainer,
-          GlobalStyles.shadowGlowPrimary,
+          shadowRegressionStyles.changelogSectionHeader,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
       >
         <Text style={styles.subHeaderText}>{i18n.t("otherChanges")}</Text>
       </Pressable>
       {showOldChanges && (
-        <Animated.FlatList
-          entering={FadeInUp}
-          data={parsedOldChanges}
-          renderItem={renderChangelogItem}
-        ></Animated.FlatList>
+        <Animated.View entering={FadeInUp}>
+          <StaticList
+            data={parsedOldChanges}
+            keyExtractor={(item) => item.versionString}
+            renderItem={renderChangelogItem}
+          />
+        </Animated.View>
       )}
       {/* <Pressable
         onPress={() => {

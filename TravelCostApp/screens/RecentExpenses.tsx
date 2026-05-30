@@ -23,6 +23,10 @@ import { fetchTravelerIsTouched } from "../util/http";
 import { StyleSheet, Text, View, RefreshControl } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
+import {
+  periodHeaderLabelFontSize,
+  shadowRegressionStyles,
+} from "../styles/shadow-regression-styles";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
 import { DateTime } from "luxon";
 
@@ -354,6 +358,7 @@ function RecentExpenses({ navigation }) {
         zone={3}
       ></TourGuideZone>
       <View
+        testID="period-date-header"
         style={[
           styles.dateHeader,
           !isPortrait && styles.landscapeDateHeader,
@@ -372,7 +377,10 @@ function RecentExpenses({ navigation }) {
         </View>
       </View>
 
-      <View style={[styles.header, !isPortrait && styles.landscapeHeader]}>
+      <View
+        testID="period-header-row"
+        style={[styles.header, !isPortrait && styles.landscapeHeader]}
+      >
         <DropDownPicker
           open={open}
           value={PeriodValue}
@@ -412,7 +420,10 @@ function RecentExpenses({ navigation }) {
         <ExpensesSummary expenses={recentExpenses} periodName={PeriodValue} />
       </View>
       <View
-        style={[styles.tempGrayBar1, !isPortrait && styles.landscapeBar]}
+        style={[
+          shadowRegressionStyles.overviewDividerBar,
+          !isPortrait && styles.landscapeBar,
+        ]}
       ></View>
       {ExpensesOutputJSX}
 
@@ -446,9 +457,7 @@ const styles = StyleSheet.create({
     paddingTop: constantScale(16, 0.5),
   },
   dateHeader: {
-    marginVertical: dynamicScale(16, true),
-    marginLeft: dynamicScale(12),
-    marginBottom: dynamicScale(-20, true),
+    ...shadowRegressionStyles.overviewPeriodDateHeader,
   },
   dateHeaderContent: {
     flexDirection: "row",
@@ -466,12 +475,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.gray700,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    marginTop: dynamicScale(24, true),
-    marginHorizontal: dynamicScale(8),
-    marginBottom: dynamicScale(12, true),
-    zIndex: 10,
+    ...shadowRegressionStyles.overviewPeriodHeaderRow,
   },
   landscapeHeader: {
     marginTop: dynamicScale(4, true),
@@ -482,34 +486,20 @@ const styles = StyleSheet.create({
     marginHorizontal: dynamicScale(12),
   },
   dropdownContainer: {
-    maxWidth: dynamicScale(170, false, 0.5),
-    marginTop: dynamicScale(8, true),
-    ...Platform.select({
-      ios: {
-        shadowColor: GlobalStyles.colors.textColor,
-        shadowOffset: { width: 1, height: 1 },
-        shadowOpacity: 0.35,
-        shadowRadius: 4,
-      },
-      android: {
-        // marginTop: "4%",
-        elevation: 8,
-        borderRadius: 12,
-      },
-    }),
+    ...shadowRegressionStyles.overviewDropdownContainer,
   },
   dropdownContainerDropdown: {
     maxHeight: dynamicScale(600, true),
+    ...shadowRegressionStyles.dropdownListContainer,
   },
   dropdown: {
-    borderRadius: 10,
-    borderWidth: 0,
+    ...shadowRegressionStyles.overviewDropdownInner,
   },
   dropdownTextStyle: {
     fontSize:
       i18n.locale == "fr"
         ? dynamicScale(20, false, 0.5)
-        : dynamicScale(34, false, 0.5),
+        : periodHeaderLabelFontSize,
     fontWeight: "bold",
   },
   scaledUpTextStyle: {
@@ -518,22 +508,8 @@ const styles = StyleSheet.create({
   zBehind: {
     zIndex: 10,
   },
-  tempGrayBar1: {
-    borderTopWidth: 1,
-    borderBottomWidth: 0,
-    borderTopColor: GlobalStyles.colors.gray600,
-    borderBottomColor: GlobalStyles.colors.gray600,
-    minHeight: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    elevation: 2,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 1, height: 2.5 },
-    shadowOpacity: 0.9,
-    shadowRadius: 4,
-    zIndex: 2,
-  },
   landscapeBar: {
-    // marginTop: dynamicScale(24, true),
-    // marginBottom: dynamicScale(-8, true),
+    marginTop: dynamicScale(12, true),
+    marginBottom: dynamicScale(-12, true),
   },
 });

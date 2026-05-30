@@ -6,13 +6,13 @@ import {
   StyleSheet,
   Text,
   View,
-  ScrollView,
 } from "react-native";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
 import IconButton from "../components/UI/IconButton";
 import FeedbackForm from "../components/FeedbackForm/FeedbackForm";
 import { GlobalStyles } from "../constants/styles";
+import { shadowRegressionStyles } from "../styles/shadow-regression-styles";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 
@@ -323,7 +323,7 @@ const ProfileScreen = ({ navigation }) => {
           {i18n.t("supportFeedbackLabel")}
         </GradientButton>
       </View>
-      <ScrollView style={styles.tripContainer}>
+      <View style={styles.tripContainer} testID="profile-trip-container">
         <View style={styles.horizontalContainer}>
           <Text style={styles.tripListTitle}>{i18n.t("myTrips")}</Text>
           <TourGuideZone
@@ -357,10 +357,11 @@ const ProfileScreen = ({ navigation }) => {
           maskOffset={constantScale(200, 0.1)}
           tooltipBottomOffset={constantScale(150, 0.1)}
           zone={6}
+          style={{ flex: 1 }}
         >
           <TripList trips={tripHistory}></TripList>
         </TourGuideZone>
-      </ScrollView>
+      </View>
       <View style={styles.horizontalButtonContainer}>
         <TourGuideZone
           text={i18n.t("walk7")}
@@ -371,7 +372,7 @@ const ProfileScreen = ({ navigation }) => {
           <View>
             <IconButton
               icon="list-outline"
-              buttonStyle={[styles.addButton, GlobalStyles.shadowGlowPrimary]}
+              buttonStyle={[styles.addButton, shadowRegressionStyles.addExpenseFab]}
               size={dynamicScale(42, false, 0.5)}
               color={GlobalStyles.colors.backgroundColor}
               badge={null}
@@ -443,9 +444,8 @@ const styles = StyleSheet.create({
 
   tripContainer: {
     flex: 1,
-    // minHeight: "68%",
     margin: dynamicScale(16),
-    marginBottom: dynamicScale(-150, true),
+    marginBottom: dynamicScale(8, true),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   horizontalContainer: {

@@ -289,10 +289,7 @@ const FinderScreen = () => {
     <>
       {datepickerJSX}
       <View style={styles.container}>
-        <ScrollView
-          style={[GlobalStyles.wideStrongShadow]}
-          contentContainerStyle={styles.cardContainer}
-        >
+        <ScrollView contentContainerStyle={styles.cardContainer}>
           <Text style={styles.titleText}>{i18n.t("finderTitle")}</Text>
           <View
             // scrollEnabled={false}
@@ -319,10 +316,7 @@ const FinderScreen = () => {
                 showOnEmpty
                 // placeholder="Search for descriptions, categories, traveller names..."
                 label={i18n.t("searchLabel")}
-                containerStyle={[
-                  styles.queryContainer,
-                  GlobalStyles.shadowGlowPrimary,
-                ]}
+                containerStyle={styles.queryContainer}
                 style={styles.autoCompleteStyle}
                 menuStyle={styles.autoCompleteMenuStyle}
               ></Autocomplete>
@@ -429,6 +423,7 @@ const styles = StyleSheet.create({
     borderRadius: dynamicScale(20, false, 0.5),
     padding: dynamicScale(20),
     justifyContent: "space-around",
+    ...GlobalStyles.wideStrongShadow,
     // android styles
     ...Platform.select({
       android: {
@@ -488,6 +483,8 @@ const styles = StyleSheet.create({
     marginTop: dynamicScale(10, true),
     marginLeft: dynamicScale(18),
     maxWidth: dynamicScale(180),
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
+    ...GlobalStyles.shadowGlowPrimary,
   },
   autoCompleteStyle: {
     zIndex: 0,

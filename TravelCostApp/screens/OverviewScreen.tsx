@@ -13,12 +13,12 @@ import {
   StyleSheet,
   Text,
   View,
-  ScrollView,
   RefreshControl,
   Pressable,
 } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
+import { shadowRegressionStyles, periodHeaderLabelFontSize } from "../styles/shadow-regression-styles";
 import { MemoizedExpensesOverview } from "../components/ExpensesOutput/ExpensesOverview";
 import ToggleButton from "../assets/SVG/toggleButton";
 import { TourGuideZone } from "rn-tourguide";
@@ -185,6 +185,7 @@ const OverviewScreen = ({ navigation }) => {
   return (
     <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
       <View
+        testID="period-date-header"
         style={[
           styles.dateHeader,
           !isPortrait && styles.landscapeDateHeader,
@@ -197,7 +198,10 @@ const OverviewScreen = ({ navigation }) => {
           {offlineString}
         </Text>
       </View>
-      <View style={[styles.header, !isPortrait && styles.landscapeHeader]}>
+      <View
+        testID="period-header-row"
+        style={[styles.header, !isPortrait && styles.landscapeHeader]}
+      >
         <DropDownPicker
           open={open}
           value={PeriodValue}
@@ -251,33 +255,31 @@ const OverviewScreen = ({ navigation }) => {
       {
         <View
           style={[
-            styles.tempGrayBar1,
+            shadowRegressionStyles.overviewDividerBar,
             !isPortrait && styles.landscapeBar,
             !isPortrait && isTablet && styles.landscapeBarTablet,
           ]}
         ></View>
       }
 
-      <ScrollView
-        style={{ flex: 1 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing || isFetching}
-            onRefresh={onRefresh}
-            tintColor={GlobalStyles.colors.textColor}
-            colors={[GlobalStyles.colors.textColor]}
-            style={{
-              backgroundColor: "transparent",
-            }}
-          />
-        }
-      >
+      <View style={{ flex: 1 }}>
         <MemoizedExpensesOverview
           navigation={navigation}
           expenses={recentExpenses}
           periodName={PeriodValue}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing || isFetching}
+              onRefresh={onRefresh}
+              tintColor={GlobalStyles.colors.textColor}
+              colors={[GlobalStyles.colors.textColor]}
+              style={{
+                backgroundColor: "transparent",
+              }}
+            />
+          }
         />
-      </ScrollView>
+      </View>
 
       {/* FAB Toggle Button */}
       <TourGuideZone
@@ -316,9 +318,7 @@ const styles = StyleSheet.create({
     paddingTop: constantScale(12, 0.5),
   },
   dateHeader: {
-    marginTop: dynamicScale(12, true),
-    marginLeft: dynamicScale(18),
-    marginBottom: dynamicScale(-4, true),
+    ...shadowRegressionStyles.overviewPeriodDateHeader,
   },
   landscapeDateHeader: {
     marginTop: dynamicScale(4, true),
@@ -336,12 +336,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.gray700,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    zIndex: 10,
-    marginTop: dynamicScale(18, true),
-    paddingHorizontal: dynamicScale(12),
-    marginBottom: dynamicScale(12, true),
+    ...shadowRegressionStyles.overviewPeriodHeaderRow,
   },
   landscapeHeader: {
     marginTop: dynamicScale(12, true),
@@ -352,34 +347,20 @@ const styles = StyleSheet.create({
     marginHorizontal: dynamicScale(12),
   },
   dropdownContainer: {
-    maxWidth: dynamicScale(170, false, 0.5),
-    marginTop: dynamicScale(2, true),
-    ...Platform.select({
-      ios: {
-        shadowColor: GlobalStyles.colors.textColor,
-        shadowOffset: { width: 1, height: 1 },
-        shadowOpacity: 0.35,
-        shadowRadius: 4,
-      },
-      android: {
-        // marginTop: "2%",
-        elevation: 8,
-        borderRadius: 12,
-      },
-    }),
+    ...shadowRegressionStyles.overviewDropdownContainer,
   },
   dropdownContainerDropdown: {
     maxHeight: dynamicScale(600, true),
+    ...shadowRegressionStyles.dropdownListContainer,
   },
   dropdown: {
-    borderRadius: 10,
-    borderWidth: 0,
+    ...shadowRegressionStyles.overviewDropdownInner,
   },
   dropdownTextStyle: {
     fontSize:
       i18n.locale == "fr"
         ? dynamicScale(20, false, 0.5)
-        : dynamicScale(34, false, 0.5),
+        : periodHeaderLabelFontSize,
     fontWeight: "bold",
   },
   scaledUpTextStyle: {
@@ -387,21 +368,6 @@ const styles = StyleSheet.create({
   },
   zBehind: {
     zIndex: 10,
-  },
-
-  tempGrayBar1: {
-    borderTopWidth: 1,
-    borderBottomWidth: 0,
-    borderTopColor: GlobalStyles.colors.gray600,
-    borderBottomColor: GlobalStyles.colors.gray600,
-    minHeight: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    elevation: 2,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 1, height: 2.5 },
-    shadowOpacity: 0.9,
-    shadowRadius: 4,
-    zIndex: 0,
   },
   landscapeBar: {
     marginTop: dynamicScale(12, true),
@@ -411,16 +377,9 @@ const styles = StyleSheet.create({
     marginTop: dynamicScale(52, true, 1),
     marginBottom: dynamicScale(4, true),
   },
-  customSummaryStyle: {
-    marginTop: dynamicScale(-10, true, 0.3),
-  },
+  customSummaryStyle: {},
   fabToggleButton: {
-    position: "absolute",
-    bottom: dynamicScale(20, true),
-    left: "50%",
-    marginLeft: constantScale(-49, 0.08), // Half of the svg width to center it
-    zIndex: 1000,
-    elevation: 10,
-    ...GlobalStyles.shadowGlowPrimary,
+    ...shadowRegressionStyles.overviewFabToggleButton,
   },
 });
+

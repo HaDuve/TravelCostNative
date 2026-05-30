@@ -1263,33 +1263,29 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               label: i18n.t("notPaidLabel"),
               value: isPaidString.notPaid,
               showSelectedCheck: true,
-              style: [
-                {
-                  backgroundColor:
-                    paidBack == isPaidString.paid
-                      ? GlobalStyles.colors.gray500
-                      : GlobalStyles.colors.gray300,
-                },
+              style:
                 paidBack == isPaidString.paid
-                  ? GlobalStyles.strongShadow
-                  : null,
-              ],
+                  ? {
+                      backgroundColor: GlobalStyles.colors.gray500,
+                      ...GlobalStyles.strongShadow,
+                    }
+                  : {
+                      backgroundColor: GlobalStyles.colors.gray300,
+                    },
             },
             {
               label: i18n.t("paidLabel"),
               value: isPaidString.paid,
               showSelectedCheck: true,
-              style: [
-                {
-                  backgroundColor:
-                    paidBack == isPaidString.notPaid
-                      ? GlobalStyles.colors.gray500
-                      : GlobalStyles.colors.gray300,
-                },
+              style:
                 paidBack == isPaidString.notPaid
-                  ? GlobalStyles.strongShadow
-                  : null,
-              ],
+                  ? {
+                      backgroundColor: GlobalStyles.colors.gray500,
+                      ...GlobalStyles.strongShadow,
+                    }
+                  : {
+                      backgroundColor: GlobalStyles.colors.gray300,
+                    },
               // checkedColor: GlobalStyles.colors.primary500,
             },
           ]}
@@ -1406,7 +1402,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
           <Animated.View layout={LinearTransition} style={styles.form}>
             <View style={styles.inputsRow}>
               <Input
-                inputStyle={[styles.amountInput, GlobalStyles.strongShadow]}
+                inputStyle={styles.amountInput}
                 label={
                   i18n.t("priceIn") + getCurrencySymbol(inputs.currency.value)
                 }
@@ -1421,10 +1417,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               />
               {inputs.amount.value && isAndroid && (
                 <IconButton
-                  buttonStyle={[
-                    styles.quickSumButton,
-                    GlobalStyles.strongShadow,
-                  ]}
+                  buttonStyle={styles.quickSumButton}
                   icon={"add-outline"}
                   color={GlobalStyles.colors.textColor}
                   size={dynamicScale(24, false, 0.5)}
@@ -1439,10 +1432,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               )}
               {!inputs.amount.value && tempAmount && (
                 <IconButton
-                  buttonStyle={[
-                    styles.quickSumButton,
-                    GlobalStyles.strongShadow,
-                  ]}
+                  buttonStyle={styles.quickSumButton}
                   icon={"return-down-back-outline"}
                   color={GlobalStyles.colors.textColor}
                   size={dynamicScale(24, false, 0.5)}
@@ -1469,7 +1459,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                 </Text>
               )}
               <IconButton
-                buttonStyle={[styles.iconButton, GlobalStyles.strongShadow]}
+                buttonStyle={styles.iconButton}
                 icon={icon}
                 color={GlobalStyles.colors.primary500}
                 size={dynamicScale(48, false, 0.4)}
@@ -1648,20 +1638,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                             <IconButton
                               icon="people-circle-outline"
                               size={constantScale(28, 0.5)}
-                              buttonStyle={[
-                                {
-                                  height: constantScale(48, 0.5),
-                                  backgroundColor:
-                                    GlobalStyles.colors.backgroundColor,
-                                  borderRadius: dynamicScale(4, false, 0.5),
-                                  borderWidth: 1,
-                                  borderColor: GlobalStyles.colors.gray700,
-                                  marginRight: constantScale(12),
-                                  marginLeft: constantScale(-8),
-                                  padding: constantScale(4),
-                                },
-                                GlobalStyles.strongShadow,
-                              ]}
+                              buttonStyle={styles.whoPaidSplitButton}
                               color={GlobalStyles.colors.primary500}
                               onPress={() => {
                                 Haptics.impactAsync(
@@ -1947,28 +1924,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                       renderItem={(itemData) => {
                         const splitValue = itemData.item.amount.toString();
                         return (
-                          <View
-                            style={[
-                              GlobalStyles.strongShadow,
-                              {
-                                minWidth: constantScale(100, 0.5),
-                                marginTop: constantScale(14, 0.5),
-                                marginBottom: constantScale(8, 0.5),
-                                borderWidth: 1,
-                                borderRadius: 8,
-                                padding: constantScale(8, 0.5),
-                                paddingBottom: constantScale(32, 0.5),
-                                margin: constantScale(8, 0.5),
-                                backgroundColor:
-                                  GlobalStyles.colors.backgroundColor,
-                                borderColor: GlobalStyles.colors.gray700,
-                                //centering content
-                                justifyContent: "center",
-                                alignItems: "center",
-                                overflow: "visible",
-                              },
-                            ]}
-                          >
+                          <View style={styles.splitEditorCard}>
                             <View
                               style={{
                                 flexDirection: "row",
@@ -2166,10 +2122,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               {/* <Text style={{ borderWidth: 1, borderColor: "blue" }}>Test</Text> */}
               {inputs.amount.value && (
                 <IconButton
-                  buttonStyle={[
-                    styles.taskBarButtons,
-                    GlobalStyles.strongShadow,
-                  ]}
+                  buttonStyle={styles.taskBarButtons}
                   icon={"add-outline"}
                   color={GlobalStyles.colors.textColor}
                   size={dynamicScale(24, false, 0.5)}
@@ -2178,10 +2131,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               )}
               {!inputs.amount.value && tempAmount && (
                 <IconButton
-                  buttonStyle={[
-                    styles.taskBarButtons,
-                    GlobalStyles.strongShadow,
-                  ]}
+                  buttonStyle={styles.taskBarButtons}
                   icon={"return-down-back-outline"}
                   color={GlobalStyles.colors.textColor}
                   size={dynamicScale(24, false, 0.5)}
@@ -2237,6 +2187,7 @@ const styles = StyleSheet.create({
     borderColor: GlobalStyles.colors.gray700,
     padding: constantScale(8, 0.5),
     marginTop: constantScale(8, 0.5),
+    ...GlobalStyles.strongShadow,
   },
   quickSumButton: {
     borderWidth: 1,
@@ -2248,8 +2199,12 @@ const styles = StyleSheet.create({
     maxHeight: dynamicScale(32, false, 0.5),
     marginTop: "10.5%",
     marginLeft: "-16%",
+    ...GlobalStyles.strongShadow,
   },
-  taskBarButtons: {},
+  taskBarButtons: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    ...GlobalStyles.strongShadow,
+  },
   iconButton: {
     borderWidth: 1,
     backgroundColor: GlobalStyles.colors.backgroundColor,
@@ -2257,6 +2212,34 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: dynamicScale(8, false, 0.5),
     margin: dynamicScale(8, false, 0.5),
+    ...GlobalStyles.strongShadow,
+  },
+  whoPaidSplitButton: {
+    height: constantScale(48, 0.5),
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderRadius: dynamicScale(4, false, 0.5),
+    borderWidth: 1,
+    borderColor: GlobalStyles.colors.gray700,
+    marginRight: constantScale(12),
+    marginLeft: constantScale(-8),
+    padding: constantScale(4),
+    ...GlobalStyles.strongShadow,
+  },
+  splitEditorCard: {
+    minWidth: constantScale(100, 0.5),
+    marginTop: constantScale(14, 0.5),
+    marginBottom: constantScale(8, 0.5),
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: constantScale(8, 0.5),
+    paddingBottom: constantScale(32, 0.5),
+    margin: constantScale(8, 0.5),
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    borderColor: GlobalStyles.colors.gray700,
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "visible",
+    ...GlobalStyles.strongShadow,
   },
   descriptionContainer: {
     flex: 1,

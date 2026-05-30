@@ -118,7 +118,6 @@ const PackageItem = ({ purchasePackage, setIsPurchasing, navigation }) => {
         pressed && GlobalStyles.pressed,
         styles.container,
         isPopular && styles.isPopularContainer,
-        GlobalStyles.strongShadow,
       ]}
     >
       {isPopularLabel}
@@ -152,6 +151,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     margin: "2%",
     marginHorizontal: "4%",
+    ...GlobalStyles.strongShadow,
   },
   isPopularContainer: {
     borderWidth: 4,

@@ -10,8 +10,14 @@ import { TripContext } from "../store/trip-context";
 import { touchAllTravelers } from "../util/http";
 import { GlobalStyles } from "../constants/styles";
 import { getRate } from "../util/currencyExchange";
-import { daysBetween, getDatePlusDays } from "../util/date";
 import { expandRangedExpense } from "../util/expand-ranged-expense";
+import {
+  buildRangedExpenseDatesFromSpan,
+  haveRangedExpenseSpanChanged,
+  planNonRangedToRangedInstances,
+  planRangedExpenseInPlaceUpdates,
+  planRangedExpenseReplacement,
+} from "../util/plan-ranged-expense-edit";
 import { isPaidString } from "../util/expense";
 import {
   deleteExpenseOnlineOffline,
@@ -42,7 +48,6 @@ import { trackEvent } from "../util/vexo-tracking";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 import { dynamicScale } from "../util/scalingUtil";
 import { VexoEvents } from "../util/vexo-constants";
-import { DateTime } from "luxon";
 
 interface ManageExpenseProps {
   route: {
@@ -241,26 +246,11 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     expenseCtx.addExpense(expenseToAdd);
   };
 
-  const createRangedData = async (expenseData: ExpenseData) => {
-    const rangeId =
-      Date.now().toString() + Math.random().toString(36).substring(2, 15);
+  const newRangeId = () =>
+    Date.now().toString() + Math.random().toString(36).substring(2, 15);
 
-    const day1 = new Date(expenseData.startDate);
-    const day2 = new Date(expenseData.endDate);
-    const days = daysBetween(day2, day1);
-    const isSingleDay = isSameDay(expenseData.endDate, expenseData.startDate);
-
-    const dates: Date[] = [];
-    for (let i = 0; i <= days; i++) {
-      const newDate = getDatePlusDays(day1, i) as Date;
-      newDate.setHours(new Date().getHours(), new Date().getMinutes());
-      dates.push(newDate);
-    }
-
-    const instances = expandRangedExpense(expenseData, {
-      rangeId: isSingleDay ? null : rangeId,
-      dates,
-    });
+  const persistNewRangedInstances = async (instances: ExpenseData[]) => {
+    const progressMax = Math.max(instances.length - 1, 0);
 
     for (let i = 0; i < instances.length; i++) {
       Toast.show({
@@ -269,9 +259,9 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         text2: i18n.t("toastSaving2"),
         autoHide: false,
         props: {
-          progress: days === 0 ? 0 : i / days,
+          progress: progressMax === 0 ? 0 : i / progressMax,
           progressAt: i,
-          progressMax: days,
+          progressMax,
           size: "small",
         },
       });
@@ -294,6 +284,21 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     }
   };
 
+  const createRangedData = async (expenseData: ExpenseData) => {
+    const rangeId = newRangeId();
+    const dates = buildRangedExpenseDatesFromSpan(
+      expenseData.startDate,
+      expenseData.endDate
+    );
+    const isSingleDay = isSameDay(expenseData.endDate, expenseData.startDate);
+    const instances = expandRangedExpense(expenseData, {
+      rangeId: isSingleDay ? null : rangeId,
+      dates,
+    });
+
+    await persistNewRangedInstances(instances);
+  };
+
   const editSingleData = async (expenseData: ExpenseData) => {
     expenseData.editedTimestamp = Date.now();
     const item: OfflineQueueManageExpenseItem = {
@@ -309,15 +314,13 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     await updateExpenseOnlineOffline(item, isOnline);
   };
 
-  const editRangedData = async (expenseData) => {
-    // find all the expenses that have the same identifying rangeId
+  const editRangedData = async (expenseData: ExpenseData) => {
     const expensesInRange = expenseCtx.expenses.filter(
       (expense) =>
         expense.rangeId && expense.rangeId === selectedExpense?.rangeId
     );
-    // if we dont find any expenses, it must have been a non-ranged expense, so update it to a ranged expense
-    if (expensesInRange?.length === 0) {
-      // delete the original expense
+
+    if (expensesInRange.length === 0) {
       expenseCtx.deleteExpense(editedExpenseId);
       const item: OfflineQueueManageExpenseItem = {
         type: "delete",
@@ -328,25 +331,13 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         },
       };
       await deleteExpenseOnlineOffline(item, isOnline);
-      await createRangedData(expenseData);
+
+      const instances = planNonRangedToRangedInstances(expenseData, newRangeId());
+      await persistNewRangedInstances(instances);
       return;
     }
-    // sort the expenses by date, oldest expense first
-    expensesInRange.sort((a, b) => {
-      return new Date(a.date).getTime() - new Date(b.date).getTime();
-    });
 
-    // check if the dates are the same, then update one by one or redo all
-    // get the first and last day from expenses in range
-    const oldStart = new Date(expensesInRange[0].date);
-    const oldEnd = new Date(expensesInRange[expensesInRange?.length - 1].date);
-    // get days from expenseData
-    const newStart = new Date(expenseData.startDate);
-    const newEnd = new Date(expenseData.endDate);
-    const differentDates =
-      !isSameDay(oldStart, newStart) || !isSameDay(oldEnd, newEnd);
-    if (differentDates) {
-      // Delete old expenses FIRST
+    if (haveRangedExpenseSpanChanged(expensesInRange, expenseData)) {
       await deleteAllExpensesByRangedId(
         tripid,
         selectedExpense,
@@ -354,55 +345,40 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         expenseCtx,
         { showUndoToast: false },
       );
-      // Then create new expenses
-      await createRangedData(expenseData);
+
+      const instances = planRangedExpenseReplacement(expenseData, newRangeId());
+      await persistNewRangedInstances(instances);
       return;
     }
-    //else update the expenses one by one
-    for (let i = 0; i < expensesInRange?.length; i++) {
+
+    const updates = planRangedExpenseInPlaceUpdates(expenseData, expensesInRange);
+    const progressMax = updates.length;
+
+    for (let i = 0; i < updates.length; i++) {
       Toast.show({
         type: "loading",
         text1: i18n.t("toastSaving1"),
-        text2: i18n.t("toastSaving2"), //+ " " + (i + 1) + "/" + (expensesInRange?.length + 1)
+        text2: i18n.t("toastSaving2"),
         autoHide: false,
         props: {
-          progress: i / expensesInRange?.length,
+          progress: i / progressMax,
           progressAt: i,
-          progressMax: expensesInRange?.length,
+          progressMax,
           size: "small",
         },
       });
-      const expense = expensesInRange[i];
-      // set the correct new date
-      const newDate = getDatePlusDays(expenseData.startDate, i);
-      if (newDate instanceof Date) {
-        newDate.setHours(new Date().getHours(), new Date().getMinutes());
-      } else if (newDate instanceof DateTime) {
-        newDate.set({
-          hour: new Date().getHours(),
-          minute: new Date().getMinutes(),
-        });
-      }
-      // IMPORTANT: don't mutate the shared expenseData object inside the loop.
-      // Mutating can cause stale/incorrect state during rerenders (and can lead to loops),
-      // especially when toggling fields like paidBack on ranged expenses.
-      const updatedExpenseData: ExpenseData = {
-        ...expenseData,
-        date: newDate,
-        editedTimestamp: Date.now(),
-        // sanity fix
-        rangeId: expense.rangeId,
-      };
+
+      const { id, expenseData: updatedExpenseData } = updates[i];
       const item: OfflineQueueManageExpenseItem = {
         type: "update",
         expense: {
           tripid: tripid,
           uid: selectedExpenseAuthorUid,
           expenseData: updatedExpenseData,
-          id: expense.id,
+          id,
         },
       };
-      expenseCtx.updateExpense(expense.id, updatedExpenseData);
+      expenseCtx.updateExpense(id, updatedExpenseData);
       await updateExpenseOnlineOffline(item, isOnline);
     }
   };

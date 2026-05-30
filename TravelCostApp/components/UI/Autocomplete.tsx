@@ -13,6 +13,16 @@ const suggestionMenuStackStyle = {
   elevation: 8,
 };
 
+/** Paper only draws outlined-label edge cover when roundness > 6 */
+const MIN_OUTLINE_ROUNDNESS = 8;
+
+function resolveFieldRoundness(style: object): number {
+  const flat = StyleSheet.flatten(style) ?? {};
+  const fromStyle =
+    typeof flat.borderRadius === "number" ? flat.borderRadius : MIN_OUTLINE_ROUNDNESS;
+  return Math.max(fromStyle, MIN_OUTLINE_ROUNDNESS);
+}
+
 const Autocomplete = ({
   value: origValue,
   label,
@@ -59,9 +69,16 @@ const Autocomplete = ({
     return [...new Set(filteredData)];
   }
 
+  const flatFieldStyle = StyleSheet.flatten(style) ?? {};
   const fieldBackground =
-    (StyleSheet.flatten(style)?.backgroundColor as string | undefined) ??
+    (flatFieldStyle.backgroundColor as string | undefined) ??
     GlobalStyles.colors.backgroundColorLight;
+  const fieldRoundness = resolveFieldRoundness(style);
+  const fieldStyle = {
+    ...flatFieldStyle,
+    backgroundColor: fieldBackground,
+    borderRadius: fieldRoundness,
+  };
 
   return (
     <View
@@ -74,10 +91,12 @@ const Autocomplete = ({
       <TextInput
         testID="autocomplete-field"
         theme={{
+          roundness: fieldRoundness,
           colors: {
             background: fieldBackground,
           },
         }}
+        outlineStyle={{ borderRadius: fieldRoundness }}
         selectTextOnFocus
         onFocus={() => {
           if (value?.length === 0) {
@@ -106,7 +125,7 @@ const Autocomplete = ({
         label={label}
         // right={right}
         // left={left}
-        style={style}
+        style={fieldStyle}
         inputMode="text"
         mode="outlined"
         outlineColor={GlobalStyles.colors.primary700}
@@ -133,7 +152,11 @@ const Autocomplete = ({
           testID="autocomplete-suggestions"
           entering={FadeIn.duration(500)}
           style={[
-            { maxWidth: "100%" },
+            {
+              maxWidth: "100%",
+              width: "100%",
+              paddingHorizontal: dynamicScale(8, false, 0.3),
+            },
             menuStyle,
             suggestionMenuStackStyle,
           ]}
@@ -141,15 +164,20 @@ const Autocomplete = ({
           {
             // only show the newest 3 items
             filteredData.slice(0, 3).map((autotext, i) => {
+              const suggestionPadding = dynamicScale(10, false, 0.3);
               return (
                 <Menu.Item
                   key={i}
+                  testID={`autocomplete-suggestion-${i}`}
                   style={[
                     {
                       backgroundColor: GlobalStyles.colors.backgroundColor,
                       borderWidth: 1,
                       borderColor: GlobalStyles.colors.primaryGrayed,
                       maxWidth: "100%",
+                      paddingVertical: suggestionPadding,
+                      paddingHorizontal: dynamicScale(12, false, 0.3),
+                      justifyContent: "center",
                     },
                   ]}
                   //   icon={icon}
@@ -184,9 +212,9 @@ const Autocomplete = ({
                   titleStyle={{
                     flex: 1,
                     fontSize: dynamicScale(12, false, 0.3),
-                    paddingTop: dynamicScale(4, false, 0.5),
-                    paddingBottom: dynamicScale(24, false, 0.25),
-                    // maxWidth: "100%",
+                    marginVertical: 0,
+                    paddingVertical: 0,
+                    paddingHorizontal: 0,
                     width: "100%",
                   }}
                   title={autotext}

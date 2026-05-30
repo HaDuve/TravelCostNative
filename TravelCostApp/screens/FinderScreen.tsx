@@ -318,7 +318,6 @@ const FinderScreen = () => {
                 label={i18n.t("searchLabel")}
                 containerStyle={styles.queryContainer}
                 style={styles.autoCompleteStyle}
-                menuStyle={styles.autoCompleteMenuStyle}
               ></Autocomplete>
               {checkedQuery && (
                 <IconButton
@@ -498,14 +497,10 @@ const styles = StyleSheet.create({
     paddingVertical: dynamicScale(2, false, 2),
     paddingHorizontal: dynamicScale(2),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
-    borderRadius: dynamicScale(5),
+    borderRadius: dynamicScale(8, false, 0.3),
   },
   buttonContainer: {
     marginTop: dynamicScale(20, true),
     marginBottom: dynamicScale(20, true),
-  },
-  autoCompleteMenuStyle: {
-    marginLeft: dynamicScale(8),
-    marginBottom: dynamicScale(-1, true),
   },
 });

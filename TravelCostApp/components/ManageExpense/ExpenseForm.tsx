@@ -50,6 +50,7 @@ import {
   validateSplitListWithEditOrder,
 } from "../../util/split";
 import { useSplitEditor } from "../../hooks/useSplitEditor";
+import { useRangedMode } from "../../hooks/useRangedMode";
 import { useExpenseFx } from "../../hooks/useExpenseFx";
 import { useExpenseFormInputs } from "../../hooks/useExpenseFormInputs";
 import {
@@ -104,8 +105,6 @@ import {
 import {
   buildRangedDuplOrSplitPromptString,
   countInclusiveDaysInRange,
-  resolveAlreadyDividedAmountByDays,
-  resolveAmountWhenCollapsingRangeToSingleDay,
 } from "../../util/expense-form-range";
 import { NetworkContext } from "../../store/network-context";
 import { SettingsContext } from "../../store/settings-context";
@@ -267,9 +266,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   const [loadingTravellers, setLoadingTravellers] = useState(
     !tripCtx.travellers && tripCtx.travellers?.length < 1
   );
-
-  const [confirmedRange, setConfirmedRange] = useState(false);
-  const [helperStateForDividing, setHelperStateForDividing] = useState(false);
 
   const extractUserNames = useCallback(
     (travellers: string[] | Traveller[] | undefined): string[] => {
@@ -437,15 +433,25 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       ? countInclusiveDaysInRange(new Date(startDate), new Date(endDate))
       : 1;
 
-  const [duplOrSplit, setDuplOrSplit] = useState<DuplicateOption>(
-    editingValues ? Number(editingValues.duplOrSplit) : DuplicateOption.null
-  );
-
-  const alreadyDividedAmountByDays = resolveAlreadyDividedAmountByDays(
+  const rangedMode = useRangedMode({
     isEditing,
+    initialDuplOrSplit: editingValues
+      ? Number(editingValues.duplOrSplit)
+      : DuplicateOption.null,
+  });
+
+  const {
     duplOrSplit,
-    helperStateForDividing
-  );
+    alreadyDividedAmountByDays,
+    shouldPromptForMode,
+    onMultiDayRangeConfirmed,
+    consumeModePrompt,
+    confirmDuplicate,
+    confirmSplit,
+    clearMode,
+    setModeFromDuplOrSplit,
+    resolveCollapseToSingleDayAmount,
+  } = rangedMode;
 
   const splitEditor = useSplitEditor({
     initialSplitList: resetEditOrder(editingValues?.splitList ?? []),
@@ -619,25 +625,23 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     // no range
     if (startDateFormat === endDateFormat) {
       inputChangedHandler("date", startDateFormat);
-      const adjustedAmount = resolveAmountWhenCollapsingRangeToSingleDay({
+      const adjustedAmount = resolveCollapseToSingleDayAmount({
         amount: Number(amountValue),
         inclusiveDayCount: daysBeween,
-        duplOrSplit,
-        alreadyDividedAmountByDays,
       });
       if (adjustedAmount !== null) {
         inputChangedHandler("amount", adjustedAmount);
       }
-      setDuplOrSplit(DuplicateOption.null);
+      clearMode();
       return;
     }
-    if (duplOrSplit == DuplicateOption.null) setConfirmedRange(true);
+    onMultiDayRangeConfirmed();
 
     // TODO: make this structured
   };
   useLayoutEffect(() => {
-    if (!confirmedRange) return;
-    setConfirmedRange(false);
+    if (!shouldPromptForMode) return;
+    consumeModePrompt();
     Alert.alert(
       `${i18n.t("duplicateExpenses")} / ${i18n.t("splitUpExpenses")}`, //i18n.t("duplOrSplit"),
       `${i18n.t("duplicateExpenses")}: ${duplOrSplitString(1)}\n\n ${i18n.t(
@@ -648,15 +652,14 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
           text: i18n.t("duplicateExpenses"), //i18n.t("duplicate"),
           onPress: () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setDuplOrSplit(DuplicateOption.duplicate);
+            confirmDuplicate();
           },
         },
         {
           text: i18n.t("splitUpExpenses"), //i18n.t("split"),
           onPress: () => {
-            if (duplOrSplit !== 2) setHelperStateForDividing(true);
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setDuplOrSplit(DuplicateOption.split);
+            confirmSplit();
           },
         },
       ],
@@ -668,9 +671,11 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     amountValue,
     inputs.currency.value,
     daysBeween,
-    duplOrSplit,
-    confirmedRange,
+    shouldPromptForMode,
     duplOrSplitString,
+    consumeModePrompt,
+    confirmDuplicate,
+    confirmSplit,
   ]);
 
   useEffect(() => {
@@ -976,7 +981,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                 setSplitList(restored.splitList);
               }
               if (restored.duplOrSplit !== undefined) {
-                setDuplOrSplit(restored.duplOrSplit);
+                setModeFromDuplOrSplit(restored.duplOrSplit);
               }
               if (restored.paidBack) {
                 setPaidBack(restored.paidBack);

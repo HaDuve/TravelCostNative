@@ -552,8 +552,8 @@ const ExpenseGraph = ({
           maxToRenderPerBatch={20}
           // windowSize={7}
           getItemLayout={(data, index) => ({
-            length: dynamicScale(65, true),
-            offset: dynamicScale(65, true) * index,
+            length: dynamicScale(52, true),
+            offset: dynamicScale(52, true) * index,
             index,
           })}
         ></Animated.FlatList>
@@ -613,13 +613,12 @@ const styles = StyleSheet.create({
   },
 
   itemContainer: {
-    paddingVertical: dynamicScale(12, true),
+    paddingVertical: dynamicScale(4, true),
     paddingHorizontal: dynamicScale(24),
-    marginHorizontal: dynamicScale(20),
-    marginTop: dynamicScale(4, true),
-    marginBottom: dynamicScale(8, true),
+    marginHorizontal: dynamicScale(4),
     borderRadius: dynamicScale(10, false, 0.5),
     flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },

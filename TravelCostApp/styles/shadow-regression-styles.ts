@@ -56,8 +56,9 @@ const overviewHeaderCardBase = {
 export const shadowRegressionStyles = StyleSheet.create({
   statisticsPieCategoryCard: statisticsCardShadow,
   expenseGraphCategoryCard: {
-    height: dynamicScale(65, true),
+    height: dynamicScale(52, true),
     minWidth: dynamicScale(200),
+    justifyContent: "center",
     ...statisticsCardShadow,
   },
   overviewDropdownContainer: {

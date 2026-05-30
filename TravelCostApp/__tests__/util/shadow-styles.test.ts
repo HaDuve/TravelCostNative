@@ -35,6 +35,15 @@ describe("shadow styles", () => {
     );
   });
 
+  it("expense graph category card uses compact height and vertical centering", () => {
+    const flat = StyleSheet.flatten(
+      shadowRegressionStyles.expenseGraphCategoryCard
+    ) as Record<string, unknown>;
+
+    expect(flat.height).toBe(dynamicScale(52, true));
+    expect(flat.justifyContent).toBe("center");
+  });
+
   it("statistics pie category card shadow includes backgroundColor", () => {
     assertSolidBackgroundForShadow(
       StyleSheet.flatten(shadowRegressionStyles.statisticsPieCategoryCard)

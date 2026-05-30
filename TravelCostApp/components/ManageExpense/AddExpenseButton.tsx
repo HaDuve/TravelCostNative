@@ -3,7 +3,7 @@ import { GlobalStyles } from "../../constants/styles";
 import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 import * as Haptics from "expo-haptics";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TourGuideZone } from "rn-tourguide";
 
@@ -19,6 +19,7 @@ import {
   ExpenseData,
   findMostDuplicatedDescriptionExpenses,
 } from "../../util/expense";
+import { expensesForTemplateSelection } from "../../util/template-expense-pool";
 import uniqBy from "lodash.uniqby";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { safelyParseJSON } from "../../util/jsonParse";
@@ -34,14 +35,21 @@ const AddExpenseButton = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
   const expCtx = useContext(ExpensesContext);
 
+  const templateSourceExpenses = useMemo(
+    () => expensesForTemplateSelection(expCtx.expenses),
+    [expCtx.expenses]
+  );
+
   const lastExpenses: ExpenseData[] = uniqBy(
-    [...expCtx.expenses].sort((a, b) => {
+    [...templateSourceExpenses].sort((a, b) => {
       return (b.editedTimestamp ?? 0) - (a.editedTimestamp ?? 0);
     }),
     "description"
   );
 
-  const topDuplicates = findMostDuplicatedDescriptionExpenses(expCtx.expenses);
+  const topDuplicates = findMostDuplicatedDescriptionExpenses(
+    templateSourceExpenses
+  );
 
   const [lastExpensesNumber, setLastExpensesNumber] = useState(PageLength);
   const [templatePickerVisible, setTemplatePickerVisible] = useState(false);

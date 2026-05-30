@@ -478,6 +478,9 @@ const en = {
   bannerText2:
     "Save even more money with the latest functions of the premium version.\nStart your free trial today!",
   templateExpenses: "Expense Templates",
+  templateExpensesHelpTitle: "How expense templates work",
+  templateExpensesHelpText:
+    "Long-press the + button to start from a past expense instead of a blank form.\n\nCopied: description, amount, category, currency and country, who paid, and how the cost is split. The date is always set to today—you can change it if you need another day.\n\nThis creates a new expense, not an edit of the old one. Review and adjust anything before you save.",
   mostUsedExpenses: "Most used expenses",
   lastUsedExpenses: "Last used expenses",
   budgetPerTraveller: "Budget per traveller",
@@ -1091,6 +1094,9 @@ const de = {
   bannerText2:
     "Spare noch mehr Geld mit den neuesten Funktionen der Premium-Version.\nStarte noch heute deine kostenlose Testversion!",
   templateExpenses: "Ausgaben-Vorlagen",
+  templateExpensesHelpTitle: "So funktionieren Ausgaben-Vorlagen",
+  templateExpensesHelpText:
+    "Halte die +-Taste gedrückt, um von einer früheren Ausgabe statt einem leeren Formular zu starten.\n\nÜbernommen werden: Beschreibung, Betrag, Kategorie, Währung und Land, Wer hat bezahlt und die Aufteilung. Das Datum ist immer heute—ändere es, wenn du einen anderen Tag brauchst.\n\nEs entsteht eine neue Ausgabe, keine Bearbeitung der alten. Prüfe alles und passe es an, bevor du speicherst.",
   mostUsedExpenses: "Am häufigsten verwendete Ausgaben",
   lastUsedExpenses: "Zuletzt verwendete Ausgaben",
   budgetPerTraveller: "Budget pro Reisendem",
@@ -1704,6 +1710,9 @@ const fr = {
   bannerText2:
     "Économisez encore plus d'argent avec les dernières fonctionnalités de la version premium.\nCommencez votre essai gratuit dès aujourd'hui !",
   templateExpenses: "Modèles de dépenses",
+  templateExpensesHelpTitle: "Comment fonctionnent les modèles de dépenses",
+  templateExpensesHelpText:
+    "Appuyez longuement sur le bouton + pour partir d'une dépense passée au lieu d'un formulaire vide.\n\nReprise : description, montant, catégorie, devise et pays, qui a payé et le partage. La date est toujours aujourd'hui—modifiez-la si vous avez besoin d'un autre jour.\n\nCela crée une nouvelle dépense, pas une modification de l'ancienne. Vérifiez et ajustez tout avant d'enregistrer.",
   mostUsedExpenses: "Dépenses les plus utilisées",
   lastUsedExpenses: "Dernières dépenses utilisées",
   budgetPerTraveller: "Budget par voyageur",
@@ -2318,6 +2327,9 @@ const ru = {
   bannerText2:
     "Экономьте еще больше с последними функциями премиум-версии.\nНачните бесплатную пробную версию сегодня!",
   templateExpenses: "Шаблоны расходов",
+  templateExpensesHelpTitle: "Как работают шаблоны расходов",
+  templateExpensesHelpText:
+    "Долгое нажатие на кнопку + позволяет начать с прошлого расхода вместо пустой формы.\n\nКопируются: описание, сумма, категория, валюта и страна, кто оплатил и как делится сумма. Дата всегда сегодня—измените её, если нужен другой день.\n\nСоздаётся новый расход, а не правка старого. Проверьте и при необходимости измените данные перед сохранением.",
   mostUsedExpenses: "Самые используемые расходы",
   lastUsedExpenses: "Последние использованные расходы",
   budgetPerTraveller: "Бюджет на одного путешественника",

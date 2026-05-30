@@ -35,7 +35,14 @@ import { VexoEvents } from "../../util/vexo-constants";
 const IconSize = dynamicScale(28, false, 0.5);
 
 function ExpenseItem(props): JSX.Element {
-  const { showSumForTravellerName, filtered } = props;
+  const {
+    showSumForTravellerName,
+    filtered,
+    onPressOverride,
+    disableLongPressSelection,
+    layoutVariant = "ledger",
+  } = props;
+  const isTemplatePickerRow = layoutVariant === "templatePicker";
   const { setSelectable, selectItem } = props;
   const {
     id,
@@ -134,6 +141,11 @@ function ExpenseItem(props): JSX.Element {
   const hideSpecial = settingHideSpecialExpenses && isSpecialExpense;
 
   const navigateToExpense = useCallback(async () => {
+    if (onPressOverride) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onPressOverride();
+      return;
+    }
     if (!id) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
       return;
@@ -151,7 +163,7 @@ function ExpenseItem(props): JSX.Element {
     navigation.navigate("ManageExpense", {
       expenseId: id,
     });
-  }, [id, navigation]);
+  }, [id, navigation, onPressOverride, category, currency, country]);
   const originalCurrencyJSX = useMemo(
     () =>
       !sameCurrency ? (
@@ -229,14 +241,22 @@ function ExpenseItem(props): JSX.Element {
                 </View>
               );
             }}
-            contentContainerStyle={styles.avatarContainer}
+            contentContainerStyle={[
+              styles.avatarContainer,
+              isTemplatePickerRow && styles.avatarContainerTemplatePicker,
+            ]}
             keyExtractor={(item) => {
               return item.userName;
             }}
           ></FlatList>
         </View>
       ) : (
-        <View style={styles.avatarContainer}>
+        <View
+          style={[
+            styles.avatarContainer,
+            isTemplatePickerRow && styles.avatarContainerTemplatePicker,
+          ]}
+        >
           <View
             testID="expense-item-traveller-avatar"
             style={[styles.avatar, styles.avatarPaid]}
@@ -245,7 +265,7 @@ function ExpenseItem(props): JSX.Element {
           </View>
         </View>
       ),
-    [longList?.length, splitList?.length, whoPaid]
+    [isTemplatePickerRow, longList?.length, splitList?.length, whoPaid]
   );
 
   if (typeof date === "string") date = new Date(date);
@@ -274,7 +294,7 @@ function ExpenseItem(props): JSX.Element {
       <Pressable
         onPress={navigateToExpense}
         onLongPress={() => {
-          if (setSelectable === undefined) return;
+          if (disableLongPressSelection || setSelectable === undefined) return;
           setSelectable(true);
           if (selectItem) {
             selectItem(id);
@@ -286,7 +306,12 @@ function ExpenseItem(props): JSX.Element {
           style={[
             styles.expenseItem,
             {
-              height: constantScale(55),
+              minHeight: isTemplatePickerRow
+                ? constantScale(72, 0.5)
+                : constantScale(55, 0.5),
+              height: isTemplatePickerRow
+                ? undefined
+                : constantScale(55, 0.5),
               paddingLeft: dynamicScale(16),
               ...Platform.select({
                 ios: {
@@ -297,9 +322,11 @@ function ExpenseItem(props): JSX.Element {
                 },
               }),
             },
-            isLandscape && {
-              height: dynamicScale(100, true),
-            },
+            isTemplatePickerRow && styles.expenseItemTemplatePicker,
+            isLandscape &&
+              !isTemplatePickerRow && {
+                height: dynamicScale(100, true),
+              },
           ]}
         >
           <View
@@ -315,15 +342,27 @@ function ExpenseItem(props): JSX.Element {
               }
             />
           </View>
-          <View style={styles.leftItem}>
+          <View
+            testID={
+              isTemplatePickerRow ? "expense-item-description-column" : undefined
+            }
+            style={[
+              styles.leftItem,
+              isTemplatePickerRow && styles.leftItemTemplatePicker,
+            ]}
+          >
             <Text
+              testID="expense-item-description"
               maxFontSizeMultiplier={1.2}
-              numberOfLines={1}
-              ellipsizeMode="tail"
+              numberOfLines={isTemplatePickerRow ? 2 : 1}
+              ellipsizeMode={isTemplatePickerRow ? undefined : "tail"}
               style={[
                 styles.textBase,
                 styles.description,
-                settingShowFlags && settingShowWhoPaid && { width: "90%" },
+                !isTemplatePickerRow &&
+                  settingShowFlags &&
+                  settingShowWhoPaid && { width: "90%" },
+                isTemplatePickerRow && styles.descriptionTemplatePicker,
                 hideSpecial && { color: GlobalStyles.colors.textHidden },
               ]}
             >
@@ -343,16 +382,43 @@ function ExpenseItem(props): JSX.Element {
             </Text>
           </View>
           {settingShowFlags && (
-            <View style={styles.countryFlag}>
+            <View
+              testID={
+                isTemplatePickerRow ? "expense-item-flag-slot" : undefined
+              }
+              style={[
+                styles.countryFlag,
+                isTemplatePickerRow && styles.countryFlagTemplatePicker,
+              ]}
+            >
               <ExpenseCountryFlag
                 countryName={country}
                 style={GlobalStyles.countryFlagStyle}
-                containerStyle={styles.countryFlagContainer}
+                containerStyle={[
+                  styles.countryFlagContainer,
+                  isTemplatePickerRow && styles.countryFlagContainerTemplatePicker,
+                ]}
               />
             </View>
           )}
-          {settingShowWhoPaid && <View>{sharedList()}</View>}
-          <View style={styles.amountContainer}>
+          {settingShowWhoPaid && (
+            <View
+              testID={
+                isTemplatePickerRow ? "expense-item-travellers-slot" : undefined
+              }
+              style={[
+                isTemplatePickerRow && styles.travellerListTemplatePicker,
+              ]}
+            >
+              {sharedList()}
+            </View>
+          )}
+          <View
+            style={[
+              styles.amountContainer,
+              isTemplatePickerRow && styles.amountContainerTemplatePicker,
+            ]}
+          >
             <Text
               style={[
                 styles.amountText,
@@ -390,6 +456,9 @@ ExpenseItem.propTypes = {
   filtered: PropTypes.bool,
   isSpecialExpense: PropTypes.bool,
   setSelectable: PropTypes.func,
+  onPressOverride: PropTypes.func,
+  disableLongPressSelection: PropTypes.bool,
+  layoutVariant: PropTypes.oneOf(["ledger", "templatePicker"]),
 };
 
 const styles = StyleSheet.create({
@@ -403,6 +472,11 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  expenseItemTemplatePicker: {
+    alignItems: "flex-start",
+    paddingVertical: dynamicScale(10, true),
+    width: "100%",
   },
   textBase: {
     marginTop: dynamicScale(2, true),
@@ -432,6 +506,40 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "flex-start",
   },
+  leftItemTemplatePicker: {
+    flexGrow: 2,
+    flexShrink: 0,
+    flexBasis: "30%",
+    minWidth: "30%",
+    height: undefined,
+    minHeight: constantScale(44, 0.5),
+  },
+  descriptionTemplatePicker: {
+    flexShrink: 0,
+    alignSelf: "stretch",
+  },
+  countryFlagTemplatePicker: {
+    flexShrink: 1,
+    flexGrow: 0,
+    minWidth: 0,
+    overflow: "hidden",
+  },
+  countryFlagContainerTemplatePicker: {
+    width: undefined,
+    maxWidth: constantScale(50),
+    flexShrink: 1,
+  },
+  travellerListTemplatePicker: {
+    flexShrink: 1,
+    flexGrow: 0,
+    minWidth: 0,
+    overflow: "hidden",
+  },
+  avatarContainerTemplatePicker: {
+    width: undefined,
+    maxWidth: constantScale(55),
+    flexShrink: 1,
+  },
   amountContainer: {
     paddingHorizontal: dynamicScale(4),
     paddingVertical: 0,
@@ -441,6 +549,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     width: constantScale(150, 0.5),
     height: constantScale(40, 0.5),
+  },
+  amountContainerTemplatePicker: {
+    flexShrink: 0,
+    width: constantScale(108, 0.5),
+    minHeight: constantScale(40, 0.5),
+    height: undefined,
   },
   amountText: {
     textAlign: "center",

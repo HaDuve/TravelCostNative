@@ -29,6 +29,7 @@ jest.mock("../../screens/FilteredExpenses", () => () => null);
 import FilteredPieCharts from "../../screens/FilteredPieCharts";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 import { makeExpense } from "../fixtures/expense";
+import { toExpenseNavigationDtos } from "../../util/expense-navigation-dto";
 import { i18n } from "../../i18n/i18n";
 
 const CATEGORIES = i18n.t("categories");
@@ -41,7 +42,7 @@ function renderScreen(routeOverrides: Record<string, unknown> = {}) {
   const navigation = { navigate: jest.fn(), pop: jest.fn() };
   const route = {
     params: {
-      expenses: [makeExpense({ id: "e1" })],
+      expenses: toExpenseNavigationDtos([makeExpense({ id: "e1" })]),
       dayString: "May 2026",
       noList: false,
       ...routeOverrides,

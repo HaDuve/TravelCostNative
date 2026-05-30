@@ -10,6 +10,7 @@ import { Platform, StyleSheet, Text, View, ScrollView } from "react-native";
 import DatePickerContainer from "../components/UI/DatePickerContainer";
 import DatePickerModal from "../components/UI/DatePickerModal";
 import { getFormattedDate } from "../util/date";
+import { toExpenseNavigationDtos } from "../util/expense-navigation-dto";
 
 import { i18n } from "../i18n/i18n";
 
@@ -201,7 +202,7 @@ const FinderScreen = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     trackEvent(VexoEvents.FINDER_PRESSED);
     navigation.navigate("FilteredPieCharts", {
-      expenses: filteredExpenses,
+      expenses: toExpenseNavigationDtos(filteredExpenses),
       dayString: allEpensesQueryString + queryString + " " + dateString,
     });
   }, [

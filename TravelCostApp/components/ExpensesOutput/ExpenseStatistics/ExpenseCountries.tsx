@@ -12,6 +12,7 @@ import { i18n } from "../../../i18n/i18n";
 import { getCatLocalized } from "../../../util/category";
 import PropTypes from "prop-types";
 import { ExpenseData, getExpensesSum } from "../../../util/expense";
+import { toExpenseNavigationDtos } from "../../../util/expense-navigation-dto";
 import ExpenseCountryFlag from "../ExpenseCountryFlag";
 import { shadowRegressionStyles } from "../../../styles/shadow-regression-styles";
 import BlurPremium from "../../Premium/BlurPremium";
@@ -101,7 +102,7 @@ const ExpenseCountries = ({
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigation.navigate("FilteredExpenses", {
-            expenses: itemData.item.catExpenses,
+            expenses: toExpenseNavigationDtos(itemData.item.catExpenses),
             dayString: getCatLocalized(itemData.item.cat) + " " + newPeriodName,
           });
         }}

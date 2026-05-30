@@ -57,6 +57,7 @@ import { addShadowItemsToExpenses } from "./ExpenseListUtil";
 import { UserContext } from "../../store/user-context";
 import * as Haptics from "expo-haptics";
 import { toShortFormat } from "../../util/date";
+import { toExpenseNavigationDtos } from "../../util/expense-navigation-dto";
 import {
   DEVELOPER_MODE,
   EXPENSES_LOAD_TIMEOUT,
@@ -479,7 +480,7 @@ function ExpensesList({
     });
 
     navigation.navigate("FilteredPieCharts", {
-      expenses: finderExpenses,
+      expenses: toExpenseNavigationDtos(finderExpenses),
       dayString: `${finderExpenses?.length} selected Expenses from ${periodName}`,
       noList: true,
     });

@@ -40,6 +40,7 @@ import {
   isPaidString,
   getEffectivePaidBack,
 } from "../util/expense";
+import { toExpenseNavigationDtos } from "../util/expense-navigation-dto";
 import Animated from "react-native-reanimated";
 import { formatExpenseWithCurrency } from "../util/string";
 import { useFocusEffect } from "@react-navigation/native";
@@ -305,7 +306,7 @@ const SplitSummaryScreen = ({ navigation }) => {
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             navigation.navigate("FilteredExpenses", {
-              expenses: expensesList,
+              expenses: toExpenseNavigationDtos(expensesList),
               dayString: `${item.userName} ${i18n.t("owes")} ${
                 item.whoPaid
               } ${formatExpenseWithCurrency(item.amount, tripCurrency)}`,

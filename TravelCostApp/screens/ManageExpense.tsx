@@ -13,10 +13,10 @@ import { getRate } from "../util/currencyExchange";
 import { expandRangedExpense } from "../util/expand-ranged-expense";
 import {
   buildRangedExpenseDatesFromSpan,
-  haveRangedExpenseSpanChanged,
   planNonRangedToRangedInstances,
   planRangedExpenseInPlaceUpdates,
   planRangedExpenseReplacement,
+  shouldReplaceRangedExpenseInstances,
 } from "../util/plan-ranged-expense-edit";
 import { isPaidString } from "../util/expense";
 import {
@@ -337,7 +337,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       return;
     }
 
-    if (haveRangedExpenseSpanChanged(expensesInRange, expenseData)) {
+    if (shouldReplaceRangedExpenseInstances(expensesInRange, expenseData)) {
       await deleteAllExpensesByRangedId(
         tripid,
         selectedExpense,

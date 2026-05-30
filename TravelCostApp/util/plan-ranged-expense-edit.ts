@@ -47,6 +47,24 @@ export function haveRangedExpenseSpanChanged(
   return !isSameDay(oldStart, newStart) || !isSameDay(oldEnd, newEnd);
 }
 
+/** Whether edit should delete and re-expand instead of pairwise in-place updates. */
+export function shouldReplaceRangedExpenseInstances(
+  existingInstances: ExpenseData[],
+  submitted: ExpenseData
+): boolean {
+  if (haveRangedExpenseSpanChanged(existingInstances, submitted)) {
+    return true;
+  }
+
+  const sorted = sortInstancesByDate(existingInstances);
+  const dayCount = buildRangedExpenseDatesFromSpan(
+    submitted.startDate,
+    submitted.endDate
+  ).length;
+
+  return sorted.length !== dayCount;
+}
+
 /** Pairwise in-place updates for an unchanged **Ranged expense** span. */
 export function planRangedExpenseInPlaceUpdates(
   submitted: ExpenseData,
@@ -59,6 +77,12 @@ export function planRangedExpenseInPlaceUpdates(
   );
   const rangeId = sorted[0]?.rangeId ?? null;
   const expanded = expandRangedExpense(submitted, { rangeId, dates });
+
+  if (sorted.length !== expanded.length) {
+    throw new Error(
+      "Ranged expense instance count does not match span; use replacement path"
+    );
+  }
 
   return expanded.map((expenseData, index) => ({
     id: sorted[index].id,

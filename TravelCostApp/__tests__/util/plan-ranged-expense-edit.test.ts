@@ -4,6 +4,7 @@ import {
   planNonRangedToRangedInstances,
   planRangedExpenseInPlaceUpdates,
   planRangedExpenseReplacement,
+  shouldReplaceRangedExpenseInstances,
 } from "../../util/plan-ranged-expense-edit";
 import { makeExpense } from "../fixtures/expense";
 
@@ -98,6 +99,60 @@ describe("haveRangedExpenseSpanChanged", () => {
   });
 });
 
+describe("shouldReplaceRangedExpenseInstances", () => {
+  it("returns true when span endpoints match but stored instance count differs", () => {
+    const existing = [
+      makeExpense({
+        id: "e1",
+        rangeId: "r1",
+        date: DAY1,
+        startDate: DAY1,
+        endDate: DAY3,
+      }),
+      makeExpense({
+        id: "e3",
+        rangeId: "r1",
+        date: DAY3,
+        startDate: DAY1,
+        endDate: DAY3,
+      }),
+    ];
+    const submitted = makeExpense({ startDate: DAY1, endDate: DAY3 });
+
+    expect(haveRangedExpenseSpanChanged(existing, submitted)).toBe(false);
+    expect(shouldReplaceRangedExpenseInstances(existing, submitted)).toBe(true);
+  });
+
+  it("returns false when span and instance count both match", () => {
+    const existing = [
+      makeExpense({
+        id: "e1",
+        rangeId: "r1",
+        date: DAY1,
+        startDate: DAY1,
+        endDate: DAY3,
+      }),
+      makeExpense({
+        id: "e2",
+        rangeId: "r1",
+        date: DAY2,
+        startDate: DAY1,
+        endDate: DAY3,
+      }),
+      makeExpense({
+        id: "e3",
+        rangeId: "r1",
+        date: DAY3,
+        startDate: DAY1,
+        endDate: DAY3,
+      }),
+    ];
+    const submitted = makeExpense({ startDate: DAY1, endDate: DAY3 });
+
+    expect(shouldReplaceRangedExpenseInstances(existing, submitted)).toBe(false);
+  });
+});
+
 describe("planRangedExpenseReplacement", () => {
   it("expands a fresh instance set whose per-day amounts reconstruct the total", () => {
     const submitted = makeExpense({
@@ -115,6 +170,23 @@ describe("planRangedExpenseReplacement", () => {
     expect(instances.every((e) => e.amount === 50)).toBe(true);
     const summed = instances.reduce((sum, e) => sum + e.amount, 0);
     expect(Number(summed.toFixed(2))).toBe(150);
+  });
+
+  it("documents rounding drift when the total does not divide evenly", () => {
+    const submitted = makeExpense({
+      startDate: DAY1,
+      endDate: DAY3,
+      amount: 100,
+      calcAmount: 100,
+      duplOrSplit: DuplicateOption.split,
+    });
+
+    const instances = planRangedExpenseReplacement(submitted, "r-new");
+
+    expect(instances.map((e) => e.amount)).toEqual([33.33, 33.33, 33.33]);
+    expect(Number(instances.reduce((sum, e) => sum + e.amount, 0).toFixed(2))).toBe(
+      99.99
+    );
   });
 });
 

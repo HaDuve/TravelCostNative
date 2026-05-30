@@ -19,6 +19,7 @@ import { fetchTripName, touchAllTravelers } from "../../util/http";
 import { TripContext } from "../../store/trip-context";
 import { ExpensesContext } from "../../store/expenses-context";
 import IconButton from "../UI/IconButton";
+import ExpenseSwipeDeleteAction from "./ExpenseSwipeDeleteAction";
 import Animated, {
   Easing,
   FadeIn,
@@ -133,32 +134,7 @@ function ExpensesList({
   );
 
   const renderRightActions = useCallback((progress, dragX, onClick) => {
-    return (
-      <View
-        style={{
-          marginBottom: dynamicScale(2, true, 0.5),
-          paddingTop: dynamicScale(14, true, 0.5),
-          paddingLeft: dynamicScale(10, true, 0.5),
-          alignContent: "center",
-          justifyContent: "center",
-          width: dynamicScale(56),
-          backgroundColor: GlobalStyles.colors.error500,
-        }}
-      >
-        {/* <Text>test</Text> */}
-        <IconButton
-          icon="trash"
-          color={GlobalStyles.colors.backgroundColor}
-          size={constantScale(36, 0.5)}
-          onPress={onClick}
-          buttonStyle={{
-            marginBottom: "0%",
-            marginTop: "-30%",
-            marginLeft: "-20%",
-          }}
-        />
-      </View>
-    );
+    return <ExpenseSwipeDeleteAction onPress={onClick} />;
   }, []);
   const onClick = useCallback(({ item, index }, isOnline) => {
     const editedExpenseId = item.id;

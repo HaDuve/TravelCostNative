@@ -9,6 +9,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "update:production": "node scripts/eas-update.js --target production",
+    "update:production:bump": "node scripts/eas-update.js --target production --bump-changelog",
     "update:alpha": "node scripts/eas-update.js --target alpha",
     "update:staging": "node scripts/eas-update.js --target staging",
     "update:dev": "node scripts/eas-update.js --target dev",

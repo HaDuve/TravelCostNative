@@ -193,6 +193,8 @@ pnpm run submit:alpha:ios
 pnpm run update:dev -- "Your message"
 pnpm run update:staging -- "Your message"
 pnpm run update:production -- "Your message"
+pnpm run update:production:bump -- "Your message"   # publish OTA + bump changelog suffix
+pnpm run update:production:bump -- --dry-run       # preview only
 ```
 
 ### Manual Testing Commands

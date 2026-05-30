@@ -11,11 +11,8 @@ import { touchAllTravelers } from "../util/http";
 import { GlobalStyles } from "../constants/styles";
 import { getRate } from "../util/currencyExchange";
 import { daysBetween, getDatePlusDays } from "../util/date";
-import {
-  countInclusiveDaysInRange,
-  distributeRangedAmount,
-} from "../util/expense-form-range";
-import { DuplicateOption, isPaidString } from "../util/expense";
+import { expandRangedExpense } from "../util/expand-ranged-expense";
+import { isPaidString } from "../util/expense";
 import {
   deleteExpenseOnlineOffline,
   OfflineQueueManageExpenseItem,
@@ -31,7 +28,6 @@ import PropTypes from "prop-types";
 import {
   deleteAllExpensesByRangedId,
   ExpenseData,
-  Split,
 } from "../util/expense";
 import type { ExpenseFormSubmitPayload } from "../util/expense-form-submit";
 import { NetworkContext } from "../store/network-context";
@@ -245,84 +241,56 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     expenseCtx.addExpense(expenseToAdd);
   };
 
-  const createRangedData = async (expenseData) => {
-    // rangeId to identify all the expenses that belong to the same range
+  const createRangedData = async (expenseData: ExpenseData) => {
     const rangeId =
       Date.now().toString() + Math.random().toString(36).substring(2, 15);
 
-    // sanity check if the expenseData.date is unequal to expenseData.startDate and endDate
-    // if so, set the date to the startDate
-    if (isSameDay(expenseData.endDate, expenseData.startDate)) {
-      // delete the rangeId field
-      expenseData.rangeId = null;
-    } else {
-      expenseData.rangeId = rangeId;
-    }
-
-    // get number of days
     const day1 = new Date(expenseData.startDate);
     const day2 = new Date(expenseData.endDate);
     const days = daysBetween(day2, day1);
-    const dayCount = countInclusiveDaysInRange(day1, day2);
+    const isSingleDay = isSameDay(expenseData.endDate, expenseData.startDate);
 
-    if (Number(expenseData.duplOrSplit) === DuplicateOption.split) {
-      const rangedDistributeInput = {
-        dayCount,
-        mode: DuplicateOption.split,
-        alreadyDivided: Boolean(expenseData.alreadyDividedAmountByDays),
-      };
-      expenseData.calcAmount = distributeRangedAmount({
-        total: expenseData.calcAmount,
-        ...rangedDistributeInput,
-      });
-      expenseData.amount = distributeRangedAmount({
-        total: expenseData.amount,
-        ...rangedDistributeInput,
-      });
-      expenseData.splitList.forEach((split: Split) => {
-        split.amount = distributeRangedAmount({
-          total: split.amount,
-          ...rangedDistributeInput,
-        });
-      });
+    const dates: Date[] = [];
+    for (let i = 0; i <= days; i++) {
+      const newDate = getDatePlusDays(day1, i) as Date;
+      newDate.setHours(new Date().getHours(), new Date().getMinutes());
+      dates.push(newDate);
     }
 
-    // iterate over number of days between and change date and endDate to the first date + iterator
-    for (let i = 0; i <= days; i++) {
+    const instances = expandRangedExpense(expenseData, {
+      rangeId: isSingleDay ? null : rangeId,
+      dates,
+    });
+
+    for (let i = 0; i < instances.length; i++) {
       Toast.show({
         type: "loading",
         text1: i18n.t("toastSaving1"),
-        text2: i18n.t("toastSaving2"), //+ " " + (i + 1) + "/" + dayCount
+        text2: i18n.t("toastSaving2"),
         autoHide: false,
         props: {
-          progress: i / days,
+          progress: days === 0 ? 0 : i / days,
           progressAt: i,
           progressMax: days,
           size: "small",
         },
       });
-      const newDate = getDatePlusDays(day1, i);
-      if (newDate instanceof Date) {
-        newDate.setHours(new Date().getHours(), new Date().getMinutes());
-      } else if (newDate instanceof DateTime) {
-        newDate.set({
-          hour: new Date().getHours(),
-          minute: new Date().getMinutes(),
-        });
-      }
-      expenseData.date = newDate;
-      expenseData.editedTimestamp = Date.now();
+
+      const expenseToPersist = {
+        ...instances[i],
+        editedTimestamp: Date.now(),
+      };
 
       const item: OfflineQueueManageExpenseItem = {
         type: "add",
         expense: {
           tripid: tripid,
           uid: uid,
-          expenseData: expenseData,
+          expenseData: expenseToPersist,
         },
       };
       const id = await storeExpenseOnlineOffline(item, isOnline);
-      expenseCtx.addExpense({ ...expenseData, id: id });
+      expenseCtx.addExpense({ ...expenseToPersist, id: id ?? "" });
     }
   };
 

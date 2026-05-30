@@ -11,7 +11,7 @@ import { splitType } from "./split";
 
 export type ExpenseFormSnapshot = {
   uid: string;
-  /** Raw amount field text; defaults to {@link amountValue} when omitted (draft save path). */
+  /** Raw amount field text from the form input; submit and draft persistence use {@link amountValue}. */
   amountInput?: string | number;
   amountValue: string | number;
   dateIso: string;

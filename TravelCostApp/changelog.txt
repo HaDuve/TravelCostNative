@@ -2,10 +2,13 @@ Changelog Travel Expense App
 
 __Newest Changes:
 
-1.3.005c
-- Added restore feature after delete expense
+1.3.005d
+- Bugfixes and performance improvements
 
 __Other Changes:
+
+1.3.005c
+- Added restore feature after delete expense
 
 1.3.005b
 - Bugfixes and performance improvements

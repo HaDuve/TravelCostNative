@@ -292,7 +292,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       Toast.show({
         type: "loading",
         text1: i18n.t("toastSaving1"),
-        text2: i18n.t("toastSaving2"), //+ " " + (i + 1) + "/" + (days + 1)
+        text2: i18n.t("toastSaving2"), //+ " " + (i + 1) + "/" + dayCount
         autoHide: false,
         props: {
           progress: i / days,

@@ -62,6 +62,21 @@ describe("distributeRangedAmount", () => {
       })
     ).toBe(33.33);
   });
+
+  it("documents rounding drift when summing per-day ranged-split shares", () => {
+    const dayCount = 3;
+    const total = 100;
+    const perDay = distributeRangedAmount({
+      total,
+      dayCount,
+      mode: DuplicateOption.split,
+      alreadyDivided: false,
+    });
+
+    expect(perDay).toBe(33.33);
+    expect(Number((perDay * dayCount).toFixed(2))).toBe(99.99);
+    expect(perDay * dayCount).not.toBe(total);
+  });
 });
 
 describe("multiplyAmountForRangedDuplicate", () => {

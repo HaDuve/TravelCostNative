@@ -33,12 +33,34 @@ describe("shadow styles", () => {
     );
   });
 
-  it("overview dropdown and fab shadow styles include backgroundColor", () => {
+  it("overview dropdown shadow style includes backgroundColor", () => {
     assertSolidBackgroundForShadow(
       StyleSheet.flatten(shadowRegressionStyles.overviewDropdownContainer)
     );
+  });
+
+  it("overview fab toggle keeps svg-only chrome without a background halo", () => {
+    const flat = StyleSheet.flatten(
+      shadowRegressionStyles.overviewFabToggleButton
+    ) as Record<string, unknown>;
+    expect(flat.backgroundColor).toBeUndefined();
+    expect(flat.borderRadius).toBeUndefined();
+  });
+
+  it("expenses summary pressable co-locates shadow and backgroundColor", () => {
     assertSolidBackgroundForShadow(
-      StyleSheet.flatten(shadowRegressionStyles.overviewFabToggleButton)
+      StyleSheet.flatten([
+        shadowRegressionStyles.expensesSummaryPressable,
+        { shadowColor: "#BFBFBF", shadowOpacity: 0.75 },
+      ])
     );
+  });
+
+  it("expense country flag container co-locates shadow and backgroundColor", () => {
+    const flat = StyleSheet.flatten(
+      shadowRegressionStyles.expenseCountryFlagContainer
+    );
+    expect(styleHasShadow(flat)).toBe(true);
+    assertSolidBackgroundForShadow(flat);
   });
 });

@@ -1,6 +1,7 @@
 import { Platform, StyleSheet, View, Text } from "react-native";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { GlobalStyles } from "../../constants/styles";
+import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 import * as Progress from "react-native-progress";
 import { TripContext } from "../../store/trip-context";
 
@@ -309,6 +310,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
       onPress={() => pressBudgetHandler()}
       style={({ pressed }) => [
         styles.container,
+        shadowRegressionStyles.expensesSummaryPressable,
         style,
         GlobalStyles.shadow,
         pressed && GlobalStyles.pressedWithShadow,

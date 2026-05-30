@@ -13,6 +13,7 @@ import { getCatLocalized } from "../../../util/category";
 import PropTypes from "prop-types";
 import { ExpenseData, getExpensesSum } from "../../../util/expense";
 import ExpenseCountryFlag from "../ExpenseCountryFlag";
+import { shadowRegressionStyles } from "../../../styles/shadow-regression-styles";
 import BlurPremium from "../../Premium/BlurPremium";
 import { processTitleStringFilteredPiecharts } from "../../../util/string";
 import { TripContext } from "../../../store/trip-context";
@@ -88,7 +89,10 @@ const ExpenseCountries = ({
       <ExpenseCountryFlag
         countryName={country}
         style={GlobalStyles.countryFlagStyle}
-        containerStyle={[styles.countryFlagContainerStyle, GlobalStyles.shadow]}
+        containerStyle={[
+          styles.countryFlagContainerStyle,
+          shadowRegressionStyles.expenseCountryFlagContainer,
+        ]}
       ></ExpenseCountryFlag>
     );
     return (

@@ -49,8 +49,13 @@ export const shadowRegressionStyles = StyleSheet.create({
     marginLeft: constantScale(-49, 0.08),
     zIndex: 1000,
     elevation: 10,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 999,
     ...GlobalStyles.shadowGlowPrimary,
+  },
+  expensesSummaryPressable: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  expenseCountryFlagContainer: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    ...GlobalStyles.shadow,
   },
 });

@@ -7,7 +7,12 @@ import {
 } from "../store/mmkv";
 import { DateOrDateTime, isToday } from "./date";
 import { getAllExpenses } from "./http";
-import { deleteUserExpenses } from "./user-delete-expense";
+import Toast from "react-native-toast-message";
+import { i18n } from "../i18n/i18n";
+import {
+  collectUserDeleteTargets,
+  deleteUserExpenses,
+} from "./user-delete-expense";
 import { splitType } from "./split";
 import { asPeriodSlice, sumByPeriod, sumForTrip } from "./expenseTotals";
 
@@ -189,15 +194,18 @@ export async function deleteAllExpensesByRangedId(
   options?: { showUndoToast?: boolean },
 ) {
   const allExpenses = expenseCtx?.expenses || [];
-  const expensesToDelete = allExpenses.filter(
-    (expense) =>
-      expense?.rangeId === selectedExpense?.rangeId && !expense.isDeleted,
-  );
-  const targets = expensesToDelete.map((expense: ExpenseData) => ({
-    tripid,
-    uid: expense.uid,
-    id: expense.id,
-  }));
+  const targets = selectedExpense?.id
+    ? collectUserDeleteTargets(tripid, allExpenses, [selectedExpense.id])
+    : [];
+
+  if (targets.length === 0) {
+    Toast.show({
+      type: "error",
+      text1: i18n.t("error"),
+      text2: i18n.t("deleteError"),
+    });
+    return;
+  }
 
   await deleteUserExpenses({
     tripid,

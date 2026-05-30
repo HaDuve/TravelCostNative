@@ -269,7 +269,7 @@ function ExpensesList({
       ]);
     }
     deleteExpenseHandler();
-  }, []);
+  }, [tripID, expenseCtx, navigation, forceCloseRow, isOnline]);
 
   const renderExpenseItem = useCallback(
     (

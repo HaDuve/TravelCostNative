@@ -356,6 +356,7 @@ const ProfileScreen = ({ navigation }) => {
           maskOffset={constantScale(200, 0.1)}
           tooltipBottomOffset={constantScale(150, 0.1)}
           zone={6}
+          style={{ flex: 1 }}
         >
           <TripList trips={tripHistory}></TripList>
         </TourGuideZone>

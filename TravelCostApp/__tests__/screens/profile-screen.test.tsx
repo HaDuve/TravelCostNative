@@ -58,16 +58,29 @@ jest.mock("../../components/Premium/PremiumConstants", () => ({
   setAttributesAsync: jest.fn(async () => {}),
 }));
 
-jest.mock("rn-tourguide", () => ({
-  TourGuideZone: ({ children }: { children: React.ReactNode }) => (
-    <>{children}</>
-  ),
-  useTourGuideController: () => ({
-    canStart: false,
-    start: jest.fn(),
-    eventEmitter: { on: jest.fn(), off: jest.fn() },
-  }),
-}));
+jest.mock("rn-tourguide", () => {
+  const { View } = require("react-native");
+  return {
+    TourGuideZone: ({
+      children,
+      style,
+      zone,
+    }: {
+      children: React.ReactNode;
+      style?: object;
+      zone?: number;
+    }) => (
+      <View testID={`tour-guide-zone-${zone}`} style={style}>
+        {children}
+      </View>
+    ),
+    useTourGuideController: () => ({
+      canStart: false,
+      start: jest.fn(),
+      eventEmitter: { on: jest.fn(), off: jest.fn() },
+    }),
+  };
+});
 
 jest.mock("../../util/vexo-tracking", () => ({
   trackEvent: jest.fn(),
@@ -205,6 +218,89 @@ describe("Profile screen", () => {
       flexWrap: "wrap",
       width: "100%",
     });
+  });
+
+  it("allocates remaining profile height to the trip history list", async () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
+        expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
+        user: {
+          userName: "Alice",
+          freshlyCreated: false,
+          tripHistory: ["t1"],
+          loadUserNameFromStorage: jest.fn(),
+          updateTripHistory: jest.fn(async () => {}),
+          needsTour: false,
+          setNeedsTour: jest.fn(),
+          hasNewChanges: false,
+          setHasNewChanges: jest.fn(),
+          setUserName: jest.fn(async () => {}),
+          setTripHistory: jest.fn(),
+        },
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("trip-list-wrapper")).toBeTruthy();
+    });
+
+    const tripContainer = screen.getByTestId("profile-trip-container");
+    const listWrapper = screen.getByTestId("trip-list-wrapper");
+    const listZone = screen.getByTestId("tour-guide-zone-6");
+    const containerFlat = StyleSheet.flatten(
+      tripContainer.props.style
+    ) as Record<string, unknown>;
+    const wrapperFlat = StyleSheet.flatten(
+      listWrapper.props.style
+    ) as Record<string, unknown>;
+    const zoneFlat = StyleSheet.flatten(listZone.props.style) as Record<
+      string,
+      unknown
+    >;
+
+    expect(containerFlat.flex).toBe(1);
+    expect(zoneFlat.flex).toBe(1);
+    expect(wrapperFlat.flex).toBe(1);
+  });
+
+  it("sizes trip history cards to content so Traveller chips are not clipped", async () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
+        expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
+        user: {
+          userName: "Alice",
+          freshlyCreated: false,
+          tripHistory: ["t1"],
+          loadUserNameFromStorage: jest.fn(),
+          updateTripHistory: jest.fn(async () => {}),
+          needsTour: false,
+          setNeedsTour: jest.fn(),
+          hasNewChanges: false,
+          setHasNewChanges: jest.fn(),
+          setUserName: jest.fn(async () => {}),
+          setTripHistory: jest.fn(),
+        },
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("trip-history-card-t1")).toBeTruthy();
+    });
+
+    const card = screen.getByTestId("trip-history-card-t1");
+    const flat = StyleSheet.flatten(card.props.style) as Record<
+      string,
+      unknown
+    >;
+    expect(flat.flex).not.toBe(1);
   });
 
   it("keeps trip history cards in the visible layout region", async () => {

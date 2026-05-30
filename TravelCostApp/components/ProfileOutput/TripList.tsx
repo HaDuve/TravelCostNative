@@ -31,6 +31,7 @@ function TripList({ trips }) {
         data={uniqTrips}
         scrollEnabled={true}
         horizontal={isLandscape}
+        style={{ flex: 1 }}
         ListFooterComponent={
           <View style={{ height: constantScale(150), width: "100%" }}></View>
         }

@@ -541,7 +541,6 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
   tripItem: {
-    flex: 1,
     padding: dynamicScale(12),
     margin: dynamicScale(12),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,

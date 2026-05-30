@@ -28,13 +28,44 @@ const mockGetEasUpdateInfo = getEasUpdateInfo as jest.MockedFunction<
   typeof getEasUpdateInfo
 >;
 
+function getVersionToggle(screen: ReturnType<typeof renderWithAppProviders>) {
+  return screen.getByRole("button", { name: i18n.t("settingsVersionHeader") });
+}
+
 function expandVersionFooter(screen: ReturnType<typeof renderWithAppProviders>) {
-  fireEvent.press(screen.getByText(i18n.t("settingsVersionHeader")));
+  fireEvent.press(getVersionToggle(screen));
 }
 
 describe("SettingsUpdateInfoFooter", () => {
   beforeEach(() => {
     mockGetEasUpdateInfo.mockReset();
+  });
+
+  it("exposes the version toggle as an expandable button for assistive tech", async () => {
+    mockGetEasUpdateInfo.mockResolvedValue({
+      updatesEnabled: true,
+      runningUpdateId: "running-id",
+      runningUpdateCreatedAt: "2026-05-20T10:00:00.000Z",
+      newerUpdateId: null,
+      newerUpdateCreatedAt: null,
+      newerUpdateAvailable: false,
+    });
+
+    const screen = renderWithAppProviders(<SettingsUpdateInfoFooter />, {
+      wrapNavigation: false,
+      network: { isConnected: true, strongConnection: true },
+    });
+
+    await screen.findByText(i18n.t("settingsVersionHeader"));
+
+    const toggle = getVersionToggle(screen);
+    expect(toggle.props.accessibilityState).toEqual({ expanded: false });
+
+    expandVersionFooter(screen);
+
+    expect(getVersionToggle(screen).props.accessibilityState).toEqual({
+      expanded: true,
+    });
   });
 
   it("shows only the Version header when collapsed", async () => {
@@ -79,7 +110,10 @@ describe("SettingsUpdateInfoFooter", () => {
     await screen.findByText(i18n.t("settingsVersionHeader"));
     expandVersionFooter(screen);
 
-    expect(screen.getByText(/Current version created at:/i)).toBeTruthy();
+    const currentLine = screen.getByText(/Current version created at:/i);
+    expect(currentLine.props.style).toEqual(
+      expect.objectContaining({ paddingHorizontal: "8%", marginLeft: "2%" })
+    );
     expect(
       screen.queryByText(/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/)
     ).toBeNull();

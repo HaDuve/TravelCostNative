@@ -31,14 +31,18 @@ const SettingsUpdateInfoFooter = () => {
   );
 
   const lines = buildVersionDisplayLines(info);
+  const versionHeaderLabel = i18n.t("settingsVersionHeader");
 
   return (
-    <View>
+    <View style={styles.section}>
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={versionHeaderLabel}
+        accessibilityState={{ expanded }}
         onPress={() => setExpanded((prev) => !prev)}
         style={styles.headerRow}
       >
-        <Text style={styles.textButton}>{i18n.t("settingsVersionHeader")}</Text>
+        <Text style={styles.headerText}>{versionHeaderLabel}</Text>
         <Ionicons
           name={expanded ? "chevron-up" : "chevron-down"}
           size={dynamicScale(18, false, 0.5)}
@@ -48,15 +52,15 @@ const SettingsUpdateInfoFooter = () => {
       {expanded && (
         <>
           {lines.updatesDisabled && (
-            <Text style={styles.textButton}>
+            <Text style={styles.bodyText}>
               {i18n.t("settingsUpdatesDisabledLabel")}
             </Text>
           )}
           {lines.currentLine && (
-            <Text style={styles.textButton}>{lines.currentLine}</Text>
+            <Text style={styles.bodyText}>{lines.currentLine}</Text>
           )}
           {lines.latestLine && (
-            <Text style={styles.textButton}>{lines.latestLine}</Text>
+            <Text style={styles.bodyText}>{lines.latestLine}</Text>
           )}
         </>
       )}
@@ -67,8 +71,10 @@ const SettingsUpdateInfoFooter = () => {
 export default SettingsUpdateInfoFooter;
 
 const styles = StyleSheet.create({
-  headerRow: {
+  section: {
     marginTop: "4%",
+  },
+  headerRow: {
     paddingVertical: "1%",
     paddingHorizontal: "8%",
     flexDirection: "row",
@@ -77,8 +83,17 @@ const styles = StyleSheet.create({
     gap: dynamicScale(6, false, 0.5),
     marginLeft: "2%",
   },
-  textButton: {
+  headerText: {
+    textAlign: "center",
+    fontSize: dynamicScale(16, false, 0.5),
+    fontWeight: "bold",
+    fontStyle: "italic",
+    color: GlobalStyles.colors.gray700,
+  },
+  bodyText: {
     paddingVertical: "1%",
+    paddingHorizontal: "8%",
+    marginLeft: "2%",
     textAlign: "center",
     fontSize: dynamicScale(16, false, 0.5),
     fontWeight: "bold",

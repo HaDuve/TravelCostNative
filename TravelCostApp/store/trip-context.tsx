@@ -3,7 +3,6 @@
 import React, { createContext, useEffect, useState } from "react";
 import { fetchTrip, fetchUser, getTravellers, updateTrip } from "../util/http";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
-import { MAX_JS_NUMBER } from "../confAppConstants";
 import { secureStoreGetItem } from "./secure-storage";
 import { ExpenseData, isPaidString } from "../util/expense";
 import { Traveller } from "../util/traveler";
@@ -16,6 +15,7 @@ import { computeDynamicDailyBudget } from "../util/budget";
 import type { TripData } from "../types/trip";
 import { settleTrip } from "../util/settlement";
 import { useTripTotalSpent } from "../hooks/useTripTotalSpent";
+import { hydrateTrip } from "../util/hydrate-trip";
 
 export type { TripData };
 
@@ -38,7 +38,7 @@ export type TripContextType = {
   addTrip: ({ tripName, tripTotalBudget }) => void;
   deleteTrip: (tripid: string) => void;
   getcurrentTrip: () => TripData;
-  setCurrentTrip: (tripid: string, trip: TripData) => Promise<void>;
+  setCurrentTrip: (tripid: string, trip: TripData) => Promise<TripData | void>;
   fetchAndSetCurrentTrip: (tripid: string) => Promise<TripData>;
   saveTripDataInStorage: (tripData: TripData) => Promise<void>;
   loadTripDataFromStorage: () => Promise<TripData>;
@@ -77,7 +77,7 @@ export const TripContext = createContext<TripContextType>({
     const tripData = {} as TripData;
     return tripData;
   },
-  setCurrentTrip: async (tripid: string, trip: TripData) => {},
+  setCurrentTrip: async (tripid: string, trip: TripData) => undefined,
   fetchAndSetCurrentTrip: async (tripid: string): Promise<TripData> => {
     return {};
   },
@@ -200,43 +200,6 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     setRefreshState(!refreshState);
   }
 
-  /**
-   * Migrates trip data from old settlement system (isPaidDate) to new system (isPaidTimestamp).
-   * Old system: "settled until today" - isPaidDate exists but means partial settlement
-   * New system: "settled everything" - isPaidTimestamp means all expenses before that timestamp are paid
-   * Migration: Convert isPaidDate to isPaidTimestamp, set isPaid to false (since old system was different)
-   */
-  function migrateTripSettlementData(trip: TripData): TripData {
-    // If trip has isPaidDate but no isPaidTimestamp, migrate it
-    if (trip.isPaidDate && !trip.isPaidTimestamp) {
-      try {
-        // Convert ISO string date to timestamp
-        const date = new Date(trip.isPaidDate);
-        if (!isNaN(date.getTime())) {
-          trip.isPaidTimestamp = date.getTime();
-          // Set isPaid to false because old system was "settled until today", not "settled everything"
-          trip.isPaid = isPaidString.notPaid;
-        }
-      } catch (error) {
-        safeLogError(error);
-      }
-    }
-    return trip;
-  }
-
-  function dropDeprecatedTripFields(trip: TripData): TripData {
-    // `totalSum` was a persisted trip-level total-spent number. We now derive totals
-    // from expenses (see #247) and drop this field on load to avoid stale state.
-    //
-    // Important: don't mutate the input object; callers may retain the reference.
-    if (!trip) return trip;
-    if (!("totalSum" in trip)) return trip;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { totalSum: _deprecatedTotalSum, ...rest } = trip as any;
-    return rest as TripData;
-  }
-
   async function fetchAndSetTravellers(tripid: string): Promise<boolean> {
     await loadTravellersFromStorage();
     const { isFastEnough } = await isConnectionFastEnough();
@@ -253,7 +216,10 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     }
   }
 
-  async function setCurrentTrip(tripid: string, trip: TripData) {
+  async function setCurrentTrip(
+    tripid: string,
+    trip: TripData
+  ): Promise<TripData | void> {
     if (!trip) return;
     if (tripid === "reset") {
       _setTripid("");
@@ -271,30 +237,20 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
       return;
     }
 
-    // Migrate trip data from old settlement system
-    const migratedTrip = dropDeprecatedTripFields(migrateTripSettlementData(trip));
+    const hydratedTrip = hydrateTrip({ ...trip, tripid: trip.tripid ?? tripid });
 
     _setTripid(tripid);
-    setTripName(migratedTrip.tripName);
-    setTotalBudget(
-      migratedTrip.totalBudget
-        ? migratedTrip.totalBudget.toString()
-        : MAX_JS_NUMBER.toString()
-    );
-    setTripCurrency(migratedTrip.tripCurrency);
-    // negative Numbers are not allowed
-    if (Number(migratedTrip.dailyBudget) < 0) {
-      setdailyBudget("0.0001");
-    } else {
-      setdailyBudget(migratedTrip.dailyBudget.toString());
-    }
-    setStartDate(migratedTrip.startDate);
-    setEndDate(migratedTrip.endDate);
-    setIsPaid(migratedTrip.isPaid ?? isPaidString.notPaid);
-    setIsPaidDate(migratedTrip.isPaidDate);
-    setIsPaidTimestamp(migratedTrip.isPaidTimestamp);
+    setTripName(hydratedTrip.tripName);
+    setTotalBudget(hydratedTrip.totalBudget!);
+    setTripCurrency(hydratedTrip.tripCurrency);
+    setdailyBudget(hydratedTrip.dailyBudget!);
+    setStartDate(hydratedTrip.startDate);
+    setEndDate(hydratedTrip.endDate);
+    setIsPaid(hydratedTrip.isPaid!);
+    setIsPaidDate(hydratedTrip.isPaidDate!);
+    setIsPaidTimestamp(hydratedTrip.isPaidTimestamp);
     setIsLoading(false);
-    setIsDynamicDailyBudget(migratedTrip.isDynamicDailyBudget);
+    setIsDynamicDailyBudget(hydratedTrip.isDynamicDailyBudget ?? false);
     if (typeof trip.travellers[1] === "string") {
       setTravellers(trip.travellers);
     } else {
@@ -307,6 +263,8 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
       });
       setTravellers(extractedTravellers);
     }
+
+    return hydratedTrip;
   }
 
   async function fetchAndSetCurrentTrip(tripid: string) {
@@ -318,10 +276,8 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
       if (!trip) throw new Error("no trip found");
       trip.tripid = tripid;
 
-      // Migrate trip data from old settlement system
-      const migratedTrip = dropDeprecatedTripFields(migrateTripSettlementData(trip));
-
-      await setCurrentTrip(tripid, migratedTrip);
+      const migratedTrip = await setCurrentTrip(tripid, trip);
+      if (!migratedTrip) return;
 
       // If migration occurred, save migrated trip back to database and storage
       if (
@@ -402,38 +358,20 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
   async function loadTripDataFromStorage() {
     const tripData: TripData = getMMKVObject(MMKV_KEYS.CURRENT_TRIP);
     if (tripData) {
-      // `totalSum` might still exist in persisted data from older app versions.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const hadDeprecatedTotalSum = "totalSum" in (tripData as any);
+      const migratedTrip = await setCurrentTrip(tripData.tripid ?? "", tripData);
+      if (!migratedTrip) {
+        setIsLoading(false);
+        return;
+      }
 
-      // Migrate trip data from old settlement system
-      const migratedTrip = dropDeprecatedTripFields(
-        migrateTripSettlementData(tripData)
-      );
-
-      setTripName(migratedTrip.tripName);
-      setTotalBudget(
-        migratedTrip.totalBudget
-          ? migratedTrip.totalBudget.toString()
-          : MAX_JS_NUMBER.toString()
-      );
-
-      setTripCurrency(migratedTrip.tripCurrency);
-      setdailyBudget(migratedTrip.dailyBudget.toString());
-      setIsPaid(migratedTrip.isPaid ?? isPaidString.notPaid);
-      setIsPaidDate(migratedTrip.isPaidDate ?? "");
-      setIsPaidTimestamp(migratedTrip.isPaidTimestamp);
-      setStartDate(migratedTrip.startDate ?? "");
-      setEndDate(migratedTrip.endDate ?? "");
       try {
         await loadTravellersFromStorage();
       } catch (error) {
         safeLogError(error);
       }
-      setIsLoading(false);
 
-      // If migration occurred, save migrated trip back to storage.
-      // Also persist the cleanup of deprecated fields (e.g. legacy `totalSum`).
       const didMigrateSettlementData =
         tripData.isPaidDate &&
         !tripData.isPaidTimestamp &&

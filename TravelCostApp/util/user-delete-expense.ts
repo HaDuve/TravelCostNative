@@ -107,6 +107,12 @@ function showDeletedExpenseToast(
   actionId: string,
   onUndo: () => Promise<void>,
 ): void {
+  const dismissUndoScope = () => {
+    if (dismissToastClearsUndo && pendingUndoDelete?.actionId === actionId) {
+      clearPendingUndoDelete();
+    }
+  };
+
   Toast.show({
     type: "deletedExpense",
     text1: i18n.t("toastDeletedExpense1"),
@@ -114,11 +120,9 @@ function showDeletedExpenseToast(
     visibilityTime: UNDO_DELETE_WINDOW_MS,
     autoHide: true,
     onHide: () => {
-      if (dismissToastClearsUndo) {
-        clearPendingUndoDelete();
-      }
+      // Undo scope is cleared explicitly via onDismissUndo or the expiry timer.
     },
-    props: { actionId, onUndo },
+    props: { actionId, onUndo, onDismissUndo: dismissUndoScope },
   });
 }
 

@@ -1,6 +1,12 @@
+let mockLastToastOnHide: (() => void) | undefined;
+
 jest.mock("react-native-toast-message", () => ({
-  show: jest.fn(),
-  hide: jest.fn(),
+  show: jest.fn((args) => {
+    mockLastToastOnHide = args.onHide;
+  }),
+  hide: jest.fn(() => {
+    mockLastToastOnHide?.();
+  }),
 }));
 
 jest.mock("../../util/offline-queue", () => ({
@@ -36,6 +42,7 @@ describe("deleteUserExpenses", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
+    mockLastToastOnHide = undefined;
   });
 
   afterEach(() => {
@@ -134,6 +141,7 @@ describe("undoUserExpenseDelete", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
+    mockLastToastOnHide = undefined;
   });
 
   afterEach(() => {
@@ -162,6 +170,32 @@ describe("undoUserExpenseDelete", () => {
     expect(restoreExpenseOnlineOffline).toHaveBeenCalledTimes(2);
     expect(expenseCtx.restoreExpenses).toHaveBeenCalledWith(["exp-1", "exp-2"]);
     expect(actionId).toBeDefined();
+  });
+
+  it("still restores when Toast.hide runs before the undo handler", async () => {
+    await deleteUserExpenses({
+      tripid: "trip-1",
+      targets: [{ tripid: "trip-1", uid: "u1", id: "exp-1" }],
+      isOnline: true,
+      expenseCtx,
+    });
+
+    const { onUndo } = (Toast.show as jest.Mock).mock.calls.find(
+      ([args]) => args.type === "deletedExpense",
+    )![0].props;
+
+    Toast.hide();
+
+    await onUndo();
+
+    expect(restoreExpenseOnlineOffline).toHaveBeenCalledWith(
+      {
+        type: "restore",
+        expense: { tripid: "trip-1", uid: "u1", id: "exp-1" },
+      },
+      true,
+    );
+    expect(expenseCtx.restoreExpenses).toHaveBeenCalledWith(["exp-1"]);
   });
 
   it("shows expired copy when undo is pressed after the window", async () => {
@@ -203,6 +237,7 @@ describe("dismissing the deleted expense toast", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
+    mockLastToastOnHide = undefined;
   });
 
   afterEach(() => {
@@ -220,8 +255,8 @@ describe("dismissing the deleted expense toast", () => {
     const deletedToastCall = (Toast.show as jest.Mock).mock.calls.find(
       ([args]) => args.type === "deletedExpense",
     )!;
-    const { actionId, onHide } = deletedToastCall[0];
-    onHide();
+    const { actionId, onDismissUndo } = deletedToastCall[0].props;
+    onDismissUndo();
 
     await undoUserExpenseDelete({
       actionId,
@@ -263,6 +298,7 @@ describe("pending undo replacement", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
+    mockLastToastOnHide = undefined;
   });
 
   afterEach(() => {

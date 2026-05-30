@@ -231,50 +231,79 @@ const toastConfig: ToastConfig = {
   ),
   deletedExpense: (props) => {
     const onUndo = props.props?.onUndo as (() => void | Promise<void>) | undefined;
+    const onDismissUndo = props.props?.onDismissUndo as (() => void) | undefined;
     return (
-      <BaseToast
-        {...props}
+      <View
         style={[
           {
+            flexDirection: "row",
+            borderLeftWidth: 5,
             borderLeftColor: GlobalStyles.colors.primary500,
+            backgroundColor: "#FFF",
+            borderRadius: dynamicScale(6),
           },
           SIZESTYLES,
           GlobalStyles.wideStrongShadow,
         ]}
-        contentContainerStyle={CONTENTCONTAINERSTYLE}
-        text1Style={{
-          fontSize: dynamicScale(17, false, 0.5),
-          fontWeight: "500",
-        }}
-        text2Style={{
-          fontSize: dynamicScale(15, false, 0.5),
-          fontWeight: "400",
-        }}
-        text1NumberOfLines={2}
-        text2NumberOfLines={2}
-        renderTrailingIcon={() => (
-          <TouchableOpacity
-            onPress={() => {
-              void onUndo?.();
-            }}
-            style={{
+      >
+        <Pressable
+          style={[
+            CONTENTCONTAINERSTYLE,
+            {
+              flex: 1,
               justifyContent: "center",
-              paddingHorizontal: dynamicScale(12),
-            }}
-          >
+              paddingVertical: dynamicScale(8),
+            },
+          ]}
+          onPress={() => {
+            onDismissUndo?.();
+            Toast.hide();
+          }}
+        >
+          {(props.text1?.length ?? 0) > 0 && (
             <Text
               style={{
-                color: GlobalStyles.colors.primary500,
-                fontSize: dynamicScale(16, false, 0.5),
-                fontWeight: "600",
+                fontSize: dynamicScale(17, false, 0.5),
+                fontWeight: "500",
               }}
+              numberOfLines={2}
             >
-              {i18n.t("undo")}
+              {props.text1}
             </Text>
-          </TouchableOpacity>
-        )}
-        onPress={() => Toast.hide()}
-      />
+          )}
+          {(props.text2?.length ?? 0) > 0 && (
+            <Text
+              style={{
+                fontSize: dynamicScale(15, false, 0.5),
+                fontWeight: "400",
+                color: "#979797",
+              }}
+              numberOfLines={2}
+            >
+              {props.text2}
+            </Text>
+          )}
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            void onUndo?.();
+          }}
+          style={{
+            justifyContent: "center",
+            paddingHorizontal: dynamicScale(12),
+          }}
+        >
+          <Text
+            style={{
+              color: GlobalStyles.colors.primary500,
+              fontSize: dynamicScale(16, false, 0.5),
+              fontWeight: "600",
+            }}
+          >
+            {i18n.t("undo")}
+          </Text>
+        </Pressable>
+      </View>
     );
   },
   budgetOverview: (props) => {

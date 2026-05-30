@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 
 import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
+import { dynamicScale } from "../../util/scalingUtil";
 import {
   assertSolidBackgroundForShadow,
   styleHasShadow,
@@ -68,6 +69,49 @@ describe("shadow styles", () => {
     expect(summary.shadowColor).toBe(dropdown.shadowColor);
     expect(summary.shadowOpacity).toBe(dropdown.shadowOpacity);
     expect(summary.shadowRadius).toBe(dropdown.shadowRadius);
+  });
+
+  it("overview header cards share equal minHeight and vertical centering", () => {
+    const summary = StyleSheet.flatten(
+      shadowRegressionStyles.expensesSummaryContainer
+    ) as Record<string, unknown>;
+    const dropdown = StyleSheet.flatten(
+      shadowRegressionStyles.overviewDropdownContainer
+    ) as Record<string, unknown>;
+
+    expect(summary.minHeight).toBe(dropdown.minHeight);
+    expect(summary.justifyContent).toBe("center");
+    expect(dropdown.justifyContent).toBe("center");
+  });
+
+  it("overview header cards use compact height and vertical padding", () => {
+    const dropdown = StyleSheet.flatten(
+      shadowRegressionStyles.overviewDropdownContainer
+    ) as Record<string, unknown>;
+
+    expect(dropdown.minHeight).toBe(dynamicScale(52, true));
+    expect(dropdown.paddingVertical).toBe(dynamicScale(4, true));
+  });
+
+  it("overview period header row separates cards with explicit gap", () => {
+    const row = StyleSheet.flatten(
+      shadowRegressionStyles.overviewPeriodHeaderRow
+    ) as Record<string, unknown>;
+
+    expect(row.flexDirection).toBe("row");
+    expect(row.gap).toBeGreaterThanOrEqual(8);
+  });
+
+  it("overview dropdown inner style matches container backgroundColor", () => {
+    const container = StyleSheet.flatten(
+      shadowRegressionStyles.overviewDropdownContainer
+    ) as Record<string, unknown>;
+    const inner = StyleSheet.flatten(
+      shadowRegressionStyles.overviewDropdownInner
+    ) as Record<string, unknown>;
+
+    expect(inner.backgroundColor).toBe(container.backgroundColor);
+    expect(inner.borderWidth).toBe(0);
   });
 
   it("overview header cards share equal flex and width constraints", () => {

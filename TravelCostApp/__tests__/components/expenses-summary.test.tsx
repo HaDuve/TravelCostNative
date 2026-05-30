@@ -62,5 +62,6 @@ describe("ExpensesSummary", () => {
     expect(flat.flex).toBe(dropdownChrome.flex);
     expect(flat.maxWidth).toBe(dropdownChrome.maxWidth);
     expect(flat.alignItems).toBe("center");
+    expect(flat.paddingTop).toBeUndefined();
   });
 });

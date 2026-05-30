@@ -44,12 +44,12 @@ const overviewHeaderCardShadow = Platform.select({
 const overviewHeaderCardBase = {
   flex: 1,
   maxWidth: "50%" as const,
-  minHeight: dynamicScale(64, true),
+  minHeight: dynamicScale(52, true),
   backgroundColor: GlobalStyles.colors.backgroundColor,
   borderRadius: 10,
   borderWidth: 1,
   borderColor: GlobalStyles.colors.gray300,
-  paddingVertical: dynamicScale(6, true),
+  paddingVertical: dynamicScale(4, true),
   ...overviewHeaderCardShadow,
 };
 
@@ -63,6 +63,28 @@ export const shadowRegressionStyles = StyleSheet.create({
   overviewDropdownContainer: {
     ...overviewHeaderCardBase,
     marginTop: dynamicScale(2, true),
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  overviewDropdownInner: {
+    borderRadius: 10,
+    borderWidth: 0,
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+  },
+  overviewPeriodHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "stretch",
+    gap: dynamicScale(12, true),
+    zIndex: 10,
+    marginTop: dynamicScale(18, true),
+    paddingHorizontal: dynamicScale(12),
+    marginBottom: dynamicScale(12, true),
+  },
+  overviewPeriodDateHeader: {
+    marginTop: dynamicScale(12, true),
+    marginLeft: dynamicScale(18),
+    marginBottom: dynamicScale(-4, true),
   },
   expensesSummaryContainer: {
     ...overviewHeaderCardBase,

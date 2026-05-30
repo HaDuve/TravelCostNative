@@ -7,9 +7,9 @@ jest.mock("expo-haptics", () => ({
 
 jest.mock("react-native-dropdown-picker", () => {
   const React = require("react");
-  const { Text } = require("react-native");
-  return function MockDropDownPicker() {
-    return <Text testID="mock-dropdown-picker" />;
+  const { View } = require("react-native");
+  return function MockDropDownPicker(props: { containerStyle?: object }) {
+    return <View testID="mock-dropdown-picker" style={props.containerStyle} />;
   };
 });
 

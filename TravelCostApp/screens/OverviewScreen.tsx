@@ -185,6 +185,7 @@ const OverviewScreen = ({ navigation }) => {
   return (
     <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
       <View
+        testID="period-date-header"
         style={[
           styles.dateHeader,
           !isPortrait && styles.landscapeDateHeader,
@@ -197,7 +198,10 @@ const OverviewScreen = ({ navigation }) => {
           {offlineString}
         </Text>
       </View>
-      <View style={[styles.header, !isPortrait && styles.landscapeHeader]}>
+      <View
+        testID="period-header-row"
+        style={[styles.header, !isPortrait && styles.landscapeHeader]}
+      >
         <DropDownPicker
           open={open}
           value={PeriodValue}
@@ -314,9 +318,7 @@ const styles = StyleSheet.create({
     paddingTop: constantScale(12, 0.5),
   },
   dateHeader: {
-    marginTop: dynamicScale(12, true),
-    marginLeft: dynamicScale(18),
-    marginBottom: dynamicScale(-4, true),
+    ...shadowRegressionStyles.overviewPeriodDateHeader,
   },
   landscapeDateHeader: {
     marginTop: dynamicScale(4, true),
@@ -334,13 +336,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.gray700,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    zIndex: 10,
-    marginTop: dynamicScale(18, true),
-    paddingHorizontal: dynamicScale(12),
-    marginBottom: dynamicScale(12, true),
+    ...shadowRegressionStyles.overviewPeriodHeaderRow,
   },
   landscapeHeader: {
     marginTop: dynamicScale(12, true),
@@ -357,8 +353,7 @@ const styles = StyleSheet.create({
     maxHeight: dynamicScale(600, true),
   },
   dropdown: {
-    borderRadius: 10,
-    borderWidth: 0,
+    ...shadowRegressionStyles.overviewDropdownInner,
   },
   dropdownTextStyle: {
     fontSize:

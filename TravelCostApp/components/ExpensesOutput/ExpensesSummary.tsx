@@ -68,7 +68,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
 
   if (isOfflineMissingTrip) {
     return (
-      <View style={[styles.container, style]}>
+      <View style={style}>
         <Text style={styles.offlineText}>
           {i18n.t("offline")}: {i18n.t("noDataAvailable")}
         </Text>
@@ -311,7 +311,6 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
       onPress={() => pressBudgetHandler()}
       style={({ pressed }) => [
         shadowRegressionStyles.expensesSummaryContainer,
-        styles.container,
         style,
         pressed && GlobalStyles.pressedWithShadow,
       ]}
@@ -333,7 +332,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
         borderWidth={0}
         borderRadius={dynamicScale(6)}
         progress={budgetProgress}
-        height={constantScale(8, 0.5)}
+        height={constantScale(6, 0.5)}
       />
     </Pressable>
   );
@@ -348,22 +347,6 @@ ExpensesSummary.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    ...Platform.select({
-      ios: {
-        paddingTop: dynamicScale(4, true),
-        paddingLeft: dynamicScale(8),
-        paddingRight: dynamicScale(8),
-        marginBottom: dynamicScale(-4, true),
-      },
-      android: {
-        paddingTop: dynamicScale(4, true),
-        paddingLeft: dynamicScale(8),
-        paddingRight: dynamicScale(8),
-        marginBottom: dynamicScale(-4, true),
-      },
-    }),
-  },
   sumTextContainer: {
     alignItems: "center",
   },

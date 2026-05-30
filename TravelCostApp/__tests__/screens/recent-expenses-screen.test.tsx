@@ -156,5 +156,7 @@ describe("RecentExpenses screen", () => {
     expect(dropdown.flex).toBe(overviewDropdown.flex);
     expect(dropdown.maxWidth).toBe(overviewDropdown.maxWidth);
     expect(dropdown.borderWidth).toBe(overviewDropdown.borderWidth);
+    expect(dropdown.minHeight).toBe(overviewDropdown.minHeight);
+    expect(dropdown.justifyContent).toBe("center");
   });
 });

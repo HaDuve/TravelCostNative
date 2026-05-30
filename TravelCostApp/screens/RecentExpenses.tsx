@@ -358,6 +358,7 @@ function RecentExpenses({ navigation }) {
         zone={3}
       ></TourGuideZone>
       <View
+        testID="period-date-header"
         style={[
           styles.dateHeader,
           !isPortrait && styles.landscapeDateHeader,
@@ -376,7 +377,10 @@ function RecentExpenses({ navigation }) {
         </View>
       </View>
 
-      <View style={[styles.header, !isPortrait && styles.landscapeHeader]}>
+      <View
+        testID="period-header-row"
+        style={[styles.header, !isPortrait && styles.landscapeHeader]}
+      >
         <DropDownPicker
           open={open}
           value={PeriodValue}
@@ -453,9 +457,7 @@ const styles = StyleSheet.create({
     paddingTop: constantScale(16, 0.5),
   },
   dateHeader: {
-    marginVertical: dynamicScale(16, true),
-    marginLeft: dynamicScale(12),
-    marginBottom: dynamicScale(-20, true),
+    ...shadowRegressionStyles.overviewPeriodDateHeader,
   },
   dateHeaderContent: {
     flexDirection: "row",
@@ -473,14 +475,7 @@ const styles = StyleSheet.create({
     color: GlobalStyles.colors.gray700,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    marginTop: dynamicScale(24, true),
-    marginHorizontal: dynamicScale(8),
-    marginBottom: dynamicScale(12, true),
-    paddingHorizontal: dynamicScale(12),
-    zIndex: 10,
+    ...shadowRegressionStyles.overviewPeriodHeaderRow,
   },
   landscapeHeader: {
     marginTop: dynamicScale(4, true),
@@ -497,8 +492,7 @@ const styles = StyleSheet.create({
     maxHeight: dynamicScale(600, true),
   },
   dropdown: {
-    borderRadius: 10,
-    borderWidth: 0,
+    ...shadowRegressionStyles.overviewDropdownInner,
   },
   dropdownTextStyle: {
     fontSize:

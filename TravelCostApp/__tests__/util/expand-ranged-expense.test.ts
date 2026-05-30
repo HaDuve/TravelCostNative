@@ -47,7 +47,29 @@ describe("expandRangedExpense", () => {
     });
 
     expect(expanded).toHaveLength(1);
-    expect(expanded[0].rangeId).toBeFalsy();
+    expect(expanded[0].rangeId).toBeNull();
+  });
+
+  it("gives each instance its own splitList", () => {
+    const dates = [
+      new Date("2026-01-15T12:00:00.000Z"),
+      new Date("2026-01-16T12:00:00.000Z"),
+    ];
+    const expanded = expandRangedExpense(
+      makeExpense({
+        amount: 100,
+        calcAmount: 100,
+        duplOrSplit: DuplicateOption.split,
+        splitList: [
+          { userName: "Alice", amount: 60 },
+          { userName: "Bob", amount: 40 },
+        ],
+      }),
+      { rangeId: "r1", dates }
+    );
+
+    expanded[0].splitList![0].amount = 999;
+    expect(expanded[1].splitList![0].amount).toBe(30);
   });
 
   it("spreads a ranged-split total evenly per day", () => {

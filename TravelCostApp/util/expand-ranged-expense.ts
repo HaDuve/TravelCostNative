@@ -46,12 +46,17 @@ export function expandRangedExpense(
   input: ExpandRangedExpenseInput
 ): ExpenseData[] {
   const dayCount = input.dates.length;
-  const distributed = distributeRangedExpenseAmounts(expenseData, dayCount);
-  const rangeId = dayCount === 1 ? undefined : input.rangeId ?? undefined;
+  const { amount, calcAmount, splitList } = distributeRangedExpenseAmounts(
+    expenseData,
+    dayCount
+  );
+  const rangeId = dayCount === 1 ? null : input.rangeId ?? null;
 
   return input.dates.map((date) => ({
     ...expenseData,
-    ...distributed,
+    amount,
+    calcAmount,
+    splitList: splitList?.map((split) => ({ ...split })),
     date,
     rangeId,
   }));

@@ -252,17 +252,9 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
 
     const dates: Date[] = [];
     for (let i = 0; i <= days; i++) {
-      const newDate = getDatePlusDays(day1, i);
-      if (newDate instanceof Date) {
-        newDate.setHours(new Date().getHours(), new Date().getMinutes());
-        dates.push(newDate);
-      } else if (newDate instanceof DateTime) {
-        newDate.set({
-          hour: new Date().getHours(),
-          minute: new Date().getMinutes(),
-        });
-        dates.push(newDate.toJSDate());
-      }
+      const newDate = getDatePlusDays(day1, i) as Date;
+      newDate.setHours(new Date().getHours(), new Date().getMinutes());
+      dates.push(newDate);
     }
 
     const instances = expandRangedExpense(expenseData, {

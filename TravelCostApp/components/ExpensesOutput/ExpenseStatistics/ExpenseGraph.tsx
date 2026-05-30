@@ -23,6 +23,7 @@ import {
   MAX_JS_NUMBER,
   PRELOADED_DATA_POINTS,
 } from "../../../confAppConstants";
+import { toExpenseNavigationDtos } from "../../../util/expense-navigation-dto";
 import { SettingsContext } from "../../../store/settings-context";
 import { getExpensesSumPeriod } from "../../../util/expense";
 import { dynamicScale } from "../../../util/scalingUtil";
@@ -140,7 +141,7 @@ const ExpenseGraph = ({
                 // if (!filteredExpenses || filteredExpenses?.length === 0) return;
 
                 navigation.navigate("FilteredExpenses", {
-                  expenses: filteredExpenses,
+                  expenses: toExpenseNavigationDtos(filteredExpenses),
                   dayString: dayString,
                 });
               }}
@@ -155,7 +156,7 @@ const ExpenseGraph = ({
                   );
                 // if (!filteredExpenses || filteredExpenses?.length === 0) return;
                 navigation.navigate("FilteredPieCharts", {
-                  expenses: filteredExpenses,
+                  expenses: toExpenseNavigationDtos(filteredExpenses),
                   dayString: titleStringFilteredPieCharts,
                 });
               }}
@@ -253,7 +254,7 @@ const ExpenseGraph = ({
                   );
                 // if (!filteredExpenses || filteredExpenses?.length === 0) return;
                 navigation.navigate("FilteredExpenses", {
-                  expenses: filteredExpenses,
+                  expenses: toExpenseNavigationDtos(filteredExpenses),
                   dayString: weekString,
                 });
               }}
@@ -268,7 +269,7 @@ const ExpenseGraph = ({
                   );
                 // if (!filteredExpenses || filteredExpenses?.length === 0) return;
                 navigation.navigate("FilteredPieCharts", {
-                  expenses: filteredExpenses,
+                  expenses: toExpenseNavigationDtos(filteredExpenses),
                   dayString: titleStringFilteredPieCharts,
                 });
               }}
@@ -342,7 +343,7 @@ const ExpenseGraph = ({
                   );
                 // if (!filteredExpenses || filteredExpenses?.length === 0) return;
                 navigation.navigate("FilteredExpenses", {
-                  expenses: filteredExpenses,
+                  expenses: toExpenseNavigationDtos(filteredExpenses),
                   dayString: month,
                 });
               }}
@@ -357,7 +358,7 @@ const ExpenseGraph = ({
                   );
                 // if (!filteredExpenses || filteredExpenses?.length === 0) return;
                 navigation.navigate("FilteredPieCharts", {
-                  expenses: filteredExpenses,
+                  expenses: toExpenseNavigationDtos(filteredExpenses),
                   dayString: titleStringFilteredPieCharts,
                 });
               }}
@@ -435,7 +436,7 @@ const ExpenseGraph = ({
                   );
                 // if (!filteredExpenses || filteredExpenses?.length === 0) return;
                 navigation.navigate("FilteredExpenses", {
-                  expenses: filteredExpenses,
+                  expenses: toExpenseNavigationDtos(filteredExpenses),
                   dayString: yearString,
                 });
               }}
@@ -450,7 +451,7 @@ const ExpenseGraph = ({
                   );
                 // if (!filteredExpenses || filteredExpenses?.length === 0) return;
                 navigation.navigate("FilteredPieCharts", {
-                  expenses: filteredExpenses,
+                  expenses: toExpenseNavigationDtos(filteredExpenses),
                   dayString: titleStringFilteredPieCharts,
                 });
               }}

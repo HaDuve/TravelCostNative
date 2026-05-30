@@ -14,6 +14,7 @@ import PropTypes from "prop-types";
 import { processTitleStringFilteredPiecharts } from "../../../util/string";
 import { TripContext } from "../../../store/trip-context";
 import { ExpenseData, getExpensesSum } from "../../../util/expense";
+import { toExpenseNavigationDtos } from "../../../util/expense-navigation-dto";
 import { shadowRegressionStyles } from "../../../styles/shadow-regression-styles";
 import { dynamicScale } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
@@ -92,7 +93,7 @@ const ExpenseCategories = ({
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigation.navigate("FilteredExpenses", {
-            expenses: itemData.item.catExpenses,
+            expenses: toExpenseNavigationDtos(itemData.item.catExpenses),
             dayString: getCatLocalized(itemData.item.cat) + " " + newPeriodName,
           });
         }}

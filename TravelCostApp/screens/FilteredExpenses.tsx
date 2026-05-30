@@ -13,19 +13,27 @@ import { useNavigation } from "@react-navigation/native";
 import AddExpenseHereButton from "../components/UI/AddExpensesHereButton";
 import { getEarliestDate } from "../util/date";
 import { ExpenseData } from "../util/expense";
+import {
+  expenseDateToIsoString,
+  hydrateExpensesFromNavigationDtos,
+} from "../util/expense-navigation-dto";
 
 const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
+  const routeParams = route?.params;
   const { expenses, dayString, showSumForTravellerName } = expensesAsArg
     ? {
         expenses: expensesAsArg,
         dayString: dayStringAsArg,
         showSumForTravellerName: "",
       }
-    : route.params;
+    : {
+        ...routeParams,
+        expenses: hydrateExpensesFromNavigationDtos(routeParams?.expenses ?? []),
+      };
   const withArgs = expensesAsArg ? true : false;
   const navigation = useNavigation();
   const earliestDate = getEarliestDate(
-    expenses.map((exp: ExpenseData) => exp.date)
+    expenses.map((exp: ExpenseData) => expenseDateToIsoString(exp.date))
   );
   // ||new Date(dayString).toISOString();
 

@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { UserContext } from "../../store/user-context";
 import { dynamicScale } from "../../util/scalingUtil";
+import { toExpenseNavigationDtos } from "../../util/expense-navigation-dto";
 
 function ExpensesOutput({
   expenses,
@@ -83,7 +84,7 @@ function ExpensesOutput({
                 textStyle={{ marginVertical: dynamicScale(4, false, 0.5) }}
                 onPress={() => {
                   (navigation as any).navigate("FilteredExpenses", {
-                    expenses: yesterdayExpenses,
+                    expenses: toExpenseNavigationDtos(yesterdayExpenses),
                     dayString: i18n.t("yesterday"),
                   });
                 }}
@@ -96,7 +97,7 @@ function ExpensesOutput({
                 textStyle={{ marginVertical: dynamicScale(4, false, 0.5) }}
                 onPress={() => {
                   (navigation as any).navigate("FilteredExpenses", {
-                    expenses: tomorrowExpenses,
+                    expenses: toExpenseNavigationDtos(tomorrowExpenses),
                     dayString: i18n.t("tomorrow"),
                   });
                 }}

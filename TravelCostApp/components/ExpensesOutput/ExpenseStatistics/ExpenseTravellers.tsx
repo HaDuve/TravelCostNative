@@ -15,6 +15,7 @@ import {
   ExpenseData,
   getExpensesSum,
 } from "../../../util/expense";
+import { toExpenseNavigationDtos } from "../../../util/expense-navigation-dto";
 import { sumByTraveller } from "../../../util/expenseTotals";
 import { TripContext } from "../../../store/trip-context";
 import { shadowRegressionStyles } from "../../../styles/shadow-regression-styles";
@@ -107,7 +108,7 @@ const ExpenseTravellers = ({
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigation.navigate("FilteredExpenses", {
-            expenses: itemData.item.catExpenses,
+            expenses: toExpenseNavigationDtos(itemData.item.catExpenses),
             dayString: getCatLocalized(itemData.item.cat) + " " + newPeriodName,
             showSumForTravellerName: itemData.item.cat,
           });

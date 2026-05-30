@@ -27,6 +27,7 @@ import {
   getAllExpensesData,
   getExpensesSum,
 } from "../util/expense";
+import { toExpenseNavigationDtos } from "../util/expense-navigation-dto";
 import { formatExpenseWithCurrency } from "../util/string";
 import PropTypes from "prop-types";
 import { TripContext, TripData } from "../store/trip-context";
@@ -618,7 +619,7 @@ const TripSummaryScreen = ({ navigation }) => {
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 navigation.navigate("FilteredPieCharts", {
-                  expenses: allExpensesList,
+                  expenses: toExpenseNavigationDtos(allExpensesList),
                   dayString: `${titleText}\n${allExpensesList?.length} ${i18n.t(
                     "expensesTab"
                   )}`,

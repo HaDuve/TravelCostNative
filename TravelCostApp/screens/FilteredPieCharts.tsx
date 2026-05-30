@@ -19,9 +19,17 @@ import { ExpenseData } from "../util/expense";
 import { getEarliestDate } from "../util/date";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
+import {
+  expenseDateToIsoString,
+  hydrateExpensesFromNavigationDtos,
+} from "../util/expense-navigation-dto";
 
 const FilteredPieCharts = ({ navigation, route }) => {
-  const { expenses, dayString, noList = false } = route.params;
+  const { dayString, noList = false } = route.params;
+  const expenses = useMemo(
+    () => hydrateExpensesFromNavigationDtos(route.params?.expenses ?? []),
+    [route.params?.expenses]
+  );
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
 
   const { isPortrait, isTablet } = useContext(OrientationContext);
@@ -95,7 +103,10 @@ const FilteredPieCharts = ({ navigation, route }) => {
   }, [contentsMaxIndex]);
 
   const earliestDate = useMemo(
-    () => getEarliestDate(expenses.map((exp: ExpenseData) => exp.date)),
+    () =>
+      getEarliestDate(
+        expenses.map((exp: ExpenseData) => expenseDateToIsoString(exp.date))
+      ),
     [expenses]
   );
 

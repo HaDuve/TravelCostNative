@@ -1,6 +1,24 @@
 import { FlatList, ScrollView } from "react-native";
 import type { ReactTestInstance } from "react-test-renderer";
 
+function getComponentName(type: unknown): string {
+  const typeName = type as { displayName?: string; name?: string };
+  return typeName?.displayName ?? typeName?.name ?? "";
+}
+
+const VIRTUALIZED_LIST_COMPONENT_NAMES = new Set([
+  "FlatList",
+  "VirtualizedList",
+  "AnimatedFlatList",
+  "ReanimatedFlatList",
+]);
+
+export function isVirtualizedListComponent(node: ReactTestInstance): boolean {
+  if (node.type === FlatList) return true;
+  const name = getComponentName(node.type);
+  return VIRTUALIZED_LIST_COMPONENT_NAMES.has(name);
+}
+
 function isVerticalFlatList(node: ReactTestInstance): boolean {
   const horizontal = node.props?.horizontal;
   return horizontal !== true;
@@ -11,21 +29,20 @@ function isVerticalScrollView(node: ReactTestInstance): boolean {
   return horizontal !== true;
 }
 
+function isScrollViewComponent(node: ReactTestInstance): boolean {
+  if (node.type === ScrollView) return true;
+  const name = getComponentName(node.type);
+  return name === "ScrollView" || name === "RCTScrollView";
+}
+
 function collectNestedVerticalFlatLists(
   node: ReactTestInstance,
   insideVerticalScrollView: boolean
 ): ReactTestInstance[] {
   const violations: ReactTestInstance[] = [];
-  const typeName = node.type as { displayName?: string; name?: string };
-  const name = typeName?.displayName ?? typeName?.name ?? "";
 
-  const isScrollView =
-    node.type === ScrollView || name === "ScrollView" || name === "RCTScrollView";
-  const isFlatList =
-    node.type === FlatList ||
-    name === "FlatList" ||
-    name === "VirtualizedList" ||
-    name === "AnimatedFlatList";
+  const isScrollView = isScrollViewComponent(node);
+  const isFlatList = isVirtualizedListComponent(node);
 
   const nowInsideScrollView =
     insideVerticalScrollView ||

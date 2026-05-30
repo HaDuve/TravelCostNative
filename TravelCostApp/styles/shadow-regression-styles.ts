@@ -82,4 +82,29 @@ export const shadowRegressionStyles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.backgroundColor,
     ...GlobalStyles.shadow,
   },
+  splitBalanceRow: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    ...GlobalStyles.strongShadow,
+  },
+  splitSummaryCard: {
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
+    ...GlobalStyles.wideStrongShadow,
+  },
+  tripHistoryCard: {
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
+    ...GlobalStyles.wideStrongShadow,
+  },
+  tripTravellerChip: {
+    backgroundColor: GlobalStyles.colors.backgroundColor,
+    ...GlobalStyles.strongShadow,
+    ...Platform.select({
+      android: {
+        backgroundColor: GlobalStyles.colors.gray300,
+      },
+    }),
+  },
+  changelogItem: {
+    backgroundColor: GlobalStyles.colors.backgroundColorLight,
+    ...GlobalStyles.strongShadow,
+  },
 });

@@ -1,6 +1,7 @@
 import * as React from "react";
 import { StyleSheet } from "react-native";
 import { waitFor, within } from "@testing-library/react-native";
+import { ScrollView } from "react-native";
 
 jest.mock("@react-navigation/native", () => {
   const actual = jest.requireActual("@react-navigation/native");
@@ -167,6 +168,44 @@ describe("Split Summary screen", () => {
       screen.getByTestId("split-balance-row-Bob-Alice").props.style
     ) as Record<string, unknown>;
     expect(rowStyle.flex).not.toBe(1);
+  });
+
+  it("does not wrap portrait split summary content in ScrollView", async () => {
+    const navigation = { navigate: jest.fn(), pop: jest.fn() };
+    const screen = renderWithAppProviders(
+      <SplitSummaryScreen navigation={navigation as any} />,
+      {
+        trip: {
+          tripid: "t1",
+          tripCurrency: "EUR",
+          isPaid: "notPaid",
+          isPaidTimestamp: 0,
+          fetchAndSettleCurrentTrip: jest.fn(async () => {}),
+        },
+        user: { userName: "Alice", freshlyCreated: false },
+        expenses: {
+          expenses: [
+            makeExpense({
+              whoPaid: "Alice",
+              amount: 100,
+              calcAmount: 100,
+              currency: "EUR",
+              splitList: [
+                { userName: "Alice", amount: 50 },
+                { userName: "Bob", amount: 50 },
+              ],
+            }),
+          ],
+        },
+        orientation: { isPortrait: true, isLandscape: false, isTablet: false },
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Split Summary")).toBeTruthy();
+    });
+
+    expect(screen.UNSAFE_queryAllByType(ScrollView)).toHaveLength(0);
   });
 
   it("does not nest vertical FlatList inside ScrollView in portrait", async () => {

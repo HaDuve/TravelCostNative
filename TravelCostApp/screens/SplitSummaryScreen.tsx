@@ -9,6 +9,7 @@ import React, {
 import { i18n } from "../i18n/i18n";
 
 import StaticList from "../components/UI/StaticList";
+import { shadowRegressionStyles } from "../styles/shadow-regression-styles";
 import {
   Alert,
   FlatList,
@@ -17,7 +18,6 @@ import {
   StyleSheet,
   Text,
   View,
-  ScrollView,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
@@ -313,7 +313,7 @@ const SplitSummaryScreen = ({ navigation }) => {
           }}
           style={({ pressed }) => [
             styles.splitContainer,
-            GlobalStyles.strongShadow,
+            shadowRegressionStyles.splitBalanceRow,
             pressed && GlobalStyles.pressedWithShadow,
           ]}
         >
@@ -412,7 +412,7 @@ const SplitSummaryScreen = ({ navigation }) => {
   const splitSummaryContent = (
     <Animated.View
       style={[
-        GlobalStyles.wideStrongShadow,
+        shadowRegressionStyles.splitSummaryCard,
         styles.cardContainer,
         !isPortrait && styles.row,
       ]}
@@ -533,17 +533,6 @@ const SplitSummaryScreen = ({ navigation }) => {
       {isPortrait && ButtonContainerJSX}
     </Animated.View>
   );
-
-  if (isPortrait) {
-    return (
-      <ScrollView
-        scrollEnabled
-        contentContainerStyle={styles.container}
-      >
-        {splitSummaryContent}
-      </ScrollView>
-    );
-  }
 
   return <View style={styles.container}>{splitSummaryContent}</View>;
 };

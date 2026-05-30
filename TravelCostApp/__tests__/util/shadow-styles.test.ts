@@ -77,4 +77,28 @@ describe("shadow styles", () => {
     expect(styleHasShadow(flat)).toBe(true);
     assertSolidBackgroundForShadow(flat);
   });
+
+  it("split balance row co-locates shadow and backgroundColor", () => {
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.splitBalanceRow)
+    );
+  });
+
+  it("trip history card co-locates shadow and backgroundColor", () => {
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.tripHistoryCard)
+    );
+  });
+
+  it("trip traveller chip co-locates shadow and backgroundColor", () => {
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.tripTravellerChip)
+    );
+  });
+
+  it("changelog item co-locates shadow and backgroundColor", () => {
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.changelogItem)
+    );
+  });
 });

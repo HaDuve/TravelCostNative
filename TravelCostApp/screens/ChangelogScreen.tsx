@@ -10,6 +10,7 @@ import InfoButton from "../components/UI/InfoButton";
 import { parseChangelog } from "../util/parseChangelog";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import StaticList from "../components/UI/StaticList";
+import { shadowRegressionStyles } from "../styles/shadow-regression-styles";
 import { ChangelogItem } from "../util/parseChangelog";
 import { Pressable } from "react-native";
 import * as Haptics from "expo-haptics";
@@ -22,7 +23,7 @@ import { i18n } from "../i18n/i18n";
 
 function renderChangelogItem({ item }: { item: ChangelogItem }) {
   return (
-    <View style={[styles.changelogContainer, GlobalStyles.strongShadow]}>
+    <View style={[styles.changelogContainer, shadowRegressionStyles.changelogItem]}>
       <Text style={styles.changelogText}>
         {item.versionString}
         {item.changes} {"\n"}

@@ -11,6 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 
 import { GlobalStyles } from "../../constants/styles";
+import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 import * as Progress from "react-native-progress";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { TripContext } from "../../store/trip-context";
@@ -379,7 +380,7 @@ function TripHistoryItem({ tripid, trips }) {
       >
         <View
           style={[
-            GlobalStyles.wideStrongShadow,
+            shadowRegressionStyles.tripHistoryCard,
             styles.tripItem,
             !contextTrip && styles.inactive,
             activeBorder,
@@ -433,7 +434,10 @@ function TripHistoryItem({ tripid, trips }) {
     return (
       <View
         testID={`trip-traveller-${item.userName}`}
-        style={[GlobalStyles.strongShadow, styles.travellerCard]}
+        style={[
+          shadowRegressionStyles.tripTravellerChip,
+          styles.travellerCard,
+        ]}
       >
         <View style={[styles.avatar, GlobalStyles.shadowPrimary]}>
           <Text style={styles.avatarText}>
@@ -456,7 +460,7 @@ function TripHistoryItem({ tripid, trips }) {
         style={[
           styles.tripItem,
           !contextTrip && styles.inactive,
-          GlobalStyles.wideStrongShadow,
+          shadowRegressionStyles.tripHistoryCard,
           activeBorder,
         ]}
       >

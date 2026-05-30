@@ -12,6 +12,7 @@ import TripList from "../components/ProfileOutput/TripList";
 import IconButton from "../components/UI/IconButton";
 import FeedbackForm from "../components/FeedbackForm/FeedbackForm";
 import { GlobalStyles } from "../constants/styles";
+import { shadowRegressionStyles } from "../styles/shadow-regression-styles";
 import { TripContext } from "../store/trip-context";
 import { UserContext } from "../store/user-context";
 
@@ -371,7 +372,7 @@ const ProfileScreen = ({ navigation }) => {
           <View>
             <IconButton
               icon="list-outline"
-              buttonStyle={[styles.addButton, GlobalStyles.shadowGlowPrimary]}
+              buttonStyle={[styles.addButton, shadowRegressionStyles.addExpenseFab]}
               size={dynamicScale(42, false, 0.5)}
               color={GlobalStyles.colors.backgroundColor}
               badge={null}

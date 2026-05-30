@@ -14,6 +14,7 @@ import { View } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { GlobalStyles, ListLayoutAnimation } from "../../constants/styles";
+import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 import { fetchTripName, touchAllTravelers } from "../../util/http";
 import { TripContext } from "../../store/trip-context";
 import { ExpensesContext } from "../../store/expenses-context";
@@ -887,7 +888,7 @@ function ExpensesList({
         <Animated.View
           entering={FadeInUp.duration(250).easing(Easing.linear)}
           exiting={FadeOutUp.duration(200).easing(Easing.linear)}
-          style={[styles.scrollToTopButton, GlobalStyles.shadowPrimary]}
+          style={[styles.scrollToTopButton, shadowRegressionStyles.scrollToTopFab]}
         >
           <Pressable
             style={({ pressed }) => [pressed && GlobalStyles.pressedWithShadow]}

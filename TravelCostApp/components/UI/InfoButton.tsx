@@ -8,7 +8,7 @@ import { dynamicScale } from "../../util/scalingUtil";
 const InfoButton = ({ containerStyle, onPress }) => {
   return (
     <Pressable
-      style={[styles.container, GlobalStyles.strongShadow, containerStyle]}
+      style={[styles.container, containerStyle]}
       onPress={onPress}
     >
       <Text style={styles.text}>i</Text>
@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
     height: dynamicScale(20, false, 0.5),
     alignItems: "center",
     justifyContent: "center",
+    ...GlobalStyles.strongShadow,
   },
   text: {
     fontSize: dynamicScale(12, false, 0.5),

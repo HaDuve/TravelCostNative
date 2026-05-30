@@ -3,6 +3,7 @@ import { useState, useContext, useEffect, useLayoutEffect } from "react";
 import { View, Text, Alert, ScrollView, Platform } from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
+import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 import { AuthContext } from "../../store/auth-context";
 import {
   storeTrip,
@@ -673,7 +674,7 @@ const TripForm = ({ navigation, route }) => {
     return (
       <LoadingBarOverlay
         customText={i18n.t("loadingYourTrip")}
-        containerStyle={GlobalStyles.wideStrongShadow}
+        containerStyle={shadowRegressionStyles.toastSurface}
         progress={loadingProgress == 0 ? null : loadingProgress / 9}
         // progressMax={10}
         // progressAt={loadingProgress}
@@ -786,10 +787,7 @@ const TripForm = ({ navigation, route }) => {
                     icon="git-compare-outline"
                     color={GlobalStyles.colors.primary500}
                     size={dynamicScale(36, false, 0.5)}
-                    buttonStyle={[
-                      styles.recalcButton,
-                      GlobalStyles.strongShadow,
-                    ]}
+                    buttonStyle={styles.recalcButton}
                     onPressStyle={GlobalStyles.pressedWithShadow}
                     onPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -841,10 +839,7 @@ const TripForm = ({ navigation, route }) => {
                         icon="git-compare-outline"
                         color={GlobalStyles.colors.primary500}
                         size={dynamicScale(36, false, 0.5)}
-                        buttonStyle={[
-                          styles.recalcButton,
-                          GlobalStyles.strongShadow,
-                        ]}
+                        buttonStyle={styles.recalcButton}
                         onPressStyle={GlobalStyles.pressedWithShadow}
                         onPress={() => {
                           Haptics.impactAsync(
@@ -1028,12 +1023,7 @@ const styles = StyleSheet.create({
   recalcButton: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
     borderRadius: 99,
-    // minHeight: 36,
-    // marginRight: "3%",
-    // marginBottom: "5%",
-    // paddingHorizontal: "2%",
-    // paddingTop: "1%",
-    // paddingLeft: "3%",
+    ...GlobalStyles.strongShadow,
   },
   card: {
     flex: 1,

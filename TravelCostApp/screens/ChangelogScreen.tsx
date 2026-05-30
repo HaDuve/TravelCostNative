@@ -114,13 +114,13 @@ const ChangelogScreen = ({ navigation }) => {
       </View>
 
       <Pressable
+        testID="changelog-section-whats-new"
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           setShowNewChanges(!showNewChanges);
         }}
         style={({ pressed }) => [
-          styles.changelogContainer,
-          GlobalStyles.shadowGlowPrimary,
+          shadowRegressionStyles.changelogSectionHeader,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
       >
@@ -136,13 +136,13 @@ const ChangelogScreen = ({ navigation }) => {
         </Animated.View>
       )}
       <Pressable
+        testID="changelog-section-other-changes"
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           setShowOldChanges(!showOldChanges);
         }}
         style={({ pressed }) => [
-          styles.changelogContainer,
-          GlobalStyles.shadowGlowPrimary,
+          shadowRegressionStyles.changelogSectionHeader,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
       >

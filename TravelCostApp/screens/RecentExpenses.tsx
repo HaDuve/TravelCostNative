@@ -490,6 +490,7 @@ const styles = StyleSheet.create({
   },
   dropdownContainerDropdown: {
     maxHeight: dynamicScale(600, true),
+    ...shadowRegressionStyles.dropdownListContainer,
   },
   dropdown: {
     ...shadowRegressionStyles.overviewDropdownInner,

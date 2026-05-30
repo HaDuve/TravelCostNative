@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 
+import { GlobalStyles } from "../../constants/styles";
 import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 import { dynamicScale } from "../../util/scalingUtil";
 import {
@@ -128,14 +129,6 @@ describe("shadow styles", () => {
     expect(dropdown.maxWidth).toBe("50%");
   });
 
-  it("expense country flag container co-locates shadow and backgroundColor", () => {
-    const flat = StyleSheet.flatten(
-      shadowRegressionStyles.expenseCountryFlagContainer
-    );
-    expect(styleHasShadow(flat)).toBe(true);
-    assertSolidBackgroundForShadow(flat);
-  });
-
   it("split balance row co-locates shadow and backgroundColor", () => {
     assertSolidBackgroundForShadow(
       StyleSheet.flatten(shadowRegressionStyles.splitBalanceRow)
@@ -174,6 +167,72 @@ describe("shadow styles", () => {
     ) as Record<string, unknown>;
     expect(styleHasShadow(flat)).toBe(true);
     assertSolidBackgroundForShadow(flat);
+  });
+
+  it("add expense fab co-locates shadow and backgroundColor", () => {
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.addExpenseFab)
+    );
+  });
+
+  it("add expense template row co-locates shadow and backgroundColor", () => {
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.addExpenseTemplateRow)
+    );
+  });
+
+  it("scroll-to-top fab co-locates shadow and backgroundColor", () => {
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.scrollToTopFab)
+    );
+  });
+
+  it("toast surfaces co-locate shadow and backgroundColor", () => {
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.toastSurface)
+    );
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.toastStrongSurface)
+    );
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.toastProgressBarTrack)
+    );
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.toastBannerShell)
+    );
+  });
+
+  it("changelog and trip summary section headers co-locate shadow and backgroundColor", () => {
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.changelogSectionHeader)
+    );
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.tripSummaryExpandableHeader)
+    );
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.tripSummaryTripListHeader)
+    );
+  });
+
+  it("trip summary trip items co-locate shadow and backgroundColor", () => {
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.tripSummaryTripItem)
+    );
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.tripSummaryTripItemSelected)
+    );
+  });
+
+  it("expense form and gradient button surfaces co-locate shadow and backgroundColor", () => {
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.expenseFormStrongSurface)
+    );
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten({
+        ...StyleSheet.flatten(shadowRegressionStyles.gradientButtonShadow),
+        backgroundColor: GlobalStyles.gradientPrimaryButton.at(-1),
+      })
+    );
   });
 
   it("statistics pie category cards use list item margins and border chrome", () => {

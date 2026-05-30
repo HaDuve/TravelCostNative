@@ -89,10 +89,7 @@ const ExpenseCountries = ({
       <ExpenseCountryFlag
         countryName={country}
         style={GlobalStyles.countryFlagStyle}
-        containerStyle={[
-          styles.countryFlagContainerStyle,
-          shadowRegressionStyles.expenseCountryFlagContainer,
-        ]}
+        containerStyle={styles.countryFlagContainerStyle}
       ></ExpenseCountryFlag>
     );
     return (

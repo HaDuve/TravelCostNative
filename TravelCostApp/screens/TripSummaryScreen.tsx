@@ -16,6 +16,7 @@ import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { Checkbox } from "react-native-paper";
 import { daysBetween, isToday } from "../util/date";
 import { GlobalStyles } from "../constants/styles";
+import { shadowRegressionStyles } from "../styles/shadow-regression-styles";
 import FlatButton from "../components/UI/FlatButton";
 
 import { i18n } from "../i18n/i18n";
@@ -322,8 +323,7 @@ const TripSummaryScreen = ({ navigation }) => {
               setShowSummary(!showSummary);
             }}
             style={({ pressed }) => [
-              styles.expandableContainer,
-              GlobalStyles.shadowGlowPrimary,
+              shadowRegressionStyles.tripSummaryExpandableHeader,
               pressed && GlobalStyles.pressedWithShadow,
             ]}
           >
@@ -332,7 +332,7 @@ const TripSummaryScreen = ({ navigation }) => {
           </Pressable>
           {showSummary && (
             <Animated.View entering={FadeInUp}>
-              <View style={[styles.summaryContainer, GlobalStyles.shadow]}>
+              <View style={styles.summaryContainer}>
                 <Text
                   style={[
                     styles.summaryText,
@@ -357,12 +357,7 @@ const TripSummaryScreen = ({ navigation }) => {
                   )}
                 </Text>
                 <View style={styles.progressBarContainer}>
-                  <View
-                    style={[
-                      GlobalStyles.shadow,
-                      { borderRadius: dynamicScale(8, false, 0.5) },
-                    ]}
-                  >
+                  <View style={shadowRegressionStyles.toastProgressBarTrack}>
                     <Progress.Bar
                       color={progressBarColor}
                       unfilledColor={GlobalStyles.colors.gray600}
@@ -396,10 +391,9 @@ const TripSummaryScreen = ({ navigation }) => {
                             <ExpenseCountryFlag
                               countryName={country}
                               style={GlobalStyles.countryFlagStyle}
-                              containerStyle={[
-                                { padding: dynamicScale(4, false, 0.5) },
-                                GlobalStyles.shadow,
-                              ]}
+                              containerStyle={{
+                                padding: dynamicScale(4, false, 0.5),
+                              }}
                             ></ExpenseCountryFlag>
                           );
                           return (
@@ -550,8 +544,7 @@ const TripSummaryScreen = ({ navigation }) => {
           setShowTripList(!showTripList);
         }}
         style={({ pressed }) => [
-          styles.tripListContainer,
-          GlobalStyles.shadowGlowPrimary,
+          shadowRegressionStyles.tripSummaryTripListHeader,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
       >
@@ -564,12 +557,11 @@ const TripSummaryScreen = ({ navigation }) => {
               renderItem={({ item }) => (
                 <TouchableOpacity
                   onPress={itemCheckBoxHandler.bind(this, { item })}
-                  style={[
-                    styles.tripItemContainer,
+                  style={
                     item.selected
-                      ? GlobalStyles.shadowPrimary
-                      : GlobalStyles.shadow,
-                  ]}
+                      ? shadowRegressionStyles.tripSummaryTripItemSelected
+                      : shadowRegressionStyles.tripSummaryTripItem
+                  }
                 >
                   <Checkbox
                     color={GlobalStyles.colors.primary700}

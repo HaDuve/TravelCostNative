@@ -216,9 +216,9 @@ function ExpenseItem(props): JSX.Element {
               const userPaid = item.userName === whoPaid;
               return (
                 <View
+                  testID="expense-item-traveller-avatar"
                   style={[
                     styles.avatar,
-                    GlobalStyles.shadow,
                     { marginBottom: dynamicScale(16, true) },
                     userPaid && styles.avatarPaid,
                   ]}
@@ -237,7 +237,10 @@ function ExpenseItem(props): JSX.Element {
         </View>
       ) : (
         <View style={styles.avatarContainer}>
-          <View style={[styles.avatar, styles.avatarPaid, GlobalStyles.shadow]}>
+          <View
+            testID="expense-item-traveller-avatar"
+            style={[styles.avatar, styles.avatarPaid]}
+          >
             <Text style={styles.avatarText}>{whoPaid?.slice(0, 1)}</Text>
           </View>
         </View>
@@ -344,10 +347,7 @@ function ExpenseItem(props): JSX.Element {
               <ExpenseCountryFlag
                 countryName={country}
                 style={GlobalStyles.countryFlagStyle}
-                containerStyle={[
-                  styles.countryFlagContainer,
-                  GlobalStyles.shadow,
-                ]}
+                containerStyle={styles.countryFlagContainer}
               />
             </View>
           )}
@@ -481,6 +481,7 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.gray500,
     alignItems: "center",
     justifyContent: "center",
+    ...GlobalStyles.shadow,
     ...Platform.select({
       android: {
         minHeight: constantScale(20, 0.5),

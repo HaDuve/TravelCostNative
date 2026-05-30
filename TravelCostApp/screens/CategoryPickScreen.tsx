@@ -169,7 +169,6 @@ const CategoryPickScreen = ({ route, navigation }: CategoryPickScreenProps) => {
       <Pressable
         style={({ pressed }) => [
           styles.widthConstraint,
-          GlobalStyles.strongShadow,
           styles.itemContainer,
           styles.buttonStyle,
           pressed && GlobalStyles.pressedWithShadow,
@@ -313,6 +312,7 @@ const styles = StyleSheet.create({
     paddingVertical: "4%",
     paddingHorizontal: "1%",
     borderRadius: 12,
+    ...GlobalStyles.strongShadow,
   },
   itemContainer: {
     flex: 1,

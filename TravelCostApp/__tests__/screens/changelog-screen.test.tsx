@@ -38,6 +38,8 @@ jest.mock("../../util/version", () => ({
 import ChangelogScreen from "../../screens/ChangelogScreen";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 import { assertNoNestedVerticalFlatLists } from "../../test-utils/scroll-composition";
+import { assertSolidBackgroundForShadow } from "../../util/shadow-styles";
+import { StyleSheet } from "react-native";
 
 describe("Changelog screen", () => {
   it("renders changelog entries when sections are expanded", () => {
@@ -64,6 +66,27 @@ describe("Changelog screen", () => {
     );
 
     assertNoNestedVerticalFlatLists(screen.root);
+  });
+
+  it("co-locates shadow and backgroundColor on section headers", () => {
+    const navigation = { navigate: jest.fn(), pop: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ChangelogScreen navigation={navigation as any} />,
+      {
+        network: { strongConnection: false, isConnected: true },
+      }
+    );
+
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(
+        screen.getByTestId("changelog-section-whats-new").props.style
+      ) as Record<string, unknown>
+    );
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(
+        screen.getByTestId("changelog-section-other-changes").props.style
+      ) as Record<string, unknown>
+    );
   });
 
   it("hides whats-new entries when the section header is collapsed", () => {

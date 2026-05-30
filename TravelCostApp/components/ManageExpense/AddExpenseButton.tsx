@@ -1,5 +1,6 @@
 import React, { Alert, Pressable, StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
+import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 import * as Haptics from "expo-haptics";
 import Animated, {
   SlideInDown,
@@ -153,7 +154,7 @@ const AddExpenseButton = ({ navigation }) => {
         <Pressable
           style={({ pressed }) => [
             styles.expenseTemplateContainer,
-            GlobalStyles.strongShadow,
+            shadowRegressionStyles.addExpenseTemplateRow,
             pressed && GlobalStyles.pressedWithShadow,
           ]}
           onPress={onPressHandler}
@@ -289,7 +290,7 @@ const AddExpenseButton = ({ navigation }) => {
             onLongPress={hideTempOverlay}
             style={({ pressed }) => [
               styles.addButton,
-              GlobalStyles.shadowGlowPrimary,
+              shadowRegressionStyles.addExpenseFab,
               styles.longPressedButton,
               { flexDirection: "column" },
               pressed && GlobalStyles.pressedWithShadowNoScale,
@@ -373,9 +374,10 @@ const AddExpenseButton = ({ navigation }) => {
       ></TourGuideZone>
 
       <Pressable
+        testID="add-expense-fab"
         style={({ pressed }) => [
           styles.addButton,
-          GlobalStyles.shadowGlowPrimary,
+          shadowRegressionStyles.addExpenseFab,
           pressed && GlobalStyles.pressedWithShadow,
         ]}
         onPress={pressHandler}

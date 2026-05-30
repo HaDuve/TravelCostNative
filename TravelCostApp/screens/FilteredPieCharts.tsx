@@ -19,13 +19,16 @@ import { ExpenseData } from "../util/expense";
 import { getEarliestDate } from "../util/date";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
-import { hydrateExpensesFromNavigationDtos, expenseDateToIsoString } from "../util/expense-navigation-dto";
+import {
+  expenseDateToIsoString,
+  hydrateExpensesFromNavigationDtos,
+} from "../util/expense-navigation-dto";
 
 const FilteredPieCharts = ({ navigation, route }) => {
   const { dayString, noList = false } = route.params;
   const expenses = useMemo(
-    () => hydrateExpensesFromNavigationDtos(route.params.expenses),
-    [route.params.expenses]
+    () => hydrateExpensesFromNavigationDtos(route.params?.expenses ?? []),
+    [route.params?.expenses]
   );
   const [toggleGraphEnum, setToggleGraphEnum] = useState(0);
 

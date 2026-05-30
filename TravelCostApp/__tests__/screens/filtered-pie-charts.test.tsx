@@ -109,4 +109,10 @@ describe("FilteredPieCharts navigation arrows", () => {
     fireEvent.press(screen.getByTestId("icon-chevron-back-outline"));
     expectActiveTitle(screen, CURRENCIES);
   });
+
+  it("renders when route params omit expenses", () => {
+    const { screen } = renderScreen({ expenses: undefined });
+
+    expectActiveTitle(screen, CATEGORIES);
+  });
 });

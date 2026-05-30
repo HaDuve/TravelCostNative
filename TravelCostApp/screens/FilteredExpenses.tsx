@@ -28,7 +28,7 @@ const FilteredExpenses = ({ route, expensesAsArg, dayStringAsArg }) => {
       }
     : {
         ...routeParams,
-        expenses: hydrateExpensesFromNavigationDtos(routeParams.expenses),
+        expenses: hydrateExpensesFromNavigationDtos(routeParams?.expenses ?? []),
       };
   const withArgs = expensesAsArg ? true : false;
   const navigation = useNavigation();

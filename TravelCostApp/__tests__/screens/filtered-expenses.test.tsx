@@ -76,6 +76,25 @@ describe("FilteredExpenses route params", () => {
     ).toEqual(["older", "newer"]);
   });
 
+  it("renders an empty filtered list when route params omit expenses", () => {
+    renderWithAppProviders(
+      <FilteredExpenses
+        route={{
+          params: {
+            dayString: "Empty",
+          },
+        }}
+      />
+    );
+
+    expect(mockExpensesOutput).toHaveBeenCalledWith(
+      expect.objectContaining({
+        isFiltered: true,
+        expenses: [],
+      })
+    );
+  });
+
   it("uses the earliest hydrated expense date for add-expense-here", () => {
     const expenses = [
       makeExpense({

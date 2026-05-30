@@ -408,50 +408,17 @@ export function splitTypesDropdown() {
 }
 
 export function travellerToDropdown(
-  travellers: string[] | Traveller[] | { [key: string]: { userName: string } },
+  travellers: Traveller[],
   includeAddTraveller = true
 ): Array<{ label: string; value: string }> {
-  if (!travellers || (Array.isArray(travellers) && travellers.length < 1)) {
+  if (!travellers || travellers.length < 1) {
     return [];
   }
-  const listOfLabelValues: Array<{ label: string; value: string }> = [];
-  // sometimes this is not an array but an object
-  try {
-    if (Array.isArray(travellers)) {
-      travellers.forEach((traveller) => {
-        // Handle both string[] and Traveller[]
-        const userName =
-          typeof traveller === "string" ? traveller : traveller.userName;
-        // TODO: make value uid based and not name based
-        listOfLabelValues.push({ label: userName, value: userName });
-      });
-    } else {
-      // get travellers.user.username
-      Object.keys(travellers).forEach((key) => {
-        listOfLabelValues.push({
-          label: travellers[key]["userName"],
-          value: travellers[key]["userName"],
-        });
-      });
-    }
-  } catch (error) {
-    // Fallback: try to extract user names from object
-    if (!Array.isArray(travellers)) {
-      Object.keys(travellers).forEach((key) => {
-        const traveller = travellers[key];
-        if (
-          traveller &&
-          typeof traveller === "object" &&
-          "userName" in traveller
-        ) {
-          listOfLabelValues.push({
-            label: traveller.userName,
-            value: traveller.userName,
-          });
-        }
-      });
-    }
-  }
+  const listOfLabelValues = travellers.map((traveller) => ({
+    // TODO: make value uid based and not name based
+    label: traveller.userName,
+    value: traveller.userName,
+  }));
 
   // Add "+ add traveller" item at the end only if requested
   if (includeAddTraveller) {

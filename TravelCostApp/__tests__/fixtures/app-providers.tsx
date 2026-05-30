@@ -28,7 +28,10 @@ const defaultTrip = {
   tripCurrency: "EUR",
   dailyBudget: "100",
   totalBudget: "3000",
-  travellers: ["Alice", "Bob"],
+  travellers: [
+    { uid: "u1", userName: "Alice" },
+    { uid: "u2", userName: "Bob" },
+  ],
   loadTravellersFromStorage: jest.fn(async () => {}),
 };
 

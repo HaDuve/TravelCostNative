@@ -17,7 +17,6 @@ import {
   updateTripHistory,
   putTravelerInTrip,
   getTravellers,
-  TravellerNames,
 } from "../util/http";
 import { UserContext } from "../store/user-context";
 import { AuthContext } from "../store/auth-context";
@@ -178,9 +177,11 @@ const JoinTrip = ({ navigation, route }) => {
       // await asyncStoreSetObject("expenses", expenses);
       setMMKVObject(MMKV_KEYS.EXPENSES, expenses);
 
-      const travellers: TravellerNames = await getTravellers(tripid);
+      const travellers = await getTravellers(tripid);
       // only put traveller in trip if not already in trip
-      if (!travellers[userCtx.userName])
+      if (
+        !travellers?.some((traveller) => traveller.userName === userCtx.userName)
+      )
         await putTravelerInTrip(tripid, {
           uid: uid,
           userName: userCtx.userName,

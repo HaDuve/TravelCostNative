@@ -17,7 +17,7 @@ import { UserData } from "../store/user-context";
 import { i18n } from "../i18n/i18n";
 
 import { Traveller } from "./traveler";
-import uniqBy from "lodash.uniqby";
+import { normalizeTravellers } from "./normalize-travellers";
 import { getMMKVString, setMMKVString } from "../store/mmkv";
 import { secureStoreGetItem } from "../store/secure-storage";
 import { ExpoPushToken } from "expo-notifications";
@@ -727,29 +727,13 @@ export async function fetchTripsTravellers(
   }
 }
 
-export type TravellerNames = string[];
-
-export async function getTravellers(tripid: string): Promise<TravellerNames> {
+export async function getTravellers(tripid: string): Promise<Traveller[]> {
   try {
     const response = await fetchTripsTravellers(tripid);
-    const travellerids = [];
-    const travelerNames = [];
-    for (const key in response) {
-      const travelerName = response[key].userName;
-      const uid = response[key].uid;
-      if (
-        !travellerids.includes(uid) &&
-        !travelerNames.includes(travelerName) &&
-        travelerName &&
-        travelerName?.length > 0
-      ) {
-        travellerids.push(uid);
-        travelerNames.push(travelerName);
-      }
-    }
-    return uniqBy(travelerNames);
+    return normalizeTravellers(response);
   } catch (error) {
     safeLogError(error);
+    return [];
   }
 }
 

@@ -36,7 +36,10 @@ jest.mock("../../util/http", () => ({
   fetchChangelog: jest.fn(async () => null),
   storeExpoPushTokenInTrip: jest.fn(async () => {}),
   fetchTripName: jest.fn(async () => "Japan 2026"),
-  getTravellers: jest.fn(async () => ["Alice", "Bob"]),
+  getTravellers: jest.fn(async () => [
+    { uid: "u1", userName: "Alice" },
+    { uid: "u2", userName: "Bob" },
+  ]),
   getTripData: jest.fn(async () => ({
     dailyBudget: "100",
     totalBudget: "3000",

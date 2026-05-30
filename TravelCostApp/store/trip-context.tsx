@@ -16,6 +16,7 @@ import type { TripData } from "../types/trip";
 import { settleTrip } from "../util/settlement";
 import { useTripTotalSpent } from "../hooks/useTripTotalSpent";
 import { hydrateTrip } from "../util/hydrate-trip";
+import { normalizeTravellers } from "../util/normalize-travellers";
 
 export type { TripData };
 
@@ -98,7 +99,7 @@ export const TripContext = createContext<TripContextType>({
 });
 
 function TripContextProvider({ children }: React.PropsWithChildren) {
-  const [travellers, setTravellers] = useState([]);
+  const [travellers, setTravellers] = useState<Traveller[]>([]);
   const [tripid, setTripid] = useState("");
   const [tripName, setTripName] = useState("");
   const [totalBudget, setTotalBudget] = useState("");
@@ -177,9 +178,9 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
 
   useEffect(() => {
     async function loadAsyncTravellers() {
-      const travellers = await asyncStoreGetObject("currentTravellers");
-      if (travellers) {
-        setTravellers(travellers);
+      const storedTravellers = await asyncStoreGetObject("currentTravellers");
+      if (storedTravellers) {
+        setTravellers(normalizeTravellers(storedTravellers));
       }
     }
     loadAsyncTravellers();
@@ -251,18 +252,7 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     setIsPaidTimestamp(hydratedTrip.isPaidTimestamp);
     setIsLoading(false);
     setIsDynamicDailyBudget(hydratedTrip.isDynamicDailyBudget ?? false);
-    if (typeof trip.travellers[1] === "string") {
-      setTravellers(trip.travellers);
-    } else {
-      const extractedTravellers = [];
-      Object.keys(trip.travellers).forEach((key) => {
-        //skip undefined keys
-        if (key && travellers[key]) {
-          extractedTravellers.push(travellers[key]["userName"]);
-        }
-      });
-      setTravellers(extractedTravellers);
-    }
+    setTravellers(normalizeTravellers(trip.travellers));
 
     return hydratedTrip;
   }
@@ -391,11 +381,12 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
   }
 
   async function loadTravellersFromStorage(): Promise<Traveller[]> {
-    const travellers = await asyncStoreGetObject("currentTravellers");
-    if (travellers) {
-      setTravellers(travellers);
+    const storedTravellers = await asyncStoreGetObject("currentTravellers");
+    const roster = normalizeTravellers(storedTravellers);
+    if (roster.length > 0) {
+      setTravellers(roster);
     }
-    return travellers ?? [];
+    return roster;
   }
 
   const value = {

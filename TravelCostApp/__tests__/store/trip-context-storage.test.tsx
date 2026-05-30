@@ -107,6 +107,45 @@ describe("TripContext storage contracts", () => {
     15000
   );
 
+  it("setCurrentTrip normalizes legacy name-list travellers to canonical roster", async () => {
+    const ctxRef: {
+      current: { getcurrentTrip: () => { travellers?: unknown } } | null;
+    } = { current: null };
+    const TripContextProvider = require("../../store/trip-context").default;
+
+    function SetTripTravellersProbe() {
+      const { TripContext } = require("../../store/trip-context");
+      const ctx = useContext(TripContext);
+      ctxRef.current = ctx;
+      const didInit = useRef(false);
+      useEffect(() => {
+        if (didInit.current) return;
+        didInit.current = true;
+        void ctx.setCurrentTrip("trip-1", {
+          tripid: "trip-1",
+          tripName: "Trip",
+          travellers: ["Alice", "Bob"],
+        } as any);
+      }, [ctx]);
+      return null;
+    }
+
+    render(
+      <ExpensesContext.Provider value={{ expenses: [] } as any}>
+        <TripContextProvider>
+          <SetTripTravellersProbe />
+        </TripContextProvider>
+      </ExpensesContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(ctxRef.current?.getcurrentTrip().travellers).toEqual([
+        { uid: "", userName: "Alice" },
+        { uid: "", userName: "Bob" },
+      ]);
+    });
+  });
+
   it("setCurrentTrip drops deprecated totalSum field when present", async () => {
     const results: Array<{
       storedTrip: unknown;

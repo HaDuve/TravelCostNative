@@ -21,9 +21,9 @@ function TripList({ trips }) {
   }
   return (
     <View
+      testID="trip-list-wrapper"
       style={{
         flex: 1,
-        zIndex: -10,
       }}
     >
       <FlatList

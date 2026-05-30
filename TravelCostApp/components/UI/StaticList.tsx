@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 export type StaticListProps<T> = {
   data: readonly T[];
@@ -33,9 +33,16 @@ function StaticList<T>({
   const footer = renderSlot(ListFooterComponent);
   const empty = renderSlot(ListEmptyComponent);
 
+  const flatContent = StyleSheet.flatten(contentContainerStyle) ?? {};
+  const needsWrapWidth =
+    flatContent.flexDirection === "row" && flatContent.flexWrap === "wrap";
+  const resolvedContentStyle = needsWrapWidth
+    ? [contentContainerStyle, { width: "100%" }]
+    : contentContainerStyle;
+
   return (
     <View style={style}>
-      <View style={contentContainerStyle} testID="static-list-content">
+      <View style={resolvedContentStyle} testID="static-list-content">
         {header}
         {data.length === 0
           ? empty

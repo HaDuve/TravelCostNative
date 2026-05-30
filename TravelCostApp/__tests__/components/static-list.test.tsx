@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Text } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import { render, screen } from "@testing-library/react-native";
 
 import StaticList from "../../components/UI/StaticList";
@@ -71,9 +71,27 @@ describe("StaticList", () => {
       />
     );
 
-    expect(screen.getByTestId("static-list-content").props.style).toMatchObject({
+    expect(
+      StyleSheet.flatten(screen.getByTestId("static-list-content").props.style)
+    ).toMatchObject({
       flexDirection: "row",
       flexWrap: "wrap",
+    });
+  });
+
+  it("uses full width for row wrap layouts so percentage-width items measure on native", () => {
+    render(
+      <StaticList
+        data={["a", "b"]}
+        contentContainerStyle={{ flexDirection: "row", flexWrap: "wrap" }}
+        renderItem={({ item }) => <Text>{item}</Text>}
+      />
+    );
+
+    expect(
+      StyleSheet.flatten(screen.getByTestId("static-list-content").props.style)
+    ).toMatchObject({
+      width: "100%",
     });
   });
 });

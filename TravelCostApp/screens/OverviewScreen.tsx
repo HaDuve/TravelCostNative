@@ -251,7 +251,7 @@ const OverviewScreen = ({ navigation }) => {
       {
         <View
           style={[
-            styles.tempGrayBar1,
+            shadowRegressionStyles.overviewDividerBar,
             !isPortrait && styles.landscapeBar,
             !isPortrait && isTablet && styles.landscapeBarTablet,
           ]}
@@ -336,6 +336,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-evenly",
+    alignItems: "center",
     zIndex: 10,
     marginTop: dynamicScale(18, true),
     paddingHorizontal: dynamicScale(12),
@@ -372,21 +373,6 @@ const styles = StyleSheet.create({
   zBehind: {
     zIndex: 10,
   },
-
-  tempGrayBar1: {
-    borderTopWidth: 1,
-    borderBottomWidth: 0,
-    borderTopColor: GlobalStyles.colors.gray600,
-    borderBottomColor: GlobalStyles.colors.gray600,
-    minHeight: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    elevation: 2,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 1, height: 2.5 },
-    shadowOpacity: 0.9,
-    shadowRadius: 4,
-    zIndex: 0,
-  },
   landscapeBar: {
     marginTop: dynamicScale(12, true),
     marginBottom: dynamicScale(-12, true),
@@ -395,9 +381,7 @@ const styles = StyleSheet.create({
     marginTop: dynamicScale(52, true, 1),
     marginBottom: dynamicScale(4, true),
   },
-  customSummaryStyle: {
-    marginTop: dynamicScale(-10, true, 0.3),
-  },
+  customSummaryStyle: {},
   fabToggleButton: {
     ...shadowRegressionStyles.overviewFabToggleButton,
   },

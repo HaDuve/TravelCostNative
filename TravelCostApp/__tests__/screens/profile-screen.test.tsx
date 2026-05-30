@@ -79,6 +79,7 @@ import ProfileScreen from "../../screens/ProfileScreen";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 import { assertNoNestedVerticalFlatLists } from "../helpers/scroll-composition";
 import { waitFor } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
 
 describe("Profile screen", () => {
   it("shows the signed-in User name and My Trips section", () => {
@@ -167,6 +168,42 @@ describe("Profile screen", () => {
     await waitFor(() => {
       expect(screen.getByTestId("trip-traveller-Alice")).toBeTruthy();
       expect(screen.getByTestId("trip-traveller-Bob")).toBeTruthy();
+    });
+  });
+
+  it("renders trip history travellers in a full-width wrap container", async () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
+        expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
+        user: {
+          userName: "Alice",
+          freshlyCreated: false,
+          tripHistory: ["t1"],
+          loadUserNameFromStorage: jest.fn(),
+          updateTripHistory: jest.fn(async () => {}),
+          needsTour: false,
+          setNeedsTour: jest.fn(),
+          hasNewChanges: false,
+          setHasNewChanges: jest.fn(),
+          setUserName: jest.fn(async () => {}),
+          setTripHistory: jest.fn(),
+        },
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("trip-traveller-Alice")).toBeTruthy();
+    });
+
+    const listContent = screen.getByTestId("static-list-content");
+    expect(StyleSheet.flatten(listContent.props.style)).toMatchObject({
+      flexDirection: "row",
+      flexWrap: "wrap",
+      width: "100%",
     });
   });
 });

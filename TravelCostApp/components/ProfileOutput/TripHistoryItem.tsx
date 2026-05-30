@@ -439,7 +439,7 @@ function TripHistoryItem({ tripid, trips }) {
           styles.travellerCard,
         ]}
       >
-        <View style={[styles.avatar, GlobalStyles.shadowPrimary]}>
+        <View style={shadowRegressionStyles.tripTravellerAvatar}>
           <Text style={styles.avatarText}>
             {item.userName.charAt(0)}
           </Text>
@@ -578,12 +578,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   travellerCard: {
-    width: "48%",
+    flex: 1,
     flexDirection: "row",
     justifyContent: "flex-start",
     margin: dynamicScale(4),
     padding: dynamicScale(8, false, 0.5),
     borderRadius: dynamicScale(16, false, 0.5),
+    maxWidth: "45%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
     // android styles
     ...Platform.select({
@@ -592,15 +593,6 @@ const styles = StyleSheet.create({
         backgroundColor: GlobalStyles.colors.gray300,
       },
     }),
-  },
-  avatar: {
-    minHeight: dynamicScale(20, false, 0.5),
-    minWidth: dynamicScale(20, false, 0.5),
-    borderRadius: dynamicScale(60, false, 0.5),
-    backgroundColor: GlobalStyles.colors.gray500,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: dynamicScale(14, false, 0.5),
   },
   avatarText: {
     fontSize: dynamicScale(14, false, 0.5),

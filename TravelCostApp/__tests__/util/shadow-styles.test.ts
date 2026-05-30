@@ -70,6 +70,20 @@ describe("shadow styles", () => {
     expect(summary.shadowRadius).toBe(dropdown.shadowRadius);
   });
 
+  it("overview header cards share equal flex and width constraints", () => {
+    const summary = StyleSheet.flatten(
+      shadowRegressionStyles.expensesSummaryContainer
+    ) as Record<string, unknown>;
+    const dropdown = StyleSheet.flatten(
+      shadowRegressionStyles.overviewDropdownContainer
+    ) as Record<string, unknown>;
+
+    expect(summary.flex).toBe(1);
+    expect(dropdown.flex).toBe(1);
+    expect(summary.maxWidth).toBe("50%");
+    expect(dropdown.maxWidth).toBe("50%");
+  });
+
   it("expense country flag container co-locates shadow and backgroundColor", () => {
     const flat = StyleSheet.flatten(
       shadowRegressionStyles.expenseCountryFlagContainer
@@ -100,5 +114,21 @@ describe("shadow styles", () => {
     assertSolidBackgroundForShadow(
       StyleSheet.flatten(shadowRegressionStyles.changelogItem)
     );
+  });
+
+  it("overview divider bar co-locates shadow and backgroundColor", () => {
+    const flat = StyleSheet.flatten(
+      shadowRegressionStyles.overviewDividerBar
+    ) as Record<string, unknown>;
+    expect(styleHasShadow(flat)).toBe(true);
+    assertSolidBackgroundForShadow(flat);
+  });
+
+  it("trip traveller avatar co-locates shadow and backgroundColor", () => {
+    const flat = StyleSheet.flatten(
+      shadowRegressionStyles.tripTravellerAvatar
+    ) as Record<string, unknown>;
+    expect(styleHasShadow(flat)).toBe(true);
+    assertSolidBackgroundForShadow(flat);
   });
 });

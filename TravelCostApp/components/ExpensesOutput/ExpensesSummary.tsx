@@ -320,7 +320,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
         <CurrencyTicker
           value={expenseSumNum}
           currency={tripCurrency}
-          fontSize={dynamicScale(32, false, 0.5)}
+          fontSize={dynamicScale(26, false, 0.5)}
           style={{ color: budgetColor }}
           truncate={true}
           truncateLimit={1000}
@@ -331,9 +331,9 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
         color={budgetColor}
         unfilledColor={unfilledColor}
         borderWidth={0}
-        borderRadius={dynamicScale(8)}
+        borderRadius={dynamicScale(6)}
         progress={budgetProgress}
-        height={constantScale(12, 0.5)}
+        height={constantScale(8, 0.5)}
       />
     </Pressable>
   );

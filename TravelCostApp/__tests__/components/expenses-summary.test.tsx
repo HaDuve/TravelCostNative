@@ -59,6 +59,8 @@ describe("ExpensesSummary", () => {
 
     expect(flat.borderWidth).toBe(dropdownChrome.borderWidth);
     expect(flat.shadowColor).toBe(dropdownChrome.shadowColor);
+    expect(flat.flex).toBe(dropdownChrome.flex);
+    expect(flat.maxWidth).toBe(dropdownChrome.maxWidth);
     expect(flat.alignItems).toBe("center");
   });
 });

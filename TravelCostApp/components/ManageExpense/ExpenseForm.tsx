@@ -100,7 +100,6 @@ import {
 import {
   buildRangedDuplOrSplitPromptString,
   countInclusiveDaysInRange,
-  divideAmountForRangedSplit,
   resolveAlreadyDividedAmountByDays,
   resolveAmountWhenCollapsingRangeToSingleDay,
 } from "../../util/expense-form-range";
@@ -361,6 +360,12 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     editingValues ? Number(editingValues.duplOrSplit) : DuplicateOption.null
   );
 
+  const alreadyDividedAmountByDays = resolveAlreadyDividedAmountByDays(
+    isEditing,
+    duplOrSplit,
+    helperStateForDividing
+  );
+
   const splitEditor = useSplitEditor({
     initialSplitList: resetEditOrder(editingValues?.splitList ?? []),
     initialSplitType: editingValues ? editingValues.splitType : "SELF",
@@ -374,6 +379,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     duplOrSplit,
     isEditing,
     rangedDayCount: daysBeween,
+    alreadyDividedAmountByDays,
   });
 
   const {
@@ -470,12 +476,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       });
     }
   }, [dateISO]);
-
-  const alreadyDividedAmountByDays = resolveAlreadyDividedAmountByDays(
-    isEditing,
-    duplOrSplit,
-    helperStateForDividing
-  );
 
   const rangedPromptLabels = useMemo(
     () => ({
@@ -995,20 +995,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   async function submitHandler() {
     const expenseData = buildExpenseData(makeFormSnapshot());
-
-    if (duplOrSplit === 2 && !isEditing) {
-      const newSplitList = recalcSplitsWithEditOrder(
-        splitList,
-        divideAmountForRangedSplit(+amountValue, daysBeween)
-      );
-      setSplitList(newSplitList);
-      setSplitListValid(
-        Boolean(
-          validateSplitList(newSplitList, splitType, +amountValue) &&
-            validateSplitListWithEditOrder(newSplitList, +amountValue)
-        )
-      );
-    }
 
     if (!splitListValid && splitType !== splitTypes.SELF) {
       Alert.alert(i18n.t("sorry"), i18n.t("sorrySplitList"));

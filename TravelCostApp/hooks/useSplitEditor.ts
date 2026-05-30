@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import * as Haptics from "expo-haptics";
 
 import type { Split } from "../util/expense";
-import { divideAmountForRangedSplit } from "../util/expense-form-range";
+import { distributeRangedAmount } from "../util/expense-form-range";
 import {
   applySplitEdit,
   calcSplitList,
@@ -33,6 +33,7 @@ export type UseSplitEditorOptions = {
   duplOrSplit?: number;
   isEditing?: boolean;
   rangedDayCount?: number;
+  alreadyDividedAmountByDays?: boolean;
 };
 
 export function useSplitEditor({
@@ -46,6 +47,7 @@ export function useSplitEditor({
   duplOrSplit = 0,
   isEditing = false,
   rangedDayCount = 1,
+  alreadyDividedAmountByDays = false,
 }: UseSplitEditorOptions) {
   const [splitList, setSplitList] = useState(() =>
     resetEditOrder(initialSplitList)
@@ -141,7 +143,12 @@ export function useSplitEditor({
       if (duplOrSplit === 2 && isEditing) {
         const rangedList = recalcSplitsWithEditOrder(
           splitList,
-          divideAmountForRangedSplit(amount, rangedDayCount)
+          distributeRangedAmount({
+            total: amount,
+            dayCount: rangedDayCount,
+            mode: duplOrSplit,
+            alreadyDivided: alreadyDividedAmountByDays,
+          })
         );
         setSplitList(rangedList);
         setSplitListValid(
@@ -164,6 +171,7 @@ export function useSplitEditor({
     [
       amount,
       currentSplitType,
+      alreadyDividedAmountByDays,
       duplOrSplit,
       isEditing,
       rangedDayCount,

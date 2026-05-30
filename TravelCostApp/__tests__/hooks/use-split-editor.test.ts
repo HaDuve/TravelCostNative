@@ -12,7 +12,7 @@ import {
   validateSplitListWithEditOrder,
   type splitType,
 } from "../../util/split";
-import { divideAmountForRangedSplit } from "../../util/expense-form-range";
+import { distributeRangedAmount } from "../../util/expense-form-range";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 
@@ -195,7 +195,12 @@ describe("useSplitEditor", () => {
     ]);
     const amount = 150;
     const rangedDayCount = 3;
-    const perDay = divideAmountForRangedSplit(amount, rangedDayCount);
+    const perDay = distributeRangedAmount({
+      total: amount,
+      dayCount: rangedDayCount,
+      mode: 2,
+      alreadyDivided: false,
+    });
     const { result } = renderSplitEditor({
       initialSplitList,
       initialSplitType: "EXACT",

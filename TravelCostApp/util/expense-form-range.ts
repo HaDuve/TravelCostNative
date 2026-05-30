@@ -26,6 +26,28 @@ export function divideAmountForRangedSplit(
   return amount / inclusiveDayCount;
 }
 
+export type DistributeRangedAmountInput = {
+  total: number;
+  dayCount: number;
+  mode: DuplicateOption | number;
+  alreadyDivided: boolean;
+};
+
+/** Per-day amount for a **Ranged expense** from total, inclusive day count, and mode. */
+export function distributeRangedAmount(
+  input: DistributeRangedAmountInput
+): number {
+  if (input.alreadyDivided) {
+    return input.total;
+  }
+  if (Number(input.mode) === DuplicateOption.split) {
+    return Number(
+      divideAmountForRangedSplit(input.total, input.dayCount).toFixed(2)
+    );
+  }
+  return input.total;
+}
+
 /** Whether the amount field already holds a per-day share (editing ranged split). */
 export function resolveAlreadyDividedAmountByDays(
   isEditing: boolean,

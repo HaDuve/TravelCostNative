@@ -1,7 +1,7 @@
 import { Platform, StyleSheet, View, Text } from "react-native";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { GlobalStyles } from "../../constants/styles";
-import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
+import { shadowRegressionStyles, periodHeaderLabelFontSize } from "../../styles/shadow-regression-styles";
 import * as Progress from "react-native-progress";
 import { TripContext } from "../../store/trip-context";
 
@@ -320,7 +320,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
         <CurrencyTicker
           value={expenseSumNum}
           currency={tripCurrency}
-          fontSize={dynamicScale(26, false, 0.5)}
+          fontSize={periodHeaderLabelFontSize}
           style={{ color: budgetColor }}
           truncate={true}
           truncateLimit={1000}

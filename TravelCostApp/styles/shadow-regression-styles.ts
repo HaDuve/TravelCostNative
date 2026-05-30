@@ -3,9 +3,15 @@ import { Platform, StyleSheet } from "react-native";
 import { GlobalStyles } from "../constants/styles";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 
+export const periodHeaderLabelFontSize = dynamicScale(28, false, 0.5);
+
 const statisticsCardShadow = {
   backgroundColor: GlobalStyles.colors.backgroundColor,
   borderRadius: dynamicScale(10, false, 0.5),
+  borderWidth: 1,
+  borderColor: GlobalStyles.colors.gray300,
+  marginHorizontal: dynamicScale(16),
+  marginBottom: dynamicScale(20, true),
   ...Platform.select({
     ios: {
       shadowColor: "#000",
@@ -38,10 +44,12 @@ const overviewHeaderCardShadow = Platform.select({
 const overviewHeaderCardBase = {
   flex: 1,
   maxWidth: "50%" as const,
+  minHeight: dynamicScale(64, true),
   backgroundColor: GlobalStyles.colors.backgroundColor,
   borderRadius: 10,
   borderWidth: 1,
   borderColor: GlobalStyles.colors.gray300,
+  paddingVertical: dynamicScale(6, true),
   ...overviewHeaderCardShadow,
 };
 

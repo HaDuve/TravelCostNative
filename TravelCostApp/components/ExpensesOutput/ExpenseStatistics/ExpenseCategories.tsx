@@ -180,8 +180,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   categoryCard: {
-    marginBottom: dynamicScale(20, true),
-    marginHorizontal: dynamicScale(16),
     paddingBottom: dynamicScale(12, true),
     ...shadowRegressionStyles.statisticsPieCategoryCard,
   },

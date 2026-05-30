@@ -18,7 +18,7 @@ import {
 } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
-import { shadowRegressionStyles } from "../styles/shadow-regression-styles";
+import { shadowRegressionStyles, periodHeaderLabelFontSize } from "../styles/shadow-regression-styles";
 import { MemoizedExpensesOverview } from "../components/ExpensesOutput/ExpensesOverview";
 import ToggleButton from "../assets/SVG/toggleButton";
 import { TourGuideZone } from "rn-tourguide";
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
     fontSize:
       i18n.locale == "fr"
         ? dynamicScale(20, false, 0.5)
-        : dynamicScale(34, false, 0.5),
+        : periodHeaderLabelFontSize,
     fontWeight: "bold",
   },
   scaledUpTextStyle: {

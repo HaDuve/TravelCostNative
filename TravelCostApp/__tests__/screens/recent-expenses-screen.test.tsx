@@ -30,9 +30,9 @@ jest.mock("expo-haptics", () => ({
 
 jest.mock("react-native-dropdown-picker", () => {
   const React = require("react");
-  const { Text } = require("react-native");
-  return function MockDropDownPicker() {
-    return <Text testID="mock-dropdown-picker" />;
+  const { View } = require("react-native");
+  return function MockDropDownPicker(props: { containerStyle?: object }) {
+    return <View testID="mock-dropdown-picker" style={props.containerStyle} />;
   };
 });
 
@@ -75,7 +75,9 @@ jest.mock("../../util/http", () => ({
 }));
 
 import { waitFor } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
 import RecentExpenses from "../../screens/RecentExpenses";
+import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 import { fetchAndSetExpenses } from "../../components/ExpensesOutput/RecentExpensesUtil";
 import { makeExpense } from "../fixtures/expense";
 import { renderWithAppProviders } from "../fixtures/app-providers";
@@ -124,5 +126,35 @@ describe("RecentExpenses screen", () => {
 
     expect(screen.getByText(/Japan 2026/)).toBeTruthy();
     expect(screen.getByText(/75/)).toBeTruthy();
+  });
+
+  it("uses the same period header card chrome as Overview", () => {
+    const monthExpenses = [makeExpense({ id: "e1", calcAmount: 75, amount: 75 })];
+    const navigation = { navigate: jest.fn() };
+
+    const screen = renderWithAppProviders(
+      <RecentExpenses navigation={navigation as any} />,
+      {
+        expenses: {
+          expenses: monthExpenses,
+          getRecentExpenses: () => monthExpenses,
+        },
+        user: {
+          periodName: "month",
+          needsTour: false,
+        },
+      }
+    );
+
+    const dropdown = StyleSheet.flatten(
+      screen.getByTestId("mock-dropdown-picker").props.style
+    ) as Record<string, unknown>;
+    const overviewDropdown = StyleSheet.flatten(
+      shadowRegressionStyles.overviewDropdownContainer
+    ) as Record<string, unknown>;
+
+    expect(dropdown.flex).toBe(overviewDropdown.flex);
+    expect(dropdown.maxWidth).toBe(overviewDropdown.maxWidth);
+    expect(dropdown.borderWidth).toBe(overviewDropdown.borderWidth);
   });
 });

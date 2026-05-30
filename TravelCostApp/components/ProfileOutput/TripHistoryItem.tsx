@@ -1,4 +1,3 @@
-import StaticList from "../UI/StaticList";
 import {
   Pressable,
   StyleSheet,
@@ -379,6 +378,7 @@ function TripHistoryItem({ tripid, trips }) {
         style={({ pressed }) => pressed && GlobalStyles.pressed}
       >
         <View
+          testID={`trip-history-card-${tripid}`}
           style={[
             shadowRegressionStyles.tripHistoryCard,
             styles.tripItem,
@@ -457,6 +457,7 @@ function TripHistoryItem({ tripid, trips }) {
       style={({ pressed }) => pressed && GlobalStyles.pressed}
     >
       <View
+        testID={`trip-history-card-${tripid}`}
         style={[
           styles.tripItem,
           !contextTrip && styles.inactive,
@@ -508,12 +509,20 @@ function TripHistoryItem({ tripid, trips }) {
             />
           </View>
         </View>
-        <StaticList
-          data={travellers}
-          renderItem={renderTravellers}
-          keyExtractor={(item) => item.userName + tripid}
-          contentContainerStyle={{ flexDirection: "row", flexWrap: "wrap" }}
-        />
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            width: "100%",
+          }}
+          testID="trip-travellers-wrap"
+        >
+          {travellers.map((item) => (
+            <React.Fragment key={item.userName + tripid}>
+              {renderTravellers({ item })}
+            </React.Fragment>
+          ))}
+        </View>
       </View>
     </Pressable>
   );

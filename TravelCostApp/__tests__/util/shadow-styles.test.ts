@@ -131,4 +131,14 @@ describe("shadow styles", () => {
     expect(styleHasShadow(flat)).toBe(true);
     assertSolidBackgroundForShadow(flat);
   });
+
+  it("statistics pie category cards use list item margins and border chrome", () => {
+    const flat = StyleSheet.flatten(
+      shadowRegressionStyles.statisticsPieCategoryCard
+    ) as Record<string, unknown>;
+
+    expect(flat.borderWidth).toBeGreaterThan(0);
+    expect(flat.borderColor).toBeDefined();
+    expect(flat.marginHorizontal).toBeDefined();
+  });
 });

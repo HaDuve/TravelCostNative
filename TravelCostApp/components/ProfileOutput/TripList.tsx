@@ -24,6 +24,7 @@ function TripList({ trips }) {
       testID="trip-list-wrapper"
       style={{
         flex: 1,
+        minHeight: dynamicScale(120, true),
       }}
     >
       <FlatList

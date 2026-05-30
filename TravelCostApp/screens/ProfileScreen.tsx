@@ -322,7 +322,7 @@ const ProfileScreen = ({ navigation }) => {
           {i18n.t("supportFeedbackLabel")}
         </GradientButton>
       </View>
-      <View style={styles.tripContainer}>
+      <View style={styles.tripContainer} testID="profile-trip-container">
         <View style={styles.horizontalContainer}>
           <Text style={styles.tripListTitle}>{i18n.t("myTrips")}</Text>
           <TourGuideZone
@@ -442,9 +442,8 @@ const styles = StyleSheet.create({
 
   tripContainer: {
     flex: 1,
-    // minHeight: "68%",
     margin: dynamicScale(16),
-    marginBottom: dynamicScale(-150, true),
+    marginBottom: dynamicScale(8, true),
     backgroundColor: GlobalStyles.colors.backgroundColor,
   },
   horizontalContainer: {

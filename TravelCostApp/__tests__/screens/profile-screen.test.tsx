@@ -199,11 +199,49 @@ describe("Profile screen", () => {
       expect(screen.getByTestId("trip-traveller-Alice")).toBeTruthy();
     });
 
-    const listContent = screen.getByTestId("static-list-content");
+    const listContent = screen.getByTestId("trip-travellers-wrap");
     expect(StyleSheet.flatten(listContent.props.style)).toMatchObject({
       flexDirection: "row",
       flexWrap: "wrap",
       width: "100%",
     });
+  });
+
+  it("keeps trip history cards in the visible layout region", async () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
+        expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
+        user: {
+          userName: "Alice",
+          freshlyCreated: false,
+          tripHistory: ["t1"],
+          loadUserNameFromStorage: jest.fn(),
+          updateTripHistory: jest.fn(async () => {}),
+          needsTour: false,
+          setNeedsTour: jest.fn(),
+          hasNewChanges: false,
+          setHasNewChanges: jest.fn(),
+          setUserName: jest.fn(async () => {}),
+          setTripHistory: jest.fn(),
+        },
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("trip-history-card-t1")).toBeTruthy();
+    });
+
+    const tripContainer = screen.getByTestId("profile-trip-container");
+    const flat = StyleSheet.flatten(tripContainer.props.style) as Record<
+      string,
+      unknown
+    >;
+    expect(typeof flat.marginBottom !== "number" || flat.marginBottom >= 0).toBe(
+      true
+    );
   });
 });

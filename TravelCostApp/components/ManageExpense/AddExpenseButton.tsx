@@ -3,7 +3,7 @@ import { GlobalStyles } from "../../constants/styles";
 import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 import * as Haptics from "expo-haptics";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TourGuideZone } from "rn-tourguide";
 
@@ -35,7 +35,10 @@ const AddExpenseButton = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
   const expCtx = useContext(ExpensesContext);
 
-  const templateSourceExpenses = expensesForTemplateSelection(expCtx.expenses);
+  const templateSourceExpenses = useMemo(
+    () => expensesForTemplateSelection(expCtx.expenses),
+    [expCtx.expenses]
+  );
 
   const lastExpenses: ExpenseData[] = uniqBy(
     [...templateSourceExpenses].sort((a, b) => {

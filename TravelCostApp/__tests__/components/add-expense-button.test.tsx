@@ -108,6 +108,48 @@ describe("AddExpenseButton", () => {
     useWindowDimensionsSpy.mockRestore();
   });
 
+  it("shows only recent template expenses when the trip has more than 250 expenses", () => {
+    const expenses = Array.from({ length: 251 }, (_, i) =>
+      makeExpense({
+        id: `e-${i}`,
+        description: i === 0 ? "Ancient coffee" : `Expense ${i}`,
+        editedTimestamp: i,
+      })
+    );
+
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <AddExpenseButton navigation={navigation} />,
+      {
+        wrapNavigation: false,
+        expenses: {
+          expenses,
+          getRecentExpenses: () => expenses,
+        },
+      }
+    );
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+
+    expect(screen.getByText("Expense 250")).toBeTruthy();
+    expect(screen.queryByText("Ancient coffee")).toBeNull();
+  });
+
+  it("does not reopen template help after closing the picker with help left open", () => {
+    const { screen } = renderAddExpenseButtonWithTemplate();
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+    fireEvent.press(screen.getByTestId("expense-template-picker-info"));
+    expect(screen.getByTestId("expense-template-help-modal")).toBeTruthy();
+
+    fireEvent(screen.UNSAFE_getByType(Modal), "requestClose");
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+
+    expect(screen.queryByTestId("expense-template-help-modal")).toBeNull();
+    expect(screen.getByTestId("expense-template-picker-modal")).toBeTruthy();
+  });
+
   it("opens template help from the info button", () => {
     const { screen } = renderAddExpenseButtonWithTemplate();
 

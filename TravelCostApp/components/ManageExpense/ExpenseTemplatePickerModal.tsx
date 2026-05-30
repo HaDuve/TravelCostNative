@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import PropTypes from "prop-types";
 import * as Haptics from "expo-haptics";
@@ -44,6 +44,12 @@ const ExpenseTemplatePickerModal = ({
   const closeHelp = useCallback(() => {
     setHelpVisible(false);
   }, []);
+
+  useEffect(() => {
+    if (!isVisible) {
+      setHelpVisible(false);
+    }
+  }, [isVisible]);
 
   const renderItem = ({
     item,

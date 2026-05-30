@@ -19,7 +19,7 @@ jest.mock("react-native-toast-message", () => ({
 }));
 
 import { fireEvent } from "@testing-library/react-native";
-import { StyleSheet } from "react-native";
+import { Modal, StyleSheet } from "react-native";
 
 import { i18n } from "../../i18n/i18n";
 import ExpensesSummary from "../../components/ExpensesOutput/ExpensesSummary";
@@ -149,6 +149,76 @@ describe("ExpensesSummary", () => {
 
     fireEvent.press(screen.getByTestId("expenses-summary-pressable"));
     fireEvent.press(screen.getByTestId("budget-overview-backdrop"));
+
+    expect(screen.queryByText(i18n.t("overview"))).toBeNull();
+  });
+
+  it("shows overview without per-traveller list for a single traveller", () => {
+    const expenses = [makeExpense({ calcAmount: 50, amount: 50 })];
+
+    const screen = renderWithAppProviders(
+      <ExpensesSummary expenses={expenses} periodName="month" />,
+      {
+        wrapNavigation: false,
+        trip: { travellers: ["Alice"] },
+        expenses: {
+          expenses,
+          getRecentExpenses: () => expenses,
+        },
+      },
+    );
+
+    fireEvent.press(screen.getByTestId("expenses-summary-pressable"));
+
+    expect(screen.getByText(i18n.t("overview"))).toBeTruthy();
+    expect(
+      screen.queryByText(new RegExp(i18n.t("budgetPerTraveller"))),
+    ).toBeNull();
+  });
+
+  it("shows an error toast instead of the modal when the period budget is unlimited", () => {
+    const expenses = [makeExpense({ calcAmount: 50, amount: 50 })];
+
+    const screen = renderWithAppProviders(
+      <ExpensesSummary expenses={expenses} periodName="total" />,
+      {
+        wrapNavigation: false,
+        trip: { totalBudget: "", travellers: ["Alice"] },
+        expenses: {
+          expenses,
+          getRecentExpenses: () => expenses,
+        },
+      },
+    );
+
+    fireEvent.press(screen.getByTestId("expenses-summary-pressable"));
+
+    expect(screen.queryByText(i18n.t("overview"))).toBeNull();
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "error",
+        text1: i18n.t("noTotalBudget"),
+        text2: i18n.t("infinityLeftToSpend"),
+      }),
+    );
+  });
+
+  it("dismisses the budget overview modal on Android back", () => {
+    const expenses = [makeExpense({ calcAmount: 75, amount: 75 })];
+
+    const screen = renderWithAppProviders(
+      <ExpensesSummary expenses={expenses} periodName="month" />,
+      {
+        wrapNavigation: false,
+        expenses: {
+          expenses,
+          getRecentExpenses: () => expenses,
+        },
+      },
+    );
+
+    fireEvent.press(screen.getByTestId("expenses-summary-pressable"));
+    fireEvent(screen.UNSAFE_getByType(Modal), "requestClose");
 
     expect(screen.queryByText(i18n.t("overview"))).toBeNull();
   });

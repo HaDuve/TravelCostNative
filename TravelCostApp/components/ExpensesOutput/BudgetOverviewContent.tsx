@@ -86,6 +86,8 @@ const BudgetOverviewContent = ({
       {hasMultipleTravellers && (
         <FlatList
           data={travellerList}
+          nestedScrollEnabled
+          style={styles.travellerList}
           ListHeaderComponent={() => (
             <Text style={styles.overviewTextInfo}>
               {i18n.t("budgetPerTraveller")}:{" "}
@@ -182,6 +184,9 @@ const BudgetOverviewContent = ({
 export default BudgetOverviewContent;
 
 const styles = StyleSheet.create({
+  travellerList: {
+    maxHeight: dynamicScale(320, false, 0.5),
+  },
   budgetOverviewHeader: {
     flexDirection: "row",
     justifyContent: "space-between",

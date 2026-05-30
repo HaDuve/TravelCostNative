@@ -98,6 +98,62 @@ describe("AddExpenseButton", () => {
     expect(description.props.ellipsizeMode).toBeUndefined();
   });
 
+  it("reserves at least 30% row width for the template description column", () => {
+    const { screen } = renderAddExpenseButtonWithTemplate();
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+
+    const descriptionColumn = screen.getByTestId("expense-item-description-column");
+    const columnStyle = StyleSheet.flatten(descriptionColumn.props.style);
+
+    expect(columnStyle.minWidth).toBe("30%");
+    expect(columnStyle.flexGrow).toBeGreaterThan(1);
+  });
+
+  it("lets template picker flag and traveller slots shrink when space is tight", () => {
+    const { screen } = renderAddExpenseButtonWithTemplate();
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+
+    const flagSlot = screen.getByTestId("expense-item-flag-slot");
+    const travellersSlot = screen.getByTestId("expense-item-travellers-slot");
+
+    expect(StyleSheet.flatten(flagSlot.props.style).flexShrink).toBe(1);
+    expect(StyleSheet.flatten(travellersSlot.props.style).flexShrink).toBe(1);
+  });
+
+  it("uses tighter horizontal padding on the template picker modal", () => {
+    const { screen } = renderAddExpenseButtonWithTemplate();
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+
+    const contentStyle = StyleSheet.flatten(
+      screen.getByTestId("expense-template-picker-content").props.style
+    );
+    expect(contentStyle.paddingHorizontal).toBe(6);
+    expect(contentStyle.marginHorizontal).toBe(0);
+  });
+
+  it("keeps the template picker modal within the screen width", () => {
+    const screenWidth = 390;
+    const useWindowDimensionsSpy = jest
+      .spyOn(require("react-native"), "useWindowDimensions")
+      .mockReturnValue({ width: screenWidth, height: 844, scale: 2, fontScale: 1 });
+
+    const { screen } = renderAddExpenseButtonWithTemplate();
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+
+    const contentStyle = StyleSheet.flatten(
+      screen.getByTestId("expense-template-picker-content").props.style
+    );
+
+    expect(contentStyle.maxWidth).toBeLessThanOrEqual(screenWidth);
+    expect(contentStyle.width).toBeLessThanOrEqual(screenWidth);
+    expect(contentStyle.maxWidth).toBe(screenWidth - 12);
+
+    useWindowDimensionsSpy.mockRestore();
+  });
+
   it("dismisses the template picker via backdrop and keeps the fab visible", () => {
     const navigation = { navigate: jest.fn() };
     const templateExpense = makeExpense({

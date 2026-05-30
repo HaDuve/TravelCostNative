@@ -241,14 +241,22 @@ function ExpenseItem(props): JSX.Element {
                 </View>
               );
             }}
-            contentContainerStyle={styles.avatarContainer}
+            contentContainerStyle={[
+              styles.avatarContainer,
+              isTemplatePickerRow && styles.avatarContainerTemplatePicker,
+            ]}
             keyExtractor={(item) => {
               return item.userName;
             }}
           ></FlatList>
         </View>
       ) : (
-        <View style={styles.avatarContainer}>
+        <View
+          style={[
+            styles.avatarContainer,
+            isTemplatePickerRow && styles.avatarContainerTemplatePicker,
+          ]}
+        >
           <View
             testID="expense-item-traveller-avatar"
             style={[styles.avatar, styles.avatarPaid]}
@@ -257,7 +265,7 @@ function ExpenseItem(props): JSX.Element {
           </View>
         </View>
       ),
-    [longList?.length, splitList?.length, whoPaid]
+    [isTemplatePickerRow, longList?.length, splitList?.length, whoPaid]
   );
 
   if (typeof date === "string") date = new Date(date);
@@ -335,6 +343,9 @@ function ExpenseItem(props): JSX.Element {
             />
           </View>
           <View
+            testID={
+              isTemplatePickerRow ? "expense-item-description-column" : undefined
+            }
             style={[
               styles.leftItem,
               isTemplatePickerRow && styles.leftItemTemplatePicker,
@@ -371,16 +382,34 @@ function ExpenseItem(props): JSX.Element {
             </Text>
           </View>
           {settingShowFlags && (
-            <View style={styles.countryFlag}>
+            <View
+              testID={
+                isTemplatePickerRow ? "expense-item-flag-slot" : undefined
+              }
+              style={[
+                styles.countryFlag,
+                isTemplatePickerRow && styles.countryFlagTemplatePicker,
+              ]}
+            >
               <ExpenseCountryFlag
                 countryName={country}
                 style={GlobalStyles.countryFlagStyle}
-                containerStyle={styles.countryFlagContainer}
+                containerStyle={[
+                  styles.countryFlagContainer,
+                  isTemplatePickerRow && styles.countryFlagContainerTemplatePicker,
+                ]}
               />
             </View>
           )}
           {settingShowWhoPaid && (
-            <View style={isTemplatePickerRow && styles.travellerListTemplatePicker}>
+            <View
+              testID={
+                isTemplatePickerRow ? "expense-item-travellers-slot" : undefined
+              }
+              style={[
+                isTemplatePickerRow && styles.travellerListTemplatePicker,
+              ]}
+            >
               {sharedList()}
             </View>
           )}
@@ -447,6 +476,7 @@ const styles = StyleSheet.create({
   expenseItemTemplatePicker: {
     alignItems: "flex-start",
     paddingVertical: dynamicScale(10, true),
+    width: "100%",
   },
   textBase: {
     marginTop: dynamicScale(2, true),
@@ -478,16 +508,37 @@ const styles = StyleSheet.create({
   },
   leftItemTemplatePicker: {
     flexGrow: 2,
-    flexShrink: 1,
-    minWidth: 0,
+    flexShrink: 0,
+    flexBasis: "30%",
+    minWidth: "30%",
     height: undefined,
     minHeight: constantScale(44, 0.5),
   },
   descriptionTemplatePicker: {
+    flexShrink: 0,
+    alignSelf: "stretch",
+  },
+  countryFlagTemplatePicker: {
+    flexShrink: 1,
+    flexGrow: 0,
+    minWidth: 0,
+    overflow: "hidden",
+  },
+  countryFlagContainerTemplatePicker: {
+    width: undefined,
+    maxWidth: constantScale(50),
     flexShrink: 1,
   },
   travellerListTemplatePicker: {
-    flexShrink: 0,
+    flexShrink: 1,
+    flexGrow: 0,
+    minWidth: 0,
+    overflow: "hidden",
+  },
+  avatarContainerTemplatePicker: {
+    width: undefined,
+    maxWidth: constantScale(55),
+    flexShrink: 1,
   },
   amountContainer: {
     paddingHorizontal: dynamicScale(4),

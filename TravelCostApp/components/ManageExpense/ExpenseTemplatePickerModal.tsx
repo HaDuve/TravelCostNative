@@ -1,5 +1,5 @@
 import React from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import PropTypes from "prop-types";
 
 import AppModal from "../UI/AppModal";
@@ -7,6 +7,7 @@ import ExpenseListRow from "../ExpensesOutput/ExpenseListRow";
 import { GlobalStyles } from "../../constants/styles";
 import { i18n } from "../../i18n/i18n";
 import type { ExpenseData } from "../../util/expense";
+import { templatePickerModalContentWidth } from "../../util/modal-layout";
 import { dynamicScale } from "../../util/scalingUtil";
 import FlatButton from "../UI/FlatButton";
 
@@ -27,6 +28,8 @@ const ExpenseTemplatePickerModal = ({
   onSelectTemplate,
   onLoadMore,
 }: ExpenseTemplatePickerModalProps) => {
+  const { width: screenWidth } = useWindowDimensions();
+  const contentWidth = templatePickerModalContentWidth(screenWidth);
   const hasTopSection = topDuplicateCount > 0;
 
   const renderItem = ({
@@ -65,7 +68,15 @@ const ExpenseTemplatePickerModal = ({
       onClose={onClose}
       testID="expense-template-picker-modal"
       backdropTestID="expense-template-picker-backdrop"
-      contentStyle={styles.modalContent}
+      contentTestID="expense-template-picker-content"
+      contentStyle={[
+        styles.modalContent,
+        {
+          width: contentWidth,
+          maxWidth: contentWidth,
+          marginHorizontal: 0,
+        },
+      ]}
     >
       <View style={styles.modalHeader}>
         <Text style={styles.modalTitle}>{i18n.t("templateExpenses")}</Text>
@@ -100,11 +111,11 @@ export default ExpenseTemplatePickerModal;
 
 const styles = StyleSheet.create({
   modalContent: {
-    width: "94%",
-    maxWidth: dynamicScale(480, false, 0.5),
     maxHeight: "85%",
-    paddingVertical: dynamicScale(16, false, 0.5),
-    paddingHorizontal: dynamicScale(12, false, 0.5),
+    padding: dynamicScale(12, false, 0.5),
+    paddingVertical: dynamicScale(12, false, 0.5),
+    paddingHorizontal: 6,
+    alignSelf: "center",
   },
   modalHeader: {
     flexDirection: "row",
@@ -114,6 +125,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     flex: 1,
+    paddingLeft: dynamicScale(8, false, 0.5),
     fontWeight: "300",
     fontSize: dynamicScale(22, false, 0.5),
     color: GlobalStyles.colors.textColor,

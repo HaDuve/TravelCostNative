@@ -21,6 +21,7 @@ export type AppModalProps = {
   backdropTestID?: string;
   animationType?: ModalProps["animationType"];
   contentStyle?: StyleProp<ViewStyle>;
+  contentTestID?: string;
 };
 
 const AppModal = ({
@@ -31,6 +32,7 @@ const AppModal = ({
   backdropTestID = "app-modal-backdrop",
   animationType = "slide",
   contentStyle,
+  contentTestID,
 }: AppModalProps) => {
   return (
     <Modal
@@ -47,7 +49,12 @@ const AppModal = ({
         accessibilityRole="button"
       >
         <Pressable onPress={(event) => event.stopPropagation()}>
-          <View style={[styles.modalContainer, contentStyle]}>{children}</View>
+          <View
+            testID={contentTestID}
+            style={[styles.modalContainer, contentStyle]}
+          >
+            {children}
+          </View>
         </Pressable>
       </Pressable>
     </Modal>
@@ -62,6 +69,7 @@ AppModal.propTypes = {
   backdropTestID: PropTypes.string,
   animationType: PropTypes.string,
   contentStyle: PropTypes.object,
+  contentTestID: PropTypes.string,
 };
 
 export default AppModal;

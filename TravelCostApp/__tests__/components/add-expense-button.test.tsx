@@ -14,11 +14,119 @@ jest.mock("rn-tourguide", () => ({
   TourGuideZone: ({ children }: { children?: React.ReactNode }) => children ?? null,
 }));
 
+jest.mock("@react-navigation/native", () => ({
+  useNavigation: () => ({ navigate: jest.fn() }),
+}));
+
+import { fireEvent } from "@testing-library/react-native";
+
+import { i18n } from "../../i18n/i18n";
 import AddExpenseButton from "../../components/ManageExpense/AddExpenseButton";
+import { makeExpense } from "../fixtures/expense";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 import { assertSolidBackgroundForShadow } from "../../util/shadow-styles";
 
 describe("AddExpenseButton", () => {
+  it("opens the template expense modal on long press with a ledger-style row", () => {
+    const navigation = { navigate: jest.fn() };
+    const templateExpense = makeExpense({
+      id: "e-template",
+      description: "Coffee shop",
+      amount: 42,
+      calcAmount: 42,
+      editedTimestamp: 2,
+    });
+
+    const screen = renderWithAppProviders(
+      <AddExpenseButton navigation={navigation} />,
+      {
+        wrapNavigation: false,
+        expenses: {
+          expenses: [templateExpense],
+          getRecentExpenses: () => [templateExpense],
+        },
+      }
+    );
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+
+    expect(screen.getByTestId("expense-template-picker-modal")).toBeTruthy();
+    expect(screen.getByText("Coffee shop")).toBeTruthy();
+    expect(screen.getByText(/42/)).toBeTruthy();
+    expect(screen.getByText(i18n.t("templateExpenses"))).toBeTruthy();
+  });
+
+  it("dismisses the template picker via backdrop and keeps the fab visible", () => {
+    const navigation = { navigate: jest.fn() };
+    const templateExpense = makeExpense({
+      id: "e-template",
+      description: "Coffee shop",
+      editedTimestamp: 2,
+    });
+
+    const screen = renderWithAppProviders(
+      <AddExpenseButton navigation={navigation} />,
+      {
+        wrapNavigation: false,
+        expenses: {
+          expenses: [templateExpense],
+          getRecentExpenses: () => [templateExpense],
+        },
+      }
+    );
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+    expect(screen.getByTestId("expense-template-picker-modal")).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId("expense-template-picker-backdrop"));
+
+    expect(screen.queryByTestId("expense-template-picker-modal")).toBeNull();
+    expect(screen.getByTestId("add-expense-fab")).toBeTruthy();
+  });
+
+  it("prefills Manage expense from a template with today's date", () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-05-30T10:00:00.000Z"));
+
+    const navigation = { navigate: jest.fn() };
+    const templateExpense = makeExpense({
+      id: "e-template",
+      description: "Coffee shop",
+      amount: 42,
+      calcAmount: 42,
+      editedTimestamp: 2,
+    });
+
+    const screen = renderWithAppProviders(
+      <AddExpenseButton navigation={navigation} />,
+      {
+        wrapNavigation: false,
+        expenses: {
+          expenses: [templateExpense],
+          getRecentExpenses: () => [templateExpense],
+        },
+      }
+    );
+
+    fireEvent(screen.getByTestId("add-expense-fab"), "longPress");
+    fireEvent.press(screen.getByText("Coffee shop"));
+
+    expect(navigation.navigate).toHaveBeenCalledWith("ManageExpense", {
+      pickedCat: templateExpense.category,
+      tempValues: expect.objectContaining({
+        description: "Coffee shop",
+        date: "2026-05-30T10:00:00.000Z",
+        startDate: "2026-05-30T10:00:00.000Z",
+        endDate: "2026-05-30T10:00:00.000Z",
+      }),
+    });
+    expect(
+      (navigation.navigate as jest.Mock).mock.calls[0][1].tempValues
+    ).not.toHaveProperty("id");
+
+    jest.useRealTimers();
+  });
+
   it("co-locates shadow and backgroundColor on the add expense fab", () => {
     const navigation = { navigate: jest.fn() };
 

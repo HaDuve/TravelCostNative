@@ -184,12 +184,6 @@ describe("shadow styles", () => {
     );
   });
 
-  it("add expense template row co-locates shadow and backgroundColor", () => {
-    assertSolidBackgroundForShadow(
-      StyleSheet.flatten(shadowRegressionStyles.addExpenseTemplateRow)
-    );
-  });
-
   it("scroll-to-top fab co-locates shadow and backgroundColor", () => {
     assertSolidBackgroundForShadow(
       StyleSheet.flatten(shadowRegressionStyles.scrollToTopFab)

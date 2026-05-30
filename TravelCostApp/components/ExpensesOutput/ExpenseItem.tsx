@@ -35,7 +35,8 @@ import { VexoEvents } from "../../util/vexo-constants";
 const IconSize = dynamicScale(28, false, 0.5);
 
 function ExpenseItem(props): JSX.Element {
-  const { showSumForTravellerName, filtered } = props;
+  const { showSumForTravellerName, filtered, onPressOverride, disableLongPressSelection } =
+    props;
   const { setSelectable, selectItem } = props;
   const {
     id,
@@ -134,6 +135,11 @@ function ExpenseItem(props): JSX.Element {
   const hideSpecial = settingHideSpecialExpenses && isSpecialExpense;
 
   const navigateToExpense = useCallback(async () => {
+    if (onPressOverride) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onPressOverride();
+      return;
+    }
     if (!id) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
       return;
@@ -151,7 +157,7 @@ function ExpenseItem(props): JSX.Element {
     navigation.navigate("ManageExpense", {
       expenseId: id,
     });
-  }, [id, navigation]);
+  }, [id, navigation, onPressOverride, category, currency, country]);
   const originalCurrencyJSX = useMemo(
     () =>
       !sameCurrency ? (
@@ -274,7 +280,7 @@ function ExpenseItem(props): JSX.Element {
       <Pressable
         onPress={navigateToExpense}
         onLongPress={() => {
-          if (setSelectable === undefined) return;
+          if (disableLongPressSelection || setSelectable === undefined) return;
           setSelectable(true);
           if (selectItem) {
             selectItem(id);
@@ -390,6 +396,8 @@ ExpenseItem.propTypes = {
   filtered: PropTypes.bool,
   isSpecialExpense: PropTypes.bool,
   setSelectable: PropTypes.func,
+  onPressOverride: PropTypes.func,
+  disableLongPressSelection: PropTypes.bool,
 };
 
 const styles = StyleSheet.create({

@@ -154,10 +154,6 @@ export const shadowRegressionStyles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.primary400,
     ...GlobalStyles.shadowGlowPrimary,
   },
-  addExpenseTemplateRow: {
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    ...GlobalStyles.strongShadow,
-  },
   scrollToTopFab: {
     backgroundColor: GlobalStyles.colors.backgroundColor,
     ...GlobalStyles.shadowPrimary,

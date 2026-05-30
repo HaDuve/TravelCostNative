@@ -483,7 +483,10 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      keyboardShouldPersistTaps="always"
+      style={styles.container}
+    >
       <ExpenseForm
         onCancel={cancelHandler}
         onSubmit={confirmHandler}

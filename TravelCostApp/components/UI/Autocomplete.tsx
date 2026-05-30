@@ -15,6 +15,9 @@ const suggestionMenuStackStyle = {
 /** Paper only draws outlined-label edge cover when roundness > 6 */
 const MIN_OUTLINE_ROUNDNESS = 8;
 
+/** Grace period after blur so the first tap can reach a suggestion while the keyboard closes */
+export const AUTOCOMPLETE_BLUR_DISMISS_MS = 200;
+
 function resolveFieldRoundness(style: object): number {
   const flat = StyleSheet.flatten(style) ?? {};
   const fromStyle =
@@ -36,8 +39,17 @@ const Autocomplete = ({
   const [value, setValue] = useState(origValue);
   const [menuVisible, setMenuVisible] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
-  const [blurTimeout, setBlurTimeout] = useState(null);
   const isSelectingRef = useRef(false);
+  const blurDismissTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
+
+  const clearBlurDismiss = () => {
+    if (blurDismissTimeoutRef.current) {
+      clearTimeout(blurDismissTimeoutRef.current);
+      blurDismissTimeoutRef.current = null;
+    }
+  };
 
   useEffect(() => {
     setValue(origValue);
@@ -47,14 +59,8 @@ const Autocomplete = ({
     if (origValue == "") setMenuVisible(false);
   }, [origValue]);
 
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (blurTimeout) {
-        clearTimeout(blurTimeout);
-      }
-    };
-  }, [blurTimeout]);
+  useEffect(() => clearBlurDismiss, []);
+
   /**
    * Filters the data array based on the provided text and removes duplicate results.
    * @param {string} text - The text to filter the data array with.
@@ -80,20 +86,30 @@ const Autocomplete = ({
   };
 
   const selectSuggestion = (autotext: string) => {
-    isSelectingRef.current = true;
-
-    if (blurTimeout) {
-      clearTimeout(blurTimeout);
-      setBlurTimeout(null);
+    if (value === autotext && !menuVisible) {
+      return;
     }
-
+    clearBlurDismiss();
+    isSelectingRef.current = true;
     origOnChange(autotext);
     setValue(autotext);
+    setMenuVisible(false);
+    isSelectingRef.current = false;
+  };
 
-    setTimeout(() => {
-      setMenuVisible(false);
-      isSelectingRef.current = false;
-    }, 50);
+  const handleSuggestionTouchStart = (autotext: string) => {
+    // Apply on touch start so selection wins over keyboard-dismiss blur.
+    selectSuggestion(autotext);
+  };
+
+  const scheduleBlurDismiss = () => {
+    clearBlurDismiss();
+    blurDismissTimeoutRef.current = setTimeout(() => {
+      if (!isSelectingRef.current) {
+        setMenuVisible(false);
+      }
+      blurDismissTimeoutRef.current = null;
+    }, AUTOCOMPLETE_BLUR_DISMISS_MS);
   };
 
   return (
@@ -129,13 +145,7 @@ const Autocomplete = ({
           if (isSelectingRef.current) {
             return;
           }
-
-          const timeoutId = setTimeout(() => {
-            if (!isSelectingRef.current) {
-              setMenuVisible(false);
-            }
-          }, 5000);
-          setBlurTimeout(timeoutId);
+          scheduleBlurDismiss();
         }}
         placeholder={placeholder}
         style={fieldStyle}
@@ -176,10 +186,12 @@ const Autocomplete = ({
                 styles.suggestionItem,
                 pressed && styles.suggestionItemPressed,
               ]}
+              onTouchStart={() => handleSuggestionTouchStart(autotext)}
               onPress={() => selectSuggestion(autotext)}
             >
               <Text
                 testID={`autocomplete-suggestion-${i}-text`}
+                pointerEvents="none"
                 style={styles.suggestionText}
                 numberOfLines={1}
               >

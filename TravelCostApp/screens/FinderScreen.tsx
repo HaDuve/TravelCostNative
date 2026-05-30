@@ -289,7 +289,10 @@ const FinderScreen = () => {
     <>
       {datepickerJSX}
       <View style={styles.container}>
-        <ScrollView contentContainerStyle={styles.cardContainer}>
+        <ScrollView
+          keyboardShouldPersistTaps="always"
+          contentContainerStyle={styles.cardContainer}
+        >
           <Text style={styles.titleText}>{i18n.t("finderTitle")}</Text>
           <View
             // scrollEnabled={false}

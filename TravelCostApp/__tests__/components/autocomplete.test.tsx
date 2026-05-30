@@ -1,10 +1,12 @@
 import * as React from "react";
 import { StyleSheet } from "react-native";
-import { fireEvent } from "@testing-library/react-native";
+import { act, fireEvent } from "@testing-library/react-native";
 
 import { TextInput as PaperTextInput } from "react-native-paper";
 
-import Autocomplete from "../../components/UI/Autocomplete";
+import Autocomplete, {
+  AUTOCOMPLETE_BLUR_DISMISS_MS,
+} from "../../components/UI/Autocomplete";
 import { GlobalStyles } from "../../constants/styles";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 
@@ -163,6 +165,108 @@ describe("Autocomplete", () => {
     );
 
     expect(itemStyle.paddingTop).toBe(itemStyle.paddingBottom);
+  });
+
+  it("keeps suggestions up briefly after blur so a keyboard-dismiss tap can still select", () => {
+    jest.useFakeTimers();
+    const screen = renderWithAppProviders(
+      <Autocomplete
+        value=""
+        label="Suchen"
+        data={suggestions}
+        showOnEmpty
+        onChange={jest.fn()}
+      />,
+      { wrapNavigation: false }
+    );
+
+    const field = screen.getByTestId("autocomplete-field");
+    fireEvent(field, "focus");
+    fireEvent(field, "blur");
+
+    expect(screen.getByTestId("autocomplete-suggestions")).toBeTruthy();
+
+    act(() => {
+      jest.advanceTimersByTime(AUTOCOMPLETE_BLUR_DISMISS_MS - 1);
+    });
+    expect(screen.getByTestId("autocomplete-suggestions")).toBeTruthy();
+
+    act(() => {
+      jest.advanceTimersByTime(1);
+    });
+    expect(screen.queryByTestId("autocomplete-suggestions")).toBeNull();
+
+    jest.useRealTimers();
+  });
+
+  it("applies a suggestion when blur from keyboard dismiss precedes the press", () => {
+    jest.useFakeTimers();
+    const onChange = jest.fn();
+    const screen = renderWithAppProviders(
+      <Autocomplete
+        value=""
+        label="Suchen"
+        data={suggestions}
+        showOnEmpty
+        onChange={onChange}
+      />,
+      { wrapNavigation: false }
+    );
+
+    fireEvent(screen.getByTestId("autocomplete-field"), "focus");
+    fireEvent(screen.getByTestId("autocomplete-field"), "blur");
+
+    const suggestion = screen.getByTestId("autocomplete-suggestion-0");
+    act(() => {
+      fireEvent(suggestion, "pressIn");
+      fireEvent.press(suggestion);
+    });
+
+    expect(onChange).toHaveBeenCalledWith("Tina");
+    expect(screen.queryByTestId("autocomplete-suggestions")).toBeNull();
+
+    jest.useRealTimers();
+  });
+
+  it("selects a filtered suggestion on touchStart while typing", () => {
+    const onChange = jest.fn();
+    const screen = renderWithAppProviders(
+      <Autocomplete
+        value=""
+        label="Description"
+        data={["Tina", "Thomas", "Essen"]}
+        showOnEmpty={false}
+        onChange={onChange}
+      />,
+      { wrapNavigation: false }
+    );
+
+    fireEvent.changeText(screen.getByTestId("autocomplete-field"), "T");
+    expect(screen.getByText("Tina")).toBeTruthy();
+
+    fireEvent(screen.getByTestId("autocomplete-suggestion-0"), "touchStart");
+
+    expect(onChange).toHaveBeenCalledWith("Tina");
+    expect(screen.queryByTestId("autocomplete-suggestions")).toBeNull();
+  });
+
+  it("still applies a suggestion when an item is pressed", () => {
+    const onChange = jest.fn();
+    const screen = renderWithAppProviders(
+      <Autocomplete
+        value=""
+        label="Suchen"
+        data={suggestions}
+        showOnEmpty
+        onChange={onChange}
+      />,
+      { wrapNavigation: false }
+    );
+
+    fireEvent(screen.getByTestId("autocomplete-field"), "focus");
+    fireEvent.press(screen.getByTestId("autocomplete-suggestion-0"));
+
+    expect(onChange).toHaveBeenCalledWith("Tina");
   });
 
   it("raises the container stacking while suggestions are visible", () => {

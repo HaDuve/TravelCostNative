@@ -30,7 +30,7 @@ import SplitSummaryScreen from "../../screens/SplitSummaryScreen";
 import * as splitUtil from "../../util/split";
 import { makeExpense } from "../fixtures/expense";
 import { renderWithAppProviders } from "../fixtures/app-providers";
-import { assertNoNestedVerticalFlatLists } from "../helpers/scroll-composition";
+import { assertNoNestedVerticalFlatLists } from "../../test-utils/scroll-composition";
 
 describe("Split Summary screen", () => {
   it("lists an open Balance from fixture expenses via rollupOpenBalances", async () => {

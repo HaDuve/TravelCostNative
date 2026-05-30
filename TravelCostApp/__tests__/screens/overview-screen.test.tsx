@@ -54,7 +54,7 @@ jest.mock("../../components/ExpensesOutput/ExpensesOverview", () => {
 import OverviewScreen from "../../screens/OverviewScreen";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 import { makeExpense } from "../fixtures/expense";
-import { assertNoNestedVerticalFlatLists } from "../helpers/scroll-composition";
+import { assertNoNestedVerticalFlatLists } from "../../test-utils/scroll-composition";
 
 const graphExpensesContext = {
   expenses: [makeExpense({ category: "Food", calcAmount: 42 })],

@@ -77,7 +77,7 @@ jest.mock("../../components/FeedbackForm/FeedbackForm", () => () => null);
 
 import ProfileScreen from "../../screens/ProfileScreen";
 import { renderWithAppProviders } from "../fixtures/app-providers";
-import { assertNoNestedVerticalFlatLists } from "../helpers/scroll-composition";
+import { assertNoNestedVerticalFlatLists } from "../../test-utils/scroll-composition";
 import { waitFor } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 

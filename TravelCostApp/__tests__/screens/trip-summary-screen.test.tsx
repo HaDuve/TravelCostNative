@@ -26,7 +26,7 @@ jest.mock("../../util/http", () => ({
 import TripSummaryScreen from "../../screens/TripSummaryScreen";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 import { i18n } from "../../i18n/i18n";
-import { assertNoNestedVerticalFlatLists } from "../helpers/scroll-composition";
+import { assertNoNestedVerticalFlatLists } from "../../test-utils/scroll-composition";
 
 describe("TripSummaryScreen", () => {
   // The whole screen used to be wrapped in a one-shot reanimated `entering`

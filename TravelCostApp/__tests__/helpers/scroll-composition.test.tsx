@@ -1,13 +1,20 @@
+import { existsSync } from "fs";
+import { join } from "path";
 import { FlatList } from "react-native";
 import type { ReactTestInstance } from "react-test-renderer";
 
-import { isVirtualizedListComponent } from "./scroll-composition";
+import { isVirtualizedListComponent } from "../../test-utils/scroll-composition";
 
 function mockNode(type: unknown, props: Record<string, unknown> = {}): ReactTestInstance {
   return { type, props, children: [] } as ReactTestInstance;
 }
 
 describe("scroll composition", () => {
+  it("keeps the helper module outside __tests__ so Jest does not run it as an empty suite", () => {
+    const legacyHelperPath = join(__dirname, "scroll-composition.ts");
+    expect(existsSync(legacyHelperPath)).toBe(false);
+  });
+
   it("treats Reanimated and Animated FlatList display names as virtualized lists", () => {
     expect(
       isVirtualizedListComponent(

@@ -37,7 +37,7 @@ jest.mock("../../util/version", () => ({
 
 import ChangelogScreen from "../../screens/ChangelogScreen";
 import { renderWithAppProviders } from "../fixtures/app-providers";
-import { assertNoNestedVerticalFlatLists } from "../helpers/scroll-composition";
+import { assertNoNestedVerticalFlatLists } from "../../test-utils/scroll-composition";
 
 describe("Changelog screen", () => {
   it("renders changelog entries when sections are expanded", () => {

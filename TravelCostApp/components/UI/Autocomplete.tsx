@@ -1,12 +1,17 @@
 // Autocomplete/index.js
 
-import { View, Platform } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Menu, TextInput } from "react-native-paper";
 import React, { useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
 import { GlobalStyles } from "../../constants/styles";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { dynamicScale } from "../../util/scalingUtil";
+
+const suggestionMenuStackStyle = {
+  zIndex: 1000,
+  elevation: 8,
+};
 
 const Autocomplete = ({
   value: origValue,
@@ -54,9 +59,25 @@ const Autocomplete = ({
     return [...new Set(filteredData)];
   }
 
+  const fieldBackground =
+    (StyleSheet.flatten(style)?.backgroundColor as string | undefined) ??
+    GlobalStyles.colors.backgroundColorLight;
+
   return (
-    <View style={containerStyle}>
+    <View
+      testID="autocomplete-container"
+      style={[
+        containerStyle,
+        { overflow: "visible", zIndex: menuVisible ? 10 : 1 },
+      ]}
+    >
       <TextInput
+        testID="autocomplete-field"
+        theme={{
+          colors: {
+            background: fieldBackground,
+          },
+        }}
         selectTextOnFocus
         onFocus={() => {
           if (value?.length === 0) {
@@ -109,9 +130,13 @@ const Autocomplete = ({
       />
       {menuVisible && filteredData && filteredData.length > 0 && (
         <Animated.View
+          testID="autocomplete-suggestions"
           entering={FadeIn.duration(500)}
-          style={{ maxWidth: "100%" }}
-          // exiting={FadeOutUp}
+          style={[
+            { maxWidth: "100%" },
+            menuStyle,
+            suggestionMenuStackStyle,
+          ]}
         >
           {
             // only show the newest 3 items

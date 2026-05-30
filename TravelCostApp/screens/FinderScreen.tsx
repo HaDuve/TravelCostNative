@@ -295,7 +295,7 @@ const FinderScreen = () => {
             // scrollEnabled={false}
             style={{ flex: 1, minHeight: "50%" }}
           >
-            <View style={styles.rowContainer}>
+            <View style={[styles.rowContainer, styles.searchRowContainer]}>
               <View style={styles.checkBoxContainer}>
                 <Checkbox
                   status={checkedQuery ? "checked" : "unchecked"}
@@ -337,7 +337,7 @@ const FinderScreen = () => {
                 ></IconButton>
               )}
             </View>
-            <View style={styles.rowContainer}>
+            <View style={[styles.rowContainer, styles.dateRowContainer]}>
               <View style={styles.checkBoxContainer}>
                 <Checkbox
                   status={checkedDate ? "checked" : "unchecked"}
@@ -457,6 +457,12 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     minHeight: dynamicScale(90, true),
   },
+  searchRowContainer: {
+    zIndex: 10,
+  },
+  dateRowContainer: {
+    zIndex: 1,
+  },
   titleText: {
     fontSize: dynamicScale(32, false, 0.5),
     fontWeight: "bold",
@@ -484,10 +490,10 @@ const styles = StyleSheet.create({
     marginLeft: dynamicScale(18),
     maxWidth: dynamicScale(180),
     backgroundColor: GlobalStyles.colors.backgroundColorLight,
+    overflow: "visible",
     ...GlobalStyles.shadowGlowPrimary,
   },
   autoCompleteStyle: {
-    zIndex: 0,
     fontSize: dynamicScale(16, false, 0.4),
     paddingVertical: dynamicScale(2, false, 2),
     paddingHorizontal: dynamicScale(2),
@@ -499,7 +505,6 @@ const styles = StyleSheet.create({
     marginBottom: dynamicScale(20, true),
   },
   autoCompleteMenuStyle: {
-    zIndex: 0,
     marginLeft: dynamicScale(8),
     marginBottom: dynamicScale(-1, true),
   },

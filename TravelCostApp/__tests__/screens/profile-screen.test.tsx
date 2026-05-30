@@ -36,9 +36,7 @@ jest.mock("../../util/http", () => ({
   fetchChangelog: jest.fn(async () => null),
   storeExpoPushTokenInTrip: jest.fn(async () => {}),
   fetchTripName: jest.fn(async () => "Japan 2026"),
-  getTravellers: jest.fn(async () => ({
-    travellers: [{ userName: "Alice" }, { userName: "Bob" }],
-  })),
+  getTravellers: jest.fn(async () => ["Alice", "Bob"]),
   getTripData: jest.fn(async () => ({
     dailyBudget: "100",
     totalBudget: "3000",
@@ -140,5 +138,35 @@ describe("Profile screen", () => {
     });
 
     assertNoNestedVerticalFlatLists(screen.root);
+  });
+
+  it("shows Traveller chips on trip history cards", async () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
+        expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
+        user: {
+          userName: "Alice",
+          freshlyCreated: false,
+          tripHistory: ["t1"],
+          loadUserNameFromStorage: jest.fn(),
+          updateTripHistory: jest.fn(async () => {}),
+          needsTour: false,
+          setNeedsTour: jest.fn(),
+          hasNewChanges: false,
+          setHasNewChanges: jest.fn(),
+          setUserName: jest.fn(async () => {}),
+          setTripHistory: jest.fn(),
+        },
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("trip-traveller-Alice")).toBeTruthy();
+      expect(screen.getByTestId("trip-traveller-Bob")).toBeTruthy();
+    });
   });
 });

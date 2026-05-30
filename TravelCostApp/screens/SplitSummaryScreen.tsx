@@ -301,6 +301,7 @@ const SplitSummaryScreen = ({ navigation }) => {
       const item = itemData.item;
       return (
         <Pressable
+          testID={`split-balance-row-${item.userName}-${item.whoPaid}`}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             navigation.navigate("FilteredExpenses", {
@@ -606,7 +607,7 @@ const styles = StyleSheet.create({
     }),
   },
   splitContainer: {
-    flex: 1,
+    alignSelf: "stretch",
     flexDirection: "row",
     paddingHorizontal: dynamicScale(16, false, 0.5),
     paddingVertical: dynamicScale(8, false, 0.5),

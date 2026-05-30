@@ -431,17 +431,18 @@ function TripHistoryItem({ tripid, trips }) {
   function renderTravellers({ item }: { item: { userName?: string } }) {
     if (!item?.userName) return <></>;
     return (
-      <View style={{ width: "50%" }}>
-        <View style={[GlobalStyles.strongShadow, styles.travellerCard]}>
-          <View style={[styles.avatar, GlobalStyles.shadowPrimary]}>
-            <Text style={styles.avatarText}>
-              {item.userName.charAt(0)}
-            </Text>
-          </View>
-          <Text style={styles.travellerNameText}>
-            {truncateString(item.userName, 10)}
+      <View
+        testID={`trip-traveller-${item.userName}`}
+        style={[GlobalStyles.strongShadow, styles.travellerCard]}
+      >
+        <View style={[styles.avatar, GlobalStyles.shadowPrimary]}>
+          <Text style={styles.avatarText}>
+            {item.userName.charAt(0)}
           </Text>
         </View>
+        <Text style={styles.travellerNameText}>
+          {truncateString(item.userName, 10)}
+        </Text>
       </View>
     );
   }
@@ -573,13 +574,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   travellerCard: {
-    flex: 1,
+    width: "48%",
     flexDirection: "row",
     justifyContent: "flex-start",
     margin: dynamicScale(4),
     padding: dynamicScale(8, false, 0.5),
     borderRadius: dynamicScale(16, false, 0.5),
-    maxWidth: "45%",
     backgroundColor: GlobalStyles.colors.backgroundColor,
     // android styles
     ...Platform.select({

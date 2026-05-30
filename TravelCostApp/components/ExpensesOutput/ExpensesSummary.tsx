@@ -307,12 +307,12 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
 
   return (
     <Pressable
+      testID="expenses-summary-pressable"
       onPress={() => pressBudgetHandler()}
       style={({ pressed }) => [
+        shadowRegressionStyles.expensesSummaryContainer,
         styles.container,
-        shadowRegressionStyles.expensesSummaryPressable,
         style,
-        GlobalStyles.shadow,
         pressed && GlobalStyles.pressedWithShadow,
       ]}
     >
@@ -349,9 +349,6 @@ ExpensesSummary.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    maxWidth: "50%",
-    alignItems: "center",
     ...Platform.select({
       ios: {
         paddingTop: dynamicScale(4, true),

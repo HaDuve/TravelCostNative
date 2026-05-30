@@ -53,13 +53,21 @@ describe("shadow styles", () => {
     expect(flat.borderRadius).toBeUndefined();
   });
 
-  it("expenses summary pressable co-locates shadow and backgroundColor", () => {
-    assertSolidBackgroundForShadow(
-      StyleSheet.flatten([
-        shadowRegressionStyles.expensesSummaryPressable,
-        { shadowColor: "#BFBFBF", shadowOpacity: 0.75 },
-      ])
-    );
+  it("expenses summary container matches overview dropdown shadow chrome", () => {
+    const summary = StyleSheet.flatten(
+      shadowRegressionStyles.expensesSummaryContainer
+    ) as Record<string, unknown>;
+    const dropdown = StyleSheet.flatten(
+      shadowRegressionStyles.overviewDropdownContainer
+    ) as Record<string, unknown>;
+
+    assertSolidBackgroundForShadow(summary);
+    expect(summary.borderWidth).toBeGreaterThan(0);
+    expect(summary.borderRadius).toBe(dropdown.borderRadius);
+    expect(summary.backgroundColor).toBe(dropdown.backgroundColor);
+    expect(summary.shadowColor).toBe(dropdown.shadowColor);
+    expect(summary.shadowOpacity).toBe(dropdown.shadowOpacity);
+    expect(summary.shadowRadius).toBe(dropdown.shadowRadius);
   });
 
   it("expense country flag container co-locates shadow and backgroundColor", () => {

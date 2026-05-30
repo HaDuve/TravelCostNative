@@ -1,5 +1,6 @@
 import { DuplicateOption } from "../../util/expense";
 import { expandRangedExpense } from "../../util/expand-ranged-expense";
+import { asPeriodSlice, sumByPeriod, sumForTrip } from "../../util/expenseTotals";
 import { makeExpense } from "../fixtures/expense";
 
 describe("expandRangedExpense", () => {
@@ -137,6 +138,42 @@ describe("expandRangedExpense", () => {
     );
 
     expect(expanded.every((e) => e.amount === 50)).toBe(true);
+  });
+
+  it("ranged split per-day instances reconstruct the original total in trip total spent", () => {
+    const dates = [
+      new Date("2026-01-15T12:00:00.000Z"),
+      new Date("2026-01-16T12:00:00.000Z"),
+      new Date("2026-01-17T12:00:00.000Z"),
+    ];
+    const source = makeExpense({
+      amount: 150,
+      calcAmount: 150,
+      duplOrSplit: DuplicateOption.split,
+    });
+    const expanded = expandRangedExpense(source, { rangeId: "r1", dates }).map(
+      (expense, index) => ({ ...expense, id: `e${index}` })
+    );
+
+    expect(sumForTrip(expanded)).toBe(150);
+  });
+
+  it("ranged duplicate counts once in trip total spent and every day in period spend", () => {
+    const dates = [
+      new Date("2026-01-15T12:00:00.000Z"),
+      new Date("2026-01-16T12:00:00.000Z"),
+    ];
+    const expanded = expandRangedExpense(
+      makeExpense({
+        amount: 50,
+        calcAmount: 50,
+        duplOrSplit: DuplicateOption.duplicate,
+      }),
+      { rangeId: "r1", dates }
+    ).map((expense, index) => ({ ...expense, id: `e${index}` }));
+
+    expect(sumForTrip(expanded)).toBe(50);
+    expect(sumByPeriod(asPeriodSlice(expanded))).toBe(100);
   });
 
   it("does not mutate the submitted expense data", () => {

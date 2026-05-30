@@ -3,26 +3,31 @@ import { Platform, StyleSheet } from "react-native";
 import { GlobalStyles } from "../constants/styles";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 
+const statisticsCardShadow = {
+  backgroundColor: GlobalStyles.colors.backgroundColor,
+  borderRadius: dynamicScale(10, false, 0.5),
+  ...Platform.select({
+    ios: {
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 1,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 2.84,
+    },
+    android: {
+      elevation: 5,
+    },
+  }),
+};
+
 export const shadowRegressionStyles = StyleSheet.create({
+  statisticsPieCategoryCard: statisticsCardShadow,
   expenseGraphCategoryCard: {
     height: dynamicScale(65, true),
     minWidth: dynamicScale(200),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: dynamicScale(10, false, 0.5),
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 1,
-          height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 2.84,
-      },
-      android: {
-        elevation: 5,
-      },
-    }),
+    ...statisticsCardShadow,
   },
   overviewDropdownContainer: {
     maxWidth: dynamicScale(170, false, 0.5),

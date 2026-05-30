@@ -183,16 +183,7 @@ const styles = StyleSheet.create({
     marginBottom: dynamicScale(20, true),
     marginHorizontal: dynamicScale(16),
     paddingBottom: dynamicScale(12, true),
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 1,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 2.84,
-    elevation: 5,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: dynamicScale(10, false, 0.5),
+    ...shadowRegressionStyles.statisticsPieCategoryCard,
   },
   countryFlagContainerStyle: {
     marginBottom: dynamicScale(3, true),

@@ -33,6 +33,12 @@ describe("shadow styles", () => {
     );
   });
 
+  it("statistics pie category card shadow includes backgroundColor", () => {
+    assertSolidBackgroundForShadow(
+      StyleSheet.flatten(shadowRegressionStyles.statisticsPieCategoryCard)
+    );
+  });
+
   it("overview dropdown shadow style includes backgroundColor", () => {
     assertSolidBackgroundForShadow(
       StyleSheet.flatten(shadowRegressionStyles.overviewDropdownContainer)

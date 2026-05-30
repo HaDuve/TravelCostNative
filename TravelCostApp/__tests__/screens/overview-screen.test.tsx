@@ -56,6 +56,16 @@ import { renderWithAppProviders } from "../fixtures/app-providers";
 import { makeExpense } from "../fixtures/expense";
 import { assertNoNestedVerticalFlatLists } from "../helpers/scroll-composition";
 
+const graphExpensesContext = {
+  expenses: [makeExpense({ category: "Food", calcAmount: 42 })],
+  getRecentExpenses: () => [makeExpense({ category: "Food", calcAmount: 42 })],
+  getMonthlyExpenses: () => ({
+    firstDay: new Date("2026-05-01"),
+    lastDay: new Date("2026-05-31"),
+    monthlyExpenses: [makeExpense({ category: "Food", calcAmount: 42 })],
+  }),
+};
+
 describe("Overview screen", () => {
   it("shows the trip name in the header", () => {
     const navigation = { navigate: jest.fn() };
@@ -74,7 +84,7 @@ describe("Overview screen", () => {
     expect(screen.getByText(/Japan 2026/)).toBeTruthy();
   });
 
-  it("does not nest vertical FlatList inside ScrollView", () => {
+  it("does not nest vertical FlatList inside ScrollView in pie mode", () => {
     const navigation = { navigate: jest.fn() };
     const screen = renderWithAppProviders(
       <OverviewScreen navigation={navigation as any} />,
@@ -92,6 +102,40 @@ describe("Overview screen", () => {
     );
 
     assertNoNestedVerticalFlatLists(screen.root);
+  });
+
+  it("does not nest vertical FlatList inside ScrollView in graph mode", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <OverviewScreen navigation={navigation as any} />,
+      {
+        user: {
+          needsTour: false,
+          isShowingGraph: true,
+          setIsShowingGraph: jest.fn(),
+        },
+        expenses: graphExpensesContext,
+      }
+    );
+
+    assertNoNestedVerticalFlatLists(screen.root);
+  });
+
+  it("passes pull-to-refresh control to the graph statistics section", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <OverviewScreen navigation={navigation as any} />,
+      {
+        user: {
+          needsTour: false,
+          isShowingGraph: true,
+          setIsShowingGraph: jest.fn(),
+        },
+        expenses: graphExpensesContext,
+      }
+    );
+
+    expect(screen.getByTestId("overview-refresh-control")).toBeTruthy();
   });
 
   it("shows pie chart statistics when graph mode is off", () => {

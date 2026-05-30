@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Pressable, Platform } from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 import * as Haptics from "expo-haptics";
 
 import React, { useContext, useMemo } from "react";
@@ -617,12 +617,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: dynamicScale(24),
     marginHorizontal: dynamicScale(20),
     marginTop: dynamicScale(4, true),
-    ...Platform.select({
-      android: {
-        elevation: 5,
-        borderRadius: 10,
-      },
-    }),
     marginBottom: dynamicScale(8, true),
     borderRadius: dynamicScale(10, false, 0.5),
     flexDirection: "row",
@@ -639,19 +633,5 @@ const styles = StyleSheet.create({
   },
   red: {
     color: GlobalStyles.colors.error300,
-  },
-  shadow: {
-    borderTopWidth: 1,
-    borderBottomWidth: 0,
-    borderTopColor: GlobalStyles.colors.gray600,
-    borderBottomColor: GlobalStyles.colors.gray600,
-    minHeight: 1,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    elevation: 2,
-    shadowColor: GlobalStyles.colors.textColor,
-    shadowOffset: { width: 1, height: 2.5 },
-    shadowOpacity: 0.9,
-    shadowRadius: 4,
-    zIndex: 2,
   },
 });

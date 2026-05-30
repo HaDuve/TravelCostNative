@@ -154,6 +154,11 @@ describe("draft round-trip", () => {
 describe("summarizeDraftChanges", () => {
   const baseline = { lastCountry: "DE", lastCurrency: "EUR" };
 
+  it("returns no lines when draft or baseline is missing", () => {
+    expect(summarizeDraftChanges(undefined, baseline)).toEqual([]);
+    expect(summarizeDraftChanges(makeExpense(), undefined)).toEqual([]);
+  });
+
   it("lists changed draft fields with localized labels", () => {
     const lines = summarizeDraftChanges(
       makeExpense({

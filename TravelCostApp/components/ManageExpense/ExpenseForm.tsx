@@ -52,6 +52,10 @@ import {
 import { useSplitEditor } from "../../hooks/useSplitEditor";
 import { useExpenseFx } from "../../hooks/useExpenseFx";
 import { useExpenseFormInputs } from "../../hooks/useExpenseFormInputs";
+import {
+  resolveDefaultNewExpenseCountry,
+  resolveDefaultNewExpenseCurrency,
+} from "../../util/expense-form-inputs";
 import { useCategoryAutomap } from "../../hooks/useCategoryAutomap";
 import {
   buildExpenseData,
@@ -153,7 +157,7 @@ export type ExpenseFormProps = {
   onSubmit: (expenseData: ExpenseFormSubmitPayload) => Promise<void>;
   submitButtonLabel: string;
   isEditing: boolean;
-  defaultValues: ExpenseData;
+  defaultValues?: ExpenseData;
   pickedCat: string;
   navigation: NavigationProp<any>;
   editedExpenseId: string;
@@ -185,7 +189,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   const { isPortrait, isTablet } = useContext(OrientationContext);
   const hideSpecial = settings.hideSpecialExpenses;
   const alwaysShowAdvancedSetting = settings.alwaysShowAdvanced || isEditing;
-  const editingValues: ExpenseData = defaultValues;
+  const editingValues = defaultValues;
 
   // Helper function to get most recent valid expense from current trip for defaults
   const getMostRecentTripExpense = useCallback(() => {
@@ -211,21 +215,54 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   const mostRecentExpense = getMostRecentTripExpense();
 
-  const lastCurrency = userCtx.lastCurrency
-    ? userCtx.lastCurrency
-    : tripCtx.tripCurrency;
-  const currencyPlaceholder = isEditing
-    ? editingValues.currency + " | " + getCurrencySymbol(editingValues.currency)
-    : lastCurrency + " | " + getCurrencySymbol(lastCurrency);
-  const countryPlaceholder = isEditing
-    ? editingValues.country
-    : (userCtx.lastCountry ?? "");
+  const defaultNewExpenseCurrency = useMemo(
+    () =>
+      isEditing && editingValues
+        ? editingValues.currency
+        : resolveDefaultNewExpenseCurrency({
+            lastCurrency: userCtx.lastCurrency,
+            tripCurrency: tripCtx.tripCurrency,
+            mostRecentExpenseCurrency: mostRecentExpense?.currency,
+          }),
+    [
+      isEditing,
+      editingValues?.currency,
+      mostRecentExpense?.currency,
+      tripCtx.tripCurrency,
+      userCtx.lastCurrency,
+    ]
+  );
+
+  const defaultNewExpenseCountry = useMemo(
+    () =>
+      isEditing && editingValues
+        ? editingValues.country
+        : resolveDefaultNewExpenseCountry({
+            lastCountry: userCtx.lastCountry,
+            mostRecentExpenseCountry: mostRecentExpense?.country,
+          }),
+    [
+      isEditing,
+      editingValues?.country,
+      mostRecentExpense?.country,
+      userCtx.lastCountry,
+    ]
+  );
+
+  const currencyPlaceholder =
+    isEditing && editingValues
+      ? editingValues.currency + " | " + getCurrencySymbol(editingValues.currency)
+      : defaultNewExpenseCurrency +
+        " | " +
+        getCurrencySymbol(defaultNewExpenseCurrency);
+  const countryPlaceholder =
+    isEditing && editingValues ? editingValues.country : defaultNewExpenseCountry;
   const [hideAdvanced, sethideAdvanced] = useState(true);
   const [currencyPickerValue, setCurrencyPickerValue] = useState(
-    isEditing ? editingValues.currency : lastCurrency
+    defaultNewExpenseCurrency
   );
   const [countryPickerValue, setCountryPickerValue] = useState(
-    isEditing ? editingValues.country : userCtx.lastCountry
+    defaultNewExpenseCountry
   );
   const [loadingTravellers, setLoadingTravellers] = useState(
     !tripCtx.travellers && tripCtx.travellers?.length < 1
@@ -281,23 +318,13 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         isValid: true,
       },
       country: {
-        value: editingValues
-          ? editingValues.country
-          : mostRecentExpense?.country
-            ? mostRecentExpense.country
-            : userCtx.lastCountry
-              ? userCtx.lastCountry
-              : "",
+        value: editingValues ? editingValues.country : defaultNewExpenseCountry,
         isValid: true,
       },
       currency: {
         value: editingValues
           ? editingValues.currency
-          : mostRecentExpense?.currency
-            ? mostRecentExpense.currency
-            : userCtx.lastCurrency
-              ? userCtx.lastCurrency
-              : tripCtx.tripCurrency,
+          : defaultNewExpenseCurrency,
         isValid: true,
       },
       whoPaid: {
@@ -307,13 +334,10 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     }),
     [
       editingValues,
-      mostRecentExpense?.country,
-      mostRecentExpense?.currency,
+      defaultNewExpenseCountry,
+      defaultNewExpenseCurrency,
       newCat,
       pickedCat,
-      tripCtx.tripCurrency,
-      userCtx.lastCountry,
-      userCtx.lastCurrency,
     ]
   );
 
@@ -339,6 +363,63 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       autoExpenseLinearSplitAdjustRef.current(inputIdentifier, enteredValue);
     },
   });
+
+  useEffect(() => {
+    if (isEditing || !userCtx.lastCurrency) return;
+
+    const preferred = resolveDefaultNewExpenseCurrency({
+      lastCurrency: userCtx.lastCurrency,
+      tripCurrency: tripCtx.tripCurrency,
+      mostRecentExpenseCurrency: mostRecentExpense?.currency,
+    });
+    const beforeLastCurrencyLoaded = resolveDefaultNewExpenseCurrency({
+      lastCurrency: "",
+      tripCurrency: tripCtx.tripCurrency,
+      mostRecentExpenseCurrency: mostRecentExpense?.currency,
+    });
+
+    if (
+      inputs.currency.value === beforeLastCurrencyLoaded &&
+      preferred !== inputs.currency.value
+    ) {
+      inputChangedHandler("currency", preferred);
+      setCurrencyPickerValue(preferred);
+    }
+  }, [
+    isEditing,
+    inputChangedHandler,
+    inputs.currency.value,
+    mostRecentExpense?.currency,
+    tripCtx.tripCurrency,
+    userCtx.lastCurrency,
+  ]);
+
+  useEffect(() => {
+    if (isEditing || !userCtx.lastCountry) return;
+
+    const preferred = resolveDefaultNewExpenseCountry({
+      lastCountry: userCtx.lastCountry,
+      mostRecentExpenseCountry: mostRecentExpense?.country,
+    });
+    const beforeLastCountryLoaded = resolveDefaultNewExpenseCountry({
+      lastCountry: "",
+      mostRecentExpenseCountry: mostRecentExpense?.country,
+    });
+
+    if (
+      inputs.country.value === beforeLastCountryLoaded &&
+      preferred !== inputs.country.value
+    ) {
+      inputChangedHandler("country", preferred);
+      setCountryPickerValue(preferred);
+    }
+  }, [
+    isEditing,
+    inputChangedHandler,
+    inputs.country.value,
+    mostRecentExpense?.country,
+    userCtx.lastCountry,
+  ]);
 
   const [showDatePickerRange, setShowDatePickerRange] = useState(false);
   const [startDate, setStartDate] = useState(
@@ -1041,15 +1122,23 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       inputChangedHandler("category", arg);
     }
     if (!inputs.country.isValid) {
-      // Use trip-specific default first, then fall back to user context
-      const defaultCountry = mostRecentExpense?.country || userCtx.lastCountry;
-      inputChangedHandler("country", defaultCountry);
+      inputChangedHandler(
+        "country",
+        resolveDefaultNewExpenseCountry({
+          lastCountry: userCtx.lastCountry,
+          mostRecentExpenseCountry: mostRecentExpense?.country,
+        })
+      );
     }
     if (!inputs.currency.isValid) {
-      // Use trip-specific default first, then fall back to user context
-      const defaultCurrency =
-        mostRecentExpense?.currency || userCtx.lastCurrency;
-      inputChangedHandler("currency", defaultCurrency);
+      inputChangedHandler(
+        "currency",
+        resolveDefaultNewExpenseCurrency({
+          lastCurrency: userCtx.lastCurrency,
+          tripCurrency: tripCtx.tripCurrency,
+          mostRecentExpenseCurrency: mostRecentExpense?.currency,
+        })
+      );
     }
     if (!inputs.whoPaid.isValid) {
       setWhoPaidWithLogging(userCtx.userName);

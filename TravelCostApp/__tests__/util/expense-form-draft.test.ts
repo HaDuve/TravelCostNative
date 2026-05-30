@@ -13,6 +13,7 @@ import {
   summarizeDraftChanges,
   toExpenseDraft,
 } from "../../util/expense-form-draft";
+import { buildExpenseData } from "../../util/expense-form-submit";
 
 function dateFromIso(iso: string): Date {
   return DateTime.fromISO(iso).toJSDate();
@@ -41,7 +42,7 @@ describe("toExpenseDraft", () => {
     expect(draft.endDate).toEqual(dateFromIso("2026-01-16"));
   });
 
-  it("keeps display amount separate from resolved calcAmount when amountInput differs", () => {
+  it("uses resolved amountValue for amount and calcAmount when quick-sum differs from field text", () => {
     const draft = toExpenseDraft(
       makeExpenseFormSnapshot({
         amountInput: "10",
@@ -49,8 +50,19 @@ describe("toExpenseDraft", () => {
       })
     );
 
-    expect(draft.amount).toBe(10);
+    expect(draft.amount).toBe(25);
     expect(draft.calcAmount).toBe(25);
+  });
+
+  it("persists the same resolved amount that advanced submit validates", () => {
+    const snapshot = makeExpenseFormSnapshot({
+      amountInput: "10",
+      amountValue: 25,
+    });
+
+    expect(toExpenseDraft(snapshot).amount).toBe(
+      buildExpenseData(snapshot).amount
+    );
   });
 });
 
@@ -99,7 +111,7 @@ describe("draft round-trip", () => {
     });
     const restored = applyDraftToForm(toExpenseDraft(snapshot));
 
-    expect(restored.inputs?.amount?.value).toBe("10");
+    expect(restored.inputs?.amount?.value).toBe("25");
     expect(restored.inputs?.description?.value).toBe(snapshot.description);
     expect(restored.inputs?.category?.value).toBe(snapshot.categoryInput);
     expect(restored.inputs?.country?.value).toBe(snapshot.country);

@@ -429,13 +429,11 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   };
 
   async function confirmHandler(payload: ExpenseFormSubmitPayload): Promise<void> {
-    // Fast submit omits categoryString/calcAmount; this handler completes the shape.
-    const expenseData = payload as ExpenseData;
+    const expenseData = payload;
     try {
-      // set the category to the corresponting catstring
+      // Normalize localized category label and trip-currency calcAmount (FX) on every submit path.
       expenseData.categoryString = getCatLocalized(expenseData.category);
 
-      // calc calcAmount from amount, currency and TripCtx.tripCurrency and add it to expenseData
       const base = tripCtx.tripCurrency;
       const target = expenseData.currency;
       const rate = await getRate(base, target);

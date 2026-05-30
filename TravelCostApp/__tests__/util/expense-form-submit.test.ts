@@ -115,7 +115,7 @@ describe("buildExpenseData", () => {
 });
 
 describe("buildFastExpenseData", () => {
-  it("assembles fast-path ExpenseData with deliberate omissions", () => {
+  it("assembles fast-path ExpenseData with the same core fields as advanced submit", () => {
     const snapshot = makeExpenseFormSnapshot({
       pickedCat: "food",
       lastCountry: "FR",
@@ -129,11 +129,13 @@ describe("buildFastExpenseData", () => {
     expect(built).toEqual({
       uid: "u1",
       amount: 42.5,
+      calcAmount: 42.5,
       date: rangeStart,
       startDate: rangeStart,
       endDate: dateFromIso("2026-01-16"),
       description: getCatLocalized("food"),
       category: "food",
+      categoryString: getCatLocalized("food"),
       country: "FR",
       currency: "USD",
       whoPaid: "Bob",
@@ -144,10 +146,8 @@ describe("buildFastExpenseData", () => {
       paidBack: "not paid",
       isSpecialExpense: false,
       duplOrSplit: 0,
+      alreadyDividedAmountByDays: false,
     });
-    expect(built).not.toHaveProperty("calcAmount");
-    expect(built).not.toHaveProperty("categoryString");
-    expect(built).not.toHaveProperty("alreadyDividedAmountByDays");
   });
 
   it("uses empty country when lastCountry is unset", () => {

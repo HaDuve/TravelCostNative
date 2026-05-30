@@ -11,7 +11,7 @@ import { splitType } from "./split";
 
 export type ExpenseFormSnapshot = {
   uid: string;
-  /** Raw amount field text; defaults to {@link amountValue} when omitted (draft save path). */
+  /** Raw amount field text from the form input; submit and draft persistence use {@link amountValue}. */
   amountInput?: string | number;
   amountValue: string | number;
   dateIso: string;
@@ -52,16 +52,8 @@ export type BuiltAdvancedExpenseData = ExpenseData & {
   alreadyDividedAmountByDays: boolean;
 };
 
-/** Fast submit deliberately omits these fields (see issue #270). */
-export type BuiltFastExpenseData = Omit<
-  ExpenseData,
-  "calcAmount" | "categoryString" | "alreadyDividedAmountByDays"
->;
-
-/** Payload from ExpenseForm before ManageExpense fills FX/category fields. */
-export type ExpenseFormSubmitPayload =
-  | BuiltAdvancedExpenseData
-  | BuiltFastExpenseData;
+/** Payload from ExpenseForm before ManageExpense applies FX conversion on submit. */
+export type ExpenseFormSubmitPayload = BuiltAdvancedExpenseData;
 
 function sharedExpenseCore(snapshot: ExpenseFormSnapshot) {
   return {
@@ -112,7 +104,7 @@ export function buildExpenseData(
 
 export function buildFastExpenseData(
   snapshot: ExpenseFormSnapshot
-): BuiltFastExpenseData {
+): BuiltAdvancedExpenseData {
   const rangeDate = DateTime.fromISO(snapshot.startDateIso).toJSDate();
 
   return {
@@ -122,10 +114,13 @@ export function buildFastExpenseData(
     endDate: DateTime.fromISO(snapshot.endDateIso).toJSDate(),
     description: getCatLocalized(snapshot.pickedCat),
     category: snapshot.pickedCat,
+    categoryString: getCatLocalized(snapshot.pickedCat),
+    calcAmount: +snapshot.amountValue,
     country: snapshot.lastCountry ? snapshot.lastCountry : "",
     currency: snapshot.lastCurrency,
     whoPaid: snapshot.userName,
     listEQUAL: snapshot.listEQUAL,
+    alreadyDividedAmountByDays: snapshot.alreadyDividedAmountByDays,
   };
 }
 

@@ -46,8 +46,7 @@ export function useExpenseFx({
 
       if (splitList?.length > 0) {
         splitList.forEach((split) => {
-          split.rate = rate;
-          splitConvertedAmounts.push((split.amount / split.rate).toFixed(2));
+          splitConvertedAmounts.push((split.amount / rate).toFixed(2));
         });
       }
 

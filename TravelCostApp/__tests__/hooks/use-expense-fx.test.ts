@@ -63,11 +63,12 @@ describe("useExpenseFx", () => {
     });
   });
 
-  it("mutates split.rate in place and exposes per-split converted amounts", async () => {
+  it("does not mutate splitList entries when computing converted amounts", async () => {
     const splitList = [
       makeSplit({ userName: "A", amount: 100 }),
       makeSplit({ userName: "B", amount: 50 }),
     ];
+    const splitListBefore = splitList.map((split) => ({ ...split }));
     const getRate = jest.fn(async () => 2);
 
     const { result } = renderHook(() =>
@@ -84,7 +85,6 @@ describe("useExpenseFx", () => {
       expect(result.current.splitListCalcAmounts).toEqual(["50.00", "25.00"]);
     });
 
-    expect(splitList[0].rate).toBe(2);
-    expect(splitList[1].rate).toBe(2);
+    expect(splitList).toEqual(splitListBefore);
   });
 });

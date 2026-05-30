@@ -38,13 +38,12 @@ export function toExpenseDraft(
   snapshot: ExpenseFormSnapshot,
   overrides: Partial<ExpenseData> = {}
 ): ExpenseData {
-  const amountInput = snapshot.amountInput ?? snapshot.amountValue;
   const resolvedAmount = +snapshot.amountValue;
 
   return {
     category: snapshot.categoryInput,
     description: snapshot.description,
-    amount: +amountInput,
+    amount: resolvedAmount,
     date: createSafeDate(snapshot.dateIso),
     startDate: createSafeDate(snapshot.startDateIso),
     endDate: createSafeDate(snapshot.endDateIso),

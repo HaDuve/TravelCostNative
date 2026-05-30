@@ -107,12 +107,17 @@ export function buildFastExpenseData(
 ): BuiltAdvancedExpenseData {
   const rangeDate = DateTime.fromISO(snapshot.startDateIso).toJSDate();
 
+  let description = snapshot.description;
+  if (description === "") {
+    description = getCatLocalized(snapshot.pickedCat);
+  }
+
   return {
     ...sharedExpenseCore(snapshot),
     date: rangeDate,
     startDate: rangeDate,
     endDate: DateTime.fromISO(snapshot.endDateIso).toJSDate(),
-    description: getCatLocalized(snapshot.pickedCat),
+    description,
     category: snapshot.pickedCat,
     categoryString: getCatLocalized(snapshot.pickedCat),
     calcAmount: +snapshot.amountValue,

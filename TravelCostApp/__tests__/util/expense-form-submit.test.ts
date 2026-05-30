@@ -133,7 +133,7 @@ describe("buildFastExpenseData", () => {
       date: rangeStart,
       startDate: rangeStart,
       endDate: dateFromIso("2026-01-16"),
-      description: getCatLocalized("food"),
+      description: "Lunch",
       category: "food",
       categoryString: getCatLocalized("food"),
       country: "FR",
@@ -156,6 +156,28 @@ describe("buildFastExpenseData", () => {
     );
 
     expect(built.country).toBe("");
+  });
+
+  it("keeps user-edited description instead of overwriting with category label", () => {
+    const built = buildFastExpenseData(
+      makeExpenseFormSnapshot({
+        pickedCat: "food",
+        description: "Coffee with Ana",
+      })
+    );
+
+    expect(built.description).toBe("Coffee with Ana");
+  });
+
+  it("fills empty description from localized category label", () => {
+    const built = buildFastExpenseData(
+      makeExpenseFormSnapshot({
+        pickedCat: "food",
+        description: "",
+      })
+    );
+
+    expect(built.description).toBe(getCatLocalized("food"));
   });
 });
 

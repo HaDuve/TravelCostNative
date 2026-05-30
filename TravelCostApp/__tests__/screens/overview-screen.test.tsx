@@ -29,6 +29,28 @@ jest.mock("../../components/UI/ToastComponent", () => ({
   showBanner: jest.fn(),
 }));
 
+jest.mock("../../components/ExpensesOutput/ExpensesOverview", () => {
+  const React = require("react");
+  const { Text } = require("react-native");
+  const actual = jest.requireActual(
+    "../../components/ExpensesOutput/ExpensesOverview"
+  );
+  const ActualExpensesOverview = actual.default;
+  return {
+    ...actual,
+    MemoizedExpensesOverview: (props: {
+      refreshControl?: React.ReactElement;
+    }) => (
+      <>
+        {props.refreshControl ? (
+          <Text testID="overview-refresh-control">refresh</Text>
+        ) : null}
+        <ActualExpensesOverview {...props} />
+      </>
+    ),
+  };
+});
+
 import OverviewScreen from "../../screens/OverviewScreen";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 import { makeExpense } from "../fixtures/expense";
@@ -90,5 +112,22 @@ describe("Overview screen", () => {
     );
 
     expect(screen.getByText(/categories/i)).toBeTruthy();
+  });
+
+  it("passes pull-to-refresh control to the statistics section", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <OverviewScreen navigation={navigation as any} />,
+      {
+        user: {
+          needsTour: false,
+          isShowingGraph: false,
+          setIsShowingGraph: jest.fn(),
+        },
+        expenses: { expenses: [], getRecentExpenses: () => [] },
+      }
+    );
+
+    expect(screen.getByTestId("overview-refresh-control")).toBeTruthy();
   });
 });

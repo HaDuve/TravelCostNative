@@ -64,10 +64,6 @@ const ChangelogScreen = ({ navigation }) => {
     if (fallBackChangelog) {
       setChangelogText(fallBackChangelog); //.replaceAll("- ", "\n • "));
     }
-    const fallBackVersion = getMMKVString(MMKV_KEYS.CURRENT_VERSION);
-    if (fallBackVersion) {
-      setMMKVString(MMKV_KEYS.CURRENT_VERSION, fallBackVersion);
-    }
     setIsFetching(false);
   }, []);
 

@@ -61,4 +61,19 @@ describe("StaticList", () => {
     expect(screen.getByText("FnFooter")).toBeTruthy();
     expect(screen.getByText("FnEmpty")).toBeTruthy();
   });
+
+  it("forwards contentContainerStyle for grid layouts", () => {
+    render(
+      <StaticList
+        data={["a", "b"]}
+        contentContainerStyle={{ flexDirection: "row", flexWrap: "wrap" }}
+        renderItem={({ item }) => <Text>{item}</Text>}
+      />
+    );
+
+    expect(screen.getByTestId("static-list-content").props.style).toMatchObject({
+      flexDirection: "row",
+      flexWrap: "wrap",
+    });
+  });
 });

@@ -27,6 +27,7 @@ import { SettingsContext } from "../../../store/settings-context";
 import { getExpensesSumPeriod } from "../../../util/expense";
 import { dynamicScale } from "../../../util/scalingUtil";
 import { OrientationContext } from "../../../store/orientation-context";
+import { shadowRegressionStyles } from "../../../styles/shadow-regression-styles";
 
 const ExpenseGraph = ({
   periodName,
@@ -608,24 +609,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   categoryCard: {
-    height: dynamicScale(65, true),
-    minWidth: dynamicScale(200),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: dynamicScale(10, false, 0.5),
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 1,
-          height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 2.84,
-      },
-      android: {
-        elevation: 5,
-      },
-    }),
+    ...shadowRegressionStyles.expenseGraphCategoryCard,
   },
 
   itemContainer: {
@@ -671,5 +655,3 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
 });
-
-export const expenseGraphStyles = styles;

@@ -503,13 +503,12 @@ function TripHistoryItem({ tripid, trips }) {
             />
           </View>
         </View>
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-          <StaticList
-            data={travellers}
-            renderItem={renderTravellers}
-            keyExtractor={(item) => item.userName + tripid}
-          />
-        </View>
+        <StaticList
+          data={travellers}
+          renderItem={renderTravellers}
+          keyExtractor={(item) => item.userName + tripid}
+          contentContainerStyle={{ flexDirection: "row", flexWrap: "wrap" }}
+        />
       </View>
     </Pressable>
   );

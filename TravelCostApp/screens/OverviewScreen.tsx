@@ -18,6 +18,7 @@ import {
 } from "react-native";
 import ExpensesSummary from "../components/ExpensesOutput/ExpensesSummary";
 import { GlobalStyles } from "../constants/styles";
+import { shadowRegressionStyles } from "../styles/shadow-regression-styles";
 import { MemoizedExpensesOverview } from "../components/ExpensesOutput/ExpensesOverview";
 import ToggleButton from "../assets/SVG/toggleButton";
 import { TourGuideZone } from "rn-tourguide";
@@ -349,22 +350,7 @@ const styles = StyleSheet.create({
     marginHorizontal: dynamicScale(12),
   },
   dropdownContainer: {
-    maxWidth: dynamicScale(170, false, 0.5),
-    marginTop: dynamicScale(2, true),
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 10,
-    ...Platform.select({
-      ios: {
-        shadowColor: GlobalStyles.colors.textColor,
-        shadowOffset: { width: 1, height: 1 },
-        shadowOpacity: 0.35,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 8,
-        borderRadius: 12,
-      },
-    }),
+    ...shadowRegressionStyles.overviewDropdownContainer,
   },
   dropdownContainerDropdown: {
     maxHeight: dynamicScale(600, true),
@@ -413,16 +399,7 @@ const styles = StyleSheet.create({
     marginTop: dynamicScale(-10, true, 0.3),
   },
   fabToggleButton: {
-    position: "absolute",
-    bottom: dynamicScale(20, true),
-    left: "50%",
-    marginLeft: constantScale(-49, 0.08), // Half of the svg width to center it
-    zIndex: 1000,
-    elevation: 10,
-    backgroundColor: GlobalStyles.colors.backgroundColor,
-    borderRadius: 999,
-    ...GlobalStyles.shadowGlowPrimary,
+    ...shadowRegressionStyles.overviewFabToggleButton,
   },
 });
 
-export const overviewScreenStyles = styles;

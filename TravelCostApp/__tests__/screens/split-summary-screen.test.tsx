@@ -161,4 +161,42 @@ describe("Split Summary screen", () => {
 
     assertNoNestedVerticalFlatLists(screen.root);
   });
+
+  it("does not nest vertical FlatList inside ScrollView in landscape", async () => {
+    const navigation = { navigate: jest.fn(), pop: jest.fn() };
+    const screen = renderWithAppProviders(
+      <SplitSummaryScreen navigation={navigation as any} />,
+      {
+        trip: {
+          tripid: "t1",
+          tripCurrency: "EUR",
+          isPaid: "notPaid",
+          isPaidTimestamp: 0,
+          fetchAndSettleCurrentTrip: jest.fn(async () => {}),
+        },
+        user: { userName: "Alice", freshlyCreated: false },
+        expenses: {
+          expenses: [
+            makeExpense({
+              whoPaid: "Alice",
+              amount: 100,
+              calcAmount: 100,
+              currency: "EUR",
+              splitList: [
+                { userName: "Alice", amount: 50 },
+                { userName: "Bob", amount: 50 },
+              ],
+            }),
+          ],
+        },
+        orientation: { isPortrait: false, isLandscape: true, isTablet: false },
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Bob")).toBeTruthy();
+    });
+
+    assertNoNestedVerticalFlatLists(screen.root);
+  });
 });

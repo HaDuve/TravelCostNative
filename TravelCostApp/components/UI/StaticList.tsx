@@ -35,7 +35,7 @@ function StaticList<T>({
 
   return (
     <View style={style}>
-      <View style={contentContainerStyle}>
+      <View style={contentContainerStyle} testID="static-list-content">
         {header}
         {data.length === 0
           ? empty

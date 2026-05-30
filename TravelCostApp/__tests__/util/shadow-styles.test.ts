@@ -1,50 +1,6 @@
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
-jest.mock("rn-tourguide", () => ({
-  TourGuideZone: ({ children }: { children: React.ReactNode }) => children,
-}));
-
-jest.mock("react-native-dropdown-picker", () => {
-  const React = require("react");
-  return function MockDropDownPicker() {
-    return null;
-  };
-});
-
-jest.mock("../../assets/SVG/toggleButton", () => {
-  const React = require("react");
-  return function MockToggleButton() {
-    return null;
-  };
-});
-
-jest.mock("../../util/vexo-tracking", () => ({
-  trackEvent: jest.fn(),
-}));
-
-jest.mock("../../components/UI/ToastComponent", () => ({
-  showBanner: jest.fn(),
-}));
-
-jest.mock("react-native-toast-message/lib/src/Toast", () => ({
-  Toast: { show: jest.fn(), hide: jest.fn() },
-}));
-
-jest.mock("../../components/ExpensesOverview/ExpenseChart", () => {
-  const React = require("react");
-  return function MockExpenseChart() {
-    return null;
-  };
-});
-
-jest.mock("../../components/ExpensesOverview/CategoryChart", () => {
-  const React = require("react");
-  return function MockCategoryChart() {
-    return null;
-  };
-});
-import { expenseGraphStyles } from "../../components/ExpensesOutput/ExpenseStatistics/ExpenseGraph";
-import { overviewScreenStyles } from "../../screens/OverviewScreen";
+import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 import {
   assertSolidBackgroundForShadow,
   styleHasShadow,
@@ -73,19 +29,16 @@ describe("shadow styles", () => {
 
   it("expense graph category card shadow includes backgroundColor", () => {
     assertSolidBackgroundForShadow(
-      StyleSheet.flatten(expenseGraphStyles.categoryCard)
+      StyleSheet.flatten(shadowRegressionStyles.expenseGraphCategoryCard)
     );
   });
 
   it("overview dropdown and fab shadow styles include backgroundColor", () => {
     assertSolidBackgroundForShadow(
-      StyleSheet.flatten(overviewScreenStyles.dropdownContainer)
+      StyleSheet.flatten(shadowRegressionStyles.overviewDropdownContainer)
     );
     assertSolidBackgroundForShadow(
-      StyleSheet.flatten([
-        overviewScreenStyles.fabToggleButton,
-        Platform.select({ ios: {}, android: {} }),
-      ])
+      StyleSheet.flatten(shadowRegressionStyles.overviewFabToggleButton)
     );
   });
 });

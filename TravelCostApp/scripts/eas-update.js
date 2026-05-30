@@ -4,14 +4,17 @@
  *
  * Usage:
  *   pnpm run update:production -- "Fix login"
+ *   pnpm run update:production:bump -- "Fix login"
  *   node scripts/eas-update.js --target production --message "Fix login"
  *   node scripts/eas-update.js --target production   # message from changelog newest block
+ *   node scripts/eas-update.js --target production --bump-changelog [--message "Fix login"]
  */
 
 const fs = require("fs");
 const path = require("path");
 const { spawnSync } = require("child_process");
 const { getUpdateTarget } = require("./eas-profiles");
+const { bumpEasUpdate, DEFAULT_NOTES } = require("./bump-app-version");
 
 const ROOT = path.join(__dirname, "..");
 const CHANGELOG = path.join(ROOT, "changelog.txt");
@@ -23,10 +26,11 @@ function usageAndExit(message) {
   console.error(
     [
       "Usage:",
-      "  node scripts/eas-update.js --target <production|alpha|staging|dev> [--message <text>]",
+      "  node scripts/eas-update.js --target <production|alpha|staging|dev> [--message <text>] [--bump-changelog]",
       "",
       "Examples:",
       '  pnpm run update:production -- "Fix login"',
+      "  pnpm run update:production:bump",
       "  node scripts/eas-update.js --target production",
     ].join("\n"),
   );
@@ -34,11 +38,12 @@ function usageAndExit(message) {
 }
 
 function parseArgs(argv) {
-  const opts = { target: null, message: null };
+  const opts = { target: null, message: null, bumpChangelog: false };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--target") opts.target = argv[++i];
     else if (arg === "--message") opts.message = argv[++i];
+    else if (arg === "--bump-changelog") opts.bumpChangelog = true;
   }
 
   if (!opts.message) {
@@ -110,18 +115,28 @@ function runUpdate(target, message) {
   }
 }
 
+function resolveUpdateMessage(opts) {
+  if (opts.message) return opts.message;
+  if (opts.bumpChangelog) return DEFAULT_NOTES[0];
+  return readDefaultMessageFromChangelog();
+}
+
 function main() {
   const opts = parseArgs(process.argv.slice(2));
   if (!opts.target) {
     usageAndExit("Missing --target.");
   }
 
-  const message = opts.message ?? readDefaultMessageFromChangelog();
+  const message = resolveUpdateMessage(opts);
   if (!message) {
     usageAndExit("Missing update message. Pass --message or add a __Newest Changes__ block in changelog.txt.");
   }
 
   runUpdate(opts.target, message);
+
+  if (opts.bumpChangelog) {
+    bumpEasUpdate({ notes: [message] });
+  }
 }
 
 main();

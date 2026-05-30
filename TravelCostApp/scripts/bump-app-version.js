@@ -253,4 +253,8 @@ function main() {
   bumpAppRelease(options);
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = { bumpEasUpdate, DEFAULT_NOTES };

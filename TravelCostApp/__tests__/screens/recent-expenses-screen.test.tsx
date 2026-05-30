@@ -16,9 +16,9 @@ jest.mock("../../util/currencyExchange", () => ({
   getRate: jest.fn(async () => 1),
 }));
 
-jest.mock("../../components/ExpensesOutput/ExpensesOutput", () => ({
-  MemoizedExpensesOutput: () => null,
-}));
+jest.mock("../../components/ExpensesOutput/ExpensesOutput", () =>
+  jest.requireActual("../../components/ExpensesOutput/ExpensesOutput")
+);
 
 jest.mock("../../components/ManageExpense/AddExpenseButton", () => () => null);
 jest.mock("../../components/UI/MiniSyncIndicator", () => () => null);
@@ -72,6 +72,12 @@ jest.mock("../../components/ExpensesOutput/RecentExpensesUtil", () => ({
 
 jest.mock("../../util/http", () => ({
   fetchTravelerIsTouched: jest.fn(async () => true),
+  fetchTripName: jest.fn(async () => "Japan 2026"),
+  touchAllTravelers: jest.fn(async () => {}),
+}));
+
+jest.mock("react-native-toast-message/lib/src/Toast", () => ({
+  Toast: { show: jest.fn(), hide: jest.fn() },
 }));
 
 import { waitFor } from "@testing-library/react-native";
@@ -81,6 +87,19 @@ import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
 import { fetchAndSetExpenses } from "../../components/ExpensesOutput/RecentExpensesUtil";
 import { makeExpense } from "../fixtures/expense";
 import { renderWithAppProviders } from "../fixtures/app-providers";
+import { assertNoNestedVerticalFlatLists } from "../../test-utils/scroll-composition";
+
+function expensesContextForList(
+  listedExpenses: ReturnType<typeof makeExpense>[]
+) {
+  return {
+    expenses: listedExpenses,
+    getRecentExpenses: () => listedExpenses,
+    getDailyExpenses: jest.fn(() => []),
+    loadExpensesFromStorage: jest.fn(async () => {}),
+    deleteExpense: jest.fn(),
+  };
+}
 
 describe("RecentExpenses screen", () => {
   beforeEach(() => {
@@ -93,11 +112,7 @@ describe("RecentExpenses screen", () => {
 
     const navigation = { navigate: jest.fn() };
     renderWithAppProviders(<RecentExpenses navigation={navigation as any} />, {
-      expenses: {
-        expenses: [],
-        getRecentExpenses: () => [],
-        loadExpensesFromStorage: jest.fn(async () => {}),
-      },
+      expenses: expensesContextForList([]),
       network: { isConnected: true, strongConnection: true },
     });
 
@@ -113,10 +128,7 @@ describe("RecentExpenses screen", () => {
     const screen = renderWithAppProviders(
       <RecentExpenses navigation={navigation as any} />,
       {
-        expenses: {
-          expenses: monthExpenses,
-          getRecentExpenses: () => monthExpenses,
-        },
+        expenses: expensesContextForList(monthExpenses),
         user: {
           periodName: "month",
           needsTour: false,
@@ -135,10 +147,7 @@ describe("RecentExpenses screen", () => {
     const screen = renderWithAppProviders(
       <RecentExpenses navigation={navigation as any} />,
       {
-        expenses: {
-          expenses: monthExpenses,
-          getRecentExpenses: () => monthExpenses,
-        },
+        expenses: expensesContextForList(monthExpenses),
         user: {
           periodName: "month",
           needsTour: false,
@@ -158,5 +167,36 @@ describe("RecentExpenses screen", () => {
     expect(dropdown.borderWidth).toBe(overviewDropdown.borderWidth);
     expect(dropdown.minHeight).toBe(overviewDropdown.minHeight);
     expect(dropdown.justifyContent).toBe("center");
+  });
+
+  it("does not nest vertical FlatList inside ScrollView when expenses are listed", async () => {
+    const monthExpenses = [
+      makeExpense({ id: "e1", calcAmount: 75, amount: 75, description: "Coffee" }),
+      makeExpense({ id: "e2", calcAmount: 25, amount: 25, description: "Lunch" }),
+    ];
+    const navigation = { navigate: jest.fn(), popToTop: jest.fn() };
+
+    const screen = renderWithAppProviders(
+      <RecentExpenses navigation={navigation as any} />,
+      {
+        expenses: expensesContextForList(monthExpenses),
+        user: {
+          periodName: "month",
+          needsTour: false,
+          freshlyCreated: false,
+        },
+        trip: {
+          tripName: "Japan 2026",
+          fetchAndSetTravellers: jest.fn(async () => {}),
+        },
+        network: { isConnected: true, strongConnection: true },
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Lunch")).toBeTruthy();
+    });
+
+    assertNoNestedVerticalFlatLists(screen.root);
   });
 });

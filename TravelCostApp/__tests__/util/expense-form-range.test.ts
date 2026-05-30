@@ -10,12 +10,74 @@ import {
   buildRangedDuplOrSplitPromptString,
   buildRangedSplitPromptString,
   countInclusiveDaysInRange,
+  distributeRangedAmount,
   divideAmountForRangedSplit,
   formatRangedAmountFieldValue,
   multiplyAmountForRangedDuplicate,
   resolveAlreadyDividedAmountByDays,
   resolveAmountWhenCollapsingRangeToSingleDay,
 } from "../../util/expense-form-range";
+
+describe("distributeRangedAmount", () => {
+  it("spreads a ranged-split total evenly per day across an inclusive span", () => {
+    expect(
+      distributeRangedAmount({
+        total: 150,
+        dayCount: 3,
+        mode: DuplicateOption.split,
+        alreadyDivided: false,
+      })
+    ).toBe(50);
+  });
+
+  it("keeps the full per-day amount for ranged duplicate", () => {
+    expect(
+      distributeRangedAmount({
+        total: 50,
+        dayCount: 3,
+        mode: DuplicateOption.duplicate,
+        alreadyDivided: false,
+      })
+    ).toBe(50);
+  });
+
+  it("short-circuits when the amount is already a per-day share", () => {
+    expect(
+      distributeRangedAmount({
+        total: 50,
+        dayCount: 3,
+        mode: DuplicateOption.split,
+        alreadyDivided: true,
+      })
+    ).toBe(50);
+  });
+
+  it("rounds ranged-split per-day amounts to two decimal places", () => {
+    expect(
+      distributeRangedAmount({
+        total: 100,
+        dayCount: 3,
+        mode: DuplicateOption.split,
+        alreadyDivided: false,
+      })
+    ).toBe(33.33);
+  });
+
+  it("documents rounding drift when summing per-day ranged-split shares", () => {
+    const dayCount = 3;
+    const total = 100;
+    const perDay = distributeRangedAmount({
+      total,
+      dayCount,
+      mode: DuplicateOption.split,
+      alreadyDivided: false,
+    });
+
+    expect(perDay).toBe(33.33);
+    expect(Number((perDay * dayCount).toFixed(2))).toBe(99.99);
+    expect(perDay * dayCount).not.toBe(total);
+  });
+});
 
 describe("multiplyAmountForRangedDuplicate", () => {
   it("leaves amount unchanged for a single-day span", () => {

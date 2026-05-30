@@ -146,9 +146,13 @@ export type DraftChangeBaseline = {
 };
 
 export function summarizeDraftChanges(
-  draft: ExpenseData,
-  baseline: DraftChangeBaseline
+  draft: ExpenseData | null | undefined,
+  baseline: DraftChangeBaseline | null | undefined
 ): string[] {
+  if (!draft || !baseline) {
+    return [];
+  }
+
   const draftPaidBack = readDraftPaidBack(draft);
   const changedItems: string[] = [];
 

@@ -11,7 +11,11 @@ import { touchAllTravelers } from "../util/http";
 import { GlobalStyles } from "../constants/styles";
 import { getRate } from "../util/currencyExchange";
 import { daysBetween, getDatePlusDays } from "../util/date";
-import { isPaidString } from "../util/expense";
+import {
+  countInclusiveDaysInRange,
+  distributeRangedAmount,
+} from "../util/expense-form-range";
+import { DuplicateOption, isPaidString } from "../util/expense";
 import {
   deleteExpenseOnlineOffline,
   OfflineQueueManageExpenseItem,
@@ -259,20 +263,27 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     const day1 = new Date(expenseData.startDate);
     const day2 = new Date(expenseData.endDate);
     const days = daysBetween(day2, day1);
+    const dayCount = countInclusiveDaysInRange(day1, day2);
 
-    // 0 is null, 1 is dupl (default), 2 is split
-    if (
-      expenseData.duplOrSplit === 2 &&
-      !expenseData.alreadyDividedAmountByDays
-    ) {
-      // split the amount and calcAmount by the number of days for split
-      const splitCalcAmount = expenseData.calcAmount / (days + 1);
-      expenseData.calcAmount = Number(splitCalcAmount.toFixed(2));
-      const splitDaysAmount = expenseData.amount / (days + 1);
-      expenseData.amount = Number(splitDaysAmount.toFixed(2));
-      // also split the splits by the number of days for split
+    if (Number(expenseData.duplOrSplit) === DuplicateOption.split) {
+      const rangedDistributeInput = {
+        dayCount,
+        mode: DuplicateOption.split,
+        alreadyDivided: Boolean(expenseData.alreadyDividedAmountByDays),
+      };
+      expenseData.calcAmount = distributeRangedAmount({
+        total: expenseData.calcAmount,
+        ...rangedDistributeInput,
+      });
+      expenseData.amount = distributeRangedAmount({
+        total: expenseData.amount,
+        ...rangedDistributeInput,
+      });
       expenseData.splitList.forEach((split: Split) => {
-        split.amount = Number((split.amount / (days + 1)).toFixed(2));
+        split.amount = distributeRangedAmount({
+          total: split.amount,
+          ...rangedDistributeInput,
+        });
       });
     }
 
@@ -281,7 +292,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       Toast.show({
         type: "loading",
         text1: i18n.t("toastSaving1"),
-        text2: i18n.t("toastSaving2"), //+ " " + (i + 1) + "/" + (days + 1)
+        text2: i18n.t("toastSaving2"), //+ " " + (i + 1) + "/" + dayCount
         autoHide: false,
         props: {
           progress: i / days,

@@ -1,6 +1,8 @@
 import {
   applyFieldValidityToInputs,
   resolveAmountValue,
+  resolveDefaultNewExpenseCountry,
+  resolveDefaultNewExpenseCurrency,
 } from "../../util/expense-form-inputs";
 import type { ExpenseFormInputsState } from "../../util/expense-form-inputs";
 
@@ -25,6 +27,57 @@ function makeInputs(
     whoPaid: { value: overrides.whoPaid ?? "alice", isValid: true },
   };
 }
+
+describe("resolveDefaultNewExpenseCurrency", () => {
+  it("prefers the user's latest-used currency over trip home currency", () => {
+    expect(
+      resolveDefaultNewExpenseCurrency({
+        lastCurrency: "USD",
+        tripCurrency: "EUR",
+      })
+    ).toBe("USD");
+  });
+
+  it("prefers the user's latest-used currency over the most recent trip expense", () => {
+    expect(
+      resolveDefaultNewExpenseCurrency({
+        lastCurrency: "USD",
+        tripCurrency: "EUR",
+        mostRecentExpenseCurrency: "EUR",
+      })
+    ).toBe("USD");
+  });
+
+  it("falls back to the most recent trip expense when no latest-used currency is set", () => {
+    expect(
+      resolveDefaultNewExpenseCurrency({
+        lastCurrency: "",
+        tripCurrency: "EUR",
+        mostRecentExpenseCurrency: "GBP",
+      })
+    ).toBe("GBP");
+  });
+
+  it("falls back to trip home currency when nothing else is available", () => {
+    expect(
+      resolveDefaultNewExpenseCurrency({
+        lastCurrency: "",
+        tripCurrency: "EUR",
+      })
+    ).toBe("EUR");
+  });
+});
+
+describe("resolveDefaultNewExpenseCountry", () => {
+  it("prefers the user's latest-used country over trip expense defaults", () => {
+    expect(
+      resolveDefaultNewExpenseCountry({
+        lastCountry: "US",
+        mostRecentExpenseCountry: "DE",
+      })
+    ).toBe("US");
+  });
+});
 
 describe("resolveAmountValue", () => {
   it("sums amount input and temp amount when both are set", () => {

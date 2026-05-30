@@ -5,6 +5,40 @@ export type ExpenseFormInputField = {
   isValid: boolean;
 };
 
+export type DefaultNewExpenseLocaleInput = {
+  lastCurrency: string;
+  tripCurrency: string;
+  mostRecentExpenseCurrency?: string;
+};
+
+/** Default expense currency for a new expense (latest-used wins over trip habits). */
+export function resolveDefaultNewExpenseCurrency(
+  input: DefaultNewExpenseLocaleInput
+): string {
+  if (input.lastCurrency?.trim()) {
+    return input.lastCurrency;
+  }
+  if (input.mostRecentExpenseCurrency?.trim()) {
+    return input.mostRecentExpenseCurrency;
+  }
+  return input.tripCurrency;
+}
+
+export type DefaultNewExpenseCountryInput = {
+  lastCountry: string;
+  mostRecentExpenseCountry?: string;
+};
+
+/** Default expense country for a new expense (latest-used wins over trip habits). */
+export function resolveDefaultNewExpenseCountry(
+  input: DefaultNewExpenseCountryInput
+): string {
+  if (input.lastCountry?.trim()) {
+    return input.lastCountry;
+  }
+  return input.mostRecentExpenseCountry?.trim() ?? "";
+}
+
 export type ExpenseFormInputsState = {
   amount: ExpenseFormInputField;
   date: ExpenseFormInputField;

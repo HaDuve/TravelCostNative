@@ -200,6 +200,9 @@ const en = {
   leaveTripSure: "Are you sure you want to leave this budget? Your past expenses stay for the remaining nomads.",
   leaveTripConnectRequired: "Connect to the internet to leave this budget.",
   leaveTripNowShowing: "Now showing %{name}",
+  toastLeftTrip1: "Left budget",
+  toastLeftTrip2: "You can undo this action",
+  toastUndoLeaveExpired: "Undo is no longer available for this leave.",
   setActive: "Set as active budget",
   datePickerLabel: "Start and end dates",
 
@@ -808,6 +811,10 @@ const de = {
   leaveTripConnectRequired:
     "Verbinde dich mit dem Internet, um dieses Budget zu verlassen.",
   leaveTripNowShowing: "Jetzt angezeigt: %{name}",
+  toastLeftTrip1: "Budget verlassen",
+  toastLeftTrip2: "Du kannst diese Aktion rückgängig machen",
+  toastUndoLeaveExpired:
+    "Rückgängig machen ist für dieses Verlassen nicht mehr möglich.",
   setActive: "Als aktives Budget markieren",
   datePickerLabel: "Start- und Enddatum",
 
@@ -1448,6 +1455,10 @@ const fr = {
   leaveTripConnectRequired:
     "Connectez-vous à internet pour quitter ce budget.",
   leaveTripNowShowing: "Affichage de %{name}",
+  toastLeftTrip1: "Budget quitté",
+  toastLeftTrip2: "Vous pouvez annuler cette action",
+  toastUndoLeaveExpired:
+    "L'annulation n'est plus disponible pour ce départ.",
   setActive: "Définir comme budget actif",
   datePickerLabel: "Dates de début et de fin",
 
@@ -2078,6 +2089,10 @@ const ru = {
   leaveTripConnectRequired:
     "Подключитесь к интернету, чтобы покинуть этот бюджет.",
   leaveTripNowShowing: "Сейчас показан: %{name}",
+  toastLeftTrip1: "Бюджет покинут",
+  toastLeftTrip2: "Вы можете отменить это действие",
+  toastUndoLeaveExpired:
+    "Отменить выход из бюджета уже нельзя.",
   setActive: "Сделать активным бюджетом",
   datePickerLabel: "Даты начала и окончания",
 

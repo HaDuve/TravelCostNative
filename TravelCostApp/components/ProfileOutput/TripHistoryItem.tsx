@@ -18,7 +18,9 @@ import {
   formatExpenseWithCurrency,
   truncateString,
 } from "../../util/string";
-import { TravellerNames, fetchTripName, getTravellers } from "../../util/http";
+import { fetchTripName, getTravellers } from "../../util/http";
+import type { Traveller } from "../../util/traveler";
+import { normalizeTravellers } from "../../util/normalize-travellers";
 import { FittingCurrencyAmount } from "../UI/FittingCurrencyAmount";
 
 import { i18n } from "../../i18n/i18n";
@@ -56,7 +58,7 @@ export type TripHistoryItemType = {
   isDynamicDailyBudget: boolean;
   startDate: string;
   endDate: string;
-  travellers: TravellerNames[];
+  travellers: Traveller[];
   sumOfExpenses: number;
   progress: number;
   days: number;
@@ -69,7 +71,7 @@ function TripHistoryItem({ tripid, trips }) {
   const contextTrip = tripCtx.tripid == tripid;
   const netCtx = useContext(NetworkContext);
   // list of objects containing the userName key
-  const [travellers, setTravellers] = useState<TravellerNames[]>([]);
+  const [travellers, setTravellers] = useState<Traveller[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [tripName, setTripName] = useState("");
   const [totalBudget, setTotalBudget] = useState("");
@@ -129,11 +131,8 @@ function TripHistoryItem({ tripid, trips }) {
       setSumOfExpenses(trip.sumOfExpenses);
       setProgress(trip.progress);
       setDays(trip.days);
-      const travellers = [];
-      trip.travellers?.forEach((traveller) => {
-        travellers.push(traveller);
-      });
-      if (travellers.length > 0) setTravellers(travellers);
+      const roster = normalizeTravellers(trip.travellers);
+      if (roster.length > 0) setTravellers(roster);
       setIsFetching(false);
     }
   }
@@ -169,11 +168,7 @@ function TripHistoryItem({ tripid, trips }) {
       now: new Date(),
     }).toFixed(2);
     setDailyBudget(isDynamic ? dynamicDailyBudget : tripCtx.dailyBudget);
-    const objTravellers = [];
-    tripCtx.travellers.forEach((traveller) => {
-      objTravellers.push({ userName: traveller });
-    });
-    if (objTravellers.length > 0) setTravellers(objTravellers);
+    if (tripCtx.travellers.length > 0) setTravellers(tripCtx.travellers);
 
     setIsFetching(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -274,12 +269,8 @@ function TripHistoryItem({ tripid, trips }) {
     }
     async function getTripTravellers() {
       try {
-        const listTravellers: TravellerNames = await getTravellers(tripid);
-        const objTravellers = [];
-        listTravellers.forEach((traveller) => {
-          objTravellers.push({ userName: traveller });
-        });
-        if (objTravellers.length > 0) setTravellers(objTravellers);
+        const roster = await getTravellers(tripid);
+        if (roster?.length > 0) setTravellers(roster);
       } catch (error) {
         return;
       }
@@ -428,11 +419,16 @@ function TripHistoryItem({ tripid, trips }) {
 
   const dimensionChars = dynamicScale(25, false, 0.4);
 
-  function renderTravellers({ item }: { item: { userName?: string } }) {
+  function renderTravellers({
+    item,
+  }: {
+    item: { uid?: string; userName?: string };
+  }) {
     if (!item?.userName) return <></>;
+    const travellerKey = item.uid || item.userName;
     return (
       <View
-        testID={`trip-traveller-${item.userName}`}
+        testID={`trip-traveller-${travellerKey}`}
         style={[
           shadowRegressionStyles.tripTravellerChip,
           styles.travellerCard,
@@ -543,11 +539,14 @@ function TripHistoryItem({ tripid, trips }) {
           }}
           testID="trip-travellers-wrap"
         >
-          {travellers.map((item) => (
-            <React.Fragment key={item.userName + tripid}>
-              {renderTravellers({ item })}
-            </React.Fragment>
-          ))}
+          {travellers.map((item) => {
+            const travellerKey = item.uid || item.userName;
+            return (
+              <React.Fragment key={`${travellerKey}-${tripid}`}>
+                {renderTravellers({ item })}
+              </React.Fragment>
+            );
+          })}
         </View>
       </View>
     </Pressable>

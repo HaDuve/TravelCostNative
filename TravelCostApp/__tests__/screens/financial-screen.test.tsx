@@ -26,7 +26,10 @@ describe("Financial screen", () => {
         dailyBudget: "100",
         startDate: pastDate.toISOString(),
         endDate: new Date("2026-02-01T12:00:00.000Z").toISOString(),
-        travellers: ["Alice", "Bob"],
+        travellers: [
+          { uid: "u1", userName: "Alice" },
+          { uid: "u2", userName: "Bob" },
+        ],
       },
       expenses: {
         expenses: [makeExpense({ date: pastDate, calcAmount: 40 })],

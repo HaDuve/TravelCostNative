@@ -216,7 +216,10 @@ function renderNewExpenseForm(
       trip: {
         tripid: "t1",
         tripCurrency: "EUR",
-        travellers: ["Alice", "Bob"],
+        travellers: [
+          { uid: "u1", userName: "Alice" },
+          { uid: "u2", userName: "Bob" },
+        ],
         fetchAndSetTravellers: jest.fn(async () => {}),
         ...overrides.trip,
       },
@@ -341,7 +344,7 @@ describe("ExpenseForm", () => {
         trip: {
           tripid: "t1",
           tripCurrency: "EUR",
-          travellers: ["Alice"],
+          travellers: [{ uid: "u1", userName: "Alice" }],
           fetchAndSetTravellers: jest.fn(async () => {}),
         },
         user: { userName: "Alice", lastCurrency: "USD", lastCountry: "US" },
@@ -367,7 +370,10 @@ describe("ExpenseForm", () => {
       trip: {
         tripid: "t1",
         tripCurrency: "EUR",
-        travellers: ["Alice", "Bob"],
+        travellers: [
+          { uid: "u1", userName: "Alice" },
+          { uid: "u2", userName: "Bob" },
+        ],
         fetchAndSetTravellers: jest.fn(async () => {}),
       },
       user: {

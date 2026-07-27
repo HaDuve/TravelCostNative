@@ -79,6 +79,7 @@ import {
   type ModalFlowState,
 } from "../../util/modal-flow-reducer";
 import { Traveller } from "../../util/traveler";
+import { travellerUserNames } from "../../util/normalize-travellers";
 
 import { i18n } from "../../i18n/i18n";
 
@@ -271,18 +272,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     !tripCtx.travellers && tripCtx.travellers?.length < 1
   );
 
-  const extractUserNames = useCallback(
-    (travellers: string[] | Traveller[] | undefined): string[] => {
-      if (!travellers) return [];
-      if (travellers.length === 0) return [];
-      if (typeof travellers[0] === "string") {
-        return travellers as string[];
-      }
-      return (travellers as Traveller[]).map((t) => t.userName);
-    },
-    []
-  );
-
   const [currentTravellers, setCurrentTravellers] = useState(
     tripCtx.travellers
   );
@@ -410,10 +399,10 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     initialSplitType: editingValues ? editingValues.splitType : "SELF",
     initialSplitTravellersList: editingValues?.listEQUAL?.length
       ? editingValues.listEQUAL
-      : extractUserNames(tripCtx.travellers),
+      : travellerUserNames(tripCtx.travellers),
     amount: +amountValue,
     whoPaid,
-    tripTravellerNames: extractUserNames(tripCtx.travellers),
+    tripTravellerNames: travellerUserNames(tripCtx.travellers),
     onAutosave: () => saveDraftDataRef.current(),
     duplOrSplit,
     isEditing,
@@ -465,7 +454,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   useEffect(() => {
     if (tripCtx.travellers) {
-      const userNames = extractUserNames(tripCtx.travellers);
+      const userNames = travellerUserNames(tripCtx.travellers);
       setSplitTravellersList(userNames);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1049,11 +1038,11 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
   const openTravellerMultiPicker = useCallback(() => {
     if (!editingValues) {
-      const userNames = extractUserNames(currentTravellers);
+      const userNames = travellerUserNames(currentTravellers);
       setSplitTravellersList(userNames);
     }
     setModalFlow(MODAL_FLOW_STATE.EXACT_SHARING);
-  }, [currentTravellers, editingValues, extractUserNames, setSplitTravellersList]);
+  }, [currentTravellers, editingValues, setSplitTravellersList]);
   openTravellerMultiPickerRef.current = openTravellerMultiPicker;
 
   // Never call setState during render: move these guards into effects.
@@ -1105,7 +1094,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
     const expenseData = buildFastExpenseData(
       makeFormSnapshot({
-        listEQUAL: extractUserNames(currentTravellers),
+        listEQUAL: travellerUserNames(currentTravellers),
       })
     );
     await onSubmit(expenseData);
@@ -1645,7 +1634,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                                 const tempSplitType: splitType =
                                   splitTypes.EXACT;
                                 const userNames =
-                                  extractUserNames(currentTravellers);
+                                  travellerUserNames(currentTravellers);
                                 const listSplits = calcSplitList(
                                   tempSplitType,
                                   +amountValue,

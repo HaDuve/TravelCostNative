@@ -4,6 +4,7 @@ import { GlobalStyles } from "../../constants/styles";
 import { shadowRegressionStyles, periodHeaderLabelFontSize } from "../../styles/shadow-regression-styles";
 import * as Progress from "react-native-progress";
 import { TripContext } from "../../store/trip-context";
+import { travellerUserNames } from "../../util/normalize-travellers";
 
 import { i18n } from "../../i18n/i18n";
 
@@ -39,15 +40,10 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
   const [isOverviewVisible, setIsOverviewVisible] = useState(false);
 
   const safeExpenses = Array.isArray(expenses) ? expenses : [];
-  const travellers = Array.isArray(tripCtx.travellers)
-    ? tripCtx.travellers
-    : [];
-  const travellerNames = travellers.map((traveller) =>
-    typeof traveller === "string" ? traveller : traveller?.userName,
-  );
+  const travellerNames = travellerUserNames(tripCtx.travellers ?? []);
   const tripCurrency = tripCtx.tripCurrency || userCtx.lastCurrency || "";
   const isOfflineMissingTrip =
-    !tripCtx.tripid && travellers.length === 0 && !tripCurrency;
+    !tripCtx.tripid && travellerNames.length === 0 && !tripCurrency;
 
   if (!periodName) return <></>;
 

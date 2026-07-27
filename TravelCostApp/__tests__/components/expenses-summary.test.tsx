@@ -257,7 +257,7 @@ describe("ExpensesSummary", () => {
       <ExpensesSummary expenses={expenses} periodName="month" />,
       {
         wrapNavigation: false,
-        trip: { travellers: ["Alice"] },
+        trip: { travellers: [{ uid: "u1", userName: "Alice" }] },
         expenses: {
           expenses,
           getRecentExpenses: () => expenses,
@@ -283,7 +283,7 @@ describe("ExpensesSummary", () => {
         trip: {
           totalBudget: "3435973836",
           dailyBudget: "50",
-          travellers: ["Alice"],
+          travellers: [{ uid: "u1", userName: "Alice" }],
         },
         expenses: {
           expenses,

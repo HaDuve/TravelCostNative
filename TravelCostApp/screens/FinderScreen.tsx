@@ -30,6 +30,7 @@ import {
 } from "../store/async-storage";
 import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
+import { travellerUserNames } from "../util/normalize-travellers";
 import { DEFAULTCATEGORIES } from "../util/category";
 import safeLogError from "../util/error";
 import { ExpenseData } from "../util/expense";
@@ -259,14 +260,12 @@ const FinderScreen = () => {
   const cats = DEFAULTCATEGORIES.map((cat) => {
     if (cat.cat !== "newCat") return cat.catString;
   });
-  const travellers = Array.isArray(tripCtx.travellers)
-    ? tripCtx.travellers
-    : [];
+  const travellerNames = travellerUserNames(tripCtx.travellers ?? []);
 
   const suggestions = searchQuery
-    ? [...travellers, ...cats, ...suggestionData]
+    ? [...travellerNames, ...cats, ...suggestionData]
     : [
-        ...travellers.slice(0, 1),
+        ...travellerNames.slice(0, 1),
         ...cats.slice(0, 1),
         ...suggestionData.slice(0, 1),
       ];

@@ -36,7 +36,10 @@ jest.mock("../../util/http", () => ({
   fetchChangelog: jest.fn(async () => null),
   storeExpoPushTokenInTrip: jest.fn(async () => {}),
   fetchTripName: jest.fn(async () => "Japan 2026"),
-  getTravellers: jest.fn(async () => ["Alice", "Bob"]),
+  getTravellers: jest.fn(async () => [
+    { uid: "u1", userName: "Alice" },
+    { uid: "u2", userName: "Bob" },
+  ]),
   getTripData: jest.fn(async () => ({
     dailyBudget: "100",
     totalBudget: "3000",
@@ -69,6 +72,7 @@ import { renderWithAppProviders } from "../fixtures/app-providers";
 import { assertNoNestedVerticalFlatLists } from "../../test-utils/scroll-composition";
 import { waitFor } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
+import { getTravellers } from "../../util/http";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 
@@ -92,6 +96,13 @@ function profileUserOverrides(
 describe("Profile screen", () => {
   beforeEach(() => {
     jest.mocked(trackEvent).mockClear();
+  });
+
+  afterEach(() => {
+    jest.mocked(getTravellers).mockImplementation(async () => [
+      { uid: "u1", userName: "Alice" },
+      { uid: "u2", userName: "Bob" },
+    ]);
   });
 
   it("renders Profile trip actions without starting a guided tour", async () => {
@@ -170,8 +181,30 @@ describe("Profile screen", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId("trip-traveller-Alice")).toBeTruthy();
-      expect(screen.getByTestId("trip-traveller-Bob")).toBeTruthy();
+      expect(screen.getByTestId("trip-traveller-u1")).toBeTruthy();
+      expect(screen.getByTestId("trip-traveller-u2")).toBeTruthy();
+    });
+  });
+
+  it("keeps distinct Traveller chips when display names collide", async () => {
+    jest.mocked(getTravellers).mockImplementation(async () => [
+      { uid: "u1", userName: "Alice" },
+      { uid: "u2", userName: "Alice" },
+    ]);
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
+        expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
+        user: profileUserOverrides({ tripHistory: ["t1"] }),
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("trip-traveller-u1")).toBeTruthy();
+      expect(screen.getByTestId("trip-traveller-u2")).toBeTruthy();
     });
   });
 
@@ -188,7 +221,7 @@ describe("Profile screen", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId("trip-traveller-Alice")).toBeTruthy();
+      expect(screen.getByTestId("trip-traveller-u1")).toBeTruthy();
     });
 
     const listContent = screen.getByTestId("trip-travellers-wrap");

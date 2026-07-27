@@ -25,7 +25,15 @@ import {
   storeExpenseOnlineOffline,
   updateExpenseOnlineOffline,
 } from "../util/offline-queue";
-import { deleteUserExpenses } from "../util/user-delete-expense";
+import {
+  collectUserDeleteTargets,
+  deleteUserExpenses,
+} from "../util/user-delete-expense";
+import {
+  persistRangedExpenseAdd,
+  persistRangedExpenseInPlaceEdit,
+  persistRangedExpenseReplace,
+} from "../util/ranged-expense-persist";
 
 import { i18n } from "../i18n/i18n";
 
@@ -47,6 +55,7 @@ import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { trackEvent } from "../util/vexo-tracking";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 import { dynamicScale } from "../util/scalingUtil";
+import { notifyTravelersAfterRangedSync } from "../util/notify-travelers-after-ranged-sync";
 import { VexoEvents } from "../util/vexo-constants";
 
 interface ManageExpenseProps {
@@ -249,42 +258,14 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   const newRangeId = () =>
     Date.now().toString() + Math.random().toString(36).substring(2, 15);
 
-  const persistNewRangedInstances = async (instances: ExpenseData[]) => {
-    const progressMax = Math.max(instances.length - 1, 0);
-
-    for (let i = 0; i < instances.length; i++) {
-      Toast.show({
-        type: "loading",
-        text1: i18n.t("toastSaving1"),
-        text2: i18n.t("toastSaving2"),
-        autoHide: false,
-        props: {
-          progress: progressMax === 0 ? 0 : i / progressMax,
-          progressAt: i,
-          progressMax,
-          size: "small",
-        },
-      });
-
-      const expenseToPersist = {
-        ...instances[i],
-        editedTimestamp: Date.now(),
-      };
-
-      const item: OfflineQueueManageExpenseItem = {
-        type: "add",
-        expense: {
-          tripid: tripid,
-          uid: uid,
-          expenseData: expenseToPersist,
-        },
-      };
-      const id = await storeExpenseOnlineOffline(item, isOnline);
-      expenseCtx.addExpense({ ...expenseToPersist, id: id ?? "" });
-    }
+  const rangedPersistParams = {
+    tripid,
+    uid,
+    isOnline,
+    expenseCtx,
   };
 
-  const createRangedData = async (expenseData: ExpenseData) => {
+  const createRangedData = (expenseData: ExpenseData): Promise<void> => {
     const rangeId = newRangeId();
     const dates = buildRangedExpenseDatesFromSpan(
       expenseData.startDate,
@@ -296,25 +277,10 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       dates,
     });
 
-    await persistNewRangedInstances(instances);
+    return persistRangedExpenseAdd(instances, rangedPersistParams).syncPromise;
   };
 
-  const editSingleData = async (expenseData: ExpenseData) => {
-    expenseData.editedTimestamp = Date.now();
-    const item: OfflineQueueManageExpenseItem = {
-      type: "update",
-      expense: {
-        tripid: tripid,
-        uid: selectedExpenseAuthorUid,
-        expenseData: expenseData,
-        id: editedExpenseId,
-      },
-    };
-    expenseCtx.updateExpense(editedExpenseId, expenseData);
-    await updateExpenseOnlineOffline(item, isOnline);
-  };
-
-  const editRangedData = async (expenseData: ExpenseData) => {
+  const editRangedData = (expenseData: ExpenseData): Promise<void> => {
     const expensesInRange = expenseCtx.expenses.filter(
       (expense) =>
         expense.rangeId && expense.rangeId === selectedExpense?.rangeId
@@ -330,57 +296,45 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           id: editedExpenseId,
         },
       };
-      await deleteExpenseOnlineOffline(item, isOnline);
-
+      const deleteSync = deleteExpenseOnlineOffline(item, isOnline);
       const instances = planNonRangedToRangedInstances(expenseData, newRangeId());
-      await persistNewRangedInstances(instances);
-      return;
+      const addSync = persistRangedExpenseAdd(instances, rangedPersistParams)
+        .syncPromise;
+      return Promise.all([deleteSync, addSync]).then(() => {});
     }
 
     if (shouldReplaceRangedExpenseInstances(expensesInRange, expenseData)) {
-      await deleteAllExpensesByRangedId(
-        tripid,
-        selectedExpense,
-        isOnline,
-        expenseCtx,
-        { showUndoToast: false },
-      );
-
+      const deleteTargets = collectUserDeleteTargets(tripid, expenseCtx.expenses, [
+        selectedExpense.id!,
+      ]);
       const instances = planRangedExpenseReplacement(expenseData, newRangeId());
-      await persistNewRangedInstances(instances);
-      return;
+      return persistRangedExpenseReplace(
+        deleteTargets,
+        instances,
+        rangedPersistParams,
+      ).syncPromise;
     }
 
     const updates = planRangedExpenseInPlaceUpdates(expenseData, expensesInRange);
-    const progressMax = updates.length;
+    return persistRangedExpenseInPlaceEdit(updates, {
+      ...rangedPersistParams,
+      uid: selectedExpenseAuthorUid,
+    }).syncPromise;
+  };
 
-    for (let i = 0; i < updates.length; i++) {
-      Toast.show({
-        type: "loading",
-        text1: i18n.t("toastSaving1"),
-        text2: i18n.t("toastSaving2"),
-        autoHide: false,
-        props: {
-          progress: i / progressMax,
-          progressAt: i,
-          progressMax,
-          size: "small",
-        },
-      });
-
-      const { id, expenseData: updatedExpenseData } = updates[i];
-      const item: OfflineQueueManageExpenseItem = {
-        type: "update",
-        expense: {
-          tripid: tripid,
-          uid: selectedExpenseAuthorUid,
-          expenseData: updatedExpenseData,
-          id,
-        },
-      };
-      expenseCtx.updateExpense(id, updatedExpenseData);
-      await updateExpenseOnlineOffline(item, isOnline);
-    }
+  const editSingleData = async (expenseData: ExpenseData) => {
+    expenseData.editedTimestamp = Date.now();
+    const item: OfflineQueueManageExpenseItem = {
+      type: "update",
+      expense: {
+        tripid: tripid,
+        uid: selectedExpenseAuthorUid,
+        expenseData: expenseData,
+        id: editedExpenseId,
+      },
+    };
+    expenseCtx.updateExpense(editedExpenseId, expenseData);
+    await updateExpenseOnlineOffline(item, isOnline);
   };
 
   async function confirmHandler(payload: ExpenseFormSubmitPayload): Promise<void> {
@@ -414,6 +368,8 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         expenseData.splitList = [];
       }
 
+      let rangedSyncPromise: Promise<void> | null = null;
+
       if (isEditing) {
         // editing the expense
         if (
@@ -422,7 +378,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           selectedExpense.rangeId
         ) {
           // editing ranged Data
-          await editRangedData(expenseData);
+          rangedSyncPromise = editRangedData(expenseData);
         } else {
           // editing normal expense (no-ranged)
           await editSingleData(expenseData);
@@ -449,7 +405,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           expenseData.endDate.toString().slice(0, 10)
         ) {
           // adding a new ranged expense (no-editing)
-          await createRangedData(expenseData);
+          rangedSyncPromise = createRangedData(expenseData);
         } else {
           // adding a new normal expense (no-editing, no-ranged)
           await createSingleData(expenseData);
@@ -470,8 +426,19 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       // Clear draft data after successful submission
       clearExpenseDraft(editedExpenseId);
       navigation.popToTop();
-      if (isOnline && (await isConnectionFastEnoughAsBool()))
+      const shouldTouchTravelers =
+        isOnline && (await isConnectionFastEnoughAsBool());
+      if (rangedSyncPromise) {
+        void rangedSyncPromise.catch(safeLogError);
+        notifyTravelersAfterRangedSync(
+          rangedSyncPromise,
+          tripid,
+          shouldTouchTravelers,
+          touchAllTravelers,
+        );
+      } else if (shouldTouchTravelers) {
         await touchAllTravelers(tripid, true);
+      }
     } catch (error) {
       safeLogError(error);
       return Promise.reject(error);

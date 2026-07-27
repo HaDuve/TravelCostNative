@@ -16,7 +16,6 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import * as SplashScreen from "expo-splash-screen";
-import { shouldShowOnboarding } from "./components/Rating/firstStartUtil";
 
 import { NetworkProvider } from "react-native-offline";
 import { Ionicons } from "@expo/vector-icons";
@@ -43,7 +42,6 @@ import TripContextProvider, {
   TripData,
 } from "./store/trip-context";
 import TripForm from "./components/ManageTrip/TripForm";
-import OnboardingScreen from "./screens/OnboardingScreen";
 import JoinTrip from "./screens/JoinTrip";
 import ShareTripButton from "./components/ProfileOutput/ShareTrip";
 import OverviewScreen from "./screens/OverviewScreen";
@@ -70,8 +68,6 @@ import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
 import Toast from "react-native-toast-message";
 import { useInterval } from "./components/Hooks/useInterval";
 import { isForeground } from "./util/appState";
-import { TourGuideProvider, TooltipProps } from "rn-tourguide";
-import { loadTourConfig } from "./util/tourUtil";
 import { loadKeys, Keys } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
 import { SettingsProvider } from "./store/settings-context";
@@ -98,7 +94,6 @@ import { ExpenseData } from "./util/expense";
 
 import safeLogError from "./util/error";
 import { constantScale, dynamicScale } from "./util/scalingUtil";
-import { CustomTooltip } from "./components/UI/Tourguide_Tooltip";
 import OrientationContextProvider from "./store/orientation-context";
 import {
   initializeVexo,
@@ -155,17 +150,6 @@ function SafeAreaWrapper({ children }: { children: React.ReactNode }) {
   );
 }
 function NotAuthenticatedStack() {
-  const [needOnboarding, setNeedOnboarding] = useState(false);
-  const navigation = useNavigation();
-  useEffect(() => {
-    async function checkOnboarding() {
-      const need = await shouldShowOnboarding();
-      if (!need) return;
-      setNeedOnboarding(need);
-      navigation.navigate("Onboarding");
-    }
-    checkOnboarding();
-  }, []);
   return (
     <AuthStack.Navigator
       screenOptions={{
@@ -174,13 +158,6 @@ function NotAuthenticatedStack() {
         contentStyle: { backgroundColor: GlobalStyles.colors.backgroundColor },
       }}
     >
-      {needOnboarding && (
-        <AuthStack.Screen
-          name="Onboarding"
-          component={OnboardingScreen}
-          options={{ headerShown: false }}
-        />
-      )}
       <AuthStack.Screen
         name="Login"
         component={LoginScreen}
@@ -395,10 +372,9 @@ function Navigation() {
 }
 
 function Home() {
-  const { isShowingGraph, freshlyCreated, hasNewChanges } =
-    useContext(UserContext);
+  const { isShowingGraph, hasNewChanges } = useContext(UserContext);
 
-  const FirstScreen = freshlyCreated ? "Profile" : "RecentExpenses";
+  const FirstScreen = "RecentExpenses";
   const expCtx = useContext(ExpensesContext);
   const expenses = expCtx.expenses;
   const hasExp = expenses?.length > 0;
@@ -544,7 +520,6 @@ function Root() {
         asyncQueue();
 
         const delayedOnlineSetup = async () => {
-          if (userCtx.freshlyCreated) return;
           if (!onlineSetupDone) {
             const { isFastEnough } = await isConnectionFastEnough();
             if (isFastEnough) {
@@ -559,6 +534,7 @@ function Root() {
                 checkUser.locale = i18n.locale;
                 await updateUser(storedUid, checkUser);
               }
+              if (!tripid) return;
               const tripData: TripData =
                 await tripCtx.fetchAndSetCurrentTrip(tripid);
               if (!tripData) return;
@@ -691,9 +667,6 @@ function Root() {
           safeLogError(vexoError, "App.tsx", 692);
         }
 
-        const needsTour = await loadTourConfig();
-        userCtx.setNeedsTour(needsTour);
-
         // check if user is online
         if (!online) {
           await setupOfflineMount(true, storedToken);
@@ -721,7 +694,8 @@ function Root() {
         }
 
         if (freshlyCreated) {
-          await userCtx.setFreshlyCreatedTo(freshlyCreated);
+          // Leftover gate flag with an Active trip: clear and ignore for routing
+          await userCtx.setFreshlyCreatedTo(false);
         }
         // check if user was deleted
         const checkUser = await fetchUser(storedUid);
@@ -737,7 +711,9 @@ function Root() {
           return;
         }
         if (checkUser.userName && !checkUser.currentTrip) {
-          await userCtx.setFreshlyCreatedTo(true);
+          // No Active trip on server: login/signup paths create an implicit default.
+          // Do not re-enable Profile-first gate from boot.
+          await userCtx.setFreshlyCreatedTo(false);
         }
         // setup context
         await authCtx.setUserID(storedUid);
@@ -833,39 +809,9 @@ export default function App() {
                       <NetworkProvider>
                         <OrientationContextProvider>
                           <GestureHandlerRootView style={{ flex: 1 }}>
-                            <TourGuideProvider
-                              key="settings"
-                              borderRadius={16}
-                              labels={{
-                                previous: i18n.t("tourGuideLabelPrevious"),
-                                next: i18n.t("tourGuideLabelNext"),
-                                skip: i18n.t("tourGuideLabelSkip"),
-                                finish: i18n.t("tourGuideLabelFinish"),
-                              }}
-                              tooltipComponent={({
-                                isFirstStep,
-                                isLastStep,
-                                handleNext,
-                                handlePrev,
-                                handleStop,
-                                currentStep,
-                                labels,
-                              }: TooltipProps) =>
-                                CustomTooltip({
-                                  isFirstStep,
-                                  isLastStep,
-                                  handleNext,
-                                  handlePrev,
-                                  handleStop,
-                                  currentStep,
-                                  labels,
-                                })
-                              }
-                            >
-                              <Root />
+                            <Root />
 
-                              <ToastComponent />
-                            </TourGuideProvider>
+                            <ToastComponent />
                           </GestureHandlerRootView>
                         </OrientationContextProvider>
                       </NetworkProvider>

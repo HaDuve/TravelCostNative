@@ -33,10 +33,9 @@ const BlurPremium = ({ canBack = false }) => {
       // Check if user is in onboarding state
       const shouldShowOnboardingFlow = await shouldShowOnboarding();
       const isFreshlyCreated = userCtx.freshlyCreated;
-      const needsTour = userCtx.needsTour;
 
       // Suppress popup if user is in any onboarding state
-      return shouldShowOnboardingFlow || isFreshlyCreated || needsTour;
+      return shouldShowOnboardingFlow || isFreshlyCreated;
     }
     async function checkPremium() {
       const checkPremi = await userCtx.checkPremium();
@@ -44,7 +43,7 @@ const BlurPremium = ({ canBack = false }) => {
       setIsPremium(checkPremi && !isOnboarding);
     }
     checkPremium();
-  }, [userCtx.isPremium, userCtx.freshlyCreated, userCtx.needsTour]);
+  }, [userCtx.isPremium, userCtx.freshlyCreated]);
 
   const isConnected = netCtx.isConnected && netCtx.strongConnection;
 

@@ -53,6 +53,7 @@ export type TripContextType = {
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
   isDynamicDailyBudget: boolean;
+  isImplicitDefault: boolean;
 };
 
 export const TripContext = createContext<TripContextType>({
@@ -96,6 +97,7 @@ export const TripContext = createContext<TripContextType>({
   isLoading: false,
   setIsLoading: (isLoading: boolean) => {},
   isDynamicDailyBudget: false,
+  isImplicitDefault: false,
 });
 
 function TripContextProvider({ children }: React.PropsWithChildren) {
@@ -116,6 +118,7 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isDynamicDailyBudget, setIsDynamicDailyBudget] = useState(false);
+  const [isImplicitDefault, setIsImplicitDefault] = useState(false);
 
   const tripTotalSpent = useTripTotalSpent();
 
@@ -235,6 +238,7 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
       setIsPaidDate("");
       setIsPaidTimestamp(undefined);
       setIsLoading(false);
+      setIsImplicitDefault(false);
       return;
     }
 
@@ -252,6 +256,7 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     setIsPaidTimestamp(hydratedTrip.isPaidTimestamp);
     setIsLoading(false);
     setIsDynamicDailyBudget(hydratedTrip.isDynamicDailyBudget ?? false);
+    setIsImplicitDefault(hydratedTrip.isImplicitDefault === true);
     setTravellers(normalizeTravellers(trip.travellers));
 
     return hydratedTrip;
@@ -328,6 +333,7 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
       endDate: endDate,
       travellers: travellers,
       isDynamicDailyBudget: isDynamicDailyBudget,
+      isImplicitDefault: isImplicitDefault,
     };
     return curTripData;
   }
@@ -422,6 +428,7 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     isLoading: isLoading,
     setIsLoading: setIsLoading,
     isDynamicDailyBudget: isDynamicDailyBudget,
+    isImplicitDefault: isImplicitDefault,
   };
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>;

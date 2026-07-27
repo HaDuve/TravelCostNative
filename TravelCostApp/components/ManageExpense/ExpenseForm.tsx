@@ -43,6 +43,7 @@ import {
   calcSplitList,
   recalcSplitsWithEditOrder,
   resetEditOrder,
+  splitAmountDisplayValue,
   splitType,
   splitTypesDropdown,
   travellerToDropdown,
@@ -54,8 +55,11 @@ import { useRangedMode } from "../../hooks/useRangedMode";
 import { useExpenseFx } from "../../hooks/useExpenseFx";
 import { useExpenseFormInputs } from "../../hooks/useExpenseFormInputs";
 import {
+  countryLabelForPicker,
   resolveDefaultNewExpenseCountry,
   resolveDefaultNewExpenseCurrency,
+  resolveLoadedLastCountryIfStale,
+  resolveLoadedLastCurrencyIfStale,
 } from "../../util/expense-form-inputs";
 import { useCategoryAutomap } from "../../hooks/useCategoryAutomap";
 import {
@@ -262,7 +266,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     defaultNewExpenseCurrency
   );
   const [countryPickerValue, setCountryPickerValue] = useState(
-    defaultNewExpenseCountry
+    () => countryLabelForPicker(defaultNewExpenseCountry)
   );
   const [loadingTravellers, setLoadingTravellers] = useState(
     !tripCtx.travellers && tripCtx.travellers?.length < 1
@@ -303,13 +307,17 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         isValid: true,
       },
       country: {
-        value: editingValues ? editingValues.country : defaultNewExpenseCountry,
+        value:
+          isEditing && editingValues
+            ? editingValues.country
+            : defaultNewExpenseCountry,
         isValid: true,
       },
       currency: {
-        value: editingValues
-          ? editingValues.currency
-          : defaultNewExpenseCurrency,
+        value:
+          isEditing && editingValues
+            ? editingValues.currency
+            : defaultNewExpenseCurrency,
         isValid: true,
       },
       whoPaid: {
@@ -318,6 +326,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       },
     }),
     [
+      isEditing,
       editingValues,
       defaultNewExpenseCountry,
       defaultNewExpenseCurrency,
@@ -348,63 +357,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       autoExpenseLinearSplitAdjustRef.current(inputIdentifier, enteredValue);
     },
   });
-
-  useEffect(() => {
-    if (isEditing || !userCtx.lastCurrency) return;
-
-    const preferred = resolveDefaultNewExpenseCurrency({
-      lastCurrency: userCtx.lastCurrency,
-      tripCurrency: tripCtx.tripCurrency,
-      mostRecentExpenseCurrency: mostRecentExpense?.currency,
-    });
-    const beforeLastCurrencyLoaded = resolveDefaultNewExpenseCurrency({
-      lastCurrency: "",
-      tripCurrency: tripCtx.tripCurrency,
-      mostRecentExpenseCurrency: mostRecentExpense?.currency,
-    });
-
-    if (
-      inputs.currency.value === beforeLastCurrencyLoaded &&
-      preferred !== inputs.currency.value
-    ) {
-      inputChangedHandler("currency", preferred);
-      setCurrencyPickerValue(preferred);
-    }
-  }, [
-    isEditing,
-    inputChangedHandler,
-    inputs.currency.value,
-    mostRecentExpense?.currency,
-    tripCtx.tripCurrency,
-    userCtx.lastCurrency,
-  ]);
-
-  useEffect(() => {
-    if (isEditing || !userCtx.lastCountry) return;
-
-    const preferred = resolveDefaultNewExpenseCountry({
-      lastCountry: userCtx.lastCountry,
-      mostRecentExpenseCountry: mostRecentExpense?.country,
-    });
-    const beforeLastCountryLoaded = resolveDefaultNewExpenseCountry({
-      lastCountry: "",
-      mostRecentExpenseCountry: mostRecentExpense?.country,
-    });
-
-    if (
-      inputs.country.value === beforeLastCountryLoaded &&
-      preferred !== inputs.country.value
-    ) {
-      inputChangedHandler("country", preferred);
-      setCountryPickerValue(preferred);
-    }
-  }, [
-    isEditing,
-    inputChangedHandler,
-    inputs.country.value,
-    mostRecentExpense?.country,
-    userCtx.lastCountry,
-  ]);
 
   const [showDatePickerRange, setShowDatePickerRange] = useState(false);
   const [startDate, setStartDate] = useState(
@@ -1044,6 +996,46 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     [baseInputChangedHandler, debouncedAutoCategory, scheduleDraftSave]
   );
 
+  useEffect(() => {
+    const preferred = resolveLoadedLastCurrencyIfStale({
+      isEditing,
+      lastCurrency: userCtx.lastCurrency,
+      currentCurrency: inputs.currency.value,
+      tripCurrency: tripCtx.tripCurrency,
+      mostRecentExpenseCurrency: mostRecentExpense?.currency,
+    });
+    if (preferred) {
+      inputChangedHandler("currency", preferred);
+      setCurrencyPickerValue(preferred);
+    }
+  }, [
+    isEditing,
+    inputChangedHandler,
+    inputs.currency.value,
+    mostRecentExpense?.currency,
+    tripCtx.tripCurrency,
+    userCtx.lastCurrency,
+  ]);
+
+  useEffect(() => {
+    const preferred = resolveLoadedLastCountryIfStale({
+      isEditing,
+      lastCountry: userCtx.lastCountry,
+      currentCountry: inputs.country.value,
+      mostRecentExpenseCountry: mostRecentExpense?.country,
+    });
+    if (preferred) {
+      inputChangedHandler("country", preferred);
+      setCountryPickerValue(countryLabelForPicker(preferred));
+    }
+  }, [
+    isEditing,
+    inputChangedHandler,
+    inputs.country.value,
+    mostRecentExpense?.country,
+    userCtx.lastCountry,
+  ]);
+
   const openTravellerMultiPicker = useCallback(() => {
     if (!editingValues) {
       const userNames = travellerUserNames(currentTravellers);
@@ -1532,6 +1524,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                     setCountryValue={setCurrencyPickerValue}
                     onChangeValue={updateCurrency}
                     placeholder={currencyPlaceholder}
+                    inputCurrencyCode={inputs.currency.value}
                   ></CurrencyPicker>
                 </View>
                 <View style={[styles.inputsRowSecond]}>
@@ -1916,7 +1909,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                         ></View>
                       }
                       renderItem={(itemData) => {
-                        const splitValue = itemData.item.amount.toString();
+                        const splitValue = splitAmountDisplayValue(itemData.item);
                         return (
                           <View style={styles.splitEditorCard}>
                             <View
@@ -2003,7 +1996,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                                     itemData.index,
                                     itemData.item
                                   ),
-                                  value: splitValue ? splitValue : "",
+                                  value: splitValue,
                                 }}
                               ></Input>
                               <Text

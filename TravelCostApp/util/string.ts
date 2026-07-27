@@ -6,7 +6,8 @@ import { getCurrencySymbol } from "./currencySymbol";
 export function formatExpenseWithCurrency(
   amount: number | string,
   currency?: string,
-  options?: Intl.NumberFormatOptions
+  options?: Intl.NumberFormatOptions,
+  localeOverride?: string
 ): string {
   if (typeof amount === "string") amount = Number(amount);
   if (isNaN(amount)) {
@@ -18,9 +19,10 @@ export function formatExpenseWithCurrency(
     return amount.toFixed(2);
   }
   const locale =
-    Localization.getLocales()[0] && Localization.getLocales()[0].languageTag
+    localeOverride ||
+    (Localization.getLocales()[0] && Localization.getLocales()[0].languageTag
       ? Localization.getLocales()[0].languageTag
-      : "en-US";
+      : "en-US");
 
   const fractionOptions: Intl.NumberFormatOptions = {
     style: "currency",
@@ -102,37 +104,103 @@ export function truncateString(str: string, n: number) {
   return str?.length > n ? str.slice(0, n - 1) + "..." : str;
 }
 
+type CompactScale = { threshold: number; suffixes: Record<string, string> };
+
+const COMPACT_SCALES: CompactScale[] = [
+  {
+    threshold: 1_000_000_000,
+    suffixes: { en: "b", de: " Mrd.", fr: " Md", ru: " млрд" },
+  },
+  {
+    threshold: 1_000_000,
+    suffixes: { en: "m", de: " Mio.", fr: " M", ru: " млн" },
+  },
+  {
+    threshold: 1_000,
+    suffixes: { en: "k", de: "k", fr: "k", ru: "k" },
+  },
+];
+
+function languageFromLocale(locale: string): string {
+  return locale.slice(0, 2).toLowerCase();
+}
+
+function formatCompactMantissa(
+  absAmount: number,
+  language: string
+): { mantissa: string; suffix: string } | null {
+  let scaleEntry =
+    COMPACT_SCALES.find(({ threshold }) => absAmount >= threshold) ?? null;
+  if (!scaleEntry) return null;
+
+  let scale = scaleEntry.threshold;
+  let rounded = Number((absAmount / scale).toFixed(1));
+
+  // Carry to the next larger scale when rounding reaches 1000 (e.g. 999999 → 1 Mio.)
+  const scaleIndex = COMPACT_SCALES.findIndex((s) => s.threshold === scale);
+  if (rounded >= 1000 && scaleIndex > 0) {
+    scaleEntry = COMPACT_SCALES[scaleIndex - 1];
+    scale = scaleEntry.threshold;
+    rounded = Number((absAmount / scale).toFixed(1));
+  }
+
+  const decimalSep = language === "en" ? "." : ",";
+  const mantissa = Number.isInteger(rounded)
+    ? String(rounded)
+    : rounded.toFixed(1).replace(".", decimalSep);
+
+  return {
+    mantissa,
+    suffix: scaleEntry.suffixes[language] ?? scaleEntry.suffixes.en,
+  };
+}
+
+function currencySymbolGoesFirst(locale: string, currency: string): boolean {
+  try {
+    const parts = new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency,
+      currencyDisplay: "narrowSymbol",
+    }).formatToParts(1);
+    const currencyIndex = parts.findIndex((p) => p.type === "currency");
+    const numberIndex = parts.findIndex(
+      (p) => p.type === "integer" || p.type === "decimal"
+    );
+    return currencyIndex !== -1 && numberIndex !== -1 && currencyIndex < numberIndex;
+  } catch {
+    return languageFromLocale(locale) === "en";
+  }
+}
+
 /**
- * Truncates or limits a number to a specified border value,
- * with options for formatting.
- * @param num The number to truncate.
- * @param border The border value to truncate the number. Default is 1000.
- * @param asNumber Determines whether to return the result as a number (true) or string (false). Default is true.
- * @param digits The number of digits after the decimal point for the truncated number. Default is 0.
- * @returns The truncated number or string based on the provided parameters.
+ * Space-saving compact currency amount (k / Mio. / Mrd. etc.).
+ * Used when the full formatExpenseWithCurrency string does not fit.
  */
-export function truncateNumber(
-  num: number | undefined,
-  border = 1000,
-  asNumber = true,
-  digits = 0
-) {
-  if (num === undefined || num === null || isNaN(num)) {
-    return asNumber ? 0 : "";
+export function formatCompactExpenseWithCurrency(
+  amount: number | string,
+  currency?: string,
+  locale = "en"
+): string {
+  if (typeof amount === "string") amount = Number(amount);
+  if (isNaN(amount)) {
+    return "";
+  }
+  if (!currency) {
+    return formatExpenseWithCurrency(amount, currency, undefined, locale);
   }
 
-  const isNumGreaterThanBorder = num > border;
-
-  if (asNumber) {
-    if (isNumGreaterThanBorder) {
-      return Number(num.toFixed(digits));
-    }
-    return num;
+  const abs = Math.abs(amount);
+  const language = languageFromLocale(locale);
+  const compact = formatCompactMantissa(abs, language);
+  if (!compact) {
+    return formatExpenseWithCurrency(amount, currency, undefined, locale);
   }
 
-  if (isNumGreaterThanBorder) {
-    return num.toFixed(digits);
-  }
+  const sign = amount < 0 ? "-" : "";
+  const body = `${sign}${compact.mantissa}${compact.suffix}`;
+  const symbol = getCurrencySymbol(currency);
 
-  return num.toFixed(0);
+  return currencySymbolGoesFirst(locale, currency)
+    ? `${symbol}${body}`
+    : `${body}${symbol}`;
 }

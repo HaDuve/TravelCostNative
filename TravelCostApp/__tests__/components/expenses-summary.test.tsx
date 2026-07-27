@@ -49,6 +49,103 @@ describe("ExpensesSummary", () => {
     expect(screen.getByText(/75/)).toBeTruthy();
   });
 
+  it("still shows summary when leftover gate flag is set on an Active trip", () => {
+    const expenses = [makeExpense({ calcAmount: 40, amount: 40 })];
+
+    const screen = renderWithAppProviders(
+      <ExpensesSummary expenses={expenses} periodName="month" />,
+      {
+        wrapNavigation: false,
+        user: { freshlyCreated: true },
+        expenses: {
+          expenses,
+          getRecentExpenses: () => expenses,
+        },
+        trip: {
+          tripid: "t-implicit",
+          tripCurrency: "EUR",
+          isImplicitDefault: true,
+          travellers: ["Alice"],
+        },
+      }
+    );
+
+    expect(screen.getByTestId("expenses-summary-pressable")).toBeTruthy();
+    expect(screen.getByText(/40/)).toBeTruthy();
+  });
+
+  it("hides progress when the Active trip is budget-free", () => {
+    const expenses = [makeExpense({ calcAmount: 40, amount: 40 })];
+
+    const screen = renderWithAppProviders(
+      <ExpensesSummary expenses={expenses} periodName="month" />,
+      {
+        wrapNavigation: false,
+        expenses: {
+          expenses,
+          getRecentExpenses: () => expenses,
+        },
+        trip: {
+          tripid: "t-implicit",
+          tripCurrency: "EUR",
+          isImplicitDefault: true,
+          dailyBudget: "0",
+          totalBudget: "0",
+          travellers: ["Alice"],
+        },
+      }
+    );
+
+    expect(screen.getByTestId("expenses-summary-pressable")).toBeTruthy();
+    expect(screen.queryByTestId("expenses-summary-progress")).toBeNull();
+  });
+
+  it("hides total progress for daily-only trips", () => {
+    const expenses = [makeExpense({ calcAmount: 40, amount: 40 })];
+
+    const screen = renderWithAppProviders(
+      <ExpensesSummary expenses={expenses} periodName="total" />,
+      {
+        wrapNavigation: false,
+        expenses: {
+          expenses,
+          getRecentExpenses: () => expenses,
+        },
+        trip: {
+          dailyBudget: "50",
+          totalBudget: "0",
+          travellers: ["Alice"],
+        },
+      }
+    );
+
+    expect(screen.getByTestId("expenses-summary-pressable")).toBeTruthy();
+    expect(screen.queryByTestId("expenses-summary-progress")).toBeNull();
+  });
+
+  it("hides period progress for total-only trips", () => {
+    const expenses = [makeExpense({ calcAmount: 40, amount: 40 })];
+
+    const screen = renderWithAppProviders(
+      <ExpensesSummary expenses={expenses} periodName="month" />,
+      {
+        wrapNavigation: false,
+        expenses: {
+          expenses,
+          getRecentExpenses: () => expenses,
+        },
+        trip: {
+          dailyBudget: "0",
+          totalBudget: "2000",
+          travellers: ["Alice"],
+        },
+      }
+    );
+
+    expect(screen.getByTestId("expenses-summary-pressable")).toBeTruthy();
+    expect(screen.queryByTestId("expenses-summary-progress")).toBeNull();
+  });
+
   it("uses dropdown-matching shadow chrome on the budget summary pressable", () => {
     const expenses = [makeExpense({ calcAmount: 75, amount: 75 })];
 
@@ -176,14 +273,18 @@ describe("ExpensesSummary", () => {
     ).toBeNull();
   });
 
-  it("shows an error toast instead of the modal when the period budget is unlimited", () => {
+  it("hides total progress when total budget is unset (MAX sentinel)", () => {
     const expenses = [makeExpense({ calcAmount: 50, amount: 50 })];
 
     const screen = renderWithAppProviders(
       <ExpensesSummary expenses={expenses} periodName="total" />,
       {
         wrapNavigation: false,
-        trip: { totalBudget: "", travellers: [{ uid: "u1", userName: "Alice" }] },
+        trip: {
+          totalBudget: "3435973836",
+          dailyBudget: "50",
+          travellers: [{ uid: "u1", userName: "Alice" }],
+        },
         expenses: {
           expenses,
           getRecentExpenses: () => expenses,
@@ -191,16 +292,8 @@ describe("ExpensesSummary", () => {
       },
     );
 
-    fireEvent.press(screen.getByTestId("expenses-summary-pressable"));
-
-    expect(screen.queryByText(i18n.t("overview"))).toBeNull();
-    expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: "error",
-        text1: i18n.t("noTotalBudget"),
-        text2: i18n.t("infinityLeftToSpend"),
-      }),
-    );
+    expect(screen.getByTestId("expenses-summary-pressable")).toBeTruthy();
+    expect(screen.queryByTestId("expenses-summary-progress")).toBeNull();
   });
 
   it("dismisses the budget overview modal on Android back", () => {

@@ -20,8 +20,6 @@ import { GlobalStyles } from "../constants/styles";
 import LinkingButton from "../components/UI/LinkButton";
 import { DEVELOPER_MODE } from "../confAppConstants";
 import { useFocusEffect } from "@react-navigation/native";
-import { resetTour } from "../util/tourUtil";
-import { reloadApp } from "../util/appState";
 import { ENTITLEMENT_ID } from "../components/Premium/PremiumConstants";
 import PropTypes from "prop-types";
 import GradientButton from "../components/UI/GradientButton";
@@ -186,17 +184,6 @@ const SettingsScreen = ({ navigation }) => {
 
       <SettingsSection multiTraveller={multiTraveller}></SettingsSection>
 
-      <GradientButton
-        style={styles.settingsButton}
-        buttonStyle={{}}
-        onPress={async () => {
-          trackEvent(VexoEvents.RESET_APP_INTRODUCTION_PRESSED);
-          await resetTour();
-          await reloadApp();
-        }}
-      >
-        {i18n.t("resetAppIntroductionLabel")}
-      </GradientButton>
       <LinkingButton
         style={styles.settingsButton}
         URL="https://foodfornomads.com/"

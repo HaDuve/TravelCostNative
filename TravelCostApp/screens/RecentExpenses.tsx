@@ -36,9 +36,8 @@ import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpensesUtil";
 import { _toShortFormat } from "../util/dateTime";
-import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
+import { useScrollToTop } from "@react-navigation/native";
 import { isForeground } from "../util/appState";
-import { TourGuideZone } from "rn-tourguide";
 import PropTypes from "prop-types";
 import Toast from "react-native-toast-message";
 import { NetworkContext } from "../store/network-context";
@@ -96,7 +95,6 @@ function RecentExpenses({ navigation }) {
       showAnyIndicator = false,
       ignoreTouched = false
     ) => {
-      if (userCtx.freshlyCreated) return;
       // if (ignoreTouched)
       // check offlinemode
       const online = netCtx.isConnected && netCtx.strongConnection;
@@ -151,22 +149,8 @@ function RecentExpenses({ navigation }) {
       // tripCtx,
       tripid,
       uid,
-      userCtx.freshlyCreated,
       userCtx.isSendingOfflineQueueMutex,
     ]
-  );
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (userCtx.freshlyCreated) {
-        Toast.show({
-          type: "success",
-          text1: i18n.t("welcomeToBudgetForNomads"),
-          text2: i18n.t("pleaseCreateTrip"),
-        });
-        navigation.navigate("Profile");
-      }
-    }, [userCtx.freshlyCreated, navigation])
   );
 
   const [isFetching, setIsFetching] = useState(false);
@@ -263,7 +247,6 @@ function RecentExpenses({ navigation }) {
 
   useInterval(
     () => {
-      if (userCtx.freshlyCreated) return;
       setDateTimeString(_toShortFormat(DateTime.now()));
       if (isForeground()) {
         const asyncPolling = async () => {
@@ -339,24 +322,6 @@ function RecentExpenses({ navigation }) {
   // }
   return (
     <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
-      <TourGuideZone
-        text={i18n.t("walk1")}
-        zone={1}
-        maskOffset={constantScale(-4, 0.5)}
-        tooltipBottomOffset={constantScale(200, 0.5)}
-      ></TourGuideZone>
-      <TourGuideZone
-        text={i18n.t("walk8")}
-        zone={8}
-        maskOffset={constantScale(-4, 0.5)}
-        tooltipBottomOffset={constantScale(-200, 0.5)}
-      ></TourGuideZone>
-      <TourGuideZone
-        text={i18n.t("walk3")}
-        maskOffset={constantScale(200, 0.5)}
-        tooltipBottomOffset={constantScale(-200, 0.5)}
-        zone={3}
-      ></TourGuideZone>
       <View
         testID="period-date-header"
         style={[

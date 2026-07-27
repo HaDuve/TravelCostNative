@@ -1,6 +1,6 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { useContext, useEffect, useState } from "react";
-import React, { Alert } from "react-native";
+import { Platform } from "react-native";
 
 import { i18n } from "../i18n/i18n";
 
@@ -9,10 +9,10 @@ import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { asyncStoreSafeClear } from "../store/async-storage";
 import { UserContext, UserData } from "../store/user-context";
 import { createUser } from "../util/auth";
-import { setAxiosAccessToken, storeUser, updateUser } from "../util/http";
+import { storeUser, updateUser } from "../util/http";
+import { setAxiosAccessToken } from "../util/axios-config";
 import { AuthContext } from "../store/auth-context";
 import Toast from "react-native-toast-message";
-import { Platform } from "react-native";
 import Purchases from "react-native-purchases";
 import {
   loadKeys,
@@ -22,11 +22,19 @@ import {
 import { NetworkContext } from "../store/network-context";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
+import { TripContext } from "../store/trip-context";
+import { ExpensesContext } from "../store/expenses-context";
+import { secureStoreSetItem } from "../store/secure-storage";
+import { MMKV_KEYS, setMMKVObject } from "../store/mmkv";
+import safeLogError from "../util/error";
+import { createImplicitDefaultForUser } from "../util/create-implicit-default-for-user";
 
 function SignupScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const authCtx = useContext(AuthContext);
   const userCtx = useContext(UserContext);
+  const tripCtx = useContext(TripContext);
+  const expCtx = useContext(ExpensesContext);
   const netCtx = useContext(NetworkContext);
 
   const [isConnected, setIsConnected] = useState(
@@ -90,7 +98,6 @@ function SignupScreen() {
       await userCtx.setUserName(name);
       userCtx.setTripHistory([]);
 
-      await userCtx.setFreshlyCreatedTo(true);
       await authCtx.setUserID(uid);
       const { REVCAT_G, REVCAT_A }: Keys = await loadKeys();
       if (REVCAT_A || REVCAT_G) {
@@ -115,8 +122,27 @@ function SignupScreen() {
         userName: name,
         locale: userData.locale,
       });
+
+      await createImplicitDefaultForUser({
+        uid,
+        userName: name,
+        existingTripHistory: [],
+        setCurrentTrip: tripCtx.setCurrentTrip,
+        setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
+        setTripHistory: userCtx.setTripHistory,
+      });
+      expCtx.setExpenses([]);
+      setMMKVObject(MMKV_KEYS.EXPENSES, []);
+      await secureStoreSetItem("uid", uid);
     } catch (error) {
-      await authCtx.authenticate(token);
+      safeLogError(error);
+      setIsAuthenticating(false);
+      Toast.show({
+        type: "error",
+        text1: i18n.t("exceptionError"),
+        text2: i18n.t("tryAgain"),
+      });
+      return;
     }
     await authCtx.authenticate(token);
   }

@@ -41,32 +41,3 @@ export const getExpenseDraft = (expenseId: string) => {
 export const clearExpenseDraft = (expenseId: string) => {
   deleteMMKVObject(MMKV_KEY_PATTERNS.EXPENSE_DRAFT(expenseId));
 };
-
-// Recent currencies storage (max 5)
-const MAX_RECENT_CURRENCIES = 5;
-
-export const getRecentCurrencies = (): string[] => {
-  const currencies = getMMKVObject(MMKV_KEYS.RECENT_CURRENCIES);
-  return Array.isArray(currencies) ? currencies : [];
-};
-
-export const addRecentCurrency = (currencyCode: string) => {
-  if (!currencyCode) return;
-
-  const recent = getRecentCurrencies();
-  // Remove if already exists
-  const filtered = recent.filter((c) => c !== currencyCode);
-  // Add to front
-  const updated = [currencyCode, ...filtered].slice(0, MAX_RECENT_CURRENCIES);
-  setMMKVObject(MMKV_KEYS.RECENT_CURRENCIES, updated);
-};
-
-export const initializeRecentCurrencies = (tripCurrency: string) => {
-  if (!tripCurrency) return;
-
-  const recent = getRecentCurrencies();
-  // Only initialize if empty
-  if (recent.length === 0) {
-    setMMKVObject(MMKV_KEYS.RECENT_CURRENCIES, [tripCurrency]);
-  }
-};

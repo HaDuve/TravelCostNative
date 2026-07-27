@@ -18,7 +18,6 @@ export const MMKV_KEYS = {
   CATEGORY_LIST: "categoryList",
 
   // Currency related
-  RECENT_CURRENCIES: "recentCurrencies",
   CURRENCY_EXCHANGE_LAST_UPDATE: "currencyExchange_lastUpdate",
 
   // UI/App state

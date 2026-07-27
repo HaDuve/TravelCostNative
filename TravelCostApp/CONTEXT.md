@@ -14,18 +14,30 @@ _Avoid_: Account (in domain speech), member
 A User who appears on a specific trip’s roster. Every Traveller is a User; joining or creating a trip is what makes someone a Traveller for that trip. A User who has not completed onboarding or has not joined a trip is not a Traveller.
 _Avoid_: Member, participant, user (when you mean someone on the trip roster)
 
+**Nomad** (user-facing):
+The label shown in the app for a **Traveller** on a trip roster (e.g. “Invite nomads”, “Budget per nomad”). Domain speech and code use **Traveller**; UI copy uses **Nomad** / localized equivalents (DE: Nomade). Distinct from the product name **Budget for Nomads**.
+_Avoid_: Member (awkward in DE), traveller (user-facing — use Nomad), using “nomad” in domain speech when you mean Traveller
+
 ### Trips
 
 **Trip**:
-The shared container where a group tracks travel spending together — expenses, travellers, budgets, and splits all belong to one trip.
+The shared container where a group tracks spending together — expenses, travellers, budgets, and splits all belong to one trip. Usable for everyday personal tracking or group travel.
 _Avoid_: Trip budget (as a noun for the container), journey, group ledger
+
+**Budget** (user-facing):
+The label shown in the app for a Trip — the expense container a User creates, joins, or tracks. Domain speech and code use **Trip**; UI copy uses **Budget** (e.g. “My Budgets”, “Create budget”).
+_Avoid_: Using “budget” in domain speech when you mean the Trip entity (conflicts with budget amounts on a trip)
 
 **Active trip**:
 The trip a User has selected for day-to-day use — adding expenses, viewing the ledger, and seeing trip-level summaries. A User may belong to many trips but only one is active at a time.
 _Avoid_: Current trip (implementation alias only), open trip
 
+**Implicit default trip**:
+A trip created automatically when a User has no **Active trip**, so they can add expenses before naming a budget. Naming promotes it in place to an ordinary trip; it is never back-applied to trips that already existed before this path shipped. UI may show it as “Your budget” until named.
+_Avoid_: Unnamed trip (legacy empty names are not this), draft trip, temporary trip
+
 **Trip history**:
-All trips a User can open (shown as “My Trips”) — not only past trips; includes current and future-dated trips. One is the **Active trip**.
+All trips a User can open (shown as “My Budgets” in UI) — not only past trips; includes current and ongoing containers. One is the **Active trip**.
 _Avoid_: History (alone — implies completed trips only)
 
 **Leave trip**:
@@ -121,15 +133,19 @@ _Avoid_: Duplicate (alone — ambiguous), multiply (UI copy)
 ### Budget
 
 **Budget**:
-A spending target on a trip. Qualifiers name the shape: **total budget** (whole trip), **daily budget** (per calendar day), and **dynamic daily budget** (recalculated daily target — see below).
+A spending target on a trip. Qualifiers name the shape: **total budget** (whole trip), **daily budget** (per calendar day), and **dynamic daily budget** (recalculated daily target — see below). Either shape may be unset; when both are unset the trip is **budget-free**.
 _Avoid_: Spending limit, trip budget (as the trip container)
 
+**Budget-free**:
+A trip with neither a **total budget** nor a **daily budget** set. Over-budget signals and budget progress do not apply until at least one is set.
+_Avoid_: No-budget mode, unbudgeted trip (prefer **budget-free**)
+
 **Total budget**:
-The cap on cumulative spending for the entire trip. The trip is **over total budget** when cumulative spend exceeds this amount.
+The cap on cumulative spending for the entire trip. Optional — when unset, total progress does not apply. The trip is **over total budget** when a total is set and cumulative spend exceeds it.
 _Avoid_: Trip budget (ambiguous with the trip itself)
 
 **Daily budget**:
-The spending target for a single calendar day. The day is **over daily budget** only when that day’s spend exceeds that day’s daily target — not merely because cumulative spend is high.
+The spending target for a single calendar day. Optional — when unset, period budget lines and daily over-budget coloring do not apply. When set, the day is **over daily budget** only when that day’s spend exceeds that day’s daily target — not merely because cumulative spend is high.
 
 **Dynamic daily budget**:
 A mode where the daily budget target is recalculated from remaining total budget and remaining trip days (e.g. after €1,200 spent with €1,800 left over 20 days, the target becomes ~€90/day). When enabled, “over daily budget” uses the current recalculated target, not necessarily the original figure entered at trip setup.

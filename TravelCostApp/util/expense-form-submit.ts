@@ -7,7 +7,7 @@ import {
   paidBackStatus,
   Split,
 } from "./expense";
-import { splitType } from "./split";
+import { resetEditOrder, splitType } from "./split";
 
 export type ExpenseFormSnapshot = {
   uid: string;
@@ -60,7 +60,7 @@ function sharedExpenseCore(snapshot: ExpenseFormSnapshot) {
     uid: snapshot.uid,
     amount: +snapshot.amountValue,
     splitType: snapshot.splitType,
-    splitList: snapshot.splitList,
+    splitList: resetEditOrder(snapshot.splitList),
     iconName: snapshot.iconName,
     paidBack: snapshot.paidBack,
     isSpecialExpense: snapshot.isSpecialExpense,

@@ -1,8 +1,12 @@
 import {
   applyFieldValidityToInputs,
+  countriesRepresentSamePlace,
+  countryLabelForPicker,
   resolveAmountValue,
   resolveDefaultNewExpenseCountry,
   resolveDefaultNewExpenseCurrency,
+  resolveLoadedLastCountryIfStale,
+  resolveLoadedLastCurrencyIfStale,
 } from "../../util/expense-form-inputs";
 import type { ExpenseFormInputsState } from "../../util/expense-form-inputs";
 
@@ -76,6 +80,95 @@ describe("resolveDefaultNewExpenseCountry", () => {
         mostRecentExpenseCountry: "DE",
       })
     ).toBe("US");
+  });
+});
+
+describe("countriesRepresentSamePlace", () => {
+  it("treats ISO codes and English names as the same country", () => {
+    expect(countriesRepresentSamePlace("DE", "Germany")).toBe(true);
+    expect(countriesRepresentSamePlace("US", "United States of America")).toBe(
+      true
+    );
+  });
+});
+
+describe("countryLabelForPicker", () => {
+  it("maps stored ISO codes to English picker labels", () => {
+    expect(countryLabelForPicker("DE")).toBe("Germany");
+    expect(countryLabelForPicker("US")).toBe("United States of America");
+  });
+});
+
+describe("resolveLoadedLastCountryIfStale", () => {
+  it("returns latest-used country when the form still shows trip defaults", () => {
+    expect(
+      resolveLoadedLastCountryIfStale({
+        isEditing: false,
+        lastCountry: "US",
+        currentCountry: "DE",
+        mostRecentExpenseCountry: "DE",
+      })
+    ).toBe("US");
+  });
+
+  it("returns null when the user already changed country away from trip defaults", () => {
+    expect(
+      resolveLoadedLastCountryIfStale({
+        isEditing: false,
+        lastCountry: "US",
+        currentCountry: "France",
+        mostRecentExpenseCountry: "DE",
+      })
+    ).toBeNull();
+  });
+
+  it("returns latest-used country when a restored draft left country empty", () => {
+    expect(
+      resolveLoadedLastCountryIfStale({
+        isEditing: false,
+        lastCountry: "US",
+        currentCountry: "",
+        mostRecentExpenseCountry: "DE",
+      })
+    ).toBe("US");
+  });
+});
+
+describe("resolveLoadedLastCurrencyIfStale", () => {
+  it("returns latest-used currency when the form still shows trip defaults", () => {
+    expect(
+      resolveLoadedLastCurrencyIfStale({
+        isEditing: false,
+        lastCurrency: "USD",
+        currentCurrency: "EUR",
+        tripCurrency: "EUR",
+        mostRecentExpenseCurrency: "EUR",
+      })
+    ).toBe("USD");
+  });
+
+  it("returns null when the user already changed currency away from trip defaults", () => {
+    expect(
+      resolveLoadedLastCurrencyIfStale({
+        isEditing: false,
+        lastCurrency: "USD",
+        currentCurrency: "GBP",
+        tripCurrency: "EUR",
+        mostRecentExpenseCurrency: "EUR",
+      })
+    ).toBeNull();
+  });
+
+  it("returns latest-used currency when a restored draft left currency empty", () => {
+    expect(
+      resolveLoadedLastCurrencyIfStale({
+        isEditing: false,
+        lastCurrency: "USD",
+        currentCurrency: "",
+        tripCurrency: "EUR",
+        mostRecentExpenseCurrency: "EUR",
+      })
+    ).toBe("USD");
   });
 });
 

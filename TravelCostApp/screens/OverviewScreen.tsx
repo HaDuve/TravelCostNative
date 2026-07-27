@@ -21,7 +21,6 @@ import { GlobalStyles } from "../constants/styles";
 import { shadowRegressionStyles, periodHeaderLabelFontSize } from "../styles/shadow-regression-styles";
 import { MemoizedExpensesOverview } from "../components/ExpensesOutput/ExpensesOverview";
 import ToggleButton from "../assets/SVG/toggleButton";
-import { TourGuideZone } from "rn-tourguide";
 
 import { i18n } from "../i18n/i18n";
 
@@ -88,27 +87,11 @@ const OverviewScreen = ({ navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      if (userCtx.freshlyCreated) {
-        Toast.show({
-          type: "success",
-          text1: i18n.t("welcomeToBudgetForNomads"),
-          text2: i18n.t("pleaseCreateTrip"),
-        });
-        navigation.navigate("Profile");
-      }
-    }, [userCtx.freshlyCreated, navigation])
-  );
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (!userCtx.freshlyCreated) {
-        const onboardingFlags: OnboardingFlags = {
-          freshlyCreated: userCtx.freshlyCreated,
-          needsTour: userCtx.needsTour,
-        };
-        showBanner(navigation, onboardingFlags);
-      }
-    }, [navigation, userCtx.freshlyCreated, userCtx.needsTour])
+      const onboardingFlags: OnboardingFlags = {
+        freshlyCreated: userCtx.freshlyCreated,
+      };
+      showBanner(navigation, onboardingFlags);
+    }, [navigation, userCtx.freshlyCreated])
   );
 
   useEffect(() => {
@@ -282,23 +265,15 @@ const OverviewScreen = ({ navigation }) => {
       </View>
 
       {/* FAB Toggle Button */}
-      <TourGuideZone
-        text={i18n.t("walk4")}
-        tooltipBottomOffset={constantScale(166, 0.5)}
-        maskOffset={constantScale(60, 0.5)}
-        zone={4}
-        shape={"circle"}
+      <Pressable
+        onPress={toggleContent}
+        style={({ pressed }) => [
+          styles.fabToggleButton,
+          pressed && GlobalStyles.pressedWithShadow,
+        ]}
       >
-        <Pressable
-          onPress={toggleContent}
-          style={({ pressed }) => [
-            styles.fabToggleButton,
-            pressed && GlobalStyles.pressedWithShadow,
-          ]}
-        >
-          <ToggleButton toggled={userCtx.isShowingGraph} />
-        </Pressable>
-      </TourGuideZone>
+        <ToggleButton toggled={userCtx.isShowingGraph} />
+      </Pressable>
     </View>
   );
 };

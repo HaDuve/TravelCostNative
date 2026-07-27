@@ -48,7 +48,6 @@ export interface UserData {
   lastCurrency?: string;
   lastCountry?: string;
   freshlyCreated?: boolean;
-  needsTour?: boolean;
   isPremium?: boolean;
   locale?: string;
 }
@@ -69,8 +68,6 @@ export type UserContextType = {
 
   freshlyCreated: boolean;
   setFreshlyCreatedTo: (bool: boolean) => void;
-  needsTour: boolean;
-  setNeedsTour: (bool: boolean) => void;
 
   tripHistory: string[];
   setTripHistory: (tripHistory: string[]) => void;
@@ -108,8 +105,6 @@ export const UserContext = createContext<UserContextType>({
 
   freshlyCreated: false,
   setFreshlyCreatedTo: async (bool: boolean) => {},
-  needsTour: false,
-  setNeedsTour: (bool: boolean) => {},
 
   tripHistory: [],
   setTripHistory: (tripHistory: string[]) => {},
@@ -136,7 +131,6 @@ export const UserContext = createContext<UserContextType>({
 function UserContextProvider({ children }) {
   const [userName, setName] = useState("");
   const [freshlyCreated, setFreshlyCreated] = useState(false);
-  const [needsTour, setNeedsTour] = useState(false);
   const [periodName, setPeriodName] = useState("day");
   const [isOnline, setIsOnline] = useState(false);
   const [lastCurrency, setLastCurrency] = useState("");
@@ -306,9 +300,6 @@ function UserContextProvider({ children }) {
 
     freshlyCreated: freshlyCreated,
     setFreshlyCreatedTo: setFreshlyCreatedTo,
-
-    needsTour: needsTour,
-    setNeedsTour: setNeedsTour,
 
     tripHistory: tripHistory,
     setTripHistory: setTripHistory,

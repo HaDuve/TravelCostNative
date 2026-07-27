@@ -64,6 +64,23 @@ describe("toExpenseDraft", () => {
       buildExpenseData(snapshot).amount
     );
   });
+
+  it("strips ephemeral split form fields before autosave persistence", () => {
+    const draft = toExpenseDraft(
+      makeExpenseFormSnapshot({
+        splitList: [
+          {
+            userName: "Alice",
+            amount: 12,
+            amountInput: "12.",
+            editOrder: 0,
+          },
+        ],
+      })
+    );
+
+    expect(draft.splitList).toEqual([{ userName: "Alice", amount: 12 }]);
+  });
 });
 
 describe("applyDraftToForm", () => {

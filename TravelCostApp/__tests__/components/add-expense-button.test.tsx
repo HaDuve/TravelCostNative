@@ -10,9 +10,6 @@ jest.mock("../../util/vexo-tracking", () => ({
   trackEvent: jest.fn(),
 }));
 
-jest.mock("rn-tourguide", () => ({
-  TourGuideZone: ({ children }: { children?: React.ReactNode }) => children ?? null,
-}));
 
 jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: jest.fn() }),

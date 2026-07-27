@@ -6,38 +6,6 @@ const tripBudgetAsContainerFr = /budget de voyage/i;
 /** Cyrillic inflection between бюджет and поездк (\\w does not match Russian suffixes). */
 const tripBudgetAsContainerRu = /бюджет.{0,4}поездк/iu;
 
-const walk5Expectations: Array<{
-  lang: string;
-  locale: Record<string, string>;
-  tripPattern: RegExp;
-  avoidPattern: RegExp;
-}> = [
-  {
-    lang: "en",
-    locale: en,
-    tripPattern: /new trip/i,
-    avoidPattern: tripBudgetAsContainerEn,
-  },
-  {
-    lang: "de",
-    locale: de,
-    tripPattern: /neue Reise/i,
-    avoidPattern: /budget.*reise/i,
-  },
-  {
-    lang: "fr",
-    locale: fr,
-    tripPattern: /nouveau voyage/i,
-    avoidPattern: tripBudgetAsContainerFr,
-  },
-  {
-    lang: "ru",
-    locale: ru,
-    tripPattern: /новое путешествие/i,
-    avoidPattern: tripBudgetAsContainerRu,
-  },
-];
-
 describe("trip form i18n (issue #223)", () => {
   describe("tripBudgetAsContainerRu guard", () => {
     it("matches inflected budget+trip phrasing that \\w-based patterns miss", () => {
@@ -107,22 +75,11 @@ describe("trip form i18n (issue #223)", () => {
     });
   });
 
-  describe("walkthrough onboarding (walk5)", () => {
-    it.each(walk5Expectations)(
-      "$lang walk5 promotes creating a Trip, not a trip-budget container",
-      ({ locale, tripPattern, avoidPattern }) => {
-        expect(locale.walk5).toMatch(tripPattern);
-        expect(locale.walk5).not.toMatch(avoidPattern);
-      }
-    );
-  });
-
   it("trip form alert keys exist in every locale", () => {
     for (const locale of [en, de, fr, ru]) {
       expect(locale.enterNameAlert).toBeTruthy();
       expect(locale.tripFormTitleNew).toBeTruthy();
       expect(locale.tripFormTitleEdit).toBeTruthy();
-      expect(locale.walk5).toBeTruthy();
     }
   });
 });

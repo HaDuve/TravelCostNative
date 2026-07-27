@@ -24,6 +24,7 @@ import { secureStoreSetItem } from "../store/secure-storage";
 import { ExpensesContext } from "../store/expenses-context";
 import { MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
+import { createImplicitDefaultForUser } from "../util/create-implicit-default-for-user";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -72,6 +73,7 @@ function LoginScreen() {
       safeLogError(error);
       setIsAuthenticating(false);
       authCtx.logout(tripCtx.tripid);
+      return;
     }
     const userData = checkUser;
     // Check if the user logged in but there is no userName, we deleted the account
@@ -84,18 +86,8 @@ function LoginScreen() {
         visibilityTime: 4000,
       });
       authCtx.logout(tripCtx.tripid);
+      setIsAuthenticating(false);
       return;
-    }
-    tripCtx.setTripid(checkUser.currentTrip);
-    let freshlyCreated = checkUser.freshlyCreated;
-    if (!checkUser.currentTrip) {
-      // we infer freshly created if no current trip exists but we assigned a name already
-      //   "loginHandler ~ we set to freshly because username but no current trip!"
-      // );
-      await userCtx.setFreshlyCreatedTo(true);
-      freshlyCreated = true;
-    } else {
-      await userCtx.setFreshlyCreatedTo(freshlyCreated);
     }
     try {
       //// END OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
@@ -119,25 +111,53 @@ function LoginScreen() {
     } catch (error) {
       safeLogError(error);
     }
-    const tripid = userData.currentTrip;
-    if (!tripid && freshlyCreated) {
-      await authCtx.authenticate(token);
-      return;
-    }
-    try {
-      await secureStoreSetItem("currentTripId", tripid);
-      await secureStoreSetItem("uid", uid);
-      await touchMyTraveler(tripid, uid);
 
-      await tripCtx.fetchAndSetCurrentTrip(tripid);
-      await userCtx.loadCatListFromAsyncInCtx(tripid);
-      await userCtx.updateTripHistory();
-      tripCtx.refresh();
-      expCtx.setExpenses([]);
-      setMMKVObject(MMKV_KEYS.EXPENSES, []);
-    } catch (error) {
-      safeLogError(error);
+    let tripid = userData.currentTrip;
+    if (!tripid) {
+      try {
+        const created = await createImplicitDefaultForUser({
+          uid,
+          userName: userData.userName,
+          existingTripHistory: userCtx.tripHistory,
+          setCurrentTrip: tripCtx.setCurrentTrip,
+          setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
+          setTripHistory: userCtx.setTripHistory,
+        });
+        tripid = created.tripid;
+        expCtx.setExpenses([]);
+        setMMKVObject(MMKV_KEYS.EXPENSES, []);
+        await userCtx.loadCatListFromAsyncInCtx(tripid);
+        tripCtx.refresh();
+      } catch (error) {
+        safeLogError(error);
+        setIsAuthenticating(false);
+        authCtx.logout(tripCtx.tripid);
+        return;
+      }
+    } else {
+      // Leftover freshlyCreated with an existing Active trip: clear and ignore for routing
+      await userCtx.setFreshlyCreatedTo(false);
+      try {
+        await updateUser(uid, {
+          ...userData,
+          freshlyCreated: false,
+        });
+        await secureStoreSetItem("currentTripId", tripid);
+        await secureStoreSetItem("uid", uid);
+
+        await touchMyTraveler(tripid, uid);
+
+        await tripCtx.fetchAndSetCurrentTrip(tripid);
+        await userCtx.loadCatListFromAsyncInCtx(tripid);
+        await userCtx.updateTripHistory();
+        tripCtx.refresh();
+        expCtx.setExpenses([]);
+        setMMKVObject(MMKV_KEYS.EXPENSES, []);
+      } catch (error) {
+        safeLogError(error);
+      }
     }
+    tripCtx.setTripid(tripid);
     await authCtx.authenticate(token);
   }
 

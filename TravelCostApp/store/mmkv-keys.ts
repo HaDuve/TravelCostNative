@@ -45,6 +45,7 @@ export type LastFetchKey = `lastFetch_${string}`;
 export type LastUpdateAllExpensesTripKey = `lastUpdate_allExpenses_tripid_${string}`;
 export type LastUpdateIsoAllExpensesTripKey =
   `lastUpdateISO_allExpenses_tripid${string}`;
+export type NamingBannerDismissedKey = `namingBannerDismissed_${string}`;
 
 // Dynamic key patterns - keys that require parameters
 export const MMKV_KEY_PATTERNS = {
@@ -68,6 +69,8 @@ export const MMKV_KEY_PATTERNS = {
     tripid: string
   ): LastUpdateIsoAllExpensesTripKey =>
     `lastUpdateISO_allExpenses_tripid${tripid}`,
+  NAMING_BANNER_DISMISSED: (tripid: string): NamingBannerDismissedKey =>
+    `namingBannerDismissed_${tripid}`,
 } as const;
 
 // Type for all static keys
@@ -81,7 +84,8 @@ export type MMKVDynamicKey =
   | TripLastUpdateIsoKey
   | LastFetchKey
   | LastUpdateAllExpensesTripKey
-  | LastUpdateIsoAllExpensesTripKey;
+  | LastUpdateIsoAllExpensesTripKey
+  | NamingBannerDismissedKey;
 export type MMKVKey = MMKVStaticKey | MMKVDynamicKey;
 
 // Type guard to ensure a string is a valid MMKV key
@@ -99,6 +103,7 @@ export function isValidMMKVKey(key: string): key is MMKVKey {
     key.startsWith("lastUpdateISO_trip_") ||
     key.startsWith("lastFetch_") ||
     key.startsWith("lastUpdate_allExpenses_tripid_") ||
-    key.startsWith("lastUpdateISO_allExpenses_tripid")
+    key.startsWith("lastUpdateISO_allExpenses_tripid") ||
+    key.startsWith("namingBannerDismissed_")
   );
 }

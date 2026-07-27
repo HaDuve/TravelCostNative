@@ -104,6 +104,7 @@ import {
   VexoUserContext,
 } from "./util/vexo-tracking";
 import { VexoEvents } from "./util/vexo-constants";
+import { HOME_TAB_INITIAL_ROUTE_NAME } from "./util/home-landing";
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
@@ -377,7 +378,7 @@ function Navigation() {
 function Home() {
   const { isShowingGraph, hasNewChanges } = useContext(UserContext);
 
-  const FirstScreen = "RecentExpenses";
+  const FirstScreen = HOME_TAB_INITIAL_ROUTE_NAME;
   const expCtx = useContext(ExpensesContext);
   const expenses = expCtx.expenses;
   const hasExp = expenses?.length > 0;

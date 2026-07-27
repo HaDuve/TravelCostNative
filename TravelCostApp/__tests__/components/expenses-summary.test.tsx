@@ -49,7 +49,7 @@ describe("ExpensesSummary", () => {
     expect(screen.getByText(/75/)).toBeTruthy();
   });
 
-  it("still shows summary when freshlyCreated leftover flag is set", () => {
+  it("still shows summary when leftover gate flag is set on an Active trip", () => {
     const expenses = [makeExpense({ calcAmount: 40, amount: 40 })];
 
     const screen = renderWithAppProviders(

@@ -43,7 +43,6 @@ import {
 import { toExpenseNavigationDtos } from "../util/expense-navigation-dto";
 import Animated from "react-native-reanimated";
 import { formatExpenseWithCurrency } from "../util/string";
-import { useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";

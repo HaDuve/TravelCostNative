@@ -152,6 +152,10 @@ function LoginScreen() {
       // Leftover freshlyCreated with an existing Active trip: clear and ignore for routing
       await userCtx.setFreshlyCreatedTo(false);
       try {
+        await updateUser(uid, {
+          ...userData,
+          freshlyCreated: false,
+        });
         await secureStoreSetItem("currentTripId", tripid);
         await secureStoreSetItem("uid", uid);
 

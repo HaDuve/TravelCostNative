@@ -23,7 +23,7 @@ describe("isImplicitDefaultTrip", () => {
 });
 
 describe("buildImplicitDefaultTripData", () => {
-  it("builds a budget-free implicit default with locale currency and no dates", () => {
+  it("builds an implicit default trip with locale currency, zero budgets, and no dates", () => {
     const trip = buildImplicitDefaultTripData("JPY");
 
     expect(trip.isImplicitDefault).toBe(true);
@@ -49,6 +49,11 @@ describe("non-premium trip limit counting", () => {
     expect(countsTowardNonPremiumTripLimit(trips[0])).toBe(false);
     expect(countsTowardNonPremiumTripLimit(trips[1])).toBe(true);
     expect(countsTowardNonPremiumTripLimit(trips[2])).toBe(true);
+  });
+
+  it("does not count failed trip fetches against the limit", () => {
+    expect(countsTowardNonPremiumTripLimit(null)).toBe(false);
+    expect(countableTripsTowardNonPremiumLimit([null, undefined])).toBe(0);
   });
 });
 

@@ -151,7 +151,12 @@ function SignupScreen() {
       await secureStoreSetItem("uid", uid);
     } catch (error) {
       safeLogError(error);
-      await authCtx.authenticate(token);
+      setIsAuthenticating(false);
+      Toast.show({
+        type: "error",
+        text1: i18n.t("exceptionError"),
+        text2: i18n.t("tryAgain"),
+      });
       return;
     }
     await authCtx.authenticate(token);

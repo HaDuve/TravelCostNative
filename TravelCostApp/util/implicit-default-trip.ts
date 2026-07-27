@@ -13,6 +13,7 @@ export function isImplicitDefaultTrip(
 export function countsTowardNonPremiumTripLimit(
   trip: Pick<TripData, "isImplicitDefault"> | null | undefined
 ): boolean {
+  if (!trip) return false;
   return !isImplicitDefaultTrip(trip);
 }
 

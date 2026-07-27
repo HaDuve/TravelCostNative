@@ -175,7 +175,7 @@ describe("Overview screen", () => {
     expect(screen.getByTestId("overview-refresh-control")).toBeTruthy();
   });
 
-  it("does not redirect to Profile when freshlyCreated is leftover", () => {
+  it("does not redirect to Profile when leftover gate flag is set on an Active trip", () => {
     const Toast = require("react-native-toast-message/lib/src/Toast").Toast;
     const navigation = { navigate: jest.fn() };
 

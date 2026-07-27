@@ -17,7 +17,7 @@ export interface TripData {
   isPaid?: isPaidString;
   isPaidTimestamp?: number;
   isDynamicDailyBudget?: boolean;
-  /** Silent first-run container; missing/absent ≡ false. Never backfill legacy trips. */
+  /** Implicit default trip — silent first-run container; missing/absent ≡ false. Never backfill legacy trips. */
   isImplicitDefault?: boolean;
   // online categories are stored as a JSON.stringified strings
   // local categories are stored as Category arrays.

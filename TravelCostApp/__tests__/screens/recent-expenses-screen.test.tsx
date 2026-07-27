@@ -200,7 +200,7 @@ describe("RecentExpenses screen", () => {
     assertNoNestedVerticalFlatLists(screen.root);
   });
 
-  it("does not redirect to Profile or toast when freshlyCreated is leftover", async () => {
+  it("does not redirect to Profile or toast create-trip when leftover gate flag is set", async () => {
     const Toast = require("react-native-toast-message");
     const navigation = { navigate: jest.fn() };
 

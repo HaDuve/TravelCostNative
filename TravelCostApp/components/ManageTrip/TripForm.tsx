@@ -295,13 +295,18 @@ const TripForm = ({ navigation, route }) => {
       const result = await tripCtx.leaveTrip(editedTripId, {
         uid,
         tripHistory: userCtx.tripHistory ?? [],
-        roster: travellers,
+        getTravellers,
         openBalances: [],
         removeFromTripHistoryLocal: userCtx.removeTripFromHistory,
       });
 
       Toast.hide();
       if (!result.performed) {
+        Toast.show({
+          text1: i18n.t("toastSavingError1"),
+          text2: i18n.t("error2"),
+          type: "error",
+        });
         return;
       }
       navigation.pop();

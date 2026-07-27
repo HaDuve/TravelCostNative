@@ -707,7 +707,7 @@ export async function removeTravelerFromTrip(tripid: string, uid: string) {
     const authToken = await getValidIdToken();
     if (!authToken) {
       console.warn("[HTTP] No valid auth token for removeTravelerFromTrip");
-      return null;
+      throw new Error("No valid auth token");
     }
 
     const response = await axios.delete(

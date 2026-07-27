@@ -11,9 +11,10 @@ import type { Traveller } from "./traveler";
 export type LeaveTripDeps = {
   uid: string;
   tripHistory: readonly string[];
-  roster: readonly Traveller[];
   openBalances?: readonly unknown[];
   activeTripId: string | null | undefined;
+  /** Authoritative Traveller roster for the trip being left. */
+  getTravellers: (tripid: string) => Promise<Traveller[]>;
   /** Update Trip history state + local cache after a successful leave. */
   removeFromTripHistoryLocal: (tripid: string) => void;
 };
@@ -31,9 +32,10 @@ export async function leaveTrip(
   tripid: string,
   deps: LeaveTripDeps
 ): Promise<LeaveTripResult> {
+  const roster = await deps.getTravellers(tripid);
   const plan = planTripLeave({
     tripHistory: deps.tripHistory,
-    roster: deps.roster,
+    roster,
     openBalances: deps.openBalances ?? [],
     activeTripId: deps.activeTripId,
     tripid,

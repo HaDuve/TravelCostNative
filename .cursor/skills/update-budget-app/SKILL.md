@@ -81,9 +81,14 @@ eas update:list --branch production --limit 1 --non-interactive 2>/dev/null || t
 Summarize **user-visible** changes only. Style rules: [changelog-style.md](changelog-style.md).
 
 Quick rules:
-- **OTA patch:** 1 bullet (2 max). Prefer one line: `Fixed X` or `New Y, bugfixes and performance improvements`. Pure internal fixes → `Bugfixes and performance improvements`.
-- **Store release:** up to 3 feature bullets + optional `Bugfixes and performance improvements`.
+- **OTA patch:** 1 feature bullet + `Bugfixes and performance improvements` on its **own line** (2 bullets total). Pure internal fixes → bugfixes line only.
+- **Store release:** up to 2–3 feature bullets, then `Bugfixes and performance improvements` on its **own line**.
+- **Never** combine bugfixes with a feature on one line (see [changelog-style.md](changelog-style.md)).
 - Mirror recent tone: `Added …`, `Improved …`, `Fixed …`, `New …`; screen names as in the app.
+- Pass multiple `--notes` to bump scripts — one per bullet:
+  ```bash
+  pnpm run version:bump:eas -- --notes "Improved offline ranged expenses" "Bugfixes and performance improvements"
+  ```
 
 Scan changed files for user-facing hints — e.g. `screens/`, `components/`, `i18n/` keys — not commit messages alone.
 
@@ -100,11 +105,14 @@ pnpm run version:bump:eas -- --notes "Your concise bullet text"
 pnpm run version:bump:eas -- --dry-run --notes "Preview"
 ```
 
-Or publish + bump in one step (uses `--notes` for the new block):
+Or publish + bump in one step. For feature + bugfixes, bump changelog first with two notes, then publish:
 
 ```bash
-pnpm run update:production:bump -- "Your concise bullet text"
+pnpm run version:bump:eas -- --notes "Your feature bullet" "Bugfixes and performance improvements"
+pnpm run update:production
 ```
+
+`update:production:bump -- "single message"` only accepts one string — use it for bugfixes-only releases, or use `version:bump:eas` with two `--notes` before `update:production`.
 
 **Store release — new app version:**
 
@@ -151,10 +159,15 @@ build → submit (optional: submit+update)
 
 ```bash
 eas whoami
-pnpm run update:production:bump -- --dry-run          # optional preview
-pnpm run update:production:bump -- "matches changelog bullet"
-# or, if newest block already correct and version line already bumped:
-pnpm run update:production                            # reads changelog automatically
+pnpm run version:bump:eas -- --notes "Feature headline" "Bugfixes and performance improvements"
+pnpm run update:production -- --dry-run          # optional preview
+pnpm run update:production                       # reads changelog automatically
+```
+
+Bugfixes-only OTA:
+
+```bash
+pnpm run update:production:bump -- "Bugfixes and performance improvements"
 ```
 
 Other tiers: `update:alpha`, `update:staging`, `update:dev`.

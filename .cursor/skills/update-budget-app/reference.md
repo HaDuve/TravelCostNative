@@ -104,8 +104,10 @@ git diff "$LAST_CL"..HEAD -- . ':!changelog.txt' ':!pnpm-lock.yaml'
 | Goal | Method |
 |------|--------|
 | Fix bullets before first publish of current suffix | Edit `__Newest Changes__` in place |
-| New OTA suffix | `pnpm run version:bump:eas -- --notes "…"` or `update:production:bump` |
-| New store version | `pnpm run version:bump -- --notes "…" "…"` |
+| New OTA suffix | `pnpm run version:bump:eas -- --notes "feature" "Bugfixes and performance improvements"` then `update:production` |
+| New store version | `pnpm run version:bump -- --notes "headline" "Bugfixes and performance improvements"` |
+
+`Bugfixes and performance improvements` must always be its own bullet — never on the same line as a feature. See [changelog-style.md](changelog-style.md).
 
 `update:production` (no args) publishes using newest block: `{version}: {first bullet}`.
 

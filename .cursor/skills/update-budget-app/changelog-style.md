@@ -18,6 +18,32 @@ __Other Changes:
 - Bullets: `- ` prefix, no trailing period.
 - Blank line between version blocks in `__Other Changes__`.
 
+## Bugfixes line (required rule)
+
+**Always** put `Bugfixes and performance improvements` on its **own bullet line**. Never combine it with a feature/fix on the same line.
+
+```
+# Wrong
+- New Layout for Modals, bugfixes and performance improvements
+
+# Right
+- New Layout for Modals
+- Bugfixes and performance improvements
+```
+
+When using `version:bump`, `version:bump:eas`, or `update:*:bump`, pass **two notes**:
+
+```bash
+pnpm run version:bump:eas -- --notes "Improved offline ranged expenses" "Bugfixes and performance improvements"
+```
+
+Skip the bugfixes line only when the release is **purely** internal with no user-visible headline — then a single bullet is fine:
+
+```
+1.3.005f
+- Bugfixes and performance improvements
+```
+
 ## Voice (recent 1.3.x entries)
 
 | Pattern | Example |
@@ -25,18 +51,17 @@ __Other Changes:
 | Added feature | `Added restore feature after delete expense` |
 | Improved | `Improved Splitting Expenses (auto balances splits)` |
 | Fixed | `Fixed sync` |
-| New UI | `New Layout for Modals, bugfixes and performance improvements` |
-| Minor OTA | `Bugfixes and performance improvements` (alone is fine) |
+| New UI | `New Layout for Modals` |
+| Bugfixes | `Bugfixes and performance improvements` (always its own line) |
 
 - **Title case** for feature words; screen names as users see them (Overview, Expense Form, Settings Screen).
-- Combine small related items on **one line** with commas when they're all minor.
-- End with `Bugfixes and performance improvements` when anything beyond a pure typo fix shipped — often on the same line as the headline change for small OTAs.
+- Combine small related **features** on one line with commas when they're all minor — but never append bugfixes to that line.
 
 ## Do not write
 
 - File paths, PR numbers, refactor/test-only work, internal renames.
 - "Updated dependencies", "Bumped expo", unless it's the main user-visible story of a store release.
-- Long lists — cap at **1 bullet** for OTA patches, **3–4** for store releases (plus bugfixes line if needed).
+- Long lists — cap at **1 feature bullet** for OTA patches, **2–3 feature bullets** for store releases, then the bugfixes line.
 
 ## Examples by size
 
@@ -50,12 +75,14 @@ __Other Changes:
 ```
 1.3.005f
 - Fixed expense amount rounding in split summary
+- Bugfixes and performance improvements
 ```
 
-**OTA — small feature + polish (one line, like 1.3.005e):**
+**OTA — small feature + polish:**
 ```
 1.3.005f
-- New Layout for Modals, bugfixes and performance improvements
+- New Layout for Modals
+- Bugfixes and performance improvements
 ```
 
 **Store release — multiple features:**

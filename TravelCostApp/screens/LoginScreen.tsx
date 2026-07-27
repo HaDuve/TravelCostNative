@@ -135,6 +135,7 @@ function LoginScreen() {
           setTripHistory: userCtx.setTripHistory,
         });
         tripid = created.tripid;
+        // New implicit default has no ledger yet — not the activate-existing-trip path.
         expCtx.setExpenses([]);
         setMMKVObject(MMKV_KEYS.EXPENSES, []);
         await userCtx.loadCatListFromAsyncInCtx(tripid);

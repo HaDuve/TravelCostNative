@@ -621,24 +621,37 @@ function Root() {
     }
     try {
       await userCtx.loadUserNameFromStorage();
-      const lastKnownTrip =
-        (getMMKVObject(MMKV_KEYS.CURRENT_TRIP) as TripData | null) ??
-        ({} as TripData);
-      const lastKnownRoster =
-        ((await asyncStoreGetObject("currentTravellers")) as Traveller[]) ??
-        [];
-      const lastKnownExpenses =
-        (getMMKVObject(MMKV_KEYS.EXPENSES) as ExpenseData[]) ?? [];
-      await activateTripFromLastKnown(
-        storedTripId,
-        {
-          tripData: { ...lastKnownTrip, tripid: lastKnownTrip.tripid ?? storedTripId },
-          roster: lastKnownRoster,
-          expenses: lastKnownExpenses,
-        },
-        // Omit server mirror — offline must not call updateUser.
-        (({ updateUser: _skip, ...rest }) => rest)(activateTripDeps(storedUid))
-      );
+      const lastKnownTrip = getMMKVObject(MMKV_KEYS.CURRENT_TRIP) as
+        | TripData
+        | null;
+      if (!lastKnownTrip) {
+        // No cached trip payload — fall back to storage loaders rather than
+        // hydrating an empty shell through the activate seam.
+        await tripCtx.loadTripDataFromStorage();
+        await tripCtx.loadTravellersFromStorage();
+        await expensesCtx.loadExpensesFromStorage(true);
+      } else {
+        const lastKnownRoster =
+          ((await asyncStoreGetObject("currentTravellers")) as Traveller[]) ??
+          [];
+        const lastKnownExpenses =
+          (getMMKVObject(MMKV_KEYS.EXPENSES) as ExpenseData[]) ?? [];
+        await activateTripFromLastKnown(
+          storedTripId,
+          {
+            tripData: {
+              ...lastKnownTrip,
+              tripid: lastKnownTrip.tripid ?? storedTripId,
+            },
+            roster: lastKnownRoster,
+            expenses: lastKnownExpenses,
+          },
+          // Omit server mirror — offline must not call updateUser.
+          (({ updateUser: _skip, ...rest }) => rest)(
+            activateTripDeps(storedUid)
+          )
+        );
+      }
       await userCtx.loadCatListFromAsyncInCtx("async");
       await authCtx.authenticate(storedToken);
     } catch (error) {}

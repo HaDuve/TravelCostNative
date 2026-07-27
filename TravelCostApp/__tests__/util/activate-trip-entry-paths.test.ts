@@ -1,3 +1,5 @@
+import { readFileSync } from "fs";
+import { join } from "path";
 import type { ExpenseData } from "../../util/expense";
 import type { Traveller } from "../../util/traveler";
 import type { TripData } from "../../types/trip";
@@ -5,6 +7,8 @@ import {
   activateTrip,
   activateTripFromLastKnown,
 } from "../../util/activate-trip";
+
+const appRoot = join(__dirname, "../..");
 
 function tripX(): TripData {
   return {
@@ -103,6 +107,34 @@ function depsFor(probe: StoreProbe, overrides: Record<string, unknown> = {}) {
     ...overrides,
   };
 }
+
+describe("call-site wiring to activateTrip (#326)", () => {
+  it("JoinTrip awaits activateTrip and does not fire-and-forget currentTrip updates", () => {
+    const src = readFileSync(join(appRoot, "screens/JoinTrip.tsx"), "utf8");
+    expect(src).toMatch(/await activateTrip\(/);
+    expect(src).not.toMatch(/updateUser\(uid,\s*\{\s*currentTrip:/);
+    expect(src).not.toMatch(/tripCtx\.fetchAndSetTravellers/);
+    expect(src).not.toMatch(/secureStoreSetItem\("currentTripId"/);
+  });
+
+  it("LoginScreen activates an existing Active trip via activateTrip instead of emptying expenses", () => {
+    const src = readFileSync(join(appRoot, "screens/LoginScreen.tsx"), "utf8");
+    expect(src).toMatch(/await activateTrip\(/);
+    expect(src).not.toMatch(/fetchAndSetCurrentTrip/);
+    // Empty ledger only allowed on implicit-default creation, not on the activate path.
+    const activateBlock = src.slice(src.indexOf("await activateTrip("));
+    expect(activateBlock).not.toMatch(/setExpenses\(\[\]\)/);
+  });
+
+  it("App boot/poll activates via activateTrip and offline via activateTripFromLastKnown", () => {
+    const src = readFileSync(join(appRoot, "App.tsx"), "utf8");
+    expect(src).toMatch(/await activateTrip\(/);
+    expect(src).toMatch(/await activateTripFromLastKnown\(/);
+    expect(src).not.toMatch(/tripCtx\.setTripid\(/);
+    expect(src).not.toMatch(/fetchAndSetCurrentTrip/);
+    expect(src).not.toMatch(/fetchAndSetTravellers/);
+  });
+});
 
 describe("join entry path via activateTrip", () => {
   it("awaits server currentTrip and replaces stale expenses with the joined trip ledger", async () => {

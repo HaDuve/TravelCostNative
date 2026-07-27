@@ -35,13 +35,14 @@ const en = {
   // Other Strings
   overview: "Overview",
   categories: "Categories",
-  invitationText: "I have an invitation from another Traveller!",
-  joinTrip: "Do you want to join the Trip",
+  invitationText: "I have an invitation from another Nomad!",
+  joinTrip: "Do you want to join this budget",
   joinLink: "You can paste your Invitation Link here!",
   join: "Join",
-  createFirstTrip: "Create first trip",
-  myTrips: "My Trips",
+  createFirstTrip: "Create first budget",
+  myTrips: "My Budgets",
   myBudgets: "My Budgets",
+  homeFirstPromise: "Track what you spend — solo or with others.",
   yourBudgets: "Your budgets",
   joinBudget: "Join budget",
   joinBudgetHint: "Enter an invite code or link",
@@ -52,8 +53,8 @@ const en = {
   activeTripLabel: "Active",
   implicitBudgetExpenseCount: "%{count} expenses · tap to name",
   chooseAction: "Please choose action:",
-  inviteTravellers: "Invite other travellers",
-  setActiveTrip: "Set as active Trip",
+  inviteTravellers: "Invite other nomads",
+  setActiveTrip: "Set as active budget",
   calcOpenSplits: "Calculate balances",
   daily: "Daily",
 
@@ -124,7 +125,7 @@ const en = {
 
   // Walkthrough Texts
   walk1:
-    "Welcome to Budget for Nomads! 🎉 \n\nWe are excited to support you on your journey.",
+    "Welcome to Budget for Nomads! 🎉 \n\nTrack what you spend — solo or with others.",
   walk2:
     "Get started by adding your expenses. 🛍️ \n\nTap on the '+' symbol and enter as many details as you want. Give it a try now!",
   walk3:
@@ -132,13 +133,13 @@ const en = {
   walk4:
     "View your expenses by category or daily overview. 📈 \n\nUse the toggle switch to switch between the two options.",
   walk5:
-    "Are you already planning your next adventure? 🌎\n\nYou can create a new trip here.",
+    "Want another budget? 📒\n\nYou can create a new budget here.",
   walk6:
-    "View your trips. 🗺️ \n\nYour active trip will be highlighted in green.",
+    "View your budgets. 📒 \n\nYour active budget will be highlighted in green.",
   walk7:
-    "Get an overview! \n\nWith this button you can quickly show the summary for one or more trips.",
+    "Get an overview! \n\nWith this button you can quickly show the summary for one or more budgets.",
   walk8:
-    "Now you're ready to go. 🚀 \n\nEnjoy your journey and keep an eye on your budget as you explore the world.",
+    "Now you're ready to go. 🚀 \n\nTrack what you spend — solo or with others.",
 
   // Tabbar labels
   expensesTab: "Expenses",
@@ -148,7 +149,7 @@ const en = {
 
   // Settings Labels
   logoutLabel: "Logout",
-  joinTripLabel: "Join Trip",
+  joinTripLabel: "Join budget",
   simplifySplitsLabel: "Balance summary",
   resetAppIntroductionLabel: "Reset App Introduction",
   visitFoodForNomadsLabel: "Visit Food For Nomads",
@@ -179,44 +180,41 @@ const en = {
   getLocalPriceError: "Please enter a product or service name",
 
   // Trip Form Labels
-  tripFormTitleNew: "New Trip Budget",
-  tripFormTitleEdit: "Edit Trip Budget",
+  tripFormTitleNew: "New budget",
+  tripFormTitleEdit: "Edit budget",
   tripFormTitlePromote: "Name your budget",
   tripFormTitleAddAnother: "Add another budget",
   tripFormSubtitleAddAnother: "New budgets start empty",
   tripFormOptionalDetails: "Optional details",
-  tripNameLabel: "Trip Name",
+  tripNameLabel: "Budget name",
   baseCurrencyLabel: "Home Currency",
   totalBudgetLabel: "Total Budget in",
   dailyBudgetLabel: "Daily Budget in",
-  enterNameAlert: "Please enter a name for your new trip.",
+  enterNameAlert: "Please enter a name for your new budget.",
   enterBudgetAlert: "Please enter a Total Budget higher than Daily Budget",
-  selectCurrencyAlert: "Please select your home currency for this trip",
+  selectCurrencyAlert: "Please select your home currency for this budget",
   alertChangeHomeCurrencyTitle: "Changing home currency",
   alertChangeHomeCurrencyMessage:
     "Are you sure you want to change the currency? Set it to the currency you normally use at home.",
-  deleteTrip: "Delete Trip",
-  deleteTripSure: "Are you sure you want to delete this Trip?",
-  setActive: "Set as active Trip",
-  datePickerLabel: "Trip Start and End",
+  deleteTrip: "Delete budget",
+  deleteTripSure: "Are you sure you want to delete this budget?",
+  setActive: "Set as active budget",
+  datePickerLabel: "Start and end dates",
 
   // Loading Strings
-  loadingYourTrip: "Loading your Trip...",
+  loadingYourTrip: "Loading your budget...",
   loading: "Loading...",
 
   // Invite Screen
   inviteMessage:
     "Hey!\n" +
     "Do you already know Budget for Nomads?\n" +
-    "The app makes it super easy to keep track of all expenses while traveling and mutual debts.\n" +
-    "For our upcoming trip, I also want to invite you to the app!" +
-    // " Let's track our costs together and travel carefree.\n" +
-    // "Download the app for free here:\n" +
-    // "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=en" +
-    "\nAfter installing the app, join our trip here:\n",
+    "The app makes it super easy to keep track of expenses — solo or with others — and mutual debts.\n" +
+    "I want to invite you to our shared budget!\n" +
+    "After installing the app, join our budget here:\n",
   inviteLink:
     "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=en",
-  noTrip: "Could not find trip!",
+  noTrip: "Could not find budget!",
   tryAgain: "Please try again later.",
 
   // Login and Signup Screen
@@ -247,13 +245,13 @@ const en = {
   // Onboarding Screens
   onb1: "Welcome to Budget for Nomads",
   onb1t:
-    "Explore the world without financial stress and start tracking your travel expenses quickly.",
-  onb2: "Simplify group payments while traveling",
+    "Track what you spend — solo or with others.",
+  onb2: "Split costs with others",
   onb2t:
-    "Share and track travel expenses with friends and family and see who owes whom how much.",
+    "Share and track expenses with friends and family and see who owes whom how much.",
   onb3: "Achieve your financial goals",
   onb3t:
-    "Take control of your expenses and see how much money you have left for your journey.",
+    "Take control of your expenses and see how much money you have left to spend.",
   onbskip: "Skip",
   onbcontinue: "Continue",
   onbprevious: "Back",
@@ -270,8 +268,8 @@ const en = {
   splitUpExpenses: "Split Up",
 
   paywallTitle: "Become a Premium Nomad!",
-  paywallSubtitle: "Make your journey even easier with additional features:",
-  paywallFeature0: "✓ Create infinite trips and expenses",
+  paywallSubtitle: "Make tracking even easier with additional features:",
+  paywallFeature0: "✓ Create infinite budgets and expenses",
   paywallFeature1: "✓ Create your own categories",
   paywallFeature2: "✓ Simplify debt settlements",
   paywallFeature3: "✓ Better overview with advanced charts",
@@ -290,7 +288,7 @@ const en = {
     "Please enter a password with at least 6 characters!",
 
   // new stuff
-  shareTripLabel: "Share Trip",
+  shareTripLabel: "Share budget",
   tourGuideLabelPrevious: "Previous",
   tourGuideLabelNext: "Next",
   tourGuideLabelSkip: "Skip",
@@ -322,12 +320,12 @@ const en = {
   offlineMode: "Offline Mode",
   notPaidLabel: "Not Paid Yet",
   paidLabel: "Paid Back",
-  travellers: "Travellers",
+  travellers: "Nomads",
   countries: "Countries",
   currencies: "Currencies",
   expenses: "Expenses",
   welcomeToBudgetForNomads: "Welcome to Budget for Nomads",
-  pleaseCreateTrip: "Please Create or Join a Trip to get started!",
+  pleaseCreateTrip: "Please create or join a budget to get started!",
   finderTitle: "Finder",
   search: "Search",
   finding: "Finding",
@@ -345,12 +343,12 @@ const en = {
   simplifySplits: "Simplify splits",
   settleSplits: "Settle splits",
   balanceSimplificationHelper:
-    "See fewer payments between travellers. No money has moved yet.",
+    "See fewer payments between nomads. No money has moved yet.",
   settlementHelper:
-    "Mark the trip as settled when everyone has been paid back.",
+    "Mark the budget as settled when everyone has been paid back.",
   confirmSettle: "Settle",
   sureSettleSplits:
-    "Are you sure you want to settle the trip? Has everyone been paid back?",
+    "Are you sure you want to settle the budget? Has everyone been paid back?",
   sureDeleteAccount:
     "This will unreversibly delete your Budget for Nomads Account!",
   premiumNomad: "Premium Nomad",
@@ -371,7 +369,7 @@ const en = {
   settingsShowFlags: "Show Flag Icons",
   settingsShowInternetSpeed: "Show Internet Speed",
   settingsDisableNumberAnimations: "Disable Number Animations",
-  settingsShowTravellerIcon: "Show Traveller Icons",
+  settingsShowTravellerIcon: "Show Nomad Icons",
   settingsTrafficLightBudgetColors: "Traffic Light Budget Colors",
   trafficLightInfoTitle: "Traffic Light Budget Colors",
   trafficLightInfoText:
@@ -397,18 +395,17 @@ const en = {
     "\n\n This currency will be presented in the app and all other currencies you use on your trip will be converted into this one.",
   infoTotalBudgetTitle: "Total Budget Info",
   infoTotalBudgetText:
-    "Setup your total budget here (e.g. the amount of money for the entire trip)." +
-    "\n\n You can press the calculate button to auto-calculate the Total Budget from the Daily Budget * Trip Start and End Date." + //i18n.t("currencyInfoContent");
+    "Setup your total budget here (e.g. the amount of money for the entire budget)." +
+    "\n\n You can press the calculate button to auto-calculate the Total Budget from the Daily Budget * Start and End Date." +
     "\n\n The total Budget is optional.",
   infoDailyBudgetTitle: "Daily Budget Info",
   infoDailyBudgetText:
     "Setup your Daily budget here (e.g. the average amount of money to spend per day)." +
     "If you don't know how much exactly you want to spend, just write down an estimate." +
-    "\n\n You can press the calculate button to auto-calculate the Daily Budget from the Total Budget / Trip Start and End Date.",
-  infoTripDatesTitle: "Trip Start and End Info",
+    "\n\n You can press the calculate button to auto-calculate the Daily Budget from the Total Budget / Start and End Date.",
+  infoTripDatesTitle: "Start and End Info",
   infoTripDatesText:
-    "Setup your Trip Start and End Date here (e.g. the dates of your trip)." +
-    "\n\n The trip start and end is optional.",
+    "Setup your start and end dates here (e.g. the dates for this budget).\n\n The start and end dates are optional.",
   comingSoon: "Coming Soon...",
   comingSoonRangedDates:
     "Changing the dates of expenses with a range of dates is not yet possible.",
@@ -421,9 +418,9 @@ const en = {
   errorPurchasePackageText: "Please restart the app or try again later.",
   errorGetOffers: "Error getting offers",
   errorGetOffersText: "Please restart the app or try again later.",
-  errorShareTrip: "Error sharing the trip",
+  errorShareTrip: "Error sharing the budget",
   errorShareTripText: "Please restart the app or try again later.",
-  inviteTraveller: "Invite other Traveller",
+  inviteTraveller: "Invite other nomads",
   toastLoginError1: "Login error",
   toastLoginError2: "Please login again!",
   toastAccountError1: "Account not found",
@@ -459,16 +456,16 @@ const en = {
   toastSyncFinished1: "Online again!",
   toastSyncFinished21: "Synchronized",
   toastSyncFinished22: "offline Changes!",
-  toastSyncSuccessUpToDate: "Your Trip is up to date!",
+  toastSyncSuccessUpToDate: "Your budget is up to date!",
   toastSyncSuccessWithCount: "Successfully synced",
   toastSyncSuccessExpenses: "expenses",
   toastSyncFailed: "Failed to sync, please try again later",
   toastSyncSuccessTitle: "Sync Successful",
   toastSyncFailedTitle: "Sync Failed",
-  toastSettleSuccessTitle: "Trip settled!",
-  toastSettleSuccessMessage: "Everyone is paid back for this trip.",
+  toastSettleSuccessTitle: "Budget settled!",
+  toastSettleSuccessMessage: "Everyone is paid back for this budget.",
   toastSettleFailedTitle: "Settlement failed",
-  toastSettleFailedMessage: "Could not settle the trip. Please try again.",
+  toastSettleFailedMessage: "Could not settle the budget. Please try again.",
 
   // rate modal
   rateModalTitle: "Enjoying Budget for Nomads?",
@@ -499,7 +496,7 @@ const en = {
     "Long-press the + button to start from a past expense instead of a blank form.\n\nCopied: description, amount, category, currency and country, who paid, and how the cost is split. The date is always set to today—you can change it if you need another day.\n\nThis creates a new expense, not an edit of the old one. Review and adjust anything before you save.",
   mostUsedExpenses: "Most used expenses",
   lastUsedExpenses: "Last used expenses",
-  budgetPerTraveller: "Budget per traveller",
+  budgetPerTraveller: "Budget per nomad",
   charts: "Charts",
   future: "future",
   past: "past",
@@ -512,7 +509,7 @@ const en = {
   alertTryAgainLater: "Please try again later.",
   alertOffline: "Offline",
   alertNeedOnlineCategory: "You need to be online to add a new category",
-  alertSameCurrencyTrips: "Please select trips with the same home currency",
+  alertSameCurrencyTrips: "Please select budgets with the same home currency",
   alertDeleteContextNotImplemented: "delete context not implemented",
   alertDeleteGroupedRangeExpenses: "Delete grouped range expenses?",
   alertDeleteAllEntriesFor: "This will delete all entries that belong to",
@@ -534,7 +531,7 @@ const en = {
   paid: "Paid",
   specialExpense: "Special expense",
   shareTripDescription:
-    "Share this trip with other travelers. They'll receive an invitation link to join your trip and track expenses together.",
+    "Share this budget with other nomads. They'll receive an invitation link to join your budget and track expenses together.",
   placeholderSharedExpense: "Shared expense?",
   placeholderSharedBetween: "Shared between ... ?",
   devOfflineQueue: "Offline Queue",
@@ -572,31 +569,31 @@ const en = {
   hideSpecialExpenses: "Hide special expenses",
 
   // Trip Summary Screen
-  trips: "Trips",
-  trip: "Trip",
+  trips: "Budgets",
+  trip: "Budget",
   summary: "Summary",
   totalCosts: "Total Costs",
   averageCostPerDay: "Average Cost Per Day",
   averageCostPerMonth: "Average Cost Per Month",
   averageCostPerYear: "Average Cost Per Year",
   averageCostPerCountry: "Average Cost Per Country",
-  averageCostPerTrip: "Average Cost Per Trip",
-  averageCostPerTraveller: "Average Cost Per Traveller",
+  averageCostPerTrip: "Average Cost Per Budget",
+  averageCostPerTraveller: "Average Cost Per Nomad",
 
   // ExpenseForm and SplitSummaryScreen translations
   expenseMarkedPaidDueToSettlement:
-    "This expense is marked as paid due to trip settlement",
+    "This expense is marked as paid due to budget settlement",
   splitSummaryTitleSimplified: "Split Summary",
-  overviewOfOwedAmounts: "Overview of owed amounts in the trip:\n  ",
+  overviewOfOwedAmounts: "Overview of owed amounts in the budget:\n  ",
   simplifiedSummaryOptimalTransactions:
-    "Simplified Summary of Optimal Transactions in the trip:  ",
+    "Simplified Summary of Optimal Transactions in the budget:  ",
   yourMoneyBackWithColon: "Your money back:  ",
   youStillOweWithColon: "You still owe: ",
   somethingWentWrongSorry: "Something must have gone wrong, sorry!",
   sureSettleSplitsFullMessage:
-    "Are you sure you want to settle the trip? Has everyone been paid back? This will mark ALL expenses as paid back, regardless of their date.",
+    "Are you sure you want to settle the budget? Has everyone been paid back? This will mark ALL expenses as paid back, regardless of their date.",
   tripSettledAllExpensesPaid:
-    "Trip settled — all expenses marked as paid back",
+    "Budget settled — all expenses marked as paid back",
   noOpenSplitsAllSettled:
     "No open balances — all expenses are paid back",
   noOpenSplits: "No open balances",
@@ -638,14 +635,15 @@ const de = {
   // Other Strings
   overview: "Übersicht",
   categories: "Kategorien",
-  invitationText: "Ich habe eine Einladung von einem anderen Reisenden!",
-  joinTrip: "Möchtest du der Reise beitreten",
+  invitationText: "Ich habe eine Einladung von einem anderen Nomaden!",
+  joinTrip: "Möchtest du diesem Budget beitreten",
   joinLink:
     "Du kannst deinen Einladungslink hier reinkopieren um der Reise beizutreten.",
   join: "Beitreten",
-  createFirstTrip: "Erste Reise erstellen",
-  myTrips: "Meine Reisen",
+  createFirstTrip: "Erstes Budget erstellen",
+  myTrips: "Meine Budgets",
   myBudgets: "Meine Budgets",
+  homeFirstPromise: "Behalte im Blick, was du ausgibst — allein oder mit anderen.",
   yourBudgets: "Deine Budgets",
   joinBudget: "Budget beitreten",
   joinBudgetHint: "Einladungscode oder Link eingeben",
@@ -656,8 +654,8 @@ const de = {
   activeTripLabel: "Aktiv",
   implicitBudgetExpenseCount: "%{count} Ausgaben · tippen zum Benennen",
   chooseAction: "Bitte wähle eine Aktion aus:",
-  inviteTravellers: "Andere Reisende einladen",
-  setActiveTrip: "Als aktive Reise markieren",
+  inviteTravellers: "Andere Nomaden einladen",
+  setActiveTrip: "Als aktives Budget markieren",
   calcOpenSplits: "Salden berechnen",
   daily: "Täglich",
 
@@ -731,7 +729,7 @@ const de = {
 
   // Walkthrough Texts
   walk1:
-    "Herzlich Willkommen bei Budget for Nomads! 🎉 \n\nWir freuen uns, dass wir dich auf deiner Reise unterstützen dürfen.",
+    "Herzlich Willkommen bei Budget for Nomads! 🎉 \n\nBehalte im Blick, was du ausgibst — allein oder mit anderen.",
   walk2:
     "Leg los indem du deine Ausgaben hinzufügst. 🛍️ \n\nTippe auf das '+' Symbol und gib so viele Details ein, wie du möchtest. Probiere es jetzt einfach aus!",
   walk3:
@@ -739,13 +737,13 @@ const de = {
   walk4:
     "Schau dir deine Ausgaben nach Kategorie oder täglichem Überblick an. 📈 \n\nVerwende den Schalter, um zwischen den beiden Optionen zu wechseln.",
   walk5:
-    "Du planst bereits dein nächstes Abenteuer? 🌎\n\nHier kannst du eine neue Reise erstellen.",
+    "Noch ein Budget? 📒\n\nHier kannst du ein neues Budget erstellen.",
   walk6:
-    "Sieh dir deine Reisen an. 🗺️ \n\nDeine aktive Reise wird grün hervorgehoben.",
+    "Sieh dir deine Budgets an. 📒 \n\nDein aktives Budget wird grün hervorgehoben.",
   walk7:
-    "Erschaffe dir einen Überblick! \n\nMit dieser Schaltfläche kannst du schnell die Zusammenfassung für eine oder mehrere Reisen anzeigen.",
+    "Erschaffe dir einen Überblick! \n\nMit dieser Schaltfläche kannst du schnell die Zusammenfassung für ein oder mehrere Budgets anzeigen.",
   walk8:
-    "Jetzt bist du startklar. 🚀 \n\nGenieße deine Reise und behalte dein Budget im Blick während du die Welt erkundest.",
+    "Jetzt bist du startklar. 🚀 \n\nBehalte im Blick, was du ausgibst — allein oder mit anderen.",
 
   // Tabbar labels
   expensesTab: "Ausgaben",
@@ -755,7 +753,7 @@ const de = {
 
   // Settings Labels
   logoutLabel: "Ausloggen",
-  joinTripLabel: "Reise beitreten",
+  joinTripLabel: "Budget beitreten",
   simplifySplitsLabel: "Saldenübersicht",
   resetAppIntroductionLabel: "App Einführung wiederholen",
   visitFoodForNomadsLabel: "Food For Nomads besuchen",
@@ -786,44 +784,41 @@ const de = {
   getLocalPriceError: "Bitte gib einen Produkt- oder Dienstleistungsnamen ein",
 
   // Trip Form Labels
-  tripFormTitleNew: "Neue Reise erstellen",
-  tripFormTitleEdit: "Reise bearbeiten",
+  tripFormTitleNew: "Neues Budget",
+  tripFormTitleEdit: "Budget bearbeiten",
   tripFormTitlePromote: "Budget benennen",
   tripFormTitleAddAnother: "Weiteres Budget hinzufügen",
   tripFormSubtitleAddAnother: "Neue Budgets starten leer",
   tripFormOptionalDetails: "Optionale Details",
-  tripNameLabel: "Name der Reise",
+  tripNameLabel: "Budgetname",
   tripCurrencyLabel: "Deine Heimatwährung in",
   totalBudgetLabel: "Gesamtbudget in",
   dailyBudgetLabel: "Tägliches Budget in",
-  enterNameAlert: "Bitte gib einen Namen für deine Reise ein!",
+  enterNameAlert: "Bitte gib einen Namen für dein neues Budget ein.",
   enterBudgetAlert: "Bitte gib ein höheres Gesamtbudget als Tagesbudget ein!",
-  selectCurrencyAlert: "Bitte wähle deine Heimatwährung aus!",
+  selectCurrencyAlert: "Bitte wähle deine Heimatwährung für dieses Budget",
   alertChangeHomeCurrencyTitle: "Heimatwährung ändern",
   alertChangeHomeCurrencyMessage:
     "Möchtest du die Währung wirklich ändern? Wähle die Währung, die du zu Hause normalerweise verwendest.",
-  deleteTrip: "Reise löschen",
-  deleteTripSure: "Bist du dir sicher, dass du diese Reise löschen möchtest?",
-  setActive: "Als aktive Reise markieren",
-  datePickerLabel: "Reise Start und Ende",
+  deleteTrip: "Budget löschen",
+  deleteTripSure: "Bist du dir sicher, dass du dieses Budget löschen möchtest?",
+  setActive: "Als aktives Budget markieren",
+  datePickerLabel: "Start- und Enddatum",
 
   // Loading Strings
   loading: "Laden...",
-  loadingYourTrip: "Lade deine Reise...",
+  loadingYourTrip: "Lade dein Budget...",
 
   // Invite Screen
   inviteMessage:
     "Hey!\n" +
     "Kennst du schon Budget for Nomads?\n" +
-    "Die App macht es kinderleicht, alle Ausgaben auf Reisen und gegenseitige Schulden im Blick zu behalten.\n" +
-    "Für unsere bevorstehende Reise möchte ich dich auch zu der App einladen!" +
-    // " Lass uns gemeinsam unsere Kosten tracken und unbeschwert reisen.\n" +
-    // "Lade hier die App kostenlos herunter:\n" +
-    // "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=de" +
-    "\nNachdem du die App installiert hast, schließe dich hier unserer Reise an:\n",
+    "Die App macht es kinderleicht, Ausgaben — allein oder mit anderen — und gegenseitige Schulden im Blick zu behalten.\n" +
+    "Ich möchte dich zu unserem gemeinsamen Budget einladen!\n" +
+    "Nachdem du die App installiert hast, tritt hier unserem Budget bei:\n",
   inviteLink:
     "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=de",
-  noTrip: "Reise nicht gefunden!",
+  noTrip: "Budget nicht gefunden!",
   tryAgain: "Bitte versuche es später erneut!",
 
   // Login and Signup Screen
@@ -854,13 +849,13 @@ const de = {
   signupGoogleText: "Mit Google anmelden",
   onb1: "Willkommen bei Budget for Nomads",
   onb1t:
-    "Erkunde die Welt ohne finanziellen Stress und beginne jetzt blitzschnell deine Reisekosten zu tracken.",
-  onb2: "Vereinfache Gruppenzahlungen auf Reisen",
+    "Behalte im Blick, was du ausgibst — allein oder mit anderen.",
+  onb2: "Kosten mit anderen teilen",
   onb2t:
-    "Teile und verfolge Reisekosten mit Freunden und Familie auf  und schau nach, wer wem wie viel schuldet.",
+    "Teile und verfolge Ausgaben mit Freunden und Familie und sieh, wer wem wie viel schuldet.",
   onb3: "Erreiche deine finanziellen Ziele",
   onb3t:
-    "Übernimm die Kontrolle über deine Ausgaben und schau nach, wie viel Geld du noch auf deiner Reise zur Verfügung hast.",
+    "Behalte die Kontrolle über deine Ausgaben und sieh, wie viel Geld du noch zur Verfügung hast.",
   onbskip: "Überspringen",
   onbcontinue: "Weiter",
   onbprevious: "Zurück",
@@ -880,8 +875,8 @@ const de = {
   // Paywall and Premium
   paywallTitle: "Werde Premium Nomade!",
   paywallSubtitle:
-    "Lass dir deine Reise mit noch mehr Funktionen erleichtern: ",
-  paywallFeature0: "✓ Unbegrenzt Reisen und Ausgaben erstellen",
+    "Mach das Tracken noch einfacher mit zusätzlichen Funktionen:",
+  paywallFeature0: "✓ Unbegrenzt Budgets und Ausgaben erstellen",
   paywallFeature1: "✓ Erstelle eigene Kategorien",
   paywallFeature2: "✓ Vereinfache Schuldenbegleichungen",
   paywallFeature3: "✓ Behalte mehr Überblick mit erweiterten Diagrammen",
@@ -906,7 +901,7 @@ const de = {
     "Bitte gib ein Passwort mit mindestens 6 Zeichen ein!",
 
   // new stuff
-  shareTripLabel: "Reise teilen",
+  shareTripLabel: "Budget teilen",
   tourGuideLabelPrevious: "Zurück",
   tourGuideLabelNext: "Weiter",
   tourGuideLabelSkip: "Überspringen",
@@ -939,14 +934,14 @@ const de = {
   offlineMode: "Offline-Modus",
   notPaidLabel: "Noch nicht bezahlt",
   paidLabel: "Zurückgezahlt",
-  travellers: "Reisende",
+  travellers: "Nomaden",
   costs: "Kosten",
   countries: "Länder",
   currencies: "Währungen",
   expenses: "Ausgaben",
   welcomeToBudgetForNomads: "Willkommen bei Budget for Nomads",
   pleaseCreateTrip:
-    "Bitte erstelle oder trete einer Reise bei, um zu beginnen!",
+    "Bitte erstelle oder tritt einem Budget bei, um zu starten!",
   finderTitle: "Finder",
   search: "Suche",
   finding: "Suche",
@@ -962,14 +957,14 @@ const de = {
   XowesYtoZ1: "schuldet",
   XowesYtoZ2: "zu",
   simplifySplits: "Salden vereinfachen",
-  settleSplits: "Reise begleichen",
+  settleSplits: "Budget begleichen",
   balanceSimplificationHelper:
-    "Weniger Zahlungen zwischen Reisenden — es wurde noch kein Geld bewegt.",
+    "Weniger Zahlungen zwischen Nomaden sehen. Es ist noch kein Geld bewegt.",
   settlementHelper:
-    "Reise begleichen, wenn alle ihr Geld zurückbekommen haben.",
+    "Markiere das Budget als abgerechnet, wenn alle ihr Geld zurückbekommen haben.",
   confirmSettle: "Begleichen",
   sureSettleSplits:
-    "Reise wirklich begleichen? Hat jeder sein Geld zurückbekommen?",
+    "Bist du sicher, dass du das Budget abrechnen möchtest? Wurde allen zurückgezahlt?",
   sureDeleteAccount:
     "Dies löscht deinen Budget for Nomads Account unwiderruflich!",
   premiumNomad: "Premium-Nomade",
@@ -991,7 +986,7 @@ const de = {
   settingsShowFlags: "Länderflaggen anzeigen",
   settingsShowInternetSpeed: "Internetgeschwindigkeit anzeigen",
   settingsDisableNumberAnimations: "Zahlenanimationen deaktivieren",
-  settingsShowTravellerIcon: "Reisende-Symbole anzeigen",
+  settingsShowTravellerIcon: "Nomaden-Icons anzeigen",
   settingsTrafficLightBudgetColors: "Ampel-Budget-Farben",
   trafficLightInfoTitle: "Ampel-Budget-Farben",
   trafficLightInfoText:
@@ -1020,17 +1015,17 @@ const de = {
     "\n\n Die Heimatwährung wird in Übersichten angezeigt, und alle anderen Währungen, die du auf dieser Reise verwendest, werden in die Heimatwährung umgerechnet.",
   infoTotalBudgetTitle: "Gesamtbudget Info",
   infoTotalBudgetText:
-    "Richte hier dein Gesamtbudget ein (z. B. den Geldbetrag für die gesamte Reise)." +
-    "\n\n Du kannst auf die Schaltfläche rechts drücken, um das Gesamtbudget aus dem Tagesbudget * Reiseanfangs- und Reiseenddatum automatisch berechnen zu lassen." +
+    "Richte hier dein Gesamtbudget ein (z. B. den Geldbetrag für das gesamte Budget)." +
+    "\n\n Du kannst auf die Schaltfläche rechts drücken, um das Gesamtbudget aus dem Tagesbudget * Start- und Enddatum automatisch berechnen zu lassen." +
     "\n\n Das Gesamtbudget ist optional.",
   infoDailyBudgetTitle: "Tagesbudget Info",
   infoDailyBudgetText:
     "Richte hier dein Tagesbudget ein \n(den durchschnittlichen Geldbetrag, den du pro Tag ausgeben möchten). " +
     "Wenn du nicht genau weißt, wie viel du ausgeben möchtest, gib einfach eine Schätzung ein." +
-    "\n\n Du kannst auf die Schaltfläche rechts drücken, um das Tagesbudget aus dem Gesamtbudget / Reiseanfangs- und Reiseenddatum automatisch berechnen zu lassen.",
-  infoTripDatesTitle: "Reise Start- und Enddatum",
+    "\n\n Du kannst auf die Schaltfläche rechts drücken, um das Tagesbudget aus dem Gesamtbudget / Start- und Enddatum automatisch berechnen zu lassen.",
+  infoTripDatesTitle: "Start- und Enddatum Info",
   infoTripDatesText:
-    "Lege hier das Start- und Enddatum deiner Reise fest (die Daten deiner Reise).\n\n Der Start und das Ende der Reise sind optional.",
+    "Lege hier das Start- und Enddatum fest (die Daten für dieses Budget).\n\n Start und Ende sind optional.",
   comingSoon: "Demnächst...",
   comingSoonRangedDates:
     "Das Ändern der Ausgaben mit einem Datumsbereich ist noch nicht möglich.",
@@ -1045,10 +1040,10 @@ const de = {
   errorGetOffers: "Fehler beim Abrufen von Angeboten",
   errorGetOffersText:
     "Bitte starte die App neu oder versuche es später erneut.",
-  errorShareTrip: "Fehler beim Teilen der Reise",
+  errorShareTrip: "Fehler beim Teilen des Budgets",
   errorShareTripText:
     "Bitte starte die App neu oder versuche es später erneut.",
-  inviteTraveller: "Andere Reisende einladen",
+  inviteTraveller: "Andere Nomaden einladen",
   toastLoginError1: "Anmeldefehler",
   toastLoginError2: "Bitte melde dich erneut an!",
   toastAccountError1: "Konto nicht gefunden",
@@ -1089,19 +1084,19 @@ const de = {
   toastSyncFinished1: "Wieder online!",
   toastSyncFinished21: "Synchronisiert",
   toastSyncFinished22: "Offline-Änderungen!",
-  toastSyncSuccessUpToDate: "Deine Reise ist auf dem neuesten Stand!",
+  toastSyncSuccessUpToDate: "Dein Budget ist aktuell!",
   toastSyncSuccessWithCount: "Erfolgreich synchronisiert",
   toastSyncSuccessExpenses: "Ausgaben",
   toastSyncFailed:
     "Synchronisation fehlgeschlagen, bitte versuche es später erneut",
   toastSyncSuccessTitle: "Synchronisation erfolgreich",
   toastSyncFailedTitle: "Synchronisation fehlgeschlagen",
-  toastSettleSuccessTitle: "Reise beglichen!",
+  toastSettleSuccessTitle: "Budget abgerechnet!",
   toastSettleSuccessMessage:
-    "Alle Reisenden haben ihr Geld für diese Reise zurück.",
+    "Allen wurde für dieses Budget zurückgezahlt.",
   toastSettleFailedTitle: "Begleichung fehlgeschlagen",
   toastSettleFailedMessage:
-    "Reise konnte nicht beglichen werden. Bitte versuche es erneut.",
+    "Budget konnte nicht abgerechnet werden. Bitte versuche es erneut.",
   // rate modal
   rateModalTitle: "Gefällt dir Budget for Nomads?",
   rateModalSubTitle:
@@ -1131,7 +1126,7 @@ const de = {
     "Halte die +-Taste gedrückt, um von einer früheren Ausgabe statt einem leeren Formular zu starten.\n\nÜbernommen werden: Beschreibung, Betrag, Kategorie, Währung und Land, Wer hat bezahlt und die Aufteilung. Das Datum ist immer heute—ändere es, wenn du einen anderen Tag brauchst.\n\nEs entsteht eine neue Ausgabe, keine Bearbeitung der alten. Prüfe alles und passe es an, bevor du speicherst.",
   mostUsedExpenses: "Am häufigsten verwendete Ausgaben",
   lastUsedExpenses: "Zuletzt verwendete Ausgaben",
-  budgetPerTraveller: "Budget pro Reisendem",
+  budgetPerTraveller: "Budget pro Nomade",
   charts: "Diagramme",
   future: "zukünftige",
   past: "vergangene",
@@ -1146,7 +1141,7 @@ const de = {
   alertNeedOnlineCategory:
     "Sie müssen online sein, um eine neue Kategorie hinzuzufügen",
   alertSameCurrencyTrips:
-    "Bitte wählen Sie Reisen mit derselben Heimatwährung aus",
+    "Bitte wähle Budgets mit derselben Heimatwährung",
   alertDeleteContextNotImplemented: "Kontext löschen nicht implementiert",
   alertDeleteGroupedRangeExpenses: "Gruppierte Bereichsausgaben löschen?",
   alertDeleteAllEntriesFor: "Dies wird alle Einträge löschen, die gehören zu",
@@ -1168,7 +1163,7 @@ const de = {
   paid: "Bezahlt",
   specialExpense: "Besondere Ausgabe",
   shareTripDescription:
-    "Teilen Sie diese Reise mit anderen Reisenden. Sie erhalten einen Einladungslink, um Ihrer Reise beizutreten und gemeinsam Ausgaben zu verfolgen.",
+    "Teile dieses Budget mit anderen Nomaden. Sie erhalten einen Einladungslink, um deinem Budget beizutreten und Ausgaben gemeinsam zu tracken.",
   placeholderSharedExpense: "Geteilte Ausgabe?",
   placeholderSharedBetween: "Geteilt zwischen ... ?",
   devOfflineQueue: "Offline-Warteschlange",
@@ -1208,31 +1203,31 @@ const de = {
   hideSpecialExpenses: "Besondere Ausgaben ausblenden",
 
   // Trip Summary Screen
-  trips: "Reisen",
-  trip: "Reise",
+  trips: "Budgets",
+  trip: "Budget",
   summary: "Zusammenfassung",
   totalCosts: "Gesamtkosten",
   averageCostPerDay: "Durchschnittskosten pro Tag",
   averageCostPerMonth: "Durchschnittskosten pro Monat",
   averageCostPerYear: "Durchschnittskosten pro Jahr",
   averageCostPerCountry: "Durchschnittskosten pro Land",
-  averageCostPerTrip: "Durchschnittskosten pro Reise",
-  averageCostPerTraveller: "Durchschnittskosten pro Reisenden",
+  averageCostPerTrip: "Durchschnittskosten pro Budget",
+  averageCostPerTraveller: "Durchschnittskosten pro Nomade",
 
   // ExpenseForm and SplitSummaryScreen translations
   expenseMarkedPaidDueToSettlement:
-    "Diese Ausgabe ist aufgrund der Reiseabrechnung als bezahlt markiert",
+    "Diese Ausgabe ist durch die Budget-Abrechnung als bezahlt markiert",
   splitSummaryTitleSimplified: "Aufteilungen",
-  overviewOfOwedAmounts: "Übersicht der geschuldeten Beträge in der Reise:\n  ",
+  overviewOfOwedAmounts: "Übersicht der geschuldeten Beträge im Budget:\n  ",
   simplifiedSummaryOptimalTransactions:
-    "Vereinfachte Übersicht optimaler Transaktionen in der Reise:  ",
+    "Vereinfachte Zusammenfassung optimaler Transaktionen im Budget:  ",
   yourMoneyBackWithColon: "Dein Geld zurück:  ",
   youStillOweWithColon: "Du schuldest noch: ",
   somethingWentWrongSorry: "Etwas muss schief gelaufen sein, entschuldige!",
   sureSettleSplitsFullMessage:
-    "Reise wirklich begleichen? Hat jeder sein Geld zurückbekommen? Alle Ausgaben werden als zurückgezahlt markiert, unabhängig vom Datum.",
+    "Bist du sicher, dass du das Budget abrechnen möchtest? Wurde allen zurückgezahlt? Dadurch werden ALLE Ausgaben als zurückgezahlt markiert, unabhängig vom Datum.",
   tripSettledAllExpensesPaid:
-    "Reise beglichen — alle Ausgaben als zurückgezahlt markiert",
+    "Budget abgerechnet — alle Ausgaben als zurückgezahlt markiert",
   noOpenSplitsAllSettled:
     "Keine offenen Salden — alle Ausgaben sind zurückgezahlt",
   noOpenSplits: "Keine offenen Salden",
@@ -1274,13 +1269,14 @@ const fr = {
   // Other Strings
   overview: "Aperçu",
   categories: "Catégories",
-  invitationText: "J'ai une invitation d'un(e) autre voyageur(se) !",
-  joinTrip: "Voulez-vous rejoindre le voyage ?",
+  invitationText: "J'ai une invitation d'un(e) autre nomade !",
+  joinTrip: "Voulez-vous rejoindre ce budget",
   joinLink: "Vous pouvez coller votre lien d'invitation ici !",
   join: "Rejoindre",
-  createFirstTrip: "Créer un premier voyage",
-  myTrips: "Mes voyages",
+  createFirstTrip: "Créer un premier budget",
+  myTrips: "Mes budgets",
   myBudgets: "Mes budgets",
+  homeFirstPromise: "Suivez vos dépenses — seul ou à plusieurs.",
   yourBudgets: "Vos budgets",
   joinBudget: "Rejoindre un budget",
   joinBudgetHint: "Entrez un code ou un lien d'invitation",
@@ -1291,8 +1287,8 @@ const fr = {
   activeTripLabel: "Actif",
   implicitBudgetExpenseCount: "%{count} dépenses · appuyer pour nommer",
   chooseAction: "Veuillez choisir une action :",
-  inviteTravellers: "Inviter d'autres voyageurs",
-  setActiveTrip: "Définir comme voyage actif",
+  inviteTravellers: "Inviter d'autres nomades",
+  setActiveTrip: "Définir comme budget actif",
   calcOpenSplits: "Calculer les soldes",
   daily: "Quotidien",
 
@@ -1366,7 +1362,7 @@ const fr = {
 
   // Walkthrough Texts
   walk1:
-    "Bienvenue sur Budget for Nomads ! 🎉 \n\nNous sommes ravis de pouvoir vous aider pendant votre voyage.",
+    "Bienvenue sur Budget for Nomads ! 🎉 \n\nSuivez vos dépenses — seul ou à plusieurs.",
   walk2:
     "Commencez par ajouter vos dépenses. 🛍️ \n\nAppuyez sur le symbole '+' et saisissez autant de détails que vous le souhaitez. Essayez maintenant !",
   walk3:
@@ -1374,13 +1370,13 @@ const fr = {
   walk4:
     "Consultez vos dépenses par catégorie ou vue quotidienne. 📈 \n\nUtilisez le commutateur pour basculer entre les deux options.",
   walk5:
-    "Vous planifiez déjà votre prochaine aventure ? 🌎\n\nVous pouvez créer un nouveau voyage ici.",
+    "Un autre budget ? 📒\n\nVous pouvez créer un nouveau budget ici.",
   walk6:
-    "Consultez vos voyages. 🗺️ \n\nVotre voyage actif sera mis en évidence en vert.",
+    "Consultez vos budgets. 📒 \n\nVotre budget actif sera surligné en vert.",
   walk7:
-    "Obtenez un aperçu ! \n\nAvec ce bouton, vous pouvez rapidement afficher le résumé d'un ou de plusieurs voyages.",
+    "Obtenez une vue d'ensemble ! \n\nAvec ce bouton, vous pouvez rapidement afficher le résumé d'un ou plusieurs budgets.",
   walk8:
-    "Vous êtes prêt à partir maintenant. 🚀 \n\nProfitez de votre voyage et surveillez votre budget pendant que vous explorez le monde.",
+    "Vous êtes prêt. 🚀 \n\nSuivez vos dépenses — seul ou à plusieurs.",
   // Tabbar labels
   expensesTab: "Dépenses",
   overviewTab: "Vue d'ensemble",
@@ -1389,7 +1385,7 @@ const fr = {
 
   // Settings Labels
   logoutLabel: "Déconnexion",
-  joinTripLabel: "Rejoindre un voyage",
+  joinTripLabel: "Rejoindre un budget",
   simplifySplitsLabel: "Résumé des soldes",
   resetAppIntroductionLabel: "Réinitialiser l'introduction de l'application",
   visitFoodForNomadsLabel: "Visitez Food For Nomads",
@@ -1422,46 +1418,43 @@ const fr = {
   getLocalPriceError: "Veuillez entrer un nom de produit ou de service",
 
   // Trip Form Labels
-  tripFormTitleNew: "Nouveau voyage",
-  tripFormTitleEdit: "Modifier le voyage",
+  tripFormTitleNew: "Nouveau budget",
+  tripFormTitleEdit: "Modifier le budget",
   tripFormTitlePromote: "Nommer votre budget",
   tripFormTitleAddAnother: "Ajouter un autre budget",
   tripFormSubtitleAddAnother: "Les nouveaux budgets commencent vides",
   tripFormOptionalDetails: "Détails optionnels",
-  tripNameLabel: "Nom du voyage",
+  tripNameLabel: "Nom du budget",
   baseCurrencyLabel: "Devise du domicile",
   totalBudgetLabel: "Budget total en",
   dailyBudgetLabel: "Budget quotidien en",
-  enterNameAlert: "Veuillez entrer un nom pour votre nouveau voyage.",
+  enterNameAlert: "Veuillez saisir un nom pour votre nouveau budget.",
   enterBudgetAlert:
     "Veuillez entrer un budget total supérieur au budget quotidien",
   selectCurrencyAlert:
-    "Veuillez sélectionner votre devise du domicile pour ce voyage",
+    "Veuillez sélectionner votre devise domicile pour ce budget",
   alertChangeHomeCurrencyTitle: "Changer la devise du domicile",
   alertChangeHomeCurrencyMessage:
     "Voulez-vous vraiment changer la devise ? Choisissez la devise que vous utilisez habituellement chez vous.",
-  deleteTrip: "Supprimer le voyage",
-  deleteTripSure: "Êtes-vous sûr de vouloir supprimer ce voyage?",
-  setActive: "Définir comme voyage actif",
-  datePickerLabel: "Début et fin du voyage",
+  deleteTrip: "Supprimer le budget",
+  deleteTripSure: "Êtes-vous sûr de vouloir supprimer ce budget ?",
+  setActive: "Définir comme budget actif",
+  datePickerLabel: "Dates de début et de fin",
 
   // Loading Strings
-  loadingYourTrip: "Chargement de votre voyage...",
+  loadingYourTrip: "Chargement de votre budget...",
   loading: "Chargement...",
 
   // Invite Screen
   inviteMessage:
     "Salut !\n" +
     "Connais-tu déjà Budget for Nomads ?\n" +
-    "Cette application facilite grandement le suivi de toutes les dépenses lors de voyages et des dettes mutuelles.\n" +
-    "Pour notre prochain voyage, je souhaite également t'inviter à utiliser l'application !" +
-    // " Suivons ensemble nos dépenses et voyageons en toute tranquillité.\n" +
-    // "Télécharge l'application gratuitement ici :\n" +
-    // "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=fr" +
-    "\nAprès avoir installé l'application, rejoins notre voyage ici :\n",
+    "Cette application facilite grandement le suivi des dépenses — seul ou à plusieurs — et des dettes mutuelles.\n" +
+    "Je souhaite t'inviter à notre budget partagé !\n" +
+    "Après avoir installé l'application, rejoins notre budget ici :\n",
   inviteLink:
     "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=fr",
-  noTrip: "Impossible de trouver le voyage !",
+  noTrip: "Budget introuvable !",
   tryAgain: "Veuillez réessayer ultérieurement.",
 
   // Login and Signup Screen
@@ -1494,13 +1487,13 @@ const fr = {
   //Onboarding Screens
   onb1: "Bienvenue sur Budget for Nomads",
   onb1t:
-    "Explorez le monde sans stress financier et commencez dès maintenant à suivre rapidement vos dépenses de voyage.",
-  onb2: "Simplifiez les paiements en groupe pendant les voyages",
+    "Suivez vos dépenses — seul ou à plusieurs.",
+  onb2: "Partagez les coûts avec d'autres",
   onb2t:
-    "Partagez et suivez les dépenses de voyage avec vos amis et votre famille, et vérifiez qui doit combien à qui.",
+    "Partagez et suivez les dépenses avec vos amis et votre famille et voyez qui doit quoi à qui.",
   onb3: "Atteignez vos objectifs financiers",
   onb3t:
-    "Prenez le contrôle de vos dépenses et consultez le montant d'argent qu'il vous reste disponible pour votre voyage.",
+    "Prenez le contrôle de vos dépenses et voyez combien il vous reste à dépenser.",
   onbskip: "Passer",
   onbcontinue: "Continuer",
   onbprevious: "Précédent",
@@ -1518,8 +1511,8 @@ const fr = {
 
   paywallTitle: "Devenez un Nomade Premium !",
   paywallSubtitle:
-    "Facilitez votre voyage avec des fonctionnalités supplémentaires :",
-  paywallFeature0: "✓ Créer des voyages et des dépenses infinis",
+    "Rendez le suivi encore plus facile avec des fonctionnalités supplémentaires :",
+  paywallFeature0: "✓ Créer des budgets et des dépenses illimités",
   paywallFeature1: "✓ Créez vos propres catégories",
   paywallFeature2: "✓ Simplifiez le règlement des dettes",
   paywallFeature3:
@@ -1540,7 +1533,7 @@ const fr = {
     "Veuillez entrer un mot de passe d'au moins 6 caractères !",
 
   // new stuff
-  shareTripLabel: "Partager le voyage",
+  shareTripLabel: "Partager le budget",
   tourGuideLabelPrevious: "Précédent",
   tourGuideLabelNext: "Suivant",
   tourGuideLabelSkip: "Passer",
@@ -1574,12 +1567,12 @@ const fr = {
   offlineMode: "Mode hors ligne",
   notPaidLabel: "Pas encore payé",
   paidLabel: "Remboursé",
-  travellers: "Voyageurs",
+  travellers: "Nomades",
   countries: "Pays",
   currencies: "Devises",
   expenses: "Dépenses",
   welcomeToBudgetForNomads: "Bienvenue dans Budget for Nomads",
-  pleaseCreateTrip: "Veuillez créer ou rejoindre un voyage pour commencer !",
+  pleaseCreateTrip: "Veuillez créer ou rejoindre un budget pour commencer !",
   finderTitle: "Recherche",
   search: "Rechercher",
   finding: "Recherche en cours",
@@ -1595,14 +1588,14 @@ const fr = {
   XowesYtoZ1: "doit",
   XowesYtoZ2: "à",
   simplifySplits: "Simplifier les soldes",
-  settleSplits: "Régler le voyage",
+  settleSplits: "Régler le budget",
   balanceSimplificationHelper:
-    "Moins de paiements entre voyageurs. Aucun argent n'a encore bougé.",
+    "Voyez moins de paiements entre nomades. Aucun argent n'a encore bougé.",
   settlementHelper:
-    "Marquer le voyage comme réglé quand tout le monde a été remboursé.",
+    "Marquez le budget comme réglé lorsque tout le monde a été remboursé.",
   confirmSettle: "Régler",
   sureSettleSplits:
-    "Régler le voyage ? Tout le monde a-t-il été remboursé ?",
+    "Êtes-vous sûr de vouloir régler le budget ? Tout le monde a-t-il été remboursé ?",
   sureDeleteAccount:
     "Cela supprimera définitivement votre compte Budget for Nomads !",
   premiumNomad: "Nomade Premium",
@@ -1624,7 +1617,7 @@ const fr = {
   settingsShowFlags: "Afficher les icônes de drapeau",
   settingsShowInternetSpeed: "Afficher la vitesse d'Internet",
   settingsDisableNumberAnimations: "Désactiver les animations de nombres",
-  settingsShowTravellerIcon: "Afficher les icônes de voyageur",
+  settingsShowTravellerIcon: "Afficher les icônes de nomades",
   settingsTrafficLightBudgetColors: "Couleurs de budget feux de circulation",
   trafficLightInfoTitle: "Couleurs de budget feux de circulation",
   trafficLightInfoText:
@@ -1651,18 +1644,18 @@ const fr = {
     "\n\n Cette devise s'affiche dans l'application ; toutes les autres devises utilisées pendant le voyage y sont converties.",
   infoTotalBudgetTitle: "Informations sur le budget total",
   infoTotalBudgetText:
-    "Configurez ici votre budget total (par exemple, le montant d'argent pour l'ensemble du voyage)." +
-    "\n\n Vous pouvez appuyer sur le bouton de calcul pour auto-calculer le budget total à partir du budget quotidien * dates de début et de fin du voyage." +
+    "Configurez ici votre budget total (par exemple, le montant d'argent pour l'ensemble du budget)." +
+    "\n\n Vous pouvez appuyer sur le bouton de calcul pour auto-calculer le budget total à partir du budget quotidien * dates de début et de fin." +
     "\n\n Le budget total est facultatif.",
   infoDailyBudgetTitle: "Informations sur le budget quotidien",
   infoDailyBudgetText:
     "Configurez ici votre budget quotidien (par exemple, le montant moyen d'argent à dépenser par jour)." +
     "Si vous ne savez pas exactement combien vous souhaitez dépenser, indiquez simplement une estimation." +
-    "\n\n Vous pouvez appuyer sur le bouton de calcul pour auto-calculer le budget quotidien à partir du budget total / dates de début et de fin du voyage.",
-  infoTripDatesTitle: "Informations sur les dates de début et de fin du voyage",
+    "\n\n Vous pouvez appuyer sur le bouton de calcul pour auto-calculer le budget quotidien à partir du budget total / dates de début et de fin.",
+  infoTripDatesTitle: "Infos dates de début et de fin",
   infoTripDatesText:
-    "Configurez ici les dates de début et de fin de votre voyage (par exemple, les dates de votre voyage)." +
-    "\n\n Le début et la fin du voyage sont facultatifs.",
+    "Configurez ici les dates de début et de fin (par exemple, les dates pour ce budget)." +
+    "\n\n Les dates de début et de fin sont facultatives.",
   comingSoon: "Bientôt disponible...",
   comingSoonRangedDates:
     "Il n'est pas encore possible de modifier les dates des dépenses avec une plage de dates.",
@@ -1677,10 +1670,10 @@ const fr = {
   errorGetOffers: "Erreur lors de l'obtention des offres",
   errorGetOffersText:
     "Veuillez redémarrer l'application ou réessayer ultérieurement.",
-  errorShareTrip: "Erreur lors du partage du voyage",
+  errorShareTrip: "Erreur lors du partage du budget",
   errorShareTripText:
     "Veuillez redémarrer l'application ou réessayer ultérieurement.",
-  inviteTraveller: "Inviter un autre voyageur",
+  inviteTraveller: "Inviter d'autres nomades",
   toastLoginError1: "Erreur de connexion",
   toastLoginError2: "Veuillez vous connecter à nouveau !",
   toastAccountError1: "Compte introuvable",
@@ -1721,18 +1714,18 @@ const fr = {
   toastSyncFinished1: "En ligne à nouveau !",
   toastSyncFinished21: "Synchronisé",
   toastSyncFinished22: "modifications hors ligne !",
-  toastSyncSuccessUpToDate: "Votre voyage est à jour !",
+  toastSyncSuccessUpToDate: "Votre budget est à jour !",
   toastSyncSuccessWithCount: "Synchronisé avec succès",
   toastSyncSuccessExpenses: "dépenses",
   toastSyncFailed: "Échec de la synchronisation, veuillez réessayer plus tard",
   toastSyncSuccessTitle: "Synchronisation réussie",
   toastSyncFailedTitle: "Échec de la synchronisation",
-  toastSettleSuccessTitle: "Voyage réglé !",
+  toastSettleSuccessTitle: "Budget réglé !",
   toastSettleSuccessMessage:
-    "Tout le monde a été remboursé pour ce voyage.",
+    "Tout le monde a été remboursé pour ce budget.",
   toastSettleFailedTitle: "Échec du règlement",
   toastSettleFailedMessage:
-    "Impossible de régler le voyage. Veuillez réessayer.",
+    "Impossible de régler le budget. Veuillez réessayer.",
   // rate modal
   rateModalTitle: "Vous appréciez Budget for Nomads ?",
   rateModalSubTitle:
@@ -1763,7 +1756,7 @@ const fr = {
     "Appuyez longuement sur le bouton + pour partir d'une dépense passée au lieu d'un formulaire vide.\n\nReprise : description, montant, catégorie, devise et pays, qui a payé et le partage. La date est toujours aujourd'hui—modifiez-la si vous avez besoin d'un autre jour.\n\nCela crée une nouvelle dépense, pas une modification de l'ancienne. Vérifiez et ajustez tout avant d'enregistrer.",
   mostUsedExpenses: "Dépenses les plus utilisées",
   lastUsedExpenses: "Dernières dépenses utilisées",
-  budgetPerTraveller: "Budget par voyageur",
+  budgetPerTraveller: "Budget par nomade",
   charts: "Diagrammes",
   future: "futures",
   past: "passés",
@@ -1778,7 +1771,7 @@ const fr = {
   alertNeedOnlineCategory:
     "Vous devez être en ligne pour ajouter une nouvelle catégorie",
   alertSameCurrencyTrips:
-    "Veuillez sélectionner des voyages avec la même devise du domicile",
+    "Veuillez sélectionner des budgets avec la même devise domicile",
   alertDeleteContextNotImplemented: "suppression du contexte non implémentée",
   alertDeleteGroupedRangeExpenses: "Supprimer les dépenses de groupe?",
   alertDeleteAllEntriesFor:
@@ -1801,7 +1794,7 @@ const fr = {
   paid: "Payé",
   specialExpense: "Dépense spéciale",
   shareTripDescription:
-    "Partagez ce voyage avec d'autres voyageurs. Ils recevront un lien d'invitation pour rejoindre votre voyage et suivre les dépenses ensemble.",
+    "Partagez ce budget avec d'autres nomades. Ils recevront un lien d'invitation pour rejoindre votre budget et suivre les dépenses ensemble.",
   placeholderSharedExpense: "Dépense partagée?",
   placeholderSharedBetween: "Partagé entre ... ?",
   devOfflineQueue: "File d'attente hors ligne",
@@ -1841,31 +1834,31 @@ const fr = {
   hideSpecialExpenses: "Masquer les dépenses spéciales",
 
   // Trip Summary Screen
-  trips: "Voyages",
-  trip: "Voyage",
+  trips: "Budgets",
+  trip: "Budget",
   summary: "Résumé",
   totalCosts: "Coûts totaux",
   averageCostPerDay: "Coût moyen par jour",
   averageCostPerMonth: "Coût moyen par mois",
   averageCostPerYear: "Coût moyen par an",
   averageCostPerCountry: "Coût moyen par pays",
-  averageCostPerTrip: "Coût moyen par voyage",
-  averageCostPerTraveller: "Coût moyen par voyageur",
+  averageCostPerTrip: "Coût moyen par budget",
+  averageCostPerTraveller: "Coût moyen par nomade",
 
   // ExpenseForm and SplitSummaryScreen translations
   expenseMarkedPaidDueToSettlement:
-    "Cette dépense est marquée comme payée en raison du règlement du voyage",
+    "Cette dépense est marquée comme payée suite au règlement du budget",
   splitSummaryTitleSimplified: "Résumé des dépenses",
-  overviewOfOwedAmounts: "Aperçu des montants dus dans le voyage :\n  ",
+  overviewOfOwedAmounts: "Aperçu des montants dus dans le budget :\n  ",
   simplifiedSummaryOptimalTransactions:
-    "Résumé simplifié des transactions optimales dans le voyage :  ",
+    "Résumé simplifié des transactions optimales dans le budget :  ",
   yourMoneyBackWithColon: "Votre argent est de retour :  ",
   youStillOweWithColon: "Vous devez toujours : ",
   somethingWentWrongSorry: "Quelque chose a dû mal se passer, désolé !",
   sureSettleSplitsFullMessage:
-    "Régler le voyage ? Tout le monde a-t-il été remboursé ? Toutes les dépenses seront marquées comme remboursées, quelle que soit leur date.",
+    "Êtes-vous sûr de vouloir régler le budget ? Tout le monde a-t-il été remboursé ? Cela marquera TOUTES les dépenses comme remboursées, quelle que soit leur date.",
   tripSettledAllExpensesPaid:
-    "Voyage réglé — toutes les dépenses marquées comme remboursées",
+    "Budget réglé — toutes les dépenses marquées comme remboursées",
   noOpenSplitsAllSettled:
     "Aucun solde ouvert — toutes les dépenses sont remboursées",
   noOpenSplits: "Aucun solde ouvert",
@@ -1907,13 +1900,14 @@ const ru = {
   // Other Strings
   overview: "Обзор",
   categories: "Категории",
-  invitationText: "У меня есть приглашение от другого путешественника!",
-  joinTrip: "Хотите присоединиться к поездке?",
+  invitationText: "У меня есть приглашение от другого номада!",
+  joinTrip: "Хотите присоединиться к этому бюджету",
   joinLink: "Вы можете вставить ссылку на ваше приглашение здесь!",
   join: "Присоединиться",
-  createFirstTrip: "Создать первую поездку",
-  myTrips: "Мои поездки",
+  createFirstTrip: "Создать первый бюджет",
+  myTrips: "Мои бюджеты",
   myBudgets: "Мои бюджеты",
+  homeFirstPromise: "Следите за тратами — в одиночку или вместе.",
   yourBudgets: "Ваши бюджеты",
   joinBudget: "Присоединиться к бюджету",
   joinBudgetHint: "Введите код или ссылку приглашения",
@@ -1924,8 +1918,8 @@ const ru = {
   activeTripLabel: "Активный",
   implicitBudgetExpenseCount: "%{count} расходов · нажмите, чтобы назвать",
   chooseAction: "Пожалуйста, выберите действие:",
-  inviteTravellers: "Пригласить других путешественников",
-  setActiveTrip: "Установить активную поездку",
+  inviteTravellers: "Пригласить других номадов",
+  setActiveTrip: "Сделать активным бюджетом",
   calcOpenSplits: "Рассчитать балансы",
   daily: "Ежедневно",
 
@@ -1997,7 +1991,7 @@ const ru = {
 
   // Walkthrough Texts
   walk1:
-    "Добро пожаловать в Budget for Nomads! 🎉 \n\nМы рады поддерживать вас в вашем путешествии.",
+    "Добро пожаловать в Budget for Nomads! 🎉 \n\nСледите за тратами — в одиночку или вместе.",
   walk2:
     "Начните, добавляя свои расходы. 🛍️ \n\nНажмите на символ '+', и введите все необходимые детали. Просто попробуйте сейчас!",
   walk3:
@@ -2005,13 +1999,13 @@ const ru = {
   walk4:
     "Просмотрите свои расходы по категориям или в ежедневном обзоре. 📈 \n\nИспользуйте переключатель для переключения между этими двумя опциями.",
   walk5:
-    "Уже планируете свое следующее приключение? 🌎\n\nЗдесь вы можете создать новое путешествие.",
+    "Ещё один бюджет? 📒\n\nЗдесь можно создать новый бюджет.",
   walk6:
-    "Посмотрите свои путешествия. 🗺️ \n\nВаше активное путешествие будет выделено зеленым цветом.",
+    "Смотрите свои бюджеты. 📒 \n\nАктивный бюджет будет выделен зелёным.",
   walk7:
-    "Получите обзор! \n\nС помощью этой кнопки вы можете быстро просмотреть сводку для одной или нескольких поездок.",
+    "Получите обзор! \n\nЭтой кнопкой можно быстро показать сводку по одному или нескольким бюджетам.",
   walk8:
-    "Теперь вы готовы к старту. 🚀 \n\nНаслаждайтесь путешествием и следите за своим бюджетом, пока исследуете мир.",
+    "Всё готово. 🚀 \n\nСледите за тратами — в одиночку или вместе.",
 
   // Tabbar labels
   expensesTab: "Расходы",
@@ -2021,7 +2015,7 @@ const ru = {
 
   // Settings Labels
   logoutLabel: "Выйти",
-  joinTripLabel: "Присоединиться к поездке",
+  joinTripLabel: "Присоединиться к бюджету",
   simplifySplitsLabel: "Сводка балансов",
   resetAppIntroductionLabel: "Сбросить введение в приложение",
   visitFoodForNomadsLabel: "Посетить Food For Nomads",
@@ -2052,44 +2046,41 @@ const ru = {
   getLocalPriceError: "Пожалуйста, введите название продукта или услуги",
 
   // Trip Form Labels
-  tripFormTitleNew: "Новая поездка",
-  tripFormTitleEdit: "Изменить поездку",
+  tripFormTitleNew: "Новый бюджет",
+  tripFormTitleEdit: "Редактировать бюджет",
   tripFormTitlePromote: "Назовите бюджет",
   tripFormTitleAddAnother: "Добавить другой бюджет",
   tripFormSubtitleAddAnother: "Новые бюджеты начинаются пустыми",
   tripFormOptionalDetails: "Дополнительные детали",
-  tripNameLabel: "Название поездки",
+  tripNameLabel: "Название бюджета",
   baseCurrencyLabel: "Домашняя валюта",
   totalBudgetLabel: "Общий бюджет в",
   dailyBudgetLabel: "Дневной бюджет в",
-  enterNameAlert: "Введите название новой поездки.",
+  enterNameAlert: "Пожалуйста, введите название нового бюджета.",
   enterBudgetAlert: "Введите общий бюджет, превышающий дневной бюджет",
-  selectCurrencyAlert: "Выберите домашнюю валюту для этой поездки",
+  selectCurrencyAlert: "Пожалуйста, выберите домашнюю валюту для этого бюджета",
   alertChangeHomeCurrencyTitle: "Изменение домашней валюты",
   alertChangeHomeCurrencyMessage:
     "Вы уверены, что хотите изменить валюту? Укажите валюту, которую вы обычно используете дома.",
-  deleteTrip: "Удалить поездку",
-  deleteTripSure: "Вы уверены, что хотите удалить эту поездку?",
-  setActive: "Установить активной поездкой",
-  datePickerLabel: "Начало и окончание поездки",
+  deleteTrip: "Удалить бюджет",
+  deleteTripSure: "Вы уверены, что хотите удалить этот бюджет?",
+  setActive: "Сделать активным бюджетом",
+  datePickerLabel: "Даты начала и окончания",
 
   // Loading Strings
-  loadingYourTrip: "Загрузка вашей поездки...",
+  loadingYourTrip: "Загрузка вашего бюджета...",
   loading: "Загрузка...",
 
   // Invite Screen
   inviteMessage:
     "Привет!\n" +
     "Ты уже знаком с Budget for Nomads?\n" +
-    "Это приложение позволяет легко отслеживать все расходы во время путешествий и взаимные долги.\n" +
-    "Для нашей предстоящей поездки я также хочу пригласить тебя в это приложение!" +
-    // " Давай отслеживать наши расходы вместе и путешествовать беззаботно.\n" +
-    // "Скачай приложение бесплатно здесь:\n" +
-    // "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=ru" +
-    "\nПосле установки приложения, присоединяйся к нашей поездке здесь:\n",
+    "Это приложение позволяет легко отслеживать расходы — в одиночку или вместе — и взаимные долги.\n" +
+    "Я хочу пригласить тебя в наш общий бюджет!\n" +
+    "После установки приложения присоединяйся к нашему бюджету здесь:\n",
   inviteLink:
     "https://apps.apple.com/de/app/budget-for-nomads/id6446042796?l=ru",
-  noTrip: "Не удалось найти поездку!",
+  noTrip: "Бюджет не найден!",
   tryAgain: "Пожалуйста, попробуйте еще раз позже.",
 
   // Login and Signup Screen
@@ -2123,13 +2114,13 @@ const ru = {
   // Onboarding Screens
   onb1: "Добро пожаловать в Budget for Nomads",
   onb1t:
-    "Исследуйте мир без финансового стресса и начните быстро отслеживать свои расходы во время путешествия.",
-  onb2: "Упростите групповые платежи во время поездок",
+    "Следите за тратами — в одиночку или вместе.",
+  onb2: "Делите расходы с другими",
   onb2t:
-    "Делитесь и отслеживайте расходы во время путешествия с друзьями и семьей и смотрите, кто кому сколько должен.",
-  onb3: "Достигайте своих финансовых целей",
+    "Делитесь и отслеживайте расходы с друзьями и семьёй и смотрите, кто кому сколько должен.",
+  onb3: "Достигайте финансовых целей",
   onb3t:
-    "Займите контроль над своими расходами и посмотрите, сколько денег у вас еще есть во время путешествия.",
+    "Контролируйте расходы и смотрите, сколько денег у вас осталось.",
   onbskip: "Пропустить",
   onbcontinue: "Продолжить",
   onbprevious: "Назад",
@@ -2145,8 +2136,8 @@ const ru = {
   splitUpExpenses: "Разделить",
 
   paywallTitle: "Станьте Премиум-Номадом!",
-  paywallSubtitle: "Упростите свое путешествие с дополнительными функциями:",
-  paywallFeature0: "✓ Créer des voyages et des dépenses infinis",
+  paywallSubtitle: "Сделайте учёт ещё проще с дополнительными функциями:",
+  paywallFeature0: "✓ Создавайте неограниченно бюджетов и расходов",
   paywallFeature1: "✓ Создавайте собственные категории,",
   paywallFeature2: "✓ Упрощайте расчеты по долгам,",
   paywallFeature3:
@@ -2164,7 +2155,7 @@ const ru = {
     "Пожалуйста, введите действительный адрес электронной почты!",
   passwordInvalidInfoText:
     "Пожалуйста, введите пароль длиной не менее 6 символов!",
-  shareTripLabel: "Поделиться поездкой",
+  shareTripLabel: "Поделиться бюджетом",
   tourGuideLabelPrevious: "Предыдущий",
   tourGuideLabelNext: "Следующий",
   tourGuideLabelSkip: "Пропустить",
@@ -2196,13 +2187,13 @@ const ru = {
   offlineMode: "Офлайн режим",
   notPaidLabel: "Еще не оплачено",
   paidLabel: "Оплачено",
-  travellers: "Путешественники",
+  travellers: "Номады",
   countries: "Страны",
   currencies: "Валюты",
   expenses: "Расходы",
   welcomeToBudgetForNomads: "Добро пожаловать в Budget for Nomads",
   pleaseCreateTrip:
-    "Пожалуйста, создайте или присоединитесь к поездке, чтобы начать!",
+    "Пожалуйста, создайте или присоединитесь к бюджету, чтобы начать!",
   finderTitle: "Поиск",
   search: "Поиск",
   finding: "Поиск",
@@ -2218,14 +2209,14 @@ const ru = {
   XowesYtoZ1: "должен",
   XowesYtoZ2: "для",
   simplifySplits: "Упростить балансы",
-  settleSplits: "Закрыть поездку",
+  settleSplits: "Закрыть бюджет",
   balanceSimplificationHelper:
-    "Меньше платежей между путешественниками. Деньги ещё не переводились.",
+    "Меньше платежей между номадами. Деньги ещё не переводились.",
   settlementHelper:
-    "Отметить поездку закрытой, когда всем вернули деньги.",
+    "Отметьте бюджет как рассчитанный, когда всем вернули деньги.",
   confirmSettle: "Закрыть",
   sureSettleSplits:
-    "Закрыть поездку? Всем вернули деньги?",
+    "Вы уверены, что хотите рассчитать бюджет? Всем ли вернули долги?",
   sureDeleteAccount: "Это безвозвратно удалит ваш аккаунт в Budget for Nomads!",
   premiumNomad: "Премиум-намбад",
   premiumNomadActiveNow: "Теперь вы являетесь премиум-намбадом!",
@@ -2246,7 +2237,7 @@ const ru = {
   settingsShowFlags: "Показывать значки флагов",
   settingsShowInternetSpeed: "Показывать скорость интернета",
   settingsDisableNumberAnimations: "Отключить анимацию чисел",
-  settingsShowTravellerIcon: "Показывать значки путешественников",
+  settingsShowTravellerIcon: "Показывать иконки номадов",
   settingsTrafficLightBudgetColors: "Цвета бюджета светофора",
   trafficLightInfoTitle: "Цвета бюджета светофора",
   trafficLightInfoText:
@@ -2273,20 +2264,20 @@ const ru = {
     "\n\n Эта валюта будет отображаться в приложении, и все остальные валюты, которые вы используете во время путешествия, будут конвертироваться в эту.",
   infoTotalBudgetTitle: "Информация об общем бюджете",
   infoTotalBudgetText:
-    "Настройте ваш общий бюджет здесь (например, сумму денег на весь путешествие)." +
-    '\n\n Вы можете нажать кнопку "Рассчитать" для автоматического расчета общего бюджета на основе ежедневного бюджета * даты начала и окончания путешествия.' +
+    "Настройте ваш общий бюджет здесь (например, сумму денег на весь бюджет)." +
+    '\n\n Вы можете нажать кнопку "Рассчитать" для автоматического расчета общего бюджета на основе ежедневного бюджета * даты начала и окончания.' +
     "\n\n Общий бюджет является необязательным.",
 
   infoDailyBudgetTitle: "Информация о ежедневном бюджете",
   infoDailyBudgetText:
     "Настройте ваш ежедневный бюджет здесь (например, среднюю сумму денег, которую вы планируете тратить в день)." +
     "Если вы не знаете точно, сколько вы хотите потратить, просто укажите приблизительную сумму." +
-    '\n\n Вы можете нажать кнопку "Рассчитать" для автоматического расчета ежедневного бюджета на основе общего бюджета / даты начала и окончания путешествия.',
+    '\n\n Вы можете нажать кнопку "Рассчитать" для автоматического расчета ежедневного бюджета на основе общего бюджета / даты начала и окончания.',
 
-  infoTripDatesTitle: "Информация о датах начала и окончания путешествия",
+  infoTripDatesTitle: "Информация о датах начала и окончания",
   infoTripDatesText:
-    "Настройте даты начала и окончания путешествия здесь (например, даты вашего путешествия)." +
-    "\n\n Даты начала и окончания путешествия являются необязательными.",
+    "Настройте даты начала и окончания здесь (например, даты для этого бюджета)." +
+    "\n\n Даты начала и окончания являются необязательными.",
 
   comingSoon: "Скоро появится...",
 
@@ -2311,10 +2302,10 @@ const ru = {
   errorGetOffersText:
     "Пожалуйста, перезапустите приложение или попробуйте позже.",
 
-  errorShareTrip: "Ошибка при передаче путешествия",
+  errorShareTrip: "Ошибка при отправке бюджета",
   errorShareTripText:
     "Пожалуйста, перезапустите приложение или попробуйте позже.",
-  inviteTraveller: "Пригласить другого путешественника",
+  inviteTraveller: "Пригласить других номадов",
   toastLoginError1: "Ошибка входа",
   toastLoginError2: "Пожалуйста, войдите снова!",
   toastAccountError1: "Аккаунт не найден",
@@ -2355,17 +2346,17 @@ const ru = {
   toastSyncFinished1: "Снова онлайн!",
   toastSyncFinished21: "Синхронизированы",
   toastSyncFinished22: "офлайн изменения!",
-  toastSyncSuccessUpToDate: "Ваша поездка актуальна!",
+  toastSyncSuccessUpToDate: "Ваш бюджет актуален!",
   toastSyncSuccessWithCount: "Успешно синхронизировано",
   toastSyncSuccessExpenses: "расходов",
   toastSyncFailed: "Не удалось синхронизировать, попробуйте позже",
   toastSyncSuccessTitle: "Синхронизация успешна",
   toastSyncFailedTitle: "Ошибка синхронизации",
-  toastSettleSuccessTitle: "Поездка закрыта!",
-  toastSettleSuccessMessage: "Всем вернули деньги по этой поездке.",
+  toastSettleSuccessTitle: "Бюджет рассчитан!",
+  toastSettleSuccessMessage: "Всем вернули долги по этому бюджету.",
   toastSettleFailedTitle: "Ошибка закрытия",
   toastSettleFailedMessage:
-    "Не удалось закрыть поездку. Пожалуйста, попробуйте снова.",
+    "Не удалось рассчитать бюджет. Попробуйте ещё раз.",
   // rate modal
   rateModalTitle: "Нравится Budget for Nomads?",
   rateModalSubTitle:
@@ -2396,7 +2387,7 @@ const ru = {
     "Долгое нажатие на кнопку + позволяет начать с прошлого расхода вместо пустой формы.\n\nКопируются: описание, сумма, категория, валюта и страна, кто оплатил и как делится сумма. Дата всегда сегодня—измените её, если нужен другой день.\n\nСоздаётся новый расход, а не правка старого. Проверьте и при необходимости измените данные перед сохранением.",
   mostUsedExpenses: "Самые используемые расходы",
   lastUsedExpenses: "Последние использованные расходы",
-  budgetPerTraveller: "Бюджет на одного путешественника",
+  budgetPerTraveller: "Бюджет на одного номада",
   charts: "Схемы",
   future: "Будущее",
   past: "прошлые",
@@ -2411,7 +2402,7 @@ const ru = {
   alertNeedOnlineCategory:
     "Вам нужно быть онлайн, чтобы добавить новую категорию",
   alertSameCurrencyTrips:
-    "Пожалуйста, выберите поездки с одинаковой домашней валютой",
+    "Пожалуйста, выберите бюджеты с одной домашней валютой",
   alertDeleteContextNotImplemented: "удаление контекста не реализовано",
   alertDeleteGroupedRangeExpenses: "Удалить сгруппированные расходы диапазона?",
   alertDeleteAllEntriesFor: "Это удалит все записи, которые принадлежат к",
@@ -2433,7 +2424,7 @@ const ru = {
   paid: "Оплачено",
   specialExpense: "Особый расход",
   shareTripDescription:
-    "Поделитесь этой поездкой с другими путешественниками. Они получат ссылку-приглашение для присоединения к вашей поездке и совместного отслеживания расходов.",
+    "Поделитесь этим бюджетом с другими номадами. Они получат ссылку-приглашение, чтобы присоединиться к бюджету и вместе учитывать расходы.",
   placeholderSharedExpense: "Совместный расход?",
   placeholderSharedBetween: "Разделить между ... ?",
   devOfflineQueue: "Очередь офлайн",
@@ -2472,31 +2463,31 @@ const ru = {
   hideSpecialExpenses: "Скрыть специальные расходы",
 
   // Trip Summary Screen
-  trips: "Поездки",
-  trip: "Поездка",
+  trips: "Бюджеты",
+  trip: "Бюджет",
   summary: "Сводка",
   totalCosts: "Общие расходы",
   averageCostPerDay: "Средние расходы в день",
   averageCostPerMonth: "Средние расходы в месяц",
   averageCostPerYear: "Средние расходы в год",
   averageCostPerCountry: "Средние расходы на страну",
-  averageCostPerTrip: "Средние расходы на поездку",
-  averageCostPerTraveller: "Средние расходы на путешественника",
+  averageCostPerTrip: "Средняя стоимость на бюджет",
+  averageCostPerTraveller: "Средняя стоимость на номада",
 
   // ExpenseForm and SplitSummaryScreen translations
   expenseMarkedPaidDueToSettlement:
-    "Эта статья расходов помечена как оплаченная из-за урегулирования поездки",
+    "Этот расход отмечен как оплаченный из‑за расчёта бюджета",
   splitSummaryTitleSimplified: "Разделить сумму",
-  overviewOfOwedAmounts: "Обзор причитающихся сумм в поездке:\n  ",
+  overviewOfOwedAmounts: "Обзор задолженностей в бюджете:\n  ",
   simplifiedSummaryOptimalTransactions:
-    "Упрощенная сводка оптимальных транзакций в поездке:  ",
+    "Упрощённая сводка оптимальных переводов в бюджете:  ",
   yourMoneyBackWithColon: "Ваши деньги вернутся:  ",
   youStillOweWithColon: "Вы все еще должны: ",
   somethingWentWrongSorry: "Что-то пошло не так, извините!",
   sureSettleSplitsFullMessage:
-    "Закрыть поездку? Всем вернули деньги? Все расходы будут отмечены как возмещённые, независимо от даты.",
+    "Вы уверены, что хотите рассчитать бюджет? Всем ли вернули долги? Это отметит ВСЕ расходы как возвращённые, независимо от даты.",
   tripSettledAllExpensesPaid:
-    "Поездка закрыта — все расходы отмечены как возмещённые",
+    "Бюджет рассчитан — все расходы отмечены как возвращённые",
   noOpenSplitsAllSettled:
     "Нет открытых балансов — все расходы возмещены",
   noOpenSplits: "Нет открытых балансов",

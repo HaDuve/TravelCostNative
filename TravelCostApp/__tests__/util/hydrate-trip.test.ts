@@ -77,4 +77,16 @@ describe("hydrateTrip", () => {
 
     expect(hydrated.isDynamicDailyBudget).toBe(true);
   });
+
+  it("preserves isImplicitDefault when set on raw trip", () => {
+    const hydrated = hydrateTrip(minimalTrip({ isImplicitDefault: true }));
+
+    expect(hydrated.isImplicitDefault).toBe(true);
+  });
+
+  it("leaves missing isImplicitDefault unset (no legacy backfill)", () => {
+    const hydrated = hydrateTrip(minimalTrip());
+
+    expect(hydrated.isImplicitDefault).toBeUndefined();
+  });
 });

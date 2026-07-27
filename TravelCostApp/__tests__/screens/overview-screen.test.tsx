@@ -174,4 +174,28 @@ describe("Overview screen", () => {
 
     expect(screen.getByTestId("overview-refresh-control")).toBeTruthy();
   });
+
+  it("does not redirect to Profile when freshlyCreated is leftover", () => {
+    const Toast = require("react-native-toast-message/lib/src/Toast").Toast;
+    const navigation = { navigate: jest.fn() };
+
+    renderWithAppProviders(<OverviewScreen navigation={navigation as any} />, {
+      user: {
+        needsTour: false,
+        freshlyCreated: true,
+        isShowingGraph: false,
+        setIsShowingGraph: jest.fn(),
+      },
+      expenses: { expenses: [], getRecentExpenses: () => [] },
+      trip: {
+        tripid: "t-implicit",
+        tripName: "",
+        tripCurrency: "EUR",
+        isImplicitDefault: true,
+      },
+    });
+
+    expect(navigation.navigate).not.toHaveBeenCalledWith("Profile");
+    expect(Toast.show).not.toHaveBeenCalled();
+  });
 });

@@ -8,7 +8,14 @@ import { i18n } from "../i18n/i18n";
 
 import { AuthContext } from "../store/auth-context";
 import { UserContext, UserData } from "../store/user-context";
-import { fetchUser, touchMyTraveler, updateUser } from "../util/http";
+import {
+  fetchUser,
+  putTravelerInTrip,
+  storeTrip,
+  storeTripHistory,
+  touchMyTraveler,
+  updateUser,
+} from "../util/http";
 import { TripContext } from "../store/trip-context";
 import Toast from "react-native-toast-message";
 import Purchases from "react-native-purchases";
@@ -22,8 +29,12 @@ import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 import { secureStoreSetItem } from "../store/secure-storage";
 import { ExpensesContext } from "../store/expenses-context";
-import { MMKV_KEYS, setMMKVObject } from "../store/mmkv";
+import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
+import {
+  deviceLocaleTripCurrency,
+  ensureImplicitDefaultActiveTrip,
+} from "../util/implicit-default-trip";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -86,17 +97,6 @@ function LoginScreen() {
       authCtx.logout(tripCtx.tripid);
       return;
     }
-    tripCtx.setTripid(checkUser.currentTrip);
-    let freshlyCreated = checkUser.freshlyCreated;
-    if (!checkUser.currentTrip) {
-      // we infer freshly created if no current trip exists but we assigned a name already
-      //   "loginHandler ~ we set to freshly because username but no current trip!"
-      // );
-      await userCtx.setFreshlyCreatedTo(true);
-      freshlyCreated = true;
-    } else {
-      await userCtx.setFreshlyCreatedTo(freshlyCreated);
-    }
     try {
       //// END OF IMPORTANT CHECKS BEFORE ACTUALLY LOGGING IN IN APP.tsx OR LOGIN.tsx
       const { REVCAT_G, REVCAT_A }: Keys = await loadKeys();
@@ -119,25 +119,55 @@ function LoginScreen() {
     } catch (error) {
       safeLogError(error);
     }
-    const tripid = userData.currentTrip;
-    if (!tripid && freshlyCreated) {
-      await authCtx.authenticate(token);
-      return;
-    }
-    try {
-      await secureStoreSetItem("currentTripId", tripid);
-      await secureStoreSetItem("uid", uid);
-      await touchMyTraveler(tripid, uid);
 
-      await tripCtx.fetchAndSetCurrentTrip(tripid);
-      await userCtx.loadCatListFromAsyncInCtx(tripid);
-      await userCtx.updateTripHistory();
-      tripCtx.refresh();
-      expCtx.setExpenses([]);
-      setMMKVObject(MMKV_KEYS.EXPENSES, []);
-    } catch (error) {
-      safeLogError(error);
+    let tripid = userData.currentTrip;
+    if (!tripid) {
+      try {
+        const created = await ensureImplicitDefaultActiveTrip({
+          uid,
+          userName: userData.userName,
+          tripCurrency: deviceLocaleTripCurrency(),
+          categories: getMMKVObject(MMKV_KEYS.CATEGORY_LIST),
+          storeTrip,
+          putTravelerInTrip,
+          storeTripHistory,
+          updateUser,
+          setCurrentTrip: tripCtx.setCurrentTrip,
+          secureStoreSetItem,
+          setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
+          setTripHistory: userCtx.setTripHistory,
+        });
+        tripid = created.tripid;
+        expCtx.setExpenses([]);
+        setMMKVObject(MMKV_KEYS.EXPENSES, []);
+        await userCtx.loadCatListFromAsyncInCtx(tripid);
+        tripCtx.refresh();
+      } catch (error) {
+        safeLogError(error);
+        setIsAuthenticating(false);
+        authCtx.logout(tripCtx.tripid);
+        return;
+      }
+    } else {
+      // Leftover freshlyCreated with an existing Active trip: clear and ignore for routing
+      await userCtx.setFreshlyCreatedTo(false);
+      try {
+        await secureStoreSetItem("currentTripId", tripid);
+        await secureStoreSetItem("uid", uid);
+
+        await touchMyTraveler(tripid, uid);
+
+        await tripCtx.fetchAndSetCurrentTrip(tripid);
+        await userCtx.loadCatListFromAsyncInCtx(tripid);
+        await userCtx.updateTripHistory();
+        tripCtx.refresh();
+        expCtx.setExpenses([]);
+        setMMKVObject(MMKV_KEYS.EXPENSES, []);
+      } catch (error) {
+        safeLogError(error);
+      }
     }
+    tripCtx.setTripid(tripid);
     await authCtx.authenticate(token);
   }
 

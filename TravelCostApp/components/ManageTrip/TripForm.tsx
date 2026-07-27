@@ -62,6 +62,8 @@ import safeLogError from "../../util/error";
 import { dynamicScale } from "../../util/scalingUtil";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
+import { getTripData } from "../../util/trip";
+import { countableTripsTowardNonPremiumLimit } from "../../util/implicit-default-trip";
 
 const TripForm = ({ navigation, route }) => {
   const tripCtx = useContext(TripContext);
@@ -382,10 +384,20 @@ const TripForm = ({ navigation, route }) => {
   const isLimitedByPremium = async () => {
     const isPremium = await isPremiumMember();
     if (isPremium) return false;
-    const tripHistory = userCtx.tripHistory;
-    const tripHistoryLength = tripHistory?.length || 0;
-    const tooManyTrips = tripHistoryLength >= MAX_TRIPS_NONPREMIUM;
-    return tooManyTrips;
+    const tripHistory = userCtx.tripHistory ?? [];
+    const trips = await Promise.all(
+      tripHistory.map(async (tripid) => {
+        try {
+          return await getTripData(tripid);
+        } catch (error) {
+          safeLogError(error);
+          return null;
+        }
+      })
+    );
+    return (
+      countableTripsTowardNonPremiumLimit(trips) >= MAX_TRIPS_NONPREMIUM
+    );
   };
 
   function checkFormValidity(tripData: TripData) {

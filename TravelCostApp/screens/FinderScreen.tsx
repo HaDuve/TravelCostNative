@@ -14,7 +14,7 @@ import { toExpenseNavigationDtos } from "../util/expense-navigation-dto";
 
 import { i18n } from "../i18n/i18n";
 
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import FinderFilterRow from "../components/Finder/FinderFilterRow";
@@ -30,7 +30,6 @@ import {
 } from "../store/async-storage";
 import { ExpensesContext } from "../store/expenses-context";
 import { TripContext } from "../store/trip-context";
-import { UserContext } from "../store/user-context";
 import { DEFAULTCATEGORIES } from "../util/category";
 import safeLogError from "../util/error";
 import { ExpenseData } from "../util/expense";
@@ -42,21 +41,7 @@ import { VexoEvents } from "../util/vexo-constants";
 const FinderScreen = () => {
   const navigation = useNavigation();
   const expCtx = useContext(ExpensesContext);
-  const userCtx = useContext(UserContext);
   const tripCtx = useContext(TripContext);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (userCtx.freshlyCreated) {
-        Toast.show({
-          type: "success",
-          text1: i18n.t("welcomeToBudgetForNomads"),
-          text2: i18n.t("pleaseCreateTrip"),
-        });
-        navigation.navigate("Profile");
-      }
-    }, [userCtx.freshlyCreated, navigation])
-  );
 
   const [checkedQuery, setCheckedQuery] = React.useState(false);
   const [checkedDate, setCheckedDate] = React.useState(false);

@@ -49,6 +49,31 @@ describe("ExpensesSummary", () => {
     expect(screen.getByText(/75/)).toBeTruthy();
   });
 
+  it("still shows summary when freshlyCreated leftover flag is set", () => {
+    const expenses = [makeExpense({ calcAmount: 40, amount: 40 })];
+
+    const screen = renderWithAppProviders(
+      <ExpensesSummary expenses={expenses} periodName="month" />,
+      {
+        wrapNavigation: false,
+        user: { freshlyCreated: true },
+        expenses: {
+          expenses,
+          getRecentExpenses: () => expenses,
+        },
+        trip: {
+          tripid: "t-implicit",
+          tripCurrency: "EUR",
+          isImplicitDefault: true,
+          travellers: ["Alice"],
+        },
+      }
+    );
+
+    expect(screen.getByTestId("expenses-summary-pressable")).toBeTruthy();
+    expect(screen.getByText(/40/)).toBeTruthy();
+  });
+
   it("uses dropdown-matching shadow chrome on the budget summary pressable", () => {
     const expenses = [makeExpense({ calcAmount: 75, amount: 75 })];
 

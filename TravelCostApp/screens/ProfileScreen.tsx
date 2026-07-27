@@ -303,9 +303,7 @@ const ProfileScreen = ({ navigation }) => {
     };
   }, []);
 
-  const visibleContent = userCtx.freshlyCreated ? (
-    <></>
-  ) : (
+  const visibleContent = (
     <>
       <View style={styles.headerButtonsContainer}>
         <GetLocalPriceButton

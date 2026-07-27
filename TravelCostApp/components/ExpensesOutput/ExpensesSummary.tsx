@@ -47,7 +47,7 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
   const isOfflineMissingTrip =
     !tripCtx.tripid && travellers.length === 0 && !tripCurrency;
 
-  if (!periodName || userCtx.freshlyCreated) return <></>;
+  if (!periodName) return <></>;
 
   if (isOfflineMissingTrip) {
     return (

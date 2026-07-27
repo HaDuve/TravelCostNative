@@ -88,26 +88,11 @@ const OverviewScreen = ({ navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      if (userCtx.freshlyCreated) {
-        Toast.show({
-          type: "success",
-          text1: i18n.t("welcomeToBudgetForNomads"),
-          text2: i18n.t("pleaseCreateTrip"),
-        });
-        navigation.navigate("Profile");
-      }
-    }, [userCtx.freshlyCreated, navigation])
-  );
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (!userCtx.freshlyCreated) {
-        const onboardingFlags: OnboardingFlags = {
-          freshlyCreated: userCtx.freshlyCreated,
-          needsTour: userCtx.needsTour,
-        };
-        showBanner(navigation, onboardingFlags);
-      }
+      const onboardingFlags: OnboardingFlags = {
+        freshlyCreated: userCtx.freshlyCreated,
+        needsTour: userCtx.needsTour,
+      };
+      showBanner(navigation, onboardingFlags);
     }, [navigation, userCtx.freshlyCreated, userCtx.needsTour])
   );
 

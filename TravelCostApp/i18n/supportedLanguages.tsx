@@ -198,6 +198,8 @@ const en = {
     "Are you sure you want to change the currency? Set it to the currency you normally use at home.",
   leaveTrip: "Leave budget",
   leaveTripSure: "Are you sure you want to leave this budget? Your past expenses stay for the remaining nomads.",
+  leaveTripPermanentDeleteSure:
+    "You are the last nomad on this budget. Leaving permanently deletes it and all its expenses. This cannot be undone.",
   leaveTripConnectRequired: "Connect to the internet to leave this budget.",
   leaveTripNowShowing: "Now showing %{name}",
   toastLeftTrip1: "Left budget",
@@ -808,6 +810,8 @@ const de = {
   leaveTrip: "Budget verlassen",
   leaveTripSure:
     "Möchtest du dieses Budget wirklich verlassen? Deine bisherigen Ausgaben bleiben für die anderen Nomaden erhalten.",
+  leaveTripPermanentDeleteSure:
+    "Du bist der letzte Nomade in diesem Budget. Verlassen löscht es und alle Ausgaben endgültig. Das kann nicht rückgängig gemacht werden.",
   leaveTripConnectRequired:
     "Verbinde dich mit dem Internet, um dieses Budget zu verlassen.",
   leaveTripNowShowing: "Jetzt angezeigt: %{name}",
@@ -1452,6 +1456,8 @@ const fr = {
   leaveTrip: "Quitter le budget",
   leaveTripSure:
     "Voulez-vous vraiment quitter ce budget ? Vos dépenses passées restent pour les autres nomades.",
+  leaveTripPermanentDeleteSure:
+    "Vous êtes le dernier nomade sur ce budget. Quitter le supprime définitivement avec toutes ses dépenses. Cette action est irréversible.",
   leaveTripConnectRequired:
     "Connectez-vous à internet pour quitter ce budget.",
   leaveTripNowShowing: "Affichage de %{name}",
@@ -2086,6 +2092,8 @@ const ru = {
   leaveTrip: "Покинуть бюджет",
   leaveTripSure:
     "Вы уверены, что хотите покинуть этот бюджет? Ваши прошлые расходы останутся для остальных номадов.",
+  leaveTripPermanentDeleteSure:
+    "Вы последний номад в этом бюджете. Выход безвозвратно удалит его и все расходы. Это нельзя отменить.",
   leaveTripConnectRequired:
     "Подключитесь к интернету, чтобы покинуть этот бюджет.",
   leaveTripNowShowing: "Сейчас показан: %{name}",

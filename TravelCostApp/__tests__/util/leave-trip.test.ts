@@ -14,6 +14,7 @@ jest.mock("../../util/http", () => ({
   removeTripFromHistory: jest.fn(async () => undefined),
   putTravelerInTrip: jest.fn(async () => ({})),
   storeTripHistory: jest.fn(async () => undefined),
+  deleteTrip: jest.fn(async () => ({ status: 200 })),
 }));
 
 import Toast from "react-native-toast-message";
@@ -29,6 +30,7 @@ import {
   undoLeaveTrip,
 } from "../../util/leave-trip";
 import {
+  deleteTrip,
   putTravelerInTrip,
   removeTravelerFromTrip,
   removeTripFromHistory,
@@ -47,6 +49,7 @@ const putTravelerInTripMock = putTravelerInTrip as jest.MockedFunction<
 const storeTripHistoryMock = storeTripHistory as jest.MockedFunction<
   typeof storeTripHistory
 >;
+const deleteTripMock = deleteTrip as jest.MockedFunction<typeof deleteTrip>;
 
 function expense(id: string, description: string): ExpenseData {
   return {
@@ -173,16 +176,14 @@ describe("leaveTrip plain leave", () => {
     expect(removeFromTripHistoryLocal).toHaveBeenCalledWith("trip-b");
   });
 
-  it("does not write when the planner refuses plain leave", async () => {
+  it("does not write when the last-trip guard forbids leaving", async () => {
     const removeFromTripHistoryLocal = jest.fn();
     const restoreTripHistoryLocal = jest.fn();
-    const getTravellers = jest.fn(async () => [
-      { uid: "u1", userName: "Alice" },
-    ]);
+    const getTravellers = jest.fn(async () => multiTravellerRoster());
 
-    const result = await leaveTrip("trip-b", {
+    const result = await leaveTrip("trip-a", {
       uid: "u1",
-      tripHistory: ["trip-a", "trip-b"],
+      tripHistory: ["trip-a"],
       activeTripId: "trip-a",
       getTravellers,
       removeFromTripHistoryLocal,
@@ -190,8 +191,9 @@ describe("leaveTrip plain leave", () => {
     });
 
     expect(result.performed).toBe(false);
-    expect(result.mode).toBe("cascadeDelete");
+    expect(result.allowed).toBe(false);
     expect(removeTravelerFromTripMock).not.toHaveBeenCalled();
+    expect(deleteTripMock).not.toHaveBeenCalled();
     expect(removeTripFromHistoryMock).not.toHaveBeenCalled();
     expect(removeFromTripHistoryLocal).not.toHaveBeenCalled();
   });
@@ -237,7 +239,43 @@ describe("leaveTrip plain leave", () => {
     );
   });
 
-  it("does not show an Undo toast for cascade-delete planning", async () => {
+});
+
+describe("leaveTrip cascade-delete", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+    mockLastToastOnHide = undefined;
+    clearPendingUndoLeave();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    clearPendingUndoLeave();
+  });
+
+  it("cascade-deletes the trip via deleteTrip when the leaver is the last Traveller", async () => {
+    const removeFromTripHistoryLocal = jest.fn();
+
+    const result = await leaveTrip("trip-b", {
+      uid: "u1",
+      tripHistory: ["trip-a", "trip-b"],
+      activeTripId: "trip-a",
+      getTravellers: async () => [{ uid: "u1", userName: "Alice" }],
+      removeFromTripHistoryLocal,
+      restoreTripHistoryLocal: jest.fn(),
+    });
+
+    expect(result.performed).toBe(true);
+    expect(result.mode).toBe("cascadeDelete");
+    expect(result.warnings).toContain("permanentDelete");
+    expect(deleteTripMock).toHaveBeenCalledWith("trip-b");
+    expect(removeTripFromHistoryMock).toHaveBeenCalledWith("u1", "trip-b");
+    expect(removeFromTripHistoryLocal).toHaveBeenCalledWith("trip-b");
+    expect(removeTravelerFromTripMock).not.toHaveBeenCalled();
+  });
+
+  it("does not show an Undo toast for the cascade-delete path", async () => {
     await leaveTrip("trip-b", {
       uid: "u1",
       tripHistory: ["trip-a", "trip-b"],
@@ -251,6 +289,28 @@ describe("leaveTrip plain leave", () => {
       ([args]) => args.type === "deletedExpense"
     );
     expect(undoToast).toBeUndefined();
+  });
+
+  it("promotes Active trip before cascade-delete when leaving the Active trip", async () => {
+    const removeFromTripHistoryLocal = jest.fn();
+    const probe = createActivateProbe("trip-a");
+
+    const result = await leaveTrip("trip-a", {
+      uid: "u1",
+      tripHistory: ["trip-a", "trip-b"],
+      activeTripId: "trip-a",
+      getTravellers: async () => [{ uid: "u1", userName: "Alice" }],
+      removeFromTripHistoryLocal,
+      restoreTripHistoryLocal: jest.fn(),
+      activate: probe.activate,
+    });
+
+    expect(result.performed).toBe(true);
+    expect(result.mode).toBe("cascadeDelete");
+    expect(result.nextActiveTripId).toBe("trip-b");
+    expect(result.promotedTripName).toBe("Portugal");
+    expect(deleteTripMock).toHaveBeenCalledWith("trip-a");
+    expect(probe.mirrors().secureCurrentTripId).toBe("trip-b");
   });
 });
 

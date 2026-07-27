@@ -1,16 +1,38 @@
+let mockLastToastOnHide: (() => void) | undefined;
+
+jest.mock("react-native-toast-message", () => ({
+  show: jest.fn((args) => {
+    mockLastToastOnHide = args.onHide;
+  }),
+  hide: jest.fn(() => {
+    mockLastToastOnHide?.();
+  }),
+}));
+
 jest.mock("../../util/http", () => ({
   removeTravelerFromTrip: jest.fn(async () => ({ status: 200 })),
   removeTripFromHistory: jest.fn(async () => undefined),
+  putTravelerInTrip: jest.fn(async () => ({})),
+  storeTripHistory: jest.fn(async () => undefined),
 }));
 
+import Toast from "react-native-toast-message";
+import { i18n } from "../../i18n/i18n";
 import type { ExpenseData } from "../../util/expense";
 import type { Traveller } from "../../util/traveler";
 import type { TripData } from "../../types/trip";
 import type { ActivateTripDeps } from "../../util/activate-trip";
-import { leaveTrip } from "../../util/leave-trip";
 import {
+  UNDO_LEAVE_WINDOW_MS,
+  clearPendingUndoLeave,
+  leaveTrip,
+  undoLeaveTrip,
+} from "../../util/leave-trip";
+import {
+  putTravelerInTrip,
   removeTravelerFromTrip,
   removeTripFromHistory,
+  storeTripHistory,
 } from "../../util/http";
 
 const removeTravelerFromTripMock = removeTravelerFromTrip as jest.MockedFunction<
@@ -18,6 +40,12 @@ const removeTravelerFromTripMock = removeTravelerFromTrip as jest.MockedFunction
 >;
 const removeTripFromHistoryMock = removeTripFromHistory as jest.MockedFunction<
   typeof removeTripFromHistory
+>;
+const putTravelerInTripMock = putTravelerInTrip as jest.MockedFunction<
+  typeof putTravelerInTrip
+>;
+const storeTripHistoryMock = storeTripHistory as jest.MockedFunction<
+  typeof storeTripHistory
 >;
 
 function expense(id: string, description: string): ExpenseData {
@@ -111,12 +139,20 @@ function createActivateProbe(initialActiveId: string) {
 
 describe("leaveTrip plain leave", () => {
   beforeEach(() => {
-    removeTravelerFromTripMock.mockClear();
-    removeTripFromHistoryMock.mockClear();
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+    mockLastToastOnHide = undefined;
+    clearPendingUndoLeave();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    clearPendingUndoLeave();
   });
 
   it("loads the Traveller roster before planning so a non-active leave can run", async () => {
     const removeFromTripHistoryLocal = jest.fn();
+    const restoreTripHistoryLocal = jest.fn();
     const getTravellers = jest.fn(async () => multiTravellerRoster());
 
     const result = await leaveTrip("trip-b", {
@@ -125,6 +161,7 @@ describe("leaveTrip plain leave", () => {
       activeTripId: "trip-a",
       getTravellers,
       removeFromTripHistoryLocal,
+      restoreTripHistoryLocal,
     });
 
     expect(getTravellers).toHaveBeenCalledWith("trip-b");
@@ -138,6 +175,7 @@ describe("leaveTrip plain leave", () => {
 
   it("does not write when the planner refuses plain leave", async () => {
     const removeFromTripHistoryLocal = jest.fn();
+    const restoreTripHistoryLocal = jest.fn();
     const getTravellers = jest.fn(async () => [
       { uid: "u1", userName: "Alice" },
     ]);
@@ -148,6 +186,7 @@ describe("leaveTrip plain leave", () => {
       activeTripId: "trip-a",
       getTravellers,
       removeFromTripHistoryLocal,
+      restoreTripHistoryLocal,
     });
 
     expect(result.performed).toBe(false);
@@ -156,12 +195,53 @@ describe("leaveTrip plain leave", () => {
     expect(removeTripFromHistoryMock).not.toHaveBeenCalled();
     expect(removeFromTripHistoryLocal).not.toHaveBeenCalled();
   });
+
+  it("shows a deletedExpense Undo toast after a plain leave", async () => {
+    await leaveTrip("trip-b", {
+      uid: "u1",
+      tripHistory: ["trip-a", "trip-b"],
+      activeTripId: "trip-a",
+      getTravellers: async () => multiTravellerRoster(),
+      removeFromTripHistoryLocal: jest.fn(),
+      restoreTripHistoryLocal: jest.fn(),
+    });
+
+    const undoToast = (Toast.show as jest.Mock).mock.calls.find(
+      ([args]) => args.type === "deletedExpense"
+    );
+    expect(undoToast).toBeDefined();
+    expect(undoToast![0].visibilityTime).toBe(UNDO_LEAVE_WINDOW_MS);
+    expect(undoToast![0].props?.onUndo).toEqual(expect.any(Function));
+  });
+
+  it("does not show an Undo toast for cascade-delete planning", async () => {
+    await leaveTrip("trip-b", {
+      uid: "u1",
+      tripHistory: ["trip-a", "trip-b"],
+      activeTripId: "trip-a",
+      getTravellers: async () => [{ uid: "u1", userName: "Alice" }],
+      removeFromTripHistoryLocal: jest.fn(),
+      restoreTripHistoryLocal: jest.fn(),
+    });
+
+    const undoToast = (Toast.show as jest.Mock).mock.calls.find(
+      ([args]) => args.type === "deletedExpense"
+    );
+    expect(undoToast).toBeUndefined();
+  });
 });
 
 describe("leaveTrip Active trip promotion", () => {
   beforeEach(() => {
-    removeTravelerFromTripMock.mockClear();
-    removeTripFromHistoryMock.mockClear();
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+    mockLastToastOnHide = undefined;
+    clearPendingUndoLeave();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    clearPendingUndoLeave();
   });
 
   it("promotes the first remaining Trip history id via activateTrip when leaving the Active trip", async () => {
@@ -174,6 +254,7 @@ describe("leaveTrip Active trip promotion", () => {
       activeTripId: "trip-a",
       getTravellers: async () => multiTravellerRoster(),
       removeFromTripHistoryLocal,
+      restoreTripHistoryLocal: jest.fn(),
       activate: probe.activate,
     });
 
@@ -201,6 +282,7 @@ describe("leaveTrip Active trip promotion", () => {
       activeTripId: "trip-a",
       getTravellers: async () => multiTravellerRoster(),
       removeFromTripHistoryLocal,
+      restoreTripHistoryLocal: jest.fn(),
       activate: probe.activate,
     });
 
@@ -238,6 +320,7 @@ describe("leaveTrip Active trip promotion", () => {
         activeTripId: "trip-a",
         getTravellers: async () => multiTravellerRoster(),
         removeFromTripHistoryLocal,
+        restoreTripHistoryLocal: jest.fn(),
         activate: probe.activate,
       })
     ).rejects.toThrow("cache write failed");
@@ -254,7 +337,7 @@ describe("leaveTrip Active trip promotion", () => {
 });
 
 describe("leaveTrip Active trip promotion wiring", () => {
-  it("TripForm leave path promotes via leaveTrip activate deps (activateTrip seam)", () => {
+  it("TripForm leave path wires activate + Trip history restore for Undo", () => {
     const { readFileSync } = require("fs") as typeof import("fs");
     const { join } = require("path") as typeof import("path");
     const src = readFileSync(
@@ -262,7 +345,126 @@ describe("leaveTrip Active trip promotion wiring", () => {
       "utf8"
     );
     expect(src).toMatch(/activate:\s*\{/);
+    expect(src).toMatch(/restoreTripHistoryLocal/);
+    expect(src).toMatch(/removeFromTripHistoryLocal/);
+  });
+
+  it("leaveTrip owns Undo toast copy for plain leave and promotion", () => {
+    const { readFileSync } = require("fs") as typeof import("fs");
+    const { join } = require("path") as typeof import("path");
+    const src = readFileSync(
+      join(__dirname, "../../util/leave-trip.ts"),
+      "utf8"
+    );
+    expect(src).toMatch(/toastLeftTrip1/);
     expect(src).toMatch(/leaveTripNowShowing/);
-    expect(src).toMatch(/result\.nextActiveTripId/);
+    expect(src).toMatch(/type:\s*"deletedExpense"/);
+  });
+});
+
+describe("undoLeaveTrip", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+    mockLastToastOnHide = undefined;
+    clearPendingUndoLeave();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    clearPendingUndoLeave();
+  });
+
+  it("restores the Traveller roster entry and Trip history when Undo is pressed in time", async () => {
+    const restoreTripHistoryLocal = jest.fn();
+    const previousHistory = ["trip-a", "trip-b"];
+
+    await leaveTrip("trip-b", {
+      uid: "u1",
+      tripHistory: previousHistory,
+      activeTripId: "trip-a",
+      getTravellers: async () => multiTravellerRoster(),
+      removeFromTripHistoryLocal: jest.fn(),
+      restoreTripHistoryLocal,
+    });
+
+    const { onUndo } = (Toast.show as jest.Mock).mock.calls.find(
+      ([args]) => args.type === "deletedExpense"
+    )![0].props;
+
+    await onUndo();
+
+    expect(putTravelerInTripMock).toHaveBeenCalledWith("trip-b", {
+      uid: "u1",
+      userName: "Alice",
+    });
+    expect(storeTripHistoryMock).toHaveBeenCalledWith("u1", previousHistory);
+    expect(restoreTripHistoryLocal).toHaveBeenCalledWith(previousHistory);
+  });
+
+  it("restores the previously Active trip when leave had promoted another", async () => {
+    const probe = createActivateProbe("trip-a");
+    // After leave, Active trip is trip-b; Undo must re-activate trip-a.
+    probe.activate.fetchTrip = async (tripid) => {
+      if (tripid === "trip-b") return tripB();
+      if (tripid === "trip-a") {
+        return {
+          tripid: "trip-a",
+          tripName: "Old active",
+          tripCurrency: "EUR",
+        };
+      }
+      throw new Error(`unexpected trip ${tripid}`);
+    };
+
+    await leaveTrip("trip-a", {
+      uid: "u1",
+      tripHistory: ["trip-a", "trip-b", "trip-c"],
+      activeTripId: "trip-a",
+      getTravellers: async () => multiTravellerRoster(),
+      removeFromTripHistoryLocal: jest.fn(),
+      restoreTripHistoryLocal: jest.fn(),
+      activate: probe.activate,
+    });
+
+    expect(probe.mirrors().secureCurrentTripId).toBe("trip-b");
+
+    const { onUndo } = (Toast.show as jest.Mock).mock.calls.find(
+      ([args]) => args.type === "deletedExpense"
+    )![0].props;
+
+    await onUndo();
+
+    const mirrors = probe.mirrors();
+    expect(mirrors.secureCurrentTripId).toBe("trip-a");
+    expect(mirrors.serverCurrentTrip).toBe("trip-a");
+    expect(mirrors.contextTripid).toBe("trip-a");
+  });
+
+  it("shows expired copy when Undo is pressed after the window", async () => {
+    await leaveTrip("trip-b", {
+      uid: "u1",
+      tripHistory: ["trip-a", "trip-b"],
+      activeTripId: "trip-a",
+      getTravellers: async () => multiTravellerRoster(),
+      removeFromTripHistoryLocal: jest.fn(),
+      restoreTripHistoryLocal: jest.fn(),
+    });
+
+    const { actionId } = (Toast.show as jest.Mock).mock.calls.find(
+      ([args]) => args.type === "deletedExpense"
+    )![0].props;
+
+    jest.advanceTimersByTime(UNDO_LEAVE_WINDOW_MS + 1);
+
+    await undoLeaveTrip({ actionId });
+
+    expect(putTravelerInTripMock).not.toHaveBeenCalled();
+    expect(Toast.show).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "error",
+        text2: i18n.t("toastUndoLeaveExpired"),
+      })
+    );
   });
 });

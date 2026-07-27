@@ -298,6 +298,7 @@ const TripForm = ({ navigation, route }) => {
         getTravellers,
         openBalances: [],
         removeFromTripHistoryLocal: userCtx.removeTripFromHistory,
+        restoreTripHistoryLocal: userCtx.restoreTripHistory,
         activate: {
           previousTripSnapshot: tripCtx.getcurrentTrip(),
           previousExpensesSnapshot: expenseCtx.expenses,
@@ -317,8 +318,8 @@ const TripForm = ({ navigation, route }) => {
         },
       });
 
-      Toast.hide();
       if (!result.performed) {
+        Toast.hide();
         Toast.show({
           text1: i18n.t("toastSavingError1"),
           text2: i18n.t("error2"),
@@ -326,14 +327,7 @@ const TripForm = ({ navigation, route }) => {
         });
         return;
       }
-      if (result.nextActiveTripId) {
-        Toast.show({
-          type: "success",
-          text1: i18n.t("leaveTripNowShowing", {
-            name: result.promotedTripName || i18n.t("trip"),
-          }),
-        });
-      }
+      // leaveTrip shows the Undo toast (and hides the loading toast).
       navigation.pop();
     } catch (error) {
       safeLogError(error);

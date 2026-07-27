@@ -86,6 +86,7 @@ export const TripContext = createContext<TripContextType>({
     nextActiveTripId: null,
     warnings: [],
     performed: false,
+    promotedTripName: null,
   }),
   getcurrentTrip: () => {
     const tripData = {} as TripData;

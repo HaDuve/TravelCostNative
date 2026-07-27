@@ -199,6 +199,7 @@ const en = {
   leaveTrip: "Leave budget",
   leaveTripSure: "Are you sure you want to leave this budget? Your past expenses stay for the remaining nomads.",
   leaveTripConnectRequired: "Connect to the internet to leave this budget.",
+  leaveTripNowShowing: "Now showing %{name}",
   setActive: "Set as active budget",
   datePickerLabel: "Start and end dates",
 
@@ -806,6 +807,7 @@ const de = {
     "Möchtest du dieses Budget wirklich verlassen? Deine bisherigen Ausgaben bleiben für die anderen Nomaden erhalten.",
   leaveTripConnectRequired:
     "Verbinde dich mit dem Internet, um dieses Budget zu verlassen.",
+  leaveTripNowShowing: "Jetzt angezeigt: %{name}",
   setActive: "Als aktives Budget markieren",
   datePickerLabel: "Start- und Enddatum",
 
@@ -1445,6 +1447,7 @@ const fr = {
     "Voulez-vous vraiment quitter ce budget ? Vos dépenses passées restent pour les autres nomades.",
   leaveTripConnectRequired:
     "Connectez-vous à internet pour quitter ce budget.",
+  leaveTripNowShowing: "Affichage de %{name}",
   setActive: "Définir comme budget actif",
   datePickerLabel: "Dates de début et de fin",
 
@@ -2074,6 +2077,7 @@ const ru = {
     "Вы уверены, что хотите покинуть этот бюджет? Ваши прошлые расходы останутся для остальных номадов.",
   leaveTripConnectRequired:
     "Подключитесь к интернету, чтобы покинуть этот бюджет.",
+  leaveTripNowShowing: "Сейчас показан: %{name}",
   setActive: "Сделать активным бюджетом",
   datePickerLabel: "Даты начала и окончания",
 

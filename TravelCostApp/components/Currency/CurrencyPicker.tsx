@@ -13,13 +13,12 @@ import PropTypes from "prop-types";
 import { getCurrencySymbol } from "../../util/currencySymbol";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
-import {
-  addRecentCurrency,
-  getRecentCurrencies,
-  initializeRecentCurrencies,
-} from "../../store/mmkv";
-import { TripContext } from "../../store/trip-context";
+import { ExpensesContext } from "../../store/expenses-context";
 import { UserContext } from "../../store/user-context";
+import {
+  getRecentPickerCurrencies,
+  normalizePickerCurrencyKey,
+} from "../../util/picker-recent-items";
 
 const countryToCurrency = require("country-to-currency");
 const countries = require("i18n-iso-countries");
@@ -36,7 +35,7 @@ const CurrencyPicker = ({
   placeholder,
   valid = true,
 }) => {
-  const tripCtx = useContext(TripContext);
+  const expCtx = useContext(ExpensesContext);
   const userCtx = useContext(UserContext);
 
   const CC = useMemo(() => {
@@ -44,11 +43,6 @@ const CurrencyPicker = ({
     const normalized = locale.slice(0, 2);
     return ["de", "en", "fr", "ru"].includes(normalized) ? normalized : "en";
   }, []);
-
-  const homeCurrency = useMemo(() => {
-    const localeCurrency = Localization.getLocales()[0]?.currencyCode;
-    return localeCurrency || tripCtx.tripCurrency || "USD";
-  }, [tripCtx.tripCurrency]);
 
   const allCountryOptions = useMemo(() => {
     const nonEnglish = CC !== "en";
@@ -68,31 +62,20 @@ const CurrencyPicker = ({
     });
   }, [CC]);
 
-  // Initialize recent currencies from trip if empty
-  useEffect(() => {
-    if (tripCtx.tripCurrency) {
-      initializeRecentCurrencies(tripCtx.tripCurrency);
-    }
-  }, [tripCtx.tripCurrency]);
-
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-
   const memoizedItems = useMemo(() => {
-    // refreshTrigger is intentionally referenced to rebuild the list after updates
-    void refreshTrigger;
+    const recentCurrencies = getRecentPickerCurrencies(
+      expCtx.expenses,
+      userCtx.lastCurrency
+    );
 
-    const preferredCurrencyCodes = [
-      tripCtx.tripCurrency,
-      homeCurrency,
-      userCtx.lastCurrency,
-      ...getRecentCurrencies(),
-    ].filter(Boolean);
-
-    const recentCurrencyCodes = Array.from(new Set(preferredCurrencyCodes));
-    const recentItems = recentCurrencyCodes
-      .map((currencyCode) =>
-        allCountryOptions.find((option) => option.currencyCode === currencyCode)
-      )
+    const recentItems = recentCurrencies
+      .map((currency) => {
+        const currencyKey = normalizePickerCurrencyKey(currency);
+        return allCountryOptions.find(
+          (option) =>
+            normalizePickerCurrencyKey(option.currencyCode) === currencyKey
+        );
+      })
       .filter(Boolean)
       .map((option) => {
         const shortLabel = `${option.currencyCode} | ${getCurrencySymbol(
@@ -122,13 +105,7 @@ const CurrencyPicker = ({
         : []),
       ...allCountryOptions,
     ];
-  }, [
-    allCountryOptions,
-    homeCurrency,
-    refreshTrigger,
-    tripCtx.tripCurrency,
-    userCtx.lastCurrency,
-  ]);
+  }, [allCountryOptions, expCtx.expenses, userCtx.lastCurrency]);
 
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState(memoizedItems);
@@ -155,14 +132,8 @@ const CurrencyPicker = ({
         }}
         onSelectItem={(item) => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          // Extract currency from the value string
           const currency = item.value?.split(" | ")[0]?.trim();
           if (currency && item.value !== "__separator__") {
-            // Add to recent currencies
-            addRecentCurrency(currency);
-            // Trigger rebuild of items list
-            setRefreshTrigger((prev) => prev + 1);
-
             trackEvent(VexoEvents.CURRENCY_PICKED, {
               currency: currency,
             });

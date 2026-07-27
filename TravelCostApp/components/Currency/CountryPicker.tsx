@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import React, { StyleSheet, View } from "react-native";
+import React, { useContext, useMemo, useState, useEffect } from "react";
+import { StyleSheet, View } from "react-native";
 
 import DropDownPicker from "react-native-dropdown-picker";
 import * as i18nIsoCountries from "i18n-iso-countries";
-import { useState } from "react";
 
 import { GlobalStyles } from "../../constants/styles";
 import { i18n } from "../../i18n/i18n";
@@ -12,6 +12,19 @@ import * as Haptics from "expo-haptics";
 import PropTypes from "prop-types";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
+import { ExpensesContext } from "../../store/expenses-context";
+import { UserContext } from "../../store/user-context";
+import {
+  getRecentPickerCountries,
+  normalizePickerCountryKey,
+} from "../../util/picker-recent-items";
+
+const countries = require("i18n-iso-countries");
+
+i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/en.json"));
+i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/de.json"));
+i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/fr.json"));
+i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/ru.json"));
 
 const CountryPicker = ({
   countryValue,
@@ -20,47 +33,72 @@ const CountryPicker = ({
   placeholder,
   valid = true,
 }) => {
-  // Users Device CountryCode CC to translate Country names in picker
-  // enforce a language we have registered, otherwise, english
-  let CC =
-    Localization.getLocales()[0] && Localization.getLocales()[0].languageCode
-      ? Localization.getLocales()[0].languageCode.slice(0, 2)
-      : "en";
-  if (CC !== "de" && CC !== "en" && CC !== "fr" && CC !== "ru") CC = "en";
-  //   const CC = "en";
+  const expCtx = useContext(ExpensesContext);
+  const userCtx = useContext(UserContext);
 
-  const countries = require("i18n-iso-countries");
-  i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/en.json"));
-  i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/de.json"));
-  i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/fr.json"));
-  i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/ru.json"));
-  // i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/es.json"));
-  // i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/zh.json"));
-  // i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/hi.json"));
-  // i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/ar.json"));
-  // i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/pt.json"));
-  // i18nIsoCountries.registerLocale(require("i18n-iso-countries/langs/ja.json"));
+  const CC = useMemo(() => {
+    const locale = Localization.getLocales()[0]?.languageCode ?? "en";
+    const normalized = locale.slice(0, 2);
+    return ["de", "en", "fr", "ru"].includes(normalized) ? normalized : "en";
+  }, []);
 
-  const nonEnglish = CC !== "en";
-  const nonEnglishCountryString = (code) => {
-    if (!nonEnglish) return "";
-    return ` - ${nonEnglish && countries.getName(code, CC)}`;
-  };
+  const allCountryOptions = useMemo(() => {
+    const nonEnglish = CC !== "en";
+    const nonEnglishCountryString = (code: string) =>
+      nonEnglish ? ` - ${countries.getName(code, CC)}` : "";
 
-  const countryOptions = Object.keys(countries.getNames("en")).map((code) => ({
-    label: `${countries.getName(code, "en")}` + nonEnglishCountryString(code),
-    value: `${countries.getName(code, "en")}` + nonEnglishCountryString(code),
-    // icon: () => (
-    //   <ExpenseCountryFlag
-    //     countryName={code}
-    //     style={GlobalStyles.countryFlagStyleBig}
-    //     containerStyle={GlobalStyles.countryFlagStyleBig}
-    //   />
-    // ),
-  }));
+    return Object.keys(countries.getNames("en")).map((code) => {
+      const label =
+        `${countries.getName(code, "en")}` + nonEnglishCountryString(code);
+
+      return {
+        label,
+        value: label,
+        countryCode: code,
+      };
+    });
+  }, [CC]);
+
+  const memoizedItems = useMemo(() => {
+    const recentCountries = getRecentPickerCountries(
+      expCtx.expenses,
+      userCtx.lastCountry
+    );
+
+    const recentItems = recentCountries
+      .map((country) => {
+        const countryKey = normalizePickerCountryKey(country);
+        return allCountryOptions.find(
+          (option) => option.countryCode === countryKey
+        );
+      })
+      .filter(Boolean);
+
+    if (recentItems.length === 0) {
+      return allCountryOptions;
+    }
+
+    return [
+      ...recentItems,
+      ...(allCountryOptions.length
+        ? [
+            {
+              label: "────────────────────────",
+              value: "__separator__",
+              disabled: true,
+            },
+          ]
+        : []),
+      ...allCountryOptions,
+    ];
+  }, [allCountryOptions, expCtx.expenses, userCtx.lastCountry]);
 
   const [open, setOpen] = useState(false);
-  const [items, setItems] = useState(countryOptions);
+  const [items, setItems] = useState(memoizedItems);
+
+  useEffect(() => {
+    setItems(memoizedItems);
+  }, [memoizedItems]);
 
   return (
     <View style={styles.container}>
@@ -83,8 +121,7 @@ const CountryPicker = ({
         }}
         onSelectItem={(item) => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          // Track country selection
-          if (item.value) {
+          if (item.value && item.value !== "__separator__") {
             trackEvent(VexoEvents.COUNTRY_PICKED, {
               country: item.value,
             });

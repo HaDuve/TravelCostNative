@@ -4,6 +4,7 @@ import { secureStoreRemoveItem } from "./secure-storage";
 import { ACTIVE_TRIP_ID_KEY } from "../util/active-trip-id";
 import safeLogError from "../util/error";
 import { safelyParseJSON } from "../util/jsonParse";
+import { deleteMMKVObject, MMKV_KEYS } from "./mmkv";
 
 /**
  * Store item in long-term Memory of the device.
@@ -108,6 +109,10 @@ export async function asyncStoreSafeClear() {
     await secureStoreRemoveItem("lastCurrency");
     await secureStoreRemoveItem("ENCM");
     await secureStoreRemoveItem("ENCP");
+    // MMKV survives AsyncStorage/secure clears; drop Active trip + expenses so
+    // the next login cannot resurrect the prior session's cache.
+    deleteMMKVObject(MMKV_KEYS.CURRENT_TRIP);
+    deleteMMKVObject(MMKV_KEYS.EXPENSES);
   } catch (error) {
     safeLogError(error);
   }

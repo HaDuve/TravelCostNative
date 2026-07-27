@@ -31,8 +31,6 @@ export type TripContextType = {
   tripProgress: number;
   startDate: string;
   endDate: string;
-  refreshState: boolean;
-  refresh: () => void;
   setTripProgress: (percent: number) => void;
   travellers: Traveller[];
   fetchAndSetTravellers: (tripid: string) => Promise<boolean>;
@@ -67,8 +65,6 @@ export const TripContext = createContext<TripContextType>({
   tripProgress: 0,
   startDate: "",
   endDate: "",
-  refreshState: false,
-  refresh: () => {},
   setTripProgress: (percent: number) => {},
   travellers: [],
   fetchAndSetTravellers: async (tripid: string) => false,
@@ -109,7 +105,6 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
   const [tripCurrency, setTripCurrency] = useState("");
   const [dailyBudget, setdailyBudget] = useState("");
   const [progress, setProgress] = useState(0);
-  const [refreshState, setRefreshState] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [isPaid, setIsPaid] = useState(isPaidString.notPaid);
@@ -209,10 +204,6 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
   function setTripProgress(percent: number) {
     if (percent < 0 || percent > 1) percent = 1;
     setProgress(percent);
-  }
-  //
-  function refresh() {
-    setRefreshState(!refreshState);
   }
 
   async function fetchAndSetTravellers(tripid: string): Promise<boolean> {
@@ -416,8 +407,6 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     tripProgress: progress,
     startDate: startDate,
     endDate: endDate,
-    refresh: refresh,
-    refreshState: refreshState,
     setTripProgress: setTripProgress,
     travellers: travellers,
     fetchAndSetTravellers: fetchAndSetTravellers,

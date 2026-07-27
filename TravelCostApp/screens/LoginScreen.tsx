@@ -143,7 +143,6 @@ function LoginScreen() {
         });
         tripid = created.tripid;
         await userCtx.loadCatListFromAsyncInCtx(tripid);
-        tripCtx.refresh();
       } catch (error) {
         safeLogError(error);
         setIsAuthenticating(false);

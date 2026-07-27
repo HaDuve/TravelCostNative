@@ -61,6 +61,17 @@ describe("useSplitEditor", () => {
     jest.clearAllMocks();
   });
 
+  it("preserves a trailing decimal while editing a split amount", () => {
+    const { result } = renderSplitEditor();
+
+    act(() => {
+      result.current.inputSplitListHandler(0, { userName: "A" }, "12.");
+    });
+
+    expect(result.current.splitList[0].amountInput).toBe("12.");
+    expect(result.current.splitList[0].amount).toBe(12);
+  });
+
   it("updates splitList and splitListValid when a split amount is edited", () => {
     const initialSplitList = resetEditOrder([
       makeSplit({ userName: "A", amount: 30, editOrder: 0 }),

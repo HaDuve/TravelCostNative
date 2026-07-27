@@ -196,9 +196,43 @@ export function recalcSplitsWithEditOrder(
 export function resetEditOrder(splits: Split[]): Split[] {
   if (!splits) return [];
   return splits.map((split) => {
-    const { editOrder, ...splitWithoutOrder } = split;
+    const { editOrder, amountInput, ...splitWithoutOrder } = split;
     return splitWithoutOrder;
   });
+}
+
+/** Parses split amount field text into a numeric amount and optional in-progress display text. */
+export function parseSplitAmountInput(
+  value: string | number
+): { amount: number; amountInput?: string } {
+  if (typeof value === "number") {
+    return { amount: value };
+  }
+
+  const normalized = value.replace(/,/g, ".");
+  if (normalized === "") {
+    return { amount: 0, amountInput: "" };
+  }
+  if (normalized === ".") {
+    return { amount: 0, amountInput: "." };
+  }
+  if (normalized.endsWith(".")) {
+    const whole = normalized.slice(0, -1);
+    return {
+      amount: whole === "" ? 0 : Number(whole) || 0,
+      amountInput: normalized,
+    };
+  }
+
+  return { amount: Number(normalized) || 0 };
+}
+
+/** Value shown in the split amount TextInput while editing. */
+export function splitAmountDisplayValue(split: Split): string {
+  if (split.amountInput !== undefined) {
+    return split.amountInput;
+  }
+  return split.amount ? split.amount.toString() : "";
 }
 
 /**
@@ -213,7 +247,7 @@ export function applySplitEdit(
   amount: number,
   splitType: splitType
 ): { splitList: Split[]; valid: boolean } {
-  const tempList = splitList.map((split) => ({ ...split }));
+  const tempList = splitList.map((split) => ({ ...split, amountInput: undefined }));
 
   tempList.forEach((split, i) => {
     if (i === index) {
@@ -223,11 +257,15 @@ export function applySplitEdit(
     }
   });
 
+  const parsed = parseSplitAmountInput(value);
   tempList[index] = {
     ...tempList[index],
-    amount: Number(value) || 0,
+    amount: parsed.amount,
     userName,
     editOrder: 0,
+    ...(parsed.amountInput !== undefined
+      ? { amountInput: parsed.amountInput }
+      : {}),
   };
 
   const recalculatedList = recalcSplitsWithEditOrder(tempList, amount);

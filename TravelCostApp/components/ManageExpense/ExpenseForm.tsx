@@ -43,6 +43,7 @@ import {
   calcSplitList,
   recalcSplitsWithEditOrder,
   resetEditOrder,
+  splitAmountDisplayValue,
   splitType,
   splitTypesDropdown,
   travellerToDropdown,
@@ -1918,7 +1919,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                         ></View>
                       }
                       renderItem={(itemData) => {
-                        const splitValue = itemData.item.amount.toString();
+                        const splitValue = splitAmountDisplayValue(itemData.item);
                         return (
                           <View style={styles.splitEditorCard}>
                             <View
@@ -2005,7 +2006,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                                     itemData.index,
                                     itemData.item
                                   ),
-                                  value: splitValue ? splitValue : "",
+                                  value: splitValue,
                                 }}
                               ></Input>
                               <Text

@@ -39,6 +39,23 @@ describe("buildExpenseData", () => {
     expect(built.endDate).toEqual(dateFromIso("2026-01-16"));
   });
 
+  it("strips ephemeral split form fields from persisted splitList", () => {
+    const built = buildExpenseData(
+      makeExpenseFormSnapshot({
+        splitList: [
+          {
+            userName: "Alice",
+            amount: 12,
+            amountInput: "12.",
+            editOrder: 0,
+          },
+        ],
+      })
+    );
+
+    expect(built.splitList).toEqual([{ userName: "Alice", amount: 12 }]);
+  });
+
   it("uses pickedCat for category when newCat is true", () => {
     const built = buildExpenseData(
       makeExpenseFormSnapshot({

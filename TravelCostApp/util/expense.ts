@@ -180,6 +180,8 @@ export function toExpenseOnline(expense: ExpenseData): ExpenseDataOnline {
 export interface Split {
   userName: string;
   amount: number;
+  /** Raw amount text while the user is mid-decimal entry in the expense form. */
+  amountInput?: string;
   whoPaid?: string;
   rate?: number;
   editOrder?: number; // 0 = most recent edit, higher = older edits, undefined = never edited

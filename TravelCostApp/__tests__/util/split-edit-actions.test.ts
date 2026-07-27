@@ -1,6 +1,8 @@
 import {
   applySplitEdit,
+  parseSplitAmountInput,
   removeFromSplit,
+  splitAmountDisplayValue,
 } from "../../util/split";
 import type { Split } from "../../util/expense";
 
@@ -8,11 +10,41 @@ function makeSplit(overrides: Partial<Split> & Pick<Split, "userName">): Split {
   return {
     userName: overrides.userName,
     amount: overrides.amount ?? 0,
+    amountInput: overrides.amountInput,
     whoPaid: overrides.whoPaid,
     rate: overrides.rate,
     editOrder: overrides.editOrder,
   };
 }
+
+describe("parseSplitAmountInput", () => {
+  it("preserves a trailing decimal separator while the user is still typing", () => {
+    expect(parseSplitAmountInput("12.")).toEqual({
+      amount: 12,
+      amountInput: "12.",
+    });
+  });
+
+  it("normalizes comma decimal separators to dot notation", () => {
+    expect(parseSplitAmountInput("12,5")).toEqual({ amount: 12.5 });
+  });
+
+  it("treats a lone decimal separator as zero with visible input", () => {
+    expect(parseSplitAmountInput(".")).toEqual({ amount: 0, amountInput: "." });
+  });
+});
+
+describe("splitAmountDisplayValue", () => {
+  it("shows in-progress decimal text instead of coercing it away", () => {
+    expect(
+      splitAmountDisplayValue({
+        userName: "A",
+        amount: 12,
+        amountInput: "12.",
+      })
+    ).toBe("12.");
+  });
+});
 
 describe("applySplitEdit", () => {
   it("bumps edit order on the edited split, recalculates remainder, and reports validity for EXACT", () => {
@@ -37,6 +69,27 @@ describe("applySplitEdit", () => {
       makeSplit({ userName: "C", amount: 40 }),
     ]);
     expect(valid).toBe(true);
+  });
+
+  it("keeps a trailing decimal on the edited split while recalculating others", () => {
+    const splitList: Split[] = [
+      makeSplit({ userName: "A", amount: 30, editOrder: 0 }),
+      makeSplit({ userName: "B", amount: 20, editOrder: 1 }),
+      makeSplit({ userName: "C", amount: 50 }),
+    ];
+
+    const { splitList: result } = applySplitEdit(
+      splitList,
+      0,
+      "A",
+      "12.",
+      100,
+      "EXACT"
+    );
+
+    expect(result[0]).toEqual(
+      makeSplit({ userName: "A", amount: 12, amountInput: "12.", editOrder: 0 })
+    );
   });
 
   it("reports invalid when a split amount is cleared to zero", () => {

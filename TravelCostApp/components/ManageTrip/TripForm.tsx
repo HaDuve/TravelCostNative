@@ -59,11 +59,8 @@ import {
   secureStoreSetItem,
 } from "../../store/secure-storage";
 import { activateTrip } from "../../util/activate-trip";
-import {
-  leaveConfirmMessage,
-  resolveLeaverOpenBalances,
-} from "../../util/leave-trip";
-import { planTripLeave } from "../../util/plan-trip-leave";
+import { resolveLeaverOpenBalances } from "../../util/leave-trip";
+import { promptLeaveTrip } from "../../util/prompt-leave-trip";
 import BackButton from "../UI/BackButton";
 import { onShare } from "../ProfileOutput/ShareTrip";
 import { NetworkContext } from "../../store/network-context";
@@ -366,50 +363,21 @@ const TripForm = ({ navigation, route }) => {
   }
 
   async function leaveHandler() {
-    if (!isConnected) {
-      Alert.alert(i18n.t("noConnection"), i18n.t("leaveTripConnectRequired"));
-      return;
-    }
     if (!editedTripId) return;
-    try {
-      const uid = authCtx.uid ?? (await secureStoreGetItem("uid"));
-      if (!uid) return;
-      const roster = await getTravellers(editedTripId);
-      const openBalances = await resolveLeaverOpenBalances(
-        editedTripId,
-        uid,
-        roster,
-        leaverOpenBalancesDeps()
-      );
-      const plan = planTripLeave({
-        tripHistory: userCtx.tripHistory ?? [],
-        roster,
-        openBalances,
-        activeTripId: tripCtx.tripid,
-        tripid: editedTripId,
-      });
-      Alert.alert(
-        i18n.t("leaveTrip"),
-        leaveConfirmMessage(plan.warnings),
-        [
-          {
-            text: i18n.t("cancel"),
-            style: "cancel",
-          },
-          {
-            text: i18n.t("leaveTrip"),
-            style: "destructive",
-            onPress: () => {
-              void leaveAcceptHandler();
-            },
-          },
-        ],
-        { cancelable: false }
-      );
-    } catch (error) {
-      safeLogError(error);
-      Alert.alert(i18n.t("error"), i18n.t("error2"));
-    }
+    const uid = authCtx.uid ?? (await secureStoreGetItem("uid"));
+    if (!uid) return;
+    await promptLeaveTrip({
+      isConnected,
+      tripid: editedTripId,
+      uid,
+      tripHistory: userCtx.tripHistory ?? [],
+      activeTripId: tripCtx.tripid,
+      getTravellers,
+      openBalancesDeps: leaverOpenBalancesDeps(),
+      onConfirm: () => {
+        void leaveAcceptHandler();
+      },
+    });
   }
 
   async function editingTripData(tripData: TripData, setActive = false) {

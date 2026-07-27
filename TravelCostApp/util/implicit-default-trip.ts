@@ -3,6 +3,7 @@ import * as Localization from "expo-localization";
 import type { TripData } from "../types/trip";
 import type { Category } from "./category";
 import type { Traveller } from "./traveler";
+import { ACTIVE_TRIP_ID_KEY } from "./active-trip-id";
 
 export function isImplicitDefaultTrip(
   trip: Pick<TripData, "isImplicitDefault"> | null | undefined
@@ -101,7 +102,7 @@ export async function ensureImplicitDefaultActiveTrip(
     uid: deps.uid,
     userName: deps.userName,
   });
-  await deps.secureStoreSetItem("currentTripId", tripid);
+  await deps.secureStoreSetItem(ACTIVE_TRIP_ID_KEY, tripid);
   await deps.updateTripHistory(deps.uid, tripid);
   await deps.updateUser(deps.uid, {
     userName: deps.userName,

@@ -4,6 +4,7 @@ import React, { createContext, useEffect, useState } from "react";
 import { fetchTrip, fetchUser, getTravellers, updateTrip } from "../util/http";
 import { asyncStoreGetObject, asyncStoreSetObject } from "./async-storage";
 import { secureStoreGetItem } from "./secure-storage";
+import { getActiveTripId } from "../util/active-trip-id";
 import { ExpenseData, isPaidString } from "../util/expense";
 import { Traveller } from "../util/traveler";
 import { isConnectionFastEnough } from "../util/connectionSpeed";
@@ -123,17 +124,27 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
   const tripTotalSpent = useTripTotalSpent();
 
   async function loadTripidFetchTrip() {
-    const stored_tripid = await secureStoreGetItem("currentTripId");
+    const stored_tripid = await getActiveTripId();
     const stored_uid = await secureStoreGetItem("uid");
     if (!(stored_tripid || stored_uid)) return;
     setTripid(stored_tripid ?? "");
     const { isFastEnough } = await isConnectionFastEnough();
     if (isFastEnough) {
       try {
-        const checkUser = await fetchUser(stored_uid);
-        const fetched_tripid = checkUser.currentTrip;
-        await fetchAndSetCurrentTrip(fetched_tripid ?? stored_tripid);
-        await fetchAndSetTravellers(fetched_tripid ?? stored_tripid);
+        // Secure currentTripId is authoritative; server currentTrip is a mirror.
+        // Fall back to server only when secure storage has no Active trip id.
+        let activeTripId = stored_tripid;
+        if (!activeTripId && stored_uid) {
+          const checkUser = await fetchUser(stored_uid);
+          activeTripId = checkUser.currentTrip ?? null;
+        }
+        if (!activeTripId) {
+          setIsLoading(false);
+          return;
+        }
+        setTripid(activeTripId);
+        await fetchAndSetCurrentTrip(activeTripId);
+        await fetchAndSetTravellers(activeTripId);
       } catch (error) {
         setIsLoading(false);
       }

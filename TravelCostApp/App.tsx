@@ -111,6 +111,7 @@ import {
   activateTrip,
   activateTripFromLastKnown,
 } from "./util/activate-trip";
+import { getActiveTripId } from "./util/active-trip-id";
 import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "./store/mmkv";
 import { Traveller } from "./util/traveler";
 // Keep the splash screen visible while we fetch resources
@@ -545,7 +546,7 @@ function Root() {
                 await updateUser(storedUid, checkUser);
               }
               // Authoritative Active trip id is secure storage (not server guesswork).
-              const tripid = await secureStoreGetItem("currentTripId");
+              const tripid = await getActiveTripId();
               if (!tripid) return;
               try {
                 setOnlineSetupDone(true);
@@ -668,7 +669,7 @@ function Root() {
       // fetch token and trip
       const storedToken = await secureStoreGetItem("token");
       const storedUid = await secureStoreGetItem("uid");
-      const storedTripId = await secureStoreGetItem("currentTripId");
+      const storedTripId = await getActiveTripId();
       const freshlyCreated = await asyncStoreGetObject("freshlyCreated");
 
       let REVCAT_G, REVCAT_A, VEXO;

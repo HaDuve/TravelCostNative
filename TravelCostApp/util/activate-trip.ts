@@ -1,6 +1,7 @@
 import type { TripData } from "../types/trip";
 import type { ExpenseData } from "./expense";
 import type { Traveller } from "./traveler";
+import { ACTIVE_TRIP_ID_KEY } from "./active-trip-id";
 import { hydrateTrip } from "./hydrate-trip";
 import { normalizeTravellers } from "./normalize-travellers";
 
@@ -47,7 +48,7 @@ export async function activateTrip(
     throw new Error("activateTrip requires a tripid");
   }
 
-  const previousActiveTripId = await deps.secureStoreGetItem("currentTripId");
+  const previousActiveTripId = await deps.secureStoreGetItem(ACTIVE_TRIP_ID_KEY);
 
   const rawTrip = deps.tripData ?? (await deps.fetchTrip(tripid));
   if (!rawTrip) {
@@ -69,7 +70,7 @@ export async function activateTrip(
 
   let committed = false;
   try {
-    await deps.secureStoreSetItem("currentTripId", tripid);
+    await deps.secureStoreSetItem(ACTIVE_TRIP_ID_KEY, tripid);
     await deps.updateUser(deps.uid, { currentTrip: tripid });
     await deps.setCurrentTrip(tripid, hydratedTrip);
     await deps.saveTripDataInStorage(hydratedTrip);
@@ -127,7 +128,7 @@ async function rollbackActivateTrip(
   }
 
   try {
-    await deps.secureStoreSetItem("currentTripId", previousActiveTripId);
+    await deps.secureStoreSetItem(ACTIVE_TRIP_ID_KEY, previousActiveTripId);
     await deps.updateUser(deps.uid, { currentTrip: previousActiveTripId });
 
     if (deps.previousTripSnapshot) {

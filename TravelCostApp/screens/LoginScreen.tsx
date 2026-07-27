@@ -36,6 +36,7 @@ import { MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
 import { createImplicitDefaultForUser } from "../util/create-implicit-default-for-user";
 import { activateTrip } from "../util/activate-trip";
+import { getActiveTripId } from "../util/active-trip-id";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -123,7 +124,8 @@ function LoginScreen() {
       safeLogError(error);
     }
 
-    let tripid = userData.currentTrip;
+    // Secure currentTripId is authoritative; server currentTrip is a fallback mirror.
+    let tripid = (await getActiveTripId()) ?? userData.currentTrip;
     if (!tripid) {
       try {
         const created = await createImplicitDefaultForUser({

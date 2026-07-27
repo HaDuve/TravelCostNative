@@ -59,6 +59,7 @@ import {
   secureStoreSetItem,
 } from "../../store/secure-storage";
 import { activateTrip } from "../../util/activate-trip";
+import { ACTIVE_TRIP_ID_KEY } from "../../util/active-trip-id";
 import BackButton from "../UI/BackButton";
 import { onShare } from "../ProfileOutput/ShareTrip";
 import { NetworkContext } from "../../store/network-context";
@@ -377,7 +378,7 @@ const TripForm = ({ navigation, route }) => {
     await putTravelerInTrip(tripid, { userName: userName, uid: uid });
     setLoadingProgress(4);
 
-    await secureStoreSetItem("currentTripId", tripid);
+    await secureStoreSetItem(ACTIVE_TRIP_ID_KEY, tripid);
     // await asyncStoreSetObject("expenses", []);
     setMMKVObject(MMKV_KEYS.EXPENSES, []);
 

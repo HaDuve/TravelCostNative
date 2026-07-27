@@ -16,8 +16,8 @@ import { DEBUG_FORCE_OFFLINE } from "../confAppConstants";
 
 import NetInfo from "@react-native-community/netinfo";
 import { isConnectionFastEnough } from "./connectionSpeed";
-import { secureStoreGetItem } from "../store/secure-storage";
 import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "../store/mmkv";
+import { getActiveTripId } from "./active-trip-id";
 import safeLogError from "./error";
 import { withRetries } from "./sync-with-retries";
 
@@ -96,7 +96,7 @@ const resolveTripidOrThrow = async (
   errorMessage: string,
   toastKey: "toastErrorStoreExp" | "toastErrorUpdateExp" | "toastErrorDeleteExp",
 ) => {
-  const tripid = await secureStoreGetItem("currentTripId");
+  const tripid = await getActiveTripId();
   if (!tripid) {
     Toast.show({
       type: "error",
@@ -221,7 +221,7 @@ export const restoreExpenseOnlineOffline = async (
   item: OfflineQueueManageExpenseItem,
   online: boolean,
 ) => {
-  const tripid = await secureStoreGetItem("currentTripId");
+  const tripid = await getActiveTripId();
   if (!tripid) {
     Toast.show({
       type: "error",
@@ -360,7 +360,7 @@ export const storeExpenseOnlineOffline = async (
   online: boolean,
   forceTripid: string | null = null,
 ): Promise<string> => {
-  const tripid = forceTripid ?? (await secureStoreGetItem("currentTripId"));
+  const tripid = forceTripid ?? (await getActiveTripId());
   if (!tripid) {
     Toast.show({
       type: "error",

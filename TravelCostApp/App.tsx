@@ -469,7 +469,7 @@ function Home() {
         options={{
           title: i18n.t("profileTab"),
           tabBarShowLabel: false,
-          tabBarLabel: i18n.t("myTrips"),
+          tabBarLabel: i18n.t("myBudgets"),
           tabBarIcon: ({ color }) => (
             <View>
               {hasNewChanges && (

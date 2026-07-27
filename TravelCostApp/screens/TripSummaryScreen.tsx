@@ -549,7 +549,7 @@ const TripSummaryScreen = ({ navigation }) => {
           pressed && GlobalStyles.pressedWithShadow,
         ]}
       >
-        <Text style={styles.expandableHeaderTitle}>{i18n.t("myTrips")}</Text>
+        <Text style={styles.expandableHeaderTitle}>{i18n.t("myBudgets")}</Text>
         {showTripList && (
           <Animated.View entering={FadeInUp}>
             <StaticList

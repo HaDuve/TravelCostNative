@@ -36,7 +36,7 @@ describe("TripSummaryScreen", () => {
   // animation; on a modal screen that animation can be dropped during the
   // transition, leaving the content stuck at opacity 0. The content must
   // render regardless of any entering animation.
-  it("renders the My Trips section without depending on an entering animation", async () => {
+  it("renders the My Budgets section without depending on an entering animation", async () => {
     const navigation = { navigate: jest.fn(), pop: jest.fn(), goBack: jest.fn() };
 
     const screen = renderWithAppProviders(
@@ -51,7 +51,7 @@ describe("TripSummaryScreen", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(i18n.t("myTrips"))).toBeTruthy();
+      expect(screen.getByText(i18n.t("myBudgets"))).toBeTruthy();
     });
   });
 

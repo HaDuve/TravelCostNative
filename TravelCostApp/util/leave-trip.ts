@@ -11,13 +11,101 @@ import {
   activateTrip,
   type ActivateTripDeps,
 } from "./activate-trip";
+import type { ExpenseData, Split } from "./expense";
 import {
   planTripLeave,
   type PlanTripLeaveResult,
+  type TripLeaveWarning,
 } from "./plan-trip-leave";
+import { rollupOpenBalances } from "./split";
 import type { Traveller } from "./traveler";
 
 export const UNDO_LEAVE_WINDOW_MS = 8000;
+
+/**
+ * Open Balances that involve a Traveller (as debtor or who paid),
+ * from the trip-wide rollup — used to feed `planTripLeave` warnings.
+ */
+export function openBalancesForTraveller(
+  expenses: ExpenseData[],
+  tripCurrency: string,
+  isPaidTimestamp: number | undefined,
+  travellerUserName: string
+): Split[] {
+  return rollupOpenBalances(expenses, tripCurrency, isPaidTimestamp).filter(
+    (balance) =>
+      balance.userName === travellerUserName ||
+      balance.whoPaid === travellerUserName
+  );
+}
+
+/** Confirm-dialog body for Leave trip: base copy plus optional open-Balance warning. */
+export function leaveConfirmMessage(
+  warnings: readonly TripLeaveWarning[]
+): string {
+  const base = warnings.includes("permanentDelete")
+    ? i18n.t("leaveTripPermanentDeleteSure")
+    : i18n.t("leaveTripSure");
+  if (!warnings.includes("openBalances")) {
+    return base;
+  }
+  return `${base}\n\n${i18n.t("leaveTripOpenBalancesWarning")}`;
+}
+
+export type ResolveLeaverOpenBalancesDeps = {
+  activeTripId: string | null | undefined;
+  activeExpenses: ExpenseData[];
+  activeTripCurrency: string;
+  activeIsPaidTimestamp: number | undefined;
+  fallbackTripCurrency?: string;
+  userNameFallback?: string;
+  getAllExpenses: (
+    tripid: string,
+    uid: string
+  ) => Promise<ExpenseData[] | null | undefined>;
+  fetchTrip: (tripid: string) => Promise<{
+    tripCurrency?: string;
+    isPaidTimestamp?: number;
+  } | null>;
+};
+
+/**
+ * Resolve open Balances for the leaver on a trip: Active trip uses local
+ * expenses; other trips fetch expenses + trip meta, then filter via rollup.
+ */
+export async function resolveLeaverOpenBalances(
+  tripid: string,
+  uid: string,
+  roster: readonly Pick<Traveller, "uid" | "userName">[],
+  deps: ResolveLeaverOpenBalancesDeps
+): Promise<Split[]> {
+  const leaverUserName =
+    roster.find((traveller) => traveller.uid === uid)?.userName ??
+    deps.userNameFallback;
+  if (!leaverUserName) {
+    return [];
+  }
+
+  if (tripid === deps.activeTripId) {
+    return openBalancesForTraveller(
+      deps.activeExpenses,
+      deps.activeTripCurrency,
+      deps.activeIsPaidTimestamp,
+      leaverUserName
+    );
+  }
+
+  const [expenses, trip] = await Promise.all([
+    deps.getAllExpenses(tripid, uid),
+    deps.fetchTrip(tripid),
+  ]);
+  return openBalancesForTraveller(
+    expenses ?? [],
+    trip?.tripCurrency ?? deps.fallbackTripCurrency ?? deps.activeTripCurrency,
+    trip?.isPaidTimestamp,
+    leaverUserName
+  );
+}
 
 export type LeaveTripDeps = {
   uid: string;

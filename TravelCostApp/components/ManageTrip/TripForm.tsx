@@ -59,6 +59,10 @@ import {
   secureStoreSetItem,
 } from "../../store/secure-storage";
 import { activateTrip } from "../../util/activate-trip";
+import {
+  leaveConfirmMessage,
+  resolveLeaverOpenBalances,
+} from "../../util/leave-trip";
 import { planTripLeave } from "../../util/plan-trip-leave";
 import BackButton from "../UI/BackButton";
 import { onShare } from "../ProfileOutput/ShareTrip";
@@ -281,6 +285,19 @@ const TripForm = ({ navigation, route }) => {
     navigation.pop();
   }
 
+  function leaverOpenBalancesDeps() {
+    return {
+      activeTripId: tripCtx.tripid,
+      activeExpenses: expenseCtx.expenses ?? [],
+      activeTripCurrency: tripCtx.tripCurrency,
+      activeIsPaidTimestamp: tripCtx.isPaidTimestamp,
+      fallbackTripCurrency: inputs.tripCurrency.value,
+      userNameFallback: userCtx.userName,
+      getAllExpenses,
+      fetchTrip,
+    };
+  }
+
   async function leaveAcceptHandler() {
     const uid = authCtx.uid ?? (await secureStoreGetItem("uid"));
     if (!uid || !editedTripId) return;
@@ -293,11 +310,18 @@ const TripForm = ({ navigation, route }) => {
     });
 
     try {
+      const roster = await getTravellers(editedTripId);
+      const openBalances = await resolveLeaverOpenBalances(
+        editedTripId,
+        uid,
+        roster,
+        leaverOpenBalancesDeps()
+      );
       const result = await tripCtx.leaveTrip(editedTripId, {
         uid,
         tripHistory: userCtx.tripHistory ?? [],
         getTravellers,
-        openBalances: [],
+        openBalances,
         removeFromTripHistoryLocal: userCtx.removeTripFromHistory,
         restoreTripHistoryLocal: userCtx.restoreTripHistory,
         activate: {
@@ -348,20 +372,25 @@ const TripForm = ({ navigation, route }) => {
     }
     if (!editedTripId) return;
     try {
+      const uid = authCtx.uid ?? (await secureStoreGetItem("uid"));
+      if (!uid) return;
       const roster = await getTravellers(editedTripId);
+      const openBalances = await resolveLeaverOpenBalances(
+        editedTripId,
+        uid,
+        roster,
+        leaverOpenBalancesDeps()
+      );
       const plan = planTripLeave({
         tripHistory: userCtx.tripHistory ?? [],
         roster,
-        openBalances: [],
+        openBalances,
         activeTripId: tripCtx.tripid,
         tripid: editedTripId,
       });
-      const message = plan.warnings.includes("permanentDelete")
-        ? i18n.t("leaveTripPermanentDeleteSure")
-        : i18n.t("leaveTripSure");
       Alert.alert(
         i18n.t("leaveTrip"),
-        message,
+        leaveConfirmMessage(plan.warnings),
         [
           {
             text: i18n.t("cancel"),

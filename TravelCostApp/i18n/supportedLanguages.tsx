@@ -200,6 +200,8 @@ const en = {
   leaveTripSure: "Are you sure you want to leave this budget? Your past expenses stay for the remaining nomads.",
   leaveTripPermanentDeleteSure:
     "You are the last nomad on this budget. Leaving permanently deletes it and all its expenses. This cannot be undone.",
+  leaveTripOpenBalancesWarning:
+    "You still have unsettled balances on this budget. You can leave anyway, but money matters remain unresolved.",
   leaveTripConnectRequired: "Connect to the internet to leave this budget.",
   leaveTripNowShowing: "Now showing %{name}",
   toastLeftTrip1: "Left budget",
@@ -812,6 +814,8 @@ const de = {
     "Möchtest du dieses Budget wirklich verlassen? Deine bisherigen Ausgaben bleiben für die anderen Nomaden erhalten.",
   leaveTripPermanentDeleteSure:
     "Du bist der letzte Nomade in diesem Budget. Verlassen löscht es und alle Ausgaben endgültig. Das kann nicht rückgängig gemacht werden.",
+  leaveTripOpenBalancesWarning:
+    "Du hast noch offene Salden in diesem Budget. Du kannst trotzdem verlassen, aber offene Geldbeträge bleiben ungelöst.",
   leaveTripConnectRequired:
     "Verbinde dich mit dem Internet, um dieses Budget zu verlassen.",
   leaveTripNowShowing: "Jetzt angezeigt: %{name}",
@@ -1458,6 +1462,8 @@ const fr = {
     "Voulez-vous vraiment quitter ce budget ? Vos dépenses passées restent pour les autres nomades.",
   leaveTripPermanentDeleteSure:
     "Vous êtes le dernier nomade sur ce budget. Quitter le supprime définitivement avec toutes ses dépenses. Cette action est irréversible.",
+  leaveTripOpenBalancesWarning:
+    "Vous avez encore des soldes non réglés sur ce budget. Vous pouvez quand même quitter, mais les questions d'argent restent en suspens.",
   leaveTripConnectRequired:
     "Connectez-vous à internet pour quitter ce budget.",
   leaveTripNowShowing: "Affichage de %{name}",
@@ -2094,6 +2100,8 @@ const ru = {
     "Вы уверены, что хотите покинуть этот бюджет? Ваши прошлые расходы останутся для остальных номадов.",
   leaveTripPermanentDeleteSure:
     "Вы последний номад в этом бюджете. Выход безвозвратно удалит его и все расходы. Это нельзя отменить.",
+  leaveTripOpenBalancesWarning:
+    "У вас ещё есть незакрытые балансы в этом бюджете. Вы можете уйти, но денежные вопросы останутся нерешёнными.",
   leaveTripConnectRequired:
     "Подключитесь к интернету, чтобы покинуть этот бюджет.",
   leaveTripNowShowing: "Сейчас показан: %{name}",

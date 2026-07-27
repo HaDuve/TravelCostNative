@@ -14,9 +14,10 @@ import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 import { ExpensesContext } from "../../store/expenses-context";
 import { UserContext } from "../../store/user-context";
+import { normalizeCountryKey } from "../../util/expense-form-inputs";
 import {
+  buildPinnedPickerDropdownItems,
   getRecentPickerCountries,
-  normalizePickerCountryKey,
 } from "../../util/picker-recent-items";
 
 const countries = require("i18n-iso-countries");
@@ -67,30 +68,14 @@ const CountryPicker = ({
 
     const recentItems = recentCountries
       .map((country) => {
-        const countryKey = normalizePickerCountryKey(country);
+        const countryKey = normalizeCountryKey(country);
         return allCountryOptions.find(
           (option) => option.countryCode === countryKey
         );
       })
-      .filter(Boolean);
+      .filter((item): item is (typeof allCountryOptions)[number] => item != null);
 
-    if (recentItems.length === 0) {
-      return allCountryOptions;
-    }
-
-    return [
-      ...recentItems,
-      ...(allCountryOptions.length
-        ? [
-            {
-              label: "────────────────────────",
-              value: "__separator__",
-              disabled: true,
-            },
-          ]
-        : []),
-      ...allCountryOptions,
-    ];
+    return buildPinnedPickerDropdownItems(recentItems, allCountryOptions);
   }, [allCountryOptions, expCtx.expenses, userCtx.lastCountry]);
 
   const [open, setOpen] = useState(false);

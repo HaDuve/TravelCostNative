@@ -16,6 +16,7 @@ import { VexoEvents } from "../../util/vexo-constants";
 import { ExpensesContext } from "../../store/expenses-context";
 import { UserContext } from "../../store/user-context";
 import {
+  buildPinnedPickerDropdownItems,
   getRecentPickerCurrencies,
   normalizePickerCurrencyKey,
 } from "../../util/picker-recent-items";
@@ -76,7 +77,7 @@ const CurrencyPicker = ({
             normalizePickerCurrencyKey(option.currencyCode) === currencyKey
         );
       })
-      .filter(Boolean)
+      .filter((item): item is (typeof allCountryOptions)[number] => item != null)
       .map((option) => {
         const shortLabel = `${option.currencyCode} | ${getCurrencySymbol(
           option.currencyCode
@@ -88,23 +89,7 @@ const CurrencyPicker = ({
         };
       });
 
-    if (recentItems.length === 0) {
-      return allCountryOptions;
-    }
-
-    return [
-      ...recentItems,
-      ...(allCountryOptions.length
-        ? [
-            {
-              label: "────────────────────────",
-              value: "__separator__",
-              disabled: true,
-            },
-          ]
-        : []),
-      ...allCountryOptions,
-    ];
+    return buildPinnedPickerDropdownItems(recentItems, allCountryOptions);
   }, [allCountryOptions, expCtx.expenses, userCtx.lastCurrency]);
 
   const [open, setOpen] = useState(false);

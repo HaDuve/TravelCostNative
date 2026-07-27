@@ -1,5 +1,6 @@
 import { makeExpense } from "../fixtures/expense";
 import {
+  buildPinnedPickerDropdownItems,
   getRecentPickerCountries,
   getRecentPickerCurrencies,
 } from "../../util/picker-recent-items";
@@ -118,6 +119,23 @@ describe("getRecentPickerCurrencies", () => {
     ]);
   });
 
+  it("dedupes when last-used currency already appears in recent expenses", () => {
+    const expenses = [
+      makeExpense({
+        id: "e1",
+        currency: "EUR",
+        date: new Date("2026-01-15T12:00:00.000Z"),
+      }),
+      makeExpense({
+        id: "e2",
+        currency: "USD",
+        date: new Date("2026-01-12T12:00:00.000Z"),
+      }),
+    ];
+
+    expect(getRecentPickerCurrencies(expenses, "EUR")).toEqual(["EUR", "USD"]);
+  });
+
   it("returns at most 5 currencies", () => {
     const expenses = [
       makeExpense({ id: "e1", currency: "EUR", date: new Date("2026-01-20") }),
@@ -135,6 +153,35 @@ describe("getRecentPickerCurrencies", () => {
       "USD",
       "GBP",
       "JPY",
+    ]);
+  });
+});
+
+describe("buildPinnedPickerDropdownItems", () => {
+  it("returns all items when there are no pinned entries", () => {
+    const allItems = [
+      { label: "Germany", value: "Germany" },
+      { label: "France", value: "France" },
+    ];
+
+    expect(buildPinnedPickerDropdownItems([], allItems)).toEqual(allItems);
+  });
+
+  it("prepends pinned items, a separator, and then the full list", () => {
+    const allItems = [
+      { label: "Germany", value: "Germany" },
+      { label: "France", value: "France" },
+    ];
+    const pinned = [{ label: "Italy", value: "Italy" }];
+
+    expect(buildPinnedPickerDropdownItems(pinned, allItems)).toEqual([
+      { label: "Italy", value: "Italy" },
+      {
+        label: "────────────────────────",
+        value: "__separator__",
+        disabled: true,
+      },
+      ...allItems,
     ]);
   });
 });

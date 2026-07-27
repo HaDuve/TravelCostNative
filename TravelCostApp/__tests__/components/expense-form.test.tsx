@@ -38,7 +38,6 @@ jest.mock("../../store/mmkv", () => ({
   clearExpenseCat: jest.fn(),
   getMMKVObject: jest.fn(() => undefined),
   setExpenseCat: jest.fn(),
-  getRecentCurrencies: jest.fn(() => []),
   MMKV_KEYS: { CATEGORY_LIST: "categoryList" },
 }));
 

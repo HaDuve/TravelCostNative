@@ -110,9 +110,6 @@ export {
   setExpenseDraft,
   getExpenseDraft,
   clearExpenseDraft,
-  getRecentCurrencies,
-  addRecentCurrency,
-  initializeRecentCurrencies,
   type IDCat,
 } from "./mmkv-helpers";
 

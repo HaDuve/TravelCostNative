@@ -1,20 +1,36 @@
 import type { ExpenseData } from "./expense";
-import { countryToAlpha2 } from "country-to-iso";
+import { normalizeCountryKey } from "./expense-form-inputs";
 
 const MAX_RECENT_PICKER_ITEMS = 5;
 
-export function normalizePickerCountryKey(country: string): string {
-  const trimmed = country?.trim() ?? "";
-  if (!trimmed) return "";
-  if (trimmed.length === 2) {
-    return trimmed.toUpperCase();
-  }
-  const alpha2 = countryToAlpha2(trimmed);
-  return alpha2?.toUpperCase() ?? trimmed.toLowerCase();
-}
-
 export function normalizePickerCurrencyKey(currency: string): string {
   return currency?.trim().toUpperCase() ?? "";
+}
+
+export type PickerDropdownItem = {
+  label: string;
+  value: string;
+  disabled?: boolean;
+};
+
+export function buildPinnedPickerDropdownItems<T extends PickerDropdownItem>(
+  recentItems: Array<T | null | undefined>,
+  allItems: T[]
+): Array<T | PickerDropdownItem> {
+  const pinned = recentItems.filter((item): item is T => item != null);
+  if (pinned.length === 0) {
+    return allItems;
+  }
+
+  const separator: PickerDropdownItem = {
+    label: "────────────────────────",
+    value: "__separator__",
+    disabled: true,
+  };
+
+  return allItems.length > 0
+    ? [...pinned, separator, ...allItems]
+    : [...pinned];
 }
 
 function buildRecentPickerItems(
@@ -60,7 +76,7 @@ export function getRecentPickerCountries(
     expenses,
     lastCountry,
     (expense) => expense.country,
-    normalizePickerCountryKey
+    normalizeCountryKey
   );
 }
 

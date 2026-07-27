@@ -21,7 +21,6 @@ import { GlobalStyles } from "../constants/styles";
 import { shadowRegressionStyles, periodHeaderLabelFontSize } from "../styles/shadow-regression-styles";
 import { MemoizedExpensesOverview } from "../components/ExpensesOutput/ExpensesOverview";
 import ToggleButton from "../assets/SVG/toggleButton";
-import { TourGuideZone } from "rn-tourguide";
 
 import { i18n } from "../i18n/i18n";
 
@@ -90,10 +89,9 @@ const OverviewScreen = ({ navigation }) => {
     React.useCallback(() => {
       const onboardingFlags: OnboardingFlags = {
         freshlyCreated: userCtx.freshlyCreated,
-        needsTour: userCtx.needsTour,
       };
       showBanner(navigation, onboardingFlags);
-    }, [navigation, userCtx.freshlyCreated, userCtx.needsTour])
+    }, [navigation, userCtx.freshlyCreated])
   );
 
   useEffect(() => {
@@ -267,23 +265,15 @@ const OverviewScreen = ({ navigation }) => {
       </View>
 
       {/* FAB Toggle Button */}
-      <TourGuideZone
-        text={i18n.t("walk4")}
-        tooltipBottomOffset={constantScale(166, 0.5)}
-        maskOffset={constantScale(60, 0.5)}
-        zone={4}
-        shape={"circle"}
+      <Pressable
+        onPress={toggleContent}
+        style={({ pressed }) => [
+          styles.fabToggleButton,
+          pressed && GlobalStyles.pressedWithShadow,
+        ]}
       >
-        <Pressable
-          onPress={toggleContent}
-          style={({ pressed }) => [
-            styles.fabToggleButton,
-            pressed && GlobalStyles.pressedWithShadow,
-          ]}
-        >
-          <ToggleButton toggled={userCtx.isShowingGraph} />
-        </Pressable>
-      </TourGuideZone>
+        <ToggleButton toggled={userCtx.isShowingGraph} />
+      </Pressable>
     </View>
   );
 };

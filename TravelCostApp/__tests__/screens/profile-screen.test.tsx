@@ -58,30 +58,6 @@ jest.mock("../../components/Premium/PremiumConstants", () => ({
   setAttributesAsync: jest.fn(async () => {}),
 }));
 
-jest.mock("rn-tourguide", () => {
-  const { View } = require("react-native");
-  return {
-    TourGuideZone: ({
-      children,
-      style,
-      zone,
-    }: {
-      children: React.ReactNode;
-      style?: object;
-      zone?: number;
-    }) => (
-      <View testID={`tour-guide-zone-${zone}`} style={style}>
-        {children}
-      </View>
-    ),
-    useTourGuideController: () => ({
-      canStart: false,
-      start: jest.fn(),
-      eventEmitter: { on: jest.fn(), off: jest.fn() },
-    }),
-  };
-});
-
 jest.mock("../../util/vexo-tracking", () => ({
   trackEvent: jest.fn(),
 }));
@@ -93,8 +69,59 @@ import { renderWithAppProviders } from "../fixtures/app-providers";
 import { assertNoNestedVerticalFlatLists } from "../../test-utils/scroll-composition";
 import { waitFor } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
+import { trackEvent } from "../../util/vexo-tracking";
+import { VexoEvents } from "../../util/vexo-constants";
+
+function profileUserOverrides(
+  overrides: Record<string, unknown> = {}
+): Record<string, unknown> {
+  return {
+    userName: "Alice",
+    freshlyCreated: false,
+    tripHistory: [],
+    loadUserNameFromStorage: jest.fn(),
+    updateTripHistory: jest.fn(async () => {}),
+    hasNewChanges: false,
+    setHasNewChanges: jest.fn(),
+    setUserName: jest.fn(async () => {}),
+    setTripHistory: jest.fn(),
+    ...overrides,
+  };
+}
 
 describe("Profile screen", () => {
+  beforeEach(() => {
+    jest.mocked(trackEvent).mockClear();
+  });
+
+  it("renders Profile trip actions without starting a guided tour", async () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { setCurrentTrip: jest.fn(async () => {}) },
+        expenses: { setExpenses: jest.fn() },
+        user: profileUserOverrides({ freshlyCreated: true }),
+      }
+    );
+
+    expect(screen.getByText("Alice")).toBeTruthy();
+    expect(screen.getByText("My Trips")).toBeTruthy();
+    expect(screen.getByTestId("profile-trip-container")).toBeTruthy();
+
+    await waitFor(() => {
+      expect(trackEvent).not.toHaveBeenCalledWith(
+        VexoEvents.ONBOARDING_TOUR_STARTED
+      );
+      expect(trackEvent).not.toHaveBeenCalledWith(
+        VexoEvents.ONBOARDING_TOUR_SKIPPED
+      );
+      expect(navigation.navigate).not.toHaveBeenCalledWith("RecentExpenses");
+      expect(navigation.navigate).not.toHaveBeenCalledWith("Overview");
+    });
+  });
+
   it("shows the signed-in User name and My Trips section", () => {
     const navigation = { navigate: jest.fn() };
     const screen = renderWithAppProviders(
@@ -103,19 +130,7 @@ describe("Profile screen", () => {
         auth: { uid: "u1", logout: jest.fn() },
         trip: { setCurrentTrip: jest.fn(async () => {}) },
         expenses: { setExpenses: jest.fn() },
-        user: {
-          userName: "Alice",
-          freshlyCreated: false,
-          tripHistory: [],
-          loadUserNameFromStorage: jest.fn(),
-          updateTripHistory: jest.fn(async () => {}),
-          needsTour: false,
-          setNeedsTour: jest.fn(),
-          hasNewChanges: false,
-          setHasNewChanges: jest.fn(),
-          setUserName: jest.fn(async () => {}),
-          setTripHistory: jest.fn(),
-        },
+        user: profileUserOverrides(),
       }
     );
 
@@ -131,19 +146,7 @@ describe("Profile screen", () => {
         auth: { uid: "u1", logout: jest.fn() },
         trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
         expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
-        user: {
-          userName: "Alice",
-          freshlyCreated: false,
-          tripHistory: ["t1"],
-          loadUserNameFromStorage: jest.fn(),
-          updateTripHistory: jest.fn(async () => {}),
-          needsTour: false,
-          setNeedsTour: jest.fn(),
-          hasNewChanges: false,
-          setHasNewChanges: jest.fn(),
-          setUserName: jest.fn(async () => {}),
-          setTripHistory: jest.fn(),
-        },
+        user: profileUserOverrides({ tripHistory: ["t1"] }),
       }
     );
 
@@ -162,19 +165,7 @@ describe("Profile screen", () => {
         auth: { uid: "u1", logout: jest.fn() },
         trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
         expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
-        user: {
-          userName: "Alice",
-          freshlyCreated: false,
-          tripHistory: ["t1"],
-          loadUserNameFromStorage: jest.fn(),
-          updateTripHistory: jest.fn(async () => {}),
-          needsTour: false,
-          setNeedsTour: jest.fn(),
-          hasNewChanges: false,
-          setHasNewChanges: jest.fn(),
-          setUserName: jest.fn(async () => {}),
-          setTripHistory: jest.fn(),
-        },
+        user: profileUserOverrides({ tripHistory: ["t1"] }),
       }
     );
 
@@ -192,19 +183,7 @@ describe("Profile screen", () => {
         auth: { uid: "u1", logout: jest.fn() },
         trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
         expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
-        user: {
-          userName: "Alice",
-          freshlyCreated: false,
-          tripHistory: ["t1"],
-          loadUserNameFromStorage: jest.fn(),
-          updateTripHistory: jest.fn(async () => {}),
-          needsTour: false,
-          setNeedsTour: jest.fn(),
-          hasNewChanges: false,
-          setHasNewChanges: jest.fn(),
-          setUserName: jest.fn(async () => {}),
-          setTripHistory: jest.fn(),
-        },
+        user: profileUserOverrides({ tripHistory: ["t1"] }),
       }
     );
 
@@ -228,19 +207,7 @@ describe("Profile screen", () => {
         auth: { uid: "u1", logout: jest.fn() },
         trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
         expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
-        user: {
-          userName: "Alice",
-          freshlyCreated: false,
-          tripHistory: ["t1"],
-          loadUserNameFromStorage: jest.fn(),
-          updateTripHistory: jest.fn(async () => {}),
-          needsTour: false,
-          setNeedsTour: jest.fn(),
-          hasNewChanges: false,
-          setHasNewChanges: jest.fn(),
-          setUserName: jest.fn(async () => {}),
-          setTripHistory: jest.fn(),
-        },
+        user: profileUserOverrides({ tripHistory: ["t1"] }),
       }
     );
 
@@ -250,20 +217,14 @@ describe("Profile screen", () => {
 
     const tripContainer = screen.getByTestId("profile-trip-container");
     const listWrapper = screen.getByTestId("trip-list-wrapper");
-    const listZone = screen.getByTestId("tour-guide-zone-6");
     const containerFlat = StyleSheet.flatten(
       tripContainer.props.style
     ) as Record<string, unknown>;
     const wrapperFlat = StyleSheet.flatten(
       listWrapper.props.style
     ) as Record<string, unknown>;
-    const zoneFlat = StyleSheet.flatten(listZone.props.style) as Record<
-      string,
-      unknown
-    >;
 
     expect(containerFlat.flex).toBe(1);
-    expect(zoneFlat.flex).toBe(1);
     expect(wrapperFlat.flex).toBe(1);
   });
 
@@ -275,19 +236,7 @@ describe("Profile screen", () => {
         auth: { uid: "u1", logout: jest.fn() },
         trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
         expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
-        user: {
-          userName: "Alice",
-          freshlyCreated: false,
-          tripHistory: ["t1"],
-          loadUserNameFromStorage: jest.fn(),
-          updateTripHistory: jest.fn(async () => {}),
-          needsTour: false,
-          setNeedsTour: jest.fn(),
-          hasNewChanges: false,
-          setHasNewChanges: jest.fn(),
-          setUserName: jest.fn(async () => {}),
-          setTripHistory: jest.fn(),
-        },
+        user: profileUserOverrides({ tripHistory: ["t1"] }),
       }
     );
 
@@ -311,19 +260,7 @@ describe("Profile screen", () => {
         auth: { uid: "u1", logout: jest.fn() },
         trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
         expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
-        user: {
-          userName: "Alice",
-          freshlyCreated: false,
-          tripHistory: ["t1"],
-          loadUserNameFromStorage: jest.fn(),
-          updateTripHistory: jest.fn(async () => {}),
-          needsTour: false,
-          setNeedsTour: jest.fn(),
-          hasNewChanges: false,
-          setHasNewChanges: jest.fn(),
-          setUserName: jest.fn(async () => {}),
-          setTripHistory: jest.fn(),
-        },
+        user: profileUserOverrides({ tripHistory: ["t1"] }),
       }
     );
 

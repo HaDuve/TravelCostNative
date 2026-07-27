@@ -5,9 +5,6 @@ import * as Haptics from "expo-haptics";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { TourGuideZone } from "rn-tourguide";
-
-import { i18n } from "../../i18n/i18n";
 
 import PropTypes from "prop-types";
 import { SettingsContext } from "../../store/settings-context";
@@ -21,7 +18,7 @@ import {
 } from "../../util/expense";
 import { expensesForTemplateSelection } from "../../util/template-expense-pool";
 import uniqBy from "lodash.uniqby";
-import { constantScale, dynamicScale } from "../../util/scalingUtil";
+import { dynamicScale } from "../../util/scalingUtil";
 import { safelyParseJSON } from "../../util/jsonParse";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
@@ -219,15 +216,6 @@ const AddExpenseButton = ({ navigation }) => {
         entering={SlideInDown}
         exiting={SlideOutDown}
       >
-        <TourGuideZone
-          text={i18n.t("walk2")}
-          borderRadius={constantScale(16, 0.5)}
-          shape={"circle"}
-          maskOffset={constantScale(40, 0.5)}
-          tooltipBottomOffset={constantScale(80, 0.5)}
-          zone={2}
-        ></TourGuideZone>
-
         <Pressable
           testID="add-expense-fab"
           style={({ pressed }) => [

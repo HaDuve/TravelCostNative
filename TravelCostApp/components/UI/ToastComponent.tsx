@@ -322,9 +322,9 @@ export async function showBanner(
 
   if (onboardingFlags) {
     const shouldShowOnboardingFlow = await shouldShowOnboarding();
-    const { freshlyCreated, needsTour } = onboardingFlags;
+    const { freshlyCreated } = onboardingFlags;
 
-    if (shouldShowOnboardingFlow || freshlyCreated || needsTour) {
+    if (shouldShowOnboardingFlow || freshlyCreated) {
       return;
     }
   }

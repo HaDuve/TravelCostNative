@@ -13,9 +13,6 @@ jest.mock("react-native-dropdown-picker", () => {
   };
 });
 
-jest.mock("rn-tourguide", () => ({
-  TourGuideZone: ({ children }: any) => <>{children}</>,
-}));
 
 jest.mock("../../util/vexo-tracking", () => ({
   trackEvent: jest.fn(),
@@ -73,7 +70,6 @@ describe("Overview screen", () => {
       <OverviewScreen navigation={navigation as any} />,
       {
         user: {
-          needsTour: false,
           isShowingGraph: false,
           setIsShowingGraph: jest.fn(),
         },
@@ -90,7 +86,6 @@ describe("Overview screen", () => {
       <OverviewScreen navigation={navigation as any} />,
       {
         user: {
-          needsTour: false,
           isShowingGraph: false,
           setIsShowingGraph: jest.fn(),
         },
@@ -110,7 +105,6 @@ describe("Overview screen", () => {
       <OverviewScreen navigation={navigation as any} />,
       {
         user: {
-          needsTour: false,
           isShowingGraph: true,
           setIsShowingGraph: jest.fn(),
         },
@@ -127,7 +121,6 @@ describe("Overview screen", () => {
       <OverviewScreen navigation={navigation as any} />,
       {
         user: {
-          needsTour: false,
           isShowingGraph: true,
           setIsShowingGraph: jest.fn(),
         },
@@ -144,7 +137,6 @@ describe("Overview screen", () => {
       <OverviewScreen navigation={navigation as any} />,
       {
         user: {
-          needsTour: false,
           isShowingGraph: false,
           setIsShowingGraph: jest.fn(),
         },
@@ -164,7 +156,6 @@ describe("Overview screen", () => {
       <OverviewScreen navigation={navigation as any} />,
       {
         user: {
-          needsTour: false,
           isShowingGraph: false,
           setIsShowingGraph: jest.fn(),
         },
@@ -181,7 +172,6 @@ describe("Overview screen", () => {
 
     renderWithAppProviders(<OverviewScreen navigation={navigation as any} />, {
       user: {
-        needsTour: false,
         freshlyCreated: true,
         isShowingGraph: false,
         setIsShowingGraph: jest.fn(),

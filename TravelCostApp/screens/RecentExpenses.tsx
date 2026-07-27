@@ -38,7 +38,6 @@ import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpenses
 import { _toShortFormat } from "../util/dateTime";
 import { useScrollToTop } from "@react-navigation/native";
 import { isForeground } from "../util/appState";
-import { TourGuideZone } from "rn-tourguide";
 import PropTypes from "prop-types";
 import Toast from "react-native-toast-message";
 import { NetworkContext } from "../store/network-context";
@@ -323,24 +322,6 @@ function RecentExpenses({ navigation }) {
   // }
   return (
     <View style={[styles.container, isTablet && styles.tabletPaddingTop]}>
-      <TourGuideZone
-        text={i18n.t("walk1")}
-        zone={1}
-        maskOffset={constantScale(-4, 0.5)}
-        tooltipBottomOffset={constantScale(200, 0.5)}
-      ></TourGuideZone>
-      <TourGuideZone
-        text={i18n.t("walk8")}
-        zone={8}
-        maskOffset={constantScale(-4, 0.5)}
-        tooltipBottomOffset={constantScale(-200, 0.5)}
-      ></TourGuideZone>
-      <TourGuideZone
-        text={i18n.t("walk3")}
-        maskOffset={constantScale(200, 0.5)}
-        tooltipBottomOffset={constantScale(-200, 0.5)}
-        zone={3}
-      ></TourGuideZone>
       <View
         testID="period-date-header"
         style={[

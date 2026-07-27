@@ -2,11 +2,15 @@ Changelog Travel Expense App
 
 __Newest Changes:
 
-1.3.005h
-- Improved large currency amounts in Overview and My Budgets
+1.3.005i
+- Fixed Overview currency amounts in German and other locales
 - Bugfixes and performance improvements
 
 __Other Changes:
+
+1.3.005h
+- Improved large currency amounts in Overview and My Budgets
+- Bugfixes and performance improvements
 
 1.3.005g
 - Fixed currency default on new expenses

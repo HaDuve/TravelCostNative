@@ -20,6 +20,40 @@ interface CurrencyTickerProps {
   testID?: string;
 }
 
+export type FormattedCurrencyParts = {
+  prefix: string;
+  tokens: string[];
+  suffix: string;
+};
+
+/**
+ * Split a localized currency display string into prefix, number tokens
+ * (digit groups + separators), and suffix — without parseFloat so leading
+ * zeros in groups like "063" / "06" stay intact.
+ */
+export function splitFormattedCurrencyParts(
+  formattedValue: string
+): FormattedCurrencyParts {
+  const firstDigit = formattedValue.search(/\d/);
+  if (firstDigit === -1) {
+    return { prefix: formattedValue, tokens: [], suffix: "" };
+  }
+
+  let lastDigit = firstDigit;
+  for (let i = firstDigit; i < formattedValue.length; i++) {
+    if (/\d/.test(formattedValue[i])) {
+      lastDigit = i;
+    }
+  }
+
+  const prefix = formattedValue.slice(0, firstDigit);
+  const numberStr = formattedValue.slice(firstDigit, lastDigit + 1);
+  const suffix = formattedValue.slice(lastDigit + 1);
+  const tokens = numberStr.split(/([^\d])/).filter((token) => token !== "");
+
+  return { prefix, tokens, suffix };
+}
+
 /**
  * CurrencyTicker component that displays an animated number with currency formatting
  */
@@ -36,26 +70,10 @@ const CurrencyTicker: React.FC<CurrencyTickerProps> = ({
 
   const formattedValue = displayText;
 
-  // Split the formatted value into parts
-  const parts = useMemo(() => {
-    // More comprehensive regex to capture currency, number with formatting, and suffix
-    const matches = formattedValue.match(/([^\d]*)([\d,.]*)([^\d]*)/);
-    if (!matches) return { prefix: "", number: value, suffix: "" };
-
-    // Extract the numeric part and clean it up
-    const numberStr = matches[2] || "0";
-    const cleanNumber = parseFloat(numberStr.replace(/,/g, "")) || 0;
-
-    // Split the formatted number to preserve decimal point and commas
-    const formattedNumber = numberStr.split(/([,.])/);
-
-    return {
-      prefix: matches[1] || "",
-      number: cleanNumber,
-      suffix: matches[3] || "",
-      formattedNumber: formattedNumber,
-    };
-  }, [formattedValue, value]);
+  const parts = useMemo(
+    () => splitFormattedCurrencyParts(formattedValue),
+    [formattedValue]
+  );
 
   const textStyle = [
     {
@@ -114,47 +132,43 @@ const CurrencyTicker: React.FC<CurrencyTickerProps> = ({
         {fullText}
       </Text>
       <View style={styles.row}>
-        {parts.prefix && (
+        {parts.prefix ? (
           <Tick
             fontSize={fontSize * 0.8}
             style={[styles.symbol, { color: (style as TextStyle)?.color }]}
           >
             {parts.prefix}
           </Tick>
-        )}
-        {parts.formattedNumber.map((part, index) => {
-          if (part === "," || part === ".") {
-            return (
-              <Tick
-                key={index}
-                fontSize={fontSize}
-                style={[styles.symbol, { color: (style as TextStyle)?.color }]}
-              >
-                {part}
-              </Tick>
-            );
-          }
-          const num = parseFloat(part);
-          if (!isNaN(num)) {
+        ) : null}
+        {parts.tokens.map((token, index) => {
+          if (/^\d+$/.test(token)) {
             return (
               <Ticker
                 key={index}
-                value={num}
+                value={token}
                 fontSize={fontSize}
                 textStyle={{ color: (style as TextStyle)?.color }}
               />
             );
           }
-          return null;
+          return (
+            <Tick
+              key={index}
+              fontSize={fontSize}
+              style={[styles.symbol, { color: (style as TextStyle)?.color }]}
+            >
+              {token}
+            </Tick>
+          );
         })}
-        {parts.suffix && (
+        {parts.suffix ? (
           <Tick
             fontSize={fontSize * 0.8}
             style={[styles.symbol, { color: (style as TextStyle)?.color }]}
           >
             {parts.suffix}
           </Tick>
-        )}
+        ) : null}
       </View>
     </View>
   );

@@ -11,7 +11,7 @@ import TickerDigit from "./TickerDigit";
 import Tick from "./Tick";
 
 interface TickerProps {
-  value: number;
+  value: number | string;
   fontSize?: number;
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
@@ -28,8 +28,9 @@ const Ticker: React.FC<TickerProps> = ({
 }) => {
   const [calculatedFontSize, setCalculatedFontSize] = useState(fontSize);
 
-  // Convert number to string and split into digits
-  const splitValue = value.toString().split("");
+  // Keep digit strings as-is (e.g. "063") so leading zeros are not dropped
+  const splitValue = String(value).split("");
+  const displayValue = String(value);
 
   return (
     <View style={[styles.container, style]}>
@@ -52,7 +53,7 @@ const Ticker: React.FC<TickerProps> = ({
           }
         }}
       >
-        {value}
+        {displayValue}
       </Text>
 
       {/* Visible animated digits */}

@@ -28,6 +28,7 @@ import {
   shadowRegressionStyles,
 } from "../styles/shadow-regression-styles";
 import AddExpenseButton from "../components/ManageExpense/AddExpenseButton";
+import NamingBanner from "../components/UI/NamingBanner";
 import { DateTime } from "luxon";
 
 import { i18n } from "../i18n/i18n";
@@ -51,6 +52,12 @@ import { getMMKVObject, MMKV_KEYS } from "../store/mmkv";
 import { constantScale, dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
 import { refreshWithToast } from "../util/refreshWithToast";
+import {
+  dismissNamingBanner,
+  dismissNamingBannerAfterFirstExpense,
+  isNamingBannerDismissed,
+  shouldShowNamingBanner,
+} from "../util/naming-banner";
 
 function RecentExpenses({ navigation }) {
   const expensesCtx = useContext(ExpensesContext);
@@ -212,6 +219,56 @@ function RecentExpenses({ navigation }) {
   ]);
 
   const [loadedOnce, setLoadedOnce] = useState(false);
+  const tripExpenseCount = expensesCtx.expenses?.length ?? 0;
+  const [namingBannerDismissed, setNamingBannerDismissed] = useState(() =>
+    isNamingBannerDismissed(tripid)
+  );
+
+  useEffect(() => {
+    setNamingBannerDismissed(isNamingBannerDismissed(tripid));
+  }, [tripid]);
+
+  useEffect(() => {
+    if (!tripCtx.isImplicitDefault) return;
+    if (tripExpenseCount < 1) return;
+    dismissNamingBannerAfterFirstExpense(
+      tripid,
+      tripExpenseCount,
+      tripCtx.isImplicitDefault
+    );
+    setNamingBannerDismissed(true);
+  }, [tripExpenseCount, tripCtx.isImplicitDefault, tripid]);
+
+  const showNamingBanner = shouldShowNamingBanner({
+    isImplicitDefault: tripCtx.isImplicitDefault === true,
+    isDismissed: namingBannerDismissed,
+    expenseCount: tripExpenseCount,
+  });
+
+  const handleNameIt = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    navigation.navigate("ManageTrip", {
+      tripId: tripid,
+      mode: "promote",
+    });
+  }, [navigation, tripid]);
+
+  const handleNamingLater = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    dismissNamingBanner(tripid);
+    setNamingBannerDismissed(true);
+  }, [tripid]);
+
+  const handleEmptyCtaPress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (settings.skipCategoryScreen) {
+      navigation.navigate("ManageExpense", { pickedCat: "undefined" });
+    } else {
+      navigation.navigate("CategoryPick");
+    }
+  }, [navigation, settings.skipCategoryScreen]);
+
+  const tripLedgerEmpty = tripExpenseCount === 0;
 
   useEffect(() => {
     const asyncLoading = async () => {
@@ -296,6 +353,8 @@ function RecentExpenses({ navigation }) {
     <MemoizedExpensesOutput
       expenses={recentExpenses}
       fallbackText={i18n.t("fallbackTextExpenses")}
+      emptyCtaLabel={tripLedgerEmpty ? i18n.t("addExp") : undefined}
+      onEmptyCtaPress={tripLedgerEmpty ? handleEmptyCtaPress : undefined}
       refreshing={refreshing}
       refreshControl={
         <RefreshControl
@@ -390,6 +449,9 @@ function RecentExpenses({ navigation }) {
           !isPortrait && styles.landscapeBar,
         ]}
       ></View>
+      {showNamingBanner && (
+        <NamingBanner onNameIt={handleNameIt} onLater={handleNamingLater} />
+      )}
       {ExpensesOutputJSX}
 
       <AddExpenseButton navigation={navigation} />

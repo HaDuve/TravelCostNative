@@ -56,8 +56,19 @@ const mmkvStore: Record<string, unknown> = {};
 
 jest.mock("../../store/mmkv", () => ({
   MMKV_KEYS: { OFFLINE_QUEUE: "offlineQueue" },
+  MMKV_KEY_PATTERNS: {
+    NAMING_BANNER_DISMISSED: (tripid: string) =>
+      `namingBannerDismissed_${tripid}`,
+  },
   getMMKVObject: jest.fn((key: string) => mmkvStore[key] ?? null),
   setMMKVObject: jest.fn((key: string, value: unknown) => {
+    mmkvStore[key] = value;
+  }),
+  getMMKVString: jest.fn((key: string) => {
+    const value = mmkvStore[key];
+    return typeof value === "string" ? value : "";
+  }),
+  setMMKVString: jest.fn((key: string, value: string) => {
     mmkvStore[key] = value;
   }),
 }));
@@ -83,7 +94,7 @@ jest.mock("react-native-toast-message/lib/src/Toast", () => ({
   Toast: { show: jest.fn(), hide: jest.fn() },
 }));
 
-import { waitFor } from "@testing-library/react-native";
+import { act, fireEvent, waitFor } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 import RecentExpenses from "../../screens/RecentExpenses";
 import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
@@ -93,10 +104,14 @@ import { renderWithAppProviders } from "../fixtures/app-providers";
 import { assertNoNestedVerticalFlatLists } from "../../test-utils/scroll-composition";
 
 function expensesContextForList(
-  listedExpenses: ReturnType<typeof makeExpense>[]
+  listedExpenses: ReturnType<typeof makeExpense>[],
+  options?: {
+    tripExpenses?: ReturnType<typeof makeExpense>[];
+  }
 ) {
+  const tripExpenses = options?.tripExpenses ?? listedExpenses;
   return {
-    expenses: listedExpenses,
+    expenses: tripExpenses,
     getRecentExpenses: () => listedExpenses,
     getDailyExpenses: jest.fn(() => []),
     loadExpensesFromStorage: jest.fn(async () => {}),
@@ -104,10 +119,47 @@ function expensesContextForList(
   };
 }
 
+const implicitDefaultTrip = {
+  tripid: "t-implicit",
+  tripName: "",
+  tripCurrency: "EUR",
+  isImplicitDefault: true,
+  dailyBudget: "0",
+  totalBudget: "0",
+  travellers: ["Alice"],
+};
+
+function renderImplicitRecent(
+  navigation: { navigate: jest.Mock },
+  expenses: ReturnType<typeof expensesContextForList>
+) {
+  return renderWithAppProviders(
+    <RecentExpenses navigation={navigation as any} />,
+    {
+      expenses,
+      user: {
+        periodName: "month",
+        freshlyCreated: false,
+      },
+      trip: implicitDefaultTrip,
+    }
+  );
+}
+
+async function flushExpensesLoadTimeout() {
+  await act(async () => {
+    jest.advanceTimersByTime(1000);
+  });
+}
+
 describe("RecentExpenses screen", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     Object.keys(mmkvStore).forEach((key) => delete mmkvStore[key]);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   it("fetches expenses after the offline queue flushes successfully", async () => {
@@ -234,24 +286,9 @@ describe("RecentExpenses screen", () => {
 
   it("hides period progress on a budget-free implicit default Active trip", () => {
     const navigation = { navigate: jest.fn() };
-    const screen = renderWithAppProviders(
-      <RecentExpenses navigation={navigation as any} />,
-      {
-        expenses: expensesContextForList([]),
-        user: {
-          periodName: "month",
-          freshlyCreated: false,
-        },
-        trip: {
-          tripid: "t-implicit",
-          tripName: "",
-          tripCurrency: "EUR",
-          isImplicitDefault: true,
-          dailyBudget: "0",
-          totalBudget: "0",
-          travellers: ["Alice"],
-        },
-      }
+    const screen = renderImplicitRecent(
+      navigation,
+      expensesContextForList([])
     );
 
     expect(screen.getByTestId("expenses-summary-pressable")).toBeTruthy();
@@ -259,6 +296,136 @@ describe("RecentExpenses screen", () => {
   });
 
   it("keeps the add-expense entry point on Recent Expenses for an implicit default Active trip", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderImplicitRecent(
+      navigation,
+      expensesContextForList([])
+    );
+
+    expect(screen.getByTestId("add-expense-entry")).toBeTruthy();
+    expect(navigation.navigate).not.toHaveBeenCalledWith("Profile");
+  });
+
+  it("shows a clear empty-state add-expense CTA for an implicit default Active trip", async () => {
+    jest.useFakeTimers();
+    const navigation = { navigate: jest.fn() };
+    const screen = renderImplicitRecent(
+      navigation,
+      expensesContextForList([])
+    );
+
+    await flushExpensesLoadTimeout();
+
+    expect(screen.getByTestId("empty-expenses-cta")).toBeTruthy();
+    fireEvent.press(screen.getByText("Add Expense"));
+    expect(navigation.navigate).toHaveBeenCalledWith("CategoryPick");
+  });
+
+  it("does not show the empty-state CTA when the trip ledger already has expenses", async () => {
+    jest.useFakeTimers();
+    const historyExpense = makeExpense({
+      id: "e-history",
+      calcAmount: 40,
+      amount: 40,
+    });
+    const navigation = { navigate: jest.fn() };
+    const screen = renderImplicitRecent(
+      navigation,
+      expensesContextForList([], { tripExpenses: [historyExpense] })
+    );
+
+    await flushExpensesLoadTimeout();
+
+    expect(screen.queryByTestId("empty-expenses-cta")).toBeNull();
+  });
+
+  it("shows the naming banner for an undismissed implicit default Active trip", async () => {
+    jest.useFakeTimers();
+    const navigation = { navigate: jest.fn() };
+    const screen = renderImplicitRecent(
+      navigation,
+      expensesContextForList([])
+    );
+
+    await flushExpensesLoadTimeout();
+
+    expect(screen.getByTestId("naming-banner")).toBeTruthy();
+    expect(
+      screen.getByText("Name your budget to keep things organized.")
+    ).toBeTruthy();
+    expect(screen.getByTestId("naming-banner-name-it")).toBeTruthy();
+    expect(screen.getByTestId("naming-banner-later")).toBeTruthy();
+  });
+
+  it("Name it opens the promote Name your budget flow", async () => {
+    jest.useFakeTimers();
+    const navigation = { navigate: jest.fn() };
+    const screen = renderImplicitRecent(
+      navigation,
+      expensesContextForList([])
+    );
+
+    await flushExpensesLoadTimeout();
+
+    fireEvent.press(screen.getByText("Name it"));
+    expect(navigation.navigate).toHaveBeenCalledWith("ManageTrip", {
+      tripId: "t-implicit",
+      mode: "promote",
+    });
+  });
+
+  it("Later permanently dismisses the naming banner across remount", async () => {
+    jest.useFakeTimers();
+    const navigation = { navigate: jest.fn() };
+    const screen = renderImplicitRecent(
+      navigation,
+      expensesContextForList([])
+    );
+
+    await flushExpensesLoadTimeout();
+
+    fireEvent.press(screen.getByTestId("naming-banner-later"));
+    expect(screen.queryByTestId("naming-banner")).toBeNull();
+    expect(mmkvStore["namingBannerDismissed_t-implicit"]).toBe("1");
+
+    screen.unmount();
+    const remounted = renderImplicitRecent(
+      { navigate: jest.fn() },
+      expensesContextForList([])
+    );
+    await flushExpensesLoadTimeout();
+    expect(remounted.queryByTestId("naming-banner")).toBeNull();
+  });
+
+  it("never shows the naming banner when the Active trip already has expenses", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderImplicitRecent(
+      navigation,
+      expensesContextForList([
+        makeExpense({ id: "e1", calcAmount: 12, amount: 12 }),
+      ])
+    );
+
+    expect(screen.queryByTestId("naming-banner")).toBeNull();
+  });
+
+  it("first expense permanently dismisses the naming banner in MMKV", async () => {
+    jest.useFakeTimers();
+    const navigation = { navigate: jest.fn() };
+    renderImplicitRecent(
+      navigation,
+      expensesContextForList([
+        makeExpense({ id: "e1", calcAmount: 12, amount: 12 }),
+      ])
+    );
+
+    await act(async () => {});
+
+    expect(mmkvStore["namingBannerDismissed_t-implicit"]).toBe("1");
+  });
+
+  it("does not show the naming banner on a named Active trip", async () => {
+    jest.useFakeTimers();
     const navigation = { navigate: jest.fn() };
     const screen = renderWithAppProviders(
       <RecentExpenses navigation={navigation as any} />,
@@ -269,18 +436,17 @@ describe("RecentExpenses screen", () => {
           freshlyCreated: false,
         },
         trip: {
-          tripid: "t-implicit",
-          tripName: "",
+          tripid: "t-named",
+          tripName: "Japan 2026",
           tripCurrency: "EUR",
-          isImplicitDefault: true,
-          dailyBudget: "0",
-          totalBudget: "0",
+          isImplicitDefault: false,
           travellers: ["Alice"],
         },
       }
     );
 
-    expect(screen.getByTestId("add-expense-entry")).toBeTruthy();
-    expect(navigation.navigate).not.toHaveBeenCalledWith("Profile");
+    await flushExpensesLoadTimeout();
+
+    expect(screen.queryByTestId("naming-banner")).toBeNull();
   });
 });

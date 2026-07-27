@@ -14,6 +14,7 @@ import { EXPENSES_LOAD_TIMEOUT } from "../../confAppConstants";
 import { memo } from "react";
 import { TripContext } from "../../store/trip-context";
 import FlatButton from "../UI/FlatButton";
+import GradientButton from "../UI/GradientButton";
 import { useNavigation } from "@react-navigation/native";
 import { ExpensesContext, RangeString } from "../../store/expenses-context";
 import { UserContext } from "../../store/user-context";
@@ -27,8 +28,10 @@ function ExpensesOutput({
   refreshing,
   showSumForTravellerName,
   isFiltered,
+  emptyCtaLabel,
+  onEmptyCtaPress,
 }) {
-  const { tripName } = useContext(TripContext);
+  const { tripName, tripid } = useContext(TripContext);
   const [showLoading, setShowLoading] = useState(true);
   const [fallback, setFallback] = useState(true);
   const navigation = useNavigation();
@@ -43,15 +46,16 @@ function ExpensesOutput({
   const tomorrowExpenses = expCtx.getDailyExpenses(-1);
   const showTomorrow =
     tomorrowExpenses && tomorrowExpenses.length > 0 && shouldShowExtraButtons;
+  const tripReady = Boolean(tripid || tripName);
   useEffect(() => {
     setTimeout(() => {
-      if (tripName) setShowLoading(false);
+      if (tripReady) setShowLoading(false);
     }, EXPENSES_LOAD_TIMEOUT);
-  }, [tripName]);
+  }, [tripReady]);
 
   useEffect(() => {
-    if (tripName && expenses.length > 1) setShowLoading(false);
-  }, [tripName, expenses.length]);
+    if (tripReady && expenses.length > 1) setShowLoading(false);
+  }, [tripReady, expenses.length]);
 
   const memoizedContent = useMemo(() => {
     if (expenses?.length > 0) {
@@ -78,6 +82,16 @@ function ExpensesOutput({
             {showLoading && <LoadingOverlay></LoadingOverlay>}
             {!showLoading && (
               <Text style={styles.infoText}>{fallbackText}</Text>
+            )}
+            {!showLoading && emptyCtaLabel && onEmptyCtaPress && (
+              <View testID="empty-expenses-cta" style={styles.emptyCta}>
+                <GradientButton
+                  onPress={onEmptyCtaPress}
+                  buttonStyle={styles.emptyCtaInner}
+                >
+                  {emptyCtaLabel}
+                </GradientButton>
+              </View>
             )}
             {showYesterday && (
               <FlatButton
@@ -110,14 +124,21 @@ function ExpensesOutput({
       </Animated.View>
     );
   }, [
+    emptyCtaLabel,
     expenses,
     fallback,
     fallbackText,
     isFiltered,
+    onEmptyCtaPress,
     refreshControl,
     refreshing,
     showLoading,
     showSumForTravellerName,
+    showTomorrow,
+    showYesterday,
+    tomorrowExpenses,
+    yesterdayExpenses,
+    navigation,
   ]);
 
   return (
@@ -138,6 +159,8 @@ ExpensesOutput.propTypes = {
   refreshing: PropTypes.bool,
   showSumForTravellerName: PropTypes.string,
   isFiltered: PropTypes.bool,
+  emptyCtaLabel: PropTypes.string,
+  onEmptyCtaPress: PropTypes.func,
 };
 
 const styles = StyleSheet.create({
@@ -173,5 +196,13 @@ const styles = StyleSheet.create({
     fontSize: dynamicScale(16, false, 0.5),
     textAlign: "center",
     marginVertical: dynamicScale(32, false, 0.5),
+  },
+  emptyCta: {
+    alignSelf: "center",
+    marginTop: dynamicScale(8, true),
+    minWidth: "70%",
+  },
+  emptyCtaInner: {
+    paddingVertical: dynamicScale(12, true),
   },
 });

@@ -468,6 +468,8 @@ const en = {
   rateModalButton: "Rate Now",
   never: "Never",
   later: "Later",
+  namingBannerText: "Name your budget to keep things organized.",
+  namingBannerNameIt: "Name it",
   // gpt
   gptInfoTitle: "GPT-4 Info",
   gptInfoText:
@@ -1088,6 +1090,8 @@ const de = {
   rateModalButton: "Jetzt bewerten",
   never: "Nie",
   later: "Später",
+  namingBannerText: "Benenne dein Budget, um den Überblick zu behalten.",
+  namingBannerNameIt: "Benenne es",
   // gpt
   gptInfoTitle: "ChatGPT Info",
   gptInfoText:
@@ -1707,6 +1711,8 @@ const fr = {
   rateModalButton: "Évaluer maintenant",
   never: "Jamais",
   later: "Plus tard",
+  namingBannerText: "Donnez un nom à votre budget pour rester organisé.",
+  namingBannerNameIt: "Nommer",
 
   // gpt
   gptInfoTitle: "Informations sur GPT-4",
@@ -2328,6 +2334,8 @@ const ru = {
   rateModalButton: "Оценить сейчас",
   never: "Никогда",
   later: "Позже",
+  namingBannerText: "Назовите бюджет, чтобы всё было организовано.",
+  namingBannerNameIt: "Назвать",
 
   // gpt
   gptInfoTitle: "Информация о GPT-4",

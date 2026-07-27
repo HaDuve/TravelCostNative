@@ -52,7 +52,7 @@ export function toExpenseDraft(
     whoPaid: snapshot.whoPaid as string,
     splitType: snapshot.splitType,
     listEQUAL: snapshot.listEQUAL,
-    splitList: snapshot.splitList,
+    splitList: resetEditOrder(snapshot.splitList),
     duplOrSplit: snapshot.duplOrSplit,
     calcAmount: resolvedAmount,
     paidBack: snapshot.paidBack,

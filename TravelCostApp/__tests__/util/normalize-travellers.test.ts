@@ -37,6 +37,27 @@ describe("normalizeTravellers", () => {
       { uid: "uid-b", userName: "Bob" },
     ]);
   });
+
+  it("dedupes Firebase map entries that share a uid", () => {
+    expect(
+      normalizeTravellers({
+        keyA: { uid: "uid-a", userName: "Alice" },
+        keyB: { uid: "uid-a", userName: "Alice" },
+      })
+    ).toEqual([{ uid: "uid-a", userName: "Alice" }]);
+  });
+
+  it("keeps same display name when uids differ", () => {
+    expect(
+      normalizeTravellers([
+        { uid: "u1", userName: "Alice" },
+        { uid: "u2", userName: "Alice" },
+      ])
+    ).toEqual([
+      { uid: "u1", userName: "Alice" },
+      { uid: "u2", userName: "Alice" },
+    ]);
+  });
 });
 
 describe("travellerUserNames", () => {

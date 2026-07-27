@@ -420,11 +420,16 @@ function TripHistoryItem({ tripid, trips }) {
 
   const dimensionChars = dynamicScale(25, false, 0.4);
 
-  function renderTravellers({ item }: { item: { userName?: string } }) {
+  function renderTravellers({
+    item,
+  }: {
+    item: { uid?: string; userName?: string };
+  }) {
     if (!item?.userName) return <></>;
+    const travellerKey = item.uid || item.userName;
     return (
       <View
-        testID={`trip-traveller-${item.userName}`}
+        testID={`trip-traveller-${travellerKey}`}
         style={[
           shadowRegressionStyles.tripTravellerChip,
           styles.travellerCard,
@@ -508,11 +513,14 @@ function TripHistoryItem({ tripid, trips }) {
           }}
           testID="trip-travellers-wrap"
         >
-          {travellers.map((item) => (
-            <React.Fragment key={item.userName + tripid}>
-              {renderTravellers({ item })}
-            </React.Fragment>
-          ))}
+          {travellers.map((item) => {
+            const travellerKey = item.uid || item.userName;
+            return (
+              <React.Fragment key={`${travellerKey}-${tripid}`}>
+                {renderTravellers({ item })}
+              </React.Fragment>
+            );
+          })}
         </View>
       </View>
     </Pressable>

@@ -96,8 +96,16 @@ import { renderWithAppProviders } from "../fixtures/app-providers";
 import { assertNoNestedVerticalFlatLists } from "../../test-utils/scroll-composition";
 import { waitFor } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
+import { getTravellers } from "../../util/http";
 
 describe("Profile screen", () => {
+  afterEach(() => {
+    jest.mocked(getTravellers).mockImplementation(async () => [
+      { uid: "u1", userName: "Alice" },
+      { uid: "u2", userName: "Bob" },
+    ]);
+  });
+
   it("shows the signed-in User name and My Trips section", () => {
     const navigation = { navigate: jest.fn() };
     const screen = renderWithAppProviders(
@@ -182,8 +190,42 @@ describe("Profile screen", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId("trip-traveller-Alice")).toBeTruthy();
-      expect(screen.getByTestId("trip-traveller-Bob")).toBeTruthy();
+      expect(screen.getByTestId("trip-traveller-u1")).toBeTruthy();
+      expect(screen.getByTestId("trip-traveller-u2")).toBeTruthy();
+    });
+  });
+
+  it("keeps distinct Traveller chips when display names collide", async () => {
+    jest.mocked(getTravellers).mockImplementation(async () => [
+      { uid: "u1", userName: "Alice" },
+      { uid: "u2", userName: "Alice" },
+    ]);
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { setCurrentTrip: jest.fn(async () => {}), tripid: "t1" },
+        expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
+        user: {
+          userName: "Alice",
+          freshlyCreated: false,
+          tripHistory: ["t1"],
+          loadUserNameFromStorage: jest.fn(),
+          updateTripHistory: jest.fn(async () => {}),
+          needsTour: false,
+          setNeedsTour: jest.fn(),
+          hasNewChanges: false,
+          setHasNewChanges: jest.fn(),
+          setUserName: jest.fn(async () => {}),
+          setTripHistory: jest.fn(),
+        },
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("trip-traveller-u1")).toBeTruthy();
+      expect(screen.getByTestId("trip-traveller-u2")).toBeTruthy();
     });
   });
 
@@ -212,7 +254,7 @@ describe("Profile screen", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId("trip-traveller-Alice")).toBeTruthy();
+      expect(screen.getByTestId("trip-traveller-u1")).toBeTruthy();
     });
 
     const listContent = screen.getByTestId("trip-travellers-wrap");

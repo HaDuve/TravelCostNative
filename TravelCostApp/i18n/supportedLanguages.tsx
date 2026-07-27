@@ -196,8 +196,9 @@ const en = {
   alertChangeHomeCurrencyTitle: "Changing home currency",
   alertChangeHomeCurrencyMessage:
     "Are you sure you want to change the currency? Set it to the currency you normally use at home.",
-  deleteTrip: "Delete budget",
-  deleteTripSure: "Are you sure you want to delete this budget?",
+  leaveTrip: "Leave budget",
+  leaveTripSure: "Are you sure you want to leave this budget? Your past expenses stay for the remaining nomads.",
+  leaveTripConnectRequired: "Connect to the internet to leave this budget.",
   setActive: "Set as active budget",
   datePickerLabel: "Start and end dates",
 
@@ -800,8 +801,11 @@ const de = {
   alertChangeHomeCurrencyTitle: "Heimatwährung ändern",
   alertChangeHomeCurrencyMessage:
     "Möchtest du die Währung wirklich ändern? Wähle die Währung, die du zu Hause normalerweise verwendest.",
-  deleteTrip: "Budget löschen",
-  deleteTripSure: "Bist du dir sicher, dass du dieses Budget löschen möchtest?",
+  leaveTrip: "Budget verlassen",
+  leaveTripSure:
+    "Möchtest du dieses Budget wirklich verlassen? Deine bisherigen Ausgaben bleiben für die anderen Nomaden erhalten.",
+  leaveTripConnectRequired:
+    "Verbinde dich mit dem Internet, um dieses Budget zu verlassen.",
   setActive: "Als aktives Budget markieren",
   datePickerLabel: "Start- und Enddatum",
 
@@ -1436,8 +1440,11 @@ const fr = {
   alertChangeHomeCurrencyTitle: "Changer la devise du domicile",
   alertChangeHomeCurrencyMessage:
     "Voulez-vous vraiment changer la devise ? Choisissez la devise que vous utilisez habituellement chez vous.",
-  deleteTrip: "Supprimer le budget",
-  deleteTripSure: "Êtes-vous sûr de vouloir supprimer ce budget ?",
+  leaveTrip: "Quitter le budget",
+  leaveTripSure:
+    "Voulez-vous vraiment quitter ce budget ? Vos dépenses passées restent pour les autres nomades.",
+  leaveTripConnectRequired:
+    "Connectez-vous à internet pour quitter ce budget.",
   setActive: "Définir comme budget actif",
   datePickerLabel: "Dates de début et de fin",
 
@@ -2062,8 +2069,11 @@ const ru = {
   alertChangeHomeCurrencyTitle: "Изменение домашней валюты",
   alertChangeHomeCurrencyMessage:
     "Вы уверены, что хотите изменить валюту? Укажите валюту, которую вы обычно используете дома.",
-  deleteTrip: "Удалить бюджет",
-  deleteTripSure: "Вы уверены, что хотите удалить этот бюджет?",
+  leaveTrip: "Покинуть бюджет",
+  leaveTripSure:
+    "Вы уверены, что хотите покинуть этот бюджет? Ваши прошлые расходы останутся для остальных номадов.",
+  leaveTripConnectRequired:
+    "Подключитесь к интернету, чтобы покинуть этот бюджет.",
   setActive: "Сделать активным бюджетом",
   datePickerLabel: "Даты начала и окончания",
 

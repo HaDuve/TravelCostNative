@@ -6,7 +6,8 @@ import { getCurrencySymbol } from "./currencySymbol";
 export function formatExpenseWithCurrency(
   amount: number | string,
   currency?: string,
-  options?: Intl.NumberFormatOptions
+  options?: Intl.NumberFormatOptions,
+  localeOverride?: string
 ): string {
   if (typeof amount === "string") amount = Number(amount);
   if (isNaN(amount)) {
@@ -18,9 +19,10 @@ export function formatExpenseWithCurrency(
     return amount.toFixed(2);
   }
   const locale =
-    Localization.getLocales()[0] && Localization.getLocales()[0].languageTag
+    localeOverride ||
+    (Localization.getLocales()[0] && Localization.getLocales()[0].languageTag
       ? Localization.getLocales()[0].languageTag
-      : "en-US";
+      : "en-US");
 
   const fractionOptions: Intl.NumberFormatOptions = {
     style: "currency",
@@ -123,16 +125,34 @@ function languageFromLocale(locale: string): string {
   return locale.slice(0, 2).toLowerCase();
 }
 
-function compactSuffix(language: string, absAmount: number): { scale: number; suffix: string } | null {
-  for (const { threshold, suffixes } of COMPACT_SCALES) {
-    if (absAmount >= threshold) {
-      return {
-        scale: threshold,
-        suffix: suffixes[language] ?? suffixes.en,
-      };
-    }
+function formatCompactMantissa(
+  absAmount: number,
+  language: string
+): { mantissa: string; suffix: string } | null {
+  let scaleEntry =
+    COMPACT_SCALES.find(({ threshold }) => absAmount >= threshold) ?? null;
+  if (!scaleEntry) return null;
+
+  let scale = scaleEntry.threshold;
+  let rounded = Number((absAmount / scale).toFixed(1));
+
+  // Carry to the next larger scale when rounding reaches 1000 (e.g. 999999 → 1 Mio.)
+  const scaleIndex = COMPACT_SCALES.findIndex((s) => s.threshold === scale);
+  if (rounded >= 1000 && scaleIndex > 0) {
+    scaleEntry = COMPACT_SCALES[scaleIndex - 1];
+    scale = scaleEntry.threshold;
+    rounded = Number((absAmount / scale).toFixed(1));
   }
-  return null;
+
+  const decimalSep = language === "en" ? "." : ",";
+  const mantissa = Number.isInteger(rounded)
+    ? String(rounded)
+    : rounded.toFixed(1).replace(".", decimalSep);
+
+  return {
+    mantissa,
+    suffix: scaleEntry.suffixes[language] ?? scaleEntry.suffixes.en,
+  };
 }
 
 function currencySymbolGoesFirst(locale: string, currency: string): boolean {
@@ -166,62 +186,21 @@ export function formatCompactExpenseWithCurrency(
     return "";
   }
   if (!currency) {
-    return formatExpenseWithCurrency(amount, currency);
+    return formatExpenseWithCurrency(amount, currency, undefined, locale);
   }
 
   const abs = Math.abs(amount);
   const language = languageFromLocale(locale);
-  const compact = compactSuffix(language, abs);
+  const compact = formatCompactMantissa(abs, language);
   if (!compact) {
-    return formatExpenseWithCurrency(amount, currency);
+    return formatExpenseWithCurrency(amount, currency, undefined, locale);
   }
 
-  const scaled = abs / compact.scale;
-  const decimalSep =
-    language === "en" ? "." : ",";
-  const mantissa = Number.isInteger(scaled)
-    ? String(scaled)
-    : scaled.toFixed(1).replace(".", decimalSep);
   const sign = amount < 0 ? "-" : "";
-  const body = `${sign}${mantissa}${compact.suffix}`;
+  const body = `${sign}${compact.mantissa}${compact.suffix}`;
   const symbol = getCurrencySymbol(currency);
 
   return currencySymbolGoesFirst(locale, currency)
     ? `${symbol}${body}`
     : `${body}${symbol}`;
-}
-
-/**
- * Truncates or limits a number to a specified border value,
- * with options for formatting.
- * @param num The number to truncate.
- * @param border The border value to truncate the number. Default is 1000.
- * @param asNumber Determines whether to return the result as a number (true) or string (false). Default is true.
- * @param digits The number of digits after the decimal point for the truncated number. Default is 0.
- * @returns The truncated number or string based on the provided parameters.
- */
-export function truncateNumber(
-  num: number | undefined,
-  border = 1000,
-  asNumber = true,
-  digits = 0
-) {
-  if (num === undefined || num === null || isNaN(num)) {
-    return asNumber ? 0 : "";
-  }
-
-  const isNumGreaterThanBorder = num > border;
-
-  if (asNumber) {
-    if (isNumGreaterThanBorder) {
-      return Number(num.toFixed(digits));
-    }
-    return num;
-  }
-
-  if (isNumGreaterThanBorder) {
-    return num.toFixed(digits);
-  }
-
-  return num.toFixed(0);
 }

@@ -5,15 +5,10 @@ import {
   TextStyle,
   Text,
   Platform,
-  LayoutChangeEvent,
 } from "react-native";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Ticker, Tick } from "./index";
-import {
-  formatCompactExpenseWithCurrency,
-  formatExpenseWithCurrency,
-} from "../../../util/string";
-import { pickFittingCurrencyText } from "../FittingCurrencyAmount";
+import { useFittingCurrencyText } from "../FittingCurrencyAmount";
 import { i18n } from "../../../i18n/i18n";
 
 interface CurrencyTickerProps {
@@ -21,11 +16,8 @@ interface CurrencyTickerProps {
   currency: string;
   fontSize?: number;
   style?: StyleProp<TextStyle>;
-  /** @deprecated Fitting is layout-based; kept for call-site compat. */
-  truncate?: boolean;
-  /** @deprecated Unused; fitting uses container measure. */
-  truncateLimit?: number;
   disableAnimation?: boolean;
+  testID?: string;
 }
 
 /**
@@ -37,25 +29,12 @@ const CurrencyTicker: React.FC<CurrencyTickerProps> = ({
   fontSize = 50,
   style,
   disableAnimation = false,
+  testID = "currency-ticker",
 }) => {
-  const [containerWidth, setContainerWidth] = useState<number | null>(null);
-  const [fullWidth, setFullWidth] = useState<number | null>(null);
+  const { displayText, fullText, onContainerLayout, onFullProbeTextLayout } =
+    useFittingCurrencyText(value, currency, i18n.locale);
 
-  const fullText = useMemo(
-    () => formatExpenseWithCurrency(value, currency),
-    [value, currency]
-  );
-  const compactText = useMemo(
-    () => formatCompactExpenseWithCurrency(value, currency, i18n.locale),
-    [value, currency]
-  );
-
-  const formattedValue = pickFittingCurrencyText(
-    fullText,
-    compactText,
-    fullWidth,
-    containerWidth
-  );
+  const formattedValue = displayText;
 
   // Split the formatted value into parts
   const parts = useMemo(() => {
@@ -78,14 +57,6 @@ const CurrencyTicker: React.FC<CurrencyTickerProps> = ({
     };
   }, [formattedValue, value]);
 
-  function onContainerLayout(event: LayoutChangeEvent) {
-    setContainerWidth(event.nativeEvent.layout.width);
-  }
-
-  function onFullProbeLayout(event: LayoutChangeEvent) {
-    setFullWidth(event.nativeEvent.layout.width);
-  }
-
   const textStyle = [
     {
       fontSize,
@@ -105,12 +76,14 @@ const CurrencyTicker: React.FC<CurrencyTickerProps> = ({
   if (disableAnimation) {
     return (
       <View
+        testID={testID}
         style={[styles.container, styles.stretch]}
         onLayout={onContainerLayout}
       >
         <Text
+          testID={`${testID}-full-probe`}
           style={[textStyle, styles.fullProbe]}
-          onLayout={onFullProbeLayout}
+          onTextLayout={onFullProbeTextLayout}
           numberOfLines={1}
           importantForAccessibility="no-hide-descendants"
           accessibilityElementsHidden
@@ -126,12 +99,14 @@ const CurrencyTicker: React.FC<CurrencyTickerProps> = ({
 
   return (
     <View
+      testID={testID}
       style={[styles.container, styles.stretch, style]}
       onLayout={onContainerLayout}
     >
       <Text
+        testID={`${testID}-full-probe`}
         style={[{ fontSize, fontWeight: "bold" }, styles.fullProbe]}
-        onLayout={onFullProbeLayout}
+        onTextLayout={onFullProbeTextLayout}
         numberOfLines={1}
         importantForAccessibility="no-hide-descendants"
         accessibilityElementsHidden
@@ -142,7 +117,7 @@ const CurrencyTicker: React.FC<CurrencyTickerProps> = ({
         {parts.prefix && (
           <Tick
             fontSize={fontSize * 0.8}
-            style={[styles.symbol, { color: (style as any)?.color }]}
+            style={[styles.symbol, { color: (style as TextStyle)?.color }]}
           >
             {parts.prefix}
           </Tick>
@@ -153,7 +128,7 @@ const CurrencyTicker: React.FC<CurrencyTickerProps> = ({
               <Tick
                 key={index}
                 fontSize={fontSize}
-                style={[styles.symbol, { color: (style as any)?.color }]}
+                style={[styles.symbol, { color: (style as TextStyle)?.color }]}
               >
                 {part}
               </Tick>
@@ -166,7 +141,7 @@ const CurrencyTicker: React.FC<CurrencyTickerProps> = ({
                 key={index}
                 value={num}
                 fontSize={fontSize}
-                textStyle={{ color: (style as any)?.color }}
+                textStyle={{ color: (style as TextStyle)?.color }}
               />
             );
           }
@@ -175,7 +150,7 @@ const CurrencyTicker: React.FC<CurrencyTickerProps> = ({
         {parts.suffix && (
           <Tick
             fontSize={fontSize * 0.8}
-            style={[styles.symbol, { color: (style as any)?.color }]}
+            style={[styles.symbol, { color: (style as TextStyle)?.color }]}
           >
             {parts.suffix}
           </Tick>

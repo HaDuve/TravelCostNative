@@ -7,6 +7,20 @@ import { fireEvent, render, screen } from "@testing-library/react-native";
 
 import { FittingCurrencyAmount } from "../../components/UI/FittingCurrencyAmount";
 
+function fireFullProbeTextLayout(width: number) {
+  fireEvent(
+    screen.getByTestId("fitting-currency-full-probe", {
+      includeHiddenElements: true,
+    }),
+    "textLayout",
+    {
+      nativeEvent: {
+        lines: [{ width, height: 20, x: 0, y: 0, ascender: 0, capHeight: 0, descender: 0, xHeight: 0 }],
+      },
+    }
+  );
+}
+
 describe("FittingCurrencyAmount", () => {
   it("shows compact currency text when the full amount is wider than the container", () => {
     render(
@@ -21,15 +35,7 @@ describe("FittingCurrencyAmount", () => {
     fireEvent(screen.getByTestId("fitting-currency"), "layout", {
       nativeEvent: { layout: { width: 40, height: 20, x: 0, y: 0 } },
     });
-    fireEvent(
-      screen.getByTestId("fitting-currency-full-probe", {
-        includeHiddenElements: true,
-      }),
-      "layout",
-      {
-        nativeEvent: { layout: { width: 80, height: 20, x: 0, y: 0 } },
-      }
-    );
+    fireFullProbeTextLayout(80);
 
     expect(screen.getByText("10k€")).toBeTruthy();
   });
@@ -47,15 +53,7 @@ describe("FittingCurrencyAmount", () => {
     fireEvent(screen.getByTestId("fitting-currency"), "layout", {
       nativeEvent: { layout: { width: 120, height: 20, x: 0, y: 0 } },
     });
-    fireEvent(
-      screen.getByTestId("fitting-currency-full-probe", {
-        includeHiddenElements: true,
-      }),
-      "layout",
-      {
-        nativeEvent: { layout: { width: 80, height: 20, x: 0, y: 0 } },
-      }
-    );
+    fireFullProbeTextLayout(80);
 
     expect(screen.queryByText("10k€")).toBeNull();
     expect(

@@ -221,8 +221,6 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
           currency={tripCurrency}
           fontSize={periodHeaderLabelFontSize}
           style={{ color: budgetColor }}
-          truncate={true}
-          truncateLimit={1000}
           disableAnimation={settings.disableNumberAnimations}
         />
       </View>

@@ -285,6 +285,41 @@ describe("TripForm Leave trip confirm dialog", () => {
     );
   });
 
+  it("does not warn the leaver about open Balances that only involve other Travellers", async () => {
+    getTravellersMock.mockResolvedValue([
+      { uid: "u1", userName: "Alice" },
+      { uid: "u2", userName: "Bob" },
+      { uid: "u3", userName: "Charlie" },
+    ]);
+    getAllExpensesMock.mockResolvedValue([
+      makeExpense({
+        whoPaid: "Bob",
+        amount: 80,
+        calcAmount: 80,
+        currency: "EUR",
+        splitList: [
+          { userName: "Bob", amount: 40 },
+          { userName: "Charlie", amount: 40 },
+        ],
+      }),
+    ]);
+
+    const screen = renderEditForm();
+    fireEvent.press(await screen.findByText(i18n.t("leaveTrip")));
+
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalledWith(
+        i18n.t("leaveTrip"),
+        i18n.t("leaveTripSure"),
+        expect.any(Array),
+        expect.any(Object)
+      );
+    });
+    expect(alertSpy.mock.calls[0][1]).not.toContain(
+      i18n.t("leaveTripOpenBalancesWarning")
+    );
+  });
+
   it("has open-Balance warning copy in EN/DE/FR/RU", () => {
     for (const locale of [en, de, fr, ru]) {
       expect(locale.leaveTripOpenBalancesWarning.length).toBeGreaterThan(10);

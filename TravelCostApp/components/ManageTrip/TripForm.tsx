@@ -61,7 +61,7 @@ import {
 import { activateTrip } from "../../util/activate-trip";
 import {
   leaveConfirmMessage,
-  openBalancesForTraveller,
+  resolveLeaverOpenBalances,
 } from "../../util/leave-trip";
 import { planTripLeave } from "../../util/plan-trip-leave";
 import BackButton from "../UI/BackButton";
@@ -285,37 +285,17 @@ const TripForm = ({ navigation, route }) => {
     navigation.pop();
   }
 
-  async function resolveLeaverOpenBalances(
-    tripid: string,
-    uid: string,
-    roster: { uid: string; userName?: string }[]
-  ) {
-    const leaverUserName =
-      roster.find((traveller) => traveller.uid === uid)?.userName ??
-      userCtx.userName;
-    if (!leaverUserName) {
-      return [];
-    }
-
-    if (tripid === tripCtx.tripid) {
-      return openBalancesForTraveller(
-        expenseCtx.expenses ?? [],
-        tripCtx.tripCurrency,
-        tripCtx.isPaidTimestamp,
-        leaverUserName
-      );
-    }
-
-    const [expenses, trip] = await Promise.all([
-      getAllExpenses(tripid, uid),
-      fetchTrip(tripid),
-    ]);
-    return openBalancesForTraveller(
-      expenses ?? [],
-      trip?.tripCurrency ?? inputs.tripCurrency.value,
-      trip?.isPaidTimestamp,
-      leaverUserName
-    );
+  function leaverOpenBalancesDeps() {
+    return {
+      activeTripId: tripCtx.tripid,
+      activeExpenses: expenseCtx.expenses ?? [],
+      activeTripCurrency: tripCtx.tripCurrency,
+      activeIsPaidTimestamp: tripCtx.isPaidTimestamp,
+      fallbackTripCurrency: inputs.tripCurrency.value,
+      userNameFallback: userCtx.userName,
+      getAllExpenses,
+      fetchTrip,
+    };
   }
 
   async function leaveAcceptHandler() {
@@ -334,7 +314,8 @@ const TripForm = ({ navigation, route }) => {
       const openBalances = await resolveLeaverOpenBalances(
         editedTripId,
         uid,
-        roster
+        roster,
+        leaverOpenBalancesDeps()
       );
       const result = await tripCtx.leaveTrip(editedTripId, {
         uid,
@@ -397,7 +378,8 @@ const TripForm = ({ navigation, route }) => {
       const openBalances = await resolveLeaverOpenBalances(
         editedTripId,
         uid,
-        roster
+        roster,
+        leaverOpenBalancesDeps()
       );
       const plan = planTripLeave({
         tripHistory: userCtx.tripHistory ?? [],

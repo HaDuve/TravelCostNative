@@ -11,13 +11,46 @@ import {
   activateTrip,
   type ActivateTripDeps,
 } from "./activate-trip";
+import type { ExpenseData, Split } from "./expense";
 import {
   planTripLeave,
   type PlanTripLeaveResult,
+  type TripLeaveWarning,
 } from "./plan-trip-leave";
+import { rollupOpenBalances } from "./split";
 import type { Traveller } from "./traveler";
 
 export const UNDO_LEAVE_WINDOW_MS = 8000;
+
+/**
+ * Open Balances that involve a Traveller (as debtor or who paid),
+ * from the trip-wide rollup — used to feed `planTripLeave` warnings.
+ */
+export function openBalancesForTraveller(
+  expenses: ExpenseData[],
+  tripCurrency: string,
+  isPaidTimestamp: number | undefined,
+  travellerUserName: string
+): Split[] {
+  return rollupOpenBalances(expenses, tripCurrency, isPaidTimestamp).filter(
+    (balance) =>
+      balance.userName === travellerUserName ||
+      balance.whoPaid === travellerUserName
+  );
+}
+
+/** Confirm-dialog body for Leave trip: base copy plus optional open-Balance warning. */
+export function leaveConfirmMessage(
+  warnings: readonly TripLeaveWarning[]
+): string {
+  const base = warnings.includes("permanentDelete")
+    ? i18n.t("leaveTripPermanentDeleteSure")
+    : i18n.t("leaveTripSure");
+  if (!warnings.includes("openBalances")) {
+    return base;
+  }
+  return `${base}\n\n${i18n.t("leaveTripOpenBalancesWarning")}`;
+}
 
 export type LeaveTripDeps = {
   uid: string;

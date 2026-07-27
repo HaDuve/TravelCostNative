@@ -59,6 +59,10 @@ import {
   secureStoreSetItem,
 } from "../../store/secure-storage";
 import { activateTrip } from "../../util/activate-trip";
+import {
+  leaveConfirmMessage,
+  openBalancesForTraveller,
+} from "../../util/leave-trip";
 import { planTripLeave } from "../../util/plan-trip-leave";
 import BackButton from "../UI/BackButton";
 import { onShare } from "../ProfileOutput/ShareTrip";
@@ -281,6 +285,39 @@ const TripForm = ({ navigation, route }) => {
     navigation.pop();
   }
 
+  async function resolveLeaverOpenBalances(
+    tripid: string,
+    uid: string,
+    roster: { uid: string; userName?: string }[]
+  ) {
+    const leaverUserName =
+      roster.find((traveller) => traveller.uid === uid)?.userName ??
+      userCtx.userName;
+    if (!leaverUserName) {
+      return [];
+    }
+
+    if (tripid === tripCtx.tripid) {
+      return openBalancesForTraveller(
+        expenseCtx.expenses ?? [],
+        tripCtx.tripCurrency,
+        tripCtx.isPaidTimestamp,
+        leaverUserName
+      );
+    }
+
+    const [expenses, trip] = await Promise.all([
+      getAllExpenses(tripid, uid),
+      fetchTrip(tripid),
+    ]);
+    return openBalancesForTraveller(
+      expenses ?? [],
+      trip?.tripCurrency ?? inputs.tripCurrency.value,
+      trip?.isPaidTimestamp,
+      leaverUserName
+    );
+  }
+
   async function leaveAcceptHandler() {
     const uid = authCtx.uid ?? (await secureStoreGetItem("uid"));
     if (!uid || !editedTripId) return;
@@ -293,11 +330,17 @@ const TripForm = ({ navigation, route }) => {
     });
 
     try {
+      const roster = await getTravellers(editedTripId);
+      const openBalances = await resolveLeaverOpenBalances(
+        editedTripId,
+        uid,
+        roster
+      );
       const result = await tripCtx.leaveTrip(editedTripId, {
         uid,
         tripHistory: userCtx.tripHistory ?? [],
         getTravellers,
-        openBalances: [],
+        openBalances,
         removeFromTripHistoryLocal: userCtx.removeTripFromHistory,
         restoreTripHistoryLocal: userCtx.restoreTripHistory,
         activate: {
@@ -348,20 +391,24 @@ const TripForm = ({ navigation, route }) => {
     }
     if (!editedTripId) return;
     try {
+      const uid = authCtx.uid ?? (await secureStoreGetItem("uid"));
+      if (!uid) return;
       const roster = await getTravellers(editedTripId);
+      const openBalances = await resolveLeaverOpenBalances(
+        editedTripId,
+        uid,
+        roster
+      );
       const plan = planTripLeave({
         tripHistory: userCtx.tripHistory ?? [],
         roster,
-        openBalances: [],
+        openBalances,
         activeTripId: tripCtx.tripid,
         tripid: editedTripId,
       });
-      const message = plan.warnings.includes("permanentDelete")
-        ? i18n.t("leaveTripPermanentDeleteSure")
-        : i18n.t("leaveTripSure");
       Alert.alert(
         i18n.t("leaveTrip"),
-        message,
+        leaveConfirmMessage(plan.warnings),
         [
           {
             text: i18n.t("cancel"),

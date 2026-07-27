@@ -298,6 +298,23 @@ const TripForm = ({ navigation, route }) => {
         getTravellers,
         openBalances: [],
         removeFromTripHistoryLocal: userCtx.removeTripFromHistory,
+        activate: {
+          previousTripSnapshot: tripCtx.getcurrentTrip(),
+          previousExpensesSnapshot: expenseCtx.expenses,
+          fetchTrip,
+          getTravellers,
+          getAllExpenses,
+          updateUser,
+          secureStoreGetItem,
+          secureStoreSetItem,
+          setCurrentTrip: tripCtx.setCurrentTrip,
+          saveTripDataInStorage: tripCtx.saveTripDataInStorage,
+          saveTravellersInStorage: tripCtx.saveTravellersInStorage,
+          setExpenses: expenseCtx.setExpenses,
+          setExpensesCache: (nextExpenses) =>
+            setMMKVObject(MMKV_KEYS.EXPENSES, nextExpenses),
+          setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
+        },
       });
 
       Toast.hide();
@@ -308,6 +325,14 @@ const TripForm = ({ navigation, route }) => {
           type: "error",
         });
         return;
+      }
+      if (result.nextActiveTripId) {
+        Toast.show({
+          type: "success",
+          text1: i18n.t("leaveTripNowShowing", {
+            name: result.promotedTripName || i18n.t("trip"),
+          }),
+        });
       }
       navigation.pop();
     } catch (error) {

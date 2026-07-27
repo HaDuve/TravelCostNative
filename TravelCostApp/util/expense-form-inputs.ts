@@ -128,11 +128,11 @@ export function resolveLoadedLastCurrencyIfStale(
     tripCurrency: input.tripCurrency,
     mostRecentExpenseCurrency: input.mostRecentExpenseCurrency,
   });
+  const stillOnTripDefault =
+    input.currentCurrency === beforeLastCurrencyLoaded ||
+    (!input.currentCurrency?.trim() && beforeLastCurrencyLoaded?.trim());
 
-  if (
-    input.currentCurrency === beforeLastCurrencyLoaded &&
-    preferred !== input.currentCurrency
-  ) {
+  if (stillOnTripDefault && preferred !== input.currentCurrency) {
     return preferred;
   }
 

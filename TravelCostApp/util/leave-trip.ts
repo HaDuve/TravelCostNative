@@ -1,6 +1,7 @@
 import Toast from "react-native-toast-message";
 import { i18n } from "../i18n/i18n";
 import {
+  deleteTrip,
   putTravelerInTrip,
   removeTravelerFromTrip,
   removeTripFromHistory as removeTripFromHistoryRemote,
@@ -40,7 +41,7 @@ export type LeaveTripDeps = {
 };
 
 export type LeaveTripResult = PlanTripLeaveResult & {
-  /** True when roster + Trip history writes ran (plain leave only). */
+  /** True when leave or cascade-delete writes ran. */
   performed: boolean;
   /** Trip name after Active trip promotion; null when no promotion ran. */
   promotedTripName: string | null;
@@ -117,9 +118,9 @@ function showLeftTripToast(
 }
 
 /**
- * Leave trip orchestration for the plain-leave path, including Active trip
- * promotion via `activateTrip` when the left trip was active, and an Undo toast
- * mirroring delete-expense. Cascade-delete is planned but not executed here.
+ * Leave trip orchestration: plain leave (roster + Trip history + optional Undo)
+ * or cascade-delete when the leaver is the last Traveller (DELETE trip; no Undo).
+ * Active trip promotion runs before either write path when needed.
  */
 export async function leaveTrip(
   tripid: string,
@@ -134,24 +135,14 @@ export async function leaveTrip(
     tripid,
   });
 
-  if (!plan.allowed || plan.mode !== "leave") {
+  if (!plan.allowed) {
     return { ...plan, performed: false, promotedTripName: null };
   }
-
-  const leaver = roster.find((t) => t.uid === deps.uid);
-  if (!leaver?.userName) {
-    throw new Error(
-      "leaveTrip: Traveller roster entry with userName required for leave"
-    );
-  }
-  const userName = leaver.userName;
-  const previousTripHistory = [...deps.tripHistory];
-  const previousActiveTripId = plan.nextActiveTripId ? tripid : null;
 
   let promotedTripName: string | null = null;
 
   // Promote first when leaving the Active trip so a failed activateTrip does
-  // not leave the User without a valid Active trip after roster/history writes.
+  // not leave the User without a valid Active trip after leave/cascade writes.
   if (plan.nextActiveTripId) {
     if (!deps.activate) {
       throw new Error(
@@ -164,6 +155,31 @@ export async function leaveTrip(
     });
     promotedTripName = tripData.tripName ?? null;
   }
+
+  if (plan.mode === "cascadeDelete") {
+    const deleted = await deleteTrip(tripid);
+    if (!deleted) {
+      throw new Error("leaveTrip: cascade-delete failed");
+    }
+    await removeTripFromHistoryRemote(deps.uid, tripid);
+    deps.removeFromTripHistoryLocal(tripid);
+    Toast.hide();
+    return {
+      ...plan,
+      performed: true,
+      promotedTripName,
+    };
+  }
+
+  const leaver = roster.find((t) => t.uid === deps.uid);
+  if (!leaver?.userName) {
+    throw new Error(
+      "leaveTrip: Traveller roster entry with userName required for leave"
+    );
+  }
+  const userName = leaver.userName;
+  const previousTripHistory = [...deps.tripHistory];
+  const previousActiveTripId = plan.nextActiveTripId ? tripid : null;
 
   await removeTravelerFromTrip(tripid, deps.uid);
   await removeTripFromHistoryRemote(deps.uid, tripid);

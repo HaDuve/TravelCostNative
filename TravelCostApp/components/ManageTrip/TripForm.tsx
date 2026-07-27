@@ -59,6 +59,7 @@ import {
   secureStoreSetItem,
 } from "../../store/secure-storage";
 import { activateTrip } from "../../util/activate-trip";
+import { planTripLeave } from "../../util/plan-trip-leave";
 import BackButton from "../UI/BackButton";
 import { onShare } from "../ProfileOutput/ShareTrip";
 import { NetworkContext } from "../../store/network-context";
@@ -327,7 +328,7 @@ const TripForm = ({ navigation, route }) => {
         });
         return;
       }
-      // leaveTrip shows the Undo toast (and hides the loading toast).
+      // Plain leave: leaveTrip shows Undo toast. Cascade-delete: no Undo.
       navigation.pop();
     } catch (error) {
       safeLogError(error);
@@ -340,29 +341,46 @@ const TripForm = ({ navigation, route }) => {
     }
   }
 
-  function leaveHandler() {
+  async function leaveHandler() {
     if (!isConnected) {
       Alert.alert(i18n.t("noConnection"), i18n.t("leaveTripConnectRequired"));
       return;
     }
-    Alert.alert(
-      i18n.t("leaveTrip"),
-      i18n.t("leaveTripSure"),
-      [
-        {
-          text: i18n.t("cancel"),
-          style: "cancel",
-        },
-        {
-          text: i18n.t("leaveTrip"),
-          style: "destructive",
-          onPress: () => {
-            void leaveAcceptHandler();
+    if (!editedTripId) return;
+    try {
+      const roster = await getTravellers(editedTripId);
+      const plan = planTripLeave({
+        tripHistory: userCtx.tripHistory ?? [],
+        roster,
+        openBalances: [],
+        activeTripId: tripCtx.tripid,
+        tripid: editedTripId,
+      });
+      const message = plan.warnings.includes("permanentDelete")
+        ? i18n.t("leaveTripPermanentDeleteSure")
+        : i18n.t("leaveTripSure");
+      Alert.alert(
+        i18n.t("leaveTrip"),
+        message,
+        [
+          {
+            text: i18n.t("cancel"),
+            style: "cancel",
           },
-        },
-      ],
-      { cancelable: false }
-    );
+          {
+            text: i18n.t("leaveTrip"),
+            style: "destructive",
+            onPress: () => {
+              void leaveAcceptHandler();
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    } catch (error) {
+      safeLogError(error);
+      Alert.alert(i18n.t("error"), i18n.t("error2"));
+    }
   }
 
   async function editingTripData(tripData: TripData, setActive = false) {

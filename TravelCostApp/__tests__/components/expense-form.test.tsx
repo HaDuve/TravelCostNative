@@ -1,5 +1,5 @@
 import * as React from "react";
-import { fireEvent, render, waitFor } from "@testing-library/react-native";
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 
 jest.mock("@react-navigation/native", () => {
   const actual = jest.requireActual("@react-navigation/native");
@@ -48,6 +48,11 @@ jest.mock("../../store/secure-storage", () => ({
 
 jest.mock("../../util/currencyExchange", () => ({
   getRate: jest.fn(async () => 1),
+}));
+
+jest.mock("../../components/Premium/PremiumConstants", () => ({
+  isPremiumMember: jest.fn(async () => true),
+  ENTITLEMENT_ID: "premium",
 }));
 
 jest.mock("../../components/UI/DatePickerContainer", () => {
@@ -125,6 +130,7 @@ import { i18n } from "../../i18n/i18n";
 import { makeExpense } from "../fixtures/expense";
 import { AppProviders, renderWithAppProviders } from "../fixtures/app-providers";
 import { Alert } from "react-native";
+import { getExpenseDraft } from "../../store/mmkv";
 
 function renderNewExpenseForm(
   overrides: Parameters<typeof renderWithAppProviders>[1] = {}
@@ -176,7 +182,9 @@ function renderNewExpenseForm(
   );
 }
 
-function renderNewExpenseWithDeferredLastCountry() {
+function renderNewExpenseWithDeferredLastCountry(
+  onSubmit: jest.Mock = jest.fn(async () => {})
+) {
   const navigation = {
     navigate: jest.fn(),
     pop: jest.fn(),
@@ -211,6 +219,8 @@ function renderNewExpenseWithDeferredLastCountry() {
             userName: "Alice",
             lastCountry,
             lastCurrency,
+            setLastCountry: jest.fn(),
+            setLastCurrency: jest.fn(),
             setPeriodString: jest.fn(),
             isSendingOfflineQueueMutex: false,
             setIsSendingOfflineQueueMutex: jest.fn(),
@@ -226,12 +236,12 @@ function renderNewExpenseWithDeferredLastCountry() {
       >
         <ExpenseForm
           onCancel={jest.fn()}
-          onSubmit={jest.fn(async () => {})}
+          onSubmit={onSubmit}
           submitButtonLabel={i18n.t("add")}
           isEditing={false}
           defaultValues={makeExpense({
-            amount: 0,
-            description: "",
+            amount: 25,
+            description: "Hotel stay",
             whoPaid: "",
             splitList: [],
             listEQUAL: [],
@@ -378,5 +388,60 @@ describe("ExpenseForm", () => {
     });
 
     alertSpy.mockRestore();
+  });
+
+  it("submits latest-used country on advanced save after secure storage loads", async () => {
+    jest.useFakeTimers();
+    const onSubmit = jest.fn(async () => {});
+    const screen = renderNewExpenseWithDeferredLastCountry(onSubmit);
+
+    fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("expense-form-country-flag")).toHaveTextContent(
+        "US"
+      );
+    });
+
+    await act(async () => {
+      fireEvent.press(screen.getAllByText(i18n.t("add")).pop()!);
+      jest.advanceTimersByTime(600);
+    });
+
+    expect(onSubmit).toHaveBeenCalled();
+    expect(onSubmit.mock.calls[0][0].country).toBe("US");
+    jest.useRealTimers();
+  });
+
+  it("applies latest-used country after restoring a draft with an empty country", async () => {
+    const draftExpense = makeExpense({
+      amount: 25,
+      description: "Hotel stay",
+      country: "",
+      currency: "EUR",
+    });
+    (getExpenseDraft as jest.Mock).mockReturnValue(draftExpense);
+
+    const alertSpy = jest
+      .spyOn(Alert, "alert")
+      .mockImplementation((_title, _message, buttons) => {
+        const restoreButton = buttons?.find(
+          (button) => button.text === i18n.t("restore")
+        );
+        restoreButton?.onPress?.();
+      });
+
+    const screen = renderNewExpenseWithDeferredLastCountry();
+
+    fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("expense-form-country-flag")).toHaveTextContent(
+        "US"
+      );
+    });
+
+    alertSpy.mockRestore();
+    (getExpenseDraft as jest.Mock).mockReturnValue(undefined);
   });
 });

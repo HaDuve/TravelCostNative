@@ -121,6 +121,17 @@ describe("resolveLoadedLastCountryIfStale", () => {
       })
     ).toBeNull();
   });
+
+  it("returns latest-used country when a restored draft left country empty", () => {
+    expect(
+      resolveLoadedLastCountryIfStale({
+        isEditing: false,
+        lastCountry: "US",
+        currentCountry: "",
+        mostRecentExpenseCountry: "DE",
+      })
+    ).toBe("US");
+  });
 });
 
 describe("resolveLoadedLastCurrencyIfStale", () => {
@@ -134,6 +145,18 @@ describe("resolveLoadedLastCurrencyIfStale", () => {
         mostRecentExpenseCurrency: "EUR",
       })
     ).toBe("USD");
+  });
+
+  it("returns null when the user already changed currency away from trip defaults", () => {
+    expect(
+      resolveLoadedLastCurrencyIfStale({
+        isEditing: false,
+        lastCurrency: "USD",
+        currentCurrency: "GBP",
+        tripCurrency: "EUR",
+        mostRecentExpenseCurrency: "EUR",
+      })
+    ).toBeNull();
   });
 });
 

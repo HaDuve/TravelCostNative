@@ -88,9 +88,12 @@ export function resolveLoadedLastCountryIfStale(
     lastCountry: "",
     mostRecentExpenseCountry: input.mostRecentExpenseCountry,
   });
+  const stillOnTripDefault =
+    countriesRepresentSamePlace(input.currentCountry, beforeLastCountryLoaded) ||
+    (!input.currentCountry?.trim() && beforeLastCountryLoaded?.trim());
 
   if (
-    countriesRepresentSamePlace(input.currentCountry, beforeLastCountryLoaded) &&
+    stillOnTripDefault &&
     !countriesRepresentSamePlace(preferred, input.currentCountry)
   ) {
     return preferred;

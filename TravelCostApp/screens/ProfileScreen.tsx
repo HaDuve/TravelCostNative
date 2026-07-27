@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import ProfileForm from "../components/ManageProfile/ProfileForm";
 import TripList from "../components/ProfileOutput/TripList";
-import IconButton from "../components/UI/IconButton";
+import MyBudgetsHubActions from "../components/ProfileOutput/MyBudgetsHubActions";
 import FeedbackForm from "../components/FeedbackForm/FeedbackForm";
 import { GlobalStyles } from "../constants/styles";
 import { shadowRegressionStyles } from "../styles/shadow-regression-styles";
@@ -39,6 +39,7 @@ import GradientButton from "../components/UI/GradientButton";
 import safeLogError from "../util/error";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
+import IconButton from "../components/UI/IconButton";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -233,26 +234,14 @@ const ProfileScreen = ({ navigation }) => {
         </GradientButton>
       </View>
       <View style={styles.tripContainer} testID="profile-trip-container">
-        <View style={styles.horizontalContainer}>
-          <Text style={styles.tripListTitle}>{i18n.t("myTrips")}</Text>
-          <IconButton
-            icon={"globe-outline"}
-            size={dynamicScale(36, false, 0.5)}
-            buttonStyle={styles.newTripButtonContainer}
-            color={GlobalStyles.colors.primary400}
-            badge={null}
-            badgeText={null}
-            badgeStyle={null}
-            onPressIn={null}
-            onPressOut={null}
-            onLongPress={null}
-            category={null}
-            onPress={() => {
-              trackEvent(VexoEvents.CREATE_TRIP_FROM_PROFILE_PRESSED);
-              navigation.navigate("ManageTrip");
-            }}
-          />
-        </View>
+        <Text style={styles.tripListTitle}>{i18n.t("myBudgets")}</Text>
+        <MyBudgetsHubActions
+          onJoin={() => navigation.navigate("Join")}
+          onAddAnother={() =>
+            navigation.navigate("ManageTrip", { mode: "addAnother" })
+          }
+        />
+        <Text style={styles.listSectionLabel}>{i18n.t("yourBudgets")}</Text>
         <TripList trips={tripHistory}></TripList>
       </View>
       <View style={styles.horizontalButtonContainer}>
@@ -371,6 +360,17 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     color: GlobalStyles.colors.gray700,
     marginLeft: dynamicScale(10),
+    marginBottom: dynamicScale(12, true),
+  },
+  listSectionLabel: {
+    fontSize: dynamicScale(13, false, 0.5),
+    fontWeight: "600",
+    color: GlobalStyles.colors.gray700,
+    marginTop: dynamicScale(8, true),
+    marginBottom: dynamicScale(8, true),
+    marginLeft: dynamicScale(4),
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   deleteContainer: {
     marginTop: dynamicScale(16, true),

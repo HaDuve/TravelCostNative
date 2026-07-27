@@ -10,6 +10,10 @@ import { useHeaderHeight } from "@react-navigation/elements";
 
 import { useCallback, useContext, useEffect, useState } from "react";
 import {
+  applyJoinImplicitDefaultCleanup,
+  resolveJoinImplicitDefaultDecision,
+} from "../util/join-implicit-default";
+import {
   fetchTrip,
   getAllExpenses,
   storeTripHistory,
@@ -17,6 +21,8 @@ import {
   updateTripHistory,
   putTravelerInTrip,
   getTravellers,
+  updateTrip,
+  deleteTrip,
 } from "../util/http";
 import { UserContext } from "../store/user-context";
 import { AuthContext } from "../store/auth-context";
@@ -146,7 +152,11 @@ const JoinTrip = ({ navigation, route }) => {
 
     setIsFetching(true);
     try {
-      tripid = joinTripid;
+      const previousActiveTripId = tripCtx.tripid;
+      const previousWasImplicit = tripCtx.isImplicitDefault === true;
+      const previousExpenseCount = expenseCtx.expenses?.length ?? 0;
+
+      tripid = joinTripid || tripid;
 
       // if fresh store history else update
       if (userCtx.freshlyCreated) {
@@ -154,7 +164,11 @@ const JoinTrip = ({ navigation, route }) => {
       } else {
         await updateTripHistory(uid, tripid);
       }
-      userCtx.setTripHistory(uniqBy([...(userCtx.tripHistory ?? []), tripid]));
+      const historyWithJoined = uniqBy([
+        ...(userCtx.tripHistory ?? []),
+        tripid,
+      ]);
+      userCtx.setTripHistory(historyWithJoined);
 
       updateUser(uid, {
         currentTrip: tripid,
@@ -186,6 +200,23 @@ const JoinTrip = ({ navigation, route }) => {
           uid: uid,
           userName: userCtx.userName,
         });
+
+      const joinDecision = resolveJoinImplicitDefaultDecision({
+        activeTripId: previousActiveTripId,
+        isImplicitDefault: previousWasImplicit,
+        expenseCount: previousExpenseCount,
+        joinedTripId: tripid,
+        promotedTripName: i18n.t("myBudgetAutoName"),
+      });
+      await applyJoinImplicitDefaultCleanup(joinDecision, {
+        uid,
+        tripHistory: historyWithJoined,
+        updateTrip,
+        deleteTrip,
+        storeTripHistory,
+        setTripHistory: userCtx.setTripHistory,
+      });
+
       // // Immediately reload the React Native Bundle
       // const r = await reloadApp();
       // if (r == -1)

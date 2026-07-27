@@ -48,6 +48,7 @@ import { Platform } from "react-native";
 import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 import { computeDynamicDailyBudget } from "../../util/budget";
+import { isImplicitDefaultTrip } from "../../util/implicit-default-trip";
 
 export type TripHistoryItemType = {
   tripid: string;
@@ -56,12 +57,14 @@ export type TripHistoryItemType = {
   dailyBudget: string;
   tripCurrency: string;
   isDynamicDailyBudget: boolean;
+  isImplicitDefault?: boolean;
   startDate: string;
   endDate: string;
   travellers: Traveller[];
   sumOfExpenses: number;
   progress: number;
   days: number;
+  expenseCount?: number;
 };
 
 function TripHistoryItem({ tripid, trips }) {
@@ -81,6 +84,8 @@ function TripHistoryItem({ tripid, trips }) {
   const [progress, setProgress] = useState(0);
   const [allLoaded, setAllLoaded] = useState(false);
   const [isDynamicDailyBudget, setIsDynamicDailyBudget] = useState(false);
+  const [isImplicitDefault, setIsImplicitDefault] = useState(false);
+  const [expenseCount, setExpenseCount] = useState(0);
   const [days, setDays] = useState(0);
 
   const storeTripHistoryItem = useCallback(
@@ -93,12 +98,14 @@ function TripHistoryItem({ tripid, trips }) {
         dailyBudget: dailyBudget,
         tripCurrency: tripCurrency,
         isDynamicDailyBudget: isDynamicDailyBudget,
+        isImplicitDefault: isImplicitDefault,
         startDate: tripCtx.startDate,
         endDate: tripCtx.endDate,
         travellers: travellers,
         sumOfExpenses: sumOfExpenses,
         progress: progress,
         days: days,
+        expenseCount: expenseCount,
       };
       setMMKVObject(MMKV_KEY_PATTERNS.TRIP_HISTORY_ITEM(tripid), trip);
     },
@@ -106,7 +113,9 @@ function TripHistoryItem({ tripid, trips }) {
     [
       dailyBudget,
       days,
+      expenseCount,
       isDynamicDailyBudget,
+      isImplicitDefault,
       progress,
       sumOfExpenses,
       totalBudget,
@@ -128,9 +137,13 @@ function TripHistoryItem({ tripid, trips }) {
       setDailyBudget(trip.dailyBudget);
       setTripCurrency(trip.tripCurrency);
       setIsDynamicDailyBudget(trip.isDynamicDailyBudget);
+      setIsImplicitDefault(trip.isImplicitDefault === true);
       setSumOfExpenses(trip.sumOfExpenses);
       setProgress(trip.progress);
       setDays(trip.days);
+      if (typeof trip.expenseCount === "number") {
+        setExpenseCount(trip.expenseCount);
+      }
       const roster = normalizeTravellers(trip.travellers);
       if (roster.length > 0) setTravellers(roster);
       setIsFetching(false);
@@ -140,6 +153,7 @@ function TripHistoryItem({ tripid, trips }) {
   const handleContextTrip = useCallback(() => {
     const isDynamic = tripCtx.isDynamicDailyBudget;
     setIsDynamicDailyBudget(isDynamic);
+    setIsImplicitDefault(tripCtx.isImplicitDefault === true);
     setTripName(tripCtx.tripName);
     setTotalBudget(tripCtx.totalBudget);
 
@@ -149,6 +163,7 @@ function TripHistoryItem({ tripid, trips }) {
       if (isNaN(Number(expense.calcAmount))) return acc;
       return acc + Number(expense.calcAmount);
     }, 0);
+    setExpenseCount(_expenses.length);
     const newProgress = sumOfExpenses / Number(tripCtx.totalBudget);
     if (isNaN(newProgress) || newProgress > 1) {
       setProgress(1);
@@ -177,6 +192,7 @@ function TripHistoryItem({ tripid, trips }) {
     tripCtx.dailyBudget,
     tripCtx.endDate,
     tripCtx.isDynamicDailyBudget,
+    tripCtx.isImplicitDefault,
     tripCtx.startDate,
     tripCtx.totalBudget,
     tripCtx.travellers,
@@ -246,6 +262,8 @@ function TripHistoryItem({ tripid, trips }) {
 
         const isDynamic = trip.isDynamicDailyBudget;
         setIsDynamicDailyBudget(isDynamic);
+        setIsImplicitDefault(isImplicitDefaultTrip(trip));
+        setExpenseCount(_expenses?.length ?? 0);
         const startDate = trip.startDate;
         const endDate = trip.endDate;
         const days = daysBetween(new Date(endDate), new Date(startDate));
@@ -343,12 +361,28 @@ function TripHistoryItem({ tripid, trips }) {
       tripId: tripid,
       isActiveTrip: contextTrip,
     });
-    navigation.navigate("ManageTrip", { tripId: tripid, trips: trips });
+    const rowIsImplicit =
+      isImplicitDefault ||
+      (contextTrip && tripCtx.isImplicitDefault === true);
+    // useNavigation() is untyped in this screen tree
+    (navigation as { navigate: (screen: string, params?: object) => void }).navigate(
+      "ManageTrip",
+      rowIsImplicit
+        ? { tripId: tripid, trips: trips, mode: "promote" }
+        : { tripId: tripid, trips: trips }
+    );
   }
 
   const activeBorder = contextTrip
-    ? { borderWidth: 1, borderColor: GlobalStyles.colors.primary400 }
+    ? { borderWidth: 2, borderColor: GlobalStyles.colors.primary400 }
     : {};
+
+  const displayTripName = isImplicitDefault
+    ? i18n.t("yourBudget")
+    : tripName;
+  const implicitSubtitle = isImplicitDefault
+    ? i18n.t("implicitBudgetExpenseCount", { count: expenseCount })
+    : null;
 
   const activeProgress = progress;
   const isOverBudget = noTotalBudget
@@ -464,15 +498,35 @@ function TripHistoryItem({ tripid, trips }) {
           style={[styles.topRow, isScaledUp && { flexDirection: "column" }]}
         >
           <View>
-            <Text
-              style={[
-                styles.textBase,
-                styles.description,
-                isScaledUp && { textAlign: "center" },
-              ]}
-            >
-              {truncateString(tripName, dimensionChars)}
-            </Text>
+            <View style={styles.titleRow}>
+              <Text
+                style={[
+                  styles.textBase,
+                  styles.description,
+                  isScaledUp && { textAlign: "center" },
+                  styles.titleFlex,
+                ]}
+              >
+                {truncateString(displayTripName, dimensionChars)}
+              </Text>
+              {contextTrip && (
+                <View style={styles.activePill} testID="active-trip-pill">
+                  <Text style={styles.activePillText}>
+                    {i18n.t("activeTripLabel")}
+                  </Text>
+                </View>
+              )}
+            </View>
+            {implicitSubtitle ? (
+              <Text
+                style={[
+                  styles.implicitSubtitle,
+                  isScaledUp && { textAlign: "center" },
+                ]}
+              >
+                {implicitSubtitle}
+              </Text>
+            ) : null}
             <View
               style={[
                 styles.dailyRow,
@@ -605,7 +659,34 @@ const styles = StyleSheet.create({
     marginBottom: dynamicScale(4, true),
     fontWeight: "300",
     fontStyle: "italic",
-    width: dynamicScale(110),
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: dynamicScale(8),
+    maxWidth: dynamicScale(150),
+  },
+  titleFlex: {
+    flexShrink: 1,
+    width: undefined,
+    maxWidth: dynamicScale(110),
+  },
+  activePill: {
+    backgroundColor: GlobalStyles.colors.primary50,
+    paddingHorizontal: dynamicScale(8),
+    paddingVertical: dynamicScale(2, true),
+    borderRadius: 99,
+  },
+  activePillText: {
+    fontSize: dynamicScale(11, false, 0.5),
+    color: GlobalStyles.colors.primary700,
+    fontWeight: "600",
+  },
+  implicitSubtitle: {
+    fontSize: dynamicScale(12, false, 0.5),
+    color: GlobalStyles.colors.textHidden,
+    marginBottom: dynamicScale(4, true),
   },
   amountContainer: {
     paddingHorizontal: dynamicScale(12),

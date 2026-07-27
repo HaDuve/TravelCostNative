@@ -1,10 +1,15 @@
 import * as React from "react";
 
+const mockHubNavigate = jest.fn();
+
 jest.mock("@react-navigation/native", () => {
   const actual = jest.requireActual("@react-navigation/native");
   return {
     ...actual,
     useFocusEffect: jest.fn(),
+    useNavigation: () => ({
+      navigate: mockHubNavigate,
+    }),
   };
 });
 
@@ -70,7 +75,7 @@ jest.mock("../../components/FeedbackForm/FeedbackForm", () => () => null);
 import ProfileScreen from "../../screens/ProfileScreen";
 import { renderWithAppProviders } from "../fixtures/app-providers";
 import { assertNoNestedVerticalFlatLists } from "../../test-utils/scroll-composition";
-import { waitFor } from "@testing-library/react-native";
+import { fireEvent, waitFor } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 import { getTravellers } from "../../util/http";
 import { trackEvent } from "../../util/vexo-tracking";
@@ -96,6 +101,7 @@ function profileUserOverrides(
 describe("Profile screen", () => {
   beforeEach(() => {
     jest.mocked(trackEvent).mockClear();
+    mockHubNavigate.mockClear();
   });
 
   afterEach(() => {
@@ -118,7 +124,7 @@ describe("Profile screen", () => {
     );
 
     expect(screen.getByText("Alice")).toBeTruthy();
-    expect(screen.getByText("My Trips")).toBeTruthy();
+    expect(screen.getByText("My Budgets")).toBeTruthy();
     expect(screen.getByTestId("profile-trip-container")).toBeTruthy();
 
     await waitFor(() => {
@@ -133,7 +139,7 @@ describe("Profile screen", () => {
     });
   });
 
-  it("shows the signed-in User name and My Trips section", () => {
+  it("shows the signed-in User name and My Budgets hub (Variant B)", () => {
     const navigation = { navigate: jest.fn() };
     const screen = renderWithAppProviders(
       <ProfileScreen navigation={navigation as any} />,
@@ -146,7 +152,138 @@ describe("Profile screen", () => {
     );
 
     expect(screen.getByText("Alice")).toBeTruthy();
-    expect(screen.getByText("My Trips")).toBeTruthy();
+    expect(screen.getByText("My Budgets")).toBeTruthy();
+    expect(screen.getByText("Join budget")).toBeTruthy();
+    expect(screen.getByText("Add another budget")).toBeTruthy();
+    expect(screen.getByText("Your budgets")).toBeTruthy();
+  });
+
+  it("Join budget opens the existing join flow", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { setCurrentTrip: jest.fn(async () => {}) },
+        expenses: { setExpenses: jest.fn() },
+        user: profileUserOverrides(),
+      }
+    );
+
+    fireEvent.press(screen.getByTestId("my-budgets-join"));
+    expect(navigation.navigate).toHaveBeenCalledWith("Join");
+  });
+
+  it("Add another budget opens an empty create form", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: { setCurrentTrip: jest.fn(async () => {}) },
+        expenses: { setExpenses: jest.fn() },
+        user: profileUserOverrides(),
+      }
+    );
+
+    fireEvent.press(screen.getByTestId("my-budgets-add-another"));
+    expect(navigation.navigate).toHaveBeenCalledWith("ManageTrip", {
+      mode: "addAnother",
+    });
+  });
+
+  it("labels an implicit default Active trip as Your budget with expense count", async () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: {
+          setCurrentTrip: jest.fn(async () => {}),
+          tripid: "implicit-1",
+          tripName: "",
+          isImplicitDefault: true,
+          totalBudget: "0",
+          dailyBudget: "0",
+          tripCurrency: "EUR",
+          travellers: [{ uid: "u1", userName: "Alice" }],
+        },
+        expenses: {
+          setExpenses: jest.fn(),
+          getExpensesSum: () => 12,
+          expenses: [
+            { id: "e1", calcAmount: "5" },
+            { id: "e2", calcAmount: "7" },
+          ],
+        },
+        user: profileUserOverrides({ tripHistory: ["implicit-1"] }),
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Your budget")).toBeTruthy();
+      expect(screen.getByText(/2 expenses/)).toBeTruthy();
+    });
+  });
+
+  it("marks the Active trip clearly in the My Budgets list", async () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: {
+          setCurrentTrip: jest.fn(async () => {}),
+          tripid: "t1",
+          tripName: "Japan 2026",
+        },
+        expenses: { setExpenses: jest.fn(), getExpensesSum: () => 0 },
+        user: profileUserOverrides({ tripHistory: ["t1"] }),
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("trip-history-card-t1")).toBeTruthy();
+      expect(screen.getByText("Active")).toBeTruthy();
+    });
+  });
+
+  it("opens promote Name your budget when tapping an implicit default row", async () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileScreen navigation={navigation as any} />,
+      {
+        auth: { uid: "u1", logout: jest.fn() },
+        trip: {
+          setCurrentTrip: jest.fn(async () => {}),
+          tripid: "implicit-1",
+          tripName: "",
+          isImplicitDefault: true,
+          totalBudget: "0",
+          dailyBudget: "0",
+          tripCurrency: "EUR",
+          travellers: [{ uid: "u1", userName: "Alice" }],
+        },
+        network: { isConnected: true, strongConnection: true },
+        expenses: {
+          setExpenses: jest.fn(),
+          getExpensesSum: () => 0,
+          expenses: [],
+        },
+        user: profileUserOverrides({ tripHistory: ["implicit-1"] }),
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("trip-history-card-implicit-1")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByTestId("trip-history-card-implicit-1"));
+    expect(mockHubNavigate).toHaveBeenCalledWith("ManageTrip", {
+      tripId: "implicit-1",
+      trips: ["implicit-1"],
+      mode: "promote",
+    });
   });
 
   it("does not nest vertical FlatList inside ScrollView when trips are listed", async () => {

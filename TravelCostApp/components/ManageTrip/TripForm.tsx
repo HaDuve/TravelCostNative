@@ -20,6 +20,7 @@ import {
   updateTripHistory,
   updateTrip,
   getAllExpenses,
+  getTravellers,
   putTravelerInTrip,
 } from "../../util/http";
 
@@ -53,7 +54,11 @@ import Animated, {
   ZoomIn,
   ZoomOut,
 } from "react-native-reanimated";
-import { secureStoreSetItem } from "../../store/secure-storage";
+import {
+  secureStoreGetItem,
+  secureStoreSetItem,
+} from "../../store/secure-storage";
+import { activateTrip } from "../../util/activate-trip";
 import BackButton from "../UI/BackButton";
 import { onShare } from "../ProfileOutput/ShareTrip";
 import { NetworkContext } from "../../store/network-context";
@@ -315,23 +320,27 @@ const TripForm = ({ navigation, route }) => {
 
       setLoadingProgress(1);
       if (editedTripId === tripCtx.tripid || setActive) {
-        await secureStoreSetItem("currentTripId", editedTripId);
-        await tripCtx.saveTripDataInStorage(tripData);
-        setLoadingProgress(2);
-        await tripCtx.setCurrentTrip(editedTripId, tripData);
         setLoadingProgress(4);
-        await updateUser(uid, {
-          currentTrip: editedTripId,
+        await activateTrip(editedTripId, {
+          uid,
+          tripData,
+          previousTripSnapshot: tripCtx.getcurrentTrip(),
+          previousExpensesSnapshot: expenseCtx.expenses,
+          fetchTrip,
+          getTravellers,
+          getAllExpenses,
+          updateUser,
+          secureStoreGetItem,
+          secureStoreSetItem,
+          setCurrentTrip: tripCtx.setCurrentTrip,
+          saveTripDataInStorage: tripCtx.saveTripDataInStorage,
+          saveTravellersInStorage: tripCtx.saveTravellersInStorage,
+          setExpenses: expenseCtx.setExpenses,
+          setExpensesCache: (nextExpenses) =>
+            setMMKVObject(MMKV_KEYS.EXPENSES, nextExpenses),
+          setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
         });
-        setLoadingProgress(5);
-        await tripCtx.fetchAndSetTravellers(editedTripId);
-        setLoadingProgress(7);
-        await userCtx.setFreshlyCreatedTo(false);
-        setLoadingProgress(8);
-        const expenses = await getAllExpenses(editedTripId, uid);
         setLoadingProgress(9);
-        expenseCtx.mergeExpenses([...expenses]);
-        tripCtx.setdailyBudget(tripData.dailyBudget);
         return;
       }
       tripCtx.refresh();
@@ -341,6 +350,7 @@ const TripForm = ({ navigation, route }) => {
       safeLogError(error);
       navigation.popToTop();
       Toast.hide();
+      throw error;
     }
   }
 

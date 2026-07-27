@@ -4,7 +4,7 @@ import {
   resolveTripFormMode,
   shouldConfirmCurrencyChange,
 } from "../../util/trip-form";
-import { resolvePeriodStartDate } from "../../util/budget-free";
+import { resolvePeriodStartDate } from "../../util/budget";
 
 describe("trip-form", () => {
   describe("resolveTripFormMode", () => {
@@ -51,6 +51,21 @@ describe("trip-form", () => {
       expect(trip.endDate).toBeUndefined();
       expect(trip.totalBudget).toBe("0");
       expect(trip.dailyBudget).toBe("0");
+    });
+
+    it("clears isImplicitDefault on edit when the trip was an implicit default", () => {
+      const trip = buildTripFormSubmitData({
+        mode: "edit",
+        tripid: "implicit-1",
+        tripName: "Home",
+        tripCurrency: "EUR",
+        totalBudget: "",
+        dailyBudget: "",
+        isDynamicDailyBudget: false,
+        wasImplicitDefault: true,
+      });
+
+      expect(trip.isImplicitDefault).toBe(false);
     });
 
     it("addAnother creates a named trip without inventing dates", () => {

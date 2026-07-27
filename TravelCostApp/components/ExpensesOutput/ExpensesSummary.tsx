@@ -25,11 +25,9 @@ import { CurrencyTicker } from "../UI/AnimatedNumber";
 import {
   calculateDailyAverage,
   getBudgetColor,
-} from "../../util/budget";
-import {
-  periodProgressApplies,
   resolvePeriodStartDate,
-} from "../../util/budget-free";
+} from "../../util/budget";
+import { periodProgressApplies } from "../../util/budget-free";
 import BudgetOverviewModal from "./BudgetOverviewModal";
 
 const ExpensesSummary = ({ expenses, periodName, style = {} }) => {

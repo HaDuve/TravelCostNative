@@ -94,6 +94,29 @@ export function getBudgetColor(
 }
 
 /**
+ * Period average start: trip startDate, else earliest expense date, else undefined (all-time / skip).
+ */
+export function resolvePeriodStartDate(
+  tripStartDate: string | null | undefined,
+  expenseDates: Array<Date | string | null | undefined>
+): string | undefined {
+  if (tripStartDate && String(tripStartDate).trim().length > 0) {
+    const parsed = new Date(tripStartDate);
+    if (!Number.isNaN(parsed.getTime())) return String(tripStartDate).trim();
+  }
+
+  let earliest: Date | undefined;
+  for (const raw of expenseDates) {
+    if (!raw) continue;
+    const d = raw instanceof Date ? raw : new Date(raw);
+    if (Number.isNaN(d.getTime())) continue;
+    if (!earliest || d.getTime() < earliest.getTime()) earliest = d;
+  }
+  if (!earliest) return undefined;
+  return earliest.toISOString().slice(0, 10);
+}
+
+/**
  * Calculates the daily average spending for a given period.
  * The average is calculated from the current period + the previous period.
  */

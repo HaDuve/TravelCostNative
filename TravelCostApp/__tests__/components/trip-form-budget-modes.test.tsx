@@ -41,11 +41,20 @@ jest.mock("../../components/Currency/CurrencyPicker", () => () => null);
 jest.mock("../../components/UI/DatePickerModal", () => () => null);
 jest.mock("../../components/UI/DatePickerContainer", () => () => null);
 
-import { fireEvent } from "@testing-library/react-native";
+jest.mock("../../util/appState", () => ({
+  sleep: jest.fn(async () => {}),
+}));
+
+jest.mock("../../store/secure-storage", () => ({
+  secureStoreSetItem: jest.fn(async () => {}),
+}));
+
+import { fireEvent, waitFor } from "@testing-library/react-native";
 
 import TripForm from "../../components/ManageTrip/TripForm";
 import { i18n } from "../../i18n/i18n";
 import { renderWithAppProviders } from "../fixtures/app-providers";
+import { updateTrip } from "../../util/http";
 
 const navigation = {
   navigate: jest.fn(),
@@ -54,6 +63,10 @@ const navigation = {
 };
 
 describe("TripForm budget form modes", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (updateTrip as jest.Mock).mockResolvedValue({});
+  });
   it("shows Name your budget for promote mode with optional details collapsed", () => {
     const screen = renderWithAppProviders(
       <TripForm
@@ -138,5 +151,57 @@ describe("TripForm budget form modes", () => {
     expect(screen.getByTestId("trip-form-title").props.children).toBe(
       i18n.t("tripFormTitleEdit")
     );
+  });
+
+  it("naming an implicit default Active trip without mode clears isImplicitDefault via updateTrip", async () => {
+    const screen = renderWithAppProviders(
+      <TripForm
+        navigation={navigation}
+        route={{ params: { tripId: "t-implicit" } }}
+      />,
+      {
+        network: { isConnected: true, strongConnection: true },
+        trip: {
+          tripid: "t-implicit",
+          tripName: "",
+          tripCurrency: "EUR",
+          dailyBudget: "0",
+          totalBudget: "0",
+          isImplicitDefault: true,
+          travellers: ["Alice"],
+          saveTripDataInStorage: jest.fn(async () => {}),
+          setCurrentTrip: jest.fn(async () => {}),
+          fetchAndSetTravellers: jest.fn(async () => true),
+          setdailyBudget: jest.fn(),
+        },
+        user: {
+          setFreshlyCreatedTo: jest.fn(async () => {}),
+        },
+        expenses: {
+          expenses: [],
+          mergeExpenses: jest.fn(),
+        },
+        auth: { uid: "u1" },
+      }
+    );
+
+    expect(await screen.findByTestId("trip-form-title")).toBeTruthy();
+    expect(screen.getByTestId("trip-form-title").props.children).toBe(
+      i18n.t("tripFormTitlePromote")
+    );
+
+    const nameInput = screen.getByDisplayValue("");
+    fireEvent.changeText(nameInput, "Home budget");
+    fireEvent.press(screen.getByText(i18n.t("saveChanges")));
+
+    await waitFor(() => {
+      expect(updateTrip).toHaveBeenCalledWith(
+        "t-implicit",
+        expect.objectContaining({
+          tripName: "Home budget",
+          isImplicitDefault: false,
+        })
+      );
+    });
   });
 });

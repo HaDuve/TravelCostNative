@@ -58,12 +58,14 @@ export type BuildTripFormSubmitInput = {
   endDate?: string | null;
   tripid?: string;
   travellers?: TripData["travellers"];
+  /** When true, naming graduates an implicit default trip even if mode resolved as edit. */
+  wasImplicitDefault?: boolean;
 };
 
 /**
  * Build trip payload for promote / add-another / edit.
  * Does not invent dates or daily-from-total without dates.
- * Promote clears isImplicitDefault.
+ * Promote (or naming a previously implicit trip) clears isImplicitDefault.
  */
 export function buildTripFormSubmitData(
   input: BuildTripFormSubmitInput
@@ -109,7 +111,7 @@ export function buildTripFormSubmitData(
   if (endDate) tripData.endDate = endDate;
   if (input.tripid) tripData.tripid = input.tripid;
 
-  if (input.mode === "promote") {
+  if (input.mode === "promote" || input.wasImplicitDefault === true) {
     tripData.isImplicitDefault = false;
   }
 

@@ -161,7 +161,7 @@ const TripForm = ({ navigation, route }) => {
   const editedTripId = route.params?.tripId;
   const isEditing = !!editedTripId;
   const formMode: TripFormMode = resolveTripFormMode(route.params, {
-    isImplicitDefault: loadedIsImplicitDefault,
+    isImplicitDefault: loadedIsImplicitDefault || tripCtx.isImplicitDefault,
   });
   const isPromote = formMode === "promote";
   const isAddAnother = formMode === "addAnother";
@@ -224,8 +224,7 @@ const TripForm = ({ navigation, route }) => {
           startDate: tripCtx.startDate,
           endDate: tripCtx.endDate,
           travellers: tripCtx.travellers,
-          isImplicitDefault: (tripCtx as { isImplicitDefault?: boolean })
-            .isImplicitDefault,
+          isImplicitDefault: tripCtx.isImplicitDefault,
         });
         setIsLoading(false);
         return;
@@ -253,6 +252,7 @@ const TripForm = ({ navigation, route }) => {
     tripCtx.startDate,
     tripCtx.endDate,
     tripCtx.travellers,
+    tripCtx.isImplicitDefault,
   ]);
 
   const [countryValue, setCountryValue] = useState(
@@ -502,19 +502,15 @@ const TripForm = ({ navigation, route }) => {
         return;
       }
     }
-    navigation.pop();
-    Toast.show({
-      type: "loading",
-      text1: i18n.t("toastSaving1"),
-      text2: i18n.t("toastSaving2"),
-      autoHide: false,
-    });
     if (!isConnected) {
       Alert.alert(i18n.t("noConnection"), i18n.t("checkConnectionError"));
       setIsLoading(false);
-      Toast.hide();
       return;
     }
+    const wasImplicitDefault =
+      loadedIsImplicitDefault ||
+      tripCtx.isImplicitDefault === true ||
+      isPromote;
     const tripData: TripData = buildTripFormSubmitData({
       mode: formMode,
       tripName: inputs.tripName.value,
@@ -526,13 +522,22 @@ const TripForm = ({ navigation, route }) => {
       tripid: editedTripId,
       travellers: travellers,
       isDynamicDailyBudget: inputs.isDynamicDailyBudget.value,
+      wasImplicitDefault,
     });
 
     const formIsValid = checkFormValidity(tripData);
     if (!formIsValid) return;
+
+    navigation.pop();
+    Toast.show({
+      type: "loading",
+      text1: i18n.t("toastSaving1"),
+      text2: i18n.t("toastSaving2"),
+      autoHide: false,
+    });
     try {
-      if (isEditing || isPromote) {
-        await editingTripData(tripData, setActive || isPromote);
+      if (isEditing) {
+        await editingTripData(tripData, setActive || wasImplicitDefault);
       } else {
         await createTripData(tripData);
       }

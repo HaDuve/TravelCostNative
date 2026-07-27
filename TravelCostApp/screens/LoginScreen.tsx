@@ -133,13 +133,15 @@ function LoginScreen() {
           userName: userData.userName,
           existingTripHistory: userCtx.tripHistory,
           setCurrentTrip: tripCtx.setCurrentTrip,
+          saveTripDataInStorage: tripCtx.saveTripDataInStorage,
+          saveTravellersInStorage: tripCtx.saveTravellersInStorage,
+          setExpenses: expCtx.setExpenses,
+          setExpensesCache: (nextExpenses) =>
+            setMMKVObject(MMKV_KEYS.EXPENSES, nextExpenses),
           setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
           setTripHistory: userCtx.setTripHistory,
         });
         tripid = created.tripid;
-        // New implicit default has no ledger yet — not the activate-existing-trip path.
-        expCtx.setExpenses([]);
-        setMMKVObject(MMKV_KEYS.EXPENSES, []);
         await userCtx.loadCatListFromAsyncInCtx(tripid);
         tripCtx.refresh();
       } catch (error) {

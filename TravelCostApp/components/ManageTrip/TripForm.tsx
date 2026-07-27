@@ -59,7 +59,6 @@ import {
   secureStoreSetItem,
 } from "../../store/secure-storage";
 import { activateTrip } from "../../util/activate-trip";
-import { ACTIVE_TRIP_ID_KEY } from "../../util/active-trip-id";
 import BackButton from "../UI/BackButton";
 import { onShare } from "../ProfileOutput/ShareTrip";
 import { NetworkContext } from "../../store/network-context";
@@ -378,20 +377,6 @@ const TripForm = ({ navigation, route }) => {
     await putTravelerInTrip(tripid, { userName: userName, uid: uid });
     setLoadingProgress(4);
 
-    await secureStoreSetItem(ACTIVE_TRIP_ID_KEY, tripid);
-    // await asyncStoreSetObject("expenses", []);
-    setMMKVObject(MMKV_KEYS.EXPENSES, []);
-
-    // the following context state functions are unnecessary as long as we reload
-    try {
-      await tripCtx.setCurrentTrip(tripid, tripData);
-      setLoadingProgress(5);
-
-      expenseCtx.setExpenses([]);
-    } catch (error) {
-      safeLogError(error);
-    }
-
     try {
       if (userCtx.tripHistory?.length > 0)
         userCtx.setTripHistory([...userCtx.tripHistory, tripid]);
@@ -411,15 +396,34 @@ const TripForm = ({ navigation, route }) => {
       safeLogError(error);
     }
     setLoadingProgress(7);
-    await updateUser(uid, {
-      userName: userName,
-      currentTrip: tripid,
+
+    // Secure + server + context mirrors + empty ledger via activateTrip.
+    await activateTrip(tripid, {
+      uid,
+      tripData: { ...tripData, tripid },
+      previousTripSnapshot: tripCtx.getcurrentTrip(),
+      previousExpensesSnapshot: expenseCtx.expenses,
+      fetchTrip,
+      getTravellers,
+      getAllExpenses: async () => [],
+      updateUser: async (userId, data) => {
+        await updateUser(userId, {
+          userName: userName,
+          currentTrip: data.currentTrip,
+        });
+      },
+      secureStoreGetItem,
+      secureStoreSetItem,
+      setCurrentTrip: tripCtx.setCurrentTrip,
+      saveTripDataInStorage: tripCtx.saveTripDataInStorage,
+      saveTravellersInStorage: tripCtx.saveTravellersInStorage,
+      setExpenses: expenseCtx.setExpenses,
+      setExpensesCache: (nextExpenses) =>
+        setMMKVObject(MMKV_KEYS.EXPENSES, nextExpenses),
+      setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
     });
     setLoadingProgress(9);
-    expenseCtx.setExpenses([]);
-    setMMKVObject(MMKV_KEYS.EXPENSES, []);
 
-    await userCtx.setFreshlyCreatedTo(false);
     navigation.navigate("RecentExpenses");
   }
 

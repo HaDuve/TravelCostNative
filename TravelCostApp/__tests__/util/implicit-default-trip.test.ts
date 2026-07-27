@@ -80,6 +80,18 @@ describe("non-premium trip limit counting", () => {
 });
 
 describe("ensureImplicitDefaultActiveTrip", () => {
+  it("routes Active trip mirror writes through activateTrip", () => {
+    const { readFileSync } = require("fs");
+    const { join } = require("path");
+    const src = readFileSync(
+      join(__dirname, "../../util/implicit-default-trip.ts"),
+      "utf8"
+    );
+    expect(src).toMatch(/await activateTrip\(/);
+    expect(src).not.toMatch(/await deps\.secureStoreSetItem\(/);
+    expect(src).not.toMatch(/await deps\.setCurrentTrip\(/);
+  });
+
   it("appends the new trip to existing Trip history instead of overwriting", async () => {
     const storeTrip = jest.fn(async () => "trip-implicit-1");
     const putTravelerInTrip = jest.fn(async () => ({}));
@@ -89,6 +101,10 @@ describe("ensureImplicitDefaultActiveTrip", () => {
     const secureStoreSetItem = jest.fn(async () => undefined);
     const setFreshlyCreatedTo = jest.fn(async () => undefined);
     const setTripHistory = jest.fn();
+    const setExpenses = jest.fn();
+    const setExpensesCache = jest.fn();
+    const saveTripDataInStorage = jest.fn(async () => undefined);
+    const saveTravellersInStorage = jest.fn(async () => undefined);
 
     const result = await ensureImplicitDefaultActiveTrip({
       uid: "u1",
@@ -100,7 +116,12 @@ describe("ensureImplicitDefaultActiveTrip", () => {
       updateTripHistory,
       updateUser,
       setCurrentTrip,
+      secureStoreGetItem: jest.fn(async () => null),
       secureStoreSetItem,
+      saveTripDataInStorage,
+      saveTravellersInStorage,
+      setExpenses,
+      setExpensesCache,
       setFreshlyCreatedTo,
       setTripHistory,
     });
@@ -142,6 +163,7 @@ describe("ensureImplicitDefaultActiveTrip", () => {
       "trip-implicit-1",
     ]);
     expect(setFreshlyCreatedTo).toHaveBeenCalledWith(false);
+    expect(setExpenses).toHaveBeenCalledWith([]);
     expect(result.tripid).toBe("trip-implicit-1");
     expect(result.tripData.isImplicitDefault).toBe(true);
   });
@@ -160,7 +182,12 @@ describe("ensureImplicitDefaultActiveTrip", () => {
       updateTripHistory,
       updateUser: jest.fn(async () => undefined),
       setCurrentTrip: jest.fn(async () => undefined),
+      secureStoreGetItem: jest.fn(async () => null),
       secureStoreSetItem: jest.fn(async () => undefined),
+      saveTripDataInStorage: jest.fn(async () => undefined),
+      saveTravellersInStorage: jest.fn(async () => undefined),
+      setExpenses: jest.fn(),
+      setExpensesCache: jest.fn(),
       setFreshlyCreatedTo: jest.fn(async () => undefined),
       setTripHistory,
     });

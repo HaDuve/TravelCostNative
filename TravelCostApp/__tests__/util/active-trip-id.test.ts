@@ -128,4 +128,18 @@ describe("Active trip id reader wiring (#327)", () => {
       /getActiveTripId\(\)\)\s*\?\?\s*userData\.currentTrip/
     );
   });
+
+  it("create-trip and implicit-default write mirrors only via activateTrip", () => {
+    const tripForm = src("components/ManageTrip/TripForm.tsx");
+    expect(tripForm).toMatch(/await activateTrip\(/);
+    expect(tripForm).not.toMatch(/secureStoreSetItem\(ACTIVE_TRIP_ID_KEY/);
+    expect(tripForm).not.toMatch(
+      /secureStoreSetItem\(["']currentTripId["']\)/
+    );
+
+    const implicit = src("util/implicit-default-trip.ts");
+    expect(implicit).toMatch(/await activateTrip\(/);
+    expect(implicit).not.toMatch(/await deps\.secureStoreSetItem\(/);
+    expect(implicit).not.toMatch(/await deps\.setCurrentTrip\(/);
+  });
 });

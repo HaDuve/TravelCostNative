@@ -16,6 +16,7 @@ jest.mock("../../util/http", () => ({
 }));
 
 jest.mock("../../store/secure-storage", () => ({
+  secureStoreGetItem: jest.fn(async () => null),
   secureStoreSetItem: jest.fn(async () => undefined),
 }));
 
@@ -37,12 +38,18 @@ describe("createImplicitDefaultForUser", () => {
     const setCurrentTrip = jest.fn(async () => undefined);
     const setFreshlyCreatedTo = jest.fn(async () => undefined);
     const setTripHistory = jest.fn();
+    const setExpenses = jest.fn();
+    const setExpensesCache = jest.fn();
 
     await createImplicitDefaultForUser({
       uid: "u1",
       userName: "Alice",
       existingTripHistory: ["trip-old-1"],
       setCurrentTrip,
+      saveTripDataInStorage: jest.fn(async () => undefined),
+      saveTravellersInStorage: jest.fn(async () => undefined),
+      setExpenses,
+      setExpensesCache,
       setFreshlyCreatedTo,
       setTripHistory,
     });
@@ -60,6 +67,7 @@ describe("createImplicitDefaultForUser", () => {
       expect.objectContaining({ isImplicitDefault: true })
     );
     expect(setFreshlyCreatedTo).toHaveBeenCalledWith(false);
+    expect(setExpenses).toHaveBeenCalledWith([]);
     expect(putTravelerInTrip).toHaveBeenCalled();
     expect(updateUser).toHaveBeenCalled();
     expect(secureStoreSetItem).toHaveBeenCalledWith(

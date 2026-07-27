@@ -11,4 +11,4 @@ Three stores held an Active trip id — secure `currentTripId`, server `users/{u
 ## Consequences
 
 - Call sites that need “which trip is active” use `getActiveTripId`; they must not prefer server or context over secure storage.
-- Mirror writes belong in `activateTrip` (switch/restore). Creation paths that mint a new Active trip may still set the secure key (and mirrors) when establishing the first id.
+- Mirror writes belong in `activateTrip` (including establish-Active-trip on create / implicit default). Do not write server `currentTrip` or `TripContext.tripid` ad hoc.

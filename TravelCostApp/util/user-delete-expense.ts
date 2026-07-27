@@ -148,12 +148,6 @@ export async function deleteUserExpenses({
 
   clearPendingUndoDelete();
   Toast.hide();
-  Toast.show({
-    type: "loading",
-    text1: i18n.t("toastDeleting1"),
-    text2: i18n.t("toastDeleting2"),
-    autoHide: false,
-  });
 
   try {
     for (const target of targets) {

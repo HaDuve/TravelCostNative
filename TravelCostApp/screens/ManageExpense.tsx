@@ -25,7 +25,15 @@ import {
   storeExpenseOnlineOffline,
   updateExpenseOnlineOffline,
 } from "../util/offline-queue";
-import { deleteUserExpenses } from "../util/user-delete-expense";
+import {
+  collectUserDeleteTargets,
+  deleteUserExpenses,
+} from "../util/user-delete-expense";
+import {
+  persistRangedExpenseAdd,
+  persistRangedExpenseInPlaceEdit,
+  persistRangedExpenseReplace,
+} from "../util/ranged-expense-persist";
 
 import { i18n } from "../i18n/i18n";
 
@@ -249,42 +257,14 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
   const newRangeId = () =>
     Date.now().toString() + Math.random().toString(36).substring(2, 15);
 
-  const persistNewRangedInstances = async (instances: ExpenseData[]) => {
-    const progressMax = Math.max(instances.length - 1, 0);
-
-    for (let i = 0; i < instances.length; i++) {
-      Toast.show({
-        type: "loading",
-        text1: i18n.t("toastSaving1"),
-        text2: i18n.t("toastSaving2"),
-        autoHide: false,
-        props: {
-          progress: progressMax === 0 ? 0 : i / progressMax,
-          progressAt: i,
-          progressMax,
-          size: "small",
-        },
-      });
-
-      const expenseToPersist = {
-        ...instances[i],
-        editedTimestamp: Date.now(),
-      };
-
-      const item: OfflineQueueManageExpenseItem = {
-        type: "add",
-        expense: {
-          tripid: tripid,
-          uid: uid,
-          expenseData: expenseToPersist,
-        },
-      };
-      const id = await storeExpenseOnlineOffline(item, isOnline);
-      expenseCtx.addExpense({ ...expenseToPersist, id: id ?? "" });
-    }
+  const rangedPersistParams = {
+    tripid,
+    uid,
+    isOnline,
+    expenseCtx,
   };
 
-  const createRangedData = async (expenseData: ExpenseData) => {
+  const createRangedData = (expenseData: ExpenseData) => {
     const rangeId = newRangeId();
     const dates = buildRangedExpenseDatesFromSpan(
       expenseData.startDate,
@@ -296,25 +276,11 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       dates,
     });
 
-    await persistNewRangedInstances(instances);
+    const { syncPromise } = persistRangedExpenseAdd(instances, rangedPersistParams);
+    void syncPromise.catch(safeLogError);
   };
 
-  const editSingleData = async (expenseData: ExpenseData) => {
-    expenseData.editedTimestamp = Date.now();
-    const item: OfflineQueueManageExpenseItem = {
-      type: "update",
-      expense: {
-        tripid: tripid,
-        uid: selectedExpenseAuthorUid,
-        expenseData: expenseData,
-        id: editedExpenseId,
-      },
-    };
-    expenseCtx.updateExpense(editedExpenseId, expenseData);
-    await updateExpenseOnlineOffline(item, isOnline);
-  };
-
-  const editRangedData = async (expenseData: ExpenseData) => {
+  const editRangedData = (expenseData: ExpenseData) => {
     const expensesInRange = expenseCtx.expenses.filter(
       (expense) =>
         expense.rangeId && expense.rangeId === selectedExpense?.rangeId
@@ -330,57 +296,52 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           id: editedExpenseId,
         },
       };
-      await deleteExpenseOnlineOffline(item, isOnline);
+      void deleteExpenseOnlineOffline(item, isOnline).catch(safeLogError);
 
       const instances = planNonRangedToRangedInstances(expenseData, newRangeId());
-      await persistNewRangedInstances(instances);
+      const { syncPromise } = persistRangedExpenseAdd(instances, rangedPersistParams);
+      void syncPromise.catch(safeLogError);
       return;
     }
 
     if (shouldReplaceRangedExpenseInstances(expensesInRange, expenseData)) {
-      await deleteAllExpensesByRangedId(
-        tripid,
-        selectedExpense,
-        isOnline,
-        expenseCtx,
-        { showUndoToast: false },
-      );
-
+      const deleteTargets = collectUserDeleteTargets(tripid, expenseCtx.expenses, [
+        selectedExpense.id!,
+      ]);
       const instances = planRangedExpenseReplacement(expenseData, newRangeId());
-      await persistNewRangedInstances(instances);
+      const { syncPromise } = persistRangedExpenseReplace(
+        deleteTargets,
+        instances,
+        rangedPersistParams,
+      );
+      void syncPromise.catch(safeLogError);
       return;
     }
 
     const updates = planRangedExpenseInPlaceUpdates(expenseData, expensesInRange);
-    const progressMax = updates.length;
+    const { syncPromise } = persistRangedExpenseInPlaceEdit(
+      updates,
+      {
+        ...rangedPersistParams,
+        uid: selectedExpenseAuthorUid,
+      },
+    );
+    void syncPromise.catch(safeLogError);
+  };
 
-    for (let i = 0; i < updates.length; i++) {
-      Toast.show({
-        type: "loading",
-        text1: i18n.t("toastSaving1"),
-        text2: i18n.t("toastSaving2"),
-        autoHide: false,
-        props: {
-          progress: i / progressMax,
-          progressAt: i,
-          progressMax,
-          size: "small",
-        },
-      });
-
-      const { id, expenseData: updatedExpenseData } = updates[i];
-      const item: OfflineQueueManageExpenseItem = {
-        type: "update",
-        expense: {
-          tripid: tripid,
-          uid: selectedExpenseAuthorUid,
-          expenseData: updatedExpenseData,
-          id,
-        },
-      };
-      expenseCtx.updateExpense(id, updatedExpenseData);
-      await updateExpenseOnlineOffline(item, isOnline);
-    }
+  const editSingleData = async (expenseData: ExpenseData) => {
+    expenseData.editedTimestamp = Date.now();
+    const item: OfflineQueueManageExpenseItem = {
+      type: "update",
+      expense: {
+        tripid: tripid,
+        uid: selectedExpenseAuthorUid,
+        expenseData: expenseData,
+        id: editedExpenseId,
+      },
+    };
+    expenseCtx.updateExpense(editedExpenseId, expenseData);
+    await updateExpenseOnlineOffline(item, isOnline);
   };
 
   async function confirmHandler(payload: ExpenseFormSubmitPayload): Promise<void> {
@@ -422,7 +383,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           selectedExpense.rangeId
         ) {
           // editing ranged Data
-          await editRangedData(expenseData);
+          editRangedData(expenseData);
         } else {
           // editing normal expense (no-ranged)
           await editSingleData(expenseData);
@@ -449,7 +410,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           expenseData.endDate.toString().slice(0, 10)
         ) {
           // adding a new ranged expense (no-editing)
-          await createRangedData(expenseData);
+          createRangedData(expenseData);
         } else {
           // adding a new normal expense (no-editing, no-ranged)
           await createSingleData(expenseData);

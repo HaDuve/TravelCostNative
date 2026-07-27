@@ -117,15 +117,26 @@ jest.mock("../../components/Currency/CurrencyPicker", () => {
   const { Text } = require("react-native");
   return function MockCurrencyPicker({
     countryValue,
+    inputCurrencyCode,
     placeholder,
   }: {
     countryValue?: string;
+    inputCurrencyCode?: string;
     placeholder?: string;
   }) {
     return React.createElement(
-      Text,
-      { testID: "expense-form-currency-value" },
-      countryValue ?? placeholder ?? ""
+      React.Fragment,
+      null,
+      React.createElement(
+        Text,
+        { testID: "expense-form-currency-value" },
+        countryValue ?? placeholder ?? ""
+      ),
+      React.createElement(
+        Text,
+        { testID: "expense-form-currency-input" },
+        inputCurrencyCode ?? ""
+      )
     );
   };
 });
@@ -136,6 +147,46 @@ import { makeExpense } from "../fixtures/expense";
 import { AppProviders, renderWithAppProviders } from "../fixtures/app-providers";
 import { Alert } from "react-native";
 import { getExpenseDraft } from "../../store/mmkv";
+import type { RenderAPI } from "@testing-library/react-native";
+
+function mockRangedSplitAlert() {
+  return jest
+    .spyOn(Alert, "alert")
+    .mockImplementation((_title, _message, buttons) => {
+      const splitButton = buttons?.find(
+        (button) => button.text === i18n.t("splitUpExpenses")
+      );
+      splitButton?.onPress?.();
+    });
+}
+
+function mockDraftRestoreAlert() {
+  return jest
+    .spyOn(Alert, "alert")
+    .mockImplementation((_title, _message, buttons) => {
+      const restoreButton = buttons?.find(
+        (button) => button.text === i18n.t("restore")
+      );
+      restoreButton?.onPress?.();
+    });
+}
+
+function confirmRangedDateSpan(screen: RenderAPI) {
+  fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
+  fireEvent.press(screen.getByTestId("open-date-range"));
+  fireEvent.press(screen.getByTestId("confirm-ranged-dates"));
+}
+
+async function expectExpenseFormCurrencyInput(
+  screen: RenderAPI,
+  currency: string
+) {
+  await waitFor(() => {
+    expect(screen.getByTestId("expense-form-currency-input")).toHaveTextContent(
+      currency
+    );
+  });
+}
 
 function renderNewExpenseForm(
   overrides: Parameters<typeof renderWithAppProviders>[1] = {}
@@ -187,7 +238,7 @@ function renderNewExpenseForm(
   );
 }
 
-function renderNewExpenseWithDeferredLastCountry(
+function renderNewExpenseWithDeferredLastLocale(
   onSubmit: jest.Mock = jest.fn(async () => {})
 ) {
   const navigation = {
@@ -353,15 +404,11 @@ describe("ExpenseForm", () => {
 
     fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
 
-    await waitFor(() => {
-      expect(screen.getByTestId("expense-form-currency-value")).toHaveTextContent(
-        "USD"
-      );
-    });
+    await expectExpenseFormCurrencyInput(screen, "USD");
   });
 
   it("applies latest-used country after secure storage loads on a new expense", async () => {
-    const screen = renderNewExpenseWithDeferredLastCountry();
+    const screen = renderNewExpenseWithDeferredLastLocale();
 
     fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
 
@@ -373,20 +420,10 @@ describe("ExpenseForm", () => {
   });
 
   it("keeps latest-used country after confirming a ranged date span", async () => {
-    const alertSpy = jest
-      .spyOn(Alert, "alert")
-      .mockImplementation((_title, _message, buttons) => {
-        const splitButton = buttons?.find(
-          (button) => button.text === i18n.t("splitUpExpenses")
-        );
-        splitButton?.onPress?.();
-      });
+    const alertSpy = mockRangedSplitAlert();
+    const screen = renderNewExpenseWithDeferredLastLocale();
 
-    const screen = renderNewExpenseWithDeferredLastCountry();
-
-    fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
-    fireEvent.press(screen.getByTestId("open-date-range"));
-    fireEvent.press(screen.getByTestId("confirm-ranged-dates"));
+    confirmRangedDateSpan(screen);
 
     await waitFor(() => {
       expect(screen.getByTestId("expense-form-country-flag")).toHaveTextContent(
@@ -398,26 +435,12 @@ describe("ExpenseForm", () => {
   });
 
   it("keeps latest-used currency after confirming a ranged date span", async () => {
-    const alertSpy = jest
-      .spyOn(Alert, "alert")
-      .mockImplementation((_title, _message, buttons) => {
-        const splitButton = buttons?.find(
-          (button) => button.text === i18n.t("splitUpExpenses")
-        );
-        splitButton?.onPress?.();
-      });
+    const alertSpy = mockRangedSplitAlert();
+    const screen = renderNewExpenseWithDeferredLastLocale();
 
-    const screen = renderNewExpenseWithDeferredLastCountry();
+    confirmRangedDateSpan(screen);
 
-    fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
-    fireEvent.press(screen.getByTestId("open-date-range"));
-    fireEvent.press(screen.getByTestId("confirm-ranged-dates"));
-
-    await waitFor(() => {
-      expect(
-        screen.getByTestId("expense-form-currency-value")
-      ).toHaveTextContent("USD");
-    });
+    await expectExpenseFormCurrencyInput(screen, "USD");
 
     alertSpy.mockRestore();
   });
@@ -425,7 +448,7 @@ describe("ExpenseForm", () => {
   it("submits latest-used country on advanced save after secure storage loads", async () => {
     jest.useFakeTimers();
     const onSubmit = jest.fn(async () => {});
-    const screen = renderNewExpenseWithDeferredLastCountry(onSubmit);
+    const screen = renderNewExpenseWithDeferredLastLocale(onSubmit);
 
     fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
 
@@ -448,15 +471,11 @@ describe("ExpenseForm", () => {
   it("submits latest-used currency on advanced save after secure storage loads", async () => {
     jest.useFakeTimers();
     const onSubmit = jest.fn(async () => {});
-    const screen = renderNewExpenseWithDeferredLastCountry(onSubmit);
+    const screen = renderNewExpenseWithDeferredLastLocale(onSubmit);
 
     fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
 
-    await waitFor(() => {
-      expect(
-        screen.getByTestId("expense-form-currency-value")
-      ).toHaveTextContent("USD");
-    });
+    await expectExpenseFormCurrencyInput(screen, "USD");
 
     await act(async () => {
       fireEvent.press(screen.getAllByText(i18n.t("add")).pop()!);
@@ -470,26 +489,13 @@ describe("ExpenseForm", () => {
 
   it("submits latest-used currency after confirming a ranged date span", async () => {
     jest.useFakeTimers();
-    const alertSpy = jest
-      .spyOn(Alert, "alert")
-      .mockImplementation((_title, _message, buttons) => {
-        const splitButton = buttons?.find(
-          (button) => button.text === i18n.t("splitUpExpenses")
-        );
-        splitButton?.onPress?.();
-      });
+    const alertSpy = mockRangedSplitAlert();
     const onSubmit = jest.fn(async () => {});
-    const screen = renderNewExpenseWithDeferredLastCountry(onSubmit);
+    const screen = renderNewExpenseWithDeferredLastLocale(onSubmit);
 
-    fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
-    fireEvent.press(screen.getByTestId("open-date-range"));
-    fireEvent.press(screen.getByTestId("confirm-ranged-dates"));
+    confirmRangedDateSpan(screen);
 
-    await waitFor(() => {
-      expect(
-        screen.getByTestId("expense-form-currency-value")
-      ).toHaveTextContent("USD");
-    });
+    await expectExpenseFormCurrencyInput(screen, "USD");
 
     await act(async () => {
       fireEvent.press(screen.getAllByText(i18n.t("add")).pop()!);
@@ -512,16 +518,8 @@ describe("ExpenseForm", () => {
     });
     (getExpenseDraft as jest.Mock).mockReturnValue(draftExpense);
 
-    const alertSpy = jest
-      .spyOn(Alert, "alert")
-      .mockImplementation((_title, _message, buttons) => {
-        const restoreButton = buttons?.find(
-          (button) => button.text === i18n.t("restore")
-        );
-        restoreButton?.onPress?.();
-      });
-
-    const screen = renderNewExpenseWithDeferredLastCountry();
+    const alertSpy = mockDraftRestoreAlert();
+    const screen = renderNewExpenseWithDeferredLastLocale();
 
     fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
 
@@ -544,24 +542,12 @@ describe("ExpenseForm", () => {
     });
     (getExpenseDraft as jest.Mock).mockReturnValue(draftExpense);
 
-    const alertSpy = jest
-      .spyOn(Alert, "alert")
-      .mockImplementation((_title, _message, buttons) => {
-        const restoreButton = buttons?.find(
-          (button) => button.text === i18n.t("restore")
-        );
-        restoreButton?.onPress?.();
-      });
-
-    const screen = renderNewExpenseWithDeferredLastCountry();
+    const alertSpy = mockDraftRestoreAlert();
+    const screen = renderNewExpenseWithDeferredLastLocale();
 
     fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
 
-    await waitFor(() => {
-      expect(
-        screen.getByTestId("expense-form-currency-value")
-      ).toHaveTextContent("USD");
-    });
+    await expectExpenseFormCurrencyInput(screen, "USD");
 
     alertSpy.mockRestore();
     (getExpenseDraft as jest.Mock).mockReturnValue(undefined);

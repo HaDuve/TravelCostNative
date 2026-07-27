@@ -1535,6 +1535,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                     setCountryValue={setCurrencyPickerValue}
                     onChangeValue={updateCurrency}
                     placeholder={currencyPlaceholder}
+                    inputCurrencyCode={inputs.currency.value}
                   ></CurrencyPicker>
                 </View>
                 <View style={[styles.inputsRowSecond]}>

@@ -42,9 +42,6 @@ jest.mock("react-native-dropdown-picker", () => {
   };
 });
 
-jest.mock("rn-tourguide", () => ({
-  TourGuideZone: ({ children }: any) => <>{children}</>,
-}));
 
 jest.mock("react-native-toast-message", () => ({
   show: jest.fn(),
@@ -137,7 +134,6 @@ describe("RecentExpenses screen", () => {
         expenses: expensesContextForList(monthExpenses),
         user: {
           periodName: "month",
-          needsTour: false,
         },
       }
     );
@@ -156,7 +152,6 @@ describe("RecentExpenses screen", () => {
         expenses: expensesContextForList(monthExpenses),
         user: {
           periodName: "month",
-          needsTour: false,
         },
       }
     );
@@ -188,7 +183,6 @@ describe("RecentExpenses screen", () => {
         expenses: expensesContextForList(monthExpenses),
         user: {
           periodName: "month",
-          needsTour: false,
           freshlyCreated: false,
         },
         trip: {
@@ -214,7 +208,6 @@ describe("RecentExpenses screen", () => {
       expenses: expensesContextForList([]),
       user: {
         periodName: "month",
-        needsTour: false,
         freshlyCreated: true,
       },
       trip: {
@@ -247,7 +240,6 @@ describe("RecentExpenses screen", () => {
         expenses: expensesContextForList([]),
         user: {
           periodName: "month",
-          needsTour: false,
           freshlyCreated: false,
         },
         trip: {
@@ -273,7 +265,6 @@ describe("RecentExpenses screen", () => {
         expenses: expensesContextForList([]),
         user: {
           periodName: "month",
-          needsTour: false,
           freshlyCreated: false,
         },
         trip: {

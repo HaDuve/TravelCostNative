@@ -102,7 +102,6 @@ const DevContent = ({ navigation }) => {
           navigation.navigate("RecentExpenses");
           const onboardingFlags: OnboardingFlags = {
             freshlyCreated: userCtx.freshlyCreated,
-            needsTour: userCtx.needsTour,
           };
           await showBanner(navigation, onboardingFlags);
         }}

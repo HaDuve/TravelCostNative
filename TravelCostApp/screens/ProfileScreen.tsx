@@ -18,14 +18,10 @@ import { UserContext } from "../store/user-context";
 
 import { i18n } from "../i18n/i18n";
 import React from "react";
-import { TourGuideZone, useTourGuideController } from "rn-tourguide";
-import { useInterval } from "../components/Hooks/useInterval";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { AuthContext } from "../store/auth-context";
 import { secureStoreGetItem } from "../store/secure-storage";
-import { sleep } from "../util/appState";
 import { storeExpoPushTokenInTrip } from "../util/http";
-import { saveStoppedTour } from "../util/tourUtil";
 
 import { useFocusEffect } from "@react-navigation/native";
 import Constants from "expo-constants";
@@ -37,7 +33,7 @@ import Purchases from "react-native-purchases";
 import { setAttributesAsync } from "../components/Premium/PremiumConstants";
 import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import { NetworkContext } from "../store/network-context";
-import { constantScale, dynamicScale } from "../util/scalingUtil";
+import { dynamicScale } from "../util/scalingUtil";
 import GetLocalPriceButton from "../components/Settings/GetLocalPriceButton";
 import GradientButton from "../components/UI/GradientButton";
 import safeLogError from "../util/error";
@@ -114,7 +110,6 @@ const ProfileScreen = ({ navigation }) => {
   const netCtx = useContext(NetworkContext);
   const isConnected = netCtx.isConnected && netCtx.strongConnection;
 
-  const [tourIsRunning, setTourIsRunning] = useState(false);
   const [tripHistory, setTripHistory] = useState([]);
   const [isFetchingLogout, setIsFetchingLogout] = useState(false);
   const [isFeedbackModalVisible, setIsFeedbackModalVisible] = useState(false);
@@ -219,90 +214,6 @@ const ProfileScreen = ({ navigation }) => {
     fetchHistory();
   }, [userCtx]);
 
-  useInterval(
-    () => {
-      if (canStart && userCtx.needsTour && !tourIsRunning) {
-        // 👈 test if you can start otherwise nothing will happen
-        sleepyStartTour();
-      }
-    },
-    3000,
-    false
-  );
-
-  const {
-    canStart, // a boolean indicate if you can start tour guide
-    start, // a function to start the tourguide
-    // stop, // a function  to stopping it
-    eventEmitter, // an object for listening some events
-  } = useTourGuideController();
-  // Can start at mount 🎉
-  // you need to wait until everything is registered 😁
-  async function sleepyStartTour() {
-    setTourIsRunning(true);
-    await sleep(1000);
-    start();
-  }
-  useEffect(() => {
-    if (canStart && userCtx.needsTour) {
-      // 👈 test if you can start otherwise nothing will happen
-      sleepyStartTour();
-    }
-  }, [canStart, userCtx.needsTour]); // 👈 don't miss it!
-
-  const handleOnStart = () => {
-    trackEvent(VexoEvents.ONBOARDING_TOUR_STARTED);
-    navigation.navigate("RecentExpenses");
-  };
-  const handleOnStop = () => {
-    trackEvent(VexoEvents.ONBOARDING_TOUR_SKIPPED);
-    saveStoppedTour();
-    userCtx.setNeedsTour(false);
-    setTourIsRunning(false);
-    // Branch.io removed - no event logging
-  };
-  const handleOnStepChange = async (step) => {
-    switch (step?.order) {
-      case 1:
-        await navigation.navigate("RecentExpenses");
-        break;
-      case 2:
-        await navigation.navigate("RecentExpenses");
-        break;
-      case 3:
-        await navigation.navigate("RecentExpenses");
-        break;
-      case 4:
-        await navigation.navigate("Overview");
-        break;
-      case 5:
-        await navigation.navigate("Profile");
-        break;
-      case 6:
-        await navigation.navigate("Profile");
-        break;
-      case 7:
-        await navigation.navigate("Profile");
-        break;
-      case 8:
-      default:
-        navigation.navigate("RecentExpenses");
-        break;
-    }
-  };
-
-  React.useEffect(() => {
-    eventEmitter.on("start", handleOnStart);
-    eventEmitter.on("stop", handleOnStop);
-    eventEmitter.on("stepChange", handleOnStepChange);
-
-    return () => {
-      eventEmitter.off("start", handleOnStart);
-      eventEmitter.off("stop", handleOnStop);
-      eventEmitter.off("stepChange", handleOnStepChange);
-    };
-  }, []);
-
   const visibleContent = (
     <>
       <View style={styles.headerButtonsContainer}>
@@ -324,68 +235,45 @@ const ProfileScreen = ({ navigation }) => {
       <View style={styles.tripContainer} testID="profile-trip-container">
         <View style={styles.horizontalContainer}>
           <Text style={styles.tripListTitle}>{i18n.t("myTrips")}</Text>
-          <TourGuideZone
-            text={i18n.t("walk5")}
-            shape={"circle"}
-            maskOffset={constantScale(24, 0.5)}
-            zone={5}
-          >
-            <IconButton
-              icon={"globe-outline"}
-              size={dynamicScale(36, false, 0.5)}
-              buttonStyle={styles.newTripButtonContainer}
-              color={GlobalStyles.colors.primary400}
-              badge={null}
-              badgeText={null}
-              badgeStyle={null}
-              onPressIn={null}
-              onPressOut={null}
-              onLongPress={null}
-              category={null}
-              onPress={() => {
-                trackEvent(VexoEvents.CREATE_TRIP_FROM_PROFILE_PRESSED);
-                navigation.navigate("ManageTrip");
-              }}
-            />
-          </TourGuideZone>
-          {/* </Pressable> */}
+          <IconButton
+            icon={"globe-outline"}
+            size={dynamicScale(36, false, 0.5)}
+            buttonStyle={styles.newTripButtonContainer}
+            color={GlobalStyles.colors.primary400}
+            badge={null}
+            badgeText={null}
+            badgeStyle={null}
+            onPressIn={null}
+            onPressOut={null}
+            onLongPress={null}
+            category={null}
+            onPress={() => {
+              trackEvent(VexoEvents.CREATE_TRIP_FROM_PROFILE_PRESSED);
+              navigation.navigate("ManageTrip");
+            }}
+          />
         </View>
-        <TourGuideZone
-          text={i18n.t("walk6")}
-          maskOffset={constantScale(200, 0.1)}
-          tooltipBottomOffset={constantScale(150, 0.1)}
-          zone={6}
-          style={{ flex: 1 }}
-        >
-          <TripList trips={tripHistory}></TripList>
-        </TourGuideZone>
+        <TripList trips={tripHistory}></TripList>
       </View>
       <View style={styles.horizontalButtonContainer}>
-        <TourGuideZone
-          text={i18n.t("walk7")}
-          maskOffset={constantScale(50, 0.5)}
-          tooltipBottomOffset={constantScale(50, 0.5)}
-          zone={7}
-        >
-          <View>
-            <IconButton
-              icon="list-outline"
-              buttonStyle={[styles.addButton, shadowRegressionStyles.addExpenseFab]}
-              size={dynamicScale(42, false, 0.5)}
-              color={GlobalStyles.colors.backgroundColor}
-              badge={null}
-              badgeText={null}
-              badgeStyle={null}
-              onPressIn={null}
-              onPressOut={null}
-              onLongPress={null}
-              category={null}
-              onPress={() => {
-                onSummaryHandler();
-              }}
-            />
-          </View>
-        </TourGuideZone>
+        <View>
+          <IconButton
+            icon="list-outline"
+            buttonStyle={[styles.addButton, shadowRegressionStyles.addExpenseFab]}
+            size={dynamicScale(42, false, 0.5)}
+            color={GlobalStyles.colors.backgroundColor}
+            badge={null}
+            badgeText={null}
+            badgeStyle={null}
+            onPressIn={null}
+            onPressOut={null}
+            onLongPress={null}
+            category={null}
+            onPress={() => {
+              onSummaryHandler();
+            }}
+          />
+        </View>
       </View>
     </>
   );

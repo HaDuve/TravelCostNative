@@ -51,7 +51,6 @@ import BackButton from "../UI/BackButton";
 import { onShare } from "../ProfileOutput/ShareTrip";
 import { NetworkContext } from "../../store/network-context";
 import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "../../store/mmkv";
-import { useTourGuideController } from "rn-tourguide";
 import LoadingBarOverlay from "../UI/LoadingBarOverlay";
 import { Switch } from "react-native-paper";
 import { formatExpenseWithCurrency } from "../../util/string";
@@ -85,13 +84,6 @@ const TripForm = ({ navigation, route }) => {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [infoIsVisible, setInfoIsVisible] = useState(false);
   const windowWidth = dynamicScale(350);
-  const {
-    canStart, // a boolean indicate if you can start tour guide
-    start, // a function to start the tourguide
-    // stop, // a function  to stopping it
-    eventEmitter, // an object for listening some events
-  } = useTourGuideController();
-
   const [inputs, setInputs] = useState({
     tripName: {
       value: "",
@@ -339,9 +331,6 @@ const TripForm = ({ navigation, route }) => {
       setLoadingProgress(5);
 
       expenseCtx.setExpenses([]);
-      if (userCtx.freshlyCreated) {
-        userCtx.setNeedsTour(true);
-      }
     } catch (error) {
       safeLogError(error);
     }
@@ -373,11 +362,7 @@ const TripForm = ({ navigation, route }) => {
     expenseCtx.setExpenses([]);
     setMMKVObject(MMKV_KEYS.EXPENSES, []);
 
-    // Tourguide
     await userCtx.setFreshlyCreatedTo(false);
-    if (canStart && userCtx.needsTour) {
-      start();
-    }
     navigation.navigate("RecentExpenses");
   }
 

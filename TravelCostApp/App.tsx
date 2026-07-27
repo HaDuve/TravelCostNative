@@ -68,8 +68,6 @@ import SplashScreenOverlay from "./components/UI/SplashScreenOverlay";
 import Toast from "react-native-toast-message";
 import { useInterval } from "./components/Hooks/useInterval";
 import { isForeground } from "./util/appState";
-import { TourGuideProvider, TooltipProps } from "rn-tourguide";
-import { loadTourConfig } from "./util/tourUtil";
 import { loadKeys, Keys } from "./components/Premium/PremiumConstants";
 import PaywallScreen from "./components/Premium/PayWall";
 import { SettingsProvider } from "./store/settings-context";
@@ -96,7 +94,6 @@ import { ExpenseData } from "./util/expense";
 
 import safeLogError from "./util/error";
 import { constantScale, dynamicScale } from "./util/scalingUtil";
-import { CustomTooltip } from "./components/UI/Tourguide_Tooltip";
 import OrientationContextProvider from "./store/orientation-context";
 import {
   initializeVexo,
@@ -670,9 +667,6 @@ function Root() {
           safeLogError(vexoError, "App.tsx", 692);
         }
 
-        const needsTour = await loadTourConfig();
-        userCtx.setNeedsTour(needsTour);
-
         // check if user is online
         if (!online) {
           await setupOfflineMount(true, storedToken);
@@ -815,39 +809,9 @@ export default function App() {
                       <NetworkProvider>
                         <OrientationContextProvider>
                           <GestureHandlerRootView style={{ flex: 1 }}>
-                            <TourGuideProvider
-                              key="settings"
-                              borderRadius={16}
-                              labels={{
-                                previous: i18n.t("tourGuideLabelPrevious"),
-                                next: i18n.t("tourGuideLabelNext"),
-                                skip: i18n.t("tourGuideLabelSkip"),
-                                finish: i18n.t("tourGuideLabelFinish"),
-                              }}
-                              tooltipComponent={({
-                                isFirstStep,
-                                isLastStep,
-                                handleNext,
-                                handlePrev,
-                                handleStop,
-                                currentStep,
-                                labels,
-                              }: TooltipProps) =>
-                                CustomTooltip({
-                                  isFirstStep,
-                                  isLastStep,
-                                  handleNext,
-                                  handlePrev,
-                                  handleStop,
-                                  currentStep,
-                                  labels,
-                                })
-                              }
-                            >
-                              <Root />
+                            <Root />
 
-                              <ToastComponent />
-                            </TourGuideProvider>
+                            <ToastComponent />
                           </GestureHandlerRootView>
                         </OrientationContextProvider>
                       </NetworkProvider>

@@ -20,7 +20,13 @@ jest.mock("../../components/ExpensesOutput/ExpensesOutput", () =>
   jest.requireActual("../../components/ExpensesOutput/ExpensesOutput")
 );
 
-jest.mock("../../components/ManageExpense/AddExpenseButton", () => () => null);
+jest.mock("../../components/ManageExpense/AddExpenseButton", () => {
+  const React = require("react");
+  const { Text } = require("react-native");
+  return function MockAddExpenseButton() {
+    return <Text testID="add-expense-entry">add expense</Text>;
+  };
+});
 jest.mock("../../components/UI/MiniSyncIndicator", () => () => null);
 
 jest.mock("expo-haptics", () => ({
@@ -198,5 +204,91 @@ describe("RecentExpenses screen", () => {
     });
 
     assertNoNestedVerticalFlatLists(screen.root);
+  });
+
+  it("does not redirect to Profile or toast create-trip when leftover gate flag is set", async () => {
+    const Toast = require("react-native-toast-message");
+    const navigation = { navigate: jest.fn() };
+
+    renderWithAppProviders(<RecentExpenses navigation={navigation as any} />, {
+      expenses: expensesContextForList([]),
+      user: {
+        periodName: "month",
+        needsTour: false,
+        freshlyCreated: true,
+      },
+      trip: {
+        tripid: "t-implicit",
+        tripName: "",
+        tripCurrency: "EUR",
+        isImplicitDefault: true,
+        fetchAndSetTravellers: jest.fn(async () => {}),
+      },
+      network: { isConnected: true, strongConnection: true },
+    });
+
+    await waitFor(() => {
+      expect(fetchAndSetExpenses).toHaveBeenCalled();
+    });
+
+    expect(navigation.navigate).not.toHaveBeenCalledWith("Profile");
+    expect(Toast.show).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        text2: expect.any(String),
+      })
+    );
+  });
+
+  it("shows period summary for an implicit default Active trip", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <RecentExpenses navigation={navigation as any} />,
+      {
+        expenses: expensesContextForList([]),
+        user: {
+          periodName: "month",
+          needsTour: false,
+          freshlyCreated: false,
+        },
+        trip: {
+          tripid: "t-implicit",
+          tripName: "",
+          tripCurrency: "EUR",
+          isImplicitDefault: true,
+          dailyBudget: "0",
+          totalBudget: "0",
+          travellers: ["Alice"],
+        },
+      }
+    );
+
+    expect(screen.getByTestId("expenses-summary-pressable")).toBeTruthy();
+  });
+
+  it("keeps the add-expense entry point on Recent Expenses for an implicit default Active trip", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <RecentExpenses navigation={navigation as any} />,
+      {
+        expenses: expensesContextForList([]),
+        user: {
+          periodName: "month",
+          needsTour: false,
+          freshlyCreated: false,
+        },
+        trip: {
+          tripid: "t-implicit",
+          tripName: "",
+          tripCurrency: "EUR",
+          isImplicitDefault: true,
+          dailyBudget: "0",
+          totalBudget: "0",
+          travellers: ["Alice"],
+        },
+      }
+    );
+
+    expect(screen.getByTestId("add-expense-entry")).toBeTruthy();
+    expect(navigation.navigate).not.toHaveBeenCalledWith("Profile");
   });
 });

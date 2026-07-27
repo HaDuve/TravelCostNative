@@ -43,7 +43,6 @@ import {
 import { toExpenseNavigationDtos } from "../util/expense-navigation-dto";
 import Animated from "react-native-reanimated";
 import { formatExpenseWithCurrency } from "../util/string";
-import { useFocusEffect } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { dynamicScale } from "../util/scalingUtil";
 import { OrientationContext } from "../store/orientation-context";
@@ -59,22 +58,9 @@ const SplitSummaryScreen = ({ navigation }) => {
     isPaid,
     isPaidTimestamp,
   } = useContext(TripContext);
-  const { freshlyCreated, userName } = useContext(UserContext);
+  const { userName } = useContext(UserContext);
   const { expenses } = useContext(ExpensesContext);
   // avoid rerenders
-  useFocusEffect(
-    React.useCallback(() => {
-      if (freshlyCreated) {
-        Toast.show({
-          type: "success",
-          text1: i18n.t("welcomeToBudgetForNomads"),
-          text2: i18n.t("pleaseCreateTrip"),
-        });
-        navigation.navigate("Profile");
-      }
-    }, [freshlyCreated, navigation])
-  );
-
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState();
   const { isPortrait } = useContext(OrientationContext);

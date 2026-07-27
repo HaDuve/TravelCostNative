@@ -36,7 +36,7 @@ import { useInterval } from "../components/Hooks/useInterval";
 import { DEBUG_POLLING_INTERVAL } from "../confAppConstants";
 import { fetchAndSetExpenses } from "../components/ExpensesOutput/RecentExpensesUtil";
 import { _toShortFormat } from "../util/dateTime";
-import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
+import { useScrollToTop } from "@react-navigation/native";
 import { isForeground } from "../util/appState";
 import { TourGuideZone } from "rn-tourguide";
 import PropTypes from "prop-types";
@@ -96,7 +96,6 @@ function RecentExpenses({ navigation }) {
       showAnyIndicator = false,
       ignoreTouched = false
     ) => {
-      if (userCtx.freshlyCreated) return;
       // if (ignoreTouched)
       // check offlinemode
       const online = netCtx.isConnected && netCtx.strongConnection;
@@ -151,22 +150,8 @@ function RecentExpenses({ navigation }) {
       // tripCtx,
       tripid,
       uid,
-      userCtx.freshlyCreated,
       userCtx.isSendingOfflineQueueMutex,
     ]
-  );
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (userCtx.freshlyCreated) {
-        Toast.show({
-          type: "success",
-          text1: i18n.t("welcomeToBudgetForNomads"),
-          text2: i18n.t("pleaseCreateTrip"),
-        });
-        navigation.navigate("Profile");
-      }
-    }, [userCtx.freshlyCreated, navigation])
   );
 
   const [isFetching, setIsFetching] = useState(false);
@@ -263,7 +248,6 @@ function RecentExpenses({ navigation }) {
 
   useInterval(
     () => {
-      if (userCtx.freshlyCreated) return;
       setDateTimeString(_toShortFormat(DateTime.now()));
       if (isForeground()) {
         const asyncPolling = async () => {

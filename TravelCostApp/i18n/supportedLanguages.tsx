@@ -957,11 +957,11 @@ const de = {
   XowesYtoZ1: "schuldet",
   XowesYtoZ2: "zu",
   simplifySplits: "Salden vereinfachen",
-  settleSplits: "Reise begleichen",
+  settleSplits: "Budget begleichen",
   balanceSimplificationHelper:
-    "Weniger Zahlungen zwischen Nomaden sehen. Es ist noch kein Geld geflossen.",
+    "Weniger Zahlungen zwischen Nomaden sehen. Es ist noch kein Geld bewegt.",
   settlementHelper:
-    "Markiere das Budget als abgerechnet, wenn alle zurückgezahlt wurden.",
+    "Markiere das Budget als abgerechnet, wenn alle ihr Geld zurückbekommen haben.",
   confirmSettle: "Begleichen",
   sureSettleSplits:
     "Bist du sicher, dass du das Budget abrechnen möchtest? Wurde allen zurückgezahlt?",
@@ -1588,7 +1588,7 @@ const fr = {
   XowesYtoZ1: "doit",
   XowesYtoZ2: "à",
   simplifySplits: "Simplifier les soldes",
-  settleSplits: "Régler le voyage",
+  settleSplits: "Régler le budget",
   balanceSimplificationHelper:
     "Voyez moins de paiements entre nomades. Aucun argent n'a encore bougé.",
   settlementHelper:
@@ -2209,11 +2209,11 @@ const ru = {
   XowesYtoZ1: "должен",
   XowesYtoZ2: "для",
   simplifySplits: "Упростить балансы",
-  settleSplits: "Закрыть поездку",
+  settleSplits: "Закрыть бюджет",
   balanceSimplificationHelper:
     "Меньше платежей между номадами. Деньги ещё не переводились.",
   settlementHelper:
-    "Отметьте бюджет как рассчитанный, когда всем вернули долги.",
+    "Отметьте бюджет как рассчитанный, когда всем вернули деньги.",
   confirmSettle: "Закрыть",
   sureSettleSplits:
     "Вы уверены, что хотите рассчитать бюджет? Всем ли вернули долги?",

@@ -343,7 +343,6 @@ const TripForm = ({ navigation, route }) => {
         setLoadingProgress(9);
         return;
       }
-      tripCtx.refresh();
       Toast.hide();
       return;
     } catch (error) {

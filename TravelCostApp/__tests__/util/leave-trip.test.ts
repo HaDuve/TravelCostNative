@@ -210,8 +210,31 @@ describe("leaveTrip plain leave", () => {
       ([args]) => args.type === "deletedExpense"
     );
     expect(undoToast).toBeDefined();
+    expect(undoToast![0].text1).toBe(i18n.t("toastLeftTrip1"));
+    expect(undoToast![0].text2).toBe(i18n.t("toastLeftTrip2"));
     expect(undoToast![0].visibilityTime).toBe(UNDO_LEAVE_WINDOW_MS);
     expect(undoToast![0].props?.onUndo).toEqual(expect.any(Function));
+  });
+
+  it("Undo toast text1 names the promoted Active trip after leaving Active trip", async () => {
+    const probe = createActivateProbe("trip-a");
+
+    await leaveTrip("trip-a", {
+      uid: "u1",
+      tripHistory: ["trip-a", "trip-b"],
+      activeTripId: "trip-a",
+      getTravellers: async () => multiTravellerRoster(),
+      removeFromTripHistoryLocal: jest.fn(),
+      restoreTripHistoryLocal: jest.fn(),
+      activate: probe.activate,
+    });
+
+    const undoToast = (Toast.show as jest.Mock).mock.calls.find(
+      ([args]) => args.type === "deletedExpense"
+    );
+    expect(undoToast![0].text1).toBe(
+      i18n.t("leaveTripNowShowing", { name: "Portugal" })
+    );
   });
 
   it("does not show an Undo toast for cascade-delete planning", async () => {
@@ -439,6 +462,36 @@ describe("undoLeaveTrip", () => {
     expect(mirrors.secureCurrentTripId).toBe("trip-a");
     expect(mirrors.serverCurrentTrip).toBe("trip-a");
     expect(mirrors.contextTripid).toBe("trip-a");
+  });
+
+  it("does not restore Trip history when roster restore fails", async () => {
+    const restoreTripHistoryLocal = jest.fn();
+    putTravelerInTripMock.mockResolvedValueOnce(null);
+
+    await leaveTrip("trip-b", {
+      uid: "u1",
+      tripHistory: ["trip-a", "trip-b"],
+      activeTripId: "trip-a",
+      getTravellers: async () => multiTravellerRoster(),
+      removeFromTripHistoryLocal: jest.fn(),
+      restoreTripHistoryLocal,
+    });
+
+    const { onUndo } = (Toast.show as jest.Mock).mock.calls.find(
+      ([args]) => args.type === "deletedExpense"
+    )![0].props;
+
+    await onUndo();
+
+    expect(putTravelerInTripMock).toHaveBeenCalled();
+    expect(storeTripHistoryMock).not.toHaveBeenCalled();
+    expect(restoreTripHistoryLocal).not.toHaveBeenCalled();
+    expect(Toast.show).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "error",
+        text2: i18n.t("error2"),
+      })
+    );
   });
 
   it("shows expired copy when Undo is pressed after the window", async () => {

@@ -139,7 +139,12 @@ export async function leaveTrip(
   }
 
   const leaver = roster.find((t) => t.uid === deps.uid);
-  const userName = leaver?.userName ?? "";
+  if (!leaver?.userName) {
+    throw new Error(
+      "leaveTrip: Traveller roster entry with userName required for leave"
+    );
+  }
+  const userName = leaver.userName;
   const previousTripHistory = [...deps.tripHistory];
   const previousActiveTripId = plan.nextActiveTripId ? tripid : null;
 
@@ -219,10 +224,13 @@ export async function undoLeaveTrip({
   Toast.hide();
 
   try {
-    await putTravelerInTrip(pending.tripid, {
+    const restored = await putTravelerInTrip(pending.tripid, {
       uid: pending.uid,
       userName: pending.userName,
     });
+    if (restored == null) {
+      throw new Error("undoLeaveTrip: roster restore failed");
+    }
     await storeTripHistory(pending.uid, pending.previousTripHistory);
     pending.restoreTripHistoryLocal(pending.previousTripHistory);
 

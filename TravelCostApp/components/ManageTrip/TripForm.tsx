@@ -280,33 +280,66 @@ const TripForm = ({ navigation, route }) => {
     navigation.pop();
   }
 
-  // async function deleteAcceptHandler() {
-  // const trips = route.params.trips;
-  // if triplist?.length == 1 await userCtx.setFreshlyCreatedTo(true);
-  // await deleteTrip(editedTripId);
-  // }
-  // function deleteHandler() {
-  //   Alert.alert(
-  //     i18n.t("deleteTrip"),
-  //     i18n.t("deleteTripSure"),
-  //     [
-  //       {
-  //         text: i18n.t("cancel"),
-  //         style: "cancel",
-  //       },
-  //       {
-  //         // text: i18n.t("delete"),
-  //         text: i18n.t("delete"),
-  //         style: "destructive",
-  //         onPress: async () => {
-  //           deleteAcceptHandler();
-  //           navigation.pop();
-  //         },
-  //       },
-  //     ],
-  //     { cancelable: false }
-  //   );
-  // }
+  async function leaveAcceptHandler() {
+    const uid = authCtx.uid ?? (await secureStoreGetItem("uid"));
+    if (!uid || !editedTripId) return;
+
+    Toast.show({
+      type: "loading",
+      text1: i18n.t("toastSaving1"),
+      text2: i18n.t("toastSaving2"),
+      autoHide: false,
+    });
+
+    try {
+      const result = await tripCtx.leaveTrip(editedTripId, {
+        uid,
+        tripHistory: userCtx.tripHistory ?? [],
+        roster: travellers,
+        openBalances: [],
+        removeFromTripHistoryLocal: userCtx.removeTripFromHistory,
+      });
+
+      Toast.hide();
+      if (!result.performed) {
+        return;
+      }
+      navigation.pop();
+    } catch (error) {
+      safeLogError(error);
+      Toast.hide();
+      Toast.show({
+        text1: i18n.t("toastSavingError1"),
+        text2: i18n.t("error2"),
+        type: "error",
+      });
+    }
+  }
+
+  function leaveHandler() {
+    if (!isConnected) {
+      Alert.alert(i18n.t("noConnection"), i18n.t("leaveTripConnectRequired"));
+      return;
+    }
+    Alert.alert(
+      i18n.t("leaveTrip"),
+      i18n.t("leaveTripSure"),
+      [
+        {
+          text: i18n.t("cancel"),
+          style: "cancel",
+        },
+        {
+          text: i18n.t("leaveTrip"),
+          style: "destructive",
+          onPress: () => {
+            void leaveAcceptHandler();
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  }
 
   async function editingTripData(tripData: TripData, setActive = false) {
     try {
@@ -1071,16 +1104,25 @@ const TripForm = ({ navigation, route }) => {
               {i18n.t("setActive")}
             </GradientButton>
           )}
-          {/* {isEditing && (
+          {isEditing && !isPromote && (userCtx.tripHistory?.length ?? 0) > 1 && (
             <GradientButton
-              buttonStyle={{ backgroundColor: GlobalStyles.colors.error300 }}
-              style={[styles.button, { marginBottom: 8, marginHorizontal: 24 }]}
-              onPress={deleteHandler}
+              buttonStyle={{
+                backgroundColor: GlobalStyles.colors.error300,
+                opacity: isConnected ? 1 : 0.5,
+              }}
+              style={[
+                styles.button,
+                {
+                  marginBottom: dynamicScale(8, false, 0.5),
+                  marginHorizontal: dynamicScale(24, false, 0.5),
+                },
+              ]}
+              onPress={leaveHandler}
               colors={GlobalStyles.gradientErrorButton}
             >
-              {i18n.t("deleteTrip")}
+              {i18n.t("leaveTrip")}
             </GradientButton>
-          )} */}
+          )}
         </KeyboardAvoidingView>
       </Animated.View>
       <View

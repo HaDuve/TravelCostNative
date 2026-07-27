@@ -18,7 +18,7 @@ const P1_BUDGET_KEYS = [
   "tripFormTitleEdit",
   "tripNameLabel",
   "enterNameAlert",
-  "deleteTrip",
+  "leaveTrip",
   "setActive",
   "travellers",
   "inviteTraveller",
@@ -51,7 +51,7 @@ describe("home-first P1 copy sweep (issue #357)", () => {
       expect(en.tripFormTitleEdit).toBe("Edit budget");
       expect(en.tripNameLabel).toBe("Budget name");
       expect(en.enterNameAlert).toBe("Please enter a name for your new budget.");
-      expect(en.deleteTrip).toBe("Delete budget");
+      expect(en.leaveTrip).toBe("Leave budget");
       expect(en.setActive).toBe("Set as active budget");
       expect(en.travellers).toBe("Nomads");
       expect(en.inviteTraveller).toBe("Invite other nomads");
@@ -106,7 +106,7 @@ describe("home-first P1 copy sweep (issue #357)", () => {
       for (const key of [
         "joinTripLabel",
         "shareTripLabel",
-        "deleteTrip",
+        "leaveTrip",
         "setActive",
         "pleaseCreateTrip",
         "paywallFeature0",
@@ -129,7 +129,7 @@ describe("home-first P1 copy sweep (issue #357)", () => {
       for (const key of [
         "joinTripLabel",
         "shareTripLabel",
-        "deleteTrip",
+        "leaveTrip",
         "enterNameAlert",
         "pleaseCreateTrip",
         "paywallFeature0",
@@ -151,7 +151,7 @@ describe("home-first P1 copy sweep (issue #357)", () => {
       for (const key of [
         "joinTripLabel",
         "shareTripLabel",
-        "deleteTrip",
+        "leaveTrip",
         "enterNameAlert",
         "pleaseCreateTrip",
         "paywallFeature0",

@@ -18,6 +18,11 @@ import { settleTrip } from "../util/settlement";
 import { useTripTotalSpent } from "../hooks/useTripTotalSpent";
 import { hydrateTrip } from "../util/hydrate-trip";
 import { normalizeTravellers } from "../util/normalize-travellers";
+import {
+  leaveTrip as executeLeaveTrip,
+  type LeaveTripDeps,
+  type LeaveTripResult,
+} from "../util/leave-trip";
 
 export type { TripData };
 
@@ -36,7 +41,11 @@ export type TripContextType = {
   fetchAndSetTravellers: (tripid: string) => Promise<boolean>;
   setTripid: (tripid: string) => void;
   addTrip: ({ tripName, tripTotalBudget }) => void;
-  deleteTrip: (tripid: string) => void;
+  /** Leave trip: roster removal + Trip history splice for plain leave. */
+  leaveTrip: (
+    tripid: string,
+    deps: Omit<LeaveTripDeps, "activeTripId">
+  ) => Promise<LeaveTripResult>;
   getcurrentTrip: () => TripData;
   setCurrentTrip: (tripid: string, trip: TripData) => Promise<TripData | void>;
   fetchAndSetCurrentTrip: (tripid: string) => Promise<TripData>;
@@ -71,7 +80,13 @@ export const TripContext = createContext<TripContextType>({
   setTripid: (tripid: string) => {},
 
   addTrip: ({ tripName, tripTotalBudget }) => {},
-  deleteTrip: (tripid: string) => {},
+  leaveTrip: async () => ({
+    allowed: false,
+    mode: "leave",
+    nextActiveTripId: null,
+    warnings: [],
+    performed: false,
+  }),
   getcurrentTrip: () => {
     const tripData = {} as TripData;
     return tripData;
@@ -345,7 +360,16 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
   }
 
   function addTrip() {}
-  function deleteTrip() {}
+
+  async function leaveTrip(
+    tripidToLeave: string,
+    deps: Omit<LeaveTripDeps, "activeTripId">
+  ): Promise<LeaveTripResult> {
+    return executeLeaveTrip(tripidToLeave, {
+      ...deps,
+      activeTripId: tripid,
+    });
+  }
 
   async function saveTripDataInStorage(tripData: TripData) {
     // cut away the trip.expenses array
@@ -412,7 +436,7 @@ function TripContextProvider({ children }: React.PropsWithChildren) {
     fetchAndSetTravellers: fetchAndSetTravellers,
     setTripid: _setTripid,
     addTrip: addTrip,
-    deleteTrip: deleteTrip,
+    leaveTrip: leaveTrip,
     getcurrentTrip: getcurrentTrip,
     setCurrentTrip: setCurrentTrip,
     fetchAndSetCurrentTrip: fetchAndSetCurrentTrip,

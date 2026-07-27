@@ -71,6 +71,8 @@ export type UserContextType = {
 
   tripHistory: string[];
   setTripHistory: (tripHistory: string[]) => void;
+  /** Remove a trip id from Trip history state + MMKV (Leave trip). */
+  removeTripFromHistory: (tripid: string) => void;
   updateTripHistory: () => void;
   isOnline: boolean;
   setIsOnline: (bool: boolean) => void;
@@ -108,6 +110,7 @@ export const UserContext = createContext<UserContextType>({
 
   tripHistory: [],
   setTripHistory: (tripHistory: string[]) => {},
+  removeTripFromHistory: (_tripid: string) => {},
   updateTripHistory: async () => {},
   isOnline: false,
   setIsOnline: (bool: boolean) => {},
@@ -172,6 +175,12 @@ function UserContextProvider({ children }) {
     } catch (error) {
       safeLogError(error);
     }
+  }
+
+  function removeTripFromHistory(tripid: string) {
+    const nextHistory = (tripHistory ?? []).filter((id) => id !== tripid);
+    setTripHistory(nextHistory);
+    setMMKVObject(MMKV_KEYS.TRIP_HISTORY, nextHistory);
   }
   useEffect(() => {
     const storedHistory = getMMKVObject(MMKV_KEYS.TRIP_HISTORY);
@@ -303,6 +312,7 @@ function UserContextProvider({ children }) {
 
     tripHistory: tripHistory,
     setTripHistory: setTripHistory,
+    removeTripFromHistory: removeTripFromHistory,
 
     lastCurrency: lastCurrency,
     setLastCurrency: setLastCurrency,

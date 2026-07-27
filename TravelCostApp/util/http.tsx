@@ -697,6 +697,29 @@ export async function putTravelerInTrip(tripid: string, traveller: Traveller) {
   }
 }
 
+/** Remove a Traveller roster entry (Leave trip). Does not delete expenses/splits. */
+export async function removeTravelerFromTrip(tripid: string, uid: string) {
+  try {
+    if (!tripid || !uid) {
+      throw new Error("tripid and uid are required");
+    }
+
+    const authToken = await getValidIdToken();
+    if (!authToken) {
+      console.warn("[HTTP] No valid auth token for removeTravelerFromTrip");
+      return null;
+    }
+
+    const response = await axios.delete(
+      `${BACKEND_URL}/trips/${tripid}/travellers/${uid}.json?auth=${authToken}`
+    );
+    return response;
+  } catch (error) {
+    safeLogError(error);
+    throw error;
+  }
+}
+
 export type tripTravellers = {
   [key: string]: {
     uid: string;
@@ -787,6 +810,15 @@ export async function updateTripHistory(userId: string, newTripid: string) {
     `${BACKEND_URL}/users/${userId}/tripHistory.json?auth=${authToken}`,
     tripHistory
   );
+}
+
+/** Splice a trip id out of the User's Trip history (Leave trip). */
+export async function removeTripFromHistory(userId: string, tripid: string) {
+  const tripHistory = await fetchTripHistory(userId);
+  const nextHistory = (tripHistory ?? []).filter(
+    (id: string) => id !== tripid
+  );
+  return storeTripHistory(userId, nextHistory);
 }
 
 export async function storeTripHistory(userId: string, tripHistory: string[]) {

@@ -1,6 +1,13 @@
 import React from "react";
 import { useState, useContext, useEffect, useLayoutEffect } from "react";
-import { View, Text, Alert, ScrollView, Platform } from "react-native";
+import {
+  View,
+  Text,
+  Alert,
+  ScrollView,
+  Platform,
+  Pressable,
+} from "react-native";
 import { StyleSheet } from "react-native";
 import { GlobalStyles } from "../../constants/styles";
 import { shadowRegressionStyles } from "../../styles/shadow-regression-styles";
@@ -63,6 +70,14 @@ import { trackEvent } from "../../util/vexo-tracking";
 import { VexoEvents } from "../../util/vexo-constants";
 import { getTripData } from "../../util/trip";
 import { countableTripsTowardNonPremiumLimit } from "../../util/implicit-default-trip";
+import {
+  buildTripFormSubmitData,
+  hasOptionalTripFormValues,
+  resolveTripFormMode,
+  shouldConfirmCurrencyChange,
+  type TripFormMode,
+} from "../../util/trip-form";
+import { hasDailyBudget, hasTotalBudget } from "../../util/budget-free";
 
 const TripForm = ({ navigation, route }) => {
   const tripCtx = useContext(TripContext);
@@ -107,21 +122,15 @@ const TripForm = ({ navigation, route }) => {
     },
   });
 
-  // datepicker states
+  // datepicker states — unset by default (no invented today→+7 window)
   const [showDatePickerRange, setShowDatePickerRange] = useState(false);
-  const [startDate, setStartDate] = useState(
-    // defaultValues
-    // ? getFormattedDate(DateTime.fromJSDate(defaultValues.date).toJSDate())
-    // :
-    getFormattedDate(DateTime.now())
-  );
-  const [endDate, setEndDate] = useState(
-    // defaultValues
-    //   ? getFormattedDate(DateTime.fromJSDate(defaultValues.date).toJSDate())
-    //   :
-    getFormattedDate(DateTime.now().plus({ days: 7 }))
-  );
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [travellers, setTravellers] = useState([]);
+  const [loadedIsImplicitDefault, setLoadedIsImplicitDefault] = useState(
+    false
+  );
+  const [optionalDetailsOpen, setOptionalDetailsOpen] = useState(false);
 
   const openDatePickerRange = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -151,25 +160,52 @@ const TripForm = ({ navigation, route }) => {
 
   const editedTripId = route.params?.tripId;
   const isEditing = !!editedTripId;
+  const formMode: TripFormMode = resolveTripFormMode(route.params, {
+    isImplicitDefault: loadedIsImplicitDefault,
+  });
+  const isPromote = formMode === "promote";
+  const isAddAnother = formMode === "addAnother";
 
   useLayoutEffect(() => {
+    const applyLoadedTrip = (selectedTrip: TripData) => {
+      const daily =
+        selectedTrip.dailyBudget !== undefined &&
+        selectedTrip.dailyBudget !== null
+          ? String(selectedTrip.dailyBudget)
+          : "";
+      const total =
+        selectedTrip.totalBudget !== undefined &&
+        selectedTrip.totalBudget !== null
+          ? String(selectedTrip.totalBudget)
+          : "";
+      inputChangedHandler("tripName", selectedTrip.tripName ?? "");
+      inputChangedHandler("tripCurrency", selectedTrip.tripCurrency);
+      inputChangedHandler("dailyBudget", daily === "0" ? "" : daily);
+      inputChangedHandler(
+        "totalBudget",
+        total === "0" || Number(total) >= MAX_JS_NUMBER ? "" : total
+      );
+      inputChangedHandler(
+        "isDynamicDailyBudget",
+        selectedTrip.isDynamicDailyBudget
+      );
+      setStartDate(selectedTrip.startDate ?? "");
+      setEndDate(selectedTrip.endDate ?? "");
+      setTravellers(selectedTrip.travellers ?? []);
+      setLoadedIsImplicitDefault(selectedTrip.isImplicitDefault === true);
+      setOptionalDetailsOpen(
+        hasOptionalTripFormValues({
+          ...selectedTrip,
+          dailyBudget: daily,
+          totalBudget: total,
+        })
+      );
+    };
+
     const fetchTripData = async () => {
       try {
         const selectedTrip = await fetchTrip(editedTripId);
-        inputChangedHandler("tripName", selectedTrip.tripName);
-        inputChangedHandler("tripCurrency", selectedTrip.tripCurrency);
-        inputChangedHandler("dailyBudget", selectedTrip.dailyBudget.toString());
-        inputChangedHandler(
-          "totalBudget",
-          selectedTrip.totalBudget?.toString()
-        );
-        inputChangedHandler(
-          "isDynamicDailyBudget",
-          selectedTrip.isDynamicDailyBudget
-        );
-        setStartDate(selectedTrip.startDate);
-        setEndDate(selectedTrip.endDate);
-        setTravellers(selectedTrip.travellers);
+        applyLoadedTrip(selectedTrip);
       } catch (error) {
         safeLogError(error);
       }
@@ -179,14 +215,18 @@ const TripForm = ({ navigation, route }) => {
       // if we are editing a trip, we load the data from the context
       // no need to fetch it from the server in that case
       if (tripCtx.tripid == editedTripId) {
-        inputChangedHandler("tripName", tripCtx.tripName);
-        inputChangedHandler("totalBudget", tripCtx.totalBudget);
-        inputChangedHandler("dailyBudget", tripCtx.dailyBudget);
-        inputChangedHandler("tripCurrency", tripCtx.tripCurrency);
-        inputChangedHandler(
-          "isDynamicDailyBudget",
-          tripCtx.isDynamicDailyBudget
-        );
+        applyLoadedTrip({
+          tripName: tripCtx.tripName,
+          totalBudget: tripCtx.totalBudget,
+          dailyBudget: tripCtx.dailyBudget,
+          tripCurrency: tripCtx.tripCurrency,
+          isDynamicDailyBudget: tripCtx.isDynamicDailyBudget,
+          startDate: tripCtx.startDate,
+          endDate: tripCtx.endDate,
+          travellers: tripCtx.travellers,
+          isImplicitDefault: (tripCtx as { isImplicitDefault?: boolean })
+            .isImplicitDefault,
+        });
         setIsLoading(false);
         return;
       } else {
@@ -197,16 +237,22 @@ const TripForm = ({ navigation, route }) => {
     if (isEditing && editedTripId) {
       loadTripDataFromContext();
       fetchTripData();
+    } else if (isAddAnother) {
+      setOptionalDetailsOpen(false);
     }
   }, [
     editedTripId,
     isEditing,
+    isAddAnother,
     tripCtx.dailyBudget,
     tripCtx.totalBudget,
     tripCtx.tripCurrency,
     tripCtx.tripName,
     tripCtx.tripid,
     tripCtx.isDynamicDailyBudget,
+    tripCtx.startDate,
+    tripCtx.endDate,
+    tripCtx.travellers,
   ]);
 
   const [countryValue, setCountryValue] = useState(
@@ -392,27 +438,27 @@ const TripForm = ({ navigation, route }) => {
     // tripCurrency should not be empty
     const tripCurrencyIsValid =
       tripData.tripCurrency && tripData.tripCurrency?.length > 0;
-    // Total budget should be a number between 0 and 3B
+    // Total budget optional; when both set, total must exceed daily
+    const hasTotal = hasTotalBudget(tripData);
+    const hasDaily = hasDailyBudget(tripData);
     const totalBudgetIsValid =
-      !tripData.totalBudget ||
-      tripData.totalBudget === "0" ||
-      (tripData.totalBudget &&
-        !isNaN(+tripData.totalBudget) &&
+      !hasTotal ||
+      (!isNaN(+tripData.totalBudget) &&
         +tripData.totalBudget >= 0 &&
         +tripData.totalBudget < MAX_JS_NUMBER &&
-        +tripData.totalBudget > +tripData.dailyBudget);
+        (!hasDaily || +tripData.totalBudget > +tripData.dailyBudget));
 
     const dynamicIsValid =
       !tripData.isDynamicDailyBudget ||
-      (tripData.isDynamicDailyBudget && totalBudgetIsValid);
+      (tripData.isDynamicDailyBudget && hasTotal);
 
+    // Daily optional (budget-free allowed); when set must be positive
     const dailyBudgetIsValid =
-      !isNaN(+tripData.dailyBudget) &&
-      +tripData.dailyBudget > 0 &&
-      +tripData.dailyBudget < MAX_JS_NUMBER &&
-      (!tripData.totalBudget ||
-        tripData.totalBudget === "0" ||
-        +tripData.dailyBudget < +tripData.totalBudget);
+      !hasDaily ||
+      (!isNaN(+tripData.dailyBudget) &&
+        +tripData.dailyBudget > 0 &&
+        +tripData.dailyBudget < MAX_JS_NUMBER &&
+        (!hasTotal || +tripData.dailyBudget < +tripData.totalBudget));
 
     if (!tripNameIsValid) {
       inputs.tripName.isValid = tripNameIsValid;
@@ -469,38 +515,24 @@ const TripForm = ({ navigation, route }) => {
       Toast.hide();
       return;
     }
-    const tripData: TripData = {
+    const tripData: TripData = buildTripFormSubmitData({
+      mode: formMode,
       tripName: inputs.tripName.value,
       totalBudget: inputs.totalBudget.value,
       tripCurrency: inputs.tripCurrency.value,
       dailyBudget: inputs.dailyBudget.value,
-      startDate: startDate,
-      endDate: endDate,
+      startDate,
+      endDate,
       tripid: editedTripId,
       travellers: travellers,
       isDynamicDailyBudget: inputs.isDynamicDailyBudget.value,
-    };
-
-    if (
-      !tripData.dailyBudget &&
-      tripData.totalBudget &&
-      tripData.startDate &&
-      tripData.endDate &&
-      !tripData.isDynamicDailyBudget
-    ) {
-      const diffDays = daysBetween(new Date(endDate), new Date(startDate)) + 1;
-      const calcDailyBudget = (
-        Number(inputs.totalBudget.value) / diffDays
-      ).toFixed(2);
-      tripData.dailyBudget = calcDailyBudget;
-    }
+    });
 
     const formIsValid = checkFormValidity(tripData);
     if (!formIsValid) return;
-    if (!tripData.totalBudget) tripData.totalBudget = "0";
     try {
-      if (isEditing) {
-        await editingTripData(tripData, setActive);
+      if (isEditing || isPromote) {
+        await editingTripData(tripData, setActive || isPromote);
       } else {
         await createTripData(tripData);
       }
@@ -529,6 +561,21 @@ const TripForm = ({ navigation, route }) => {
 
   function updateCurrency() {
     if (!countryValue || countryValue.length < 1) return;
+    const apply = () => {
+      inputChangedHandler("tripCurrency", countryValue?.split(" ")[0]);
+    };
+    const expenseCount = Array.isArray(expenseCtx.expenses)
+      ? expenseCtx.expenses.length
+      : 0;
+    if (
+      !shouldConfirmCurrencyChange({
+        isEditing,
+        expenseCount,
+      })
+    ) {
+      apply();
+      return;
+    }
     Alert.alert(
       i18n.t("alertChangeHomeCurrencyTitle"),
       i18n.t("alertChangeHomeCurrencyMessage"),
@@ -540,9 +587,7 @@ const TripForm = ({ navigation, route }) => {
         {
           text: i18n.t("yes"),
           style: "destructive",
-          onPress: () => {
-            inputChangedHandler("tripCurrency", countryValue?.split(" ")[0]);
-          },
+          onPress: apply,
         },
       ]
     );
@@ -605,12 +650,15 @@ const TripForm = ({ navigation, route }) => {
     setInfoIsVisible(true);
   }
 
-  const titleString = isEditing
-    ? i18n.t("tripFormTitleEdit")
-    : i18n.t("tripFormTitleNew");
-  const currencyView = isEditing ? (
-    <></>
-  ) : (
+  const titleString =
+    formMode === "promote"
+      ? i18n.t("tripFormTitlePromote")
+      : formMode === "addAnother"
+        ? i18n.t("tripFormTitleAddAnother")
+        : i18n.t("tripFormTitleEdit");
+  const subtitleString =
+    formMode === "addAnother" ? i18n.t("tripFormSubtitleAddAnother") : "";
+  const currencyView = (
     <View style={styles.currencyPickerContainer}>
       <CurrencyPicker
         placeholder={
@@ -742,7 +790,14 @@ const TripForm = ({ navigation, route }) => {
               isEditing && { minHeight: "70%" },
             ]}
           >
-            <Text style={styles.title}>{titleString}</Text>
+            <Text style={styles.title} testID="trip-form-title">
+              {titleString}
+            </Text>
+            {!!subtitleString && (
+              <Text style={styles.subtitle} testID="trip-form-subtitle">
+                {subtitleString}
+              </Text>
+            )}
 
             <Input
               label={i18n.t("tripNameLabel")}
@@ -756,166 +811,206 @@ const TripForm = ({ navigation, route }) => {
               autoFocus={false}
             />
 
-            {currencyView}
+            <Pressable
+              testID="trip-form-optional-toggle"
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setOptionalDetailsOpen((open) => !open);
+              }}
+              style={styles.optionalToggle}
+            >
+              <Text style={styles.optionalToggleText}>
+                {i18n.t("tripFormOptionalDetails")}
+                {optionalDetailsOpen ? " ▲" : " ▼"}
+              </Text>
+            </Pressable>
 
-            <View style={styles.categoryRow}>
-              {/* TODO: add recalculate button */}
-              <Input
-                label={`${i18n.t("totalBudgetLabel")} ${
-                  inputs.tripCurrency.value
-                }`}
-                style={{ flex: 1, marginTop: "-2%" }}
-                inputStyle={{}}
-                autoFocus={false}
-                textInputConfig={{
-                  keyboardType: "decimal-pad",
-                  onChangeText: inputChangedHandler.bind(this, "totalBudget"),
-                  value: inputs.totalBudget.value,
-                }}
-                invalid={!inputs.totalBudget.isValid}
-              />
-              {validDailyBudgetEntry && !inputs.isDynamicDailyBudget.value && (
-                <Animated.View
-                  entering={ZoomIn}
-                  exiting={ZoomOut}
-                  style={styles.recalcButtonContainer}
-                >
-                  <IconButton
-                    icon="git-compare-outline"
-                    color={GlobalStyles.colors.primary500}
-                    size={dynamicScale(36, false, 0.5)}
-                    buttonStyle={styles.recalcButton}
-                    onPressStyle={GlobalStyles.pressedWithShadow}
-                    onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      const diffDays =
-                        daysBetween(new Date(endDate), new Date(startDate)) + 1;
-                      const calcTotalBudget =
-                        Number(inputs.dailyBudget.value) * diffDays;
-                      inputChangedHandler(
-                        "totalBudget",
-                        calcTotalBudget.toString()
-                      );
-                    }}
-                  />
-                </Animated.View>
-              )}
-              <InfoButton
-                onPress={showInfoHandler.bind(this, infoEnum.totalBudget)}
-                containerStyle={{ marginTop: "-3%" }}
-              ></InfoButton>
-            </View>
+            {optionalDetailsOpen && (
+              <View testID="trip-form-optional-section">
+                {currencyView}
 
-            {!inputs.isDynamicDailyBudget.value && (
-              <View>
                 <View style={styles.categoryRow}>
+                  {/* TODO: add recalculate button */}
                   <Input
-                    style={{ flex: 1 }}
-                    inputStyle={{}}
-                    autoFocus={false}
-                    label={`${i18n.t("dailyBudgetLabel")} ${
+                    label={`${i18n.t("totalBudgetLabel")} ${
                       inputs.tripCurrency.value
                     }`}
+                    style={{ flex: 1, marginTop: "-2%" }}
+                    inputStyle={{}}
+                    autoFocus={false}
                     textInputConfig={{
                       keyboardType: "decimal-pad",
                       onChangeText: inputChangedHandler.bind(
                         this,
-                        "dailyBudget"
+                        "totalBudget"
                       ),
-                      value: inputs.dailyBudget.value,
+                      value: inputs.totalBudget.value,
                     }}
-                    invalid={!inputs.dailyBudget.isValid}
+                    invalid={!inputs.totalBudget.isValid}
                   />
-                  {validTotalBudgetEntry && (
-                    <Animated.View
-                      entering={ZoomIn}
-                      exiting={ZoomOut}
-                      style={styles.recalcButtonContainer}
-                    >
-                      <IconButton
-                        icon="git-compare-outline"
-                        color={GlobalStyles.colors.primary500}
-                        size={dynamicScale(36, false, 0.5)}
-                        buttonStyle={styles.recalcButton}
-                        onPressStyle={GlobalStyles.pressedWithShadow}
-                        onPress={() => {
-                          Haptics.impactAsync(
-                            Haptics.ImpactFeedbackStyle.Light
-                          );
-                          const diffDays =
-                            daysBetween(
-                              new Date(endDate),
-                              new Date(startDate)
-                            ) + 1;
-                          const calcDailyBudget = (
-                            Number(inputs.totalBudget.value) / diffDays
-                          ).toFixed(2);
+                  {validDailyBudgetEntry &&
+                    !inputs.isDynamicDailyBudget.value &&
+                    !!startDate &&
+                    !!endDate && (
+                      <Animated.View
+                        entering={ZoomIn}
+                        exiting={ZoomOut}
+                        style={styles.recalcButtonContainer}
+                      >
+                        <IconButton
+                          icon="git-compare-outline"
+                          color={GlobalStyles.colors.primary500}
+                          size={dynamicScale(36, false, 0.5)}
+                          buttonStyle={styles.recalcButton}
+                          onPressStyle={GlobalStyles.pressedWithShadow}
+                          onPress={() => {
+                            Haptics.impactAsync(
+                              Haptics.ImpactFeedbackStyle.Light
+                            );
+                            const diffDays =
+                              daysBetween(
+                                new Date(endDate),
+                                new Date(startDate)
+                              ) + 1;
+                            const calcTotalBudget =
+                              Number(inputs.dailyBudget.value) * diffDays;
+                            inputChangedHandler(
+                              "totalBudget",
+                              calcTotalBudget.toString()
+                            );
+                          }}
+                        />
+                      </Animated.View>
+                    )}
+                  <InfoButton
+                    onPress={showInfoHandler.bind(this, infoEnum.totalBudget)}
+                    containerStyle={{ marginTop: "-3%" }}
+                  ></InfoButton>
+                </View>
+
+                {!inputs.isDynamicDailyBudget.value && (
+                  <View>
+                    <View style={styles.categoryRow}>
+                      <Input
+                        style={{ flex: 1 }}
+                        inputStyle={{}}
+                        autoFocus={false}
+                        label={`${i18n.t("dailyBudgetLabel")} ${
+                          inputs.tripCurrency.value
+                        }`}
+                        textInputConfig={{
+                          keyboardType: "decimal-pad",
+                          onChangeText: inputChangedHandler.bind(
+                            this,
+                            "dailyBudget"
+                          ),
+                          value: inputs.dailyBudget.value,
+                        }}
+                        invalid={!inputs.dailyBudget.isValid}
+                      />
+                      {validTotalBudgetEntry && !!startDate && !!endDate && (
+                        <Animated.View
+                          entering={ZoomIn}
+                          exiting={ZoomOut}
+                          style={styles.recalcButtonContainer}
+                        >
+                          <IconButton
+                            icon="git-compare-outline"
+                            color={GlobalStyles.colors.primary500}
+                            size={dynamicScale(36, false, 0.5)}
+                            buttonStyle={styles.recalcButton}
+                            onPressStyle={GlobalStyles.pressedWithShadow}
+                            onPress={() => {
+                              Haptics.impactAsync(
+                                Haptics.ImpactFeedbackStyle.Light
+                              );
+                              const diffDays =
+                                daysBetween(
+                                  new Date(endDate),
+                                  new Date(startDate)
+                                ) + 1;
+                              const calcDailyBudget = (
+                                Number(inputs.totalBudget.value) / diffDays
+                              ).toFixed(2);
+                              inputChangedHandler(
+                                "dailyBudget",
+                                calcDailyBudget.toString()
+                              );
+                            }}
+                          />
+                        </Animated.View>
+                      )}
+                      <InfoButton
+                        onPress={showInfoHandler.bind(
+                          this,
+                          infoEnum.dailyBudget
+                        )}
+                        containerStyle={{ marginTop: "-3%" }}
+                      ></InfoButton>
+                    </View>
+                  </View>
+                )}
+                <View style={styles.dynamicDailyContainer}>
+                  <Text style={styles.dynamicDailyLabel}>
+                    Calculate Daily Budget dynamically
+                  </Text>
+                  <Switch
+                    value={inputs.isDynamicDailyBudget.value}
+                    style={{ marginRight: "5%" }}
+                    color={GlobalStyles.colors.primary500}
+                    onValueChange={(value) => {
+                      if (startDate && endDate) {
+                        const calcNewDaily =
+                          +inputs.totalBudget.value /
+                          daysBetween(new Date(endDate), new Date(startDate));
+                        const isAPositiveInt =
+                          !isNaN(calcNewDaily) &&
+                          calcNewDaily > 0 &&
+                          calcNewDaily < MAX_JS_NUMBER;
+                        const newDailyBudget =
+                          isAPositiveInt && calcNewDaily.toFixed(2);
+                        if (
+                          !inputs.dailyBudget.value &&
+                          inputs.totalBudget.value
+                        )
                           inputChangedHandler(
                             "dailyBudget",
-                            calcDailyBudget.toString()
+                            newDailyBudget ?? ""
                           );
-                        }}
-                      />
-                    </Animated.View>
-                  )}
+                      }
+                      inputChangedHandler("isDynamicDailyBudget", value);
+                    }}
+                  ></Switch>
                   <InfoButton
-                    onPress={showInfoHandler.bind(this, infoEnum.dailyBudget)}
-                    containerStyle={{ marginTop: "-3%" }}
+                    onPress={showInfoHandler.bind(
+                      this,
+                      infoEnum.dynamicDailyBudget
+                    )}
+                    containerStyle={{ marginLeft: "-4%" }}
+                  ></InfoButton>
+                </View>
+                <Text
+                  style={[
+                    styles.label,
+                    { marginLeft: "5%", marginTop: "2%", marginBottom: "-4%" },
+                  ]}
+                >
+                  {i18n.t("datePickerLabel")}
+                </Text>
+                <View style={{ flexDirection: "row" }}>
+                  {DatePickerContainer({
+                    openDatePickerRange,
+                    startDate,
+                    endDate,
+                    dateIsRanged: true,
+                  })}
+                  <InfoButton
+                    onPress={showInfoHandler.bind(this, infoEnum.datePicker)}
+                    containerStyle={{ marginLeft: "-4%" }}
                   ></InfoButton>
                 </View>
               </View>
             )}
-            <View style={styles.dynamicDailyContainer}>
-              <Text style={styles.dynamicDailyLabel}>
-                Calculate Daily Budget dynamically
-              </Text>
-              <Switch
-                value={inputs.isDynamicDailyBudget.value}
-                style={{ marginRight: "5%" }}
-                color={GlobalStyles.colors.primary500}
-                onValueChange={(value) => {
-                  const calcNewDaily =
-                    +inputs.totalBudget.value /
-                    daysBetween(new Date(endDate), new Date(startDate));
-                  const isAPositiveInt =
-                    !isNaN(calcNewDaily) &&
-                    calcNewDaily > 0 &&
-                    calcNewDaily < MAX_JS_NUMBER;
-                  const newDailyBudget =
-                    isAPositiveInt && calcNewDaily.toFixed(2);
-                  if (!inputs.dailyBudget.value && inputs.totalBudget.value)
-                    inputChangedHandler("dailyBudget", newDailyBudget ?? "");
-                  inputChangedHandler("isDynamicDailyBudget", value);
-                }}
-              ></Switch>
-              <InfoButton
-                onPress={showInfoHandler.bind(
-                  this,
-                  infoEnum.dynamicDailyBudget
-                )}
-                containerStyle={{ marginLeft: "-4%" }}
-              ></InfoButton>
-            </View>
-            <Text
-              style={[
-                styles.label,
-                { marginLeft: "5%", marginTop: "2%", marginBottom: "-4%" },
-              ]}
-            >
-              {i18n.t("datePickerLabel")}
-            </Text>
-            <View style={{ flexDirection: "row" }}>
-              {DatePickerContainer({
-                openDatePickerRange,
-                startDate,
-                endDate,
-                dateIsRanged: true,
-              })}
-              <InfoButton
-                onPress={showInfoHandler.bind(this, infoEnum.datePicker)}
-                containerStyle={{ marginLeft: "-4%" }}
-              ></InfoButton>
-            </View>
           </View>
           {/* Add Currency Input field */}
           <View style={styles.buttonContainer}>
@@ -937,7 +1032,7 @@ const TripForm = ({ navigation, route }) => {
             )}
           </View>
           {/* Horizontal container */}
-          {isEditing && (
+          {isEditing && !isPromote && (
             <GradientButton
               buttonStyle={{}}
               style={[
@@ -1050,8 +1145,24 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: GlobalStyles.colors.textColor,
     marginTop: dynamicScale(5, false, 0.5),
-    marginBottom: dynamicScale(24, false, 0.5),
+    marginBottom: dynamicScale(8, false, 0.5),
     textAlign: "center",
+  },
+  subtitle: {
+    fontSize: dynamicScale(14, false, 0.5),
+    color: GlobalStyles.colors.textColor,
+    marginBottom: dynamicScale(16, false, 0.5),
+    textAlign: "center",
+    opacity: 0.8,
+  },
+  optionalToggle: {
+    paddingVertical: dynamicScale(10, false, 0.5),
+    marginBottom: dynamicScale(4, false, 0.5),
+  },
+  optionalToggleText: {
+    fontSize: dynamicScale(14, false, 0.5),
+    fontWeight: "600",
+    color: GlobalStyles.colors.primary500,
   },
   categoryRow: {
     flex: 1,

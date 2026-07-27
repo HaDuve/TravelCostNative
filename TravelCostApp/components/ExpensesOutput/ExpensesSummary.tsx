@@ -26,6 +26,10 @@ import {
   calculateDailyAverage,
   getBudgetColor,
 } from "../../util/budget";
+import {
+  periodProgressApplies,
+  resolvePeriodStartDate,
+} from "../../util/budget-free";
 import BudgetOverviewModal from "./BudgetOverviewModal";
 
 const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
@@ -58,6 +62,14 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
       </View>
     );
   }
+
+  const showProgress = periodProgressApplies(
+    {
+      dailyBudget: tripCtx.dailyBudget,
+      totalBudget: tripCtx.totalBudget,
+    },
+    periodName
+  );
 
   const expensesSum = getExpensesSumPeriod(safeExpenses, hideSpecial);
 
@@ -120,31 +132,46 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
     budgetNumber > 0 ? (expenseSumNum / budgetNumber) * 1 : 0;
 
   const today = new Date();
-  const averageDailySpending = settings.trafficLightBudgetColors
-    ? calculateDailyAverage(
-        periodName as "day" | "week" | "month" | "year" | "total",
-        today,
-        expCtx.expenses || [],
-        {
-          startDate: tripCtx.startDate,
-        },
-        hideSpecial,
-      )
-    : 0;
+  const periodStart =
+    resolvePeriodStartDate(
+      tripCtx.startDate,
+      (expCtx.expenses || []).map((e) => {
+        const d = e.date;
+        if (d instanceof Date) return d;
+        if (typeof d === "string") return d;
+        if (d && typeof (d as { toJSDate?: () => Date }).toJSDate === "function") {
+          return (d as { toJSDate: () => Date }).toJSDate();
+        }
+        return undefined;
+      })
+    ) ?? tripCtx.startDate;
+  const averageDailySpending =
+    settings.trafficLightBudgetColors && periodStart
+      ? calculateDailyAverage(
+          periodName as "day" | "week" | "month" | "year" | "total",
+          today,
+          expCtx.expenses || [],
+          {
+            startDate: periodStart,
+          },
+          hideSpecial,
+        )
+      : 0;
 
   const dailyBudget = Number(tripCtx.dailyBudget) || 0;
-  const budgetColor = noTotalBudget
-    ? GlobalStyles.colors.primary500
-    : getBudgetColor(
-        expenseSumNum,
-        budgetNumber,
-        averageDailySpending,
-        dailyBudget,
-        settings.trafficLightBudgetColors,
-      );
+  const budgetColor =
+    !showProgress || noTotalBudget
+      ? GlobalStyles.colors.primary500
+      : getBudgetColor(
+          expenseSumNum,
+          budgetNumber,
+          averageDailySpending,
+          dailyBudget,
+          settings.trafficLightBudgetColors,
+        );
 
   let unfilledColor = GlobalStyles.colors.gray600;
-  if (!noTotalBudget) {
+  if (!noTotalBudget && showProgress) {
     if (budgetColor === GlobalStyles.colors.error300) {
       unfilledColor = GlobalStyles.colors.errorGrayed;
     } else if (budgetColor === GlobalStyles.colors.accent500) {
@@ -157,16 +184,17 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
   }
 
   if (budgetProgress > 1) budgetProgress -= 1;
-  if (noTotalBudget) {
+  if (noTotalBudget || !showProgress) {
     budgetProgress = 0;
   }
-  if (Number.isNaN(budgetProgress)) {
+  if (showProgress && Number.isNaN(budgetProgress)) {
     return <></>;
   }
   const valid = tripCtx.tripid && travellerNames.length > 0;
   const closeOverview = () => setIsOverviewVisible(false);
 
   const pressBudgetHandler = () => {
+    if (!showProgress) return;
     if (isOverviewVisible) {
       closeOverview();
       return;
@@ -188,31 +216,33 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
 
   return (
     <>
-    <BudgetOverviewModal
-      isVisible={isOverviewVisible}
-      onClose={closeOverview}
-      travellerList={travellerNames}
-      travellerBudgets={
-        travellerNames.length > 0 ? budgetNumber / travellerNames.length : 0
-      }
-      travellerSplitExpenseSums={travellerSplitExpenseSums}
-      currency={tripCurrency}
-      noTotalBudget={noTotalBudget}
-      periodName={periodName}
-      trafficLightActive={settings.trafficLightBudgetColors}
-      currentBudgetColor={budgetColor}
-      averageDailySpending={averageDailySpending}
-      dailyBudget={dailyBudget}
-      expenseSumNum={expenseSumNum}
-      budgetNumber={budgetNumber}
-    />
+    {showProgress && (
+      <BudgetOverviewModal
+        isVisible={isOverviewVisible}
+        onClose={closeOverview}
+        travellerList={travellerNames}
+        travellerBudgets={
+          travellerNames.length > 0 ? budgetNumber / travellerNames.length : 0
+        }
+        travellerSplitExpenseSums={travellerSplitExpenseSums}
+        currency={tripCurrency}
+        noTotalBudget={noTotalBudget}
+        periodName={periodName}
+        trafficLightActive={settings.trafficLightBudgetColors}
+        currentBudgetColor={budgetColor}
+        averageDailySpending={averageDailySpending}
+        dailyBudget={dailyBudget}
+        expenseSumNum={expenseSumNum}
+        budgetNumber={budgetNumber}
+      />
+    )}
     <Pressable
       testID="expenses-summary-pressable"
       onPress={() => pressBudgetHandler()}
       style={({ pressed }) => [
         shadowRegressionStyles.expensesSummaryContainer,
         style,
-        pressed && GlobalStyles.pressedWithShadow,
+        pressed && showProgress && GlobalStyles.pressedWithShadow,
       ]}
     >
       <View style={styles.sumTextContainer}>
@@ -224,14 +254,17 @@ const ExpensesSummary = ({ expenses, periodName, style = {} }) => {
           disableAnimation={settings.disableNumberAnimations}
         />
       </View>
-      <Progress.Bar
-        color={budgetColor}
-        unfilledColor={unfilledColor}
-        borderWidth={0}
-        borderRadius={dynamicScale(6)}
-        progress={budgetProgress}
-        height={constantScale(6, 0.5)}
-      />
+      {showProgress && (
+        <Progress.Bar
+          testID="expenses-summary-progress"
+          color={budgetColor}
+          unfilledColor={unfilledColor}
+          borderWidth={0}
+          borderRadius={dynamicScale(6)}
+          progress={budgetProgress}
+          height={constantScale(6, 0.5)}
+        />
+      )}
     </Pressable>
     </>
   );

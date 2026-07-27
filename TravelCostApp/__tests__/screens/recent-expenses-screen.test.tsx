@@ -232,7 +232,7 @@ describe("RecentExpenses screen", () => {
     );
   });
 
-  it("shows period summary for an implicit default Active trip", () => {
+  it("hides period progress on a budget-free implicit default Active trip", () => {
     const navigation = { navigate: jest.fn() };
     const screen = renderWithAppProviders(
       <RecentExpenses navigation={navigation as any} />,
@@ -255,6 +255,7 @@ describe("RecentExpenses screen", () => {
     );
 
     expect(screen.getByTestId("expenses-summary-pressable")).toBeTruthy();
+    expect(screen.queryByTestId("expenses-summary-progress")).toBeNull();
   });
 
   it("keeps the add-expense entry point on Recent Expenses for an implicit default Active trip", () => {

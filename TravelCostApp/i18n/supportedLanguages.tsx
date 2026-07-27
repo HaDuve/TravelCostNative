@@ -171,6 +171,10 @@ const en = {
   // Trip Form Labels
   tripFormTitleNew: "New Trip Budget",
   tripFormTitleEdit: "Edit Trip Budget",
+  tripFormTitlePromote: "Name your budget",
+  tripFormTitleAddAnother: "Add another budget",
+  tripFormSubtitleAddAnother: "New budgets start empty",
+  tripFormOptionalDetails: "Optional details",
   tripNameLabel: "Trip Name",
   baseCurrencyLabel: "Home Currency",
   totalBudgetLabel: "Total Budget in",
@@ -762,6 +766,10 @@ const de = {
   // Trip Form Labels
   tripFormTitleNew: "Neue Reise erstellen",
   tripFormTitleEdit: "Reise bearbeiten",
+  tripFormTitlePromote: "Budget benennen",
+  tripFormTitleAddAnother: "Weiteres Budget hinzufügen",
+  tripFormSubtitleAddAnother: "Neue Budgets starten leer",
+  tripFormOptionalDetails: "Optionale Details",
   tripNameLabel: "Name der Reise",
   tripCurrencyLabel: "Deine Heimatwährung in",
   totalBudgetLabel: "Gesamtbudget in",
@@ -1382,6 +1390,10 @@ const fr = {
   // Trip Form Labels
   tripFormTitleNew: "Nouveau voyage",
   tripFormTitleEdit: "Modifier le voyage",
+  tripFormTitlePromote: "Nommer votre budget",
+  tripFormTitleAddAnother: "Ajouter un autre budget",
+  tripFormSubtitleAddAnother: "Les nouveaux budgets commencent vides",
+  tripFormOptionalDetails: "Détails optionnels",
   tripNameLabel: "Nom du voyage",
   baseCurrencyLabel: "Devise du domicile",
   totalBudgetLabel: "Budget total en",
@@ -1996,6 +2008,10 @@ const ru = {
   // Trip Form Labels
   tripFormTitleNew: "Новая поездка",
   tripFormTitleEdit: "Изменить поездку",
+  tripFormTitlePromote: "Назовите бюджет",
+  tripFormTitleAddAnother: "Добавить другой бюджет",
+  tripFormSubtitleAddAnother: "Новые бюджеты начинаются пустыми",
+  tripFormOptionalDetails: "Дополнительные детали",
   tripNameLabel: "Название поездки",
   baseCurrencyLabel: "Домашняя валюта",
   totalBudgetLabel: "Общий бюджет в",

@@ -57,28 +57,26 @@ export async function leaveTrip(
     return { ...plan, performed: false, promotedTripName: null };
   }
 
+  let promotedTripName: string | null = null;
+
+  // Promote first when leaving the Active trip so a failed activateTrip does
+  // not leave the User without a valid Active trip after roster/history writes.
+  if (plan.nextActiveTripId) {
+    if (!deps.activate) {
+      throw new Error(
+        "leaveTrip: activate deps required to promote Active trip"
+      );
+    }
+    const { tripData } = await activateTrip(plan.nextActiveTripId, {
+      uid: deps.uid,
+      ...deps.activate,
+    });
+    promotedTripName = tripData.tripName ?? null;
+  }
+
   await removeTravelerFromTrip(tripid, deps.uid);
   await removeTripFromHistoryRemote(deps.uid, tripid);
   deps.removeFromTripHistoryLocal(tripid);
 
-  if (!plan.nextActiveTripId) {
-    return { ...plan, performed: true, promotedTripName: null };
-  }
-
-  if (!deps.activate) {
-    throw new Error(
-      "leaveTrip: activate deps required to promote Active trip"
-    );
-  }
-
-  const { tripData } = await activateTrip(plan.nextActiveTripId, {
-    uid: deps.uid,
-    ...deps.activate,
-  });
-
-  return {
-    ...plan,
-    performed: true,
-    promotedTripName: tripData.tripName ?? null,
-  };
+  return { ...plan, performed: true, promotedTripName };
 }

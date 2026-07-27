@@ -215,6 +215,42 @@ describe("leaveTrip Active trip promotion", () => {
     expect(after.expensesState).toEqual(before.expensesState);
     expect(after.expensesCache).toEqual(before.expensesCache);
   });
+
+  it("promotes before leave writes so a failed activate does not orphan Active trip", async () => {
+    const removeFromTripHistoryLocal = jest.fn();
+    const probe = createActivateProbe("trip-a");
+    const previousTrip: TripData = {
+      tripid: "trip-a",
+      tripName: "Old active",
+      tripCurrency: "EUR",
+    };
+    const previousExpenses = [expense("e-old", "from old active")];
+    probe.activate.previousTripSnapshot = previousTrip;
+    probe.activate.previousExpensesSnapshot = previousExpenses;
+    probe.activate.setExpensesCache = () => {
+      throw new Error("cache write failed");
+    };
+
+    await expect(
+      leaveTrip("trip-a", {
+        uid: "u1",
+        tripHistory: ["trip-a", "trip-b"],
+        activeTripId: "trip-a",
+        getTravellers: async () => multiTravellerRoster(),
+        removeFromTripHistoryLocal,
+        activate: probe.activate,
+      })
+    ).rejects.toThrow("cache write failed");
+
+    expect(removeTravelerFromTripMock).not.toHaveBeenCalled();
+    expect(removeTripFromHistoryMock).not.toHaveBeenCalled();
+    expect(removeFromTripHistoryLocal).not.toHaveBeenCalled();
+
+    const mirrors = probe.mirrors();
+    expect(mirrors.secureCurrentTripId).toBe("trip-a");
+    expect(mirrors.serverCurrentTrip).toBe("trip-a");
+    expect(mirrors.contextTripid).toBe("trip-a");
+  });
 });
 
 describe("leaveTrip Active trip promotion wiring", () => {

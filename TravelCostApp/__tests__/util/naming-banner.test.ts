@@ -48,6 +48,16 @@ describe("naming banner (implicit default trip guidance)", () => {
         })
       ).toBe(false);
     });
+
+    it("hides synchronously when the trip already has expenses", () => {
+      expect(
+        shouldShowNamingBanner({
+          isImplicitDefault: true,
+          isDismissed: false,
+          expenseCount: 1,
+        })
+      ).toBe(false);
+    });
   });
 
   describe("dismiss persistence", () => {

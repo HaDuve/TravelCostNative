@@ -4,13 +4,18 @@ import { MMKV_KEY_PATTERNS } from "../store/mmkv-keys";
 export type NamingBannerVisibilityInput = {
   isImplicitDefault: boolean;
   isDismissed: boolean;
+  /** Trip ledger expense count — first expense hides the banner without waiting for effects. */
+  expenseCount?: number;
 };
 
-/** Naming banner only for undismissed implicit default Active trips. */
+/** Naming banner only for undismissed implicit default Active trips with no expenses yet. */
 export function shouldShowNamingBanner(
   input: NamingBannerVisibilityInput
 ): boolean {
-  return input.isImplicitDefault === true && input.isDismissed !== true;
+  if (input.isImplicitDefault !== true) return false;
+  if (input.isDismissed === true) return false;
+  if ((input.expenseCount ?? 0) > 0) return false;
+  return true;
 }
 
 export function isNamingBannerDismissed(tripid: string): boolean {

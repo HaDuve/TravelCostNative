@@ -219,6 +219,7 @@ function RecentExpenses({ navigation }) {
   ]);
 
   const [loadedOnce, setLoadedOnce] = useState(false);
+  const tripExpenseCount = expensesCtx.expenses?.length ?? 0;
   const [namingBannerDismissed, setNamingBannerDismissed] = useState(() =>
     isNamingBannerDismissed(tripid)
   );
@@ -229,23 +230,19 @@ function RecentExpenses({ navigation }) {
 
   useEffect(() => {
     if (!tripCtx.isImplicitDefault) return;
-    const expenseCount = expensesCtx.expenses?.length ?? 0;
-    if (expenseCount < 1) return;
+    if (tripExpenseCount < 1) return;
     dismissNamingBannerAfterFirstExpense(
       tripid,
-      expenseCount,
+      tripExpenseCount,
       tripCtx.isImplicitDefault
     );
     setNamingBannerDismissed(true);
-  }, [
-    expensesCtx.expenses?.length,
-    tripCtx.isImplicitDefault,
-    tripid,
-  ]);
+  }, [tripExpenseCount, tripCtx.isImplicitDefault, tripid]);
 
   const showNamingBanner = shouldShowNamingBanner({
     isImplicitDefault: tripCtx.isImplicitDefault === true,
     isDismissed: namingBannerDismissed,
+    expenseCount: tripExpenseCount,
   });
 
   const handleNameIt = useCallback(() => {
@@ -270,6 +267,8 @@ function RecentExpenses({ navigation }) {
       navigation.navigate("CategoryPick");
     }
   }, [navigation, settings.skipCategoryScreen]);
+
+  const tripLedgerEmpty = tripExpenseCount === 0;
 
   useEffect(() => {
     const asyncLoading = async () => {
@@ -354,12 +353,8 @@ function RecentExpenses({ navigation }) {
     <MemoizedExpensesOutput
       expenses={recentExpenses}
       fallbackText={i18n.t("fallbackTextExpenses")}
-      emptyCtaLabel={
-        recentExpenses?.length === 0 ? i18n.t("addExp") : undefined
-      }
-      onEmptyCtaPress={
-        recentExpenses?.length === 0 ? handleEmptyCtaPress : undefined
-      }
+      emptyCtaLabel={tripLedgerEmpty ? i18n.t("addExp") : undefined}
+      onEmptyCtaPress={tripLedgerEmpty ? handleEmptyCtaPress : undefined}
       refreshing={refreshing}
       refreshControl={
         <RefreshControl

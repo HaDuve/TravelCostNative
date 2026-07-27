@@ -1,24 +1,213 @@
-import { FlatList, View } from "react-native";
-import TripHistoryItem from "./TripHistoryItem";
-import React, { useContext } from "react";
-import LoadingOverlay from "../UI/LoadingOverlay";
+import * as React from "react";
+import { FlatList, Platform, View } from "react-native";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import PropTypes from "prop-types";
 import uniqBy from "lodash.uniqby";
-import { TripData } from "../../store/trip-context";
+import { useCallback, useContext, useRef } from "react";
+
+import TripHistoryItem from "./TripHistoryItem";
+import TripSwipeLeaveAction from "./TripSwipeLeaveAction";
+import LoadingOverlay from "../UI/LoadingOverlay";
+import { TripContext, TripData } from "../../store/trip-context";
 import { OrientationContext } from "../../store/orientation-context";
+import { NetworkContext } from "../../store/network-context";
+import { AuthContext } from "../../store/auth-context";
+import { UserContext } from "../../store/user-context";
+import { ExpensesContext } from "../../store/expenses-context";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
+import { promptLeaveTrip } from "../../util/prompt-leave-trip";
+import { performLeaveTripUi } from "../../util/perform-leave-trip-ui";
+import {
+  fetchTrip,
+  getAllExpenses,
+  getTravellers,
+  updateUser,
+} from "../../util/http";
+import {
+  secureStoreGetItem,
+  secureStoreSetItem,
+} from "../../store/secure-storage";
+import { MMKV_KEYS, setMMKVObject } from "../../store/mmkv";
 
 function TripList({ trips }) {
   const { isLandscape } = useContext(OrientationContext);
+  const { isConnected, strongConnection } = useContext(NetworkContext);
+  const online = !!(isConnected && strongConnection);
+  const authCtx = useContext(AuthContext);
+  const tripCtx = useContext(TripContext);
+  const userCtx = useContext(UserContext);
+  const expenseCtx = useContext(ExpensesContext);
+  const row = useRef<Record<number, Swipeable | null>>({}).current;
+  const prevOpenedRow = useRef<Swipeable | null>(null);
+
+  const canLeave = (userCtx.tripHistory?.length ?? trips?.length ?? 0) > 1;
+
+  const forceCloseRow = useCallback(
+    (index: number) => {
+      row[index]?.close();
+    },
+    [row]
+  );
+
+  const closeRow = useCallback(
+    (index: number) => {
+      if (prevOpenedRow.current && prevOpenedRow.current !== row[index]) {
+        prevOpenedRow.current.close();
+      }
+      prevOpenedRow.current = row[index];
+      setTimeout(() => {
+        forceCloseRow(index);
+      }, 1500);
+    },
+    [forceCloseRow, row]
+  );
+
+  const openBalancesDeps = useCallback(
+    () => ({
+      activeTripId: tripCtx.tripid,
+      activeExpenses: expenseCtx.expenses ?? [],
+      activeTripCurrency: tripCtx.tripCurrency,
+      activeIsPaidTimestamp: tripCtx.isPaidTimestamp,
+      userNameFallback: userCtx.userName,
+      getAllExpenses,
+      fetchTrip,
+    }),
+    [
+      expenseCtx.expenses,
+      tripCtx.isPaidTimestamp,
+      tripCtx.tripCurrency,
+      tripCtx.tripid,
+      userCtx.userName,
+    ]
+  );
+
+  const performLeave = useCallback(
+    async (tripid: string) => {
+      const uid = authCtx.uid ?? (await secureStoreGetItem("uid"));
+      if (!uid) return;
+
+      await performLeaveTripUi({
+        tripid,
+        uid,
+        tripHistory: userCtx.tripHistory ?? [],
+        getTravellers,
+        openBalancesDeps: openBalancesDeps(),
+        leaveTrip: tripCtx.leaveTrip,
+        removeFromTripHistoryLocal: userCtx.removeTripFromHistory,
+        restoreTripHistoryLocal: userCtx.restoreTripHistory,
+        activate: {
+          previousTripSnapshot: tripCtx.getcurrentTrip(),
+          previousExpensesSnapshot: expenseCtx.expenses,
+          fetchTrip,
+          getTravellers,
+          getAllExpenses,
+          updateUser,
+          secureStoreGetItem,
+          secureStoreSetItem,
+          setCurrentTrip: tripCtx.setCurrentTrip,
+          saveTripDataInStorage: tripCtx.saveTripDataInStorage,
+          saveTravellersInStorage: tripCtx.saveTravellersInStorage,
+          setExpenses: expenseCtx.setExpenses,
+          setExpensesCache: (nextExpenses) =>
+            setMMKVObject(MMKV_KEYS.EXPENSES, nextExpenses),
+          setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
+        },
+      });
+    },
+    [
+      authCtx.uid,
+      expenseCtx.expenses,
+      expenseCtx.setExpenses,
+      openBalancesDeps,
+      tripCtx,
+      userCtx.removeTripFromHistory,
+      userCtx.restoreTripHistory,
+      userCtx.setFreshlyCreatedTo,
+      userCtx.tripHistory,
+    ]
+  );
+
+  const onLeavePress = useCallback(
+    async (tripid: string) => {
+      const uid = authCtx.uid ?? (await secureStoreGetItem("uid"));
+      if (!uid) return;
+      await promptLeaveTrip({
+        isConnected: online,
+        tripid,
+        uid,
+        tripHistory: userCtx.tripHistory ?? trips ?? [],
+        activeTripId: tripCtx.tripid,
+        getTravellers,
+        openBalancesDeps: openBalancesDeps(),
+        onConfirm: () => {
+          void performLeave(tripid);
+        },
+      });
+    },
+    [
+      authCtx.uid,
+      online,
+      openBalancesDeps,
+      performLeave,
+      tripCtx.tripid,
+      trips,
+      userCtx.tripHistory,
+    ]
+  );
+
   if (!trips || trips?.length < 1) return <LoadingOverlay></LoadingOverlay>;
 
   const uniqTrips: TripData[] = uniqBy(trips);
+
   function renderTripItem(itemData) {
     if (!itemData || !itemData.item) return <></>;
-    if (typeof itemData.item === "string" || itemData.item instanceof String) {
-      return <TripHistoryItem {...{ tripid: itemData.item, trips: trips }} />;
-    } else return <></>;
+    if (!(typeof itemData.item === "string" || itemData.item instanceof String)) {
+      return <></>;
+    }
+    const tripid = itemData.item as string;
+    const index = itemData.index;
+    const card = <TripHistoryItem {...{ tripid, trips }} />;
+
+    if (!canLeave) {
+      return card;
+    }
+
+    const leaveAction = () => (
+      <TripSwipeLeaveAction onPress={() => void onLeavePress(tripid)} />
+    );
+
+    if (Platform.OS === "android") {
+      return (
+        <GestureHandlerRootView>
+          <Swipeable
+            renderLeftActions={leaveAction}
+            onSwipeableOpen={() => closeRow(index)}
+            ref={(ref) => {
+              row[index] = ref;
+            }}
+            overshootFriction={8}
+          >
+            {card}
+          </Swipeable>
+        </GestureHandlerRootView>
+      );
+    }
+
+    return (
+      <Swipeable
+        renderRightActions={leaveAction}
+        onSwipeableOpen={() => closeRow(index)}
+        ref={(ref) => {
+          row[index] = ref;
+        }}
+        overshootFriction={8}
+      >
+        {card}
+      </Swipeable>
+    );
   }
+
   return (
     <View
       testID="trip-list-wrapper"

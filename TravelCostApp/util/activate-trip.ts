@@ -16,7 +16,8 @@ export type ActivateTripDeps = {
   getTravellers: (tripid: string) => Promise<Traveller[]>;
   getAllExpenses: (
     tripid: string,
-    uid: string
+    uid: string,
+    useDelta?: boolean
   ) => Promise<ExpenseData[]>;
   updateUser: (
     uid: string,
@@ -53,8 +54,12 @@ export async function activateTrip(
     throw new Error("activateTrip: trip not found");
   }
 
-  const roster = normalizeTravellers(await deps.getTravellers(tripid));
-  const expenses = await deps.getAllExpenses(tripid, deps.uid);
+  const [rosterRaw, expenses] = await Promise.all([
+    deps.getTravellers(tripid),
+    // Full ledger required: replace must not apply a delta-sized subset.
+    deps.getAllExpenses(tripid, deps.uid, false),
+  ]);
+  const roster = normalizeTravellers(rosterRaw);
 
   const hydratedTrip = hydrateTrip({
     ...rawTrip,

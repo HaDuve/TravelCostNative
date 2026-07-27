@@ -150,4 +150,40 @@ describe("activateTrip", () => {
     expect(contextTrip?.tripid).toBe("trip-a");
     expect(expensesState).toEqual(previousExpenses);
   });
+
+  it("replaces expenses with the full trip ledger, not a delta-sized subset", async () => {
+    const fullLedger = [
+      expense("e-x1", "ramen"),
+      expense("e-x2", "hotel"),
+      expense("e-x3", "train"),
+    ];
+    let requestedUseDelta: boolean | undefined;
+    let expensesState = [expense("e-old", "stale from trip-a")];
+
+    await activateTrip("trip-x", {
+      uid: "u1",
+      fetchTrip: async () => tripX(),
+      getTravellers: async () => [{ uid: "u1", userName: "Alice" }],
+      getAllExpenses: async (_tripid, _uid, useDelta) => {
+        requestedUseDelta = useDelta;
+        // Simulate a previously visited trip: delta would return only the newest row.
+        return useDelta === false ? fullLedger : [fullLedger[2]];
+      },
+      updateUser: async () => {},
+      secureStoreGetItem: async () => "trip-a",
+      secureStoreSetItem: async () => {},
+      setCurrentTrip: async () => {},
+      saveTripDataInStorage: async () => {},
+      saveTravellersInStorage: async () => {},
+      setExpenses: (expenses) => {
+        expensesState = expenses;
+      },
+      setExpensesCache: () => {},
+      setFreshlyCreatedTo: async () => {},
+    });
+
+    expect(requestedUseDelta).toBe(false);
+    expect(expensesState).toEqual(fullLedger);
+    expect(expensesState).toHaveLength(3);
+  });
 });

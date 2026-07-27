@@ -155,10 +155,27 @@ describe("TripForm Leave trip confirm dialog", () => {
     });
   });
 
+  it("surfaces an error alert when roster fetch fails before confirm", async () => {
+    getTravellersMock.mockRejectedValue(new Error("network"));
+
+    const screen = renderEditForm();
+    fireEvent.press(await screen.findByText(i18n.t("leaveTrip")));
+
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalledWith(
+        i18n.t("error"),
+        i18n.t("error2")
+      );
+    });
+  });
+
   it("has permanent-delete warning copy in EN/DE/FR/RU", () => {
+    for (const locale of [en, de, fr, ru]) {
+      expect(locale.leaveTripPermanentDeleteSure.length).toBeGreaterThan(10);
+      expect(locale.leaveTripPermanentDeleteSure).not.toBe(
+        locale.leaveTripSure
+      );
+    }
     expect(en.leaveTripPermanentDeleteSure).toMatch(/permanent/i);
-    expect(de.leaveTripPermanentDeleteSure.length).toBeGreaterThan(10);
-    expect(fr.leaveTripPermanentDeleteSure.length).toBeGreaterThan(10);
-    expect(ru.leaveTripPermanentDeleteSure.length).toBeGreaterThan(10);
   });
 });

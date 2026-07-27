@@ -347,35 +347,40 @@ const TripForm = ({ navigation, route }) => {
       return;
     }
     if (!editedTripId) return;
-    const roster = await getTravellers(editedTripId);
-    const plan = planTripLeave({
-      tripHistory: userCtx.tripHistory ?? [],
-      roster,
-      openBalances: [],
-      activeTripId: tripCtx.tripid,
-      tripid: editedTripId,
-    });
-    const message = plan.warnings.includes("permanentDelete")
-      ? i18n.t("leaveTripPermanentDeleteSure")
-      : i18n.t("leaveTripSure");
-    Alert.alert(
-      i18n.t("leaveTrip"),
-      message,
-      [
-        {
-          text: i18n.t("cancel"),
-          style: "cancel",
-        },
-        {
-          text: i18n.t("leaveTrip"),
-          style: "destructive",
-          onPress: () => {
-            void leaveAcceptHandler();
+    try {
+      const roster = await getTravellers(editedTripId);
+      const plan = planTripLeave({
+        tripHistory: userCtx.tripHistory ?? [],
+        roster,
+        openBalances: [],
+        activeTripId: tripCtx.tripid,
+        tripid: editedTripId,
+      });
+      const message = plan.warnings.includes("permanentDelete")
+        ? i18n.t("leaveTripPermanentDeleteSure")
+        : i18n.t("leaveTripSure");
+      Alert.alert(
+        i18n.t("leaveTrip"),
+        message,
+        [
+          {
+            text: i18n.t("cancel"),
+            style: "cancel",
           },
-        },
-      ],
-      { cancelable: false }
-    );
+          {
+            text: i18n.t("leaveTrip"),
+            style: "destructive",
+            onPress: () => {
+              void leaveAcceptHandler();
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    } catch (error) {
+      safeLogError(error);
+      Alert.alert(i18n.t("error"), i18n.t("error2"));
+    }
   }
 
   async function editingTripData(tripData: TripData, setActive = false) {

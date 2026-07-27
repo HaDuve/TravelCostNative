@@ -188,7 +188,25 @@ export const deleteExpenseWithRetryAndQueue = async (
 export const deleteExpenseOnlineOffline = async (
   item: OfflineQueueManageExpenseItem,
   online: boolean,
-) => deleteExpenseWithRetryAndQueue(item, online);
+): Promise<void> => {
+  await resolveTripidOrThrow(
+    item,
+    "No tripid found in asyncStore! (deleteExpenseOnlineOffline)",
+    "toastErrorDeleteExp",
+  );
+
+  const { isFastEnough } = await isConnectionFastEnough();
+  if (online && isFastEnough) {
+    try {
+      await attemptDeleteExpenseOnline(item);
+      return;
+    } catch (error) {
+      await pushQueueReturnRndID(item);
+    }
+  } else {
+    await pushQueueReturnRndID(item);
+  }
+};
 
 /**
  * Restores a soft-deleted expense on the server or offline queue (mirrors deleteExpenseOnlineOffline).
@@ -250,7 +268,25 @@ export const restoreExpenseOnlineOffline = async (
 export const updateExpenseOnlineOffline = async (
   item: OfflineQueueManageExpenseItem,
   online = true,
-) => updateExpenseWithRetryAndQueue(item, online);
+): Promise<void> => {
+  await resolveTripidOrThrow(
+    item,
+    "No tripid found in asyncStore! (updateExpenseOnlineOffline)",
+    "toastErrorUpdateExp",
+  );
+
+  const { isFastEnough } = await isConnectionFastEnough();
+  if (online && isFastEnough) {
+    try {
+      await attemptUpdateExpenseOnline(item);
+      return;
+    } catch (error) {
+      await pushQueueReturnRndID(item);
+    }
+  } else {
+    await pushQueueReturnRndID(item);
+  }
+};
 
 export const storeExpenseWithRetryAndQueue = async (
   item: OfflineQueueManageExpenseItem,
@@ -323,22 +359,33 @@ export const storeExpenseOnlineOffline = async (
   item: OfflineQueueManageExpenseItem,
   online: boolean,
   forceTripid: string | null = null,
-) => {
-  if (forceTripid) {
-    item.expense.tripid = forceTripid;
-    ensureAddItemId(item);
-    const { isFastEnough } = await isConnectionFastEnough();
-    if (online && isFastEnough) {
-      try {
-        return await withRetries(() => attemptStoreExpenseOnline(item));
-      } catch (error) {
-        safeLogError("error1: could not store expense " + error);
-        return pushQueueReturnRndID(item);
-      }
-    }
-    return pushQueueReturnRndID(item);
+): Promise<string> => {
+  const tripid = forceTripid ?? (await secureStoreGetItem("currentTripId"));
+  if (!tripid) {
+    Toast.show({
+      type: "error",
+      text1: i18n.t("error"),
+      text2: i18n.t("toastErrorStoreExp"),
+    });
+    throw new Error(
+      "No tripid found in asyncStore! (storeExpenseOnlineOffline)",
+    );
   }
-  return storeExpenseWithRetryAndQueue(item, online);
+  item.expense.tripid = tripid;
+  ensureAddItemId(item);
+
+  const { isFastEnough } = await isConnectionFastEnough();
+  if (online && isFastEnough) {
+    try {
+      return await attemptStoreExpenseOnline(item);
+    } catch (error) {
+      safeLogError("error1: could not store expense " + error);
+      return pushQueueReturnRndID(item);
+    }
+  }
+
+  safeLogError("error2 : network is not online && fast enough");
+  return pushQueueReturnRndID(item);
 };
 
 /**

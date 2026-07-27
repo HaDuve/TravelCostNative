@@ -55,6 +55,7 @@ import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { trackEvent } from "../util/vexo-tracking";
 import { isConnectionFastEnoughAsBool } from "../util/connectionSpeed";
 import { dynamicScale } from "../util/scalingUtil";
+import { notifyTravelersAfterRangedSync } from "../util/notify-travelers-after-ranged-sync";
 import { VexoEvents } from "../util/vexo-constants";
 
 interface ManageExpenseProps {
@@ -264,7 +265,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
     expenseCtx,
   };
 
-  const createRangedData = (expenseData: ExpenseData) => {
+  const createRangedData = (expenseData: ExpenseData): Promise<void> => {
     const rangeId = newRangeId();
     const dates = buildRangedExpenseDatesFromSpan(
       expenseData.startDate,
@@ -276,11 +277,10 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       dates,
     });
 
-    const { syncPromise } = persistRangedExpenseAdd(instances, rangedPersistParams);
-    void syncPromise.catch(safeLogError);
+    return persistRangedExpenseAdd(instances, rangedPersistParams).syncPromise;
   };
 
-  const editRangedData = (expenseData: ExpenseData) => {
+  const editRangedData = (expenseData: ExpenseData): Promise<void> => {
     const expensesInRange = expenseCtx.expenses.filter(
       (expense) =>
         expense.rangeId && expense.rangeId === selectedExpense?.rangeId
@@ -296,12 +296,11 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           id: editedExpenseId,
         },
       };
-      void deleteExpenseOnlineOffline(item, isOnline).catch(safeLogError);
-
+      const deleteSync = deleteExpenseOnlineOffline(item, isOnline);
       const instances = planNonRangedToRangedInstances(expenseData, newRangeId());
-      const { syncPromise } = persistRangedExpenseAdd(instances, rangedPersistParams);
-      void syncPromise.catch(safeLogError);
-      return;
+      const addSync = persistRangedExpenseAdd(instances, rangedPersistParams)
+        .syncPromise;
+      return Promise.all([deleteSync, addSync]).then(() => {});
     }
 
     if (shouldReplaceRangedExpenseInstances(expensesInRange, expenseData)) {
@@ -309,24 +308,18 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         selectedExpense.id!,
       ]);
       const instances = planRangedExpenseReplacement(expenseData, newRangeId());
-      const { syncPromise } = persistRangedExpenseReplace(
+      return persistRangedExpenseReplace(
         deleteTargets,
         instances,
         rangedPersistParams,
-      );
-      void syncPromise.catch(safeLogError);
-      return;
+      ).syncPromise;
     }
 
     const updates = planRangedExpenseInPlaceUpdates(expenseData, expensesInRange);
-    const { syncPromise } = persistRangedExpenseInPlaceEdit(
-      updates,
-      {
-        ...rangedPersistParams,
-        uid: selectedExpenseAuthorUid,
-      },
-    );
-    void syncPromise.catch(safeLogError);
+    return persistRangedExpenseInPlaceEdit(updates, {
+      ...rangedPersistParams,
+      uid: selectedExpenseAuthorUid,
+    }).syncPromise;
   };
 
   const editSingleData = async (expenseData: ExpenseData) => {
@@ -375,6 +368,8 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
         expenseData.splitList = [];
       }
 
+      let rangedSyncPromise: Promise<void> | null = null;
+
       if (isEditing) {
         // editing the expense
         if (
@@ -383,7 +378,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           selectedExpense.rangeId
         ) {
           // editing ranged Data
-          editRangedData(expenseData);
+          rangedSyncPromise = editRangedData(expenseData);
         } else {
           // editing normal expense (no-ranged)
           await editSingleData(expenseData);
@@ -410,7 +405,7 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
           expenseData.endDate.toString().slice(0, 10)
         ) {
           // adding a new ranged expense (no-editing)
-          createRangedData(expenseData);
+          rangedSyncPromise = createRangedData(expenseData);
         } else {
           // adding a new normal expense (no-editing, no-ranged)
           await createSingleData(expenseData);
@@ -431,8 +426,19 @@ const ManageExpense = ({ route, navigation }: ManageExpenseProps) => {
       // Clear draft data after successful submission
       clearExpenseDraft(editedExpenseId);
       navigation.popToTop();
-      if (isOnline && (await isConnectionFastEnoughAsBool()))
+      const shouldTouchTravelers =
+        isOnline && (await isConnectionFastEnoughAsBool());
+      if (rangedSyncPromise) {
+        void rangedSyncPromise.catch(safeLogError);
+        notifyTravelersAfterRangedSync(
+          rangedSyncPromise,
+          tripid,
+          shouldTouchTravelers,
+          touchAllTravelers,
+        );
+      } else if (shouldTouchTravelers) {
         await touchAllTravelers(tripid, true);
+      }
     } catch (error) {
       safeLogError(error);
       return Promise.reject(error);

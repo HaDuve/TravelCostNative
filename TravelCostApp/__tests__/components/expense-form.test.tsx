@@ -116,11 +116,17 @@ jest.mock("../../components/Currency/CurrencyPicker", () => {
   const React = require("react");
   const { Text } = require("react-native");
   return function MockCurrencyPicker({
+    countryValue,
     placeholder,
   }: {
+    countryValue?: string;
     placeholder?: string;
   }) {
-    return React.createElement(Text, null, placeholder ?? "");
+    return React.createElement(
+      Text,
+      { testID: "expense-form-currency-value" },
+      countryValue ?? placeholder ?? ""
+    );
   };
 });
 
@@ -348,7 +354,9 @@ describe("ExpenseForm", () => {
     fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
 
     await waitFor(() => {
-      expect(screen.getByText("USD | $")).toBeTruthy();
+      expect(screen.getByTestId("expense-form-currency-value")).toHaveTextContent(
+        "USD"
+      );
     });
   });
 
@@ -389,6 +397,31 @@ describe("ExpenseForm", () => {
     alertSpy.mockRestore();
   });
 
+  it("keeps latest-used currency after confirming a ranged date span", async () => {
+    const alertSpy = jest
+      .spyOn(Alert, "alert")
+      .mockImplementation((_title, _message, buttons) => {
+        const splitButton = buttons?.find(
+          (button) => button.text === i18n.t("splitUpExpenses")
+        );
+        splitButton?.onPress?.();
+      });
+
+    const screen = renderNewExpenseWithDeferredLastCountry();
+
+    fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
+    fireEvent.press(screen.getByTestId("open-date-range"));
+    fireEvent.press(screen.getByTestId("confirm-ranged-dates"));
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("expense-form-currency-value")
+      ).toHaveTextContent("USD");
+    });
+
+    alertSpy.mockRestore();
+  });
+
   it("submits latest-used country on advanced save after secure storage loads", async () => {
     jest.useFakeTimers();
     const onSubmit = jest.fn(async () => {});
@@ -409,6 +442,64 @@ describe("ExpenseForm", () => {
 
     expect(onSubmit).toHaveBeenCalled();
     expect(onSubmit.mock.calls[0][0].country).toBe("US");
+    jest.useRealTimers();
+  });
+
+  it("submits latest-used currency on advanced save after secure storage loads", async () => {
+    jest.useFakeTimers();
+    const onSubmit = jest.fn(async () => {});
+    const screen = renderNewExpenseWithDeferredLastCountry(onSubmit);
+
+    fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("expense-form-currency-value")
+      ).toHaveTextContent("USD");
+    });
+
+    await act(async () => {
+      fireEvent.press(screen.getAllByText(i18n.t("add")).pop()!);
+      jest.advanceTimersByTime(600);
+    });
+
+    expect(onSubmit).toHaveBeenCalled();
+    expect(onSubmit.mock.calls[0][0].currency).toBe("USD");
+    jest.useRealTimers();
+  });
+
+  it("submits latest-used currency after confirming a ranged date span", async () => {
+    jest.useFakeTimers();
+    const alertSpy = jest
+      .spyOn(Alert, "alert")
+      .mockImplementation((_title, _message, buttons) => {
+        const splitButton = buttons?.find(
+          (button) => button.text === i18n.t("splitUpExpenses")
+        );
+        splitButton?.onPress?.();
+      });
+    const onSubmit = jest.fn(async () => {});
+    const screen = renderNewExpenseWithDeferredLastCountry(onSubmit);
+
+    fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
+    fireEvent.press(screen.getByTestId("open-date-range"));
+    fireEvent.press(screen.getByTestId("confirm-ranged-dates"));
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("expense-form-currency-value")
+      ).toHaveTextContent("USD");
+    });
+
+    await act(async () => {
+      fireEvent.press(screen.getAllByText(i18n.t("add")).pop()!);
+      jest.advanceTimersByTime(600);
+    });
+
+    expect(onSubmit).toHaveBeenCalled();
+    expect(onSubmit.mock.calls[0][0].currency).toBe("USD");
+
+    alertSpy.mockRestore();
     jest.useRealTimers();
   });
 
@@ -438,6 +529,38 @@ describe("ExpenseForm", () => {
       expect(screen.getByTestId("expense-form-country-flag")).toHaveTextContent(
         "US"
       );
+    });
+
+    alertSpy.mockRestore();
+    (getExpenseDraft as jest.Mock).mockReturnValue(undefined);
+  });
+
+  it("applies latest-used currency after restoring a draft with an empty currency", async () => {
+    const draftExpense = makeExpense({
+      amount: 25,
+      description: "Hotel stay",
+      country: "DE",
+      currency: "",
+    });
+    (getExpenseDraft as jest.Mock).mockReturnValue(draftExpense);
+
+    const alertSpy = jest
+      .spyOn(Alert, "alert")
+      .mockImplementation((_title, _message, buttons) => {
+        const restoreButton = buttons?.find(
+          (button) => button.text === i18n.t("restore")
+        );
+        restoreButton?.onPress?.();
+      });
+
+    const screen = renderNewExpenseWithDeferredLastCountry();
+
+    fireEvent.press(screen.getByText(i18n.t("showMoreOptions")));
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("expense-form-currency-value")
+      ).toHaveTextContent("USD");
     });
 
     alertSpy.mockRestore();

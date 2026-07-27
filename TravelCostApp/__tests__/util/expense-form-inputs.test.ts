@@ -158,6 +158,18 @@ describe("resolveLoadedLastCurrencyIfStale", () => {
       })
     ).toBeNull();
   });
+
+  it("returns latest-used currency when a restored draft left currency empty", () => {
+    expect(
+      resolveLoadedLastCurrencyIfStale({
+        isEditing: false,
+        lastCurrency: "USD",
+        currentCurrency: "",
+        tripCurrency: "EUR",
+        mostRecentExpenseCurrency: "EUR",
+      })
+    ).toBe("USD");
+  });
 });
 
 describe("resolveAmountValue", () => {

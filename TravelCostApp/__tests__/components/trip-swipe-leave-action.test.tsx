@@ -13,6 +13,7 @@ describe("TripSwipeLeaveAction", () => {
     );
 
     const container = screen.getByTestId("trip-swipe-leave-action");
+    expect(screen.getByTestId("icon-exit-outline")).toBeTruthy();
     const containerStyle = StyleSheet.flatten(
       container.props.style
     ) as Record<string, unknown>;

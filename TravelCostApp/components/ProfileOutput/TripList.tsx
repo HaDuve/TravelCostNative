@@ -2,7 +2,6 @@ import * as React from "react";
 import { FlatList, Platform, View } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import Toast from "react-native-toast-message";
 import PropTypes from "prop-types";
 import uniqBy from "lodash.uniqby";
 import { useCallback, useContext, useRef } from "react";
@@ -18,7 +17,7 @@ import { UserContext } from "../../store/user-context";
 import { ExpensesContext } from "../../store/expenses-context";
 import { constantScale, dynamicScale } from "../../util/scalingUtil";
 import { promptLeaveTrip } from "../../util/prompt-leave-trip";
-import { resolveLeaverOpenBalances } from "../../util/leave-trip";
+import { performLeaveTripUi } from "../../util/perform-leave-trip-ui";
 import {
   fetchTrip,
   getAllExpenses,
@@ -30,8 +29,6 @@ import {
   secureStoreSetItem,
 } from "../../store/secure-storage";
 import { MMKV_KEYS, setMMKVObject } from "../../store/mmkv";
-import { i18n } from "../../i18n/i18n";
-import safeLogError from "../../util/error";
 
 function TripList({ trips }) {
   const { isLandscape } = useContext(OrientationContext);
@@ -90,65 +87,33 @@ function TripList({ trips }) {
       const uid = authCtx.uid ?? (await secureStoreGetItem("uid"));
       if (!uid) return;
 
-      Toast.show({
-        type: "loading",
-        text1: i18n.t("toastSaving1"),
-        text2: i18n.t("toastSaving2"),
-        autoHide: false,
-      });
-
-      try {
-        const roster = await getTravellers(tripid);
-        const openBalances = await resolveLeaverOpenBalances(
-          tripid,
-          uid,
-          roster,
-          openBalancesDeps()
-        );
-        const result = await tripCtx.leaveTrip(tripid, {
-          uid,
-          tripHistory: userCtx.tripHistory ?? [],
+      await performLeaveTripUi({
+        tripid,
+        uid,
+        tripHistory: userCtx.tripHistory ?? [],
+        getTravellers,
+        openBalancesDeps: openBalancesDeps(),
+        leaveTrip: tripCtx.leaveTrip,
+        removeFromTripHistoryLocal: userCtx.removeTripFromHistory,
+        restoreTripHistoryLocal: userCtx.restoreTripHistory,
+        activate: {
+          previousTripSnapshot: tripCtx.getcurrentTrip(),
+          previousExpensesSnapshot: expenseCtx.expenses,
+          fetchTrip,
           getTravellers,
-          openBalances,
-          removeFromTripHistoryLocal: userCtx.removeTripFromHistory,
-          restoreTripHistoryLocal: userCtx.restoreTripHistory,
-          activate: {
-            previousTripSnapshot: tripCtx.getcurrentTrip(),
-            previousExpensesSnapshot: expenseCtx.expenses,
-            fetchTrip,
-            getTravellers,
-            getAllExpenses,
-            updateUser,
-            secureStoreGetItem,
-            secureStoreSetItem,
-            setCurrentTrip: tripCtx.setCurrentTrip,
-            saveTripDataInStorage: tripCtx.saveTripDataInStorage,
-            saveTravellersInStorage: tripCtx.saveTravellersInStorage,
-            setExpenses: expenseCtx.setExpenses,
-            setExpensesCache: (nextExpenses) =>
-              setMMKVObject(MMKV_KEYS.EXPENSES, nextExpenses),
-            setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
-          },
-        });
-
-        if (!result.performed) {
-          Toast.hide();
-          Toast.show({
-            text1: i18n.t("toastSavingError1"),
-            text2: i18n.t("error2"),
-            type: "error",
-          });
-        }
-        // Plain leave: leaveTrip shows Undo toast. Cascade-delete: no Undo.
-      } catch (error) {
-        safeLogError(error);
-        Toast.hide();
-        Toast.show({
-          text1: i18n.t("toastSavingError1"),
-          text2: i18n.t("error2"),
-          type: "error",
-        });
-      }
+          getAllExpenses,
+          updateUser,
+          secureStoreGetItem,
+          secureStoreSetItem,
+          setCurrentTrip: tripCtx.setCurrentTrip,
+          saveTripDataInStorage: tripCtx.saveTripDataInStorage,
+          saveTravellersInStorage: tripCtx.saveTravellersInStorage,
+          setExpenses: expenseCtx.setExpenses,
+          setExpensesCache: (nextExpenses) =>
+            setMMKVObject(MMKV_KEYS.EXPENSES, nextExpenses),
+          setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
+        },
+      });
     },
     [
       authCtx.uid,

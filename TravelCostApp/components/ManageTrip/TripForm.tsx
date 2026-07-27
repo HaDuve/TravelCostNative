@@ -59,8 +59,8 @@ import {
   secureStoreSetItem,
 } from "../../store/secure-storage";
 import { activateTrip } from "../../util/activate-trip";
-import { resolveLeaverOpenBalances } from "../../util/leave-trip";
 import { promptLeaveTrip } from "../../util/prompt-leave-trip";
+import { performLeaveTripUi } from "../../util/perform-leave-trip-ui";
 import BackButton from "../UI/BackButton";
 import { onShare } from "../ProfileOutput/ShareTrip";
 import { NetworkContext } from "../../store/network-context";
@@ -299,66 +299,35 @@ const TripForm = ({ navigation, route }) => {
     const uid = authCtx.uid ?? (await secureStoreGetItem("uid"));
     if (!uid || !editedTripId) return;
 
-    Toast.show({
-      type: "loading",
-      text1: i18n.t("toastSaving1"),
-      text2: i18n.t("toastSaving2"),
-      autoHide: false,
-    });
-
-    try {
-      const roster = await getTravellers(editedTripId);
-      const openBalances = await resolveLeaverOpenBalances(
-        editedTripId,
-        uid,
-        roster,
-        leaverOpenBalancesDeps()
-      );
-      const result = await tripCtx.leaveTrip(editedTripId, {
-        uid,
-        tripHistory: userCtx.tripHistory ?? [],
+    const performed = await performLeaveTripUi({
+      tripid: editedTripId,
+      uid,
+      tripHistory: userCtx.tripHistory ?? [],
+      getTravellers,
+      openBalancesDeps: leaverOpenBalancesDeps(),
+      leaveTrip: tripCtx.leaveTrip,
+      removeFromTripHistoryLocal: userCtx.removeTripFromHistory,
+      restoreTripHistoryLocal: userCtx.restoreTripHistory,
+      activate: {
+        previousTripSnapshot: tripCtx.getcurrentTrip(),
+        previousExpensesSnapshot: expenseCtx.expenses,
+        fetchTrip,
         getTravellers,
-        openBalances,
-        removeFromTripHistoryLocal: userCtx.removeTripFromHistory,
-        restoreTripHistoryLocal: userCtx.restoreTripHistory,
-        activate: {
-          previousTripSnapshot: tripCtx.getcurrentTrip(),
-          previousExpensesSnapshot: expenseCtx.expenses,
-          fetchTrip,
-          getTravellers,
-          getAllExpenses,
-          updateUser,
-          secureStoreGetItem,
-          secureStoreSetItem,
-          setCurrentTrip: tripCtx.setCurrentTrip,
-          saveTripDataInStorage: tripCtx.saveTripDataInStorage,
-          saveTravellersInStorage: tripCtx.saveTravellersInStorage,
-          setExpenses: expenseCtx.setExpenses,
-          setExpensesCache: (nextExpenses) =>
-            setMMKVObject(MMKV_KEYS.EXPENSES, nextExpenses),
-          setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
-        },
-      });
-
-      if (!result.performed) {
-        Toast.hide();
-        Toast.show({
-          text1: i18n.t("toastSavingError1"),
-          text2: i18n.t("error2"),
-          type: "error",
-        });
-        return;
-      }
-      // Plain leave: leaveTrip shows Undo toast. Cascade-delete: no Undo.
+        getAllExpenses,
+        updateUser,
+        secureStoreGetItem,
+        secureStoreSetItem,
+        setCurrentTrip: tripCtx.setCurrentTrip,
+        saveTripDataInStorage: tripCtx.saveTripDataInStorage,
+        saveTravellersInStorage: tripCtx.saveTravellersInStorage,
+        setExpenses: expenseCtx.setExpenses,
+        setExpensesCache: (nextExpenses) =>
+          setMMKVObject(MMKV_KEYS.EXPENSES, nextExpenses),
+        setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
+      },
+    });
+    if (performed) {
       navigation.pop();
-    } catch (error) {
-      safeLogError(error);
-      Toast.hide();
-      Toast.show({
-        text1: i18n.t("toastSavingError1"),
-        text2: i18n.t("error2"),
-        type: "error",
-      });
     }
   }
 

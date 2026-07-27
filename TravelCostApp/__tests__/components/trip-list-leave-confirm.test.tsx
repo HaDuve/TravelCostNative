@@ -260,6 +260,23 @@ describe("TripList swipe-to-leave", () => {
     });
   });
 
+  it("shows connect-required when the connection is weak (matches TripForm leave gating)", async () => {
+    const screen = renderList({
+      network: { isConnected: true, strongConnection: false },
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId("trip-history-card-t1")).toBeTruthy();
+    });
+    pressSwipeLeave(screen);
+
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalledWith(
+        i18n.t("noConnection"),
+        i18n.t("leaveTripConnectRequired")
+      );
+    });
+  });
+
   it("calls leaveTrip when the User confirms the swipe leave dialog", async () => {
     const leaveTrip = jest.fn(async () => ({
       allowed: true,

@@ -8,7 +8,14 @@ import { i18n } from "../i18n/i18n";
 
 import { AuthContext } from "../store/auth-context";
 import { UserContext, UserData } from "../store/user-context";
-import { fetchUser, touchMyTraveler, updateUser } from "../util/http";
+import {
+  fetchTrip,
+  fetchUser,
+  getAllExpenses,
+  getTravellers,
+  touchMyTraveler,
+  updateUser,
+} from "../util/http";
 import { TripContext } from "../store/trip-context";
 import Toast from "react-native-toast-message";
 import Purchases from "react-native-purchases";
@@ -20,11 +27,15 @@ import {
 import { NetworkContext } from "../store/network-context";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
-import { secureStoreSetItem } from "../store/secure-storage";
+import {
+  secureStoreGetItem,
+  secureStoreSetItem,
+} from "../store/secure-storage";
 import { ExpensesContext } from "../store/expenses-context";
 import { MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
 import { createImplicitDefaultForUser } from "../util/create-implicit-default-for-user";
+import { activateTrip } from "../util/activate-trip";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -142,22 +153,34 @@ function LoginScreen() {
           ...userData,
           freshlyCreated: false,
         });
-        await secureStoreSetItem("currentTripId", tripid);
         await secureStoreSetItem("uid", uid);
 
         await touchMyTraveler(tripid, uid);
 
-        await tripCtx.fetchAndSetCurrentTrip(tripid);
+        await activateTrip(tripid, {
+          uid,
+          previousTripSnapshot: tripCtx.getcurrentTrip(),
+          previousExpensesSnapshot: expCtx.expenses,
+          fetchTrip,
+          getTravellers,
+          getAllExpenses,
+          updateUser,
+          secureStoreGetItem,
+          secureStoreSetItem,
+          setCurrentTrip: tripCtx.setCurrentTrip,
+          saveTripDataInStorage: tripCtx.saveTripDataInStorage,
+          saveTravellersInStorage: tripCtx.saveTravellersInStorage,
+          setExpenses: expCtx.setExpenses,
+          setExpensesCache: (nextExpenses) =>
+            setMMKVObject(MMKV_KEYS.EXPENSES, nextExpenses),
+          setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
+        });
         await userCtx.loadCatListFromAsyncInCtx(tripid);
         await userCtx.updateTripHistory();
-        tripCtx.refresh();
-        expCtx.setExpenses([]);
-        setMMKVObject(MMKV_KEYS.EXPENSES, []);
       } catch (error) {
         safeLogError(error);
       }
     }
-    tripCtx.setTripid(tripid);
     await authCtx.authenticate(token);
   }
 

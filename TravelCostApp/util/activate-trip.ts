@@ -88,6 +88,35 @@ export async function activateTrip(
   }
 }
 
+export type LastKnownActiveTrip = {
+  tripData: TripData;
+  roster: Traveller[];
+  expenses: ExpenseData[];
+};
+
+/**
+ * Offline / last-known boot: route through activateTrip with cached payloads
+ * and a no-op server mirror so stores stay aligned without network.
+ */
+export async function activateTripFromLastKnown(
+  tripid: string,
+  lastKnown: LastKnownActiveTrip,
+  deps: Omit<
+    ActivateTripDeps,
+    "tripData" | "fetchTrip" | "getTravellers" | "getAllExpenses" | "updateUser"
+  > &
+    Partial<Pick<ActivateTripDeps, "updateUser">>
+): Promise<{ tripid: string; tripData: TripData }> {
+  return activateTrip(tripid, {
+    ...deps,
+    tripData: lastKnown.tripData,
+    fetchTrip: async () => lastKnown.tripData,
+    getTravellers: async () => lastKnown.roster,
+    getAllExpenses: async () => lastKnown.expenses,
+    updateUser: deps.updateUser ?? (async () => {}),
+  });
+}
+
 async function rollbackActivateTrip(
   attemptedTripid: string,
   previousActiveTripId: string | null,

@@ -1,6 +1,6 @@
 ---
 name: update-budget-app
-description: Chooses and runs the correct Budget For Nomads (TravelCostApp) release flow — OTA patch, native EAS build, store submit, or full release — and updates changelog.txt from git changes in the project's existing style. Use when the user asks to deploy, release, ship, hotfix, OTA update, update changelog, push to production/alpha/staging, submit to App Store or Play Store, or bump the app version.
+description: Chooses and runs the correct Budget For Nomads (TravelCostApp) release flow — OTA patch, native EAS build, store submit, or full release — and updates changelog.txt from git changes in the project's existing style. Bare invocation (no tier) defaults to production OTA. Use when the user asks to deploy, release, ship, hotfix, OTA update, update changelog, push to production/alpha/staging, submit to App Store or Play Store, or bump the app version.
 ---
 
 # Update Budget App
@@ -133,7 +133,7 @@ Show the user the **old → new** changelog block before running publish/build c
 | Beta testers | `alpha` | TestFlight |
 | Live users | `production` | App Store / Play |
 
-Default to **`production`** only when explicitly requested.
+**Default when the user does not name a tier** (e.g. bare `/update-budget-app` with no comment): treat as **OTA → `production`** (main / live users). Only ask for audience when they name another tier, ask to choose, or the change requires a native store binary (Step 4 Flow B/C).
 
 ## Step 4 — Choose the flow
 
@@ -211,9 +211,9 @@ pnpm run update:dev -- "message"
 - [ ] `eas whoami` succeeds
 - [ ] changelog.txt reflects git diff since last changelog commit
 - [ ] Changelog base version matches app.config.js
-- [ ] Target tier confirmed
+- [ ] Target tier confirmed (default: production OTA when user named none)
 - [ ] Flow matches change classification (OTA vs native)
-- [ ] User approved production publish/submit if not explicitly requested
+- [ ] For native store submit/build: user confirmed production if not already explicit
 ```
 
 ## Step 6 — Post-release verify

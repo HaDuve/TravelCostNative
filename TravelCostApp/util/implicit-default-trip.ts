@@ -48,17 +48,27 @@ export function buildImplicitDefaultTripData(
   return trip;
 }
 
+export function mergeTripHistoryWithNewTrip(
+  existingTripHistory: string[] | null | undefined,
+  tripid: string
+): string[] {
+  const history = existingTripHistory ?? [];
+  if (history.includes(tripid)) return [...history];
+  return [...history, tripid];
+}
+
 export type EnsureImplicitDefaultActiveTripDeps = {
   uid: string;
   userName: string;
   tripCurrency: string;
   categories?: Category[] | string | null;
+  existingTripHistory?: string[] | null;
   storeTrip: (tripData: TripData) => Promise<string>;
   putTravelerInTrip: (
     tripid: string,
     traveller: Traveller
   ) => Promise<unknown>;
-  storeTripHistory: (userId: string, tripHistory: string[]) => Promise<unknown>;
+  updateTripHistory: (userId: string, newTripid: string) => Promise<unknown>;
   updateUser: (
     userId: string,
     userData: {
@@ -82,20 +92,24 @@ export async function ensureImplicitDefaultActiveTrip(
   );
   const tripid = await deps.storeTrip(tripData);
   const tripWithId: TripData = { ...tripData, tripid };
+  const nextHistory = mergeTripHistoryWithNewTrip(
+    deps.existingTripHistory,
+    tripid
+  );
 
   await deps.putTravelerInTrip(tripid, {
     uid: deps.uid,
     userName: deps.userName,
   });
   await deps.secureStoreSetItem("currentTripId", tripid);
-  await deps.storeTripHistory(deps.uid, [tripid]);
+  await deps.updateTripHistory(deps.uid, tripid);
   await deps.updateUser(deps.uid, {
     userName: deps.userName,
     currentTrip: tripid,
     freshlyCreated: false,
   });
   await deps.setCurrentTrip(tripid, tripWithId);
-  deps.setTripHistory([tripid]);
+  deps.setTripHistory(nextHistory);
   await deps.setFreshlyCreatedTo(false);
 
   return { tripid, tripData: tripWithId };

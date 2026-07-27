@@ -20,7 +20,13 @@ jest.mock("../../components/ExpensesOutput/ExpensesOutput", () =>
   jest.requireActual("../../components/ExpensesOutput/ExpensesOutput")
 );
 
-jest.mock("../../components/ManageExpense/AddExpenseButton", () => () => null);
+jest.mock("../../components/ManageExpense/AddExpenseButton", () => {
+  const React = require("react");
+  const { Text } = require("react-native");
+  return function MockAddExpenseButton() {
+    return <Text testID="add-expense-entry">add expense</Text>;
+  };
+});
 jest.mock("../../components/UI/MiniSyncIndicator", () => () => null);
 
 jest.mock("expo-haptics", () => ({
@@ -257,5 +263,32 @@ describe("RecentExpenses screen", () => {
     );
 
     expect(screen.getByTestId("expenses-summary-pressable")).toBeTruthy();
+  });
+
+  it("keeps the add-expense entry point on Recent Expenses for an implicit default Active trip", () => {
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <RecentExpenses navigation={navigation as any} />,
+      {
+        expenses: expensesContextForList([]),
+        user: {
+          periodName: "month",
+          needsTour: false,
+          freshlyCreated: false,
+        },
+        trip: {
+          tripid: "t-implicit",
+          tripName: "",
+          tripCurrency: "EUR",
+          isImplicitDefault: true,
+          dailyBudget: "0",
+          totalBudget: "0",
+          travellers: ["Alice"],
+        },
+      }
+    );
+
+    expect(screen.getByTestId("add-expense-entry")).toBeTruthy();
+    expect(navigation.navigate).not.toHaveBeenCalledWith("Profile");
   });
 });

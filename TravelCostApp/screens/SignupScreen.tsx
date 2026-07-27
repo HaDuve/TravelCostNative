@@ -9,13 +9,7 @@ import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { asyncStoreSafeClear } from "../store/async-storage";
 import { UserContext, UserData } from "../store/user-context";
 import { createUser } from "../util/auth";
-import {
-  putTravelerInTrip,
-  storeTrip,
-  storeTripHistory,
-  storeUser,
-  updateUser,
-} from "../util/http";
+import { storeUser, updateUser } from "../util/http";
 import { setAxiosAccessToken } from "../util/axios-config";
 import { AuthContext } from "../store/auth-context";
 import Toast from "react-native-toast-message";
@@ -31,12 +25,9 @@ import { VexoEvents } from "../util/vexo-constants";
 import { TripContext } from "../store/trip-context";
 import { ExpensesContext } from "../store/expenses-context";
 import { secureStoreSetItem } from "../store/secure-storage";
-import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "../store/mmkv";
+import { MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
-import {
-  deviceLocaleTripCurrency,
-  ensureImplicitDefaultActiveTrip,
-} from "../util/implicit-default-trip";
+import { createImplicitDefaultForUser } from "../util/create-implicit-default-for-user";
 
 function SignupScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -132,17 +123,11 @@ function SignupScreen() {
         locale: userData.locale,
       });
 
-      await ensureImplicitDefaultActiveTrip({
+      await createImplicitDefaultForUser({
         uid,
         userName: name,
-        tripCurrency: deviceLocaleTripCurrency(),
-        categories: getMMKVObject(MMKV_KEYS.CATEGORY_LIST),
-        storeTrip,
-        putTravelerInTrip,
-        storeTripHistory,
-        updateUser,
+        existingTripHistory: [],
         setCurrentTrip: tripCtx.setCurrentTrip,
-        secureStoreSetItem,
         setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
         setTripHistory: userCtx.setTripHistory,
       });

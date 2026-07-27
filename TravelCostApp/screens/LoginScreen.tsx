@@ -8,14 +8,7 @@ import { i18n } from "../i18n/i18n";
 
 import { AuthContext } from "../store/auth-context";
 import { UserContext, UserData } from "../store/user-context";
-import {
-  fetchUser,
-  putTravelerInTrip,
-  storeTrip,
-  storeTripHistory,
-  touchMyTraveler,
-  updateUser,
-} from "../util/http";
+import { fetchUser, touchMyTraveler, updateUser } from "../util/http";
 import { TripContext } from "../store/trip-context";
 import Toast from "react-native-toast-message";
 import Purchases from "react-native-purchases";
@@ -29,12 +22,9 @@ import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
 import { secureStoreSetItem } from "../store/secure-storage";
 import { ExpensesContext } from "../store/expenses-context";
-import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "../store/mmkv";
+import { MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
-import {
-  deviceLocaleTripCurrency,
-  ensureImplicitDefaultActiveTrip,
-} from "../util/implicit-default-trip";
+import { createImplicitDefaultForUser } from "../util/create-implicit-default-for-user";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -83,6 +73,7 @@ function LoginScreen() {
       safeLogError(error);
       setIsAuthenticating(false);
       authCtx.logout(tripCtx.tripid);
+      return;
     }
     const userData = checkUser;
     // Check if the user logged in but there is no userName, we deleted the account
@@ -95,6 +86,7 @@ function LoginScreen() {
         visibilityTime: 4000,
       });
       authCtx.logout(tripCtx.tripid);
+      setIsAuthenticating(false);
       return;
     }
     try {
@@ -123,17 +115,11 @@ function LoginScreen() {
     let tripid = userData.currentTrip;
     if (!tripid) {
       try {
-        const created = await ensureImplicitDefaultActiveTrip({
+        const created = await createImplicitDefaultForUser({
           uid,
           userName: userData.userName,
-          tripCurrency: deviceLocaleTripCurrency(),
-          categories: getMMKVObject(MMKV_KEYS.CATEGORY_LIST),
-          storeTrip,
-          putTravelerInTrip,
-          storeTripHistory,
-          updateUser,
+          existingTripHistory: userCtx.tripHistory,
           setCurrentTrip: tripCtx.setCurrentTrip,
-          secureStoreSetItem,
           setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
           setTripHistory: userCtx.setTripHistory,
         });

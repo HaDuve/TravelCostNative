@@ -5,6 +5,7 @@ import {
   countableTripsTowardNonPremiumLimit,
   ensureImplicitDefaultActiveTrip,
   isImplicitDefaultTrip,
+  mergeTripHistoryWithNewTrip,
 } from "../../util/implicit-default-trip";
 
 describe("isImplicitDefaultTrip", () => {
@@ -19,6 +20,27 @@ describe("isImplicitDefaultTrip", () => {
 
   it("treats true as true", () => {
     expect(isImplicitDefaultTrip({ isImplicitDefault: true })).toBe(true);
+  });
+});
+
+describe("mergeTripHistoryWithNewTrip", () => {
+  it("appends a new trip id to existing Trip history", () => {
+    expect(mergeTripHistoryWithNewTrip(["t1", "t2"], "t3")).toEqual([
+      "t1",
+      "t2",
+      "t3",
+    ]);
+  });
+
+  it("does not duplicate an id already in Trip history", () => {
+    expect(mergeTripHistoryWithNewTrip(["t1", "t2"], "t1")).toEqual([
+      "t1",
+      "t2",
+    ]);
+  });
+
+  it("treats missing history as empty", () => {
+    expect(mergeTripHistoryWithNewTrip(undefined, "t1")).toEqual(["t1"]);
   });
 });
 
@@ -58,10 +80,10 @@ describe("non-premium trip limit counting", () => {
 });
 
 describe("ensureImplicitDefaultActiveTrip", () => {
-  it("stores an implicit default trip, sets Active trip, and clears freshlyCreated", async () => {
+  it("appends the new trip to existing Trip history instead of overwriting", async () => {
     const storeTrip = jest.fn(async () => "trip-implicit-1");
     const putTravelerInTrip = jest.fn(async () => ({}));
-    const storeTripHistory = jest.fn(async () => undefined);
+    const updateTripHistory = jest.fn(async () => undefined);
     const updateUser = jest.fn(async () => undefined);
     const setCurrentTrip = jest.fn(async () => undefined);
     const secureStoreSetItem = jest.fn(async () => undefined);
@@ -72,9 +94,10 @@ describe("ensureImplicitDefaultActiveTrip", () => {
       uid: "u1",
       userName: "Alice",
       tripCurrency: "EUR",
+      existingTripHistory: ["trip-old-1", "trip-old-2"],
       storeTrip,
       putTravelerInTrip,
-      storeTripHistory,
+      updateTripHistory,
       updateUser,
       setCurrentTrip,
       secureStoreSetItem,
@@ -99,7 +122,7 @@ describe("ensureImplicitDefaultActiveTrip", () => {
       "currentTripId",
       "trip-implicit-1"
     );
-    expect(storeTripHistory).toHaveBeenCalledWith("u1", ["trip-implicit-1"]);
+    expect(updateTripHistory).toHaveBeenCalledWith("u1", "trip-implicit-1");
     expect(updateUser).toHaveBeenCalledWith("u1", {
       userName: "Alice",
       currentTrip: "trip-implicit-1",
@@ -113,9 +136,36 @@ describe("ensureImplicitDefaultActiveTrip", () => {
         tripid: "trip-implicit-1",
       })
     );
-    expect(setTripHistory).toHaveBeenCalledWith(["trip-implicit-1"]);
+    expect(setTripHistory).toHaveBeenCalledWith([
+      "trip-old-1",
+      "trip-old-2",
+      "trip-implicit-1",
+    ]);
     expect(setFreshlyCreatedTo).toHaveBeenCalledWith(false);
     expect(result.tripid).toBe("trip-implicit-1");
     expect(result.tripData.isImplicitDefault).toBe(true);
+  });
+
+  it("starts Trip history with only the new trip when history is empty", async () => {
+    const updateTripHistory = jest.fn(async () => undefined);
+    const setTripHistory = jest.fn();
+
+    await ensureImplicitDefaultActiveTrip({
+      uid: "u1",
+      userName: "Alice",
+      tripCurrency: "EUR",
+      existingTripHistory: [],
+      storeTrip: jest.fn(async () => "trip-implicit-1"),
+      putTravelerInTrip: jest.fn(async () => ({})),
+      updateTripHistory,
+      updateUser: jest.fn(async () => undefined),
+      setCurrentTrip: jest.fn(async () => undefined),
+      secureStoreSetItem: jest.fn(async () => undefined),
+      setFreshlyCreatedTo: jest.fn(async () => undefined),
+      setTripHistory,
+    });
+
+    expect(updateTripHistory).toHaveBeenCalledWith("u1", "trip-implicit-1");
+    expect(setTripHistory).toHaveBeenCalledWith(["trip-implicit-1"]);
   });
 });

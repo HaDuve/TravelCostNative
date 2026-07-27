@@ -16,6 +16,7 @@ jest.mock("../../util/http", () => ({
   updateTripHistory: jest.fn(),
   updateTrip: jest.fn(),
   getAllExpenses: jest.fn(async () => []),
+  getTravellers: jest.fn(async () => [{ uid: "u1", userName: "Alice" }]),
   putTravelerInTrip: jest.fn(),
 }));
 
@@ -46,6 +47,7 @@ jest.mock("../../util/appState", () => ({
 }));
 
 jest.mock("../../store/secure-storage", () => ({
+  secureStoreGetItem: jest.fn(async () => "t-implicit"),
   secureStoreSetItem: jest.fn(async () => {}),
 }));
 
@@ -168,10 +170,16 @@ describe("TripForm budget form modes", () => {
           dailyBudget: "0",
           totalBudget: "0",
           isImplicitDefault: true,
-          travellers: ["Alice"],
+          travellers: [{ uid: "u1", userName: "Alice" }],
+          getcurrentTrip: jest.fn(() => ({
+            tripid: "t-implicit",
+            tripName: "",
+            tripCurrency: "EUR",
+            travellers: [{ uid: "u1", userName: "Alice" }],
+          })),
           saveTripDataInStorage: jest.fn(async () => {}),
+          saveTravellersInStorage: jest.fn(async () => {}),
           setCurrentTrip: jest.fn(async () => {}),
-          fetchAndSetTravellers: jest.fn(async () => true),
           setdailyBudget: jest.fn(),
         },
         user: {
@@ -179,7 +187,7 @@ describe("TripForm budget form modes", () => {
         },
         expenses: {
           expenses: [],
-          mergeExpenses: jest.fn(),
+          setExpenses: jest.fn(),
         },
         auth: { uid: "u1" },
       }

@@ -17,9 +17,9 @@ import { TripContext } from "../../store/trip-context";
 import {
   formatExpenseWithCurrency,
   truncateString,
-  truncateNumber,
 } from "../../util/string";
 import { TravellerNames, fetchTripName, getTravellers } from "../../util/http";
+import { FittingCurrencyAmount } from "../UI/FittingCurrencyAmount";
 
 import { i18n } from "../../i18n/i18n";
 
@@ -328,18 +328,12 @@ function TripHistoryItem({ tripid, trips }) {
     totalBudget == "" ||
     isNaN(Number(totalBudget)) ||
     totalBudget >= MAX_JS_NUMBER.toString();
-  const totalBudgetString = noTotalBudget
-    ? "∞"
-    : formatExpenseWithCurrency(
-        truncateNumber(Number(totalBudget)),
-        tripCurrency
-      );
   const dailyBudgetString = formatExpenseWithCurrency(
-    truncateNumber(Number(dailyBudget)),
+    Number(dailyBudget),
     tripCurrency
   );
   const sumOfExpensesString = formatExpenseWithCurrency(
-    truncateNumber(Number(sumOfExpenses)),
+    Number(sumOfExpenses),
     tripCurrency
   );
 
@@ -369,6 +363,11 @@ function TripHistoryItem({ tripid, trips }) {
   const isOverBudget = noTotalBudget
     ? false
     : Number(sumOfExpenses) > Number(totalBudget);
+
+  const amountTextStyle = [
+    styles.amount,
+    isOverBudget && { color: GlobalStyles.colors.errorGrayed },
+  ];
 
   if (!tripid) return <Text>no id</Text>;
   if (isFetching || (tripid && !totalBudget)) {
@@ -478,22 +477,49 @@ function TripHistoryItem({ tripid, trips }) {
             >
               {truncateString(tripName, dimensionChars)}
             </Text>
-            <Text
-              style={[styles.textBase, isScaledUp && { textAlign: "center" }]}
-            >
-              {i18n.t("daily") + (isDynamicDailyBudget ? "*" : "")}
-              {": " + dailyBudgetString}
-            </Text>
-          </View>
-          <View style={styles.amountContainer}>
-            <Text
+            <View
               style={[
-                styles.amount,
-                isOverBudget && { color: GlobalStyles.colors.errorGrayed },
+                styles.dailyRow,
+                isScaledUp && { justifyContent: "center" },
               ]}
             >
-              {sumOfExpensesString}/{totalBudgetString}
-            </Text>
+              <Text
+                style={[styles.textBase, isScaledUp && { textAlign: "center" }]}
+              >
+                {i18n.t("daily") + (isDynamicDailyBudget ? "*" : "")}
+                {": "}
+              </Text>
+              <FittingCurrencyAmount
+                amount={Number(dailyBudget) || 0}
+                currency={tripCurrency}
+                locale={i18n.locale}
+                style={[styles.textBase, isScaledUp && { textAlign: "center" }]}
+                containerStyle={styles.dailyAmountFit}
+              />
+            </View>
+          </View>
+          <View style={styles.amountContainer}>
+            <View style={styles.amountRow}>
+              <FittingCurrencyAmount
+                amount={Number(sumOfExpenses) || 0}
+                currency={tripCurrency}
+                locale={i18n.locale}
+                style={amountTextStyle}
+                containerStyle={styles.amountFit}
+              />
+              <Text style={amountTextStyle}>/</Text>
+              {noTotalBudget ? (
+                <Text style={amountTextStyle}>∞</Text>
+              ) : (
+                <FittingCurrencyAmount
+                  amount={Number(totalBudget) || 0}
+                  currency={tripCurrency}
+                  locale={i18n.locale}
+                  style={amountTextStyle}
+                  containerStyle={styles.amountFit}
+                />
+              )}
+            </View>
             <Progress.Bar
               color={
                 isOverBudget
@@ -565,6 +591,16 @@ const styles = StyleSheet.create({
     fontSize: dynamicScale(14, false, 0.5),
     fontWeight: "300",
   },
+  dailyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    maxWidth: dynamicScale(150),
+  },
+  dailyAmountFit: {
+    flexShrink: 1,
+    maxWidth: dynamicScale(100),
+  },
   description: {
     fontSize: dynamicScale(16, false, 0.5),
     marginBottom: dynamicScale(4, true),
@@ -579,6 +615,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: dynamicScale(4, false, 0.5),
     minWidth: dynamicScale(80),
+    width: dynamicScale(150, true, 1),
+  },
+  amountRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+  },
+  amountFit: {
+    flexShrink: 1,
+    maxWidth: "45%",
   },
   amount: {
     fontSize: dynamicScale(12, false, 0.5),

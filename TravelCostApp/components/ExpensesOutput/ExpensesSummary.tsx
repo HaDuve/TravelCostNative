@@ -250,6 +250,8 @@ ExpensesSummary.propTypes = {
 const styles = StyleSheet.create({
   sumTextContainer: {
     alignItems: "center",
+    alignSelf: "stretch",
+    width: "100%",
   },
   offlineText: {
     color: GlobalStyles.colors.primary500,

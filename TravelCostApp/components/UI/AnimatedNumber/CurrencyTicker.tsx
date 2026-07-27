@@ -5,20 +5,25 @@ import {
   TextStyle,
   Text,
   Platform,
+  LayoutChangeEvent,
 } from "react-native";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Ticker, Tick } from "./index";
 import {
+  formatCompactExpenseWithCurrency,
   formatExpenseWithCurrency,
-  truncateNumber,
 } from "../../../util/string";
+import { pickFittingCurrencyText } from "../FittingCurrencyAmount";
+import { i18n } from "../../../i18n/i18n";
 
 interface CurrencyTickerProps {
   value: number;
   currency: string;
   fontSize?: number;
   style?: StyleProp<TextStyle>;
+  /** @deprecated Fitting is layout-based; kept for call-site compat. */
   truncate?: boolean;
+  /** @deprecated Unused; fitting uses container measure. */
   truncateLimit?: number;
   disableAnimation?: boolean;
 }
@@ -31,17 +36,26 @@ const CurrencyTicker: React.FC<CurrencyTickerProps> = ({
   currency,
   fontSize = 50,
   style,
-  truncate = true,
-  truncateLimit = 1000,
   disableAnimation = false,
 }) => {
-  // Format the number with currency
-  const formattedValue = useMemo(() => {
-    const truncatedValue = truncate
-      ? truncateNumber(value, truncateLimit, true)
-      : value;
-    return formatExpenseWithCurrency(truncatedValue, currency);
-  }, [value, currency, truncate, truncateLimit]);
+  const [containerWidth, setContainerWidth] = useState<number | null>(null);
+  const [fullWidth, setFullWidth] = useState<number | null>(null);
+
+  const fullText = useMemo(
+    () => formatExpenseWithCurrency(value, currency),
+    [value, currency]
+  );
+  const compactText = useMemo(
+    () => formatCompactExpenseWithCurrency(value, currency, i18n.locale),
+    [value, currency]
+  );
+
+  const formattedValue = pickFittingCurrencyText(
+    fullText,
+    compactText,
+    fullWidth,
+    containerWidth
+  );
 
   // Split the formatted value into parts
   const parts = useMemo(() => {
@@ -64,32 +78,66 @@ const CurrencyTicker: React.FC<CurrencyTickerProps> = ({
     };
   }, [formattedValue, value]);
 
+  function onContainerLayout(event: LayoutChangeEvent) {
+    setContainerWidth(event.nativeEvent.layout.width);
+  }
+
+  function onFullProbeLayout(event: LayoutChangeEvent) {
+    setFullWidth(event.nativeEvent.layout.width);
+  }
+
+  const textStyle = [
+    {
+      fontSize,
+      fontWeight: "bold" as const,
+      ...Platform.select({
+        android: {
+          textShadowColor: "rgba(0, 0, 0, 0.15)",
+          textShadowOffset: { width: 2, height: 2 },
+          textShadowRadius: 8,
+        },
+      }),
+    },
+    style,
+  ];
+
   // If animation is disabled, render simple Text with original styling
   if (disableAnimation) {
     return (
-      <Text
-        style={[
-          {
-            fontSize,
-            fontWeight: "bold",
-            ...Platform.select({
-              android: {
-                textShadowColor: "rgba(0, 0, 0, 0.15)",
-                textShadowOffset: { width: 2, height: 2 },
-                textShadowRadius: 8,
-              },
-            }),
-          },
-          style,
-        ]}
+      <View
+        style={[styles.container, styles.stretch]}
+        onLayout={onContainerLayout}
       >
-        {formattedValue}
-      </Text>
+        <Text
+          style={[textStyle, styles.fullProbe]}
+          onLayout={onFullProbeLayout}
+          numberOfLines={1}
+          importantForAccessibility="no-hide-descendants"
+          accessibilityElementsHidden
+        >
+          {fullText}
+        </Text>
+        <Text style={textStyle} numberOfLines={1}>
+          {formattedValue}
+        </Text>
+      </View>
     );
   }
 
   return (
-    <View style={[styles.container, style]}>
+    <View
+      style={[styles.container, styles.stretch, style]}
+      onLayout={onContainerLayout}
+    >
+      <Text
+        style={[{ fontSize, fontWeight: "bold" }, styles.fullProbe]}
+        onLayout={onFullProbeLayout}
+        numberOfLines={1}
+        importantForAccessibility="no-hide-descendants"
+        accessibilityElementsHidden
+      >
+        {fullText}
+      </Text>
       <View style={styles.row}>
         {parts.prefix && (
           <Tick
@@ -141,14 +189,25 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
   },
+  stretch: {
+    alignSelf: "stretch",
+    overflow: "hidden",
+  },
   row: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
   },
   symbol: {
     opacity: 0.8,
     marginHorizontal: 1,
     fontWeight: "600",
+  },
+  fullProbe: {
+    position: "absolute",
+    opacity: 0,
+    left: 0,
+    top: 0,
   },
 });
 

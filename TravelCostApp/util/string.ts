@@ -102,6 +102,95 @@ export function truncateString(str: string, n: number) {
   return str?.length > n ? str.slice(0, n - 1) + "..." : str;
 }
 
+type CompactScale = { threshold: number; suffixes: Record<string, string> };
+
+const COMPACT_SCALES: CompactScale[] = [
+  {
+    threshold: 1_000_000_000,
+    suffixes: { en: "b", de: " Mrd.", fr: " Md", ru: " млрд" },
+  },
+  {
+    threshold: 1_000_000,
+    suffixes: { en: "m", de: " Mio.", fr: " M", ru: " млн" },
+  },
+  {
+    threshold: 1_000,
+    suffixes: { en: "k", de: "k", fr: "k", ru: "k" },
+  },
+];
+
+function languageFromLocale(locale: string): string {
+  return locale.slice(0, 2).toLowerCase();
+}
+
+function compactSuffix(language: string, absAmount: number): { scale: number; suffix: string } | null {
+  for (const { threshold, suffixes } of COMPACT_SCALES) {
+    if (absAmount >= threshold) {
+      return {
+        scale: threshold,
+        suffix: suffixes[language] ?? suffixes.en,
+      };
+    }
+  }
+  return null;
+}
+
+function currencySymbolGoesFirst(locale: string, currency: string): boolean {
+  try {
+    const parts = new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency,
+      currencyDisplay: "narrowSymbol",
+    }).formatToParts(1);
+    const currencyIndex = parts.findIndex((p) => p.type === "currency");
+    const numberIndex = parts.findIndex(
+      (p) => p.type === "integer" || p.type === "decimal"
+    );
+    return currencyIndex !== -1 && numberIndex !== -1 && currencyIndex < numberIndex;
+  } catch {
+    return languageFromLocale(locale) === "en";
+  }
+}
+
+/**
+ * Space-saving compact currency amount (k / Mio. / Mrd. etc.).
+ * Used when the full formatExpenseWithCurrency string does not fit.
+ */
+export function formatCompactExpenseWithCurrency(
+  amount: number | string,
+  currency?: string,
+  locale = "en"
+): string {
+  if (typeof amount === "string") amount = Number(amount);
+  if (isNaN(amount)) {
+    return "";
+  }
+  if (!currency) {
+    return formatExpenseWithCurrency(amount, currency);
+  }
+
+  const abs = Math.abs(amount);
+  const language = languageFromLocale(locale);
+  const compact = compactSuffix(language, abs);
+  if (!compact) {
+    return formatExpenseWithCurrency(amount, currency);
+  }
+
+  const scaled = abs / compact.scale;
+  const decimalSep =
+    language === "en" ? "." : ",";
+  const mantissa = Number.isInteger(scaled)
+    ? String(scaled)
+    : scaled.toFixed(1).replace(".", decimalSep);
+  const sign = amount < 0 ? "-" : "";
+  const body = `${sign}${mantissa}${compact.suffix}`;
+  const symbol = getCurrencySymbol(currency);
+
+  return currencySymbolGoesFirst(locale, currency)
+    ? `${symbol}${body}`
+    : `${body}${symbol}`;
+}
+
 /**
  * Truncates or limits a number to a specified border value,
  * with options for formatting.

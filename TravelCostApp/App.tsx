@@ -36,6 +36,9 @@ import {
   touchMyTraveler,
   dataResponseTime,
   updateUser,
+  fetchTrip,
+  getAllExpenses,
+  getTravellers,
 } from "./util/http";
 import TripContextProvider, {
   TripContext,
@@ -79,7 +82,10 @@ import {
 } from "./components/Rating/firstStartUtil";
 import RatingModal from "./screens/RatingModal";
 import NetworkContextProvider from "./store/network-context";
-import { secureStoreGetItem } from "./store/secure-storage";
+import {
+  secureStoreGetItem,
+  secureStoreSetItem,
+} from "./store/secure-storage";
 import { isConnectionFastEnough } from "./util/connectionSpeed";
 import FinderScreen from "./screens/FinderScreen";
 import CustomerScreen from "./screens/CustomerScreen";
@@ -101,6 +107,12 @@ import {
   VexoUserContext,
 } from "./util/vexo-tracking";
 import { VexoEvents } from "./util/vexo-constants";
+import {
+  activateTrip,
+  activateTripFromLastKnown,
+} from "./util/activate-trip";
+import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "./store/mmkv";
+import { Traveller } from "./util/traveler";
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
@@ -523,24 +535,22 @@ function Root() {
           if (!onlineSetupDone) {
             const { isFastEnough } = await isConnectionFastEnough();
             if (isFastEnough) {
-              //prepare online setup
               const storedUid = await secureStoreGetItem("uid");
               if (!storedUid) return;
               const checkUser = await fetchUser(storedUid);
               if (!checkUser) return;
-              const tripid = checkUser.currentTrip;
               const locale = checkUser.locale;
               if (!locale) {
                 checkUser.locale = i18n.locale;
                 await updateUser(storedUid, checkUser);
               }
+              // Authoritative Active trip id is secure storage (not server guesswork).
+              const tripid = await secureStoreGetItem("currentTripId");
               if (!tripid) return;
-              const tripData: TripData =
-                await tripCtx.fetchAndSetCurrentTrip(tripid);
-              if (!tripData) return;
               try {
                 setOnlineSetupDone(true);
-                await onlineSetup(tripData, checkUser, tripid, storedUid);
+                await activateTrip(tripid, activateTripDeps(storedUid));
+                await onlineSetup(checkUser, tripid, storedUid);
               } catch (error) {
                 setOnlineSetupDone(false);
               }
@@ -561,23 +571,39 @@ function Root() {
     }
   };
 
+  function activateTripDeps(uid: string) {
+    return {
+      uid,
+      previousTripSnapshot: tripCtx.getcurrentTrip(),
+      previousExpensesSnapshot: expensesCtx.expenses,
+      fetchTrip,
+      getTravellers,
+      getAllExpenses,
+      updateUser,
+      secureStoreGetItem,
+      secureStoreSetItem,
+      setCurrentTrip: tripCtx.setCurrentTrip,
+      saveTripDataInStorage: tripCtx.saveTripDataInStorage,
+      saveTravellersInStorage: tripCtx.saveTravellersInStorage,
+      setExpenses: expensesCtx.setExpenses,
+      setExpensesCache: (nextExpenses: ExpenseData[]) =>
+        setMMKVObject(MMKV_KEYS.EXPENSES, nextExpenses),
+      setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
+    };
+  }
+
   async function onlineSetup(
-    tripData: TripData,
     checkUser: UserData,
     storedTripId: string,
     storedUid: string
   ) {
-    const userData: UserData = checkUser;
-    const tripid = userData.currentTrip;
-    if (!tripid || tripid?.length < 2) {
+    if (!storedTripId || storedTripId.length < 2) {
       return;
     }
-    // save user Name in Ctx and async
     await loadKeys();
     try {
-      await userCtx.addUserName(userData);
-      await tripCtx.setCurrentTrip(tripid, tripData);
-      await userCtx.loadCatListFromAsyncInCtx(tripid);
+      await userCtx.addUserName(checkUser);
+      await userCtx.loadCatListFromAsyncInCtx(storedTripId);
       await touchMyTraveler(storedTripId, storedUid);
     } catch (error) {
       await tripCtx.loadTripDataFromStorage();
@@ -586,15 +612,46 @@ function Root() {
 
   async function setupOfflineMount(
     isOfflineMode: boolean,
-    storedToken: string
+    storedToken: string,
+    storedUid: string,
+    storedTripId: string
   ) {
     if (!isOfflineMode) {
       return null;
     }
     try {
       await userCtx.loadUserNameFromStorage();
-      await tripCtx.loadTripDataFromStorage();
-      await tripCtx.loadTravellersFromStorage();
+      const lastKnownTrip = getMMKVObject(MMKV_KEYS.CURRENT_TRIP) as
+        | TripData
+        | null;
+      if (!lastKnownTrip) {
+        // No cached trip payload — fall back to storage loaders rather than
+        // hydrating an empty shell through the activate seam.
+        await tripCtx.loadTripDataFromStorage();
+        await tripCtx.loadTravellersFromStorage();
+        await expensesCtx.loadExpensesFromStorage(true);
+      } else {
+        const lastKnownRoster =
+          ((await asyncStoreGetObject("currentTravellers")) as Traveller[]) ??
+          [];
+        const lastKnownExpenses =
+          (getMMKVObject(MMKV_KEYS.EXPENSES) as ExpenseData[]) ?? [];
+        await activateTripFromLastKnown(
+          storedTripId,
+          {
+            tripData: {
+              ...lastKnownTrip,
+              tripid: lastKnownTrip.tripid ?? storedTripId,
+            },
+            roster: lastKnownRoster,
+            expenses: lastKnownExpenses,
+          },
+          // Omit server mirror — offline must not call updateUser.
+          (({ updateUser: _skip, ...rest }) => rest)(
+            activateTripDeps(storedUid)
+          )
+        );
+      }
       await userCtx.loadCatListFromAsyncInCtx("async");
       await authCtx.authenticate(storedToken);
     } catch (error) {}
@@ -669,26 +726,7 @@ function Root() {
 
         // check if user is online
         if (!online) {
-          await setupOfflineMount(true, storedToken);
-          setAppIsReady(true);
-          return;
-        }
-
-        // set tripId in context
-        let tripData;
-        if (storedTripId) {
-          tripData = await tripCtx.fetchAndSetCurrentTrip(storedTripId);
-          await tripCtx.fetchAndSetTravellers(storedTripId);
-          tripCtx.setTripid(storedTripId);
-        } else {
-          Toast.show({
-            type: "error",
-            text1: i18n.t("toastLoginError1"),
-            text2: i18n.t("toastLoginError2"),
-            visibilityTime: 5000,
-          });
-          await asyncStoreSafeClear();
-          authCtx.logout(tripCtx.tripid);
+          await setupOfflineMount(true, storedToken, storedUid, storedTripId);
           setAppIsReady(true);
           return;
         }
@@ -715,9 +753,25 @@ function Root() {
           // Do not re-enable Profile-first gate from boot.
           await userCtx.setFreshlyCreatedTo(false);
         }
+        try {
+          await activateTrip(storedTripId, activateTripDeps(storedUid));
+          setOnlineSetupDone(true);
+        } catch (error) {
+          safeLogError(error);
+          Toast.show({
+            type: "error",
+            text1: i18n.t("toastLoginError1"),
+            text2: i18n.t("toastLoginError2"),
+            visibilityTime: 5000,
+          });
+          await asyncStoreSafeClear();
+          authCtx.logout(tripCtx.tripid);
+          setAppIsReady(true);
+          return;
+        }
         // setup context
         await authCtx.setUserID(storedUid);
-        await onlineSetup(tripData, checkUser, storedTripId, storedUid);
+        await onlineSetup(checkUser, storedTripId, storedUid);
         await authCtx.authenticate(storedToken);
         setAppIsReady(true);
       } else {

@@ -40,7 +40,10 @@ import { ActivityIndicator } from "react-native-paper";
 import BackButton from "../components/UI/BackButton";
 import { NetworkContext } from "../store/network-context";
 import uniqBy from "lodash.uniqby";
-import { secureStoreSetItem } from "../store/secure-storage";
+import {
+  secureStoreGetItem,
+  secureStoreSetItem,
+} from "../store/secure-storage";
 import { MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -52,6 +55,7 @@ import { sleep } from "../util/appState";
 import { dynamicScale } from "../util/scalingUtil";
 import { trackEvent } from "../util/vexo-tracking";
 import { VexoEvents } from "../util/vexo-constants";
+import { activateTrip } from "../util/activate-trip";
 
 const JoinTrip = ({ navigation, route }) => {
   // join Trips via route params (route.params.id -> tripid)
@@ -170,36 +174,42 @@ const JoinTrip = ({ navigation, route }) => {
       ]);
       userCtx.setTripHistory(historyWithJoined);
 
-      updateUser(uid, {
-        currentTrip: tripid,
-      });
+      const travellers = await getTravellers(tripid);
+      // only put traveller in trip if not already in trip
+      if (
+        !travellers?.some((traveller) => traveller.userName === userCtx.userName)
+      ) {
+        await putTravelerInTrip(tripid, {
+          uid: uid,
+          userName: userCtx.userName,
+        });
+      }
+
       try {
-        await tripCtx.setCurrentTrip(tripid, tripdata);
-        await tripCtx.fetchAndSetTravellers(tripid);
-        await userCtx.setFreshlyCreatedTo(false);
+        await activateTrip(tripid, {
+          uid,
+          tripData: tripdata,
+          previousTripSnapshot: tripCtx.getcurrentTrip(),
+          previousExpensesSnapshot: expenseCtx.expenses,
+          fetchTrip,
+          getTravellers,
+          getAllExpenses,
+          updateUser,
+          secureStoreGetItem,
+          secureStoreSetItem,
+          setCurrentTrip: tripCtx.setCurrentTrip,
+          saveTripDataInStorage: tripCtx.saveTripDataInStorage,
+          saveTravellersInStorage: tripCtx.saveTravellersInStorage,
+          setExpenses: expenseCtx.setExpenses,
+          setExpensesCache: (nextExpenses) =>
+            setMMKVObject(MMKV_KEYS.EXPENSES, nextExpenses),
+          setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
+        });
         await userCtx.loadCatListFromAsyncInCtx(tripid);
       } catch (error) {
         safeLogError(error);
         throw new Error("Error while updating user in context");
       }
-
-      const expenses = await getAllExpenses(tripid, uid);
-      expenseCtx.setExpenses(expenses);
-      tripdata.expenses = [];
-      setMMKVObject(MMKV_KEYS.CURRENT_TRIP, tripdata);
-      await secureStoreSetItem("currentTripId", tripid);
-      // await asyncStoreSetObject("expenses", expenses);
-      setMMKVObject(MMKV_KEYS.EXPENSES, expenses);
-
-      const travellers = await getTravellers(tripid);
-      // only put traveller in trip if not already in trip
-      if (
-        !travellers?.some((traveller) => traveller.userName === userCtx.userName)
-      )
-        await putTravelerInTrip(tripid, {
-          uid: uid,
-          userName: userCtx.userName,
-        });
 
       const joinDecision = resolveJoinImplicitDefaultDecision({
         activeTripId: previousActiveTripId,
@@ -217,9 +227,6 @@ const JoinTrip = ({ navigation, route }) => {
         setTripHistory: userCtx.setTripHistory,
       });
 
-      // // Immediately reload the React Native Bundle
-      // const r = await reloadApp();
-      // if (r == -1)
       navigation.popToTop();
     } catch (error) {
       Alert.alert(

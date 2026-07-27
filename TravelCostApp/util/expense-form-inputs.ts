@@ -41,18 +41,18 @@ export function resolveDefaultNewExpenseCountry(
   return input.mostRecentExpenseCountry?.trim() ?? "";
 }
 
-export function countriesRepresentSamePlace(a: string, b: string): boolean {
-  const normalize = (value: string): string => {
-    const trimmed = value?.trim() ?? "";
-    if (!trimmed) return "";
-    if (trimmed.length === 2) {
-      return trimmed.toUpperCase();
-    }
-    const alpha2 = countryToAlpha2(trimmed);
-    return alpha2?.toUpperCase() ?? trimmed.toLowerCase();
-  };
+export function normalizeCountryKey(country: string): string {
+  const trimmed = country?.trim() ?? "";
+  if (!trimmed) return "";
+  if (trimmed.length === 2) {
+    return trimmed.toUpperCase();
+  }
+  const alpha2 = countryToAlpha2(trimmed);
+  return alpha2?.toUpperCase() ?? trimmed.toLowerCase();
+}
 
-  return normalize(a) === normalize(b);
+export function countriesRepresentSamePlace(a: string, b: string): boolean {
+  return normalizeCountryKey(a) === normalizeCountryKey(b);
 }
 
 /** English label used by CountryPicker for a stored country code or name. */

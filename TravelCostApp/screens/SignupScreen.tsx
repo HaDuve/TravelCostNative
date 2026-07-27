@@ -128,11 +128,14 @@ function SignupScreen() {
         userName: name,
         existingTripHistory: [],
         setCurrentTrip: tripCtx.setCurrentTrip,
+        saveTripDataInStorage: tripCtx.saveTripDataInStorage,
+        saveTravellersInStorage: tripCtx.saveTravellersInStorage,
+        setExpenses: expCtx.setExpenses,
+        setExpensesCache: (nextExpenses) =>
+          setMMKVObject(MMKV_KEYS.EXPENSES, nextExpenses),
         setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
         setTripHistory: userCtx.setTripHistory,
       });
-      expCtx.setExpenses([]);
-      setMMKVObject(MMKV_KEYS.EXPENSES, []);
       await secureStoreSetItem("uid", uid);
     } catch (error) {
       safeLogError(error);

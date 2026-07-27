@@ -36,6 +36,7 @@ import { MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 import safeLogError from "../util/error";
 import { createImplicitDefaultForUser } from "../util/create-implicit-default-for-user";
 import { activateTrip } from "../util/activate-trip";
+import { getActiveTripId } from "../util/active-trip-id";
 
 function LoginScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -123,7 +124,8 @@ function LoginScreen() {
       safeLogError(error);
     }
 
-    let tripid = userData.currentTrip;
+    // Secure currentTripId is authoritative; server currentTrip is a fallback mirror.
+    let tripid = (await getActiveTripId()) ?? userData.currentTrip;
     if (!tripid) {
       try {
         const created = await createImplicitDefaultForUser({
@@ -131,13 +133,15 @@ function LoginScreen() {
           userName: userData.userName,
           existingTripHistory: userCtx.tripHistory,
           setCurrentTrip: tripCtx.setCurrentTrip,
+          saveTripDataInStorage: tripCtx.saveTripDataInStorage,
+          saveTravellersInStorage: tripCtx.saveTravellersInStorage,
+          setExpenses: expCtx.setExpenses,
+          setExpensesCache: (nextExpenses) =>
+            setMMKVObject(MMKV_KEYS.EXPENSES, nextExpenses),
           setFreshlyCreatedTo: userCtx.setFreshlyCreatedTo,
           setTripHistory: userCtx.setTripHistory,
         });
         tripid = created.tripid;
-        // New implicit default has no ledger yet — not the activate-existing-trip path.
-        expCtx.setExpenses([]);
-        setMMKVObject(MMKV_KEYS.EXPENSES, []);
         await userCtx.loadCatListFromAsyncInCtx(tripid);
         tripCtx.refresh();
       } catch (error) {

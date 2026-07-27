@@ -5,8 +5,13 @@ import {
   updateUser,
 } from "./http";
 import { getMMKVObject, MMKV_KEYS } from "../store/mmkv";
-import { secureStoreSetItem } from "../store/secure-storage";
+import {
+  secureStoreGetItem,
+  secureStoreSetItem,
+} from "../store/secure-storage";
 import type { TripData } from "../types/trip";
+import type { Traveller } from "./traveler";
+import type { ExpenseData } from "./expense";
 import {
   deviceLocaleTripCurrency,
   ensureImplicitDefaultActiveTrip,
@@ -17,6 +22,10 @@ type ImplicitDefaultAuthContexts = {
   userName: string;
   existingTripHistory?: string[] | null;
   setCurrentTrip: (tripid: string, trip: TripData) => Promise<unknown>;
+  saveTripDataInStorage: (tripData: TripData) => Promise<void>;
+  saveTravellersInStorage: (travellers: Traveller[]) => Promise<unknown>;
+  setExpenses: (expenses: ExpenseData[]) => void;
+  setExpensesCache: (expenses: ExpenseData[]) => void;
   setFreshlyCreatedTo: (value: boolean) => void | Promise<unknown>;
   setTripHistory: (tripHistory: string[]) => void;
 };
@@ -36,7 +45,12 @@ export async function createImplicitDefaultForUser(
     updateTripHistory,
     updateUser,
     setCurrentTrip: ctx.setCurrentTrip,
+    secureStoreGetItem,
     secureStoreSetItem,
+    saveTripDataInStorage: ctx.saveTripDataInStorage,
+    saveTravellersInStorage: ctx.saveTravellersInStorage,
+    setExpenses: ctx.setExpenses,
+    setExpensesCache: ctx.setExpensesCache,
     setFreshlyCreatedTo: ctx.setFreshlyCreatedTo,
     setTripHistory: ctx.setTripHistory,
   });

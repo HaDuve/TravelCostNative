@@ -3,6 +3,8 @@ import * as Localization from "expo-localization";
 import type { TripData } from "../types/trip";
 import type { Category } from "./category";
 import type { Traveller } from "./traveler";
+import type { ExpenseData } from "./expense";
+import { activateTrip } from "./activate-trip";
 
 export function isImplicitDefaultTrip(
   trip: Pick<TripData, "isImplicitDefault"> | null | undefined
@@ -78,7 +80,12 @@ export type EnsureImplicitDefaultActiveTripDeps = {
     }
   ) => Promise<unknown>;
   setCurrentTrip: (tripid: string, trip: TripData) => Promise<unknown>;
+  secureStoreGetItem: (key: string) => Promise<string | null>;
   secureStoreSetItem: (key: string, value: string) => Promise<unknown>;
+  saveTripDataInStorage: (tripData: TripData) => Promise<void>;
+  saveTravellersInStorage: (travellers: Traveller[]) => Promise<unknown>;
+  setExpenses: (expenses: ExpenseData[]) => void;
+  setExpensesCache: (expenses: ExpenseData[]) => void;
   setFreshlyCreatedTo: (value: boolean) => void | Promise<unknown>;
   setTripHistory: (tripHistory: string[]) => void;
 };
@@ -96,21 +103,37 @@ export async function ensureImplicitDefaultActiveTrip(
     deps.existingTripHistory,
     tripid
   );
+  const roster: Traveller[] = [
+    { uid: deps.uid, userName: deps.userName },
+  ];
 
-  await deps.putTravelerInTrip(tripid, {
-    uid: deps.uid,
-    userName: deps.userName,
-  });
-  await deps.secureStoreSetItem("currentTripId", tripid);
+  await deps.putTravelerInTrip(tripid, roster[0]);
   await deps.updateTripHistory(deps.uid, tripid);
-  await deps.updateUser(deps.uid, {
-    userName: deps.userName,
-    currentTrip: tripid,
-    freshlyCreated: false,
-  });
-  await deps.setCurrentTrip(tripid, tripWithId);
   deps.setTripHistory(nextHistory);
-  await deps.setFreshlyCreatedTo(false);
 
-  return { tripid, tripData: tripWithId };
+  // Mirror writes (secure + server + context + empty ledger) go through activateTrip.
+  const activated = await activateTrip(tripid, {
+    uid: deps.uid,
+    tripData: tripWithId,
+    fetchTrip: async () => tripWithId,
+    getTravellers: async () => roster,
+    getAllExpenses: async () => [],
+    updateUser: async (uid, data) => {
+      await deps.updateUser(uid, {
+        userName: deps.userName,
+        currentTrip: data.currentTrip,
+        freshlyCreated: false,
+      });
+    },
+    secureStoreGetItem: deps.secureStoreGetItem,
+    secureStoreSetItem: deps.secureStoreSetItem,
+    setCurrentTrip: deps.setCurrentTrip,
+    saveTripDataInStorage: deps.saveTripDataInStorage,
+    saveTravellersInStorage: deps.saveTravellersInStorage,
+    setExpenses: deps.setExpenses,
+    setExpensesCache: deps.setExpensesCache,
+    setFreshlyCreatedTo: deps.setFreshlyCreatedTo,
+  });
+
+  return { tripid: activated.tripid, tripData: activated.tripData };
 }

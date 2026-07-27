@@ -19,8 +19,8 @@ import { i18n } from "../i18n/i18n";
 import { Traveller } from "./traveler";
 import { normalizeTravellers } from "./normalize-travellers";
 import { getMMKVString, setMMKVString } from "../store/mmkv";
-import { secureStoreGetItem } from "../store/secure-storage";
 import { ExpoPushToken } from "expo-notifications";
+import { getActiveTripId } from "./active-trip-id";
 import safeLogError from "./error";
 import { safelyParseJSON } from "./jsonParse";
 import { getValidIdToken } from "./firebase-auth";
@@ -985,7 +985,7 @@ export async function storeExpoPushTokenInTrip(
   if (!token) return;
   let usedTripID = tripid;
   if (!tripid || tripid.length < 1)
-    usedTripID = await secureStoreGetItem("currentTripId");
+    usedTripID = await getActiveTripId();
   if (!usedTripID) return;
 
   const authToken = await getValidIdToken();

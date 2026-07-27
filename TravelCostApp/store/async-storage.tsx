@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import { secureStoreRemoveItem } from "./secure-storage";
+import { ACTIVE_TRIP_ID_KEY } from "../util/active-trip-id";
 import safeLogError from "../util/error";
 import { safelyParseJSON } from "../util/jsonParse";
 
@@ -101,7 +102,7 @@ export async function asyncStoreSafeClear() {
     await AsyncStorage.multiRemove(keys);
     await secureStoreRemoveItem("token");
     await secureStoreRemoveItem("uid");
-    await secureStoreRemoveItem("currentTripId");
+    await secureStoreRemoveItem(ACTIVE_TRIP_ID_KEY);
     await secureStoreRemoveItem("freshlyCreated");
     await secureStoreRemoveItem("lastCountry");
     await secureStoreRemoveItem("lastCurrency");

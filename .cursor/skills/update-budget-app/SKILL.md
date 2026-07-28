@@ -1,6 +1,6 @@
 ---
 name: update-budget-app
-description: Chooses and runs the correct Budget For Nomads (TravelCostApp) release flow — OTA patch, native EAS build, store submit, or full release — updates changelog.txt from git changes in the project's existing style, and commits/pushes changelog (and app version files for store bumps) before publishing. Bare invocation (no tier) defaults to production OTA. Use when the user asks to deploy, release, ship, hotfix, OTA update, update changelog, push to production/alpha/staging, submit to App Store or Play Store, or bump the app version.
+description: Chooses and runs the correct Budget For Nomads (TravelCostApp) release flow — OTA patch, native EAS build, store submit, or full release — updates changelog.txt from git changes in the project's existing style (consolidates into the current OTA suffix if the last update on the target branch was under 24h ago), and commits/pushes changelog (and app version files for store bumps) before publishing. Bare invocation (no tier) defaults to production OTA. Use when the user asks to deploy, release, ship, hotfix, OTA update, update changelog, push to production/alpha/staging, submit to App Store or Play Store, or bump the app version.
 ---
 
 # Update Budget App
@@ -62,19 +62,34 @@ __Newest Changes:
 
 Confirm its **base** matches `app.config.js` (`1.3.005e` → app `1.3.005`). Mismatch → stop and fix before releasing.
 
-### 2b — Decide: edit in place vs bump version line
+### 2b — Decide: edit in place vs consolidate vs bump version line
+
+Use the **target tier’s branch** from Step 3 (default `production`).
+
+**Check last published OTA on that branch:**
+
+```bash
+cd TravelCostApp
+BRANCH=production   # or alpha / staging / dev
+eas update:list --branch "$BRANCH" --limit 1 --json --non-interactive 2>/dev/null || true
+# If a group ID is returned, fetch createdAt:
+eas update:view <groupId> --json 2>/dev/null || true
+```
+
+From the result:
+
+- **Published version** — prefix of `message` before `:` (e.g. `1.3.005k`)
+- **Published at** — `createdAt` from `eas update:view` (prefer over parsing “N hours ago” text)
+- **Within 24h** — `now - createdAt < 24 hours`
 
 | Situation | Action |
 |-----------|--------|
-| Newest block **not published yet** and bullets are wrong/incomplete | **Edit bullets** in `__Newest Changes__` only (keep same version line). Do not add a new suffix. |
-| Newest block **already published** (or ready to ship as-is) | **Bump** via script (next step) — moves current block to `__Other Changes__` |
-| Store release (`version:bump`) | Script creates new patch version block (e.g. `1.3.006`) |
+| Newest block **not published yet** (no matching update on branch, or version mismatch) | **Edit bullets** in `__Newest Changes__` only (keep same version line). Do not add a new suffix. |
+| Newest block **published** and **last update < 24h ago** on target branch | **Consolidate in place** — edit bullets under the **same** OTA suffix; do **not** run `version:bump:eas`. Republish with `update:{tier}`. |
+| Newest block **published ≥ 24h ago** (or no reliable timestamp) | **Bump** via `version:bump:eas` — moves current block to `__Other Changes__` |
+| Store release (`version:bump`) | Script creates new patch version block (e.g. `1.3.006`) — 24h rule does not apply |
 
-Check whether the current newest OTA was already published:
-
-```bash
-eas update:list --branch production --limit 1 --non-interactive 2>/dev/null || true
-```
+**Consolidation (under 24h):** merge new user-visible changes from the diff into the existing `__Newest Changes__` bullets. Combine related features on one line; keep `Bugfixes and performance improvements` on its own line. Same OTA suffix stays live — users see one changelog entry, not a new letter every few hours.
 
 ### 2c — Write bullets from the diff
 
@@ -82,6 +97,7 @@ Summarize **user-visible** changes only. Style rules: [changelog-style.md](chang
 
 Quick rules:
 - **OTA patch:** 1 feature bullet + `Bugfixes and performance improvements` on its **own line** (2 bullets total). Pure internal fixes → bugfixes line only.
+- **Consolidation (under 24h):** edit existing bullets manually — do not use `version:bump:eas --notes`; merge new work into the current feature line(s).
 - **Store release:** up to 2–3 feature bullets, then `Bugfixes and performance improvements` on its **own line**.
 - **Never** combine bugfixes with a feature on one line (see [changelog-style.md](changelog-style.md)).
 - Mirror recent tone: `Added …`, `Improved …`, `Fixed …`, `New …`; screen names as in the app.
@@ -98,7 +114,15 @@ Scan changed files for user-facing hints — e.g. `screens/`, `components/`, `i1
 
 Edit `changelog.txt` under `__Newest Changes:` only. Preserve section markers and structure.
 
-**OTA — new suffix (after publish or fresh OTA):**
+**Published under 24h ago — consolidate in place (same OTA suffix):**
+
+Edit `changelog.txt` under `__Newest Changes:` only — merge new bullets into the existing block; **keep the same version line**. Do not run `version:bump:eas`. Commit/push (Step 2e), then republish:
+
+```bash
+pnpm run update:production    # reads updated changelog; same suffix, new code
+```
+
+**OTA — new suffix (published ≥ 24h ago, or fresh OTA after long gap):**
 
 ```bash
 pnpm run version:bump:eas -- --notes "Your concise bullet text"
@@ -186,6 +210,17 @@ build → submit (optional: submit+update)
 
 **When:** JS/asset-only, same `app.config.js` version, changelog updated (Step 2).
 
+**Last OTA on target branch under 24h ago** — consolidate (Step 2b/2d): edit `changelog.txt` in place, commit/push, then:
+
+```bash
+eas whoami
+# Step 2e: commit + push changelog.txt (repo root)
+pnpm run update:production -- --dry-run          # optional preview
+pnpm run update:production                       # same suffix, updated bullets
+```
+
+**Last OTA ≥ 24h ago (or first OTA for this suffix)** — bump suffix, then publish:
+
 ```bash
 eas whoami
 pnpm run version:bump:eas -- --notes "Feature headline" "Bugfixes and performance improvements"
@@ -244,6 +279,7 @@ pnpm run update:dev -- "message"
 - [ ] `eas whoami` succeeds
 - [ ] changelog.txt reflects git diff since last changelog commit
 - [ ] Changelog base version matches app.config.js
+- [ ] OTA path: checked last update on target branch — consolidate (under 24h) vs bump suffix (24h+)
 - [ ] Changelog (and app version files for store bumps) committed and pushed
 - [ ] Target tier confirmed (default: production OTA when user named none)
 - [ ] Flow matches change classification (OTA vs native)
@@ -274,6 +310,7 @@ eas build:list --limit 3
 | Generic changelog when diff shows a user-visible fix | Name the fix concisely |
 | `version:bump` for OTA-only patches | `version:bump:eas` or edit in place |
 | `version:bump:eas` when app version must change | `version:bump` + native build |
+| `version:bump:eas` when last OTA on target branch was under 24h ago | Edit `changelog.txt` in place (consolidate), then `update:{tier}` |
 | Publishing without checking changelog vs git diff | Step 2 first |
 | Leaving changelog.txt uncommitted after a release | Step 2e commit + push before publish (after for `:bump` post-publish) |
 

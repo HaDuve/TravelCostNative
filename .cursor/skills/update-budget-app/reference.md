@@ -104,8 +104,18 @@ git diff "$LAST_CL"..HEAD -- . ':!changelog.txt' ':!pnpm-lock.yaml'
 | Goal | Method |
 |------|--------|
 | Fix bullets before first publish of current suffix | Edit `__Newest Changes__` in place |
-| New OTA suffix | `pnpm run version:bump:eas -- --notes "feature" "Bugfixes and performance improvements"` then `update:production` |
+| Add changes within 24h of last OTA on same branch | **Consolidate in place** — edit bullets, keep same suffix; `update:{tier}` (no `version:bump:eas`) |
+| New OTA suffix (last publish 24h+ ago) | `pnpm run version:bump:eas -- --notes "feature" "Bugfixes and performance improvements"` then `update:production` |
 | New store version | `pnpm run version:bump -- --notes "headline" "Bugfixes and performance improvements"` |
+
+**24h consolidation check:**
+
+```bash
+eas update:list --branch production --limit 1 --json --non-interactive
+eas update:view <groupId> --json   # createdAt + message version prefix
+```
+
+If `message` matches newest changelog version and `createdAt` is under 24 hours ago, merge new bullets into that block instead of bumping the suffix.
 
 `Bugfixes and performance improvements` must always be its own bullet — never on the same line as a feature. See [changelog-style.md](changelog-style.md).
 

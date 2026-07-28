@@ -63,6 +63,22 @@ Skip the bugfixes line only when the release is **purely** internal with no user
 - "Updated dependencies", "Bumped expo", unless it's the main user-visible story of a store release.
 - Long lists — cap at **1 feature bullet** for OTA patches, **2–3 feature bullets** for store releases, then the bugfixes line.
 
+## Consolidation (same OTA suffix within 24h)
+
+When the last OTA on the target branch was published **under 24 hours ago** and matches the newest changelog version, **do not** bump the suffix. Edit the existing `__Newest Changes__` block: merge new user-visible work into the feature bullet(s), keep `Bugfixes and performance improvements` on its own line, then republish with `update:{tier}`.
+
+```
+# Was (1.3.005k, published 2h ago)
+1.3.005k
+- Improved action buttons across Settings
+- Bugfixes and performance improvements
+
+# After consolidating today's fix — still 1.3.005k
+1.3.005k
+- Improved action buttons across Settings; fixed expense amount rounding in split summary
+- Bugfixes and performance improvements
+```
+
 ## Examples by size
 
 **OTA — tiny fix (no user-visible headline):**

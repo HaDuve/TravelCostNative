@@ -9,9 +9,14 @@ import {
   Pressable,
   ScrollView,
 } from "react-native";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { UserContext } from "../store/user-context";
 import { fetchTripName } from "../util/http";
+import {
+  patchActiveTripNameInList,
+  type TripSummaryListItem,
+} from "../util/trip-summary-cache";
 import LoadingBarOverlay from "../components/UI/LoadingBarOverlay";
 import { Checkbox } from "react-native-paper";
 import { daysBetween, isToday } from "../util/date";
@@ -50,11 +55,7 @@ import { Platform } from "react-native";
 import { safelyParseJSON } from "../util/jsonParse";
 import * as Haptics from "expo-haptics";
 
-export type TripAsObject = {
-  tripid: string;
-  tripname: string;
-  selected: boolean;
-};
+export type TripAsObject = TripSummaryListItem;
 export type TravellerAndCost = {
   traveller: string;
   cost: number;
@@ -100,47 +101,62 @@ const TripSummaryScreen = ({ navigation }) => {
   const subtitleText = `(${tripSummary?.numberOfTrips + " " + titleTextTrips})`;
   const numberOfDaysIsANumber =
     tripSummary?.numberOfDays && !isNaN(tripSummary.numberOfDays);
-  useEffect(() => {
-    async function asyncSetAllTrips() {
-      if (!userCtx.tripHistory) {
-        setIsFetching(false);
-        return;
-      }
-      setIsFetching(true);
-      const allTripsAsObjects: TripAsObject[] = [];
-      const lastUpdate = getMMKVString(
-        MMKV_KEYS.ALL_TRIPS_AS_OBJECT_CACHE_ISO_DATE
-      );
-      // check if lastUpdate is a iso string today
-      const lastUpdateWasToday = lastUpdate && isToday(new Date(lastUpdate));
-      if (lastUpdateWasToday) {
-        const allTrips = getMMKVObject(MMKV_KEYS.ALL_TRIPS_AS_OBJECT);
-        setAllTrips(allTrips);
-        setIsFetching(false);
-        return;
-      }
 
-      for (let i = 0; i < userCtx.tripHistory.length; i++) {
-        const tripid = userCtx.tripHistory[i];
-        const tripName = await fetchTripName(tripid);
-        allTripsAsObjects.push({
-          tripid: tripid,
-          tripname: tripName,
-          selected: true,
-        });
-      }
-      setAllTrips(allTripsAsObjects);
-      setMMKVObject(MMKV_KEYS.ALL_TRIPS_AS_OBJECT, allTripsAsObjects);
-      const allTripsISODate = new Date().toISOString();
-      setMMKVString(
-        MMKV_KEYS.ALL_TRIPS_AS_OBJECT_CACHE_ISO_DATE,
-        allTripsISODate
-      );
+  const loadAllTrips = useCallback(async () => {
+    if (!userCtx.tripHistory) {
       setIsFetching(false);
+      return;
     }
-    asyncSetAllTrips();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userCtx.tripHistory?.length]);
+    setIsFetching(true);
+    const allTripsAsObjects: TripAsObject[] = [];
+    const lastUpdate = getMMKVString(
+      MMKV_KEYS.ALL_TRIPS_AS_OBJECT_CACHE_ISO_DATE
+    );
+    const lastUpdateWasToday = lastUpdate && isToday(new Date(lastUpdate));
+    if (lastUpdateWasToday) {
+      const cachedTrips = getMMKVObject(
+        MMKV_KEYS.ALL_TRIPS_AS_OBJECT
+      ) as TripAsObject[] | null;
+      if (cachedTrips?.length) {
+        setAllTrips(
+          patchActiveTripNameInList(
+            cachedTrips,
+            tripCtx.tripid,
+            tripCtx.tripName
+          )
+        );
+        setIsFetching(false);
+        return;
+      }
+    }
+
+    for (let i = 0; i < userCtx.tripHistory.length; i++) {
+      const tripid = userCtx.tripHistory[i];
+      const tripName =
+        tripid === tripCtx.tripid && tripCtx.tripName?.trim()
+          ? tripCtx.tripName
+          : await fetchTripName(tripid);
+      allTripsAsObjects.push({
+        tripid: tripid,
+        tripname: tripName,
+        selected: true,
+      });
+    }
+    setAllTrips(allTripsAsObjects);
+    setMMKVObject(MMKV_KEYS.ALL_TRIPS_AS_OBJECT, allTripsAsObjects);
+    const allTripsISODate = new Date().toISOString();
+    setMMKVString(
+      MMKV_KEYS.ALL_TRIPS_AS_OBJECT_CACHE_ISO_DATE,
+      allTripsISODate
+    );
+    setIsFetching(false);
+  }, [tripCtx.tripName, tripCtx.tripid, userCtx.tripHistory]);
+
+  useFocusEffect(
+    useCallback(() => {
+      void loadAllTrips();
+    }, [loadAllTrips])
+  );
 
   const summarizeHandler = async () => {
     setIsFetching(true);

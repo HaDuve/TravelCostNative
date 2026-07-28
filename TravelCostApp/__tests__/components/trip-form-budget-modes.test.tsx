@@ -51,7 +51,7 @@ jest.mock("../../store/secure-storage", () => ({
   secureStoreSetItem: jest.fn(async () => {}),
 }));
 
-import { fireEvent, waitFor } from "@testing-library/react-native";
+import { act, fireEvent, waitFor } from "@testing-library/react-native";
 
 import TripForm from "../../components/ManageTrip/TripForm";
 import { i18n } from "../../i18n/i18n";
@@ -153,6 +153,56 @@ describe("TripForm budget form modes", () => {
     expect(screen.getByTestId("trip-form-title").props.children).toBe(
       i18n.t("tripFormTitleEdit")
     );
+  });
+
+  it("keeps typed budget name when fetchTrip completes after user input", async () => {
+    const { fetchTrip } = require("../../util/http");
+    let resolveFetch: (trip: object) => void = () => {};
+    fetchTrip.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveFetch = resolve;
+        })
+    );
+
+    const screen = renderWithAppProviders(
+      <TripForm
+        navigation={navigation}
+        route={{ params: { tripId: "t-implicit", mode: "promote" } }}
+      />,
+      {
+        network: { isConnected: true, strongConnection: true },
+        trip: {
+          tripid: "t-implicit",
+          tripName: "",
+          tripCurrency: "EUR",
+          dailyBudget: "0",
+          totalBudget: "0",
+          isImplicitDefault: true,
+          travellers: [{ uid: "u1", userName: "Alice" }],
+        },
+        expenses: { expenses: [] },
+      }
+    );
+
+    const nameInput = await screen.findByDisplayValue("");
+    fireEvent.changeText(nameInput, "Home budget");
+    expect(screen.getByDisplayValue("Home budget")).toBeTruthy();
+
+    await act(async () => {
+      resolveFetch({
+        tripName: "",
+        tripCurrency: "EUR",
+        dailyBudget: "0",
+        totalBudget: "0",
+        isDynamicDailyBudget: false,
+        isImplicitDefault: true,
+        travellers: [{ uid: "u1", userName: "Alice" }],
+      });
+    });
+
+    await waitFor(() => expect(fetchTrip).toHaveBeenCalled());
+    expect(screen.getByDisplayValue("Home budget")).toBeTruthy();
   });
 
   it("naming an implicit default Active trip without mode clears isImplicitDefault via updateTrip", async () => {

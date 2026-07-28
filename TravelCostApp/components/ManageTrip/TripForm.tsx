@@ -1,5 +1,11 @@
 import React from "react";
-import { useState, useContext, useEffect, useLayoutEffect } from "react";
+import {
+  useState,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from "react";
 import {
   View,
   Text,
@@ -84,6 +90,7 @@ import {
   shouldConfirmCurrencyChange,
   type TripFormMode,
 } from "../../util/trip-form";
+import { updateTripNameInAllTripsCache } from "../../util/trip-summary-cache";
 import { hasDailyBudget, hasTotalBudget } from "../../util/budget-free";
 
 const TripForm = ({ navigation, route }) => {
@@ -138,6 +145,12 @@ const TripForm = ({ navigation, route }) => {
     false
   );
   const [optionalDetailsOpen, setOptionalDetailsOpen] = useState(false);
+  const userHasEditedFormRef = useRef(false);
+  const fetchStartedForTripRef = useRef<string | null>(null);
+
+  const markFormEdited = () => {
+    userHasEditedFormRef.current = true;
+  };
 
   const openDatePickerRange = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -156,6 +169,7 @@ const TripForm = ({ navigation, route }) => {
     const endDate = DateTime.fromJSDate(output.endDate).toJSDate();
     const startDateFormat = getFormattedDate(startDate);
     const endDateFormat = getFormattedDate(endDate);
+    markFormEdited();
     setStartDate(startDateFormat);
     setEndDate(endDateFormat);
   };
@@ -173,8 +187,14 @@ const TripForm = ({ navigation, route }) => {
   const isPromote = formMode === "promote";
   const isAddAnother = formMode === "addAnother";
 
+  useEffect(() => {
+    userHasEditedFormRef.current = false;
+    fetchStartedForTripRef.current = null;
+  }, [editedTripId]);
+
   useLayoutEffect(() => {
     const applyLoadedTrip = (selectedTrip: TripData) => {
+      if (userHasEditedFormRef.current) return;
       const daily =
         selectedTrip.dailyBudget !== undefined &&
         selectedTrip.dailyBudget !== null
@@ -185,17 +205,21 @@ const TripForm = ({ navigation, route }) => {
         selectedTrip.totalBudget !== null
           ? String(selectedTrip.totalBudget)
           : "";
-      inputChangedHandler("tripName", selectedTrip.tripName ?? "");
-      inputChangedHandler("tripCurrency", selectedTrip.tripCurrency);
-      inputChangedHandler("dailyBudget", daily === "0" ? "" : daily);
-      inputChangedHandler(
-        "totalBudget",
-        total === "0" || Number(total) >= MAX_JS_NUMBER ? "" : total
-      );
-      inputChangedHandler(
-        "isDynamicDailyBudget",
-        selectedTrip.isDynamicDailyBudget
-      );
+      setInputs((curInputs) => ({
+        ...curInputs,
+        tripName: { value: selectedTrip.tripName ?? "", isValid: true },
+        tripCurrency: { value: selectedTrip.tripCurrency, isValid: true },
+        dailyBudget: { value: daily === "0" ? "" : daily, isValid: true },
+        totalBudget: {
+          value:
+            total === "0" || Number(total) >= MAX_JS_NUMBER ? "" : total,
+          isValid: true,
+        },
+        isDynamicDailyBudget: {
+          value: selectedTrip.isDynamicDailyBudget,
+          isValid: true,
+        },
+      }));
       setStartDate(selectedTrip.startDate ?? "");
       setEndDate(selectedTrip.endDate ?? "");
       setTravellers(selectedTrip.travellers ?? []);
@@ -212,6 +236,7 @@ const TripForm = ({ navigation, route }) => {
     const fetchTripData = async () => {
       try {
         const selectedTrip = await fetchTrip(editedTripId);
+        if (userHasEditedFormRef.current) return;
         applyLoadedTrip(selectedTrip);
       } catch (error) {
         safeLogError(error);
@@ -242,25 +267,14 @@ const TripForm = ({ navigation, route }) => {
 
     if (isEditing && editedTripId) {
       loadTripDataFromContext();
-      fetchTripData();
+      if (fetchStartedForTripRef.current !== editedTripId) {
+        fetchStartedForTripRef.current = editedTripId;
+        void fetchTripData();
+      }
     } else if (isAddAnother) {
       setOptionalDetailsOpen(false);
     }
-  }, [
-    editedTripId,
-    isEditing,
-    isAddAnother,
-    tripCtx.dailyBudget,
-    tripCtx.totalBudget,
-    tripCtx.tripCurrency,
-    tripCtx.tripName,
-    tripCtx.tripid,
-    tripCtx.isDynamicDailyBudget,
-    tripCtx.startDate,
-    tripCtx.endDate,
-    tripCtx.travellers,
-    tripCtx.isImplicitDefault,
-  ]);
+  }, [editedTripId, isEditing, isAddAnother, tripCtx.tripid]);
 
   const [countryValue, setCountryValue] = useState(
     inputs?.tripCurrency ? inputs.tripCurrency.value : standardCurrency
@@ -271,6 +285,7 @@ const TripForm = ({ navigation, route }) => {
   // let currencyPickerRef = undefined;
 
   function inputChangedHandler(inputIdentifier, enteredValue) {
+    markFormEdited();
     setInputs((curInputs) => {
       return {
         ...curInputs,
@@ -352,6 +367,7 @@ const TripForm = ({ navigation, route }) => {
   async function editingTripData(tripData: TripData, setActive = false) {
     try {
       await updateTrip(editedTripId, tripData);
+      updateTripNameInAllTripsCache(editedTripId, tripData.tripName ?? "");
 
       // Track trip edit
       trackEvent(VexoEvents.TRIP_EDITED, {
@@ -403,6 +419,7 @@ const TripForm = ({ navigation, route }) => {
       tripData.categories = JSON.stringify(currentCategories);
 
     const tripid = await storeTrip(tripData);
+    updateTripNameInAllTripsCache(tripid, tripData.tripName ?? "");
 
     // Track trip creation
     trackEvent(VexoEvents.TRIP_CREATED, {

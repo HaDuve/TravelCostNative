@@ -6,6 +6,7 @@ __Newest Changes:
 - Improved action buttons across Settings, forms, and summaries
 - Improved currency amounts in Overview, My Budgets, and trip history; updated Onboarding and Leave Trip/Budget; redesigned Profile screen and fixed logout after confirm
 - Fixed premium paywall overlay on custom categories; improved premium upsell with feature hints; fixed stale trip names and signup after cache clear
+- Fixed empty Recent Expenses state showing before sync completes
 - Bugfixes and performance improvements
 
 __Other Changes:

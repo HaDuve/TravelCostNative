@@ -126,5 +126,6 @@ export default BlurPremium;
 
 BlurPremium.propTypes = {
   canBack: PropTypes.bool,
+  /** i18n key naming the blocked premium feature — keys listed in __tests__/i18n/paywall-hints.test.ts */
   featureHintKey: PropTypes.string,
 };

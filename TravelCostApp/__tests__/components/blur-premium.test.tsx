@@ -104,6 +104,9 @@ describe("BlurPremium", () => {
 
     expect(screen.getByText(i18n.t("paywallTitle"))).toBeTruthy();
     expect(screen.getByText(i18n.t("back"))).toBeTruthy();
+    expect(
+      screen.queryByText(i18n.t("paywallHintCustomCategories"))
+    ).toBeNull();
   });
 
   it("shows a feature hint under the premium prompt when featureHintKey is set", async () => {

@@ -99,6 +99,207 @@ export function useFittingCurrencyText(
  * space-saving compact form. Full width is measured via a hidden probe
  * so the visible text never feeds back into the fit decision.
  */
+type FittingCurrencyPairDisplay = {
+  spentText: string;
+  budgetText: string;
+};
+
+type SpentBudgetPairLabels = {
+  spentFull: string;
+  spentCompact: string;
+  budgetFull: string;
+  budgetCompact: string;
+};
+
+function formatSpentBudgetPairLabels(
+  spent: number,
+  budget: number,
+  currency: string,
+  locale: string,
+  noBudget = false
+): SpentBudgetPairLabels {
+  const spentFull = formatExpenseWithCurrency(
+    spent,
+    currency,
+    undefined,
+    locale
+  );
+  const spentCompact = formatCompactExpenseWithCurrency(
+    spent,
+    currency,
+    locale
+  );
+  const budgetFull = noBudget
+    ? "∞"
+    : formatExpenseWithCurrency(budget, currency, undefined, locale);
+  const budgetCompact = noBudget
+    ? "∞"
+    : formatCompactExpenseWithCurrency(budget, currency, locale);
+
+  return { spentFull, spentCompact, budgetFull, budgetCompact };
+}
+
+/** Chooses compact for both spent and budget when the full pair overflows the row. */
+export function pickFittingCurrencyPairLabels(
+  labels: SpentBudgetPairLabels,
+  rowWidth: number | null,
+  fullCombinedWidth: number | null
+): FittingCurrencyPairDisplay {
+  const useCompact =
+    rowWidth != null &&
+    fullCombinedWidth != null &&
+    fullCombinedWidth > rowWidth;
+
+  return {
+    spentText: useCompact ? labels.spentCompact : labels.spentFull,
+    budgetText: useCompact ? labels.budgetCompact : labels.budgetFull,
+  };
+}
+
+/** Chooses compact for both spent and budget when the full pair overflows the row. */
+export function pickFittingCurrencyPairDisplay(
+  spent: number,
+  budget: number,
+  currency: string,
+  locale: string,
+  rowWidth: number | null,
+  fullCombinedWidth: number | null,
+  options?: { noBudget?: boolean }
+): FittingCurrencyPairDisplay {
+  const { noBudget = false } = options ?? {};
+  const labels = formatSpentBudgetPairLabels(
+    spent,
+    budget,
+    currency,
+    locale,
+    noBudget
+  );
+  return pickFittingCurrencyPairLabels(labels, rowWidth, fullCombinedWidth);
+}
+
+export function useFittingCurrencyPairText(
+  spent: number,
+  budget: number,
+  currency: string,
+  locale?: string,
+  noBudget = false
+) {
+  const [rowWidth, setRowWidth] = useState<number | null>(null);
+  const [fullCombinedWidth, setFullCombinedWidth] = useState<number | null>(
+    null
+  );
+
+  const resolvedLocale = resolveFittingLocale(locale);
+
+  const labels = useMemo(
+    () =>
+      formatSpentBudgetPairLabels(
+        spent,
+        budget,
+        currency,
+        resolvedLocale,
+        noBudget
+      ),
+    [spent, budget, currency, resolvedLocale, noBudget]
+  );
+
+  const fullProbeText = useMemo(
+    () => `${labels.spentFull}/${labels.budgetFull}`,
+    [labels]
+  );
+
+  const { spentText, budgetText } = pickFittingCurrencyPairLabels(
+    labels,
+    rowWidth,
+    fullCombinedWidth
+  );
+
+  function onRowLayout(event: LayoutChangeEvent) {
+    setRowWidth(event.nativeEvent.layout.width);
+  }
+
+  function onFullProbeTextLayout(
+    event: NativeSyntheticEvent<TextLayoutEventData>
+  ) {
+    const lineWidth = event.nativeEvent.lines[0]?.width;
+    if (lineWidth != null) {
+      setFullCombinedWidth(lineWidth);
+    }
+  }
+
+  return {
+    spentText,
+    budgetText,
+    fullProbeText,
+    onRowLayout,
+    onFullProbeTextLayout,
+  };
+}
+
+type FittingCurrencyAmountPairProps = {
+  spent: number;
+  budget: number;
+  currency: string;
+  locale?: string;
+  textStyle?: StyleProp<TextStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
+  rowStyle?: StyleProp<ViewStyle>;
+  noBudget?: boolean;
+  testID?: string;
+};
+
+/**
+ * Shows full spent/budget formatting when the pair fits the row; otherwise
+ * compact form for both amounts so neither side ellipsizes alone.
+ */
+export function FittingCurrencyAmountPair({
+  spent,
+  budget,
+  currency,
+  locale,
+  textStyle,
+  containerStyle,
+  rowStyle,
+  noBudget = false,
+  testID = "fitting-currency-pair",
+}: FittingCurrencyAmountPairProps) {
+  const {
+    spentText,
+    budgetText,
+    fullProbeText,
+    onRowLayout,
+    onFullProbeTextLayout,
+  } = useFittingCurrencyPairText(spent, budget, currency, locale, noBudget);
+
+  return (
+    <View
+      testID={testID}
+      style={[styles.pairContainer, containerStyle]}
+      onLayout={onRowLayout}
+    >
+      <Text
+        testID={`${testID}-full-probe`}
+        style={[textStyle, styles.fullProbe]}
+        onTextLayout={onFullProbeTextLayout}
+        numberOfLines={1}
+        importantForAccessibility="no-hide-descendants"
+        accessibilityElementsHidden
+      >
+        {fullProbeText}
+      </Text>
+      <View style={[styles.pairRow, rowStyle]}>
+        <Text style={textStyle} numberOfLines={1}>
+          {spentText}
+        </Text>
+        <Text style={textStyle}>/</Text>
+        <Text style={textStyle} numberOfLines={1}>
+          {budgetText}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
 export function FittingCurrencyAmount({
   amount,
   currency,
@@ -138,6 +339,16 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     alignSelf: "stretch",
     overflow: "hidden",
+  },
+  pairContainer: {
+    width: "100%",
+    overflow: "hidden",
+  },
+  pairRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
   },
   fullProbe: {
     position: "absolute",

@@ -21,7 +21,7 @@ import {
 import { fetchTripName, getTravellers } from "../../util/http";
 import type { Traveller } from "../../util/traveler";
 import { normalizeTravellers } from "../../util/normalize-travellers";
-import { FittingCurrencyAmount } from "../UI/FittingCurrencyAmount";
+import { FittingCurrencyAmount, FittingCurrencyAmountPair } from "../UI/FittingCurrencyAmount";
 
 import { i18n } from "../../i18n/i18n";
 
@@ -549,27 +549,15 @@ function TripHistoryItem({ tripid, trips }) {
             </View>
           </View>
           <View style={styles.amountContainer}>
-            <View style={styles.amountRow}>
-              <FittingCurrencyAmount
-                amount={Number(sumOfExpenses) || 0}
-                currency={tripCurrency}
-                locale={i18n.locale}
-                style={amountTextStyle}
-                containerStyle={styles.amountFit}
-              />
-              <Text style={amountTextStyle}>/</Text>
-              {noTotalBudget ? (
-                <Text style={amountTextStyle}>∞</Text>
-              ) : (
-                <FittingCurrencyAmount
-                  amount={Number(totalBudget) || 0}
-                  currency={tripCurrency}
-                  locale={i18n.locale}
-                  style={amountTextStyle}
-                  containerStyle={styles.amountFit}
-                />
-              )}
-            </View>
+            <FittingCurrencyAmountPair
+              spent={Number(sumOfExpenses) || 0}
+              budget={Number(totalBudget) || 0}
+              currency={tripCurrency}
+              locale={i18n.locale}
+              textStyle={amountTextStyle}
+              rowStyle={styles.amountRow}
+              noBudget={noTotalBudget}
+            />
             <Progress.Bar
               color={
                 isOverBudget
@@ -702,10 +690,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-  },
-  amountFit: {
-    flexShrink: 1,
-    maxWidth: "45%",
   },
   amount: {
     fontSize: dynamicScale(12, false, 0.5),

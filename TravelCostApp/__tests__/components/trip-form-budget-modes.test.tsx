@@ -155,6 +155,54 @@ describe("TripForm budget form modes", () => {
     );
   });
 
+  it("keeps typed budget name when fetchTrip completes after user input", async () => {
+    const { fetchTrip } = require("../../util/http");
+    let resolveFetch: (trip: object) => void = () => {};
+    fetchTrip.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveFetch = resolve;
+        })
+    );
+
+    const screen = renderWithAppProviders(
+      <TripForm
+        navigation={navigation}
+        route={{ params: { tripId: "t-implicit", mode: "promote" } }}
+      />,
+      {
+        network: { isConnected: true, strongConnection: true },
+        trip: {
+          tripid: "t-implicit",
+          tripName: "",
+          tripCurrency: "EUR",
+          dailyBudget: "0",
+          totalBudget: "0",
+          isImplicitDefault: true,
+          travellers: [{ uid: "u1", userName: "Alice" }],
+        },
+        expenses: { expenses: [] },
+      }
+    );
+
+    const nameInput = await screen.findByDisplayValue("");
+    fireEvent.changeText(nameInput, "Home budget");
+    expect(screen.getByDisplayValue("Home budget")).toBeTruthy();
+
+    resolveFetch({
+      tripName: "",
+      tripCurrency: "EUR",
+      dailyBudget: "0",
+      totalBudget: "0",
+      isDynamicDailyBudget: false,
+      isImplicitDefault: true,
+      travellers: [{ uid: "u1", userName: "Alice" }],
+    });
+
+    await waitFor(() => expect(fetchTrip).toHaveBeenCalled());
+    expect(screen.getByDisplayValue("Home budget")).toBeTruthy();
+  });
+
   it("naming an implicit default Active trip without mode clears isImplicitDefault via updateTrip", async () => {
     const screen = renderWithAppProviders(
       <TripForm

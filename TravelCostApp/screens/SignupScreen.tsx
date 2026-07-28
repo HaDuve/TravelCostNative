@@ -75,6 +75,8 @@ function SignupScreen() {
       setIsAuthenticating(false);
       return;
     }
+    // Drop stale local session before storing new auth credentials.
+    await asyncStoreSafeClear();
     try {
       // NECESSARY TRYCATCH
       ({ token, uid } = await createUser(email, password));
@@ -93,7 +95,6 @@ function SignupScreen() {
     }
     try {
       // UNESSENTIAL TRYCATCH
-      await asyncStoreSafeClear();
       setAxiosAccessToken(token);
       await userCtx.setUserName(name);
       userCtx.setTripHistory([]);

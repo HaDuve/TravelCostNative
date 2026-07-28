@@ -8,6 +8,17 @@ jest.mock("expo-haptics", () => ({
   ImpactFeedbackStyle: { Light: "Light" },
 }));
 
+jest.mock("@react-navigation/native", () => {
+  const React = require("react");
+  const actual = jest.requireActual("@react-navigation/native");
+  return {
+    ...actual,
+    useFocusEffect: (callback: () => void | (() => void)) => {
+      React.useEffect(() => callback(), [callback]);
+    },
+  };
+});
+
 jest.mock("../../store/mmkv", () => ({
   getMMKVString: jest.fn(() => new Date().toISOString()),
   getMMKVObject: jest.fn(() => [
@@ -137,6 +148,30 @@ describe("TripSummaryScreen", () => {
     expect(pressableTestIds.indexOf("trip-summary-charts")).toBeLessThan(
       pressableTestIds.indexOf("trip-summary-back")
     );
+  });
+
+  it("shows the Active trip name from context when the daily cache is stale", async () => {
+    const navigation = { navigate: jest.fn(), pop: jest.fn(), goBack: jest.fn() };
+
+    const screen = renderWithAppProviders(
+      <TripSummaryScreen navigation={navigation as any} />,
+      {
+        trip: {
+          tripid: "t1",
+          tripName: "Home budget",
+          tripCurrency: "EUR",
+        },
+        user: {
+          userName: "Alice",
+          freshlyCreated: false,
+          tripHistory: ["t1"],
+        },
+      }
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Home budget")).toBeTruthy();
+    });
   });
 
   it("shows a hint on the gradient summary row", async () => {

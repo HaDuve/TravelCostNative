@@ -1,6 +1,7 @@
 import * as React from "react";
 import { render, type RenderOptions } from "@testing-library/react-native";
 import { NavigationContainer } from "@react-navigation/native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { AuthContext } from "../../store/auth-context";
 import { ExpensesContext } from "../../store/expenses-context";
@@ -92,21 +93,28 @@ export function AppProviders({
   const auth = { uid: "u1", ...overrides.auth };
 
   const tree = (
-    <AuthContext.Provider value={auth as any}>
-      <TripContext.Provider value={trip as any}>
-        <ExpensesContext.Provider value={expenses as any}>
-          <UserContext.Provider value={user as any}>
-            <NetworkContext.Provider value={network as any}>
-              <SettingsContext.Provider value={settings as any}>
-                <OrientationContext.Provider value={orientation as any}>
-                  {children}
-                </OrientationContext.Provider>
-              </SettingsContext.Provider>
-            </NetworkContext.Provider>
-          </UserContext.Provider>
-        </ExpensesContext.Provider>
-      </TripContext.Provider>
-    </AuthContext.Provider>
+    <SafeAreaProvider
+      initialMetrics={{
+        frame: { x: 0, y: 0, width: 390, height: 844 },
+        insets: { top: 0, left: 0, right: 0, bottom: 0 },
+      }}
+    >
+      <AuthContext.Provider value={auth as any}>
+        <TripContext.Provider value={trip as any}>
+          <ExpensesContext.Provider value={expenses as any}>
+            <UserContext.Provider value={user as any}>
+              <NetworkContext.Provider value={network as any}>
+                <SettingsContext.Provider value={settings as any}>
+                  <OrientationContext.Provider value={orientation as any}>
+                    {children}
+                  </OrientationContext.Provider>
+                </SettingsContext.Provider>
+              </NetworkContext.Provider>
+            </UserContext.Provider>
+          </ExpensesContext.Provider>
+        </TripContext.Provider>
+      </AuthContext.Provider>
+    </SafeAreaProvider>
   );
 
   if (overrides.wrapNavigation === false) {

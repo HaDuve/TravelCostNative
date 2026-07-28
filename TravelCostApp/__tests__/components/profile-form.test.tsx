@@ -25,6 +25,12 @@ import { renderWithAppProviders } from "../fixtures/app-providers";
 import { asyncStoreSafeClear } from "../../store/async-storage";
 
 describe("Profile", () => {
+  let alertSpy: jest.SpyInstance;
+
+  afterEach(() => {
+    alertSpy?.mockRestore();
+  });
+
   it("shows the signed-in User name", () => {
     const navigation = { navigate: jest.fn() };
     const screen = renderWithAppProviders(
@@ -57,7 +63,7 @@ describe("Profile", () => {
     const setTripHistory = jest.fn();
     const setUserName = jest.fn(async () => {});
     const setIsFetchingLogout = jest.fn();
-    const alertSpy = jest
+    alertSpy = jest
       .spyOn(Alert, "alert")
       .mockImplementation((_title, _message, buttons) => {
         const yesButton = buttons?.find(
@@ -99,7 +105,40 @@ describe("Profile", () => {
     expect(asyncStoreSafeClear).toHaveBeenCalled();
     expect(setIsFetchingLogout).toHaveBeenCalledWith(true);
     expect(setIsFetchingLogout).toHaveBeenCalledWith(false);
+  });
 
-    alertSpy.mockRestore();
+  it("does not sign the User out when they dismiss logout", () => {
+    const logout = jest.fn();
+    alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {});
+
+    const navigation = { navigate: jest.fn() };
+    const screen = renderWithAppProviders(
+      <ProfileForm
+        navigation={navigation as any}
+        setIsFetchingLogout={jest.fn()}
+      />,
+      {
+        wrapNavigation: false,
+        auth: { uid: "u1", logout },
+        trip: { tripid: "t1", setCurrentTrip: jest.fn(async () => {}) },
+        expenses: { setExpenses: jest.fn() },
+        user: {
+          userName: "Alice",
+          hasNewChanges: false,
+          setHasNewChanges: jest.fn(),
+          setUserName: jest.fn(async () => {}),
+          setTripHistory: jest.fn(),
+        },
+      }
+    );
+
+    fireEvent.press(screen.getByTestId("icon-exit-outline"));
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      i18n.t("sure"),
+      i18n.t("signOutAlertMess"),
+      expect.any(Array)
+    );
+    expect(logout).not.toHaveBeenCalled();
   });
 });

@@ -51,7 +51,7 @@ jest.mock("../../store/secure-storage", () => ({
   secureStoreSetItem: jest.fn(async () => {}),
 }));
 
-import { fireEvent, waitFor } from "@testing-library/react-native";
+import { act, fireEvent, waitFor } from "@testing-library/react-native";
 
 import TripForm from "../../components/ManageTrip/TripForm";
 import { i18n } from "../../i18n/i18n";
@@ -189,14 +189,16 @@ describe("TripForm budget form modes", () => {
     fireEvent.changeText(nameInput, "Home budget");
     expect(screen.getByDisplayValue("Home budget")).toBeTruthy();
 
-    resolveFetch({
-      tripName: "",
-      tripCurrency: "EUR",
-      dailyBudget: "0",
-      totalBudget: "0",
-      isDynamicDailyBudget: false,
-      isImplicitDefault: true,
-      travellers: [{ uid: "u1", userName: "Alice" }],
+    await act(async () => {
+      resolveFetch({
+        tripName: "",
+        tripCurrency: "EUR",
+        dailyBudget: "0",
+        totalBudget: "0",
+        isDynamicDailyBudget: false,
+        isImplicitDefault: true,
+        travellers: [{ uid: "u1", userName: "Alice" }],
+      });
     });
 
     await waitFor(() => expect(fetchTrip).toHaveBeenCalled());

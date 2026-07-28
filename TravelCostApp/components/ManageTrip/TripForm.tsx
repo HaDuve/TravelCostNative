@@ -148,6 +148,10 @@ const TripForm = ({ navigation, route }) => {
   const userHasEditedFormRef = useRef(false);
   const fetchStartedForTripRef = useRef<string | null>(null);
 
+  const markFormEdited = () => {
+    userHasEditedFormRef.current = true;
+  };
+
   const openDatePickerRange = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowDatePickerRange(true);
@@ -165,6 +169,7 @@ const TripForm = ({ navigation, route }) => {
     const endDate = DateTime.fromJSDate(output.endDate).toJSDate();
     const startDateFormat = getFormattedDate(startDate);
     const endDateFormat = getFormattedDate(endDate);
+    markFormEdited();
     setStartDate(startDateFormat);
     setEndDate(endDateFormat);
   };
@@ -280,7 +285,7 @@ const TripForm = ({ navigation, route }) => {
   // let currencyPickerRef = undefined;
 
   function inputChangedHandler(inputIdentifier, enteredValue) {
-    userHasEditedFormRef.current = true;
+    markFormEdited();
     setInputs((curInputs) => {
       return {
         ...curInputs,

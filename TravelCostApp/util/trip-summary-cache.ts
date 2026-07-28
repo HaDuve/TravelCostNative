@@ -1,21 +1,10 @@
-import {
-  deleteMMKVObject,
-  getMMKVObject,
-  MMKV_KEYS,
-  setMMKVObject,
-} from "../store/mmkv";
+import { getMMKVObject, MMKV_KEYS, setMMKVObject } from "../store/mmkv";
 
 export type TripSummaryListItem = {
   tripid: string;
   tripname: string;
   selected: boolean;
 };
-
-/** Drop cached trip names so Trip Summary refetches from the server. */
-export function invalidateAllTripsAsObjectCache() {
-  deleteMMKVObject(MMKV_KEYS.ALL_TRIPS_AS_OBJECT);
-  deleteMMKVObject(MMKV_KEYS.ALL_TRIPS_AS_OBJECT_CACHE_ISO_DATE);
-}
 
 /** Keep today's cache in sync after a rename without forcing a full refetch. */
 export function updateTripNameInAllTripsCache(tripid: string, tripname: string) {

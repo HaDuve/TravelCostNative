@@ -1,11 +1,9 @@
 import {
-  invalidateAllTripsAsObjectCache,
   patchActiveTripNameInList,
   updateTripNameInAllTripsCache,
 } from "../../util/trip-summary-cache";
 
 jest.mock("../../store/mmkv", () => ({
-  deleteMMKVObject: jest.fn(),
   getMMKVObject: jest.fn(),
   setMMKVObject: jest.fn(),
   MMKV_KEYS: {
@@ -14,27 +12,11 @@ jest.mock("../../store/mmkv", () => ({
   },
 }));
 
-import {
-  deleteMMKVObject,
-  getMMKVObject,
-  setMMKVObject,
-  MMKV_KEYS,
-} from "../../store/mmkv";
+import { getMMKVObject, setMMKVObject, MMKV_KEYS } from "../../store/mmkv";
 
 describe("trip summary cache", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-  });
-
-  it("invalidates cached trip names", () => {
-    invalidateAllTripsAsObjectCache();
-
-    expect(deleteMMKVObject).toHaveBeenCalledWith(
-      MMKV_KEYS.ALL_TRIPS_AS_OBJECT
-    );
-    expect(deleteMMKVObject).toHaveBeenCalledWith(
-      MMKV_KEYS.ALL_TRIPS_AS_OBJECT_CACHE_ISO_DATE
-    );
   });
 
   it("updates a renamed trip inside today's cache", () => {
